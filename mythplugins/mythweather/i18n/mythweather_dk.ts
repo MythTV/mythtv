@@ -3,533 +3,533 @@
     <name>String::DayOfWeek</name>
     <message>
         <source>MON</source>
-        <translation type="unfinished">Man</translation>
+        <translation>Man</translation>
     </message>
     <message>
         <source>TUE</source>
-        <translation type="unfinished">Tir</translation>
+        <translation>Tir</translation>
     </message>
     <message>
         <source>WED</source>
-        <translation type="unfinished">Ons</translation>
+        <translation>Ons</translation>
     </message>
     <message>
         <source>THU</source>
-        <translation type="unfinished">Tor</translation>
+        <translation>Tor</translation>
     </message>
     <message>
         <source>FRI</source>
-        <translation type="unfinished">Fre</translation>
+        <translation>Fre</translation>
     </message>
     <message>
         <source>SAT</source>
-        <translation type="unfinished">Lør</translation>
+        <translation>Lør</translation>
     </message>
     <message>
         <source>SUN</source>
-        <translation type="unfinished">Søn</translation>
+        <translation>Søn</translation>
     </message>
 </context>
 <context>
     <name>String::WeatherType</name>
     <message>
         <source>Cloudy</source>
-        <translation type="unfinished"></translation>
+        <translation>Skyet</translation>
     </message>
     <message>
         <source>Mostly Cloudy</source>
-        <translation type="unfinished"></translation>
+        <translation>Mest skyet</translation>
     </message>
     <message>
         <source>Partly Cloudy</source>
-        <translation type="unfinished"></translation>
+        <translation>Delvist skyet</translation>
     </message>
     <message>
         <source>Light Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Let regn</translation>
     </message>
     <message>
         <source>Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Byger</translation>
     </message>
     <message>
         <source>Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn</translation>
     </message>
     <message>
         <source>AM Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn om formiddagen</translation>
     </message>
     <message>
         <source>Fog</source>
-        <translation type="unfinished"></translation>
+        <translation>Tåge</translation>
     </message>
     <message>
         <source>Few Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkelte byger</translation>
     </message>
     <message>
         <source>Mostly Sunny</source>
-        <translation type="unfinished"></translation>
+        <translation>Mest solskin</translation>
     </message>
     <message>
         <source>Sunny</source>
-        <translation type="unfinished"></translation>
+        <translation>Solskin</translation>
     </message>
     <message>
         <source>Scattered Flurries</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkelte snebyger</translation>
     </message>
     <message>
         <source>AM Clouds/PM Sun</source>
-        <translation type="unfinished"></translation>
+        <translation>Skyet om formiddagen, sol om eftermiddagen</translation>
     </message>
     <message>
         <source>Isolated T-Storms</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkelte tordenbyger</translation>
     </message>
     <message>
         <source>Scattered Thunderstorms</source>
-        <translation type="unfinished"></translation>
+        <translation>Nogle tordenbyger</translation>
     </message>
     <message>
         <source>PM Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn om eftermiddagen</translation>
     </message>
     <message>
         <source>PM Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn og blæst om eftermiddagen</translation>
     </message>
     <message>
         <source>Rain/Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn- eller snebyger</translation>
     </message>
     <message>
         <source>Few Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkelte snebyger</translation>
     </message>
     <message>
         <source>Cloudy/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Skyet og blæsende</translation>
     </message>
     <message>
         <source>Flurries/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Vindstød</translation>
     </message>
     <message>
         <source>Mostly Cloudy/Windy</source>
-        <translation type="unfinished"></translation>
+        <translation>Mest skyet og blæsende</translation>
     </message>
     <message>
         <source>Rain/Thunder</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn og torden</translation>
     </message>
     <message>
         <source>Partly Cloudy/Windy</source>
-        <translation type="unfinished"></translation>
+        <translation>Delvist skyet og blæsende</translation>
     </message>
     <message>
         <source>AM Rain/Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn- eller snebyger om formiddagen</translation>
     </message>
     <message>
         <source>Light Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Let regn og blæsende</translation>
     </message>
     <message>
         <source>Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Byger og blæsende</translation>
     </message>
     <message>
         <source>Mostly Sunny/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Mest sol og blæsende</translation>
     </message>
     <message>
         <source>Flurries</source>
-        <translation type="unfinished"></translation>
+        <translation>Byger</translation>
     </message>
     <message>
         <source>Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn og blæsende</translation>
     </message>
     <message>
         <source>Sct Flurries/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkelte byger og blæsende</translation>
     </message>
     <message>
         <source>Sct Strong Storms</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkelte kraftige storme</translation>
     </message>
     <message>
         <source>PM T-Storms</source>
-        <translation type="unfinished"></translation>
+        <translation>Tordenbyger om eftermiddagen</translation>
     </message>
     <message>
         <source>Thunderstorms</source>
-        <translation type="unfinished"></translation>
+        <translation>Tordenbyger</translation>
     </message>
     <message>
         <source>Sunny/Windy</source>
-        <translation type="unfinished"></translation>
+        <translation>Sol og blæsende</translation>
     </message>
     <message>
         <source>AM Thunderstorms</source>
-        <translation type="unfinished"></translation>
+        <translation>Tordenbyger om formiddagen</translation>
     </message>
     <message>
         <source>AM Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn om formiddagen</translation>
     </message>
     <message>
         <source>Iso T-Storms/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkelte tordenbyger og blæsende</translation>
     </message>
     <message>
         <source>Rain/Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn eller sne</translation>
     </message>
     <message>
         <source>Sct T-Storms/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkelte tordenbyger og blæsende</translation>
     </message>
     <message>
         <source>AM Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Byger og blæsende om formiddagen</translation>
     </message>
     <message>
         <source>Sct Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkelte snebyger</translation>
     </message>
     <message>
         <source>Snow to Ice/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Sne/isslag og blæsende</translation>
     </message>
     <message>
         <source>Snow to Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Sne eller regn</translation>
     </message>
     <message>
         <source>AM Light Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Let regn om formiddagen</translation>
     </message>
     <message>
         <source>PM Light Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Let regn om eftermiddagen</translation>
     </message>
     <message>
         <source>PM Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn om eftermiddagen</translation>
     </message>
     <message>
         <source>Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Snebyger</translation>
     </message>
     <message>
         <source>Rain to Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn eller sne</translation>
     </message>
     <message>
         <source>PM Rain/Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn eller sne om eftermiddagen</translation>
     </message>
     <message>
         <source>Few Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkelte byger og blæsende</translation>
     </message>
     <message>
         <source>Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Sne og blæsende</translation>
     </message>
     <message>
         <source>PM Rain/Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn- og snebyger om eftermiddagen</translation>
     </message>
     <message>
         <source>PM Rain/Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn, sne og blæsende om eftermiddagen</translation>
     </message>
     <message>
         <source>Rain/Snow Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn- eller snebyger og blæsende</translation>
     </message>
     <message>
         <source>Rain/Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn eller sne og blæsende</translation>
     </message>
     <message>
         <source>Light Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Let sne</translation>
     </message>
     <message>
         <source>PM Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Sne om eftermiddagen</translation>
     </message>
     <message>
         <source>Few Snow Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkelte snebyger og blæsende</translation>
     </message>
     <message>
         <source>Light Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Let sne og blæsende</translation>
     </message>
     <message>
         <source>Wintry Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>Blandet vintervejr</translation>
     </message>
     <message>
         <source>AM Wintry Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>Blandet vintervejr om formiddagen</translation>
     </message>
     <message>
         <source>Hvy Rain/Freezing Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Kraftig regn/isslag</translation>
     </message>
     <message>
         <source>AM Light Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Let sne om formiddagen</translation>
     </message>
     <message>
         <source>Rain/Freezing Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn eller isslag</translation>
     </message>
     <message>
         <source>T-Storms/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Tordenbyger og blæsende</translation>
     </message>
     <message>
         <source>Sprinkles</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkelte dryp</translation>
     </message>
     <message>
         <source>AM Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Snebyger om formiddagen</translation>
     </message>
     <message>
         <source>AM Clouds/PM Sun/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Skyet om formiddagen, sol og blæsende om eftermiddagen</translation>
     </message>
     <message>
         <source>AM Rain/Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn, sne og blæsende om formiddagen</translation>
     </message>
     <message>
         <source>Rain to Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn eller sne og blæsende</translation>
     </message>
     <message>
         <source>Snow to Wintry Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>Sne og blandet vintervejr</translation>
     </message>
     <message>
         <source>PM Snow Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Snebyger og blæsende om eftermiddagen</translation>
     </message>
     <message>
         <source>Snow and Ice to Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Sne/isslag eller regn</translation>
     </message>
     <message>
         <source>Heavy Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Kraftig regn</translation>
     </message>
     <message>
         <source>AM Rain/Ice</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn eller isslag om formiddagen</translation>
     </message>
     <message>
         <source>AM Snow Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Snebyger og blæsende om formiddagen</translation>
     </message>
     <message>
         <source>AM Light Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Let sne og blæsende om formiddagen</translation>
     </message>
     <message>
         <source>PM Light Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Let regn og blæsende om eftermiddagen</translation>
     </message>
     <message>
         <source>AM Light Wintry Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>Let blandet vintervejr om formiddagen</translation>
     </message>
     <message>
         <source>PM Light Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Let sne og blæsende om eftermiddagen</translation>
     </message>
     <message>
         <source>Heavy Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Kraftig regn og blæsende</translation>
     </message>
     <message>
         <source>PM Snow Shower</source>
-        <translation type="unfinished"></translation>
+        <translation>Snebyger om eftermiddagen</translation>
     </message>
     <message>
         <source>Snow to Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Sne eller regn og blæsende</translation>
     </message>
     <message>
         <source>PM Light Rain/Ice</source>
-        <translation type="unfinished"></translation>
+        <translation>Let regn/isslag om eftermiddagen</translation>
     </message>
     <message>
         <source>AM Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Sne om formiddagen</translation>
     </message>
     <message>
         <source>Snow to Ice</source>
-        <translation type="unfinished"></translation>
+        <translation>Sne eller isslag</translation>
     </message>
     <message>
         <source>Wintry Mix/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Blandet vintervejr og blæsende</translation>
     </message>
     <message>
         <source>PM Light Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Let sne om eftermiddagen</translation>
     </message>
     <message>
         <source>AM Drizzle</source>
-        <translation type="unfinished"></translation>
+        <translation>Silende regn om formiddagen</translation>
     </message>
     <message>
         <source>Strong Storms/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Kraftige storme og blæst</translation>
     </message>
     <message>
         <source>PM Drizzle</source>
-        <translation type="unfinished"></translation>
+        <translation>Silende regn om eftermiddagen</translation>
     </message>
     <message>
         <source>Drizzle</source>
-        <translation type="unfinished"></translation>
+        <translation>Silende regnvejr</translation>
     </message>
     <message>
         <source>AM Light Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Let regn og blæsende om eftermiddagen</translation>
     </message>
     <message>
         <source>AM Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn og blæst om formiddagen</translation>
     </message>
     <message>
         <source>Wintry Mix to Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Blandet vintervejr eller sne</translation>
     </message>
     <message>
         <source>Snow Showers/Windy</source>
-        <translation type="unfinished"></translation>
+        <translation>Snebyger og blæsende</translation>
     </message>
     <message>
         <source>Light Rain Shower</source>
-        <translation type="unfinished"></translation>
+        <translation>Lette regnbyger</translation>
     </message>
     <message>
         <source>Light Rain with Thunder</source>
-        <translation type="unfinished"></translation>
+        <translation>Let regn med torden</translation>
     </message>
     <message>
         <source>Light Drizzle</source>
-        <translation type="unfinished"></translation>
+        <translation>Let silende regn</translation>
     </message>
     <message>
         <source>Mist</source>
-        <translation type="unfinished"></translation>
+        <translation>Diset</translation>
     </message>
     <message>
         <source>Smoke</source>
-        <translation type="unfinished"></translation>
+        <translation>Røg</translation>
     </message>
     <message>
         <source>Haze</source>
-        <translation type="unfinished"></translation>
+        <translation>Diset</translation>
     </message>
     <message>
         <source>Light Snow Shower</source>
-        <translation type="unfinished"></translation>
+        <translation>Lette snebyger</translation>
     </message>
     <message>
         <source>Light Snow Shower/ Windy</source>
-        <translation type="unfinished"></translation>
+        <translation>Lette snebyger og blæsende</translation>
     </message>
     <message>
         <source>Clear</source>
-        <translation type="unfinished"></translation>
+        <translation>Klart</translation>
     </message>
     <message>
         <source>A Few Clouds</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkelte skyer</translation>
     </message>
     <message>
         <source>Fair</source>
-        <translation type="unfinished"></translation>
+        <translation>Pænt</translation>
     </message>
 </context>
 <context>
     <name>String::WindDirection</name>
     <message>
         <source>N</source>
-        <translation type="unfinished"></translation>
+        <translation>N</translation>
     </message>
     <message>
         <source>NNE</source>
-        <translation type="unfinished"></translation>
+        <translation>NNØ</translation>
     </message>
     <message>
         <source>NE</source>
-        <translation type="unfinished"></translation>
+        <translation>NØ</translation>
     </message>
     <message>
         <source>E</source>
-        <translation type="unfinished"></translation>
+        <translation>Ø</translation>
     </message>
     <message>
         <source>SE</source>
-        <translation type="unfinished"></translation>
+        <translation>SØ</translation>
     </message>
     <message>
         <source>SSE</source>
-        <translation type="unfinished"></translation>
+        <translation>SSØ</translation>
     </message>
     <message>
         <source>S</source>
-        <translation type="unfinished"></translation>
+        <translation>S</translation>
     </message>
     <message>
         <source>SSW</source>
-        <translation type="unfinished"></translation>
+        <translation>SSV</translation>
     </message>
     <message>
         <source>SW</source>
-        <translation type="unfinished"></translation>
+        <translation>SV</translation>
     </message>
     <message>
         <source>W</source>
-        <translation type="unfinished"></translation>
+        <translation>V</translation>
     </message>
     <message>
         <source>NW</source>
-        <translation type="unfinished"></translation>
+        <translation>NV</translation>
     </message>
     <message>
         <source>NNW</source>
-        <translation type="unfinished"></translation>
+        <translation>NNV</translation>
     </message>
     <message>
         <source>ENE</source>
-        <translation type="unfinished"></translation>
+        <translation>ØNØ</translation>
     </message>
     <message>
         <source>ESE</source>
-        <translation type="unfinished"></translation>
+        <translation>ØSØ</translation>
     </message>
     <message>
         <source>WSW</source>
-        <translation type="unfinished"></translation>
+        <translation>VSV</translation>
     </message>
     <message>
         <source>WNW</source>
-        <translation type="unfinished"></translation>
+        <translation>VNV</translation>
     </message>
 </context>
 <context>
@@ -540,7 +540,7 @@
     </message>
     <message>
         <source>[ retrieving weather data ... ]</source>
-        <translation>[ henter vejr data ... ]</translation>
+        <translation>[ henter vejr-data ... ]</translation>
     </message>
     <message>
         <source>current conditions</source>
@@ -564,11 +564,11 @@
     </message>
     <message>
         <source>Wind Chill</source>
-        <translation>Vindafkølet luft</translation>
+        <translation>Lufttemperatur</translation>
     </message>
     <message>
         <source>UV Index</source>
-        <translation>UV Stråling</translation>
+        <translation>UV-index</translation>
     </message>
     <message>
         <source>extended forecast</source>
@@ -576,11 +576,11 @@
     </message>
     <message>
         <source>LO</source>
-        <translation>MIN</translation>
+        <translation>Min</translation>
     </message>
     <message>
         <source>HI</source>
-        <translation>MAX</translation>
+        <translation>Max</translation>
     </message>
     <message>
         <source>today&apos;s forecast</source>
@@ -588,7 +588,7 @@
     </message>
     <message>
         <source>tomorrow&apos;s outlook</source>
-        <translation>Smugkig på i morgen</translation>
+        <translation>Vejret i morgen</translation>
     </message>
     <message>
         <source>Forecast for</source>
@@ -604,46 +604,46 @@
     </message>
     <message>
         <source>Enter Zip Code</source>
-        <translation>Indtast postkode</translation>
+        <translation>Indtast postnr</translation>
     </message>
     <message>
         <source>weather setup</source>
-        <translation>Vejr opsætning&quot;</translation>
+        <translation>Vejr-opsætning</translation>
     </message>
     <message>
         <source>To save, press &apos;i&apos; - to cancel, hit escape</source>
-        <translation>Gem med &apos;i&apos; - afbryd med escape</translation>
+        <translation>Gem med &apos;i&apos;. Afbryd med &apos;Esc&apos;</translation>
     </message>
     <message>
         <source>RAIN</source>
-        <translation type="unfinished"></translation>
+        <translation>Regn</translation>
     </message>
     <message>
         <source>MIX/ICE</source>
-        <translation type="unfinished"></translation>
+        <translation>Blandet/Isslag</translation>
     </message>
     <message>
         <source>SNOW</source>
-        <translation type="unfinished"></translation>
+        <translation>Sne</translation>
     </message>
     <message>
         <source>LIGHT</source>
-        <translation type="unfinished"></translation>
+        <translation>Let</translation>
     </message>
     <message>
         <source>HEAVY</source>
-        <translation type="unfinished"></translation>
+        <translation>Kraftig</translation>
     </message>
 </context>
 <context>
     <name>Weather</name>
     <message>
         <source> is invalid)</source>
-        <translation>er ugyldig)</translation>
+        <translation> er ugyldig)</translation>
     </message>
     <message>
         <source>   No Location Set, Please read the README</source>
-        <translation>   Ingen lokation sat. Læs venligst README filen</translation>
+        <translation>   Ingen lokation sat. Læs venligst README-filen</translation>
     </message>
     <message>
         <source>Configuring MythWeather...</source>
@@ -651,11 +651,11 @@
     </message>
     <message>
         <source>Use the right arrow key to select unit conversion...</source>
-        <translation>Brug pil til højre til at vælge enheds konvertering med...</translation>
+        <translation>Brug pil til højre til at vælge enheds-konvertering...</translation>
     </message>
     <message>
         <source>Weather Units</source>
-        <translation>Vejr enheder</translation>
+        <translation>Vejr-enheder</translation>
     </message>
     <message>
         <source>Location</source>
@@ -663,7 +663,7 @@
     </message>
     <message>
         <source>Aggressiveness</source>
-        <translation>Aggresivitet</translation>
+        <translation>Aggressivitet</translation>
     </message>
     <message>
         <source>Configuration Saved...</source>
@@ -671,15 +671,15 @@
     </message>
     <message>
         <source>Retrieving weather data...</source>
-        <translation>Henter vejr oplysninger...</translation>
+        <translation>Henter vejr-data...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select your location...</source>
-        <translation>Brug pil til højre til at vælge din lokation...</translation>
+        <translation>Brug pil til højre for at vælge din lokation...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select the aggressiveness level...</source>
-        <translation>Brug pil til højre til at vælge aggresivitets niveau...</translation>
+        <translation>Brug pil til højre til at vælge aggressivitets-niveau...</translation>
     </message>
     <message>
         <source> 1  High Speed Connection</source>
@@ -695,11 +695,11 @@
     </message>
     <message>
         <source>Obtaining initial weather data...</source>
-        <translation>Henter indledende vejr oplysninger...</translation>
+        <translation>Henter grundlæggende vejr-data...</translation>
     </message>
     <message>
         <source>Updating weather data...</source>
-        <translation>Opdaterer vejr data...</translation>
+        <translation>Opdaterer vejr-data...</translation>
     </message>
     <message>
         <source>Calm</source>
@@ -707,7 +707,7 @@
     </message>
     <message>
         <source> at </source>
-        <translation> ved </translation>
+        <translation> med </translation>
     </message>
     <message>
         <source>Unlimited</source>
@@ -731,15 +731,15 @@
     </message>
     <message>
         <source>Today a high of </source>
-        <translation>Dagens højeste temperatur </translation>
+        <translation>Dagens højeste temperatur er på ca. </translation>
     </message>
     <message>
         <source> and a low of </source>
-        <translation> og den laveste bliver ca. </translation>
+        <translation> grader, og den laveste er ca. </translation>
     </message>
     <message>
         <source>. Currently there is a humidity of </source>
-        <translation>. Lige nu er der er en luftfugtighed på </translation>
+        <translation> grader. Lige nu er luftfugtigheden </translation>
     </message>
     <message>
         <source>% and the winds are</source>
@@ -747,11 +747,11 @@
     </message>
     <message>
         <source> calm.</source>
-        <translation>roligt.</translation>
+        <translation> roligt.</translation>
     </message>
     <message>
         <source> coming in at </source>
-        <translation> kommer ind med </translation>
+        <translation> med </translation>
     </message>
     <message>
         <source> mph from the </source>
@@ -759,19 +759,19 @@
     </message>
     <message>
         <source> Km/h from the </source>
-        <translation> Km/t fra </translation>
+        <translation> km/t fra </translation>
     </message>
     <message>
         <source> Visibility will be unlimited for today.</source>
-        <translation> Sightbarheden vil være ubegrænset idag.</translation>
+        <translation> Sightbarheden vil være ubegrænset i dag.</translation>
     </message>
     <message>
         <source> Visibility conditions are unknown.</source>
-        <translation> Sigtbarhedstilstanden er ukendt.</translation>
+        <translation> Sigtbarheden er ukendt.</translation>
     </message>
     <message>
         <source> There will be a visibility of </source>
-        <translation> Der vil være en sigtbarhed på </translation>
+        <translation> Sigtbarheden er </translation>
     </message>
     <message>
         <source> miles.</source>
@@ -839,19 +839,19 @@
     </message>
     <message>
         <source>Date Error</source>
-        <translation>Dato fejl</translation>
+        <translation>Dato-fejl</translation>
     </message>
     <message>
         <source>Tomorrow expect a high of </source>
-        <translation>I morgen når temperaturerne op omkring </translation>
+        <translation>I morgen når temperaturen op omkring </translation>
     </message>
     <message>
         <source>Expected conditions: </source>
-        <translation>Forventede forhold:</translation>
+        <translation>Forventede forhold: </translation>
     </message>
     <message>
         <source>Weather data from: </source>
-        <translation>Vejr data fra:</translation>
+        <translation>Vejr-data fra: </translation>
     </message>
     <message>
         <source>Updating...</source>
@@ -863,11 +863,11 @@
     </message>
     <message>
         <source>*** Invalid Area ID Entered *** Use a valid area id.</source>
-        <translation type="obsolete">*** Ugyldigt område ID indtastet *** Brug et gyldigt område id.</translation>
+        <translation type="obsolete">*** Ugyldigt område-ID indtastet *** Brug et gyldigt område-ID.</translation>
     </message>
     <message>
         <source>Weather Data Not Available</source>
-        <translation type="obsolete">Vejr data ikke tilgængelig</translation>
+        <translation type="obsolete">Vejr-data er ikke tilgængelige.</translation>
     </message>
     <message>
         <source>!!! Timeout Limit !!! Change aggressiveness level.</source>
@@ -875,35 +875,35 @@
     </message>
     <message>
         <source>*** Invalid Area ID or Server Error ***</source>
-        <translation>*** Ugyldigt område ID eller server fejl ***</translation>
+        <translation>*** Ugyldigt område-ID eller server-fejl ***</translation>
     </message>
     <message>
         <source>Imperial (Fahrenheit, in, etc)</source>
-        <translation type="unfinished"></translation>
+        <translation>Imperial (Fahrenheit, tommer, osv.)</translation>
     </message>
     <message>
         <source>Metric (Celsius, kPa, etc)</source>
-        <translation type="unfinished"></translation>
+        <translation>Metrisk (Celcius, kPa, osv.)</translation>
     </message>
     <message>
         <source> F</source>
-        <translation type="unfinished"></translation>
+        <translation> F</translation>
     </message>
     <message>
         <source> C</source>
-        <translation type="unfinished"></translation>
+        <translation> C</translation>
     </message>
     <message>
         <source>.</source>
-        <translation type="unfinished"></translation>
+        <translation>.</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukendt</translation>
     </message>
     <message>
         <source> - PAUSED -</source>
-        <translation type="unfinished"></translation>
+        <translation> - PAUSE -</translation>
     </message>
 </context>
 </TS>
