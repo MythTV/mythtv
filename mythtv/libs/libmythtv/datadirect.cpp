@@ -208,10 +208,10 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
                       ":YEAR,:SERIESID,:COLORCODE,:SYNDNUM,"
                       ":ORIGINALAIRDATE);");
         query.bindValue(":PROGRAMID", curr_program.programid);
-        query.bindValue(":TITLE", curr_program.title);
-        query.bindValue(":SUBTITLE", curr_program.subtitle);
-        query.bindValue(":DESCRIPTION", curr_program.description);
-        query.bindValue(":SHOWTYPE", curr_program.showtype); 
+        query.bindValue(":TITLE", curr_program.title.utf8());
+        query.bindValue(":SUBTITLE", curr_program.subtitle.utf8());
+        query.bindValue(":DESCRIPTION", curr_program.description.utf8());
+        query.bindValue(":SHOWTYPE", curr_program.showtype.utf8()); 
         query.bindValue(":MPAARATING", curr_program.mpaaRating);
         query.bindValue(":STARRATING", curr_program.starRating);
         query.bindValue(":STARS", staravg);
@@ -238,10 +238,10 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
                       "givenname, surname, fullname) VALUES(:PROGRAMID,"
                       ":ROLE,:GIVENNAME,:SURNAME,:FULLNAME);");
         query.bindValue(":PROGRAMID", lastprogramid);
-        query.bindValue(":ROLE", roleunderlines);
-        query.bindValue(":GIVENNAME", curr_productioncrew.givenname);
-        query.bindValue(":SURNAME", curr_productioncrew.surname);
-        query.bindValue(":FULLNAME", fullname);
+        query.bindValue(":ROLE", roleunderlines.utf8());
+        query.bindValue(":GIVENNAME", curr_productioncrew.givenname.utf8());
+        query.bindValue(":SURNAME", curr_productioncrew.surname.utf8());
+        query.bindValue(":FULLNAME", fullname.utf8());
 
         if (!query.exec())
             MythContext::DBError("Inserting into dd_productioncrew", query);
@@ -251,7 +251,7 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
         query.prepare("INSERT INTO dd_genre (programid, class, relevance) "
                       "VALUES(:PROGRAMID,:CLASS,:RELEVANCE);");
         query.bindValue(":PROGRAMID", lastprogramid);
-        query.bindValue(":CLASS", curr_genre.gclass);
+        query.bindValue(":CLASS", curr_genre.gclass.utf8());
         query.bindValue(":RELEVANCE", curr_genre.relevance);
 
         if (!query.exec())
@@ -557,6 +557,7 @@ void DataDirectProcessor::createTempTables()
             "INDEX nameidx (fullname))";
     createATempTable("dd_productioncrew", table);  
 
-    table = "( programid char(12), class char(30), relevance char(1) )";
+    table = "( programid char(12) NOT NULL, class char(30), "
+            "relevance char(1), INDEX progidx (programid))";
     createATempTable("dd_genre", table);
 }

@@ -308,11 +308,14 @@ void DataDirectProgramUpdate(Source source)
                     "hdtv, closecaptioned, partnumber, parttotal, seriesid, "
                     "originalairdate, colorcode, syndicatedepisodenumber, "
                     "programid) SELECT chanid, starttime, endtime, title, "
-                    "subtitle, description, category, category_type, airdate, "
-                    "stars, previouslyshown, stereo, subtitled, hdtv, "
+                    "subtitle, description, dd_genre.class, category_type, "
+                    "airdate, stars, previouslyshown, stereo, subtitled, hdtv, "
                     "closecaptioned, partnumber, parttotal, seriesid, "
                     "originalairdate, colorcode, syndicatedepisodenumber, "
-                    "programid FROM dd_v_program;"))
+                    "dd_v_program.programid FROM dd_v_program "
+                    "LEFT JOIN dd_genre ON ("
+                    "dd_v_program.programid = dd_genre.programid AND "
+                    "dd_genre.relevance = '0');"))
         MythContext::DBError("Inserting into program table", query);
 
     //cerr << "Finished adding rows to main program table...\n";
@@ -372,6 +375,14 @@ bool grabDDData(Source source, int poffset, QDate pdate)
     if (dd_grab_all && dddataretrieved)
         needtoretrieve = false;
 
+    QDateTime qdtNow = QDateTime::currentDateTime();
+    QSqlQuery query;
+    QString status = "currently running.";
+
+    query.exec(QString("UPDATE settings SET data ='%1' "
+                       "WHERE value='mythfilldatabaseLastRunStart'")
+                       .arg(qdtNow.toString("yyyy-MM-dd hh:mm")));
+
     if (needtoretrieve)
     {
         cerr << "Retrieving datadirect data... \n";
@@ -406,6 +417,11 @@ bool grabDDData(Source source, int poffset, QDate pdate)
          << ddprocessor.getActualListingsFrom().toString() << " "
          << "to " << ddprocessor.getActualListingsTo().toString() 
          << " (UTC) \n";
+
+    qdtNow = QDateTime::currentDateTime();
+    query.exec(QString("UPDATE settings SET data ='%1' "
+                       "WHERE value='mythfilldatabaseLastRunEnd'")
+                       .arg(qdtNow.toString("yyyy-MM-dd hh:mm")));
 
     cerr << "Clearing data for source...\n";
     QDateTime basedt = QDateTime(QDate(1970, 1, 1));
