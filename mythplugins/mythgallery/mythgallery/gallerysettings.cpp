@@ -11,10 +11,10 @@
 
 // General Settings
 
-class MythGalleryDir: public LineEditSetting, public GlobalSetting {
+class MythGalleryDir: public GlobalLineEdit {
 public:
     MythGalleryDir():
-        GlobalSetting("GalleryDir") {
+        GlobalLineEdit("GalleryDir") {
         setLabel(QObject::tr("Directory that holds images"));
         setValue("/var/lib/pictures");
         setHelpText(QObject::tr("This directory must exist and "
@@ -22,10 +22,10 @@ public:
     };
 };
 
-class MythGalleryMoviePlayerCmd: public LineEditSetting, public GlobalSetting {
+class MythGalleryMoviePlayerCmd: public GlobalLineEdit {
 public:
     MythGalleryMoviePlayerCmd():
-        GlobalSetting("GalleryMoviePlayerCmd") {
+        GlobalLineEdit("GalleryMoviePlayerCmd") {
         setLabel(QObject::tr("Command run to display movie files"));
         setValue("mplayer -fs %s");
         setHelpText(QObject::tr("This command is executed whenever a movie "
@@ -33,10 +33,10 @@ public:
     };
 };
 
-class MythGalleryImportDirs: public LineEditSetting, public GlobalSetting {
+class MythGalleryImportDirs: public GlobalLineEdit {
 public:
     MythGalleryImportDirs():
-        GlobalSetting("GalleryImportDirs") {
+        GlobalLineEdit("GalleryImportDirs") {
         setLabel(QObject::tr("Paths to import images from"));
         setValue("/mnt/cdrom:/mnt/camera");
         setHelpText(QObject::tr("This is a colon separated list of paths. "
@@ -47,21 +47,21 @@ public:
 
 #ifdef OPENGL_SUPPORT
 
-class SlideshowUseOpenGL: public CheckBoxSetting, public GlobalSetting {
+class SlideshowUseOpenGL: public GlobalCheckBox {
 public:
 
     SlideshowUseOpenGL() :
-        GlobalSetting("SlideshowUseOpenGL") {
+        GlobalCheckBox("SlideshowUseOpenGL") {
         setLabel(QObject::tr("Use OpenGL transitions"));
         setHelpText(QObject::tr("Check this to enable OpenGL "
                                 "based slideshow transitions"));
     }
 };
 
-class SlideshowOpenGLTransition: public ComboBoxSetting, public GlobalSetting {
+class SlideshowOpenGLTransition: public GlobalComboBox {
 public:
     SlideshowOpenGLTransition() : 
-        GlobalSetting("SlideshowOpenGLTransition") {
+        GlobalComboBox("SlideshowOpenGLTransition") {
         setLabel(QObject::tr("Type of OpenGL transition"));
         addSelection("none");
         addSelection("blend (gl)");
@@ -80,10 +80,10 @@ public:
 
 #endif /* OPENGL_SUPPORT */
 
-class SlideshowTransition: public ComboBoxSetting, public GlobalSetting {
+class SlideshowTransition: public GlobalComboBox {
 public:
     SlideshowTransition() : 
-        GlobalSetting("SlideshowTransition") {
+        GlobalComboBox("SlideshowTransition") {
         setLabel(QObject::tr("Type of transition"));
         addSelection("none");
         addSelection("chess board"); 
@@ -104,10 +104,10 @@ public:
     }
 };
 
-class SlideshowBackground: public ComboBoxSetting, public GlobalSetting {
+class SlideshowBackground: public GlobalComboBox {
 public:
     SlideshowBackground() :
-      GlobalSetting("SlideshowBackground") {
+      GlobalComboBox("SlideshowBackground") {
         setLabel(QObject::tr("Type of background"));
         // use names from /etc/X11/rgb.txt
         addSelection("theme","");
@@ -118,11 +118,10 @@ public:
     }
 };
 
-class SlideshowDelay: public SpinBoxSetting, public GlobalSetting {
+class SlideshowDelay: public GlobalSpinBox {
 public:
     SlideshowDelay():
-        SpinBoxSetting(1,600,1) ,
-        GlobalSetting("SlideshowDelay") {
+        GlobalSpinBox("SlideshowDelay", 1, 600, 1) {
         setLabel(QObject::tr("Slideshow Delay"));
         setValue(5);
         setHelpText(QObject::tr("This is the number of seconds to display each "
