@@ -105,6 +105,8 @@ OSD::OSD(int width, int height, const QString &filename, const QString &prefix,
     show_pause = hidingpause = false;
     pauseyoffset = 0;
 
+    totalfadeframes = 0;
+
     pausemovementperframe = (int)(6 * hmult);
     
     currentdialogoption = 1;
@@ -389,6 +391,8 @@ bool OSD::LoadTheme(void)
     }
  
 
+    totalfadeframes = settings->GetNumSetting("FadeAwayFrames");
+
     if (pausesliderTextRect.width() == 0)
         pausesliderTextRect = pausesliderRect;
 
@@ -441,6 +445,7 @@ void OSD::SetInfoText(const QString &text, const QString &subtitle,
     dummy = start;
     dummy = end;
 
+    fadingframes = totalfadeframes;
     infocallsign = callsign.left(5);
 
     if (useinfoicon)
@@ -474,6 +479,7 @@ void OSD::StartPause(int position, bool fill, QString msgtext,
     displaypausetime = -1;
     pauseyoffset = 0;
     hidingpause = false;
+    fadingframes = totalfadeframes;
     
     if (displaytime > 0)
         displaypausetime = time(NULL) + displaytime;
@@ -489,6 +495,7 @@ void OSD::UpdatePause(int position, QString slidertext)
     pauseposition = position;
     pauseslidertext = slidertext;
     hidingpause = false;
+    fadingframes = totalfadeframes;
     pauseyoffset = 0;
     pthread_mutex_unlock(&osdlock);
 }
@@ -499,6 +506,7 @@ void OSD::EndPause(void)
     hidingpause = true;
     show_pause = false;
     displaypausetime = 0;
+    fadingframes = totalfadeframes;
     pthread_mutex_unlock(&osdlock);
 }
 
@@ -507,6 +515,7 @@ void OSD::SetChannumText(const QString &text, int length)
     pthread_mutex_lock(&osdlock);
     displayframes = time(NULL) + length;
     show_channum = true;
+    fadingframes = totalfadeframes;
 
     channumtext = text;
     pthread_mutex_unlock(&osdlock);
@@ -545,6 +554,7 @@ void OSD::SetDialogBox(const QString &message, const QString &optionone,
 void OSD::ShowLast(int length)
 {
     displayframes = time(NULL) + length;
+    fadingframes = totalfadeframes;
     show_channum = true;
     show_info = true;
 }
@@ -586,11 +596,19 @@ void OSD::Display(unsigned char *yuvptr)
  
     if (time(NULL) > displayframes)
     {
-        show_info = false; 
-	show_channum = false;
-        show_dialog = false;
-        pthread_mutex_unlock(&osdlock);
-    	return;
+        if (fadingframes > 0)
+        {
+            fadingframes--;
+        }
+        else
+        {
+            show_info = false; 
+            show_channum = false;
+            show_dialog = false;
+            fadingframes = 0;
+            pthread_mutex_unlock(&osdlock);
+            return;
+        }
     }
 
     if (show_dialog)
@@ -771,19 +789,26 @@ void OSD::DrawStringWithOutline(unsigned char *yuvptr, QRect rect,
     int maxx = rect.right();
     int maxy = rect.bottom();
 
-    font->DrawString(yuvptr, x - 1, y - 1, text, maxx, maxy, false,
+    int alphamod = 255;
+
+    if (totalfadeframes > 0)
+        alphamod = (int)((((float)(fadingframes) / totalfadeframes) * 256.0) +
+                   0.5);
+
+    font->DrawString(yuvptr, x - 1, y - 1, text, maxx, maxy, alphamod, false,
                      rightjustify);
 
-    font->DrawString(yuvptr, x + 1, y - 1, text, maxx, maxy, false,
+    font->DrawString(yuvptr, x + 1, y - 1, text, maxx, maxy, alphamod, false,
                      rightjustify);
 
-    font->DrawString(yuvptr, x - 1, y + 1, text, maxx, maxy, false,
+    font->DrawString(yuvptr, x - 1, y + 1, text, maxx, maxy, alphamod, false,
                       rightjustify);
 
-    font->DrawString(yuvptr, x + 1, y + 1, text, maxx, maxy, false,
+    font->DrawString(yuvptr, x + 1, y + 1, text, maxx, maxy, alphamod, false,
                       rightjustify);
 
-    font->DrawString(yuvptr, x, y, text, maxx, maxy, true, rightjustify);
+    font->DrawString(yuvptr, x, y, text, maxx, maxy, alphamod, true, 
+                     rightjustify);
 }    
 
 void OSD::DrawStringIntoBox(QRect rect, const QString &text, 
@@ -932,6 +957,12 @@ void OSD::BlendImage(OSDImage *image, int xstart, int ystart,
     int ysrcwidth;
     int ydestwidth;
 
+    int alphamod = 255;
+
+    if (totalfadeframes > 0)
+        alphamod = (int)((((float)(fadingframes) / totalfadeframes) * 256.0) + 
+                   0.5);
+
     for (int y = 0; y < height; y++)
     {
         ysrcwidth = y * width;
@@ -940,8 +971,11 @@ void OSD::BlendImage(OSDImage *image, int xstart, int ystart,
         for (int x = 0; x < width; x++)
         {
             alpha = *(image->alpha + x + ysrcwidth);
+  
             if (alpha == 0)
                 continue;
+
+            alpha = ((alpha * alphamod) + 0x80) >> 8;
 
 	    dest = screen + x + xstart + ydestwidth;
             src = image->ybuffer + x + ysrcwidth;
@@ -972,6 +1006,9 @@ void OSD::BlendImage(OSDImage *image, int xstart, int ystart,
 
 	    if (alpha == 0)
 		continue;
+
+            alpha = ((alpha * alphamod) + 0x80) >> 8;
+
             dest = destuptr + x + xstart + ydestwidth;
             src = image->ubuffer + x + ysrcwidth;
 
@@ -1007,6 +1044,11 @@ void OSD::BlendFillSlider(OSDImage *image, int xstart, int ystart,
     int ysrcwidth;
     int ydestwidth;
 
+    int alphamod = 255;
+    if (totalfadeframes > 0)
+        alphamod = (int)((((float)(fadingframes) / totalfadeframes) * 256.0) + 
+                   0.5);
+
     for (int y = 0; y < height; y++)
     {
         ysrcwidth = y * image->width;
@@ -1017,6 +1059,8 @@ void OSD::BlendFillSlider(OSDImage *image, int xstart, int ystart,
             alpha = *(image->alpha + ysrcwidth);
             if (alpha == 0)
                 continue;
+
+            alpha = ((alpha * alphamod) + 0x80) >> 8;
 
             dest = screen + x + xstart + ydestwidth;
             src = image->ybuffer + ysrcwidth;
@@ -1047,6 +1091,9 @@ void OSD::BlendFillSlider(OSDImage *image, int xstart, int ystart,
 
             if (alpha == 0)
                 continue;
+
+            alpha = ((alpha * alphamod) + 0x80) >> 8;
+
             dest = destuptr + x + xstart + ydestwidth;
             src = image->ubuffer + ysrcwidth;
 

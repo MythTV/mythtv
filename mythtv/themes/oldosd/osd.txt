@@ -16,6 +16,8 @@ str InfoIconPosition=15,10
 # is displayed
 str InfoCallSignRect=55,15,95,45
 
+# Make the OSD fade away when it's gone or not?
+int FadeAwayFrames=30
 
 # If this next setting exists, display a dialog when the video is paused.
 # This pixmap should also be sized to fit a 640x480 screen.

@@ -286,7 +286,7 @@ void TTFFont::render_text(Raster_Map *rmap, Raster_Map *rchr, char *text,
 void TTFFont::merge_text(unsigned char *yuv, Raster_Map * rmap, int offset_x, 
                          int offset_y, int xstart, int ystart, int width, 
                          int height, int video_width, int video_height, 
-                         bool white)
+                         bool white, int alphamod)
 {
    int                 x, y;
    unsigned char      *ptr, *src;
@@ -312,6 +312,7 @@ void TTFFont::merge_text(unsigned char *yuv, Raster_Map * rmap, int offset_x,
 	  {
 	     if ((a = *ptr) > 0)
 	       {
+                  a = ((a * alphamod) + 0x80) >> 8;
 		  src = yuv + (y + ystart) * video_width + (x + xstart);
 		  if (white)
                   {
@@ -341,8 +342,8 @@ void TTFFont::merge_text(unsigned char *yuv, Raster_Map * rmap, int offset_x,
 }
 
 void TTFFont::DrawString(unsigned char *yuvptr, int x, int y, 
-                         const QString &text, int maxx, int maxy, bool white, 
-                         bool rightjustify)
+                         const QString &text, int maxx, int maxy, 
+                         int alphamod, bool white, bool rightjustify)
 {
    int                  width, height, w, h, inx, iny, clipx, clipy;
    Raster_Map          *rmap, *rtmp;
@@ -414,7 +415,7 @@ void TTFFont::DrawString(unsigned char *yuvptr, int x, int y,
    }
 
    merge_text(yuvptr, rmap, clipx, clipy, x, y, width, height, 
-              video_width, video_height, white);
+              video_width, video_height, white, alphamod);
 
    destroy_font_raster(rmap);
    destroy_font_raster(rtmp);

@@ -143,7 +143,11 @@ class OSD
     TTFFont *pausesliderfont;
     int pauseyoffset;
     int pausemovementperframe;
+
     bool hidingpause;
+ 
+    int fadingframes;
+    int totalfadeframes;
    
     int CalcNewOffset(OSDImage *image, int curoffset);
 

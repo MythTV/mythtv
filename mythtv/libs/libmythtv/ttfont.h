@@ -18,7 +18,7 @@ class TTFFont
      bool isValid(void) { return valid; }
 
      void DrawString(unsigned char *yuvptr, int x, int y, const QString &text,
-                     int maxx, int maxy, bool white = true, 
+                     int maxx, int maxy, int alphamod = 255, bool white = true, 
                      bool rightjustify = false); 
      void CalcWidth(const QString &text, int *width_return);
 
@@ -32,7 +32,8 @@ class TTFFont
                       int *xorblah, int *yor);
      void merge_text(unsigned char *yuv, Raster_Map *rmap, int offset_x, 
                      int offset_y, int xstart, int ystart, int width, 
-                     int height, int video_width, int video_height, bool white);
+                     int height, int video_width, int video_height, bool white,
+                     int alphamod);
 
      bool         valid;
      FT_Library   library;
