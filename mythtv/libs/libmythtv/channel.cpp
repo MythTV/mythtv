@@ -47,7 +47,8 @@ bool Channel::Open(void)
         isopen = true;
     else
     {
-         cerr << "Channel::Open(): Can't open: " << device << endl;
+         VERBOSE(VB_IMPORTANT, QString("Channel::Open(): Can't open: %1")
+			              .arg(device));
          perror(device.ascii());
          return false;
     }
@@ -282,8 +283,10 @@ bool Channel::ChannelUp(void)
 
         if (chancount > totalChannels)
         {
-            cerr << "Error, couldn't find any available channels.\n";
-            cerr << "Your database is most likely setup incorrectly.\n";
+            VERBOSE(VB_IMPORTANT, "Error, couldn't find any available "
+                                  "channels.");
+            VERBOSE(VB_IMPORTANT, "Your database is most likely setup "
+                                  "incorrectly.");
             break;
         }
     }
@@ -315,8 +318,10 @@ bool Channel::ChannelDown(void)
 
         if (chancount > totalChannels)
         {
-            cerr << "Error, couldn't find any available channels.\n";
-            cerr << "Your database is most likely setup incorrectly.\n";
+            VERBOSE(VB_IMPORTANT, "Error, couldn't find any available "
+                                  "channels.");
+            VERBOSE(VB_IMPORTANT, "Your database is most likely setup "
+                                  "incorrectly.");
             break;
         }
     }
@@ -330,7 +335,8 @@ bool Channel::SetChannelByString(const QString &chan)
     
     if (!Open())
     {
-        cerr << "channel object wasn't open, can't change channels\n";
+        VERBOSE(VB_IMPORTANT, "Channel object wasn't open, can't change "
+                              "channels");
         return false;
     }
 
@@ -395,6 +401,8 @@ bool Channel::SetChannelByString(const QString &chan)
     int frequency = freqid.toInt(&ok);
     bool isFrequency = ok && frequency > 50000;
 
+    SetFormat(tvformat);
+
     // Tune
     if (externalChanger[currentcapchannel].isEmpty())
     {
@@ -414,8 +422,6 @@ bool Channel::SetChannelByString(const QString &chan)
         return false;
 
     curchannelname = chan;
-
-    SetFormat(tvformat);
 
     pParent->SetVideoFiltersForChannel(this, chan);
     SetContrast();
@@ -451,19 +457,45 @@ int signalStrengthATSC(int device, int input)
         return clamp(101 - (signal >> 9), 0, 100);
 }
 
+// Returns ATSC signal strength 0-100. >75 is good. Using v4l2.
+int signalStrengthATSC_v4l2(int device, int input)
+{
+    struct v4l2_tuner vsig;
+    vsig.index = input;
+
+    int ioctlval = ioctl(device,VIDIOC_G_TUNER, &vsig);
+    if (ioctlval == -1)
+    {
+        perror("VIDIOC_G_TUNER problem in channel.h's signalStrengthATSC()");
+        return 0;
+    }
+    VERBOSE(VB_CHANNEL, QString("signal strength: %1").arg(vsig.signal));
+
+    return clamp(vsig.signal, 0, 100);
+}
+
 bool Channel::CheckSignal(int msecTotal, int reqSignal, int input) 
 {
-    int msecSleep = 100, maxSignal = 0, i = 0;
+    int msecSleep = 500, maxSignal = 0, i = 0;
 
     msecTotal = max(msecSleep, msecTotal);
 
     if (usingstrength) 
     {
+        VERBOSE(VB_CHANNEL, QString("CheckSignal(%1, %2, %3) usingv4l2(%4)")
+                .arg(msecTotal).arg(reqSignal).arg(input).arg(usingv4l2));
+
         for (i = 0; i < (msecTotal / msecSleep) + 1; i++) 
         {
             if (i != 0) 
                 usleep(msecSleep);
-            maxSignal = max(maxSignal, signalStrengthATSC(videofd, input));
+            if (usingv4l2)
+                maxSignal = max(maxSignal, signalStrengthATSC_v4l2(videofd, 
+                                input));
+            else
+                maxSignal = max(maxSignal, signalStrengthATSC(videofd, input));
+
+
             if (maxSignal >= reqSignal) 
                 break;
         }
@@ -496,6 +528,16 @@ bool Channel::TuneToFrequency(int frequency)
 {
     VERBOSE(VB_CHANNEL, QString("TuneToFrequency(%1)").arg(frequency));
 
+    int signalThresholdWait = 5000;
+    int signalThreshold = 65;
+    if (usingstrength) 
+    {
+        signalThresholdWait = gContext->GetNumSetting("ATSCCheckSignalWait", 
+                                                      5000);
+        signalThreshold = gContext->GetNumSetting("ATSCCheckSignalThreshold", 
+                                                  65);
+    }
+
     if (usingv4l2)
     {
         struct v4l2_frequency vf;
@@ -508,7 +550,8 @@ bool Channel::TuneToFrequency(int frequency)
             perror("VIDIOC_S_FREQUENCY");
             return false;
         }
-        return CheckSignal();
+        return CheckSignal(signalThresholdWait, signalThreshold,
+                           currentcapchannel);
     }
 
     if (ioctl(videofd, VIDIOCSFREQ, &frequency) == -1)
@@ -517,7 +560,7 @@ bool Channel::TuneToFrequency(int frequency)
         return false;
     }
 
-    return CheckSignal();
+    return CheckSignal(signalThresholdWait, signalThreshold, currentcapchannel);
 }
 
 void Channel::SwitchToInput(int newcapchannel, bool setstarting)

@@ -1428,6 +1428,35 @@ public:
     };
 };
 
+class ATSCCheckSignalWait: public SpinBoxSetting, public BackendSetting {
+public:
+    ATSCCheckSignalWait():
+        SpinBoxSetting(1000, 10000, 250),
+        BackendSetting("ATSCCheckSignalWait") {
+        setLabel(QObject::tr("Wait for ATSC signal lock (msec)"));
+        setHelpText(QObject::tr("MythTV can check the signal strength "
+                      "When you tune into a HDTV or other over-the-air "
+                      "digital station. This value is the number of "
+                      "milliseconds to allow before we give up trying to "
+                      "get an acceptible signal."));
+        setValue(5000);
+    };
+};
+
+class ATSCCheckSignalThreshold: public SliderSetting, public GlobalSetting {
+public:
+    ATSCCheckSignalThreshold():
+        SliderSetting(50, 90, 1),
+        GlobalSetting("ATSCCheckSignalThreshold") {
+        setLabel(QObject::tr("ATSC Signal Threshold"));
+        setHelpText(QObject::tr("Threshold for a signal to be considered "
+                      "acceptible. If you set this too low Myth may crash, "
+                      "if you set it too low you may not be able to tune "
+                      "to channels on which reception is good."));
+        setValue(65);
+    };
+};
+
 class SmartChannelChange: public CheckBoxSetting, public GlobalSetting {
 public:
     SmartChannelChange():
@@ -2374,10 +2403,16 @@ GeneralSettings::GeneralSettings()
     general->addChild(new RecordOverTime());
     general->addChild(new ChannelOrdering());
     general->addChild(new SmartChannelChange());
-    general->addChild(new AdvancedRecord());
-    general->addChild(new ChannelFormat());
-    general->addChild(new LongChannelFormat());
     addChild(general);
+
+    VerticalConfigurationGroup* gen2 = new VerticalConfigurationGroup(false);
+    gen2->setLabel(QObject::tr("General (page 2)"));
+    gen2->addChild(new AdvancedRecord());
+    gen2->addChild(new ChannelFormat());
+    gen2->addChild(new LongChannelFormat());
+    gen2->addChild(new ATSCCheckSignalWait());
+    gen2->addChild(new ATSCCheckSignalThreshold());
+    addChild(gen2);
 
     VerticalConfigurationGroup* autoexp = new VerticalConfigurationGroup(false);
     autoexp->setLabel(QObject::tr("Global Auto Expire Settings"));

@@ -94,7 +94,7 @@ TVRec::TVRec(int capturecardnum)
     }
     else // "V4L" or "MPEG", ie, analog TV, or "HDTV"
     {
-        Channel *achannel = new Channel(this, videodev);
+        Channel *achannel = new Channel(this, videodev, (cardtype == "HDTV"));
         channel = achannel; // here for SetFormat()->RetrieveInputChannels()
         channel->Open();
         achannel->SetFormat(gContext->GetSetting("TVFormat"));
@@ -485,29 +485,55 @@ void TVRec::HandleStateChange(void)
         // Determine whether to automatically run the transcoder or not
         autoTranscode = profile.byName("autotranscode")->getValue().toInt();
 
-        SetupRecorder(profile);
-        nvr->SetRecording(curRecording);
-        nvr->SetDB(db_conn, &db_lock);
-        if (channel != NULL)
-            nvr->ChannelNameChanged(channel->GetCurrentName());
+        bool error = false;
 
-        SetVideoFiltersForChannel(channel, channel->GetCurrentName());
-        if (channel->Open())
+        SetupRecorder(profile);
+        if (channel != NULL)
         {
-            channel->SetBrightness();
-            channel->SetContrast();
-            channel->SetColour();
-            channel->SetHue();
-            channel->Close();
+            // If there is a tuner make sure this is a valid station
+            // hdtv will block for a long time if we try to get
+            // mpeg ts packets from outer space.
+            bool success = channel->Open();
+            if (success)
+            {
+                success = channel->SetChannelByString(channel->GetCurrentName());
+                if (!success)
+                {
+                    VERBOSE(VB_IMPORTANT, "Signal level too low?");
+                    error = true;
+                }
+                channel->Close();
+            } 
+            else
+                error = true;
         }
 
-        pthread_create(&encode, NULL, SpawnEncode, nvr);
+        if (!error)
+        {
+            nvr->SetRecording(curRecording);
+            nvr->SetDB(db_conn, &db_lock);
+            if (channel != NULL)
+                nvr->ChannelNameChanged(channel->GetCurrentName());
 
-        while (!nvr->IsRecording() && !nvr->IsErrored())
-            usleep(50);
+            SetVideoFiltersForChannel(channel, channel->GetCurrentName());
+            if (channel->Open())
+            {
+                channel->SetBrightness();
+                channel->SetContrast();
+                channel->SetColour();
+                channel->SetHue();
+                channel->Close();
+            }
+            pthread_create(&encode, NULL, SpawnEncode, nvr);
+
+            while (!nvr->IsRecording() && !nvr->IsErrored())
+                usleep(50);
+        } 
+        else
+            VERBOSE(VB_IMPORTANT, "Tuning Error -- aborting recording");
 
         if (nvr->IsRecording())
-        {
+	{
             // evil.
             channel->SetFd(nvr->GetVideoFd());
             frameRate = nvr->GetFrameRate();
