@@ -131,7 +131,7 @@ static bool comp_recstart(ProgramInfo *a, ProgramInfo *b)
     // Note: the PruneRedundants logic depends on the following
     if (a->recordid != b->recordid)
         return a->recordid < b->recordid;
-    if (a->chansign != "" && b->chansign != "")
+    if (a->chansign != "" || b->chansign != "")
     {
         if (a->chansign != b->chansign)
             return a->chansign < b->chansign;
