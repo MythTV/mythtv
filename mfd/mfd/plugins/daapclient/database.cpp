@@ -1489,6 +1489,8 @@ void Database::beIgnorant()
         new_playlists->setAutoDelete(true);
         delete new_playlists;
         new_playlists = NULL;
+        
+        new_playlists = new QIntDict<Playlist>;
     }
 }
 
