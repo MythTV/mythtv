@@ -20,7 +20,7 @@ bool MythCDROMFreeBSD::mediaChanged()
     return false;
 }
 
-bool MythCDROMLinux::checkOK()
+bool MythCDROMFreeBSD::checkOK()
 {
     // Not implemented
     return true;
@@ -63,20 +63,16 @@ MediaStatus MythCDROMFreeBSD::checkMedia()
     return setStatus(MEDIASTAT_UNKNOWN, false);
 }
 
-MediaError MythCDROMLinux::lock() 
+MediaError MythCDROMFreeBSD::lock() 
 {
     MediaError ret = MythMediaDevice::lock();
     if (ret == MEDIAERR_OK)
-#ifdef __FreeBSD__
         ioctl(m_DeviceHandle, CDIOCPREVENT);
-#else
-        ioctl(m_DeviceHandle, CDROM_LOCKDOOR, 1);
-#endif
 
     return ret;
 }
 
-MediaError MythCDROMLinux::unlock() 
+MediaError MythCDROMFreeBSD::unlock() 
 {
     if (openDevice()) 
     { 
