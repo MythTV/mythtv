@@ -34,19 +34,19 @@
     <name>String::WeatherType</name>
     <message>
         <source>Cloudy</source>
-        <translation>Bewölkt</translation>
+        <translation>bewölkt</translation>
     </message>
     <message>
         <source>Mostly Cloudy</source>
-        <translation>Meist bewölkt</translation>
+        <translation>meist bewölkt</translation>
     </message>
     <message>
         <source>Partly Cloudy</source>
-        <translation>Teilw. bewölkt</translation>
+        <translation>teilw. bewölkt</translation>
     </message>
     <message>
         <source>Light Rain</source>
-        <translation>Leichter Regen</translation>
+        <translation>etwas Regen</translation>
     </message>
     <message>
         <source>Showers</source>
@@ -66,15 +66,15 @@
     </message>
     <message>
         <source>Few Showers</source>
-        <translation>Vereinzelte Schauer</translation>
+        <translation>vereinzelte Schauer</translation>
     </message>
     <message>
         <source>Mostly Sunny</source>
-        <translation>Meist sonnig</translation>
+        <translation>meist sonnig</translation>
     </message>
     <message>
         <source>Sunny</source>
-        <translation>Sonnig</translation>
+        <translation>sonnig</translation>
     </message>
     <message>
         <source>Scattered Flurries</source>
@@ -86,11 +86,11 @@
     </message>
     <message>
         <source>Isolated T-Storms</source>
-        <translation>Vereinzelte Gewitter</translation>
+        <translation>vereinzelte Gewitter</translation>
     </message>
     <message>
         <source>Scattered Thunderstorms</source>
-        <translation>Verteilte Gewitter</translation>
+        <translation>verteilte Gewitter</translation>
     </message>
     <message>
         <source>PM Showers</source>
@@ -106,19 +106,19 @@
     </message>
     <message>
         <source>Few Snow Showers</source>
-        <translation>Vereinzelte Schneeschauer</translation>
+        <translation>vereinzelte Schneeschauer</translation>
     </message>
     <message>
         <source>Cloudy/Wind</source>
-        <translation>Bewölkt/Windig</translation>
+        <translation>bewölkt/windig</translation>
     </message>
     <message>
         <source>Flurries/Wind</source>
-        <translation>Böeig/Windig</translation>
+        <translation>böeig/windig</translation>
     </message>
     <message>
         <source>Mostly Cloudy/Windy</source>
-        <translation>Meist bewölkt/windig</translation>
+        <translation>meist bewölkt/windig</translation>
     </message>
     <message>
         <source>Rain/Thunder</source>
@@ -126,7 +126,7 @@
     </message>
     <message>
         <source>Partly Cloudy/Windy</source>
-        <translation>Teilw. bewölkt/windig</translation>
+        <translation>teilw. bewölkt/windig</translation>
     </message>
     <message>
         <source>AM Rain/Snow Showers</source>
@@ -134,7 +134,7 @@
     </message>
     <message>
         <source>Light Rain/Wind</source>
-        <translation>Leichter Regen/Wind</translation>
+        <translation>leichter Regen/Wind</translation>
     </message>
     <message>
         <source>Showers/Wind</source>
@@ -142,7 +142,7 @@
     </message>
     <message>
         <source>Mostly Sunny/Wind</source>
-        <translation>Meist sonnig/Wind</translation>
+        <translation>meist sonnig/Wind</translation>
     </message>
     <message>
         <source>Flurries</source>
@@ -154,11 +154,11 @@
     </message>
     <message>
         <source>Sct Flurries/Wind</source>
-        <translation>Verteilte böeige Winde</translation>
+        <translation>verteilte, böeige Winde</translation>
     </message>
     <message>
         <source>Sct Strong Storms</source>
-        <translation>Verteilte starke Stürme</translation>
+        <translation>verteilte, heftige Stürme</translation>
     </message>
     <message>
         <source>PM T-Storms</source>
@@ -170,7 +170,7 @@
     </message>
     <message>
         <source>Sunny/Windy</source>
-        <translation>Sonnig/Windig</translation>
+        <translation>sonnig/windig</translation>
     </message>
     <message>
         <source>AM Thunderstorms</source>
@@ -182,7 +182,7 @@
     </message>
     <message>
         <source>Iso T-Storms/Wind</source>
-        <translation>Vereinzelte Gewitter/Wind</translation>
+        <translation>vereinzelte Gewitter/Wind</translation>
     </message>
     <message>
         <source>Rain/Snow</source>
@@ -190,7 +190,7 @@
     </message>
     <message>
         <source>Sct T-Storms/Wind</source>
-        <translation>Verteilte Gewitter/Wind</translation>
+        <translation>verteilte Gewitter/Wind</translation>
     </message>
     <message>
         <source>AM Showers/Wind</source>
@@ -198,7 +198,7 @@
     </message>
     <message>
         <source>Sct Snow Showers</source>
-        <translation>Verteilte Schneeschauer</translation>
+        <translation>verteilte Schneeschauer</translation>
     </message>
     <message>
         <source>Snow to Ice/Wind</source>
@@ -210,11 +210,11 @@
     </message>
     <message>
         <source>AM Light Rain</source>
-        <translation>Vorm. leichter Regen</translation>
+        <translation>Vorm. etwas Regen</translation>
     </message>
     <message>
         <source>PM Light Rain</source>
-        <translation>Nachm. leichter Regen</translation>
+        <translation>Nachm. etwas Regen</translation>
     </message>
     <message>
         <source>PM Rain</source>
@@ -234,7 +234,7 @@
     </message>
     <message>
         <source>Few Showers/Wind</source>
-        <translation>Wenige Schauer/Wind</translation>
+        <translation>wenige Schauer/Wind</translation>
     </message>
     <message>
         <source>Snow/Wind</source>
@@ -258,7 +258,7 @@
     </message>
     <message>
         <source>Light Snow</source>
-        <translation>Leichter Schnee</translation>
+        <translation>etwas Schnee</translation>
     </message>
     <message>
         <source>PM Snow</source>
@@ -266,11 +266,11 @@
     </message>
     <message>
         <source>Few Snow Showers/Wind</source>
-        <translation>Wenige Schneeschauer/Wind</translation>
+        <translation>wenige Schneeschauer/Wind</translation>
     </message>
     <message>
         <source>Light Snow/Wind</source>
-        <translation>Leichter Schnee/Wind</translation>
+        <translation>etwas Schnee/Wind</translation>
     </message>
     <message>
         <source>Wintry Mix</source>
@@ -282,11 +282,11 @@
     </message>
     <message>
         <source>Hvy Rain/Freezing Rain</source>
-        <translation>sta. Regen/gefr. Regen</translation>
+        <translation>heftiger/gefr. Regen</translation>
     </message>
     <message>
         <source>AM Light Snow</source>
-        <translation>Vorm. leichter Schnee</translation>
+        <translation>Vorm. etwas Schnee</translation>
     </message>
     <message>
         <source>Rain/Freezing Rain</source>
@@ -330,7 +330,7 @@
     </message>
     <message>
         <source>Heavy Rain</source>
-        <translation>Starker Regen</translation>
+        <translation>heftiger Regen</translation>
     </message>
     <message>
         <source>AM Rain/Ice</source>
@@ -342,11 +342,11 @@
     </message>
     <message>
         <source>AM Light Snow/Wind</source>
-        <translation>Vorm. leichter Schnee/Wind</translation>
+        <translation>Vorm. etwas Schnee/Wind</translation>
     </message>
     <message>
         <source>PM Light Rain/Wind</source>
-        <translation>Nachm. leichter Regen/Wind</translation>
+        <translation>Nachm. etwas Regen/Wind</translation>
     </message>
     <message>
         <source>AM Light Wintry Mix</source>
@@ -354,11 +354,11 @@
     </message>
     <message>
         <source>PM Light Snow/Wind</source>
-        <translation>Nachm. leichter Schnee/Wind</translation>
+        <translation>Nachm. etwas Schnee/Wind</translation>
     </message>
     <message>
         <source>Heavy Rain/Wind</source>
-        <translation>Starker Regen/Wind</translation>
+        <translation>heftiger Regen/Wind</translation>
     </message>
     <message>
         <source>PM Snow Shower</source>
@@ -386,7 +386,7 @@
     </message>
     <message>
         <source>PM Light Snow</source>
-        <translation>Nachm. leichter Schnee</translation>
+        <translation>Nachm. etwas Schnee</translation>
     </message>
     <message>
         <source>AM Drizzle</source>
@@ -394,7 +394,7 @@
     </message>
     <message>
         <source>Strong Storms/Wind</source>
-        <translation>Starke Stürme/Wind</translation>
+        <translation>starke Stürme/Wind</translation>
     </message>
     <message>
         <source>PM Drizzle</source>
@@ -406,7 +406,7 @@
     </message>
     <message>
         <source>AM Light Rain/Wind</source>
-        <translation>Vorm. leichter Regen/Wind</translation>
+        <translation>Vorm. etwas Regen/Wind</translation>
     </message>
     <message>
         <source>AM Rain/Wind</source>
@@ -422,15 +422,15 @@
     </message>
     <message>
         <source>Light Rain Shower</source>
-        <translation>Leichte Regenschauer</translation>
+        <translation>leichte Regenschauer</translation>
     </message>
     <message>
         <source>Light Rain with Thunder</source>
-        <translation>Leichter Regen mit Donner</translation>
+        <translation>etwas Regen mit Donner</translation>
     </message>
     <message>
         <source>Light Drizzle</source>
-        <translation>Leichter Nieselregen</translation>
+        <translation>leichter Nieselregen</translation>
     </message>
     <message>
         <source>Mist</source>
@@ -446,11 +446,11 @@
     </message>
     <message>
         <source>Light Snow Shower</source>
-        <translation>Leichte Schneeschauer</translation>
+        <translation>leichte Schneeschauer</translation>
     </message>
     <message>
         <source>Light Snow Shower/ Windy</source>
-        <translation>Leichte Schneeschauer/Wind</translation>
+        <translation>leichte Schneeschauer/Wind</translation>
     </message>
     <message>
         <source>Clear</source>
@@ -458,7 +458,7 @@
     </message>
     <message>
         <source>A Few Clouds</source>
-        <translation>Wenige Wolken</translation>
+        <translation>wenige Wolken</translation>
     </message>
     <message>
         <source>Fair</source>
@@ -544,7 +544,7 @@
     </message>
     <message>
         <source>current conditions</source>
-        <translation>Aktuelles Wetter</translation>
+        <translation>Das aktuelle Wetter</translation>
     </message>
     <message>
         <source>Humidity</source>
@@ -794,56 +794,28 @@
         <translation> km.</translation>
     </message>
     <message>
-        <source>SUN</source>
-        <translation type="obsolete">SO</translation>
-    </message>
-    <message>
         <source>Sunday</source>
         <translation>Sonntag</translation>
-    </message>
-    <message>
-        <source>MON</source>
-        <translation type="obsolete">MO</translation>
     </message>
     <message>
         <source>Monday</source>
         <translation>Montag</translation>
     </message>
     <message>
-        <source>TUE</source>
-        <translation type="obsolete">DI</translation>
-    </message>
-    <message>
         <source>Tuesday</source>
         <translation>Dienstag</translation>
-    </message>
-    <message>
-        <source>WED</source>
-        <translation type="obsolete">MI</translation>
     </message>
     <message>
         <source>Wednesday</source>
         <translation>Mittwoch</translation>
     </message>
     <message>
-        <source>THU</source>
-        <translation type="obsolete">DO</translation>
-    </message>
-    <message>
         <source>Thursday</source>
         <translation>Donnerstag</translation>
     </message>
     <message>
-        <source>FRI</source>
-        <translation type="obsolete">FR</translation>
-    </message>
-    <message>
         <source>Friday</source>
         <translation>Freitag</translation>
-    </message>
-    <message>
-        <source>SAT</source>
-        <translation type="obsolete">SA</translation>
     </message>
     <message>
         <source>Saturday</source>
@@ -872,18 +844,6 @@
     <message>
         <source> (Not All Information Available)</source>
         <translation> (Nicht alle Informationen vorhanden)</translation>
-    </message>
-    <message>
-        <source>*** Invalid Area ID Entered *** Use a valid area id.</source>
-        <translation type="obsolete">*** Ungültige Orts-ID eingegeben *** Gültige ID eingeben.</translation>
-    </message>
-    <message>
-        <source>Weather Data Not Available</source>
-        <translation type="obsolete">Wetterdaten nicht verfügbar</translation>
-    </message>
-    <message>
-        <source>!!! Timeout Limit !!! Change aggressiveness level.</source>
-        <translation type="obsolete">!!! Zeitüberschreitung !!! Agressivitäts-Level ändern.</translation>
     </message>
     <message>
         <source>*** Invalid Area ID or Server Error ***</source>
