@@ -264,6 +264,30 @@ DVDデバイスが設定されていません｡</translation>
         <source>This determines the number of simultaneous transcode jobs. If set at 1 (the default), there will only be one active job at a time.</source>
         <translation>同時に変換するジョブ数を設定します｡1に設定すると(既定)一度に一つ処理します｡</translation>
     </message>
+    <message>
+        <source>On DVD insertion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display mythdvd menu menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do nothing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rip DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media Monitoring should be turned on to allow this feature (Setup -&gt; General -&gt; CD/DVD Monitor</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
