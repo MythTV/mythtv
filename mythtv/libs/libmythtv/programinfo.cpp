@@ -503,7 +503,55 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(QSqlDatabase *db,
     schedList.FromScheduler();
     progList.FromProgram(db, querystr, schedList);
 
-    return progList.take(0);
+    if (!progList.isEmpty())
+    {
+        return progList.take(0);
+    }
+    else
+    {
+        ProgramInfo *p = new ProgramInfo;
+        QString querystr = QString("SELECT chanid, channum, callsign, name, "
+                                   "commfree, outputfilters "
+                                   "FROM channel "
+                                   "WHERE chanid = \"%1\";")
+                                   .arg(channel);
+
+        QSqlQuery query(QString::null, db);
+        query.prepare(querystr);
+
+        if (!query.exec() || !query.isActive())
+        {
+            MythContext::DBError("ProgramInfo::GetProgramAtDateTime", 
+                                 query.executedQuery());
+            return p;
+        }
+
+        if (query.next())
+        {
+            p->chanid = query.value(0).toString();
+            p->startts = dtime;
+            p->endts = dtime;
+            p->recstartts = p->startts;
+            p->recendts = p->endts;
+            p->lastmodified = p->startts;
+            p->title = gContext->GetSetting("UnknownTitle");
+            p->subtitle = "";
+            p->description = "";
+            p->category = "";
+            p->chanstr = query.value(1).toString();
+            p->chansign = QString::fromUtf8(query.value(2).toString());
+            p->channame = QString::fromUtf8(query.value(3).toString());
+            p->repeat = 0;
+            p->chancommfree = query.value(4).toInt();
+            p->chanOutputFilters = query.value(5).toString();
+            p->seriesid = "";
+            p->programid = "";
+            p->year = "";
+            p->stars = 0.f;
+        }
+
+        return p;
+    }
 }
 
 ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
