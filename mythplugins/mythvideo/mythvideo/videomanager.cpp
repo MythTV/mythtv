@@ -1546,7 +1546,14 @@ void VideoManager::slotAutoIMDB()
        doWaitBackground(p, curitem->Title());
        backup.flush();
 
-      int ret = GetMovieListing(curitem->Title());
+       int ret;
+
+       if (curitem->InetRef() == "00000000") {
+         ret = GetMovieListing(curitem->Title());
+       } else {
+         movieNumber = curitem->InetRef();
+         ret = 1;
+       }
 
       VERBOSE(VB_ALL,
               QString("GetMovieList returned %1 possible matches").arg(ret));
