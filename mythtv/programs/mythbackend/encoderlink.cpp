@@ -31,6 +31,8 @@ EncoderLink::EncoderLink(int capturecardnum, PlaybackSock *lsock,
     endRecordingTime = QDateTime::currentDateTime().addDays(-2);
     startRecordingTime = endRecordingTime;
     chanid = "";
+
+    freeSpace = -1;
 }
 
 EncoderLink::EncoderLink(int capturecardnum, TVRec *ltv)
@@ -178,6 +180,7 @@ void EncoderLink::cacheFreeSpace()
     if (local)
     {
         struct statfs statbuf;
+        memset(&statbuf, 0, sizeof(statbuf));
         if (statfs(recordfileprefix.ascii(), &statbuf) == 0)
         {
             freeSpace = statbuf.f_bavail / (1024*1024/statbuf.f_bsize);

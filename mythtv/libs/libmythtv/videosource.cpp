@@ -1019,7 +1019,7 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard& parent)
 
 void CaptureCardGroup::triggerChanged(const QString& value) 
 {
-    QString own = (value == "MJPEG") ? "V4L" : value;
+    QString own = (value == "MJPEG" || value == "GO7007") ? "V4L" : value;
     TriggeredConfigurationGroup::triggerChanged(own);
 }
 
@@ -1094,6 +1094,7 @@ void CardType::fillSelections(SelectSetting* setting)
                           "DVB");
     setting->addSelection(QObject::tr("FireWire Input"),
                           "FIREWIRE");
+    setting->addSelection(QObject::tr("USB Mpeg-4 Encoder (Plextor ConvertX, etc)"), "GO7007");
 }
 
 class CardID: public SelectLabelSetting, public CISetting {

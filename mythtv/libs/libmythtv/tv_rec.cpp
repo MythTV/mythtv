@@ -695,7 +695,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
         return;
     }
 
-    // V4L/MJPEG from here on
+    // V4L/MJPEG/GO7007 from here on
 
     nvr = new NuppelVideoRecorder(channel);
 

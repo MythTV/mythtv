@@ -463,9 +463,9 @@ void NuppelVideoPlayer::ReinitOSD(void)
 void NuppelVideoPlayer::ReinitVideo(void)
 {
     InitFilters();
-    videoOutput->InputChanged(video_width, video_height, video_aspect);
 
     videofiltersLock.lock();
+    videoOutput->InputChanged(video_width, video_height, video_aspect);
     ReinitOSD();
     videofiltersLock.unlock();
 

@@ -30,6 +30,7 @@ extern "C" {
 }
 
 #include "videodev_myth.h"
+#include "go7007_myth.h"
 
 #ifdef WORDS_BIGENDIAN
 #include "bswap.h"
@@ -158,6 +159,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(ChannelBase *channel)
     prev_bframe_save_pos = -1;
 
     volume = 100;
+    go7007 = false;
 }
 
 NuppelVideoRecorder::~NuppelVideoRecorder(void)
@@ -890,7 +892,8 @@ bool NuppelVideoRecorder::Open(void)
             vcap.card[2] == '8' && vcap.card[4] == '8')
             correct_bttv = true;
 
-        if (QString("cx8800") == QString((char *)vcap.driver))
+        QString driver = (char *)vcap.driver;
+        if (driver == "cx8800" || driver == "go7007")
         {
             channelfd = open(videodevice.ascii(), O_RDWR);
             if (channelfd < 0)
@@ -899,6 +902,11 @@ bool NuppelVideoRecorder::Open(void)
                 perror("open video:");
                 KillChildren();
                 return false;
+            }
+
+            if (driver == "go7007")
+            {
+                go7007 = true;
             }
             
             inpixfmt = FMT_NONE;
@@ -1187,8 +1195,9 @@ void NuppelVideoRecorder::DoV4L2(void)
     vfmt.fmt.pix.height = h;
     vfmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
 
-    // this is our preferred format, try this first
-    if (inpixfmt == FMT_YUV422P)
+    if (go7007)
+        vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_MPEG;
+    else if (inpixfmt == FMT_YUV422P)
         vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV422P;
     else
         vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV420;
@@ -1219,6 +1228,49 @@ void NuppelVideoRecorder::DoV4L2(void)
     }
     else // cool, we can do our preferred format, most likely running on bttv.
         VERBOSE(VB_RECORD, "NVR: v4l2: format set, getting yuv420 from v4l");
+
+    if (go7007)
+    {
+        struct go7007_comp_params comp;
+        struct go7007_mpeg_params mpeg;
+
+        memset(&comp, 0, sizeof(comp));
+        comp.gop_size = keyframedist;
+        comp.max_b_frames = 0;
+        comp.aspect_ratio = GO7007_ASPECT_RATIO_1_1;
+        comp.flags |= GO7007_COMP_CLOSED_GOP;
+        if (ioctl(fd, GO7007IOC_S_COMP_PARAMS, &comp) < 0) 
+        {
+            VERBOSE(VB_IMPORTANT, "Unable to set compression params\n");
+            errored = true;
+            return;
+        }
+
+        memset(&mpeg, 0, sizeof(mpeg));
+        mpeg.mpeg_video_standard = GO7007_MPEG_VIDEO_MPEG4;
+        if (ioctl(fd, GO7007IOC_S_MPEG_PARAMS, &mpeg) < 0)
+        {
+            VERBOSE(VB_IMPORTANT, "Unable to set MPEG params\n");
+            errored = true;
+            return;
+        }
+
+        int usebitrate = targetbitrate * 1000;
+        if (scalebitrate)
+        {
+            float diff = (w * h) / (640.0 * 480.0);
+            usebitrate = (int)(diff * usebitrate);
+        }
+
+        if (ioctl(fd, GO7007IOC_S_BITRATE, &usebitrate) < 0) 
+        {
+            VERBOSE(VB_IMPORTANT, "Unable to set bitrate\n");
+            errored = true;
+            return;
+        }
+
+        hardware_encode = true;
+    }
 
     int numbuffers = 5;
 
@@ -1320,6 +1372,7 @@ again:
 
         memset(&vbuf, 0, sizeof(vbuf));
         vbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        vbuf.memory = V4L2_MEMORY_MMAP;
         if (ioctl(fd, VIDIOC_DQBUF, &vbuf) < 0)
         {
             perror("VIDIOC_DQBUF");
@@ -1387,7 +1440,7 @@ again:
             else
             {
                 // buffer the frame directly
-                BufferIt(buffers[frame], video_buffer_size);
+                BufferIt(buffers[frame], vbuf.bytesused);
             }
         }
 
@@ -1395,14 +1448,14 @@ again:
         ioctl(fd, VIDIOC_QBUF, &vbuf);
     }
 
+    KillChildren();
+
     ioctl(fd, VIDIOC_STREAMOFF, &turnon);
 
     for (int i = 0; i < numbuffers; i++)
     {
         munmap(buffers[i], bufferlen[i]);
     }
-
-    KillChildren();
 
     if (!livetv)
         WriteSeekTable();

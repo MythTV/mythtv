@@ -57,6 +57,7 @@ void AutoExpire::RunExpirer(void)
             ExpireEpisodesOverMax();
 
         struct statfs statbuf;
+        memset(&statbuf, 0, sizeof(statbuf));
         int freespace = -1;
         if (statfs(recordfileprefix.ascii(), &statbuf) == 0) {
             freespace = statbuf.f_bavail / (1024*1024*1024/statbuf.f_bsize);

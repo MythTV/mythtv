@@ -97,8 +97,8 @@ DVBRecorder::~DVBRecorder()
     if (_buffer)
         delete[] _buffer;
 
-    delete pat_pkt;
-    delete pmt_pkt;
+    delete [] pat_pkt;
+    delete [] pmt_pkt;
 }
 
 void DVBRecorder::SetOption(const QString &name, int value)
@@ -239,6 +239,7 @@ void DVBRecorder::OpenFilters(uint16_t pid, ES_Type type)
     if (!_software_filter_option || !_software_filter_open)
     {
         struct dmx_pes_filter_params params;
+        memset(&params, 0, sizeof(params));
         params.input = DMX_IN_FRONTEND;
         params.output = DMX_OUT_TS_TAP;
         params.flags = DMX_IMMEDIATE_START;

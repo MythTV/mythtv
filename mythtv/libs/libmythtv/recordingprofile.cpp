@@ -595,6 +595,8 @@ public:
                codecName->addSelection("MPEG-2 Hardware Encoder");
             else if (groupType == "MJPEG")
                 codecName->addSelection("Hardware MJPEG");
+            else if (groupType == "GO7007")
+                codecName->addSelection("MPEG-4");
             else
             {
                 // V4L, TRANSCODE (and any undefined types)

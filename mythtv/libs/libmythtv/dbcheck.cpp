@@ -9,7 +9,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdbcon.h"
 
-const QString currentDatabaseVersion = "1074";
+const QString currentDatabaseVersion = "1075";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -1486,6 +1486,19 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
             return false;
     }
 
+    if (dbver == "1074")
+    {
+        const QString updates[] = {
+"INSERT INTO profilegroups SET name = \"USB Mpeg-4 Encoder (Plextor ConvertX, etc)\", cardtype = 'GO7007', is_default = 1;",
+"INSERT INTO recordingprofiles SET name = \"Default\", profilegroup = 8;",
+"INSERT INTO recordingprofiles SET name = \"Live TV\", profilegroup = 8;",
+"INSERT INTO recordingprofiles SET name = \"High Quality\", profilegroup = 8;",
+"INSERT INTO recordingprofiles SET name = \"Low Quality\", profilegroup = 8;",
+""
+};
+        if (!performActualUpdate(updates, "1075", dbver))
+            return false;
+    }
 
 
 

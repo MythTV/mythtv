@@ -277,6 +277,7 @@ class NuppelVideoRecorder : public RecorderBase
     bool correct_bttv;
 
     int volume;
+    bool go7007;
 };
 
 #endif
