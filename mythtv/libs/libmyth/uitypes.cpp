@@ -117,16 +117,21 @@ void LayerSet::SetText(QMap<QString, QString> &infoMap)
                 new_text = infoMap[item->Name()];
             }
             else if (new_text.contains(QRegExp("%.*%")))
+            {
                 for (; riter != infoMap.end(); riter++)
                 {
-                   full_regex = "%" + riter.key().upper() +
-                     "(\\|([^%|]*))?" + "(\\|([^%|]*))?" + "(\\|([^%]*))?%";
+                   QString key = riter.key().upper();
+                   QString data = riter.data();
+
+                   full_regex = QString("%") + key + QString("(\\|([^%|]*))?") +
+                     QString("(\\|([^%|]*))?") + QString("(\\|([^%]*))?%");
                    if (riter.data() != "")
                        new_text.replace(QRegExp(full_regex),
-                                        "\\2" + riter.data() + "\\4");
+                                        QString("\\2") + data + QString("\\4"));
                    else
-                       new_text.replace(QRegExp(full_regex), "\\6");
+                       new_text.replace(QRegExp(full_regex), QString("\\6"));
                 }
+            }
 
             if (new_text != "")
                 item->SetText(new_text);
