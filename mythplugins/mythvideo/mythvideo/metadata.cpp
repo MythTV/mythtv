@@ -104,7 +104,7 @@ bool Metadata::Remove(QSqlDatabase *db)
     }
     else
     {
-            cout << "impossible de supprimmer le fichier" << endl;
+            cerr << "impossible de supprimmer le fichier" << endl;
     }
     return isremoved;
 }
@@ -399,23 +399,52 @@ void Metadata::guessTitle()
     title.replace(QRegExp("%20"), " ");
     title = title.left(title.findRev("."));
     title.replace(QRegExp("\\."), " ");
-    while ((title.find("[") != -1) && (title.find("]") != -1))
-    {
-        title = title.left(title.find("[")) + 
-                title.right(title.length() - title.find("]") - 1);
-    }
-    while ((title.find("(") != -1) && (title.find(")") != -1))
-    {
-        title = title.left(title.find("(")) + 
-                title.right(title.length() - title.find(")") - 1);
-    }
-    while ((title.find("{") != -1) && (title.find("}") != -1))
-    {
-        title = title.left(title.find("{")) + 
-                title.right(title.length() - title.find("}") - 1);
-    }
-
+    
+    eatBraces("[", "]");
+    eatBraces("(", ")");
+    eatBraces("{", "}");
+    
     title = title.stripWhiteSpace();
+}
+
+void Metadata::eatBraces(const QString &left_brace, const QString &right_brace)
+{
+    bool keep_checking = true;
+    
+    while(keep_checking)
+    {
+        int left_position = title.find(left_brace);
+        int right_position = title.find(right_brace);
+        if(left_position == -1 || right_position == -1)
+        {
+            //
+            //  No matching sets of these braces left.
+            //
+
+            keep_checking = false;
+        }
+        else
+        {
+            if(left_position < right_position)
+            {
+                //
+                //  We have a matching set like:  (  foo  )
+                //
+
+                title = title.left(left_position) + 
+                        title.right(title.length() - right_position - 1);
+            }
+            else if (left_position > right_position)
+            {
+                //
+                //  We have a matching set like:  )  foo  (
+                //
+
+                title = title.left(right_position) + 
+                        title.right(title.length() - left_position - 1);
+            }
+        }
+    }
 }
 
 void Metadata::updateDatabase(QSqlDatabase *db)

@@ -156,6 +156,7 @@ class Metadata
     void setCountries(QStringList lcountries){countries = lcountries;}
 
     void guessTitle();
+    void eatBraces(const QString &left_brace, const QString &right_brace);
     void setField(QString field, QString data);
     void dumpToDatabase(QSqlDatabase *db);
     void updateDatabase(QSqlDatabase *db);
