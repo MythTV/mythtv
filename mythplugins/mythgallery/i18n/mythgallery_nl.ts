@@ -2,24 +2,28 @@
 <context>
     <name>IconView</name>
     <message>
+        <source>Caching thumbnails...</source>
+        <translation type="obsolete">Inladen miniaturen</translation>
+    </message>
+    <message>
         <source>Import pictures?</source>
-        <translation type="unfinished"></translation>
+        <translation>Foto&apos;s importeren?</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation>Neen</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja</translation>
     </message>
     <message>
         <source>Nothing found to import</source>
-        <translation type="unfinished"></translation>
+        <translation>Niets gevonden om te importeren</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Error</source>
@@ -34,31 +38,31 @@
     <name>QObject</name>
     <message>
         <source>Directory that holds images</source>
-        <translation type="unfinished"></translation>
+        <translation>Map met foto&apos;s</translation>
     </message>
     <message>
         <source>This directory must exist and MythGallery needs to have read permission.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze map moet bestaan en we moeten leesrechten hebben</translation>
     </message>
     <message>
         <source>Paths to import images from</source>
-        <translation type="unfinished"></translation>
+        <translation>Foto&apos;s importeren uit</translation>
     </message>
     <message>
         <source>Type of transition</source>
-        <translation type="unfinished"></translation>
+        <translation>Type overgang</translation>
     </message>
     <message>
         <source>Type of background</source>
-        <translation type="unfinished"></translation>
+        <translation>Achtergrond</translation>
     </message>
     <message>
         <source>This is the number of seconds to display each picture.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aantal seconden voor elke foto.</translation>
     </message>
     <message>
         <source>MythGallery Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Foto instellingen</translation>
     </message>
     <message>
         <source>This is a colon separated list of paths. If the path in the list is a directory, its contents will be copied. If it is an executable, it will be run.</source>
@@ -105,27 +109,31 @@
     <name>SingleView</name>
     <message>
         <source>Bytes</source>
-        <translation type="unfinished"></translation>
+        <translation>Bytes</translation>
     </message>
     <message>
         <source>Width</source>
-        <translation type="unfinished"></translation>
+        <translation>Breedte</translation>
     </message>
     <message>
         <source>Height</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoogte</translation>
     </message>
     <message>
         <source>Pixel Count</source>
-        <translation type="unfinished"></translation>
+        <translation>Pixels</translation>
     </message>
     <message>
         <source>Rotation Angle</source>
-        <translation type="unfinished"></translation>
+        <translation>Draaihoek</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="obsolete">OK</translation>
     </message>
     <message>
         <source>pixels</source>
-        <translation type="unfinished"></translation>
+        <translation>punten</translation>
     </message>
     <message>
         <source>megapixels</source>
@@ -133,15 +141,19 @@
     </message>
     <message>
         <source>degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>graden</translation>
+    </message>
+    <message>
+        <source>Filename: </source>
+        <translation type="obsolete">Bestandsnaam: </translation>
     </message>
     <message>
         <source>Created: </source>
-        <translation type="unfinished"></translation>
+        <translation>Gemaakt: </translation>
     </message>
     <message>
         <source>Modified: </source>
-        <translation type="unfinished"></translation>
+        <translation>Aangepast: </translation>
     </message>
     <message>
         <source>Folder: </source>
