@@ -1913,6 +1913,7 @@ static GenericComboBox *MythLanguage()
     gc->addSelection(QString::fromUtf8("Nihongo"), "JA");     // Japanese
     gc->addSelection(QString::fromUtf8("Slovenski"), "SI");   // Slovenian
     gc->addSelection(QString::fromUtf8("Suomi"), "FI");   // Finnish
+    gc->addSelection(QString::fromUtf8("Hanzi (Traditional)"), "ZH_TW"); // Traditional Chinese
     gc->setHelpText(QObject::tr("Your preferred language.") );
     return gc;
 }

@@ -12,6 +12,7 @@
      <text lang="SV">Väderinställningar</text>
      <text lang="JA">天気設定</text>
      <text lang="FI">Sään Asetukset</text>
+     <text lang="ZH_TW">天氣報告設定</text>
      <alttext lang="DE">Wetter</text>
      <action>CONFIGPLUGIN mythweather</action>
      <depends>mythweather</depends>
@@ -27,6 +28,7 @@
      <text lang="SV">Nyhetsinställningar</text>
      <text lang="JA">ニュース設定</text>
      <text lang="FI">Uutisten Asetukset</text>
+     <text lang="ZH_TW">網上新聞設定</text>
      <alttext lang="DE">Nachrichten</text>
      <action>CONFIGPLUGIN mythnews</action>
      <depends>mythnews</depends>
@@ -39,6 +41,7 @@
      <text lang="SV">Webb-inställningar</text>
      <text lang="JA">Web設定</text>
      <text lang="FI">Nettiasetukset</text>
+     <text lang="ZH_TW">互聯網設定</text>
      <alttext lang="DE">WWW</text>
      <action>CONFIGPLUGIN mythbookmarkmanager</action>
      <depends>mythbookmarkmanager</depends>

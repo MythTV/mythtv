@@ -14,6 +14,7 @@
       <text lang="SV">Se på TV</text>
       <text lang="JA">TV放送</text>
       <text lang="FI">Katso TV:tä</text>
+      <text lang="ZH_TW">觀看電視</text>
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -25,6 +26,7 @@
      <text lang="SV">Mediabibliotek</text>
      <text lang="JA">メディアライブラリ</text>
      <text lang="FI">Mediakirjasto</text>
+     <text lang="ZH_TW">媒體館</text>
      <action>MENU library.xml</action>
    </button>
    
@@ -42,6 +44,7 @@
       <text lang="SV">Hantera inspelningar</text>
       <text lang="JA">録画予約</text>
       <text lang="FI">Hallitse Nauhoituksia</text>
+      <text lang="ZH_TW">管理電視錄影</text>
       <action>MENU manage_recordings.xml</action>
    </button>
 
@@ -53,6 +56,7 @@
      <text lang="SV">Informationscenter</text>
      <text lang="JA">インフォメーションセンター</text>
      <text lang="FI">Tiedotepalvelu</text>
+     <text lang="ZH_TW">資訊中心</text>
      <action>MENU info_menu.xml</action>
    </button>
 
@@ -64,6 +68,7 @@
      <text lang="SV">Optiska diskar</text>
      <text lang="JA">オプティカルディスク</text>
      <text lang="FI">DVD ja CD</text>
+     <text lang="ZH_TW">光碟</text>
      <action>MENU optical_menu.xml</action>
      <depends>mythmusic mythdvd</depends>
    </button>
@@ -92,6 +97,7 @@
      <text lang="SV">Verktyg/Inställningar</text>
      <text lang="JA">設定</text>
      <text lang="FI">Oheis/Asetukset</text>
+     <text lang="ZH_TW">工具/設定</text>
      <alttext lang="DE">Verschiedenes</alttext>
      <action>MENU util_menu.xml</action>
    </button>

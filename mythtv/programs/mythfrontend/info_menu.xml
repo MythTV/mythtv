@@ -10,6 +10,7 @@
      <text lang="SV">Nyheter</text>
      <text lang="JA">ニュース</text>
      <text lang="FI">Uutiset</text>
+     <text lang="ZH_TW">網上新聞</text>
      <action>PLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -28,6 +29,7 @@
      <text lang="SV">Väder</text>
      <text lang="JA">天気</text>
      <text lang="FI">Säätiedotus</text>
+     <text lang="ZH_TW">天氣報告</text>
      <action>PLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
@@ -39,6 +41,7 @@
       <text lang="SV">Webb</text>
       <text lang="JA">ウェブ</text>
       <text lang="FI">Nettiselain</text>
+      <text lang="ZH_TW">互聯網</text>
       <action>PLUGIN mythbookmarkmanager</action>
       <depends>mythbookmarkmanager</depends>
    </button>
@@ -63,6 +66,7 @@
       <text lang="SV">Systemstatus</text>
       <text lang="JA">システムステータス</text>
       <text lang="FI">Systeemin Tila</text>
+      <text lang="ZH_TW">系統狀態</text>
       <action>TV_STATUS</action>
    </button>
 

@@ -14,6 +14,7 @@
       <text lang="SV">Generellt</text>
       <text lang="JA">一般</text>
       <text lang="FI">Yleiset</text>
+      <text lang="ZH_TW">一般</text>
       <action>SETTINGS GENERAL</action>
    </button>
 
@@ -31,6 +32,7 @@
       <text lang="SV">Programguide</text>
       <text lang="JA">番組ガイド</text>
       <text lang="FI">Ohjelmaopas</text>
+      <text lang="ZH_TW">節目表</text>
       <alttext lang="DE">EPG</alttext>
       <action>SETTINGS EPG</action>
    </button>
@@ -49,6 +51,7 @@
       <text lang="SV">Uppspelning</text>
       <text lang="JA">再生</text>
       <text lang="FI">Toisto</text>
+      <text lang="ZH_TW">重播</text>
       <action>SETTINGS PLAYBACK</action>
    </button>
 
@@ -66,6 +69,7 @@
       <text lang="SV">Inspelningsprofiler</text>
       <text lang="JA">録画プロフィール</text>
       <text lang="FI">Nauhoitusprofiilit</text>
+      <text lang="ZH_TW">錄影設定</text>
       <alttext lang="SV">Inspelning</alttext>
       <alttext lang="DE">Profile</alttext>
       <action>SETTINGS RECORDING</action>
@@ -78,6 +82,7 @@
       <text lang="SV">Inspelningsprioriteter</text>
       <text lang="JA">録画優先順位</text>
       <text lang="FI">Nauhoitusprioriteetit</text>
+      <text lang="ZH_TW">錄影優先次序</text>
       <alttext lang="DE">Prioritäten</alttext>
       <action>MENU recpriorities_settings.xml</action>
    </button>

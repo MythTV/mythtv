@@ -8,6 +8,7 @@
       <text lang="JA">タイトル</text>
       <text lang="NL">Titels«</text>
       <text lang="FI">Nimikkeet</text>
+      <text lang="ZH_TW">標題</text>
       <action>TV_SEARCH_TITLE</action>
    </button>
    
@@ -19,6 +20,7 @@
       <text lang="NL">Beschrijving</text>      
       <text lang="JA">キーワード</text>
       <text lang="FI">Avainsanat</text>
+      <text lang="ZH_TW">關鍵字</text>
       <action>TV_SEARCH_KEYWORD</action>
    </button>
    
