@@ -693,7 +693,8 @@ void fillData(QValueList<Source> &sourcelist)
         for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
              grabData(*it, xmltv_grabber, -1);
     }
-    else if (xmltv_grabber == "tv_grab_na" || xmltv_grabber == "tv_grab_aus")
+    else if (xmltv_grabber == "tv_grab_na" || xmltv_grabber == "tv_grab_aus" ||
+             xmltv_grabber == "tv_grab_sn")
     {
         for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
             grabData(*it, xmltv_grabber, 1);

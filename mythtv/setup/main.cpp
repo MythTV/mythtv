@@ -362,14 +362,15 @@ int main(int argc, char *argv[])
     setupSources();
 
     cout << endl << endl;
-    cout << "Now, please run mythfilldatabase to populate the database with "
-            "info.\n";
+    cout << "Now, please run 'mythfilldatabase' to populate the database with "
+            "channel information.\n";
     cout << endl;
-    cout << "If your xmltv grabber doesn't provide channel numbers "
-            "(like tv_grab_uk and tv_grab_de),\n";
-    cout << "or you want more options on how channels are inserted into the "
-         << "database, please\n";
-    cout << "run 'mythfilldatabase --manual' instead.\n";
+    cout << "If you are are using the following xmltv grabbers:\n";
+    cout << "  tv_grab_uk, tv_grab_de, tv_grab_sn\n";
+    cout << "You _MUST_ run 'mythfilldatabase --manual the first time, "
+         << "instead\n";
+    cout << "of just 'mythfilldatabase'.  These grabbers do not provide\n";
+    cout << "channel numbers, so you have to set them manually.\n";
 
     return 0;
 }
