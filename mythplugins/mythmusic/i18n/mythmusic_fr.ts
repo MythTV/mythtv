@@ -1,49 +1,6 @@
 <!DOCTYPE TS><TS>
 <context>
-    <name>@default</name>
-    <message>
-        <source>Repeat: All</source>
-        <translation type="obsolete">R�eter: Tout</translation>
-    </message>
-    <message>
-        <source>Repeat: Track</source>
-        <translation type="obsolete">R�eter: Piste</translation>
-    </message>
-    <message>
-        <source>Playing stream.</source>
-        <translation type="obsolete">Lecture du Flux.</translation>
-    </message>
-    <message>
-        <source>Buffering stream.</source>
-        <translation type="obsolete">Chargement du Flux.</translation>
-    </message>
-    <message>
-        <source>Stream paused.</source>
-        <translation type="obsolete">Flux en pause.</translation>
-    </message>
-    <message>
-        <source>Output error.</source>
-        <translation type="obsolete">Erreur de sortie.</translation>
-    </message>
-    <message>
-        <source>Stream stopped.</source>
-        <translation type="obsolete">Flux Stopp�</translation>
-    </message>
-    <message>
-        <source>Finished playing stream.</source>
-        <translation type="obsolete">Lecture du Flux Terminé.</translation>
-    </message>
-    <message>
-        <source>Decoder error.</source>
-        <translation type="obsolete">Erreur du Décodeur.</translation>
-    </message>
-</context>
-<context>
     <name>DatabaseBox</name>
-    <message>
-        <source>Select music to be played:</source>
-        <translation type="obsolete">Séléctionner la musique à jouer:</translation>
-    </message>
     <message>
         <source>Copy To New Playlist</source>
         <translation>Copier dans la nouvelle playlist</translation>
@@ -133,254 +90,135 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
 L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </translation>
     </message>
     <message>
-        <source>Artist:<byte value="x9"/></source>
-        <translation>Artiste: </translation>
-    </message>
-    <message>
-        <source>Album:<byte value="x9"/></source>
-        <translation>Album: </translation>
-    </message>
-    <message>
-        <source>Title:<byte value="x9"/></source>
-        <translation>Titre: </translation>
-    </message>
-    <message>
-        <source>Length:<byte value="x9"/></source>
-        <translation>Durée: </translation>
-    </message>
-    <message>
         <source>Genre: </source>
         <translation>Genre: </translation>
     </message>
-</context>
-<context>
-    <name>PlaybackBox</name>
     <message>
-        <source>Shuffle Mode</source>
-        <translation type="obsolete">Mode Al�toire</translation>
+        <source>Artist:<byte value="x9"/></source>
+        <translation>Artiste:</translation>
     </message>
     <message>
-        <source>Repeat Mode</source>
-        <translation type="obsolete">Mode r�eter</translation>
+        <source>Album:<byte value="x9"/></source>
+        <translation>Album:</translation>
     </message>
     <message>
-        <source>Edit Playlist</source>
-        <translation type="unfinished">Editer la playlist</translation>
+        <source>Title:<byte value="x9"/></source>
+        <translation>Titre:</translation>
     </message>
     <message>
-        <source>Visualize</source>
-        <translation type="unfinished">Visualisation</translation>
-    </message>
-    <message>
-        <source>Rating</source>
-        <translation type="obsolete">Notation</translation>
-    </message>
-    <message>
-        <source>Artist</source>
-        <translation type="obsolete">Artiste</translation>
-    </message>
-    <message>
-        <source>Title</source>
-        <translation type="obsolete">Titre</translation>
-    </message>
-    <message>
-        <source>Length</source>
-        <translation type="obsolete">Dur�</translation>
-    </message>
-    <message>
-        <source>Repeat: Track</source>
-        <translation type="unfinished">Repeter : la piste</translation>
-    </message>
-    <message>
-        <source>Repeat: All</source>
-        <translation type="unfinished">Repeter: Tout</translation>
-    </message>
-    <message>
-        <source>Playing stream.</source>
-        <translation type="unfinished">Jouer le Flux.</translation>
-    </message>
-    <message>
-        <source>Buffering stream.</source>
-        <translation type="unfinished">Mise en buffer du Flux.</translation>
-    </message>
-    <message>
-        <source>Stream paused.</source>
-        <translation type="unfinished">Mise en pause du Flux.</translation>
-    </message>
-    <message>
-        <source>Output error.</source>
-        <translation type="unfinished">Erreur de Sortie.</translation>
-    </message>
-    <message>
-        <source>Stream stopped.</source>
-        <translation type="unfinished">Flux Stoppé.</translation>
-    </message>
-    <message>
-        <source>Finished playing stream.</source>
-        <translation type="unfinished">Fin du Flux.</translation>
-    </message>
-    <message>
-        <source>Decoder error.</source>
-        <translation type="unfinished">Erreur du Décodeur.</translation>
-    </message>
-    <message>
-        <source>Shuffle: Intelligent</source>
-        <translation type="obsolete">Al�toire.: Intelligent</translation>
-    </message>
-    <message>
-        <source>Shuffle: Random</source>
-        <translation type="obsolete">Al�toire: Random</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Intelligent</source>
-        <translation type="obsolete">1 Aleatoire: Intelligent</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Random</source>
-        <translation type="obsolete">1 Al�toire: Random</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: None</source>
-        <translation type="unfinished">1 Aléatoire: Non</translation>
-    </message>
-    <message>
-        <source>Shuffle: None</source>
-        <translation type="unfinished">Aleatoire: Non</translation>
-    </message>
-    <message>
-        <source>2 Repeat: All</source>
-        <translation type="unfinished">2 Répeter: Tout</translation>
-    </message>
-    <message>
-        <source>2 Repeat: Track</source>
-        <translation type="unfinished">2 Répeter: Piste</translation>
-    </message>
-    <message>
-        <source>2 Repeat: None</source>
-        <translation type="unfinished">2 Répeter: Non</translation>
-    </message>
-    <message>
-        <source>Repeat: None</source>
-        <translation type="unfinished">Répeter: Non</translation>
-    </message>
-    <message>
-        <source>3 Edit Playlist</source>
-        <translation type="unfinished">3 Editer la Liste de Lecture</translation>
-    </message>
-    <message>
-        <source>4 Visualize</source>
-        <translation type="unfinished">4 Visualisation</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Smart</source>
-        <translation type="unfinished">1 Aléatoire: Simple</translation>
-    </message>
-    <message>
-        <source>Shuffle: Smart</source>
-        <translation type="unfinished">Aléatoire: Simple</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Rand</source>
-        <translation type="unfinished">1 Aleatoire: Variable</translation>
-    </message>
-    <message>
-        <source>Shuffle: Rand</source>
-        <translation type="unfinished">Aléatoire: Variable</translation>
-    </message>
-    <message>
-        <source>playlist root</source>
-        <translation type="unfinished">Racine de la Liste de Lecture</translation>
-    </message>
-    <message>
-        <source>kbps</source>
-        <translation type="unfinished">kbps</translation>
-    </message>
-    <message>
-        <source>kHz</source>
-        <translation type="unfinished">kHz</translation>
-    </message>
-    <message>
-        <source>ch</source>
-        <translation type="unfinished">can.</translation>
+        <source>Length:<byte value="x9"/></source>
+        <translation>Durée:</translation>
     </message>
 </context>
 <context>
     <name>PlaybackBoxMusic</name>
     <message>
         <source>Edit Playlist</source>
-        <translation type="obsolete">Editer la playlist</translation>
+        <translation>Editer la playlist</translation>
     </message>
     <message>
         <source>Visualize</source>
-        <translation type="obsolete">Visualisation</translation>
+        <translation>Visualisation</translation>
     </message>
     <message>
         <source>3 Edit Playlist</source>
-        <translation type="obsolete">3 Editer la Liste de Lecture</translation>
+        <translation>3 Editer la Liste de Lecture</translation>
     </message>
     <message>
         <source>4 Visualize</source>
-        <translation type="obsolete">4 Visualisation</translation>
+        <translation>4 Visualisation</translation>
     </message>
     <message>
         <source>1 Shuffle: Smart</source>
-        <translation type="obsolete">1 Aléatoire: Simple</translation>
+        <translation>1 Aléatoire: Simple</translation>
     </message>
     <message>
         <source>Shuffle: Smart</source>
-        <translation type="obsolete">Aléatoire: Simple</translation>
+        <translation>Aléatoire: Simple</translation>
     </message>
     <message>
         <source>1 Shuffle: Rand</source>
-        <translation type="obsolete">1 Aleatoire: Variable</translation>
+        <translation>1 Aleatoire: Variable</translation>
     </message>
     <message>
         <source>Shuffle: Rand</source>
-        <translation type="obsolete">Aléatoire: Variable</translation>
+        <translation>Aléatoire: Variable</translation>
     </message>
     <message>
         <source>1 Shuffle: None</source>
-        <translation type="obsolete">1 Aléatoire: Non</translation>
+        <translation>1 Aléatoire: Non</translation>
     </message>
     <message>
         <source>Shuffle: None</source>
-        <translation type="obsolete">Aleatoire: Non</translation>
+        <translation>Aleatoire: Non</translation>
     </message>
     <message>
         <source>2 Repeat: All</source>
-        <translation type="obsolete">2 Répeter: Tout</translation>
+        <translation>2 Répeter: Tout</translation>
     </message>
     <message>
         <source>2 Repeat: Track</source>
-        <translation type="obsolete">2 Répeter: Piste</translation>
+        <translation>2 Répeter: Piste</translation>
     </message>
     <message>
         <source>2 Repeat: None</source>
-        <translation type="obsolete">2 Répeter: Non</translation>
+        <translation>2 Répeter: Non</translation>
     </message>
     <message>
         <source>Repeat: None</source>
-        <translation type="obsolete">Répeter: Non</translation>
+        <translation>Répeter: Non</translation>
     </message>
     <message>
         <source>playlist root</source>
-        <translation type="obsolete">Racine de la Liste de Lecture</translation>
+        <translation>Racine de la Liste de Lecture</translation>
     </message>
     <message>
         <source>kbps</source>
-        <translation type="obsolete">kbps</translation>
+        <translation>kbps</translation>
     </message>
     <message>
         <source>kHz</source>
-        <translation type="obsolete">kHz</translation>
+        <translation>kHz</translation>
     </message>
     <message>
         <source>ch</source>
-        <translation type="obsolete">can.</translation>
+        <translation>can.</translation>
     </message>
     <message>
         <source>Decoder error.</source>
-        <translation type="obsolete">Erreur du Décodeur.</translation>
+        <translation>Erreur du Décodeur.</translation>
+    </message>
+    <message>
+        <source>Repeat: All</source>
+        <translation>Répéter: tout</translation>
+    </message>
+    <message>
+        <source>Repeat: Track</source>
+        <translation>Répéter: Piste</translation>
+    </message>
+    <message>
+        <source>Playing stream.</source>
+        <translation>Jouer le flux</translation>
+    </message>
+    <message>
+        <source>Buffering stream.</source>
+        <translation>Stockage de flux</translation>
+    </message>
+    <message>
+        <source>Stream paused.</source>
+        <translation>Flux en Pause</translation>
+    </message>
+    <message>
+        <source>Output error.</source>
+        <translation>Erreur d&apos;I/O</translation>
+    </message>
+    <message>
+        <source>Stream stopped.</source>
+        <translation>Flux arrêté</translation>
+    </message>
+    <message>
+        <source>Finished playing stream.</source>
+        <translation>Fin de lecture de flux.</translation>
     </message>
 </context>
 <context>
@@ -395,7 +233,7 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     </message>
     <message>
         <source>BumpScope</source>
-        <translation type="unfinished"></translation>
+        <translation>BumpScope</translation>
     </message>
     <message>
         <source>Various Artists</source>
@@ -403,7 +241,7 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     </message>
     <message>
         <source>Ogg Vorbis Audio</source>
-        <translation></translation>
+        <translation>Audio Ogg Vorbis</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -411,7 +249,7 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     </message>
     <message>
         <source>FLAC Audio</source>
-        <translation></translation>
+        <translation>Audio FLAC</translation>
     </message>
     <message>
         <source>Directory to hold music</source>
@@ -440,10 +278,6 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     <message>
         <source>Tree Sorting</source>
         <translation>Trie de l&apos;Arborescence</translation>
-    </message>
-    <message>
-        <source>Order in which to sort the Music Selection Tree. Possible values are space-separated list of genre, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the actual directory tree.</source>
-        <translation type="obsolete">Indiquer comment doit être trier l&apos;arborescence de la selection musicale.  Les valeurs possibles sont en liste avec des espace comme séparateur: genre, artiste, album, et titre OU le mot-clé &quot;annuaire&quot; pour indiquer l&apos;affichage de l&apos;arborescence.</translation>
     </message>
     <message>
         <source>Script Path</source>
@@ -491,11 +325,11 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     </message>
     <message>
         <source>Ogg Vorbis</source>
-        <translation></translation>
+        <translation>Ogg Vorbis</translation>
     </message>
     <message>
         <source>Lame (MP3)</source>
-        <translation></translation>
+        <translation>Lame (MP3)</translation>
     </message>
     <message>
         <source>Audio encoder to use for CD ripping. Note that the quality level &apos;Perfect&apos; will use the FLAC encoder.</source>
@@ -507,7 +341,7 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     </message>
     <message>
         <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / and -. &apos;-&apos; will be replaced by the Token separator</source>
-        <translation type="unfinished">Définit le chemin/nom pour les nouvelles chansons. GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, /  sont des valeurs possibles et -, &apos;-&apos; sera remplacé par le caractère de séparation</translation>
+        <translation>Définit le chemin/nom pour les nouvelles chansons. GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, /  sont des valeurs possibles et -, &apos;-&apos; sera remplacé par le caractère de séparation</translation>
     </message>
     <message>
         <source>Token separator</source>
@@ -667,31 +501,31 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     </message>
     <message>
         <source>MonoScope</source>
-        <translation></translation>
+        <translation>MonoScope</translation>
     </message>
     <message>
         <source>StereoScope</source>
-        <translation></translation>
+        <translation>StereoScope</translation>
     </message>
     <message>
         <source>Spectrum</source>
-        <translation></translation>
+        <translation>Spectrum</translation>
     </message>
     <message>
         <source>Goom</source>
-        <translation></translation>
+        <translation>Goom</translation>
     </message>
     <message>
         <source>Synaesthesia</source>
-        <translation></translation>
+        <translation>Synaesthesia</translation>
     </message>
     <message>
         <source>Gears</source>
-        <translation></translation>
+        <translation>Gears</translation>
     </message>
     <message>
         <source>Blank</source>
-        <translation></translation>
+        <translation>Blanc</translation>
     </message>
     <message>
         <source>Default Rip Quality</source>
@@ -735,25 +569,7 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     </message>
     <message>
         <source>MPEG Layer 1/2/3 Audio (MAD decoder)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>music database</source>
-        <translation type="obsolete">Base de données Musicale</translation>
-    </message>
-    <message>
-        <source>cd ripper</source>
-        <translation type="obsolete">Import de CD</translation>
-    </message>
-    <message>
-        <source>
-
-You have no MythMusic tables in your database.</source>
-        <translation type="obsolete">Il n&apos;y a pas de tables MythMusic dans la base de données.</translation>
-    </message>
-    <message>
-        <source>OK, I&apos;ll read the documentation</source>
-        <translation type="obsolete">OK, Je lirai la documentation</translation>
+        <translation>Couche Audio MPEG 1/2/3 (Décodeur MAD)</translation>
     </message>
     <message>
         <source>Unknown Artist</source>
@@ -777,7 +593,7 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>%1 - %2</source>
-        <translation></translation>
+        <translation>%1 - %2</translation>
     </message>
     <message>
         <source>title</source>
@@ -789,15 +605,15 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source> ~ </source>
-        <translation></translation>
+        <translation> ~ </translation>
     </message>
     <message>
         <source>Ooops</source>
-        <translation></translation>
+        <translation>Ooops</translation>
     </message>
     <message>
         <source>%1 ~ %2</source>
-        <translation></translation>
+        <translation>%1 ~ %2</translation>
     </message>
     <message>
         <source>Not Initialized</source>
@@ -805,11 +621,11 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>oops</source>
-        <translation></translation>
+        <translation>oops</translation>
     </message>
     <message>
         <source>,%1</source>
-        <translation></translation>
+        <translation>,%1</translation>
     </message>
     <message>
         <source>All My Playlists</source>
@@ -877,11 +693,11 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>650MB/75min</source>
-        <translation></translation>
+        <translation>650MB/75min</translation>
     </message>
     <message>
         <source>700MB/80min</source>
-        <translation></translation>
+        <translation>700MB/80min</translation>
     </message>
     <message>
         <source>Default CD Capacity.</source>
@@ -901,23 +717,23 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>1x</source>
-        <translation></translation>
+        <translation>1x</translation>
     </message>
     <message>
         <source>2x</source>
-        <translation></translation>
+        <translation>2x</translation>
     </message>
     <message>
         <source>4x</source>
-        <translation></translation>
+        <translation>4x</translation>
     </message>
     <message>
         <source>8x</source>
-        <translation></translation>
+        <translation>8x</translation>
     </message>
     <message>
         <source>16x</source>
-        <translation></translation>
+        <translation>16x</translation>
     </message>
     <message>
         <source>CD Writer speed. Auto will use the recomended speed.</source>
@@ -1027,51 +843,51 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>Track Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Information de Piste</translation>
     </message>
     <message>
         <source>Artist:</source>
-        <translation type="unfinished"></translation>
+        <translation>Artiste:</translation>
     </message>
     <message>
         <source>Album:</source>
-        <translation type="unfinished"></translation>
+        <translation>Album:</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Titre:</translation>
     </message>
     <message>
         <source>Genre:</source>
-        <translation type="unfinished"></translation>
+        <translation>Genre:</translation>
     </message>
     <message>
         <source>Year:</source>
-        <translation type="unfinished"></translation>
+        <translation>Année:</translation>
     </message>
     <message>
         <source>Track No.:</source>
-        <translation type="unfinished"></translation>
+        <translation>Piste No:</translation>
     </message>
     <message>
         <source>Rating:</source>
-        <translation type="unfinished"></translation>
+        <translation>Appréciation:</translation>
     </message>
     <message>
         <source>Play Count:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nb lectures:</translation>
     </message>
     <message>
         <source>Last Play:</source>
-        <translation type="unfinished"></translation>
+        <translation>Der. Lecture:</translation>
     </message>
     <message>
         <source>Compilation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Compilation:</translation>
     </message>
     <message>
         <source>Filename:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier:</translation>
     </message>
 </context>
 </TS>

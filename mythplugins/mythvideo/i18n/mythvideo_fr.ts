@@ -217,10 +217,6 @@
         <translation>Liste</translation>
     </message>
     <message>
-        <source>The defualt view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
-        <translation type="obsolete">La vue par défaut pour MythVideo. Les autres vues peuvent être atteintes à travers le menu popup accessible par la touche MENU</translation>
-    </message>
-    <message>
         <source>Aggressive Parental Control</source>
         <translation>Contrôle Parental Agressif</translation>
     </message>
@@ -257,12 +253,8 @@
         <translation>Galerie Vidéo</translation>
     </message>
     <message>
-        <source>Manually Enter IMDB #</source>
-        <translation type="obsolete">Entrer le n° allociné</translation>
-    </message>
-    <message>
         <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
-        <translation type="unfinished"></translation>
+        <translation>La vue par défaut pour MythVideo. Les autres vues peuvent être atteintes à travers le menu popup accessible par la touche MENU</translation>
     </message>
 </context>
 <context>
@@ -452,18 +444,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>MENU: Options</source>
-        <translation type="obsolete">Menu: Options</translation>
-    </message>
-    <message>
-        <source>Up/Down, Page Up/Down - Browse</source>
-        <translation type="obsolete">haut/Bas, Pg Haut/bas - Naviguer</translation>
-    </message>
-    <message>
-        <source>Menu - Options</source>
-        <translation type="obsolete">Menu - Options</translation>
-    </message>
-    <message>
         <source>Parental</source>
         <translation>Niveau</translation>
     </message>
@@ -485,15 +465,15 @@
     </message>
     <message>
         <source>INFO - Action Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>INFO - Menu Actions</translation>
     </message>
     <message>
         <source>Up/Down, Page Up/Down: Browse   MENU: Options   INFO: Action Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Haut/Bas, Page Haut/Bas: Naviguer   MENU: Options   INFO: Menu Action</translation>
     </message>
     <message>
         <source>Play File After This:</source>
-        <translation type="unfinished"></translation>
+        <translation>Jouer le fichier après ceci:</translation>
     </message>
 </context>
 <context>

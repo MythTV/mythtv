@@ -636,15 +636,15 @@
     </message>
     <message>
         <source>COLD</source>
-        <translation type="unfinished"></translation>
+        <translation>FROID</translation>
     </message>
     <message>
         <source>COLDEST</source>
-        <translation type="unfinished"></translation>
+        <translation>TRES FROID</translation>
     </message>
     <message>
         <source>CLOUD TEMPERATURE</source>
-        <translation type="unfinished"></translation>
+        <translation>TEMPERATURE NUAGES</translation>
     </message>
 </context>
 <context>

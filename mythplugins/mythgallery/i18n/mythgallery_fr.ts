@@ -3,47 +3,47 @@
     <name>GLSingleView</name>
     <message>
         <source>Folder: </source>
-        <translation type="unfinished">répertoire: </translation>
+        <translation>répertoire: </translation>
     </message>
     <message>
         <source>Created: </source>
-        <translation type="unfinished">Créé le:</translation>
+        <translation>Créé le:</translation>
     </message>
     <message>
         <source>Modified: </source>
-        <translation type="unfinished">Modifié le:</translation>
+        <translation>Modifié le:</translation>
     </message>
     <message>
         <source>Bytes</source>
-        <translation type="unfinished">Octets</translation>
+        <translation>Octets</translation>
     </message>
     <message>
         <source>Width</source>
-        <translation type="unfinished">Largeur</translation>
+        <translation>Largeur</translation>
     </message>
     <message>
         <source>pixels</source>
-        <translation type="unfinished">Pixels</translation>
+        <translation>Pixels</translation>
     </message>
     <message>
         <source>Height</source>
-        <translation type="unfinished">Hauteur</translation>
+        <translation>Hauteur</translation>
     </message>
     <message>
         <source>Pixel Count</source>
-        <translation type="unfinished">Nombre de pixels</translation>
+        <translation>Nombre de pixels</translation>
     </message>
     <message>
         <source>megapixels</source>
-        <translation type="unfinished">MegaPixels</translation>
+        <translation>MegaPixels</translation>
     </message>
     <message>
         <source>Rotation Angle</source>
-        <translation type="unfinished">Angle de rotation</translation>
+        <translation>Angle de rotation</translation>
     </message>
     <message>
         <source>degrees</source>
-        <translation type="unfinished">degrées</translation>
+        <translation>degrées</translation>
     </message>
 </context>
 <context>
@@ -98,7 +98,7 @@
     </message>
     <message>
         <source>Random</source>
-        <translation type="unfinished"></translation>
+        <translation>Aléatoire</translation>
     </message>
 </context>
 <context>
@@ -173,11 +173,11 @@
     </message>
     <message>
         <source>Command run to display movie files</source>
-        <translation type="unfinished"></translation>
+        <translation>Commande à lancer pour afficher une vidéo</translation>
     </message>
     <message>
         <source>This command is executed whenever a movie file is selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Cette commande est exécutée lorsqu&apos;une vidéo est sélectionnée</translation>
     </message>
 </context>
 <context>
