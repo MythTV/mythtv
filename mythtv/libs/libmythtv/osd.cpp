@@ -37,7 +37,7 @@ OSD::OSD(int width, int height, const string &filename)
     infofontsize = 16;
     channumfontsize = 40;
 
-    if (vid_width < 400)
+    if (vid_width < 400 || vid_height < 400)
     {
         infofontsize /= 2;
         channumfontsize /= 2;
