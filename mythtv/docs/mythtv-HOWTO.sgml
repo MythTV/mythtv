@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-08-19, v2.60
+<date>2003-08-19, v2.61
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2407,7 +2407,8 @@ By default, MythWeb uses the Apache <tt>.htaccess</tt> file to restrict
 access to the website.  If you do not wish to use access control, then
 rename or remove the <tt>/var/www/html/mythweb/.htaccess</tt> file.
 
-To create the password file for Apache, you could do something like this:
+To create the password file for Apache (if your system doesn't already have
+one), you could do something like this:
 <tscreen><verb>
 # cd /var/www
 # htpasswd -c htpasswd mythtv
@@ -2416,7 +2417,7 @@ Re-type new password:
 Adding password for user mythtv
 </verb></tscreen>
 
-See the man page for <bf>htaccess</bf> for more examples.
+See the man page for <bf>htpasswd</bf> for more examples.
 
 To access the web page, open a web browser and use <bf>http://[name or ip
 address]/mythweb/</bf>
@@ -4300,6 +4301,8 @@ version update.  Add MythDVD section.  Add MythWeb2 section.
 v2.60, 2003-08-19.  MythWeb2 is now the default, but is called MythWeb, so
 get rid of the just-added section.  Add instructions for generating
 htpasswd.
+v2.61, 2003-08-19.  Correct name of program to generate passwords for
+apache.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

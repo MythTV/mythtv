@@ -65,7 +65,8 @@ $
 <P>By default, MythWeb uses the Apache <CODE>.htaccess</CODE> file to restrict
 access to the website.  If you do not wish to use access control, then
 rename or remove the <CODE>/var/www/html/mythweb/.htaccess</CODE> file.</P>
-<P>To create the password file for Apache, you could do something like this:
+<P>To create the password file for Apache (if your system doesn't already have
+one), you could do something like this:
 <BLOCKQUOTE><CODE>
 <PRE>
 # cd /var/www
@@ -76,7 +77,7 @@ Adding password for user mythtv
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>See the man page for <B>htaccess</B> for more examples.</P>
+<P>See the man page for <B>htpasswd</B> for more examples.</P>
 <P>To access the web page, open a web browser and use <B>http://[name or ip
 address]/mythweb/</B></P>
 <P><B>NOTE</B>: Make sure that you have a trailing slash on the URL,
