@@ -65,8 +65,8 @@ Weather::Weather(QWidget *parent, const char *name)
     if (debug == true)
 	cout << "MythWeather: Reading 'SIUnits' from context.\n";
     
-    QString convertFlag = gContext->GetSetting("SIUnits");
-    if (convertFlag.upper() == "YES")
+    int convertFlag = gContext->GetNumSetting("SIUnits",0);
+    if (convertFlag)
     {
 	if (debug == true)
 		cout << "MythWeather: --- Converting Data\n";
