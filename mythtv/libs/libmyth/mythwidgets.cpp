@@ -122,6 +122,16 @@ void MythLineEdit::keyPressEvent(QKeyEvent *e)
     }
 }
 
+void MythLineEdit::setText(const QString& text) {
+    // Don't mess with the cursor position; it causes
+    // counter-intuitive behaviour due to interactions with the
+    // communication with the settings stuff
+
+    int pos = cursorPosition();
+    QLineEdit::setText(text);
+    setCursorPosition(pos);
+}
+
 void MythTable::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;

@@ -109,6 +109,9 @@ class MythLineEdit : public QLineEdit
 
     void setHelpText(QString help) { helptext = help; }
 
+ public slots:
+     virtual void setText(const QString& text);
+
   signals:
     void changeHelpText(QString);
 
