@@ -27,6 +27,14 @@ typedef struct LBFilter
     TF_STRUCT;
 } LBFilter;
 
+#define MM_MMX    0x0001 /* standard MMX */
+#define MM_3DNOW  0x0004 /* AMD 3DNOW */
+#define MM_MMXEXT 0x0002 /* SSE integer functions or AMD MMX ext */
+#define MM_SSE    0x0008 /* SSE functions */
+#define MM_SSE2   0x0010 /* PIV SSE2 functions */
+
+#ifdef i386
+
 #define cpuid(index,eax,ebx,ecx,edx)\
     __asm __volatile\
         ("movl %%ebx, %%esi\n\t"\
@@ -35,12 +43,6 @@ typedef struct LBFilter
          : "=a" (eax), "=S" (ebx),\
            "=c" (ecx), "=d" (edx)\
          : "0" (index));
-
-#define MM_MMX    0x0001 /* standard MMX */
-#define MM_3DNOW  0x0004 /* AMD 3DNOW */
-#define MM_MMXEXT 0x0002 /* SSE integer functions or AMD MMX ext */
-#define MM_SSE    0x0008 /* SSE functions */
-#define MM_SSE2   0x0010 /* PIV SSE2 functions */
 
 #define        emms()                  __asm__ __volatile__ ("emms")
 
@@ -149,50 +151,6 @@ int mm_support(void)
     }
 }
 
-void linearBlend(unsigned char *src, int stride)
-{
-    int a, b, c, x;
-
-    for (x = 0; x < 2; x++)
-    {
-        a= *(uint32_t*)&src[stride*0];
-        b= *(uint32_t*)&src[stride*1];
-        c= *(uint32_t*)&src[stride*2];
-        a= (a&c) + (((a^c)&0xFEFEFEFEUL)>>1);
-        *(uint32_t*)&src[stride*0]= (a|b) - (((a^b)&0xFEFEFEFEUL)>>1);
-
-        a= *(uint32_t*)&src[stride*3];
-        b= (a&b) + (((a^b)&0xFEFEFEFEUL)>>1);
-        *(uint32_t*)&src[stride*1]= (c|b) - (((c^b)&0xFEFEFEFEUL)>>1);
-
-        b= *(uint32_t*)&src[stride*4];
-        c= (b&c) + (((b^c)&0xFEFEFEFEUL)>>1);
-        *(uint32_t*)&src[stride*2]= (c|a) - (((c^a)&0xFEFEFEFEUL)>>1);
-
-        c= *(uint32_t*)&src[stride*5];
-        a= (a&c) + (((a^c)&0xFEFEFEFEUL)>>1);
-        *(uint32_t*)&src[stride*3]= (a|b) - (((a^b)&0xFEFEFEFEUL)>>1);
-
-        a= *(uint32_t*)&src[stride*6];
-        b= (a&b) + (((a^b)&0xFEFEFEFEUL)>>1);
-        *(uint32_t*)&src[stride*4]= (c|b) - (((c^b)&0xFEFEFEFEUL)>>1);
-
-        b= *(uint32_t*)&src[stride*7];
-        c= (b&c) + (((b^c)&0xFEFEFEFEUL)>>1);
-        *(uint32_t*)&src[stride*5]= (c|a) - (((c^a)&0xFEFEFEFEUL)>>1);
-
-        c= *(uint32_t*)&src[stride*8];
-        a= (a&c) + (((a^c)&0xFEFEFEFEUL)>>1);
-        *(uint32_t*)&src[stride*6]= (a|b) - (((a^b)&0xFEFEFEFEUL)>>1);
-
-        a= *(uint32_t*)&src[stride*9];
-        b= (a&b) + (((a^b)&0xFEFEFEFEUL)>>1);
-        *(uint32_t*)&src[stride*7]= (c|b) - (((c^b)&0xFEFEFEFEUL)>>1);
-
-        src += 4;
-    }
-}
-
 void linearBlendMMX(unsigned char *src, int stride)
 {
 //  src += 4 * stride;
@@ -285,6 +243,56 @@ void linearBlend3DNow(unsigned char *src, int stride)
        : : "r" (src), "r" (stride)
        : "%eax", "%edx"
     );
+}
+#else // i386
+#define emms()
+int mm_support(void) { return 0; }
+void linearBlendMMX(unsigned char *src, int stride) {(void)src; (void)stride;};
+void linearBlend3DNow(unsigned char *src, int stride) {(void)src;(void)stride;};
+#endif // i386
+
+void linearBlend(unsigned char *src, int stride)
+{
+    int a, b, c, x;
+
+    for (x = 0; x < 2; x++)
+    {
+        a= *(uint32_t*)&src[stride*0];
+        b= *(uint32_t*)&src[stride*1];
+        c= *(uint32_t*)&src[stride*2];
+        a= (a&c) + (((a^c)&0xFEFEFEFEUL)>>1);
+        *(uint32_t*)&src[stride*0]= (a|b) - (((a^b)&0xFEFEFEFEUL)>>1);
+
+        a= *(uint32_t*)&src[stride*3];
+        b= (a&b) + (((a^b)&0xFEFEFEFEUL)>>1);
+        *(uint32_t*)&src[stride*1]= (c|b) - (((c^b)&0xFEFEFEFEUL)>>1);
+
+        b= *(uint32_t*)&src[stride*4];
+        c= (b&c) + (((b^c)&0xFEFEFEFEUL)>>1);
+        *(uint32_t*)&src[stride*2]= (c|a) - (((c^a)&0xFEFEFEFEUL)>>1);
+
+        c= *(uint32_t*)&src[stride*5];
+        a= (a&c) + (((a^c)&0xFEFEFEFEUL)>>1);
+        *(uint32_t*)&src[stride*3]= (a|b) - (((a^b)&0xFEFEFEFEUL)>>1);
+
+        a= *(uint32_t*)&src[stride*6];
+        b= (a&b) + (((a^b)&0xFEFEFEFEUL)>>1);
+        *(uint32_t*)&src[stride*4]= (c|b) - (((c^b)&0xFEFEFEFEUL)>>1);
+
+        b= *(uint32_t*)&src[stride*7];
+        c= (b&c) + (((b^c)&0xFEFEFEFEUL)>>1);
+        *(uint32_t*)&src[stride*5]= (c|a) - (((c^a)&0xFEFEFEFEUL)>>1);
+
+        c= *(uint32_t*)&src[stride*8];
+        a= (a&c) + (((a^c)&0xFEFEFEFEUL)>>1);
+        *(uint32_t*)&src[stride*6]= (a|b) - (((a^b)&0xFEFEFEFEUL)>>1);
+
+        a= *(uint32_t*)&src[stride*9];
+        b= (a&b) + (((a^b)&0xFEFEFEFEUL)>>1);
+        *(uint32_t*)&src[stride*7]= (c|b) - (((c^b)&0xFEFEFEFEUL)>>1);
+
+        src += 4;
+    }
 }
 
 int linearBlendFilter(VideoFilter *f, VideoFrame *frame)

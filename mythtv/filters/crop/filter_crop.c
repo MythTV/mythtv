@@ -7,16 +7,6 @@
  * 
  */
 
-//From linearblend
-#define cpuid(index,eax,ebx,ecx,edx)\
-    __asm __volatile\
-        ("movl %%ebx, %%esi\n\t"\
-         "cpuid\n\t"\
-         "xchgl %%ebx, %%esi"\
-         : "=a" (eax), "=S" (ebx),\
-           "=c" (ecx), "=d" (edx)\
-         : "0" (index));
-
 #define MM_MMX    0x0001 /* standard MMX */
 #define MM_3DNOW  0x0004 /* AMD 3DNOW */
 #define MM_MMXEXT 0x0002 /* SSE integer functions or AMD MMX ext */
@@ -50,6 +40,18 @@ typedef struct ThisFilter
   TF_STRUCT;
 
 } ThisFilter;
+
+#ifdef i386
+
+//From linearblend
+#define cpuid(index,eax,ebx,ecx,edx)\
+    __asm __volatile\
+        ("movl %%ebx, %%esi\n\t"\
+         "cpuid\n\t"\
+         "xchgl %%ebx, %%esi"\
+         : "=a" (eax), "=S" (ebx),\
+           "=c" (ecx), "=d" (edx)\
+         : "0" (index));
 
 int mm_support(void) // From linearblend
 {
@@ -154,6 +156,9 @@ int mm_support(void) // From linearblend
     return 0;
   }
 }
+#else // i386
+int mm_support(void) { return 0; };
+#endif
 
 int crop(VideoFilter *f, VideoFrame *frame)
 {
@@ -211,6 +216,7 @@ int crop(VideoFilter *f, VideoFrame *frame)
   return 0;
 }
 
+#ifdef i386
 int cropMMX(VideoFilter *f, VideoFrame *frame)
 {
   ThisFilter *tf = (ThisFilter *)f;  
@@ -275,7 +281,9 @@ int cropMMX(VideoFilter *f, VideoFrame *frame)
   TF_END(tf, "Crop: ");
   return 0;
 }
-
+#else // i386
+int cropMMX(VideoFilter *f, VideoFrame *frame) { (void)f; (void)frame; }
+#endif
 
 VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
                         int *width, int *height, char *options)

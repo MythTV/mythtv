@@ -21,6 +21,13 @@
 
 #define ABS(A) ( (A) > 0 ? (A) : -(A) )
 
+#define MM_MMX    0x0001        /* standard MMX */
+#define MM_3DNOW  0x0004        /* AMD 3DNOW */
+#define MM_MMXEXT 0x0002        /* SSE integer functions or AMD MMX ext */
+#define MM_SSE    0x0008        /* SSE functions */
+#define MM_SSE2   0x0010        /* PIV SSE2 functions */
+
+#ifdef i386
 
 #include "mmx.h"
 
@@ -34,12 +41,6 @@ static const mmx_t mz = { 0x0LL };
          : "=a" (eax), "=S" (ebx),\
            "=c" (ecx), "=d" (edx)\
          : "0" (index));
-
-#define MM_MMX    0x0001        /* standard MMX */
-#define MM_3DNOW  0x0004        /* AMD 3DNOW */
-#define MM_MMXEXT 0x0002        /* SSE integer functions or AMD MMX ext */
-#define MM_SSE    0x0008        /* SSE functions */
-#define MM_SSE2   0x0010        /* PIV SSE2 functions */
 
 /* function to determin cacheline size, it's not perfect because some flakey
    procs make an accurate test complicated, but it should be good enough
@@ -155,6 +156,9 @@ mm_support (void)
         return 0;
     }
 }
+#else
+int mm_support(void) { return 0; }
+#endif // i386
 
 typedef struct ThisFilter
 {
@@ -229,6 +233,8 @@ denoise (uint8_t * Frame,
         }
     }
 }
+
+#ifdef i386
 
 static void
 denoiseMMX (uint8_t * Frame,
@@ -435,6 +441,18 @@ denoiseMMX (uint8_t * Frame,
         LinePrev += W;
     }
 }
+#else // i386
+static void
+denoiseMMX (uint8_t * Frame,
+            uint8_t * FramePrev,
+            uint8_t * Line,
+            int W, int H,
+            uint8_t * Spatial, uint8_t * Temporal)
+{
+     (void)Frame; (void)FramePrev; (void)Line; (void)W; (void)H;
+     (void)Spatial; (void)Temporal;
+}
+#endif // i386
 
 static int
 denoise3DFilter (VideoFilter * f, VideoFrame * frame)

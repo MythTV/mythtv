@@ -10,6 +10,14 @@
  * 
  */
 
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "filter.h"
+#include "frame.h"
+
 //Regular filter
 #define LUMA_THRESHOLD_DEFAULT 15
 #define CHROMA_THRESHOLD_DEFAULT 25
@@ -22,30 +30,6 @@
 
 //#define QUICKDNR_DEBUG
 //#define TIME_FILTER
-
-//From linearblend
-#define cpuid(index,eax,ebx,ecx,edx)\
-    __asm __volatile\
-        ("movl %%ebx, %%esi\n\t"\
-         "cpuid\n\t"\
-         "xchgl %%ebx, %%esi"\
-         : "=a" (eax), "=S" (ebx),\
-           "=c" (ecx), "=d" (edx)\
-         : "0" (index));
-
-#define MM_MMX    0x0001 /* standard MMX */
-#define MM_3DNOW  0x0004 /* AMD 3DNOW */
-#define MM_MMXEXT 0x0002 /* SSE integer functions or AMD MMX ext */
-#define MM_SSE    0x0008 /* SSE functions */
-#define MM_SSE2   0x0010 /* PIV SSE2 functions */
-
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "filter.h"
-#include "frame.h"
 
 static const char FILTER_NAME[] = "quickdnr";
 
@@ -63,6 +47,24 @@ typedef struct ThisFilter
   uint8_t *average;
   TF_STRUCT;
 } ThisFilter;
+
+#define MM_MMX    0x0001 /* standard MMX */
+#define MM_3DNOW  0x0004 /* AMD 3DNOW */
+#define MM_MMXEXT 0x0002 /* SSE integer functions or AMD MMX ext */
+#define MM_SSE    0x0008 /* SSE functions */
+#define MM_SSE2   0x0010 /* PIV SSE2 functions */
+
+#ifdef i386
+
+//From linearblend
+#define cpuid(index,eax,ebx,ecx,edx)\
+    __asm __volatile\
+        ("movl %%ebx, %%esi\n\t"\
+         "cpuid\n\t"\
+         "xchgl %%ebx, %%esi"\
+         : "=a" (eax), "=S" (ebx),\
+           "=c" (ecx), "=d" (edx)\
+         : "0" (index));
 
 int mm_support(void) // From linearblend
 {
@@ -167,6 +169,9 @@ int mm_support(void) // From linearblend
     return 0;
   }
 }
+#else // i386
+int mm_support(void) { return 0; }
+#endif
 
 int quickdnr(VideoFilter *f, VideoFrame *frame)
 {  
@@ -233,6 +238,8 @@ int quickdnr2(VideoFilter *f, VideoFrame *frame)
  
   return 0;
 }
+
+#ifdef i386
 
 int quickdnrMMX(VideoFilter *f, VideoFrame *frame)
 {
@@ -469,6 +476,16 @@ int quickdnr2MMX(VideoFilter *f, VideoFrame *frame)
 
   return 0;
 }
+#else // i386
+int quickdnrMMX(VideoFilter *f, VideoFrame *frame) {
+     (void)f; (void)frame;
+     return 0;
+};
+int quickdnr2MMX(VideoFilter *f, VideoFrame *frame) {
+     (void)f; (void)frame;
+     return 0;
+};
+#endif // i386
 
 void cleanup(VideoFilter *vf)
 {
