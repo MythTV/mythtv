@@ -154,6 +154,10 @@ Ok, so try running 'mythfrontend'.  You'll see a ugly little menu show up.
 This should be pretty simple to figure out.  Only thing to keep in mind, though,
 is that 'mythfrontend' needs to be running for scheduled recordings to happen.
 
+NOTE: conflict resolution is _NOT IMPLEMENTED_.  It doesn't even attempt to
+      look for recording conflicts at all.  I have no idea what it'll do
+      if it tries to record two things at once.
+
 In the 'configfiles' subdir there are some example lirc config files to get a
 remote working with this stuff.  Just use irxevent and it should all work.
 
