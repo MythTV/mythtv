@@ -1,6 +1,6 @@
 SOURCES += ../libs/libmyth/uitypes.cpp
-
 SOURCES += ../libs/libmyth/dbsettings.cpp
+SOURCES += ../libs/libmyth/langsettings.cpp
 SOURCES += ../libs/libmyth/managedlist.cpp
 SOURCES += ../libs/libmyth/mythcontext.cpp
 SOURCES += ../libs/libmyth/mythdialogs.cpp

@@ -13,7 +13,7 @@ using namespace std;
 class LangEditor: public ListBoxSetting, public ConfigurationDialog {
 public:
     LangEditor() {
-        setLabel(tr("Select your preferred language"));
+        setLabel(QObject::tr("Select your preferred language"));
     };
     
     virtual void load(QSqlDatabase* db) {
