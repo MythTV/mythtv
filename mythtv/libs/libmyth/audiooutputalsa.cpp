@@ -1,118 +1,14 @@
 #include <cstdio>
 #include <cstdlib>
 
-
 using namespace std;
 
 #include "mythcontext.h"
 #include "audiooutputalsa.h"
 
-
-static int set_params(snd_pcm_t *handle,
-                      snd_pcm_access_t access,
-                      snd_pcm_format_t format,
-                      unsigned int channels,
-                      unsigned int rate,
-                      unsigned int buffer_time,
-                      unsigned int period_time,
-					  bool *can_pause)
-{
-    unsigned int rrate;
-    int err, dir;
-    snd_pcm_hw_params_t *params;
-    snd_pcm_sw_params_t *swparams;
-    snd_pcm_uframes_t buffer_size;
-    snd_pcm_uframes_t period_size;
-
-    snd_pcm_hw_params_alloca(&params);
-    snd_pcm_sw_params_alloca(&swparams);
-    
-    /* choose all parameters */
-    if((err = snd_pcm_hw_params_any(handle, params)) < 0) {
-        printf("Broken configuration for playback: no configurations available: %s\n", snd_strerror(err));
-        return err;
-    }
-    /* set the interleaved read/write format */
-    if((err = snd_pcm_hw_params_set_access(handle, params, access)) < 0) {
-        printf("Access type not available for playback: %s\n", snd_strerror(err));
-        return err;
-    }
-    /* set the sample format */
-    if((err = snd_pcm_hw_params_set_format(handle, params, format)) < 0) {
-        printf("Sample format not available for playback: %s\n", snd_strerror(err));
-        return err;
-    }
-    /* set the count of channels */
-    if((err = snd_pcm_hw_params_set_channels(handle, params, channels)) < 0) {
-        printf("Channels count (%i) not available for playbacks: %s\n", channels, snd_strerror(err));
-        return err;
-    }
-    /* set the stream rate */
-    rrate = rate;
-    if((err = snd_pcm_hw_params_set_rate_near(handle, params, &rrate, 0)) < 0) {
-        printf("Rate %iHz not available for playback: %s\n", rate, snd_strerror(err));
-        return err;
-    }
-    if (rrate != rate) {
-        printf("Rate doesn't match (requested %iHz, get %iHz)\n", rate, err);
-        return -EINVAL;
-    }
-    /* set the buffer time */
-    if((err = snd_pcm_hw_params_set_buffer_time_near(handle, params, &buffer_time, &dir)) < 0) {
-        printf("Unable to set buffer time %i for playback: %s\n", buffer_time, snd_strerror(err));
-        return err;
-    }
-    if((err = snd_pcm_hw_params_get_buffer_size(params, &buffer_size)) < 0) {
-        printf("Unable to get buffer size for playback: %s\n", snd_strerror(err));
-        return err;
-    }
-    /* set the period time */
-    if((err = snd_pcm_hw_params_set_period_time_near(handle, params, &period_time, &dir)) < 0) {
-        printf("Unable to set period time %i for playback: %s\n", period_time, snd_strerror(err));
-        return err;
-    }
-    if((err = snd_pcm_hw_params_get_period_size(params, &period_size, &dir)) < 0) {
-        printf("Unable to get period size for playback: %s\n", snd_strerror(err));
-        return err;
-    }
-    /* write the parameters to device */
-    if((err = snd_pcm_hw_params(handle, params)) < 0) {
-        printf("Unable to set hw params for playback: %s\n", snd_strerror(err));
-        return err;
-    }
-    
-	if(can_pause)
-		*can_pause = snd_pcm_hw_params_can_pause(params);
-
-    /* get the current swparams */
-    if((err = snd_pcm_sw_params_current(handle, swparams)) < 0) {
-        printf("Unable to determine current swparams for playback: %s\n", snd_strerror(err));
-        return err;
-    }
-    /* start the transfer after period_size */
-    if((err = snd_pcm_sw_params_set_start_threshold(handle, swparams, period_size)) < 0) {
-        printf("Unable to set start threshold mode for playback: %s\n", snd_strerror(err));
-        return err;
-    }
-    /* allow the transfer when at least period_size samples can be processed */
-    if((err = snd_pcm_sw_params_set_avail_min(handle, swparams, period_size)) < 0) {
-        printf("Unable to set avail min for playback: %s\n", snd_strerror(err));
-        return err;
-    }
-    /* align all transfers to 1 sample */
-    if((err = snd_pcm_sw_params_set_xfer_align(handle, swparams, 1)) < 0) {
-        printf("Unable to set transfer align for playback: %s\n", snd_strerror(err));
-        return err;
-    }
-    /* write the parameters to the playback device */
-    if((err = snd_pcm_sw_params(handle, swparams)) < 0) {
-        printf("Unable to set sw params for playback: %s\n", snd_strerror(err));
-        return err;
-    }
-    return 0;
-}
 AudioOutputALSA::AudioOutputALSA(QString audiodevice, int audio_bits, 
                                  int audio_channels, int audio_samplerate)
+               : AudioOutput()
 {
     this->audiodevice = audiodevice;
     pcm_handle = NULL;
@@ -121,11 +17,12 @@ AudioOutputALSA::AudioOutputALSA(QString audiodevice, int audio_bits,
     Reconfigure(audio_bits, audio_channels, audio_samplerate);
 }
 
-void AudioOutputALSA::SetBlocking(bool blocking)
+AudioOutputALSA::~AudioOutputALSA()
 {
     if(pcm_handle != NULL)
-        snd_pcm_nonblock(pcm_handle, !blocking);
+        snd_pcm_close(pcm_handle);
 }
+
 void AudioOutputALSA::Reconfigure(int audio_bits, 
                                   int audio_channels, int audio_samplerate)
 {
@@ -143,12 +40,14 @@ void AudioOutputALSA::Reconfigure(int audio_bits,
     }
     else
     {
-        printf("Opening ALSA audio device '%s'.\n", audiodevice.ascii());
+        VERBOSE(VB_IMPORTANT, QString("Opening ALSA audio device '%1'.")
+                              .arg(audiodevice));
         err = snd_pcm_open(&new_pcm_handle, audiodevice, 
                            SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK);
         if(err < 0)
         {
-            printf("Playback open error: %s\n", snd_strerror(err));
+            Error(QString("Error opening ALSA device for playback: %1")
+                         .arg(snd_strerror(err)));
             return;
         }
     }
@@ -165,34 +64,33 @@ void AudioOutputALSA::Reconfigure(int audio_bits,
         format = SND_PCM_FORMAT_S24_LE;
     else
     {
-        printf("Error: Unknown sample format: %d bits.\n", audio_bits);
+        Error(QString("Unknown sample format: %1 bits.").arg(audio_bits));
         return;
     }
 
-    err = set_params(new_pcm_handle, SND_PCM_ACCESS_MMAP_INTERLEAVED, format, audio_channels, audio_samplerate, buffer_time, period_time, &can_hw_pause);
+    err = SetParameters(new_pcm_handle, SND_PCM_ACCESS_MMAP_INTERLEAVED,
+                        format, audio_channels, audio_samplerate, buffer_time,
+                        period_time, &can_hw_pause);
     if(err < 0)
-    {
-        printf("Error setting audio params: %s\n", snd_strerror(err));
         return;
-    }
     
     effdsp = audio_samplerate * 100;
     
     pcm_handle = new_pcm_handle;
 }
 
-AudioOutputALSA::~AudioOutputALSA()
+void AudioOutputALSA::SetBlocking(bool blocking)
 {
     if(pcm_handle != NULL)
-        snd_pcm_close(pcm_handle);
+        snd_pcm_nonblock(pcm_handle, !blocking);
 }
 
-static int xrun_recovery(snd_pcm_t *handle, int err)
+int AudioOutputALSA::XRunRecovery(snd_pcm_t *handle, int err)
 {
-//    printf("xrun_recovery\n");
     if (err == -EPIPE) {    /* under-run */
         if((err = snd_pcm_prepare(handle)) < 0)
-            printf("Can't recovery from underrun, prepare failed: %s\n", snd_strerror(err));
+            VERBOSE(VB_IMPORTANT, QString("Can't recovery from underrun,"
+                    " prepare failed: %1").arg(snd_strerror(err)));
         return 0;
     } else if (err == -ESTRPIPE) {
         // this happens only via power management turning soundcard off.
@@ -201,7 +99,8 @@ static int xrun_recovery(snd_pcm_t *handle, int err)
         if (err < 0) {
             err = snd_pcm_prepare(handle);
             if (err < 0)
-                printf("Can't recovery from suspend, prepare failed: %s\n", snd_strerror(err));
+                VERBOSE(VB_IMPORTANT, QString("Can't recover from suspend,"
+                        " prepare failed: %1").arg(snd_strerror(err)));
         }
     }
     return err;
@@ -214,10 +113,12 @@ void AudioOutputALSA::Reset(void)
         return;
     audbuf_timecode = 0;
     if((err = snd_pcm_drop(pcm_handle)) < 0)
-        printf("Error resetting sound: %s\n", snd_strerror(err));
+        VERBOSE(VB_IMPORTANT, QString("Error resetting sound: %1")
+                              .arg(snd_strerror(err)));
     if((err = snd_pcm_prepare(pcm_handle)) < 0)
-        if(xrun_recovery(pcm_handle, err) < 0)
-            printf("Error preparing sound after reset: %s\n", snd_strerror(err));
+        if(XRunRecovery(pcm_handle, err) < 0)
+            VERBOSE(VB_IMPORTANT, QString("Error preparing sound after reset:"
+                                          " %1").arg(snd_strerror(err)));
 }
 
 void AudioOutputALSA::AddSamples(char *buffer, int frames, long long timecode)
@@ -243,10 +144,10 @@ void AudioOutputALSA::AddSamples(char *buffer, int frames, long long timecode)
         }
         else if (err < 0)
         {
-            if (xrun_recovery(pcm_handle, err) < 0) 
+            if (XRunRecovery(pcm_handle, err) < 0) 
             {
-                printf("Write error: %s\n", snd_strerror(err));
-                printf("Disabling sound output.\n");
+                Error(QString("Write error, disabling sound output: %1")
+                      .arg(snd_strerror(err)));
                 snd_pcm_close(pcm_handle);
                 pcm_handle = NULL;
             }
@@ -274,11 +175,11 @@ void AudioOutputALSA::AddSamples(char *buffers[], int frames, long long timecode
 //    printf("Trying to write %d non-i frames to soundbuffer\n", frames);
     err = snd_pcm_mmap_writen(pcm_handle, (void **)buffers, frames);
     if (err == -EAGAIN || (err >= 0 && err != frames))
-        printf("Audio buffer overflow, audio data lost!\n");
+        VERBOSE(VB_IMPORTANT, "Audio buffer overflow, audio data lost!");
     else if (err < 0) {
-        if (xrun_recovery(pcm_handle, err) < 0) {
-            printf("Write error: %s\n", snd_strerror(err));
-            printf("Disabling sound output.\n");
+        if (XRunRecovery(pcm_handle, err) < 0) {
+            Error(QString("Write error, disabling sound output: %1")
+                  .arg(snd_strerror(err)));
             snd_pcm_close(pcm_handle);
             pcm_handle = NULL;
         }
@@ -312,19 +213,20 @@ bool AudioOutputALSA::GetPause(void)
 void AudioOutputALSA::Pause(bool paused)
 {
 #if DO_HW_PAUSE
-    int err;
-	if(pcm_handle != NULL && can_hw_pause)
-	{
-		snd_pcm_state_t state = snd_pcm_state(pcm_handle);
-		if((state == SND_PCM_STATE_RUNNING && paused) ||
-		   (state == SND_PCM_STATE_PAUSED && !paused))
-		{
-			if ((err = snd_pcm_pause(pcm_handle, true)) < 0)
-				printf("Couldn't %spause: %s\n", (paused?"":"un"), snd_strerror(err));
-		}
-	}
+    if(pcm_handle != NULL && can_hw_pause)
+    {
+        snd_pcm_state_t state = snd_pcm_state(pcm_handle);
+        if((state == SND_PCM_STATE_RUNNING && paused) ||
+           (state == SND_PCM_STATE_PAUSED && !paused))
+        {
+            int err;
+            if ((err = snd_pcm_pause(pcm_handle, true)) < 0)
+                VERBOSE(VB_IMPORTANT, QString("Couldn't (un)pause: %1")
+                                             .arg(snd_strerror(err)));
+        }
+    }
 #endif
-	this->paused = paused;
+    this->paused = paused;
 }
 
 int AudioOutputALSA::GetAudiotime(void)
@@ -339,7 +241,8 @@ int AudioOutputALSA::GetAudiotime(void)
     err = snd_pcm_delay(pcm_handle, &frame_delay);
     if(err < 0)
     {
-        printf("Error determining sound output delay: %s\n", snd_strerror(err));
+        VERBOSE(VB_IMPORTANT, QString("Error determining sound output delay:"
+                                      " %1").arg(snd_strerror(err)));
         frame_delay = 0;
     }
     
@@ -350,3 +253,152 @@ int AudioOutputALSA::GetAudiotime(void)
 //    printf("GetAudiotime returning: %d\n", result);
     return result;
 }
+
+int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_access_t access,
+                        snd_pcm_format_t format, unsigned int channels,
+                        unsigned int rate, unsigned int buffer_time,
+                        unsigned int period_time, bool *can_pause)
+{
+    int err, dir;
+    snd_pcm_hw_params_t *params;
+    snd_pcm_sw_params_t *swparams;
+    snd_pcm_uframes_t buffer_size;
+    snd_pcm_uframes_t period_size;
+
+    snd_pcm_hw_params_alloca(&params);
+    snd_pcm_sw_params_alloca(&swparams);
+    
+    /* choose all parameters */
+    if((err = snd_pcm_hw_params_any(handle, params)) < 0)
+    {
+        Error(QString("Broken configuration for playback; no configurations"
+              " available: %1").arg(snd_strerror(err)));
+        return err;
+    }
+
+    /* set the interleaved read/write format */
+    if((err = snd_pcm_hw_params_set_access(handle, params, access)) < 0)
+    {
+        Error(QString("Access type not available: %1")
+              .arg(snd_strerror(err)));
+        return err;
+    }
+
+    /* set the sample format */
+    if((err = snd_pcm_hw_params_set_format(handle, params, format)) < 0)
+    {
+        Error(QString("Sample format not available: %1")
+              .arg(snd_strerror(err)));
+        return err;
+    }
+
+    /* set the count of channels */
+    if((err = snd_pcm_hw_params_set_channels(handle, params, channels)) < 0)
+    {
+        Error(QString("Channels count (%i) not available: %1")
+              .arg(channels).arg(snd_strerror(err)));
+        return err;
+    }
+
+    /* set the stream rate */
+    unsigned int rrate = rate;
+    if((err = snd_pcm_hw_params_set_rate_near(handle, params, &rrate, 0)) < 0)
+    {
+        Error(QString("Samplerate (%1Hz) not available: %2")
+              .arg(rate).arg(snd_strerror(err)));
+        return err;
+    }
+
+    if (rrate != rate)
+    {
+        Error(QString("Rate doesn't match (requested %1Hz, got %2Hz)")
+              .arg(rate).arg(err));
+        return -EINVAL;
+    }
+
+    /* set the buffer time */
+    if((err = snd_pcm_hw_params_set_buffer_time_near(handle, params,
+                                                     &buffer_time, &dir)) < 0)
+    {
+        Error(QString("Unable to set buffer time %1 for playback: %2")
+              .arg(buffer_time).arg(snd_strerror(err)));
+        return err;
+    }
+
+    if((err = snd_pcm_hw_params_get_buffer_size(params, &buffer_size)) < 0)
+    {
+        Error(QString("Unable to get buffer size for playback: %1")
+              .arg(snd_strerror(err)));
+        return err;
+    }
+
+    /* set the period time */
+    if((err = snd_pcm_hw_params_set_period_time_near(
+                    handle, params, &period_time, &dir)) < 0)
+    {
+        Error(QString("Unable to set period time %1 for playback: %2")
+              .arg(period_time).arg(snd_strerror(err)));
+        return err;
+    }
+
+    if((err = snd_pcm_hw_params_get_period_size(params, &period_size,
+                                                &dir)) < 0) {
+        Error(QString("Unable to get period size for playback: %1")
+              .arg(snd_strerror(err)));
+        return err;
+    }
+
+    /* write the parameters to device */
+    if((err = snd_pcm_hw_params(handle, params)) < 0) {
+        Error(QString("Unable to set hw params for playback: %1")
+              .arg(snd_strerror(err)));
+        return err;
+    }
+    
+	if(can_pause)
+		*can_pause = snd_pcm_hw_params_can_pause(params);
+
+    /* get the current swparams */
+    if((err = snd_pcm_sw_params_current(handle, swparams)) < 0)
+    {
+        Error(QString("Unable to determine current swparams for playback:"
+                      " %1").arg(snd_strerror(err)));
+        return err;
+    }
+    /* start the transfer after period_size */
+    if((err = snd_pcm_sw_params_set_start_threshold(handle, swparams, 
+                                                    period_size)) < 0)
+    {
+        Error(QString("Unable to set start threshold mode for playback: %1")
+              .arg(snd_strerror(err)));
+        return err;
+    }
+
+    /* allow the transfer when at least period_size samples can be processed */
+    if((err = snd_pcm_sw_params_set_avail_min(handle, swparams,
+                                              period_size)) < 0)
+    {
+        Error(QString("Unable to set avail min for playback: %1")
+              .arg(snd_strerror(err)));
+        return err;
+    }
+
+    /* align all transfers to 1 sample */
+    if((err = snd_pcm_sw_params_set_xfer_align(handle, swparams, 1)) < 0)
+    {
+        Error(QString("Unable to set transfer align for playback: %1")
+              .arg(snd_strerror(err)));
+        return err;
+    }
+
+    /* write the parameters to the playback device */
+    if((err = snd_pcm_sw_params(handle, swparams)) < 0)
+    {
+        Error(QString("Unable to set sw params for playback: %1")
+              .arg(snd_strerror(err)));
+        return err;
+    }
+
+    return 0;
+}
+

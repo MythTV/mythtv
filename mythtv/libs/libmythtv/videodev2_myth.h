@@ -854,7 +854,7 @@ struct v4l2_streamparm
 #define VIDIOC_S_CTRL		_IOW  ('V', 28, struct v4l2_control)
 #define VIDIOC_G_TUNER		_IOWR ('V', 29, struct v4l2_tuner)
 #define VIDIOC_S_TUNER		_IOW  ('V', 30, struct v4l2_tuner)
-#define VIDIOC_G_AUDIO		_IOR  ('V', 33, struct v4l2_audio)
+#define VIDIOC_G_AUDIO		_IOWR ('V', 33, struct v4l2_audio)
 #define VIDIOC_S_AUDIO		_IOW  ('V', 34, struct v4l2_audio)
 #define VIDIOC_QUERYCTRL	_IOWR ('V', 36, struct v4l2_queryctrl)
 #define VIDIOC_QUERYMENU	_IOWR ('V', 37, struct v4l2_querymenu)

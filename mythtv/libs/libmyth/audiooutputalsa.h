@@ -33,6 +33,12 @@ public:
  
     virtual int GetAudiotime(void);
 
+    inline int SetParameters(snd_pcm_t *handle, snd_pcm_access_t access,
+                             snd_pcm_format_t format, unsigned int channels,
+                             unsigned int rate, unsigned int buffer_time,
+                             unsigned int period_time, bool *can_pause);
+    inline int AudioOutputALSA::XRunRecovery(snd_pcm_t *handle, int err);
+
  private:
     QString audiodevice;
     snd_pcm_t *pcm_handle;

@@ -19,6 +19,7 @@ using namespace std;
 
 AudioOutputOSS::AudioOutputOSS(QString audiodevice, int laudio_bits, 
                                int laudio_channels, int laudio_samplerate)
+              : AudioOutput()
 {
     pthread_mutex_init(&audio_buflock, NULL);
     pthread_mutex_init(&avsync_lock, NULL);
@@ -64,7 +65,7 @@ void AudioOutputOSS::Reconfigure(int laudio_bits, int laudio_channels,
     audio_samplerate = laudio_samplerate;
     if(audio_bits != 8 && audio_bits != 16)
     {
-        cerr << "AudioOutDSP only supports 8 or 16bit audio ";
+        Error("AudioOutputOSS only supports 8 or 16bit audio.");
         return;
     }
     audio_bytes_per_sample = audio_channels * audio_bits / 8;
@@ -88,11 +89,12 @@ void AudioOutputOSS::Reconfigure(int laudio_bits, int laudio_channels,
         {
             if (errno == EBUSY)
             {
-                cerr << "ERROR: something is currently using: " << audiodevice
-                     << "\nFix this, then run mythfrontend again\n";
-                exit(1);
+                Error(QString("WARNING: something is currently"
+                              " using: %1, retrying.").arg(audiodevice));
+                return;
             }
-            cerr << "Error opening audio device (" << audiodevice << "):\n";
+            VERBOSE(VB_IMPORTANT, QString("Error opening audio device (%1), the"
+                    " error was: %2").arg(audiodevice).arg(strerror(errno)));
             perror(audiodevice.ascii());
         }
         if (audiofd < 0)
@@ -101,7 +103,8 @@ void AudioOutputOSS::Reconfigure(int laudio_bits, int laudio_channels,
 
     if (audiofd == -1)
     {
-        cerr << "player: Can't open audio device: " << audiodevice << endl;
+        Error(QString("Error opening audio device (%1), the error was: %2")
+              .arg(audiodevice).arg(strerror(errno)));
         return;
     }
 
@@ -127,11 +130,9 @@ void AudioOutputOSS::Reconfigure(int laudio_bits, int laudio_channels,
 
     if (err)
     {
-        cerr << "player: " << audiodevice 
-             << ": error setting audio output device to "
-             << audio_samplerate << "kHz/" 
-             << audio_bits << "bits/"
-             << audio_channels << "channel\n";
+        Error(QString("Unable to set audio device (%1) to %2 kHz / %3 bits"
+                      " / %4 channels").arg(audiodevice).arg(audio_samplerate)
+                      .arg(audio_bits).arg(audio_channels));
         close(audiofd);
         audiofd = -1;
         return;
@@ -156,11 +157,12 @@ void AudioOutputOSS::Reconfigure(int laudio_bits, int laudio_channels,
     {
         if (!(caps & DSP_CAP_REALTIME))
         {
-            cerr << "audio device cannot report buffer state accurately!\n"
-                 << "audio/video sync will be bad, continuing anyway...\n";
+            VERBOSE(VB_IMPORTANT, "The audio device cannot report buffer state"
+                    " accurately! audio/video sync will be bad, continuing...");
         }
     } else {
-        perror("ioctl(SNDCTL_DSP_GETCAPS)");
+        VERBOSE(VB_IMPORTANT, QString("Unable to get audio card capabilities,"
+                " the error was: %1").arg(strerror(errno)));
     }
 
     audbuf_timecode = 0;
@@ -237,7 +239,9 @@ void AudioOutputOSS::WriteAudio(unsigned char *aubuf, int size)
 
     if (lw < 0)
     {
-        perror("Writing to audio device");
+        Error(QString("Error writing to audio device (%1), unable to"
+              " continue. The error was: %2").arg(audiodevice)
+              .arg(strerror(errno)));
         close(audiofd);
         audiofd = -1;
         return;
@@ -378,7 +382,7 @@ void AudioOutputOSS::AddSamples(char *buffers[], int samples,
         }
         else
         {
-            cout << "Audio buffer overflow, audio data lost!\n";
+            VERBOSE(VB_IMPORTANT, "Audio buffer overflow, audio data lost!");
             samples = afree / audio_bytes_per_sample;
         }
     }
@@ -427,7 +431,7 @@ void AudioOutputOSS::AddSamples(char *buffer, int samples, long long timecode)
         }
         else
         {
-            cout << "Audio buffer overflow, audio data lost!\n";
+            VERBOSE(VB_IMPORTANT, "Audio buffer overflow, audio data lost!");
             len = afree;
         }
     }
@@ -468,8 +472,8 @@ inline int AudioOutputOSS::getSpaceOnSoundcard(void)
         numbadioctls++;
         if (numbadioctls > 2 || space < -5000)
         {
-            cerr << "Your soundcard is not reporting free space correctly.\n"
-                 << "Falling back to old method...\n";
+            VERBOSE(VB_IMPORTANT, "Your soundcard is not reporting free space"
+                    " correctly. Falling back to old method...");
             audio_buffer_unused = 0;
             space = info.bytes;
         }
@@ -546,7 +550,7 @@ void AudioOutputOSS::OutputAudioLoop(void)
             numlowbuffer++;
             if (numlowbuffer > 5 && audio_buffer_unused)
             {
-                cerr << "dropping back audio_buffer_unused\n";
+                VERBOSE(VB_IMPORTANT, "dropping back audio_buffer_unused");
                 audio_buffer_unused /= 2;
             }
 

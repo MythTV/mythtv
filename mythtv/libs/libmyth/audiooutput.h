@@ -1,6 +1,11 @@
 #ifndef AUDIOOUTPUT
 #define AUDIOOUTPUT
 
+#include <iostream>
+using namespace std;
+
+#include "mythcontext.h"
+
 class AudioOutput
 {
  public:
@@ -8,6 +13,7 @@ class AudioOutput
     static AudioOutput *OpenAudio(QString audiodevice, int audio_bits, 
                                  int audio_channels, int audio_samplerate);
 
+    AudioOutput() { lastError = QString::null; };
     virtual ~AudioOutput() { };
 
     // reconfigure sound out for new params
@@ -32,6 +38,15 @@ class AudioOutput
  
     virtual int GetAudiotime(void) = 0;
 //  virtual int WaitForFreeSpace(int bytes) = 0;
+
+    QString GetError() { return lastError; };
+
+ protected:
+    void Error(QString msg) 
+     { lastError = msg; VERBOSE(VB_ALL, lastError); };
+
+ private:
+    QString lastError;
 };
 
 #endif

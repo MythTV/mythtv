@@ -9,6 +9,7 @@ using namespace std;
 
 AudioOutputARTS::AudioOutputARTS(QString audiodevice, int audio_bits, 
                                  int audio_channels, int audio_samplerate)
+               : AudioOutput()
 {
     this->audiodevice = audiodevice;
     pcm_handle = NULL;
@@ -19,6 +20,7 @@ AudioOutputARTS::AudioOutputARTS(QString audiodevice, int audio_bits,
 
 void AudioOutputARTS::SetBlocking(bool blocking)
 {
+    (void)blocking;
     // FIXME: kedl: not sure what else could be required here?
 }
 
@@ -35,15 +37,17 @@ void AudioOutputARTS::Reconfigure(int audio_bits,
         pcm_handle=NULL;
     }
 
-    printf("setup: %d %d %d\n",audio_bits,audio_channels,audio_samplerate);
-    printf("Opening ARTS audio device '%s'.\n", audiodevice.ascii());
+    VERBOSE(VB_GENERAL, QString("Opening ARTS audio device '%1'.")
+                        .arg(audiodevice));
     err = arts_init();
     if (err < 0)
     {
-        fprintf(stderr, "arts_init error: %s\n", arts_error_text(err));
+        Error(QString("Opening ARTS sound device failed, the error was: %1")
+              .arg(arts_error_text(err)));
         return;
     }
-    stream = arts_play_stream(audio_samplerate, audio_bits, audio_channels, "mythtv");
+    stream = arts_play_stream(audio_samplerate, audio_bits, audio_channels, 
+                              "mythtv");
 
     effdsp = audio_samplerate * 100;
     pcm_handle = stream;
@@ -72,10 +76,13 @@ void AudioOutputARTS::AddSamples(char *buffer, int frames, long long timecode)
     if(pcm_handle == NULL)
         return;
 
-    err = arts_write(pcm_handle, buffer, frames * audio_bits/8 * audio_channels);
+    err = arts_write(pcm_handle, buffer, 
+                     frames * audio_bits / 8 * audio_channels);
     if(err < 0)
     {
-        fprintf(stderr, "arts_write error: %s\n", arts_error_text(err));
+        // FIXME: Fatal?
+        VERBOSE(VB_IMPORTANT, QString("Write error: %1")
+                              .arg(arts_error_text(err)));
         return;
     }
 
@@ -98,8 +105,9 @@ void AudioOutputARTS::AddSamples(char *buffers[], int frames, long long timecode
 
     if (audiobuffer==NULL)
     {
-        fprintf(stderr, "couldn't get memory to write audio to artsd\n");
-	return;
+        // FIXME: Fatal?
+        VERBOSE(VB_IMPORTANT, "Couldn't get memory to write audio to artsd");
+        return;
     }
 
     if(pcm_handle == NULL)
@@ -125,7 +133,8 @@ void AudioOutputARTS::AddSamples(char *buffers[], int frames, long long timecode
 
     if(err < 0)
     {
-        fprintf(stderr, "arts_write error: %s\n", arts_error_text(err));
+        // FIXME: Fatal?
+        VERBOSE(VB_IMPORTANT, QString("Write error: %1").arg(arts_error_text(err)));
         return;
     }
 

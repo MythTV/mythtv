@@ -20,6 +20,7 @@
 using namespace std;
 
 #include "mythdbcon.h"
+#include "dialogbox.h"
 #include "NuppelVideoPlayer.h"
 #include "NuppelVideoRecorder.h"
 #include "audiooutput.h"
@@ -1709,6 +1710,31 @@ void NuppelVideoPlayer::StartPlaying(void)
     {
         audioOutput = AudioOutput::OpenAudio(audiodevice, audio_bits,
                                              audio_channels, audio_samplerate);
+
+        DialogBox *dialog = NULL;
+        if (audioOutput == NULL)
+            dialog = new DialogBox(gContext->GetMainWindow(),
+                                   QObject::tr("Unable to create AudioOutput."));
+        else if (audioOutput->GetError() != QString::null)
+            dialog = new DialogBox(gContext->GetMainWindow(),
+                                   audioOutput->GetError());
+        if (dialog != NULL)
+        {
+            dialog->AddButton(QObject::tr("Continue WITHOUT AUDIO!"));
+            dialog->AddButton(QObject::tr("Return to menu."));
+            int ret = dialog->exec();
+            delete dialog;
+
+            if (audioOutput)
+            {
+                delete audioOutput;
+                audioOutput = NULL;
+            }
+            disableaudio = true;
+
+            if (ret == 2)
+                return;
+        }
     }
 
     InitVideo();
