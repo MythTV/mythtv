@@ -266,6 +266,18 @@ public:
 };
 
 
+class PBBStartInTitle: public CheckBoxSetting, public GlobalSetting {
+public:
+    PBBStartInTitle():
+        GlobalSetting("PlaybackBoxStartInTitle") {
+        setLabel(QObject::tr("Start in title section."));
+        setValue(true);
+        setHelpText(QObject::tr("If set focus will initially be on the "
+                    "show titles otherwise focus will be on the recordings."));
+    };
+};
+
+
 class JumpAmount: public SpinBoxSetting, public GlobalSetting {
 public:
     JumpAmount():
@@ -2151,6 +2163,7 @@ PlaybackSettings::PlaybackSettings()
     pbox->addChild(new RememberRecGroup());
     pbox->addChild(new UseCategoriesAsRecGroups());
     pbox->addChild(new UseGroupNameAsAllPrograms());
+    pbox->addChild(new PBBStartInTitle());
     addChild(pbox);
 
     addChild(new HwDecSettings());

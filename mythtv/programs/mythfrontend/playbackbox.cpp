@@ -37,7 +37,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
            : MythDialog(parent, name)
 {
     type = ltype;
-
+    
     state = kStopped;
     killState = kDone;
     waitToStart = false;
@@ -52,8 +52,10 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     // How full the actual list is (list in this context being the number
     // of spaces available for data to be shown).
     listCount = 0;          
-                            
-    inTitle = true;         // Cursor in Title Listing
+
+    inTitle = gContext->GetNumSetting("PlaybackBoxStartInTitle", 1);
+
+ 
     skipNum = 0;            // Amount of records to skip (for scrolling)
 
     curShowing = 0;         // Where in the list (0 - # in list)
@@ -177,7 +179,7 @@ void PlaybackBox::killPlayerSafe(void)
     /* if the user keeps selecting new recordings we will never stop playing */
     setEnabled(false);
 
-    if (state != kKilled && playbackPreview != 0)
+    if (state != kKilled && playbackPreview != 0 && killState != kDone )
     {
         while (state != kKilled)
         {
