@@ -306,9 +306,17 @@ void IconView::keyPressEvent(QKeyEvent *e)
 #ifdef OPENGL_SUPPORT
                     int useOpenGL = gContext->GetNumSetting("SlideshowUseOpenGL");
                     if (useOpenGL) {
-                        GLSDialog gv(m_db, m_itemList, pos, slideShow,
-                                     gContext->GetMainWindow());
-                        gv.exec();
+
+                        if (QGLFormat::hasOpenGL()) {
+                            GLSDialog gv(m_db, m_itemList, pos, slideShow,
+                                         gContext->GetMainWindow());
+                            gv.exec();
+                        }
+                        else {
+                            MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                                      tr("Error"),
+                                                      tr("Sorry: OpenGL support not available"));
+                        }
                     }
                     else 
 #endif
@@ -809,9 +817,16 @@ void IconView::actionSlideShow()
 #ifdef OPENGL_SUPPORT
     int useOpenGL = gContext->GetNumSetting("SlideshowUseOpenGL");
     if (useOpenGL) {
-        GLSDialog gv(m_db, m_itemList, pos, true,
-                     gContext->GetMainWindow());
-        gv.exec();
+        if (QGLFormat::hasOpenGL()) {
+            GLSDialog gv(m_db, m_itemList, pos, true,
+                         gContext->GetMainWindow());
+            gv.exec();
+        }
+        else {
+            MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                      tr("Error"),
+                                      tr("Sorry: OpenGL support not available"));
+        }
     }
     else 
 #endif
