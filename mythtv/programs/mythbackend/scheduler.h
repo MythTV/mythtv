@@ -27,7 +27,7 @@ class Scheduler : public QObject
     ~Scheduler();
 
     void Reschedule(int recordid) { reschedQueue.append(recordid); }
-    bool FillRecordLists(void);
+    void FillRecordListFromDB(void);
     void FillRecordListFromMaster(void);
 
     void FillEncoderFreeSpaceCache(void);
@@ -59,9 +59,11 @@ class Scheduler : public QObject
   private:
     void verifyCards(void);
 
+    bool FillRecordList(void);
+    void UpdateMatches(int recordid);
     void PruneOldRecords(void);
     void AddNewRecords(void);
-    void BuildNewRecordsQueries(QStringList &from, QStringList &where);
+    void BuildNewRecordsQueries(int recordid, QStringList &from, QStringList &where);
     void PruneOverlaps(void);
     void BuildListMaps(void);
     void ClearListMaps(void);

@@ -223,7 +223,7 @@ void Scheduler::FillEncoderFreeSpaceCache()
     }
 }
 
-bool Scheduler::FillRecordLists(void)
+bool Scheduler::FillRecordList(void)
 {
     QMutexLocker lockit(reclist_lock);
 
@@ -267,6 +267,23 @@ bool Scheduler::FillRecordLists(void)
     PruneRedundants();
 
     return hasconflicts;
+}
+
+void Scheduler::FillRecordListFromDB(void)
+{
+    QSqlQuery query(QString::null, db);
+    query.prepare("CREATE TEMPORARY TABLE recordmatch "
+                  "(recordid int unsigned, chanid int unsigned, "
+                  " starttime datetime, INDEX (recordid));");
+    query.exec();
+    if (!query.isActive())
+    {
+        MythContext::DBError("FillRecordListFromDB", query);
+        return;
+    }
+
+    UpdateMatches(-1);
+    FillRecordList();
 }
 
 void Scheduler::FillRecordListFromMaster(void)
@@ -804,6 +821,7 @@ void Scheduler::RunScheduler(void)
     bool firstRun = true;
 
     struct timeval fillstart, fillend;
+    float matchTime, placeTime;
 
     // wait for slaves to connect
     sleep(2);
@@ -822,23 +840,39 @@ void Scheduler::RunScheduler(void)
              curtime.secsTo((*startIter)->recstartts) > 30) &&
             reschedQueue.count())
         {
+            gettimeofday(&fillstart, NULL);
             QString msg;
             while (reschedQueue.count())
             {
-                msg.sprintf("Reschedule requested for id %d.", 
-                            reschedQueue.front());
+                int recordid = reschedQueue.front();
                 reschedQueue.pop_front();
+                msg.sprintf("Reschedule requested for id %d.", recordid);
                 VERBOSE(VB_GENERAL, msg);
+                if (recordid != 0)
+                {
+                    if (recordid == -1)
+                        reschedQueue.clear();
+                    UpdateMatches(recordid);
+                }
             }
+            gettimeofday(&fillend, NULL);
+
+            matchTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
+                         (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
+
             FillEncoderFreeSpaceCache();
             gettimeofday(&fillstart, NULL);
-            FillRecordLists();
+            FillRecordList();
             gettimeofday(&fillend, NULL);
             PrintList();
-            msg.sprintf("Scheduled %d items in %.1f seconds.", reclist.size(), 
-                        ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
-                         (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0);
 
+            placeTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
+                         (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
+
+            msg.sprintf("Scheduled %d items in "
+                        "%.1f = %.2f match + %.2f place", reclist.size(),
+                        matchTime + placeTime, matchTime, placeTime);
+                         
             VERBOSE(VB_GENERAL, msg);
             gContext->LogEntry("scheduler", LP_INFO, "Scheduled items", msg);
 
@@ -1220,18 +1254,17 @@ void *Scheduler::SchedulerThread(void *param)
     return NULL;
 }
 
-void Scheduler::BuildNewRecordsQueries(QStringList &from, QStringList &where)
+void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from, 
+                                       QStringList &where)
 {
     QString query;
     QSqlQuery result;
     QString qphrase;
 
-    from << "";
-    where << QString("record.search = %1 AND "
-                     "program.title = record.title").arg(kNoSearch);
-
     query = QString("SELECT recordid,search,subtitle,description "
-                    "FROM record WHERE search <> %1").arg(kNoSearch);
+                    "FROM record WHERE search <> %1 AND "
+                    "(recordid = %2 OR %3 = -1) ")
+        .arg(kNoSearch).arg(recordid).arg(recordid);
 
     result = db->exec(query);
     if (!result.isActive())
@@ -1294,6 +1327,112 @@ void Scheduler::BuildNewRecordsQueries(QStringList &from, QStringList &where)
             break;
         }
     }
+
+    if (recordid == -1 || from.count() == 0)
+    {
+        from << "";
+        where << QString("record.search = %1 AND "
+                         "(record.recordid = %2 OR %3 = -1) AND "
+                         "program.title = record.title ")
+            .arg(kNoSearch).arg(recordid).arg(recordid);
+    }
+}
+
+void Scheduler::UpdateMatches(int recordid) {
+    struct timeval dbstart, dbend;
+
+    QSqlQuery query(QString::null, db);
+    query.prepare("DELETE FROM recordmatch WHERE "
+                  "recordid = :RECORDID OR :RECORDID = -1;");
+    query.bindValue(":RECORDID", recordid);
+
+    query.exec();
+
+    if (!query.isActive())
+    {
+        MythContext::DBError("UpdateMatches", query);
+        return;
+    }
+
+    unsigned clause;
+    QStringList fromclauses, whereclauses;
+
+    BuildNewRecordsQueries(recordid, fromclauses, whereclauses);
+
+    if (print_verbose_messages & VB_SCHEDULE)
+    {
+        for (clause = 0; clause < fromclauses.count(); clause++)
+            cout << "Query " << clause << ": " << fromclauses[clause] 
+                 << "/" << whereclauses[clause] << endl;
+    }
+
+    for (clause = 0; clause < fromclauses.count(); clause++)
+    {
+        QString query = QString(
+"INSERT INTO recordmatch (recordid, chanid, starttime) "
+"SELECT record.recordid, program.chanid, program.starttime "
+"FROM record, program ") + fromclauses[clause] + QString(
+" INNER JOIN channel ON (channel.chanid = program.chanid) "
+"WHERE ") + whereclauses[clause] + QString(" AND "
+"((record.type = %1 " // allrecord
+"OR record.type = %2 " // findonerecord
+"OR record.type = %3 " // finddailyrecord
+"OR record.type = %4) " // findweeklyrecord
+" OR "
+" ((record.station = channel.callsign) " // channel matches
+"  AND "
+"  ((record.type = %5) " // channelrecord
+"   OR"
+"   ((TIME_TO_SEC(record.starttime) = TIME_TO_SEC(program.starttime)) " // timeslot matches
+"    AND "
+"    ((record.type = %6) " // timeslotrecord
+"     OR"
+"     ((DAYOFWEEK(record.startdate) = DAYOFWEEK(program.starttime) "
+"      AND "
+"      ((record.type = %7) " // weekslotrecord
+"       OR"
+"       ((TO_DAYS(record.startdate) = TO_DAYS(program.starttime)) " // date matches
+"        AND "
+"        (TIME_TO_SEC(record.endtime) = TIME_TO_SEC(program.endtime)) "
+"        AND "
+"        (TO_DAYS(record.enddate) = TO_DAYS(program.endtime)) "
+"        )"
+"       )"
+"      )"
+"     )"
+"    )"
+"   )"
+"  )"
+" )"
+") ")
+            .arg(kAllRecord)
+            .arg(kFindOneRecord)
+            .arg(kFindDailyRecord)
+            .arg(kFindWeeklyRecord)
+            .arg(kChannelRecord)
+            .arg(kTimeslotRecord)
+            .arg(kWeekslotRecord);
+
+        VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query %1...").arg(clause));
+
+        gettimeofday(&dbstart, NULL);
+        QSqlQuery result = db->exec(query);
+        gettimeofday(&dbend, NULL);
+
+        if (!result.isActive())
+        {
+            MythContext::DBError("UpdateMatches", result);
+            return;
+        }
+
+        VERBOSE(VB_SCHEDULE, QString(" |-- %1 results in %2 sec.")
+                .arg(result.size())
+                .arg(((dbend.tv_sec  - dbstart.tv_sec) * 1000000 +
+                      (dbend.tv_usec - dbstart.tv_usec)) / 1000000.0));
+
+    }
+
+    VERBOSE(VB_SCHEDULE, " +-- Done.");
 }
 
 void Scheduler::AddNewRecords(void) {
@@ -1358,18 +1497,6 @@ void Scheduler::AddNewRecords(void) {
         }
     }
 
-    unsigned clause;
-    QStringList fromclauses, whereclauses;
-
-    BuildNewRecordsQueries(fromclauses, whereclauses);
-
-    if (print_verbose_messages & VB_SCHEDULE)
-    {
-        for (clause = 0; clause < fromclauses.count(); clause++)
-            cout << "Query " << clause << ": " << fromclauses[clause] 
-                 << "/" << whereclauses[clause] << endl;
-    }
-
     QString progfindid = QString(
 "(CASE record.type "
 "  WHEN %1 "
@@ -1387,8 +1514,6 @@ void Scheduler::AddNewRecords(void) {
         .arg(kFindWeeklyRecord)
         .arg(kOverrideRecord);
 
-    for (clause = 0; clause < fromclauses.count(); clause++)
-    {
     QString query = QString(
 "SELECT DISTINCT channel.chanid, channel.sourceid, "
 "program.starttime, program.endtime, "
@@ -1409,8 +1534,11 @@ void Scheduler::AddNewRecords(void) {
 "program.airdate, program.stars, program.originalairdate, record.inactive, ")
 + progfindid + QString(
 
-"FROM record, program ") + fromclauses[clause] + QString(
+"FROM recordmatch "
 
+" INNER JOIN record ON (recordmatch.recordid = record.recordid) "
+" INNER JOIN program ON (recordmatch.chanid = program.chanid AND "
+"                        recordmatch.starttime = program.starttime) "
 " INNER JOIN channel ON (channel.chanid = program.chanid) "
 " INNER JOIN cardinput ON (channel.sourceid = cardinput.sourceid) "
 " INNER JOIN capturecard ON (capturecard.cardid = cardinput.cardid) "
@@ -1461,51 +1589,9 @@ void Scheduler::AddNewRecords(void) {
 "          AND program.description = recorded.description)) "
 "      ) "
 "     ) "
-"  ) "
+"  ) ");
 
-"WHERE ") + whereclauses[clause] + QString(" AND "
-
-"((record.type = %1 " // allrecord
-"OR record.type = %2 " // findonerecord
-"OR record.type = %3 " // finddailyrecord
-"OR record.type = %4) " // findweeklyrecord
-" OR "
-" ((record.station = channel.callsign) " // channel matches
-"  AND "
-"  ((record.type = %5) " // channelrecord
-"   OR"
-"   ((TIME_TO_SEC(record.starttime) = TIME_TO_SEC(program.starttime)) " // timeslot matches
-"    AND "
-"    ((record.type = %6) " // timeslotrecord
-"     OR"
-"     ((DAYOFWEEK(record.startdate) = DAYOFWEEK(program.starttime) "
-"      AND "
-"      ((record.type = %7) " // weekslotrecord
-"       OR"
-"       ((TO_DAYS(record.startdate) = TO_DAYS(program.starttime)) " // date matches
-"        AND "
-"        (TIME_TO_SEC(record.endtime) = TIME_TO_SEC(program.endtime)) "
-"        AND "
-"        (TO_DAYS(record.enddate) = TO_DAYS(program.endtime)) "
-"        )"
-"       )"
-"      )"
-"     )"
-"    )"
-"   )"
-"  )"
-" )"
-") ")
-        .arg(kAllRecord)
-        .arg(kFindOneRecord)
-        .arg(kFindDailyRecord)
-        .arg(kFindWeeklyRecord)
-        .arg(kChannelRecord)
-        .arg(kTimeslotRecord)
-        .arg(kWeekslotRecord);
-
-    VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query %1...").arg(clause));
-    //cerr << query << endl;
+    VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query..."));
 
     gettimeofday(&dbstart, NULL);
     QSqlQuery result = db->exec(query);
@@ -1644,8 +1730,6 @@ void Scheduler::AddNewRecords(void) {
             p->recstatus = rsInactive;
 
         tmpList.push_back(p);
-    }
-
     }
 
     VERBOSE(VB_SCHEDULE, " +-- Cleanup...");

@@ -116,6 +116,10 @@ public:
     static void fillSelections(QSqlDatabase* db, SelectSetting* setting);
 
     static void signalChange(int recordid);
+    // Use -1 for recordid when all recordids are potentially
+    // affected, such as when the program table is updated.  
+    // Use 0 for recordid when a reschdule isn't specific to a single
+    // recordid, such as when a recording type priority is changed.
     
     void setInactiveObj(SRInactive* val) {inactive = val;}
     void setRecTypeObj(SRRecordingType* val) {type = val;}
