@@ -773,9 +773,10 @@ information about the locations and contents of shared libraries from
 information in <tt>/etc/ld.so.conf</tt>.  Because MythTV installs some
 shared libraries in <tt>/usr/local/lib</tt>, that directory needs to be
 added to the list of directories for <bf>ld.so</bf> to search when doing
-runtime linking of programs. You do this, as root, by editing
-<tt>/etc/ld.so.conf</tt>, then running <bf>ldconfig</bf>. There are many
-ways to do this; one that works is to enter this series of commands:
+runtime linking of programs, if it is not already there.
+You do this, as root, by editing <tt>/etc/ld.so.conf</tt>, then
+running <bf>ldconfig</bf>. There are many ways to do this; one that
+works is to enter this series of commands:
 
 <tscreen><verb>
 $ su -
@@ -4389,9 +4390,16 @@ $ su
 </verb></tscreen>
 
 2.  Change the hostname.
-For most distributions, edit the <tt>/etc/sysconfig/network</tt> file.  Look
-for <tt>HOSTNAME=frontend1</tt> and change this to
-<tt>HOSTNAME=kidsroom</tt> or whatever you'll be using.  To alter the
+
+For Red Hat and derived distributions, edit the
+<tt>/etc/sysconfig/network</tt> file.  Look for
+<tt>HOSTNAME=frontend1</tt> and change this to
+<tt>HOSTNAME=kidsroom</tt> or whatever you'll be using.  For other
+distributions, refer to the documentation, such as the
+<verb>hostname(1)</verb> man page.
+
+<p>
+To alter the
 hostname in the current session, run:
 <tscreen><verb>
 # hostname kidsroom
