@@ -42,6 +42,8 @@ int main(int argc, char **argv)
 
     QString themename = globalsettings->GetSetting("Theme");
     QString themedir = findThemeDir(themename, installprefix);
+
+    globalsettings->SetSetting("ThemePathName", themedir + "/");
   
     themedir += "/qtlook.txt";
     globalsettings->ReadSettings(themedir);

@@ -10,7 +10,7 @@ int GuiHeight=600
 #
 # Do we color the Qt widgets according to the 'qtlook.txt' file in the theme?
 # (only works for the program guide, currently)
-int ThemeQt=0
+int ThemeQt=1
 # Generate static thumbnail pixmaps for recordings?  Takes extra time to start
 # the playback/delete dialogs if turned on.
 int GeneratePreviewPixmaps=0

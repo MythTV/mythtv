@@ -7,6 +7,7 @@
 #include <math.h>
 #include <qcursor.h>
 #include <qapplication.h>
+#include <qimage.h>
 
 #include <iostream>
 using namespace std;
@@ -45,14 +46,23 @@ GuideGrid::GuideGrid(const QString &channel, QWidget *parent, const char *name)
     {
         bgcolor = QColor(globalsettings->GetSetting("BackgroundColor"));
         fgcolor = QColor(globalsettings->GetSetting("ForegroundColor"));
+
+        if (globalsettings->GetSetting("BackgroundPixmap") != "")
+        {
+            QString pmapname = globalsettings->GetSetting("ThemePathName") +
+                               globalsettings->GetSetting("BackgroundPixmap");
+            setPaletteBackgroundPixmap(QPixmap(pmapname));
+        }
+        else
+            setPalette(QPalette(bgcolor));
     }
     else
     {
         bgcolor = QColor("white");
         fgcolor = QColor("black");
+        setPalette(QPalette(bgcolor));
     }
 
-    setPalette(QPalette(bgcolor));
     m_font = new QFont("Arial", (int)(11 * hmult), QFont::Bold);
     m_largerFont = new QFont("Arial", (int)(13 * hmult), QFont::Bold);
 
@@ -521,11 +531,35 @@ QBrush GuideGrid::getBGColor(const QString &category)
     return br;
 }
 
+QRgb blendColors(QRgb source, QRgb add, int alpha)
+{
+    int sred = qRed(source);
+    int sgreen = qGreen(source);
+    int sblue = qBlue(source);
+
+    int tmp1 = (qRed(add) - sred) * alpha;
+    int tmp2 = sred + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+    sred = tmp2 & 0xff;
+
+    tmp1 = (qGreen(add) - sgreen) * alpha;
+    tmp2 = sgreen + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+    sgreen = tmp2 & 0xff;
+
+    tmp1 = (qBlue(add) - sblue) * alpha;
+    tmp2 = sblue + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+    sblue = tmp2 & 0xff;
+
+    return qRgb(sred, sgreen, sblue);
+}
+
+
 void GuideGrid::paintPrograms(QPainter *p)
 {
     QRect pr = programRect();
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
+
+    QImage bgimage = pix.convertToImage();
 
     QPainter tmp(&pix);
     tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
@@ -588,10 +622,29 @@ void GuideGrid::paintPrograms(QPainter *p)
 
                 QBrush br = getBGColor(pginfo->category);
 
-                int startx = (int)(x * xdifference + 1 * wmult); 
-                int endx = (int)((x + spread) * xdifference - 2 * wmult);
-                tmp.fillRect(startx, (int)(ydifference * y + 1 * hmult),
-                             endx, (int)(ydifference - 2 * hmult), br);
+                if (br != QBrush(bgcolor))
+                {
+                    QRgb blendcolor = br.color().rgb();
+
+                    int startx = (int)(x * xdifference + 1 * wmult);
+                    int endx = (int)((x + spread) * xdifference - 2 * wmult);
+                    int starty = (int)(ydifference * y + 1 * hmult);
+                    int endy = (int)(ydifference * (y + 1) - 2 * hmult);
+                    unsigned int *data = NULL;
+                   
+                    for (int tmpy = starty; tmpy < endy; tmpy++)
+                    {
+                        data = (unsigned int *)bgimage.scanLine(tmpy);
+                        for (int tmpx = startx; tmpx < endx; tmpx++)
+                        {
+                            QRgb pixelcolor = data[tmpx];
+                            data[tmpx] = blendColors(pixelcolor, blendcolor, 
+                                                     96);
+                        }
+                    }
+                    tmp.drawImage(startx, starty, bgimage, startx, starty, 
+                                  endx - startx, ydifference - (int)(2 * hmult));
+                }
 
                 int maxwidth = (int)(spread * xdifference - (10 * wmult));
 
@@ -599,10 +652,10 @@ void GuideGrid::paintPrograms(QPainter *p)
                 if (pginfo->category != "" && usetheme)
                     info += " (" + pginfo->category + ")";
                 
-                startx = (int)(x * xdifference + 7 * wmult);
+                int startx = (int)(x * xdifference + 7 * wmult);
                 tmp.drawText(startx,
                              (int)(height / 8 + y * ydifference + 1 * hmult), 
-                             maxwidth, ydifference,
+                             maxwidth, ydifference - height / 8,
                              AlignLeft | WordBreak,
                              info);
 

@@ -351,6 +351,8 @@ int main(int argc, char **argv)
         exit(0);
     }
 
+    globalsettings->SetSetting("ThemePathName", themedir + "/");
+
     QString qttheme = themedir + "/qtlook.txt";
     globalsettings->ReadSettings(qttheme);
  
