@@ -101,6 +101,7 @@ void CommDetect::Init(int w, int h, double frame_rate, int method)
     logoMinValues = new unsigned char[width * height];
 
     logoFrameCount = 0;
+    logoInfoAvailable = false;
 
     ClearAllMaps();
 }
@@ -125,7 +126,7 @@ void CommDetect::ProcessNextFrame(VideoFrame *frame, long long frame_number)
     if (commDetectMethod & COMM_DETECT_SCENE)
         sceneHasChanged = CheckSceneHasChanged();
 
-    if (commDetectMethod & COMM_DETECT_LOGO)
+    if ((logoInfoAvailable) && (commDetectMethod & COMM_DETECT_LOGO))
     {
         bool nowPresent = CheckStationLogo();
 
@@ -261,6 +262,9 @@ bool CommDetect::CheckStationLogo(void)
     int in_pixels = 0;
     long out_sum = 0;
     int out_pixels = 0;
+
+    if (!logoInfoAvailable)
+        return(false);
 
     for (int y = logoMinY - 2; y <= (logoMaxY + 2); y += 5)
     {
@@ -595,7 +599,7 @@ void CommDetect::BuildAllMethodsCommList(void)
     bool includeLogoMethod        = (logoCommBreakMap.size() > 2);
 
     QMap<long long, int> frameMap;
-    QMap<long long, int>::Iterator it;
+//    QMap<long long, int>::Iterator it;
 
     commBreakMap.clear();
 
@@ -622,12 +626,11 @@ void CommDetect::BuildAllMethodsCommList(void)
     }
 
 
-    for (int i = 0; i <= framesProcessed; i++)
-    {
-        int value = frameMap[i];
-
+//    for (int i = 0; i <= framesProcessed; i++)
+//    {
+//        int value = frameMap[i];
         
-    }
+//    }
 }
 
 void CommDetect::BuildBlankFrameCommList(void)
@@ -1008,6 +1011,9 @@ void CommDetect::DumpLogo(bool fromCurrentFrame)
 {
     char scrPixels[] = " .oxX";
 
+    if (!logoInfoAvailable)
+        return;
+
     printf( "\nLogo Data " );
     if (fromCurrentFrame)
         printf( "from current frame\n" );
@@ -1196,6 +1202,7 @@ void CommDetect::SetLogoMask(unsigned char *mask)
 //    DumpLogo();
 
     logoFrameCount = 0;
+    logoInfoAvailable = true;
 }
 
 void CommDetect::CondenseMarkMap(QMap<long long, int>&map, int spacing,

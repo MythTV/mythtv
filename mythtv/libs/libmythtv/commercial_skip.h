@@ -109,6 +109,7 @@ class CommDetect
     unsigned char *logoFrame;
     unsigned char *logoMask;
     unsigned char *logoCheckMask;
+    bool logoInfoAvailable;
     int logoFrameCount;
     int logoMinX;
     int logoMaxX;
