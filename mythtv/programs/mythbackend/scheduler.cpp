@@ -1409,9 +1409,10 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
         switch (searchtype)
         {
         case kPowerSearch:
+            qphrase.remove(QRegExp("^\\s*AND\\s+", false));
             from << result.value(2).toString();
             where << QString("record.recordid = %1 AND "
-                             "program.manualid = 0 %2")
+                             "program.manualid = 0 AND ( %2 )")
                 .arg(result.value(0).toString())
                 .arg(qphrase);
             break;
@@ -1568,7 +1569,7 @@ void Scheduler::UpdateMatches(int recordid) {
         if (!result.isActive())
         {
             MythContext::DBError("UpdateMatches", result);
-            return;
+            continue;
         }
 
         VERBOSE(VB_SCHEDULE, QString(" |-- %1 results in %2 sec.")

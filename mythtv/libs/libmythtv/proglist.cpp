@@ -549,7 +549,7 @@ void ProgLister::addSearchRecord(void)
     if (chooseLineEdit)
         text = chooseLineEdit->text();
     else if (chooseEditButton)
-        text = viewList[curView];
+        text = chooseListBox->currentText();
     else
         return;
 
@@ -579,6 +579,7 @@ void ProgLister::addSearchRecord(void)
     record.loadBySearch(searchtype, text, what);
     record.exec();
 
+    chooseListBox->setFocus();
     setViewFromEdit();
 }
 
@@ -1039,7 +1040,6 @@ QString ProgLister::powerStringToSQL(QString &qphrase)
     QString str = "";
 
     qphrase.replace("\"","\\\"");
-
     QStringList field = QStringList::split( ":", qphrase, true);
 
     if ( field.count() != 6)
@@ -1049,23 +1049,43 @@ QString ProgLister::powerStringToSQL(QString &qphrase)
         return str;
     }
     if (field[0])
-        str += QString("AND program.title LIKE \"\%%1\%\" ")
+        str += QString("program.title LIKE \"\%%1\%\" ")
                        .arg(field[0]);
     if (field[1])
-        str += QString("AND program.subtitle LIKE \"\%%1\%\" ")
+    {
+	if (str > "")
+            str += "AND ";
+        str += QString("program.subtitle LIKE \"\%%1\%\" ")
                        .arg(field[1]);
+    }
     if (field[2])
-        str += QString("AND program.description LIKE \"\%%1\%\" ")
+    {
+	if (str > "")
+            str += "AND ";
+        str += QString("program.description LIKE \"\%%1\%\" ")
                        .arg(field[2]);
+    }
     if (field[3])
-        str += QString("AND program.category_type=\"%1\" ")
+    {
+	if (str > "")
+            str += "AND ";
+        str += QString("program.category_type=\"%1\" ")
                        .arg(field[3]);
+    }
     if (field[4])
-        str += QString("AND program.category=\"%1\" ")
+    {
+	if (str > "")
+            str += "AND ";
+        str += QString("program.category=\"%1\" ")
                        .arg(field[4]);
+    }
     if (field[5])
-        str += QString("AND channel.callsign=\"%1\" ")
+    {
+	if (str > "")
+            str += "AND ";
+        str += QString("channel.callsign=\"%1\" ")
                        .arg(field[5]);
+    }
     return str;
 }
 
@@ -1359,14 +1379,15 @@ void ProgLister::fillItemList(void)
     {
         where = QString("WHERE channel.visible = 1 "
                         "  AND program.endtime > %1 "
-                        "  %2 ")
+                        "  AND ( %2 ) ")
                         .arg(startstr).arg(powerStringToSQL(qphrase));
     }
     else if (type == plSQLSearch) // complex search
     {
+        qphrase.remove(QRegExp("^\\s*AND\\s+", false));
         where = QString("WHERE channel.visible = 1 "
                         "  AND program.endtime > %1 "
-                        "  %2 ")
+                        "  AND ( %2 ) ")
                         .arg(startstr).arg(qphrase);
     }
     else if (type == plChannel) // list by channel
