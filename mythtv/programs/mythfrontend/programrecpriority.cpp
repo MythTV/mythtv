@@ -847,6 +847,9 @@ void ProgramRecPriority::updateList(QPainter *p)
                         ltype->SetItemText(cnt, 5, 
                                            QString::number(abs(finalRecPriority)));
 
+                        if (progInfo->rectype == kDontRecord)
+                            ltype->EnableForcedFont(cnt, "inactive");
+
                         cnt++;
                         listCount++;
                     }
