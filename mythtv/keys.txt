@@ -92,7 +92,7 @@ LiveTV Browse Mode:
 - Down          browse program on channel below current listed channel/program.
 - /             browse program on next favorite channel.
 - 0-9           enter a channel number to browse.
-- Enter/Space   change channel to channel of current listed program.
+- Space/Enter   change channel to channel of current listed program.
 - R/r           Toggle recording of current program (cycles through types)
 - ESC/O         Exit Browse mode.
 
@@ -103,7 +103,7 @@ Playback Recording Zoom Mode:
 - Down          Move video Down
 - PageUp        Zoom In
 - PageDown      Zoom Out
-- Enter/Space   Exit Zoom mode leaving picture at current size and position
+- Space/Enter   Exit Zoom mode leaving picture at current size and position
 - ESC           Exit Zoom mode and return to original size.
 
 If you have two or more tuner cards:
