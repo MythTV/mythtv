@@ -153,16 +153,14 @@ int main(int argc, char **argv)
     }
 
     //
-    //  Get the Myth context and db hooks if we were ./configure'd with MYTHLIB support
+    //  Get the Myth context and db hooks
     //    
 
 
     QSqlDatabase *db = NULL;
 
     mfdContext = new Settings();
-    
 
-#ifdef MYTHLIB_SUPPORT
     db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
     {
@@ -174,16 +172,14 @@ int main(int argc, char **argv)
         cerr << "mfd: Couldn't open database. I go away now." << endl;
         return -1;
     }
-#endif
 
     //
     //  Figure out port to listen on
     //
 
     int assigned_port = 2342;
-#ifdef MYTHLIB_SUPPORT
     assigned_port = gContext->GetNumSetting("MFDPort", 2342);
-#endif
+
     if(special_port > 0)
     {
         assigned_port = special_port;
@@ -196,12 +192,10 @@ int main(int argc, char **argv)
     //
    
     bool log_stdout = false;
-#ifdef MYTHLIB_SUPPORT
     if(mfdContext->getNumSetting("MFDLogFlag", 0))
     {
         log_stdout = true;
     }
-#endif
 
     if(!daemon_mode)
     {
@@ -212,9 +206,7 @@ int main(int argc, char **argv)
     //  Make sure database are all up to whack
     //
 
-#ifdef MYTHLIB_SUPPORT
     UpgradeMusicDatabaseSchema();
-#endif
 
     the_mfd = new MFD(db, assigned_port, log_stdout, logging_verbosity);
     a.exec();

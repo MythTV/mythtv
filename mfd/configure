@@ -8,7 +8,6 @@
 
 # default parameters
 
-mythlib="yes"
 zeroconfig="yes"
 audio="yes"
 daapserver="yes"
@@ -22,10 +21,6 @@ mfdclient="yes"
 
 for opt do
   case "$opt" in
-  --enable-mythlib) mythlib="yes"
-  ;;
-  --disable-mythlib) mythlib="no"
-  ;;
   --enable-zeroconfig) zeroconfig="yes"
   ;;
   --disable-zeroconfig) zeroconfig="no"
@@ -72,7 +67,6 @@ for opt do
       daapserver="yes"
       daapclient="yes"
       httpserver="yes"
-      mythlib="yes"
       mmusic="yes"
       wmasupport="yes"
       aacsupport="yes"
@@ -85,7 +79,6 @@ for opt do
       daapserver="no"
       daapclient="no"
       httpserver="no"
-      mythlib="no"
       mmusic="no"
       wmasupport="no"
       aacsupport="no"
@@ -98,12 +91,6 @@ done
 #
 #   Sanity checking
 #
-
-if test "$mythlib" = "no" ; then
-    mmusic="no"
-    wmasupport="no"
-    aacsupport="no"
-fi
 
 if test "$audio" = "no" ; then
     wmasupport="no"
@@ -118,7 +105,6 @@ Options: [defaults in brackets after descriptions]
 
 Standard options:
   --help               print this message
-  --enable-mythlib     use mythlib/db for settings and content [default=yes] 
   --enable-zeroconfig  enable auto discovery of services       [default=yes]
   --enable-audio       enable audio playing                    [default=yes]
   --enable-wmasupport  include ability to play wma audio files [default=yes]
@@ -132,7 +118,6 @@ Standard options:
 
 All options can be turned off with --disable-foo
 Some options will be automatically turned off if they make no sense 
-(e.g. you can't include mythmusic if you turn off mythlib support)
 
 EOF
 exit 1
@@ -175,19 +160,6 @@ echo " "
 #
 #   Myth lib
 #
-
-if test "$mythlib" = "yes" ; then
-    echo "                    mythlib support: yes"        
-    echo "//  Include mythlib support " >> ./config.h
-    echo " " >> ./config.h
-    echo "#define MYTHLIB_SUPPORT 1" >> ./config.h
-    echo " " >> ./config.h
-    echo "USE_MYTH_LIB = 1 " >> ./options.pro
-fi
-
-if test "$mythlib" = "no" ; then
-    echo "                    mythlib support: no"
-fi
 
 #
 #   Dummy

@@ -16,40 +16,28 @@
 
 #include "settings.h"
 
-#ifdef MYTHLIB_SUPPORT 
-    MythContext *gContext;
-#endif
+MythContext *gContext;
 
 
 //
-//  This is very straightforward. If we're linked with libmyth, then use
-//  gContext for settings. If we aren't, well ... at the moment, hand back
-//  the defaults.
+//  Use libmyth's gContext for settings. 
 //
 
 Settings::Settings()
 {
-#ifdef MYTHLIB_SUPPORT 
     gContext = new MythContext(MYTH_BINARY_VERSION, false);
-#endif
 }
 
 int Settings::openDatabase(QSqlDatabase *db)
 {
-#ifdef MYTHLIB_SUPPORT 
     return gContext->OpenDatabase(db);
-#endif
-    return 0;
 }
 
 
 
 QString Settings::GetSetting(const QString &key, const QString &defaultval)
 {
-#ifdef MYTHLIB_SUPPORT
     return gContext->GetSetting(key, defaultval);
-#endif
-    return defaultval;
 }
 
 QString Settings::getSetting(const QString &key, const QString &defaultval)
@@ -61,10 +49,7 @@ QString Settings::getSetting(const QString &key, const QString &defaultval)
 
 int Settings::GetNumSetting(const QString &key, int defaultval)
 {
-#ifdef MYTHLIB_SUPPORT
     return gContext->GetNumSetting(key, defaultval);
-#endif
-    return defaultval;
 }
 
 int Settings::getNumSetting(const QString &key, int defaultval)
@@ -88,12 +73,7 @@ QStringList Settings::getListSetting(const QString &key, const QStringList &defa
 
 QString Settings::GetHostName()
 {
-#ifdef MYTHLIB_SUPPORT
     return gContext->GetHostName();
-#endif
-    char my_hostname[2049] = "ihavenohostname";
-    gethostname(my_hostname, 2048);
-    return my_hostname;
 }
 
 QString Settings::getHostName()

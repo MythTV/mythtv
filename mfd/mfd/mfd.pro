@@ -23,9 +23,8 @@ INSTALLS += target
 
 TARGET = mfd
 
-!isEmpty(USE_MYTH_LIB) {
 LIBS += -lmyth-$$LIBVERSION 
-}
+
 
 !isEmpty(USE_WMA_AUDIO){
 LIBS += -lmythavformat-$$LIBVERSION

@@ -16,9 +16,7 @@
 
 #include "../config.h"
 
-#ifdef MYTHLIB_SUPPORT 
 #include <mythtv/mythcontext.h>
-#endif
 
 class Settings
 {
