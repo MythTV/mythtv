@@ -179,6 +179,7 @@ Metadata* MetaIOMP4::read(QString filename)
     QString artist = "", album = "", title = "", genre = "";
     QString writer = "", comment = "";
     int year = 0, tracknum = 0, length = 0;
+    bool compilation = false;
 
     mp4callback_data_t callback_data;
     callback_data.fd = 0;
@@ -265,6 +266,17 @@ Metadata* MetaIOMP4::read(QString filename)
         free(char_storage);
     }
 
+    if (mp4ff_meta_get_compilation(mp4_ifile, &char_storage))
+    {
+        //
+        //  Does the returned char_storage tell us anything?
+        //  I dunno?
+        //
+
+        compilation = true;
+        free(char_storage);
+    }
+
     //
     //  Find the AAC track inside this mp4 which we need to do to find the
     //  length
@@ -325,13 +337,15 @@ Metadata* MetaIOMP4::read(QString filename)
     metadataSanityCheck(&artist, &album, &title, &genre);
 
     Metadata *retdata = new Metadata(filename, 
+                                     "",
                                      artist, 
                                      album, 
                                      title, 
                                      genre,
                                      year, 
                                      tracknum, 
-                                     length);
+                                     length,
+                                     compilation);
 
     //retdata->setComposer(writer);
     //retdata->setComment(comment);

@@ -595,6 +595,11 @@ void PlaybackBoxMusic::updatePlaylistFromSmartPlaylist(QString category, QString
 
 void PlaybackBoxMusic::showEditMetadataDialog()
 {
+    if(!curMeta)
+    {
+        return;
+    }
+
     // stop music playing
     stop();
     
