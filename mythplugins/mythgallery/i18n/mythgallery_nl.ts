@@ -3,47 +3,47 @@
     <name>GLSingleView</name>
     <message>
         <source>Folder: </source>
-        <translation type="unfinished">Map: </translation>
+        <translation>Map: </translation>
     </message>
     <message>
         <source>Created: </source>
-        <translation type="unfinished">Gemaakt: </translation>
+        <translation>Gemaakt: </translation>
     </message>
     <message>
         <source>Modified: </source>
-        <translation type="unfinished">Aangepast: </translation>
+        <translation>Aangepast: </translation>
     </message>
     <message>
         <source>Bytes</source>
-        <translation type="unfinished">Bytes</translation>
+        <translation>Bytes</translation>
     </message>
     <message>
         <source>Width</source>
-        <translation type="unfinished">Breedte</translation>
+        <translation>Breedte</translation>
     </message>
     <message>
         <source>pixels</source>
-        <translation type="unfinished">punten</translation>
+        <translation>punten</translation>
     </message>
     <message>
         <source>Height</source>
-        <translation type="unfinished">Hoogte</translation>
+        <translation>Hoogte</translation>
     </message>
     <message>
         <source>Pixel Count</source>
-        <translation type="unfinished">Pixels</translation>
+        <translation>Aantal pixels</translation>
     </message>
     <message>
         <source>megapixels</source>
-        <translation type="unfinished"></translation>
+        <translation>megapixels</translation>
     </message>
     <message>
         <source>Rotation Angle</source>
-        <translation type="unfinished">Draaihoek</translation>
+        <translation>Draaihoek</translation>
     </message>
     <message>
         <source>degrees</source>
-        <translation type="unfinished">graden</translation>
+        <translation>graden</translation>
     </message>
 </context>
 <context>
@@ -133,7 +133,7 @@
     </message>
     <message>
         <source>This is the type of transition used between pictures in slideshow mode.</source>
-        <translation>Dit is het overganstype dat gebruikt wordt in diashow mode.</translation>
+        <translation>Dit is het overganstype dat gebruikt wordt in diashow modus.</translation>
     </message>
     <message>
         <source>This is the type of background for each picture in single view mode.</source>
@@ -141,7 +141,7 @@
     </message>
     <message>
         <source>Slideshow Delay</source>
-        <translation>Diashow pausetijd</translation>
+        <translation>Diashow vertraging</translation>
     </message>
     <message>
         <source>Use OpenGL transitions</source>
@@ -157,7 +157,7 @@
     </message>
     <message>
         <source>This is the type of OpenGL transition used between pictures in slideshow mode.</source>
-        <translation>Dit is het type OpenGL overgang die gebruikt wordt in diashow mode.</translation>
+        <translation>Dit is het type OpenGL overgang die gebruikt wordt in diashow modus.</translation>
     </message>
     <message>
         <source>Gallery Directory does not exist or is unreadable.</source>
@@ -196,7 +196,7 @@
     </message>
     <message>
         <source>megapixels</source>
-        <translation type="unfinished"></translation>
+        <translation>megapixels</translation>
     </message>
     <message>
         <source>degrees</source>
