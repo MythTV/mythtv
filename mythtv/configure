@@ -951,7 +951,7 @@ if test x"$distcc" = x"yes"; then
         distcc="no"
     else
         XYZ=`which $cc`
-        if test x"$XYZ" != x"" -a x"`ls -l $XYZ | grep -o distcc`" != x""; then
+        if test x"$XYZ" != x"" -a x"`ls -l $XYZ | grep distcc`" != x""; then
             distcc="yes, using distcc symlinked $cc"
         fi
     fi
@@ -963,7 +963,7 @@ if test x"$ccache" = x"yes"; then
         ccache="no"
     else
         XYZ=`which $cc`
-        if test x"$XYZ" != x"" -a x"`ls -l $XYZ | grep -o ccache`" != x""; then
+        if test x"$XYZ" != x"" -a x"`ls -l $XYZ | grep ccache`" != x""; then
             ccache="yes, using ccache symlinked $cc"
         fi
     fi
