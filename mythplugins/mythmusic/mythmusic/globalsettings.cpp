@@ -393,7 +393,7 @@ public:
     };
 };
 
-GeneralSettings::GeneralSettings()
+MusicGeneralSettings::MusicGeneralSettings()
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
     general->setLabel(QObject::tr("General Settings"));
@@ -408,7 +408,7 @@ GeneralSettings::GeneralSettings()
     addChild(general);
 }
 
-PlayerSettings::PlayerSettings()
+MusicPlayerSettings::MusicPlayerSettings()
 {
     VerticalConfigurationGroup* playersettings = new VerticalConfigurationGroup(false);
     playersettings->setLabel(QObject::tr("Playback Settings"));
@@ -432,7 +432,7 @@ PlayerSettings::PlayerSettings()
     addChild(playersettings2);
 }
 
-RipperSettings::RipperSettings()
+MusicRipperSettings::MusicRipperSettings()
 {
     VerticalConfigurationGroup* rippersettings = new VerticalConfigurationGroup(false);
     rippersettings->setLabel(QObject::tr("CD Ripper Settings"));

@@ -27,19 +27,19 @@ protected:
 // The real work.
 
 // Temporary dumping ground for things that have not been properly categorized yet
-class GeneralSettings: virtual public ConfigurationWizard {
+class MusicGeneralSettings: virtual public ConfigurationWizard {
 public:
-    GeneralSettings();
+    MusicGeneralSettings();
 };
 
-class PlayerSettings: virtual public ConfigurationWizard {
+class MusicPlayerSettings: virtual public ConfigurationWizard {
 public:
-    PlayerSettings();
+    MusicPlayerSettings();
 };
 
-class RipperSettings: virtual public ConfigurationWizard {
+class MusicRipperSettings: virtual public ConfigurationWizard {
 public:
-    RipperSettings();
+    MusicRipperSettings();
 };
 
 #endif

@@ -309,17 +309,17 @@ void MusicCallback(void *data, QString &selection)
     }
     else if (sel == "music_set_general")
     {
-        GeneralSettings settings;
+        MusicGeneralSettings settings;
         settings.exec(QSqlDatabase::database());
     }
     else if (sel == "music_set_player")
     {
-        PlayerSettings settings;
+        MusicPlayerSettings settings;
         settings.exec(QSqlDatabase::database());
     }
     else if (sel == "music_set_ripper")
     {
-        RipperSettings settings;
+        MusicRipperSettings settings;
         settings.exec(QSqlDatabase::database());
     }
 }
@@ -394,12 +394,15 @@ int mythplugin_init(const char *libversion)
 
     UpgradeMusicDatabaseSchema();
 
-    GeneralSettings general;
+    MusicGeneralSettings general;
     general.load(QSqlDatabase::database());
     general.save(QSqlDatabase::database());
-    PlayerSettings settings;
+    MusicPlayerSettings settings;
     settings.load(QSqlDatabase::database());
     settings.save(QSqlDatabase::database());
+    MusicRipperSettings ripper;
+    ripper.load(QSqlDatabase::database());
+    ripper.save(QSqlDatabase::database());
 
     setupKeys();
 
