@@ -734,6 +734,7 @@ char *TVRec::GetScreenGrab(ProgramInfo *pginfo, const QString &filename,
     delete nupvidplay;
     delete tmprbuf;
 
+    screendb->close(); 
     QSqlDatabase::removeDatabase(name);
 
     return retbuf;
@@ -2076,6 +2077,7 @@ void TVRec::DoFlagCommercialsThread(void)
     delete tmprbuf;
     delete program_info;
 
+    commthread_db->close();
     QSqlDatabase::removeDatabase(name);
 }
 
