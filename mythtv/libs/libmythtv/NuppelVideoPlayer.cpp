@@ -2696,7 +2696,7 @@ int NuppelVideoPlayer::FlagCommercials(int show_percentage)
     {
         // sleep a little so we don't use all cpu even if we're niced
         if (!show_percentage)
-            usleep(1000);
+            usleep(10000);
 
         if ((show_percentage) &&
             ((framesPlayed % 100) == 0))
