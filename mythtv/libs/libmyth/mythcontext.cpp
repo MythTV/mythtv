@@ -633,7 +633,7 @@ void MythContext::InitializeScreenSettings()
 {
     int x = 0, y = 0, w = 0, h = 0;
 
-#ifndef QWS
+#if defined(Q_WS_X11)
     GetMythTVGeometry(qt_xdisplay(), qt_xscreen(), &x, &y, &w, &h);
 #endif
 

@@ -8,7 +8,7 @@ using namespace std;
 #include "util.h"
 #include "mythcontext.h"
 
-#ifndef QWS
+#if defined(Q_WS_X11)
 extern "C" {
 #include <X11/Xlib.h>
 #include <X11/extensions/Xinerama.h>
@@ -500,7 +500,7 @@ long long decodeLongLong(QStringList &list, QStringList::iterator &it)
     return retval;
 } 
 
-#ifndef QWS
+#if defined(Q_WS_X11)
 void GetMythTVGeometry(Display *dpy, int screen_num, int *x, int *y, 
                        int *w, int *h) 
 {
