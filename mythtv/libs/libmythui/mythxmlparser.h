@@ -12,8 +12,11 @@
 
 #include <qdom.h>
 #include "mythfontproperties.h"
-#include "mythcontainer.h"
+#include "mythuicontainer.h"
 #include "mythuitype.h"
+
+class MythUITree;
+class MythUIThemedDialogPrivate;
 
 class MythXMLParser
 {
@@ -23,7 +26,11 @@ class MythXMLParser
 
     void SetWMult(double wm) { wmult = wm; }
     void SetHMult(double hm) { hmult = hm; }
-    void setOwner(MythUIType *l_owner) { owner = l_owner;}
+    void setOwner(MythUIType *l_owner, MythUIThemedDialogPrivate *o_owner) 
+                 { 
+                    m_owner = l_owner;
+                    m_private_owner = o_owner;
+                 }
     void setTheme(const QString &theme_file, const QString &theme_dir);
 
     //
@@ -44,6 +51,8 @@ class MythXMLParser
     MythUIContainer*    getContainer(const QString &a_name);
     void                parseImage(MythUIContainer *, QDomElement &);
     void                parseTextArea(MythUIContainer *, QDomElement &);
+    void                parseTree(MythUIContainer *, QDomElement &);
+    void                parseTreeColumn(MythUITree *, QDomElement &);
 
 
 /*
@@ -76,7 +85,8 @@ class MythXMLParser
  
   private:
 
-    MythUIType                        *owner;
+    MythUIType                        *m_owner;
+    MythUIThemedDialogPrivate         *m_private_owner;
     QMap<QString, MythFontProperties> fontMap;
     QMap<QString, MythUIContainer*>   m_containers;
     double                            wmult;

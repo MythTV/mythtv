@@ -4,6 +4,7 @@ using namespace std;
 #include <qfontmetrics.h>
 
 #include "mythuitype.h"
+#include "mythimage.h"
 #include "mythpainter.h"
 #include "mythmainwindow.h"
 
@@ -28,16 +29,42 @@ MythUIType::MythUIType(QObject *parent, const char *name)
         if (m_Parent)
             m_Parent->AddChild(this);
     }
+    
+    //
+    //  Optional elements that draw a frame around any MythUIType if user sets
+    //  debug true in the xml
+    //
+
+    m_debug_mode = false;
+    m_debug_hor_line = NULL;
+    m_debug_ver_line = NULL;
+    m_debug_color = QColor(0,0,255);    // blue by default
 }
 
 MythUIType::~MythUIType()
 {
+    //
+    //  delete debugging images if they exist
+    //
+    
+    if(m_debug_hor_line)
+    {
+        delete m_debug_hor_line;
+        m_debug_hor_line = NULL;
+    }
+    if(m_debug_ver_line)
+    {
+        delete m_debug_ver_line;
+        m_debug_ver_line = NULL;
+    }
 }
 
 void MythUIType::AddChild(MythUIType *child)
 {
     if (!child)
+    {
         return;
+    }
 
     m_ChildrenList.push_back(child);
 }
@@ -157,10 +184,32 @@ int MythUIType::CalcAlpha(int alphamod)
     return (int)(m_Alpha * (alphamod / 255.0));
 }
 
+void MythUIType::setDebugColor(QColor c)
+{
+    m_debug_color = c;
+}
+
+void MythUIType::makeDebugImages()
+{
+    //
+    //  MythImage::FromQImage() deletes the QImage's
+    //
+
+    QImage *temp_image = new QImage(m_Area.width(), 1, 32);
+    temp_image->fill(m_debug_color.rgb());
+    m_debug_hor_line = MythImage::FromQImage(temp_image);
+
+    temp_image = new QImage(1, m_Area.height(), 32);
+    temp_image->fill(m_debug_color.rgb());
+    m_debug_ver_line = MythImage::FromQImage(temp_image);
+}
+
 void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod)
 {
     if (!m_Visible)
+    {
         return;
+    }
 
     QValueVector<MythUIType *>::Iterator it;
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
@@ -170,6 +219,34 @@ void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod)
     }
 
     SetRedraw(false);
+    
+    //
+    //  If I'm in debugging mode, draw a frame at the edge of my area
+    //
+    
+    if (m_debug_mode && m_Area.width() > 0 && m_Area.height() > 0)
+    {
+        if(!m_debug_hor_line || !m_debug_ver_line)
+        {
+            makeDebugImages();
+        }
+        
+        //
+        //  This is slow, but is only called when debug is set in the xml
+        //
+
+        QRect area = QRect(m_Area.left() + xoffset, m_Area.top() + yoffset, 1, m_Area.height());
+        p->DrawImage(area, m_debug_ver_line, m_debug_ver_line->rect(), CalcAlpha(alphaMod)); 
+
+        area = QRect(m_Area.right() + xoffset, m_Area.top() + yoffset, 1, m_Area.height());
+        p->DrawImage(area, m_debug_ver_line, m_debug_ver_line->rect(), CalcAlpha(alphaMod)); 
+
+        area = QRect(m_Area.left() + xoffset, m_Area.top() + yoffset, m_Area.width(), 1);
+        p->DrawImage(area, m_debug_hor_line, m_debug_ver_line->rect(), CalcAlpha(alphaMod)); 
+
+        area = QRect(m_Area.left() + xoffset, m_Area.bottom() + yoffset, m_Area.width(), 1);
+        p->DrawImage(area, m_debug_hor_line, m_debug_ver_line->rect(), CalcAlpha(alphaMod)); 
+    }
 }
 
 void MythUIType::SetPosition(QPoint pos)

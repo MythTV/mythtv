@@ -19,11 +19,15 @@ using namespace std;
 #include "mythmainwindow.h"
 #include "mythuiimage.h"
 #include "mythuitext.h"
+#include "mythuitree.h"
+#include "myththemeddialogprivate.h"
+
 MythXMLParser::MythXMLParser(void)
 {
     wmult = 800;
     hmult = 600;
-    owner = NULL;
+    m_owner = NULL;
+    m_private_owner = NULL;
     
     m_themedir     = "";
     m_themedir_alt = "";
@@ -361,7 +365,9 @@ QRect MythXMLParser::parseRect(QString text)
 
 MythUIContainer* MythXMLParser::parseContainer(QDomElement &element)
 {
-    if(!owner)
+    bool debugging = false;
+
+    if(!m_owner)
     {
         cerr << "mythxmlparser.o: you can't call parseContainer() "
              << "without setting an owner"
@@ -395,6 +401,30 @@ MythUIContainer* MythXMLParser::parseContainer(QDomElement &element)
     QRect area = parseRect(area_string);
     normalizeRect(area);
 
+    //
+    //  Check for debugging being on
+    //
+
+    QString debug_string = element.attribute("debug", "");
+    if (debug_string.length() > 0) 
+    {
+        if (debug_string.lower() == "yes" ||
+            debug_string.lower() == "true")
+        {
+            debugging = true;
+        }
+    }
+    
+    debug_string = element.attribute("debugging", "");
+    if (debug_string.length() > 0) 
+    {
+        if (debug_string.lower() == "yes" ||
+            debug_string.lower() == "true")
+        {
+            debugging = true;
+        }
+    }
+
     MythUIContainer *new_container = getContainer(name);
     if (new_container)
     {
@@ -406,9 +436,10 @@ MythUIContainer* MythXMLParser::parseContainer(QDomElement &element)
         return NULL;
     }
 
-    new_container = new MythUIContainer(name);
+    new_container = new MythUIContainer(m_owner, name);
     new_container->setArea(area);
     m_containers[name] = new_container;
+    m_private_owner->addWidgetToMap(new_container);
 
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
@@ -434,6 +465,12 @@ MythUIContainer* MythXMLParser::parseContainer(QDomElement &element)
                      info.tagName() == "text_area" )
             {
                 parseTextArea(new_container, info);
+            }
+            else if (info.tagName() == "tree"     ||
+                     info.tagName() == "treeview" ||
+                     info.tagName() == "tree_view" )
+            {
+                parseTree(new_container, info);
             }
             else
             {
@@ -546,6 +583,7 @@ MythUIContainer* MythXMLParser::parseContainer(QDomElement &element)
         }
     */
 
+    new_container->setDebug(debugging);
     return new_container;
 }
 
@@ -661,11 +699,12 @@ void MythXMLParser::parseImage(MythUIContainer *container, QDomElement &element)
     //  If we made it through the above, then we found the file
     //
 
-    MythUIImage *new_image = new MythUIImage(f.name(), owner, name);
+    MythUIImage *new_image = new MythUIImage(f.name(), container, name);
     f.close();
     new_image->Load();
+    m_private_owner->addWidgetToMap(new_image);
     
-    position += container->getPosition();
+//    position += container->getPosition();
     new_image->SetPosition(position);
 
 }
@@ -769,11 +808,11 @@ void MythXMLParser::parseTextArea(MythUIContainer *container, QDomElement &eleme
         }
     }
 
-    area.moveBy(container->getPosition().x(), container->getPosition().y());
-    alt_area.moveBy(container->getPosition().x(), container->getPosition().y());
+    //area.moveBy(container->getPosition().x(), container->getPosition().y());
+    //alt_area.moveBy(container->getPosition().x(), container->getPosition().y());
 
     MythUIText *new_text = new MythUIText(value, *font, area, 
-                                        alt_area, owner, name);
+                                        alt_area, container, name);
 
     if (multiline.lower() == "yes" ||
         multiline.lower() == "true")
@@ -806,8 +845,287 @@ void MythXMLParser::parseTextArea(MythUIContainer *container, QDomElement &eleme
         else if (align.lower() == "hcenter")
             new_text->SetJustification(jst | Qt::AlignHCenter);
     }
+    m_private_owner->addWidgetToMap(new_text);
 }
 
+void MythXMLParser::parseTree(MythUIContainer *container, QDomElement &element)
+{
+
+    //
+    //  Defaults.
+    //
+    
+    MythUITreeType tree_type = MUTT_vertical;
+    int numb_columns = 0;
+    int numb_rows = 0;
+    bool debugging = false;
+
+    //
+    //  Create a default font if we need one
+    //
+
+    MythFontProperties *default_font = GetFont("myth_xml_parser_default_tree_font");
+    if(!default_font)
+    {
+        QFont temp_font = CreateFont("Arial", 12);
+        default_font = new MythFontProperties();
+        
+    }
+
+
+
+    //
+    //  Area defaults to container area
+    //
+
+    QRect area = QRect(0,0,container->getArea().width(), container->getArea().height());
+
+    QString name = element.attribute("name", "");
+    if (name.isNull() || name.isEmpty())
+    {
+        cerr << "mythxmlparser.o: tree tag with no name is being ignored"
+             << endl;
+        return;
+    }
+    
+    
+    //
+    //  User can also specify area by saying <tree area="0,0,800,600">
+    //
+
+    QString possible_area = element.attribute("area", "");
+    if (possible_area.length() > 0)
+    {
+        area = parseRect(possible_area);
+        normalizeRect(area);
+    }
+    
+    //
+    //  Figure out the type of tree
+    //
+    
+    QString possible_type = element.attribute("type", "");
+    if (possible_type.length() > 0)
+    {
+        possible_type = possible_type.lower();
+        if (possible_type == "vertical")
+        {
+            tree_type = MUTT_vertical;
+        }
+        else if (possible_type == "horizontal")
+        {
+            tree_type = MUTT_horizontal;
+        }
+        else if (possible_type == "folders" || possible_type == "folder")
+        {
+            tree_type = MUTT_folder;
+        }
+    }
+    
+    //
+    //  Get column/row counts
+    //
+    
+    QString possible_columns = element.attribute("columns", "");
+    if (possible_columns.length() > 0)
+    {
+        numb_columns = possible_columns.toInt();
+    }
+    
+    QString possible_rows = element.attribute("rows", "");
+    if (possible_rows.length() > 0)
+    {
+        numb_rows = possible_rows.toInt();
+    }
+
+    //
+    //  Check for debugging being on
+    //
+
+    QString debug_string = element.attribute("debug", "");
+    if (debug_string.length() > 0) 
+    {
+        if (debug_string.lower() == "yes" ||
+            debug_string.lower() == "true")
+        {
+            debugging = true;
+        }
+    }
+    
+    debug_string = element.attribute("debugging", "");
+    if (debug_string.length() > 0) 
+    {
+        if (debug_string.lower() == "yes" ||
+            debug_string.lower() == "true")
+        {
+            debugging = true;
+        }
+    }
+    
+
+
+    //
+    //  Do some sanity checking
+    //
+    
+    if(tree_type == MUTT_vertical)
+    {
+        if(numb_columns < 1)
+        {
+            cerr << "mythxmlparser.o: vertical type tree with "
+                 << "no columns makes no sense"
+                 << endl;
+        }
+        if(numb_rows > 0)
+        {
+            cerr << "mythxmlparser.o: vertical type tree with "
+                 << "rows specified makes no sense"
+                 << endl;
+        }
+        
+    }
+    else if(tree_type == MUTT_horizontal)
+    {
+        // etc.
+    }
+    
+
+    //
+    //  Create the tree and prepare to receive sub-elements (by telling it
+    //  its type)
+    //
+
+    MythUITree *new_tree = new MythUITree(area, container, name);
+    new_tree->preInit(tree_type, numb_columns, numb_rows); 
+    
+    //
+    //  Parse sub elements
+    //
+    
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        {
+            //
+            //  User can _also_ specify area by saying
+            //  <area>0,0,800,600</area>
+            //
+
+            if (info.tagName() == "area")
+            {
+                area = parseRect(getFirstText(info));
+                normalizeRect(area);
+            }
+            else if (info.tagName() == "column")
+            {
+                parseTreeColumn(new_tree, info);
+            }
+            else if (info.tagName() == "font")
+            {
+                MythFontProperties *new_font = GetFont(getFirstText(info));
+                if (!new_font)
+                {
+                    cerr << "mythxmlparser.o: Unknown font called \""
+                         << getFirstText(info)
+                         << "\" in tree called \""
+                         << name
+                         << "\""
+                         << endl;
+                }
+             }
+             else
+             {
+                    cerr << "mythxmlparser.o: Unknown tag called \""
+                     << info.tagName() 
+                     << "\" in tree called \""
+                     << name
+                     << "\""
+                     << endl;
+                     return;
+            }
+
+        }
+    }
+
+    if(debugging)
+    {
+        new_tree->setDebug(true);
+    }
+    m_private_owner->addWidgetToMap(new_tree);
+}
+
+
+void MythXMLParser::parseTreeColumn(MythUITree *new_tree, QDomElement &element)
+{
+    //
+    //  Set defaults
+    //
+
+    QRect area = QRect(0,0,0,0);
+    bool debugging = false;
+
+    //
+    //  Find the number identifier for this column
+    //
+    
+    QString number_tag = element.attribute("number", "");
+    int number = number_tag.toInt();
+
+    //
+    //  Check for debugging being on
+    //
+
+    QString debug_string = element.attribute("debug", "");
+    if (debug_string.length() > 0) 
+    {
+        if (debug_string.lower() == "yes" ||
+            debug_string.lower() == "true")
+        {
+            debugging = true;
+        }
+    }
+    
+    debug_string = element.attribute("debugging", "");
+    if (debug_string.length() > 0) 
+    {
+        if (debug_string.lower() == "yes" ||
+            debug_string.lower() == "true")
+        {
+            debugging = true;
+        }
+    }
+    
+    //
+    //  Parse any child tags of the column
+    //
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        {
+            if (info.tagName() == "area")
+            {
+                area = parseRect(getFirstText(info));
+                normalizeRect(area);
+            }
+            else
+            {
+                cerr << "mythxmlparser.o: Unknown tag called \""
+                     << info.tagName() 
+                     << "\" in column description of tree called \""
+                     << new_tree->name()
+                     << "\""
+                     << endl;
+                return;
+            }
+
+        }
+    }
+
+    new_tree->addColumn(number, area, debugging);
+}
 
 
 /*
@@ -909,6 +1227,8 @@ void XMLParse::parseAnimatedImage(LayerSet *container, QDomElement &element)
     image->SetParent(container);
     container->AddType(image);
     container->bumpUpLayers(order.toInt());
+    
+   
 }
 
 void XMLParse::parseRepeatedImage(LayerSet *container, QDomElement &element)

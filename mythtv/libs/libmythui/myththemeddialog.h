@@ -11,6 +11,7 @@
 
 #include "mythscreentype.h"
 
+class MythUITree;
 class MythUIThemedDialogPrivate;
 
 class MythUIThemedDialog : public MythScreenType
@@ -29,6 +30,13 @@ class MythUIThemedDialog : public MythScreenType
     virtual ~MythUIThemedDialog();
 
     virtual bool keyPressEvent(QKeyEvent *e);
+    
+    //
+    //  Methods to get pointers to parsed in objects
+    //
+    
+    MythUITree* getMythUITree(const QString &widget_name);
+
 
   private:
 

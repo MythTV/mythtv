@@ -88,9 +88,10 @@ void MythUIImage::Reset(void)
 
 void MythUIImage::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod)
 {
+
     QRect area = m_Area;
     area.moveBy(xoffset, yoffset);
-
+    
     int alpha = CalcAlpha(alphaMod); 
 
     QRect srcRect = m_Image->rect();

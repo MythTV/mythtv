@@ -2,10 +2,12 @@
 #define MYTHUI_TYPES_H_
 
 #include <qobject.h>
+#include <qimage.h>
 #include <qobjectlist.h>
 #include <qptrlist.h>
 #include <qvaluevector.h>
 
+class MythImage;
 class MythPainter;
 
 /**
@@ -34,8 +36,7 @@ class MythUIType : public QObject
     // Called each draw pulse.  Will redraw automatically if dirty afterwards
     virtual void Pulse(void);
 
-    virtual void Draw(MythPainter *p, int xoffset, int yoffset, 
-                      int alphaMod = 255);
+    virtual void Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod = 255);
 
     virtual void SetPosition(QPoint pos);
     virtual QRect CalculateScreenArea(void);
@@ -55,6 +56,8 @@ class MythUIType : public QObject
     int GetAlpha(void);
 
     virtual bool keyPressEvent(QKeyEvent *);
+    void setDebug(bool y_or_n){ m_debug_mode = y_or_n; }
+    void setDebugColor(QColor c);
 
   protected:
     virtual void customEvent(QCustomEvent *);
@@ -82,6 +85,7 @@ class MythUIType : public QObject
     void AddFocusableChildrenToList(QPtrList<MythUIType> &focusList);
     void HandleAlphaPulse();
     void HandleMovementPulse();
+    void makeDebugImages();
 
     int CalcAlpha(int alphamod);
 
@@ -106,6 +110,11 @@ class MythUIType : public QObject
     QPoint m_XYSpeed;
 
     MythUIType *m_Parent;
+
+    bool        m_debug_mode;
+    MythImage  *m_debug_hor_line;
+    MythImage  *m_debug_ver_line;
+    QColor      m_debug_color;
 };
 
 #endif

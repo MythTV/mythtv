@@ -22,6 +22,8 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
     m_Justification = (Qt::AlignLeft | Qt::AlignTop);
 
     m_colorCycling = false;
+    
+    setDebugColor(QColor(255,255,255));
 }
 
 void MythUIText::SetText(const QString &text)
