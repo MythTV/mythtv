@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-08-19, v2.61
+  2003-08-20, v2.62
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -175,6 +175,7 @@
      19.24 I can't change the channel when watching Live TV.
      19.25 Colors are wrong, people have blue faces.
      19.26 When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"
+     19.27 What is this transcoder thing, and how do I use it?
 
   20. Miscellaneous.
      20.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
@@ -206,6 +207,8 @@
 
 
   ______________________________________________________________________
+
+
 
   [1m1.  How to obtain this document.[0m
 
@@ -403,11 +406,13 @@
   boot time.  See the Troubleshooting Section for ``instructions'' on
   how to do this.
 
+
   Writing video to disk is sensitive to timing issues; RTJPEG requires
   less CPU with the tradeoff being larger files and needing to write to
   the disk faster.  MPEG-4 requires more CPU, but the files are smaller.
   At the default resolution, MPEG-2 creates the largest files of all
   with almost no CPU impact.
+
   See the Troubleshooting ``section'' for more information.
 
 
@@ -466,12 +471,12 @@
   +o  A Celeron 450 uses 2% CPU for encoding a 480x480 16Mbps MPEG-2
      stream.
 
+
   Here are some data points for decoding:
 
 
   +o  An Athlon 1800XP can decode a 720x480 8Mbps MPEG-2 file using 10%
      CPU
-
 
   +o  An Athlon 1GHz can decode a 720x480 16Mbps MPEG-2 file using 30-50%
      CPU, can decode a 480x480 16Mbps MPEG-2 using 30% CPU and
@@ -598,12 +603,12 @@
   <http://www.matrox.com/mga/support/drivers/files/lnx_21.cfm> for
   details.
 
+
   Newer Matrox cards can be run with a set of kernel patches (for kernel
   2.4.19) and a customized X driver, but this arrangement does not
   support XVideo on TV-out. See
   http://www.bglug.ca/matrox_tvout/g450_tvout_howto.html
   <http://www.bglug.ca/matrox_tvout/g450_tvout_howto.html> for details.
-
 
   Specific cards:
 
@@ -667,7 +672,6 @@
   to Linux and some laptops, can be used as MythTV frontends to display
   on a television screen. Please consult the mythtv-users mailing list
   for messages that report the details of these special arrangements.
-
 
 
   [1m3.1.9.  External Adapters[0m
@@ -736,6 +740,7 @@
   prerequisites for MythTV (such as XMLTV) are available as RPM
   packages. If you have problems with the RPMs, please send him email
   directly.
+
   Given the large number of dependent RPMs you are advised to use tools
   like apt or yum for automatic retrieval and installation of the
   required RPMs.  (http://atrpms.physik.fu-berlin.de/install.html
@@ -792,12 +797,12 @@
   See /usr/share/doc/packagename/README.Debian for more information.
 
 
+
   [1m3.2.2.  Manual installation[0m
 
   You may use the graphical tools that come with your distribution, or
   you can use command-line utilities.  Either system will get the job
   done, and it all depends on your comfort level with Linux.
-
 
   In order to compile MythTV, we need to make sure that the software it
   needs is installed.  As of 2003-03-15, this list includes [1mmysql[22m, [1mgcc[22m,
@@ -857,6 +862,7 @@
   If you are going to be installing mysql on this system, search for
   mysql - it should be under "Databases".  Make sure that mysql and
   mysql-clients are installed.  If not, click on "Mark".
+
 
   Search for gcc.  You're going to need gcc and gcc-c++ installed.
 
@@ -924,8 +930,6 @@
   You can not install qt-MySQL, a necessary prerequisite, graphically.
   To install this package using the command line do
 
-
-
        $ up2date --solvedeps qt-MySQL
 
 
@@ -986,8 +990,6 @@
   beta version of the next release of Mandrake), make sure to download
   the standard "Mandrake" release.  Download the .src.rpm file to a
   directory that you can find.
-
-
 
   $ su
   # cp qt3-3.0.5-7mdk.src.rpm /usr/src/RPMS/SRPMS
@@ -3097,18 +3099,18 @@
 
 
 
-  By default, MythWeb uses the Apache .htaccess file to restrict access
-  to the website.  If you do not wish to use access control, then rename
-  or remove the /var/www/html/mythweb/.htaccess file.
+  Edit the /var/www/html/mythweb/config/conf.php file if required.
+
+  By default, MythWeb uses an Apache .htaccess file to restrict access
+  to the website and to configure some variables.
 
   To create the password file for Apache (if your system doesn't already
   have one), you could do something like this:
-
-  # cd /var/www
-  # htpasswd -c htpasswd mythtv
-  New password:
-  Re-type new password:
-  Adding password for user mythtv
+       # cd /var/www
+       # htpasswd -c htpasswd mythtv
+       New password:
+       Re-type new password:
+       Adding password for user mythtv
 
 
 
@@ -4225,6 +4227,59 @@
   modifying ``/etc/ld.so.conf''.
 
 
+  [1m19.27.  What is this transcoder thing, and how do I use it?[0m
+
+  The transcoder re-encodes files from one MythTV format to another.
+  The main purpose of the transcoder is to allow users with hardware
+  encoders (PVR-250) or systems that can only record in RTJpeg due to
+  performance reasons (multiple capture cards, slow system, etc) to
+  create MPEG4 streams to save space.
+
+  The transcoder can be used in two ways:
+
+  +o  Automatically re-encode every file once it has completed recording
+
+  +o  After marking commercials, the transcoder can be run manually to
+     delete the commercials from the file (thus further saving space)
+
+     The two methods are independent.  The first is an automatic process
+     that can be enabled/disabled through the setup program; the second
+     is a manual method which must be invoked on each recording
+     individually.
+
+
+  The second method can be used on files that have already been
+  transcoded (or files which were are already in the correct format), so
+  only the frames immediately following a cut section will be re-
+  encoded, resultiing in a very minimal loss of quality.
+
+  To enable automatic transcoding, do the following: start the setup
+  program under the host-specific settings: set the Transcoder Auto-run
+  checkbox
+
+  For either manual or automatic transcoding: start mythbackend start
+  mythfrontend select setup, and the Transcoding recording profile.  now
+  select either RTJPEG or MPEG4 (selecting any of the hardware encoders
+  will result in the transcoder not working).  set the other parameters
+  as you'd like.  For best performance, you should match the audio to
+  the 'Default' profile.  If you plan to only use the manual transcoder,
+  you can choose to set the video to be the same as the default profile
+  too (as long as it is MPEG4 or RTJpeg)
+
+  Everything should now be setup properly.  If you elected to use the
+  Auto-Run feature, the transcoder will automatically launch after each
+  recording is complete.  The transcoder thread runs at a low priority,
+  so it should not impact any critical tasks or other recordings.
+
+  If you want to manually transcode a program, simply press 'X' while
+  watching a recording (you should have already finished marking all
+  commercials).  If you change your mind, hitting 'X' again will stop
+  the transcoding.
+
+  Once the transcode is complete, mythbackend will replace the old file
+  with the new as soon as it is no longer in use.
+
+
   [1m20.  Miscellaneous.[0m
 
   [1m20.1.  I'd like to watch the files without using MythTV / I'd like to[0m
@@ -4245,8 +4300,7 @@
   <http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/>.
 
 
-
-  $ wget http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/mplayer-0.90rc5-mythtv-20030407.diff
+       $ wget http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/mplayer-0.90rc5-mythtv-20030407.diff
 
 
 
@@ -4258,8 +4312,6 @@
        $ cp mplayer-0.90rc5-mythtv-20030407.diff MPlayer-0.90
        $ cd MPlayer-0.90
        $ patch -p1 < mplayer-0.90rc5-mythtv-20030407.diff
-
-
 
   At this point, you can read the MPlayer documentation and start the
   compile process.
@@ -4372,7 +4424,6 @@
   <http://www.vcdhelp.com/forum/userguides/94382.php>.
 
 
-
   [1m20.5.  MythTV GUI and X Display Sizes.[0m
 
   MythTV is designed to be run as dedicated full screen TV application
@@ -4392,7 +4443,6 @@
 
   The MythTV GUI uses its GUI dimensions regardless of the other two and
   is anchored to the upper left corner of the X Desktop.
-
   The MythTV full screen mode uses the X display size dimensions
   regardless of the other two and is anchored to the upper left corner
   of the X display.
@@ -4501,10 +4551,9 @@
   setup the database structure before running the setup program.
 
 
-
-  $ mysql -u root
-  mysql> drop database mythconverg;
-  mysql> quit
+       $ mysql -u root
+       mysql> drop database mythconverg;
+       mysql> quit
 
 
 
@@ -4586,8 +4635,6 @@
 
        $ mysql -u root mythconverg
        mysql> delete from program where chanid = '1015';
-
-
 
   [1m20.10.  I'd like to use a hardware MPEG-2 encoder (ie, a PVR-250/350).[0m
 
@@ -4712,10 +4759,11 @@
   Check that the ivtv driver has created a new video device:
 
 
-       $ ls -l /dev/v4l/vi*
-       crw-------    1 mythtv   sys       81, 224 Dec 31  1969 vbi0
-       crw-------    1 mythtv   sys       81,   0 Dec 31  1969 video0
-       crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
+
+  $ ls -l /dev/v4l/vi*
+  crw-------    1 mythtv   sys       81, 224 Dec 31  1969 vbi0
+  crw-------    1 mythtv   sys       81,   0 Dec 31  1969 video0
+  crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
 
 
 
@@ -4752,8 +4800,7 @@
   parameters, add something like the following to your rc.local:
 
 
-
-  /path/to/ivtv/utils/test_ioctl -c bitrate=4500000,bitrate_peak=6000000
+       /path/to/ivtv/utils/test_ioctl -c bitrate=4500000,bitrate_peak=6000000
 
 
 
@@ -4836,10 +4883,11 @@
   /etc/rc.d/init.d/:
 
 
-       $ cd contrib
-       $ su
-       # chmod a+x etc.rc.d.init.d.mythbackend
-       # cp etc.rc.d.init.d.mythbackend /etc/rc.d/init.d/mythbackend
+
+  $ cd contrib
+  $ su
+  # chmod a+x etc.rc.d.init.d.mythbackend
+  # cp etc.rc.d.init.d.mythbackend /etc/rc.d/init.d/mythbackend
 
 
 
@@ -4956,8 +5004,6 @@
 
        # /etc/init.d/mythbackend stop
 
-
-
   To obtain a list of options:
 
 
@@ -5019,6 +5065,8 @@
   MythTV creates large files.  The partitions that your distribution
   sets up for you may not be optimized for large files.
 
+
+
   [1m20.14.1.  Ext3[0m
 
   With Ext3, your biggest gain is that in case of a crash and reboot you
@@ -5061,7 +5109,6 @@
   There's lots more that can be done with LVM, so check the LVM HOWTO
   http://tldp.org/HOWTO/lvm-HOWTO/ <http://tldp.org/HOWTO/lvm-HOWTO/>
   document for details.
-
 
   Make sure your kernel configuration includes LVM support or that it's
   available as a module. Today, most vendors include this by default.
@@ -5126,9 +5173,9 @@
   Now create a 5GB volume for mythmusic files if you like:
 
 
-  # lvcreate --name music --size 5G VGforMyth
-  # mkreiserfs /dev/VGforMyth/music
-  # mount /dev/VGforMyth/music /var/music
+       # lvcreate --name music --size 5G VGforMyth
+       # mkreiserfs /dev/VGforMyth/music
+       # mount /dev/VGforMyth/music /var/music
 
 
 
@@ -5144,6 +5191,7 @@
   it says you have to
 
   Create the new LVM physical volume:
+
 
   # pvcreate /dev/hdb1
 
