@@ -1300,7 +1300,7 @@ again:
 
                 uint8_t *y_plane = conversion_buffer;
                 uint8_t *cb_plane = y_plane + w * h;
-                uint8_t *cr_plane = cr_plane + w * h / 4;
+                uint8_t *cr_plane = cb_plane + w * h / 4;
 
                 uint8_t *src = buffers[frame];
 
