@@ -668,6 +668,7 @@ void UIListTreeType::tryToSetCurrent(QStringList route)
     else
     {
         currentpos = (UIListGenericTree *)first_child;
+        currentlevel->MoveToNamedPosition(currentpos->getString());
     }
 
 
