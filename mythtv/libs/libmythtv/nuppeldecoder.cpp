@@ -192,9 +192,13 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         }
     }
 
+    if (fileheader.aspect > .999 && fileheader.aspect < 1.001)
+        fileheader.aspect = 4.0 / 3;
+    current_aspect = fileheader.aspect;
+
     m_parent->SetVideoParams(fileheader.width, fileheader.height,
                              fileheader.fps, fileheader.keyframedist,
-                             4.0 / 3, kScan_Detect);
+                             fileheader.aspect, kScan_Detect);
 
     video_width = fileheader.width;
     video_height = fileheader.height;

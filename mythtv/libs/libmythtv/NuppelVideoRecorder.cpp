@@ -67,6 +67,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(ChannelBase *channel)
     w = 352;
     h = 240;
     pip_mode = 0;
+    video_aspect = 1.33333;
 
     skip_btaudio = false;
 
@@ -1677,7 +1678,7 @@ void NuppelVideoRecorder::WriteHeader(void)
     fileheader.desiredwidth  = 0;
     fileheader.desiredheight = 0;
     fileheader.pimode = 'P';
-    fileheader.aspect = 1.0;
+    fileheader.aspect = video_aspect;
     if (ntsc_framerate)
         fileheader.fps = 29.97;
     else

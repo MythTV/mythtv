@@ -352,6 +352,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
 
     int video_width = nvp->GetVideoWidth();
     int video_height = nvp->GetVideoHeight();
+    float video_aspect = nvp->GetVideoAspect();
     float video_frame_rate = nvp->GetFrameRate();
     long long total_frame_count = nvp->GetTotalFrameCount();
     int newWidth = video_width;
@@ -430,6 +431,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         }
 
         nvr->AudioInit(true);
+        nvr->SetVideoAspect(video_aspect);
 
         outRingBuffer = new RingBuffer(outputname, true, false);
         nvr->SetRingBuffer(outRingBuffer);

@@ -87,6 +87,7 @@ class NuppelVideoRecorder : public RecorderBase
     bool SetupAVCodec(void);
     void SetupRTjpeg(void);
     int AudioInit(bool skipdevice = false);
+    void SetVideoAspect(float newAspect) {video_aspect = newAspect; };
     void WriteVideo(VideoFrame *frame, bool skipsync = false, 
                     bool forcekey = false);
     void WriteAudio(unsigned char *buf, int fnum, int timecode);
@@ -151,6 +152,7 @@ class NuppelVideoRecorder : public RecorderBase
     int quiet;
     int rawmode;
     int usebttv;
+    float video_aspect;
 
     CommDetect *commDetect;
 
