@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-04-25, v2.18
+<date>2003-04-25, v2.19
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2211,7 +2211,6 @@ you're at the first level.
 <sect>MythGame.
 
 <sect>MythMusic.  
-<p>[Documentation still being developed.]
 <p>MythMusic has a number of pre-requisites that must be satisfied before it
 is operational.  Depending on your distribution, some of these prerequisites can
 be satisfied through the various package managers.  If your distribution doesn't
@@ -2373,7 +2372,6 @@ getting MythMusic going. Make sure that you run <tt>./configure</tt> first.
 If you wish to use the new visualizations, make sure you install the
 prerequisites.  Run <tt>./configure --help</tt> for help.
 
-
 <code>
 NOTE for Red Hat users: Before compiling, make the following modification 
 to settings.pro, otherwise the compile will fail:
@@ -2387,7 +2385,6 @@ INCLUDEPATH *= /usr/include/cdda
 save and close settings.pro and proceed with compiling MythMusic.
 </code>
 
-
 <tscreen><verb>
 $ make
 $ su
@@ -2397,15 +2394,17 @@ $ cd musicdb
 $ mysql -u root < metadata.sql
 </verb></tscreen>
 
-Edit the <tt>/usr/local/share/mythtv/mythmusic-settings.txt</tt> file for
-your particular system.  Here's some explanation about the Ignore_ID3 and
-The NonID3FileNameFormat:
+<sect1>Configuring MythMusic.
+<p>After starting MythMusic, go to the Setup/General Setup screen and adjust
+it for your particular configuration.
 
-If Ignore_ID3 is set to TRUE, mythmusic will try to determine the
+Here's some explanation about the Ignore_ID3 and The NonID3FileNameFormat:
+
+If Ignore_ID3 is set to TRUE, MythMusic will try to determine the
 Genre, Artist, Album, Track Number, and Title from the filename of the
 mp3 file.  The NonID3FileNameFormat variable should be set to the
 directory/file format where the mp3 files are stored.  For instance, I
-store mine in the above shown Genre/Artist/Album/Track format.  Mythmusic
+store mine in the above shown Genre/Artist/Album/Track format.  MythMusic
 will then use this information to fill in the proper fields when it
 populates the musicmetadata table rather than searching for an ID3 tag in
 the mp3 file.
@@ -2434,6 +2433,55 @@ Another item to consider:  there are some CD's that contain computer data
 that runs as a "CD Extra".  After the CD information lookup, ensure that the
 "(Data for CD Extra)" track is not selected for encoding, otherwise
 MythMusic will hang attempting to encode the non-audio data.
+
+<!--
+Next stuff is from a message by jasonmiller [jasonmiller@micron.com]
+with additional comments by Thor 
+-->
+Here's some information on playlist management:
+
+Q: How do I create a new playlist?  
+A: Using the MythMusic "Select Music" menu option, setup the playlist as you
+normally would by adding songs or other playlists as needed.  When you are
+ready to save the new playlist, highlight "Active Play Queue" at the bottom
+of the selection tree and hit the "i" key. This will popup a menu allowing
+you to name and save the new playlist.  You can also hit Enter to bring up
+the popup on the Active Play Queue. This does not work on the playlists
+above, as Enter is obviously bound to checking/unchecking the boxes. Any
+number (ie. keypad on remote) will also bring up the menu in both cases.
+
+Q: How do I enter the playlist name in the text field without a keyboard?
+A: Use the keypad number keys (bound to your remote) to select letters
+quasi-cell phone style. Keys 2-9 work pretty much like any cell phone text
+entry. 1 cycles through a few special characters, delete, and space. 0 is
+like a CAPS LOCK. Hard to describe, fairly easy to use. You will soon be
+able to specify the cycle timing in a Setup screen. You can type fairly
+quickly through a combination of jumping around the number keys AND hitting
+a non-number key (right arrow is particularily good for this) to force the
+current character.
+
+Q: How do I edit a playlist? 
+A: Highlight the playlist in the selection tree and hit the "i" key then
+select "Move to Active Play Queue" in the popup.  You can now modify the
+"Active Play Queue" like normal, adding songs and playlists by selecting
+them from the song tree.  When you are done, highlight the "Active Play
+Queue" in the selection tree and hit the "i" key then select "Save Back to
+Playlist Tree".  And whatever you were editing as your Active Queue before
+you moved an existing playlist "on top" of Active reappears. Think of Active
+has having a push on, pop off capability, but with a depth of only 1.
+
+Q: How do I delete an item from a playlist?
+A: Highlight the item in the selection tree and hit the "d" key.
+
+Q: How do I rearrange the songs in my playlist?
+A: Highlight a song and hit the "space" bar, the song will now have pair of
+red arrows in front of it.  Use the up and down arrow keys to move it around
+in the playlist.  When you have it where you want it, hit the "space" bar
+again.
+
+Q: How do I delete a playlist?
+A: Highlight the playlist in the selection tree and hit the "i" key then
+select "Delete this Playlist" from the popup.
 
 <sect>MythWeather
 <p>The MythWeather module will obtain the weather information for the
@@ -3321,6 +3369,8 @@ v2.18, 2003-04-25.  Minor edits.  Internal link to PVR250 instructions.
 Added blackbox as a known-good WM.  Added link to email message about
 PVR-250 not showing inputs.  Updated mythweather debug (runtime option now),
 updated mythvideo settings file.
+v2.19, 2003-04-25.  Mythmusic playlist addition.  Mythmusic adjustments
+since it's now graphically setup.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

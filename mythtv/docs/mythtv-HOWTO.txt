@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-04-25, v2.18
+  2003-04-25, v2.19
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -115,7 +115,8 @@
         15.2.1 Additional options with CVS MythMusic
      15.3 Red Hat Linux 8.0
      15.4 Compiling MythMusic.
-     15.5 Using MythMusic.
+     15.5 Configuring MythMusic.
+     15.6 Using MythMusic.
 
   16. MythWeather
   17. MythVideo
@@ -2363,8 +2364,6 @@
 
   [1m15.  MythMusic.[0m
 
-  [Documentation still being developed.]
-
   MythMusic has a number of pre-requisites that must be satisfied before
   it is operational.  Depending on your distribution, some of these
   prerequisites can be satisfied through the various package managers.
@@ -2539,16 +2538,20 @@
        $ cd musicdb
        $ mysql -u root < metadata.sql
 
-  Edit the /usr/local/share/mythtv/mythmusic-settings.txt file for your
-  particular system.  Here's some explanation about the Ignore_ID3 and
-  The NonID3FileNameFormat:
+  [1m15.5.  Configuring MythMusic.[0m
 
-  If Ignore_ID3 is set to TRUE, mythmusic will try to determine the
+  After starting MythMusic, go to the Setup/General Setup screen and
+  adjust it for your particular configuration.
+
+  Here's some explanation about the Ignore_ID3 and The
+  NonID3FileNameFormat:
+
+  If Ignore_ID3 is set to TRUE, MythMusic will try to determine the
   Genre, Artist, Album, Track Number, and Title from the filename of the
   mp3 file.  The NonID3FileNameFormat variable should be set to the
   directory/file format where the mp3 files are stored.  For instance, I
   store mine in the above shown Genre/Artist/Album/Track format.
-  Mythmusic will then use this information to fill in the proper fields
+  MythMusic will then use this information to fill in the proper fields
   when it populates the musicmetadata table rather than searching for an
   ID3 tag in the mp3 file.
 
@@ -2567,7 +2570,7 @@
   The Ignore_ID3 option does not disable the code that determines the
   track length, just the portion that tries to read ID3 info.
 
-  [1m15.5.  Using MythMusic.[0m
+  [1m15.6.  Using MythMusic.[0m
 
   MythMusic is fairly simple to use.  It is recommended that you insert
   the CD before selecting "Import CD".  You should also ensure that your
@@ -2579,6 +2582,53 @@
   ensure that the "(Data for CD Extra)" track is not selected for
   encoding, otherwise MythMusic will hang attempting to encode the non-
   audio data.
+
+  Here's some information on playlist management:
+
+  Q: How do I create a new playlist?  A: Using the MythMusic "Select
+  Music" menu option, setup the playlist as you normally would by adding
+  songs or other playlists as needed.  When you are ready to save the
+  new playlist, highlight "Active Play Queue" at the bottom of the
+  selection tree and hit the "i" key. This will popup a menu allowing
+  you to name and save the new playlist.  You can also hit Enter to
+  bring up the popup on the Active Play Queue. This does not work on the
+  playlists above, as Enter is obviously bound to checking/unchecking
+  the boxes. Any number (ie. keypad on remote) will also bring up the
+  menu in both cases.
+
+  Q: How do I enter the playlist name in the text field without a
+  keyboard?  A: Use the keypad number keys (bound to your remote) to
+  select letters quasi-cell phone style. Keys 2-9 work pretty much like
+  any cell phone text entry. 1 cycles through a few special characters,
+  delete, and space. 0 is like a CAPS LOCK. Hard to describe, fairly
+  easy to use. You will soon be able to specify the cycle timing in a
+  Setup screen. You can type fairly quickly through a combination of
+  jumping around the number keys AND hitting a non-number key (right
+  arrow is particularily good for this) to force the current character.
+
+  Q: How do I edit a playlist?  A: Highlight the playlist in the
+  selection tree and hit the "i" key then select "Move to Active Play
+  Queue" in the popup.  You can now modify the "Active Play Queue" like
+  normal, adding songs and playlists by selecting them from the song
+  tree.  When you are done, highlight the "Active Play Queue" in the
+  selection tree and hit the "i" key then select "Save Back to Playlist
+  Tree".  And whatever you were editing as your Active Queue before you
+  moved an existing playlist "on top" of Active reappears. Think of
+  Active has having a push on, pop off capability, but with a depth of
+  only 1.
+
+  Q: How do I delete an item from a playlist?  A: Highlight the item in
+  the selection tree and hit the "d" key.
+
+  Q: How do I rearrange the songs in my playlist?  A: Highlight a song
+  and hit the "space" bar, the song will now have pair of red arrows in
+  front of it.  Use the up and down arrow keys to move it around in the
+  playlist.  When you have it where you want it, hit the "space" bar
+  again.
+
+  Q: How do I delete a playlist?  A: Highlight the playlist in the
+  selection tree and hit the "i" key then select "Delete this Playlist"
+  from the popup.
 
   [1m16.  MythWeather[0m
 
@@ -2789,7 +2839,6 @@
   In this case, you would need to either delete the Option "DPMS" line,
   or change it to # Option "DPMS" to comment it out.  The next time you
   start XFree this change will take effect.
-
   Finally, check:
 
        Section "Monitor"
@@ -2825,7 +2874,7 @@
 
   You may also combine the command to turn off DPMS and the screensaver:
 
-  $ xset -dpms s off
+       $ xset -dpms s off
 
   Finally, depending on your distribution, you may be able to turn it
   off from within the control panel.
@@ -2865,18 +2914,18 @@
   At this point, you now have debug-enabled software ready.  Let's
   assume that the problem you're having is in the setup program.
 
-  $ cd setup
-  $ gdb ./setup
+       $ cd setup
+       $ gdb ./setup
 
-  GNU gdb 5.3-1mdk (Mandrake Linux)
-  Copyright 2002 Free Software Foundation, Inc.
-  GDB is free software, covered by the GNU General Public License, and you are
-  welcome to change it and/or distribute copies of it under certain
-  conditions.
-  Type "show copying" to see the conditions.
-  There is absolutely no warranty for GDB.  Type "show warranty" for details.
-  This GDB was configured as "i586-mandrake-linux-gnu"...
-  (gdb)
+       GNU gdb 5.3-1mdk (Mandrake Linux)
+       Copyright 2002 Free Software Foundation, Inc.
+       GDB is free software, covered by the GNU General Public License, and you are
+       welcome to change it and/or distribute copies of it under certain
+       conditions.
+       Type "show copying" to see the conditions.
+       There is absolutely no warranty for GDB.  Type "show warranty" for details.
+       This GDB was configured as "i586-mandrake-linux-gnu"...
+       (gdb)
 
   [1mgdb [22mhas a number of options, read the man page for more information.
 
@@ -2949,7 +2998,7 @@
   instructions on disabling the sound manager.  If you wish to see what
   application is grabbing a resource, you can use the fuser command:
 
-       # fuser -v /dev/dsp
+  # fuser -v /dev/dsp
 
   To disable aRts in KDE, go to KDE->Control Center->Sound->Sound System
   and uncheck the "Start aRts soundserver on KDE startup" box.  Run #
@@ -3054,14 +3103,14 @@
   Here's an example submitted to the mythtv-dev list by Pat Pflaum
   mailto:pat@netburp.com <mailto:pat@netburp.com> using fvwm:
 
-       $ cat > .xinitrc
-       fvwm &
-       mythfrontend
-       ^D
-       $ cat > .fvwmrc
-       Style "myth*"      NoTitle, NoHandles, Sticky, WindowListSkip, BorderWidth 0
-       ^D
-       $
+  $ cat > .xinitrc
+  fvwm &
+  mythfrontend
+  ^D
+  $ cat > .fvwmrc
+  Style "myth*"      NoTitle, NoHandles, Sticky, WindowListSkip, BorderWidth 0
+  ^D
+  $
 
   [1m19.4.  What capture resolution should I use?  How does video work?[0m
 
@@ -3322,12 +3371,12 @@
   Mandrake kernel level (ie, not 2.4.21-0.16mdk as in the example below,
   then alter the [1murpmi [22mcommand appropriately.)
 
-  $ uname -a
-  Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
-  unknown GNU/Linux
+       $ uname -a
+       Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
+       unknown GNU/Linux
 
-  $ su
-  # urpmi kernel-source
+       $ su
+       # urpmi kernel-source
 
   [1mNOTE[22m:  You do not need to recompile your kernel.
 

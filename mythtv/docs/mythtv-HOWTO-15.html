@@ -14,7 +14,6 @@
 <HR>
 <H2><A NAME="s15">15.</A> <A HREF="mythtv-HOWTO.html#toc15">MythMusic. </A></H2>
 
-<P>[Documentation still being developed.]</P>
 <P>MythMusic has a number of pre-requisites that must be satisfied before it
 is operational.  Depending on your distribution, some of these prerequisites can
 be satisfied through the various package managers.  If your distribution doesn't
@@ -203,7 +202,6 @@ will cause an error, so use the source package instead.</P>
 getting MythMusic going. Make sure that you run <CODE>./configure</CODE> first. 
 If you wish to use the new visualizations, make sure you install the
 prerequisites.  Run <CODE>./configure --help</CODE> for help.</P>
-
 <P>
 <HR>
 <PRE>
@@ -220,7 +218,6 @@ save and close settings.pro and proceed with compiling MythMusic.
 </PRE>
 <HR>
 </P>
-
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -233,14 +230,18 @@ $ mysql -u root &lt; metadata.sql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Edit the <CODE>/usr/local/share/mythtv/mythmusic-settings.txt</CODE> file for
-your particular system.  Here's some explanation about the Ignore_ID3 and
-The NonID3FileNameFormat:</P>
-<P>If Ignore_ID3 is set to TRUE, mythmusic will try to determine the
+
+<H2><A NAME="ss15.5">15.5</A> <A HREF="mythtv-HOWTO.html#toc15.5">Configuring MythMusic.</A>
+</H2>
+
+<P>After starting MythMusic, go to the Setup/General Setup screen and adjust
+it for your particular configuration.</P>
+<P>Here's some explanation about the Ignore_ID3 and The NonID3FileNameFormat:</P>
+<P>If Ignore_ID3 is set to TRUE, MythMusic will try to determine the
 Genre, Artist, Album, Track Number, and Title from the filename of the
 mp3 file.  The NonID3FileNameFormat variable should be set to the
 directory/file format where the mp3 files are stored.  For instance, I
-store mine in the above shown Genre/Artist/Album/Track format.  Mythmusic
+store mine in the above shown Genre/Artist/Album/Track format.  MythMusic
 will then use this information to fill in the proper fields when it
 populates the musicmetadata table rather than searching for an ID3 tag in
 the mp3 file.</P>
@@ -256,7 +257,7 @@ you specify GENRE it's the same as Genre in the format field.</P>
 <P>The Ignore_ID3 option does not disable the code that determines the track
 length, just the portion that tries to read ID3 info.</P>
 
-<H2><A NAME="ss15.5">15.5</A> <A HREF="mythtv-HOWTO.html#toc15.5">Using MythMusic. </A>
+<H2><A NAME="ss15.6">15.6</A> <A HREF="mythtv-HOWTO.html#toc15.6">Using MythMusic. </A>
 </H2>
 
 <P>MythMusic is fairly simple to use.  It is recommended that you insert the
@@ -266,6 +267,44 @@ doesn't try to automount the CD and begin playing it automatically.</P>
 that runs as a "CD Extra".  After the CD information lookup, ensure that the
 "(Data for CD Extra)" track is not selected for encoding, otherwise
 MythMusic will hang attempting to encode the non-audio data.</P>
+<P>Here's some information on playlist management:</P>
+<P>Q: How do I create a new playlist?  
+A: Using the MythMusic "Select Music" menu option, setup the playlist as you
+normally would by adding songs or other playlists as needed.  When you are
+ready to save the new playlist, highlight "Active Play Queue" at the bottom
+of the selection tree and hit the "i" key. This will popup a menu allowing
+you to name and save the new playlist.  You can also hit Enter to bring up
+the popup on the Active Play Queue. This does not work on the playlists
+above, as Enter is obviously bound to checking/unchecking the boxes. Any
+number (ie. keypad on remote) will also bring up the menu in both cases.</P>
+<P>Q: How do I enter the playlist name in the text field without a keyboard?
+A: Use the keypad number keys (bound to your remote) to select letters
+quasi-cell phone style. Keys 2-9 work pretty much like any cell phone text
+entry. 1 cycles through a few special characters, delete, and space. 0 is
+like a CAPS LOCK. Hard to describe, fairly easy to use. You will soon be
+able to specify the cycle timing in a Setup screen. You can type fairly
+quickly through a combination of jumping around the number keys AND hitting
+a non-number key (right arrow is particularily good for this) to force the
+current character.</P>
+<P>Q: How do I edit a playlist? 
+A: Highlight the playlist in the selection tree and hit the "i" key then
+select "Move to Active Play Queue" in the popup.  You can now modify the
+"Active Play Queue" like normal, adding songs and playlists by selecting
+them from the song tree.  When you are done, highlight the "Active Play
+Queue" in the selection tree and hit the "i" key then select "Save Back to
+Playlist Tree".  And whatever you were editing as your Active Queue before
+you moved an existing playlist "on top" of Active reappears. Think of Active
+has having a push on, pop off capability, but with a depth of only 1.</P>
+<P>Q: How do I delete an item from a playlist?
+A: Highlight the item in the selection tree and hit the "d" key.</P>
+<P>Q: How do I rearrange the songs in my playlist?
+A: Highlight a song and hit the "space" bar, the song will now have pair of
+red arrows in front of it.  Use the up and down arrow keys to move it around
+in the playlist.  When you have it where you want it, hit the "space" bar
+again.</P>
+<P>Q: How do I delete a playlist?
+A: Highlight the playlist in the selection tree and hit the "i" key then
+select "Delete this Playlist" from the popup.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-16.html">Next</A>
