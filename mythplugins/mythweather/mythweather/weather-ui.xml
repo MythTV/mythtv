@@ -89,8 +89,8 @@
         <font>header</font>
         <area>30,170,400,50</area>
         <value>loading...</value>
-        <value lang="ES">Cargando información...</value>
-        <value lang="CA">Obtenint informació...</value>
+        <value lang="ES">Cargando...</value>
+        <value lang="CA">Carregant�...</value>
       </textarea>
       <textarea name="retrieve" draworder="3" align="center">
         <font>timedate</font>

@@ -19,7 +19,6 @@ installimages.files = images/*.png
 
 INSTALLS += installfiles installimages uifiles
 
-LIBS += 
 LIBS += -L$${PREFIX}/lib -lmyth-$$LIBVERSION
 
 # Input

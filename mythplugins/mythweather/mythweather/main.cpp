@@ -27,6 +27,7 @@ MythContext *gContext;
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    QTranslator translator(0);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
@@ -42,6 +43,11 @@ int main(int argc, char *argv[])
         printf("couldn't open db\n");
         return -1;
     }
+
+    translator.load(PREFIX + QString("/share/mythtv/i18n/mythweather_") +
+                    QString(gContext->GetSetting("Language").lower()) +
+                    QString(".qm"), ".");
+    a.installTranslator(&translator);
 
     gContext->LoadQtConfig();
 

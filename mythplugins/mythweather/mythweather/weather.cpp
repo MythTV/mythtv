@@ -1130,7 +1130,7 @@ void Weather::holdPage()
 	{
         	txtLocale += country + " (" + locale;
 		if (validArea == false)
-			txtLocale += " is invalid)";
+			txtLocale += tr(" is invalid)");
 		else
 			txtLocale += ")";
 	}
@@ -1138,13 +1138,13 @@ void Weather::holdPage()
 	{
         	txtLocale += state + ", " + country + " (" + locale;
                 if (validArea == false)
-                        txtLocale += " is invalid)";
+                        txtLocale += tr(" is invalid)");
                 else
                         txtLocale += ")";
 	}
 
 	if (readReadme == true)
-		txtLocale += "   No Location Set, Please read the README";
+		txtLocale += tr("   No Location Set, Please read the README");
 
         LayerSet *container = theme->GetSet("weatherpages");
         if (container)
@@ -1191,23 +1191,23 @@ void Weather::setupPage()
             if (type)
             {
                if (noACCID == false)
-                   type->SetText("Configuring MythWeather...");
+                   type->SetText(tr("Configuring MythWeather..."));
                else
                    type->SetText("Missing ACCID data file!");
             }
         
             type = (UITextType *)container->GetType("help");
             if (type)
-                type->SetText("Use the right arrow key to select unit conversion...");
+                type->SetText(tr("Use the right arrow key to select unit conversion..."));
    
             UIListType *ltype = (UIListType *)container->GetType("options");
             if (ltype)
             {
                 ltype->ResetList();
                 ltype->SetActive(true);
-                ltype->SetItemText(0, "Weather Units");
-                ltype->SetItemText(1, "Location");
-                ltype->SetItemText(2, "Aggressiveness");
+                ltype->SetItemText(0, tr("Weather Units"));
+                ltype->SetItemText(1, tr("Location"));
+                ltype->SetItemText(2, tr("Aggressiveness"));
                 ltype->SetItemCurrent(0);
             }
             ltype = (UIListType *)container->GetType("mainlist");
@@ -1241,8 +1241,8 @@ void Weather::setupPage()
                 LayerSet *container = theme->GetSet("weatherpages");
                 if (container)
                 {
-                    SetText(container, "location", "Configuration Saved...");
-                    SetText(container, "updatetime", "Retrieving weather data...");
+                    SetText(container, "location", tr("Configuration Saved..."));
+                    SetText(container, "updatetime", tr("Retrieving weather data..."));
                 }
 		readReadme = false;
 		update_Timer->start((int)(10));
@@ -1261,7 +1261,7 @@ void Weather::setupPage()
     			{
         			txtLocale += country + " (" + locale;
                 		if (validArea == false)
-                        		txtLocale += " is invalid)";
+                        		txtLocale += tr(" is invalid)");
                 		else
                         		txtLocale += ")";
     			}
@@ -1269,7 +1269,7 @@ void Weather::setupPage()
     			{
         			txtLocale += state + ", " + country + " (" + locale;
                 		if (validArea == false)
-                        		txtLocale += " is invalid)";
+                        		txtLocale += tr(" is invalid)");
                 		else
                         		txtLocale += ")";
     			}
@@ -1346,7 +1346,7 @@ void Weather::upKey()
                        {
                            type = (UITextType *)container->GetType("help");
                            if (type)
-                               type->SetText("Use the right arrow key to select unit conversion...");
+                               type->SetText(tr("Use the right arrow key to select unit conversion..."));
 
                            UIListType *ltype = (UIListType *)container->GetType("mainlist");
                            if (ltype)
@@ -1362,7 +1362,7 @@ void Weather::upKey()
                        {
                            type = (UITextType *)container->GetType("help");
                            if (type)
-                               type->SetText("Use the right arrow key to select your location...");
+                               type->SetText(tr("Use the right arrow key to select your location..."));
                        }
                        updateLetters();          
                        loadCityData(curCity);
@@ -1373,7 +1373,7 @@ void Weather::upKey()
                        {
                            type = (UITextType *)container->GetType("help");
                            if (type)
-                               type->SetText("Use the right arrow key to select the aggressiveness level...");
+                               type->SetText(tr("Use the right arrow key to select the aggressiveness level..."));
                        }
                        updateAggr();
                        break;
@@ -1513,7 +1513,7 @@ void Weather::dnKey()
                        {
                            type = (UITextType *)container->GetType("help");
                            if (type)
-                               type->SetText("Use the right arrow key to select unit conversion...");
+                               type->SetText(tr("Use the right arrow key to select unit conversion..."));
 
                            UIListType *ltype = (UIListType *)container->GetType("mainlist");
                            if (ltype)
@@ -1529,7 +1529,7 @@ void Weather::dnKey()
                        {
                            type = (UITextType *)container->GetType("help");
                            if (type)
-                               type->SetText("Use the right arrow key to select your location...");
+                               type->SetText(tr("Use the right arrow key to select your location..."));
                            
                        }
                        updateLetters();
@@ -1541,7 +1541,7 @@ void Weather::dnKey()
                        {
                            type = (UITextType *)container->GetType("help");
                            if (type)
-                               type->SetText("Use the right arrow key to select the aggressiveness level...");
+                               type->SetText(tr("Use the right arrow key to select the aggressiveness level..."));
                        }
                        updateAggr();
                        break;
@@ -1640,11 +1640,11 @@ void Weather::updateAggr()
                         h = i - 15;
 
                 if (h == 1)
-                        temp = " 1  High Speed Connection";
+                        temp = tr(" 1  High Speed Connection");
                 else if (h == 8)
-                        temp = " 8  Medium Speed Connection";
+                        temp = tr(" 8  Medium Speed Connection");
                 else if (h == 15)
-                        temp = " 15 Low Speed Connection";
+                        temp = tr(" 15 Low Speed Connection");
                 else
                         temp = QString(" %1 ").arg(h);
                 if (i == config_Aggressiveness)
@@ -1873,7 +1873,7 @@ void Weather::update_timeout()
     if (firstRun == true)
     {
         if (container)
-            SetText(container, "updatetime", "Obtaining initial weather data...");
+            SetText(container, "updatetime", tr("Obtaining initial weather data..."));
 	if (debug == true)
 		cerr << "MythWeather: First run, reset timer to updateInterval.\n";
     	update_Timer->changeInterval((int)(1000 * 60 * updateInterval));
@@ -1881,7 +1881,7 @@ void Weather::update_timeout()
     else
     {
         if (container)
-           SetText(container, "updatetime", "Updating weather data...");
+           SetText(container, "updatetime", tr("Updating weather data..."));
     }
     update(fullRect());
 
@@ -1933,13 +1933,13 @@ void Weather::update_timeout()
         SetText(container, "humidity", curHumid + "%");
 
         if (winddir == "CALM")
-            SetText(container, "winddata", "Calm");
+            SetText(container, "winddata", tr("Calm"));
         else
         {
             if (convertData == false)
-                SetText(container, "winddata", winddir + " at " + curWind + " mph");
+                SetText(container, "winddata", winddir + tr(" at ") + curWind + " mph");
             else
-                SetText(container, "winddata", winddir + " at " + curWind + " Km/h");
+                SetText(container, "winddata", winddir + tr(" at ") + curWind + " Km/h");
         }
 
         if (visibility.toFloat() != 999.00)
@@ -1952,7 +1952,7 @@ void Weather::update_timeout()
                 SetText(container, "visibility", visibility + " km");
         }
         else
-            SetText(container, "visibility", "Unlimited");
+            SetText(container, "visibility", tr("Unlimited"));
 
         if (convertData == false)
             SetText(container, "windchill", curFeel + " F");
@@ -1960,13 +1960,13 @@ void Weather::update_timeout()
             SetText(container, "windchill", curFeel + " C");
 
         if (uvIndex.toInt() < 3)
-            SetText(container, "uvlevel", uvIndex + " (minimal)");
+            SetText(container, "uvlevel", uvIndex + tr(" (minimal)"));
         else if (uvIndex.toInt() < 6)
-            SetText(container, "uvlevel", uvIndex + " (moderate)");
+            SetText(container, "uvlevel", uvIndex + tr(" (moderate)"));
         else if (uvIndex.toInt() < 8)
-            SetText(container, "uvlevel", uvIndex + " (high)");
+            SetText(container, "uvlevel", uvIndex + tr(" (high)"));
         else if (uvIndex.toInt() >= 8)
-            SetText(container, "uvlevel", uvIndex + " (extreme)");
+            SetText(container, "uvlevel", uvIndex + tr(" (extreme)"));
 
         UIImageType *itype = (UIImageType *)container->GetType("currentpic");
         if (itype)
@@ -1981,7 +1981,7 @@ void Weather::update_timeout()
     {
 	txtLocale += country + " (" + locale;
                 if (validArea == false)
-                        txtLocale += " is invalid)";
+                        txtLocale += tr(" is invalid)");
                 else
                         txtLocale += ")";
     }
@@ -1989,13 +1989,13 @@ void Weather::update_timeout()
     {
 	txtLocale += state + ", " + country + " (" + locale;
                 if (validArea == false)
-                        txtLocale += " is invalid)";
+                        txtLocale += tr(" is invalid)");
                 else
                         txtLocale += ")";
     }
 
     if (readReadme == true)
-                txtLocale += "   No Location Set, Please read the README";
+                txtLocale += tr("   No Location Set, Please read the README");
 
     container = theme->GetSet("weatherpages");
     if (container)
@@ -2006,30 +2006,30 @@ void Weather::update_timeout()
 
     QString todayDesc;
 
-    todayDesc = "Today a high of " + highTemp[0] + " and a low of ";
-    todayDesc += lowTemp[0] + ". Currently there is a humidity of ";
-    todayDesc += curHumid + "% and the winds are";
+    todayDesc = tr("Today a high of ") + highTemp[0] + tr(" and a low of ");
+    todayDesc += lowTemp[0] + tr(". Currently there is a humidity of ");
+    todayDesc += curHumid + tr("% and the winds are");
 
     if (winddir == "CALM")
-         todayDesc += " calm.";
+         todayDesc += tr(" calm.");
     else
     {
 	if (convertData == false)
-		todayDesc += " coming in at " + curWind + " mph from the " + winddir + ".";
+		todayDesc += tr(" coming in at ") + curWind + tr(" mph from the ") + winddir + ".";
 	else 
-		todayDesc += " coming in at " + curWind + " Km/h from the " + winddir + ".";
+		todayDesc += tr(" coming in at ") + curWind + tr(" Km/h from the ") + winddir + ".";
     }
   
     if (visibility.toFloat() == 999.00)
-	todayDesc += " Visibility will be unlimited for today.";
+	todayDesc += tr(" Visibility will be unlimited for today.");
     else
     {
 	if (visibility == "")
-	   todayDesc += " Visibility conditions are unknown.";
+	   todayDesc += tr(" Visibility conditions are unknown.");
 	else if (convertData == false)
-	   todayDesc += " There will be a visibility of " + visibility + " miles.";
+	   todayDesc += tr(" There will be a visibility of ") + visibility + tr(" miles.");
 	else
-           todayDesc += " There will be a visibility of " + visibility + " km.";
+           todayDesc += tr(" There will be a visibility of ") + visibility + tr(" km.");
     }
 
     container = theme->GetSet("weatherpages");
@@ -2041,27 +2041,27 @@ void Weather::update_timeout()
     QString tomDesc;
  
     QString tomDate;
-    if (date[0].upper() == "SUN")
-        tomDate = "Sunday";
-    else if (date[0].upper() == "MON")
-        tomDate = "Monday";
-    else if (date[0].upper() == "TUE")
-        tomDate = "Tuesday";
-    else if (date[0].upper() == "WED")
-        tomDate = "Wednesday";
-    else if (date[0].upper() == "THU")
-        tomDate = "Thursday";
-    else if (date[0].upper() == "FRI")
-        tomDate = "Friday";
-    else if (date[0].upper() == "SAT")
-        tomDate = "Saturday";
+    if (date[0].upper() == tr("SUN"))
+        tomDate = tr("Sunday");
+    else if (date[0].upper() == tr("MON"))
+        tomDate = tr("Monday");
+    else if (date[0].upper() == tr("TUE"))
+        tomDate = tr("Tuesday");
+    else if (date[0].upper() == tr("WED"))
+        tomDate = tr("Wednesday");
+    else if (date[0].upper() == tr("THU"))
+        tomDate = tr("Thursday");
+    else if (date[0].upper() == tr("FRI"))
+        tomDate = tr("Friday");
+    else if (date[0].upper() == tr("SAT"))
+        tomDate = tr("Saturday");
     else
-        tomDate = "Date Error";
+        tomDate = tr("Date Error");
 
-    tomDesc = "Tomorrow expect a high of " + highTemp[0] + " and a low of ";
+    tomDesc = tr("Tomorrow expect a high of ") + highTemp[0] + tr(" and a low of ");
     tomDesc += lowTemp[0];
 
-    QString tomCond = "Expected conditions: " + weatherType[0];
+    QString tomCond = tr("Expected conditions: ") + weatherType[0];
  
     container = theme->GetSet("weatherpages");
     if (container)
@@ -2118,7 +2118,7 @@ void Weather::update_timeout()
     container = theme->GetSet("weatherpages");
     if (container)
     {
-         SetText(container, "updatetime", "Weather data from: " + updated);
+         SetText(container, "updatetime", tr("Weather data from: ") + updated);
     }
 
     if (firstRun == true)
@@ -2166,7 +2166,7 @@ bool Weather::UpdateData()
         LayerSet *container = theme->GetSet("weatherpages");
         if (container)
         {
-            SetText(container, "updatetime", "Updating...");
+            SetText(container, "updatetime", tr("Updating..."));
         }
 
 	bool result = false;
@@ -2189,7 +2189,7 @@ bool Weather::UpdateData()
 	if (curTemp.length() == 0)
 	{
 		curTemp = "-na-";
-		updated = updated + " (Not All Information Available)";
+		updated = updated + tr(" (Not All Information Available)");
 	}
 	else
 	{
@@ -2450,7 +2450,7 @@ bool Weather::GetWeatherData()
                 update_Timer->stop();
                 cerr << "MythWeather: Invalid Area ID.\n";
                 if (container)
-                    SetText(container, "updatetime", "*** Invalid Area ID Entered *** Use a valid area id.");
+                    SetText(container, "updatetime", tr("*** Invalid Area ID Entered *** Use a valid area id."));
                 delete internetData;
                 return false;
 	}
@@ -2460,8 +2460,8 @@ bool Weather::GetWeatherData()
                 cerr << "MythWeather: Timeout error, change aggressiveness variable.\n";
                 if (container)
                 {
-                    SetText(container, "location", "Weather Data Not Available");
-                    SetText(container, "updatetime", "!!! Timeout Limit !!! Change aggressiveness level.");
+                    SetText(container, "location", tr("Weather Data Not Available"));
+                    SetText(container, "updatetime", tr("!!! Timeout Limit !!! Change aggressiveness level."));
                 }
                 
                 delete internetData;
