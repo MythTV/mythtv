@@ -184,14 +184,13 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
 "  AND "
 "  ((record.type = %2) " // channelrecord
 "   OR"
-"   (((TIME_TO_SEC(record.starttime) = TIME_TO_SEC(program.starttime)) " // timeslot matches
-"      AND "
-"     (TIME_TO_SEC(record.endtime) = TIME_TO_SEC(program.endtime)) "
-"    )"
+"   ((TIME_TO_SEC(record.starttime) = TIME_TO_SEC(program.starttime)) " // timeslot matches
 "    AND "
 "    ((record.type = %3) " // timeslotrecord
 "     OR"
 "     ((TO_DAYS(record.startdate) = TO_DAYS(program.starttime)) " // date matches
+"      AND "
+"      (TIME_TO_SEC(record.endtime) = TIME_TO_SEC(program.endtime)) "
 "      AND "
 "      (TO_DAYS(record.enddate) = TO_DAYS(program.endtime)) "
 "     )"
