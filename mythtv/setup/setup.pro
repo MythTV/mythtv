@@ -8,14 +8,16 @@ CONFIG += thread
 
 INCLUDEPATH += ../libs/libmythtv ../libs ../libs/libmyth
 
-LIBS += -L../../libs/libmyth -L../../libs/libmythtv
+LIBS += -L../libs/libmyth -L../libs/libmythtv -L../libs/libavcodec
+LIBS += -L../libs/libavformat
 
 include ( ../settings.pro )
 
-LIBS += -lmythtv-$$LIBVERSION -lmyth-$$LIBVERSION $$EXTRA_LIBS
+LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION
+LIBS += -lmythavcodec-$$LIBVERSION -lmyth-$$LIBVERSION $$EXTRA_LIBS
 
-DEPENDPATH += ../../libs/libmythtv ../../libs/libmyth ../../libs/libavcodec
-DEPENDPATH += ../../libs/libavformat
+DEPENDPATH += ../libs/libmythtv ../libs/libmyth ../libs/libavcodec
+DEPENDPATH += ../libs/libavformat
 
 # Input
 HEADERS += backendsettings.h
