@@ -115,7 +115,7 @@ convert the video stream to the MPEG-2 format without using the motherboard
 CPU.  The main CPU has the responsibility of running the Operating System
 and reading and writing the encoded frames to the disk.  These tasks have
 fairly low CPU requirements compared to encoding video, which is why a
-device like a Series 1 Tivo can run with only 16MB of RAM and a 54Mhz CPU.
+device like a Series 1 Tivo can run with only 16MB of RAM and a 54MHz CPU.
 
 There are many variables that go into the question: "How fast a CPU do I
 need to run MythTV"?  Obviously, the faster your CPU, the better your
@@ -125,22 +125,22 @@ encoding and decoding video simultaneously to allow Pause, Fast Forward and
 Rewind functions for live TV requires more CPU then just encoding or
 decoding.  MythTV also supports multiple encoder cards in a single PC,
 thereby increasing the CPU requirements if you plan on simultaneously
-encoding multiple programs.  As a general guideline, plan on 1Ghz per
+encoding multiple programs.  As a general guideline, plan on 1GHz per
 encoder.
 
 Here are a few data points:
 <itemize>
-<item>A PIII/733Mhz system can encode one video stream using the MPEG-4
+<item>A PIII/733MHz system can encode one video stream using the MPEG-4
 codec using 480x480 capture resolution.  This does not allow for live TV
 watching, but does allow for encoding video and then watching it later.
 <item>The developer states that his AMD1800+ system can <bf>almost</bf>
 encode two MPEG-4 video streams and watch one program simultaneously.
-<item>A PIII/800Mhz system with 512MB RAM can encode one video
+<item>A PIII/800MHz system with 512MB RAM can encode one video
 stream using the RTJPEG codec with 480x480 capture resolution and play it back
 simultaneously, thereby allowing live TV watching.
-<item>A dual Celeron/450Mhz is able to view a 480x480 MPEG-4/3300Kbps file
+<item>A dual Celeron/450MHz is able to view a 480x480 MPEG-4/3300kbps file
 created on a different system with 30% CPU usage.
-<item>A P4 2.4Ghz machine can encode two 3300Kbps 480x480 MPEG-4 files and
+<item>A P4 2.4GHz machine can encode two 3300Kbps 480x480 MPEG-4 files and
 simultaneously serve content to a remote frontend.
 </itemize>
 
@@ -231,7 +231,7 @@ Here are some data points for decoding:
 
 <itemize>
 <item>An Athlon 1800XP can decode a 720x480 8Mbps MPEG-2 file using 10% CPU
-<item>An Athlon 1Ghz can decode a 720x480 16Mbps MPEG-2 file using 30-50%
+<item>An Athlon 1GHz can decode a 720x480 16Mbps MPEG-2 file using 30-50%
 CPU, can decode a 480x480 16Mbps MPEG-2 using 30% CPU and approximately 30%
 for Live TV at 416x480.
 <item>A P3-550 can decode a 480x480 16Mbps MPEG-2 file with 55% CPU.
@@ -354,7 +354,7 @@ SVideo ports. Reported to work with the proprietary Matrox X driver.
 <item>Matrox Millennium 450GX AGP. Uses external adapter to provide
 Composite and SVideo ports. TV-out implementation does <em>NOT</em> support XVideo.
 <item>Matrox Millennium 550GX AGP. Uses external adapter to provide
-Composite and sVideo ports. TV-out implementation does <em>NOT</em> support XVideo.
+Composite and S-Video ports. TV-out implementation does <em>NOT</em> support XVideo.
 </itemize>
 
 <sect3>nVidia
@@ -451,11 +451,11 @@ url="mailto:Axel.Thimm@physik.fu-berlin.de"
 name="mailto:Axel.Thimm@physik.fu-berlin.de"> and are available at <url
 url="http://atrpms.physik.fu-berlin.de/topic/multimedia/"
 name="http://atrpms.physik.fu-berlin.de/topic/multimedia/">. All of the
-prerequisites for MythTV (such as XMLTV) are available as rpm packages. If
+prerequisites for MythTV (such as XMLTV) are available as RPM packages. If
 you have problems with the RPMs, please send him email directly.
  
-Given the large number of dependent rpms you are advised to use tools like
-apt or yum for automatic retrieval and installation of the required rpms.
+Given the large number of dependent RPMs you are advised to use tools like
+apt or yum for automatic retrieval and installation of the required RPMs.
 (<url url="http://atrpms.physik.fu-berlin.de/install.html"
 name="http://atrpms.physik.fu-berlin.de/install.html">) In this case a
 special meta-package called mythtv-suite will allow you to install all of
@@ -950,12 +950,12 @@ mirror by typing:
 # urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
 </verb></tscreen>
 
-and skipping straight to the XMLTV compililation step.
+and skipping straight to the XMLTV compilation step.
 
 <sect2>Other distributions and manual installation.
-<p><bf>NOTE</bf>: Red Hat Linux 8.0 and Suse 8.1 users, you <em>must</em>
+<p><bf>NOTE</bf>: Red Hat Linux 8.0 and SuSE 8.1 users, you <em>must</em>
 download and install an updated version of libexpat.  The version that ships
-with Red Hat Linux 8.0 and Suse 8.1 (version 1.95.4) is buggy, and will
+with Red Hat Linux 8.0 and SuSE 8.1 (version 1.95.4) is buggy, and will
 cause problems with XML::Twig. All other distributions may skip this step
 and proceed with <ref id="untarring_xmltv" name="untar'ing"> the xmltv file.
 
@@ -1071,7 +1071,7 @@ $ su -
 # vi /etc/make.conf
 </verb></tscreen>
 
-Add mysql to your USE variable.  ie <tt>USE="mysql ...."</tt>
+Add mysql to your USE variable.  i.e. <tt>USE="mysql ...."</tt>
 
 Locate the line that contains: <tt>#/usr/local/portage</tt> and remove the #
 <tscreen><verb>
@@ -1109,7 +1109,7 @@ This can be done from the command line by typing:
 </verb></tscreen>
 
 <sect1>Gentoo
-<p>After installing mysql you need to initialise the database by running
+<p>After installing mysql you need to initialize the database by running
 mysql_install_db as root. 
 
 <sect1>Setting up the initial database.
@@ -1161,7 +1161,7 @@ $ mysql -u root < 0.9-to-0.10.sql
 id="modify_perm_mysql">
 <p>If you're going to have multiple systems accessing a master database,
 you must grant access to the database from remote systems.  By default, the
-<tt>mc.sql</tt> script is only granting access to the localhost.
+<tt>mc.sql</tt> script is only granting access to the local host.
 
 To allow other hosts access to your master database, you can either set it
 up for no security at all, or with more granularity.  Note that the "%" is
@@ -1356,7 +1356,7 @@ You should increase the main volume (the first slider) and the PCM volume,
 and unmute them by hitting "m".  For MythTV, if your tuner card audio output
 is patched to the Line-In input of your sound card, set the Line input for
 capture by pressing SPACE at the slider and mute it by pressing "M". If
-you've patched your tuner card to the Mic-In port of your soundcard, follow
+you've patched your tuner card to the Mic-In port of your sound card, follow
 the same instructions but make sure that you're on the Mic slider.
 
 Test the driver by playing a simple file:
@@ -1505,13 +1505,13 @@ srw-rw-rw-    1 root     root            0 Jan 27 15:01 /dev/lircd=
 prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
 </verb></tscreen>
 
-As you can see, there's a link from /dev/lirc to ttyS0, aka "COM1", which is
+As you can see, there's a link from /dev/lirc to ttyS0, a.k.a. "COM1", which is
 appropriate for the Pinnacle Systems PCTV Pro.  However, you may notice
 something like this:
 <tscreen><verb>
 crw-------    1 root     root      61,   0 Dec 31  1969 lirc
 </verb></tscreen>
-Some IR receivers (including some homebrew's) use a character device as
+Some IR receivers (including some homebrew units) use a character device as
 their data interface as opposed to a link to a serial port.  If the <tt>make
 install</tt> step has created a character device for you, don't replace it
 with a link to a COM port.
@@ -1596,7 +1596,7 @@ you must do to make lirc work is go to the "character devices" section
 and change "Standard/generic (8250/16550 and compatible UARTs) serial  
 support" from "y" to "m". Now if you want you can have a look around.  
 For instance, you might wish to turn off ham radio support, or perhaps  
-turn off pcmcia support if you are not on a laptop. But be careful!  
+turn off PCMCIA support if you are not on a laptop. But be careful!  
 Only change things you know you can change. If you are not sure, just  
 stick to the one required change. Click "save and exit".
 Next:
@@ -1878,8 +1878,8 @@ mythbackend setup screen for Input Connections.
 This csh script will be called each time MythTV needs to change the channel.
 Below is a copy of the script followed by the corresponding perl script.
 Make sure both are in your path. Also make sure you leave the #!/bin/csh
-setting and not change it to bourne or bash. This will create a frustrating
-symptom to diagnose where MythTV cannot open /dev/device. Unlike bourne or
+setting and not change it to Bourne or bash. This will create a frustrating
+symptom to diagnose where MythTV cannot open /dev/device. Unlike Bourne or
 bash, csh scripts automatically close parent file descriptors before they
 start.
 <tscreen><verb>
@@ -1899,7 +1899,7 @@ See <tt>contrib/channel.pl</tt> for the actual file.  Copy it to
 <tt>/usr/local/bin/</tt>
  
 The last statement within the perl script is the lirc rc command. This is
-the command that transmits the code to your cable/dss box. Make sure to have
+the command that transmits the code to your cable/DSS box. Make sure to have
 the IRDA device within a few feet of the box.
 
 <sect>Configuring MythTV. <label id="Configuring_mythtv">
@@ -2049,7 +2049,7 @@ look for a terminal window running XMLTV that may be waiting for input.
 Once you have chosen your provider, press RETURN to continue.  XMLTV will
 now begin collecting the initial data for your location.  The screen may
 blank for a few seconds to several minutes, depending on the load of the
-listings provider and the speed of your connection to the internet.  Be
+listings provider and the speed of your connection to the Internet.  Be
 patient!
 
 You will then be returned to the Video Sources screen.  If you have multiple
@@ -2068,9 +2068,9 @@ MythTV know which device will connect to which input source.
 When you start this screen, you should see a listing of the various input
 connections available on each of the Capture cards you defined earlier.  For
 example, you may have a capture card with a tuner, a SVideo and a Composite
-connection.  If you wanted to associate the tuner (aka, "Television") with
+connection.  If you wanted to associate the tuner (a.k.a., "Television") with
 an "Antenna" source you defined in Video Sources, you would move to the
-/dev/videodevice (Television) -> line and press the spacebar.  Using the
+/dev/videodevice (Television) -> line and press the space bar.  Using the
 left and right arrow keys will show you the various choices you have already
 created for video source.  In our case, you would use the left/right cursor
 keys until "Antenna" was shown in the Video Source field.  Press down to
@@ -2386,10 +2386,10 @@ MythTV being installed and operational.
 <p>Download mythweb from <url url="http://www.mythtv.org/"
 name="http://www.mythtv.org/"> and save it to a location where you can find
 it.  The next step depends on whether your distribution has a web server and
-if you have php support.
+if you have PHP support.
 
 <sect2>Mandrake 9.0
-<p>Mandrake 9.0 has <bf>apache</bf> and <bf>php</bf> pre-packaged, so
+<p>Mandrake 9.0 has <bf>apache</bf> and <bf>PHP</bf> pre-packaged, so
 installation is quite simple.  Once you have installed the two programs,
 either with the graphical installer (see instructions in <ref
 id="graphicinstalltools_" name="Graphic Install Tools">) or through the
@@ -2711,7 +2711,7 @@ will then use this information to fill in the proper fields when it
 populates the musicmetadata table rather than searching for an ID3 tag in
 the mp3 file.
 
-The files can be layed out in any format, such as:
+The files can be laid out in any format, such as:
 
 Genre/Artist/Album/Title
 Artist/Genre/Album/Title
@@ -2731,7 +2731,7 @@ length, just the portion that tries to read ID3 info.
 CD before selecting "Import CD".  You should also ensure that your system
 doesn't try to automount the CD and begin playing it automatically.
 
-Another item to consider:  there are some CD's that contain computer data
+Another item to consider:  there are some CDs that contain computer data
 that runs as a "CD Extra" when inserted into some Windows PCs and
 Macintoshes.  As of 2003-06-10, MythMusic doesn't support track skipping or
 individual track selection, so if you have a CD with "CD Extra" data you
@@ -2748,7 +2748,7 @@ Q: How do I create a new playlist?
 A: Using the MythMusic "Select Music" menu option, setup the playlist as you
 normally would by adding songs or other playlists as needed.  When you are
 ready to save the new playlist, highlight "Active Play Queue" at the bottom
-of the selection tree and hit the "i" key. This will popup a menu allowing
+of the selection tree and hit the "i" key. This will pop up a menu allowing
 you to name and save the new playlist.  You can also hit Enter to bring up
 the popup on the Active Play Queue. This does not work on the playlists
 above, as Enter is obviously bound to checking/unchecking the boxes. Any
@@ -2761,7 +2761,7 @@ entry. 1 cycles through a few special characters, delete, and space. 0 is
 like a CAPS LOCK. Hard to describe, fairly easy to use. You will soon be
 able to specify the cycle timing in a Setup screen. You can type fairly
 quickly through a combination of jumping around the number keys AND hitting
-a non-number key (right arrow is particularily good for this) to force the
+a non-number key (right arrow is particularly good for this) to force the
 current character.
 
 Q: How do I edit a playlist? 
@@ -2808,7 +2808,7 @@ decision by the author that programs that automatically delete things are
 bad.
 
 The files are used to locally cache CD lookups. If you are re-inserting
-CD's, your machine will not actually have to go out to the internet to
+CDs, your machine will not actually have to go out to the Internet to
 determine what is on them.  However, the URL used to access the freedb
 database has recently changed, so the stale information in the files from
 previous runs of MythMusic would cause the error above.  Once the files have
@@ -3203,7 +3203,7 @@ speakers.
 You may also want to ensure that <tt>/dev/dsp</tt> hasn't already been
 grabbed by another process, like <bf>esd</bf> or <bf>artsd</bf>.  If
 <tt>/dev/dsp</tt> isn't available, then MythTV won't work.  Check your
-windowmanager documentation for instructions on disabling the sound manager.
+window manager documentation for instructions on disabling the sound manager.
 If you wish to see what application is grabbing a resource, you can use the
 <tt>fuser</tt> command:
 <tscreen><verb>
@@ -3227,7 +3227,7 @@ name="Link">.
 <p>mythbackend does a check to see if your sound device is capable of full
 duplex operation.  If it's not, it's most likely that you're going to run
 into issues when you try to record and play sound at the same time.  If your
-backend is a seperate machine than your frontend, then there's no problem,
+backend is a separate machine than your frontend, then there's no problem,
 since you're only going to be doing one thing at a time with the card. 
 Likewise, if you're running the frontend and backend on the same machine,
 but you're using btaudio as your recording source, and using the playback
