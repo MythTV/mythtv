@@ -17,13 +17,21 @@
 <P>The MythWeather module will obtain the weather information for the
 location that you specify.  You must be running MythTV v0.8 in order to use
 MythWeather.</P>
-<P><B>NOTE for Red Hat Linux 8.0 users</B>: Red Hat 8 users must make the
-following modification, or several weather icons will fail to be installed.</P>
-<P>From the mythweather build directory move to the mythweather sub-directory
-and edit the Makefile there.</P>
-<P>Find and comment out (using a '#' symbol) the following line:</P>
-<P><CODE>strip "$(INSTALL_ROOT)/usr/local/share/mythtv/mythweather/images/"</CODE></P>
-<P>Continuing:</P>
+<P>
+<HR>
+<PRE>
+NOTE for Red Hat Linux 8.0 users: Red Hat 8 users must make the following
+modification, or several weather icons will fail to be installed.
+
+From the mythweather build directory move to the mythweather sub-directory
+and edit the Makefile there.
+
+Find and comment out (using a '#' symbol) the following line:
+
+strip "$(INSTALL_ROOT)/usr/local/share/mythtv/mythweather/images/"
+</PRE>
+<HR>
+</P>
 <P>Change into the MythWeather directory, then make and make install:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -35,7 +43,8 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>MythWeather uses MSNBC.com as its source for weather data.</P>
+<P>MythWeather uses MSNBC.com as its source for weather data and weather.com
+for its radar image.</P>
 <P>These are the keyboard commands for MythWeather:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -61,13 +70,11 @@ try increasing the aggressiveness level parameter.  This parameter is
 inverse; a higher number actually means that MythWeather will be less
 aggressive, and will therefore wait longer before timing out.</P>
 <P>MythWeather will print debugging information on the terminal.  If you wish
-to see additional debugging information while MythWeather is running, you'll
-need to modify the source and recompile.</P>
-<P>Open file <CODE>weather.cpp</CODE> and go to line 40.  You should see <CODE>debug =
-false</CODE>.  Change this to true, go back to the main mythweather directory
-and run <CODE>make clean distclean; make</CODE> then switch to superuser and run
-<CODE>make install</CODE>.  MythWeather will now print additional data to the
-terminal to allow you to troubleshoot MythWeather issues.</P>
+to see additional debugging information while MythWeather is running, run
+mythweather from the command line with as <CODE>mythweather --debug</CODE></P>
+<P>You may also force mythweather to re-run the configuration by starting it on
+the command line as <CODE>mythweather --configure</CODE>.  These two options are
+mutually exclusive.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-17.html">Next</A>

@@ -72,7 +72,7 @@ simultaneously serve content to a remote frontend.</LI>
 </UL>
 </P>
 <P>The second mode of operation is where MythTV is paired with a hardware-based
-video encoder, such as a Matrox G200 or a Hauppauge WinTV PVR-250/350.  In
+video encoder, such as a Matrox G200 or a Hauppauge WinTV-PVR-250/350.  In
 this mode, because the video encoding is being done externally, the CPU
 requirements are quite low.  See the 
 <A HREF="#video_capture_device">Video Capture Device</A> section for details.</P>
@@ -135,21 +135,27 @@ the bttv modules by typing:</P>
 <P>You want to see the <CODE>bttv</CODE> module listed.</P>
 <P>While inexpensive video-capture cards just capture raw frames, leaving
 encoding to software, some higher-end cards incorporate hardware-level
-encoding. Using either a G200 MJPEG encoder card, or a WinTV PVR-250 or 350
+encoding. Using either a G200 MJPEG encoder card, or a WinTV-PVR-250 or 350
 from Hauppauge and the driver from the IvyTV project 
 <A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A> will
 allow you to use dedicated hardware encoders rather than your CPU. As of
 2003-04-15, the CVS version MythTV is now able to use the PVR-250/350 cards
 as an input device for live TV and for scheduled recordings. As of
 2003-04-23, seek support is still being written. Using the onboard MPEG-2
-encoder drastically reduces the CPU requirements for encoding. Here are some
-data points:</P>
+encoder drastically reduces the CPU requirements for encoding. </P>
+<P>Here are some data points for encoding:
+<UL>
+<LI>A Celeron 450 uses 2% CPU for encoding a 480x480 16Mbps MPEG-2 stream.</LI>
+</UL>
+</P>
+<P>Here are some data points for decoding:</P>
 <P>
 <UL>
 <LI>An Athlon 1800XP can decode a 720x480 8Mbps MPEG-2 file using 10% CPU</LI>
 <LI>An Athlon 1Ghz can decode a 720x480 16Mbps MPEG-2 file using 30-50%
 CPU, can decode a 480x480 16Mbps MPEG-2 using 30% CPU and approximately 30%
 for Live TV at 416x480.</LI>
+<LI>A P3-550 can decode a 480x480 16Mbps MPEG-2 file with 55% CPU.</LI>
 </UL>
 </P>
 <P>
@@ -162,6 +168,9 @@ NOTE:  The MPEG-2 decoder on the PVR-350 is not yet supported.
 </PRE>
 <HR>
 </P>
+<P>See the 
+<A HREF="mythtv-HOWTO-19.html#pvr250">I'd like to use a hardware MPEG-2 encoder</A>
+section for information on installing a PVR-250 on Mandrake 9.1.</P>
 
 <H3>Sound card</H3>
 
@@ -191,15 +200,15 @@ intensive.  Check the XFree86 documentation for details if you are uncertain
 about your preferred card.  You may also run <CODE>xvinfo</CODE>; look for your
 video card to be listed as one of the adapters.</P>
 <P>Most people, though, want to view television on a television set. For this, 
-you need either (a) one of the relatively small number of cards with TV-out 
+you need either (a) one of the relatively small number of cards with TV out 
 outputs that are supported by Linux and XFree86, or (b) an external 
 VGA-to-TV converter.</P>
-<P>For (a), all nVidia cards with tv-out that are supported by the current drivers
+<P>For (a), all nVidia cards with TV out that are supported by the current drivers
 from nVidia should be able to display on a television. Some cards with
 certain chip sets support overscan adjustment. See 
 <A HREF="http://www.nvidia.com/content/drivers/drivers.asp">http://www.nvidia.com/content/drivers/drivers.asp</A> for nVidia driver
 information.</P>
-<P>Many older nVidia cards (such as GeForce2 cards with tv-out) can use
+<P>Many older nVidia cards (such as GeForce2 cards with TV out) can use
 <B>nvtv</B> 
 <A HREF="http://sourceforge.net/projects/nv-tv-out/">http://sourceforge.net/projects/nv-tv-out/</A>, a utility which provides
 controls for overscan, x,y position and several other useful controls to

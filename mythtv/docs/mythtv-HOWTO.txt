@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-04-25, v2.17
+  2003-04-25, v2.18
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -134,6 +134,7 @@
      18.12 I can't see parts of the On Screen Display.
      18.13 The mythbackend program told me to look at this section.
      18.14 My remote doesn't work / works sometimes and not others / "ghost" keypresses.
+     18.15 My PVR-250 card doesn't show inputs in the setup screen.
 
   19. Miscellaneous.
      19.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
@@ -149,7 +150,7 @@
      19.7 I'd like to delete the mysql database.
      19.8 btaudio
      19.9 Removing unwanted channels.
-     19.10 I'd like to use a hardware MPEG2 encoder.
+     19.10 I'd like to use a hardware MPEG-2 encoder.
 
   ______________________________________________________________________
 
@@ -297,7 +298,7 @@
 
   The second mode of operation is where MythTV is paired with a
   hardware-based video encoder, such as a Matrox G200 or a Hauppauge
-  WinTV PVR-250/350.  In this mode, because the video encoding is being
+  WinTV-PVR-250/350.  In this mode, because the video encoding is being
   done externally, the CPU requirements are quite low.  See the ``Video
   Capture Device'' section for details.
 
@@ -360,7 +361,7 @@
 
   While inexpensive video-capture cards just capture raw frames, leaving
   encoding to software, some higher-end cards incorporate hardware-level
-  encoding. Using either a G200 MJPEG encoder card, or a WinTV PVR-250
+  encoding. Using either a G200 MJPEG encoder card, or a WinTV-PVR-250
   or 350 from Hauppauge and the driver from the IvyTV project
   http://ivtv.sourceforge.net/ <http://ivtv.sourceforge.net/> will allow
   you to use dedicated hardware encoders rather than your CPU. As of
@@ -368,7 +369,13 @@
   cards as an input device for live TV and for scheduled recordings. As
   of 2003-04-23, seek support is still being written. Using the onboard
   MPEG-2 encoder drastically reduces the CPU requirements for encoding.
-  Here are some data points:
+
+  Here are some data points for encoding:
+
+  +o  A Celeron 450 uses 2% CPU for encoding a 480x480 16Mbps MPEG-2
+     stream.
+
+  Here are some data points for decoding:
 
   +o  An Athlon 1800XP can decode a 720x480 8Mbps MPEG-2 file using 10%
      CPU
@@ -377,12 +384,17 @@
      CPU, can decode a 480x480 16Mbps MPEG-2 using 30% CPU and
      approximately 30% for Live TV at 416x480.
 
+  +o  A P3-550 can decode a 480x480 16Mbps MPEG-2 file with 55% CPU.
+
   ______________________________________________________________________
   NOTE:  As of 2003-04-15 the current IVTV driver does not support multiple
   hardware encoder cards in the same chassis.
 
   NOTE:  The MPEG-2 decoder on the PVR-350 is not yet supported.
   ______________________________________________________________________
+
+  See the ``I'd like to use a hardware MPEG-2 encoder'' section for
+  information on installing a PVR-250 on Mandrake 9.1.
 
   [1m3.1.5.  Sound card[0m
 
@@ -416,17 +428,17 @@
 
   Most people, though, want to view television on a television set. For
   this, you need either (a) one of the relatively small number of cards
-  with TV-out outputs that are supported by Linux and XFree86, or (b) an
+  with TV out outputs that are supported by Linux and XFree86, or (b) an
   external VGA-to-TV converter.
 
-  For (a), all nVidia cards with tv-out that are supported by the
+  For (a), all nVidia cards with TV out that are supported by the
   current drivers from nVidia should be able to display on a television.
   Some cards with certain chip sets support overscan adjustment. See
   http://www.nvidia.com/content/drivers/drivers.asp
   <http://www.nvidia.com/content/drivers/drivers.asp> for nVidia driver
   information.
 
-  Many older nVidia cards (such as GeForce2 cards with tv-out) can use
+  Many older nVidia cards (such as GeForce2 cards with TV out) can use
   [1mnvtv [22mhttp://sourceforge.net/projects/nv-tv-out/
   <http://sourceforge.net/projects/nv-tv-out/>, a utility which provides
   controls for overscan, x,y position and several other useful controls
@@ -436,7 +448,6 @@
   http://sourceforge.net/forum/forum.php?forum_id=105850
   <http://sourceforge.net/forum/forum.php?forum_id=105850> for more
   infomation on which cards work with [1mnvtv[22m.
-
   Recent Matrox cards (the G450 and G550) are reported to work with
   kernel patches (for Linux 2.4.19) available at
   http://www.bglug.ca/matrox_tvout/ <http://www.bglug.ca/matrox_tvout/>.
@@ -449,6 +460,7 @@
 
   For choice (b), VGA-to-TV converters work well; many people have
   stated they are satisfied with the output of the following devices:
+
   +o  AITech Web Cable Plus, powered by external transformer or takes
      power from PS/2 keyboard connector, support resolutions up to
      1024x768, outputs composite and SVideo, provides position
@@ -757,16 +769,16 @@
   Open a shell, and switch to superuser mode.  [1mNOTE: ^D [22mmeans press [1mCTRL[0m
   and [1md [22mat the same time.
 
-  $ su
-  # cd /etc/profile.d
-  cat > mythtv.sh
-  export QTDIR=/usr/lib/qt3
-  export PATH=$PATH:/usr/lib/qt3/bin
-  ^D
+       $ su
+       # cd /etc/profile.d
+       cat > mythtv.sh
+       export QTDIR=/usr/lib/qt3
+       export PATH=$PATH:/usr/lib/qt3/bin
+       ^D
 
-  # chmod a+x mythtv.sh
-  # exit
-  $ exit
+       # chmod a+x mythtv.sh
+       # exit
+       $ exit
 
   The last two commands are to exit out of the shell.  This way, when
   you next open a shell your new commands will take effect.
@@ -817,7 +829,7 @@
   Switch to /etc and execute the following:
 
        $ su -
-       # echo /usr/local/lib >> /etc/ld.so.conf
+       # echo /usr/local/lib >> ld.so.conf
        # /sbin/ldconfig
        # exit
        $
@@ -862,6 +874,7 @@
 
   If you've got a system with an AMD K6-2 or a VIA C3 processor, make
   the following change in the settings.pro file.
+
   Look for
 
   -march=pentiumpro
@@ -889,18 +902,18 @@
 
   Check that it worked:
 
-       # ls -l /usr/local/lib
-       -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
-       -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
-       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
-       libmp3lame.so.0.0.0*
-       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
-       libmp3lame.so.0.0.0*
-       -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
-       libmp3lame.so.0.0.0*
+  # ls -l /usr/local/lib
+  -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
+  -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
+  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
+  libmp3lame.so.0.0.0*
+  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
+  libmp3lame.so.0.0.0*
+  -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
+  libmp3lame.so.0.0.0*
 
-       # exit
-       $
+  # exit
+  $
 
   [1m5.3.  Building XMLTV.[0m
 
@@ -913,10 +926,10 @@
   If you get errors installing XML::Twig or other XMLTV prerequisites,
   try deleting the old versions of libexpat
 
-  $ su
-  # rm -f /usr/lib/libexpat*
-  # /sbin/ldconfig
-  # exit
+       $ su
+       # rm -f /usr/lib/libexpat*
+       # /sbin/ldconfig
+       # exit
 
   Download version 1.95.5 from sourceforge.net:
   http://sourceforge.net/projects/expat/
@@ -941,8 +954,8 @@
 
   Untar the xmltv file:
 
-       $ tar -xjf xmltv-0.5.9.tar.bz2
-       $ cd xmltv-0.5.9
+  $ tar -xjf xmltv-0.5.9.tar.bz2
+  $ cd xmltv-0.5.9
 
   Install the xmltv prerequisites:
 
@@ -955,14 +968,14 @@
   and skipping to the compile step.
   ______________________________________________________________________
 
-  $ su
-  # perl -MCPAN -e shell
-  cpan> install XML::Twig
-  cpan> install Date::Manip
-  Date::Manip is up to date.
-  cpan> install LWP
-  cpan> install XML::Writer
-  cpan> exit
+       $ su
+       # perl -MCPAN -e shell
+       cpan> install XML::Twig
+       cpan> install Date::Manip
+       Date::Manip is up to date.
+       cpan> install LWP
+       cpan> install XML::Writer
+       cpan> exit
 
   Change to the XMLTV directory and compile it:
 
@@ -986,10 +999,10 @@
 
   Unpack MythTV
 
-       $ tar -xjf mythtv-0.8.tar.bz2
-       $ cd mythtv-0.8
-       $ ./configure
-       $ make
+  $ tar -xjf mythtv-0.8.tar.bz2
+  $ cd mythtv-0.8
+  $ ./configure
+  $ make
 
   ______________________________________________________________________
   NOTE for Red Hat 8 users: You must manually modify a Makefile
@@ -1086,7 +1099,7 @@
 
   To setup the initial mysql databases:
 
-       $ cd database
+  $ cd database
 
   [1m6.4.1.  Mandrake 9.0[0m
 
@@ -1126,8 +1139,8 @@
 
   This example has no security at all, and allows access from any host.
 
-       $ mysql -u root mythconverg
-       mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
+  $ mysql -u root mythconverg
+  mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
 
   For a more secure setup, you can restrict which machines or subnets
   have access. If you have a complete DNS system operational, you could
@@ -1138,8 +1151,8 @@
 
   Finally, if you just want to restrict by IP subnet:
 
-  $ mysql -u root mythconverg
-  mysql> grant all on mythconverg.* to mythtv@"192.168.1.%" identified by "mythtv";
+       $ mysql -u root mythconverg
+       mysql> grant all on mythconverg.* to mythtv@"192.168.1.%" identified by "mythtv";
 
   [1m7.  Setting up ALSA and the mixer.[0m
 
@@ -1232,36 +1245,36 @@
 
   Start with the alsa-driver package:
 
-       $ tar -xjf alsa-driver-0.9.x.tar.bz2
-       $ cd alsa-driver-0.9.x
-       $ ./configure --with-cards=XXX --with-sequencer=yes
-       $ make
-       $ su
-       # make install
-       # ./snddevices
-       # exit
-       $
+  $ tar -xjf alsa-driver-0.9.x.tar.bz2
+  $ cd alsa-driver-0.9.x
+  $ ./configure --with-cards=XXX --with-sequencer=yes
+  $ make
+  $ su
+  # make install
+  # ./snddevices
+  # exit
+  $
 
   This will compile and install the kernel modules and initialization
   scripts, as well as create device nodes in /dev.
 
   Install the rest of the packages:
 
-  $ cd ~
-  $ tar -xjf alsa-lib-0.9.x.tar.bz2
-  $ cd alsa-lib-0.9.x
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $ cd ..
-  $ tar -xjf alsa-utils-0.9.x.tar.bz2
-  $ cd alsa-utils-0.9.x
-  $ ./configure
-  $ make
-  $ su
-  # make install
+       $ cd ~
+       $ tar -xjf alsa-lib-0.9.x.tar.bz2
+       $ cd alsa-lib-0.9.x
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $ cd ..
+       $ tar -xjf alsa-utils-0.9.x.tar.bz2
+       $ cd alsa-utils-0.9.x
+       $ ./configure
+       $ make
+       $ su
+       # make install
 
   Next, you must edit /etc/modules.conf so that the ALSA modules are
   loaded automatically. The first step is to remove your old OSS
@@ -1300,6 +1313,7 @@
   the mixer settings won't get restored the next time you boot unless
   you ran the shutdown script or you've explicitly saved the state which
   you can do as root with:
+
        # alsactl -f /etc/asound.state store
 
   Reboot your machine.  Login and adjust the sound levels using
@@ -1331,13 +1345,13 @@
   Note the spelling in the following commands.
   ______________________________________________________________________
 
-       $ amixer set Master,0 100%,100% unmute
-       $ amixer set Line,0 75%,75% mute captur
-       $ amixer set Capture,0 100%,100% mute captur
-       $ su
-       # alsactl store
-       # exit
-       $
+  $ amixer set Master,0 100%,100% unmute
+  $ amixer set Line,0 75%,75% mute captur
+  $ amixer set Capture,0 100%,100% mute captur
+  $ su
+  # alsactl store
+  # exit
+  $
 
   If you have multiple sound cards, then use the -c parameter to specify
   which card to adjust.  Note that the first card will be "0", the
@@ -1451,10 +1465,10 @@
   At this point, if you're using a serial receiver, check that the link
   has been correctly made in /dev
 
-  $ ls -l /dev/li*
-  lr-xr-xr-x    1 root     root            5 Jan 27 09:00 /dev/lirc -> ttyS0
-  srw-rw-rw-    1 root     root            0 Jan 27 15:01 /dev/lircd=
-  prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
+       $ ls -l /dev/li*
+       lr-xr-xr-x    1 root     root            5 Jan 27 09:00 /dev/lirc -> ttyS0
+       srw-rw-rw-    1 root     root            0 Jan 27 15:01 /dev/lircd=
+       prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
 
   As you can see, there's a link from /dev/lirc to ttyS0, aka "COM1".
 
@@ -1484,11 +1498,11 @@
   For the impatient: Make sure you have an emergency floppy boot disk
   available!
 
-       $ cd /usr/src/linux
-       $ su
-       # make mrproper
-       # cd configs
-       # ls
+  $ cd /usr/src/linux
+  $ su
+  # make mrproper
+  # cd configs
+  # ls
 
   at this point you must look at the file names and determine which
   config file is right for you. For instance if you have an Athlon XP
@@ -1573,9 +1587,9 @@
   Now, we're going to add the commands necessary for lircd to run each
   time we boot.  Mandrake 9.1 users, you can execute:
 
-       $ su
-       # chkconfig --level 35 lircd on
-       # exit
+  $ su
+  # chkconfig --level 35 lircd on
+  # exit
 
   All other distributions:
 
@@ -1618,7 +1632,7 @@
   [1mirxevent [22misn't a daemon, so if you know that your remote is working
   you need to invoke it like this:
 
-       $ irxevent &
+  $ irxevent &
 
   If [1mirxevent [22misn't running, then MythTV will not respond to your remote
   control.
@@ -1632,17 +1646,17 @@
 
   The lircrc.example file has this:
 
-  begin
-      prog = irxevent
-      button = ChannelUp
-      config = Key Up CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = ChannelUp
+           config = Key Up CurrentWindow
+       end
 
-  begin
-      prog = irxevent
-      button = ChannelDown
-      config = Key Down CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = ChannelDown
+           config = Key Down CurrentWindow
+       end
 
   but the /etc/lircd.conf that comes in the lircd package defines the
   buttons for the Pinnacle Studio PCTV as:
@@ -1736,6 +1750,7 @@
 
   The configuration for starting [1mlircd [22mdiffers if you're going to be
   sending and receiving IR versus just receiving.
+
        # cd /etc/rc.d
        # cat >> rc.local
        echo "Starting lircd"
@@ -1789,6 +1804,7 @@
 
   See contrib/channel.pl for the actual file.  Copy it to
   /usr/local/bin/
+
   The last statement within the perl script is the lirc rc command. This
   is the command that transmits the code to your cable/dss box. Make
   sure to have the IRDA device within a few feet of the box.
@@ -2184,10 +2200,10 @@
 
   To determine if you've got SSE on an Intel processor, you can:
 
-  $ cat /proc/cpuinfo
-  [snip]
-  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca
-  cmov pat pse36 mmx fxsr sse
+       $ cat /proc/cpuinfo
+       [snip]
+       flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca
+       cmov pat pse36 mmx fxsr sse
 
   Notice the [1msse [22mat the end of the line - this tells you that this
   processor will be able to deinterlace correctly.
@@ -2292,13 +2308,13 @@
 
   [1m12.2.  Completing the installation.[0m
 
-  $ tar -xjf mythweb-0.8.tar.bz2
-  $ cd mythweb-0.8
-  $ su
-  # mkdir /var/www/html/mythweb
-  # cp -r . /var/www/html/mythweb
-  # exit
-  $
+       $ tar -xjf mythweb-0.8.tar.bz2
+       $ cd mythweb-0.8
+       $ su
+       # mkdir /var/www/html/mythweb
+       # cp -r . /var/www/html/mythweb
+       # exit
+       $
 
   To access the web page, open a web browser and use [1mhttp://[name or ip[0m
   [1maddress]/mythweb/[0m
@@ -2389,14 +2405,14 @@
   Download FLAC from http://flac.sourceforge.net
   <http://flac.sourceforge.net> and install:
 
-       $ tar -xzf flac-1.1.0.tar.gz
-       $ cd flac-1.1.0
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
-       $
+  $ tar -xzf flac-1.1.0.tar.gz
+  $ cd flac-1.1.0
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
+  $
 
   Download libcdaudio from libcdaudio.sourceforge.net
   <http://sourceforge.net/project/showfiles.php?group_id=27134> and
@@ -2485,7 +2501,6 @@
   packages for Vorbis, cdparanoia, SDL, and OpenGL (which you probably
   already have installed). To install these all at once, simply type
   (all on the same line):
-
        $ up2date --solvedeps libvorbis libvorbis-devel vorbis-tools cdparanoia-devel cdparanoia-libs cdparanoia SDL-devel SDL
 
   If you get the following message: "None of the packages you requested
@@ -2571,18 +2586,17 @@
   location that you specify.  You must be running MythTV v0.8 in order
   to use MythWeather.
 
-  [1mNOTE for Red Hat Linux 8.0 users[22m: Red Hat 8 users must make the
-  following modification, or several weather icons will fail to be
-  installed.
+  ______________________________________________________________________
+  NOTE for Red Hat Linux 8.0 users: Red Hat 8 users must make the following
+  modification, or several weather icons will fail to be installed.
 
-  From the mythweather build directory move to the mythweather sub-
-  directory and edit the Makefile there.
+  From the mythweather build directory move to the mythweather sub-directory
+  and edit the Makefile there.
 
   Find and comment out (using a '#' symbol) the following line:
 
   strip "$(INSTALL_ROOT)/usr/local/share/mythtv/mythweather/images/"
-
-  Continuing:
+  ______________________________________________________________________
 
   Change into the MythWeather directory, then make and make install:
 
@@ -2592,21 +2606,22 @@
        # make install
        # exit
 
-  MythWeather uses MSNBC.com as its source for weather data.
+  MythWeather uses MSNBC.com as its source for weather data and
+  weather.com for its radar image.
 
   These are the keyboard commands for MythWeather:
 
-  Left Key             Goes back one page, and extends the time spent
-                       on the page you are on.
-  Right Key            Goes forward one page, see above.
-  Space                Pause, wait on the current page until space is hit
-                       again.
-  Numeric Keys         You can check other weather by keying in other ZIP codes.
-  Enter Key            Switch between Celsius and Fahrenheit. Can also
-                       be used a way to force a data update.
-  "m" Key              Resets the location to the database default, then updates the data.
-  "i"                  Enter / Save settings
-  ESC                  Exit the settings screen without saving / Exit the program
+       Left Key             Goes back one page, and extends the time spent
+                            on the page you are on.
+       Right Key            Goes forward one page, see above.
+       Space                Pause, wait on the current page until space is hit
+                            again.
+       Numeric Keys         You can check other weather by keying in other ZIP codes.
+       Enter Key            Switch between Celsius and Fahrenheit. Can also
+                            be used a way to force a data update.
+       "m" Key              Resets the location to the database default, then updates the data.
+       "i"                  Enter / Save settings
+       ESC                  Exit the settings screen without saving / Exit the program
 
   MythWeather also has an "Aggressiveness" setting.  This affects how
   long MythWeather waits for data from the msnbc.com website before
@@ -2619,13 +2634,12 @@
 
   MythWeather will print debugging information on the terminal.  If you
   wish to see additional debugging information while MythWeather is
-  running, you'll need to modify the source and recompile.
+  running, run mythweather from the command line with as mythweather
+  --debug
 
-  Open file weather.cpp and go to line 40.  You should see debug =
-  false.  Change this to true, go back to the main mythweather directory
-  and run make clean distclean; make then switch to superuser and run
-  make install.  MythWeather will now print additional data to the
-  terminal to allow you to troubleshoot MythWeather issues.
+  You may also force mythweather to re-run the configuration by starting
+  it on the command line as mythweather --configure.  These two options
+  are mutually exclusive.
 
   [1m17.  MythVideo[0m
 
@@ -2640,7 +2654,7 @@
        # make install
        # exit
 
-  The next step is to edit the /usr/local/share/mythvideo/mythexplorer-
+  The next step is to edit the /usr/local/share/mythvideo/mythvideo-
   settings.txt file.  Change the StartDir to a valid mount point on your
   system.
 
@@ -2653,6 +2667,7 @@
   +o  You have an AMD K6-2 or VIA C3 processor.  If you have either of
      these, make sure that you you followed the instructions in this
      ``section''.
+
   +o  You have an early production Intel Celeron, Pentium Pro or Pentium
      II.  If you have any of these processors, make sure that your
      ``deinterlace'' variable is set correctly.  Your CPU needs to
@@ -2763,13 +2778,13 @@
 
   Also, look for:
 
-  Section "Device"
-      Identifier "device1"
-      VendorName "nVidia Corporation"
-      BoardName "NVIDIA GeForce 256 (generic)"
-      Driver "nv"
-      Option "DPMS"
-  EndSection
+       Section "Device"
+           Identifier "device1"
+           VendorName "nVidia Corporation"
+           BoardName "NVIDIA GeForce 256 (generic)"
+           Driver "nv"
+           Option "DPMS"
+       EndSection
 
   In this case, you would need to either delete the Option "DPMS" line,
   or change it to # Option "DPMS" to comment it out.  The next time you
@@ -2810,7 +2825,7 @@
 
   You may also combine the command to turn off DPMS and the screensaver:
 
-       $ xset -dpms s off
+  $ xset -dpms s off
 
   Finally, depending on your distribution, you may be able to turn it
   off from within the control panel.
@@ -2850,18 +2865,18 @@
   At this point, you now have debug-enabled software ready.  Let's
   assume that the problem you're having is in the setup program.
 
-       $ cd setup
-       $ gdb ./setup
+  $ cd setup
+  $ gdb ./setup
 
-       GNU gdb 5.3-1mdk (Mandrake Linux)
-       Copyright 2002 Free Software Foundation, Inc.
-       GDB is free software, covered by the GNU General Public License, and you are
-       welcome to change it and/or distribute copies of it under certain
-       conditions.
-       Type "show copying" to see the conditions.
-       There is absolutely no warranty for GDB.  Type "show warranty" for details.
-       This GDB was configured as "i586-mandrake-linux-gnu"...
-       (gdb)
+  GNU gdb 5.3-1mdk (Mandrake Linux)
+  Copyright 2002 Free Software Foundation, Inc.
+  GDB is free software, covered by the GNU General Public License, and you are
+  welcome to change it and/or distribute copies of it under certain
+  conditions.
+  Type "show copying" to see the conditions.
+  There is absolutely no warranty for GDB.  Type "show warranty" for details.
+  This GDB was configured as "i586-mandrake-linux-gnu"...
+  (gdb)
 
   [1mgdb [22mhas a number of options, read the man page for more information.
 
@@ -2927,6 +2942,7 @@
 
   Master mixer - sets the level for the analog signal sent to line-out
   or the speakers.
+
   You may also want to ensure that /dev/dsp hasn't already been grabbed
   by another process, like [1mesd [22mor [1martsd[22m.  If /dev/dsp isn't available,
   then MythTV won't work.  Check your windowmanager documentation for
@@ -2991,6 +3007,15 @@
 
   +o  fvwm
 
+  +o  blackbox
+
+  [1m18.15.  My PVR-250 card doesn't show inputs in the setup screen.[0m
+
+  See message http://lists.snowman.net/pipermail/mythtv-
+  users/2003-April/002527.html
+  <http://lists.snowman.net/pipermail/mythtv-
+  users/2003-April/002527.html>
+
   [1m19.  Miscellaneous.[0m
 
   [1m19.1.  I'd like to watch the files without using MythTV / I'd like to[0m
@@ -3029,14 +3054,14 @@
   Here's an example submitted to the mythtv-dev list by Pat Pflaum
   mailto:pat@netburp.com <mailto:pat@netburp.com> using fvwm:
 
-  $ cat > .xinitrc
-  fvwm &
-  mythfrontend
-  ^D
-  $ cat > .fvwmrc
-  Style "myth*"      NoTitle, NoHandles, Sticky, WindowListSkip, BorderWidth 0
-  ^D
-  $
+       $ cat > .xinitrc
+       fvwm &
+       mythfrontend
+       ^D
+       $ cat > .fvwmrc
+       Style "myth*"      NoTitle, NoHandles, Sticky, WindowListSkip, BorderWidth 0
+       ^D
+       $
 
   [1m19.4.  What capture resolution should I use?  How does video work?[0m
 
@@ -3282,7 +3307,7 @@
        $ mysql -u root mythconverg
        mysql> delete from program where chanid = '1015';
 
-  [1m19.10.  I'd like to use a hardware MPEG2 encoder.[0m
+  [1m19.10.  I'd like to use a hardware MPEG-2 encoder.[0m
 
   [1mNOTE[22m:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS NOT
   GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR IVTV DRIVER
@@ -3291,18 +3316,20 @@
   <https://lists.sourceforge.net/lists/listinfo/ivtv-devel>
 
   These instructions work for Mandrake 9.1 on a backend machine which is
-  hosting a single PVR250 capture card.
+  hosting a single PVR-250 capture card.
 
   Install the Mandrake kernel source.  If you are using a different
   Mandrake kernel level (ie, not 2.4.21-0.16mdk as in the example below,
   then alter the [1murpmi [22mcommand appropriately.)
 
-       $ uname -a
-       Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
-       unknown GNU/Linux
+  $ uname -a
+  Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
+  unknown GNU/Linux
 
-       $ su
-       # urpmi kernel-source
+  $ su
+  # urpmi kernel-source
+
+  [1mNOTE[22m:  You do not need to recompile your kernel.
 
   Download the IVTV driver from CVS:
 
