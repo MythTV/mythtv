@@ -996,7 +996,8 @@ void NuppelVideoRecorder::WriteSeekTable(bool todumpfile)
     vector<struct seektable_entry>::iterator i = seektable->begin();
     for (; i != seektable->end(); i++)
     {
-        memcpy(seekbuf + offset, i, sizeof(struct seektable_entry));
+        memcpy(seekbuf + offset, (const void *)&(*i), 
+               sizeof(struct seektable_entry));
         offset += sizeof(struct seektable_entry);
     }
 
