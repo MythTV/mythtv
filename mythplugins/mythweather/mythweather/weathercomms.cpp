@@ -226,6 +226,8 @@ QString WeatherSock::parseData(QString beg, QString end)
     if (debug == true)
     {
         cout << "MythWeather: Parse HTML : Looking for: " << beg << ", ending with: " << end << endl;
+        if (httpData.length() == 0)
+            cout << "MythWeather: Parse HTML : No Data!\n";
     }
     int start = httpData.find(beg) + beg.length();
     int endint = httpData.find(end, start + 1);
@@ -307,7 +309,7 @@ void WeatherSock::makeConnection()
   	if (connectType == 0)
 		httpSock->connectToHost("www.msnbc.com", 80);
 	else if (connectType == 1 || connectType == 2)
-		httpSock->connectToHost("www.weather.com", 80);
+		httpSock->connectToHost("w3.weather.com", 80);
 	else if (connectType == 3)
         {
                 image_out.setName("/tmp/weather.jpg");
@@ -444,10 +446,10 @@ void WeatherSock::socketConnected()
    {
         QTextStream os(httpSock);
         os << "GET /weather/map/"
-	   << locale << "?from=LAPmaps"
+	   << locale << "?from=LAPmaps&setcookie=1"
            << " HTTP/1.1\n"
            << "Connection: close\n"
-           << "Host: www.weather.com\n\n\n";
+           << "Host: w3.weather.com\n\n\n";
         mapLoc = "";
    } 
    else if (connectType == 2)
@@ -456,7 +458,7 @@ void WeatherSock::socketConnected()
         os << "GET " << mapLoc 
            << " HTTP/1.1\n"
            << "Connection: close\n"
-           << "Host: www.weather.com\n\n\n";
+           << "Host: w3.weather.com\n\n\n";
         imageLoc = "";
    }
    else if (connectType == 3)

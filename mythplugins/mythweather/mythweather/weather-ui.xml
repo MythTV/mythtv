@@ -576,7 +576,7 @@
       </textarea>
       <textarea name="locationhold" draworder="7" align="center">
         <font>temp</font>
-        <area>0,257,800,50</area>
+        <area>0,257,800,55</area>
       </textarea>
     </container>
 
