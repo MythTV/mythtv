@@ -509,6 +509,22 @@ section on modifying
 <A HREF="mythtv-HOWTO-22.html#hauppauge_remote">Hauppauge PVR-250 remote and MythTV's native LIRC support.</A> for
 examples on finding and removing old versions of lirc.</P>
 
+<H2><A NAME="ss20.27">20.27</A> <A HREF="mythtv-HOWTO.html#toc20.27">MySQL not connecting correctly.</A>
+</H2>
+
+<P>Your <B>MySQL</B> installation may have networking turned off. 
+Check that <CODE>/etc/mysql/my.cnf</CODE> <EM>does not</EM> contain
+<CODE>skip-networking</CODE>.  If it does, remove it, and restart
+<B>MySQL</B>.</P>
+
+<H2><A NAME="ss20.28">20.28</A> <A HREF="mythtv-HOWTO.html#toc20.28">My screen goes black when I try to play something.</A>
+</H2>
+
+<P>MythTV prints error and status messages to the shell that was used to
+start the application.  If nothing seems to be happening when you try to
+view a program, try switching back to the shell and look for error messages
+there.</P>
+
 <HR>
 <A HREF="mythtv-HOWTO-21.html">Next</A>
 <A HREF="mythtv-HOWTO-19.html">Previous</A>

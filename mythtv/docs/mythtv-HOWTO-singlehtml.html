@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-12-08, v2.91
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-12-10, v0.13.00
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -178,6 +178,8 @@ necessary.</EM>
 <LI><A NAME="toc20.24">20.24</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.24">I can't change the channel when watching Live TV.</A>
 <LI><A NAME="toc20.25">20.25</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.25">When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"</A>
 <LI><A NAME="toc20.26">20.26</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.26">Troubleshooting the Hauppauge PVR-250 IR remote</A>
+<LI><A NAME="toc20.27">20.27</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.27">MySQL not connecting correctly.</A>
+<LI><A NAME="toc20.28">20.28</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.28">My screen goes black when I try to play something.</A>
 </UL>
 <P>
 <H2><A NAME="toc21">21.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s21">Miscellaneous. </A></H2>
@@ -225,7 +227,7 @@ at
 <A HREF="http://www.mythtv.org/mailman/listinfo/mythtv-users">http://www.mythtv.org/mailman/listinfo/mythtv-users</A>.</P>
 <P>Searchable archives for the lists are available at 
 <A HREF="http://www.gossamer-threads.com/archive/MythTV_C2/">http://www.gossamer-threads.com/archive/MythTV_C2/</A>.</P>
-<P>This HOWTO is for MythTV v0.12.</P>
+<P>This HOWTO is for MythTV v0.13.</P>
 
 <H2><A NAME="s2">2.</A> <A HREF="#toc2">Introduction.</A></H2>
 
@@ -387,9 +389,9 @@ information.</P>
 <P>MythTV creates large files, many in excess of 2GB.  You <EM>must</EM> use a
 filesystem that will allow you to create large files.  Filesystems known to
 have problems with large files are FAT and FAT32.</P>
-<P>Because of these large files, it may be useful to plan for future expansion
-right from the beginning.  If your case and power supply have the capability
-for additional hard drives, read through the 
+<P>Because of the size of these files, it may be useful to plan for future
+expansion right from the beginning.  If your case and power supply have the
+capability for additional hard drives, read through the 
 <A HREF="#LVM">LVM</A> and 
 <A HREF="#advancedpartitionformatting">Advanced Partition Formatting</A> sections for some pointers.</P>
 <P>
@@ -432,13 +434,15 @@ the bttv modules by typing:
 <P>You want to see the <CODE>bttv</CODE> module listed.</P>
 <P>While inexpensive video-capture cards just capture raw frames, leaving
 encoding to software, some higher-end cards incorporate hardware-level
-encoding. Using either a G200 MJPEG encoder card, or a WinTV-PVR-250 or 350
-from Hauppauge and the driver from the IvyTV project 
-<A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A> will
-allow you to use dedicated hardware encoders rather than your CPU. Release
-0.12 of MythTV is able to use the PVR-250/350 cards as an input device for
-live TV and for scheduled recordings.  Using the onboard MPEG-2 encoder
-drastically reduces the CPU requirements for encoding.</P>
+encoding. Using either a G200 MJPEG encoder card, or a MPEG-2 encoder card
+supported by the IvyTV project 
+<A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A> such as the Hauppauge PVR-250, PVR-350,
+Avermedia M179, Hauppauge "Freestyle" or Yuan M600 cards will allow you to
+use dedicated hardware encoders rather than your CPU. Release 0.13 of MythTV
+is able to use these MPEG-2 encoders as an input device for live TV and for
+scheduled recordings.  (The PVR-350 can simultaneously be used as an output
+device.) Using the onboard MPEG-2 encoder drastically reduces the CPU
+requirements for encoding.</P>
 <P>Here are some data points for encoding:
 <UL>
 <LI>A Celeron 450 uses 2% CPU for encoding a 480x480 16Mbps MPEG-2 stream.</LI>
@@ -458,7 +462,9 @@ for Live TV at 416x480.</LI>
 </P>
 <P>See the 
 <A HREF="#pvr250">Hauppauge PVR-250/350 hardware MPEG-2 encoder.</A>
-section for information on installing a PVR-250 on Mandrake 9.1.</P>
+section for information on installing a PVR-250 on Mandrake 9.1.  The
+information contained in the section will also apply to other MPEG-2 encoder cards
+supported by the IVTV driver.</P>
 <P><B>NOTE</B>: The ATI All-in-Wonder cards (which are not the same as the ATI
 TV Wonder, TV Wonder VE or TV Wonder Pro) <EM>will not</EM> work as a MythTV
 capture device because the GATOS 
@@ -486,8 +492,8 @@ when using <CODE>btaudio</CODE>, and that often the audio recorded in this
 way will be mono only.  See the 
 <A HREF="#btaudio">btaudio</A>
 section for more information.</P>
-<P><B>NOTE</B>:  The PVR-250/350 does not require a sound card for audio
-capture.</P>
+<P><B>NOTE</B>:  The MPEG-2 cards supported by the IVTV driver do not require
+a sound card for audio capture.</P>
 <P><B>NOTE</B>:  Plugging a Line-level device into the Mic input is not
 recommended.  Line-level devices have higher volatages and can damage the
 soundcard.  In addition, even if it doesn't break your card, you will be
@@ -912,6 +918,9 @@ load the <CODE>lame</CODE> library without compiling from source.</P>
 
 <H3>Special instructions for Mandrake 8.2 </H3>
 
+<P><B>NOTE: These instructions will be removed on 2004-01-15.  Contact the
+HOWTO maintainer if you wish to create up-to-date docs for Mandrake
+8.2.</B></P>
 <P>Mandrake 8.2 does not have a pre-packaged libqt3-devel, so you must compile
 and install this manually.  The following command will install the
 prerequisites for qt3, so don't skip this step.  The simplest tool for
@@ -959,7 +968,6 @@ filenames will vary, so one you know the filename, you can install them with
 
 Once this has completed (it can take a while, so please be patient),
 continue by following the Mandrake 9.0 instructions.</P>
-
 <H3>Mandrake 8.2 and 9.0</H3>
 
 <P>The simplest tool for installing packages from the command line is
@@ -974,14 +982,6 @@ $ su
 # urpmi XFree86-devel perl
 </PRE>
 </CODE></BLOCKQUOTE>
-
-<HR>
-<PRE>
-NOTE for Mandrake 8.2 users: do not execute the following
-command.  You've already manually installed the files in the previous
-section.
-</PRE>
-<HR>
 
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -1008,10 +1008,6 @@ everything already installed
 </P>
 <P>In that case, you're ready to move to the next 
 <A HREF="#Setting_up_paths">section</A>.</P>
-<H3>Red Hat Linux 8.0</H3>
-
-<P>[Please submit instructions]</P>
-
 <H3>Gentoo. </H3>
 
 <P>If Qt has not been installed on your system: Edit
@@ -1370,8 +1366,17 @@ list of all the dependent packages you must download and install.
 <A HREF="#manually_building_mythtv">Manually building MythTV</A>.</P>
 <H3>Mandrake</H3>
 
-<P>You may install the XMLTV prerequisites if you have added a contrib
-mirror by typing:
+<P>RPMs for <B>XMLTV</B> and all of its dependencies are located in
+Mandrake's "contrib".  If you have added a contrib mirror, try installing
+<B>XMLTV</B>:
+<BLOCKQUOTE><CODE>
+<PRE>
+# urpmi xmltv
+</PRE>
+</CODE></BLOCKQUOTE>
+
+If this does not work, it is possible that contrib for your Mandrake version
+does not have <B>XMLTV</B>, so you may install the XMLTV prerequisites by typing:
 <BLOCKQUOTE><CODE>
 <PRE>
 # urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
@@ -1471,8 +1476,8 @@ $ su
 <P>Unpack MythTV
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythtv-0.12.tar.bz2
-$ cd mythtv-0.12
+$ tar -xjf mythtv-0.13.tar.bz2
+$ cd mythtv-0.13
 $ ./configure
 $ qmake mythtv.pro
 $ make
@@ -2247,7 +2252,7 @@ interact directly with </P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythtv-0.12/configfiles
+$ cd ~/mythtv-0.13/configfiles
 $ cp lircrc.example ~/.lircrc
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -3123,8 +3128,8 @@ Mandrake Control Center.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythweb-0.12.tar.bz2
-$ cd mythweb-0.12
+$ tar -xjf mythweb-0.13.tar.bz2
+$ cd mythweb-0.13
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -3167,8 +3172,8 @@ operational.</P>
 it.
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythgallery-0.12.tar.bz2
-$ cd mythgallery-0.12
+$ tar -xjf mythgallery-0.13.tar.bz2
+$ cd mythgallery-0.13
 $ qmake mythgallery.pro
 $ make
 # su
@@ -4247,6 +4252,22 @@ section on modifying
 <A HREF="#hauppauge_remote">Hauppauge PVR-250 remote and MythTV's native LIRC support.</A> for
 examples on finding and removing old versions of lirc.</P>
 
+<H2><A NAME="ss20.27">20.27</A> <A HREF="#toc20.27">MySQL not connecting correctly.</A>
+</H2>
+
+<P>Your <B>MySQL</B> installation may have networking turned off. 
+Check that <CODE>/etc/mysql/my.cnf</CODE> <EM>does not</EM> contain
+<CODE>skip-networking</CODE>.  If it does, remove it, and restart
+<B>MySQL</B>.</P>
+
+<H2><A NAME="ss20.28">20.28</A> <A HREF="#toc20.28">My screen goes black when I try to play something.</A>
+</H2>
+
+<P>MythTV prints error and status messages to the shell that was used to
+start the application.  If nothing seems to be happening when you try to
+view a program, try switching back to the shell and look for error messages
+there.</P>
+
 <H2><A NAME="s21">21.</A> <A HREF="#toc21">Miscellaneous. </A></H2>
 
 <H2><A NAME="ss21.1">21.1</A> <A HREF="#toc21.1">I'd like to watch the files without using MythTV / I'd like to convert the files to some other format. </A>
@@ -4454,7 +4475,7 @@ picture.</P>
 <P>See the <B>mysqldump</B> manpage for more information.
 <BLOCKQUOTE><CODE>
 <PRE>
-$ mysqldump -u mythtv -pmythtv mythconverg > mythtv_backup.sql
+$ mysqldump -u mythtv -pmythtv mythconverg -c > mythtv_backup.sql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -5472,7 +5493,5 @@ percentage after it has been created using the <B>tune2fs</B> program:
 </P>
 <P>You can check on your filesystem using the <B>dumpe2fs</B> program.  See
 the <B>man</B> page for details.</P>
-
-
 </BODY>
 </HTML>

@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-12-08, v2.91
+<date>2003-12-10, v0.13.00
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -33,7 +33,7 @@ Searchable archives for the lists are available at <url
 url="http://www.gossamer-threads.com/archive/MythTV_C2/"
 name="http://www.gossamer-threads.com/archive/MythTV_C2/">.
 
-This HOWTO is for MythTV v0.12.
+This HOWTO is for MythTV v0.13.
 
 <sect>Introduction.
 <p>This HOWTO document will focus on manually building MythTV in a North
@@ -188,9 +188,9 @@ information.
 filesystem that will allow you to create large files.  Filesystems known to
 have problems with large files are FAT and FAT32.
 
-Because of these large files, it may be useful to plan for future expansion
-right from the beginning.  If your case and power supply have the capability
-for additional hard drives, read through the <ref id="LVM"
+Because of the size of these files, it may be useful to plan for future
+expansion right from the beginning.  If your case and power supply have the
+capability for additional hard drives, read through the <ref id="LVM"
 name="LVM"> and <ref id="advancedpartitionformatting" name="Advanced
 Partition Formatting"> sections for some pointers.
 
@@ -232,13 +232,15 @@ You want to see the <tt>bttv</tt> module listed.
 
 While inexpensive video-capture cards just capture raw frames, leaving
 encoding to software, some higher-end cards incorporate hardware-level
-encoding. Using either a G200 MJPEG encoder card, or a WinTV-PVR-250 or 350
-from Hauppauge and the driver from the IvyTV project <url
-url="http://ivtv.sourceforge.net/" name="http://ivtv.sourceforge.net/"> will
-allow you to use dedicated hardware encoders rather than your CPU. Release
-0.12 of MythTV is able to use the PVR-250/350 cards as an input device for
-live TV and for scheduled recordings.  Using the onboard MPEG-2 encoder
-drastically reduces the CPU requirements for encoding.
+encoding. Using either a G200 MJPEG encoder card, or a MPEG-2 encoder card
+supported by the IvyTV project <url url="http://ivtv.sourceforge.net/"
+name="http://ivtv.sourceforge.net/"> such as the Hauppauge PVR-250, PVR-350,
+Avermedia M179, Hauppauge "Freestyle" or Yuan M600 cards will allow you to
+use dedicated hardware encoders rather than your CPU. Release 0.13 of MythTV
+is able to use these MPEG-2 encoders as an input device for live TV and for
+scheduled recordings.  (The PVR-350 can simultaneously be used as an output
+device.) Using the onboard MPEG-2 encoder drastically reduces the CPU
+requirements for encoding.
 
 Here are some data points for encoding:
 <itemize>
@@ -258,7 +260,9 @@ for Live TV at 416x480.
 </itemize>
 
 See the <ref id="pvr250" name="Hauppauge PVR-250/350 hardware MPEG-2 encoder.">
-section for information on installing a PVR-250 on Mandrake 9.1.
+section for information on installing a PVR-250 on Mandrake 9.1.  The
+information contained in the section will also apply to other MPEG-2 encoder cards
+supported by the IVTV driver.
 
 <bf>NOTE</bf>: The ATI All-in-Wonder cards (which are not the same as the ATI
 TV Wonder, TV Wonder VE or TV Wonder Pro) <em>will not</em> work as a MythTV
@@ -287,8 +291,8 @@ when using <tt>btaudio</tt>, and that often the audio recorded in this
 way will be mono only.  See the <ref id="btaudio" name="btaudio">
 section for more information.
 
-<bf>NOTE</bf>:  The PVR-250/350 does not require a sound card for audio
-capture.
+<bf>NOTE</bf>:  The MPEG-2 cards supported by the IVTV driver do not require
+a sound card for audio capture.
 
 <bf>NOTE</bf>:  Plugging a Line-level device into the Mic input is not
 recommended.  Line-level devices have higher volatages and can damage the
@@ -709,7 +713,13 @@ mirror.  You will most likely need to add a "Contrib" mirror to your setup.
 If you add a site from the "Penguin Liberation Front", you will be able to
 load the <tt>lame</tt> library without compiling from source.
 
+<!-- Not sure if anyone is still using 8.2, and the minimum is now QT 3.1
+Drop this section by 2004-01-15 if no one complains.
+-->
 <sect4>Special instructions for Mandrake 8.2  
+<p><bf>NOTE: These instructions will be removed on 2004-01-15.  Contact the
+HOWTO maintainer if you wish to create up-to-date docs for Mandrake
+8.2.</bf>
 <p>Mandrake 8.2 does not have a pre-packaged libqt3-devel, so you must compile
 and install this manually.  The following command will install the
 prerequisites for qt3, so don't skip this step.  The simplest tool for
@@ -750,7 +760,6 @@ filenames will vary, so one you know the filename, you can install them with
 </verb></tscreen>
 Once this has completed (it can take a while, so please be patient),
 continue by following the Mandrake 9.0 instructions.
-
 <sect4>Mandrake 8.2 and 9.0
 <p>The simplest tool for installing packages from the command line is
 <bf>urpmi</bf>.
@@ -763,11 +772,13 @@ $ su
 # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
 # urpmi XFree86-devel perl
 </verb></tscreen>
+<!--
 <code>
 NOTE for Mandrake 8.2 users: do not execute the following
 command.  You've already manually installed the files in the previous
 section.
 </code>
+-->
 <tscreen><verb>
 # urpmi libqt3-devel
 </verb></tscreen>
@@ -785,10 +796,6 @@ everything already installed
 
 In that case, you're ready to move to the next <ref
 id="Setting_up_paths" name="section">.
-<sect3>Red Hat Linux 8.0
-
-<p>[Please submit instructions]
-
 <sect3>Gentoo. 
 <p>If Qt has not been installed on your system: Edit
 <tt>/etc/make.conf</tt> and locate the "USE" variable. If the line is
@@ -1099,8 +1106,14 @@ list of all the dependent packages you must download and install.
 If you install from this location you may skip to <ref id="manually_building_mythtv"
 name="Manually building MythTV">.
 <sect2>Mandrake
-<p>You may install the XMLTV prerequisites if you have added a contrib
-mirror by typing:
+<p>RPMs for <bf>XMLTV</bf> and all of its dependencies are located in
+Mandrake's "contrib".  If you have added a contrib mirror, try installing
+<bf>XMLTV</bf>:
+<tscreen><verb>
+# urpmi xmltv
+</verb></tscreen>
+If this does not work, it is possible that contrib for your Mandrake version
+does not have <bf>XMLTV</bf>, so you may install the XMLTV prerequisites by typing:
 <tscreen><verb>
 # urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
 </verb></tscreen>
@@ -1182,8 +1195,8 @@ $ su
 <sect1>Manually building MythTV.
 <p>Unpack MythTV
 <tscreen><verb>
-$ tar -xjf mythtv-0.12.tar.bz2
-$ cd mythtv-0.12
+$ tar -xjf mythtv-0.13.tar.bz2
+$ cd mythtv-0.13
 $ ./configure
 $ qmake mythtv.pro
 $ make
@@ -1856,7 +1869,7 @@ to control MythTV.  MythTV now includes native support for lirc and can
 interact directly with 
 
 <tscreen><verb>
-$ cd ~/mythtv-0.12/configfiles
+$ cd ~/mythtv-0.13/configfiles
 $ cp lircrc.example ~/.lircrc
 </verb></tscreen> 
 or
@@ -2681,8 +2694,8 @@ Mandrake Control Center.
 <sect1>Completing the installation.
 <p>
 <tscreen><verb>
-$ tar -xjf mythweb-0.12.tar.bz2
-$ cd mythweb-0.12
+$ tar -xjf mythweb-0.13.tar.bz2
+$ cd mythweb-0.13
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -2722,8 +2735,8 @@ operational.
 name="http://www.mythtv.org/"> and save it to a location where you can find
 it.
 <tscreen><verb>
-$ tar -xjf mythgallery-0.12.tar.bz2
-$ cd mythgallery-0.12
+$ tar -xjf mythgallery-0.13.tar.bz2
+$ cd mythgallery-0.13
 $ qmake mythgallery.pro
 $ make
 # su
@@ -3696,6 +3709,18 @@ section on modifying <ref id="modifying_ld.so.conf" name="/etc/ld.so.conf">.
 name="Hauppauge PVR-250 remote and MythTV's native LIRC support."> for
 examples on finding and removing old versions of lirc.
 
+<sect1>MySQL not connecting correctly.
+<p>Your <bf>MySQL</bf> installation may have networking turned off. 
+Check that <tt>/etc/mysql/my.cnf</tt> <em>does not</em> contain
+<tt>skip-networking</tt>.  If it does, remove it, and restart
+<bf>MySQL</bf>.
+
+<sect1>My screen goes black when I try to play something.
+<p>MythTV prints error and status messages to the shell that was used to
+start the application.  If nothing seems to be happening when you try to
+view a program, try switching back to the shell and look for error messages
+there.
+
 <sect>Miscellaneous. 
 <sect1>I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.  
 <p>MythTV comes with a utility called <bf>mythtranscode</bf> which can
@@ -3899,7 +3924,7 @@ picture.
 <sect1>I'd like to save or restore my database.
 <p>See the <bf>mysqldump</bf> manpage for more information.
 <tscreen><verb>
-$ mysqldump -u mythtv -pmythtv mythconverg > mythtv_backup.sql
+$ mysqldump -u mythtv -pmythtv mythconverg -c > mythtv_backup.sql
 </verb></tscreen>
 
 To restore: (assuming that you've dropped the database)
@@ -4828,207 +4853,15 @@ percentage after it has been created using the <bf>tune2fs</bf> program:
 
 You can check on your filesystem using the <bf>dumpe2fs</bf> program.  See
 the <bf>man</bf> page for details.
-
-
 </article>
 <!-- Revision History
-v2.00, 2003-03-14.  Initial release for 0.8.  Added xset command for
-screensaver. Added lirc for Mandrake 9.1
-v2.01, 2003-03-18.  Fixed some typos.
-v2.02, 2003-03-21.  RH8 pre-reqs for MythMusic.  plf for Mandrake liblame. 
-Changes throughout for Mandrake 9.1.  Started using "code" to seperate out
-special notes for certain distros.  Changed Mandrake instructions for
-getting the kernel-source.  More on DPMS / screensaver
-v2.03, 2003-03-24.  Added note about ivtv.  Less terse instructions to
-create a /mnt/store directory if you don't already have one.
-v2.04, 2003-03-27.  Added information on btaudio.  Added information on full
-duplex issues as reported by mythbackend.  Added information on -f flag to
-mysql.  Added info on mythbackend command-line options.
-v2.05, 2003-03-27.  Reformatted the examples in mythmusic a little.  Added
-Mandrake 9.1 mythmusic prereq.
-v2.06, 2003-03-27.  grammar error.  Added link to Axel Thimm's RPMs. 
-Expanded on the command line parameters to mythbackend.
-v2.07, 2003-03-31.  more b0rken btaudio.  Added to amixer commands.
-v2.08, 2003-04-07.  Updated XMLTV.
-v2.09, 2003-04-11.  Add spec for P4 2.4Ghz machine.  Added comment on repeat
-= commands for .lircrc file.
-v2.10, 2003-04-11.  Fixed typo.  AMD SSE info.  Channel removal information.
-v2.11, 2003-04-11.  Updated channel removal.
-v2.12, 2003-04-12.  keys.txt.  troubleshooting the remote.
-v2.13, 2003-04-15.  Update on PVR-250.
-v2.14, 2003-04-16.  Update on lirc hanging issues - Tivo remote can hang
-lirc.
-v2.15, 2003-04-23.  Specified that configuration is relative to the
-mythtv-0.8 directory.  Added urpmi for Mandrake Cooker for XMLTV
-prerequisites.  Added gist.com instructions.  Incorporated prerequisite
-text from Ray Olszewski [ray@comarre.com] with edits.
-v2.16, 2003-04-23.  Additional stuff in the hardware pre-req section.
-v2.17, 2003-04-24.  John Crombe's suggestion WRT ld.so.conf.  Another scan
-converter.  PVR250 initial docs.
-v2.18, 2003-04-25.  Minor edits.  Internal link to PVR250 instructions. 
-Added blackbox as a known-good WM.  Added link to email message about
-PVR-250 not showing inputs.  Updated mythweather debug (runtime option now),
-updated mythvideo settings file.
-v2.19, 2003-04-25.  Mythmusic playlist addition.  Mythmusic adjustments
-since it's now graphically setup.
-v2.20, 2003-04-25.  More CPU stats.  Fixed error in mythvideo path.
-v2.21, 2003-04-25.  Grammar error in PVR250 section.  NFS.  Auto-starting
-myth.
-v2.22, 2003-04-26.  PVR250 ptune.pl command.  Modify the ld.so.conf example. 
-More information on saving the mysql database.
-v2.23, 2003-04-28.  XMLTV version.  mythbackend startup as a daemon.
-Normalized spacing between tscreen tag and text.
-v2.24, 2003-04-28.  canada-cable.
-v2.25, 2003-04-29.  Additional btaudio card.  Added instructions for Gentoo
-mythbackend auto-start.
-v2.26, 2003-04-29.  Debugging info for threads.  Get rid of videodev2.h
-instructions; it's now in the Myth CVS.  Remove gist.com; they've shutdown. 
-v2.27, 2003-05-01.  New website for Mark Cooper's pvr hw database.  Better
-debug command for threads.
-v2.28, 2003-05-02.  MythWeb update for Mandrake.  mythweb db_open error. 
-ivtvfwextract is a perl file.  Added "-v" to mythbackend as daemon example.
-v2.29, 2003-05-04.  Updated CVS path.
-v2.30, 2003-05-05.  Updated PVR-250 instructions.  
-v2.31, 2003-05-06.  Blackbox focus update.
-v2.32, 2003-05-09.  Speeling correction.
-v2.33, 2003-05-10.  Added xset command to .xinitrc for blackbox.  Added
-.blackboxrc example.  Added link to nyvalls.se RPMS for Mandrake.  Added
-people to the contributors section.
-v2.34, 2003-05-14.  Updated PVR-250 example.  Remove ptune.pl stuff; it's
-changing too fast.  Updated gdb troubleshooting section.  Updated "can't CVS
-checkout anymore" section.
-v2.35, 2003-05-19.  Remove the depmod error advice in the PVR-250 since IVTV has fixed
-their Makefile.  Get rid of stuff that is too hard to keep up with, like the
-status of the ivtv driver and what it can and can't do.
-v2.36, 2003-05-21.  Added instructions on modifying the PVR250 bitrate. 
-Added Advanced Backend Configurations.  Fixed consistency of section
-headers.  PVR-250 audio troubleshooting.
-v2.37, 2003-05-25.  Fixed dangling close tag.  A little more on
-troubleshooting with gdb.
-v2.38, 2003-06-09.  Fix some more tags.  (WTF is it with the tags lately?)
-Update non-US mythtv website and POC.  Add the stuff about DNR for PVR-250. 
-Added Advanced Partition formatting section.  Fixed the chkconfig example to
-add -levels.
-v2.39, 2003-06-09.  Standardized on pre-requisite vs. prerequisite.  Modify
-lirc example so that the user knows that only certain kinds of serial
-modules should have the link to ttySx.  Altered the PVR-250 bitrate example.
-v2.40, 2003-06-09.  Fixed lirc acronym expansion.  sdl vs. SDL in Mandrake
-MythMusic.  Updated MythVideo docs.
-v2.41, 2003-06-09.  Bumped version numbers to 0.9.
-v2.42, 2003-06-09.  Added troubleshooting note on Suse.  Added the mkspecs
-->default error.
-v2.43, 2003-06-09.  Slight tweak to mkspecs troubleshooting.  Added the
-error message you get when QTDIR isn't set.
-v2.44, 2003-06-10.  Modify requirements for Gentoo - don't need KDE.
-v2.45, 2003-06-10.  QT vs. Qt  Added some mythmusic FAQ-type stuff.
-v2.46, 2003-06-11.  Added TV-out information by Ray Olszewski.  Adjusted CVS
-references to release.
-v2.47, 2003-06-11.  Added note that Canucks shouldn't use a space in the
-postal code in setup/XMLTV.  (Suggestion by "Chris Thompson" chris at
-hypocrite.org)
-v2.48, 2003-06-12.  Removed the note for Canadians since the setup screen
-now allows spaces for postal code.
-v2.49, 2003-06-12.  Incorporate items that are in the FAQ that aren't in the
-HOWTO yet.
-v2.50, 2003-06-18.  Updated MythGallery docs to fix itemize tag and added
-image rotation keys.  Add updated .fvwmrc example.  Added RH9.0
-stuff from Cedar, Matt and Jarod.  Reorg of some sections.  Added "PVR-250"
-to the "I'd like to use a hardware MPEG-2 encoder" title.
-v2.51, 2003-07-02.  Fixed MDZ's mplayer patch name and MPlayer version.  Bruce
-Markey's addition for updating the database.  Bumped version numbers to v0.10.
-v2.52, 2003-07-09.  Incorporate Ray Olszewski's modified section 4.  Dennis
-Lou's mythgallery doc update.  Updated XMLTV version.  Martin Smith's LVM
-contribution.  More detailed instructions on upgrading the database from one
-release to another.  Remove the "can't start early" from 10.1.  Put back the
-PDF version.
-v2.53, 2003-07-13.  Add link to searchable archive right near the top.  Added
-"Channels off by one".  Added a little more details about the "error" in the
-ivtv make.  Moved/added keys.txt to more prominent positions in the HOWTO. 
-Added note that you don't need to transcode .nuv files if they're made by a
-PVR-250/350.  Added example for LVM/ext2 and ext3.  Added note to not run
-XMLTV 0.5.15 if you're not running CVS.  Add link in first section to single
-page and PDF version of docs.
-v2.54, 2003-07-21.  Fix grammar in LVM section.  Axel Thimm's updates.
-v2.55, 2003-07-29.  Added GeForce MX420 PCI as working.  Don't add multiple
-sources to inputs unless there's something actually on them.  Add link to
-troubleshooting audio in Alsa section.  Modify lirc section so people don't
-get confused about the example vs. _their_ setup.  Add IR keyboard/learning
-remote option to lirc section.
-v2.56, 2003-08-03.  version 2^8.  ATI All-in-Wonder doesn't work as a capture
-device, so quit asking.  Don't use a FAT filesystem and expect things to
-magically work when creating a 2GB file.
-v2.57, 2003-08-18.  Add link back to CVS instructions from "Downloading and
-compiling".  Added additional examples to mythbackend -help
-v2.58/2.59, 2003-08-19.  Version bump.  Added example if LVM needs new method of
-adding partitions. Gentoo updates from Max Kalika max@gentoo.org.  XMLTV
-version update.  Add MythDVD section.  Add MythWeb2 section.
-v2.60, 2003-08-19.  MythWeb2 is now the default, but is called MythWeb, so
-get rid of the just-added section.  Add instructions for generating
-htpasswd.
-v2.61, 2003-08-19.  Correct name of program to generate passwords for
-apache.
-v2.62, 2003-08-20.  Added pointer to conf.php for MythWeb.  Transcoder docs
-from mythtv-dev list by Geoffrey Hausheer ou401cru02*sneakemail.com. 
-htaccess file has more than just authentication, so don't tell people to
-delete it if they want to.
-v2.63, 2003-08-20.  Updated and expanded Debian-specific information.
-v2.64, 2003-08-21.  MythDVD instructions.  Work in progress.
-v2.65, 2003-08-21.  Change "add below" to "above" in PVR section.  Guess
-they flip-flopped at some point. Add some advice about mixer levels.  Add
-libid3tag to MythMusic section.
-v2.66, 2003-08-23.  Move transcoder docs to Misc section.
-v2.67, 2003-08-31.  Update XMLTV version.  Jarod Wilson's update.  New
-Hauppauge firmware version.
-v2.68, 2003-08-31.  Explicit instructions on woody vs. unstable Debian
-packages, minor typo fix
-v2.69, 2003-09-06.  Incorporate some suggestions from -users about CVS.  Add
-pointer to custom distributions.
-v2.70, 2003-09-06.  Add a section for Debian-specific build
-instructions,and an example of how to build from the source package
-v2.71, 2003-09-09.  Get rid of "can't CVS anymore" - it's been switched for
-a while now.
-v2.72, 2003-09-11.  Got to qmake before make now. Add GDB section title.
-v2.73, 2003-09-11.  Make the qmake thing a little more specific.
-v2.74, 2003-09-15.  Update the PVR-250 modules.conf.  Add a little more to
-PVR-250 troubleshooting.
-v2.75, 2003-09-17.  Don't connect line level stuff to the mic input.  Bad
-things can happen. Holger.Beetz at debitel.net
-v2.76, 2003-09-18.  Add a check for "Am I running the correct msp3400"?
-v2.77, 2003-09-18.  Add a check for lirc_i2c and lirc_dev in unusual places. 
-Stupid Mandrake.  Add section for lirc-0.7.0/Hauppauge remotes.  Discuss
-native lirc support.  Start thinking about a re-write of the lirc section -
-it's confusing.
-v2.78, 2003-09-18.  Fix a dangling pointer and a split header.
-v2.79, 2003-09-19.  Create a dedicated "examples" section, move stuff to it. 
-Get rid of some old crap.  Talk about LVM sooner in the doc.  Add a section
-for MythNews.
-v2.80, 2003-09-21.  Fix LVM acronym.  Explicit filenames for lirc to look
-for if it's not working.  modinfo examples of pathname to check that the
-correct modules are being loaded.  "Troubleshooting PVR-250" section.
-v2.81, 2003-09-24.  Put PVR-250 troubleshooting in the troubleshooting
-section.  Correct troubleshooting step.  Fix section header for PVR-250. 
-Full path for lircd.  Incorporate suggestion from -users on test_ioctl and
--d parameter.
-v2.82, 2003-09-29.  Changed website for KnoppMyth.  Fix some typos.
-v2.83, 2003-10-05.  Incorporate frontend-only docs.  Update XMLTV version. 
-Differentiate between ATI All-in-Wonder and TV Wonder cards for people that
-don't know the difference.  Remove the manual test_ioctl stuff for PVR-250
-bitrate since we now have profile support.
-v2.84, 2003-10-15.  Bruce's updates to docs; contribution from Michael Greb
-for Xbox frontend.  Fix tag in section 3.  Bump to v 0.12.  Get rid of
-database upgrade step since it's now done automatically.  Add a thing in the
-hardware section about the PVR-350 as a TV-out.
-v2.85, 2003-10-21.  Update Gentoo section; mythtv is now "stable".
-v2.86, 2003-10-24.  Fix typo in themes example.  Replace section on patching
-MPlayer.
-v2.87, 2003-10-25.  Add link to nuvexport website.  Fix broken section header for
-mythtranscode.
-v2.88, 2003-11-01.  Fix PVR-250 firmware version.  Geoffrey Hausheer's 10.5
-revision.  Incorporate bstoneaz suggestion on crontab location.
-v2.89, 2003-11-04.  Add note on Debian .debs, remove Cedar from authors
-section, add note on RH8, add note for Qt3.1 minimum.
-v2.90, 2003-11-09.  Update XMLTV version.
-v2.91, 2003-12-08.  Update XMLTV version.  Fix "MPEG44".
+v0.13.00, 2003-12-10.  Initial version for MythTV v0.13.  Rename docs
+version to match.  Add troubleshooting step for the MySQL "skip networking"
+issue.  Add -c to mysqldump to explicitly state insert parameters.  Add
+XMLTV as a Mandrake package.  Add troubleshooting step: "Look at the shell
+for error messages".  Add a warning for Mandrake 8.2: docs are going to get
+dumped unless a maintainer comes forward.  Look out, Redhat 8.0.  You're
+next.
 -->
 
 <!--

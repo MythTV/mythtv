@@ -119,9 +119,9 @@ information.</P>
 <P>MythTV creates large files, many in excess of 2GB.  You <EM>must</EM> use a
 filesystem that will allow you to create large files.  Filesystems known to
 have problems with large files are FAT and FAT32.</P>
-<P>Because of these large files, it may be useful to plan for future expansion
-right from the beginning.  If your case and power supply have the capability
-for additional hard drives, read through the 
+<P>Because of the size of these files, it may be useful to plan for future
+expansion right from the beginning.  If your case and power supply have the
+capability for additional hard drives, read through the 
 <A HREF="mythtv-HOWTO-22.html#LVM">LVM</A> and 
 <A HREF="mythtv-HOWTO-22.html#advancedpartitionformatting">Advanced Partition Formatting</A> sections for some pointers.</P>
 <P>
@@ -164,13 +164,15 @@ the bttv modules by typing:
 <P>You want to see the <CODE>bttv</CODE> module listed.</P>
 <P>While inexpensive video-capture cards just capture raw frames, leaving
 encoding to software, some higher-end cards incorporate hardware-level
-encoding. Using either a G200 MJPEG encoder card, or a WinTV-PVR-250 or 350
-from Hauppauge and the driver from the IvyTV project 
-<A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A> will
-allow you to use dedicated hardware encoders rather than your CPU. Release
-0.12 of MythTV is able to use the PVR-250/350 cards as an input device for
-live TV and for scheduled recordings.  Using the onboard MPEG-2 encoder
-drastically reduces the CPU requirements for encoding.</P>
+encoding. Using either a G200 MJPEG encoder card, or a MPEG-2 encoder card
+supported by the IvyTV project 
+<A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A> such as the Hauppauge PVR-250, PVR-350,
+Avermedia M179, Hauppauge "Freestyle" or Yuan M600 cards will allow you to
+use dedicated hardware encoders rather than your CPU. Release 0.13 of MythTV
+is able to use these MPEG-2 encoders as an input device for live TV and for
+scheduled recordings.  (The PVR-350 can simultaneously be used as an output
+device.) Using the onboard MPEG-2 encoder drastically reduces the CPU
+requirements for encoding.</P>
 <P>Here are some data points for encoding:
 <UL>
 <LI>A Celeron 450 uses 2% CPU for encoding a 480x480 16Mbps MPEG-2 stream.</LI>
@@ -190,7 +192,9 @@ for Live TV at 416x480.</LI>
 </P>
 <P>See the 
 <A HREF="mythtv-HOWTO-22.html#pvr250">Hauppauge PVR-250/350 hardware MPEG-2 encoder.</A>
-section for information on installing a PVR-250 on Mandrake 9.1.</P>
+section for information on installing a PVR-250 on Mandrake 9.1.  The
+information contained in the section will also apply to other MPEG-2 encoder cards
+supported by the IVTV driver.</P>
 <P><B>NOTE</B>: The ATI All-in-Wonder cards (which are not the same as the ATI
 TV Wonder, TV Wonder VE or TV Wonder Pro) <EM>will not</EM> work as a MythTV
 capture device because the GATOS 
@@ -218,8 +222,8 @@ when using <CODE>btaudio</CODE>, and that often the audio recorded in this
 way will be mono only.  See the 
 <A HREF="mythtv-HOWTO-21.html#btaudio">btaudio</A>
 section for more information.</P>
-<P><B>NOTE</B>:  The PVR-250/350 does not require a sound card for audio
-capture.</P>
+<P><B>NOTE</B>:  The MPEG-2 cards supported by the IVTV driver do not require
+a sound card for audio capture.</P>
 <P><B>NOTE</B>:  Plugging a Line-level device into the Mic input is not
 recommended.  Line-level devices have higher volatages and can damage the
 soundcard.  In addition, even if it doesn't break your card, you will be
@@ -644,6 +648,9 @@ load the <CODE>lame</CODE> library without compiling from source.</P>
 
 <H3>Special instructions for Mandrake 8.2 </H3>
 
+<P><B>NOTE: These instructions will be removed on 2004-01-15.  Contact the
+HOWTO maintainer if you wish to create up-to-date docs for Mandrake
+8.2.</B></P>
 <P>Mandrake 8.2 does not have a pre-packaged libqt3-devel, so you must compile
 and install this manually.  The following command will install the
 prerequisites for qt3, so don't skip this step.  The simplest tool for
@@ -691,7 +698,6 @@ filenames will vary, so one you know the filename, you can install them with
 
 Once this has completed (it can take a while, so please be patient),
 continue by following the Mandrake 9.0 instructions.</P>
-
 <H3>Mandrake 8.2 and 9.0</H3>
 
 <P>The simplest tool for installing packages from the command line is
@@ -706,14 +712,6 @@ $ su
 # urpmi XFree86-devel perl
 </PRE>
 </CODE></BLOCKQUOTE>
-
-<HR>
-<PRE>
-NOTE for Mandrake 8.2 users: do not execute the following
-command.  You've already manually installed the files in the previous
-section.
-</PRE>
-<HR>
 
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -740,10 +738,6 @@ everything already installed
 </P>
 <P>In that case, you're ready to move to the next 
 <A HREF="mythtv-HOWTO-4.html#Setting_up_paths">section</A>.</P>
-<H3>Red Hat Linux 8.0</H3>
-
-<P>[Please submit instructions]</P>
-
 <H3>Gentoo. </H3>
 
 <P>If Qt has not been installed on your system: Edit

@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-12-08, v2.91
+  2003-12-10, v0.13.00
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -45,8 +45,7 @@
            3.2.4.1 Mandrake
               3.2.4.1.1 Special instructions for Mandrake 8.2
               3.2.4.1.2 Mandrake 8.2 and 9.0
-           3.2.4.2 Red Hat Linux 8.0
-           3.2.4.3 Gentoo.
+           3.2.4.2 Gentoo.
 
   4. System Configuration Requirements for Compiling MythTV
      4.1 Software requirements for compiling MythTV
@@ -182,6 +181,8 @@
      20.24 I can't change the channel when watching Live TV.
      20.25 When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"
      20.26 Troubleshooting the Hauppauge PVR-250 IR remote
+     20.27 MySQL not connecting correctly.
+     20.28 My screen goes black when I try to play something.
 
   21. Miscellaneous.
      21.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
@@ -240,7 +241,7 @@
   http://www.gossamer-threads.com/archive/MythTV_C2/
   <http://www.gossamer-threads.com/archive/MythTV_C2/>.
 
-  This HOWTO is for MythTV v0.12.
+  This HOWTO is for MythTV v0.13.
 
 
   [1m2.  Introduction.[0m
@@ -275,7 +276,6 @@
   +o  Developer:  Matt Zimmerman,  <mailto:mdz@debian.org>
 
   +o  Developer:  John Danner,  <mailto:jdanner@untzuntz.com>
-
 
   +o  Developer:  Chris Pinkham,  <mailto:cpinkham@bc2va.org>
 
@@ -435,10 +435,10 @@
   filesystem that will allow you to create large files.  Filesystems
   known to have problems with large files are FAT and FAT32.
 
-  Because of these large files, it may be useful to plan for future
-  expansion right from the beginning.  If your case and power supply
-  have the capability for additional hard drives, read through the
-  ``LVM'' and ``Advanced Partition Formatting'' sections for some
+  Because of the size of these files, it may be useful to plan for
+  future expansion right from the beginning.  If your case and power
+  supply have the capability for additional hard drives, read through
+  the ``LVM'' and ``Advanced Partition Formatting'' sections for some
   pointers.
 
 
@@ -485,12 +485,14 @@
 
   While inexpensive video-capture cards just capture raw frames, leaving
   encoding to software, some higher-end cards incorporate hardware-level
-  encoding. Using either a G200 MJPEG encoder card, or a WinTV-PVR-250
-  or 350 from Hauppauge and the driver from the IvyTV project
-  http://ivtv.sourceforge.net/ <http://ivtv.sourceforge.net/> will allow
+  encoding. Using either a G200 MJPEG encoder card, or a MPEG-2 encoder
+  card supported by the IvyTV project http://ivtv.sourceforge.net/
+  <http://ivtv.sourceforge.net/> such as the Hauppauge PVR-250, PVR-350,
+  Avermedia M179, Hauppauge "Freestyle" or Yuan M600 cards will allow
   you to use dedicated hardware encoders rather than your CPU. Release
-  0.12 of MythTV is able to use the PVR-250/350 cards as an input device
-  for live TV and for scheduled recordings.  Using the onboard MPEG-2
+  0.13 of MythTV is able to use these MPEG-2 encoders as an input device
+  for live TV and for scheduled recordings.  (The PVR-350 can
+  simultaneously be used as an output device.) Using the onboard MPEG-2
   encoder drastically reduces the CPU requirements for encoding.
 
   Here are some data points for encoding:
@@ -514,7 +516,9 @@
      80% CPU.
 
   See the ``Hauppauge PVR-250/350 hardware MPEG-2 encoder.''  section
-  for information on installing a PVR-250 on Mandrake 9.1.
+  for information on installing a PVR-250 on Mandrake 9.1.  The
+  information contained in the section will also apply to other MPEG-2
+  encoder cards supported by the IVTV driver.
 
   [1mNOTE[22m: The ATI All-in-Wonder cards (which are not the same as the ATI
   TV Wonder, TV Wonder VE or TV Wonder Pro) [4mwill[24m [4mnot[24m work as a MythTV
@@ -545,8 +549,8 @@
   using btaudio, and that often the audio recorded in this way will be
   mono only.  See the ``btaudio'' section for more information.
 
-  [1mNOTE[22m:  The PVR-250/350 does not require a sound card for audio
-  capture.
+  [1mNOTE[22m:  The MPEG-2 cards supported by the IVTV driver do not require a
+  sound card for audio capture.
 
   [1mNOTE[22m:  Plugging a Line-level device into the Mic input is not
   recommended.  Line-level devices have higher volatages and can damage
@@ -596,6 +600,7 @@
   threads.com/archive/MythTV_C2/Users_F11/ <http://www.gossamer-
   threads.com/archive/MythTV_C2/Users_F11/> using the card name in your
   search string.
+
 
 
   [1m3.1.8.1.  ATI[0m
@@ -660,6 +665,7 @@
   +o  Matrox Millennium 550GX AGP. Uses external adapter to provide
      Composite and S-Video ports. TV-out implementation does [4mNOT[24m support
      XVideo.
+
 
 
   [1m3.1.8.3.  nVidia[0m
@@ -802,7 +808,8 @@
   atrpms-kickstart package <http://atrpms.physik.fu-
   berlin.de/dist/rh9/atrpms-kickstart/>.  Install the package with:
 
-  # rpm -Uvh atrpms-kickstart*
+
+       # rpm -Uvh atrpms-kickstart*
 
 
 
@@ -919,6 +926,8 @@
 
   [1m3.2.3.  Graphical installation tools.[0m
 
+
+
   [1m3.2.3.1.  Mandrake 9.0[0m
 
   On systems running KDE, a tool which will allow you to see what
@@ -984,6 +993,7 @@
   packages at installation time, or once the system is up and running.
   You can access this program by selecting
 
+
   RedHatMenu>System Settings>Packages
 
 
@@ -997,6 +1007,7 @@
   +o  SQL Database Server -  you will have to click on "details" and make
      sure "mysql-server" is checked.  (only required on the master
      system)
+
   +o  Development Tools
 
   +o  X Software Development
@@ -1047,6 +1058,10 @@
 
   [1m3.2.4.1.1.  Special instructions for Mandrake 8.2[0m
 
+  [1mNOTE: These instructions will be removed on 2004-01-15.  Contact the[0m
+  [1mHOWTO maintainer if you wish to create up-to-date docs for Mandrake[0m
+  [1m8.2.[0m
+
   Mandrake 8.2 does not have a pre-packaged libqt3-devel, so you must
   compile and install this manually.  The following command will install
   the prerequisites for qt3, so don't skip this step.  The simplest tool
@@ -1057,8 +1072,8 @@
 
 
 
-  $ urpmi mesa-common-devel libmng1-devel mysql-devel libunixodbc2-devel
-  $ urpmi postgresql-devel xfree86-static-libs
+       $ urpmi mesa-common-devel libmng1-devel mysql-devel libunixodbc2-devel
+       $ urpmi postgresql-devel xfree86-static-libs
 
 
 
@@ -1097,7 +1112,6 @@
   Once this has completed (it can take a while, so please be patient),
   continue by following the Mandrake 9.0 instructions.
 
-
   [1m3.2.4.1.2.  Mandrake 8.2 and 9.0[0m
 
   The simplest tool for installing packages from the command line is
@@ -1111,14 +1125,6 @@
        $ su
        # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
        # urpmi XFree86-devel perl
-
-
-
-  ______________________________________________________________________
-  NOTE for Mandrake 8.2 users: do not execute the following
-  command.  You've already manually installed the files in the previous
-  section.
-  ______________________________________________________________________
 
 
 
@@ -1143,12 +1149,7 @@
 
   In that case, you're ready to move to the next ``section''.
 
-  [1m3.2.4.2.  Red Hat Linux 8.0[0m
-
-  [Please submit instructions]
-
-
-  [1m3.2.4.3.  Gentoo.[0m
+  [1m3.2.4.2.  Gentoo.[0m
 
   If Qt has not been installed on your system: Edit /etc/make.conf and
   locate the "USE" variable. If the line is commented out, remove the
@@ -1173,9 +1174,7 @@
   /etc/make.conf and rebuild Qt by running
 
 
-
-  # emerge qt
-
+       # emerge qt
 
 
   All the necessary files will be downloaded and built. Even on a fast
@@ -1238,6 +1237,8 @@
        # /sbin/ldconfig
        # exit
        $
+
+
 
   [1m4.2.2.  Distribution-Specific Notes[0m
 
@@ -1528,8 +1529,17 @@
 
   [1m5.3.2.  Mandrake[0m
 
-  You may install the XMLTV prerequisites if you have added a contrib
-  mirror by typing:
+  RPMs for [1mXMLTV [22mand all of its dependencies are located in Mandrake's
+  "contrib".  If you have added a contrib mirror, try installing [1mXMLTV[22m:
+
+
+       # urpmi xmltv
+
+
+
+  If this does not work, it is possible that contrib for your Mandrake
+  version does not have [1mXMLTV[22m, so you may install the XMLTV prerequi-
+  sites by typing:
 
 
        # urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
@@ -1588,6 +1598,8 @@
 
   Install the xmltv prerequisites:
 
+
+
        $ su
        # perl -MCPAN -e shell
        cpan> install XML::Twig
@@ -1628,8 +1640,8 @@
   Unpack MythTV
 
 
-       $ tar -xjf mythtv-0.12.tar.bz2
-       $ cd mythtv-0.12
+       $ tar -xjf mythtv-0.13.tar.bz2
+       $ cd mythtv-0.13
        $ ./configure
        $ qmake mythtv.pro
        $ make
@@ -1700,9 +1712,10 @@
   official Portage tree.
 
 
-       $ su -
-       # emerge --sync # make sure portage is up to date.
-       # vi /etc/make.conf
+
+  $ su -
+  # emerge --sync # make sure portage is up to date.
+  # vi /etc/make.conf
 
 
 
@@ -1710,6 +1723,8 @@
 
 
        # emerge mythtv
+
+
 
   [1m6.  MySQL.[0m
 
@@ -1758,7 +1773,6 @@
   which may or may not be one of your MythTV boxes.  If the database is
   on a non-MythTV machine you'll need to copy the database/mc.sql file
   to it.
-
   To setup the initial mysql databases:
 
 
@@ -1771,6 +1785,8 @@
 
 
        $ mysql -u root < mc.sql
+
+
 
   [1m6.4.2.  Debian 3.0[0m
 
@@ -1881,7 +1897,6 @@
   "ON"; this insures that the Line-in is used as the source.  Click OK,
   and make sure that you save the settings so that this is your default.
 
-
   [1m7.1.1.1.  Using OSS drivers.[0m
 
   Red Hat Linux 8.0 ships with OSS sound drivers rather than the ALSA
@@ -1898,7 +1913,6 @@
   to install ALSA you must do this:
 
   To configure sound to work with MythTV, select
-
 
   RedHat Menu>Sound &
   Video>Volume Control
@@ -1954,22 +1968,21 @@
   Install the rest of the packages:
 
 
-
-  $ cd ~
-  $ tar -xjf alsa-lib-0.9.x.tar.bz2
-  $ cd alsa-lib-0.9.x
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $ cd ..
-  $ tar -xjf alsa-utils-0.9.x.tar.bz2
-  $ cd alsa-utils-0.9.x
-  $ ./configure
-  $ make
-  $ su
-  # make install
+       $ cd ~
+       $ tar -xjf alsa-lib-0.9.x.tar.bz2
+       $ cd alsa-lib-0.9.x
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $ cd ..
+       $ tar -xjf alsa-utils-0.9.x.tar.bz2
+       $ cd alsa-utils-0.9.x
+       $ ./configure
+       $ make
+       $ su
+       # make install
 
 
 
@@ -2018,7 +2031,7 @@
   you can do as root with:
 
 
-  # alsactl -f /etc/asound.state store
+       # alsactl -f /etc/asound.state store
 
 
 
@@ -2142,9 +2155,8 @@
   Install using urpmi.
 
 
-
-  $ su
-  # urpmi kernel-source
+       $ su
+       # urpmi kernel-source
 
 
 
@@ -2198,8 +2210,6 @@
   making and installing the lirc driver.
 
   Once the configuration step is complete:
-
-
 
   $ make
   $ su
@@ -2447,7 +2457,7 @@
   The next step is to convert those signals into something that can be
   used to control MythTV.  MythTV now includes native support for lirc
   and can interact directly with
-       $ cd ~/mythtv-0.12/configfiles
+       $ cd ~/mythtv-0.13/configfiles
        $ cp lircrc.example ~/.lircrc
 
 
@@ -3417,8 +3427,8 @@
 
 
 
-       $ tar -xjf mythweb-0.12.tar.bz2
-       $ cd mythweb-0.12
+       $ tar -xjf mythweb-0.13.tar.bz2
+       $ cd mythweb-0.13
        $ su
        # mkdir /var/www/html/mythweb
        # cp -r . /var/www/html/mythweb
@@ -3466,8 +3476,8 @@
   it.
 
 
-       $ tar -xjf mythgallery-0.12.tar.bz2
-       $ cd mythgallery-0.12
+       $ tar -xjf mythgallery-0.13.tar.bz2
+       $ cd mythgallery-0.13
        $ qmake mythgallery.pro
        $ make
        # su
@@ -4628,6 +4638,19 @@
   support.'' for examples on finding and removing old versions of lirc.
 
 
+  [1m20.27.  MySQL not connecting correctly.[0m
+
+  Your [1mMySQL [22minstallation may have networking turned off.  Check that
+  /etc/mysql/my.cnf [4mdoes[24m [4mnot[24m contain skip-networking.  If it does,
+  remove it, and restart [1mMySQL[22m.
+
+
+  [1m20.28.  My screen goes black when I try to play something.[0m
+
+  MythTV prints error and status messages to the shell that was used to
+  start the application.  If nothing seems to be happening when you try
+  to view a program, try switching back to the shell and look for error
+  messages there.
   [1m21.  Miscellaneous.[0m
 
   [1m21.1.  I'd like to watch the files without using MythTV / I'd like to[0m
@@ -4641,6 +4664,7 @@
   (http://forevermore.net/myth/ <http://forevermore.net/myth/>) are
   better suited for the end user.  However, since [1mmythtranscode [22mcan be a
   useful tool, directions on using it follow.
+
   [1mmythtranscode [22mcreates raw streams, which means that they do not
   contain any container information such as resolution, frame-rate, or
   audio sampling rate.  In order to process the output, you must supply
@@ -4691,9 +4715,8 @@
 
   Using ffmepg:
 
-
-       ffmpeg -f u16le -ar 32000 -ac 2 -i audout -f rawvideo -s 640x480 -r 29.97 \
-       -i vidout -vcodec mpeg4 -b 2000 -acodec mp3 -ab 128 out.avi
+  ffmpeg -f u16le -ar 32000 -ac 2 -i audout -f rawvideo -s 640x480 -r 29.97 \
+  -i vidout -vcodec mpeg4 -b 2000 -acodec mp3 -ab 128 out.avi
 
 
 
@@ -4702,6 +4725,7 @@
 
        mplayer -audiofile audout -audio-demuxer 20 -rawaudio rate=32000 \
        -rawvideo on:w=640:h=480:fps=29.97 vidout
+
 
 
   If you wanted to write the raw data to separate audio and video files
@@ -4866,7 +4890,7 @@
   See the [1mmysqldump [22mmanpage for more information.
 
 
-       $ mysqldump -u mythtv -pmythtv mythconverg > mythtv_backup.sql
+       $ mysqldump -u mythtv -pmythtv mythconverg -c > mythtv_backup.sql
 
 
 
@@ -4883,8 +4907,6 @@
   You may need to alter the mysql permissions if this database is being
   shared with multiple systems.  See the ``Modifying access to the MySQL
   database for multiple systems'' section for more information.
-
-
   [1m21.6.  I'd like to delete the mysql database.[0m
 
   [1mNOTE[22m:  Performing this step will remove the entire database.  You will
@@ -4964,8 +4986,8 @@
   channel 15:
 
 
-  $ mysql -u root mythconverg
-  mysql> delete from channel where chanid = '1015';
+       $ mysql -u root mythconverg
+       mysql> delete from channel where chanid = '1015';
 
 
 
@@ -5024,6 +5046,8 @@
        Style myth* NoTitle, NoHandles, Sticky, WindowListSkip, SloppyFocus, GrabFocus, BorderWidth 0
        ^D
        $
+
+
 
   The following also works with blackbox:
 
@@ -5088,10 +5112,10 @@
   runlevels 3, 4 or 5:
 
 
-  $ su
-  # chkconfig --level 345 mythbackend on
-  # exit
-  $
+       $ su
+       # chkconfig --level 345 mythbackend on
+       # exit
+       $
 
 
 
@@ -5132,13 +5156,12 @@
   to edit the /etc/security/msec/perm.local file to include the
   following:
 
-
-       # /etc/security/msec/perm.local
-       # Local overrides to the msec program
-       #
-       # Full file path                user.group              permissions
-       /var/log/mythtv/                root.mythtv             775
-       /var/log/mythtv/*               root.mythtv             664
+  # /etc/security/msec/perm.local
+  # Local overrides to the msec program
+  #
+  # Full file path                user.group              permissions
+  /var/log/mythtv/                root.mythtv             775
+  /var/log/mythtv/*               root.mythtv             664
 
 
 
@@ -5146,11 +5169,10 @@
   may add it by typing:
 
 
-
-  $ cd contrib
-  $ su
-  # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
-  # exit
+       $ cd contrib
+       $ su
+       # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
+       # exit
 
 
 
@@ -5272,7 +5294,6 @@
   program under the host-specific settings: set the Transcoder Auto-run
   checkbox
 
-
   For either manual or automatic transcoding: start mythbackend start
   mythfrontend select setup, and the Transcoding recording profile.  now
   select either RTJPEG or MPEG-4 (selecting any of the hardware encoders
@@ -5327,8 +5348,6 @@
        $ su
        # urpmi kernel-source
 
-
-
   [1mNOTE[22m:  You do not need to recompile your kernel.
 
   Download the IVTV driver from CVS:
@@ -5337,6 +5356,8 @@
        $ cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/ivtv login
        <enter> as password
        $ cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/ivtv co ivtv
+
+
 
   This should create an ivtv directory.  Switch to it and perform the
   following commands:
@@ -5399,10 +5420,9 @@
   the appropriate modules directory:
 
 
-
-  $ su
-  # make install
-  # depmod -a
+       $ su
+       # make install
+       # depmod -a
 
 
 
@@ -5460,7 +5480,6 @@
   The remaining setup is just like a standard V4L card; define a video
   source if you have not already done so, and assign the video source to
   a video card input on the Input Connections screen.
-
 
   Some people report issues with the ivtv module not being loaded when
   required by MythTV.  To get around this, you can [1mmodprobe [22mthe ivtv
@@ -5524,6 +5543,7 @@
   ASSISTANCE, SEE THE LIRC MAILING LIST.
   http://lists.sourceforge.net/lists/listinfo/lirc-list
   <http://lists.sourceforge.net/lists/listinfo/lirc-list>
+
   These instructions work for Mandrake 9.2 on a frontend machine which
   is hosting a single PVR-250 capture card using MythTV's native LIRC
   support.

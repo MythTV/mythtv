@@ -137,8 +137,17 @@ list of all the dependent packages you must download and install.
 <A HREF="#manually_building_mythtv">Manually building MythTV</A>.</P>
 <H3>Mandrake</H3>
 
-<P>You may install the XMLTV prerequisites if you have added a contrib
-mirror by typing:
+<P>RPMs for <B>XMLTV</B> and all of its dependencies are located in
+Mandrake's "contrib".  If you have added a contrib mirror, try installing
+<B>XMLTV</B>:
+<BLOCKQUOTE><CODE>
+<PRE>
+# urpmi xmltv
+</PRE>
+</CODE></BLOCKQUOTE>
+
+If this does not work, it is possible that contrib for your Mandrake version
+does not have <B>XMLTV</B>, so you may install the XMLTV prerequisites by typing:
 <BLOCKQUOTE><CODE>
 <PRE>
 # urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
@@ -238,8 +247,8 @@ $ su
 <P>Unpack MythTV
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythtv-0.12.tar.bz2
-$ cd mythtv-0.12
+$ tar -xjf mythtv-0.13.tar.bz2
+$ cd mythtv-0.13
 $ ./configure
 $ qmake mythtv.pro
 $ make
