@@ -105,7 +105,7 @@ HDTVRecorder::HDTVRecorder()
 {
     _atsc_stream_data = new ATSCStreamData(-1, DEFAULT_SUBCHANNEL);
 
-    _buffer_size = TSPacket::SIZE * 128;
+    _buffer_size = TSPacket::SIZE * 1500;
     if ((_buffer = new unsigned char[_buffer_size])) {
         // make valgrind happy, initialize buffer memory
         memset(_buffer, 0xFF, _buffer_size);
