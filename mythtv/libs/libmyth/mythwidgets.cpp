@@ -58,7 +58,10 @@ void MythCheckBox::keyPressEvent(QKeyEvent* e)
 void MythCheckBox::focusInEvent(QFocusEvent *e)
 {
      emit changeHelpText(helptext);
-     this->setPaletteBackgroundColor(QColor(0,0,0));
+
+     QColor highlight = colorGroup().highlight();
+
+     this->setPaletteBackgroundColor(highlight);
      QCheckBox::focusInEvent(e);
 }
 

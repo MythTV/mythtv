@@ -197,6 +197,32 @@ public:
     };
 };
 
+class MPEG4OptionVHQ: public CodecParam, public CheckBoxSetting {
+public:
+    MPEG4OptionVHQ(const RecordingProfile& parent):
+        CodecParam(parent, "mpeg4optionvhq") {
+        setLabel("Enable high-quality encoding");
+        setValue(false);
+        setHelpText("If set, the MPEG4 encoder will use 'high-quality' "
+                    "encoding options.  This requires much more "
+                    "processing, but can result in better video.");
+    };
+};
+
+class MPEG4Option4MV: public CodecParam, public CheckBoxSetting {
+public:
+    MPEG4Option4MV(const RecordingProfile& parent):
+        CodecParam(parent, "mpeg4option4mv") {
+        setLabel("Enable 4mv encoding");
+        setValue(false);
+        setHelpText("If set, the MPEG4 encoder will use '4MV' "
+                    "motion-vecotr encoding option.  This requires "
+                    "much more processing, but can result in better "
+                    "video. It is highly recomended that the HQ option is "
+                    "enabled whenever 4MV is enabled.");
+    };
+};
+
 class HardwareMJPEGQuality: public CodecParam, public SliderSetting {
 public:
     HardwareMJPEGQuality(const RecordingProfile& parent):
@@ -254,13 +280,15 @@ public:
         addTarget("RTjpeg", params);
         codecName->addSelection("RTjpeg");
 
-        params = new VerticalConfigurationGroup();
+        params = new VerticalConfigurationGroup(false);
         params->setLabel("MPEG-4 Parameters");
         params->addChild(new MPEG4bitrate(parent));
         params->addChild(new MPEG4MaxQuality(parent));
         params->addChild(new MPEG4MinQuality(parent));
         params->addChild(new MPEG4QualDiff(parent));
         params->addChild(new MPEG4ScaleBitrate(parent));
+        params->addChild(new MPEG4OptionVHQ(parent));
+        params->addChild(new MPEG4Option4MV(parent));
 
         addTarget("MPEG-4", params);
         codecName->addSelection("MPEG-4");

@@ -439,6 +439,8 @@ void TVRec::SetupRecorder(RecordingProfile& profile)
       nvr->SetMP4Quality(profile.byName("mpeg4maxquality")->getValue().toInt(),
                          profile.byName("mpeg4minquality")->getValue().toInt(),
                          profile.byName("mpeg4qualdiff")->getValue().toInt());
+      nvr->SetMP4OptionVHQ(profile.byName("mpeg4optionvhq")->getValue().toInt() ? 1 : 0);
+      nvr->SetMP4OptionVHQ(profile.byName("mpeg4option4mv")->getValue().toInt() ? 1 : 0);
     } else if (setting == "RTjpeg") {
       nvr->SetCodec("rtjpeg");
       nvr->SetRTJpegQuality(profile.byName("rtjpegquality")->getValue().toInt());

@@ -54,12 +54,21 @@ class NuppelVideoRecorder
     void SetAsPIP(void) { pip = true; }
     
     void SetCodec(QString desiredcodec) { codec = desiredcodec; }
+
     void SetRTJpegMotionLevels(int lM1, int lM2) { M1 = lM1; M2 = lM2; }
     void SetRTJpegQuality(int quality) { Q = quality; }
+
     void SetMP4TargetBitrate(int rate) { targetbitrate = rate; }
     void SetMP4ScaleBitrate(int scale) { scalebitrate = scale;}
     void SetMP4Quality(int max, int min, int diff) 
                        { maxquality = max; minquality = min; qualdiff = diff; }
+    void SetMP4OptionVHQ(int value) 
+                       { mp4opts = (value) ? mp4opts | CODEC_FLAG_HQ : 
+                                             mp4opts & ~CODEC_FLAG_HQ; }
+    void SetMP4Option4MV(int value) 
+                       { mp4opts = (value) ? mp4opts | CODEC_FLAG_4MV :
+                                             mp4opts & ~CODEC_FLAG_4MV; }
+
     void SetResolution(int width, int height) { w = width; h = height; }
     void SetAudioSampleRate(int rate) { audio_samplerate = rate; }   
     void SetAudioCompression(bool compress) { compressaudio = compress; }
@@ -281,6 +290,8 @@ class NuppelVideoRecorder
     int maxquality;
     int minquality;
     int qualdiff;
+    int mp4opts;
+
     QString codec;
 
     bool pip;

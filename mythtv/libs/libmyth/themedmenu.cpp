@@ -1067,37 +1067,13 @@ void ThemedMenu::paintEvent(QPaintEvent *e)
 void ThemedMenu::paintLogo(QPainter *p)
 {
     if (logo)
-    {
-        QPixmap pix(logoRect.size());
-        pix.fill(this, logoRect.topLeft());
-
-        QPainter tmp;
-        tmp.begin(&pix, this);
-
-        tmp.drawPixmap(0, 0, *logo);
-
-        tmp.end();
-
-        p->drawPixmap(logoRect.topLeft(), pix);
-    }
+        p->drawPixmap(logoRect.topLeft(), *logo);
 }
 
 void ThemedMenu::paintTitle(QPainter *p)
 {
     if (curTitle)
-    {
-        QPixmap pix(titleRect.size());
-        pix.fill(this, titleRect.topLeft());
-
-        QPainter tmp;
-        tmp.begin(&pix, this);
-    
-        tmp.drawPixmap(0, 0, *curTitle);
-
-        tmp.end();
-
-        p->drawPixmap(titleRect.topLeft(), pix);
-    }
+        p->drawPixmap(titleRect.topLeft(), *curTitle);
 }
 
 void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased,

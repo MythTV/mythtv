@@ -118,6 +118,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     maxquality = 2;
     minquality = 31;
     qualdiff = 3;
+    mp4opts = 0;
 
     oldtc = 0;
     startnum = 0;
@@ -275,6 +276,7 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     mpa_ctx->mb_qmin = maxquality;
     mpa_ctx->mb_qmax = minquality;
     mpa_ctx->max_qdiff = qualdiff;
+    mpa_ctx->flags = mp4opts;
 
     mpa_ctx->qblur = 0.5;
     mpa_ctx->max_b_frames = 0;
