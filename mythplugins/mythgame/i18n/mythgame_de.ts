@@ -36,15 +36,15 @@
     </message>
     <message>
         <source>MAME binary location</source>
-        <translation>Lokation der MAME-Datei</translation>
+        <translation>Pfad der MAME Programmdatei</translation>
     </message>
     <message>
         <source>Location of the XMAME emulator binary.</source>
-        <translation>Lokation der XMAME-Emulator-Datei.</translation>
+        <translation>Pfad der XMAME-Emulator-Datei.</translation>
     </message>
     <message>
         <source>MAME ROM location</source>
-        <translation>Position der MAME-ROM</translation>
+        <translation>Position der MAME ROMs</translation>
     </message>
     <message>
         <source>Location of the MAME games.</source>
@@ -56,75 +56,75 @@
     </message>
     <message>
         <source>Path to the catver.ini file</source>
-        <translation>Pfad zur catver.ini-Datei</translation>
+        <translation>Pfad zu MAMEs catver.ini Datei</translation>
     </message>
     <message>
         <source>Mame screenshots path</source>
-        <translation>Pfad zu Mame-Bildschirmphotos</translation>
+        <translation>Pfad für MAME Bildschirmphotos</translation>
     </message>
     <message>
         <source>Directory where MAME screenshots are kept.</source>
-        <translation>Verzeichnis in dem MAME Bildschirmphotos aufgehoben werden.</translation>
+        <translation>Verzeichnisname für MAME Bildschirmphotos.</translation>
     </message>
     <message>
         <source>MAME hiscores path</source>
-        <translation>Pfad der MAME-Hiscores</translation>
+        <translation>Pfad zu MAMEs Highscore-Dateien</translation>
     </message>
     <message>
         <source>MAME flyers path</source>
-        <translation>Pfad zu MAME-flyer-Dateien</translation>
+        <translation>Pfad zu MAMEs Flyer-Dateien</translation>
     </message>
     <message>
         <source>Directory where MAME flyers are kept.</source>
-        <translation>Verzeichnis in dem MAME Flyer-Dateien aufgehoben werden.</translation>
+        <translation>Verzeichnisname für MAMEs Flyer-Dateien.</translation>
     </message>
     <message>
         <source>MAME cabinets path</source>
-        <translation>Pfad der MAME-Cabinet-Dateien</translation>
+        <translation>Pfad zu MAMEs Cabinet-Dateien</translation>
     </message>
     <message>
         <source>Directory where MAME cabinets are kept.</source>
-        <translation>Verzeichnis in dem MAME Cabinet-Dateien aufgehoben werden.</translation>
+        <translation>Verzeichnisname für MAMEs Cabinet-Dateien.</translation>
     </message>
     <message>
         <source>MAME history path</source>
-        <translation>Pfad der MAME-History-Dateien</translation>
+        <translation>Pfad zu MAMEs History-Dateien</translation>
     </message>
     <message>
         <source>MAME cheat files path</source>
-        <translation>Pfad der MAME-Cheat-Dateien</translation>
+        <translation>Pfad zu MAMEs Cheat-Dateien</translation>
     </message>
     <message>
         <source>Show disclaimer</source>
-        <translation>Haftungsausschuss anzeigen</translation>
+        <translation>Haftungsausschluß anzeigen</translation>
     </message>
     <message>
         <source>Set to show the disclaimer or not</source>
-        <translation>Aktivieren um Haftungsausschluß anzuzeigen</translation>
+        <translation>Falls gesetzt, wird der Haftungsausschluß angezeigt</translation>
     </message>
     <message>
         <source>Show game info</source>
-        <translation>Spiel-Informationen anzeigen</translation>
+        <translation>Spielinformationen anzeigen</translation>
     </message>
     <message>
         <source>Set to show the game info or not</source>
-        <translation>Setzen um Spiel-Informationen anzuzeigen</translation>
+        <translation>Falls gesetzt, werden Informationen zu den Spielen angezeigt.</translation>
     </message>
     <message>
         <source>NES binary location</source>
-        <translation>Position der NES-Datei</translation>
+        <translation>Position der NES Programmdatei</translation>
     </message>
     <message>
         <source>Location of the NES emulator binary.</source>
-        <translation>Position des NES-Emulators.</translation>
+        <translation>Position der NES Programmdatei.</translation>
     </message>
     <message>
         <source>NES ROM location</source>
-        <translation>Position der NES-ROM</translation>
+        <translation>Position der NES ROMs</translation>
     </message>
     <message>
         <source>Location of the NES games.</source>
-        <translation>Position der NES-Spiele.</translation>
+        <translation>Position der NES Spiele.</translation>
     </message>
     <message>
         <source>NES CRC file</source>
@@ -132,79 +132,79 @@
     </message>
     <message>
         <source>This is the same file that comes with the xmame(xmess) distribution: xmame-0.XX/CRC/nes.crc</source>
-        <translation>Das ist die gleiche Datei, die auch mit xmame (xmess) ausgeliefert wird: xmame-0.XX/CRC/res.crc</translation>
+        <translation>Das ist die gleiche Datei, die auch mit xmame (xmess) ausgeliefert wird: xmame-0.XX/CRC/nes.crc.</translation>
     </message>
     <message>
         <source>NES screenshots path</source>
-        <translation>Pfad zu NES-Bildschirmphotos</translation>
+        <translation>Pfad für NES Bildschirmphotos</translation>
     </message>
     <message>
         <source>Directory where NES screenshots are kept.</source>
-        <translation>Verzeichnis in dem NES-Bildschirmphotos aufgehoben werden.</translation>
+        <translation>Verzeichnisname für NES Bildschirmphotos.</translation>
     </message>
     <message>
         <source>SNES binary location</source>
-        <translation>Position der SNES-Datei</translation>
+        <translation>Position der SNES Programmdatei</translation>
     </message>
     <message>
         <source>Location of the snes9x emulator binary.</source>
-        <translation>Position des snes9x-Emulators.</translation>
+        <translation>Position des snes9x Emulators.</translation>
     </message>
     <message>
         <source>SNES ROM location</source>
-        <translation>Position der SNES-ROM</translation>
+        <translation>Position der SNES ROMs</translation>
     </message>
     <message>
         <source>Location of the SNES games.</source>
-        <translation>Position der SNES-Spiele.</translation>
+        <translation>Position der SNES Spiele.</translation>
     </message>
     <message>
         <source>SNES screenshots path</source>
-        <translation>Pfad zu SNES-Bildschirmphotos</translation>
+        <translation>Pfad für SNES Bildschirmphotos</translation>
     </message>
     <message>
         <source>Directory where SNES screenshots are kept. Looks for screenshots with file names matching the rom file name.</source>
-        <translation>Verzeichnis in dem SNES-Bildschirmphotos aufgehoben werden. Sucht nach Bildschirmphotos mit dem gleichen Namen wie der ROM-Dateiname.</translation>
+        <translation>Verzeichnisname für SNES Bildschirmphotos. Sucht nach Bildschirmphotos mit dem gleichen Namen wie die ROM-Datei.</translation>
     </message>
     <message>
         <source>PC Game List xml file</source>
-        <translation>PC-Spielliste als xml-Datei</translation>
+        <translation>PC-Spieleliste als XML-Datei</translation>
     </message>
     <message>
         <source>Path to the Game List xml file. (see README for details)</source>
-        <translation>Pfad zur xml-Datei mit der Spiele-Liste (bitte README-Datei beachten)</translation>
+        <translation>Pfad zur XML-Datei mit der Spiele-Liste (Lesen Sie die README Datei für Einzelheiten)</translation>
     </message>
     <message>
         <source>PC screenshots path</source>
-        <translation>Pfad zu PC-Bildschirmphotos</translation>
+        <translation>Pfad für PC Bildschirmphotos</translation>
     </message>
     <message>
         <source>Directory where screenshots are kept. Looks for screenshots with file names matching the game name in the Game List xml file.</source>
-        <translation>Verzeichnis in dem Bildschirmphotos gespeichert werden. Sucht nach Dateinamen der Photos mit dem gleichen Namen wie der Spielname in der Spielliste-xml-Datei.</translation>
+        <translation>Verzeichnisname für Bildschirmphotos. Sucht nach Bildschirmphotos mit den gleichen Dateinamen wie der Name des Spiels in der Spiellisten XML-Datei.</translation>
     </message>
     <message>
         <source>MythGame Settings -- General</source>
-        <translation>MythGame Einstellungen -- Allgemein</translation>
+        <translation>Allgemeines</translation>
     </message>
     <message>
         <source>MythGame Settings -- xmame (page 1)</source>
-        <translation>MythGame Einstellungen - xmame (Seite 1)</translation>
+        <translation>xmame Emulator 1/2</translation>
     </message>
     <message>
         <source>MythGame Settings -- xmame (page 2)</source>
-        <translation>MythGame Einstellungen - xmame (Seite 2)</translation>
+        <translation>xmame Emulator 2/2</translation>
     </message>
     <message>
         <source>MythGame Settings -- NES Emulation</source>
-        <translation>MythGame Einstellungen -- NES-Emulation</translation>
+        <translation>NES Emulation</translation>
     </message>
     <message>
         <source>MythGame Settings -- SNES Emulation</source>
-        <translation>MythGame Einstellungen -- SNES-Emulation</translation>
+        <translation>SNES Emulation</translation>
     </message>
     <message>
         <source>MythGame Settings -- PC games</source>
-        <translation>MythGame Einstellungen -- PC-Spiele</translation>
+        <translation>PC Spiele</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -212,7 +212,7 @@
     </message>
     <message>
         <source>Loading game...</source>
-        <translation>Spiel laden...</translation>
+        <translation>Lade Spiel...</translation>
     </message>
     <message>
         <source>Use defaults</source>
@@ -220,7 +220,7 @@
     </message>
     <message>
         <source>Use the global default MAME settings. All other settings are ignored if this is set.</source>
-        <translation>Benutze globale MAME-Einstellungen. Alle anderen Einstellungen werden ignoriert, falls dies gesetzt ist.</translation>
+        <translation>Benutze globale MAME-Einstellungen. Alle anderen Einstellungen werden ignoriert, falls diese Option gesetzt ist.</translation>
     </message>
     <message>
         <source>Fullscreen mode</source>
@@ -356,7 +356,7 @@
     </message>
     <message>
         <source>Joystick Type</source>
-        <translation>Joystick-Typ</translation>
+        <translation>Joystick Typ</translation>
     </message>
     <message>
         <source>No Joystick</source>
@@ -364,7 +364,7 @@
     </message>
     <message>
         <source>i386 Joystick</source>
-        <translation>i386-Joystick</translation>
+        <translation>i386 Joystick</translation>
     </message>
     <message>
         <source>Fm Town Pad</source>
@@ -372,7 +372,7 @@
     </message>
     <message>
         <source>X11 Input Extension Joystick</source>
-        <translation>X11 Eingangserweiterungs-Joystick</translation>
+        <translation>X11 Input Extension Joystick</translation>
     </message>
     <message>
         <source>New i386 linux 1.x.x Joystick</source>
@@ -396,7 +396,7 @@
     </message>
     <message>
         <source>Mame Game Settings - </source>
-        <translation>Mame Spiel-Einstellungen - </translation>
+        <translation>MAME Spieleeinstellungen - </translation>
     </message>
     <message>
         <source> - </source>
@@ -404,15 +404,15 @@
     </message>
     <message>
         <source> - top level</source>
-        <translation>- oberste Ebene</translation>
+        <translation>Standardwerte</translation>
     </message>
     <message>
         <source>video page 1</source>
-        <translation>Video Seite 1</translation>
+        <translation>Video 1/2</translation>
     </message>
     <message>
         <source>video page 2</source>
-        <translation>Video Seite 2</translation>
+        <translation>Video 2/2</translation>
     </message>
     <message>
         <source>vector</source>
@@ -432,11 +432,11 @@
     </message>
     <message>
         <source>Looking for NES games...</source>
-        <translation>Suche NES-Spiele...</translation>
+        <translation>Suche NES Spiele...</translation>
     </message>
     <message>
         <source>Looking for SNES games...</source>
-        <translation>Suche SNES-Spiele...</translation>
+        <translation>Suche SNES Spiele...</translation>
     </message>
     <message>
         <source>   (bad checksum)</source>
@@ -444,7 +444,7 @@
     </message>
     <message>
         <source>Use the global default SNES settings. All other settings are ignored if this is set.</source>
-        <translation>Benutze globale SNES-Einstellungen. Falls gesetzt werden alle anderen Einstellungen ignoriert.</translation>
+        <translation>Benutze globale SNES Einstellungen. Falls gesetzt werden alle anderen Einstellungen ignoriert.</translation>
     </message>
     <message>
         <source>Use transparency</source>
@@ -456,7 +456,7 @@
     </message>
     <message>
         <source>Use 16-bit mode</source>
-        <translation>Benutze 16-bit-Modus</translation>
+        <translation>Benutze 16 Bit Modus</translation>
     </message>
     <message>
         <source>Use Hi-res mode</source>
@@ -552,7 +552,7 @@
     </message>
     <message>
         <source>Use stereo audio</source>
-        <translation>Stereo-Ton benutzen</translation>
+        <translation>Stereoton benutzen</translation>
     </message>
     <message>
         <source>Envx</source>
@@ -600,7 +600,7 @@
     </message>
     <message>
         <source>SNES Game Settings - </source>
-        <translation>SNES Spiel-Einstellungen - </translation>
+        <translation>SNES Spiele Einstellungen - </translation>
     </message>
     <message>
         <source>video</source>
@@ -608,19 +608,19 @@
     </message>
     <message>
         <source>misc page 1</source>
-        <translation>Sonstiges Seite 1</translation>
+        <translation>Sonstiges 1/2</translation>
     </message>
     <message>
         <source>misc page 2</source>
-        <translation>Sonstiges Seite 2</translation>
+        <translation>Sonstiges 2/2</translation>
     </message>
     <message>
         <source>sound page 1</source>
-        <translation>Ton Seite 1</translation>
+        <translation>Ton 1/2</translation>
     </message>
     <message>
         <source>sound page 2</source>
-        <translation>Ton Seite 2</translation>
+        <translation>Ton 2/2</translation>
     </message>
     <message>
         <source>Show Only Favorites</source>
@@ -628,7 +628,7 @@
     </message>
     <message>
         <source>Limit games listed to only those tagged as &quot;favorite&quot;</source>
-        <translation>Es werden nur Spiele, die als &quot;Favorit&quot; gekennzeichnet wurden angezeigt</translation>
+        <translation>Es werden nur Spiele, die als &quot;Favorit&quot; gekennzeichnet wurden angezeigt.</translation>
     </message>
     <message>
         <source>The path to the MAME history.dat file.</source>
@@ -640,7 +640,7 @@
     </message>
     <message>
         <source>Wrong xmame version.</source>
-        <translation>Falsche xmame-Version.</translation>
+        <translation>Falsche xmame Version.</translation>
     </message>
     <message>
         <source>This version of xmame is not supported.</source>
@@ -648,17 +648,17 @@
     </message>
     <message>
         <source>Failed to read catver.ini</source>
-        <translation>Konnte catver.ini-Datei nicht lesen</translation>
+        <translation>Konnte die Datei catver.ini nicht lesen.</translation>
     </message>
     <message>
         <source>MythTV was unable to read catver.ini.
 Please enter the correct path and try again.</source>
-        <translation>MythTV konnte die catver.ini-Datei nicht lesen.
-Bitte den richtigen Pfad eingeben und erneut versuchen.</translation>
+        <translation>MythTV konnte die Datei catver.ini nicht lesen.
+Bitte den Pfad überprüfen und erneut versuchen.</translation>
     </message>
     <message>
         <source>Order in which to sort the games - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation>Sortierreihenfolge der Spiele - gilt für alle Systeme. Vorhanden: System, Jahr, Genre und Spielname</translation>
+        <translation>Sortierreihenfolge der Spiele - gilt für alle Systeme. Möglich ist: &apos;system&apos;, &apos;year&apos;, &apos;genre&apos; und &apos;gamename&apos;.</translation>
     </message>
     <message>
         <source>MAME image downloader</source>
@@ -666,19 +666,19 @@ Bitte den richtigen Pfad eingeben und erneut versuchen.</translation>
     </message>
     <message>
         <source>The path to the MAME image downloader helper.  (See the contrib/ dir in the mythgame source.)</source>
-        <translation>Der Pfad zum MAME-Image-Download-Hilfsprogramm (Siehe contrib-Verzeichnis im Mythgame-Quelltext.)</translation>
+        <translation>Der Pfad zum MAME ROM Image Downloadprogramm (Siehe contrib-Verzeichnis im Mythgame-Quelltext).</translation>
     </message>
     <message>
         <source>Automatically download images</source>
-        <translation>Automatisch Images herunterladen</translation>
+        <translation>ROM Images automatisch herunterladen</translation>
     </message>
     <message>
         <source>Attempt to automatically download ROM images if they don&apos;t exist.</source>
-        <translation>Erlaube das automatische Herunterladen von Images, wenn sie nicht vorhanden sind.</translation>
+        <translation>Versuche nicht vorhandene ROM Images automatisch herunterzuladen.</translation>
     </message>
     <message>
         <source>SNES Emulator</source>
-        <translation>SNES-Emulator</translation>
+        <translation>SNES Emulator</translation>
     </message>
     <message>
         <source>SNES9x</source>
@@ -730,7 +730,7 @@ Bitte den richtigen Pfad eingeben und erneut versuchen.</translation>
     </message>
     <message>
         <source>Set the beam size for vector games (float)</source>
-        <translation>Balkengröße festlegen für Vektorspiele (float)</translation>
+        <translation>Balkengröße für Vektorspiele (Kommazahl).</translation>
     </message>
     <message>
         <source>Flicker</source>
@@ -738,15 +738,15 @@ Bitte den richtigen Pfad eingeben und erneut versuchen.</translation>
     </message>
     <message>
         <source>Set the flicker for vector games (float)</source>
-        <translation>Flimmerwert festlegen für Vektorspiele (float)</translation>
+        <translation>Flimmerwert für Vektorspiele(Kommazahl).</translation>
     </message>
     <message>
         <source>Enable sound (if available)</source>
-        <translation>Ton aktivieren (wenn vorhanden)</translation>
+        <translation>Ton aktivieren (falls vorhanden)</translation>
     </message>
     <message>
         <source>Enable samples (if available)</source>
-        <translation>Samples aktivieren (wenn vorhanden)</translation>
+        <translation>Samples aktivieren (falls vorhanden)</translation>
     </message>
     <message>
         <source>Enable cheat subsystem</source>
@@ -754,7 +754,7 @@ Bitte den richtigen Pfad eingeben und erneut versuchen.</translation>
     </message>
     <message>
         <source>Enable mouse (if supported)</source>
-        <translation>Maus aktivieren (wenn unterstützt)</translation>
+        <translation>Maus aktivieren (falls unterstützt)</translation>
     </message>
     <message>
         <source>Select type of joystick support to use</source>
@@ -766,19 +766,19 @@ Bitte den richtigen Pfad eingeben und erneut versuchen.</translation>
     </message>
     <message>
         <source>Directory where MAME hiscores are kept.</source>
-        <translation>Verzeichnis in dem MAME Hiscore-Dateien aufgehoben werden.</translation>
+        <translation>Verzeichnisname für MAMEs Highscore-Dateien.</translation>
     </message>
     <message>
         <source>MAME hiscores file</source>
-        <translation>MAME Hiscore-Datei</translation>
+        <translation>MAME Highscore-Datei</translation>
     </message>
     <message>
         <source>Path to the MAME hiscore.dat file</source>
-        <translation>Pfad zur hiscore.dat-Datei für MAME</translation>
+        <translation>Pfad zu MAMEs hiscore.dat Datei</translation>
     </message>
     <message>
         <source>Atari binary location</source>
-        <translation>Position der Atari-Datei</translation>
+        <translation>Position der Atari Programmdatei</translation>
     </message>
     <message>
         <source>Location of the Atari emulator binary.</source>
@@ -786,7 +786,7 @@ Bitte den richtigen Pfad eingeben und erneut versuchen.</translation>
     </message>
     <message>
         <source>Atari ROM location</source>
-        <translation>Position der Atari ROM</translation>
+        <translation>Position der Atari ROMs</translation>
     </message>
     <message>
         <source>Location of the Atari games.</source>
@@ -794,31 +794,31 @@ Bitte den richtigen Pfad eingeben und erneut versuchen.</translation>
     </message>
     <message>
         <source>Odyssey2 binary location</source>
-        <translation>Position der Odyssey2-Datei</translation>
+        <translation>Position der Odyssey2 Programmdatei</translation>
     </message>
     <message>
         <source>Location of the Odyssey2 emulator binary.</source>
-        <translation>Position des Odyssey2-Emulators.</translation>
+        <translation>Position des Odyssey2 Emulators.</translation>
     </message>
     <message>
         <source>Odyssey2 ROM location</source>
-        <translation>Position der Odyssey2-ROM</translation>
+        <translation>Position der Odyssey2 ROMs</translation>
     </message>
     <message>
         <source>Location of the Odyssey2 games.</source>
-        <translation>Position der Odyssey2-Spiele.</translation>
+        <translation>Position der Odyssey2 Spiele.</translation>
     </message>
     <message>
         <source>MythGame Settings -- Atari Emulation</source>
-        <translation>MythGame Einstellungen -- Atari-Emulation</translation>
+        <translation>Atari Emulation</translation>
     </message>
     <message>
         <source>MythGame Settings -- Odyssey2 Emulation</source>
-        <translation>MythGame Einstellungen -- Odyssey2-Emulation</translation>
+        <translation>Odyssey2 Emulation</translation>
     </message>
     <message>
         <source>Set X-Y Scale to the same aspect ratio. For vector games scale may have values like 1.5 and even 0.5. For scaling of regular games this will be rounded to an int</source>
-        <translation>Setze X-Y-Skalierungsfaktor für das gleiche Verhältnis. Der Wert liegt bei Vektorspielen bei 1.5 oder auch 0.5. Für reguläre Spiele wird dieser Wert auf eine Ganzzahl gerundet</translation>
+        <translation>Setze den X-Y-Skalierungsfaktor auf das gleiche Seitenverhältnis. Der Wert liegt bei Vektorspielen bei 1.5 oder auch 0.5. Für reguläre Spiele wird dieser Wert auf eine Ganzzahl gerundet.</translation>
     </message>
     <message>
         <source>Enable translucency</source>
@@ -826,15 +826,15 @@ Bitte den richtigen Pfad eingeben und erneut versuchen.</translation>
     </message>
     <message>
         <source>Always scale vectorgames to X x Y, keeping their aspect ratio. This overrides the scale options.</source>
-        <translation>Immer Vektorspiele zu X mal Y skalieren unter Beibehaltung vom Verhältnis. Überschreibt weitere Skalierungsoptionen.</translation>
+        <translation>Vektorspiele immer auf X x Y unter Beibehaltung des Seitenverhältnisses skalieren. Überschreibt weitere Skalierungsoptionen.</translation>
     </message>
     <message>
         <source>Generate sound even when sound is disabled. This is needed for some games which won&apos;t run without sound.</source>
-        <translation>Ton erzeugen auch wenn Ton generell deaktiviert ist. Es ist für manche Spiele nötig, die nicht ohne Ton funktionieren.</translation>
+        <translation>Ton erzeugen auch wenn der Ton abgeschalten ist. Dies wird bei manchen Spielen benötigt, die nicht ohne Tonausgabe funktionieren.</translation>
     </message>
     <message>
         <source>Set volume to x db, (-32 (soft) - 0 (loud) )</source>
-        <translation>Lautstärke auf x db setzen (-32 (leise) - 0 (laut))</translation>
+        <translation>Lautstärke in db (von -32 (leise) bis 0 (laut))</translation>
     </message>
 </context>
 <context>

@@ -6,6 +6,7 @@
      <text lang="DK">Spil</text>
      <text lang="PT">Jogos</text>
      <text lang="SV">Spel</text>
+     <text lang="DE">Spiele</text>
      <action>GAME_PLAY</action>
   </button>
 

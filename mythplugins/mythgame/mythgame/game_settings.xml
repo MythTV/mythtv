@@ -6,7 +6,7 @@
       <text lang="IT">Impostazioni generali</text>
       <text lang="ES">Opciones Generales</text>
       <text lang="CA">Opcions Generals</text>
-      <text lang="DE">Allgemeines</text>
+      <text lang="DE">Grundeinstellungen</text>
       <text lang="DK">Generelle indstillinger</text>
       <text lang="NL">Algemeen</text>
       <text lang="PT">Configurações Gerais</text>
@@ -19,6 +19,7 @@
       <text>Scan for Games</text>
       <text lang="PT">Procurar Jogos</text>
       <text lang="SV">Sök efter spel</text>
+      <text lang="DE">Nach Spielen suchen</text>
       <action>SEARCH_FOR_GAMES</action>
    </button>
 
