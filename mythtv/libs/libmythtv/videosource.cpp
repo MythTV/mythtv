@@ -1001,7 +1001,7 @@ public:
         CISetting(parent, "freetoaironly")
     {
         setValue(true);
-        setLabel(tr("Free to air channels only."));
+        setLabel(QObject::tr("Free to air channels only."));
         setHelpText(QObject::tr("If set, only free to air channels will be "
                     "used."));
     };
