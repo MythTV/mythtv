@@ -120,7 +120,9 @@ int main(int argc, char **argv)
     bool daemonize = false;
     bool printsched = false;
     bool printexpire = false;
-    for(int argpos = 1; argpos < a.argc(); ++argpos)
+    bool noAutoShutdown = false;
+    for (int argpos = 1; argpos < a.argc(); ++argpos)
+    {
         if (!strcmp(a.argv()[argpos],"-l") ||
             !strcmp(a.argv()[argpos],"--logfile"))
         {
@@ -137,8 +139,9 @@ int main(int argc, char **argv)
                     ++argpos;
                 }
             }
-        } else if (!strcmp(a.argv()[argpos],"-p") ||
-                   !strcmp(a.argv()[argpos],"--pidfile"))
+        } 
+        else if (!strcmp(a.argv()[argpos],"-p") ||
+                 !strcmp(a.argv()[argpos],"--pidfile"))
         {
             if (a.argc() > argpos)
             {
@@ -147,17 +150,27 @@ int main(int argc, char **argv)
                 {
                     cerr << "Invalid or missing argument to -p/--pidfile option\n";
                     return -1;
-                } else
+                } 
+                else
                 {
                    ++argpos;
                 }
             }
-        } else if (!strcmp(a.argv()[argpos],"-d") ||
-                   !strcmp(a.argv()[argpos],"--daemon"))
+        } 
+        else if (!strcmp(a.argv()[argpos],"-d") ||
+                 !strcmp(a.argv()[argpos],"--daemon"))
         {
             daemonize = true;
-        } else if (!strcmp(a.argv()[argpos],"-v") ||
-                   !strcmp(a.argv()[argpos],"--verbose"))
+
+        }
+        else if (!strcmp(a.argv()[argpos],"-n") ||
+                 !strcmp(a.argv()[argpos],"--noautoshutdown"))
+        {
+            noAutoShutdown = true;
+            VERBOSE(VB_ALL, "Auto shutdown procedure disabled by commandline"); 
+        }
+        else if (!strcmp(a.argv()[argpos],"-v") ||
+                 !strcmp(a.argv()[argpos],"--verbose"))
         {
             if (a.argc() > argpos)
             {
@@ -166,7 +179,8 @@ int main(int argc, char **argv)
                 {
                     cerr << "Invalid or missing argument to -v/--verbose option\n";
                     return -1;
-                } else
+                } 
+                else
                 {
                     QStringList verboseOpts;
                     verboseOpts = QStringList::split(',',a.argv()[argpos+1]);
@@ -231,18 +245,22 @@ int main(int argc, char **argv)
                         }
                     }
                 }
-            } else
+            } 
+            else
             {
                 cerr << "Missing argument to -v/--verbose option\n";
                 return -1;
             }
-        } else if (!strcmp(a.argv()[argpos],"--printsched"))
+        } 
+        else if (!strcmp(a.argv()[argpos],"--printsched"))
         {
             printsched = true;
-        } else if (!strcmp(a.argv()[argpos],"--printexpire"))
+        } 
+        else if (!strcmp(a.argv()[argpos],"--printexpire"))
         {
             printexpire = true;
-        } else if (!strcmp(a.argv()[argpos],"--version"))
+        } 
+        else if (!strcmp(a.argv()[argpos],"--version"))
         {
             cout << MYTH_BINARY_VERSION << endl;
             exit(0);
@@ -257,6 +275,8 @@ int main(int argc, char **argv)
                     "-p or --pidfile filename       Write PID of mythbackend " <<
                                                     "to filename" << endl <<
                     "-d or --daemon                 Runs mythbackend as a daemon" << endl <<
+                    "-n or --noautoshutdonw         Blocks the auto shutdown routine, so that the" << endl <<
+                    "                               backend will stay alive"<<endl <<
                     "-v or --verbose debug-level    Prints more information" << endl <<
                     "                               Accepts any combination (separated by comma)" << endl << 
                     "                               of all,none,quiet,record,playback," << endl <<
@@ -266,6 +286,7 @@ int main(int argc, char **argv)
                     "--version                      Version information" << endl;
             return -1;
         }
+    }
 
     int logfd = -1;
 
@@ -426,7 +447,7 @@ int main(int argc, char **argv)
     if (ismaster && runsched)
     {
         QSqlDatabase *scdb = QSqlDatabase::database("SUBDB");
-        sched = new Scheduler(true, &tvList, scdb);
+        sched = new Scheduler(true, &tvList, scdb, noAutoShutdown);
     }
 
     QSqlDatabase *expdb = QSqlDatabase::database("EXPDB");
@@ -462,6 +483,17 @@ int main(int argc, char **argv)
     }
 
     new MainServer(ismaster, port, statusport, &tvList, msdb, sched);
+
+    if (ismaster)
+    {
+        QString WOLslaveBackends;
+        WOLslaveBackends = gContext->GetSetting("WOLslaveBackendsCommand","");
+        if (!WOLslaveBackends.isEmpty())
+        {
+            VERBOSE(VB_ALL, "Waking slave Backends now.");
+            system(WOLslaveBackends.ascii());
+        }
+    }
 
     a.exec();
 

@@ -286,6 +286,123 @@ public:
     };
 };
 
+class WOLbackendReconnectWaitTime: public SpinBoxSetting, public BackendSetting {
+public:
+    WOLbackendReconnectWaitTime():
+        SpinBoxSetting(0,1200, 5), 
+        BackendSetting("WOLbackendReconnectWaitTime") {
+        setLabel("reconnect wait time (secs)");
+        setValue(0);
+        setHelpText("Length of time the frontend waits between the tries to "
+                    "wake up the master backend. This should be the time your "
+                    "masterbackend needs to startup. Set 0 to disable.");
+    };
+};
+
+class WOLbackendConnectRetry: public SpinBoxSetting, public BackendSetting {
+public:
+    WOLbackendConnectRetry():
+        SpinBoxSetting(1, 60, 1), 
+        BackendSetting("WOLbackendConnectRetry") {
+        setLabel("Count of reconnect tries");
+        setHelpText("Number of times the frontend will try to wake up the "
+                    "master backend.");
+        setValue(5);
+    };
+};
+
+class WOLbackendCommand: public LineEditSetting, public BackendSetting {
+public:
+    WOLbackendCommand():
+        BackendSetting("WOLbackendCommand") {
+        setLabel("Wake Command");
+        setValue("");
+        setHelpText("The command used to wake up your master backend server.");
+    };
+};
+
+class WOLslaveBackendsCommand: public LineEditSetting, public BackendSetting {
+public:
+    WOLslaveBackendsCommand():
+        BackendSetting("WOLslaveBackendsCommand") {
+        setLabel("Wake command for slaves");
+        setValue("");
+        setHelpText("The command used to wakeup your slave Backends. Leave "
+                    "empty to disable.");
+    };
+};
+
+class idleTimeoutSecs: public SpinBoxSetting, public BackendSetting {
+public:
+    idleTimeoutSecs():
+        SpinBoxSetting(0, 1200, 5), 
+        BackendSetting("idleTimeoutSecs") {
+        setLabel("Idle timeout (secs)");
+        setValue(0);
+        setHelpText("The amount of time the master backend idles before it "
+                    "shuts down all backends. Set to 0 to disable auto "
+                    "shutdown.");
+    };
+};
+    
+class idleWaitForRecordingTime: public SpinBoxSetting, public BackendSetting {
+public:
+    idleWaitForRecordingTime():
+        SpinBoxSetting(0, 120, 1), BackendSetting("idleWaitForRecordingTime") {
+        setLabel("Max. wait for recording (min)");
+        setValue(15);
+        setHelpText("The amount of time the master backend waits for a "
+                    "recording.  If it's idle but a recording starts "
+                    "within this time period, the backends won't shut down.");
+    };
+};
+
+class StartupSecsBeforeRecording: public SpinBoxSetting, public BackendSetting {
+public:
+    StartupSecsBeforeRecording():
+        SpinBoxSetting(0, 1200, 5), 
+        BackendSetting("StartupSecsBeforeRecording") {
+        setLabel("Startup before rec. (secs)");
+        setValue(120);
+        setHelpText("The amount of time the master backend will be woken up "
+                    "before a recording starts.");
+    };
+};
+
+class WakeupTimeFormat: public LineEditSetting, public BackendSetting {
+public:
+    WakeupTimeFormat():
+        BackendSetting("WakeupTimeFormat") {
+        setLabel("wakeup time format");
+        setValue("hh:mm yyyy-MM-dd");
+        setHelpText("The format of the time string passed to the "
+                    "\'setWakeuptime Command\' as $time. See "
+                    "QT::QDateTime.toString() for details. Set to 'time_t' for "
+                    "seconds since epoch.");
+    };
+};
+
+class SetWakeuptimeCommand: public LineEditSetting, public BackendSetting {
+public:
+    SetWakeuptimeCommand():
+        BackendSetting("SetWakeuptimeCommand") {
+        setLabel("set wakeuptime command");
+        setValue("");
+        setHelpText("The command used to set the time (passed as $time) to "
+                    "wake up the masterbackend");
+    };
+};
+
+class ServerHaltCommand: public LineEditSetting, public BackendSetting {
+public:
+    ServerHaltCommand():
+        BackendSetting("ServerHaltCommand") {
+        setLabel("server halt command");
+        setValue("sudo /sbin/halt -p");
+        setHelpText("The command used to halt the backends.");
+    };
+};
+
 BackendSettings::BackendSettings() {
     VerticalConfigurationGroup* server = new VerticalConfigurationGroup(false);
     server->setLabel("Host Address Backend Setup");
@@ -313,5 +430,28 @@ BackendSettings::BackendSettings() {
     group2->addChild(new TimeOffset());
     group2->addChild(new MasterBackendOverride());
     addChild(group2);
+
+    VerticalConfigurationGroup* group3 = new VerticalConfigurationGroup(false);
+    group3->setLabel("Shutdown/Wakeup Options");
+    group3->addChild(new idleTimeoutSecs());
+    group3->addChild(new idleWaitForRecordingTime());
+    group3->addChild(new StartupSecsBeforeRecording());
+    group3->addChild(new WakeupTimeFormat());
+    group3->addChild(new SetWakeuptimeCommand());
+    group3->addChild(new ServerHaltCommand());
+    addChild(group3);    
+
+    VerticalConfigurationGroup* group4 = new VerticalConfigurationGroup(false);
+    group4->setLabel("WakeOnLan settings");
+
+    VerticalConfigurationGroup* backend = new VerticalConfigurationGroup();
+    backend->setLabel("MasterBackend");
+    backend->addChild(new WOLbackendReconnectWaitTime());
+    backend->addChild(new WOLbackendConnectRetry());
+    backend->addChild(new WOLbackendCommand());
+    group4->addChild(backend);
+    
+    group4->addChild(new WOLslaveBackendsCommand());
+    addChild(group4);
 }
 

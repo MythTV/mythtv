@@ -33,8 +33,7 @@ using namespace std;
 #include "dbcheck.h"
 
 #define QUIT     1
-#define HALTWKUP 2
-#define HALT     3
+#define HALT     2
 
 ThemedMenu *menu;
 MythContext *gContext;
@@ -352,41 +351,44 @@ void TVMenuCallback(void *data, QString &selection)
 
 int handleExit(void)
 {
+    // first of all find out, if a backend runs on this host...
+    bool backendOnLocalhost = false;
+
+    QStringList strlist = "";
+    strlist << "QUERY_IS_ACTIVE_BACKEND";
+    strlist << gContext->GetHostName();
+                
+    gContext->SendReceiveStringList(strlist);
+
+    if (QString(strlist[0]) == "FALSE")
+        backendOnLocalhost = false;
+    else //if (QString(strlist[0]) == "TRUE")
+        backendOnLocalhost = true;
+
     QString title = QObject::tr("Do you really want to exit MythTV?");
 
     DialogBox diag(gContext->GetMainWindow(), title);
     diag.AddButton(QObject::tr("No"));
     diag.AddButton(QObject::tr("Yes, Exit now"));
-    diag.AddButton(QObject::tr("Yes, Exit and shutdown the computer"));
-//    bool haltNwakeup = context->GetNumSetting("UseHaltWakeup");
-//    if (haltNwakeup)
-//        diag.AddButton("Yes, Shutdown and set wakeup time");
+    if (!backendOnLocalhost)
+        diag.AddButton(QObject::tr("Yes, Exit and Shutdown"));
 
     int result = diag.exec();
     switch (result)
     {
         case 2: return QUIT;
         case 3: return HALT;
-//        case 4: return HALTWKUP;
         default: return 0;
     }
 
     return 0;
 }
 
-void haltnow(int how)
+void haltnow()
 {
-    QString halt_cmd = gContext->GetSetting("HaltCommand", "halt");
-    QString haltwkup_cmd = gContext->GetSetting("HaltCommandWhenWakeup",
-                                                "echo 'would halt now, and set "
-                                                "wakeup time to %1 (secs since "
-                                                "1970) if command was set'");
-
-    if (how == HALTWKUP)
-    {
-    }
-    else if (how == HALT)
-        system(halt_cmd.ascii());
+    QString halt_cmd = gContext->GetSetting("HaltCommand", 
+                                            "sudo /sbin/halt -p");
+    system(halt_cmd.ascii());
 }
 
 int RunMenu(QString themedir)
@@ -411,9 +413,10 @@ int RunMenu(QString themedir)
     return exitstatus;
 }   
 
-void WriteDefaults(QSqlDatabase* db) {
-    // If any settings are missing from the database, this will write
-    // the default values
+// If any settings are missing from the database, this will write
+// the default values
+void WriteDefaults(QSqlDatabase* db) 
+{
     PlaybackSettings ps;
     ps.load(db);
     ps.save(db);
@@ -724,6 +727,11 @@ int main(int argc, char **argv)
     else
         xbox = NULL;
 
+    // this direct connect is only necessary, if the user wants to use the
+    // auto shutdown/wakeup feature
+    if (gContext->GetNumSetting("idleTimeoutSecs",0) > 0)
+        gContext->ConnectToMasterServer();
+
     if (pluginname != "")
     {
         if (MythPluginManager::run_plugin(pluginname))
@@ -741,7 +749,8 @@ int main(int argc, char **argv)
 
     int exitstatus = RunMenu(themedir);
 
-    haltnow(exitstatus);
+    if (exitstatus == HALT)
+        haltnow();
 
     delete gContext;
     return exitstatus;

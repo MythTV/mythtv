@@ -18,14 +18,21 @@ using namespace std;
 #include "libmythtv/scheduledrecording.h"
 #include "encoderlink.h"
 #include "libmyth/mythcontext.h"
+#include "mainserver.h"
 #include "remoteutil.h"
 
 Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList, 
-                     QSqlDatabase *ldb)
+                     QSqlDatabase *ldb, bool noAutoShutdown)
 {
     hasconflicts = false;
     db = ldb;
     m_tvList = tvList;
+
+    m_mainServer = NULL;
+    m_noAutoShutdown = noAutoShutdown;
+    // we block the shutdown until a backend connected, if no recording
+    // starts within the next period of time (calculated in the while() loop)
+    m_blockShutdown = true;
 
     setupCards();
 
@@ -49,6 +56,11 @@ Scheduler::~Scheduler()
         delete pginfo;
         recordingList.pop_back();
     }
+}
+
+void Scheduler::SetMainServer(MainServer *ms)
+{
+    m_mainServer = ms;
 }
 
 void Scheduler::setupCards(void)
@@ -1290,6 +1302,11 @@ void Scheduler::RunScheduler(void)
 
     list<ProgramInfo *>::iterator recIter;
 
+    QDateTime idleSince = QDateTime();
+    int idleTimeoutSecs = 0;
+    int idleWaitForRecordingTime = 0;
+    bool doneWakeupCheck = false;
+
     // wait for slaves to connect
     sleep(2);
 
@@ -1311,6 +1328,27 @@ void Scheduler::RunScheduler(void)
             // Determine if the user wants us to start recording early
             // and by how many seconds
             prerollseconds = gContext->GetNumSetting("RecordPreRoll");
+
+            idleTimeoutSecs = gContext->GetNumSetting("idleTimeoutSecs", 0);
+            idleWaitForRecordingTime =
+                       gContext->GetNumSetting("idleWaitForRecordingTime", 15);
+
+            // check once on startup, if a recording starts within the
+            // idleWaitForRecordingTime. If no, block the shutdown,
+            // because system seems to be waken up by the user and not by a
+            // wakeup call
+            if (!doneWakeupCheck)
+            {
+                if ((recIter = recordingList.begin()) != recordingList.end())
+                {
+                    if (curtime.secsTo((*recIter)->startts) - prerollseconds
+                        < idleWaitForRecordingTime * 60)
+                    {
+                        m_blockShutdown = false;
+                    }
+                }
+                doneWakeupCheck = true;
+            }
         }
 
         recIter = recordingList.begin();
@@ -1447,9 +1485,124 @@ void Scheduler::RunScheduler(void)
                 recIter++;
         }
 
+        // if idletimeout is 0, the user disabled the auto-shutdown feature
+        if ((idleTimeoutSecs > 0) && (m_mainServer != NULL) && 
+            !m_noAutoShutdown)
+        {
+            // we release the block when a client connects
+            if (m_blockShutdown)
+                m_blockShutdown &= !m_mainServer->isClientConnected();
+            else
+            {
+                // find out, if we are currently recording (or LiveTV)
+                bool recording = false;
+                QMap<int, EncoderLink *>::Iterator it;
+                for (it = m_tvList->begin(); (it != m_tvList->end()) && 
+                     !recording; ++it)
+                {
+                    if (it.data()->IsBusy())
+                        recording = true;
+                }
+                
+                if (!(m_mainServer->isClientConnected()) && !recording)
+                {
+                    if (!idleSince.isValid())
+                    {
+                        if ((recIter = recordingList.begin()) != 
+                            recordingList.end())
+                        {
+                            if (curtime.secsTo((*recIter)->startts) - 
+                                prerollseconds > idleWaitForRecordingTime * 60)
+                            {
+                                idleSince = curtime;
+                            }
+                        }
+                        else
+                            idleSince = curtime;
+                    } 
+                    else 
+                    {
+                        // is the machine already ideling the timeout time?
+                        if (idleSince.addSecs(idleTimeoutSecs) < curtime)
+                        {
+                            ShutdownServer(prerollseconds);
+                        }
+                        else
+                        {
+                            int itime = idleSince.secsTo(curtime);
+                            QString msg;
+                            if (itime == 1)
+                            {
+                                msg = QString("I\'m idle now... shutdown will "
+                                              "occur in %1 seconds.")
+                                             .arg(idleTimeoutSecs);
+                                VERBOSE(VB_ALL, msg);
+                            }
+                            else if (itime % 10 == 0)
+                            {
+                                msg = QString("%1 secs left to system "
+                                              "shutdown!")
+                                             .arg(idleTimeoutSecs - itime);
+                                VERBOSE(VB_ALL, msg);
+                            }
+                        }
+                    }
+                }
+                else
+                    // not idle, make the time invalid
+                    idleSince = QDateTime();
+            }
+        }
+
         sleep(1);
     }
 } 
+
+void Scheduler::ShutdownServer(int prerollseconds)
+{    
+    list<ProgramInfo *>::iterator recIter = recordingList.begin();
+
+    // set the wakeuptime if needed
+    if (recIter != recordingList.end())
+    {
+        ProgramInfo *nextRecording = (*recIter);
+        QDateTime restarttime = nextRecording->startts.addSecs((-1) * 
+                                                               prerollseconds);
+
+        int add = gContext->GetNumSetting("StartupSecsBeforeRecording", 240);
+        if (add)
+            restarttime = restarttime.addSecs((-1) * add);
+
+        QString wakeup_timeformat = gContext->GetSetting("WakeupTimeFormat",
+                                                         "hh:mm yyyy-MM-dd");
+        QString setwakeup_cmd = gContext->GetSetting("SetWakeuptimeCommand",
+                                                     "echo \'Wakeuptime would "
+                                                     "be $time if command "
+                                                     "set.\'");
+
+        if (wakeup_timeformat == "time_t")
+        {
+            QString time_ts;
+            setwakeup_cmd.replace("$time", 
+                                  time_ts.setNum(restarttime.toTime_t()));
+        }
+        else
+            setwakeup_cmd.replace("$time", 
+                                  restarttime.toString(wakeup_timeformat));
+
+        // now run the command to set the wakeup time
+        system(setwakeup_cmd.ascii());
+    }
+
+    QString halt_cmd = gContext->GetSetting("ServerHaltCommand",
+                                            "sudo /sbin/halt -p");
+
+    // now we shut the slave backends down...
+    m_mainServer->ShutSlaveBackendsDown(halt_cmd);
+
+    //and now shutdown myself
+    system(halt_cmd.ascii());
+}
 
 void *Scheduler::SchedulerThread(void *param)
 {

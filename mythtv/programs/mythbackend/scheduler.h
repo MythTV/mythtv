@@ -4,6 +4,7 @@
 class ProgramInfo;
 class QSqlDatabase;
 class EncoderLink;
+class MainServer;
 
 #include <qmutex.h>
 #include <qmap.h> 
@@ -19,7 +20,7 @@ class Scheduler : public QObject
 {
   public:
     Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList, 
-              QSqlDatabase *ldb);
+              QSqlDatabase *ldb, bool noAutoShutdown = false);
    ~Scheduler();
 
     bool CheckForChanges(void);
@@ -47,6 +48,8 @@ class Scheduler : public QObject
     void PrintList(void);
 
     bool HasConflicts(void) { return hasconflicts; }
+
+    void SetMainServer(MainServer *ms);
 
   protected:
     void RunScheduler(void);
@@ -78,6 +81,8 @@ class Scheduler : public QObject
     ProgramInfo *GetBest(ProgramInfo *info, 
                          list<ProgramInfo *> *conflictList);
     void DoMultiCard();
+
+    void ShutdownServer(int prerollseconds);
 
     list<ProgramInfo *> *CopyList(list<ProgramInfo *> *sourcelist);
 
@@ -116,6 +121,10 @@ class Scheduler : public QObject
     void PruneDontRecords(void);
 
     QValueList<ProgramInfo> dontRecordList;
+
+    MainServer *m_mainServer;
+    bool m_blockShutdown;
+    bool m_noAutoShutdown;
 };
 
 #endif

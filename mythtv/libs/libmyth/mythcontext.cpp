@@ -128,30 +128,65 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
     if (serverSock)
         return true;
 
-    VERBOSE(VB_GENERAL, QString("Connecting to backend server: %1:%2")
-            .arg(hostname).arg(port));
+    int cnt = 0;
 
-    serverSock = new QSocketDevice(QSocketDevice::Stream);
-   
-    if (!connectSocket(serverSock, hostname, port))
+    int sleepTime = GetNumSetting("WOLbackendReconnectWaitTime", 0);
+    int maxConnTry = GetNumSetting("WOLbackendConnectRetry", 1);
+
+    do
     {
-        delete serverSock;
-        serverSock = NULL;
-        
-        cerr << "Connection timed out.\n";
-        cerr << "You probably should modify the Master Server settings\n";
-        cerr << "in the setup program and set the proper IP address.\n";
-        if (m_height && m_width)
+        VERBOSE(VB_GENERAL, QString("Connecting to backend server: "
+                                    "%1:%2 (try %3 of %4")
+                                    .arg(hostname).arg(port).arg(cnt+1)
+                                    .arg(maxConnTry));
+
+        serverSock = new QSocketDevice(QSocketDevice::Stream);
+
+        if (!connectSocket(serverSock, hostname, port))
         {
-            MythPopupBox::showOkPopup(mainWindow, "connection failure",
-                                      tr("Could not connect to the master "
-                                         "backend server -- is it running?  Is "
-                                         "the IP address set for it in the "
-                                         "setup program correct?"));
-        }
+            delete serverSock;
+            serverSock = NULL;
         
-        return false;
+            // only inform the user of a failure if WOL is disabled 
+            if (sleepTime <= 0)
+            {
+                cerr << "Connection timed out.\n";
+                cerr << "You probably should modify the Master Server "
+                     << "settings\nin the setup program and set the proper "
+                     << "IP address.\n";
+                if (m_height && m_width)
+                {
+                    MythPopupBox::showOkPopup(mainWindow, "connection failure",
+                                              tr("Could not connect to the "
+                                                 "master backend server -- is "
+                                                 "it running?  Is the IP "
+                                                 "address set for it in the "
+                                                 "setup program correct?"));
+                }
+
+                return false;
+            }
+            else
+            {
+                VERBOSE(VB_GENERAL, "Trying to wake up the MasterBackend "
+                                    "now.");
+                QString wol_cmd = GetSetting("WOLbackendCommand",
+                                             "echo \'would run the "
+                                             "WakeServerCommand now, if "
+                                             "set!\'");
+                system(wol_cmd.ascii());
+
+                VERBOSE(VB_GENERAL, QString("Waiting for %1 seconds until I "
+                                            "try to reconnect again.")
+                                            .arg(sleepTime));
+                sleep(sleepTime);
+                ++cnt;
+            }
+        }
+        else
+            break;
     }
+    while (cnt <= maxConnTry);
     
     QString str = QString("ANN Playback %1 %2").arg(m_localhostname).arg(false);
     QStringList strlist = str;

@@ -33,6 +33,9 @@ class MainServer : public QObject
     void customEvent(QCustomEvent *e);
     void PrintStatus(QSocket *socket);
 
+    bool isClientConnected();
+    void ShutSlaveBackendsDown(QString &haltcmd);
+
     void ProcessRequest(QSocket *sock); 
     void MarkUnused(ProcessRequestThread *prt);
 
@@ -50,7 +53,7 @@ class MainServer : public QObject
                         QSocket *socket);
     void HandleDone(QSocket *socket);
 
-    // playback
+    void HandleIsActiveBackendQuery(QStringList &slist, PlaybackSock *pbs);
     void HandleQueryRecordings(QString type, PlaybackSock *pbs);
     void HandleStopRecording(QStringList &slist, PlaybackSock *pbs);
     void DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs);

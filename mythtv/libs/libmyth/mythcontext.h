@@ -90,6 +90,7 @@ class MythContext : public QObject
 
     bool ConnectToMasterServer(void);
     bool ConnectServer(const QString &hostname, int port);
+    bool IsConnectedToMaster(void) { return serverSock; }
 
     QString GetInstallPrefix() { return m_installprefix; }
     QString GetShareDir() { return m_installprefix + "/share/mythtv/"; }

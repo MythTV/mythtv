@@ -115,6 +115,9 @@ MainServer::MainServer(bool master, int port, int statusport,
                 SLOT(reconnectTimeout()));
         masterServerReconnect->start(1000, true);
     }
+
+    if (sched)
+        sched->SetMainServer(this);
 }
 
 MainServer::~MainServer()
@@ -323,6 +326,27 @@ void MainServer::ProcessRequest(QSocket *sock)
                  << " Bad FREE_TUNER query" << endl;
         else
             HandleFreeTuner(tokens[1].toInt(), pbs);
+    }
+    else if (command == "QUERY_IS_ACTIVE_BACKEND")
+    {
+        if (tokens.size() != 1)
+            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                 << " Bad QUERY_IS_ACTIVE_BACKEND" << endl;
+        else
+            HandleIsActiveBackendQuery(listline, pbs);
+        
+    }
+    else if (command == "SHUTDOWN_NOW")
+    {
+        if (tokens.size() != 1)
+            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                 << " Bad SHUTDOWN_NOW request" << endl;
+        else if (!ismaster)
+        {
+            VERBOSE(VB_ALL, "Going down now as of Mainserver request!");
+            QString halt_cmd = listline[1];
+            system(halt_cmd.ascii());
+        }
     }
     else if (command == "BACKEND_MESSAGE")
     {
@@ -1801,6 +1825,25 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     SendResponse(pbssock, retlist);
 }
 
+void MainServer::HandleIsActiveBackendQuery(QStringList &slist,
+                                            PlaybackSock *pbs)
+{
+    QStringList retlist;
+    QString queryhostname = slist[1];
+    
+    if (gContext->GetHostName() != queryhostname)
+    {
+        if (getSlaveByHostname(queryhostname) != NULL)
+            retlist << "TRUE";
+        else
+            retlist << "FALSE";
+    }
+    else
+        retlist << "TRUE";
+    
+    SendResponse(pbs->getSocket(), retlist);
+} 
+
 void MainServer::HandleFileTransferQuery(QStringList &slist, 
                                          QStringList &commands,
                                          PlaybackSock *pbs)
@@ -2314,6 +2357,46 @@ void MainServer::reconnectTimeout(void)
 
     masterServer = new PlaybackSock(masterServerSock, server, true);
     playbackList.push_back(masterServer);
+}
+
+// returns true, if a client (slavebackends are not counted!)
+// is connected by checking the lists.
+bool MainServer::isClientConnected()
+{
+    bool foundClient = false;
+
+    foundClient |= (ringBufList.size() > 0);
+    foundClient |= (fileTransferList.size() > 0);
+
+    if ((playbackList.size() > 0) && !foundClient)
+    {
+        vector<PlaybackSock *>::iterator it = playbackList.begin();
+        for (; !foundClient && (it != playbackList.end()); ++it)
+        {
+            // we simply ignore slaveBackends!
+            if (!(*it)->isSlaveBackend())
+                foundClient = true;
+        }
+    }
+    
+    return (foundClient);
+}
+
+// sends the Slavebackends the request to shut down using haltcmd
+void MainServer::ShutSlaveBackendsDown(QString &haltcmd)
+{
+    QStringList bcast = "SHUTDOWN_NOW";
+    bcast << haltcmd;
+    
+    if (playbackList.size() > 0)
+    {
+        vector<PlaybackSock *>::iterator it = playbackList.begin();
+        for (; it != playbackList.end(); ++it)
+        {
+            if ((*it)->isSlaveBackend())
+                WriteStringList((*it)->getSocket(),bcast); 
+        }
+    }
 }
 
 void MainServer::PrintStatus(QSocket *socket)
