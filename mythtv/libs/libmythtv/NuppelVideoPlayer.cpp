@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <sys/soundcard.h>
 #include <sys/ioctl.h>
+#include <sys/time.h>
 #include <time.h>
 #include <math.h>
 #include <qstringlist.h>
