@@ -110,7 +110,7 @@ class MythPrivRequest
     void *m_data;
 };
 
-#define MYTH_BINARY_VERSION "0.16.20040906-1"
+#define MYTH_BINARY_VERSION "0.16.20040911-1"
 #define MYTH_PROTO_VERSION "13"
 
 extern int print_verbose_messages;
@@ -229,7 +229,7 @@ class MythContext : public QObject
     bool GetScreensaverEnabled(void);
 
     void addPrivRequest(MythPrivRequest::Type t, void *data);
-    bool hasPrivRequest() const;
+    void waitPrivRequest() const;
     MythPrivRequest popPrivRequest();
 
   private slots:

@@ -18,8 +18,13 @@ static void *run_priv_thread(void *data)
     (void)data;
     while (true) 
     {
-        if (gContext->hasPrivRequest()) 
+        gContext->waitPrivRequest();
+        
+        for (MythPrivRequest req = gContext->popPrivRequest(); 
+             true; req = gContext->popPrivRequest()) 
         {
+            bool done = false;
+
             MythPrivRequest req = gContext->popPrivRequest();
             switch (req.getType()) 
             {
@@ -32,7 +37,8 @@ static void *run_priv_thread(void *data)
                     {
                         int status = pthread_setschedparam(
                             *target_thread, SCHED_FIFO, &sp);
-                        if (status) {
+                        if (status) 
+                        {
                             perror("pthread_setschedparam");
                             VERBOSE(VB_GENERAL, "Running as SUID root would allow "
                                     "some threads to run with realtime priority, "
@@ -52,10 +58,12 @@ static void *run_priv_thread(void *data)
                 pthread_exit(NULL);
                 break;
             case MythPrivRequest::PrivEnd:
+                done = true; // queue is empty
                 break;
             }
+            if (done)
+                break; // from processing the queue
         }
-        sleep(1);
     }
     return NULL; // will never happen
 }

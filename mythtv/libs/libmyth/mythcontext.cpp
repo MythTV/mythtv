@@ -8,6 +8,7 @@
 #include <qsqldatabase.h>
 #include <qurl.h>
 #include <qnetwork.h>
+#include <qwaitcondition.h>
 
 #include <qsocketdevice.h>
 #include <qhostaddress.h>
@@ -100,6 +101,7 @@ class MythContextPrivate
 
     QMutex *m_priv_mutex;
     queue<MythPrivRequest> m_priv_requests;
+    QWaitCondition m_priv_queued;
 };
 
 MythContextPrivate::MythContextPrivate(MythContext *lparent)
@@ -1647,12 +1649,17 @@ void MythContext::addPrivRequest(MythPrivRequest::Type t, void *data)
 {
     QMutexLocker lockit(d->m_priv_mutex);
     d->m_priv_requests.push(MythPrivRequest(t, data));
+    d->m_priv_queued.wakeAll();
 }
 
-bool MythContext::hasPrivRequest() const
+void MythContext::waitPrivRequest() const
 {
-    QMutexLocker lockit(d->m_priv_mutex);
-    return !d->m_priv_requests.empty();
+    while (true) 
+    {
+        d->m_priv_queued.wait();
+        if (!d->m_priv_requests.empty())
+            return;
+    }
 }
 
 MythPrivRequest MythContext::popPrivRequest()

@@ -1675,7 +1675,9 @@ void NuppelVideoPlayer::StartPlaying(void)
        write to the audio and video output devices.  These should use a
        minimum of CPU. */
 
-    pthread_t output_video;
+    pthread_t output_video, decoder_thread;
+
+    decoder_thread = pthread_self();
     pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);
 
     if (!disablevideo)
@@ -1683,6 +1685,9 @@ void NuppelVideoPlayer::StartPlaying(void)
         // Request that the video output thread run with realtime priority.
         // If mythyv/mythfrontend was installed SUID root, this will work.
         gContext->addPrivRequest(MythPrivRequest::MythRealtime, &output_video);
+
+        // Use realtime prio for decoder thread as well
+       gContext->addPrivRequest(MythPrivRequest::MythRealtime, &decoder_thread);
     }
 
     int pausecheck = 0;
@@ -1876,6 +1881,15 @@ void NuppelVideoPlayer::StartPlaying(void)
     if (audioOutput)
         delete audioOutput;
     audioOutput = NULL;
+
+    if (!disablevideo)
+    {
+        // Reset to default scheduling
+        struct sched_param sp = {0};
+        int status = pthread_setschedparam(decoder_thread, SCHED_OTHER, &sp);
+        if (status)
+            perror("pthread_setschedparam");
+    }
 
     playing = false;
 }
