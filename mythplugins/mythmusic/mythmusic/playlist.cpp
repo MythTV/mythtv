@@ -31,7 +31,7 @@ void Track::postLoad(PlaylistsContainer *grandparent)
         else if (index_value > 0) // Normal Track
             label = all_available_music->getLabel(index_value, &bad_reference);
         else if (index_value < 0)
-            label = grandparent->getPlaylistName(index_value * -1, 
+            label = grandparent->getPlaylistName(index_value, 
                                                  bad_reference);
     }
     else
@@ -60,7 +60,7 @@ void Playlist::postLoad()
     }  
 }
 
-bool Playlist::checkTrack(int a_track_id)
+bool Playlist::checkTrack(int a_track_id, bool cd_flag)
 {
     // XXX SPEED THIS UP
     // Should be a straight lookup against cached index
@@ -69,7 +69,7 @@ bool Playlist::checkTrack(int a_track_id)
 
     for (it = songs.first(); it; it = songs.next())
     {
-        if (it->getValue() == a_track_id)
+        if (it->getValue() == a_track_id && it->getCDFlag() == cd_flag)
         {
             result = true;
         }
@@ -739,7 +739,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
             //  f'ing CD tracks to keep Isaac happy
             //
 
-            Metadata *tmpdata = all_available_music->getMetadata(it->getValue() * -1);
+            Metadata *tmpdata = all_available_music->getMetadata(it->getValue());
             if (tmpdata)
             {
                 QString a_string = QString(QObject::tr("%1 ~ %2")).arg(tmpdata->Artist()).arg(tmpdata->Title());
@@ -748,7 +748,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
                 {
                     a_string = QString("CD Track %1").arg(tmpdata->Track());
                 }
-                GenericTree *added_node = tree_to_write_to->addNode(a_string, it->getValue() * -1, true);
+                GenericTree *added_node = tree_to_write_to->addNode(a_string, it->getValue(), true);
                 ++a_counter;
                 added_node->setAttribute(0, 1);
                 added_node->setAttribute(1, a_counter); //  regular order
@@ -1019,7 +1019,7 @@ bool Playlist::containsReference(int to_check, int depth)
     for(it = songs.first(); it; it = songs.next())
     {
         check = it->getValue();
-        if(check < 0)
+        if (check < 0 && !it->getCDFlag())
         {
             if(check * -1 == to_check)
             {

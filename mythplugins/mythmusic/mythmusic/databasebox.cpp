@@ -537,7 +537,7 @@ void DatabaseBox::fillCD(void)
             if (CDCheckItem *track_ptr = dynamic_cast<CDCheckItem*>(uit))
             {
                 track_ptr->setCheck(0);
-                if (the_playlists->checkCDTrack(track_ptr->getID()))
+                if (the_playlists->checkCDTrack(track_ptr->getID() * -1))
                     track_ptr->setCheck(2);
             }
             ++it;
@@ -560,7 +560,9 @@ void DatabaseBox::fillCD(void)
 
 void DatabaseBox::doMenus(UIListGenericTree *item)
 {
-    if (TreeCheckItem *item_ptr = dynamic_cast<TreeCheckItem*>(item))
+    if (dynamic_cast<CDCheckItem*>(item))
+        return;
+    else if (TreeCheckItem *item_ptr = dynamic_cast<TreeCheckItem*>(item))
     {
         if (item_ptr->getID() < 0)
             doPlaylistPopup(item_ptr);
@@ -573,7 +575,8 @@ void DatabaseBox::alternateDoMenus(UIListGenericTree *item, int keypad_number)
 {
     if (TreeCheckItem *item_ptr = dynamic_cast<TreeCheckItem*>(item))
     {
-        if (item_ptr->getID() < 0)
+        bool is_cd = dynamic_cast<CDCheckItem*>(item) != 0;
+        if (item_ptr->getID() < 0 && !is_cd)
             doPlaylistPopup(item_ptr);
         else if (item->getParent())
         {
@@ -1170,8 +1173,9 @@ void DatabaseBox::checkTree(UIListGenericTree *startingpoint)
         //  Only check things which are TreeCheckItem's
         if (TreeCheckItem *item = dynamic_cast<TreeCheckItem*>(uit))
         {
+            bool is_cd = dynamic_cast<CDCheckItem*>(uit) != 0;
             item->setCheck(0);
-            if (active_playlist->checkTrack(item->getID()))
+            if (active_playlist->checkTrack(item->getID(), is_cd))
             {
                 //  Turn on if it's on the current playlist
                 item->setCheck(2);

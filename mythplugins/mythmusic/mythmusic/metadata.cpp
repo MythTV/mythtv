@@ -748,7 +748,8 @@ void AllMusic::putCDOnTheListView(CDCheckItem *where)
         }
         QString title_temp = QString(QObject::tr("%1 - %2")).arg((*anit).Track()).arg(title_string);
         QString level_temp = QObject::tr("title");
-        CDCheckItem *new_item = new CDCheckItem(where, title_temp, level_temp, (*anit).Track());
+        CDCheckItem *new_item = new CDCheckItem(where, title_temp, level_temp, 
+                                                -(*anit).Track());
         new_item->setCheck(false); //  Avoiding -Wall     
     }  
 }

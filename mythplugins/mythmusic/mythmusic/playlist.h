@@ -81,7 +81,7 @@ class Playlist
 
     void moveTrackUpDown(bool flag, Track *the_track);
 
-    bool checkTrack(int a_track_id);
+    bool checkTrack(int a_track_id, bool cd_flag);
 
     void addTrack(int the_track_id, bool update_display, bool cd_flag);
 
