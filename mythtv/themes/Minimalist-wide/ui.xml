@@ -1081,7 +1081,7 @@
       </listarea>
       <image name="titlelines" draworder="3" fleximage="no">
         <filename>shared/trans-titles.png</filename>
-        <position>-1,0</position>
+        <position>-1,1</position>
       </image>
       <listarea name="bottomtitles" draworder="2">
         <area>30,242,295,170</area>
@@ -1110,7 +1110,7 @@
       </listarea>
       <image name="showinglines" draworder="5" fleximage="yes">
         <filename>playback_box/showings.png</filename>
-        <position>1,-1</position>
+        <position>3,0</position>
       </image>
       <textarea name="current" draworder="6">
         <area>34,190,295,40</area>
