@@ -22,6 +22,7 @@ DaapResponse::DaapResponse(
                             int length
                           )
 {
+    preserved_top_line = "";
     expected_payload_size = -1;
     parent = owner;
     raw_length = length;
@@ -48,8 +49,8 @@ DaapResponse::DaapResponse(
             //  some checking that things are sane
             //
             
-            
             top_line = QString(parsing_buffer);
+            preserved_top_line = top_line;
             QStringList line_tokens = QStringList::split( " ", top_line );
 
             if(line_tokens.count() < 3)
@@ -210,7 +211,7 @@ QString DaapResponse::getHeader(const QString& field_label)
 void DaapResponse::printHeaders()
 {
     cout << "============== Debugging Output - DAAP Response Headers ===============" << endl;
-
+    cout << preserved_top_line;
     QDictIterator<HttpHeader> it( headers );
     for( ; it.current(); ++it )
     {

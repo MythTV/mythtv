@@ -8,6 +8,12 @@
 
 */
 
+#include <unistd.h>
+#include <netdb.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 #include "settings.h"
 
 #ifdef MYTHLIB_SUPPORT 
@@ -21,7 +27,7 @@
 //  the defaults.
 //
 
-Settings::Settings(const QString &binversion)
+Settings::Settings()
 {
 #ifdef MYTHLIB_SUPPORT 
     gContext = new MythContext(MYTH_BINARY_VERSION, false, false);
@@ -72,7 +78,9 @@ QString Settings::GetHostName()
 #ifdef MYTHLIB_SUPPORT
     return gContext->GetHostName();
 #endif
-    return "ihavenoidea";
+    char my_hostname[2049] = "ihavenohostname";
+    gethostname(my_hostname, 2048);
+    return my_hostname;
 }
 
 QString Settings::getHostName()

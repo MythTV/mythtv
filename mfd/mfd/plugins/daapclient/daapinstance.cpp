@@ -41,9 +41,10 @@ DaapInstance::DaapInstance(
     client_socket_to_daap_server = NULL;
     if(pipe(u_shaped_pipe) < 0)
     {
-        warning("daap instance could not create a u shaped pipe");
+        warning("could not create a u shaped pipe");
     }
     daap_server_type = DAAP_SERVER_UNKNOWN;
+    
 
     //
     //  Server supplied information:
@@ -88,6 +89,7 @@ DaapInstance::DaapInstance(
     //
 
     databases.setAutoDelete(true);
+    current_request_db = NULL;
 }                           
 
 void DaapInstance::run()
@@ -100,7 +102,7 @@ void DaapInstance::run()
     QHostAddress daap_server_address;
     if(!daap_server_address.setAddress(server_address))
     {
-        warning(QString("daap instance could not "
+        warning(QString("could not "
                         "set daap server's address "
                         "of %1")
                         .arg(server_address));
@@ -120,7 +122,7 @@ void DaapInstance::run()
         ++connect_tries;
         if(connect_tries > 10)
         {
-            warning(QString("daap instance could not "
+            warning(QString("could not "
                             "connect to server %1:%2")
                             .arg(server_address)
                             .arg(server_port));
@@ -129,7 +131,7 @@ void DaapInstance::run()
         usleep(100);
     }
 
-    log(QString("daap instance made basic "
+    log(QString("made basic "
                 "connection to \"%1\" (%2:%3)")
                 .arg(service_name)
                 .arg(server_address)
@@ -188,7 +190,7 @@ void DaapInstance::run()
         int result = select(nfds, &readfds, NULL, NULL, &timeout);
         if(result < 0)
         {
-            warning("daap instance got an error from select() "
+            warning("got an error from select() "
                     "... not sure what to do");
         }
         else
@@ -369,7 +371,7 @@ void DaapInstance::handleIncoming()
             //  Well, something is borked. Give up on this daap server.
             //
             
-            warning(QString("daap instance has given up on "
+            warning(QString("given up on "
                             "\"%1\" (%2:%3)")
                             .arg(service_name)
                             .arg(server_address)
@@ -416,7 +418,7 @@ bool DaapInstance::checkServerType(const QString &server_description)
         }
         if(!copasetic)
         {
-            warning(QString("daap instance is completely confused about "
+            warning(QString("completely confused about "
                             "what kind of server it is talking to: \"%1\"")
                             .arg(server_description));
             
@@ -453,7 +455,7 @@ bool DaapInstance::checkServerType(const QString &server_description)
                 else
                 {
                     daap_server_type = DAAP_SERVER_ITUNESLESSTHAN401;
-                    log(QString("daap instance discovered service "
+                    log(QString("discovered service "
                                 "named \"%1\" is being served by "
                                 "iTunes (v < 4.1 !!)")
                                 .arg(service_name), 2);
@@ -465,7 +467,7 @@ bool DaapInstance::checkServerType(const QString &server_description)
         else if(server_description.left(6) == "MythTV")
         {
             daap_server_type = DAAP_SERVER_MYTH;
-            log(QString("daap instance discovered service "
+            log(QString("discovered service "
                         "named \"%1\" is being served by "
                         "another myth box :-)")
                         .arg(service_name), 2);
@@ -473,7 +475,7 @@ bool DaapInstance::checkServerType(const QString &server_description)
         else
         {
             daap_server_type = DAAP_SERVER_UNKNOWN;
-            warning(QString("daap instance did not recognize the "
+            warning(QString("did not recognize the "
                             "type of server it's connected to: \"%1\"")
                             .arg(server_description));
         }
@@ -493,7 +495,7 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
         //  We got an iTunes 4.1 or greater server.
         //
         
-        warning("daap instance cannot talk to iTunes because\n"
+        warning("cannot talk to iTunes because\n"
                 "                   it uses a totally undocumented Client-DAAP-Validation header\n\n"
                 "                   Please complain to Apple at:\n\n"
                 "                   Apple Customer Relations, (800) 767-2775\n" 
@@ -513,7 +515,7 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
         "application/x-dmap-tagged"
       )
     {
-        warning("daap instance got a daap response which "
+        warning("got a daap response which "
                 "is not x-dmap-tagged ... this is bad");
         return;
     }
@@ -574,11 +576,19 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
     }
     else if(top_level_tag.type == 'adbs')
     {
-        doDatabaseItemsResponse(rebuilt_internal);
+        if(current_request_db)
+        {
+            current_request_db->doDatabaseItemsResponse(rebuilt_internal);            
+        }
+        else
+        {
+            warning("got an adbs response, but "
+                    "have no current database ");
+        }
     }
     else
     {
-        warning("daap instance got a top level "
+        warning("got a top level "
                 "unknown tag in a dmap payload ");
     }
 
@@ -594,7 +604,7 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
     {
         if(!a_database->hasItems())
         {
-            int which_database = a_database->getId();
+            int which_database = a_database->getDaapId();
             QString request_string = QString("/databases/%1/items").arg(which_database);
             DaapRequest update_request(this, request_string, server_address);
             update_request.addGetVariable("session-id", session_id);
@@ -639,7 +649,8 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
                                                     "daap.songdatakind,"
                                                     "daap.songdataurl"
                                                  ));
-            
+
+            current_request_db = a_database;            
             update_request.send(client_socket_to_daap_server);
             
             //
@@ -647,6 +658,10 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
             //
 
             a_database = databases.last();
+        }
+        else
+        {
+            current_request_db = NULL;
         }
     }
 
@@ -688,7 +703,7 @@ void DaapInstance::doServerInfoResponse(TagInput& dmap_data)
                 dmap_data >> a_u32_variable;
                 if(a_u32_variable != 200)    // DAAP ok magic, like HTTP 200
                 {
-                    warning("daap instance got non 200 for DAAP status");
+                    warning("got non 200 for DAAP status");
                 }
                 break;
 
@@ -715,7 +730,7 @@ void DaapInstance::doServerInfoResponse(TagInput& dmap_data)
                     QString q_string = QString::fromUtf8(a_string.c_str());
                     if(q_string != service_name)
                     {
-                        warning(QString("daap instance got conflicting names for "
+                        warning(QString("got conflicting names for "
                                         "service: \"%1\" versus \"%2\" (sticking "
                                         "with \"%3\")")
                                         .arg(service_name)
@@ -847,7 +862,7 @@ void DaapInstance::doServerInfoResponse(TagInput& dmap_data)
                 break;
 
             default:
-                warning("daap instance got an unknown tag type "
+                warning("got an unknown tag type "
                         "while doing doServerInfoResponse()");
                 dmap_data >> emergency_throwaway_chunk;
         }
@@ -911,7 +926,7 @@ void DaapInstance::doLoginResponse(TagInput& dmap_data)
                 break;
 
             default:
-                warning("daap instance got an unknown tag type "
+                warning("got an unknown tag type "
                         "while doing doLoginResponse()");
                 dmap_data >> emergency_throwaway_chunk;
         }
@@ -923,7 +938,7 @@ void DaapInstance::doLoginResponse(TagInput& dmap_data)
     if(session_id != -1 && login_status)
     {
         logged_in = true;
-        log(QString("daap instance has managed to log "
+        log(QString("managed to log "
                     "on to \"%1\" and will start loading "
                     "metadata ... ")
                     .arg(service_name), 5);
@@ -941,7 +956,7 @@ void DaapInstance::doLoginResponse(TagInput& dmap_data)
     }
     else
     {
-        warning(QString("daap instance could not log on "
+        warning(QString("could not log on "
                         "to \"%1\" (password protected?) "
                         "and is giving up")
                         .arg(service_name));
@@ -997,7 +1012,7 @@ void DaapInstance::doUpdateResponse(TagInput& dmap_data)
                 break;
 
             default:
-                warning("daap instance got an unknown tag type "
+                warning("got an unknown tag type "
                         "while doing doUpdateResponse()");
                 dmap_data >> emergency_throwaway_chunk;
         }
@@ -1014,7 +1029,7 @@ void DaapInstance::doUpdateResponse(TagInput& dmap_data)
         //  time of see what kind of databases are available
         //
         
-        log(QString("daap instance has now figured out that "
+        log(QString("now figured out that "
                     "\"%1\" (%2:%3) is on generation %4")
                     .arg(service_name)
                     .arg(server_address)
@@ -1117,7 +1132,7 @@ void DaapInstance::doDatabaseListResponse(TagInput& dmap_data)
                 break;
 
             default:
-                warning("daap instance got an unknown tag type "
+                warning("got an unknown tag type "
                         "while doing doDatabaseListResponse()");
                 dmap_data >> a_chunk;
         }
@@ -1152,7 +1167,7 @@ void DaapInstance::parseDatabaseListings(TagInput& dmap_data, int how_many)
             //
             //  this should not happen
             //
-            warning("daap instance got a non mlit tag "
+            warning("got a non mlit tag "
                     "where one absolutely has to be.");
         }
         
@@ -1229,537 +1244,18 @@ void DaapInstance::parseDatabaseListings(TagInput& dmap_data, int how_many)
             
         Database *new_database = new Database(
                                                 new_database_id,
-                                                new_database_persistent_id,
                                                 new_database_name,
                                                 new_database_expected_item_count,
                                                 new_database_expected_container_count,
-                                                the_mfd
+                                                the_mfd,
+                                                parent,
+                                                session_id,
+                                                server_address,
+                                                server_port
                                              );
         databases.append(new_database);
     }
 }
-
-void DaapInstance::doDatabaseItemsResponse(TagInput& dmap_data)
-{
-
-    Tag a_tag;
-    Chunk a_chunk;
-
-    bool database_items_status = false;
-    int new_numb_items = -1;
-    int new_received_numb_items = -1;
-
-    while(!dmap_data.isFinished())
-    {
-        //
-        //  parse responses to a /database/x/items request
-        //
-
-        dmap_data >> a_tag;
-
-        u32 a_u32_variable;
-        u8  a_u8_variable;
-
-        switch(a_tag.type)
-        {
-            case 'mstt':
-
-                //
-                //  status of request
-                //
-                
-                dmap_data >> a_u32_variable;
-                if(a_u32_variable == 200)    // like HTTP 200 (OK!)
-                {
-                    database_items_status = true;
-                }
-                break;
-
-            case 'muty':
-            
-                //
-                //  update type ... only ever seen 0 here ... dunno ?
-                //
-                
-                dmap_data >> a_u8_variable;
-                break;
-                
-            case 'mtco':
-                
-                //
-                //  number of total items
-                //
-                
-                dmap_data >> a_u32_variable;
-                new_numb_items = a_u32_variable;
-                cout << "new_numb_items = " << new_numb_items << endl;
-                break;
-                
-            case 'mrco':
-            
-                //
-                //  received number of items
-                //                
-                
-                dmap_data >> a_u32_variable;
-                new_received_numb_items = a_u32_variable;
-                cout << "new_received_numb_items = " << new_received_numb_items << endl;
-                break;
-                
-            case 'mlcl':
-
-                //
-                //  This is "listing" tag, saying there's a list of other tags to come
-                //
-                
-                dmap_data >> a_chunk;
-                {
-                    TagInput re_rebuilt_internal(a_chunk);
-                    parseItems(re_rebuilt_internal, new_received_numb_items);
-                }
-                break;
-
-            default:
-                warning("daap instance got an unknown tag type "
-                        "while doing doDatabaseItemsResponse()");
-                dmap_data >> a_chunk;
-        }
-
-        dmap_data >> end;
-
-    }
-}    
-
-void DaapInstance::parseItems(TagInput& dmap_data, int how_many)
-{
-
-    Tag a_tag;
-
-    u8  a_u8_variable;
-    u16 a_u16_variable;
-    u32 a_u32_variable;
-    u64 a_u64_variable;
-    
-    std::string a_string;
-    Chunk listing;
-
-    QTime loading_time;
-    loading_time.start();    
-    
-    for(int i = 0; i < how_many; i++)
-    {
-        Chunk emergency_throwaway_chunk;
-
-        dmap_data >> a_tag >> listing >> end;
-    
-        if(a_tag.type != 'mlit')
-        {
-            //
-            //  this should not happen
-            //
-            warning("daap instance got a non mlit tag "
-                    "where one simply must be.");
-        }
-        
-        int     new_item_id = -1;
-        int     new_item_persistent_id = 1;
-        QString new_item_name = "";
-        QString new_item_album_name = "";
-        QString new_item_artist_name = "";
-        int     new_item_bpm = -1;
-        int     new_item_bitrate = -1;
-        QString new_item_comment = "";
-        bool    new_item_compilation = false;
-        QString new_item_composer_name = "";
-        int     new_item_date_added = -1;   //  seconds since epoch?
-        int     new_item_date_modified = -1;
-        int     new_item_disc_count = -1;
-        int     new_item_disc_number = -1;
-        int     new_item_disabled = -1;
-        QString new_item_eqpreset = "";
-        QString new_item_format = "";
-        QString new_item_genre = "";
-        QString new_item_description = "";
-        int     new_item_relative_volume = 0;
-        int     new_item_sample_rate = -1;
-        int     new_item_size = -1;
-        int     new_item_start_time = -1;
-        int     new_item_stop_time = -1;
-        int     new_item_total_time = -1;
-        int     new_item_track_count = -1;
-        int     new_item_track_number = -1;
-        int     new_item_rating = -1;
-        int     new_item_year = -1;
-        QString new_item_url = "";
-        
-        TagInput internal_listing(listing);
-        while(!internal_listing.isFinished())
-        {
-    
-            internal_listing >> a_tag;
-        
-            switch(a_tag.type)
-            {
-                //
-                //  This ain't pretty, and there are a lot of them, but it
-                //  works (and, suprisingly, it's not aching slow)
-                //
-
-                case 'mikd':
-                
-                    //
-                    //  item kind ... no idea what that means
-                    //
-
-                    internal_listing >> a_u8_variable;
-                    break;
-
-                case 'asdk':
-            
-                    //
-                    //  data kind ... I think this is file vs. network
-                    //  stream or something (1 = radio, 2 = file) ... dunno
-                    //
-                
-                    internal_listing >> a_u8_variable;
-                    break;
-                
-                case 'miid':
-            
-                    //
-                    //  item id !
-                    //
-                
-                    internal_listing >> a_u32_variable;
-                    new_item_id = a_u32_variable;
-                    break;
-                    
-                case 'mper':
-                
-                    internal_listing >> a_u64_variable;
-                    new_item_persistent_id = a_u64_variable;
-                    break;
-
-                case 'minm':
-            
-                    //
-                    //   Item name
-                    //
-                
-                    internal_listing >> a_string;
-                    new_item_name = QString::fromUtf8(a_string.c_str());
-                    break;
-                
-                case 'asal':
-                
-                    //
-                    //  Album name
-                    //
-                    
-                    internal_listing >> a_string;
-                    new_item_album_name = QString::fromUtf8(a_string.c_str());
-                    break;
-                
-                case 'asar':
-                
-                    //
-                    //  Artist name
-                    //
-                    
-                    internal_listing >> a_string;
-                    new_item_artist_name = QString::fromUtf8(a_string.c_str());
-                    break;
-                    
-                case 'asbt':
-                
-                    //
-                    //  Beats per minute
-                    //
-                    
-                    internal_listing >> a_u16_variable;
-                    new_item_bpm = a_u16_variable;
-                    break;
-                    
-                case 'asbr':
-                
-                    //
-                    //  Bitrate (probably not used to calculate anything)
-                    //    
-                    
-                    internal_listing >> a_u16_variable;
-                    new_item_bitrate = a_u16_variable;
-                    break;
-                    
-                case 'ascm':
-                
-                    //
-                    //  Comment
-                    //
-                    
-                    internal_listing >> a_string;
-                    new_item_comment = QString::fromUtf8(a_string.c_str());
-                    break;
-                    
-                case 'asco':
-                
-                    //
-                    //  Part of a compilation (this is probably a bool flag)
-                    //
-                    
-                    internal_listing >> a_u8_variable;
-                    new_item_compilation = (bool) a_u8_variable;
-                    break;
-                
-                case 'ascp':
-                
-                    //
-                    //  Composer's name
-                    //
-                    
-                    internal_listing >> a_string;
-                    new_item_composer_name = QString::fromUtf8(a_string.c_str());
-                    break;
-                    
-                case 'asda':
-                
-                    //
-                    //  Date added
-                    //
-                    
-                    internal_listing >> a_u32_variable;
-                    new_item_date_added = a_u32_variable;
-                    break;
-                    
-                case 'asdm':
-                
-                    //
-                    //  Date modified
-                    //
-                    
-                    internal_listing >> a_u32_variable;
-                    new_item_date_modified = a_u32_variable;
-                    break;
-                    
-                case 'asdc':
-                
-                    //
-                    //  Number of discs in the collection this item came
-                    //  from
-                    //   
-                    
-                    internal_listing >> a_u16_variable;
-                    new_item_disc_count = a_u16_variable;
-                    break;
-                    
-                case 'asdn':
-                
-                    //
-                    //  The disc number (out of disc count) the item is/was
-                    //  on
-                    //
-                
-                    internal_listing >> a_u16_variable;
-                    new_item_disc_number = a_u16_variable;
-                    break;
-                    
-                case 'asdb':
-                
-                    //
-                    //  Song is disabled (ie. not checked for playing in
-                    //  iTunes)
-                    //
-
-                    internal_listing >> a_u8_variable;
-                    new_item_disabled = a_u8_variable;
-                    break;
-                    
-                case 'aseq':
-                
-                    //
-                    //  Song eq preset (e.g. "Bass Booster", "Spoken Word")
-                    //
-                    
-                    internal_listing >> a_string;
-                    new_item_eqpreset = QString::fromUtf8(a_string.c_str());
-                    break;
-                
-                case 'asfm':
-                
-                    //
-                    //  Song format (wav, ogg, etc.)
-                    //
-                    
-                    internal_listing >> a_string;
-                    new_item_format = QString::fromUtf8(a_string.c_str());
-                    break;
-                    
-                case 'asgn':
-
-                    //
-                    //  Genre
-                    //      
-                    
-                    internal_listing >> a_string;
-                    new_item_genre = QString::fromUtf8(a_string.c_str());
-                    break;
-
-                case 'asdt':
-                
-                    //
-                    //  Description
-                    //
-                    
-                    internal_listing >> a_string;
-                    new_item_description = QString::fromUtf8(a_string.c_str());
-                    break; 
-                    
-                case 'asrv':
-                
-                    //
-                    //  relative volume (probably -100 to +100, or 0-256 ?)
-                    //
-                    
-                    internal_listing >> a_u8_variable;
-                    new_item_relative_volume = a_u8_variable;
-                    break;
-                    
-                case 'assr':
-                
-                    //
-                    //  Sample rate (44.1, etc.)
-                    //
-                    
-                    internal_listing >> a_u32_variable;
-                    new_item_sample_rate = a_u32_variable;
-                    break;
-
-                case 'assz':
-                
-                    //
-                    //  Song size (bytes ?)
-                    //
-                    
-                    internal_listing >> a_u32_variable;
-                    new_item_size = a_u32_variable;
-                    break;
-                    
-                case 'asst':
-                
-                    //
-                    //  Start time (I guess you could set to always skip
-                    //  over something)
-                    //
-                    
-                    internal_listing >> a_u32_variable;
-                    new_item_start_time = a_u32_variable;
-                    break;
-                    
-                case 'assp':
-                
-                    //
-                    //  Stop time
-                    //
-                    
-                    internal_listing >> a_u32_variable;
-                    new_item_stop_time = a_u32_variable;
-                    break;
-                    
-                case 'astm':
-                
-                    //
-                    //  Total time
-                    //
-                    
-                    internal_listing >> a_u32_variable;
-                    new_item_total_time = a_u32_variable;
-                    break;
-                    
-                    
-                case 'astc':
-                
-                    //
-                    //  Track count (how many in total)
-                    //
-                    
-                    internal_listing >> a_u16_variable;
-                    new_item_track_count = a_u16_variable;
-                    break;
-                    
-                case 'astn':
-                
-                    //
-                    //  Track number
-                    //
-                    
-                    internal_listing >> a_u16_variable;
-                    new_item_track_number = a_u16_variable;
-                    break;
-                    
-                case 'asur':
-                
-                    //
-                    //  User rating (0 to 100)
-                    //
-                    
-                    internal_listing >> a_u8_variable;
-                    new_item_rating = a_u8_variable;
-                    break;
-
-                case 'asyr':
-                
-                    //
-                    //  Year song was released (?)
-                    //
-                    
-                    internal_listing >> a_u16_variable;
-                    new_item_year = a_u16_variable;
-                    break;
-
-                case 'asul':
-                
-                    //
-                    //  A url for the song (link to band home page? I have
-                    //  no idea)
-                    //
-                    
-                    internal_listing >> a_string;
-                    new_item_url = QString::fromUtf8(a_string.c_str());
-                    break;
-
-                default:
-                    
-                    warning("unknown tag while parsing database item");
-                    internal_listing >> emergency_throwaway_chunk;
-            }
-            internal_listing >> end;
-        }
-        
-        //
-        //  If we have enough data, make a Metadata object
-        //
-
-        if(new_item_id > -1 && new_item_name.length() > 0)
-        {
-            //
-            //  Make new metadata
-            //  
-        }
-        else
-        {
-            warning("got incomplete data for an item, going to ignore it");
-        }        
-        
-        
-    }
-    
-    double elapsed_time = loading_time.elapsed() / 1000.0;
-    log(QString("daap instance parsed and loaded metadata for %1 "
-                "items in %2 seconds")
-                .arg(how_many)
-                .arg(elapsed_time), 4);
-    
-}
-
 
 DaapInstance::~DaapInstance()
 {

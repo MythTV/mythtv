@@ -141,11 +141,10 @@ int main(int argc, char **argv)
 
     QSqlDatabase *db = NULL;
 
-    mfdContext = new Settings(MYTH_BINARY_VERSION);
+    mfdContext = new Settings();
     
 
 #ifdef MYTHLIB_SUPPORT
-    //gContext = new MythContext(MYTH_BINARY_VERSION, false, false);
     db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
     {

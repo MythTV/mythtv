@@ -16,6 +16,12 @@
 
 #include "../../mfd.h"
 #include "mdcontainer.h"
+#include "../../mdserver.h"
+
+#include "../daapserver/daaplib/taginput.h"
+#include "../daapserver/daaplib/tagoutput.h"
+
+class DaapClient;
 
 class Database
 {
@@ -23,30 +29,51 @@ class Database
   public:
   
     Database(
-                int l_id, 
-                int l_persistent_id,
+                int l_daap_id, 
                 const QString& l_name,
                 int l_expected_numb_items,
-                int l_expected_numb_containers,
-                MFD *my_mfd
+                int l_expected_numb_playlists,
+                MFD *my_mfd,
+                DaapClient *owner,
+                int l_session_id,
+                QString l_host_address,
+                int l_host_port
             );
     ~Database();
 
-    bool    hasItems();
-    int     getId(){return id;}
+    bool    hasItems(){return have_items;}
+    bool    hasPlaylistList(){return have_playlist_list;}
+    bool    hasPlaylists(){return have_playlists;}
+    
+    int     getDaapId(){return daap_id;}
+
+    void    doDatabaseItemsResponse(TagInput &dmap_data);
+    void    parseItems(TagInput &dmap_Data, int how_many);
+
+    
+
      
   private:   
-  
-    int     id;
-    int     persistent_id;
+
+    DaapClient *parent;
+    void    log(const QString &log_message, int verbosity);
+    void    warning(const QString &warning_message);  
+    int     daap_id;
     QString name;
     int     expected_numb_items;
-    int     expected_numb_containers;
+    int     expected_numb_playlists;
     
     MFD                 *the_mfd;
-    MetadataContainer   *my_metadatacontainer;
+    MetadataServer      *metadata_server;
+    MetadataContainer   *metadata_container;
+    int                 container_id;
 
-
-    bool    fake_temp_bool;
+    bool    have_items;
+    bool    have_playlist_list;
+    bool    have_playlists;
+    
+    int session_id;
+    QString host_address;
+    int host_port;
 };
 #endif  // database_h_

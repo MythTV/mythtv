@@ -582,7 +582,7 @@ void DaapServer::sendDatabaseList(HttpRequest *http_request)
 
 }
 
-void DaapServer::addItemToResponse(TagOutput &response, AudioMetadata *which_item, u64 meta_codes)
+void DaapServer::addItemToResponse(DaapRequest *daap_request, TagOutput &response, AudioMetadata *which_item, u64 meta_codes)
 {
     response << Tag('mlit');
                     
@@ -620,47 +620,77 @@ void DaapServer::addItemToResponse(TagOutput &response, AudioMetadata *which_ite
 
     if(meta_codes & DAAP_META_SONGBITRATE)
     {
-        // response << Tag('asbr') << (u16) ...
+        if(which_item->getBitrate() > 0)
+        {
+            response << Tag('asbr') << (u16) which_item->getBitrate() << end;
+        }
     }
 
     if(meta_codes & DAAP_META_SONGBEATSPERMINUTE)
     {
-        // response << Tag('asbt') << (u16) ...
+        if(which_item->getBpm() > 0)
+        {
+            response << Tag('asbt') << (u16) which_item->getBpm() << end;
+        }
     }
     
     if(meta_codes & DAAP_META_SONGCOMMENT)
     {
-        // response << Tag('ascm') << utf8 ....
+        if(which_item->getComment().length() > 0)
+        {
+            response << Tag('ascm') << which_item->getComment().utf8() << end;
+        }
     }
 
     if(meta_codes & DAAP_META_SONGCOMPILATION)
     {
-        response << Tag('asco') << (u8) 0 << end;
+        response << Tag('asco') << (u8) which_item->getCompilation() << end;
     }
     
     if(meta_codes & DAAP_META_SONGCOMPOSER)
     {
-        // response << Tag('ascp') << utf8 ....
+        if(which_item->getComposer().length() > 0)
+        {
+            response << Tag('ascp') << which_item->getComposer().utf8() << end;
+        }
     }
 
     if(meta_codes & DAAP_META_SONGDATEADDED)
     {
-        // response << Tag('asda') << (u32) ... (seconds since when ... ?)
+        QDateTime when = which_item->getDateAdded();
+        QDateTime first_possible;
+        first_possible.setTime_t(0);
+        if(when > first_possible)
+        {
+            response << Tag('asda') << (u32) when.toTime_t() << end;
+        }
     }
 
     if(meta_codes & DAAP_META_SONGDATEMODIFIED)
     {
-        // response << Tag('asdm') << (u32) ... (seconds since when ... ?)
+        QDateTime when = which_item->getDateModified();
+        QDateTime first_possible;
+        first_possible.setTime_t(0);
+        if(when > first_possible)
+        {
+            response << Tag('asdm') << (u32) when.toTime_t() << end;
+        }
     }
 
     if(meta_codes & DAAP_META_SONGDISCCOUNT)
     {
-        // response << Tag('asdc') << (u16) ...
+        if(which_item->getDiscCount() > 0)
+        {
+            response << Tag('asdc') << (u16) which_item->getDiscCount() << end;
+        }
     }
     
     if(meta_codes & DAAP_META_SONGDISCNUMBER)
     {
-        // response << Tag('asdn') << (u16) ...
+        if(which_item->getDiscNumber() > 0)
+        {
+            response << Tag('asdn') << (u16) which_item->getDiscNumber() << end;
+        }
     }
     
     if(meta_codes & DAAP_META_SONGDISABLED)
@@ -669,30 +699,39 @@ void DaapServer::addItemToResponse(TagOutput &response, AudioMetadata *which_ite
     }
     if(meta_codes & DAAP_META_SONGEQPRESET)
     {
-        //
+        if(which_item->getEqPreset().length() > 0)
+        {
+            response << Tag('aseq') << which_item->getEqPreset().utf8() << end;
+        }
     }
 
     if(meta_codes & DAAP_META_SONGFORMAT)
     {
-        if(which_item->getUrl().fileName().section('.', -1,-1) == "mp3")
+        //
+        //  If the client is another Myth box, tell them the truth about our
+        //  file formats. If it's something else (e.g. iTunes) then trick
+        //  them.
+        //
+        
+        if(daap_request->getClientType() == DAAP_CLIENT_MFDDAAPCLIENT)
         {
-            response << Tag('asfm') << "mp3" << end;
-        }
-        else if(which_item->getUrl().fileName().section('.', -1,-1) == "mp4")
-        {
-            response << Tag('asfm') << "mp4" << end;
-        }
-        else if(which_item->getUrl().fileName().section('.', -1,-1) == "aac")
-        {
-            response << Tag('asfm') << "aac" << end;
-        }
-        else if(which_item->getUrl().fileName().section('.', -1,-1) == "m4a")
-        {
-            response << Tag('asfm') << "m4a" << end;
+            QString extension = which_item->getUrl().fileName().section('.', -1,-1);
+            response << Tag('asfm') << extension.utf8() << end;
         }
         else
         {
-            response << Tag('asfm') << "wav" << end;
+            if(which_item->getUrl().fileName().section('.', -1,-1) == "mp3")
+            {
+                response << Tag('asfm') << "mp3" << end;
+            }
+            else if(which_item->getUrl().fileName().section('.', -1,-1) == "m4a")
+            {
+                response << Tag('asfm') << "m4a" << end;
+            }
+            else
+            {
+                response << Tag('asfm') << "wav" << end;
+            }
         }
     }
 
@@ -709,32 +748,50 @@ void DaapServer::addItemToResponse(TagOutput &response, AudioMetadata *which_ite
     
     if(meta_codes & DAAP_META_SONGDESCRIPTION)
     {
-        // response << Tag('asdt') << utf8 ...
+        if(which_item->getDescription().length() > 0)
+        {
+            response << Tag('asdt') << which_item->getDescription().utf8() << end;
+        }
     }
     
     if(meta_codes & DAAP_META_SONGRELATIVEVOLUME)
     {
-        // response << Tag('asrv') << (u8) ...
+        if(which_item->getRelativeVolume() != 0)
+        {
+            response << Tag('asrv') << (u8) which_item->getRelativeVolume() << end;
+        }
     }
     
     if(meta_codes & DAAP_META_SONGSAMPLERATE)
     {
-        // response << Tag('assr') << (u32) ...
+        if(which_item->getSampleRate() > 0)
+        {
+            response << Tag('assr') << (u32) which_item->getSampleRate() << end;
+        }
     }
     
     if(meta_codes & DAAP_META_SONGSIZE)
     {
-        // response << Tag('assz') << (u32) ...
+        if(which_item->getSize() > 0)
+        {
+            response << Tag('assz') << (u32) which_item->getSize() << end;
+        }
     }
     
     if(meta_codes & DAAP_META_SONGSTARTTIME)
     {
-        response << Tag('asst') << (u32) 0 << end;
+        if(which_item->getStartTime() > -1)
+        {
+            response << Tag('asst') << (u32) which_item->getStartTime() << end;
+        }
     }
 
     if(meta_codes & DAAP_META_SONGSTOPTIME)
     {
-        response << Tag('assp') << (u32) which_item->getLength() << end;
+        if(which_item->getStopTime() > -1)
+        {
+            response << Tag('assp') << (u32) which_item->getStopTime() << end;
+        }
     }
     
     if(meta_codes & DAAP_META_SONGTIME)
@@ -744,7 +801,10 @@ void DaapServer::addItemToResponse(TagOutput &response, AudioMetadata *which_ite
     
     if(meta_codes & DAAP_META_SONGTRACKCOUNT)
     {
-        // response << Tag('astc') << (u16) ...
+        if(which_item->getTrackCount() > 0)
+        {
+            response << Tag('astc') << (u16) which_item->getTrackCount() << end;
+        }
     }
 
     if(meta_codes & DAAP_META_SONGTRACKNUMBER)
@@ -837,7 +897,7 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
                 if(added_metadata->getType() == MDT_audio)
                 {
                     AudioMetadata *added_audio_metadata = (AudioMetadata*)added_metadata;
-                    addItemToResponse(response, added_audio_metadata, meta_codes);
+                    addItemToResponse(daap_request, response, added_audio_metadata, meta_codes);
                 }
                 else
                 {
@@ -906,7 +966,7 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
                         if(iterator.current()->getType() == MDT_audio)
                         {
                             AudioMetadata *which_item = (AudioMetadata*)iterator.current();
-                            addItemToResponse(response, which_item, meta_codes);
+                            addItemToResponse(daap_request, response, which_item, meta_codes);
                         }
                         else
                         {

@@ -124,36 +124,108 @@ class AudioMetadata : public Metadata
     ~AudioMetadata();
 
 
-    QString getArtist() { return artist; }
-    void    setArtist(const QString &lartist) { artist = lartist; }
+    QString     getArtist() { return artist; }
+    void        setArtist(const QString &lartist) { artist = lartist; }
     
-    QString getAlbum() { return album; }
-    void    setAlbum(const QString &lalbum) { album = lalbum; }
+    QString     getAlbum() { return album; }
+    void        setAlbum(const QString &lalbum) { album = lalbum; }
 
-    QString getTitle() { return title; }
-    void    setTitle(const QString &ltitle) { title = ltitle; }
+    QString     getTitle() { return title; }
+    void        setTitle(const QString &ltitle) { title = ltitle; }
 
-    QString getGenre() { return genre; }
-    void    setGenre(const QString &lgenre) { genre = lgenre; }
+    QString     getGenre() { return genre; }
+    void        setGenre(const QString &lgenre) { genre = lgenre; }
 
-    int     getYear() { return year; }
-    void    setYear(int lyear) { year = lyear; }
+    int         getYear() { return year; }
+    void        setYear(int lyear) { year = lyear; }
  
-    int     getTrack() { return tracknum; }
-    void    setTrack(int ltrack) { tracknum = ltrack; }
+    int         getTrack() { return tracknum; }
+    void        setTrack(int ltrack) { tracknum = ltrack; }
 
-    int     getLength() { return length; }
-    void    setLength(int llength) { length = llength; }
+    int         getLength() { return length; }
+    void        setLength(int llength) { length = llength; }
+    
+    int         getBpm() { return bpm; }
+    void        setBpm(int lbpm) { bpm = lbpm;}
+    
+    int         getBitrate(){ return bitrate; }
+    void        setBitrate(int lbitrate){ bitrate = lbitrate;}
+    
+    QString     getComment(){ return comment; }
+    void        setComment(const QString &lcomment){ comment = lcomment;}
+
+    bool        getCompilation(){ return compilation;}
+    void        setCompilation(bool yah_or_nah){ compilation = yah_or_nah;}
+    
+    QString     getComposer(){ return composer; }
+    void        setComposer(const QString lcomposer){composer = lcomposer;}
+
+    QDateTime   getDateAdded(){ return date_added;}
+    void        setDateAdded(QDateTime ldate_added){ date_added = ldate_added; }
+    
+    QDateTime   getDateModified(){ return date_modified;}
+    void        setDateModified(QDateTime ldate_modified){ date_modified = ldate_modified; }
+
+    int         getDiscCount(){ return disc_count;}
+    void        setDiscCount(int ldisc_count){ disc_count = ldisc_count;}
+    
+    int         getDiscNumber(){ return disc_number;}
+    void        setDiscNumber(int ldisc_number){ disc_number = ldisc_number;}
+    
+    QString     getEqPreset(){ return eq_preset;}
+    void        setEqPreset(const QString &leq_preset){ eq_preset = leq_preset;}
+    
+    QString     getFormat(){ return format;}
+    void        setFormat(const QString &lformat){ format = lformat;}
+    
+    QString     getDescription(){ return description;}
+    void        setDescription(const QString &ldescription){description = ldescription;}
+    
+    int         getRelativeVolume(){ return relative_volume;}
+    void        setRelativeVolume(int lrelative_volume){relative_volume = lrelative_volume;}
+    
+    int         getSampleRate(){ return sample_rate;}
+    void        setSampleRate(int lsample_rate){ sample_rate = lsample_rate;}
+    
+    int         getSize(){ return size;}
+    void        setSize(int lsize){size = lsize;}
+    
+    int         getStartTime(){ return start_time;}
+    void        setStartTime(int lstart_time){ start_time = lstart_time;}
+
+    int         getStopTime(){ return stop_time;}
+    void        setStopTime(int lstop_time){ stop_time = lstop_time;}
+
+    int         getTrackCount(){ return track_count;}
+    void        setTrackCount(int ltrack_count){track_count = ltrack_count;}
 
   protected:
 
-    QString artist;
-    QString album;
-    QString title;
-    QString genre;
-    int year;
-    int tracknum;
-    int length;
+    QString     artist;
+    QString     album;
+    QString     title;
+    QString     genre;
+    int         year;
+    int         tracknum;
+    int         length;
+    int         bpm;
+    int         bitrate;
+    QString     comment;
+    bool        compilation;
+    QString     composer;
+    QDateTime   date_added;
+    QDateTime   date_modified;
+    int         disc_count;
+    int         disc_number;
+    QString     eq_preset;
+    QString     format;
+    QString     description;
+    int         relative_volume;
+    int         sample_rate;
+    int         size;
+    int         start_time;
+    int         stop_time;
+    int         track_count;
 };
 
 

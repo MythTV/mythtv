@@ -49,6 +49,7 @@ class DaapResponse
     int          expected_payload_size;
         
     QDict<HttpHeader>   headers;
+    QString             preserved_top_line;
     std::vector<char>   payload;
 };
 

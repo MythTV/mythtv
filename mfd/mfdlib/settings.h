@@ -23,7 +23,7 @@ class Settings
 {
   public:
 
-    Settings(const QString &binversion);
+    Settings();
     ~Settings();
 
     int    openDatabase(QSqlDatabase *db);

@@ -67,8 +67,6 @@ class DaapInstance: public QThread
     void doUpdateResponse(TagInput &dmap_data);
     void doDatabaseListResponse(TagInput &dmap_data);
     void parseDatabaseListings(TagInput &dmap_data, int how_many);
-    void doDatabaseItemsResponse(TagInput &dmap_data);
-    void parseItems(TagInput &dmap_Data, int how_many);
     
   private:
 
@@ -87,6 +85,7 @@ class DaapInstance: public QThread
     QSocketDevice  *client_socket_to_daap_server;
 
     QPtrList<Database>  databases;
+    Database            *current_request_db;
 
     //
     //  A WHOLE bunch of values that are filled in by talking to the server
