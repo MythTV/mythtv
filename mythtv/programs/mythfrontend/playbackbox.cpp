@@ -80,7 +80,7 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
 
     QSqlQuery query;
     QString thequery;
-    ProgramListItem *item;
+    ProgramListItem *item = NULL;
    
     thequery = "SELECT chanid,starttime,endtime,title,subtitle,description "
                "FROM recorded ORDER BY starttime;";
@@ -191,7 +191,11 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     nvp = NULL;
     timer = new QTimer(this);
 
-    listview->setCurrentItem(listview->firstChild());
+    if (item)
+    {
+        listview->setCurrentItem(item);
+        listview->setSelected(item, true);
+    }
 
     connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
     timer->start(1000 / 30);

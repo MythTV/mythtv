@@ -86,7 +86,7 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
 
     QSqlQuery query;
     QString thequery;
-    ProgramListItem *item;
+    ProgramListItem *item = NULL;
     
     thequery = "SELECT chanid,starttime,endtime,title,subtitle,description "
                "FROM recorded ORDER BY starttime DESC;";
@@ -203,8 +203,12 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
 
     nvp = NULL;
     timer = new QTimer(this);
-    
-    listview->setCurrentItem(listview->firstChild());
+   
+    if (item)
+    { 
+        listview->setCurrentItem(item);
+        listview->setSelected(item, true);
+    }
 
     connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
     timer->start(1000 / 30);
@@ -221,7 +225,6 @@ void DeleteBox::Show()
     showFullScreen();
     setActiveWindow();
 }
-
 
 static void *SpawnDecoder(void *param)
 {
@@ -277,14 +280,23 @@ void DeleteBox::startPlayer(ProgramInfo *rec)
 void DeleteBox::changed(QListViewItem *lvitem)
 {
     killPlayer();
-	
-    ProgramListItem *pgitem = (ProgramListItem *)lvitem;
-    if (!pgitem)
-        return;
-   
+
     if (!title)
         return;
 
+    ProgramListItem *pgitem = (ProgramListItem *)lvitem;
+    if (!pgitem)
+    {
+        title->setText("");
+        date->setText("");
+        chan->setText("");
+        subtitle->setText("");
+        description->setText("");
+        if (pixlabel)
+            pixlabel->setPixmap(QPixmap(0, 0));
+        return;
+    }
+   
     ProgramInfo *rec = pgitem->getProgramInfo();
   
     if (globalsettings->GetNumSetting("PlaybackPreview") == 1) 
@@ -337,6 +349,22 @@ void DeleteBox::changed(QListViewItem *lvitem)
 
     timer->start(1000 / 30);
 }
+
+static void *SpawnDelete(void *param)
+{   
+    QString *filenameptr = (QString *)param;
+    QString filename = *filenameptr;
+
+    unlink(filename.ascii());
+
+    filename += ".png";
+
+    unlink(filename.ascii());
+
+    delete filenameptr;
+
+    return NULL;
+}   
 
 void DeleteBox::selected(QListViewItem *lvitem)
 {
@@ -401,16 +429,28 @@ void DeleteBox::selected(QListViewItem *lvitem)
 
         query = db->exec(thequery);
 
-        unlink(filename.ascii());
+        QString *fileptr = new QString(filename);
 
-        filename += ".png";
+        pthread_t deletethread;
+        pthread_attr_t attr;
+        pthread_attr_init(&attr);
+        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
-        unlink(filename.ascii());
+        pthread_create(&deletethread, &attr, SpawnDelete, fileptr);
 
-        if (lvitem->itemAbove())
+        if (lvitem->itemBelow())
+        {
+            listview->setCurrentItem(lvitem->itemBelow());
+            listview->setSelected(lvitem->itemBelow(), true);
+        }
+        else if (lvitem->itemAbove())
+        {
             listview->setCurrentItem(lvitem->itemAbove());
-        else 
-            listview->setCurrentItem(listview->firstChild());
+            listview->setSelected(lvitem->itemAbove(), true);
+        }
+        else
+            changed(NULL);
+
         delete lvitem;
         UpdateProgressBar();
     }    
