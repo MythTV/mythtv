@@ -1546,13 +1546,15 @@ bool NuppelVideoPlayer::FastForward(float seconds)
 
         // account for the fact that framesPlayed is ahead of what we're
         // actually showing on the screen because of the videoOutput buffers
-        if (fftime > videoOutput->ValidVideoFrames())
+        int inBuf = videoOutput->ValidVideoFrames();
+
+        if (fftime > inBuf)
         {
-            fftime -= videoOutput->ValidVideoFrames();
+            fftime -= inBuf;
         }
-        else if (fftime < videoOutput->ValidVideoFrames())
+        else if (fftime < inBuf)
         {
-            rewindtime = videoOutput->ValidVideoFrames() - 1 - fftime;
+            rewindtime = inBuf - 1 - fftime;
             fftime = 0;
         }
         else
@@ -1567,7 +1569,18 @@ bool NuppelVideoPlayer::FastForward(float seconds)
 bool NuppelVideoPlayer::Rewind(float seconds)
 {
     if (rewindtime == 0)
+    {
         rewindtime = (int)(seconds * video_frame_rate);
+
+        // account for the fact that framesPlayed is ahead of what we're
+        // actually showing on the screen because of the videoOutput buffers
+        int inBuf = videoOutput->ValidVideoFrames();
+
+        if (inBuf > 0)
+        {
+            rewindtime += inBuf - 1;
+        }
+    }
 
     return rewindtime >= framesPlayed;
 }
