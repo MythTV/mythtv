@@ -508,16 +508,13 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
         if (stopreads)
             break;
 
-        usleep(100);
-
         qApp->lock();
         available = sock->bytesAvailable();
         qApp->unlock();
-    }
 
-    qApp->lock();
-    available = sock->bytesAvailable();
-    qApp->unlock();
+        if (available < sz)
+            usleep(100);
+    }
 
     if (available > 0)
     {
@@ -554,7 +551,7 @@ void RingBuffer::CalcReadAheadThresh(int estbitrate)
     if (estbitrate > 14000)
         fill_threshold += 256000;
 
-    if (fill_threshold >= 256000)
+    if (fill_threshold == 256000)
         fill_min = 128000;
 
     readsallowed = false;
@@ -676,7 +673,7 @@ void RingBuffer::ReadAheadThread(void)
         if (pausereadthread)
         {
             readaheadpaused = true;
-            usleep(500);
+            usleep(100);
             totfree = ReadBufFree();
             continue;
         }
@@ -778,7 +775,7 @@ void RingBuffer::ReadAheadThread(void)
 
         pthread_rwlock_unlock(&rwlock);
 
-        if (readsallowed || wantseek)
+        if (used >= fill_threshold || wantseek)
             usleep(500);
     }
 
