@@ -172,6 +172,8 @@ class PlaybackBox : public MythDialog
     QColor popupHighlight;
 
     bool expectingPopup;
+
+    bool firstrun;
 };
 
 #endif

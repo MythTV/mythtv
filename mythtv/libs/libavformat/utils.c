@@ -708,6 +708,8 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                     return 0;
                 }
             } else {
+                if (s->cur_st && s->cur_st->parser)
+                    av_free_packet(&s->cur_pkt);
                 s->cur_st = NULL;
             }
         } else {

@@ -51,6 +51,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
 
     lastKey = 0;
 
+    memset(&params, 0, sizeof(AVFormatParameters));
     memset(prvpkt, 0, 3);
 }
 
@@ -340,7 +341,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                     setLowBuffers();
                     m_parent->ForceVideoOutputType(kVideoOutput_XvMC);
                 }
-		else if (codec && codec->id == CODEC_ID_MPEG2VIDEO_VIA)
+                else if (codec && codec->id == CODEC_ID_MPEG2VIDEO_VIA)
                 {
                     enc->flags |= CODEC_FLAG_EMU_EDGE;
                     enc->get_buffer = get_avf_buffer_via;
@@ -374,6 +375,13 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 audio_sample_size = enc->channels * 2;
                 audio_sampling_rate = enc->sample_rate;
                 audio_channels = enc->channels;
+                break;
+            }
+            case CODEC_TYPE_DATA:
+            {
+                bitrate += enc->bit_rate;
+                // otherwise, ignore it
+                continue;
                 break;
             }
             default:
@@ -1125,7 +1133,8 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     if (mpa_pic.qscale_table != NULL && mpa_pic.qstride > 0 &&
                         context->height == picframe->height)
                     {
-                        int tblsize = mpa_pic.qstride * picframe->height;
+                        int tblsize = mpa_pic.qstride * 
+                                      ((picframe->height + 15) / 16);
 
                         if (picframe->qstride != mpa_pic.qstride ||
                             picframe->qscale_table == NULL)
@@ -1159,7 +1168,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
             frame_decoded = 1;
             firstloop = false;
         }
-        
+       
         av_free_packet(pkt);
     }                    
 

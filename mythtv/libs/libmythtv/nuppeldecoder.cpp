@@ -726,7 +726,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
 
         if (mpa_pic->qscale_table != NULL && mpa_pic->qstride > 0)
         {
-            int tablesize = mpa_pic->qstride * video_height;
+            int tablesize = mpa_pic->qstride * ((video_height + 15) / 16);
 
             if (frame->qstride != mpa_pic->qstride ||
                 frame->qscale_table == NULL)

@@ -114,6 +114,7 @@ typedef struct ParseContext1{
     int frame_rate;
     int progressive_sequence;
     int width, height;
+    int aspect_ratio_info;
 
     /* XXX: suppress that, needed by MPEG4 */
     MpegEncContext *enc;
@@ -263,6 +264,46 @@ static const int frame_rate_tab[16] = {
     25025,
 };
 
+static const float mpeg1_aspect[16]={
+    0.0000,
+    1.0000,
+    0.6735,
+    0.7031,
+
+    0.7615,
+    0.8055,
+    0.8437,
+    0.8935,
+
+    0.9157,
+    0.9815,
+    1.0255,
+    1.0695,
+
+    1.0950,
+    1.1575,
+    1.2015,
+};
+
+static const AVRational mpeg2_aspect[16]={
+    {0,1},
+    {1,1},
+    {4,3},
+    {16,9},
+    {221,100},
+    {0,1},
+    {0,1},
+    {0,1},
+    {0,1},
+    {0,1},
+    {0,1},
+    {0,1},
+    {0,1},
+    {0,1},
+    {0,1},
+    {0,1},
+};
+
 static void mpegvideo_extract_headers(AVCodecParserContext *s, 
                                       AVCodecContext *avctx,
                                       const uint8_t *buf, int buf_size)
@@ -274,6 +315,7 @@ static void mpegvideo_extract_headers(AVCodecParserContext *s,
     int frame_rate_ext_n, frame_rate_ext_d;
     int top_field_first, repeat_first_field, progressive_frame;
     int horiz_size_ext, vert_size_ext;
+    float aspect;
 
     s->repeat_pict = 0;
     buf_end = buf + buf_size;
@@ -290,6 +332,11 @@ static void mpegvideo_extract_headers(AVCodecParserContext *s,
             if (bytes_left >= 4) {
                 pc->width = avctx->width = (buf[0] << 4) | (buf[1] >> 4);
                 pc->height = avctx->height = ((buf[1] & 0x0f) << 8) | buf[2];
+                pc->aspect_ratio_info = (buf[3] >> 4);
+                if (avctx->codec_id == CODEC_ID_MPEG1VIDEO){
+                    aspect= mpeg1_aspect[pc->aspect_ratio_info];
+                    if(aspect!=0.0) avctx->sample_aspect_ratio= av_d2q(aspect, 255);
+                }
                 frame_rate_index = buf[3] & 0xf;
                 pc->frame_rate = avctx->frame_rate = frame_rate_tab[frame_rate_index];
                 avctx->frame_rate_base = MPEG1_FRAME_RATE_BASE;
@@ -312,6 +359,13 @@ static void mpegvideo_extract_headers(AVCodecParserContext *s,
                         avctx->frame_rate = pc->frame_rate * (frame_rate_ext_n + 1);
                         avctx->frame_rate_base = MPEG1_FRAME_RATE_BASE * (frame_rate_ext_d + 1);
                         avctx->sub_id = 2; /* forces MPEG2 */
+                        if (pc->aspect_ratio_info <= 1)
+                            avctx->sample_aspect_ratio = mpeg2_aspect[pc->aspect_ratio_info];
+                        else{
+                            avctx->sample_aspect_ratio = 
+                                 av_div_q(mpeg2_aspect[pc->aspect_ratio_info],
+                                          (AVRational){avctx->width, avctx->height});
+                        }      
                     }
                     break;
                 case 0x8: /* picture coding extension */

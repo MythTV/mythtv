@@ -70,7 +70,7 @@ FilterManager::~FilterManager()
         free(i.current()->name);
         free(i.current()->descript);
         free(i.current()->libname);
-        delete (i.current()->formats);
+        delete [] (i.current()->formats);
         delete i.current();
     }
 }

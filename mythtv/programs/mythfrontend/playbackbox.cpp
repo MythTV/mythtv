@@ -99,7 +99,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
         exit(0);
     }
 
-    connected = FillList(); 
+    firstrun = true;
 
     curTitle = 0;
 
@@ -443,7 +443,7 @@ void PlaybackBox::updateInfo(QPainter *p)
 
         timer->start(500);
     }
-    else
+    else if (!firstrun)
     {
         LayerSet *norec = theme->GetSet("norecordings_info");
         if (type != Delete && norec)
@@ -602,7 +602,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
     ShowData::Iterator it;
     ShowData::Iterator start;
     ShowData::Iterator end;
-    if (titleData[curTitle] != tr("All Programs"))
+    if (titleData && titleData[curTitle] != tr("All Programs"))
     {
         start = showData.begin();
         end = showData.end();
@@ -616,7 +616,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
     int overrectime = gContext->GetNumSetting("RecordOverTime", 0);
     int underrectime = gContext->GetNumSetting("RecordPreRoll", 0);
 
-    if (container)
+    if (container && titleData)
     {
         int itemCnt = 0;
         UIListType *ltype = (UIListType *)container->GetType("toptitles");
@@ -791,7 +791,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
 
     leftRight = false;
 
-    if (showData.count() == 0)
+    if (showData.count() == 0 && !firstrun)
     {
         LayerSet *norec = theme->GetSet("norecordings_list");
         if (type != Delete && norec)
@@ -1782,6 +1782,15 @@ void PlaybackBox::timeout(void)
         return;
     if (noUpdate)
         return;
+
+    if (firstrun)
+    {
+        firstrun = false;
+        connected = FillList();
+        skipUpdate = false;
+        repaint(fullRect);
+    }
+
     if (showData.count() == 0)
         return;
 

@@ -61,6 +61,7 @@ int main(int argc, char *argv[])
         QString filename = a.argv()[1];
 
         ProgramInfo *pginfo = new ProgramInfo();
+        pginfo->endts = QDateTime::currentDateTime().addSecs(-180);
         pginfo->pathname = filename;
     
         tv->Playback(pginfo);

@@ -24,7 +24,7 @@ HEADERS += avformat.h avi.h avio.h dv.h mpegts.h os_support.h qtpalette.h
 SOURCES += 4xm.c allformats.c asf.c au.c avidec.c avienc.c avio.c aviobuf.c 
 SOURCES += crc.c cutils.c dv.c ffm.c file.c flvdec.c flvenc.c idcin.c idroq.c
 SOURCES += img.c ipmovie.c mov.c movenc.c mp3.c mpeg.c mpegts.c mpegtsenc.c 
-SOURCES += mpjpeg.c nut.c ogg.c os_support.c rm.c psxstr.c raw.c rm.c 
+SOURCES += mpjpeg.c nut.c os_support.c rm.c psxstr.c raw.c rm.c 
 SOURCES += segafilm.c swf.c utils.c wav.c wc3movie.c westwood.c yuv4mpeg.c
 
 # not using:  audio.c, barpainet.* beosaudio.cpp, dv1394.*, framehook.*
@@ -41,4 +41,6 @@ contains( AMR_WB, yes ) {
     SOURCES += amr.c
 }
 
-
+contains( CONFIG_VORBIS, yes ) {
+    SOURCES += ogg.c
+}
