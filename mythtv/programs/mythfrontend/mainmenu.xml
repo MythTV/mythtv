@@ -119,4 +119,9 @@
      <action>MENU main_settings.xml</action>
    </button>
 
+   <!-- <button>
+     <type>SHUTDOWN</type>
+     <text>Shutdown</text>
+     <action>SHUTDOWN</action>
+   </button> -->
 </mythmenu>

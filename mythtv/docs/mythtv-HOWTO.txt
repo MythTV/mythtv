@@ -228,8 +228,8 @@
   <http://www.mythtv.org/docs/mythtv-HOWTO.pdf>.
 
   It's recommended that you join the user list at
-  http://www.snowman.net/mailman/listinfo/mythtv-users
-  <http://www.snowman.net/mailman/listinfo/mythtv-users>.
+  http://www.mythtv.org/mailman/listinfo/mythtv-users
+  <http://www.mythtv.org/mailman/listinfo/mythtv-users>.
 
   Searchable archives for the lists are available at
   http://www.gossamer-threads.com/archive/MythTV_C2/
@@ -1382,10 +1382,10 @@
 
   [1mNOTE[22m: If you are going to use CVS to compile MythTV rather than using
   the distribution tarball, it is [1mstrongly [22mrecommended that you join the
-  http://www.snowman.net/mailman/listinfo/mythtv-commits/
-  <http://www.snowman.net/mailman/listinfo/mythtv-commits/> and
-  http://www.snowman.net/mailman/listinfo/mythtv-dev/
-  <http://www.snowman.net/mailman/listinfo/mythtv-dev/> mailing lists.
+  http://www.mythtv.org/mailman/listinfo/mythtv-commits/
+  <http://www.mythtv.org/mailman/listinfo/mythtv-commits/> and
+  http://www.mythtv.org/mailman/listinfo/mythtv-dev/
+  <http://www.mythtv.org/mailman/listinfo/mythtv-dev/> mailing lists.
 
   Get XMLTV from http://xmltv.sourceforge.net
   <http://xmltv.sourceforge.net>.  Download version 0.5.17 if you're in
@@ -4351,9 +4351,8 @@
 
   [1m20.15.  My PVR-250 card doesn't show inputs in the setup screen.[0m
 
-  See message http://lists.snowman.net/pipermail/mythtv-
-  users/2003-April/002527.html
-  <http://lists.snowman.net/pipermail/mythtv-
+  See message http://www.mythtv.org/pipermail/mythtv-
+  users/2003-April/002527.html <http://www.mythtv.org/pipermail/mythtv-
   users/2003-April/002527.html>
 
 
@@ -4402,6 +4401,7 @@
        $ su
        # cd /usr/lib/qt3/mkspecs
        # ln -sf linux-g++ default
+
 
 
   and then restart the compile,

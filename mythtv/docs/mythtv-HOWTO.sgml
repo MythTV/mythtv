@@ -26,8 +26,8 @@ at <url url="http://www.mythtv.org/docs/mythtv-HOWTO.pdf"
 name="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">.
 
 It's recommended that you join the user list at <url
-url="http://www.snowman.net/mailman/listinfo/mythtv-users"
-name="http://www.snowman.net/mailman/listinfo/mythtv-users">.
+url="http://www.mythtv.org/mailman/listinfo/mythtv-users"
+name="http://www.mythtv.org/mailman/listinfo/mythtv-users">.
 
 Searchable archives for the lists are available at <url
 url="http://www.gossamer-threads.com/archive/MythTV_C2/"
@@ -986,10 +986,10 @@ with <tt>update mythtv</tt> after you've done your initial download.
 
 <bf>NOTE</bf>: If you are going to use CVS to compile MythTV rather than
 using the distribution tarball, it is <bf>strongly</bf> recommended that you
-join the <url url="http://www.snowman.net/mailman/listinfo/mythtv-commits/"
-name="http://www.snowman.net/mailman/listinfo/mythtv-commits/"> and <url
-url="http://www.snowman.net/mailman/listinfo/mythtv-dev/"
-name="http://www.snowman.net/mailman/listinfo/mythtv-dev/"> mailing lists.
+join the <url url="http://www.mythtv.org/mailman/listinfo/mythtv-commits/"
+name="http://www.mythtv.org/mailman/listinfo/mythtv-commits/"> and <url
+url="http://www.mythtv.org/mailman/listinfo/mythtv-dev/"
+name="http://www.mythtv.org/mailman/listinfo/mythtv-dev/"> mailing lists.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
 name="http://xmltv.sourceforge.net">.  Download version 0.5.17 if you're in
@@ -3476,8 +3476,8 @@ they run.  The following window managers are known to work correctly:
 
 <sect1>My PVR-250 card doesn't show inputs in the setup screen.
 <p>See message <url url=
-"http://lists.snowman.net/pipermail/mythtv-users/2003-April/002527.html"
-name="http://lists.snowman.net/pipermail/mythtv-users/2003-April/002527.html">
+"http://www.mythtv.org/pipermail/mythtv-users/2003-April/002527.html"
+name="http://www.mythtv.org/pipermail/mythtv-users/2003-April/002527.html">
 
 <sect1>Where's my "canada-cable" entry gone to?
 <sect1>My channels are off by one.
