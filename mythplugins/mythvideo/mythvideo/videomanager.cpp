@@ -470,7 +470,7 @@ QString VideoManager::GetMoviePoster(QString movieNum)
 	//cout << "Imp found: " << filename << endl;
 
 	host = parseData(impsite, "//", "/");
-	path = impsite.replace("http://" + host, "");
+	path = impsite.replace(QRegExp("http://" + host), QString(""));
 	path = path.left(impsite.findRev("/") + 1) + "posters/";
     }
 
