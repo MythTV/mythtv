@@ -271,16 +271,6 @@ public:
     };
 };
 
-class ExternalChannelCommand: public LineEditSetting, public GlobalSetting {
-public:
-    ExternalChannelCommand():
-        GlobalSetting("ExternalChannelCommand") {
-        setLabel("External channel change command");
-        setValue("");
-    };
-};
-
-
 class GeneratePreviewPixmaps: public CheckBoxSetting, public GlobalSetting {
 public:
     GeneratePreviewPixmaps():
@@ -613,7 +603,6 @@ public:
         addChild(new RecordOverTime());
 
         addChild(new ChannelOrdering());
-        addChild(new ExternalChannelCommand());
         addChild(new ChannelSorting());
         addChild(new DefaultTVChannel());
         addChild(new TunerCardInput());

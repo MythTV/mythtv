@@ -870,16 +870,38 @@ QString TVRec::GetNextChannel(Channel *chan, bool direction)
     return ret;
 }
 
-bool TVRec::ChangeExternalChannel(const QString &channum)
+bool TVRec::ChangeExternalChannel(const QString& channum)
 {
-    QString command = context->GetSetting("ExternalChannelCommand");
+    QString query = QString("SELECT cardinput.externalcommand "
+                            "FROM cardinput,channel,capturecard "
+                            "WHERE channel.channum = %1 "
+                            "AND channel.sourceid = cardinput.sourceid "
+                            "AND cardinput.inputname = '%2' "
+                            "AND cardinput.cardid = capturecard.cardid "
+                            "AND capturecard.videodevice = '%3' ")
+        .arg(channum)
+        .arg(channel->GetCurrentInput())
+        .arg(channel->GetDevice());
 
-    command += QString(" ") + QString(channum);
+    QString command(QString::null);
 
-    int ret = system(command.ascii());
+    pthread_mutex_lock(&db_lock);
 
-    if (ret > 0)
-        return true;
+    QSqlQuery result = db_conn->exec(query);
+    if (result.isActive() && result.numRowsAffected()) {
+        result.next();
+        command = QString("%1 %2")
+            .arg(result.value(0).toString())
+            .arg(channum);
+
+    }
+    pthread_mutex_unlock(&db_lock);
+
+    if (command != QString::null) {
+        cout << "External channel change: " << command << endl;
+        system(command.ascii());
+    }
+
     return true;
 }
 

@@ -304,6 +304,15 @@ public:
     };
 };
 
+class ExternalChannelCommand: public LineEditSetting, public CISetting {
+public:
+    ExternalChannelCommand(const CardInput& parent):
+        CISetting(parent,"externalcommand") {
+        setLabel("External channel change command");
+        setValue("");
+    };
+};
+
 class CardInput: public VerticalConfigurationGroup, public ConfigurationDialog {
 public:
     CardInput(MythContext* context): ConfigurationDialog(context) {
@@ -312,6 +321,7 @@ public:
         addChild(cardid = new CardID(*this));
         addChild(inputname = new InputName(*this));
         addChild(sourceid = new SourceID(*this));
+        addChild(new ExternalChannelCommand(*this));
     };
 
     int getInputID(void) const { return id->intValue(); };
