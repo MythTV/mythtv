@@ -1178,13 +1178,14 @@ void Scheduler::AddNewRecords(void) {
 "program.starttime, program.endtime, "
 "program.title, program.subtitle, program.description, "
 "channel.channum, channel.callsign, channel.name, "
-"oldrecorded.endtime, program.category, "
+"oldrecorded.endtime IS NOT NULL AS oldrecduplicate, program.category, "
 "record.recpriority + channel.recpriority + "
 "IF(cardinput.preference IS NOT NULL,cardinput.preference,0), "
-"record.dupin, recorded.endtime, record.type, "
-"record.recordid, recordoverride.type, "
-"program.starttime - INTERVAL record.startoffset minute, "
-"program.endtime + INTERVAL record.endoffset minute, "
+"record.dupin, "
+"recorded.endtime IS NOT NULL AND recorded.endtime < NOW() AS recduplicate, "
+"record.type, record.recordid, recordoverride.type, "
+"program.starttime - INTERVAL record.startoffset minute AS recstartts, "
+"program.endtime + INTERVAL record.endoffset minute AS recendts, "
 "program.previouslyshown, record.recgroup, record.dupmethod, "
 "channel.commfree, capturecard.cardid, "
 "cardinput.cardinputid, UPPER(cardinput.shareable) = 'Y' AS shareable "
@@ -1195,6 +1196,7 @@ void Scheduler::AddNewRecords(void) {
 " INNER JOIN capturecard ON (capturecard.cardid = cardinput.cardid) "
 " LEFT JOIN oldrecorded ON "
 "  ( "
+"    record.dupmethod > 1 AND "
 "    oldrecorded.title IS NOT NULL AND oldrecorded.title <> '' AND program.title = oldrecorded.title "
 "     AND "
 "    (((record.dupmethod & 0x02) = 0) OR (oldrecorded.subtitle IS NOT NULL AND oldrecorded.subtitle <> '' AND program.subtitle = oldrecorded.subtitle)) "
@@ -1203,6 +1205,7 @@ void Scheduler::AddNewRecords(void) {
 "  ) "
 " LEFT JOIN recorded ON "
 "  ( "
+"    record.dupmethod > 1 AND "
 "    recorded.title IS NOT NULL AND recorded.title <> '' AND program.title = recorded.title "
 "     AND "
 "    (((record.dupmethod & 0x02) = 0) OR (recorded.subtitle IS NOT NULL AND recorded.subtitle <> '' AND program.subtitle = recorded.subtitle)) "
@@ -1370,28 +1373,22 @@ void Scheduler::AddNewRecords(void) {
         // Check for rsTooManyRecordings
         if (!allowmap.contains(p->recordid))
             allowmap[p->recordid] = p->AllowRecordingNewEpisodes(db);
-        if (!allowmap[p->recordid])
+        if (!p->reactivate && !allowmap[p->recordid])
             p->recstatus = rsTooManyRecordings;
 
         // Check for rsCurrentRecording and rsPreviousRecording
         if (p->override == 2)
             p->recstatus = rsManualOverride;
         else if (p->rectype != kSingleRecord &&
-                 p->override != 1 &&
+                 p->override != 1 && !p->reactivate &&
                  !(p->dupmethod & kDupCheckNone))
         {
-            if (p->dupin & kDupsInOldRecorded)
-            {
-                if (!result.value(10).isNull() &&
-                    result.value(10).toDateTime() < p->recstartts)
-                    p->recstatus = rsPreviousRecording;
-            }
-            if (p->dupin & kDupsInRecorded)
-            {
-                if (!result.value(14).isNull() &&
-                    result.value(14).toDateTime() < p->recstartts)
-                    p->recstatus = rsCurrentRecording;
-            }
+            if (p->dupin & kDupsInOldRecorded &&
+                result.value(10).toInt())
+                p->recstatus = rsPreviousRecording;
+            if (p->dupin & kDupsInRecorded &&
+                result.value(14).toInt())
+                p->recstatus = rsCurrentRecording;
         }
 
         // Check for rsOverlap against last non-rsOverlap
