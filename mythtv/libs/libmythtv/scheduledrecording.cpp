@@ -101,7 +101,7 @@ void ScheduledRecording::loadByProgram(QSqlDatabase* db, ProgramInfo* proginfo)
 
     
     if (search->intValue() == kNoSearch)
-        setProgram(proginfo);
+        setProgram(proginfo, db);
 }
 
 void ScheduledRecording::loadBySearch(QSqlDatabase *db,
@@ -708,7 +708,7 @@ void ScheduledRecording::setProgram(ProgramInfo *proginfo, QSqlDatabase* db)
         seriesid->setValue(proginfo->seriesid);
         programid->setValue(proginfo->programid);
         category->setValue(proginfo->category);
-    
+        
         if (db)
             fetchChannelInfo(db);
     }
