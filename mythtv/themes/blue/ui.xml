@@ -1209,12 +1209,20 @@
     <font name="title" face="Arial">
       <color>#ffffff</color>
       <dropcolor>#000000</dropcolor>
-      <size>27</size>
+      <size>24</size>
+      <size:big>26</size:big>
       <size:small>14</size:small>
+      <shadow>4,4</shadow>
+      <bold>yes</bold>
+    </font>
+  <font name="subtitle" face="Arial">
+      <color>#ffffee</color>
+      <size>17</size>
+      <size:big>20</size:big>
+      <size:small>13</size:small>
       <shadow>3,3</shadow>
       <bold>yes</bold>
     </font>
-
     <font name="info" face="Arial">
       <color>#ffffff</color>
       <size>17</size>
@@ -1251,7 +1259,7 @@
     </container>
 
     <container name="selector">
-      <area>0,50,800,310</area>
+      <area>0,40,800,310</area>
       <listarea name="toptitles" draworder="2">
         <area>30,22,190,105</area>
         <fcnfont name="active" function="active"></fcnfont>
@@ -1285,7 +1293,7 @@
         <items>7</items>
         <image function="selectionbar" filename="bar.png" location="-13,-2"></image>
         <image function="uparrow" filename="uparrow.png" location="743,12"></image>
-        <image function="downarrow" filename="downarrow.png" location="743,255"></image>
+        <image function="downarrow" filename="downarrow.png" location="743,251"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="yes">
         <filename>showings.png</filename>
@@ -1297,77 +1305,78 @@
       </textarea>
     </container>
 
-    <container name="group_info">
+        <container name="group_info">
       <context>0</context>
-      <area>30,360,799,240</area>
+      <area>0,360,799,240</area>
+
+      
+
       <textarea name="title" draworder="6">
-        <area>20,0,779,45</area>
+        <area>23,12,779,45</area>
         <font>title</font>
       </textarea>
       <textarea name="description" draworder="6">
-        <area>20,50,600,120</area>
-        <altarea>180,130,600,90</altarea>
+        <area>25,50,600,120</area>
+        <altarea>25,50,600,120</altarea>
         <font>info</font>
         <multiline>yes</multiline>
       </textarea>
     </container>
 
+
     <container name="program_info_play">
       <context>0</context>
-      <area>15,360,800,240</area>
+      <area>0,340,800,300</area>
       <textarea name="title" draworder="6">
-        <area>20,0,580,40</area>
-        <altarea>20,0,760,40</altarea>
+        <area>25,14,580,40</area>
+        <altarea>20,5,580,40</altarea>
         <font>title</font>
       </textarea>
+
+      <textarea name="subtitle" draworder="6">
+        <area>25,47,600,40</area>
+        <font>subtitle</font>
+        <multiline>yes</multiline>
+      </textarea>
+
       <textarea name="channel" draworder="6">
-        <area>20,40,160,30</area>
+        <area>25,74,160,30</area>
         <font>info</font>
       </textarea>
+
       <textarea name="timedate" draworder="6">
-        <area>160,40,440,30</area>
-        <altarea>200,40,580,30</altarea>
+        <area>170,74,440,30</area>
         <font>info</font>
       </textarea>
-      <textarea name="subdescr" draworder="6">
-        <area>20,97,750,125</area>
-        <altarea>20,70,760,125</altarea>
+
+      <textarea name="description" draworder="6">
+        <area>25,140,750,125</area>
+        <altarea>25,140,755,125</altarea>
         <font>info</font>
         <multiline>yes</multiline>
-        <value>%SUBTITLE|"|"
-%%STARS%%DESCRIPTION%</value>
-      </textarea>
-<!--
-      <textarea name="recgroupinfo" draworder="6">
-        <area>250,100,140,30</area>
-        <font>info</font>
-        <value>Rec Group:</value>
-      </textarea>
-      <textarea name="recgroup" draworder="6">
-        <area>400,100,180,35</area>
-        <font>info</font>
-      </textarea>
--->
+        <value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
+        </textarea>
 
+      <image name="commflagged" draworder="6">
+        <filename>type/commflagged.png</filename>
+        <position>84,106</position>
+      </image>
       <image name="autoexpire" draworder="6">
-        <filename>autoexpire.png</filename>
-        <position>20,62</position>
+        <filename>type/autoexpire.png</filename>
+        <position>52,106</position>
       </image>
       <image name="bookmark" draworder="6">
-        <filename>bookmark.png</filename>
-        <position>55,62</position>
-      </image>
-      <image name="commflagged" draworder="6">
-        <filename>commflagged.png</filename>
-        <position>90,62</position>
+        <filename>type/bookmark.png</filename>
+        <position>116,106</position>
       </image>
       <image name="cutlist" draworder="6">
-        <filename>cutlist.png</filename>
-        <position>125,62</position>
+        <filename>type/cutlist.png</filename>
+        <position>148,106</position>
       </image>
+
       <image name="processing" draworder="6">
-        <filename>processing.png</filename>
-        <position>160,62</position>
+        <filename>type/processing.png</filename>
+        <position>20,106</position>
       </image>
 
     </container>
