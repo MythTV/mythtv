@@ -237,7 +237,7 @@ class NuppelVideoPlayer
     QString osdtheme;
     OSD *osd;
 
-    bool InitAVCodec(int codectype);
+    bool InitAVCodec(int codec);
     void CloseAVCodec(void);
 
     AVCodec *mpa_codec;
@@ -253,6 +253,9 @@ class NuppelVideoPlayer
 
     QString videoFilterList;
     vector<VideoFilter *> videoFilters;
+
+    struct extendeddata extradata;
+    bool usingextradata;
 };
 
 #endif

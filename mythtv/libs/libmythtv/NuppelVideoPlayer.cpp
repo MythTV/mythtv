@@ -66,6 +66,9 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
     needsetpipplayer = false;
 
     videoFilterList = "";
+
+    usingextradata = false;
+    memset(&extradata, 0, sizeof(extendeddata));
 }
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
@@ -114,11 +117,19 @@ void NuppelVideoPlayer::InitSound(void)
 {
     int bits = 16, stereo = 1, speed = audio_samplerate;
 
+    if (usingextradata)
+    {
+        bits = extradata.audio_bits_per_sample;
+        stereo = (extradata.audio_channels == 2);
+        speed = extradata.audio_sample_rate;
+    }
+
     if (disableaudio)
     {
         audiofd = -1;
         return;
     }
+
     audiofd = open(audiodevice.ascii(), O_WRONLY);
     if (audiofd == -1)
     {
@@ -270,6 +281,20 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     startpos = ringBuffer->Seek(0, SEEK_CUR);
 
     ringBuffer->Read(&frameheader, FRAMEHEADERSIZE);
+    
+    if (frameheader.frametype == 'X')
+    {
+        if (frameheader.packetlength != EXTENDEDSIZE)
+        {
+            cerr << "Corrupt file.  Bad extended frame.\n";
+        }
+        else
+        {
+            ringBuffer->Read(&extradata, EXTENDEDSIZE);
+            usingextradata = true;
+            ringBuffer->Read(&frameheader, FRAMEHEADERSIZE);    
+        }
+    }
 
     while (frameheader.frametype != 'A' && frameheader.frametype != 'V' &&
            frameheader.frametype != 'S' && frameheader.frametype != 'T' &&
@@ -293,6 +318,8 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
     foundit = 0;
     effdsp = audio_samplerate;
+    if (usingextradata)
+        effdsp = extradata.audio_sample_rate;
 
     while (!foundit) 
     {
@@ -330,16 +357,35 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     return 0;
 }
 
-bool NuppelVideoPlayer::InitAVCodec(int codectype)
+bool NuppelVideoPlayer::InitAVCodec(int codec)
 {
     if (mpa_codec)
         CloseAVCodec();
 
-    mpa_codec = avcodec_find_decoder((enum CodecID)codectype);
+    if (usingextradata)
+    {
+        switch(extradata.video_fourcc) 
+        {
+            case MKTAG('D', 'I', 'V', 'X'): codec = CODEC_ID_MPEG4; break;
+            case MKTAG('W', 'M', 'V', '1'): codec = CODEC_ID_WMV1; break;
+            case MKTAG('D', 'I', 'V', '3'): codec = CODEC_ID_MSMPEG4V3; break;
+            case MKTAG('M', 'P', '4', '2'): codec = CODEC_ID_MSMPEG4V2; break;
+            case MKTAG('M', 'P', 'G', '4'): codec = CODEC_ID_MSMPEG4V1; break;
+            case MKTAG('M', 'J', 'P', 'G'): codec = CODEC_ID_MJPEG; break;
+            case MKTAG('H', '2', '6', '3'): codec = CODEC_ID_H263; break;
+            case MKTAG('I', '2', '6', '3'): codec = CODEC_ID_H263I; break;
+            case MKTAG('M', 'P', 'E', 'G'): codec = CODEC_ID_MPEG1VIDEO; break;
+            default: codec = -1;
+        }
+    }
+    mpa_codec = avcodec_find_decoder((enum CodecID)codec);
 
     if (!mpa_codec)
     {
-        cout << "couldn't find codec " << codectype << endl;
+        cerr << "couldn't find codec " << codec;
+        if (usingextradata)
+            cerr << " (" << extradata.video_fourcc << ")";
+        cerr << endl;
         return false;
     }
 
@@ -352,7 +398,7 @@ bool NuppelVideoPlayer::InitAVCodec(int codectype)
     
     if (avcodec_open(&mpa_ctx, mpa_codec) < 0)
     {
-        cerr << "Couldn't find codec\n";
+        cerr << "Couldn't find lavc codec\n";
         return false;
     }
 
@@ -573,6 +619,9 @@ int NuppelVideoPlayer::GetAudiotime(void)
 
 void NuppelVideoPlayer::SetAudiotime(void)
 {
+    if (audbuf_timecode == 0)
+        return;
+
     int soundcard_buffer;
     int totalbuffer;
 
@@ -592,7 +641,7 @@ void NuppelVideoPlayer::SetAudiotime(void)
 
        'ms/byte' is given by '25000/effdsp'...
      */
- 
+
     pthread_mutex_lock(&audio_buflock);
     pthread_mutex_lock(&avsync_lock);
  
@@ -1042,9 +1091,9 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
 	    //printf("audio thread waiting for prebuffer\n");
 	    continue;
         }
- 
+
         SetAudiotime(); // once per loop, calculate stuff for a/v sync
-	
+
         /* do audio output */
 	
         /* approximate # of audio bytes for each frame. */

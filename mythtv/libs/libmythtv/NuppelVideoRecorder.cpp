@@ -864,29 +864,75 @@ void NuppelVideoRecorder::WriteHeader(bool todumpfile)
         ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
 
     memset(tbls, 0, sizeof(tbls));
-
-    if (useavcodec)
-    {
-        tbls[0] = 1;
-        tbls[1] = (int)(mpa_codec->id);
-        tbls[2] = mpa_ctx.bit_rate;
-        tbls[3] = mpa_ctx.qmin;
-        tbls[4] = mpa_ctx.qmax;
-        tbls[5] = mpa_ctx.max_qdiff;
-    }
-    else
-    {
-        tbls[0] = 0;
-        tbls[1] = Q;
-        tbls[2] = M1;
-        tbls[3] = M2;
-    }
-
-    // compression configuration data
     if (todumpfile)
         ringBuffer->WriteToDumpFile(tbls, sizeof(tbls));
     else
         ringBuffer->Write(tbls, sizeof(tbls));
+
+    memset(&frameheader, 0, sizeof(frameheader));
+    frameheader.frametype = 'X'; // extended data
+    frameheader.packetlength = sizeof(extendeddata);
+
+    // extended data header
+    if (todumpfile)
+        ringBuffer->WriteToDumpFile(&frameheader, FRAMEHEADERSIZE);
+    else
+        ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+    
+    struct extendeddata moredata;
+    memset(&moredata, 0, sizeof(extendeddata));
+    
+    moredata.version = 1;
+    if (useavcodec)
+    {
+        int vidfcc = 0;
+        switch(mpa_codec->id)
+        {
+            case CODEC_ID_MPEG4: vidfcc = MKTAG('D', 'I', 'V', 'X'); break;
+            case CODEC_ID_WMV1: vidfcc = MKTAG('W', 'M', 'V', '1'); break;
+            case CODEC_ID_MSMPEG4V3: vidfcc = MKTAG('D', 'I', 'V', '3'); break;
+            case CODEC_ID_MSMPEG4V2: vidfcc = MKTAG('M', 'P', '4', '2'); break;
+            case CODEC_ID_MSMPEG4V1: vidfcc = MKTAG('M', 'P', 'G', '4'); break;
+            case CODEC_ID_MJPEG: vidfcc = MKTAG('M', 'J', 'P', 'G'); break;
+            case CODEC_ID_H263: vidfcc = MKTAG('H', '2', '6', '3'); break;
+            case CODEC_ID_H263P: vidfcc = MKTAG('H', '2', '6', '3'); break;
+            case CODEC_ID_H263I: vidfcc = MKTAG('I', '2', '6', '3'); break;
+            case CODEC_ID_MPEG1VIDEO: vidfcc = MKTAG('M', 'P', 'E', 'G'); break;
+            default: break;
+        }
+        moredata.video_fourcc = vidfcc;
+        moredata.lavc_bitrate = mpa_ctx.bit_rate;
+        moredata.lavc_qmin = mpa_ctx.qmin;
+        moredata.lavc_qmax = mpa_ctx.qmax;
+        moredata.lavc_maxqdiff = mpa_ctx.max_qdiff;
+    }
+    else
+    {
+        moredata.video_fourcc = MKTAG('R', 'J', 'P', 'G');
+        moredata.rtjpeg_quality = Q;
+        moredata.rtjpeg_luma_filter = M1;
+        moredata.rtjpeg_chroma_filter = M2;
+    }
+
+    if (compressaudio)
+    {
+        moredata.audio_fourcc = MKTAG('L', 'A', 'M', 'E');
+        moredata.audio_compression_ratio = 11;
+        moredata.audio_quality = mp3quality;
+    }
+    else
+    {
+        moredata.audio_fourcc = MKTAG('R', 'A', 'W', 'A');
+    }
+
+    moredata.audio_sample_rate = audio_samplerate;
+    moredata.audio_channels = 2;
+    moredata.audio_bits_per_sample = 16;
+
+    if (todumpfile)
+        ringBuffer->WriteToDumpFile(&moredata, sizeof(moredata));
+    else
+        ringBuffer->Write(&moredata, sizeof(moredata));
 
     last_block = 0;
     lf = 0; // that resets framenumber so that seeking in the

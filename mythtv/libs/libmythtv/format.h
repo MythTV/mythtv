@@ -28,7 +28,8 @@ typedef struct rtframeheader
    			// R .. Seekpoint: String RTjjjjjjjj (use full packet)
 			// D .. Addition Data for Compressors
    			//      ct: R .. RTjpeg Tables
-
+                        // X .. eXtended data
+   
    char comptype;	// V: 0 .. raw YUV420
 			//    1 .. RTJpeg
 			//    2 .. RTJpeg with lzo afterwards
@@ -73,8 +74,42 @@ typedef struct rtframeheader
    			// R:     do not use here! (fixed 'RTjjjjjjjjjjjjjj')
 } rtframeheader;
 
+// The fourcc's here are for the most part taken from libavcodec.
+// As to their correctness, I have no idea.  The audio ones are surely wrong,
+// but I suppose it doesn't really matter as long as I'm consistant.
+
+typedef struct extendeddata
+{
+   int version;            // yes, this is repeated from the file header
+   int video_fourcc;       // video encoding method used 
+   int audio_fourcc;       // audio encoding method used
+   // generic data
+   int audio_sample_rate;
+   int audio_bits_per_sample;
+   int audio_channels;
+   // codec specific
+   // mp3lame
+   int audio_compression_ratio;
+   int audio_quality;
+   // rtjpeg
+   int rtjpeg_quality;
+   int rtjpeg_luma_filter;
+   int rtjpeg_chroma_filter;
+   // libavcodec
+   int lavc_bitrate;
+   int lavc_qmin;
+   int lavc_qmax;
+   int lavc_maxqdiff;
+   // unused for later -- total size of 128 integers.
+   // new fields must be added at the end, above this comment.
+   int expansion[113];
+} extendeddata;
+
 #define FRAMEHEADERSIZE sizeof(rtframeheader)
 #define FILEHEADERSIZE  sizeof(rtfileheader)
+#define EXTENDEDSIZE sizeof(extendeddata)
+
+#define MKTAG(a,b,c,d) (a | (b << 8) | (c << 16) | (d << 24))
 
 typedef struct vidbuffertype
 {
