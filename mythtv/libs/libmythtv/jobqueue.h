@@ -92,6 +92,10 @@ class JobQueue : public QObject
     ~JobQueue(void);
     void customEvent(QCustomEvent *e);
 
+    static bool QueueJob(QSqlDatabase* db, int jobType, QString chanid,
+                         QDateTime starttime, QString args = "",
+                         QString comment = "", QString host = "",
+                         int flags = 0);
     static bool QueueJobs(QSqlDatabase* db, int jobTypes, QString chanid,
                          QDateTime starttime, QString args = "",
                          QString comment = "", QString host = "");

@@ -31,6 +31,7 @@ class StatusBox : public MythDialog
     void doDVBStatus();
     void doLogEntries();
     void doJobQueueStatus();
+    void doMachineStatus();
     void clicked();
     void setHelpText();
 
@@ -57,6 +58,8 @@ class StatusBox : public MythDialog
     QMap<int, QString> contentData;
 
     MythMainWindow *my_parent;
+
+    bool isBackend;
 };
 
 #endif

@@ -5,8 +5,22 @@
 #include <qvbox.h>
 #include <qgrid.h>
 #include <qregexp.h>
+#include <qhostaddress.h>
 
 #include <unistd.h>
+
+#ifdef __linux__
+#include <sys/statvfs.h>
+#include <sys/sysinfo.h>
+#endif
+#if defined(__FreeBSD__) || defined(CONFIG_DARWIN)
+#include <sys/sysctl.h>
+#include <sys/param.h>
+#include <sys/mount.h>
+#endif
+#ifdef CONFIG_DARWIN
+#include <mach/mach.h>
+#endif
 
 #include <iostream>
 using namespace std;
@@ -39,8 +53,24 @@ StatusBox::StatusBox(MythMainWindow *parent, const char *name)
 #endif
     icon_list->SetItemText(item_count++, QObject::tr("Log Entries"));
     icon_list->SetItemText(item_count++, QObject::tr("Job Queue"));
+    icon_list->SetItemText(item_count++, QObject::tr("Machine Status"));
     icon_list->SetItemCurrent(0);
     icon_list->SetActive(true);
+
+    QStringList strlist;
+    strlist << "QUERY_IS_ACTIVE_BACKEND";
+    strlist << gContext->GetHostName();
+
+    gContext->SendReceiveStringList(strlist);
+
+    if (QString(strlist[0]) == "FALSE")
+        isBackend = false;
+    else if (QString(strlist[0]) == "TRUE")
+        isBackend = true;
+    else
+        isBackend = false;
+
+    cerr << "QUERY_IS_ACTIVE_BACKEND='" << strlist[0] << "'\n";
 
     max_icons = item_count;
     inContent = false;
@@ -431,6 +461,16 @@ void StatusBox::setHelpText()
             helptext->SetText(QObject::tr("Job Queue shows any jobs currently "
                                           "in Myth's Job Queue such as a "
                                           "commercial flagging job."));
+        if (currentItem == QObject::tr("Machine Status"))
+        {
+            QString machineStr = QObject::tr("Machine Status shows "
+                                             "some operating system "
+                                             "statistics of this machine");
+            if (!isBackend)
+                machineStr.append(QObject::tr(" and the MythTV server"));
+
+            helptext->SetText(machineStr);
+        }
     }
     update(TopRect);
 }
@@ -563,6 +603,8 @@ void StatusBox::clicked()
         doLogEntries();
     else if (currentItem == QObject::tr("Job Queue"))
         doJobQueueStatus();
+    else if (currentItem == QObject::tr("Machine Status"))
+        doMachineStatus();
 }
 
 void StatusBox::doListingsStatus()
@@ -933,3 +975,343 @@ void StatusBox::doJobQueueStatus()
     update(ContentRect);
 }
 
+// Some helper routines for doMachineStatus() that format the output strings
+
+#define MB (1024*1024)
+
+static const QString usageStr(float total, float used, float free)
+{
+    char  buff1[10];       // QString::arg(double) doesn't allow %0.2f,
+    char  buff2[10];       // so we need to use sprintf() with a buffer
+    char *units  = "MB";
+    char *format = "%0.0f";
+
+    if (total == 0.0)
+        return "unknown";
+
+    if (total > 1024)
+        units = "GB", format = "%0.2f",
+        total /= 1024, used /= 1024, free /= 1024;
+
+    sprintf(buff1, format, total);
+
+    QString s = QString("%1 %2").arg(buff1).arg(units);
+    //QString s = QString("%1 %2 %3")
+                //.arg(buff1).arg(units).arg(QObject::tr("total"));
+
+
+    // If, some some reason, we didn't get the usage stats, shorten output:
+
+    if (used == 0 && free == 0)
+        return s;
+
+
+    sprintf(buff1, format, used);
+    sprintf(buff2, format, free);
+
+    return s + ", " +
+           QString("%1 %2 %3")
+           .arg(buff1).arg(units).arg(QObject::tr("used"))
+           + ", " +
+           QString("%1 %2 %3 (%4%)")
+           .arg(buff2).arg(units).arg(QObject::tr("free"))
+           .arg((int)(100*free/total));
+}
+
+static bool diskUsage(const char *fs,
+                      double &total, double &used, double &free)
+{
+    // stat the file system
+
+#ifdef __linux__
+#define STAT statvfs
+#elif defined(__FreeBSD__) || defined(CONFIG_DARWIN)
+#define STAT statfs
+#endif
+
+    struct STAT sbuff;
+    if (!STAT(fs, &sbuff))
+    {
+        // see http://en.wikipedia.org/wiki/Megabyte
+
+        total = (double)sbuff.f_blocks * sbuff.f_bsize / MB;
+        free  = (double)sbuff.f_bfree  * sbuff.f_bsize / MB;
+        //total /= MB;
+        //free  /= MB;
+        used   = total - free;
+        return true;
+    }
+    else
+        return false;
+}
+
+static const QString diskUsageStr(const char *path)
+{
+    double total, free, used;
+
+    if (diskUsage(path, total, used, free))
+        return usageStr (total, used, free);
+    else
+        return QString("%1 - %2").arg(path).arg(strerror(errno));
+        //return QString("statfs() error (%1) on %2")
+               //.arg(strerror(errno)).arg(path);
+}
+
+static const QString uptimeStr(time_t uptime)
+{
+    int     days, hours, min, secs;
+    QString str;
+
+    str = QString("   " + QObject::tr("Uptime") + ": ");
+
+    if (uptime == 0)
+        return str + "unknown";
+
+    days = uptime/(60*60*24);
+    uptime -= days*60*60*24;
+    hours = uptime/(60*60);
+    uptime -= hours*60*60;
+    min  = uptime/60;
+    secs = uptime%60;
+
+    if (days > 0)
+    {
+        char    buff[6];
+        QString dayLabel;
+
+        if (days == 1)
+            dayLabel = QObject::tr("day");
+        else
+            dayLabel = QObject::tr("days");
+
+        sprintf(buff, "%d:%02d", hours, min);
+
+        return str + QString("%1 %2, %3").arg(days).arg(dayLabel).arg(buff);
+    }
+    else
+    {
+        char  buff[9];
+
+        sprintf(buff, "%d:%02d:%02d", hours, min, secs);
+
+        return str + buff;
+    }
+}
+
+#ifdef CONFIG_DARWIN
+static void getMachMemStats(long &totalM, long &usedM, long &freeM,
+                            long &totalS, long &usedS, long &freeS)
+{
+    mach_port_t             mp;
+    mach_msg_type_number_t  count, pageSize;
+    vm_statistics_data_t    s;
+
+    mp = mach_host_self();
+
+    // VM page size
+    if (host_page_size(mp, &pageSize) != KERN_SUCCESS)
+        pageSize = 4096;   // If we can't look it up, 4K is a good guess
+
+    count = HOST_VM_INFO_COUNT;
+    if (host_statistics(mp, HOST_VM_INFO,
+                        (host_info_t)&s, &count) != KERN_SUCCESS)
+    {
+        cerr << "Failed to get vm statistics.\n";
+        return;
+    }
+
+    pageSize >>= 10;  // This gives usages in KB
+    usedM = (s.active_count +
+             s.inactive_count + s.wire_count) * pageSize / 1024;
+    totalM = (s.free_count + s.active_count +
+              s.inactive_count + s.wire_count) * pageSize / 1024;
+    freeM = s.free_count * pageSize / 1024;
+
+
+    // This is a real hack. I have not found a way to ask the kernel how much
+    // swap it is using, and the dynamic_pager daemon doesn't even seem to be
+    // able to report what filesystem it is using for the swapfiles. So, we do:
+    double total, used, free;
+    diskUsage("/private/var/vm", total, used, free);
+    totalS = (long)total, usedS = (long)used, freeS = (long)free;
+}
+#endif
+
+void StatusBox::doMachineStatus()
+{
+    QSqlDatabase *db(QSqlDatabase::database());
+
+    int           count(0);
+    long          totalM, usedM, freeM;    // Physical memory
+    long          totalS, usedS, freeS;    // Virtual  memory (swap)
+    time_t        uptime;
+
+    contentLines.clear();
+    contentDetail.clear();
+    contentFont.clear();
+    //doScroll = false;??
+
+    if (isBackend)
+        contentLines[count++] = QObject::tr("System") + ":";
+    else
+        contentLines[count++] = QObject::tr("This machine") + ":";
+
+#ifdef __linux__
+    struct sysinfo sinfo;
+    if (sysinfo(&sinfo))
+        contentLines[count++] = QString("   sysinfo() error");
+    else
+    {
+        uptime = sinfo.uptime;
+
+        totalM = sinfo.totalram/MB;
+        freeM  = sinfo.freeram/MB;
+        usedM  = totalM - freeM;
+        totalS = sinfo.totalswap/MB;
+        freeS  = sinfo.freeswap/MB;
+        usedS  = totalS - freeS;
+
+#elif defined(__FreeBSD__) || defined(CONFIG_DARWIN)
+
+    int            mib[2];
+    struct timeval bootTime;
+    size_t         len;
+
+    // Uptime is calculated. Get this machine's boot time
+    // and subtract it from the current machine time
+    len    = sizeof(bootTime);
+    mib[0] = CTL_KERN;
+    mib[1] = KERN_BOOTTIME;
+    if (sysctl(mib, 2, &bootTime, &len, NULL, 0) == -1)
+        contentLines[count++] = QString("   sysctl() error");
+    else
+    {
+        uptime = time(NULL) - bootTime.tv_sec;
+
+        // We can easily look up the Physical memory statistics:
+        unsigned int totalBytes;
+        len    = sizeof(totalBytes);
+        mib[0] = CTL_HW;
+        mib[1] = HW_PHYSMEM;
+        if (sysctl(mib, 2, &totalBytes, &len, NULL, 0) == -1)
+            totalM = -1;
+        else
+            totalM = totalBytes/MB;
+
+        usedM = freeM = 0;
+
+        // VM stats are a bit harder.
+        totalS = usedS = freeS = 0;
+
+  #ifdef CONFIG_DARWIN
+        getMachMemStats(totalM, usedM, freeM, totalS, usedS, freeS);
+  #endif
+#else
+    {   // Hmmm. Not Linux, not FreeBSD or Darwin. What else is there :-)
+#endif
+        // uptime
+        contentLines[count] = uptimeStr(uptime);
+
+        // weighted average loads
+        contentLines[count].append(".   " + QObject::tr("Load") + ": ");
+
+        double loads[3];
+        if (getloadavg(loads,sizeof(loads)/sizeof(*loads)) == -1)
+            contentLines[count].append(QObject::tr("unknown") +
+                                       " - getloadavg() " +
+                                       QObject::tr("failed"));
+        else
+        {
+            char buff[512];
+
+            sprintf(buff, "%0.2f, %0.2f, %0.2f", loads[0], loads[1], loads[2]);
+            contentLines[count].append(QString(buff));
+        }
+        count++;
+
+
+        // memory usage
+        if (totalM > 0)
+            contentLines[count++] = "   " + QObject::tr("RAM") +
+                                    ": "  + usageStr(totalM, usedM, freeM);
+        if (totalS > 0)
+            contentLines[count++] = "   " +
+                                    QObject::tr("Swap") +
+                                    ": "  + usageStr(totalS, usedS, freeS);
+    }
+
+    if (!isBackend)
+    {
+        contentLines[count++] = QObject::tr("MythTV server") + ":";
+
+        // uptime
+        uptime = 0;
+        contentLines[count] = uptimeStr(uptime);
+
+        // weighted average loads
+        contentLines[count].append(".   " + QObject::tr("Load") + ": ");
+
+        // How will I get this from the backend. A new query?
+        contentLines[count++].append(QObject::tr("unknown"));
+
+        // memory usage
+        totalM = usedM = freeM = 0;
+        if (totalM > 0)
+            contentLines[count++] = "   " + QObject::tr("RAM") +
+                                    ": "  + usageStr(totalM, usedM, freeM);
+        totalS = usedS = freeS = 0;
+        if (totalS > 0)
+            contentLines[count++] = "   " + QObject::tr("Swap") +
+                                    ": "  + usageStr(totalS, usedS, freeS);
+    }
+
+    // get free disk space
+    contentLines[count++] = QString(QObject::tr("Disk space:"));
+
+    if (db && isBackend)
+    {
+        QString str;
+
+        // Perform the database queries
+        QSqlQuery path = db->exec("SELECT * FROM settings"
+                                  " where value=\"RecordFilePrefix\";");
+
+        contentLines[count] = "   " + QString(QObject::tr("Recordings")) + ": ";
+
+        // did we get results?
+        if (path.isActive() && path.numRowsAffected())
+        {
+            // skip to first result
+            path.next();
+            str = diskUsageStr(path.value(1).toCString());
+        }
+        else
+            str = QString(QObject::tr("DB error - RecordFilePrefix unknown"));
+        contentLines[count++].append(str);
+
+        // Ditto for the second path
+        contentLines[count] = "   " + QString(QObject::tr("TV buffer")) + ": ";
+        path = db->exec("SELECT * FROM settings"
+                        " where value=\"LiveBufferDir\";");
+        if (path.isActive() && path.numRowsAffected())
+        {
+            path.next();
+            str = diskUsageStr(path.value(1).toCString());
+        }
+        else
+            str = QString(QObject::tr("DB error - LiveBufferDir unknown"));
+        contentLines[count++].append(str);
+    }
+    else
+    {
+        int  total, used;
+        RemoteGetFreeSpace(total, used);
+        if (total)
+            contentLines[count++] = "   " + usageStr(total, used, total - used);
+        else
+            contentLines[count++] = "   " + QString(QObject::tr("Unknown"));
+    }
+
+    contentTotalLines = count;
+    update(ContentRect);
+}
