@@ -1,3 +1,5 @@
+SOURCES += ../libs/libmyth/uitypes.cpp
+
 SOURCES += ../libs/libmyth/dbsettings.cpp
 SOURCES += ../libs/libmyth/managedlist.cpp
 SOURCES += ../libs/libmyth/mythcontext.cpp
@@ -15,6 +17,7 @@ SOURCES += ../libs/libmythtv/jobqueue.cpp
 SOURCES += ../libs/libmythtv/progfind.cpp
 SOURCES += ../libs/libmythtv/proglist.cpp
 SOURCES += ../libs/libmythtv/programinfo.cpp
+SOURCES += ../libs/libmythtv/scanwizard.cpp
 SOURCES += ../libs/libmythtv/scheduledrecording.cpp
 SOURCES += ../libs/libmythtv/tv_play.cpp
 SOURCES += ../libs/libmythtv/profilegroup.cpp
