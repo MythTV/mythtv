@@ -793,6 +793,19 @@ void MythContext::CloseRemoteRingBuffer(int recorder, QSocket *sock)
     sock->close();
 }
 
+void MythContext::RequestRemoteRingBlock(int recorder, QSocket *sock,
+                                         int size)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
+    strlist << "REQUEST_BLOCK";
+    strlist << QString::number(size);
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+}
+
 long long MythContext::SeekRemoteRing(int recorder, QSocket *sock,
                                       long long curpos,
                                       long long pos, int whence)

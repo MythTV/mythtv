@@ -32,6 +32,7 @@ TVRec::TVRec(MythContext *lcontext, const QString &startchannel,
     rbuffer = NULL;
     nvr = NULL;
     readthreadSock = NULL;
+    readrequest = 0;
 
     ConnectDB(capturecardnum);
 
@@ -1052,22 +1053,39 @@ void TVRec::KillReadThread(void)
     pthread_join(readthread, NULL);
 }
 
+void TVRec::RequestRingBufferBlock(int size)
+{
+    if (size > 128000)
+        size = 128000;
+
+    pthread_mutex_lock(&readthreadLock);
+    readrequest = size; 
+    pthread_mutex_unlock(&readthreadLock);
+
+    while (readrequest > 0)
+        usleep(500);
+}
+
 void TVRec::DoReadThread(void)
 {
     readthreadlive = true;
 
-    char *buffer = new char[16001];
+    char *buffer = new char[128001];
 
     while (readthreadlive)
     {
+        while (readrequest == 0)
+            usleep(5000);
+
         pthread_mutex_lock(&readthreadLock);
 
-        int ret = rbuffer->Read(buffer, 16000);
-        WriteBlock(readthreadSock, buffer, ret);
+        int ret = rbuffer->Read(buffer, readrequest);
+        if (!rbuffer->GetStopReads())
+            WriteBlock(readthreadSock, buffer, ret);
+
+        readrequest -= ret;
 
         pthread_mutex_unlock(&readthreadLock);
- 
-        usleep(5000);
     }
 
     delete [] buffer;

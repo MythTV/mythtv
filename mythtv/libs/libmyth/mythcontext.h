@@ -84,6 +84,7 @@ class MythContext
 
     QSocket *SetupRemoteRingBuffer(int recorder, QString url);
     void CloseRemoteRingBuffer(int recorder, QSocket *sock);
+    void RequestRemoteRingBlock(int recorder, QSocket *sock, int size);
     long long SeekRemoteRing(int recorder, QSocket *sock, long long curpos,
                              long long pos, int whence);
     

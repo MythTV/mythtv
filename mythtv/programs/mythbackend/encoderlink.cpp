@@ -215,6 +215,12 @@ void EncoderLink::PauseClearRingBuffer(void)
         tv->PauseClearRingBuffer();
 }
 
+void EncoderLink::RequestRingBufferBlock(int size)
+{
+    if (local)
+        tv->RequestRingBufferBlock(size);
+}
+
 long long EncoderLink::SeekRingBuffer(long long curpos, long long pos, 
                                       int whence)
 {

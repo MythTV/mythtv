@@ -73,6 +73,8 @@ class RingBuffer
 
     void StopReads(void) { stopreads = true; }
     void StartReads(void) { stopreads = false; }
+    bool GetStopReads(void) { return stopreads; }
+
     bool LiveMode(void) { return !normalfile; }
 
     const QString GetFilename(void) { return filename; }

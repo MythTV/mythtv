@@ -572,6 +572,13 @@ void MainServer::HandleRecorderQuery(QStringList list, QStringList commands,
 
         retlist << "OK";
     }
+    else if (command == "REQUEST_BLOCK")
+    {
+        int size = list[2].toInt();
+
+        enc->RequestRingBufferBlock(size);
+        retlist << "OK";
+    }
     else if (command == "SEEK_RINGBUF")
     {
         long long pos = decodeLongLong(list, 2);

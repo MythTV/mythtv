@@ -400,6 +400,8 @@ int RingBuffer::safe_read(QSocket *sock, void *data, unsigned sz)
 
     while (sock->bytesAvailable() < sz) 
     {
+        int reqsize = 128000;
+        m_context->RequestRemoteRingBlock(recorder_num, sock, reqsize);
         zerocnt++;
         if (zerocnt == 100)
         {

@@ -75,6 +75,7 @@ class TVRec
     void PauseRingBuffer(void);
     void UnpauseRingBuffer(void);
     void PauseClearRingBuffer(void);
+    void RequestRingBufferBlock(int size);
     long long SeekRingBuffer(long long curpos, long long pos, int whence);
 
  protected:
@@ -143,6 +144,7 @@ class TVRec
     bool inoverrecord;
     int overrecordseconds;
 
+    long long readrequest;
     QSocket *readthreadSock;
     bool readthreadlive;
     pthread_mutex_t readthreadLock;
