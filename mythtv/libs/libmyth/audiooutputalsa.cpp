@@ -263,7 +263,6 @@ void AudioOutputALSA::WriteAudio(unsigned char *aubuf, int size)
         lw = snd_pcm_mmap_writei(pcm_handle, tmpbuf, frames);
         if (lw >= 0)
         {
-        // VERBOSE(VB_AUDIO, QString("Wrote %1 frames in WriteAudio").arg(lw));
             frames -= lw;
             tmpbuf += lw * audio_bytes_per_sample; // bytes
         } 
@@ -271,10 +270,29 @@ void AudioOutputALSA::WriteAudio(unsigned char *aubuf, int size)
         {
             VERBOSE(VB_AUDIO, QString("Soundcard is blocked.  Waiting for card to become ready"));
             snd_pcm_wait(pcm_handle, 10);
-        }  
-        else if (lw < 0)
+        }
+        else if (lw == -EPIPE &&
+                 snd_pcm_state(pcm_handle) == SND_PCM_STATE_XRUN &&
+                 snd_pcm_prepare(pcm_handle) == 0)
         {
-            Error(QString("snd_pcm_mmap_writei(%1,frames=%2) error %3")
+            VERBOSE(VB_AUDIO, "WriteAudio: xrun (buffer underrun)");
+            continue;
+        }
+        else if (lw == -EPIPE &&
+                 snd_pcm_state(pcm_handle) == SND_PCM_STATE_SUSPENDED)
+        {
+            VERBOSE(VB_AUDIO, "WriteAudio: suspended");
+
+            while ((lw = snd_pcm_resume(pcm_handle)) == -EAGAIN)
+                usleep(200);
+
+            if (lw < 0 && (lw = snd_pcm_prepare(pcm_handle)) == 0)
+                continue;
+        }
+
+        if (lw < 0)
+        {
+            Error(QString("snd_pcm_mmap_writei(%1,frames=%2) error %3: %4")
                   .arg(audiodevice).arg(frames).arg(snd_strerror(lw)));
             snd_pcm_close(pcm_handle);
             pcm_handle = NULL;
@@ -482,8 +500,8 @@ void AudioOutputALSA::AddSamples(char *buffer, int samples, long long timecode)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, QString("Audio buffer overflow, audio data lost!"
-                                          "[] afree=%1 need=%2")
+            VERBOSE(VB_IMPORTANT, QString("Audio buffer overflow, audio data"
+                                          "lost! afree=%1 need=%2")
                     .arg(afree).arg(samples * audio_bytes_per_sample));
             len = afree;
         }
