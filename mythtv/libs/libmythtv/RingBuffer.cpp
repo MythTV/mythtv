@@ -80,12 +80,15 @@ static unsigned safe_write(int fd, const void *data, unsigned sz)
         ret = write(fd, (char *)data + tot, sz - tot);
         if (ret < 0)
         {
+            if (errno == EAGAIN)
+                continue;
+
             char msg[128];
 
             errcnt++;
             snprintf(msg, 127,
                      "ERROR: file I/O problem in safe_write(), errcnt = %d",
-                     errcnt );
+                     errcnt);
             perror(msg);
             if (errcnt == 3) 
                 break;
@@ -485,6 +488,9 @@ int RingBuffer::safe_read(int fd, void *data, unsigned sz)
         ret = read(fd, (char *)data + tot, sz - tot);
         if (ret < 0)
         {
+            if (errno == EAGAIN)
+                continue;
+
             perror("ERROR: file I/O problem in 'safe_read()'");
             errcnt++;
             numfailures++;

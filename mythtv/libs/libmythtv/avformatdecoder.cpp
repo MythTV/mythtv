@@ -1032,7 +1032,6 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
     AVPacket *pkt = NULL;
     int len, ret = 0;
     unsigned char *ptr;
-    short *samples = new short[AVCODEC_MAX_AUDIO_FRAME_SIZE / 2];
     int data_size = 0;
     long long pts;
     bool firstloop = false;
@@ -1080,7 +1079,6 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
             {
                 ateof = true;
                 m_parent->SetEof();
-                delete[] samples;
                 return;
             }
         }
@@ -1154,12 +1152,14 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     if (do_ac3_passthru)
                     {
                         data_size = pkt->size;
-                        ret = EncodeAC3Frame(ptr, len, samples, data_size);
+                        ret = EncodeAC3Frame(ptr, len, audioSamples, 
+                                             data_size);
                     }
                     else
                     {
-                        ret = avcodec_decode_audio(&curstream->codec, samples,
-                                                   &data_size, ptr, len);
+                        ret = avcodec_decode_audio(&curstream->codec,
+                                                   audioSamples, &data_size, 
+                                                   ptr, len);
                     }
 
                     ptr += ret;
@@ -1189,7 +1189,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     lastapts += (long long)((double)(data_size * 1000) /
                                 audio_sample_size / audio_sampling_rate);
 
-                    m_parent->AddAudioData((char *)samples, data_size, 
+                    m_parent->AddAudioData((char *)audioSamples, data_size, 
                                            temppts);
                     break;
                 }
@@ -1322,7 +1322,6 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
         delete pkt;
 
     m_parent->SetFramesPlayed(framesPlayed);
-    delete[] samples;
 }
 
 bool AvFormatDecoder::DoRewind(long long desiredFrame)
@@ -1344,7 +1343,7 @@ bool AvFormatDecoder::DoRewind(long long desiredFrame)
     long long diff = keyPos - curPosition;
 
     // Don't rewind further than we have space to store video
-    while (ringBuffer->GetFreeSpaceWithReadChange(diff) < 0)
+    while (ringBuffer->GetFreeSpaceWithReadChange(diff) <= 0)
     {
         pos_idx++;
         if (pos_idx >= (int)m_positionMap.size())

@@ -168,6 +168,8 @@ class AvFormatDecoder : public DecoderBase
     long long lastapts; 
 
     bool do_ac3_passthru;
+
+    short int audioSamples[AVCODEC_MAX_AUDIO_FRAME_SIZE];
 };
 
 #endif

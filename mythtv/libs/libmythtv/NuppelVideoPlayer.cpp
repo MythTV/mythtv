@@ -600,6 +600,8 @@ void NuppelVideoPlayer::InitFilters(void)
     VideoFrameType otmp = FMT_YV12;
     int btmp;
 
+    videofiltersLock.lock();
+
     if (videoFilters)
         delete videoFilters;
 
@@ -607,6 +609,8 @@ void NuppelVideoPlayer::InitFilters(void)
     postfilt_height = video_height;
     videoFilters = FiltMan->LoadFilters(videoFilterList, itmp, otmp, 
                                         postfilt_width, postfilt_height, btmp);
+
+    videofiltersLock.unlock();
 }
 
 int NuppelVideoPlayer::tbuffer_numvalid(void)
@@ -1468,7 +1472,7 @@ void NuppelVideoPlayer::ExAVSync(void)
                 nexttrigger.tv_usec -= 2000;
                 NormalizeTimeval(&nexttrigger);
             }
-            else if (delay < -(frame_interval/2)) 
+            else if (delay < -(refreshrate/4)) 
             {
                 nexttrigger.tv_usec += 2000;
                 NormalizeTimeval(&nexttrigger);
@@ -1737,7 +1741,10 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             video_actually_paused = true;
             videoThreadPaused.wakeAll();
 
+            videofiltersLock.lock();
             videoOutput->ProcessFrame(NULL, osd, videoFilters, pipplayer);
+            videofiltersLock.unlock();
+
             videoOutput->PrepareFrame(NULL); 
             videoOutput->Show(m_scan);
             ResetNexttrigger(&nexttrigger);
@@ -1776,7 +1783,9 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         if (cc)
             ShowText();
 
+        videofiltersLock.lock();
         videoOutput->ProcessFrame(frame, osd, videoFilters, pipplayer);
+        videofiltersLock.unlock();
 
         if (usevideotimebase)
             VTAVSync();
@@ -1826,13 +1835,17 @@ void NuppelVideoPlayer::IvtvVideoLoop(void)
         if (pausevideo)
         {
             videoThreadPaused.wakeAll();
+            videofiltersLock.lock();
             videoOutput->ProcessFrame(NULL, osd, videoFilters, pipplayer);
+            videofiltersLock.unlock();
         }
         else
         {
             if (cc)
                 ShowText();
+            videofiltersLock.lock();
             videoOutput->ProcessFrame(NULL, osd, videoFilters, pipplayer);
+            videofiltersLock.unlock();
         }
 
         usleep(delay);

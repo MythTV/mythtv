@@ -279,6 +279,9 @@ int RemoteFile::Read(void *data, int size)
     VERBOSE(VB_NETWORK, QString("Read(): reqd=%1, rcvd=%2, rept=%3, error=%4")
                                 .arg(size).arg(recv).arg(sent).arg(error));
 
+    if (sent < 0)
+        return sent;
+
     if (error || sent != recv)
         recv = -1;
 

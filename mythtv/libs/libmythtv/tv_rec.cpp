@@ -2148,8 +2148,6 @@ int TVRec::RequestRingBufferBlock(int size)
         return -1;
     }
 
-    char *buffer = new char[256001];
-
     while (tot < size && !rbuffer->GetStopReads() && readthreadlive)
     {
         int request = size - tot;
@@ -2157,12 +2155,12 @@ int TVRec::RequestRingBufferBlock(int size)
         if (request > 256000)
             request = 256000;
  
-        ret = rbuffer->Read(buffer, request);
+        ret = rbuffer->Read(requestBuffer, request);
         
         if (rbuffer->GetStopReads() || ret <= 0)
             break;
         
-        if (!WriteBlock(readthreadSock->socketDevice(), buffer, ret))
+        if (!WriteBlock(readthreadSock->socketDevice(), requestBuffer, ret))
         {
             tot = -1;
             break;
@@ -2173,8 +2171,6 @@ int TVRec::RequestRingBufferBlock(int size)
             break; // we hit eof
     }
     readthreadLock.unlock();
-
-    delete[] buffer;
 
     if (ret < 0)
         tot = -1;

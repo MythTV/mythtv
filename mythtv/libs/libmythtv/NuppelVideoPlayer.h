@@ -442,6 +442,8 @@ class NuppelVideoPlayer
     QWidget *parentWidget;
 
     QMutex vidExitLock;
+
+    QMutex videofiltersLock;
 };
 
 #endif

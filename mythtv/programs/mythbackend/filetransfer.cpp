@@ -64,7 +64,6 @@ int FileTransfer::RequestBlock(int size)
     if (!readthreadlive || !rbuffer)
         return -1;
 
-    char *buffer = new char[256001];
     int tot = 0;
     int ret = 0;
 
@@ -76,12 +75,12 @@ int FileTransfer::RequestBlock(int size)
         if (request > 256000)
             request = 256000;
 
-        ret = rbuffer->Read(buffer, request);
+        ret = rbuffer->Read(requestBuffer, request);
         
         if (rbuffer->GetStopReads() || ret <= 0)
             break;
             
-        if (!WriteBlock(sock->socketDevice(), buffer, ret))
+        if (!WriteBlock(sock->socketDevice(), requestBuffer, ret))
         {
             tot = -1;
             break;
@@ -92,8 +91,6 @@ int FileTransfer::RequestBlock(int size)
             break; // we hit eof
     }
     readthreadLock.unlock();
-
-    delete[] buffer;
 
     if (ret < 0)
         tot = -1;

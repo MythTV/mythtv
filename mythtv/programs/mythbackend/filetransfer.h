@@ -35,6 +35,8 @@ class FileTransfer
     RingBuffer *rbuffer;
     QSocket *sock;
     bool ateof;
+
+    char requestBuffer[256001];
 };
 
 #endif

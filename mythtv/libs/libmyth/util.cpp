@@ -275,10 +275,38 @@ int ReadBlock(QSocketDevice *socket, void *data, int maxlen)
     return maxlen;
 }
 
-
+// QSocket (backend version)
 bool WriteStringList(QSocket *socket, QStringList &list)
-{// QSocket (backend)
+{
+    if (list.size() <= 0)
+    {
+        VERBOSE(VB_ALL, "invalid stringlist in WriteStringList");
+        return false;
+    }
+
+    if (!socket || socket->state() != QSocket::Connected)
+    {
+        VERBOSE(VB_ALL, "writing to unconnected socket in WriteStringList");
+        return false;
+    }
+
+    QStringList::iterator iter = list.begin();
+    for (; iter != list.end(); iter++)
+    {
+        if ((*iter) == QString::null)
+        {
+            VERBOSE(VB_ALL, "NULL in string in list in WriteStringList");
+            return false;
+        }
+    }
+
     QString str = list.join("[]:[]");
+    if (str == QString::null)
+    {
+        VERBOSE(VB_ALL, "joined null string in WriteStringList");
+        return false;
+    }
+
     QCString utf8 = str.utf8();
 
     int size = utf8.length();
@@ -310,9 +338,22 @@ bool WriteStringList(QSocket *socket, QStringList &list)
 
     while (size > 0)
     {
+        if (socket->state() != QSocket::Connected)
+        {
+            VERBOSE(VB_ALL, "writing to unconnected socket #2");
+            return false;
+        }
+
         qApp->lock();
         int temp = socket->writeBlock(payload.data() + written, size);
         qApp->unlock();
+
+        if (temp < 0)
+        {
+            VERBOSE(VB_ALL, "writeBlock failed!");
+            return false;
+        }
+
         // cerr << "  written: " << temp << endl; //DEBUG
         written += temp;
         size -= temp;

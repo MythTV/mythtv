@@ -526,9 +526,9 @@ void DVBChannel::CheckOptions()
     unsigned int frequency;
     if (info.type == FE_QPSK)
         if (t.params.frequency > t.lnb_lof_switch)
-            frequency = t.params.frequency - t.lnb_lof_hi;
+            frequency = abs((int)t.params.frequency - (int)t.lnb_lof_hi);
         else
-            frequency = t.params.frequency - t.lnb_lof_lo;
+            frequency = abs((int)t.params.frequency - (int)t.lnb_lof_lo);
     else
         frequency = t.params.frequency;
 
@@ -1156,12 +1156,14 @@ bool DVBChannel::TuneQPSK(dvb_tuning_t& tuning, bool reset, bool& havetuned)
     int frequency = tuning.params.frequency;
     if (tuning.params.frequency >= tuning.lnb_lof_switch)
     {
-        tuning.params.frequency = tuning.params.frequency - tuning.lnb_lof_hi;
+        tuning.params.frequency = abs((int)tuning.params.frequency - 
+                                      (int)tuning.lnb_lof_hi);
         tuning.tone = SEC_TONE_ON;
     }
     else
     {
-        tuning.params.frequency = tuning.params.frequency - tuning.lnb_lof_lo;
+        tuning.params.frequency = abs((int)tuning.params.frequency - 
+                                      (int)tuning.lnb_lof_lo);
         tuning.tone = SEC_TONE_OFF;
     }
 

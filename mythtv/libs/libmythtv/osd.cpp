@@ -1733,6 +1733,8 @@ void OSD::HideAll(void)
         if (*i)
             (*i)->Hide();
 
+    runningTreeMenu = NULL;
+
     changed = true;
     osdlock.unlock();
 }

@@ -228,6 +228,8 @@ class TVRec
     int autoTranscode;
 
     dvb_options_t dvb_options;
+
+    char requestBuffer[256001];
 };
 
 #endif
