@@ -495,6 +495,17 @@ void UIListTreeType::MoveDown(MovementUnit unit)
     RedrawCurrent();
 }
 
+void UIListTreeType::MoveDown(int count)
+{    
+    if (!currentlevel)
+    {
+        return;
+    }
+    currentlevel->MoveDown(count);
+    SetCurrentPosition();
+    RedrawCurrent();
+}
+
 void UIListTreeType::MoveUp(MovementUnit unit)
 {
     if (!currentlevel)
@@ -502,6 +513,17 @@ void UIListTreeType::MoveUp(MovementUnit unit)
         return;
     }
     currentlevel->MoveUp((UIListBtnType::MovementUnit)unit);
+    SetCurrentPosition();
+    RedrawCurrent();
+}
+
+void UIListTreeType::MoveUp(int count)
+{    
+    if (!currentlevel)
+    {
+        return;
+    }
+    currentlevel->MoveUp(count);
     SetCurrentPosition();
     RedrawCurrent();
 }
@@ -1124,6 +1146,46 @@ void UIListBtnType::MoveUp(MovementUnit unit)
     emit itemSelected(m_selItem);
 }
 
+void UIListBtnType::MoveUp(int count)
+{
+    int pos = m_selPosition;
+    if (pos == -1)
+        return;
+
+    if (pos > count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            --(*m_selIterator);
+            --m_selPosition;
+        }
+    }
+
+    if (!m_selIterator->current())
+        return;
+
+    m_selItem = m_selIterator->current();
+
+    if (m_selPosition <= m_topPosition)
+    {
+        m_topItem = m_selItem;
+        (*m_topIterator) = (*m_selIterator);
+        m_topPosition = m_selPosition;
+    }
+
+    if (m_topItem != m_itemList.first())
+        m_showUpArrow = true;
+    else
+        m_showUpArrow = false;
+
+    if (m_topPosition + (int)m_itemsVisible < m_itemCount)
+        m_showDnArrow = true;
+    else
+        m_showDnArrow = false;
+
+    emit itemSelected(m_selItem);
+}
+
 void UIListBtnType::MoveDown(MovementUnit unit)
 {
     int pos = m_selPosition;
@@ -1154,6 +1216,47 @@ void UIListBtnType::MoveDown(MovementUnit unit)
             m_selIterator->toLast();
             m_selPosition = m_itemCount - 1;
             break;
+    }
+
+    if (!m_selIterator->current()) 
+        return;
+
+    m_selItem = m_selIterator->current();
+
+    while (m_topPosition + (int)m_itemsVisible < m_selPosition + 1) 
+    {
+        ++(*m_topIterator);
+        ++m_topPosition;
+    }
+   
+    m_topItem = m_topIterator->current();
+
+    if (m_topItem != m_itemList.first())
+        m_showUpArrow = true;
+    else
+        m_showUpArrow = false;
+
+    if (m_topPosition + (int)m_itemsVisible < m_itemCount)
+        m_showDnArrow = true;
+    else
+        m_showDnArrow = false;
+    
+    emit itemSelected(m_selItem);
+}
+
+void UIListBtnType::MoveDown(int count)
+{
+    int pos = m_selPosition;
+    if (pos == -1)
+        return;
+
+    if ((pos + count) < m_itemCount - 1)
+    {
+        for (int i = 0; i < count; i++)
+        {
+             ++(*m_selIterator);
+             ++m_selPosition;
+        }
     }
 
     if (!m_selIterator->current()) 

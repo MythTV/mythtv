@@ -95,7 +95,9 @@ class UIListTreeType : public UIType
 
     enum MovementUnit { MoveItem, MovePage, MoveMax };
     void MoveDown(MovementUnit unit = MoveItem);
+    void MoveDown(int count);
     void MoveUp(MovementUnit unit = MoveItem);
+    void MoveUp(int count);
     void MoveLeft(bool do_refresh = true);
     bool MoveRight(bool do_refresh = true);
     void calculateScreenArea();
@@ -189,7 +191,9 @@ class UIListBtnType : public UIType
 
     enum MovementUnit { MoveItem, MovePage, MoveMax };
     void  MoveDown(MovementUnit unit=MoveItem);
+    void  MoveDown(int count);
     void  MoveUp(MovementUnit unit=MoveItem);
+    void  MoveUp(int count);    
     bool  MoveToNamedPosition(const QString &position_name);
 
     bool  IsVisible() { return m_visible; }
