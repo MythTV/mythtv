@@ -44,6 +44,12 @@
       <bold>yes</bold>
     </font>
 
+    <font name="directoryfnt" face="Arial">
+      <color>#ffff33</color>
+      <size>16</size>
+      <bold>yes</bold>
+    </font>
+
     <container name="background">
       <textarea name="sched" draworder="0">
         <area>20,10,800,40</area>
@@ -67,6 +73,7 @@
         <fcnfont name="active_font" function="active"></fcnfont>
         <fcnfont name="inactive_font" function="inactive"></fcnfont>
         <fcnfont name="active_font" function="selected"></fcnfont>
+        <fcnfont name="directoryfnt" function="directory"></fcnfont>
         <columnpadding>10</columnpadding>
         <column number="1" width="500" context="-1"></column>
         <items>19</items>

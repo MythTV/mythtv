@@ -23,36 +23,11 @@ using namespace std;
 #include <mythtv/mythcontext.h>
 #include "dirlist.h"
 
-#ifdef ENABLE_LIRC
-#include "lirc_client.h"
-
-int lfd;
-struct lirc_config *config;
-#endif
-
 MythContext *gContext;
 
 void startDatabaseTree(QSqlDatabase *db, QValueList<Metadata> *playlist)
 {
     DatabaseBox dbbox(db, playlist);
-
-#ifdef ENABLE_LIRC
-    int flags;
-    QSocketNotifier *sn;
-
-    fcntl(lfd,F_SETOWN,getpid());
-    flags=fcntl(lfd,F_GETFL,0);
-    if(flags!=-1)
-    {
-	fcntl(lfd,F_SETFL,flags|O_NONBLOCK);
-    }
- 
-    sn = new QSocketNotifier( lfd, QSocketNotifier::Read, NULL);
-    QObject::connect( sn, SIGNAL(activated(int)),
-		      &dbbox, SLOT(dataReceived()) );
-
-#endif
-
     dbbox.Show();
     dbbox.exec();
 }
@@ -63,11 +38,6 @@ int main(int argc, char *argv[])
     QTranslator translator( 0 );
     
     gContext = new MythContext(MYTH_BINARY_VERSION);
-
-#ifdef ENABLE_LIRC
-    lfd=lirc_init("mythvideo",1);
-    lirc_readconfig(NULL,&config,NULL);
-#endif
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)

@@ -19,11 +19,6 @@ using namespace std;
 #include "dirlist.h"
 #include <mythtv/mythcontext.h>
 
-#ifdef ENABLE_LIRC
-#include "lirc_client.h"
-extern struct lirc_config *config;
-#endif
-
 DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QValueList<Metadata> *movielist, 
                          QWidget *parent, const char *name)
            : MythDialog(parent, name)
@@ -41,6 +36,10 @@ DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QValueList<Metadata> *movielist,
     listCount = 0;
     dataCount = 0;
     m_status = 0;
+
+    fullRect = QRect(0, 0, size().width(), size().height());
+    listRect = QRect(0, 0, 0, 0);
+    infoRect = QRect(0, 0, 0, 0);
 
     accel = new QAccel(this);
 
@@ -91,7 +90,17 @@ DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QValueList<Metadata> *movielist,
 
     showFullScreen();
     setActiveWindow();
+}
 
+DatabaseBox::~DatabaseBox()
+{
+    delete theme;
+    delete accel;
+    delete bgTransBackup;
+    if (m_list)
+        delete m_list;
+    if (curitem)
+        delete curitem;
 }
 
 void DatabaseBox::updateBackground(void)
@@ -157,15 +166,15 @@ void DatabaseBox::paintEvent(QPaintEvent *e)
     QRect r = e->rect();
     QPainter p(this);
 
-    if (r.intersects(listRect()) && m_status == 0)
+    if (r.intersects(listRect) && m_status == 0)
     {
         updateList(&p);
     }
-    if (r.intersects(infoRect()) && m_status == 0) 
+    if (r.intersects(infoRect) && m_status == 0) 
     {
         updateInfo(&p);
     }
-    if (r.intersects(fullRect()) && m_status > 0)
+    if (r.intersects(fullRect) && m_status > 0)
     {
         updatePlayWait(&p);
     }
@@ -191,7 +200,7 @@ void DatabaseBox::updatePlayWait(QPainter *p)
         container->Draw(p, 3, 0);
     }
     m_status++;
-    update(fullRect());
+    update(fullRect);
   }
   else if (m_status == 3)
   {
@@ -210,7 +219,7 @@ void DatabaseBox::updatePlayWait(QPainter *p)
 
 void DatabaseBox::updateList(QPainter *p)
 {
-    QRect pr = listRect();
+    QRect pr = listRect;
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
@@ -266,6 +275,11 @@ void DatabaseBox::updateList(QPainter *p)
 
                       ltype->SetItemText(cnt, 1, title);
 
+                      if ((*it).Genre() == "dir")
+                      {
+                          ltype->EnableForcedFont(cnt, "directory");
+                      }
+
                       cnt++;
                       listCount++;
                   }
@@ -304,7 +318,7 @@ void DatabaseBox::updateList(QPainter *p)
 
 void DatabaseBox::updateInfo(QPainter *p)
 {
-    QRect pr = infoRect();
+    QRect pr = infoRect;
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
@@ -398,65 +412,10 @@ void DatabaseBox::parseContainer(QDomElement &element)
     theme->parseContainer(element, name, context, area);
 
     if (name.lower() == "selector")
-    {
-        rectListLeft = area.left();
-        rectListTop = area.top();
-        rectListWidth = area.width();
-        rectListHeight = area.height();
-    }
+        listRect = area;
     if (name.lower() == "video_info")
-    {
-        rectInfoLeft = area.left();
-        rectInfoTop = area.top();
-        rectInfoWidth = area.width();
-        rectInfoHeight = area.height();
-    }
+        infoRect = area;
 }
- 
-
-
-
-#ifdef ENABLE_LIRC
-
-void DatabaseBox::dataReceived()
-{
-  //  printf("get lirc data\n");
-    char *code;
-    char *c;
-    int ret;
-    char buffer[200];
-    size_t l;
-
-    while (ret=lirc_nextcode(&code)==0 && code !=NULL)
-    {
-        while ((ret=lirc_code2char(config,code,&c))==0 && c!=NULL)
-        {
-            if (code==NULL) 
-                continue;
-            QString str = QString(c);
-            if (str == "Up")
-	    { 
-                listview->setCurrentItem(listview->currentItem()->itemAbove());
-                listview->setSelected(listview->currentItem(),TRUE);
-   	        listview->ensureItemVisible(listview->currentItem());
-	    }
-            else if (str == "Down")
-   	    {
-                listview->setCurrentItem(listview->currentItem()->itemBelow());
-                listview->setSelected(listview->currentItem(),TRUE);
-	        listview->ensureItemVisible(listview->currentItem());
-	    }
-            else if(str == "Enter")
-	    {
-	        doSelected(listview->currentItem());
-	    }
-        }
-   
-        free(code);
-        if(ret==-1) break;
-    }
-}
-#endif
 
 void DatabaseBox::exitWin()
 {
@@ -512,7 +471,7 @@ void DatabaseBox::cursorDown(bool page)
     if (inList >= listCount)
         inList = listCount - 1;
 
-    update(fullRect());
+    update(fullRect);
 }
 
 void DatabaseBox::cursorUp(bool page)
@@ -560,7 +519,7 @@ void DatabaseBox::cursorUp(bool page)
 
     if (inList > -1)
     {
-        update(fullRect());
+        update(fullRect);
     }
     else
         inList = 0;
@@ -595,7 +554,7 @@ void DatabaseBox::selected()
         m_cmd = command;
         m_status = 1;
 
-        update(fullRect());
+        update(fullRect);
     }
     else if (mdata != NULL && mdata->Genre() == "dir")
     {
@@ -616,24 +575,6 @@ void DatabaseBox::selected()
         listCount = 0;
         dataCount = 0;
         
-        update(fullRect());
+        update(fullRect);
     }
-}
-
-QRect DatabaseBox::listRect() const
-{
-    QRect r(rectListLeft, rectListTop, rectListWidth, rectListHeight);
-    return r;
-}
-
-QRect DatabaseBox::infoRect() const
-{
-    QRect r(rectInfoLeft, rectInfoTop, rectInfoWidth, rectInfoHeight);
-    return r;
-}
-
-QRect DatabaseBox::fullRect() const
-{
-    QRect r(0, 0, (int)(800*wmult), (int)(600*hmult));
-    return r;
 }

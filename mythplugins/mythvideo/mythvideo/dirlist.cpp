@@ -63,7 +63,7 @@ Dirlist::Dirlist(QString &directory)
                 Metadata retdata(fi->absFilePath(), fi->absFilePath(), "album",
                                  QObject::tr("(Up one level)"), "dir",
                                  1900, 3, 40);
-                playlist.prepend(retdata);
+                playlist.append(retdata);
                 ++it;
                 continue;
             }
@@ -74,7 +74,7 @@ Dirlist::Dirlist(QString &directory)
         {
             QString s = filename.section( '/',-1);
 	    Metadata retdata(filename, filename, "album", s, "dir",1900, 3, 40);
-            playlist.prepend(retdata);
+            playlist.append(retdata);
         }
         else
         {
@@ -84,7 +84,7 @@ Dirlist::Dirlist(QString &directory)
 	    if (prof.contains(ext, FALSE))
             {
                 data = CheckFile(filename);
-                playlist.prepend(*data);
+                playlist.append(*data);
                 delete data;
 	    }
 	}

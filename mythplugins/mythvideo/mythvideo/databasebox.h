@@ -22,6 +22,7 @@ class DatabaseBox : public MythDialog
   public:
     DatabaseBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
                 QWidget *parent = 0, const char *name = 0);
+   ~DatabaseBox();
 
   signals:
     void killTheApp();
@@ -75,23 +76,14 @@ class DatabaseBox : public MythDialog
     int enter_itemid;
     int return_itemid;
 
-    int rectListLeft;
-    int rectListTop;
-    int rectListWidth;
-    int rectListHeight;
-    int rectInfoLeft;
-    int rectInfoTop;
-    int rectInfoWidth;
-    int rectInfoHeight;
-  
+    QRect listRect;
+    QRect infoRect;
+    QRect fullRect;
+
     int listsize;
-    QRect listRect() const;
-    QRect infoRect() const;
-    QRect fullRect() const;
 
     QString m_cmd;   
     QString m_title;
-
 };
 
 #endif
