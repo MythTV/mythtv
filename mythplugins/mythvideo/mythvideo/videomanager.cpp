@@ -300,6 +300,9 @@ QString VideoManager::GetMoviePoster(QString movieNum)
         }
     }
 
+    if (movieNum == "Local")
+        return(QString("<NULL>"));
+
     QString host = "www.imdb.com";
 
     QUrl url("http://" + host + "/Posters?" + movieNum
@@ -1271,6 +1274,7 @@ void VideoManager::selected()
     {
        QString movieTitle = curitem->Title();
        movieTitle.replace(QRegExp(" "), "+");
+       movieTitle.replace(QRegExp("_"), "+");
        m_state = 1;
  
        backup.flush();
@@ -1349,6 +1353,14 @@ void VideoManager::selected()
 
        if (movieNumber == "cancel")
        {
+           QString movieCoverFile = GetMoviePoster(QString("Local"));
+           if (movieCoverFile != "<NULL>")
+           {
+               curitem->setCoverFile(movieCoverFile);
+               curitem->updateDatabase(db);
+               RefreshMovieList();
+           }
+ 
            backup.begin(this);
            backup.drawPixmap(0, 0, myBackground);
            backup.end();
@@ -1371,6 +1383,14 @@ void VideoManager::selected()
        else if (movieNumber == "reset")
        {
            ResetCurrentItem();
+
+           QString movieCoverFile = GetMoviePoster(QString("Local"));
+           if (movieCoverFile != "<NULL>")
+           {
+               curitem->setCoverFile(movieCoverFile);
+               curitem->updateDatabase(db);
+               RefreshMovieList();
+           }
  
            backup.begin(this);
            backup.drawPixmap(0, 0, myBackground);
