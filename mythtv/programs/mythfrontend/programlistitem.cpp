@@ -57,14 +57,21 @@ QPixmap *ProgramListItem::getPixmap(void)
         return pixmap;
 
     int len = 0;
-    unsigned char *data = (unsigned char *)tv->GetScreenGrab(recinfo, 65, len);
+    int video_width, video_height;
+    unsigned char *data = (unsigned char *)tv->GetScreenGrab(recinfo, 65, len,
+                                                             video_width,
+                                                             video_height);
 
-    QImage img(data, 480, 480, 32, NULL, 65536 * 65536, QImage::LittleEndian);
-    img = img.smoothScale(160, 120);
+    if (data)
+    {
+        QImage img(data, video_width, video_height, 32, NULL, 65536 * 65536, 
+                   QImage::LittleEndian);
+        img = img.smoothScale(160, 120);
 
-    img.save(filename.c_str(), "PNG");
+        img.save(filename.c_str(), "PNG");
 
-    delete [] data;
+        delete [] data;
+    }
 
     if (pixmap->load(filename.c_str()))
         return pixmap;

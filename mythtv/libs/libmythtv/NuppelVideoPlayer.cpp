@@ -1210,7 +1210,8 @@ void NuppelVideoPlayer::ClearAfterSeek(void)
     pthread_mutex_unlock(&audio_buflock);
 }
 
-char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen)
+char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
+                                       int &vh)
 {
     InitSubs();
     OpenFile(false);
@@ -1298,6 +1299,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen)
     if (!frame)
     {
         bufflen = 0;
+        vw = vh = 0;
         return NULL;
     }
 
@@ -1311,6 +1313,9 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen)
     convert(outputbuf, frame, frame + (video_width * video_height), 
             frame + (video_width * video_height * 5 / 4), video_width,
             video_height);
+
+    vw = video_width;
+    vh = video_height;
 
     return (char *)outputbuf;
 }

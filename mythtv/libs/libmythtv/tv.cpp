@@ -631,7 +631,8 @@ void TV::TeardownPlayer(void)
     }
 }
 
-char *TV::GetScreenGrab(RecordingInfo *rcinfo, int secondsin, int &bufferlen)
+char *TV::GetScreenGrab(RecordingInfo *rcinfo, int secondsin, int &bufferlen,
+                        int &video_width, int &video_height)
 {
     string filename;
 
@@ -643,7 +644,8 @@ char *TV::GetScreenGrab(RecordingInfo *rcinfo, int secondsin, int &bufferlen)
     NuppelVideoPlayer *nupvidplay = new NuppelVideoPlayer();
     nupvidplay->SetRingBuffer(tmprbuf);
     nupvidplay->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
-    char *retbuf = nupvidplay->GetScreenGrab(secondsin, bufferlen);
+    char *retbuf = nupvidplay->GetScreenGrab(secondsin, bufferlen, video_width,
+                                             video_height);
 
     delete nupvidplay;
 

@@ -39,7 +39,8 @@ class TV
 
     // next two functions only work on recorded programs.
     void Playback(RecordingInfo *rcinfo);
-    char *GetScreenGrab(RecordingInfo *rcinfo, int secondsin, int &bufferlen);
+    char *GetScreenGrab(RecordingInfo *rcinfo, int secondsin, int &bufferlen,
+                        int &video_width, int &video_height);
 
     bool IsRunning(void) { return runMainLoop; }
     void Stop(void) { runMainLoop = false; }
