@@ -50,8 +50,9 @@ void RootSRGroup::itemChanged(ManagedListItem*)
 {
     bool multiEpisode = true;
     bool isScheduled = true;
+    int rtype = recType->getValue().toInt();
 
-    switch(recType->getValue().toInt())
+    switch(rtype)
     {
         case kNotRecording:
         case kDontRecord:
@@ -65,7 +66,7 @@ void RootSRGroup::itemChanged(ManagedListItem*)
                 break;
     }
 
-    if (isScheduled)
+    if (isScheduled || rtype == kDontRecord)
     {
         recordAsShownItem->setText(QString("[ %1 ]").arg(QObject::tr("Save these settings")));
         recordAsShownItem->setState(MLS_BOLD);

@@ -766,6 +766,8 @@ void ScheduledRecording::makeOverride(void)
     id->setValue(0);
     type->clearSelections();
     type->addOverrideSelections();
+    type->setValue(kNotRecording);
+
     if (search->intValue() == kManualSearch)
         search->setChanged();
     else
