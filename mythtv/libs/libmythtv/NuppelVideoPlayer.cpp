@@ -331,7 +331,8 @@ void NuppelVideoPlayer::InitSound(void)
     {
         cerr << "player: Can't open audio device: " << audiodevice << endl;
         perror("open audio:");
-	return;
+        disableaudio = true;
+        return;
     }
 
     if (ioctl(audiofd, SNDCTL_DSP_SAMPLESIZE, &audio_bits) < 0 ||
