@@ -931,9 +931,6 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
         return;
     }
 
-    QString thequery;
-    QSqlQuery query;
-
     dblock.lock();
 
     MythContext::KickDatabase(m_db);
@@ -949,13 +946,20 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
     // Set the recorded end time to the current time
     // (we're stopping the recording so it'll never get to its originally 
     // intended end time)
-    thequery = QString("UPDATE recorded SET starttime = %1, endtime = %2 "
-                       "WHERE chanid = %3 AND title = \"%4\" AND "
-                       "starttime = %5 AND endtime = %6;")
-                       .arg(startts).arg(newendts).arg(pginfo->chanid)
-                       .arg(pginfo->title.utf8()).arg(startts).arg(endts);
+    
+    QSqlQuery query(QString::null, m_db);
+    query.prepare("UPDATE recorded SET starttime = :NEWSTARTTIME, "
+                  "endtime = :NEWENDTIME WHERE chanid = :CHANID AND "
+                  "title = :TITLE AND starttime = :STARTTIME AND "
+                  "endtime = :ENDTIME;");
+    query.bindValue(":NEWSTARTTIME", startts);
+    query.bindValue(":NEWENDTIME", newendts);
+    query.bindValue(":CHANID", pginfo->chanid);
+    query.bindValue(":TITLE", pginfo->title.utf8());
+    query.bindValue(":STARTTIME", startts);
+    query.bindValue(":ENDTIME", endts);
 
-    query = m_db->exec(thequery);
+    query.exec();
 
     if (!query.isActive())
     {
@@ -1074,8 +1078,6 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
         }
     }
 
-    QString thequery;
-
     QString startts = pginfo->recstartts.toString("yyyyMMddhhmm");
     startts += "00";
     QString endts = pginfo->recendts.toString("yyyyMMddhhmm");
@@ -1085,20 +1087,24 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
 
     MythContext::KickDatabase(m_db);
 
-    thequery = QString("DELETE FROM recorded WHERE chanid = %1 AND title "
-                       "= \"%2\" AND starttime = %3 AND endtime = %4;")
-                       .arg(pginfo->chanid).arg(pginfo->title.utf8())
-                       .arg(startts).arg(endts);
+    QSqlQuery query(QString::null, m_db);
+    query.prepare("DELETE FROM recorded WHERE chanid = :CHANID AND "
+                  "title = :TITLE AND starttime = :STARTTIME AND "
+                  "endtime = :ENDTIME;");
+    query.bindValue(":CHANID", pginfo->chanid);
+    query.bindValue(":TITLE", pginfo->title.utf8());
+    query.bindValue(":STARTTIME", startts);
+    query.bindValue(":ENDTIME", endts);
 
-    QSqlQuery query = m_db->exec(thequery);
+    query.exec();
 
     if (!query.isActive())
         MythContext::DBError("Recorded program deletion", query);
 
     // now delete any markups for this program
-    thequery = QString("DELETE FROM recordedmarkup WHERE chanid = %1 "
-                       "AND starttime = %2;")
-                       .arg(pginfo->chanid).arg(startts);
+    QString thequery = QString("DELETE FROM recordedmarkup WHERE chanid = %1 "
+                               "AND starttime = %2;")
+                              .arg(pginfo->chanid).arg(startts);
 
     query = m_db->exec(thequery);
     if (!query.isActive())
@@ -1345,10 +1351,10 @@ void MainServer::HandleLockTuner(PlaybackSock *pbs)
             VERBOSE(VB_GENERAL, msg);
 
             QString querystr = QString("SELECT videodevice, audiodevice, "
-                                            "vbidevice "
-                                          "FROM capturecard "
-                                          "WHERE cardid = %1;")
-                                          .arg(retval);
+                                       "vbidevice "
+                                       "FROM capturecard "
+                                       "WHERE cardid = %1;")
+                                       .arg(retval);
 
             QSqlQuery query = m_db->exec(querystr);
 

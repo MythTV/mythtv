@@ -949,8 +949,7 @@ void ProgFinder::showShowingList()
                             ltype->SetItemText(curLabel, " " +
                                                showData[t].startDisplay);
 
-                            if (curLabel != (int)(showsPerListing / 2) &&
-                                showData[t].recording > 0)
+                            if (showData[t].recording > 0)
                                 ltype->EnableForcedFont(curLabel, "recording");
 
                         }
@@ -1228,17 +1227,23 @@ void ProgFinder::selectShowData(QString progTitle)
     QString data;
     int rectype = 0;
 
-    thequery = QString("SELECT subtitle,starttime,channel.channum,"
-                       "channel.callsign,description,endtime,channel.chanid "
-                       "FROM program,channel "
-                       "WHERE program.title = \"%1\" AND "
-                       "program.chanid = channel.chanid "
-                       "AND program.starttime > %2 "
-                       "ORDER BY program.starttime;")
-                       .arg(progTitle.utf8())
-                       .arg(progStart.toString("yyyyMMddhhmm50"));
+    QSqlQuery query(QString::null, m_db);
+    query.prepare("SELECT subtitle,starttime,channel.channum,"
+                  "channel.callsign,description,endtime,channel.chanid "
+                  "FROM program,channel "
+                  "WHERE program.title = :TITLE AND "
+                  "program.chanid = channel.chanid "
+                  "AND program.starttime > :STARTTIME "
+                  "ORDER BY program.starttime;");
+    query.bindValue(":TITLE", progTitle.utf8());
+    query.bindValue(":STARTTIME", progStart.toString("yyyyMMddhhmm50"));
 
-    QSqlQuery query = m_db->exec(thequery);
+    if (!query.exec())
+    {
+        cerr << "MythProgFind: Error executing query! (selectShowData)\n";
+        cerr << "MythProgFind: QUERY = " << thequery.local8Bit() << endl;
+        return;
+    }
 
     int rows = query.numRowsAffected();
 

@@ -408,8 +408,8 @@ void ProgramInfo::GetProgramRangeDateTime(QSqlDatabase *db,
     QString where;
 
     where = QString("WHERE program.chanid = %1 AND endtime >= %1 AND "
-                   "starttime <= %3 AND program.chanid = channel.chanid "
-                   "ORDER BY starttime;")
+                    "starttime <= %3 AND program.chanid = channel.chanid "
+                    "ORDER BY starttime;")
                     .arg(channel).arg(ltime).arg(rtime);
 
     GetProgramListByQuery(db, proglist, where);
@@ -494,13 +494,13 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
     QString thequery;
    
     thequery = QString("SELECT recorded.chanid,starttime,endtime,title, "
-                               "subtitle,description,channel.channum, "
-                               "channel.callsign,channel.name "
-                           "FROM recorded "
-                           "LEFT JOIN channel "
-                               "ON recorded.chanid = channel.chanid "
-                           "WHERE recorded.chanid = %1 "
-                               "AND starttime = %2;")
+                       "subtitle,description,channel.channum, "
+                       "channel.callsign,channel.name "
+                       "FROM recorded "
+                       "LEFT JOIN channel "
+                       "ON recorded.chanid = channel.chanid "
+                       "WHERE recorded.chanid = %1 "
+                       "AND starttime = %2;")
                        .arg(channel).arg(starttime);
 
     QSqlQuery query = db->exec(thequery);

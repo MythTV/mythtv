@@ -575,7 +575,7 @@ void Scheduler::getAllPending(QStringList *strList)
     QMutexLocker lockit(recordingList_lock);
 
     (*strList) << QString::number(hasconflicts);
-    (*strList) << QString::number(recordingList.size());
+    (*strList) << QString::number(recordingList.size() + dontRecordList.size());
 
     QDateTime now = QDateTime::currentDateTime();
 

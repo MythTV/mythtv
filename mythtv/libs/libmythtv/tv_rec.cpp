@@ -239,6 +239,8 @@ int TVRec::StartRecording(ProgramInfo *rcinfo)
 
     if (internalState == kState_None)
     {
+        overrecordseconds = gContext->GetNumSetting("RecordOverTime");
+
         outputFilename = rcinfo->GetRecordFilename(recprefix);
         recordEndTime = rcinfo->recendts;
         curRecording = new ProgramInfo(*rcinfo);
@@ -807,8 +809,9 @@ void TVRec::RunTV(void)
                 {
                     recordEndTime = recordEndTime.addSecs(overrecordseconds);
                     inoverrecord = true;
-                    //cout << "switching to overrecord for " 
-                    //     << overrecordseconds << " more seconds\n";
+                    VERBOSE(VB_RECORD, QString("switching to overrecord for " 
+                                               "%1 more seconds")
+                                               .arg(overrecordseconds));
                 }
                 else
                 {

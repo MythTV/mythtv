@@ -12,7 +12,7 @@
     <normal>button_off.png</normal>
     <active>button_on.png</active>
     <text>
-      <area>20,110,20,35</area>
+      <area>20,110,20,5</area>
       <color>white</color>
       <fontname>Arial</fontname>
       <fontsize>14</fontsize>
