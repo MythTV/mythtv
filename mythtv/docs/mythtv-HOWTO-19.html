@@ -231,6 +231,42 @@ mysql> quit
 </CODE></BLOCKQUOTE>
 </P>
 
+<H2><A NAME="btaudio"></A> <A NAME="ss19.8">19.8</A> <A HREF="mythtv-HOWTO.html#toc19.8">btaudio </A>
+</H2>
+
+<P>btaudio allows you to obtain the audio data from your tuner card directly
+over the PCI bus without using a soundcard.  This is a useful if you would
+like to use multiple tuner cards in a system without adding a soundcard for
+each one, or if your existing soundcard is not capable of full-duplex
+operation.</P>
+<P>In order to use btaudio, your tuner card will need certain hardware
+installed on it, and that hardware must be wired correctly.  The chip that
+will allow you to use the btaudio module is the MSP34xx.  However, having a
+MSP34xx is no guarantee that you will be able to use the btaudio module.</P>
+<P>As of 2003-03-27, the following cards are known to work with btaudio:
+<UL>
+<LI>Hauppauge WinTV-radio with dbx-TV stereo, model 401</LI>
+<LI>ATI TV Wonder</LI>
+</UL>
+</P>
+<P>The following cards do not work:
+<UL>
+<LI>Pinnacle Studio PCTV Pro - note: this has a MSP34xx, but it's not
+wired correctly to the BT878 chip.</LI>
+<LI>ATI TV Wonder VE</LI>
+</UL>
+</P>
+<P>The following cards have been reported to work, but have issues:
+<UL>
+<LI>Avermedia AVerTV Studio (no digital DSP output, "whiney noise")</LI>
+</UL>
+</P>
+<P>See <CODE>contrib/example.modules.conf.for.btaudio</CODE> for an example file on
+how to configure btaudio on your system.</P>
+<P>Once btaudio loads, it should register additional <CODE>/dev/dsp</CODE> and
+<CODE>/dev/mixer</CODE> devices.  Typing <CODE>$ dmesg</CODE> will let you know
+what's going on.</P>
+
 <HR>
 Next
 <A HREF="mythtv-HOWTO-18.html">Previous</A>

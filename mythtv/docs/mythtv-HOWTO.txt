@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-03-24, v2.03
+  2003-03-25, v2.04
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -125,6 +125,7 @@
      18.10 MythTV makes my system crash.
      18.11 Troubleshooting audio
      18.12 I can't see parts of the On Screen Display.
+     18.13 The mythbackend program told me to look at this section.
 
   19. Miscellaneous.
      19.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
@@ -138,6 +139,7 @@
         19.5.4 MythTV on the Desktop
      19.6 I'd like to save or restore my database
      19.7 I'd like to delete the mysql database.
+     19.8 btaudio
 
   ______________________________________________________________________
 
@@ -200,7 +202,6 @@
 
   +o  Overall structure of HOWTO and Mandrake 9.x documentation: Robert
      Kulagowski,  <mailto:rkulagow@rocketmail.com>
-
   +o  Red Hat Linux 8.0 documentation: Cedar McKay,
      <mailto:mythhowto.3.ohthetrees@spamgourmet.com>
 
@@ -2647,6 +2648,26 @@
   instructions which tell you how to modify the Themes makefile.
   ``Link''.
 
+  [1m18.13.  The mythbackend program told me to look at this section.[0m
+
+  mythbackend does a check to see if your sound device is capable of
+  full duplex operation.  If it's not, it's most likely that you're
+  going to run into issues when you try to record and play sound at the
+  same time.  If your backend is a seperate machine than your frontend,
+  then there's no problem, since you're only going to be doing one thing
+  at a time with the card.  Likewise, if you're running the frontend and
+  backend on the same machine, but your using btaudio as your recording
+  source, and using the playback function of your soundcard, then you
+  also shouldn't have an issue, since the sound card isn't being asked
+  to perform two functions at once.
+
+  If you can't get your soundcard to go full duplex and need it to, then
+  check your distribution for updated sound drivers.  If your soundcard
+  is not capable of full-duplex operation, either because the drivers
+  don't support it, or it has been designed that way, then you're pretty
+  much out of luck and will either need to purchase a new sound card, or
+  will need to get btaudio ``operational''.
+
   [1m19.  Miscellaneous.[0m
 
   [1m19.1.  I'd like to watch the files without using MythTV / I'd like to[0m
@@ -2864,4 +2885,41 @@
        $ mysql -u root
        mysql> drop database mythconverg;
        mysql> quit
+
+  [1m19.8.  btaudio[0m
+
+  btaudio allows you to obtain the audio data from your tuner card
+  directly over the PCI bus without using a soundcard.  This is a useful
+  if you would like to use multiple tuner cards in a system without
+  adding a soundcard for each one, or if your existing soundcard is not
+  capable of full-duplex operation.
+
+  In order to use btaudio, your tuner card will need certain hardware
+  installed on it, and that hardware must be wired correctly.  The chip
+  that will allow you to use the btaudio module is the MSP34xx.
+  However, having a MSP34xx is no guarantee that you will be able to use
+  the btaudio module.
+
+  As of 2003-03-27, the following cards are known to work with btaudio:
+
+  +o  Hauppauge WinTV-radio with dbx-TV stereo, model 401
+
+  +o  ATI TV Wonder
+
+  The following cards do not work:
+
+  +o  Pinnacle Studio PCTV Pro - note: this has a MSP34xx, but it's not
+     wired correctly to the BT878 chip.
+
+  +o  ATI TV Wonder VE
+
+  The following cards have been reported to work, but have issues:
+
+  +o  Avermedia AVerTV Studio (no digital DSP output, "whiney noise")
+
+  See contrib/example.modules.conf.for.btaudio for an example file on
+  how to configure btaudio on your system.
+
+  Once btaudio loads, it should register additional /dev/dsp and
+  /dev/mixer devices.  Typing $ dmesg will let you know what's going on.
 

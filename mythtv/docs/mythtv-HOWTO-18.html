@@ -329,6 +329,26 @@ second card is #1, etc.</P>
 instructions which tell you how to modify the Themes makefile. 
 <A HREF="mythtv-HOWTO-5.html#RH80_OSD_Strip">Link</A>.</P>
 
+<H2><A NAME="ss18.13">18.13</A> <A HREF="mythtv-HOWTO.html#toc18.13">The mythbackend program told me to look at this section.</A>
+</H2>
+
+<P>mythbackend does a check to see if your sound device is capable of full
+duplex operation.  If it's not, it's most likely that you're going to run
+into issues when you try to record and play sound at the same time.  If your
+backend is a seperate machine than your frontend, then there's no problem,
+since you're only going to be doing one thing at a time with the card. 
+Likewise, if you're running the frontend and backend on the same machine,
+but your using btaudio as your recording source, and using the
+playback function of your soundcard, then you also shouldn't have an issue,
+since the sound card isn't being asked to perform two functions at once.</P>
+<P>If you can't get your soundcard to go full duplex and need it to, then check
+your distribution for updated sound drivers.  If your soundcard is not
+capable of full-duplex operation, either because the drivers don't support
+it, or it has been designed that way, then you're pretty much out of luck
+and will either need to purchase a new sound card, or will need to get
+btaudio 
+<A HREF="mythtv-HOWTO-19.html#btaudio">operational</A>.</P>
+
 <HR>
 <A HREF="mythtv-HOWTO-19.html">Next</A>
 <A HREF="mythtv-HOWTO-17.html">Previous</A>
