@@ -1,0 +1,106 @@
+<mythuitheme>
+
+  <window name="gallery">
+
+    <font name="active" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="inactive" face="Arial">
+      <color>#9999cc</color>
+      <size>16</size>
+      <bold>yes</bold>
+    </font>
+
+  <font name="title" face="Arial">
+      <color>#ddddff</color>
+      <dropcolor>#000000</dropcolor>
+      <shadow>4,4</shadow>
+      <size:small>20</size:small>
+      <size>30</size>
+      <bold>yes</bold>
+    </font>
+  <font name="menu" face="Arial">
+      <color>#ffffff</color>
+      <size>18</size>
+      <bold>yes</bold>
+      <shadow>2,2</shadow>
+    </font>    
+    
+    <container name="menu">
+      <area>20,20,140,250</area>
+
+      <listbtnarea name="menu" draworder="0">
+        <area>0,77,140,250</area>
+        <gradient type="unselected" start="#DDDDFF" end="#505050" alpha="100">
+        </gradient>
+        <gradient type="selected" start="#DDDDFF" end="#909090" alpha="255">
+        </gradient>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <showarrow>no</showarrow>
+        <showscrollarrows>no</showscrollarrows>
+      </listbtnarea>
+
+    </container>
+
+    <container name="text">
+
+      <area>110,40,680,40</area>
+      <textarea name="text" draworder="0">
+        <area>30,0,620,40</area>
+        <font>title</font>
+        <multiline>no</multiline>
+      </textarea>
+
+    </container>
+
+      <container name="view">
+      <area>150,77,680,550</area>
+
+      <blackhole name="view" draworder="0">
+            <area>0,0,680,550</area>
+      </blackhole>
+      <image name="scrollUpReg" draworder="0" fleximage="no">
+        <context>0</context>
+        <filename>lb-uparrow-reg.png</filename>
+        <position>550,490</position>
+      </image>
+      
+      <textarea name="help1" draworder="1">
+        <area>0,480,175,35</area>
+        <font>menu</font>
+        <value>SELECT: View</value>
+      </textarea>
+
+      <textarea name="help2" draworder="1">
+        <area>225,480,225,35</area>
+        <font>menu</font>
+        <value>MENU: Activate Menu</value>
+      </textarea>
+      
+      <image name="scrollUpSel" draworder="0" fleximage="no">
+        <context>1</context>
+        <filename>lb-uparrow-sel.png</filename>
+        <position>550,490</position>
+      </image>
+
+      <image name="scrollDnReg" draworder="1" fleximage="no">
+        <context>0</context>
+        <filename>lb-dnarrow-reg.png</filename>
+        <position>580,490</position>
+      </image>
+
+      <image name="scrollDnSel" draworder="1" fleximage="no">
+        <context>1</context>
+        <filename>lb-dnarrow-sel.png</filename>
+        <position>580,490</position>
+      </image>
+
+    </container>
+
+  </window>
+ 
+</mythuitheme>
