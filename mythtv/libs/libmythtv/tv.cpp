@@ -8,6 +8,7 @@
 #include "tv.h"
 #include "osd.h"
 #include "libmyth/mythcontext.h"
+#include "libmyth/dialogbox.h"
 
 // cheat and put the keycodes here
 #define wsUp            0x52 + 256
@@ -148,25 +149,27 @@ TVState TV::LiveTV(void)
 {
     if (internalState == kState_RecordingOnly)
     {
-        QString cmdline = QString("mythdialog \"MythTV is already recording "
-                                  "'%1' on ").arg(curRecording->title);
+        QString title = QString("MythTV is already recording '%1' on ")
+                               .arg(curRecording->title);
 
         if (context->GetNumSetting("DisplayChanNum") == 0)
-            cmdline += QString("%1 [%2].").arg(curRecording->channame)
-                                          .arg(curRecording->chansign);
+            title += QString("%1 [%2].").arg(curRecording->channame)
+                                        .arg(curRecording->chansign);
         else
-            cmdline += QString("channel %1.").arg(curRecording->chanstr);
+            title += QString("channel %1.").arg(curRecording->chanstr);
 
-        cmdline += QString("  Do you want to:\" \"Stop recording and watch "
-                           "TV\" \"Watch the in-progress recording\" "
-                           "\"Cancel and go back to the menu\"");
+        title += "  Do you want to:";
 
-        int result = system(cmdline.ascii());
+        DialogBox diag(context, title);
+        diag.AddButton("Cancel and go back to the menu");
+        diag.AddButton("Watch the in-progress recording");
+        diag.AddButton("Stop recording and watch TV");
 
-        if (result > 0)
-            result = WEXITSTATUS(result);
+        diag.Show();
 
-        if (result == 1)
+        int result = diag.exec();
+
+        if (result == 3)
         {
             nextState = kState_WatchingLiveTV;
             changeState = true;
