@@ -51,6 +51,10 @@ int main(int argc, char *argv[])
 
     gContext->LoadQtConfig();
 
+    MythMainWindow *mainWindow = new MythMainWindow();
+    mainWindow->Show();
+    gContext->SetMainWindow(mainWindow);
+
     int appCode = 0;
 
     if (argc > 1)
@@ -62,8 +66,7 @@ int main(int argc, char *argv[])
            appCode = 2;
     }
 
-    Weather weatherDat(db, appCode);
-    weatherDat.Show();
+    Weather weatherDat(db, appCode, mainWindow, "weather");
     weatherDat.exec();
 
     delete gContext;

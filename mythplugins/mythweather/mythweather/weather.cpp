@@ -34,7 +34,8 @@ using namespace std;
 
 #include <mythtv/mythcontext.h>
 
-Weather::Weather(QSqlDatabase *db, int appCode, QWidget *parent, const char *name)
+Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent, 
+                 const char *name)
        : MythDialog(parent, name)
 {
     config = db;
@@ -176,16 +177,7 @@ Weather::Weather(QSqlDatabase *db, int appCode, QWidget *parent, const char *nam
     accel->connectItem(accel->insertItem(Key_8), this, SLOT(newLocale8()));
     accel->connectItem(accel->insertItem(Key_9), this, SLOT(newLocale9()));
 
-    if (debug == true)
-	cerr << "MythWeather: Theming widget, show(), showFullScreen(), setActiveWindow(), setFocus();\n";
-    show();
-    showFullScreen();
-    setActiveWindow();
-    setFocus();
-
-    WFlags flags = getWFlags();
-    flags |= WRepaintNoErase;
-    setWFlags(flags);
+    setNoErase();
 
     if (debug == true)
 	cerr << "MythWeather: Finish Object Initialization.\n";
@@ -195,7 +187,6 @@ Weather::Weather(QSqlDatabase *db, int appCode, QWidget *parent, const char *nam
 	lastCityNum = (int)(accidBreaks[0]) - 1;
     	setupPage();
     }
-
 }
 
 Weather::~Weather()

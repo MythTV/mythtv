@@ -24,6 +24,7 @@
 #include <mythtv/xmlparse.h>
 #include <mythtv/oldsettings.h>
 #include <mythtv/mythwidgets.h>
+#include <mythtv/mythdialogs.h>
 
 class QLabel;
 class QListView;
@@ -40,7 +41,8 @@ class Weather : public MythDialog
 {
     Q_OBJECT
   public:
-    Weather(QSqlDatabase *db, int, QWidget *parent = 0, const char *name = 0);
+    Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent, 
+            const char *name = 0);
     ~Weather();
 
     bool UpdateData();
