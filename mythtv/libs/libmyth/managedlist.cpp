@@ -647,7 +647,7 @@ void ManagedList::cursorUp(bool page)
         while(curGroup->getItem(newIndex)->getEnabled() == false)
         {
             --newIndex;
-            if (newIndex <= 0 )
+            if (newIndex < 0 )
                 newIndex = itemCount - 1;
         }
 

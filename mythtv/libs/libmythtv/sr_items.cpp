@@ -3,9 +3,9 @@
 #include <qlayout.h>
 #include "mythdialogs.h"
 
-void SRDupSettingsGroup::itemChanged(ManagedListItem*) 
-{ 
-    syncText(); 
+void SRDupSettingsGroup::itemChanged(ManagedListItem*)
+{
+    syncText();
 }
 
 
@@ -14,14 +14,14 @@ SRDupSettingsGroup::SRDupSettingsGroup(ScheduledRecording& _rec, ManagedList* _l
 {
     dupMethItem = new SRDupMethod(_rec, _list, this);
     addItem(dupMethItem->getItem(), -1);
-    
+
     connect(dupMethItem->getItem(), SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
-    
+
     dupLocItem = new SRDupIn(_rec, _list, this);
     addItem(dupLocItem->getItem(), -1);
-    
+
     connect(dupMethItem->getItem(), SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
-    
+
     syncText();
 }
 
@@ -37,13 +37,13 @@ void SRDupSettingsGroup::syncText()
     int meth;
     int loc;
     //cerr << dupMethItem->getItem()->getValue() << " - " << dupMethItem->getItem()->getText() << endl;
-    
+
     meth = dupMethItem->getItem()->getValue().toInt();
     loc = dupLocItem->getItem()->getValue().toInt();
-    
+
 
     text = dupMethItem->getItem()->getText();
-        
+
     if ((meth != kDupCheckNone) && (meth != kDupCheckNewEpi))
     {
         if (loc == kDupsInAll)
@@ -52,7 +52,7 @@ void SRDupSettingsGroup::syncText()
             text += ", in current recordings only";
         else if (kDupsInOldRecorded)
             text += ", in previous recordings only";
-    }    
+    }
 }
 
 
@@ -64,14 +64,14 @@ SREpisodesGroup::SREpisodesGroup(ScheduledRecording& _rec, ManagedList* _list, M
 
     maxEpisodes = new SRMaxEpisodes(_rec, _list);
     addItem(maxEpisodes->getItem(), -1);
-    
+
     connect(maxEpisodes->getItem(), SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
-    
+
     maxNewest = new SRMaxNewest(_rec, _list);
     addItem(maxNewest->getItem(), -1);
-    
+
     connect(maxNewest->getItem(), SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
-    
+
     syncText();
 }
 
@@ -79,36 +79,36 @@ SREpisodesGroup::SREpisodesGroup(ScheduledRecording& _rec, ManagedList* _list, M
 void SREpisodesGroup::syncText()
 {
     int maxEpi;
-    
+
     maxEpi = maxEpisodes->getItem()->getValue().toInt();
-    
+
     text = maxEpisodes->getItem()->getText();
-    
+
     if (maxEpi != 0)
         text += QString(", %1").arg(maxNewest->getItem()->getText());
-    
+
 }
 
 
 
 SRSchedOptionsGroup::SRSchedOptionsGroup(ScheduledRecording& _rec, ManagedList* _parentList, ManagedListGroup* _group, QObject* _parent)
-                   : ManagedListGroup( QString("[ %1 ]").arg(QObject::tr("Scheduling Options")), _group, _parentList, 
+                   : ManagedListGroup( QObject::tr("Scheduling Options"), _group, _parentList,
                                        _parent, "schedOpts"),
                      schedRec(_rec)
 {
     recPriority = new SRRecPriority(_rec, _parentList);
     addItem(recPriority->getItem(), -1);
-    
+
     startOffset = new SRStartOffset(_rec, _parentList);
     addItem(startOffset->getItem());
-    
+
     endOffset = new SREndOffset(_rec, _parentList);
-    addItem(endOffset->getItem());        
-    
+    addItem(endOffset->getItem());
+
     dupMethItem = new SRDupMethod(_rec, _parentList, this);
     addItem(dupMethItem->getItem(), -1);
     connect(dupMethItem->getItem(), SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
-    
+
     dupLocItem = new SRDupIn(_rec, _parentList, this);
     addItem(dupLocItem->getItem(), -1);
     connect(dupMethItem->getItem(), SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
@@ -117,10 +117,10 @@ SRSchedOptionsGroup::SRSchedOptionsGroup(ScheduledRecording& _rec, ManagedList* 
 
 void SRSchedOptionsGroup::itemChanged(ManagedListItem*)
 {
-    
+
     if (dupMethItem->getItem()->getEnabled())
     {
-        if ((dupMethItem->getItem()->getValue().toInt() != kDupCheckNone) && 
+        if ((dupMethItem->getItem()->getValue().toInt() != kDupCheckNone) &&
            (dupMethItem->getItem()->getValue().toInt() != kDupCheckNewEpi) )
             dupLocItem->getItem()->setEnabled(true);
         else
@@ -131,16 +131,16 @@ void SRSchedOptionsGroup::itemChanged(ManagedListItem*)
 void SRSchedOptionsGroup::setEnabled(bool isScheduled, bool multiEpisode)
 {
     ManagedListGroup::setEnabled(isScheduled);
-    
+
     dupMethItem->getItem()->setEnabled(isScheduled & multiEpisode);
-    
+
     if (dupMethItem->getItem()->getEnabled())
     {
         if (dupMethItem->getItem()->getValue().toInt() != kDupCheckNone)
             dupLocItem->getItem()->setEnabled(true);
         else
             dupLocItem->getItem()->setEnabled(false);
-    
+
     }
     else
     {
@@ -149,34 +149,34 @@ void SRSchedOptionsGroup::setEnabled(bool isScheduled, bool multiEpisode)
 }
 
 
-SRStorageOptionsGroup::SRStorageOptionsGroup(ScheduledRecording& _rec, ManagedList* _parentList, ManagedListGroup* _group, 
+SRStorageOptionsGroup::SRStorageOptionsGroup(ScheduledRecording& _rec, ManagedList* _parentList, ManagedListGroup* _group,
                                              QObject* _parent)
-                     : ManagedListGroup(QString("[ %1 ]").arg(QObject::tr("Storage Options")), _group, _parentList, 
+                     : ManagedListGroup(QObject::tr("Storage Options"), _group, _parentList,
                                         _parent, "storageOpts"),
                        schedRec(_rec)
 {
     profile = new SRProfileSelector(_rec, _parentList, this);
     addItem(profile->getItem(), -1);
-    
+
     recGroup = new SRRecGroup(_rec, _parentList, this);
     addItem(recGroup->getItem(), -1);
-    
+
     autoExpire = new SRAutoExpire(_rec, _parentList);
-    addItem(autoExpire->getItem(), -1);       
-    
+    addItem(autoExpire->getItem(), -1);
+
     maxEpisodes = new SRMaxEpisodes(_rec, _parentList);
     addItem(maxEpisodes->getItem(), -1);
-    
+
     connect(maxEpisodes->getItem(), SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
-    
+
     maxNewest = new SRMaxNewest(_rec, _parentList);
-    addItem(maxNewest->getItem(), -1);    
-   
+    addItem(maxNewest->getItem(), -1);
+
 }
 
 void SRStorageOptionsGroup::itemChanged(ManagedListItem*)
 {
-    maxNewest->getItem()->setEnabled(maxEpisodes->getValue().toInt() !=0); 
+    maxNewest->getItem()->setEnabled(maxEpisodes->getValue().toInt() !=0);
 }
 
 void SRStorageOptionsGroup::setEnabled(bool isScheduled, bool)
@@ -189,7 +189,7 @@ void SRRecGroup::onGoingBack()
     if ( selectItem->getCurItemValue() == "__NEW_GROUP__" )
     {
         selectItem->selectValue("Default");
-    }   
+    }
 }
 
 

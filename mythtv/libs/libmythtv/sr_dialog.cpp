@@ -3,20 +3,20 @@
 #include "mythcontext.h"
 #include "sr_dialog.h"
 
-RecOptDialog::RecOptDialog(ScheduledRecording* sr, MythMainWindow *parent, const char *name) 
+RecOptDialog::RecOptDialog(ScheduledRecording* sr, MythMainWindow *parent, const char *name)
             : MythDialog(parent, name), listMenu(this, "listMenu")
 {
     schedRec = sr;
     program = sr->getProgramInfo();
-    
-   
+
+
     theme = new XMLParse();
     theme->SetWMult(wmult);
     theme->SetHMult(hmult);
 
     if (!theme->LoadTheme(xmldata, "recording_options"))
     {
-    
+
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), tr("Missing Element"),
                                   tr("The theme you are using does not contain a 'recording_options' "
                                      "element.  Please contact the theme creator and ask if they could "
@@ -24,15 +24,15 @@ RecOptDialog::RecOptDialog(ScheduledRecording* sr, MythMainWindow *parent, const
                                      "Press EXIT to return to the menu."));
         return;
     }
-    
+
     LoadWindow(xmldata);
-    
+
     listMenu.init(theme, "selector", "menu_list", listRect);
-    
+
     rootGroup = sr->getRootGroup();
     rootGroup->setParentList(&listMenu);
     listMenu.setCurGroup(rootGroup);
-      
+
     setNoErase();
     allowEvents = true;
     allowUpdates = true;
@@ -60,7 +60,7 @@ void RecOptDialog::LoadWindow(QDomElement &element)
     for (QDomNode child = element.firstChild(); !child.isNull(); child = child.nextSibling())
     {
         QDomElement e = child.toElement();
-        
+
         if (!e.isNull())
         {
             if (e.tagName() == "font")
@@ -93,13 +93,13 @@ void RecOptDialog::paintEvent(QPaintEvent *e)
 
     QRect r = e->rect();
     QPainter p(this);
-    
+
     if ( updateAll || r.intersects(infoRect))
         updateInfo(&p);
-    
+
     listMenu.paintEvent(r, &p, updateAll);
 
-        
+
 }
 
 void RecOptDialog::keyPressEvent(QKeyEvent *e)
@@ -113,7 +113,7 @@ void RecOptDialog::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
 
-    
+
     for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
@@ -121,7 +121,7 @@ void RecOptDialog::keyPressEvent(QKeyEvent *e)
         if (action == "ESCAPE")
         {
             if (!listMenu.goBack())
-                done(MythDialog::Rejected);
+                done(MythDialog::Accepted);
         }
         else if (!listMenu.getLocked())
         {
@@ -142,7 +142,7 @@ void RecOptDialog::keyPressEvent(QKeyEvent *e)
             else if (action == "PAGELEFT")
                 listMenu.cursorLeft(true);
             else if (action == "PAGERIGHT")
-                listMenu.cursorRight(true);            
+                listMenu.cursorRight(true);
             else
                 handled = false;
         }
@@ -156,12 +156,12 @@ void RecOptDialog::keyPressEvent(QKeyEvent *e)
 
 void RecOptDialog::updateInfo(QPainter *p)
 {
-    
+
     LayerSet *container = theme->GetSet("program_info");
-    
+
     if (container)
-    {  
-        
+    {
+
         if (infoMap.isEmpty())
         {
             if (schedRec)
@@ -170,27 +170,27 @@ void RecOptDialog::updateInfo(QPainter *p)
                 // this should NEVER happen
                 return;
         }
-        
+
         QRect pr = infoRect;
         QPixmap pix(pr.size());
         pix.fill(this, pr.topLeft());
         QPainter tmp(&pix);
 
-        
+
         container->ClearAllText();
         container->SetText(infoMap);
-        
+
         container->Draw(&tmp, 4, 0);
         container->Draw(&tmp, 5, 0);
         container->Draw(&tmp, 6, 0);
         container->Draw(&tmp, 7, 0);
         container->Draw(&tmp, 8, 0);
-        
+
         tmp.end();
         p->drawPixmap(pr.topLeft(), pix);
     }
 
-    
+
 }
 
 
