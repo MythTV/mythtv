@@ -606,7 +606,7 @@ void ProgLister::fillViewList(const QString &view)
             while (query.next())
             {
                 QString category = query.value(0).toString();
-                if (category <= " " or category == NULL)
+                if (category <= " " || category == NULL)
                     continue;
                 category = QString::fromUtf8(query.value(0).toString());
                 viewList << category;
