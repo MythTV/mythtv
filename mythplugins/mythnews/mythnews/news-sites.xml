@@ -77,6 +77,12 @@
 <ico>http://www.lwn.net/favicon.ico"</ico>
 </item>
 
+<item>
+<title>Debian Security Advisories</title>
+<url>http://www.debian.org/security/dsa-long.rdf</url>
+<ico>http://www.debian.org/favicon.ico</ico>
+</item>
+
 <item> 
 <title>heise online news</title>
 <url>http://www.heise.de/newsticker/heise.rdf</url>
