@@ -5,6 +5,7 @@
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <linux/videodev.h>
 #include "channel.h"
 #include "frequencies.h"
@@ -628,7 +629,33 @@ bool Channel::ChangeExternalChannel(const QString &channum)
                                       .arg(channum);
 
     cout << "External channel change: " << command << endl;
-    system(command.ascii());
+    pid_t child = fork();
+    if (child < 0)
+    {
+        perror("fork");
+    }
+    else if (child == 0)
+    {
+        for(int i = 3; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
+            close(i);
+        execl("/bin/sh", "sh", "-c", command.ascii());
+        perror("exec");
+        exit(1);
+    }
+    else
+    {
+        int status;
+        if (waitpid(child, &status, 0) < 0)
+        {
+            perror("waitpid");
+        }
+        else if (status != 0)
+        {
+            cerr << "External channel change command exited with status "
+                 << status << endl;
+            return false;
+        }
+    }
 
     return true;
 }
