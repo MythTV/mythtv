@@ -26,10 +26,10 @@
 --------------- General WEBCAM Settings ---------------
 */
 
-class WebcamDevice: public ComboBoxSetting, public GlobalSetting {
+class WebcamDevice: public GlobalComboBox {
 public:
-    WebcamDevice():ComboBoxSetting(true),
-        GlobalSetting("WebcamDevice") {
+    WebcamDevice():
+        GlobalComboBox("WebcamDevice", true) {
         setLabel(QObject::tr("Webcam device"));
         QDir dev("/dev", "video*", QDir::Name, QDir::System);
         fillSelectionsFromDir(dev);
@@ -39,10 +39,10 @@ public:
     }
 };
 
-class TxResolution: public ComboBoxSetting, public GlobalSetting {
+class TxResolution: public GlobalComboBox {
 public:
     TxResolution():
-        GlobalSetting("TxResolution") {
+        GlobalComboBox("TxResolution") {
         setLabel(QObject::tr("Transmit Resolution"));
         addSelection(QObject::tr("176x144"), "176x144");
         addSelection(QObject::tr("128x96"), "128x96");
@@ -53,10 +53,10 @@ public:
     };
 };
 
-class CaptureResolution: public ComboBoxSetting, public GlobalSetting {
+class CaptureResolution: public GlobalComboBox {
 public:
     CaptureResolution():
-        GlobalSetting("CaptureResolution") {
+        GlobalComboBox("CaptureResolution") {
         setLabel(QObject::tr("Capture Resolution"));
         addSelection(QObject::tr("352x288"), "352x288");
         addSelection(QObject::tr("320x240"), "320x240");
@@ -70,11 +70,10 @@ public:
     };
 };
 
-class TransmitFPS: public SpinBoxSetting, public GlobalSetting {
+class TransmitFPS: public GlobalSpinBox {
 public:
     TransmitFPS():
-        SpinBoxSetting(1,30,1),
-        GlobalSetting("TransmitFPS") {
+        GlobalSpinBox("TransmitFPS", 1, 30, 1) {
         setLabel(QObject::tr("Transmit Frames/Second"));
         setValue(5);
         setHelpText(QObject::tr("Number of webcam frames/sec to transmit, from 1 to "
@@ -86,10 +85,10 @@ public:
 --------------- General VXML Settings ---------------
 */
 
-class TimeToAnswer: public LineEditSetting, public GlobalSetting {
+class TimeToAnswer: public GlobalLineEdit {
 public:
     TimeToAnswer():
-        GlobalSetting("TimeToAnswer") {
+        GlobalLineEdit("TimeToAnswer") {
         setLabel(QObject::tr("Time to Answer"));
         setValue(QObject::tr("10"));
         setHelpText(QObject::tr("The time in seconds a call rings before being "
@@ -97,10 +96,10 @@ public:
     }
 };
 
-class DefaultVxmlUrl: public LineEditSetting, public GlobalSetting {
+class DefaultVxmlUrl: public GlobalLineEdit {
 public:
     DefaultVxmlUrl():
-        GlobalSetting("DefaultVxmlUrl") {
+        GlobalLineEdit("DefaultVxmlUrl") {
         setLabel(QObject::tr("Default VXML URL"));
         setValue(QObject::tr("http://127.0.0.1/vxml/index.vxml"));
         setHelpText(QObject::tr("The URL to retrieve a VXML script which can "
@@ -109,10 +108,10 @@ public:
     }
 };
 
-class DefaultVoicemailPrompt: public LineEditSetting, public GlobalSetting {
+class DefaultVoicemailPrompt: public GlobalLineEdit {
 public:
     DefaultVoicemailPrompt():
-        GlobalSetting("DefaultVoicemailPrompt") {
+        GlobalLineEdit("DefaultVoicemailPrompt") {
         setLabel(QObject::tr("Default Voicemail Prompt"));
         setValue(QObject::tr("I am not at home, please leave a message after the tone"));
         setHelpText(QObject::tr("Either a text message to be read by the TTS engine or the filename of "
@@ -120,10 +119,10 @@ public:
     }
 };
 
-class TTSVoice: public ComboBoxSetting, public GlobalSetting {
+class TTSVoice: public GlobalComboBox {
 public:
-    TTSVoice():ComboBoxSetting(true),
-        GlobalSetting("TTSVoice") {
+    TTSVoice():
+        GlobalComboBox("TTSVoice", true) {
         setLabel(QObject::tr("Text to Speech Voice"));
 #ifdef FESTIVAL_SUPPORT
         QDir festDir(FESTIVAL_HOME "lib/voices/english/", "[a-z]*;[A-Z]*", QDir::Name, QDir::Dirs);  // The name filter is to remove "." and ".." directories
@@ -136,10 +135,10 @@ public:
 --------------- General SIP Settings ---------------
 */
 
-class SipRegisterWithProxy: public CheckBoxSetting, public GlobalSetting {
+class SipRegisterWithProxy: public GlobalCheckBox {
 public:
     SipRegisterWithProxy():
-        GlobalSetting("SipRegisterWithProxy") {
+        GlobalCheckBox("SipRegisterWithProxy") {
         setLabel(QObject::tr("Register with a Proxy or Service"));
         setValue(true);
         setHelpText(QObject::tr("Allows you to register with services such as Free World Dialup; "
@@ -147,40 +146,40 @@ public:
     };
 };
 
-class SipProxyName: public LineEditSetting, public GlobalSetting {
+class SipProxyName: public GlobalLineEdit {
 public:
     SipProxyName():
-        GlobalSetting("SipProxyName") {
+        GlobalLineEdit("SipProxyName") {
         setLabel(QObject::tr("Proxy DNS Name"));
         setValue("fwd.pulver.com");
         setHelpText(QObject::tr("Name of the Proxy, such as fwd.pulver.com for Free World Dialup."));
     }
 };
 
-class SipProxyAuthName: public LineEditSetting, public GlobalSetting {
+class SipProxyAuthName: public GlobalLineEdit {
 public:
     SipProxyAuthName():
-        GlobalSetting("SipProxyAuthName") {
+        GlobalLineEdit("SipProxyAuthName") {
         setLabel(QObject::tr("Authentication Name"));
         setValue("");
         setHelpText(QObject::tr("Your username for authentication with the proxy. For FWD this is your FWD number."));
     }
 };
 
-class SipProxyAuthPassword: public LineEditSetting, public GlobalSetting {
+class SipProxyAuthPassword: public GlobalLineEdit {
 public:
     SipProxyAuthPassword():
-        GlobalSetting("SipProxyAuthPassword") {
+        GlobalLineEdit("SipProxyAuthPassword") {
         setLabel(QObject::tr("Authentication Password"));
         setValue("");
         setHelpText(QObject::tr("Your password for authentication with the proxy."));
     }
 };
 
-class SipLocalPort: public LineEditSetting, public GlobalSetting {
+class SipLocalPort: public GlobalLineEdit {
 public:
     SipLocalPort():
-        GlobalSetting("SipLocalPort") {
+        GlobalLineEdit("SipLocalPort") {
         setLabel(QObject::tr("SIP Local Port"));
         setValue(QObject::tr("5060"));
         setHelpText(QObject::tr("The port on this machine to use. You may need to make these different "
@@ -188,10 +187,10 @@ public:
     }
 };
 
-class MicrophoneDevice: public ComboBoxSetting, public GlobalSetting {
+class MicrophoneDevice: public GlobalComboBox {
 public:
-    MicrophoneDevice():ComboBoxSetting(true),
-        GlobalSetting("MicrophoneDevice") {
+    MicrophoneDevice():
+        GlobalComboBox("MicrophoneDevice", true) {
         setLabel(QObject::tr("Microphone device"));
         QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
         addSelection("None");
@@ -201,20 +200,20 @@ public:
     }
 };
 
-class MySipName: public LineEditSetting, public GlobalSetting {
+class MySipName: public GlobalLineEdit {
 public:
     MySipName():
-        GlobalSetting("MySipName") {
+        GlobalLineEdit("MySipName") {
         setLabel(QObject::tr("My Display Name"));
         setValue("Me");
         setHelpText(QObject::tr("My common name to display when I call other people. "));
     }
 };
 
-/*class MySipUser: public LineEditSetting, public GlobalSetting {
+/*class MySipUser: public GlobalLineEdit {
 public:
     MySipUser():
-        GlobalSetting("MySipUser") {
+        GlobalLineEdit("MySipUser") {
         setLabel(QObject::tr("My SIP User"));
         setValue("1000");
         setHelpText(QObject::tr("The phone number or username that identifies this SIP client. "
@@ -222,10 +221,10 @@ public:
     }
 };*/
 
-class CodecPriorityList: public LineEditSetting, public GlobalSetting {
+class CodecPriorityList: public GlobalLineEdit {
 public:
     CodecPriorityList():
-        GlobalSetting("CodecPriorityList") {
+        GlobalLineEdit("CodecPriorityList") {
         setLabel(QObject::tr("Codecs Supported"));
         setValue("GSM;G.711u;G.711a");
         setHelpText(QObject::tr("The list of codecs to use, in the preferred order separated by semicolon. "
@@ -233,20 +232,20 @@ public:
     }
 };
 
-class SipBindInterface: public LineEditSetting, public GlobalSetting {
+class SipBindInterface: public GlobalLineEdit {
 public:
     SipBindInterface():
-        GlobalSetting("SipBindInterface") {
+        GlobalLineEdit("SipBindInterface") {
         setLabel(QObject::tr("SIP Network Interface"));
         setValue(QObject::tr("eth0"));
         setHelpText(QObject::tr("Enter the name of the network to bind to e.g. eth0"));
     }
 };
 
-class NatTraversalMethod: public ComboBoxSetting, public GlobalSetting {
+class NatTraversalMethod: public GlobalComboBox {
 public:
     NatTraversalMethod():
-        GlobalSetting("NatTraversalMethod") {
+        GlobalComboBox("NatTraversalMethod") {
         setLabel(QObject::tr("NAT Traversal Method"));
         addSelection("None");
         addSelection("Manual");
@@ -259,10 +258,10 @@ public:
     }
 };
 
-class NatIpAddress: public LineEditSetting, public GlobalSetting {
+class NatIpAddress: public GlobalLineEdit {
 public:
     NatIpAddress():
-        GlobalSetting("NatIpAddress") {
+        GlobalLineEdit("NatIpAddress") {
         setLabel(QObject::tr("NAT IP Address"));
         setValue(QObject::tr("http://checkip.dyndns.org"));
         setHelpText(QObject::tr("If you selected MANUAL above, then enter your Public IP Address here. If you "
@@ -270,10 +269,10 @@ public:
     }
 };
 
-class AudioLocalPort: public LineEditSetting, public GlobalSetting {
+class AudioLocalPort: public GlobalLineEdit {
 public:
     AudioLocalPort():
-        GlobalSetting("AudioLocalPort") {
+        GlobalLineEdit("AudioLocalPort") {
         setLabel(QObject::tr("Audio RTP Port"));
         setValue("21232");
         setHelpText(QObject::tr("Enter the port to use for Audio RTP; an even number between 1024 and 32767. If you have a firewall "
@@ -281,10 +280,10 @@ public:
     }
 };
 
-class VideoLocalPort: public LineEditSetting, public GlobalSetting {
+class VideoLocalPort: public GlobalLineEdit {
 public:
     VideoLocalPort():
-        GlobalSetting("VideoLocalPort") {
+        GlobalLineEdit("VideoLocalPort") {
         setLabel(QObject::tr("Video RTP Port"));
         setValue("21234");
         setHelpText(QObject::tr("Enter the port to use for Video RTP; an even number between 1024 and 32767. If you have a firewall "
@@ -292,10 +291,10 @@ public:
     }
 };
 
-class SipAutoanswer: public CheckBoxSetting, public GlobalSetting {
+class SipAutoanswer: public GlobalCheckBox {
 public:
     SipAutoanswer():
-        GlobalSetting("SipAutoanswer") {
+        GlobalCheckBox("SipAutoanswer") {
         setLabel(QObject::tr("Auto-Answer"));
         setValue(false);
         setHelpText(QObject::tr("When the MythFrontend is in the MythPhone plugin, "
