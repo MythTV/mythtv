@@ -18,3 +18,8 @@ HEADERS += programinfo.h settings.h themedmenu.h
 
 SOURCES += dialogbox.cpp guidegrid.cpp infodialog.cpp infostructs.cpp 
 SOURCES += lcddevice.cpp programinfo.cpp settings.cpp themedmenu.cpp
+
+inc.path = /usr/local/include/mythtv/
+inc.files = $$HEADERS
+
+INSTALLS += inc
