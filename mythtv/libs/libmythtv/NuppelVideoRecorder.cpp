@@ -71,7 +71,10 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     keyframedist = KEYFRAMEDIST;
 
     audiobytes = 0;
+    audio_bits = 16;
+    audio_channels = 2;
     audio_samplerate = 44100;
+    audio_bytes_per_sample = audio_channels * audio_bits / 8;
 
     picture_format = PIX_FMT_YUV420P;
 
@@ -252,16 +255,29 @@ void NuppelVideoRecorder::Initialize(void)
 {
     int videomegs;
     int audiomegs = 2;
-    
+
+    if (AudioInit() != 0)   
+    {
+        cerr << "Could not detect audio blocksize\n";
+    }
+ 
     if (compressaudio)
     {
         gf = lame_init();
 	lame_set_bWriteVbrTag(gf, 0);
 	lame_set_quality(gf, mp3quality);
 	lame_set_compression_ratio(gf, 11);
+        lame_set_mode(gf, audio_channels == 2 ? STEREO : MONO);
+        lame_set_num_channels(gf, audio_channels);
         lame_set_out_samplerate(gf, audio_samplerate);
         lame_set_in_samplerate(gf, audio_samplerate);
 	lame_init_params(gf);
+
+        if (audio_bits != 16) 
+        {
+            cerr << "lame support requires 16bit audio\n";
+            compressaudio = false;
+        }
     }
 
     if (codec == "hardware-mjpeg")
@@ -281,11 +297,6 @@ void NuppelVideoRecorder::Initialize(void)
         videomegs = 12;
 
     video_buffer_count = (videomegs * 1000 * 1000) / video_buffer_size;
-
-    if (AudioInit() != 0)
-    {
-        cerr << "Could not detect audio blocksize\n";
-    }
 
     if (audio_buffer_size != 0)
         audio_buffer_count = (audiomegs * 1000 * 1000) / audio_buffer_size;
@@ -313,17 +324,17 @@ void NuppelVideoRecorder::Initialize(void)
 int NuppelVideoRecorder::AudioInit(void)
 {
     int afmt, afd;
-    int frag, channels, rate, blocksize = 4096;
+    int frag, blocksize = 4096;
 
     if (-1 == (afd = open(audiodevice.ascii(), O_RDONLY)))
     {
         cerr << "Cannot open DSP '" << audiodevice << "', dying.\n";
-        return(1);
+        return 1;
     }
   
     //ioctl(afd, SNDCTL_DSP_RESET, 0);
    
-    frag=(8<<16)|(10);//8 buffers, 1024 bytes each
+    frag = (8 << 16) | (10); //8 buffers, 1024 bytes each
     ioctl(afd, SNDCTL_DSP_SETFRAGMENT, &frag);
 
     afmt = AFMT_S16_LE;
@@ -331,25 +342,22 @@ int NuppelVideoRecorder::AudioInit(void)
     if (afmt != AFMT_S16_LE) 
     {
         cerr << "Can't get 16 bit DSP, exiting\n";
-        return(1);
-    }
-
-    channels = 2;
-    ioctl(afd, SNDCTL_DSP_CHANNELS, &channels);
-
-    /* sample rate */
-    rate = audio_samplerate;
-    if (ioctl(afd, SNDCTL_DSP_SPEED, &rate) < 0)
-    {
-        cerr << "setting sample rate failed, exiting\n";
         return 1;
     }
 
-    if (rate != audio_samplerate)
+    if (ioctl(afd, SNDCTL_DSP_SAMPLESIZE, &audio_bits) < 0 ||
+        ioctl(afd, SNDCTL_DSP_CHANNELS, &audio_channels) < 0 ||
+        ioctl(afd, SNDCTL_DSP_SPEED, &audio_samplerate) < 0)
     {
-        cerr << "setting sample rate to " << audio_samplerate << " failed\n";
+        cerr << "recorder: " << audiodevice 
+             << ": error setting audio input device to "
+             << audio_samplerate << "kHz/" 
+             << audio_bits << "bits/"
+             << audio_channels << "channel\n";
         return 1;
     }
+
+    audio_bytes_per_sample = audio_channels * audio_bits / 8;
 
     if (-1 == ioctl(afd, SNDCTL_DSP_GETBLKSIZE, &blocksize)) 
     {
@@ -1107,8 +1115,8 @@ void NuppelVideoRecorder::WriteHeader(bool todumpfile)
     }
 
     moredata.audio_sample_rate = audio_samplerate;
-    moredata.audio_channels = 2;
-    moredata.audio_bits_per_sample = 16;
+    moredata.audio_channels = audio_channels;
+    moredata.audio_bits_per_sample = audio_bits;
 
     extendeddataOffset = ringBuffer->GetFileWritePosition();
 
@@ -1238,7 +1246,7 @@ void NuppelVideoRecorder::doAudioThread(void)
 {
     int afmt = 0, trigger = 0;
     int afd = 0, act = 0, lastread = 0;
-    int frag = 0, channels = 0, rate = 0, blocksize = 0;
+    int frag = 0, blocksize = 0;
     unsigned char *buffer;
     audio_buf_info ispace;
     struct timeval anow;
@@ -1265,12 +1273,20 @@ void NuppelVideoRecorder::doAudioThread(void)
         return;
     }
 
-    channels = 2;
-    ioctl(afd, SNDCTL_DSP_CHANNELS, &channels);
+    if (ioctl(afd, SNDCTL_DSP_SAMPLESIZE, &audio_bits) < 0 ||
+        ioctl(afd, SNDCTL_DSP_CHANNELS, &audio_channels) < 0 ||
+        ioctl(afd, SNDCTL_DSP_SPEED, &audio_samplerate) < 0)
+    {
+        cerr << "recorder: " << audiodevice 
+             << ": error setting audio input device to "
+             << audio_samplerate << "kHz/" 
+             << audio_bits << "bits/"
+             << audio_channels << "channel\n";
+        close(afd);
+        return;
+    }
 
-    /* sample rate */
-    rate = audio_samplerate;
-    ioctl(afd, SNDCTL_DSP_SPEED, &rate);
+    audio_bytes_per_sample = audio_channels * audio_bits / 8;
 
     if (-1 == ioctl(afd, SNDCTL_DSP_GETBLKSIZE,  &blocksize)) 
     {
@@ -1339,8 +1355,8 @@ void NuppelVideoRecorder::doAudioThread(void)
 	/* Back up the timecode. The more stuff is in the hw buffer,
 	   the earlier this audio was actually recorded. */
 	audiobuffer[act]->timecode -=
-	    (int) ( ( (double)ispace.fragments * (double)ispace.fragsize * 1000.0 ) /
-		    ( (double)audio_samplerate * 4.0 ) );
+	    (int)(ispace.fragments * ispace.fragsize * 1000.0 /
+		 (audio_samplerate * audio_bytes_per_sample));
 
         memcpy(audiobuffer[act]->buffer, buffer, audio_buffer_size);
 
@@ -1717,14 +1733,11 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
         abytes = (double)audiobytes; // - (double)audio_buffer_size; 
                                      // wrong guess ;-)
         // need seconds instead of msec's
-        //mt = (double)timecode/1000.0;
         mt = (double)timecode;
         if (mt > 0.0) 
         {
-            //eff = (abytes/4.0)/mt;
-            //effectivedsp=(int)(100.0*eff);
-            eff = (abytes/mt)*((double)100000.0/(double)4.0);
-            effectivedsp=(int)eff;
+            eff = (abytes / mt) * (100000.0 / audio_bytes_per_sample);
+            effectivedsp = (int)eff;
         }
     }
 
@@ -1735,10 +1748,23 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
         int gaplesssize = 0;
         int lameret = 0;
 
-        lameret = lame_encode_buffer_interleaved(gf, (short int *)buf,
-                                                 audio_buffer_size / 4,
-                                                 (unsigned char *)mp3buf,
-                                                 mp3buf_size);
+        if(audio_channels == 2)
+        {
+            lameret = lame_encode_buffer_interleaved(gf, (short int *)buf,
+                                                     audio_buffer_size / 
+                                                     audio_bytes_per_sample,
+                                                     (unsigned char *)mp3buf,
+                                                     mp3buf_size);
+        }
+        else
+        {
+            lameret = lame_encode_buffer(gf, (short int *)buf, (short int *)buf,
+                                         audio_buffer_size / 
+                                         audio_bytes_per_sample,
+                                         (unsigned char *)mp3buf,
+                                         mp3buf_size);
+        }
+
         if (lameret < 0)
         {
             cerr << "lame error, exiting\n";

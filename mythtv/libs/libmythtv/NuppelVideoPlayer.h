@@ -190,7 +190,10 @@ class NuppelVideoPlayer
     unsigned char *directbuf;
     char lastct;
     int effdsp; // from the recorded stream
-    int audio_samplerate; // rate to tell the output device
+    int audio_channels;
+    int audio_bits;
+    int audio_bytes_per_sample;
+    int audio_samplerate;
     int filesize;
     int startpos;
 

@@ -126,6 +126,9 @@ class NuppelVideoRecorder
     int compression;
     int compressaudio;
     unsigned long long audiobytes;
+    int audio_channels; 
+    int audio_bits;
+    int audio_bytes_per_sample;
     int audio_samplerate; // rate we request from sounddevice
     int effectivedsp; // actual measured rate
 

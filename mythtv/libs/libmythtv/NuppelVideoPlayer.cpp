@@ -81,9 +81,13 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
 
     ringBuffer = NULL;
     weMadeBuffer = false;
-
     osd = NULL;
+
+    audio_bits = 16;
+    audio_channels = 2;
     audio_samplerate = 44100;
+    audio_bytes_per_sample = audio_channels * audio_bits / 8;
+
     editmode = false;
     advancevideo = resetvideo = advancedecoder = false;
 
@@ -245,13 +249,13 @@ void NuppelVideoPlayer::InitVideo(void)
 
 void NuppelVideoPlayer::InitSound(void)
 {
-    int bits = 16, stereo = 1, speed = audio_samplerate, caps;
+    int caps;
 
     if (usingextradata)
     {
-        bits = extradata.audio_bits_per_sample;
-        stereo = (extradata.audio_channels == 2);
-        speed = extradata.audio_sample_rate;
+        audio_bits = extradata.audio_bits_per_sample;
+        audio_channels = extradata.audio_channels;
+        audio_samplerate = extradata.audio_sample_rate;
     }
 
     if (disableaudio)
@@ -268,29 +272,21 @@ void NuppelVideoPlayer::InitSound(void)
 	return;
     }
 
-    if (ioctl(audiofd, SNDCTL_DSP_SAMPLESIZE, &bits) < 0)
+    if (ioctl(audiofd, SNDCTL_DSP_SAMPLESIZE, &audio_bits) < 0 ||
+        ioctl(audiofd, SNDCTL_DSP_CHANNELS, &audio_channels) < 0 ||
+        ioctl(audiofd, SNDCTL_DSP_SPEED, &audio_samplerate) < 0)
     {
-        cerr << "problem setting sample size, exiting\n";
+        cerr << "player: " << audiodevice 
+             << ": error setting audio output device to "
+             << audio_samplerate << "kHz/" 
+             << audio_bits << "bits/"
+             << audio_channels << "channel\n";
         close(audiofd);
         audiofd = -1;
         return;
     }
 
-    if (ioctl(audiofd, SNDCTL_DSP_STEREO, &stereo) < 0) 
-    {
-        cerr << "problem setting to stereo, exiting\n";
-        close(audiofd);
-        audiofd = -1;
-        return;
-    }
-
-    if (ioctl(audiofd, SNDCTL_DSP_SPEED, &speed) < 0) 
-    {
-        cerr << "problem setting sample rate, exiting\n";
-        close(audiofd);
-        audiofd = -1;
-        return;
-    }
+    audio_bytes_per_sample = audio_channels * audio_bits / 8;
 
     if (ioctl(audiofd, SNDCTL_DSP_GETCAPS, &caps) >= 0 && 
         !(caps & DSP_CAP_REALTIME))
@@ -559,7 +555,12 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     foundit = 0;
     effdsp = audio_samplerate;
     if (usingextradata)
+    {
         effdsp = extradata.audio_sample_rate;
+        audio_channels = extradata.audio_channels;
+        audio_bits = extradata.audio_bits_per_sample;
+        audio_bytes_per_sample = audio_channels * audio_bits / 8;
+    }
 
     while (!foundit) 
     {
@@ -979,8 +980,8 @@ void NuppelVideoPlayer::SetAudiotime(void)
     ioctl(audiofd, SNDCTL_DSP_GETODELAY, &soundcard_buffer); // bytes
     totalbuffer = audiolen(false) + soundcard_buffer;
                
-    audiotime = audbuf_timecode - (int)((double)totalbuffer * 25000.0 /
-                                        (double)effdsp);
+    audiotime = audbuf_timecode - (int)(totalbuffer * 100000.0 /
+                                        (audio_bytes_per_sample * effdsp));
  
     gettimeofday(&audiotime_updated, NULL);
 
@@ -1096,7 +1097,6 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
             else if (frameheader.comptype=='3') 
             {
                 int lameret = 0;
-                int len = 0;
                 short int pcmlbuffer[audio_samplerate]; 
                 short int pcmrbuffer[audio_samplerate];
                 int packetlen = frameheader.packetlength;
@@ -1113,9 +1113,9 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
                         int itemp = 0;
                         int afree = audiofree(false);
 
-                        if (lameret * 4 > afree)
+                        if (lameret * audio_bytes_per_sample > afree)
                         {
-                            lameret = afree / 4;
+                            lameret = afree / audio_bytes_per_sample;
                             cout << "Audio buffer overflow, audio data lost!\n";
                         }
 
@@ -1124,10 +1124,10 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
                         for (itemp = 0; itemp < lameret; itemp++)
                         {
                             saudbuffer[waud / 2] = pcmlbuffer[itemp];
-                            saudbuffer[waud / 2 + 1] = pcmrbuffer[itemp];
-                           
-                            waud += 4;
-                            len += 4;
+                            if (audio_channels == 2)
+                                saudbuffer[waud / 2 + 1] = pcmrbuffer[itemp];
+
+                            waud += audio_bytes_per_sample;
                             if (waud >= AUDBUFSIZE)
                                 waud -= AUDBUFSIZE;
                         }
@@ -1518,8 +1518,8 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
         /* do audio output */
 	
         /* approximate # of audio bytes for each frame. */
-        bytesperframe = 4 * (int)((1.0/video_frame_rate) *
-                                  ((double)effdsp/100.0) + 0.5);
+        bytesperframe = audio_bytes_per_sample * 
+                        (int)(effdsp / 100.0 / video_frame_rate + 0.5);
 	
         // wait for the buffer to fill with enough to play
         if (bytesperframe >= audiolen(true))
