@@ -54,6 +54,8 @@ OSDSet::OSDSet(const QString &name, bool cache, int screenwidth,
     m_priority = 5;
     currentOSDFunctionalType = 0;
 
+    m_showwith = QRegExp(".*");
+
     allTypes = new vector<OSDType *>;
 }
 

@@ -2127,7 +2127,7 @@ void TV::DoInfo(void)
     {
         QMap<QString, QString> infoMap;
         playbackinfo->ToMap(infoMap);
-        osd->HideAllExcept("program_info");
+        osd->HideSet("status");
         osd->ClearAllText("program_info");
         osd->SetText("program_info", infoMap, osd_display_time);
     }
@@ -2135,6 +2135,7 @@ void TV::DoInfo(void)
     {
         QString desc = "";
         int pos = nvp->calcSliderPos(desc);
+        osd->HideSet("program_info");
         osd->StartPause(pos, false, tr("Position"), desc, osd_display_time);
         update_osd_pos = true;
     }
@@ -2856,7 +2857,6 @@ void TV::UpdateOSD(void)
             curPlaybackInfo->ToMap(infoMap);
     }
 
-    osd->HideAllExcept("program_info", "channel_number");
     osd->ClearAllText("program_info");
     osd->SetText("program_info", infoMap, osd_display_time);
     osd->ClearAllText("channel_number");

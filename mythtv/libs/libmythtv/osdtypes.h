@@ -7,6 +7,7 @@
 #include <qvaluelist.h>
 #include <vector>
 #include <qobject.h>
+#include <qregexp.h>
 
 using namespace std;
 
@@ -68,6 +69,10 @@ class OSDSet : public QObject
     bool NeedsUpdate(void) { return m_needsupdate; }
 
     void SetDrawEveryFrame(bool draw) { m_draweveryframe = draw; }
+
+    void SetShowWith(const QString &re) { m_showwith = re; };
+    bool CanShowWith(const QString &name) const { 
+        return m_showwith.exactMatch(name); };
     
   signals:
     void OSDClosed(int);
@@ -113,6 +118,8 @@ class OSDSet : public QObject
     int currentOSDFunctionalType;
 
     bool m_draweveryframe;
+
+    QRegExp m_showwith;
 };
 
 class OSDType : public QObject

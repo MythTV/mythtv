@@ -1062,6 +1062,10 @@ void OSD::parseContainer(QDomElement &element)
                                    (int)(movefade.y() * hmult));
     }
 
+    QString showwith = element.attribute("showwith", "");
+    if (!showwith.isEmpty())
+        container->SetShowWith(showwith);
+
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
     {
@@ -1233,6 +1237,8 @@ void OSD::ClearAllText(const QString &name)
 void OSD::SetText(const QString &name,
                           QMap<QString, QString> &infoMap, int length)
 {
+    HideAllExcept(name);
+
     osdlock.lock();
     OSDSet *container = GetSet(name);
     if (container)
@@ -1775,19 +1781,21 @@ void OSD::HideEditArrow(long long number, int type)
     osdlock.unlock();
 }
 
-bool OSD::HideAllExcept(const QString &name1, const QString &name2)
+bool OSD::HideAllExcept(const QString &other)
 {
     bool result = false;
 
     osdlock.lock();
+
+    OSDSet *oset = GetSet(other);
 
     vector<OSDSet *>::iterator i;
     for (i = setList->begin(); i != setList->end(); i++)
         if (*i && (*i)->Displaying())
         {
             QString name = (*i)->GetName();
-            if (name != "cc_page" && name != "menu" &&
-                name != name1 && name != name2)
+            if (name != "cc_page" && name != "menu" && name != other && 
+                (!oset || !oset->CanShowWith(name)))
             {
                 (*i)->Hide();
                 result = true;
