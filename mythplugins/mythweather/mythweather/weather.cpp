@@ -158,10 +158,10 @@ Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent,
     accel->connectItem(accel->insertItem(Key_Left), this, SLOT(cursorLeft()));
     accel->connectItem(accel->insertItem(Key_Right), this, SLOT(cursorRight()));
     accel->connectItem(accel->insertItem(Key_P), this, SLOT(holdPage()));
-    accel->connectItem(accel->insertItem(Key_Space), this, SLOT(convertFlip()));
-    accel->connectItem(accel->insertItem(Key_Enter), this, SLOT(convertFlip()));
+    accel->connectItem(accel->insertItem(Key_Space), this, SLOT(resetLocale()));
+    accel->connectItem(accel->insertItem(Key_Enter), this, SLOT(resetLocale()));
     accel->connectItem(accel->insertItem(Key_Return), this, SLOT(convertFlip()));
-    accel->connectItem(accel->insertItem(Key_M), this, SLOT(resetLocale()));
+    accel->connectItem(accel->insertItem(Key_M), this, SLOT(convertFlip()));
     accel->connectItem(accel->insertItem(Key_I), this, SLOT(setupPage()));
     accel->connectItem(accel->insertItem(Key_Up), this, SLOT(upKey()));
     accel->connectItem(accel->insertItem(Key_Down), this, SLOT(dnKey()));

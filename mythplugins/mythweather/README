@@ -61,9 +61,9 @@ MYTHWEATHER KEYBOARD COMMANDS
 			again.
    Numeric Keys		You can check other weather by keying in other ZIP 
                         codes.
-   Enter Key		Switch between celsius and fahrenheit. Can also
+   'm' Key		Switch between celsius and fahrenheit. Can also
 			be used a way to force a data update.
-   'm' Key		Resets the location to the database default, then 
+   Enter Key		Resets the location to the database default, then 
                         updates the data.
 
    From within Configuration:
