@@ -497,7 +497,7 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
     }
 
     video_size = video_height * video_width * 3 / 2;
-    if (keyframedist > 0)
+    if (keyframedistance > 0)
         keyframedist = keyframedistance;
 
     if (aspect > 0.0f)
