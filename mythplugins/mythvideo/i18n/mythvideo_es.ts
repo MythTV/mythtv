@@ -173,6 +173,161 @@
     </message>
 </context>
 <context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Director:</source>
+        <translation>Director:</translation>
+    </message>
+    <message>
+        <source>Year:</source>
+        <translation>Año:</translation>
+    </message>
+    <message>
+        <source>Rated:</source>
+        <translation>Clasificación:</translation>
+    </message>
+    <message>
+        <source>Parental Level:</source>
+        <translation>Nivel de acceso:</translation>
+    </message>
+    <message>
+        <source>Runtime:</source>
+        <translation>Duración:</translation>
+    </message>
+    <message>
+        <source>Plot:</source>
+        <translation>Resumen:</translation>
+    </message>
+    <message>
+        <source>Filename:</source>
+        <translation>Nombre del archivo:</translation>
+    </message>
+    <message>
+        <source>Cover File:</source>
+        <translation>Carátula:</translation>
+    </message>
+    <message>
+        <source>0-9: Edit</source>
+        <translation>0-9: Editar</translation>
+    </message>
+    <message>
+        <source>Menu/Info: Manual IMDB</source>
+        <translation>Menu/Info: IMDB Manual</translation>
+    </message>
+    <message>
+        <source>Enter/OK: Auto IMDB</source>
+        <translation>Enter/OK: IMDB Automático</translation>
+    </message>
+    <message>
+        <source>retrieving data...</source>
+        <translation>obteniendo información...</translation>
+    </message>
+    <message>
+        <source>[ looking for ]</source>
+        <translation>[ buscando ]</translation>
+    </message>
+    <message>
+        <source>Enter IMDB #</source>
+        <translation>Introducir IMDB #</translation>
+    </message>
+    <message>
+        <source>loading...</source>
+        <translation>cargando...</translation>
+    </message>
+    <message>
+        <source>No Videos Found</source>
+        <translation>No encuentro vídeos</translation>
+    </message>
+    <message>
+        <source>Use the left and right arrows</source>
+        <translation>Cursor izq/der para navegar</translation>
+    </message>
+    <message>
+        <source>Directed by</source>
+        <translation>Director</translation>
+    </message>
+    <message>
+        <source>File:</source>
+        <translation>Archivo:</translation>
+    </message>
+    <message>
+        <source>Player:</source>
+        <translation>Comando:</translation>
+    </message>
+    <message>
+        <source>MythVideo File Associations</source>
+        <translation>Asociación de archivos a MythVideo</translation>
+    </message>
+    <message>
+        <source>Extension:</source>
+        <translation>Extensión:</translation>
+    </message>
+    <message>
+        <source>Command:</source>
+        <translation>Comando:</translation>
+    </message>
+    <message>
+        <source>Use default player:</source>
+        <translation>Reproductor:</translation>
+    </message>
+    <message>
+        <source>Ignore:</source>
+        <translation>Ignorar:</translation>
+    </message>
+    <message>
+        <source>Edit Video Information</source>
+        <translation>Editar Información del video</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation>Nombre:</translation>
+    </message>
+    <message>
+        <source>Parental Control:</source>
+        <translation>Nível de Acceso:</translation>
+    </message>
+    <message>
+        <source>File to Always Play Next:</source>
+        <translation>Archivo a reproducir después:</translation>
+    </message>
+    <message>
+        <source>Include while Browsing:</source>
+        <translation>Incluir al listar:</translation>
+    </message>
+    <message>
+        <source>Cover Art:</source>
+        <translation>Imagen de portada:</translation>
+    </message>
+    <message>
+        <source>Unique Player Command:</source>
+        <translation>Commande de lecture:</translation>
+    </message>
+    <message>
+        <source>/path/to/the/thing.jpg</source>
+        <translation>/directorio/para/la/imagen.jpg</translation>
+    </message>
+    <message>
+        <source>Browsable:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IMDB Num.:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PL </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>VideoBrowser</name>
     <message>
         <source>Parental Pin:</source>

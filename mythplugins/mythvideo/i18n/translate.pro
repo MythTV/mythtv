@@ -7,7 +7,7 @@ SOURCES += ../mythvideo/metadata.cpp
 SOURCES += ../mythvideo/videobrowser.cpp
 SOURCES += ../mythvideo/videomanager.cpp
 SOURCES += ../mythvideo/videotree.cpp
-
+SOURCES += ./themestrings.h
 
 
 TRANSLATIONS  = mythvideo_it.ts mythvideo_es.ts mythvideo_ca.ts

@@ -173,6 +173,161 @@
     </message>
 </context>
 <context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Director:</source>
+        <translation>Regissör:</translation>
+    </message>
+    <message>
+        <source>Year:</source>
+        <translation>År:</translation>
+    </message>
+    <message>
+        <source>Rated:</source>
+        <translation>Klassificering:</translation>
+    </message>
+    <message>
+        <source>Parental Level:</source>
+        <translation>Barnlåsnivå:</translation>
+    </message>
+    <message>
+        <source>Browsable:</source>
+        <translation>Blädderbar:</translation>
+    </message>
+    <message>
+        <source>Runtime:</source>
+        <translation>Längd:</translation>
+    </message>
+    <message>
+        <source>Plot:</source>
+        <translation>Handling:</translation>
+    </message>
+    <message>
+        <source>Filename:</source>
+        <translation>Filnamn:</translation>
+    </message>
+    <message>
+        <source>Cover File:</source>
+        <translation>Fil för omslagsbild:</translation>
+    </message>
+    <message>
+        <source>IMDB Num.:</source>
+        <translation>IMDB-nummer:</translation>
+    </message>
+    <message>
+        <source>0-9: Edit</source>
+        <translation>0-9: Redigera</translation>
+    </message>
+    <message>
+        <source>Menu/Info: Manual IMDB</source>
+        <translation>Meny/Info: Manuell IMDB</translation>
+    </message>
+    <message>
+        <source>Enter/OK: Auto IMDB</source>
+        <translation>Enter/OK: Automatisk IMDB</translation>
+    </message>
+    <message>
+        <source>retrieving data...</source>
+        <translation>hämtar data...</translation>
+    </message>
+    <message>
+        <source>[ looking for ]</source>
+        <translation>[ letar efter ]</translation>
+    </message>
+    <message>
+        <source>Enter IMDB #</source>
+        <translation>Mata in IMDB-nummer</translation>
+    </message>
+    <message>
+        <source>loading...</source>
+        <translation>Laddar...</translation>
+    </message>
+    <message>
+        <source>No Videos Found</source>
+        <translation>Inga filmer funna</translation>
+    </message>
+    <message>
+        <source>Use the left and right arrows</source>
+        <translation>Använd vänster och höger piltangent</translation>
+    </message>
+    <message>
+        <source>PL</source>
+        <translation>Nivå</translation>
+    </message>
+    <message>
+        <source>Directed by</source>
+        <translation>Regisserad av:</translation>
+    </message>
+    <message>
+        <source>File:</source>
+        <translation>Fil:</translation>
+    </message>
+    <message>
+        <source>Player:</source>
+        <translation>Spelare:</translation>
+    </message>
+    <message>
+        <source>PL </source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>MythVideo File Associations</source>
+        <translation>Filassociationer för videospelaren</translation>
+    </message>
+    <message>
+        <source>Extension:</source>
+        <translation>Filändelse:</translation>
+    </message>
+    <message>
+        <source>Command:</source>
+        <translation>Kommando:</translation>
+    </message>
+    <message>
+        <source>Use default player:</source>
+        <translation>Använd standardspelare:</translation>
+    </message>
+    <message>
+        <source>Ignore:</source>
+        <translation>Ignorera:</translation>
+    </message>
+    <message>
+        <source>Edit Video Information</source>
+        <translation>Redigera filminformation</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation>Namn:</translation>
+    </message>
+    <message>
+        <source>Parental Control:</source>
+        <translation>Barnlås:</translation>
+    </message>
+    <message>
+        <source>File to Always Play Next:</source>
+        <translation>Fil som alltid spelas efter denna:</translation>
+    </message>
+    <message>
+        <source>Include while Browsing:</source>
+        <translation>Inkludera vid bläddring:</translation>
+    </message>
+    <message>
+        <source>Cover Art:</source>
+        <translation>Omslagsbild:</translation>
+    </message>
+    <message>
+        <source>Unique Player Command:</source>
+        <translation>Kommando för uppspelning:</translation>
+    </message>
+    <message>
+        <source>/path/to/the/thing.jpg</source>
+        <translation>/sökväg/till/bilden.jpg</translation>
+    </message>
+    <message>
+        <source>1</source>
+        <translation type="unfinished">1</translation>
+    </message>
+</context>
+<context>
     <name>VideoBrowser</name>
     <message>
         <source>Parental Pin:</source>

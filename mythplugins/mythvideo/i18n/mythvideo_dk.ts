@@ -169,6 +169,161 @@
     </message>
 </context>
 <context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Director:</source>
+        <translation>Instruktør:</translation>
+    </message>
+    <message>
+        <source>Year:</source>
+        <translation>Udgivet:</translation>
+    </message>
+    <message>
+        <source>Rated:</source>
+        <translation>Klassifikation:</translation>
+    </message>
+    <message>
+        <source>Parental Level:</source>
+        <translation>Voksen niveau:</translation>
+    </message>
+    <message>
+        <source>Runtime:</source>
+        <translation>Længde:</translation>
+    </message>
+    <message>
+        <source>Plot:</source>
+        <translation>Resumé:</translation>
+    </message>
+    <message>
+        <source>Filename:</source>
+        <translation>Filnavn:</translation>
+    </message>
+    <message>
+        <source>Cover File:</source>
+        <translation>Omslagsfil:</translation>
+    </message>
+    <message>
+        <source>retrieving data...</source>
+        <translation>Henter information...</translation>
+    </message>
+    <message>
+        <source>[ looking for ]</source>
+        <translation>[ leder efter ]</translation>
+    </message>
+    <message>
+        <source>Enter IMDB #</source>
+        <translation>Indtast IMDB #</translation>
+    </message>
+    <message>
+        <source>loading...</source>
+        <translation>Indlæser...</translation>
+    </message>
+    <message>
+        <source>No Videos Found</source>
+        <translation>Ingen videoer fundet</translation>
+    </message>
+    <message>
+        <source>Use the left and right arrows</source>
+        <translation>Brug venstre og højre piletast</translation>
+    </message>
+    <message>
+        <source>Directed by</source>
+        <translation>Instrueret af:</translation>
+    </message>
+    <message>
+        <source>File:</source>
+        <translation>Fil:</translation>
+    </message>
+    <message>
+        <source>Player:</source>
+        <translation>Afspiller:</translation>
+    </message>
+    <message>
+        <source>Browsable:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IMDB Num.:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0-9: Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu/Info: Manual IMDB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter/OK: Auto IMDB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PL </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythVideo File Associations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extension:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use default player:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ignore:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Video Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental Control:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File to Always Play Next:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Include while Browsing:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cover Art:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unique Player Command:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>/path/to/the/thing.jpg</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>VideoBrowser</name>
     <message>
         <source>Parental Pin:</source>

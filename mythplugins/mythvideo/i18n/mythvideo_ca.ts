@@ -173,6 +173,161 @@
     </message>
 </context>
 <context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Director:</source>
+        <translation>Director:</translation>
+    </message>
+    <message>
+        <source>Year:</source>
+        <translation>Any:</translation>
+    </message>
+    <message>
+        <source>Rated:</source>
+        <translation>Classificació:</translation>
+    </message>
+    <message>
+        <source>Parental Level:</source>
+        <translation>Nivell d&apos;accés:</translation>
+    </message>
+    <message>
+        <source>Browsable:</source>
+        <translation>Llistable:</translation>
+    </message>
+    <message>
+        <source>Runtime:</source>
+        <translation>Duració:</translation>
+    </message>
+    <message>
+        <source>Plot:</source>
+        <translation>Resum:</translation>
+    </message>
+    <message>
+        <source>Filename:</source>
+        <translation>Nom de l&apos;arxiu:</translation>
+    </message>
+    <message>
+        <source>Cover File:</source>
+        <translation>Caràtula:</translation>
+    </message>
+    <message>
+        <source>0-9: Edit</source>
+        <translation>0-9: Editar</translation>
+    </message>
+    <message>
+        <source>Menu/Info: Manual IMDB</source>
+        <translation>Menu/Info: IMDB Manual</translation>
+    </message>
+    <message>
+        <source>Enter/OK: Auto IMDB</source>
+        <translation>Enter/OK: IMDB automatisch</translation>
+    </message>
+    <message>
+        <source>retrieving data...</source>
+        <translation>obtenint informació...</translation>
+    </message>
+    <message>
+        <source>[ looking for ]</source>
+        <translation>[ cercant ]</translation>
+    </message>
+    <message>
+        <source>Enter IMDB #</source>
+        <translation>IntroduÏr IMDB #</translation>
+    </message>
+    <message>
+        <source>loading...</source>
+        <translation>carregant...</translation>
+    </message>
+    <message>
+        <source>No Videos Found</source>
+        <translation>No trovo vídeos</translation>
+    </message>
+    <message>
+        <source>Use the left and right arrows</source>
+        <translation>Cursor esq/dreta per navegar</translation>
+    </message>
+    <message>
+        <source>Directed by</source>
+        <translation>Director</translation>
+    </message>
+    <message>
+        <source>File:</source>
+        <translation>Arxiu:</translation>
+    </message>
+    <message>
+        <source>Player:</source>
+        <translation>Comanda:</translation>
+    </message>
+    <message>
+        <source>MythVideo File Associations</source>
+        <translation>Associació d&apos;arxius a MythVideo</translation>
+    </message>
+    <message>
+        <source>Extension:</source>
+        <translation>Extensió:</translation>
+    </message>
+    <message>
+        <source>Command:</source>
+        <translation>Comanda:</translation>
+    </message>
+    <message>
+        <source>Use default player:</source>
+        <translation>Reproductor:</translation>
+    </message>
+    <message>
+        <source>Ignore:</source>
+        <translation>Ignorar:</translation>
+    </message>
+    <message>
+        <source>Edit Video Information</source>
+        <translation>Editar Informació del vídeo</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation>Nom:</translation>
+    </message>
+    <message>
+        <source>Parental Control:</source>
+        <translation>Nivell d&apos;Accès:</translation>
+    </message>
+    <message>
+        <source>File to Always Play Next:</source>
+        <translation>Arxiu a reproduir després:</translation>
+    </message>
+    <message>
+        <source>Include while Browsing:</source>
+        <translation>Incloure al llistar:</translation>
+    </message>
+    <message>
+        <source>Cover Art:</source>
+        <translation>Imatge de caràtula:</translation>
+    </message>
+    <message>
+        <source>Unique Player Command:</source>
+        <translation>Comanda d&apos;execució específica:</translation>
+    </message>
+    <message>
+        <source>/path/to/the/thing.jpg</source>
+        <translation>/directori/per/la/imatge.jpg</translation>
+    </message>
+    <message>
+        <source>IMDB Num.:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PL </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>VideoBrowser</name>
     <message>
         <source>Parental Pin:</source>

@@ -173,6 +173,161 @@
     </message>
 </context>
 <context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Director:</source>
+        <translation>Réalisateur:</translation>
+    </message>
+    <message>
+        <source>Year:</source>
+        <translation>Année:</translation>
+    </message>
+    <message>
+        <source>Rated:</source>
+        <translation>Notes:</translation>
+    </message>
+    <message>
+        <source>Parental Level:</source>
+        <translation>Niveau parental:</translation>
+    </message>
+    <message>
+        <source>Browsable:</source>
+        <translation>Listé:</translation>
+    </message>
+    <message>
+        <source>Runtime:</source>
+        <translation>Durée:</translation>
+    </message>
+    <message>
+        <source>Plot:</source>
+        <translation>Résumé:</translation>
+    </message>
+    <message>
+        <source>Filename:</source>
+        <translation>Nom du fichier:</translation>
+    </message>
+    <message>
+        <source>Cover File:</source>
+        <translation>Affiche:</translation>
+    </message>
+    <message>
+        <source>IMDB Num.:</source>
+        <translation>N° IMDB</translation>
+    </message>
+    <message>
+        <source>0-9: Edit</source>
+        <translation>0-9: Editer</translation>
+    </message>
+    <message>
+        <source>Menu/Info: Manual IMDB</source>
+        <translation>Menu/Info: IMDB Manuel</translation>
+    </message>
+    <message>
+        <source>Enter/OK: Auto IMDB</source>
+        <translation>Entrée/Ok: IMDN Automatique</translation>
+    </message>
+    <message>
+        <source>retrieving data...</source>
+        <translation>Récupération des données ...</translation>
+    </message>
+    <message>
+        <source>[ looking for ]</source>
+        <translation>[ Recherche ]</translation>
+    </message>
+    <message>
+        <source>Enter IMDB #</source>
+        <translation>Saisie le N° IMDB</translation>
+    </message>
+    <message>
+        <source>loading...</source>
+        <translation>Chargement...</translation>
+    </message>
+    <message>
+        <source>No Videos Found</source>
+        <translation>Aucune vidéo trouvée</translation>
+    </message>
+    <message>
+        <source>Use the left and right arrows</source>
+        <translation>Utiliser les flèches droite et gauche</translation>
+    </message>
+    <message>
+        <source>Directed by</source>
+        <translation>Réalisé par:</translation>
+    </message>
+    <message>
+        <source>File:</source>
+        <translation>Fichier:</translation>
+    </message>
+    <message>
+        <source>Player:</source>
+        <translation>Lecteur:</translation>
+    </message>
+    <message>
+        <source>MythVideo File Associations</source>
+        <translation>Association de fichiers de MythVideo</translation>
+    </message>
+    <message>
+        <source>Extension:</source>
+        <translation>Extension:</translation>
+    </message>
+    <message>
+        <source>Command:</source>
+        <translation>Commande:</translation>
+    </message>
+    <message>
+        <source>Use default player:</source>
+        <translation>Utiliser le lecteur par défaut:</translation>
+    </message>
+    <message>
+        <source>Ignore:</source>
+        <translation>Ignoré:</translation>
+    </message>
+    <message>
+        <source>Edit Video Information</source>
+        <translation>Editer les informations de la vidéo</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation>Nom:</translation>
+    </message>
+    <message>
+        <source>Parental Control:</source>
+        <translation>Niveau parental:</translation>
+    </message>
+    <message>
+        <source>File to Always Play Next:</source>
+        <translation>Fichier à toujours lire ensuite:</translation>
+    </message>
+    <message>
+        <source>Include while Browsing:</source>
+        <translation>Inclure dans la liste:</translation>
+    </message>
+    <message>
+        <source>Cover Art:</source>
+        <translation>Affiche:</translation>
+    </message>
+    <message>
+        <source>/path/to/the/thing.jpg</source>
+        <translation>/Chemin/d&apos;acces/à/l&apos;affiche.jpg</translation>
+    </message>
+    <message>
+        <source>PL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1</source>
+        <translation type="unfinished">Elevé {1?}</translation>
+    </message>
+    <message>
+        <source>PL </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unique Player Command:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>VideoBrowser</name>
     <message>
         <source>Parental Pin:</source>

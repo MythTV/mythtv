@@ -173,6 +173,161 @@
     </message>
 </context>
 <context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Director:</source>
+        <translation>Regisseur:</translation>
+    </message>
+    <message>
+        <source>Year:</source>
+        <translation>Jahr:</translation>
+    </message>
+    <message>
+        <source>Rated:</source>
+        <translation>Freigabe:</translation>
+    </message>
+    <message>
+        <source>Parental Level:</source>
+        <translation>Kindersicherungs-Level:</translation>
+    </message>
+    <message>
+        <source>Browsable:</source>
+        <translation>Listbar:</translation>
+    </message>
+    <message>
+        <source>Runtime:</source>
+        <translation>Länge:</translation>
+    </message>
+    <message>
+        <source>Plot:</source>
+        <translation>Handlung:</translation>
+    </message>
+    <message>
+        <source>Filename:</source>
+        <translation>Dateiname:</translation>
+    </message>
+    <message>
+        <source>Cover File:</source>
+        <translation>Cover-Datei:</translation>
+    </message>
+    <message>
+        <source>IMDB Num.:</source>
+        <translation>IMDB-Nr.:</translation>
+    </message>
+    <message>
+        <source>0-9: Edit</source>
+        <translation>0-9: Editieren</translation>
+    </message>
+    <message>
+        <source>Menu/Info: Manual IMDB</source>
+        <translation>Menu/Info: IMDB manuell</translation>
+    </message>
+    <message>
+        <source>retrieving data...</source>
+        <translation>Hole Daten...</translation>
+    </message>
+    <message>
+        <source>[ looking for ]</source>
+        <translation>[ suche nach ]</translation>
+    </message>
+    <message>
+        <source>Enter IMDB #</source>
+        <translation>Eingabe IMDB #</translation>
+    </message>
+    <message>
+        <source>loading...</source>
+        <translation>Lade...</translation>
+    </message>
+    <message>
+        <source>No Videos Found</source>
+        <translation>Keine Videos gefunden</translation>
+    </message>
+    <message>
+        <source>Use the left and right arrows</source>
+        <translation>Verwende Links-/Rechts-Pfeiltasten</translation>
+    </message>
+    <message>
+        <source>Directed by</source>
+        <translation>Regie:</translation>
+    </message>
+    <message>
+        <source>File:</source>
+        <translation>Datei:</translation>
+    </message>
+    <message>
+        <source>Player:</source>
+        <translation>Abspieler:</translation>
+    </message>
+    <message>
+        <source>MythVideo File Associations</source>
+        <translation>MythVideo-Dateiverknüpfungen</translation>
+    </message>
+    <message>
+        <source>Extension:</source>
+        <translation>Erweiterung:</translation>
+    </message>
+    <message>
+        <source>Command:</source>
+        <translation>Kommando:</translation>
+    </message>
+    <message>
+        <source>Use default player:</source>
+        <translation>Standard-Abspieler:</translation>
+    </message>
+    <message>
+        <source>Ignore:</source>
+        <translation>Ignoriere:</translation>
+    </message>
+    <message>
+        <source>Edit Video Information</source>
+        <translation>Video-Informationen editieren</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation>Name:</translation>
+    </message>
+    <message>
+        <source>Parental Control:</source>
+        <translation>Kindersicherungs-Level:</translation>
+    </message>
+    <message>
+        <source>File to Always Play Next:</source>
+        <translation>Datei immer anschließend spielen:</translation>
+    </message>
+    <message>
+        <source>Include while Browsing:</source>
+        <translation>Beim Listen berücksichtigen:</translation>
+    </message>
+    <message>
+        <source>Cover Art:</source>
+        <translation>Cover-Bild:</translation>
+    </message>
+    <message>
+        <source>Unique Player Command:</source>
+        <translation>Spezielles Abspielkommando:</translation>
+    </message>
+    <message>
+        <source>/path/to/the/thing.jpg</source>
+        <translation>/pfad/zum/bild.jpg</translation>
+    </message>
+    <message>
+        <source>Enter/OK: Auto IMDB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1</source>
+        <translation type="unfinished">1</translation>
+    </message>
+    <message>
+        <source>PL </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>VideoBrowser</name>
     <message>
         <source>Parental Pin:</source>
