@@ -474,7 +474,7 @@ void TV::SetupPlayer(void)
                         m_context->GetInstallPrefix()); 
     nvp->SetOSDThemeName(m_context->GetSetting("OSDTheme"));
     nvp->SetAudioSampleRate(m_context->GetNumSetting("AudioSampleRate"));
-    nvp->SetAudioDevice(m_context->GetSetting("AudioDevice"));
+    nvp->SetAudioDevice(m_context->GetSetting("AudioOutputDevice"));
     nvp->SetLength(playbackLen);
     nvp->SetExactSeeks(m_context->GetNumSetting("ExactSeeking"));
 
