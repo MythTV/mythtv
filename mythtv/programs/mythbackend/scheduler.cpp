@@ -370,6 +370,7 @@ void Scheduler::UpdateRecStatus(ProgramInfo *pginfo)
         if (p->IsSameProgramTimeslot(*pginfo))
         {
             p->recstatus = pginfo->recstatus;
+            ScheduledRecording::signalChange(0);
             return;
         }
     }
