@@ -245,6 +245,10 @@ void OSD::parseFont(QDomElement &element)
                 shadowOffset.setX((int)(shadowOffset.x() * wmult));
                 shadowOffset.setY((int)(shadowOffset.y() * hmult));
             }
+            else if (info.tagName() == "filename")
+            {
+                fontfile = getFirstText(info);
+            }
             else
             {
                 cerr << "Unknown tag " << info.tagName() << " in font\n";
