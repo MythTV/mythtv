@@ -1632,7 +1632,7 @@ void TV::ChangeChannelByString(QString &name)
 {
     bool muted = false;
 
-    if (!channame_vector.isEmpty() && channame_vector.last() == name)
+    if (!channame_vector.empty() && channame_vector.back() == name)
         return;
 
     if (!activerecorder->CheckChannel(name))
