@@ -1241,6 +1241,9 @@ void ThemedMenu::drawInactiveButtons(void)
 
     QPainter tmp(&bground);
 
+    paintLogo(&tmp);
+    paintTitle(&tmp);
+
     ThemedButton *store = activebutton;
     activebutton = NULL;
     
@@ -1260,6 +1263,9 @@ void ThemedMenu::drawInactiveButtons(void)
     erase(buttonArea);
     erase(uparrowRect);
     erase(downarrowRect);
+    erase(logoRect);
+    if (drawTitle)
+        erase(titleRect);
 }
 
 void ThemedMenu::drawScrollArrows(QPainter *p)
@@ -1289,12 +1295,6 @@ void ThemedMenu::paintEvent(QPaintEvent *e)
     QRect r = e->rect();
     QPainter p(this);
 
-    if (r.intersects(logoRect))
-        paintLogo(&p);
-
-    if (drawTitle && r.intersects(titleRect))
-        paintTitle(&p);
-
     if (r.intersects(watermarkRect))
         paintWatermark(&p);
 
@@ -1307,16 +1307,8 @@ void ThemedMenu::paintEvent(QPaintEvent *e)
 
 void ThemedMenu::paintLogo(QPainter *p)
 {
-    QPixmap pix(logoRect.size());
-   
-    QPainter tmp(&pix, this);
-    tmp.drawPixmap(QPoint(0, 0), backgroundPixmap, logoRect);
-
     if (logo)
-        tmp.drawPixmap(QPoint(0, 0), *logo);
-
-    tmp.end();
-    p->drawPixmap(logoRect.topLeft(), pix);
+        p->drawPixmap(logoRect.topLeft(), *logo);
 }
 
 void ThemedMenu::paintTitle(QPainter *p)
