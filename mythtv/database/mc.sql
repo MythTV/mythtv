@@ -1,7 +1,22 @@
 CREATE DATABASE mythconverg;
 GRANT ALL ON mythconverg.* TO mythtv@localhost IDENTIFIED BY "mythtv";
 USE mythconverg;
-CREATE TABLE channel
+CREATE TABLE IF NOT EXISTS recordingprofiles
+(
+    id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    name VARCHAR(128),
+    videocodec VARCHAR(128),
+    audiocodec VARCHAR(128),
+    UNIQUE(name)
+);
+CREATE TABLE IF NOT EXISTS codecparams
+(
+    profile INT UNSIGNED NOT NULL REFERENCES recordingprofiles(id),
+    name VARCHAR(128) NOT NULL,
+    value VARCHAR(128),
+    PRIMARY KEY (profile, name)
+);
+CREATE TABLE IF NOT EXISTS channel
 (
     chanid INT UNSIGNED NOT NULL PRIMARY KEY,
     channum VARCHAR(5) NOT NULL,
@@ -13,7 +28,7 @@ CREATE TABLE channel
     videofilters VARCHAR(255) NULL,
     xmltvid VARCHAR(64) NULL
 );
-CREATE TABLE program
+CREATE TABLE IF NOT EXISTS program
 (
     chanid INT UNSIGNED NOT NULL,
     starttime TIMESTAMP NOT NULL,
@@ -25,7 +40,7 @@ CREATE TABLE program
     PRIMARY KEY (chanid, starttime),
     INDEX (endtime)
 );
-CREATE TABLE singlerecord
+CREATE TABLE IF NOT EXISTS singlerecord
 (
     chanid INT UNSIGNED NOT NULL,
     starttime TIMESTAMP NOT NULL,
@@ -33,24 +48,27 @@ CREATE TABLE singlerecord
     title VARCHAR(128) NULL,
     subtitle VARCHAR(128) NULL,
     description TEXT NULL,
+    profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofiles(id);
     PRIMARY KEY (chanid, starttime),
     INDEX (endtime)
 );
-CREATE TABLE timeslotrecord
+CREATE TABLE IF NOT EXISTS timeslotrecord
 (
     chanid INT UNSIGNED NOT NULL,
     starttime TIME NOT NULL,
     endtime TIME NOT NULL,
     title VARCHAR(128) NULL,
+    profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofiles(id);
     PRIMARY KEY(chanid, starttime),
     INDEX (endtime)
 );
-CREATE TABLE allrecord
+CREATE TABLE IF NOT EXISTS allrecord
 (
     title VARCHAR(128) NULL,
-    chanid INT UNSIGNED NULL
+    chanid INT UNSIGNED NULL,
+    profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofiles(id)
 );
-CREATE TABLE recorded
+CREATE TABLE IF NOT EXISTS recorded
 (
     chanid INT UNSIGNED NOT NULL,
     starttime TIMESTAMP NOT NULL,
@@ -61,13 +79,13 @@ CREATE TABLE recorded
     PRIMARY KEY (chanid, starttime),
     INDEX (endtime)
 );
-CREATE TABLE settings
+CREATE TABLE IF NOT EXISTS settings
 (
     value VARCHAR(128) NOT NULL,
     data TEXT NULL,
     PRIMARY KEY(value)
 );
-CREATE TABLE conflictresolutionoverride
+CREATE TABLE IF NOT EXISTS conflictresolutionoverride
 (
     chanid INT UNSIGNED NOT NULL,
     starttime TIMESTAMP NOT NULL,
@@ -75,7 +93,7 @@ CREATE TABLE conflictresolutionoverride
     INDEX (chanid, starttime),
     INDEX (endtime)
 );
-CREATE TABLE conflictresolutionsingle
+CREATE TABLE IF NOT EXISTS conflictresolutionsingle
 (
     preferchanid INT UNSIGNED NOT NULL,
     preferstarttime TIMESTAMP NOT NULL,
@@ -86,14 +104,14 @@ CREATE TABLE conflictresolutionsingle
     INDEX (preferchanid, preferstarttime),
     INDEX (preferendtime)
 );
-CREATE TABLE conflictresolutionany
+CREATE TABLE IF NOT EXISTS conflictresolutionany
 (
     prefertitle VARCHAR(128) NOT NULL,
     disliketitle VARCHAR(128) NOT NULL,
     INDEX (prefertitle),
     INDEX (disliketitle)
 );
-CREATE TABLE oldrecorded
+CREATE TABLE IF NOT EXISTS oldrecorded
 (
     chanid INT UNSIGNED NOT NULL,
     starttime TIMESTAMP NOT NULL,
@@ -105,7 +123,7 @@ CREATE TABLE oldrecorded
     INDEX (endtime),
     INDEX (title)
 );
-CREATE TABLE capturecard
+CREATE TABLE IF NOT EXISTS capturecard
 (
     cardid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
     videodevice VARCHAR(128),
@@ -113,12 +131,12 @@ CREATE TABLE capturecard
     cardtype VARCHAR(32) DEFAULT 'V4L',
     audioratelimit INT
 );
-CREATE TABLE videosource
+CREATE TABLE IF NOT EXISTS videosource
 (
     sourceid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
     name VARCHAR(128)
 );
-CREATE TABLE cardinput
+CREATE TABLE IF NOT EXISTS cardinput
 (
     cardinputid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
     cardid INT UNSIGNED NOT NULL,
@@ -128,4 +146,7 @@ CREATE TABLE cardinput
     preference INT,
     shareable CHAR DEFAULT 'N'
 );
- 
+
+INSERT INTO recordingprofiles (name) VALUES ('Default');
+INSERT INTO recordingprofiles (name) VALUES ('Live TV');
+
