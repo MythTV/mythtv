@@ -347,13 +347,31 @@ int main(int argc, char **argv)
         gContext->LCDconnectToHost(lcd_host, lcd_port);
     }
 
-    qApp->unlock();
+    if (a.argc() == 2)
+    {
+        QString pluginname = a.argv()[1];
 
+        if (MythPluginManager::init_plugin(pluginname))
+        {
+            MythPluginManager::run_plugin(pluginname);
+            return 0;
+        }
+        else
+        {
+            pluginname = "myth" + pluginname;
+            if (MythPluginManager::init_plugin(pluginname))
+            {
+                MythPluginManager::run_plugin(pluginname);
+                return 0;
+            }
+        }
+    }            
+
+    qApp->unlock();
     int exitstatus = RunMenu(themedir);
 
     haltnow(exitstatus);
 
     delete gContext;
-
     return exitstatus;
 }
