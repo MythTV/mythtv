@@ -56,8 +56,9 @@ class UIListBtnType : public UIType
     int   GetItemPos(UIListBtnTypeItem* item);
     int   GetCount();
 
-    void  MoveDown();
-    void  MoveUp();
+    enum MovementUnit { MoveItem, MovePage, MoveMax };
+    void  MoveDown(MovementUnit unit=MoveItem);
+    void  MoveUp(MovementUnit unit=MoveItem);
 
   private:
 

@@ -224,12 +224,29 @@ int UIListBtnType::GetItemPos(UIListBtnTypeItem* item)
     return m_itemList.find(item);    
 }
 
-void UIListBtnType::MoveUp()
+void UIListBtnType::MoveUp(MovementUnit unit)
 {
-    if (m_itemList.find(m_selItem) == -1)
+    int pos = m_itemList.find(m_selItem);
+    if (pos == -1)
         return;
 
-    UIListBtnTypeItem *item = m_itemList.prev();
+    UIListBtnTypeItem *item;
+    switch (unit)
+    {
+    case MoveItem:
+        item = m_itemList.prev();
+        break;
+    case MovePage:
+        if (pos > m_itemsVisible)
+        {
+            item = m_itemList.at(pos - m_itemsVisible);
+            break;
+        }
+        // fall through
+    case MoveMax:
+        item = m_itemList.first();
+        break;
+    }
     if (!item) 
         return;
 
@@ -251,11 +268,30 @@ void UIListBtnType::MoveUp()
     emit itemSelected(m_selItem);
 }
 
-void UIListBtnType::MoveDown()
+void UIListBtnType::MoveDown(MovementUnit unit)
 {
-    if (m_itemList.find(m_selItem) == -1)
+    int pos = m_itemList.find(m_selItem);
+    if (pos == -1)
         return;
-    UIListBtnTypeItem *item = m_itemList.next();
+
+    UIListBtnTypeItem *item;
+    switch (unit)
+    {
+    case MoveItem:
+        item = m_itemList.next();
+        break;
+    case MovePage:
+        if ((pos + m_itemsVisible) < m_itemList.count()-1)
+        {
+            item = m_itemList.at(pos + m_itemsVisible);
+            break;
+        }
+        // fall through
+    case MoveMax:
+        item = m_itemList.last();
+        break;
+    }
+
     if (!item) 
         return;
 
@@ -264,7 +300,7 @@ void UIListBtnType::MoveDown()
     if (m_itemList.find(m_topItem) + m_itemsVisible <=
         (unsigned int)m_itemList.find(m_selItem)) 
     {
-        m_topItem = m_itemList.at(m_itemList.find(m_topItem) + 1);
+        m_topItem = m_itemList.at(m_itemList.find(m_selItem) - m_itemsVisible + 1);
     }
     
     if (m_topItem != m_itemList.first())
