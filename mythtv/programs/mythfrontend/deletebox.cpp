@@ -90,10 +90,8 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     QString thequery;
     ProgramListItem *item;
     
-    thequery = "SELECT channel.chanid,starttime,endtime,title,subtitle,"
-               "description,channel.channum FROM recorded,channel "
-               "WHERE recorded.chanid = channel.chanid "
-               "ORDER BY starttime DESC;";
+    thequery = "SELECT chanid,starttime,endtime,title,subtitle,description "
+               "FROM recorded ORDER BY starttime DESC;";
 
     query = db->exec(thequery);
 
@@ -112,7 +110,6 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
             proginfo->title = query.value(3).toString();
             proginfo->subtitle = query.value(4).toString();
             proginfo->description = query.value(5).toString();
-            proginfo->chanstr = query.value(6).toString();
             proginfo->conflicting = false;
 
             if (proginfo->title == QString::null)
@@ -121,6 +118,22 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
                 proginfo->subtitle = "";
             if (proginfo->description == QString::null)
                 proginfo->description = "";
+
+            QSqlQuery subquery;
+            QString subquerystr;
+
+            subquerystr = QString("SELECT channum FROM channel WHERE "
+                                  "chanid = %1").arg(proginfo->chanid);
+            subquery = db->exec(subquerystr);
+
+            if (subquery.isActive() && subquery.numRowsAffected() > 0)
+            {
+                subquery.next();
+ 
+                proginfo->chanstr = subquery.value(0).toString();
+            }
+            else
+                proginfo->chanstr = proginfo->chanid;
 
             item = new ProgramListItem(listview, proginfo, 4, tv, fileprefix);
         }
