@@ -1,0 +1,683 @@
+<myththeme>
+
+  <background style="normal">
+    <image>background.jpeg</image>
+    <buttonarea>115,115,410,390</buttonarea>
+    <visiblerowlimit>7</visiblerowlimit>
+  </background>
+
+  <titles>
+    <position>20,20</position>
+    <image mode="TV">title/title_tv.png</image>
+    <image mode="MAIN">title/title_main.png</image>
+    <image mode="MUSIC">title/title_music.png</image>
+    <image mode="GALLERY">title/title_gallery.png</image>
+    <image mode="VIDEO">title/title_video.png</image>
+    <image mode="SCHEDULE">title/title_schedule.png</image>
+    <image mode="SEARCH">title/title_search.png</image>
+    <image mode="SETUP">title/title_setup.png</image>
+    <image mode="TVSETUP">title/title_tv_settings.png</image>
+    <image mode="DVD">title/title_dvd.png</image>
+    <image mode="DVD_SETTINGS">title/title_dvd_setup.png</image>
+    <image mode="MUSIC_SETTINGS">title/title_music_setup.png</image>
+    <image mode="VIDEO_SETTINGS">title/title_video_setup.png</image>
+    <image mode="GAME_SETTINGS">title/title_game_setup.png</image>
+    <image mode="LIBRARY">title/title_library.png</image>
+    <image mode="MANAGE_RECORDINGS">title/title_manage_recordings.png</image>
+    <image mode="INFO">title/title_info_center.png</image>
+    <image mode="OPTICAL_DISK">title/title_optical_disks.png</image>
+    <image mode="UTIL">title/title_util.png</image>
+  </titles>
+
+  <genericbutton>
+    <watermarkposition>524,105</watermarkposition> <!-- 20px right margin -->
+    <normal>text-blank.png</normal>
+    <active>text-blank.png</active>
+    <text>
+    <area>5,3,3,3</area>
+    <color>white</color>
+      <fontname>Arial</fontname>
+      <fontsize>28</fontsize>
+      <bold>yes</bold>
+      <italics>no</italics>
+      <centered>no</centered>
+      <outline>
+         <color>black</color>
+         <size>2</size>
+      </outline>
+      <!--<shadow>
+         <color>black</color>
+         <offset>2,2</offset>
+         <alpha>128</alpha>
+      </shadow>-->
+    </text>
+    <activetext>
+      <area>5,3,3,3</area>
+      <color>#0086FF</color>
+      <fontname>Arial</fontname>
+      <fontsize>28</fontsize>
+      <bold>yes</bold>
+      <italics>no</italics>
+      <centered>no</centered>
+      <outline>
+         <color>black</color>
+         <size>3</size>
+      </outline>
+      <!--<shadow>
+         <color>black</color>
+         <offset>3,3</offset>
+         <alpha>128</alpha>
+      </shadow>-->
+    </activetext>
+  </genericbutton>
+  
+
+  <uparrow>
+    <image>arrow_up.png</image>
+    <position>65,120</position>
+  </uparrow>
+
+  <downarrow>
+    <image>arrow_down.png</image>
+    <position>65,460</position>
+  </downarrow>
+
+  
+<!-- ################################################################ -->
+<!-- ########  Below are all the buttons that's in the menus ######## -->
+<!-- ################################################################ -->
+
+<!-- ####################################-->
+<!-- ########  dvd_settings.xml  ########-->
+<!-- ####################################-->
+
+  <buttondef name="DVD_SETTINGS_GENERAL">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/dvd.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="DVD_SETTINGS_PLAY">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/dvd_play.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="DVD_SETTINGS_RIP">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/dvd_rip.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+<!-- ###############################-->
+<!-- ########  dvdmenu.xml  ########-->
+<!-- ###############################-->
+
+  <buttondef name="DVD_PLAY">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/dvd_play.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="VCD_PLAY">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/vcd_play.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="DVD_RIP">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/dvd_rip.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+<!-- #####################################-->
+<!-- ########  game_settings.xml  ########-->
+<!-- #####################################-->
+
+  <buttondef name="GAME_SETTINGS_GENERAL">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/game.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="GAME_SCAN">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/game.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+<!-- ################################-->
+<!-- ########  mainmenu.xml  ########-->
+<!-- ################################-->
+
+  <buttondef name="TV">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="MUSIC">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/music.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="VIDEO">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/video.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="DVD">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/dvd.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="FM">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/radio.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="IMAGES">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/gallery.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="GAME">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/game.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="WEATHER">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/weather.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="NEWS">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/news.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="WEBPAGE">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/web.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="RECIPE">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/recipe.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETUP">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/setup.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SHUTDOWN">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/NOTHING.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+<!-- #####################################-->
+<!-- ########  main_settings.xml  ########-->
+<!-- #####################################-->
+
+  <buttondef name="SETTINGS_GENERAL">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/setup.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_APPEARANCE">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/setup.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_TV">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_MUSIC">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/music.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_VIDEO">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/video.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_DVD">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/dvd.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_FM">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/radio.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_IMAGES">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/gallery.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_GAME">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/game.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_WEATHER">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/weather.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_NEWS">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/news.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_WEBPAGE">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/web.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_RECIPE">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/recipe.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_XBOX">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/NOTHING.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+<!-- ######################################-->
+<!-- ########  music_settings.xml  ########-->
+<!-- ######################################-->
+
+  <buttondef name="MUSIC_SETTINGS_GENERAL">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/music.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="MUSIC_SETTINGS_PLAYER">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/music_playlist.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="MUSIC_SETTINGS_RIP">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/music_rip.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+<!-- #################################-->
+<!-- ########  musicmenu.xml  ########-->
+<!-- #################################-->
+
+  <buttondef name="MUSIC_PLAY">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/music.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="MUSIC_PLAYLIST">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/music_playlist.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="MUSIC_RIP">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/music_rip.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="MUSIC_SCAN">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/music_scan.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+<!-- ##############################################-->
+<!-- ########  recpriorities_settings.xml  ########-->
+<!-- ##############################################-->
+
+  <buttondef name="TV_RECPRIORITIES_SETTINGS_GENERAL">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_recpriorities.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="TV_RECPRIORITIES_CHANNEL">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_recpriorities.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+<!-- #############################-->
+<!-- ########  setup.xml  ########-->
+<!-- #############################-->
+
+  <buttondef name="SETUP_GENERAL">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/setup.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETUP_CAPTURE_CARDS">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/setup.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETUP_VIDEO_SOURCES">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/setup.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETUP_INPUT_CONNECTIONS">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/setup.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETUP_CHANNEL_EDITOR">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/setup.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+<!-- ###################################-->
+<!-- ########  tv_schedule.xml  ########-->
+<!-- ###################################-->
+
+  <buttondef name="TV_PROGRAM_GUIDE">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_programguide.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="TV_PROGFIND">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_progfind.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="TV_SEARCH_LISTINGS">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_searchlistings.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="TV_MANUAL_SCHEDULE">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_schedule.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="TV_RECPRIORITIES">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_recpriorities.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="TV_CONFLICTS">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_conflicts.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+<!-- #################################-->
+<!-- ########  tv_search.xml  ########-->
+<!-- #################################-->
+
+  <buttondef name="TV_SEARCH_TITLES">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_searchlistings.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="TV_SEARCH_DESCRIPTIONS">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_searchlistings.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="TV_SEARCH_CHANNELS">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_searchlistings.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="TV_SEARCH_CATEGORIES">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_searchlistings.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="TV_SEARCH_MOVIES">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_searchlistings.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="TV_SEARCH_NEW_TITLES">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_searchlistings.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+<!-- ###################################-->
+<!-- ########  tv_settings.xml  ########-->
+<!-- ###################################-->
+
+  <buttondef name="TV_SETTINGS_GENERAL">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="TV_SETTINGS_PROGRAM_GUIDE">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_programguide.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="TV_SETTINGS_PLAYBACK">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_playback.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="TV_SETTINGS_RECORDING_PROFILES">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_schedule.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="TV_SETTINGS_RECPRIORITIES">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_recpriorities.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+<!-- ##############################-->
+<!-- ########  tvmenu.xml  ########-->
+<!-- ##############################-->
+
+  <buttondef name="TV_WATCH_TV">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="TV_SCHEDULE_RECORDINGS">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_schedule.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="TV_WATCH_RECORDINGS">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_playback.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="TV_DELETE">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_delete.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="TV_STATUS">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_status.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+<!-- ######################################-->
+<!-- ########  video_settings.xml  ########-->
+<!-- ######################################-->
+
+  <buttondef name="VIDEO_SETTINGS_GENERAL">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/video.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="VIDEO_SETTINGS_PLAYER">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/video_list.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="VIDEO_FILE_TYPES">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/video_browser.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+<!-- #################################-->
+<!-- ########  videomenu.xml  ########-->
+<!-- #################################-->
+
+  <buttondef name="VIDEO_BROWSER">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/video_browser.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="VIDEO_LIST">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/video_list.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="VIDEO_MANAGER">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/video_manager.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+<!-- ###########################################-->
+<!-- ########  AltMenus Specific Icons  ########-->
+<!-- ###########################################-->
+
+  <buttondef name="TV_UPCOMING_RECORDINGS">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_progfind.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_MEDIA">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/video_browser.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETTINGS_INFO_CENTER">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/info_center.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="MENU_MEDIA_LIBRARY">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/video_browser.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="MENU_MANAGE_RECORDINGS">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/video_manager.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="MENU_INFO_CENTER">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/info_center.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="MENU_OPTICAL_DISKS">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/dvd.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="MENU_UTILITIES_SETUP">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/setup.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETUP_FRONTEND">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/setup.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETUP_BACKEND">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/setup.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="SETUP_MENU">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/setup.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+</myththeme>
+

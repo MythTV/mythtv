@@ -1,0 +1,2128 @@
+<mythuitheme>
+
+  <window name="programguide">
+
+    <font name="title" face="Arial">
+      <color>#DDDDff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>24</size>
+      <size:small>14</size:small>
+      <size:big>24</size:big>
+      <shadow>4,4</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="info" face="Arial">
+      <color>#ffffee</color>
+      <size>17</size>
+      <size:small>13</size:small>
+      <size:big>19</size:big>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="descinfo2" face="Arial">
+      <color>#ffffee</color>
+      <size>13</size>
+      <size:small>12</size:small>
+      <size:big>15</size:big>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="descinfo" face="Arial">
+      <shadow>2,2</shadow>
+      <color>#ffffff</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <size:big>18</size:big>
+    </font>
+
+    <font name="chaninfo" face="Arial">
+      <shadow>1,1</shadow>
+      <color>#ffffff</color>
+      <size>15</size>
+      <size:small>12</size:small>
+      <size:big>17</size:big>
+      <bold>yes</bold>
+    </font>
+
+    <font name="recstatus" face="Arial">
+      <color>#ffff33</color>
+      <size>15</size>
+      <size:small>12</size:small>
+      <size:big>17</size:big>
+      <shadow>2,2</shadow>
+    </font>
+
+    <font name="small" face="Arial">
+      <color>#ffff33</color>
+      <size>16</size>
+      <size:small>10</size:small>
+      <size:big>18</size:big>
+    </font>
+
+    <container name="background">
+      <image name="backup" draworder="0" fleximage="no">
+        <context>0</context>
+        <position>0,0</position>
+        <filename>gg-background.png</filename>
+      </image>
+    </container>
+
+    <container name="date_info">
+      <area>20,176,115,25</area>
+      <textarea name="date" draworder="4" align="center">
+         <font>info</font>
+         <area>0,0,115,25</area>
+         <cutdown>no</cutdown>
+      </textarea>
+    </container>
+
+    <container name="chanbar">
+      <area>20,206,123,386</area>
+      <bar name="chans" draworder="4">
+        <area>0,0,123,386</area>
+        <textoffset>38,0</textoffset>
+        <iconoffset>3,10</iconoffset>
+        <iconsize>30,30</iconsize>
+        <orientation>vertical</orientation>
+        <align>allcenter</align>
+        <font>chaninfo</font>
+        <imagefile>gg-chans.png</imagefile>
+      </bar>
+    </container>
+
+    <container name="timebar">
+      <area>142,175,640,31</area>
+      <bar name="times" draworder="4">
+        <area>0,0,640,31</area>
+        <align>allcenter</align>
+        <imagefile>gg-times.png</imagefile>
+        <font>descinfo</font>
+      </bar>
+    </container>
+
+    <container name="guide">
+      <area>143,206,645,386</area>
+      <guidegrid name="guidegrid" draworder="4">
+        <area>0,0,645,386</area>
+        <solidcolor>#003256</solidcolor>
+        <selector type="box" color="#ffff33"></selector>
+        <recordingcolor>#00aa00</recordingcolor>
+        <conflictingcolor>#ff6600</conflictingcolor>
+        <cutdown>no</cutdown>
+        <multiline>yes</multiline>
+        <textoffset>9,6</textoffset>
+        <catcolor category="Unknown" color="#222200"></catcolor>
+        <catcolor category="Shopping" color="#222200"></catcolor>
+        <catcolor category="Educational" color="CornflowerBlue"></catcolor>
+        <catcolor category="Adult" color="thistle3"></catcolor>
+        <catcolor category="Musical" color="turquoise3"></catcolor>
+        <catcolor category="News" color="DarkOrange3"></catcolor>
+        <catcolor category="Newsmagazine" color="DarkOrange3"></catcolor>
+        <catcolor category="Reality" color="sienna"></catcolor>
+        <catcolor category="Cooking" color="tan3"></catcolor>
+        <catcolor category="Documentary" color="goldenrod"></catcolor>
+        <catcolor category="Doc" color="goldenrod"></catcolor>
+        <catcolor category="Sports" color="DarkCyan"></catcolor>
+        <catcolor category="Sports event" color="DarkCyan"></catcolor>
+        <catcolor category="Sports non-event" color="DarkCyan"></catcolor>
+        <catcolor category="Sports talk" color="DarkCyan"></catcolor>
+        <catcolor category="Mystery" color="SlateGrey"></catcolor>
+        <catcolor category="Crime/Mystery" color="SlateGrey"></catcolor>
+        <catcolor category="Music" color="DarkRed"></catcolor>
+        <catcolor category="Music special" color="#aa0000"></catcolor>
+        <catcolor category="Movies" color="Blue"></catcolor>
+        <catcolor category="Drama" color="rosybrown3"></catcolor>
+        <catcolor category="Classic" color="grey62"></catcolor>
+        <catcolor category="Crime" color="MediumVioletRed"></catcolor>
+        <catcolor category="Crime drama" color="MediumVioletRed"></catcolor>
+        <catcolor category="Talk" color="MediumTurquoise"></catcolor>
+        <catcolor category="Western" color="#bbbb00"></catcolor>
+        <catcolor category="War" color="#dddd00"></catcolor>
+        <catcolor category="Comedy" color="#8800aa"></catcolor>
+        <catcolor category="Comedy-drama" color="#880099"></catcolor>
+        <catcolor category="Romance-comedy" color="#bb00aa"></catcolor>
+        <catcolor category="Sitcom" color="#880088"></catcolor>
+
+        <catcolor category="Special" color="#ee0000"></catcolor>
+        <catcolor category="Animals" color="#00ff44"></catcolor>
+        <catcolor category="Nature" color="#33ff99"></catcolor>
+        <catcolor category="Science/Nature" color="#33ff99"></catcolor>
+  
+        <catcolor category="SciFi" color="#DD6666"></catcolor>
+        <catcolor category="Sci-fi/Fantasy" color="#aa6666"></catcolor>
+        <catcolor category="Fantasy" color="#996666"></catcolor>
+        <catcolor category="Science fiction" color="#DD6666"></catcolor>
+        <catcolor category="Horror" color="firebrick3"></catcolor>
+
+        <catcolor category="Suspense" color="firebrick3"></catcolor>
+        <catcolor category="Action" color="maroon"></catcolor>
+        <catcolor category="Action/Adv" color="maroon"></catcolor>
+        <catcolor category="Adventure" color="maroon"></catcolor>
+        <catcolor category="Romance" color="#ff9999"></catcolor>
+
+        <catcolor category="Food/Travel" color="#aa00aa"></catcolor>
+        <catcolor category="Home/How-to" color="#00aa00"></catcolor>
+        <catcolor category="Home improvement" color="#00cc00"></catcolor>
+        <catcolor category="How-to" color="#00aa00"></catcolor>
+        <catcolor category="House/garden" color="#00ee00"></catcolor>
+        <catcolor category="Game" color="orchid"></catcolor>
+        <catcolor category="Children's" color="#3333ff"></catcolor>
+        <catcolor category="Children" color="#3333ff"></catcolor>
+        <catcolor category="Children-musical" color="#3333dd"></catcolor>
+        <catcolor category="Children-music" color="#3333dd"></catcolor>
+        <catcolor category="Kids" color="MediumSlateBlue"></catcolor>
+        <catcolor category="Anthology" color="DarkOrchid"></catcolor>
+        <catcolor category="CINE" color="Blue"></catcolor>
+        <catcolor category="SERIE" color="DarkOrchid"></catcolor>
+        <catcolor category="DOCUMENTAL" color="goldenrod"></catcolor>
+        <catcolor category="INFORMATIVO" color="DarkOrange3"></catcolor>
+        <catcolor category="DEPORTES" color="DarkCyan"></catcolor>
+        <catcolor category="FUTBOL" color="DarkCyan"></catcolor>
+        <catcolor category="MUSICAL" color="turquoise3"></catcolor>
+        <catcolor category="INFANTIL" color="MediumSlateBlue"></catcolor>
+        <catcolor category="MAGAZINE" color="MediumTurquoise"></catcolor>
+        <catcolor category="TIEMPO" color="#33ff99"></catcolor>
+        <catcolor category="SHOW" color="sienna"></catcolor>
+        <catcolor category="Animated" color="#3333aa"></catcolor>
+        <catcolor category="Game show" color="orchid"></catcolor>
+        <catcolor category="Docudrama" color="goldenrod"></catcolor>
+        <catcolor category="Self improvement" color="#00ffaa"></catcolor>
+        <catcolor category="Excercise" color="#00dd99"></catcolor>
+        <catcolor category="Bus./financial" color="DarkOrange3"></catcolor>
+
+
+                <!-- Categories introduced by tv_grab_au -->
+        <catcolor category="Childrens" color="MediumSlateBlue"></catcolor>
+        <catcolor category="Movie" color="Blue"></catcolor>
+        <catcolor category="Live" color="DarkOrange3"></catcolor>
+
+        <!-- categories used by the NextView EPG service -->
+        <!-- (available in some european countries) -->
+        <catcolor category="news" color="DarkOrange3"></catcolor>
+        <catcolor category="music/ballet/dance" color="DarkRed"></catcolor>
+        <catcolor category="sports" color="DarkCyan"></catcolor>
+        <catcolor category="series" color="DarkOrchid"></catcolor>
+        <catcolor category="social/political/economics" color="DarkOrange3"></catcolor>
+        <catcolor category="show/game show" color="MediumTurquoise"></catcolor>
+        <catcolor category="science" color="#33ff99"></catcolor>
+        <catcolor category="technology" color="#33ff99"></catcolor>
+        <catcolor category="kids" color="MediumSlateBlue"></catcolor>
+        <catcolor category="leisure hobbies" color="Red"></catcolor>
+        <catcolor category="tourism/travel" color="#aa00aa"></catcolor>
+        <catcolor category="arts/culture" color="goldenrod"></catcolor>
+        <catcolor category="movie" color="Blue"></catcolor>
+
+       <!-- Categories introduced by tv_grab_uk_rt -->
+        <catcolor category="Animation" color="MediumSlateBlue"></catcolor>
+        <catcolor category="Business" color="DarkOrange3"></catcolor>
+        <catcolor category="Children's Show" color="MediumSlateBlue"></catcolor>
+        <catcolor category="Consumer" color="goldenrod"></catcolor>
+        <catcolor category="Cookery" color="#aa00aa"></catcolor>
+        <catcolor category="Current Affairs" color="DarkOrange3"></catcolor>
+        <catcolor category="Drama Series" color="rosybrown3"></catcolor>
+        <catcolor category="Entertainment" color="DarkOrchid"></catcolor>
+        <catcolor category="Environment" color="#33ff99"></catcolor>
+        <catcolor category="Film" color="Blue"></catcolor>
+        <catcolor category="Game Show" color="orchid"></catcolor>
+        <catcolor category="Gardening" color="Red"></catcolor>
+        <catcolor category="Interests" color="Red"></catcolor>
+        <catcolor category="Music &amp; Arts" color="goldenrod"></catcolor>
+        <catcolor category="News &amp; Current Affairs" color="DarkOrange3"></catcolor>
+        <catcolor category="Religious" color="goldenrod"></catcolor>
+        <catcolor category="Sitcoms" color="DarkOrchid"></catcolor>
+        <catcolor category="Soaps" color="DarkOrchid"></catcolor>
+	<catcolor category="Soap" color="DarkOrchid"></catcolor>
+        <catcolor category="Sport" color="DarkCyan"></catcolor>
+        <catcolor category="Talk Show" color="MediumTurquoise"></catcolor>
+        <catcolor category="Transport" color="#33ff99"></catcolor>
+        <catcolor category="Travel" color="#aa00aa"></catcolor>
+
+        <!-- Categories introduced by tv_grab_jp -->
+        <catcolor category="ドラマ" color="rosybrown3"></catcolor>
+        <catcolor category="映画" color="Blue"></catcolor>
+        <catcolor category="スポーツ" color="DarkCyan"></catcolor>
+        <catcolor category="演劇・伝統芸" color="turquoise3"></catcolor>
+        <catcolor category="音楽" color="DarkRed"></catcolor>
+        <catcolor category="バラエティー" color="DarkOrchid"></catcolor>
+        <catcolor category="教養" color="CornflowerBlue"></catcolor>
+        <catcolor category="アニメ・キッズ" color="MediumSlateBlue"></catcolor>
+        <catcolor category="社会・報道" color="DarkOrange3"></catcolor>
+        <catcolor category="趣味・暮らし" color="goldenrod"></catcolor>
+
+        <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
+        <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png"></recordstatus>
+        <recordstatus type="ChannelRecord" image="gg-rs-channel.png"></recordstatus>
+        <recordstatus type="AllRecord" image="gg-rs-all.png"></recordstatus>
+        <recordstatus type="WeekslotRecord" image="gg-rs-weekslot.png"></recordstatus>
+        <recordstatus type="FindOneRecord" image="gg-rs-findone.png"></recordstatus>
+
+        <arrow direction="left" image="gg-arrow-left.png"></arrow>
+        <arrow direction="right" image="gg-arrow-right.png"></arrow>
+        <font>descinfo2</font>
+      </guidegrid>
+    </container>
+
+    <container name="current_info">
+      <area>665,12,120,25</area>
+      <textarea name="time" draworder="4" align="right">
+        <area>0,0,120,25</area>
+        <cutdown>no</cutdown>
+        <font>info</font>
+      </textarea>
+    </container>
+
+    <container name="program_info">
+      <area>20,10,765,151</area>
+      <textarea name="title" draworder="4" align="left">
+        <area>4,10,590,60</area>
+        <font>title</font>
+      </textarea>
+      <textarea name="subtitle" draworder="6">
+        <area>4,42,720,30</area>
+        <font>info</font>
+        <value>%SUBTITLE|"|"%</value>
+      </textarea>
+      <textarea name="description" draworder="6">
+        <area>4,69,780,65</area>
+        <font>descinfo</font>
+        <multiline>yes</multiline>
+	<value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
+      </textarea>
+      <textarea name="recordingstatus" draworder="6" align="right">
+        <area>375,122,390,30</area>
+        <font>recstatus</font>
+      </textarea>
+
+    </container>
+
+  </window>
+
+   <window name="programguide-video">
+
+    <font name="title" face="Arial">
+      <color>#DDDDff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>24</size>
+      <size:small>14</size:small>
+      <shadow>4,4</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="info" face="Arial">
+      <color>#ffffee</color>
+      <size>17</size>
+      <size:small>13</size:small>
+      <size:big>19</size:big>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="descinfo2" face="Arial">
+      <color>#ffffee</color>
+      <size>13</size>
+      <size:small>12</size:small>
+      <size:big>15</size:big>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="descinfo" face="Arial">
+      <shadow>2,2</shadow>
+      <color>#ffffff</color>
+      <size>16</size>
+      <size:small>9</size:small>
+      <size:big>18</size:big>
+    </font>
+
+    <font name="chaninfo" face="Arial">
+      <shadow>1,1</shadow>
+      <color>#ffffff</color>
+      <size>15</size>
+      <size:small>12</size:small>
+      <size:big>17</size:big>
+      <bold>yes</bold>
+    </font>
+
+    <font name="recstatus" face="Arial">
+      <color>#ffff33</color>
+      <size>17</size>
+      <size:small>12</size:small>
+      <size:big>19</size:big>
+      <shadow>2,2</shadow>
+
+    </font>
+
+    <font name="small" face="Arial">
+      <color>#ffff33</color>
+      <size>16</size>
+      <size:big>18</size:big>
+      <size:small>10</size:small>
+    </font>
+
+    <container name="background">
+      <image name="backup" draworder="0" fleximage="no">
+        <context>0</context>
+        <position>0,0</position>
+        <filename>gg-vid-background.png</filename>
+      </image>
+    </container>
+
+    <container name="current_video">
+      <area>546,21,236,176</area>
+    </container>
+
+    <container name="date_info">
+      <area>30,288,60,25</area>
+      <textarea name="date" draworder="4" align="right">
+         <font>info</font>
+         <area>0,0,60,25</area>
+         <cutdown>no</cutdown>
+      </textarea>
+    </container>
+
+    <container name="chanbar">
+      <area>20,318,123,266</area>
+      <bar name="chans" draworder="4">
+        <area>0,0,123,266</area>
+        <textoffset>38,0</textoffset>
+        <iconoffset>3,10</iconoffset>
+        <iconsize>30,30</iconsize>
+        <orientation>vertical</orientation>
+        <align>allcenter</align>
+        <font>chaninfo</font>
+        <imagefile>gg-chans.png</imagefile>
+      </bar>
+    </container>
+
+    <container name="timebar">
+      <area>142,288,640,31</area>
+      <bar name="times" draworder="4">
+        <area>0,0,640,31</area>
+        <align>allcenter</align>
+        <imagefile>gg-times.png</imagefile>
+        <font>descinfo</font>
+      </bar>
+    </container>
+
+    <container name="guide">
+      <area>143,319,645,266</area>
+      <guidegrid name="guidegrid" draworder="4">
+        <area>0,0,645,266</area>
+        <solidcolor>#003256</solidcolor>
+        <selector type="box" color="#ffff33"></selector>
+        <recordingcolor>#00aa00</recordingcolor>
+        <conflictingcolor>#ff6600</conflictingcolor>
+        <textoffset>9,6</textoffset>
+        <catcolor category="Unknown" color="#222200"></catcolor>
+        <catcolor category="Shopping" color="#222200"></catcolor>
+        <catcolor category="Educational" color="CornflowerBlue"></catcolor>
+        <catcolor category="Adult" color="thistle3"></catcolor>
+        <catcolor category="Musical" color="turquoise3"></catcolor>
+        <catcolor category="News" color="DarkOrange3"></catcolor>
+        <catcolor category="Newsmagazine" color="DarkOrange3"></catcolor>
+        <catcolor category="Reality" color="sienna"></catcolor>
+        <catcolor category="Cooking" color="tan3"></catcolor>
+        <catcolor category="Documentary" color="goldenrod"></catcolor>
+        <catcolor category="Doc" color="goldenrod"></catcolor>
+        <catcolor category="Sports" color="DarkCyan"></catcolor>
+        <catcolor category="Sports event" color="DarkCyan"></catcolor>
+        <catcolor category="Sports non-event" color="DarkCyan"></catcolor>
+        <catcolor category="Sports talk" color="DarkCyan"></catcolor>
+        <catcolor category="Mystery" color="SlateGrey"></catcolor>
+        <catcolor category="Crime/Mystery" color="SlateGrey"></catcolor>
+        <catcolor category="Music" color="DarkRed"></catcolor>
+        <catcolor category="Music special" color="#aa0000"></catcolor>
+        <catcolor category="Movies" color="Blue"></catcolor>
+        <catcolor category="Drama" color="rosybrown3"></catcolor>
+        <catcolor category="Classic" color="grey62"></catcolor>
+        <catcolor category="Crime" color="MediumVioletRed"></catcolor>
+        <catcolor category="Crime drama" color="MediumVioletRed"></catcolor>
+        <catcolor category="Talk" color="MediumTurquoise"></catcolor>
+        <catcolor category="Western" color="#bbbb00"></catcolor>
+        <catcolor category="War" color="#dddd00"></catcolor>
+        <catcolor category="Special" color="#ee0000"></catcolor>
+        <catcolor category="Comedy" color="#8800aa"></catcolor>
+        <catcolor category="Comedy-drama" color="#880099"></catcolor>
+        <catcolor category="Romance-comedy" color="#bb00aa"></catcolor>
+        <catcolor category="Sitcom" color="#880088"></catcolor>
+        <catcolor category="Animals" color="#00ff44"></catcolor>
+        <catcolor category="Nature" color="#33ff99"></catcolor>
+        <catcolor category="Science/Nature" color="#33ff99"></catcolor>
+        <catcolor category="SciFi" color="#DD00DD"></catcolor>
+        <catcolor category="Sci-fi/Fantasy" color="#DD00DD"></catcolor>
+        <catcolor category="Science fiction" color="#DD00DD"></catcolor>
+        <catcolor category="Horror" color="firebrick3"></catcolor>
+        <catcolor category="Suspense" color="firebrick3"></catcolor>
+        <catcolor category="Action" color="maroon"></catcolor>
+        <catcolor category="Action/Adv" color="maroon"></catcolor>
+        <catcolor category="Adventure" color="maroon"></catcolor>
+        <catcolor category="Romance" color="#ff9999"></catcolor>
+        <catcolor category="Food/Travel" color="#aa00aa"></catcolor>
+        <catcolor category="Home/How-to" color="#00aa00"></catcolor>
+        <catcolor category="Home improvement" color="#00cc00"></catcolor>
+        <catcolor category="How-to" color="#00aa00"></catcolor>
+        <catcolor category="House/garden" color="#00ee00"></catcolor>
+        <catcolor category="Game" color="orchid"></catcolor>
+        <catcolor category="Children's" color="#3333ff"></catcolor>
+        <catcolor category="Children" color="#3333ff"></catcolor>
+        <catcolor category="Children-musical" color="#3333dd"></catcolor>
+        <catcolor category="Children-music" color="#3333dd"></catcolor>
+        <catcolor category="Kids" color="MediumSlateBlue"></catcolor>
+        <catcolor category="CINE" color="Blue"></catcolor>
+        <catcolor category="SERIE" color="DarkOrchid"></catcolor>
+        <catcolor category="DOCUMENTAL" color="goldenrod"></catcolor>
+        <catcolor category="INFORMATIVO" color="DarkOrange3"></catcolor>
+        <catcolor category="DEPORTES" color="DarkCyan"></catcolor>
+        <catcolor category="FUTBOL" color="DarkCyan"></catcolor>
+        <catcolor category="MUSICAL" color="turquoise3"></catcolor>
+        <catcolor category="INFANTIL" color="MediumSlateBlue"></catcolor>
+        <catcolor category="MAGAZINE" color="MediumTurquoise"></catcolor>
+        <catcolor category="TIEMPO" color="#33ff99"></catcolor>
+        <catcolor category="SHOW" color="sienna"></catcolor>
+        <catcolor category="Animated" color="#3333aa"></catcolor>
+        <catcolor category="Game show" color="orchid"></catcolor>
+        <catcolor category="Docudrama" color="goldenrod"></catcolor>
+        <catcolor category="Self improvement" color="#00ffaa"></catcolor>
+        <catcolor category="Excercise" color="#00dd99"></catcolor>
+        <catcolor category="Bus./financial" color="DarkOrange3"></catcolor>
+        
+        <!-- categories used by the NextView EPG service -->
+        <!-- (available in some european countries) -->
+        <catcolor category="news" color="DarkOrange3"></catcolor>
+        <catcolor category="music/ballet/dance" color="DarkRed"></catcolor>
+        <catcolor category="sports" color="DarkCyan"></catcolor>
+        <catcolor category="series" color="DarkOrchid"></catcolor>
+        <catcolor category="social/political/economics" color="DarkOrange3"></catcolor>
+        <catcolor category="show/game show" color="MediumTurquoise"></catcolor>
+        <catcolor category="science" color="#33ff99"></catcolor>
+        <catcolor category="technology" color="#33ff99"></catcolor>
+        <catcolor category="kids" color="MediumSlateBlue"></catcolor>
+        <catcolor category="leisure hobbies" color="Red"></catcolor>
+        <catcolor category="tourism/travel" color="#aa00aa"></catcolor>
+        <catcolor category="arts/culture" color="goldenrod"></catcolor>
+        <catcolor category="movie" color="Blue"></catcolor>
+
+        <!-- Categories introduced by tv_grab_uk_rt -->
+        <catcolor category="Animation" color="MediumSlateBlue"></catcolor>
+        <catcolor category="Business" color="DarkOrange3"></catcolor>
+        <catcolor category="Children's Show" color="MediumSlateBlue"></catcolor>
+        <catcolor category="Consumer" color="goldenrod"></catcolor>
+        <catcolor category="Cookery" color="#aa00aa"></catcolor>
+        <catcolor category="Current Affairs" color="DarkOrange3"></catcolor>
+        <catcolor category="Drama Series" color="rosybrown3"></catcolor>
+        <catcolor category="Entertainment" color="DarkOrchid"></catcolor>
+        <catcolor category="Environment" color="#33ff99"></catcolor>
+        <catcolor category="Film" color="Blue"></catcolor>
+        <catcolor category="Game Show" color="orchid"></catcolor>
+        <catcolor category="Gardening" color="Red"></catcolor>
+        <catcolor category="Interests" color="Red"></catcolor>
+        <catcolor category="Music &amp; Arts" color="goldenrod"></catcolor>
+        <catcolor category="News &amp; Current Affairs" color="DarkOrange3"></catcolor>
+        <catcolor category="Religious" color="goldenrod"></catcolor>
+        <catcolor category="Sitcoms" color="DarkOrchid"></catcolor>
+        <catcolor category="Soaps" color="DarkOrchid"></catcolor>
+        <catcolor category="Soap" color="DarkOrchid"></catcolor>
+        <catcolor category="Sport" color="DarkCyan"></catcolor>
+        <catcolor category="Talk Show" color="MediumTurquoise"></catcolor>
+        <catcolor category="Transport" color="#33ff99"></catcolor>
+        <catcolor category="Travel" color="#aa00aa"></catcolor>
+
+        <!-- Categories introduced by tv_grab_jp -->
+        <catcolor category="ドラマ" color="rosybrown3"></catcolor>
+        <catcolor category="映画" color="Blue"></catcolor>
+        <catcolor category="スポーツ" color="DarkCyan"></catcolor>
+        <catcolor category="演劇・伝統芸" color="turquoise3"></catcolor>
+        <catcolor category="音楽" color="DarkRed"></catcolor>
+        <catcolor category="バラエティー" color="DarkOrchid"></catcolor>
+        <catcolor category="教養" color="CornflowerBlue"></catcolor>
+        <catcolor category="アニメ・キッズ" color="MediumSlateBlue"></catcolor>
+        <catcolor category="社会・報道" color="DarkOrange3"></catcolor>
+        <catcolor category="趣味・暮らし" color="goldenrod"></catcolor>
+
+        <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
+        <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png"></recordstatus>
+        <recordstatus type="ChannelRecord" image="gg-rs-channel.png"></recordstatus>
+        <recordstatus type="AllRecord" image="gg-rs-all.png"></recordstatus>
+        <recordstatus type="WeekslotRecord" image="gg-rs-weekslot.png"></recordstatus>
+        <recordstatus type="FindOneRecord" image="gg-rs-findone.png"></recordstatus>
+        <arrow direction="left" image="gg-arrow-left.png"></arrow>
+        <arrow direction="right" image="gg-arrow-right.png"></arrow>
+        <font>descinfo</font>
+      </guidegrid>
+    </container>
+
+    <container name="current_info">
+      <area>605,201,130,82</area>
+      <textarea name="time" draworder="4" align="left">
+        <area>10,0,130,32</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="channel" draworder="4" align="center">
+        <area>0,0,120,32</area>
+        <font>info</font>
+      </textarea>
+    </container>
+
+    <container name="program_info">
+      <area>20,3,504,275</area>
+      <textarea name="title" draworder="4" align="left">
+        <area>4,10,504,79</area>
+        <font>title</font>
+      </textarea>
+      <textarea name="subtitle" draworder="6">
+        <area>4,46,504,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="timedate" draworder="6">
+        <area>4,93,504,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="description" draworder="6">
+        <area>4,125,504,99</area>
+        <font>descinfo</font>
+        <multiline>yes</multiline>
+        <value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
+      </textarea>
+      <textarea name="recordingstatus" draworder="6">
+        <area>4,234,489,30</area>
+        <font>recstatus</font>
+      </textarea>
+    </container>
+
+  </window>
+
+  <window name="conflict">
+
+    <font name="active_font" face="Arial">
+      <color>#ffffff</color>
+      <size>15</size>
+      <size:small>11</size:small>
+      <size:big>17</size:big>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="inactive_font" face="Arial">
+      <color>#9999cc</color>
+      <size>15</size>
+      <size:small>11</size:small>
+      <size:big>17</size:big>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="record_font" face="Arial">
+      <color>#F7862B</color>
+      <size>15</size>
+      <size:small>11</size:small>
+      <size:big>17</size:big>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="norecordfnt" face="Arial">
+      <color>#9999cc</color>
+      <size>15</size>
+      <size:small>11</size:small>
+      <size:big>17</size:big>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="conflictfnt" face="Arial">
+      <color>#ffff33</color>
+      <size>15</size>
+      <size:small>11</size:small>
+      <size:big>17</size:big>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="currenttitle" face="Arial">
+      <color>#ffff33</color>
+      <size>18</size>
+      <size:small>12</size:small>
+      <size:big>20</size:big>
+      <bold>yes</bold>
+    </font>
+
+    <font name="title" face="Arial">
+      <color>#DDDDff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>24</size>
+      <size:small>14</size:small>
+      <shadow>4,4</shadow>
+      <bold>yes</bold>
+    </font>
+
+
+    <font name="subtitle" face="Arial">
+      <color>#ffffdd</color>
+      <size>17</size>
+      <size:small>15</size:small>
+      <size:big>19</size:big>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+
+    <font name="info" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <size:small>15</size:small>
+      <size:big>19</size:big>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="infob" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <size:small>15</size:small>
+      <size:big>19</size:big>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="infoyb" face="Arial">
+      <color>#ffff33</color>
+      <size>17</size>
+      <size:small>10</size:small>
+      <size:big>19</size:big>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="message" face="Arial">
+      <color>#ffffdd</color>
+      <size>16</size>
+      <size:small>10</size:small>
+      <size:big>18</size:big>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="messagegray" face="Arial">
+      <color>#999999</color>
+      <size>16</size>
+      <size:small>10</size:small>
+      <size:big>18</size:big>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="messageyellow" face="Arial">
+      <color>#ffff33</color>
+      <size>16</size>
+      <size:small>10</size:small>
+      <size:big>18</size:big>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <container name="background">
+      <image name="filler" draworder="0" fleximage="no">
+        <filename>cr-background.png</filename>
+        <position>0,0</position>
+      </image>
+
+      <image name="filler" draworder="0" fleximage="yes">
+        <filename>cr-background.png</filename>
+        <position>0,39</position>
+      </image>
+
+      <textarea name="showinstr" align="left" draworder="0">
+        <area>500,558,800,30</area>
+        <font>message</font>
+        <value>Show  (1) All  (2) Important</value>
+      </textarea>
+    </container>
+
+    <container name="conflict_info">
+      <area>400,10,380,30</area>
+      <textarea name="status" align="right" draworder="4">
+        <area>0,0,380,30</area>
+        <font>info</font>
+      </textarea>
+    </container>
+
+    <container name="showlevel_info">
+      <area>20,10,280,30</area>
+      <textarea name="showing" draworder="4">
+        <area>0,0,105,30</area>
+        <font>message</font>
+        <value>Showing:</value>
+      </textarea>
+      <textarea name="showlevel" draworder="4">
+        <area>110,0,110,30</area>
+        <font>message</font>
+      </textarea>
+    </container>
+
+    <container name="selector">
+      <area>0,39,800,290</area>
+      <listarea name="conflictlist" draworder="4">
+        <area>20,12,760,265</area>
+        <fcnfont name="conflictfnt" function="conflictingrecording"></fcnfont>
+        <fcnfont name="norecordfnt" function="disabledrecording"></fcnfont>
+        <fcnfont name="active_font" function="active"></fcnfont>
+        <fcnfont name="inactive_font" function="inactive"></fcnfont>
+        <fcnfont name="record_font" function="recording"></fcnfont>
+        <fcnfont name="active_font" function="selected"></fcnfont>
+        <columnpadding>10</columnpadding>
+        <column number="1" width="155" context="-1"></column>
+        <column number="2" width="147" context="-1"></column>
+        <column number="3" width="400" context="-1"></column>
+        <column number="4" width="30" context="-1"></column>
+        <items>8</items>
+        <image function="selectionbar" filename="tit-cr-selectbar.png" location="-14,-5"></image>
+        <image function="uparrow" filename="uparrow.png" location="755,22"></image>
+        <image function="downarrow" filename="downarrow.png" location="755,230"></image>
+      </listarea>
+      <image name="showinglines" draworder="5" fleximage="no">
+        <filename>cr-lines.png</filename>
+        <position>0,0</position>
+      </image>
+    </container>
+
+    <container name="program_info">
+      <area>0,340,800,210</area>
+      <textarea name="title" draworder="6">
+        <area>20,0,800,40</area>
+        <font>title</font>
+      </textarea>
+      <textarea name="subtitle" draworder="6">
+        <area>20,38,579,30</area>
+        <font>subtitle</font>
+      </textarea>
+      <textarea name="infotime" draworder="6" align="right">
+        <area>20,66,150,30</area>
+        <font>infob</font>
+        <value>Airdate:</value>
+      </textarea>
+      <textarea name="timedate" draworder="6">
+        <area>180,66,600,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="infochan" draworder="6" align="right">
+        <area>20,95,150,30</area>
+        <font>infob</font>
+        <value>Channel:</value>
+      </textarea>
+      <textarea name="channel" draworder="6">
+        <area>180,95,400,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="infodesc" draworder="6" align="right">
+        <area>20,125,150,30</area>
+        <font>infob</font>
+        <value>Description:</value>
+      </textarea>
+      <textarea name="description" draworder="6">
+        <area>180,125,600,90</area>
+        <font>info</font>
+        <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+    <container name="status_info">
+      <area>20,558,480,30</area>
+      <textarea name="recordingstatus" align="left" draworder="6">
+        <area>0,0,480,30</area>
+        <font>infoyb</font>
+      </textarea>
+    </container>
+ 
+
+   <container name="norecordings_list">
+      <textarea name="msg" align="center" draworder="8">
+         <area>0,110,800,70</area>
+         <font>info</font>
+         <value>You Haven't Scheduled Any Programs To Be Recorded</value>
+         <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+    <container name="norecordings_info">
+      <textarea name="topline" align="center" draworder="8">
+         <area>20,40,760,30</area>
+         <font>info</font>
+         <value>To schedule a recording, exit this screen and</value>
+      </textarea>
+      <textarea name="botline" align="center" draworder="8">
+         <area>20,70,760,30</area>
+         <font>info</font>
+         <value>Select 'Program Guide' or 'Program Finder'</value>
+      </textarea>
+    </container>
+
+  </window>
+
+  <window name="recprioritychannels">
+
+    <font name="active_font" face="Arial">
+      <color>#ffffff</color>
+      <size>15</size>
+      <size:small>13</size:small>
+      <size:big>17</size:big>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="inactive_font" face="Arial">
+      <color>#9999cc</color>
+      <size>15</size>
+      <size:small>13</size:small>
+      <size:big>17</size:big>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="currenttitle" face="Arial">
+      <color>#ffff33</color>
+      <size>18</size>
+      <size:small>16</size:small>
+      <size:big>20</size:big>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="title" face="Arial">
+      <color>#DDDDff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>24</size>
+      <size:small>22</size:small>
+      <shadow>4,4</shadow>
+      <bold>yes</bold>
+    </font>
+
+
+    <font name="info" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <size:small>15</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="message" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <size:small>14</size:small>
+      <size:big>18</size:big>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <container name="background">
+      <textarea name="sched" draworder="0">
+        <area>20,10,800,40</area>
+        <font>info</font>
+        <value>Channel Recording Priorities</value>
+      </textarea>
+      <image name="filler" draworder="0" fleximage="yes">
+        <filename>rk-background.png</filename>
+        <position>0,35</position>
+      </image>
+      <textarea name="keyinstr" align="center" draworder="0">
+        <area>0,570,800,30</area>
+        <font>message</font>
+        <value>(1) Sort by Channel    (2) Sort by Priority</value>
+      </textarea>
+    </container>
+
+    <container name="selector">
+     <area>0,39,800,375</area>
+      <listarea name="recprioritylist" draworder="4">
+        <area>20,12,760,330</area>
+        <fcnfont name="active_font" function="active"></fcnfont>
+        <fcnfont name="inactive_font" function="inactive"></fcnfont>
+        <fcnfont name="active_font" function="selected"></fcnfont>
+        <columnpadding>1</columnpadding>
+        <column number="1" width="75" context="-1"></column>
+        <column number="2" width="590" context="-1"></column>
+        <column number="3" width="17" context="-1"></column>
+        <column number="4" width="50" context="-1"></column>
+        <items>9</items>
+        <image function="selectionbar" filename="tit-trk-selectbar.png" location="-6,-2"></image>
+        <image function="uparrow" filename="uparrow.png" location="755,22"></image>
+        <image function="downarrow" filename="downarrow.png" location="755,290"></image>
+      </listarea>
+      <image name="showinglines" draworder="5" fleximage="no">
+        <filename>rk-lines.png</filename>
+        <position>0,0</position>
+      </image>
+    </container>
+
+    <container name="channel_info">
+      <area>0,414,800,240</area>
+      <image name="icon" draworder="6">
+        <position>20,0</position>
+               <filename>blankicon.jpg</filename>
+        <staticsize>60,60</staticsize>
+      </image>
+      <textarea name="title" draworder="6">
+        <area>120,12,800,40</area>
+        <font>title</font>
+      </textarea>
+      <textarea name="inforecpriority" draworder="6">
+        <area>20,90,160,30</area>
+        <font>info</font>
+        <value>Priority:</value>
+      </textarea>
+      <textarea name="recpriority" draworder="6">
+        <area>200,90,400,30</area>
+        <font>info</font>
+      </textarea>
+    </container>
+
+
+   <container name="norecordings_list">
+      <textarea name="msg" align="center" draworder="8">
+         <area>0,110,800,70</area>
+         <font>info</font>
+         <value>You Haven't Scheduled Any Programs To Be Recorded</value>
+         <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+    <container name="norecordings_info">
+      <textarea name="topline" align="center" draworder="8">
+         <area>20,40,760,30</area>
+         <font>info</font>
+         <value>To schedule a recording, exit this screen and</value>
+      </textarea>
+      <textarea name="botline" align="center" draworder="8">
+         <area>20,70,760,30</area>
+         <font>info</font>
+         <value>Select 'Program Guide' or 'Program Finder'</value>
+      </textarea>
+    </container>
+
+  </window>
+
+  <window name="recpriorityprograms">
+
+    <font name="active_font" face="Arial">
+      <color>#ffffff</color>
+      <size>15</size>
+      <size:small>13</size:small>
+      <size:big>17</size:big>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="inactive_font" face="Arial">
+      <color>#9999cc</color>
+      <size>15</size>
+      <size:small>13</size:small>
+      <size:big>17</size:big>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="currenttitle" face="Arial">
+      <color>#ffff33</color>
+      <size>15</size>
+      <size:small>13</size:small>
+      <size:big>17</size:big>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="title" face="Arial">
+      <color>#DDDDff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>24</size>
+      <size:small>20</size:small>
+      <size:big>24</size:big>
+      <shadow>4,4</shadow>
+      <bold>yes</bold>
+    </font>
+
+
+    <font name="subtitle" face="Arial">
+      <color>#ffffdd</color>
+      <size>17</size>
+      <size:small>15</size:small>
+      <size:big>19</size:big>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="info" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <size:small>10</size:small>
+      <size:big>19</size:big>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="tinyinfo" face="Arial">
+      <color>#cccccc</color>
+      <size>10</size>
+      <size:small>8</size:small>
+      <size:big>12</size:big>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="grayinfo" face="Arial">
+      <color>#cccccc</color>
+      <size>17</size>
+      <size:small>15</size:small>
+      <size:big>19</size:big>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="yellowinfo" face="Arial">
+      <color>#ffff33</color>
+      <size>17</size>
+      <size:small>15</size:small>
+      <size:big>19</size:big>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="message" face="Arial">
+      <color>#ffffDD</color>
+      <size>15</size>
+      <size:small>13</size:small>
+      <size:big>17</size:big>
+      <shadow>1,1</shadow>
+    </font>
+
+    <container name="background">
+      <image name="backgroundimg" draworder="0" fleximage="no">
+        <filename>rk-background.png</filename>
+        <position>0,0</position>
+      </image>
+
+      <textarea name="sched" draworder="0">
+        <area>20,10,800,40</area>
+        <font>info</font>
+        <value>Program Recording Priorities</value>
+      </textarea>
+      <textarea name="recprioritylabel" draworder="0">
+        <area>625,20,800,40</area>
+        <font>tinyinfo</font>
+        <value>Priority</value>
+      </textarea>
+      <textarea name="finalrecprioritylabel" draworder="0">
+        <area>690,20,800,40</area>
+        <font>tinyinfo</font>
+        <value>Final Priority</value>
+      </textarea>
+      <image name="filler" draworder="0" fleximage="yes">
+        <filename>rk-background.png</filename>
+        <position>0,35</position>
+      </image>
+      <textarea name="keyinstr" align="center" draworder="0">
+        <area>0,565,800,30</area>
+        <font>message</font>
+        <value>(1) Sort by Title    (2) Sort by Priority</value>
+      </textarea>
+    </container>
+
+    <container name="selector">
+      <area>0,39,800,375</area>
+      <listarea name="recprioritylist" draworder="4">
+        <area>20,12,760,330</area>
+        <fcnfont name="active_font" function="active"></fcnfont>
+        <fcnfont name="inactive_font" function="inactive"></fcnfont>
+        <fcnfont name="active_font" function="selected"></fcnfont>
+        <columnpadding>1</columnpadding>
+        <column number="1" width="615" context="-1"></column>
+        <column number="2" width="17" context="-1"></column>
+        <column number="3" width="56" context="-1"></column>
+        <column number="4" width="17" context="-1"></column>
+        <column number="5" width="50" context="-1"></column>
+        <items>11</items>
+        <image function="selectionbar" filename="tit-trk-selectbar.png" location="-6,-2"></image>
+        <image function="uparrow" filename="uparrow.png" location="755,22"></image>
+        <image function="downarrow" filename="downarrow.png" location="755,290"></image>
+      </listarea>
+      <image name="showinglines" draworder="5" fleximage="no">
+        <filename>rk-lines.png</filename>
+        <position>0,0</position>
+      </image>
+    </container>
+
+    <container name="program_info">
+      <area>0,410,800,240</area>
+      <textarea name="title" draworder="6">
+        <area>20,0,800,50</area>
+        <font>title</font>
+      </textarea>
+      <textarea name="subtitle" draworder="6">
+        <area>20,40,579,30</area>
+        <font>subtitle</font>
+      </textarea>
+      <textarea name="infotype" draworder="6">
+        <area>20,70,280,30</area>
+        <font>info</font>
+        <value>Record Type:</value>
+      </textarea>
+      <textarea name="type" draworder="6">
+        <area>180,70,430,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="typebracketA" draworder="6">
+        <area>620,70,100,30</area>
+        <font>grayinfo</font>
+        <value>[</value>
+      </textarea>
+      <textarea name="typesign" draworder="6">
+        <area>630,70,100,30</area>
+        <font>grayinfo</font>
+      </textarea>
+      <textarea name="typerecpriority" draworder="6">
+        <area>643,70,100,30</area>
+        <font>grayinfo</font>
+      </textarea>
+      <textarea name="typebracketB" draworder="6">
+        <area>668,70,100,30</area>
+        <font>grayinfo</font>
+        <value>]</value>
+      </textarea>
+      <textarea name="infochannel" draworder="6">
+        <area>20,100,160,30</area>
+        <font>info</font>
+        <value>Channel:</value>
+      </textarea>
+      <textarea name="channel" draworder="6">
+        <area>180,100,400,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="channelbracketA" draworder="6">
+        <area>620,100,100,30</area>
+        <font>grayinfo</font>
+        <value>[</value>
+      </textarea>
+      <textarea name="channelsign" draworder="6">
+        <area>630,100,100,30</area>
+        <font>grayinfo</font>
+      </textarea>
+      <textarea name="channelrecpriority" draworder="6">
+        <area>643,100,100,30</area>
+        <font>grayinfo</font>
+      </textarea>
+      <textarea name="channelbracketB" draworder="6">
+        <area>668,100,100,30</area>
+        <font>grayinfo</font>
+        <value>]</value>
+      </textarea>
+      <textarea name="inforecpriority" draworder="6">
+        <area>20,130,160,30</area>
+        <font>info</font>
+        <value>Priority:</value>
+      </textarea>
+      <textarea name="recpriority" draworder="6">
+        <area>180,130,400,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="recprioritybracketA" draworder="6">
+        <area>620,130,100,30</area>
+        <font>grayinfo</font>
+        <value>[</value>
+      </textarea>
+      <textarea name="recprioritysign" draworder="6">
+        <area>630,130,100,30</area>
+        <font>grayinfo</font>
+      </textarea>
+      <textarea name="recpriorityB" draworder="6">
+        <area>643,130,100,30</area>
+        <font>grayinfo</font>
+      </textarea>
+      <textarea name="recprioritybracketB" draworder="6">
+        <area>668,130,100,30</area>
+        <font>grayinfo</font>
+        <value>]  = </value>
+      </textarea>
+      <textarea name="finalrecpriority" draworder="6">
+        <area>709,130,150,30</area>
+        <font>yellowinfo</font>
+      </textarea>
+    </container>
+
+    <container name="norecordings_list">
+      <textarea name="msg" align="center" draworder="8">
+         <area>0,110,800,70</area>
+         <font>info</font>
+         <value>You Haven't Scheduled Any Programs To Be Recorded</value>
+         <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+    <container name="norecordings_info">
+      <textarea name="topline" align="center" draworder="8">
+         <area>20,40,760,30</area>
+         <font>info</font>
+         <value>To schedule a recording, exit this screen and</value>
+      </textarea>
+      <textarea name="botline" align="center" draworder="8">
+         <area>20,70,760,30</area>
+         <font>info</font>
+         <value>Select 'Program Guide' or 'Program Finder'</value>
+      </textarea>
+    </container>
+
+  </window>
+
+  <window name="playback">
+
+    <font name="active" face="Arial">
+      <color>#ffffff</color>
+      <size>15</size>
+      <size:big>20</size:big>
+      <size:small>13</size:small>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="inactive" face="Arial">
+      <color>#9999cc</color>
+      <size>15</size>
+      <size:big>20</size:big>
+      <size:small>13</size:small>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="record_font" face="Arial">
+      <color>#F7862B</color>
+      <size>15</size>
+      <size:big>20</size:big>
+      <size:small>13</size:small>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="overunderrecfont" face="Arial">
+      <color>#ffffAA</color>
+      <size>15</size>
+      <size:big>20</size:big>
+      <size:small>13</size:small>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="currenttitle" face="Arial">
+      <color>#ffff33</color>
+      <size>16</size>
+      <size:big>22</size:big>
+      <size:small>14</size:small>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="title" face="Arial">
+      <color>#DDDDff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>24</size>
+      <size:big>26</size:big>
+      <size:small>14</size:small>
+      <shadow>4,4</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="subtitle" face="Arial">
+      <color>#ffffee</color>
+      <size>17</size>
+      <size:big>20</size:big>
+      <size:small>13</size:small>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+
+
+    <font name="info" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <size:big>20</size:big>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+
+    </font>
+
+    <font name="message" face="Arial">
+      <color>#FFFFDD</color>
+      <size>17</size>
+      <size:big>20</size:big>
+      <size:small>12</size:small>
+      <shadow>2,2</shadow>
+    </font>
+
+    <container name="background">
+      <image name="filler" draworder="0" fleximage="yes">
+        <filename>pbb_back.png</filename>
+        <position>0,0</position>
+      </image>
+      <textarea name="messagedel" draworder="0" align="hcenter">
+        <area>20,10,760,35</area>
+        <font>message</font>
+        <value>Select a recording to permanently erase.</value>
+        <context>1</context>
+      </textarea>
+      <textarea name="messageplay" draworder="0" align ="hcenter">
+        <area>20,10,760,35</area>
+        <font>message</font>
+        <value>Select a recording to watch.</value>
+        <context>0</context>
+      </textarea>
+    </container>
+
+    <container name="selector">
+      <area>0,40,800,320</area>
+      <listarea name="toptitles" draworder="2">
+        <area>30,22,190,105</area>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="active" function="selected"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <items>3</items>
+      </listarea>
+      <image name="titlelines" draworder="3" fleximage="no">
+        <filename>trans-titles.png</filename>
+        <position>0,0</position>
+      </image>
+      <listarea name="bottomtitles" draworder="2">
+        <area>30,172,190,105</area>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="active" function="selected"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <items>3</items>
+      </listarea>
+      <listarea name="showing" draworder="4">
+        <area>240,18,600,265</area>
+        <fcnfont name="record_font" function="recording"></fcnfont>
+        <fcnfont name="overunderrecfont" function="overunderrecording"></fcnfont>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="active" function="selected"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <columnpadding>10</columnpadding>
+        <column number="1" width="350" context="-1"></column>
+        <column number="2" width="50" context="-1"></column>
+        <column number="3" width="110" context="0"></column>
+        <column number="4" width="110" context="1"></column>
+        <items>7</items>
+        <image function="selectionbar" filename="selrec-bar.png" location="-13,-2"></image>
+        <image function="uparrow" filename="uparrow.png" location="755,22"></image>
+        <image function="downarrow" filename="downarrow.png" location="755,230"></image>
+      </listarea>
+      <image name="showinglines" draworder="5" fleximage="yes">
+        <filename>showings.png</filename>
+        <position>0,0</position>
+      </image>
+      <textarea name="current" draworder="6">
+        <area>34,131,185,40</area>
+        <font>currenttitle</font>
+      </textarea>
+    </container>
+
+    <container name="group_info">
+      <context>0</context>
+      <area>0,360,799,240</area>
+
+      <image name="filler" draworder="0" fleximage="no">
+	<context>0</context>
+        <filename>pbb_bot.png</filename>
+        <position>2,2</position>
+      </image>
+
+      <textarea name="title" draworder="6">
+        <area>20,0,779,45</area>
+        <font>title</font>
+      </textarea>
+      <textarea name="description" draworder="6">
+        <area>25,50,600,120</area>
+        <altarea>25,50,600,120</altarea>
+        <font>info</font>
+        <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+    <container name="program_info_play">
+      <context>0</context>
+      <area>0,340,800,300</area>
+      <textarea name="title" draworder="6">
+        <area>20,5,580,40</area>
+        <altarea>20,5,580,40</altarea>
+        <font>title</font>
+      </textarea>
+
+      <textarea name="subtitle" draworder="6">
+        <area>20,47,600,40</area>
+        <font>subtitle</font>
+        <multiline>yes</multiline>
+      </textarea>
+
+      <textarea name="channel" draworder="6">
+        <area>20,74,160,30</area>
+        <font>info</font>
+      </textarea>
+
+      <textarea name="timedate" draworder="6">
+        <area>170,74,440,30</area>
+        <font>info</font>
+      </textarea>
+
+      <textarea name="description" draworder="6">
+        <area>20,140,765,125</area>
+        <altarea>20,140,765,125</altarea>
+        <font>info</font>
+	<multiline>yes</multiline>
+	<value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
+        </textarea>
+
+      <image name="commflagged" draworder="6">
+        <filename>type/commflagged.png</filename>
+        <position>84,106</position>
+      </image>
+      <image name="autoexpire" draworder="6">
+        <filename>type/autoexpire.png</filename>
+        <position>52,106</position>
+      </image>
+      <image name="bookmark" draworder="6">
+        <filename>type/bookmark.png</filename>
+        <position>116,106</position>
+      </image>
+      <image name="cutlist" draworder="6">
+        <filename>type/cutlist.png</filename>
+        <position>148,106</position>
+      </image>
+
+      <image name="processing" draworder="6">
+        <filename>type/processing.png</filename>
+        <position>20,106</position>
+      </image>
+
+    </container>
+
+    <container name="program_info_del">
+      <context>1</context>
+      <area>0,340,800,300</area>
+      <textarea name="title" draworder="6">
+        <area>20,5,580,40</area>
+        <altarea>20,5,580,40</altarea>
+        <font>title</font>
+      </textarea>
+
+      <textarea name="subtitle" draworder="6">
+        <area>20,47,600,40</area>
+        <font>subtitle</font>
+        <multiline>yes</multiline>
+      </textarea>
+
+      <textarea name="channel" draworder="6">
+        <area>20,74,160,30</area>
+        <font>info</font>
+      </textarea>
+
+      <textarea name="timedate" draworder="6">
+        <area>170,74,440,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="description" draworder="6">
+        <area>20,125,765,125</area>
+        <altarea>20,125,765,125</altarea>
+        <font>info</font>
+	<multiline>yes</multiline>
+	<value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
+      </textarea>
+
+    </container>
+
+    <container name="video">
+      <area>620,350,160,120</area>
+    </container>
+
+    <!-- Confirm delete and legend help popup -->
+    <popup name="confirmdelete">
+      <foreground>#ffffff</foreground>
+      <highlight>#ffffff</highlight>
+    </popup>
+
+    <container name="usage">
+      <context>1</context>
+      <area>0,530,800,50</area>
+      <statusbar name="usedbar" draworder="5">
+        <container fleximage="yes">container.png</container>
+	<fill>delrec-filler.png</fill>
+        <position>20,0</position>
+      </statusbar>
+      <textarea name="freereport" draworder="6">
+        <area>430,3,370,30</area>
+        <font>info</font>
+      </textarea>
+    </container>
+
+    <container name="norecordings_list">
+      <textarea name="msg" align="center" draworder="8">
+         <area>200,140,600,30</area>
+         <font>info</font>
+         <value>Sorry, No Recordings Available</value>
+      </textarea>
+    </container>
+
+    <container name="norecordings_info">
+      <textarea name="topline" align="center" draworder="8">
+         <area>20,80,580,30</area>
+         <font>info</font>
+         <value>To schedule a recording, exit this screen and</value>
+      </textarea>
+      <textarea name="botline" align="center" draworder="8">
+         <area>20,110,580,30</area>
+         <font>info</font>
+         <value>Select 'Schedule a Recording' from the Main Menu</value>
+      </textarea>
+    </container>
+
+  </window>
+
+  <window name="programfind">
+
+    <font name="active" face="Arial">
+      <color>#ffffff</color>
+      <size>15</size>
+      <size:small>11</size:small>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="inactive" face="Arial">
+      <color>#9999cc</color>
+      <size>15</size>
+      <size:small>11</size:small>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="record_font" face="Arial">
+      <color>#F7862B</color>
+      <size>15</size>
+      <size:small>11</size:small>
+      <shadow>1,1</shadow>
+    </font>
+    <font name="titleinfo" face="Arial">
+      <color>#bbbbff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>24</size>
+      <size:small>12</size:small>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="subtitle" face="Arial">
+      <color>#ffffee</color>
+      <size>17</size>
+      <size:small>13</size:small>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+
+
+    <font name="info" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="infos" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <size:small>10</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="timedate" face="Arial">
+      <color>#ffffff</color>
+      <size>14</size>
+      <size:small>10</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="descinfo" face="Arial">
+      <shadow>2,2</shadow>
+      <color>#ffffff</color>
+      <size>16</size>
+      <size:small>9</size:small>
+    </font>
+
+
+
+    <font name="info_y" face="Arial">
+      <color>#ffff33</color>
+      <size>17</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="recinfo" face="Arial">
+      <color>#ffff33</color>
+      <size>17</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="channel" face="Arial">
+      <color>#ffff33</color>
+      <size>17</size>
+      <size:small>14</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <container name="background">
+     <image name="filler" draworder="0" fleximage="no">
+        <filename>pf-top.png</filename>
+        <position>26,28</position>
+      </image>
+ 
+      <image name="lineback" draworder="0" fleximage="no">
+        <filename>pf-background.png</filename>
+        <position>25,265</position>
+      </image>
+      <textarea name="prgrambar" align="center">
+        <area>0,570,800,30</area>
+        <font>info</font>
+        <value>(4) Program Guide   **(6) Program Finder **</value>
+        <context>1</context>
+      </textarea>
+    </container>
+
+    <container name="selector">
+      <area>25,260,770,310</area>
+      <listarea name="alphabet" draworder="2">
+        <area>23,8,65,295</area>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="active" function="selected"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <items>9</items>
+        <image function="selectionbar" filename="tit-pf-sel1.png" location="-14,-7"></image>
+      </listarea>
+      <listarea name="shows" draworder="2">
+        <area>88,8,380,295</area>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="active" function="selected"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <column number="1" width="380" context="-1"></column>
+        <items>9</items>
+        <image function="selectionbar" filename="tit-pf-sel2.png" location="-14,-7"></image>
+      </listarea>
+      <listarea name="times" draworder="2">
+        <area>470,8,280,295</area>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="active" function="selected"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <fcnfont name="record_font" function="recording"></fcnfont>
+        <items>9</items>
+        <image function="selectionbar" filename="tit-pf-sel3.png" location="-8,-7"></image>
+      </listarea>
+      <image name="lines" draworder="5" fleximage="no">
+        <filename>pf-lines.png</filename>
+        <position>0,0</position>
+      </image>
+    </container>
+
+    <container name="program_info">
+      <area>25,25,750,220</area>
+      <textarea name="title" draworder="6">
+        <area>13,5,515,45</area>
+        <font>titleinfo</font>
+      </textarea>
+      <textarea name="subtitle" draworder="6">
+        <area>13,48,700,35</area>
+        <font>subtitle</font>
+      </textarea>
+      <textarea name="timedate" draworder="6" align="right">
+        <area>300,155,440,27</area>
+       <font>timedate</font>
+      </textarea>
+      <textarea name="channelnum" draworder="6" align="right">
+        <area>540,183,70,40</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="channelname" draworder="6" align="left">
+        <area>620,183,230,40</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="description" draworder="6">
+        <area>13,75,730,90</area>
+        <font>descinfo</font>
+        <multiline>yes</multiline>
+      </textarea>
+      <textarea name="recordingstatus" draworder="6">
+        <area>13,183,500,35</area>
+        <font>recinfo</font>
+      </textarea>
+    </container>
+
+    <container name="help_info_1">
+      <area>25,25,750,220</area>
+      <textarea name="selectinfo" draworder="6">
+        <area>10,5,500,30</area>
+        <font>info</font>
+        <value>Select a letter...</value>
+      </textarea>
+      <textarea name="pickinfo" draworder="6">
+        <area>10,75,720,120</area>
+        <font>info</font>
+        <value>Pick the letter in which the show starts with, then press SELECT or the right arrow</value>
+        <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+    <container name="help_info_2">
+      <area>25,25,750,220</area>
+      <textarea name="selectprog" draworder="6">
+        <area>10,5,500,30</area>
+        <font>info</font>
+        <value>Select a program...</value>
+      </textarea>
+      <textarea name="pickprog" draworder="6">
+        <area>10,75,720,120</area>
+        <font>info</font>
+        <value>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</value>
+        <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+    <container name="noprograms">
+      <area>25,25,750,220</area>
+      <textarea name="noprog" draworder="6">
+        <area>10,5,500,30</area>
+        <font>info</font>
+        <value>No Programs</value>
+      </textarea>
+      <textarea name="research" draworder="6">
+        <area>10,75,500,120</area>
+        <font>info</font>
+        <value>There are no available programs under this search. Please select another search.</value>
+        <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+  </window>
+
+  <window name="programlist">
+
+    <font name="active_font" face="Arial">
+      <color>#ffffff</color>
+      <size>15</size>
+      <size:small>11</size:small>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="inactive_font" face="Arial">
+      <color>#9999cc</color>
+      <size>15</size>
+      <size:small>11</size:small>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="record_font" face="Arial">
+      <color>#F7862B</color>
+      <size>15</size>
+      <size:small>11</size:small>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="conflict_font" face="Arial">
+      <color>#ffff33</color>
+      <size>15</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="title" face="Arial">
+      <color>#DDDDff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>24</size>
+      <size:small>14</size:small>
+      <shadow>4,4</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="subtitle" face="Arial">
+      <color>#ffffee</color>
+      <size>17</size>
+      <size:small>13</size:small>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="info" face="Arial">
+      <color>#ffffff</color>
+      <size>15</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="yellowinfo" face="Arial">
+      <color>#ffff33</color>
+      <size>15</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="message" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <container name="background">
+      <image name="backgroundimg" draworder="0" fleximage="no">
+        <filename>rk-background.png</filename>
+        <position>0,0</position>
+      </image>
+ 
+       <textarea name="sched" draworder="0">
+        <area>20,10,800,40</area>
+        <font>info</font>
+        <value>Program Listings</value>
+      </textarea>
+   
+    </container>
+
+    <container name="view">
+      <area>300,10,480,30</area>
+      <textarea name="curview" draworder="4" align="right">
+        <area>0,0,480,30</area>
+        <font>info</font>
+      </textarea>
+    </container>
+
+    <container name="selector">
+      <area>0,39,800,375</area>
+      <listarea name="proglist" draworder="4">
+        <area>20,12,760,330</area>
+        <fcnfont name="active_font" function="active"></fcnfont>
+        <fcnfont name="inactive_font" function="inactive"></fcnfont>
+        <fcnfont name="active_font" function="selected"></fcnfont>
+        <fcnfont name="record_font" function="recording"></fcnfont>
+        <fcnfont name="conflict_font" function="conflicting"></fcnfont>
+        <columnpadding>5</columnpadding>
+        <column number="1" width="155" context="-1"></column>
+        <column number="2" width="142" context="-1"></column>
+        <column number="3" width="420" context="-1"></column>
+        <items>11</items>
+        <image function="selectionbar" filename="tit-trk-selectbar.png" location="-6,-2"></image>
+        <image function="uparrow" filename="uparrow.png" location="755,22"></image>
+        <image function="downarrow" filename="downarrow.png" location="755,290"></image>
+      </listarea>
+      <image name="showinglines" draworder="5" fleximage="no">
+        <filename>rk-lines.png</filename>
+        <position>0,0</position>
+      </image>
+    </container>
+
+    <container name="program_info">
+      <area>0,410,800,280</area>
+      <textarea name="title" draworder="6">
+        <area>20,0,780,50</area>
+        <font>title</font>
+      </textarea>
+
+      <textarea name="subtitle" draworder="6">
+        <area>20,40,780,50</area>
+        <font>subtitle</font>
+      </textarea>
+
+      <textarea name="channel" draworder="6" align="right">
+        <area>390,0,390,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="timedate" draworder="6" align="right">
+        <area>390,150,390,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="description" draworder="6">
+        <area>20,70,760,100</area>
+        <font>info</font>
+	<multiline>yes</multiline>
+	<value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
+      </textarea>
+      <textarea name="type" draworder="6">
+        <area>20,150,430,30</area>
+        <font>yellowinfo</font>
+      </textarea>
+    </container>
+
+    <container name="noprograms_list">
+      <textarea name="msg" align="center" draworder="8">
+         <area>0,110,800,70</area>
+         <font>info</font>
+         <value>No listings found for this program. </value>
+         <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+  </window>
+
+
+  <window name="recording_options">
+
+    <font name="active_font" face="Arial">
+      <color>#ffffff</color>
+      <size:big>18</size:big>
+      <size>15</size>
+      <size:small>11</size:small>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="enabled_state_0_font" face="Arial">
+      <color>#ffffff</color>
+      <size:big>22</size:big>
+      <size>17</size>
+      <size:small>11</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="infob" face="Arial">
+      <color>#ffffff</color>
+      <size:big>17</size:big>
+      <size>15</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+
+    <font name="inactive_font" face="Arial">
+      <color>#9999cc</color>
+      <size:big>18</size:big>
+      <size>15</size>
+      <size:small>11</size:small>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="currenttitle" face="Arial">
+      <color>#ffff33</color>
+      <size>15</size>
+      <size:small>12</size:small>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="title" face="Arial">
+      <color>#DDDDff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>24</size>
+      <size:small>14</size:small>
+      <shadow>4,4</shadow>
+      <bold>yes</bold>
+    </font>
+
+
+    <font name="subtitle" face="Arial">
+      <color>#ffffdd</color>
+      <size>17</size>
+      <size:small>12</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="info" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+    </font>
+
+    <font name="tinyinfo" face="Arial">
+      <color>#cccccc</color>
+      <size>10</size>
+      <size:small>8</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="grayinfo" face="Arial">
+      <color>#cccccc</color>
+      <size>17</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="yellowinfo" face="Arial">
+      <color>#ffff33</color>
+      <size>17</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="message" face="Arial">
+      <color>#ffffDD</color>
+      <size>15</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+    </font>
+
+    <container name="background">
+      <image name="backgroundimg" draworder="0" fleximage="no">
+        <filename>ro-background.png</filename>
+        <position>0,0</position>
+      </image>
+    </container>
+
+    <container name="selector">
+      <area>0,300,800,300</area>
+      <listarea name="menu_list" draworder="4">
+        <area>20,10,760,274</area>
+        <fcnfont name="active_font" function="active"></fcnfont>
+        <fcnfont name="inactive_font" function="inactive"></fcnfont>
+	<fcnfont name="inactive_font" function="disabled"></fcnfont>
+        <fcnfont name="active_font" function="selected"></fcnfont>
+	<fcnfont name="enabled_state_0_font" function="enabled_state_0"></fcnfont>
+        <columnpadding>1</columnpadding>
+        <column number="1" width="745" context="-1"></column>
+        <items>8</items>
+        <image function="selectionbar" filename="tit-trk-selectbar.png" location="-6,-2"></image>
+        <image function="uparrow" filename="uparrow.png" location="755,15"></image>
+        <image function="downarrow" filename="downarrow.png" location="755,235"></image>
+      </listarea>
+      <image name="showinglines" draworder="5" fleximage="no">
+        <filename>ro-lines.png</filename>
+        <position>0,0</position>
+      </image>
+    </container>
+
+    <container name="program_info">
+      <area>0,20,800,210</area>
+      <textarea name="title" draworder="6">
+        <area>20,0,800,40</area>
+        <font>title</font>
+      </textarea>
+      <textarea name="subtitle" draworder="6">
+        <area>20,38,579,30</area>
+        <font>subtitle</font>
+      </textarea>
+      <textarea name="infotime" draworder="6" align="right">
+        <area>20,66,150,30</area>
+        <font>infob</font>
+        <value>Airdate:</value>
+      </textarea>
+      <textarea name="timedate" draworder="6">
+        <area>180,66,600,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="infochan" draworder="6" align="right">
+        <area>20,95,150,30</area>
+        <font>infob</font>
+        <value>Channel:</value>
+      </textarea>
+      <textarea name="longchannel" draworder="6">
+        <area>180,95,400,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="infodesc" draworder="6" align="right">
+        <area>20,125,150,30</area>
+        <font>infob</font>
+        <value>Description:</value>
+      </textarea>
+      <textarea name="description" draworder="6">
+        <area>180,125,600,120</area>
+        <font>info</font>
+        <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+
+  </window>
+
+
+
+
+</mythuitheme>
