@@ -175,4 +175,9 @@
     <offset>14,22</offset>
   </buttondef>
 
+  <buttondef name="WEBPAGE">
+    <image>webpage.png</image>
+    <offset>55,30</offset>
+  </buttondef>
+
 </myththeme>

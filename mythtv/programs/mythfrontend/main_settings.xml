@@ -136,6 +136,13 @@
    </button>
 
    <button>
+     <type>WEBPAGE</type>
+     <text>Web Settings</text>
+     <action>CONFIGPLUGIN mythbookmarkmanager</action>
+     <depends>mythbookmarkmanager</depends>
+   </button>
+
+   <button>
      <type>SETUP</type>
      <text>Xbox</text>
      <text lang="PT">Configurar XBox</text>

@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythcontext.h"
 
-const QString currentDatabaseVersion = "1008";
+const QString currentDatabaseVersion = "1009";
 
 void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -246,8 +246,8 @@ void UpgradeTVDatabaseSchema(void)
 ");",
 "CREATE TABLE IF NOT EXISTS dvb_sat ("
 "   satid   SMALLINT NOT NULL AUTO_INCREMENT,"
-"   lnbid   SMALLINT NULL,"
-"   cardnum SMALLINT NULL,"
+"   lnbid   SMALLINT NOT NULL,"
+"   cardnum SMALLINT NOT NULL,"
 "   PRIMARY KEY (cardnum,satid,lnbid)"
 ");",
 "CREATE TABLE IF NOT EXISTS dvb_lnb ("
@@ -269,6 +269,20 @@ void UpgradeTVDatabaseSchema(void)
 ""
 };
         performActualUpdate(updates, "1008", dbver);
+    }
+
+    if (dbver == "1008")
+    {
+        const QString updates[] = {
+"CREATE TABLE IF NOT EXISTS dvb_sat ("
+"   satid   SMALLINT NOT NULL AUTO_INCREMENT,"
+"   lnbid   SMALLINT NOT NULL,"
+"   cardnum SMALLINT NOT NULL,"
+"   PRIMARY KEY (cardnum,satid,lnbid)"
+");",
+""
+};
+        performActualUpdate(updates, "1009", dbver);
     }
 }
 

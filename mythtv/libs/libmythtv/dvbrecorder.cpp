@@ -282,8 +282,9 @@ void DVBRecorder::StartRecording()
 
         if (paused)
         {
-            if (ioctl(fd_dvr, DMX_STOP) < 0)
-                ERRNO("Pausing DVB filters failed.");
+            for (int i=0; i<fd_demux.size(); i++)
+                if (ioctl(fd_demux[i], DMX_STOP) < 0)
+                    ERRNO(QString("Pausing DVB filter #%1 failed.").arg(i));
             receiving = false;
             mainpaused = true;
             emit Paused();
@@ -294,18 +295,13 @@ void DVBRecorder::StartRecording()
         }
         else if (was_paused)
         {
-            if (ioctl(fd_dvr, DMX_START) < 0)
-            {
-                was_paused = false;
-                mainpaused = false;
-                emit Unpaused();
-            }
-            else
-            {
-                ERRNO("Unpausing DVB filters failed.");
-                usleep(50);
-                continue;
-            }
+            for (int i=0; i<fd_demux.size(); i++)
+                if (ioctl(fd_demux[i], DMX_START) < 0)
+                    ERRNO(QString("Unpausing DVB filter #%1 failed.").arg(i));
+
+            was_paused = false;
+            mainpaused = false;
+            emit Unpaused();
         }
 
         ret = poll(&polls, 1, 1000);
