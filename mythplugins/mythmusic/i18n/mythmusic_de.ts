@@ -47,11 +47,11 @@
     </message>
     <message>
         <source>All My Music ~ Loading Music Data </source>
-        <translation type="unfinished"></translation>
+        <translation>Meine Musik ~ Lade Musikdaten</translation>
     </message>
     <message>
         <source>Loading Music Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Lade Musikdaten</translation>
     </message>
 </context>
 <context>
@@ -154,15 +154,15 @@
     </message>
     <message>
         <source>kbps</source>
-        <translation type="unfinished"></translation>
+        <translation>kbps</translation>
     </message>
     <message>
         <source>kHz</source>
-        <translation type="unfinished"></translation>
+        <translation>kHz</translation>
     </message>
     <message>
         <source>ch</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal</translation>
     </message>
 </context>
 <context>
@@ -181,43 +181,43 @@
     </message>
     <message>
         <source>Various Artists</source>
-        <translation type="unfinished"></translation>
+        <translation>Versch. Künstler</translation>
     </message>
     <message>
         <source>Ogg Vorbis Audio</source>
-        <translation type="unfinished"></translation>
+        <translation>Ogg Vorbis Audio</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Unbekannt</translation>
     </message>
     <message>
         <source>FLAC Audio</source>
-        <translation type="unfinished"></translation>
+        <translation>FLAC Audio</translation>
     </message>
     <message>
         <source>Directory to hold music</source>
-        <translation type="unfinished"></translation>
+        <translation>Verzeichnis für Musikdateien</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythMusic needs to have write permission to the directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dieses Verzeichnis muß existieren und MythMusic Schreibrechte dafür besitzen.</translation>
     </message>
     <message>
         <source>Audio device</source>
-        <translation type="unfinished"></translation>
+        <translation>Audio Gerät</translation>
     </message>
     <message>
         <source>Audio Device used for playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>Audio Gerät für die Wiedergabe.</translation>
     </message>
     <message>
         <source>CD device</source>
-        <translation type="unfinished"></translation>
+        <translation>CD Laufwerk</translation>
     </message>
     <message>
         <source>CDRom device used for ripping/playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>CD Laufwerk für Ripping/Abspielen.</translation>
     </message>
     <message>
         <source>Tree Sorting</source>
@@ -229,31 +229,31 @@
     </message>
     <message>
         <source>Script Path</source>
-        <translation type="unfinished"></translation>
+        <translation>Skriptpfad</translation>
     </message>
     <message>
         <source>If present this script will be executed after a CD Rip is completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dieses Skript wird, falls vorhanden, nach einem CD Rip ausgeführt.</translation>
     </message>
     <message>
         <source>Filename Format</source>
-        <translation type="unfinished"></translation>
+        <translation>Maske für Dateinamen</translation>
     </message>
     <message>
         <source>Directory and filename Format used to grab information if no ID3 information is found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Verzeichnis-/Dateinamenformat um Informationen auszulesen falls keine ID3 Marken vorhanden sind.</translation>
     </message>
     <message>
         <source>Ignore ID3 Tags</source>
-        <translation type="unfinished"></translation>
+        <translation>ID3 Marken ignorieren</translation>
     </message>
     <message>
         <source>If set, MythMusic will skip checking ID3 tags in files and just try to determine Genre, Artist, Album, and Track number and title from the filename.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt werden ID3 Marken ignoriert und Genre,Künstler, Album und Titel aus dem Dateinamen bestimmt.</translation>
     </message>
     <message>
         <source>Automatically lookup CDs</source>
-        <translation type="unfinished"></translation>
+        <translation>CDs autom. nachschlagen</translation>
     </message>
     <message>
         <source>Automatically lookup an audio CD if it is present and show its information in the Music Selection Tree.</source>
@@ -265,51 +265,51 @@
     </message>
     <message>
         <source>If this is not set, you will need to use arrow keys to select and activate various functions.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls nicht gesetzt, müssen für verschiedene Funktionen die Pfeiltasten verwendet werden.</translation>
     </message>
     <message>
         <source>Encoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Kodierung</translation>
     </message>
     <message>
         <source>Ogg Vorbis</source>
-        <translation type="unfinished"></translation>
+        <translation>Ogg Vorbis</translation>
     </message>
     <message>
         <source>Lame (MP3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Lame (MP3)</translation>
     </message>
     <message>
         <source>Audio encoder to use for CD ripping. Note that the quality level &apos;Perfect&apos; will use the FLAC encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Audio Kodierer für CD Ripping.</translation>
     </message>
     <message>
         <source>File storage location</source>
-        <translation type="unfinished"></translation>
+        <translation>Verzeichnis für Dateien</translation>
     </message>
     <message>
         <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / and -. &apos;-&apos; will be replaced by the Token separator</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestimmt das Verzeichnis/Name für neue Lieder. Möglich ist: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / und -. &apos;-&apos; wird durch den Feldtrenner ersetzt</translation>
     </message>
     <message>
         <source>Token separator</source>
-        <translation type="unfinished"></translation>
+        <translation>Feldtrenner</translation>
     </message>
     <message>
         <source> - </source>
-        <translation type="unfinished"></translation>
+        <translation> - </translation>
     </message>
     <message>
         <source>Filename tokens will be separated by this string.</source>
-        <translation type="unfinished"></translation>
+        <translation>Felder werden durch diesen Text getrennt.</translation>
     </message>
     <message>
         <source>Replace &apos; &apos; with &apos;_&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Ersetze &apos; &apos; mit &apos;_&apos;</translation>
     </message>
     <message>
         <source>If set, whitespace characters in filenames will be replaced with underscore characters.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, werden Leerzeichen in Dateinamen durch den Unterstrich ersetzt.</translation>
     </message>
     <message>
         <source>Paranoia Level</source>
@@ -317,11 +317,11 @@
     </message>
     <message>
         <source>Full</source>
-        <translation type="unfinished"></translation>
+        <translation>Genauer</translation>
     </message>
     <message>
         <source>Faster</source>
-        <translation type="unfinished"></translation>
+        <translation>Schneller</translation>
     </message>
     <message>
         <source>Paranoia level of the CD ripper. Set to faster if you&apos;re not concerned about possible errors in the audio.</source>
@@ -329,11 +329,11 @@
     </message>
     <message>
         <source>Automatically eject CDs after ripping</source>
-        <translation type="unfinished"></translation>
+        <translation>CDs nach dem Rippen auswerfen</translation>
     </message>
     <message>
         <source>If set, the CD tray will automatically open after the CD has been ripped.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, wird die CD Schublade nach dem CD rippen geöffnet.</translation>
     </message>
     <message>
         <source>Rating Weight</source>
@@ -369,23 +369,23 @@
     </message>
     <message>
         <source>Show Song Ratings</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewertungen anzeigen</translation>
     </message>
     <message>
         <source>Show song ratings on the playback screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewertungen bei der Wiedergabe anzeigen.</translation>
     </message>
     <message>
         <source>List as Shuffled</source>
-        <translation type="unfinished"></translation>
+        <translation>Anzeige 1:1 sortieren</translation>
     </message>
     <message>
         <source>List songs on the playback screen in the order they will be played.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bei der Wiedergabe die Lieder in der Reihenfolge des Abspielens anzeigen.</translation>
     </message>
     <message>
         <source>Show entire music tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Musikverzeichnis vollständig anzeigen</translation>
     </message>
     <message>
         <source>If selected, you can navigate your entire music tree from the playing screen.</source>
@@ -393,19 +393,19 @@
     </message>
     <message>
         <source>Play mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Spielmodus</translation>
     </message>
     <message>
         <source>Normal</source>
-        <translation type="unfinished"></translation>
+        <translation>Normal</translation>
     </message>
     <message>
         <source>Random</source>
-        <translation type="unfinished"></translation>
+        <translation>Random</translation>
     </message>
     <message>
         <source>Intelligent</source>
-        <translation type="unfinished"></translation>
+        <translation>Intelligent</translation>
     </message>
     <message>
         <source>Starting shuffle mode for the player.  Can be either normal, random, or intelligent (random).</source>
@@ -413,19 +413,19 @@
     </message>
     <message>
         <source>Delay before Visualizations start (seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Verzögerung vor Visualisierung (in Sekunden)</translation>
     </message>
     <message>
         <source>If set to 0, visualizations will never automatically start.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bei 0 wird keine Visualisierung gestartet.</translation>
     </message>
     <message>
         <source>Change Visualizer on each song</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualisierung für jedes Lied ändern</translation>
     </message>
     <message>
         <source>Change the visualizer when the song change.</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualisierung bei einem Liedwechsel ändern.</translation>
     </message>
     <message>
         <source>Width for Visual Scaling</source>
@@ -433,7 +433,7 @@
     </message>
     <message>
         <source>If set to &quot;2&quot;, visualizations will be scaled in half.  Currently only used by the goom visualization.  Reduces CPU load on slower machines.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ein Faktor 2 halbiert die Visualisierung. Wird momentan nur vom Goom Visualisierer genutzt. Reduziert die CPU Last.</translation>
     </message>
     <message>
         <source>Height for Visual Scaling</source>
@@ -441,11 +441,11 @@
     </message>
     <message>
         <source>Visualizations</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualisierungen</translation>
     </message>
     <message>
         <source>List of visualizations to use during playback. Possible values are space-separated list of </source>
-        <translation type="unfinished"></translation>
+        <translation>Liste der Visualisierungen für die Wiedergabe, durch Leerzeichen getrennt </translation>
     </message>
     <message>
         <source>MonoScope</source>
@@ -477,149 +477,151 @@
     </message>
     <message>
         <source>Default Rip Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard Rip Qualität</translation>
     </message>
     <message>
         <source>Low</source>
-        <translation type="unfinished">Niedrig</translation>
+        <translation>Niedrig</translation>
     </message>
     <message>
         <source>Medium</source>
-        <translation type="unfinished">Mittel</translation>
+        <translation>Mittel</translation>
     </message>
     <message>
         <source>High</source>
-        <translation type="unfinished">Hoch</translation>
+        <translation>Hoch</translation>
     </message>
     <message>
         <source>Perfect</source>
-        <translation type="unfinished">Perfekt</translation>
+        <translation>Perfekt</translation>
     </message>
     <message>
         <source>Default quality for new CD rips.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Standard Qualität für neue CD Rips. Bei der Einstellung &apos;Perfekt&apos; wird der FLAC Kodierer verwendet.</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Allgemeines</translation>
     </message>
     <message>
         <source>Playback Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiedergabeoptionen</translation>
     </message>
     <message>
         <source>Visualization Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualisierungsoptionen</translation>
     </message>
     <message>
         <source>CD Ripper Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>CD Ripper Einstellungen</translation>
     </message>
     <message>
         <source>MPEG Layer 1/2/3 Audio (MAD decoder)</source>
-        <translation type="unfinished"></translation>
+        <translation>MPEG Layer 1/2/3 Audio (MAD Dekoder)</translation>
     </message>
     <message>
         <source>music database</source>
-        <translation type="unfinished"></translation>
+        <translation>Musikdatenbank</translation>
     </message>
     <message>
         <source>cd ripper</source>
-        <translation type="unfinished"></translation>
+        <translation>CD Ripper</translation>
     </message>
     <message>
         <source>
 
 You have no MythMusic tables in your database.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;br&gt;
+&lt;br&gt;
+MythMusic Tabellen fehlen in der Datenbank.</translation>
     </message>
     <message>
         <source>OK, I&apos;ll read the documentation</source>
-        <translation type="unfinished"></translation>
+        <translation>Gut, ich werde die Dokumentation lesen</translation>
     </message>
     <message>
         <source>Unknown Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Unbekannter Künstler</translation>
     </message>
     <message>
         <source>Unknown Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Unbekanntes Album</translation>
     </message>
     <message>
         <source>Unknown Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Unbekanntes Genre</translation>
     </message>
     <message>
         <source>CD -- none</source>
-        <translation type="unfinished"></translation>
+        <translation>CD -- Leer</translation>
     </message>
     <message>
         <source>All My Music</source>
-        <translation type="unfinished">Meine Musik</translation>
+        <translation>Meine Musik</translation>
     </message>
     <message>
         <source>%1 - %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 - %2</translation>
     </message>
     <message>
         <source>title</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel</translation>
     </message>
     <message>
         <source>Missing database entry: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehlender Datenbankeintrag: %1</translation>
     </message>
     <message>
         <source> ~ </source>
-        <translation type="unfinished"></translation>
+        <translation>~</translation>
     </message>
     <message>
         <source>Ooops</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoppla</translation>
     </message>
     <message>
         <source>%1 ~ %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 ~ %2</translation>
     </message>
     <message>
         <source>Not Initialized</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicht Initialisiert</translation>
     </message>
     <message>
         <source>oops</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoppla</translation>
     </message>
     <message>
         <source>,%1</source>
-        <translation type="unfinished"></translation>
+        <translation>,%1</translation>
     </message>
     <message>
         <source>All My Playlists</source>
-        <translation type="unfinished">Alle meine Spiellisten</translation>
+        <translation>Alle Spiellisten</translation>
     </message>
     <message>
         <source>Active Play Queue</source>
-        <translation type="unfinished">Aktuelle Spielliste</translation>
+        <translation>Aktuelle Spielliste</translation>
     </message>
     <message>
         <source>Active Play Queue (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktuelle Spielliste (%1)</translation>
     </message>
     <message>
         <source>Something is Wrong</source>
-        <translation type="unfinished"></translation>
+        <translation>Etwas stimmt nicht</translation>
     </message>
     <message>
         <source>Visualization requires FFT library</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualisierung erfordert die FFT Bibliothek</translation>
     </message>
     <message>
         <source>Did you run configure?</source>
-        <translation type="unfinished"></translation>
+        <translation>Haben Sie configure ausgeführt?</translation>
     </message>
     <message>
         <source>and</source>
-        <translation type="unfinished"></translation>
+        <translation>und</translation>
     </message>
 </context>
 <context>
@@ -668,11 +670,11 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>Genre: </source>
-        <translation type="unfinished"></translation>
+        <translation>Genre:</translation>
     </message>
     <message>
         <source>Ripping...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kodiere...</translation>
     </message>
 </context>
 </TS>
