@@ -742,7 +742,7 @@ AudioMetadata* aacDecoder::getMetadata()
     if( (track_num = getAACTrack(mp4_ifile)) < 0)
     {
         warning("could not find aac track to calculate metadata length");
-        mp4ff_close(mp4_input_file);
+        mp4ff_close(mp4_ifile);
         free(mp4_callback);
         fclose(input);
         return NULL;
@@ -761,7 +761,7 @@ AudioMetadata* aacDecoder::getMetadata()
     if(!buffer)
     {
         warning("could not get decoder config to calculate metadata length");
-        mp4ff_close(mp4_input_file);
+        mp4ff_close(mp4_ifile);
         free(mp4_callback);
         fclose(input);
         return NULL;
@@ -772,7 +772,7 @@ AudioMetadata* aacDecoder::getMetadata()
     if (AudioSpecificConfig(buffer, buffer_size, &mp4ASC) < 0)
     {
         warning("could not get audio specifics to calculate metadata length");
-        mp4ff_close(mp4_input_file);
+        mp4ff_close(mp4_ifile);
         free(mp4_callback);
         fclose(input);
         return NULL;
