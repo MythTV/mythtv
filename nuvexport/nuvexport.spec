@@ -4,7 +4,7 @@
 
 Name:       nuvexport
 Version:    0.2
-Release:    cvs20041214
+Release:    cvs20041226
 License:    GPL
 Summary:    mythtv nuv video file conversion script
 URL:        http://forevermore.net/nuvexport/
@@ -16,6 +16,7 @@ BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:  noarch
 
 # Standard nuvexport modules:
+Requires:  perl >= 5.6
 Requires:  transcode >= 0.6.12
 Requires:  ffmpeg >= 0.4.9
 Requires:  mjpegtools >= 1.6.2

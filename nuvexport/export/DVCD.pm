@@ -61,7 +61,7 @@ package export::DVCD;
     # Add the temporary files that will need to be deleted
         push @tmpfiles, $self->get_outfile($episode, ".$$.m1v"), $self->get_outfile($episode, ".$$.mpa");
     # Execute the parent method
-        $self->SUPER::export($episode);
+        $self->SUPER::export($episode, ".$$");
     # Multiplex the streams
         my $command = "nice -n $Args{'nice'} tcmplex -m v"
                       .' -i '.shell_escape($self->get_outfile($episode, ".$$.m1v"))
