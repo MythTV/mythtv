@@ -9,9 +9,12 @@
 #
 # Author: Tim Harvey (tharvey AT alumni.calpoly DOT edu)
 # Modified: Andrei Rjeousski
+# v1.1
 # - Added amazon.com covers and improved handling for imdb posters
-#
-
+# v1.2
+#     - when searching amazon, try searching for main movie name and if nothing is found, search for informal name
+#     - better handling for amazon posters, see if movie title is a substring in the search results returned by amazon
+#     - fixed redirects for some movies on impawards
 
 use LWP::Simple;      # libwww-perl providing simple HTML get actions
 use HTML::Entities;
@@ -23,7 +26,7 @@ use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M $opt_P);
 use Getopt::Std; 
 
 $title = "IMDB Query"; 
-$version = "v1.1";
+$version = "v1.2";
 $author = "Tim Harvey, Andrei Rjeousski";
 
 # display usage
@@ -257,7 +260,8 @@ sub getMoviePoster {
 	if ($uri ne "") {
 		if (defined $opt_d) { printf("# processing redirect to %s\n",$uri); }
 		# this was redirect
-		$impres = get $site . $uri;
+                $impsite = $site . $uri;
+                $impres = get $impsite;
 	}
 
       
@@ -287,8 +291,9 @@ sub getMoviePoster {
    # now we couldnt even find lowres poster from IMDB, lets try looking for dvd
    # cover on amazon.com   
 
-   my $movie_title;
+   my @movie_titles;
    my $found_low_res = 0;
+   my $k = 0;
    
    # no poster found, take lowres image from imdb
    if ($uri eq "") {
@@ -298,8 +303,21 @@ sub getMoviePoster {
 
        $uri = parseBetween($response, "alt=\"cover\" src=\"http://ia.imdb.com/media/imdb/", "\"");
        
-       # get the title
-       $movie_title = parseBetween($response, "<title>", "<\/title>");
+      if (defined $opt_d) { print "# starting to look for movie title\n"; }
+      
+      # get main title
+      if (defined $opt_d) { print "# Getting possible movie titles:\n"; }
+      $movie_titles[$k++] = parseBetween($response, "<title>", "<\/title>");
+      if (defined $opt_d) { print "# Title: ".$movie_titles[$k-1]."\n"; }
+
+      # now we get all other possible movie titles and store them in the titles array
+      while($response =~ m/>([^>^\(]*)([ ]{0,1}\([^\)]*\)[^\(^\)]*[ ]{0,1}){0,1}\(informal title\)/g) {
+         $movie_titles[$k++] = $1;
+         chomp($movie_titles[$k-1]);
+         $movie_titles[$k-1] =~ s/^\s+//;
+         $movie_titles[$k-1] =~ s/\s+$//;
+         if (defined $opt_d) { print "# Title: ".$movie_titles[$k-1]."\n"; }
+      }
        
        if ($uri ne "" ) {
            $uri = "http://ia.imdb.com/media/imdb/".$uri;
@@ -313,37 +331,65 @@ sub getMoviePoster {
    # cover on amazon.com
    if ($uri eq "" or $found_low_res) {
       if (defined $opt_d) { print "# starting to look for poster on Amazon.com\n"; }
-      if (defined $opt_d) { print "# starting to look for movie title\n"; }
+
+      my $titleid = 0;
+      my $found = 0;
+      my $ama_uri = "";
+      my $xml_parser = XML::Simple->new();
       
          
-      # get rid of the year
-      $movie_title =~ /(.*) \([^\)]+\)/i;
-      if ($1) { $movie_title = $1; }
-      $movie_title =~ /(.*), The$/i;
-      if ($1) { $movie_title = $1; }
+      do {
+         # get rid of the year
+         $movie_titles[$titleid] =~ s/ ?\([^\)]+\) ?//g;
+         $movie_titles[$titleid] =~ /(.*), The$/i;
+         if ($1) { $movie_titles[$titleid] = $1; }
 
-      $movie_title =~ s/\"//g; # if we give amazon quotes they give them back
+         $movie_titles[$titleid] =~ s/[\"\']//g; # if we give amazon quotes they give them back
       
-      if (defined $opt_d) { print "# Movie title is: $movie_title\n"; }
-      
-      # request XML info from amazon
-      my $xml_uri = "http://xml.amazon.com/onca/xml3?t=000&dev-t=000&KeywordSearch=".$movie_title."&mode=dvd&type=lite&page=1&f=xml";
-      
-      $response = get $xml_uri;
-      if (defined $opt_r) { printf("%s", $response); }
-      
-      my $xml_parser = XML::Simple->new();
-      my $xml_doc = $xml_parser->XMLin($response);
-      my $ama_uri = "";
+         if (defined $opt_d) { print "# Searching for: $movie_titles[$titleid]\n"; }
 
-      if (ref($xml_doc->{Details}) eq 'ARRAY') {
-         $ama_uri = $xml_doc->{Details}->[0]->{ImageUrlLarge};
-      } else {
-         $ama_uri = $xml_doc->{Details}->{ImageUrlLarge};
-      }
+         # Encode the movie title to be save
+         my $safe_movie_title = $movie_titles[$titleid];
+         $safe_movie_title =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;      
+         # request XML info from amazon
+         my $xml_uri = "http://xml.amazon.com/onca/xml3?t=000&dev-t=000&KeywordSearch=".$safe_movie_title."&mode=dvd&type=lite&page=1&f=xml";
+         if (defined $opt_d) { print "# Amazon request string is: $xml_uri\n";}
+
+         # get the response
+         $response = get $xml_uri;
+         if (defined $opt_r) { printf("%s", $response); }
+      
+         # parse the response
+         my $xml_doc = $xml_parser->XMLin($response);
+
+         # if we only got one result, fake it as array
+         if (ref($xml_doc->{Details}) ne 'ARRAY') {
+            my @tmpArray = ($xml_doc->{Details});
+            $xml_doc->{Details} = \@tmpArray;
+         }
+
+         $k = 0;
+         do {
+            if (ref($xml_doc->{Details}->[$k]) eq 'HASH') {
+               my $tmp_movie_title = $xml_doc->{Details}->[$k]->{ProductName};
+               $tmp_movie_title =~ s/[\"\']//g;
+               if (defined $opt_d) { print "# Amazon: comparing (" . $tmp_movie_title . ") to (" . $movie_titles[$titleid] . ")\n"; }
+               if ($tmp_movie_title =~ /.*$movie_titles[$titleid].*/) {
+                  if (defined $opt_d) { print "# Amazon: found poster " . $xml_doc->{Details}->[$k]->{ImageUrlLarge} . "\n"; }
+                  $ama_uri = $xml_doc->{Details}->[$k]->{ImageUrlLarge};
+                  $found = 1;
+               }
+            }
+
+           $k++;
+        } until ($found || $k == 5);
+        #only search through first 5 matches
+
+         $titleid++;
+      } until ($found || $titleid > $#movie_titles);
       
       my $image = get $ama_uri if (defined($ama_uri) && $ama_uri ne "");
-      if (defined($ama_uri) && length($image) eq "807") {
+      if ($ama_uri ne "" && length($image) eq "807") {
          if (defined $opt_d) { printf("# this image is blank\n"); }
          $ama_uri = "";
       }
