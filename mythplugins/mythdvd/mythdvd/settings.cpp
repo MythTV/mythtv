@@ -68,14 +68,12 @@ GeneralSettings::GeneralSettings()
 */
 
 
-class PlayerCommand: public ComboBoxSetting, public GlobalSetting {
+class PlayerCommand: public LineEditSetting, public GlobalSetting {
 public:
     PlayerCommand():
-        ComboBoxSetting(true), GlobalSetting("DVDPlayerCommand") {
+        GlobalSetting("DVDPlayerCommand") {
         setLabel(QObject::tr("DVD Player Command"));
-        addSelection("mplayer dvd:// -dvd-device %d -fs -zoom -vo xv");
-        addSelection("xine -pfhq --auto-scan dvd");
-        addSelection("ogle");
+        setValue("mplayer dvd:// -dvd-device %d -fs -zoom -vo xv");
         setHelpText(QObject::tr("This can be any command to launch a DVD player "
                     "(e.g. MPlayer, ogle, etc.). If present, %d will "
                     "be substituted for the DVD device (e.g. /dev/dvd)."));
