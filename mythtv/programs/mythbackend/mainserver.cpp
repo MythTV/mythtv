@@ -328,7 +328,15 @@ void MainServer::customEvent(QCustomEvent *e)
                                                                      tokens[1],
                                                                      startts);
             dblock.unlock();
-            DoHandleDeleteRecording(pinfo, NULL);
+            if (pinfo)
+            {
+                DoHandleDeleteRecording(pinfo, NULL);
+            }
+            else
+            {
+                cerr << "Cannot find program info for '" << me->Message()
+                     << "', while attempting to Auto-Expire." << endl;
+            }
 
             return;
         }
