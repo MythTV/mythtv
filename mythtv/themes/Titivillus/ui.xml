@@ -904,7 +904,7 @@
         <column number="5" width="17" context="-1"></column>
         <column number="6" width="50" context="-1"></column>
         <items>9</items>
-        <image function="selectionbar" filename="rec_priority/tit-trk-selectbar.png" location="-6,-2"></image>
+        <image function="selectionbar" filename="conflict/tit-cr-selectbar.png" location="-15,-5"></image>
         <image function="uparrow" filename="shared/up_arrow.png" location="750,12"></image>
         <image function="downarrow" filename="shared/down_arrow.png" location="750,255"></image>
       </listarea>
@@ -1101,7 +1101,7 @@
         <column number="4" width="110" context="1"></column>
 
         <items>7</items>
-        <image function="selectionbar" filename="shared/long_bar.png" location="-20,-2"></image>
+        <image function="selectionbar" filename="shared/long_bar.png" location="-20,-7"></image>
         <image function="uparrow" draworder="6" filename="shared/up_arrow.png" location="750,15"></image>
         <image function="downarrow" draworder="6" filename="shared/down_arrow.png" location="750,258"></image>
       </listarea>
@@ -1297,7 +1297,7 @@
         <fcnfont name="list-selected" function="selected"></fcnfont>
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
         <items>9</items>
-        <image function="selectionbar" filename="progfind/progfind_sel1.png" location="-14,0"></image>
+        <image function="selectionbar" filename="progfind/progfind_sel1.png" location="-14,-5"></image>
       </listarea>
       <listarea name="shows" draworder="2">
         <area>88,8,380,295</area>
@@ -1306,7 +1306,7 @@
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
         <column number="1" width="380" context="-1"></column>
         <items>9</items>
-        <image function="selectionbar" filename="progfind/progfind_sel2.png" location="-14,0"></image>
+        <image function="selectionbar" filename="progfind/progfind_sel2.png" location="-14,-5"></image>
       </listarea>
       <listarea name="times" draworder="2">
         <area>470,8,280,295</area>
@@ -1315,11 +1315,11 @@
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
         <fcnfont name="list-record" function="recording"></fcnfont>
         <items>9</items>
-        <image function="selectionbar" filename="progfind/progfind_sel3.png" location="-8,0"></image>
+        <image function="selectionbar" filename="progfind/progfind_sel3.png" location="-8,-5"></image>
       </listarea>
       <image name="lines" draworder="5" fleximage="no">
         <filename>progfind/progfind_lines.png</filename>
-        <position>0,10</position>
+        <position>0,5</position>
       </image>
     </container>
 
@@ -1549,11 +1549,11 @@
         <columnpadding>1</columnpadding>
         <column number="1" width="745" context="-1"></column>
         <items>8</items>
-        <image function="selectionbar" filename="rec_priority/tit-trk-selectbar.png" location="-6,-2"></image>
+        <image function="selectionbar" filename="conflict/tit-cr-selectbar.png" location="-10,-5"></image>
         <image function="uparrow" filename="shared/up_arrow.png" location="755,15"></image>
         <image function="downarrow" filename="shared/down_arrow.png" location="755,235"></image>
-        <image function="rightarrow" filename="shared/right_arrow.png" location="-30,5"></image>
-        <image function="leftarrow" filename="shared/left_arrow.png" location="-5,5"></image>
+        <image function="rightarrow" filename="shared/right_arrow.png" location="-30,3"></image>
+        <image function="leftarrow" filename="shared/left_arrow.png" location="-5,3"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="no">
         <filename>rec_opts/ro-lines.png</filename>
