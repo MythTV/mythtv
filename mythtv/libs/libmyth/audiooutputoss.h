@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <qstring.h>
+#include <qmutex.h>
 
 #include "audiooutput.h"
 
@@ -90,6 +91,8 @@ private:
 
     int numbadioctls;
     int numlowbuffer;
+
+    QMutex killAudioLock;
 };
 
 #endif

@@ -172,6 +172,8 @@ void AudioOutputOSS::Reconfigure(int laudio_bits, int laudio_channels,
 
 void AudioOutputOSS::KillAudio()
 {
+    killAudioLock.lock();
+
     //printf("Killing AudioOutputDSP\n");
     if (output_audio)
     {
@@ -182,6 +184,8 @@ void AudioOutputOSS::KillAudio()
 
     if (audiofd != -1)
         close(audiofd);
+
+    killAudioLock.unlock();
 }
 
 bool AudioOutputOSS::GetPause(void)
