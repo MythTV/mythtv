@@ -258,6 +258,46 @@ public:
     };
 };
 
+class AtariBinary: public LineEditSetting, public GlobalSetting {
+public:
+    AtariBinary():
+        GlobalSetting("AtariBinary") {
+        setLabel(QObject::tr("Atari binary location"));
+        setValue("/usr/bin/stella.sdl");
+        setHelpText(QObject::tr("Location of the Atari emulator binary."));
+    };
+};
+
+class AtariRomPath: public LineEditSetting, public GlobalSetting {
+public:
+    AtariRomPath():
+        GlobalSetting("AtariRomLocation") {
+        setLabel(QObject::tr("Atari ROM location"));
+        setValue("/usr/lib/games/atari/roms");
+        setHelpText(QObject::tr("Location of the Atari games."));
+    };
+};
+
+class Odyssey2Binary: public LineEditSetting, public GlobalSetting {
+public:
+    Odyssey2Binary():
+        GlobalSetting("Odyssey2Binary") {
+        setLabel(QObject::tr("Odyssey2 binary location"));
+        setValue("/usr/bin/o2em");
+        setHelpText(QObject::tr("Location of the Odyssey2 emulator binary."));
+    };
+};
+
+class Odyssey2RomPath: public LineEditSetting, public GlobalSetting {
+public:
+    Odyssey2RomPath():
+        GlobalSetting("Odyssey2RomLocation") {
+        setLabel(QObject::tr("Odyssey2 ROM location"));
+        setValue("/usr/lib/games/odyssey2/roms");
+        setHelpText(QObject::tr("Location of the Odyssey2 games."));
+    };
+};
+
 class PCList: public LineEditSetting, public GlobalSetting {
 public:
     PCList():
@@ -326,6 +366,18 @@ MythGameSettings::MythGameSettings()
     snes->addChild(new SnesRomPath());
     snes->addChild(new SnesScreensLocation());
     addChild(snes);
+
+    VerticalConfigurationGroup *atari = new VerticalConfigurationGroup(false);
+    atari->setLabel(QObject::tr("MythGame Settings -- Atari Emulation"));
+    atari->addChild(new AtariBinary());
+    atari->addChild(new AtariRomPath());
+    addChild(atari);
+
+    VerticalConfigurationGroup *odyssey2 = new VerticalConfigurationGroup(false);
+    odyssey2->setLabel(QObject::tr("MythGame Settings -- Odyssey2 Emulation"));
+    odyssey2->addChild(new Odyssey2Binary());
+    odyssey2->addChild(new Odyssey2RomPath());
+    addChild(odyssey2);
 
     VerticalConfigurationGroup *pc = new VerticalConfigurationGroup(false);
     pc->setLabel(QObject::tr("MythGame Settings -- PC games"));

@@ -2,6 +2,8 @@
 #include "mamehandler.h"
 #include "neshandler.h"
 #include "sneshandler.h"
+#include "atarihandler.h"
+#include "odyssey2handler.h"
 #include "pchandler.h"
 
 #include <qobject.h>
@@ -31,6 +33,10 @@ static void checkHandlers(void)
             GameHandler::registerHandler(NesHandler::getHandler());
         if (gContext->GetSetting("SnesBinary") != "")
             GameHandler::registerHandler(SnesHandler::getHandler());
+	if (gContext->GetSetting("AtariBinary") != "")
+            GameHandler::registerHandler(AtariHandler::getHandler());
+	if (gContext->GetSetting("Odyssey2Binary") != "")
+            GameHandler::registerHandler(Odyssey2Handler::getHandler());
         if (gContext->GetSetting("PCGameList") != "")
             GameHandler::registerHandler(PCHandler::getHandler());
     }
