@@ -413,8 +413,8 @@ void CommDetect::BuildMasterCommList(void)
 void CommDetect::BuildBlankFrameCommList(void)
 {
     long long bframes[blankFrameMap.count()*2];
-    long long c_start[512];
-    long long c_end[512];
+    long long c_start[blankFrameMap.count()];
+    long long c_end[blankFrameMap.count()];
     int frames = 0;
     int commercials = 0;
     int i, x;

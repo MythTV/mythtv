@@ -30,6 +30,7 @@ int force = 0;
 
 bool show_percentage = true;
 bool full_speed = true;
+bool be_nice = true;
 
 double fps = 29.97; 
 
@@ -298,6 +299,10 @@ int main(int argc, char *argv[])
         {
             force = 1;
         }
+        else if (!strcmp(a.argv()[argpos], "--hogcpu"))
+        {
+            be_nice = false;
+        }
         else if (!strcmp(a.argv()[argpos], "--help"))
         {
             cout << "usage:\n";
@@ -333,6 +338,10 @@ int main(int argc, char *argv[])
             cout << "--force\n";
             cout << "   Force flagging of a video even if mythcommflag\n";
             cout << "   thinks it is already in use by another instance.\n";
+            cout << "\n";
+            cout << "--hogcpu\n";
+            cout << "   Do not nice the flagging process.\n";
+            cout << "   WARNING: This will consume all free cpu time.\n";
             cout << "\n";
             cout << "--help\n";
             cout << "   This text\n";
@@ -371,7 +380,8 @@ int main(int argc, char *argv[])
     }
 
     // be nice to other programs since FlagCommercials() can consume 100% cpu
-    nice(19);
+    if (be_nice)
+        nice(19);
 
     time_now = time(NULL);
     if (!quiet)

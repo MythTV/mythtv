@@ -1295,7 +1295,20 @@ void PlaybackBox::doRemove(ProgramInfo *rec)
 
         if (inTitle == false)
         {
-            cursorDown(false);
+            if ((int)(skipNum + curShowing) >= (int)(titleitems - 1))
+            {
+                skipNum = titleitems - listsize;
+                curShowing = listsize - 1;
+            }
+            else if ((int)(skipNum + listsize) >= (int)titleitems)
+            {
+                skipNum = titleitems - listsize;
+                if (skipNum >= 0)
+                    curShowing++;
+            }
+
+            if (curShowing >= listCount)
+                curShowing = listCount - 1;
         }
         else
         {
