@@ -724,9 +724,9 @@ void VideoOutputXv::DrawUnusedRects(void)
 {
     XSetForeground(data->XJ_disp, data->XJ_gc, XJ_black);
   
-    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 0, 0, dispw,
-                   dispyoff);
-    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 0, 
+    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, dispx, dispy, 
+                   dispw, dispyoff);
+    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, dispx, 
                    dispyoff + disphoff, dispw, dispyoff);
 }
 

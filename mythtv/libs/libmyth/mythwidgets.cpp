@@ -41,6 +41,23 @@ void MythComboBox::keyPressEvent(QKeyEvent *e)
     }
 }
 
+void MythComboBox::focusInEvent(QFocusEvent *e)
+{
+    emit changeHelpText(helptext);
+    emit gotFocus();
+
+    QColor highlight = colorGroup().highlight();
+
+    this->setPaletteBackgroundColor(highlight);
+    QComboBox::focusInEvent(e);
+}
+
+void MythComboBox::focusOutEvent(QFocusEvent *e)
+{
+    this->unsetPalette();
+    QComboBox::focusOutEvent(e);
+}
+
 void MythCheckBox::keyPressEvent(QKeyEvent* e)
 {
     switch (e->key()) {
@@ -61,18 +78,18 @@ void MythCheckBox::keyPressEvent(QKeyEvent* e)
 
 void MythCheckBox::focusInEvent(QFocusEvent *e)
 {
-     emit changeHelpText(helptext);
+    emit changeHelpText(helptext);
 
-     QColor highlight = colorGroup().highlight();
+    QColor highlight = colorGroup().highlight();
 
-     this->setPaletteBackgroundColor(highlight);
-     QCheckBox::focusInEvent(e);
+    this->setPaletteBackgroundColor(highlight);
+    QCheckBox::focusInEvent(e);
 }
 
 void MythCheckBox::focusOutEvent(QFocusEvent *e)
 {
-     this->unsetPalette();
-     QCheckBox::focusOutEvent(e);
+    this->unsetPalette();
+    QCheckBox::focusOutEvent(e);
 }
 
 bool MythSpinBox::eventFilter(QObject* o, QEvent* e)
@@ -80,7 +97,15 @@ bool MythSpinBox::eventFilter(QObject* o, QEvent* e)
     (void)o;
 
     if (e->type() == QEvent::FocusIn)
+    {
+        QColor highlight = colorGroup().highlight();
+        editor()->setPaletteBackgroundColor(highlight);
         emit(changeHelpText(helptext));
+    }
+    else if (e->type() == QEvent::FocusOut)
+    {
+        editor()->unsetPalette();
+    }
 
     if (e->type() != QEvent::KeyPress)
         return FALSE;
@@ -107,6 +132,22 @@ bool MythSpinBox::eventFilter(QObject* o, QEvent* e)
     return TRUE;
 }
 
+void MythSpinBox::focusInEvent(QFocusEvent *e)
+{
+    emit changeHelpText(helptext);
+
+    QColor highlight = colorGroup().highlight();
+
+    this->setPaletteBackgroundColor(highlight);
+    QSpinBox::focusInEvent(e);
+}
+
+void MythSpinBox::focusOutEvent(QFocusEvent *e)
+{
+    this->unsetPalette();
+    QSpinBox::focusOutEvent(e);
+}
+
 void MythSlider::keyPressEvent(QKeyEvent* e)
 {
     switch (e->key()) {
@@ -131,6 +172,22 @@ void MythSlider::keyPressEvent(QKeyEvent* e)
     }
 }
 
+void MythSlider::focusInEvent(QFocusEvent *e)
+{
+    emit changeHelpText(helptext);
+
+    QColor highlight = colorGroup().highlight();
+
+    this->setPaletteBackgroundColor(highlight);
+    QSlider::focusInEvent(e);
+}
+
+void MythSlider::focusOutEvent(QFocusEvent *e)
+{
+    this->unsetPalette();
+    QSlider::focusOutEvent(e);
+}
+
 void MythLineEdit::keyPressEvent(QKeyEvent *e)
 {
     switch (e->key()) {
@@ -149,7 +206,8 @@ void MythLineEdit::keyPressEvent(QKeyEvent *e)
     }
 }
 
-void MythLineEdit::setText(const QString& text) {
+void MythLineEdit::setText(const QString& text) 
+{
     // Don't mess with the cursor position; it causes
     // counter-intuitive behaviour due to interactions with the
     // communication with the settings stuff
@@ -157,6 +215,22 @@ void MythLineEdit::setText(const QString& text) {
     int pos = cursorPosition();
     QLineEdit::setText(text);
     setCursorPosition(pos);
+}
+
+void MythLineEdit::focusInEvent(QFocusEvent *e)
+{
+    emit changeHelpText(helptext);
+
+    QColor highlight = colorGroup().highlight();
+
+    this->setPaletteBackgroundColor(highlight);
+    QLineEdit::focusInEvent(e);
+}
+
+void MythLineEdit::focusOutEvent(QFocusEvent *e)
+{
+    this->unsetPalette();
+    QLineEdit::focusOutEvent(e);
 }
 
 // thor feb 18 2003
@@ -650,16 +724,22 @@ void MythRemoteLineEdit::focusInEvent(QFocusEvent *e)
 {
     emit changeHelpText(helptext);
     emit gotFocus();    //perhaps we need to save a playlist?
+
+    QColor highlight = colorGroup().highlight();
+
+    this->setPaletteBackgroundColor(highlight);
+
     QTextEdit::focusInEvent(e);
 }
 
 
 void MythRemoteLineEdit::focusOutEvent(QFocusEvent *e)
 {
+    this->unsetPalette();
+
     emit lostFocus();
     QTextEdit::focusOutEvent(e);
 }
-
 
 MythRemoteLineEdit::~MythRemoteLineEdit()
 {
@@ -668,9 +748,6 @@ MythRemoteLineEdit::~MythRemoteLineEdit()
         delete cycle_timer;
     }
 }
-
-
-
 
 void MythTable::keyPressEvent(QKeyEvent *e)
 {
