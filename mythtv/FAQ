@@ -74,3 +74,14 @@
   http://www.geocrawler.com/lists/3/SourceForge/12349/75/10112099/
   for a patch, or upgrade to ALSA 0.9.0rc6 or later.
 
+) When trying to run setup, I get an "Illegal instruction", "Bus error" or
+  "Segmentation fault" message
+- You need to use compilation flags appropriate for your processor.  Rebuild
+  everything from scratch after editing settings.pro.
+
+) mythfrontend works, but when I try to watch TV or play a recording, it
+  crashes with an "Illegal instruction", "Bus error" or "Segmentation fault"
+  message every time
+- Do you have deinterlace=1 in settings.txt?  Try disabling it, and if that
+  corrects the problem, read and follow the instructions at the top of
+  filters/linearblend/filter_linearblend.c and rebuild mythtv.
