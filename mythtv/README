@@ -37,6 +37,9 @@ See the mythtv-HOWTO.html or mythtv-HOWTO.txt file in the docs/ subdirectory
 for in-depth instructions on installing and compiling mythtv and the
 pre-requisites.
 
+Debian users:  mythtv has been packaged by Matthew Zimmerman.  The package
+is available from http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/
+
 You also need v4l setup and working properly.  If xawtv works, this should, too.
 
 Hardware wise, you need a computer.  Really.  Helps to have a fast one, too.
@@ -48,24 +51,10 @@ colorspaces), and a TV tuner card.  If you're using ALSA for sound support
 IMPORTANT: You _must_ edit the settings.txt file in /usr/local/share/mythtv/
            before running the application.  
 
-Specifically, you need to at least change the 'BufferName' and the 
-'RecordFilePrefix' preferences to directories that exist on your machine.  
-Look through the rest of the file and change whatever else you want.  If you 
-change the Width/Height settings and you don't get any video, then the 
-resolution you selected wasn't liked by the v4l subsystem.
-
-The next thing to do is set up the mysql database that the program data
-will be stored in.  Change to the 'database' subdir of this distribution.
-You need to run the mc.sql script.  So, something like mysql < mc.sql
-might work.  I dunno.  It worked for me with the default mysql installation on
-debian, might not work elsewhere.  Better instructions welcome.
+If you change the Width/Height settings and you don't get any video, then
+the resolution you selected wasn't liked by the v4l subsystem.
 
 See the UPGRADING file for information on upgrading between releases.
-
-If you're in the US/Canada, you can proceed with the next step.  Otherwise, you
-need to edit /usr/local/share/mythtv/settings.txt and edit the very first
-setting -- XMLTVGrab.  Change this to the appropriate xmltv grabber 
-(tv_grab_uk in the UK, etc).
 
 Next, you need to run the setup program that should be located in the setup/ 
 subdir.  It will ask you some questions about your hardware, and then run 

@@ -3,7 +3,7 @@
 v1.00, 2002-11-05.  Initial.
 v1.01, 2002-11-06.  Added section on lirc, spelling errors.
 v1.02, 2002-11-11.  Converted to docbook, added more to the remote control
-section, compiling on AMD and Via C3 processors, Debian packaging.
+section, compiling on AMD and Via C3 processors, Debian packaging, ispell.
 -->
 <!-- 
 To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or 
@@ -38,7 +38,7 @@ For users with a Debian system, the mythtv program has been packaged by Matt
 Zimmerman <url url="mailto:mdz@debian.org"> and is available at <url 
 url="http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/"
 name="http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/">  The mailing list
-message for this annoucement can be accessed at <url
+message for this announcement can be accessed at <url
 url="http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html"
 name="http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html">.
 
@@ -63,7 +63,7 @@ clicking K->Configuration->Packaging->KPackage
 There are many inter-related modules, so make sure that you've got the
 main package for each one, and not a sub package for an unrelated item.  For
 example, there are many modules that have "perl" in them; some are a part of
-the apache webserver, others are a part of the perl distribution.  In each
+the apache web server, others are a part of the perl distribution.  In each
 case, we're looking to make sure that the primary module is getting
 installed.
 
@@ -115,11 +115,11 @@ everything already installed
 </verb></tscreen>
 
 In that case, you're ready to move onto the next step.
-<sect2>Redhat
+<sect2>Red Hat Linux 8.0
 
 <p>[Please submit instructions]
 
-<sect2>Gentoo
+<sect2>Gentoo.
 
 <p>[Please submit instructions]
 
@@ -151,7 +151,7 @@ export PATH=$PATH:/usr/lib/qt3/bin
 The last two commands are to exit out of the shell.  This way, when you next
 open a shell your new commands will take effect.
 
-<sect2>Redhat.
+<sect2>Red Hat Linux 8.0
 <p>[Please submit instructions]
 
 <sect2>Gentoo.
@@ -173,7 +173,7 @@ You should see QTDIR and the path changes you made.
 Next, we need to make sure that the libraries that we're building will be
 found when we need them.
 
-<sect1>Modifying <tt>/etc/ld.so.conf</tt>.
+<sect1>Modifying <tt>/etc/ld.so.conf</tt>
 <p>Switch to /etc and execute the following:
 <tscreen><verb>
 # cd /etc
@@ -189,13 +189,13 @@ found when we need them.
 <sect>Downloading and compiling.
 
 <p>Get mythtv from the <url url="http://www.mythtv.org" name="mythtv.org">
-website.  Save the tarball to a directory you can find.
+web site.  Save the tarball to a directory you can find.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
 name="http://xmltv.sourceforge.net">.  Download version 0.5.2
 
 Get lame from <url url="http://www.mp3dev.org/mp3"
-name="http://www.mp3dev.org/mp3">.  Download the sourcecode to v3.92 by
+name="http://www.mp3dev.org/mp3">.  Download the source code to v3.92 by
 following the links to sourceforge.net
 
 <sect1>Notes on compiling on a system with non-Intel processors. 
@@ -252,7 +252,7 @@ Install the xmltv prerequisites:
 # perl -MCPAN -e shell
 </verb></tscreen>
 Check to see which version of TWIG is being offered by CPAN.  If it's 3.08,
-we need to download it from the author's webiste, because 3.08 has a problem
+we need to download it from the author's web site, because 3.08 has a problem
 with perl 5.8. As of 2002-11-02:
 <tscreen><verb>
 cpan> i /TWIG/
@@ -324,22 +324,40 @@ Switch to superuser:
 # make install
 # exit
 </verb></tscreen>
-Make sure that mysql is running and started at boot.  Click on Mandrake
+
+<sect>MySQL.
+<sect1>Mandrake 9.0
+<p>Make sure that mysql is running and started at boot.  Click on Mandrake
 Control Center->System->Services
 
-Setup the initial mysql databases:
+<sect1>Red Hat Linux 8.0
+<p>Please submit content.
+<sect1>Gentoo.
+<p>Please submit content.
+
+<sect1>Setting up the initial database.
+<p>Setup the initial mysql databases:
 <tscreen><verb>
 % cd database
+</verb></tscreen>
+<sect2>Mandrake 9.0
+<p>
+<tscreen><verb>
 % mysql -u root &lt; mc.sql
+</verb></tscreen>
+<sect2>Debian 3.0
+<p>
+<tscreen><verb>
+% mysql &lt; mc.sql
 </verb></tscreen>
 
 <sect>Setting up alsa and the mixer.
 
 <p>If your video doesn't appear to be in-sync with your audio, it could be
 because you are listening to the real-time audio from your video card rather
-than after it's been processed and synced to the video by mythtv.
+than after it's been processed and synchronized to the video by mythtv.
 
-What you need to do is to mute the "line-in" of your soundcard and also
+What you need to do is to mute the "line-in" of your sound card and also
 set it as the recording source.
 
 There are two ways to do this.  Graphically, and from the command line.
@@ -352,7 +370,7 @@ Click on Settings->Configure  Make sure that "Tick Marks" and "Show
 labels" have "X"'s in them.  This will make it easier to find the correct
 audio source.  Click OK.
 
-On the mixer page, look for Line-In on your soundcard.  You should see
+On the mixer page, look for Line-In on your sound card.  You should see
 two LED's - a green one at the top, and a red one at the bottom.  The green
 one at the top is for muting; you want to make sure that the green LED is a
 dark green, meaning that it's "off".  You also want to click on the red LED
@@ -478,7 +496,7 @@ if you've got a Pinnacle Studio PCTV remote.
 Start pressing the keys on your remote; <bf>irw</bf> will
 print the name of the button as it is defined in your
 <tt>/etc/lircd.conf</tt>. If you don't see anything at this point, you need
-to troubleshoot further by going back to the lirc homepage and investigating
+to troubleshoot further by going back to the lirc home page and investigating
 from there.
 
 If it is working, then press <bf>CTRL-C</bf> to abort the program.  Once you
@@ -505,7 +523,7 @@ an external program from a remote control button.
 <p>Take a look at the lircrc.example files in the <tt>configfiles/</tt>
 directory.  In my case, (Pinnacle Studio card) the channel up and down functions
 weren't working, due to the fact that the button names were different than
-the <tt>lircrc.example</tt> files that come with mythtv.
+the default <tt>lircrc.example</tt> file that came with mythtv.
 
 The <tt>lircrc.example</tt> file has this:
 <tscreen><verb>
@@ -553,5 +571,41 @@ By examining the button names defined in <tt>/etc/lircd.conf</tt> and using
 the <bf>irw</bf> program to make sure that your remote is working, you can
 create the appropriate mappings in <tt>.lircrc</tt> to get excellent remote
 functionality with mythtv.
+
+<sect>Configuring mythtv.
+<p>By this point, all of the prerequisites have been installed,
+<bf>mysql</bf> is running and has had it's initial database setup.  It's now
+time to configure mythtv.
+
+Open a shell and switch to the <tt>/usr/local/share/mythtv</tt> directory. 
+You <bf>MUST</bf> edit the <tt>settings.txt</tt> file so that it's
+appropriate for your system.  At a minimum, ensure that the BufferName, RecordFilePrefix
+and PIPBuffername variables are set to directories that exist on your system. 
+By default, these point to <tt>/mnt/store</tt>.  For example, you may wish to create
+a <tt>/var/video</tt> subdirectory, so you would change <tt>/mnt/store</tt>
+to <tt>/var/video</tt>
+<tscreen><verb>
+% su
+# mkdir /var/video
+# chmod a+rwx /var/video
+# exit
+</verb></tscreen>
+The <tt>settings.txt</tt> file is fairly self-explanatory.  
+
+<bf>NOTE</bf>: although the width and height can be changed to almost
+anything, if you start mythtv and don't see video, it is likely that the
+video4linux (v4l) subsystem did not like the height and width parameters
+specified.  It's best to leave the default as-is until you're sure that
+mythtv is operational.
+
+Users in North America can now exit and save the file.  Users in other parts
+of the world need to modify the first line and modify the XMLTVGrabber
+variable to the correct grabber for their region.  <bf>tv_grab_uk</bf> for the
+UK, etc.  Use the name from the xmltv directory.
+
+<sect>Using mythtv.
+<sect>Using mythweb.
+<sect>Using mythgallery.
+<sect>Using mythgame.
 
 </article>
