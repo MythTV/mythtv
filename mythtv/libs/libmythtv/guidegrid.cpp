@@ -1,11 +1,12 @@
-#include "guidegrid.h"
-
 #include <qapplication.h>
 #include <qpainter.h>
 #include <qfont.h>
 #include <qsqldatabase.h>
 #include <qsqlquery.h>
 #include <qaccel.h>
+
+#include "guidegrid.h"
+#include "infodialog.h"
 
 GuideGrid::GuideGrid(int channel, QWidget *parent, const char *name)
          : QWidget(parent, name)
@@ -14,7 +15,7 @@ GuideGrid::GuideGrid(int channel, QWidget *parent, const char *name)
     m_font = new QFont("Arial", 11, QFont::Bold);
     m_largerFont = new QFont("Arial", 13, QFont::Bold);
 
-    m_currentStartTime = QDateTime::currentDateTime();
+    m_originalStartTime = m_currentStartTime = QDateTime::currentDateTime();
     m_currentStartChannel = channel;
 
     m_currentRow = 0;
@@ -52,13 +53,17 @@ GuideGrid::GuideGrid(int channel, QWidget *parent, const char *name)
     accel->connectItem(accel->insertItem(Key_S), this, SLOT(cursorDown()));
     accel->connectItem(accel->insertItem(Key_W), this, SLOT(cursorUp()));
 
-    connect(this, SIGNAL(killTheApp()), qApp, SLOT(quit()));
-
     accel->connectItem(accel->insertItem(Key_C), this, SLOT(escape()));
+    accel->connectItem(accel->insertItem(Key_Escape), this, SLOT(escape()));
     accel->connectItem(accel->insertItem(Key_Enter), this, SLOT(enter()));
     accel->connectItem(accel->insertItem(Key_M), this, SLOT(enter()));
 
+    accel->connectItem(accel->insertItem(Key_I), this, SLOT(displayInfo()));
+
+    connect(this, SIGNAL(killTheApp()), qApp, SLOT(quit()));
+
     selectState = false;
+    showInfo = false;
 }
 
 int GuideGrid::getLastChannel(void)
@@ -263,12 +268,18 @@ void GuideGrid::paintEvent(QPaintEvent *e)
     QRect r = e->rect();
     QPainter p(this);
 
-    if (r.intersects(programRect()))
-        paintPrograms(&p);  
-    if (r.intersects(channelRect()))
-        paintChannels(&p);
-    if (r.intersects(timeRect()))
-        paintTimes(&p);
+    if (showInfo)
+    {
+    }
+    else
+    {
+        if (r.intersects(programRect()))
+            paintPrograms(&p);  
+        if (r.intersects(channelRect()))
+            paintChannels(&p);
+        if (r.intersects(timeRect()))
+            paintTimes(&p);
+    }
 }
 
 void GuideGrid::paintChannels(QPainter *p)
@@ -440,6 +451,12 @@ void GuideGrid::paintPrograms(QPainter *p)
     tmp.end();
 
     p->drawPixmap(cr.topLeft(), pix);
+}
+
+QRect GuideGrid::fullRect() const
+{
+    QRect r(0, 0, 800, 600);
+    return r;
 }
 
 QRect GuideGrid::channelRect() const
@@ -708,4 +725,15 @@ void GuideGrid::enter()
 void GuideGrid::escape()
 {
     emit killTheApp();
+}
+
+void GuideGrid::displayInfo()
+{
+    showInfo = 1;
+
+    InfoDialog *diag = new InfoDialog(this, "Program Info");
+    diag->setCaption("BLAH!!!");
+    diag->exec();
+
+    showInfo = 0;
 }

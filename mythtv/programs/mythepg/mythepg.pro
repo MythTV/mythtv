@@ -6,5 +6,5 @@ TEMPLATE = app
 CONFIG += thread
 
 # Input
-HEADERS += guidegrid.h
-SOURCES += guidegrid.cpp main.cpp
+HEADERS += guidegrid.h infodialog.h
+SOURCES += guidegrid.cpp infodialog.cpp main.cpp

@@ -70,6 +70,8 @@ class GuideGrid : public QWidget
     void enter();
     void escape();
 
+    void displayInfo();
+
   protected:
     void paintEvent(QPaintEvent *);
 
@@ -78,6 +80,7 @@ class GuideGrid : public QWidget
     void paintTimes(QPainter *p);
     void paintPrograms(QPainter *p);
 
+    QRect fullRect() const;
     QRect channelRect() const;
     QRect timeRect() const;
     QRect programRect() const;
@@ -97,6 +100,7 @@ class GuideGrid : public QWidget
     TimeInfo *m_timeInfos[10];
     ProgramInfo *m_programInfos[10][10];
 
+    QDateTime m_originalStartTime;
     QDateTime m_currentStartTime;
     unsigned int m_currentStartChannel;
     unsigned int m_currentEndChannel;
@@ -105,6 +109,7 @@ class GuideGrid : public QWidget
     int m_currentCol;
 
     bool selectState;
+    bool showInfo;
 };
 
 #define CHANNUM_MAX  128
