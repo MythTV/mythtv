@@ -720,8 +720,8 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
         {
             current_request_db->doDatabasePlaylistResponse(
                                                             rebuilt_internal, 
-                                                            current_request_playlist,
-                                                            metadata_generation
+                                                            current_request_playlist
+                                                            //metadata_generation
                                                           );            
         }
         else
@@ -886,6 +886,9 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
         }
         else
         {
+            
+            current_request_db->updateIfYouAreDone(metadata_generation);
+            
             current_request_db = NULL;
             current_request_playlist = -1;
             

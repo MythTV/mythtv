@@ -223,6 +223,8 @@ void Database::checkUpdateType(int new_numb_items, int new_received_numb_items)
         //
         log("receiving a complete data update from daap server", 9);
         full_data_update = true;
+        metadata_additions.clear();
+        metadata_deletions.clear();
     }
     else
     {
@@ -1021,7 +1023,7 @@ void Database::parseDeletedContainers(TagInput& dmap_data)
 
 }
 
-void Database::doDatabasePlaylistResponse(TagInput &dmap_data, int which_playlist, int new_generation)
+void Database::doDatabasePlaylistResponse(TagInput &dmap_data, int which_playlist)
 {
     //
     //  First, find the playlist
@@ -1155,20 +1157,6 @@ void Database::doDatabasePlaylistResponse(TagInput &dmap_data, int which_playlis
     {
         have_playlists = true;
         
-        //
-        //  We now have all items (metadata) and all containers (playlists)
-        //  from our daap server. Time to tell the metadata container about
-        //  it.
-        //
-        
-        doTheMetadataSwap();
-
-        //
-        //  We are now up to date with this generation of data.
-        //
-
-        generation_delta = new_generation;
-        
     }
 }
 
@@ -1255,7 +1243,6 @@ void Database::doTheMetadataSwap()
     //  the /database/whatever calls, and have got all the way to sitting in
     //  a hanging update)
     //
-
 
     if(full_data_update)
     {
@@ -1476,6 +1463,27 @@ void Database::beIgnorant()
     have_items = false;
     have_playlist_list = false;
     have_playlists = false;
+}
+
+void Database::updateIfYouAreDone(int new_generation)
+{
+    if(have_items && have_playlist_list && have_playlists)
+    {
+        //
+        //  We now have all items (metadata) and all containers (playlists)
+        //  from our daap server. Time to tell the metadata container about
+        //  it.
+        //
+        
+        doTheMetadataSwap();
+
+        //
+        //  We are now up to date with this generation of data.
+        //
+
+        generation_delta = new_generation;
+        
+    }
 }
 
 void Database::log(const QString &log_message, int verbosity)
