@@ -11,6 +11,7 @@
       <text lang="NL">Algemeen</text>
       <text lang="PT">Configurações Gerais</text>
       <text lang="SV">Generella inställningar</text>
+      <text lang="FR">Générales</text>
       <action>MUSIC_SET_GENERAL</action>
    </button>
 
@@ -25,6 +26,7 @@
       <text lang="NL">Afspelen</text>
       <text lang="PT">Configurações de Leitura</text>
       <text lang="SV">Inställningar för avspelning</text>
+      <text lang="FR">Lecteur</text>
       <action>MUSIC_SET_PLAYER</action>
    </button>
 
@@ -36,6 +38,7 @@
       <text lang="SV">Inställningar för kopiering</text>
       <text lang="CA">Configuració de volcat</text>
       <text lang="ES">Configuració del riper</text>
+      <text lang="FR">Copie des CDs</text>
       <action>MUSIC_SET_RIPPER</action>
    </button>
 </mythmenu>

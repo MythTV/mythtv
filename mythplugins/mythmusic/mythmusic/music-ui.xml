@@ -177,6 +177,7 @@
                 <value lang="SV">Vänta...</value>
                 <value lang="ES">Aguarde un momento...</value>
                 <value lang="CA">Esperi uns moments...</value>
+		<value lang="FR">Patientez, svp ...</value>
             </textarea>
 
             <!--
