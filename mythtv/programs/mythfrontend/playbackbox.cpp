@@ -2264,7 +2264,7 @@ void PlaybackBox::doBeginTranscoding()
             jobHost = gContext->GetHostName();
 
         JobQueue::QueueJob(db, JOB_TRANSCODE, curitem->chanid, curitem->startts,
-                           jobHost, "", "", JOB_USE_CUTLIST);
+                           "", "", jobHost, JOB_USE_CUTLIST);
     }
 }
 
@@ -2300,7 +2300,7 @@ void PlaybackBox::doBeginFlagging()
             jobHost = tmpItem->hostname;
 
         JobQueue::QueueJob(db, JOB_COMMFLAG, curitem->chanid, curitem->startts,
-                           jobHost);
+                           "", "", jobHost);
     }
 
     update(listRect);
