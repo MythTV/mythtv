@@ -381,9 +381,15 @@ void LCD::veryBadThings(int anError)
 		cerr << "Why? There was an error reading from the socket." << endl ;  
 	}
 	
-	//  Uncomment this once we require Qt >= 3.1
-	//socket->clearPendingData();
+#if (QT_VERSION >= 0x030102)
+	socket->clearPendingData();
 	socket->close();
+#else
+#warning
+#warning ***   You should think seriously about upgrading your Qt to 3.1 or higher   ***
+#warning
+    delete socket;
+#endif
 	
 }
 
