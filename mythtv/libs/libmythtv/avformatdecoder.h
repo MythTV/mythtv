@@ -28,6 +28,11 @@ class AvFormatDecoder : public DecoderBase
 
     char *GetScreenGrab(int secondsin);
 
+    bool isLastFrameKey(void) { return false; }
+    void WriteStoredData(RingBuffer *rb) { }
+    void SetRawFrameState(bool state) { (void)state; }
+    bool GetRawFrameState(void) { return false; }
+
   protected:
     RingBuffer *getRingBuf(void) { return ringBuffer; }
 

@@ -4,6 +4,8 @@
 #include <qstring.h>
 #include <pthread.h>
 #include <qdatetime.h>
+#include <qvaluelist.h>
+#include <qptrlist.h>
 
 #include "tv.h"
 
@@ -94,6 +96,8 @@ class TVRec
     void RequestRingBufferBlock(int size);
     long long SeekRingBuffer(long long curpos, long long pos, int whence);
 
+    bool isParsingCommercials(ProgramInfo *pginfo);
+
  protected:
     void RunTV(void);
     static void *EventThread(void *param);
@@ -180,6 +184,9 @@ class TVRec
     int m_capturecardnum;
 
     bool ispip;
+
+    QPtrList <ProgramInfo> commercialFlag;
+    pthread_mutex_t commLock;
 };
 
 #endif

@@ -7,6 +7,7 @@
 #include "RingBuffer.h"
 #include "osd.h"
 #include "jitterometer.h"
+#include "recordingprofile.h"
 
 extern "C" {
 #include "filter.h"
@@ -85,7 +86,8 @@ class NuppelVideoPlayer
     void SetLength(int len) { totalLength = len; }
     int GetLength(void) { return totalLength; }
 
-    void ReencodeFile(char *inputname, char *outputname);
+    bool ReencodeFile(char *inputname, char *outputname,
+                      RecordingProfile &profile);
 
     int FlagCommercials(int show_percentage = false);
 
@@ -260,6 +262,7 @@ class NuppelVideoPlayer
     int rtxt;          /* next slot to read */
     int txttimecodes[MAXTBUFFER];      /* timecode for each slot */
     char txttype[MAXTBUFFER];  /* texttype for each slot */
+    int txtlen[MAXTBUFFER];  /* size of tbuffer for each slot */
     unsigned char *tbuffer[MAXTBUFFER+1];      /* decoded subtitles */
 
     pthread_mutex_t audio_buflock; /* adjustments to audiotimecode, waud, and

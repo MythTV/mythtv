@@ -179,6 +179,9 @@ public:
 
         addTarget("tv_grab_fi", new XMLTV_generic_config(parent, "tv_grab_fi"));
         grabber->addSelection("Finland", "tv_grab_fi");
+
+        addTarget("tv_grab_es", new XMLTV_generic_config(parent, "tv_grab_es"));
+        grabber->addSelection("Spain", "tv_grab_es");
     };
 };
 

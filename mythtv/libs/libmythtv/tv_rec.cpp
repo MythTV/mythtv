@@ -48,6 +48,7 @@ TVRec::TVRec(int capturecardnum)
     deinterlace_mode = 0;
 
     pthread_mutex_init(&db_lock, NULL);
+    pthread_mutex_init(&commLock, NULL);
 
     ConnectDB(capturecardnum);
 
@@ -596,18 +597,27 @@ void TVRec::TeardownRecorder(bool killFile)
     {
         prevRecording->SetBlankFrameList(blank_frame_map, db_conn);
 
-        if ((!prematurelystopped) &&
-            (gContext->GetNumSetting("AutoCommercialFlag", 0)))
+        if (!prematurelystopped)
         {
-            flagthreadstarted = false;
+            if (gContext->GetNumSetting("AutoCommercialFlag", 0))
+            {
+                flagthreadstarted = false;
 
-            pthread_attr_t attr;
-            pthread_attr_init(&attr);
-            pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-            pthread_create(&commercials, &attr, FlagCommercialsThread, this);
+                pthread_attr_t attr;
+                pthread_attr_init(&attr);
+                pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+                pthread_create(&commercials, &attr, FlagCommercialsThread, 
+                               this);
 
-            while (!flagthreadstarted)
-                usleep(50);
+                while (!flagthreadstarted)
+                    usleep(50);
+            }
+
+            QString message = QString("LOCAL_READY_TO_TRANSCODE %1 %2")
+                       .arg(prevRecording->chanid)
+                       .arg(prevRecording->startts.toString("yyyyMMddhhmmss"));
+            MythEvent me(message);
+            gContext->dispatch(me);
         }
     }
 
@@ -1767,6 +1777,10 @@ void TVRec::FlagCommercials(void)
 
     nice(19);
 
+    pthread_mutex_lock(&commLock);
+    commercialFlag.append(program_info);
+    pthread_mutex_unlock(&commLock);
+
     QString filename = program_info->GetRecordFilename(
                                 gContext->GetSetting("RecordFilePrefix"));
 
@@ -1776,6 +1790,10 @@ void TVRec::FlagCommercials(void)
     nvp->SetRingBuffer(tmprbuf);
 
     nvp->FlagCommercials();
+
+    pthread_mutex_lock(&commLock);
+    commercialFlag.removeRef(program_info);
+    pthread_mutex_unlock(&commLock);
 
     delete nvp;
     delete tmprbuf;
@@ -1846,5 +1864,21 @@ void TVRec::StoreInputChannels(map<int, QString> &inputChannel)
     }
 
     pthread_mutex_unlock(&db_lock);
+}
+
+bool TVRec::isParsingCommercials(ProgramInfo *pginfo)
+{
+    ProgramInfo *pinfo;
+    pthread_mutex_lock(&commLock);
+    for (pinfo = commercialFlag.first(); pinfo; pinfo = commercialFlag.next())
+    {
+        if(pginfo->chanid == pinfo->chanid || pginfo->startts == pinfo->startts)
+        {
+            pthread_mutex_unlock(&commLock);
+            return true;
+        }
+    }
+    pthread_mutex_unlock(&commLock);
+    return false;
 }
 

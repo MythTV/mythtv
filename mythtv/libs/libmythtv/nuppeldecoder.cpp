@@ -64,6 +64,8 @@ NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent)
 
     lastKey = 0;
     framesPlayed = 0;
+
+    getrawframes = false;
 }
 
 NuppelDecoder::~NuppelDecoder()
@@ -627,6 +629,33 @@ bool NuppelDecoder::isValidFrametype(char type)
     return false;
 }
 
+void NuppelDecoder::StoreRawData(unsigned char *newstrm)
+{
+    unsigned char *strmcpy;
+    if (newstrm) 
+    {
+        strmcpy = new unsigned char[frameheader.packetlength];
+        memcpy(strmcpy, newstrm, frameheader.packetlength);
+    } 
+    else
+        strmcpy = NULL;
+
+    StoredData.append(new RawDataList(frameheader, strmcpy));
+}
+
+void NuppelDecoder::WriteStoredData(RingBuffer *rb)
+{
+    RawDataList *data;
+    while(! StoredData.isEmpty()) {
+        data = StoredData.first();
+        rb->Write(&(data->frameheader), FRAMEHEADERSIZE);
+        if(data->packet)
+            rb->Write(data->packet, data->frameheader.packetlength);
+        StoredData.removeFirst();
+        delete data;
+    }
+}
+
 void NuppelDecoder::GetFrame(int onlyvideo)
 {
     bool gotvideo = false;
@@ -674,8 +703,11 @@ void NuppelDecoder::GetFrame(int onlyvideo)
         }
 
         if (frameheader.frametype == 'R')
+        {
+            if (getrawframes)
+                StoreRawData(NULL);
             continue; // the R-frame has no data packet
-
+        }
 
         if (frameheader.frametype == 'S')
         {
@@ -694,6 +726,8 @@ void NuppelDecoder::GetFrame(int onlyvideo)
                 if (!haspositionmap)
                     (*positionMap)[lastKey / keyframedist] = currentposition;
             }
+            if (getrawframes)
+                StoreRawData(NULL);
         }
 
         if (frameheader.packetlength > 0)
@@ -729,6 +763,9 @@ void NuppelDecoder::GetFrame(int onlyvideo)
         {
             if (frameheader.comptype=='3')
             {
+                if (getrawframes)
+                    StoreRawData(strm);
+
                 int lameret = 0;
                 short int pcmlbuffer[audio_samplerate * 4];
                 short int pcmrbuffer[audio_samplerate * 4];
@@ -755,6 +792,7 @@ void NuppelDecoder::GetFrame(int onlyvideo)
             }
             else
             {
+                getrawframes = 0;
                 m_parent->AddAudioData((char *)strm, frameheader.packetlength, 
                                        frameheader.timecode);
             }
@@ -762,6 +800,9 @@ void NuppelDecoder::GetFrame(int onlyvideo)
 
         if (frameheader.frametype == 'T')
         {
+            if (getrawframes)
+                StoreRawData(strm);
+
             m_parent->AddTextData((char *)strm, frameheader.packetlength,
                                   frameheader.timecode, frameheader.comptype);
         }

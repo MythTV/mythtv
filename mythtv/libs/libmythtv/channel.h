@@ -19,6 +19,7 @@ class Channel
     void Close(void);
 
     void SetChannelOrdering(QString chanorder) { channelorder = chanorder; }
+    void ForceCurrentChannel(void);
 
     void SetFormat(const QString &format);
     void SetFreqTable(const QString &name);

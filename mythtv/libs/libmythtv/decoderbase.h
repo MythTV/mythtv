@@ -32,6 +32,11 @@ class DecoderBase
 
     virtual char *GetScreenGrab(int secondsin) = 0; 
 
+    virtual bool isLastFrameKey() = 0;
+    virtual void WriteStoredData(RingBuffer *rb) = 0;
+    virtual void SetRawFrameState(bool state) = 0;
+    virtual bool GetRawFrameState() = 0;
+
   protected:
     NuppelVideoPlayer *m_parent;
     RingBuffer *ringBuffer;

@@ -2,6 +2,7 @@
 #define NUPPELDECODER_H_
 
 #include <qmap.h>
+#include <qptrlist.h>
 
 #include "decoderbase.h"
 #include "format.h"
@@ -22,6 +23,17 @@ extern "C" {
 #include "../libavcodec/avcodec.h"
 }
 
+class RawDataList
+{
+  public:
+    RawDataList(struct rtframeheader frameh, unsigned char *data)
+    { frameheader = frameh; packet = data; }
+   ~RawDataList() { if (packet) delete [] packet; }
+  
+    struct rtframeheader frameheader;
+    unsigned char *packet;
+};
+
 class NuppelDecoder : public DecoderBase
 {
   public:
@@ -40,6 +52,11 @@ class NuppelDecoder : public DecoderBase
 
     char *GetScreenGrab(int secondsin);
 
+    bool isLastFrameKey(void) { return (lastKey == framesPlayed); }
+    void WriteStoredData(RingBuffer *rb);
+    void SetRawFrameState(bool state) { getrawframes = state; }
+    bool GetRawFrameState(void) { return getrawframes; }
+
   private:
     bool DecodeFrame(struct rtframeheader *frameheader,
                      unsigned char *lstrm, unsigned char *outbuf);
@@ -47,6 +64,7 @@ class NuppelDecoder : public DecoderBase
 
     bool InitAVCodec(int codec);
     void CloseAVCodec(void);
+    void StoreRawData(unsigned char *strm);
 
     friend int get_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic);
     friend void release_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic);
@@ -96,6 +114,9 @@ class NuppelDecoder : public DecoderBase
 
     long long lastKey;
     long long framesPlayed;
+
+    QPtrList <RawDataList> StoredData;
+    bool getrawframes;
 };
 
 #endif

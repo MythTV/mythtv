@@ -204,7 +204,17 @@ void Channel::SetFreqTable(const QString &name)
         totalChannels = chanlists[0].count;
     }
 }
-  
+ 
+void Channel::ForceCurrentChannel(void)
+{ 
+    if (!isopen)
+        return;
+    if (!externalChanger[currentcapchannel].isEmpty())
+        return;
+    ChannelUp();
+    ChannelDown();
+}
+ 
 bool Channel::SetChannelByString(const QString &chan)
 {
     if (!isopen)

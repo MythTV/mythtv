@@ -78,6 +78,16 @@ class NuppelVideoRecorder : public RecorderBase
     long long GetKeyframePosition(long long desired);
     void GetBlankFrameMap(QMap<long long, int> &blank_frame_map);
 
+    // reencode stuff
+    void StreamAllocate(void);
+    void WriteHeader(bool todumpfile = false);
+    void WriteSeekTable(bool todumpfile);
+    bool SetupAVCodec(void);
+    int AudioInit(bool skipdevice = false);
+    void WriteVideo(Frame *frame, bool skipsync = false, bool forcekey = false);
+    void WriteAudio(unsigned char *buf, int fnum, int timecode);
+    void WriteText(unsigned char *buf, int len, int timecode, int pagenr);
+
  protected:
     static void *WriteThread(void *param);
     static void *AudioThread(void *param);
@@ -88,7 +98,6 @@ class NuppelVideoRecorder : public RecorderBase
     void doVbiThread(void);
     
  private:
-    int AudioInit(void);
     void InitBuffers(void);
     void InitFilters(void);   
  
@@ -98,18 +107,10 @@ class NuppelVideoRecorder : public RecorderBase
     void BufferIt(unsigned char *buf, int len = -1);
     
     int CreateNuppelFile(void);
-    void WriteHeader(bool todumpfile = false);
-
-    void WriteVideo(Frame *frame);
-    void WriteAudio(unsigned char *buf, int fnum, int timecode);
-    void WriteText(unsigned char *buf, int len, int timecode, int pagenr);
 
     Frame * areaDeinterlace(unsigned char *yuvptr, int width, int height);
     Frame * GetField(struct vidbuffertype *vidbuf, bool top_field, 
                      bool interpolate);
-    bool SetupAVCodec(void);
-
-    void WriteSeekTable(bool todumpfile);
 
     void DoV4L2(void);
     void DoMJPEG(void);

@@ -19,6 +19,7 @@ using namespace std;
 
 #include "NuppelVideoPlayer.h"
 #include "NuppelVideoRecorder.h"
+#include "recordingprofile.h"
 #include "XJ.h"
 #include "osdtypes.h"
 #include "remoteutil.h"
@@ -2576,130 +2577,182 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
     return (char *)outputbuf;
 }
 
-void NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname)
+#define SetOption(profile, name) { \
+    int value = profile.byName(name)->getValue().toInt(); \
+    nvr->SetEncodingOption(name, value); \
+}
+
+bool NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
+                                     RecordingProfile &profile)
 { 
+    NuppelVideoRecorder *nvr;
+
     inputname = inputname;
     outputname = outputname;
-/*
+
     filename = inputname;
      
-    OpenFile(false);
+    int audioframesize = 4096 * 4;
+    int audioFrame = 0;
+    // Input setup
+    nvr = new NuppelVideoRecorder;
+    ringBuffer = new RingBuffer(filename, false, false);
 
-    mpa_codec = avcodec_find_encoder(CODEC_ID_MPEG4);
-
-    if (!mpa_codec)
+    if (OpenFile(false) < 0)
     {
-        cout << "error finding codec\n";
-        return;
-    }
-    mpa_ctx->pix_fmt = PIX_FMT_YUV420P;
-
-    mpa_picture.linesize[0] = video_width;
-    mpa_picture.linesize[1] = video_width / 2;
-    mpa_picture.linesize[2] = video_width / 2;
-
-    mpa_ctx->width = video_width;
-    mpa_ctx->height = video_height;
- 
-    mpa_ctx->frame_rate = (int)(video_frame_rate * FRAME_RATE_BASE);
-    mpa_ctx.bit_rate = 1800 * 1000;
-    mpa_ctx.bit_rate_tolerance = 1024 * 8 * 1000;
-    mpa_ctx.qmin = 2;
-    mpa_ctx.qmax = 15;
-    mpa_ctx.max_qdiff = 3;
-    mpa_ctx.qcompress = 0.5;
-    mpa_ctx.qblur = 0.5;
-    mpa_ctx.max_b_frames = 3;
-    mpa_ctx.b_quant_factor = 2.0;
-    mpa_ctx.rc_strategy = 2;
-    mpa_ctx.b_frame_strategy = 0;
-    mpa_ctx.gop_size = 30; 
-    mpa_ctx.flags = CODEC_FLAG_HQ; // | CODEC_FLAG_TYPE; 
-    mpa_ctx.me_method = 5;
-    mpa_ctx.key_frame = -1; 
-
-    if (avcodec_open(&mpa_ctx, mpa_codec) < 0)
-    {
-        cerr << "Unable to open FFMPEG/MPEG4 codex\n" << endl;
-        return;
+        delete nvr;
+        return false;
     }
 
-    FILE *out = fopen(outputname, "w+");
+    // Recorder setup
+    nvr->SetFrameRate(video_frame_rate);
 
-    int fileend = 0;
+    // this is ripped from tv_rec SetupRecording. It'd be nice to consolodate
+    nvr->SetEncodingOption("width", video_width);
+    nvr->SetEncodingOption("height", video_height);
 
-    unsigned char *frame = NULL;
+    nvr->SetBaseOption("tvformat", gContext->GetSetting("TVFormat"));
+    nvr->SetBaseOption("vbiformat", gContext->GetSetting("VbiFormat"));
 
-    static unsigned long int tbls[128];
-
-    fwrite(&fileheader, FILEHEADERSIZE, 1, out);
-    frameheader.frametype = 'D';
-    frameheader.comptype = 'R';
-    frameheader.packetlength = sizeof(tbls);
-
-    fwrite(&frameheader, FRAMEHEADERSIZE, 1, out);
-    fwrite(tbls, sizeof(tbls), 1, out);
-
-    int outsize;
-    unsigned char *outbuffer = new unsigned char[1000 * 1000 * 3];
-    bool nextiskey = true;
-
-    while (!fileend)
+    QString setting = profile.byName("videocodec")->getValue();
+    if (setting == "MPEG-4") 
     {
-        fileend = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader,
-                                                       FRAMEHEADERSIZE));
+        nvr->SetBaseOption("codec", "mpeg4");
 
-        if (fileend)
-            continue;
-        if (frameheader.frametype == 'R')
-        {
-            fwrite("RTjjjjjjjjjjjjjjjjjjjjjjjj", FRAMEHEADERSIZE, 1, out);
-            continue;
-        }
-        else if (frameheader.frametype == 'S')
-        {
-            fwrite(&frameheader, FRAMEHEADERSIZE, 1, out);
-            nextiskey = true;
-            continue;
-        }
-
-        fileend = (ringBuffer->Read(strm, frameheader.packetlength) !=
-                                    frameheader.packetlength);
-
-        if (frameheader.frametype == 'V')
-        {
-            framesPlayed++;
-            frame = DecodeFrame(&frameheader, strm);
-
-            mpa_picture.data[0] = frame;
-            mpa_picture.data[1] = frame + (video_width * video_height);
-            mpa_picture.data[2] = frame + (video_width * video_height * 5 / 4);
-        
-            mpa_ctx.key_frame = nextiskey;
-
-            outsize = avcodec_encode_video(&mpa_ctx, outbuffer, 
-                                           1000 * 1000 * 3, &mpa_picture);
-
-            frameheader.comptype = '3' + CODEC_ID_MPEG4;
-            frameheader.packetlength = outsize;
-
-            fwrite(&frameheader, FRAMEHEADERSIZE, 1, out);
-            fwrite(outbuffer, frameheader.packetlength, 1, out);
-            cout << framesPlayed << endl; 
-            nextiskey = false;
-        }
-        else
-        {
-            fwrite(&frameheader, FRAMEHEADERSIZE, 1, out);
-            fwrite(strm, frameheader.packetlength, 1, out);
-        }
+        SetOption(profile, "mpeg4bitrate");
+        SetOption(profile, "mpeg4scalebitrate");
+        SetOption(profile, "mpeg4maxquality");
+        SetOption(profile, "mpeg4minquality");
+        SetOption(profile, "mpeg4qualdiff");
+        SetOption(profile, "mpeg4optionvhq");
+        SetOption(profile, "mpeg4option4mv");
+        nvr->SetupAVCodec();
+    } 
+    else if (setting == "RTjpeg") 
+    {
+        nvr->SetBaseOption("codec", "rtjpeg");
+        SetOption(profile, "rtjpegquality");
+        SetOption(profile, "rtjpegchromafilter");
+        SetOption(profile, "rtjpeglumafilter");
+    } 
+    else 
+    {
+        cerr << "Unknown video codec: " << setting << endl;
     }
 
-    delete [] outbuffer;
+    setting = profile.byName("audiocodec")->getValue();
+    if (setting == "MP3") 
+    {
+        nvr->SetEncodingOption("audiocompression", 1);
+        SetOption(profile, "mp3quality");
+        SetOption(profile, "samplerate");
+        decoder->SetRawFrameState(true);
+    } 
+    else if (setting == "Uncompressed") 
+    {
+        nvr->SetEncodingOption("audiocompression", 0);
+    } 
+    else 
+    {
+        cerr << "Unknown audio codec: " << setting << endl;
+    }
 
-    fclose(out);
-    avcodec_close(&mpa_ctx);
-*/
+    nvr->AudioInit(true);
+
+    RingBuffer *outRingBuffer = new RingBuffer(outputname, true, false);
+    nvr->SetRingBuffer(outRingBuffer);
+    nvr->WriteHeader(false);
+    nvr->StreamAllocate();
+
+    playing = true;
+
+    pthread_mutex_init(&audio_buflock, NULL);
+    pthread_mutex_init(&video_buflock, NULL);
+    pthread_mutex_init(&text_buflock, NULL);
+    pthread_mutex_init(&avsync_lock, NULL);
+
+    own_vidbufs = true;
+
+    for (int i = 0; i <= MAXVBUFFER; i++)
+        vbuffer[i] = new unsigned char[video_size];
+
+    for (int i = 0; i < MAXTBUFFER; i++)
+        tbuffer[i] = new unsigned char[text_size];
+
+    wpos = 0;
+    ClearAfterSeek();
+
+    Frame frame;
+    frame.codec = CODEC_YUV;
+    frame.width = video_width;
+    frame.height = video_height;
+    frame.len = video_width * video_height * 3 / 2;
+
+    decoder->GetFrame(0);
+    int tryraw = decoder->GetRawFrameState();
+    while (!eof)
+    {
+        frame.buf = vbuffer[vpos];
+        frame.timecode = timecodes[vpos];
+        frame.frameNumber = framesPlayed;
+
+        if (tryraw)
+        {
+            // Encoding from NuppelVideo to NuppelVideo with MP3 audio
+            // So let's not decode/reencode audio
+            if (!decoder->GetRawFrameState()) 
+            {
+                // The Raw stae changed during decode.  This is not good
+                delete outRingBuffer;
+                delete nvr;
+                unlink(outputname);
+                return false;
+            }
+
+            decoder->WriteStoredData(outRingBuffer);
+            nvr->WriteVideo(&frame, true, decoder->isLastFrameKey());
+            raud = waud;
+            rtxt = wtxt;
+        } 
+        else 
+        {
+            // audio is fully decoded, so we need to reencode it
+            if ((audioframesize = audiolen(false))) 
+            {
+                nvr->SetEncodingOption("audioframesize", audioframesize);
+                int starttime = audbuf_timecode - 
+                                (int)((audioframesize * 100000.0)
+                                / (audio_bytes_per_sample * effdsp));
+                nvr->WriteAudio(audiobuffer + raud, audioFrame++, starttime);
+                /* update raud */
+                raud = (raud + audioframesize) % AUDBUFSIZE;
+            }
+
+            while (tbuffer_numvalid()) 
+            {
+                int pagenr = 0; 
+                unsigned char *inpos = tbuffer[rtxt];
+                if (txttype[rtxt] == 'T') 
+                {
+                    memcpy(&pagenr, inpos, sizeof(int));
+                    inpos += sizeof(int);
+                    txtlen[rtxt] -= sizeof(int);
+                }
+                nvr->WriteText(inpos, txtlen[rtxt], txttimecodes[rtxt], pagenr);
+                rtxt = (rtxt + 1) % MAXTBUFFER;
+            }
+
+            nvr->WriteVideo(&frame);
+        }
+    
+        decoder->GetFrame(0);
+    }
+
+    if (!tryraw)
+        nvr->WriteSeekTable(false);
+    delete outRingBuffer;
+    delete nvr;
+    return true;
 }
 
 int NuppelVideoPlayer::FlagCommercials(int show_percentage)

@@ -252,6 +252,8 @@ void NuppelVideoRecorder::SetEncodingOption(const QString &opt, int value)
         mp3quality = value;
     else if (opt == "samplerate")
         audio_samplerate = value;
+    else if (opt == "audioframesize")
+        audio_buffer_size = value;
     else
         cerr << "Unknown encoding setting: " << opt << endl;
 }
@@ -298,6 +300,9 @@ int NuppelVideoRecorder::GetVideoFd(void)
 
 bool NuppelVideoRecorder::SetupAVCodec(void)
 {
+    if (!useavcodec)
+        useavcodec = true;
+
     if (mpa_codec)
         avcodec_close(mpa_ctx);
     
@@ -390,25 +395,6 @@ void NuppelVideoRecorder::Initialize(void)
         cerr << "Could not detect audio blocksize\n";
     }
  
-    if (compressaudio)
-    {
-        gf = lame_init();
-        lame_set_bWriteVbrTag(gf, 0);
-        lame_set_quality(gf, mp3quality);
-        lame_set_compression_ratio(gf, 11);
-        lame_set_mode(gf, audio_channels == 2 ? STEREO : MONO);
-        lame_set_num_channels(gf, audio_channels);
-        lame_set_out_samplerate(gf, audio_samplerate);
-        lame_set_in_samplerate(gf, audio_samplerate);
-        lame_init_params(gf);
-
-        if (audio_bits != 16) 
-        {
-            cerr << "lame support requires 16bit audio\n";
-            compressaudio = false;
-        }
-    }
-
     if (codec == "hardware-mjpeg")
     {
         codec = "mjpeg";
@@ -458,9 +444,6 @@ void NuppelVideoRecorder::Initialize(void)
     else
         audio_buffer_count = 0;
 
-    mp3buf_size = (int)(1.25 * 16384 + 7200);
-    mp3buf = new char[mp3buf_size];
-
     text_buffer_size = 8 * (sizeof(teletextsubtitle) + VT_WIDTH);
     text_buffer_count = video_buffer_count;
 
@@ -480,56 +463,80 @@ void NuppelVideoRecorder::Initialize(void)
     InitFilters();
 }
 
-int NuppelVideoRecorder::AudioInit(void)
+int NuppelVideoRecorder::AudioInit(bool skipdevice)
 {
     int afmt, afd;
     int frag, blocksize = 4096;
 
-    if (-1 == (afd = open(audiodevice.ascii(), O_RDONLY)))
+    if (!skipdevice)
     {
-        cerr << "Cannot open DSP '" << audiodevice << "', dying.\n";
-        return 1;
-    }
+        if (-1 == (afd = open(audiodevice.ascii(), O_RDONLY)))
+        {
+            cerr << "Cannot open DSP '" << audiodevice << "', dying.\n";
+            return 1;
+        }
   
-    //ioctl(afd, SNDCTL_DSP_RESET, 0);
+        //ioctl(afd, SNDCTL_DSP_RESET, 0);
    
-    frag = (8 << 16) | (10); //8 buffers, 1024 bytes each
-    ioctl(afd, SNDCTL_DSP_SETFRAGMENT, &frag);
+        frag = (8 << 16) | (10); //8 buffers, 1024 bytes each
+        ioctl(afd, SNDCTL_DSP_SETFRAGMENT, &frag);
+ 
+        afmt = AFMT_S16_LE;
+        ioctl(afd, SNDCTL_DSP_SETFMT, &afmt);
+        if (afmt != AFMT_S16_LE) 
+        {
+            cerr << "Can't get 16 bit DSP, exiting\n";
+            return 1;
+        }
 
-    afmt = AFMT_S16_LE;
-    ioctl(afd, SNDCTL_DSP_SETFMT, &afmt);
-    if (afmt != AFMT_S16_LE) 
-    {
-        cerr << "Can't get 16 bit DSP, exiting\n";
-        return 1;
-    }
+        if (ioctl(afd, SNDCTL_DSP_SAMPLESIZE, &audio_bits) < 0 ||
+            ioctl(afd, SNDCTL_DSP_CHANNELS, &audio_channels) < 0 ||
+            ioctl(afd, SNDCTL_DSP_SPEED, &audio_samplerate) < 0)
+        {
+            cerr << "recorder: " << audiodevice 
+                 << ": error setting audio input device to "
+                 << audio_samplerate << "kHz/" 
+                 << audio_bits << "bits/"
+                 << audio_channels << "channel\n";
+            return 1;
+        }
 
-    if (ioctl(afd, SNDCTL_DSP_SAMPLESIZE, &audio_bits) < 0 ||
-        ioctl(afd, SNDCTL_DSP_CHANNELS, &audio_channels) < 0 ||
-        ioctl(afd, SNDCTL_DSP_SPEED, &audio_samplerate) < 0)
-    {
-        cerr << "recorder: " << audiodevice 
-             << ": error setting audio input device to "
-             << audio_samplerate << "kHz/" 
-             << audio_bits << "bits/"
-             << audio_channels << "channel\n";
-        return 1;
+        if (-1 == ioctl(afd, SNDCTL_DSP_GETBLKSIZE, &blocksize)) 
+        {
+            cerr << "Can't get DSP blocksize, exiting\n";
+            return(1);
+        }
+
+        close(afd);
     }
 
     audio_bytes_per_sample = audio_channels * audio_bits / 8;
-
-    if (-1 == ioctl(afd, SNDCTL_DSP_GETBLKSIZE, &blocksize)) 
-    {
-        cerr << "Can't get DSP blocksize, exiting\n";
-        return(1);
-    }
     blocksize *= 4;
 
-    close(afd);
-  
     audio_buffer_size = blocksize;
 
-    return(0); // everything is ok
+    if (compressaudio)
+    {
+        gf = lame_init();
+        lame_set_bWriteVbrTag(gf, 0);
+        lame_set_quality(gf, mp3quality);
+        lame_set_compression_ratio(gf, 11);
+        lame_set_mode(gf, audio_channels == 2 ? STEREO : MONO);
+        lame_set_num_channels(gf, audio_channels);
+        lame_set_out_samplerate(gf, audio_samplerate);
+        lame_set_in_samplerate(gf, audio_samplerate);
+        lame_init_params(gf);
+
+        if (audio_bits != 16) 
+        {
+            cerr << "lame support requires 16bit audio\n";
+            compressaudio = false;
+        }
+    }
+    mp3buf_size = (int)(1.25 * 16384 + 7200);
+    mp3buf = new char[mp3buf_size];
+
+    return 0; 
 }
 
 void NuppelVideoRecorder::InitFilters(void)
@@ -591,6 +598,11 @@ void NuppelVideoRecorder::StopRecording(void)
     encoding = false;
 }
 
+void NuppelVideoRecorder::StreamAllocate(void)
+{
+    strm = new signed char[w * h * 2 + 10];
+}
+
 void NuppelVideoRecorder::StartRecording(void)
 {
     if (lzo_init() != LZO_E_OK)
@@ -599,7 +611,7 @@ void NuppelVideoRecorder::StartRecording(void)
         return;
     }
 
-    strm = new signed char[w * h * 2 + 10];
+    StreamAllocate();
 
     if (codec.lower() == "rtjpeg")
         useavcodec = false;
@@ -2677,7 +2689,7 @@ Frame *NuppelVideoRecorder::GetField(struct vidbuffertype *vidbuf,
     return frame;
 }
 
-void NuppelVideoRecorder::WriteVideo(Frame *frame)
+void NuppelVideoRecorder::WriteVideo(Frame *frame, bool skipsync, bool forcekey)
 {
     int tmp = 0, r = 0, out_len = OUT_LEN;
     struct rtframeheader frameheader;
@@ -2734,9 +2746,9 @@ void NuppelVideoRecorder::WriteVideo(Frame *frame)
     // see if it's time for a seeker header, sync information and a keyframe
     frameheader.keyframe  = frameofgop;             // no keyframe defaulted
 
-    bool wantkeyframe = false;
+    bool wantkeyframe = forcekey;
 
-    if (((fnum-startnum)>>1) % keyframedist == 0) {
+    if (((fnum-startnum)>>1) % keyframedist == 0 && !skipsync) {
         frameheader.keyframe=0;
         frameofgop=0;
         ringBuffer->Write("RTjjjjjjjjjjjjjjjjjjjjjjjj", FRAMEHEADERSIZE);

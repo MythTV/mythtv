@@ -15,6 +15,7 @@ class RecorderBase
     void SetRingBuffer(RingBuffer *rbuf);
 
     float GetFrameRate(void) { return video_frame_rate; }
+    void SetFrameRate(float rate) { video_frame_rate = rate; }
 
     void SetBaseOption(const QString &opt, const QString &value);
 
