@@ -507,8 +507,8 @@ void ScheduledRecording::runProgList(void)
                                 gContext->GetMainWindow(), "proglist");
             break;
         case kPowerSearch:
-            pl = new ProgLister(plPowerSearch, title->getValue()
-                                .remove(" (" + tr("Power Search") + ")", ""),
+            pl = new ProgLister(plPowerSearch, QString(title->getValue())
+                                .remove(" (" + tr("Power Search") + ")"),
                                 QSqlDatabase::database(),
                                 gContext->GetMainWindow(), "proglist");
             break;
