@@ -1,48 +1,9 @@
 <!DOCTYPE TS><TS>
 <context>
-    <name>@default</name>
-    <message>
-        <source>Repeat: All</source>
-        <translation type="obsolete">Ripetizione: Tutto</translation>
-    </message>
-    <message>
-        <source>Repeat: Track</source>
-        <translation type="obsolete">Ripetizione: Traccia</translation>
-    </message>
-    <message>
-        <source>Playing stream.</source>
-        <translation type="obsolete">Esecuzione brano.</translation>
-    </message>
-    <message>
-        <source>Buffering stream.</source>
-        <translation type="obsolete">Buffering del brano.</translation>
-    </message>
-    <message>
-        <source>Stream paused.</source>
-        <translation type="obsolete">Brano in pausa.</translation>
-    </message>
-    <message>
-        <source>Output error.</source>
-        <translation type="obsolete">Errore di Output.</translation>
-    </message>
-    <message>
-        <source>Stream stopped.</source>
-        <translation type="obsolete">Brano fermato.</translation>
-    </message>
-    <message>
-        <source>Finished playing stream.</source>
-        <translation type="obsolete">Esecuzione terminata.</translation>
-    </message>
-    <message>
-        <source>Decoder error.</source>
-        <translation type="obsolete">Errore di decodifica.</translation>
-    </message>
-</context>
-<context>
     <name>DatabaseBox</name>
     <message>
         <source>Select music to be played:</source>
-        <translation>Seleziona la musica da eseguire:</translation>
+        <translation type="obsolete">Seleziona il brano musicale da ascoltare:</translation>
     </message>
     <message>
         <source>Copy To New Playlist</source>
@@ -82,158 +43,158 @@
     </message>
     <message>
         <source>Blechy Blech Blah</source>
-        <translation type="unfinished"></translation>
+        <translation>Blechy Blech Blah</translation>
     </message>
     <message>
         <source>All My Music ~ Loading Music Data </source>
-        <translation type="unfinished"></translation>
+        <translation>Tutta la mia musica ~ caricamento dei dati musicali</translation>
     </message>
     <message>
         <source>Loading Music Data</source>
+        <translation>Caricamento dei dati musicali</translation>
+    </message>
+    <message>
+        <source>The theme you are using does not contain a &apos;musictree&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t create CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CD Created</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CD-RW Blanking Progress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Audio CD from Playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create MP3 CD from Playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear CD-RW Disk</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>PlaybackBox</name>
     <message>
-        <source>Shuffle Mode</source>
-        <translation type="obsolete">Modo casuale</translation>
-    </message>
-    <message>
-        <source>Repeat Mode</source>
-        <translation type="obsolete">Modo ciclico</translation>
-    </message>
-    <message>
         <source>Edit Playlist</source>
-        <translation type="unfinished">Modifica la Playlist</translation>
+        <translation>Modifica la Playlist</translation>
     </message>
     <message>
         <source>Visualize</source>
-        <translation type="unfinished">Visualizza</translation>
-    </message>
-    <message>
-        <source>Rating</source>
-        <translation type="obsolete">Valutazione</translation>
-    </message>
-    <message>
-        <source>Artist</source>
-        <translation type="obsolete">Artista</translation>
-    </message>
-    <message>
-        <source>Title</source>
-        <translation type="obsolete">Titolo</translation>
-    </message>
-    <message>
-        <source>Length</source>
-        <translation type="obsolete">Durata</translation>
+        <translation>Visualizza</translation>
     </message>
     <message>
         <source>Repeat: Track</source>
-        <translation type="unfinished">Ripetizione: Traccia</translation>
+        <translation>Ripetizione: Traccia</translation>
     </message>
     <message>
         <source>Repeat: All</source>
-        <translation type="unfinished">Ripetizione: Tutto</translation>
+        <translation>Ripetizione: Tutto</translation>
     </message>
     <message>
         <source>Playing stream.</source>
-        <translation type="unfinished">Esecuzione brano.</translation>
+        <translation>Esecuzione brano.</translation>
     </message>
     <message>
         <source>Buffering stream.</source>
-        <translation type="unfinished">Buffering del brano.</translation>
+        <translation>Buffering del brano.</translation>
     </message>
     <message>
         <source>Stream paused.</source>
-        <translation type="unfinished">Brano in pausa.</translation>
+        <translation>Brano in pausa.</translation>
     </message>
     <message>
         <source>Output error.</source>
-        <translation type="unfinished">Errore di Output.</translation>
+        <translation>Errore di Output.</translation>
     </message>
     <message>
         <source>Stream stopped.</source>
-        <translation type="unfinished">Brano fermato.</translation>
+        <translation>Brano fermato.</translation>
     </message>
     <message>
         <source>Finished playing stream.</source>
-        <translation type="unfinished">Esecuzione terminata.</translation>
+        <translation>Esecuzione terminata.</translation>
     </message>
     <message>
         <source>Decoder error.</source>
-        <translation type="unfinished">Errore di decodifica.</translation>
-    </message>
-    <message>
-        <source>Shuffle: Intelligent</source>
-        <translation type="obsolete">Ordine: Intelligente</translation>
-    </message>
-    <message>
-        <source>Shuffle: Random</source>
-        <translation type="obsolete">Ordine: Casuale</translation>
+        <translation>Errore di decodifica.</translation>
     </message>
     <message>
         <source>1 Shuffle: None</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Ordine: No</translation>
     </message>
     <message>
         <source>Shuffle: None</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordine: No</translation>
     </message>
     <message>
         <source>2 Repeat: All</source>
-        <translation type="unfinished"></translation>
+        <translation>2 Ripeti: Tutti</translation>
     </message>
     <message>
         <source>2 Repeat: Track</source>
-        <translation type="unfinished"></translation>
+        <translation>2 Ripeti: Traccia</translation>
     </message>
     <message>
         <source>2 Repeat: None</source>
-        <translation type="unfinished"></translation>
+        <translation>2 Ripeti: No</translation>
     </message>
     <message>
         <source>Repeat: None</source>
-        <translation type="unfinished"></translation>
+        <translation>Ripeti: No</translation>
     </message>
     <message>
         <source>3 Edit Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>3 Modifica Playlist</translation>
     </message>
     <message>
         <source>4 Visualize</source>
-        <translation type="unfinished"></translation>
+        <translation>4 Visualizza</translation>
     </message>
     <message>
         <source>1 Shuffle: Smart</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Ordine: Furbo</translation>
     </message>
     <message>
         <source>Shuffle: Smart</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordine: Furbo</translation>
     </message>
     <message>
         <source>1 Shuffle: Rand</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Ordine: Casuale</translation>
     </message>
     <message>
         <source>Shuffle: Rand</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordine: Casuale</translation>
     </message>
     <message>
         <source>playlist root</source>
-        <translation type="unfinished"></translation>
+        <translation>Radice della Playlist</translation>
     </message>
     <message>
         <source>kbps</source>
-        <translation type="unfinished"></translation>
+        <translation>kbps</translation>
     </message>
     <message>
         <source>kHz</source>
-        <translation type="unfinished"></translation>
+        <translation>kHz</translation>
     </message>
     <message>
         <source>ch</source>
-        <translation type="unfinished"></translation>
+        <translation>ch</translation>
     </message>
 </context>
 <context>
@@ -248,27 +209,27 @@
     </message>
     <message>
         <source>BumpScope</source>
-        <translation type="unfinished"></translation>
+        <translation>BumpScope</translation>
     </message>
     <message>
         <source>Various Artists</source>
-        <translation type="unfinished"></translation>
+        <translation>Artisti Vari</translation>
     </message>
     <message>
         <source>Ogg Vorbis Audio</source>
-        <translation type="unfinished"></translation>
+        <translation>Audio Ogg Vorbis</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Sconosciuto</translation>
     </message>
     <message>
         <source>FLAC Audio</source>
-        <translation type="unfinished"></translation>
+        <translation>Audio FLAC</translation>
     </message>
     <message>
         <source>Directory to hold music</source>
-        <translation type="unfinished"></translation>
+        <translation>Cartella che contiene i file musicali</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythMusic needs to have write permission to the directory.</source>
@@ -690,6 +651,110 @@
         <source>CD Ripper Settings (part 2)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Enable CD Writing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Requires a SCSI or an IDE-SCSI CD Writer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CD-Writer Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the SCSI Device for CD Writing.  If your IDE device is not present, try adding hdd(or hdc/hdb)=ide-scsi to your boot options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disk Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>650MB/75min</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>700MB/80min</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default CD Capacity.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable directories on MP3 Creation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CD Write Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1x</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2x</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4x</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8x</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>16x</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CD Writer speed. Auto will use the recomended speed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CD Blanking Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Complete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blanking Method. Fast takes 1 minute. Complete can take up to 20 minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CD Recording Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Artists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Creating CD File System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Burning CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Ripper</name>
@@ -739,18 +804,18 @@
     </message>
     <message>
         <source>Genre: </source>
-        <translation type="unfinished"></translation>
+        <translation>Genere:</translation>
     </message>
     <message>
         <source>Ripping...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ripping...</translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
         <source>Please Wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>Attendere Prego...</translation>
     </message>
 </context>
 </TS>

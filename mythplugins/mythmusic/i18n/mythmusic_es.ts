@@ -42,7 +42,7 @@
     <name>DatabaseBox</name>
     <message>
         <source>Select music to be played:</source>
-        <translation>Seleccione la música a escuchar:</translation>
+        <translation type="obsolete">Seleccione la música a escuchar:</translation>
     </message>
     <message>
         <source>Copy To New Playlist</source>
@@ -91,6 +91,38 @@
     <message>
         <source>Loading Music Data</source>
         <translation>Cargando datos de música</translation>
+    </message>
+    <message>
+        <source>The theme you are using does not contain a &apos;musictree&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t create CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CD Created</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CD-RW Blanking Progress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Audio CD from Playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create MP3 CD from Playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear CD-RW Disk</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -714,6 +746,110 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>CD Ripper Settings (part 2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable CD Writing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Requires a SCSI or an IDE-SCSI CD Writer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CD-Writer Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the SCSI Device for CD Writing.  If your IDE device is not present, try adding hdd(or hdc/hdb)=ide-scsi to your boot options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disk Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>650MB/75min</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>700MB/80min</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default CD Capacity.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable directories on MP3 Creation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CD Write Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1x</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2x</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4x</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8x</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>16x</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CD Writer speed. Auto will use the recomended speed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CD Blanking Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Complete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blanking Method. Fast takes 1 minute. Complete can take up to 20 minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CD Recording Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Artists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Creating CD File System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Burning CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
