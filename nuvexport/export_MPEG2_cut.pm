@@ -84,7 +84,7 @@ package export_MPEG2_cut;
 			return 0;
 		}
 
-		my $command = "mpeg2cut $main::video_dir/$self->{episode}->{filename} $safe_outfile ";
+		my $command = "mpeg2cut $main::video_dir/$self->{episode}->{filename} $safe_outfile $self->{episode}->{lastgop} ";
 
 		@cuts = split("\n",$self->{episode}->{cutlist});
 		my @skiplist;

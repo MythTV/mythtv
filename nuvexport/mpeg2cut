@@ -6,7 +6,7 @@
 # Prerequisites:
 #   avidemux2	- http://fixounet.free.fr/avidemux/
 #   transcode	- http://zebra.fh-weingarten.de/~transcode/
-#   lvemux	- http://lvempeg.sourceforge.net/
+#   lvemux      - http://lvempeg.sourceforge.net/
 #   gdk2-cursed - http://zemljanka.sourceforge.net/cursed/
 #
 # Usage: mpeg2cut inputfile outputfile segmentList
@@ -16,58 +16,107 @@
 export LD_PRELOAD=libgdk-cursed-2.0.so:libgtk-cursed-2.0.so
 
 FILENAME=$1
-OUTFILE=$2
 BASENAME=`basename ${FILENAME} .nuv`
+OUTFILE=$2
+LASTGOP=$3
+
+# get the largest numbered mark of type 6 * (15 NTSC or 12 PAL), that's the
+# last GOP frame
 
 echo Filename \"${FILENAME}\"
 echo OutFile \"${OUTFILE}\"
 
-shift
-shift
+shift 3
 CUTLIST=$*
 
+echo Last GOP index ${LASTGOP}
 echo Cutlist \"${CUTLIST}\"
+
+echo -n Finding the AV Offset to use with lvemux:
+OFFSET=`(tcprobe -i ${FILENAME} 2> /dev/null) | grep av_fine_ms | \
+	sed -e 's/^.*av_fine_ms //' | cut -d " " -f 1`
+OFFSET=$((-1 * ${OFFSET}))
+echo ${OFFSET}
+
+echo -n Finding framerate:
+FRAMERATE=`(tcprobe -i ${FILENAME} 2> /dev/null) | grep "frame rate" | \
+	sed -e 's/^.*-f //' | cut -d " " -f 1`
+echo ${FRAMERATE}
+
+if [ .${FRAMERATE}. = .25.000. ]
+then
+	GOPSPACE=12
+else
+	GOPSPACE=15
+fi
+
+LASTFRAME=$(( ${LASTGOP} * ${GOPSPACE} ))
+echo Last Frame ${LASTFRAME}
 
 if [ ! -f ${FILENAME}.idx ]
 then
+	echo Indexing the file with avidemux2
 	nice -n 19 avidemux2 --index-mpeg ${FILENAME} ${FILENAME}.idx C0 \
-		--audio-codec MP2 --quit 2> /dev/null
+		--audio-codec MP2 --quit 2> /dev/null > /dev/null
 fi
 
-OFFSET=`(tcprobe -i ${FILENAME} 2> /dev/null) | grep av_fine_ms | \
-	sed -e 's/^.*av_fine_ms //' | cut -d " " -f 1`
+
+cat > ${BASENAME}.cut << EOF
+ADMW0002
+01 videos
+Name : ${FILENAME}.idx
+EOF
+
+cat /dev/null > ${BASENAME}.cut2
 
 count=0
-SLICELIST=""
-
 for i in ${CUTLIST}
 do
 	START=`echo $i | cut -d '-' -f 1`
 	END=`echo $i | cut -d '-' -f 2`
-	SLICE=${BASENAME}_${count}
 
-	if [ .${START}. != .. ]
+	if [ .${START}. = .. ]
 	then
-		START="--begin ${START}"
+		START=0
 	fi
 
-	if [ .${END}. != .. ]
+	if [ ${START} -ge ${LASTFRAME} ]
 	then
-		END="--end ${END}"
+		continue
 	fi
 
-	nice -n 19 avidemux2 --load ${FILENAME} ${START} ${END} \
-		--audio-codec MP2 --save-raw-video ${SLICE}.m2v \
-		--save-raw-audio ${SLICE}.mp2 --quit 2> /dev/null
-	nice -n 19 lvemux -sh $((-1 * ${OFFSET})) -v ${SLICE}.m2v \
-		-a ${SLICE}.mp2 -o ${SLICE}.mpg
-	rm ${SLICE}.m2v ${SLICE}.m2v.idx ${SLICE}.mp2
+	if [ .${END}. = .. ]
+	then
+		END=${LASTFRAME}
+	fi
+	LENGTH=$((${END} - ${START} + 1))
 
-	SLICELIST="${SLICELIST} ${SLICE}.mpg"
+	cat >> ${BASENAME}.cut2 << EOF
+Start : ${START}
+Size : ${LENGTH}
+Ref :   0
+EOF
 	count=$((${count} + 1))
 done
+echo ${count} segments >> ${BASENAME}.cut
 
-echo Concatenating ${count} segments
-nice -n 19 cat ${SLICELIST} > ${OUTFILE}
-rm ${SLICELIST} ${FILENAME}.idx
+cat ${BASENAME}.cut2 >> ${BASENAME}.cut
+cat >> ${BASENAME}.cut << EOF
+Audio codec : none
+Audio filter : audioNormalizeMode=0 audioResampleMode=0 audioDRC=0 audioShift=0
+audioDelay=0 audioFreq=48000
+Audio conf : audioProcessMode=0 audioMP3mode=0 audioMP3bitrate=128
+EOF
+
+echo Cutting out commercials with avidemux2
+nice -n 19 avidemux2 --load-workbench ${BASENAME}.cut \
+	--audio-codec MP2 --save-raw-video ${BASENAME}.m2v \
+	--save-raw-audio ${BASENAME}.mp2 --quit 2> /dev/null > /dev/null
+
+echo Remultiplexing video
+nice -n 19 lvemux -r -1 -v ${BASENAME}.m2v -a ${BASENAME}.mp2 -o "${OUTFILE}"
+
+echo Cleaning up
+rm ${FILENAME}.idx ${BASENAME}.m2v ${BASENAME}.mp2 ${BASENAME}.m2v.idx
+rm ${BASENAME}.cut ${BASENAME}.cut2
 

@@ -245,7 +245,11 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
 
 # Parse out the record data for each file
     $q = "SELECT title, subtitle, description, hostname, cutlist FROM recorded WHERE chanid=? AND starttime=? AND endtime=?";
+    my $q2 = "SELECT mark FROM recordedmarkup WHERE chanid=? AND starttime=? AND type=6 ORDER BY mark DESC LIMIT 1";
+
     $sh = $dbh->prepare($q);
+    my $sh2 = $dbh->prepare($q2);
+
     foreach $file (@Files) {
         next unless ($file =~ /\.nuv$/);
     # Pull out the various parts that make up the filename
@@ -263,6 +267,10 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
         my ($show, $episode, $description, $show_hostname, $cutlist) = $sh->fetchrow_array;
     # Unknown file - someday we should report this
         next unless ($show);
+
+        $sh2->execute($channel, "$syear$smonth$sday$shour$sminute$ssecond")
+            or die "Could not execute ($q2):  $!\n\n";
+        my ($lastgop) = $sh2->fetchrow_array;
     #$description =~ s/(?:''|``)/"/sg;
         push @{$Shows{$show}}, {'filename'       => $file,
                                 'channel'        => $channel,
@@ -274,6 +282,7 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
                                 'description'    => ($description or 'No Description'),
                                 'hostname'       => $show_hostname,
                                 'cutlist'        => $cutlist,
+				'lastgop'	 => $lastgop,
                                 'showtime'       => generate_showtime($syear, $smonth, $sday, $shour, $sminute, $ssecond)};
     }
     $sh->finish();
