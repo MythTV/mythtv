@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-01-29, v1.086
+<date>2003-01-30, v1.087
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2231,6 +2231,10 @@ away from MythTV to service other processes.
 As an example, if you are capturing at 640x480, you may wish to run X
 Windows and the MythTV GUI at 640x480.
 
+If you'd like to read more on this, go to the vcdhelp website at <url
+url="http://www.vcdhelp.com/forum/userguides/94382.php"
+name="http://www.vcdhelp.com/forum/userguides/94382.php">.
+
 <sect1>I'd like to delete the mysql database.
 <p><bf>NOTE</bf>:  Performing this step will remove the entire database. 
 You will lose all of your settings and will need to re-run the mc.sql script
@@ -2455,6 +2459,7 @@ v1.085, 2003-01-29.  Instructions for setting /etc/sysconfig/harddiskhda,
 etc.  Adjusted section 4 again; didn't know that RH8 sets the paths in the
 RPM install.
 v1.086, 2003-01-29.  More on resolution hints.
+v1.087, 2003-01-30.  Pointer to VCDHelp's webpage on resolution.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

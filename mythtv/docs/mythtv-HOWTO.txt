@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-01-29, v1.086
+  2003-01-30, v1.087
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -2332,6 +2332,10 @@
 
   As an example, if you are capturing at 640x480, you may wish to run X
   Windows and the MythTV GUI at 640x480.
+
+  If you'd like to read more on this, go to the vcdhelp website at
+  http://www.vcdhelp.com/forum/userguides/94382.php
+  <http://www.vcdhelp.com/forum/userguides/94382.php>.
 
   [1m18.5.  I'd like to delete the mysql database.[0m
 
