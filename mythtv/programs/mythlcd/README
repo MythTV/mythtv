@@ -49,9 +49,9 @@ use/debug/play with mythLCD code and see the results in a terminal. This can
 be surprisingly useful, as it's an easy way to see the status of a mythbox
 on the display of another computer.
  
-	****IMPORTANT****:  you need to build myth from source for this to
-work. Before building, you need to edit settings.pro and uncomment the
-LCD_DEVICE define.
+	****IMPORTANT****: You need to enable LCD output in mythfrontend in order
+for this to work. The "Enable LCD display" setting is on the last page of the
+"Appearance" settings wizard.
 
 	Once LCDproc is up and running, go into programs/mythlcd and type
 make. Now just run the program (i.e. ./mythlcd). There is no "make install".
