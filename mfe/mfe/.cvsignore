@@ -1,2 +1,5 @@
 Makefile
 moc_mfedialog.cpp
+moc_playlistdialog.cpp
+moc_netflasher.cpp
+
