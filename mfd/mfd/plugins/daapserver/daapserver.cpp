@@ -519,10 +519,7 @@ void DaapServer::sendMetadata(HttpInRequest *http_request, QString request_path,
     //  have to munge the path a bit
     //
 
-    if(
-        daap_request->getClientType() == DAAP_CLIENT_ITUNES45 &&
-        request_path.contains("daap://")
-      )
+    if(request_path.contains("daap://"))
     {
         request_path = request_path.section(":", 2, -1);
         request_path = request_path.section("/", 1, -1);
