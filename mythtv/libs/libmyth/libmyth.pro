@@ -29,6 +29,8 @@ inc.files += settings.h uitypes.h xmlparse.h mythplugin.h mythdialogs.h
 inc.files += audiooutput.h inetcomms.h httpcomms.h mythmedia.h mythcdrom.h 
 inc.files += mythmediamonitor.h mythwizard.h
 
+INSTALLS += inc
+
 using_alsa {
     DEFINES += USE_ALSA
     HEADERS += audiooutputalsa.h
@@ -43,4 +45,9 @@ using_lirc {
     LIBS += $$LIRC_LIBS
 }
 
-INSTALLS += inc
+using_arts {
+    DEFINES += USE_ARTS
+    HEADERS += audiooutputarts.h
+    SOURCES += audiooutputarts.cpp
+    LIBS += $$ARTS_LIBS
+}

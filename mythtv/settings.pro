@@ -31,6 +31,12 @@ EXTRA_LIBS += -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm
 #CONFIG += using_alsa
 #ALSA_LIBS = -lasound
 
+# Native ARTS support
+#CONFIG += using_arts
+#ARTS_LIBS = -L/opt/kde3/lib -ldl -lartsc -lpthread
+#EXTRA_LIBS += -L/opt/kde3/lib -ldl -lartsc -lpthread
+#INCLUDEPATH += /opt/kde3/include
+
 # DVB support
 #CONFIG += using_dvb
 #DEFINES += USING_DVB

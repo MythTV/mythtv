@@ -964,6 +964,7 @@ public:
         addSelection(sampdate.toString("MM.dd"), "MM.dd");
         addSelection(sampdate.toString("ddd d MMM"), "ddd d MMM");
         addSelection(sampdate.toString("dd.MM.yyyy"), "dd.MM.yyyy");
+        addSelection(sampdate.toString("yyyy-MM-dd"), "yyyy-MM-dd");
         setHelpText(QObject::tr("Your preferred date format."));
     };
 };
@@ -983,6 +984,7 @@ public:
         addSelection(sampdate.toString("MM.dd"), "MM.dd");
         addSelection(sampdate.toString("d.M."), "d.M.");
         addSelection(sampdate.toString("dd.MM."), "dd.MM.");
+        addSelection(sampdate.toString("MM-dd"), "MM-dd");
         setHelpText(QObject::tr("Your preferred short date format."));
     };
 };
@@ -993,7 +995,7 @@ public:
         GlobalSetting("TimeFormat") {
         setLabel(QObject::tr("Time format"));
 
-        QTime samptime(18, 56, 0);
+        QTime samptime(6, 56, 0);
 
         addSelection(samptime.toString("h:mm AP"), "h:mm AP");
         addSelection(samptime.toString("h:mm ap"), "h:mm ap");
