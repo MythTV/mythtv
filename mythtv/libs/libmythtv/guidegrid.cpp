@@ -33,6 +33,7 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel,
          : MythDialog(context, parent, name)
 {
     DISPLAY_CHANS = 6;
+    int maxchannel = 0;
 
     embedcallback = embedcb;
     callbackdata = data;
@@ -106,7 +107,10 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel,
     fillTimeInfos();
     //int filltime = clock.elapsed();
     //clock.restart();
-    fillChannelInfos();
+    fillChannelInfos(maxchannel);
+    if (DISPLAY_CHANS > maxchannel)
+        DISPLAY_CHANS = maxchannel;
+
     //int fillchannels = clock.elapsed();
     //clock.restart();
     fillProgramInfos();
@@ -453,7 +457,7 @@ void GuideGrid::timeout()
                       forvideo->width(), forvideo->height());
 }
 
-void GuideGrid::fillChannelInfos()
+void GuideGrid::fillChannelInfos(int &maxchannel)
 {
     m_channelInfos.clear();
 
@@ -465,6 +469,7 @@ void GuideGrid::fillChannelInfos()
     query.exec(thequery);
     
     bool set = false;
+    maxchannel = 0;
     
     if (query.isActive() && query.numRowsAffected() > 0)
     {
@@ -490,6 +495,7 @@ void GuideGrid::fillChannelInfos()
             }
 		
             m_channelInfos.push_back(val);
+            maxchannel++;
         }
     }
     else

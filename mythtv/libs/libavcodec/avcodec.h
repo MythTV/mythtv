@@ -5,8 +5,8 @@
 
 #define LIBAVCODEC_VERSION_INT 0x000406
 #define LIBAVCODEC_VERSION     "0.4.6"
-#define LIBAVCODEC_BUILD       4647
-#define LIBAVCODEC_BUILD_STR   "4647"
+#define LIBAVCODEC_BUILD       4649
+#define LIBAVCODEC_BUILD_STR   "4649"
 
 enum CodecID {
     CODEC_ID_NONE, 
@@ -60,7 +60,6 @@ enum CodecType {
 };
 
 enum PixelFormat {
-    PIX_FMT_ANY = -1,
     PIX_FMT_YUV420P,
     PIX_FMT_YUV422,
     PIX_FMT_RGB24,
@@ -147,6 +146,7 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
 #define CODEC_FLAG_INTERLACED_DCT 0x00040000 /* use interlaced dct */
 #define CODEC_FLAG_LOW_DELAY      0x00080000 /* force low delay / will fail on b frames */
 #define CODEC_FLAG_ALT_SCAN       0x00100000 /* use alternate scan */
+#define CODEC_FLAG_TRELLIS_QUANT  0x00200000 /* use trellis quantization */
 
 /* codec capabilities */
 
@@ -827,8 +827,10 @@ typedef struct AVCodecContext {
 #define FF_DEBUG_MB_TYPE   8
 #define FF_DEBUG_QP        16
 #define FF_DEBUG_MV        32
-#define FF_DEBUG_VIS_MV    64
-#define FF_DEBUG_SKIP      128
+#define FF_DEBUG_VIS_MV    0x00000040
+#define FF_DEBUG_SKIP      0x00000080
+#define FF_DEBUG_STARTCODE 0x00000100
+#define FF_DEBUG_PTS       0x00000200
     
     /**
      * error
@@ -880,11 +882,19 @@ typedef struct AVCodecContext {
 #define FF_CMP_CHROMA 256
     
     /**
-     * ME diamond size
+     * ME diamond size & shape
      * encoding: set by user.
      * decoding: unused
      */
     int dia_size;
+
+    /**
+     * amount of previous MV predictors (2a+1 x 2a+1 square)
+     * encoding: set by user.
+     * decoding: unused
+     */
+    int last_predictor_count;
+
 } AVCodecContext;
 
 typedef struct AVCodec {

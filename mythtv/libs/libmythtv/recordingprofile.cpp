@@ -273,7 +273,7 @@ public:
         QString fullsize, halfsize;
         int maxwidth, maxheight;
         if (tvFormat.lower() == "ntsc" || tvFormat.lower() == "ntsc-jp") {
-            maxwidth = 640;
+            maxwidth = 720;
             maxheight = 480;
 
         } else {

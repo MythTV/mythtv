@@ -98,8 +98,7 @@ void OSD::SetNoThemeDefaults(void)
     {
         name = "channel_font";
         int fontsize = 40;
-        if (vid_width < 400)
-            fontsize /= 2;
+        fontsize = (int)(fontsize * hmult);
 
         chanfont = LoadFont(fontname, fontsize);
        
@@ -134,8 +133,7 @@ void OSD::SetNoThemeDefaults(void)
     {
         name = "info_font";
         int fontsize = 16;
-        if (vid_width < 400) 
-            fontsize /= 2;
+        fontsize = (int)(fontsize * hmult);
 
         infofont = LoadFont(fontname, fontsize);
 
@@ -294,9 +292,13 @@ bool OSD::LoadTheme(void)
         int x = position.x();
         int y = position.y();
 
+        x = (int)(x * wmult);
+
         x += (int)(vid_width * 0.045);
         if (y == -1)
             y = (int)(vid_height * 0.95 - imageheight);
+        else
+            y = (int)(y * hmult);
 
         position.setX(x);
         position.setY(y);
@@ -307,8 +309,7 @@ bool OSD::LoadTheme(void)
         if (fontsize == 0)
             fontsize = 16;
 
-        if (vid_width < 400)
-            fontsize /= 2;
+        fontsize = (int)(fontsize * hmult);
 
         name = "info_font";
         TTFFont *infofont = LoadFont(fontname, fontsize);
@@ -433,9 +434,13 @@ bool OSD::LoadTheme(void)
         int x = position.x();
         int y = position.y();
 
+        x = (int)(x * wmult);
+
         x += (int)(vid_width * 0.045);
         if (y == -1)
             y = (int)(vid_height * 0.95 - image->ImageSize().height());
+        else
+            y = (int)(y * hmult);
 
         position.setX(x);
         position.setY(y);
@@ -446,9 +451,8 @@ bool OSD::LoadTheme(void)
         if (fontsize == 0)
             fontsize = 16;
 
-        if (vid_width < 400)
-            fontsize /= 2;
-
+        fontsize = (int)(fontsize * hmult);
+ 
         name = "pause_font";
         TTFFont *pausefont = LoadFont(fontname, fontsize);
 
@@ -518,8 +522,7 @@ bool OSD::LoadTheme(void)
         if (!channumfontsize)
             channumfontsize = 40;
 
-        if (vid_height < 400)
-            channumfontsize /= 2;
+        channumfontsize = (int)(channumfontsize * hmult);
 
         name = "channel_font";
         TTFFont *chanfont = LoadFont(fontname, channumfontsize);
@@ -549,8 +552,7 @@ bool OSD::LoadTheme(void)
         if (!settingsfontsize)
             settingsfontsize = 40;
 
-        if (vid_height < 400)
-            settingsfontsize /= 2;
+        settingsfontsize = (int)(settingsfontsize * hmult);
 
         name = "settings_font";
         TTFFont *settingsfont = LoadFont(fontname, settingsfontsize);

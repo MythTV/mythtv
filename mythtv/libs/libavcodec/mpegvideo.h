@@ -150,8 +150,8 @@ typedef struct MotionEstContext{
     int (*motion_search[7])(struct MpegEncContext * s, int block,
                              int *mx_ptr, int *my_ptr,
                              int P[10][2], int pred_x, int pred_y,
-                             int xmin, int ymin, int xmax, int ymax, Picture *ref_picture,
-                             uint16_t * const mv_penalty);
+                             int xmin, int ymin, int xmax, int ymax, Picture *ref_picture, int16_t (*last_mv)[2], 
+                             int ref_mv_scale, uint16_t * const mv_penalty);
 }MotionEstContext;
 
 typedef struct MpegEncContext {
@@ -307,6 +307,13 @@ typedef struct MpegEncContext {
     int inter_quant_bias;    /* bias for the quantizer */
     int min_qcoeff;          /* minimum encodable coefficient */
     int max_qcoeff;          /* maximum encodable coefficient */
+    int ac_esc_length;       /* num of bits needed to encode the longest esc */
+    uint8_t *intra_ac_vlc_length;
+    uint8_t *intra_ac_vlc_last_length;
+    uint8_t *inter_ac_vlc_length;
+    uint8_t *inter_ac_vlc_last_length;
+#define UNI_AC_ENC_INDEX(run,level) ((run)*128 + (level))
+
     /* precomputed matrix (combine qscale and DCT renorm) */
     int __align8 q_intra_matrix[32][64];
     int __align8 q_inter_matrix[32][64];
@@ -362,7 +369,7 @@ typedef struct MpegEncContext {
     
     int resync_mb_x;                 /* x position of last resync marker */
     int resync_mb_y;                 /* y position of last resync marker */
-    GetBitContext last_resync_gb;    /* used to serach for the next resync marker */
+    GetBitContext last_resync_gb;    /* used to search for the next resync marker */
     int mb_num_left;                 /* number of MBs left in this video packet (for partitioned Slices only)*/
     int next_p_frame_damaged;        /* set if the next p frame is damaged, to avoid showing trashed b frames */
     int error_resilience;
@@ -435,6 +442,7 @@ typedef struct MpegEncContext {
     INT8 (*field_select_table)[2];   /* wtf, no really another table for interlaced b frames */
     int t_frame;                     /* time distance of first I -> B, used for interlaced b frames */
     int padding_bug_score;           /* used to detect the VERY common padding bug in MPEG4 */
+    int last_vo_picture_number;      /* last picture number for which we added a VOS/VO/VOL header */
 
     /* divx specific, used to workaround (many) bugs in divx5 */
     int divx_version;

@@ -86,7 +86,7 @@ class GuideGrid : public MythDialog
     QRect titleRect() const;
     QRect infoRect() const;
 
-    void fillChannelInfos();
+    void fillChannelInfos(int &maxchannel);
 
     void fillTimeInfos();
 

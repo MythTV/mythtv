@@ -82,12 +82,13 @@ static UINT16 (*mv_penalty)[MAX_MV*2+1]= NULL;
 static UINT8 fcode_tab[MAX_MV*2+1];
 static UINT8 umv_fcode_tab[MAX_MV*2+1];
 
-static UINT32 uni_mpeg4_intra_rl_bits[64*64*2*2];
-static UINT8  uni_mpeg4_intra_rl_len [64*64*2*2];
-static UINT32 uni_mpeg4_inter_rl_bits[64*64*2*2];
-static UINT8  uni_mpeg4_inter_rl_len [64*64*2*2];
-#define UNI_MPEG4_ENC_INDEX(last,run,level) ((last)*128 + (run)*256 + (level))
+static uint32_t uni_mpeg4_intra_rl_bits[64*64*2*2];
+static uint8_t  uni_mpeg4_intra_rl_len [64*64*2*2];
+static uint32_t uni_mpeg4_inter_rl_bits[64*64*2*2];
+static uint8_t  uni_mpeg4_inter_rl_len [64*64*2*2];
+//#define UNI_MPEG4_ENC_INDEX(last,run,level) ((last)*128 + (run)*256 + (level))
 //#define UNI_MPEG4_ENC_INDEX(last,run,level) ((last)*128*64 + (run) + (level)*64)
+#define UNI_MPEG4_ENC_INDEX(last,run,level) ((last)*128*64 + (run)*128 + (level))
 
 /* mpeg4
 inter
@@ -1441,6 +1442,11 @@ void h263_encode_init(MpegEncContext *s)
         s->fcode_tab= fcode_tab;
         s->min_qcoeff= -2048;
         s->max_qcoeff=  2047;
+        s->intra_ac_vlc_length     = uni_mpeg4_intra_rl_len;
+        s->intra_ac_vlc_last_length= uni_mpeg4_intra_rl_len + 128*64;
+        s->inter_ac_vlc_length     = uni_mpeg4_inter_rl_len;
+        s->inter_ac_vlc_last_length= uni_mpeg4_inter_rl_len + 128*64;
+        s->ac_esc_length= 7+2+1+6+1+12+1;
         break;
     case CODEC_ID_H263P:
         s->fcode_tab= umv_fcode_tab;
@@ -1564,21 +1570,77 @@ void ff_set_mpeg4_time(MpegEncContext * s, int picture_number){
     }
 }
 
-static void mpeg4_encode_vol_header(MpegEncContext * s)
+static void mpeg4_encode_gop_header(MpegEncContext * s){
+    int hours, minutes, seconds;
+    
+    put_bits(&s->pb, 16, 0);
+    put_bits(&s->pb, 16, GOP_STARTCODE);
+    
+    seconds= s->time/s->time_increment_resolution;
+    minutes= seconds/60; seconds %= 60;
+    hours= minutes/60; minutes %= 60;
+    hours%=24;
+
+    put_bits(&s->pb, 5, hours);
+    put_bits(&s->pb, 6, minutes);
+    put_bits(&s->pb, 1, 1);
+    put_bits(&s->pb, 6, seconds);
+    
+    put_bits(&s->pb, 1, 0); //closed gov == NO
+    put_bits(&s->pb, 1, 0); //broken link == NO
+
+    ff_mpeg4_stuffing(&s->pb);
+}
+
+static void mpeg4_encode_visual_object_header(MpegEncContext * s){
+    int profile_and_level_indication;
+    int vo_ver_id;
+    
+    if(s->max_b_frames || s->quarter_sample){
+        profile_and_level_indication= 0xF1; // adv simple level 1
+        vo_ver_id= 5;
+    }else{
+        profile_and_level_indication= 0x01; // simple level 1
+        vo_ver_id= 1;
+    }
+    //FIXME levels
+
+    put_bits(&s->pb, 16, 0);
+    put_bits(&s->pb, 16, VOS_STARTCODE);
+    
+    put_bits(&s->pb, 8, profile_and_level_indication);
+    
+    put_bits(&s->pb, 16, 0);
+    put_bits(&s->pb, 16, VISUAL_OBJ_STARTCODE);
+    
+    put_bits(&s->pb, 1, 1);
+        put_bits(&s->pb, 4, vo_ver_id);
+        put_bits(&s->pb, 3, 1); //priority
+ 
+    put_bits(&s->pb, 4, 1); //visual obj type== video obj
+    
+    put_bits(&s->pb, 1, 0); //video signal type == no clue //FIXME
+
+    ff_mpeg4_stuffing(&s->pb);
+}
+
+static void mpeg4_encode_vol_header(MpegEncContext * s, int vo_number, int vol_number)
 {
-    int vo_ver_id=2; //must be 2 if we want GMC or q-pel
+    int vo_ver_id;
     char buf[255];
 
-    if(s->max_b_frames){
+    if(s->max_b_frames || s->quarter_sample){
+        vo_ver_id= 5;
         s->vo_type= ADV_SIMPLE_VO_TYPE;
     }else{
+        vo_ver_id= 1;
         s->vo_type= SIMPLE_VO_TYPE;
     }
 
     put_bits(&s->pb, 16, 0);
-    put_bits(&s->pb, 16, 0x100);        /* video obj */
+    put_bits(&s->pb, 16, 0x100 + vo_number);        /* video obj */
     put_bits(&s->pb, 16, 0);
-    put_bits(&s->pb, 16, 0x120);        /* video obj layer */
+    put_bits(&s->pb, 16, 0x120 + vol_number);       /* video obj layer */
 
     put_bits(&s->pb, 1, 0);		/* random access vol */
     put_bits(&s->pb, 8, s->vo_type);	/* video obj type indication */
@@ -1621,7 +1683,7 @@ static void mpeg4_encode_vol_header(MpegEncContext * s)
     put_bits(&s->pb, 1, 1);		/* obmc disable */
     if (vo_ver_id == 1) {
         put_bits(&s->pb, 1, s->vol_sprite_usage=0);		/* sprite enable */
-    }else{ /* vo_ver_id == 2 */
+    }else{
         put_bits(&s->pb, 2, s->vol_sprite_usage=0);		/* sprite enable */
     }
     
@@ -1665,8 +1727,13 @@ void mpeg4_encode_picture_header(MpegEncContext * s, int picture_number)
     int time_div, time_mod;
     
     if(s->pict_type==I_TYPE){
-        if(picture_number==0 || !s->strict_std_compliance)
-            mpeg4_encode_vol_header(s);
+        if(picture_number - s->last_vo_picture_number >= 300 || picture_number==0){
+            mpeg4_encode_visual_object_header(s);
+            mpeg4_encode_vol_header(s, 0, 0);
+
+            s->last_vo_picture_number= picture_number;
+        }
+        mpeg4_encode_gop_header(s);
     }
     
     s->partitioned_frame= s->data_partitioning && s->pict_type!=B_TYPE;
@@ -1674,7 +1741,7 @@ void mpeg4_encode_picture_header(MpegEncContext * s, int picture_number)
 //printf("num:%d rate:%d base:%d\n", s->picture_number, s->frame_rate, FRAME_RATE_BASE);
     
     put_bits(&s->pb, 16, 0);	        /* vop header */
-    put_bits(&s->pb, 16, 0x1B6);	/* vop header */
+    put_bits(&s->pb, 16, VOP_STARTCODE);	/* vop header */
     put_bits(&s->pb, 2, s->pict_type - 1);	/* pict type: I = 0 , P = 1 */
 
     time_div= s->time/s->time_increment_resolution;
@@ -4147,6 +4214,22 @@ printf("offset: %d:%d , delta: %d %d %d %d, shift %d\n",
 #endif
 }
 
+static int mpeg4_decode_gop_header(MpegEncContext * s, GetBitContext *gb){
+    int hours, minutes, seconds;
+
+    hours= get_bits(gb, 5);
+    minutes= get_bits(gb, 6);
+    skip_bits1(gb);
+    seconds= get_bits(gb, 6);
+
+    s->time_base= seconds + 60*(minutes + 60*hours);
+
+    skip_bits1(gb);
+    skip_bits1(gb);
+    
+    return 0;
+}
+
 static int decode_vol_header(MpegEncContext *s, GetBitContext *gb){
     int width, height, vo_ver_id;
 
@@ -4504,6 +4587,8 @@ static int decode_vop_header(MpegEncContext *s, GetBitContext *gb){
     }
     
     s->current_picture.pts= s->time*1000LL*1000LL / s->time_increment_resolution;
+    if(s->avctx->debug&FF_DEBUG_PTS)
+        printf("MPEG4 PTS: %f\n", s->current_picture.pts/(1000.0*1000.0));
     
     if(check_marker(gb, "before vop_coded")==0 && s->picture_number==0){
         printf("hmm, seems the headers arnt complete, trying to guess time_increment_bits\n");
@@ -4668,17 +4753,51 @@ int ff_mpeg4_decode_picture_header(MpegEncContext * s, GetBitContext *gb)
         if((startcode&0xFFFFFF00) != 0x100)
             continue; //no startcode
         
+        if(s->avctx->debug&FF_DEBUG_STARTCODE){
+            printf("startcode: %3X ", startcode);
+            if     (startcode<=0x11F) printf("Video Object Start");
+            else if(startcode<=0x12F) printf("Video Object Layer Start");
+            else if(startcode<=0x13F) printf("Reserved");
+            else if(startcode<=0x15F) printf("FGS bp start");
+            else if(startcode<=0x1AF) printf("Reserved");
+            else if(startcode==0x1B0) printf("Visual Object Seq Start");
+            else if(startcode==0x1B1) printf("Visual Object Seq End");
+            else if(startcode==0x1B2) printf("User Data");
+            else if(startcode==0x1B3) printf("Group of VOP start");
+            else if(startcode==0x1B4) printf("Video Session Error");
+            else if(startcode==0x1B5) printf("Visual Object Start");
+            else if(startcode==0x1B6) printf("Video Object Plane start");
+            else if(startcode==0x1B7) printf("slice start");
+            else if(startcode==0x1B8) printf("extension start");
+            else if(startcode==0x1B9) printf("fgs start");
+            else if(startcode==0x1BA) printf("FBA Object start");
+            else if(startcode==0x1BB) printf("FBA Object Plane start");
+            else if(startcode==0x1BC) printf("Mesh Object start");
+            else if(startcode==0x1BD) printf("Mesh Object Plane start");
+            else if(startcode==0x1BE) printf("Still Textutre Object start");
+            else if(startcode==0x1BF) printf("Textutre Spatial Layer start");
+            else if(startcode==0x1C0) printf("Textutre SNR Layer start");
+            else if(startcode==0x1C1) printf("Textutre Tile start");
+            else if(startcode==0x1C2) printf("Textutre Shape Layer start");
+            else if(startcode==0x1C3) printf("stuffing start");
+            else if(startcode<=0x1C5) printf("reserved");
+            else if(startcode<=0x1FF) printf("System start");
+            printf(" at %d\n", get_bits_count(gb));
+        }
+
         switch(startcode){
         case 0x120:
             decode_vol_header(s, gb);
             break;
-        case 0x1b2:
+        case USER_DATA_STARTCODE:
             decode_user_data(s, gb);
             break;
-        case 0x1b6:
+        case GOP_STARTCODE:
+            mpeg4_decode_gop_header(s, gb);
+            break;
+        case VOP_STARTCODE:
             return decode_vop_header(s, gb);
         default:
-//            printf("startcode %X found\n", startcode);
             break;
         }
 

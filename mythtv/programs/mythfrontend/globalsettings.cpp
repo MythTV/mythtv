@@ -212,6 +212,8 @@ public:
        GlobalSetting("FixedAspectRatio") {
        setLabel("Fixed aspect ratio");
        setValue(false);
+       setHelpText("If this is set, the TV picture will be shaped to fit a "
+                   "4x3 aspect ratio when not in fullscreen mode.");
     };
 };
 

@@ -56,6 +56,7 @@ int ff_h263_decode_init(AVCodecContext *avctx)
     s->progressive_sequence=1;
     s->decode_mb= ff_h263_decode_mb;
     s->low_delay= 1;
+    avctx->pix_fmt= PIX_FMT_YUV420P;
 
     /* select sub codec */
     switch(avctx->codec->id) {
@@ -463,6 +464,9 @@ retry:
             s->workaround_bugs|= FF_BUG_QPEL_CHROMA;
         
         if(s->avctx->fourcc == ff_get_fourcc("XVID") && s->xvid_build==0)
+            s->padding_bug_score= 256*256*256*64;
+        
+        if(s->xvid_build && s->xvid_build<=3)
             s->padding_bug_score= 256*256*256*64;
         
         if(s->xvid_build && s->xvid_build<=1)
