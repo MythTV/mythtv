@@ -522,7 +522,7 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(QSqlDatabase *db,
         if (!query.exec() || !query.isActive())
         {
             MythContext::DBError("ProgramInfo::GetProgramAtDateTime", 
-                                 query.executedQuery());
+                                 query);
             return p;
         }
 
@@ -802,7 +802,7 @@ void ProgramInfo::ApplyRecordRecGroupChange(QSqlDatabase *db,
     query.bindValue(":CHANID", chanid);
 
     if (!query.exec())
-        MythContext::DBError("RecGroup update", query.executedQuery());
+        MythContext::DBError("RecGroup update", query);
 
     recgroup = newrecgroup;
 }
@@ -1036,7 +1036,7 @@ void ProgramInfo::SetFilesize(long long fsize, QSqlDatabase *db)
     
     if (!query.exec() || !query.isActive())
         MythContext::DBError("File size update", 
-                             query.executedQuery());
+                             query);
 }
 
 long long ProgramInfo::GetFilesize(QSqlDatabase *db)
@@ -1074,13 +1074,17 @@ void ProgramInfo::SetBookmark(long long pos, QSqlDatabase *db)
     query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
     
     if (pos > 0)
-        query.bindValue(":BOOKMARK", pos);
+    {
+        char posstr[128];
+        sprintf(posstr, "%lld", pos);
+        query.bindValue(":BOOKMARK", posstr);
+    }
     else
         query.bindValue(":BOOKMARK", "NULL");
     
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Save position update",
-                             query.executedQuery());
+                             query);
 }
 
 long long ProgramInfo::GetBookmark(QSqlDatabase *db)
@@ -1144,7 +1148,7 @@ void ProgramInfo::SetEditing(bool edit, QSqlDatabase *db)
    
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Edit status update", 
-                             query.executedQuery());
+                             query);
 }
 
 bool ProgramInfo::IsCommFlagged(QSqlDatabase *db)
@@ -1182,7 +1186,7 @@ void ProgramInfo::SetCommFlagged(int flag, QSqlDatabase *db)
     
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Commercial Flagged status update",
-                             query.executedQuery());
+                             query);
 }
 
 bool ProgramInfo::IsCommProcessing(QSqlDatabase *db)
@@ -1220,7 +1224,7 @@ void ProgramInfo::SetPreserveEpisode(bool preserveEpisode, QSqlDatabase *db)
     query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("PreserveEpisode update", query.executedQuery());
+        MythContext::DBError("PreserveEpisode update", query);
 }
 
 void ProgramInfo::SetAutoExpire(bool autoExpire, QSqlDatabase *db)
@@ -1238,7 +1242,7 @@ void ProgramInfo::SetAutoExpire(bool autoExpire, QSqlDatabase *db)
 
     if(!query.exec() || !query.isActive())
         MythContext::DBError("AutoExpire update",
-                             query.executedQuery());
+                             query);
 }
 
 bool ProgramInfo::GetAutoExpireFromRecorded(QSqlDatabase *db)
@@ -1383,7 +1387,7 @@ void ProgramInfo::SetCutList(QMap<long long, int> &delMap, QSqlDatabase *db)
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("cutlist update", 
-                             query.executedQuery());
+                             query);
 }
 
 void ProgramInfo::SetBlankFrameList(QMap<long long, int> &frames,
@@ -1458,7 +1462,7 @@ void ProgramInfo::ClearMarkupMap(QSqlDatabase *db, int type,
     
     if (!query.exec() || !query.isActive())
         MythContext::DBError("ClearMarkupMap deleting", 
-                             query.executedQuery());
+                             query);
 }
 
 void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
@@ -1479,7 +1483,7 @@ void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
 
         if (!query.exec() || !query.isActive())
             MythContext::DBError("SetMarkupMap checking record table",
-                                 query.executedQuery());
+                                 query);
 
         if (query.size() < 1 || !query.next())
             return;
@@ -1525,7 +1529,7 @@ void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
        
         if (!query.exec() || !query.isActive())
             MythContext::DBError("SetMarkupMap inserting", 
-                                 query.executedQuery());
+                                 query);
     }
 }
 
@@ -1645,7 +1649,7 @@ void ProgramInfo::ClearPositionMap(int type, QSqlDatabase *db)
                                
     if (!query.exec() || !query.isActive())
         MythContext::DBError("clear position map", 
-                             query.executedQuery());
+                             query);
 }
 
 void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
@@ -1692,7 +1696,7 @@ void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
     
     if (!query.exec() || !query.isActive())
         MythContext::DBError("position map clear", 
-                             query.executedQuery());
+                             query);
 
     for (i = posMap.begin(); i != posMap.end(); ++i)
     {
@@ -1736,7 +1740,7 @@ void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
         
         if (!query.exec() || !query.isActive())
             MythContext::DBError("position map insert", 
-                                 query.executedQuery());
+                                 query);
     }
 }
 
@@ -1782,7 +1786,7 @@ void ProgramInfo::SetPositionMapDelta(QMap<long long, long long> &posMap,
         
         if (!query.exec() || !query.isActive())
             MythContext::DBError("delta position map insert", 
-                                 query.executedQuery());
+                                 query);
     }
 }
 
@@ -2077,7 +2081,7 @@ void ProgramInfo::Save(QSqlDatabase *db)
     query.bindValue(":STARTTIME", startts.toString("yyyyMMddhhmmss"));
     if (!query.exec())
         MythContext::DBError("Saving program", 
-                             query.executedQuery());
+                             query);
 
     query.prepare("INSERT INTO program (chanid,starttime,endtime,"
                   " title,subtitle,description,category,airdate,"
@@ -2095,7 +2099,7 @@ void ProgramInfo::Save(QSqlDatabase *db)
 
     if (!query.exec())
         MythContext::DBError("Saving program", 
-                             query.executedQuery());
+                             query);
 }
 
 QGridLayout* ProgramInfo::DisplayWidget(QWidget *parent, QString searchtitle)
@@ -2734,7 +2738,7 @@ bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
     if (!query.exec() || !query.isActive())
     {
         MythContext::DBError("ProgramList::FromProgram", 
-                             query.executedQuery());
+                             query);
         return false;
     }
 
@@ -2815,7 +2819,7 @@ bool ProgramList::FromOldRecorded(QSqlDatabase *db, const QString sql)
     if (!query.exec() || !query.isActive())
     {
         MythContext::DBError("ProgramList::FromOldRecorded", 
-                             query.executedQuery());
+                             query);
         return false;
     }
 
