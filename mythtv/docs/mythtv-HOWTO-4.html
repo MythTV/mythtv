@@ -47,14 +47,16 @@ open a shell your new commands will take effect.</P>
 
 <H3><A NAME="RH80-LANG"></A> Red Hat Linux 8.0 </H3>
 
-<P>Red Hat Linux 8.0 uses an unusual character encoding scheme
-that some programs don't deal well with. As a result, whenever you run setup
+<P>Red Hat Linux 8.0 uses an unusual character encoding scheme which causes
+problems when running certain programs. As a result, whenever you run setup
 or mythfilldatabase you will have to set a variable to correct this problem.
 Failure to set this variable will result in a lot of UTF-8 errors.</P>
-<P>There are two modifications that you can make to your system so that you can
-follow the "standard" instructions.</P>
-<P>You can either modify the <CODE>/etc/sysconfig/i18n</CODE> file and set
-<CODE>LANG="en_US"</CODE>, or you can create a file in <CODE>~/.i18n</CODE>:</P>
+<P>There are two modifications that you can make to your system to avoid 
+this problem. The first is a system wide solution, the second will only 
+apply to your current user.</P>
+<P>The global change is to modify the <CODE>/etc/sysconfig/i18n</CODE> file and set
+<CODE>LANG="en_US"</CODE>.  If you want the change to only affect a single user,
+you could create a file called <CODE>~/.i18n</CODE>:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -65,14 +67,11 @@ $ exit
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>By making these modifications, you can follow the "other distributions"
-instructions in the 
-<A HREF="mythtv-HOWTO-9.html#Configuring_mythtv">Configuring mythtv</A> section later in this document.</P>
 
 <H2><A NAME="Checking_that_it_worked"></A> <A NAME="ss4.2">4.2</A> <A HREF="mythtv-HOWTO.html#toc4.2">Checking that it worked. </A>
 </H2>
 
-<P>Open a shell and switch to superuser mode again.
+<P>Open a shell and switch to superuser mode.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
@@ -101,7 +100,7 @@ found when we need them.</P>
 
 # ldconfig
 # exit
-%
+$ 
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>

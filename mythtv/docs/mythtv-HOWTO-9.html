@@ -64,25 +64,12 @@ UK, etc.  Use the name from the xmltv directory.</P>
 setup program and perform the initial configuration.</P>
 <P><B>NOTE</B>: Red Hat 8.0 users, if you haven't followed 
 <A HREF="mythtv-HOWTO-4.html#RH80-LANG">these</A>
-steps, ensure that you follow the Red Hat instructions.</P>
+steps, you <EM>must</EM> do so before continuing.</P>
 <P>Open a shell, and switch to the setup directory:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cd setup
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P><B>Red Hat 8.0</B>
-<BLOCKQUOTE><CODE>
-<PRE>
-$ env LANG=C setup 
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P><B>Other distributions</B>:
-<BLOCKQUOTE><CODE>
-<PRE>
 $ ./setup
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -95,14 +82,7 @@ XMLTV grabber program.</P>
 
 <P>Now that the setup program has completed, run <B>mythfilldatabase</B> to
 get one week of data inserted into the database.</P>
-<P><B>Red Hat 8.0</B>
-<BLOCKQUOTE><CODE>
-<PRE>
-$ env LANG=C mythfilldatabase
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>All other distributions can execute the following:
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mythfilldatabase
@@ -157,7 +137,7 @@ HOME=/
 22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
 42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
 # exit
-%
+$ 
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -182,7 +162,7 @@ $ crontab -l  NOTE: this is a lowercase L.
 # being honored by crontab?
 # The next text should be all on the same line.
 30 04 * * * /bin/bash $HOME/mythtv-0.7/MC/configfiles/mythfilldatabasecron
-%
+$ 
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
