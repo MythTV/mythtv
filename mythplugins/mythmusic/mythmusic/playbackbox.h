@@ -6,6 +6,7 @@
 #include <qurloperator.h>
 #include <qptrlist.h>
 #include <qtoolbutton.h>
+#include <qmutex.h>
 
 #include "metadata.h"
 
@@ -59,6 +60,8 @@ class PlaybackBox : public QDialog
     void doneseek();
 
   private:
+    void setupListView(void);
+
     void setupPlaylist(bool toggle = false);
 
     QIODevice *input;
@@ -76,6 +79,7 @@ class PlaybackBox : public QDialog
 
     QValueList<Metadata> *plist;
     QValueList<int> playlistorder;
+    QMutex listlock;
 
     int playlistindex;
     int shuffleindex;
@@ -94,6 +98,8 @@ class PlaybackBox : public QDialog
 
     bool shufflemode;
     bool repeatmode;
+
+    bool isplaying;
 };
 
 #endif

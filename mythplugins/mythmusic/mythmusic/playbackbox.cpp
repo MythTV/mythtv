@@ -20,6 +20,8 @@
 #include "output.h"
 #include "decoder.h"
 #include "playbackbox.h"
+#include "databasebox.h"
+#include "settings.h"
 
 #include "res/nextfile.xpm"
 #include "res/next.xpm"
@@ -28,6 +30,8 @@
 #include "res/prevfile.xpm"
 #include "res/prev.xpm"
 #include "res/stop.xpm"
+
+extern Settings *settings;
 
 class MyButton : public QToolButton
 {   
@@ -198,8 +202,6 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     secondcontrol->addWidget(pledit);
     connect(pledit, SIGNAL(clicked()), this, SLOT(editPlaylist()));
 
-    pledit->setDisabled(true);
-
     playview = new QListView(this);
     playview->addColumn("#");
     playview->addColumn("Artist");  
@@ -223,26 +225,9 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     playview->setSorting(-1);
     playview->setAllColumnsShowFocus(true);
 
-    QListViewItem *litem;
-
-    QValueList<Metadata>::iterator it = playlist->end();
-    int count = playlist->size();
-    it--;
-    while (it != playlist->end())
-    {
-        QString position = QString("%1").arg(count);
-        int secs = (*it).Length() / 1000;
-        int min = secs / 60;
-        secs -= min * 60;
-    
-        char timestr[64];
-        sprintf(timestr, "%2d:%02d", min, secs);
-       
-        litem = new QListViewItem(playview, position, (*it).Artist(), 
-                                  (*it).Title(), timestr);
-        listlist.prepend(litem);
-        it--; count--;
-    }
+    plist = playlist;
+    playlistindex = 0;
+    setupListView();
 
     vbox->addWidget(playview, 1);
 
@@ -251,18 +236,17 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     input = 0; decoder = 0; seeking = false; remainingTime = false;
     output = 0; outputBufferSize = 0;
 
-    plist = playlist; 
-    playlistindex = 0;
-
     shufflemode = false;
     repeatmode = false;  
 
+    curMeta = ((*plist)[playlistindex]);
+
     setupPlaylist();
 
+    isplaying = false;
+ 
     if (plist->size() > 0)
     { 
-        curMeta = ((*plist)[playlistindex]);
-
         playfile = curMeta.Filename();
         emit play();
     }
@@ -279,6 +263,41 @@ void PlaybackBox::Show(void)
     setActiveWindow();
 }
 
+void PlaybackBox::setupListView(void)
+{
+    playview->clear();
+
+    QListViewItem *litem;
+   
+    QValueList<Metadata>::iterator it = plist->end();
+    int count = plist->size();
+    it--;
+    while (it != plist->end())
+    {
+        QString position = QString("%1").arg(count);
+        int secs = (*it).Length() / 1000;
+        int min = secs / 60;
+        secs -= min * 60;
+        
+        char timestr[64];
+        sprintf(timestr, "%2d:%02d", min, secs);
+        
+        litem = new QListViewItem(playview, position, (*it).Artist(),
+                                  (*it).Title(), timestr);
+        listlist.prepend(litem);
+        it--; count--;
+    }
+
+    QListViewItem *curItem = listlist.at(playlistindex);
+
+    if (curItem)
+    {
+        playview->setCurrentItem(curItem);
+        playview->ensureItemVisible(curItem);
+        playview->setSelected(curItem, true);
+    }
+}
+
 void PlaybackBox::setupPlaylist(bool toggle)
 {
     if (toggle)
@@ -287,10 +306,23 @@ void PlaybackBox::setupPlaylist(bool toggle)
     if (playlistorder.size() > 0)
         playlistorder.clear();
 
+    playlistindex = 0;
+    shuffleindex = 0;
+
+    if (plist->size() == 0)
+    {
+        curMeta = Metadata("dummy.music");
+        return;
+    }
+
     if (!shufflemode)
     {
         for (int i = 0; i < (int)plist->size(); i++)
+        {
             playlistorder.push_back(i);
+            if (curMeta == (*plist)[i])
+                playlistindex = i;
+        } 
     }
     else
     {
@@ -320,15 +352,24 @@ void PlaybackBox::setupPlaylist(bool toggle)
             playlistorder.push_back(index);
             used = true;
             lastindex = index;
+
+            if (curMeta == (*plist)[i])
+                playlistindex = i;
         }
     }
 
+    curMeta = (*plist)[playlistindex];
     shuffleindex = playlistorder.findIndex(playlistindex);
 }
 
 void PlaybackBox::play()
 {
     stop();
+
+    if (plist->size() == 0)
+        return;
+
+    playfile = curMeta.Filename();
 
     QUrl sourceurl(playfile);
     QString sourcename(playfile);
@@ -402,6 +443,8 @@ void PlaybackBox::play()
         if (output)
             output->start();
         decoder->start();
+
+        isplaying = true;
     }
 }
 
@@ -470,8 +513,10 @@ void PlaybackBox::stop(void)
     input = 0;
 
     seekbar->setValue(0);
-    timeString.sprintf("%02d:%02d", 0, 0);
-    timelabel->setText(timeString);
+    titlelabel->setText(" ");
+    timelabel->setText(" ");
+
+    isplaying = false;
 }
 
 void PlaybackBox::stopAll()
@@ -488,6 +533,8 @@ void PlaybackBox::previous()
 {
     stop();
 
+    listlock.lock();
+
     shuffleindex--;
     if (shuffleindex < 0)
         shuffleindex = plist->size() - 1;
@@ -495,7 +542,8 @@ void PlaybackBox::previous()
     playlistindex = playlistorder[shuffleindex];
 
     curMeta = ((*plist)[playlistindex]);
-    playfile = curMeta.Filename();
+
+    listlock.unlock();
 
     play();
 }
@@ -504,6 +552,8 @@ void PlaybackBox::next()
 {
     stop();
 
+    listlock.lock();
+
     shuffleindex++;
     if (shuffleindex >= (int)plist->size())
         shuffleindex = 0;
@@ -511,7 +561,8 @@ void PlaybackBox::next()
     playlistindex = playlistorder[shuffleindex];
 
     curMeta = ((*plist)[playlistindex]);
-    playfile = curMeta.Filename();
+
+    listlock.unlock();
 
     play();
 }
@@ -596,6 +647,35 @@ void PlaybackBox::toggleRepeat()
 
 void PlaybackBox::editPlaylist()
 {
+    Metadata firstdata = curMeta;
+    
+    QValueList<Metadata> dblist = *plist; 
+    QString paths = (char *)(settings->GetSetting("TreeLevels").c_str());
+    DatabaseBox dbbox(db, paths, &dblist);
+
+    dbbox.Show();
+    dbbox.exec();
+
+    listlock.lock();
+
+    *plist = dblist;
+    setupPlaylist();
+
+    listlock.unlock();
+
+    setupListView();
+
+    if (isplaying && firstdata != curMeta)
+    {
+        stop();
+        if (plist->size() > 0)
+        {
+            playlistindex = playlistorder[shuffleindex];
+            curMeta = ((*plist)[playlistindex]);
+
+            play();
+        }
+    }    
 }
 
 void PlaybackBox::closeEvent(QCloseEvent *event)
