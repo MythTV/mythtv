@@ -538,11 +538,18 @@ public:
         params->addChild(new MPEG4MinQuality(parent));
         params->addChild(new MPEG4QualDiff(parent));
         params->addChild(new MPEG4ScaleBitrate(parent));
-        params->addChild(new MPEG4OptionVHQ(parent));
-        params->addChild(new MPEG4Option4MV(parent));
-        params->addChild(new MPEG4OptionIDCT(parent));
-        params->addChild(new MPEG4OptionIME(parent));
 
+        HorizontalConfigurationGroup *hq;
+        hq = new HorizontalConfigurationGroup(false, false);
+        hq->addChild(new MPEG4OptionVHQ(parent));
+        hq->addChild(new MPEG4Option4MV(parent));
+        params->addChild(hq);
+
+        HorizontalConfigurationGroup *inter;
+        inter = new HorizontalConfigurationGroup(false, false);
+        inter->addChild(new MPEG4OptionIDCT(parent));
+        inter->addChild(new MPEG4OptionIME(parent));
+        params->addChild(inter);
         addTarget("MPEG-4", params);
 
         // We'll eventually want to add MPEG2 software encoding params here

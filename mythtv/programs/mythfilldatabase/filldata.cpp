@@ -25,6 +25,7 @@
 
 #include "libmyth/mythcontext.h"
 #include "libmythtv/scheduledrecording.h"
+#include "libmythtv/datadirect.h"
 
 using namespace std;
 
@@ -42,6 +43,11 @@ bool refresh_tomorrow = true;
 bool refresh_second = false;
 bool refresh_tba = true;
 int listing_wrap_offset = 0;
+bool dd_grab_all = false;
+bool dddataretrieved = false;
+QString lastdduserid;
+DataDirectProcessor ddprocessor;
+
 
 class ChanInfo
 {
@@ -148,7 +154,283 @@ struct Source
     QString name;
     QString xmltvgrabber;
     QString userid;
+    QString password;
+    QString lineupid;
 };
+
+void clearDataByChannel(int chanid, QDateTime from, QDateTime to) 
+{
+    QSqlQuery query;
+    QString querystr;
+
+    querystr.sprintf("DELETE FROM program "
+                     "WHERE starttime >= '%s' AND starttime < '%s' "
+                     "AND chanid = %d;",
+                     from.toString("yyyyMMddhhmmss").ascii(),
+                     to.toString("yyyyMMddhhmmss").ascii(),
+                     chanid);
+    query.exec(querystr);
+
+    querystr.sprintf("DELETE FROM programrating WHERE starttime >= '%s' "
+                     " AND starttime < '%s' AND chanid = %d;",
+                     from.toString("yyyyMMddhhmmss").ascii(),
+                     to.toString("yyyyMMddhhmmss").ascii(),
+                     chanid);
+    query.exec(querystr);
+
+    querystr.sprintf("DELETE FROM credits WHERE starttime >= '%s' "
+                     "AND starttime < '%s' AND chanid = %d;",
+                     from.toString("yyyyMMddhhmmss").ascii(),
+                     to.toString("yyyyMMddhhmmss").ascii(),
+                     chanid);
+    query.exec(querystr);
+
+    querystr.sprintf("DELETE FROM programgenres WHERE starttime >= '%s' "
+                     "AND starttime < '%s' AND chanid = %d;",
+                     from.toString("yyyyMMddhhmmss").ascii(),
+                     to.toString("yyyyMMddhhmmss").ascii(),
+                     chanid);
+    query.exec(querystr);
+}
+
+void clearDataBySource(int sourceid, QDateTime from, QDateTime to) 
+{
+    QString querystr= QString("SELECT chanid FROM channel WHERE "
+                              "sourceid = \"%0\";").arg(sourceid);
+
+    QSqlQuery query;
+
+    if (!query.exec(querystr))
+        MythContext::DBError("Selecting channels per source", query);
+        
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        while (query.next())
+        {
+            int chanid = query.value(0).toInt();
+            clearDataByChannel(chanid, from, to);
+        }
+    }
+}
+
+// DataDirect stuff
+
+void DataDirectStationUpdate(Source source)
+{
+    QSqlQuery query;
+    QString querystr;
+    int chanid;
+
+    ddprocessor.updateStationViewTable();
+
+    querystr = "SELECT dd_v_station.stationid,dd_v_station.callsign,"
+               "dd_v_station.stationname,dd_v_station.channel "
+               "FROM dd_v_station LEFT JOIN channel ON "
+               "dd_v_station.stationid = channel.xmltvid "
+               "WHERE channel.chanid IS NULL;";
+
+    QSqlQuery query1;
+
+    if (!query1.exec(querystr))
+        MythContext::DBError("Selecting new channels", query1);
+
+    if (query1.isActive() && query1.numRowsAffected() > 0)
+    {
+        while (query1.next())
+        {
+            chanid = source.id * 1000 + query1.value(3).toString().toInt();
+
+            while(1)
+            {
+                querystr.sprintf("SELECT channum FROM channel WHERE "
+                                 "chanid = %d;", chanid);
+                if (!query.exec(querystr))
+                    break;
+
+                if (query.isActive() && query.numRowsAffected() > 0)
+                    chanid++;
+                else
+                    break;
+            }
+
+            QString xmltvid = query1.value(0).toString();
+            QString callsign = query1.value(1).toString();
+            if (callsign == QString::null || callsign == "")
+                callsign = QString::number(chanid);
+            QString name = query1.value(2).toString();
+            QString channel = query1.value(3).toString();
+
+            query.prepare("INSERT INTO channel (chanid,channum,sourceid,"
+                          "callsign, name, xmltvid, freqid, tvformat) "
+                          "VALUES (:CHANID,:CHANNUM,:SOURCEID,:CALLSIGN,"
+                          ":NAME,:XMLTVID,:FREQID,:TVFORMAT);");
+
+            query.bindValue(":CHANID", chanid);
+            query.bindValue(":CHANNUM", channel);
+            query.bindValue(":SOURCEID", source.id);
+            query.bindValue(":CALLSIGN", callsign);
+            query.bindValue(":NAME", name);
+            query.bindValue(":XMLTVID", xmltvid);
+            query.bindValue(":FREQID", channel);
+            query.bindValue(":TVFORMAT", "Default");
+        
+            if (!query.exec())
+                MythContext::DBError("Inserting new channel", query);
+        }
+    }
+
+    // Now, update the data for channels which do exist
+    querystr = QString("UPDATE channel,dd_v_station "
+                       "SET channel.callsign = dd_v_station.callsign , "
+                       "channel.name = dd_v_station.stationname "
+                       "WHERE ( (channel.xmltvid = dd_v_station.stationid) "
+                       "AND (channel.sourceid = \"%1\"));").arg(source.id);
+
+    if (!query.exec(querystr))
+        MythContext::DBError("Updating channel table", query);
+
+    // Now, delete any channels which no longer exist
+    // (Not currently done in standard program -- need to verify if required)
+}
+
+void DataDirectProgramUpdate(Source source) 
+{
+    QSqlQuery query;
+   
+    //cerr << "Creating program view table...\n";
+    ddprocessor.updateProgramViewTable(source.id);
+    //cerr <<  "Finished creating program view table...\n";
+
+    //cerr << "Adding rows to main program table from view table..\n";
+    if (!query.exec("INSERT IGNORE INTO program (chanid, starttime, endtime, "
+                    "title, subtitle, description, category, category_type, "
+                    "airdate, stars, previouslyshown, stereo, subtitled, "
+                    "hdtv, closecaptioned, partnumber, parttotal, seriesid, "
+                    "originalairdate, colorcode, syndicatedepisodenumber, "
+                    "programid) SELECT chanid, starttime, endtime, title, "
+                    "subtitle, description, category, category_type, airdate, "
+                    "stars, previouslyshown, stereo, subtitled, hdtv, "
+                    "closecaptioned, partnumber, parttotal, seriesid, "
+                    "originalairdate, colorcode, syndicatedepisodenumber, "
+                    "programid FROM dd_v_program;"))
+        MythContext::DBError("Inserting into program table", query);
+
+    //cerr << "Finished adding rows to main program table...\n";
+    //cerr << "Adding program ratings...\n";
+
+    if (!query.exec("INSERT IGNORE INTO programrating (chanid, starttime, "
+                    "system, rating) SELECT chanid, starttime, 'MPAA', "
+                    "mpaarating FROM dd_v_program WHERE mpaarating != '';"))
+        MythContext::DBError("Inserting into programrating table", query);
+
+    if (!query.exec("INSERT IGNORE INTO programrating (chanid, starttime, "
+                    "system, rating) SELECT chanid, starttime, 'VCHIP', "
+                    "tvrating FROM dd_v_program WHERE tvrating != '';"))
+        MythContext::DBError("Inserting into programrating table", query);
+
+    //cerr << "Finished adding program ratings...\n";
+    //cerr << "Populating people table from production crew list...\n";
+
+    if (!query.exec("INSERT IGNORE INTO people (name) SELECT fullname "
+                    "FROM dd_productioncrew;"))
+        MythContext::DBError("Inserting into people table", query);
+
+    //cerr << "Finished adding people...\n";
+    //cerr << "Adding credits entries from production crew list...\n";
+
+    if (!query.exec("INSERT IGNORE INTO credits (chanid, starttime, person, "
+                    "role) SELECT chanid, starttime, person, role "
+                    "FROM dd_productioncrew, dd_v_program, people "
+                    "WHERE "
+                    "((dd_productioncrew.programid = dd_v_program.programid) "
+                    "AND (dd_productioncrew.fullname = people.name));"))
+        MythContext::DBError("Inserting into credits table", query);
+
+    //cerr << "Finished inserting credits...\n";
+    //cerr << "Adding genres...\n";
+
+    if (!query.exec("INSERT IGNORE INTO programgenres (chanid, starttime, "
+                    "relevance, genre) SELECT chanid, starttime, "
+                    "relevance, class FROM dd_v_program, dd_genre "
+                    "WHERE (dd_v_program.programid = dd_genre.programid);"))
+        MythContext::DBError("Inserting into programgenres table",query);
+
+    //cerr << "Done...\n";
+}
+
+bool grabDDData(Source source, int poffset, QDate pdate) 
+{
+    ddprocessor.setLineup(source.lineupid);
+    ddprocessor.setUserID(source.userid);
+    ddprocessor.setPassword(source.password);
+
+    bool needtoretrieve = true;
+
+    if (source.userid != lastdduserid)
+        dddataretrieved = false;
+
+    if (dd_grab_all && dddataretrieved)
+        needtoretrieve = false;
+
+    if (needtoretrieve)
+    {
+        cerr << "Retrieving datadirect data... \n";
+        if (dd_grab_all) 
+        {
+            cerr << "Grabbing ALL available data...\n";
+            ddprocessor.grabAllData();
+        }
+        else
+        {
+            cerr << "Grabbing data for " << pdate.toString() 
+                 << " offset " << poffset << "\n";
+            QDateTime fromdatetime = QDateTime(pdate);
+            QDateTime todatetime;
+            fromdatetime.setTime_t(QDateTime(pdate).toTime_t(),Qt::UTC);
+            fromdatetime = fromdatetime.addDays(poffset);
+            todatetime = fromdatetime.addDays(1);
+            cerr << "From : " << fromdatetime.toString() 
+                 << " To : " << todatetime.toString() << " (UTC)\n";
+            ddprocessor.grabData(false, fromdatetime, todatetime);
+        }
+
+        dddataretrieved = true;
+        lastdduserid = source.userid;
+    }
+    else
+    {
+        cerr << "Using existing grabbed data in temp tables..\n";
+    }
+
+    cerr << "Grab complete.  Actual data from " 
+         << ddprocessor.getActualListingsFrom().toString() << " "
+         << "to " << ddprocessor.getActualListingsTo().toString() 
+         << " (UTC) \n";
+
+    cerr << "Clearing data for source...\n";
+    QDateTime basedt = QDateTime(QDate(1970, 1, 1));
+    QDateTime fromlocaldt;
+    int timesecs = basedt.secsTo(ddprocessor.getActualListingsFrom());
+    fromlocaldt.setTime_t(timesecs);
+    QDateTime tolocaldt;
+    timesecs = basedt.secsTo(ddprocessor.getActualListingsTo());
+    tolocaldt.setTime_t(timesecs);
+
+    cerr << "Clearing from " << fromlocaldt.toString() 
+         << " to " << tolocaldt.toString() << " (localtime)\n";
+
+    clearDataBySource(source.id, fromlocaldt,tolocaldt);
+    cerr << "Data for source cleared...\n";
+
+    cerr << "Main temp tables populated.  Updating myth channels...\n";
+    DataDirectStationUpdate(source);
+    cerr << "Channels updated..  Updating programs...\n";
+    DataDirectProgramUpdate(source);
+
+    return true;
+}
+
+// XMLTV stuff
 
 QDateTime fromXMLTVDate(QString &text)
 {
@@ -1029,7 +1311,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                 unsigned int chanid = promptForChannelUpdates(i,0);
 
                 if ((*i).callsign == QString::null || (*i).callsign == "")
-                    (*i).callsign = chanid;
+                    (*i).callsign = QString::number(chanid);
 
                 if (chanid > 0)
                 {
@@ -1092,7 +1374,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                 }
 
                 if ((*i).callsign == QString::null || (*i).callsign == "")
-                    (*i).callsign = chanid;
+                    (*i).callsign = QString::number(chanid);
 
                 querystr = QString("INSERT INTO channel (chanid,name,callsign,"
                                    "channum,finetune,icon,xmltvid,sourceid,"
@@ -1144,30 +1426,7 @@ void clearDBAtOffset(int offset, int chanid, QDate *qCurrentDate)
     from = from.addSecs(listing_wrap_offset);
     to = from.addDays(nextoffset);
 
-    QSqlQuery query;
-    QString querystr;
-
-    querystr.sprintf("DELETE FROM program "
-                    "WHERE starttime >= '%s' AND starttime < '%s' "
-                    "AND chanid = %d;",
-                     from.toString("yyyyMMddhhmmss").ascii(), 
-                     to.toString("yyyyMMddhhmmss").ascii(),
-                     chanid);
-    query.exec(querystr);
-
-    querystr.sprintf("DELETE FROM programrating WHERE starttime >= '%s' "
-                     " AND starttime < '%s' AND chanid = %d;", 
-                     from.toString("yyyyMMddhhmmss").ascii(), 
-                     to.toString("yyyyMMddhhmmss").ascii(),
-                     chanid);
-    query.exec(querystr);
-
-    querystr.sprintf("DELETE FROM credits WHERE starttime >= '%s' "
-                     "AND starttime < '%s' AND chanid = %d;", 
-                     from.toString("yyyyMMddhhmmss").ascii(), 
-                     to.toString("yyyyMMddhhmmss").ascii(), 
-                     chanid);
-    query.exec(querystr);
+    clearDataByChannel(chanid, from, to);
 }
 
 void handlePrograms(int id, int offset, QMap<QString, 
@@ -1428,6 +1687,11 @@ time_t toTime_t(QDateTime &dt)
 
 bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
 {
+    QString xmltv_grabber = source.xmltvgrabber;
+
+    if (xmltv_grabber == "datadirect")
+        return grabDDData(source, offset, *qCurrentDate);
+
     char tempfilename[] = "/tmp/mythXXXXXX";
     if (mkstemp(tempfilename) == -1) {
          perror("mkstemp");
@@ -1440,7 +1704,6 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
     QString configfile = QString("%1/.mythtv/%2.xmltv").arg(home)
                                                        .arg(source.name);
     QString command;
-    QString xmltv_grabber = source.xmltvgrabber;
 
     if (xmltv_grabber == "tv_grab_uk")
         command.sprintf("nice %s --days 7 --config-file '%s' --output %s",
@@ -1682,7 +1945,14 @@ bool fillData(QValueList<Source> &sourcelist)
                                          query);
             }
         }
-        else if (xmltv_grabber == "tv_grab_na" || 
+        else if (xmltv_grabber == "datadirect" && dd_grab_all)
+        {
+            QDate qCurrentDate = QDate::currentDate();
+
+            grabData(*it, 0, &qCurrentDate);
+        }
+        else if (xmltv_grabber == "datadirect" ||
+                 xmltv_grabber == "tv_grab_na" || 
                  xmltv_grabber == "tv_grab_uk_rt" ||
                  xmltv_grabber == "tv_grab_sn")
         {
@@ -1719,6 +1989,8 @@ bool fillData(QValueList<Source> &sourcelist)
             if (xmltv_grabber == "tv_grab_uk_rt" ||
                 xmltv_grabber == "tv_grab_sn")
                 maxday = 14;
+            if (xmltv_grabber == "datadirect")
+                maxday = 13;
 
             for (int i = 0; i < maxday; i++)
             {
@@ -2092,6 +2364,15 @@ int main(int argc, char *argv[])
         {
             refresh_tba = false;
         }
+#if 0
+        else if (!strcmp(a.argv()[argpos], "--dd-grab-all"))
+        {
+            dd_grab_all = true;
+            refresh_today = false;
+            refresh_tomorrow = false;
+            refresh_second = false;
+        }
+#endif
         else if (!strcmp(a.argv()[argpos], "--quiet"))
         {
              quiet = true;
@@ -2140,6 +2421,10 @@ int main(int argc, char *argv[])
             cout << "   Tomorrow will be refreshed always unless this argument is used\n";
             cout << "--dont-refresh-tba\n";
             cout << "   \"To be announced\" progs will be refreshed always unless this argument is used\n";
+#if 0
+            cout << "--dd-grab-all\n";
+            cout << "   The DataDirect grabber will grab all available data\n";
+#endif
             cout << "--help\n";
             cout << "   This text\n";
             cout << "\n";
@@ -2184,7 +2469,8 @@ int main(int argc, char *argv[])
         QValueList<Source> sourcelist;
 
         QSqlQuery sourcequery;
-        QString querystr = QString("SELECT sourceid,name,xmltvgrabber,userid "
+        QString querystr = QString("SELECT sourceid,name,xmltvgrabber,userid,"
+                                   "password,lineupid "
                                    "FROM videosource ORDER BY sourceid;");
         sourcequery.exec(querystr);
         
@@ -2200,6 +2486,8 @@ int main(int argc, char *argv[])
                        newsource.name = sourcequery.value(1).toString();
                        newsource.xmltvgrabber = sourcequery.value(2).toString();
                        newsource.userid = sourcequery.value(3).toString();
+                       newsource.password = sourcequery.value(4).toString();
+                       newsource.lineupid = sourcequery.value(5).toString();
 
                        sourcelist.append(newsource);
                   }

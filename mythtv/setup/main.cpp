@@ -67,8 +67,10 @@ void clearAllDB(void)
     query.exec("DELETE FROM videosource;");
     query.exec("DELETE FROM credits;");
     query.exec("DELETE FROM programrating;");
+    query.exec("DELETE FROM programgenres;");
     query.exec("DELETE FROM dvb_channel;");
     query.exec("DELETE FROM dvb_pids;");
+    query.exec("DELETE FROM cardinput;");
 }
 
 void SetupMenuCallback(void* data, QString& selection) {

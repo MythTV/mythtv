@@ -44,7 +44,7 @@ HEADERS += progfind.h decoderbase.h nuppeldecoder.h avformatdecoder.h
 HEADERS += recorderbase.h channelbase.h vsync.h proglist.h hdtvrecorder.h 
 HEADERS += fifowriter.h filtermanager.h videooutbase.h videoout_null.h xbox.h
 HEADERS += dbcheck.h udpnotify.h channeleditor.h channelsettings.h
-HEADERS += osdlistbtntype.h blend.h
+HEADERS += osdlistbtntype.h blend.h datadirect.h
 
 SOURCES += commercial_skip.cpp frequencies.c guidegrid.cpp infodialog.cpp 
 SOURCES += infostructs.cpp jitterometer.cpp minilzo.cpp NuppelVideoPlayer.cpp 
@@ -55,7 +55,7 @@ SOURCES += yuv2rgb.cpp progfind.cpp nuppeldecoder.cpp avformatdecoder.cpp
 SOURCES += recorderbase.cpp filtermanager.cpp proglist.cpp videooutbase.cpp 
 SOURCES += videoout_null.cpp xbox.cpp dbcheck.cpp profilegroup.cpp
 SOURCES += udpnotify.cpp channeleditor.cpp channelsettings.cpp
-SOURCES += osdsurface.cpp osdlistbtntype.cpp blend.c
+SOURCES += osdsurface.cpp osdlistbtntype.cpp blend.c datadirect.cpp
 
 !win32 {
     HEADERS += channel.h
