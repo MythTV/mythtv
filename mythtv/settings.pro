@@ -40,6 +40,10 @@ DEFINES += USING_IVTV
 #ARTS_LIBS = -L/opt/kde3/lib -ldl -lartsc -lpthread
 #EXTRA_LIBS += -L/opt/kde3/lib -ldl -lartsc -lpthread
 #INCLUDEPATH += /opt/kde3/include
+# For Mandrake, use the following:
+#ARTS_LIBS = -ldl -lartsc -lpthread
+#EXTRA_LIBS += -ldl -lartsc -lpthread
+#INCLUDEPATH += /usr/include/artsc
 
 # DVB support
 #CONFIG += using_dvb
