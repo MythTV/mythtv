@@ -50,6 +50,7 @@ int listing_wrap_offset = 0;
 bool dd_grab_all = false;
 bool dddataretrieved = false;
 bool mark_repeats = true;
+bool channel_updates = false;
 
 QString lastdduserid;
 DataDirectProcessor ddprocessor;
@@ -767,43 +768,54 @@ void DataDirectStationUpdate(Source source)
         }
     }
 
-    // Now, update the data for channels which do exist
 
-    QSqlQuery dd_station_info("SELECT callsign, stationname, stationid,"
-            "channel, fccchannelnumber, channelMinor FROM dd_v_station;");
-
-    if (dd_station_info.first())
+    if(channel_updates)
     {
-        QSqlQuery dd_update;
-        dd_update.prepare("UPDATE channel SET callsign = :CALLSIGN,"
-                " name = :NAME, channum = :CHANNEL, freqid = :FREQID "
-                " WHERE xmltvid = :STATIONID AND sourceid = :SOURCEID;");
-        do
+
+        //
+        //  User must pass "--do_channel_update" for this block of code to
+        //  execute
+        //
+
+        QSqlQuery dd_station_info("SELECT callsign, stationname, stationid,"
+                "channel, fccchannelnumber, channelMinor FROM dd_v_station;");
+
+        if (dd_station_info.first())
         {
-            QString channel = dd_station_info.value(3).toString();
-            QString freqid = dd_station_info.value(4).toString();
-            QString minor = dd_station_info.value(5).toString();
-
-            if (minor != "")
+            QSqlQuery dd_update;
+            dd_update.prepare("UPDATE channel SET callsign = :CALLSIGN,"
+                    " name = :NAME, channum = :CHANNEL, freqid = :FREQID "
+                    " WHERE xmltvid = :STATIONID AND sourceid = :SOURCEID;");
+            do
             {
-                freqid += "-" + minor;
-                channel += "_" + minor; // default channel number
-            }
-            else
-                freqid = channel;
+                QString channel = dd_station_info.value(3).toString();
+                QString freqid = dd_station_info.value(4).toString();
+                QString minor = dd_station_info.value(5).toString();
 
-            dd_update.bindValue(":CALLSIGN", dd_station_info.value(0));
-            dd_update.bindValue(":NAME", dd_station_info.value(1));
-            dd_update.bindValue(":STATIONID", dd_station_info.value(2));
-            dd_update.bindValue(":CHANNEL", channel);
-            dd_update.bindValue(":SOURCEID", source.id);
-            dd_update.bindValue(":FREQID", freqid);
-            if (!dd_update.exec())
-            {
-                MythContext::DBError("Updating channel table",
-                        dd_update.lastQuery());
-            }
-        } while (dd_station_info.next());
+                if (minor != "")
+                {
+                    freqid += "-" + minor;
+                    channel += "_" + minor; // default channel number
+                }
+                else
+                {
+                    freqid = channel;
+                }
+
+                dd_update.bindValue(":CALLSIGN", dd_station_info.value(0));
+                dd_update.bindValue(":NAME", dd_station_info.value(1));
+                dd_update.bindValue(":STATIONID", dd_station_info.value(2));
+                dd_update.bindValue(":CHANNEL", channel);
+                dd_update.bindValue(":SOURCEID", source.id);
+                dd_update.bindValue(":FREQID", freqid);
+                if (!dd_update.exec())
+                {
+                    MythContext::DBError("Updating channel table",
+                            dd_update.lastQuery());
+                }
+            } 
+            while (dd_station_info.next());
+        }
     }
 
     UpdateSourceIcons(source.id);
@@ -3002,6 +3014,10 @@ int main(int argc, char *argv[])
                  cout << "### reading channels from xawtv configfile\n";
             from_xawfile = true;
         }
+        else if (!strcmp(a.argv()[argpos], "--do_channel_updates"))
+        {
+            channel_updates = true;
+        }
         else if (!strcmp(a.argv()[argpos], "--graboptions"))
         {
             if (((argpos + 1) >= a.argc()))
@@ -3146,6 +3162,12 @@ int main(int argc, char *argv[])
             cout << "   Read channels as defined in xawtvrc file given\n";
             cout << "   <sourceid>    = cardinput\n";
             cout << "   <xawtvrcfile> = file to read\n";
+            cout << "\n";
+            cout << "--do_channel_updates\n";
+            cout << "   Ask mythfilldatabase to overwrite channel names,\n";
+            cout << "   frequencies, etc. with the values available from\n";
+            cout << "   the data source. This will override custom channel\n";
+            cout << "   names, which is why it is off by default.\n";
             cout << "\n";
             cout << "--graboptions <\"options\">\n";
             cout << "   Pass options to grabber\n";
