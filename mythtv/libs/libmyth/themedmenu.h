@@ -156,6 +156,7 @@ class ThemedMenu : public MythDialog
 
     QMap<QString, QPixmap> titleIcons;
     QPixmap *curTitle;
+    QString	titleText;
     QPoint titlePos;
     QRect titleRect;
     bool drawTitle;
