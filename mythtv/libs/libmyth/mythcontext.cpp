@@ -9,7 +9,6 @@
 #include <qurl.h>
 
 #include "mythcontext.h"
-//#include "settings.h"
 #include "oldsettings.h"
 #include "themedmenu.h"
 #include "util.h"
@@ -68,6 +67,8 @@ MythContext::MythContext(const QString &binversion, bool gui)
 
     serverSock = NULL;
     expectingReply = false;
+
+    mainWindow = NULL;
 	
     lcd_device = new LCD();
 }
@@ -171,13 +172,24 @@ void MythContext::LoadQtConfig(void)
     themedir += "/qtlook.txt";
     m_qtThemeSettings->ReadSettings(themedir);
     m_themeloaded = false;
+
+    InitializeScreenSettings();
 }
 
 void MythContext::GetScreenSettings(int &width, float &wmult, 
                                     int &height, float &hmult)
 {
-    height = GetNumSetting("GuiHeight", m_height);
-    width = GetNumSetting("GuiWidth", m_width);
+    height = m_screenheight;
+    width = m_screenwidth;
+
+    wmult = m_wmult;
+    hmult = m_hmult;
+}
+
+void MythContext::InitializeScreenSettings(void)
+{
+    int height = GetNumSetting("GuiHeight", m_height);
+    int width = GetNumSetting("GuiWidth", m_width);
 
     if (height == 0)
         height = m_height;
@@ -197,8 +209,10 @@ void MythContext::GetScreenSettings(int &width, float &wmult,
         height = 480;
     }
 
-    wmult = width / 800.0;
-    hmult = height / 600.0;
+    m_wmult = width / 800.0;
+    m_hmult = height / 600.0;
+    m_screenwidth = width;   
+    m_screenheight = height;
 }
 
 QString MythContext::FindThemeDir(QString themename)
@@ -822,3 +836,14 @@ QString MythContext::GetLanguage(void)
 
     return language;
 }
+
+void MythContext::SetMainWindow(MythMainWindow *mainwin)
+{
+    mainWindow = mainwin;
+}
+
+MythMainWindow *MythContext::GetMainWindow(void)
+{
+    return mainWindow;
+}
+

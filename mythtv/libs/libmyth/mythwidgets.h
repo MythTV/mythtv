@@ -13,7 +13,6 @@
 #include <qlistview.h>
 #include <qheader.h>
 #include <qtable.h>
-#include <qprogressbar.h>
 #include <qbuttongroup.h>
 #include <qlistbox.h>
 #include <qcheckbox.h>
@@ -207,9 +206,6 @@ class MythRemoteLineEdit : public QTextEdit
         
 };
 
-
-
-
 class MythTable : public QTable
 {
   public:
@@ -278,35 +274,6 @@ class MythCheckBox: public QCheckBox
 
   private:
     QString helptext;
-};
-
-class MythDialog : public QDialog
-{
-  public:
-    MythDialog(QWidget *parent = 0, const char *name = 0, bool modal = FALSE);
-    
-    virtual void Show();
-
-    float getHFactor(void) { return hmult; }
-    float getWFactor(void) { return wmult; }
-
-  protected:
-    float wmult, hmult;
-    int screenwidth, screenheight;
-};
-
-class MythProgressDialog: public MythDialog 
-{
-  public:
-    MythProgressDialog(const QString& message, int totalSteps);
- 
-    void Close(void);
-    void setProgress(int curprogress);
-    void keyPressEvent(QKeyEvent *);
-  
-  private:
-    QProgressBar *progress;
-    int steps;     
 };
 
 class MythListView : public QListView

@@ -3,7 +3,8 @@
 
 #include <qdatetime.h>
 #include <qhbox.h>
-#include "libmyth/mythwidgets.h"
+#include "mythwidgets.h"
+#include "mythdialogs.h"
 #include "tv.h"
 
 #include <pthread.h>

@@ -23,14 +23,12 @@ using namespace std;
 #include "playbackbox.h"
 #include "tv.h"
 #include "oldsettings.h"
-#include "programlistitem.h"
 #include "NuppelVideoPlayer.h"
 #include "yuv2rgb.h"
 
-#include "libmyth/mythcontext.h"
-#include "libmyth/dialogbox.h"
-#include "libmythtv/programinfo.h"
-#include "libmythtv/remoteutil.h"
+#include "mythcontext.h"
+#include "programinfo.h"
+#include "remoteutil.h"
 
 PlaybackBox::PlaybackBox(BoxType ltype, QWidget *parent, const char *name)
            : MythDialog(parent, name)

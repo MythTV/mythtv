@@ -5,7 +5,7 @@
 #include <qdom.h>
 #include <qmap.h>
 
-#include "mythwidgets.h"
+#include "mythdialogs.h"
 
 #include <vector>
 

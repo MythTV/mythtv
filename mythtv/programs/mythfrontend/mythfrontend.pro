@@ -29,8 +29,7 @@ TARGETDEPS += ../../libs/libvbitext/libvbitext.a
 TARGETDEPS += ../../libs/libavformat/libavformat.a
 
 # Input
-HEADERS += manualbox.h playbackbox.h programlistitem.h viewscheduled.h 
-HEADERS += globalsettings.h setrectime.h
+HEADERS += manualbox.h playbackbox.h viewscheduled.h globalsettings.h
 
-SOURCES += main.cpp manualbox.cpp playbackbox.cpp programlistitem.cpp 
-SOURCES += viewscheduled.cpp globalsettings.cpp setrectime.cpp
+SOURCES += main.cpp manualbox.cpp playbackbox.cpp viewscheduled.cpp
+SOURCES += globalsettings.cpp

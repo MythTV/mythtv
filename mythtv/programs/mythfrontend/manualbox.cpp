@@ -23,14 +23,13 @@ using namespace std;
 
 #include "manualbox.h"
 #include "tv.h"
-#include "programlistitem.h"
 #include "NuppelVideoPlayer.h"
 #include "yuv2rgb.h"
 
-#include "libmyth/mythcontext.h"
-#include "libmyth/dialogbox.h"
-#include "libmythtv/programinfo.h"
-#include "libmythtv/remoteutil.h"
+#include "mythcontext.h"
+#include "dialogbox.h"
+#include "programinfo.h"
+#include "remoteutil.h"
 
 struct QtToXKeyMap
 {

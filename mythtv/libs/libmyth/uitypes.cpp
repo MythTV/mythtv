@@ -1,11 +1,9 @@
-
 #include <math.h>
-
 #include <iostream>
 using namespace std;
 
 #include "uitypes.h"
-
+#include "mythdialogs.h"
 #include "mythcontext.h"
 
 LayerSet::LayerSet(const QString &name)

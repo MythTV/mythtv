@@ -39,6 +39,7 @@
 #define MYTHWIZARDDIALOG_H
 
 #include "mythwidgets.h"
+#include "mythdialogs.h"
 
 class QHBoxLayout;
 class MythWizardPrivate;

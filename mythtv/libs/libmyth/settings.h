@@ -8,6 +8,7 @@
 #include <map>
 
 #include "mythwidgets.h"
+#include "mythdialogs.h"
 
 using namespace std;
 

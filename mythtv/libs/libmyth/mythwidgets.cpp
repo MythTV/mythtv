@@ -891,96 +891,6 @@ void MythPushButton::keyReleaseEvent(QKeyEvent *e)
     }
 }
 
-MythDialog::MythDialog(QWidget *parent, const char *name, bool modal)
-          : QDialog(parent, name, modal)
-{
-    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-
-    int x = 0, y = 0, w = 0, h = 0;
-#ifndef QWS
-    GetMythTVGeometry(qt_xdisplay(), qt_xscreen(), &x, &y, &w, &h);
-#endif
-
-    setGeometry(x, y, screenwidth, screenheight);
-    setFixedSize(QSize(screenwidth, screenheight));
-
-    setFont(QFont("Arial", (int)(gContext->GetMediumFontSize() * hmult),
-            QFont::Bold));
-    setCursor(QCursor(Qt::BlankCursor));
-
-    gContext->ThemeWidget(this);
-}
-
-void MythDialog::Show(void)
-{
-    showFullScreen();
-    setActiveWindow();
-}
-
-MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)
-                  : MythDialog(NULL, 0, true)
-{
-    int yoff = screenheight / 3; 
-    int xoff = screenwidth / 10;
-    setGeometry(xoff, yoff, screenwidth - xoff * 2, yoff);
-    setFixedSize(QSize(screenwidth - xoff * 2, yoff));
-
-    QVBoxLayout *lay = new QVBoxLayout(this, 0);
-
-    QVBox *vbox = new QVBox(this);
-    lay->addWidget(vbox);
-
-    vbox->setLineWidth(3);
-    vbox->setMidLineWidth(3);
-    vbox->setFrameShape(QFrame::Panel);
-    vbox->setFrameShadow(QFrame::Raised);
-    vbox->setMargin((int)(15 * wmult));
-
-    QLabel *msglabel = new QLabel(vbox);
-    msglabel->setBackgroundOrigin(WindowOrigin);
-    msglabel->setText(message);
-
-    progress = new QProgressBar(totalSteps, vbox);
-    progress->setBackgroundOrigin(WindowOrigin);
-    progress->setProgress(0);
-
-    steps = totalSteps / 1000;
-    if (steps == 0)
-        steps = 1;
-  
-    reparent(NULL, WType_TopLevel | WStyle_Customize | WStyle_NoBorder |
-             (getWFlags() & 0xffff0000), QPoint(xoff, yoff));
-    raise();
-    show();
-    setActiveWindow();
-
-    gContext->LCDswitchToChannel(message);
-
-    qApp->processEvents();
-}
-
-void MythProgressDialog::Close(void)
-{
-    accept();
-    gContext->LCDswitchToTime();
-}
-
-void MythProgressDialog::setProgress(int curprogress)
-{
-    gContext->LCDsetChannelProgress( (curprogress + 0.0) / (steps * 1000.0));
-    progress->setProgress(curprogress);
-    if (curprogress % steps == 0)
-        qApp->processEvents();
-}
-
-void MythProgressDialog::keyPressEvent(QKeyEvent *e)
-{
-    if (e->key() == Key_Escape)
-        ;
-    else
-        MythDialog::keyPressEvent(e);
-}
-
 MythListView::MythListView(QWidget *parent)
             : QListView(parent)
 {
@@ -996,27 +906,24 @@ MythListView::MythListView(QWidget *parent)
     setAllColumnsShowFocus(TRUE);
 }
 
-
-
 void MythListView::ensureItemVCentered ( const QListViewItem * i )
 {
-    if ( !i )
+    if (!i)
 	return;
 
-    int y = itemPos( i );
+    int y = itemPos(i);
     int h = i->height();
     
-    if (y - h/2 < visibleHeight()/2 || y - h/2 > contentsHeight() - visibleHeight()/2)
+    if (y - h / 2 < visibleHeight() / 2 || 
+        y - h / 2 > contentsHeight() - visibleHeight() / 2)
     {
-       ensureItemVisible(i);
+        ensureItemVisible(i);
     }
     else
     {
-       ensureVisible(contentsX(), y, 0, visibleHeight()/2);
+        ensureVisible(contentsX(), y, 0, visibleHeight() / 2);
     }
 }
-
-
 
 void MythListView::keyPressEvent(QKeyEvent *e)
 {
@@ -1140,27 +1047,29 @@ void MythListView::focusInEvent(QFocusEvent *e)
     //
     
     setSelected(currentItem(), true);
-    
 }
 
-void MythListBox::setCurrentItem(const QString& matchText) {
-    for(unsigned i = 0 ; i < count() ; ++i)
+void MythListBox::setCurrentItem(const QString& matchText) 
+{
+    for (unsigned i = 0 ; i < count() ; ++i)
         if (text(i) == matchText)
             setCurrentItem(i);
 }
 
-void MythListBox::keyPressEvent(QKeyEvent* e) {
-    switch (e->key()) {
-    case Key_Up:
-    case Key_Down:
-    case Key_Next:
-    case Key_Prior:
-    case Key_Home:
-    case Key_End:
-        QListBox::keyPressEvent(e);
-        break;
-    default:
-        e->ignore();
+void MythListBox::keyPressEvent(QKeyEvent* e) 
+{
+    switch (e->key()) 
+    {
+        case Key_Up:
+        case Key_Down:
+        case Key_Next:
+        case Key_Prior:
+        case Key_Home:
+        case Key_End:
+            QListBox::keyPressEvent(e);
+            break;
+        default:
+            e->ignore();
     }
 }
 

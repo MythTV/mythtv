@@ -18,12 +18,12 @@ using namespace std;
 #include "globalsettings.h"
 #include "recordingprofile.h"
 
-#include "libmyth/themedmenu.h"
-#include "libmythtv/programinfo.h"
-#include "libmyth/mythcontext.h"
-#include "libmyth/dialogbox.h"
-#include "libmythtv/guidegrid.h"
-#include "libmyth/mythplugin.h"
+#include "themedmenu.h"
+#include "programinfo.h"
+#include "mythcontext.h"
+#include "dialogbox.h"
+#include "guidegrid.h"
+#include "mythplugin.h"
 
 #define QUIT     1
 #define HALTWKUP 2

@@ -17,12 +17,10 @@ using namespace std;
 #include "scheduledrecording.h"
 #include "infodialog.h"
 #include "tv.h"
-#include "programlistitem.h"
-#include "setrectime.h"
 
-#include "libmyth/dialogbox.h"
-#include "libmyth/mythcontext.h"
-#include "libmythtv/remoteutil.h"
+#include "dialogbox.h"
+#include "mythcontext.h"
+#include "remoteutil.h"
 
 ViewScheduled::ViewScheduled(QSqlDatabase *ldb, QWidget *parent, 
                              const char *name)

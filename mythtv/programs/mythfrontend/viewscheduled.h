@@ -3,13 +3,13 @@
 
 #include <qdatetime.h>
 #include <qdom.h>
-#include "libmyth/mythwidgets.h"
+#include "mythwidgets.h"
+#include "mythdialogs.h"
 #include "uitypes.h"
 #include "xmlparse.h"
-#include "libmythtv/programinfo.h"
+#include "programinfo.h"
 
 class QSqlDatabase;
-class ProgramInfo;
 
 class ViewScheduled : public MythDialog
 {

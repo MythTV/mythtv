@@ -12,11 +12,15 @@
 #include <qfont.h>
 #include <qpixmap.h>
 #include <qpainter.h>
+
 #include "mythwidgets.h"
 #include "util.h"
+#include "mythdialogs.h"
+
 using namespace std;
 
 class UIType;
+class MythDialog;
 
 struct fontProp {
     QFont face;

@@ -18,6 +18,7 @@ class QSqlQuery;
 class QSqlError;
 class QSocket;
 class LCD;
+class MythMainWindow;
 
 #define VERBOSE(args...) \
 if (print_verbose_messages) \
@@ -51,7 +52,7 @@ class MythEvent : public QCustomEvent
     QString extradata;
 };
 
-#define MYTH_BINARY_VERSION "0.9.06092003-1"
+#define MYTH_BINARY_VERSION "0.10.06132003-1"
 #define MYTH_SCHEMA_VERSION "900"
 
 extern bool print_verbose_messages;
@@ -123,6 +124,9 @@ class MythContext : public QObject
 
     QImage *CacheRemotePixmap(const QString &url, bool needevents = true);
 
+    void SetMainWindow(MythMainWindow *mainwin);
+    MythMainWindow *GetMainWindow(void);
+
     void LCDconnectToHost(QString hostname, unsigned int port);
     void LCDswitchToTime();
     void LCDswitchToMusic(QString artist, QString track);
@@ -139,6 +143,7 @@ class MythContext : public QObject
 
   private:
     void SetPalette(QWidget *widget);
+    void InitializeScreenSettings(void);
 
     Settings *m_settings;
     Settings *m_qtThemeSettings;
@@ -168,6 +173,11 @@ class MythContext : public QObject
     LCD *lcd_device;
 
     QString language;
+
+    MythMainWindow *mainWindow;
+
+    float m_wmult, m_hmult;
+    int m_screenwidth, m_screenheight;
 };
 
 extern MythContext *gContext;
