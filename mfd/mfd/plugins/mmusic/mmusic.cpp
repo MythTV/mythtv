@@ -1003,7 +1003,7 @@ AudioMetadata* MMusicWatcher::loadFromDatabase(
                   "relative_volume, sample_rate, bpm "
                   "FROM musicmetadata WHERE filename = ? ;");
 
-    query.bindValue(0, sqlfilename);
+    query.bindValue(0, sqlfilename.utf8());
     
     query.exec();
 
@@ -1051,10 +1051,10 @@ AudioMetadata* MMusicWatcher::loadFromDatabase(
                                         query.value(8).toInt(),
                                         lastplay,
                                         query.value(10).toInt(),
-                                        query.value(1).toString(),
-                                        query.value(2).toString(),
-                                        query.value(3).toString(),
-                                        query.value(4).toString(),
+                                  QString::fromUtf8(query.value(1).toString()),
+                                  QString::fromUtf8(query.value(2).toString()),
+                                  QString::fromUtf8(query.value(3).toString()),
+                                  QString::fromUtf8(query.value(4).toString()),
                                         query.value(5).toInt(),
                                         query.value(6).toInt(),
                                         query.value(7).toInt()
@@ -1216,7 +1216,7 @@ AudioMetadata *MMusicWatcher::checkNewFile(
         query.prepare("INSERT INTO musicmetadata (filename, mythdigest) "
                       "values ( ? , ?)");
 
-        query.bindValue(0, sqlfilename);
+        query.bindValue(0, sqlfilename.utf8());
         query.bindValue(1, new_item->getMythDigest());
         
         query.exec();
@@ -1370,10 +1370,10 @@ void MMusicWatcher::persistMetadata(AudioMetadata *an_item)
                   "bpm = ?  "
                   "WHERE intid = ? ;");
 
-    query.bindValue(0,  an_item->getTitle());
-    query.bindValue(1,  an_item->getArtist());
-    query.bindValue(2,  an_item->getAlbum());
-    query.bindValue(3,  an_item->getGenre());
+    query.bindValue(0,  an_item->getTitle().utf8());
+    query.bindValue(1,  an_item->getArtist().utf8());
+    query.bindValue(2,  an_item->getAlbum().utf8());
+    query.bindValue(3,  an_item->getGenre().utf8());
     query.bindValue(4,  an_item->getYear());
     query.bindValue(5,  an_item->getTrack());
     query.bindValue(6,  an_item->getLength());
@@ -1385,10 +1385,10 @@ void MMusicWatcher::persistMetadata(AudioMetadata *an_item)
     query.bindValue(12, date_added);
     query.bindValue(13, date_modified);
     query.bindValue(14, an_item->getFormat());
-    query.bindValue(15, an_item->getDescription());
-    query.bindValue(16, an_item->getComment());
+    query.bindValue(15, an_item->getDescription().utf8());
+    query.bindValue(16, an_item->getComment().utf8());
     query.bindValue(17, an_item->getCompilation());
-    query.bindValue(18, an_item->getComposer());
+    query.bindValue(18, an_item->getComposer().utf8());
     query.bindValue(19, an_item->getDiscCount());
     query.bindValue(20, an_item->getDiscNumber());
     query.bindValue(21, an_item->getTrackCount());
@@ -1502,10 +1502,10 @@ void MMusicWatcher::loadPlaylists()
             while(query.next())
             {
                 Playlist *new_playlist = new Playlist(
-                                                        container_id,
-                                                        query.value(0).toString(), 
-                                                        query.value(1).toString(),
-                                                        0
+                                                      container_id,
+                                  QString::fromUtf8(query.value(0).toString()), 
+                                                      query.value(1).toString(),
+                                                      0
                                                      );
                 //
                 //  We mark playlists as not editable on load. Once all
@@ -1601,7 +1601,7 @@ void MMusicWatcher::persistPlaylist(Playlist *a_playlist)
                   "playlistid = ? ;");
 
     query.bindValue(0, db_song_list_string);
-    query.bindValue(1, a_playlist->getName());
+    query.bindValue(1, a_playlist->getName().utf8());
     query.bindValue(2, a_playlist->getDbId());
         
     query.exec();

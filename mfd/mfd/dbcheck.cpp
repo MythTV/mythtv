@@ -9,7 +9,7 @@ using namespace std;
 
 #include "settings.h"
 
-const QString currentDatabaseVersion = "1002";
+const QString currentDatabaseVersion = "1003";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -153,6 +153,74 @@ void UpgradeMusicDatabaseSchema(void)
 };
 
         performActualUpdate(updates, "1002", dbver);
+    }
+
+    if (dbver == "1002")
+    {
+        VERBOSE(VB_ALL, "Updating music metadata to be UTF-8 in the database");
+
+        QSqlDatabase *db_conn = QSqlDatabase::database();
+
+        QSqlQuery query(QString::null, db_conn);
+        query.prepare("SELECT intid, artist, album, title, genre, "
+                      "filename FROM musicmetadata ORDER BY intid;");
+
+        if (query.exec() && query.isActive() && query.size() > 0)
+        {
+            while (query.next())
+            {
+                int id = query.value(0).toInt();
+                QString artist = query.value(1).toString();
+                QString album = query.value(2).toString();
+                QString title = query.value(3).toString();
+                QString genre = query.value(4).toString();
+                QString filename = query.value(5).toString();
+
+                QSqlQuery subquery(QString::null, db_conn);
+                subquery.prepare("UPDATE musicmetadata SET "
+                                 "artist = :ARTIST, album = :ALBUM, "
+                                 "title = :TITLE, genre = :GENRE, "
+                                 "filename = :FILENAME "
+                                 "WHERE intid = :ID;");
+                subquery.bindValue(":ARTIST", artist.utf8());
+                subquery.bindValue(":ALBUM", album.utf8());
+                subquery.bindValue(":TITLE", title.utf8());
+                subquery.bindValue(":GENRE", genre.utf8());
+                subquery.bindValue(":FILENAME", filename.utf8());
+                subquery.bindValue(":ID", id);
+
+                if (!subquery.exec() || !subquery.isActive())
+                    MythContext::DBError("music utf8 update", subquery);
+            }
+        }
+
+        query.prepare("SELECT playlistid, name FROM musicplaylist "
+                      "ORDER BY playlistid;");
+
+        if (query.exec() && query.isActive() && query.size() > 0)
+        {
+            while (query.next())
+            {
+                int id = query.value(0).toInt();
+                QString name = query.value(1).toString();
+
+                QSqlQuery subquery(QString::null, db_conn);
+                subquery.prepare("UPDATE musicplaylist SET "
+                                 "name = :NAME WHERE playlistid = :ID ;");
+                subquery.bindValue(":NAME", name.utf8());
+                subquery.bindValue(":ID", id);
+
+                if (!subquery.exec() || !subquery.isActive())
+                    MythContext::DBError("music playlist utf8 update", subquery);
+            }
+        }
+
+        VERBOSE(VB_ALL, "Done updating music metadata to UTF-8");
+
+        const QString updates[] = {
+""
+};
+        performActualUpdate(updates, "1003", dbver);
     }
 }
 
