@@ -1570,7 +1570,7 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len)
      // the difference should be less than 1,5*timeperframe or we have 
      // missed at least one frame, this code might be inaccurate!
      
-            if (ntsc)
+            if (ntsc_framerate)
                 fn = (fn+16)/33;
             else 
                 fn = (fn+20)/40;
@@ -1592,7 +1592,7 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len)
 
     // record the time at the start of this frame.
     // 'tcres' is at the end of the frame, so subtract the right # of ms
-    videobuffer[act]->timecode = (ntsc) ? (tcres - 33) : (tcres - 40);
+    videobuffer[act]->timecode = (ntsc_framerate) ? (tcres - 33) : (tcres - 40);
 
     memcpy(videobuffer[act]->buffer, buf, len);
     videobuffer[act]->bufferlen = len;
@@ -1624,7 +1624,7 @@ void NuppelVideoRecorder::WriteHeader(void)
     fileheader.desiredheight = 0;
     fileheader.pimode = 'P';
     fileheader.aspect = 1.0;
-    if (ntsc)
+    if (ntsc_framerate)
         fileheader.fps = 29.97;
     else
         fileheader.fps = 25.0;
@@ -3312,7 +3312,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
     
     if (dropped>0)
     {
-        if (ntsc)
+        if (ntsc_framerate)
             timeperframe = (int)(1000 / (30 * framerate_multiplier));
         else
             timeperframe = (int)(1000 / (25 * framerate_multiplier));

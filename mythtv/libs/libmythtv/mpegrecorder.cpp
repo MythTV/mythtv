@@ -320,7 +320,7 @@ void MpegRecorder::openV4L2DeviceAsInput(void)
         ivtvcodec.bitrate = ivtvcodec.bitrate_peak;
 
     // framerate (1 = 25fps, 0 = 30fps)
-    ivtvcodec.framerate = (!ntsc);
+    ivtvcodec.framerate = (!ntsc_framerate);
     ivtvcodec.stream_type = streamtype;
 
     if (ioctl(chanfd, IVTV_IOC_S_CODEC, &ivtvcodec) < 0)

@@ -70,6 +70,7 @@ class RecorderBase
 
     char vbimode;
     int ntsc;
+    int ntsc_framerate;
     double video_frame_rate;
 
     ProgramInfo *curRecording;

@@ -18,6 +18,7 @@ RecorderBase::RecorderBase(void)
     vbidevice = "/dev/vbi";
 
     ntsc = 1;
+    ntsc_framerate = 1;
     video_frame_rate = 29.97;
     vbimode = 0;
 
@@ -77,11 +78,19 @@ void RecorderBase::SetOption(const QString &name, const QString &value)
         if (value.lower() == "ntsc" || value.lower() == "ntsc-jp")
         {
             ntsc = 1;
+            ntsc_framerate = 1;
+            video_frame_rate = 29.97;
+        }
+        else if (value.lower() == "pal-m")
+        {
+            ntsc = 0;
+            ntsc_framerate = 1;
             video_frame_rate = 29.97;
         }
         else
         {
             ntsc = 0;
+            ntsc_framerate = 0;
             video_frame_rate = 25.0;
         }
     }
