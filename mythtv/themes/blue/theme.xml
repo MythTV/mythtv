@@ -94,17 +94,17 @@
 
   <buttondef name="DVD_PLAY">
     <image>watch_dvd.png</image>
-    <offset>10,25</offset>
+    <offset>14,12</offset>
   </buttondef>
 
   <buttondef name="VCD_PLAY">
     <image>watch_vcd.png</image>
-    <offset>10,25</offset>
+    <offset>14,12</offset>
   </buttondef>
 
   <buttondef name="DVD_RIP">
     <image>rip_dvd.png</image>
-    <offset>10,25</offset>
+    <offset>14,12</offset>
   </buttondef>
 
 <!-- #####################################-->
@@ -127,11 +127,11 @@
 
   <buttondef name="TV">
     <image>watch_tv.png</image>
-    <offset>20,10</offset>
+    <offset>20,12</offset>
   </buttondef>
 
   <buttondef name="MUSIC">
-    <image>cd.png</image>
+    <image>MUSIC_PLAY.png</image>
     <offset>15,10</offset>
   </buttondef>
 
@@ -141,8 +141,8 @@
   </buttondef>
 
   <buttondef name="DVD">
-    <image>dvd.png</image>
-    <offset>62,30</offset>
+    <image>watch_dvd.png</image>
+    <offset>14,12</offset>
   </buttondef>
 
   <buttondef name="FM">
@@ -152,7 +152,7 @@
 
   <buttondef name="IMAGES">
     <image>images.png</image>
-    <offset>15,10</offset>
+    <offset>15,20</offset>
   </buttondef>
 
   <buttondef name="GAME">
@@ -162,7 +162,7 @@
 
   <buttondef name="WEATHER">
     <image>weather.png</image>
-    <offset>20,20</offset>
+    <offset>16,20</offset>
   </buttondef>
 
   <buttondef name="NEWS">
@@ -172,7 +172,7 @@
 
   <buttondef name="WEBPAGE">
     <image>webpage.png</image>
-    <offset>55,30</offset>
+    <offset>15,12</offset>
   </buttondef>
 
   <buttondef name="RECIPE">
@@ -181,8 +181,8 @@
   </buttondef>
 
   <buttondef name="SETUP">
-    <image>setup.png</image>
-    <offset>20,10</offset>
+    <image>SETTINGS.png</image>
+    <offset>30,10</offset>
   </buttondef>
 
   <buttondef name="SHUTDOWN">
@@ -200,8 +200,8 @@
   </buttondef>
 
   <buttondef name="SETTINGS_APPEARANCE">
-    <image>setup.png</image>
-    <offset>20,10</offset>
+    <image>APPEARANCE.png</image>
+    <offset>15,16</offset>
   </buttondef>
 
   <buttondef name="SETTINGS_TV">
@@ -210,18 +210,18 @@
   </buttondef>
 
   <buttondef name="SETTINGS_MUSIC">
-    <image>cd.png</image>
-    <offset>15,10</offset>
+    <image>playlist.png</image>
+    <offset>10,10</offset>
   </buttondef>
 
   <buttondef name="SETTINGS_VIDEO">
     <image>videobutton.png</image>
-    <offset>20,20</offset>
+    <offset>14,12</offset>
   </buttondef>
 
   <buttondef name="SETTINGS_DVD">
-    <image>dvd.png</image>
-    <offset>62,30</offset>
+    <image>watch_dvd.png</image>
+    <offset>14,12</offset>
   </buttondef>
 
   <buttondef name="SETTINGS_FM">
@@ -231,7 +231,7 @@
 
   <buttondef name="SETTINGS_IMAGES">
     <image>images.png</image>
-    <offset>15,10</offset>
+    <offset>15,15</offset>
   </buttondef>
 
   <buttondef name="SETTINGS_GAME">
@@ -274,8 +274,8 @@
   </buttondef>
 
   <buttondef name="MUSIC_SETTINGS_PLAYER">
-    <image>cd.png</image>
-    <offset>15,10</offset>
+    <image>playlist.png</image>
+    <offset>10,10</offset>
   </buttondef>
 
   <buttondef name="MUSIC_SETTINGS_RIP">
@@ -288,13 +288,13 @@
 <!-- #################################-->
 
   <buttondef name="MUSIC_PLAY">
-    <image>cd.png</image>
+    <image>MUSIC_PLAY.png</image>
     <offset>15,10</offset>
   </buttondef>
 
   <buttondef name="MUSIC_PLAYLIST">
     <image>playlist.png</image>
-    <offset>20,10</offset>
+    <offset>14,10</offset>
   </buttondef>
 
   <buttondef name="MUSIC_RIP">
@@ -303,8 +303,8 @@
   </buttondef>
 
   <buttondef name="MUSIC_SCAN">
-    <image>setup.png</image>
-    <offset>20,10</offset>
+    <image>MUSIC_SCAN.png</image>
+    <offset>14,14</offset>
   </buttondef>
 
 <!-- ##############################################-->
@@ -356,31 +356,31 @@
 
   <buttondef name="TV_PROGRAM_GUIDE">
     <image>record.png</image>
-    <offset>20,10</offset>
+    <offset>20,12</offset>
   </buttondef>
 
   <buttondef name="TV_PROGFIND">
-    <image>record.png</image>
-    <offset>20,10</offset>
+    <image>FINDER.png</image>
+    <offset>12,12</offset>
   </buttondef>
 
   <buttondef name="TV_SEARCH_LISTINGS">
-    <image>record.png</image>
+    <image>SEARCH_LISTS.png</image>
     <offset>20,10</offset>
   </buttondef>
 
   <buttondef name="TV_SEARCH_WORDS">
-    <image>record.png</image>
-    <offset>20,10</offset>
+    <image>SEARCH_WORDS.png</image>
+    <offset>40,10</offset>
   </buttondef>
   
   <buttondef name="TV_SEARCH_LISTS">
-    <image>record.png</image>
-    <offset>20,10</offset>
+    <image>SEARCH_LISTS.png</image>
+    <offset>12,10</offset>
   </buttondef>
 
   <buttondef name="TV_MANUAL_SCHEDULE">
-    <image>record.png</image>
+    <image>MANUAL.png</image>
     <offset>20,10</offset>
   </buttondef>
 
@@ -399,22 +399,22 @@
 <!-- #################################-->
 
   <buttondef name="TV_SEARCH_TITLES">
-    <image>record.png</image>
+    <image>SEARCH_TITLES.png</image>
     <offset>20,10</offset>
   </buttondef>
 
   <buttondef name="TV_SEARCH_KEYWORDS">
-    <image>record.png</image>
-    <offset>20,10</offset>
+    <image>SEARCH_KEYWORDS.png</image>
+    <offset>16,12</offset>
   </buttondef>
 
   <buttondef name="TV_SEARCH_PEOPLE">
-    <image>record.png</image>
-    <offset>20,10</offset>
+    <image>SEARCH_PEOPLE.png</image>
+    <offset>16,10</offset>
   </buttondef>
 
   <buttondef name="TV_SEARCH_POWER">
-    <image>record.png</image>
+    <image>POWER_SEARCH.png</image>
     <offset>20,10</offset>
   </buttondef>
 
@@ -423,28 +423,28 @@
 <!-- ################################-->
 
   <buttondef name="TV_SEARCH_NEW_TITLES">
-    <image>record.png</image>
+    <image>SEARCH_NEW.png</image>
     <offset>20,10</offset>
   </buttondef>
 
   <buttondef name="TV_SEARCH_MOVIES">
-    <image>record.png</image>
-    <offset>20,10</offset>
+    <image>SEARCH_MOVIES.png</image>
+    <offset>12,12</offset>
   </buttondef>
 
   <buttondef name="TV_SEARCH_CATEGORIES">
-    <image>record.png</image>
-    <offset>20,10</offset>
+    <image>SEARCH_CAT.png</image>
+    <offset>12,12</offset>
   </buttondef>
 
   <buttondef name="TV_SEARCH_CHANNELS">
-    <image>record.png</image>
-    <offset>20,10</offset>
+    <image>SEARCH_CHAN.png</image>
+    <offset>15,10</offset>
   </buttondef>
 
   <buttondef name="TV_SEARCH_TIMES">
-    <image>record.png</image>
-    <offset>20,10</offset>
+    <image>SEARCH_TIME.png</image>
+    <offset>15,10</offset>
   </buttondef>
 
 <!-- ###################################-->
@@ -487,7 +487,7 @@
 
   <buttondef name="TV_SCHEDULE_RECORDINGS">
     <image>record.png</image>
-    <offset>20,10</offset>
+    <offset>20,13</offset>
   </buttondef>
 
   <buttondef name="TV_WATCH_RECORDINGS">
@@ -497,17 +497,17 @@
 
   <buttondef name="TV_DELETE">
     <image>delete.png</image>
-    <offset>20,10</offset>
+    <offset>20,13</offset>
   </buttondef>
 
   <buttondef name="TV_PREVIOUS">
     <image>previous.png</image>
-    <offset>20,10</offset>
+    <offset>20,13</offset>
   </buttondef>
 
   <buttondef name="TV_STATUS">
     <image>showstatus.png</image>
-    <offset>15,15</offset>
+    <offset>17,15</offset>
   </buttondef>
 
 <!-- ######################################-->
@@ -516,17 +516,17 @@
 
   <buttondef name="VIDEO_SETTINGS_GENERAL">
     <image>setup.png</image>
-    <offset>20,10</offset>
+    <offset>14,12</offset>
   </buttondef>
 
   <buttondef name="VIDEO_SETTINGS_PLAYER">
-    <image>videobutton.png</image>
-    <offset>20,20</offset>
+    <image>mv-vbrowser.png</image>
+    <offset>14,12</offset>
   </buttondef>
 
   <buttondef name="VIDEO_FILE_TYPES">
-    <image>videobutton.png</image>
-    <offset>20,20</offset>
+    <image>FILE_TYPES.png</image>
+    <offset>20,12</offset>
   </buttondef>
 
 <!-- #################################-->
@@ -535,7 +535,7 @@
 
   <buttondef name="VIDEO_BROWSER">
     <image>mv-vbrowser.png</image>
-    <offset>20,20</offset>
+    <offset>12,12</offset>
   </buttondef>
 
   <buttondef name="VIDEO_LIST">
@@ -545,7 +545,7 @@
 
   <buttondef name="VIDEO_MANAGER">
     <image>mv-vmanager.png</image>
-    <offset>20,20</offset>
+    <offset>14,12</offset>
   </buttondef>
 
 <!-- ###########################################-->
@@ -553,7 +553,7 @@
 <!-- ###########################################-->
 
   <buttondef name="TV_UPCOMING_RECORDINGS">
-    <image>record.png</image>
+    <image>UPCOMING.png</image>
     <offset>20,10</offset>
   </buttondef>
 
@@ -568,13 +568,13 @@
   </buttondef>
 
   <buttondef name="MENU_MEDIA_LIBRARY">
-    <image>cd.png</image>
+    <image>MEDIA_LIBRARY.png</image>
     <offset>15,10</offset>
   </buttondef>
 
   <buttondef name="MENU_MANAGE_RECORDINGS">
     <image>record.png</image>
-    <offset>20,10</offset>
+    <offset>20,13</offset>
   </buttondef>
 
   <buttondef name="MENU_INFO_CENTER">
@@ -583,13 +583,13 @@
   </buttondef>
 
   <buttondef name="MENU_OPTICAL_DISKS">
-    <image>dvd.png</image>
-    <offset>62,30</offset>
+    <image>cd.png</image>
+    <offset>14,10</offset>
   </buttondef>
 
   <buttondef name="MENU_UTILITIES_SETUP">
-    <image>setup.png</image>
-    <offset>20,10</offset>
+    <image>SETTINGS.png</image>
+    <offset>14,10</offset>
   </buttondef>
 
   <buttondef name="SETUP_FRONTEND">
