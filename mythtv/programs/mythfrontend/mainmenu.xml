@@ -46,7 +46,6 @@
      <text lang="DE">Informationszentrale</text>
      <text lang="SV">Informationscenter</text>
      <action>MENU info_menu.xml</action>
-     <depends>mythnews mythweather mythbookmarkmanager mythrecipe</depends>
    </button>
 
    <button>
