@@ -125,6 +125,21 @@ void HDTVRecorder::SetOption(const QString &opt, int value)
     (void)value;
 }
 
+void HDTVRecorder::SetOptionsFromProfile(RecordingProfile *profile,
+                                         const QString &videodev,
+                                         const QString &audiodev,
+                                         const QString &vbidev, int ispip)
+{
+    (void)audiodev;
+    (void)vbidev;
+    (void)profile;
+    (void)ispip;
+
+    SetOption("videodevice", videodev);
+    SetOption("tvformat", gContext->GetSetting("TVFormat"));
+    SetOption("vbiformat", gContext->GetSetting("VbiFormat"));
+}
+
 void HDTVRecorder::StartRecording(void)
 {
     uint8_t * buf;

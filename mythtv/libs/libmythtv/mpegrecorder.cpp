@@ -22,6 +22,7 @@ using namespace std;
 #include "RingBuffer.h"
 #include "mythcontext.h"
 #include "programinfo.h"
+#include "recordingprofile.h"
 
 extern "C" {
 #include "../libavcodec/avcodec.h"
@@ -167,6 +168,41 @@ void MpegRecorder::SetOption(const QString &opt, const QString &value)
     else
         RecorderBase::SetOption(opt, value);
 
+}
+
+void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile, 
+                                         const QString &videodev, 
+                                         const QString &audiodev,
+                                         const QString &vbidev, int ispip)
+{
+    (void)audiodev;
+    (void)vbidev;
+
+    SetOption("videodevice", videodev);
+    SetOption("tvformat", gContext->GetSetting("TVFormat"));
+    SetOption("vbiformat", gContext->GetSetting("VbiFormat"));
+
+    SetIntOption(profile, "mpeg2bitrate");
+    SetIntOption(profile, "mpeg2maxbitrate");
+    SetOption("mpeg2streamtype",
+              profile->byName("mpeg2streamtype")->getValue());
+    SetOption("mpeg2aspectratio",
+              profile->byName("mpeg2aspectratio")->getValue());
+
+    SetIntOption(profile, "samplerate");
+    SetOption("mpeg2audtype", profile->byName("mpeg2audtype")->getValue());
+    SetIntOption(profile, "mpeg2audbitratel1");
+    SetIntOption(profile, "mpeg2audbitratel2");
+    SetIntOption(profile, "mpeg2audvolume");
+
+    SetIntOption(profile, "width");
+    SetIntOption(profile, "height");
+
+    if (ispip)
+    {
+        SetOption("width", 160);
+        SetOption("height", 128);
+    }
 }
 
 void MpegRecorder::StartRecording(void)

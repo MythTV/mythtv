@@ -21,6 +21,7 @@ using namespace std;
 #include "vbitext/cc.h"
 #include "channelbase.h"
 #include "filtermanager.h"
+#include "recordingprofile.h"
 
 extern "C" {
 #include "vbitext/vbi.h"
@@ -266,6 +267,93 @@ void NuppelVideoRecorder::SetOption(const QString &opt, int value)
         inpixfmt = (VideoFrameType)value;
     else
         RecorderBase::SetOption(opt, value);
+}
+
+void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
+                                                const QString &videodev, 
+                                                const QString &audiodev,
+                                                const QString &vbidev, 
+                                                int ispip)
+{
+    SetOption("videodevice", videodev);
+    SetOption("vbidevice", vbidev);
+    SetOption("tvformat", gContext->GetSetting("TVFormat"));
+    SetOption("vbiformat", gContext->GetSetting("VbiFormat"));
+    SetOption("audiodevice", audiodev);
+
+    QString setting = profile->byName("videocodec")->getValue();
+    if (setting == "MPEG-4")
+    {
+        SetOption("codec", "mpeg4");
+
+        SetIntOption(profile, "mpeg4bitrate");
+        SetIntOption(profile, "mpeg4scalebitrate");
+        SetIntOption(profile, "mpeg4maxquality");
+        SetIntOption(profile, "mpeg4minquality");
+        SetIntOption(profile, "mpeg4qualdiff");
+        SetIntOption(profile, "mpeg4optionvhq");
+        SetIntOption(profile, "mpeg4option4mv");
+    }
+    else if (setting == "RTjpeg")
+    {
+        SetOption("codec", "rtjpeg");
+
+        SetIntOption(profile, "rtjpegquality");
+        SetIntOption(profile, "rtjpegchromafilter");
+        SetIntOption(profile, "rtjpeglumafilter");
+    }
+    else if (setting == "Hardware MJPEG")
+    {
+        SetOption("codec", "hardware-mjpeg");
+
+        SetIntOption(profile, "hardwaremjpegquality");
+        SetIntOption(profile, "hardwaremjpeghdecimation");
+        SetIntOption(profile, "hardwaremjpegvdecimation");
+    }
+    else
+    {
+        cerr << "Unknown video codec\n";
+        cerr << "Please go into the TV Settings, Recording Profiles and\n";
+        cerr << "setup the four 'Software Encoders' profiles.\n";
+        cerr << "Assuming RTjpeg for now.\n";
+
+        SetOption("codec", "rtjpeg");
+
+        SetIntOption(profile, "rtjpegquality");
+        SetIntOption(profile, "rtjpegchromafilter");
+        SetIntOption(profile, "rtjpeglumafilter");
+    }
+
+    setting = profile->byName("audiocodec")->getValue();
+    if (setting == "MP3")
+    {
+        SetOption("audiocompression", 1);
+        SetIntOption(profile, "mp3quality");
+        SetIntOption(profile, "samplerate");
+    }
+    else if (setting == "Uncompressed")
+        SetOption("audiocompression", 0);
+    else
+    {
+        cerr << "Unknown audio codec\n";
+        SetOption("audiocompression", 0);
+    }
+
+    SetIntOption(profile, "width");
+    SetIntOption(profile, "height");
+
+    if (ispip)
+    {
+        SetOption("codec", "rtjpeg");
+
+        SetOption("width", 160);
+        SetOption("height", 128);
+        SetOption("rtjpegchromafilter", 0);
+        SetOption("rtjpeglumafilter", 0);
+        SetOption("rtjpegquality", 255);
+        SetOption("audiocompression", 0);
+        SetOption("pip_mode", 1);
+    }
 }
 
 void NuppelVideoRecorder::Pause(bool clear)

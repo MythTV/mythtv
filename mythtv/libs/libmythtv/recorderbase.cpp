@@ -5,6 +5,7 @@ using namespace std;
 
 #include "RingBuffer.h"
 #include "programinfo.h"
+#include "recordingprofile.h"
 
 RecorderBase::RecorderBase(void)
 {
@@ -109,3 +110,10 @@ QString RecorderBase::GetCurChannelName() const
 {
     return curChannelName;
 }
+
+void RecorderBase::SetIntOption(RecordingProfile *profile, const QString &name)
+{
+    int value = profile->byName(name)->getValue().toInt();
+    SetOption(name, value);
+}
+

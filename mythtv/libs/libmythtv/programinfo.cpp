@@ -94,6 +94,52 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     record = NULL;
 }
 
+ProgramInfo &ProgramInfo::operator=(const ProgramInfo &other)
+{
+    if (record)
+        delete record;
+
+    title = other.title;
+    subtitle = other.subtitle;
+    description = other.description;
+    category = other.category;
+    chanid = other.chanid;
+    chanstr = other.chanstr;
+    chansign = other.chansign;
+    channame = other.channame;
+    pathname = other.pathname;
+    filesize = other.filesize;
+    hostname = other.hostname;
+
+    startts = other.startts;
+    endts = other.endts;
+    recstartts = other.recstartts;
+    recendts = other.recendts;
+    spread = other.spread;
+    startCol = other.startCol;
+
+    conflicting = other.conflicting;
+    recording = other.recording;
+    override = other.override;
+    norecord = other.norecord;
+    recordid = other.recordid;
+    rectype = other.rectype;
+    recdups = other.recdups;
+
+    sourceid = other.sourceid;
+    inputid = other.inputid;
+    cardid = other.cardid;
+    schedulerid = other.schedulerid;
+    recpriority = other.recpriority;
+    programflags = other.programflags;
+
+    repeat = other.repeat;
+
+    record = NULL;
+
+    return *this;
+}
+
 ProgramInfo::~ProgramInfo() 
 {
     if (record != NULL)

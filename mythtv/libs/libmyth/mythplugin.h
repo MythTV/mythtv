@@ -3,57 +3,61 @@
 
 #include <qlibrary.h>
 #include <qdict.h>
+#include <qmap.h>
 
 class QSqlDatabase;
 class MythContext;
 
-class MythPluginManager
+typedef enum {
+    kPluginType_Module = 0,
+    kPluginType_MenuPlugin
+} MythPluginType;
+
+class MythPlugin : public QLibrary
 {
   public:
-    class MythPlugin : public QLibrary
-    {
-      public:
-        MythPlugin (const QString &);
-        virtual ~MythPlugin ();
+    MythPlugin(const QString &);
+    virtual ~MythPlugin();
 
-        /*
-         * This method will call the plugin_init() function
-         * of the library.  The plugin_init() function should
-         * be declared 'extern "C" { ... }'
-         * Also, you may want to include a static local variable
-         * inside the plugin_init() function so that initialization
-         * is only done the first time the library is loaded.
-         */
-        int init(const char *libversion);
+    // This method will call the mythplugin_init() function of the library. 
+    int init(const char *libversion);
 
-        /*
-         * This method will call the plugin_run() function
-         * of the library.  The plugin_run() function should
-         * be declared 'extern "C" { ... }'
-         * Whether or not this function returns immediately
-         * is entirely dependent on the design of the plugin.
-         * You should assume that it will not return until
-         * the plugin wants to return control back to the caller.
-         */
-         void run(void);
+    // This method will call the mythplugin_run() function of the library.
+    void run(void);
+ 
+    // This method will call the mythplugin_config() function of the library.
+    void config(void);
 
-        /* 
-         * This method will call the plugin_config() function
-         * of the library.  The plugin_config() function should
-         * be declared 'extern "C" { ... }'
-         */
-         void config(void);
-    };
-      
+    // This method will call the mythplugin_type() function of the library.
+    // If such a function doesn't exist, it's a main module plugin.
+    MythPluginType type(void);
+
+    bool isEnabled() { return enabled; }
+    void setEnabled(bool enable) { enabled = enable; }
+
+    // mainmenu plugins, probably should separate out
+
+    // setup the plugin -- returns how often (in ms) the plugin wants updated
+
+  private:
+    bool enabled;
+};
+
+class MythPluginManager
+{
+  public:      
     static void init(void);
-    static bool init_plugin(const QString &);
-    static bool run_plugin(const QString &);
-    static bool config_plugin(const QString &);
-    static void unload_plugin(const QString &);
+    static bool init_plugin(const QString &plugname);
+    static bool run_plugin(const QString &plugname);
+    static bool config_plugin(const QString &plugname);
+    static void unload_plugin(const QString &plugname);
      
   private:
     static QDict<MythPlugin> m_dict;
    
+    static QMap<QString, MythPlugin *> moduleList;
+    static QMap<QString, MythPlugin *> menuPluginList;
+
     // Default constructor declared private and
     // left as abstract to prevent instantiation
     MythPluginManager();

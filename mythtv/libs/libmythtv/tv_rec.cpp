@@ -467,6 +467,7 @@ void TVRec::HandleStateChange(void)
             profileName = "Live TV";
             profile.loadByCard(db_conn, profileName, m_capturecardnum);
         }
+
         QString msg = QString("Using profile '%1' to record").arg(profileName);
         VERBOSE(VB_RECORD, msg);
 
@@ -515,32 +516,8 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     {
         nvr = new MpegRecorder();
         nvr->SetRingBuffer(rbuffer);
-        nvr->SetOption("videodevice", videodev);
-        nvr->SetOption("tvformat", gContext->GetSetting("TVFormat"));
-        nvr->SetOption("vbiformat", gContext->GetSetting("VbiFormat"));
 
-        SetOption(profile, "mpeg2bitrate");
-        SetOption(profile, "mpeg2maxbitrate");
-        nvr->SetOption("mpeg2streamtype", 
-                       profile.byName("mpeg2streamtype")->getValue());
-        nvr->SetOption("mpeg2aspectratio", 
-                       profile.byName("mpeg2aspectratio")->getValue());
-
-        SetOption(profile, "samplerate");
-        nvr->SetOption("mpeg2audtype", 
-                       profile.byName("mpeg2audtype")->getValue());
-        SetOption(profile, "mpeg2audbitratel1");
-        SetOption(profile, "mpeg2audbitratel2");
-        SetOption(profile, "mpeg2audvolume");
-
-        SetOption(profile, "width");
-        SetOption(profile, "height");
-
-        if (ispip)
-        {
-            nvr->SetOption("width", 160);
-            nvr->SetOption("height", 128);
-        }
+        nvr->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
 
         nvr->Initialize();
         return;
@@ -549,9 +526,8 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     {
         nvr = new HDTVRecorder();
         nvr->SetRingBuffer(rbuffer);
-        nvr->SetOption("videodevice", videodev);
-        nvr->SetOption("tvformat", gContext->GetSetting("TVFormat"));
-        nvr->SetOption("vbiformat", gContext->GetSetting("VbiFormat"));
+
+        nvr->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
 
         nvr->Initialize();
         return;
@@ -561,7 +537,9 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
 #ifdef USING_DVB
         nvr = new DVBRecorder(dynamic_cast<DVBChannel*>(channel));
         nvr->SetRingBuffer(rbuffer);
-        nvr->SetOption("cardnum", videodev.toInt());
+
+        nvr->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
+
         nvr->SetOption("swfilter", dvb_swfilter);
         nvr->SetOption("recordts", dvb_recordts);
         nvr->Initialize();
@@ -575,85 +553,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
 
     nvr->SetRingBuffer(rbuffer);
 
-    nvr->SetOption("videodevice", videodev);
-    nvr->SetOption("vbidevice", vbidev);
-    nvr->SetOption("tvformat", gContext->GetSetting("TVFormat"));
-    nvr->SetOption("vbiformat", gContext->GetSetting("VbiFormat"));
-    nvr->SetOption("audiodevice", audiodev);
-
-    QString setting = profile.byName("videocodec")->getValue();
-    if (setting == "MPEG-4") 
-    {
-        nvr->SetOption("codec", "mpeg4");
-
-        SetOption(profile, "mpeg4bitrate");
-        SetOption(profile, "mpeg4scalebitrate");
-        SetOption(profile, "mpeg4maxquality");
-        SetOption(profile, "mpeg4minquality");
-        SetOption(profile, "mpeg4qualdiff");
-        SetOption(profile, "mpeg4optionvhq");
-        SetOption(profile, "mpeg4option4mv");
-    } 
-    else if (setting == "RTjpeg") 
-    {
-        nvr->SetOption("codec", "rtjpeg");
-
-        SetOption(profile, "rtjpegquality");
-        SetOption(profile, "rtjpegchromafilter");
-        SetOption(profile, "rtjpeglumafilter");
-    } 
-    else if (setting == "Hardware MJPEG") 
-    {
-        nvr->SetOption("codec", "hardware-mjpeg");
-
-        SetOption(profile, "hardwaremjpegquality");
-        SetOption(profile, "hardwaremjpeghdecimation");
-        SetOption(profile, "hardwaremjpegvdecimation");
-    }
-    else
-    {
-        cerr << "Unknown video codec\n";
-        cerr << "Please go into the TV Settings, Recording Profiles and\n";
-        cerr << "setup the four 'Software Encoders' profiles.\n";
-        cerr << "Assuming RTjpeg for now.\n";
-
-        nvr->SetOption("codec", "rtjpeg");
-
-        SetOption(profile, "rtjpegquality");
-        SetOption(profile, "rtjpegchromafilter");
-        SetOption(profile, "rtjpeglumafilter");
-    }
-
-    setting = profile.byName("audiocodec")->getValue();
-    if (setting == "MP3") 
-    {
-        nvr->SetOption("audiocompression", 1);
-        SetOption(profile, "mp3quality");
-        SetOption(profile, "samplerate");
-    } 
-    else if (setting == "Uncompressed") 
-        nvr->SetOption("audiocompression", 0);
-    else 
-    {
-        cerr << "Unknown audio codec\n";
-        nvr->SetOption("audiocompression", 0);
-    }
-
-    SetOption(profile, "width");
-    SetOption(profile, "height");
-
-    if (ispip)
-    {
-        nvr->SetOption("codec", "rtjpeg");
-
-        nvr->SetOption("width", 160);
-        nvr->SetOption("height", 128);
-        nvr->SetOption("rtjpegchromafilter", 0);
-        nvr->SetOption("rtjpeglumafilter", 0);
-        nvr->SetOption("rtjpegquality", 255);
-        nvr->SetOption("audiocompression", 0);
-        nvr->SetOption("pip_mode", 1);
-    }
+    nvr->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
  
     nvr->Initialize();
 }

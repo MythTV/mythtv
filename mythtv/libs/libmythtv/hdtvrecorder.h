@@ -17,6 +17,11 @@ class HDTVRecorder : public RecorderBase
                        { RecorderBase::SetOption(name, value); }
     void SetVideoFilters(QString &filters);
 
+    void SetOptionsFromProfile(RecordingProfile *profile,
+                               const QString &videodev,
+                               const QString &audiodev,
+                               const QString &vbidev, int ispip);
+
     void Initialize(void);
     void StartRecording(void);
     void StopRecording(void);

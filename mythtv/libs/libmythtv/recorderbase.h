@@ -10,6 +10,7 @@
 
 class RingBuffer;
 class ProgramInfo;
+class RecordingProfile;
 
 class RecorderBase
 {
@@ -27,6 +28,11 @@ class RecorderBase
     virtual void SetOption(const QString &opt, const QString &value);
     virtual void SetOption(const QString &opt, int value);
     virtual void SetVideoFilters(QString &filters) = 0;
+
+    virtual void SetOptionsFromProfile(RecordingProfile *profile, 
+                                       const QString &videodev, 
+                                       const QString &audiodev,
+                                       const QString &vbidev, int ispip) = 0;
 
     virtual void Initialize(void) = 0;
     virtual void StartRecording(void) = 0;
@@ -51,6 +57,8 @@ class RecorderBase
     QString GetCurChannelName() const;
 
   protected:
+    void SetIntOption(RecordingProfile *profile, const QString &name);
+
     RingBuffer *ringBuffer;
     bool weMadeBuffer;
 

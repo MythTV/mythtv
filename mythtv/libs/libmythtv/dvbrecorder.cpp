@@ -92,6 +92,19 @@ void DVBRecorder::SetOption(const QString &name, int value)
         RecorderBase::SetOption(name, value);
 }
 
+void DVBRecorder::SetOptionsFromProfile(RecordingProfile *profile,
+                                        const QString &videodev,
+                                        const QString &audiodev,
+                                        const QString &vbidev, int ispip)
+{
+    (void)profile;
+    (void)audiodev;
+    (void)vbidev;
+    (void)ispip;
+
+    SetOption("cardnum", videodev.toInt());
+}
+
 void DVBRecorder::ChannelChanged(dvb_channel_t& chan)
 {
     chan_opts = chan;

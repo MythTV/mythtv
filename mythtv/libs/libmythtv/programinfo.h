@@ -68,6 +68,8 @@ class ProgramInfo
     ProgramInfo(const ProgramInfo &other);
     ~ProgramInfo();
 
+    ProgramInfo& operator=(const ProgramInfo &other);
+
     // returns 0 for one-time, 1 for weekdaily, 2 for weekly
     int IsProgramRecurring(void);
 
