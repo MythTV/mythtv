@@ -1,0 +1,105 @@
+<mythuitheme>
+ 
+   <window name="video">
+
+    <font name="active_font" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="inactive_font" face="Arial">
+      <color>#9999cc</color>
+      <size>16</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="bigtitle" face="Arial">
+      <color>#ffffff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>50</size>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="titlefnt" face="Arial">
+      <color>#ffffff</color>
+      <dropcolor>#000000</dropcolor>
+      <shadow>1,1</shadow>
+      <size>27</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="info" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="message" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <container name="background">
+      <textarea name="sched" draworder="0">
+        <area>20,10,800,40</area>
+        <font>info</font>
+        <value>Select a video to watch...</value>
+      </textarea>
+      <image name="filler" draworder="0" fleximage="yes">
+        <filename>cr-background.png</filename>
+        <position>0,39</position>
+        <staticsize>800,590</staticsize>
+      </image>
+    </container>
+ 
+    <container name="selector">
+      <area>0,39,800,590</area>
+      <listarea name="listing" draworder="4">
+        <area>20,12,760,512</area>
+        <fcnfont name="active_font" function="active"></fcnfont>
+        <fcnfont name="inactive_font" function="inactive"></fcnfont>
+        <fcnfont name="active_font" function="selected"></fcnfont>
+        <columnpadding>10</columnpadding>
+        <column number="1" width="500" context="-1"></column>
+        <items>19</items>
+        <image function="selectionbar" filename="cr-selectbar.png" location="-14,-5"></image>
+        <image function="uparrow" filename="uparrow.png" location="750,22"></image>
+        <image function="downarrow" filename="downarrow.png" location="750,469"></image>
+      </listarea>
+      <image name="showinglines" draworder="5" fleximage="no">
+        <filename>cr-lines.png</filename>
+        <position>0,0</position>
+        <staticsize>800,590</staticsize>
+      </image>
+    </container>
+
+    <container name="playwait">
+      <debug>yes</debug>
+      <area>0,0,800,600</area>
+      <textarea name="ld1" draworder="0">
+        <area>68,140,350,90</area>
+        <font>bigtitle</font>
+        <value>loading...</value>
+      </textarea>
+      <textarea name="title" draworder="0" align="center">
+        <area>0,320,800,60</area>
+        <font>titlefnt</font>
+      </textarea>
+    </container>
+
+   <container name="novideos_list">
+      <textarea name="msg" align="center" draworder="8">
+         <area>0,110,800,70</area>
+         <font>info</font>
+         <value>YNo Videos Found In This Directory</value>
+         <multiline>yes</multiline> 
+      </textarea>
+    </container>
+
+  </window>
+</mythuitheme>
