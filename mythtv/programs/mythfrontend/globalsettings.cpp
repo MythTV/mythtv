@@ -292,7 +292,7 @@ class UseGroupNameAsAllPrograms: public CheckBoxSetting, public GlobalSetting {
 public:
     UseGroupNameAsAllPrograms():
         GlobalSetting("DispRecGroupAsAllProg") {
-        setLabel(QObject::tr("Show group name instead of \"All Programs\"."));
+        setLabel(QObject::tr("Show group name instead of \"All Programs\""));
         setValue(false);
         setHelpText(QObject::tr("Use the name of the display group currently "
                     "being shown in place of the term \"All Programs\" in the "
@@ -318,7 +318,7 @@ class PBBShowGroupSummary: public CheckBoxSetting, public GlobalSetting {
 public:
     PBBShowGroupSummary():
         GlobalSetting("ShowGroupInfo") {
-        setLabel(QObject::tr("Show group summary."));
+        setLabel(QObject::tr("Show group summary"));
         setValue(false);
         setHelpText(QObject::tr("While selecting a group, show a group "
                     "summary instead of showing info about the first episode "
