@@ -608,21 +608,6 @@
         <filename>cr-background.png</filename>
         <position>0,39</position>
       </image>
-      <textarea name="highlighting" draworder="0" align="right">
-        <area>360,330,140,40</area>
-        <font>message</font>
-        <value>Highlighting:</value>
-      </textarea>
-      <textarea name="conyellow" draworder="0" align="right">
-        <area>505,330,130,40</area>
-        <font>messageyellow</font>
-        <value>Conflicting</value>
-      </textarea>
-      <textarea name="disgray" draworder="0" align="right">
-        <area>650,330,130,40</area>
-        <font>messagegray</font>
-        <value>Deactivated</value>
-      </textarea>
       <textarea name="showinstr" align="center" draworder="0">
         <area>0,570,800,30</area>
         <font>message</font>
@@ -717,6 +702,14 @@
       </textarea>
     </container>
 
+    <container name="status_info">
+      <area>300,330,480,30</area>
+      <textarea name="recordingstatus" align="right" draworder="6">
+        <area>0,0,480,30</area>
+        <font>message</font>
+      </textarea>
+    </container>
+ 
 
    <container name="norecordings_list">
       <textarea name="msg" align="center" draworder="8">

@@ -43,6 +43,7 @@ class ViewScheduled : public MythDialog
     void updateConflict(QPainter *);
     void updateShowLevel(QPainter *);
     void updateInfo(QPainter *);
+    void updateRecStatus(QPainter *);
 
     void LoadWindow(QDomElement &);
     void parseContainer(QDomElement &);
@@ -62,6 +63,7 @@ class ViewScheduled : public MythDialog
     QRect infoRect;
     QRect conflictRect;
     QRect showLevelRect;
+    QRect recStatusRect;
     QRect fullRect;
 
     int listsize;

@@ -37,6 +37,7 @@ ViewScheduled::ViewScheduled(QSqlDatabase *ldb, MythMainWindow *parent,
     infoRect = QRect(0, 0, 0, 0);
     conflictRect = QRect(0, 0, 0, 0);
     showLevelRect = QRect(0, 0, 0, 0);
+    recStatusRect = QRect(0, 0, 0, 0);
 
     theme = new XMLParse();
     theme->SetWMult(wmult);
@@ -149,6 +150,8 @@ void ViewScheduled::parseContainer(QDomElement &element)
         conflictRect = area;
     if (name.lower() == "showlevel_info")
         showLevelRect = area;
+    if (name.lower() == "status_info")
+        recStatusRect = area;
 }
 
 void ViewScheduled::updateBackground(void)
@@ -180,6 +183,8 @@ void ViewScheduled::paintEvent(QPaintEvent *e)
         updateConflict(&p);
     if (r.intersects(showLevelRect))
         updateShowLevel(&p);
+    if (r.intersects(recStatusRect))
+        updateRecStatus(&p);
 }
 
 void ViewScheduled::cursorDown(bool page)
@@ -410,6 +415,40 @@ void ViewScheduled::updateInfo(QPainter *p)
 
     if (recList.count() == 0)
         container = theme->GetSet("norecordings_info");
+
+    if (container)
+    {
+        container->Draw(&tmp, 4, 0);
+        container->Draw(&tmp, 5, 0);
+        container->Draw(&tmp, 6, 0);
+        container->Draw(&tmp, 7, 0);
+        container->Draw(&tmp, 8, 0);
+    }
+
+    tmp.end();
+    p->drawPixmap(pr.topLeft(), pix);
+}
+
+void ViewScheduled::updateRecStatus(QPainter *p)
+{
+    QRect pr = recStatusRect;
+    QPixmap pix(pr.size());
+    pix.fill(this, pr.topLeft());
+    QPainter tmp(&pix);
+    QMap<QString, QString> infoMap;
+
+    LayerSet *container = theme->GetSet("status_info");
+    if (container)
+    {
+        ProgramInfo p;
+        if (recList.getSelected(p))
+        {
+            QSqlDatabase *m_db = QSqlDatabase::database();
+            p.ToMap(m_db, infoMap);
+            container->ClearAllText();
+            container->SetText(infoMap);
+        }
+    }
 
     if (container)
     {
