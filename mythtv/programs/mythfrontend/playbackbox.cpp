@@ -1001,6 +1001,7 @@ void PlaybackBox::FillList()
 
     if (titleData)
         delete [] titleData;
+    titleData = NULL;
 
     showList[""] = tr("All Programs");
 
@@ -1629,7 +1630,7 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
 
 void PlaybackBox::customEvent(QCustomEvent *e)
 {
-    if (ignoreevents)
+    if (ignoreevents || noUpdate)
         return;
 
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
