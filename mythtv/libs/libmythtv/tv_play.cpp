@@ -102,6 +102,11 @@ TV::TV(QSqlDatabase *db)
     times_pressed = 0;
     last_channel = "";
 
+    getRecorderPlaybackInfo = false;
+    recorderPlaybackInfo = NULL;
+    lastRecorderNum = -1;
+    wantsToQuit = true;
+
     myWindow = NULL;
 
     deinterlace_mode = DEINTERLACE_NONE;
@@ -132,8 +137,6 @@ void TV::Init(bool createWindow)
 
     runMainLoop = false;
     changeState = false;
-
-    watchingLiveTV = false;
 
     if (createWindow)
     {
@@ -169,9 +172,18 @@ TV::~TV(void)
         delete volumeControl;
     if (myWindow)
         delete myWindow;
+    if (recorderPlaybackInfo)
+        delete recorderPlaybackInfo;
 }
 
-TVState TV::LiveTV(void)
+TVState TV::GetState(void)
+{
+    if (changeState)
+        return kState_ChangingState;
+    return internalState;
+}
+
+int TV::LiveTV(bool showDialogs)
 {
     if (internalState == kState_None)
     {
@@ -179,39 +191,33 @@ TVState TV::LiveTV(void)
 
         if (!testrec->IsValidRecorder())
         {
-            QString title = tr("MythTV is already using all available inputs "
-                               "for recording.  If you want to watch an "
-                               "in-progress recording, select one from the "
-                               "playback menu.  If you want to watch live TV, "
-                               "cancel one of the in-progress recordings from "
-                               "the delete menu.");
+            if (showDialogs)
+            {
+                QString title = tr("MythTV is already using all available "
+                                   "inputs for recording.  If you want to "
+                                   "watch an in-progress recording, select one "
+                                   "from the playback menu.  If you want to "
+                                   "watch live TV, cancel one of the "
+                                   "in-progress recordings from the delete "
+                                   "menu.");
     
-            DialogBox diag(gContext->GetMainWindow(), title);
-            diag.AddButton(tr("Cancel and go back to the TV menu"));
-            diag.exec();
-        
-            nextState = kState_None;
-            changeState = false;
-       
+                DialogBox diag(gContext->GetMainWindow(), title);
+                diag.AddButton(tr("Cancel and go back to the TV menu"));
+                diag.exec();
+            }        
+
             delete testrec;
  
-            return nextState;
+            return 0;
         }
 
         activerecorder = recorder = testrec;
+        lastRecorderNum = recorder->GetRecorderNumber();
         nextState = kState_WatchingLiveTV;
         changeState = true;
     }
 
-    TVState retval = kState_None;
-    
-    if (nextState != internalState)
-    {
-        retval = nextState;
-        changeState = true;
-    }
-
-    return retval;
+    return 1;
 }
 
 void TV::FinishRecording(void)
@@ -222,12 +228,11 @@ void TV::FinishRecording(void)
     activerecorder->FinishRecording();
 }
 
-int TV::AllowRecording(const QString &message, int timeuntil)
+void TV::AskAllowRecording(const QString &message, int timeuntil)
 {
-    if (internalState != kState_WatchingLiveTV)
-    {
-        return 2;
-    }
+    //TODO: integrate this dialog so that event doesn't have to wait
+    if (GetState() != kState_WatchingLiveTV)
+       return;
 
     dialogname = "allowrecordingbox";
 
@@ -259,30 +264,80 @@ int TV::AllowRecording(const QString &message, int timeuntil)
 
     if (result == 2)
         StopLiveTV();
-    else
-        result = 1;
-
-    return result;
+    else if (result == 3)
+        recorder->CancelNextRecording();
 }
 
-void TV::Playback(ProgramInfo *rcinfo)
+int TV::Playback(ProgramInfo *rcinfo)
 {
-    if (internalState == kState_None)
+    if (internalState != kState_None)
+        return 0;
+
+    inputFilename = rcinfo->pathname;
+
+    playbackLen = rcinfo->CalculateLength();
+    playbackinfo = rcinfo;
+
+    QDateTime curtime = QDateTime::currentDateTime();
+
+    if (curtime < rcinfo->endts)
+        nextState = kState_WatchingRecording;
+    else
+        nextState = kState_WatchingPreRecorded;
+
+    changeState = true;
+
+    return 1;
+}
+
+int TV::PlayFromRecorder(int recordernum)
+{
+    int retval = 0;
+
+    if (recorder)
     {
-        inputFilename = rcinfo->pathname;
-
-        playbackLen = rcinfo->CalculateLength();
-        playbackinfo = rcinfo;
-
-        QDateTime curtime = QDateTime::currentDateTime();
-
-        if (curtime < rcinfo->endts && curtime > rcinfo->startts)
-            nextState = kState_WatchingRecording;
-        else
-            nextState = kState_WatchingPreRecorded;
-
-        changeState = true;
+        cout << "PlayFromRecorder : recorder already exists!";
+        return -1;
     }
+
+    recorder = RemoteGetExistingRecorder(recordernum);
+
+    if (recorder->IsValidRecorder())
+    {
+        // let the mainloop get the programinfo from encoder,
+        // connecting to encoder won't work from here
+        getRecorderPlaybackInfo = true;
+        while (getRecorderPlaybackInfo)
+        {
+            qApp->unlock();
+            qApp->processEvents();
+            usleep(1000);
+            qApp->lock();
+        }
+    }
+
+    delete recorder;
+    recorder = NULL;
+
+    if (recorderPlaybackInfo)
+    {
+        bool fileexists = false;
+        if (recorderPlaybackInfo->pathname.left(7) == "myth://")
+            fileexists = RemoteCheckFile(recorderPlaybackInfo);
+        else
+        {
+            QFile checkFile(recorderPlaybackInfo->pathname);
+            fileexists = checkFile.exists();
+        }
+
+        if (fileexists)
+        {
+            Playback(recorderPlaybackInfo);
+            retval = 1;
+        }
+    }
+
+    return retval;
 }
 
 void TV::StateToString(TVState state, QString &statestr)
@@ -300,28 +355,14 @@ void TV::StateToString(TVState state, QString &statestr)
 
 bool TV::StateIsRecording(TVState state)
 {
-    bool retval = false;
-
-    if (state == kState_RecordingOnly || 
-        state == kState_WatchingRecording)
-    {
-        retval = true;
-    }
-
-    return retval;
+    return (state == kState_RecordingOnly || 
+            state == kState_WatchingRecording);
 }
 
 bool TV::StateIsPlaying(TVState state)
 {
-    bool retval = false;
-
-    if (state == kState_WatchingPreRecorded || 
-        state == kState_WatchingRecording)
-    {
-        retval = true;
-    }
-
-    return retval;
+    return (state == kState_WatchingPreRecorded || 
+            state == kState_WatchingRecording);
 }
 
 TVState TV::RemoveRecording(TVState state)
@@ -345,16 +386,13 @@ TVState TV::RemovePlaying(TVState state)
 void TV::HandleStateChange(void)
 {
     bool changed = false;
-    bool startPlayer = false;
-    bool startRecorder = false;
-    bool closePlayer = false;
-    bool closeRecorder = false;
-    bool sleepBetween = false;
+
+    TVState tmpInternalState = internalState;
 
     QString statename;
     StateToString(nextState, statename);
     QString origname;
-    StateToString(internalState, origname);
+    StateToString(tmpInternalState, origname);
 
     if (nextState == kState_Error)
     {
@@ -373,34 +411,26 @@ void TV::HandleStateChange(void)
 
         prbuffer = new RingBuffer(name, filesize, smudge, recorder);
 
-        internalState = nextState;
+        tmpInternalState = nextState;
         changed = true;
-
-        startPlayer = startRecorder = true;
 
         recorder->SpawnLiveTV();
 
-        watchingLiveTV = true;
-        sleepBetween = true;
+        StartPlayerAndRecorder(true, true);
     }
     else if (internalState == kState_WatchingLiveTV && 
              nextState == kState_None)
     {
-        closePlayer = true;
-        closeRecorder = true;
-
-        internalState = nextState;
+        tmpInternalState = nextState;
         changed = true;
 
-        watchingLiveTV = false;
+        StopPlayerAndRecorder(true, true);
     }
     else if (internalState == kState_WatchingRecording &&
              nextState == kState_WatchingPreRecorded)
     {
-        internalState = nextState;
+        tmpInternalState = nextState;
         changed = true;
-
-        watchingLiveTV = false;
     }
     else if ((internalState == kState_None && 
               nextState == kState_WatchingPreRecorded) ||
@@ -427,10 +457,10 @@ void TV::HandleStateChange(void)
             }
         }
 
-        internalState = nextState;
+        tmpInternalState = nextState;
         changed = true;
 
-        startPlayer = true;
+        StartPlayerAndRecorder(true, false);
     }
     else if ((internalState == kState_WatchingPreRecorded && 
               nextState == kState_None) || 
@@ -440,44 +470,10 @@ void TV::HandleStateChange(void)
         if (internalState == kState_WatchingRecording)
             recorder->StopPlaying();
 
-        closePlayer = true;
-        
-        internalState = nextState;
+        tmpInternalState = nextState;
         changed = true;
 
-        watchingLiveTV = false;
-    }
-    else if (internalState == kState_WatchingLiveTV &&  
-             nextState == kState_WatchingRecording)
-    {
-        if (paused)
-            osd->EndPause();
-        paused = false;
-
-        nvp->Pause();
-        while (!nvp->GetPause())
-            usleep(5);
-
-        recorder->TriggerRecordingTransition();
-
-        prbuffer->Reset();
-
-        nvp->ResetPlaying();
-        while (!nvp->ResetYet())
-            usleep(5);
-
-        usleep(300000);
-
-        nvp->Unpause();
-
-        internalState = nextState;
-        changed = true;
-    }
-    else if (internalState == kState_WatchingRecording &&
-             nextState == kState_WatchingLiveTV)
-    {
-        internalState = nextState;
-        changed = true;
+        StopPlayerAndRecorder(true, false);
     }
     else if (internalState == kState_None && 
              nextState == kState_None)
@@ -486,15 +482,20 @@ void TV::HandleStateChange(void)
     }
 
     if (!changed)
-    {
         printf("Unknown state transition: %d to %d\n", internalState,
                                                        nextState);
-    }
     else
-    {
         printf("Changing from %s to %s\n", origname.ascii(), statename.ascii());
-    }
- 
+
+    internalState = tmpInternalState;
+    changeState = false;
+
+    if (recorder)
+        recorder->FrontendReady();
+}
+
+void TV::StartPlayerAndRecorder(bool startPlayer, bool startRecorder)
+{ 
     if (startRecorder)
     {
         while (!recorder->IsRecording())
@@ -503,7 +504,7 @@ void TV::HandleStateChange(void)
         frameRate = recorder->GetFrameRate();
     }
 
-    if (sleepBetween) 
+    if (startPlayer && startRecorder) 
         usleep(300000);
 
     if (startPlayer)
@@ -519,9 +520,12 @@ void TV::HandleStateChange(void)
         activerecorder = recorder;
 
         frameRate = nvp->GetFrameRate();
-	osd = nvp->GetOSD();
+        osd = nvp->GetOSD();
     }
+}
 
+void TV::StopPlayerAndRecorder(bool closePlayer, bool closeRecorder)
+{
     if (closePlayer)
     {
         if (prbuffer)
@@ -560,8 +564,6 @@ void TV::HandleStateChange(void)
         if (pipnvp)
             TeardownPipPlayer();
     }
-
-    changeState = false;
 }
 
 void TV::SetupPlayer(void)
@@ -604,7 +606,7 @@ void TV::SetupPlayer(void)
     if (embedid > 0)
         nvp->EmbedInWidget(embedid, embx, emby, embw, embh);
 
-    if (internalState == kState_WatchingRecording)
+    if (nextState == kState_WatchingRecording)
         nvp->SetWatchingRecording(true);
 
     osd = NULL;
@@ -648,9 +650,12 @@ void TV::TeardownPlayer(void)
 
     nvp = NULL;
     osd = NULL;
-  
+ 
+    playbackinfo = NULL;
+ 
     if (recorder) 
         delete recorder; 
+
     recorder = activerecorder = NULL;
  
     if (prbuffer)
@@ -712,6 +717,26 @@ void TV::RunTV(void)
 
         usleep(1000);
 
+        if (getRecorderPlaybackInfo)
+        {
+            if (recorderPlaybackInfo)
+            {
+                delete recorderPlaybackInfo;
+                recorderPlaybackInfo = NULL;
+            }
+
+            recorder->Setup();
+
+            if(recorder->IsRecording())
+            {
+                recorderPlaybackInfo = recorder->GetRecording();
+                RemoteFillProginfo(recorderPlaybackInfo, 
+                                   gContext->GetHostName());
+            }
+
+            getRecorderPlaybackInfo = false;
+        }
+
         if (nvp)
         {
             if (keyList.size() > 0)
@@ -741,21 +766,19 @@ void TV::RunTV(void)
                 nextState = RemovePlaying(internalState);
                 changeState = true;
                 endOfRecording = true;
+                cout << ">> Player timeout\n";
             }
         }
 
         if (exitPlayer)
         {
-            if (internalState == kState_WatchingLiveTV)
+            while(osd->DialogShowing(dialogname))
             {
-                nextState = kState_None;
-                changeState = true;
+                osd->DialogAbort(dialogname);
+                usleep(500);
             }
-            else if (StateIsPlaying(internalState))
-            {
-                nextState = RemovePlaying(internalState);
-                changeState = true;
-            }
+            nextState = kState_None;
+            changeState = true;
             exitPlayer = false;
         }
 
@@ -995,6 +1018,7 @@ void TV::ProcessKeypress(int keypressed)
                 if (gContext->GetNumSetting("PlaybackExitPrompt") == 2)
                     nvp->SetBookmark();
                 exitPlayer = true;
+                wantsToQuit = true;
                 break;
             }
             break;
@@ -2090,15 +2114,7 @@ void TV::customEvent(QCustomEvent *e)
         MythEvent *me = (MythEvent *)e;
         QString message = me->Message();
 
-        if (message.left(14) != "DONE_RECORDING"
-            && message.left(14) != "ASK_RECORDING "
-            && message.left(13) != "LIVE_TV_READY")
-            return;
-
-        while (changeState)
-            usleep(100);
-
-        if (internalState == kState_WatchingRecording &&
+        if (GetState() == kState_WatchingRecording &&
             message.left(14) == "DONE_RECORDING")
         {
             message = message.simplifyWhiteSpace();
@@ -2108,18 +2124,13 @@ void TV::customEvent(QCustomEvent *e)
 
             if (cardnum == recorder->GetRecorderNumber())
             {
-                if (!watchingLiveTV)
-                {
-                    nvp->SetWatchingRecording(false);
-                    nvp->SetLength(filelen);
-                    nextState = kState_WatchingPreRecorded;
-                }
-                else
-                    nextState = kState_WatchingLiveTV;
+                nvp->SetWatchingRecording(false);
+                nvp->SetLength(filelen);
+                nextState = kState_WatchingPreRecorded;
                 changeState = true;
             }
         }
-        else if (internalState == kState_WatchingLiveTV && 
+        else if (GetState() == kState_WatchingLiveTV && 
                  message.left(14) == "ASK_RECORDING ")
         {
             message = message.simplifyWhiteSpace();
@@ -2129,16 +2140,11 @@ void TV::customEvent(QCustomEvent *e)
 
             if (cardnum == recorder->GetRecorderNumber())
             {
-                int retval = AllowRecording(me->ExtraData(), timeuntil);
-
-                QString resp = QString("ASK_RECORDING_RESPONSE %1 %2")
-                                    .arg(cardnum)
-                                    .arg(retval);
-                RemoteSendMessage(resp);
+                AskAllowRecording(me->ExtraData(), timeuntil);
             }
         }
-        else if (internalState == kState_WatchingLiveTV &&
-                 message.left(13) == "LIVE_TV_READY")
+        else if (GetState() == kState_WatchingLiveTV &&
+                 message.left(13) == "QUIT_LIVETV")
         {
             message = message.simplifyWhiteSpace();
             QStringList tokens = QStringList::split(" ", message);
@@ -2146,8 +2152,8 @@ void TV::customEvent(QCustomEvent *e)
 
             if (cardnum == recorder->GetRecorderNumber())
             {
-                nextState = kState_WatchingRecording;
-                changeState = true;
+                wantsToQuit = false;
+                exitPlayer = true;
             }
         }
     }

@@ -19,6 +19,8 @@ vector<ProgramInfo *> *RemoteGetConflictList(ProgramInfo *pginfo,
 void RemoteSendMessage(const QString &message);
 RemoteEncoder *RemoteRequestRecorder(void);
 RemoteEncoder *RemoteGetExistingRecorder(ProgramInfo *pginfo);
+RemoteEncoder *RemoteGetExistingRecorder(int recordernum);
 void RemoteGeneratePreviewPixmap(ProgramInfo *pginfo);
+void RemoteFillProginfo(ProgramInfo *pginfo, const QString &playbackhostname);
 
 #endif

@@ -33,7 +33,6 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     {
         pthread_t scthread;
         pthread_create(&scthread, NULL, SchedulerThread, this);
-        gContext->addListener(this);
     }
 }
 
@@ -45,9 +44,6 @@ Scheduler::~Scheduler()
         delete pginfo;
         recordingList.pop_back();
     }
-
-    if (threadrunning)
-        gContext->removeListener(this);
 }
 
 void Scheduler::setupCards(void)
@@ -175,23 +171,6 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
         pginfo->schedulerid = pginfo->startts.toString() + "_" + pginfo->chanid;
 
         foundlist[pginfo->schedulerid] = true;
-        if (!askedList.contains(pginfo->schedulerid))
-            askedList[pginfo->schedulerid] = false;
-    }
-
-    QMap<QString, bool>::Iterator askIter = askedList.begin();
-    for (; askIter != askedList.end(); ++askIter)
-    {
-        QString id = askIter.key();
-
-        if (!foundlist.contains(id))
-        {
-            askedList.remove(askIter);
-            askIter = askedList.begin();
-        }
-
-        if (askIter == askedList.end())
-            break;
     }
 
     if (recordingList.size() > 0)
@@ -276,7 +255,7 @@ void Scheduler::PruneDontRecords(void)
 
 void Scheduler::RemoveRecording(ProgramInfo *pginfo)
 {
-    askedList.remove(pginfo->schedulerid);
+    recPendingList.remove(pginfo->schedulerid);
 
     list<ProgramInfo *>::iterator i = recordingList.begin();
     for (; i != recordingList.end(); i++)
@@ -1156,7 +1135,7 @@ void Scheduler::RunScheduler(void)
             if (secsleft - prerollseconds > 35)
                 break;
 
-            if ((recording && !nexttv->isBusy()) || !recording)
+            if ((recording && !nexttv->IsBusyRecording()) || !recording)
             {
                 // Will use pre-roll settings only if no other
                 // program is currently being recorded
@@ -1165,43 +1144,42 @@ void Scheduler::RunScheduler(void)
 
 //            VERBOSE(secsleft << " seconds until " << nextRecording->title);
 
-            if (secsleft > 35)
+            if (secsleft > 30)
                 break;
 
-            if (recording && nexttv->GetState() == kState_WatchingLiveTV &&
-                secsleft <= 32 && secsleft > 0)
+            if (recording && secsleft > 2)
             {
-                QString id = nextRecording->schedulerid; 
-                if (askedList.contains(id) && askedList[id] == false)
+                QString id = nextRecording->schedulerid;
+
+                if (!recPendingList.contains(id))
+                    recPendingList[id] = false;
+
+                if (recPendingList.contains(id) && recPendingList[id] == false)
                 {
-                    usleep(3000000); //livetv needs time to start
-                    nexttv->AllowRecording(nextRecording, secsleft);
-                    askedList[id] = true;
-                    responseList[id] = false;
+                    nexttv->RecordPending(nextRecording, secsleft);
+                    recPendingList[id] = true;
                 }
             }
 
-            if (recording && secsleft <= -2)
+            if (recording && secsleft <= 0)
             {
-                if (responseList.contains(nextRecording->schedulerid) &&
-                    responseList[nextRecording->schedulerid] == false)
+                if (nexttv->StartRecording(nextRecording))
                 {
-                    VERBOSE("Waiting for \"" << nextRecording->title 
-                    << "\" to be approved.");
+                    VERBOSE("Started recording");
                 }
                 else
-                {
-                    nexttv->StartRecording(nextRecording);
-                    VERBOSE("Started recording \"" << nextRecording->title 
-                    << "\" on channel: " << nextRecording->chanid.toInt()-1000
-                    << " on cardid: " << nextRecording->cardid << ", sourceid: "
-                    << nextRecording->sourceid);
-                    AddToDontRecord(nextRecording);
-                    RemoveRecording(nextRecording);
-                    nextRecording = NULL;
-                    recIter = recordingList.begin();
-                    resetIter = true;
-                }
+                    VERBOSE("Canceled recording");
+
+                VERBOSE(nextRecording->title << "\" on channel: "
+                        << nextRecording->chanid.toInt()-1000
+                        << " on cardid: " << nextRecording->cardid
+                        << ", sourceid: " << nextRecording->sourceid);
+
+                AddToDontRecord(nextRecording);
+                RemoveRecording(nextRecording);
+                nextRecording = NULL;
+                recIter = recordingList.begin();
+                resetIter = true;
             }
  
             if (!recording && secsleft <= -2)
@@ -1232,60 +1210,3 @@ void *Scheduler::SchedulerThread(void *param)
  
     return NULL;
 }
-
-void Scheduler::customEvent(QCustomEvent *e)
-{
-    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
-    {
-        MythEvent *me = (MythEvent *)e;
-        QString message = me->Message();
-
-        if (message.left(22) == "ASK_RECORDING_RESPONSE")
-        {
-            message = message.simplifyWhiteSpace();
-            QStringList tokens = QStringList::split(" ", message);
-            int cardnum = tokens[1].toInt();
-            int response = tokens[2].toInt();
-
-            pthread_mutex_lock(&schedulerLock);
-
-            ProgramInfo *nextRecording = NULL;
-            EncoderLink *nexttv;
-            int secsleft;
-            list<ProgramInfo *>::iterator recIter;
-
-            QDateTime curtime = QDateTime::currentDateTime();
-
-            recIter = recordingList.begin();
-            for (; recIter != recordingList.end(); recIter++)
-            {
-                nextRecording = (*recIter);
-                secsleft = curtime.secsTo(nextRecording->startts);
-
-                if (secsleft > 35)
-                    break;
-
-                if (nextRecording->cardid == cardnum)
-                {
-                    responseList[nextRecording->schedulerid] = true;
-                    nexttv = (*m_tvList)[nextRecording->cardid];
-
-                    if (response == 1)
-                    {
-                    }
-                    else if (response == 2)
-                    {
-                        askedList[nextRecording->schedulerid] = false;
-                    }
-                    else
-                    {
-                        RemoveRecording(nextRecording);
-                    }
-                    break;
-                }
-            }
-
-            pthread_mutex_unlock(&schedulerLock);
-        }
-    }
-} 

@@ -46,6 +46,7 @@ TVRec::TVRec(int capturecardnum)
     m_capturecardnum = capturecardnum;
     ispip = false;
     curRecording = NULL;
+    pendingRecording = NULL;
 
     deinterlace_mode = 0;
 
@@ -101,7 +102,10 @@ void TVRec::Init(void)
     runMainLoop = false;
     changeState = false;
 
-    watchingLiveTV = false;
+    askAllowRecording = false;
+    recordPending = false;
+    frontendReady = false;
+    cancelNextRecording = false;
 
     pthread_create(&event, NULL, EventThread, this);
 
@@ -110,7 +114,7 @@ void TVRec::Init(void)
 
     curRecording = NULL;
     prevRecording = NULL;
-    tvtorecording = 1;
+    pendingRecording = NULL;
 }
 
 TVRec::~TVRec(void)
@@ -128,13 +132,48 @@ TVRec::~TVRec(void)
         DisconnectDB();
 }
 
-void TVRec::StartRecording(ProgramInfo *rcinfo)
-{  
+TVState TVRec::GetState(void)
+{
+    if (changeState)
+        return kState_ChangingState;
+    return internalState;
+}
+
+ProgramInfo *TVRec::GetRecording(void)
+{
+    ProgramInfo *tmppginfo = NULL;
+
+    if (curRecording && !changeState)
+        tmppginfo = new ProgramInfo(*curRecording);
+    else
+        tmppginfo = new ProgramInfo();
+
+    return tmppginfo;
+}
+
+void TVRec::RecordPending(ProgramInfo *rcinfo, int secsleft)
+{
+    if (pendingRecording)
+        delete pendingRecording;
+
+    pendingRecording = new ProgramInfo(*rcinfo);
+    recordPendingStart = QDateTime::currentDateTime().addSecs(secsleft);
+    recordPending = true;
+    askAllowRecording = true;
+}
+
+int TVRec::StartRecording(ProgramInfo *rcinfo)
+{
+    int retval = 0; //0 = recording canceled, 1 = recording started
+
+    recordPending = false;
+    askAllowRecording = false;
+
     QString recprefix = gContext->GetSetting("RecordFilePrefix");
 
     if (inoverrecord)
     {
-        nextState = RemoveRecording(internalState);
+        nextState = kState_None;
         changeState = true;
 
         while (changeState)
@@ -149,7 +188,43 @@ void TVRec::StartRecording(ProgramInfo *rcinfo)
         VERBOSE("changing state finished, starting now");
     }
 
-    if (internalState == kState_None) 
+    if (internalState == kState_WatchingLiveTV && !cancelNextRecording)
+    {
+        QDateTime timeout;
+
+        QString message = QString("QUIT_LIVETV %1").arg(m_capturecardnum);
+
+        MythEvent me(message);
+        gContext->dispatch(me);
+
+        timeout = QDateTime::currentDateTime().addSecs(3);
+
+        while (internalState != kState_None ||
+               QDateTime::currentDateTime().secsTo(timeout) <= 0)
+            usleep(100);
+
+        if (internalState != kState_None)
+        {
+            gContext->dispatch(me);
+
+            timeout = QDateTime::currentDateTime().addSecs(3);
+
+            while (internalState != kState_None ||
+                   QDateTime::currentDateTime().secsTo(timeout) <= 0)
+                usleep(100);
+        }
+
+        if (internalState != kState_None)
+        {
+            exitPlayer = true;
+            timeout = QDateTime::currentDateTime().addSecs(5);
+            while (internalState != kState_None ||
+                   QDateTime::currentDateTime().secsTo(timeout) <= 0)
+                usleep(100);
+        }
+    }
+
+    if (internalState == kState_None)
     {
         outputFilename = rcinfo->GetRecordFilename(recprefix);
         recordEndTime = rcinfo->endts;
@@ -157,17 +232,7 @@ void TVRec::StartRecording(ProgramInfo *rcinfo)
 
         nextState = kState_RecordingOnly;
         changeState = true;
-    }
-    else if (internalState == kState_WatchingLiveTV)
-    {
-        outputFilename = rcinfo->GetRecordFilename(recprefix);
-        recordEndTime = rcinfo->endts;
-        curRecording = new ProgramInfo(*rcinfo);
-
-        QString message = QString("LIVE_TV_READY %1").arg(m_capturecardnum);
-        MythEvent me(message);
-
-        gContext->dispatch(me);
+        retval = 1;
     }
     else
     {
@@ -183,7 +248,14 @@ void TVRec::StartRecording(ProgramInfo *rcinfo)
                  << curRecording->startts.toString() << " " 
                  << curRecording->endts.toString() << endl;
         }
+
+        retval = -1;
     }
+
+    if (cancelNextRecording)
+        cancelNextRecording = false;
+
+    return retval;
 }
 
 void TVRec::StopRecording(void)
@@ -206,7 +278,6 @@ void TVRec::StateToString(TVState state, QString &statestr)
         case kState_WatchingLiveTV: statestr = "WatchingLiveTV"; break;
         case kState_WatchingPreRecorded: statestr = "WatchingPreRecorded";
                                          break;
-        case kState_WatchingRecording: statestr = "WatchingRecording"; break;
         case kState_RecordingOnly: statestr = "RecordingOnly"; break;
         default: statestr = "Unknown"; break;
     }
@@ -214,28 +285,12 @@ void TVRec::StateToString(TVState state, QString &statestr)
 
 bool TVRec::StateIsRecording(TVState state)
 {
-    bool retval = false;
-
-    if (state == kState_RecordingOnly || 
-        state == kState_WatchingRecording)
-    {
-        retval = true;
-    }
-
-    return retval;
+    return (state == kState_RecordingOnly);
 }
 
 bool TVRec::StateIsPlaying(TVState state)
 {
-    bool retval = false;
-
-    if (state == kState_WatchingPreRecorded || 
-        state == kState_WatchingRecording)
-    {
-        retval = true;
-    }
-
-    return retval;
+    return (state == kState_WatchingPreRecorded);
 }
 
 TVState TVRec::RemoveRecording(TVState state)
@@ -244,8 +299,6 @@ TVState TVRec::RemoveRecording(TVState state)
     {
         if (state == kState_RecordingOnly)
             return kState_None;
-        else if (state == kState_WatchingRecording)
-            return kState_WatchingLiveTV;
         else
         {
             cerr << "Unknown state in RemoveRecording: " << state << endl;
@@ -296,6 +349,10 @@ void TVRec::HandleStateChange(void)
 {
     TVState tmpInternalState = internalState;
 
+    frontendReady = false;
+    askAllowRecording = true;
+    cancelNextRecording = false;
+
     bool changed = false;
     bool startRecorder = false;
     bool closeRecorder = false;
@@ -318,8 +375,6 @@ void TVRec::HandleStateChange(void)
         changed = true;
 
         startRecorder = true;
-
-        watchingLiveTV = true;
     }
     else if (tmpInternalState == kState_WatchingLiveTV && 
              nextState == kState_None)
@@ -332,7 +387,6 @@ void TVRec::HandleStateChange(void)
         changed = true;
 
         killRecordingFile = true;
-        watchingLiveTV = false;
     }
     else if (tmpInternalState == kState_None && 
              nextState == kState_RecordingOnly) 
@@ -348,113 +402,14 @@ void TVRec::HandleStateChange(void)
 
         startRecorder = true;
     }   
-    else if ((tmpInternalState == kState_RecordingOnly && 
-              nextState == kState_None) ||
-             (tmpInternalState == kState_WatchingRecording &&
-              nextState == kState_WatchingPreRecorded))
+    else if (tmpInternalState == kState_RecordingOnly && 
+             nextState == kState_None)
     {
         FinishedRecording();
         closeRecorder = true;
         tmpInternalState = nextState;
         changed = true;
         inoverrecord = false;
-
-        watchingLiveTV = false;
-    }
-    else if (tmpInternalState == kState_WatchingLiveTV &&
-             nextState == kState_WatchingRecording)
-    {
-        channel->StoreInputChannels();
-
-        nvr->Pause();
-        while (!nvr->GetPause())
-            usleep(5);
-
-        rbuffer->Reset();
-        SetChannel(false);
-
-        nvr->Reset();
-        nvr->TransitionToFile(outputFilename);
-
-        nvr->Unpause();
-
-        StartedRecording();
-
-        tmpInternalState = nextState;
-        changed = true;
-    }
-    else if (tmpInternalState == kState_WatchingRecording &&
-             nextState == kState_WatchingLiveTV)
-    {
-        QMap<long long, int> blank_frame_map;
-
-        nvr->Pause(false);
-        while (!nvr->GetPause())
-            usleep(5);
-
-        if (curRecording)
-        {
-            FinishedRecording();
-            prevRecording = new ProgramInfo(*curRecording);
-        }
-        else
-        {
-            prevRecording = NULL;
-        }
-
-        if (prevRecording)
-            nvr->GetBlankFrameMap(blank_frame_map);
-
-        nvr->TransitionToRing();
-        nvr->SetRecording(NULL);
-
-        nvr->Unpause();
-
-        int filelen = (int)(((float)nvr->GetFramesWritten() / frameRate));
-
-        QString message = QString("DONE_RECORDING %1 %2").arg(m_capturecardnum)
-                                                         .arg(filelen);
-        MythEvent me(message);
-        gContext->dispatch(me);
-
-        delete curRecording;
-        curRecording = NULL;
-
-        MythEvent me2("RECORDING_LIST_CHANGE");
-        gContext->dispatch(me2);
-
-        outputFilename = gContext->GetSetting("LiveBufferDir") + 
-                         QString("/ringbuf%1.nuv").arg(m_capturecardnum);
-
-        inoverrecord = false;
-        tmpInternalState = nextState;
-        changed = true;
-
-        if (prevRecording)
-        {
-            pthread_mutex_lock(&db_lock);
-            MythContext::KickDatabase(db_conn);
-            prevRecording->SetBlankFrameList(blank_frame_map, db_conn);
-            pthread_mutex_unlock(&db_lock);
-
-            if ((!prematurelystopped) &&
-                (gContext->GetNumSetting("AutoCommercialFlag", 1)))
-                FlagCommercials();
-        }
-
-        if (prevRecording)
-        {
-            delete prevRecording;
-            prevRecording = NULL;
-        }
-    }
-    else if (tmpInternalState == kState_WatchingRecording &&
-             nextState == kState_RecordingOnly)
-    {
-        tmpInternalState = nextState;
-        changed = true;
-
-        watchingLiveTV = false;
     }
     else if (tmpInternalState == kState_None && 
              nextState == kState_None)
@@ -837,6 +792,32 @@ void TVRec::RunTV(void)
 
         usleep(1000);
 
+        if (recordPending && askAllowRecording && frontendReady)
+        {
+            askAllowRecording = false;
+
+            int timeuntil = QDateTime::currentDateTime()
+                                .secsTo(recordPendingStart);
+
+            QString message = QString("MythTV wants to record \"")
+                               + pendingRecording->title;
+
+            if (gContext->GetNumSetting("DisplayChanNum") != 0)
+                message += QString("\" on ")
+                        + pendingRecording->channame
+                        + " [" +  pendingRecording->chansign + "]";
+            else
+                message += "\" on Channel " + pendingRecording->chanstr;
+
+            message += " in %d seconds.  Do you want to:";
+
+            QString query = QString("ASK_RECORDING %1 %2").arg(m_capturecardnum)
+                                                        .arg(timeuntil);
+            MythEvent me(query, message);
+
+            gContext->dispatch(me);
+        }
+
         if (StateIsRecording(internalState))
         {
             if (QDateTime::currentDateTime() > recordEndTime || finishRecording)
@@ -847,11 +828,6 @@ void TVRec::RunTV(void)
                     inoverrecord = true;
                     //cout << "switching to overrecord for " 
                     //     << overrecordseconds << " more seconds\n";
-                }
-                else if (watchingLiveTV)
-                {
-                    nextState = kState_WatchingLiveTV;
-                    changeState = true;
                 }
                 else
                 {
@@ -1522,6 +1498,19 @@ bool TVRec::IsReallyRecording(void)
     return false;
 }
 
+bool TVRec::IsBusy(void)
+{
+    bool retval = (GetState() != kState_None);
+
+    if (recordPending && 
+        QDateTime::currentDateTime().secsTo(recordPendingStart) <= 5)
+    {
+        retval = true;
+    }
+
+    return retval;
+}
+
 float TVRec::GetFramerate(void)
 {
     return frameRate;
@@ -1555,18 +1544,6 @@ long long TVRec::GetFreeSpace(long long totalreadpos)
                rbuffer->GetTotalWritePosition() - rbuffer->GetSmudgeSize();
 
     return -1;
-}
-
-void TVRec::TriggerRecordingTransition(void)
-{
-    if (!curRecording)
-        return;
-
-    if (internalState != kState_WatchingLiveTV)
-        return;
-
-    nextState = kState_WatchingRecording;
-    changeState = true;
 }
 
 void TVRec::StopPlaying(void)

@@ -109,6 +109,18 @@ bool PlaybackSock::CheckFile(ProgramInfo *pginfo)
     return exists;
 }
 
+bool PlaybackSock::IsBusy(int capturecardnum)
+{
+    QStringList strlist = QString("QUERY_REMOTEENCODER %1").arg(capturecardnum);
+
+    strlist << "IS_BUSY";
+
+    SendReceiveStringList(strlist);
+
+    bool state = strlist[0].toInt();
+    return state;
+}
+
 int PlaybackSock::GetEncoderState(int capturecardnum)
 {
     QStringList strlist = QString("QUERY_REMOTEENCODER %1").arg(capturecardnum);
@@ -132,10 +144,25 @@ bool PlaybackSock::EncoderIsRecording(int capturecardnum, ProgramInfo *pginfo)
     return ret;
 }
 
-void PlaybackSock::StartRecording(int capturecardnum, ProgramInfo *pginfo)
+int PlaybackSock::StartRecording(int capturecardnum, ProgramInfo *pginfo)
 {
     QStringList strlist = QString("QUERY_REMOTEENCODER %1").arg(capturecardnum);
     strlist << "START_RECORDING";
+    pginfo->ToStringList(strlist);
+
+    SendReceiveStringList(strlist);
+
+    int ret = strlist[0].toInt();
+    return ret;
+}
+
+void PlaybackSock::RecordPending(int capturecardnum, ProgramInfo *pginfo,
+                                 int secsleft)
+{
+    QStringList strlist = QString("QUERY_REMOTEENCODER %1 %2")
+                                 .arg(capturecardnum).arg(secsleft);
+    strlist << "RECORD_PENDING";
+    strlist << "" + secsleft;
     pginfo->ToStringList(strlist);
 
     SendReceiveStringList(strlist);

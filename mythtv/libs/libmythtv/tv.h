@@ -13,7 +13,8 @@ typedef enum
     kState_WatchingLiveTV,
     kState_WatchingPreRecorded,
     kState_WatchingRecording,       // watching what you're recording
-    kState_RecordingOnly
+    kState_RecordingOnly,
+    kState_ChangingState
 } TVState;
 
 #include "tv_play.h"

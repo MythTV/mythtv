@@ -35,8 +35,6 @@ class Scheduler : public QObject
 
     void PrintList(void);
 
-    void customEvent(QCustomEvent *e);
-
   protected:
     void RunScheduler(void);
     static void *SchedulerThread(void *param);
@@ -88,8 +86,7 @@ class Scheduler : public QObject
 
     QMap<int, EncoderLink *> *m_tvList;   
 
-    QMap<QString, bool> askedList;
-    QMap<QString, bool> responseList;
+    QMap<QString, bool> recPendingList;
 
     pthread_mutex_t schedulerLock;
 

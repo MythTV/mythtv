@@ -65,6 +65,7 @@ class MainServer : public QObject
     void HandleFileTransferQuery(QStringList &slist, QStringList &commands,
                                  PlaybackSock *pbs); 
     void HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs);
+    void HandleGetRecorderFromNum(QStringList &slist, PlaybackSock *pbs);
     void HandleMessage(QStringList &slist, PlaybackSock *pbs);
     void HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs);
     void HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs);

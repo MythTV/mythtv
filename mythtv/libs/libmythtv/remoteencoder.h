@@ -18,6 +18,7 @@ class RemoteEncoder
     bool IsValidRecorder(void);
     int GetRecorderNumber(void);
 
+    ProgramInfo *GetRecording(void);
     bool IsRecording(void);
     float GetFrameRate(void);
     long long GetFramesWritten(void);
@@ -26,7 +27,6 @@ class RemoteEncoder
     long long GetKeyframePosition(long long desired);
     void FillPositionMap(int start, int end,
                          QMap<long long, long long> &positionMap);
-    void TriggerRecordingTransition(void);
     void StopPlaying(void);
     void SetupRingBuffer(QString &path, long long &filesize, 
                          long long &fillamount, bool pip = false);
@@ -34,6 +34,8 @@ class RemoteEncoder
     void StopLiveTV(void);
     void Pause(void);
     void FinishRecording(void);
+    void FrontendReady(void);
+    void CancelNextRecording(void);
 
     void ToggleInputs(void);
     int ChangeContrast(bool direction);

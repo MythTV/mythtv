@@ -105,6 +105,18 @@ bool RemoteEncoder::IsRecording(void)
     return retval;
 }
 
+ProgramInfo *RemoteEncoder::GetRecording(void)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    strlist << "GET_RECORDING";
+
+    SendReceiveStringList(strlist);
+
+    ProgramInfo *proginfo = new ProgramInfo;
+    proginfo->FromStringList(strlist, 0);
+    return proginfo;
+}
+
 float RemoteEncoder::GetFrameRate(void)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
@@ -186,10 +198,18 @@ void RemoteEncoder::FillPositionMap(int start, int end,
     }
 }
 
-void RemoteEncoder::TriggerRecordingTransition(void)
+void RemoteEncoder::CancelNextRecording(void)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
-    strlist << "TRIGGER_RECORDING_TRANSITION";
+    strlist << "CANCEL_NEXT_RECORDING";
+
+    SendReceiveStringList(strlist);
+}
+
+void RemoteEncoder::FrontendReady(void)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    strlist << "FRONTEND_READY";
 
     SendReceiveStringList(strlist);
 }

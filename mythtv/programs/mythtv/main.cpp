@@ -63,15 +63,9 @@ int main(int argc, char *argv[])
         tv->Playback(pginfo);
     }
     else
-        tv->LiveTV();
+        tv->LiveTV(true);
 
     qApp->unlock();
-    while (tv->GetState() == kState_None)
-    {
-        usleep(1000);
-        qApp->processEvents();
-    }
-
     while (tv->GetState() != kState_None)
     {
         usleep(1000);

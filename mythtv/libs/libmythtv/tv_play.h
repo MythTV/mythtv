@@ -32,22 +32,24 @@ class TV : public QObject
 
     void Init(bool createWindow = true);
 
-    TVState LiveTV(void);
+    int LiveTV(bool showDialogs = true);
     void StopLiveTV(void) { exitPlayer = true; }
     void FinishRecording(void);
+    bool WantsToQuit(void) { return wantsToQuit; }
+    int GetLastRecorderNum(void) { return lastRecorderNum; }
+    int PlayFromRecorder(int recordernum);
 
-    int AllowRecording(const QString &message, int timeuntil);
+    void AskAllowRecording(const QString &message, int timeuntil);
 
     // next two functions only work on recorded programs.
-    void Playback(ProgramInfo *rcinfo);
+    int Playback(ProgramInfo *rcinfo);
 
     bool IsRunning(void) { return runMainLoop; }
     void Stop(void) { runMainLoop = false; }
 
-    TVState GetState(void) { return internalState; }
-    bool ChangingState(void) { return changeState; }
-    bool IsPlaying(void) { return StateIsPlaying(internalState); }
-    bool IsRecording(void) { return StateIsRecording(internalState); }
+    TVState GetState(void);
+    bool IsPlaying(void) { return StateIsPlaying(GetState()); }
+    bool IsRecording(void) { return StateIsRecording(GetState()); }
 
     void GetNextProgram(RemoteEncoder *enc, int direction,
                         QMap<QString, QString> &regexpMap);
@@ -91,6 +93,9 @@ class TV : public QObject
     bool eventFilter(QObject *o, QEvent *e);
 
   private:
+    void StartPlayerAndRecorder(bool StartPlayer, bool StartRecorder);
+    void StopPlayerAndRecorder(bool StopPlayer, bool StopRecorder);
+
     void SetChannel(bool needopen = false);
 
     void ToggleChannelFavorite(void);
@@ -169,8 +174,6 @@ class TV : public QObject
     TVState nextState;
     QString inputFilename;
 
-    bool watchingLiveTV;
-
     int playbackLen;
 
     int jumptime;
@@ -227,6 +230,11 @@ class TV : public QObject
 
     QValueList<int> keyList;
     QMutex keyListLock;
+
+    bool wantsToQuit;
+    int lastRecorderNum;
+    bool getRecorderPlaybackInfo;
+    ProgramInfo *recorderPlaybackInfo;
 };
 
 #endif

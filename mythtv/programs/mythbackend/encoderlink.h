@@ -28,24 +28,28 @@ class EncoderLink
     bool isConnected();
     int getCardId() { return m_capturecardnum; }
 
-    bool isBusy();
+    bool IsBusy(void);
+    bool IsBusyRecording(void);
+
     TVState GetState();
     bool isRecording(ProgramInfo *rec); // scheduler call only.
 
     bool MatchesRecording(ProgramInfo *rec);
-    int AllowRecording(ProgramInfo *rec, int timeuntil);
-    void StartRecording(ProgramInfo *rec);
+    void RecordPending(ProgramInfo *rec, int secsleft);
+    int StartRecording(ProgramInfo *rec);
     void StopRecording(void);
     void FinishRecording(void);
+    void FrontendReady(void);
+    void CancelNextRecording(void);
     bool WouldConflict(ProgramInfo *rec);
 
     bool IsReallyRecording(void);
+    ProgramInfo *GetRecording(void);
     float GetFramerate(void);
     long long GetFramesWritten(void);
     long long GetFilePosition(void);
     long long GetFreeSpace(long long totalreadpos);
     long long GetKeyframePosition(long long desired);
-    void TriggerRecordingTransition(void);
     void StopPlaying(void);
     void SetupRingBuffer(QString &path, long long &filesize,
                          long long &fillamount, bool pip = false);

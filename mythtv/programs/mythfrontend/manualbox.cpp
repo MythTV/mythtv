@@ -199,24 +199,20 @@ void ManualBox::killPlayer(void)
 
 void ManualBox::startPlayer(void)
 {
-
     if (NULL == m_tv)
     {
         tvstarting = true;
 
-        TVState nextstate;
-
         QSqlDatabase *db = QSqlDatabase::database();
         m_tv = new TV(db);
         m_tv->Init(false);
-        m_tv->EmbedOutput(m_pixlabel->winId(), 0, 0, (int)(320 * wmult), (int)(240 * hmult));
-        nextstate = m_tv->LiveTV();
-        
-        if (nextstate == kState_WatchingLiveTV ||
-            nextstate == kState_WatchingRecording)
+
+        m_tv->EmbedOutput(m_pixlabel->winId(), 0, 0, (int)(320 * wmult),
+                                                     (int)(240 * hmult));
+        if (m_tv->LiveTV(true))
         {
             qApp->unlock();
-            while (m_tv->ChangingState())
+            while (m_tv->GetState() == kState_ChangingState)
             {
                 usleep(50);
                 qApp->processEvents();

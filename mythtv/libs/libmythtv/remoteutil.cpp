@@ -166,6 +166,19 @@ RemoteEncoder *RemoteGetExistingRecorder(ProgramInfo *pginfo)
     return new RemoteEncoder(num, hostname, port);
 }
 
+RemoteEncoder *RemoteGetExistingRecorder(int recordernum)
+{
+    QStringList strlist = "GET_RECORDER_FROM_NUM";
+    strlist << QString("%1").arg(recordernum);
+
+    gContext->SendReceiveStringList(strlist);
+
+    QString hostname = strlist[0];
+    int port = strlist[1].toInt();
+
+    return new RemoteEncoder(recordernum, hostname, port);
+}
+
 void RemoteSendMessage(const QString &message)
 {
     QStringList strlist = "MESSAGE";
@@ -181,3 +194,15 @@ void RemoteGeneratePreviewPixmap(ProgramInfo *pginfo)
 
     gContext->SendReceiveStringList(strlist);
 }
+
+void RemoteFillProginfo(ProgramInfo *pginfo, const QString &playbackhostname)
+{
+    QStringList strlist = "FILL_PROGRAM_INFO";
+    strlist << playbackhostname;
+    pginfo->ToStringList(strlist);
+
+    gContext->SendReceiveStringList(strlist);
+
+    pginfo->FromStringList(strlist, 0);
+}
+

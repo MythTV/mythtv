@@ -1228,17 +1228,20 @@ void PlaybackBox::play(ProgramInfo *rec)
 
     QSqlDatabase *db = QSqlDatabase::database();
     noUpdate = true;
+
     TV *tv = new TV(db);
     tv->Init();
-    tv->Playback(tvrec);
 
     ignoreevents = true;
-    while (tv->IsPlaying() || tv->ChangingState())
+    if (tv->Playback(tvrec))
     {
-        qApp->unlock();
-        qApp->processEvents();
-        usleep(50);
-        qApp->lock();
+        while (tv->GetState() != kState_None)
+        {
+            qApp->unlock();
+            qApp->processEvents();
+            usleep(50);
+            qApp->lock();
+        }
     }
     noUpdate = false;
 

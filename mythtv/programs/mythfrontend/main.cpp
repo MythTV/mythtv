@@ -129,33 +129,79 @@ void startTV(void)
 {
     QSqlDatabase *db = QSqlDatabase::database();
     TV *tv = new TV(db);
+
+    QDateTime timeout;
+
     tv->Init();
-    TVState nextstate = tv->LiveTV();
 
-    qApp->unlock();
+    bool tryTV = false;
+    bool tryRecorder = false;
+    bool quitAll = false;
 
-    if (nextstate == kState_WatchingLiveTV ||
-           nextstate == kState_WatchingRecording)
+    bool showDialogs = true;
+    if (!tv->LiveTV(showDialogs))
+        quitAll = true;
+
+    while (!quitAll)
     {
-        while (tv->ChangingState())
-        {
-            usleep(50);
-            qApp->processEvents();
+        timeout = QDateTime::currentDateTime().addSecs(2);
+        while (tryRecorder)
+        { //try to play recording, if filenotfound retry until timeout
+
+            if (tv->PlayFromRecorder(tv->GetLastRecorderNum()) == 1)
+                tryRecorder = false;
+            else if (QDateTime::currentDateTime().secsTo(timeout) <= 0)
+            {
+                tryRecorder = false;
+                tryTV = true;
+            }
+            else
+            {
+                qApp->unlock();
+                qApp->processEvents();
+                usleep(100000);
+                qApp->lock();
+             }
         }
 
-        while (nextstate == kState_WatchingLiveTV ||
-               nextstate == kState_WatchingRecording ||
-               nextstate == kState_WatchingPreRecorded) 
+        timeout = QDateTime::currentDateTime().addSecs(2);
+        while (tryTV)
+        {//try to start livetv
+            bool showDialogs = false;
+            if (tv->LiveTV(showDialogs) == 1) //1 == livetv ok
+                tryTV = false;
+            else if (QDateTime::currentDateTime().secsTo(timeout) <= 0)
+            {
+                tryTV = false;
+                quitAll = true;
+            }
+            else
+            {
+                qApp->unlock();
+                qApp->processEvents();
+                usleep(100000);
+                qApp->lock();
+            }
+        }
+
+        while (tv->GetState() != kState_None)
         {
-            usleep(100);
+            qApp->unlock();
             qApp->processEvents();
-            nextstate = tv->GetState();
+            usleep(100);
+            qApp->lock();
+        }
+
+        if (tv->WantsToQuit())
+            quitAll = true;
+        else
+        {
+            tryRecorder = true;
+            tryTV = false;
         }
     }
 
     delete tv;
-
-    qApp->lock();
 }
 
 void TVMenuCallback(void *data, QString &selection)

@@ -42,7 +42,18 @@ EncoderLink::~EncoderLink()
         delete tv;
 }
 
-bool EncoderLink::isBusy(void)
+bool EncoderLink::IsBusy(void)
+{
+    if (local)
+        return tv->IsBusy();
+
+    if (sock)
+        return sock->IsBusy(m_capturecardnum);
+
+    return false;
+}
+
+bool EncoderLink::IsBusyRecording(void)
 {
     bool retval = false;
 
@@ -99,7 +110,10 @@ bool EncoderLink::MatchesRecording(ProgramInfo *rec)
 
     if (local)
     {
-        if (isBusy())
+        while (kState_ChangingState == GetState())
+            usleep(100);
+
+        if (IsBusyRecording())
             tvrec = tv->GetRecording();
 
         if (tvrec)
@@ -110,6 +124,8 @@ bool EncoderLink::MatchesRecording(ProgramInfo *rec)
             {
                 retval = true;
             }
+
+            delete tvrec;
         }
     }
     else
@@ -121,28 +137,12 @@ bool EncoderLink::MatchesRecording(ProgramInfo *rec)
     return retval;
 }
 
-int EncoderLink::AllowRecording(ProgramInfo *rec, int timeuntil)
+void EncoderLink::RecordPending(ProgramInfo *rec, int secsleft)
 {
-    TVState state = GetState();
-
-    if (state != kState_WatchingLiveTV)
-        return 1;
-
-    QString message = QString("MythTV wants to record \"") + rec->title;
-    if (gContext->GetNumSetting("DisplayChanNum") != 0)
-        message += QString("\" on ") + rec->channame + " [" +
-                   rec->chansign + "]";
-    else
-        message += "\" on Channel " + rec->chanstr;
-    message += " in %d seconds.  Do you want to:";
-
-    QString query = QString("ASK_RECORDING %1 %2").arg(m_capturecardnum)
-                                                  .arg(timeuntil - 2);
-
-    MythEvent me(query, message);
-    gContext->dispatch(me);
-
-    return -1;
+    if (local)
+        tv->RecordPending(rec, secsleft);
+    else if (sock)
+        sock->RecordPending(m_capturecardnum, rec, secsleft);
 }
 
 bool EncoderLink::WouldConflict(ProgramInfo *rec)
@@ -156,19 +156,30 @@ bool EncoderLink::WouldConflict(ProgramInfo *rec)
     return false;
 }
 
-void EncoderLink::StartRecording(ProgramInfo *rec)
+int EncoderLink::StartRecording(ProgramInfo *rec)
 {
+    int retval = 0;
+
     endRecordingTime = rec->endts;
     startRecordingTime = rec->startts;
     chanid = rec->chanid;
 
     if (local)
-        tv->StartRecording(rec);
+        retval = tv->StartRecording(rec);
     else if (sock)
-        sock->StartRecording(m_capturecardnum, rec);
+        retval = sock->StartRecording(m_capturecardnum, rec);
     else
         cerr << "Wanted to start recording at: " << m_capturecardnum
              << "\nbut the server's not here anymore\n";
+
+    if (!retval)
+    {
+        endRecordingTime = QDateTime::currentDateTime().addDays(-2);
+        startRecordingTime = endRecordingTime;
+        chanid = "";
+    }
+
+    return retval;
 }
 
 void EncoderLink::StopRecording(void)
@@ -251,15 +262,32 @@ long long EncoderLink::GetKeyframePosition(long long desired)
     return -1;
 }
 
-void EncoderLink::TriggerRecordingTransition(void)
+void EncoderLink::FrontendReady(void)
+{
+    if (local)
+        return tv->FrontendReady();
+
+    cerr << "Should be local only query: FrontendReady\n";
+}
+
+void EncoderLink::CancelNextRecording(void)
 {
     if (local)
     {
-        tv->TriggerRecordingTransition();
+        tv->CancelNextRecording();
         return;
     }
 
-    cerr << "Should be local only query: TriggerRecordingTransition\n";
+    cerr << "Should be local only query: CancelNextRecording\n";
+}
+
+ProgramInfo *EncoderLink::GetRecording(void)
+{
+    if (local)
+        return tv->GetRecording();
+
+    cerr << "Should be local only query: GetRecording\n";
+    return NULL;
 }
 
 void EncoderLink::StopPlaying(void)

@@ -260,6 +260,10 @@ void MainServer::ProcessRequest(QStringList &listline, QStringList &tokens,
         else
             HandleRemoteEncoder(listline, tokens, pbs);
     }
+    else if (command == "GET_RECORDER_FROM_NUM")
+    {
+        HandleGetRecorderFromNum(listline, pbs);
+    }
     else if (command == "GET_RECORDER_NUM")
     {
         HandleGetRecorderNum(listline, pbs);
@@ -771,8 +775,11 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
 
             elink->StopRecording();
 
-            while (elink->isBusy())
+            while (elink->IsBusyRecording() || 
+                   elink->GetState() == kState_ChangingState)
+            {
                 usleep(100);
+            }
         }
     }
 
@@ -1050,13 +1057,13 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
         else
             enchost = elink->getHostname();
 
-        if (enchost == pbshost && elink->isConnected() && !elink->isBusy())
+        if (enchost == pbshost && elink->isConnected() && !elink->IsBusy())
         {
             encoder = elink;
             retval = iter.key();
             break;
         }
-        if (retval == -1 && elink->isConnected() && !elink->isBusy())
+        if (retval == -1 && elink->isConnected() && !elink->IsBusy())
         {
             encoder = elink;
             retval = iter.key();
@@ -1172,14 +1179,33 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         encodeLongLong(retlist, filesize);
         encodeLongLong(retlist, fillamount);
     }
-    else if (command == "TRIGGER_RECORDING_TRANSITION")
+    else if (command == "GET_RECORDING")
     {
-        enc->TriggerRecordingTransition();
-        retlist << "ok";
+        ProgramInfo *pginfo = enc->GetRecording();
+        if (pginfo)
+        {
+            pginfo->ToStringList(retlist);
+            delete pginfo;
+        }
+        else
+        {
+            ProgramInfo dummy;
+            dummy.ToStringList(retlist);
+        }
     }
     else if (command == "STOP_PLAYING")
     {
         enc->StopPlaying();
+        retlist << "ok";
+    }
+    else if (command == "FRONTEND_READY")
+    {
+        enc->FrontendReady();
+        retlist << "ok";
+    }
+    else if (command == "CANCEL_NEXT_RECORDING")
+    {
+        enc->CancelNextRecording();
         retlist << "ok";
     }
     else if (command == "SPAWN_LIVETV")
@@ -1426,6 +1452,10 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     {
         retlist << QString::number((int)enc->GetState());
     }
+    if (command == "IS_BUSY")
+    {
+        retlist << QString::number((int)enc->IsBusy());
+    }
     else if (command == "MATCHES_RECORDING")
     {
         ProgramInfo *pginfo = new ProgramInfo();
@@ -1439,9 +1469,19 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     {
         ProgramInfo *pginfo = new ProgramInfo();
         pginfo->FromStringList(slist, 2);
-  
-        enc->StartRecording(pginfo);
+ 
+        retlist << QString::number((int)enc->StartRecording(pginfo));
 
+        delete pginfo;
+    }
+    else if (command == "RECORD_PENDING")
+    {
+        ProgramInfo *pginfo = new ProgramInfo();
+        int secsleft = commands[2].toInt();
+        pginfo->FromStringList(slist, 3);
+
+        enc->RecordPending(pginfo, secsleft);
+ 
         retlist << "OK";
         delete pginfo;
     }
@@ -1564,6 +1604,45 @@ void MainServer::HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs)
 
     SendResponse(pbssock, strlist);    
     delete pginfo;
+}
+
+void MainServer::HandleGetRecorderFromNum(QStringList &slist, 
+                                          PlaybackSock *pbs)
+{
+    QSocket *pbssock = pbs->getSocket();
+
+    int recordernum = slist[1].toInt();
+    EncoderLink *encoder = NULL;
+    QStringList strlist;
+
+    QMap<int, EncoderLink *>::Iterator iter = encoderList->find(recordernum);
+
+    if(iter != encoderList->end())
+        encoder =  iter.data();
+
+    if (encoder && encoder->isConnected())
+    {
+        if (encoder->isLocal())
+        {
+            strlist << gContext->GetSetting("BackendServerIP");
+            strlist << gContext->GetSetting("BackendServerPort");
+        }
+        else
+        {
+            strlist << gContext->GetSettingOnHost("BackendServerIP",
+                                                  encoder->getHostname(),
+                                                  "nohostname");
+            strlist << gContext->GetSettingOnHost("BackendServerPort",
+                                                  encoder->getHostname(), "-1");
+        }
+    }
+    else
+    {
+        strlist << "nohost";
+        strlist << "-1";
+    }
+
+    SendResponse(pbssock, strlist);
 }
 
 void MainServer::HandleMessage(QStringList &slist, PlaybackSock *pbs)
@@ -1703,16 +1782,21 @@ void MainServer::endConnection(QSocket *socket)
             for (; i != encoderList->end(); ++i)
             {
                 EncoderLink *enc = i.data();
-                if (enc->isLocal() && enc->isBusy() && 
-                    enc->GetReadThreadSocket() == socket)
+                if (enc->isLocal())
                 {
-                    if (enc->GetState() == kState_WatchingLiveTV)
+                    while (enc->GetState() == kState_ChangingState)
+                        usleep(500);
+
+                    if(enc->IsBusy() && enc->GetReadThreadSocket() == socket)
                     {
-                        enc->StopLiveTV();
-                    }
-                    else if (enc->GetState() == kState_WatchingRecording)
-                    {
-                        enc->StopPlaying();
+                        if (enc->GetState() == kState_WatchingLiveTV)
+                        {
+                            enc->StopLiveTV();
+                        }
+                        else if (enc->GetState() == kState_WatchingRecording)
+                        {
+                            enc->StopPlaying();
+                        }
                     }
                 }
             }

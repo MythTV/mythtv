@@ -38,11 +38,15 @@ class TVRec
 
     void Init(void);
 
-    void StartRecording(ProgramInfo *rcinfo);
+    void RecordPending(ProgramInfo *rcinfo, int secsleft);
+    int StartRecording(ProgramInfo *rcinfo);
+
     void StopRecording(void);
     void FinishRecording(void) { finishRecording = true; }
 
-    ProgramInfo *GetRecording(void) { return curRecording; }
+    void FrontendReady(void) { frontendReady = true; }
+    void CancelNextRecording(void) { cancelNextRecording = true; }
+    ProgramInfo *GetRecording(void);
 
     char *GetScreenGrab(ProgramInfo *pginfo, const QString &filename, 
                         int secondsin, int &bufferlen,
@@ -51,8 +55,7 @@ class TVRec
     bool IsRunning(void) { return runMainLoop; }
     void Stop(void) { runMainLoop = false; }
 
-    TVState GetState(void) { return internalState; }
-    bool ChangingState(void) { return changeState; }
+    TVState GetState(void);
     bool IsPlaying(void) { return StateIsPlaying(internalState); }
     bool IsRecording(void) { return StateIsRecording(internalState); }
 
@@ -76,13 +79,14 @@ class TVRec
 
     RecorderBase *GetRecorder(void);
 
+    bool IsBusy(void);
     bool IsReallyRecording(void);
+
     float GetFramerate(void);
     long long GetFramesWritten(void);
     long long GetFilePosition(void);
     long long GetFreeSpace(long long totalreadpos);
     long long GetKeyframePosition(long long desired);
-    void TriggerRecordingTransition(void);
     void StopPlaying(void);
     void SetupRingBuffer(QString &path, long long &filesize, 
                          long long &fillamount, bool pip = false);
@@ -174,6 +178,7 @@ class TVRec
 
     TVState internalState;
 
+    bool frontendReady;
     bool runMainLoop;
     bool exitPlayer;
     bool finishRecording;
@@ -193,8 +198,7 @@ class TVRec
 
     ProgramInfo *curRecording;
     ProgramInfo *prevRecording;
-    int tvtorecording;
-    
+ 
     QString videodev, vbidev, audiodev, cardtype;
     int audiosamplerate;
 
@@ -213,6 +217,13 @@ class TVRec
 
     QPtrList <ProgramInfo> commercialFlag;
     pthread_mutex_t commLock;
+
+    bool askAllowRecording;
+    bool recordPending;
+    bool cancelNextRecording;
+
+    ProgramInfo *pendingRecording;
+    QDateTime recordPendingStart;
 };
 
 #endif
