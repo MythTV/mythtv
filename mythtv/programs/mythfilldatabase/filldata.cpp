@@ -1281,10 +1281,10 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
                         pginfo->catType = cat;
                 }
 
-                if (cat == "Film" && !isNorthAmerica)
+                if ((cat == "Film" || cat == "film") && !isNorthAmerica)
                 {
                     // Hack for tv_grab_uk_rt
-                    pginfo->catType = cat;
+                    pginfo->catType = "movie";
                 }
             }
             else if (info.tagName() == "date" && pginfo->airdate == "")
