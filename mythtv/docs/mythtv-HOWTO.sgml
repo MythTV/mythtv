@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-03-13, v1.105
+<date>2003-03-16, v2.00
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -47,7 +47,7 @@ It's recommended that you join the user list at <url
 url="http://www.snowman.net/mailman/listinfo/mythtv-users"
 name="http://www.snowman.net/mailman/listinfo/mythtv-users">.
 
-This HOWTO is for MythTV v0.7.
+This HOWTO is for MythTV v0.8.
 
 <sect>Introduction.
 <p>This HOWTO document will focus on MythTV in a North American environment.
@@ -130,20 +130,26 @@ use the graphical tools that come with your distribution, or you can use
 command-line utilities.  Either system will get the job done, and it all
 depends on your comfort level with Linux.
 
-<bf>NOTE</bf>: If you are using MythTV on multiple systems, at least one of
-them will maintain the master database and will need mysql installed.  
+<bf>NOTE</bf>: you must have the MySQL database software installed on a
+system to store the master database.  This does not necessarily mean that
+MySQL must run on one of the MythTV boxes.
 
 In order to compile MythTV, we need to make sure that the software it needs
-is installed.  As of 2003-02-15, this list includes <bf>perl</bf>,
-<bf>mysql</bf>, <bf>gcc</bf>, <bf>freetype2-devel</bf>,
+is installed.  As of 2003-03-15, this list includes <bf>perl</bf> (for
+XMLTV), <bf>mysql</bf>, <bf>gcc</bf>, <bf>freetype2-devel</bf>,
 <bf>XFree86-devel</bf>, <bf>qt-devel</bf> and <bf>lame</bf>.  If you're going to use a
 remote control with MythTV, you're going to need the <bf>cdialog</bf>
 package in order to compile <bf>lircd</bf>.
+
+<bf>NOTE</bf>:  QT v3.1 is recommended, but not required.
 
 <bf>NOTE</bf>:  If you are going to be using RPMs to install various
 components, you should be aware that not all packages include the necessary
 headers for compiling packages.  If you're having trouble compiling, ensure
 that you've installed the <tt>-devel</tt> version of a prerequisite.
+
+<bf>NOTE</bf>:  Other than where noted, Mandrake 9.1 users may follow the
+Mandrake 9.0 instructions.
 
 There appears to be issues with ALSA and simultaneously recording and
 playing sound, which is a core requirement for MythTV.  If you are not
@@ -188,7 +194,10 @@ installation.  Ensure that you install <tt>libqt3-mysql</tt>.
 Make sure that cdialog is installed if you want to use MythTV with a remote
 control.
 
-alsa-utils is needed for setting the volume.
+alsa-utils is needed for setting the volume.  MythTV now has native volume
+support, but you may have a special configuration that necessitates an
+external program to adjust your volume settings.  If this is the case, then
+you can disable native volume support.
 
 If you marked anything to install, click on Install Marked.  Click "Yes" or
 OK if you get a message about satisfying dependencies.
@@ -579,8 +588,8 @@ $ su
 <sect1>Manually building MythTV.
 <p>Unpack MythTV
 <tscreen><verb>
-$ tar -xjf mythtv-0.7.tar.bz2
-$ cd mythtv-0.7
+$ tar -xjf mythtv-0.8.tar.bz2
+$ cd mythtv-0.8
 $ ./configure
 $ make
 </verb></tscreen>
@@ -642,10 +651,10 @@ name="http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html">.
 
 <sect>MySQL.
 <sect1>Mandrake 9.0
-<p>If this is the master system, make sure that mysql is running and started
-at boot.  Click on Mandrake Control Center->System->Services, find mysql and
-click the "On Boot" button and the "Start" button if the mysql status shows
-that it isn't running yet.
+<p>If this is the system maintaining the database, make sure that mysql is
+running and started at boot.  Click on Mandrake Control
+Center->System->Services, find mysql and click the "On Boot" button and the
+"Start" button if the mysql status shows that it isn't running yet.
 
 <bf>NOTE</bf>:  There have been reports that mysql isn't starting at boot.
 
@@ -657,18 +666,23 @@ $ su
 </verb></tscreen>
 
 <sect1>Red Hat Linux 8.0
-<p>If this is the master system, make sure that mysql is running and started at boot. Click on
-Redhat menu>Server Settings>Services and enter the root password when asked.
-Check "mysqld" and then click Start. Click Save, then close the window.
+<p>If this is the system maintaining the database, make sure that mysql is
+running and started at boot. Click on Redhat menu>Server Settings>Services
+and enter the root password when asked. Check "mysqld" and then click Start.
+Click Save, then close the window.
+
+
+
 <sect1>Gentoo.
 <p>After installing mysql you need to initialise the database by running
 mysql_install_db as root. 
 
 <sect1>Setting up the initial database.
-<p>This step is only required for systems that will be maintaining a
-database of listings.  If you are running multiple MythTV systems you can
-either have one master database read by all the other systems, or you can
-have each system maintaining its own.  To setup the initial mysql databases:
+<p>This step is only required on the system maintaining the database, which
+may or may not be one of your MythTV boxes.  If the database is on a
+non-MythTV machine, then copy the <tt>database/mc.sql</tt> file to it.
+
+To setup the initial mysql databases:
 <tscreen><verb>
 $ cd database
 </verb></tscreen>
@@ -693,6 +707,42 @@ $ su
 <tscreen><verb>
 $ su
 # mysql < /usr/share/mythtv/database/mc.sql
+</verb></tscreen>
+
+<sect2>Modifying access to the MySQL database for multiple systems <label
+id="modify_perm_mysql">
+<p>If you're going to have multiple systems accessing a master database,
+you must grant access to the database from remote systems.  By default, the
+<tt>mc.sql</tt> script is only granting access to the localhost.
+
+To allow other hosts access to your master database, you can either set it
+up for no security at all, or with more granularity.  Note that the "%" is
+the wildcard character in MySQL.
+
+<bf>NOTE</bf>:  The "no security" option is <em>very</em> dangerous unless
+you're in a controlled environment.
+
+This example has no security at all, and allows access from any host.
+
+<tscreen><verb>
+$ mysql -u root mythconverg
+mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
+</verb></tscreen>
+
+For a more secure setup, you can restrict which machines or subnets have
+access. If you have a complete DNS system operational, you could do the
+following:
+
+<tscreen><verb>
+$ mysql -u root mythconverg
+mysql> grant all on mythconverg.* to mythtv@"%.mydomain.com" identified by "mythtv";
+</verb></tscreen>
+
+Finally, if you just want to restrict by IP subnet:
+
+<tscreen><verb>
+$ mysql -u root mythconverg
+mysql> grant all on mythconverg.* to mythtv@"192.168.1.%" identified by "mythtv";
 </verb></tscreen>
 
 <sect>Setting up ALSA and the mixer.
@@ -885,7 +935,8 @@ master volume to around 75%.  Next, use the left and right cursor keys to
 move around on the screen until you find the "Line" slider.  Press SPACE to
 set it as the capture source, set the level to around 50-75% and press "M"
 to mute it.  You can now press ESC to exit out of the <bf>alsamixer</bf>
-program.
+program.  You can also have MythTV manage all volume and mute settings.  See
+the mythfrontend setup page for options.
  
 <sect>Setting up a remote control.
 <p>MythTV does not have native remote control receiver and decoder software
@@ -893,6 +944,12 @@ built-in.  Instead, remote control functions are implemented by cooperating
 with <bf>lirc</bf>, the Linux Infra Red Control program.  <bf>lirc</bf>
 handles the IR hardware and passes keystrokes to MythTV, which then acts as
 if the user had pressed the keys on the keyboard.
+
+<p><bf>NOTE</bf>:If you are running Mandrake 9.1, you may install <bf>lirc</bf> by
+executing: <tt># urpmi lirc lirc-remotes</tt> and bypass the manual compilation
+steps described below by jumping to the <ref id="completing_lirc_install"
+name="Completing the lirc install"> section.  See the contrib/mandrake91.etc.sysconfig.lircd file
+for an example of how to configure lircd.  
 
 Some IR devices require a kernel recompile, and some don't. However, all at
 least require having the kernel source available as a resource for the lirc
@@ -904,14 +961,10 @@ build process.
 $ emerge lirc
 </verb></tscreen>
 
-<sect1>Mandrake
-<p><bf>NOTE</bf>:If you are running Mandrake 9.1, you may install <bf>lirc</bf> by
-executing: <tt># urpmi lirc</tt> and bypass the manual compilation step
-described below.
-
-lircd has two prerequisites:  <bf>dialog</bf>, available in Mandrake through the
+<sect1>Mandrake 9.0
+<p>lircd has two prerequisites:  <bf>dialog</bf>, available in Mandrake through the
 "cdialog" RPM, and the kernel source.  Mandrake 9.0 is using the 2.4.19
-kernel, so the easiest thing is to go to <url url="http://www.kernel.org"
+kernel, so either install the kernel sources from the installation CD or go to <url url="http://www.kernel.org"
 name="http://www.kernel.org"> and download
 the full 2.4.19 tar file from <url
 url="http://www.kernel.org/pub/linux/kernel/v2.4/"
@@ -1066,7 +1119,9 @@ s1-custom-kernel-bootloader.html" name="http://www.redhat.com/docs/manuals/linux
 s1-custom-kernel-bootloader.html"> Remember, if you have any custom  
 kernel modules (alsa, etc) you will have to recompile/reinstall those.
 
-<sect1>Completing the lirc install.
+<sect1>Completing the lirc install. <label id="completing_lirc_install">
+<p><bf>NOTE to Mandrake 9.1 users</bf>: skip to the manual start paragraph
+below.
 <p>If configure did not mention anything about a kernel module, then you  
 are finished. If it did mention a kernel module, you must edit  
 the <tt>/etc/modules.conf</tt> file. Add this line as the first thing in the file.  
@@ -1084,7 +1139,8 @@ $ su
 # /sbin/ldconfig
 </verb></tscreen>
 
-Next, we're going to manually start lircd the first time:
+Next, we're going to manually start lircd the first time.  Mandrake 9.1
+users, type: <tt># /etc/rc.d/init.d/lircd start</tt> instead of:
 <tscreen><verb>
 # /usr/local/sbin/lircd
 </verb></tscreen>
@@ -1092,7 +1148,8 @@ Next, we're going to manually start lircd the first time:
 If this fails, complaining of a missing <tt>lircd.conf</tt> file, then you
 must find or make one. First look for a premade configuration file at <url
 url="http://lirc.sourceforge.net/remotes/"
-name="http://lirc.sourceforge.net/remotes/">.  If you find one your remote
+name="http://lirc.sourceforge.net/remotes/">.  Mandrake 9.1 users, look in
+<tt>/usr/share/lirc-remotes</tt>. If you find one your remote
 there, download the file, name it <tt>lircd.conf</tt> and put it in your
 <tt>/etc</tt> directory. If you couldn't find your remote, you must make
 your own <tt>lircd.conf</tt> file.
@@ -1118,7 +1175,16 @@ now try to start lircd again:
 </verb></tscreen>
 
 Now, we're going to add the commands necessary for lircd to run each time
-we boot:
+we boot.
+Mandrake 9.1 users, you can execute:
+<tscreen><verb>
+$ su
+# chkconfig --level 35 lircd on
+# exit
+</verb></tscreen>
+
+All other distributions:
+
 <tscreen><verb>
 # cd /etc/rc.d
 # cat >> rc.local
@@ -1136,7 +1202,7 @@ receiver.
 The next step is to convert those signals into something that can be used
 to control MythTV.
 <tscreen><verb>
-$ cd ~/mythtv-0.7/configfiles
+$ cd ~/mythtv-0.8/configfiles
 $ cp lircrc.example ~/.lircrc
 </verb></tscreen> 
 or
@@ -1164,13 +1230,6 @@ $ irxevent &
 </verb></tscreen>
 If <bf>irxevent</bf> isn't running, then MythTV will not respond to your remote
 control.
-
-Currently, MythTV doesn't have native support for controlling the mixer
-volume and mute settings.  A workaround at this time is to invoke the
-<bf>amixer</bf> program.  If you wish to define keys to control the mixer,
-the <bf>irexec</bf> program can accomplish this fairly easily.  The
-configfiles/lircrc.example.pinnaclestudiopctv file has an example of calling
-an external program from a remote control button.
 
 <sect1>Additional information for lirc.
 
@@ -1252,7 +1311,6 @@ Please note: unlike the Pinnacle receiver above you will be compiling lircd
 in addition to a kernel module for the SIR transmitter. Depending on whether
 you have your serial port driver configured as a kernel module you might see
 the following message during make:
-
 <tscreen><verb>
 lirc_sir.c:56:2: warning: #warning
 "******************************************"
@@ -1316,13 +1374,9 @@ $ irw
 Once you've verified lirc is working you can press <bf>CTRL-C</bf> to exit
 <bf>irw</bf> and configure the channel changing script.
  
-Within <tt>/usr/local/share/mythtv/settings.txt</tt>  (or
-<tt>~/.mythtv/settings.txt</tt>) you
-need to add the following line:
-<tscreen><verb>
-str ExternalChannelCommand=/usr/local/bin/change_channel
-</verb></tscreen>
- 
+The path to the channel changing script will need to be entered on the
+mythbackend setup screen for Input Connections.
+
 This csh script will be called each time MythTV needs to change the channel.
 Below is a copy of the script followed by the corresponding perl script.
 Make sure both are in your path. Also make sure you leave the #!/bin/csh
@@ -1344,34 +1398,8 @@ echo "changing to $1"
 $ exit
 </verb></tscreen>
  
-The following file should be saved as /usr/local/bin/channel.pl
-<tscreen><verb>
-#!/usr/bin/perl
- 
-# make sure to set this string to
-# the corresponding remote in /etc/lircd.conf
-$remote_name = "gi-motorola-dct2000";   
- 
-sub change_channel {
-        my($channel_digit) = @_;
-        system ("rc SEND_ONCE $remote_name $channel_digit");
-        sleep 1;
-}
- 
-$channel=$ARGV[0];
-sleep 1;
-if (length($channel) > 2) {
-        change_channel(substr($channel,0,1));
-        change_channel(substr($channel,1,1));
-        change_channel(substr($channel,2,1));
-} elsif (length($channel) > 1) {
-        change_channel(substr($channel,0,1));
-        change_channel(substr($channel,1,1));
-} else {
-        change_channel(substr($channel,0,1));
-}
-system ("rc SEND_ONCE $remote_name ENTER");
-</verb></tscreen>
+See <tt>contrib/channel.pl</tt> for the actual file.  Copy it to
+<tt>/usr/local/bin/</tt>
  
 The last statement within the perl script is the lirc rc command. This is
 the command that transmits the code to your cable/dss box. Make sure to have
@@ -1382,14 +1410,12 @@ the IRDA device within a few feet of the box.
 <bf>mysql</bf> is running and has had its initial database setup.  It's now
 time to configure MythTV.
 
-<sect1>Editing the settings.txt file.
-<p>Open a shell and switch to the <tt>/usr/local/share/mythtv</tt> directory. 
-You <bf>MUST</bf> edit the <tt>settings.txt</tt> file so that it's
-appropriate for your system.  At a minimum, ensure that the BufferName, RecordFilePrefix
-and PIPBuffername variables are set to directories that exist on your system. 
-By default, these point to <tt>/mnt/store</tt>.  For example, you may wish to create
-a <tt>/var/video</tt> subdirectory, so you would change <tt>/mnt/store</tt>
-to <tt>/var/video</tt>
+<sect1>Configuring the master backend system.
+<p>Open a shell and decide where you will store your video files.  By
+default, MythTV will assume that you will be using <tt>/mnt/store</tt>. You
+may wish to create a <tt>/var/video</tt> subdirectory, so you would change
+<tt>/mnt/store</tt> to <tt>/var/video</tt> in the setup screens.
+
 <tscreen><verb>
 $ su
 # mkdir /var/video
@@ -1397,66 +1423,185 @@ $ su
 # exit
 </verb></tscreen>
 
-The <tt>settings.txt</tt> file is fairly self-explanatory. 
-Currently, MythTV supports two different video encoders, MPEG4 and RTJPEG. 
-Take note that RTJPEG has lower CPU demands, but makes large files, and MPEG4
-has high CPU demands, but makes smaller files.
-
-<bf>NOTE</bf>: although the width and height can be changed to almost
-anything, if you start MythTV and don't see video or you get "segmentation
-fault" errors, it is likely that the video4linux (v4l) subsystem did not
-like the height and width parameters specified.  It's best to leave the
-default as-is until you're sure that MythTV is operational.
-
-<label id="deinterlace_"><bf>NOTE</bf>: the <tt>int Deinterlace=1</tt>
-variable controls the deinterlacer.  Support for deinterlacing requires that
-your processor has SSE (Streaming SIMD Extensions, aka "MMX2").  Early Intel
-Celeron (those that don't use the Coppermine 0.18um core and are usually
-<600Mhz), Pentium Pro and Pentium II CPUs do not have SSE, so make sure that
-you've got this set to "0" if you have one of these.  If you don't, you will
-get "Illegal Instruction" errors.
-
-To determine if you've got SSE, you can:
-<tscreen><verb>
-$ cat /proc/cpuinfo
-[snip]
-flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca
-cmov pat pse36 mmx fxsr sse
-</verb></tscreen>
-
-Notice the <bf>sse</bf> at the end of the line.
-
-Users in North America can now exit and save the file.  Users in other parts
-of the world need to modify the first line and modify the XMLTVGrabber
-variable to the correct grabber for their region.  <bf>tv_grab_uk</bf> for the
-UK, etc.  Use the name from the xmltv directory.
-
-<sect1>Running setup.
-<p>Now that you've edited your <tt>settings.txt</tt> file, it's time to run the
-setup program and perform the initial configuration.
+The first thing to configure is the master backend system.  If you are
+running multiple backend systems, the master backend will maintain make all
+decisions about which programs will be recorded on which tuners.  If you
+have only one backend, then it will be its own master.
 
 <bf>NOTE</bf>: Red Hat 8.0 users, if you haven't followed <ref id="RH80-LANG" name="these">
 steps, you <em>must</em> do so before continuing.
 
-Open a shell, and switch to the setup directory:
+Because MythTV now uses a database to store most configuration variables,
+part of the bootstrap of MythTV is to indicate the location of the MySQL
+database server. If the frontend, backend and MySQL database server are all
+going to be running on the same box, you can continue to the next step.  If
+not, you'll need to edit the <tt>/usr/local/share/mythtv/mysql.txt</tt> file
+and change the first line to the IP address of the database server. 
+All other configuration is within the MythTV GUI screens.
 
+<bf>NOTE</bf>:  Users that have been running the frontend and the backend on
+different machines using Red Hat Linux 8.0 have stated that they have been
+having issues with remote access to the MySQL database.  The following
+instructions may or may not work.  Add the following to <tt>/etc/my.cnf</tt>
+on the backend machine and restart MySQL.
+<tscreen><verb>
+skip-innodb
+set-variable=thread_stack=256k
+</verb></tscreen>
+
+Switch to the setup directory and run the setup program:
 <tscreen><verb>
 $ cd setup
 $ ./setup
 </verb></tscreen>
 
-The setup program will ask you a few questions and then proceed to run the
-XMLTV grabber program.
+The backend setup program will start and offer you a number of choices.  It
+is <em>strongly</em> recommended that you go through them in order.
 
-<sect1>Running mythfilldatabase.
-<p>Now that the setup program has completed, run <bf>mythfilldatabase</bf> to
-get one week of data inserted into the database.
+The first question will ask if you wish to clear out your existing
+configurations for your capture cards.  Initially, you should say "YES" so
+that there are no surprises later.
+
+The next question will ask you if you wish to clear out your video source
+information.  You should answer "YES" to this as well.
+
+Once the graphical setup starts, you'll see that there are four choices.
+<enum>
+<item>General
+<item>Capture Cards
+<item>Video Sources
+<item>Input Connections
+</enum>
+
+Use the arrow keys to move around, and press the space bar to select which
+option you wish to configure.
+
+<sect2>General
+<p>The first screen of the General configuration deals with IP addresses of the
+system that you're running setup on and any master backend you may have.  If
+you've only got one machine, then the default values are fine and you can
+move to the next page by pressing the space bar.  If you need to move around
+the screen, use the arrow keys to move focus between settings and not the mouse.
+
+If you will have multiple backends, then <em>do not</em> use the "127.0.0.1"
+IP address.
+
+It is very strongly discouraged that you make any changes to the port
+settings from the defaults.
+
+Once you're satisfied with the values, move the focus down to Next and hit
+the space bar.
+
+The next screen details the Host-specific Backend setup.  This is where you
+will set the specific directory paths for this particular backend.  Make
+sure that you've followed the steps at the beginning of this section and
+created a directory that exists and that MythTV will have write privileges
+to.  When you're done, press Next to continue, taking you to the Global
+Backend Setup.
+
+On the Global Backend Setup configure your backend with the appropriate
+settings.  Use the left and right arrow keys to iterate through the choices
+available on each setting, and the up and down keys to move between
+settings.  Move to Finish when you're done and press the space bar, taking
+you back to the main configuration screen.
+
+<sect2>Capture Cards
+<p>You should have no capture cards defined, so the highlight will be on
+(New Capture Card).  Press space to begin.
+
+Choose the appropriate settings for your particular tuner.  Use the arrow
+keys to move around and to make your choices, and press RETURN when
+complete.  Pressing RETURN will take you back to the Capture Cards screen;
+if you have additional capture cards in this machine, press the space bar
+when the highlight is on the (New Capture Card) row to define another card. 
+Once you have no additional cards to setup, press ESC.
+
+<sect2>Video Sources
+<p>When you start, the highlight should be on (New Video Source).  Press the
+space bar to begin.  The first field asks for the name of the video source.
+You may choose something easy to remember, like "Antenna" or "Cable".  Once
+you've chosen a name, press the down arrow to move to the next field.  If
+you're in North America, move to the Zip/postal code field and put in the
+appropriate value.  If not, then some manual interaction will be required
+with XMLTV.
+
+<bf>NOTE</bf>:  If you are in North America, and you enter your Zip/postal
+code and nothing seems to happen for a very very long time, it is possible
+that XMLTV is waiting for you to provide some input.  Use ALT-TAB or
+whatever key combination your window manager uses to switch programs and
+look for a terminal window running XMLTV that may be waiting for input.
+
+Once you have chosen your provider, press RETURN to continue.  XMLTV will
+now begin collecting the initial data for your location.  The screen may
+blank for a few seconds to several minutes, depending on the load of the
+listings provider and the speed of your connection to the internet.  Be
+patient!
+
+You will then be returned to the Video Sources screen.  If you have multiple
+video sources available, such as Antenna, Cable, etc, go ahead and define
+them all, even if they're not all going to be physically connected to the
+master backend server.  Once you're done, press ESC to return to the main
+screen.
+
+<sect2>Input Connections
+<p>The final configuration item is Input Connections.  On this screen, you will
+associate the various video sources you defined earlier with a physical
+input to a encoder card.  It's entirely possible that you have multiple
+tuners, and each tuner has a different input, so on this screen you let
+MythTV know which device will connect to which input source.
+
+When you start this screen, you should see a listing of the various input
+connections available on each of the Capture cards you defined earlier.  For
+example, you may have a capture card with a tuner, a SVideo and a Composite
+connection.  If you wanted to associate the tuner (aka, "Television") with
+an "Antenna" source you defined in Video Sources, you would move to the
+/dev/videodevice (Television) -> line and press the spacebar.  Using the
+left and right arrow keys will show you the various choices you have already
+created for video source.  In our case, you would use the left/right cursor
+keys until "Antenna" was shown in the Video Source field.  Press down to
+move to the next setting, all of which should be self-explanatory.
+
+Once you're done, press RETURN to go back to the Input Connections screen. 
+You would then finish associating the video sources to any other hardware
+devices you have available.
+
+Press ESC to return to the main menu, and press ESC again if you have no
+further items to configure, thereby returning you to the command line.
+
+Run the <tt>mythfilldatabase</tt> as directed.  The master backend will
+obtain guide data for all the video sources you defined during setup.
+
+Once <tt>mythfilldatabase</tt> has finished, start the master server before
+continuing.
 
 <tscreen><verb>
-$ mythfilldatabase
+$ mythbackend
 </verb></tscreen>
 
-<bf>NOTE</bf>:  <bf>mythfilldatabase</bf> might take a while to complete,
+mythbackend will print information about connections and what it's doing to
+the console.
+
+<sect1>Configuring a non-master backend.
+<p>Configuration of a non-master backend follows the same general procedure
+as that of the master backend, with the exception that you skip over the
+"Video Sources" step.  All possible video sources need to be defined on the
+master backend system; only the master backend will query a listings
+provider to obtain guide data for all the slave backends.
+
+Make sure that the IP addresses on the General setup screen are accurate. 
+If the slave backend can't communicate with the master backend due to IP
+address misconfiguration then MythTV will not function properly.
+
+Ensure that you've granted access to the master MySQL database for remote
+backends as discussed in the section titled <ref id="modify_perm_mysql"
+name="Modifying access to the MySQL database for multiple systems"> and that
+you've edited the <tt>/usr/local/share/mythtv/mysql.txt</tt> file and put
+the correct IP address for the database server.
+
+<bf>NOTE</bf>: Do not run <tt>mythfilldatabase</tt> on a non-master backend.
+
+<sect1>Configuring and running mythfilldatabase
+<p><bf>NOTE</bf>:  <bf>mythfilldatabase</bf> might take a while to complete,
 depending on any number of factors, most of which you can't control.  It's
 best to just let the program run to completion.
 
@@ -1532,7 +1677,7 @@ $ crontab -l  NOTE: this is a lowercase L.
 # Need to use a shell script because the QTDIR environment variable isn't
 # being honored by crontab?
 # The next text should be all on the same line.
-30 04 * * * /bin/bash $HOME/mythtv-0.7/MC/configfiles/mythfilldatabasecron
+30 04 * * * /bin/bash $HOME/mythtv-0.8/MC/configfiles/mythfilldatabasecron
 $ 
 </verb></tscreen>
 
@@ -1563,10 +1708,78 @@ other editor that you're comfortable with.  You may also add the
 <tt>EXPORT</tt> command to your <tt>.bashrc</tt> or to the
 <tt>/etc/profile.d/mythtv.sh</tt> file.
 
-Once you've completed this step, run the <bf>mythepg</bf> program to check
-that the database has been filled.  The cursor keys will move you around the
-grid, the "I" key will give you more information on a program and ESC will
-exit out back to the shell.
+<sect>Configuring mythfrontend
+<p>Once you have completed configuration of your backend systems, the next
+step is to configure the frontend client.  You should run the MythTV setup
+program before using any other modules such as MythMusic, etc. to correctly
+initialize the database.
+
+When you start mythfrontend, you should have a number of choices.  Before
+doing anything, go to TV, then to Setup and configure the frontend client.
+
+<sect1>General
+<p>The General screen has configuration items that don't really fit anywhere
+else.  The first configuration item asks you to indicate the number of
+seconds to record past the end of a program, which is useful if the
+broadcast network or your system clock are out of sync and will help prevent
+you missing the end of a program.  Note that MythTV currently does not
+have the ability to start early.
+
+To change the value, use the left and right arrow keys to increment and
+decrement the number of seconds.  When you're satisfied with the result, use
+the down arrow to put the input focus on the Next button or press RETURN to
+continue to the next page.
+
+The next page has a number of options to do with how channels are displayed
+on your system.  The help text will give you more information.  Move the
+focus to Next and press the space bar to continue.
+
+The final General page sets up some final configuration items.  See the help
+text for more information.
+
+<sect1>Appearance
+<p>This set of screens is mostly concerned with how MythTV will look on your
+system.  From here, you can choose different themes and set the resolution
+of your system.
+
+<sect1>Program Guide
+<p>Fairly self explanatory.  Note that the alternate program guide does not
+use the same font settings as defined in Appearance, so if the EPG is
+unreadable this is where you make the adjustments to fonts, number of
+elements displayed, etc.
+
+<sect1>Playback <label id="deinterlace_"> 
+<p>The one configuration item which may cause problems on your system is the
+"Deinterlace playback" setting.  MythTV uses a linear blend algorithm for
+deinterlacing, which will improve how the image looks on your screen. 
+Deinterlacing requires that your processor support SSE. (Streaming SIMD
+Extensions, aka "MMX2").  Early Intel Celeron (those that don't use the
+Coppermine 0.18um core and are usually <600Mhz), Pentium Pro and Pentium II
+CPUs do not have SSE, so make sure that you haven't enabled deinterlacing if
+your processor doesn't support it. If you enable it, and your processor
+doesn't support SSE, you will get "Illegal Instruction" errors.
+
+To determine if you've got SSE, you can:
+<tscreen><verb>
+$ cat /proc/cpuinfo
+[snip]
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca
+cmov pat pse36 mmx fxsr sse
+</verb></tscreen>
+
+Notice the <bf>sse</bf> at the end of the line - this tells you that this
+processor will be able to deinterlace correctly.
+
+<sect1>Recording
+<p>Currently, MythTV supports two different video encoders, MPEG4 and RTJPEG. 
+Take note that RTJPEG has lower CPU demands, but makes large files, and MPEG4
+has high CPU demands, but makes smaller files.
+
+<bf>NOTE</bf>: although the width and height can be changed to almost
+anything, if you start MythTV and don't see video or you get "segmentation
+fault" errors, it is likely that the video4linux (v4l) subsystem did not
+like the height and width parameters specified.  It's best to leave the
+default as-is until you're sure that MythTV is operational.
 
 <sect>Using MythTV.
 <p><bf>NOTE to Red Hat 8.0 users</bf>:Red Hat Linux 8.0 ships with Gnome as
@@ -1575,11 +1788,6 @@ window focus and window switching which sometimes cause mythfrontend to
 obscure the video. KDE does not seem to have any such issues. Therefore you
 will need to switch to KDE by selecting RedHatMenu>Extras>System
 Settings>Desktop Switching Tool and choose "KDE".
-
-<bf>mythfrontend</bf> is the main interface to the MythTV program.  This
-program allows you to choose which of the other modules you'd like to run
-and ensures that programs that you've scheduled for recording actually get
-recorded, so it's important that this program is always running.
 
 <!-- insert stuff on getting around, key sequences, etc -->
 
@@ -1590,12 +1798,7 @@ functionality.
 <tt>/usr/local/share/mythtv/theme.txt</tt> allows you to alter the theme
 for MythTV.  The default theme is called "blue".  Other themes that ship
 with MythTV can be found in the <tt>/usr/local/share/mythtv/themes</tt>
-directory.  Change the first variable in the <tt>theme.txt</tt> file and
-exit and restart <bf>mythfrontend</bf> for it to take effect.
-
-<bf>NOTE</bf>: Exiting <bf>mythfrontend</bf> will stop any recordings you
-have in progress, so make sure that the system isn't busy if you modify the
-theme while <bf>mythfrontend</bf> is still running.
+directory.  
 
 <sect1>Adding DirecTV information to the database.
 <p>A script for adding DirecTV information into the database has been
@@ -1606,7 +1809,6 @@ user-supplied program, so if you have issues with the script, please contact
 the author.
 
 <sect1>Adding support for an external tuner.
-<!-- Make this better -->
 <p>MythTV supports changing the channel on an external tuner.  If you have
 an external tuner, such as a DirecTV or digital cable set top box, the
 following command should be added to your settings.txt file:
@@ -1652,8 +1854,8 @@ Mandrake Control Center.
 <sect1>Completing the installation.
 <p>
 <tscreen><verb>
-$ tar -xjf mythweb-0.7.tar.bz2
-$ cd mythweb-0.7
+$ tar -xjf mythweb-0.8.tar.bz2
+$ cd mythweb-0.8
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -1675,8 +1877,8 @@ operational.
 name="http://www.mythtv.org/"> and save it to a location where you can find
 it.
 <tscreen><verb>
-$ tar -xjf mythgallery-0.7.tar.bz2
-$ cd mythgallery-0.7
+$ tar -xjf mythgallery-0.8.tar.bz2
+$ cd mythgallery-0.8
 $ make
 # su
 # make install
@@ -1741,8 +1943,8 @@ Download FLAC from <url url="http://flac.sourceforge.net"
 name="http://flac.sourceforge.net"> and install:
 
 <tscreen><verb>
-$ tar -xzf flac-1.0.4.tar.gz
-$ cd flac-1.0.4
+$ tar -xzf flac-1.1.0.tar.gz
+$ cd flac-1.1.0
 $ ./configure
 $ make
 $ su
@@ -1755,8 +1957,8 @@ Download libcdaudio from <url name="libcdaudio.sourceforge.net"
 url="http://sourceforge.net/project/showfiles.php?group_id=27134"> and
 install:
 <tscreen><verb>
-$ tar -xzf libcdaudio-0.99-6.tar.gz
-$ cd libcdaudio-0.99.6
+$ tar -xzf libcdaudio-0.99.9.tar.gz
+$ cd libcdaudio-0.99.9
 $ ./configure
 $ make
 $ su
@@ -1822,13 +2024,12 @@ install <tt># urpmi libMesaGLU1-devel</tt>.
 url="http://www.libsdl.org" name="http://www.libsdl.org">.  On Mandrake 9.1,
 you may install it by executing: <tt># urpmi libsdl1.2 libsdl1.2-devel</tt>
 
-<sect1>Compiling MythMusic.
-<p>Once all the pre-requisites have been installed, you can proceed with
-getting MythMusic going.
-<bf>NOTE</bf>:  If you are running the CVS version of MythMusic, make sure
-that you run <tt>./configure</tt> first.  If you wish to use the new
-visualizations, make sure you install the prerequisites.  Run
-<tt>./configure --help</tt> for help.
+<sect1>Compiling MythMusic. 
+<p>Once all the pre-requisites have been
+installed, you can proceed with getting MythMusic going. Make sure that you
+run <tt>./configure</tt> first.  If you wish to use the new visualizations,
+make sure you install the prerequisites.  Run <tt>./configure --help</tt>
+for help.
 
 <tscreen><verb>
 $ make
@@ -1868,10 +2069,9 @@ The Ignore_ID3 option does not disable the code that determines the track
 length, just the portion that tries to read ID3 info.
 
 <sect1>Using MythMusic.  
-<p>MythMusic is fairly simple to use.  It is
-recommended that you insert the CD before selecting "Import CD".  You should
-also ensure that your system doesn't try to automount the CD and begin
-playing it automatically.
+<p>MythMusic is fairly simple to use.  It is recommended that you insert the
+CD before selecting "Import CD".  You should also ensure that your system
+doesn't try to automount the CD and begin playing it automatically.
 
 Another item to consider:  there are some CD's that contain computer data
 that runs as a "CD Extra".  After the CD information lookup, ensure that the
@@ -1996,7 +2196,7 @@ reboot your setting will be preserved.
 <sect1>I keep losing all of my settings every time I compile!
 <p>MythTV will overwrite any settings in <tt>/usr/local/share/mythtv</tt>.
 If you want to make sure that you don't lose your modifications, make a
-directory <tt>~/.mythtv</tt> and copy your settings.txt file to this
+directory <tt>~/.mythtv</tt> and copy your mysql.txt file to this
 location.
 <sect1>Compile errors.
 <p>Some compile errors are worse than others.  If you get an error that
@@ -2017,10 +2217,11 @@ name="correctly">.  This needs to be fixed before MythTV will compile.
 <sect1>My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.
 <p>This is due to DPMS, the Display Power Management System, which is used
 to save power by turning off your monitor when the system decides that it's
-not being used.  Since it's likely that watching TV will not generate
-keyboard or mouse events for a time, you need to turn off DPMS.  There are a
-few ways to do this.  You may also need to check your BIOS for power saving
-modes and disable screen blanking there as well.
+not being used or to a screensaver that has defaulted to a blank screen. 
+Since it's likely that watching TV will not generate keyboard or mouse
+events for a time, you need to turn off DPMS and the screensaver.  There are a few ways to do
+this.  You may also need to check your BIOS for power saving modes and
+disable screen blanking there as well.
 
 Edit your <tt>/etc/X11/XF86Config-4</tt> file, and look for:
 <tscreen><verb>
@@ -2080,6 +2281,11 @@ $ xset -dpms
 </verb></tscreen>
 
 Using <tt>xset +dpms</tt> will turn it back on.
+
+Another technique to try, which will turn off the screensaver:
+<tscreen><verb>
+$ xset s off
+</verb></tscreen>
 
 Finally, depending on your distribution, you may be able to turn it off from
 within the control panel.
@@ -2206,7 +2412,8 @@ If you wish to see what application is grabbing a resource, you can use the
 </verb></tscreen>
 
 To disable aRts in KDE, go to KDE->Control Center->Sound->Sound System and
-uncheck the "Start aRts soundserver on KDE startup" box.
+uncheck the "Start aRts soundserver on KDE startup" box.  Run <tt># killall
+artsd</tt> from the command line to stop the artsd program.
 
 If you're using multiple sound cards and multiple tuners, use <tt>alsamixer
 -c 1</tt> to work with the second sound card.  The first card is #0, the
@@ -2354,12 +2561,10 @@ this happens, edit your X configuration file to match the display size then
 restart X.
 
 <sect2>MythTV Dimensions
-<p>Set the MythTV GUI size to these same dimensions as the X display. In
-0.7, edit the file <tt>theme.txt</tt>. In 0.8, from "mythfrontend" go to
-Setup->Appearance.  The default for the height and width on 0.8 is "0" -
-this will cause MythTV to automatically size itself to full screen. To
-ensure that your new dimension settings take effect, exit and restart
-MythTV.
+<p>In 0.8, from "mythfrontend" go to Setup->Appearance.  The default for the
+height and width on 0.8 is "0" - this will cause MythTV to automatically
+size itself to full screen. To ensure that your new dimension settings take
+effect, exit and restart MythTV.
 
 <bf>NOTE</bf>: When the GUI is full screen, you may need to set your window
 manager to 'Click to Focus' for windows to stack properly.
@@ -2427,312 +2632,10 @@ mysql> drop database mythconverg;
 mysql> quit
 </verb></tscreen>
 
-<sect1>I'd like to start using the development version of MythTV.
-<p>[Content under development]
-<p><bf>NOTE</bf>:It should be clear that using the development version of
-MythTV may cause loss of data on your system.  There is no guarantee that the development
-version of MythTV will work for you.
-
-<bf>THERE IS NO GUARANTEE THAT THESE INSTRUCTIONS WILL WORK.  USE AT YOUR
-OWN RISK.</bf>
-
-Here are some of the features in version 0.8:
-<itemize>
-
-<item>A frontend and backend system.  MythTV supports multiple frontend
-and backend systems.  The master backend is responsible for maintaining
-the central database and determining which system will capture and encode
-the video.  The non-master (or slave) backends register themselves with the
-master when they startup.  The frontend is responsible for displaying the video.  This
-allows you to put a lightweight, quiet, diskless and fanless machine in "the
-living room", with a large server-type machine in "the basement".  The
-frontend and backend communicate over TCP on a specified port.  MythTV
-still supports running the frontend and the backend on the same machine if
-you don't have multiple systems available.
-<item>GUI-based configuration.  Almost all of the configuration of MythTV can now
-be done using a GUI-based setup, avoiding the necessity to edit the
-<tt>settings.txt</tt> file.  You must still edit the <tt>mysql.txt</tt> file
-to indicate the IP address of the master database server.
-<item>Themes.  MythTV now has more themes for the user to choose from.  See
-the website for examples.
-<item>Recording profiles.  You may now setup various encoder profiles from
-the GUI, giving you the flexibility to record programs using various quality
-levels.
-<item>Increased hardware encoder support.  MythTV can now use the MJPEG
-encoder/decoder found on Matrox G200 series cards.  This greatly reduces the
-CPU utilization.
-<item>Commercial Skipping
-<item>Mixer control for volume and muting functionality
-</itemize>
-
-<bf>NOTE</bf>:  Problem reports for version 0.8 posted to the mailing list
-should have accompanying solutions.
-
-<sect2>Prepping for 0.8
-<p>Before you begin, shutdown all running instances of 0.7.  You should perform
-a <tt>make clean distclean</tt> before starting the compile process.
-
-Compile and install the system as you would MythTV 0.7 by following the
-instructions found in this HOWTO.  If you are installing MythTV on a new
-machine, install the database by running the <tt>database/mc.sql</tt>
-script as detailed in earlier sections of this document.
-
-However, if you are upgrading an existing 0.7 system, you <em>must</em> run the
-<tt>database/0-7-to-0-8.sql</tt> script before running the setup program to
-ensure that the database structure is up to date.
-
-Once you're done editing the file, start the setup program:
-<tscreen><verb>
-$ cd setup
-$ ./setup
-</verb></tscreen>
-
-This will open the setup wizard which will allow you to graphically
-configure your system.  
-
-<bf>NOTE</bf>: If you're going to have multiple backend systems,
-one of them must be the master.  Do not use "127.0.0.1" as the IP addresses
-in the IP configuration screen unless you will be running a single system
-running the frontend and backend on the same box.
-
-<sect2>Modifying access to the MySQL database for multiple systems
-<p>If you're going to have multiple systems accessing a master backend server,
-you must grant access to the database from remote systems.  By default, the
-<tt>mc.sql</tt> script is only granting access to the localhost.
-
-To allow other hosts access to your master backend database, you can either
-set it up for no security at all, or more granularly.  The "%" is the
-wildcard character in MySQL.
-
-<bf>NOTE</bf>:  The "no security" option is <em>very</em>
-dangerous unless you're in a controlled environment.
-
-This example has no security at all, and allows access from any host.
-
-<tscreen><verb>
-$ mysql -u root mythconverg
-mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
-</verb></tscreen>
-
-For a more secure setup, you can restrict which machines or subnets have
-access. If you have a complete DNS system operational, you could do the
-following:
-
-<tscreen><verb>
-$ mysql -u root mythconverg
-mysql> grant all on mythconverg.* to mythtv@"%.mydomain.com" identified by "mythtv";
-</verb></tscreen>
-
-Finally, if you just want to restrict by IP subnet:
-
-<tscreen><verb>
-$ mysql -u root mythconverg
-mysql> grant all on mythconverg.* to mythtv@"192.168.1.%" identified by "mythtv";
-</verb></tscreen>
-
-<sect1>Running MythTV
-<p>Once the setup wizard is done, to run the new version of MythTV, you must
-first start the backend server:
-
-<tscreen><verb>
-$ mythbackend &
-</verb></tscreen>
-
-If you're running a remote frontend client, edit the
-<tt>/usr/local/share/mythtv/mysql.txt</tt> file and change the
-<bf>DBHostname</bf> to the IP address of the master backend server.
-
-Start the frontend client:
-<tscreen><verb>
-$ mythfrontend
-</verb></tscreen>
-
-You should see the connection established between the frontend and backend
-systems by examining the mythbackend window; it will display the client
-connection attempts.
-
-The cvs version of MythTV now supports pressing the ESC key to exit the
-application.  If you wish to configure MythTV to exit on ESC, go to the
-mythfrontend setup screen (not the setup program used to initially configure
-MythTV) and enter the General configuration screen.  Move through the setup
-until you get to the System Shutdown parameter.  By default, this is set to
-"No exit key", which means there is no defined exit key for MythTV.  If you
-set it to "ESC", this will mean that the ESC key is used to exit
-MythTV.  Control, Meta and ALT modifiers mean that the Modifier + ESC key
-must be pressed to activate the exit from MythTV function.
-
-<bf>NOTE</bf>:  Users that have been running the frontend and the backend on
-different machines using Red Hat Linux 8.0 have stated that they have been
-having issues with remote access to the MySQL database.  The following
-instructions may or may not work.  Add the following to <tt>/etc/my.cnf</tt>
-on the backend machine and restart MySQL.
-<tscreen><verb>
-skip-innodb
-set-variable=thread_stack=256k
-</verb></tscreen>
-
 </article>
 <!-- Revision History
-v1.00, 2002-11-05.  Initial.
-v1.01, 2002-11-06.  Added section on lirc, spelling errors.
-v1.02, 2002-11-11.  Converted to docbook, added more to the remote control
-section, compiling on AMD and Via C3 processors, Debian packaging, ispell.
-v1.03, 2002-11-12.  Added text from Cedar McKay on Red Hat Linux 8.0
-v1.031, 2002-11-19.  Added text on the ALSA 0.9.0rc5/rc6 hanging bug, started
-development on MythMusic instructions, added text on obtaining document and
-using CVS.  Merged some more RH 8.0 documentation from Cedar McKay.  Applied
-Debian information patch from Matt Zimmerman.
-v1.032, 2002-11-22.  Added stuff on modifying xmltv, changed CVS
-documentation so that it's not dependent on CVSROOT being set, pointer to
-Tarek's DirecTV and external channel changing script, moved text around so
-that external tuner / DirecTV are located under "using MythTV".  Added
-troubleshooting information about KDE vs. Gnome on RH 8.0
-v1.033, 2002-11-23.  Fixed the XMLTV/mythfilldatabase instruction to point
-to the correct file.  Slight wording changes to the DirecTV stuff.  Moved
-some CVS parameters around.  Added "DMA" to troubleshooting section.
-v1.034, 2002-11-24.  Added information on setting up MythMusic database.
-v1.035, 2002-11-25.  Added information on Gentoo.
-v1.036, 2002-11-27.  Added information on using an IR Blaster.
-v1.037, 2002-11-28.  Added information on RH 8.0 environment setting by Mike
-Cencula, additional modifications on Genoo by Tony Clark.
-v1.038, 2002-11-28.  Modified the XMLTV version to get, still working on the
-Gentoo instructions.
-v1.039, 2002-11-29.  More work on the Gentoo instructions.
-v1.040, 2002-11-29.  Slight change to the RH 8.0 LANG instructions; put a
-reference to the "special" instructions for RH 8.0 users.
-v1.041, 2002-11-29.  Added some explanatory text about hdparm.
-v1.042, 2002-11-29.  Cleaned up the text that talks about Tivo and hardware
-based encoders.
-v1.043, 2002-11-29.  More RH 8.0 LANG stuff.
-v1.044, 2002-11-29.  Working on the MythMusic install instructions.  Added
-information about creating your own ~/.mythtv to maintain settings.
-v1.045, 2002-12-02.  Started working on the urpmi instructions for
-MythMusic.  Made changes to Mandrake docs to accomodate MDK 8.2.
-v1.046, 2002-12-02.  Added information on mythfilldatabase and xawtv
-channels.  Added attribution information for Harondel J. Sibble for Mandrake
-8.2.  Modified Gentoo again.  Added text on one system running the master database.  Added
-"Advanced Functionality" section.  Altered text throughout, referencing
-master system needing mysql, remote systems not needing it.
-v1.047, 2002-12-02.  Removed reference to advanced functions; IJR says that
-it's going to be changing soon.
-v1.048, 2002-12-04.  Modified the RH instructions, normalized the user shell
-prompt.
-v1.049, 2002-12-16.  Added Pentium 2 to list of boxes that don't support
-MMX2 (but really known as SSE).  (Needed for deinterlacer.)  Changed RH8.2 instructions per Harondel
-Sipple.
-v1.050, 2002-12-17.  Moved revision history to end of document.  Added
-version information that the HOWTO was created for.  Currently, MythTV v0.7.
-Added text mode instructions for setting alsamixer.
-v1.051, 2002-12-17.  Added instruction to run ldconfig twice for RH8.0.  Why
-does it have to be done?  No idea...  Modified section on changechannel
-script to make it generic for Tarek's website since he now has Sony and RCA
-scripts.  Added XFree86-devel requirement.  Added compile warning text in
-Troubleshooting section.  Added screen blanking (DPMS) stuff.
-v1.052, 2002-12-18.  Modified section dealing with deinterlace and
-Celeron's.  (Newer Celeron's support SSE)
-v1.053, 2002-12-20.  Added a Miscellaneous section so that I could add text about MDZ's mplayer patch.
-v1.054, 2002-12-20.  Changed name of CVS box; added troubleshooting hint on
-CVS checkouts.
-v1.055, 2002-12-23.  James Wiggins (wigginjs@mailbox.sc.edu) Remove the
-"./configure" step from MythMusic - doesn't belong there.  Add
-libcdda0-devel.
-v1.056, 2002-12-24.  Updated Gentoo mysql instruction.
-v1.057, 2002-12-25.  Added pointer to other window managers.  Added section
-on mythtv-0.8.
-v1.058, 2002-12-27.  Added text on configuring urpmi for Mandrake.
-v1.059, 2002-12-28.  Updated myth-0.8 install docs.  Added big fat warning
-for people that think that development code is supposed to work correctly
-out of the box, or that the initial instructions for using the development
-code have any basis in reality. Not that they'll read it.
-v1.060, 2003-01-01.  Added debugging instructions.
-v1.061, 2003-01-01.  Added Bruce Markey's troubleshooting audio stuff. 
-Added instruction for deleting the database.
-v1.062, 2003-01-05.  A little more on sound troubleshooting.  Added "handle"
-instructions for GDB.  Modified RH8 docs per Cedar.  Added more lircd
-information from Cedar.
-v1.063, 2003-01-06.  More modifications from Cedar on RH8.0.  Slight tweak on
-debugging instructions.  Slight change to CPU requirements.  Added Suse 8.1
-to distros with buggy libexpat.  Added DMA requirement in Hardware
-Prerequisites.  Changed to single HTML file vs 17 seperate HTML subfiles.
-v1.064, 2003-01-06.  Modified the gdb "handle" instructions a little.  Added
-instructions for .gdbinit
-v1.065, 2003-01-06.  Break up the html file back into seperate sections, per
-Isaac.  Comment out the gdb handle instructions until I figure out what's
-going on.
-v1.066, 2003-01-09.  Modified gentoo instructions, now that there's a
-download site for the portage file.  Added section identifiers for
-mythweather and mythvideo.  Added content for mythweather.
-v1.067, 2003-01-09.  Updated mythweather keys.  Fix mythweather example.
-v1.068, 2003-01-10.  Added link to Mark Cooper's hardware database website. 
-Added info to audio troubleshooting on disabling sound managers, like esd
-and artsd.  Added mythweather international example.
-v1.069, 2003-01-11.  Fixed keyboard commands for mythweather.
-v1.070, 2003-01-11.  Remove Mark Cooper's email address, per request.
-v1.071, 2003-01-11.  Added Gentoo lirc instructions.  Fixed xset command.
-v1.072, 2003-01-12.  Added alsamixer commands for multiple sound cards.
-v1.073, 2003-01-13.  Added text on configuring ESC to exit in CVS version of
-myth.
-v1.074, 2003-01-13.  Set standard names for "Myth".  "MythTV", "MythMusic",
-etc.  Adjusted exit instructions.
-v1.075, 2003-01-14.  Make it clear the Kulagowski is document author, _not_
-developer of MythTV.  Modified version of XMLTV to get; added instruction
-that latest version of XMLTV is usually best because of back-end changes at
-zap2it.
-v1.076, 2003-01-16.  Slight adjustment to Gentoo docs.  Typo in path.
-v1.077, 2003-01-16.  Added "Can't see OSD" to troubleshooting with pointer
-back to RH80 strip instructions.
-v1.078, 2003-01-16.  Added initial mythvideo instructions.  Added
-instruction not to mess with port setting in backend for mythtv-0.8.
-v1.079, 2003-01-17.  More stuff on disabling DPMS in the XF86Config file. (Who
-knew it was so difficult?)
-v1.080, 2003-01-17.  Adjustment to RH80 docs by Cedar.  Added recommendation
-to use KDE vs. Gnome for RH8.
-v1.081, 2003-01-20.  Fixed XMLTV version error (Darren Mak)
-v1.082, 2003-01-24.  Added help for MDK 9.0 mysql startup.
-v1.083, 2003-01-26.  Fixed link to webcvs in section 1.  (Cedar McKay)
-v1.084, 2003-01-29.  Modified section 4 to make it a little clearer. 
-Modified libexpat instructions.  Added fuser for /dev/dsp.  Added resolution
-hints.
-v1.085, 2003-01-29.  Instructions for setting /etc/sysconfig/harddiskhda,
-etc.  Adjusted section 4 again; didn't know that RH8 sets the paths in the
-RPM install.
-v1.086, 2003-01-29.  More on resolution hints.
-v1.087, 2003-01-30.  Pointer to VCDHelp's webpage on resolution.
-v1.088, 2003-02-01.  Added a section to check on the symlink in lirc.
-v1.089, 2003-02-03.  Added RH80 remote database instructions for v0.8
-v1.090, 2003-02-10.  Added stuff on MythWeather aggressiveness setting.
-v1.091, 2003-02-10.  Update XMLTV version.
-v1.092, 2003-02-12.  Bruce Markey submission on MythTV GUI and X Display
-Sizes
-v1.093, 2003-02-14.  Updated troubleshooting text about RedHat 7.2 and 8.0
-not symlinking correctly.
-v1.094, 2003-02-15.  Added note about -devel .rpms
-v1.095, 2003-02-16.  Updated XMLTV version.  v0.5.7 fixes NA problems,
-v0.5.8 fixes UK problems.
-v1.096, 2003-02-17.  Added text to MythWeather that it only works with
-MythTV v0.8.
-v1.097, 2003-02-18.  Explicit instructions on disabling arts in KDE.
-v1.098, 2003-02-18.  More on MythMusic.  Added Mandrake 9.1 note for
-pre-requisites.  (libqt3-mysql is now a seperate module).  Updated
-requisistes for MythMusic.  Added note for MythMusic configure.  Added note
-for Mandrake 9.1 lirc install.  Added Erik Arendse's European MythTV website
-link.  Added a little to the MythMusic usage instructions.  Added some more
-developers.
-v1.099, 2003-02-24.  More on mythmusic.  Added some more MythTV v0.8 items. 
-Update MythWeather now that there's a config page.
-v1.100, 2003-02-28.  Changes to mythtv-0.8 section of docs.
-v1.101, 2003-03-04.  Typo on the theme.txt.  Changed some text on RH8 and
-OSS/ALSA.  Added some information about the NonID3FileFormat in mythmusic. 
-Added link to mythtv-users list.  More developers.
-v1.102, 2003-03-06.  MySQL dump command.
-v1.103, 2003-03-10.  More on 0.8.  Got rid of the mythweather "Bahamas"
-troubleshooting step since you're now forced to go through setup.  Change to
-the CPU % idle tip.  Reversed the save database / delete database steps. 
-Altered text on MythTV height/width since we now fullscreen by default. 
-Added some more about sound troubleshooting.
-v1.104, 2003-03-10.  Added link to pdf version of docs.  More on 0.8. 
-Removed stuff from mythweather since there's a setup program now.
-v1.105, 2003-03-13.  Isaac's last name was wrong.  Duh.
+v2.00, 2003-03-14.  Initial release for 0.8.  Added xset command for
+screensaver. Added lirc for Mandrake 9.1
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

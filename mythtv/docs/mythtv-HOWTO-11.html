@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
- <TITLE>Installing and using MythTV: MythWeb.</TITLE>
+ <TITLE>Installing and using MythTV: Using MythTV.</TITLE>
  <LINK HREF="mythtv-HOWTO-12.html" REL=next>
  <LINK HREF="mythtv-HOWTO-10.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc11" REL=contents>
@@ -12,51 +12,62 @@
 <A HREF="mythtv-HOWTO-10.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc11">Contents</A>
 <HR>
-<H2><A NAME="s11">11.</A> <A HREF="mythtv-HOWTO.html#toc11">MythWeb.</A></H2>
+<H2><A NAME="s11">11.</A> <A HREF="mythtv-HOWTO.html#toc11">Using MythTV.</A></H2>
 
-<P>MythWeb allows you to use a web page to control various aspects of your
-MythTV system.  MythWeb is a separate application, but it's dependent on
-MythTV being installed and operational.</P>
+<P><B>NOTE to Red Hat 8.0 users</B>:Red Hat Linux 8.0 ships with Gnome as
+the default desktop environment.  However, Gnome seems to have issues with
+window focus and window switching which sometimes cause mythfrontend to
+obscure the video. KDE does not seem to have any such issues. Therefore you
+will need to switch to KDE by selecting RedHatMenu>Extras>System
+Settings>Desktop Switching Tool and choose "KDE".</P>
 
-<H2><A NAME="ss11.1">11.1</A> <A HREF="mythtv-HOWTO.html#toc11.1">Installation and pre-requisites.</A>
+
+<H2><A NAME="ss11.1">11.1</A> <A HREF="mythtv-HOWTO.html#toc11.1">Using themes with MythTV.</A>
 </H2>
 
-<P>Download mythweb from 
-<A HREF="http://www.mythtv.org/">http://www.mythtv.org/</A> and save it to a location where you can find
-it.  The next step depends on whether your distribution has a web server and
-if you have php support.</P>
+<P>MythTV is "themeable", meaning that the visual appearance of the program
+can be modified by the user without re-compiling or altering the program
+functionality.
+<CODE>/usr/local/share/mythtv/theme.txt</CODE> allows you to alter the theme
+for MythTV.  The default theme is called "blue".  Other themes that ship
+with MythTV can be found in the <CODE>/usr/local/share/mythtv/themes</CODE>
+directory.  </P>
 
-<H3>Mandrake 9.0</H3>
-
-<P>Mandrake 9.0 has <B>apache</B> and <B>php</B> pre-packaged, so
-installation is quite simple.  Once you have installed the two programs,
-either with the graphical installer (see instructions in 
-<A HREF="mythtv-HOWTO-3.html#graphicinstalltools_">Graphic Install Tools</A>) or through the
-command line (section 
-<A HREF="mythtv-HOWTO-3.html#CLIinstalltools_">Command Line</A>), and
-you've ensured that the <B>apache</B> server will start at boot using the
-Mandrake Control Center.</P>
-
-<H2><A NAME="ss11.2">11.2</A> <A HREF="mythtv-HOWTO.html#toc11.2">Completing the installation.</A>
+<H2><A NAME="ss11.2">11.2</A> <A HREF="mythtv-HOWTO.html#toc11.2">Adding DirecTV information to the database.</A>
 </H2>
 
-<P>
+<P>A script for adding DirecTV information into the database has been
+written by tarek Lubani 
+<A HREF="mailto:tarek@tarek.2y.net">mailto:tarek@tarek.2y.net</A> and is
+available at 
+<A HREF="http://tarek.2y.net/myth/ppv.pl">http://tarek.2y.net/myth/ppv.pl</A>.  This is currently an external
+user-supplied program, so if you have issues with the script, please contact
+the author.</P>
+
+<H2><A NAME="ss11.3">11.3</A> <A HREF="mythtv-HOWTO.html#toc11.3">Adding support for an external tuner.</A>
+</H2>
+
+<P>MythTV supports changing the channel on an external tuner.  If you have
+an external tuner, such as a DirecTV or digital cable set top box, the
+following command should be added to your settings.txt file:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythweb-0.7.tar.bz2
-$ cd mythweb-0.7
-$ su
-# mkdir /var/www/html/mythweb
-# cp -r . /var/www/html/mythweb
-# exit
-$ 
+str ExternalChannelCommand=/usr/local/bin/changechannel
 </PRE>
 </CODE></BLOCKQUOTE>
-
-To access the web page, open a web browser and use <B>http://[name or ip
-address]/mythweb/</B></P>
-<P><B>NOTE</B>: Make sure that you have a trailing slash on the URL,
-otherwise you will get a <CODE>404 Page not Found</CODE> error.</P>
+</P>
+<P>The <B>changechannel</B> program is not supplied with MythTV, so this is
+going to be dependent on what sort of external tuner you have.  Example
+scripts for Sony and RCA receivers can be obtained from 
+<A HREF="http://tarek.2y.net/myth/">http://tarek.2y.net/myth/</A>.  This is currently an external
+user-supplied program, so if you have issues with the script, please contact
+the author.</P>
+<P>Feel free to browse some of what sort of hardware is available at 
+<A HREF="http://shop.store.yahoo.com/snapstreammedia/cablepacks.html">http://shop.store.yahoo.com/snapstreammedia/cablepacks.html</A>, or if
+you wish to assemble your own, rather than purchase, the following may be
+helpful: 
+<A HREF="http://www.snapstream.com/products/irblaster/sonydss.htm">http://www.snapstream.com/products/irblaster/sonydss.htm</A> for cable
+pinouts for RCA DSS receivers.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-12.html">Next</A>

@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
- <TITLE>Installing and using MythTV: MythVideo</TITLE>
+ <TITLE>Installing and using MythTV: MythWeather</TITLE>
  <LINK HREF="mythtv-HOWTO-17.html" REL=next>
  <LINK HREF="mythtv-HOWTO-15.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc16" REL=contents>
@@ -12,14 +12,15 @@
 <A HREF="mythtv-HOWTO-15.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc16">Contents</A>
 <HR>
-<H2><A NAME="s16">16.</A> <A HREF="mythtv-HOWTO.html#toc16">MythVideo</A></H2>
+<H2><A NAME="s16">16.</A> <A HREF="mythtv-HOWTO.html#toc16">MythWeather</A></H2>
 
-<P>The MythVideo application will allow you to use an external program to
-watch media files that are not directly supported by MythTV.</P>
-<P>Change into the MythVideo directory, then make and make install:
+<P>The MythWeather module will obtain the weather information for the
+location that you specify.  You must be running the CVS version of MythTV
+in order to use MythWeather.</P>
+<P>Change into the MythWeather directory, then make and make install:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd mythvideo
+$ cd mythweather
 $ make
 $ su
 # make install
@@ -27,9 +28,39 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>The next step is to edit the
-<CODE>/usr/local/share/mythvideo/mythexplorer-settings.txt</CODE> file.  Change
-the StartDir to a valid mount point on your system.</P>
+<P>MythWeather uses MSNBC.com as its source for weather data.</P>
+<P>These are the keyboard commands for MythWeather:
+<BLOCKQUOTE><CODE>
+<PRE>
+Left Key             Goes back one page, and extends the time spent
+                     on the page you are on.
+Right Key            Goes forward one page, see above.
+Space                Pause, wait on the current page until space is hit
+                     again.
+Numeric Keys         You can check other weather by keying in other ZIP codes.
+Enter Key            Switch between Celsius and Fahrenheit. Can also
+                     be used a way to force a data update.
+"m" Key              Resets the location to the database default, then updates the data.
+"i"                  Enter / Save settings
+ESC                  Exit the settings screen without saving / Exit the program
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>MythWeather also has an "Aggressiveness" setting.  This affects how long
+MythWeather waits for data from the msnbc.com website before timing out.  If
+you are on a slow connection, or have a slow DNS, or MythWeather just
+doesn't seem to be working and you've already tried everything else, then
+try increasing the aggressiveness level parameter.  This parameter is
+inverse; a higher number actually means that MythWeather will be less
+aggressive, and will therefore wait longer before timing out.</P>
+<P>MythWeather will print debugging information on the terminal.  If you wish
+to see additional debugging information while MythWeather is running, you'll
+need to modify the source and recompile.</P>
+<P>Open file <CODE>weather.cpp</CODE> and go to line 40.  You should see <CODE>debug =
+false</CODE>.  Change this to true, go back to the main mythweather directory
+and run <CODE>make clean distclean; make</CODE> then switch to superuser and run
+<CODE>make install</CODE>.  MythWeather will now print additional data to the
+terminal to allow you to troubleshoot MythWeather issues.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-17.html">Next</A>

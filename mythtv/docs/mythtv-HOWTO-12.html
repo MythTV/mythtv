@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
- <TITLE>Installing and using MythTV: MythGallery.</TITLE>
+ <TITLE>Installing and using MythTV: MythWeb.</TITLE>
  <LINK HREF="mythtv-HOWTO-13.html" REL=next>
  <LINK HREF="mythtv-HOWTO-11.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc12" REL=contents>
@@ -12,47 +12,51 @@
 <A HREF="mythtv-HOWTO-11.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc12">Contents</A>
 <HR>
-<H2><A NAME="s12">12.</A> <A HREF="mythtv-HOWTO.html#toc12">MythGallery.</A></H2>
+<H2><A NAME="s12">12.</A> <A HREF="mythtv-HOWTO.html#toc12">MythWeb.</A></H2>
 
-<P>MythGallery is a photo and slideshow application.  MythGallery is a
-separate application, but it's dependent on MythTV being installed and
-operational.</P>
+<P>MythWeb allows you to use a web page to control various aspects of your
+MythTV system.  MythWeb is a separate application, but it's dependent on
+MythTV being installed and operational.</P>
+
 <H2><A NAME="ss12.1">12.1</A> <A HREF="mythtv-HOWTO.html#toc12.1">Installation and pre-requisites.</A>
 </H2>
 
-<P>Download MythGallery from 
+<P>Download mythweb from 
 <A HREF="http://www.mythtv.org/">http://www.mythtv.org/</A> and save it to a location where you can find
-it.
+it.  The next step depends on whether your distribution has a web server and
+if you have php support.</P>
+
+<H3>Mandrake 9.0</H3>
+
+<P>Mandrake 9.0 has <B>apache</B> and <B>php</B> pre-packaged, so
+installation is quite simple.  Once you have installed the two programs,
+either with the graphical installer (see instructions in 
+<A HREF="mythtv-HOWTO-3.html#graphicinstalltools_">Graphic Install Tools</A>) or through the
+command line (section 
+<A HREF="mythtv-HOWTO-3.html#CLIinstalltools_">Command Line</A>), and
+you've ensured that the <B>apache</B> server will start at boot using the
+Mandrake Control Center.</P>
+
+<H2><A NAME="ss12.2">12.2</A> <A HREF="mythtv-HOWTO.html#toc12.2">Completing the installation.</A>
+</H2>
+
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythgallery-0.7.tar.bz2
-$ cd mythgallery-0.7
-$ make
-# su
-# make install
+$ tar -xjf mythweb-0.8.tar.bz2
+$ cd mythweb-0.8
+$ su
+# mkdir /var/www/html/mythweb
+# cp -r . /var/www/html/mythweb
 # exit
 $ 
 </PRE>
 </CODE></BLOCKQUOTE>
 
-The configuration file for MythGallery is located in
-<CODE>/usr/local/share/mythtv</CODE>.  This file needs to be edited:  ensure
-that your GalleryDir variable is set to the directory where your pictures are
-stored.</P>
-<P>
-<UL>
-<LI>Use the arrow keys to move around the thumbnails.</LI>
-<LI>Use SPACE or ENTER to maximize a photo.
-<UL>
-<LI>Use p or P to start the slideshow of all the files in the
-directory.  "Play" or "Pause" on your remote may also work.</LI>
-<LI>Use SPACE or ENTER to advance to the next photo.</LI>
-</UL>
-</LI>
-<LI>Use ESC to go up one level, or to exit out of the module if
-you're at the first level.</LI>
-</UL>
-</P>
+To access the web page, open a web browser and use <B>http://[name or ip
+address]/mythweb/</B></P>
+<P><B>NOTE</B>: Make sure that you have a trailing slash on the URL,
+otherwise you will get a <CODE>404 Page not Found</CODE> error.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-13.html">Next</A>

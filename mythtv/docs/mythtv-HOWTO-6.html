@@ -17,10 +17,10 @@
 <H2><A NAME="ss6.1">6.1</A> <A HREF="mythtv-HOWTO.html#toc6.1">Mandrake 9.0</A>
 </H2>
 
-<P>If this is the master system, make sure that mysql is running and started
-at boot.  Click on Mandrake Control Center->System->Services, find mysql and
-click the "On Boot" button and the "Start" button if the mysql status shows
-that it isn't running yet.</P>
+<P>If this is the system maintaining the database, make sure that mysql is
+running and started at boot.  Click on Mandrake Control
+Center->System->Services, find mysql and click the "On Boot" button and the
+"Start" button if the mysql status shows that it isn't running yet.</P>
 <P><B>NOTE</B>:  There have been reports that mysql isn't starting at boot.</P>
 <P>
 <BLOCKQUOTE><CODE>
@@ -36,9 +36,13 @@ $ su
 <H2><A NAME="ss6.2">6.2</A> <A HREF="mythtv-HOWTO.html#toc6.2">Red Hat Linux 8.0</A>
 </H2>
 
-<P>If this is the master system, make sure that mysql is running and started at boot. Click on
-Redhat menu>Server Settings>Services and enter the root password when asked.
-Check "mysqld" and then click Start. Click Save, then close the window.</P>
+<P>If this is the system maintaining the database, make sure that mysql is
+running and started at boot. Click on Redhat menu>Server Settings>Services
+and enter the root password when asked. Check "mysqld" and then click Start.
+Click Save, then close the window.</P>
+
+
+
 <H2><A NAME="ss6.3">6.3</A> <A HREF="mythtv-HOWTO.html#toc6.3">Gentoo.</A>
 </H2>
 
@@ -48,10 +52,10 @@ mysql_install_db as root. </P>
 <H2><A NAME="ss6.4">6.4</A> <A HREF="mythtv-HOWTO.html#toc6.4">Setting up the initial database.</A>
 </H2>
 
-<P>This step is only required for systems that will be maintaining a
-database of listings.  If you are running multiple MythTV systems you can
-either have one master database read by all the other systems, or you can
-have each system maintaining its own.  To setup the initial mysql databases:
+<P>This step is only required on the system maintaining the database, which
+may or may not be one of your MythTV boxes.  If the database is on a
+non-MythTV machine, then copy the <CODE>database/mc.sql</CODE> file to it.</P>
+<P>To setup the initial mysql databases:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cd database
@@ -93,6 +97,46 @@ $ su
 <PRE>
 $ su
 # mysql &lt; /usr/share/mythtv/database/mc.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H3><A NAME="modify_perm_mysql"></A> Modifying access to the MySQL database for multiple systems </H3>
+
+<P>If you're going to have multiple systems accessing a master database,
+you must grant access to the database from remote systems.  By default, the
+<CODE>mc.sql</CODE> script is only granting access to the localhost.</P>
+<P>To allow other hosts access to your master database, you can either set it
+up for no security at all, or with more granularity.  Note that the "%" is
+the wildcard character in MySQL.</P>
+<P><B>NOTE</B>:  The "no security" option is <EM>very</EM> dangerous unless
+you're in a controlled environment.</P>
+<P>This example has no security at all, and allows access from any host.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root mythconverg
+mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>For a more secure setup, you can restrict which machines or subnets have
+access. If you have a complete DNS system operational, you could do the
+following:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root mythconverg
+mysql> grant all on mythconverg.* to mythtv@"%.mydomain.com" identified by "mythtv";
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Finally, if you just want to restrict by IP subnet:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root mythconverg
+mysql> grant all on mythconverg.* to mythtv@"192.168.1.%" identified by "mythtv";
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>

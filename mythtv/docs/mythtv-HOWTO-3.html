@@ -55,7 +55,7 @@ created on a different system with 30% CPU usage.</LI>
 <P><B>NOTE</B>:  You <EM>must</EM> use DMA for hard drive access to prevent
 choppy or jittery video.  Red Hat Linux 8.0 apparently does not enable DMA
 at boot time.  See the Troubleshooting Section for 
-<A HREF="mythtv-HOWTO-17.html#Setting_DMA">instructions</A> on how to do this.</P>
+<A HREF="mythtv-HOWTO-18.html#Setting_DMA">instructions</A> on how to do this.</P>
 <P>Mark Cooper has setup a hardware database at 
 <A HREF="http://www.goldfish.org/~mcooper/pvrhw/">http://www.goldfish.org/~mcooper/pvrhw/</A>.  The website will let you
 browse what other users have reported as their hardware configuration, and
@@ -68,18 +68,22 @@ how happy they are with the results.</P>
 use the graphical tools that come with your distribution, or you can use
 command-line utilities.  Either system will get the job done, and it all
 depends on your comfort level with Linux.</P>
-<P><B>NOTE</B>: If you are using MythTV on multiple systems, at least one of
-them will maintain the master database and will need mysql installed.  </P>
+<P><B>NOTE</B>: you must have the MySQL database software installed on a
+system to store the master database.  This does not necessarily mean that
+MySQL must run on one of the MythTV boxes.</P>
 <P>In order to compile MythTV, we need to make sure that the software it needs
-is installed.  As of 2003-02-15, this list includes <B>perl</B>,
-<B>mysql</B>, <B>gcc</B>, <B>freetype2-devel</B>,
+is installed.  As of 2003-03-15, this list includes <B>perl</B> (for
+XMLTV), <B>mysql</B>, <B>gcc</B>, <B>freetype2-devel</B>,
 <B>XFree86-devel</B>, <B>qt-devel</B> and <B>lame</B>.  If you're going to use a
 remote control with MythTV, you're going to need the <B>cdialog</B>
 package in order to compile <B>lircd</B>.</P>
+<P><B>NOTE</B>:  QT v3.1 is recommended, but not required.</P>
 <P><B>NOTE</B>:  If you are going to be using RPMs to install various
 components, you should be aware that not all packages include the necessary
 headers for compiling packages.  If you're having trouble compiling, ensure
 that you've installed the <CODE>-devel</CODE> version of a prerequisite.</P>
+<P><B>NOTE</B>:  Other than where noted, Mandrake 9.1 users may follow the
+Mandrake 9.0 instructions.</P>
 <P>There appears to be issues with ALSA and simultaneously recording and
 playing sound, which is a core requirement for MythTV.  If you are not
 running ALSA 0.9.0rc6 or higher and experience lock-ups of your system when
@@ -116,7 +120,10 @@ Qt") and libqt3 ("Libraries").
 installation.  Ensure that you install <CODE>libqt3-mysql</CODE>.</P>
 <P>Make sure that cdialog is installed if you want to use MythTV with a remote
 control.</P>
-<P>alsa-utils is needed for setting the volume.</P>
+<P>alsa-utils is needed for setting the volume.  MythTV now has native volume
+support, but you may have a special configuration that necessitates an
+external program to adjust your volume settings.  If this is the case, then
+you can disable native volume support.</P>
 <P>If you marked anything to install, click on Install Marked.  Click "Yes" or
 OK if you get a message about satisfying dependencies.</P>
 

@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
- <TITLE>Installing and using MythTV: Using MythTV.</TITLE>
+ <TITLE>Installing and using MythTV: Configuring mythfrontend</TITLE>
  <LINK HREF="mythtv-HOWTO-11.html" REL=next>
  <LINK HREF="mythtv-HOWTO-9.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc10" REL=contents>
@@ -12,70 +12,85 @@
 <A HREF="mythtv-HOWTO-9.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc10">Contents</A>
 <HR>
-<H2><A NAME="s10">10.</A> <A HREF="mythtv-HOWTO.html#toc10">Using MythTV.</A></H2>
+<H2><A NAME="s10">10.</A> <A HREF="mythtv-HOWTO.html#toc10">Configuring mythfrontend</A></H2>
 
-<P><B>NOTE to Red Hat 8.0 users</B>:Red Hat Linux 8.0 ships with Gnome as
-the default desktop environment.  However, Gnome seems to have issues with
-window focus and window switching which sometimes cause mythfrontend to
-obscure the video. KDE does not seem to have any such issues. Therefore you
-will need to switch to KDE by selecting RedHatMenu>Extras>System
-Settings>Desktop Switching Tool and choose "KDE".</P>
-<P><B>mythfrontend</B> is the main interface to the MythTV program.  This
-program allows you to choose which of the other modules you'd like to run
-and ensures that programs that you've scheduled for recording actually get
-recorded, so it's important that this program is always running.</P>
+<P>Once you have completed configuration of your backend systems, the next
+step is to configure the frontend client.  You should run the MythTV setup
+program before using any other modules such as MythMusic, etc. to correctly
+initialize the database.</P>
+<P>When you start mythfrontend, you should have a number of choices.  Before
+doing anything, go to TV, then to Setup and configure the frontend client.</P>
 
-
-<H2><A NAME="ss10.1">10.1</A> <A HREF="mythtv-HOWTO.html#toc10.1">Using themes with MythTV.</A>
+<H2><A NAME="ss10.1">10.1</A> <A HREF="mythtv-HOWTO.html#toc10.1">General</A>
 </H2>
 
-<P>MythTV is "themeable", meaning that the visual appearance of the program
-can be modified by the user without re-compiling or altering the program
-functionality.
-<CODE>/usr/local/share/mythtv/theme.txt</CODE> allows you to alter the theme
-for MythTV.  The default theme is called "blue".  Other themes that ship
-with MythTV can be found in the <CODE>/usr/local/share/mythtv/themes</CODE>
-directory.  Change the first variable in the <CODE>theme.txt</CODE> file and
-exit and restart <B>mythfrontend</B> for it to take effect.</P>
-<P><B>NOTE</B>: Exiting <B>mythfrontend</B> will stop any recordings you
-have in progress, so make sure that the system isn't busy if you modify the
-theme while <B>mythfrontend</B> is still running.</P>
+<P>The General screen has configuration items that don't really fit anywhere
+else.  The first configuration item asks you to indicate the number of
+seconds to record past the end of a program, which is useful if the
+broadcast network or your system clock are out of sync and will help prevent
+you missing the end of a program.  Note that MythTV currently does not
+have the ability to start early.</P>
+<P>To change the value, use the left and right arrow keys to increment and
+decrement the number of seconds.  When you're satisfied with the result, use
+the down arrow to put the input focus on the Next button or press RETURN to
+continue to the next page.</P>
+<P>The next page has a number of options to do with how channels are displayed
+on your system.  The help text will give you more information.  Move the
+focus to Next and press the space bar to continue.</P>
+<P>The final General page sets up some final configuration items.  See the help
+text for more information.</P>
 
-<H2><A NAME="ss10.2">10.2</A> <A HREF="mythtv-HOWTO.html#toc10.2">Adding DirecTV information to the database.</A>
+<H2><A NAME="ss10.2">10.2</A> <A HREF="mythtv-HOWTO.html#toc10.2">Appearance</A>
 </H2>
 
-<P>A script for adding DirecTV information into the database has been
-written by tarek Lubani 
-<A HREF="mailto:tarek@tarek.2y.net">mailto:tarek@tarek.2y.net</A> and is
-available at 
-<A HREF="http://tarek.2y.net/myth/ppv.pl">http://tarek.2y.net/myth/ppv.pl</A>.  This is currently an external
-user-supplied program, so if you have issues with the script, please contact
-the author.</P>
+<P>This set of screens is mostly concerned with how MythTV will look on your
+system.  From here, you can choose different themes and set the resolution
+of your system.</P>
 
-<H2><A NAME="ss10.3">10.3</A> <A HREF="mythtv-HOWTO.html#toc10.3">Adding support for an external tuner.</A>
+<H2><A NAME="ss10.3">10.3</A> <A HREF="mythtv-HOWTO.html#toc10.3">Program Guide</A>
 </H2>
 
-<P>MythTV supports changing the channel on an external tuner.  If you have
-an external tuner, such as a DirecTV or digital cable set top box, the
-following command should be added to your settings.txt file:
+<P>Fairly self explanatory.  Note that the alternate program guide does not
+use the same font settings as defined in Appearance, so if the EPG is
+unreadable this is where you make the adjustments to fonts, number of
+elements displayed, etc.</P>
+
+<H2><A NAME="deinterlace_"></A> <A NAME="ss10.4">10.4</A> <A HREF="mythtv-HOWTO.html#toc10.4">Playback </A>
+ </H2>
+
+<P>The one configuration item which may cause problems on your system is the
+"Deinterlace playback" setting.  MythTV uses a linear blend algorithm for
+deinterlacing, which will improve how the image looks on your screen. 
+Deinterlacing requires that your processor support SSE. (Streaming SIMD
+Extensions, aka "MMX2").  Early Intel Celeron (those that don't use the
+Coppermine 0.18um core and are usually &lt;600Mhz), Pentium Pro and Pentium II
+CPUs do not have SSE, so make sure that you haven't enabled deinterlacing if
+your processor doesn't support it. If you enable it, and your processor
+doesn't support SSE, you will get "Illegal Instruction" errors.</P>
+<P>To determine if you've got SSE, you can:
 <BLOCKQUOTE><CODE>
 <PRE>
-str ExternalChannelCommand=/usr/local/bin/changechannel
+$ cat /proc/cpuinfo
+[snip]
+flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca
+cmov pat pse36 mmx fxsr sse
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>The <B>changechannel</B> program is not supplied with MythTV, so this is
-going to be dependent on what sort of external tuner you have.  Example
-scripts for Sony and RCA receivers can be obtained from 
-<A HREF="http://tarek.2y.net/myth/">http://tarek.2y.net/myth/</A>.  This is currently an external
-user-supplied program, so if you have issues with the script, please contact
-the author.</P>
-<P>Feel free to browse some of what sort of hardware is available at 
-<A HREF="http://shop.store.yahoo.com/snapstreammedia/cablepacks.html">http://shop.store.yahoo.com/snapstreammedia/cablepacks.html</A>, or if
-you wish to assemble your own, rather than purchase, the following may be
-helpful: 
-<A HREF="http://www.snapstream.com/products/irblaster/sonydss.htm">http://www.snapstream.com/products/irblaster/sonydss.htm</A> for cable
-pinouts for RCA DSS receivers.</P>
+<P>Notice the <B>sse</B> at the end of the line - this tells you that this
+processor will be able to deinterlace correctly.</P>
+
+<H2><A NAME="ss10.5">10.5</A> <A HREF="mythtv-HOWTO.html#toc10.5">Recording</A>
+</H2>
+
+<P>Currently, MythTV supports two different video encoders, MPEG4 and RTJPEG. 
+Take note that RTJPEG has lower CPU demands, but makes large files, and MPEG4
+has high CPU demands, but makes smaller files.</P>
+<P><B>NOTE</B>: although the width and height can be changed to almost
+anything, if you start MythTV and don't see video or you get "segmentation
+fault" errors, it is likely that the video4linux (v4l) subsystem did not
+like the height and width parameters specified.  It's best to leave the
+default as-is until you're sure that MythTV is operational.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-11.html">Next</A>
