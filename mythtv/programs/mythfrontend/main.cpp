@@ -779,7 +779,8 @@ int main(int argc, char **argv)
 
     internal_media_init();
 
-    MythPluginManager::init();
+    MythPluginManager *pmanager = new MythPluginManager();
+    gContext->SetPluginManager(pmanager);
 
     gContext->UpdateImageCache();
 
@@ -807,12 +808,12 @@ int main(int argc, char **argv)
 
     if (pluginname != "")
     {
-        if (MythPluginManager::run_plugin(pluginname))
+        if (pmanager->run_plugin(pluginname))
             return 0;
         else
         {
             pluginname = "myth" + pluginname;
-            if (MythPluginManager::run_plugin(pluginname))
+            if (pmanager->run_plugin(pluginname))
                 return 0;
         }
     }            

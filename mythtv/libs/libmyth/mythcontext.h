@@ -26,6 +26,7 @@ class QSqlError;
 class QSocket;
 class LCD;
 class MythMainWindow;
+class MythPluginManager;
 
 enum VerboseMask {
     VB_IMPORTANT = 0x0001,
@@ -163,6 +164,9 @@ class MythContext : public QObject
                           const QString &pluginversion);
 
     void SetDisableLibraryPopup(bool check);
+
+    void SetPluginManager(MythPluginManager *pmanager);
+    MythPluginManager *getPluginManager(void);
     
   private slots:
     void EventSocketRead();

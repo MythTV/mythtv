@@ -53,31 +53,30 @@ class MythPlugin : public QLibrary
     int position;
 };
 
+// this should only be instantiated through MythContext.
 class MythPluginManager
 {
-  public:      
-    static void init(void);
-    static bool init_plugin(const QString &plugname);
-    static bool run_plugin(const QString &plugname);
-    static bool config_plugin(const QString &plugname);
-    static void unload_plugin(const QString &plugname);
+  public:   
+    MythPluginManager();
+   ~MythPluginManager();
+   
+    bool init_plugin(const QString &plugname);
+    bool run_plugin(const QString &plugname);
+    bool config_plugin(const QString &plugname);
+    void unload_plugin(const QString &plugname);
 
-    static MythPlugin *GetPlugin(const QString &plugname);
-    static MythPlugin *GetMenuPlugin(const QString &plugname);
-    static MythPlugin *GetMenuPluginAt(int pos);
+    MythPlugin *GetPlugin(const QString &plugname);
+    MythPlugin *GetMenuPlugin(const QString &plugname);
+    MythPlugin *GetMenuPluginAt(int pos);
      
   private:
-    static QDict<MythPlugin> m_dict;
+    QDict<MythPlugin> m_dict;
    
-    static QMap<QString, MythPlugin *> moduleMap;
-    static QMap<QString, MythPlugin *> menuPluginMap;
-    static QPtrList<MythPlugin> menuPluginList;
+    QMap<QString, MythPlugin *> moduleMap;
+    QMap<QString, MythPlugin *> menuPluginMap;
+    QPtrList<MythPlugin> menuPluginList;
 
-    // Default constructor declared private and
-    // left as abstract to prevent instantiation
-    MythPluginManager();
-
-    static void orderMenuPlugins();
+    void orderMenuPlugins();
 };
 
 #endif

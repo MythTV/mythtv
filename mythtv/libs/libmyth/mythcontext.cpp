@@ -20,6 +20,8 @@
 #include "lcddevice.h"
 #include "dialogbox.h"
 #include "mythdialogs.h"
+#include "mythplugin.h"
+
 
 int print_verbose_messages = VB_IMPORTANT | VB_GENERAL;
 
@@ -74,10 +76,14 @@ class MythContextPrivate
     QSocket *eventSock;
 
     bool disablelibrarypopup;
+
+    MythPluginManager *pluginmanager;
 };
 
 MythContextPrivate::MythContextPrivate(MythContext *lparent)
 {
+    pluginmanager = NULL;
+
     parent = lparent;
 
     char *tmp_installprefix = getenv("MYTHTVDIR");
@@ -1296,3 +1302,14 @@ void MythContext::SetDisableLibraryPopup(bool check)
 {
     d->disablelibrarypopup = check;
 }
+
+void MythContext::SetPluginManager(MythPluginManager *pmanager)
+{
+    d->pluginmanager = pmanager;
+}
+
+MythPluginManager *MythContext::getPluginManager(void)
+{
+    return d->pluginmanager;
+}
+

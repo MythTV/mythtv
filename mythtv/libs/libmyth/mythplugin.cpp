@@ -81,12 +81,7 @@ void MythPlugin::drawMenuPlugin(QPainter *painter, int x, int y, int w, int h)
         rfunc(painter, x, y, w, h);
 }
 
-QDict<MythPlugin> MythPluginManager::m_dict;
-QMap<QString, MythPlugin *> MythPluginManager::moduleMap;
-QMap<QString, MythPlugin *> MythPluginManager::menuPluginMap;
-QPtrList<MythPlugin> MythPluginManager::menuPluginList;
-
-void MythPluginManager::init(void)
+MythPluginManager::MythPluginManager()
 {
     m_dict.setAutoDelete(true);
 
@@ -226,7 +221,8 @@ void MythPluginManager::orderMenuPlugins(void)
     QMap<QString, MythPlugin *>::iterator iter = menuPluginMap.begin();
     for (; iter != menuPluginMap.end(); ++iter)
     {
-        menuPluginList.append(iter.data());
+        if (iter.data()->isEnabled())
+            menuPluginList.append(iter.data());
     }
 }
 

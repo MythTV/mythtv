@@ -2016,12 +2016,16 @@ void ThemedMenuPrivate::handleAction(const QString &action)
     else if (action.left(12) == "CONFIGPLUGIN")
     {
         QString rest = action.right(action.length() - 13);
-        MythPluginManager::config_plugin(rest.stripWhiteSpace());
+        MythPluginManager *pmanager = gContext->getPluginManager();
+        if (pmanager)
+            pmanager->config_plugin(rest.stripWhiteSpace());
     }
     else if (action.left(6) == "PLUGIN")
     {
         QString rest = action.right(action.length() - 7);
-        MythPluginManager::run_plugin(rest.stripWhiteSpace());
+        MythPluginManager *pmanager = gContext->getPluginManager();
+        if (pmanager)
+            pmanager->run_plugin(rest.stripWhiteSpace());
     }
     else if (action.left(8) == "SHUTDOWN")
     {
