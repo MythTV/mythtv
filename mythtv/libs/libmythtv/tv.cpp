@@ -1079,11 +1079,17 @@ bool TV::CheckChannel(char *channum)
 
     bool ret = false;
     char thequery[1024];
-    sprintf(thequery, "SELECT * FROM channel WHERE channum = %s", channum);
+    sprintf(thequery, "SELECT * FROM channel WHERE channum = %s;", channum);
 
     QSqlQuery query = db_conn->exec(thequery);
 
     if (query.isActive() && query.numRowsAffected() > 0)
+        ret = true;
+
+    sprintf(thequery, "SELECT * FROM channel;");
+    query = db_conn->exec(thequery);
+
+    if (query.numRowsAffected() == 0)
         ret = true;
 
     return ret;
