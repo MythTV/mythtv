@@ -5,11 +5,11 @@ RootSRGroup::RootSRGroup(ScheduledRecording& _rec,ManagedList* _parentList, QObj
                   : ManagedListGroup( "rootGroup", NULL, _parentList, _parent, "rootGroup"),
                     schedRec(_rec)
 {
-    cancelItem = new DialogDoneListItem( QObject::tr("Cancel"), MythDialog::Rejected, NULL, parentList, this, "cancel");
+    cancelItem = new DialogDoneListItem( QObject::tr("Go back..."), MythDialog::Rejected, NULL, parentList, this, "cancel");
     cancelItem->setState(MLS_BOLD);
     addItem(cancelItem);
     
-    recordAsShownItem = new DialogDoneListItem( QObject::tr("Record this program as shown below"), MythDialog::Accepted, NULL,
+    recordAsShownItem = new DialogDoneListItem( QObject::tr("Record this program as shown below..."), MythDialog::Accepted, NULL,
                                                 parentList, this, "recordAsShown");
     recordAsShownItem->setState(MLS_BOLD);
     addItem(recordAsShownItem);
@@ -64,7 +64,27 @@ void RootSRGroup::itemChanged(ManagedListItem*)
                 multiEpisode = false;
                 break;
     }
-
+    
+    if(isScheduled)
+    {
+        recordAsShownItem->setText(QObject::tr("Record this program as shown below..."));
+        recordAsShownItem->setState(MLS_BOLD);
+        recordAsShownItem->setEnabled(true);
+    }
+    else
+    {
+        if(schedRec.getRecordID() > 0)
+        {
+            recordAsShownItem->setText(QObject::tr("Cancel this recording..."));
+            recordAsShownItem->setState(MLS_BOLD);
+        }
+        else
+        {
+            recordAsShownItem->setEnabled(false);                
+            recordAsShownItem->setState(MLS_NORMAL);
+        }
+    }   
+    
     profile->getItem()->setEnabled(isScheduled);
     dupSettings->setEnabled(isScheduled & multiEpisode);
     offsetGroup->setEnabled(isScheduled);

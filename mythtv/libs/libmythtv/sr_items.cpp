@@ -58,7 +58,7 @@ void SRDupSettingsGroup::syncText()
 
 
 SROffsetGroup::SROffsetGroup(ScheduledRecording& _rec, ManagedList* _parentList, ManagedListGroup* _parentGroup)
-                : ManagedListGroup(QObject::tr("Pre/Post Roll"), parentGroup, _parentList, _parentGroup, "rollGroup")
+                : ManagedListGroup(QObject::tr("Pre/Post Roll"), _parentGroup, _parentList, _parentGroup, "rollGroup")
     {
            
         startOffset = new SRStartOffset(_rec, _parentList);

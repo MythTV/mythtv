@@ -183,9 +183,10 @@ ManagedListGroup::ManagedListGroup(const QString& txt, ManagedListGroup* pGroup,
     parentGroup = pGroup;
     if(pGroup)
     {
-        goBack = new ManagedListItem(tr("Go Back"), parentList, this, "goBack");
+        goBack = new ManagedListItem(tr("Go Back..."), parentList, this, "goBack");
         goBack->setValue("__NO_VALUE__");
         goBack->setState(MLS_BOLD);
+        goBack->setEnabled(true);
         addItem(goBack);
         connect(goBack, SIGNAL(selected(ManagedListItem*)), this, SLOT(doGoBack()));
         connect(goBack, SIGNAL(canceled(ManagedListItem*)), this, SLOT(doGoBack()));
@@ -246,7 +247,8 @@ void ManagedListGroup::cursorRight()
 
 void ManagedListGroup::select()
 {
-    getParentList()->setCurGroup(this);
+    if(enabled)
+        getParentList()->setCurGroup(this);
 }
 
 void ManagedListGroup::clear()
@@ -358,6 +360,9 @@ void SelectManagedListItem::clearSelections(void)
 
 void SelectManagedListItem::cursorRight()
 {
+    if(!enabled)
+        return;
+
     ++curItem;
     if(curItem >= itemCount)
         curItem = 1;
@@ -370,6 +375,9 @@ void SelectManagedListItem::cursorRight()
 
 void SelectManagedListItem::cursorLeft()
 {
+    if(!enabled)
+        return;
+
     --curItem;
     if(curItem < 1)
         curItem =  itemCount - 1;
