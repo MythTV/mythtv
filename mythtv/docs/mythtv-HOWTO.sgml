@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-05-04, v2.29
+<date>2003-05-06, v2.30
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -3222,7 +3222,7 @@ Add the following to <tt>/etc/modules.conf</tt>:
 <tscreen><verb>
 alias char-major-81     videodev
 alias char-major-81-0   ivtv
-options ivtv
+options ivtv debug=1
 options tuner type=2
 options msp3400 once=1 simple=1
 add below ivtv msp3400 saa7115 tuner
@@ -3231,16 +3231,17 @@ add below ivtv msp3400 saa7115 tuner
 <bf>NOTE</bf>:  You must specify the tuner type manually.  See
 <tt>~/ivtv/ivtv/driver/tuner.h</tt> for a listing of tuners.  In the above
 example, <tt>tuner type=2</tt> is a Phillips NTSC.  Use an appropriate tuner
-type for your system and video standard.
+type for your system and video standard.  The <tt>debug=1</tt> parameter on
+the ivtv line actually means less debugging output will be printed.
 
 Next, copy the files that were compiled in the driver directory into the
 appropriate modules directory:
 <tscreen><verb>
 $ su
 # cd /lib/modules/2.4.21-0.16mdk/kernel/drivers/media/video
-# cp ~/ivtv/ivtv/driver/msp3400.o .
-# cp ~/ivtv/ivtv/driver/saa7115.o .
-# cp ~/ivtv/ivtv/driver/ivtv.o .
+# cp /home/[yourusername]/ivtv/ivtv/driver/msp3400.o .
+# cp /home/[yourusername]/ivtv/ivtv/driver/saa7115.o .
+# cp /home/[yourusername]/ivtv/ivtv/driver/ivtv.o .
 # depmod -a
 </verb></tscreen>
 
@@ -3310,6 +3311,13 @@ $ ./ptune.pl 42
 </verb></tscreen>
 
 will change the Tuner channel to "42".
+
+You should also <bf>modprobe</bf> the ivtv driver before using it.  The
+simplest technique is to add the <bf/modprobe/> command to
+<tt>/etc/rc.d/rc.local</tt>:
+<tscreen><verb>
+# echo "/sbin/modprobe ivtv" >> /etc/rc.d/rc.local
+</verb></tscreen>
 
 <sect1>I'd like to use NFS.
 <p>You may want to use a central server to store your files.  
@@ -3517,6 +3525,7 @@ debug command for threads.
 v2.28, 2003-05-02.  MythWeb update for Mandrake.  mythweb db_open error. 
 ivtvfwextract is a perl file.  Added "-v" to mythbackend as daemon example.
 v2.29, 2003-05-04.  Updated CVS path.
+v2.30, 2003-05-05.  Updated PVR-250 instructions.  
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

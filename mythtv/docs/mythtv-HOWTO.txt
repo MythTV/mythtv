@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-05-04, v2.29
+  2003-05-06, v2.30
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -3439,7 +3439,7 @@
 
        alias char-major-81     videodev
        alias char-major-81-0   ivtv
-       options ivtv
+       options ivtv debug=1
        options tuner type=2
        options msp3400 once=1 simple=1
        add below ivtv msp3400 saa7115 tuner
@@ -3447,16 +3447,17 @@
   [1mNOTE[22m:  You must specify the tuner type manually.  See
   ~/ivtv/ivtv/driver/tuner.h for a listing of tuners.  In the above
   example, tuner type=2 is a Phillips NTSC.  Use an appropriate tuner
-  type for your system and video standard.
+  type for your system and video standard.  The debug=1 parameter on the
+  ivtv line actually means less debugging output will be printed.
 
   Next, copy the files that were compiled in the driver directory into
   the appropriate modules directory:
 
        $ su
        # cd /lib/modules/2.4.21-0.16mdk/kernel/drivers/media/video
-       # cp ~/ivtv/ivtv/driver/msp3400.o .
-       # cp ~/ivtv/ivtv/driver/saa7115.o .
-       # cp ~/ivtv/ivtv/driver/ivtv.o .
+       # cp /home/[yourusername]/ivtv/ivtv/driver/msp3400.o .
+       # cp /home/[yourusername]/ivtv/ivtv/driver/saa7115.o .
+       # cp /home/[yourusername]/ivtv/ivtv/driver/ivtv.o .
        # depmod -a
 
   [1mNOTE[22m:  depmod may give errors at this point, but it doesn't seem to
@@ -3494,6 +3495,7 @@
   Go into setup/setup on the machine hosting the hardware MPEG2 card.
   When you add a new capture card, ensure that you are using the video0
   device.
+
   [1mNOTE[22m:  As of 2003-04-25 the ivtv driver does not support VBI, so
   closed-captioning is not available.
 
@@ -3520,6 +3522,12 @@
 
   will change the Tuner channel to "42".
 
+  You should also [1mmodprobe [22mthe ivtv driver before using it.  The
+  simplest technique is to add the [1mmodprobe[22m> command to
+  /etc/rc.d/rc.local:
+
+       # echo "/sbin/modprobe ivtv" >> /etc/rc.d/rc.local
+
   [1m19.11.  I'd like to use NFS.[0m
 
   You may want to use a central server to store your files.
@@ -3534,7 +3542,7 @@
   On the "slave" machine, you'll want to edit the /etc/fstab file and
   add something like:
 
-       masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
+  masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
 
   Then run # fstab -a to re-read the file to mount the file system.
 
@@ -3543,6 +3551,7 @@
   "/var/video".  The rsize and wsize options are used to increase the
   performance of NFS; soft mean that NFS will eventually timeout on an
   error, and the nfsvers is required for filesizes over 2GB.
+
   [1m19.12.  I'd like to automatically start mythbackend at system boot[0m
   [1mtime.[0m
 
@@ -3634,10 +3643,10 @@
 
   Finally run the msec tool to check and implement your changes.
 
-       $ su
-       # msec
-       # exit
-       $
+  $ su
+  # msec
+  # exit
+  $
 
   [1mNOTE[22m: msec can only [4mreduce[24m the permissions of files, so if you don't
   get the results you expect, check that you're not asking msec to add

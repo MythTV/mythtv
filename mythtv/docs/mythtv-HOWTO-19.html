@@ -380,7 +380,7 @@ $ make
 <PRE>
 alias char-major-81     videodev
 alias char-major-81-0   ivtv
-options ivtv
+options ivtv debug=1
 options tuner type=2
 options msp3400 once=1 simple=1
 add below ivtv msp3400 saa7115 tuner
@@ -390,16 +390,17 @@ add below ivtv msp3400 saa7115 tuner
 <P><B>NOTE</B>:  You must specify the tuner type manually.  See
 <CODE>~/ivtv/ivtv/driver/tuner.h</CODE> for a listing of tuners.  In the above
 example, <CODE>tuner type=2</CODE> is a Phillips NTSC.  Use an appropriate tuner
-type for your system and video standard.</P>
+type for your system and video standard.  The <CODE>debug=1</CODE> parameter on
+the ivtv line actually means less debugging output will be printed.</P>
 <P>Next, copy the files that were compiled in the driver directory into the
 appropriate modules directory:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
 # cd /lib/modules/2.4.21-0.16mdk/kernel/drivers/media/video
-# cp ~/ivtv/ivtv/driver/msp3400.o .
-# cp ~/ivtv/ivtv/driver/saa7115.o .
-# cp ~/ivtv/ivtv/driver/ivtv.o .
+# cp /home/[yourusername]/ivtv/ivtv/driver/msp3400.o .
+# cp /home/[yourusername]/ivtv/ivtv/driver/saa7115.o .
+# cp /home/[yourusername]/ivtv/ivtv/driver/ivtv.o .
 # depmod -a
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -473,6 +474,15 @@ $ ./ptune.pl 42
 </CODE></BLOCKQUOTE>
 </P>
 <P>will change the Tuner channel to "42".</P>
+<P>You should also <B>modprobe</B> the ivtv driver before using it.  The
+simplest technique is to add the <B>modprobe</B>> command to
+<CODE>/etc/rc.d/rc.local</CODE>:
+<BLOCKQUOTE><CODE>
+<PRE>
+# echo "/sbin/modprobe ivtv" >> /etc/rc.d/rc.local
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
 <H2><A NAME="ss19.11">19.11</A> <A HREF="mythtv-HOWTO.html#toc19.11">I'd like to use NFS.</A>
 </H2>
