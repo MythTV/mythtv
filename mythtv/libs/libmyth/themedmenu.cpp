@@ -213,6 +213,7 @@ class ThemedMenuPrivate
     QRect watermarkRect;
 
     bool allowreorder;
+    int maxColumns;
 };
 
 ThemedMenuPrivate::ThemedMenuPrivate(ThemedMenu *lparent, float lwmult, 
@@ -283,6 +284,7 @@ void ThemedMenuPrivate::parseBackground(const QString &dir,
     bool hasarea = false;
 
     spreadbuttons = true;
+    maxColumns = 20;        // Arbitrary number
     visiblerowlimit = 6;	// the old default
 
     QString type = element.attribute("style", "");
@@ -317,6 +319,11 @@ void ThemedMenuPrivate::parseBackground(const QString &dir,
                 QString val = getFirstText(info);
                 if (val == "no")
                     spreadbuttons = false;
+            }
+            else if (info.tagName() == "columns")
+            {
+                QString val = getFirstText(info);
+                maxColumns = val.toInt();
             }
             else if (info.tagName() == "visiblerowlimit")
             {
@@ -1351,6 +1358,8 @@ void ThemedMenuPrivate::layoutButtons(void)
     int numbuttons = buttonList.size();
   
     columns = buttonArea.width() / buttonnormal->width();
+    columns = columns > maxColumns ? maxColumns : columns;
+    
     maxrows = buttonArea.height() / buttonnormal->height();
 
     if (maxrows < 2)
@@ -1458,6 +1467,7 @@ void ThemedMenuPrivate::positionButtons(bool resetpos)
         for (; biter != (*menuiter).buttons.end(); biter++)
         {
             int xpos = xspacing * col + (buttonnormal->width() * (col - 1));
+            xpos = (maxColumns == 1) ? 0 : xpos;
             xpos += buttonArea.x();
 
             ThemedButton *tbutton = (*biter);
