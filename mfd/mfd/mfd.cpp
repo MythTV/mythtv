@@ -95,7 +95,8 @@ void MFD::customEvent(QCustomEvent *ce)
     //  safe way to get data back up to the
     //  core mfd
     //
-    
+
+    // FIXME: Hardcoded constants.
     if(ce->type() == 65432)
     {
         //
@@ -152,8 +153,9 @@ void MFD::customEvent(QCustomEvent *ce)
         }        
         if(!message_sent)
         {
-            log(QString("wanted to send the following response but the socket/client that asked for it no longer exists: %1")
-                .arg(se->getString()), 8);
+            log(QString("wanted to send the following response but the socket"
+                        "/client that asked for it no longer exists: %1")
+                        .arg(se->getString()), 8);
         }
     }
     else if(ce->type() == 65430)
@@ -187,8 +189,8 @@ void MFD::customEvent(QCustomEvent *ce)
         QStringList service_tokens = QStringList::split(" ", se->getString());
         if(!plugin_manager->parseTokens(service_tokens, -1))
         {
-            warning(QString("mfd could not register this service at the request of a plugin: %1")
-                    .arg(se->getString()));
+            warning(QString("mfd could not register this service at the "
+                            "request of a plugin: %1").arg(se->getString()));
         }
     }
     else if(ce->type() == 65427)
@@ -203,7 +205,8 @@ void MFD::customEvent(QCustomEvent *ce)
     }
     else
     {
-        warning("receiving custom events of a type I do not understand");
+        warning(QString("receiving custom events of a type I do not "
+                        "understand, the type was %1.").arg(ce->type()));
     }
 }
 
@@ -215,10 +218,9 @@ void MFD::newConnection(MFDClientSocket *socket)
     
     connected_clients.append(socket);
 
-    log(QString("new socket connection from %1 (there are now %2 connected client(s))")
-        .arg(socket->peerAddress().toString())
-        .arg(connected_clients.count()), 2);
-
+    log(QString("new socket connection from %1 (there are now %2 connected "
+                "client(s))").arg(socket->peerAddress().toString())
+                .arg(connected_clients.count()), 2);
 
     //
     //  Whenever this client sends data,
@@ -243,8 +245,8 @@ void MFD::endConnection(MFDClientSocket *socket)
     }
     else
     {
-        log(QString("a socket connection has closed (there are now %1 connected client(s))")
-            .arg(connected_clients.count()), 2);
+        log(QString("a socket connection has closed (there are now %1 "
+                    "connected client(s))").arg(connected_clients.count()), 2);
     }
 }
 
@@ -344,22 +346,26 @@ void MFD::parseTokens(const QStringList &tokens, MFDClientSocket *socket)
     }
     else
     {
-        warning(QString("failed to parse this incoming command: %1").arg(tokens.join(" ")));
+        warning(QString("failed to parse this incoming command: %1")
+                        .arg(tokens.join(" ")));
         sendMessage(socket, QString("huh %1").arg(tokens.join(" ")));
     }
 }
 
-void MFD::doListCapabilities(const QStringList& tokens, MFDClientSocket *socket)
+void MFD::doListCapabilities(const QStringList& tokens,
+                             MFDClientSocket *socket)
 {
     if(tokens.count() < 2)
     {
-        warning(QString("failed to parse this incoming command: %1").arg(tokens.join(" ")));
+        warning(QString("failed to parse this incoming command: %1")
+                        .arg(tokens.join(" ")));
         sendMessage(socket, QString("huh %1").arg(tokens.join(" ")));
         return;
     }
     if(tokens[1] != "list")
     {
-        warning(QString("failed to parse this incoming command: %1").arg(tokens.join(" ")));
+        warning(QString("failed to parse this incoming command: %1")
+                        .arg(tokens.join(" ")));
         sendMessage(socket, QString("huh %1").arg(tokens.join(" ")));
         return;
     }
@@ -430,7 +436,8 @@ void MFD::shutDown()
         qApp->processEvents();
         if(watchdog_flag)
         {
-            warning("the plugin manager failed to stop and unload all plugins within a reasonable amount of time");
+            warning("the plugin manager failed to stop and unload all plugins "
+                    "within a reasonable amount of time");
             qApp->processEvents();
             break;
         }
@@ -442,7 +449,6 @@ void MFD::shutDown()
     
     metadata_server->stop();
     metadata_server->wait();
-    
     
     //
     //  Log the shutdown
@@ -509,15 +515,18 @@ void MFD::registerMFDService()
     }
 
     QString local_hostname = my_hostname;
-    QString self_registration_string = QString("services add mfdp %1 mfd on %2")
-                                       .arg(port_number)
-                                       .arg(local_hostname);
 
-    QStringList self_registration_tokens = QStringList::split(" ", self_registration_string);
+    QString self_registration_string =
+                    QString("services add mfdp %1 mfd on %2")
+                    .arg(port_number).arg(local_hostname);
+
+    QStringList self_registration_tokens = QStringList::split(" ", 
+                                            self_registration_string);
 
     if(!plugin_manager->parseTokens(self_registration_tokens, -1))
     {
-        warning("mfd could not register itself (perhaps no plugin handling services tokens?)");
+        warning("mfd could not register itself (perhaps no plugin "
+                "handling services tokens?)");
     }
     
 }
