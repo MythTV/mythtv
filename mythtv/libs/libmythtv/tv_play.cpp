@@ -2535,6 +2535,9 @@ void TV::customEvent(QCustomEvent *e)
         }
         else if (message.left(12) == "EXIT_TO_MENU")
         {
+            int exitprompt = gContext->GetNumSetting("PlaybackExitPrompt");
+            if (exitprompt == 1 || exitprompt == 2)
+                nvp->SetBookmark();
             wantsToQuit = true;
             exitPlayer = true;
         }
