@@ -6461,7 +6461,7 @@
 
        $ mysql -u root mythconverg
        mysql>delete from program;
-       mysql>drop table channel;
+       mysql>delete from channel;
        mysql>truncate table videosource;
 
 
