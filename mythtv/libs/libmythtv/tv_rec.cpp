@@ -141,6 +141,14 @@ void TVRec::StartRecording(ProgramInfo *rcinfo)
             usleep(50);
     }
 
+    if (changeState)
+    {
+        VERBOSE("backend still changing state, waiting..");
+        while (changeState)
+            usleep(50);
+        VERBOSE("changing state finished, starting now");
+    }
+
     if (internalState == kState_None) 
     {
         outputFilename = rcinfo->GetRecordFilename(recprefix);
