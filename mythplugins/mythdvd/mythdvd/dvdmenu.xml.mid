@@ -2,5 +2,6 @@
    <button>
       <type>DVD_RIP</type>
       <text>Rip DVD</text>
+      <text lang="DK">Genkod DVD</text>
       <action>DVD_RIP</action>
    </button>

@@ -3,12 +3,14 @@
    <button>
       <type>DVD</type>
       <text>General Settings</text>
+      <text lang="DK">Generelle indstillinger</text>
       <action>DVD_SETTINGS_GENERAL</action>
    </button>
 
    <button>
       <type>DVD_PLAY</type>
       <text>Play Settings</text>
+      <text lang="DK">Afspilnings indstillinger</text>
       <action>DVD_SETTINGS_PLAY</action>
    </button>
 

@@ -774,3 +774,4 @@ bool MTD::checkFinalFile(QFile *final_file, const QString &extension)
     
     return true;
 }
+

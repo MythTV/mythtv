@@ -3,6 +3,7 @@
    <button>
       <type>DVD_PLAY</type>
       <text>Play DVD</text>
+      <text lang="DK">Afspil DVD</text>
       <action>DVD_PLAY</action>
    </button>
 
@@ -10,6 +11,7 @@
    <button>
       <type>DVD_RIP</type>
       <text>Rip DVD</text>
+      <text lang="DK">Genkod DVD</text>
       <action>DVD_RIP</action>
    </button>
 

@@ -2,6 +2,7 @@
    <button>
       <type>DVD_RIP</type>
       <text>Rip Settings</text>
+      <text lang="DK">Genkodnings indstillinger</text>
       <action>DVD_SETTINGS_RIP</action>
    </button>
 

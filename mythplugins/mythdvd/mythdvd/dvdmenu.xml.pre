@@ -3,6 +3,7 @@
    <button>
       <type>DVD_PLAY</type>
       <text>Play DVD</text>
+      <text lang="DK">Afspil DVD</text>
       <action>DVD_PLAY</action>
    </button>
 
