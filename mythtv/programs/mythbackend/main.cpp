@@ -3,8 +3,12 @@
 #include <qfile.h>
 #include <qmap.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 #include "tv.h"
@@ -48,9 +52,38 @@ void setupTVs(MythContext *context)
     
 int main(int argc, char **argv)
 {
-    QApplication a(argc, argv);
+    QApplication a(argc, argv, false);
 
-    MythContext *context = new MythContext;
+    QString logfile = "";
+    QString pidfile = "";
+    bool daemonize = false;
+    for(int argpos = 1; argpos < a.argc(); ++argpos)
+        if (!strcmp(a.argv()[argpos],"-l") ||
+            !strcmp(a.argv()[argpos],"--logfile")) {
+            if (a.argc() > argpos) {
+                logfile = a.argv()[argpos+1];
+                ++argpos;
+            } else {
+                cerr << "Missing argument to -l/--logfile option\n";
+                return -1;
+            }
+        } else if (!strcmp(a.argv()[argpos],"-p") ||
+                   !strcmp(a.argv()[argpos],"--pidfile")) {
+            if (a.argc() > argpos) {
+                pidfile = a.argv()[argpos+1];
+                ++argpos;
+            } else {
+                cerr << "Missing argument to -p/--pidfile option\n";
+                return -1;
+            }
+        } else if (!strcmp(a.argv()[argpos],"-f")) {
+            daemonize = false;
+        } else {
+            cerr << "Invalid argument: " << a.argv()[argpos] << endl;
+            return -1;
+        }
+
+    MythContext *context = new MythContext(false);
     context->LoadSettingsFiles("backend_settings.txt");
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
@@ -82,12 +115,49 @@ int main(int argc, char **argv)
     int statusport = context->GetNumSetting("StatusPort", 6544);
 
     MainServer *ms = new MainServer(context, port, statusport, &tvList);
-    a.setMainWidget(ms);
+
+    int logfd = -1;
+
+    if (logfile != "") {
+        logfd = open(logfile.ascii(), O_WRONLY|O_CREAT|O_APPEND);
+         
+        if (logfd < 0) {
+            perror("open(logfile)");
+            return -1;
+        }
+    }
+    
+    ofstream pidfs;
+    if (pidfile != "") {
+        pidfs.open(pidfile.ascii());
+        if (!pidfs) {
+            perror("open(pidfile)");
+            return -1;
+        }
+    }
+
+    if (daemonize)
+        daemon(0, 1);
+
+    if (pidfs) {
+        pidfs << getpid() << endl;
+        pidfs.close();
+    }
+
+    close(0);
+
+    if (logfd != -1) {
+        // Send stdout and stderr to the logfile
+        dup2(logfd, 1);
+        dup2(logfd, 2);
+    }
 
     a.exec();
 
     delete context;
     delete sched;
+
+    unlink(pidfile.ascii());
 
     return 0;
 }

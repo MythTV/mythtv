@@ -1,7 +1,6 @@
 #ifndef MAINSERVER_H_
 #define MAINSERVER_H_
 
-#include <qvbox.h>
 #include <qmap.h>
 #include <qsocket.h>
 
@@ -14,7 +13,7 @@
 class MythContext;
 class HttpStatus;
 
-class MainServer : public QVBox
+class MainServer : public QObject
 {
     Q_OBJECT
   public:
