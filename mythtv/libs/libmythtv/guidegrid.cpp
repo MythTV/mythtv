@@ -592,7 +592,7 @@ QString GuideGrid::getDateLabel(ProgramInfo *pginfo)
     QDateTime startts = pginfo->startts;
     QDateTime endts = pginfo->endts;
 
-    QString timedate = endts.date().toString(dateformat) + QString(", ") +
+    QString timedate = startts.date().toString(dateformat) + QString(", ") +
                        startts.time().toString(timeformat) + QString(" - ") +
                        endts.time().toString(timeformat);
 

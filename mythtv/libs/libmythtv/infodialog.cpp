@@ -173,7 +173,7 @@ QLabel *InfoDialog::getDateLabel(ProgramInfo *pginfo)
     QString dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
     QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
 
-    QString timedate = endts.date().toString(dateformat) + QString(", ") +
+    QString timedate = startts.date().toString(dateformat) + QString(", ") +
                        startts.time().toString(timeformat) + QString(" - ") +
                        endts.time().toString(timeformat);
 
