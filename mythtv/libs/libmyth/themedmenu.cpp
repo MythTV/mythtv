@@ -1953,7 +1953,7 @@ void ThemedMenuPrivate::paintButton(unsigned int button, QPainter *p,
     else
         cr = tbutton->posRect;
 
-    parent->erase(tbutton->paintRect);
+    
     if (!erased)
     {
         if (tbutton->status == 1 && activebutton == tbutton)
