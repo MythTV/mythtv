@@ -64,6 +64,12 @@ MfdInstance::MfdInstance(
 
 void MfdInstance::run()
 {
+    //
+    //  set our priority
+    //
+    
+    int nice_level = mfdContext->getNumSetting("clientlib-mfdinstane-nice", 18);
+    nice(nice_level);
 
     QHostAddress this_address;
 
