@@ -76,6 +76,7 @@ class Weather : public MythDialog
 
   protected:
     void paintEvent(QPaintEvent *);
+    void keyPressEvent(QKeyEvent *e);
 
   private:
     void LoadWindow(QDomElement &);
@@ -89,7 +90,6 @@ class Weather : public MythDialog
     void updatePage(QPainter *);
 
     QSqlDatabase *config;
-    QAccel *accel;
 
     ifstream accidFile;
     streampos startData;
@@ -185,11 +185,11 @@ class Weather : public MythDialog
     QString httpData;
     QString oldhttpData;
 
-    QRect fullRect() const;
-    QRect newlocRect() const;
+    QRect fullRect;
+    QRect newlocRect;
 
     QPixmap realBackground;
-  
+    bool allowkeys;  
 };
 
 

@@ -10,7 +10,6 @@
 */
 
 #include <qlabel.h>
-#include <qaccel.h>
 #include <fstream>
 #include <iostream>
 #include <qlayout.h>
@@ -38,6 +37,8 @@ Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent,
                  const char *name)
        : MythDialog(parent, name)
 {
+    allowkeys = true;
+
     config = db;
     debug = false;
     if (appCode == 1)
@@ -60,6 +61,9 @@ Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent,
     noACCID = false;
 
     wData = NULL;
+
+    fullRect = QRect(0, 0, (int)(800*wmult), (int)(600*hmult));
+    newlocRect = QRect(0, 0, (int)(800*wmult), (int)(600*hmult));
 
     if (debug == true)
         cerr << "MythWeather: Reading InstallPrefix from context.\n";
@@ -152,32 +156,6 @@ Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent,
     nextpage_Timer = new QTimer(this);
     connect(nextpage_Timer, SIGNAL(timeout()), SLOT(nextpage_timeout()) );
 
-    if (debug == true)
-	cerr << "MythWeather: Setting up accelerator keys.\n";
-    accel = new QAccel(this);
-    accel->connectItem(accel->insertItem(Key_Left), this, SLOT(cursorLeft()));
-    accel->connectItem(accel->insertItem(Key_Right), this, SLOT(cursorRight()));
-    accel->connectItem(accel->insertItem(Key_P), this, SLOT(holdPage()));
-    accel->connectItem(accel->insertItem(Key_Space), this, SLOT(resetLocale()));
-    accel->connectItem(accel->insertItem(Key_Enter), this, SLOT(resetLocale()));
-    accel->connectItem(accel->insertItem(Key_Return), this, SLOT(convertFlip()));
-    accel->connectItem(accel->insertItem(Key_M), this, SLOT(convertFlip()));
-    accel->connectItem(accel->insertItem(Key_I), this, SLOT(setupPage()));
-    accel->connectItem(accel->insertItem(Key_Up), this, SLOT(upKey()));
-    accel->connectItem(accel->insertItem(Key_Down), this, SLOT(dnKey()));
-    accel->connectItem(accel->insertItem(Key_PageUp), this, SLOT(pgupKey()));
-    accel->connectItem(accel->insertItem(Key_PageDown), this, SLOT(pgdnKey()));
-    accel->connectItem(accel->insertItem(Key_0), this, SLOT(newLocale0()));
-    accel->connectItem(accel->insertItem(Key_1), this, SLOT(newLocale1()));
-    accel->connectItem(accel->insertItem(Key_2), this, SLOT(newLocale2()));
-    accel->connectItem(accel->insertItem(Key_3), this, SLOT(newLocale3()));
-    accel->connectItem(accel->insertItem(Key_4), this, SLOT(newLocale4()));
-    accel->connectItem(accel->insertItem(Key_5), this, SLOT(newLocale5()));
-    accel->connectItem(accel->insertItem(Key_6), this, SLOT(newLocale6()));
-    accel->connectItem(accel->insertItem(Key_7), this, SLOT(newLocale7()));
-    accel->connectItem(accel->insertItem(Key_8), this, SLOT(newLocale8()));
-    accel->connectItem(accel->insertItem(Key_9), this, SLOT(newLocale9()));
-
     setNoErase();
 
     if (debug == true)
@@ -201,12 +179,47 @@ Weather::~Weather()
         delete [] wData;
 }
 
+void Weather::keyPressEvent(QKeyEvent *e)
+{
+    if (!allowkeys)
+        return;
+
+    switch (e->key())
+    {
+        case Key_Left: cursorLeft(); break;
+        case Key_Right: cursorRight(); break;
+        case Key_Up: upKey(); break;
+        case Key_Down: dnKey(); break;
+        case Key_PageUp: pgupKey(); break;
+        case Key_PageDown: pgdnKey(); break;
+
+        case Key_Space: case Key_Enter: case Key_Return: resetLocale(); break;
+
+        case Key_P: holdPage(); break;
+        case Key_M: convertFlip(); break;
+        case Key_I: setupPage(); break;
+
+        case Key_0: newLocale0(); break;
+        case Key_1: newLocale1(); break;
+        case Key_2: newLocale2(); break;
+        case Key_3: newLocale3(); break;
+        case Key_4: newLocale4(); break;
+        case Key_5: newLocale5(); break;
+        case Key_6: newLocale6(); break;
+        case Key_7: newLocale7(); break;
+        case Key_8: newLocale8(); break;
+        case Key_9: newLocale9(); break;
+ 
+        default: MythDialog::keyPressEvent(e); break;
+    }
+}
+
 void Weather::updateBackground(void)
 {
     QPixmap bground(size());
     bground.fill(this, 0, 0);
-    QPixmap pix(fullRect().size());
-    pix.fill(this, fullRect().topLeft());
+    QPixmap pix(fullRect.size());
+    pix.fill(this, fullRect.topLeft());
 
     QPainter tmp(&bground);
 
@@ -274,13 +287,13 @@ void Weather::paintEvent(QPaintEvent *e)
     QRect r = e->rect();
     QPainter p(this);
 
-    if (r.intersects(fullRect()))
+    if (r.intersects(fullRect))
         updatePage(&p);
 }
 
 void Weather::updatePage(QPainter *dr)
 {
-    QRect pr = fullRect();
+    QRect pr = fullRect;
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
@@ -689,8 +702,7 @@ void Weather::updateLetters()
 	   showCityName();
        }
    }
-   update(fullRect());
-
+   update(fullRect);
 }
 
 void Weather::backupCity(int num)
@@ -742,7 +754,7 @@ void Weather::showCityName()
            cfgCity = cityNames[4];
        }
    }
-   update(fullRect());
+   update(fullRect);
 }
 
 void Weather::processEvents()
@@ -822,10 +834,10 @@ void Weather::newLocale0()
 	{
 		locale = newLocaleHold; 
 		newLocaleHold = "";
-                update(newlocRect());
+                update(newlocRect);
 		update_timeout();	
 	}
-        update(newlocRect());
+        update(newlocRect);
     }
 }
 
@@ -855,10 +867,10 @@ void Weather::newLocale1()
         {
                 locale = newLocaleHold;
 		newLocaleHold = "";
-                update(newlocRect());
+                update(newlocRect);
                 update_timeout();
         }
-        update(newlocRect());
+        update(newlocRect);
     }
 }
 void Weather::newLocale2()
@@ -887,10 +899,10 @@ void Weather::newLocale2()
         {
                 locale = newLocaleHold;
 		newLocaleHold = "";
-                update(newlocRect());
+                update(newlocRect);
                 update_timeout();
         }
-        update(newlocRect());
+        update(newlocRect);
     }
 }
 void Weather::newLocale3()
@@ -919,10 +931,10 @@ void Weather::newLocale3()
         {
                 locale = newLocaleHold;
 		newLocaleHold = "";
-                update(newlocRect());
+                update(newlocRect);
                 update_timeout();
         }
-        update(newlocRect());
+        update(newlocRect);
     }
 }
 void Weather::newLocale4()
@@ -949,10 +961,10 @@ void Weather::newLocale4()
         {
                 locale = newLocaleHold;
 		newLocaleHold = "";
-                update(newlocRect());
+                update(newlocRect);
                 update_timeout();
         }
-        update(newlocRect());
+        update(newlocRect);
     }
 }
 void Weather::newLocale5()
@@ -979,10 +991,10 @@ void Weather::newLocale5()
         {
                 locale = newLocaleHold;
 		newLocaleHold = "";
-                update(newlocRect());
+                update(newlocRect);
                 update_timeout();
         }
-        update(newlocRect());
+        update(newlocRect);
     }
 }
 void Weather::newLocale6()
@@ -1009,10 +1021,10 @@ void Weather::newLocale6()
         {
                 locale = newLocaleHold;
 		newLocaleHold = "";
-                update(newlocRect());
+                update(newlocRect);
                 update_timeout();
         }
-        update(newlocRect());
+        update(newlocRect);
     }
 }
 void Weather::newLocale7()
@@ -1041,10 +1053,10 @@ void Weather::newLocale7()
         {
                 locale = newLocaleHold;
 		newLocaleHold = "";
-                update(newlocRect());
+                update(newlocRect);
                 update_timeout();
         }
-        update(newlocRect());
+        update(newlocRect);
     }
 }
 void Weather::newLocale8()
@@ -1073,10 +1085,10 @@ void Weather::newLocale8()
         {
                 locale = newLocaleHold;
 		newLocaleHold = "";
-                update(newlocRect());
+                update(newlocRect);
                 update_timeout();
         }
-        update(newlocRect());
+        update(newlocRect);
     }
 }
 
@@ -1106,10 +1118,10 @@ void Weather::newLocale9()
         {
                 locale = newLocaleHold;
 		newLocaleHold = "";
-                update(newlocRect());
+                update(newlocRect);
                 update_timeout();
         }
-        update(newlocRect());
+        update(newlocRect);
     }
 }
 
@@ -1160,7 +1172,7 @@ void Weather::holdPage()
             }
         }
    }
-   update(fullRect());
+   update(fullRect);
   }
 }
 
@@ -1302,7 +1314,7 @@ void Weather::convertFlip()
 	}
 
 	update_timeout();
-        update(fullRect());
+        update(fullRect);
     }
     else
     {
@@ -1445,7 +1457,7 @@ void Weather::upKey()
 		updateAggr();
 	    }
 	}
-       update(fullRect());
+       update(fullRect);
    }
 }
 
@@ -1612,7 +1624,7 @@ void Weather::dnKey()
 		updateAggr();
  	   }
 	}
-	update(fullRect());
+	update(fullRect);
    }
 }
 
@@ -1757,7 +1769,7 @@ void Weather::cursorRight()
           showCityName();
       } 
    }
-   update(fullRect());
+   update(fullRect);
 }
 
 void Weather::cursorLeft()
@@ -1836,7 +1848,7 @@ void Weather::cursorLeft()
           }
       } 
    }
-   update(fullRect());
+   update(fullRect);
 }
 
 void Weather::nextpage_timeout()
@@ -1879,7 +1891,7 @@ void Weather::update_timeout()
         if (container)
            SetText(container, "updatetime", tr("Updating weather data..."));
     }
-    update(fullRect());
+    update(fullRect);
 
     result = UpdateData();
 
@@ -2153,7 +2165,7 @@ void Weather::SetText(LayerSet *container, QString widget, QString text)
 void Weather::showLayout(int pageNum)
 {
    currentPage = pageNum;
-   update(fullRect());
+   update(fullRect);
 }
 
 bool Weather::UpdateData()
@@ -2166,12 +2178,12 @@ bool Weather::UpdateData()
         }
 
 	bool result = false;
-	accel->setEnabled(false);
+        allowkeys = false;
 	if (debug == true)
 	    cerr << "MythWeather: COMMS : GetWeatherData() ...\n";
 	result = GetWeatherData();
-        update(fullRect());
-	accel->setEnabled(true);
+        update(fullRect);
+        allowkeys = true;
 
 	if (result == true)
 	{
@@ -2469,17 +2481,4 @@ bool Weather::GetWeatherData()
 	delete internetData;
 
 	return true;
-}
-
-QRect Weather::fullRect() const
-{
-    QRect r(0, 0, (int)(800*wmult), (int)(600*hmult));
-    return r;
-}
-
-QRect Weather::newlocRect() const
-{
-    // 0, 50, 800, 310
-    QRect r(0, 0, (int)(800*wmult), (int)(600*hmult));
-    return r;
 }
