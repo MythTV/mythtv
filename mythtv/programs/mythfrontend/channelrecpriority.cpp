@@ -374,7 +374,7 @@ void ChannelRecPriority::applyChannelRecPriorityChange(QString chanid,
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE channel SET recpriority = :RECPRI "
-                            "WHERE chanid = CHANID ;");
+                            "WHERE chanid = :CHANID ;");
     query.bindValue(":RECPRI", newrecpriority);
     query.bindValue(":CHANID", chanid);
 
