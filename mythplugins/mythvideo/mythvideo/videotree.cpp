@@ -569,6 +569,26 @@ void VideoTree::playVideo(int node_number)
         //
 
         QString command = "";
+
+    	// If handler contains %d, substitute default player command
+    	// This would be used to add additional switches to the default without
+    	// needing to retype the whole default command.  But, if the
+    	// command and the default command both contain %s, drop the %s from
+    	// the default since the new command already has it
+    	//
+    	// example: default: mplayer -fs %s
+    	//          custom : %d -ao alsa9:spdif %s
+    	//          result : mplayer -fs -ao alsa9:spdif %s
+    	if(handler.contains("%d"))
+    	{
+        	QString default_handler = gContext->GetSetting("VideoDefaultPlayer");
+        	if(handler.contains("%s") && default_handler.contains("%s"))
+        	{
+                	default_handler = default_handler.replace(QRegExp("%s"), "");
+        	}
+        	command = handler.replace(QRegExp("%d"), default_handler);
+    	}
+
         if(handler.contains("%s"))
         {
             command = handler.replace(QRegExp("%s"), arg);
