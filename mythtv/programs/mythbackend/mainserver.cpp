@@ -3089,6 +3089,9 @@ void MainServer::reconnectTimeout(void)
 
     masterServer = new PlaybackSock(masterServerSock, server, true);
     playbackList.push_back(masterServer);
+
+    // Handle any messages sent before the readyRead signal was connected.
+    ProcessRequest(masterServerSock);
 }
 
 // returns true, if a client (slavebackends are not counted!)
