@@ -113,6 +113,10 @@ void VideoGallery::keyPressEvent(QKeyEvent *e)
                 doMenu(true);
             }
         }
+        else if (action == "INCPARENT")
+            shiftParental(1);
+        else if (action == "DECPARENT")
+            shiftParental(-1);            
         else if (action == "MENU")
         {
             doMenu(false);
