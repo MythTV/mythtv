@@ -715,7 +715,6 @@ void AudioPlugin::stopPlaylistMode()
 
 void AudioPlugin::playFromPlaylist(bool augment_index)
 {
-
     QUrl url_to_play_next;
 
     playlist_mode_mutex.lock();
@@ -759,7 +758,7 @@ void AudioPlugin::playFromPlaylist(bool augment_index)
         //
         //  No (more?) songs to play in this list
         //
-
+        
         metadata_server->unlockMetadata();
         playlist_mode_mutex.unlock();
         stopPlaylistMode();

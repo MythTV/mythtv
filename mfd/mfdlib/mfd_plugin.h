@@ -152,6 +152,7 @@ class MFDServicePlugin : public MFDBasePlugin
     void            readClients();
     virtual void    doSomething(const QStringList &tokens, int socket_identifier);
     void            wakeUp();
+    void            checkThreadPool();
     void            waitForSomethingToHappen();
     void            setTimeout(int numb_seconds, int numb_useconds);
     int             bumpClient();

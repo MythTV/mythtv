@@ -298,6 +298,10 @@ bool ZeroConfigResponder::registerService(
     {
         strict_service_type = "_mdcap._tcp.";
     }
+    if(service_type == "mhttp")
+    {
+        strict_service_type = "_mhttp._tcp.";
+    }
 
     if(strict_service_type.length() < 1)
     {

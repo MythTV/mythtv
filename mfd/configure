@@ -13,6 +13,7 @@ zeroconfig="yes"
 audio="yes"
 daapserver="yes"
 daapclient="yes"
+httpserver="yes"
 mmusic="yes"
 wmasupport="yes"
 aacsupport="no"
@@ -39,6 +40,10 @@ for opt do
   ;;
   --disable-daapclient) daapclient="no"
   ;;
+  --enable-httpserver) httpserver="yes"
+  ;;
+  --disable-httpserver) httpserver="no"
+  ;;
   --enable-mythmusic) mmusic="yes"
   ;;
   --disable-mythmusic) mmusic="no"
@@ -56,6 +61,7 @@ for opt do
       audio="yes"
       daapserver="yes"
       daapclient="yes"
+      httpserver="yes"
       mythlib="yes"
       mmusic="yes"
       wmasupport="yes"
@@ -66,6 +72,7 @@ for opt do
       audio="no"
       daapserver="no"
       daapclient="no"
+      httpserver="no"
       mythlib="no"
       mmusic="no"
       wmasupport="no"
@@ -81,6 +88,12 @@ done
 if test "$mythlib" = "no" ; then
     mmusic="no"
     wmasupport="no"
+    aacsupport="no"
+fi
+
+if test "$audio" = "no" ; then
+    wmasupport="no"
+    aacsupport="no"
 fi
 
 if test x"$1" = x"-h" -o x"$1" = x"--help" ; then
@@ -98,6 +111,7 @@ Standard options:
   --enable-aacsupport  include ability to play aac audio files [default=no ]
   --enable-daapserver  enable serving audio via daap           [default=yes]
   --enable-daapclient  enable consuming audio via daap         [default=yes]
+  --enable-httpserver  enable basic client interface via http  [default=yes]
   --enable-mythmusic   enable serving mythmusic audio content  [default=yes]
 
 All options can be turned off with --disable-foo
@@ -274,6 +288,26 @@ fi
 if test "$daapclient" = "no" ; then
     echo "                daap client support: no"
 fi
+
+#
+#   httpserver
+#
+
+if test "$httpserver" = "yes" ; then
+    echo "                http server support: yes"
+
+    #
+    #   Conditional build and link stuff for http server
+    #
+
+    echo "SUBDIRS += ./mfd/plugins/httpserver "   >> ./config.pro
+
+fi
+
+if test "$httpserver" = "no" ; then
+    echo "                http server support: no"
+fi
+
 
 #
 #   Myth Music

@@ -39,7 +39,9 @@ class HttpResponse
     void setError(int error_number);
     void send(MFDServiceClientSocket *which_client);
     void addHeader(const QString &new_header);
+    void clearPayload();
     void setPayload(char *new_payload, int new_payload_size);
+    void addToPayload(const QString &new_content);
     void sendFile(
                     QString file_path, 
                     int skip, 

@@ -480,10 +480,26 @@ bool HttpResponse::sendBlock(MFDServiceClientSocket *which_client, std::vector<c
         }
 
         FD_ZERO(&writefds);
-        FD_SET(which_client->socket(), &writefds);
-        if(nfds <= which_client->socket())
+
+        if(which_client)
         {
-            nfds = which_client->socket() + 1;
+            int a_socket = which_client->socket();
+            if(a_socket > 0)
+            {
+                FD_SET(a_socket, &writefds);
+                if(nfds <= a_socket)
+                {
+                    nfds = a_socket + 1;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
         }
         
         timeout.tv_sec = 2;
@@ -565,6 +581,20 @@ void HttpResponse::setPayload(char *new_payload, int new_payload_size)
     payload.clear();
 
     payload.insert(payload.end(), new_payload, new_payload + new_payload_size);
+}
+
+void HttpResponse::clearPayload()
+{
+    payload.clear();
+}
+
+void HttpResponse::addToPayload(const QString &new_content)
+{
+
+    for(uint i = 0; i < new_content.length(); i++)
+    {
+        payload.push_back(new_content.at(i));
+    }
 }
 
 void HttpResponse::sendFile(QString file_path, int skip, FileSendTransformation transform)

@@ -676,6 +676,35 @@ void MFDServicePlugin::wakeUp()
     u_shaped_pipe_mutex.unlock();
 }
 
+void MFDServicePlugin::checkThreadPool()
+{
+    //
+    //  If we've gone 15 minutes without exhausting the pool, rip one out
+    //
+    //  Why 15 minutes? Why not? This is like setting a screen saver ... 
+    //
+
+    if( (thread_exhaustion_timestamp.elapsed() / 1000) > 15 * 60 &&
+        thread_pool_size > minimum_thread_pool_size)
+    {
+        thread_exhaustion_timestamp.restart();
+        thread_pool_mutex.lock();
+        if(!thread_pool.empty())
+        {
+            ServiceRequestThread *srt = thread_pool.back();
+            thread_pool.pop_back();
+            --thread_pool_size;
+            srt->killMe();
+            srt->wait();
+            delete srt;
+            srt = NULL;
+            log(QString("thread pool reduced by one due to lack of demand (size is now %1)")
+                .arg(thread_pool_size), 1);
+        }
+        thread_pool_mutex.unlock();
+    }
+}
+
 void MFDServicePlugin::waitForSomethingToHappen()
 {
     //
@@ -686,31 +715,7 @@ void MFDServicePlugin::waitForSomethingToHappen()
 
     if(use_thread_pool)
     {
-        //
-        //  If we've gone 15 minutes without exhausting the pool, rip one out
-        //
-        //  Why 15 minutes? Why not? This is like setting a screen saver ... 
-        //
-
-        if( (thread_exhaustion_timestamp.elapsed() / 1000) > 15 * 60 &&
-            thread_pool_size > minimum_thread_pool_size)
-        {
-            thread_exhaustion_timestamp.restart();
-            thread_pool_mutex.lock();
-                if(!thread_pool.empty())
-                {
-                    ServiceRequestThread *srt = thread_pool.back();
-                    thread_pool.pop_back();
-                    --thread_pool_size;
-                    srt->killMe();
-                    srt->wait();
-                    delete srt;
-                    srt = NULL;
-                    log(QString("thread pool reduced by one due to lack of demand (size is now %1)")
-                        .arg(thread_pool_size), 1);
-                }
-            thread_pool_mutex.unlock();
-        }
+        checkThreadPool();
     }
 
     int nfds = 0;
@@ -723,15 +728,27 @@ void MFDServicePlugin::waitForSomethingToHappen()
     //  Add the server socket to things we want to watch
     //
 
-    if(core_server_socket)
+    if(port_number > 0)
     {
-        if(core_server_socket->socket() > 0)
+        if(core_server_socket)
         {
-            FD_SET(core_server_socket->socket(), &readfds);
-            if(nfds <= core_server_socket->socket())
+            int s_socket = core_server_socket->socket();
+            if(s_socket > 0)
             {
-                nfds = core_server_socket->socket() + 1;
+                FD_SET(s_socket, &readfds);
+                if(nfds <= s_socket)
+                {
+                    nfds = s_socket + 1;
+                }
             }
+            else
+            {
+                warning("core server socket invalid ... total mayhem");
+            }
+        }
+        else
+        {
+            warning("lost out core server socket ... impending doom");
         }
     }
 
@@ -751,9 +768,9 @@ void MFDServicePlugin::waitForSomethingToHappen()
                 if(!a_client->isReading())
                 {
                     FD_SET(socket_fd, &readfds);
-                    if(nfds <= a_client->socket())
+                    if(nfds <= socket_fd)
                     {
-                        nfds = a_client->socket() + 1;
+                        nfds = socket_fd + 1;
                     }
                 }
             }
@@ -976,7 +993,14 @@ MFDHttpPlugin::MFDHttpPlugin(
                                 const QString &a_name,
                                 int l_minimum_thread_pool_size
                             )
-                 :MFDServicePlugin(owner, identifier, port, a_name, l_minimum_thread_pool_size)
+                 :MFDServicePlugin(
+                                    owner, 
+                                    identifier, 
+                                    port, 
+                                    a_name, 
+                                    true, // use thread pool
+                                    l_minimum_thread_pool_size
+                                  )
 {
 }
 
@@ -1035,7 +1059,7 @@ void MFDHttpPlugin::processRequest(MFDServiceClientSocket *a_client)
 
 void MFDHttpPlugin::handleIncoming(HttpRequest *, int)
 {
-    warning("(httpd) called base class handleRequest()");
+    warning("(httpd) called base class handleIncoming()");
 }
 
 void MFDHttpPlugin::sendResponse(int client_id, HttpResponse *http_response)

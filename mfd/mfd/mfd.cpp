@@ -462,8 +462,9 @@ void MFD::sendMessage(MFDClientSocket *where, const QString &what)
     //
 
     QString message = what;
-    log(QString("sending the following message to %1: %2")
+    log(QString("sending the following message to %1(%2): %3")
         .arg(where->peerAddress().toString())
+        .arg(where->getIdentifier())
         .arg(message), 10);
        
     message.append("\n");
