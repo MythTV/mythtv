@@ -19,16 +19,13 @@
  *
  * ============================================================ */
 
+#include <qapplication.h>
 #include <iostream>
 
 #include <qptrlist.h>
 #include <qstring.h>
 #include <qfile.h>
 #include <qdom.h>
-#include <qlayout.h>
-#include <qcursor.h>
-#include <qlabel.h>
-#include <qvgroupbox.h>
 #include <qtimer.h>
 
 #include "mythnewsconfig.h"
@@ -47,6 +44,7 @@ public:
     QString category;
     QString url;
     QString ico;
+    bool    inDB;
 };
 
 // ---------------------------------------------------
@@ -75,143 +73,6 @@ public:
 
 // ---------------------------------------------------
 
-class NewsSiteViewItem : public QListViewItem
-{
-public:
-
-    NewsSiteViewItem(QListViewItem* parent,
-                     NewsSiteItem* siteItem)
-        : QListViewItem(parent, siteItem->name)
-        { m_newsSite = siteItem; }
-
-    ~NewsSiteViewItem()
-        {}
-
-    NewsSiteItem* m_newsSite;
-
-};
-
-// ---------------------------------------------------
-
-class NewsSelSiteViewItem : public QListBoxText
-{
-public:
-
-    NewsSelSiteViewItem(QListBox* parent,
-                     NewsSiteItem* siteItem)
-        : QListBoxText(parent, siteItem->name)
-        { m_newsSite = siteItem; }
-
-    ~NewsSelSiteViewItem()
-        { if (m_newsSite)
-            delete m_newsSite;
-        }
-
-    NewsSiteItem* m_newsSite;
-
-};
-
-
-// ---------------------------------------------------
-
-class CMythListBox : public MythListBox
-{
-
-public:
-
-    CMythListBox(QWidget *parent):MythListBox(parent) {}
-
-    virtual void keyPressEvent(QKeyEvent* e) {
-
-        QStringList actions;
-        gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions);
-        
-        for (unsigned int i = 0; i < actions.size(); i++)
-        {
-            QString action = actions[i];
-
-            if (action == "SELECT")
-            {
-                emit returnPressed(item(currentItem()));
-                return;
-            }
-        }
-
-        MythListBox::keyPressEvent(e);
-    }
-
-    virtual void focusInEvent(QFocusEvent *e) {
-
-        QListBox::focusInEvent(e);
-        setSelected(item(currentItem()), true);
-    }
-
-};
-
-// ---------------------------------------------------
-
-CPopupBox::CPopupBox(QWidget *parent)
-        : QDialog(parent, 0, true, WType_Popup)
-{
-    setPalette(parent->palette());
-    setFont(parent->font());
-
-    QVBoxLayout *lay  = new QVBoxLayout(this, 5);
-    QVGroupBox  *vbox = new QVGroupBox("Add Custom Site",
-                                       this);
-    lay->addWidget(vbox);
-
-    QLabel *lab;
-
-    lab = new QLabel("News Feed Name:", vbox);
-    lab->setBackgroundOrigin(QWidget::WindowOrigin);
-    m_nameEdit = new QLineEdit(vbox);
-
-    lab =new QLabel("News Feed Site URL:", vbox);
-    lab->setBackgroundOrigin(QWidget::WindowOrigin);
-    m_urlEdit = new QLineEdit(vbox);
-
-    lab = new QLabel("(Optional) News Feed Site Icon URL:", vbox);
-    lab->setBackgroundOrigin(QWidget::WindowOrigin);
-    m_icoEdit = new QLineEdit(vbox);
-
-    QHBoxLayout *hbox = new QHBoxLayout(lay);
-
-    hbox->addItem(new QSpacerItem(100, 0,
-                                  QSizePolicy::Expanding,
-                                  QSizePolicy::Minimum));
-    MythPushButton *okButton =
-        new MythPushButton("&Ok", this);
-    okButton->setSizePolicy(QSizePolicy::Expanding,
-                            QSizePolicy::Fixed);
-    hbox->addWidget(okButton);
-
-    hbox->addItem(new QSpacerItem(100, 0,
-                                  QSizePolicy::Expanding,
-                                  QSizePolicy::Minimum));
-
-    connect(okButton, SIGNAL(clicked()),
-            this, SLOT(slotOkClicked()));
-
-    gContext->ThemeWidget(this);
-
-}
-
-CPopupBox::~CPopupBox()
-{
-
-}
-
-void CPopupBox::slotOkClicked()
-{
-    emit finished(m_nameEdit->text(),
-                  m_urlEdit->text(),
-                  m_icoEdit->text());
-    close();
-}
-
-// ---------------------------------------------------
-
 class MythNewsConfigPriv
 {
 public:
@@ -236,12 +97,10 @@ MythNewsConfig::MythNewsConfig(QSqlDatabase *db,
                                const char *name)
     : MythDialog(parent, name)
 {
-
-    setPalette(parent->palette());
-
-    m_db = db;
-    m_priv   = new MythNewsConfigPriv;
+    m_db              = db;
+    m_priv            = new MythNewsConfigPriv;
     m_updateFreqTimer = new QTimer(this);
+    m_updateFreq      = gContext->GetNumSetting("NewsUpdateFrequency", 30);
 
     connect(m_updateFreqTimer, SIGNAL(timeout()),
             this, SLOT(slotUpdateFreqTimerTimeout()));
@@ -258,10 +117,23 @@ MythNewsConfig::MythNewsConfig(QSqlDatabase *db,
 	    cerr << "MythNewsConfig: Error in creating sql table" << endl;
     }
 
+    m_Theme       = 0;
+    m_UISelector  = 0;
+    m_UICategory  = 0;
+    m_UISite      = 0;
+    m_SpinBox     = 0;
+    
     populateSites();
-    setupView();
 
-    setCursor(QCursor(Qt::ArrowCursor));
+    setNoErase();
+    loadTheme();
+
+    m_Context     = 0;
+    m_InColumn    = 0;
+
+    m_UISelector->AddItem("Select News Feeds");
+    m_UISelector->AddItem("Set Update Frequency");
+    m_UISelector->SetActive(true);
 }
 
 MythNewsConfig::~MythNewsConfig()
@@ -316,6 +188,8 @@ void MythNewsConfig::populateSites()
             site->ico =
                 siteNode.namedItem(QString("ico")).toElement().text();
 
+            site->inDB = findInDB(site->name);
+
             cat->siteList.append(site);
         }
 
@@ -324,174 +198,239 @@ void MythNewsConfig::populateSites()
     xmlFile.close();
 }
 
-void MythNewsConfig::setupView()
+void MythNewsConfig::loadTheme()
 {
-    QVBoxLayout *vbox = new QVBoxLayout(this,
-                                        (int)(hmult*10));
+    m_Theme = new XMLParse();
+    m_Theme->SetWMult(wmult);
+    m_Theme->SetHMult(hmult);
 
-    // Top fancy stuff
+    QDomElement xmldata;
+    m_Theme->LoadTheme(xmldata, "news", "news-");
 
-    QLabel *topLabel = new QLabel(this);
-    topLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    topLabel->setText("MythNews Settings");
+    for (QDomNode child = xmldata.firstChild(); !child.isNull();
+         child = child.nextSibling()) {
 
-    QFrame *hbar1 = new QFrame( this, "<hr>", 0 );
-    hbar1->setBackgroundOrigin(QWidget::WindowOrigin);
-    hbar1->setFrameStyle( QFrame::Sunken + QFrame::HLine );
-    hbar1->setFixedHeight( 12 );
+        QDomElement e = child.toElement();
+        if (!e.isNull()) {
 
-    vbox->addWidget(topLabel);
-    vbox->addWidget(hbar1);
+            if (e.tagName() == "font") {
+                m_Theme->parseFont(e);
+            }
+            else if (e.tagName() == "container") {
 
-    QLabel *helpLabel = new QLabel(this);
-    helpLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    helpLabel->setFrameStyle(QFrame::Box + QFrame::Sunken);
-    helpLabel->setMargin(int(hmult*4));
-    helpLabel->setText("Select and press Enter/Space to choose "
-                       "news feed sites from left\n"
-                       "Selected sites are shown on right "
-                       "(pressing Enter/Space there would remove them)");
-    vbox->addWidget(helpLabel);
+                QRect area;
+                QString name;
+                int context;
+                m_Theme->parseContainer(e, name, context, area);
 
-    // List Views
+                if (name.lower() == "config-selector")
+                    m_SelectorRect = area;
+                else if (name.lower() == "config-sites")
+                    m_SiteRect = area;
+                else if (name.lower() == "config-freq")
+                    m_FreqRect = area;
+                else if (name.lower() == "config-bottom")
+                    m_BotRect = area;
+            }
+            else {
+                std::cerr << "Unknown element: " << e.tagName()
+                          << std::endl;
+                exit(-1);
+            }
+        }
+    }
 
-    QHBoxLayout *hbox = new QHBoxLayout(vbox);
+    LayerSet *container = m_Theme->GetSet("config-selector");
+    if (!container) {
+        std::cerr << "MythNews: Failed to get selector container." << std::endl;
+        exit(-1);
+    }
 
-    m_leftView = new MythListView(this);
-    m_leftView->header()->hide();
-    m_leftView->addColumn("Sites");
-    m_leftView->setRootIsDecorated(true);
-    hbox->addWidget(m_leftView);
+    m_UISelector = (UIListBtnType*)container->GetType("selector");
+    if (!m_UISelector) {
+        std::cerr << "MythNews: Failed to get selector list area." << std::endl;
+        exit(-1);
+    }
 
-    m_rightView = new CMythListBox(this);
-    hbox->addWidget(m_rightView);
+    container = m_Theme->GetSet("config-sites");
+    if (!container) {
+        std::cerr << "MythNews: Failed to get sites container." << std::endl;
+        exit(-1);
+    }
 
-    // Populate Views - Left View
+    m_UICategory = (UIListBtnType*)container->GetType("category");
+    if (!m_UICategory) {
+        std::cerr << "MythNews: Failed to get category list area." << std::endl;
+        exit(-1);
+    }
+
+    m_UISite = (UIListBtnType*)container->GetType("sites");
+    if (!m_UISite) {
+        std::cerr << "MythNews: Failed to get site list area." << std::endl;
+        exit(-1);
+    }
 
     for (NewsCategory* cat = m_priv->categoryList.first();
          cat; cat = m_priv->categoryList.next() ) {
-        QListViewItem *catItem =
-            new QListViewItem(m_leftView, cat->name);
-        catItem->setOpen(true);
-        for (NewsSiteItem* site = cat->siteList.first();
-             site; site = cat->siteList.next() ) {
-            new NewsSiteViewItem(catItem, site);
-        }
+        m_UICategory->AddItem(cat->name);
+    }
+    slotCategoryChanged(0);
+
+    container = m_Theme->GetSet("config-freq");
+    if (!container) {
+        std::cerr << "MythNews: Failed to get frequency container." << std::endl;
+        exit(-1);
     }
 
-    // Populate Views - Right View;
-
-    QSqlQuery query("SELECT name FROM newssites", m_db);
-    if (!query.isActive()) {
-        cerr << "MythNewsConfig: Error in loading from DB" << endl;
+    UIBlackHoleType* spinboxHolder = (UIBlackHoleType*)container->GetType("spinbox_holder");
+    if (spinboxHolder) {
+        m_SpinBox = new MythNewsSpinBox(this);
+        m_SpinBox->setRange(30,1000);
+        m_SpinBox->setLineStep(10);
+        m_SpinBox->setValue(m_updateFreq);
+        QFont f = gContext->GetMediumFont();
+        m_SpinBox->setFont(f);
+        m_SpinBox->setFocusPolicy(QWidget::NoFocus);
+        m_SpinBox->setGeometry(spinboxHolder->getScreenArea());
+        m_SpinBox->hide();
+        connect(m_SpinBox, SIGNAL(valueChanged(int)),
+                SLOT(slotUpdateFreqChanged()));
     }
-    else {
-        while ( query.next() ) {
-            NewsSiteItem* site = new NewsSiteItem();
-            site->name = query.value(0).toString();
-            new NewsSelSiteViewItem(m_rightView, site);
-        }
-        m_rightView->sort();
+
+    UITextType* ttype = (UITextType*)container->GetType("help");
+    if (ttype) {
+        ttype->SetText("Set Update Frequency in Minutes\n"
+                       "Minimum allowed value is 30 Minutes");
     }
-
-    connect(m_leftView, SIGNAL(doubleClicked(QListViewItem*)),
-            this, SLOT(slotSitesViewExecuted(QListViewItem*)));
-    connect(m_leftView, SIGNAL(spacePressed(QListViewItem*)),
-            this, SLOT(slotSitesViewExecuted(QListViewItem*)));
-    connect(m_rightView, SIGNAL(doubleClicked(QListBoxItem*)),
-            this, SLOT(slotSelSitesViewExecuted(QListBoxItem*)));
-    connect(m_rightView, SIGNAL(returnPressed(QListBoxItem*)),
-            this, SLOT(slotSelSitesViewExecuted(QListBoxItem*)));
-
-    QFrame *hbar2 = new QFrame( this, "<hr>", 0 );
-    hbar2->setBackgroundOrigin(QWidget::WindowOrigin);
-    hbar2->setFrameStyle( QFrame::Sunken + QFrame::HLine );
-    hbar2->setFixedHeight( 12 );
-    vbox->addWidget(hbar2);
-
-    // Bottom view ------------------------------
-
-    // custom site ------------------------------------
-
-    hbox = new QHBoxLayout(vbox);
-
-    MythPushButton *customSiteBtn =
-        new MythPushButton("&Custom Site", this);
-    hbox->addWidget(customSiteBtn);
-
-    connect(customSiteBtn, SIGNAL(clicked()),
-            this, SLOT(slotAddCustomSite()));
-
-    QLabel *customSiteLabel = new QLabel(this);
-    customSiteLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    customSiteLabel->setText("Add a Custom New Feed Site");
-
-    hbox->addWidget(customSiteLabel);
-
-    // update freq -----------------------------------
-
-    hbox->addItem(new QSpacerItem(100, 0,
-                                  QSizePolicy::Expanding,
-                                  QSizePolicy::Minimum));
-
-
-    m_updateFreqBox = new MythSpinBox(this);
-    m_updateFreqBox->setMinValue(30);
-    m_updateFreqBox->setMaxValue(10000);
-    m_updateFreqBox->setLineStep(5);
-    hbox->addWidget(m_updateFreqBox);
-
-    m_updateFreqBox->setValue(
-        gContext->GetNumSetting("NewsUpdateFrequency", 30));
-
-    connect(m_updateFreqBox, SIGNAL(valueChanged(int)),
-            this, SLOT(slotUpdateFreqChanged()));
-
-    QLabel *updateFreqLabel = new QLabel(this);
-    updateFreqLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    updateFreqLabel->setText("Update Frequency (in minutes)");
-    hbox->addWidget(updateFreqLabel);
-
-
+        
+    
+    connect(m_UISelector, SIGNAL(itemSelected(int)),
+            SLOT(slotContextChanged(int)));
+    connect(m_UICategory, SIGNAL(itemSelected(int)),
+            SLOT(slotCategoryChanged(int)));
+    connect(m_UISite, SIGNAL(itemChecked(int,bool)),
+            SLOT(slotSiteChecked(int,bool)));
 }
 
 
-void MythNewsConfig::slotSitesViewExecuted(QListViewItem *item)
+void MythNewsConfig::paintEvent(QPaintEvent *e)
 {
-    if (!item) return;
+    QRect r = e->rect();
 
-    NewsSiteViewItem* viewItem =
-        dynamic_cast<NewsSiteViewItem*>(item);
-    if (!viewItem) {
-        // This is a upper level item
-        item->setOpen(!(item->isOpen()));
+    if (r.intersects(m_SelectorRect)) {
+        updateSelector();
+    }
+
+    if (r.intersects(m_BotRect)) {
+        updateBot();
+    }
+    
+    if (m_Context == 0) {
+        if (r.intersects(m_SiteRect)) {
+            updateSites();
+        }
     }
     else {
-        if (insertInDB(viewItem->m_newsSite)) {
-            NewsSiteItem* site = new NewsSiteItem;
-            site->name = viewItem->m_newsSite->name;
-            new NewsSelSiteViewItem(m_rightView, site);
-            m_rightView->sort();
+        if (r.intersects(m_FreqRect)) {
+            updateFreq();
         }
     }
 }
 
-void MythNewsConfig::slotSelSitesViewExecuted(QListBoxItem *item)
+void MythNewsConfig::updateSelector()
 {
-    if (!item) return;
-
-    NewsSelSiteViewItem* viewItem =
-        dynamic_cast<NewsSelSiteViewItem*>(item);
-    if (!viewItem) {
-        cerr << "MythNewsConfig: qlistboxitem not derived from newselsiteviewitem"
-             << endl;
-        return;
+    QPixmap pix(m_SelectorRect.size());
+    pix.fill(this, m_SelectorRect.topLeft());
+    QPainter p(&pix);
+    
+    LayerSet* container = m_Theme->GetSet("config-selector");
+    if (container) {
+        container->Draw(&p, 0, 0);
+        container->Draw(&p, 1, 0);
+        container->Draw(&p, 2, 0);
+        container->Draw(&p, 3, 0);
+        container->Draw(&p, 4, 0);
+        container->Draw(&p, 5, 0);
+        container->Draw(&p, 6, 0);
+        container->Draw(&p, 7, 0);
+        container->Draw(&p, 8, 0);
     }
+    p.end();
+    
+    bitBlt(this, m_SelectorRect.left(), m_SelectorRect.top(),
+           &pix, 0, 0, -1, -1, Qt::CopyROP);
+}
 
-    if (removeFromDB(viewItem->m_newsSite)) {
-        delete viewItem;
-        m_rightView->setSelected(m_rightView->item(0),true);
+void MythNewsConfig::updateSites()
+{
+    QPixmap pix(m_SiteRect.size());
+    pix.fill(this, m_SiteRect.topLeft());
+    QPainter p(&pix);
+
+    LayerSet* container = m_Theme->GetSet("config-sites");
+    if (container) {
+        container->Draw(&p, 0, 0);
+        container->Draw(&p, 1, 0);
+        container->Draw(&p, 2, 0);
+        container->Draw(&p, 3, 0);
+        container->Draw(&p, 4, 0);
+        container->Draw(&p, 5, 0);
+        container->Draw(&p, 6, 0);
+        container->Draw(&p, 7, 0);
+        container->Draw(&p, 8, 0);
     }
+    p.end();
+    
+    bitBlt(this, m_SiteRect.left(), m_SiteRect.top(),
+           &pix, 0, 0, -1, -1, Qt::CopyROP);
+}
+
+void MythNewsConfig::updateFreq()
+{
+    QPixmap pix(m_FreqRect.size());
+    pix.fill(this, m_FreqRect.topLeft());
+    QPainter p(&pix);
+    
+    LayerSet* container = m_Theme->GetSet("config-freq");
+    if (container) {
+        container->Draw(&p, 0, 0);
+        container->Draw(&p, 1, 0);
+        container->Draw(&p, 2, 0);
+        container->Draw(&p, 3, 0);
+        container->Draw(&p, 4, 0);
+        container->Draw(&p, 5, 0);
+        container->Draw(&p, 6, 0);
+        container->Draw(&p, 7, 0);
+        container->Draw(&p, 8, 0);
+    }
+    p.end();
+    
+    bitBlt(this, m_FreqRect.left(), m_FreqRect.top(),
+           &pix, 0, 0, -1, -1, Qt::CopyROP);
+}
+
+void MythNewsConfig::updateBot()
+{
+    QPixmap pix(m_BotRect.size());
+    pix.fill(this, m_BotRect.topLeft());
+    QPainter p(&pix);
+    
+    LayerSet* container = m_Theme->GetSet("config-bottom");
+    if (container) {
+        container->Draw(&p, 0, 0);
+        container->Draw(&p, 1, 0);
+        container->Draw(&p, 2, 0);
+        container->Draw(&p, 3, 0);
+        container->Draw(&p, 4, 0);
+        container->Draw(&p, 5, 0);
+        container->Draw(&p, 6, 0);
+        container->Draw(&p, 7, 0);
+        container->Draw(&p, 8, 0);
+    }
+    p.end();
+    
+    bitBlt(this, m_BotRect.left(), m_BotRect.top(),
+           &pix, 0, 0, -1, -1, Qt::CopyROP);
 }
 
 bool MythNewsConfig::findInDB(const QString& name)
@@ -546,36 +485,53 @@ bool MythNewsConfig::removeFromDB(NewsSiteItem* site)
     return (query.numRowsAffected() > 0);
 }
 
-void MythNewsConfig::slotAddCustomSite()
+void MythNewsConfig::slotContextChanged(int context)
 {
-    CPopupBox *popupBox = new CPopupBox(this);
-    connect(popupBox, SIGNAL(finished(const QString&,
-                                      const QString&,
-                                      const QString&)),
-            this, SLOT(slotCustomSiteAdded(const QString&,
-                                           const QString&,
-                                           const QString&)));
-    popupBox->show();
+    if (m_Context == (uint)context) return;
+
+    m_Context = context;
+    if (m_Context == 0)
+        m_SpinBox->hide();
+    else
+        m_SpinBox->show();
+    
+    update();    
 }
 
-void MythNewsConfig::slotCustomSiteAdded(const QString& name,
-                                         const QString& url,
-                                         const QString& ico)
+void MythNewsConfig::slotCategoryChanged(int c)
 {
-    if (name.isEmpty() || url.isEmpty()) return;
-
-    NewsSiteItem* site = new NewsSiteItem;
-    site->name = name;
-    site->url  = url;
-    site->ico  = ico;
-    site->category = "Miscellaneous";
-
-    if (insertInDB(site)) {
-        new NewsSelSiteViewItem(m_rightView, site);
-        m_rightView->sort();
+    m_UISite->Reset();
+    NewsCategory* cat = m_priv->categoryList.at(c);
+    if (cat) {
+        for (NewsSiteItem* site = cat->siteList.first();
+             site; site = cat->siteList.next() ) {
+            m_UISite->AddItem(site->name, site->inDB);
+        }
     }
-    else
-        delete site;
+}
+
+void MythNewsConfig::slotSiteChecked(int s, bool checked)
+{
+    NewsCategory* cat = m_priv->categoryList.at(m_UICategory->GetItemCurrent());
+    if (!cat) return;
+
+    NewsSiteItem* site = cat->siteList.at(s);
+    if (!site) return;
+
+    if (checked) {
+        if (insertInDB(site))
+            site->inDB = true;
+        else
+            m_UISite->SetItemChecked(s,false);
+    }
+    else {
+        if (removeFromDB(site))
+            site->inDB = false;
+        else
+            m_UISite->SetItemChecked(s,true);
+    }
+    
+    update();
 }
 
 void MythNewsConfig::slotUpdateFreqChanged()
@@ -588,6 +544,190 @@ void MythNewsConfig::slotUpdateFreqTimerTimeout()
 {
     if (m_updateFreqTimer->isActive()) return;
 
-    gContext->SaveSetting("NewsUpdateFrequency",
-                         m_updateFreqBox->value());
+    if (m_SpinBox) {
+        gContext->SaveSetting("NewsUpdateFrequency",
+                              m_SpinBox->value());
+    }
 }
+
+
+void MythNewsConfig::keyPressEvent(QKeyEvent *e)
+{
+    if (!e) return;
+
+    bool handled = false;
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("News", e, actions);
+    
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "UP") {
+            cursorUp();
+        }
+        else if (action == "DOWN") {
+            cursorDown();
+        }
+        else if (action == "LEFT") {
+            cursorLeft();
+        }
+        else if (action == "RIGHT") {
+            cursorRight();
+        }
+        else if (action == "SELECT") {
+            if (m_InColumn == 2 && m_Context == 0)
+                m_UISite->Toggle();
+        }
+        else
+            handled = false;
+    }
+
+    if (!handled)
+        MythDialog::keyPressEvent(e);
+    else
+        update();
+}
+
+void MythNewsConfig::cursorUp()
+{
+    if (m_InColumn == 0) {
+        m_UISelector->MoveUp();
+    }
+    else if (m_Context == 0) {
+        if (m_InColumn == 1)
+            m_UICategory->MoveUp();
+        else
+            m_UISite->MoveUp();
+    }
+    
+    update();
+}
+
+void MythNewsConfig::cursorDown()
+{
+    if (m_InColumn == 0) {
+        m_UISelector->MoveDown();
+    }
+    else if (m_Context == 0) {
+        if (m_InColumn == 1)
+            m_UICategory->MoveDown();
+        else
+            m_UISite->MoveDown();
+    }
+
+    update();
+}
+
+void MythNewsConfig::cursorLeft()
+{
+    if (m_InColumn == 0) return;    
+
+    m_InColumn--;
+
+    if (m_Context == 0) {
+        if (m_InColumn == 1) {
+            m_UICategory->SetActive(true);
+            m_UISite->SetActive(false);
+        }
+        else {
+            m_UICategory->SetActive(false);
+            m_UISelector->SetActive(true);
+        }
+    }
+    else {
+        m_UISelector->SetActive(true);
+        m_SpinBox->clearFocus();
+    }
+    update();
+}
+
+
+void MythNewsConfig::cursorRight()
+{
+    if (m_InColumn == 2 || (m_InColumn == 1 && m_Context == 1 ))
+        return;    
+
+    m_InColumn++;
+
+    m_UISelector->SetActive(false);
+
+    if (m_Context == 0) {
+        if (m_InColumn == 1) {
+            m_UICategory->SetActive(true);
+        }
+        else {
+            if (m_UISite->GetCount() == 0) 
+                m_InColumn--;
+            else {
+                m_UICategory->SetActive(false);
+                m_UISite->SetActive(true);
+            }
+        }
+    }
+    else {
+        m_SpinBox->setFocus();
+    }
+    update();
+}
+
+// ---------------------------------------------------------------------
+
+MythNewsSpinBox::MythNewsSpinBox(QWidget* parent, const char* widgetName )
+    : MythSpinBox(parent,widgetName)
+{
+    
+}
+
+bool MythNewsSpinBox::eventFilter(QObject* o, QEvent* e)
+{
+    (void)o;
+
+    if (e->type() == QEvent::FocusIn)
+    {
+        QColor highlight = colorGroup().highlight();
+        editor()->setPaletteBackgroundColor(highlight);
+    }
+    else if (e->type() == QEvent::FocusOut)
+    {
+        editor()->unsetPalette();
+    }
+
+    if (e->type() != QEvent::KeyPress)
+        return FALSE;
+
+    bool handled = false;
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", (QKeyEvent *)e,
+                                                     actions))
+    {
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        {
+            QString action = actions[i];
+            handled = true;
+
+            if (action == "UP") 
+                stepUp();
+            else if (action == "DOWN") 
+                stepDown();
+            else if (action == "PAGEUP")
+                stepUp();
+            else if (action == "PAGEDOWN")
+                stepDown();
+            else if (action == "LEFT") {
+                QKeyEvent *ev = (QKeyEvent*)e;
+                QApplication::postEvent(parentWidget(),
+                                        new QKeyEvent(ev->type(),ev->key(),ev->ascii(),ev->state()));
+            }
+            else if (action == "SELECT" || action == "ESCAPE")
+                return FALSE;
+            else
+                handled = false;
+        }
+    }
+
+    return TRUE;
+}
+
+

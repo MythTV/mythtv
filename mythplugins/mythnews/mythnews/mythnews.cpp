@@ -30,14 +30,10 @@
 
 #include "mythnews.h"
 
-using namespace std;
-
 MythNews::MythNews(QSqlDatabase *db, MythMainWindow *parent,
                    const char *name )
-    : MythDialog(parent, name)
+    : MythDialog(parent, name), m_DB(db)
 {
-    m_db = db;
-
     qInitNetworkProtocols ();
 
     // Setup cache directory
@@ -55,22 +51,17 @@ MythNews::MythNews(QSqlDatabase *db, MythMainWindow *parent,
 
     // Initialize variables
 
-    m_RetrievingNews = false;
-    m_InColumn = 0;
-    m_CurSite    = 0;
-    m_CurArticle = 0;
-    m_ItemsPerListing = 0;
+    m_InColumn     = 0;
+    m_UISites      = 0;
+    m_UIArticles   = 0;
+    m_TimerTimeout = 10*60*1000; 
 
-    if (m_ItemsPerListing < 1)
-        m_ItemsPerListing = 7;
-    if (m_ItemsPerListing % 2 == 0)
-        m_ItemsPerListing++;
-
-    m_TimerTimeout = 10*60*1000; // timeout every 10 minutes
+    setNoErase();
+    loadTheme();
 
     // Load sites from database
 
-    QSqlQuery query("SELECT name, url, updated FROM newssites", db);
+    QSqlQuery query("SELECT name, url, updated FROM newssites ORDER BY name", db);
     if (!query.isActive()) {
         cerr << "MythNews: Error in loading Sites from DB" << endl;
     }
@@ -86,45 +77,22 @@ MythNews::MythNews(QSqlDatabase *db, MythMainWindow *parent,
         }
     }
 
-    // Load theme and ui file
-
-    m_Theme = new XMLParse();
-    m_Theme->SetWMult(wmult);
-    m_Theme->SetHMult(hmult);
-    QDomElement xmldata;
-    m_Theme->LoadTheme(xmldata, "news", "news-");
-    LoadWindow(xmldata);
-
-    LayerSet *container = m_Theme->GetSet("selector");
-    if (container)
-    {
-        UIListType *ltype =
-            (UIListType *)container->GetType("sites");
-        if (ltype)
-        {
-            m_ItemsPerListing = ltype->GetItems();
-        }
+    for (unsigned int i=0; i<m_NewsSites.count(); i++) {
+        NewsSite* site = m_NewsSites.at(i);
+        m_UISites->AddItem(site->name());
     }
-    else
-    {
-        cerr << "MythNews: Failed to get selector object.\n";
-        exit(0);
-    }
-
-    setNoErase();
-    updateBackground();
-
+    
     // Now do the actual work
-
-    m_UpdateFreq = gContext->GetNumSetting("NewsUpdateFrequency", 30);
 
     m_RetrieveTimer = new QTimer(this);
     connect(m_RetrieveTimer, SIGNAL(timeout()),
             this, SLOT(slotRetrieveNews()));
+    m_UpdateFreq = gContext->GetNumSetting("NewsUpdateFrequency", 30);
+    m_RetrieveTimer->start(m_TimerTimeout, false);
 
     slotRetrieveNews();
 
-    m_RetrieveTimer->start(m_TimerTimeout, false);
+    slotSiteSelected(0);
 }
 
 MythNews::~MythNews()
@@ -132,86 +100,155 @@ MythNews::~MythNews()
     m_RetrieveTimer->stop();
 }
 
-void MythNews::LoadWindow(QDomElement &element)
+void MythNews::loadTheme()
 {
+    m_Theme = new XMLParse();
+    m_Theme->SetWMult(wmult);
+    m_Theme->SetHMult(hmult);
 
-    for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling())
-    {
+    QDomElement xmldata;
+    m_Theme->LoadTheme(xmldata, "news", "news-");
+
+    for (QDomNode child = xmldata.firstChild(); !child.isNull();
+         child = child.nextSibling()) {
+        
         QDomElement e = child.toElement();
-        if (!e.isNull())
-        {
-            if (e.tagName() == "font")
-            {
+        if (!e.isNull()) {
+
+            if (e.tagName() == "font") {
                 m_Theme->parseFont(e);
             }
-            else if (e.tagName() == "container")
-            {
+            else if (e.tagName() == "container") {
                 QRect area;
                 QString name;
                 int context;
                 m_Theme->parseContainer(e, name, context, area);
 
-                if (name.lower() == "news_info")
-                    m_TopRect = area;
-                if (name.lower() == "selector")
-                    m_MidRect = area;
-                if (name.lower() == "messages")
-                    m_BotRect = area;
+                if (name.lower() == "sites")
+                    m_SitesRect = area;
+                else if (name.lower() == "articles")
+                    m_ArticlesRect = area;
+                else if (name.lower() == "info")
+                    m_InfoRect = area;
             }
-            else
-            {
-                cerr << "Unknown element: " << e.tagName()
-                     << endl;
-                exit(0);
+            else {
+                std::cerr << "Unknown element: " << e.tagName()
+                          << std::endl;
+                exit(-1);
             }
         }
     }
-}
 
-void MythNews::updateBackground()
-{
-    QPixmap pix(size());
-    pix.fill(this, 0, 0);
-
-    QPainter p(&pix);
-     LayerSet *container = m_Theme->GetSet("background");
-    if (container)
-    {
-        container->Draw(&p, 0, 0);
+    LayerSet *container = m_Theme->GetSet("sites");
+    if (!container) {
+        std::cerr << "MythNews: Failed to get sites container." << std::endl;
+        exit(-1);
     }
-    p.end();
+        
+    m_UISites = (UIListBtnType*)container->GetType("siteslist");
+    if (!m_UISites) {
+        std::cerr << "MythNews: Failed to get sites list area." << std::endl;
+        exit(-1);
+    }
+        
+    connect(m_UISites, SIGNAL(itemSelected(int)),
+            SLOT(slotSiteSelected(int)));
 
-    setPaletteBackgroundPixmap(pix);
+    container = m_Theme->GetSet("articles");
+    if (!container) {
+        std::cerr << "MythNews: Failed to get articles container." << std::endl;
+        exit(-1);
+    }
+
+    m_UIArticles = (UIListBtnType*)container->GetType("articleslist");
+    if (!m_UIArticles) {
+        std::cerr << "MythNews: Failed to get articles list area." << std::endl;
+        exit(-1);
+    }
+    
+    connect(m_UIArticles, SIGNAL(itemSelected(int)),
+            SLOT(slotArticleSelected(int)));
+    
+    m_UISites->SetActive(true);
+    m_UIArticles->SetActive(false);
 }
+
 
 void MythNews::paintEvent(QPaintEvent *e)
 {
     QRect r = e->rect();
 
-    if (r.intersects(m_TopRect))
-        updateTopView();
-    if (r.intersects(m_MidRect))
-        updateMidView();
-    if (r.intersects(m_BotRect))
-            updateBotView();
+    if (r.intersects(m_SitesRect))
+        updateSitesView();
+    if (r.intersects(m_ArticlesRect))
+        updateArticlesView();
+    if (r.intersects(m_InfoRect))
+        updateInfoView();
 }
 
 
-void MythNews::updateTopView()
+void MythNews::updateSitesView()
 {
-    QPixmap pix(m_TopRect.size());
-    pix.fill(this, m_TopRect.topLeft());
+    QPixmap pix(m_SitesRect.size());
+    pix.fill(this, m_SitesRect.topLeft());
     QPainter p(&pix);
 
-    LayerSet* container = m_Theme->GetSet("news_info");
+    LayerSet* container = m_Theme->GetSet("sites");
+    if (container) {
+        container->Draw(&p, 0, 0);
+        container->Draw(&p, 1, 0);
+        container->Draw(&p, 2, 0);
+        container->Draw(&p, 3, 0);
+        container->Draw(&p, 4, 0);
+        container->Draw(&p, 5, 0);
+        container->Draw(&p, 6, 0);
+        container->Draw(&p, 7, 0);
+        container->Draw(&p, 8, 0);
+    }
+    p.end();
+
+    bitBlt(this, m_SitesRect.left(), m_SitesRect.top(),
+           &pix, 0, 0, -1, -1, Qt::CopyROP);
+}
+
+void MythNews::updateArticlesView()
+{
+    QPixmap pix(m_ArticlesRect.size());
+    pix.fill(this, m_ArticlesRect.topLeft());
+    QPainter p(&pix);
+
+    LayerSet* container = m_Theme->GetSet("articles");
+    if (container) {
+        container->Draw(&p, 0, 0);
+        container->Draw(&p, 1, 0);
+        container->Draw(&p, 2, 0);
+        container->Draw(&p, 3, 0);
+        container->Draw(&p, 4, 0);
+        container->Draw(&p, 5, 0);
+        container->Draw(&p, 6, 0);
+        container->Draw(&p, 7, 0);
+        container->Draw(&p, 8, 0);
+    }
+    p.end();
+
+    bitBlt(this, m_ArticlesRect.left(), m_ArticlesRect.top(),
+           &pix, 0, 0, -1, -1, Qt::CopyROP);
+}
+
+void MythNews::updateInfoView()
+{
+    QPixmap pix(m_InfoRect.size());
+    pix.fill(this, m_InfoRect.topLeft());
+    QPainter p(&pix);
+
+    LayerSet* container = m_Theme->GetSet("info");
     if (container)
     {
-
-        NewsSite    *site     = m_NewsSites.at(m_CurSite);
+        NewsSite    *site     = m_NewsSites.at(m_UISites->GetItemCurrent());
         NewsArticle *article  = 0;
-        if (site)
-            article = site->articleList().at(m_CurArticle);
+        if (site) {
+            article = site->articleList().at(m_UIArticles->GetItemCurrent());
+        }
 
         if (m_InColumn == 1) {
 
@@ -276,195 +313,9 @@ void MythNews::updateTopView()
     p.end();
 
 
-    bitBlt(this, m_TopRect.left(), m_TopRect.top(),
+    bitBlt(this, m_InfoRect.left(), m_InfoRect.top(),
            &pix, 0, 0, -1, -1, Qt::CopyROP);
-}
-
-void MythNews::updateMidView()
-{
-    QPixmap pix(m_MidRect.size());
-    pix.fill(this, m_MidRect.topLeft());
-    QPainter p(&pix);
-
-    LayerSet* container = m_Theme->GetSet("selector");
-
-    if (container)
-    {
-        UIListType *ltype =
-            (UIListType *)container->GetType("sites");
-        if (ltype)
-        {
-            if (m_InColumn == 0)
-            {
-                ltype->SetItemCurrent((int)(ltype->GetItems() / 2));
-                ltype->SetActive(true);
-            }
-            else
-            {
-                ltype->SetItemCurrent(-1);
-                ltype->SetActive(false);
-            }
-        }
-
-        ltype = (UIListType *)container->GetType("info");
-        if (ltype)
-        {
-            if (m_InColumn == 1)
-            {
-                ltype->SetItemCurrent((int)(ltype->GetItems() / 2));
-                ltype->SetActive(true);
-            }
-            else
-            {
-                ltype->SetItemCurrent(-1);
-                ltype->SetActive(false);
-            }
-        }
-
-        container->Draw(&p, 0, 0);
-        container->Draw(&p, 1, 0);
-        container->Draw(&p, 2, 0);
-        container->Draw(&p, 3, 0);
-        container->Draw(&p, 4, 0);
-        container->Draw(&p, 5, 0);
-        container->Draw(&p, 6, 0);
-        container->Draw(&p, 7, 0);
-        container->Draw(&p, 8, 0);
-    }
-
-    p.end();
-
-
-    bitBlt(this, m_MidRect.left(), m_MidRect.top(),
-           &pix, 0, 0, -1, -1, Qt::CopyROP);
-}
-
-void MythNews::updateBotView()
-{
-    QPixmap pix(m_BotRect.size());
-    pix.fill(this, m_BotRect.topLeft());
-    QPainter p(&pix);
-
-    LayerSet *container = m_Theme->GetSet("messages");
-    if (container)
-    {
-
-        UITextType *ttype =
-            (UITextType *)container->GetType("loading");
-        if (ttype) {
-            if (m_RetrievingNews)
-                ttype->SetText(QString("Updating..."));
-            else
-                ttype->SetText(QString("Ready"));
-        }
-
-        container->Draw(&p, 0, 0);
-        container->Draw(&p, 1, 0);
-        container->Draw(&p, 2, 0);
-        container->Draw(&p, 3, 0);
-        container->Draw(&p, 4, 0);
-        container->Draw(&p, 5, 0);
-        container->Draw(&p, 6, 0);
-        container->Draw(&p, 7, 0);
-        container->Draw(&p, 8, 0);
-    }
-
-    p.end();
-
-    bitBlt(this, m_BotRect.left(), m_BotRect.top(),
-           &pix, 0, 0, -1, -1, Qt::CopyROP);
-}
-
-
-void MythNews::showSitesList()
-{
-    int curLabel = 0;
-    int t = 0;
-    int count = 0;
-
-    LayerSet *container = m_Theme->GetSet("selector");
-    if (container) {
-
-        UIListType *ltype =
-            (UIListType *)container->GetType("sites");
-        if (ltype)
-        {
-            ltype->ResetList();
-
-            count = QMAX(m_NewsSites.count(), m_ItemsPerListing);
-
-            for (int i = (m_CurSite - ((m_ItemsPerListing - 1) / 2));
-                 i < int(m_CurSite + ((m_ItemsPerListing + 1) / 2)); i++)
-            {
-                t = i;
-
-                 if (i < 0)
-                     t = i + count;
-                 if (i >= count)
-                     t = i - count;
-                 if (t < 0) {
-                     cerr << "MythNews: -1 Error in showSitesList()\n";
-                     exit(-1);
-                 }
-
-                NewsSite* item = m_NewsSites.at(t);
-                if (item)
-                    ltype->SetItemText(curLabel, " " + item->name() + " ");
-                else
-                    ltype->SetItemText(curLabel, "");
-                curLabel++;
-            }
-
-        }
-
-    }
-
-}
-
-void MythNews::showArticlesList()
-{
-    int curLabel = 0;
-    int t = 0;
-    int count = 0;
-
-    LayerSet *container = m_Theme->GetSet("selector");
-    if (container) {
-
-        UIListType *ltype =
-            (UIListType *)container->GetType("info");
-        if (ltype)
-        {
-            ltype->ResetList();
-
-            NewsSite *site = m_NewsSites.at(m_CurSite);
-            if (!site) return;
-
-            count = QMAX(site->articleList().count(), m_ItemsPerListing);
-
-            for (int i = (m_CurArticle - ((m_ItemsPerListing - 1) / 2));
-                 i < int(m_CurArticle + ((m_ItemsPerListing + 1) / 2)); i++)
-            {
-                t = i;
-
-                if (i < 0)
-                    t = i + count;
-                if (i >= count)
-                    t = i - count;
-                if (t < 0) {
-                    cerr << "MythNews: -1 Error in showArticlesList()\n";
-                    exit(-1);
-                }
-
-                NewsArticle* item = site->articleList().at(t);
-                if (item)
-                    ltype->SetItemText(curLabel, " " + item->title() + " ");
-                else
-                    ltype->SetItemText(curLabel, "");
-                curLabel++;
-            }
-
-        }
-    }
+    
 }
 
 void MythNews::keyPressEvent(QKeyEvent *e)
@@ -490,12 +341,9 @@ void MythNews::keyPressEvent(QKeyEvent *e)
             cursorRight();
         else if (action == "RETRIEVENEWS")
             slotRetrieveNews();
-        else if (action == "FORCERETRIEVE")
-            forceRetrieveNews();
         else if (action == "CANCEL")
         {
-            if (m_RetrievingNews)
-                cancelRetrieve();
+            cancelRetrieve();
         }
         else
             handled = false;
@@ -508,53 +356,21 @@ void MythNews::keyPressEvent(QKeyEvent *e)
 void MythNews::cursorUp()
 {
     if (m_InColumn == 0) {
-
-        m_CurSite--;
-        if (m_CurSite == -1)
-            m_CurSite = m_NewsSites.count() - 1;
-        m_CurArticle = 0;
-
+        m_UISites->MoveUp();
     }
     else {
-
-        m_CurArticle--;
-        if (m_CurArticle == -1) {
-            NewsSite *item = m_NewsSites.at(m_CurSite);
-            if (item)
-                m_CurArticle = item->articleList().count() - 1;
-        }
+        m_UIArticles->MoveUp();
     }
-
-    showSitesList();
-    showArticlesList();
-
-    update(m_MidRect);
-    update(m_TopRect);
 }
 
 void MythNews::cursorDown()
 {
     if (m_InColumn == 0) {
-
-        m_CurSite++;
-        if (m_CurSite >= (int) m_NewsSites.count())
-            m_CurSite = 0;
-        m_CurArticle = 0;
+        m_UISites->MoveDown();
     }
     else {
-
-        m_CurArticle++;
-        NewsSite *item = m_NewsSites.at(m_CurSite);
-        if (item && m_CurArticle >= (int) item->articleList().count())
-            m_CurArticle = 0;
+        m_UIArticles->MoveDown();
     }
-
-
-    showSitesList();
-    showArticlesList();
-
-    update(m_MidRect);
-    update(m_TopRect);
 }
 
 void MythNews::cursorRight()
@@ -562,12 +378,13 @@ void MythNews::cursorRight()
     if (m_InColumn == 1) return;
 
     m_InColumn++;
-    m_CurArticle = 0;
 
-    showArticlesList();
+    m_UISites->SetActive(false);
+    m_UIArticles->SetActive(true);
 
-    update(m_MidRect);
-    update(m_TopRect);
+    update(m_SitesRect);
+    update(m_ArticlesRect);
+    update(m_InfoRect);
 }
 
 void MythNews::cursorLeft()
@@ -575,46 +392,13 @@ void MythNews::cursorLeft()
     if (m_InColumn == 0) return;
 
     m_InColumn--;
-    m_CurArticle = 0;
 
-    showSitesList();
-    showArticlesList();
+    m_UISites->SetActive(true);
+    m_UIArticles->SetActive(false);
 
-    update(m_MidRect);
-    update(m_TopRect);
-}
-
-void MythNews::forceRetrieveNews()
-{
-    if (m_NewsSites.count() == 0)
-        return;
-
-    cancelRetrieve();
-
-    m_RetrieveTimer->stop();
-
-    for (unsigned int i=0; i<m_NewsSites.count(); i++) {
-        NewsSite* site = m_NewsSites.at(i);
-        if (site) {
-            site->stop();
-            connect(site, SIGNAL(finished(const NewsSite*)),
-                    this, SLOT(slotNewsRetrieved(const NewsSite*)));
-        }
-    }
-
-    m_RetrievingNews = true;
-    m_RetrievedSites = 0;
-
-    update(m_BotRect);
-
-    for (unsigned int i=0; i<m_NewsSites.count(); i++) {
-        NewsSite* site = m_NewsSites.at(i);
-        if (site)
-            site->retrieve();
-    }
-
-
-    m_RetrieveTimer->start(m_TimerTimeout, false);
+    update(m_SitesRect);
+    update(m_ArticlesRect);
+    update(m_InfoRect);
 }
 
 void MythNews::slotRetrieveNews()
@@ -630,95 +414,83 @@ void MythNews::slotRetrieveNews()
         NewsSite* site = m_NewsSites.at(i);
         if (site) {
             site->stop();
-            connect(site, SIGNAL(finished(const NewsSite*)),
-                    this, SLOT(slotNewsRetrieved(const NewsSite*)));
+            connect(site, SIGNAL(finished(NewsSite*)),
+                    this, SLOT(slotNewsRetrieved(NewsSite*)));
         }
     }
-
-    m_RetrievingNews = true;
-    m_RetrievedSites = 0;
 
     for (unsigned int i=0; i<m_NewsSites.count(); i++) {
         NewsSite* site = m_NewsSites.at(i);
         if (site && site->timeSinceLastUpdate() > m_UpdateFreq)
             site->retrieve();
         else
-            m_RetrievedSites++;
-    }
-
-    if (m_RetrievedSites >= m_NewsSites.count()) {
-        processAndShowNews();
-    }
-    else {
-        update(m_BotRect);
+            processAndShowNews(site);
     }
 
     m_RetrieveTimer->start(m_TimerTimeout, false);
 }
 
-void MythNews::slotNewsRetrieved(const NewsSite* site)
+void MythNews::slotNewsRetrieved(NewsSite* site)
 {
-    m_RetrievedSites++;
-
-    /*
-      LayerSet *container = m_Theme->GetSet("messages");
-      if (container)
-      {
-      UITextType *ttype =
-      (UITextType *)container->GetType("retrieved");
-      if (ttype) {
-      if (item->successful())
-      ttype->SetText(QString("[Retrieved News from ")
-      + item->name() + QString("]"));
-      else
-      ttype->SetText(QString("[Failed to Retrieve News from ")
-      + item->name() + QString("]"));
-      }
-      }
-    */
-
     unsigned int updated = site->lastUpdated().toTime_t();
-
 
     QSqlQuery query("UPDATE newssites SET updated=" +
                     QString::number(updated) +
                     " WHERE name='" +
-                    site->name() + "'",  m_db);
+                    site->name() + "'",  m_DB);
     if (!query.isActive()) {
         cerr << "MythNews: Error in updating time in DB" << endl;
     }
 
-
-    if (m_RetrievedSites >= m_NewsSites.count()) {
-        processAndShowNews();
-    }
-    else {
-        update(m_BotRect);
-    }
+    processAndShowNews(site);
 }
 
 void MythNews::cancelRetrieve()
 {
-    for (NewsSite* item = m_NewsSites.first(); item;
-         item = m_NewsSites.next()) {
-        item->stop();
+    for (NewsSite* site = m_NewsSites.first(); site;
+         site = m_NewsSites.next()) {
+        site->stop();
+        processAndShowNews(site);
     }
-
-    processAndShowNews();
 }
 
-void MythNews::processAndShowNews()
+void MythNews::processAndShowNews(NewsSite* site)
 {
-    m_RetrievingNews = false;
+    if (!site) return;
 
-    // Reset current article number
-    m_CurArticle = 0;
-
-    for (NewsSite* item = m_NewsSites.first(); item;
-         item = m_NewsSites.next()) {
-        item->process();
+    site->process();
+    
+    if (m_NewsSites.find(site) == m_UISites->GetItemCurrent()) {
+        m_UIArticles->Reset();
+        for (unsigned int i=0; i<site->articleList().count(); i++) {
+            NewsArticle* article = site->articleList().at(i);
+            m_UIArticles->AddItem(article->title());
+        }
+        update(m_ArticlesRect);
+        update(m_InfoRect);
     }
-    showSitesList();
-    showArticlesList();
-    update();
 }
+
+void MythNews::slotSiteSelected(int itemPos)
+{
+    m_UIArticles->Reset();
+
+    NewsSite *site = m_NewsSites.at(itemPos);
+    if (!site) return;
+
+    for (unsigned int i=0; i<site->articleList().count(); i++) {
+        NewsArticle* article = site->articleList().at(i);
+        m_UIArticles->AddItem(article->title());
+    }
+
+    update(m_SitesRect);
+    update(m_ArticlesRect);
+    update(m_InfoRect);
+}
+
+void MythNews::slotArticleSelected(int)
+{
+    update(m_ArticlesRect);
+    update(m_InfoRect);
+}
+

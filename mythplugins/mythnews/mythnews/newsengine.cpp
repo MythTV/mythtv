@@ -67,7 +67,7 @@ NewsSite::NewsSite(const QString& name,
     m_url     = url;
     m_name    = name;
     m_updated = updated;
-    m_error   = NewsSite::Success;
+    m_state   = NewsSite::Success;
 
     char *home = getenv("HOME");
     m_destDir  = QString(home) + "/.mythtv";
@@ -140,7 +140,7 @@ void NewsSite::retrieve()
     connect(m_urlOp, SIGNAL(finished(QNetworkOperation*)),
             this, SLOT(slotFinished(QNetworkOperation*)));
 
-    m_error = NewsSite::RetrieveFailed;
+    m_state = NewsSite::Retrieving;
     m_data.resize(0);
     m_articleList.clear();
     m_urlOp->get(m_url);
@@ -159,7 +159,7 @@ void NewsSite::stop()
 
 bool NewsSite::successful() const
 {
-    return (m_error == NewsSite::Success);
+    return (m_state == NewsSite::Success);
 }
 
 QString NewsSite::errorMsg() const
@@ -178,15 +178,15 @@ void NewsSite::slotFinished(QNetworkOperation* op)
             stream.writeRawBytes(m_data.data(), m_data.size());
             xmlFile.close();
             m_updated = QDateTime::currentDateTime();
-            m_error = NewsSite::Success;
+            m_state = NewsSite::Success;
         }
         else {
-            m_error = NewsSite::WriteFailed;
+            m_state = NewsSite::WriteFailed;
             cerr << "MythNews: NewsEngine: Write failed" << endl;
         }
     }
     else {
-        m_error = NewsSite::RetrieveFailed;
+        m_state = NewsSite::RetrieveFailed;
     }
 
     stop();
@@ -198,7 +198,7 @@ void NewsSite::process()
 {
     m_articleList.clear();
 
-    if (m_error == RetrieveFailed)
+    if (m_state == RetrieveFailed)
         m_errorString = "Retrieve Failed. ";
     else
         m_errorString = "";
@@ -226,7 +226,7 @@ void NewsSite::process()
     }
 
 
-    if (m_error == RetrieveFailed)
+    if (m_state == RetrieveFailed)
         m_errorString += "Showing Cached News";
 
     QDomNode channelNode = domDoc.documentElement().namedItem(QString::fromLatin1("channel"));

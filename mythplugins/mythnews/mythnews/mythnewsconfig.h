@@ -26,39 +26,25 @@
 
 #include <mythtv/uitypes.h>
 #include <mythtv/xmlparse.h>
-#include <mythtv/oldsettings.h>
-#include <mythtv/mythwidgets.h>
 #include <mythtv/mythdialogs.h>
 
 class QTimer;
+class QPixmap;
+
 class MythNewsConfigPriv;
 class NewsSiteItem;
-class CMythListBox;
+class UIListBtnType;
 
-class CPopupBox : public QDialog
+class MythNewsSpinBox : public MythSpinBox
 {
-    Q_OBJECT
-
 public:
+    
+    MythNewsSpinBox(QWidget* parent = 0, const char* widgetName = 0);
 
-    CPopupBox(QWidget *parent);
-    ~CPopupBox();
+protected:
 
-signals:
-
-    void finished(const QString& name,
-                  const QString& url,
-                  const QString& ico);
-
-private slots:
-
-    void slotOkClicked();
-
-private:
-
-    QLineEdit* m_nameEdit;
-    QLineEdit* m_urlEdit;
-    QLineEdit* m_icoEdit;
+    virtual bool eventFilter(QObject* o, QEvent* e);
+    
 };
 
 class MythNewsConfig : public MythDialog
@@ -74,9 +60,22 @@ public:
 
 private:
 
-    void populateSites();
-    void setupView();
+    void paintEvent(QPaintEvent *e);
+    void keyPressEvent(QKeyEvent *e);
 
+    void populateSites();
+    void loadTheme();
+
+    void updateSelector();
+    void updateSites();
+    void updateFreq();
+    void updateBot();
+    
+    void cursorUp();
+    void cursorDown();
+    void cursorLeft();
+    void cursorRight();
+    
     bool findInDB(const QString& name);
     bool insertInDB(NewsSiteItem* site);
     bool removeFromDB(NewsSiteItem* site);
@@ -84,21 +83,31 @@ private:
     QSqlDatabase       *m_db;
     MythNewsConfigPriv *m_priv;
 
-    MythListView       *m_leftView;
-    CMythListBox       *m_rightView;
-    MythSpinBox        *m_updateFreqBox;
+    XMLParse           *m_Theme;
+    uint                m_Context;
+    uint                m_InColumn;
+
+    UIListBtnType      *m_UISelector;
+    UIListBtnType      *m_UICategory;
+    UIListBtnType      *m_UISite;
+
+    MythNewsSpinBox    *m_SpinBox;
+
+    QRect               m_SelectorRect;
+    QRect               m_SiteRect;
+    QRect               m_FreqRect;
+    QRect               m_BotRect;
+
     QTimer             *m_updateFreqTimer;
+    int                 m_updateFreq;
 
 private slots:
 
-    void slotSitesViewExecuted(QListViewItem *item);
-    void slotSelSitesViewExecuted(QListBoxItem *item);
-    void slotAddCustomSite();
-    void slotCustomSiteAdded(const QString& name,
-                             const QString& url,
-                             const QString& ico);
     void slotUpdateFreqChanged();
     void slotUpdateFreqTimerTimeout();
+    void slotContextChanged(int);
+    void slotCategoryChanged(int);
+    void slotSiteChecked(int,bool);
 };
 
 #endif /* MYTHNEWSCONFIG_H */

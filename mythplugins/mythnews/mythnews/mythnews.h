@@ -23,18 +23,15 @@
 #define MYTHNEWS_H
 
 #include <qsqldatabase.h>
-#include <qwidget.h>
-#include <qdatetime.h>
 
 #include <mythtv/uitypes.h>
 #include <mythtv/xmlparse.h>
-#include <mythtv/oldsettings.h>
-#include <mythtv/mythwidgets.h>
 #include <mythtv/mythdialogs.h>
 
 #include "newsengine.h"
 
 class QTimer;
+class UIListBtnType;
 
 class MythNews : public MythDialog
 {
@@ -48,50 +45,46 @@ public:
 
 private:
 
-    void LoadWindow(QDomElement &element);
-    void updateBackground();
+    void loadTheme();
+    void loadWindow(QDomElement &element);
     void paintEvent(QPaintEvent *e);
-    void updateTopView();
-    void updateMidView();
-    void updateBotView();
 
+    void updateSitesView();
+    void updateArticlesView();
+    void updateInfoView();
+    
     void keyPressEvent(QKeyEvent *e);
     void cursorUp();
     void cursorDown();
     void cursorRight();
     void cursorLeft();
 
-    void showSitesList();
-    void showArticlesList();
-
-    void forceRetrieveNews();
     void cancelRetrieve();
-    void processAndShowNews();
+    void processAndShowNews(NewsSite *site);
 
-    QSqlDatabase *m_db;
-    XMLParse     *m_Theme;
+    QSqlDatabase  *m_DB;
+    XMLParse      *m_Theme;
 
-    QRect        m_TopRect;
-    QRect        m_MidRect;
-    QRect        m_BotRect;
+    UIListBtnType *m_UISites;
+    UIListBtnType *m_UIArticles;
+    QRect          m_SitesRect;
+    QRect          m_ArticlesRect;
+    QRect          m_InfoRect;
+    unsigned int   m_InColumn;
 
-    int          m_CurSite;
-    int          m_CurArticle;
-    unsigned int m_ItemsPerListing;
-    unsigned int m_InColumn;
-
-
-    bool           m_RetrievingNews;
-    unsigned int   m_RetrievedSites;
     NewsSite::List m_NewsSites;
-    unsigned int   m_UpdateFreq;
+
     QTimer        *m_RetrieveTimer;
     int            m_TimerTimeout;
+    unsigned int   m_UpdateFreq;
 
 private slots:
 
     void slotRetrieveNews();
-    void slotNewsRetrieved(const NewsSite* site);
+    void slotNewsRetrieved(NewsSite* site);
+
+    void slotSiteSelected(int itemPos);
+    void slotArticleSelected(int itemPos);
 };
 
 #endif /* MYTHNEWS_H */

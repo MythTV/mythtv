@@ -62,8 +62,9 @@ class NewsSite : public QObject
 
 public:
 
-    enum Error {
-        RetrieveFailed = 0,
+    enum State {
+        Retrieving = 0,
+        RetrieveFailed,
         WriteFailed,
         Success
     };
@@ -99,7 +100,7 @@ private:
     QDateTime  m_updated;
     QString    m_destDir;
     QByteArray m_data;
-    Error      m_error;
+    State      m_state;
     QString    m_errorString;
 
     NewsArticle::List m_articleList;
@@ -107,7 +108,7 @@ private:
 
 signals:
 
-    void finished(const NewsSite* item);
+    void finished(NewsSite* item);
 
 private slots:
 
