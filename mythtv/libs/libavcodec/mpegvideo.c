@@ -943,7 +943,7 @@ int MPV_frame_start(MpegEncContext *s, AVCodecContext *avctx)
         if(!s->encoding){
             for(i=0; i<MAX_PICTURE_COUNT; i++){
                 if(s->picture[i].data[0] && s->picture[i].data[0] != s->next_picture.data[0] && s->picture[i].reference){
-                    //fprintf(stderr, "releasing zombie picture\n");
+                    fprintf(stderr, "releasing zombie picture\n");
                     avctx->release_buffer(avctx, (AVFrame*)&s->picture[i]);                
                 }
             }

@@ -72,8 +72,6 @@ class NuppelVideoPlayer
     void Unpause(void); 
     bool GetPause(void);
    
-    void AdvanceOneFrame(void) { advancedecoder = true; } 
- 
     void FastForward(float seconds);
     void Rewind(float seconds);
 
@@ -313,9 +311,7 @@ class NuppelVideoPlayer
     bool livetv;
     bool watchingrecording;
     bool editmode;
-    bool advancevideo;
     bool resetvideo;
-    bool advancedecoder;
 
     map<long long, long long> *positionMap;
     long long lastKey;

@@ -24,7 +24,7 @@ SOURCES += jfdctfst.c mpegaudio.c ac3enc.c mjpeg.c resample.c dsputil.c
 SOURCES += motion_est.c imgconvert.c imgresample.c msmpeg4.c mpeg12.c
 SOURCES += h263dec.c svq1.c rv10.c mpegaudiodec.c pcm.c simple_idct.c
 SOURCES += ratecontrol.c adpcm.c eval.c jfdctint.c dv.c error_resilience.c
-SOURCES += wmadec.c fft.c mdct.c mace.c huffyuv.c mythav.c opts.c cyuv.c
+SOURCES += wmadec.c fft.c mdct.c mace.c huffyuv.c opts.c cyuv.c
 
 contains( CONFIG_AC3, yes ) {
     SOURCES += a52dec.c

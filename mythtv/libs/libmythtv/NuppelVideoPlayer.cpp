@@ -26,7 +26,6 @@ using namespace std;
 #include "mythcontext.h"
 
 extern "C" {
-#include "../libavcodec/mythav.h"
 #include "../libvbitext/vbi.h"
 }
 
@@ -114,7 +113,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     audio_buffer_unused = 0;
 
     editmode = false;
-    advancevideo = resetvideo = advancedecoder = false;
+    resetvideo = false;
 
     totalLength = 0;
     totalFrames = 0;
@@ -127,6 +126,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     mpa_pic = NULL;
     osdtheme = "none";
     directrendering = false;
+    directbuf = NULL;
 
     disablevideo = disableaudio = false;
 
@@ -231,9 +231,14 @@ void NuppelVideoPlayer::Pause(void)
 {
     actuallypaused = false;
 
-    PauseAudio();
-    PauseVideo();
+    // pause the decoder thread first, as it's usually waiting for the video
+    // thread.  Make sure that it's done pausing before continuing on.
     paused = true;
+    while (!actuallypaused)
+        usleep(50);
+
+    PauseVideo();
+    PauseAudio();
 }
 
 void NuppelVideoPlayer::Unpause(void)
@@ -261,6 +266,9 @@ void NuppelVideoPlayer::PauseVideo(void)
 {
     video_actually_paused = false;
     pausevideo = true;
+
+    while (!video_actually_paused)
+        usleep(50);
 }
 
 void NuppelVideoPlayer::UnpauseVideo(void)
@@ -1186,7 +1194,7 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
             timecodes[wpos] = frameheader.timecode;
 
             vpos = wpos;
-            wpos = (wpos+1) % MAXVBUFFER;
+            wpos = (wpos + 1) % MAXVBUFFER;
 
             pthread_mutex_unlock(&video_buflock);
 
@@ -1602,19 +1610,11 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
                 pause_rpos = rpos;
                 memcpy(pause_buf, vbuffer[pause_rpos], video_size);
             }
-
-            if (advancevideo)
-            {
-                rpos = (rpos + 1) % MAXVBUFFER;
-                pause_rpos = rpos;
-                memcpy(pause_buf, vbuffer[pause_rpos], video_size);
-                advancevideo = false;
-            }
             if (resetvideo)
             {
-                resetvideo = false;
-                pause_rpos = 0;
+                pause_rpos = vpos;
                 memcpy(pause_buf, vbuffer[pause_rpos], video_size);
+                resetvideo = false;
             }
 
             video_actually_paused = true;
@@ -2026,6 +2026,7 @@ void NuppelVideoPlayer::StartPlaying(void)
         for (int i = 0; i < MAXTBUFFER; i++)
             tbuffer[i] = new unsigned char[text_size];
 
+        wpos = 0;
         ClearAfterSeek();
     }
 
@@ -2058,6 +2059,9 @@ void NuppelVideoPlayer::StartPlaying(void)
     {
 	if (resetplaying)
 	{
+            if (mpa_codec)
+                avcodec_flush_buffers(mpa_ctx);
+
             ClearAfterSeek();
 
 	    framesPlayed = 0;
@@ -2084,26 +2088,8 @@ void NuppelVideoPlayer::StartPlaying(void)
 	        }
                 pausecheck = 0;
             }
-            if (advancedecoder)
-            {
-                if (vbuffer_numvalid() <= 1)
-                {
-                    fftime = 1;
-                    DoFastForward();
 
-                    GetFrame(audiofd <= 0);
-                    resetvideo = true;
-                    while (resetvideo)
-                        usleep(50);
- 
-                    fftime = 0;
-                }
-                else
-                    advancevideo = true;
-                advancedecoder = false;
-                continue;
-            }
-            else if (rewindtime > 0)
+            if (rewindtime > 0)
             {   
                 DoRewind();
                 
@@ -2140,9 +2126,6 @@ void NuppelVideoPlayer::StartPlaying(void)
 	{
             PauseVideo();
 
-            while (!GetVideoPause())
-                usleep(50);
-
             if (rewindtime >= 1)
                 DoRewind();
 
@@ -2155,8 +2138,6 @@ void NuppelVideoPlayer::StartPlaying(void)
             fftime = CalcMaxFFTime(fftime);
 
             PauseVideo();
-            while (!GetVideoPause())
-                usleep(50);
 
             if (fftime >= 5)
                 DoFastForward();
@@ -2170,9 +2151,6 @@ void NuppelVideoPlayer::StartPlaying(void)
         if (skipcommercials)
         {
             PauseVideo();
-
-            while (!GetVideoPause())
-                usleep(50);
 
             DoSkipCommercials();
             UnpauseVideo();
@@ -2306,7 +2284,7 @@ bool NuppelVideoPlayer::DoRewind(void)
 
     if (mpa_codec)
         avcodec_flush_buffers(mpa_ctx);
- 
+
     while (normalframes > 0)
     {
         fileend = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader,
@@ -2344,16 +2322,6 @@ bool NuppelVideoPlayer::DoRewind(void)
             wpos = (wpos + 1) % MAXVBUFFER;
             pthread_mutex_unlock(&video_buflock);
         }
-    }
-
-    if (directrendering)
-    {
-        int pos = wpos - 1;
-        if (pos < 0)
-            pos = MAXVBUFFER - 1;
-
-        memcpy(buf, vbuffer[pos], video_size);
-        mythav_set_last_picture(mpa_ctx, buf, video_width, video_height);
     }
 
     ClearAfterSeek();
@@ -2412,22 +2380,26 @@ bool NuppelVideoPlayer::DoFastForward(void)
 
     long long keyPos = -1;
 
-    if (positionMap->find(desiredKey / keyframedist) != positionMap->end() &&
-        desiredKey != lastKey)
+    if (desiredKey != lastKey)
     {
-        keyPos = (*positionMap)[desiredKey / keyframedist];
-    }
-    else if (livetv || (watchingrecording && nvr_enc && 
-                        nvr_enc->IsValidRecorder()))
-    {
-        keyPos = nvr_enc->GetKeyframePosition(desiredKey / keyframedist);
-        for (int i = lastKey / keyframedist; i < desiredKey / keyframedist; 
-             i++)
+        if (positionMap->find(desiredKey / keyframedist) != positionMap->end())
         {
-            if (positionMap->find(i) == positionMap->end())
-                (*positionMap)[i] = nvr_enc->GetKeyframePosition(i);
+            keyPos = (*positionMap)[desiredKey / keyframedist];
+        }
+        else if (livetv || (watchingrecording && nvr_enc && 
+                            nvr_enc->IsValidRecorder()))
+        {
+            keyPos = nvr_enc->GetKeyframePosition(desiredKey / keyframedist);
+            for (int i = lastKey / keyframedist; i < desiredKey / keyframedist; 
+                 i++)
+            {
+                if (positionMap->find(i) == positionMap->end())
+                    (*positionMap)[i] = nvr_enc->GetKeyframePosition(i);
+            }
         }
     }
+
+    bool needflush = false;
 
     if (keyPos != -1)
     {
@@ -2436,11 +2408,13 @@ bool NuppelVideoPlayer::DoFastForward(void)
 
         ringBuffer->Seek(diff, SEEK_CUR);
         framesPlayed = lastKey;
+        needflush = true;
     }
     else  
     {
         while (lastKey < desiredKey && !fileend)
         {
+            needflush = true;
             fileend = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader,
                                                        FRAMEHEADERSIZE));
 
@@ -2475,7 +2449,7 @@ bool NuppelVideoPlayer::DoFastForward(void)
     if (!exactseeks)
         normalframes = 0;
 
-    if (mpa_codec && desiredKey != lastKey)
+    if (mpa_codec && needflush)
         avcodec_flush_buffers(mpa_ctx);
 
     while (normalframes > 0 && !fileend)
@@ -2514,16 +2488,6 @@ bool NuppelVideoPlayer::DoFastForward(void)
             wpos = (wpos + 1) % MAXVBUFFER;
             pthread_mutex_unlock(&video_buflock);
         }
-    }
-
-    if (directrendering)
-    {
-        int pos = wpos - 1;
-        if (pos < 0)
-            pos = MAXVBUFFER - 1;
-
-        memcpy(buf, vbuffer[pos], video_size);
-        mythav_set_last_picture(mpa_ctx, buf, video_width, video_height);
     }
 
     ClearAfterSeek();
@@ -2581,9 +2545,9 @@ void NuppelVideoPlayer::ClearAfterSeek(void)
     {
         timecodes[i] = 0;
     }
-    vpos = 0;
-    wpos = 0;
-    rpos = 0;
+    vpos = wpos;
+    rpos = wpos;
+
     for (int i = 0; i < MAXTBUFFER; i++)
     {
         txttimecodes[i] = 0;
@@ -2646,6 +2610,7 @@ bool NuppelVideoPlayer::EnableEdit(void)
     Pause();
     while (!GetPause())
         usleep(50);
+
     seekamount = keyframedist;
     seekamountpos = 4;
 
@@ -3482,9 +3447,6 @@ unsigned int NuppelVideoPlayer::GetFrameVariance(int vposition)
 void NuppelVideoPlayer::AutoCommercialSkip(void)
 {
     PauseVideo();
-
-    while (!GetVideoPause())
-        usleep(50);
 
     if (autocommercialskip == COMMERCIAL_SKIP_BLANKS)
     {
