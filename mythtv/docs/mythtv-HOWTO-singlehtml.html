@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-09-09, v2.71
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-09-11, v2.72
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -157,23 +157,24 @@ necessary.</EM>
 <LI><A NAME="toc19.6">19.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.6">Compile errors.</A>
 <LI><A NAME="toc19.7">19.7</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.7">My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.</A>
 <LI><A NAME="toc19.8">19.8</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.8">I get segfaults / MythTV isn't doing anything.</A>
-<LI><A NAME="toc19.9">19.9</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.9">MythTV makes my system crash. </A>
-<LI><A NAME="toc19.10">19.10</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.10">Troubleshooting audio. </A>
-<LI><A NAME="toc19.11">19.11</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.11">I can't see parts of the On Screen Display.</A>
-<LI><A NAME="toc19.12">19.12</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.12">The mythbackend program told me to look at this section.</A>
-<LI><A NAME="toc19.13">19.13</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.13">My remote doesn't work / works sometimes and not others / "ghost"</A>
-<LI><A NAME="toc19.14">19.14</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.14">My PVR-250 card doesn't show inputs in the setup screen.</A>
-<LI><A NAME="toc19.15">19.15</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.15">Where's my "canada-cable" entry gone to?</A>
-<LI><A NAME="toc19.16">19.16</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.16">My channels are off by one.</A>
-<LI><A NAME="toc19.17">19.17</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.17">Mythweb is showing a db_open error when I connect to it.</A>
-<LI><A NAME="toc19.18">19.18</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.18">error: can't find a register in class 'BREG' while reloading 'asm'</A>
-<LI><A NAME="toc19.19">19.19</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.19">make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
-<LI><A NAME="toc19.20">19.20</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.20">make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
-<LI><A NAME="toc19.21">19.21</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.21">My mouse pointer disappears when placed over the MythTV windows.</A>
-<LI><A NAME="toc19.22">19.22</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.22">What does "strange error flushing buffer" mean on my console?</A>
-<LI><A NAME="toc19.23">19.23</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.23">I can't change the channel when watching Live TV.</A>
-<LI><A NAME="toc19.24">19.24</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.24">Colors are wrong, people have blue faces.</A>
-<LI><A NAME="toc19.25">19.25</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.25">When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"</A>
+<LI><A NAME="toc19.9">19.9</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.9">Debugging with GDB.</A>
+<LI><A NAME="toc19.10">19.10</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.10">MythTV makes my system crash. </A>
+<LI><A NAME="toc19.11">19.11</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.11">Troubleshooting audio. </A>
+<LI><A NAME="toc19.12">19.12</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.12">I can't see parts of the On Screen Display.</A>
+<LI><A NAME="toc19.13">19.13</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.13">The mythbackend program told me to look at this section.</A>
+<LI><A NAME="toc19.14">19.14</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.14">My remote doesn't work / works sometimes and not others / "ghost"</A>
+<LI><A NAME="toc19.15">19.15</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.15">My PVR-250 card doesn't show inputs in the setup screen.</A>
+<LI><A NAME="toc19.16">19.16</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.16">Where's my "canada-cable" entry gone to?</A>
+<LI><A NAME="toc19.17">19.17</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.17">My channels are off by one.</A>
+<LI><A NAME="toc19.18">19.18</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.18">Mythweb is showing a db_open error when I connect to it.</A>
+<LI><A NAME="toc19.19">19.19</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.19">error: can't find a register in class 'BREG' while reloading 'asm'</A>
+<LI><A NAME="toc19.20">19.20</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.20">make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
+<LI><A NAME="toc19.21">19.21</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.21">make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
+<LI><A NAME="toc19.22">19.22</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.22">My mouse pointer disappears when placed over the MythTV windows.</A>
+<LI><A NAME="toc19.23">19.23</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.23">What does "strange error flushing buffer" mean on my console?</A>
+<LI><A NAME="toc19.24">19.24</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.24">I can't change the channel when watching Live TV.</A>
+<LI><A NAME="toc19.25">19.25</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.25">Colors are wrong, people have blue faces.</A>
+<LI><A NAME="toc19.26">19.26</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.26">When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"</A>
 </UL>
 <P>
 <H2><A NAME="toc20">20.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s20">Miscellaneous. </A></H2>
@@ -1420,6 +1421,7 @@ $ su
 $ tar -xjf mythtv-0.11.tar.bz2
 $ cd mythtv-0.11
 $ ./configure
+$ qmake
 $ make
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -2996,6 +2998,7 @@ it.
 <PRE>
 $ tar -xjf mythgallery-0.11.tar.bz2
 $ cd mythgallery-0.11
+$ qmake
 $ make
 # su
 # make install
@@ -3134,7 +3137,6 @@ $
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-
 <P>Download FLAC from 
 <A HREF="http://flac.sourceforge.net">http://flac.sourceforge.net</A> and install:
 <BLOCKQUOTE><CODE>
@@ -3303,6 +3305,7 @@ save and close settings.pro and proceed with compiling MythMusic.
 
 <BLOCKQUOTE><CODE>
 <PRE>
+$ qmake
 $ make
 $ su
 # make install
@@ -3448,6 +3451,7 @@ strip "$(INSTALL_ROOT)/usr/local/share/mythtv/mythweather/images/"
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cd mythweather
+$ qmake
 $ make
 $ su
 # make install
@@ -3496,6 +3500,7 @@ watch media files that are not directly supported by MythTV.</P>
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cd mythvideo
+$ qmake
 $ make
 $ su
 # make install
@@ -3553,6 +3558,7 @@ transcode, then the first command in the next example can simply be
 <BLOCKQUOTE><CODE>
 <PRE>
 $ ./configure --enable-transcode
+$ qmake
 $ make
 $ su
 # make install
@@ -3765,6 +3771,9 @@ within the control panel.</P>
 <H2><A NAME="ss19.8">19.8</A> <A HREF="#toc19.8">I get segfaults / MythTV isn't doing anything.</A>
 </H2>
 
+<H2><A NAME="ss19.9">19.9</A> <A HREF="#toc19.9">Debugging with GDB.</A>
+</H2>
+
 <P>Without details, the developers will not be able to determine if you have
 discovered a genuine code-bug,  or if the problem is with your system.  In
 order to determine what's going on, you must recompile MythTV with debugging
@@ -3838,7 +3847,7 @@ session, or by switching back to the text console by pressing CTRL-ALT-F1.
 You can now continue troubleshooting using <B>gdb</B> as detailed in the
 instructions.</P>
 
-<H2><A NAME="ss19.9">19.9</A> <A HREF="#toc19.9">MythTV makes my system crash. </A>
+<H2><A NAME="ss19.10">19.10</A> <A HREF="#toc19.10">MythTV makes my system crash. </A>
 </H2>
 
 <P>MythTV <EM>can not</EM> crash your system - it is a user-level program. 
@@ -3847,7 +3856,7 @@ issue with the drivers for your capture card or other hardware, or the CPU
 fan has fallen off/broken and your system is overheating when asked to
 perform a CPU intensive task like encoding video.</P>
 
-<H2><A NAME="Troubleshooting_Audio"></A> <A NAME="ss19.10">19.10</A> <A HREF="#toc19.10">Troubleshooting audio. </A>
+<H2><A NAME="Troubleshooting_Audio"></A> <A NAME="ss19.11">19.11</A> <A HREF="#toc19.11">Troubleshooting audio. </A>
 </H2>
 
 <P>By Bruce Markey, 
@@ -3911,14 +3920,14 @@ artsd</CODE> from the command line to stop the artsd program.</P>
 -c 1</CODE> to work with the second sound card.  The first card is #0, the
 second card is #1, etc.</P>
 
-<H2><A NAME="ss19.11">19.11</A> <A HREF="#toc19.11">I can't see parts of the On Screen Display.</A>
+<H2><A NAME="ss19.12">19.12</A> <A HREF="#toc19.12">I can't see parts of the On Screen Display.</A>
 </H2>
 
 <P>If you're a Red Hat 8.0 user, make sure that you've followed the
 instructions which tell you how to modify the Themes makefile. 
 <A HREF="#RH80_OSD_Strip">Link</A>.</P>
 
-<H2><A NAME="ss19.12">19.12</A> <A HREF="#toc19.12">The mythbackend program told me to look at this section.</A>
+<H2><A NAME="ss19.13">19.13</A> <A HREF="#toc19.13">The mythbackend program told me to look at this section.</A>
 </H2>
 
 <P>mythbackend does a check to see if your sound device is capable of full
@@ -3938,7 +3947,7 @@ and will either need to purchase a new sound card, or will need to get
 btaudio 
 <A HREF="#btaudio">operational</A>.</P>
 
-<H2><A NAME="ss19.13">19.13</A> <A HREF="#toc19.13">My remote doesn't work / works sometimes and not others / "ghost"</A>
+<H2><A NAME="ss19.14">19.14</A> <A HREF="#toc19.14">My remote doesn't work / works sometimes and not others / "ghost"</A>
 keypresses.</H2>
 
 <P>This can be due to a number of factors.  The simplest case is the
@@ -3962,16 +3971,16 @@ they run.  The following window managers are known to work correctly:</P>
 </UL>
 </P>
 
-<H2><A NAME="ss19.14">19.14</A> <A HREF="#toc19.14">My PVR-250 card doesn't show inputs in the setup screen.</A>
+<H2><A NAME="ss19.15">19.15</A> <A HREF="#toc19.15">My PVR-250 card doesn't show inputs in the setup screen.</A>
 </H2>
 
 <P>See message 
 <A HREF="http://lists.snowman.net/pipermail/mythtv-users/2003-April/002527.html">http://lists.snowman.net/pipermail/mythtv-users/2003-April/002527.html</A></P>
 
-<H2><A NAME="ss19.15">19.15</A> <A HREF="#toc19.15">Where's my "canada-cable" entry gone to?</A>
+<H2><A NAME="ss19.16">19.16</A> <A HREF="#toc19.16">Where's my "canada-cable" entry gone to?</A>
 </H2>
 
-<H2><A NAME="ss19.16">19.16</A> <A HREF="#toc19.16">My channels are off by one.</A>
+<H2><A NAME="ss19.17">19.17</A> <A HREF="#toc19.17">My channels are off by one.</A>
 </H2>
 
 <P>There is no such thing as "Canada Cable"; Canada uses the same
@@ -3984,21 +3993,21 @@ See the video4linux mailing list (
 <A HREF="https://listman.redhat.com/mailman/listinfo/video4linux-list">https://listman.redhat.com/mailman/listinfo/video4linux-list</A>) for
 more information.</P>
 
-<H2><A NAME="ss19.17">19.17</A> <A HREF="#toc19.17">Mythweb is showing a db_open error when I connect to it.</A>
+<H2><A NAME="ss19.18">19.18</A> <A HREF="#toc19.18">Mythweb is showing a db_open error when I connect to it.</A>
 </H2>
 
 <P>Find your php.ini file. Make sure you've got a line in it like this:</P>
 <P><CODE>extension=mysql.so</CODE></P>
 <P>Restart apache for it to take effect.</P>
 
-<H2><A NAME="ss19.18">19.18</A> <A HREF="#toc19.18">error: can't find a register in class 'BREG' while reloading 'asm'</A>
+<H2><A NAME="ss19.19">19.19</A> <A HREF="#toc19.19">error: can't find a register in class 'BREG' while reloading 'asm'</A>
 </H2>
 
 <P>This is due to the broken Qt that is being distributed by Suse.  To work
 around this, edit <CODE>libs/libavcodec/Makefile</CODE> and remove any
 "-fPIC" you find there and then recompile.</P>
 
-<H2><A NAME="mkspecs_error"></A> <A NAME="ss19.19">19.19</A> <A HREF="#toc19.19">make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
+<H2><A NAME="mkspecs_error"></A> <A NAME="ss19.20">19.20</A> <A HREF="#toc19.20">make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
 </H2>
 
 <P>This error happens when there's a missing link in the
@@ -4021,38 +4030,38 @@ doesn't fix the root cause of the issue, which is that your distribution
 didn't create the symlink for you when the qt3 package was installed.  The
 first choice is the better solution.</P>
 
-<H2><A NAME="ss19.20">19.20</A> <A HREF="#toc19.20">make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
+<H2><A NAME="ss19.21">19.21</A> <A HREF="#toc19.21">make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
 </H2>
 
 <P>You didn't set your <CODE>QTDIR</CODE>.  Re-read the section on 
 <A HREF="#Setting_up_paths">Setting up paths</A>.</P>
 
-<H2><A NAME="ss19.21">19.21</A> <A HREF="#toc19.21">My mouse pointer disappears when placed over the MythTV windows.</A>
+<H2><A NAME="ss19.22">19.22</A> <A HREF="#toc19.22">My mouse pointer disappears when placed over the MythTV windows.</A>
 </H2>
 
 <P>This is the intended behavior.  The MythTV interface is meant for use
 with a remote control or a keyboard.</P>
 
-<H2><A NAME="ss19.22">19.22</A> <A HREF="#toc19.22">What does "strange error flushing buffer" mean on my console?</A>
+<H2><A NAME="ss19.23">19.23</A> <A HREF="#toc19.23">What does "strange error flushing buffer" mean on my console?</A>
 </H2>
 
 <P>Nothing, really.  It's just lame (the mp3 encoder) complaining for some
 obscure reason.  This seems to be fixed in more recent versions of the
 libmp3lame library.</P>
 
-<H2><A NAME="ss19.23">19.23</A> <A HREF="#toc19.23">I can't change the channel when watching Live TV.</A>
+<H2><A NAME="ss19.24">19.24</A> <A HREF="#toc19.24">I can't change the channel when watching Live TV.</A>
 </H2>
 
 <P>Something's wrong with your program database.  Did mythfilldatabase run
 with no major errors?</P>
 
-<H2><A NAME="ss19.24">19.24</A> <A HREF="#toc19.24">Colors are wrong, people have blue faces.</A>
+<H2><A NAME="ss19.25">19.25</A> <A HREF="#toc19.25">Colors are wrong, people have blue faces.</A>
 </H2>
 
 <P>If you are using the binary nVidia drivers, make sure you're using at
 least version 1.0-2960.</P>
 
-<H2><A NAME="ss19.25">19.25</A> <A HREF="#toc19.25">When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"</A>
+<H2><A NAME="ss19.26">19.26</A> <A HREF="#toc19.26">When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"</A>
 </H2>
 
 <P>You didn't add <CODE>/usr/local/lib</CODE> to <CODE>/etc/ld.so.conf</CODE>.  See the

@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-09-09, v2.71
+  2003-09-11, v2.72
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -160,23 +160,24 @@
      19.6 Compile errors.
      19.7 My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.
      19.8 I get segfaults / MythTV isn't doing anything.
-     19.9 MythTV makes my system crash.
-     19.10 Troubleshooting audio.
-     19.11 I can't see parts of the On Screen Display.
-     19.12 The mythbackend program told me to look at this section.
-     19.13 My remote doesn't work / works sometimes and not others / "ghost" keypresses.
-     19.14 My PVR-250 card doesn't show inputs in the setup screen.
-     19.15 Where's my "canada-cable" entry gone to?
-     19.16 My channels are off by one.
-     19.17 Mythweb is showing a db_open error when I connect to it.
-     19.18 error: can't find a register in class 'BREG' while reloading 'asm'
-     19.19 make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
-     19.20 make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
-     19.21 My mouse pointer disappears when placed over the MythTV windows.
-     19.22 What does "strange error flushing buffer" mean on my console?
-     19.23 I can't change the channel when watching Live TV.
-     19.24 Colors are wrong, people have blue faces.
-     19.25 When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"
+     19.9 Debugging with GDB.
+     19.10 MythTV makes my system crash.
+     19.11 Troubleshooting audio.
+     19.12 I can't see parts of the On Screen Display.
+     19.13 The mythbackend program told me to look at this section.
+     19.14 My remote doesn't work / works sometimes and not others / "ghost" keypresses.
+     19.15 My PVR-250 card doesn't show inputs in the setup screen.
+     19.16 Where's my "canada-cable" entry gone to?
+     19.17 My channels are off by one.
+     19.18 Mythweb is showing a db_open error when I connect to it.
+     19.19 error: can't find a register in class 'BREG' while reloading 'asm'
+     19.20 make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
+     19.21 make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
+     19.22 My mouse pointer disappears when placed over the MythTV windows.
+     19.23 What does "strange error flushing buffer" mean on my console?
+     19.24 I can't change the channel when watching Live TV.
+     19.25 Colors are wrong, people have blue faces.
+     19.26 When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"
 
   20. Miscellaneous.
      20.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
@@ -209,7 +210,6 @@
 
 
   ______________________________________________________________________
-
 
   [1m1.  How to obtain this document.[0m
 
@@ -1567,6 +1567,7 @@
        $ tar -xjf mythtv-0.11.tar.bz2
        $ cd mythtv-0.11
        $ ./configure
+       $ qmake
        $ make
 
 
@@ -3261,6 +3262,7 @@
 
        $ tar -xjf mythgallery-0.11.tar.bz2
        $ cd mythgallery-0.11
+       $ qmake
        $ make
        # su
        # make install
@@ -3272,7 +3274,6 @@
   The configuration for MythGallery is accessed through the main Setup
   option in mythfrontend.  Make sure you set your pictures directory to
   wherever you're storing your photos.
-
   +o  Use the arrow keys to move around the thumbnails.
 
   +o  Use SPACE or ENTER to maximize a photo.
@@ -3447,8 +3448,6 @@
   Download cdparanoia from http://www.xiph.org/paranoia/down.html
   <http://www.xiph.org/paranoia/download/cdparanoia-III-
   alpha9.8.src.tgz>.
-
-
        $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
        $ cd cdparanoia-III-alpha9.8
        $ ./configure
@@ -3508,9 +3507,8 @@
   fftw may be obtained from http://www.fftw.org/ <http://www.fftw.org/>.
   In Mandrake 9.1 it may be installed by typing:
 
-  # urpmi libfftw2 libfftw2-devel
 
-
+       # urpmi libfftw2 libfftw2-devel
 
   OpenGL should be installed on practically all distributions.  However,
   you will need the devel module.  In Mandrake 9.1 it may be installed
@@ -3580,6 +3578,7 @@
 
 
 
+       $ qmake
        $ make
        $ su
        # make install
@@ -3625,7 +3624,6 @@
 
   The Ignore_ID3 option does not disable the code that determines the
   track length, just the portion that tries to read ID3 info.
-
 
 
   [1m15.6.  Using MythMusic.[0m
@@ -3751,6 +3749,7 @@
 
 
        $ cd mythweather
+       $ qmake
        $ make
        $ su
        # make install
@@ -3806,6 +3805,7 @@
 
 
        $ cd mythvideo
+       $ qmake
        $ make
        $ su
        # make install
@@ -3819,7 +3819,6 @@
 
        $ cd videodb
        $ mysql -u mythtv -p < metadata.sql
-
 
 
   See MythVideo's README file for additional information.
@@ -3865,6 +3864,7 @@
 
 
        $ ./configure --enable-transcode
+       $ qmake
        $ make
        $ su
        # make install
@@ -4084,6 +4084,8 @@
 
   [1m19.8.  I get segfaults / MythTV isn't doing anything.[0m
 
+  [1m19.9.  Debugging with GDB.[0m
+
   Without details, the developers will not be able to determine if you
   have discovered a genuine code-bug,  or if the problem is with your
   system.  In order to determine what's going on, you must recompile
@@ -4132,8 +4134,6 @@
        Signal        Stop      Print   Pass to program Description
        SIGPIPE       No        Yes     Yes             Broken pipe
 
-
-
   [1mgdb [22mhas a number of options, read the man page for more information.
 
   Once at the (gdb) prompt, type run to start program execution.  When
@@ -4162,7 +4162,7 @@
   instructions.
 
 
-  [1m19.9.  MythTV makes my system crash.[0m
+  [1m19.10.  MythTV makes my system crash.[0m
 
   MythTV [4mcan[24m [4mnot[24m crash your system - it is a user-level program.  If
   your system is crashing when you run MythTV, then you have some issue
@@ -4171,7 +4171,7 @@
   perform a CPU intensive task like encoding video.
 
 
-  [1m19.10.  Troubleshooting audio.[0m
+  [1m19.11.  Troubleshooting audio.[0m
 
   By Bruce Markey, mailto:bjm@lvcm.com <mailto:bjm@lvcm.com> [1mNOTE[22m:  the
   following instructions do not apply to PVR-250/350 encoders; the
@@ -4246,14 +4246,14 @@
   #0, the second card is #1, etc.
 
 
-  [1m19.11.  I can't see parts of the On Screen Display.[0m
+  [1m19.12.  I can't see parts of the On Screen Display.[0m
 
   If you're a Red Hat 8.0 user, make sure that you've followed the
   instructions which tell you how to modify the Themes makefile.
   ``Link''.
 
 
-  [1m19.12.  The mythbackend program told me to look at this section.[0m
+  [1m19.13.  The mythbackend program told me to look at this section.[0m
 
   mythbackend does a check to see if your sound device is capable of
   full duplex operation.  If it's not, it's most likely that you're
@@ -4274,7 +4274,7 @@
   will need to get btaudio ``operational''.
 
 
-  [1m19.13.  My remote doesn't work / works sometimes and not others /[0m
+  [1m19.14.  My remote doesn't work / works sometimes and not others /[0m
   [1m"ghost" keypresses.[0m
 
   This can be due to a number of factors.  The simplest case is the
@@ -4300,7 +4300,7 @@
   +o  blackbox  (using "Sloppy Focus" and "Focus New Windows")
 
 
-  [1m19.14.  My PVR-250 card doesn't show inputs in the setup screen.[0m
+  [1m19.15.  My PVR-250 card doesn't show inputs in the setup screen.[0m
 
   See message http://lists.snowman.net/pipermail/mythtv-
   users/2003-April/002527.html
@@ -4308,9 +4308,9 @@
   users/2003-April/002527.html>
 
 
-  [1m19.15.  Where's my "canada-cable" entry gone to?[0m
+  [1m19.16.  Where's my "canada-cable" entry gone to?[0m
 
-  [1m19.16.  My channels are off by one.[0m
+  [1m19.17.  My channels are off by one.[0m
 
   There is no such thing as "Canada Cable"; Canada uses the same
   frequencies as the United States.  "Canada Cable" was a hack that some
@@ -4324,7 +4324,7 @@
   more information.
 
 
-  [1m19.17.  Mythweb is showing a db_open error when I connect to it.[0m
+  [1m19.18.  Mythweb is showing a db_open error when I connect to it.[0m
 
   Find your php.ini file. Make sure you've got a line in it like this:
 
@@ -4333,7 +4333,7 @@
   Restart apache for it to take effect.
 
 
-  [1m19.18.  error: can't find a register in class 'BREG' while reloading[0m
+  [1m19.19.  error: can't find a register in class 'BREG' while reloading[0m
   [1m'asm'[0m
 
   This is due to the broken Qt that is being distributed by Suse.  To
@@ -4341,7 +4341,7 @@
   you find there and then recompile.
 
 
-  [1m19.19.  make: *** No rule to make target[0m
+  [1m19.20.  make: *** No rule to make target[0m
   [1m/usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.[0m
 
   This error happens when there's a missing link in the
@@ -4367,41 +4367,41 @@
   choice is the better solution.
 
 
-  [1m19.20.  make: *** No rule to make target /mkspecs/default/qmake.conf',[0m
+  [1m19.21.  make: *** No rule to make target /mkspecs/default/qmake.conf',[0m
   [1mneeded by Makefile'.  Stop.[0m
 
   You didn't set your QTDIR.  Re-read the section on ``Setting up
   paths''.
 
 
-  [1m19.21.  My mouse pointer disappears when placed over the MythTV win-[0m
+  [1m19.22.  My mouse pointer disappears when placed over the MythTV win-[0m
   [1mdows.[0m
 
   This is the intended behavior.  The MythTV interface is meant for use
   with a remote control or a keyboard.
 
 
-  [1m19.22.  What does "strange error flushing buffer" mean on my console?[0m
+  [1m19.23.  What does "strange error flushing buffer" mean on my console?[0m
 
   Nothing, really.  It's just lame (the mp3 encoder) complaining for
   some obscure reason.  This seems to be fixed in more recent versions
   of the libmp3lame library.
 
 
-  [1m19.23.  I can't change the channel when watching Live TV.[0m
+  [1m19.24.  I can't change the channel when watching Live TV.[0m
 
   Something's wrong with your program database.  Did mythfilldatabase
   run with no major errors?
 
 
 
-  [1m19.24.  Colors are wrong, people have blue faces.[0m
+  [1m19.25.  Colors are wrong, people have blue faces.[0m
 
   If you are using the binary nVidia drivers, make sure you're using at
   least version 1.0-2960.
 
 
-  [1m19.25.  When trying to run setup, I get an error like this: "./setup:[0m
+  [1m19.26.  When trying to run setup, I get an error like this: "./setup:[0m
   [1merror while loading shared libraries:"[0m
 
   You didn't add /usr/local/lib to /etc/ld.so.conf.  See the section on

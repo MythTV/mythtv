@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-09-09, v2.71
+<date>2003-09-11, v2.72
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1140,6 +1140,7 @@ $ su
 $ tar -xjf mythtv-0.11.tar.bz2
 $ cd mythtv-0.11
 $ ./configure
+$ qmake
 $ make
 </verb></tscreen>
 
@@ -2563,6 +2564,7 @@ it.
 <tscreen><verb>
 $ tar -xjf mythgallery-0.11.tar.bz2
 $ cd mythgallery-0.11
+$ qmake
 $ make
 # su
 # make install
@@ -2688,7 +2690,6 @@ $ su
 # exit
 $ 
 </verb></tscreen>
-
 
 Download FLAC from <url url="http://flac.sourceforge.net"
 name="http://flac.sourceforge.net"> and install:
@@ -2831,6 +2832,7 @@ INCLUDEPATH *= /usr/include/cdda
 save and close settings.pro and proceed with compiling MythMusic.
 </code>
 <tscreen><verb>
+$ qmake
 $ make
 $ su
 # make install
@@ -2983,6 +2985,7 @@ strip "$(INSTALL_ROOT)/usr/local/share/mythtv/mythweather/images/"
 Change into the MythWeather directory, then make and make install:
 <tscreen><verb>
 $ cd mythweather
+$ qmake
 $ make
 $ su
 # make install
@@ -3030,6 +3033,7 @@ watch media files that are not directly supported by MythTV.
 Change into the MythVideo directory, then make and make install:
 <tscreen><verb>
 $ cd mythvideo
+$ qmake
 $ make
 $ su
 # make install
@@ -3074,6 +3078,7 @@ transcode, then the first command in the next example can simply be
 <tt>./configure</tt>
 <tscreen><verb>
 $ ./configure --enable-transcode
+$ qmake
 $ make
 $ su
 # make install
@@ -3253,6 +3258,7 @@ Finally, depending on your distribution, you may be able to turn it off from
 within the control panel.
 
 <sect1>I get segfaults / MythTV isn't doing anything.
+<sect1>Debugging with GDB.
 <p>Without details, the developers will not be able to determine if you have
 discovered a genuine code-bug,  or if the problem is with your system.  In
 order to determine what's going on, you must recompile MythTV with debugging
@@ -4550,6 +4556,7 @@ v2.70, 2003-09-06.  Add a section for Debian-specific build
 instructions,and an example of how to build from the source package
 v2.71, 2003-09-09.  Get rid of "can't CVS anymore" - it's been switched for
 a while now.
+v2.72, 2003-09-11.  Got to qmake before make now. Add GDB section title.
 -->
 
 <!--
