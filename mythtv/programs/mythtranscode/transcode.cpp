@@ -659,7 +659,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         if (showprogress && QDateTime::currentDateTime() > statustime)
         {
             VERBOSE(VB_IMPORTANT, QString("Processed: %1 of %2 frames(%3 seconds)").
-                    arg(curFrameNum).arg(total_frame_count).
+                    arg((long)curFrameNum).arg((long)total_frame_count).
                     arg((long)(curFrameNum / video_frame_rate)));
             statustime = QDateTime::currentDateTime();
             statustime = statustime.addSecs(5);
