@@ -1,8 +1,10 @@
 str default_helper=mplayer %s
-str profile_default=movies
-str StartDir=/mnt/store/megrez
-str LoadProfile=profile_default
+str StartDir=/mnt/store
+str LoadProfile=profile_movies
 
 str wav_helper=mplayer %s
-str avi_helper=mplayer -fs -quiet %s 
+str avi_helper=mplayer -fs -vm -zoom -quiet %s
+str mpeg_helper=mplayer -fs -vm -zoom -quiet %s
+str mpg_helper=mplayer -fs -vm -zoom -quiet %s
+str divx_helper=mplayer -fs -vm -zoom -quiet %s
 str profile_movies=avi mpg mpeg divx
