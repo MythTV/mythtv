@@ -16,7 +16,8 @@ The following is a list of some of the prerequisites you will need installed:
                 optimize things a little more.  Compressing the audio's not
                 _really_ necessary, it just saves 500 or so MB per hour of 
                 recording.  You'll probably have to compile this one yourself,
-                so get it from http://www.mp3dev.org/mp3/
+                so get it from http://www.mp3dev.org/ (follow the using Lame
+                link).
 
    QT - Version 3.1 or greater is strongly recommended.  MythTV will probably
         compile with version 3.0, but there are known bugs in that version        
