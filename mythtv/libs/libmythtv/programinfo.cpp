@@ -1326,10 +1326,22 @@ void ProgramInfo::ClearMarkupMap(QSqlDatabase *db, int type,
         max_comp += tempc;
     }
 
-    QString querystr = QString("DELETE FROM recordedmarkup "
-                       "WHERE chanid = '%1' AND starttime = '%2' %3 %4 ")
-                       .arg(chanid).arg(starts).arg(min_comp).arg(max_comp);
+    
+    QString querystr;
 
+    if (isVideo)
+    {
+        querystr = QString("DELETE FROM filemarkup "
+                           "WHERE filename = '%1' %2 %3 ")
+                           .arg(pathname).arg(min_comp).arg(max_comp);
+    }
+    else
+    {
+        querystr = QString("DELETE FROM recordedmarkup "
+                           "WHERE chanid = '%1' AND starttime = '%2' %3 %4 ")
+                           .arg(chanid).arg(starts).arg(min_comp).arg(max_comp);
+    }
+    
     if (type != -100)
         querystr += QString("AND type = %1;").arg(type);
     else
@@ -1351,21 +1363,24 @@ void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
 
     QString querystr;
 
-    // check to make sure the show still exists before saving markups
-    querystr = QString("SELECT starttime FROM recorded "
-                       "WHERE chanid = '%1' AND starttime = '%2';")
-                       .arg(chanid).arg(starts);
+    if (!isVideo)
+    {
+        // check to make sure the show still exists before saving markups
+        querystr = QString("SELECT starttime FROM recorded "
+                           "WHERE chanid = '%1' AND starttime = '%2';")
+                           .arg(chanid).arg(starts);
 
-    QSqlQuery check_query = db->exec(querystr);
-    if (!check_query.isActive())
-        MythContext::DBError("SetMarkupMap checking record table",
-            querystr);
+        QSqlQuery check_query = db->exec(querystr);
+        if (!check_query.isActive())
+            MythContext::DBError("SetMarkupMap checking record table",
+                querystr);
 
-    if (check_query.isActive())
-        if ((check_query.numRowsAffected() == 0) ||
-            (!check_query.next()))
-            return;
-
+        if (check_query.isActive())
+            if ((check_query.numRowsAffected() == 0) ||
+                (!check_query.next()))
+                return;
+    }
+    
     for (i = marks.begin(); i != marks.end(); ++i)
     {
         long long frame = i.key();
@@ -1387,10 +1402,20 @@ void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
         else
             mark_type = i.data();
 
-        querystr = QString("INSERT INTO recordedmarkup (chanid, starttime, "
-                           "mark, type) values ( '%1', '%2', %3, %4);")
-                           .arg(chanid).arg(starts)
-                           .arg(frame_str).arg(mark_type);
+        if (isVideo)
+        {
+            querystr = QString("INSERT INTO filemarkup (filename, "
+                               "mark, type) values ( '%1', %2, %3);")
+                               .arg(pathname)
+                               .arg(frame_str).arg(mark_type);
+        }
+        else
+        {
+            querystr = QString("INSERT INTO recordedmarkup (chanid, starttime, "
+                               "mark, type) values ( '%1', '%2', %3, %4);")
+                               .arg(chanid).arg(starts)
+                               .arg(frame_str).arg(mark_type);
+        }                   
         QSqlQuery query = db->exec(querystr);
         if (!query.isActive())
             MythContext::DBError("SetMarkupMap inserting", querystr);
@@ -1408,13 +1433,27 @@ void ProgramInfo::GetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
     QString starts = recstartts.toString("yyyyMMddhhmm");
     starts += "00";
 
-    QString querystr = QString("SELECT mark, type FROM recordedmarkup WHERE "
-                               "chanid = '%1' AND starttime = '%2' "
-                               "AND type = %3 "
-                               "ORDER BY mark;")
-                               .arg(chanid).arg(starts)
-                               .arg(type);
+    QString querystr;
 
+    if (isVideo)
+    {
+        querystr = QString("SELECT mark, type FROM filemarkup WHERE "
+                           "filename = '%1' AND type = %2 "
+                           "ORDER BY mark;")
+                           .arg(pathname)
+                           .arg(type);
+
+    }
+    else
+    {
+        querystr = QString("SELECT mark, type FROM recordedmarkup WHERE "
+                           "chanid = '%1' AND starttime = '%2' "
+                           "AND type = %3 "
+                           "ORDER BY mark;")
+                           .arg(chanid).arg(starts)
+                           .arg(type);
+    }
+    
     QSqlQuery query = db->exec(querystr);
     if (query.isActive() && query.numRowsAffected() > 0)
     {
@@ -1456,11 +1495,22 @@ void ProgramInfo::GetPositionMap(QMap<long long, long long> &posMap, int type,
     QString starts = recstartts.toString("yyyyMMddhhmm");
     starts += "00";
 
-    QString querystr = QString("SELECT mark, offset FROM recordedmarkup "
-                               "WHERE chanid = '%1' AND starttime = '%2' "
-                               "AND type = %3;")
-                               .arg(chanid).arg(starts).arg(type);
+    QString querystr;
 
+    if (isVideo)
+    {
+        querystr = QString("SELECT mark, offset FROM filemarkup "
+                   "WHERE filename = '%1' AND type = %2;")
+                   .arg(pathname).arg(type);
+    }
+    else
+    {
+        querystr = QString("SELECT mark, offset FROM recordedmarkup "
+                           "WHERE chanid = '%1' AND starttime = '%2' "
+                           "AND type = %3;")
+                           .arg(chanid).arg(starts).arg(type);
+    }
+    
     QSqlQuery query = db->exec(querystr);
     if (query.isActive() && query.numRowsAffected() > 0)
     {
@@ -1475,10 +1525,22 @@ void ProgramInfo::ClearPositionMap(int type, QSqlDatabase *db)
     QString starts = recstartts.toString("yyyyMMddhhmm");
     starts += "00";
 
-    QString querystr = QString("DELETE FROM recordedmarkup "
-                               "WHERE chanid = '%1' AND starttime = '%2' "
-                               "AND type = %3;")
-                               .arg(chanid).arg(starts).arg(type);
+    QString querystr;
+
+    if (isVideo)
+    {
+        querystr = QString("DELETE FROM filemarkup "
+                           "WHERE filename = '%1' AND type = %2;")
+                           .arg(pathname).arg(type);
+    }
+    else
+    {
+        querystr = QString("DELETE FROM recordedmarkup "
+                           "WHERE chanid = '%1' AND starttime = '%2' "
+                           "AND type = %3;")
+                           .arg(chanid).arg(starts).arg(type);
+    }
+                               
     QSqlQuery query = db->exec(querystr);
     if (!query.isActive())
         MythContext::DBError("clear position map", querystr);
@@ -1510,11 +1572,23 @@ void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
         max_comp += tempc;
     }
 
-    QString querystr = QString("DELETE FROM recordedmarkup "
-                               "WHERE chanid = '%1' AND starttime = '%2' "
-                               "AND type = %3 %4 %5;")
-                               .arg(chanid).arg(starts).arg(type)
-                               .arg(min_comp).arg(max_comp);
+    QString querystr;
+
+    if(isVideo)
+    {
+        querystr = QString("DELETE FROM filemarkup "
+                           "WHERE filename = '%1' AND type = %2 %3 %4;")
+                           .arg(pathname).arg(type)
+                           .arg(min_comp).arg(max_comp);
+    }
+    else
+    {
+        querystr = QString("DELETE FROM recordedmarkup "
+                           "WHERE chanid = '%1' AND starttime = '%2' "
+                           "AND type = %3 %4 %5;")
+                           .arg(chanid).arg(starts).arg(type)
+                           .arg(min_comp).arg(max_comp);
+    }
     QSqlQuery query = db->exec(querystr);
     if (!query.isActive())
         MythContext::DBError("position map clear", querystr);
@@ -1538,13 +1612,25 @@ void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
        
         QString offset_str = tempc;
 
-        querystr = QString("INSERT INTO recordedmarkup (chanid, starttime, "
-                           "mark, type, offset) values "
-                           "( '%1', '%2', %3, %4, \"%5\");")
-                           .arg(chanid).arg(starts)
-                           .arg(frame_str).arg(type)
-                           .arg(offset_str);
-
+        if (isVideo)
+        {
+            querystr = QString("INSERT INTO filemarkup (filename, "
+                               "mark, type, offset) values "
+                               "( '%1', %2, %3, \"%4\");")
+                               .arg(pathname)
+                               .arg(frame_str).arg(type)
+                               .arg(offset_str);
+        }
+        else
+        {        
+            querystr = QString("INSERT INTO recordedmarkup (chanid, starttime, "
+                               "mark, type, offset) values "
+                               "( '%1', '%2', %3, %4, \"%5\");")
+                               .arg(chanid).arg(starts)
+                               .arg(frame_str).arg(type)
+                               .arg(offset_str);
+        }
+        
         QSqlQuery subquery = db->exec(querystr);
         if (!subquery.isActive())
             MythContext::DBError("position map insert", querystr);
@@ -1572,13 +1658,26 @@ void ProgramInfo::SetPositionMapDelta(QMap<long long, long long> &posMap,
        
         QString offset_str = tempc;
 
-        QString querystr = QString("INSERT INTO recordedmarkup "
-                           "(chanid, starttime, mark, type, offset) VALUES "
-                           "( '%1', '%2', %3, %4, \"%5\");")
-                           .arg(chanid).arg(starts)
-                           .arg(frame_str).arg(type)
-                           .arg(offset_str);
+        QString querystr;
 
+        if (isVideo)
+        {
+            querystr = QString("INSERT INTO filemarkup "
+                               "(filename, mark, type, offset) VALUES "
+                               "( '%1', %2, %3, \"%4\");")
+                               .arg(chanid)
+                               .arg(frame_str).arg(type)
+                               .arg(offset_str);
+        }
+        else
+        {
+            querystr = QString("INSERT INTO recordedmarkup "
+                               "(chanid, starttime, mark, type, offset) VALUES "
+                               "( '%1', '%2', %3, %4, \"%5\");")
+                               .arg(chanid).arg(starts)
+                               .arg(frame_str).arg(type)
+                               .arg(offset_str);
+        }
         QSqlQuery subquery = db->exec(querystr);
         if (!subquery.isActive())
             MythContext::DBError("delta position map insert", querystr);
