@@ -1034,6 +1034,7 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
                   "channel.outputfilters, previouslyshown, originalairdate, stars "
                   "FROM program,channel,capturecard,cardinput "
                   "WHERE channel.channum = :CHANNAME "
+                  "AND channel.visible = true "
                   "AND starttime < :CURTIME AND endtime > :CURTIME AND "
                   "program.chanid = channel.chanid AND "
                   "channel.sourceid = cardinput.sourceid AND "
