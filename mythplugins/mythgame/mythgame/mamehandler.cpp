@@ -767,7 +767,7 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
                     fullscreen = " -nocabview";
                 else if (tmp == "37 BETA 5")
                     fullscreen = " -fullview";
-                else if (tmp.toInt() >= 77)
+                else if (tmp.toInt() >= 76)
                     fullscreen = " -fullscreen";
                 else
                     fullscreen = " -fullview";
@@ -874,7 +874,7 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
         }
         /* the nocursor option doesn't apply to SDL builds of xmame */
         if (strcmp(general_prefs.xmame_display_target, "SDL")) {
-            if (general_prefs.xmame_minor.toInt() >= 77)
+            if (general_prefs.xmame_minor.toInt() >= 76)
                 *exec += game_settings.fullscreen ? (fullscreen) : windowed;
             else
                 *exec+= game_settings.fullscreen ? 
