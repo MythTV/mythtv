@@ -709,7 +709,7 @@ void TVRec::TeardownRecorder(bool killFile)
 
             QString message = QString("LOCAL_READY_TO_TRANSCODE %1 %2")
                        .arg(prevRecording->chanid)
-                       .arg(prevRecording->startts.toString("yyyyMMddhhmmss"));
+                       .arg(prevRecording->startts.toString(Qt::ISODate));
             MythEvent me(message);
             gContext->dispatch(me);
         }

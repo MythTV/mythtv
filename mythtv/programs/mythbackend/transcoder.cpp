@@ -58,8 +58,15 @@ void Transcoder::customEvent(QCustomEvent *e)
         {
             message = message.simplifyWhiteSpace();
             QStringList tokens = QStringList::split(" ", message);
-            ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(tokens[1],
-                                                                     tokens[2]);
+            QDateTime startts = QDateTime::fromString(tokens[2], Qt::ISODate);
+            ProgramInfo *pinfo = ProgramInfo::GetProgramAtDateTime(tokens[1], 
+                                                                   startts);
+            if (pinfo == NULL) 
+            {
+                cerr << "Could not read program from database, skipping "
+                        "transcoding\n";
+                return;
+            }
             EnqueueTranscode(pinfo);
         }
     }
@@ -75,9 +82,9 @@ pid_t Transcoder::Transcode(ProgramInfo *pginfo)
 
     InitTranscoder(pginfo);
     QString path = "mythtranscode";
-    QString command = QString("%1 %2 %3 %4") .arg(path.ascii())
+    QString command = QString("%1 -c %2 -s %3 -p %4").arg(path.ascii())
                       .arg(pginfo->chanid)
-                      .arg(pginfo->startts.toString("yyyyMMddhhmmss"))
+                      .arg(pginfo->startts.toString(Qt::ISODate))
                       .arg("Transcode");
     //Transcode may use the avencoder which is not thread-safe
     child = fork();
@@ -123,11 +130,9 @@ void Transcoder::ClearTranscodeTable(bool skipPartial)
                 {
                      // transcode didn't finish delete partial transcode
                      QDateTime dtstart = result.value(1).toDateTime();
-                     ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(
-                            result.value(0).toString(),
-                            dtstart.toString("yyyyMMddhhmmss")
-                     );
-
+                     ProgramInfo *pinfo = ProgramInfo::GetProgramAtDateTime(
+                                                   result.value(0).toString(), 
+                                                   dtstart);
                      if (!pinfo) 
                      {
                          cerr << "Bad transcoding info\n";
@@ -143,10 +148,9 @@ void Transcoder::ClearTranscodeTable(bool skipPartial)
             else
             {
                 QDateTime dtstart = result.value(1).toDateTime();
-                ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(
-                     result.value(0).toString(),
-                     dtstart.toString("yyyyMMddhhmmss")
-                );
+                ProgramInfo *pinfo = ProgramInfo::GetProgramAtDateTime(
+                                                  result.value(0).toString(), 
+                                                  dtstart);
 
                 if (!pinfo) {
                     cerr << "Bad transcoding info\n";
@@ -270,9 +274,9 @@ void Transcoder::RestartTranscoding()
              QDateTime dtstart = result.value(1).toDateTime();
              // This is backwards (calling a query for something we just queried)
              // but it is a simple way to get all recordings
-             ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(
-                      result.value(0).toString(),
-                      dtstart.toString("yyyyMMddhhmmss"));
+             ProgramInfo *pinfo = ProgramInfo::GetProgramAtDateTime(
+                                               result.value(0).toString(), 
+                                               dtstart);
 
              if (pinfo == NULL)
                  continue;

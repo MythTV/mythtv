@@ -31,10 +31,63 @@ int main(int argc, char *argv[])
     //  Load the context
     gContext = new MythContext(MYTH_BINARY_VERSION,false);
 
-    if (a.argc() != 4) 
+    int found_starttime = 0;
+    int found_chanid = 0;
+    int found_profile = 0;
+
+    for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
-        cerr << "mythtranscode chanid starttime profile-name\n";
-        return -1;
+        if (!strcmp(a.argv()[argpos],"-s") ||
+            !strcmp(a.argv()[argpos],"--starttime")) 
+        {
+            if (a.argc() > argpos) 
+            {
+                starttime = a.argv()[argpos + 1];
+                found_starttime = 1;
+                ++argpos;
+            } 
+            else 
+            {
+                cerr << "Missing argument to -s/--starttime option\n";
+                return -1;
+            }
+         } 
+         else if (!strcmp(a.argv()[argpos],"-c") ||
+                  !strcmp(a.argv()[argpos],"--chanid")) 
+         {
+             if (a.argc() > argpos) 
+             {
+                 chanid = a.argv()[argpos + 1];
+                 found_chanid = 1;
+                 ++argpos;
+             } 
+             else 
+             {
+                 cerr << "Missing argument to -c/--chanid option\n";
+                 return -1;
+             }
+         } 
+         else if (!strcmp(a.argv()[argpos],"-p") ||
+                  !strcmp(a.argv()[argpos],"--profile")) 
+         {
+             if (a.argc() > argpos) 
+             {
+                 profilename = a.argv()[argpos + 1];
+                 found_profile = 1;
+                 ++argpos;
+             } 
+             else 
+             {
+                 cerr << "Missing argument to -c/--chanid option\n";
+                 return -1;
+             }
+         }
+    }
+
+    if (!found_profile || !found_chanid || !found_starttime) 
+    {
+         cerr << "Must specify -p, -c, and -s options!\n";
+         return -1;
     }
 
     chanid = a.argv()[1];
@@ -63,8 +116,15 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(chanid,
-                                                              starttime);
+    QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
+    ProgramInfo *pginfo = ProgramInfo::GetProgramAtDateTime(chanid, startts);
+
+    if (!pginfo)
+    {
+        cerr << "Couldn't find recording " << chanid << " " << startts << endl;
+        return -1;
+    }
+
     QString fileprefix = gContext->GetFilePrefix();
     QString infile = pginfo->GetRecordFilename(fileprefix);
     QString tmpfile = infile;
