@@ -1203,11 +1203,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>[DVB-S/C] Symbol Rate (Option has no default)
-???</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Polarity</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1232,11 +1227,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>[Common] Inversion (Default: Auto):
-Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Auto</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1253,26 +1243,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>[DVB-C/T] Bandwidth (Default: Auto)
-???</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Modulation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>[DVB-C] Modulation (Default: Auto)
-???</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Constellation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>[DVB-T] Constellation (Default: Auto)
-???</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1284,17 +1259,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>[DVB-S/C] Forward Error Correction (Default: Auto)
-???</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>LP Coderate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>[DVB-T] Low Priority Code Rate (Default: Auto)
-???</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1302,17 +1267,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>[DVB-T] High Priority Code Rate (Default: Auto)
-???</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Guard Interval</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>[DVB-T] Guard Interval (Default: Auto)
-???</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1320,17 +1275,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>[DVB-T] Transmission Mode (Default: Auto)
-???</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Hierarchy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>[DVB-T] Hierarchy (Default: Auto)
-???</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4766,10 +4711,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Allow Transcoding jobs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Allow jobs of this type to run on this backend.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5220,16 +5161,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>[Common] Frequency (Option has no default)
-The frequency for this channel in Hz.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>[DVB-S] Polarity (Option has no default)
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>6 MHz</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5530,10 +5461,6 @@ The frequency for this channel in Hz.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Firewire Model is for future use incase there is a need to model specific work arounds.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Firewire Port</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5583,6 +5510,85 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>If enabled, you will be able to press numbers and jump the selection to whatever channel you enter.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select your preferred language</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency (Option has no default)
+The frequency for this channel in Hz.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Symbol Rate (Option has no default)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Polarity (Option has no default)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inversion (Default: Auto):
+Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandwidth (Default: Auto)
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulation (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Constellation (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forward Error Correction (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low Priority Code Rate (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High Priority Code Rate (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guard Interval (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transmission Mode (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hierarchy (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Firewire Model is for future use in case there is a need to model specific workarounds.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CPU friendly preview of recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When enabled, recording previews will play with reduced FPS to save CPU.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Pop-up Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The time (in seconds) that the menu will remain visible after navigation.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5635,6 +5641,14 @@ The frequency for this channel in Hz.</source>
     <name>ScanWizardTuningPage</name>
     <message>
         <source>Tuning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to open the card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to probe the card</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

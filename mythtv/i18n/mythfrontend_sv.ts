@@ -1592,11 +1592,11 @@
     </message>
     <message>
         <source>Time format</source>
-        <translation>Tidformat</translation>
+        <translation>Tidsformat</translation>
     </message>
     <message>
         <source>Your preferred time format.  Choose a format with &quot;AP&quot; in it for an AM/PM display, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation>Välj det tidformat du föredrar. Välj ett format med &quot;AP&quot; i formatmallen för att få tider med AM/PM angivelse. Övriga format ger 24-timmars visning.</translation>
+        <translation>Välj det tidsformat du föredrar. Välj ett format med &quot;AP&quot; i formatmallen för att få tider med AM/PM angivelse. Övriga format ger 24-timmarsvisning.</translation>
     </message>
     <message>
         <source>Theme</source>
@@ -1632,7 +1632,7 @@
     </message>
     <message>
         <source>Time Blocks (30 mins) to Display</source>
-        <translation>Antal tidluckor (30 min) att visa</translation>
+        <translation>Antal tidsluckor (30 min) att visa</translation>
     </message>
     <message>
         <source>Guide starts at channel</source>
@@ -2411,7 +2411,7 @@
     <message>
         <source>[DVB-S/C] Symbol Rate (Option has no default)
 ???</source>
-        <translation>[DVB-S/C] Symboltakt (Inget standardvärde)
+        <translation type="obsolete">[DVB-S/C] Symboltakt (Inget standardvärde)
 ???</translation>
     </message>
     <message>
@@ -2441,7 +2441,7 @@
     <message>
         <source>[Common] Inversion (Default: Auto):
 Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
-        <translation>[Gemensam] Inversion (Standard: Auto)
+        <translation type="obsolete">[Gemensam] Inversion (Standard: Auto)
 De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</translation>
     </message>
     <message>
@@ -2459,7 +2459,7 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>[DVB-C/T] Bandwidth (Default: Auto)
 ???</source>
-        <translation>[DVB-C/T] Bandbredd (Standard: Auto)
+        <translation type="obsolete">[DVB-C/T] Bandbredd (Standard: Auto)
 ???</translation>
     </message>
     <message>
@@ -2469,7 +2469,7 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>[DVB-C] Modulation (Default: Auto)
 ???</source>
-        <translation>[DVB-C] Modulation (Standard: Auto)
+        <translation type="obsolete">[DVB-C] Modulation (Standard: Auto)
 ???</translation>
     </message>
     <message>
@@ -2479,7 +2479,7 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>[DVB-T] Constellation (Default: Auto)
 ???</source>
-        <translation>[DVB-T] Konstellation (Standard: Auto)
+        <translation type="obsolete">[DVB-T] Konstellation (Standard: Auto)
 ???</translation>
     </message>
     <message>
@@ -2489,7 +2489,7 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>[DVB-S/C] Forward Error Correction (Default: Auto)
 ???</source>
-        <translation>[DVB-S/C] Främre felkorrektion (Standard: Auto)
+        <translation type="obsolete">[DVB-S/C] Främre felkorrektion (Standard: Auto)
 ???</translation>
     </message>
     <message>
@@ -2499,7 +2499,7 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>[DVB-T] Low Priority Code Rate (Default: Auto)
 ???</source>
-        <translation>[DVB-T] Lågprioriterad kodhastighet (Standard: Auto)
+        <translation type="obsolete">[DVB-T] Lågprioriterad kodhastighet (Standard: Auto)
 ???</translation>
     </message>
     <message>
@@ -2509,7 +2509,7 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>[DVB-T] High Priority Code Rate (Default: Auto)
 ???</source>
-        <translation>[DVB-T] Högprioriterad kodhastighet (Standard: Auto)
+        <translation type="obsolete">[DVB-T] Högprioriterad kodhastighet (Standard: Auto)
 ???</translation>
     </message>
     <message>
@@ -2519,7 +2519,7 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>[DVB-T] Guard Interval (Default: Auto)
 ???</source>
-        <translation>[DVB-T] Skyddsintervall (Standard: Auto)
+        <translation type="obsolete">[DVB-T] Skyddsintervall (Standard: Auto)
 ???</translation>
     </message>
     <message>
@@ -2529,7 +2529,7 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>[DVB-T] Transmission Mode (Default: Auto)
 ???</source>
-        <translation>[DVB-T] Överföringsläge (Standard: Auto)
+        <translation type="obsolete">[DVB-T] Överföringsläge (Standard: Auto)
 ???</translation>
     </message>
     <message>
@@ -2539,7 +2539,7 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>[DVB-T] Hierarchy (Default: Auto)
 ???</source>
-        <translation>[DVB-T] Hierarki (Standard: Auto)
+        <translation type="obsolete">[DVB-T] Hierarki (Standard: Auto)
 ???</translation>
     </message>
     <message>
@@ -2955,7 +2955,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Wakeup time format</source>
-        <translation>Tidformat för uppväckning</translation>
+        <translation>Tidsformat för uppväckning</translation>
     </message>
     <message>
         <source>The format of the time string passed to the &apos;setWakeuptime Command&apos; as $time. See QT::QDateTime.toString() for details. Set to &apos;time_t&apos; for seconds since epoch.</source>
@@ -3015,7 +3015,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Time offset for thumbnail preview images</source>
-        <translation>Tidpunkt för skapande av förhandsgranskningsbild</translation>
+        <translation>Tidpunkt för skapande av förhandsvisningsbild</translation>
     </message>
     <message>
         <source>Find One Recordings Priority</source>
@@ -3973,7 +3973,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Generate thumbnail preview images of recordings</source>
-        <translation>Skapa förhandsgranskningsbilder av inspelningar</translation>
+        <translation>Skapa förhandsvisningsbilder av inspelningar</translation>
     </message>
     <message>
         <source>If enabled, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>
@@ -3985,7 +3985,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>When enabled, a preview of the recording will play in a small window on the &quot;Watch a Recording&quot; menu.</source>
-        <translation>Spela upp en förhandsgranskning av inspelningen i ett litet fönster i menyn &quot;Titta på inspelningar&quot;.</translation>
+        <translation>Spela upp en förhandsvisning av inspelningen i ett litet fönster i menyn &quot;Titta på inspelningar&quot;.</translation>
     </message>
     <message>
         <source>If enabled, the Watch Recording and Delete Recording screens will use transparency. Disable if selecting the recordings is slow due to high CPU usage.</source>
@@ -4664,10 +4664,6 @@ som du startade detta programmet ifrån.</translation>
     <message>
         <source>User Job #4 Command</source>
         <translation>Kommando för användarjobb #4</translation>
-    </message>
-    <message>
-        <source>Allow Transcoding jobs</source>
-        <translation>Tillåt omkodningsjobb</translation>
     </message>
     <message>
         <source>Allow jobs of this type to run on this backend.</source>
@@ -5382,13 +5378,13 @@ som du startade detta programmet ifrån.</translation>
     <message>
         <source>[Common] Frequency (Option has no default)
 The frequency for this channel in Hz.</source>
-        <translation>[Gemensam] Frekvens (Inget standardvärde)
+        <translation type="obsolete">[Gemensam] Frekvens (Inget standardvärde)
 Kanalens frekvens i Hz.</translation>
     </message>
     <message>
         <source>[DVB-S] Polarity (Option has no default)
 </source>
-        <translation>[DVB-S] Polaritet (Inget standardvärde)
+        <translation type="obsolete">[DVB-S] Polaritet (Inget standardvärde)
 </translation>
     </message>
     <message>
@@ -5564,10 +5560,6 @@ Kanalens frekvens i Hz.</translation>
         <translation>Firewire-modell</translation>
     </message>
     <message>
-        <source>Firewire Model is for future use incase there is a need to model specific work arounds.</source>
-        <translation>Firewire-modell är för framtida bruk ifall det behövs några modellspecifika lösningar.</translation>
-    </message>
-    <message>
         <source>Firewire Port</source>
         <translation>Firewire-port</translation>
     </message>
@@ -5618,6 +5610,85 @@ Kanalens frekvens i Hz.</translation>
     <message>
         <source>If enabled, you will be able to press numbers and jump the selection to whatever channel you enter.</source>
         <translation>Flytta programguidens väljare till en viss kanal genom att ange kanalens nummer.</translation>
+    </message>
+    <message>
+        <source>CPU friendly preview of recordings</source>
+        <translation>CPU-vänlig förhandsvisning av inspelningar</translation>
+    </message>
+    <message>
+        <source>When enabled, recording previews will play with reduced FPS to save CPU.</source>
+        <translation>Visa förhandsvisningar med reducerat antal bilder per sekund.</translation>
+    </message>
+    <message>
+        <source>Select your preferred language</source>
+        <translation>Välj språk</translation>
+    </message>
+    <message>
+        <source>Menu Pop-up Time</source>
+        <translation>Pop-up-menytid</translation>
+    </message>
+    <message>
+        <source>The time (in seconds) that the menu will remain visible after navigation.</source>
+        <translation>Tid (i sekunder) menyn förblir synlig efter navigering.</translation>
+    </message>
+    <message>
+        <source>Firewire Model is for future use in case there is a need to model specific workarounds.</source>
+        <translation>Firewire-modell är för framtida bruk ifall det behövs några modellspecifika lösningar.</translation>
+    </message>
+    <message>
+        <source>Frequency (Option has no default)
+The frequency for this channel in Hz.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Symbol Rate (Option has no default)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Polarity (Option has no default)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inversion (Default: Auto):
+Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandwidth (Default: Auto)
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulation (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Constellation (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forward Error Correction (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low Priority Code Rate (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High Priority Code Rate (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guard Interval (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transmission Mode (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hierarchy (Default: Auto)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5670,6 +5741,14 @@ Kanalens frekvens i Hz.</translation>
     <message>
         <source>Tuning</source>
         <translation>Justering</translation>
+    </message>
+    <message>
+        <source>Failed to open the card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to probe the card</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

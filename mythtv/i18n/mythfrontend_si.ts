@@ -1231,7 +1231,7 @@ Frekvenca kanala v hz.</translation>
     <message>
         <source>[DVB-S/C] Symbol Rate (Option has no default)
 ???</source>
-        <translation>[DVB-S/C] Simbolno razmerje (Ni privzete možnosti)</translation>
+        <translation type="obsolete">[DVB-S/C] Simbolno razmerje (Ni privzete možnosti)</translation>
     </message>
     <message>
         <source>Satellite</source>
@@ -1273,7 +1273,7 @@ Frekvenca kanala v hz.</translation>
     <message>
         <source>[Common] Inversion (Default: Auto):
 Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
-        <translation>[Splošna] Inverzija (Privzeta: Avtomatska):
+        <translation type="obsolete">[Splošna] Inverzija (Privzeta: Avtomatska):
 Večina kartic prepozna nastavitve. Pustite Automatsko, razen če ne&apos; dela</translation>
     </message>
     <message>
@@ -1295,7 +1295,7 @@ Večina kartic prepozna nastavitve. Pustite Automatsko, razen če ne&apos; dela<
     <message>
         <source>[DVB-C/T] Bandwidth (Default: Auto)
 ???</source>
-        <translation>[DVB-C/T] Pasovna širina (Privzeto: Avtomatsko)</translation>
+        <translation type="obsolete">[DVB-C/T] Pasovna širina (Privzeto: Avtomatsko)</translation>
     </message>
     <message>
         <source>6 Mhz</source>
@@ -1316,7 +1316,7 @@ Večina kartic prepozna nastavitve. Pustite Automatsko, razen če ne&apos; dela<
     <message>
         <source>[DVB-C] Modulation (Default: Auto)
 ???</source>
-        <translation>[DVB-C] modulacija (Privzeto: Avtomatsko)</translation>
+        <translation type="obsolete">[DVB-C] modulacija (Privzeto: Avtomatsko)</translation>
     </message>
     <message>
         <source>Constellation</source>
@@ -1325,7 +1325,7 @@ Večina kartic prepozna nastavitve. Pustite Automatsko, razen če ne&apos; dela<
     <message>
         <source>[DVB-T] Constellation (Default: Auto)
 ???</source>
-        <translation>[DVB-T] Sestava</translation>
+        <translation type="obsolete">[DVB-T] Sestava</translation>
     </message>
     <message>
         <source>None</source>
@@ -1338,7 +1338,7 @@ Večina kartic prepozna nastavitve. Pustite Automatsko, razen če ne&apos; dela<
     <message>
         <source>[DVB-S/C] Forward Error Correction (Default: Auto)
 ???</source>
-        <translation>[DVB-S/C] Popravilo napak (Privzeto: Avtomatsko)</translation>
+        <translation type="obsolete">[DVB-S/C] Popravilo napak (Privzeto: Avtomatsko)</translation>
     </message>
     <message>
         <source>LP Coderate</source>
@@ -1347,7 +1347,7 @@ Večina kartic prepozna nastavitve. Pustite Automatsko, razen če ne&apos; dela<
     <message>
         <source>[DVB-T] Low Priority Code Rate (Default: Auto)
 ???</source>
-        <translation>[DVB-T] Kodno razmerje z nizko prioriteto (Privzeto: Avtomatsko)</translation>
+        <translation type="obsolete">[DVB-T] Kodno razmerje z nizko prioriteto (Privzeto: Avtomatsko)</translation>
     </message>
     <message>
         <source>HP Coderate</source>
@@ -1356,7 +1356,7 @@ Večina kartic prepozna nastavitve. Pustite Automatsko, razen če ne&apos; dela<
     <message>
         <source>[DVB-T] High Priority Code Rate (Default: Auto)
 ???</source>
-        <translation>[DVB-T] Kodno razmerje z visoko prioriteto (Privzeto: Avtomatsko)</translation>
+        <translation type="obsolete">[DVB-T] Kodno razmerje z visoko prioriteto (Privzeto: Avtomatsko)</translation>
     </message>
     <message>
         <source>Guard Interval</source>
@@ -1365,7 +1365,7 @@ Večina kartic prepozna nastavitve. Pustite Automatsko, razen če ne&apos; dela<
     <message>
         <source>[DVB-T] Guard Interval (Default: Auto)
 ???</source>
-        <translation>[DVB-T] Interval (Privzeto: Avtomatsko)</translation>
+        <translation type="obsolete">[DVB-T] Interval (Privzeto: Avtomatsko)</translation>
     </message>
     <message>
         <source>Trans. Mode</source>
@@ -1374,7 +1374,7 @@ Večina kartic prepozna nastavitve. Pustite Automatsko, razen če ne&apos; dela<
     <message>
         <source>[DVB-T] Transmission Mode (Default: Auto)
 ???</source>
-        <translation>[DVB-T] Način prenosa</translation>
+        <translation type="obsolete">[DVB-T] Način prenosa</translation>
     </message>
     <message>
         <source>Hierarchy</source>
@@ -1383,7 +1383,7 @@ Večina kartic prepozna nastavitve. Pustite Automatsko, razen če ne&apos; dela<
     <message>
         <source>[DVB-T] Hierarchy (Default: Auto)
 ???</source>
-        <translation>[DVB-T] Hierarhija</translation>
+        <translation type="obsolete">[DVB-T] Hierarhija</translation>
     </message>
     <message>
         <source>Video</source>
@@ -5071,7 +5071,7 @@ Myth se bo končal.</translation>
     </message>
     <message>
         <source>Allow Transcoding jobs</source>
-        <translation>Dovoli transkodirana opravila</translation>
+        <translation type="obsolete">Dovoli transkodirana opravila</translation>
     </message>
     <message>
         <source>Allow jobs of this type to run on this backend.</source>
@@ -5649,16 +5649,6 @@ Myth se bo končal.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>[Common] Frequency (Option has no default)
-The frequency for this channel in Hz.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>[DVB-S] Polarity (Option has no default)
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>6 MHz</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5959,10 +5949,6 @@ The frequency for this channel in Hz.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Firewire Model is for future use incase there is a need to model specific work arounds.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Firewire Port</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6012,6 +5998,85 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>If enabled, you will be able to press numbers and jump the selection to whatever channel you enter.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select your preferred language</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency (Option has no default)
+The frequency for this channel in Hz.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Symbol Rate (Option has no default)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Polarity (Option has no default)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inversion (Default: Auto):
+Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandwidth (Default: Auto)
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulation (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Constellation (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forward Error Correction (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low Priority Code Rate (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High Priority Code Rate (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guard Interval (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transmission Mode (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hierarchy (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Firewire Model is for future use in case there is a need to model specific workarounds.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CPU friendly preview of recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When enabled, recording previews will play with reduced FPS to save CPU.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Pop-up Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The time (in seconds) that the menu will remain visible after navigation.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6064,6 +6129,14 @@ The frequency for this channel in Hz.</source>
     <name>ScanWizardTuningPage</name>
     <message>
         <source>Tuning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to open the card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to probe the card</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

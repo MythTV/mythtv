@@ -1766,7 +1766,7 @@
     </message>
     <message>
         <source></source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Conflicting</source>
@@ -2043,7 +2043,7 @@
     <message>
         <source>[DVB-S/C] Symbol Rate (Option has no default)
 ???</source>
-        <translation>[DVB-S/C] débit de symboles (cette option n&apos;a pas de valeur par défaut) 
+        <translation type="obsolete">[DVB-S/C] débit de symboles (cette option n&apos;a pas de valeur par défaut) 
 ???</translation>
     </message>
     <message>
@@ -4373,10 +4373,6 @@ Myth will now exit.</source>
         <translation>Commande de tâche util. 4</translation>
     </message>
     <message>
-        <source>Allow Transcoding jobs</source>
-        <translation>Autoriser les tâches de transcodage</translation>
-    </message>
-    <message>
         <source>Allow jobs of this type to run on this backend.</source>
         <translation>Autorise les tâches de ce type à s&apos;exécuter sur ce BackEnd</translation>
     </message>
@@ -4451,7 +4447,7 @@ Myth will now exit.</source>
     <message>
         <source>[Common] Inversion (Default: Auto):
 Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
-        <translation>[Commun] Inversion (Defaut: Auto):
+        <translation type="obsolete">[Commun] Inversion (Defaut: Auto):
 La plupart des cartes peuvent l&apos;autodétecter. Laisser en mode auto sauf si ça ne fonctionne pas.</translation>
     </message>
     <message>
@@ -4461,55 +4457,55 @@ La plupart des cartes peuvent l&apos;autodétecter. Laisser en mode auto sauf si
     <message>
         <source>[DVB-C/T] Bandwidth (Default: Auto)
 ???</source>
-        <translation>[DVB-C/T] Bande Passante (Défaut: Auto)
+        <translation type="obsolete">[DVB-C/T] Bande Passante (Défaut: Auto)
 ???</translation>
     </message>
     <message>
         <source>[DVB-C] Modulation (Default: Auto)
 ???</source>
-        <translation>[DVB-C] Modulation (Défaut: Auto)
+        <translation type="obsolete">[DVB-C] Modulation (Défaut: Auto)
 ???</translation>
     </message>
     <message>
         <source>[DVB-T] Constellation (Default: Auto)
 ???</source>
-        <translation>[DVB-T] Constellation (Défaut: Auto)
+        <translation type="obsolete">[DVB-T] Constellation (Défaut: Auto)
 ???</translation>
     </message>
     <message>
         <source>[DVB-S/C] Forward Error Correction (Default: Auto)
 ???</source>
-        <translation>[DVB-S/C] Correction d&apos;erreur prédictive (Défaut: Auto)
+        <translation type="obsolete">[DVB-S/C] Correction d&apos;erreur prédictive (Défaut: Auto)
 ???</translation>
     </message>
     <message>
         <source>[DVB-T] Low Priority Code Rate (Default: Auto)
 ???</source>
-        <translation>[DVB-T] Code de débit faible priorité (Défaut: Auto)
+        <translation type="obsolete">[DVB-T] Code de débit faible priorité (Défaut: Auto)
 ???</translation>
     </message>
     <message>
         <source>[DVB-T] High Priority Code Rate (Default: Auto)
 ???</source>
-        <translation>[DVB-T] Code de débit haute priorité (Défaut: Auto)
+        <translation type="obsolete">[DVB-T] Code de débit haute priorité (Défaut: Auto)
 ???</translation>
     </message>
     <message>
         <source>[DVB-T] Guard Interval (Default: Auto)
 ???</source>
-        <translation>[DVB-T] Intervalle de garde (Défaut: Auto)
+        <translation type="obsolete">[DVB-T] Intervalle de garde (Défaut: Auto)
 ???</translation>
     </message>
     <message>
         <source>[DVB-T] Transmission Mode (Default: Auto)
 ???</source>
-        <translation>[DVB-T] Mode de transmissio, (Défaut: Auto)
+        <translation type="obsolete">[DVB-T] Mode de transmissio, (Défaut: Auto)
 ???</translation>
     </message>
     <message>
         <source>[DVB-T] Hierarchy (Default: Auto)
 ???</source>
-        <translation>[DVB-T] Hiérarchie (Défaut: Auto)
+        <translation type="obsolete">[DVB-T] Hiérarchie (Défaut: Auto)
 ???</translation>
     </message>
     <message>
@@ -5363,13 +5359,13 @@ La plupart des cartes peuvent l&apos;autodétecter. Laisser en mode auto sauf si
     <message>
         <source>[Common] Frequency (Option has no default)
 The frequency for this channel in Hz.</source>
-        <translation>[Commun] Fréquence (Cette option n&apos;a pas de valeur par défaut) 
+        <translation type="obsolete">[Commun] Fréquence (Cette option n&apos;a pas de valeur par défaut) 
 La fréquence de cette chaîne en Hz.</translation>
     </message>
     <message>
         <source>[DVB-S] Polarity (Option has no default)
 </source>
-        <translation>[DVB-S] Polarité (pas de valeur par défaut)</translation>
+        <translation type="obsolete">[DVB-S] Polarité (pas de valeur par défaut)</translation>
     </message>
     <message>
         <source>6 MHz</source>
@@ -5549,62 +5545,137 @@ La fréquence de cette chaîne en Hz.</translation>
     </message>
     <message>
         <source>Firewire Model</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Firewire Model is for future use incase there is a need to model specific work arounds.</source>
-        <translation type="unfinished"></translation>
+        <translation>Modèle de Firewire</translation>
     </message>
     <message>
         <source>Firewire Port</source>
-        <translation type="unfinished"></translation>
+        <translation>Port Firewire</translation>
     </message>
     <message>
         <source>Firewire port on your firewire card.</source>
-        <translation type="unfinished"></translation>
+        <translation>Port Firewire sur votre carte</translation>
     </message>
     <message>
         <source>Firewire Node</source>
-        <translation type="unfinished"></translation>
+        <translation>Noeud Firewire</translation>
     </message>
     <message>
         <source>Firewire node is the remote device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le Noeud Firewire est le périf distant</translation>
     </message>
     <message>
         <source>Firewire Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Vitesse du Firewire</translation>
     </message>
     <message>
         <source>100Mbps</source>
-        <translation type="unfinished"></translation>
+        <translation>100Mbps</translation>
     </message>
     <message>
         <source>200Mbps</source>
-        <translation type="unfinished"></translation>
+        <translation>200Mbps</translation>
     </message>
     <message>
         <source>400Mbps</source>
-        <translation type="unfinished"></translation>
+        <translation>400Mbps</translation>
     </message>
     <message>
         <source>Default Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Entrée par défaut</translation>
     </message>
     <message>
         <source>Only MPEG2TS is supported at this time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Seulement MPEG2TS est supporté pour l&apos;instant</translation>
     </message>
     <message>
         <source>FireWire Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Entrée Firewire</translation>
     </message>
     <message>
         <source>Allow channel jumping in guide</source>
-        <translation type="unfinished"></translation>
+        <translation>Autoriser les sauts de chaîne dans le guide</translation>
     </message>
     <message>
         <source>If enabled, you will be able to press numbers and jump the selection to whatever channel you enter.</source>
+        <translation>Si activé, vous avez la possibilité d&apos;appuyer sur les numéros de chaîne pour les sélectionner</translation>
+    </message>
+    <message>
+        <source>Select your preferred language</source>
+        <translation>Sélectionner votre langue</translation>
+    </message>
+    <message>
+        <source>Firewire Model is for future use in case there is a need to model specific workarounds.</source>
+        <translation>Le modèle de Firewire est pour un usage futur si des conturnements pour des modèles spécifiques sont nécessaires</translation>
+    </message>
+    <message>
+        <source>CPU friendly preview of recordings</source>
+        <translation>Visualisation basse CPU</translation>
+    </message>
+    <message>
+        <source>When enabled, recording previews will play with reduced FPS to save CPU.</source>
+        <translation>Si activé, la visualisation des enregistrements sont joués avec un nombre réduit d&apos;images/sec afin de limiter l&apos;usage du processeur</translation>
+    </message>
+    <message>
+        <source>Menu Pop-up Time</source>
+        <translation>Durée de menu pop-up</translation>
+    </message>
+    <message>
+        <source>The time (in seconds) that the menu will remain visible after navigation.</source>
+        <translation>La durée (en secondes) pendant laquelle le menu reste visible après la navigation</translation>
+    </message>
+    <message>
+        <source>Frequency (Option has no default)
+The frequency for this channel in Hz.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Symbol Rate (Option has no default)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Polarity (Option has no default)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inversion (Default: Auto):
+Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandwidth (Default: Auto)
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulation (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Constellation (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forward Error Correction (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low Priority Code Rate (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High Priority Code Rate (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guard Interval (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transmission Mode (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hierarchy (Default: Auto)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5658,6 +5729,14 @@ La fréquence de cette chaîne en Hz.</translation>
     <message>
         <source>Tuning</source>
         <translation>Ajustement</translation>
+    </message>
+    <message>
+        <source>Failed to open the card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to probe the card</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

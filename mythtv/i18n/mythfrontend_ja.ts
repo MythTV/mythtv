@@ -2313,7 +2313,7 @@ The frequency for this channel in hz.</source>
     <message>
         <source>[DVB-S/C] Symbol Rate (Option has no default)
 ???</source>
-        <translation>[DVB-S/C] シンボルレート (既定値はありません)
+        <translation type="obsolete">[DVB-S/C] シンボルレート (既定値はありません)
 ???</translation>
     </message>
     <message>
@@ -2357,7 +2357,7 @@ The frequency for this channel in hz.</source>
     <message>
         <source>[Common] Inversion (Default: Auto):
 Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
-        <translation>[共通] 反転 (規定値: 自動):
+        <translation type="obsolete">[共通] 反転 (規定値: 自動):
 多くのカードは自動で認識します．うまく動作しない時に設定して下さい．</translation>
     </message>
     <message>
@@ -2375,7 +2375,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>[DVB-C/T] Bandwidth (Default: Auto)
 ???</source>
-        <translation>[DVB-C/T] 帯域幅 (既定値: 自動)
+        <translation type="obsolete">[DVB-C/T] 帯域幅 (既定値: 自動)
 ???</translation>
     </message>
     <message>
@@ -2397,7 +2397,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>[DVB-C] Modulation (Default: Auto)
 ???</source>
-        <translation>[DVB-C] 変調 (既定値: 自動)
+        <translation type="obsolete">[DVB-C] 変調 (既定値: 自動)
 ???</translation>
     </message>
     <message>
@@ -2407,7 +2407,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>[DVB-T] Constellation (Default: Auto)
 ???</source>
-        <translation>[DVB-T] コンステレーション (既定値: 自動)
+        <translation type="obsolete">[DVB-T] コンステレーション (既定値: 自動)
 ???</translation>
     </message>
     <message>
@@ -2417,7 +2417,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>[DVB-S/C] Forward Error Correction (Default: Auto)
 ???</source>
-        <translation>[DVB-S/C] フォワードエラー訂正 (既定値: 自動)
+        <translation type="obsolete">[DVB-S/C] フォワードエラー訂正 (既定値: 自動)
 ???</translation>
     </message>
     <message>
@@ -2427,7 +2427,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>[DVB-T] Low Priority Code Rate (Default: Auto)
 ???</source>
-        <translation>[DVB-T] ロープライオリティコードレート (既定値: 自動)
+        <translation type="obsolete">[DVB-T] ロープライオリティコードレート (既定値: 自動)
 ???</translation>
     </message>
     <message>
@@ -2437,7 +2437,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>[DVB-T] High Priority Code Rate (Default: Auto)
 ???</source>
-        <translation>[DVB-T] ロープライオリティコードレート (既定値: 自動)
+        <translation type="obsolete">[DVB-T] ロープライオリティコードレート (既定値: 自動)
 ???</translation>
     </message>
     <message>
@@ -2447,7 +2447,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>[DVB-T] Guard Interval (Default: Auto)
 ???</source>
-        <translation>[DVB-T] ガードインターバル (既定値: 自動)
+        <translation type="obsolete">[DVB-T] ガードインターバル (既定値: 自動)
 ???</translation>
     </message>
     <message>
@@ -2457,7 +2457,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>[DVB-T] Transmission Mode (Default: Auto)
 ???</source>
-        <translation>[DVB-T] 転送モード (既定値: 自動)
+        <translation type="obsolete">[DVB-T] 転送モード (既定値: 自動)
 ???</translation>
     </message>
     <message>
@@ -2467,7 +2467,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>[DVB-T] Hierarchy (Default: Auto)
 ???</source>
-        <translation>[DVB-T] ヒエラルキー (既定値: 自動)
+        <translation type="obsolete">[DVB-T] ヒエラルキー (既定値: 自動)
 ???</translation>
     </message>
     <message>
@@ -5070,7 +5070,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Allow Transcoding jobs</source>
-        <translation>トランスコーディングジョブを有効にする</translation>
+        <translation type="obsolete">トランスコーディングジョブを有効にする</translation>
     </message>
     <message>
         <source>Allow jobs of this type to run on this backend.</source>
@@ -5683,16 +5683,6 @@ MythTVは終了します。</translation>
         <translation>ID検索</translation>
     </message>
     <message>
-        <source>[Common] Frequency (Option has no default)
-The frequency for this channel in Hz.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>[DVB-S] Polarity (Option has no default)
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>6 MHz</source>
         <translation></translation>
     </message>
@@ -5993,10 +5983,6 @@ The frequency for this channel in Hz.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Firewire Model is for future use incase there is a need to model specific work arounds.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Firewire Port</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6046,6 +6032,85 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>If enabled, you will be able to press numbers and jump the selection to whatever channel you enter.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select your preferred language</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency (Option has no default)
+The frequency for this channel in Hz.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Symbol Rate (Option has no default)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Polarity (Option has no default)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inversion (Default: Auto):
+Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandwidth (Default: Auto)
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulation (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Constellation (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forward Error Correction (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low Priority Code Rate (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High Priority Code Rate (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guard Interval (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transmission Mode (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hierarchy (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Firewire Model is for future use in case there is a need to model specific workarounds.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CPU friendly preview of recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When enabled, recording previews will play with reduced FPS to save CPU.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Pop-up Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The time (in seconds) that the menu will remain visible after navigation.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6099,6 +6164,14 @@ The frequency for this channel in Hz.</source>
     <message>
         <source>Tuning</source>
         <translation>チューニング</translation>
+    </message>
+    <message>
+        <source>Failed to open the card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to probe the card</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

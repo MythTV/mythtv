@@ -143,7 +143,7 @@
     </message>
     <message>
         <source>Minimum star rating (0.0 to 1.0 for movies only)</source>
-        <translation type="unfinished"></translation>
+        <translation>Mindestbewertung (0,0 bis 1,0 Sterne; nur für Spielfilme)</translation>
     </message>
     <message>
         <source>Exclude one station</source>
@@ -151,7 +151,7 @@
     </message>
     <message>
         <source>Match related callsigns</source>
-        <translation type="unfinished"></translation>
+        <translation>Auf bestimmte Sender begrenzen</translation>
     </message>
     <message>
         <source>Only channels from a specific video source</source>
@@ -250,10 +250,6 @@
     <message>
         <source>To see a list of all up-coming showings of this program, press &apos;5&apos;</source>
         <translation>&quot;5&quot; für eine Liste der Termine dieser Sendung</translation>
-    </message>
-    <message>
-        <source>Record one showing of this program</source>
-        <translation type="obsolete">Diese Ausstrahlung aufnehmen</translation>
     </message>
     <message>
         <source>Don&apos;t record this showing</source>
@@ -557,23 +553,23 @@
     </message>
     <message>
         <source>Commercials are flagged</source>
-        <translation>Werbung wurde markiert</translation>
+        <translation>Werbung markiert</translation>
     </message>
     <message>
         <source>An editing cutlist is present</source>
-        <translation>Schnittpunkte sind gesetzt</translation>
+        <translation>Schnittpunkte gesetzt</translation>
     </message>
     <message>
         <source>The program is able to auto-expire</source>
-        <translation>Autom. löschen ist erlaubt</translation>
+        <translation>Autom. löschen erlaubt</translation>
     </message>
     <message>
         <source>Commercials are being flagged</source>
-        <translation>Wird auf Werbung untersucht</translation>
+        <translation>Werbung wird markiert</translation>
     </message>
     <message>
         <source>A bookmark is set</source>
-        <translation>Lesezeichen ist gesetzt</translation>
+        <translation>Position gesetzt</translation>
     </message>
     <message>
         <source>Ok</source>
@@ -628,10 +624,6 @@
         <translation>, %1 GB frei</translation>
     </message>
     <message>
-        <source>Yes, but allow future recordings of this episode</source>
-        <translation type="obsolete">Ja, aber künftig wieder aufnehmen lassen</translation>
-    </message>
-    <message>
         <source>There are %1 recordings in this display group</source>
         <translation>%1 Aufnahmen in dieser Gruppe</translation>
     </message>
@@ -677,7 +669,7 @@
     </message>
     <message>
         <source>Play from bookmark</source>
-        <translation>Wiedergabe ab Lesezeichen</translation>
+        <translation>Wiedergabe ab Position</translation>
     </message>
     <message>
         <source>A preserved episode is ignored in calculations for deleting episodes above the limit.  Auto-expiration is used to remove eligable programs when disk space is low.</source>
@@ -714,14 +706,6 @@
     <message>
         <source>Show group list as titles</source>
         <translation>Zeige Gruppenliste als Titel</translation>
-    </message>
-    <message>
-        <source>Playlist Actions</source>
-        <translation type="obsolete">Playlist Aktionen</translation>
-    </message>
-    <message>
-        <source>There are %1 items in the list.</source>
-        <translation type="obsolete">Es sind %1 Einträge in der Liste.</translation>
     </message>
     <message>
         <source>Shuffle Play</source>
@@ -1012,14 +996,6 @@
         <translation>Nehme wöchentlich auf</translation>
     </message>
     <message>
-        <source>Recording when shown in this timeslot</source>
-        <translation type="obsolete">Nehme zu dieser Zeit auf</translation>
-    </message>
-    <message>
-        <source>Recording when shown on this channel</source>
-        <translation type="obsolete">Nehme auf diesem Sender auf</translation>
-    </message>
-    <message>
         <source>Recording all showings</source>
         <translation>Nehme alle Ausstrahlungen auf</translation>
     </message>
@@ -1040,20 +1016,8 @@
         <translation>Ok</translation>
     </message>
     <message>
-        <source>Recording one showing of this program</source>
-        <translation type="obsolete">Nehme eine Ausstrahlung dieser Sendung auf</translation>
-    </message>
-    <message>
         <source>Any</source>
         <translation>Jede</translation>
-    </message>
-    <message>
-        <source>Recording this showing with override options</source>
-        <translation type="obsolete">Diese Ausstrahlung mit Übersteuerungsoptionen aufnehmen</translation>
-    </message>
-    <message>
-        <source>Manually not recording this showing</source>
-        <translation type="obsolete">Aufnahme wurde manuell blockiert</translation>
     </message>
     <message>
         <source>^(The |A |An )</source>
@@ -1219,14 +1183,6 @@
         <translation>Nicht geplant</translation>
     </message>
     <message>
-        <source>Channel Recording</source>
-        <translation type="obsolete">Sendergesteuerte Aufnahme</translation>
-    </message>
-    <message>
-        <source>All Recording</source>
-        <translation type="obsolete">Alle Aufnahmen</translation>
-    </message>
-    <message>
         <source>Air Date:</source>
         <translation>Sendezeit:</translation>
     </message>
@@ -1333,10 +1289,6 @@
     <message>
         <source>Automatically Flag Commercials</source>
         <translation>Werbung autom. markieren</translation>
-    </message>
-    <message>
-        <source>Automatically flag commercials after a recording completes.</source>
-        <translation type="obsolete">Neue Aufnahmen auf Werbung untersuchen.</translation>
     </message>
     <message>
         <source>Strict Commercial Detection</source>
@@ -1603,10 +1555,6 @@
         <translation>GUI X-Versatz</translation>
     </message>
     <message>
-        <source>The horizontal offset the GUI will be displayed at.</source>
-        <translation type="obsolete">Der hoizontale Versatz mit dem die GUI angezeigt wird.</translation>
-    </message>
-    <message>
         <source>GUI Y offset</source>
         <translation>GUI Y-Versatz</translation>
     </message>
@@ -1757,10 +1705,6 @@
     <message>
         <source>Seeking</source>
         <translation>Springen</translation>
-    </message>
-    <message>
-        <source>Commercial Detection</source>
-        <translation type="obsolete">Werbung suchen</translation>
     </message>
     <message>
         <source>Overscan</source>
@@ -2092,18 +2036,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Single Recording</source>
-        <translation type="obsolete">Einmalig</translation>
-    </message>
-    <message>
-        <source>Daily Recording</source>
-        <translation type="obsolete">Täglich</translation>
-    </message>
-    <message>
-        <source>Weekly Recording</source>
-        <translation type="obsolete">Wöchentlich</translation>
-    </message>
-    <message>
         <source>Conflicting</source>
         <translation>Überschneidung</translation>
     </message>
@@ -2262,14 +2194,6 @@
     <message>
         <source>Recording</source>
         <translation>Aufnehmen</translation>
-    </message>
-    <message>
-        <source>Previous Recording</source>
-        <translation type="obsolete">Vorherige Aufnahme</translation>
-    </message>
-    <message>
-        <source>Current Recording</source>
-        <translation type="obsolete">Aktuelle Aufnahme</translation>
     </message>
     <message>
         <source>Max Recordings</source>
@@ -2484,38 +2408,18 @@
         <translation>Frequenz</translation>
     </message>
     <message>
-        <source>[Common] Frequency (Option has no default)
-The frequency for this channel in hz.</source>
-        <translation type="obsolete">[Common] Frequenz (Option hat keine Voreinstellung)
-Die Frequenz des Senders in Hz.</translation>
-    </message>
-    <message>
         <source>Symbol Rate</source>
         <translation>Symbolrate</translation>
     </message>
     <message>
         <source>[DVB-S/C] Symbol Rate (Option has no default)
 ???</source>
-        <translation>[DVB-S/C] Symbolrate (Option hat keine Voreinstellung)
+        <translation type="obsolete">[DVB-S/C] Symbolrate (Option hat keine Voreinstellung)
 ???</translation>
-    </message>
-    <message>
-        <source>Satellite</source>
-        <translation type="obsolete">Satellit</translation>
-    </message>
-    <message>
-        <source>[NONE CONFIGURED]</source>
-        <translation type="obsolete">[NICHT KONFIGURIERT]</translation>
     </message>
     <message>
         <source>Polarity</source>
         <translation>Polarität</translation>
-    </message>
-    <message>
-        <source>[DVB-S] Polarity (Option has no default)
-???</source>
-        <translation type="obsolete">[DVB-S] Polarität (Option hat keine Voreinstellung)
-???</translation>
     </message>
     <message>
         <source>Horizontal</source>
@@ -2538,11 +2442,6 @@ Die Frequenz des Senders in Hz.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>[Common] Inversion (Default: Auto):
-Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Auto</source>
         <translation>Automatisch</translation>
     </message>
@@ -2557,20 +2456,8 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>[DVB-C/T] Bandwidth (Default: Auto)
 ???</source>
-        <translation>[DVB-C/T] Bandbreite (Standard: Auto)
+        <translation type="obsolete">[DVB-C/T] Bandbreite (Standard: Auto)
 ???</translation>
-    </message>
-    <message>
-        <source>6 Mhz</source>
-        <translation type="obsolete">6 MHz</translation>
-    </message>
-    <message>
-        <source>7 Mhz</source>
-        <translation type="obsolete">7 MHz</translation>
-    </message>
-    <message>
-        <source>8 Mhz</source>
-        <translation type="obsolete">8 MHz</translation>
     </message>
     <message>
         <source>Modulation</source>
@@ -2579,7 +2466,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>[DVB-C] Modulation (Default: Auto)
 ???</source>
-        <translation>[DVB-C] Modulation (Standard: Auto)
+        <translation type="obsolete">[DVB-C] Modulation (Standard: Auto)
 ???</translation>
     </message>
     <message>
@@ -2587,17 +2474,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>[DVB-T] Constellation (Default: Auto)
-???</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>FEC</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>[DVB-S/C] Forward Error Correction (Default: Auto)
-???</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2605,17 +2482,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>[DVB-T] Low Priority Code Rate (Default: Auto)
-???</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>HP Coderate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>[DVB-T] High Priority Code Rate (Default: Auto)
-???</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2623,55 +2490,12 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>[DVB-T] Guard Interval (Default: Auto)
-???</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Trans. Mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>[DVB-T] Transmission Mode (Default: Auto)
-???</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Hierarchy</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>[DVB-T] Hierarchy (Default: Auto)
-???</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Video</source>
-        <translation type="obsolete">Video</translation>
-    </message>
-    <message>
-        <source>Teletext</source>
-        <translation type="obsolete">Teletext</translation>
-    </message>
-    <message>
-        <source>Subtitle</source>
-        <translation type="obsolete">Untertitel</translation>
-    </message>
-    <message>
-        <source>Service ID</source>
-        <translation type="obsolete">Service ID</translation>
-    </message>
-    <message>
-        <source>Provider ID</source>
-        <translation type="obsolete">Provider ID</translation>
-    </message>
-    <message>
-        <source>Transport ID</source>
-        <translation type="obsolete">Transport ID</translation>
-    </message>
-    <message>
-        <source>Network ID</source>
-        <translation type="obsolete">Netzwerk ID</translation>
     </message>
     <message>
         <source>Channel Options - Common</source>
@@ -2680,18 +2504,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>Channel Options - Video 4 Linux</source>
         <translation>Senderoptionen - Video 4 Linux</translation>
-    </message>
-    <message>
-        <source>Channel Options - DVB</source>
-        <translation type="obsolete">Senderoptionen - DVB</translation>
-    </message>
-    <message>
-        <source>Channel Options - DVB Pids &amp; IDs</source>
-        <translation type="obsolete">Senderoptionen - DVB Pids &amp; IDs</translation>
-    </message>
-    <message>
-        <source>A comma separated list of pids for each type. Note that currently MythTV only supports recording and not playback of multiple audio or video pids. It does not support showing teletext or subtitles either, but these do not crash the player as audio and video might.</source>
-        <translation type="obsolete">Eine durch Komma getrennte Liste von PIDs für jeden Typ. MythTV unterstützt im Moment nur die Aufnahme aber nicht die Wiedergabe von mehreren Audio oder Video PIDs. Ebenso werden momentan weder Untertitel noch Teletext unterstützt, diese bringen den Player jedoch nicht zum Absturz wie es bei Audio und Video passieren könnte.</translation>
     </message>
     <message>
         <source>Profile Group Name</source>
@@ -2774,10 +2586,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>MPEG-2 Enkoderkarte (PVR 250/350)</translation>
     </message>
     <message>
-        <source>pcHDTV ATSC capture card</source>
-        <translation type="obsolete">pcHDTV ATSC Fernsehkarte</translation>
-    </message>
-    <message>
         <source>Digital Video Broadcast card (DVB)</source>
         <translation>Digital Video Broadcast Karte (DVB)</translation>
     </message>
@@ -2794,40 +2602,12 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>FEHLER, Keine Eingänge gefunden</translation>
     </message>
     <message>
-        <source>[All VideoSources]</source>
-        <translation type="obsolete">[Alle Videoquellen]</translation>
-    </message>
-    <message>
-        <source>[No VideoSources Defined]</source>
-        <translation type="obsolete">[Keine Videoquellen definiert]</translation>
-    </message>
-    <message>
-        <source>[No Channels Defined]</source>
-        <translation type="obsolete">[Keine Sender definiert]</translation>
-    </message>
-    <message>
-        <source>Load &amp; Tune</source>
-        <translation type="obsolete">Laden &amp; Abstimmen</translation>
-    </message>
-    <message>
-        <source>Bit Error Rate</source>
-        <translation type="obsolete">Bitfehlerrate</translation>
-    </message>
-    <message>
-        <source>Uncorrected Blocks</source>
-        <translation type="obsolete">Nicht korrigierte Blöcke</translation>
-    </message>
-    <message>
         <source>Signal/Noise</source>
         <translation>Signal/Rauschen</translation>
     </message>
     <message>
         <source>Signal Strength</source>
         <translation>Signalstärke</translation>
-    </message>
-    <message>
-        <source>FAILED TO OPEN CARD, CHECK CONSOLE!!</source>
-        <translation type="obsolete">KONNTE DIE KARTE NICHT ANSPRECHEN, KONSOLE KONTROLLIEREN!</translation>
     </message>
     <message>
         <source>Advanced Configuration</source>
@@ -2918,14 +2698,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Record the TS, not PS.</source>
-        <translation type="obsolete">TS aufnehmen, nicht PS.</translation>
-    </message>
-    <message>
-        <source>This will make the backend not perform Transport Stream to Program Stream conversion.</source>
-        <translation type="obsolete">Schaltet die Umwandlung von Transport Stream zu Program Stream im Backend ab.</translation>
-    </message>
-    <message>
         <source>Normally the dvb-recording will drop packets from the card untill a sequence start header is seen. This option turns off this feature.</source>
         <translation>Bei DVB Aufnahmen werden normalerweise Datenpakete verworfen solange kein Sequence Startheader emfangen wurde. Diese Option schaltet dieses Merkmal ab.</translation>
     </message>
@@ -2938,28 +2710,8 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>Paketpuffer</translation>
     </message>
     <message>
-        <source>Channels</source>
-        <translation type="obsolete">Sender</translation>
-    </message>
-    <message>
         <source>Status</source>
         <translation>Status</translation>
-    </message>
-    <message>
-        <source>Satellites</source>
-        <translation type="obsolete">Satelliten</translation>
-    </message>
-    <message>
-        <source>Satellite Configuration</source>
-        <translation type="obsolete">Satellitenkonfiguration</translation>
-    </message>
-    <message>
-        <source>Satellite Name</source>
-        <translation type="obsolete">Satellitenname</translation>
-    </message>
-    <message>
-        <source>Satellite Position</source>
-        <translation type="obsolete">Satellitenposition</translation>
     </message>
     <message>
         <source>LNB LOF Switch</source>
@@ -2976,10 +2728,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     <message>
         <source>Recorder Options</source>
         <translation>Aufnahme Einstellungen</translation>
-    </message>
-    <message>
-        <source>Configuration Options</source>
-        <translation type="obsolete">Konfigurations Optionen</translation>
     </message>
     <message>
         <source>Capture device</source>
@@ -3234,10 +2982,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>Beim Umschalten warnen</translation>
     </message>
     <message>
-        <source>Find One Recording</source>
-        <translation type="obsolete">Suche Eine Aufnahme</translation>
-    </message>
-    <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
         <translation>Wählen Sie diese Option für preiswerte, auf dem BT878 basierende, DVB-T Karten (z.B. AverTV DVB-T). Bei diesen Karten darf die Lautstärke nicht verändert werden.</translation>
     </message>
@@ -3248,10 +2992,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     <message>
         <source>Find One Recordings Priority</source>
         <translation>&apos;Suche Eine&apos; Priorität</translation>
-    </message>
-    <message>
-        <source>Find One Recording types will receive this additional recording priority value.</source>
-        <translation type="obsolete">&apos;Suche Eine&apos; Aufnahmen erhalten diesen zusätzlichen Aufnahmeprioritätswert.</translation>
     </message>
     <message>
         <source>Length of time to retain DVB signal data (in days)</source>
@@ -3714,24 +3454,12 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>Seitenverhältnis festlegen</translation>
     </message>
     <message>
-        <source>16/9 Anamorphic</source>
-        <translation type="obsolete">16:9 Anamorph</translation>
-    </message>
-    <message>
-        <source>4/3 Normal</source>
-        <translation type="obsolete">4:3 Normal</translation>
-    </message>
-    <message>
         <source>16/9 Zoom</source>
         <translation>16:9 Zoom</translation>
     </message>
     <message>
         <source>4/3 Zoom</source>
         <translation>4:3 Zoom</translation>
-    </message>
-    <message>
-        <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback.</source>
-        <translation type="obsolete">Gibt das Seitenverhältnis für die Wiedergabe unabhängig von der Aufnahme vor, genau wie die &quot;w&quot; Taste während der Wiedergabe.</translation>
     </message>
     <message>
         <source>GUI width (px)</source>
@@ -3924,11 +3652,6 @@ Myth wird nun beendet.</translation>
         <translation>Ohne Werbung</translation>
     </message>
     <message>
-        <source>X</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">X</translation>
-    </message>
-    <message>
         <source>Startup command</source>
         <translation>Einschaltbefehl</translation>
     </message>
@@ -3976,34 +3699,6 @@ Myth wird nun beendet.</translation>
     <message>
         <source>this episode will be recorded at a later time.</source>
         <translation>diese Folge zu einem späteren Zeitpunkt aufgenommen wird.</translation>
-    </message>
-    <message>
-        <source>Category:  </source>
-        <translation type="obsolete">Genre:  </translation>
-    </message>
-    <message>
-        <source>Type:  </source>
-        <translation type="obsolete">Typ:  </translation>
-    </message>
-    <message>
-        <source>Episode Number:  </source>
-        <translation type="obsolete">Folge Nr.:  </translation>
-    </message>
-    <message>
-        <source>Original Airdate:  </source>
-        <translation type="obsolete">Erste Ausstrahlung:  </translation>
-    </message>
-    <message>
-        <source>Program ID:  </source>
-        <translation type="obsolete">Programm ID:  </translation>
-    </message>
-    <message>
-        <source>Filesize:  </source>
-        <translation type="obsolete">Dateigröße:  </translation>
-    </message>
-    <message>
-        <source>Recording Group:  </source>
-        <translation type="obsolete">Aufnahmegruppe:</translation>
     </message>
     <message>
         <source> The following programs will be recorded instead:
@@ -4110,10 +3805,6 @@ Myth wird nun beendet.</translation>
     <message>
         <source>One field</source>
         <translation>One field</translation>
-    </message>
-    <message>
-        <source>Deinterlace algorithm.  &apos;Linear blend&apos; and &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
-        <translation type="obsolete">Deinterlace Algorithmus. &apos;Linear blend&apos; und &apos;Kernel&apos; benötigen SSE Funktionen. &apos;Bob&apos; benötigt Xv oder XvMC Unterstützung.</translation>
     </message>
     <message>
         <source>Deinterlace settings</source>
@@ -4520,10 +4211,6 @@ Myth wird nun beendet.</translation>
         <translation>Nur diese Ausstrahlung aufnehmen</translation>
     </message>
     <message>
-        <source>Record one showing of this program</source>
-        <translation type="obsolete">Eine Ausstrahlung aufnehmen</translation>
-    </message>
-    <message>
         <source>Record in this timeslot every week</source>
         <translation>Wöchentlich zu dieser Zeit aufnehmen</translation>
     </message>
@@ -4842,10 +4529,6 @@ Myth wird nun beendet.</translation>
         <translation>Nutze den XvMC VLD Dekoder</translation>
     </message>
     <message>
-        <source>Enables the use of viaXvMC HW Mpeg decoding for the Via Unichome Chipset</source>
-        <translation type="obsolete">Dies schaltet die Unterstützung für den Via XvMC Hardware MPEG Dekoder ein. Nur beim Via Unichrome Chipsatz verfügbar.</translation>
-    </message>
-    <message>
         <source>Commercial Skip</source>
         <translation>Werbung überspringen</translation>
     </message>
@@ -4930,10 +4613,6 @@ Myth wird nun beendet.</translation>
         <translation>Auftrag 4 Befehl</translation>
     </message>
     <message>
-        <source>Allow Transcoding jobs</source>
-        <translation>Erlaube Umwandlungsaufträge</translation>
-    </message>
-    <message>
         <source>Allow jobs of this type to run on this backend.</source>
         <translation>Erlaube die folgenden Auftragstypen für dieses Backend.</translation>
     </message>
@@ -5000,10 +4679,6 @@ Myth wird nun beendet.</translation>
     <message>
         <source>Requeue Job?</source>
         <translation>Auftrag wiederholen?</translation>
-    </message>
-    <message>
-        <source>Follow Symlinks when deleting files</source>
-        <translation type="obsolete">Folge symbolischen Links</translation>
     </message>
     <message>
         <source>This will cause Myth to follow symlinks when recordings and related files are deleted, instead of deleting the symlink and leaving the actual file.</source>
@@ -5196,18 +4871,6 @@ Myth wird nun beendet.</translation>
         <translation>Schaltet die Unterstützung für den Via XvMC Hardware MPEG Dekoder ein. Nur beim Via Unichrome Chipsatz verfügbar.</translation>
     </message>
     <message>
-        <source>Keep this episode in the list</source>
-        <translation type="obsolete">Diese Folge in der Liste behalten</translation>
-    </message>
-    <message>
-        <source>Remove this episode from the list</source>
-        <translation type="obsolete">Diese Folge aus der Liste entfernen</translation>
-    </message>
-    <message>
-        <source>Remove all episodes for this title</source>
-        <translation type="obsolete">Alle Folgen entfernen</translation>
-    </message>
-    <message>
         <source>Machine Status</source>
         <translation>Rechner</translation>
     </message>
@@ -5294,18 +4957,6 @@ Myth wird nun beendet.</translation>
     <message>
         <source>Yes, delete my card settings</source>
         <translation>Ja, die Karteneinstellungen löschen</translation>
-    </message>
-    <message>
-        <source>Would you like to clear all program and channel settings before starting configuration?</source>
-        <translation type="obsolete">Möchten Sie alle Programm- und Sendereinstellungen löschen bevor Sie mit der Konfiguration beginnen?</translation>
-    </message>
-    <message>
-        <source>No, leave my program settings alone</source>
-        <translation type="obsolete">Nein, nicht löschen</translation>
-    </message>
-    <message>
-        <source>Yes, delete my program settings</source>
-        <translation type="obsolete">Ja, die Programmeinstellungen löschen</translation>
     </message>
     <message>
         <source>%1% Completed @ %2 fps.</source>
@@ -5542,16 +5193,6 @@ Myth wird nun beendet.</translation>
     <message>
         <source>Find ID</source>
         <translation>Suche ID</translation>
-    </message>
-    <message>
-        <source>[Common] Frequency (Option has no default)
-The frequency for this channel in Hz.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>[DVB-S] Polarity (Option has no default)
-</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>6 MHz</source>
@@ -5807,7 +5448,7 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>This is the default policy used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Voreinstellung der &apos;Werbung markieren&apos; Funktion für neu geplante Aufnahmen.</translation>
     </message>
     <message>
         <source>Use libmpeg2 for decoding</source>
@@ -5851,62 +5492,137 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Firewire Model</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Firewire Model is for future use incase there is a need to model specific work arounds.</source>
-        <translation type="unfinished"></translation>
+        <translation>Firewire Modell</translation>
     </message>
     <message>
         <source>Firewire Port</source>
-        <translation type="unfinished"></translation>
+        <translation>Firewire Anschluß</translation>
     </message>
     <message>
         <source>Firewire port on your firewire card.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Anschluß auf Ihrer Firewire-Karte.</translation>
     </message>
     <message>
         <source>Firewire Node</source>
-        <translation type="unfinished"></translation>
+        <translation>Firewire Knoten</translation>
     </message>
     <message>
         <source>Firewire node is the remote device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Das entfernte Gerät.</translation>
     </message>
     <message>
         <source>Firewire Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Firewire Geschwindigkeit</translation>
     </message>
     <message>
         <source>100Mbps</source>
-        <translation type="unfinished"></translation>
+        <translation>100 Mbps</translation>
     </message>
     <message>
         <source>200Mbps</source>
-        <translation type="unfinished"></translation>
+        <translation>200 Mbps</translation>
     </message>
     <message>
         <source>400Mbps</source>
-        <translation type="unfinished"></translation>
+        <translation>400 Mbps</translation>
     </message>
     <message>
         <source>Default Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Standardeingang</translation>
     </message>
     <message>
         <source>Only MPEG2TS is supported at this time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Im Moment wird nur MPEG2TS unterstützt.</translation>
     </message>
     <message>
         <source>FireWire Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Firewire Eingang</translation>
     </message>
     <message>
         <source>Allow channel jumping in guide</source>
-        <translation type="unfinished"></translation>
+        <translation>direkte Senderauswahl im EPG</translation>
     </message>
     <message>
         <source>If enabled, you will be able to press numbers and jump the selection to whatever channel you enter.</source>
+        <translation>Falls gesetzt, können Sie im EPG mit den Zifferntasten direkt zu einem bestimmten Sender springen.</translation>
+    </message>
+    <message>
+        <source>Select your preferred language</source>
+        <translation>Bitte wählen Sie Ihre Landessprache</translation>
+    </message>
+    <message>
+        <source>CPU friendly preview of recordings</source>
+        <translation>CPU freundliche Vorschau</translation>
+    </message>
+    <message>
+        <source>When enabled, recording previews will play with reduced FPS to save CPU.</source>
+        <translation>Falls gesetzt, wird die Live-Vorschau nur mit 12 fps abgespielt. Nüztlich bei langsamen Rechnern.</translation>
+    </message>
+    <message>
+        <source>Menu Pop-up Time</source>
+        <translation>Menü-Anzeigedauer</translation>
+    </message>
+    <message>
+        <source>The time (in seconds) that the menu will remain visible after navigation.</source>
+        <translation>Wie lange (in Sek.) das Menü angezeigt wird.</translation>
+    </message>
+    <message>
+        <source>Firewire Model is for future use in case there is a need to model specific workarounds.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency (Option has no default)
+The frequency for this channel in Hz.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Symbol Rate (Option has no default)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Polarity (Option has no default)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inversion (Default: Auto):
+Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandwidth (Default: Auto)
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulation (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Constellation (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forward Error Correction (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low Priority Code Rate (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High Priority Code Rate (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guard Interval (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transmission Mode (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hierarchy (Default: Auto)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5961,6 +5677,14 @@ The frequency for this channel in Hz.</source>
         <source>Tuning</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Failed to open the card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to probe the card</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScheduledRecording</name>
@@ -5998,14 +5722,6 @@ The frequency for this channel in Hz.</source>
     <message>
         <source>is not available</source>
         <translation>ist nicht verfügbar</translation>
-    </message>
-    <message>
-        <source>System Status - Select a category to view the status</source>
-        <translation type="obsolete">Systemstatus - Bitte eine Kategorie wählen</translation>
-    </message>
-    <message>
-        <source>This screen displays the status of various system components</source>
-        <translation type="obsolete">Zeigt den Status verschiedener Systemkomponenten</translation>
     </message>
 </context>
 <context>
@@ -6141,10 +5857,6 @@ The frequency for this channel in Hz.</source>
     <message>
         <source>Play</source>
         <translation>Normal</translation>
-    </message>
-    <message>
-        <source>Speed 5X</source>
-        <translation type="obsolete">Zeitraffer 5x</translation>
     </message>
     <message>
         <source>Speed 3X</source>
@@ -6494,16 +6206,8 @@ The frequency for this channel in Hz.</source>
         <translation>Rang:</translation>
     </message>
     <message>
-        <source>(1) Sort by Title    (2) Sort by Priority</source>
-        <translation type="obsolete">(1) Sortiert nach Sender (2) Sortiert nach Rang</translation>
-    </message>
-    <message>
         <source>Record Type:</source>
         <translation>Modus:</translation>
-    </message>
-    <message>
-        <source>Select a recording to permanently delete:</source>
-        <translation type="obsolete">Welche Aufnahme soll gelöscht werden:</translation>
     </message>
     <message>
         <source>Select a recording to watch:</source>
@@ -6570,18 +6274,6 @@ The frequency for this channel in Hz.</source>
         <translation>Endpriorität</translation>
     </message>
     <message>
-        <source>[</source>
-        <translation type="obsolete">[</translation>
-    </message>
-    <message>
-        <source>]</source>
-        <translation type="obsolete">]</translation>
-    </message>
-    <message>
-        <source>]  = </source>
-        <translation type="obsolete">]  =</translation>
-    </message>
-    <message>
         <source>Program Listings</source>
         <translation>Fernsehprogramm</translation>
     </message>
@@ -6592,22 +6284,6 @@ The frequency for this channel in Hz.</source>
     <message>
         <source>Airdate:</source>
         <translation>Sendezeit:</translation>
-    </message>
-    <message>
-        <source>Loading...</source>
-        <translation type="obsolete">Lade...</translation>
-    </message>
-    <message>
-        <source>Select a recording to view:</source>
-        <translation type="obsolete">Welche Aufnahme möchten Sie sehen:</translation>
-    </message>
-    <message>
-        <source>Pick the letter in which the show starts with, then hit ENTER or the right arrow</source>
-        <translation type="obsolete">Wählen Sie den Anfangsbuchstaben der Sendung. Weiter mit &quot;SELECT&quot; oder Pfeil-Rechts</translation>
-    </message>
-    <message>
-        <source>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting &apos;info&apos; will allow you to setup recording options.</source>
-        <translation type="obsolete">Wählen Sie den Titel der gesuchten Sendung. Beenden mit Pfeil-Links oder &quot;SELECT&quot; um eine Aufnahme zu planen.</translation>
     </message>
     <message>
         <source>Source:</source>
