@@ -9,7 +9,7 @@
 #include "osd.h"
 #include "libmyth/mythcontext.h"
 #include "libmyth/dialogbox.h"
-#include "libmyth/recordingprofile.h"
+#include "recordingprofile.h"
 
 // cheat and put the keycodes here
 #define wsUp            0x52 + 256
