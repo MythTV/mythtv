@@ -111,13 +111,13 @@
 
                 -->
                 <bin number="1">
-                    <area>30,30,190,235</area>
+                    <area>30,16,190,250</area>
                     <fcnfont name="active" function="active"></fcnfont>
                     <fcnfont name="inactive" function="inactive"></fcnfont>
                     <fcnfont name="selected" function="selected"></fcnfont>
                 </bin>
                 <bin number="2">
-                    <area>235,20,535,250</area>
+                    <area>235,10,535,270</area>
                     <fcnfont name="active" function="active"></fcnfont>
                     <fcnfont name="selected" function="selected"></fcnfont>
                     <fcnfont name="inactive" function="inactive"></fcnfont>
@@ -189,19 +189,19 @@
 
             <textarea name="title_text" draworder="1" align="left">
                 <font>currenttitle</font>
-                <area>270,15,450,25</area>
+                <area>270,15,450,30</area>
                 <cutdown>yes</cutdown>
             </textarea>
 
             <textarea name="artist_text" draworder="1" align="left">
                 <font>currentartist</font>
-                <area>270,35,450,25</area>
+                <area>270,45,450,25</area>
                 <cutdown>yes</cutdown>
             </textarea>
 
             <textarea name="album_text" draworder="1" align="left">
                 <font>currentartist</font>
-                <area>270,55,450,25</area>
+                <area>270,70,450,25</area>
                 <cutdown>yes</cutdown>
             </textarea>
 
@@ -212,7 +212,7 @@
 
             <textarea name="info_text" draworder="1" align="left">
                 <font>currentartist</font>
-                <area>270,125,225,25</area>
+                <area>270,125,250,25</area>
             </textarea>
 
             <textarea name="time_text" draworder="1" align="right">
