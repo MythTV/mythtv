@@ -32,7 +32,7 @@ SOURCES += vqavideo.c idcinvideo.c adx.c rational.c faandct.c snow.c sonic.c
 SOURCES += 8bps.c parser.c smc.c flicvideo.c truemotion1.c vmdav.c lcl.c
 SOURCES += qtrle.c g726.c flac.c vp3dsp.c integer.c h261.c resample2.c
 SOURCES += h264idct.c png.c pnm.c qdrw.c qpeg.c rangecoder.c ulti.c xl.c
-SOURCES += bitstream.c libpostproc/postprocess.c #ffv1.c 
+SOURCES += bitstream.c vc9.c libpostproc/postprocess.c #ffv1.c 
 
 inc.path = $${PREFIX}/include/mythtv/ffmpeg/
 inc.files = avcodec.h rational.h common.h

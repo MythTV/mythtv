@@ -171,6 +171,8 @@ static int film_read_header(AVFormatContext *s,
         return AVERROR_INVALIDDATA;
     film->base_clock = BE_32(&scratch[8]);
     film->sample_count = BE_32(&scratch[12]);
+    if(film->sample_count >= UINT_MAX / sizeof(film_sample_t))
+        return -1;
     film->sample_table = av_malloc(film->sample_count * sizeof(film_sample_t));
     
     for(i=0; i<s->nb_streams; i++)
@@ -229,6 +231,8 @@ static int film_read_packet(AVFormatContext *s,
         (film->video_type == CODEC_ID_CINEPAK)) {
         if (av_new_packet(pkt, sample->sample_size - film->cvid_extra_bytes))
             return AVERROR_NOMEM;
+        if(pkt->size < 10)
+            return -1;
         ret = get_buffer(pb, pkt->data, 10);
         /* skip the non-spec CVID bytes */
         url_fseek(pb, film->cvid_extra_bytes, SEEK_CUR);

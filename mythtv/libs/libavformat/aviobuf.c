@@ -350,6 +350,9 @@ int get_buffer(ByteIOContext *s, unsigned char *buf, int size)
 int get_partial_buffer(ByteIOContext *s, unsigned char *buf, int size)
 {
     int len;
+    
+    if(size<0)
+        return -1;
 
     len = s->buf_end - s->buf_ptr;
     if (len == 0) {
@@ -629,11 +632,13 @@ static int dyn_buf_write(void *opaque, uint8_t *buf, int buf_size)
     /* reallocate buffer if needed */
     new_size = d->pos + buf_size;
     new_allocated_size = d->allocated_size;
+    if(new_size < d->pos || new_size > INT_MAX/2)
+        return -1;
     while (new_size > new_allocated_size) {
         if (!new_allocated_size)
             new_allocated_size = new_size;
         else
-            new_allocated_size = (new_allocated_size * 3) / 2 + 1;    
+            new_allocated_size += new_allocated_size / 2 + 1;    
     }
     
     if (new_allocated_size > d->allocated_size) {
@@ -691,6 +696,8 @@ static int url_open_dyn_buf_internal(ByteIOContext *s, int max_packet_size)
     else
         io_buffer_size = 1024;
         
+    if(sizeof(DynBuffer) + io_buffer_size < io_buffer_size)
+        return -1;
     d = av_malloc(sizeof(DynBuffer) + io_buffer_size);
     if (!d)
         return -1;

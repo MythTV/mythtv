@@ -175,6 +175,7 @@ const CodecTag codec_bmp_tags[] = {
     { CODEC_ID_QPEG, MKTAG('Q', 'P', 'E', 'G') },
     { CODEC_ID_QPEG, MKTAG('Q', '1', '.', '0') },
     { CODEC_ID_QPEG, MKTAG('Q', '1', '.', '1') },
+    { CODEC_ID_WMV3, MKTAG('W', 'M', 'V', '3') },
     { CODEC_ID_RAWVIDEO, 0 },
     { 0, 0 },
 };
@@ -409,7 +410,7 @@ static int avi_write_header(AVFormatContext *s)
             parse_specific_params(stream, &au_byterate, &au_ssize, &au_scale);
             put_le32(pb, au_scale); /* scale */
             put_le32(pb, au_byterate); /* rate */
-//            av_set_pts_info(&s->streams[i], 64, au_scale, au_byterate);
+            av_set_pts_info(s->streams[i], 64, au_scale, au_byterate);
             put_le32(pb, 0); /* start */
             avi->frames_hdr_strm[i] = url_ftell(pb); /* remember this offset to fill later */
             put_le32(pb, 0); /* length, XXX: filled later */

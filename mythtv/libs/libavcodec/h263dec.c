@@ -85,6 +85,11 @@ int ff_h263_decode_init(AVCodecContext *avctx)
         s->h263_pred = 1;
         s->msmpeg4_version=5;
         break;
+    case CODEC_ID_WMV3:
+        s->h263_msmpeg4 = 1;
+        s->h263_pred = 1;
+        s->msmpeg4_version=6;
+        break;
     case CODEC_ID_H263I:
         break;
     case CODEC_ID_FLV1:
@@ -724,9 +729,8 @@ retry:
     if(s->codec_id==CODEC_ID_MPEG4 && s->bitstream_buffer_size==0 && s->divx_packed){
         int current_pos= get_bits_count(&s->gb)>>3;
         int startcode_found=0;
-
-        if(   buf_size - current_pos > 5 
-           && buf_size - current_pos < BITSTREAM_BUFFER_SIZE){
+        
+        if(buf_size - current_pos > 5){
             int i;
             for(i=current_pos; i<buf_size-3; i++){
                 if(buf[i]==0 && buf[i+1]==0 && buf[i+2]==1 && buf[i+3]==0xB6){
@@ -741,6 +745,10 @@ retry:
         }
 
         if(startcode_found){
+            s->bitstream_buffer= av_fast_realloc(
+                s->bitstream_buffer, 
+                &s->allocated_bitstream_buffer_size, 
+                buf_size - current_pos + FF_INPUT_BUFFER_PADDING_SIZE);
             memcpy(s->bitstream_buffer, buf + current_pos, buf_size - current_pos);
             s->bitstream_buffer_size= buf_size - current_pos;
         }
@@ -790,7 +798,7 @@ AVCodec mpeg4_decoder = {
     NULL,
     ff_h263_decode_end,
     ff_h263_decode_frame,
-    CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1 | CODEC_CAP_TRUNCATED,
+    CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1 | CODEC_CAP_TRUNCATED | CODEC_CAP_DELAY,
     .options = mpeg4_decoptions,
     .flush= ff_mpeg_flush,
 };
@@ -804,7 +812,7 @@ AVCodec h263_decoder = {
     NULL,
     ff_h263_decode_end,
     ff_h263_decode_frame,
-    CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1 | CODEC_CAP_TRUNCATED,
+    CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1 | CODEC_CAP_TRUNCATED | CODEC_CAP_DELAY,
     .flush= ff_mpeg_flush,
 };
 

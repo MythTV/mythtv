@@ -1114,13 +1114,13 @@ QString HostSetting::whereClause(void)
 QString HostSetting::setClause(void)
 {
     return QString("value = '%1', data = '%2', hostname = '%3'")
-                   .arg(getName()).arg(getValue())
+                   .arg(getName()).arg(getValue().utf8())
                    .arg(gContext->GetHostName());
 }
 
 QString GlobalSetting::whereClause(void)
 {
-    return QString("value = '%1'").arg(getName());
+    return QString("value = '%1'").arg(getName().utf8());
 }
 
 QString GlobalSetting::setClause(void)

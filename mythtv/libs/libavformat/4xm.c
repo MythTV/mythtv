@@ -185,6 +185,8 @@ static int fourxm_read_header(AVFormatContext *s,
             current_track = LE_32(&header[i + 8]);
             if (current_track + 1 > fourxm->track_count) {
                 fourxm->track_count = current_track + 1;
+                if((unsigned)fourxm->track_count >= UINT_MAX / sizeof(AudioTrack))
+                    return -1;
                 fourxm->tracks = av_realloc(fourxm->tracks, 
                     fourxm->track_count * sizeof(AudioTrack));
                 if (!fourxm->tracks) {
@@ -277,7 +279,7 @@ static int fourxm_read_packet(AVFormatContext *s,
 
             /* allocate 8 more bytes than 'size' to account for fourcc
              * and size */
-            if (av_new_packet(pkt, size + 8))
+            if (size + 8 < size || av_new_packet(pkt, size + 8))
                 return AVERROR_IO;
             pkt->stream_index = fourxm->video_stream_index;
             pkt->pts = fourxm->video_pts;

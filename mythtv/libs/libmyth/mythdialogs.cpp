@@ -2479,6 +2479,7 @@ void MythSearchDialog::keyPressEvent(QKeyEvent *e)
 
 void MythSearchDialog::itemSelected(int index)
 {
+    (void)index;
     done(0);
 }
 

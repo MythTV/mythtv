@@ -254,6 +254,8 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
                     ast->rate = get_le32(pb);
                     if(!ast->rate)
                         ast->rate= 1; //wrong but better then 1/0
+                    if(!ast->scale)
+                        ast->scale= 1; //wrong but better then 1/0
                     av_set_pts_info(st, 64, ast->scale, ast->rate);
                     ast->start= get_le32(pb); /* start */
                     length = get_le32(pb); /* length, in samples or bytes */
@@ -302,9 +304,11 @@ static int avi_read_header(AVFormatContext *s, AVFormatParameters *ap)
                     get_le32(pb); /* ClrUsed */
                     get_le32(pb); /* ClrImportant */
 
+                 if(size > 10*4 && size<(1<<30)){
                     st->codec.extradata_size= size - 10*4;
                     st->codec.extradata= av_malloc(st->codec.extradata_size + FF_INPUT_BUFFER_PADDING_SIZE);
                     get_buffer(pb, st->codec.extradata, st->codec.extradata_size);
+                 }
                     
                     if(st->codec.extradata_size & 1) //FIXME check if the encoder really did this correctly
                         get_byte(pb);
@@ -445,6 +449,11 @@ resync:
           AVIStream *ast;
           st = s->streams[n];
           ast = st->priv_data;
+          
+          if(st->discard){
+                url_fskip(pb, size);
+                goto resync;
+          }
 
           if(   ((ast->prefix_count<5 || sync+9 > i) && d[2]<128 && d[3]<128) || 
                 d[2]*256+d[3] == ast->prefix /*||
@@ -548,6 +557,8 @@ static int avi_read_idx1(AVFormatContext *s, int size)
     
     nb_index_entries = size / 16;
     if (nb_index_entries <= 0)
+        return -1;
+    if(nb_index_entries + 1 >= UINT_MAX / sizeof(AVIIndexEntry))
         return -1;
 
     /* read the entries and sort them in each stream component */

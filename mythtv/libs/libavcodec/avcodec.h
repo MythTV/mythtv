@@ -17,7 +17,7 @@ extern "C" {
 
 #define FFMPEG_VERSION_INT     0x000409
 #define FFMPEG_VERSION         "0.4.9-pre1"
-#define LIBAVCODEC_BUILD       4736
+#define LIBAVCODEC_BUILD       4738
 
 #define LIBAVCODEC_VERSION_INT FFMPEG_VERSION_INT
 #define LIBAVCODEC_VERSION     FFMPEG_VERSION
@@ -103,6 +103,8 @@ enum CodecID {
     CODEC_ID_FFVHUFF,
     CODEC_ID_RV30,
     CODEC_ID_RV40,
+    CODEC_ID_VC9,
+    CODEC_ID_WMV3,
     
 
     /* various pcm "codecs" */
@@ -160,6 +162,7 @@ enum CodecID {
     CODEC_ID_SONIC,
     CODEC_ID_SONIC_LS,
     CODEC_ID_FLAC,
+    CODEC_ID_MP3ADU,
     
     CODEC_ID_MPEG2TS= 0x20000, /* _FAKE_ codec to indicate a raw MPEG2 transport
                          stream (only used by libavformat) */
@@ -235,6 +238,12 @@ enum SampleFormat {
  * MPEG bitstreams could cause overread and segfault
  */
 #define FF_INPUT_BUFFER_PADDING_SIZE 8
+
+/**
+ * minimum encoding buffer size.
+ * used to avoid some checks during header writing
+ */
+#define FF_MIN_BUFFER_SIZE 16384
 
 /* motion estimation type, EPZS by default */
 enum Motion_Est_ID {
@@ -330,7 +339,10 @@ extern int motion_estimation_method;
 #define CODEC_CAP_TRUNCATED       0x0008
 /* codec can export data for HW decoding (XvMC) */
 #define CODEC_CAP_HWACCEL         0x0010
-/** codec has a non zero delay and needs to be feeded with NULL at the end to get the delayed data */
+/** 
+ * codec has a non zero delay and needs to be feeded with NULL at the end to get the delayed data.
+ * if this is not set, the codec is guranteed to never be feeded with NULL data
+ */
 #define CODEC_CAP_DELAY           0x0020
 
 //the following defines might change, so dont expect compatibility if u use them
@@ -1888,6 +1900,8 @@ extern AVCodec msmpeg4v2_decoder;
 extern AVCodec msmpeg4v3_decoder;
 extern AVCodec wmv1_decoder;
 extern AVCodec wmv2_decoder;
+extern AVCodec vc9_decoder;
+extern AVCodec wmv3_decoder;
 extern AVCodec mpeg1video_decoder;
 extern AVCodec mpeg2video_decoder;
 extern AVCodec mpegvideo_decoder;
@@ -1910,6 +1924,7 @@ extern AVCodec sp5x_decoder;
 extern AVCodec png_decoder;
 extern AVCodec mp2_decoder;
 extern AVCodec mp3_decoder;
+extern AVCodec mp3adu_decoder;
 extern AVCodec mace3_decoder;
 extern AVCodec mace6_decoder;
 extern AVCodec huffyuv_decoder;
@@ -2122,6 +2137,7 @@ int avcodec_default_get_buffer(AVCodecContext *s, AVFrame *pic);
 void avcodec_default_release_buffer(AVCodecContext *s, AVFrame *pic);
 int avcodec_default_reget_buffer(AVCodecContext *s, AVFrame *pic);
 void avcodec_align_dimensions(AVCodecContext *s, int *width, int *height);
+int avcodec_check_dimensions(void *av_log_ctx, unsigned int w, unsigned int h);
 enum PixelFormat avcodec_default_get_format(struct AVCodecContext *s, const enum PixelFormat * fmt);
 
 int avcodec_thread_init(AVCodecContext *s, int thread_count);

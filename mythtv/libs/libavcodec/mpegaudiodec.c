@@ -98,6 +98,8 @@ typedef struct MPADecodeContext {
     int frame_count;
 #endif
     void (*compute_antialias)(struct MPADecodeContext *s, struct GranuleDef *g);
+    int adu_mode; ///< 0 for standard mp3, 1 for adu formatted mp3
+    unsigned int dither_state;
 } MPADecodeContext;
 
 /* layer 3 "granule" */
@@ -179,6 +181,7 @@ static uint32_t scale_factor_mult3[4] = {
     FIXR(1.68179283050742908605),
 };
 
+void ff_mpa_synth_init(MPA_INT *window);
 static MPA_INT window[512] __attribute__((aligned(16)));
     
 /* layer 1 unscaling */
@@ -227,8 +230,10 @@ static inline int l3_unscale(int value, int exponent)
     e = FRAC_BITS - e;
 #if FRAC_BITS <= 15    
     if (e > 31)
-        e = 31;
+#else
+    if (e > 63)
 #endif
+        return 0;
     m = table_4_3_value[value];
 #if FRAC_BITS <= 15    
     m = (m * scale_factor_mult3[exponent & 3]);
@@ -349,20 +354,7 @@ static int decode_init(AVCodecContext * avctx)
                     scale_factor_mult[i][2]);
         }
         
-        /* window */
-        /* max = 18760, max sum over all 16 coefs : 44736 */
-        for(i=0;i<257;i++) {
-            int v;
-            v = mpa_enwindow[i];
-#if WFRAC_BITS < 16
-            v = (v + (1 << (16 - WFRAC_BITS - 1))) >> (16 - WFRAC_BITS);
-#endif
-            window[i] = v;
-            if ((i & 63) != 0)
-                v = -v;
-            if (i != 0)
-                window[512 - i] = v;
-        }
+	ff_mpa_synth_init(window);
         
         /* huffman decode tables */
         huff_code_table[0] = NULL;
@@ -532,6 +524,8 @@ static int decode_init(AVCodecContext * avctx)
 #ifdef DEBUG
     s->frame_count = 0;
 #endif
+    if (avctx->codec_id == CODEC_ID_MP3ADU)
+        s->adu_mode = 1;
     return 0;
 }
 
@@ -758,10 +752,11 @@ static void dct32(int32_t *out, int32_t *tab)
 
 #if FRAC_BITS <= 15
 
-static inline int round_sample(int sum)
+static inline int round_sample(int *sum)
 {
     int sum1;
-    sum1 = (sum + (1 << (OUT_SHIFT - 1))) >> OUT_SHIFT;
+    sum1 = (*sum) >> OUT_SHIFT;
+    *sum &= (1<<OUT_SHIFT)-1;
     if (sum1 < -32768)
         sum1 = -32768;
     else if (sum1 > 32767)
@@ -791,10 +786,11 @@ static inline int round_sample(int sum)
 
 #else
 
-static inline int round_sample(int64_t sum) 
+static inline int round_sample(int64_t *sum) 
 {
     int sum1;
-    sum1 = (int)((sum + (int64_t_C(1) << (OUT_SHIFT - 1))) >> OUT_SHIFT);
+    sum1 = (int)((*sum) >> OUT_SHIFT);
+    *sum &= (1<<OUT_SHIFT)-1;
     if (sum1 < -32768)
         sum1 = -32768;
     else if (sum1 > 32767)
@@ -847,12 +843,31 @@ static inline int round_sample(int64_t sum)
     sum2 op2 MULS((w2)[7 * 64], tmp);\
 }
 
+void ff_mpa_synth_init(MPA_INT *window)
+{
+    int i;
+
+    /* max = 18760, max sum over all 16 coefs : 44736 */
+    for(i=0;i<257;i++) {
+        int v;
+        v = mpa_enwindow[i];
+#if WFRAC_BITS < 16
+        v = (v + (1 << (16 - WFRAC_BITS - 1))) >> (16 - WFRAC_BITS);
+#endif
+        window[i] = v;
+        if ((i & 63) != 0)
+            v = -v;
+        if (i != 0)
+            window[512 - i] = v;
+    }	
+}
 
 /* 32 sub band synthesis filter. Input: 32 sub band samples, Output:
    32 samples. */
 /* XXX: optimize by avoiding ring buffer usage */
-static void synth_filter(MPADecodeContext *s1,
-                         int ch, int16_t *samples, int incr, 
+void ff_mpa_synth_filter(MPA_INT *synth_buf_ptr, int *synth_buf_offset,
+			 MPA_INT *window, int *dither_state,
+                         int16_t *samples, int incr, 
                          int32_t sb_samples[SBLIMIT])
 {
     int32_t tmp[32];
@@ -865,11 +880,11 @@ static void synth_filter(MPADecodeContext *s1,
 #else
     int64_t sum, sum2;
 #endif
-    
+
     dct32(tmp, sb_samples);
     
-    offset = s1->synth_buf_offset[ch];
-    synth_buf = s1->synth_buf[ch] + offset;
+    offset = *synth_buf_offset;
+    synth_buf = synth_buf_ptr + offset;
 
     for(j=0;j<32;j++) {
         v = tmp[j];
@@ -890,40 +905,40 @@ static void synth_filter(MPADecodeContext *s1,
     w = window;
     w2 = window + 31;
 
-    sum = 0;
+    sum = *dither_state;
     p = synth_buf + 16;
     SUM8(sum, +=, w, p);
     p = synth_buf + 48;
     SUM8(sum, -=, w + 32, p);
-    *samples = round_sample(sum);
+    *samples = round_sample(&sum);
     samples += incr;
     w++;
 
     /* we calculate two samples at the same time to avoid one memory
        access per two sample */
     for(j=1;j<16;j++) {
-        sum = 0;
         sum2 = 0;
         p = synth_buf + 16 + j;
         SUM8P2(sum, +=, sum2, -=, w, w2, p);
         p = synth_buf + 48 - j;
         SUM8P2(sum, -=, sum2, -=, w + 32, w2 + 32, p);
 
-        *samples = round_sample(sum);
+        *samples = round_sample(&sum);
         samples += incr;
-        *samples2 = round_sample(sum2);
+        sum += sum2;
+        *samples2 = round_sample(&sum);
         samples2 -= incr;
         w++;
         w2--;
     }
     
     p = synth_buf + 32;
-    sum = 0;
     SUM8(sum, -=, w + 32, p);
-    *samples = round_sample(sum);
+    *samples = round_sample(&sum);
+    *dither_state= sum;
 
     offset = (offset - 32) & 511;
-    s1->synth_buf_offset[ch] = offset;
+    *synth_buf_offset = offset;
 }
 
 /* cos(pi*i/24) */
@@ -1105,28 +1120,6 @@ static void imdct36(int *out, int *in)
     out[8 - 4] = t1;
 }
 
-/* fast header check for resync */
-static int check_header(uint32_t header)
-{
-    /* header */
-    if ((header & 0xffe00000) != 0xffe00000)
-	return -1;
-    /* layer check */
-    if (((header >> 17) & 3) == 0)
-	return -1;
-    /* bit rate */
-    if (((header >> 12) & 0xf) == 0xf)
-	return -1;
-    /* frequency */
-    if (((header >> 10) & 3) == 3)
-	return -1;
-    return 0;
-}
-
-/* header + layer + bitrate + freq + lsf/mpeg25 */
-#define SAME_HEADER_MASK \
-   (0xffe00000 | (3 << 17) | (0xf << 12) | (3 << 10) | (3 << 19))
-
 /* header decoding. MUST check the header before because no
    consistency check is done there. Return 1 if free format found and
    that the frame size must be computed externally */
@@ -1234,7 +1227,7 @@ int mpa_decode_header(AVCodecContext *avctx, uint32_t head)
     MPADecodeContext s1, *s = &s1;
     memset( s, 0, sizeof(MPADecodeContext) );
 
-    if (check_header(head) != 0)
+    if (ff_mpa_check_header(head) != 0)
         return -1;
 
     if (decode_header(s, head) != 0) {
@@ -2130,7 +2123,7 @@ void sample_dump(int fnum, int32_t *tab, int n)
     
     f = files[fnum];
     if (!f) {
-        sprintf(buf, "/tmp/out%d.%s.pcm", 
+        snprintf(buf, sizeof(buf), "/tmp/out%d.%s.pcm", 
                 fnum, 
 #ifdef USE_HIGHPRECISION
                 "hp"
@@ -2146,11 +2139,11 @@ void sample_dump(int fnum, int32_t *tab, int n)
     
     if (fnum == 0) {
         static int pos = 0;
-        printf("pos=%d\n", pos);
+        av_log(NULL, AV_LOG_DEBUG, "pos=%d\n", pos);
         for(i=0;i<n;i++) {
-            printf(" %0.4f", (double)tab[i] / FRAC_ONE);
+            av_log(NULL, AV_LOG_DEBUG, " %0.4f", (double)tab[i] / FRAC_ONE);
             if ((i % 18) == 17)
-                printf("\n");
+                av_log(NULL, AV_LOG_DEBUG, "\n");
         }
         pos += n;
     }
@@ -2298,9 +2291,11 @@ static int mp_decode_layer3(MPADecodeContext *s)
         }
     }
 
+  if (!s->adu_mode) {
     /* now we get bits from the main_data_begin offset */
     dprintf("seekback: %d\n", main_data_begin);
     seek_to_maindata(s, main_data_begin);
+  }
 
     for(gr=0;gr<nb_granules;gr++) {
         for(ch=0;ch<s->nb_channels;ch++) {
@@ -2500,7 +2495,9 @@ static int mp_decode_frame(MPADecodeContext *s,
     for(ch=0;ch<s->nb_channels;ch++) {
         samples_ptr = samples + ch;
         for(i=0;i<nb_frames;i++) {
-            synth_filter(s, ch, samples_ptr, s->nb_channels,
+            ff_mpa_synth_filter(s->synth_buf[ch], &(s->synth_buf_offset[ch]),
+			 window, &s->dither_state,
+			 samples_ptr, s->nb_channels,
                          s->sb_samples[ch][i]);
             samples_ptr += 32 * s->nb_channels;
         }
@@ -2552,7 +2549,7 @@ static int decode_frame(AVCodecContext * avctx,
 		header = (s->inbuf[0] << 24) | (s->inbuf[1] << 16) |
 		    (s->inbuf[2] << 8) | s->inbuf[3];
 
-		if (check_header(header) < 0) {
+		if (ff_mpa_check_header(header) < 0) {
 		    /* no sync found : move by one byte (inefficient, but simple!) */
 		    memmove(s->inbuf, s->inbuf + 1, s->inbuf_ptr - s->inbuf - 1);
 		    s->inbuf_ptr--;
@@ -2669,6 +2666,62 @@ static int decode_frame(AVCodecContext * avctx,
     return buf_ptr - buf;
 }
 
+
+static int decode_frame_adu(AVCodecContext * avctx,
+			void *data, int *data_size,
+			uint8_t * buf, int buf_size)
+{
+    MPADecodeContext *s = avctx->priv_data;
+    uint32_t header;
+    int len, out_size;
+    short *out_samples = data;
+
+    len = buf_size;
+
+    // Discard too short frames
+    if (buf_size < HEADER_SIZE) {
+        *data_size = 0;
+        return buf_size;
+    }
+
+
+    if (len > MPA_MAX_CODED_FRAME_SIZE)
+        len = MPA_MAX_CODED_FRAME_SIZE;
+
+    memcpy(s->inbuf, buf, len);
+    s->inbuf_ptr = s->inbuf + len;
+
+    // Get header and restore sync word
+    header = (s->inbuf[0] << 24) | (s->inbuf[1] << 16) |
+              (s->inbuf[2] << 8) | s->inbuf[3] | 0xffe00000;
+
+    if (ff_mpa_check_header(header) < 0) { // Bad header, discard frame
+        *data_size = 0;
+        return buf_size;
+    }
+
+    decode_header(s, header);
+    /* update codec info */
+    avctx->sample_rate = s->sample_rate;
+    avctx->channels = s->nb_channels;
+    avctx->bit_rate = s->bit_rate;
+    avctx->sub_id = s->layer;
+
+    avctx->frame_size=s->frame_size = len;
+
+    if (avctx->parse_only) {
+        /* simply return the frame data */
+        *(uint8_t **)data = s->inbuf;
+        out_size = s->inbuf_ptr - s->inbuf;
+    } else {
+        out_size = mp_decode_frame(s, out_samples);
+    }
+
+    *data_size = out_size;
+    return buf_size;
+}
+
+
 AVCodec mp2_decoder =
 {
     "mp2",
@@ -2692,5 +2745,18 @@ AVCodec mp3_decoder =
     NULL,
     NULL,
     decode_frame,
+    CODEC_CAP_PARSE_ONLY,
+};
+
+AVCodec mp3adu_decoder =
+{
+    "mp3adu",
+    CODEC_TYPE_AUDIO,
+    CODEC_ID_MP3ADU,
+    sizeof(MPADecodeContext),
+    decode_init,
+    NULL,
+    NULL,
+    decode_frame_adu,
     CODEC_CAP_PARSE_ONLY,
 };

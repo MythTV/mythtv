@@ -38,7 +38,7 @@ static int init_pass2(MpegEncContext *s);
 static double get_qscale(MpegEncContext *s, RateControlEntry *rce, double rate_factor, int frame_num);
 
 void ff_write_pass1_stats(MpegEncContext *s){
-    sprintf(s->avctx->stats_out, "in:%d out:%d type:%d q:%d itex:%d ptex:%d mv:%d misc:%d fcode:%d bcode:%d mc-var:%d var:%d icount:%d;\n",
+    snprintf(s->avctx->stats_out, 256, "in:%d out:%d type:%d q:%d itex:%d ptex:%d mv:%d misc:%d fcode:%d bcode:%d mc-var:%d var:%d icount:%d;\n",
             s->current_picture_ptr->display_picture_number, s->current_picture_ptr->coded_picture_number, s->pict_type, 
             s->current_picture.quality, s->i_tex_bits, s->p_tex_bits, s->mv_bits, s->misc_bits, 
             s->f_code, s->b_code, s->current_picture.mc_mb_var_sum, s->current_picture.mb_var_sum, s->i_count);
@@ -74,6 +74,8 @@ int ff_rate_control_init(MpegEncContext *s)
             p= strchr(p+1, ';');
         }
         i+= s->max_b_frames;
+        if(i<=0 || i>=INT_MAX / sizeof(RateControlEntry))
+            return -1;
         rcc->entry = (RateControlEntry*)av_mallocz(i*sizeof(RateControlEntry));
         rcc->num_entries= i;
         

@@ -3015,7 +3015,7 @@ void ff_mpeg4_init_partitions(MpegEncContext *s)
     uint8_t *start= pbBufPtr(&s->pb);
     uint8_t *end= s->pb.buf_end;
     int size= end - start;
-    int pb_size = (((int)start + size/3)&(~3)) - (int)start;
+    int pb_size = (((long)start + size/3)&(~3)) - (long)start;
     int tex_size= (size - 2*pb_size)&(~3);
     
     set_put_bits_buffer_size(&s->pb, pb_size);
@@ -6121,7 +6121,7 @@ int flv_h263_decode_picture_header(MpegEncContext *s)
         width = height = 0;
         break;
     }
-    if ((width == 0) || (height == 0))
+    if(avcodec_check_dimensions(s->avctx, width, height))
         return -1;
     s->width = width;
     s->height = height;

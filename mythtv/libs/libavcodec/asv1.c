@@ -339,8 +339,13 @@ static inline int decode_mb(ASV1Context *a, DCTELEM block[6][64]){
     return 0;
 }
 
-static inline void encode_mb(ASV1Context *a, DCTELEM block[6][64]){
+static inline int encode_mb(ASV1Context *a, DCTELEM block[6][64]){
     int i;
+    
+    if(a->pb.buf_end - a->pb.buf - (put_bits_count(&a->pb)>>3) < 30*16*16*3/2/8){
+        av_log(a->avctx, AV_LOG_ERROR, "encoded frame too large\n");
+        return -1;
+    }
 
     if(a->avctx->codec_id == CODEC_ID_ASV1){
         for(i=0; i<6; i++)
@@ -349,6 +354,7 @@ static inline void encode_mb(ASV1Context *a, DCTELEM block[6][64]){
         for(i=0; i<6; i++)
             asv2_encode_block(a, block[i]);
     }
+    return 0;
 }
 
 static inline void idct_put(ASV1Context *a, int mb_x, int mb_y){
@@ -402,11 +408,6 @@ static int decode_frame(AVCodecContext *avctx,
     AVFrame *picture = data;
     AVFrame * const p= (AVFrame*)&a->picture;
     int mb_x, mb_y;
-
-    /* special case for last picture */
-    if (buf_size == 0) {
-        return 0;
-    }
 
     if(p->data[0])
         avctx->release_buffer(avctx, p);
@@ -573,7 +574,7 @@ static int decode_init(AVCodecContext *avctx){
     }
 
     p->qstride= a->mb_width;
-    p->qscale_table= av_mallocz( p->qstride * a->mb_height);
+    p->qscale_table= av_malloc( p->qstride * a->mb_height);
     p->quality= (32*scale + a->inv_qscale/2)/a->inv_qscale;
     memset(p->qscale_table, p->quality, p->qstride*a->mb_height);
 

@@ -888,10 +888,6 @@ static int dvvideo_decode_frame(AVCodecContext *avctx,
 {
     DVVideoContext *s = avctx->priv_data;
   
-    /* special case for last picture */
-    if(buf_size==0)
-        return 0;
-    
     s->sys = dv_frame_profile(buf);
     if (!s->sys || buf_size < s->sys->frame_size)
         return -1; /* NOTE: we only accept several full frames */
@@ -931,7 +927,9 @@ static int dvvideo_encode_frame(AVCodecContext *c, uint8_t *buf, int buf_size,
     s->sys = dv_codec_profile(c);
     if (!s->sys)
 	return -1;
-    
+    if(buf_size < s->sys->frame_size)
+        return -1;
+
     c->pix_fmt = s->sys->pix_fmt;
     s->picture = *((AVFrame *)data);
 

@@ -594,7 +594,6 @@ static void MPV_encode_defaults(MpegEncContext *s){
         done=1;
 
         default_mv_penalty= av_mallocz( sizeof(uint8_t)*(MAX_FCODE+1)*(2*MAX_MV+1) );
-        memset(default_mv_penalty, 0, sizeof(uint8_t)*(MAX_FCODE+1)*(2*MAX_MV+1));
         memset(default_fcode_tab , 0, sizeof(uint8_t)*(2*MAX_MV+1));
 
         for(i=-16; i<16; i++){
@@ -618,6 +617,9 @@ int MPV_common_init(MpegEncContext *s)
         av_log(s->avctx, AV_LOG_ERROR, "too many threads\n");
         return -1;
     }
+
+    if((s->width || s->height) && avcodec_check_dimensions(s->avctx, s->width, s->height))
+        return -1;
 
     dsputil_init(&s->dsp, s->avctx);
     DCT_common_init(s);
@@ -742,9 +744,6 @@ int MPV_common_init(MpegEncContext *s)
         CHECKED_ALLOCZ(s->coded_block_base, y_size);
         s->coded_block= s->coded_block_base + s->b8_stride + 1;
         
-        /* divx501 bitstream reorder buffer */
-        CHECKED_ALLOCZ(s->bitstream_buffer, BITSTREAM_BUFFER_SIZE);
-
         /* cbp, ac_pred, pred_dir */
         CHECKED_ALLOCZ(s->cbp_table  , mb_array_size * sizeof(uint8_t))
         CHECKED_ALLOCZ(s->pred_dir_table, mb_array_size * sizeof(uint8_t))
@@ -849,6 +848,8 @@ void MPV_common_end(MpegEncContext *s)
     av_freep(&s->mbskip_table);
     av_freep(&s->prev_pict_types);
     av_freep(&s->bitstream_buffer);
+    s->allocated_bitstream_buffer_size=0;
+
     av_freep(&s->avctx->stats_out);
     av_freep(&s->ac_stats);
     av_freep(&s->error_status_table);
@@ -891,7 +892,22 @@ int MPV_encode_init(AVCodecContext *avctx)
     
     MPV_encode_defaults(s);
 
-    avctx->pix_fmt = PIX_FMT_YUV420P; // FIXME
+    if(avctx->pix_fmt != PIX_FMT_YUVJ420P && avctx->pix_fmt != PIX_FMT_YUV420P){
+        av_log(avctx, AV_LOG_ERROR, "only YUV420 is supported\n");
+        return -1;
+    }
+
+    if(avctx->codec_id == CODEC_ID_MJPEG || avctx->codec_id == CODEC_ID_LJPEG){
+        if(avctx->strict_std_compliance>=0 && avctx->pix_fmt != PIX_FMT_YUVJ420P){
+            av_log(avctx, AV_LOG_ERROR, "colorspace not supported in jpeg\n");
+            return -1;
+        }
+    }else{
+        if(avctx->strict_std_compliance>=0 && avctx->pix_fmt != PIX_FMT_YUV420P){
+            av_log(avctx, AV_LOG_ERROR, "colorspace not supported\n");
+            return -1;
+        }
+    }
 
     s->bit_rate = avctx->bit_rate;
     s->width = avctx->width;
@@ -1033,6 +1049,11 @@ int MPV_encode_init(AVCodecContext *avctx)
     if(s->avctx->thread_count > 1)
         s->rtp_mode= 1;
 
+    if(!avctx->frame_rate || !avctx->frame_rate_base){
+        av_log(avctx, AV_LOG_ERROR, "framerate not set\n");
+        return -1;
+    }
+        
     i= ff_gcd(avctx->frame_rate, avctx->frame_rate_base);
     if(i > 1){
         av_log(avctx, AV_LOG_INFO, "removing common factors from framerate\n");
@@ -1955,10 +1976,35 @@ static int get_intra_count(MpegEncContext *s, uint8_t *src, uint8_t *ref, int st
 
 static int load_input_picture(MpegEncContext *s, AVFrame *pic_arg){
     AVFrame *pic=NULL;
+    int64_t pts;
     int i;
     const int encoding_delay= s->max_b_frames;
     int direct=1;
     
+    if(pic_arg){
+        pts= pic_arg->pts;
+        pic_arg->display_picture_number= s->input_picture_number++;
+
+        if(pts != AV_NOPTS_VALUE){ 
+            if(s->user_specified_pts != AV_NOPTS_VALUE){
+                int64_t time= av_rescale(pts, s->avctx->frame_rate, s->avctx->frame_rate_base*(int64_t)AV_TIME_BASE);
+                int64_t last= av_rescale(s->user_specified_pts, s->avctx->frame_rate, s->avctx->frame_rate_base*(int64_t)AV_TIME_BASE);
+            
+                if(time < last)            
+                    av_log(s->avctx, AV_LOG_ERROR, "Error, Invalid timestamp=%Ld, last=%Ld\n", pts, s->user_specified_pts);
+            }
+            s->user_specified_pts= pts;
+        }else{
+            if(s->user_specified_pts != AV_NOPTS_VALUE){
+                s->user_specified_pts= 
+                pts= s->user_specified_pts + AV_TIME_BASE*(int64_t)s->avctx->frame_rate_base / s->avctx->frame_rate;
+                av_log(s->avctx, AV_LOG_INFO, "Warning: AVFrame.pts=? trying to guess (%Ld)\n", pts);
+            }else{
+                pts= av_rescale(pic_arg->display_picture_number*(int64_t)s->avctx->frame_rate_base, AV_TIME_BASE, s->avctx->frame_rate);
+            }
+        }
+    }
+
   if(pic_arg){
     if(encoding_delay && !(s->flags&CODEC_FLAG_INPUT_PRESERVED)) direct=0;
     if(pic_arg->linesize[0] != s->linesize) direct=0;
@@ -2018,27 +2064,7 @@ static int load_input_picture(MpegEncContext *s, AVFrame *pic_arg){
         }
     }
     copy_picture_attributes(s, pic, pic_arg);
-    
-    pic->display_picture_number= s->input_picture_number++;
- 
-    if(pic->pts != AV_NOPTS_VALUE){ 
-        if(s->user_specified_pts != AV_NOPTS_VALUE){
-            int64_t time= av_rescale(pic->pts, s->avctx->frame_rate, s->avctx->frame_rate_base*(int64_t)AV_TIME_BASE);
-            int64_t last= av_rescale(s->user_specified_pts, s->avctx->frame_rate, s->avctx->frame_rate_base*(int64_t)AV_TIME_BASE);
-        
-            if(time < last)            
-                av_log(s->avctx, AV_LOG_ERROR, "Error, Invalid timestamp=%Ld, last=%Ld\n", pic->pts, s->user_specified_pts);
-        }
-        s->user_specified_pts= pic->pts;
-    }else{
-        if(s->user_specified_pts != AV_NOPTS_VALUE){
-            s->user_specified_pts= 
-            pic->pts= s->user_specified_pts + AV_TIME_BASE*(int64_t)s->avctx->frame_rate_base / s->avctx->frame_rate;
-            av_log(s->avctx, AV_LOG_INFO, "Warning: AVFrame.pts=? trying to guess (%Ld)\n", pic->pts);
-        }else{
-            pic->pts= av_rescale(pic->display_picture_number*(int64_t)s->avctx->frame_rate_base, AV_TIME_BASE, s->avctx->frame_rate);
-        }
-    }
+    pic->pts= pts; //we set this here to avoid modifiying pic_arg
   }
   
     /* shift buffer entries */
@@ -2251,7 +2277,7 @@ int MPV_encode_picture(AVCodecContext *avctx,
     AVFrame *pic_arg = data;
     int i, stuffing_count;
 
-    if(avctx->pix_fmt != PIX_FMT_YUV420P){
+    if(avctx->pix_fmt != PIX_FMT_YUV420P && avctx->pix_fmt != PIX_FMT_YUVJ420P){
         av_log(avctx, AV_LOG_ERROR, "this codec supports only YUV420P\n");
         return -1;
     }
@@ -2304,11 +2330,18 @@ int MPV_encode_picture(AVCodecContext *avctx,
             avctx->error[i] += s->current_picture_ptr->error[i];
         }
 
+        if(s->flags&CODEC_FLAG_PASS1)
+            assert(avctx->header_bits + avctx->mv_bits + avctx->misc_bits + avctx->i_tex_bits + avctx->p_tex_bits == put_bits_count(&s->pb));
         flush_put_bits(&s->pb);
         s->frame_bits  = put_bits_count(&s->pb);
 
         stuffing_count= ff_vbv_update(s, s->frame_bits);
         if(stuffing_count){
+            if(s->pb.buf_end - s->pb.buf - (put_bits_count(&s->pb)>>3) < stuffing_count + 50){
+                av_log(s->avctx, AV_LOG_ERROR, "stuffing too large\n");
+                return -1;
+            }
+
             switch(s->codec_id){
             case CODEC_ID_MPEG1VIDEO:
             case CODEC_ID_MPEG2VIDEO:
@@ -4548,6 +4581,9 @@ static void write_slice_end(MpegEncContext *s){
 
     align_put_bits(&s->pb);
     flush_put_bits(&s->pb);
+    
+    if((s->flags&CODEC_FLAG_PASS1) && !s->partitioned_frame)
+        s->misc_bits+= get_bits_diff(s);
 }
 
 static int encode_thread(AVCodecContext *c, void *arg){
@@ -4555,16 +4591,16 @@ static int encode_thread(AVCodecContext *c, void *arg){
     int mb_x, mb_y, pdif = 0;
     int i, j;
     MpegEncContext best_s, backup_s;
-    uint8_t bit_buf[2][3000];
-    uint8_t bit_buf2[2][3000];
-    uint8_t bit_buf_tex[2][3000];
+    uint8_t bit_buf[2][MAX_MB_BYTES];
+    uint8_t bit_buf2[2][MAX_MB_BYTES];
+    uint8_t bit_buf_tex[2][MAX_MB_BYTES];
     PutBitContext pb[2], pb2[2], tex_pb[2];
 //printf("%d->%d\n", s->resync_mb_y, s->end_mb_y);
 
     for(i=0; i<2; i++){
-        init_put_bits(&pb    [i], bit_buf    [i], 3000);
-        init_put_bits(&pb2   [i], bit_buf2   [i], 3000);
-        init_put_bits(&tex_pb[i], bit_buf_tex[i], 3000);
+        init_put_bits(&pb    [i], bit_buf    [i], MAX_MB_BYTES);
+        init_put_bits(&pb2   [i], bit_buf2   [i], MAX_MB_BYTES);
+        init_put_bits(&tex_pb[i], bit_buf_tex[i], MAX_MB_BYTES);
     }
 
     s->last_bits= put_bits_count(&s->pb);
@@ -4621,6 +4657,18 @@ static int encode_thread(AVCodecContext *c, void *arg){
 //            int d;
             int dmin= INT_MAX;
             int dir;
+
+            if(s->pb.buf_end - s->pb.buf - (put_bits_count(&s->pb)>>3) < MAX_MB_BYTES){
+                av_log(s->avctx, AV_LOG_ERROR, "encoded frame too large\n");
+                return -1;
+            }
+            if(s->data_partitioning){
+                if(   s->pb2   .buf_end - s->pb2   .buf - (put_bits_count(&s->    pb2)>>3) < MAX_MB_BYTES
+                   || s->tex_pb.buf_end - s->tex_pb.buf - (put_bits_count(&s->tex_pb )>>3) < MAX_MB_BYTES){
+                    av_log(s->avctx, AV_LOG_ERROR, "encoded frame too large\n");
+                    return -1;
+                }
+            }
 
             s->mb_x = mb_x;
             s->mb_y = mb_y;  // moved into loop, can get changed by H.261

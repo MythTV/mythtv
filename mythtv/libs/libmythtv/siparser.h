@@ -1,3 +1,4 @@
+
 #ifndef SIPARSER_H
 #define SIPARSER_H
 
@@ -292,7 +293,7 @@ private:
 };
 
 #define SIPARSER(args...) \
-    VERBOSE(VB_GENERAL, QString("SIParser: ") << args);
+    VERBOSE(VB_SIPARSER, QString("SIParser: ") << args);
         
 
 #endif // SIPARSER_H

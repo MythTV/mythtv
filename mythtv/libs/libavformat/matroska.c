@@ -669,7 +669,7 @@ ebml_read_ascii (MatroskaDemuxContext *matroska,
 
     /* ebml strings are usually not 0-terminated, so we allocate one
      * byte more, read the string and NULL-terminate it ourselves. */
-    if (!(*str = av_malloc(size + 1))) {
+    if (size < 0 || !(*str = av_malloc(size + 1))) {
         av_log(matroska->ctx, AV_LOG_ERROR, "Memory allocation failed\n");
         return AVERROR_NOMEM;
     }
@@ -2363,6 +2363,10 @@ matroska_parse_blockgroup (MatroskaDemuxContext *matroska,
                            "Invalid stream %d or size %u\n", track, size);
                     av_free(origdata);
                     break;
+                }
+                if(matroska->ctx->streams[ matroska->tracks[track]->stream_index ]->discard){
+                    av_free(origdata);
+                    break;                
                 }
 
                 /* time (relative to cluster time) */

@@ -3307,7 +3307,7 @@ void TV::ChangeTimeStretch(int dir)
     if (osd)
     {
         int val = (int)(normal_speed*500);
-        osd->StartPause(val, false, tr("Adjust Time Stretch"), tr(text), 10, 
+        osd->StartPause(val, false, tr("Adjust Time Stretch"), text, 10, 
                         kOSDFunctionalType_TimeStretchAdjust);
         update_osd_pos = false;
     }
@@ -3369,7 +3369,7 @@ void TV::ToggleSleepTimer(void)
                               TRUE);
     }
 
-    text = tr("Sleep ") + " " + tr(sleep_timer_array[sleep_index].dispString);
+    text = tr("Sleep ") + " " + sleep_timer_array[sleep_index].dispString;
 
     // display OSD
     if (osd && !browsemode)
@@ -3686,7 +3686,7 @@ void TV::DoTogglePictureAttribute(void)
 
     if (osd)
     {
-        char *title = "Adjust Picture";
+        QString title = tr("Adjust Picture");
         QString picName;
 
         AudioOutput *aud = NULL;
@@ -3712,11 +3712,11 @@ void TV::DoTogglePictureAttribute(void)
                 aud = nvp->getAudioOutput();
                 value = (aud) ? (aud->GetCurrentVolume()) 
                         : 99; 
-                title = "Adjust Volume";
+                title = tr("Adjust Volume");
                 picName = QString("%1 %2 %").arg(tr("Volume")).arg(value);
                 break;
         }
-        osd->StartPause(value*10, true, tr(title), picName, 5, 
+        osd->StartPause(value*10, true, title, picName, 5, 
                         kOSDFunctionalType_PictureAdjust);
         update_osd_pos = false;
     }
@@ -3732,7 +3732,7 @@ void TV::DoToggleRecPictureAttribute(void)
    
     if (osd)
     {
-        QString title("Adjust Recording");
+        QString title = tr("Adjust Recording");
         QString recName;
       
         switch (recAdjustment)
@@ -3762,7 +3762,7 @@ void TV::DoToggleRecPictureAttribute(void)
                                   .arg(tr("(REC)")).arg(value);
                 break;
         }
-        osd->StartPause(value * 10, true, tr(title), recName, 5,
+        osd->StartPause(value * 10, true, title, recName, 5,
                         kOSDFunctionalType_RecPictureAdjust);
         update_osd_pos = false;
     }

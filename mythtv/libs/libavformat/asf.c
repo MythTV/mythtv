@@ -333,7 +333,7 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
                         {
                                 value = (char *)av_mallocz(value_len);
                                 get_str16_nolen(pb, value_len, value, value_len);
-                                if (strcmp(name,"WM/AlbumTitle")==0) { strcpy(s->album, value); }
+                                if (strcmp(name,"WM/AlbumTitle")==0) { pstrcpy(s->album, sizeof(s->album), value); }
                                 av_free(value);
                         }
                         if ((value_type >= 2) || (value_type <= 5)) // boolean or DWORD or QWORD or WORD
@@ -545,12 +545,13 @@ static int asf_read_packet(AVFormatContext *s, AVPacket *pkt)
 	    asf->packet_size_left -= rsize;
 	    //printf("___objsize____  %d   %d    rs:%d\n", asf->packet_obj_size, asf->packet_frag_offset, rsize);
 
-	    if (asf->stream_index < 0) {
+	    if (asf->stream_index < 0 || s->streams[asf->stream_index]->discard) {
                 asf->packet_time_start = 0;
 		/* unhandled packet (should not happen) */
 		url_fskip(pb, asf->packet_frag_size);
 		asf->packet_size_left -= asf->packet_frag_size;
-		av_log(s, AV_LOG_ERROR, "ff asf skip %d  %d\n", asf->packet_frag_size, num & 0x7f);
+                if(asf->stream_index < 0)
+                    av_log(s, AV_LOG_ERROR, "ff asf skip %d  %d\n", asf->packet_frag_size, num & 0x7f);
                 continue;
 	    }
 	    asf->asf_st = s->streams[asf->stream_index]->priv_data;

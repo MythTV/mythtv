@@ -307,6 +307,11 @@ int main(int argc, char **argv)
                             print_verbose_messages |= VB_LIBAV;
                             verboseString += " " + *it;
                         }
+                        else if(!strcmp(*it,"siparser"))
+                        {
+                            print_verbose_messages |= VB_SIPARSER;
+                            verboseString += " " + *it;
+                        }
                         else
                         {
                             cerr << "Unknown argument for -v/--verbose: "

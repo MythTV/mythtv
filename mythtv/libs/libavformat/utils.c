@@ -57,7 +57,7 @@ int match_ext(const char *filename, const char *extensions)
         p = extensions;
         for(;;) {
             q = ext1;
-            while (*p != '\0' && *p != ',') 
+            while (*p != '\0' && *p != ',' && q-ext1<sizeof(ext1)-1) 
                 *q++ = *p++;
             *q = '\0';
             if (!strcasecmp(ext1, ext)) 
@@ -182,7 +182,10 @@ static void av_destruct_packet(AVPacket *pkt)
  */
 int av_new_packet(AVPacket *pkt, int size)
 {
-    void *data = av_malloc(size + FF_INPUT_BUFFER_PADDING_SIZE);
+    void *data;
+    if((unsigned)size > (unsigned)size + FF_INPUT_BUFFER_PADDING_SIZE)
+        return AVERROR_NOMEM;
+    data = av_malloc(size + FF_INPUT_BUFFER_PADDING_SIZE);
     if (!data)
         return AVERROR_NOMEM;
     memset(data + size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
@@ -202,6 +205,8 @@ int av_dup_packet(AVPacket *pkt)
         uint8_t *data;
         /* we duplicate the packet and don't forget to put the padding
            again */
+        if((unsigned)pkt->size > (unsigned)pkt->size + FF_INPUT_BUFFER_PADDING_SIZE)
+            return AVERROR_NOMEM;
         data = av_malloc(pkt->size + FF_INPUT_BUFFER_PADDING_SIZE);
         if (!data) {
             return AVERROR_NOMEM;
@@ -279,8 +284,8 @@ int fifo_read(FifoBuffer *f, uint8_t *buf, int buf_size, uint8_t **rptr_ptr)
     return 0;
 }
 
-void fifo_realloc(FifoBuffer *f, int new_size){
-    int old_size= f->end - f->buffer;
+void fifo_realloc(FifoBuffer *f, unsigned int new_size){
+    unsigned int old_size= f->end - f->buffer;
 
     if(old_size < new_size){
         uint8_t *old= f->buffer;
@@ -748,7 +753,7 @@ static void compute_pkt_fields(AVFormatContext *s, AVStream *st,
         st->last_IP_pts= pkt->pts;
         /* cannot compute PTS if not present (we can compute it only
            by knowing the futur */
-    } else {
+    } else if(pkt->pts != AV_NOPTS_VALUE || pkt->dts != AV_NOPTS_VALUE || pkt->duration){
         if(pkt->pts != AV_NOPTS_VALUE && pkt->duration){
             int64_t old_diff= ABS(st->cur_dts - pkt->duration - pkt->pts);
             int64_t new_diff= ABS(st->cur_dts - pkt->pts);
@@ -825,7 +830,7 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                 compute_pkt_fields(s, st, NULL, pkt);
                 s->cur_st = NULL;
                 return 0;
-            } else if (s->cur_len > 0) {
+            } else if (s->cur_len > 0 && !st->discard) {
                 if (!st->got_frame) {
                     st->cur_frame_startpos = s->cur_pkt.startpos;
                     st->got_frame = 1;
@@ -1029,11 +1034,18 @@ int av_add_index_entry(AVStream *st,
 {
     AVIndexEntry *entries, *ie;
     int index;
+
+    if((unsigned)st->nb_index_entries + 1 >= UINT_MAX / sizeof(AVIndexEntry))
+        return -1;
     
     entries = av_fast_realloc(st->index_entries,
                               &st->index_entries_allocated_size,
                               (st->nb_index_entries + 1) * 
                               sizeof(AVIndexEntry));
+
+    if(!entries)
+        return -1;
+
     st->index_entries= entries;
 
     index= av_index_search_timestamp(st, timestamp, 0);
@@ -1794,6 +1806,11 @@ int av_find_stream_info(AVFormatContext *ic)
         if (ret < 0) {
             /* EOF or error */
             ret = -1; /* we could not have all the codec parameters before EOF */
+            for(i=0;i<ic->nb_streams;i++) {
+                st = ic->streams[i];
+                if (!has_codec_parameters(&st->codec))
+                    break;
+            }
             if ((ic->ctx_flags & AVFMTCTX_NOHEADER) &&
                 i == ic->nb_streams)
                 ret = 0;
@@ -2540,6 +2557,8 @@ int parse_frame_rate(int *frame_rate, int *frame_rate_base, const char *arg)
 
     /* Then, we try to parse it as fraction */
     cp = strchr(arg, '/');
+    if (!cp)
+        cp = strchr(arg, ':');
     if (cp) {
         char* cpp;
 	*frame_rate = strtol(arg, &cpp, 10);

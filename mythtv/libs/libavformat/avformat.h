@@ -229,6 +229,8 @@ typedef struct AVStream {
     int pts_wrap_bits; /* number of bits in pts (used for wrapping control) */
     /* ffmpeg.c private use */
     int stream_copy; /* if TRUE, just copy stream */
+    int discard; ///< if 1, packets can be discarded at will and dont need to be demuxed
+    //FIXME move stuff to a flags field?
     /* quality, as it has been removed from AVCodecContext and put in AVVideoFrame
      * MN:dunno if thats the right place, for it */
     float quality; 
@@ -555,7 +557,7 @@ int fifo_size(FifoBuffer *f, uint8_t *rptr);
 int fifo_read(FifoBuffer *f, uint8_t *buf, int buf_size, uint8_t **rptr_ptr);
 void fifo_write(FifoBuffer *f, uint8_t *buf, int size, uint8_t **wptr_ptr);
 int put_fifo(ByteIOContext *pb, FifoBuffer *f, int buf_size, uint8_t **rptr_ptr);
-void fifo_realloc(FifoBuffer *f, int size);
+void fifo_realloc(FifoBuffer *f, unsigned int size);
 
 /* media file input */
 AVInputFormat *av_find_input_format(const char *short_name);
