@@ -129,6 +129,12 @@ Weather::Weather(MythContext *context,
     accel->connectItem(accel->insertItem(Key_8), this, SLOT(newLocale8()));
     accel->connectItem(accel->insertItem(Key_9), this, SLOT(newLocale9()));
 
+    m_context->ThemeWidget(this);
+    show();
+    showFullScreen();
+    setActiveWindow();
+    setFocus();
+
 }
 
 void Weather::loadWeatherTypes()
@@ -1463,14 +1469,6 @@ if (pageNum == 4)
  
    }
 
-}
-
-void Weather::Show()
-{
-    m_context->ThemeWidget(this);
-    showFullScreen();
-    setActiveWindow();
-    setFocus();
 }
 
 void Weather::UpdateData()

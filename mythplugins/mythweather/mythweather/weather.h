@@ -39,8 +39,6 @@ class Weather : public MythDialog
     Weather(MythContext *context,
 	    QWidget *parent = 0, const char *name = 0);
 
-    void Show();
-  
     void UpdateData();
 
 private slots:
