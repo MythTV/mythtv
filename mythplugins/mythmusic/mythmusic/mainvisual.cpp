@@ -71,7 +71,7 @@ void MainVisual::setVisual( const QString &visualname )
 	newvis = new StereoScope;
     else if (visualname == "Synaesthesia")
         newvis = new Synaesthesia;
-    
+    	
     setVisual( newvis );
 }
 

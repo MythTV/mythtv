@@ -5,6 +5,7 @@
 #include <string>
 #include <qobject.h>
 #include <qiodevice.h>
+#include <qfile.h>
 using namespace std;
 
 #include "cddecoder.h"
@@ -35,6 +36,13 @@ CdDecoder::CdDecoder(const QString &file, DecoderFactory *d,
     totalTime = 0.0;
     chan = 0;
     output_size = 0;
+    output_buf = 0;
+    output_bytes = 0;
+    output_at = 0;
+
+    device = NULL;
+    paranoia = NULL;
+
     settracknum = -1;
 
     devicename = globalsettings->GetSetting("CDDevice");
@@ -44,6 +52,10 @@ CdDecoder::~CdDecoder(void)
 {
     if (inited)
         deinit();
+
+    if (output_buf)
+        delete [] output_buf;
+    output_buf = 0;
 }
 
 void CdDecoder::stop()
@@ -51,8 +63,54 @@ void CdDecoder::stop()
     user_stop = TRUE;
 }
 
+void CdDecoder::flush(bool final)
+{
+    ulong min = final ? 0 : bks;
+
+    while ((! done && ! finish) && output_bytes > min) {
+        output()->recycler()->mutex()->lock();
+
+        while ((! done && ! finish) && output()->recycler()->full()) {
+            mutex()->unlock();
+
+            output()->recycler()->cond()->wait(output()->recycler()->mutex());
+
+            mutex()->lock();
+            done = user_stop;
+        }
+
+        if (user_stop || finish) {
+            inited = FALSE;
+            done = TRUE;
+        } else {
+            ulong sz = output_bytes < bks ? output_bytes : bks;
+            Buffer *b = output()->recycler()->get();
+
+            memcpy(b->data, output_buf, sz);
+            if (sz != bks) memset(b->data + sz, 0, bks - sz);
+
+            b->nbytes = bks;
+            b->rate = bitrate;
+            output_size += b->nbytes;
+            output()->recycler()->add();
+
+            output_bytes -= sz;
+            memmove(output_buf, output_buf + sz, output_bytes);
+            output_at = output_bytes;
+        }
+
+        if (output()->recycler()->full()) {
+            output()->recycler()->cond()->wakeOne();
+        }
+
+        output()->recycler()->mutex()->unlock();
+    }
+}
+
 bool CdDecoder::initialize()
 {
+    bks = blockSize();
+
     inited = user_stop = done = finish = FALSE;
     len = freq = bitrate = 0;
     stat = chan = 0;
@@ -60,38 +118,44 @@ bool CdDecoder::initialize()
     seekTime = -1.0;
     totalTime = 0.0;
 
+    filename = ((QFile *)input())->name();
     tracknum = atoi(filename.ascii());
-    
-    cd_desc = cd_init_device((char *)devicename.ascii());
+   
+    if (!output_buf)
+        output_buf = new char[globalBufferSize];
+    output_at = 0;
+    output_bytes = 0;
 
-    freq = 0;
-    chan = 0;
+    device = cdda_identify(devicename.ascii(), 0, NULL);
+    if (!device)
+        return FALSE;
 
-    struct disc_info discinfo;
-    if (cd_stat(cd_desc, &discinfo) != 0)
+    if (cdda_open(device))
     {
-        error("Couldn't stat CD, Error.");
-        cd_finish(cd_desc);
-        return false;
+        cdda_close(device);
+        return FALSE;
     }
 
-    if (!discinfo.disc_present)
+    cdda_verbose_set(device, CDDA_MESSAGE_FORGETIT, CDDA_MESSAGE_FORGETIT);
+    start = cdda_track_firstsector(device, tracknum);
+    end = cdda_track_lastsector(device, tracknum);
+
+    if (start > end || end == start)
     {
-        error("No disc present");
-        cd_finish(cd_desc);
-        return false;
+        cdda_close(device);
+        return FALSE;
     }
 
-    if (tracknum > discinfo.disc_total_tracks)
-    {
-        error("No such track on CD");
-        cd_finish(cd_desc);
-        return false;
-    }
+    paranoia = paranoia_init(device);
+    paranoia_modeset(paranoia, PARANOIA_MODE_OVERLAP);
+    paranoia_seek(paranoia, start, SEEK_SET);
 
-    totalTime = discinfo.disc_track[tracknum - 1].track_length.minutes * 60 +  
-                discinfo.disc_track[tracknum - 1].track_length.seconds;
-    totalTime = totalTime < 0 ? 0 : totalTime;
+    curpos = start;
+
+    totalTime = ((end - start + 1) * CD_FRAMESAMPLES) / 44100.0;
+
+    if (output())
+        output()->configure(44100, 2, 16, 44100 * 2 * 16);
 
     inited = TRUE;
     return TRUE;
@@ -104,8 +168,13 @@ void CdDecoder::seek(double pos)
 
 void CdDecoder::deinit()
 {
-    cd_stop(cd_desc);
-    cd_finish(cd_desc);
+    if (paranoia)
+        paranoia_free(paranoia);
+    if (device)
+        cdda_close(device);
+
+    device = NULL;
+    paranoia = NULL;
 
     inited = user_stop = done = finish = FALSE;
     len = freq = bitrate = 0;
@@ -113,6 +182,11 @@ void CdDecoder::deinit()
     output_size = 0;
     setInput(0);
     setOutput(0);
+}
+
+static void paranoia_cb(long inpos, int function)
+{       
+    inpos = inpos; function = function;
 }
 
 void CdDecoder::run()
@@ -134,46 +208,55 @@ void CdDecoder::run()
         dispatch(e);
     }
 
-    cd_play_pos(cd_desc, tracknum, 0);
-
-    stat = OutputEvent::Playing;
-    OutputEvent e((OutputEvent::Type)stat);
-    dispatch(e);
+    int16_t *cdbuffer;
 
     while (! done && ! finish) {
         mutex()->lock();
         // decode
 
         if (seekTime >= 0.0) {
-            cd_play_pos(cd_desc, tracknum, (int)seekTime);
+            curpos = (int)(((seekTime * 44100) / CD_FRAMESAMPLES) + start);
+            paranoia_seek(paranoia, curpos, SEEK_SET);
 
             seekTime = -1.0;
         }
 
-        if (user_stop || finish)
+        curpos++;
+        if (curpos <= end)
         {
-            inited = FALSE;
+            cdbuffer = paranoia_read(paranoia, paranoia_cb);
+
+	    memcpy((char *)(output_buf + output_at), (char *)cdbuffer, 
+                   CD_FRAMESIZE_RAW);
+	    output_at += CD_FRAMESIZE_RAW;
+            output_bytes += CD_FRAMESIZE_RAW;
+
+            if (output())
+                flush();
+        }
+        else
+        {
+            flush(TRUE);
+
+            if (output()) {
+                output()->recycler()->mutex()->lock();
+                while (! output()->recycler()->empty() && ! user_stop) {
+                    output()->recycler()->cond()->wakeOne();
+                    mutex()->unlock();
+                    output()->recycler()->cond()->wait(
+                                                output()->recycler()->mutex());
+                    mutex()->lock();
+                }
+                output()->recycler()->mutex()->unlock();
+            }
+
             done = TRUE;
-        }
-
-        struct disc_info discinfo;
-        cd_stat(cd_desc, &discinfo);
-        if (discinfo.disc_mode == CDAUDIO_COMPLETED ||
-            discinfo.disc_mode == CDAUDIO_NOSTATUS)
-        {
-            if (!user_stop)
+            if (! user_stop) {
                 finish = TRUE;
-        }
+            }
+        } 
 
-        int tracktime = discinfo.disc_track_time.minutes * 60 +
-                        discinfo.disc_track_time.seconds;
-
-        OutputEvent e(tracktime, 0, 176400, 44100, 0, 2);
-        dispatch(e);
-       
         mutex()->unlock();
-
-        usleep(50000);
     }
 
     mutex()->lock();

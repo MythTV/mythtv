@@ -1,6 +1,7 @@
 USE mythconverg;
 CREATE TABLE musicmetadata
 (
+    intid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
     artist VARCHAR(128) NOT NULL,
     album VARCHAR(128) NOT NULL,
     title VARCHAR(128) NOT NULL,
@@ -13,4 +14,11 @@ CREATE TABLE musicmetadata
     INDEX (album),
     INDEX (title),
     INDEX (genre)
-); 
+);
+CREATE TABLE musicplaylist
+(
+    playlistid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    name VARCHAR(128) NOT NULL,
+    songlist TEXT NOT NULL
+);
+ 

@@ -239,7 +239,7 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     playb->setFocus();
 
     input = 0; decoder = 0; seeking = false; remainingTime = false;
-    output = 0; outputBufferSize = 0;
+    output = 0; outputBufferSize = 256;
 
     shufflemode = false;
     repeatmode = false;  
@@ -393,12 +393,7 @@ void PlaybackBox::play()
 
     bool startoutput = false;
 
-    QString cdext = ".cda";
-    if (playfile.right(cdext.length()).lower() == cdext)
-    {
-        output = NULL;
-    }
-    else if (!output)
+    if (!output)
     {
         QString adevice = globalsettings->GetSetting("AudioDevice");
 
@@ -414,17 +409,17 @@ void PlaybackBox::play()
             return;
     }
 
-    if (! sourceurl.isLocalFile()) {
+    if (!sourceurl.isLocalFile()) {
         StreamInput streaminput(sourceurl);
         streaminput.setup();
         input = streaminput.socket();
     } else
         input = new QFile(sourceurl.toString(FALSE, FALSE));
 
-    if (decoder && ! decoder->factory()->supports(sourcename))
+    if (decoder && !decoder->factory()->supports(sourcename))
         decoder = 0;
 
-    if (! decoder) {
+    if (!decoder) {
         decoder = Decoder::create(sourcename, input, output);
 
         if (! decoder) {
@@ -477,6 +472,8 @@ void PlaybackBox::play()
 
         isplaying = true;
     }
+
+    //mainvisual->showFullScreen();
 }
 
 void PlaybackBox::pause(void)

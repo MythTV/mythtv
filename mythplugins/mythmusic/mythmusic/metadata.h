@@ -10,7 +10,7 @@ class Metadata
   public:
     Metadata(QString lfilename = "", QString lartist = "", QString lalbum = "", 
              QString ltitle = "", QString lgenre = "", int lyear = 0, 
-             int ltracknum = 0, int llength = 0)
+             int ltracknum = 0, int llength = 0, int lid = 0)
             {
                 filename = lfilename;
                 artist = lartist;
@@ -20,6 +20,7 @@ class Metadata
                 year = lyear;
                 tracknum = ltracknum;
                 length = llength;
+                id = lid;
             }
 
     Metadata(const Metadata &other) 
@@ -32,6 +33,7 @@ class Metadata
                 year = other.year;
                 tracknum = other.tracknum;
                 length = other.length;
+                id = other.id;
             }
 
    ~Metadata() {}
@@ -57,6 +59,8 @@ class Metadata
     int Length() { return length; }
     void setLength(int llength) { length = llength; }
 
+    unsigned int ID() { return id; }
+
     QString Filename() const { return filename; }
     void setFilename(QString &lfilename) { filename = lfilename; }
 
@@ -75,6 +79,8 @@ class Metadata
     int tracknum;
     int length;
 
+    unsigned int id;
+    
     QString filename;
 };
 

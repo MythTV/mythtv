@@ -31,6 +31,8 @@ Synaesthesia::Synaesthesia()
 
 Synaesthesia::~Synaesthesia()
 {
+    if (outputImage)
+        delete outputImage;
 }
 
 void Synaesthesia::setupPalette(void)

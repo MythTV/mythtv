@@ -13,7 +13,6 @@ class Buffer;
 class Decoder;
 class Output;
 
-
 class Visual
 {
 public:

@@ -20,8 +20,8 @@ bool Metadata::isInDatabase(QSqlDatabase *db)
     bool retval = false;
 
     char thequery[512];
-    sprintf(thequery, "SELECT artist,album,title,genre,year,tracknum,length "
-                      "FROM musicmetadata WHERE filename = \"%s\";",
+    sprintf(thequery, "SELECT artist,album,title,genre,year,tracknum,length,"
+                      "intid FROM musicmetadata WHERE filename = \"%s\";",
                       filename.ascii());
 
     QSqlQuery query = db->exec(thequery);
@@ -37,6 +37,7 @@ bool Metadata::isInDatabase(QSqlDatabase *db)
         year = query.value(4).toInt();
         tracknum = query.value(5).toInt();
         length = query.value(6).toInt();
+        id = query.value(7).toUInt();
 
         retval = true;
     }
@@ -63,6 +64,9 @@ void Metadata::dumpToDatabase(QSqlDatabase *db)
                       year, tracknum, length, filename.ascii());
 
     db->exec(thequery);
+
+    // easiest way to ensure we've got 'id' filled.
+    fillData(db);
 }
 
 void Metadata::setField(QString field, QString data)
@@ -89,8 +93,8 @@ void Metadata::fillData(QSqlDatabase *db)
         return;
 
     QString thequery = "SELECT artist,album,title,genre,year,tracknum,length,"
-                       "filename FROM musicmetadata WHERE title=\"" + title +
-                       "\"";
+                       "filename,intid FROM musicmetadata WHERE title=\"" + 
+                       title + "\"";
 
     if (album != "")
         thequery += " AND album=\"" + album + "\"";
@@ -113,5 +117,6 @@ void Metadata::fillData(QSqlDatabase *db)
         tracknum = query.value(5).toInt();
         length = query.value(6).toInt();
         filename = query.value(7).toString();
+        id = query.value(8).toUInt();
     }
 }
