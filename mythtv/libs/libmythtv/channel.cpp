@@ -138,6 +138,50 @@ static int format_to_mode(const QString& fmt, int v4l_version)
     return VIDEO_MODE_NTSC;
 }
 
+static QString mode_to_format(int mode, int v4l_version)
+{
+        if (v4l_version==2)
+    {
+        if (mode == V4L2_STD_NTSC)
+            return "NTSC";
+        else if (mode == V4L2_STD_ATSC_8_VSB)
+            return "ATSC";
+        else if (mode == V4L2_STD_PAL)
+            return "PAL";
+        else if (mode == V4L2_STD_SECAM)
+            return "SECAM";
+        else if (mode == V4L2_STD_PAL_Nc)
+            return "PAL-NC";
+        else if (mode == V4L2_STD_PAL_M)
+            return "PAL-M";
+        else if (mode == V4L2_STD_PAL_N)
+            return "PAL-N";
+        else if (mode == V4L2_STD_NTSC_M_JP)
+            return "NTSC-JP";
+        return "Unknown";
+    }
+    if (v4l_version==1)
+    {
+        if (mode == VIDEO_MODE_NTSC)
+            return "NTSC";
+        else if (mode == VIDEO_MODE_ATSC)
+            return "ATSC";
+        else if (mode == VIDEO_MODE_PAL)
+            return "PAL";
+        else if (mode == VIDEO_MODE_SECAM)
+            return "SECAM";
+        else if (mode == 3)
+            return "PAL-NC";
+        else if (mode == 4)
+            return "PAL-M";
+        else if (mode == 5)
+            return "PAL-N";
+        else if (mode == 6)
+            return "NTSC-JP";
+    }
+    return "Unknown";
+}
+
 void Channel::SetFormat(const QString &format)
 {
     if (!Open())
@@ -556,13 +600,14 @@ bool Channel::CheckSignal(int msecTotal, int reqSignal, int input)
 bool Channel::TuneTo(const QString &channum, int finetune)
 {
     int i = GetCurrentChannelNum(channum);
+    VERBOSE(VB_CHANNEL, QString("Channel(%1)::TuneTo(%2): curList[%3].freq(%4)")
+            .arg(device).arg(channum).arg(i)
+            .arg((i != -1) ? curList[i].freq : -1));
+
     if (i == -1)
         return false;
 
     int frequency = curList[i].freq * 16 / 1000 + finetune;
-
-    VERBOSE(VB_CHANNEL, QString("Channel(%1)::TuneTo(%2): curList[i].freq(%3)").
-            arg(device).arg(channum).arg(curList[i].freq));
 
     return TuneToFrequency(frequency);
 }
@@ -632,8 +677,8 @@ bool Channel::TuneToFrequency(int frequency)
     {
         VERBOSE(VB_IMPORTANT,
                 QString("Channel(%1)::TuneToFrequence(): Error %2 "
-                        "while setting frequency (v1): %3").
-                arg(device).arg(ioctlval).arg(strerror(errno)));
+                        "while setting frequency (v1): %3")
+                .arg(device).arg(ioctlval).arg(strerror(errno)));
         return false;
     }
 
@@ -642,41 +687,67 @@ bool Channel::TuneToFrequency(int frequency)
 
 void Channel::SwitchToInput(int newcapchannel, bool setstarting)
 {
+    bool usingv4l1 = !usingv4l2;
+
+    VERBOSE(VB_CHANNEL, QString("Channel(%1)::SwitchToInput(in %2%3)")
+            .arg(device).arg(newcapchannel)
+            .arg(setstarting ? ", set ch" : ""));
+
     int ioctlval = 0;
     if (usingv4l2)
     {
         ioctlval = ioctl(videofd, VIDIOC_S_INPUT, &newcapchannel);
         if (ioctlval < 0)
             VERBOSE(VB_IMPORTANT,
-                    QString("Channel(%1)::SwitchToInput(): Error %2 "
-                            "while setting input (v2): %3").
-                    arg(device).arg(ioctlval).arg(strerror(errno)));
+                    QString("Channel(%1)::SwitchToInput(in %2%3): Error %4 "
+                            "while setting input (v2): %5").arg(device)
+                    .arg(newcapchannel).arg(setstarting?", set ch":"")
+                    .arg(ioctlval).arg(strerror(errno)));
 
-       ioctlval = ioctl(videofd, VIDIOC_S_STD, &videomode_v4l2);
+        VERBOSE(VB_CHANNEL, 
+                QString("Channel(%1)::SwitchToInput() setting video mode to %2")
+                .arg(device).arg(mode_to_format(videomode_v4l2, 2)));
+        ioctlval = ioctl(videofd, VIDIOC_S_STD, &videomode_v4l2);
         if (ioctlval < 0)
+        {
             VERBOSE(VB_IMPORTANT,
-                    QString("Channel(%1)::SwitchToInput(): Error %2 while "
-                            "setting video mode (v2), \"%3\", trying v4l v1").
-                    arg(device).arg(ioctlval).arg(strerror(errno)));
-        // Fall through to try v4l version 1, pcHDTV
-        // drivers don't work with VIDIOC_S_STD ioctl.
+                    QString("Channel(%1)::SwitchToInput(in %2%3): Error %4 "
+                            "while setting video mode (v2), \"%5\", trying v4l v1")
+                    .arg(device).arg(newcapchannel)
+                    .arg(setstarting ? ", set ch" : "")
+                    .arg(ioctlval).arg(strerror(errno)));
+
+            // Fall through to try v4l version 1, pcHDTV
+            // drivers don't work with VIDIOC_S_STD ioctl.
+            usingv4l1 = true;
+        }
     }
 
-    struct video_channel set;
-    memset(&set, 0, sizeof(set));
-    ioctl(videofd, VIDIOCGCHAN, &set); // read in old settings
-    set.channel = newcapchannel;
-    set.norm = videomode_v4l1;
-    ioctlval = ioctl(videofd, VIDIOCSCHAN, &set); // set new settings
-    if (ioctlval < 0)
-        VERBOSE(VB_IMPORTANT,
-                QString("Channel(%1)::SwitchToInput(): Error %2 "
-                        "while setting video mode (v1): %3").
-                arg(device).arg(ioctlval).arg(strerror(errno)));
-    else if (usingv4l2)
-        VERBOSE(VB_IMPORTANT,
-                QString("Channel(%1)::SwitchToInput(): Setting video mode "
-                        "with v4l version 1 worked").arg(device));
+    if (usingv4l1)
+    {
+        struct video_channel set;
+        memset(&set, 0, sizeof(set));
+        ioctl(videofd, VIDIOCGCHAN, &set); // read in old settings
+        set.channel = newcapchannel;
+        set.norm = videomode_v4l1;
+        VERBOSE(VB_CHANNEL, 
+                QString("Channel(%1)::SwitchToInput() setting video mode to %2")
+                .arg(device).arg(mode_to_format(videomode_v4l1, 1)));
+        ioctlval = ioctl(videofd, VIDIOCSCHAN, &set); // set new settings
+        if (ioctlval < 0)
+            VERBOSE(VB_IMPORTANT,
+                    QString("Channel(%1)::SwitchToInput(in %2%3): "
+                            "Error %4 while setting video mode (v1): %5")
+                    .arg(device).arg(newcapchannel)
+                    .arg(setstarting ? ", set ch" : "")
+                    .arg(ioctlval).arg(strerror(errno)));
+        else if (usingv4l2)
+            VERBOSE(VB_IMPORTANT,
+                    QString("Channel(%1)::SwitchToInput(in %2%3): "
+                            "Setting video mode with v4l version 1 worked")
+                    .arg(device).arg(newcapchannel)
+                    .arg(setstarting ? ", set ch" : ""));
+    }
 
     currentcapchannel = newcapchannel;
     curchannelname = "";

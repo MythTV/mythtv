@@ -342,7 +342,8 @@ void ThemedMenuPrivate::parseBackground(const QString &dir,
             }
             else
             {
-                cerr << "Unknown tag " << info.tagName() << " in background\n";
+                VERBOSE(VB_GENERAL, QString("ThemedMenuPrivate: Unknown tag %1 in "
+                                            "background").arg(info.tagName()));
                 return;
             }
         }
@@ -350,7 +351,7 @@ void ThemedMenuPrivate::parseBackground(const QString &dir,
 
     if (!hasarea)
     {
-        cerr << "Missing buttonaread in background\n";
+        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing buttonaread in background");
         return;
     }
 
@@ -412,7 +413,8 @@ void ThemedMenuPrivate::parseShadow(TextAttributes &attributes,
             }
             else
             {
-                cerr << "Unknown tag " << info.tagName() << " in text/shadow\n";
+                VERBOSE(VB_GENERAL, QString("ThemedMenuPrivate: Unknown tag %1 in "
+                                            "text/shadow").arg(info.tagName()));
                 return;
             }
         }
@@ -420,19 +422,19 @@ void ThemedMenuPrivate::parseShadow(TextAttributes &attributes,
 
     if (!hascolor)
     {
-        cerr << "Missing color tag in shadow\n";
+        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing color tag in shadow");
         return;
     }
 
     if (!hasalpha)
     {
-        cerr << "Missing alpha tag in shadow\n";
+        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing alpha tag in shadow");
         return;
     }
 
     if (!hasoffset)
     {
-        cerr << "Missing offset tag in shadow\n";
+        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing offset tag in shadow");
         return;
     }
 }
@@ -476,7 +478,7 @@ void ThemedMenuPrivate::parseFont(QDomElement &element)
     name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "Font needs a name\n";
+        VERBOSE(VB_IMPORTANT, "Font needs a name");
         return;
     }
 
@@ -490,7 +492,9 @@ void ThemedMenuPrivate::parseFont(QDomElement &element)
         
         if (!baseFont)
         {
-            cerr << "Specified base font '" << base << "'  does not exist for font " << face << endl;
+            VERBOSE(VB_IMPORTANT,
+                    QString("ThemedMenuPrivate: Specified base font '%1' does not "
+                            "exist for font %2").arg(base).arg(face));
             return;
         }
     }
@@ -502,7 +506,7 @@ void ThemedMenuPrivate::parseFont(QDomElement &element)
     {
         if (!baseFont)
         {
-            cerr << "Font needs a face\n";
+            VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Font needs a face");
             return;
         }
     }
@@ -572,7 +576,8 @@ void ThemedMenuPrivate::parseFont(QDomElement &element)
             }
             else
             {
-                cerr << "Unknown tag " << info.tagName() << " in font\n";
+                VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate: Unknown tag %1 in "
+                                              "font").arg(info.tagName()));
                 return;
             }
         }
@@ -580,7 +585,8 @@ void ThemedMenuPrivate::parseFont(QDomElement &element)
     
     if (globalFontMap.contains(name))
     {
-        cerr << "Error: already have a global font called: " << name << endl;
+        VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate: Error, already have a "
+                                      "global font called: %1").arg(name));
         return;
     }
     
@@ -602,7 +608,7 @@ void ThemedMenuPrivate::parseFont(QDomElement &element)
 
     if (size < 0 && !baseFont)
     {
-        cerr << "Error: font size must be > 0\n";
+        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Error, font size must be > 0");
         return;
     }
 
@@ -705,7 +711,8 @@ void ThemedMenuPrivate::parseOutline(TextAttributes &attributes,
             }
             else
             {
-                cerr << "Unknown tag " << info.tagName() << " in text/shadow\n";
+                VERBOSE(VB_GENERAL, QString("ThemedMenuPrivate: Unknown tag %1 in "
+                                            "text/shadow").arg(info.tagName()));
                 return;
             }
         }
@@ -713,13 +720,13 @@ void ThemedMenuPrivate::parseOutline(TextAttributes &attributes,
 
     if (!hassize)
     {
-        cerr << "Missing size in outline\n";
+        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing size in outline");
         return;
     }
 
     if (!hascolor)
     {
-        cerr << "Missing color in outline\n";
+        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing color in outline");
         return;
     }
 }
@@ -809,7 +816,8 @@ void ThemedMenuPrivate::parseText(TextAttributes &attributes,
             }
             else
             {
-                cerr << "Unknown tag " << info.tagName() << " in text\n";
+                VERBOSE(VB_GENERAL, QString("ThemedMenuPrivate: Unknown tag %1 "
+                                            "in text").arg(info.tagName()));
                 return;
             }
         }
@@ -820,7 +828,8 @@ void ThemedMenuPrivate::parseText(TextAttributes &attributes,
 
     if (!hasarea)
     {
-        cerr << "Missing 'area' tag in 'text' element of 'genericbutton'\n";
+        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing 'area' "
+                "tag in 'text' element of 'genericbutton'");
         return;
     }
 }
@@ -858,8 +867,8 @@ void ThemedMenuPrivate::parseButtonDefinition(const QString &dir,
             {
                 if (!hasnormal)
                 {
-                    cerr << "The 'normal' tag needs to come before the "
-                         << "'normaltext' tag\n";
+                    VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: The 'normal' "
+                            "tag needs to come before the 'normaltext' tag");
                     return;
                 }
                 parseText(normalAttributes, info);
@@ -868,8 +877,8 @@ void ThemedMenuPrivate::parseButtonDefinition(const QString &dir,
             {
                 if (!hasactive)
                 {
-                    cerr << "The 'active' tag needs to come before the "
-                         << "'activetext' tag\n";
+                    VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: The 'active' "
+                            "tag needs to come before the 'activetext' tag");
                     return;
                 }
                 parseText(activeAttributes, info);
@@ -881,8 +890,9 @@ void ThemedMenuPrivate::parseButtonDefinition(const QString &dir,
             }
             else
             {
-                cerr << "Unknown tag " << info.tagName() 
-                     << " in genericbutton\n";
+                VERBOSE(VB_GENERAL,
+                        QString("ThemedMenuPrivate: Unknown tag %1 in "
+                                "genericbutton").arg(info.tagName()));
                 return;
             }
         }
@@ -890,13 +900,13 @@ void ThemedMenuPrivate::parseButtonDefinition(const QString &dir,
 
     if (!hasnormal)
     {
-        cerr << "No normal button image defined\n";
+        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: No normal button image defined");
         return;
     }
 
     if (!hasactive)
     {
-        cerr << "No active button image defined\n";
+        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: No active button image defined");
         return;
     }
 
@@ -938,7 +948,8 @@ void ThemedMenuPrivate::parseLogo(const QString &dir, QDomElement &element)
 	    }
             else
             {
-                cerr << "Unknown tag " << info.tagName() << " in logo\n";
+                VERBOSE(VB_GENERAL, QString("ThemedMenuPrivate: Unknown tag %1 "
+                                            "in logo").arg(info.tagName()));
                 return;
             }
         }
@@ -946,13 +957,13 @@ void ThemedMenuPrivate::parseLogo(const QString &dir, QDomElement &element)
 
     if (!hasimage)
     {
-        cerr << "Missing image tag in logo\n";
+        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing image tag in logo");
         return;
     }
 
     if (!hasposition)
     {
-        cerr << "Missing position tag in logo\n";
+        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing position tag in logo");
         return;
     }
 
@@ -988,7 +999,8 @@ void ThemedMenuPrivate::parseTitle(const QString &dir, QDomElement &element)
                 }
                 else
                 {
-                    cerr << "Missing mode in titles/image\n";
+                    VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: "
+                            "Missing mode in titles/image");
                     return;
                 }
 
@@ -1003,7 +1015,8 @@ void ThemedMenuPrivate::parseTitle(const QString &dir, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown tag " << info.tagName() << " in logo\n";
+                VERBOSE(VB_GENERAL, QString("ThemedMenuPrivate: Unknown tag %1 "
+                                            "in logo").arg(info.tagName()));
                 return;
             }
         }
@@ -1011,13 +1024,13 @@ void ThemedMenuPrivate::parseTitle(const QString &dir, QDomElement &element)
 
     if (!hasimage)
     {
-        cerr << "Missing image tag in titles\n";
+        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing image tag in titles");
         return;
     }
 
     if (!hasposition)
     {
-        cerr << "Missing position tag in titles\n";
+        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing position tag in titles");
         return;
     }
 
@@ -1055,7 +1068,8 @@ void ThemedMenuPrivate::parseArrow(const QString &dir, QDomElement &element,
             }
             else
             {
-                cerr << "Unknown tag " << info.tagName() << " in arrow\n";
+                VERBOSE(VB_GENERAL, QString("ThemedMenuPrivate: Unknown tag %1 "
+                                            "in arrow").arg(info.tagName()));
                 return;
             }
         }
@@ -1063,13 +1077,13 @@ void ThemedMenuPrivate::parseArrow(const QString &dir, QDomElement &element,
 
     if (!hasimage)
     {
-        cerr << "Missing image tag in arrow\n";
+        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing image tag in arrow");
         return;
     }
 
     if (!hasposition)
     {
-        cerr << "Missing position tag in arrow\n";
+        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing position tag in arrow");
         return;
     }
 
@@ -1138,7 +1152,8 @@ void ThemedMenuPrivate::parseButton(const QString &dir, QDomElement &element)
             }    
             else
             {
-                cerr << "Unknown tag " << info.tagName() << " in buttondef\n";
+                VERBOSE(VB_GENERAL, QString("ThemedMenuPrivate: Unknown tag %1 "
+                                            "in buttondef").arg(info.tagName()));
                 return;
             }
         }
@@ -1146,19 +1161,21 @@ void ThemedMenuPrivate::parseButton(const QString &dir, QDomElement &element)
 
     if (!hasname)
     {
-        cerr << "Missing name in button\n";
+        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing name in button");
         return;
     }
 
     if (!hasoffset)
     {
-        cerr << "Missing offset in buttondef " << name << endl;
+        VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate: Missing offset "
+                                      "in buttondef %1").arg(name));
         return;
     }
 
     if (!hasicon) 
     {
-        cerr << "Missing image in buttondef " << name << endl;
+        VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate: Missing image "
+                                      "in buttondef %1").arg(name));
         return;
     }
 
@@ -1217,7 +1234,8 @@ void ThemedMenuPrivate::parseSettings(const QString &dir,
 
     if (!f.open(IO_ReadOnly))
     {
-        cerr << "ThemedMenuPrivate::parseSettings(): Can't open: " << filename << endl;
+        VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate::parseSettings(): "
+                                      "Can't open: %1").arg(filename));
         return;
     }
 
@@ -1227,9 +1245,9 @@ void ThemedMenuPrivate::parseSettings(const QString &dir,
 
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
-        cerr << "Error parsing: " << filename << endl;
-        cerr << "at line: " << errorLine << "  column: " << errorColumn << endl;
-        cerr << errorMsg << endl;
+        VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate: Error, parsing %1\n"
+                                      "at line: %2  column: %3 msg: %4").
+                arg(filename).arg(errorLine).arg(errorColumn).arg(errorMsg));
         f.close();
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
                                   QObject::tr("Bad Menu File"),
@@ -1293,7 +1311,8 @@ void ThemedMenuPrivate::parseSettings(const QString &dir,
             }
             else
             {
-                cerr << "Unknown element " << e.tagName() << endl;
+                VERBOSE(VB_GENERAL, QString("ThemedMenuPrivate: Unknown "
+                                            "element %1").arg(e.tagName()));
                 return;
             }
         }
@@ -1302,13 +1321,14 @@ void ThemedMenuPrivate::parseSettings(const QString &dir,
 
     if (!setbackground)
     {
-        cerr << "Missing background element\n";
+        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing background element");
         return;
     }
 
     if (!setbuttondef)
     {
-        cerr << "Missing genericbutton definition\n";
+        VERBOSE(VB_IMPORTANT,
+                "ThemedMenuPrivate: Missing genericbutton definition");
         return;
     }
 
@@ -1379,7 +1399,8 @@ void ThemedMenuPrivate::parseThemeButton(QDomElement &element)
             }
             else
             {
-                cerr << "Unknown tag " << info.tagName() << " in button\n";
+                VERBOSE(VB_GENERAL, QString("ThemedMenuPrivate: Unknown tag %1 "
+                                            "in button").arg(info.tagName()));
                 return;
             }
         }
@@ -1387,13 +1408,13 @@ void ThemedMenuPrivate::parseThemeButton(QDomElement &element)
 
     if (text == "")
     {
-        cerr << "Missing 'text' in button\n";
+        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing 'text' in button");
         return;
     }
    
     if (action.empty())
     {
-        cerr << "Missing 'action' in button\n";
+        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Missing 'action' in button");
         return;
     }
 
@@ -1410,16 +1431,19 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
 
     if (!f.open(IO_ReadOnly))
     {
-        cerr << "Couldn't read menu file " << menuname << endl;
+        VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate: Couldn't read "
+                                      "menu file %1").arg(menuname));
         if (menuname == "mainmenu.xml" )
         {
             exit(-38);
         }
         else
         {
-            MythPopupBox::showOkPopup(gContext->GetMainWindow(), QObject::tr("No Menu File"),
-                                      QObject::tr(QString("Myth could not locate the menu file %1.\n\n"
-                                      "We will now return to the main menu.").arg(menuname)));
+            MythPopupBox::showOkPopup(
+                gContext->GetMainWindow(), QObject::tr("No Menu File"),
+                QObject::tr(QString("Myth could not locate the menu file %1.\n\n"
+                                    "We will now return to the main menu.").
+                            arg(menuname)));
             menulevel = 0;
             parseMenu("mainmenu.xml");
             return;
@@ -1432,9 +1456,9 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
 
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
-        cerr << "Error parsing: " << filename << endl;
-        cerr << "at line: " << errorLine << "  column: " << errorColumn << endl;
-        cerr << errorMsg << endl;
+        VERBOSE(VB_IMPORTANT,
+                QString("Error parsing: %1\nat line: %2  column: %3 msg: %4").
+                arg(filename).arg(errorLine).arg(errorColumn).arg(errorMsg));
         f.close();
 
         if (menuname == "mainmenu.xml" )
@@ -1474,7 +1498,8 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
             }
             else
             {
-                cerr << "Unknown element " << e.tagName() << endl;
+                VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate: Unknown "
+                                              "element %1").arg(e.tagName()));
                 exit(-40);
             }
         }
@@ -1483,7 +1508,8 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
 
     if (buttonList.size() == 0)
     {
-        cerr << "No buttons for menu " << menuname << endl;
+        VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate: No buttons "
+                                      "for menu %1").arg(menuname));
         exit(-41);
     }
 
@@ -1624,13 +1650,15 @@ void ThemedMenuPrivate::layoutButtons(void)
 
     if (maxrows < 2)
     {
-        cerr << "Must have room for at least 2 rows of buttons\n";
+        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Must have "
+                "room for at least 2 rows of buttons");
         exit(-43);
     }
     
     if (columns < 1)
     {
-        cerr << "Must have room for at least 1 column of buttons\n";
+        VERBOSE(VB_IMPORTANT, "ThemedMenuPrivate: Must have "
+                "room for at least 1 column of buttons");
         exit(-44);
     }
 
@@ -2327,7 +2355,8 @@ bool ThemedMenuPrivate::handleAction(const QString &action)
         else
         {
             if (cardid == -2)
-                cerr << "themedmenu.o: Tuner already locked" << endl;
+                VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate: Card %1 is "
+                                              "already locked").arg(cardid));
             
             DialogBox *error_dialog = new DialogBox(gContext->GetMainWindow(),
                     "\n\nAll tuners are currently in use. If you want to watch "
@@ -2435,8 +2464,9 @@ bool ThemedMenuPrivate::checkPinCode(const QString &timestamp_setting,
 
     if (last_time_stamp.length() < 1)
     {
-        cerr << "themedmenu.o: Could not read password/pin time stamp. "
-             << "This is only an issue if it happens repeatedly. " << endl;
+        VERBOSE(VB_IMPORTANT,
+                "ThemedMenuPrivate: Could not read password/pin time stamp.\n"
+                "This is only an issue if it happens repeatedly.");
     }
     else
     {
