@@ -3820,7 +3820,8 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
                 if (autocommercialskip == 1)
                 {
                     PauseVideo();
-                    JumpToFrame(commBreakIter.key());
+                    JumpToFrame(commBreakIter.key() -
+                        (int)(commrewindamount * video_frame_rate));
                     UnpauseVideo();
                     while (GetVideoPause())
                         usleep(50);
