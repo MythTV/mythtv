@@ -422,6 +422,8 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
                                      video_frame_rate);
                 totalFrames = (long long)ste.keyframe_number * keyframedist;
             }
+            else
+                cerr << "0 length seek table\n";
         }
 
         ringBuffer->Seek(currentpos, SEEK_SET);
@@ -511,6 +513,14 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
     if (haspositionmap)
     {
+        LoadCutList();
+    
+        if (!deleteMap.isEmpty())
+        {
+            hasdeletetable = true;
+            deleteIter = deleteMap.begin();
+        }
+
         QString bookmarkname = ringBuffer->GetFilename();
         bookmarkname += ".bookmark";
         FILE *bookmarkfile = fopen(bookmarkname.ascii(), "r");
@@ -529,14 +539,6 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
             fftime = 0;
 
             exactseeks = seeks;
-        }
-
-        LoadCutList();
-
-        if (!deleteMap.isEmpty())
-        {
-            hasdeletetable = true;
-            deleteIter = deleteMap.begin();
         }
     }
 
@@ -1205,8 +1207,6 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             {
                 //printf("video waiting for unpause\n");
                 usleep(50); 
-                if (editmode)
-                    UpdateTimeDisplay();
 
                 if (!disablevideo)
                 {
@@ -1425,6 +1425,8 @@ void NuppelVideoPlayer::StartPlaying(void)
     killplayer = false;
     usepre = 2;
 
+    framesPlayed = 0;
+
     InitSubs();
     if (OpenFile() < 0)
         return;
@@ -1440,8 +1442,6 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     playing = true;
   
-    framesPlayed = 0;
-
     audbuf_timecode = 0;
     audiotime = 0;
     gettimeofday(&audiotime_updated, NULL);
@@ -1530,7 +1530,6 @@ void NuppelVideoPlayer::StartPlaying(void)
             else if (fftime > 0)
             {
                 fftime = CalcMaxFFTime(fftime);
-
                 DoFastForward();
 
                 fftime = 0;
@@ -1617,6 +1616,25 @@ bool NuppelVideoPlayer::DoRewind(void)
     long long number = rewindtime + 1;
 
     long long desiredFrame = framesPlayed - number;
+
+    if (!editmode && hasdeletetable && IsInDelete(desiredFrame))
+    { 
+        QMap<long long, int>::Iterator it = deleteMap.begin();
+        while (it != deleteMap.end())
+        {
+            if (desiredFrame > it.key())
+                ++it;
+            else
+                break;
+        }
+
+        if (it != deleteMap.begin() && it != deleteMap.end())
+        {
+            long long over = it.key() - desiredFrame;
+            --it;
+            desiredFrame = it.key() - over;
+        }
+    }
 
     if (desiredFrame < 0)
         desiredFrame = 0;
@@ -1862,6 +1880,25 @@ void NuppelVideoPlayer::ClearAfterSeek(void)
     pthread_mutex_unlock(&avsync_lock);
     pthread_mutex_unlock(&video_buflock);
     pthread_mutex_unlock(&audio_buflock);
+
+    deleteIter = deleteMap.begin();
+    if (hasdeletetable)  
+    {
+        while (deleteIter != deleteMap.end())
+        {
+            if (framesPlayed > deleteIter.key())
+            {
+                ++deleteIter;
+            }
+            else
+                break;
+        }
+
+        if (deleteIter != deleteMap.begin())
+            --deleteIter;
+        if (deleteIter.data() == 0)
+            ++deleteIter;
+    }
 }
 
 bool NuppelVideoPlayer::EnableEdit(void)
@@ -1878,6 +1915,19 @@ bool NuppelVideoPlayer::EnableEdit(void)
 
         dialogname = "";
         UpdateEditSlider();
+        UpdateTimeDisplay();
+
+        if (hasdeletetable)
+        {
+            if (deleteMap.contains(0))
+                deleteMap.erase(0);
+            if (deleteMap.contains(totalFrames))
+                deleteMap.erase(totalFrames);
+
+            QMap<long long, int>::Iterator it;
+            for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
+                 AddMark(it.key(), it.data());
+        }
     }
     return editmode;   
 }
@@ -1940,6 +1990,7 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
             }
             else
                 HandleArbSeek(false);
+            UpdateTimeDisplay();
             break;           
         }
         case wsRight: case 'd': case 'D':
@@ -1953,16 +2004,19 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
             }
             else
                 HandleArbSeek(true);
+            UpdateTimeDisplay();
             break;
         }
         case wsUp: 
         {
             UpdateSeekAmount(true);
+            UpdateTimeDisplay();
             break;
         }
         case wsDown:
         {
             UpdateSeekAmount(false);
+            UpdateTimeDisplay();
             break; 
         }
         case wsEscape: case 'e': case 'E':
@@ -2060,7 +2114,7 @@ void NuppelVideoPlayer::UpdateTimeDisplay(void)
         osd->SetVisible(timedisplay, -1);
     }
 
-    if (IsInDelete())
+    if (IsInDelete(framesPlayed))
     {
         osd->ShowText("deletemarker", "cut", video_width / 8, 
                       video_height / 16, video_width / 2, 
@@ -2228,7 +2282,7 @@ void NuppelVideoPlayer::HandleArbSeek(bool right)
     UpdateEditSlider();
 }
 
-bool NuppelVideoPlayer::IsInDelete(void)
+bool NuppelVideoPlayer::IsInDelete(long long testframe)
 {
     long long startpos = 0;
     long long endpos = 0;
@@ -2250,7 +2304,7 @@ bool NuppelVideoPlayer::IsInDelete(void)
             startpos = 0;
             endpos = frame;
             first = false;
-            if (startpos <= framesPlayed && endpos >= framesPlayed)
+            if (startpos <= testframe && endpos >= testframe)
                 ret = true;
         }
         else if (direction == 0)
@@ -2258,7 +2312,7 @@ bool NuppelVideoPlayer::IsInDelete(void)
             endpos = frame;
             indelete = false;
             first = false;
-            if (startpos <= framesPlayed && endpos >= framesPlayed)
+            if (startpos <= testframe && endpos >= testframe)
                 ret = true;
         }
         else if (direction == 1 && !indelete)
@@ -2270,7 +2324,7 @@ bool NuppelVideoPlayer::IsInDelete(void)
         first = false;
     }
 
-    if (indelete && framesPlayed >= startpos) 
+    if (indelete && testframe >= startpos) 
         ret = true;
 
     return ret;

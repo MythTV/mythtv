@@ -163,7 +163,7 @@ class NuppelVideoPlayer
     void HandleSelect(void);
     void HandleResponse(void);
     void HandleArbSeek(bool right);
-    bool IsInDelete(void);
+    bool IsInDelete(long long testframe);
     void SaveCutList(void);
     void LoadCutList(void);
     void DisableEdit(void);
