@@ -10,37 +10,67 @@
 	direct access files
 */
 
+#include <qvaluevector.h>
+#include <qiodevice.h>
 #include <qsocketdevice.h>
 #include <qurl.h>
 #include <qstring.h>
+#include <qdict.h>
 
-class DaapInput: public QSocketDevice
+#include "mfd_plugin.h"
+#include "httpheader.h"
+
+class DaapInput: public QIODevice
 {
 
   public:
 
-    DaapInput(QUrl);
+    DaapInput(MFDServicePlugin*, QUrl);
     ~DaapInput();
 
-    bool    open( int mode );
-    int     readBlock( char *data, uint maxlen );
+    bool              open(int mode );
+    Q_LONG            readBlock( char *data, long unsigned int maxlen );
+    Q_ULONG           size() const;
+    unsigned long int at() const;
+    bool              at(long unsigned int );
+    void              close();
+    bool              isOpen() const;
+    int               status();
+    void              eatThroughHeadersAndGetToPayload();
+    int               readLine(int *parse_point, char *parsing_buffer, char *raw_response, int raw_length);    
+    bool              isDirectAccess(){return true;}
+    void              log(const QString &log_message, int verbosity);
+    void              warning(const QString &error_message);
 
-    //bool    isDirectAccess();
+    //
+    //  Things we have to define but don't ever use
+    //
 
-    uint    size();
-    int     at();
-    bool    at( int );
-    void    close();
-    bool    isOpen();
-    int     status();
+    virtual Q_LONG  writeBlock( const char*, long unsigned int){return 0;}
+    virtual void    flush(){;}
+    virtual int     getch(){ return 0;}
+    virtual int     putch(int){return 0;}
+    virtual int     ungetch(int){return 0;}
+
         
   private:
   
-    QUrl    my_url;
-    QString my_host;
-    int     my_port;
-    bool    connected;
-    bool    all_is_well;
+    QUrl                my_url;
+    QString             my_host;
+    int                 my_port;
+    QString             my_path_and_query;
+    bool                all_is_well;
+    QSocketDevice       *socket_to_daap_server;
+    bool                connected;
+    QDict<HttpHeader>   headers;
+    QValueVector<char>  payload;
+    uint                payload_size;
+    uint                total_possible_range;
+    uint                range_begin;
+    uint                range_end;
+    int                 payload_bytes_read;
+    uint                fake_seek_position;
+    MFDServicePlugin    *parent;
 
 };
 

@@ -114,7 +114,21 @@ bool DaapRequest::send(QSocketDevice *where_to_send, bool ignore_shutdown)
     QString host_line = QString("Host: %1\r\n").arg(host_address);
     addText(&the_request, host_line);
 
-    // addText(&the_request, "Client-DAAP-Access-Index: 1\r\n");
+    
+    //
+    //  Add any additional headers that the calling program set
+    //
+    
+    QDictIterator<HttpHeader> an_it( headers );
+    for( ; an_it.current(); ++an_it )
+    {
+        QString a_header = QString("%1: %2\r\n")
+                           .arg(an_it.current()->getField())
+                           .arg(an_it.current()->getValue());
+        addText(&the_request, a_header);
+    }
+    
+
 
     //
     //  Add the final blank line
@@ -168,16 +182,19 @@ bool DaapRequest::sendBlock(std::vector<char> block_to_send, QSocketDevice *wher
 
     while(keep_going)
     {
-        if(!parent->keepGoing() && !ignore_shutdown)
+        if(parent)
         {
-            //
-            //  time to escape out of this
-            //
+            if(!parent->keepGoing() && !ignore_shutdown)
+            {
+                //
+                //  time to escape out of this
+                //
 
-            parent->log("daap request aborted a sendBlock() "
+                parent->log("daap request aborted a sendBlock() "
                         "as it's time to go", 6);
 
-            return false;
+                return false;
+            }
         }
 
         FD_ZERO(&writefds);
@@ -198,23 +215,32 @@ bool DaapRequest::sendBlock(std::vector<char> block_to_send, QSocketDevice *wher
         int result = select(nfds, NULL, &writefds, NULL, &timeout);
         if(result < 0)
         {
-            parent->warning("daap request got an error from "
-                            "select() ... not sure what to do");
+            if(parent)
+            {
+                parent->warning("daap request got an error from "
+                                "select() ... not sure what to do");
+            }
         }
         else
         {
             if(!where_to_send)
             {
-                parent->warning("daap request's socket to the "
-                                "server went away in the middle "
-                                "of sending something");
+                if(parent)
+                {
+                    parent->warning("daap request's socket to the "
+                                    "server went away in the middle "
+                                    "of sending something");
+                }
                 return false;
             }
             if(where_to_send->socket() < 1)
             {
-                parent->warning("daap request's socket to the "
-                                "server got closed in the middle "
-                                "of sending something");
+                if(parent)
+                {
+                    parent->warning("daap request's socket to the "
+                                    "server got closed in the middle "
+                                    "of sending something");
+                }
                 return false;
             }
 
@@ -235,8 +261,11 @@ bool DaapRequest::sendBlock(std::vector<char> block_to_send, QSocketDevice *wher
                     //  getting an error ... server has gone away?
                     //
                     
-                    parent->warning("daap request seems to have "
-                                    "lost contact with the server ");
+                    if(parent)
+                    {
+                        parent->warning("daap request seems to have "
+                                        "lost contact with the server ");
+                    }
                     return false;
                 
                 }
@@ -278,6 +307,14 @@ QString DaapRequest::getRequestString()
     }
     return return_value;
 }
+
+void DaapRequest::addHeader(const QString &new_header)
+{
+    HttpHeader *a_new_header = new HttpHeader(new_header);
+    headers.insert(a_new_header->getField(), a_new_header);
+}
+
+
 
 DaapRequest::~DaapRequest()
 {

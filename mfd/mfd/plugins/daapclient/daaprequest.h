@@ -10,12 +10,15 @@
 
 */
 
+#include <vector>
+using namespace std;
+
 #include <qstring.h>
 #include <qsocketdevice.h>
 #include <qdict.h>
 
 #include "httpgetvar.h"
-
+#include "httpheader.h"
 
 class DaapInstance;
 
@@ -29,11 +32,13 @@ class DaapRequest
                 const QString &l_base_url, 
                 const QString &l_host_address
                );
+               
     ~DaapRequest();
 
     bool send(QSocketDevice *where_to_send, bool ignore_shutdown=false);
     void addGetVariable(const QString &label, int value);
     void addGetVariable(const QString &label, const QString &value);
+    void addHeader(const QString &new_header);
     QString getRequestString();
         
   private:
@@ -47,6 +52,7 @@ class DaapRequest
     QString stored_request;
 
     QDict<HttpGetVariable>   get_variables;
+    QDict<HttpHeader>        headers;
     
 };
 

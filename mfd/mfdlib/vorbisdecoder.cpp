@@ -35,48 +35,64 @@ using namespace std;
 
 // static functions for OggVorbis
 
-static size_t oggread (void *buf, size_t size, size_t nmemb, void *src) {
-    if (! src) return 0;
+extern "C" size_t oggread (void *buf, size_t size, size_t nmemb, void *src)
+{
+    if (! src)
+    {
+        return 0;
+    }
 
     VorbisDecoder *dogg = (VorbisDecoder *) src;
     int len = dogg->input()->readBlock((char *) buf, (size * nmemb));
     return len / size;
 }
 
-static int oggseek(void *src, int64_t offset, int whence) {
+extern "C" int oggseek(void *src, int64_t offset, int whence) 
+{
     VorbisDecoder *dogg = (VorbisDecoder *) src;
 
+
     if (! dogg->input()->isDirectAccess())
+    {
         return -1;
+    }
 
     long start = 0;
-    switch (whence) {
-    case SEEK_END:
-        start = dogg->input()->size();
-        break;
+    switch (whence)
+    {
+    
+        case SEEK_END:
+            start = dogg->input()->size();
+            break;
 
-    case SEEK_CUR:
-        start = dogg->input()->at();
-        break;
+        case SEEK_CUR:
+            start = dogg->input()->at();
+            break;
 
-    case SEEK_SET:
-    default:
-        start = 0;
+        case SEEK_SET:
+            start = 0;
+            break;
+            
+        default:
+            start = 0;
+            cerr << "this should no happen" << endl;
     }
 
     if (dogg->input()->at(start + offset))
+    {
         return 0;
+    }
     return -1;
 }
 
-static int oggclose(void *src)
+extern "C" int oggclose(void *src)
 {
     VorbisDecoder *dogg = (VorbisDecoder *) src;
     dogg->input()->close();
     return 0;
 }
 
-static long oggtell(void *src)
+extern "C" long oggtell(void *src)
 {
     VorbisDecoder *dogg = (VorbisDecoder *) src;
     long t = dogg->input()->at();
@@ -191,8 +207,10 @@ bool VorbisDecoder::initialize()
     output_at = 0;
     output_bytes = 0;
 
-    if (! input()->isOpen()) {
-        if (! input()->open(IO_ReadOnly)) {
+    if (! input()->isOpen())
+    {
+        if (! input()->open(IO_ReadOnly))
+        {
             error("DecoderOgg: Failed to open input. Error " +
                   QString::number(input()->status()) + ".");
             return FALSE;
@@ -206,7 +224,10 @@ bool VorbisDecoder::initialize()
             oggclose,
             oggtell
         };
-    if (ov_open_callbacks(this, &oggfile, NULL, 0, oggcb) < 0) {
+
+
+    if (ov_open_callbacks(this, &oggfile, NULL, 0, oggcb) < 0)
+    {
         error("DecoderOgg: Cannot open stream.");
 
         return FALSE;
@@ -235,6 +256,14 @@ bool VorbisDecoder::initialize()
 void VorbisDecoder::seek(double pos)
 {
     seekTime = pos;
+    if(seekTime < 0.0)
+    {
+        seekTime = 0.0;
+    }
+    if(seekTime > totalTime)
+    {
+        seekTime = totalTime;
+    }
 }
 
 void VorbisDecoder::deinit()
@@ -274,8 +303,9 @@ void VorbisDecoder::run()
         mutex()->lock();
         // decode
 
-        if (seekTime >= 0.0) {
-            ov_time_seek(&oggfile, double(seekTime));
+        if (seekTime >= 0.0)
+        {
+            ov_time_seek(&oggfile, ((double)(seekTime)));
             seekTime = -1.0;
 
             output_size = long(ov_time_tell(&oggfile)) * long(freq * chan * 2);

@@ -12,8 +12,8 @@ INSTALLS += target
 HEADERS +=          audio.h   
 SOURCES += main.cpp audio.cpp 
 
-HEADERS += audiooutput.h   daapinput.h
-SOURCES += audiooutput.cpp daapinput.cpp
+HEADERS += audiooutput.h   daapinput.h   ../daapclient/daaprequest.h
+SOURCES += audiooutput.cpp daapinput.cpp ../daapclient/daaprequest.cpp
 
 LIBS += -logg -lvorbisfile -lvorbis -mfdlib
 LIBS += -lmad -lid3tag -lcdaudio -lFLAC -lcdda_interface -lcdda_paranoia

@@ -158,6 +158,13 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
                         }
                     }
                 }
+                else if(tokens[1] == "container" || tokens[1] == "playlist")
+                {
+                }
+                else
+                {
+                    ok = false;
+                }
             }
         }
         else if(tokens[0] == "pause")
@@ -307,7 +314,7 @@ bool AudioPlugin::playUrl(QUrl url)
         }
         else if(url.protocol() == "daap")
         {
-            input = new DaapInput(url);
+            input = new DaapInput(this, url);
         }
         else
         {

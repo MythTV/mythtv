@@ -145,6 +145,7 @@ AudioMetadata::AudioMetadata(
                         filename
                        )
 {
+    metadata_type = MDT_audio;
     url = filename;
     artist = l_artist;
     album = l_album;
