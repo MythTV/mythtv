@@ -708,7 +708,7 @@ void VideoBrowser::jumpSelection(int amount)
     inData += amount;
      
     if (inData < 0)
-        inData = m_list.count() + inData - 1;
+        inData = m_list.count() + inData;
     else if(inData >= (int)m_list.count())
         inData = inData - m_list.count();
      
