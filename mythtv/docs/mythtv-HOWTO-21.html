@@ -631,6 +631,93 @@ transcoding.</P>
 <P>Once the transcode is complete, mythbackend will replace the old file
 with the new as soon as it is no longer in use.</P>
 
+<H2><A NAME="ss21.14">21.14</A> <A HREF="mythtv-HOWTO.html#toc21.14">Changing your hostname.</A>
+</H2>
+
+<P>If you need to change the name of the computers used with MythTV you'll
+need to perform a sequence of steps.  There are a number of pieces of
+information that MythTV keeps track of which are tied to the hostname of the
+box, so changing the hostname involves altering the name both in the
+operating system and in the MySQL database.  In the examples below, the old
+name of the system was "frontend1" and we're going to change it to
+"kidsroom".</P>
+<P><B>NOTE</B>:  Changing the hostname using direct SQL update commands will
+break things.  You <EM>MUST</EM> use this indirect method.</P>
+<P>1.  Stop all backends.  If you run <B>mythbackend</B> from a terminal
+session, then press control-c. If your backends are started with an init
+script, you would do something like the following.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# /etc/init.d/mythbackend stop
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>2.  Change the hostname.
+For most distributions, edit the <CODE>/etc/sysconfig/network</CODE> file.  Look
+for <CODE>HOSTNAME=frontend1</CODE> and change this to
+<CODE>HOSTNAME=kidsroom</CODE> or whatever you'll be using.  To alter the
+hostname in the current session, run:
+<BLOCKQUOTE><CODE>
+<PRE>
+# hostname kidsroom
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>3.  Dump the database.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysqldump -u mythtv -pmythtv mythconverg -c > mythtv_backup.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>4.  Rename the host in the database.  First, ensure that the new hostname
+you'll be using isn't already in the database.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ grep kidsroom mythtv_backup.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Now we're actually going to change the name.  The following should all be
+typed on the same line:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cat mythtv_backup.sql | sed s/\'frontend1\'/\'kidsroom\'/ >> mythtv_restore.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>5.  Drop and recreate the database.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root
+mysql>drop database mythconverg;
+mysql>create database mythconverg;
+mysql>exit      
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>6.  Restore the database using your edited version.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u mythtv -pmythtv mythconverg &lt; mythtv_restore.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If you are running slave backends or frontends, don't forget to re-enable
+access as detailed in 
+<A HREF="mythtv-HOWTO-6.html#modify_perm_mysql">Modifying access to the MySQL database for multiple systems</A>. </P>
+<P>7.  Start the backends.  If you use init scripts, do the following, otherwise
+start them from terminal consoles.
+<BLOCKQUOTE><CODE>
+<PRE>
+# /etc/init.d/mythbackend start
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>8.  Quit and restart all frontends.  Delete the <CODE>mythtv_backup.sql</CODE>
+and <CODE>mythtv_restore.sql</CODE></P>
+
 <HR>
 <A HREF="mythtv-HOWTO-22.html">Next</A>
 <A HREF="mythtv-HOWTO-20.html">Previous</A>

@@ -128,8 +128,16 @@ capability for additional hard drives, read through the
 <A NAME="video_capture_device"></A> </P>
 <H3>Video Capture Device </H3>
 
-<P>In order to watch live TV, MythTV will need one or more video capture
-devices with Linux drivers.  For a list of video capture cards known to work
+<P>In order to capture video, MythTV will need one or more video capture
+devices with Linux drivers.  There are a number of classes of hardware
+available for capturing video.  </P>
+<H3>Frame Grabbers.</H3>
+
+<P>This class of card is the simplest and is usually the cheapest.  There is no
+onboard encoding of the analog video; hardware known as a Digital-Analog
+Converter (DAC) takes the video and presents it to the computer in an
+essentially raw digital form.</P>
+<P>For a list of video capture cards known to work
 with Linux, please see
 <CODE>/usr/src/linux/Documentation/video4linux/bttv</CODE> for a partial
 listing; even if your specific card is not listed, it may be that the vendor
@@ -148,6 +156,12 @@ are not the same.  The All-in-Wonder cards will not work with MythTV.
 </PRE>
 <HR>
 </P>
+<P><B>NOTE</B>: The ATI All-in-Wonder cards (which are not the same as the ATI
+TV Wonder, TV Wonder VE or TV Wonder Pro) <EM>will not</EM> work as a MythTV
+capture device because the GATOS 
+<A HREF="http://gatos.sourceforge.net">http://gatos.sourceforge.net</A>
+drivers that are available provide only a limited subset of the V4L API. 
+The TV Wonder series of cards are supported by the Bt8x8 Video4Linux driver.</P>
 <P>Newer cards may use the CX23881 series of chips; a driver is available at
 <A HREF="http://bytesex.org/cx88/">http://bytesex.org/cx88/</A>.</P>
 <P>After you have installed a suitable capture device, you can check that 
@@ -162,6 +176,8 @@ the bttv modules by typing:
 </CODE></BLOCKQUOTE>
 </P>
 <P>You want to see the <CODE>bttv</CODE> module listed.</P>
+<H3>Hardware MPEG-2 encoders.</H3>
+
 <P>While inexpensive video-capture cards just capture raw frames, leaving
 encoding to software, some higher-end cards incorporate hardware-level
 encoding. Using either a G200 MJPEG encoder card, or a MPEG-2 encoder card
@@ -195,13 +211,40 @@ for Live TV at 416x480.</LI>
 section for information on installing a PVR-250 on Mandrake 9.1.  The
 information contained in the section will also apply to other MPEG-2 encoder cards
 supported by the IVTV driver.</P>
-<P><B>NOTE</B>: The ATI All-in-Wonder cards (which are not the same as the ATI
-TV Wonder, TV Wonder VE or TV Wonder Pro) <EM>will not</EM> work as a MythTV
-capture device because the GATOS 
-<A HREF="http://gatos.sourceforge.net">http://gatos.sourceforge.net</A>
-drivers that are available provide only a limited subset of the V4L API. 
-The TV Wonder series of cards are supported by the Bt8x8 Video4Linux driver.</P>
+<H3>DVB capture cards.</H3>
 
+<P>DVB is a video standard primarily found in Europe.  MythTV supports DVB;
+see the pages maintained by Martin Smith 
+<A HREF="mailto:martin@ethics-gradient.net">martin@ethics-gradient.net</A> at 
+<A HREF="http://www.ethics-gradient.net/myth/mythdvb.html">http://www.ethics-gradient.net/myth/mythdvb.html</A> for more
+information.</P>
+<P>There are no known satellite systems available in the United States which
+will allow you to use a DVB card and obtain an unencrypted stream suitable
+for use with MythTV.</P>
+<H3>HDTV</H3>
+
+<P>Currently there is only one HDTV card with Linux drivers which is known
+to operate in the United States - the card available from 
+<A HREF="http://www.pchdtv.com/">http://www.pchdtv.com/</A>.  This card can
+only be used to capture over-the-air HDTV.  There are no known capture
+devices which will allow you to capture HDTV from a set-top box commonly
+found with digital cable systems.</P>
+<H3>Hardware known NOT to work and other issues.</H3>
+
+<P>
+<UL>
+<LI>Hauppauge WinTV-D or -HD (no driver)</LI>
+<LI>Hauppauge WinTV-USB series</LI>
+<LI>Hauppauge WinTV-PVR-usb, usb2 or pcr cards (no driver - this is not the PVR-250/350
+series of cards supported by the IvyTV driver)</LI>
+<LI>ATI All-in-Wonder series</LI>
+</UL>
+</P>
+<P>There are no known capture cards for digital cable.  You must use the
+set-top box provided by your digital cable provider.</P>
+<P>There are no known capture cards for HDTV content.</P>
+<P>There are no known capture cards for component (RGB or YPbPr)
+video.</P>
 <H3>Sound card</H3>
 
 <P>The system needs a sound card or an onboard equivalent on the motherboard

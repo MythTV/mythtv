@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2004-01-11, v0.13.09
+<date>2004-01-13, v0.13.10
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -178,8 +178,16 @@ Partition Formatting"> sections for some pointers.
 
 <label id="video_capture_device">
 <sect2>Video Capture Device 
-<p>In order to watch live TV, MythTV will need one or more video capture
-devices with Linux drivers.  For a list of video capture cards known to work
+<p>In order to capture video, MythTV will need one or more video capture
+devices with Linux drivers.  There are a number of classes of hardware
+available for capturing video.  
+<sect3>Frame Grabbers.
+<p>This class of card is the simplest and is usually the cheapest.  There is no
+onboard encoding of the analog video; hardware known as a Digital-Analog
+Converter (DAC) takes the video and presents it to the computer in an
+essentially raw digital form.
+
+For a list of video capture cards known to work
 with Linux, please see
 <tt>/usr/src/linux/Documentation/video4linux/bttv</tt> for a partial
 listing; even if your specific card is not listed, it may be that the vendor
@@ -198,6 +206,13 @@ NOTE:  The ATI TV Wonder series and the ATI All-in-Wonder series of cards
 are not the same.  The All-in-Wonder cards will not work with MythTV.
 </code>
 
+<bf>NOTE</bf>: The ATI All-in-Wonder cards (which are not the same as the ATI
+TV Wonder, TV Wonder VE or TV Wonder Pro) <em>will not</em> work as a MythTV
+capture device because the GATOS <url url="http://gatos.sourceforge.net"
+name="http://gatos.sourceforge.net">
+drivers that are available provide only a limited subset of the V4L API. 
+The TV Wonder series of cards are supported by the Bt8x8 Video4Linux driver.
+
 Newer cards may use the CX23881 series of chips; a driver is available at
 <url url="http://bytesex.org/cx88/" name="http://bytesex.org/cx88/">.
 
@@ -211,8 +226,8 @@ the bttv modules by typing:
 </verb</tscreen>
 
 You want to see the <tt>bttv</tt> module listed.
-
-While inexpensive video-capture cards just capture raw frames, leaving
+<sect3>Hardware MPEG-2 encoders.
+<p>While inexpensive video-capture cards just capture raw frames, leaving
 encoding to software, some higher-end cards incorporate hardware-level
 encoding. Using either a G200 MJPEG encoder card, or a MPEG-2 encoder card
 supported by the IvyTV project <url url="http://ivtv.sourceforge.net/"
@@ -245,14 +260,39 @@ See the <ref id="pvr250" name="Hauppauge PVR-250/350 hardware MPEG-2 encoder.">
 section for information on installing a PVR-250 on Mandrake 9.1.  The
 information contained in the section will also apply to other MPEG-2 encoder cards
 supported by the IVTV driver.
+<sect3>DVB capture cards.
+<p>DVB is a video standard primarily found in Europe.  MythTV supports DVB;
+see the pages maintained by Martin Smith <url
+url="mailto:martin@ethics-gradient.net" name="martin@ethics-gradient.net"> at <url
+url="http://www.ethics-gradient.net/myth/mythdvb.html"
+name="http://www.ethics-gradient.net/myth/mythdvb.html"> for more
+information.
 
-<bf>NOTE</bf>: The ATI All-in-Wonder cards (which are not the same as the ATI
-TV Wonder, TV Wonder VE or TV Wonder Pro) <em>will not</em> work as a MythTV
-capture device because the GATOS <url url="http://gatos.sourceforge.net"
-name="http://gatos.sourceforge.net">
-drivers that are available provide only a limited subset of the V4L API. 
-The TV Wonder series of cards are supported by the Bt8x8 Video4Linux driver.
+There are no known satellite systems available in the United States which
+will allow you to use a DVB card and obtain an unencrypted stream suitable
+for use with MythTV.
+<sect3>HDTV
+<p>Currently there is only one HDTV card with Linux drivers which is known
+to operate in the United States - the card available from <url
+url="http://www.pchdtv.com/" name="http://www.pchdtv.com/">.  This card can
+only be used to capture over-the-air HDTV.  There are no known capture
+devices which will allow you to capture HDTV from a set-top box commonly
+found with digital cable systems.
+<sect2>Hardware known NOT to work and other issues.
+<p><itemize>
+<item>Hauppauge WinTV-D or -HD (no driver)
+<item>Hauppauge WinTV-USB series
+<item>Hauppauge WinTV-PVR-usb, usb2 or pcr cards (no driver - this is not the PVR-250/350
+series of cards supported by the IvyTV driver)
+<item>ATI All-in-Wonder series
+</itemize>
+<p>There are no known capture cards for digital cable.  You must use the
+set-top box provided by your digital cable provider.
 
+There are no known capture cards for HDTV content.
+
+There are no known capture cards for component (RGB or YPbPr)
+video.
 <sect2>Sound card
 <p>The system needs a sound card or an onboard equivalent on the motherboard
 to play back and in most cases, to record sound. Any sound card that can be
@@ -4287,6 +4327,78 @@ transcoding.
 Once the transcode is complete, mythbackend will replace the old file
 with the new as soon as it is no longer in use.
 
+<sect1>Changing your hostname.
+<!-- Edited instructions from a post by Alan Snyder ax763 at yahoo.com -->
+<p>If you need to change the name of the computers used with MythTV you'll
+need to perform a sequence of steps.  There are a number of pieces of
+information that MythTV keeps track of which are tied to the hostname of the
+box, so changing the hostname involves altering the name both in the
+operating system and in the MySQL database.  In the examples below, the old
+name of the system was "frontend1" and we're going to change it to
+"kidsroom".
+
+<bf>NOTE</bf>:  Changing the hostname using direct SQL update commands will
+break things.  You <em>MUST</em> use this indirect method.
+ 
+1.  Stop all backends.  If you run <bf>mythbackend</bf> from a terminal
+session, then press control-c. If your backends are started with an init
+script, you would do something like the following.
+<tscreen><verb>
+$ su
+# /etc/init.d/mythbackend stop
+</verb></tscreen>
+
+2.  Change the hostname.
+For most distributions, edit the <tt>/etc/sysconfig/network</tt> file.  Look
+for <tt>HOSTNAME=frontend1</tt> and change this to
+<tt>HOSTNAME=kidsroom</tt> or whatever you'll be using.  To alter the
+hostname in the current session, run:
+<tscreen><verb>
+# hostname kidsroom
+</verb></tscreen>
+
+3.  Dump the database.
+<tscreen><verb>
+$ mysqldump -u mythtv -pmythtv mythconverg -c > mythtv_backup.sql
+</verb></tscreen>
+
+4.  Rename the host in the database.  First, ensure that the new hostname
+you'll be using isn't already in the database.
+<tscreen><verb>
+$ grep kidsroom mythtv_backup.sql
+</verb></tscreen>
+Now we're actually going to change the name.  The following should all be
+typed on the same line:
+<tscreen><verb>
+$ cat mythtv_backup.sql | sed s/\'frontend1\'/\'kidsroom\'/ >> mythtv_restore.sql
+</verb></tscreen>
+	
+5.  Drop and recreate the database.
+<tscreen><verb>
+$ mysql -u root
+mysql>drop database mythconverg;
+mysql>create database mythconverg;
+mysql>exit	
+</verb></tscreen>
+
+6.  Restore the database using your edited version.
+<tscreen><verb>
+$ mysql -u mythtv -pmythtv mythconverg < mythtv_restore.sql
+</verb></tscreen>
+
+If you are running slave backends or frontends, don't forget to re-enable
+access as detailed in <ref id="modify_perm_mysql" name="Modifying access to
+the MySQL database for multiple systems">. 
+
+7.  Start the backends.  If you use init scripts, do the following, otherwise
+start them from terminal consoles.
+<tscreen><verb>
+# /etc/init.d/mythbackend start
+</verb></tscreen>
+
+8.  Quit and restart all frontends.  Delete the <tt>mythtv_backup.sql</tt>
+and <tt>mythtv_restore.sql</tt>
+
 <sect>Example Configurations.
 <p>This section contains configurations which you may find useful.
 <sect1>Hauppauge PVR-250/350 hardware MPEG-2 encoder. <label id="pvr250">
@@ -4932,6 +5044,8 @@ Update XMLTV version.
 v0.13.09, 2004-01-11.  Get rid of "Contributors" section.  People come and
 go.  Hans Kruse's website for non-US MythTV people is a temporary holder? 
 Change ivtv section again; tmk is now doing releases on sf, so use that.
+v0.13.10, 2004-01-13.  Add instructions on changing hostname.  Add link to DVB
+docs.  Break some hearts in the video capture card section.
 -->
 
 <!--

@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2004-01-11, v0.13.09
+  2004-01-13, v0.13.10
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -22,16 +22,21 @@
         3.1.3 Hard Disk(s)
         3.1.4 Filesystems
         3.1.5 Video Capture Device
-        3.1.6 Sound card
-        3.1.7 Video Display Card
-        3.1.8 Cards with TV out
-           3.1.8.1 ATI
-           3.1.8.2 Matrox
-           3.1.8.3 nVidia
-           3.1.8.4 Savage
-           3.1.8.5 Hauppauge PVR-350
-           3.1.8.6 Other Options
-        3.1.9 External Adapters
+           3.1.5.1 Frame Grabbers.
+           3.1.5.2 Hardware MPEG-2 encoders.
+           3.1.5.3 DVB capture cards.
+           3.1.5.4 HDTV
+        3.1.6 Hardware known NOT to work and other issues.
+        3.1.7 Sound card
+        3.1.8 Video Display Card
+        3.1.9 Cards with TV out
+           3.1.9.1 ATI
+           3.1.9.2 Matrox
+           3.1.9.3 nVidia
+           3.1.9.4 Savage
+           3.1.9.5 Hauppauge PVR-350
+           3.1.9.6 Other Options
+        3.1.10 External Adapters
      3.2 Software.
         3.2.1 Pre-compiled packages.
            3.2.1.1 Red Hat Linux
@@ -208,6 +213,7 @@
         21.11.2 Gentoo
      21.12 Advanced Backend Configurations.
      21.13 What is this transcoder thing, and how do I use it?
+     21.14 Changing your hostname.
 
   22. Example Configurations.
      22.1 Hauppauge PVR-250/350 hardware MPEG-2 encoder.
@@ -268,6 +274,7 @@
   install a custom version of Knoppix optimized for MythTV.
 
 
+
   [1m3.  Checking prerequisites.[0m
 
   You must ensure that any firewalls (either hardware, or a software
@@ -277,6 +284,8 @@
   (TCP ports 6543 and 6544) must be open.  It is [4mstrongly[24m recommended
   that you do [4mnot[24m expose the MythTV and MySQL ports to the Internet or
   your "Outside" LAN.
+
+
   [1m3.1.  Hardware.[0m
 
   Hardware selection is a complex topic, one this HOWTO will only
@@ -342,7 +351,6 @@
      using the RTJPEG codec with 480x480 capture resolution and play it
      back simultaneously, thereby allowing live TV watching.
 
-
   +o  A dual Celeron/450MHz is able to view a 480x480 MPEG-4/3300kbps
      file created on a different system with 30% CPU usage.
 
@@ -405,9 +413,18 @@
 
   [1m3.1.5.  Video Capture Device[0m
 
-  In order to watch live TV, MythTV will need one or more video capture
-  devices with Linux drivers.  For a list of video capture cards known
-  to work with Linux, please see
+  In order to capture video, MythTV will need one or more video capture
+  devices with Linux drivers.  There are a number of classes of hardware
+  available for capturing video.
+
+  [1m3.1.5.1.  Frame Grabbers.[0m
+
+  This class of card is the simplest and is usually the cheapest.  There
+  is no onboard encoding of the analog video; hardware known as a
+  Digital-Analog Converter (DAC) takes the video and presents it to the
+  computer in an essentially raw digital form.
+
+  For a list of video capture cards known to work with Linux, please see
   /usr/src/linux/Documentation/video4linux/bttv for a partial listing;
   even if your specific card is not listed, it may be that the vendor is
   actually using a standard reference design and placing their own name
@@ -428,6 +445,13 @@
 
 
 
+  [1mNOTE[22m: The ATI All-in-Wonder cards (which are not the same as the ATI
+  TV Wonder, TV Wonder VE or TV Wonder Pro) [4mwill[24m [4mnot[24m work as a MythTV
+  capture device because the GATOS http://gatos.sourceforge.net
+  <http://gatos.sourceforge.net> drivers that are available provide only
+  a limited subset of the V4L API.  The TV Wonder series of cards are
+  supported by the Bt8x8 Video4Linux driver.
+
   Newer cards may use the CX23881 series of chips; a driver is available
   at http://bytesex.org/cx88/ <http://bytesex.org/cx88/>.
 
@@ -443,6 +467,8 @@
 
 
   You want to see the bttv module listed.
+
+  [1m3.1.5.2.  Hardware MPEG-2 encoders.[0m
 
   While inexpensive video-capture cards just capture raw frames, leaving
   encoding to software, some higher-end cards incorporate hardware-level
@@ -473,7 +499,6 @@
 
   +o  A P3-550 can decode a 480x480 16Mbps MPEG-2 file with 55% CPU.
 
-
   +o  A Celeron 450 (no SSE) can decode a 480x480 16Mbps MPEG-2 file with
      80% CPU.
 
@@ -482,15 +507,47 @@
   information contained in the section will also apply to other MPEG-2
   encoder cards supported by the IVTV driver.
 
-  [1mNOTE[22m: The ATI All-in-Wonder cards (which are not the same as the ATI
-  TV Wonder, TV Wonder VE or TV Wonder Pro) [4mwill[24m [4mnot[24m work as a MythTV
-  capture device because the GATOS http://gatos.sourceforge.net
-  <http://gatos.sourceforge.net> drivers that are available provide only
-  a limited subset of the V4L API.  The TV Wonder series of cards are
-  supported by the Bt8x8 Video4Linux driver.
+  [1m3.1.5.3.  DVB capture cards.[0m
+
+  DVB is a video standard primarily found in Europe.  MythTV supports
+  DVB; see the pages maintained by Martin Smith martin@ethics-
+  gradient.net <mailto:martin@ethics-gradient.net> at http://www.ethics-
+  gradient.net/myth/mythdvb.html <http://www.ethics-
+  gradient.net/myth/mythdvb.html> for more information.
+
+  There are no known satellite systems available in the United States
+  which will allow you to use a DVB card and obtain an unencrypted
+  stream suitable for use with MythTV.
+
+  [1m3.1.5.4.  HDTV[0m
+
+  Currently there is only one HDTV card with Linux drivers which is
+  known to operate in the United States - the card available from
+  http://www.pchdtv.com/ <http://www.pchdtv.com/>.  This card can only
+  be used to capture over-the-air HDTV.  There are no known capture
+  devices which will allow you to capture HDTV from a set-top box
+  commonly found with digital cable systems.
+
+  [1m3.1.6.  Hardware known NOT to work and other issues.[0m
 
 
-  [1m3.1.6.  Sound card[0m
+  +o  Hauppauge WinTV-D or -HD (no driver)
+
+  +o  Hauppauge WinTV-USB series
+
+  +o  Hauppauge WinTV-PVR-usb, usb2 or pcr cards (no driver - this is not
+     the PVR-250/350 series of cards supported by the IvyTV driver)
+
+  +o  ATI All-in-Wonder series
+
+  There are no known capture cards for digital cable.  You must use the
+  set-top box provided by your digital cable provider.
+
+  There are no known capture cards for HDTV content.
+
+  There are no known capture cards for component (RGB or YPbPr) video.
+
+  [1m3.1.7.  Sound card[0m
 
   The system needs a sound card or an onboard equivalent on the
   motherboard to play back and in most cases, to record sound. Any sound
@@ -524,7 +581,7 @@
   formats/html_single/MP3-HOWTO.html#toc8> for additional information.
 
 
-  [1m3.1.7.  Video Display Card[0m
+  [1m3.1.8.  Video Display Card[0m
 
   MythTV will work with just about any video card.  However, it is
   highly recommended that you use a card which supports XVideo (XV)
@@ -547,8 +604,7 @@
   Note that with some video cards and X drivers, Xvideo extensions are
   only supported on the VGA output, and not on the TV output.
 
-
-  [1m3.1.8.  Cards with TV out[0m
+  [1m3.1.9.  Cards with TV out[0m
 
   The next section deals with a number of cards that are known to have
   TV-out ports.  The list is unlikely to be complete, so if you know of
@@ -564,7 +620,7 @@
   search string.
 
 
-  [1m3.1.8.1.  ATI[0m
+  [1m3.1.9.1.  ATI[0m
 
   ATI makes many cards with TV-out capability, but ATI offers no
   official support for their use with Linux. The standard XFree86 ati
@@ -596,7 +652,7 @@
      reported.
 
 
-  [1m3.1.8.2.  Matrox[0m
+  [1m3.1.9.2.  Matrox[0m
 
   The standard Matrox driver included with XFree86 does not support TV-
   out.
@@ -606,11 +662,13 @@
   cards.  See http://www.matrox.com/mga/support/drivers/files/lnx_21.cfm
   <http://www.matrox.com/mga/support/drivers/files/lnx_21.cfm> for
   details.
+
   Newer Matrox cards can be run with a set of kernel patches (for kernel
   2.4.19) and a customized X driver, but this arrangement does not
   support XVideo on TV-out. See
   http://www.bglug.ca/matrox_tvout/g450_tvout_howto.html
   <http://www.bglug.ca/matrox_tvout/g450_tvout_howto.html> for details.
+
 
   Specific cards:
 
@@ -627,7 +685,7 @@
      XVideo.
 
 
-  [1m3.1.8.3.  nVidia[0m
+  [1m3.1.9.3.  nVidia[0m
 
   Some nVidia cards with TV-out can be run using the standard nv driver
   in XFree86, combined with the userspace application [1mnvtv [22mto control
@@ -652,7 +710,7 @@
   +o  GeForce4 MX420 PCI (BFG Asylum). Has SVideo port.
 
 
-  [1m3.1.8.4.  Savage[0m
+  [1m3.1.9.4.  Savage[0m
 
   The standard savage X driver supports TV out on some Savage cards.
   Unfortunately, XVideo support for the Savage 2000 card (a very common
@@ -668,11 +726,13 @@
   +o  S3 Savage IX 8MB AGP. Has SVideo output. Reported to work.
 
 
-  [1m3.1.8.5.  Hauppauge PVR-350[0m
+  [1m3.1.9.5.  Hauppauge PVR-350[0m
 
   MythTV supports the TV-out and MPEG-2 decoder functions in the IvyTV
   driver.
-  [1m3.1.8.6.  Other Options[0m
+
+
+  [1m3.1.9.6.  Other Options[0m
 
   Some devices with onboard TV-out capability, such as XBoxes converted
   to Linux and some laptops, can be used as MythTV frontends to display
@@ -680,7 +740,7 @@
   for messages that report the details of these special arrangements.
 
 
-  [1m3.1.9.  External Adapters[0m
+  [1m3.1.10.  External Adapters[0m
 
   External adapters convert standard VGA output to a form suitable for
   display on a television. The output format varies by region, since
@@ -737,12 +797,10 @@
   commonly found in that distribution.  Any issues with MythTV installed
   via a pre-compiled package [1mMUST [22mbe raised with the packager.
 
-
   If you use any of the pre-compiled packages you may not need to
   perform any additional configuration steps in this HOWTO.  The next
   logical step is ``configuring MySQL'', which you may or may not have
   to perform.  See your package documentation.
-
 
   [1m3.2.1.1.  Red Hat Linux[0m
 
@@ -800,14 +858,12 @@
   party documentation problems should be brought up with the maintainer.
 
 
-
   [1m3.2.1.2.  Mandrake[0m
 
   Thac has created RPMs for MythTV for Mandrake 9.0 and 9.1 which may be
   obtained from http://rpm.nyvalls.se/ <http://rpm.nyvalls.se/> If you
   have problems with the RPMs, please send him email directly at
   thac@nyvalls.se <thac@nyvalls.se>.
-
 
   [1m3.2.1.3.  Debian[0m
 
@@ -857,7 +913,6 @@
   package in order to compile [1mlircd [22mif your distribution doesn't have a
   pre-packaged [1mlirc[22m.  If you are using [1mXMLTV [22mas a grabber, you will need
   [1mperl[22m.
-
 
 
   ______________________________________________________________________
@@ -926,6 +981,8 @@
   from the default installation.  Ensure that you install libqt3-mysql.
   ______________________________________________________________________
 
+
+
   Make sure that cdialog is installed if you want to use MythTV with a
   remote control if you need to compile [1mlirc [22mfrom source.
 
@@ -936,6 +993,7 @@
 
   If you marked anything to install, click on Install Marked.  Click
   "Yes" or OK if you get a message about satisfying dependencies.
+
 
 
   [1m3.2.3.2.  Red Hat Linux 8.0[0m
@@ -1053,8 +1111,8 @@
 
   The "ls -l" command will show you a directory listing.  There should
   be two files, one will be named "qt3" and the other will be
-  "qt3-devel".  The full filenames will vary, so one you know the
-  filename, you can install them with
+  "qt3-devel".  The full filenames will vary, so one you know the file-
+  name, you can install them with
 
 
        # rpm -Uvh [filename1]
@@ -1186,11 +1244,11 @@
 
 
 
-       $ su -
-       # echo /usr/local/lib >> /etc/ld.so.conf
-       # /sbin/ldconfig
-       # exit
-       $
+  $ su -
+  # echo /usr/local/lib >> /etc/ld.so.conf
+  # /sbin/ldconfig
+  # exit
+  $
 
 
 
@@ -1238,8 +1296,6 @@
   Also, check that there has been a link created in /usr/lib/qt3/mkspecs
   called default. If not, you'll get errors during the compile. See the
   Troubleshooting Section for more information.
-
-
 
   [1m4.3.2.  Distribution-Specific Notes[0m
 
@@ -5296,6 +5352,95 @@
   with the new as soon as it is no longer in use.
 
 
+  [1m21.14.  Changing your hostname.[0m
+
+  If you need to change the name of the computers used with MythTV
+  you'll need to perform a sequence of steps.  There are a number of
+  pieces of information that MythTV keeps track of which are tied to the
+  hostname of the box, so changing the hostname involves altering the
+  name both in the operating system and in the MySQL database.  In the
+  examples below, the old name of the system was "frontend1" and we're
+  going to change it to "kidsroom".
+
+  [1mNOTE[22m:  Changing the hostname using direct SQL update commands will
+  break things.  You [4mMUST[24m use this indirect method.
+
+  1.  Stop all backends.  If you run [1mmythbackend [22mfrom a terminal
+  session, then press control-c. If your backends are started with an
+  init script, you would do something like the following.
+
+
+       $ su
+       # /etc/init.d/mythbackend stop
+
+
+
+  2.  Change the hostname.  For most distributions, edit the
+  /etc/sysconfig/network file.  Look for HOSTNAME=frontend1 and change
+  this to HOSTNAME=kidsroom or whatever you'll be using.  To alter the
+  hostname in the current session, run:
+
+
+
+  # hostname kidsroom
+
+
+
+  3.  Dump the database.
+
+
+       $ mysqldump -u mythtv -pmythtv mythconverg -c > mythtv_backup.sql
+
+
+
+  4.  Rename the host in the database.  First, ensure that the new
+  hostname you'll be using isn't already in the database.
+
+
+       $ grep kidsroom mythtv_backup.sql
+
+
+
+  Now we're actually going to change the name.  The following should all
+  be typed on the same line:
+
+
+       $ cat mythtv_backup.sql | sed s/\'frontend1\'/\'kidsroom\'/ >> mythtv_restore.sql
+
+
+
+  5.  Drop and recreate the database.
+
+
+       $ mysql -u root
+       mysql>drop database mythconverg;
+       mysql>create database mythconverg;
+       mysql>exit
+
+
+
+  6.  Restore the database using your edited version.
+
+
+       $ mysql -u mythtv -pmythtv mythconverg < mythtv_restore.sql
+
+
+
+  If you are running slave backends or frontends, don't forget to re-
+  enable access as detailed in ``Modifying access to the MySQL database
+  for multiple systems''.
+
+  7.  Start the backends.  If you use init scripts, do the following,
+  otherwise start them from terminal consoles.
+
+
+       # /etc/init.d/mythbackend start
+
+
+
+  8.  Quit and restart all frontends.  Delete the mythtv_backup.sql and
+  mythtv_restore.sql
+
   [1m22.  Example Configurations.[0m
 
   This section contains configurations which you may find useful.
@@ -5358,8 +5503,9 @@
   Next, compile the driver:
 
 
-       $ cd ~/ivtv/ivtv/driver
-       $ make
+
+  $ cd ~/ivtv/ivtv/driver
+  $ make
 
 
 
@@ -5381,15 +5527,14 @@
   that came with the card.
 
 
-
-  alias char-major-81     videodev
-  alias char-major-81-0   ivtv
-  alias char-major-61 lirc_i2c
-  options ivtv debug=1
-  options tuner type=2
-  options msp3400 once=1 simple=1
-  add below ivtv msp3400 saa7115 tuner
-  add above ivtv lirc_dev lirc_i2c
+       alias char-major-81     videodev
+       alias char-major-81-0   ivtv
+       alias char-major-61 lirc_i2c
+       options ivtv debug=1
+       options tuner type=2
+       options msp3400 once=1 simple=1
+       add below ivtv msp3400 saa7115 tuner
+       add above ivtv lirc_dev lirc_i2c
 
 
 
@@ -5420,15 +5565,15 @@
   Check that the card is being recognized on the PCI bus:
 
 
-       $ lspci -v
-       <snip>
+  $ lspci -v
+  <snip>
 
-       00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
-       Encoder (rev 01)
-               Subsystem: Hauppauge computer works Inc.: Unknown device 4801
-               Flags: bus master, medium devsel, latency 32, IRQ 11
-               Memory at d0000000 (32-bit, prefetchable) [size=64M]
-               Capabilities: <available only to root>
+  00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
+  Encoder (rev 01)
+          Subsystem: Hauppauge computer works Inc.: Unknown device 4801
+          Flags: bus master, medium devsel, latency 32, IRQ 11
+          Memory at d0000000 (32-bit, prefetchable) [size=64M]
+          Capabilities: <available only to root>
 
 
 
@@ -5443,6 +5588,8 @@
        crw-------    1 mythtv   sys       81, 224 Dec 31  1969 vbi0
        crw-------    1 mythtv   sys       81,   0 Dec 31  1969 video0
        crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
+
+
 
   In this case, the ivtv device is video0.
 
@@ -5544,7 +5691,6 @@
        kernel-source-2.4.22-9mdk
 
 
-
   If you've already installed LIRC from the Mandrake packages, it's
   going to be version 0.6.6, and that won't work.  Uninstall it:
 
@@ -5560,40 +5706,39 @@
   programs on your system:
 
 
+       $ su
+       # updatedb
+       # locate lirc_i2c|grep `uname -r`
+       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_i2c.c
+       /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_i2c.o.gz
 
-  $ su
-  # updatedb
-  # locate lirc_i2c|grep `uname -r`
-  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_i2c.c
-  /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_i2c.o.gz
+       # locate lirc_dev|grep `uname -r`
+       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.c
+       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.h
+       /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.stamp
+       /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.ver
+       /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_dev.o.gz
 
-  # locate lirc_dev|grep `uname -r`
-  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.c
-  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.h
-  /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.stamp
-  /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.ver
-  /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_dev.o.gz
+       # locate irw|grep "/usr"
+       /usr/bin/irw
+       /usr/local/bin/irw
+       /usr/local/man/man1/irw.1
 
-  # locate irw|grep "/usr"
-  /usr/bin/irw
-  /usr/local/bin/irw
-  /usr/local/man/man1/irw.1
+       # locate lircd|grep "/usr"
+       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lircd.conf.RM-050
+       /usr/share/man/man8/lircd.8.bz2
+       /usr/share/doc/lirc-0.6.6/html/lircd.html
+       /usr/sbin/lircd
+       /usr/local/sbin/lircd
+       /usr/local/man/man8/lircd.8
 
-  # locate lircd|grep "/usr"
-  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lircd.conf.RM-050
-  /usr/share/man/man8/lircd.8.bz2
-  /usr/share/doc/lirc-0.6.6/html/lircd.html
-  /usr/sbin/lircd
-  /usr/local/sbin/lircd
-  /usr/local/man/man8/lircd.8
-
-  # locate irxevent|grep "/usr"
-  /usr/share/man/man1/irxevent.1.bz2
-  /usr/share/doc/lirc-0.6.6/html/irxevent.html
-  /usr/share/doc/lirc-0.6.6/irxevent.keys
-  /usr/bin/irxevent
-  /usr/local/bin/irxevent
-  /usr/local/man/man1/irxevent.1
+       # locate irxevent|grep "/usr"
+       /usr/share/man/man1/irxevent.1.bz2
+       /usr/share/doc/lirc-0.6.6/html/irxevent.html
+       /usr/share/doc/lirc-0.6.6/irxevent.keys
+       /usr/bin/irxevent
+       /usr/local/bin/irxevent
+       /usr/local/man/man1/irxevent.1
 
 
 
@@ -5610,7 +5755,6 @@
        # rm -rf /usr/bin/irw /usr/local/bin/irw
 
 
-
   Download the lirc-0.7.0pre2 tarball:
 
 
@@ -5624,9 +5768,9 @@
   work correctly.  Download the patch and install:
 
 
-  $ cd lirc-0.7.0pre2
-  $ wget http://delvare.nerim.net/i2c/other/lirc-CVS-i2c-2.8.0.patch
-  $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
+       $ cd lirc-0.7.0pre2
+       $ wget http://delvare.nerim.net/i2c/other/lirc-CVS-i2c-2.8.0.patch
+       $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
 
 
 
@@ -5675,22 +5819,21 @@
   your /var/log/messages and /var/log/lircd files.
 
 
-
-  $ su
-  # modprobe lirc_i2c
-  # lsmod
-  Module                  Size  Used by    Not tainted
-  lirc_i2c                5124   0
-  lirc_dev               10096   1  [lirc_i2c]
-  ...
-  # lircd
-  # tail /var/log/messages
-  Sep 18 15:38:26 frontend kernel: lirc_i2c: chip found @ 0x18 (Hauppauge IR)
-  Sep 18 15:38:26 frontend kernel: lirc_dev: lirc_register_plugin:sample_rate:
-  10
-  ...
-  # tail /var/log/lircd
-  Sep 18 15:24:52 frontend lircd 0.7.0pre2: lircd(hauppauge) ready
+       $ su
+       # modprobe lirc_i2c
+       # lsmod
+       Module                  Size  Used by    Not tainted
+       lirc_i2c                5124   0
+       lirc_dev               10096   1  [lirc_i2c]
+       ...
+       # lircd
+       # tail /var/log/messages
+       Sep 18 15:38:26 frontend kernel: lirc_i2c: chip found @ 0x18 (Hauppauge IR)
+       Sep 18 15:38:26 frontend kernel: lirc_dev: lirc_register_plugin:sample_rate:
+       10
+       ...
+       # tail /var/log/lircd
+       Sep 18 15:24:52 frontend lircd 0.7.0pre2: lircd(hauppauge) ready
 
 
 
@@ -5737,8 +5880,6 @@
   native LIRC support within MythTV, you will need to modify your
   settings.pro file and recompile.  Your settings.pro should look like
   this:
-
-
 
   # Native lirc support
   CONFIG += using_lirc
