@@ -438,6 +438,7 @@ class SelectManagedListSetting : public ManagedListSetting
                 else
                     return selectItem->addSelection(label, QString::number(value));
             }
+            return NULL;
         }        
     
         void clearSelections() {
