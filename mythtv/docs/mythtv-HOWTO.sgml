@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-10-24, v2.86
+<date>2003-10-25, v2.87
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -3629,17 +3629,16 @@ name="Hauppauge PVR-250 remote and MythTV's native LIRC support."> for
 examples on finding and removing old versions of lirc.
 
 <sect>Miscellaneous. 
-<sect1>I'd like to watch the files without using MythTV / I'd like to
-convert the files to some other format.  
-
+<sect1>I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.  
 <p>MythTV comes with a utility called <bf>mythtranscode</bf> which can
 decode nuv files into raw format for use with other applications.  This
 command-line utility was not designed to be used by the end-user, but
 instead to be called by other applications or scripts.  Programs like
 <bf>mkmovie</bf> (<url url="http://www.icelus.org/"
-name="http://www.icelus.org/">) and <bf>nuvexport</bf> are better suited for
-the end user.  However, since <bf>mythtranscode</bf> can be a useful tool,
-directions on using it follow.  
+name="http://www.icelus.org/">) and <bf>nuvexport</bf> (<url
+url="http://forevermore.net/myth/" name="http://forevermore.net/myth/">) are
+better suited for the end user.  However, since <bf>mythtranscode</bf> can
+be a useful tool, directions on using it follow.
 
 <bf>mythtranscode</bf> creates raw streams, which means that they do not
 contain any container information such as resolution, frame-rate, or audio
@@ -4954,6 +4953,8 @@ hardware section about the PVR-350 as a TV-out.
 v2.85, 2003-10-21.  Update Gentoo section; mythtv is now "stable".
 v2.86, 2003-10-24.  Fix typo in themes example.  Replace section on patching
 MPlayer.
+v2.87, 2003-10-25.  Add link to nuvexport website.  Fix broken section header for
+mythtranscode.
 -->
 
 <!--

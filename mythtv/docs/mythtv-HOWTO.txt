@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-10-24, v2.86
+  2003-10-25, v2.87
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -4555,7 +4555,8 @@
   files into raw format for use with other applications.  This command-
   line utility was not designed to be used by the end-user, but instead
   to be called by other applications or scripts.  Programs like [1mmkmovie[0m
-  (http://www.icelus.org/ <http://www.icelus.org/>) and [1mnuvexport [22mare
+  (http://www.icelus.org/ <http://www.icelus.org/>) and [1mnuvexport[0m
+  (http://forevermore.net/myth/ <http://forevermore.net/myth/>) are
   better suited for the end user.  However, since [1mmythtranscode [22mcan be a
   useful tool, directions on using it follow.
 
@@ -4574,7 +4575,6 @@
   independently, and there is no rate control between them which means
   that the two programs don't coordinate their efforts to maintain
   synchronization.
-
 
 
   [1m21.1.1.  mythtranscode example[0m

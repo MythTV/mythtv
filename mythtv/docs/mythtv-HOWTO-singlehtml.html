@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-10-24, v2.86
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-10-25, v2.87
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -183,7 +183,7 @@ necessary.</EM>
 <H2><A NAME="toc21">21.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s21">Miscellaneous. </A></H2>
 
 <UL>
-<LI><A NAME="toc21.1">21.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.1">I'd like to watch the files without using MythTV / I'd like to</A>
+<LI><A NAME="toc21.1">21.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.1">I'd like to watch the files without using MythTV / I'd like to convert the files to some other format. </A>
 <LI><A NAME="toc21.2">21.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.2">I'd like to use some other window manager.</A>
 <LI><A NAME="toc21.3">21.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.3">What capture resolution should I use?  How does video work?</A>
 <LI><A NAME="toc21.4">21.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.4">MythTV GUI and X Display Sizes.</A>
@@ -4177,17 +4177,18 @@ examples on finding and removing old versions of lirc.</P>
 
 <H2><A NAME="s21">21.</A> <A HREF="#toc21">Miscellaneous. </A></H2>
 
-<H2><A NAME="ss21.1">21.1</A> <A HREF="#toc21.1">I'd like to watch the files without using MythTV / I'd like to</A>
-convert the files to some other format. </H2>
+<H2><A NAME="ss21.1">21.1</A> <A HREF="#toc21.1">I'd like to watch the files without using MythTV / I'd like to convert the files to some other format. </A>
+</H2>
 
 <P>MythTV comes with a utility called <B>mythtranscode</B> which can
 decode nuv files into raw format for use with other applications.  This
 command-line utility was not designed to be used by the end-user, but
 instead to be called by other applications or scripts.  Programs like
 <B>mkmovie</B> (
-<A HREF="http://www.icelus.org/">http://www.icelus.org/</A>) and <B>nuvexport</B> are better suited for
-the end user.  However, since <B>mythtranscode</B> can be a useful tool,
-directions on using it follow.  </P>
+<A HREF="http://www.icelus.org/">http://www.icelus.org/</A>) and <B>nuvexport</B> (
+<A HREF="http://forevermore.net/myth/">http://forevermore.net/myth/</A>) are
+better suited for the end user.  However, since <B>mythtranscode</B> can
+be a useful tool, directions on using it follow.</P>
 <P><B>mythtranscode</B> creates raw streams, which means that they do not
 contain any container information such as resolution, frame-rate, or audio
 sampling rate.  In order to process the output, you must supply this
