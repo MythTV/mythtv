@@ -704,8 +704,14 @@ void DVBChannel::connectNotify(const char* signal)
     {
         monitorClients++;
         if (!monitorRunning)
-            pthread_create(&statusMonitorThread, NULL,
+        {
+            pthread_attr_t attr;
+            pthread_attr_init(&attr);
+            pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+            pthread_create(&statusMonitorThread, &attr,
                            StatusMonitorHelper, this);
+        }
     }
 }
 

@@ -393,8 +393,12 @@ void DVBRecorder::StartRecording()
 
     // start the thread that logs signal data to the db
 
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
     if (signal_monitor_interval > 0 &&
-        pthread_create(&qualthread, NULL, QualityMonitorHelper, this) == 0)
+        pthread_create(&qualthread, &attr, QualityMonitorHelper, this) == 0)
     {
         qthreadexists = true;
         RECORD("DVB Quality monitor is starting at " << 

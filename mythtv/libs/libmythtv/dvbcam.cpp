@@ -84,7 +84,11 @@ bool DVBCam::Open()
 
     GENERAL("CAM - Initialized successfully.");
 
-    pthread_create(&ciHandlerThread, NULL, CiHandlerThreadHelper, this);
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+    pthread_create(&ciHandlerThread, &attr, CiHandlerThreadHelper, this);
 
     return true;
 }

@@ -117,7 +117,12 @@ void DVBSections::DelPid(int pid)
 void DVBSections::Start()
 {
     AddPid(0);
-    pthread_create(&thread, NULL, ThreadHelper, this);
+
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+    pthread_create(&thread, &attr, ThreadHelper, this);
 }
 
 void DVBSections::Stop()
