@@ -317,6 +317,10 @@ public:
             Setting::setValue(newValue);
     };
 
+    virtual void setValue(int which) {
+        SelectSetting::setValue(which);
+    };
+
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                   const char* widgetName = 0);
 private:
