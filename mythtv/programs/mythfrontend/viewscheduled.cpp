@@ -15,6 +15,9 @@
 #include "programlistitem.h"
 #include "scheduler.h"
 #include "dialogbox.h"
+#include "settings.h"
+    
+extern Settings *globalsettings; 
 
 ViewScheduled::ViewScheduled(QString prefix, TV *ltv, QSqlDatabase *ldb, 
                              QWidget *parent, const char *name)
@@ -29,7 +32,10 @@ ViewScheduled::ViewScheduled(QString prefix, TV *ltv, QSqlDatabase *ldb,
     int screenheight = QApplication::desktop()->height();
     int screenwidth = QApplication::desktop()->width();
 
-    screenwidth = 800; screenheight = 600;
+    if (globalsettings->GetNumSetting("GuiWidth") > 0)
+        screenwidth = globalsettings->GetNumSetting("GuiWidth");
+    if (globalsettings->GetNumSetting("GuiHeight") > 0)
+        screenheight = globalsettings->GetNumSetting("GuiHeight");
 
     float wmult = screenwidth / 800.0;
     float hmult = screenheight / 600.0;

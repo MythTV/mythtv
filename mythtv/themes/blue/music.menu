@@ -4,7 +4,7 @@ str Logo=myth_tv_logo.png
 str LogoPos=270,40
 
 int NumButtons=4
-str ButtonOrderVertical=1,2,3,4
+str ButtonOrderVertical=1,3,2,4
 str ButtonOrderHorizontal=1,2,3,4
 int StartButton=1
 

@@ -1,6 +1,10 @@
 #include <qapplication.h>
 
 #include "dialogbox.h"
+#include "settings.h"
+
+Settings *globalsettings;
+char installprefix[] = "/usr/local";
 
 int main(int argc, char **argv)
 {
@@ -11,6 +15,11 @@ int main(int argc, char **argv)
         printf("Not enough args to run with\n");
         return 0;
     }
+
+    globalsettings = new Settings;
+
+    globalsettings->LoadSettingsFiles("theme.txt", installprefix);
+    globalsettings->LoadSettingsFiles("mysql.txt", installprefix);
 
     DialogBox diag(argv[1]);
     a.setMainWidget(&diag);

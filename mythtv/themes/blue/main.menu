@@ -15,7 +15,7 @@ str ButtonText1=TV
 str ButtonAction1=MODE_TV
 
 str ButtonPos2=430,250
-str ButtonIcon2=play_cd.png
+str ButtonIcon2=cd.png
 str ButtonIconOffset2=15,10
 str ButtonText2=Music
 str ButtonAction2=MODE_MUSIC

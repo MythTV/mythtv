@@ -9,6 +9,9 @@ INSTALLS = target
 
 include (../settings.pro)
 
+INCLUDEPATH += ../libmythtv
+
 # Input
-HEADERS += dialogbox.h
-SOURCES += dialogbox.cpp main.cpp
+HEADERS += dialogbox.h ../libmythtv/settings.h
+SOURCES += dialogbox.cpp main.cpp ../libmythtv/settings.cpp
+

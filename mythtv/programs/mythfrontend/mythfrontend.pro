@@ -11,10 +11,7 @@ INSTALLS = target
 include ( ../settings.pro )
 
 setting.path = /usr/local/share/mythtv/
-
-!exists( /usr/local/share/mythtv/theme.txt ) {
-    setting.files += theme.txt
-}
+setting.files += theme.txt
 
 INSTALLS += setting
 

@@ -3,10 +3,19 @@
 #include <stdlib.h>
 
 #include "guidegrid.h"
+#include "settings.h"
+
+Settings *globalsettings;
+char installprefix[] = "/usr/local";
 
 int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
+
+    globalsettings = new Settings;
+
+    globalsettings->LoadSettingsFiles("theme.txt", installprefix);
+    globalsettings->LoadSettingsFiles("mysql.txt", installprefix);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     db->setDatabaseName("mythconverg");

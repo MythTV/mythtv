@@ -3,10 +3,19 @@
 #include <unistd.h>
 
 #include "themedmenu.h"
+#include "settings.h"
+
+Settings *globalsettings;
+char installprefix[] = "/usr/local";
 
 int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
+
+    globalsettings = new Settings;
+
+    globalsettings->LoadSettingsFiles("theme.txt", installprefix);
+    globalsettings->LoadSettingsFiles("mysql.txt", installprefix);
 
     if (argc != 3)
     {

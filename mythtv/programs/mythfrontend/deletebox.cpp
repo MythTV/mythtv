@@ -18,6 +18,9 @@
 #include "tv.h"
 #include "dialogbox.h"
 #include "programlistitem.h"
+#include "settings.h"
+
+extern Settings *globalsettings;
 
 DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb, 
                      QWidget *parent, const char *name)
@@ -32,7 +35,10 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     int screenheight = QApplication::desktop()->height();
     int screenwidth = QApplication::desktop()->width();
 
-    screenwidth = 800; screenheight = 600;
+    if (globalsettings->GetNumSetting("GuiWidth") > 0)
+        screenwidth = globalsettings->GetNumSetting("GuiWidth");
+    if (globalsettings->GetNumSetting("GuiHeight") > 0)
+        screenheight = globalsettings->GetNumSetting("GuiHeight");
 
     float wmult = screenwidth / 800.0;
     float hmult = screenheight / 600.0;
@@ -46,7 +52,8 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
 
     QVBoxLayout *vbox = new QVBoxLayout(this, 15 * wmult);
 
-    QLabel *label = new QLabel("Select a recording to permanantly delete:", this);
+    QLabel *label = new QLabel("Select a recording to permanantly delete:", 
+                               this);
     vbox->addWidget(label);
 
     listview = new MyListView(this);

@@ -8,6 +8,9 @@
 #include <qbitmap.h>
 
 #include "menubox.h"
+#include "settings.h"
+
+extern Settings *globalsettings;
 
 MenuBox::MenuBox(const char *text, QWidget *parent, 
                  const char *name)
@@ -16,7 +19,10 @@ MenuBox::MenuBox(const char *text, QWidget *parent,
     int screenheight = QApplication::desktop()->height();
     int screenwidth = QApplication::desktop()->width();
 
-    screenwidth = 800; screenheight = 600;
+    if (globalsettings->GetNumSetting("GuiWidth") > 0)
+        screenwidth = globalsettings->GetNumSetting("GuiWidth");
+    if (globalsettings->GetNumSetting("GuiHeight") > 0)
+        screenheight = globalsettings->GetNumSetting("GuiHeight");
 
     float wmult = screenwidth / 800.0;
     float hmult = screenheight / 600.0;
@@ -29,17 +35,6 @@ MenuBox::MenuBox(const char *text, QWidget *parent,
     setCursor(QCursor(Qt::BlankCursor));
 
     QLabel *maintext = new QLabel(text, this);
-
-/*
-    if (strlen(text) < 1)
-    {
-        QPixmap *logo = new QPixmap("/usr/local/share/mythtv/mythtv-logo.png");
-        logo->setMask(logo->createHeuristicMask());
-        maintext->setPixmap(*logo);
-        delete logo;
-    }
-*/
-
     maintext->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
     maintext->setFont(QFont("Arial", 40 * hmult, QFont::Bold));
 

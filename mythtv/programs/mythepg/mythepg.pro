@@ -13,5 +13,7 @@ INCLUDEPATH += ../libmythtv
 
 # Input
 HEADERS += guidegrid.h infodialog.h infostructs.h ../libmythtv/programinfo.h
-SOURCES += guidegrid.cpp infodialog.cpp infostructs.cpp 
-SOURCES += ../libmythtv/programinfo.cpp main.cpp
+HEADERS += ../libmythtv/settings.h
+
+SOURCES += guidegrid.cpp infodialog.cpp infostructs.cpp main.cpp
+SOURCES += ../libmythtv/programinfo.cpp ../libmythtv/settings.cpp

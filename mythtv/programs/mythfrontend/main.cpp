@@ -17,6 +17,8 @@
 
 char installprefix[] = "/usr/local";
 
+Settings *globalsettings;
+
 int startGuide(int startchannel)
 {
     GuideGrid gg(startchannel);
@@ -281,10 +283,10 @@ int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
 
-    Settings *mysettings = new Settings;
+    globalsettings = new Settings;
 
-    mysettings->LoadSettingsFiles("theme.txt", installprefix);
-    mysettings->LoadSettingsFiles("mysql.txt", installprefix);
+    globalsettings->LoadSettingsFiles("theme.txt", installprefix);
+    globalsettings->LoadSettingsFiles("mysql.txt", installprefix);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
@@ -319,7 +321,7 @@ int main(int argc, char **argv)
     QString prefix = tv->GetFilePrefix();
     QString theprefix = tv->GetInstallPrefix();
 
-    QString themename = mysettings->GetSetting("Theme");
+    QString themename = globalsettings->GetSetting("Theme");
 
     QString themedir = findThemeDir(themename, theprefix);
     bool usetheme = true;
@@ -353,7 +355,7 @@ int main(int argc, char **argv)
     }
 
     delete tv;
-    delete mysettings;
+    delete globalsettings;
 
     return 0;
 }

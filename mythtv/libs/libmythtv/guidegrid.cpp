@@ -15,6 +15,9 @@ using namespace std;
 #include "infodialog.h"
 #include "infostructs.h"
 #include "programinfo.h"
+#include "settings.h"
+
+extern Settings *globalsettings;
 
 GuideGrid::GuideGrid(int channel, QWidget *parent, const char *name)
          : QDialog(parent, name)
@@ -22,7 +25,10 @@ GuideGrid::GuideGrid(int channel, QWidget *parent, const char *name)
     screenheight = QApplication::desktop()->height();
     screenwidth = QApplication::desktop()->width();
 
-    screenwidth = 800; screenheight = 600;
+    if (globalsettings->GetNumSetting("GuiWidth") > 0)
+        screenwidth = globalsettings->GetNumSetting("GuiWidth");
+    if (globalsettings->GetNumSetting("GuiHeight") > 0)
+        screenheight = globalsettings->GetNumSetting("GuiHeight");
 
     wmult = screenwidth / 800.0;
     hmult = screenheight / 600.0;
@@ -343,23 +349,25 @@ void GuideGrid::paintChannels(QPainter *p)
     int datewidth = lfm.width(date);
     int dateheight = lfm.height();
 
-    tmp.drawText((75 * wmult - datewidth) / 2, (55 * hmult - dateheight) / 2,
+    tmp.drawText((cr.width() - datewidth) / 2, (55 * hmult - dateheight) / 2,
                  date);
 
     date = m_currentStartTime.toString("MMM d");
     datewidth = lfm.width(date);
 
-    tmp.drawText((75 * wmult - datewidth) / 2, 
+    tmp.drawText((cr.width() - datewidth) / 2, 
                  (55 * hmult - dateheight) / 2 + dateheight, date);
 
     tmp.setFont(*m_font);
 
+    int ydifference = (int)(ceil((600 * hmult - 49 * hmult) / 6));
+    int yoffset = (int)(49 * hmult);
     for (unsigned int i = 0; i < 6; i++)
     {
-        tmp.drawLine(0, (i * 92 + 48) * hmult, 74 * wmult, 
-                     (i * 92 + 48) * hmult);
+        tmp.drawLine(0, yoffset + ydifference * i, cr.right(), 
+                     yoffset + ydifference * i);
     }
-    tmp.drawLine(74 * wmult, 0, 74 * wmult, 600 * hmult);
+    tmp.drawLine(cr.right(), 0, cr.right(), cr.height());
 
     for (unsigned int i = 0; i < 6; i++)
     {
@@ -371,24 +379,25 @@ void GuideGrid::paintChannels(QPainter *p)
         {
             if (!chinfo->icon)
                 chinfo->LoadIcon();
-            tmp.drawPixmap((75 * hmult - chinfo->icon->width()) / 2, 
-                           (i * 92 + 55) * hmult,
-                           *(chinfo->icon));
+            yoffset = (int)(55 * hmult);
+            tmp.drawPixmap((cr.width() - chinfo->icon->width()) / 2, 
+                           ydifference * i + yoffset, *(chinfo->icon));
         }
         tmp.setFont(*m_largerFont);
         QFontMetrics lfm(*m_largerFont);
         int width = lfm.width(chinfo->chanstr);
         int bheight = lfm.height();
             
-        tmp.drawText((75 * wmult - width) / 2, 
-                     (i * 92 + 55 + 30) * hmult + bheight, chinfo->chanstr);
+        yoffset = (int)(85 * hmult);
+        tmp.drawText((cr.width() - width) / 2, 
+                     ydifference * i + yoffset + bheight, chinfo->chanstr);
 
         tmp.setFont(*m_font);
         QFontMetrics fm(*m_font);
         width = fm.width(chinfo->callsign);
         int height = fm.height();
-        tmp.drawText((75 * wmult - width) / 2, 
-                     (i * 92 + 55 + 30) * hmult + bheight + height,
+        tmp.drawText((cr.width() - width) / 2, 
+                     ydifference * i + yoffset + bheight + height,
                      chinfo->callsign);
     }
 
@@ -408,9 +417,11 @@ void GuideGrid::paintTimes(QPainter *p)
     tmp.setPen(QPen(black, 2 * wmult));
     tmp.setFont(*m_largerFont);
 
-    for (int i = 0; i < 5; i++)
+    int xdifference = (int)(cr.right() / 6);
+
+    for (int i = 1; i < 6; i++)
     {
-        tmp.drawLine(i * 145 * wmult, 0, i * 145 * wmult, 48 * hmult);
+        tmp.drawLine(i * xdifference, 0, i * xdifference, cr.bottom());
     }
 
     for (int i = 0; i < 5; i++)
@@ -421,12 +432,12 @@ void GuideGrid::paintTimes(QPainter *p)
         int width = fm.width(tinfo->usertime);
         int height = fm.height();
 
-        tmp.drawText((145 * wmult- width) / 2 + i * 145 * wmult, 
-                     (48 * hmult - height) / 2 + height, 
+        tmp.drawText((xdifference - width) / 2 + i * xdifference, 
+                     (cr.bottom() - height) / 2 + height, 
                      tinfo->usertime);
     }
 
-    tmp.drawLine(0, 48 * hmult, 800 * wmult, 48 * hmult);
+    tmp.drawLine(0, cr.bottom(), cr.right(), cr.bottom());
 
     tmp.end();
 
@@ -444,10 +455,13 @@ void GuideGrid::paintPrograms(QPainter *p)
 
     tmp.setFont(*m_largerFont);
 
+    int ydifference = (int)(ceil((600 * hmult - 49 * hmult) / 6));
+    int xdifference = (int)(cr.right() / 6);
+
     for (int i = 1; i < 6; i++)
     {
-        int ypos = (int)((i * 92) * hmult) - 1;
-        tmp.drawLine(0, ypos, 800 * wmult, ypos);
+        int ypos = ydifference * i;
+        tmp.drawLine(0, ypos, cr.right(), ypos);
     }
 
     for (unsigned int y = 0; y < 6; y++)
@@ -491,19 +505,19 @@ void GuideGrid::paintPrograms(QPainter *p)
                     }
                 }
 
-                int maxwidth = (int)((spread * 145 - 15) * wmult);
+                int maxwidth = (int)(spread * xdifference - (15 * wmult));
 
-                tmp.drawText((10 + x * 145) * wmult, 
-                             height / 8 + (92 * y) * hmult, 
-                             maxwidth, 92 * hmult,
+                tmp.drawText(x * xdifference + 10 * wmult, 
+                             height / 8 + y * ydifference, 
+                             maxwidth, ydifference,
                              AlignLeft | WordBreak,
                              pginfo->title);
 
                 tmp.setPen(QPen(black, 2 * wmult));
 
-                tmp.drawLine((x + spread) * 145 * wmult, (92 * y - 1) * hmult, 
-                             (x + spread) * 145 * wmult, 
-                             (92 * (y + 1) - 1) * hmult);
+                tmp.drawLine((x + spread) * xdifference, ydifference * y, 
+                             (x + spread) * xdifference, 
+                             ydifference * (y + 1));
 
                 if (pginfo->recordtype > 0)
                 {
@@ -519,8 +533,8 @@ void GuideGrid::paintPrograms(QPainter *p)
 
                     int width = fm.width(text);
 
-                    tmp.drawText((x + spread) * 145 * wmult - width * 1.5, 
-                                 92 * (y + 1) * hmult - height, width * 1.5, 
+                    tmp.drawText((x + spread) * xdifference - width * 1.5, 
+                                 (y + 1) * ydifference - height, width * 1.5, 
                                  height, AlignLeft, text);
              
                     tmp.setPen(QPen(black, 2 * wmult));
@@ -532,12 +546,14 @@ void GuideGrid::paintPrograms(QPainter *p)
                     {
                         tmp.setPen(QPen(red, 2 * wmult));
                   
-                        int rectheight = (int)(92 * hmult - 3);
-                        if (y == 5)
-                            rectheight += 1; 
-                        tmp.drawRect((x * 145) * wmult + 2, 
-                                     (y * 92) * hmult + 1, 
-                                     (142 + 145 * (spread - 1)) * wmult + 1,
+                        int rectheight = (int)(ydifference - 2 * hmult);
+                        int xstart = 1;
+                        if (x != 0)
+                            xstart = x * xdifference + 2;
+
+                        tmp.drawRect(xstart, 
+                                     ydifference * y + 2 * hmult, 
+                                     xdifference * (spread) - 2, 
                                      rectheight);
                         tmp.setPen(QPen(black, 2 * wmult));
                     }
@@ -560,16 +576,13 @@ QRect GuideGrid::fullRect() const
 
 QRect GuideGrid::channelRect() const
 {
-    QRect r(0, 0, 75 * wmult, 600 * hmult);
-
-    if (screenwidth != 800)
-        r.setWidth(r.width() - 1);
+    QRect r(0, 0, 74 * wmult, 600 * hmult);
     return r;
 }
 
 QRect GuideGrid::timeRect() const
 {
-    QRect r(74 * wmult, 0, 800 * wmult, 49 * hmult);
+    QRect r(74 * wmult, 0, 800 * wmult, 49 * hmult + 1);
     return r;
 }
 

@@ -1,1 +1,4 @@
 str Theme=blue
+
+int GuiWidth=800
+int GuiHeight=600

@@ -10,6 +10,9 @@
 #include "tv.h"
 #include "infostructs.h"
 #include "programlistitem.h"
+#include "settings.h"
+
+extern Settings *globalsettings;
 
 void MyListView::keyPressEvent(QKeyEvent *e)
 {
@@ -67,8 +70,11 @@ QPixmap *ProgramListItem::getPixmap(void)
 
     int screenheight = QApplication::desktop()->height();
     int screenwidth = QApplication::desktop()->width();
- 
-    screenwidth = 800; screenheight = 600;   
+
+    if (globalsettings->GetNumSetting("GuiWidth") > 0)
+        screenwidth = globalsettings->GetNumSetting("GuiWidth");
+    if (globalsettings->GetNumSetting("GuiHeight") > 0)
+        screenheight = globalsettings->GetNumSetting("GuiHeight");
  
     float wmult = screenwidth / 800.0;
     float hmult = screenheight / 600.0;
@@ -81,7 +87,8 @@ QPixmap *ProgramListItem::getPixmap(void)
 
         if (screenwidth != 800 || screenheight != 600)
         {
-            QImage tmp2 = tmpimage.smoothScale(160 * wmult, 120 * hmult);
+            QImage tmp2 = tmpimage.smoothScale(tmpimage.width() * wmult, 
+                                               tmpimage.height() * hmult);
             pixmap->convertFromImage(tmp2);
         }
         else
@@ -112,7 +119,8 @@ QPixmap *ProgramListItem::getPixmap(void)
 
             if (screenwidth != 800 || screenheight != 600)
             {
-                QImage tmp2 = tmpimage.smoothScale(160 * wmult, 120 * hmult);
+                QImage tmp2 = tmpimage.smoothScale(tmpimage.width() * wmult, 
+                                                   tmpimage.height() * hmult);
                 pixmap->convertFromImage(tmp2);
             }
             else

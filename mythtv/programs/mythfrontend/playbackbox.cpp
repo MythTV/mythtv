@@ -13,6 +13,10 @@
 #include "programinfo.h"
 #include "tv.h"
 #include "programlistitem.h"
+#include "settings.h"
+
+extern Settings *globalsettings;
+
 
 PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb, 
                          QWidget *parent, const char *name)
@@ -27,7 +31,10 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     int screenheight = QApplication::desktop()->height();
     int screenwidth = QApplication::desktop()->width();
 
-    screenwidth = 800; screenheight = 600;
+    if (globalsettings->GetNumSetting("GuiWidth") > 0)
+        screenwidth = globalsettings->GetNumSetting("GuiWidth");
+    if (globalsettings->GetNumSetting("GuiHeight") > 0)
+        screenheight = globalsettings->GetNumSetting("GuiHeight");
 
     float wmult = screenwidth / 800.0;
     float hmult = screenheight / 600.0;
