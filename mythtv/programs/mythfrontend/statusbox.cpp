@@ -370,6 +370,7 @@ void StatusBox::keyPressEvent(QKeyEvent *e)
                 contentPos = 0;
                 list_area->SetActive(false);
                 icon_list->SetActive(true);
+                setHelpText();
                 update(SelectRect);
                 update(ContentRect);
             }
