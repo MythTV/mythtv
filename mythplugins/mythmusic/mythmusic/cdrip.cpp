@@ -102,6 +102,7 @@ Ripper::Ripper(QSqlDatabase *ldb, MythMainWindow *parent, const char *name)
     QLabel *artistl = new QLabel(tr("Artist: "), firstdiag);
     artistl->setBackgroundOrigin(WindowOrigin);
     artistedit = new MythLineEdit(firstdiag);
+    artistedit->setRW();
     if (track)
     {
         artistedit->setText(track->Artist());
@@ -113,6 +114,7 @@ Ripper::Ripper(QSqlDatabase *ldb, MythMainWindow *parent, const char *name)
     QLabel *albuml = new QLabel(tr("Album: "), firstdiag);
     albuml->setBackgroundOrigin(WindowOrigin);
     albumedit = new MythLineEdit(firstdiag);
+    albumedit->setRW();
     if (track)
     {
         albumedit->setText(track->Album());
