@@ -182,7 +182,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
             rotateAngle += 90;
             handled = true;
             redraw = true;
-            newzoom = 0;
+            newzoom = 1;
             break;
         }
         case '[': case Key_1:
@@ -190,7 +190,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
             rotateAngle -= 90;
             handled = true;
             redraw = true;
-            newzoom = 0;
+            newzoom = 1;
             break;
         }
         case Key_Left:
@@ -229,7 +229,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
         case Key_7: // zoom out
         {
             handled = zoomfactor;
-            newzoom = (zoomfactor < 2) ? zoomfactor : (zoomfactor / 2);
+            newzoom = (zoomfactor < 1) ? zoomfactor : (zoomfactor / 2);
             break;
         }
         case Key_9: // zoom in
@@ -277,7 +277,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
         case Key_0: // fullsize 
         {
             handled = zoomfactor;
-            newzoom = 0;
+            newzoom = 1;
             break;
         }
         case Key_PageUp: // upper left corner
