@@ -811,8 +811,8 @@ void AudioPlugin::playFromPlaylist(int augment_index)
         warning(QString("asked to play playlist %1 in "
                         "container %2, but that "
                         "doesn't exist")
-                        .arg(current_playlist_container)
-                        .arg(current_playlist_id));
+                        .arg(current_playlist_id)
+                        .arg(current_playlist_container));
         metadata_server->unlockMetadata();
         playlist_mode_mutex.unlock();
         stopPlaylistMode();

@@ -121,8 +121,10 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, const QStri
          << "\" to a collection called \""
          << collection_name
          << "\""
+         << ", and the collection's id is "
+         << new_playlist->getCollectionId()
          << endl;
-    */     
+    */   
 
     GenericTree *collection_node = audio_collection_tree->getChildByName(collection_name);
     if(!collection_node)
@@ -159,13 +161,13 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, const QStri
     {
         UIListGenericTree *track_node = new UIListGenericTree(playlist_node, (*l_it).getName());
         track_node->setInt(counter);
-        track_node->setAttribute(0, collection_id);
+        track_node->setAttribute(0, new_playlist->getCollectionId());
         track_node->setAttribute(1, 2);
         track_node->setAttribute(2, new_playlist->getId());
 
         UIListGenericTree *o_track_node = new UIListGenericTree(collection_playlist_node, (*l_it).getName());
         o_track_node->setInt(counter);
-        o_track_node->setAttribute(0, collection_id);
+        o_track_node->setAttribute(0, new_playlist->getCollectionId());
         o_track_node->setAttribute(1, 2);
         o_track_node->setAttribute(2, new_playlist->getId());
         ++counter;
