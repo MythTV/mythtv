@@ -63,8 +63,8 @@ EPG
 - Arrow keys are used to move the highlighted program point around.
 - The keys A, D, S, W perform the same as left, right, down and up.
 - PageUp and PageDown move the channel list up or down a page.
-- Home (or Control-Left) and End (or Control-Right) move the highlight left or
-  right by one day.
+- Home and End move the highlight left or right by one day.
+- Control-Left and Control Right move the highlight left or right by one page.
 - The keys 9, 3, 7 and 1 (like a numeric keypad) perform the same as PageUp,
   PageDown, Home and End.
 - I or Space or Enter will bring up more information about a show, and allow
