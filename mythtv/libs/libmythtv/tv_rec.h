@@ -155,6 +155,8 @@ class TVRec
     pthread_mutex_t readthreadLock;
 
     int m_capturecardnum;
+
+    bool ispip;
 };
 
 #endif

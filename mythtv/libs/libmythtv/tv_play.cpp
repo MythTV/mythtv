@@ -447,8 +447,8 @@ void TV::HandleStateChange(void)
     if (closePlayer)
     {
         TeardownPlayer();
-        //if (pipnvp)
-        //    TeardownPipPlayer();
+        if (pipnvp)
+            TeardownPipPlayer();
     }
 
     changeState = false;
@@ -491,7 +491,6 @@ void TV::SetupPlayer(void)
     osd = NULL;
 }
 
-/*
 void TV::SetupPipPlayer(void)
 {
     if (pipnvp)
@@ -500,20 +499,19 @@ void TV::SetupPipPlayer(void)
         return;
     }
 
-    QString filters = "";
-
-    pipnvp = new NuppelVideoPlayer();
+    pipnvp = new NuppelVideoPlayer(m_context);
     pipnvp->SetAsPIP();
     pipnvp->SetRingBuffer(piprbuffer);
-    pipnvp->SetRecorder(pipnvr);
-    pipnvp->SetOSDFontName(context->GetSetting("OSDFont"),
-                           context->GetInstallPrefix());
-    pipnvp->SetOSDThemeName(context->GetSetting("OSDTheme"));
-    pipnvp->SetAudioSampleRate(context->GetNumSetting("AudioSampleRate"));
-    pipnvp->SetAudioDevice(context->GetSetting("AudioDevice"));
+    pipnvp->SetRecorder(piprecorder);
+    pipnvp->SetOSDFontName(m_context->GetSetting("OSDFont"),
+                           m_context->GetInstallPrefix());
+    pipnvp->SetOSDThemeName(m_context->GetSetting("OSDTheme"));
+    pipnvp->SetAudioSampleRate(m_context->GetNumSetting("AudioSampleRate"));
+    pipnvp->SetAudioDevice(m_context->GetSetting("AudioOutputDevice"));
+    pipnvp->SetExactSeeks(m_context->GetNumSetting("ExactSeeking"));
+
     pipnvp->SetLength(playbackLen);
 }
-*/
 
 void TV::TeardownPlayer(void)
 {
@@ -544,7 +542,6 @@ void TV::TeardownPlayer(void)
     }
 }
 
-/*
 void TV::TeardownPipPlayer(void)
 {
     if (pipnvp)
@@ -563,7 +560,6 @@ void TV::TeardownPipPlayer(void)
     delete piprbuffer;
     piprbuffer = NULL;
 }
-*/
 
 void *TV::EventThread(void *param)
 {
@@ -828,9 +824,9 @@ void TV::ProcessKeypress(int keypressed)
 
             case 'M': case 'm': LoadMenu(); break;
 
-            //case 'V': case 'v': TogglePIPView(); break;
-            //case 'B': case 'b': ToggleActiveWindow(); break;
-            //case 'N': case 'n': SwapPIP(); break;
+            case 'V': case 'v': TogglePIPView(); break;
+            case 'B': case 'b': ToggleActiveWindow(); break;
+            case 'N': case 'n': SwapPIP(); break;
 
             // Contrast, brightness, colour of the input source
             case 'j': ChangeContrast(false); break;
@@ -861,32 +857,35 @@ void TV::ProcessKeypress(int keypressed)
     }
 }
 
-/*
 void TV::TogglePIPView(void)
 {
     if (!pipnvp)
     {
-        if (!pipchannel->Open())
+        RemoteEncoder *testrec = RemoteRequestRecorder(m_context);
+
+        if (!testrec->IsValidRecorder())
+        {
+            delete testrec;
             return;
+        }
 
-        pipchannel->Close();
+        piprecorder = testrec;
 
-        long long filesize = context->GetNumSetting("PIPBufferSize");
-        filesize = filesize * 1024 * 1024 * 1024;
-        long long smudge = context->GetNumSetting("PIPMaxBufferFill");
-        smudge = smudge * 1024 * 1024;
+        QString name = "";
+        long long filesize = 0;
+        long long smudge = 0;
 
-        piprbuffer = new RingBuffer(context->GetSetting("PIPBufferName"),
-                                    filesize, smudge);
+        piprecorder->Setup();
+        piprecorder->SetupRingBuffer(name, filesize, smudge, true);
 
-        SetupPipRecorder();
-        pthread_create(&pipencode, NULL, SpawnEncode, pipnvr);
+        piprbuffer = new RingBuffer(m_context, name, filesize, smudge,
+                                    piprecorder);
 
-        while (!pipnvr->IsRecording())
+        piprecorder->SpawnLiveTV();
+
+        while (!piprecorder->IsRecording())
             usleep(50);
     
-        pipchannel->SetFd(pipnvr->GetVideoFd());
-
         SetupPipPlayer();
         pthread_create(&pipdecode, NULL, SpawnDecode, pipnvp);
 
@@ -903,8 +902,8 @@ void TV::TogglePIPView(void)
         nvp->SetPipPlayer(NULL);
         while (!nvp->PipPlayerSet())
             usleep(50);
-	
-        TeardownPipRecorder();
+
+        piprecorder->StopLiveTV();	
         TeardownPipPlayer();        
     }
 }
@@ -917,16 +916,14 @@ void TV::ToggleActiveWindow(void)
     if (activenvp == nvp)
     {
         activenvp = pipnvp;
-        activenvr = pipnvr;
         activerbuffer = piprbuffer;
-        activechannel = pipchannel;
+        activerecorder = piprecorder;
     }
     else
     {
         activenvp = nvp;
-        activenvr = nvr;
-        activerbuffer = rbuffer;
-        activechannel = channel;
+        activerbuffer = prbuffer;
+        activerecorder = recorder;
     }
 }
 
@@ -935,8 +932,14 @@ void TV::SwapPIP(void)
     if (!pipnvp)
         return;
 
-    QString pipchanname = pipchannel->GetCurrentName();
-    QString bigchanname = channel->GetCurrentName();
+    QString dummy;
+    QString pipchanname;
+    QString bigchanname;
+
+    piprecorder->GetChannelInfo(dummy, dummy, dummy, dummy, dummy, dummy,
+                                dummy, dummy, pipchanname);
+    recorder->GetChannelInfo(dummy, dummy, dummy, dummy, dummy, dummy,
+                             dummy, dummy, bigchanname);
 
     if (activenvp != nvp)
         ToggleActiveWindow();
@@ -949,7 +952,6 @@ void TV::SwapPIP(void)
 
     ToggleActiveWindow();
 }
-*/
 
 int TV::calcSliderPos(int offset, QString &desc)
 {

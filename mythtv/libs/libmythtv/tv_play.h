@@ -90,13 +90,10 @@ class TV : public QObject
 
     void LoadMenu(void);
 
-    //void SetupPipRecorder();
-    //void TeardownPipRecorder();
-    
     void SetupPlayer();
     void TeardownPlayer();
-    //void SetupPipPlayer();
-    //void TeardownPipPlayer();
+    void SetupPipPlayer();
+    void TeardownPipPlayer();
     
     void ProcessKeypress(int keypressed);
 
@@ -107,9 +104,9 @@ class TV : public QObject
     TVState RemovePlaying(TVState state);
     TVState RemoveRecording(TVState state);
 
-    //void TogglePIPView(void);
-    //void ToggleActiveWindow(void);
-    //void SwapPIP(void);
+    void TogglePIPView(void);
+    void ToggleActiveWindow(void);
+    void SwapPIP(void);
 
     MythContext *m_context;
     

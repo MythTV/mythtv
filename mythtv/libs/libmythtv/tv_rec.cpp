@@ -35,6 +35,7 @@ TVRec::TVRec(MythContext *lcontext, const QString &startchannel,
     readrequest = 0;
     readthreadlive = false;
     m_capturecardnum = capturecardnum;
+    ispip = false;
 
     pthread_mutex_init(&db_lock, NULL);
 
@@ -458,13 +459,25 @@ void TVRec::SetupRecorder(RecordingProfile& profile)
     nvr->SetTVFormat(context->GetSetting("TVFormat"));
 
     nvr->SetAudioDevice(audiodev);
-    
+   
+    if (ispip)
+    {
+        nvr->SetAsPIP();
+        nvr->SetResolution(160, 128);
+        nvr->SetCodec("rtjpeg");
+        nvr->SetRTJpegMotionLevels(0, 0);
+        nvr->SetRTJpegQuality(255);
+        nvr->SetAudioCompression(false);
+    }
+ 
     nvr->Initialize();
 }
 
 void TVRec::TeardownRecorder(bool killFile)
 {
     int filelen = -1;
+
+    ispip = false;
 
     if (nvr)
     {
@@ -1033,7 +1046,7 @@ void TVRec::TriggerRecordingTransition(void)
 void TVRec::SetupRingBuffer(QString &path, long long &filesize, 
                             long long &fillamount, bool pip)
 {
-    (void)pip;
+    ispip = pip;
     filesize = context->GetNumSetting("BufferSize");
     fillamount = context->GetNumSetting("MaxBufferFill");
 
