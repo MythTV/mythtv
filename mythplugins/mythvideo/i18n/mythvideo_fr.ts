@@ -42,7 +42,7 @@
     </message>
     <message>
         <source>Delete</source>
-        <translation>Supprimer</translation>
+        <translation>Suppr.</translation>
     </message>
 </context>
 <context>
@@ -141,7 +141,7 @@
     </message>
     <message>
         <source>Unknown Rating</source>
-        <translation>Note inconnu</translation>
+        <translation>Tout public</translation>
     </message>
     <message>
         <source>Default Player</source>
@@ -256,12 +256,16 @@
         <source>Video Gallery</source>
         <translation>Galerie Vidéo</translation>
     </message>
+    <message>
+        <source>Manually Enter IMDB #</source>
+        <translation type="obsolete">Entrer le n° allociné</translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
         <source>Director:</source>
-        <translation>Réalisateur:</translation>
+        <translation>Réal.:</translation>
     </message>
     <message>
         <source>Year:</source>
@@ -269,7 +273,7 @@
     </message>
     <message>
         <source>Rated:</source>
-        <translation>Notes:</translation>
+        <translation>Classé:</translation>
     </message>
     <message>
         <source>Parental Level:</source>
@@ -289,7 +293,7 @@
     </message>
     <message>
         <source>Filename:</source>
-        <translation>Nom du fichier:</translation>
+        <translation>Fichier:</translation>
     </message>
     <message>
         <source>Cover File:</source>
@@ -297,19 +301,19 @@
     </message>
     <message>
         <source>IMDB Num.:</source>
-        <translation>N° IMDB</translation>
+        <translation>N° allociné:</translation>
     </message>
     <message>
         <source>retrieving data...</source>
-        <translation>Récupération des données ...</translation>
+        <translation>Récupération des données...</translation>
     </message>
     <message>
         <source>[ looking for ]</source>
-        <translation>[ Recherche ]</translation>
+        <translation>[ recherche ]</translation>
     </message>
     <message>
         <source>Enter IMDB #</source>
-        <translation>Saisir le N° IMDB</translation>
+        <translation>Saisir le N° allociné</translation>
     </message>
     <message>
         <source>loading...</source>
@@ -345,7 +349,7 @@
     </message>
     <message>
         <source>Use default player:</source>
-        <translation>Utiliser le lecteur par défaut:</translation>
+        <translation>Lecteur par défaut:</translation>
     </message>
     <message>
         <source>Ignore:</source>
@@ -365,7 +369,7 @@
     </message>
     <message>
         <source>File to Always Play Next:</source>
-        <translation>Fichier à toujours lire ensuite:</translation>
+        <translation>Fichier à lire ensuite:</translation>
     </message>
     <message>
         <source>Include while Browsing:</source>
@@ -397,11 +401,11 @@
     </message>
     <message>
         <source>Filters video list</source>
-        <translation>liste de filtres vidéo</translation>
+        <translation>Liste de filtres vidéo</translation>
     </message>
     <message>
         <source>Category :</source>
-        <translation>catégorie:</translation>
+        <translation>Catégorie:</translation>
     </message>
     <message>
         <source>Genre :</source>
@@ -429,7 +433,7 @@
     </message>
     <message>
         <source>Sort by :</source>
-        <translation>trier par:</translation>
+        <translation>Trier par:</translation>
     </message>
     <message>
         <source>Aucune video</source>
@@ -457,11 +461,11 @@
     </message>
     <message>
         <source>Parental</source>
-        <translation>Parental</translation>
+        <translation>Niveau</translation>
     </message>
     <message>
         <source>Level</source>
-        <translation>Niveau</translation>
+        <translation>parental</translation>
     </message>
     <message>
         <source>Year</source>
@@ -504,7 +508,7 @@
     </message>
     <message>
         <source>Filter Display</source>
-        <translation>filtrer l&apos;affichage</translation>
+        <translation>Filtrer</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -515,96 +519,96 @@
     <name>VideoDialog</name>
     <message>
         <source>Switch to Browse View</source>
-        <translation type="unfinished">Commuter en navigation</translation>
+        <translation>Mode navigation</translation>
     </message>
     <message>
         <source>Switch to Gallery View</source>
-        <translation type="unfinished">Commuter en galerie</translation>
+        <translation>Mode gallerie</translation>
     </message>
     <message>
         <source>Switch to List View</source>
-        <translation type="unfinished"></translation>
+        <translation>Mode liste</translation>
     </message>
     <message>
         <source>Select action</source>
-        <translation type="unfinished">Choix action</translation>
+        <translation>Choix action</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished">Code parental:</translation>
+        <translation>Code parental:</translation>
     </message>
 </context>
 <context>
     <name>VideoFilterDialog</name>
     <message>
         <source>Result of this filter : %1 video(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Résultats de ce filtre : %1 vidéo(s)</translation>
     </message>
     <message>
         <source>Result of this filter : No Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Résultats de ce filtre : Aucune vidéo</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">Inconnu</translation>
+        <translation>Inconnu</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished">minutes</translation>
+        <translation>minutes</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>tous</translation>
     </message>
     <message>
         <source>Save as default</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtre par défaut</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation type="unfinished">Valider</translation>
+        <translation>Valider</translation>
     </message>
 </context>
 <context>
     <name>VideoGallery</name>
     <message>
-        <source>Filter Display</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Watch This Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Regarder cette vidéo</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Voir le résumé complet</translation>
     </message>
     <message>
         <source>View Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Voir les détails</translation>
+    </message>
+    <message>
+        <source>Filter Display</source>
+        <translation>Filtrage</translation>
     </message>
     <message>
         <source>Plain View</source>
-        <translation type="unfinished"></translation>
+        <translation>Vue plane</translation>
     </message>
     <message>
         <source>Folder View</source>
-        <translation type="unfinished"></translation>
+        <translation>Vue avec dossiers</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Annuler</translation>
+        <translation>Annuler</translation>
     </message>
 </context>
 <context>
     <name>VideoManager</name>
     <message>
         <source>Manually Enter IMDB #</source>
-        <translation>Entrer le code IMDB#</translation>
+        <translation>Entrer le n° allociné</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -640,7 +644,7 @@
     </message>
     <message>
         <source>delete failed</source>
-        <translation>Mauvais effacement </translation>
+        <translation>échec de l&apos;effacement</translation>
     </message>
     <message>
         <source>Select action:</source>
@@ -648,15 +652,15 @@
     </message>
     <message>
         <source>Edit Metadata</source>
-        <translation>Éditer données</translation>
+        <translation>Édition des données</translation>
     </message>
     <message>
         <source>Search IMDB</source>
-        <translation>Chercher IMDB</translation>
+        <translation>Recherche allociné</translation>
     </message>
     <message>
         <source>Reset Metadata</source>
-        <translation>Vider Données</translation>
+        <translation>Effacer les données</translation>
     </message>
     <message>
         <source>Toggle Browseable</source>
@@ -664,11 +668,11 @@
     </message>
     <message>
         <source>Remove Video</source>
-        <translation>Supprimer Vidéo</translation>
+        <translation>Supprimer la vidéo</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation>Filtrer Affichage</translation>
+        <translation>Filtre d&apos;affichage</translation>
     </message>
     <message>
         <source>Delete this file?</source>
@@ -679,11 +683,11 @@
     <name>VideoSelected</name>
     <message>
         <source>No rating available.</source>
-        <translation type="unfinished">Pas de note disponible.</translation>
+        <translation>Pas de note disponible.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished">minutes</translation>
+        <translation>minutes</translation>
     </message>
 </context>
 <context>
@@ -706,7 +710,7 @@
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation>montrer l&apos;affiche</translation>
+        <translation>Montrer l&apos;affiche</translation>
     </message>
     <message>
         <source>Filter Display</source>
@@ -714,11 +718,11 @@
     </message>
     <message>
         <source>Switch to Browse View</source>
-        <translation>Commuter en navigation</translation>
+        <translation>Mode navigation</translation>
     </message>
     <message>
         <source>Switch to Gallery View</source>
-        <translation>Commuter en galerie</translation>
+        <translation>Mode gallerie</translation>
     </message>
     <message>
         <source>Cancel</source>
