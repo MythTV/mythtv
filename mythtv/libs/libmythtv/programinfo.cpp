@@ -392,6 +392,10 @@ void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
         {
             cerr << "DB Error: record deletion failed, SQL query was:" << endl;
             cerr << thequery << endl;
+            cerr << "Driver error was:" << endl;
+            cerr << query.lastError().driverText() << endl;
+            cerr << "Database error was:" << endl;
+            cerr << query.lastError().databaseText() << endl;
         }
     }
     else if (recordtype == kTimeslotRecord)
@@ -414,6 +418,10 @@ void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
         {
             cerr << "DB Error: record deletion failed, SQL query was:" << endl;
             cerr << thequery << endl;
+            cerr << "Driver error was:" << endl;
+            cerr << query.lastError().driverText() << endl;
+            cerr << "Database error was:" << endl;
+            cerr << query.lastError().databaseText() << endl;
         }
     }
     else if (recordtype == kChannelRecord)
@@ -425,6 +433,10 @@ void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
         {
             cerr << "DB Error: record deletion failed, SQL query was:" << endl;
             cerr << thequery << endl;
+            cerr << "Driver error was:" << endl;
+            cerr << query.lastError().driverText() << endl;
+            cerr << "Database error was:" << endl;
+            cerr << query.lastError().databaseText() << endl;
         }
     }
     else if (recordtype == kAllRecord)
@@ -436,6 +448,10 @@ void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
         {
             cerr << "DB Error: record deletion failed, SQL query was:" << endl;
             cerr << thequery << endl;
+            cerr << "Driver error was:" << endl;
+            cerr << query.lastError().driverText() << endl;
+            cerr << "Database error was:" << endl;
+            cerr << query.lastError().databaseText() << endl;
         }
     }
 
@@ -458,6 +474,10 @@ void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
         {
             cerr << "DB Error: record insertion failed, SQL query was:" << endl;
             cerr << thequery << endl;
+            cerr << "Driver error was:" << endl;
+            cerr << query.lastError().driverText() << endl;
+            cerr << "Database error was:" << endl;
+            cerr << query.lastError().databaseText() << endl;
         }
     }
     else if (newstate == kTimeslotRecord)
@@ -476,6 +496,10 @@ void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
         {
             cerr << "DB Error: record insertion failed, SQL query was:" << endl;
             cerr << thequery << endl;
+            cerr << "Driver error was:" << endl;
+            cerr << query.lastError().driverText() << endl;
+            cerr << "Database error was:" << endl;
+            cerr << query.lastError().databaseText() << endl;
         }
     }
     else if (newstate == kChannelRecord)
@@ -486,6 +510,10 @@ void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
         {
             cerr << "DB Error: record insertion failed, SQL query was:" << endl;
             cerr << thequery << endl;
+            cerr << "Driver error was:" << endl;
+            cerr << query.lastError().driverText() << endl;
+            cerr << "Database error was:" << endl;
+            cerr << query.lastError().databaseText() << endl;
         }
     }
     else if (newstate == kAllRecord)
@@ -496,6 +524,10 @@ void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
         {
             cerr << "DB Error: record insertion failed, SQL query was:" << endl;
             cerr << thequery << endl;
+            cerr << "Driver error was:" << endl;
+            cerr << query.lastError().driverText() << endl;
+            cerr << "Database error was:" << endl;
+            cerr << query.lastError().databaseText() << endl;
         }
     }
 
@@ -519,6 +551,145 @@ void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
 
     recordtype = newstate;
 }
+
+void ProgramInfo::ApplyRecordTimeChange(const QDateTime &newstartts, 
+                                        const QDateTime &newendts)
+{
+    QString starts = startts.toString("yyyyMMddhhmm");
+    QString ends = endts.toString("yyyyMMddhhmm");
+    QString newstarts = newstartts.toString("yyyyMMddhhmm");
+    QString newends = newendts.toString("yyyyMMddhhmm");
+
+    char sqlstarttime[128];
+    sprintf(sqlstarttime, "%s00", starts.ascii());
+
+    char sqlendtime[128];
+    sprintf(sqlendtime, "%s00", ends.ascii());
+
+    char sqlnewstarttime[128];
+    sprintf(sqlnewstarttime, "%s00", newstarts.ascii());
+
+    char sqlnewendtime[128];
+    sprintf(sqlnewendtime, "%s00", newends.ascii());
+
+    QString sqltitle = title;
+    QString sqlsubtitle = subtitle;
+    QString sqldescription = description;
+
+    sqltitle.replace(QRegExp("\""), QString("\\\""));
+    sqlsubtitle.replace(QRegExp("\""), QString("\\\""));
+    sqldescription.replace(QRegExp("\""), QString("\\\""));
+
+    QString thequery;
+    QSqlQuery query;
+
+    if (recordtype == kSingleRecord)
+    {
+        thequery = QString("DELETE FROM singlerecord WHERE "
+                           "chanid = %1 AND starttime = %2 AND "
+                           "endtime = %3;").arg(chanid).arg(sqlstarttime)
+                           .arg(sqlendtime);
+        if (!query.exec(thequery))
+        {
+            cerr << "DB Error: record deletion failed, SQL query was:" << endl;
+            cerr << thequery << endl;
+            cerr << "Driver error was:" << endl;
+            cerr << query.lastError().driverText() << endl;
+            cerr << "Database error was:" << endl;
+            cerr << query.lastError().databaseText() << endl;
+        }
+
+        thequery = QString("INSERT INTO singlerecord (chanid,starttime,"
+                           "endtime,title,subtitle,description) "
+                           "VALUES(%1, %2, %3, \"%4\", \"%5\", \"%6\");")
+                           .arg(chanid).arg(sqlnewstarttime).arg(sqlnewendtime)
+                           .arg(sqltitle).arg(sqlsubtitle).arg(sqldescription);
+        if (!query.exec(thequery))
+        {
+            cerr << "DB Error: record insertion failed, SQL query was:" << endl;
+            cerr << thequery << endl;
+            cerr << "Driver error was:" << endl;
+            cerr << query.lastError().driverText() << endl;
+            cerr << "Database error was:" << endl;
+            cerr << query.lastError().databaseText() << endl;
+        }
+    }
+    else if (recordtype == kTimeslotRecord)
+    {
+        char tempstarttime[512], tempendtime[512];
+        strcpy(tempstarttime, sqlstarttime);
+        strcpy(tempendtime, sqlendtime);
+
+        for (int i = 0; i < 8; i++)
+        {
+            tempstarttime[i] = '0';
+            tempendtime[i] = '0';
+        }
+
+        thequery = QString("DELETE FROM timeslotrecord WHERE chanid = %1 "
+                           "AND starttime = %2 AND endtime = %3;")
+                           .arg(chanid).arg(tempstarttime).arg(tempendtime);
+
+        if (!query.exec(thequery))
+        {
+            cerr << "DB Error: record deletion failed, SQL query was:" << endl;
+            cerr << thequery << endl;
+            cerr << "Driver error was:" << endl;
+            cerr << query.lastError().driverText() << endl;
+            cerr << "Database error was:" << endl;
+            cerr << query.lastError().databaseText() << endl;
+        }
+
+        strcpy(tempstarttime, sqlnewstarttime);
+        strcpy(tempendtime, sqlnewendtime);
+
+        for (int i = 0; i < 8; i++)
+        {
+            tempstarttime[i] = '0';
+            tempendtime[i] = '0';
+        }
+
+        thequery = QString("INSERT INTO timeslotrecord (chanid,starttime,"
+                           "endtime,title) VALUES(%1,%2,%3,\"%4\");")
+                           .arg(chanid).arg(tempstarttime).arg(tempendtime)
+                           .arg(sqltitle);
+        if (!query.exec(thequery))
+        {
+            cerr << "DB Error: record insertion failed, SQL query was:" << endl;
+            cerr << thequery << endl;
+            cerr << "Driver error was:" << endl;
+            cerr << query.lastError().driverText() << endl;
+            cerr << "Database error was:" << endl;
+            cerr << query.lastError().databaseText() << endl;
+        }
+    }
+
+    /*
+     This operation is a nop for recordtype == kChannelRecord and kAllRecord
+     TODO: in those cases, create a new kSingleInstance recording with the
+     proper times and fix up the scheduler so it prefers that
+     to the repeating recordings.
+    */
+
+    thequery = "SELECT NULL FROM settings WHERE value = \"RecordChanged\";";
+    query.exec(thequery);
+
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        thequery = "UPDATE settings SET data = \"yes\" WHERE "
+                   "value = \"RecordChanged\";";
+    }
+    else
+    {
+        thequery = "INSERT settings (value,data) "
+                   "VALUES(\"RecordChanged\", \"yes\");";
+    }
+    query.exec(thequery);
+
+    startts = newstartts;
+    endts = newendts;
+}
+
 
 bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
 {
@@ -591,6 +762,10 @@ void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
         cerr << "DB Error: recorded program insertion failed, SQL query "
              << "was:" << endl;
         cerr << query << endl;
+        cerr << "Driver error was:" << endl;
+        cerr << qquery.lastError().driverText() << endl;
+        cerr << "Database error was:" << endl;
+        cerr << qquery.lastError().databaseText() << endl;
     }
 
     query = QString("INSERT INTO oldrecorded (chanid,starttime,endtime,title,"
@@ -605,6 +780,10 @@ void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
         cerr << "DB Error: recorded program insertion failed, SQL query "
              << "was:" << endl;
         cerr << query << endl;
+        cerr << "Driver error was:" << endl;
+        cerr << qquery.lastError().driverText() << endl;
+        cerr << "Database error was:" << endl;
+        cerr << qquery.lastError().databaseText() << endl;
     }
 
     if (recordtype == kSingleRecord)
@@ -619,6 +798,10 @@ void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
             cerr << "DB Error: recorded program deletion from singlerecord "
                  << "failed, SQL query was:" << endl;
             cerr << query << endl;
+            cerr << "Driver error was:" << endl;
+            cerr << qquery.lastError().driverText() << endl;
+            cerr << "Database error was:" << endl;
+            cerr << qquery.lastError().databaseText() << endl;
         }
     }
 

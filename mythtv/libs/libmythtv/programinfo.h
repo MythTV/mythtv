@@ -32,6 +32,8 @@ class ProgramInfo
 
     RecordingType GetProgramRecordingStatus(void);
     void ApplyRecordStateChange(RecordingType newstate);
+    void ApplyRecordTimeChange(const QDateTime &newstartts,
+                               const QDateTime &newendts);
 
     void WriteRecordedToDB(QSqlDatabase *db);
 

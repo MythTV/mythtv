@@ -28,6 +28,7 @@ class ViewScheduled : public QDialog
     void FillList(void);
     void handleConflicting(ProgramInfo *rec);
     void handleNotRecording(ProgramInfo *rec);
+    void chooseConflictingProgram(ProgramInfo *rec);
 
     QSqlDatabase *db;
 

@@ -16,6 +16,7 @@ using namespace std;
 #include "viewscheduled.h"
 #include "tv.h"
 #include "programlistitem.h"
+#include "setrectime.h"
 
 #include "libmyth/dialogbox.h"
 #include "libmyth/mythcontext.h"
@@ -315,6 +316,27 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
 }
 
 void ViewScheduled::handleConflicting(ProgramInfo *rec)
+{
+
+    DialogBox diag(m_context, "How do you want to resolve this conflict?");
+
+    diag.AddButton("Adjust this program's recording time");
+    diag.AddButton("Record only one program in this timeslot");
+
+    diag.Show();
+    int ret = diag.exec();
+
+    if (ret == 1)
+    {
+        SetRecTimeDialog *srt = new SetRecTimeDialog(m_context,rec,db);
+    }
+    else
+    {
+        chooseConflictingProgram(rec);
+    }
+}
+
+void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
 {
     list<ProgramInfo *> *conflictlist = m_context->GetConflictList(rec, true);
 
