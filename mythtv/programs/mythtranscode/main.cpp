@@ -208,7 +208,7 @@ int main(int argc, char *argv[])
          cerr << "Can't specify --database or --buildindex with --infile\n";
          return -1;
     }
-    if (use_db and build_index)
+    if (use_db && build_index)
     {
          cerr << "Can't specify both --database and --buildindex\n";
          return -1;
