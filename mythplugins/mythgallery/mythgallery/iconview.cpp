@@ -460,7 +460,7 @@ void IconView::importPics()
         }
     }
 
-#if QT_VERSION >= 310
+#if QT_VERSION >= 0x030100
     importdir.refresh();
     if (importdir.count() == 0)
 #endif
