@@ -1,5 +1,5 @@
                              MythMusic
-                            Release 0.9
+                           Release 0.10
 
 
 There'll be more information here later, but for now:
@@ -63,33 +63,20 @@ Compiling note:  If you get an error on building this, that says something
 If you get any errors about missing references, etc, you most likely don't have
 one of the required pieces of software installed.
 
-Follow this by a 'make install'.  It'll put a 'mythmusic' binary in your
-/usr/local/bin directory, and stuff mythmusic-settings.txt in your
-existing /usr/local/share/mythtv/ directory.
+Follow this by a 'make install'.  It'll put a 'libmythmusic.so' plugin in your
+/usr/local/lib/mythtv/plugins directory.
 
-You'll probably want to edit the mythmusic-settings.txt file to set where
-your existing music is stored.  This'll also be where new music shows up after
-it's ripped.
-
-MythMusic will also read the mysql.txt settings files used by MythTV, so any 
+MythMusic will also read the mysql.txt settings file used by MythTV, so any 
 changes you made to those will be carried over into this.
 
 The final thing to do is add the musicdb/metadata.sql file to your existing
 database setup from MythTV.
 
-So, now you can run mythmusic.  The first time you run it, it'll seem to just 
-sit there at first, while it searches the directory you told it music was 
-stored in.  It'll print out status messages to the console, so you can hopefully
-gauge progress that way..  This may take a while, depends on how much music 
-you've already got there.  It's reading all the metadata (vorbis comments, 
-id3 tags, etc) and stash the information in the database.  If it's looking 
-over a network, the process might take a _long_ time.  Actually, running over 
-a network isn't recommended for now, as there's little input buffering, so 
-you'll probably have jerky playback.
+You'll want to go into the Music Settings section of the Setup item from 
+mythfrontend and set at least the path where your music is stored.
 
 Once it's done searching for your music, the interface will show up.  It should
-be fairly easy to figure out..  Any playlists you create will be saved on exit
-and auto-loaded the next time you start mythmusic.
+be fairly easy to figure out..   Check out the howto for details.
 
 Feel free to subscribe to the development mailing list at:
 http://www.snowman.net/mailman/listinfo/mythtv-dev
