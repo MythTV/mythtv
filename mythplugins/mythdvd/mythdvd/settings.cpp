@@ -55,7 +55,7 @@ public :
     SetOnInsertDVD():
        GlobalSetting("DVDOnInsertDVD") {
        setLabel(QObject::tr("On DVD insertion"));
-       addSelection(QObject::tr("Display mythdvd menu menu"),"1");
+       addSelection(QObject::tr("Display mythdvd menu"),"1");
        addSelection(QObject::tr("Do nothing"),"0");
        addSelection(QObject::tr("Play DVD"),"2");
 #ifdef TRANSCODE_SUPPORT       
