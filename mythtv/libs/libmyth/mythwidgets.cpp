@@ -912,8 +912,6 @@ MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)
     setGeometry(xoff, yoff, screenwidth - xoff * 2, yoff);
     setFixedSize(QSize(screenwidth - xoff * 2, yoff));
 
-    qApp->processEvents();
-
     QVBoxLayout *lay = new QVBoxLayout(this, 0);
 
     QVBox *vbox = new QVBox(this);

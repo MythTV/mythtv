@@ -34,7 +34,7 @@ class RecListItem : public QListViewItem
 };
 
 InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
-          : MythDialog(parent, name)
+          : MythDialog(parent, name, true)
 {
     int bigfont = gContext->GetBigFontSize();
     int mediumfont = gContext->GetMediumFontSize();
@@ -62,7 +62,7 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
     descriptionfield->setAlignment(Qt::WordBreak | Qt::AlignLeft | 
                                    Qt::AlignTop);
 
-    qApp->processEvents();
+    descriptionlabel->polish();
 
     int descwidth = (int)(800 * wmult) - descriptionlabel->width() - 100;
     int titlewidth = (int)(760 * wmult);

@@ -472,7 +472,7 @@ MythDialog* ScheduledRecording::dialogWidget(QWidget* parent, const char* name)
     descriptionfield->setAlignment(Qt::WordBreak | Qt::AlignLeft | 
                                    Qt::AlignTop);
 
-    qApp->processEvents();
+    descriptionlabel->polish();
 
     int descwidth = (int)(700 * wmult) - descriptionlabel->width();
     int titlewidth = (int)(760 * wmult);

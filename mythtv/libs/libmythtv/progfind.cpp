@@ -1451,8 +1451,6 @@ void ProgFinder::getSearchData(int charNum)
 		    cnts++;
 
                 }
-
-		qApp->processEvents();
 	}
 
         int cnt = 0;
