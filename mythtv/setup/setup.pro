@@ -6,12 +6,12 @@ TEMPLATE = app
 CONFIG -= moc
 CONFIG += thread
 
+INCLUDEPATH += ../libs/
+LIBS +=  -L../libs/libmyth -L../libs/libmythtv
+
 include ( ../settings.pro )
 
-INCLUDEPATH += ../libs/
-LIBS += -L../libs/libmyth -L../libs/libmythtv 
-LIBS += -lmyth-$$LIBVERSION -lmythtv
-LIBS += $$EXTRA_LIBS
+LIBS += -lmyth-$$LIBVERSION -lmythtv $$EXTRA_LIBS
 
 DEPENDPATH += ../../libs/libmyth
 
