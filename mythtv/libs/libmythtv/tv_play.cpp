@@ -689,8 +689,8 @@ void TV::RunTV(void)
     int pausecheck = 0;
 
     channelqueued = false;
-    channelKeys[0] = channelKeys[1] = channelKeys[2] = ' ';
-    channelKeys[3] = 0;
+    channelKeys[0] = channelKeys[1] = channelKeys[2] = channelKeys[3] = ' ';
+    channelKeys[4] = 0;
     channelkeysstored = 0;    
 
     runMainLoop = true;
@@ -1396,7 +1396,7 @@ void TV::ChangeChannel(int direction)
     activenvp->Unpause();
 
     channelqueued = false;
-    channelKeys[0] = channelKeys[1] = channelKeys[2] = ' ';
+    channelKeys[0] = channelKeys[1] = channelKeys[2] = channelKeys[3] = ' ';
     channelkeysstored = 0;
 
     if (muted)
@@ -1410,20 +1410,21 @@ void TV::ChannelKey(int key)
     if (key > 256)
         thekey = key - 256 - 0xb0 + '0';
 
-    if (channelkeysstored == 3)
+    if (channelkeysstored == 4)
     {
         channelKeys[0] = channelKeys[1];
         channelKeys[1] = channelKeys[2];
-        channelKeys[2] = thekey;
+        channelKeys[2] = channelKeys[3];
+        channelKeys[3] = thekey;
     }
     else
     {
         channelKeys[channelkeysstored] = thekey; 
         channelkeysstored++;
     }
-    channelKeys[3] = 0;
+    channelKeys[4] = 0;
 
-    if (activenvp == nvp)
+    if (activenvp == nvp && osd)
         osd->SetChannumText(channelKeys, 2);
 
     channelqueued = true;
@@ -1446,7 +1447,7 @@ void TV::ChannelCommit(void)
     ChangeChannelByString(chan);
 
     channelqueued = false;
-    channelKeys[0] = channelKeys[1] = channelKeys[2] = ' ';
+    channelKeys[0] = channelKeys[1] = channelKeys[2] = channelKeys[3] = ' ';
     channelkeysstored = 0;
 }
 
@@ -1550,7 +1551,7 @@ void TV::doLoadMenu(void)
 
     if (chanstr != "")
     {
-        chanstr = chanstr.left(3);
+        chanstr = chanstr.left(4);
         sprintf(channelKeys, "%s", chanstr.ascii());
         channelqueued = true; 
     }
@@ -1667,7 +1668,7 @@ void TV::EPGChannelUpdate(QString chanstr)
 {
     if (chanstr != "")
     {
-        chanstr = chanstr.left(3);
+        chanstr = chanstr.left(4);
         sprintf(channelKeys, "%s", chanstr.ascii());
         channelqueued = true; 
     }
