@@ -111,7 +111,7 @@
     <container name="selector">
       <area>0,39,800,310</area>
       <listarea name="conflictlist" draworder="4">
-        <area>20,18,760,265</area>
+        <area>20,12,760,265</area>
         <fcnfont name="conflictfnt" function="conflictingrecording"></fcnfont>
         <fcnfont name="norecordfnt" function="disabledrecording"></fcnfont>
         <fcnfont name="active_font" function="active"></fcnfont>
