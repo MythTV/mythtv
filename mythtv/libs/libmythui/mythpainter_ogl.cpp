@@ -53,7 +53,7 @@ void MythOpenGLPainter::Begin(QWidget *parent)
     assert(realParent);
 
     realParent->makeCurrent();
-    dgl->qglClearColor(dgl->palette().brush(QPalette::Background));
+    glClearColor(0.0, 0.0, 0.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT);
     glShadeModel(GL_FLAT);
     glViewport(0, 0, parent->width(), parent->height());
