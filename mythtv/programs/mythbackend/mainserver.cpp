@@ -2668,9 +2668,9 @@ void MainServer::PrintDVBStatus(QTextStream& os)
 
     bool doneAnything = false;
     
-    os << "<div class=\"content\">\r\n" <<
-        "<h2>DVB Signal Information</h2>\r\n" <<
-        "Details of DVB error statistics for last 48 hours:<br>\r\n";
+    os << "\r\n  <div class=\"content\">\r\n" <<
+        "    <h2>DVB Signal Information</h2>\r\n" <<
+        "    Details of DVB error statistics for last 48 hours:<br />\r\n";
 
     QString outerqry =
         "SELECT starttime,endtime FROM recorded "
@@ -2708,20 +2708,21 @@ void MainServer::PrintDVBStatus(QTextStream& os)
             
             if (query.isActive() && query.numRowsAffected())
             {
-                os << "<br>Recording period from " << t_start.toString() << 
+                os << "    <br />Recording period from " 
+                   << t_start.toString() << 
                     " to " << t_end.toString() <<
-                    "<br>\n";
+                    "<br />\n";
                 
                 while (query.next())
                 {
-                    os << "Card: " << query.value(0).toInt() <<
+                    os << "    Encoder " << query.value(0).toInt() <<
                         " Min SNR: " << query.value(5).toInt() <<
                         " Avg SNR: " << query.value(6).toInt() <<
                         " Min BER: " << query.value(8).toInt() <<
                         " Avg BER: " << query.value(9).toInt() <<
                         " Cont Errs: " << query.value(13).toInt() <<
                         " Overflows: " << query.value(14).toInt() <<
-                        "<br>\r\n";
+                        "<br />\r\n";
 
                     doneAnything = true;
                 }
@@ -2731,13 +2732,13 @@ void MainServer::PrintDVBStatus(QTextStream& os)
 
     if (!doneAnything)
     {
-        os << "<br>There is no DVB signal quality data available to display." 
-           << "<br>\r\n";
+        os << "    <br />There is no DVB signal quality data available to "
+            "display.<br />\r\n";
     }
 
     dblock.unlock();
 
-    os << "</div>\r\n";
+    os << "  </div>\r\n";
 }
 #endif
 
