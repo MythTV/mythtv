@@ -1,3 +1,5 @@
+#include <qapplication.h>
+
 #include <iostream>
 #include <unistd.h>
 
@@ -57,9 +59,10 @@ void RemoteEncoder::SendReceiveStringList(QStringList &strlist)
 
 QSocket *RemoteEncoder::openControlSocket(const QString &host, short port)
 {
+    qApp->lock();
     QSocket *sock = new QSocket();
-
     sock->connectToHost(host, port);
+    qApp->unlock();
 
     int num = 0;
     while (sock->state() == QSocket::HostLookup ||

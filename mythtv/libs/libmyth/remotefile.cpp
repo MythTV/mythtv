@@ -71,9 +71,10 @@ QSocket *RemoteFile::openSocket(bool control, bool events)
     int port = qurl.port();
     QString dir = qurl.path();
 
+    qApp->lock();
     QSocket *sock = new QSocket();
-
     sock->connectToHost(host, port);
+    qApp->unlock();
 
     int num = 0;
     while (sock->state() == QSocket::HostLookup ||
@@ -160,10 +161,12 @@ void RemoteFile::Close(void)
     ReadStringList(controlSock, strlist);
     lock.unlock();
 
+    qApp->lock();
     if (sock)
         sock->close();
     if (controlSock)
         controlSock->close();
+    qApp->unlock();
 }
 
 void RemoteFile::Reset(void)
