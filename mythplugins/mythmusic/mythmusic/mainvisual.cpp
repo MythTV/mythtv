@@ -11,6 +11,7 @@
 #include "synaesthesia.h"
 #include "bumpscope.h"
 #include "visualize.h"
+#include "goom/mythgoom.h"
 
 #include <qtimer.h>
 #include <qpainter.h>
@@ -255,6 +256,7 @@ static void checkVisFactories(void)
 #endif
 #ifdef SDL_SUPPORT
         MainVisual::registerVisFactory(new BumpScopeFactory);
+        MainVisual::registerVisFactory(new GoomFactory);
 #endif
     }
 }

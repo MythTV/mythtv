@@ -60,6 +60,12 @@ VisualMode=Random
 # (0 = no automatic, manual button press only)
 VisualModeDelay=10
 
+# Amount to scale down the visualization by (only used by the Goom vis
+# currently) Valid values are 1 (no scaling down) and 2 (halve the value)
+# Reduces CPU load for those with slow machines =)
+VisualScaleWidth=1
+VisualScaleHeight=1
+
 # Use keyboard (ie. remote control) accelerators in the playback screen
 # (true, false) You probably want to make this true.
 KeyboardAccelerators=false
