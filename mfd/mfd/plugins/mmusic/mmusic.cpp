@@ -150,8 +150,7 @@ void MMusicWatcher::initialize()
     loadPlaylists();
     
     //
-    //  Fill our container with an empty set of metadata and an empty set of
-    //  playlists
+    //  Fill our container with an empty set of metadata and the playlists
     //
     
     metadata_server->doAtomicDataSwap(  
@@ -249,7 +248,7 @@ void MMusicWatcher::run()
 
                 //
                 //  Something changed. Fire off an event (this will tell the
-                //  mfd to tell all the plusins (that care) that it's time
+                //  mfd to tell all the plugins (that care) that it's time
                 //  to update)
                 //
                 
@@ -285,7 +284,16 @@ void MMusicWatcher::run()
             //  sleep to a time close to our next sweep time
             //
 
-            int seconds_to_sleep = (sweep_wait - metadata_sweep_time.elapsed()) / 1000;
+            int seconds_to_sleep = 0;
+            if(sweep_wait > 0)
+            {
+                seconds_to_sleep = (sweep_wait - metadata_sweep_time.elapsed()) / 1000;
+            }
+            else
+            {
+                seconds_to_sleep = 10;
+            }
+
             if(seconds_to_sleep > 0)
             {
                 setTimeout(seconds_to_sleep, 0);

@@ -52,7 +52,7 @@ Metadata::Metadata(
 void Metadata::setRating(int l_rating)
 {
     //
-    //  must lie between 0 and 100
+    //  must lie between 0 and 10
     //
     
     rating = l_rating;
@@ -61,9 +61,9 @@ void Metadata::setRating(int l_rating)
     {
         rating = 0;
     }
-    if(rating > 100)
+    if(rating > 10)
     {
-        rating = 100;
+        rating = 10;
     }
 }
 

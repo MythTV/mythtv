@@ -44,7 +44,7 @@ class Metadata
                 int l_collection_id,
                 int l_id, 
                 QUrl l_url = QUrl(""),
-                int l_rating = 50,
+                int l_rating = 5,
                 QDateTime l_last_played = QDateTime(),
                 int l_play_count = 0
             );

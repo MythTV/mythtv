@@ -791,9 +791,7 @@ void DaapServer::addItemToResponse(
     
     if(meta_codes & DAAP_META_SONGGENRE)
     {
-        if(which_item->getGenre().length() > 0 &&
-           which_item->getGenre() != "Unknown" &&
-           which_item->getGenre() != "Unknown Genre")
+        if(which_item->getGenre().length() > 0)
         {
             response << Tag('asgn') << which_item->getGenre().utf8() << end;
         }
@@ -867,7 +865,7 @@ void DaapServer::addItemToResponse(
     
     if(meta_codes & DAAP_META_SONGUSERRATING)
     {
-        response << Tag('asur') << (u8) which_item->getRating() << end;
+        response << Tag('asur') << (u8) which_item->getRating() * 10 << end;
     }
 
     if(meta_codes & DAAP_META_SONGYEAR)
