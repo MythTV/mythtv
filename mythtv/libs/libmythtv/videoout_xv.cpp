@@ -654,7 +654,6 @@ void XvVideoOutput::PrepareFrame(unsigned char *buffer, int width, int height)
         XvShmPutImage(data->XJ_disp, xv_port, data->XJ_curwin, data->XJ_gc,
                       image, imgx, imgy, imgw, imgh, dispxoff, dispyoff,
                       dispwoff, disphoff, False);
-        XSync(data->XJ_disp, False);
 
         pthread_mutex_unlock(&lock);
     }
@@ -748,7 +747,7 @@ void XvVideoOutput::PrepareFrame(unsigned char *buffer, int width, int height)
 
 void XvVideoOutput::Show()
 {
-        XSync(data->XJ_disp, False);
+    XSync(data->XJ_disp, False);
 }
 
 void XvVideoOutput::ResizeVideo(int x, int y, int w, int h)
