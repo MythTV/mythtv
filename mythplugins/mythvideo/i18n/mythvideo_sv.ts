@@ -156,10 +156,6 @@
         <translation>Nyscannade filer i Video Manager kommer att markeras som bläddringsbara och kommer att synas i bläddra-menyn.</translation>
     </message>
     <message>
-        <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos; or &apos;MythXine&apos;.</source>
-        <translation type="obsolete">Detta är kommandot som används för att spela upp filer som har en filändelse som inte specifikt har associerats med en spelare. Du kan även skriva in namnet på en av avspelningspluginerna, exempelvis &apos;Internal&apos; eller &apos;MythXine&apos;.</translation>
-    </message>
-    <message>
         <source>New category</source>
         <translation>Ny kategori</translation>
     </message>
@@ -223,10 +219,6 @@
     <message>
         <source>Listings</source>
         <translation>Listningar</translation>
-    </message>
-    <message>
-        <source>The defualt view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
-        <translation type="obsolete">Standardvy för MythVideo. Andra vyer kan nås genom popup-menyn tillgänglig via MENY-knappen.</translation>
     </message>
     <message>
         <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
@@ -452,18 +444,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>MENU: Options</source>
-        <translation type="obsolete">MENY: Inställningar</translation>
-    </message>
-    <message>
-        <source>Up/Down, Page Up/Down - Browse</source>
-        <translation type="obsolete">Up/Down, Page Up/Down - Bläddra</translation>
-    </message>
-    <message>
-        <source>Menu - Options</source>
-        <translation type="obsolete">Meny - Inställningar</translation>
-    </message>
-    <message>
         <source>Parental</source>
         <translation>Barnlås</translation>
     </message>
@@ -485,23 +465,19 @@
     </message>
     <message>
         <source>INFO - Action Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>INFO - Handlingsmeny</translation>
     </message>
     <message>
         <source>Up/Down, Page Up/Down: Browse   MENU: Options   INFO: Action Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Upp/Ner, Page Up/Down: Bläddra   MENY: Inställningar   INFO: Handlingsmeny</translation>
     </message>
     <message>
         <source>Play File After This:</source>
-        <translation type="unfinished"></translation>
+        <translation>Spela fil efter detta:</translation>
     </message>
 </context>
 <context>
     <name>VideoBrowser</name>
-    <message>
-        <source>Parental Pin:</source>
-        <translation type="obsolete">PIN-kod (barnlås):</translation>
-    </message>
     <message>
         <source>%1 of %2</source>
         <translation>%1 av %2</translation>
@@ -519,14 +495,6 @@
         <translation>minuter</translation>
     </message>
     <message>
-        <source>Ok</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
-        <source>Select action</source>
-        <translation type="obsolete">Välj åtgärd</translation>
-    </message>
-    <message>
         <source>Watch This Video</source>
         <translation>Spela upp denna film</translation>
     </message>
@@ -537,10 +505,6 @@
     <message>
         <source>Filter Display</source>
         <translation>Filtervisning</translation>
-    </message>
-    <message>
-        <source>Switch to Video Listings</source>
-        <translation type="obsolete">Växla till filmlista</translation>
     </message>
     <message>
         <source>Cancel</source>
