@@ -80,8 +80,9 @@ void ProgFinder::Initialize(void)
     running = true;
     m_db = QSqlDatabase::database();
     
-    
     allowkeypress = true;
+    inFill = false;
+    needFill = false;
 
     baseDir = gContext->GetInstallPrefix();
 
@@ -158,6 +159,7 @@ void ProgFinder::keyPressEvent(QKeyEvent *e)
 {
     if (!allowkeypress)
         return;
+    allowkeypress = false;
 
     bool handled = false;
 
@@ -195,6 +197,19 @@ void ProgFinder::keyPressEvent(QKeyEvent *e)
 
     if (!handled)
         MythDialog::keyPressEvent(e);
+
+    if (needFill && inSearch == 2)
+    {
+        do
+        {
+            needFill = false;
+            ProgramInfo *curPick = showData[curShow];
+            if (curPick)
+                selectShowData(curPick->title, curShow);
+        } while (needFill);
+    }
+
+    allowkeypress = true;
 }
 
 void ProgFinder::updateBackground(void)
@@ -220,17 +235,16 @@ void ProgFinder::updateBackground(void)
 
 void ProgFinder::paintEvent(QPaintEvent *e)
 {
+    if (inFill)
+        return;
+
     QRect r = e->rect();
     QPainter p(this);
 
     if (r.intersects(listRect))
-    {
         updateList(&p);
-    }
     if (r.intersects(infoRect))
-    {
         updateInfo(&p);
-    }
 }
 
 void ProgFinder::updateList(QPainter *p)
@@ -890,7 +904,7 @@ void ProgFinder::selectSearchData()
     if (running == false)
         return;
 
-    allowkeypress = false;
+    inFill = true;
     QString thequery;
     QString data;
 
@@ -956,7 +970,7 @@ void ProgFinder::selectSearchData()
         listCount = showsPerListing;
 
     curProgram = 0;
-    allowkeypress = true;
+    inFill = false;
     showProgramList();
 }
 
@@ -1023,7 +1037,7 @@ void ProgFinder::selectShowData(QString progTitle, int newCurShow)
     if (running == false)
         return;
 
-    allowkeypress = false;
+    inFill = true;
     QDateTime progStart = QDateTime::currentDateTime();
 
     schedList.FromScheduler();
@@ -1041,7 +1055,7 @@ void ProgFinder::selectShowData(QString progTitle, int newCurShow)
         showCount = showsPerListing;
 
     curShow = newCurShow;
-    allowkeypress = true;
+    inFill = false;
     showShowingList();
 }
 
@@ -1285,9 +1299,23 @@ void ProgFinder::customEvent(QCustomEvent *e)
         {
             if (inSearch == 2)
             {
-                ProgramInfo *curPick = showData[curShow];
-                if (curPick)
-                    selectShowData(curPick->title, curShow);
+                if (!allowkeypress)
+                {
+                    needFill = true;
+                    return;
+                }
+
+                allowkeypress = false;
+
+                do
+                {
+                    needFill = false;
+                    ProgramInfo *curPick = showData[curShow];
+                    if (curPick)
+                        selectShowData(curPick->title, curShow);
+                } while (needFill);
+
+                allowkeypress = true;
             }
         }
     }

@@ -118,6 +118,8 @@ class ProgFinder : public MythDialog
     QString channelFormat;
 
     bool allowkeypress;
+    bool inFill;
+    bool needFill;
 };
 
 class JaProgFinder : public ProgFinder
