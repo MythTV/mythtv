@@ -1,7 +1,7 @@
 <myththeme>
     <font name="basefont"  face="Trebuchet Ms">
       <color>#ffffff</color>
-      <dropcolor>#585D64</dropcolor>
+      <dropcolor>#3B4045</dropcolor>
       <size>20</size>
       <size:small>18</size:small>
       <size:big>22</size:big>
@@ -9,13 +9,12 @@
       <bold>yes</bold>
     </font>
    <font name="title" base="basefont" face="Arial Black">
-      <color>#ffffdd</color>
+      <!--<color>#ffffdd</color>-->
+      <color>#DEEAF9</color>
       <dropcolor>#000000</dropcolor>
       <size>24</size>
-      <bold>yes</bold>
       <size:big>24</size:big>
       <size:small>18</size:small>
-      <shadow>2,2</shadow>
     </font>
     
     <font name="subtitle" base="basefont"  face="Arial Black">
@@ -23,7 +22,6 @@
       <size>22</size>
       <size:big>24</size:big>
       <size:small>20</size:small>
-      <shadow>2,2</shadow>
     </font>
     
     <font name="info" base="basefont">
@@ -128,7 +126,8 @@
     <active>black_button_on.png</active>
     <text>
       <area>50,8,3,0</area>
-      <color>white</color>
+      <color>#DEEAF9</color>
+<!--       <color>white</color> -->
       <fontname>Trebuchet Ms</fontname>
       <fontsize>28</fontsize>
       <bold>yes</bold>
@@ -136,17 +135,18 @@
       <centered>no</centered>
       <outline>
          <color>black</color>
-         <size>3</size>
+         <size>2</size>
       </outline>
-      <!--<shadow>
+      <shadow>
          <color>black</color>
          <offset>2,2</offset>
          <alpha>128</alpha>
-      </shadow>-->
+      </shadow>
     </text>
     <activetext>
       <area>50,8,3,0</area>
-      <color>#0086FF</color>
+<!--       <color>#0086FF</color> -->
+      <color>#3C5574</color>
       <fontname>Trebuchet Ms</fontname>
       <fontsize>28</fontsize>
       <bold>yes</bold>
@@ -154,7 +154,7 @@
       <centered>no</centered>
       <outline>
          <color>black</color>
-         <size>3</size>
+         <size>2</size>
       </outline>
       <!--<shadow>
          <color>black</color>
