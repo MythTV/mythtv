@@ -3289,7 +3289,7 @@ void TV::ChangeTimeStretch(int dir)
 
     activenvp->Play(normal_speed, true);
 
-    QString text = QString("Time Stretch %1X").arg(normal_speed);
+    QString text = QString(tr("Time Stretch %1X")).arg(normal_speed);
 
     //if (osd && !browsemode)
     if (osd)

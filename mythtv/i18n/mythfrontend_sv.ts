@@ -5421,6 +5421,14 @@ som du startade detta programmet i.</translation>
         <source>Try Again</source>
         <translation>Försök igen</translation>
     </message>
+    <message>
+        <source>Adjust Time Stretch</source>
+        <translation>Justera tempo</translation>
+    </message>
+    <message>
+        <source>Time Stretch %1X</source>
+        <translation>Tempo %1X</translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
