@@ -57,7 +57,6 @@ DEFINES += USING_IVTV
 
 # Default audio output, OSS
 CONFIG += using_oss
-DEFINES += USING_OSS
 
 # Native ALSA support
 #CONFIG += using_alsa
@@ -152,7 +151,6 @@ macx {
     CONFIG     -= using_ivtv
     DEFINES    -= USING_IVTV
     CONFIG     -= using_oss
-    DEFINES    -= USING_OSS
     CONFIG     -= using_joystick_menu
 }
 win32 {
@@ -162,7 +160,6 @@ win32 {
     CONFIG     -= using_ivtv
     DEFINES    -= USING_IVTV
     CONFIG     -= using_oss
-    DEFINES    -= USING_OSS
     CONFIG     -= using_joystick_menu
 }
 freebsd {

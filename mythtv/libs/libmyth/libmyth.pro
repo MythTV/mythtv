@@ -47,6 +47,7 @@ inc.files += uilistbtntype.h uiphoneentry.h generictree.h managedlist.h
 inc.files += visual.h volumebase.h output.h
 
 using_oss {
+    DEFINES += USING_OSS
     SOURCES += audiooutputoss.cpp
     HEADERS += audiooutputoss.h
 }
