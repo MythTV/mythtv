@@ -941,7 +941,10 @@ bool ServiceHandler::RequirePIDs()
         return false;
 
     if (status[0].pulling == false)
+    {
+        status[0].pulling = true;
         return true;
+    }
 
     return false;
 }

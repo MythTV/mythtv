@@ -117,10 +117,7 @@ void SIParser::CheckTrackers()
                              break;
                 case EVENTS:
                              while (Table[EVENTS]->GetEmitID(key0,key1))
-{                                 emit EventsReady( &((EventHandler *) Table[EVENTS])->Events[key0] );
-printf("Emiting key0 = %d\n",key0);
-}
-
+                                 emit EventsReady( &((EventHandler *) Table[EVENTS])->Events[key0] );
                              break;
                 case NETWORK:
                              while(Table[NETWORK]->GetEmitID(key0,key1))
@@ -1984,17 +1981,14 @@ void SIParser::ParseTVCT(tablehead_t* head, uint8_t* buffer, int size)
 //        uint8_t ETM_Location = (buffer[pos+26] & 0xC0) >> 6;
         s.ServiceID = buffer[pos+24] << 8 | buffer[pos+25];
 
-
         s.ATSCSourceID = buffer[pos+28] << 8 | buffer[pos+29];
 #ifdef USING_DVB_EIT
         Table[EVENTS]->RequestEmit(s.ATSCSourceID);
 #endif
 
         s.Version = head->version;
-        // TODO: HACK to do some ATSC Testing
         s.ServiceType = 1;
-
-        s.EITPresent = (buffer[26] & 0x02) >> 1;
+        s.EITPresent = 1;
 
         uint16_t descriptors_length = (buffer[pos+30] & 0x02) << 8 | buffer[pos+31];
 
