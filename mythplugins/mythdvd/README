@@ -180,20 +180,6 @@ Other required libraries
 
 
 
-DATABASE
---------
-
-    You need to go into the ./dvddb and run the appropriate file. If
-this is your first time installing mythdvd, then you probably just want to
-do a:
-
-	mysql -p -u mythtv < metadata.sql
-
-    As with other myth modules, if you are upgrading a CVS version, run the
-cvs.sql, and if you are moving to a new release version, run the appropriate
-from-x-to-y.sql script (if any).
-
-
 FILESYSTEMS
 -----------
 
