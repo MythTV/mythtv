@@ -185,6 +185,40 @@ void VideoManager::RefreshMovieList()
     updateML = false;
 }
 
+// Replace the numeric character references
+// See http://www.w3.org/TR/html4/charset.html#h-5.3.1
+static void replaceNumCharRefs(QString &str)
+{
+    QString &ret = str;
+    int pos = 0;
+    QRegExp re("&#(\\d+|(x|X)[0-9a-fA-F]+);");
+
+    while ((pos = re.search(ret, pos)) != -1) 
+    {
+        int len = re.matchedLength();
+        QString numStr = re.cap(1);
+        bool ok = false;
+        int num = -1;
+
+        if (numStr[0] == 'x' || numStr[0] == 'X') 
+        {
+            QString hexStr = numStr.right(numStr.length() - 1);
+            num = hexStr.toInt(&ok, 16);
+        } 
+        else 
+            num = numStr.toInt(&ok, 10);
+
+        QChar rep('X');
+
+        if (ok)
+           rep = QChar(num);
+
+        ret.replace(pos, len, rep);
+
+        pos += 1;
+    }
+}
+
 QString VideoManager::parseData(QString data, QString beg, QString end)
 {
     bool debug = false;
@@ -200,8 +234,7 @@ QString VideoManager::parseData(QString data, QString beg, QString end)
     {
         ret = data.mid(start, endint - start);
 
-        ret.replace(QRegExp("&#38;"), "&");
-        ret.replace(QRegExp("&#34;"), "\"");
+        replaceNumCharRefs(ret);
 
         if (debug == true)
             cout << "MythVideo: Parse HTML : Returning : " << ret << endl;

@@ -139,12 +139,14 @@ void Metadata::dumpToDatabase(QSqlDatabase *db)
 
     QString thequery;
     thequery.sprintf("INSERT INTO videometadata (title,director,plot,"
-                              "rating,year,userrating,length,filename,showlevel,coverfile,inetref) VALUES "
-                              "(\"%s\",\"%s\",\"%s\",\"%s\",%d,%f,%d,\"%s\",%d,\"%s\",\"%s\");",
-                              title.latin1(), director.latin1(),
-                              plot.latin1(), rating.latin1(), year,
-                              userrating, length, sqlfilename.ascii(), showlevel,
-                              sqlcoverfile.ascii(), inetref.ascii());
+                     "rating,year,userrating,length,filename,showlevel,"
+                     "coverfile,inetref) VALUES "
+                     "(\"%s\",\"%s\",\"%s\",\"%s\",%d,%f,%d,\"%s\",%d,\"%s\","
+                     "\"%s\");",
+                     title.utf8().data(), director.utf8().data(),
+                     plot.utf8().data(), rating.utf8().data(), year,
+                     userrating, length, sqlfilename.utf8().data(), showlevel,
+                     sqlcoverfile.utf8().data(), inetref.utf8().data());
 
     db->exec(thequery);
 
@@ -190,13 +192,14 @@ void Metadata::updateDatabase(QSqlDatabase *db)
     sqlcoverfile.replace(QRegExp("\""), QString("\\\""));
 
     QString thequery;
-    thequery.sprintf("UPDATE videometadata SET title=\"%s\",director=\"%s\",plot=\"%s\","
-                              "rating=\"%s\",year=%d,userrating=%f,length=%d,filename=\"%s\","
-                              "showlevel=%d,coverfile=\"%s\",inetref=\"%s\" WHERE intid=%d",
-                              title.latin1(), director.latin1(),
-                              plot.latin1(), rating.latin1(), year,
-                              userrating, length, sqlfilename.ascii(), showlevel,
-                              sqlcoverfile.ascii(), inetref.ascii(), id);
+    thequery.sprintf("UPDATE videometadata SET title=\"%s\",director=\"%s\","
+                     "plot=\"%s\",rating=\"%s\",year=%d,userrating=%f,"
+                     "length=%d,filename=\"%s\",showlevel=%d,coverfile=\"%s\","
+                     "inetref=\"%s\" WHERE intid=%d",
+                     title.utf8().data(), director.utf8().data(),
+                     plot.utf8().data(), rating.utf8().data(), year,
+                     userrating, length, sqlfilename.utf8().data(), showlevel,
+                     sqlcoverfile.utf8().data(), inetref.utf8().data(), id);
 
     db->exec(thequery);
 }

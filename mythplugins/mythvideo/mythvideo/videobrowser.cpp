@@ -215,7 +215,7 @@ void VideoBrowser::updatePlayWait(QPainter *p)
   else if (m_state == 4)
   {
     // Play the movie
-    myth_system((QString("%1 ") .arg(m_cmd)).ascii());
+    myth_system((QString("%1 ") .arg(m_cmd)).local8Bit());
 
     Metadata *childItem = new Metadata;
     Metadata *parentItem = new Metadata(*curitem);
@@ -229,7 +229,7 @@ void VideoBrowser::updatePlayWait(QPainter *p)
         {
             //Load up data about this child
             selected(childItem);
-            myth_system((QString("%1 ") .arg(m_cmd)).ascii());
+            myth_system((QString("%1 ") .arg(m_cmd)).local8Bit());
         }
 
         delete parentItem;
@@ -542,10 +542,9 @@ void VideoBrowser::selected(Metadata *someItem)
         }
     }
 
-
-
     QString arg;
-    arg.sprintf("\"%s\"", filename.replace(QRegExp("\""), "\\\"").ascii());
+    arg.sprintf("\"%s\"",
+                filename.replace(QRegExp("\""), "\\\"").utf8().data());
 
     QString command = "";
     

@@ -394,7 +394,8 @@ void VideoTree::handleTreeListSelection(int node_int, IntVector *)
         }
 
         QString arg;
-        arg.sprintf("\"%s\"", filename.replace(QRegExp("\""), "\\\"").ascii());
+        arg.sprintf("\"%s\"", 
+                    filename.replace(QRegExp("\""), "\\\"").utf8().data());
 
         //
         //  Did the user specify %s in the player
@@ -417,7 +418,7 @@ void VideoTree::handleTreeListSelection(int node_int, IntVector *)
         //  Run the player
         //
         
-        myth_system((QString("%1 ").arg(command)).ascii());
+        myth_system((QString("%1 ").arg(command)).local8Bit());
 
         //
         //  Go back to tree browsing
