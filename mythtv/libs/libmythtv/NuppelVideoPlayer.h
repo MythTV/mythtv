@@ -61,8 +61,13 @@ class NuppelVideoPlayer
 
     void SetOSDFontName(char *filename) { osdfilename = filename; }
     
-    void SetInfoText(char *text, int secs);
-    void SetChannelText(char *text, int secs);
+    void SetInfoText(const string &text, const string &subtitle,
+                     const string &desc, const string &category,
+                     const string &start, const string &end, int secs);
+    void SetChannelText(const string &text, int secs);
+
+    void ShowLastOSD(int secs);
+    void TurnOffOSD(void) { osd->TurnOff(); }
    
     bool OSDVisible(void) { if (osd) return osd->Visible(); else return false; }
     

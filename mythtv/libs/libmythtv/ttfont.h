@@ -25,6 +25,9 @@ ____________________________________________________________________________*/
 #define INCLUDED_TTFONT__H_
 
 #include <freetype/freetype.h>
+#include <string>
+
+using namespace std;
 
 typedef struct _efont
   {
@@ -43,12 +46,12 @@ typedef struct _efont
   }
 Efont;
 
-void EFont_draw_string(unsigned char *yuvptr, int x, int y, char *text,
+void EFont_draw_string(unsigned char *yuvptr, int x, int y, const string &text,
                        Efont *font, int maxx, int maxy, int video_width,
-                       bool white = true);
+                       bool white = true, bool rightjustify = false);
 void Efont_free(Efont * f);
 Efont *Efont_load(char *file, int size);
-void Efont_extents(Efont * f, char *text, int *font_ascent_return,
+void Efont_extents(Efont * f, const string &text, int *font_ascent_return,
                    int *font_descent_return, int *width_return,
                    int *max_ascent_return, int *max_descent_return,
                    int *lbearing_return, int *rbearing_return);

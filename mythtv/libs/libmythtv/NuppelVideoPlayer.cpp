@@ -984,12 +984,22 @@ void NuppelVideoPlayer::ClearAfterSeek(void)
     audiotimecode = 0;
 }
 
-void NuppelVideoPlayer::SetInfoText(char *text, int secs)
+void NuppelVideoPlayer::SetInfoText(const string &text, const string &subtitle,
+                                    const string &desc, const string &category,
+                                    const string &start, const string &end,
+                                    int secs)
 {
-    osd->SetInfoText(text, (int)(secs * ceil(video_frame_rate)));
+    osd->SetInfoText(text, subtitle, desc, category, start, end, 
+                     (int)(secs * ceil(video_frame_rate)));
 }
 
-void NuppelVideoPlayer::SetChannelText(char *text, int secs)
+void NuppelVideoPlayer::SetChannelText(const string &text, int secs)
 {
     osd->SetChannumText(text, (int)(secs * ceil(video_frame_rate)));
 }
+
+void NuppelVideoPlayer::ShowLastOSD(int secs)
+{
+    osd->ShowLast((int)(secs * ceil(video_frame_rate)));
+}
+

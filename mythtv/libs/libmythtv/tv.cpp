@@ -126,6 +126,7 @@ void TV::LiveTV(void)
         {
            switch (keypressed) {
 	       case 'p': case 'P': paused = nvp->TogglePause(); break;
+               case 'i': case 'I': nvp->ShowLastOSD(osd_display_time); break;
                case wsRight: nvp->FastForward(5); break;
                case wsLeft: nvp->Rewind(5); break;
                case wsEscape: nvp->StopPlaying(); break;
@@ -198,7 +199,8 @@ void TV::ChangeChannel(bool up)
     GetChannelInfo(channel->GetCurrent(), title, subtitle, desc, category, 
                    starttime, endtime);
 
-    nvp->SetInfoText((char *)title.c_str(), osd_display_time);
+    nvp->SetInfoText(title, subtitle, desc, category, starttime, endtime,
+                     osd_display_time);
     nvp->SetChannelText(channel->GetCurrentName(), osd_display_time);
 
     nvp->Unpause();
@@ -274,7 +276,8 @@ void TV::ChangeChannel(char *name)
     GetChannelInfo(channel->GetCurrent(), title, subtitle, desc, category,
                    starttime, endtime);
 
-    nvp->SetInfoText((char *)title.c_str(), osd_display_time);
+    nvp->SetInfoText(title, subtitle, desc, category, starttime, endtime,
+                     osd_display_time);
     nvp->SetChannelText(channel->GetCurrentName(), osd_display_time);
 
     nvp->Unpause();
@@ -336,11 +339,6 @@ void TV::GetChannelInfo(int lchannel, string &title, string &subtitle,
 
         mysql_free_result(res_set);
     }
-
-    printf("title: %s\n", title.c_str());
-    printf("subtitle: %s\n", subtitle.c_str());
-    printf("description: %s\n", desc.c_str());
-    printf("category: %s\n", category.c_str()); 
 }
 
 void TV::ConnectDB(void)

@@ -308,15 +308,15 @@ void NuppelVideoRecorder::StartRecording(void)
   
     // if channel has a audio then activate it
     if ((vchan.flags & VIDEO_VC_AUDIO)==VIDEO_VC_AUDIO) {
-        if (!quiet) 
-            fprintf(stderr, "%s\n", "unmuting tv-audio");
+        //if (!quiet) 
+        //    fprintf(stderr, "%s\n", "unmuting tv-audio");
         // audio hack, to enable audio from tvcard, in case we use a tuner
         va.audio = 0; // use audio channel 0
         if (ioctl(fd, VIDIOCGAUDIO, &va)<0) 
             perror("VIDIOCGAUDIO"); 
         origaudio = va;
-        if (!quiet) 
-            fprintf(stderr, "audio volume was '%d'\n", va.volume);
+        //if (!quiet) 
+        //    fprintf(stderr, "audio volume was '%d'\n", va.volume);
         va.audio = 0;
         va.flags &= ~VIDEO_AUDIO_MUTE; // now this really has to work
 

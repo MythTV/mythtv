@@ -14,11 +14,16 @@ class OSD
 
     void Display(unsigned char *yuvptr);
     
-    void SetInfoText(char *text, int length);
-    void SetChannumText(char *text, int length);
+    void SetInfoText(const string &text, const string &subtitle, 
+                     const string &desc, const string &category,
+                     const string &start, const string &end, int length);
+    void SetChannumText(const string &text, int length);
 
-    bool Visible(void) { return displayframes > 0; }
+    void ShowLast(int length);
+    void TurnOff(void);
     
+    bool Visible(void) { return displayframes > 0; }
+   
  private:
     string fontname;
 
@@ -31,8 +36,11 @@ class OSD
     int info_width;
     int info_height;
     bool show_info;
-    char *infotext;
+    string infotext;
+    string subtitletext;
+    string desctext;
     Efont *info_font;
+    int infofontsize;
 
     int channum_y_start;
     int channum_x_start;
@@ -40,10 +48,14 @@ class OSD
     int channum_x_end;
     int channum_width;
     int channum_height;
-    char *channumtext;
+    string channumtext;
     bool show_channum;
     Efont *channum_font;
+    int channumfontsize;
+
     int displayframes;
+
+    int space_width;
 };
     
 #endif

@@ -320,21 +320,23 @@ merge_text(unsigned char *yuv, TT_Raster_Map * rmap, int offset_x, int offset_y,
 }
 
 void
-EFont_draw_string(unsigned char *yuvptr, int x, int y, char *text,
+EFont_draw_string(unsigned char *yuvptr, int x, int y, const string &text,
 		  Efont * font, int maxx, int maxy, int video_width,
-                  bool white)
+                  bool white, bool rightjustify)
 {
    int                  width, height, w, h, inx, iny, clipx, clipy;
    TT_Raster_Map       *rmap, *rtmp;
    char                 is_pixmap = 0;
 
+   char *ctext = (char *)text.c_str();
+   
    inx = 0;
    iny = 0;
 
-   if (strlen(text) < 1)
+   if (strlen(ctext) < 1)
        return;
 
-   rtmp = calc_size(font, &w, &h, text);
+   rtmp = calc_size(font, &w, &h, ctext);
    if (w <= 0 || h <= 0)
    {
        destroy_font_raster(rtmp);
@@ -342,7 +344,7 @@ EFont_draw_string(unsigned char *yuvptr, int x, int y, char *text,
    }
    rmap = create_font_raster(w, h);
 
-   render_text(rmap, rtmp, font, text, &inx, &iny);
+   render_text(rmap, rtmp, font, ctext, &inx, &iny);
 
    is_pixmap = 1;
 
@@ -383,6 +385,10 @@ EFont_draw_string(unsigned char *yuvptr, int x, int y, char *text,
 	destroy_font_raster(rtmp);
 	return;
      }
+
+   if (rightjustify)
+   {
+   }
 
    merge_text(yuvptr, rmap, clipx, clipy, x, y, width, height, 
               video_width, white);
@@ -558,7 +564,7 @@ Efont_load(char *file, int size)
 }
 
 void
-Efont_extents(Efont * f, char *text, int *font_ascent_return,
+Efont_extents(Efont * f, const string &text, int *font_ascent_return,
 	      int *font_descent_return, int *width_return,
 	      int *max_ascent_return, int *max_descent_return,
 	      int *lbearing_return, int *rbearing_return)
@@ -566,6 +572,8 @@ Efont_extents(Efont * f, char *text, int *font_ascent_return,
    int                 i, ascent, descent, pw;
    TT_Glyph_Metrics    gmetrics;
 
+   char *ctext = (char *)text.c_str();
+   
    if (!f)
       return;
 
@@ -573,9 +581,9 @@ Efont_extents(Efont * f, char *text, int *font_ascent_return,
    descent = f->descent;
    pw = 0;
 
-   for (i = 0; text[i]; i++)
+   for (i = 0; ctext[i]; i++)
      {
-	unsigned char       j = text[i];
+	unsigned char       j = ctext[i];
 
 	if (!TT_VALID(f->glyphs[j]))
 	   continue;
@@ -585,7 +593,7 @@ Efont_extents(Efont * f, char *text, int *font_ascent_return,
 	     if (lbearing_return)
 		*lbearing_return = ((-gmetrics.bearingX) / 64);
 	  }
-	if (text[i + 1] == 0)
+	if (ctext[i + 1] == 0)
 	  {
 	     if (rbearing_return)
 		*rbearing_return = ((gmetrics.bbox.xMax - gmetrics.advance) / 64);
