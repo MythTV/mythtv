@@ -1,3 +1,0 @@
-# set your offset to UTC (only necessary if your xmltv data is given in 
-# another timezone -- should be only european users)
-#str TimeOffset=-0600

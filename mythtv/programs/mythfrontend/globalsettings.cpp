@@ -358,13 +358,36 @@ public:
     };
 };
 
-class TimeOffset: public SpinBoxSetting, public GlobalSetting {
+class TimeOffset: public ComboBoxSetting, public GlobalSetting {
 public:
     TimeOffset():
-        SpinBoxSetting(-12, 12, 1),
         GlobalSetting("TimeOffset") {
         setLabel("Time offset for XMLTV listings");
-        setValue(0);
+        addSelection("(None)", "");
+        addSelection("-0100");
+        addSelection("-0200");
+        addSelection("-0300");
+        addSelection("-0400");
+        addSelection("-0500");
+        addSelection("-0600");
+        addSelection("-0700");
+        addSelection("-0800");
+        addSelection("-0900");
+        addSelection("-1000");
+        addSelection("-1100");
+        addSelection("-1200");
+        addSelection("+0100");
+        addSelection("+0200");
+        addSelection("+0300");
+        addSelection("+0400");
+        addSelection("+0500");
+        addSelection("+0600");
+        addSelection("+0700");
+        addSelection("+0800");
+        addSelection("+0900");
+        addSelection("+1000");
+        addSelection("+1100");
+        addSelection("+1200");
     };
 };
 
