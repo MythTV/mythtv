@@ -2327,16 +2327,99 @@ void MainServer::PrintStatus(QSocket *socket)
     QDateTime qdtNow = QDateTime::currentDateTime();
 
     os << "HTTP/1.0 200 Ok\r\n"
-       << "Content-Type: text/html; charset=\"utf-8\"\r\n"
+       << "Content-Type: text/html; charset=\"UTF-8\"\r\n"
        << "\r\n";
 
-    os << "<HTTP>\r\n"
-       << "<HEAD>\r\n"
-       << "  <TITLE>MythTV Status - " 
+    os << "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
+       << "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n"
+       << "<html>\r\n"
+       << "<head>\r\n"
+       << "  <meta http-equiv=\"Content-Type\""
+       << "content=\"text/html; charset=UTF-8\" />\r\n"
+       << "  <style type=\"text/css\" title=\"Default\" media=\"all\">\r\n"
+       << "  <!--\r\n"
+       << "  body {\r\n"
+       << "    background-color:#fff;\r\n"
+       << "    font:11px verdana, arial, helvetica, sans-serif;\r\n"
+       << "    margin:20px;\r\n"
+       << "  }\r\n"
+       << "  h1 {\r\n"
+       << "    font-size:28px;\r\n"
+       << "    font-weight:900;\r\n"
+       << "    color:#ccc;\r\n"
+       << "    letter-spacing:0.5em;\r\n"
+       << "    margin-bottom:30px;\r\n"
+       << "    width:750px;\r\n"
+       << "    text-align:center;\r\n"
+       << "  }\r\n"
+       << "  h2 {\r\n"
+       << "    font-size:18px;\r\n"
+       << "    font-weight:800;\r\n"
+       << "    color:#360;\r\n"
+       << "    border:none;\r\n"
+       << "    letter-spacing:0.3em;\r\n"
+       << "    padding:0px;\r\n"
+       << "    margin-bottom:10px;\r\n"
+       << "    margin-top:0px;\r\n"
+       << "  }\r\n"
+       << "  div.content {\r\n"
+       << "    width:750px;\r\n"
+       << "    border-top:1px solid #000;\r\n"
+       << "    border-right:1px solid #000;\r\n"
+       << "    border-bottom:1px solid #000;\r\n"
+       << "    border-left:10px solid #000;\r\n"
+       << "    padding:10px;\r\n"
+       << "    margin-bottom:30px;\r\n"
+       << "    -moz-border-radius:8px 0px 0px 8px;\r\n"
+       << "  }\r\n"
+       << "  div#schedule a {\r\n"
+       << "    display:block;\r\n"
+       << "    color:#000;\r\n"
+       << "    text-decoration:none;\r\n"
+       << "    padding:.2em .8em;\r\n"
+       << "    border:thin solid #fff;\r\n"
+       << "  }\r\n"
+       << "  div#schedule a span {\r\n"
+       << "    display:none;\r\n"
+       << "  }\r\n"
+       << "  div#schedule a:hover {\r\n"
+       << "    background-color:#F4F4F4;\r\n"
+       << "    border-top:thin solid #000;\r\n"
+       << "    border-bottom:thin solid #000;\r\n"
+       << "    border-left:thin solid #000;\r\n"
+       << "    cursor:default;\r\n"
+       << "  }\r\n"
+       << "  div#schedule a:hover span {\r\n"
+       << "    display:block;\r\n"
+       << "    position:absolute;\r\n"
+       << "    background-color:#F4F4F4;\r\n"
+       << "    color:#000;\r\n"
+       << "    left:439px;\r\n"
+       << "    margin-top:-20px;\r\n"
+       << "    width:340px;\r\n"
+       << "    padding:5px;\r\n"
+       << "    border:thin dashed #000;\r\n"
+       << "  }\r\n"
+       << "  div.diskstatus {\r\n"
+       << "    width:375px;\r\n"
+       << "    height:7em;\r\n"
+       << "    float:left;\r\n"
+       << "  }\r\n"
+       << "  div.loadstatus {\r\n"
+       << "    width:375px;\r\n"
+       << "    height:7em;\r\n"
+       << "    float:right;\r\n"
+       << "  }\r\n"
+       << "  -->\r\n"
+       << "  </style>\r\n"
+       << "  <title>MythTV Status - " 
        << qdtNow.toString(shortdateformat) 
-       << " " << qdtNow.toString(timeformat) << "</TITLE>\r\n"
-       << "</HEAD>\r\n"
-       << "<BODY>\r\n";
+       << " " << qdtNow.toString(timeformat) << "</title>\r\n"
+       << "</head>\r\n"
+       << "<body>\r\n\r\n"
+       << "  <h1>MythTV Status</h1>\r\n"
+       << "  <div class=\"content\">\r\n"
+       << "    <h2>Encoder status</h2>\r\n";
 
     // encoder information ---------------------
     QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
@@ -2348,50 +2431,62 @@ void MainServer::PrintStatus(QSocket *socket)
 
         if (bIsLocal)
         {
-            os << "Encoder: " << elink->getCardId() << " is local ";
+            os << "    Encoder " << elink->getCardId() << " is local on "
+               << gContext->GetHostName();
         }
         else
         {
-            os << "Encoder: " << elink->getCardId() << " is remote ";
-            if (elink->isConnected())
-                os << "(currently connected) ";
-            else
-                os << "(currently not connected) ";
+            os << "    Encoder " << elink->getCardId() << " is remote on "
+               << elink->getHostname();
+            if (!elink->isConnected())
+                os << " (currently not connected)";
         }
 
         TVState encstate = elink->GetState();
 
         if (encstate == kState_WatchingLiveTV)
         {
-            os << "and is watching Live TV.\r\n";
+            os << " and is watching Live TV";
+            if (bIsLocal)
+            {
+                QString title, callsign, dummy;
+                elink->GetChannelInfo(title, dummy, dummy, dummy, dummy, dummy,
+                                      callsign, dummy, dummy, dummy);
+                os << ": '" << title << "' on "  << callsign;
+            }
+            os << ".";
         }
         else if (encstate == kState_RecordingOnly || 
                  encstate == kState_WatchingRecording)
         {
-            os << "and is recording";
+            os << " and is recording";
             if (bIsLocal)
             {
                 ProgramInfo *pi = elink->GetRecording();
                 if (pi)
                 {
-                    os << " '" << pi->title << "'.  This recording will end "
+                    os << " '" << pi->title << "'. This recording will end "
                        << "at " << (pi->recendts).toString(timeformat);
                     delete pi;
                 }
             }
-            os << ".\r\n";
+            os << ".";
         }
         else
-            os << "and is not recording.\r\n";
+            os << " and is not recording.";
 
-        os << "<br>\r\n";
+        os << "\r\n";
     }
+
+    os << "  </div>\r\n\r\n"
+       << "  <div class=\"content\">\r\n"
+       << "    <h2>Schedule</h2>\r\n";
 
     // upcoming shows ---------------------
     list<ProgramInfo *> recordingList;
     m_sched->getAllPending(&recordingList);
 
-    unsigned int iNum = 5;
+    unsigned int iNum = 10;
     if (recordingList.size() < iNum) 
     {
         iNum = recordingList.size();
@@ -2399,38 +2494,21 @@ void MainServer::PrintStatus(QSocket *socket)
 
     if (iNum == 0)
     {
-        os << "<P>There are no shows scheduled for recording.\r\n";
+        os << "    There are no shows scheduled for recording.\r\n";
     }
     else
     {
-       os << "<P>The next " << iNum << " show" << (iNum == 1 ? "" : "s" )
+       os << "    The next " << iNum << " show" << (iNum == 1 ? "" : "s" )
           << " that " << (iNum == 1 ? "is" : "are") 
-          << " scheduled for recording:<BR>\r\n";
+          << " scheduled for recording:\r\n";
 
-       os << "<Script language=JavaScript>";
-       os << "function dispDesc(i) {\r\n";
-       os << "wnd=window.open(\"\", \"\",\"width=250 height=180\");";
-       os << "wnd.document.write(\"<font face=arial size=+1><b>\");";
-       os << "wnd.document.write("
-          << "document.forms['Desc'].elements['title_' + i].value);";
-       os << "wnd.document.write(\"</b></font><br><br>\");";
-       os << "wnd.document.write(\"<font face=helvetica size=-1>\");";
-       os << "wnd.document.write("
-          << "document.forms['Desc'].elements['desc_' + i].value);";
-       os << "wnd.document.write(\"</font>\");";
-       os << "}";
-       os << "</script>";
-
-       os << "<form name=\"Desc\">\r\n";
-
-       os << "<TABLE BORDER WIDTH=80%>\r\n"; 
-       os << "<TR><TH>Start Time</TH><TH>Show</TH><TH>Encoder</TH></TR>\r\n";
+       os << "    <div id=\"schedule\">\r\n";
        list<ProgramInfo *>::iterator iter = recordingList.begin();
        for (unsigned int i = 0; (iter != recordingList.end()) && i < iNum; 
             iter++, i++)
        {
            if (!(*iter)->recording ||     // bad entry, don't show as upcoming
-               ((*iter)->recstartts) < QDateTime::currentDateTime()) // recording
+               ((*iter)->recstartts) < QDateTime::currentDateTime()) // rec
            {                       
                i--;
            }
@@ -2440,25 +2518,62 @@ void MainServer::PrintStatus(QSocket *socket)
                                                             "&quot;");
                QString qstrDescription = ((*iter)->description).replace(
                                                      QRegExp("\""), "&quot;");
-               os << "<TR " << ((i % 2 == 0) ? "BGCOLOR=EEEEEE" : "") << ">" 
-                  << "<TD>" << ((*iter)->recstartts).toString(shortdateformat) 
-                  << " " << ((*iter)->recstartts).toString(timeformat) << "</TD>" 
-                  << "<TD><input type=\"hidden\" name=\"desc_" << i << "\""
-                  << "value=\"" << qstrDescription << "\">"
-                  << "<input type=\"hidden\" name=\"title_" << i << "\""
-                  << "value=\"" << qstrTitle << "\">"
-                  << "<a href=\"javascript:dispDesc('" << i << "')\">"
-                  << (*iter)->title << "</a></TD>"
-                  << "<TD>" << (*iter)->cardid << "</TD></TR>\r\n";
+               QString qstrSubtitle = ((*iter)->subtitle).replace(
+                                                     QRegExp("\""), "&quot;");
+               QString timeToRecstart = "in";
+               int totalSecsToRecstart = qdtNow.secsTo((*iter)->recstartts);
+               int totalDaysToRecstart = qdtNow.daysTo((*iter)->recstartts);
+               int hoursToRecstart = totalSecsToRecstart / 3600;
+               int minutesToRecstart = (totalSecsToRecstart / 60) % 60;
+
+               if (totalDaysToRecstart > 1)
+               {
+                   timeToRecstart += QString(" %1 days,")
+                                             .arg(totalDaysToRecstart);
+                   hoursToRecstart -= totalDaysToRecstart * 24;
+               }
+               else if (totalDaysToRecstart == 1)
+               {
+                   timeToRecstart += (" 1 day,");
+                   hoursToRecstart -= 24;
+               }
+
+               if (hoursToRecstart > 1)
+                   timeToRecstart += QString(" %1 hours and")
+                                             .arg(hoursToRecstart);
+               else if (hoursToRecstart == 1)
+                   timeToRecstart += " 1 hour and";
+ 
+               if (minutesToRecstart != 1)
+                   timeToRecstart += QString(" %1 minutes")
+                                             .arg(minutesToRecstart);
+               else
+                   timeToRecstart += " 1 minute";
+
+               if (timeToRecstart == "in 0 minutes")
+                   timeToRecstart = "shortly";
+
+               os << "      <a href=\"#\">"
+                  << ((*iter)->recstartts).toString(shortdateformat)
+                  << " " << ((*iter)->recstartts).toString(timeformat) << " - "
+                  << (*iter)->channame << " - "
+                  << qstrTitle << "<span><strong>" << qstrTitle << "</strong>"
+                  << (qstrSubtitle == "" ? "" : " (" + qstrSubtitle + ")" )
+                  << "<br /><br />" << qstrDescription << "<br /><br />"
+                  << "This recording will start "  << timeToRecstart
+                  << " using encoder " << (*iter)->cardid << " with the '";
+               dblock.lock();
+               os << (*iter)->GetProgramRecordingProfile(m_db);
+               dblock.unlock();
+               os << "' profile.</span></a>\r\n";
            }
        }
-       os << "</TABLE>";
-       os << "</form>";
+       os  << "    </div>\r\n";
    }
 
-    os << "<P>Machine Information:\r\n";
-    os << "<TABLE WIDTH =100% BGCOLOR=EEEEEE>";
-    os << "<TR><TD>";
+    os << "  </div>\r\n\r\n  <div class=\"content\">\r\n"
+       << "    <h2>Machine information</h2>\r\n"
+       << "    <div class=\"diskstatus\">\r\n";
 
     // drive space   ---------------------
     int iTotal = -1, iUsed = -1;
@@ -2466,34 +2581,33 @@ void MainServer::PrintStatus(QSocket *socket)
 
     getFreeSpace(iTotal, iUsed);
 
-    os << "Disk Usage:\r\n";
-
-    os << "<UL><LI>Total Space: ";
+    os << "      Disk Usage:\r\n      <ul>\r\n        <li>Total Space: ";
     rep.sprintf(tr("%d,%03d MB "), (iTotal) / 1000, (iTotal) % 1000);
-    os << rep << "\r\n";
+    os << rep << "</li>\r\n";
 
-    os << "<LI>Space Used: ";
+    os << "        <li>Space Used: ";
     rep.sprintf(tr("%d,%03d MB "), (iUsed) / 1000, (iUsed) % 1000);
-    os << rep << "\r\n";
+    os << rep << "</li>\r\n";
 
-    os << "<LI>Space Free: ";
+    os << "        <li>Space Free: ";
     rep.sprintf(tr("%d,%03d MB "), (iTotal - iUsed) / 1000,
                 (iTotal - iUsed) % 1000);
-    os << rep << "</UL>\r\n";
+    os << rep << "</li>\r\n      </ul>\r\n    </div>\r\n\r\n";
 
-    os << "</TD><TD>";
-    
     // load average ---------------------
+    os << "    <div class=\"loadstatus\">\r\n";
     double rgdAverages[3];
     if (getloadavg(rgdAverages, 3) != -1)
     {
-        os << "This machine's load average:";
-        os << "<UL><LI>1 Minute: " << rgdAverages[0] << "\r\n";
-        os << "<LI>5 Minute: " << rgdAverages[1] << "\r\n";
-        os << "<LI>15 Minute: " << rgdAverages[2] << "\r\n</UL>";
+        os << "      This machine's load average:"
+           << "\r\n      <ul>\r\n        <li>"
+           << "1 Minute: " << rgdAverages[0] << "</li>\r\n"
+           << "        <li>5 Minutes: " << rgdAverages[1] << "</li>\r\n"
+           << "        <li>15 Minutes: " << rgdAverages[2]
+           << "</li>\r\n      </ul>\r\n";
     }
 
-    os << "</TD></TR></TABLE>";    // end the machine information table
+    os << "    </div>\r\n";    // end of disk status and load average
 
     dblock.lock();
 
@@ -2519,42 +2633,30 @@ void MainServer::PrintStatus(QSocket *socket)
     mfdLastRunEnd = gContext->GetSetting("mythfilldatabaseLastRunEnd");
     mfdLastRunStatus = gContext->GetNumSetting("mythfilldatabaseLastRunStatus");
 
-    os << "Last mythfilldatabase run started on: "
-       << mfdLastRunStart
-       << "\r\n";
-    os << "and ended on: "
-       << mfdLastRunEnd
-       << ".\r\n";
+    os << "    Last mythfilldatabase run started on " << mfdLastRunStart
+       << " and ended on " << mfdLastRunEnd << ". ";
 
     if(!mfdLastRunStatus)
-    {
-       os << "<P><strong>WARNING</strong>: There was an error during the last run."
-          << "\r\n";
-    }
+       os << "<br /><strong>WARNING</strong>: "
+          << "There was an error during the last run.<br />\r\n";
     else
-    {
-       os << "Last run: successful."
-          << "\r\n";
-    }
-
-    os << "<P>Guide data until "
-       << QDateTime(GuideDataThrough).toString("yyyy-MM-dd hh:mm")
-       << "\r\n";
+       os << "Last run was successful.<br />\r\n";
 
     DaysOfData = qdtNow.daysTo(GuideDataThrough);
 
-    os << "<p>There " << (DaysOfData == 1 ? "is " : "are ")
-       << DaysOfData
-       << " day" << (DaysOfData == 1 ? "" : "s" ) << " of guide data.\r\n";
+    os << "    There's guide data until "
+       << QDateTime(GuideDataThrough).toString("yyyy-MM-dd hh:mm");
+
+    if (DaysOfData > 0)
+        os << " (" << DaysOfData << " day"
+           << (DaysOfData == 1 ? "" : "s" ) << ").";
+    else
+       os << ".";
 
     if (DaysOfData <= 3)
-    {
-        os << "<p><strong>WARNING</strong>: is "
-           << "<tt>mythfilldatabase</tt> running?\r\n";
-    }
+        os << "<strong>WARNING</strong>: is mythfilldatabase running?";
 
-    os << "</BODY>\r\n"
-       << "</HTTP>\r\n";
+    os << "\r\n  </div>\r\n\r\n</body>\r\n</html>\r\n";
 
     while (recordingList.size() > 0)
     {

@@ -590,6 +590,17 @@ RecordingType ProgramInfo::GetProgramRecordingStatus(QSqlDatabase *db)
     return record->getRecordingType();
 }
 
+QString ProgramInfo::GetProgramRecordingProfile(QSqlDatabase *db)
+{
+    if (record == NULL)
+    {
+        record = new ScheduledRecording();
+        record->loadByProgram(db, this);
+    }
+
+    return record->getProfileName();
+}
+
 bool ProgramInfo::AllowRecordingNewEpisodes(QSqlDatabase *db)
 {
     if (record == NULL) 
