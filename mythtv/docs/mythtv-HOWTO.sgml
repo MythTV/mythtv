@@ -1,9 +1,8 @@
 <!doctype linuxdoc system>
 <article>
-
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-07-02, v2.51
+<date>2003-07-09, v2.52
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -11,11 +10,8 @@ different ways.  This document will attempt to give general installation
 instructions, as well as including distribution-specific instructions where
 necessary.
 </abstract>
-
 <toc>
-
 <sect>How to obtain this document. <label id="how_to_obtain">
-
 <p>This HOWTO document is maintained at the primary MythTV website: <url
 url="http://www.mythtv.org" name="http://www.mythtv.org"> by Robert
 Kulagowski <url url="mailto:rkulagow@rocketmail.com">.  (Please note that I
@@ -26,7 +22,6 @@ accessible either through the <url
 url="http://cvs.mythtv.org/cgi-bin/viewcvs.cgi/" name="ViewCVS"> web
 interface, or directly from the CVS repository.  You may download the latest
 copy of MythTV and the documentation from CVS this way:
-
 <tscreen><verb>
 $ mkdir mythtv
 $ cd mythtv
@@ -35,15 +30,11 @@ Logging in to :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs
 CVS password: mythtv
 $ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs checkout mythtv
 </verb></tscreen>
-
 This documentation will be in the <tt>docs/</tt> subdirectory.
 
-<!--
-A PDF version of this documentation can be obtained from <url
-url="http://www.smalltime.com/mythtv/MythTV_How-To.pdf"
-name="http://www.smalltime.com/mythtv/MythTV_How-To.pdf">
-Put back when we figure out what happened to N. Ziarek.
--->
+The other MythTV modules may be downloaded from CVS the same way; replace
+"mythtv" with "mythweather", "mythgallery", "mythmusic", etc.
+
 <bf>NOTE</bf>: If you are going to use CVS to compile MythTV rather than
 using the distribution tarball, it is <bf>strongly</bf> recommended that you
 join the <url url="http://www.snowman.net/mailman/listinfo/mythtv-commits/"
@@ -97,7 +88,6 @@ configuration, and how happy they are with the results.
 If you have specific questions about the suitability of specific hardware
 choices, you can consult the archives of the mythtv-users mailing list or
 post a question to the list.
-
 <sect2>CPU Type and Speed
 <p>Selection of CPU type and speed is one of the trickiest elements of
 hardware selection, mainly because there are so many tradeoffs which can be
@@ -725,33 +715,103 @@ $ emerge mysql
 All the necessary files will be downloaded and built. Even on a fast machine
 this may take a lot of time if you need to do a full Qt build.
 
-<sect>Setting up paths, ldconfig and other shell variables. <label
+<sect>System Configuration Requirements for Compiling MythTV <label
 id="Setting_up_paths">
-<p>There are modifications that need to be made to your system before you
-start compiling.
+<p>Before you compile MythTV from the current source tarball or from CVS, you 
+may need to modify your system configuration in a few ways.
 
-<tt>QTDIR</tt> needs to be set, and <tt>/usr/lib/qt3/bin</tt> must be added
-to your path.  Your distribution may already be making these changes as a part of the
-installation of the software prerequisites detailed earlier.
+In general, if you install MythTV from pre-packaged binaries for your Linux
+distribution/version, you don't need to be too concerned about the issues in
+this section of the HOWTO - the install script for the packages should take
+care of them. However, this section is still recommended reading which may
+help if the packager skipped a step in their packaging.
+
+<sect1>Software requirements for compiling MythTV
+<sect2>General requirements
+<p>MythTV is written in C++ and requires a fairly complete, but standard, 
+compilation environment, including a recent g++ compiler, <tt>make</tt>, and 
+appropriate headers files for shared libraries. Any standard Linux 
+distribution should be able to install a suitable compilation environment 
+from its packaging system. Section 3.2 of this HOWTO provides some details 
+of how to install the required environment for many distributions.
+
+Subsequent sections of this chapter address the few oddities that you may 
+have to adjust by hand before you compile MythTV.
+
+The reference compilation system for MythTV is Debian.
+
+<sect2>Distribution-Specific Notes 
+<p>None 
+<sect1>Shared-Library Requirements for MythTV 
+<sect2>Modifying /etc/ld.so.conf <label id="modifying_ld.so.conf">
+<p>The runtime manager for shared libraries, <bf>/lib/ld.so</bf>, gets
+information about the locations and contents of shared libraries from
+<tt>/etc/ld.so.cache</tt>, a file created by <bf>ldconfig</bf> from
+information in <tt>/etc/ld.so.conf</tt>.  Because MythTV installs some
+shared libraries in <tt>/usr/local/lib</tt>, that directory needs to be
+added to the list of directories for <bf>ld.so</bf> to search when doing
+runtime linking of programs. You do this, as root, by editing
+<tt>/etc/ld.so.conf</tt>, then running <bf>ldconfig</bf>. There are many
+ways to do this; one that works is to enter this series of commands:
+
+<tscreen><verb>
+$ su -
+# echo /usr/local/lib >> /etc/ld.so.conf
+# /sbin/ldconfig
+# exit
+$
+</verb></tscreen>
+<sect2>Distribution-Specific Notes
+<sect3>Red Hat
+<p>It appears that Red Hat Linux 8.0 requires that the <bf>ldconfig</bf>
+command be run twice. Red Hat will also frequently "forget" about the path.
+It's recommended to run <bf>/sbin/ldconfig</bf> after installing every
+package. Failing that, always run it if you get an unexpected error about
+not finding libraries.
+<sect1>Shell-Alias Requirements for MythTV
+<sect2>General requirements
+<sect3>QT libraries and binaries
+<p>The compiler needs to be able to locate QT binaries and libraries in order 
+to compile MythTV. QTDIR needs to be set and <tt>/usr/lib/qt3/bin</tt> must be 
+added to your path. Your distribution may already be making these changes 
+as a part of the installation of the software prerequisites detailed
+earlier.
+
+One way to do this is as follows: <label id="Checking_that_it_worked">
+
+Open a new shell and switch to superuser mode.
+<tscreen><verb>
+$ su
+# set
+[lots of text]
+     	
+PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
+QTDIR=/usr/lib/qt3
+
+[lots more text]
+</verb></tscreen>
+
+You should see <tt>QTDIR</tt> and <tt>/usr/lib/qt3/bin</tt> in your path.
+
+If you don't, do not proceed past this step until you have resolved this
+error. You may need to manually specify the QTDIR and PATH at the shell
+prompt before compiling.
 
 Also, check that there has been a link created in
-<tt>/usr/lib/qt3/mkspecs</tt> called <tt>default</tt>.  If not, you'll get
-errors during the compile.  See the Troubleshooting Section for <ref
-id="mkspecs_error" name="more"> information.
+<tt>/usr/lib/qt3/mkspecs</tt> called <tt>default</tt>. If not, you'll get
+errors during the compile. See the Troubleshooting Section for more
+information.
+<sect2>Distribution-Specific Notes
+<sect3>Mandrake
+<p>The following instructions work for Mandrake 9.0 and 9.1 using
+<bf>bash</bf> as the shell, and may be applicable for a distribution which
+uses <tt>/etc/profile.d</tt>.
 
-<sect1>Distribution-specific information. <label
-id="Distribution-specific_information">
-<sect2>Mandrake 9.0
-<p>The following instructions work for Mandrake 9.0 and 9.1 using <tt>bash</tt> as the
-shell, and may be applicable for a distribution which uses
-<tt>/etc/profile.d</tt>.
+As root, create the following file in <tt>/etc/profile.d</tt> The example
+filename is "mythtv.sh". Use what you feel is appropriate.
 
-As root, create the following file in <tt>/etc/profile.d</tt>  The example
-filename is "mythtv.sh".  Use what you feel is appropriate.
-
-Open a shell, and switch to superuser mode.
-<bf>NOTE: ^D</bf> means press <bf>CTRL</bf> and <bf>d</bf> at the same time.
-
+Open a shell, and switch to superuser mode. 
+<bf>NOTE</bf>: ^D means press CTRL and d at the same time.
 <tscreen><verb>
 $ su
 # cd /etc/profile.d
@@ -764,70 +824,32 @@ export PATH=$PATH:/usr/lib/qt3/bin
 # exit
 $ exit
 </verb></tscreen>
-The last two commands are to exit out of the shell.  This way, when you next
-open a shell your new commands will take effect.
-
-<sect2>Red Hat Linux 8.0 <label id="RH80-LANG">
-<!-- Content submitted by Michael D. Cencula" <mike@cencula.com> -->
+The last two commands are to exit out of the shell. This way, when you next 
+open a shell your new commands
+will take effect.
+<sect3>Red Hat
 <p>Red Hat Linux 8.0 uses an unusual character encoding scheme which causes
 problems when running certain programs. As a result, whenever you run setup
 or mythfilldatabase you will have to set a variable to correct this problem.
 Failure to set this variable will result in a lot of UTF-8 errors.
 
-There are two modifications that you can make to your system to avoid 
-this problem. The first is a system wide solution, the second will only 
-apply to your current user.
+There are two modifications that you can make to your system to avoid this
+problem. The first is a system wide solution, the second will only apply to
+your current user.
 
 The global change is to modify the <tt>/etc/sysconfig/i18n</tt> file and set
-<tt>LANG="en_US"</tt>.  If you want the change to only affect a single user,
+<tt>LANG="en_US"</tt>. If you want the change to only affect a single user,
 you could create a file called <tt>~/.i18n</tt>:
 <tscreen><verb>
 $ echo LANG="en_US" > ~/.i18n
 </verb></tscreen>
-
-<sect1>Checking QTDIR and the PATH. <label id="Checking_that_it_worked">
-<p>Open a new shell and switch to superuser mode.
-<tscreen><verb>
-$ su
-# set
-
-[lots of text]
-QTDIR=/usr/lib/qt3
-PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
-</verb></tscreen>
-You should see QTDIR and <tt>/usr/lib/qt3/bin</tt> in your path.
-
-If you don't, do not proceed past this step until you have resolved this
-error.  You may need to manually specify the QTDIR and PATH at the shell
-prompt before compiling.
-
-Next, we need to make sure that the libraries that we're building will be
-found when we need them.
-
-<sect1>Modifying <tt>/etc/ld.so.conf</tt><label id="modifying_ld.so.conf">
-<p>Execute the following:
-<tscreen><verb>
-$ su -
-# echo /usr/local/lib >> /etc/ld.so.conf
-# /sbin/ldconfig
-# exit
-$ 
-</verb></tscreen>
-
-<code>
-NOTE for Red Hat Linux 8.0 users:  It appears that Red Hat Linux 8.0
-requires that the ldconfig command needs to be run twice. Red Hat will also
-frequently "forget" about the path. It's recommended to run
-/sbin/ldconfig after installing every package. Failing that, always
-run it if you get an unexpected error about not finding libraries.
-</code>
-
 <sect>Downloading and compiling.
 <p>Get MythTV from the <url url="http://www.mythtv.org" name="mythtv.org">
 web site.  Save the tarball to a directory you can find.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
-name="http://xmltv.sourceforge.net">.  Download version 0.5.10
+name="http://xmltv.sourceforge.net">.  Download version 0.5.15 if you're in
+North America.
 
 <code>
 NOTE for Mandrake users:  If you have added a "PLF" mirror, you may skip the
@@ -941,15 +963,12 @@ $ su
 $ 
 </verb></tscreen>
 
-<bf>NOTE</bf>:  Red Hat Linux 8.0 users, make sure that you set your LANG as
-described in <ref id="RH80-LANG" name="Section 4">.
-
 Continuing on:
 
 <label id="untarring_xmltv">Untar the xmltv file:
 <tscreen><verb>
-$ tar -xjf xmltv-0.5.10.tar.bz2
-$ cd xmltv-0.5.10
+$ tar -xjf xmltv-0.5.15.tar.bz2
+$ cd xmltv-0.5.15
 </verb></tscreen>
 Install the xmltv prerequisites:
 
@@ -966,7 +985,7 @@ cpan> exit
 
 Change to the XMLTV directory and compile it:
 <tscreen><verb>
-$ cd xmltv-0.5.10
+$ cd xmltv-0.5.15
 $ perl Makefile.PL
 </verb></tscreen>
 You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
@@ -1081,22 +1100,18 @@ To setup the initial mysql databases:
 $ cd database
 </verb></tscreen>
 <sect2>Mandrake 9.0 and Red Hat Linux
-<p>
-<tscreen><verb>
+<p><tscreen><verb>
 $ mysql -u root < mc.sql
 </verb></tscreen>
 <sect2>Debian 3.0
-<p>
-<tscreen><verb>
+<p><tscreen><verb>
 $ mysql < mc.sql
 </verb></tscreen>
 <sect2>Gentoo
-<p>
-<tscreen><verb>
+<p><tscreen><verb>
 $ su
 # mysql < /usr/share/mythtv/database/mc.sql
 </verb></tscreen>
-
 If you've already got a copy of the database installed and need to update the
 schema, use the <tt>-f</tt> flag to force <bf>mysql</bf> to continue setting
 up the tables even if they already exist.  By default, <bf>mysql</bf> will
@@ -1106,6 +1121,19 @@ stop at the first error.
 Instructions for doing so can be found on MySQL's web site at <url
 url="http://www.mysql.com/doc/en/Security.html"
 name="http://www.mysql.com/doc/en/Security.html">.
+
+<sect1>Upgrading the database
+<p>If you need to upgrade the database, either because you're using the CVS
+version of MythTV, or because you're moving from one release to another,
+you'll need to run the appropriate <bf>mysql</bf> script found in
+the <tt>database/</tt> directory.  Use the same format as above, replacing
+"mc.sql" with the appropriate .sql file:
+
+So, if you're upgrading from MythTV 0.9 to 0.10 on a Mandrake system:
+<tscreen><verb>
+$ cd database
+$ mysql -u root < 0.9-to-0.10.sql
+</verb></tscreen>
 
 <sect2>Modifying access to the MySQL database for multiple systems <label
 id="modify_perm_mysql">
@@ -1139,13 +1167,6 @@ Finally, if you just want to restrict by IP subnet:
 $ mysql -u root mythconverg
 mysql> grant all on mythconverg.* to mythtv@"192.168.1.%" identified by "mythtv";
 </verb></tscreen>
-
-<sect1>Upgrading the database.
-<p>If you are upgrading a database that had been used with a previous
-version of MythTV, there are files which allow you to add the necessary
-updates. In the same directory as "mc.sql", there are files such as
-"0-8-to-0-9.sql" for updating from one release to the next. "cvs.sql"
-contains the changes in the development version since the previous release.
 
 <sect>Setting up ALSA and the mixer.
 <p>If your video doesn't appear to be in-sync with your audio, it could be
@@ -1866,9 +1887,6 @@ See <ref id="advanced_backend_config" name="Advanced Backend
 Configurations"> for information on configuring multiple backend systems in
 various ways.
 
-<bf>NOTE</bf>: Red Hat 8.0 users, if you haven't followed <ref id="RH80-LANG" name="these">
-steps, you <em>must</em> do so before continuing.
-
 Because MythTV now uses a database to store most configuration variables,
 part of the bootstrap of MythTV is to indicate the location of the MySQL
 database server. If the frontend, backend and MySQL database server are all
@@ -2176,11 +2194,10 @@ doing anything, go to TV, then to Setup and configure the frontend client.
 
 <sect1>General
 <p>The General screen has configuration items that don't really fit anywhere
-else.  The first configuration item asks you to indicate the number of
-seconds to record past the end of a program, which is useful if the
+else.  The first few configuration items asks you to indicate the number of
+seconds to record before or after a program, which is useful if the
 broadcast network or your system clock are out of sync and will help prevent
-you missing the end of a program.  Note that MythTV currently does not
-have the ability to start early.
+you missing the beginning or end of a program.  
 
 To change the value, use the left and right arrow keys to increment and
 decrement the number of seconds.  When you're satisfied with the result, use
@@ -2370,7 +2387,62 @@ you're storing your photos.
 <item>Use SPACE or ENTER to advance to the next photo.
 <item>Use ESC to go up one level, or to exit out of the module if you're at the first level.
 <item>Use the &lsqb and &rsqb keys to rotate the image.
+<item>Use M to bring up the setup dialog.
+<item>Use I to import pictures; when a photo is maximized this will bring up
+photo information.
+<item>7 and 9 are used to Zoom Out and in, 2, 4, 6 and 8 are used to move
+around while in zoom mode, 5 centers and 0 exits zoom.
 </itemize>
+
+<sect1>Importing Pictures
+<p>The import path in the setup dialog is a colon separated list of
+directories and/or executable files.  When the import key is pressed, a new
+directory (the destination directory) under the current directory will be
+created and the import path will be searched.  If the item in the import
+path is a directory (the source directory), the contents of that directory
+will be copied to the destination directory. If you would like the source
+directory to be that of a removable device, it might be a good idea to use
+autofs.  See the automount howto at <url url="www.linuxdoc.org"
+name="www.linuxdoc.org"> for info on how to get it working.
+
+If the item in the import path is an executable file, MythGallery will
+attempt to execute it with the destination directory as its sole argument.
+Be careful when using executable scripts that the script runs unattended
+(doesn't need user intervention) and returns properly, otherwise it could
+create the appearance of MythGallery hanging (e.g. running
+<bf>smbclient</bf> and prompting for password).  Also be sure that scripts
+have executable permissions set.
+
+Here is an example script that a user may want to run
+on import: 
+<tscreen><verb>
+#!/bin/csh
+
+if ($#argv == 0) then 
+        echo "Usage: $0 dest_dir" 
+        exit 
+endif 
+
+cd $argv[1]
+
+# get stuff over the network
+wget http://www.somesite.dom/dir/file1.jpg 
+wget http://www.somesite.dom/dir/file2.jpg
+wget http://www.somesite.dom/dir/file3.jpg
+
+# stuff that requires manual module loading and/or fs mounting
+modprobe camera_module
+mount /dev/camera /mnt/camera
+cp /mnt/camera/* $argv[1]
+umount /mnt/camera
+rmmod camera_module
+
+# perform some processing
+foreach pname (`ls *.jpg`)
+        jpegtran -flip vertical $pname > $pname.new
+        mv $pname.new $pname
+end
+</verb></tscreen>
 
 <sect>MythGame.
 
@@ -3891,6 +3963,104 @@ percentage after it has been created using the <bf>tune2fs</bf> program:
 You can check on your filesystem using the <bf>dumpe2fs</bf> program.  See
 the <bf>man</bf> page for details.
 
+<sect1>I'd like to have more flexible disk storage with LVM.
+<!-- Contributed by Martin Smith martin at spamcop.net -->
+<p>LVM greatly increases the flexibility you have in managing your storage
+than traditional physical partitions. This section will provide some brief
+notes on how to use LVM to create storage space for your video files and how
+to add additional disk space in future. There's lots more that can be done
+with LVM, so check the LVM HOWTO <url url="http://tldp.org/HOWTO/lvm-HOWTO/"
+name="http://tldp.org/HOWTO/lvm-HOWTO/"> document for details.
+
+Make sure your kernel configuration includes LVM support or that it's
+available as a module. Today, most vendors include this by default. You'll
+also want to ensure that you have a copy of the LVM utilities; check your
+distribution, or get the latest versions from <url
+url="http://www.sistina.com/products_lvm.htm"
+name="http://www.sistina.com/products_lvm.htm"> and build them manually.
+
+Check that the <bf>vgscan</bf> program is being run at some point during
+your boot sequence - most distributions do this by default. Look for a
+message during boot up that looks like this:
+<tt>vgscan -- reading all physical volumes (this may take a while...)</tt>
+
+LVM uses a few concepts you should be familiar with before starting.
+<itemize>
+<item>PV (Physical Volume).  The actual partition on the hard drive.
+<item>VG (Volume Group).  The aggregation of all the PVs make a VG.
+<item>LV (Logical Volume).  Subdivision of the pool of space available in
+the VG into individual chunks, like /usr, /var/video, etc.
+</itemize>
+
+The following example assumes that you want to create a LVM partition from a
+chunk of space in /dev/hda5, using a reiserfs filesystem and mounted on
+/var/video. You later decide to extend this filesystem by adding a new disk:
+/dev/hdb.
+
+You need to create at least one LVM partition for a physical volume. Use
+<bf>fdisk</bf> or your favorite partition editor to set the type to LVM
+(0x8e). If you're using an entire disk, create one big partition rather than
+using the device itself. e.g. use /dev/hdb1 not /dev/hdb.
+
+<tt># fdisk /dev/hda</tt>
+.... create partition 5, save partition table and reboot if you have to
+
+Create the LVM physical volume from the partitions (repeat if you have
+multiple partitions to use):
+<tscreen><verb>
+# pvcreate /dev/hda5
+</verb></tscreen>
+Create a LVM volume group out of this physical volume called "VGforMyth" that is
+allocated in chunks that are a multiple of 64MB
+<tscreen><verb>
+# vgcreate --name VGforMyth -s 64m /dev/hda5
+</verb></tscreen>
+Create a logical volume of 20GB called "video" and then create the reiserfs
+filesystem and mount it:
+<tscreen><verb>
+# lvcreate --name video --size 20G VGforMyth
+# mkreiserfs /dev/VGforMyth/video
+# mount /dev/VGforMyth/video /var/video
+</verb></tscreen>
+Now create a 5GB volume for mythmusic files if you like:
+<tscreen><verb>
+# lvcreate --name music --size 5G VGforMyth
+# mkreiserfs /dev/VGforMyth/music
+# mount /dev/VGforMyth/music /var/music
+</verb></tscreen>
+Display the volume group status:
+<tt># vgdisplay -v</tt>
+
+Now, lets suppose you want to add a 60GB hard disk to the system as hdb and
+allocate 50GB of it to video storage.
+
+First, create a single partition /dev/hdb1 covering the whole disk and make
+it type 0x8e using your partition editor.
+
+<tt># fdisk /dev/hdb</tt>
+.... create partition, set type, save and reboot if it says you have to
+
+Create the new LVM physical volume:
+
+<tt># pvcreate /dev/hdb1</tt>
+
+Add the new physical volume to the volume group:
+
+<tt># vgextend VGforMyth /dev/hdb1</tt>
+
+Make the logical volume used for video bigger:
+
+<tt># lvextend --size +50G /dev/VGforMyth/video</tt>
+
+Unmount, resize and remount the filesystem (non destructively):
+<tscreen><verb>
+# umount /var/video
+# resize_reiserfs /dev/VGforMyth/video
+# mount /dev/VGforMyth/video /var/video
+</verb></tscreen>
+
+And check that you now have more space in /var/video using <bf>df</bf>.
+
 </article>
 <!-- Revision History
 v2.00, 2003-03-14.  Initial release for 0.8.  Added xset command for
@@ -3997,6 +4167,11 @@ stuff from Cedar, Matt and Jarod.  Reorg of some sections.  Added "PVR-250"
 to the "I'd like to use a hardware MPEG-2 encoder" title.
 v2.51, 2003-07-02.  Fixed MDZ's mplayer patch name and MPlayer version.  Bruce
 Markey's addition for updating the database.  Bumped version numbers to v0.10.
+v2.52, 2003-07-09.  Incorporate Ray Olszewski's modified section 4.  Dennis
+Lou's mythgallery doc update.  Updated XMLTV version.  Martin Smith's LVM
+contribution.  More detailed instructions on upgrading the database from one
+release to another.  Remove the "can't start early" from 10.1.  Put back the
+PDF version.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

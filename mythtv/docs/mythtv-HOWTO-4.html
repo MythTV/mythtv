@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
- <TITLE>Installing and using MythTV: Setting up paths, ldconfig and other shell variables. </TITLE>
+ <TITLE>Installing and using MythTV: System Configuration Requirements for Compiling MythTV </TITLE>
  <LINK HREF="mythtv-HOWTO-5.html" REL=next>
  <LINK HREF="mythtv-HOWTO-3.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc4" REL=contents>
@@ -12,31 +12,115 @@
 <A HREF="mythtv-HOWTO-3.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc4">Contents</A>
 <HR>
-<H2><A NAME="Setting_up_paths"></A> <A NAME="s4">4.</A> <A HREF="mythtv-HOWTO.html#toc4">Setting up paths, ldconfig and other shell variables. </A></H2>
+<H2><A NAME="Setting_up_paths"></A> <A NAME="s4">4.</A> <A HREF="mythtv-HOWTO.html#toc4">System Configuration Requirements for Compiling MythTV </A></H2>
 
-<P>There are modifications that need to be made to your system before you
-start compiling.</P>
-<P><CODE>QTDIR</CODE> needs to be set, and <CODE>/usr/lib/qt3/bin</CODE> must be added
-to your path.  Your distribution may already be making these changes as a part of the
-installation of the software prerequisites detailed earlier.</P>
-<P>Also, check that there has been a link created in
-<CODE>/usr/lib/qt3/mkspecs</CODE> called <CODE>default</CODE>.  If not, you'll get
-errors during the compile.  See the Troubleshooting Section for 
-<A HREF="mythtv-HOWTO-18.html#mkspecs_error">more</A> information.</P>
+<P>Before you compile MythTV from the current source tarball or from CVS, you 
+may need to modify your system configuration in a few ways.</P>
+<P>In general, if you install MythTV from pre-packaged binaries for your Linux
+distribution/version, you don't need to be too concerned about the issues in
+this section of the HOWTO - the install script for the packages should take
+care of them. However, this section is still recommended reading which may
+help if the packager skipped a step in their packaging.</P>
 
-<H2><A NAME="Distribution-specific_information"></A> <A NAME="ss4.1">4.1</A> <A HREF="mythtv-HOWTO.html#toc4.1">Distribution-specific information. </A>
+<H2><A NAME="ss4.1">4.1</A> <A HREF="mythtv-HOWTO.html#toc4.1">Software requirements for compiling MythTV</A>
 </H2>
 
-<H3>Mandrake 9.0</H3>
+<H3>General requirements</H3>
 
-<P>The following instructions work for Mandrake 9.0 and 9.1 using <CODE>bash</CODE> as the
-shell, and may be applicable for a distribution which uses
-<CODE>/etc/profile.d</CODE>.</P>
-<P>As root, create the following file in <CODE>/etc/profile.d</CODE>  The example
-filename is "mythtv.sh".  Use what you feel is appropriate.</P>
-<P>Open a shell, and switch to superuser mode.
-<B>NOTE: ^D</B> means press <B>CTRL</B> and <B>d</B> at the same time.</P>
+<P>MythTV is written in C++ and requires a fairly complete, but standard, 
+compilation environment, including a recent g++ compiler, <CODE>make</CODE>, and 
+appropriate headers files for shared libraries. Any standard Linux 
+distribution should be able to install a suitable compilation environment 
+from its packaging system. Section 3.2 of this HOWTO provides some details 
+of how to install the required environment for many distributions.</P>
+<P>Subsequent sections of this chapter address the few oddities that you may 
+have to adjust by hand before you compile MythTV.</P>
+<P>The reference compilation system for MythTV is Debian.</P>
+
+<H3>Distribution-Specific Notes </H3>
+
+<P>None </P>
+<H2><A NAME="ss4.2">4.2</A> <A HREF="mythtv-HOWTO.html#toc4.2">Shared-Library Requirements for MythTV </A>
+</H2>
+
+<H3><A NAME="modifying_ld.so.conf"></A> Modifying /etc/ld.so.conf </H3>
+
+<P>The runtime manager for shared libraries, <B>/lib/ld.so</B>, gets
+information about the locations and contents of shared libraries from
+<CODE>/etc/ld.so.cache</CODE>, a file created by <B>ldconfig</B> from
+information in <CODE>/etc/ld.so.conf</CODE>.  Because MythTV installs some
+shared libraries in <CODE>/usr/local/lib</CODE>, that directory needs to be
+added to the list of directories for <B>ld.so</B> to search when doing
+runtime linking of programs. You do this, as root, by editing
+<CODE>/etc/ld.so.conf</CODE>, then running <B>ldconfig</B>. There are many
+ways to do this; one that works is to enter this series of commands:</P>
 <P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su -
+# echo /usr/local/lib >> /etc/ld.so.conf
+# /sbin/ldconfig
+# exit
+$
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<H3>Distribution-Specific Notes</H3>
+
+<H3>Red Hat</H3>
+
+<P>It appears that Red Hat Linux 8.0 requires that the <B>ldconfig</B>
+command be run twice. Red Hat will also frequently "forget" about the path.
+It's recommended to run <B>/sbin/ldconfig</B> after installing every
+package. Failing that, always run it if you get an unexpected error about
+not finding libraries.</P>
+<H2><A NAME="ss4.3">4.3</A> <A HREF="mythtv-HOWTO.html#toc4.3">Shell-Alias Requirements for MythTV</A>
+</H2>
+
+<H3>General requirements</H3>
+
+<H3>QT libraries and binaries</H3>
+
+<P>The compiler needs to be able to locate QT binaries and libraries in order 
+to compile MythTV. QTDIR needs to be set and <CODE>/usr/lib/qt3/bin</CODE> must be 
+added to your path. Your distribution may already be making these changes 
+as a part of the installation of the software prerequisites detailed
+earlier.</P>
+<P>One way to do this is as follows: 
+<A NAME="Checking_that_it_worked"></A> </P>
+<P>Open a new shell and switch to superuser mode.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# set
+[lots of text]
+        
+PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
+QTDIR=/usr/lib/qt3
+
+[lots more text]
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>You should see <CODE>QTDIR</CODE> and <CODE>/usr/lib/qt3/bin</CODE> in your path.</P>
+<P>If you don't, do not proceed past this step until you have resolved this
+error. You may need to manually specify the QTDIR and PATH at the shell
+prompt before compiling.</P>
+<P>Also, check that there has been a link created in
+<CODE>/usr/lib/qt3/mkspecs</CODE> called <CODE>default</CODE>. If not, you'll get
+errors during the compile. See the Troubleshooting Section for more
+information.</P>
+<H3>Distribution-Specific Notes</H3>
+
+<H3>Mandrake</H3>
+
+<P>The following instructions work for Mandrake 9.0 and 9.1 using
+<B>bash</B> as the shell, and may be applicable for a distribution which
+uses <CODE>/etc/profile.d</CODE>.</P>
+<P>As root, create the following file in <CODE>/etc/profile.d</CODE> The example
+filename is "mythtv.sh". Use what you feel is appropriate.</P>
+<P>Open a shell, and switch to superuser mode. 
+<B>NOTE</B>: ^D means press CTRL and d at the same time.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
@@ -52,20 +136,20 @@ $ exit
 </PRE>
 </CODE></BLOCKQUOTE>
 
-The last two commands are to exit out of the shell.  This way, when you next
-open a shell your new commands will take effect.</P>
-
-<H3><A NAME="RH80-LANG"></A> Red Hat Linux 8.0 </H3>
+The last two commands are to exit out of the shell. This way, when you next 
+open a shell your new commands
+will take effect.</P>
+<H3>Red Hat</H3>
 
 <P>Red Hat Linux 8.0 uses an unusual character encoding scheme which causes
 problems when running certain programs. As a result, whenever you run setup
 or mythfilldatabase you will have to set a variable to correct this problem.
 Failure to set this variable will result in a lot of UTF-8 errors.</P>
-<P>There are two modifications that you can make to your system to avoid 
-this problem. The first is a system wide solution, the second will only 
-apply to your current user.</P>
+<P>There are two modifications that you can make to your system to avoid this
+problem. The first is a system wide solution, the second will only apply to
+your current user.</P>
 <P>The global change is to modify the <CODE>/etc/sysconfig/i18n</CODE> file and set
-<CODE>LANG="en_US"</CODE>.  If you want the change to only affect a single user,
+<CODE>LANG="en_US"</CODE>. If you want the change to only affect a single user,
 you could create a file called <CODE>~/.i18n</CODE>:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -73,55 +157,6 @@ $ echo LANG="en_US" > ~/.i18n
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-
-<H2><A NAME="Checking_that_it_worked"></A> <A NAME="ss4.2">4.2</A> <A HREF="mythtv-HOWTO.html#toc4.2">Checking QTDIR and the PATH. </A>
-</H2>
-
-<P>Open a new shell and switch to superuser mode.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# set
-
-[lots of text]
-QTDIR=/usr/lib/qt3
-PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
-</PRE>
-</CODE></BLOCKQUOTE>
-
-You should see QTDIR and <CODE>/usr/lib/qt3/bin</CODE> in your path.</P>
-<P>If you don't, do not proceed past this step until you have resolved this
-error.  You may need to manually specify the QTDIR and PATH at the shell
-prompt before compiling.</P>
-<P>Next, we need to make sure that the libraries that we're building will be
-found when we need them.</P>
-
-<H2><A NAME="modifying_ld.so.conf"></A> <A NAME="ss4.3">4.3</A> <A HREF="mythtv-HOWTO.html#toc4.3">Modifying <CODE>/etc/ld.so.conf</CODE></A>
-</H2>
-
-<P>Execute the following:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su -
-# echo /usr/local/lib >> /etc/ld.so.conf
-# /sbin/ldconfig
-# exit
-$ 
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>
-<HR>
-<PRE>
-NOTE for Red Hat Linux 8.0 users:  It appears that Red Hat Linux 8.0
-requires that the ldconfig command needs to be run twice. Red Hat will also
-frequently "forget" about the path. It's recommended to run
-/sbin/ldconfig after installing every package. Failing that, always
-run it if you get an unexpected error about not finding libraries.
-</PRE>
-<HR>
-</P>
-
 <HR>
 <A HREF="mythtv-HOWTO-5.html">Next</A>
 <A HREF="mythtv-HOWTO-3.html">Previous</A>
