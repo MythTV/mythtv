@@ -597,7 +597,7 @@ class SRMaxNewest: public SRBoolSetting
 {
     public:
         SRMaxNewest(ScheduledRecording& _parent, ManagedListGroup* _group, ManagedList* _list)
-                   : SRBoolSetting(_parent, QObject::tr("Delete oldest if this would exceede the max episodes"),
+                   : SRBoolSetting(_parent, QObject::tr("Delete oldest if this would exceed the max episodes"),
                                    QObject::tr("Don't record if this would exceed the max episodes"),
                                    "maxnewestItem", "maxnewest", _group, _list )
         {
