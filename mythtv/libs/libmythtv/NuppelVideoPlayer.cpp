@@ -2169,7 +2169,7 @@ void NuppelVideoPlayer::UpdateTimeDisplay(void)
         hours, mins, secs, frames);
 
     char framestr[128];
-    sprintf(framestr, "%11d", framesPlayed);
+    sprintf(framestr, "%lld", framesPlayed);
 
     QString cutmarker = "";
     if (IsInDelete(framesPlayed))
