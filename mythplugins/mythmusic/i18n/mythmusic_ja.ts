@@ -130,7 +130,7 @@
     </message>
     <message>
         <source>Artist:<byte value="x9"/></source>
-        <translation>アーチスト:</translation>
+        <translation>アーチスト: </translation>
     </message>
     <message>
         <source>Album:<byte value="x9"/></source>
@@ -142,7 +142,7 @@
     </message>
     <message>
         <source>Length:<byte value="x9"/></source>
-        <translation>時間:</translation>
+        <translation type="unfinished">時間:</translation>
     </message>
     <message>
         <source>Genre: </source>
@@ -150,66 +150,66 @@
     </message>
     <message>
         <source>Compilation Artist:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>編集アーチスト:</translation>
     </message>
 </context>
 <context>
     <name>EditMetadataDialog</name>
     <message>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>終了</translation>
     </message>
     <message>
         <source>DB Statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>DB統計</translation>
     </message>
     <message>
         <source>Various Artists</source>
-        <translation type="unfinished">各種アーティスト</translation>
+        <translation>様々なアーティスト</translation>
     </message>
     <message>
         <source>Select an Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>アーチストを選択</translation>
     </message>
     <message>
         <source>Select a Compilation Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>編集アーチストを選択</translation>
     </message>
     <message>
         <source>Select an Album</source>
-        <translation type="unfinished"></translation>
+        <translation>アルバムを選択</translation>
     </message>
     <message>
         <source>Select a Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>ジャンルを選択</translation>
     </message>
     <message>
         <source>Save Changes?</source>
-        <translation type="unfinished"></translation>
+        <translation>変更を保存しますか?</translation>
     </message>
     <message>
         <source>Save to Database Only</source>
-        <translation type="unfinished"></translation>
+        <translation>データベースのみ保存</translation>
     </message>
     <message>
         <source>Save to File Only</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルにのみ保存</translation>
     </message>
     <message>
         <source>Save to File and Database</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルとデータベースに保存</translation>
     </message>
     <message>
         <source>Exit/Do Not Save</source>
-        <translation type="unfinished"></translation>
+        <translation>保存しないで終了</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <source>Are you sure you want to save the modified metadata to the file?</source>
-        <translation type="unfinished"></translation>
+        <translation>変更をファイルに保存してよろしいですか?</translation>
     </message>
 </context>
 <context>
@@ -347,135 +347,135 @@
     <name>PlaybackBoxMusic</name>
     <message>
         <source>Edit Playlist</source>
-        <translation type="unfinished">プレイリスト編集</translation>
+        <translation>プレイリスト編集</translation>
     </message>
     <message>
         <source>Visualize</source>
-        <translation type="unfinished">ビジュアライズ</translation>
+        <translation>ビジュアライズ</translation>
     </message>
     <message>
         <source>3 Edit Playlist</source>
-        <translation type="unfinished">3 プレイリスト編集</translation>
+        <translation>3 プレイリスト編集</translation>
     </message>
     <message>
         <source>4 Visualize</source>
-        <translation type="unfinished">4 ビジュアライズ</translation>
+        <translation>4 ビジュアライズ</translation>
     </message>
     <message>
         <source>1 Shuffle: Smart</source>
-        <translation type="unfinished">1 シャッフル: スマート</translation>
+        <translation>1 シャッフル: スマート</translation>
     </message>
     <message>
         <source>Shuffle: Smart</source>
-        <translation type="unfinished">シャッフル: スマート</translation>
+        <translation>シャッフル: スマート</translation>
     </message>
     <message>
         <source>1 Shuffle: Rand</source>
-        <translation type="unfinished">1 シャッフル: ランダム</translation>
+        <translation>1 シャッフル: ランダム</translation>
     </message>
     <message>
         <source>Shuffle: Rand</source>
-        <translation type="unfinished">シャッフル: ランダム</translation>
+        <translation>シャッフル: ランダム</translation>
     </message>
     <message>
         <source>1 Shuffle: None</source>
-        <translation type="unfinished">1 シャッフル: 無し</translation>
+        <translation>1 シャッフル: 無し</translation>
     </message>
     <message>
         <source>Shuffle: None</source>
-        <translation type="unfinished">シャッフル: 無し</translation>
+        <translation>シャッフル: 無し</translation>
     </message>
     <message>
         <source>2 Repeat: All</source>
-        <translation type="unfinished">2 リピート: 全て</translation>
+        <translation>2 リピート: 全て</translation>
     </message>
     <message>
         <source>Repeat: All</source>
-        <translation type="unfinished">リピート: 全て</translation>
+        <translation>リピート: 全て</translation>
     </message>
     <message>
         <source>2 Repeat: Track</source>
-        <translation type="unfinished">2 リピート: トラック</translation>
+        <translation>2 リピート: トラック</translation>
     </message>
     <message>
         <source>Repeat: Track</source>
-        <translation type="unfinished">リピート: トラック</translation>
+        <translation>リピート: トラック</translation>
     </message>
     <message>
         <source>2 Repeat: None</source>
-        <translation type="unfinished">2 リピート: 無し</translation>
+        <translation>2 リピート: 無し</translation>
     </message>
     <message>
         <source>Repeat: None</source>
-        <translation type="unfinished">リピート: 無し</translation>
+        <translation>リピート: 無し</translation>
     </message>
     <message>
         <source>playlist root</source>
-        <translation type="unfinished">プレイリストルート</translation>
+        <translation>プレイリストルート</translation>
     </message>
     <message>
         <source>Playing stream.</source>
-        <translation type="unfinished">再生ストリーム.</translation>
+        <translation>再生ストリーム.</translation>
     </message>
     <message>
         <source>Buffering stream.</source>
-        <translation type="unfinished">バッファーストリーム.</translation>
+        <translation>バッファーストリーム.</translation>
     </message>
     <message>
         <source>Output error.</source>
-        <translation type="unfinished">出力エラー.</translation>
+        <translation>出力エラー.</translation>
     </message>
     <message>
         <source>Finished playing stream.</source>
-        <translation type="unfinished">再生ストリーム終了.</translation>
+        <translation>再生ストリーム終了.</translation>
     </message>
     <message>
         <source>Stream paused.</source>
-        <translation type="unfinished"></translation>
+        <translation>ストリーム一時停止中.</translation>
     </message>
     <message>
         <source>kbps</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>kHz</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>ch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Stream stopped.</source>
-        <translation type="unfinished"></translation>
+        <translation>ストリーム停止中.</translation>
     </message>
     <message>
         <source>Decoder error.</source>
-        <translation type="unfinished"></translation>
+        <translation>デコーダーエラー.</translation>
     </message>
     <message>
         <source>Smart playlists</source>
-        <translation type="unfinished"></translation>
+        <translation>スマートプレイリスト</translation>
     </message>
     <message>
         <source>All Tracks</source>
-        <translation type="unfinished"></translation>
+        <translation>全てのトラック</translation>
     </message>
     <message>
         <source>Tracks by current Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>このアーチストのトラック</translation>
     </message>
     <message>
         <source>Tracks from current Album</source>
-        <translation type="unfinished"></translation>
+        <translation>このアルバムのトラック</translation>
     </message>
     <message>
         <source>Tracks from current Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>このジャンルのトラック</translation>
     </message>
     <message>
         <source>Tracks from current Year</source>
-        <translation type="unfinished"></translation>
+        <translation>この年のトラック</translation>
     </message>
 </context>
 <context>
@@ -1062,7 +1062,7 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>CD: %1 ~ %2 - %3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1121,274 +1121,270 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>Multi-Artist?</source>
-        <translation type="unfinished"></translation>
+        <translation>複数のアーチスト?</translation>
     </message>
     <message>
         <source>Switch Titles &amp;&amp; Artists</source>
-        <translation type="unfinished"></translation>
+        <translation>タイトルとアーチストを交換</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished">タイトル</translation>
+        <translation>タイトル</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation type="unfinished">アーティスト</translation>
+        <translation>アーティスト</translation>
     </message>
     <message>
         <source>Length</source>
-        <translation type="unfinished">長さ</translation>
+        <translation>時間</translation>
     </message>
 </context>
 <context>
     <name>SmartPLCriteriaRow</name>
     <message>
         <source>Select an Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>アーチストを選択</translation>
     </message>
     <message>
         <source>Select an Album</source>
-        <translation type="unfinished"></translation>
+        <translation>アルバムを選択</translation>
     </message>
     <message>
         <source>Select a Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>ジャンルを選択</translation>
     </message>
     <message>
         <source>Select a Title</source>
-        <translation type="unfinished"></translation>
+        <translation>タイトルを選択</translation>
     </message>
 </context>
 <context>
     <name>SmartPLOrderByDialog</name>
     <message>
         <source>Order By Fields</source>
-        <translation type="unfinished"></translation>
+        <translation>フィールド順</translation>
     </message>
     <message>
         <source>1 Add</source>
-        <translation type="unfinished"></translation>
+        <translation>1 追加</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>追加</translation>
     </message>
     <message>
         <source>2 Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>2 削除</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>削除</translation>
     </message>
     <message>
         <source>3 Move Up</source>
-        <translation type="unfinished"></translation>
+        <translation>3 上に移動</translation>
     </message>
     <message>
         <source>Move Up</source>
-        <translation type="unfinished"></translation>
+        <translation>上に移動</translation>
     </message>
     <message>
         <source>4 Move Down</source>
-        <translation type="unfinished"></translation>
+        <translation>4 下に移動</translation>
     </message>
     <message>
         <source>Move Down</source>
-        <translation type="unfinished"></translation>
+        <translation>下に移動</translation>
     </message>
     <message>
         <source>5 Ascending</source>
-        <translation type="unfinished"></translation>
+        <translation>5 昇順</translation>
     </message>
     <message>
         <source>Ascending</source>
-        <translation type="unfinished"></translation>
+        <translation>昇順</translation>
     </message>
     <message>
         <source>6 Descending</source>
-        <translation type="unfinished"></translation>
+        <translation>6 降順</translation>
     </message>
     <message>
         <source>Descending</source>
-        <translation type="unfinished"></translation>
+        <translation>昇順</translation>
     </message>
     <message>
         <source>7 OK</source>
-        <translation type="unfinished"></translation>
+        <translation>7 決定</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>決定</translation>
     </message>
 </context>
 <context>
     <name>SmartPLResultViewer</name>
     <message>
         <source>Smart Playlist Result Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>スマートプレイリストビューワー</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>編集</translation>
     </message>
     <message>
         <source>ID</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation type="unfinished">アーティスト</translation>
+        <translation>アーティスト</translation>
     </message>
     <message>
         <source>Album</source>
-        <translation type="unfinished"></translation>
+        <translation>アルバム</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished">タイトル</translation>
+        <translation>タイトル</translation>
     </message>
     <message>
         <source>Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>ジャンル</translation>
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>年</translation>
     </message>
     <message>
         <source>Track No.</source>
-        <translation type="unfinished"></translation>
+        <translation>トラックNo.</translation>
     </message>
 </context>
 <context>
     <name>SmartPlaylistDialog</name>
     <message>
         <source>Smart Playlists</source>
-        <translation type="unfinished"></translation>
+        <translation>スマートプレイリスト</translation>
     </message>
     <message>
         <source>1 Select</source>
-        <translation type="unfinished"></translation>
+        <translation>1 選択</translation>
     </message>
     <message>
         <source>Select</source>
-        <translation type="unfinished"></translation>
+        <translation>選択</translation>
     </message>
     <message>
         <source>2 New</source>
-        <translation type="unfinished"></translation>
+        <translation>2 新規</translation>
     </message>
     <message>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>新規</translation>
     </message>
     <message>
         <source>3 Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>3 編集</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>編集</translation>
     </message>
     <message>
         <source>4 Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>4 削除</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>削除</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this SmartPlaylist?</source>
-        <translation type="unfinished"></translation>
+        <translation>このスマートプレイリストを削除してよろしいですか?</translation>
     </message>
 </context>
 <context>
     <name>SmartPlaylistEditor</name>
     <message>
         <source>Smart Playlist Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>スマートプレイリスト編集</translation>
     </message>
     <message>
         <source>Category:</source>
-        <translation type="unfinished"></translation>
+        <translation>カテゴリー:</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished">タイトル:</translation>
+        <translation>タイトル:</translation>
     </message>
     <message>
         <source>Match</source>
-        <translation type="unfinished"></translation>
+        <translation>検索方法</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>全て</translation>
     </message>
     <message>
         <source>Any</source>
-        <translation type="unfinished"></translation>
+        <translation>どれか</translation>
     </message>
     <message>
         <source>Of The Following Conditions</source>
-        <translation type="unfinished"></translation>
+        <translation>下の条件に一致</translation>
     </message>
     <message>
         <source>Order By:</source>
-        <translation type="unfinished"></translation>
+        <translation>並び順:</translation>
     </message>
     <message>
         <source>Matches:</source>
-        <translation type="unfinished"></translation>
+        <translation>一致結果:</translation>
     </message>
     <message>
         <source>Limit:</source>
-        <translation type="unfinished"></translation>
+        <translation>リミット:</translation>
     </message>
     <message>
         <source></source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>保存</translation>
     </message>
     <message>
         <source>Show Results</source>
-        <translation type="unfinished"></translation>
+        <translation>結果を表示する</translation>
     </message>
     <message>
         <source>Smart Playlist Categories</source>
-        <translation type="unfinished"></translation>
+        <translation>スマートプレイリストのカテゴリー</translation>
     </message>
     <message>
         <source>New Category</source>
-        <translation type="unfinished"></translation>
+        <translation>新しいカテゴリー</translation>
     </message>
     <message>
         <source>Delete Category</source>
-        <translation type="unfinished"></translation>
+        <translation>カテゴリーを削除</translation>
     </message>
     <message>
         <source>Rename Category</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source> </source>
-        <translation type="unfinished"></translation>
+        <translation>カテゴリーの名前を変更</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this Category?</source>
-        <translation type="unfinished"></translation>
+        <translation>このカテゴリーを削除してよろしいですか?</translation>
     </message>
     <message>
         <source>It will also delete any Smart Playlists belonging to this category.</source>
-        <translation type="unfinished"></translation>
+        <translation>関連するスマートプレイリストも削除されます。</translation>
     </message>
 </context>
 <context>
@@ -1439,7 +1435,7 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>Compilation:</source>
-        <translation type="unfinished"></translation>
+        <translation>編集:</translation>
     </message>
     <message>
         <source>Filename:</source>
