@@ -379,7 +379,7 @@ void NuppelVideoPlayer::InitVideo(void)
             MythMainWindow *window = gContext->GetMainWindow();
             assert(window);
 
-            QObject *playbackwin = window->child("tv playback");
+            QObject *playbackwin = window->child("video playback window");
 
             QWidget *widget = (QWidget *)playbackwin;
 
