@@ -177,22 +177,36 @@ bool Channel::SetChannel(int i)
             }
         }
     }
+
     return false;
 }
 
 bool Channel::ChannelUp(void)
 {
     bool finished = false;
+    int chancount = 0;
+    int startchannel = curchannel;
 
     while (!finished)
     {
         curchannel++;
+        chancount++;
 
         if (curchannel == totalChannels)
             curchannel = 0;
 
         finished = SetChannel(curchannel);
+
+        if (chancount > totalChannels)
+        {
+            cerr << "Error, couldn't find any available channels.\n";
+            cerr << "Your database is most likely setup incorrectly.\n";
+            break;
+        }
     }
+
+    if (!finished)
+        curchannel = startchannel;
 
     return finished;
 }
@@ -200,15 +214,29 @@ bool Channel::ChannelUp(void)
 bool Channel::ChannelDown(void)
 {
     bool finished = false;
+    int chancount = 0;
+    int startchannel = curchannel;
+
     while (!finished)
     {
         curchannel--;
+        chancount++;
 
         if (curchannel < 0)
             curchannel = totalChannels - 1;
 
         finished = SetChannel(curchannel);
+
+        if (chancount > totalChannels)
+        {
+            cerr << "Error, couldn't find any available channels.\n";
+            cerr << "Your database is most likely setup incorrectly.\n";
+            break;
+        }
     }
+
+    if (!finished)
+        curchannel = startchannel;
 
     return finished;
 }
