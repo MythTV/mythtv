@@ -585,10 +585,14 @@ void TVRec::SetChannel(bool needopen)
         chanstr = query.value(0).toString();
         inputname = query.value(1).toString();
     } else {
-        cout << "Channel query failed: " << thequery << endl;
+        MythContext::DBError("SetChannel", query);
     }
 
     pthread_mutex_unlock(&db_lock);
+
+    cout << "SetChannel:\n"
+         << inputname << endl
+         << chanstr << endl;
 
     channel->SwitchToInput(inputname);
     channel->SetChannelByString(chanstr);
@@ -798,7 +802,9 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
     int testnum = 0;
 
     QString test;
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (!query.isActive())
+        MythContext::DBError("getdevices", query);
+    else if (query.numRowsAffected() > 0)
     {
         query.next();
 
@@ -849,7 +855,9 @@ bool TVRec::CheckChannel(Channel *chan, const QString &channum, int &finetuning)
 
     QSqlQuery query = db_conn->exec(thequery);
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (!query.isActive())
+        MythContext::DBError("checkchannel", query);
+    else if (query.numRowsAffected() > 0)
     {
         query.next();
 
@@ -898,7 +906,9 @@ QString TVRec::GetNextChannel(Channel *chan, bool direction)
 
     QString id = QString::null;
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (!query.isActive())
+        MythContext::DBError("getnextchannel", query);
+    else if (query.numRowsAffected() > 0)
     {
         query.next();
 
@@ -932,7 +942,9 @@ QString TVRec::GetNextChannel(Channel *chan, bool direction)
 
     query = db_conn->exec(thequery);
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (!query.isActive())
+        MythContext::DBError("getnextchannel", query);
+    else if (query.numRowsAffected() > 0)
     {
         query.next();
 
@@ -958,7 +970,9 @@ QString TVRec::GetNextChannel(Channel *chan, bool direction)
 
         query = db_conn->exec(thequery);
  
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (!query.isActive())
+            MythContext::DBError("getnextchannel", query);
+        else if (query.numRowsAffected() > 0)
         { 
             query.next();
 
@@ -989,7 +1003,9 @@ bool TVRec::ChangeExternalChannel(const QString& channum)
     pthread_mutex_lock(&db_lock);
 
     QSqlQuery result = db_conn->exec(query);
-    if (result.isActive() && result.numRowsAffected()) {
+    if (!result.isActive())
+        MythContext::DBError("changeexternalchannel", result);
+    else if (result.numRowsAffected()) {
         result.next();
         command = QString("%1 %2")
             .arg(result.value(0).toString())
