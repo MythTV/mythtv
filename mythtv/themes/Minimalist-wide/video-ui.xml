@@ -523,12 +523,12 @@
         <container name="background">
             <image name="filler" draworder="0" fleximage="yes">
                 <filename>playback_box/pbb_back.png</filename>
-                <position>0,20</position>
+                <position>0,3</position>
             </image>
-            <image name="titlelines" draworder="0" fleximage="no">
+<!--            <image name="titlelines" draworder="0" fleximage="no">
                 <filename>shared/trans-titles.png</filename>
                 <position>0,10</position>
-            </image>
+            </image>-->
             <!--<image name="morefiller" draworder="0" fleximage="no">
                 <filename>mv_other_background.png</filename>
                 <position>0,300</position>
@@ -536,23 +536,27 @@
         </container>
 
         <container name="videoselector">
-            <area>0,10,800,310</area>
+            <area>0,0,1280,413</area>
+            <image name="titlelines" draworder="3" fleximage="no">
+              <filename>shared/trans-titles.png</filename>
+              <position>-1,1</position>
+            </image>
             <managedtreelist name="videotreelist" draworder="4" bins="2">
-                <area>40,10,720,270</area>
+                <area>20,20,1240,413</area>
                 <image function="selectionbar" filename="shared/long_bar.png" location="-18,-5" padding="17" fleximage="no"></image>
                 <image function="uparrow" filename="shared/up_arrow.png" ></image>
                 <image function="downarrow" filename="shared/down_arrow.png"></image>
                 <image function="leftarrow" filename="leftarrow.png"></image>
                 <image function="rightarrow" filename="rightarrow.png"></image>
                 <bin number="1">
-                    <area>30,16,190,250</area>
+                    <area>0,0,310,410</area>
                     <fcnfont name="list-active" function="active"></fcnfont>
                     <fcnfont name="list-inactive" function="inactive"></fcnfont>
                     <fcnfont name="list-selected" function="selected"></fcnfont>
                     <fcnfont name="list-selectable" function="selectable"></fcnfont>
                 </bin>
                 <bin number="2">
-                    <area>235,10,535,270</area>
+                    <area>335,10,900,410</area>
                     <fcnfont name="list-active" function="active"></fcnfont>
                     <fcnfont name="list-selected" function="selected"></fcnfont>
                     <fcnfont name="list-inactive" function="inactive"></fcnfont>
@@ -568,51 +572,47 @@
         </container>
 
         <container name="videoinfo">
-            <area>0,301,800,300</area>
+            <area>0,440,1280,300</area>
             <textarea name="video_title" draworder="4">
-                <area>50,20,530,60</area>
+                <area>40,0,580,44</area>
                 <font>title</font>
             </textarea>
-            <textarea name="file_label" draworder="4" align="right">
-                <area>30,73,90,40</area>
-                <font>info</font>
-                <value>File:</value>
-            </textarea>
             <textarea name="player_label" draworder="4" align="right">
-                <area>30,106,90,40</area>
+                <area>25,55,90,40</area>
                 <font>info</font>
                 <value>Player:</value>
             </textarea>
             <textarea name="plot" draworder="4">
-              <area>30,146,570,145</area>
+              <area>25,105,1000,145</area>
               <font>metadata</font>
               <multiline>yes</multiline>
             </textarea>
 
             <textarea name="video_file" draworder="4">
-                <area>130,73,380,40</area>
-                <font>metadata</font>
+                <area>863,15,360,40</area>
+                <font>small-info</font>
             </textarea>
             <textarea name="video_player" draworder="4">
-                <area>130,106,570,40</area>
+                <area>130,55,770,40</area>
                 <font>metadata</font>
             </textarea>
             <image name="video_poster" draworder="1" fleximage="no">
-                <position>605,20</position>
-                <staticsize>166,235</staticsize>
+<!--                 <area>1048,495,174,174</area> -->
+                <position>1048,55</position>
+                <staticsize>166,215</staticsize>
             </image>
             <textarea name="help" draworder="4" align="left">
-                <area>30,267,360,40</area>
+                <area>30,237,465,40</area>
                 <font>help</font>
                 <value>MENU - Options    INFO - Action Menu</value>
             </textarea>
-            <textarea name="pl_label" draworder="4" align="right">
-                <area>512,267,260,40</area>
+            <textarea name="pl_label" draworder="4" align="left">
+                <area>672,237,360,40</area>
                 <font>info</font>
                 <value>Current Parental Level: </value>
             </textarea>
             <textarea name="pl_value" draworder="4">
-                <area>770,267,20,40</area>
+                <area>970,237,20,40</area>
                 <font>info</font>
                 <value>1</value>
             </textarea>
