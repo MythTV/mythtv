@@ -10,7 +10,7 @@ using namespace std;
 #include <mythtv/settings.h>
 
 Settings *globalsettings;
-char theprefix[] = "/usr/local";
+char theprefix[] = PREFIX;
 
 int main(int argc, char *argv[])
 {

@@ -22,7 +22,7 @@ using namespace std;
 
 Settings *globalsettings;
 
-char theprefix[] = "/usr/local";
+char theprefix[] = PREFIX;
 
 void CheckFreeDBServerFile(void)
 {

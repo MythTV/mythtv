@@ -14,7 +14,7 @@ using namespace std;
 #include <mythtv/settings.h>
 
 Settings *globalsettings;
-char theprefix[] = "/usr/local";
+char theprefix[] = PREFIX;
 
 void startDatabaseTree(QSqlDatabase *db, QString &paths,
                        QValueList<RomInfo> *romlist)
