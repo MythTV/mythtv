@@ -23,6 +23,7 @@ DecoderBase::DecoderBase(NuppelVideoPlayer *parent, MythSqlDatabase *db,
 
     framesRead = 0;
     framesPlayed = 0;
+    lastKey = 0;
 
     hasKeyFrameAdjustTable = false;
     hasFullPositionMap = false;
@@ -30,6 +31,14 @@ DecoderBase::DecoderBase(NuppelVideoPlayer *parent, MythSqlDatabase *db,
     posmapStarted = false;
 
     keyframedist = -1;
+
+    current_aspect = 1.33333;
+    current_width = 640;
+    current_height = 480;
+    fps = 29.97;
+
+    getrawframes = false;
+    getrawvideo = false; 
 }
 
 void DecoderBase::Reset(void)
