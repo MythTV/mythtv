@@ -45,7 +45,7 @@ struct GenericData
 void runMenu(QString, const QString &, QSqlDatabase *, QString);
 void VideoCallback(void *, QString &);
 void SearchDir(QSqlDatabase *, QString &);
-void BuildFileList(QString &, VideoLoadedMap &);
+void BuildFileList(QString &, VideoLoadedMap &, QStringList &);
 
 extern "C" {
 int mythplugin_init(const char *libversion);
@@ -183,7 +183,8 @@ void SearchDir(QSqlDatabase *db, QString &directory)
     VideoLoadedMap video_files;
     VideoLoadedMap::Iterator iter;
 
-    BuildFileList(directory, video_files);
+    QStringList imageExtensions = QImage::inputFormatList();
+    BuildFileList(directory, video_files, imageExtensions);
 
     QSqlQuery query("SELECT filename FROM videometadata;", db);
 
@@ -249,7 +250,8 @@ void SearchDir(QSqlDatabase *db, QString &directory)
     delete file_checking;
 }
 
-void BuildFileList(QString &directory, VideoLoadedMap &video_files)
+void BuildFileList(QString &directory, VideoLoadedMap &video_files,
+                   QStringList &imageExtensions)
 {
     QDir d(directory);
 
@@ -262,16 +264,25 @@ void BuildFileList(QString &directory, VideoLoadedMap &video_files)
 
     QFileInfoListIterator it(*list);
     QFileInfo *fi;
+    QRegExp r;
 
     while ((fi = it.current()) != 0)
     {
         ++it;
-        if (fi->fileName() == "." || fi->fileName() == "..")
+        if (fi->fileName() == "." || fi->fileName() == ".." ||
+            fi->fileName() == "Thumbs.db")
             continue;
         QString filename = fi->absFilePath();
         if (fi->isDir())
-            BuildFileList(filename, video_files);
+            BuildFileList(filename, video_files, imageExtensions);
         else
-            video_files[filename] = kFileSystem;
+        {
+            r.setPattern("^" + fi->extension() + "$");
+            r.setCaseSensitive(false);
+            QStringList result = imageExtensions.grep(r);
+
+            if (result.isEmpty())
+                video_files[filename] = kFileSystem;
+        }
     }
 }

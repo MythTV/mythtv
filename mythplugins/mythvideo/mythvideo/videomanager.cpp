@@ -282,6 +282,25 @@ void VideoManager::updateBackground(void)
 
 QString VideoManager::GetMoviePoster(QString movieNum)
 {
+    QString movieFile = curitem->Filename();
+    QStringList images = QImage::inputFormatList();
+
+    movieFile = movieFile.left(movieFile.findRev("."));
+
+    QStringList::Iterator an_image_item = images.begin();
+    for (; an_image_item != images.end(); ++an_image_item)
+    {
+        QString an_image = *an_image_item;
+        QString coverFile = movieFile + "." + an_image.lower();
+
+        QFile checkFile(coverFile);
+
+        if (checkFile.exists())
+        {
+            return coverFile;
+        }
+    }
+
     QString host = "www.imdb.com";
 
     QUrl url("http://" + host + "/Posters?" + movieNum
