@@ -308,6 +308,7 @@ OSDTypeImage::OSDTypeImage(const QString &name, const QString &filename,
 
     m_yuv = m_alpha = NULL;
     m_isvalid = false;
+    m_imagesize = QRect(0, 0, 0, 0);
 
     LoadImage(filename, wmult, hmult, scalew, scaleh);
 }
@@ -368,9 +369,9 @@ void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
         m_alpha = NULL;
     }
 
-    QImage tmpimage(filename);
-   
-    if (tmpimage.width() == 0 || tmpimage.height() == 0)
+    QImage tmpimage;
+
+    if (!tmpimage.load(filename))
         return;
 
     float mult = wmult;
