@@ -434,7 +434,9 @@ install this package using the command line do
 
 <tscreen><verb>
 $ up2date --solvedeps qt-MySQL
-</verb></tscreen><label id="RH_XFree86-devel">
+</verb></tscreen>
+
+<label id="RH_XFree86-devel">
 <bf>NOTE</bf>:  ensure that the correct symlinks have been created for the
 XFree-86 development libraries:
 
@@ -2462,7 +2464,7 @@ Enter Key            Switch between Celsius and Fahrenheit. Can also
                      be used a way to force a data update.
 "m" Key              Resets the location to the database default, then updates the data.
 "i"                  Enter / Save settings
-ESC                  Exit the settings scree#)00thout saving / Exit the program
+ESC                  Exit the settings screen without saving / Exit the program
 </verb></tscreen>
 
 MythWeather also has an "Aggressiveness" setting.  This affects how long
@@ -2547,6 +2549,9 @@ program to check and enable DMA.
 # hdparm -d /dev/hd?
 </verb></tscreen> will tell you the DMA status for your hard drives.  If you run
 <bf>hdparm</bf> with the <tt>-d1</tt> parameter, it will turn DMA on.
+
+<!-- Next section adopted from a post by Dwaine Garden
+dwainegarden@rogers.com to the mailing list. -->
 
 You may also setup your PC to do this at boot time, either by adding the
 command to your <tt>/etc/rc.local</tt> file, or by adding files to
