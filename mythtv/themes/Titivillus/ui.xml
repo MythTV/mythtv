@@ -72,8 +72,8 @@
       </image>
     </container>
 
-    <container name="date_info">
-      <area>20,176,115,25</area>
+     <container name="date_info">
+      <area>20,185,115,25</area>
       <textarea name="date" draworder="4" align="center">
          <font>info</font>
          <area>0,0,115,25</area>
@@ -82,7 +82,7 @@
     </container>
 
     <container name="chanbar">
-      <area>20,206,123,386</area>
+      <area>30,208,123,374</area>
       <bar name="chans" draworder="4">
         <area>0,0,123,386</area>
         <textoffset>38,0</textoffset>
@@ -96,7 +96,7 @@
     </container>
 
     <container name="timebar">
-      <area>142,175,640,31</area>
+      <area>155,182,640,31</area>
       <bar name="times" draworder="4">
         <area>0,0,640,31</area>
         <align>allcenter</align>
@@ -106,7 +106,7 @@
     </container>
 
     <container name="guide">
-      <area>143,206,645,386</area>
+      <area>155,210,645,374</area>
       <guidegrid name="guidegrid" draworder="4">
         <area>0,0,645,386</area>
         <solidcolor>#003256</solidcolor>
@@ -287,16 +287,17 @@
     </container>
 
     <container name="current_info">
-      <area>665,12,120,25</area>
-      <textarea name="time" draworder="4" align="right">
-        <area>0,0,120,25</area>
+      <area>660,20,120,30</area>
+      <textarea name="time" draworder="4" align="allcenter">
+        <area>0,0,120,32</area>
         <cutdown>no</cutdown>
         <font>info</font>
       </textarea>
     </container>
 
+
     <container name="program_info">
-      <area>20,10,765,151</area>
+      <area>20,12,760,151</area>
       <textarea name="title" draworder="4" align="left">
         <area>4,10,590,60</area>
         <font>title</font>
@@ -313,7 +314,7 @@
         <value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
       </textarea>
       <textarea name="recordingstatus" draworder="6" align="right">
-        <area>375,122,390,30</area>
+        <area>380,40,380,30</area>
         <font>recstatus</font>
       </textarea>
 
@@ -393,13 +394,13 @@
       </image>
     </container>
 
-    <container name="current_video">
-      <area>546,21,236,176</area>
+<container name="current_video">
+      <area>540,20,240,180</area>
     </container>
 
     <container name="date_info">
-      <area>30,288,60,25</area>
-      <textarea name="date" draworder="4" align="right">
+      <area>20,296,115,25</area>
+         <textarea name="date" draworder="4" align="right">
          <font>info</font>
          <area>0,0,60,25</area>
          <cutdown>no</cutdown>
@@ -407,9 +408,9 @@
     </container>
 
     <container name="chanbar">
-      <area>20,318,123,266</area>
+      <area>20,320,123,259</area>
       <bar name="chans" draworder="4">
-        <area>0,0,123,266</area>
+        <area>0,0,120,266</area>
         <textoffset>38,0</textoffset>
         <iconoffset>3,10</iconoffset>
         <iconsize>30,30</iconsize>
@@ -421,9 +422,9 @@
     </container>
 
     <container name="timebar">
-      <area>142,288,640,31</area>
+      <area>142,295,638,31</area>
       <bar name="times" draworder="4">
-        <area>0,0,640,31</area>
+        <area>0,0,638,31</area>
         <align>allcenter</align>
         <imagefile>guide/gg-times.png</imagefile>
         <font>descinfo2</font>
@@ -431,9 +432,9 @@
     </container>
 
     <container name="guide">
-      <area>143,319,645,266</area>
+      <area>138,319,648,266</area>
       <guidegrid name="guidegrid" draworder="4">
-        <area>0,0,645,266</area>
+        <area>0,0,648,266</area>
         <solidcolor>#003256</solidcolor>
         <selector type="box" color="#ffff33"></selector>
         <recordingcolor>#00aa00</recordingcolor>
@@ -620,7 +621,7 @@
         <font>info</font>
       </textarea>
       <textarea name="description" draworder="6">
-        <area>4,90,504,159</area>
+        <area>4,100,500,159</area>
         <font>descinfo</font>
         <multiline>yes</multiline>
         <value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
