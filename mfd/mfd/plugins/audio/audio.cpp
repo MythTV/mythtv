@@ -461,7 +461,7 @@ bool AudioPlugin::playMetadata(int collection_id, int metadata_id)
     if(!metadata_to_play)
     {
         warning(QString("was asked to play container %1 "
-                        "item %2, but that does not exist")
+                        "item %2, but it does not exist")
                         .arg(collection_id)
                         .arg(metadata_id));
         return false;
@@ -742,7 +742,11 @@ void AudioPlugin::playFromPlaylist(int augment_index)
                                                           
     if(!playlist_to_play)
     {
-        warning("asked to play from playlist that doesn't exist");
+        warning(QString("asked to play playlist %1 in "
+                        "container %2, but that "
+                        "doesn't exist")
+                        .arg(current_playlist_container)
+                        .arg(current_playlist_id));
         metadata_server->unlockMetadata();
         playlist_mode_mutex.unlock();
         stopPlaylistMode();

@@ -52,19 +52,18 @@ class Database
     void    parseItems(TagInput &dmap_data, int how_many_now);
     void    parseDeletions(TagInput &dmap_data);    
 
-    void    doDatabaseListPlaylistsResponse(TagInput &dmap_data);    
+    void    doDatabaseListPlaylistsResponse(TagInput &dmap_data, int new_generation);    
     void    parseContainers(TagInput &dmap_data, int how_many);
     void    parseDeletedContainers(TagInput &dmap_data);
 
-    void    doDatabasePlaylistResponse(TagInput &dmap_data, int which_playlist);
+    void    doDatabasePlaylistResponse(TagInput &dmap_data, int which_playlist, int new_generation);
     void    parsePlaylist(TagInput &dmap_data, int how_many, Playlist *which_playlist);
 
-    void    doTheMetadataSwap();
+    void    doTheMetadataSwap(int new_generation);
     
     int     getKnownGeneration(){return generation_delta;}
     void    beIgnorant();
     void    checkUpdateType(int new_numb_items, int new_received_numb_items);
-    void    updateIfYouAreDone(int new_generation);
          
   private:   
 

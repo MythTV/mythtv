@@ -113,6 +113,7 @@ Playlist* MetadataContainer::getPlaylist(int pl_id)
     {
         return current_playlists->find(pl_id);
     }
+
     return NULL;
 }
 

@@ -278,6 +278,7 @@ Playlist* MetadataServer::getPlaylistByUniversalId(uint universal_id)
 
 Playlist* MetadataServer::getPlaylistByContainerAndId(int container_id, int playlist_id)
 {
+    cout << "$$$$$$$$$$$$$$$$ looking for container_id = " << container_id << " and playlist_id = " << playlist_id << endl;
     //
     //  Metadata should be locked _before_ calling this method
     //
@@ -304,6 +305,7 @@ Playlist* MetadataServer::getPlaylistByContainerAndId(int container_id, int play
     {
         if(a_container->getIdentifier() == container_id)
         {
+            cout << "$$$$$$$$$$$$$$$$ found the container" << endl;
             return_value = a_container->getPlaylist(playlist_id);
             break; 
         }

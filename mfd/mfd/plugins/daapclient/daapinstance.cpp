@@ -705,7 +705,7 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
     {
         if(current_request_db)
         {
-            current_request_db->doDatabaseListPlaylistsResponse(rebuilt_internal);            
+            current_request_db->doDatabaseListPlaylistsResponse(rebuilt_internal, metadata_generation);            
         }
         else
         {
@@ -720,8 +720,8 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
         {
             current_request_db->doDatabasePlaylistResponse(
                                                             rebuilt_internal, 
-                                                            current_request_playlist
-                                                            //metadata_generation
+                                                            current_request_playlist,
+                                                            metadata_generation
                                                           );            
         }
         else
@@ -886,8 +886,6 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
         }
         else
         {
-            
-            current_request_db->updateIfYouAreDone(metadata_generation);
             
             current_request_db = NULL;
             current_request_playlist = -1;
@@ -1316,6 +1314,7 @@ void DaapInstance::doUpdateResponse(TagInput& dmap_data)
         //
         //  Crap ... 
         //
+
         warning("doUpdateResponse() got a bad update status");
     }
 }

@@ -721,7 +721,6 @@ void Database::parseItems(TagInput& dmap_data, int how_many_now)
             if(new_item_myth_digest.length() > 0)
             {
                 new_item->setMythDigest(new_item_myth_digest);
-                // cout << "wow, I got a myth digest of \"" << new_item_myth_digest << "\"" << endl;
             }
             
             new_metadata->insert(new_item->getId(), new_item);
@@ -785,7 +784,7 @@ void Database::parseDeletions(TagInput& dmap_data)
     }
 }
 
-void Database::doDatabaseListPlaylistsResponse(TagInput &dmap_data)
+void Database::doDatabaseListPlaylistsResponse(TagInput &dmap_data, int new_generation)
 {
     //
     //  Figure out how many playlists there are and instantiate an object
@@ -902,6 +901,7 @@ void Database::doDatabaseListPlaylistsResponse(TagInput &dmap_data)
         //
         
         have_playlists = true;
+        doTheMetadataSwap(new_generation);
     }
 }
 
@@ -1039,7 +1039,7 @@ void Database::parseDeletedContainers(TagInput& dmap_data)
 
 }
 
-void Database::doDatabasePlaylistResponse(TagInput &dmap_data, int which_playlist)
+void Database::doDatabasePlaylistResponse(TagInput &dmap_data, int which_playlist, int new_generation)
 {
     //
     //  First, find the playlist
@@ -1172,7 +1172,7 @@ void Database::doDatabasePlaylistResponse(TagInput &dmap_data, int which_playlis
     if(all_filled)
     {
         have_playlists = true;
-        
+        doTheMetadataSwap(new_generation);        
     }
 }
 
@@ -1252,7 +1252,7 @@ void Database::parsePlaylist(TagInput &dmap_data, int how_many, Playlist *which_
     }
 }
 
-void Database::doTheMetadataSwap()
+void Database::doTheMetadataSwap(int new_generation)
 {
     //
     //  This gets called when everything is up to date.  (ie. we've made all
@@ -1465,7 +1465,7 @@ void Database::doTheMetadataSwap()
     new_playlists = new QIntDict<Playlist>;
     new_metadata->setAutoDelete(true);
     
-    
+    generation_delta = new_generation;
 }
 
 void Database::beIgnorant()
@@ -1479,27 +1479,6 @@ void Database::beIgnorant()
     have_items = false;
     have_playlist_list = false;
     have_playlists = false;
-}
-
-void Database::updateIfYouAreDone(int new_generation)
-{
-    if(have_items && have_playlist_list && have_playlists)
-    {
-        //
-        //  We now have all items (metadata) and all containers (playlists)
-        //  from our daap server. Time to tell the metadata container about
-        //  it.
-        //
-        
-        doTheMetadataSwap();
-
-        //
-        //  We are now up to date with this generation of data.
-        //
-
-        generation_delta = new_generation;
-        
-    }
 }
 
 void Database::log(const QString &log_message, int verbosity)
