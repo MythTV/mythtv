@@ -177,7 +177,7 @@ void PlaybackBox::killPlayerSafe(void)
     /* if the user keeps selecting new recordings we will never stop playing */
     setEnabled(false);
 
-    if (state != kKilled)
+    if (state != kKilled && playbackPreview != 0)
     {
         while (state != kKilled)
         {
@@ -360,104 +360,157 @@ void PlaybackBox::grayOut(QPainter *tmp)
                         (int)(600*hmult));
 }
 
-void PlaybackBox::updateInfo(QPainter *p)
+void PlaybackBox::updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix)
 {
-    QMap<QString, QString> infoMap;
-    QRect pr = infoRect;
-    QPixmap pix(pr.size());
-    pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
+    LayerSet *container = theme->GetSet("group_info");
 
-    if (showData.count() > 0 && curitem)
+    if (container)
     {
-        QSqlDatabase *m_db = QSqlDatabase::database();
-
-        if (playingVideo == true)
-            state = kChanging;
-
-        curitem->ToMap(m_db, infoMap);
-
-        LayerSet *container = NULL;
-        if (type != Delete)
-            container = theme->GetSet("program_info_play");
+        QMap<QString, QString> infoMap;
+        if(titleData[curTitle] == groupDisplayName)
+            infoMap["title"] = titleData[curTitle];
         else
-            container = theme->GetSet("program_info_del");
-        if (container)
-        {
-            if ((playbackPreview == 0) &&
-                (generatePreviewPixmap == 0))
-                container->UseAlternateArea(true);
+            infoMap["title"] = QString("%1 - %2").arg(groupDisplayName)
+                                                 .arg(titleData[curTitle]);
+        
+        if( countInGroup > 1  )
+            infoMap["description"] = QString(tr("There are %1 recordings in "
+                                                "this display group")).arg(countInGroup);
+        else if( countInGroup == 1  )
+            infoMap["description"] = QString(tr("There is one recording in "
+                                                 "this display group"));
+        else
+            infoMap["description"] = QString(tr("There are no recordings in "
+                                                "this display group"));
+        container->ClearAllText();
+        container->SetText(infoMap);
 
-            container->ClearAllText();
-            container->SetText(infoMap);
-
-            int flags = curitem->programflags;
-
-            UIImageType *itype;
-            itype = (UIImageType *)container->GetType("commflagged");
-            if (itype)
-            {
-                if (flags & FL_COMMFLAG)
-                    itype->ResetFilename();
-                else
-                    itype->SetImage("blank.png");
-                itype->LoadImage();
-            }
-
-            itype = (UIImageType *)container->GetType("cutlist");
-            if (itype)
-            {
-                if (flags & FL_CUTLIST)
-                    itype->ResetFilename();
-                else
-                    itype->SetImage("blank.png");
-                itype->LoadImage();
-            }
-
-            itype = (UIImageType *)container->GetType("autoexpire");
-            if (itype)
-            {
-                if (flags & FL_AUTOEXP)
-                    itype->ResetFilename();
-                else
-                    itype->SetImage("blank.png");
-                itype->LoadImage();
-            }
-
-            itype = (UIImageType *)container->GetType("processing");
-            if (itype)
-            {
-                if (flags & FL_EDITING)
-                    itype->ResetFilename();
-                else
-                    itype->SetImage("blank.png");
-                itype->LoadImage();
-            }
-
-            itype = (UIImageType *)container->GetType("bookmark");
-            if (itype)
-            {
-                if (flags & FL_BOOKMARK)
-                    itype->ResetFilename();
-                else
-                    itype->SetImage("blank.png");
-                itype->LoadImage();
-            }
-        }
-
-        if (container && type != Delete)
+        if (type != Delete)
             container->Draw(&tmp, 6, 0);
         else
             container->Draw(&tmp, 6, 1);
 
         tmp.end();
         p->drawPixmap(pr.topLeft(), pix);
+    }
 
-        waitToStartPreviewTimer.start();
-        waitToStart = true;
+}
+
+
+void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
+{
+    QSqlDatabase *m_db = QSqlDatabase::database();
+    QMap<QString, QString> infoMap;
+    QPainter tmp(&pix);
+        
+    if (playingVideo == true)
+        state = kChanging;
+
+    
+
+    LayerSet *container = NULL;
+    if (type != Delete)
+        container = theme->GetSet("program_info_play");
+    else
+        container = theme->GetSet("program_info_del");
+
+    if (container)
+    {
+        curitem->ToMap(m_db, infoMap);
+        
+        if ((playbackPreview == 0) &&
+            (generatePreviewPixmap == 0))
+            container->UseAlternateArea(true);
+
+        container->ClearAllText();
+        container->SetText(infoMap);
+
+        int flags = curitem->programflags;
+
+        UIImageType *itype;
+        itype = (UIImageType *)container->GetType("commflagged");
+        if (itype)
+        {
+            if (flags & FL_COMMFLAG)
+                itype->ResetFilename();
+            else
+                itype->SetImage("blank.png");
+            itype->LoadImage();
+        }
+
+        itype = (UIImageType *)container->GetType("cutlist");
+        if (itype)
+        {
+            if (flags & FL_CUTLIST)
+                itype->ResetFilename();
+            else
+                itype->SetImage("blank.png");
+            itype->LoadImage();
+        }
+
+        itype = (UIImageType *)container->GetType("autoexpire");
+        if (itype)
+        {
+            if (flags & FL_AUTOEXP)
+                itype->ResetFilename();
+            else
+                itype->SetImage("blank.png");
+            itype->LoadImage();
+        }
+
+        itype = (UIImageType *)container->GetType("processing");
+        if (itype)
+        {
+            if (flags & FL_EDITING)
+                itype->ResetFilename();
+            else
+                itype->SetImage("blank.png");
+            itype->LoadImage();
+        }
+
+        itype = (UIImageType *)container->GetType("bookmark");
+        if (itype)
+        {
+            if (flags & FL_BOOKMARK)
+                itype->ResetFilename();
+            else
+                itype->SetImage("blank.png");
+            itype->LoadImage();
+        }
+    }
+
+    if (container && type != Delete)
+        container->Draw(&tmp, 6, 0);
+    else
+        container->Draw(&tmp, 6, 1);
+
+    tmp.end();
+    p->drawPixmap(pr.topLeft(), pix);
+
+    waitToStartPreviewTimer.start();
+    waitToStart = true;
+
+}
+
+void PlaybackBox::updateInfo(QPainter *p)
+{
+    QRect pr = infoRect;
+    QPixmap pix(pr.size());
+    pix.fill(this, pr.topLeft());
+    
+
+    if (showData.count() > 0 && curitem && !inTitle)
+    {
+        updateProgramInfo(p, pr, pix);
+    }
+    else if( inTitle )
+    {
+        updateGroupInfo(p, pr, pix);
     }
     else
     {
+        QPainter tmp(&pix);
         LayerSet *norec = theme->GetSet("norecordings_info");
         if (type != Delete && norec)
             norec->Draw(&tmp, 8, 0);
@@ -471,6 +524,9 @@ void PlaybackBox::updateInfo(QPainter *p)
 
 void PlaybackBox::updateVideo(QPainter *p)
 {
+    if(inTitle)
+        return;
+        
     /* show a still frame if the user doesn't want a video preview or nvp 
      * hasn't started playing the video preview yet */
     if (((playbackPreview == 0) || !playingVideo || (state == kStarting) || 
@@ -851,6 +907,10 @@ void PlaybackBox::updateShowTitles(QPainter *p)
 
     } 
     // end of container check
+    if (titleData && titleData[curTitle] != groupDisplayName)
+        countInGroup = cnt;
+    else
+        countInGroup = showData.size();
 
     listCount = cnt;
 
@@ -900,18 +960,30 @@ void PlaybackBox::updateShowTitles(QPainter *p)
 
 void PlaybackBox::cursorLeft()
 {
-    inTitle = true;
-    skipUpdate = false;
-    update(fullRect);
-    leftRight = true;
+    if(!inTitle)
+    {
+        killPlayerSafe();
+        inTitle = true;
+        skipUpdate = false;
+        update(fullRect);
+        leftRight = true;
+    }
+    else
+        showMenu();    
+        
 }
 
 void PlaybackBox::cursorRight()
 {
-    leftRight = true;
-    inTitle = false;
-    skipUpdate = false;
-    update(fullRect);
+    if(inTitle)
+    {
+        leftRight = true;
+        inTitle = false;
+        skipUpdate = false;
+        update(fullRect);
+    }
+    else
+        showActionsSelected();    
 }
 
 void PlaybackBox::cursorDown(bool page, bool newview)
@@ -1037,7 +1109,7 @@ void PlaybackBox::cursorUp(bool page, bool newview)
         {
             if (curShowing < ((int)(listsize / 2) + 1) && skipNum > 0)
             {
-                     curShowing = (int)(listsize / 2);
+                curShowing = (int)(listsize / 2);
                 skipNum--;
                 if (skipNum < 0)
                 {
@@ -1301,6 +1373,12 @@ void PlaybackBox::expireSelected()
 void PlaybackBox::selected()
 {
     state = kStopping;
+
+    if(inTitle)
+    {
+        cursorRight();
+        return;
+    }    
 
     if (!curitem)
         return;

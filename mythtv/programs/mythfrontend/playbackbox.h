@@ -113,6 +113,7 @@ class PlaybackBox : public MythDialog
     int skipNum;
     int skipCnt;
     int listCount;
+    int countInGroup;
     bool inTitle;
     bool playingVideo;
     bool leftRight;
@@ -182,7 +183,9 @@ class PlaybackBox : public MythDialog
     void updateShowTitles(QPainter *);
     void updateInfo(QPainter *);
     void updateUsage(QPainter *);
-  
+    void updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix);
+    void updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix);
+    
     QString showDateFormat;
     QString showTimeFormat;
 

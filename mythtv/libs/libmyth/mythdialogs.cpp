@@ -865,7 +865,7 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, const char *name)
     setFont(parent->font());
     setCursor(QCursor(Qt::BlankCursor));
 
-    hpadding = 110;
+    hpadding = 130;
     wpadding = 80;
 
     vbox = new QVBoxLayout(this, (int)(10 * hmult));
@@ -889,7 +889,7 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, bool graphicPopup,
     setFont(parent->font());
     setCursor(QCursor(Qt::BlankCursor));
 
-    hpadding = 110;
+    hpadding = 130;
     wpadding = 80;
 
     vbox = new QVBoxLayout(this, (int)(10 * hmult));

@@ -212,7 +212,7 @@
         <catcolor category="Telefilm" color="brown"></catcolor>
         <catcolor category="Musicale" color="Red"></catcolor>
         <catcolor category="Musica" color="Red"></catcolor>
-        <catcolor category="VarietÃ| " color="sienna"></catcolor>
+        <catcolor category="Varietï¿½ " color="sienna"></catcolor>
         <catcolor category="Magazine" color="sienna"></catcolor>
         <catcolor category="Rubrica" color="sienna"></catcolor>
         <catcolor category="Notizie" color="Orange"></catcolor>
@@ -225,7 +225,7 @@
         <catcolor category="Ragazzi" color="Green"></catcolor>
         <catcolor category="TV Movies" color="DarkOrchid"></catcolor>
         <catcolor category="TV-Movie" color="DarkOrchid"></catcolor>
-        <catcolor category="AttualitÃ| " color="tan3"></catcolor>
+        <catcolor category="Attualitï¿½ " color="tan3"></catcolor>
         <catcolor category="Documentario" color="tan3"></catcolor>
 
         <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
@@ -1267,6 +1267,21 @@
       <textarea name="current" draworder="6">
         <area>34,131,185,40</area>
         <font>currenttitle</font>
+      </textarea>
+    </container>
+
+    <container name="group_info">
+      <context>0</context>
+      <area>0,360,799,240</area>
+      <textarea name="title" draworder="6">
+        <area>20,0,779,45</area>
+        <font>title</font>
+      </textarea>
+      <textarea name="description" draworder="6">
+        <area>20,50,600,120</area>
+        <altarea>180,130,600,90</altarea>
+        <font>info</font>
+        <multiline>yes</multiline>
       </textarea>
     </container>
 
