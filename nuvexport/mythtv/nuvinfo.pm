@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.01.19 (xris)
+#Last Updated: 2005.01.22 (xris)
 #
 #  mythtv::nuvinfo.pm
 #
@@ -142,8 +142,9 @@ package mythtv::nuvinfo;
             $info{'mpeg_stream_type'} = 'TS';
         }
         else {
-            $info{'mpeg_stream_type'} = 'system';   # ?????
-            die "Unrecognized mpeg stream type.  Please email this to the nuvexport author:\n\n$data\n\n";
+            die "Unrecognized mpeg stream type.  Please execute the following and see if you\n"
+               ."notice errors.  If not, email the output to the nuvexport author.\n\n"
+               ."    $program -vo null -ao null -frames 0 -identify '$file'\n\n";
         }
 # ID_VIDEO_BITRATE=6500000
 # ID_AUDIO_FORMAT=80
