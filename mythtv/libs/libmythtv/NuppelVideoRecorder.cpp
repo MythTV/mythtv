@@ -198,7 +198,7 @@ void NuppelVideoRecorder::SetVbiFormat(QString vbiformat)
 {
     if (vbiformat.lower() == "pal teletext")
         vbimode = 1;
-    else if (vbiformat.lower() == "ntsc cc")
+    else if (vbiformat.lower().left(4) == "ntsc")
         vbimode = 2;
     else
         vbimode = 0;

@@ -43,9 +43,10 @@ TVRec::TVRec(const QString &startchannel, int capturecardnum)
 
     audiosamplerate = -1;
 
-    GetDevices(capturecardnum, videodev, vbidev, audiodev, audiosamplerate);
+    QString inputname;
 
-    QString inputname = gContext->GetSetting("TunerCardInput");
+    GetDevices(capturecardnum, videodev, vbidev, audiodev, audiosamplerate,
+               inputname);
 
     channel = new Channel(this, videodev);
     channel->Open();
@@ -772,18 +773,19 @@ void TVRec::DisconnectDB(void)
 }
 
 void TVRec::GetDevices(int cardnum, QString &video, QString &vbi, 
-                       QString &audio, int &rate)
+                       QString &audio, int &rate, QString &defaultinput)
 {
     video = "";
     vbi = "";
     audio = "";
+    defaultinput = "Television";
 
     pthread_mutex_lock(&db_lock);
 
     MythContext::KickDatabase(db_conn);
 
     QString thequery = QString("SELECT videodevice,vbidevice,audiodevice,"
-                               "audioratelimit FROM capturecard "
+                               "audioratelimit,defaultinput FROM capturecard "
                                "WHERE cardid = %1;")
                               .arg(cardnum);
 
@@ -808,6 +810,9 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
         if (test != QString::null)
             audio = QString::fromUtf8(test);
         testnum = query.value(3).toInt();
+        test = query.value(4).toString();
+        if (test != QString::null)
+            defaultinput = QString::fromUtf8(test);
 
         if (testnum > 0)
             rate = testnum;
@@ -1076,8 +1081,8 @@ void TVRec::SetupRingBuffer(QString &path, long long &filesize,
                             long long &fillamount, bool pip)
 {
     ispip = pip;
-    filesize = gContext->GetNumSetting("BufferSize");
-    fillamount = gContext->GetNumSetting("MaxBufferFill");
+    filesize = gContext->GetNumSetting("BufferSize", 5);
+    fillamount = gContext->GetNumSetting("MaxBufferFill", 50);
 
     path = gContext->GetSetting("LiveBufferDir") + QString("/ringbuf%1.nuv")
                                                        .arg(m_capturecardnum);

@@ -9,6 +9,7 @@ using namespace std;
 
 #include "remotefile.h"
 #include "util.h"
+#include "mythcontext.h"
 
 RemoteFile::RemoteFile(const QString &url, bool needevents, int lrecordernum)
 {
@@ -97,18 +98,13 @@ QSocket *RemoteFile::openSocket(bool control, bool events)
         return NULL;
     }
 
-    char localhostname[256];
-    if (gethostname(localhostname, 256))
-    {
-        cerr << "Error getting local hostname\n";
-        exit(0);
-    }
+    QString hostname = gContext->GetHostName();
 
     QStringList strlist;
 
     if (control)
     {
-        strlist = QString("ANN Playback %1 %2").arg(localhostname).arg(false);
+        strlist = QString("ANN Playback %1 %2").arg(hostname).arg(false);
         WriteStringList(sock, strlist);
         ReadStringList(sock, strlist);
     }
@@ -116,7 +112,7 @@ QSocket *RemoteFile::openSocket(bool control, bool events)
     {
         if (type == 0)
         {
-            strlist = QString("ANN FileTransfer %1").arg(localhostname);
+            strlist = QString("ANN FileTransfer %1").arg(hostname);
             strlist << dir;
 
             WriteStringList(sock, strlist);
@@ -127,7 +123,7 @@ QSocket *RemoteFile::openSocket(bool control, bool events)
         }
         else
         {
-            strlist = QString("ANN RingBuffer %1 %2").arg(localhostname)
+            strlist = QString("ANN RingBuffer %1 %2").arg(hostname)
                              .arg(recordernum);
             WriteStringList(sock, strlist);
             ReadStringList(sock, strlist);

@@ -1,3 +1,5 @@
+#include "mythcontext.h"
+
 #include "globalsettings.h"
 #include <qfile.h>
 #include <qdialog.h>
@@ -14,11 +16,14 @@ public:
 
 protected:
     virtual QString whereClause(void) {
-        return QString("value = '%1'").arg(getName());
+        return QString("value = '%1' AND hostname = '%2'")
+                       .arg(getName()).arg(gContext->GetHostName());
     };
 
     virtual QString setClause(void) {
-        return QString("value = '%1', data = '%2'").arg(getName()).arg(getValue());
+        return QString("value = '%1', data = '%2', hostname = '%3'")
+                       .arg(getName()).arg(getValue())
+                       .arg(gContext->GetHostName());
     };
 };
 
@@ -196,19 +201,6 @@ public:
     };
 };
 
-// XXX, this should find available inputs in a reusable way
-class TunerCardInput: public ComboBoxSetting, public GlobalSetting {
-public:
-    TunerCardInput():
-        ComboBoxSetting(true), GlobalSetting("TunerCardInput") {
-        setLabel("Default input");
-        addSelection("Television");
-        addSelection("Composite1");
-        addSelection("Composite3");
-        addSelection("S-Video");
-    };
-};
-
 class VertScanPercentage: public SpinBoxSetting, public GlobalSetting {
 public:
     VertScanPercentage():
@@ -353,42 +345,6 @@ public:
         setLabel("Xinerama screen");
         setValue(0);
         setHelpText("If using Xinerama, run only on the specified screen.");
-    };
-};
-
-class TimeOffset: public ComboBoxSetting, public GlobalSetting {
-public:
-    TimeOffset():
-        GlobalSetting("TimeOffset") {
-        setLabel("Time offset for XMLTV listings");
-        addSelection("(None)", "");
-        addSelection("-0100");
-        addSelection("-0200");
-        addSelection("-0300");
-        addSelection("-0400");
-        addSelection("-0500");
-        addSelection("-0600");
-        addSelection("-0700");
-        addSelection("-0800");
-        addSelection("-0900");
-        addSelection("-1000");
-        addSelection("-1100");
-        addSelection("-1200");
-        addSelection("+0100");
-        addSelection("+0200");
-        addSelection("+0300");
-        addSelection("+0400");
-        addSelection("+0500");
-        addSelection("+0600");
-        addSelection("+0700");
-        addSelection("+0800");
-        addSelection("+0900");
-        addSelection("+1000");
-        addSelection("+1100");
-        addSelection("+1200");
-        setHelpText("If your local timezone does not match the timezone "
-                    "returned by XMLTV, use this setting to have "
-                    "mythfilldatabase adjust the program start and end times.");
     };
 };
 
@@ -731,7 +687,6 @@ GeneralSettings::GeneralSettings()
     general->setLabel("General");
     general->addChild(new RecordOverTime());
     general->addChild(new WeatherAggressiveness());
-    general->addChild(new TimeOffset());
     addChild(general);
 
     VerticalConfigurationGroup* general2 = new VerticalConfigurationGroup(false);
@@ -739,7 +694,6 @@ GeneralSettings::GeneralSettings()
     general2->addChild(new ChannelOrdering());
     general2->addChild(new ChannelSorting());
     general2->addChild(new DefaultTVChannel());
-    general2->addChild(new TunerCardInput());
     general2->addChild(new DisplayChanNum());
     addChild(general2);
 

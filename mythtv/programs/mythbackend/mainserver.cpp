@@ -11,9 +11,8 @@ using namespace std;
 #include <sys/stat.h>
 #include <sys/vfs.h>
 
-
-#include "../../libs/libmyth/mythcontext.h"
-#include "../../libs/libmyth/util.h"
+#include "libmyth/mythcontext.h"
+#include "libmyth/util.h"
 
 #include "mainserver.h"
 #include "scheduler.h"

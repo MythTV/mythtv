@@ -5,14 +5,11 @@ using namespace std;
 
 #include "playbacksock.h"
 
+#include "libmyth/mythcontext.h"
+
 PlaybackSock::PlaybackSock(QSocket *lsock, QString lhostname, bool wantevents)
 {
-    char localhostname[256];
-    if (gethostname(localhostname, 256))
-    {
-        cerr << "Error getting local hostname\n";
-        exit(0);
-    }
+    QString localhostname = gContext->GetHostName();
 
     sock = lsock;
     hostname = lhostname;

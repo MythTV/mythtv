@@ -28,6 +28,14 @@ MythContext::MythContext(bool gui)
     pthread_mutex_init(&dbLock, NULL);
     m_db = QSqlDatabase::addDatabase("QMYSQL3", "MythContext");
 
+    char localhostname[1024];
+    if (gethostname(localhostname, 1024))
+    {
+        cerr << "Error getting local hostname\n";
+        exit(0);
+    }
+    m_localhostname = localhostname;
+
     LoadSettingsFiles("mysql.txt");
 
     if (gui)
@@ -84,6 +92,8 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
         if (num > 100)
         {
             cerr << "Connection timed out.\n";
+            cerr << "You probably should edit backend_settings.txt and\n";
+            cerr << "set the proper IP address in there.\n";
             exit(0);
         }
     }
@@ -93,14 +103,6 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
         cout << "Could not connect to backend server\n";
         exit(0);
     }
-
-    char localhostname[256];
-    if (gethostname(localhostname, 256))
-    {
-        cerr << "Error getting local hostname\n";
-        exit(0);
-    }
-    m_localhostname = localhostname;
 
     QString str = QString("ANN Playback %1 %2").arg(m_localhostname).arg(true);
     QStringList strlist = str;
@@ -130,27 +132,6 @@ QString MythContext::GetFilePrefix(void)
 void MythContext::LoadSettingsFiles(const QString &filename)
 {
     m_settings->LoadSettingsFiles(filename, m_installprefix);
-}
-
-void MythContext::LoadSettingsDatabase(QSqlDatabase *db)
-{
-    QString thequery = "SELECT * FROM settings;";
-    QSqlQuery query = db->exec(thequery);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
-    {
-        while (query.next())
-        {
-            QString key = query.value(0).toString();
-            QString value = query.value(1).toString();
-
-            if (value == QString::null)
-                value = "";
-
-            if (key != QString::null && key != "")
-                SetSetting(key, value);
-        }
-    }
 }
 
 void MythContext::LoadQtConfig(void)
@@ -249,18 +230,38 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
 {
     bool found = false;
     QString value;
-    pthread_mutex_lock(&dbLock);
-    if (m_db->isOpen()) {
 
+    pthread_mutex_lock(&dbLock);
+
+    if (m_db->isOpen()) 
+    {
         KickDatabase(m_db);
 
-        QString query = QString("SELECT data FROM settings WHERE value = '%1';").arg(key);
+        QString query = QString("SELECT data FROM settings WHERE value = '%1' "
+                                "AND hostname = '%2';")
+                               .arg(key).arg(m_localhostname);
+
         QSqlQuery result = m_db->exec(query);
 
-        if (result.isActive() && result.numRowsAffected() > 0) {
+        if (result.isActive() && result.numRowsAffected() > 0) 
+        {
             result.next();
             value = result.value(0).toString();
             found = true;
+        }
+        else
+        {
+            query = QString("SELECT data FROM settings WHERE value = '%1' AND "
+                            "hostname IS NULL;").arg(key);
+
+            result = m_db->exec(query);
+
+            if (result.isActive() && result.numRowsAffected() > 0) 
+            {
+                result.next();
+                value = result.value(0).toString();
+                found = true;
+            }
         }
     }
     pthread_mutex_unlock(&dbLock);
@@ -274,20 +275,40 @@ int MythContext::GetNumSetting(const QString &key, int defaultval)
 {
     bool found = false;
     int value = defaultval;
-    pthread_mutex_lock(&dbLock);
-    if (m_db->isOpen()) {
 
+    pthread_mutex_lock(&dbLock);
+    if (m_db->isOpen()) 
+    {
         KickDatabase(m_db);
 
-        QString query = QString("SELECT data FROM settings WHERE value = '%1';").arg(key);
+        QString query = QString("SELECT data FROM settings WHERE value = '%1' "
+                                "AND hostname = '%2';")
+                                .arg(key).arg(m_localhostname);
+
         QSqlQuery result = m_db->exec(query);
 
-        if (result.isActive() && result.numRowsAffected() > 0) {
+        if (result.isActive() && result.numRowsAffected() > 0) 
+        {
             result.next();
             value = result.value(0).toString().toInt();
             found = true;
         }
+        else
+        {
+            query = QString("SELECT data FROM settings WHERE value = '%1' AND "
+                            "hostname IS NULL;").arg(key);
+
+            result = m_db->exec(query);
+
+            if (result.isActive() && result.numRowsAffected() > 0)
+            {
+                result.next();
+                value = result.value(0).toString().toInt();
+                found = true;
+            }
+        }
     }
+
     pthread_mutex_unlock(&dbLock);
 
     if (found)

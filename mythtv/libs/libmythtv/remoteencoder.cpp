@@ -6,6 +6,7 @@ using namespace std;
 #include "remoteencoder.h"
 #include "programinfo.h"
 #include "util.h"
+#include "mythcontext.h"
 
 RemoteEncoder::RemoteEncoder(int num, const QString &host, short port)
 {
@@ -79,16 +80,11 @@ QSocket *RemoteEncoder::openControlSocket(const QString &host, short port)
         return NULL;
     }
 
-    char localhostname[256];
-    if (gethostname(localhostname, 256))
-    {
-        cerr << "Error getting local hostname\n";
-        exit(0);
-    }
-
+    QString hostname = gContext->GetHostName();
+ 
     QStringList strlist;
 
-    strlist = QString("ANN Playback %1 %2").arg(localhostname).arg(false);
+    strlist = QString("ANN Playback %1 %2").arg(hostname).arg(false);
     WriteStringList(sock, strlist);
     ReadStringList(sock, strlist);
 

@@ -296,6 +296,19 @@ public:
     };
 };
 
+// XXX, this should find available inputs in a reasonable way
+class TunerCardInput: public ComboBoxSetting, public CCSetting {
+public:
+    TunerCardInput(const CaptureCard& parent):
+        CCSetting(parent, "defaultinput") {
+        setLabel("Default input");
+        addSelection("Television");
+        addSelection("Composite1");
+        addSelection("Composite3");
+        addSelection("S-Video");
+    };
+};
+
 class CaptureCard: public VerticalConfigurationGroup, public ConfigurationDialog {
 public:
     CaptureCard() {
@@ -306,6 +319,7 @@ public:
         addChild(new VbiDevice(*this));
         addChild(new AudioDevice(*this));
         addChild(new AudioRateLimit(*this));
+        addChild(new TunerCardInput(*this));
         addChild(new Hostname(*this));
     };
 

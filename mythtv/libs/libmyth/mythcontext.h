@@ -52,13 +52,15 @@ class MythContext : public QObject
     virtual ~MythContext();
 
     QString GetMasterHostPrefix(void);
+
+    QString GetHostName(void) { return m_localhostname; }
+
     bool ConnectServer(const QString &hostname, int port);
 
     QString GetInstallPrefix() { return m_installprefix; }
     QString GetFilePrefix();
 
     void LoadSettingsFiles(const QString &filename);
-    void LoadSettingsDatabase(QSqlDatabase *db);
     void LoadQtConfig();
 
     void GetScreenSettings(int &width, float &wmult, int &height, float &hmult);

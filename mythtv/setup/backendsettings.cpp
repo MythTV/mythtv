@@ -15,24 +15,44 @@ protected:
     };
 
     virtual QString setClause(void) {
-        return QString("value = '%1', data = '%1'").arg(getName()).arg(getValue());
+        return QString("value = '%1', data = '%2'").arg(getName()).arg(getValue());
     };
 };
 
-class RecordFilePrefix: public LineEditSetting, public BackendSetting {
+class BackendHostSetting: public SimpleDBStorage, virtual public Configurable {
+public:
+    BackendHostSetting(QString name):
+        SimpleDBStorage("settings", "data") {
+        setName(name);
+    };
+
+protected:
+    virtual QString whereClause(void) {
+        return QString("value = '%1' AND hostname = '%2'")
+                       .arg(getName()).arg(gContext->GetHostName());
+    };
+
+    virtual QString setClause(void) {
+        return QString("value = '%1', data = '%2', hostname = '%3'")
+                       .arg(getName()).arg(getValue())
+                       .arg(gContext->GetHostName());
+    };
+};
+
+class RecordFilePrefix: public LineEditSetting, public BackendHostSetting {
 public:
     RecordFilePrefix():
-        BackendSetting("RecordFilePrefix") {
+        BackendHostSetting("RecordFilePrefix") {
         setLabel("Directory to hold recordings");
         setValue("/mnt/store/");
         setHelpText("All recordings get stored in this directory.");
     };
 };
 
-class LiveBufferPrefix: public LineEditSetting, public BackendSetting {
+class LiveBufferPrefix: public LineEditSetting, public BackendHostSetting {
 public:
     LiveBufferPrefix():
-        BackendSetting("LiveBufferDir") {
+        BackendHostSetting("LiveBufferDir") {
         setLabel("Directory to hold the Live-TV buffers");
         setValue("/mnt/store/");
         setHelpText("All Live-TV buffers will get stored in this directory. "
@@ -97,11 +117,11 @@ public:
     };
 };
 
-class BufferSize: public SliderSetting, public BackendSetting {
+class BufferSize: public SliderSetting, public BackendHostSetting {
 public:
     BufferSize():
         SliderSetting(1, 100, 1),
-        BackendSetting("BufferSize") {
+        BackendHostSetting("BufferSize") {
 
         setLabel("Live TV buffer (GB)");
         setValue(5);
@@ -109,27 +129,68 @@ public:
     };
 };
 
-class MaxBufferFill: public SliderSetting, public BackendSetting {
+class MaxBufferFill: public SliderSetting, public BackendHostSetting {
 public:
     MaxBufferFill():
         SliderSetting(1, 100, 1),
-        BackendSetting("MaxBufferFill") {
+        BackendHostSetting("MaxBufferFill") {
         setValue(50);
         setHelpText("How full the live TV buffer is allowed to grow before "
                     "forcing an unpause.");
     };
 };
 
+class TimeOffset: public ComboBoxSetting, public BackendSetting {
+public:
+    TimeOffset():
+        BackendSetting("TimeOffset") {
+        setLabel("Time offset for XMLTV listings");
+        addSelection("(None)", "");
+        addSelection("-0100");
+        addSelection("-0200");
+        addSelection("-0300");
+        addSelection("-0400");
+        addSelection("-0500");
+        addSelection("-0600");
+        addSelection("-0700");
+        addSelection("-0800");
+        addSelection("-0900");
+        addSelection("-1000");
+        addSelection("-1100");
+        addSelection("-1200");
+        addSelection("+0100");
+        addSelection("+0200");
+        addSelection("+0300");
+        addSelection("+0400");
+        addSelection("+0500");
+        addSelection("+0600");
+        addSelection("+0700");
+        addSelection("+0800");
+        addSelection("+0900");
+        addSelection("+1000");
+        addSelection("+1100");
+        addSelection("+1200");
+        setHelpText("If your local timezone does not match the timezone "
+                    "returned by XMLTV, use this setting to have "
+                    "mythfilldatabase adjust the program start and end times.");
+    };
+};
+
 BackendSettings::BackendSettings() {
     VerticalConfigurationGroup* group1 = new VerticalConfigurationGroup(false);
-    group1->setLabel("General");
+    group1->setLabel("Host-specific Backend Setup");
     group1->addChild(new RecordFilePrefix());
     group1->addChild(new LiveBufferPrefix());
     group1->addChild(new BufferSize());
     group1->addChild(new MaxBufferFill());
-    group1->addChild(new TVFormat());
-    group1->addChild(new VbiFormat());
-    group1->addChild(new FreqTable());
     addChild(group1);
+
+    VerticalConfigurationGroup* group2 = new VerticalConfigurationGroup(false);
+    group2->setLabel("Global Backend Setup");
+    group2->addChild(new TVFormat());
+    group2->addChild(new VbiFormat());
+    group2->addChild(new FreqTable());
+    group2->addChild(new TimeOffset());
+    addChild(group2);
 }
 

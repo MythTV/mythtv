@@ -98,7 +98,7 @@ class TVRec
                         QString &channelname);
 
     void GetDevices(int cardnum, QString &video, QString &vbi, QString &audio,
-                    int &rate);
+                    int &rate, QString &defaultinput);
 
     void ConnectDB(int cardnum);
     void DisconnectDB(void);

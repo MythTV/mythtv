@@ -775,11 +775,7 @@ QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg,
 HostnameSetting::HostnameSetting(void)  {
     setVisible(false);
     
-    char buf[1024];
-    if (gethostname(buf,sizeof(buf)) == 0) {
-        buf[sizeof(buf)-1] = 0;
-        setValue(QString(buf));
-    }
+    setValue(gContext->GetHostName());
 }
 
 void ChannelSetting::fillSelections(QSqlDatabase* db, SelectSetting* setting) {

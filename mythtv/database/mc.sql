@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS settings
     value VARCHAR(128) NOT NULL,
     data TEXT NULL,
     hostname VARCHAR(255) NULL,
-    PRIMARY KEY(value)
+    INDEX (value, hostname)
 );
 CREATE TABLE IF NOT EXISTS conflictresolutionoverride
 (
@@ -123,6 +123,7 @@ CREATE TABLE IF NOT EXISTS capturecard
     audiodevice VARCHAR(128),
     vbidevice VARCHAR(128),
     cardtype VARCHAR(32) DEFAULT 'V4L',
+    defaultinput VARCHAR(32) DEFAULT 'Television',
     audioratelimit INT,
     hostname VARCHAR(255)
 );

@@ -80,7 +80,7 @@ void SetupMenuCallback(void* data, QString& selection) {
 }
 
 void SetupMenu(void) {
-    QString theme = gContext->GetSetting("Theme");
+    QString theme = gContext->GetSetting("Theme", "blue");
 
     ThemedMenu* menu = new ThemedMenu(gContext->FindThemeDir(theme),
                                       "setup.xml");
