@@ -21,6 +21,7 @@
 #include <math.h>
 
 using namespace std;
+#include "../../config.h"
 
 class LCD : public QObject
 {
