@@ -161,6 +161,14 @@ public:
                                   const char* widgetName=0);
 };
 
+// Read-only displa of a setting
+class LabelSetting: virtual public Setting {
+protected:
+    LabelSetting() {};
+public:
+    virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
+};
+
 class LineEditSetting: virtual public Setting {
 protected:
     LineEditSetting() {};
