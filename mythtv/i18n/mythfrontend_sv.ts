@@ -1744,6 +1744,22 @@
         <source>Image size</source>
         <translation>Bildstorlek</translation>
     </message>
+    <message>
+        <source>Use the PVR-350&apos;s TV out / MPEG decoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV can use the PVR-350&apos;s TV out and MPEG decoder for high quality playback.  This requires that the ivtv-fb kernel module is also loaded and set up properly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video device for the PVR-350 MPEG decoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PVR-350 Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RankPrograms</name>

@@ -1611,6 +1611,242 @@
         <source>Localization</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>(Create new profile group)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Profile name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Codec</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MP3 Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The higher the slider number, the lower the quality of the audio.  Better quality audio (lower numbers) requires more CPU.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sampling rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sets the audio sampling rate for your DSP. Ensure that you choose a sampling rate appropriate for your device.  btaudio may only allow 32000.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sets the audio type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bitrate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sets the audio bitrate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume (%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume of the recording </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bitrate Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RTjpeg Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Higher is better quality.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Luma filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lower is better.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chroma filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bitrate in kilobits/second.  2200Kbps is approximately 1 Gigabyte per hour.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scale bitrate for frame size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the MPEG4 bitrate will be used for 640x480.  If other resolutions are used, the bitrate will be scaled appropriately.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimum quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modifying the default may have severe consequences.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max quality difference between frames</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable high-quality encoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use &apos;high-quality&apos; encoding options.  This requires much more processing, but can result in better video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable 4MV encoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use &apos;4MV&apos; motion-vector encoding.  This requires much more processing, but can result in better video. It is highly recommended that the HQ option is enabled if 4MV is enabled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max. Bitrate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum Bitrate in kilobits/second.  2200Kbps is approximately 1 Gigabyte per hour.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stream Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sets the type of stream generated by your PVR.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aspect Ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Square</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sets the aspect ratio of stream generated by your PVR.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal Decimation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical Decimation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Compression</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RTjpeg Parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MPEG-4 Parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hardware MJPEG Parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MPEG-2 Hardware Encoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically transcode after recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Width</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Height</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mixer Controls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smart Fast Forwarding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, then immediately after rewinding, only skip forward the same amount as skipping backwards.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Xv picture controls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, Xv picture controls (brightness, contrast, etc.) are used during playback. These are independent of the v4l controls used for recording. The Xv controls may not work properly on some systems.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use the PVR-350&apos;s TV out / MPEG decoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV can use the PVR-350&apos;s TV out and MPEG decoder for high quality playback.  This requires that the ivtv-fb kernel module is also loaded and set up properly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video device for the PVR-350 MPEG decoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PVR-350 Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RankPrograms</name>
