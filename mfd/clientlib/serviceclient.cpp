@@ -20,7 +20,8 @@ ServiceClient::ServiceClient(
                                 int an_mfd,
                                 MfdServiceType l_service_type,
                                 const QString &l_ip_address,
-                                uint l_port
+                                uint l_port,
+                                QString l_magic_token
                             )
 {
     mfd_interface = the_mfd;
@@ -28,6 +29,7 @@ ServiceClient::ServiceClient(
     service_type = l_service_type;
     ip_address = l_ip_address;
     port = l_port;
+    magic_token = l_magic_token;
     
     //
     //  We start out unconnected
@@ -92,6 +94,15 @@ int ServiceClient::bytesAvailable()
 void ServiceClient::handleIncoming()
 {
     cerr << "something is calling base class ServiceClient::handleIncoming()"
+         << endl;
+}
+
+void ServiceClient::executeCommand(QStringList new_command)
+{
+    cerr << "serviceclient.o: base ServiceClient class asked to "
+         << "execute this command \""
+         << new_command.join(" ")
+         << "\""
          << endl;
 }
 

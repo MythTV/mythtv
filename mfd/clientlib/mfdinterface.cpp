@@ -42,9 +42,10 @@ MfdInterface::MfdInterface()
 void MfdInterface::playAudio(int which_mfd, int container, int type, int which_id, int index)
 {
     //
-    //  Find the instance, ask it to play something
+    //  Find the instance, hand it a play command
     //  
 
+    bool found_it = false;
     for(
         MfdInstance *an_mfd = mfd_instances->first();
         an_mfd;
@@ -53,18 +54,33 @@ void MfdInterface::playAudio(int which_mfd, int container, int type, int which_i
     {
         if(an_mfd->getId() == which_mfd)
         {
-            an_mfd->playAudio(container, type, which_id, index);
+            an_mfd->addPendingCommand(
+                                        QStringList::split(" ", QString("audio play %1 %2 %3 %4")
+                                                .arg(container)
+                                                .arg(type)
+                                                .arg(which_id)
+                                                .arg(index))
+                                     );
+            found_it = true;
             break;
         }
+    }
+    
+    if(!found_it)
+    {
+        cerr << "mfdinterface.o: could not find an mfd "
+             << "for a playAudio() request"
+             << endl;
     }
 }
 
 void MfdInterface::stopAudio(int which_mfd)
 {
     //
-    //  Find the instance, ask it to play something
+    //  Find the instance, hand it a stop command
     //  
 
+    bool found_it = false;
     for(
         MfdInstance *an_mfd = mfd_instances->first();
         an_mfd;
@@ -73,12 +89,160 @@ void MfdInterface::stopAudio(int which_mfd)
     {
         if(an_mfd->getId() == which_mfd)
         {
-            an_mfd->stopAudio();
+            an_mfd->addPendingCommand(
+                                        QStringList::split(" ", QString("audio stop"))
+                                     );
+            found_it = true;
             break;
         }
     }
+    
+    if(!found_it)
+    {
+        cerr << "mfdinterface.o: could not find an mfd "
+             << "for a stopAudio() request"
+             << endl;
+    }
 }
 
+
+void MfdInterface::pauseAudio(int which_mfd, bool on_or_off)
+{
+    //
+    //  Find the instance, hand it a pause command
+    //  
+
+    bool found_it = false;
+    for(
+        MfdInstance *an_mfd = mfd_instances->first();
+        an_mfd;
+        an_mfd = mfd_instances->next()
+       )
+    {
+        if(an_mfd->getId() == which_mfd)
+        {
+            if(on_or_off)
+            {
+                an_mfd->addPendingCommand(
+                                            QStringList::split(" ", QString("audio pause on"))
+                                         );
+            }
+            else
+            {
+                an_mfd->addPendingCommand(
+                                            QStringList::split(" ", QString("audio pause off"))
+                                         );
+            }
+
+            found_it = true;
+            break;
+        }
+    }
+    
+    if(!found_it)
+    {
+        cerr << "mfdinterface.o: could not find an mfd "
+             << "for a pauseAudio() request"
+             << endl;
+    }
+}
+
+void MfdInterface::seekAudio(int which_mfd, int how_much)
+{
+    //
+    //  Find the instance, hand it a seek command
+    //  
+
+    bool found_it = false;
+    for(
+        MfdInstance *an_mfd = mfd_instances->first();
+        an_mfd;
+        an_mfd = mfd_instances->next()
+       )
+    {
+        if(an_mfd->getId() == which_mfd)
+        {
+            an_mfd->addPendingCommand(
+                                        QStringList::split(" ", QString("audio seek $1")
+                                                                        .arg(how_much))
+                                     );
+
+            found_it = true;
+            break;
+        }
+    }
+    
+    if(!found_it)
+    {
+        cerr << "mfdinterface.o: could not find an mfd "
+             << "for a seekAudio() request"
+             << endl;
+    }
+}
+
+void MfdInterface::nextAudio(int which_mfd)
+{
+    //
+    //  Find the instance, hand it a next command
+    //  
+
+    bool found_it = false;
+    for(
+        MfdInstance *an_mfd = mfd_instances->first();
+        an_mfd;
+        an_mfd = mfd_instances->next()
+       )
+    {
+        if(an_mfd->getId() == which_mfd)
+        {
+            an_mfd->addPendingCommand(
+                                        QStringList::split(" ", QString("audio next"))
+                                     );
+
+            found_it = true;
+            break;
+        }
+    }
+    
+    if(!found_it)
+    {
+        cerr << "mfdinterface.o: could not find an mfd "
+             << "for a nextAudio() request"
+             << endl;
+    }
+}
+
+void MfdInterface::prevAudio(int which_mfd)
+{
+    //
+    //  Find the instance, hand it a prev command
+    //  
+
+    bool found_it = false;
+    for(
+        MfdInstance *an_mfd = mfd_instances->first();
+        an_mfd;
+        an_mfd = mfd_instances->next()
+       )
+    {
+        if(an_mfd->getId() == which_mfd)
+        {
+            an_mfd->addPendingCommand(
+                                        QStringList::split(" ", QString("audio prev"))
+                                     );
+
+            found_it = true;
+            break;
+        }
+    }
+    
+    if(!found_it)
+    {
+        cerr << "mfdinterface.o: could not find an mfd "
+             << "for a prevAudio() request"
+             << endl;
+    }
+}
 
 
 void MfdInterface::customEvent(QCustomEvent *ce)

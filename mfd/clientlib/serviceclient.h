@@ -11,6 +11,7 @@
 */
 
 #include <qstring.h>
+#include <qstringlist.h>
 #include <qsocketdevice.h>
 
 enum MfdServiceType
@@ -32,7 +33,8 @@ class ServiceClient
                     int which_mfd,
                     MfdServiceType l_service_type,
                     const QString &l_ip_address,
-                    uint l_port
+                    uint l_port,
+                    QString l_magic_token
                  );
 
     virtual ~ServiceClient();
@@ -47,6 +49,8 @@ class ServiceClient
     void            setName(const QString &a_name){name = a_name;}
     QString         getName(){return name;}
     int             getId(){return mfd_id;}
+    QString         getMagicToken(){return magic_token;}
+    virtual void    executeCommand(QStringList new_command);
     
 
   protected:
@@ -58,6 +62,7 @@ class ServiceClient
     MfdServiceType service_type;
     uint           port;  
     QString        name;
+    QString        magic_token;
 };
 
 #endif

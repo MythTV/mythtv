@@ -30,8 +30,18 @@ class MfdInterface : public QObject
     MfdInterface();
     ~MfdInterface();
 
+    //
+    //  Methods that the linking client application can call to make an mfd
+    //  do something
+    //
+
     void playAudio(int which_mfd, int container, int type, int which_id, int index=0);
     void stopAudio(int which_mfd);
+    void pauseAudio(int which_mfd, bool on_or_off);
+    void seekAudio(int which_mfd, int how_much);
+    void nextAudio(int which_mfd);
+    void prevAudio(int which_mfd);
+    
     
   signals:
 

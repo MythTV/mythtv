@@ -38,7 +38,8 @@ MetadataClient::MetadataClient(
                             an_mfd,
                             MFD_SERVICE_METADATA,
                             l_ip_address,
-                            l_port
+                            l_port,
+                            "metadata"
                           )
 {
     //

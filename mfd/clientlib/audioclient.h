@@ -30,8 +30,13 @@ class AudioClient : public ServiceClient
     void playTrack(int container, int id);
     void playList(int container, int id, int index);
     void stopAudio();
+    void pauseAudio(bool y_or_n);
+    void seekAudio(int how_much);
+    void nextAudio();
+    void prevAudio();
     void handleIncoming();
     void parseFromAudio(QStringList &tokens);
+    void executeCommand(QStringList new_command);
     ~AudioClient();
 
 };

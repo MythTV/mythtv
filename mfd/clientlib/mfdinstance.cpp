@@ -137,7 +137,29 @@ void MfdInstance::run()
 
     while(keep_going)
     {
+
+        //
+        //  See if we have any pending commands
+        //  
+        
+        QStringList new_command;
+        pending_commands_mutex.lock();
+            if(pending_commands.count() > 0)
+            {
+                new_command = pending_commands[0];
+                pending_commands.pop_front();
+            }
+        pending_commands_mutex.unlock();
+
+        if(new_command.count() > 0)
+        {
+            executeCommands(new_command);
+        }
     
+        //
+        //  Setup a list of descriptors to watch for any activity
+        //
+
         fd_set fds;
         int nfds = 0;
         FD_ZERO(&fds);
@@ -192,13 +214,19 @@ void MfdInstance::run()
     
     
         //
-        //  Sleep as long as mdnsd tells us to
+        //  Sleep for up to 10 seconds
         //
 
         struct timeval timeout;
-        timeout.tv_sec = 2;
+        timeout.tv_sec = 10;
         timeout.tv_usec = 0;
-        
+
+        pending_commands_mutex.lock();
+            if(pending_commands.count() > 0)
+            {
+                timeout.tv_sec = 0;
+            }
+        pending_commands_mutex.unlock();        
         
         //
         //  Sit in select until something happens
@@ -274,68 +302,6 @@ void MfdInstance::wakeUp()
         write(u_shaped_pipe[1], "wakeup\0", 7);
     u_shaped_pipe_mutex.unlock();
     
-}
-
-void MfdInstance::playAudio(int container, int type, int which_id, int index)
-{
-    if(type == 1) //item
-    {
-        //
-        //  play metadata item  this is currently a _horrific_ hack
-        //
-
-        for(
-            ServiceClient *an_sc = my_service_clients->first();
-            an_sc;
-            an_sc = my_service_clients->next()
-           )
-        {
-            if(an_sc->getType()    == MFD_SERVICE_AUDIO_CONTROL)
-            {
-                AudioClient *ac = (AudioClient *)an_sc;
-                ac->playTrack(container, which_id);
-                break;
-            }
-        }
-    }
-    if(type == 2)   // playlist
-    {
-        //
-        //  play list  this is currently a _horrific_ hack
-        //
-
-        for(
-            ServiceClient *an_sc = my_service_clients->first();
-            an_sc;
-            an_sc = my_service_clients->next()
-           )
-        {
-            if(an_sc->getType()    == MFD_SERVICE_AUDIO_CONTROL)
-            {
-                AudioClient *ac = (AudioClient *)an_sc;
-                ac->playList(container, which_id, index);
-                break;
-            }
-        }
-    }
-        
-}
-
-void MfdInstance::stopAudio()
-{
-    for(
-        ServiceClient *an_sc = my_service_clients->first();
-        an_sc;
-        an_sc = my_service_clients->next()
-       )
-    {
-        if(an_sc->getType()    == MFD_SERVICE_AUDIO_CONTROL)
-        {
-            AudioClient *ac = (AudioClient *)an_sc;
-            ac->stopAudio();
-            break;
-        }
-    }
 }
 
 void MfdInstance::readFromMfd()
@@ -535,6 +501,83 @@ void MfdInstance::announceMyDemise()
                                                  );
 
     QApplication::postEvent( mfd_interface, de );
+}
+
+void MfdInstance::addPendingCommand(QStringList new_command)
+{
+    if(new_command.count() < 1)
+    {
+        cerr << "mfdinstance.o: something is trying to "
+             << "addPendingCommand(), but passed no commands "
+             << endl;
+        return;
+    }
+    if(new_command.count() < 2)
+    {
+        cerr << "mfdinstance.o: something is trying to "
+             << "addPendingCommand(), but only passed a magic "
+             << "token of \""
+             << new_command[0] 
+             << "\" with no actual commands."
+             << endl;
+        return;
+    }
+    
+    pending_commands_mutex.lock();
+        pending_commands.append(new_command);
+    pending_commands_mutex.unlock();
+    wakeUp();
+}
+
+void MfdInstance::executeCommands(QStringList new_command)
+{
+    //
+    //  Make sure the list of tokens in new_command contains _at least_ a
+    //  magic token (e.g. "audio") and some actual command
+    //
+    
+    if(new_command.count() < 2)
+    {
+        cerr << "mfdinstance.o: asked to executeCommands() with"
+             << "no commands"
+             << endl;
+             return;
+    }
+    
+    //
+    //  Pop off the magic token
+    //
+
+    QString magic_token = new_command[0];
+    new_command.pop_front();
+    
+    //
+    //  Find the service client object that will deal with these kinds of
+    //  commands
+    //
+    
+    bool found_one = false;
+    for(
+            ServiceClient *an_sc = my_service_clients->first();
+            an_sc;
+            an_sc = my_service_clients->next()
+           )
+    {
+        if(an_sc->getMagicToken() == magic_token)
+        {
+            found_one = true;
+            an_sc->executeCommand(new_command);
+        }
+    }
+    
+    if(!found_one)
+    {
+        cerr << "mfdinstance.o: no service client object would "
+             << "deal with a magic_token of \""
+             << magic_token
+             << "\""
+             << endl;
+    }
 }
 
 MfdInstance::~MfdInstance()    

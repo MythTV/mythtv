@@ -47,9 +47,6 @@ class MfdInstance : public QThread
     void    announceMyDemise();
     int     getId(){return mfd_id;}
     
-    void    playAudio(int container, int type, int which_id, int index);
-    void    stopAudio();
-    
     //
     //  Adding and removing interfaces to services _this_ mfd offers
     //
@@ -62,10 +59,13 @@ class MfdInstance : public QThread
                                 const QString &address, 
                                 uint a_port
                             );
-    
+
+    virtual void    addPendingCommand(QStringList new_command);
  
   private:
   
+    void    executeCommands(QStringList new_command);    
+
     QString name;
     QString hostname;
     QString ip_address;
@@ -83,7 +83,15 @@ class MfdInstance : public QThread
     
     MfdInterface *mfd_interface;
     int mfd_id;
-    
+
+    //
+    //  Thread safe way to get commands from the client thread into this
+    //  instance thread for execution
+    //    
+
+    QValueList<QStringList> pending_commands;
+    QMutex                  pending_commands_mutex;
+
 };
 
 #endif

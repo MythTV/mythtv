@@ -28,7 +28,8 @@ AudioClient::AudioClient(
                             an_mfd,
                             MFD_SERVICE_AUDIO_CONTROL,
                             l_ip_address,
-                            l_port
+                            l_port,
+                            "audio"
                           )
 {
 }
@@ -56,6 +57,39 @@ void AudioClient::stopAudio()
 {
     QString command = QString("stop");
 
+    client_socket_to_service->writeBlock(command.ascii(), command.length());
+}
+
+void AudioClient::pauseAudio(bool y_or_n)
+{
+    QString command;
+    if(y_or_n)
+    {
+        command = QString("pause on");
+    }
+    else
+    {
+        command = QString("pause off");
+    }
+
+    client_socket_to_service->writeBlock(command.ascii(), command.length());
+}
+
+void AudioClient::seekAudio(int how_much)
+{   
+    QString command = QString("seek %1").arg(how_much);
+    client_socket_to_service->writeBlock(command.ascii(), command.length());
+}
+
+void AudioClient::nextAudio()
+{   
+    QString command = QString("next");
+    client_socket_to_service->writeBlock(command.ascii(), command.length());
+}
+
+void AudioClient::prevAudio()
+{   
+    QString command = QString("prev");
     client_socket_to_service->writeBlock(command.ascii(), command.length());
 }
 
@@ -165,6 +199,134 @@ void AudioClient::parseFromAudio(QStringList &tokens)
     cerr << "getting tokens from audio server I don't understand: "
          << tokens.join(" ")
          << endl;
+}
+
+void AudioClient::executeCommand(QStringList new_command)
+{
+    if(new_command.count() < 1)
+    {
+        cerr << "audioclient.o: asked to executeCommand(), "
+             << "but got no commands."
+             << endl;
+        return;
+    }
+    
+    if(new_command[0] == "play")
+    {
+        //
+        //  Make sure we have enough tokens for a "play" command
+        //  
+        
+        if(new_command.count() < 5)
+        {
+            cerr << "audioclient.o: asked to play audio, but not "
+                 << "enough tokens provided to know what to play."
+                 << endl;
+            return;
+        }
+
+        //
+        //  Convert the string tokens to useful variables
+        //
+
+        bool ok = true;
+
+        int container = new_command[1].toInt(&ok);
+        if(container < 0 || !ok)
+        {
+            cerr << "audioclient.o: error converting play command's "
+                 << "container token." 
+                 << endl;
+            return;
+        }
+        
+        int type = new_command[2].toInt(&ok);
+        if(type < 1 || type > 2 || !ok)
+        {
+            cerr << "audioclient.o: error converting play command's "
+                 << "type token." 
+                 << endl;
+            return;
+        }
+        
+        int which_id = new_command[3].toInt(&ok);
+        if(which_id < 0 || !ok)
+        {
+            cerr << "audioclient.o: error converting play command's "
+                 << "which_id token." 
+                 << endl;
+            return;
+        }
+        
+        int index = new_command[4].toInt(&ok);
+        if(index < 0 || !ok)
+        {
+            cerr << "audioclient.o: error converting play command's "
+                 << "index token." 
+                 << endl;
+            return;
+        }
+        
+        //
+        //  Either basic metadata item (type = 1) or an entry in a playlist (type = 2)
+        //
+        
+        if(type == 1)
+        {
+            playTrack(container, which_id);
+        }
+        else if(type == 2)
+        {
+            playList(container, which_id, index);
+        }
+        
+    }
+    else if(new_command[0] == "stop")
+    {
+        //
+        //  Stop the audio 
+        //
+        
+        stopAudio();        
+    }
+    else if(new_command[0] == "pause")
+    {
+        //
+        //  Turn audio pause on or off
+        //
+        
+        if(new_command.count() < 2)
+        {
+            cerr << "audioclient.o: pause is a useless command "
+                 << "unless you add \"on\" or \"off\"."
+                 << endl;
+            return;
+        }
+
+        if(new_command[1] == "on")
+        {
+            pauseAudio(true);
+        }
+        else if(new_command[1] == "off")
+        {
+            pauseAudio(false);
+        }
+        else
+        {
+            cerr << "audioclient.o: got pause command with "
+                 << "neither \"on\" nor \"off\"."
+                 << endl;
+        }
+    }    
+    else
+    {
+        cerr << "audioclient.o: I don't understand this "
+             << "command: \""
+             << new_command.join(" ")
+             << "\""
+             << endl;
+    }
+    
 }
 
 AudioClient::~AudioClient()
