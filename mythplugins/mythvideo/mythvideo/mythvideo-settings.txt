@@ -3,12 +3,12 @@ str profile_default=profile_movies
 str StartDir=/mnt/store
 str LoadProfile=profile_default
 
-str wav_helper=/usr/local/bin/mplayer %s
-str avi_helper=/usr/local/bin/mplayer %s 
-str mpg_helper=/usr/local/bin/mplayer %s 
-str mpeg_helper=/usr/local/bin/mplayer %s 
-str divx_helper=/usr/local/bin/mplayer %s 
-str mp3_helper=/usr/local/bin/mplayer %s 
-str wma_helper=/usr/local/bin/mplayer %s 
+str wav_helper=/usr/local/bin/mplayer -fs -vm -zoom -quiet %s
+str avi_helper=/usr/local/bin/mplayer -fs -vm -zoom -quiet %s
+str mpg_helper=/usr/local/bin/mplayer -fs -vm -zoom -quiet %s
+str mpeg_helper=/usr/local/bin/mplayer -fs -vm -zoom -quiet %s
+str divx_helper=/usr/local/bin/mplayer -fs -vm -zoom -quiet %s
+str mp3_helper=/usr/local/bin/mplayer -fs -vm -zoom -quiet %s
+str wma_helper=/usr/local/bin/mplayer -fs -vm -zoom -quiet %s
 
 str profile_movies=wav avi mpg mpeg divx mp3 wma
