@@ -195,6 +195,8 @@ for opt do
   ;;
   --enable-shared) lshared="yes"
   ;;
+  --enable-lcd) lcdproc="yes"
+  ;;
   --disable-mpegaudio-hp) mpegaudio_hp="no"
   ;;
   esac
@@ -363,6 +365,7 @@ echo "  --enable-win32           enable win32 cross compile"
 echo "  --disable-a52            disable GPL'ed A52 support [default=no]"
 echo "  --enable-a52bin          open liba52.so.0 at runtime [default=no]"
 echo "  --enable-shared          build shared libraries [default=no]"
+echo "  --enable-lcd             build with support for lcd display [default=no]"
 echo ""
 echo "Advanced options (experts only):"
 echo "  --source-path=PATH       path of source code [$source_path]"
@@ -477,6 +480,10 @@ fi
 if test "$lshared" = "yes" ; then
   echo "BUILD_SHARED=yes" >> config.mak
   echo "PIC=-fPIC" >> config.mak
+fi
+if test "$lcdproc" = "yes" ; then
+  echo "BUILD_LCD=yes" >> config.mak
+  echo "#define LCD_DEVICE" >> $TMPH
 fi
 echo "EXTRALIBS=$extralibs" >> config.mak
 echo -n "VERSION=" >>config.mak
