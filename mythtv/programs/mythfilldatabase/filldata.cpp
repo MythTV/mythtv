@@ -851,8 +851,8 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                                      "name = \"%s\", callsign = \"%s\", "
                                      "channum = \"%s\", finetune = %d, "
                                      "icon = \"%s\", freqid = \"%s\", "
-                                     "tvformat = \"%s\", "
-                                     " WHERE xmltvid = \"%s\" "
+                                     "tvformat = \"%s\" "
+                                     "WHERE xmltvid = \"%s\" "
                                      "AND sourceid = %d;",
                                      chanid.ascii(),
                                      (*i).name.ascii(),
