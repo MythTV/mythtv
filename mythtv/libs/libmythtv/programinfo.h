@@ -7,7 +7,7 @@
 #include <qmap.h>
 #include "scheduledrecording.h"
 
-#define NUMPROGRAMLINES 17
+#define NUMPROGRAMLINES 20
 
 class QSqlDatabase;
 

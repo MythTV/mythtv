@@ -108,6 +108,9 @@ void ProgramInfo::ToStringList(QStringList &list)
     list << QString::number(recording);
     list << QString::number(duplicate);
     list << hostname;
+    list << QString::number(sourceid);
+    list << QString::number(cardid);
+    list << QString::number(inputid);
 }
 
 void ProgramInfo::FromStringList(QStringList &list, int offset)
@@ -134,7 +137,10 @@ void ProgramInfo::FromStringList(QStringList &list, int offset)
     conflicting = list[offset + 13].toInt();
     recording = list[offset + 14].toInt();
     duplicate = list[offset + 15].toInt();
-    hostname = list[offset += 16];
+    hostname = list[offset + 16];
+    sourceid = list[offset + 17].toInt();
+    cardid = list[offset + 18].toInt();
+    inputid = list[offset + 19].toInt();
 
     if (title == " ")
         title = "";
