@@ -75,7 +75,9 @@ void startTV(void)
             usleep(50);
 
         while (nextstate == kState_WatchingLiveTV ||
-               nextstate == kState_WatchingRecording)
+               nextstate == kState_WatchingRecording ||
+               nextstate == kState_WatchingPreRecorded ||
+               nextstate == kState_WatchingOtherRecording)
         {
             usleep(2000);
             nextstate = tv->GetState();
