@@ -1,63 +1,9 @@
 <!doctype linuxdoc system>
-<!-- Revision History
-v1.00, 2002-11-05.  Initial.
-v1.01, 2002-11-06.  Added section on lirc, spelling errors.
-v1.02, 2002-11-11.  Converted to docbook, added more to the remote control
-section, compiling on AMD and Via C3 processors, Debian packaging, ispell.
-v1.03, 2002-11-12.  Added text from Cedar McKay on Red Hat Linux 8.0
-v1.031, 2002-11-19.  Added text on the ALSA 0.9.0rc5/rc6 hanging bug, started
-development on mythmusic instructions, added text on obtaining document and
-using CVS.  Merged some more RH 8.0 documentation from Cedar McKay.  Applied
-Debian information patch from Matt Zimmerman.
-v1.032, 2002-11-22.  Added stuff on modifying xmltv, changed CVS
-documentation so that it's not dependent on CVSROOT being set, pointer to
-Tarek's DirecTV and external channel changing script, moved text around so
-that external tuner / DirecTV are located under "using mythtv".  Added
-troubleshooting information about KDE vs. Gnome on RH 8.0
-v1.033, 2002-11-23.  Fixed the XMLTV/mythfilldatabase instruction to point
-to the correct file.  Slight wording changes to the DirecTV stuff.  Moved
-some CVS parameters around.  Added "DMA" to troubleshooting section.
-v1.034, 2002-11-24.  Added information on setting up mythmusic database.
-v1.035, 2002-11-25.  Added information on Gentoo.
-v1.036, 2002-11-27.  Added information on using an IR Blaster.
-v1.037, 2002-11-28.  Added information on RH 8.0 environment setting by Mike
-Cencula, additional modifications on Genoo by Tony Clark.
-v1.038, 2002-11-28.  Modified the XMLTV version to get, still working on the
-Gentoo instructions.
-v1.039, 2002-11-29.  More work on the Gentoo instructions.
-v1.040, 2002-11-29.  Slight change to the RH 8.0 LANG instructions; put a
-reference to the "special" instructions for RH 8.0 users.
-v1.041, 2002-11-29.  Added some explanatory text about hdparm.
-v1.042, 2002-11-29.  Cleaned up the text that talks about Tivo and hardware
-based encoders.
-v1.043, 2002-11-29.  More RH 8.0 LANG stuff.
-v1.044, 2002-11-29.  Working on the mythmusic install instructions.  Added
-information about creating your own ~/.mythtv to maintain settings.
-v1.045, 2002-12-02.  Started working on the urpmi instructions for
-mythmusic.  Made changes to Mandrake docs to accomodate MDK 8.2.
-v1.046, 2002-12-02.  Added information on mythfilldatabase and xawtv
-channels.  Added attribution information for Harondel J. Sibble for Mandrake
-8.2.  Modified Gentoo again.  Added text on one system running the master database.  Added
-"Advanced Functionality" section.  Altered text throughout, referencing
-master system needing mysql, remote systems not needing it.
-v1.047, 2002-12-02.  Removed reference to advanced functions; IJR says that
-it's going to be changing soon.
-v1.048, 2002-12-04.  Modified the RH instructions, normalized the user shell
-prompt.
-v1.049, 2002-12-16.  Added Pentium 2 to list of boxes that don't support
-MMX2 (but really known as SSE).  (Needed for deinterlacer.)  Changed RH8.2 instructions per Harondel
-Sipple.
--->
-<!--
-To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
-"$ linuxdoc -B txt -b 1 mythtv-HOWTO.sgml"  
--->
-
 <article>
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-12-16, v1.049
+<date>2002-12-17, v1.050
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -89,6 +35,8 @@ This documentation will be in the <tt>docs/</tt> subdirectory.
 the distribution tarballs, it is <bf>strongly</bf> recommended that you <url
 url="http://www.snowman.net/mailman/listinfo/mythtv-commits/" name="join">
 the mythtv-dev mailing list.
+
+This HOWTO is for mythtv v0.7.
 
 <sect>Introduction.
 <p>This HOWTO document will focus on mythtv in a North American environment.
@@ -860,15 +808,24 @@ $
 That takes care of setting the volume correctly, and the ALSA startup script
 will restore the volume after a reboot.
 
+You may also use the <bf>alsamixer</bf> program to set the volume.  First,
+start <bf>alsamixer</bf> from the command line.  You should start out on the
+"Master" volume control slider.  Use the up and down cursor to set the
+master volume to around 75%.  Next, use the left and right cursor keys to
+move around on the screen until you find the "Line" slider.  Press SPACE to
+set it as the capture source, set the level to around 50-75% and press "M"
+to mute it.  You can now press ESC to exit out of the <bf>alsamixer</bf>
+program.
+ 
 <sect>Setting up a remote control.
 
 <p>mythtv does not have native remote control receiver and decoder software
 built-in.  Instead, remote control functions are implemented by cooperating
-with lirc, the Linux Infra Red Control program.  lirc handles the IR
+with <bf>lirc</bf>, the Linux Infra Red Control program.  <bf>lirc</bf> handles the IR
 hardware and passes keystrokes to mythtv, which then acts as if the user had
 pressed the keys on the keyboard.
 
-lircd has two prerequisites:  dialog, available in Mandrake through the
+lircd has two prerequisites:  <bf>dialog</bf>, available in Mandrake through the
 "cdialog" RPM, and the kernel source.  Mandrake 9.0 is using the 2.4.19
 kernel, so the easiest thing is to go to <url url="http://www.kernel.org"
 name="http://www.kernel.org"> and download
@@ -1659,3 +1616,59 @@ directory <tt>~/.mythtv</tt> and copy your settings.txt file to this
 location.
 
 </article>
+<!-- Revision History
+v1.00, 2002-11-05.  Initial.
+v1.01, 2002-11-06.  Added section on lirc, spelling errors.
+v1.02, 2002-11-11.  Converted to docbook, added more to the remote control
+section, compiling on AMD and Via C3 processors, Debian packaging, ispell.
+v1.03, 2002-11-12.  Added text from Cedar McKay on Red Hat Linux 8.0
+v1.031, 2002-11-19.  Added text on the ALSA 0.9.0rc5/rc6 hanging bug, started
+development on mythmusic instructions, added text on obtaining document and
+using CVS.  Merged some more RH 8.0 documentation from Cedar McKay.  Applied
+Debian information patch from Matt Zimmerman.
+v1.032, 2002-11-22.  Added stuff on modifying xmltv, changed CVS
+documentation so that it's not dependent on CVSROOT being set, pointer to
+Tarek's DirecTV and external channel changing script, moved text around so
+that external tuner / DirecTV are located under "using mythtv".  Added
+troubleshooting information about KDE vs. Gnome on RH 8.0
+v1.033, 2002-11-23.  Fixed the XMLTV/mythfilldatabase instruction to point
+to the correct file.  Slight wording changes to the DirecTV stuff.  Moved
+some CVS parameters around.  Added "DMA" to troubleshooting section.
+v1.034, 2002-11-24.  Added information on setting up mythmusic database.
+v1.035, 2002-11-25.  Added information on Gentoo.
+v1.036, 2002-11-27.  Added information on using an IR Blaster.
+v1.037, 2002-11-28.  Added information on RH 8.0 environment setting by Mike
+Cencula, additional modifications on Genoo by Tony Clark.
+v1.038, 2002-11-28.  Modified the XMLTV version to get, still working on the
+Gentoo instructions.
+v1.039, 2002-11-29.  More work on the Gentoo instructions.
+v1.040, 2002-11-29.  Slight change to the RH 8.0 LANG instructions; put a
+reference to the "special" instructions for RH 8.0 users.
+v1.041, 2002-11-29.  Added some explanatory text about hdparm.
+v1.042, 2002-11-29.  Cleaned up the text that talks about Tivo and hardware
+based encoders.
+v1.043, 2002-11-29.  More RH 8.0 LANG stuff.
+v1.044, 2002-11-29.  Working on the mythmusic install instructions.  Added
+information about creating your own ~/.mythtv to maintain settings.
+v1.045, 2002-12-02.  Started working on the urpmi instructions for
+mythmusic.  Made changes to Mandrake docs to accomodate MDK 8.2.
+v1.046, 2002-12-02.  Added information on mythfilldatabase and xawtv
+channels.  Added attribution information for Harondel J. Sibble for Mandrake
+8.2.  Modified Gentoo again.  Added text on one system running the master database.  Added
+"Advanced Functionality" section.  Altered text throughout, referencing
+master system needing mysql, remote systems not needing it.
+v1.047, 2002-12-02.  Removed reference to advanced functions; IJR says that
+it's going to be changing soon.
+v1.048, 2002-12-04.  Modified the RH instructions, normalized the user shell
+prompt.
+v1.049, 2002-12-16.  Added Pentium 2 to list of boxes that don't support
+MMX2 (but really known as SSE).  (Needed for deinterlacer.)  Changed RH8.2 instructions per Harondel
+Sipple.
+v1.050, 2002-12-17.  Moved revision history to end of document.  Added
+version information that the HOWTO was created for.  Currently, mythtv v0.7.
+Added text mode instructions for setting alsamixer.
+-->
+<!--
+To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
+"$ linuxdoc -B txt -b 1 mythtv-HOWTO.sgml"  
+-->
