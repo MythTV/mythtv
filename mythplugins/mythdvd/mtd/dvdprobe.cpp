@@ -347,7 +347,7 @@ void DVDTitle::addAudio(DVDAudio *new_audio_track)
 void DVDTitle::addSubTitle(DVDSubTitle *new_subtitle)
 {
     //
-    //  Check if this langauge already exists
+    //  Check if this language already exists
     //  (which happens a lot)
     //
     
@@ -405,12 +405,12 @@ void DVDTitle::determineInputID(QSqlDatabase *db)
     }
     else
     {
-        cerr << "dvdprobe.o: You have a title on your dvd in format myth doesn't understand." << endl;
+        cerr << "dvdprobe.o: You have a title on your dvd in a format myth doesn't understand." << endl;
         cerr << "dvdprobe.o: Either that, or you haven't installed the dvdinput table." << endl;
         cerr << "dvdprobe.o: You probably want to report this to a mailing list or something: " << endl;
         cerr << "                  height = " << hsize << endl;
         cerr << "                   width = " << vsize << endl;
-        cerr << "            aspect ratio = " << aspect_ratio << endl;
+        cerr << "            aspect ratio = " << aspect_ratio << " (" << ar_numerator << "/"<< ar_denominator << ")" << endl;
         cerr << "              frame rate = " << frame_rate << endl;
         cerr << "                 fr_code = " << fr_code << endl;
         if(letterbox)
@@ -440,7 +440,7 @@ DVDProbe::DVDProbe(const QString &dvd_device, QSqlDatabase *ldb)
 {
     //
     //  This object just figures out what's on a disc
-    //  and tells whoever asks about it.
+    //  and tells whomever asks about it.
     //
     
     if(!ldb)
@@ -641,7 +641,7 @@ bool DVDProbe::probe()
                     if(vtsi_mat)
                     {
                         //
-                        //  and now, wave the diving rod over audio bits
+                        //  and now, wave the divining rod over audio bits
                         //
                     
                         for(int j=0; j < vtsi_mat->nr_of_vts_audio_streams; j++)
@@ -653,7 +653,7 @@ bool DVDProbe::probe()
                         }
 
                         //
-                        //  divine, with any luck, subtitles
+                        //  determine, with any luck, subtitles
                         //
                         
                         for(int j=0; j < vtsi_mat->nr_of_vts_subp_streams; j++)

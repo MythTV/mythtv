@@ -7,6 +7,14 @@
       <action>DVD_PLAY</action>
    </button>
 
+   <button>
+      <type>VCD_PLAY</type>
+      <text>Play VCD</text>
+      <text lang="DK">Afspil VCD</text>
+      <action>VCD_PLAY</action>
+   </button>
+
+
 
    <button>
       <type>DVD_RIP</type>

@@ -2,7 +2,7 @@ USE mythconverg;
 
 #
 #  This table classifies
-#  data on a DVD
+#  ways to transcode a title 
 #
 
 CREATE TABLE dvdtranscode
