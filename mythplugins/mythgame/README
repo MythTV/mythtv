@@ -1,5 +1,5 @@
                                     MythGame
-			          Release 0.12
+			          Release 0.13
 
 
 There'll be more information here later, but for now:
@@ -36,14 +36,11 @@ changes you made to those will be carried over into this.
 After compiling and installing, you will need to enter the setup menu from
 mythfrontend to configure mythgame.  You'll probably want to set ROM paths, etc.
 
-If you want to use the screenshot-based selection interface, set the ShotCount
-setting to 5.
-
 The first time you run MythGame, it'll search out and insert all games that it
 finds into its database, so it may seem to take awhile.  Later runs should be
 fairly quick.  In the normal text-only selection interface, just navigate around
-with the arrow keys, and use space/enter to start a game.  Hitting 'e' on the
-game name will take you to a settings dialog, and hitting 'e' on the system
+with the arrow keys, and use space/enter to start a game.  Hitting 'm' on the
+game name will take you to a settings dialog, and hitting 'm' on the system
 name (ie, MAME), will take you to a system setup menu.  In the screenshot-based
 selection menu, just hit tab to switch between navigating the list and the
 screenshot section.

@@ -1,13 +1,4 @@
 
-A Note on the dvddb
-===================
-
-If you are installing mythdvd for the first time, you just need to execute
-the main metadata.sql script as described in ../README and in the online
-documentation at:
-
-        http://www.mythtv.org/docs/
-
 Table schema
 ============
 

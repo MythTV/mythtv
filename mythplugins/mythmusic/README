@@ -1,5 +1,5 @@
                              MythMusic 
-                           Release 0.12
+                           Release 0.13
 
 
 There'll be more information here later, but for now:
@@ -20,7 +20,7 @@ In addition to MythTV's requirements, you'll need these software packages:
    Vorbis - I've just used this with version 1.0.  You'll need a full install,
             encoding and decoding support.  http://www.vorbis.com
 
-   FLAC - lossless encoder/decoder.  Version 1.0.4 is needed.
+   FLAC - lossless encoder/decoder.  Version >= 1.0.4 is needed.
           http://flac.sourceforge.net
 
    libcdaudio - Used to play CDs and to hit FreeDB for CD information.
