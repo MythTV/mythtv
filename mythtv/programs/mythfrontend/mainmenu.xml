@@ -13,4 +13,11 @@
      <depends>musicmenu.xml</depends>
    </button>
 
+   <button>
+     <type>GAME</type>
+     <text>Games</text>
+     <action>EXEC mythgame</action>
+     <depends>gamemenu.xml</depends>
+   </button>
+
 </mythmenu>
