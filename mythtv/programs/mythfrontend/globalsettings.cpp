@@ -560,6 +560,15 @@ public:
     };
 };
 
+class EPGType: public CheckBoxSetting, public GlobalSetting {
+public:
+    EPGType():
+        GlobalSetting("EPGType") {
+        setLabel("Use alternative EPG layout");
+        setValue(false);
+    };
+};
+
 class EPGCurrentTimeColor: public LineEditSetting, public GlobalSetting {
 public:
     EPGCurrentTimeColor():
@@ -735,6 +744,7 @@ EPGSettings::EPGSettings(MythContext *context)
     fonts->addChild(new EPGChanCallsignFontSize());
     fonts->addChild(new EPGProgFontSize());
     fonts->addChild(new EPGTitleFontSize());
+    fonts->addChild(new EPGType());
     addChild(fonts);
 
     VerticalConfigurationGroup* gen = new VerticalConfigurationGroup(false);
@@ -754,6 +764,8 @@ ThemeSettings::ThemeSettings(MythContext *context)
     theme->addChild(new GuiWidth());
     theme->addChild(new GuiHeight());
     theme->addChild(new ThemeQt());
+    theme->addChild(new DateFormat());
+    theme->addChild(new TimeFormat());
 
     addChild(theme);
 }

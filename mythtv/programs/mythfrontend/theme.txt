@@ -1,4 +1,0 @@
-# Program Guide Grid specific options
-#
-# Uncomment this to use the alternative EPG layout
-#int EPGType=1
