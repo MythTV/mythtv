@@ -479,6 +479,7 @@ char *pstrcat(char *buf, int buf_size, const char *s);
 
 void __dynarray_add(unsigned long **tab_ptr, int *nb_ptr, unsigned long elem);
 
+#ifdef __GNUC__
 #define dynarray_add(tab, nb_ptr, elem)\
 do {\
     typeof(tab) _tab = (tab);\
@@ -486,6 +487,12 @@ do {\
     (void)sizeof(**_tab == _elem); /* check that types are compatible */\
     __dynarray_add((unsigned long **)_tab, nb_ptr, (unsigned long)_elem);\
 } while(0)
+#else
+#define dynarray_add(tab, nb_ptr, elem)\
+do {\
+    __dynarray_add((unsigned long **)(tab), nb_ptr, (unsigned long)(elem));\
+} while(0)
+#endif
 
 time_t mktimegm(struct tm *tm);
 const char *small_strptime(const char *p, const char *fmt, 

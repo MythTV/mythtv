@@ -15,7 +15,7 @@ extern "C" {
 
 #define FFMPEG_VERSION_INT     0x000408
 #define FFMPEG_VERSION         "0.4.8"
-#define LIBAVCODEC_BUILD       4679
+#define LIBAVCODEC_BUILD       4680
 
 #define LIBAVCODEC_VERSION_INT FFMPEG_VERSION_INT
 #define LIBAVCODEC_VERSION     FFMPEG_VERSION
@@ -1243,7 +1243,15 @@ typedef struct AVCodecContext {
      * - decoding: set by user, will be converted to upper case by lavc during init
      */
     unsigned int stream_codec_tag;
-   
+
+    /**  
+     * scene change detection threshold.
+     * 0 is default, larger means fewer detected scene changes
+     * - encoding: set by user.
+     * - decoding: unused
+     */
+    int scenechange_threshold;
+ 
     /**
      * VIA CLE266 Hardware MPEG decoding
      * - encoding: forbidden

@@ -31,7 +31,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
     framesPlayed = 0;
     framesRead = 0;
 
-    audio_check_1st = true;
+    audio_check_1st = 2;
     audio_sample_size = 4;
     audio_sampling_rate = 48000;
 
@@ -453,29 +453,35 @@ bool AvFormatDecoder::CheckVideoParams(int width, int height)
 
 bool AvFormatDecoder::CheckAudioParams(int freq, int channels)
 {
-    if (audio_check_1st)
+    if (audio_check_1st == 2)
     {
         if (freq == audio_sampling_rate && channels == audio_channels)
             return false;
 
-        audio_check_1st = false;
+        audio_check_1st = 1;
         audio_sampling_rate_2nd = freq;
         audio_channels_2nd = channels;
         return false;
     }
     else
     {
-        audio_check_1st = true;
-
         if ((freq != audio_sampling_rate_2nd && channels != audio_channels_2nd)
             || (freq == audio_sampling_rate && channels == audio_channels))
         {
             audio_sampling_rate_2nd = -1;
             audio_channels_2nd = -1;
+            audio_check_1st = 2;
             return false;
         }
-    }
 
+        if (audio_check_1st == 1)
+        {
+            audio_check_1st = 0;
+            return false;
+        }
+
+        audio_check_1st = 2;
+    }
 
     QString chan = "stereo";
     if (channels == 1)
@@ -984,15 +990,6 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                             validvpts = true;
                             newvpts = (long long)((double)pkt->pts * 
                                                   ptsmultiplier); 
-                        }
-                        else if (context->codec_id == CODEC_ID_MPEG1VIDEO ||
-                                 context->codec_id == CODEC_ID_MPEG2VIDEO ||
-                                 context->codec_id == CODEC_ID_MPEG2VIDEO_XVMC ||
-                                 context->codec_id == CODEC_ID_MPEG2VIDEO_VIA)
-                        {
-                            // guess, based off of the audio timestamp and 
-                            // the prebuffer size
-                            newvpts = lastapts + (int)(1000.0 / fps) * 3;
                         }
 
                         if (newvpts <= lastvpts)

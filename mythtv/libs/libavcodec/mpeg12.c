@@ -196,6 +196,7 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
         uint64_t time_code;
         float best_aspect_error= 1E10;
         float aspect_ratio= s->avctx->aspect_ratio;
+        int constraint_parameter_flag;
         
         if(aspect_ratio==0.0) aspect_ratio= s->width / (float)s->height; //pixel aspect 1:1 (VGA)
         
@@ -252,8 +253,18 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
 
             put_bits(&s->pb, 18, v & 0x3FFFF);
             put_bits(&s->pb, 1, 1); /* marker */
-            put_bits(&s->pb, 10, vbv_buffer_size & 0x3FF); 
-            put_bits(&s->pb, 1, 1); /* constrained parameter flag */
+            put_bits(&s->pb, 10, vbv_buffer_size & 0x3FF);
+
+            constraint_parameter_flag=
+                s->width <= 768 && s->height <= 576 &&
+                s->mb_width * s->mb_height <= 396 &&
+                s->mb_width * s->mb_height * frame_rate_tab[s->frame_rate_index] <= MPEG1_FRAME_RATE_BASE*396*25 &&
+                frame_rate_tab[s->frame_rate_index] <= MPEG1_FRAME_RATE_BASE*30 &&
+                vbv_buffer_size <= 20 &&
+                v <= 1856000/400 &&
+                s->codec_id == CODEC_ID_MPEG1VIDEO;
+
+            put_bits(&s->pb, 1, constraint_parameter_flag);
             
             ff_write_quant_matrix(&s->pb, s->avctx->intra_matrix);
             ff_write_quant_matrix(&s->pb, s->avctx->inter_matrix);
@@ -2468,9 +2479,11 @@ static int mpeg_decode_frame(AVCodecContext *avctx,
         /* find start next code */
         start_code = find_start_code(&buf_ptr, buf_end);
         if (start_code < 0){
-            if (slice_end(avctx, picture)) {
-                if(s2->last_picture_ptr) //FIXME merge with the stuff in mpeg_decode_slice
-                    *data_size = sizeof(AVPicture);
+            if(s2->pict_type != B_TYPE || avctx->hurry_up==0){
+                if (slice_end(avctx, picture)) {
+                    if(s2->last_picture_ptr) //FIXME merge with the stuff in mpeg_decode_slice
+                        *data_size = sizeof(AVPicture);
+                }
             }
             return FFMAX(0, buf_ptr - buf - s2->parse_context.last_index);
         }
