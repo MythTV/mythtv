@@ -49,7 +49,10 @@ LCDHost=localhost
 LCDPort=13666
 
 # VisualMode for the player
-# Can be one of: Synaesthesia Spectrum MonoScope StereoScope Gears Blank Random
+# Can be one of: Synaesthesia MonoScope StereoScope Blank Random
+# with FFTW support: Spectrum 
+# with SDL support: BumpScope (and faster Synaesthesia)
+# with OpenGL support: Gears (needs FFTW as well)
 # (Random chooses anything but Blank)
 VisualMode=Random
 

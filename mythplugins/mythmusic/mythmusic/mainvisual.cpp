@@ -9,6 +9,7 @@
 #include "buffer.h"
 #include "output.h"
 #include "synaesthesia.h"
+#include "bumpscope.h"
 #include "visualize.h"
 
 #include <qtimer.h>
@@ -251,6 +252,9 @@ static void checkVisFactories(void)
         MainVisual::registerVisFactory(new SpectrumFactory);
 #ifdef OPENGL_SUPPORT
         MainVisual::registerVisFactory(new GearsFactory);
+#endif
+#ifdef SDL_SUPPORT
+        MainVisual::registerVisFactory(new BumpScopeFactory);
 #endif
     }
 }

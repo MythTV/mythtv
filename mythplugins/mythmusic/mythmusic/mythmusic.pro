@@ -5,6 +5,10 @@
 include ( ../settings.pro )
 include (config.pro)
 
+!exists( config.pro ) {
+   error(Missing config.pro: please run the configure script)
+}
+
 TEMPLATE = app
 CONFIG += thread
 TARGET = mythmusic
@@ -25,10 +29,11 @@ HEADERS += decoder.h flacdecoder.h flacencoder.h maddecoder.h mainvisual.h
 HEADERS += metadata.h playbackbox.h playlist.h polygon.h output.h recycler.h 
 HEADERS += scrolllabel.h streaminput.h synaesthesia.h encoder.h visualize.h
 HEADERS += treecheckitem.h visual.h vorbisdecoder.h vorbisencoder.h polygon.h
+HEADERS += bumpscope.h
 
 SOURCES += audiooutput.cpp cddecoder.cpp cdrip.cpp databasebox.cpp decoder.cpp 
 SOURCES += flacdecoder.cpp flacencoder.cpp maddecoder.cpp main.cpp
 SOURCES += mainvisual.cpp metadata.cpp playbackbox.cpp playlist.cpp output.cpp 
 SOURCES += recycler.cpp scrolllabel.cpp streaminput.cpp encoder.cpp
 SOURCES += synaesthesia.cpp treecheckitem.cpp vorbisdecoder.cpp 
-SOURCES += vorbisencoder.cpp visualize.cpp
+SOURCES += vorbisencoder.cpp visualize.cpp bumpscope.cpp

@@ -40,7 +40,7 @@ Synaesthesia::Synaesthesia(long int winid)
     sprintf(SDL_windowhack, "SDL_WINDOWID=%ld", winid);
     putenv(SDL_windowhack);
 
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE) < 0)
     {
         cerr << "Unable to init SDL\n";
         return;
