@@ -5,6 +5,7 @@
 #include <qpixmap.h>
 #include <qpalette.h>
 #include <qsocket.h>
+#include <qobject.h>
 
 #include <list>
 #include <vector>
@@ -14,11 +15,12 @@ class Settings;
 class QSqlDatabase;
 class ProgramInfo;
 
-class MythContext
+class MythContext : public QObject
 {
+    Q_OBJECT
   public:
     MythContext(bool gui = true);
-   ~MythContext();
+    virtual ~MythContext();
 
     bool ConnectServer(const QString &hostname, int port);
 
@@ -91,7 +93,12 @@ class MythContext
                                 QString &channelname);
     void GetRecorderInputName(int recorder, QString &inputname);
 
+  private slots:
+    void readSocket();
+
   private:
+    void SendReceiveStringList(QStringList &strlist);
+
     void SetPalette(QWidget *widget);
 
     // font sizes
@@ -113,6 +120,7 @@ class MythContext
     QString m_localhostname;
 
     pthread_mutex_t serverSockLock;
+    bool expectingReply;
 };
 
 #endif

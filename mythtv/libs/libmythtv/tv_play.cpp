@@ -90,50 +90,31 @@ TV::~TV(void)
 
 TVState TV::LiveTV(void)
 {
-    if (internalState == kState_RecordingOnly)
+    if (internalState == kState_None)
     {
-        QString title = QString("MythTV is already recording 'blah' on ");
+        int testrec = m_context->RequestRecorder();
 
-/*
-        if (context->GetNumSetting("DisplayChanNum") == 0)
-            title += QString("%1 [%2].").arg(curRecording->channame)
-                                        .arg(curRecording->chansign);
-        else
-            title += QString("channel %1.").arg(curRecording->chanstr);
-*/
-        title += "  Do you want to:";
-
-        DialogBox diag(m_context, title);
-        diag.AddButton("Cancel and go back to the menu");
-        //diag.AddButton("Watch the in-progress recording");
-        //diag.AddButton("Stop recording and watch TV");
-
-        diag.Show();
-
-        int result = diag.exec();
-
-/*
-        if (result == 3)
+        if (testrec < 0)
         {
-            nextState = kState_WatchingLiveTV;
-            changeState = true;
-        }
-        else if (result == 2)
-        {
-            nextState = kState_WatchingRecording;
-            inputFilename = outputFilename;
-            changeState = true;
-        }
-        else
-*/
-        {
-            nextState = kState_RecordingOnly;
+            QString title = "MythTV is already using all available inputs for "
+                            "recording.  If you want to watch an in-progress "
+                            "recording, select one from the playback menu.  If "
+                            "you want to watch live TV, cancel one of the "
+                            "in-progress recordings from the delete menu.";
+    
+            DialogBox diag(m_context, title);
+            diag.AddButton("Cancel and go back to the TV menu");
+
+            diag.Show();
+            diag.exec();
+        
+            nextState = kState_None;
             changeState = false;
+        
+            return nextState;
         }
-    }
-    else if (internalState == kState_None)
-    {
-        activerecorder_num = recorder_num = m_context->RequestRecorder();
+
+        activerecorder_num = recorder_num = testrec;
         nextState = kState_WatchingLiveTV;
         changeState = true;
     }

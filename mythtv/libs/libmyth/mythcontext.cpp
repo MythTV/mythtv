@@ -19,6 +19,7 @@
 using namespace libmyth;
 
 MythContext::MythContext(bool gui)
+           : QObject()
 {
     m_installprefix = PREFIX;
     m_settings = new Settings;
@@ -61,6 +62,7 @@ MythContext::MythContext(bool gui)
     m_hmult = m_height / 600.0;
 
     serverSock = NULL;
+    expectingReply = false;
 }
 
 MythContext::~MythContext()
@@ -116,6 +118,8 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
     QStringList strlist = str;
     WriteStringList(serverSock, strlist);
     ReadStringList(serverSock, strlist);
+
+    connect(serverSock, SIGNAL(readyRead()), this, SLOT(readSocket()));
 
     return true;
 }
@@ -405,6 +409,19 @@ void MythContext::SetSetting(const QString &key, const QString &newValue)
     m_settings->SetSetting(key, newValue);
 }
 
+void MythContext::SendReceiveStringList(QStringList &strlist)
+{
+    pthread_mutex_lock(&serverSockLock);
+    expectingReply = true;
+
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+
+
+    expectingReply = false;
+    pthread_mutex_unlock(&serverSockLock);
+}
+
 vector<ProgramInfo *> *MythContext::GetRecordedList(bool deltype)
 {
     QString str = "QUERY_RECORDINGS ";
@@ -415,10 +432,7 @@ vector<ProgramInfo *> *MythContext::GetRecordedList(bool deltype)
 
     QStringList strlist = str;
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 
     int numrecordings = strlist[0].toInt();
 
@@ -441,10 +455,7 @@ void MythContext::GetFreeSpace(int &totalspace, int &usedspace)
 {
     QStringList strlist = QString("QUERY_FREESPACE");
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 
     totalspace = strlist[0].toInt();
     usedspace = strlist[1].toInt();
@@ -455,20 +466,14 @@ void MythContext::DeleteRecording(ProgramInfo *pginfo)
     QStringList strlist = QString("DELETE_RECORDING");
     pginfo->ToStringList(strlist);
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 }
 
 bool MythContext::GetAllPendingRecordings(list<ProgramInfo *> &recordinglist)
 {
     QStringList strlist = QString("QUERY_GETALLPENDING");
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 
     bool conflicting = strlist[0].toInt();
     int numrecordings = strlist[1].toInt();
@@ -494,10 +499,7 @@ list<ProgramInfo *> *MythContext::GetConflictList(ProgramInfo *pginfo,
     QStringList strlist = cmd;
     pginfo->ToStringList(strlist);
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 
     int numrecordings = strlist[0].toInt();
     int offset = 1;
@@ -520,10 +522,7 @@ int MythContext::RequestRecorder(void)
 {
     QStringList strlist = "GET_FREE_RECORDER";
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 
     int retval = strlist[0].toInt();
     return retval;
@@ -534,10 +533,7 @@ bool MythContext::RecorderIsRecording(int recorder)
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
     strlist << "IS_RECORDING";
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 
     bool retval = strlist[0].toInt();
     return retval;
@@ -548,10 +544,7 @@ float MythContext::GetRecorderFrameRate(int recorder)
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
     strlist << "GET_FRAMERATE";
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 
     float retval = strlist[0].toFloat();
     return retval;
@@ -562,10 +555,7 @@ long long MythContext::GetRecorderFramesWritten(int recorder)
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
     strlist << "GET_FRAMES_WRITTEN";
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 
     long long retval = decodeLongLong(strlist, 0);
 
@@ -577,10 +567,7 @@ long long MythContext::GetRecorderFilePosition(int recorder)
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
     strlist << "GET_FILE_POSITION";
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 
     long long retval = decodeLongLong(strlist, 0);
 
@@ -594,10 +581,7 @@ long long MythContext::GetRecorderFreeSpace(int recorder,
     strlist << "GET_FREE_SPACE";
     encodeLongLong(strlist, totalreadpos);
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 
     long long retval = decodeLongLong(strlist, 0);
 
@@ -610,10 +594,7 @@ long long MythContext::GetKeyframePosition(int recorder, long long desired)
     strlist << "GET_KEYFRAME_POS";
     encodeLongLong(strlist, desired);
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 
     long long retval = decodeLongLong(strlist, 0);
 
@@ -629,10 +610,7 @@ void MythContext::SetupRecorderRingBuffer(int recorder, QString &path,
     strlist << "SETUP_RING_BUFFER";
     strlist << QString::number((int)pip);
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 
     path = strlist[0];
 
@@ -645,10 +623,7 @@ void MythContext::SpawnLiveTVRecording(int recorder)
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
     strlist << "SPAWN_LIVETV";
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 }
 
 void MythContext::StopLiveTVRecording(int recorder)
@@ -656,10 +631,7 @@ void MythContext::StopLiveTVRecording(int recorder)
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
     strlist << "STOP_LIVETV";
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 }
 
 void MythContext::PauseRecorder(int recorder)
@@ -667,10 +639,7 @@ void MythContext::PauseRecorder(int recorder)
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
     strlist << "PAUSE";
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 }
 
 void MythContext::ToggleRecorderInputs(int recorder)
@@ -678,10 +647,7 @@ void MythContext::ToggleRecorderInputs(int recorder)
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
     strlist << "TOGGLE_INPUTS";
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 }
 
 void MythContext::RecorderChangeChannel(int recorder, bool direction)
@@ -690,10 +656,7 @@ void MythContext::RecorderChangeChannel(int recorder, bool direction)
     strlist << "CHANGE_CHANNEL";
     strlist << QString::number((int)direction);    
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 }
 
 void MythContext::RecorderSetChannel(int recorder, QString channel)
@@ -702,10 +665,7 @@ void MythContext::RecorderSetChannel(int recorder, QString channel)
     strlist << "SET_CHANNEL";
     strlist << channel;
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 }
 
 void MythContext::RecorderChangeContrast(int recorder, bool direction)
@@ -714,10 +674,7 @@ void MythContext::RecorderChangeContrast(int recorder, bool direction)
     strlist << "CHANGE_CONTRAST";
     strlist << QString::number((int)direction);    
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 }
 
 void MythContext::RecorderChangeBrightness(int recorder, bool direction)
@@ -726,10 +683,7 @@ void MythContext::RecorderChangeBrightness(int recorder, bool direction)
     strlist << "CHANGE_BRIGHTNESS";
     strlist << QString::number((int)direction);    
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 }
 
 void MythContext::RecorderChangeColour(int recorder, bool direction)
@@ -738,10 +692,7 @@ void MythContext::RecorderChangeColour(int recorder, bool direction)
     strlist << "CHANGE_COLOUR";
     strlist << QString::number((int)direction);    
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 }
 
 bool MythContext::CheckChannel(int recorder, QString channel)
@@ -750,10 +701,7 @@ bool MythContext::CheckChannel(int recorder, QString channel)
     strlist << "CHECK_CHANNEL";
     strlist << channel;
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 
     bool retval = strlist[0].toInt();
     return retval;
@@ -769,10 +717,7 @@ void MythContext::GetRecorderChannelInfo(int recorder, QString &title,
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
     strlist << "GET_PROGRAM_INFO";
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 
     title = strlist[0];
     subtitle = strlist[1];
@@ -790,10 +735,18 @@ void MythContext::GetRecorderInputName(int recorder, QString &inputname)
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
     strlist << "GET_INPUT_NAME";
 
-    pthread_mutex_lock(&serverSockLock);
-    WriteStringList(serverSock, strlist);
-    ReadStringList(serverSock, strlist);
-    pthread_mutex_unlock(&serverSockLock);
+    SendReceiveStringList(strlist);
 
     inputname = strlist[0];
 }
+
+void MythContext::readSocket(void)
+{
+    if (expectingReply)
+        return;
+
+    if (serverSock->bytesAvailable() > 0)
+        cout << "ready read\n";
+
+}
+

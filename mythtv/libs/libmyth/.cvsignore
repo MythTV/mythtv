@@ -9,3 +9,4 @@ moc_lcddevice.cpp
 moc_themedmenu.cpp
 moc_settings.cpp
 moc_mythwidgets.cpp
+moc_mythcontext.cpp
