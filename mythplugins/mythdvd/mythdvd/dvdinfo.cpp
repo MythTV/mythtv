@@ -58,7 +58,8 @@ uint DVDTitleInfo::getPlayLength()
 
 QString DVDTitleInfo::getTimeString()
 {
-    QString a_string = QString("%1:%2:%3").arg(hours).arg(minutes).arg(seconds);
+    QString a_string;
+    a_string.sprintf("%d:%02d:%02d", hours, minutes, seconds);
     return a_string;
 }
 

@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 {
 #if TRANSCODE_SUPPORT
     QApplication a(argc, argv, false);
-    bool daemon_mode = true;
+    bool daemon_mode = false;
     int  special_port = -1;    
     //
     //  Check command line arguments
@@ -42,7 +42,7 @@ int main(int argc, char **argv)
         if (!strcmp(a.argv()[argpos],"-d") ||
             !strcmp(a.argv()[argpos],"--daemon"))
         {
-            // No problem, daemon mode is the default
+            daemon_mode = true;
         }
         else if (!strcmp(a.argv()[argpos],"-n") ||
             !strcmp(a.argv()[argpos],"--nodaemon"))
