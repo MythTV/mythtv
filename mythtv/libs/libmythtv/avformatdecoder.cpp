@@ -735,6 +735,9 @@ void release_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic)
 void render_slice_xvmc(struct AVCodecContext *s, const AVFrame *src,
                        int offset[4], int y, int type, int height)
 {
+    if (!src)
+        return;
+
     (void)offset;
     (void)type;
 
