@@ -4,3 +4,4 @@ void InitializeOSD(int width, int height);
 void DisplayOSD(unsigned char *yuvptr);
 
 void SetOSDInfoText(char *text, int length);
+void SetOSDChannumText(char *text, int length);

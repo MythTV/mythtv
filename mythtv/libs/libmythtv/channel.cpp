@@ -148,7 +148,7 @@ bool Channel::ChannelDown(void)
     return SetChannel(curchannel);
 }
 
-char *Channel::GetCurrentChannelName(void)
+char *Channel::GetCurrentName(void)
 {
     return curList[curchannel].name;
 }

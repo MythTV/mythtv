@@ -23,7 +23,7 @@ class Channel
     bool ChannelUp(void);
     bool ChannelDown(void);
   
-    char *GetCurrentChannelName(void);
+    char *GetCurrentName(void);
 
     void SetFd(int fd) { videofd = fd; } 
  private:

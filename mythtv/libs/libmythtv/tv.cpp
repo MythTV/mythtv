@@ -121,7 +121,9 @@ int main(int argc, char *argv[])
 			    nvp->ResetPlaying();
 			    while (!nvp->ResetYet())
                                 usleep(5);
-			    nvp->SetInfoText("Placeholder", osd_display_time);
+			    nvp->SetInfoText("Channel Up", osd_display_time);
+			    nvp->SetChannelText(channel->GetCurrentName(),
+					        osd_display_time);
 			    nvp->Unpause();
                           } break;
                case wsDown: {
@@ -144,7 +146,9 @@ int main(int argc, char *argv[])
                             nvp->ResetPlaying();
                             while (!nvp->ResetYet())
                                 usleep(5);
-			    nvp->SetInfoText("Placeholder 2", osd_display_time);
+			    nvp->SetInfoText("Channel Down", osd_display_time);
+                            nvp->SetChannelText(channel->GetCurrentName(),
+                                                osd_display_time);
                             nvp->Unpause();
                           } break;
                default: break;
@@ -152,12 +156,12 @@ int main(int argc, char *argv[])
       }
       if (paused)
       {
-          fprintf(stderr, "\r Paused: %f seconds behind realtime (%f%% buffer left)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, (float)rbuffer->GetFreeSpace() / (float)rbuffer->GetFileSize() * 100.0);
+      //    fprintf(stderr, "\r Paused: %f seconds behind realtime (%f%% buffer left)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, (float)rbuffer->GetFreeSpace() / (float)rbuffer->GetFileSize() * 100.0);
       }
       else
       {
-	  fprintf(stderr, "\r                                                                      ");
-          fprintf(stderr, "\r Playing: %f seconds behind realtime (%lld skipped frames)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, nvp->GetFramesSkipped());
+//	  fprintf(stderr, "\r                                                                      ");
+ //         fprintf(stderr, "\r Playing: %f seconds behind realtime (%lld skipped frames)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, nvp->GetFramesSkipped());
       }
   }
 

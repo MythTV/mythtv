@@ -1,6 +1,7 @@
 // a linear blending deinterlacer yoinked from the mplayer sources.
 
 #include <stdlib.h>
+#include <string.h>
 
 #ifdef MMX
 #include "mmx.h"
@@ -8,6 +9,8 @@
 #else
 #define emms()
 #endif
+
+#include "ttfont.h"
 
 static inline void linearBlend(unsigned char *src, int stride)
 {
@@ -122,8 +125,22 @@ static int info_x_end;
 static int info_width;
 static int info_height;
 
+static int channum_y_start;
+static int channum_x_start;
+static int channum_y_end;
+static int channum_x_end;
+static int channum_width;
+static int channum_height;
+
+static char *channumtext;
+static bool show_channum;
+
 static int displayframes;
-static int darken_info;
+static bool show_info;
+static char *infotext;
+
+static Efont *info_font;
+static Efont *channum_font;
 
 void InitializeOSD(int width, int height)
 {
@@ -138,20 +155,51 @@ void InitializeOSD(int width, int height)
     info_width = info_x_end - info_x_start;
     info_height = info_y_end - info_y_start;
 
+    channum_y_start = height * 1 / 8;
+    channum_y_end = height * 2 / 8;
+    channum_x_start = width * 7 / 8;
+    channum_x_end = width * 15 * 16;
+    
+    channum_width = channum_x_end - channum_x_start;
+    channum_height = channum_y_end - channum_y_start;
+    
     displayframes = 0;
+    show_info = false;
+    show_channum = false;
+
+    infotext = channumtext = NULL;
+    
+    info_font = Efont_load("/usr/share/fonts/truetype/Arial.ttf", 20);
+    channum_font = Efont_load("/usr/share/fonts/truetype/Arial.ttf", 40);
 }
 
 void SetOSDInfoText(char *text, int length)
 {
     displayframes = length;
-    darken_info = true;
+    show_info = true;
+
+    infotext = strdup(text);
+}
+
+void SetOSDChannumText(char *text, int length)
+{
+    displayframes = length;
+    show_channum = true;
+
+    channumtext = strdup(text);
 }
 
 void DisplayOSD(unsigned char *yuvptr)
 {
     if (displayframes <= 0)
     {
-        darken_info = false; 
+        show_info = false; 
+        if (infotext)
+            free(infotext);
+        if (channumtext)
+            free(channumtext);
+	infotext = NULL;
+	channumtext = NULL;
     	return;
     }
 
@@ -160,7 +208,7 @@ void DisplayOSD(unsigned char *yuvptr)
     unsigned char *src;
 
     char c = 128;
-    if (darken_info)
+    if (show_info)
     {
         for (int y = info_y_start ; y < info_y_end; y++)
         {
@@ -170,5 +218,16 @@ void DisplayOSD(unsigned char *yuvptr)
 	        *src = ((*src * c) >> 8) + *src;
             }
         }
+
+	EFont_draw_string(yuvptr, info_x_start + 5, info_y_start + 5, infotext,
+                          info_font, info_x_end - 10, info_y_end - 10, 
+                          vid_width);
+    }
+
+    if (show_channum)
+    {
+        EFont_draw_string(yuvptr, channum_x_start, channum_y_start, channumtext,
+                          channum_font, channum_x_end, channum_y_end, 
+                          vid_width);
     }
 }

@@ -984,3 +984,8 @@ void NuppelVideoPlayer::SetInfoText(char *text, int secs)
 {
     SetOSDInfoText(text, (int)(secs * ceil(video_frame_rate)));
 }
+
+void NuppelVideoPlayer::SetChannelText(char *text, int secs)
+{
+    SetOSDChannumText(text, (int)(secs * ceil(video_frame_rate)));
+}
