@@ -115,18 +115,19 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, const QStri
     
     GenericTree *by_playlist_node = NULL;
 
+    /*
     cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Am trying to add a playlist called \""
          << new_playlist->getName()
          << "\" to a collection called \""
          << collection_name
          << "\""
          << endl;
-         
+    */     
 
     GenericTree *collection_node = audio_collection_tree->getChildByName(collection_name);
     if(!collection_node)
     {
-        cout << "created collection_node" << endl;
+        //cout << "created collection_node" << endl;
         collection_node = new UIListGenericTree(audio_collection_tree, collection_name);
         
         //
@@ -134,7 +135,7 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, const QStri
         //
 
         by_playlist_node = new UIListGenericTree((UIListGenericTree *)collection_node, "Playlist");
-        cout << "created by_playlist_node" << endl;
+        //cout << "created by_playlist_node" << endl;
     }
     else
     {

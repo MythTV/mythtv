@@ -1407,7 +1407,6 @@ void MetadataClient::buildTree()
     MetadataCollection *a_collection;
     while ( (a_collection = it.current()) != 0 )
     {
-        cout << "@#@#@#@#@#@#@#@#@ Doing a collection called: " << a_collection->getName() << endl;
         ++it;
         
         //

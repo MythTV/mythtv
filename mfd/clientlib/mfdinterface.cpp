@@ -241,12 +241,12 @@ void MfdInterface::swapMetadata(int which_mfd, MfdContentCollection *new_collect
     
     if(old_collection)
     {
-        cout << "swapped in new collection for old" << endl;
+        //cout << "swapped in new collection for old" << endl;
         mfd_collections.remove(which_mfd);
     }
     else
     {
-        cout << "no old collection, sticking in new one" << endl;
+        //cout << "no old collection, sticking in new one" << endl;
     }
     
     emit metadataChanged(which_mfd, new_collection);
