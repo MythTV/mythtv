@@ -193,7 +193,7 @@ void StackedConfigurationGroup::raise(Configurable* child) {
 void StackedConfigurationGroup::save(QSqlDatabase* db) {
     if (saveAll)
         ConfigurationGroup::save(db);
-    else if (top > children.size())
+    else if (top < children.size())
         children[top]->save(db);
 }
 
@@ -248,6 +248,8 @@ void StringSelectSetting::setValue(const QString& newValue)  {
 
 QWidget* LabelSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                     const char* widgetName) {
+    (void)cg;
+
     QWidget* widget = new QHBox(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
@@ -261,8 +263,6 @@ QWidget* LabelSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
 
     connect(this, SIGNAL(valueChanged(const QString&)),
             value, SLOT(setText(const QString&)));
-
-    cg = cg;
 
     return widget;
 }
@@ -359,6 +359,8 @@ QWidget* SpinBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
 QWidget* SelectLabelSetting::configWidget(ConfigurationGroup *cg,
                                           QWidget* parent,
                                           const char* widgetName) {
+    (void)cg;
+
     QWidget* widget = new QHBox(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
@@ -372,8 +374,6 @@ QWidget* SelectLabelSetting::configWidget(ConfigurationGroup *cg,
 
     connect(this, SIGNAL(valueChanged(const QString&)),
             value, SLOT(setText(const QString&)));
-
-    cg = cg;
 
     return widget;
 }
