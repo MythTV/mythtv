@@ -452,6 +452,8 @@ typedef struct MpegEncContext {
                            DCTELEM *block, int n, int qscale);
     void (*dct_unquantize)(struct MpegEncContext *s, // unquantizer to use (mpeg4 can use both)
                            DCTELEM *block, int n, int qscale);
+    INT16 __align8 dct_quantize_temp_block[64];
+    INT16 __align8 fdct_mmx_block_tmp[64];
 } MpegEncContext;
 
 int MPV_common_init(MpegEncContext *s);

@@ -26,13 +26,7 @@
 /* dct code */
 typedef short DCTELEM;
 
-void fdct_ifast (DCTELEM *data);
-
 void j_rev_dct (DCTELEM *data);
-
-void fdct_mmx(DCTELEM *block);
-
-extern void (*av_fdct)(DCTELEM *block);
 
 /* encoding scans */
 extern UINT8 ff_alternate_horizontal_scan[64];
@@ -118,10 +112,12 @@ extern int mm_flags;
 
 int mm_support(void);
 
+#ifndef emms
 static inline void emms(void)
 {
     __asm __volatile ("emms;":::"memory");
 }
+#endif
 
 #define emms_c() \
 {\
@@ -191,5 +187,12 @@ struct unaligned_32 { uint32_t l; } __attribute__((packed));
 void get_psnr(UINT8 *orig_image[3], UINT8 *coded_image[3],
               int orig_linesize[3], int coded_linesize,
               AVCodecContext *avctx);
-              
+
+#include "mpegvideo.h"
+
+extern void (*av_fdct)(MpegEncContext *s, DCTELEM *block);
+
+void fdct_ifast(MpegEncContext *s, DCTELEM *data);
+void fdct_mmx(MpegEncContext *s, DCTELEM *block);
+
 #endif

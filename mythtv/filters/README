@@ -1,0 +1,88 @@
+MythTV Video Filter Plugins V0.1
+
+Using Filters
+~~~~~~~~~~~~~
+Loading a new filter module is done by calling
+load_videoFilter function with the name and any options (NULL if none)
+for the filter.
+For example:
+VideoFilter *filter = load_videoFilter("linearblend",NULL);
+
+To process video frames with a filter you fill in the frame information then 
+call the process_video_filters with the frame, the array of filters to be 
+applied (placed in the array in the order in which they will be applied and the 
+number of filters in the array.
+
+For example:
+    Frame frame;
+
+    frame.codec=CODEC_YUV; // MythTV uses YUV420 As its internal capture format
+
+    frame.width = w; // Width of the frame
+    frame.height = h; // Height of the frame
+    frame.frameNumber = fnum; // Number of this frame
+    frame.buf = buf; // Buffer holding video frame
+
+       // Process the frame    
+    process_video_filters(&frame,&videoFilters[0],videoFilters.size());
+
+
+
+
+Adding new filters
+~~~~~~~~~~~~~~~~~~
+
+New filter have a straightforward interface. Firstly a new filter will require 
+a struct with the following layout:
+
+typedef struct VideoFilter_
+{
+  // Public part of filter interface
+
+  int (*filter)(Frame *);
+  void (*cleanup)(struct VideoFilter_ *);
+
+  char *name;
+  void *handle; // Library handle;
+
+  // Any private data or functions for this filter
+  // follows after this point.
+
+} VideoFilter;
+
+
+Your filter will also require a new_filter function with the following
+prototype:
+VideoFilter *new_filter(char *options);
+
+The new_filter function fills in a VideoFilter structure and returns it to
+the caller. An example new_filter call from the invert filter is shown below:
+
+VideoFilter *new_filter(char *options)
+{
+  ThisFilter *filter = malloc(sizeof(ThisFilter));
+
+  if (filter == NULL)
+  {
+    fprintf(stderr,"Couldn't allocate memory for filter\n");
+    return NULL;
+  }
+
+  filter->filter=&invert;
+  filter->cleanup=&cleanup;
+  filter->name = FILTER_NAME;
+  return (VideoFilter *)filter;
+}
+
+
+Here we are setting the filter and cleanup function pointers and the name of 
+the filter.  The filter function is called for each video frame to process and 
+the cleanup function frees any resources the filter may have been using (this 
+includes freeing the memory allocated for the filter itself, so the filter 
+pointer should not be used after calling the cleanup function.
+
+
+The API is likely to be fairly fluid as this *is* a version 0.1 and changes
+in the API are probable.
+
+Please email any suggestions to richard@earthmen.com

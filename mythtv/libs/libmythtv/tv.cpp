@@ -697,16 +697,26 @@ void TV::SetupPlayer(void)
         return;
     }
 
+    QString filters = "";
     nvp = new NuppelVideoPlayer();
     nvp->SetRingBuffer(prbuffer);
     nvp->SetRecorder(nvr);
-    nvp->SetDeinterlace((bool)settings->GetNumSetting("Deinterlace"));
     nvp->SetOSDFontName(settings->GetSetting("OSDFont"), theprefix);
     nvp->SetOSDThemeName(settings->GetSetting("OSDTheme"));
     nvp->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
     nvp->SetAudioDevice(settings->GetSetting("AudioDevice"));
     nvp->SetLength(playbackLen);
     osd_display_time = settings->GetNumSetting("OSDDisplayTime");
+
+    if (settings->GetNumSetting("Deinterlace"))
+    {
+        if (filters.length() > 1)
+            filters += ",";
+        filters += "linearblend";
+    }
+
+    nvp->SetVideoFilters(filters);
+
     osd = NULL;
 }
 
@@ -718,16 +728,24 @@ void TV::SetupPipPlayer(void)
         return;
     }
 
+    QString filters = "";
+
     pipnvp = new NuppelVideoPlayer();
     pipnvp->SetAsPIP();
     pipnvp->SetRingBuffer(piprbuffer);
     pipnvp->SetRecorder(pipnvr);
-    pipnvp->SetDeinterlace((bool)settings->GetNumSetting("Deinterlace"));
     pipnvp->SetOSDFontName(settings->GetSetting("OSDFont"), theprefix);
     pipnvp->SetOSDThemeName(settings->GetSetting("OSDTheme"));
     pipnvp->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
     pipnvp->SetAudioDevice(settings->GetSetting("AudioDevice"));
     pipnvp->SetLength(playbackLen);
+
+    if (settings->GetNumSetting("Deinterlace"))
+    {
+        if (filters.length() > 1)
+            filters += ",";
+        filters += "linearblend";
+    }
 }
 
 void TV::TeardownPlayer(void)
@@ -1370,7 +1388,7 @@ void TV::GetChannelInfo(int lchannel, QString &title, QString &subtitle,
     loctime = localtime(&curtime);
 
     strftime(curtimestr, 128, "%Y%m%d%H%M%S", loctime);
-
+    
     char thequery[1024];
     sprintf(thequery, "SELECT channum,starttime,endtime,title,subtitle,description,category FROM program WHERE channum = %d AND starttime < %s AND endtime > %s;", lchannel, curtimestr, curtimestr);
 
@@ -1385,16 +1403,16 @@ void TV::GetChannelInfo(int lchannel, QString &title, QString &subtitle,
         endtime = query.value(2).toString();
         test = query.value(3).toString();
         if (test != QString::null)
-            title = test;
+            title = QString::fromUtf8(test);
         test = query.value(4).toString();
         if (test != QString::null)
-            subtitle = test;
+            subtitle = QString::fromUtf8(test);
         test = query.value(5).toString();
         if (test != QString::null)
-            desc = test;
+            desc = QString::fromUtf8(test);
         test = query.value(6).toString();
         if (test != QString::null)
-            category = test;
+            category = QString::fromUtf8(test);
     }
 
     sprintf(thequery, "SELECT callsign,icon FROM channel WHERE channum = %d", 

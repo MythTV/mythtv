@@ -15,7 +15,9 @@ INSTALLS += themes
 
 # Input
 HEADERS += effects.h \
+           filter.h \
            format.h \
+           frame.h \
            jitterometer.h \
            lzoconf.h \
            minilzo.h \
@@ -30,6 +32,7 @@ HEADERS += effects.h \
            XJ.h \
            yuv2rgb.h
 SOURCES += effects.cpp \
+           filter.c \
            jitterometer.cpp \
            minilzo.cpp \
            NuppelVideoPlayer.cpp \

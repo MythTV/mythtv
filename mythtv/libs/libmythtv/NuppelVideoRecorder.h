@@ -25,6 +25,7 @@
 
 extern "C" {
 #include "../libavcodec/avcodec.h"
+#include "filter.h"
 }
 
 using namespace std;
@@ -77,7 +78,9 @@ class NuppelVideoRecorder
     float GetFrameRate(void) { return video_frame_rate; }
   
     void WriteHeader(bool todumpfile = false);
- 
+
+    void SetVideoFilters(QString &filters) { videoFilterList = filters; }
+
  protected:
     static void *WriteThread(void *param);
     static void *AudioThread(void *param);
@@ -87,8 +90,9 @@ class NuppelVideoRecorder
     
  private:
     int AudioInit(void);
+    void InitFilters(void);
     void InitBuffers(void);
-
+    
     int SpawnChildren(void);
     void KillChildren(void);
     
@@ -203,6 +207,12 @@ class NuppelVideoRecorder
     QString codec;
 
     bool pip;
+
+    static int numencoders;
+    static pthread_mutex_t avcodeclock;
+
+    QString videoFilterList;
+    vector<VideoFilter *> videoFilters;
 };
 
 #endif

@@ -50,10 +50,10 @@ ProgramInfo *GetProgramAtDateTime(int channel, const char *time)
         query.next();
 
         ProgramInfo *proginfo = new ProgramInfo;
-        proginfo->title = query.value(3).toString();
-        proginfo->subtitle = query.value(4).toString();
-        proginfo->description = query.value(5).toString();
-        proginfo->category = query.value(6).toString();
+        proginfo->title = QString::fromUtf8(query.value(3).toString());
+        proginfo->subtitle = QString::fromUtf8(query.value(4).toString());
+        proginfo->description = QString::fromUtf8(query.value(5).toString());
+        proginfo->category = QString::fromUtf8(query.value(6).toString());
         proginfo->startts = QDateTime::fromString(query.value(1).toString(),
                                                   Qt::ISODate);
         proginfo->endts = QDateTime::fromString(query.value(2).toString(),

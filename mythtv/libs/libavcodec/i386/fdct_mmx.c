@@ -9,6 +9,7 @@
  */
 #include "../common.h"
 #include "mmx.h"
+#include "../dsputil.h"
 
 #define ATTR_ALIGN(align) __attribute__ ((__aligned__ (align)))
 
@@ -267,10 +268,9 @@ static inline void fdct_row(const int16_t *in, int16_t *out, const int16_t *tabl
     movq_r2m(mm6, *(out + 4));
 }
 
-void fdct_mmx(int16_t *block)
+void fdct_mmx(MpegEncContext *s, int16_t *block)
 {
-    /* XXX: not thread safe */
-    static int16_t block_tmp[64] ATTR_ALIGN(8);
+    int16_t *block_tmp = s->fdct_mmx_block_tmp;
     int16_t *block1, *out;
     const int16_t *table;
     int i;

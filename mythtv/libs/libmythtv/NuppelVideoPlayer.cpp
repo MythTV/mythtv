@@ -8,6 +8,7 @@
 #include <sys/ioctl.h>
 #include <time.h>
 #include <math.h>
+#include <qstringlist.h>
 
 #include <iostream>
 using namespace std;
@@ -40,7 +41,6 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
     waud = raud = 0;
 
     paused = 0;
-    deinterlace = 0;
 
     audiodevice = "/dev/dsp";
 
@@ -64,6 +64,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
 
     setpipplayer = pipplayer = NULL;
     needsetpipplayer = false;
+
+    videoFilterList = "";
 }
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
@@ -91,6 +93,9 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
     }
 
     CloseAVCodec();
+
+    filters_cleanup(&videoFilters[0], videoFilters.size());
+    videoFilters.clear();
 }
 
 bool NuppelVideoPlayer::GetPause(void)
@@ -357,6 +362,18 @@ void NuppelVideoPlayer::CloseAVCodec(void)
     avcodec_close(&mpa_ctx);
 }
 
+void NuppelVideoPlayer::InitFilters(void)
+{
+    QStringList filters = QStringList::split(",", videoFilterList);
+    for (QStringList::Iterator i = filters.begin(); i != filters.end(); i++)
+    {
+        VideoFilter *filter = load_videoFilter((char *)((*i).ascii()),
+                                               NULL);
+        if (filter != NULL)
+            videoFilters.push_back(filter);
+    }   
+}
+
 unsigned char *NuppelVideoPlayer::DecodeFrame(struct rtframeheader *frameheader,
                                               unsigned char *lstrm)
 {
@@ -591,6 +608,14 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
     int gotvideo = 0;
     int seeked = 0;
 
+    Frame frame;
+
+    frame.codec = CODEC_YUV;
+    frame.width = video_width;
+    frame.height = video_height;
+    frame.bpp = -1;
+    frame.frameNumber = framesPlayed;
+
     if (weseeked)
     {
         seeked = 1;
@@ -645,11 +670,14 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
                 usleep(2000);
             }
 
+            frame.buf = ret;
+
+            process_video_filters(&frame, &videoFilters[0], 
+                                  videoFilters.size());
+
             pthread_mutex_lock(&video_buflock);
             memcpy(vbuffer[wpos], ret, (int)(video_width*video_height * 1.5));
             timecodes[wpos] = frameheader.timecode;
-            if (deinterlace)
-                linearBlendYUV420(vbuffer[wpos], video_width, video_height);
 
             wpos = (wpos+1) % MAXVBUFFER;
             pthread_mutex_unlock(&video_buflock);
@@ -1081,6 +1109,8 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     if (fileheader.audioblocks != 0)
         InitSound();
+
+    InitFilters();
 
     osd = new OSD(video_width, video_height, osdfilename, osdprefix, osdtheme);
 

@@ -38,9 +38,9 @@ static int RENAME(dct_quantize)(MpegEncContext *s,
 {
     int level=0, last_non_zero_p1, q; //=0 is cuz gcc says uninitalized ...
     const UINT16 *qmat, *bias;
-    static __align8 INT16 temp_block[64];
+    INT16 *temp_block = s->dct_quantize_temp_block;
 
-    av_fdct (block);
+    av_fdct (s, block);
 
     if (s->mb_intra) {
         int dummy;

@@ -348,18 +348,18 @@ EFont_draw_string(unsigned char *yuvptr, int x, int y, const QString &text,
    TT_Raster_Map       *rmap, *rtmp;
    char                 is_pixmap = 0;
 
+   if (text.length() < 1)
+        return;
+
    int video_width = font->vid_width;
    int video_height = font->vid_height;
 
-   char *ctext = (char *)text.latin1();
-   
+   char *ctext = (char *)text.latin1(); 
+
    inx = 0;
    iny = 0;
 
-   if (strlen(ctext) < 1)
-       return;
-
-   rtmp = calc_size(font, &w, &h, ctext);
+   rtmp = calc_size(font, &w, &h, (char *)ctext);
    if (w <= 0 || h <= 0)
    {
        destroy_font_raster(rtmp);
@@ -537,7 +537,7 @@ Efont_load(char *file, int size, int video_width, int video_height)
    if (i == n)
       TT_Get_CharMap(f->face, 0, &char_map);
    f->num_glyph = f->properties.num_Glyphs;
-   //f->num_glyph = 256;
+   f->num_glyph = 256;
    f->glyphs = (TT_Glyph *) malloc((f->num_glyph + 1) * sizeof(TT_Glyph));
    memset(f->glyphs, 0, f->num_glyph * sizeof(TT_Glyph));
    f->glyphs_cached = 
@@ -560,7 +560,7 @@ Efont_load(char *file, int size, int video_width, int video_height)
 	     if (code >= num_glyphs)
 		code = 0;
 	  }
-	else
+        else
 	   code = TT_Char_Index(char_map, i);
 
 	TT_New_Glyph(f->face, &f->glyphs[i]);

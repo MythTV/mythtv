@@ -865,7 +865,7 @@ int MPV_encode_picture(AVCodecContext *avctx,
         
         if(s->flags&CODEC_FLAG_PASS1)
             ff_write_pass1_stats(s);
-    
+
     }
 
     s->input_picture_number++;
@@ -1777,7 +1777,7 @@ static void encode_mb(MpegEncContext *s, int motion_x, int motion_y)
         }
 
     }
-            
+
 #if 0
             {
                 float adap_parm;
@@ -2019,10 +2019,12 @@ static void encode_picture(MpegEncContext *s, int picture_number)
         }
 //printf("Scene change detected, encoding as I Frame\n");
     }
-    
+   
     if(s->pict_type==P_TYPE || s->pict_type==S_TYPE) 
+    {
         s->f_code= ff_get_best_fcode(s, s->p_mv_table, MB_TYPE_INTER);
         ff_fix_long_p_mvs(s);
+    }
     if(s->pict_type==B_TYPE){
         s->f_code= ff_get_best_fcode(s, s->b_forw_mv_table, MB_TYPE_FORWARD);
         s->b_code= ff_get_best_fcode(s, s->b_back_mv_table, MB_TYPE_BACKWARD);
@@ -2032,7 +2034,7 @@ static void encode_picture(MpegEncContext *s, int picture_number)
         ff_fix_long_b_mvs(s, s->b_bidir_forw_mv_table, s->f_code, MB_TYPE_BIDIR);
         ff_fix_long_b_mvs(s, s->b_bidir_back_mv_table, s->b_code, MB_TYPE_BIDIR);
     }
-    
+   
 //printf("f_code %d ///\n", s->f_code);
 
 //    printf("%d %d\n", s->avg_mb_var, s->mc_mb_var);
@@ -2135,7 +2137,7 @@ static void encode_picture(MpegEncContext *s, int picture_number)
         s->block_index[3]= s->block_wrap[0]*(mb_y*2 + 2);
         s->block_index[4]= s->block_wrap[4]*(mb_y + 1)                    + s->block_wrap[0]*(s->mb_height*2 + 2);
         s->block_index[5]= s->block_wrap[4]*(mb_y + 1 + s->mb_height + 2) + s->block_wrap[0]*(s->mb_height*2 + 2);
-        for(mb_x=0; mb_x < s->mb_width; mb_x++) {
+	for(mb_x=0; mb_x < s->mb_width; mb_x++) {
             const int mb_type= s->mb_type[mb_y * s->mb_width + mb_x];
             const int xy= (mb_y+1) * (s->mb_width+2) + mb_x + 1;
 //            int d;
@@ -2149,7 +2151,7 @@ static void encode_picture(MpegEncContext *s, int picture_number)
             s->block_index[3]+=2;
             s->block_index[4]++;
             s->block_index[5]++;
-            
+           
             /* write gob / video packet header for formats which support it at any MB (MPEG4) */
             if(s->rtp_mode && s->mb_y>0 && s->codec_id==CODEC_ID_MPEG4){
                 int pdif= pbBufPtr(&s->pb) - s->ptr_lastgob;
@@ -2361,7 +2363,6 @@ static void encode_picture(MpegEncContext *s, int picture_number)
 //printf("MB %d %d bits\n", s->mb_x+s->mb_y*s->mb_width, get_bit_count(&s->pb));
         }
 
-
         /* Obtain average GOB size for RTP */
         if (s->rtp_mode) {
             if (!mb_y)
@@ -2411,7 +2412,7 @@ static int dct_quantize_c(MpegEncContext *s,
     int max=0;
     unsigned int threshold1, threshold2;
     
-    av_fdct (block);
+    av_fdct (s, block);
 
     /* we need this permutation so that we correct the IDCT
        permutation. will be moved into DCT code */

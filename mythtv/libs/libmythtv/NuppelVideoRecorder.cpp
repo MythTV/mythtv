@@ -9,6 +9,8 @@
 #include <sys/mman.h>
 #include <errno.h>
 
+#include <qstringlist.h>
+
 #include <iostream>
 using namespace std;
 
@@ -16,6 +18,9 @@ using namespace std;
 
 #define KEYFRAMEDISTEND   30
 #define KEYFRAMEDISTSTART 30
+
+pthread_mutex_t NuppelVideoRecorder::avcodeclock = PTHREAD_MUTEX_INITIALIZER;
+int NuppelVideoRecorder::numencoders = 0;
 
 NuppelVideoRecorder::NuppelVideoRecorder(void)
 {
@@ -87,6 +92,9 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     audio_behind = 0;
 
     pip = false;
+    numencoders++;
+
+    videoFilterList = "";
 }
 
 NuppelVideoRecorder::~NuppelVideoRecorder(void)
@@ -121,6 +129,10 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
 
     if (mpa_codec)
         avcodec_close(&mpa_ctx);
+    numencoders--;
+
+    filters_cleanup(&videoFilters[0], videoFilters.size());
+    videoFilters.clear();
 }
 
 void NuppelVideoRecorder::SetTVFormat(QString tvformat)
@@ -239,7 +251,9 @@ void NuppelVideoRecorder::Initialize(void)
         livetv = ringBuffer->LiveMode();
 
     audiobytes = 0;
+
     InitBuffers();
+    InitFilters();
 }
 
 int NuppelVideoRecorder::AudioInit(void)
@@ -295,6 +309,18 @@ int NuppelVideoRecorder::AudioInit(void)
     audio_buffer_size = blocksize;
 
     return(0); // everything is ok
+}
+
+void NuppelVideoRecorder::InitFilters(void)
+{
+    QStringList filters = QStringList::split(",", videoFilterList);
+    for (QStringList::Iterator i = filters.begin(); i != filters.end(); i++)
+    {
+        VideoFilter *filter = load_videoFilter((char *)((*i).ascii()), 
+                                               NULL);
+        if (filter != NULL)
+            videoFilters.push_back(filter);
+    }
 }
 
 void NuppelVideoRecorder::InitBuffers(void)
@@ -1117,6 +1143,7 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
     int raw = 0;
     int timeperframe = 40;
     uint8_t *planes[3];
+    Frame frame;
 
     memset(&frameheader, 0, sizeof(frameheader));
 
@@ -1124,6 +1151,13 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
     planes[1] = planes[0] + w*h;
     planes[2] = planes[1] + (w*h)/4;
     compressthis = compression;
+
+    frame.codec = CODEC_YUV;
+    frame.width = w;
+    frame.height = h;
+    frame.bpp = -1;
+    frame.frameNumber = fnum;
+    frame.buf = buf;
 
     if (lf == 0) 
     { // this will be triggered every new file
@@ -1181,6 +1215,8 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
         sync();   
     }
 
+    process_video_filters(&frame, &videoFilters[0], videoFilters.size());
+
     if (useavcodec)
     {
         mpa_picture.data[0] = planes[0];
@@ -1189,8 +1225,12 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
 
         mpa_ctx.key_frame = wantkeyframe;
 
+        if (numencoders > 1)
+            pthread_mutex_lock(&avcodeclock);
         tmp = avcodec_encode_video(&mpa_ctx, (unsigned char *)strm, 
                                    w * h + (w * h) / 2, &mpa_picture); 
+        if (numencoders > 1)
+            pthread_mutex_unlock(&avcodeclock);
     }
     else
     {

@@ -2,6 +2,7 @@
 #define NUPPELVIDEOPLAYER
 
 #include <map>
+#include <vector>
 #include <qstring.h>
 
 #ifdef MMX
@@ -21,6 +22,7 @@
 
 extern "C" {
 #include "../libavcodec/avcodec.h"
+#include "filter.h"
 }
 using namespace std;
 
@@ -47,9 +49,6 @@ class NuppelVideoPlayer
     bool IsPlaying(void) { return playing; }
 
     void SetRingBuffer(RingBuffer *rbuf) { ringBuffer = rbuf; }
-
-    void SetDeinterlace(bool set) { deinterlace = set; }
-    bool GetDeinterlace(void) { return deinterlace; }
 
     void SetAudioSampleRate(int rate) { audio_samplerate = rate; }
 
@@ -94,7 +93,9 @@ class NuppelVideoPlayer
     void SetPipPlayer(NuppelVideoPlayer *pip) { setpipplayer = pip; 
                                                 needsetpipplayer = true; }
     bool PipPlayerSet(void) { return !needsetpipplayer; }
-    
+ 
+    void SetVideoFilters(QString &filters) { videoFilterList = filters; }
+
  protected:
     void OutputAudioLoop(void);
     void OutputVideoLoop(void);
@@ -106,6 +107,7 @@ class NuppelVideoPlayer
     void InitSound(void);
     void WriteAudio(unsigned char *aubuf, int size);
 
+    void InitFilters(void);
     int InitSubs(void);
     
     int OpenFile(bool skipDsp = false);
@@ -134,8 +136,6 @@ class NuppelVideoPlayer
 
     void ShowPip(unsigned char *xvidbuf);
 
-    int deinterlace;
-    
     int audiofd;
 
     QString filename;
@@ -250,6 +250,9 @@ class NuppelVideoPlayer
     NuppelVideoPlayer *pipplayer;
     NuppelVideoPlayer *setpipplayer;
     bool needsetpipplayer;
+
+    QString videoFilterList;
+    vector<VideoFilter *> videoFilters;
 };
 
 #endif

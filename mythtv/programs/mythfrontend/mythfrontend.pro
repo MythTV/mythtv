@@ -19,7 +19,8 @@ INCLUDEPATH += ../mythepg ../mythdialog ../libNuppelVideo ../libmythtv
 LIBS += -L../libmythtv -L../libNuppelVideo -L../libavcodec
 LIBS += -lmythtv -lNuppelVideo -lXv -lttf -lmp3lame -lavcodec
 
-TARGETDEPS = ../libNuppelVideo/libNuppelVideo.a ../libmythtv/libmythtv.a
+TARGETDEPS  = ../libNuppelVideo/libNuppelVideo.a ../libmythtv/libmythtv.a
+TARGETDEPS += ../libavcodec/libavcodec.a
 
 # Input
 HEADERS += ../mythepg/guidegrid.h ../mythepg/infodialog.h 
