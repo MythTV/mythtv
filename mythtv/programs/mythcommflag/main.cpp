@@ -33,6 +33,7 @@ bool fullSpeed = true;
 bool rebuildSeekTable = false;
 bool beNice = true;
 bool inJobQueue = false;
+bool copyToCutlist = false;
 
 double fps = 29.97; 
 
@@ -71,6 +72,30 @@ void BuildVideoMarkup(QString& filename)
     delete program_info;
     delete mdb;
 
+}
+
+void CopySkipListToCutList(QSqlDatabase *db, QString chanid, QString starttime)
+{
+    QMap<long long, int> cutlist;
+    QMap<long long, int>::Iterator it;
+
+    ProgramInfo *pginfo =
+        ProgramInfo::GetProgramFromRecorded(db, chanid, starttime);
+
+    if (!pginfo)
+    {
+        cerr << "No program data exists for channel " <<
+            chanid.ascii() << "at " << starttime.ascii() << endl;
+        exit(-1);
+    }
+
+    pginfo->GetCommBreakList(cutlist, db);
+    for (it = cutlist.begin(); it != cutlist.end(); ++it)
+        if (it.data() == MARK_COMM_START)
+            cutlist[it.key()] = MARK_CUT_START;
+        else
+            cutlist[it.key()] = MARK_CUT_END;
+    pginfo->SetCutList(cutlist, db);
 }
 
 int FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
@@ -371,6 +396,10 @@ int main(int argc, char *argv[])
             if (!quiet)
                 showBlanks = true;
         }
+        else if (!strcmp(a.argv()[argpos], "--gencutlist"))
+        {
+            copyToCutlist = true;
+        }
         else if (!strcmp(a.argv()[argpos], "--justblanks"))
         {
             justBlanks = true;
@@ -518,6 +547,7 @@ int main(int argc, char *argv[])
                     "--video filename             Rebuild the seektable for a video (non-recording) file" << endl <<
                     "--sleep                      Give up some CPU time after processing" << endl <<
                     "--rebuild                    Do not flag commercials, just rebuild seektable" << endl <<
+                    "--gencutlist                 Copy the commercial skip list to the cutlist" << endl <<
                     "                             each frame." << endl <<
                     "-v OR --verbose debug-level  Prints more information" << endl <<
                     "                             Accepts any combination (separated by comma)" << endl << 
@@ -568,6 +598,11 @@ int main(int argc, char *argv[])
     {
         printf( "You must specify both the Channel ID and the Start Time\n");
         exit(12);
+    }
+
+    if (copyToCutlist) {
+        CopySkipListToCutList(db, chanid, starttime);
+        exit(0);
     }
 
     if (inJobQueue) {

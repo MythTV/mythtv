@@ -1598,6 +1598,18 @@ void JobQueue::DoFlagCommercialsThread(void)
         ChangeJobStatus(commthread_db->db(), jobID, JOB_ABORTED,
                         "Job aborted by user.");
     }
+    else if (breaksFound == 254)
+    {
+        msg = QString("ERROR in Commercial Flagging for %1, problem opening "
+                      "file or initting decoder, check backend log.")
+                      .arg(logDesc);
+
+        gContext->LogEntry("commflag", LP_WARNING,
+                           "Commercial Flagging ERRORED", msg);
+
+        ChangeJobStatus(commthread_db->db(), jobID, JOB_ERRORED,
+                        "Job ERRORED, unable to open file or init decoder.");
+    }
     else if (breaksFound >= 200)
     {
         msg = QString("Commercial Flagging ERRORED for %1 with result %2.")
