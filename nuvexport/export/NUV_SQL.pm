@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.09.26 (xris)
+#Last Updated: 2004.09.27 (xris)
 #
 #  export::NUV_SQL
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -26,7 +26,8 @@ package export::NUV_SQL;
                      'enabled'         => 1,
                      'errors'          => [],
                     # Delete original files?
-                     'delete'       => 0,
+                     'delete'          => 0,
+                     'create_dir'      => 1,
                     };
         bless($self, $class);
 
@@ -54,6 +55,10 @@ package export::NUV_SQL;
         }
     # Load the save path, if requested
         $self->{'path'} = query_savepath();
+    # Create a
+        $self->{'create_dir'} = query_text('Create a directory with the show name?',
+                                           'yesno',
+                                           $self->{'create_dir'} ? 'Yes' : 'No');
 	}
 
     sub export {
@@ -61,6 +66,11 @@ package export::NUV_SQL;
         my $episode = shift;
     # Make sure we have finfo
         load_finfo($episode);
+    # Create a show-name directory?
+        if ($self->{'create_dir'}) {
+            $self->{'path'} .= '/'.$episode->{'outfile'};
+            mkdir($self->{'path'}, 0755) or die "Can't create $self->{'path'}:  $!\n\n";
+        }
     # Load the three files we'll be using
 		my $txt_file = basename($episode->{'filename'}, '.nuv') . '.txt';
 		my $sql_file = basename($episode->{'filename'}, '.nuv') . '.sql';
