@@ -130,20 +130,20 @@ public:
     };
 };
 
-class SRPreRoll: public SpinBoxSetting, public SRSetting {
+class SRStartOffset: public SpinBoxSetting, public SRSetting {
 public:
-    SRPreRoll(const ScheduledRecording& parent):
+    SRStartOffset(const ScheduledRecording& parent):
         SpinBoxSetting(-120, 120, 10, true),
-        SRSetting(parent, "preroll") {
+        SRSetting(parent, "startoffset") {
         setLabel(QObject::tr("Start Early (minutes)"));
     };
 };
 
-class SRPostRoll: public SpinBoxSetting, public SRSetting {
+class SREndOffset: public SpinBoxSetting, public SRSetting {
 public:
-    SRPostRoll(const ScheduledRecording& parent):
+    SREndOffset(const ScheduledRecording& parent):
         SpinBoxSetting(-120, 240, 10, true),
-        SRSetting(parent, "postroll") {
+        SRSetting(parent, "endoffset") {
         setLabel(QObject::tr("End Late   (minutes)"));
     };
 };
@@ -276,8 +276,8 @@ ScheduledRecording::ScheduledRecording() {
     addChild(dupmethod = new SRDupMethod(*this));
     addChild(autoexpire = new SRAutoExpire(*this));
     addChild(maxepisodes = new SRMaxEpisodes(*this));
-    addChild(preroll = new SRPreRoll(*this));
-    addChild(postroll = new SRPostRoll(*this));
+    addChild(startoffset = new SRStartOffset(*this));
+    addChild(endoffset = new SREndOffset(*this));
     addChild(maxnewest = new SRMaxNewest(*this));
     addChild(channel = new SRChannel(*this));
     addChild(title = new SRTitle(*this));
@@ -600,8 +600,8 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
     vbox1->addWidget(maxnewest->configWidget(this, dialog));
 
     vbox2->addWidget(recgroup->configWidget(this, dialog));
-    vbox2->addWidget(preroll->configWidget(this, dialog));
-    vbox2->addWidget(postroll->configWidget(this, dialog));
+    vbox2->addWidget(startoffset->configWidget(this, dialog));
+    vbox2->addWidget(endoffset->configWidget(this, dialog));
     vbox2->addWidget(dupmethod->configWidget(this, dialog));
     vbox2->addWidget(dupin->configWidget(this, dialog));
 

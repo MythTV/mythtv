@@ -109,8 +109,8 @@ private:
     class SRDupIn* dupin;
     class SRDupMethod* dupmethod;
     class SRAutoExpire* autoexpire;
-    class SRPreRoll* preroll;
-    class SRPostRoll* postroll;
+    class SRStartOffset* startoffset;
+    class SREndOffset* endoffset;
     class SRMaxEpisodes* maxepisodes;
     class SRMaxNewest* maxnewest;
     class SRChannel* channel;
