@@ -136,7 +136,6 @@ void MythLineEdit::keyPressEvent(QKeyEvent *e)
         break;
     case Key_Enter:
     case Key_Return:
-    case Key_Space:
         e->ignore();
     default:
         QLineEdit::keyPressEvent(e);
