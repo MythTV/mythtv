@@ -9,10 +9,10 @@
 #include "videodlg.h"
 // General Settings
 
-class VideoDefaultParentalLevel: public ComboBoxSetting, public GlobalSetting {
+class VideoDefaultParentalLevel: public GlobalComboBox {
 public:
     VideoDefaultParentalLevel() :
-      GlobalSetting("VideoDefaultParentalLevel") {
+      GlobalComboBox("VideoDefaultParentalLevel") {
         setLabel(QObject::tr("Starting Parental Level"));
         addSelection(QObject::tr("4 - Highest"), "4");
         addSelection(QObject::tr("1 - Lowest"), "1");
@@ -26,10 +26,10 @@ public:
 };
 
 
-class VideoDefaultView: public ComboBoxSetting, public GlobalSetting {
+class VideoDefaultView: public GlobalComboBox {
 public:
     VideoDefaultView() :
-      GlobalSetting("Default MythVideo View") {
+      GlobalComboBox("Default MythVideo View") {
         setLabel(QObject::tr("Default View"));
         addSelection(QObject::tr("Gallery"), "1");
         addSelection(QObject::tr("Browser"), "0");
@@ -41,10 +41,10 @@ public:
 };
 
 
-class VideoAdminPassword: public LineEditSetting, public GlobalSetting {
+class VideoAdminPassword: public GlobalLineEdit {
 public:
     VideoAdminPassword():
-        GlobalSetting("VideoAdminPassword") {
+        GlobalLineEdit("VideoAdminPassword") {
         setLabel(QObject::tr("Parental Control PIN"));
         setHelpText(QObject::tr("This PIN is used to control the current "
                     "Parental Level. If you want to use this feature, then "
@@ -53,10 +53,10 @@ public:
     };
 };
 
-class VideoAggressivePC: public CheckBoxSetting, public GlobalSetting {
+class VideoAggressivePC: public GlobalCheckBox {
 public:
     VideoAggressivePC():
-        GlobalSetting("VideoAggressivePC") {
+        GlobalCheckBox("VideoAggressivePC") {
         setLabel(QObject::tr("Aggressive Parental Control"));
         setValue(false);
         setHelpText(QObject::tr("If set, you will not be able to return "
@@ -66,10 +66,10 @@ public:
     };
 };
 
-class VideoListUnknownFiletypes: public CheckBoxSetting, public GlobalSetting {
+class VideoListUnknownFiletypes: public GlobalCheckBox {
 public:
     VideoListUnknownFiletypes():
-        GlobalSetting("VideoListUnknownFiletypes") {
+        GlobalCheckBox("VideoListUnknownFiletypes") {
         setLabel(QObject::tr("Show Unknown File Types"));
         setValue(true);
         setHelpText(QObject::tr("If set, all files below the Myth Video "
@@ -78,10 +78,10 @@ public:
     };
 };
 
-class VideoTreeNoDB: public CheckBoxSetting, public GlobalSetting {
+class VideoTreeNoDB: public GlobalCheckBox {
 public:
     VideoTreeNoDB():
-        GlobalSetting("VideoTreeNoDB") {
+        GlobalCheckBox("VideoTreeNoDB") {
         setLabel(QObject::tr("Video List browses files"));
         setValue(false);
         setHelpText(QObject::tr("If set, this will cause the Video List "
@@ -91,10 +91,10 @@ public:
     };
 };
 
-class VideoNewBrowsable: public CheckBoxSetting, public GlobalSetting {
+class VideoNewBrowsable: public GlobalCheckBox {
 public:
     VideoNewBrowsable():
-        GlobalSetting("VideoNewBrowsable") {
+        GlobalCheckBox("VideoNewBrowsable") {
         setLabel(QObject::tr("Newly scanned files are browsable by default"));
         setValue(true);
         setHelpText(QObject::tr("If set, newly scanned files in the Video Manager "
@@ -104,10 +104,10 @@ public:
 };
 
 
-class SearchListingsCommand: public LineEditSetting, public GlobalSetting {
+class SearchListingsCommand: public GlobalLineEdit {
 public:
     SearchListingsCommand():
-        GlobalSetting("MovieListCommandLine") {
+        GlobalLineEdit("MovieListCommandLine") {
         setLabel(QObject::tr("Command to search for movie listings"));
         setValue(gContext->GetShareDir() + "mythvideo/scripts/imdb.pl -M tv=no;video=no");
         setHelpText(QObject::tr("This command must be "
@@ -116,10 +116,10 @@ public:
 };
 
 
-class GetPostersCommand: public LineEditSetting, public GlobalSetting {
+class GetPostersCommand: public GlobalLineEdit {
 public:
     GetPostersCommand():
-        GlobalSetting("MoviePosterCommandLine") {
+        GlobalLineEdit("MoviePosterCommandLine") {
         setLabel(QObject::tr("Command to search for movie posters"));
         setValue(gContext->GetShareDir() + "mythvideo/scripts/imdb.pl -P");
         setHelpText(QObject::tr("This command must be "
@@ -128,10 +128,10 @@ public:
 };
 
 
-class GetDataCommand: public LineEditSetting, public GlobalSetting {
+class GetDataCommand: public GlobalLineEdit {
 public:
     GetDataCommand():
-        GlobalSetting("MovieDataCommandLine") {
+        GlobalLineEdit("MovieDataCommandLine") {
         setLabel(QObject::tr("Command to extract data for movies"));
         setValue(gContext->GetShareDir() + "mythvideo/scripts/imdb.pl -D");
         setHelpText(QObject::tr("This command must be "
@@ -140,10 +140,10 @@ public:
 };
 
 
-class VideoStartupDirectory: public LineEditSetting, public GlobalSetting {
+class VideoStartupDirectory: public GlobalLineEdit {
 public:
     VideoStartupDirectory():
-        GlobalSetting("VideoStartupDir") {
+        GlobalLineEdit("VideoStartupDir") {
         setLabel(QObject::tr("Directory that holds videos"));
         setValue("/share/Movies/dvd");
         setHelpText(QObject::tr("This directory must exist, and the user "
@@ -153,10 +153,10 @@ public:
 };
 
 
-class VideoArtworkDirectory: public LineEditSetting, public GlobalSetting {
+class VideoArtworkDirectory: public GlobalLineEdit {
 public:
     VideoArtworkDirectory():
-        GlobalSetting("VideoArtworkDir") {
+        GlobalLineEdit("VideoArtworkDir") {
         setLabel(QObject::tr("Directory that holds movie posters"));
         char *home = getenv("HOME");
         setValue(QString(home) + "/.mythtv/MythVideo");
@@ -168,10 +168,10 @@ public:
 
 //Player Settings
 
-class VideoDefaultPlayer: public LineEditSetting, public GlobalSetting {
+class VideoDefaultPlayer: public GlobalLineEdit {
 public:
     VideoDefaultPlayer():
-        GlobalSetting("VideoDefaultPlayer") {
+        GlobalLineEdit("VideoDefaultPlayer") {
         setLabel(QObject::tr("Default Player"));
         setValue("mplayer -fs -zoom -quiet -vo xv %s");
         setHelpText(QObject::tr("This is the command used for any file "
@@ -181,38 +181,38 @@ public:
     };
 };
 
-class VideoGalleryRows: public SpinBoxSetting, public GlobalSetting {
+class VideoGalleryRows: public GlobalSpinBox {
 public:
     VideoGalleryRows():
-        SpinBoxSetting(2, 5, 1), GlobalSetting("VideoGalleryRowsPerPage") {
+        GlobalSpinBox("VideoGalleryRowsPerPage", 2, 5, 1) {
         setLabel(QObject::tr("Rows to display"));
         setValue(3);
     };
 };
 
-class VideoGalleryColumns: public SpinBoxSetting, public GlobalSetting {
+class VideoGalleryColumns: public GlobalSpinBox {
 public:
     VideoGalleryColumns():
-        SpinBoxSetting(2, 5, 1), GlobalSetting("VideoGalleryColsPerPage") {
+        GlobalSpinBox("VideoGalleryColsPerPage", 2, 5, 1) {
         setLabel(QObject::tr("Columns to display"));
         setValue(4);
     };
 };
 
-class VideoGallerySubtitle: public CheckBoxSetting, public GlobalSetting {
+class VideoGallerySubtitle: public GlobalCheckBox {
 public:
     VideoGallerySubtitle():
-        GlobalSetting("VideoGallerySubtitle") {
+        GlobalCheckBox("VideoGallerySubtitle") {
         setLabel(QObject::tr("Show title below thumbnails"));
         setValue(true);
         setHelpText(QObject::tr("If set, the additional text will make the thumbnails smaller."));
     };
 };
 
-class VideoGalleryAspectRatio: public CheckBoxSetting, public GlobalSetting {
+class VideoGalleryAspectRatio: public GlobalCheckBox {
 public:
     VideoGalleryAspectRatio():
-        GlobalSetting("VideoGalleryAspectRatio") {
+        GlobalCheckBox("VideoGalleryAspectRatio") {
         setLabel(QObject::tr("Maintain aspect ratio of thumbnails"));
         setValue(true);
         setHelpText(QObject::tr("If set, the scaled thumbnails will maintain their "
