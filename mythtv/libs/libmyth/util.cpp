@@ -6,6 +6,12 @@
 using namespace std;
 
 #include "util.h"
+#include "../libmyth/oldsettings.h"
+
+extern "C" {
+#include <X11/Xlib.h>
+#include <X11/extensions/Xinerama.h>
+}
 
 bool WriteStringList(QSocket *socket, QStringList &list)
 {
@@ -120,3 +126,53 @@ long long decodeLongLong(QStringList &list, int offset)
 
     return retval;
 } 
+
+void GetMythTVGeometry(Display *dpy, int screen_num, int *x, int *y, int *w, 
+                       int *h) 
+{
+    int event_base, error_base;
+
+    char *prefix = (char *)PREFIX;
+
+    Settings *settings = new Settings();
+    settings->LoadSettingsFiles(QString("settings.txt"), QString(prefix));
+
+    if( XineramaQueryExtension(dpy, &event_base, &error_base) &&
+        XineramaIsActive(dpy) ) {
+
+        XineramaScreenInfo *xinerama_screens;
+        XineramaScreenInfo *screen;
+        int nr_xinerama_screens;
+
+        int screen_nr = settings->GetNumSetting("XineramaScreen",0);
+
+        xinerama_screens = XineramaQueryScreens(dpy, &nr_xinerama_screens);
+
+        printf("Found %d Xinerama Screens.\n", nr_xinerama_screens);
+
+        if( screen_nr > 0 && screen_nr < nr_xinerama_screens ) {
+            screen = &xinerama_screens[screen_nr];
+            printf("Using screen %d, %dx%d+%d+%d\n",
+                   screen_nr, screen->width, screen->height, screen->x_org, 
+                   screen->y_org );
+        } else {
+            screen = &xinerama_screens[0];
+            printf("Using first Xinerama screen, %dx%d+%d+%d\n",
+                   screen->width, screen->height, screen->x_org, screen->y_org);
+        }
+
+        *w = screen->width;
+        *h = screen->height;
+        *x = screen->x_org;
+        *y = screen->y_org;
+
+        XFree(xinerama_screens);
+    } else {
+        *w = DisplayWidth(dpy, screen_num);
+        *h = DisplayHeight(dpy, screen_num);
+        *x = 0; *y = 0;
+    }
+
+    delete settings;
+}
+

@@ -22,7 +22,7 @@ class XvVideoOutput
 
     void EmbedInWidget(unsigned long wid, int x, int y, int w, int h);
     void StopEmbedding(void);
-
+    void MoveResize(void);
 
   private:
     void sizehint(int x, int y, int width, int height, int max);
@@ -45,6 +45,9 @@ class XvVideoOutput
 
     int oldx, oldy, oldw, oldh;
     int curx, cury, curw, curh;
+    int img_xoff, img_yoff; 
+    int imgx, imgy, imgw, imgh, dispxoff, dispyoff, dispwoff, disphoff;
+    float img_hscanf, img_vscanf;
 
     int dispx, dispy, dispw, disph;
     int olddispx, olddispy, olddispw, olddisph;

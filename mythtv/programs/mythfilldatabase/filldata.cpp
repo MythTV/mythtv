@@ -375,16 +375,32 @@ void fixProgramList(QValueList<ProgInfo> *fixlist)
         // remove overlapping programs
         if (conflict(*cur, *i))
         {
+            QValueList<ProgInfo>::iterator tokeep, todelete;
+
+            if((*cur).subtitle != "" && (*i).subtitle == "")
+                tokeep = cur, todelete = i;
+            else if((*i).subtitle != "" && (*cur).subtitle == "")
+                tokeep = i, todelete = cur;
+            else if((*cur).desc != "" && (*i).desc == "")
+                tokeep = cur, todelete = i;
+            else if((*i).desc != "" && (*cur).desc == "")
+                tokeep = i, todelete = cur;
+            else
+                tokeep = i, todelete = cur;
+
             cerr << "removing conflicting program: "
-                 << (*cur).channel << " "
-                 << (*cur).title << " "
-                 << (*cur).startts << "-" << (*cur).endts << endl;
+                 << (*todelete).channel << " "
+                 << (*todelete).title << " "
+                 << (*todelete).startts << "-" << (*todelete).endts << endl;
             cerr << "conflicted with             : "
-                 <<   (*i).channel << " "
-                 <<   (*i).title << " "
-                 <<   (*i).startts << "-" <<   (*i).endts << endl;
+                 << (*tokeep).channel << " "
+                 << (*tokeep).title << " "
+                 << (*tokeep).startts << "-" <<   (*tokeep).endts << endl;
             cerr << endl;
-            fixlist->erase(cur);
+
+            if (todelete == i)
+                i = cur;
+            fixlist->erase(todelete);
         }
     }
 }

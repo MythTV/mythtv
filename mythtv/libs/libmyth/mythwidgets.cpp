@@ -7,6 +7,7 @@ using namespace std;
 
 #include "mythwidgets.h"
 #include "mythcontext.h"
+#include "util.h"
 
 void MythComboBox::keyPressEvent(QKeyEvent *e)
 {
@@ -283,7 +284,10 @@ MythDialog::MythDialog(MythContext *context, QWidget *parent, const char *name,
 
     context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
-    setGeometry(0, 0, screenwidth, screenheight);
+    int x, y, w, h;
+    GetMythTVGeometry(qt_xdisplay(), qt_xscreen(), &x, &y, &w, &h);
+
+    setGeometry(x, y, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
     setFont(QFont("Arial", (int)(context->GetMediumFontSize() * hmult),

@@ -62,6 +62,10 @@ str ChannelOrdering=channum + 0
 # Which input on the tuner card to start on?
 str TunerCardInput=Television
 
+# If using Xinerama, what screen to use?
+# Ignored if not using Xinerama
+int XineramaScreen=0
+
 # TV options
 # 
 #
@@ -74,8 +78,8 @@ str FreqTable=us-cable
 str VertScanMode=overscan
 str HorizScanMode=overscan
 # How much do we chop (or add)?  %, 0 - 100
-int VertScanPercentage=5
-int HorizScanPercentage=5
+int VertScanPercentage=1
+int HorizScanPercentage=1
 # How much do we offset the picture?
 int xScanDisplacement=0
 int yScanDisplacement=0

@@ -16,6 +16,7 @@ using namespace std;
 
 #include "XJ.h"
 #include "../libmyth/oldsettings.h"
+#include "../libmyth/util.h"
 
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
@@ -131,9 +132,35 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
     data->XJ_screen = DefaultScreenOfDisplay(data->XJ_disp);
     XJ_screen_num = DefaultScreen(data->XJ_disp);
 
-    XJ_screenwidth = DisplayWidth(data->XJ_disp, XJ_screen_num);
-    XJ_screenheight = DisplayHeight(data->XJ_disp, XJ_screen_num);
-  
+    char *prefix = (char *)PREFIX;
+
+    Settings *settings = new Settings();
+    settings->LoadSettingsFiles(QString("settings.txt"), QString(prefix));
+
+    QString HorizScanMode = settings->GetSetting("HorizScanMode", "overscan");
+    QString VertScanMode = settings->GetSetting("VertScanMode", "overscan");
+
+    img_hscanf = settings->GetNumSetting("HorizScanPercentage", 5) / 100.0;
+    img_vscanf = settings->GetNumSetting("VertScanPercentage",5) / 100.0;
+   
+    img_xoff = settings->GetNumSetting("xScanDisplacement", 0);
+    img_yoff = settings->GetNumSetting("yScanDisplacement",0);
+
+
+    if (VertScanMode == "underscan") 
+    {
+        img_vscanf = 0 - img_vscanf;
+    }
+    if (HorizScanMode == "underscan") 
+    {
+        img_hscanf = 0 - img_hscanf;
+    }
+
+    printf("Over/underscanning. V: %f, H: %f, XOff: %d, YOff: %d\n", 
+           img_vscanf, img_hscanf, img_xoff, img_yoff);
+
+    delete settings;
+
     XJ_white=XWhitePixel(data->XJ_disp, XJ_screen_num);
     XJ_black=XBlackPixel(data->XJ_disp, XJ_screen_num);
   
@@ -141,7 +168,8 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
   
     data->XJ_root = DefaultRootWindow(data->XJ_disp);
 
-    curx = 0; cury = 0;
+    GetMythTVGeometry(data->XJ_disp, XJ_screen_num, &curx, &cury, 
+                      &XJ_screenwidth, &XJ_screenheight);
     curw = XJ_width; curh = XJ_height;
 
     dispx = 0; dispy = 0;
@@ -159,9 +187,9 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
 
     if (createwindow)
     {
-        data->XJ_win = XCreateSimpleWindow(data->XJ_disp, data->XJ_root, 0, 0,
-                                           XJ_width, XJ_height, 0, XJ_white,
-                                           XJ_black);
+        data->XJ_win = XCreateSimpleWindow(data->XJ_disp, data->XJ_root, curx, 
+                                           cury, XJ_width, XJ_height, 0, 
+                                           XJ_white, XJ_black);
         data->XJ_curwin = data->XJ_win;
 
         if (!data->XJ_win) 
@@ -374,21 +402,6 @@ void XvVideoOutput::ToggleFullScreen(void)
 {
     pthread_mutex_lock(&lock);
 
-    float HorizScanFactor, VertScanFactor;
-    int xScanDisp, yScanDisp;
-    char *prefix = (char *)PREFIX;
-
-    Settings *settings = new Settings();
-    settings->LoadSettingsFiles(QString("settings.txt"), QString(prefix));
-
-    QString HorizScanMode = settings->GetSetting("HorizScanMode", "overscan");
-    QString VertScanMode = settings->GetSetting("VertScanMode", "overscan");
-
-    HorizScanFactor = settings->GetNumSetting("HorizScanPercentage", 5) / 100.0;
-    VertScanFactor = settings->GetNumSetting("VertScanPercentage",5) / 100.0;
-    xScanDisp = settings->GetNumSetting("xScanDisplacement", 0);
-    yScanDisp = settings->GetNumSetting("yScanDisplacement",0);
- 
     if (XJ_fullscreen)
     {
         XJ_fullscreen = 0; 
@@ -401,65 +414,18 @@ void XvVideoOutput::ToggleFullScreen(void)
         XJ_fullscreen = 1;
         oldx = curx; oldy = cury; oldw = curw; oldh = curh;
 
-        if (VertScanMode == "overscan")
-        {
-            if (HorizScanMode == "overscan")
-            {
-                curx = xScanDisp - (int)ceil(XJ_screenwidth * HorizScanFactor);
-                curw = (int)ceil(XJ_screenwidth * (1 + 2 * HorizScanFactor));
-            }
-            else
-            {
-                curx = xScanDisp + (int)ceil(XJ_screenwidth * HorizScanFactor);
-                curw = (int)ceil(XJ_screenwidth * (1 - 2 * HorizScanFactor));
-            }
-
-            cury = yScanDisp - (int)ceil(XJ_screenheight * VertScanFactor);
-            curh = (int)ceil(XJ_screenheight * (1 + 2 * (VertScanFactor + 0.01)));
-        }
-        else
-        {
-            if (HorizScanMode == "overscan")
-            {
-                curx = xScanDisp - (int)ceil(XJ_screenwidth * HorizScanFactor);
-                curw = (int)ceil(XJ_screenwidth * (1 + 2 * HorizScanFactor));
-            }
-            else
-            {
-                curx = xScanDisp + (int)ceil(XJ_screenwidth * HorizScanFactor);
-                curw = (int)ceil(XJ_screenwidth * (1 - 2 * HorizScanFactor));
-            }
-
-            cury = yScanDisp + (int)ceil(XJ_screenheight * VertScanFactor);
-            curh = (int)ceil(XJ_screenheight * (1 - 2 * VertScanFactor));
-        }
-
+        curw = XJ_screenwidth;
+        curh = XJ_screenheight;
         hide_cursor();
         decorate(0);
     }
-
-    curx = ((curx - 1) / 2) * 2;
-    cury = ((cury - 1) / 2) * 2;
-
-    int hclamp = XJ_height / 4;
-
-    curh = (int)((rintf(curh) / hclamp) * hclamp) + 4;
-    curw = ((curw) / 2) * 2 + 4;
 
     dispx = 0;
     dispy = 0;
     dispw = curw;
     disph = curh;
 
-    delete settings;
-
-    sizehint(curx, cury, curw, curh, 0);
- 
-    XMoveResizeWindow(data->XJ_disp, data->XJ_win, curx, cury, curw, curh);
-    XMapRaised(data->XJ_disp, data->XJ_win);
-
-    XRaiseWindow(data->XJ_disp, data->XJ_win);
-    XFlush(data->XJ_disp);
+    MoveResize();
 
     pthread_mutex_unlock(&lock);
 }
@@ -524,7 +490,8 @@ void XvVideoOutput::Show(unsigned char *buffer, int width, int height)
     pthread_mutex_lock(&lock);
  
     XvShmPutImage(data->XJ_disp, xv_port, data->XJ_curwin, data->XJ_gc, image, 
-                  0, 0, width, height, dispx, dispy, dispw, disph, False);
+                  imgx, imgy, imgw, imgh, dispxoff, dispyoff, dispwoff, 
+                  disphoff, False);
     XSync(data->XJ_disp, False);
 
     pthread_mutex_unlock(&lock);
@@ -558,4 +525,104 @@ int XvVideoOutput::CheckEvents(void)
     }
 
     return key;
+}
+
+void XvVideoOutput::MoveResize(void)
+{
+    int yoff, xoff;
+
+    XMoveResizeWindow(data->XJ_disp, data->XJ_win, curx, cury, curw, curh);
+    XMapRaised(data->XJ_disp, data->XJ_win);
+
+    XRaiseWindow(data->XJ_disp, data->XJ_win);
+    XFlush(data->XJ_disp);
+
+    // Preset all image placement and sizing variables.
+    imgx = 0; imgy = 0;
+    imgw = XJ_width; imgh = XJ_height;
+    xoff = img_xoff; yoff = img_yoff;
+    dispxoff = dispx; dispyoff = dispy;
+    dispwoff = dispw; disphoff = disph;
+
+/*
+    Here we apply playback over/underscanning and offsetting (if any apply).
+
+    It doesn't make any sense to me to offset an image such that it is clipped.
+    Therefore, we only apply offsets if there is an underscan or overscan which
+    creates "room" to move the image around. That is, if we overscan, we can 
+    move the "viewport". If we underscan, we change where we place the image 
+    into the display window. If no over/underscanning is performed, you just 
+    get the full original image scaled into the full display area.
+*/
+
+    if (img_vscanf > 0) {
+        // Veritcal overscan. Move the Y start point in original image.
+        imgy = (int)ceil(XJ_height * img_vscanf);
+        imgh = (int)ceil(XJ_height * (1 - 2 * img_vscanf));
+
+        // If there is an offset, apply it now that we have a room.
+        // To move the image down, move the start point up.
+        if(yoff > 0) {
+            // Can't offset the image more than we have overscanned.
+            if(yoff > imgy) yoff = imgy;
+            imgy -= yoff;
+        }
+        // To move the image up, move the start point down.
+        if(yoff < 0) {
+            // Again, can't offset more than overscanned.
+            if( abs(yoff) > imgy ) yoff = 0 - imgy;
+            imgy -= yoff;
+        }
+    }
+
+    if (img_hscanf > 0) {
+        // Horizontal overscan. Move the X start point in original image.
+        imgx = (int)ceil(XJ_width * img_hscanf);
+        imgw = (int)ceil(XJ_width * (1 - 2 * img_hscanf));
+        if(xoff > 0) {
+            if(xoff > imgx) xoff = imgx;
+            imgx -= xoff;
+        }
+        if(xoff < 0) {
+            if( abs(xoff) > imgx ) xoff = 0 - imgx;
+            imgx -= xoff;
+        }
+    }
+
+    float vscanf, hscanf;
+    if (img_vscanf < 0) {
+        // Veritcal underscan. Move the starting Y point in the display window.
+        // Use the abolute value of scan factor.
+        vscanf = fabs(img_vscanf);
+        dispyoff = (int)ceil(disph * vscanf);
+        disphoff = (int)ceil(disph * (1 - 2 * vscanf));
+        // Now offset the image within the extra blank space created by 
+        // underscanning.
+        // To move the image down, increase the Y offset inside the display 
+        // window.
+        if(yoff > 0) {
+            // Can't offset more than we have underscanned.
+            if(yoff > dispyoff) yoff = dispyoff;
+            dispyoff += yoff;
+        }
+        if(yoff < 0) {
+            if( abs(yoff) > dispyoff ) yoff = 0 - dispyoff;
+            dispyoff += yoff;
+        }
+    }
+
+    if (img_hscanf < 0) {
+        hscanf = fabs(img_hscanf);
+        dispxoff = (int)ceil(dispw * hscanf);
+        dispwoff = (int)ceil(dispw * (1 - 2 * hscanf));
+        if(xoff > 0) {
+            if(xoff > dispxoff) xoff = dispxoff;
+            dispxoff += xoff;
+        }
+        if(xoff < 0) {
+            if( abs(xoff) > dispxoff ) xoff = 0 - dispxoff;
+            dispxoff += xoff;
+        }
+    }
+
 }

@@ -10,7 +10,7 @@ target.path = $${PREFIX}/bin
 INSTALLS = target
 
 INCLUDEPATH += ../../libs
-LIBS += -L../../libs/libmyth -lmyth-$$LIBVERSION
+LIBS += -L../../libs/libmyth -lmyth-$$LIBVERSION -lXinerama
 
 # Input
 SOURCES += main.cpp

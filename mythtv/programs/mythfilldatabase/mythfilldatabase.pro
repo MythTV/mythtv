@@ -12,7 +12,7 @@ target.path = $${PREFIX}/bin
 INSTALLS = target
 
 INCLUDEPATH += ../../libs/
-LIBS += -lmyth-$$LIBVERSION -L/usr/local/lib -L../../libs/libmyth
+LIBS += -lmyth-$$LIBVERSION -lXinerama -L../../libs/libmyth -L/usr/local/lib
 
 # Input
 SOURCES += filldata.cpp

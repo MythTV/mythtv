@@ -21,7 +21,8 @@ INCLUDEPATH += ../../libs/libNuppelVideo ../../libs/libmythtv ../../libs
 LIBS += -L../../libs/libmythtv -L../../libs/libNuppelVideo 
 LIBS += -L../../libs/libavcodec -L../../libs/libmyth
 
-LIBS += -lmythtv -lNuppelVideo -lavcodec -lmyth-$$LIBVERSION -lXv -lmp3lame 
+LIBS += -lmythtv -lNuppelVideo -lavcodec -lmyth-$$LIBVERSION -lXv -lXinerama
+LIBS += -lmp3lame 
 
 TARGETDEPS  = ../../libs/libNuppelVideo/libNuppelVideo.a 
 TARGETDEPS += ../../libs/libmythtv/libmythtv.a
