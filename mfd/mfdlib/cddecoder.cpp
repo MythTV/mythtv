@@ -1,7 +1,7 @@
 /*
     cddecoder.cpp
 
-    (c) 2003 Thor Sigvaldason and Isaac Richards
+    (c) 2003, 2004 Thor Sigvaldason and Isaac Richards
     Part of the mythTV project
     
     cd decoder
@@ -13,7 +13,6 @@
 
 #include "../config.h"
 
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>

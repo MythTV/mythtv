@@ -1,7 +1,7 @@
 /*
 	maddecoder.cpp
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
+	(c) 2003, 2004 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
 	mad mp3 decoder
@@ -13,7 +13,6 @@
 
 #include "../config.h"
 
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
@@ -634,39 +633,44 @@ AudioMetadata *MadDecoder::getMetadata()
         for (unsigned int j = 0; j < nstrings; ++j)
         {
             ucs4 = id3_field_getstrings(field, j);
-            assert(ucs4);
-
-            if (!strcmp(info[i].id, ID3_FRAME_GENRE))
+            if(!ucs4)
             {
-                ucs4 = id3_genre_name(ucs4);
+                warning("id3_field_getstrings() returned nothing");
             }
+            else
+            {
+                if (!strcmp(info[i].id, ID3_FRAME_GENRE))
+                {
+                    ucs4 = id3_genre_name(ucs4);
+                }
 
-            latin1 = id3_ucs4_latin1duplicate(ucs4);
+                latin1 = id3_ucs4_latin1duplicate(ucs4);
             
-            if (!latin1)
-            {
-                continue;
+                if (!latin1)
+                {
+                    continue;
+                }
+
+                switch (i)
+                {
+                    case 0: title += (char *)latin1; break;
+                    case 1: artist += (char *)latin1; break;
+                    case 2: album += (char *)latin1; break;
+                    case 3: if (year == 0) 
+                                year = atoi((char *)latin1); break;
+                    case 4: if (tracknum == 0) 
+                                tracknum = atoi((char *)latin1); break;
+                    case 5: if (genre != (char *)latin1)
+                            {
+                                genre += (char *)latin1;
+                            }
+                            break;
+
+                    default: break;
+                }
+
+                free(latin1);
             }
-
-            switch (i)
-            {
-                case 0: title += (char *)latin1; break;
-                case 1: artist += (char *)latin1; break;
-                case 2: album += (char *)latin1; break;
-                case 3: if (year == 0) 
-                            year = atoi((char *)latin1); break;
-                case 4: if (tracknum == 0) 
-                            tracknum = atoi((char *)latin1); break;
-                case 5: if (genre != (char *)latin1)
-                        {
-                            genre += (char *)latin1;
-                        }
-                        break;
-
-                default: break;
-            }
-
-            free(latin1);
         }
     }
 

@@ -1,7 +1,7 @@
 /*
 	decoder.cpp
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
+	(c) 2003, 2004 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
 	Methods for decoder classes
