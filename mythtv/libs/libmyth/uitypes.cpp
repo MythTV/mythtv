@@ -2432,8 +2432,6 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                 font_name = "selected";
             }
 
-            QString msg = hotspot_node->getString();
-            drawText(p, msg, font_name, x_location, y_location, i);
             
 
             if(i == active_bin)
@@ -2467,6 +2465,14 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                     p->drawPixmap(x_location, y_location - QFontMetrics(tmpfont->face).height() + QFontMetrics(tmpfont->face).descent(), (*highlight_map[0]));
                 }
             }
+
+            //
+            //  Move this down for people with (slightly) broken fonts
+            //
+            
+            QString msg = hotspot_node->getString();
+            drawText(p, msg, font_name, x_location, y_location, i);
+
             if(i == bins)
             {
                 //
