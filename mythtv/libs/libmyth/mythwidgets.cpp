@@ -395,5 +395,27 @@ void MythWizard::showPage(QWidget* page) {
         // last page
         finishButton()->setEnabled(TRUE);
         finishButton()->setFocus();
+    } else {
+        nextButton()->setFocus();
+    }
+}
+
+void MythWizard::keyPressEvent(QKeyEvent* e) {
+    switch (e->key()) {
+    case Key_Enter:
+    case Key_Return:
+        if (indexOf(currentPage()) == pageCount()-1)
+            accept();
+        else
+            next();
+        break;
+    case Key_Escape:
+        if (indexOf(currentPage()) == 0)
+            reject();
+        else
+            back();
+        break;
+    default:
+        e->ignore();
     }
 }

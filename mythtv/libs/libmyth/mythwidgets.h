@@ -175,6 +175,8 @@ public:
         QWizard(parent, name, TRUE) {};
 
     virtual void showPage(QWidget* page);
+
+    virtual void keyPressEvent(QKeyEvent* e);
 };
 
 #endif
