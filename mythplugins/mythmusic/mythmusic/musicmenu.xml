@@ -29,11 +29,11 @@
 
    <button>
       <type>SETUP</type>
-      <text>Setup</text>
-      <text lang="IT">Configurazione</text>
-      <text lang="ES">Configurar</text>
-      <text lang="CA">Configurar</text>
-      <action>MENU music_settings.xml</action>
+      <text>Scan for Music</text>
+      <text lang="IT">Rileggi lista brani</text>
+      <text lang="ES">Actualizar lista</text>
+      <text lang="CA">Actualitzar llista</text>
+      <action>SETTINGS_SCAN</action>
    </button>
 
 </mythmenu>
