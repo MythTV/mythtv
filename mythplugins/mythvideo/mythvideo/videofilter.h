@@ -2,11 +2,11 @@
 #define VIDEOFILTER_H_
 
 /*
-	videofilter.h
+    videofilter.h
 
-	(c) 2003 Xavier Hervy
-	Part of the mythTV project
-	
+    (c) 2003 Xavier Hervy
+    Part of the mythTV project
+    
     Class to let user filter the video list
 
 */
@@ -20,7 +20,8 @@ using namespace std;
 class VideoFilterSettings
 {
     public :
-        VideoFilterSettings(QSqlDatabase *db, bool loaddefaultsettings = true, bool _allowBrowse = true);
+        VideoFilterSettings(QSqlDatabase *db, bool loaddefaultsettings = true, 
+                            bool _manager=false, bool _allowBrowse = true);
         VideoFilterSettings(VideoFilterSettings *other);
         ~VideoFilterSettings();
         QString BuildClauseFrom();
@@ -49,7 +50,9 @@ class VideoFilterSettings
         void setOrderby (int lorderby) {orderby = lorderby;};
         
         bool getAllowBrowse(void){return allowBrowse;};
-        void setAllowBrowse(bool _allowBrowse){allowBrowse = _allowBrowse;};
+        void setAllowBrowse(bool _allowBrowse){allowBrowse = _allowBrowse;}
+        bool getIsManager(void){return isManager;}
+        void setIsManager(bool _mgr){isManager = _mgr;}
     private : 
         int category;
         int genre;
@@ -61,7 +64,8 @@ class VideoFilterSettings
         int browse;
         int orderby;
         bool allowBrowse;
-        QSqlDatabase	*db;
+        bool isManager;
+        QSqlDatabase    *db;
 };
 
 class VideoFilterDialog : public MythThemedDialog
@@ -106,7 +110,7 @@ class VideoFilterDialog : public MythThemedDialog
  private:
     void update_numvideo();
     QSqlDatabase        *db;    
-    VideoFilterSettings	*originalSettings;
+    VideoFilterSettings *originalSettings;
     VideoFilterSettings *currentSettings;
     //  
     //  GUI Stuff
@@ -115,11 +119,11 @@ class VideoFilterDialog : public MythThemedDialog
     UISelectorType      *browse_select;
     UISelectorType      *orderby_select;
     UISelectorType      *year_select;
-    UISelectorType	*userrating_select;
-    UISelectorType	*category_select;
-    UISelectorType	*country_select;
-    UISelectorType	*genre_select;
-    UISelectorType	*runtime_select;
+    UISelectorType  *userrating_select;
+    UISelectorType  *category_select;
+    UISelectorType  *country_select;
+    UISelectorType  *genre_select;
+    UISelectorType  *runtime_select;
     UITextButtonType    *save_button;
     UITextButtonType    *done_button;
     UITextType*numvideos_text; 

@@ -8,22 +8,32 @@
 
 #include "videofilter.h"
 
-VideoFilterSettings::VideoFilterSettings(QSqlDatabase * ldb, bool loaddefaultsettings, bool _allowBrowse)
+VideoFilterSettings::VideoFilterSettings(QSqlDatabase * ldb, bool loaddefaultsettings, bool _mgr, 
+                                         bool _allowBrowse)
 {
+    QString prefix;
+    isManager = _mgr;
     
+    if ( isManager )
+        prefix = "VideoManagerDefault";
+    else
+        prefix = "VideoDefault";
     
     // do nothing yet
     db = ldb;
-    if (loaddefaultsettings){
-        category = gContext->GetNumSetting("VideoDefaultCategory",-1);
-        genre = gContext->GetNumSetting("VideoDefaultGenre",-1);
-        country = gContext->GetNumSetting("VideoDefaultCountry",-1);
-        year = gContext->GetNumSetting("VideoDefaultYear",-1);
-        runtime = gContext->GetNumSetting("VideoDefaultRuntime",-2);
-        userrating = gContext->GetNumSetting("VideoDefaultUserrating",-1);
-        browse = gContext->GetNumSetting("VideoDefaultBrowse",-1);
-        orderby = gContext->GetNumSetting("VideoDefaultOrderby",0);
-    }else{
+    if (loaddefaultsettings)
+    {
+        category = gContext->GetNumSetting( QString("%1Category").arg(prefix),-1);
+        genre = gContext->GetNumSetting( QString("%1Genre").arg(prefix),-1);
+        country = gContext->GetNumSetting( QString("%1Country").arg(prefix),-1);
+        year = gContext->GetNumSetting( QString("%1Year").arg(prefix),-1);
+        runtime = gContext->GetNumSetting( QString("%1Runtime").arg(prefix),-2);
+        userrating = gContext->GetNumSetting( QString("%1Userrating").arg(prefix),-1);
+        browse = gContext->GetNumSetting( QString("%1Browse").arg(prefix),-1);
+        orderby = gContext->GetNumSetting( QString("%1Orderby").arg(prefix),0);
+    }
+    else
+    {
         category = -1;
         genre = -1;
         country = -1;
@@ -52,7 +62,7 @@ VideoFilterSettings::VideoFilterSettings(VideoFilterSettings *other)
     browse = other->browse;
     allowBrowse = other->allowBrowse;
     orderby = other->orderby;
-    db = other->db;
+    isManager = other->isManager;
 }
 
 VideoFilterSettings::~VideoFilterSettings()
@@ -61,14 +71,21 @@ VideoFilterSettings::~VideoFilterSettings()
 }
 void VideoFilterSettings::saveAsDefault()
 {
-    gContext->SaveSetting("VideoDefaultCategory", category);
-    gContext->SaveSetting("VideoDefaultGenre", genre);
-    gContext->SaveSetting("VideoDefaultCountry", country);
-    gContext->SaveSetting("VideoDefaultYear", year);
-    gContext->SaveSetting("VideoDefaultRuntime", runtime);
-    gContext->SaveSetting("VideoDefaultUserrating", userrating);
-    gContext->SaveSetting("VideoDefaultBrowse", browse);
-    gContext->SaveSetting("VideoDefaultOrderby", orderby);
+    QString prefix;
+        
+    if ( isManager )
+        prefix = "VideoManagerDefault";
+    else
+        prefix = "VideoDefault";
+
+    gContext->SaveSetting(QString("%1Category").arg(prefix), category);
+    gContext->SaveSetting(QString("%1Genre").arg(prefix), genre);
+    gContext->SaveSetting(QString("%1Country").arg(prefix), country);
+    gContext->SaveSetting(QString("%1Year").arg(prefix), year);
+    gContext->SaveSetting(QString("%1Runtime").arg(prefix), runtime);
+    gContext->SaveSetting(QString("%1Userrating").arg(prefix), userrating);
+    gContext->SaveSetting(QString("%1Browse").arg(prefix), browse);
+    gContext->SaveSetting(QString("%1Orderby").arg(prefix), orderby);
 }
 
 VideoFilterDialog::VideoFilterDialog(QSqlDatabase *ldb,
@@ -450,7 +467,7 @@ void VideoFilterDialog::keyPressEvent(QKeyEvent *e)
            if ((year_select) && (getCurrentFocusWidget() == year_select)) 
                 currentSelector = year_select;
            if ((runtime_select)&&(getCurrentFocusWidget() == runtime_select))
-                currentSelector = runtime_select;	
+                currentSelector = runtime_select;   
            if ((userrating_select)&&(getCurrentFocusWidget() == userrating_select)) 
                 currentSelector = userrating_select;
             if ((browse_select)&&(getCurrentFocusWidget() == browse_select)) 

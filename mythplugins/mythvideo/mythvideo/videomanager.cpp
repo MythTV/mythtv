@@ -37,7 +37,7 @@ VideoManager::VideoManager(QSqlDatabase *ldb,
     popup = NULL;
     
 
-    currentVideoFilter = new VideoFilterSettings(db,false);
+    currentVideoFilter = new VideoFilterSettings(db, true, true);
     RefreshMovieList();
 
     fullRect = QRect(0, 0, (int)(800*wmult), (int)(600*hmult));
@@ -415,42 +415,42 @@ void VideoManager::GetMovieData(QString movieNum)
         curitem->setUserRating(data["UserRating"].toFloat());
         curitem->setRating(data["MovieRating"]);
         curitem->setLength(data["Runtime"].toInt());
-	//movieGenres
-	movieGenres.clear();
-	QString genres = data["Genres"];
-	int indice ;
-	QString genre;
-	while (genres!= ""){
-		indice = genres.find(",");
-		if (indice == -1){
-			genre = genres;
-			genres = "";
-		} else {
-			genre = genres.left(indice);
-			genres = genres.right(genres.length()-indice -1);
-		}
-		movieGenres.append(genre.stripWhiteSpace());
-	}
-	curitem->setGenres(movieGenres);
-	//movieCountries
-	movieCountries.clear();
-	QString countries = data["Countries"];
-	QString country;
-	while (countries!= ""){
-		indice = countries.find(",");
-		if (indice == -1){
-			country = countries;
-			countries = "";
-		} else {
-			country = countries.left(indice);
-			countries = countries.right(countries.length()-indice -1);
-		}
-		country.stripWhiteSpace();
+    //movieGenres
+    movieGenres.clear();
+    QString genres = data["Genres"];
+    int indice ;
+    QString genre;
+    while (genres!= ""){
+        indice = genres.find(",");
+        if (indice == -1){
+            genre = genres;
+            genres = "";
+        } else {
+            genre = genres.left(indice);
+            genres = genres.right(genres.length()-indice -1);
+        }
+        movieGenres.append(genre.stripWhiteSpace());
+    }
+    curitem->setGenres(movieGenres);
+    //movieCountries
+    movieCountries.clear();
+    QString countries = data["Countries"];
+    QString country;
+    while (countries!= ""){
+        indice = countries.find(",");
+        if (indice == -1){
+            country = countries;
+            countries = "";
+        } else {
+            country = countries.left(indice);
+            countries = countries.right(countries.length()-indice -1);
+        }
+        country.stripWhiteSpace();
 
-		movieCountries.append(country.stripWhiteSpace());
-	}
-	curitem->setCountries(movieCountries);
-	
+        movieCountries.append(country.stripWhiteSpace());
+    }
+    curitem->setCountries(movieCountries);
+    
         curitem->setInetRef(movieNumber);
         QString movieCoverFile = "";
         movieCoverFile = GetMoviePoster(movieNumber);
@@ -505,7 +505,7 @@ QString VideoManager::executeExternal(QStringList args, QString purpose)
        }
     } else {
        err = QString("\"%1\" failed: Could not start process")
-		.arg(cmd.local8Bit());
+        .arg(cmd.local8Bit());
     }
 
     while (proc.canReadLineStdout() || proc.canReadLineStderr()) {
