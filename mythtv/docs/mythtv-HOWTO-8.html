@@ -62,7 +62,7 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss8.3">8.3</A> <A HREF="mythtv-HOWTO.html#toc8.3">Red Hat Linux 8.0</A>
+<H2><A NAME="ss8.3">8.3</A> <A HREF="mythtv-HOWTO.html#toc8.3">Red Hat Linux</A>
 </H2>
 
 <P>You should already have the source from the "Kernel Development" package
@@ -71,7 +71,7 @@ you installed in section 3.2. Ensure that a symlink has been created:
 <PRE>
 $ cd /usr/src
 $ su
-# ln -s linux-2.4.18-x.x.x linux
+# ln -s linux-2.4 /usr/src/linux
 # exit
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -80,7 +80,7 @@ $ su
 <H2><A NAME="ss8.4">8.4</A> <A HREF="mythtv-HOWTO.html#toc8.4">Obtaining and compiling lirc.</A>
 </H2>
 
-<P>You're going to need to download and compile lircd.  Go to 
+<P>You're going to need to download and compile <B>lircd</B>.  Go to 
 <A HREF="http://www.lirc.org">http://www.lirc.org</A> and download lirc; as
 of 2002-11-07, the version available is 0.6.6.  Grab the remotes.tgz file as
 well. 
@@ -214,7 +214,7 @@ Next:
 kernel upon boot. If you are using <B>lilo</B>, change your lilo configuration  
 according to  
 <A HREF="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/  s1-custom-kernel-bootloader.html">http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/  s1-custom-kernel-bootloader.html</A> Remember, if you have any custom  
-kernel modules (alsa, etc) you will have to recompile/reinstall those.</P>
+kernel modules (ALSA, etc) you will have to recompile/reinstall those.</P>
 
 <H2><A NAME="completing_lirc_install"></A> <A NAME="ss8.5">8.5</A> <A HREF="mythtv-HOWTO.html#toc8.5">Completing the lirc install. </A>
 </H2>
@@ -312,7 +312,7 @@ receiver.</P>
 to control MythTV.
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythtv-0.9/configfiles
+$ cd ~/mythtv-0.10/configfiles
 $ cp lircrc.example ~/.lircrc
 </PRE>
 </CODE></BLOCKQUOTE>

@@ -25,18 +25,18 @@ them.</P>
 <A HREF="http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/">http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/</A>.
 <BLOCKQUOTE><CODE>
 <PRE>
-$ wget http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/mplayer-0.90pre10+mythtv.patch
+$ wget http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/mplayer-0.90rc5-mythtv-20030407.diff
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 <P>Download the source to MPlayer and patch:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
-$ tar -xjf MPlayer-0.90rc1.tar.bz2
-$ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
-$ cd MPlayer-0.90rc1
-$ patch -p1 &lt; mplayer-0.90pre10+mythtv.patch
+$ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90.tar.bz2
+$ tar -xjf MPlayer-0.90.tar.bz2
+$ cp mplayer-0.90rc5-mythtv-20030407.diff MPlayer-0.90
+$ cd MPlayer-0.90
+$ patch -p1 &lt; mplayer-0.90rc5-mythtv-20030407.diff
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -62,7 +62,7 @@ fvwm &amp;
 mythfrontend
 ^D
 $ cat > .fvwmrc
-Style "myth*"      NoTitle, NoHandles, Sticky, WindowListSkip, BorderWidth 0
+Style myth* NoTitle, NoHandles, Sticky, WindowListSkip, SloppyFocus, GrabFocus, BorderWidth 0
 ^D
 $
 </PRE>
@@ -169,8 +169,8 @@ restart X.</P>
 
 <H3>MythTV Dimensions</H3>
 
-<P>In 0.9, from "mythfrontend" go to Setup->Appearance.  The default for the
-height and width on 0.9 is "0" - this will cause MythTV to automatically
+<P>In 0.10, from "mythfrontend" go to Setup->Appearance.  The default for the
+height and width on 0.10 is "0" - this will cause MythTV to automatically
 size itself to full screen. To ensure that your new dimension settings take
 effect, exit and restart MythTV.</P>
 <P><B>NOTE</B>: When the GUI is full screen, you may need to set your window
@@ -329,7 +329,7 @@ mysql> delete from program where chanid = '1015';
 </P>
 <P>
 <A NAME="pvr250"></A> </P>
-<H2><A NAME="ss19.10">19.10</A> <A HREF="mythtv-HOWTO.html#toc19.10">I'd like to use a hardware MPEG-2 encoder.</A>
+<H2><A NAME="ss19.10">19.10</A> <A HREF="mythtv-HOWTO.html#toc19.10">I'd like to use a hardware MPEG-2 encoder (ie, a PVR-250/350).</A>
 </H2>
 
 <P><B>NOTE</B>:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS

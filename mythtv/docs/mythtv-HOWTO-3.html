@@ -138,7 +138,7 @@ encoding. Using either a G200 MJPEG encoder card, or a WinTV-PVR-250 or 350
 from Hauppauge and the driver from the IvyTV project 
 <A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A> will
 allow you to use dedicated hardware encoders rather than your CPU. Release
-0.9 of MythTV is able to use the PVR-250/350 cards as an input device for
+0.10 of MythTV is able to use the PVR-250/350 cards as an input device for
 live TV and for scheduled recordings.  Using the onboard MPEG-2 encoder
 drastically reduces the CPU requirements for encoding.</P>
 <P>Here are some data points for encoding:
@@ -333,25 +333,91 @@ the "Plus" version above)</LI>
 <H2><A NAME="ss3.2">3.2</A> <A HREF="mythtv-HOWTO.html#toc3.2">Software.</A>
 </H2>
 
-<P>There are a few ways of installing programs on Linux systems; you can either
-use the graphical tools that come with your distribution, or you can use
-command-line utilities.  Either system will get the job done, and it all
-depends on your comfort level with Linux.</P>
-<P><B>NOTE for Red Hat users</B>:  Axel Thimm has created RPMs for MythTV
-which may be obtained from 
-<A HREF="http://atrpms.physik.fu-berlin.de/name/mythtv/">http://atrpms.physik.fu-berlin.de/name/mythtv/</A>.  If you have
-problems with the RPMs, please send him email directly at 
-<A HREF="mailto:Axel.Thimm@physik.fu-berlin.de">mailto:Axel.Thimm@physik.fu-berlin.de</A>.</P>
-<P><B>NOTE for Mandrake users</B>:  Thac has created RPMs for MythTV for
-Mandrake 9.0 and 9.1 which may be obtained from 
-<A HREF="http://rpm.nyvalls.se/">http://rpm.nyvalls.se/</A> If you have
-problems with the RPMs, please send him email directly at 
-<A HREF="thac@nyvalls.se">thac@nyvalls.se</A>.</P>
+<P>There are a few ways of installing programs on Linux systems; you can
+either use a pre-compiled package, or install from a tarball after
+satisfying any prerequisites.</P>
 <P><B>NOTE</B>: you must have the MySQL database software installed on a
 system to store the master database.  This does not necessarily mean that
 MySQL must run on one of the MythTV boxes.</P>
+
+<H3>Pre-compiled packages.</H3>
+
+<P>A number of people have created pre-compiled packages for MythTV that may
+make your installation easier.</P>
+<P><B>BIG FAT WARNING</B>:  This HOWTO assumes that you have <EM>not</EM>
+installed MythTV from a package.  All example command lines and file
+locations are based on the MythTV tarball defaults.  Some packagers have
+modified the filenames, binaries and file locations to match what is
+commonly found in that distribution.  Any issues with MythTV installed via a
+pre-compiled package <B>MUST</B> be raised with the packager.</P>
+<P>If you use any of the pre-compiled packages you may not need to perform any
+additional configuration steps in this HOWTO.  The next logical step is 
+<A HREF="mythtv-HOWTO-6.html#mysql">configuring MySQL</A>, which you may or may not have to
+perform.  See your package documentation.</P>
+
+<H3>Red Hat </H3>
+
+<P>Axel Thimm has created RPMs for MythTV which may be obtained from 
+<A HREF="http://atrpms.physik.fu-berlin.de/name/mythtv/">http://atrpms.physik.fu-berlin.de/name/mythtv/</A>.  If you have
+problems with the RPMs, please send him email directly at 
+<A HREF="mailto:Axel.Thimm@physik.fu-berlin.de">mailto:Axel.Thimm@physik.fu-berlin.de</A>.</P>
+<P>A meta-package created by Axel, called mythtv-suite, will allow you to
+install all of MythTV and its add-ons, plus all dependencies, but is
+dependant on having <B>apt</B> or <B>yum</B> installed and have
+<CODE>atrpms</CODE> enabled as a source. If you haven't downloaded the
+atrpms-kickstart packages, you can download it here:</P>
+<P>
+<A HREF="http://atrpms.physik.fu-berlin.de/dist/rh9/atrpms-kickstart/">http://atrpms.physik.fu-berlin.de/dist/rh9/atrpms-kickstart/</A></P>
+<P>Install the package with:
+<BLOCKQUOTE><CODE>
+<PRE>
+# rpm -Uvh atrpms-kickstart*
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Then update your <B>apt</B> package listings:
+<BLOCKQUOTE><CODE>
+<PRE>
+# apt-get update
+</PRE>
+</CODE></BLOCKQUOTE>
+
+And finally:
+<BLOCKQUOTE><CODE>
+<PRE>
+# apt-get install mythtv-suite
+</PRE>
+</CODE></BLOCKQUOTE>
+        
+These steps however, do NOT perform the installation of any drivers 
+required for <B>ALSA</B>, capture cards, <B>lirc</B>, etc.</P>
+
+<H3>Mandrake</H3>
+
+<P>Thac has created RPMs for MythTV for Mandrake 9.0 and 9.1 which may be
+obtained from 
+<A HREF="http://rpm.nyvalls.se/">http://rpm.nyvalls.se/</A> If you have problems with the RPMs, please
+send him email directly at 
+<A HREF="thac@nyvalls.se">thac@nyvalls.se</A>.</P>
+
+<H3>Debian </H3>
+
+<P>Debian packages for MythTV and some of its add-on modules
+have been packaged by Matt Zimmerman 
+<A HREF="mailto:mdz@debian.org">mailto:mdz@debian.org</A> and
+are available at 
+<A HREF="http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/">http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/</A>,
+including installation instructions.  All of the prerequisites for MythTV
+are available as Debian packages.</P>
+<P>See <CODE>/usr/share/doc/packagename/README.Debian</CODE> for more information.</P>
+
+<H3>Manual installation</H3>
+
+<P>You may use the graphical tools that come with your distribution, or you
+can use command-line utilities.  Either system will get the job done, and it
+all depends on your comfort level with Linux.</P>
 <P>In order to compile MythTV, we need to make sure that the software it needs
-is installed.  As of 2003-03-15, this list includes <B>mysql,</B>
+is installed.  As of 2003-03-15, this list includes <B>mysql</B>,
 <B>gcc</B>, <B>freetype2-devel</B>, <B>XFree86-devel</B>,
 <B>qt-devel</B> and <B>lame</B>.  If you're going to use a remote
 control with MythTV, you're going to need the <B>cdialog</B> package in
@@ -480,7 +546,7 @@ from the command line.</P>
 <H3>Mandrake</H3>
 
 <P><B>urpmi</B> is the simplest tool for installation of packages from the
-command line.  The difficult part is the configuration aspect.  The
+command line, but properly configuring it can be difficult.  The
 following website 
 <A HREF="http://plf.zarb.org/~nanardon/urpmiweb.php">http://plf.zarb.org/~nanardon/urpmiweb.php</A> will allow you to choose
 a mirror site and then present the command-line configuration text for that
@@ -544,8 +610,7 @@ continue by following the Mandrake 9.0 instructions.</P>
 <B>urpmi</B>.</P>
 <P>Open a shell, and execute the following, all on the same line. You may get
 asked a number of questions regarding dependencies.  It's best to answer
-"YES".</P>
-<P>
+"YES".
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
@@ -553,8 +618,7 @@ $ su
 # urpmi XFree86-devel perl
 </PRE>
 </CODE></BLOCKQUOTE>
-</P>
-<P>
+
 <HR>
 <PRE>
 NOTE for Mandrake 8.2 users: do not execute the following
@@ -562,8 +626,7 @@ command.  You've already manually installed the files in the previous
 section.
 </PRE>
 <HR>
-</P>
-<P>
+
 <BLOCKQUOTE><CODE>
 <PRE>
 # urpmi libqt3-devel
@@ -578,8 +641,8 @@ NOTE for Mandrake 9.1 users: execute the following command.
 # urpmi libqt3-mysql
 </PRE>
 <HR>
-</P>
-<P>However, you might get this when you execute the command above:
+
+However, you might get this when you execute the command above:
 <BLOCKQUOTE><CODE>
 <PRE>
 [root@pvr root]# urpmi mysql gcc gcc-c++ freetype2-devel libqt3-devel alsa-utils XFree86-devel perl

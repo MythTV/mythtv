@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-06-18, v2.50
+<date>2003-07-02, v2.51
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -55,7 +55,7 @@ It's recommended that you join the user list at <url
 url="http://www.snowman.net/mailman/listinfo/mythtv-users"
 name="http://www.snowman.net/mailman/listinfo/mythtv-users">.
 
-This HOWTO is for MythTV v0.9.
+This HOWTO is for MythTV v0.10.
 
 <sect>Introduction.
 <p>This HOWTO document will focus on manually building MythTV in a North
@@ -211,7 +211,7 @@ encoding. Using either a G200 MJPEG encoder card, or a WinTV-PVR-250 or 350
 from Hauppauge and the driver from the IvyTV project <url
 url="http://ivtv.sourceforge.net/" name="http://ivtv.sourceforge.net/"> will
 allow you to use dedicated hardware encoders rather than your CPU. Release
-0.9 of MythTV is able to use the PVR-250/350 cards as an input device for
+0.10 of MythTV is able to use the PVR-250/350 cards as an input device for
 live TV and for scheduled recordings.  Using the onboard MPEG-2 encoder
 drastically reduces the CPU requirements for encoding.
 
@@ -472,16 +472,15 @@ name="http://rpm.nyvalls.se/"> If you have problems with the RPMs, please
 send him email directly at <url url="thac@nyvalls.se"
 name="thac@nyvalls.se">.
 
-<sect3>Debian
-<p>Debian packages for MythTV and some of its add-on modules have been
-packaged by Matt Zimmerman <url url="mailto:mdz@debian.org"> and are
-available at <url
+<sect3>Debian <p>Debian packages for MythTV and some of its add-on modules
+have been packaged by Matt Zimmerman <url url="mailto:mdz@debian.org"> and
+are available at <url
 url="http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/"
-name="http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/"
->, including installation instructions.  All of the prerequisites for
-MythTV are available as Debian packages.
+name="http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/">,
+including installation instructions.  All of the prerequisites for MythTV
+are available as Debian packages.
 
-See <tt>/usr/share/doc/<package>/README.Debian</tt> for more information.
+See <tt>/usr/share/doc/packagename/README.Debian</tt> for more information.
 
 <sect2>Manual installation
 <p>You may use the graphical tools that come with your distribution, or you
@@ -903,7 +902,7 @@ name="Manually building MythTV">.
 <sect2>Mandrake
 <p>You may install the XMLTV prerequisites if you have added a contrib
 mirror by typing:
-<tscreen></verb>
+<tscreen><verb>
 # urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
 </verb></tscreen>
 
@@ -988,8 +987,8 @@ $ su
 <sect1>Manually building MythTV.
 <p>Unpack MythTV
 <tscreen><verb>
-$ tar -xjf mythtv-0.9.tar.bz2
-$ cd mythtv-0.9
+$ tar -xjf mythtv-0.10.tar.bz2
+$ cd mythtv-0.10
 $ ./configure
 $ make
 </verb></tscreen>
@@ -1140,6 +1139,13 @@ Finally, if you just want to restrict by IP subnet:
 $ mysql -u root mythconverg
 mysql> grant all on mythconverg.* to mythtv@"192.168.1.%" identified by "mythtv";
 </verb></tscreen>
+
+<sect1>Upgrading the database.
+<p>If you are upgrading a database that had been used with a previous
+version of MythTV, there are files which allow you to add the necessary
+updates. In the same directory as "mc.sql", there are files such as
+"0-8-to-0-9.sql" for updating from one release to the next. "cvs.sql"
+contains the changes in the development version since the previous release.
 
 <sect>Setting up ALSA and the mixer.
 <p>If your video doesn't appear to be in-sync with your audio, it could be
@@ -1612,7 +1618,7 @@ receiver.
 The next step is to convert those signals into something that can be used
 to control MythTV.
 <tscreen><verb>
-$ cd ~/mythtv-0.9/configfiles
+$ cd ~/mythtv-0.10/configfiles
 $ cp lircrc.example ~/.lircrc
 </verb></tscreen> 
 or
@@ -2129,7 +2135,7 @@ $ crontab -l  NOTE: this is a lowercase L.
 # Need to use a shell script because the QTDIR environment variable isn't
 # being honored by crontab?
 # The next text should be all on the same line.
-30 04 * * * /bin/bash $HOME/mythtv-0.9/configfiles/mythfilldatabasecron
+30 04 * * * /bin/bash $HOME/mythtv-0.10/configfiles/mythfilldatabasecron
 $ 
 </verb></tscreen>
 
@@ -2322,8 +2328,8 @@ Mandrake Control Center.
 <sect1>Completing the installation.
 <p>
 <tscreen><verb>
-$ tar -xjf mythweb-0.9.tar.bz2
-$ cd mythweb-0.9
+$ tar -xjf mythweb-0.10.tar.bz2
+$ cd mythweb-0.10
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -2345,8 +2351,8 @@ operational.
 name="http://www.mythtv.org/"> and save it to a location where you can find
 it.
 <tscreen><verb>
-$ tar -xjf mythgallery-0.9.tar.bz2
-$ cd mythgallery-0.9
+$ tar -xjf mythgallery-0.10.tar.bz2
+$ cd mythgallery-0.10
 $ make
 # su
 # make install
@@ -2360,12 +2366,10 @@ you're storing your photos.
 <itemize>
 <item>Use the arrow keys to move around the thumbnails.
 <item>Use SPACE or ENTER to maximize a photo.
-<itemize><item>Use p or P to start the slideshow of all the files in the
-directory.  "Play" or "Pause" on your remote may also work.
+<item>Use p or P to start the slideshow of all the files in the directory.  "Play" or "Pause" on your remote may also work.
 <item>Use SPACE or ENTER to advance to the next photo.
-<item>Use ESC to go up one level, or to exit out of the module if
-you're at the first level.
-<item>Use the [ and ] keys to rotate the image.
+<item>Use ESC to go up one level, or to exit out of the module if you're at the first level.
+<item>Use the &lsqb and &rsqb keys to rotate the image.
 </itemize>
 
 <sect>MythGame.
@@ -2675,7 +2679,7 @@ will be rebuilt as you use CDs.
 
 <sect>MythWeather.
 <p>The MythWeather module will obtain the weather information for the
-location that you specify.  You must be running MythTV v0.9 in order to use
+location that you specify.  You must be running MythTV v0.10 in order to use
 MythWeather.
 
 <code>
@@ -3212,16 +3216,16 @@ Download the patch to MPlayer from Matt's website.
 <url url="http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/"
 name="http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/">.
 <tscreen><verb>
-$ wget http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/mplayer-0.90pre10+mythtv.patch
+$ wget http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/mplayer-0.90rc5-mythtv-20030407.diff
 </verb></tscreen>
 
 Download the source to MPlayer and patch:
 <tscreen><verb>
-$ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
-$ tar -xjf MPlayer-0.90rc1.tar.bz2
-$ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
-$ cd MPlayer-0.90rc1
-$ patch -p1 < mplayer-0.90pre10+mythtv.patch
+$ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90.tar.bz2
+$ tar -xjf MPlayer-0.90.tar.bz2
+$ cp mplayer-0.90rc5-mythtv-20030407.diff MPlayer-0.90
+$ cd MPlayer-0.90
+$ patch -p1 < mplayer-0.90rc5-mythtv-20030407.diff
 </verb></tscreen>
 
 At this point, you can read the MPlayer documentation and start the compile
@@ -3350,8 +3354,8 @@ this happens, edit your X configuration file to match the display size then
 restart X.
 
 <sect2>MythTV Dimensions
-<p>In 0.9, from "mythfrontend" go to Setup->Appearance.  The default for the
-height and width on 0.9 is "0" - this will cause MythTV to automatically
+<p>In 0.10, from "mythfrontend" go to Setup->Appearance.  The default for the
+height and width on 0.10 is "0" - this will cause MythTV to automatically
 size itself to full screen. To ensure that your new dimension settings take
 effect, exit and restart MythTV.
 
@@ -3991,6 +3995,8 @@ v2.50, 2003-06-18.  Updated MythGallery docs to fix itemize tag and added
 image rotation keys.  Add updated .fvwmrc example.  Added RH9.0
 stuff from Cedar, Matt and Jarod.  Reorg of some sections.  Added "PVR-250"
 to the "I'd like to use a hardware MPEG-2 encoder" title.
+v2.51, 2003-07-02.  Fixed MDZ's mplayer patch name and MPlayer version.  Bruce
+Markey's addition for updating the database.  Bumped version numbers to v0.10.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

@@ -12,7 +12,7 @@
 <A HREF="mythtv-HOWTO-5.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc6">Contents</A>
 <HR>
-<H2><A NAME="s6">6.</A> <A HREF="mythtv-HOWTO.html#toc6">MySQL.</A></H2>
+<H2><A NAME="mysql"></A> <A NAME="s6">6.</A> <A HREF="mythtv-HOWTO.html#toc6">MySQL.</A></H2>
 
 <H2><A NAME="ss6.1">6.1</A> <A HREF="mythtv-HOWTO.html#toc6.1">Mandrake 9.0</A>
 </H2>
@@ -32,13 +32,21 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss6.2">6.2</A> <A HREF="mythtv-HOWTO.html#toc6.2">Red Hat Linux 8.0</A>
+<H2><A NAME="ss6.2">6.2</A> <A HREF="mythtv-HOWTO.html#toc6.2">Red Hat Linux</A>
 </H2>
 
 <P>If this is the system maintaining the database, make sure that mysql is
 running and started at boot. Click on Redhat menu>Server Settings>Services
 and enter the root password when asked. Check "mysqld" and then click Start.
 Click Save, then close the window.</P>
+<P>This can be done from the command line by typing:
+<BLOCKQUOTE><CODE>
+<PRE>
+# /sbin/chkconfig mysqld on
+# /sbin/service mysqld start
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
 <H2><A NAME="ss6.3">6.3</A> <A HREF="mythtv-HOWTO.html#toc6.3">Gentoo</A>
 </H2>
@@ -51,7 +59,7 @@ mysql_install_db as root. </P>
 
 <P>This step is only required on the system maintaining the database, which
 may or may not be one of your MythTV boxes.  If the database is on a
-non-MythTV machine, then copy the <CODE>database/mc.sql</CODE> file to it.</P>
+non-MythTV machine you'll need to copy the <CODE>database/mc.sql</CODE> file to it.</P>
 <P>To setup the initial mysql databases:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -59,7 +67,7 @@ $ cd database
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<H3>Mandrake 9.0</H3>
+<H3>Mandrake 9.0 and Red Hat Linux</H3>
 
 <P>
 <BLOCKQUOTE><CODE>
@@ -77,16 +85,6 @@ $ mysql &lt; mc.sql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<H3>Red Hat Linux 8.0</H3>
-
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# mysql &lt; mc.sql
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
 <H3>Gentoo</H3>
 
 <P>
@@ -101,6 +99,9 @@ $ su
 schema, use the <CODE>-f</CODE> flag to force <B>mysql</B> to continue setting
 up the tables even if they already exist.  By default, <B>mysql</B> will
 stop at the first error.</P>
+<P><B>NOTE</B>: It is good practice to set a root password for mysql. 
+Instructions for doing so can be found on MySQL's web site at 
+<A HREF="http://www.mysql.com/doc/en/Security.html">http://www.mysql.com/doc/en/Security.html</A>.</P>
 
 <H3><A NAME="modify_perm_mysql"></A> Modifying access to the MySQL database for multiple systems </H3>
 
@@ -138,6 +139,15 @@ mysql> grant all on mythconverg.* to mythtv@"192.168.1.%" identified by "mythtv"
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+
+<H2><A NAME="ss6.5">6.5</A> <A HREF="mythtv-HOWTO.html#toc6.5">Upgrading the database.</A>
+</H2>
+
+<P>If you are upgrading a database that had been used with a previous
+version of MythTV, there are files which allow you to add the necessary
+updates. In the same directory as "mc.sql", there are files such as
+"0-8-to-0-9.sql" for updating from one release to the next. "cvs.sql"
+contains the changes in the development version since the previous release.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-7.html">Next</A>

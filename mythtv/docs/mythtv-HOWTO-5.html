@@ -26,6 +26,11 @@ NOTE for Mandrake users:  If you have added a "PLF" mirror, you may skip the
 next step and type:
 
 # urpmi libmp3lame0 libmp3lame0-devel
+
+NOTE for Red Hat users:  lame and lame-devel may be obtained from
+http://freshrpms.net/rpm/lame/. After downloading, be sure to install both:
+
+# rpm -Uvh lame*
 </PRE>
 <HR>
 </P>
@@ -87,8 +92,35 @@ $
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss5.3">5.3</A> <A HREF="mythtv-HOWTO.html#toc5.3">Building XMLTV. </A>
+<H2><A NAME="ss5.3">5.3</A> <A HREF="mythtv-HOWTO.html#toc5.3">XMLTV. </A>
 </H2>
+
+<H3>Red Hat Linux 8.0 &amp; 9:</H3>
+
+<P>RPMs for <B>XMLTV</B> and all of its dependencies can be obtained from
+<A HREF="http://atrpms.physik.fu-berlin.de/name/xmltv/">http://atrpms.physik.fu-berlin.de/name/xmltv/</A>. The web page has a
+list of all the dependent packages you must download and install.
+<BLOCKQUOTE><CODE>
+<PRE>
+# rpm -Uvh xmltv* perl*
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If you install from this location you may skip to 
+<A HREF="#manually_building_mythtv">Manually building MythTV</A>.</P>
+<H3>Mandrake</H3>
+
+<P>You may install the XMLTV prerequisites if you have added a contrib
+mirror by typing:
+<BLOCKQUOTE><CODE>
+<PRE>
+# urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>and skipping straight to the XMLTV compililation step.</P>
+
+<H3>Other distributions and manual installation.</H3>
 
 <P><B>NOTE</B>: Red Hat Linux 8.0 and Suse 8.1 users, you <EM>must</EM>
 download and install an updated version of libexpat.  The version that ships
@@ -139,17 +171,6 @@ $ cd xmltv-0.5.10
 
 Install the xmltv prerequisites:</P>
 <P>
-<HR>
-<PRE>
-NOTE for Mandrake Users: you may install the XMLTV prerequisites if you
-have added a cooker mirror by typing:
-
-# urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
-
-and skipping to the compile step.
-</PRE>
-<HR>
-
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
@@ -194,8 +215,8 @@ $ su
 <P>Unpack MythTV
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythtv-0.9.tar.bz2
-$ cd mythtv-0.9
+$ tar -xjf mythtv-0.10.tar.bz2
+$ cd mythtv-0.10
 $ ./configure
 $ make
 </PRE>
@@ -255,17 +276,6 @@ $ su -
 </P>
 <P><B>NOTE</B>: If you have perl dependency problems update to >=ExtUtils-MakeMaker-6.05-r4</P>
 
-<H2><A NAME="ss5.6">5.6</A> <A HREF="mythtv-HOWTO.html#toc5.6">Debian.</A>
-</H2>
-
-<P>Debian packages for MythTV and some of its add-on modules have been
-packaged by Matt Zimmerman 
-<A HREF="mailto:mdz@debian.org">mailto:mdz@debian.org</A> and are
-available at 
-<A HREF="http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/">http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/</A>, including installation instructions.  All of the prerequisites for
-MythTV are available as Debian packages.</P>
-<P>The mailing list message for this announcement can be accessed at 
-<A HREF="http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html">http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html</A>.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-6.html">Next</A>
