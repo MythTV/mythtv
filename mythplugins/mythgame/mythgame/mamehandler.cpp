@@ -220,7 +220,7 @@ void MameHandler::processGames()
 
 
                                         if (p[0] == '\"')
-                                                *p = *p++;
+                                                *p++;
                                         value = p;
 
                                         i = 0;
