@@ -195,12 +195,12 @@ void ChannelEditor::del() {
     if (val == 0) {
         QSqlQuery query;
     
-        query = db->exec(QString("DELETE channel FROM channel "
+        query = db->exec(QString("DELETE FROM channel "
                                  "WHERE chanid ='%1'").arg(id));
         if (!query.isActive())
             MythContext::DBError("ChannelEditor Delete Channel", query);
 
-        query = db->exec(QString("DELETE dvb_channel FROM dvb_channel "
+        query = db->exec(QString("DELETE FROM dvb_channel "
                                  "WHERE chanid ='%1'").arg(id));
         if (!query.isActive())
             MythContext::DBError("ChannelEditor Delete DVBChannel", query);

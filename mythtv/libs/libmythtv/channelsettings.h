@@ -64,8 +64,8 @@ public:
         }
 
         if (query.numRowsAffected() > 0)
-            while(query.next())
-                if (tmpfloor < query.value(0).toInt())
+            while (query.next())
+                if (tmpfloor <= query.value(0).toInt())
                     tmpfloor = query.value(0).toInt() + 1;
 
         return floor<tmpfloor?tmpfloor:floor;

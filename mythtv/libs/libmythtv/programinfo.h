@@ -108,7 +108,7 @@ class ProgramInfo
     QString GetRecordBasename(void);
     QString GetRecordFilename(const QString &prefix);
 
-    QString MakeUniqueKey(void);
+    QString MakeUniqueKey(void) const;
 
     int CalculateLength(void);
 
@@ -232,6 +232,35 @@ private:
     void setOverride(QSqlDatabase *db, int override);
 
     class ScheduledRecording* record;
+};
+
+class PGInfoCon
+{
+  public:
+    PGInfoCon();
+    ~PGInfoCon();
+    
+    typedef QPtrListIterator<ProgramInfo> PGInfoConIt;
+    
+    void updateAll(const vector<ProgramInfo *> &pginfoList);
+    bool update(const ProgramInfo &pginfo);
+    int count();
+    void clear();
+   
+    int selectedIndex();
+    void setSelected(int delta = 1);
+    bool getSelected(ProgramInfo &pginfo);
+    
+    PGInfoConIt iterator();
+  private:
+    void init();
+    void checkSetIndex();
+    ProgramInfo *find(const ProgramInfo &pginfo);
+    ProgramInfo *findFromKey(const QString &key);
+    ProgramInfo *findNearest(const ProgramInfo &pginfo);
+     
+    QPtrList<ProgramInfo> allData;
+    int selectedPos;
 };
 
 #endif

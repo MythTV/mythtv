@@ -59,9 +59,6 @@ ViewScheduled::ViewScheduled(QSqlDatabase *ldb, MythMainWindow *parent,
 
     updateBackground();
 
-    curRec = 0;
-    recCount = 0;
-    recList.setAutoDelete(true);
     FillList();
  
     setNoErase();
@@ -185,77 +182,39 @@ void ViewScheduled::paintEvent(QPaintEvent *e)
 
 void ViewScheduled::cursorDown(bool page)
 {
-    if (curRec < recCount - 1)
-    {
-        curRec += (page ? listsize : 1);
-        if (curRec > recCount - 1)
-            curRec = recCount - 1;
-        update(fullRect);
-    }
+    recList.setSelected(page ? listsize : 1);
+    update(fullRect);
 }
 
 void ViewScheduled::cursorUp(bool page)
 {
-    if (curRec > 0)
-    {
-        curRec -= (page ? listsize : 1);
-        if (curRec < 0)
-            curRec = 0;
-        update(fullRect);
-    }
+    recList.setSelected(page ? -listsize : -1);
+    update(fullRect);
+}
+
+void ViewScheduled::fillUpdateAll(void)
+{
+    FillList();
+    update(fullRect);
 }
 
 void ViewScheduled::FillList(void)
 {
-    ProgramInfo *oldInfo = recList.at(curRec);
-    if (oldInfo)
-        oldInfo = new ProgramInfo(*oldInfo);
-
-    recList.clear();
-
     vector<ProgramInfo *> schedList;
+    vector<ProgramInfo *> schedListFilter;
     conflictBool = RemoteGetAllPendingRecordings(schedList);
 
     vector<ProgramInfo *>::iterator i;
-
     for (i = schedList.begin(); i != schedList.end(); i++)
     {
         ProgramInfo *p = *i;
         if (p->recording || showAll || p->norecord > nrOtherShowing)
-            recList.append(p);
+            schedListFilter.push_back(p);
         else
             delete p;
     }
 
-    recCount = (int)recList.count();
-
-    // The list has changed -- new entries could have been added and
-    // old entries (including the old curRec) could have been deleted.
-    // Try to reset curRec to the same entry it was on before.  Else,
-    // try to set it to the next later entry.  Else, set it to the
-    // last entry.  FIXME: optimize this (how?).
-    if (!oldInfo)
-        curRec = 0;
-    else
-    {
-        curRec = recCount - 1;
-        ProgramInfo *p;
-        for (p = recList.last(); p; p = recList.prev())
-        {
-            if (p->recordid == oldInfo->recordid &&
-                p->chanid == oldInfo->chanid &&
-                p->startts == oldInfo->startts)
-            {
-                curRec = recList.at();
-                break;
-            }
-            else if (p->recstartts >= oldInfo->recstartts)
-                curRec = recList.at();
-        }
-    }
-
-    if (oldInfo)
-        delete oldInfo;
+    recList.updateAll(schedListFilter);
 }
 
 void ViewScheduled::updateList(QPainter *p)
@@ -274,23 +233,35 @@ void ViewScheduled::updateList(QPainter *p)
             ltype->ResetList();
             ltype->SetActive(true);
 
+            int listCount = recList.count();
+            int listPos = recList.selectedIndex();
+
             int skip;
-            if (recCount <= listsize || curRec <= listsize / 2)
+            if (listCount <= listsize || listPos <= listsize / 2)
+            {
                 skip = 0;
-            else if (curRec >= recCount - listsize + listsize / 2)
-                skip = recCount - listsize;
+            }
+            else if (listPos >= listCount - listsize + listsize / 2)
+            {
+                skip = listCount - listsize;
+            }
             else
-                skip = curRec - listsize / 2;
+                skip = listPos - listsize / 2;
+
             ltype->SetUpArrow(skip > 0);
-            ltype->SetDownArrow(skip + listsize < recCount);
+            ltype->SetDownArrow(skip + listsize < listCount);
 
             int i;
+            PGInfoCon::PGInfoConIt it = recList.iterator();
+            it += skip;
+
             for (i = 0; i < listsize; i++)
             {
-                if (i + skip >= recCount)
+                if (i + skip >= listCount)
                     break;
 
-                ProgramInfo *p = recList.at(i+skip);
+                ProgramInfo *p = it.current();
+                ++it;
 
                 QString temp;
 
@@ -315,7 +286,7 @@ void ViewScheduled::updateList(QPainter *p)
                     temp = p->NoRecordChar();
                 ltype->SetItemText(i, 4, temp);
 
-                if (i + skip == curRec)
+                if (i + skip == listPos)
                     ltype->SetItemCurrent(i);
 
                 if (p->conflicting)
@@ -326,7 +297,7 @@ void ViewScheduled::updateList(QPainter *p)
         }
     }
 
-    if (recCount == 0)
+    if (recList.count() == 0)
         container = theme->GetSet("norecordings_list");
 
     if (container)
@@ -423,17 +394,17 @@ void ViewScheduled::updateInfo(QPainter *p)
     LayerSet *container = theme->GetSet("program_info");
     if (container)
     {
-        ProgramInfo *p = recList.at(curRec);
-        if (p)
+        ProgramInfo p;
+        if (recList.getSelected(p))
         {
             QSqlDatabase *m_db = QSqlDatabase::database();
-            p->ToMap(m_db, regexpMap);
+            p.ToMap(m_db, regexpMap);
             container->ClearAllText();
             container->SetTextByRegexp(regexpMap);
         }
     }
 
-    if (recCount == 0)
+    if (recList.count() == 0)
         container = theme->GetSet("norecordings_info");
 
     if (container)
@@ -451,22 +422,26 @@ void ViewScheduled::updateInfo(QPainter *p)
 
 void ViewScheduled::edit()
 {
-    ProgramInfo *curitem = recList.at(curRec);
-
-    if (!curitem)
+    ProgramInfo curItem;
+    if (!recList.getSelected(curItem))
         return;
 
-    curitem->EditScheduled(db);
+    curItem.EditScheduled(db);
+    
+    if (!recList.update(curItem))
+        fillUpdateAll();
 }
 
 void ViewScheduled::selected()
 {
-    ProgramInfo *curitem = recList.at(curRec);
-
-    if (!curitem)
+    ProgramInfo curItem;
+    if (!recList.getSelected(curItem))
         return;
 
-    curitem->EditRecording(db);
+    curItem.EditRecording(db);
+    
+    if (!recList.update(curItem))
+        fillUpdateAll();
 }
 
 void ViewScheduled::customEvent(QCustomEvent *e)

@@ -100,7 +100,7 @@ ProgramInfo::~ProgramInfo()
         delete record;
 }
 
-QString ProgramInfo::MakeUniqueKey(void)
+QString ProgramInfo::MakeUniqueKey(void) const
 {
     return title + ":" + chanid + ":" + startts.toString(Qt::ISODate);
 }
@@ -2070,3 +2070,150 @@ void ProgramInfo::handleConflicting(QSqlDatabase *db)
         delete (*iter);
     delete conflictlist;
 }
+
+PGInfoCon::PGInfoCon()
+{
+    init();
+}
+
+PGInfoCon::~PGInfoCon() 
+{
+    init();
+}
+
+void PGInfoCon::updateAll(const vector<ProgramInfo *> &pginfoList)
+{
+    ProgramInfo *tmp = allData.at(selectedPos);
+    ProgramInfo org;
+
+    if (tmp)
+        org = *tmp;
+    else
+        selectedPos = -1;
+
+    allData.clear();
+    vector<ProgramInfo *>::const_iterator i;
+    for (i = pginfoList.begin(); i != pginfoList.end(); i++)
+        allData.append(*i);
+
+    if (selectedPos >= 0)
+    {
+        tmp = allData.at(selectedPos);
+        if (tmp && tmp->MakeUniqueKey() == org.MakeUniqueKey())
+            ;
+        else
+        {
+            tmp = find(org);
+            if (!tmp)
+                tmp = findNearest(org);
+
+            if (tmp)
+                selectedPos = allData.find(tmp);
+        }
+    }
+
+    checkSetIndex();
+}
+
+bool PGInfoCon::update(const ProgramInfo &pginfo)
+{
+    ProgramInfo *oldpginfo = find(pginfo);
+
+    if (oldpginfo)
+    {
+        *oldpginfo = pginfo;
+        return true;
+    }    
+
+    return false;    
+}
+
+int PGInfoCon::count()
+{
+    return allData.count();
+}
+
+void PGInfoCon::clear()
+{
+    init();
+}
+
+PGInfoCon::PGInfoConIt PGInfoCon::iterator()
+{
+    PGInfoConIt it(allData);
+    return it;
+}
+
+int PGInfoCon::selectedIndex()
+{
+    return selectedPos;
+}
+
+void PGInfoCon::setSelected(int delta)
+{
+    selectedPos += delta;
+    checkSetIndex();        
+}
+
+bool PGInfoCon::getSelected(ProgramInfo &pginfo)
+{
+    ProgramInfo *current = allData.at(selectedPos);
+    if (current)
+    {
+        pginfo = *current;
+        return true;
+    }    
+
+    return false;    
+}
+
+void PGInfoCon::init()
+{
+    selectedPos = -1;
+    allData.setAutoDelete(true);
+    allData.clear();
+}
+
+void PGInfoCon::checkSetIndex()
+{
+    if (selectedPos < 0)
+        selectedPos = 0;
+    else if (selectedPos > count() - 1)
+        selectedPos = count() - 1;
+
+    if (count() == 0)
+        selectedPos = -1;
+}
+
+ProgramInfo *PGInfoCon::find(const ProgramInfo &pginfo)
+{
+    QString key(pginfo.MakeUniqueKey());
+    return findFromKey(key);
+}
+
+ProgramInfo *PGInfoCon::findFromKey(const QString &key)
+{
+    if (key == "")
+        return NULL;
+
+    ProgramInfo *pginfo;
+    for (PGInfoConIt it(allData); (pginfo = it.current()) != 0; ++it)
+    {
+        if (pginfo->MakeUniqueKey() == key)
+            return pginfo;
+    }        
+
+    return NULL;                
+}
+
+ProgramInfo *PGInfoCon::findNearest(const ProgramInfo &pginfo)
+{
+    ProgramInfo *tmppginfo;
+    for (PGInfoConIt it(allData); (tmppginfo = it.current()) != 0; ++it)
+    {
+        if (tmppginfo->recstartts >= pginfo.recstartts)
+            return tmppginfo;
+    }
+    return allData.last();
+}
+

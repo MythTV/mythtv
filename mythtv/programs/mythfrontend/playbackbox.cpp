@@ -1284,7 +1284,6 @@ void PlaybackBox::play(ProgramInfo *rec)
     if (fileExists(rec) == false)
     {
         cerr << "Error: " << rec->pathname << " file not found\n";
-        state = kStopping;
         return;
     }
 
@@ -1296,6 +1295,7 @@ void PlaybackBox::play(ProgramInfo *rec)
     tv->Init();
 
     setEnabled(false);
+    state = kKilling; // stop preview playback and don't restart it
 
     if (tv->Playback(tvrec))
     {
@@ -1308,6 +1308,7 @@ void PlaybackBox::play(ProgramInfo *rec)
         }
     }
 
+    state = kStarting; // restart playback preview
     setEnabled(true);
 
     update(fullRect);
