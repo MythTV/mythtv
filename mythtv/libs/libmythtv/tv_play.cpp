@@ -2802,15 +2802,12 @@ void TV::UpdateOSD(void)
 
 void TV::UpdateOSDInput(void)
 {
-    QString dummy = "";
     QString name = "";
-    QString msg = QString ("%1: ").arg(activerecorder->GetRecorderNumber());
 
     activerecorder->GetInputName(name);
-    msg += name;
-
-    osd->SetInfoText(msg, dummy, dummy, dummy, dummy, dummy, dummy, dummy, 
-                     osd_display_time);
+    QString msg = QString ("%1: %2").arg(activerecorder->GetRecorderNumber())
+                                    .arg(name);
+    osd->SetSettingsText(msg, 3);
 }
 
 void TV::UpdateLCD(void)
