@@ -307,8 +307,9 @@ void SimpleDBStorage::load(QSqlDatabase* db) {
 
     if (query.isActive() && query.numRowsAffected() > 0) {
         query.next();
-        QVariant result = query.value(0);
-        setValue(query.value(0).toString());
+        QString result = query.value(0).toString();
+        if (result != QString::null)
+          setValue(result);
     }
 }
 
