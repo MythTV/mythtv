@@ -306,6 +306,17 @@ public:
     };
 };
 
+class ReduceJitter: public CheckBoxSetting, public GlobalSetting {
+public:
+    ReduceJitter():
+       GlobalSetting("ReduceJitter") {
+       setLabel("Jitter reduction");
+       setValue(false);
+       setHelpText("If this is set, frame timing will be adjusted for "
+                   "smoother motion.");
+    };
+};
+
 class FixedAspectRatio: public CheckBoxSetting, public GlobalSetting {
 public:
     FixedAspectRatio():
@@ -721,6 +732,7 @@ PlaybackSettings::PlaybackSettings()
     general->addChild(new MixerVolume());
     general->addChild(new PCMVolume());
     general->addChild(new Deinterlace());
+    general->addChild(new ReduceJitter());
     general->addChild(new PlaybackExitPrompt());
     general->addChild(new EndOfRecordingExitPrompt());
     general->addChild(new FixedAspectRatio());

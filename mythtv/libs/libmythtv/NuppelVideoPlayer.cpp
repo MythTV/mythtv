@@ -23,6 +23,7 @@ using namespace std;
 #include "osdtypes.h"
 #include "remoteutil.h"
 #include "programinfo.h"
+#include "mythcontext.h"
 
 extern "C" {
 #include "../libavcodec/mythav.h"
@@ -1306,6 +1307,66 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
     }
 }
 
+void NuppelVideoPlayer::ReduceJitter(struct timeval *nexttrigger)
+{
+  /* Comments and debug variables will be trimmed later */
+
+  /* usleep() will relinqusish the CPU. The scheduler won't start
+     a new time slice until 0-10000usec (or 10000-20000usec)
+     later. Without a realtime scheduling policy, there will
+     always be jitter. This strives to smooth the time spacing
+     between frames. */
+
+  /* Half the frames are delayed until half as late as the
+     previous frame. */
+
+    static int cheat = 5000;
+    static int fudge = 0;
+
+    struct timeval now; 
+    int delay, miss;
+    int cnt = 0;
+
+    cheat += 100;
+
+    gettimeofday(&now, NULL);
+
+    delay = (nexttrigger->tv_sec - now.tv_sec) * 1000000 +
+            (nexttrigger->tv_usec - now.tv_usec); // uSecs
+
+    /* The usleep() is shortened by "cheat" so that this process
+       gets the CPU early for about half the frames. Also, late
+       frames won't be as late. */
+
+    if (delay > (cheat - fudge))
+        usleep(delay - (cheat - fudge));
+
+    /* if late, draw the frame ASAP. If a little early, the frame
+       is due during this time slice so hold the CPU until half as
+       late as the previous frame (fudge) */
+
+    while (delay + fudge > 0)
+    {
+        gettimeofday(&now, NULL);
+        
+        delay = (nexttrigger->tv_sec - now.tv_sec) * 1000000 +
+                (nexttrigger->tv_usec - now.tv_usec); // uSecs
+
+        if (cnt == 0)
+            miss = delay + fudge;
+
+        cnt++;
+    }
+
+    // cerr << cheat - fudge << '\t' << miss << '\t';
+    // cerr << 0 - fudge << '\t' << delay << endl;
+    
+    fudge = abs(delay / 2);
+
+    if (cnt > 1)
+        cheat -= 200;
+}
+
 static void NormalizeTimeval(struct timeval *tv)
 {
     while (tv->tv_usec > 999999)
@@ -1493,13 +1554,11 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     int laudiotime;
     int delay, avsync_delay;
 
-    int delay_clipping = 0;
     struct timeval nexttrigger, now; 
-
-    gettimeofday(&nexttrigger, NULL);
   
-
     //Jitterometer *output_jmeter = new Jitterometer("video_output", 100);
+
+    bool reducejitter = gContext->GetNumSetting("ReduceJitter", 0);
 
     if (!disablevideo)
     {
@@ -1516,6 +1575,8 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
     int pause_rpos = 0;
     unsigned char *pause_buf = new unsigned char[video_size];
+
+    ResetNexttrigger(&nexttrigger);
 
     while (!eof && !killvideo)
     {
@@ -1600,55 +1661,49 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
             osd->Display(vbuffer[rpos]);
         }
-	
+
         // calculate 'delay', that we need to get from 'now' to 'nexttrigger'
         gettimeofday(&now, NULL);
 
         delay = (nexttrigger.tv_sec - now.tv_sec) * 1000000 +
                 (nexttrigger.tv_usec - now.tv_usec); // uSecs
 
-	/* If delay is something silly, like > 200ms or < 0ms, 
-	   we clip it to these amounts. */
-        if ( delay > 200000 )
+        /* If delay is sometwhat more than a frame or < 0ms, 
+           we clip it to these amounts and reset nexttrigger */
+        if ( delay > 40000 )
         {
-            cout << "Delaying to next trigger: " << delay << endl;
-            delay = 200000;
-	    delay_clipping = 1;
-        }
-
-        /* trigger */
-        if (delay > 0)
+            // cerr << "Delaying to next trigger: " << delay << endl;
+            delay = 40000;
             usleep(delay);
-	else
-	{
-	    //printf("clipped negative delay %d.\n", delay);
-	    delay_clipping = 1;
-	}
 
-	/* The time right now is a good approximation of nexttrigger. */
-	/* It's not perfect, because usleep() is only pseudo-
-	   approximate about waking us up. So we jitter a few ms. */
-	/* The value of nexttrigger is perfect -- we calculated it to
-	   be exactly one frame time after the previous frame,
-	   plus just enough feedback to stay synchronized with audio. */
-	/* UNLESS... we had to clip. In this case, resync nexttrigger
-	   with the wall clock. */
-	if(delay_clipping)
-	{
-	    gettimeofday(&nexttrigger, NULL);
-	    delay_clipping = 0;
-	}
+            gettimeofday(&nexttrigger, NULL);
+        }
+        else if (delay <= 0)
+        {
+            // cerr << "clipped negative delay " << delay << endl;
+            gettimeofday(&nexttrigger, NULL);
+        }
+        else
+        {
+            if (!disablevideo && reducejitter)
+                ReduceJitter(&nexttrigger);
+            else
+                usleep(delay);
+        }
 
         if (!disablevideo)
         {
-	    videoOutput->Show(vbuffer[rpos], video_width, video_height);
+            videoOutput->Show(vbuffer[rpos], video_width, video_height);
         }
         /* a/v sync assumes that when 'Show' returns, that is the instant
            the frame has become visible on screen */
-	
-        //output_jmeter->RecordCycleTime();
-	
-        /* compute new value of nexttrigger */
+
+        // output_jmeter->RecordCycleTime();
+
+	/* The value of nexttrigger is perfect -- we calculated it to
+	   be exactly one frame time after the previous frame,
+	   plus just enough feedback to stay synchronized with audio. */
+
         nexttrigger.tv_usec += (int)(1000000 / video_frame_rate);
 	
         /* Apply just a little feedback. The ComputeAudiotime() function is

@@ -157,6 +157,8 @@ class NuppelVideoPlayer
     bool DecodeFrame(struct rtframeheader *frameheader,
                      unsigned char *strm, unsigned char *outbuf);
     void GetFrame(int onlyvideo);
+
+    void ReduceJitter(struct timeval *nexttrigger);
     
     long long CalcMaxFFTime(long long ff);
    
