@@ -38,6 +38,7 @@ private:
     bool ToneVoltageLnb(dvb_tuning_t& tuning, bool reset, bool& havetuned);
     bool ToneSwitch(dvb_tuning_t& tuning, bool reset, bool& havetuned);
     bool Diseqc1xSwitch(dvb_tuning_t& tuning, bool reset, bool& havetuned);
+    bool Diseqc1xSwitch_10way(dvb_tuning_t& tuning, bool reset, bool& havetuned);
     bool PositionerGoto(dvb_tuning_t& tuning, bool reset, bool& havetuned);
     bool PositionerStore(dvb_tuning_t& tuning);
     bool PositionerStopMovement();

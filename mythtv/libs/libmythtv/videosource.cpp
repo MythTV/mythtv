@@ -825,6 +825,7 @@ public:
         addSelection("DiSEqC v1.1 Switch (4-Way)","5");
         addSelection("DiSEqC v1.2 Positioner","6");
         addSelection("DiSEqC v1.3 Positioner (Goto X)","7");
+        addSelection("DiSEqC v1.1 or 2.1 (10-way method2)","8");
         setHelpText(QObject::tr("Select the input type for DVB-S cards. "
                     "Leave as Single LNB/Input for DVB-C or DVB-T. "
                     "The inputs are mapped from Input Connections option "
@@ -1766,6 +1767,28 @@ QValueList<DVBDiseqcInputList> VideoDevice::fillDVBInputsDiseqc(int dvb_diseqc_t
         case 7:
             for (int x=1;x<20;x++)
                 list.append ( DVBDiseqcInputList(QString("DiSEqC v1.3 Input %1").arg(x),QString(""),QString("%1").arg(x)));
+            break;
+        case 8:
+            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input  1"),
+                                           QString("0"), QString("")));
+            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input  2"),
+                                           QString("1"), QString("")));
+            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input  3"),
+                                           QString("2"), QString("")));
+            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input  4"),
+                                           QString("3"), QString("")));
+            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input  5"),
+                                           QString("4"), QString("")));
+            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input  6"),
+                                           QString("5"), QString("")));
+            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input  7"),
+                                           QString("6"), QString("")));
+            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input  8"),
+                                           QString("7"), QString("")));
+            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input  9"),
+                                           QString("8"), QString("")));
+            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input 10"),
+                                           QString("9"), QString("")));
             break;
         default:
             list.append ( DVBDiseqcInputList(QString("DVBInput"),QString(""),QString("")));

@@ -84,6 +84,10 @@ bool DVBDiSEqC::Set(dvb_tuning_t& tuning, bool reset, bool& havetuned)
             if (!PositionerGotoAngular(tuning,reset,havetuned))
 		return false;
             break;
+        case 8: // v1.1 10 Way
+            if (!Diseqc1xSwitch_10way(tuning, reset, havetuned))
+                return false;
+            break;
  
         default:
             ERRNO("Unsupported DiSEqC type.");
@@ -313,6 +317,52 @@ bool DVBDiSEqC::SendDiSEqCMessage(dvb_diseqc_master_cmd &cmd)
     {
         ERRNO("FE_DISEQC_SEND_BURST failed");
         return false;
+    }
+
+    return true;
+}
+
+bool DVBDiSEqC::Diseqc1xSwitch_10way(dvb_tuning_t& tuning, bool reset, 
+                               bool& havetuned)
+{
+    if (reset) 
+    {
+      	if (!DiseqcReset()) 
+        {
+      	    ERRNO("DiseqcReset() failed");
+      	    return false;
+      	}
+    }
+
+    GENERAL(QString("DiSEqC 1.1 Switch - Port %1").arg(tuning.diseqc_port));
+
+    if ((prev_tuning.diseqc_port != tuning.diseqc_port ||
+        prev_tuning.tone != tuning.tone ||
+        prev_tuning.voltage != tuning.voltage) || reset)
+    {
+        if (tuning.diseqc_port > 9)
+        {
+            ERRNO("Supports only up to 10-way switches.");
+            return false;
+        }
+
+        dvb_diseqc_master_cmd cmd = 
+            {{CMD_FIRST, MASTER_TO_LSS, WRITE_N1, 0xf0, 0x00, 0x00}, 4};
+
+        cmd.msg[DATA_1] = 0xF0 
+		| (tuning.diseqc_port & 0x0F); 
+
+        if (!SendDiSEqCMessage(tuning,cmd)) 
+        {
+            ERRNO("Setting DiSEqC failed.\n");
+            return false;
+        }
+
+        prev_tuning.diseqc_port = tuning.diseqc_port;
+        prev_tuning.tone = tuning.tone;
+        prev_tuning.voltage = tuning.voltage;
+        havetuned = true;
+
     }
 
     return true;
