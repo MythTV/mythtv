@@ -1,5 +1,15 @@
 #!/bin/sh
 
+
+### BEGIN INIT INFO
+# Provides:       mythbackend
+# Required-Start: $network $remote_fs $mysql
+# Required-Stop:
+# Default-Start:  2 3 5
+# Default-Stop:
+# Description:    Start the MythTV backend
+### END INIT INFO
+
 # Shell functions sourced from /etc/rc.status:
 #      rc_check         check and set local and overall rc status
 #      rc_status        check and set local and overall rc status
