@@ -59,12 +59,20 @@ public:
 
 class SampleRate: public CodecParam, public ComboBoxSetting {
 public:
-    SampleRate(const RecordingProfile& parent):
+    SampleRate(const RecordingProfile& parent, bool analog = true):
         CodecParam(parent, "samplerate") {
         setLabel("Sampling rate");
-        addSelection("32000");
-        addSelection("44100");
-        addSelection("48000");
+        if (analog)
+        {
+            addSelection("32000");
+            addSelection("44100");
+            addSelection("48000");
+        }
+        else
+        {
+            addSelection("48000");
+            addSelection("44100");
+        }
 	setHelpText("Sets the audio sampling rate for your DSP. "
                     "Ensure that you choose a sampling rate appropriate "
                     "for your device.  btaudio may only allow 32000.");
@@ -183,25 +191,26 @@ public:
         setName(labelName);
         setUseLabel(false);
 
-        addChild(new SampleRate(parent));
-
         codecName = new AudioCodecName(parent);
         addChild(codecName);
         setTrigger(codecName);
 
         ConfigurationGroup* params = new VerticalConfigurationGroup(false);
         params->setLabel("MP3");
+        params->addChild(new SampleRate(parent));
         params->addChild(new MP3Quality(parent));
         addTarget("MP3", params);
 
         params = new VerticalConfigurationGroup(false);
         params->setLabel("MPEG-2 Hardware Encoder");
+        params->addChild(new SampleRate(parent, false));
         params->addChild(new MPEG2AudioBitrateSettings(parent));
         params->addChild(new MPEG2audVolume(parent));
         addTarget("MPEG-2 Hardware Encoder", params);
 
         params = new VerticalConfigurationGroup(false);
         params->setLabel("Uncompressed");
+        params->addChild(new SampleRate(parent));
         addTarget("Uncompressed", params);
     };
 

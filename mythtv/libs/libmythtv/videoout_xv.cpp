@@ -717,7 +717,9 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer)
 
 void VideoOutputXv::Show()
 {
+    pthread_mutex_lock(&lock);
     XSync(data->XJ_disp, False);
+    pthread_mutex_unlock(&lock);
 }
 
 void VideoOutputXv::DrawUnusedRects(void)

@@ -1031,7 +1031,7 @@ void MythContext::dispatchNow(MythEvent &e)
 QString MythContext::GetLanguage(void)
 {
     if (language == QString::null || language == "")
-        language = GetSetting("Language").lower();
+        language = GetSetting("Language", "EN").lower();
 
     return language;
 }

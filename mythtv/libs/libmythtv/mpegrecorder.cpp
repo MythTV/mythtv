@@ -122,28 +122,34 @@ void MpegRecorder::SetOption(const QString &opt, const QString &value)
 {
     if (opt == "mpeg2streamtype")
     {
-        bool found;
+        bool found = false;
         for (unsigned int i = 0; i < sizeof(streamType) / sizeof(char*); i++)
+        {
             if (QString(streamType[i]) == value)
             {
                 streamtype = i;
                 found = true;
                 break;
             }
-        if (! found)
+        }
+
+        if (!found)
             cerr << "MPEG2 stream type: " << value << " is invalid\n";
     }
     else if (opt == "mpeg2aspectratio")
     {
         bool found = false;
         for (int i = 0; aspectRatio[i] != 0; i++)
+        {
             if (QString(aspectRatio[i]) == value)
             {
                 aspectratio = i + 1;
                 found = true;
                 break;
             }
-        if (! found)
+        }
+
+        if (!found)
             cerr << "MPEG2 Aspect-ratio: " << value << " is invalid\n";
     }
     else if (opt == "mpeg2audtype")
@@ -205,14 +211,16 @@ void MpegRecorder::StartRecording(void)
         audio_rate = 0;
     else if (audsamplerate == 48000)
         audio_rate = 1;
+    // 32kHz doesn't seem to work, let's force 44.1kHz instead.
     else if (audsamplerate == 32000)
-        audio_rate = 2;
+        audio_rate = 0;
     else
     {
         cerr << "Error setting audio sample rate\n";
         cerr << audsamplerate << " is not a valid sampling rate\n";
         return;
     }
+
     ivtvcodec.aspect = aspectratio;
     if (audtype == 2)
         ivtvcodec.audio_bitmask = audio_rate + (audtype << 2) + 
@@ -223,7 +231,7 @@ void MpegRecorder::StartRecording(void)
     ivtvcodec.bitrate = bitrate * 1000;
     ivtvcodec.bitrate_peak = maxbitrate * 1000;
     // framerate (1 = 25fps, 0 = 30fps)
-    ivtvcodec.framerate = (! ntsc);
+    ivtvcodec.framerate = (!ntsc);
     ivtvcodec.stream_type = streamtype;
 
     if (ioctl(chanfd, IVTV_IOC_S_CODEC, &ivtvcodec) < 0)
