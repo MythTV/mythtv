@@ -47,7 +47,26 @@ open a shell your new commands will take effect.</P>
 
 <H3>Red Hat Linux 8.0</H3>
 
-<P>[Please submit instructions]</P>
+<P>Red Hat Linux 8.0 uses an unusual character encoding scheme
+that some programs don't deal well with. As a result, whenever you run setup
+or mythfilldatabase you will have to set a variable to correct this problem.
+Failure to set this variable will result in a lot of UTF-8 errors.</P>
+<P>There are two modifications that you can make to your system so that you can
+follow the "standard" instructions.</P>
+<P>You can either modify the <CODE>/etc/sysconfig/i18n</CODE> file and set
+<CODE>LANG="en_US"</CODE>, or you can create a file in <CODE>~/.i18n</CODE>:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+% cat > ~/.i18n
+LANG="en_US"
+^D
+% exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>By making these modifications, you can follow the "other distributions"
+instructions in the "Configuring mythtv" section later in this document.</P>
 
 <H3>Gentoo.</H3>
 

@@ -20,6 +20,8 @@ some CVS parameters around.  Added "DMA" to troubleshooting section.
 v1.034, 2002-11-24.  Added information on setting up mythmusic database.
 v1.035, 2002-11-25.  Added information on Gentoo.
 v1.036, 2002-11-27.  Added information on using an IR Blaster.
+v1.037, 2002-11-28.  Added information on RH 8.0 environment setting by Mike
+Cencula, additional modifications on Genoo by Tony Clark.
 -->
 <!--
 To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
@@ -30,7 +32,7 @@ To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-11-27, v1.036
+<date>2002-11-28, v1.037
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -229,9 +231,21 @@ In that case, you're ready to move onto the next step.
 <p>[Please submit instructions]
 
 <sect3>Gentoo.
+<p>If KDE has not been installed on your system:
+Edit <tt>/etc/make.conf</tt> and locate the "USE" variable.  If the line is commented 
+out, remove the comment.  The line should have at least:
+<tscreen><verb>
+USE="mysql qt alsa"
+</verb></tscreen>
 
-<p>[Please submit instructions]
+Next you need to build KDE.  If you don't plan on using the ebuilds as
+described in the Gentoo <ref id="Gentoo_build" name="section"> then you also need to install lame.
+<tscreen><verb>
+$emerge kde lame
+</verb></tscreen>
 
+All the necessary files will be downloaded and built.  This will take a lot
+of time, even on a fast machine.
 
 <sect>Setting up paths and ldconfig.
 
@@ -262,7 +276,27 @@ The last two commands are to exit out of the shell.  This way, when you next
 open a shell your new commands will take effect.
 
 <sect2>Red Hat Linux 8.0
-<p>[Please submit instructions]
+<!-- Content submitted by Michael D. Cencula" <mike@cencula.com> -->
+<p>Red Hat Linux 8.0 uses an unusual character encoding scheme
+that some programs don't deal well with. As a result, whenever you run setup
+or mythfilldatabase you will have to set a variable to correct this problem.
+Failure to set this variable will result in a lot of UTF-8 errors.
+
+There are two modifications that you can make to your system so that you can
+follow the "standard" instructions.
+
+You can either modify the <tt>/etc/sysconfig/i18n</tt> file and set
+<tt>LANG="en_US"</tt>, or you can create a file in <tt>~/.i18n</tt>:
+
+<tscreen><verb>
+% cat > ~/.i18n
+LANG="en_US"
+^D
+% exit
+</verb></tscreen>
+
+By making these modifications, you can follow the "other distributions"
+instructions in the "Configuring mythtv" section later in this document.
 
 <sect2>Gentoo.
 
@@ -425,7 +459,7 @@ Switch to superuser:
 # exit
 </verb></tscreen>
 
-<sect1>Gentoo.
+<sect1>Gentoo. <label id="Gentoo_build">
 <p>There are ebuilds setup for mythtv and for XMLTV.  To use them, do the
 following:
 
@@ -443,8 +477,10 @@ mkdir -p /home/[yourusername]/portage/video-media/mythtv
 mkdir -p /home/[yourusername]/portage/dev-perl/xmltv
 </verb></tscreen>
 
-Download the ebuilds and save them to a directory you can find.  The two
-ebuilds are:
+Download the ebuilds and save them to their respective directories made
+above.  Make sure the downloaded file names are the same as those on
+bugs.gentoo.org.  The correct source files will fail to download if the
+ebuild names are wrong.  The two ebuilds are:
 
 <itemize>
 <item>mythtv: <url url="http://bugs.gentoo.org/show_bug.cgi?id=10533"
@@ -506,8 +542,6 @@ enable SQL support you need to add to your USE variable (USE="mysql") in
 <tscreen><verb>
 % emerge qt
 </verb</tscreen>
-
-
 
 <sect1>Setting up the initial database.
 <p>Setup the initial mysql databases:
@@ -982,10 +1016,8 @@ of the world need to modify the first line and modify the XMLTVGrabber
 variable to the correct grabber for their region.  <bf>tv_grab_uk</bf> for the
 UK, etc.  Use the name from the xmltv directory.
 
-
 <sect1>Running setup.
-<p>
-Now that you've edited your <tt>settings.txt</tt> file, it's time to run the
+<p>Now that you've edited your <tt>settings.txt</tt> file, it's time to run the
 setup program and perform the initial configuration.
 
 Open a shell, and switch to the setup directory:
@@ -993,11 +1025,6 @@ Open a shell, and switch to the setup directory:
 <tscreen><verb>
 % cd setup
 </verb></tscreen>
-
-<bf>NOTE</bf>:Red Hat Linux 8.0 uses an unusual character encoding scheme
-that some programs don't deal well with. As a result, whenever you run setup
-or mythfilldatabase you will have to set a variable to correct this problem.
-Failure to set this variable will result in a lot of UTF-8 errors.
 
 Red Hat 8.0 users, ensure that you do this:
 <tscreen><verb>
@@ -1189,6 +1216,8 @@ you wish to assemble your own, rather than purchase, the following may be
 helpful: <url url="http://www.snapstream.com/products/irblaster/sonydss.htm"
 name="http://www.snapstream.com/products/irblaster/sonydss.htm"> for cable
 pinouts for RCA DSS receivers.
+
+
 
 <sect>mythweb.
 <p>mythweb allows you to use a web page to control various aspects of your

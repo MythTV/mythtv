@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2002-11-27, v1.036
+  2002-11-28, v1.037
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -306,7 +306,20 @@
 
   [1m3.2.2.3.  Gentoo.[0m
 
-  [Please submit instructions]
+  If KDE has not been installed on your system: Edit /etc/make.conf and
+  locate the "USE" variable.  If the line is commented out, remove the
+  comment.  The line should have at least:
+
+       USE="mysql qt alsa"
+
+  Next you need to build KDE.  If you don't plan on using the ebuilds as
+  described in the Gentoo ``section'' then you also need to install
+  lame.
+
+       $emerge kde lame
+
+  All the necessary files will be downloaded and built.  This will take
+  a lot of time, even on a fast machine.
 
   [1m4.  Setting up paths and ldconfig.[0m
 
@@ -339,7 +352,26 @@
 
   [1m4.1.2.  Red Hat Linux 8.0[0m
 
-  [Please submit instructions]
+  Red Hat Linux 8.0 uses an unusual character encoding scheme that some
+  programs don't deal well with. As a result, whenever you run setup or
+  mythfilldatabase you will have to set a variable to correct this
+  problem.  Failure to set this variable will result in a lot of UTF-8
+  errors.
+
+  There are two modifications that you can make to your system so that
+  you can follow the "standard" instructions.
+
+  You can either modify the /etc/sysconfig/i18n file and set
+  LANG="en_US", or you can create a file in ~/.i18n:
+
+  % cat > ~/.i18n
+  LANG="en_US"
+  ^D
+  % exit
+
+  By making these modifications, you can follow the "other
+  distributions" instructions in the "Configuring mythtv" section later
+  in this document.
 
   [1m4.1.3.  Gentoo.[0m
 
@@ -365,14 +397,14 @@
 
   Switch to /etc and execute the following:
 
-  # cd /etc
-  # cat >> ld.so.conf
-  /usr/local/lib
-  ^D
+       # cd /etc
+       # cat >> ld.so.conf
+       /usr/local/lib
+       ^D
 
-  # ldconfig
-  # exit
-  %
+       # ldconfig
+       # exit
+       %
 
   [1m5.  Downloading and compiling.[0m
 
@@ -418,18 +450,18 @@
 
   Check that it worked:
 
-  # ls -l /usr/local/lib
-  -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
-  -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
-  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
-  libmp3lame.so.0.0.0*
-  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
-  libmp3lame.so.0.0.0*
-  -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
-  libmp3lame.so.0.0.0*
+       # ls -l /usr/local/lib
+       -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
+       -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
+       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
+       libmp3lame.so.0.0.0*
+       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
+       libmp3lame.so.0.0.0*
+       -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
+       libmp3lame.so.0.0.0*
 
-  # exit
-  %
+       # exit
+       %
 
   [1m5.3.  Building XMLTV.[0m
 
@@ -482,11 +514,11 @@
   matter if you're installing North America and have followed the
   instructions to this point.
 
-       % make
-       % make test
-       % su
-       # make install
-       # exit
+  % make
+  % make test
+  % su
+  # make install
+  # exit
 
   [1m5.4.  Manually building mythtv.[0m
 
@@ -520,8 +552,10 @@
        mkdir -p /home/[yourusername]/portage/video-media/mythtv
        mkdir -p /home/[yourusername]/portage/dev-perl/xmltv
 
-  Download the ebuilds and save them to a directory you can find.  The
-  two ebuilds are:
+  Download the ebuilds and save them to their respective directories
+  made above.  Make sure the downloaded file names are the same as those
+  on bugs.gentoo.org.  The correct source files will fail to download if
+  the ebuild names are wrong.  The two ebuilds are:
 
   +o  mythtv: http://bugs.gentoo.org/show_bug.cgi?id=10533
      <http://bugs.gentoo.org/show_bug.cgi?id=10533>
@@ -599,14 +633,14 @@
 
   [1m6.4.3.  Red Hat Linux 8.0[0m
 
-  % mysql < mc.sql
+       % mysql < mc.sql
 
   if this returns an error message try switching to root first.
 
-       % su
-       # mysql < mc.sql
-       # exit
-       %
+  % su
+  # mysql < mc.sql
+  # exit
+  %
 
   [1m7.  Setting up ALSA and the mixer.[0m
 
@@ -708,15 +742,16 @@
        % wget http://www.kernel.org/pub/linux/kernel/v2.4/linux-2.4.19.tar.bz2
 
   Next, open a shell and login as superuser.
-       % su
-       # mkdir /usr/src
-       # mv linux-2.4.19.tar.bz2 /usr/src
-       # cd /usr/src
-       # tar -xjf linux-2.4.19.tar.bz2
-       # chown -R root.root linux-2.4.19
-       # ln -sf linux-2.4.19 linux
-       # exit
-       %
+
+  % su
+  # mkdir /usr/src
+  # mv linux-2.4.19.tar.bz2 /usr/src
+  # cd /usr/src
+  # tar -xjf linux-2.4.19.tar.bz2
+  # chown -R root.root linux-2.4.19
+  # ln -sf linux-2.4.19 linux
+  # exit
+  %
 
   [1m8.2.  Obtaining and compiling lirc.[0m
 
@@ -1050,12 +1085,6 @@
 
        % cd setup
 
-  [1mNOTE[22m:Red Hat Linux 8.0 uses an unusual character encoding scheme that
-  some programs don't deal well with. As a result, whenever you run
-  setup or mythfilldatabase you will have to set a variable to correct
-  this problem.  Failure to set this variable will result in a lot of
-  UTF-8 errors.
-
   Red Hat 8.0 users, ensure that you do this:
 
        % env LANG=C setup
@@ -1113,19 +1142,19 @@
   If you want to know what time your job will run, you can do the
   following:
 
-       # cat /etc/crontab
-       SHELL=/bin/bash
-       PATH=/sbin:/bin:/usr/sbin:/usr/bin
-       MAILTO=root
-       HOME=/
+  # cat /etc/crontab
+  SHELL=/bin/bash
+  PATH=/sbin:/bin:/usr/sbin:/usr/bin
+  MAILTO=root
+  HOME=/
 
-       # run-parts
-       01 * * * * root nice -n 19 run-parts /etc/cron.hourly
-       02 4 * * * root nice -n 19 run-parts /etc/cron.daily
-       22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
-       42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
-       # exit
-       %
+  # run-parts
+  01 * * * * root nice -n 19 run-parts /etc/cron.hourly
+  02 4 * * * root nice -n 19 run-parts /etc/cron.daily
+  22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
+  42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
+  # exit
+  %
 
   We can see from the display that the cron.daily job will run at 0402
   every morning.

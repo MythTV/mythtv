@@ -165,8 +165,26 @@ everything already installed
 
 <H3>Gentoo.</H3>
 
-<P>[Please submit instructions]</P>
-
+<P>If KDE has not been installed on your system:
+Edit <CODE>/etc/make.conf</CODE> and locate the "USE" variable.  If the line is commented 
+out, remove the comment.  The line should have at least:
+<BLOCKQUOTE><CODE>
+<PRE>
+USE="mysql qt alsa"
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Next you need to build KDE.  If you don't plan on using the ebuilds as
+described in the Gentoo 
+<A HREF="mythtv-HOWTO-5.html#Gentoo_build">section</A> then you also need to install lame.
+<BLOCKQUOTE><CODE>
+<PRE>
+$emerge kde lame
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>All the necessary files will be downloaded and built.  This will take a lot
+of time, even on a fast machine.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-4.html">Next</A>
