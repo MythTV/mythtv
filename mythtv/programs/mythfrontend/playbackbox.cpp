@@ -352,7 +352,7 @@ void PlaybackBox::updateInfo(QPainter *p)
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
 
-    if (showData.count() > 0)
+    if (showData.count() > 0 && curitem)
     {
         ignoreevents = true;
 
@@ -986,6 +986,8 @@ void PlaybackBox::FillList()
     if (order == 0 && type != Delete)
         cnt = 100;
 
+    noUpdate = true;
+
     showData.clear();
     showDateData.clear();
     if (showList.count() > 0)
@@ -998,8 +1000,6 @@ void PlaybackBox::FillList()
     titleData = NULL;
 
     showList[""] = tr("All Programs");
-
-    noUpdate = true;
 
     vector<ProgramInfo *> *infoList;
     infoList = RemoteGetRecordedList(type == Delete);
