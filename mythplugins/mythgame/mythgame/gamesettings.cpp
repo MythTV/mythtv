@@ -9,379 +9,349 @@
 
 // General Settings
 
-class GameTreeLevels: public GlobalLineEdit {
-public:
-    GameTreeLevels():
-        GlobalLineEdit("GameTreeLevels") {
-        setLabel(QObject::tr("Game display order"));
-        setValue("system year genre gamename");
-        setHelpText(QObject::tr("Order in which to sort the games "
+static HostLineEdit *GameTreeLevels()
+{
+    HostLineEdit *gc = new HostLineEdit("GameTreeLevels");
+    gc->setLabel(QObject::tr("Game display order"));
+    gc->setValue("system year genre gamename");
+    gc->setHelpText(QObject::tr("Order in which to sort the games "
                     "- this is for all systems. Available choices: "
                     "system, year, genre and gamename"));
-    };
+    return gc;
 };
 
-class GameShowFavorites: public GlobalCheckBox {
-public:
-    GameShowFavorites():
-        GlobalCheckBox("GameShowFavorites") {
-        setLabel(QObject::tr("Show Only Favorites"));
-        setValue(false);
-        setHelpText(QObject::tr("Limit games listed to only those tagged "
+static HostCheckBox *GameShowFavorites()
+{
+    HostCheckBox *gc = new HostCheckBox("GameShowFavorites");
+    gc->setLabel(QObject::tr("Show Only Favorites"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Limit games listed to only those tagged "
                     "as \"favorite\""));
-    };
+    return gc;
 };
 
-class MameBinary: public GlobalLineEdit {
-public:
-    MameBinary():
-        GlobalLineEdit("XMameBinary") {
-        setLabel(QObject::tr("MAME binary location"));
-        setValue("/usr/games/xmame");
-        setHelpText(QObject::tr("Location of the XMAME emulator binary."));
-    };
+static HostLineEdit *MameBinary()
+{
+    HostLineEdit *gc = new HostLineEdit("XMameBinary");
+    gc->setLabel(QObject::tr("MAME binary location"));
+    gc->setValue("/usr/games/xmame");
+    gc->setHelpText(QObject::tr("Location of the XMAME emulator binary."));
+    return gc;
 };
 
-class MameRomPath: public GlobalLineEdit {
-public:
-    MameRomPath():
-        GlobalLineEdit("MameRomLocation") {
-        setLabel(QObject::tr("MAME ROM location"));
-        setValue("/usr/lib/games/xmame/roms");
-        setHelpText(QObject::tr("Location of the MAME games."));
-    };
+static HostLineEdit *MameRomPath()
+{
+    HostLineEdit *gc = new HostLineEdit("MameRomLocation");
+    gc->setLabel(QObject::tr("MAME ROM location"));
+    gc->setValue("/usr/lib/games/xmame/roms");
+    gc->setHelpText(QObject::tr("Location of the MAME games."));
+    return gc;
 };
 
-class MameCatFile: public GlobalLineEdit {
-public:
-    MameCatFile():
-        GlobalLineEdit("XMameCatFile") {
-        setLabel(QObject::tr("catver.ini file"));
-        setValue("/usr/lib/games/xmame/catver.ini");
-        setHelpText(QObject::tr("Path to the catver.ini file"));
-    };
+static HostLineEdit *MameCatFile()
+{
+    HostLineEdit *gc = new HostLineEdit("XMameCatFile");
+    gc->setLabel(QObject::tr("catver.ini file"));
+    gc->setValue("/usr/lib/games/xmame/catver.ini");
+    gc->setHelpText(QObject::tr("Path to the catver.ini file"));
+    return gc;
 };
 
-class MameScreensLocation: public GlobalLineEdit {
-public:
-    MameScreensLocation():
-        GlobalLineEdit("MameScreensLocation") {
-        setLabel(QObject::tr("Mame screenshots path"));
-        setValue("/var/lib/mythgame/screens");
-        setHelpText(QObject::tr("Directory where MAME screenshots are kept."));
-    };
+static HostLineEdit *MameScreensLocation()
+{
+    HostLineEdit *gc = new HostLineEdit("MameScreensLocation");
+    gc->setLabel(QObject::tr("Mame screenshots path"));
+    gc->setValue("/var/lib/mythgame/screens");
+    gc->setHelpText(QObject::tr("Directory where MAME screenshots are kept."));
+    return gc;
 };
 
-class MameScoresDirectory: public GlobalLineEdit {
-public:
-    MameScoresDirectory():
-        GlobalLineEdit("MameScoresDirectory") {
-        setLabel(QObject::tr("MAME hiscores path"));
-        setValue("/var/lib/mythgame/hiscore");
-        setHelpText(QObject::tr("Directory where MAME hiscores are kept."));
-    };
+static HostLineEdit *MameScoresDirectory()
+{
+    HostLineEdit *gc = new HostLineEdit("MameScoresDirectory");
+    gc->setLabel(QObject::tr("MAME hiscores path"));
+    gc->setValue("/var/lib/mythgame/hiscore");
+    gc->setHelpText(QObject::tr("Directory where MAME hiscores are kept."));
+    return gc;
 };
 
-class MameScoresFile: public GlobalLineEdit {
-public:
-    MameScoresFile():
-            GlobalLineEdit("MameScoresFile") {
-            setLabel(QObject::tr("MAME hiscores file"));
-            setValue("/var/lib/mythgame/hiscore.dat");
-            setHelpText(QObject::tr("Path to the MAME hiscore.dat file"));
-        };
+static HostLineEdit *MameScoresFile()
+{
+    HostLineEdit *gc = new HostLineEdit("MameScoresFile");
+    gc->setLabel(QObject::tr("MAME hiscores file"));
+    gc->setValue("/var/lib/mythgame/hiscore.dat");
+    gc->setHelpText(QObject::tr("Path to the MAME hiscore.dat file"));
+    return gc;
 };
 
-class MameFlyersLocation: public GlobalLineEdit {
-public:
-    MameFlyersLocation():
-        GlobalLineEdit("MameFlyersLocation") {
-        setLabel(QObject::tr("MAME flyers path"));
-        setValue("/var/lib/mythgame/flyers");
-        setHelpText(QObject::tr("Directory where MAME flyers are kept."));
-    };
+static HostLineEdit *MameFlyersLocation()
+{
+    HostLineEdit *gc = new HostLineEdit("MameFlyersLocation");
+    gc->setLabel(QObject::tr("MAME flyers path"));
+    gc->setValue("/var/lib/mythgame/flyers");
+    gc->setHelpText(QObject::tr("Directory where MAME flyers are kept."));
+    return gc;
 };
 
-class MameCabinetsLocation: public GlobalLineEdit {
-public:
-    MameCabinetsLocation():
-        GlobalLineEdit("MameCabinetsLocation") {
-        setLabel(QObject::tr("MAME cabinets path"));
-        setValue("/usr/lib/games/xmame/cab");
-        setHelpText(QObject::tr("Directory where MAME cabinets are kept."));
-    };
+static HostLineEdit *MameCabinetsLocation()
+{
+    HostLineEdit *gc = new HostLineEdit("MameCabinetsLocation");
+    gc->setLabel(QObject::tr("MAME cabinets path"));
+    gc->setValue("/usr/lib/games/xmame/cab");
+    gc->setHelpText(QObject::tr("Directory where MAME cabinets are kept."));
+    return gc;
 };
 
-class MameHistoryLocation: public GlobalLineEdit {
-public:
-    MameHistoryLocation():
-        GlobalLineEdit("MameHistoryLocation") {
-        setLabel(QObject::tr("MAME history path"));
-        setValue("/var/lib/mythgame/history.dat");
-        setHelpText(QObject::tr("The path to the MAME history.dat file."));
-    };
+static HostLineEdit *MameHistoryLocation()
+{
+    HostLineEdit *gc = new HostLineEdit("MameHistoryLocation");
+    gc->setLabel(QObject::tr("MAME history path"));
+    gc->setValue("/var/lib/mythgame/history.dat");
+    gc->setHelpText(QObject::tr("The path to the MAME history.dat file."));
+    return gc;
 };
 
-class MameCheatLocation: public GlobalLineEdit {
-public:
-    MameCheatLocation():
-        GlobalLineEdit("MameCheatLocation") {
-        setLabel(QObject::tr("MAME cheat files path"));
-        setValue("");
-        setHelpText(QObject::tr("The path to the MAME cheat.dat file."));
-    };
+static HostLineEdit *MameCheatLocation()
+{
+    HostLineEdit *gc = new HostLineEdit("MameCheatLocation");
+    gc->setLabel(QObject::tr("MAME cheat files path"));
+    gc->setValue("");
+    gc->setHelpText(QObject::tr("The path to the MAME cheat.dat file."));
+    return gc;
 };
 
-class MameImageDownloader: public GlobalLineEdit {
-public:
-    MameImageDownloader():
-        GlobalLineEdit("MameImageDownloader") {
-        setLabel(QObject::tr("MAME image downloader"));
-        setValue("");
-        setHelpText(QObject::tr("The path to the MAME image downloader "
+static HostLineEdit *MameImageDownloader()
+{
+    HostLineEdit *gc = new HostLineEdit("MameImageDownloader");
+    gc->setLabel(QObject::tr("MAME image downloader"));
+    gc->setValue("");
+    gc->setHelpText(QObject::tr("The path to the MAME image downloader "
                     "helper.  (See the contrib/ dir in the mythgame source.)"));
-    };
+    return gc;
 };
 
-class MameAutomaticallyDownloadImages: public GlobalCheckBox {
-public:
-    MameAutomaticallyDownloadImages():
-        GlobalCheckBox("MameAutomaticallyDownloadImages") {
-        setLabel(QObject::tr("Automatically download images"));
-        setValue(true);
-        setHelpText(QObject::tr("Attempt to automatically download ROM images "
+static HostCheckBox *MameAutomaticallyDownloadImages()
+{
+    HostCheckBox *gc = new HostCheckBox("MameAutomaticallyDownloadImages");
+    gc->setLabel(QObject::tr("Automatically download images"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("Attempt to automatically download ROM images "
                     "if they don't exist."));
-    };
+    return gc;
 };
 
-class MameShowDisclaimer: public GlobalCheckBox {
-public:
-    MameShowDisclaimer():
-        GlobalCheckBox("MameShowDisclaimer") {
-        setLabel(QObject::tr("Show disclaimer"));
-        setValue(true);
-        setHelpText(QObject::tr("Set to show the disclaimer or not"));
-    };
+static HostCheckBox *MameShowDisclaimer()
+{
+    HostCheckBox *gc = new HostCheckBox("MameShowDisclaimer");
+    gc->setLabel(QObject::tr("Show disclaimer"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("Set to show the disclaimer or not"));
+    return gc;
 };
 
-class MameShowGameInfo: public GlobalCheckBox {
-public:
-    MameShowGameInfo():
-        GlobalCheckBox("MameShowGameInfo") {
-        setLabel(QObject::tr("Show game info"));
-        setValue(true);
-        setHelpText(QObject::tr("Set to show the game info or not"));
-    };
+static HostCheckBox *MameShowGameInfo()
+{
+    HostCheckBox *gc = new HostCheckBox("MameShowGameInfo");
+    gc->setLabel(QObject::tr("Show game info"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("Set to show the game info or not"));
+    return gc;
 };
 
-class NesBinary: public GlobalLineEdit {
-public:
-    NesBinary():
-        GlobalLineEdit("NesBinary") {
-        setLabel(QObject::tr("NES binary location"));
-        setValue("/usr/bin/snes9x");
-        setHelpText(QObject::tr("Location of the NES emulator binary."));
-    };
+static HostLineEdit *NesBinary()
+{
+    HostLineEdit *gc = new HostLineEdit("NesBinary");
+    gc->setLabel(QObject::tr("NES binary location"));
+    gc->setValue("/usr/bin/snes9x");
+    gc->setHelpText(QObject::tr("Location of the NES emulator binary."));
+    return gc;
 };
 
-class NesRomPath: public GlobalLineEdit {
-public:
-    NesRomPath():
-        GlobalLineEdit("NesRomLocation") {
-        setLabel(QObject::tr("NES ROM location"));
-        setValue("/usr/lib/games/nes/roms");
-        setHelpText(QObject::tr("Location of the NES games."));
-    };
+static HostLineEdit *NesRomPath()
+{
+    HostLineEdit *gc = new HostLineEdit("NesRomLocation");
+    gc->setLabel(QObject::tr("NES ROM location"));
+    gc->setValue("/usr/lib/games/nes/roms");
+    gc->setHelpText(QObject::tr("Location of the NES games."));
+    return gc;
 };
 
-class NesCRCFile: public GlobalLineEdit {
-public:
-    NesCRCFile():
-        GlobalLineEdit("NesCRCFile") {
-        setLabel(QObject::tr("NES CRC file"));
-        setValue("/usr/lib/games/nes/nes.crc");
-        setHelpText(QObject::tr("This is the same file that comes with the "
+static HostLineEdit *NesCRCFile()
+{
+    HostLineEdit *gc = new HostLineEdit("NesCRCFile");
+    gc->setLabel(QObject::tr("NES CRC file"));
+    gc->setValue("/usr/lib/games/nes/nes.crc");
+    gc->setHelpText(QObject::tr("This is the same file that comes with the "
                     "xmame(xmess) distribution: xmame-0.XX/CRC/nes.crc"));
-    };
+    return gc;
 };
 
-class NesScreensLocation: public GlobalLineEdit {
-public:
-    NesScreensLocation():
-        GlobalLineEdit("NesScreensLocation") {
-        setLabel(QObject::tr("NES screenshots path"));
-        setValue("/usr/lib/games/nes/screens");
-        setHelpText(QObject::tr("Directory where NES screenshots are kept."));
-    };
+static HostLineEdit *NesScreensLocation()
+{
+    HostLineEdit *gc = new HostLineEdit("NesScreensLocation");
+    gc->setLabel(QObject::tr("NES screenshots path"));
+    gc->setValue("/usr/lib/games/nes/screens");
+    gc->setHelpText(QObject::tr("Directory where NES screenshots are kept."));
+    return gc;
 };
 
-class SnesEmulator: public GlobalComboBox {
-public:
-    SnesEmulator():
-        GlobalComboBox("SnesEmulator") {
-        setLabel(QObject::tr("SNES Emulator"));
-        addSelection(QObject::tr("SNES9x"), "SNES9x");
-        addSelection(QObject::tr("zSNES"), "zSNES");
-        setHelpText(QObject::tr("Which emulator to use"));
-    };
+static HostComboBox *SnesEmulator()
+{
+    HostComboBox *gc = new HostComboBox("SnesEmulator");
+    gc->setLabel(QObject::tr("SNES Emulator"));
+    gc->addSelection(QObject::tr("SNES9x"), "SNES9x");
+    gc->addSelection(QObject::tr("zSNES"), "zSNES");
+    gc->setHelpText(QObject::tr("Which emulator to use"));
+    return gc;
 };
 
-class SnesBinary: public GlobalLineEdit {
-public:
-    SnesBinary():
-        GlobalLineEdit("SnesBinary") {
-        setLabel(QObject::tr("SNES binary location"));
-        setValue("/usr/bin/snes9x");
-        setHelpText(QObject::tr("Location of the snes9x emulator binary."));
-    };
+static HostLineEdit *SnesBinary()
+{
+    HostLineEdit *gc = new HostLineEdit("SnesBinary");
+    gc->setLabel(QObject::tr("SNES binary location"));
+    gc->setValue("/usr/bin/snes9x");
+    gc->setHelpText(QObject::tr("Location of the snes9x emulator binary."));
+    return gc;
 };
 
-class SnesRomPath: public GlobalLineEdit {
-public:
-    SnesRomPath():
-        GlobalLineEdit("SnesRomLocation") {
-        setLabel(QObject::tr("SNES ROM location"));
-        setValue("/usr/lib/games/snes/roms");
-        setHelpText(QObject::tr("Location of the SNES games."));
-    };
+static HostLineEdit *SnesRomPath()
+{
+    HostLineEdit *gc = new HostLineEdit("SnesRomLocation");
+    gc->setLabel(QObject::tr("SNES ROM location"));
+    gc->setValue("/usr/lib/games/snes/roms");
+    gc->setHelpText(QObject::tr("Location of the SNES games."));
+    return gc;
 };
 
-class SnesScreensLocation: public GlobalLineEdit {
-public:
-    SnesScreensLocation():
-        GlobalLineEdit("SnesScreensLocation") {
-        setLabel(QObject::tr("SNES screenshots path"));
-        setValue("/usr/lib/games/snes/screens");
-        setHelpText(QObject::tr("Directory where SNES screenshots are kept. "
+static HostLineEdit *SnesScreensLocation()
+{
+    HostLineEdit *gc = new HostLineEdit("SnesScreensLocation");
+    gc->setLabel(QObject::tr("SNES screenshots path"));
+    gc->setValue("/usr/lib/games/snes/screens");
+    gc->setHelpText(QObject::tr("Directory where SNES screenshots are kept. "
                     "Looks for screenshots with file names matching the "
-		    "rom file name."));
-    };
+                    "rom file name."));
+    return gc;
 };
 
-class AtariBinary: public GlobalLineEdit {
-public:
-    AtariBinary():
-        GlobalLineEdit("AtariBinary") {
-        setLabel(QObject::tr("Atari binary location"));
-        setValue("/usr/bin/stella.sdl");
-        setHelpText(QObject::tr("Location of the Atari emulator binary."));
-    };
+static HostLineEdit *AtariBinary()
+{
+    HostLineEdit *gc = new HostLineEdit("AtariBinary");
+    gc->setLabel(QObject::tr("Atari binary location"));
+    gc->setValue("/usr/bin/stella.sdl");
+    gc->setHelpText(QObject::tr("Location of the Atari emulator binary."));
+    return gc;
 };
 
-class AtariRomPath: public GlobalLineEdit {
-public:
-    AtariRomPath():
-        GlobalLineEdit("AtariRomLocation") {
-        setLabel(QObject::tr("Atari ROM location"));
-        setValue("/usr/lib/games/atari/roms");
-        setHelpText(QObject::tr("Location of the Atari games."));
-    };
+static HostLineEdit *AtariRomPath()
+{
+    HostLineEdit *gc = new HostLineEdit("AtariRomLocation");
+    gc->setLabel(QObject::tr("Atari ROM location"));
+    gc->setValue("/usr/lib/games/atari/roms");
+    gc->setHelpText(QObject::tr("Location of the Atari games."));
+    return gc;
 };
 
-class Odyssey2Binary: public GlobalLineEdit {
-public:
-    Odyssey2Binary():
-        GlobalLineEdit("Odyssey2Binary") {
-        setLabel(QObject::tr("Odyssey2 binary location"));
-        setValue("/usr/bin/o2em");
-        setHelpText(QObject::tr("Location of the Odyssey2 emulator binary."));
-    };
+static HostLineEdit *Odyssey2Binary()
+{
+    HostLineEdit *gc = new HostLineEdit("Odyssey2Binary");
+    gc->setLabel(QObject::tr("Odyssey2 binary location"));
+    gc->setValue("/usr/bin/o2em");
+    gc->setHelpText(QObject::tr("Location of the Odyssey2 emulator binary."));
+    return gc;
 };
 
-class Odyssey2RomPath: public GlobalLineEdit {
-public:
-    Odyssey2RomPath():
-        GlobalLineEdit("Odyssey2RomLocation") {
-        setLabel(QObject::tr("Odyssey2 ROM location"));
-        setValue("/usr/lib/games/odyssey2/roms");
-        setHelpText(QObject::tr("Location of the Odyssey2 games."));
-    };
+static HostLineEdit *Odyssey2RomPath()
+{
+    HostLineEdit *gc = new HostLineEdit("Odyssey2RomLocation");
+    gc->setLabel(QObject::tr("Odyssey2 ROM location"));
+    gc->setValue("/usr/lib/games/odyssey2/roms");
+    gc->setHelpText(QObject::tr("Location of the Odyssey2 games."));
+    return gc;
 };
 
-class PCList: public GlobalLineEdit {
-public:
-    PCList():
-        GlobalLineEdit("PCGameList") {
-        setLabel(QObject::tr("PC Game List xml file"));
-        setValue("/usr/games/gamelist.xml");
-        setHelpText(QObject::tr("Path to the Game List xml file. (see "
-		    "README for details)"));
-    };
+static HostLineEdit *PCList()
+{
+    HostLineEdit *gc = new HostLineEdit("PCGameList");
+    gc->setLabel(QObject::tr("PC Game List xml file"));
+    gc->setValue("/usr/games/gamelist.xml");
+    gc->setHelpText(QObject::tr("Path to the Game List xml file. (see "
+		                "README for details)"));
+    return gc;
 };
 
-class PCScreensLocation: public GlobalLineEdit {
-public:
-    PCScreensLocation():
-        GlobalLineEdit("PCScreensLocation") {
-        setLabel(QObject::tr("PC screenshots path"));
-        setValue("/var/lib/mythgame/screens");
-        setHelpText(QObject::tr("Directory where screenshots are kept. "
+static HostLineEdit *PCScreensLocation()
+{
+    HostLineEdit *gc = new HostLineEdit("PCScreensLocation");
+    gc->setLabel(QObject::tr("PC screenshots path"));
+    gc->setValue("/var/lib/mythgame/screens");
+    gc->setHelpText(QObject::tr("Directory where screenshots are kept. "
                     "Looks for screenshots with file names matching the "
                     "game name in the Game List xml file."));
-    };
+    return gc;
 };
 
 MythGameSettings::MythGameSettings()
 {
     VerticalConfigurationGroup *general = new VerticalConfigurationGroup(false);
     general->setLabel(QObject::tr("MythGame Settings -- General"));
-    general->addChild(new GameTreeLevels());
-    general->addChild(new GameShowFavorites());
+    general->addChild(GameTreeLevels());
+    general->addChild(GameShowFavorites());
     addChild(general);
 
     VerticalConfigurationGroup *mame = new VerticalConfigurationGroup(false);
     mame->setLabel(QObject::tr("MythGame Settings -- xmame (page 1)"));
-    mame->addChild(new MameBinary());
-    mame->addChild(new MameRomPath());
-    mame->addChild(new MameCatFile());
-    mame->addChild(new MameScreensLocation());
-    mame->addChild(new MameScoresDirectory());
-    mame->addChild(new MameScoresFile());
-    mame->addChild(new MameFlyersLocation());
+    mame->addChild(MameBinary());
+    mame->addChild(MameRomPath());
+    mame->addChild(MameCatFile());
+    mame->addChild(MameScreensLocation());
+    mame->addChild(MameScoresDirectory());
+    mame->addChild(MameScoresFile());
+    mame->addChild(MameFlyersLocation());
     addChild(mame);
 
     VerticalConfigurationGroup *mame2 = new VerticalConfigurationGroup(false);
     mame2->setLabel(QObject::tr("MythGame Settings -- xmame (page 2)"));
-    mame2->addChild(new MameCabinetsLocation());
-    mame2->addChild(new MameHistoryLocation());
-    mame2->addChild(new MameCheatLocation());
-    mame2->addChild(new MameImageDownloader());
-    mame2->addChild(new MameAutomaticallyDownloadImages());
-    mame2->addChild(new MameShowDisclaimer());
-    mame2->addChild(new MameShowGameInfo());
+    mame2->addChild(MameCabinetsLocation());
+    mame2->addChild(MameHistoryLocation());
+    mame2->addChild(MameCheatLocation());
+    mame2->addChild(MameImageDownloader());
+    mame2->addChild(MameAutomaticallyDownloadImages());
+    mame2->addChild(MameShowDisclaimer());
+    mame2->addChild(MameShowGameInfo());
     addChild(mame2);
 
     VerticalConfigurationGroup *nes = new VerticalConfigurationGroup(false);
     nes->setLabel(QObject::tr("MythGame Settings -- NES Emulation"));
-    nes->addChild(new NesBinary());
-    nes->addChild(new NesRomPath());
-    nes->addChild(new NesCRCFile());
-    nes->addChild(new NesScreensLocation());
+    nes->addChild(NesBinary());
+    nes->addChild(NesRomPath());
+    nes->addChild(NesCRCFile());
+    nes->addChild(NesScreensLocation());
     addChild(nes);
 
     VerticalConfigurationGroup *snes = new VerticalConfigurationGroup(false);
     snes->setLabel(QObject::tr("MythGame Settings -- SNES Emulation"));
-    snes->addChild(new SnesEmulator());
-    snes->addChild(new SnesBinary());
-    snes->addChild(new SnesRomPath());
-    snes->addChild(new SnesScreensLocation());
+    snes->addChild(SnesEmulator());
+    snes->addChild(SnesBinary());
+    snes->addChild(SnesRomPath());
+    snes->addChild(SnesScreensLocation());
     addChild(snes);
 
     VerticalConfigurationGroup *atari = new VerticalConfigurationGroup(false);
     atari->setLabel(QObject::tr("MythGame Settings -- Atari Emulation"));
-    atari->addChild(new AtariBinary());
-    atari->addChild(new AtariRomPath());
+    atari->addChild(AtariBinary());
+    atari->addChild(AtariRomPath());
     addChild(atari);
 
     VerticalConfigurationGroup *odyssey2 = new VerticalConfigurationGroup(false);
     odyssey2->setLabel(QObject::tr("MythGame Settings -- Odyssey2 Emulation"));
-    odyssey2->addChild(new Odyssey2Binary());
-    odyssey2->addChild(new Odyssey2RomPath());
+    odyssey2->addChild(Odyssey2Binary());
+    odyssey2->addChild(Odyssey2RomPath());
     addChild(odyssey2);
 
     VerticalConfigurationGroup *pc = new VerticalConfigurationGroup(false);
     pc->setLabel(QObject::tr("MythGame Settings -- PC games"));
-    pc->addChild(new PCList());
-    pc->addChild(new PCScreensLocation());
+    pc->addChild(PCList());
+    pc->addChild(PCScreensLocation());
     addChild(pc);
 }

@@ -26,280 +26,281 @@
 --------------- General WEBCAM Settings ---------------
 */
 
-class WebcamDevice: public GlobalComboBox {
-public:
-    WebcamDevice():
-        GlobalComboBox("WebcamDevice", true) {
-        setLabel(QObject::tr("Webcam device"));
-        QDir dev("/dev", "video*", QDir::Name, QDir::System);
-        fillSelectionsFromDir(dev);
-        setHelpText(QObject::tr("Select the device path your webcam is "
+static HostComboBox *WebcamDevice()
+{
+    HostComboBox *gc = new HostComboBox("WebcamDevice", true);
+    gc->setLabel(QObject::tr("Webcam device"));
+    QDir dev("/dev", "video*", QDir::Name, QDir::System);
+    gc->fillSelectionsFromDir(dev);
+    gc->setHelpText(QObject::tr("Select the device path your webcam is "
 		    "using. If you have a capture card it may be using "
 		    "/dev/video so try dev/video1"));
-    }
+    return gc;
 };
 
-class TxResolution: public GlobalComboBox {
-public:
-    TxResolution():
-        GlobalComboBox("TxResolution") {
-        setLabel(QObject::tr("Transmit Resolution"));
-        addSelection(QObject::tr("176x144"), "176x144");
-        addSelection(QObject::tr("128x96"), "128x96");
-        addSelection(QObject::tr("704x576"), "704x576");
-        addSelection(QObject::tr("352x288"), "352x288");
-        setHelpText(QObject::tr("Size of video window to transmit; higher "
+static HostComboBox *TxResolution()
+{
+    HostComboBox *gc = new HostComboBox("TxResolution");
+    gc->setLabel(QObject::tr("Transmit Resolution"));
+    gc->addSelection(QObject::tr("176x144"), "176x144");
+    gc->addSelection(QObject::tr("128x96"), "128x96");
+    gc->addSelection(QObject::tr("704x576"), "704x576");
+    gc->addSelection(QObject::tr("352x288"), "352x288");
+    gc->setHelpText(QObject::tr("Size of video window to transmit; higher "
                     "resolutions require more bandwidth."));
-    };
+    return gc;
 };
 
-class CaptureResolution: public GlobalComboBox {
-public:
-    CaptureResolution():
-        GlobalComboBox("CaptureResolution") {
-        setLabel(QObject::tr("Capture Resolution"));
-        addSelection(QObject::tr("352x288"), "352x288");
-        addSelection(QObject::tr("320x240"), "320x240");
-        addSelection(QObject::tr("176x144"), "176x144");
-        addSelection(QObject::tr("160x120"), "160x120");
-        addSelection(QObject::tr("128x96"), "128x96");
-        addSelection(QObject::tr("704x576"), "704x576");
-        addSelection(QObject::tr("640x480"), "640x480");
-        setHelpText(QObject::tr("Size of video source from your webcam. Choose a value compatible with your "
-                    "webcam hardware. Choose higher values to digitally pan/zoom before transmission."));
-    };
+static HostComboBox *CaptureResolution()
+{
+    HostComboBox *gc = new HostComboBox("CaptureResolution");
+    gc->setLabel(QObject::tr("Capture Resolution"));
+    gc->addSelection(QObject::tr("352x288"), "352x288");
+    gc->addSelection(QObject::tr("320x240"), "320x240");
+    gc->addSelection(QObject::tr("176x144"), "176x144");
+    gc->addSelection(QObject::tr("160x120"), "160x120");
+    gc->addSelection(QObject::tr("128x96"), "128x96");
+    gc->addSelection(QObject::tr("704x576"), "704x576");
+    gc->addSelection(QObject::tr("640x480"), "640x480");
+    gc->setHelpText(QObject::tr("Size of video source from your webcam. Choose "
+                    "a value compatible with your webcam hardware. Choose "
+                    "higher values to digitally pan/zoom before "
+                    "transmission."));
+    return gc;
 };
 
-class TransmitFPS: public GlobalSpinBox {
-public:
-    TransmitFPS():
-        GlobalSpinBox("TransmitFPS", 1, 30, 1) {
-        setLabel(QObject::tr("Transmit Frames/Second"));
-        setValue(5);
-        setHelpText(QObject::tr("Number of webcam frames/sec to transmit, from 1 to "
-                                "30. Higher numbers create better results but use more bandwidth."));
-    }
+static HostSpinBox *TransmitFPS()
+{
+    HostSpinBox *gc = new HostSpinBox("TransmitFPS", 1, 30, 1);
+    gc->setLabel(QObject::tr("Transmit Frames/Second"));
+    gc->setValue(5);
+    gc->setHelpText(QObject::tr("Number of webcam frames/sec to transmit, from "
+                    "1 to 0. Higher numbers create better results but use more "
+                    "bandwidth."));
+    return gc;
 };
 
 /*
 --------------- General VXML Settings ---------------
 */
 
-class TimeToAnswer: public GlobalLineEdit {
-public:
-    TimeToAnswer():
-        GlobalLineEdit("TimeToAnswer") {
-        setLabel(QObject::tr("Time to Answer"));
-        setValue(QObject::tr("10"));
-        setHelpText(QObject::tr("The time in seconds a call rings before being "
-                                "automatically answered and diverted to a VXML script."));
-    }
+static HostLineEdit *TimeToAnswer()
+{
+    HostLineEdit *gc = new HostLineEdit("TimeToAnswer");
+    gc->setLabel(QObject::tr("Time to Answer"));
+    gc->setValue(QObject::tr("10"));
+    gc->setHelpText(QObject::tr("The time in seconds a call rings before being "
+                    "automatically answered and diverted to a VXML script."));
+    return gc;
 };
 
-class DefaultVxmlUrl: public GlobalLineEdit {
-public:
-    DefaultVxmlUrl():
-        GlobalLineEdit("DefaultVxmlUrl") {
-        setLabel(QObject::tr("Default VXML URL"));
-        setValue(QObject::tr("http://127.0.0.1/vxml/index.vxml"));
-        setHelpText(QObject::tr("The URL to retrieve a VXML script which can "
-                                "be used to prompt for leaving a voicemail etc. Leave blank if you "
-                                "have no HTTP server and a default Voicemail script will be used."));
-    }
+static HostLineEdit *DefaultVxmlUrl()
+{
+    HostLineEdit *gc = new HostLineEdit("DefaultVxmlUrl");
+    gc->setLabel(QObject::tr("Default VXML URL"));
+    gc->setValue(QObject::tr("http://127.0.0.1/vxml/index.vxml"));
+    gc->setHelpText(QObject::tr("The URL to retrieve a VXML script which can "
+                    "be used to prompt for leaving a voicemail etc. Leave "
+                    "blank if you have no HTTP server and a default Voicemail "
+                    "script will be used."));
+    return gc;
 };
 
-class DefaultVoicemailPrompt: public GlobalLineEdit {
-public:
-    DefaultVoicemailPrompt():
-        GlobalLineEdit("DefaultVoicemailPrompt") {
-        setLabel(QObject::tr("Default Voicemail Prompt"));
-        setValue(QObject::tr("I am not at home, please leave a message after the tone"));
-        setHelpText(QObject::tr("Either a text message to be read by the TTS engine or the filename of "
-                                "a .wav file to be played to callers. Only used where the above setting is blank."));
-    }
+static HostLineEdit *DefaultVoicemailPrompt()
+{
+    HostLineEdit *gc = new HostLineEdit("DefaultVoicemailPrompt");
+    gc->setLabel(QObject::tr("Default Voicemail Prompt"));
+    gc->setValue(QObject::tr("I am not at home, please leave a message after "
+                 "the tone"));
+    gc->setHelpText(QObject::tr("Either a text message to be read by the TTS "
+                    "engine or the filename of a .wav file to be played to "
+                    "callers. Only used where the above setting is blank."));
+    return gc;
 };
 
-class TTSVoice: public GlobalComboBox {
-public:
-    TTSVoice():
-        GlobalComboBox("TTSVoice", true) {
-        setLabel(QObject::tr("Text to Speech Voice"));
+static HostComboBox *TTSVoice()
+{
+    HostComboBox *gc = new HostComboBox("TTSVoice", true);
+    gc->setLabel(QObject::tr("Text to Speech Voice"));
 #ifdef FESTIVAL_SUPPORT
-        QDir festDir(FESTIVAL_HOME "lib/voices/english/", "[a-z]*;[A-Z]*", QDir::Name, QDir::Dirs);  // The name filter is to remove "." and ".." directories
-        fillSelectionsFromDir(festDir, false);
+    QDir festDir(FESTIVAL_HOME "lib/voices/english/",
+                 "[a-z]*;[A-Z]*", QDir::Name, QDir::Dirs);
+                 // The name filter is to remove "." and ".." directories
+    gc->fillSelectionsFromDir(festDir, false);
 #endif
-        setHelpText(QObject::tr("Choose a voice to use from the Text To Speech library. "));
-    }
+    gc->setHelpText(QObject::tr("Choose a voice to use from the Text To Speech "
+                    "library. "));
+    return gc;
 };
 /*
 --------------- General SIP Settings ---------------
 */
 
-class SipRegisterWithProxy: public GlobalCheckBox {
-public:
-    SipRegisterWithProxy():
-        GlobalCheckBox("SipRegisterWithProxy") {
-        setLabel(QObject::tr("Register with a Proxy or Service"));
-        setValue(true);
-        setHelpText(QObject::tr("Allows you to register with services such as Free World Dialup; "
-                    "or with applications like Asterisk. Restart mythfrontend if you change this."));
-    };
+static HostCheckBox *SipRegisterWithProxy()
+{
+    HostCheckBox *gc = new HostCheckBox("SipRegisterWithProxy");
+    gc->setLabel(QObject::tr("Register with a Proxy or Service"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("Allows you to register with services such as "
+                    "Free World Dialup; or with applications like Asterisk. "
+                    "Restart mythfrontend if you change this."));
+    return gc;
 };
 
-class SipProxyName: public GlobalLineEdit {
-public:
-    SipProxyName():
-        GlobalLineEdit("SipProxyName") {
-        setLabel(QObject::tr("Proxy DNS Name"));
-        setValue("fwd.pulver.com");
-        setHelpText(QObject::tr("Name of the Proxy, such as fwd.pulver.com for Free World Dialup."));
-    }
+static HostLineEdit *SipProxyName()
+{
+    HostLineEdit *gc = new HostLineEdit("SipProxyName");
+    gc->setLabel(QObject::tr("Proxy DNS Name"));
+    gc->setValue("fwd.pulver.com");
+    gc->setHelpText(QObject::tr("Name of the Proxy, such as fwd.pulver.com for "
+                    "Free World Dialup."));
+    return gc;
 };
 
-class SipProxyAuthName: public GlobalLineEdit {
-public:
-    SipProxyAuthName():
-        GlobalLineEdit("SipProxyAuthName") {
-        setLabel(QObject::tr("Authentication Name"));
-        setValue("");
-        setHelpText(QObject::tr("Your username for authentication with the proxy. For FWD this is your FWD number."));
-    }
+static HostLineEdit *SipProxyAuthName()
+{
+    HostLineEdit *gc = new HostLineEdit("SipProxyAuthName");
+    gc->setLabel(QObject::tr("Authentication Name"));
+    gc->setValue("");
+    gc->setHelpText(QObject::tr("Your username for authentication with the "
+                    "proxy. For FWD this is your FWD number."));
+    return gc;
 };
 
-class SipProxyAuthPassword: public GlobalLineEdit {
-public:
-    SipProxyAuthPassword():
-        GlobalLineEdit("SipProxyAuthPassword") {
-        setLabel(QObject::tr("Authentication Password"));
-        setValue("");
-        setHelpText(QObject::tr("Your password for authentication with the proxy."));
-    }
+static HostLineEdit *SipProxyAuthPassword()
+{
+    HostLineEdit *gc = new HostLineEdit("SipProxyAuthPassword");
+    gc->setLabel(QObject::tr("Authentication Password"));
+    gc->setValue("");
+    gc->setHelpText(QObject::tr("Your password for authentication with the "
+                    "proxy."));
+    return gc;
 };
 
-class SipLocalPort: public GlobalLineEdit {
-public:
-    SipLocalPort():
-        GlobalLineEdit("SipLocalPort") {
-        setLabel(QObject::tr("SIP Local Port"));
-        setValue(QObject::tr("5060"));
-        setHelpText(QObject::tr("The port on this machine to use. You may need to make these different "
-                                "for each Mythfrontend and setup your firewall to let this port through."));
-    }
+static HostLineEdit *SipLocalPort()
+{
+    HostLineEdit *gc = new HostLineEdit("SipLocalPort");
+    gc->setLabel(QObject::tr("SIP Local Port"));
+    gc->setValue(QObject::tr("5060"));
+    gc->setHelpText(QObject::tr("The port on this machine to use. You may need "
+                    "to make these different for each Mythfrontend and setup "
+                    "your firewall to let this port through."));
+    return gc;
 };
 
-class MicrophoneDevice: public GlobalComboBox {
-public:
-    MicrophoneDevice():
-        GlobalComboBox("MicrophoneDevice", true) {
-        setLabel(QObject::tr("Microphone device"));
-        QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
-        addSelection("None");
-        fillSelectionsFromDir(dev);
-        setHelpText(QObject::tr("Select the device path for your microphone. "
-		    "Currently this CANNOT be the same device as used for audio output."));
-    }
+static HostComboBox *MicrophoneDevice()
+{
+    HostComboBox *gc = new HostComboBox("MicrophoneDevice", true);
+    gc->setLabel(QObject::tr("Microphone device"));
+    QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
+    gc->addSelection("None");
+    gc->fillSelectionsFromDir(dev);
+    gc->setHelpText(QObject::tr("Select the device path for your microphone. "
+		                "Currently this CANNOT be the same device as used for "
+		                "audio output."));
+    return gc;
 };
 
-class MySipName: public GlobalLineEdit {
-public:
-    MySipName():
-        GlobalLineEdit("MySipName") {
-        setLabel(QObject::tr("My Display Name"));
-        setValue("Me");
-        setHelpText(QObject::tr("My common name to display when I call other people. "));
-    }
+static HostLineEdit *MySipName()
+{
+    HostLineEdit *gc = new HostLineEdit("MySipName");
+    gc->setLabel(QObject::tr("My Display Name"));
+    gc->setValue("Me");
+    gc->setHelpText(QObject::tr("My common name to display when I call other "
+                    "people. "));
+    return gc;
 };
 
-/*class MySipUser: public GlobalLineEdit {
-public:
-    MySipUser():
-        GlobalLineEdit("MySipUser") {
-        setLabel(QObject::tr("My SIP User"));
-        setValue("1000");
-        setHelpText(QObject::tr("The phone number or username that identifies this SIP client. "
-                                "This will be combined with the host address to form the SIP URI user@ip-address."));
-    }
+/*static HostLineEdit *MySipUser() {
+    HostLineEdit *gc = new HostLineEdit("MySipUser");
+    gc->setLabel(QObject::tr("My SIP User"));
+    gc->setValue("1000");
+    gc->setHelpText(QObject::tr("The phone number or username that identifies "
+                    "this SIP client. This will be combined with the host "
+                    "address to form the SIP URI user@ip-address."));
+    return gc;
 };*/
 
-class CodecPriorityList: public GlobalLineEdit {
-public:
-    CodecPriorityList():
-        GlobalLineEdit("CodecPriorityList") {
-        setLabel(QObject::tr("Codecs Supported"));
-        setValue("GSM;G.711u;G.711a");
-        setHelpText(QObject::tr("The list of codecs to use, in the preferred order separated by semicolon. "
-                                "Supported codecs are G.711u, G.711a and GSM."));
-    }
+static HostLineEdit *CodecPriorityList()
+{
+    HostLineEdit *gc = new HostLineEdit("CodecPriorityList");
+    gc->setLabel(QObject::tr("Codecs Supported"));
+    gc->setValue("GSM;G.711u;G.711a");
+    gc->setHelpText(QObject::tr("The list of codecs to use, in the preferred "
+                    "order separated by semicolon. Supported codecs are "
+                    "G.711u, G.711a and GSM."));
+    return gc;
 };
 
-class SipBindInterface: public GlobalLineEdit {
-public:
-    SipBindInterface():
-        GlobalLineEdit("SipBindInterface") {
-        setLabel(QObject::tr("SIP Network Interface"));
-        setValue(QObject::tr("eth0"));
-        setHelpText(QObject::tr("Enter the name of the network to bind to e.g. eth0"));
-    }
+static HostLineEdit *SipBindInterface()
+{
+    HostLineEdit *gc = new HostLineEdit("SipBindInterface");
+    gc->setLabel(QObject::tr("SIP Network Interface"));
+    gc->setValue(QObject::tr("eth0"));
+    gc->setHelpText(QObject::tr("Enter the name of the network to bind to e.g. "
+                    "eth0"));
+    return gc;
 };
 
-class NatTraversalMethod: public GlobalComboBox {
-public:
-    NatTraversalMethod():
-        GlobalComboBox("NatTraversalMethod") {
-        setLabel(QObject::tr("NAT Traversal Method"));
-        addSelection("None");
-        addSelection("Manual");
-        addSelection("Web Server");
-        setHelpText(QObject::tr("Method to use for NAT traversal; needs a Frontend restart after channging. Choose "
-                                "NONE if you have a public IP address, "
-                                "choose MANUAL if your ISP always gives you the same public address and manually "
-                                "enter this address below. Choose Web Server if you have a dynamic NAT address "
-                                "and enter a web address like http://checkip.dyndns.org below. "));
-    }
+static HostComboBox *NatTraversalMethod()
+{
+    HostComboBox *gc = new HostComboBox("NatTraversalMethod");
+    gc->setLabel(QObject::tr("NAT Traversal Method"));
+    gc->addSelection("None");
+    gc->addSelection("Manual");
+    gc->addSelection("Web Server");
+    gc->setHelpText(QObject::tr("Method to use for NAT traversal; needs a "
+                    "Frontend restart after channging. Choose NONE if you have "
+                    "a public IP address, choose MANUAL if your ISP always "
+                    "gives you the same public address and manually enter this "
+                    "address below. Choose Web Server if you have a dynamic "
+                    "NAT address and enter a web address like "
+                    "http://checkip.dyndns.org below. "));
+    return gc;
 };
 
-class NatIpAddress: public GlobalLineEdit {
-public:
-    NatIpAddress():
-        GlobalLineEdit("NatIpAddress") {
-        setLabel(QObject::tr("NAT IP Address"));
-        setValue(QObject::tr("http://checkip.dyndns.org"));
-        setHelpText(QObject::tr("If you selected MANUAL above, then enter your Public IP Address here. If you "
-                                "selected WEB Server above then enter your web server URL here."));
-    }
+static HostLineEdit *NatIpAddress()
+{
+    HostLineEdit *gc = new HostLineEdit("NatIpAddress");
+    gc->setLabel(QObject::tr("NAT IP Address"));
+    gc->setValue(QObject::tr("http://checkip.dyndns.org"));
+    gc->setHelpText(QObject::tr("If you selected MANUAL above, then enter your "
+                    "Public IP Address here. If you selected WEB Server above "
+                    "then enter your web server URL here."));
+    return gc;
 };
 
-class AudioLocalPort: public GlobalLineEdit {
-public:
-    AudioLocalPort():
-        GlobalLineEdit("AudioLocalPort") {
-        setLabel(QObject::tr("Audio RTP Port"));
-        setValue("21232");
-        setHelpText(QObject::tr("Enter the port to use for Audio RTP; an even number between 1024 and 32767. If you have a firewall "
-                                "you should enable UDP through the firewall on this port."));
-    }
+static HostLineEdit *AudioLocalPort()
+{
+    HostLineEdit *gc = new HostLineEdit("AudioLocalPort");
+    gc->setLabel(QObject::tr("Audio RTP Port"));
+    gc->setValue("21232");
+    gc->setHelpText(QObject::tr("Enter the port to use for Audio RTP; an even "
+                    "number between 1024 and 32767. If you have a firewall you "
+                    "should enable UDP through the firewall on this port."));
+    return gc;
 };
 
-class VideoLocalPort: public GlobalLineEdit {
-public:
-    VideoLocalPort():
-        GlobalLineEdit("VideoLocalPort") {
-        setLabel(QObject::tr("Video RTP Port"));
-        setValue("21234");
-        setHelpText(QObject::tr("Enter the port to use for Video RTP; an even number between 1024 and 32767. If you have a firewall "
-                                "you should enable UDP through the firewall on this port."));
-    }
+static HostLineEdit *VideoLocalPort()
+{
+    HostLineEdit *gc = new HostLineEdit("VideoLocalPort");
+    gc->setLabel(QObject::tr("Video RTP Port"));
+    gc->setValue("21234");
+    gc->setHelpText(QObject::tr("Enter the port to use for Video RTP; an even "
+                    "number between 1024 and 32767. If you have a firewall you "
+                    "should enable UDP through the firewall on this port."));
+    return gc;
 };
 
-class SipAutoanswer: public GlobalCheckBox {
-public:
-    SipAutoanswer():
-        GlobalCheckBox("SipAutoanswer") {
-        setLabel(QObject::tr("Auto-Answer"));
-        setValue(false);
-        setHelpText(QObject::tr("When the MythFrontend is in the MythPhone plugin, "
-                    "setting this automatically answers all incoming calls. There is no security yet."));
-    };
+static HostCheckBox *SipAutoanswer()
+{
+    HostCheckBox *gc = new HostCheckBox("SipAutoanswer");
+    gc->setLabel(QObject::tr("Auto-Answer"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("When the MythFrontend is in the MythPhone "
+                    "plugin, setting this automatically answers all incoming "
+                    "calls. There is no security yet."));
+    return gc;
 };
 
 
@@ -313,41 +314,41 @@ MythPhoneSettings::MythPhoneSettings()
 
     VerticalConfigurationGroup* sipProxySet = new VerticalConfigurationGroup(false);
     sipProxySet->setLabel(QObject::tr("SIP Proxy Settings"));
-    sipProxySet->addChild(new SipRegisterWithProxy());
-    sipProxySet->addChild(new SipProxyName());
-    sipProxySet->addChild(new SipProxyAuthName());
-    sipProxySet->addChild(new SipProxyAuthPassword());
-    sipProxySet->addChild(new MySipName());
-    //sipProxySet->addChild(new MySipUser());
+    sipProxySet->addChild(SipRegisterWithProxy());
+    sipProxySet->addChild(SipProxyName());
+    sipProxySet->addChild(SipProxyAuthName());
+    sipProxySet->addChild(SipProxyAuthPassword());
+    sipProxySet->addChild(MySipName());
+    //sipProxySet->addChild(MySipUser());
     addChild(sipProxySet);
 
     VerticalConfigurationGroup* sipSet = new VerticalConfigurationGroup(false);
     sipSet->setLabel(QObject::tr("SIP Settings"));
-    sipSet->addChild(new CodecPriorityList());
-    sipSet->addChild(new SipBindInterface());
-    sipSet->addChild(new SipLocalPort());
-    sipSet->addChild(new NatTraversalMethod());
-    sipSet->addChild(new NatIpAddress());
-    sipSet->addChild(new AudioLocalPort());
-    sipSet->addChild(new VideoLocalPort());
+    sipSet->addChild(CodecPriorityList());
+    sipSet->addChild(SipBindInterface());
+    sipSet->addChild(SipLocalPort());
+    sipSet->addChild(NatTraversalMethod());
+    sipSet->addChild(NatIpAddress());
+    sipSet->addChild(AudioLocalPort());
+    sipSet->addChild(VideoLocalPort());
     addChild(sipSet);
 
     VerticalConfigurationGroup* vxmlSet = new VerticalConfigurationGroup(false);
     vxmlSet->setLabel(QObject::tr("VXML Settings"));
-    vxmlSet->addChild(new SipAutoanswer());
-    vxmlSet->addChild(new TimeToAnswer());
-    vxmlSet->addChild(new DefaultVxmlUrl());
-    vxmlSet->addChild(new DefaultVoicemailPrompt());
-    vxmlSet->addChild(new TTSVoice());
+    vxmlSet->addChild(SipAutoanswer());
+    vxmlSet->addChild(TimeToAnswer());
+    vxmlSet->addChild(DefaultVxmlUrl());
+    vxmlSet->addChild(DefaultVoicemailPrompt());
+    vxmlSet->addChild(TTSVoice());
     addChild(vxmlSet);
 
     VerticalConfigurationGroup* webcamSet = new VerticalConfigurationGroup(false);
     webcamSet->setLabel(QObject::tr("WEBCAM Settings"));
-    webcamSet->addChild(new WebcamDevice());
-    webcamSet->addChild(new MicrophoneDevice());
-    webcamSet->addChild(new TxResolution());
-    webcamSet->addChild(new TransmitFPS());
-    webcamSet->addChild(new CaptureResolution());
+    webcamSet->addChild(WebcamDevice());
+    webcamSet->addChild(MicrophoneDevice());
+    webcamSet->addChild(TxResolution());
+    webcamSet->addChild(TransmitFPS());
+    webcamSet->addChild(CaptureResolution());
     addChild(webcamSet);
 }
 

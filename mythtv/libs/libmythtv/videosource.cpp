@@ -1725,30 +1725,26 @@ public:
     }
 };
 
-class DiseqcLatitude : public BackendLineEdit
+static GlobalLineEdit *DiseqcLatitude()
 {
-public:
-    DiseqcLatitude() : BackendLineEdit("latitude")
-    {
-        setLabel("Latitude");
-        setHelpText(QObject::tr("The Latitude of your satellite dishes "
+    GlobalLineEdit *gc = new GlobalLineEdit("latitude");
+    gc->setLabel("Latitude");
+    gc->setHelpText(QObject::tr("The Latitude of your satellite dishes "
                     "location on the Earth.. "
                     " This is used with DiSEqC Motor Support.  Format 35.78"
                     " for 35.78 degrees North Longitude"));
-    }
+    return gc;
 };
 
-class DiseqcLongitude : public BackendLineEdit
+static GlobalLineEdit *DiseqcLongitude()
 {
-public:
-    DiseqcLongitude() : BackendLineEdit("longitude")
-    {
-        setLabel("Longitude");
-        setHelpText(QObject::tr("The Longitude of your satellite dishes "
+    GlobalLineEdit *gc = new GlobalLineEdit("longitude");
+    gc->setLabel("Longitude");
+    gc->setHelpText(QObject::tr("The Longitude of your satellite dishes "
                     "location on the Earth.. "
                     " This is used with DiSEqC Motor Support.  Format -78.93"
                     " for 78.93 degrees West Longitude"));
-    }
+    return gc;
 };
 
 class DVBDiseqcConfigurationWizard: public ConfigurationWizard
@@ -1760,8 +1756,8 @@ public:
         rec->setLabel(QObject::tr("Diseqc Options"));
         rec->setUseLabel(false);
 
-        rec->addChild(new DiseqcLatitude());
-        rec->addChild(new DiseqcLongitude());
+        rec->addChild(DiseqcLatitude());
+        rec->addChild(DiseqcLongitude());
         addChild(rec);
     }
 };

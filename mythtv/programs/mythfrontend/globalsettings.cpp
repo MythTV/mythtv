@@ -12,9 +12,9 @@
 #include <qdir.h>
 #include <qimage.h>
 
-static GlobalComboBox *AudioOutputDevice()
+static HostComboBox *AudioOutputDevice()
 {
-    GlobalComboBox *gc = new GlobalComboBox("AudioOutputDevice", true);
+    HostComboBox *gc = new HostComboBox("AudioOutputDevice", true);
 
     gc->setLabel(QObject::tr("Audio output device"));
     QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
@@ -34,9 +34,9 @@ static GlobalComboBox *AudioOutputDevice()
     return gc;
 }
 
-static GlobalCheckBox *MythControlsVolume()
+static HostCheckBox *MythControlsVolume()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("MythControlsVolume");
+    HostCheckBox *gc = new HostCheckBox("MythControlsVolume");
     gc->setLabel(QObject::tr("Use internal volume controls"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("MythTV can control the PCM and master "
@@ -45,9 +45,9 @@ static GlobalCheckBox *MythControlsVolume()
     return gc;
 }
 
-static GlobalComboBox *MixerDevice()
+static HostComboBox *MixerDevice()
 {
-    GlobalComboBox *gc = new GlobalComboBox("MixerDevice", true);
+    HostComboBox *gc = new HostComboBox("MixerDevice", true);
 
     gc->setLabel(QObject::tr("Mixer Device"));
     QDir dev("/dev", "mixer*", QDir::Name, QDir::System);
@@ -65,9 +65,9 @@ static GlobalComboBox *MixerDevice()
 static const char* MixerControlControls[] = { "PCM",
                                               "Master" };
 
-static GlobalComboBox *MixerControl()
+static HostComboBox *MixerControl()
 {
-    GlobalComboBox *gc = new GlobalComboBox("MixerControl", true);
+    HostComboBox *gc = new HostComboBox("MixerControl", true);
     gc->setLabel(QObject::tr("Mixer Controls"));
     for (unsigned int i = 0; i < sizeof(MixerControlControls) / sizeof(char*); 
          ++i) 
@@ -80,9 +80,9 @@ static GlobalComboBox *MixerControl()
     return gc;
 }
 
-static GlobalSlider *MixerVolume()
+static HostSlider *MixerVolume()
 {
-    GlobalSlider *gs = new GlobalSlider("MasterMixerVolume", 0, 100, 1);
+    HostSlider *gs = new HostSlider("MasterMixerVolume", 0, 100, 1);
     gs->setLabel(QObject::tr("Master Mixer Volume"));
     gs->setValue(70);
     gs->setHelpText(QObject::tr("Initial volume for the Master Mixer.  "
@@ -91,9 +91,9 @@ static GlobalSlider *MixerVolume()
     return gs;
 }
 
-static GlobalSlider *PCMVolume()
+static HostSlider *PCMVolume()
 {
-    GlobalSlider *gs = new GlobalSlider("PCMMixerVolume", 0, 100, 1);
+    HostSlider *gs = new HostSlider("PCMMixerVolume", 0, 100, 1);
     gs->setLabel(QObject::tr("PCM Mixer Volume"));
     gs->setValue(70);
     gs->setHelpText(QObject::tr("Initial volume for PCM output.  Using the "
@@ -101,9 +101,9 @@ static GlobalSlider *PCMVolume()
     return gs;
 }
 
-static GlobalCheckBox *IndividualMuteControl()
+static HostCheckBox *IndividualMuteControl()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("IndividualMuteControl");
+    HostCheckBox *gc = new HostCheckBox("IndividualMuteControl");
     gc->setLabel(QObject::tr("Independent Muting of Left and Right Audio "
                  "Channels"));
     gc->setValue(false);
@@ -115,9 +115,9 @@ static GlobalCheckBox *IndividualMuteControl()
     return gc;
 }
 
-static GlobalCheckBox *AC3PassThrough()
+static HostCheckBox *AC3PassThrough()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("AC3PassThru");
+    HostCheckBox *gc = new HostCheckBox("AC3PassThru");
     gc->setLabel(QObject::tr("Enable AC3 to SPDIF passthrough"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Enable sending AC3 audio directly to your "
@@ -127,9 +127,9 @@ static GlobalCheckBox *AC3PassThrough()
     return gc;
 }
 
-static GlobalCheckBox *Deinterlace()
+static HostCheckBox *Deinterlace()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("Deinterlace");
+    HostCheckBox *gc = new HostCheckBox("Deinterlace");
     gc->setLabel(QObject::tr("Deinterlace playback"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Make the video look normal on a progressive "
@@ -137,9 +137,9 @@ static GlobalCheckBox *Deinterlace()
     return gc;
 }
 
-static GlobalComboBox *DeinterlaceFilter()
+static HostComboBox *DeinterlaceFilter()
 {
-    GlobalComboBox *gc = new GlobalComboBox("DeinterlaceFilter", false);
+    HostComboBox *gc = new HostComboBox("DeinterlaceFilter", false);
     gc->setLabel(QObject::tr("Algorithm"));
     gc->addSelection(QObject::tr("Linear blend"), "linearblend");
     gc->addSelection(QObject::tr("Kernel (less motion blur)"), "kerneldeint");
@@ -169,9 +169,9 @@ public:
     }
 };
 
-static GlobalLineEdit *CustomFilters()
+static HostLineEdit *CustomFilters()
 {
-    GlobalLineEdit *ge = new GlobalLineEdit("CustomFilters");
+    HostLineEdit *ge = new HostLineEdit("CustomFilters");
     ge->setLabel(QObject::tr("Custom Filters"));
     ge->setValue("");
     ge->setHelpText(QObject::tr("Advanced Filter configuration, format:\n"
@@ -179,9 +179,9 @@ static GlobalLineEdit *CustomFilters()
     return ge;
 }
 
-static GlobalCheckBox *DecodeExtraAudio()
+static HostCheckBox *DecodeExtraAudio()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("DecodeExtraAudio");
+    HostCheckBox *gc = new HostCheckBox("DecodeExtraAudio");
     gc->setLabel(QObject::tr("Extra audio buffering"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Enable this setting if MythTV is playing "
@@ -193,9 +193,9 @@ static GlobalCheckBox *DecodeExtraAudio()
     return gc;
 }
 
-static GlobalComboBox *PIPLocation()
+static HostComboBox *PIPLocation()
 {
-    GlobalComboBox *gc = new GlobalComboBox("PIPLocation");
+    HostComboBox *gc = new HostComboBox("PIPLocation");
     gc->setLabel(QObject::tr("PIP Video Location"));
     gc->addSelection(QObject::tr("Top Left"), "0");
     gc->addSelection(QObject::tr("Bottom Left"), "1");
@@ -205,9 +205,9 @@ static GlobalComboBox *PIPLocation()
     return gc;
 }
 
-static BackendLineEdit *AllRecGroupPassword()
+static GlobalLineEdit *AllRecGroupPassword()
 {
-    BackendLineEdit *be = new BackendLineEdit("AllRecGroupPassword");
+    GlobalLineEdit *be = new GlobalLineEdit("AllRecGroupPassword");
     be->setLabel(QObject::tr("Password required to view all recordings"));
     be->setValue("");
     be->setHelpText(QObject::tr("If given, a password must be entered to "
@@ -215,9 +215,9 @@ static BackendLineEdit *AllRecGroupPassword()
     return be;
 }
 
-static GlobalComboBox *DisplayRecGroup()
+static HostComboBox *DisplayRecGroup()
 {
-    GlobalComboBox *gc = new GlobalComboBox("DisplayRecGroup");
+    HostComboBox *gc = new HostComboBox("DisplayRecGroup");
     gc->setLabel(QObject::tr("Default Recording Group to display"));
 
     gc->addSelection(QObject::tr("All Programs"), QString("All Programs"));
@@ -240,9 +240,9 @@ static GlobalComboBox *DisplayRecGroup()
     return gc;
 }
 
-static GlobalCheckBox *RememberRecGroup()
+static HostCheckBox *RememberRecGroup()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("RememberRecGroup");
+    HostCheckBox *gc = new HostCheckBox("RememberRecGroup");
     gc->setLabel(QObject::tr("Save current Recording Group view when changed"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("Remember the last selected Recording "
@@ -252,9 +252,9 @@ static GlobalCheckBox *RememberRecGroup()
     return gc;
 }
 
-static GlobalCheckBox *UseCategoriesAsRecGroups()
+static HostCheckBox *UseCategoriesAsRecGroups()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("UseCategoriesAsRecGroups");
+    HostCheckBox *gc = new HostCheckBox("UseCategoriesAsRecGroups");
     gc->setLabel(QObject::tr("Use program categories as display groups"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Add the list of program categories to the "
@@ -264,9 +264,9 @@ static GlobalCheckBox *UseCategoriesAsRecGroups()
     return gc;
 }
 
-static GlobalCheckBox *UseGroupNameAsAllPrograms()
+static HostCheckBox *UseGroupNameAsAllPrograms()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("DispRecGroupAsAllProg");
+    HostCheckBox *gc = new HostCheckBox("DispRecGroupAsAllProg");
     gc->setLabel(QObject::tr("Show group name instead of \"All Programs\""));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Use the name of the display group currently "
@@ -275,9 +275,9 @@ static GlobalCheckBox *UseGroupNameAsAllPrograms()
     return gc;
 }
 
-static GlobalCheckBox *PBBStartInTitle()
+static HostCheckBox *PBBStartInTitle()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("PlaybackBoxStartInTitle");
+    HostCheckBox *gc = new HostCheckBox("PlaybackBoxStartInTitle");
     gc->setLabel(QObject::tr("Start in Title section"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("If enabled, the selector highlight will "
@@ -286,9 +286,9 @@ static GlobalCheckBox *PBBStartInTitle()
     return gc;
 }
 
-static GlobalCheckBox *PBBShowGroupSummary()
+static HostCheckBox *PBBShowGroupSummary()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("ShowGroupInfo");
+    HostCheckBox *gc = new HostCheckBox("ShowGroupInfo");
     gc->setLabel(QObject::tr("Show group summary"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("While selecting a group, show a group "
@@ -297,9 +297,9 @@ static GlobalCheckBox *PBBShowGroupSummary()
     return gc;
 }
 
-static GlobalSpinBox *JumpAmount()
+static HostSpinBox *JumpAmount()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("JumpAmount", 1, 30, 5, true);
+    HostSpinBox *gs = new HostSpinBox("JumpAmount", 1, 30, 5, true);
     gs->setLabel(QObject::tr("Jump amount (in minutes)"));
     gs->setValue(10);
     gs->setHelpText(QObject::tr("How many minutes to jump forward or backward "
@@ -307,9 +307,9 @@ static GlobalSpinBox *JumpAmount()
     return gs;
 }
 
-static GlobalSpinBox *FastForwardAmount()
+static HostSpinBox *FastForwardAmount()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("FastForwardAmount", 1, 600, 5, 
+    HostSpinBox *gs = new HostSpinBox("FastForwardAmount", 1, 600, 5, 
                                             true);
     gs->setLabel(QObject::tr("Fast forward amount (in seconds)"));
     gs->setValue(30);
@@ -318,9 +318,9 @@ static GlobalSpinBox *FastForwardAmount()
     return gs;
 }
 
-static GlobalSpinBox *RewindAmount()
+static HostSpinBox *RewindAmount()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("RewindAmount", 1, 600, 5, true);
+    HostSpinBox *gs = new HostSpinBox("RewindAmount", 1, 600, 5, true);
     gs->setLabel(QObject::tr("Rewind amount (in seconds)"));
     gs->setValue(5);
     gs->setHelpText(QObject::tr("How many seconds to skip backward on a "
@@ -328,9 +328,9 @@ static GlobalSpinBox *RewindAmount()
     return gs;
 }
 
-static GlobalCheckBox *SmartForward()
+static HostCheckBox *SmartForward()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("SmartForward");
+    HostCheckBox *gc = new HostCheckBox("SmartForward");
     gc->setLabel(QObject::tr("Smart Fast Forwarding"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If enabled, then immediately after "
@@ -339,9 +339,9 @@ static GlobalCheckBox *SmartForward()
     return gc;
 }
 
-static GlobalCheckBox *ExactSeeking()
+static HostCheckBox *ExactSeeking()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("ExactSeeking");
+    HostCheckBox *gc = new HostCheckBox("ExactSeeking");
     gc->setLabel(QObject::tr("Seek to exact frame"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If enabled, seeking is frame exact, but "
@@ -349,9 +349,9 @@ static GlobalCheckBox *ExactSeeking()
     return gc;
 }
 
-static BackendComboBox *CommercialSkipMethod()
+static GlobalComboBox *CommercialSkipMethod()
 {
-    BackendComboBox *bc = new BackendComboBox("CommercialSkipMethod");
+    GlobalComboBox *bc = new GlobalComboBox("CommercialSkipMethod");
     bc->setLabel(QObject::tr("Commercial Skip Method"));
     bc->addSelection(QObject::tr("Blank Frame Detection (default)"), "1");
     bc->addSelection(QObject::tr("Blank Frame + Scene Change Detection"), "3");
@@ -365,9 +365,9 @@ static BackendComboBox *CommercialSkipMethod()
     return bc;
 }
 
-static GlobalComboBox *AutoCommercialSkip()
+static HostComboBox *AutoCommercialSkip()
 {
-    GlobalComboBox *gc = new GlobalComboBox("AutoCommercialSkip");
+    HostComboBox *gc = new HostComboBox("AutoCommercialSkip");
     gc->setLabel(QObject::tr("Automatically Skip Commercials"));
     gc->addSelection(QObject::tr("Off"), "0");
     gc->addSelection(QObject::tr("Notify, but do not skip"), "2");
@@ -379,9 +379,9 @@ static GlobalComboBox *AutoCommercialSkip()
     return gc;
 }
 
-static GlobalCheckBox *TryUnflaggedSkip()
+static HostCheckBox *TryUnflaggedSkip()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("TryUnflaggedSkip");
+    HostCheckBox *gc = new HostCheckBox("TryUnflaggedSkip");
     gc->setLabel(QObject::tr("Skip Unflagged Commercials"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Try to skip commercial breaks even if they "
@@ -391,9 +391,9 @@ static GlobalCheckBox *TryUnflaggedSkip()
     return gc;
 }
 
-static BackendCheckBox *AutoCommercialFlag()
+static GlobalCheckBox *AutoCommercialFlag()
 {
-    BackendCheckBox *bc = new BackendCheckBox("AutoCommercialFlag");
+    GlobalCheckBox *bc = new GlobalCheckBox("AutoCommercialFlag");
     bc->setLabel(QObject::tr("Automatically Flag Commercials"));
     bc->setValue(true);
     bc->setHelpText(QObject::tr("This is the default policy used for the Auto-"
@@ -402,9 +402,9 @@ static BackendCheckBox *AutoCommercialFlag()
     return bc;
 }
 
-static BackendCheckBox *AggressiveCommDetect()
+static GlobalCheckBox *AggressiveCommDetect()
 {
-    BackendCheckBox *bc = new BackendCheckBox("AggressiveCommDetect");
+    GlobalCheckBox *bc = new GlobalCheckBox("AggressiveCommDetect");
     bc->setLabel(QObject::tr("Strict Commercial Detection"));
     bc->setValue(true);
     bc->setHelpText(QObject::tr("Enable stricter Commercial Detection code.  "
@@ -412,9 +412,9 @@ static BackendCheckBox *AggressiveCommDetect()
     return bc;
 }
 
-static BackendCheckBox *CommSkipAllBlanks()
+static GlobalCheckBox *CommSkipAllBlanks()
 {
-    BackendCheckBox *bc = new BackendCheckBox("CommSkipAllBlanks");
+    GlobalCheckBox *bc = new GlobalCheckBox("CommSkipAllBlanks");
     bc->setLabel(QObject::tr("Skip blank frames after commercials"));
     bc->setValue(true);
     bc->setHelpText(QObject::tr("When using Blank Frame Detection and "
@@ -423,9 +423,9 @@ static BackendCheckBox *CommSkipAllBlanks()
     return bc;
 }
 
-static GlobalSpinBox *CommRewindAmount()
+static HostSpinBox *CommRewindAmount()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("CommRewindAmount", 0, 10, 1);
+    HostSpinBox *gs = new HostSpinBox("CommRewindAmount", 0, 10, 1);
     gs->setLabel(QObject::tr("Commercial Skip Auto-Rewind Amount"));
     gs->setHelpText(QObject::tr("If set, Myth will automatically rewind "
                     "this many seconds after performing a commercial skip."));
@@ -433,9 +433,9 @@ static GlobalSpinBox *CommRewindAmount()
     return gs;
 }
 
-static GlobalSpinBox *CommNotifyAmount()
+static HostSpinBox *CommNotifyAmount()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("CommNotifyAmount", 0, 10, 1);
+    HostSpinBox *gs = new HostSpinBox("CommNotifyAmount", 0, 10, 1);
     gs->setLabel(QObject::tr("Commercial Skip Notify Amount"));
     gs->setHelpText(QObject::tr("If set, MythTV will act like a commercial "
                     "begins this many seconds early.  This can be useful "
@@ -445,9 +445,9 @@ static GlobalSpinBox *CommNotifyAmount()
     return gs;
 }
 
-static BackendSpinBox *AutoExpireDiskThreshold()
+static GlobalSpinBox *AutoExpireDiskThreshold()
 {
-    BackendSpinBox *bs = new BackendSpinBox("AutoExpireDiskThreshold", 
+    GlobalSpinBox *bs = new GlobalSpinBox("AutoExpireDiskThreshold", 
                                             0, 200, 1);
     bs->setLabel(QObject::tr("Auto Expire Free Disk Space Threshold "
                  "(in Gigabytes)"));
@@ -458,9 +458,9 @@ static BackendSpinBox *AutoExpireDiskThreshold()
     return bs;
 };
 
-static BackendSpinBox *AutoExpireFrequency()
+static GlobalSpinBox *AutoExpireFrequency()
 {
-    BackendSpinBox *bs = new BackendSpinBox("AutoExpireFrequency", 1, 60, 10, 
+    GlobalSpinBox *bs = new GlobalSpinBox("AutoExpireFrequency", 1, 60, 10, 
                                             true);
     bs->setLabel(QObject::tr("Auto Expire Frequency (in minutes)"));
     bs->setHelpText(QObject::tr("How often the AutoExpire process "
@@ -469,9 +469,9 @@ static BackendSpinBox *AutoExpireFrequency()
     return bs;
 }
 
-static BackendComboBox *AutoExpireMethod()
+static GlobalComboBox *AutoExpireMethod()
 {
-    BackendComboBox *bc = new BackendComboBox("AutoExpireMethod");
+    GlobalComboBox *bc = new GlobalComboBox("AutoExpireMethod");
     bc->setLabel(QObject::tr("Auto Expire Method"));
     bc->addSelection(QObject::tr("Oldest Show First"), "1");
     bc->setHelpText(QObject::tr("Method used to determine which recorded "
@@ -479,9 +479,9 @@ static BackendComboBox *AutoExpireMethod()
     return bc;
 }
 
-static BackendCheckBox *AutoExpireDefault()
+static GlobalCheckBox *AutoExpireDefault()
 {
-    BackendCheckBox *bc = new BackendCheckBox("AutoExpireDefault");
+    GlobalCheckBox *bc = new GlobalCheckBox("AutoExpireDefault");
     bc->setLabel(QObject::tr("Auto-Expire Default"));
     bc->setValue(true);
     bc->setHelpText(QObject::tr("When enabled, any newly recorded programs "
@@ -490,9 +490,9 @@ static BackendCheckBox *AutoExpireDefault()
     return bc;
 }
 
-static BackendSpinBox *MinRecordDiskThreshold()
+static GlobalSpinBox *MinRecordDiskThreshold()
 {
-    BackendSpinBox *bs = new BackendSpinBox("MinRecordDiskThreshold",
+    GlobalSpinBox *bs = new GlobalSpinBox("MinRecordDiskThreshold",
                                             0, 1000000, 100);
     bs->setLabel(QObject::tr("New Recording Free Disk Space Threshold "
                  "(in Megabytes)"));
@@ -503,9 +503,9 @@ static BackendSpinBox *MinRecordDiskThreshold()
     return bs;
 }
 
-static BackendCheckBox *RerecordAutoExpired()
+static GlobalCheckBox *RerecordAutoExpired()
 {
-    BackendCheckBox *bc = new BackendCheckBox("RerecordAutoExpired");
+    GlobalCheckBox *bc = new GlobalCheckBox("RerecordAutoExpired");
     bc->setLabel(QObject::tr("Re-record programs which have been "
                              "automatically expired"));
     bc->setValue(false);
@@ -515,9 +515,9 @@ static BackendCheckBox *RerecordAutoExpired()
     return bc;
 }
 
-static BackendSpinBox *RecordPreRoll()
+static GlobalSpinBox *RecordPreRoll()
 {
-    BackendSpinBox *bs = new BackendSpinBox("RecordPreRoll", 0, 600, 60, true);
+    GlobalSpinBox *bs = new GlobalSpinBox("RecordPreRoll", 0, 600, 60, true);
     bs->setLabel(QObject::tr("Time to record before start of show "
                  "(in seconds)"));
     bs->setHelpText(QObject::tr("This global setting is ignored in case of "
@@ -526,9 +526,9 @@ static BackendSpinBox *RecordPreRoll()
     return bs;
 }
 
-static BackendSpinBox *RecordOverTime()
+static GlobalSpinBox *RecordOverTime()
 {
-    BackendSpinBox *bs = new BackendSpinBox("RecordOverTime", 0, 1800, 60, true);
+    GlobalSpinBox *bs = new GlobalSpinBox("RecordOverTime", 0, 1800, 60, true);
     bs->setLabel(QObject::tr("Time to record past end of show (in seconds)"));
     bs->setValue(0);
     bs->setHelpText(QObject::tr("This global setting is ignored in case of "
@@ -536,9 +536,9 @@ static BackendSpinBox *RecordOverTime()
     return bs;
 }
 
-static GlobalCheckBox *PlayBoxOrdering()
+static HostCheckBox *PlayBoxOrdering()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("PlayBoxOrdering");
+    HostCheckBox *gc = new HostCheckBox("PlayBoxOrdering");
     gc->setLabel(QObject::tr("List Newest Recording First"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("When enabled, the most recent recording "
@@ -548,9 +548,9 @@ static GlobalCheckBox *PlayBoxOrdering()
     return gc;
 }
 
-static GlobalComboBox *PlayBoxEpisodeSort()
+static HostComboBox *PlayBoxEpisodeSort()
 {
-    GlobalComboBox *gc = new GlobalComboBox("PlayBoxEpisodeSort");
+    HostComboBox *gc = new HostComboBox("PlayBoxEpisodeSort");
     gc->setLabel(QObject::tr("Sort Episodes"));
     gc->addSelection(QObject::tr("Record date"), "Date");
     gc->addSelection(QObject::tr("Program ID"), "Id");
@@ -570,9 +570,9 @@ class PlayBoxSettings: public HorizontalConfigurationGroup
     }
 };
 
-static GlobalCheckBox *StickyKeys()
+static HostCheckBox *StickyKeys()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("StickyKeys");
+    HostCheckBox *gc = new HostCheckBox("StickyKeys");
     gc->setLabel(QObject::tr("Sticky keys"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If enabled, fast forward and rewind "
@@ -583,9 +583,9 @@ static GlobalCheckBox *StickyKeys()
     return gc;
 }
 
-static GlobalCheckBox *FFRewRepos()
+static HostCheckBox *FFRewRepos()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("FFRewRepos");
+    HostCheckBox *gc = new HostCheckBox("FFRewRepos");
     gc->setLabel(QObject::tr("Reposition after fast forward/rewind"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("When exiting sticky keys fast forward/rewind "
@@ -595,9 +595,9 @@ static GlobalCheckBox *FFRewRepos()
     return gc;
 }
 
-static GlobalCheckBox *FFRewReverse()
+static HostCheckBox *FFRewReverse()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("FFRewReverse");
+    HostCheckBox *gc = new HostCheckBox("FFRewReverse");
     gc->setLabel(QObject::tr("Reverse direction in fast forward/rewind"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("If enabled, pressing the sticky rewind key "
@@ -608,9 +608,9 @@ static GlobalCheckBox *FFRewReverse()
     return gc; 
 }
 
-static GlobalSpinBox *OSDDisplayTime()
+static HostSpinBox *OSDDisplayTime()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("OSDDisplayTime", 0, 30, 1);
+    HostSpinBox *gs = new HostSpinBox("OSDDisplayTime", 0, 30, 1);
     gs->setLabel(QObject::tr("Number of seconds for OSD information"));
     gs->setValue(3);
     gs->setHelpText(QObject::tr("How long the program information remains on "
@@ -618,9 +618,9 @@ static GlobalSpinBox *OSDDisplayTime()
     return gs;
 }
 
-static GlobalComboBox *MenuTheme()
+static HostComboBox *MenuTheme()
 {
-    GlobalComboBox *gc = new GlobalComboBox("MenuTheme");
+    HostComboBox *gc = new HostComboBox("MenuTheme");
     gc->setLabel(QObject::tr("Menu theme"));
 
     QDir themes(gContext->GetThemesParentDir());
@@ -645,9 +645,9 @@ static GlobalComboBox *MenuTheme()
     return gc;
 }
 
-static GlobalComboBox *OSDTheme()
+static HostComboBox *OSDTheme()
 {
-    GlobalComboBox *gc = new GlobalComboBox("OSDTheme");
+    HostComboBox *gc = new HostComboBox("OSDTheme");
     gc->setLabel(QObject::tr("OSD theme"));
 
     QDir themes(gContext->GetThemesParentDir());
@@ -672,9 +672,9 @@ static GlobalComboBox *OSDTheme()
     return gc;
 }
 
-static GlobalComboBox *OSDFont()
+static HostComboBox *OSDFont()
 {
-    GlobalComboBox *gc = new GlobalComboBox("OSDFont");
+    HostComboBox *gc = new HostComboBox("OSDFont");
     gc->setLabel(QObject::tr("OSD font"));
     QDir ttf(gContext->GetFontsDir(), gContext->GetFontsNameFilter());
     gc->fillSelectionsFromDir(ttf, false);
@@ -682,9 +682,9 @@ static GlobalComboBox *OSDFont()
     return gc;
 }
 
-static GlobalComboBox *OSDCCFont()
+static HostComboBox *OSDCCFont()
 {
-    GlobalComboBox *gc = new GlobalComboBox("OSDCCFont");
+    HostComboBox *gc = new HostComboBox("OSDCCFont");
     gc->setLabel(QObject::tr("Closed Caption font"));
     QDir ttf(gContext->GetFontsDir(), gContext->GetFontsNameFilter());
     gc->fillSelectionsFromDir(ttf, false);
@@ -692,9 +692,9 @@ static GlobalComboBox *OSDCCFont()
     return gc;
 }
 
-static GlobalComboBox *OSDThemeFontSizeType()
+static HostComboBox *OSDThemeFontSizeType()
 {
-    GlobalComboBox *gc = new GlobalComboBox("OSDThemeFontSizeType");
+    HostComboBox *gc = new HostComboBox("OSDThemeFontSizeType");
     gc->setLabel(QObject::tr("Font size"));
     gc->addSelection(QObject::tr("default"), "default");
     gc->addSelection(QObject::tr("small"), "small");
@@ -703,9 +703,9 @@ static GlobalComboBox *OSDThemeFontSizeType()
     return gc;
 }
 
-static GlobalComboBox *ChannelOrdering()
+static HostComboBox *ChannelOrdering()
 {
-    GlobalComboBox *gc = new GlobalComboBox("ChannelOrdering");
+    HostComboBox *gc = new HostComboBox("ChannelOrdering");
     gc->setLabel(QObject::tr("Channel ordering"));
     gc->addSelection(QObject::tr("channel number (numeric)"), "channum + 0");
     gc->addSelection(QObject::tr("channel number (alpha)"), "channum");
@@ -714,9 +714,9 @@ static GlobalComboBox *ChannelOrdering()
     return gc;
 }
 
-static GlobalSpinBox *VertScanPercentage()
+static HostSpinBox *VertScanPercentage()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("VertScanPercentage", -100, 100, 1);
+    HostSpinBox *gs = new HostSpinBox("VertScanPercentage", -100, 100, 1);
     gs->setLabel(QObject::tr("Vertical over/underscan percentage"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("Adjust this if the image does not fill your "
@@ -724,9 +724,9 @@ static GlobalSpinBox *VertScanPercentage()
     return gs;
 }
 
-static GlobalSpinBox *HorizScanPercentage()
+static HostSpinBox *HorizScanPercentage()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("HorizScanPercentage", -100, 100, 1);
+    HostSpinBox *gs = new HostSpinBox("HorizScanPercentage", -100, 100, 1);
     gs->setLabel(QObject::tr("Horizontal over/underscan percentage"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("Adjust this if the image does not fill your "
@@ -734,27 +734,27 @@ static GlobalSpinBox *HorizScanPercentage()
     return gs;
 };
 
-static GlobalSpinBox *XScanDisplacement()
+static HostSpinBox *XScanDisplacement()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("XScanDisplacement", -50, 50, 1);
+    HostSpinBox *gs = new HostSpinBox("XScanDisplacement", -50, 50, 1);
     gs->setLabel(QObject::tr("Scan displacement (X)"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("Adjust this to move the image horizontally."));
     return gs; 
 }
 
-static GlobalSpinBox *YScanDisplacement()
+static HostSpinBox *YScanDisplacement()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("YScanDisplacement", -50, 50, 1);
+    HostSpinBox *gs = new HostSpinBox("YScanDisplacement", -50, 50, 1);
     gs->setLabel(QObject::tr("Scan displacement (Y)"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("Adjust this to move the image vertically."));
     return gs;
 };
 
-static GlobalCheckBox *UseMPEG2Dec()
+static HostCheckBox *UseMPEG2Dec()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("UseMPEG2Dec");
+    HostCheckBox *gc = new HostCheckBox("UseMPEG2Dec");
     gc->setLabel(QObject::tr("Use libmpeg2 for decoding"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If enabled, libmpeg2 will be used instead "
@@ -763,9 +763,9 @@ static GlobalCheckBox *UseMPEG2Dec()
     return gc;
 }
 
-static GlobalCheckBox *UseVideoTimebase()
+static HostCheckBox *UseVideoTimebase()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("UseVideoTimebase");
+    HostCheckBox *gc = new HostCheckBox("UseVideoTimebase");
     gc->setLabel(QObject::tr("Use video as timebase"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Use the video as the timebase and warp "
@@ -773,9 +773,9 @@ static GlobalCheckBox *UseVideoTimebase()
     return gc;
 }
 
-static GlobalCheckBox *CCBackground()
+static HostCheckBox *CCBackground()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("CCBackground");
+    HostCheckBox *gc = new HostCheckBox("CCBackground");
     gc->setLabel(QObject::tr("Black background for Closed Captioning"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If enabled, captions will be displayed "
@@ -784,9 +784,9 @@ static GlobalCheckBox *CCBackground()
     return gc;
 }
 
-static GlobalCheckBox *DefaultCCMode()
+static HostCheckBox *DefaultCCMode()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("DefaultCCMode");
+    HostCheckBox *gc = new HostCheckBox("DefaultCCMode");
     gc->setLabel(QObject::tr("Always display Closed Captioning"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If enabled, captions will be displayed "
@@ -796,9 +796,9 @@ static GlobalCheckBox *DefaultCCMode()
     return gc;
 }
 
-static GlobalCheckBox *PersistentBrowseMode()
+static HostCheckBox *PersistentBrowseMode()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("PersistentBrowseMode");
+    HostCheckBox *gc = new HostCheckBox("PersistentBrowseMode");
     gc->setLabel(QObject::tr("Always use Browse mode when changing channels "
                  "in LiveTV"));
     gc->setValue(false);
@@ -808,9 +808,9 @@ static GlobalCheckBox *PersistentBrowseMode()
     return gc;
 }
 
-static GlobalCheckBox *AggressiveBuffer()
+static HostCheckBox *AggressiveBuffer()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("AggressiveSoundcardBuffer");
+    HostCheckBox *gc = new HostCheckBox("AggressiveSoundcardBuffer");
     gc->setLabel(QObject::tr("Aggressive Soundcard Buffering"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If enabled, MythTV will pretend to have "
@@ -820,9 +820,9 @@ static GlobalCheckBox *AggressiveBuffer()
     return gc;
 }
 
-static GlobalCheckBox *ClearSavedPosition()
+static HostCheckBox *ClearSavedPosition()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("ClearSavedPosition");
+    HostCheckBox *gc = new HostCheckBox("ClearSavedPosition");
     gc->setLabel(QObject::tr("Clear Saved Position on playback"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("Automatically clear saved position on a "
@@ -832,9 +832,9 @@ static GlobalCheckBox *ClearSavedPosition()
     return gc;
 }
 
-static GlobalCheckBox *AltClearSavedPosition()
+static HostCheckBox *AltClearSavedPosition()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("AltClearSavedPosition");
+    HostCheckBox *gc = new HostCheckBox("AltClearSavedPosition");
     gc->setLabel(QObject::tr("Alternate Clear Saved Position"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("During playback the Select key "
@@ -845,9 +845,9 @@ static GlobalCheckBox *AltClearSavedPosition()
     return gc;
 }
 
-static GlobalCheckBox *UsePicControls()
+static HostCheckBox *UsePicControls()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("UseOutputPictureControls");
+    HostCheckBox *gc = new HostCheckBox("UseOutputPictureControls");
     gc->setLabel(QObject::tr("Use Xv picture controls"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If enabled, Xv picture controls (brightness, "
@@ -858,9 +858,9 @@ static GlobalCheckBox *UsePicControls()
     return gc;
 }
 
-static GlobalCheckBox *CCWarnSetting()
+static HostCheckBox *CCWarnSetting()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("CCBufferWarnings");
+    HostCheckBox *gc = new HostCheckBox("CCBufferWarnings");
     gc->setLabel(QObject::tr("Enable channel change buffer warnings"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If enabled, MythTV will warn you whenever you "
@@ -868,9 +868,9 @@ static GlobalCheckBox *CCWarnSetting()
     return gc;
 }
 
-static GlobalLineEdit *UDPNotifyPort()
+static HostLineEdit *UDPNotifyPort()
 {
-    GlobalLineEdit *ge = new GlobalLineEdit("UDPNotifyPort");
+    HostLineEdit *ge = new HostLineEdit("UDPNotifyPort");
     ge->setLabel(QObject::tr("UDP Notify Port"));
     ge->setValue("6948");
     ge->setHelpText(QObject::tr("During playback, MythTV will listen for "
@@ -880,9 +880,9 @@ static GlobalLineEdit *UDPNotifyPort()
     return ge;
 }
 
-static GlobalComboBox *PlaybackExitPrompt()
+static HostComboBox *PlaybackExitPrompt()
 {
-    GlobalComboBox *gc = new GlobalComboBox("PlaybackExitPrompt");
+    HostComboBox *gc = new HostComboBox("PlaybackExitPrompt");
     gc->setLabel(QObject::tr("Action on playback exit"));
     gc->addSelection(QObject::tr("Just exit"), "0");
     gc->addSelection(QObject::tr("Save position and exit"), "2");
@@ -894,9 +894,9 @@ static GlobalComboBox *PlaybackExitPrompt()
     return gc;
 }
 
-static GlobalCheckBox *EndOfRecordingExitPrompt()
+static HostCheckBox *EndOfRecordingExitPrompt()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("EndOfRecordingExitPrompt");
+    HostCheckBox *gc = new HostCheckBox("EndOfRecordingExitPrompt");
     gc->setLabel(QObject::tr("Prompt at end of recording"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If set, a "
@@ -905,9 +905,9 @@ static GlobalCheckBox *EndOfRecordingExitPrompt()
     return gc;
 }
 
-static GlobalCheckBox *GeneratePreviewPixmaps()
+static HostCheckBox *GeneratePreviewPixmaps()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("GeneratePreviewPixmaps");
+    HostCheckBox *gc = new HostCheckBox("GeneratePreviewPixmaps");
     gc->setLabel(QObject::tr("Generate thumbnail preview images of "
                  "recordings"));
     gc->setValue(false);
@@ -916,9 +916,9 @@ static GlobalCheckBox *GeneratePreviewPixmaps()
     return gc;
 }
 
-static BackendSpinBox *PreviewPixmapOffset()
+static GlobalSpinBox *PreviewPixmapOffset()
 {
-    BackendSpinBox *bs = new BackendSpinBox("PreviewPixmapOffset", 0, 600, 1);
+    GlobalSpinBox *bs = new GlobalSpinBox("PreviewPixmapOffset", 0, 600, 1);
     bs->setLabel(QObject::tr("Time offset for thumbnail preview images"));
     bs->setHelpText(QObject::tr("MythTV will make a thumbnail image this "
                     "many seconds from the beginning of the recording. "
@@ -927,9 +927,9 @@ static BackendSpinBox *PreviewPixmapOffset()
     return bs;
 }
 
-static GlobalCheckBox *PlaybackPreview()
+static HostCheckBox *PlaybackPreview()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("PlaybackPreview");
+    HostCheckBox *gc = new HostCheckBox("PlaybackPreview");
     gc->setLabel(QObject::tr("Display live preview of recordings"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("When enabled, a preview of the recording "
@@ -938,9 +938,9 @@ static GlobalCheckBox *PlaybackPreview()
     return gc;
 }
 
-static GlobalCheckBox *PlayBoxTransparency()
+static HostCheckBox *PlayBoxTransparency()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("PlayBoxTransparency");
+    HostCheckBox *gc = new HostCheckBox("PlayBoxTransparency");
     gc->setLabel(QObject::tr("Use Transparent Boxes"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("If enabled, the Watch Recording and Delete "
@@ -950,9 +950,9 @@ static GlobalCheckBox *PlayBoxTransparency()
     return gc;
 }
 
-static GlobalComboBox *PlayBoxShading()
+static HostComboBox *PlayBoxShading()
 {
-    GlobalComboBox *gc = new GlobalComboBox("PlayBoxShading");
+    HostComboBox *gc = new HostComboBox("PlayBoxShading");
     gc->setLabel(QObject::tr("Popup Background Shading Method"));
     gc->addSelection(QObject::tr("Fill"), "0");
     gc->addSelection(QObject::tr("Image"), "1");
@@ -964,9 +964,9 @@ static GlobalComboBox *PlayBoxShading()
     return gc;
 }
 
-static GlobalComboBox *AllowQuitShutdown()
+static HostComboBox *AllowQuitShutdown()
 {
-    GlobalComboBox *gc = new GlobalComboBox("AllowQuitShutdown");
+    HostComboBox *gc = new HostComboBox("AllowQuitShutdown");
     gc->setLabel(QObject::tr("System Exit key"));
     gc->addSelection(QObject::tr("ESC"), "4");
     gc->addSelection(QObject::tr("No exit key"), "0");
@@ -980,9 +980,9 @@ static GlobalComboBox *AllowQuitShutdown()
     return gc;
 }
 
-static GlobalCheckBox *NoPromptOnExit()
+static HostCheckBox *NoPromptOnExit()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("NoPromptOnExit");
+    HostCheckBox *gc = new HostCheckBox("NoPromptOnExit");
     gc->setLabel(QObject::tr("Confirm Exit"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("When enabled, MythTV will prompt "
@@ -991,9 +991,9 @@ static GlobalCheckBox *NoPromptOnExit()
     return gc;
 }
 
-static GlobalLineEdit *HaltCommand()
+static HostLineEdit *HaltCommand()
 {
-    GlobalLineEdit *ge = new GlobalLineEdit("HaltCommand");
+    HostLineEdit *ge = new HostLineEdit("HaltCommand");
     ge->setLabel(QObject::tr("Halt command"));
     ge->setValue("halt");
     ge->setHelpText(QObject::tr("If you have configured an exit key using the "
@@ -1003,9 +1003,9 @@ static GlobalLineEdit *HaltCommand()
     return ge;
 }
 
-static GlobalLineEdit *LircKeyPressedApp()
+static HostLineEdit *LircKeyPressedApp()
 {
-    GlobalLineEdit *ge = new GlobalLineEdit("LircKeyPressedApp");
+    HostLineEdit *ge = new HostLineEdit("LircKeyPressedApp");
     ge->setLabel(QObject::tr("Keypress Application"));
     ge->setValue("");
     ge->setHelpText(QObject::tr("External application or script to run when "
@@ -1013,9 +1013,9 @@ static GlobalLineEdit *LircKeyPressedApp()
     return ge;
 }
 
-static GlobalCheckBox *UseArrowAccels()
+static HostCheckBox *UseArrowAccels()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("UseArrowAccels");
+    HostCheckBox *gc = new HostCheckBox("UseArrowAccels");
     gc->setLabel(QObject::tr("Use Arrow Key Accelerators"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("If enabled, Arrow key accelerators will "
@@ -1024,9 +1024,9 @@ static GlobalCheckBox *UseArrowAccels()
     return gc;
 }
 
-static GlobalLineEdit *SetupPinCode()
+static HostLineEdit *SetupPinCode()
 {
-    GlobalLineEdit *ge = new GlobalLineEdit("SetupPinCode");
+    HostLineEdit *ge = new HostLineEdit("SetupPinCode");
     ge->setLabel(QObject::tr("Setup Pin Code"));
     ge->setHelpText(QObject::tr("This PIN is used to control access to the "
                     "setup menus. If you want to use this feature, then "
@@ -1035,9 +1035,9 @@ static GlobalLineEdit *SetupPinCode()
     return ge;
 }
 
-static GlobalCheckBox *SetupPinCodeRequired()
+static HostCheckBox *SetupPinCodeRequired()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("SetupPinCodeRequired");
+    HostCheckBox *gc = new HostCheckBox("SetupPinCodeRequired");
     gc->setLabel(QObject::tr("Require Setup PIN"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If set, you will not be able to return "
@@ -1046,9 +1046,9 @@ static GlobalCheckBox *SetupPinCodeRequired()
     return gc;
 }
 
-static GlobalSpinBox *XineramaScreen()
+static HostSpinBox *XineramaScreen()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("XineramaScreen", 0, 8, 1);
+    HostSpinBox *gs = new HostSpinBox("XineramaScreen", 0, 8, 1);
     gs->setLabel(QObject::tr("Xinerama screen"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("If using Xinerama, run only on the specified "
@@ -1056,9 +1056,9 @@ static GlobalSpinBox *XineramaScreen()
     return gs;
 }
 
-static GlobalComboBox *AspectOverride()
+static HostComboBox *AspectOverride()
 {
-    GlobalComboBox *gc = new GlobalComboBox("AspectOverride");
+    HostComboBox *gc = new HostComboBox("AspectOverride");
     gc->setLabel(QObject::tr("Aspect Override"));
     gc->addSelection(QObject::tr("Off"), "0");
     gc->addSelection(QObject::tr("4/3"), "1");
@@ -1078,9 +1078,9 @@ static GlobalComboBox *AspectOverride()
 
 // Theme settings
 
-static GlobalSpinBox *GuiWidth()
+static HostSpinBox *GuiWidth()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("GuiWidth", 0, 1920, 8, true);
+    HostSpinBox *gs = new HostSpinBox("GuiWidth", 0, 1920, 8, true);
     gs->setLabel(QObject::tr("GUI width (px)"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("The width of the GUI.  Do not make the GUI "
@@ -1089,9 +1089,9 @@ static GlobalSpinBox *GuiWidth()
     return gs;
 }
 
-static GlobalSpinBox *GuiHeight()
+static HostSpinBox *GuiHeight()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("GuiHeight", 0, 1600, 8, true);
+    HostSpinBox *gs = new HostSpinBox("GuiHeight", 0, 1600, 8, true);
     gs->setLabel(QObject::tr("GUI height (px)"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("The height of the GUI.  Do not make the GUI "
@@ -1100,9 +1100,9 @@ static GlobalSpinBox *GuiHeight()
     return gs;
 }
 
-static GlobalSpinBox *GuiOffsetX()
+static HostSpinBox *GuiOffsetX()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("GuiOffsetX", -1600, 1600, 8, true);
+    HostSpinBox *gs = new HostSpinBox("GuiOffsetX", -1600, 1600, 8, true);
     gs->setLabel(QObject::tr("GUI X offset"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("The horizontal offset the GUI will be "
@@ -1110,9 +1110,9 @@ static GlobalSpinBox *GuiOffsetX()
     return gs;
 }
 
-static GlobalSpinBox *GuiOffsetY()
+static HostSpinBox *GuiOffsetY()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("GuiOffsetY", -1600, 1600, 8, true);
+    HostSpinBox *gs = new HostSpinBox("GuiOffsetY", -1600, 1600, 8, true);
     gs->setLabel(QObject::tr("GUI Y offset"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("The vertical offset the GUI will be "
@@ -1120,9 +1120,9 @@ static GlobalSpinBox *GuiOffsetY()
     return gs;
 }
 
-static GlobalSpinBox *DisplaySizeWidth()
+static HostSpinBox *DisplaySizeWidth()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("DisplaySizeWidth", 0, 10000, 1);
+    HostSpinBox *gs = new HostSpinBox("DisplaySizeWidth", 0, 10000, 1);
     gs->setLabel(QObject::tr("Display Size - Width"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("Horizontal size of the monitor or TV, is used "
@@ -1131,9 +1131,9 @@ static GlobalSpinBox *DisplaySizeWidth()
     return gs;
 }
 
-static GlobalSpinBox *DisplaySizeHeight()
+static HostSpinBox *DisplaySizeHeight()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("DisplaySizeHeight", 0, 10000, 1);
+    HostSpinBox *gs = new HostSpinBox("DisplaySizeHeight", 0, 10000, 1);
     gs->setLabel(QObject::tr("Display Size - Height"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("Vertical size of the monitor or TV, is used "
@@ -1142,9 +1142,9 @@ static GlobalSpinBox *DisplaySizeHeight()
     return gs;
 }
 
-static GlobalCheckBox *GuiSizeForTV()
+static HostCheckBox *GuiSizeForTV()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("GuiSizeForTV");
+    HostCheckBox *gc = new HostCheckBox("GuiSizeForTV");
     gc->setLabel(QObject::tr("Use GUI size for TV playback"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("If enabled, use the above size for TV, "
@@ -1153,9 +1153,9 @@ static GlobalCheckBox *GuiSizeForTV()
 }
 
 #if defined(USING_XRANDR) || defined(CONFIG_DARWIN)
-static GlobalCheckBox *UseVideoModes()
+static HostCheckBox *UseVideoModes()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("UseVideoModes");
+    HostCheckBox *gc = new HostCheckBox("UseVideoModes");
     gc->setLabel(QObject::tr("Separate video modes for GUI and TV playback"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Switch X Window video modes for TV. "
@@ -1163,9 +1163,9 @@ static GlobalCheckBox *UseVideoModes()
     return gc;
 }
 
-static GlobalSpinBox *GuiVidModeWidth()
+static HostSpinBox *GuiVidModeWidth()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("GuiVidModeWidth", 0, 1920, 8, true);
+    HostSpinBox *gs = new HostSpinBox("GuiVidModeWidth", 0, 1920, 8, true);
     gs->setLabelAboveWidget(true);
     gs->setLabel(QObject::tr("Width"));
     gs->setValue(0);
@@ -1175,9 +1175,9 @@ static GlobalSpinBox *GuiVidModeWidth()
     return gs;
 }
 
-static GlobalSpinBox *GuiVidModeHeight()
+static HostSpinBox *GuiVidModeHeight()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("GuiVidModeHeight", 0, 1200, 4, true);
+    HostSpinBox *gs = new HostSpinBox("GuiVidModeHeight", 0, 1200, 4, true);
     gs->setLabelAboveWidget(true);
     gs->setLabel(QObject::tr("Height"));
     gs->setValue(0);
@@ -1187,9 +1187,9 @@ static GlobalSpinBox *GuiVidModeHeight()
     return gs;
 }
 
-static GlobalSpinBox *VidModeWidth(int idx)
+static HostSpinBox *VidModeWidth(int idx)
 {
-    GlobalSpinBox *gs = new GlobalSpinBox(QString("VidModeWidth%1").arg(idx),
+    HostSpinBox *gs = new HostSpinBox(QString("VidModeWidth%1").arg(idx),
                                             0, 1920, 8, true);
     gs->setLabel(QObject::tr("X"));
     gs->setValue(0);
@@ -1198,9 +1198,9 @@ static GlobalSpinBox *VidModeWidth(int idx)
     return gs;
 }
 
-static GlobalSpinBox *VidModeHeight(int idx)
+static HostSpinBox *VidModeHeight(int idx)
 {
-    GlobalSpinBox *gs = new GlobalSpinBox(QString("VidModeHeight%1").arg(idx),
+    HostSpinBox *gs = new HostSpinBox(QString("VidModeHeight%1").arg(idx),
                                             0, 1200, 4, true);
     gs->setLabel(QObject::tr("Y"));
     gs->setValue(0);
@@ -1209,9 +1209,9 @@ static GlobalSpinBox *VidModeHeight(int idx)
     return gs;
 }
 
-static GlobalSpinBox *TVVidModeWidth()
+static HostSpinBox *TVVidModeWidth()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("TVVidModeWidth", 0, 1920, 8, true);
+    HostSpinBox *gs = new HostSpinBox("TVVidModeWidth", 0, 1920, 8, true);
     gs->setLabelAboveWidget(true);
     gs->setLabel(QObject::tr("Width"));
     gs->setValue(0);
@@ -1222,9 +1222,9 @@ static GlobalSpinBox *TVVidModeWidth()
     return gs;
 }
 
-static GlobalSpinBox *TVVidModeWidth(int idx)
+static HostSpinBox *TVVidModeWidth(int idx)
 {
-    GlobalSpinBox *gs = new GlobalSpinBox(QString("TVVidModeWidth%1").arg(idx), 
+    HostSpinBox *gs = new HostSpinBox(QString("TVVidModeWidth%1").arg(idx), 
                                             0, 1920, 8, true);
     gs->setLabel(QObject::tr("X"));
     gs->setValue(0);
@@ -1236,9 +1236,9 @@ static GlobalSpinBox *TVVidModeWidth(int idx)
 }
 
 
-static GlobalSpinBox *TVVidModeHeight()
+static HostSpinBox *TVVidModeHeight()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("TVVidModeHeight", 0, 1200, 4, true);
+    HostSpinBox *gs = new HostSpinBox("TVVidModeHeight", 0, 1200, 4, true);
     gs->setLabelAboveWidget(true);
     gs->setLabel(QObject::tr("Height"));
     gs->setValue(0);
@@ -1248,9 +1248,9 @@ static GlobalSpinBox *TVVidModeHeight()
     return gs;
 }
 
-static GlobalSpinBox *TVVidModeHeight(int idx)
+static HostSpinBox *TVVidModeHeight(int idx)
 {
-    GlobalSpinBox *gs = new GlobalSpinBox(QString("TVVidModeHeight%1").arg(idx),
+    HostSpinBox *gs = new HostSpinBox(QString("TVVidModeHeight%1").arg(idx),
                                             0, 1200, 4, true);
     gs->setLabel(QObject::tr("Y"));
     gs->setValue(0);
@@ -1260,9 +1260,9 @@ static GlobalSpinBox *TVVidModeHeight(int idx)
     return gs;
 }
 
-static GlobalCheckBox *TVVidModeAltAspect()
+static HostCheckBox *TVVidModeAltAspect()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("TVVidModeAltAspect");
+    HostCheckBox *gc = new HostCheckBox("TVVidModeAltAspect");
     gc->setLabelAboveWidget(true);
     gc->setLabel(QObject::tr("Alt Aspect"));
     gc->setValue(false);
@@ -1272,9 +1272,9 @@ static GlobalCheckBox *TVVidModeAltAspect()
     return gc;
 }
 
-static GlobalCheckBox *TVVidModeAltAspect(int idx)
+static HostCheckBox *TVVidModeAltAspect(int idx)
 {
-    GlobalCheckBox *gc = new GlobalCheckBox(QString("TVVidModeAltAspect%1").arg(idx));
+    HostCheckBox *gc = new HostCheckBox(QString("TVVidModeAltAspect%1").arg(idx));
     gc->setLabelAboveWidget(true);
     gc->setLabel(QObject::tr("Alt Aspect"));
     gc->setValue(false);
@@ -1350,18 +1350,18 @@ class VideoModeSettings: public VerticalConfigurationGroup,
 };
 #endif
 
-static GlobalCheckBox *RunInWindow()
+static HostCheckBox *RunInWindow()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("RunFrontendInWindow");
+    HostCheckBox *gc = new HostCheckBox("RunFrontendInWindow");
     gc->setLabel(QObject::tr("Run the frontend in a window"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Toggles between windowed and borderless operation."));
     return gc;
 }
 
-static GlobalCheckBox *RandomTheme()
+static HostCheckBox *RandomTheme()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("RandomTheme");
+    HostCheckBox *gc = new HostCheckBox("RandomTheme");
     gc->setLabel(QObject::tr("Use a random theme"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Use a random theme each time MythTV is "
@@ -1369,9 +1369,9 @@ static GlobalCheckBox *RandomTheme()
     return gc;
 }
 
-static GlobalComboBox *MythDateFormat()
+static HostComboBox *MythDateFormat()
 {
-    GlobalComboBox *gc = new GlobalComboBox("DateFormat");
+    HostComboBox *gc = new HostComboBox("DateFormat");
     gc->setLabel(QObject::tr("Date format"));
 
     QDate sampdate(2004, 1, 31);
@@ -1388,9 +1388,9 @@ static GlobalComboBox *MythDateFormat()
     return gc;
 }
 
-static GlobalComboBox *MythShortDateFormat()
+static HostComboBox *MythShortDateFormat()
 {
-    GlobalComboBox *gc = new GlobalComboBox("ShortDateFormat");
+    HostComboBox *gc = new HostComboBox("ShortDateFormat");
     gc->setLabel(QObject::tr("Short Date format"));
 
     QDate sampdate(2004, 1, 31);
@@ -1411,9 +1411,9 @@ static GlobalComboBox *MythShortDateFormat()
     return gc;
 }
 
-static GlobalComboBox *MythTimeFormat()
+static HostComboBox *MythTimeFormat()
 {
-    GlobalComboBox *gc = new GlobalComboBox("TimeFormat");
+    HostComboBox *gc = new HostComboBox("TimeFormat");
     gc->setLabel(QObject::tr("Time format"));
 
     QTime samptime(6, 56, 0);
@@ -1431,9 +1431,9 @@ static GlobalComboBox *MythTimeFormat()
     return gc;
 }
 
-static GlobalComboBox *ThemeFontSizeType()
+static HostComboBox *ThemeFontSizeType()
 {
-    GlobalComboBox *gc = new GlobalComboBox("ThemeFontSizeType");
+    HostComboBox *gc = new HostComboBox("ThemeFontSizeType");
     gc->setLabel(QObject::tr("Font size"));
     gc->addSelection(QObject::tr("default"), "default");
     gc->addSelection(QObject::tr("small"), "small");
@@ -1443,7 +1443,7 @@ static GlobalComboBox *ThemeFontSizeType()
 }
 
 ThemeSelector::ThemeSelector():
-    GlobalSetting("Theme") {
+    HostImageSelect("Theme") {
 
     setLabel(QObject::tr("Theme"));
 
@@ -1481,10 +1481,10 @@ ThemeSelector::ThemeSelector():
     setValue("G.A.N.T.");
 }
 
-class StyleSetting: public ComboBoxSetting, public GlobalSetting {
+class StyleSetting: public HostComboBox {
 public:
     StyleSetting():
-        GlobalSetting("Style") {
+        HostComboBox("Style") {
         setLabel(QObject::tr("Qt Style"));
         fillSelections();
         setHelpText(QObject::tr("At startup, MythTV will change the Qt "
@@ -1505,13 +1505,13 @@ public:
 
     void load(QSqlDatabase *db) {
         fillSelections();
-        GlobalSetting::load(db);
+        HostComboBox::load(db);
     };
 };
 
-static GlobalComboBox *ChannelFormat()
+static HostComboBox *ChannelFormat()
 {
-    GlobalComboBox *gc = new GlobalComboBox("ChannelFormat");
+    HostComboBox *gc = new HostComboBox("ChannelFormat");
     gc->setLabel(QObject::tr("Channel format"));
     gc->addSelection(QObject::tr("number"), "<num>");
     gc->addSelection(QObject::tr("number callsign"), "<num> <sign>");
@@ -1523,9 +1523,9 @@ static GlobalComboBox *ChannelFormat()
     return gc;
 }
 
-static GlobalComboBox *LongChannelFormat()
+static HostComboBox *LongChannelFormat()
 {
-    GlobalComboBox *gc = new GlobalComboBox("LongChannelFormat");
+    HostComboBox *gc = new HostComboBox("LongChannelFormat");
     gc->setLabel(QObject::tr("Long Channel format"));
     gc->addSelection(QObject::tr("number"), "<num>");
     gc->addSelection(QObject::tr("number callsign"), "<num> <sign>");
@@ -1537,9 +1537,9 @@ static GlobalComboBox *LongChannelFormat()
     return gc;
 }
 
-static BackendSpinBox *ATSCCheckSignalWait()
+static GlobalSpinBox *ATSCCheckSignalWait()
 {
-    BackendSpinBox *bs = new BackendSpinBox("ATSCCheckSignalWait", 
+    GlobalSpinBox *bs = new GlobalSpinBox("ATSCCheckSignalWait", 
                                             1000, 10000, 250);
     bs->setLabel(QObject::tr("Time limit for ATSC signal lock (msec)"));
     bs->setHelpText(QObject::tr("MythTV can check the signal strength "
@@ -1551,9 +1551,9 @@ static BackendSpinBox *ATSCCheckSignalWait()
     return bs;
 }
 
-static BackendSpinBox *ATSCCheckSignalThreshold()
+static GlobalSpinBox *ATSCCheckSignalThreshold()
 {
-    BackendSpinBox *bs = new BackendSpinBox("ATSCCheckSignalThreshold",
+    GlobalSpinBox *bs = new GlobalSpinBox("ATSCCheckSignalThreshold",
                                             50, 90, 1);
     bs->setLabel(QObject::tr("ATSC Signal Threshold"));
     bs->setHelpText(QObject::tr("Threshold for a signal to be considered "
@@ -1565,9 +1565,9 @@ static BackendSpinBox *ATSCCheckSignalThreshold()
     return bs;
 }
 
-static BackendSpinBox *HDRingbufferSize()
+static GlobalSpinBox *HDRingbufferSize()
 {
-    BackendSpinBox *bs = new BackendSpinBox("HDRingbufferSize",
+    GlobalSpinBox *bs = new GlobalSpinBox("HDRingbufferSize",
 					    25*188, 512*188, 25*188);
     bs->setLabel(QObject::tr("HD Ringbuffer size (KB)"));
     bs->setHelpText(QObject::tr("The HD device ringbuffer allows the "
@@ -1580,9 +1580,9 @@ static BackendSpinBox *HDRingbufferSize()
     return bs;
 }
 
-static GlobalCheckBox *SmartChannelChange()
+static HostCheckBox *SmartChannelChange()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("SmartChannelChange");
+    HostCheckBox *gc = new HostCheckBox("SmartChannelChange");
     gc->setLabel(QObject::tr("Change channels immediately without select"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("When a complete channel number is entered "
@@ -1591,9 +1591,9 @@ static GlobalCheckBox *SmartChannelChange()
     return gc;
 }
 
-static BackendCheckBox *LastFreeCard()
+static GlobalCheckBox *LastFreeCard()
 {
-    BackendCheckBox *bc = new BackendCheckBox("LastFreeCard");
+    GlobalCheckBox *bc = new GlobalCheckBox("LastFreeCard");
     bc->setLabel(QObject::tr("Avoid conflicts between live TV and "
                  "scheduled shows."));
     bc->setValue(false);
@@ -1603,27 +1603,27 @@ static BackendCheckBox *LastFreeCard()
     return bc;
 }
 
-static GlobalSpinBox *QtFontBig()
+static HostSpinBox *QtFontBig()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("QtFontBig", 1, 48, 1);
+    HostSpinBox *gs = new HostSpinBox("QtFontBig", 1, 48, 1);
     gs->setLabel(QObject::tr("\"Big\" font"));
     gs->setValue(25);
     gs->setHelpText(QObject::tr("Default size is 25."));
     return gs;
 }
 
-static GlobalSpinBox *QtFontMedium()
+static HostSpinBox *QtFontMedium()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("QtFontMedium", 1, 48, 1);
+    HostSpinBox *gs = new HostSpinBox("QtFontMedium", 1, 48, 1);
     gs->setLabel(QObject::tr("\"Medium\" font"));
     gs->setValue(16);
     gs->setHelpText(QObject::tr("Default size is 16."));
     return gs;
 }
 
-static GlobalSpinBox *QtFontSmall()
+static HostSpinBox *QtFontSmall()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("QtFontSmall", 1, 48, 1);
+    HostSpinBox *gs = new HostSpinBox("QtFontSmall", 1, 48, 1);
     gs->setLabel(QObject::tr("\"Small\" font"));
     gs->setValue(12);
     gs->setHelpText(QObject::tr("Default size is 12."));
@@ -1631,9 +1631,9 @@ static GlobalSpinBox *QtFontSmall()
 }
 
 // EPG settings
-static GlobalCheckBox *EPGScrollType()
+static HostCheckBox *EPGScrollType()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("EPGScrollType");
+    HostCheckBox *gc = new HostCheckBox("EPGScrollType");
     gc->setLabel(QObject::tr("Floating Program Guide Selector"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("If enabled, the program guide's selector "
@@ -1642,9 +1642,9 @@ static GlobalCheckBox *EPGScrollType()
     return gc;
 }
 
-static GlobalComboBox *EPGFillType()
+static HostComboBox *EPGFillType()
 {
-    GlobalComboBox *gc = new GlobalComboBox("EPGFillType");
+    HostComboBox *gc = new HostComboBox("EPGFillType");
     gc->setLabel(QObject::tr("Guide Shading Method"));
     gc->addSelection(QObject::tr("Alpha - Transparent (CPU Usage - High)"),
                      QString::number((int)UIGuideType::Alpha));
@@ -1657,9 +1657,9 @@ static GlobalComboBox *EPGFillType()
     return gc;
 };
 
-static GlobalCheckBox *EPGShowCategoryColors()
+static HostCheckBox *EPGShowCategoryColors()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("EPGShowCategoryColors");
+    HostCheckBox *gc = new HostCheckBox("EPGShowCategoryColors");
     gc->setLabel(QObject::tr("Display Genre Colors"));
     gc->setHelpText(QObject::tr("Colorize program guide using "
                     "genre colors. (Not available for all grabbers.)"));
@@ -1667,26 +1667,26 @@ static GlobalCheckBox *EPGShowCategoryColors()
     return gc;
 }
 
-static GlobalCheckBox *EPGShowCategoryText()
+static HostCheckBox *EPGShowCategoryText()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("EPGShowCategoryText");
+    HostCheckBox *gc = new HostCheckBox("EPGShowCategoryText");
     gc->setLabel(QObject::tr("Display Genre Text"));
     gc->setHelpText(QObject::tr("(Not available for all grabbers.)"));
     gc->setValue(true);
     return gc;
 }
 
-static GlobalCheckBox *EPGShowChannelIcon()
+static HostCheckBox *EPGShowChannelIcon()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("EPGShowChannelIcon");
+    HostCheckBox *gc = new HostCheckBox("EPGShowChannelIcon");
     gc->setLabel(QObject::tr("Display the channel icon"));
     gc->setValue(true);
     return gc;
 }
 
-static GlobalCheckBox *EPGShowFavorites()
+static HostCheckBox *EPGShowFavorites()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("EPGShowFavorites");
+    HostCheckBox *gc = new HostCheckBox("EPGShowFavorites");
     gc->setLabel(QObject::tr("Only display 'favorite' channels"));
     gc->setHelpText(QObject::tr("If enabled, the EPG will initially display "
                     "only the channels marked as favorites. Pressing "
@@ -1696,17 +1696,17 @@ static GlobalCheckBox *EPGShowFavorites()
     return gc;
 }
 
-static GlobalSpinBox *EPGChanDisplay()
+static HostSpinBox *EPGChanDisplay()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("chanPerPage", 3, 12, 1);
+    HostSpinBox *gs = new HostSpinBox("chanPerPage", 3, 12, 1);
     gs->setLabel(QObject::tr("Channels to Display"));
     gs->setValue(5);
     return gs;
 }
 
-static GlobalSpinBox *EPGTimeDisplay()
+static HostSpinBox *EPGTimeDisplay()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("timePerPage", 1, 5, 1);
+    HostSpinBox *gs = new HostSpinBox("timePerPage", 1, 5, 1);
     gs->setLabel(QObject::tr("Time Blocks (30 mins) to Display"));
     gs->setValue(4);
     return gs;
@@ -1714,9 +1714,9 @@ static GlobalSpinBox *EPGTimeDisplay()
 
 // General RecPriorities settings
 
-static BackendCheckBox *GRSchedMoveHigher()
+static GlobalCheckBox *GRSchedMoveHigher()
 {
-    BackendCheckBox *bc = new BackendCheckBox("SchedMoveHigher");
+    GlobalCheckBox *bc = new GlobalCheckBox("SchedMoveHigher");
     bc->setLabel(QObject::tr("Reschedule Higher Priorities"));
     bc->setHelpText(QObject::tr("Move higher priority programs to other "
                     "cards and showings when resolving conflicts.  This "
@@ -1727,9 +1727,9 @@ static BackendCheckBox *GRSchedMoveHigher()
     return bc;
 }
 
-static BackendSpinBox *GRSingleRecordRecPriority()
+static GlobalSpinBox *GRSingleRecordRecPriority()
 {
-    BackendSpinBox *bs = new BackendSpinBox("SingleRecordRecPriority",
+    GlobalSpinBox *bs = new GlobalSpinBox("SingleRecordRecPriority",
                                             -99, 99, 1);
     bs->setLabel(QObject::tr("Single Recordings Priority"));
     bs->setHelpText(QObject::tr("Single Recordings will receive this "
@@ -1738,9 +1738,9 @@ static BackendSpinBox *GRSingleRecordRecPriority()
     return bs;
 }
 
-static BackendSpinBox *GRWeekslotRecordRecPriority()
+static GlobalSpinBox *GRWeekslotRecordRecPriority()
 {
-    BackendSpinBox *bs = new BackendSpinBox("WeekslotRecordRecPriority",
+    GlobalSpinBox *bs = new GlobalSpinBox("WeekslotRecordRecPriority",
                                             -99, 99, 1);
     bs->setLabel(QObject::tr("Weekslot Recordings Priority"));
     bs->setHelpText(QObject::tr("Weekslot Recordings will receive this "
@@ -1749,9 +1749,9 @@ static BackendSpinBox *GRWeekslotRecordRecPriority()
     return bs;
 }
 
-static BackendSpinBox *GRTimeslotRecordRecPriority()
+static GlobalSpinBox *GRTimeslotRecordRecPriority()
 {
-    BackendSpinBox *bs = new BackendSpinBox("TimeslotRecordRecPriority",
+    GlobalSpinBox *bs = new GlobalSpinBox("TimeslotRecordRecPriority",
                                             -99, 99, 1);
     bs->setLabel(QObject::tr("Timeslot Recordings Priority"));
     bs->setHelpText(QObject::tr("Timeslot Recordings will receive this "
@@ -1760,9 +1760,9 @@ static BackendSpinBox *GRTimeslotRecordRecPriority()
     return bs;
 }
 
-static BackendSpinBox *GRChannelRecordRecPriority()
+static GlobalSpinBox *GRChannelRecordRecPriority()
 {
-    BackendSpinBox *bs = new BackendSpinBox("ChannelRecordRecPriority",
+    GlobalSpinBox *bs = new GlobalSpinBox("ChannelRecordRecPriority",
                                             -99, 99, 1);
     bs->setLabel(QObject::tr("Channel Recordings Priority"));
     bs->setHelpText(QObject::tr("Channel Recordings will receive this "
@@ -1771,9 +1771,9 @@ static BackendSpinBox *GRChannelRecordRecPriority()
     return bs;
 }
 
-static BackendSpinBox *GRAllRecordRecPriority()
+static GlobalSpinBox *GRAllRecordRecPriority()
 {
-    BackendSpinBox *bs = new BackendSpinBox("AllRecordRecPriority",
+    GlobalSpinBox *bs = new GlobalSpinBox("AllRecordRecPriority",
                                             -99, 99, 1);
     bs->setLabel(QObject::tr("All Recordings Priority"));
     bs->setHelpText(QObject::tr("All Recording types will receive this "
@@ -1782,9 +1782,9 @@ static BackendSpinBox *GRAllRecordRecPriority()
     return bs;
 }
 
-static BackendSpinBox *GRFindOneRecordRecPriority()
+static GlobalSpinBox *GRFindOneRecordRecPriority()
 {
-    BackendSpinBox *bs = new BackendSpinBox("FindOneRecordRecPriority",
+    GlobalSpinBox *bs = new GlobalSpinBox("FindOneRecordRecPriority",
                                             -99, 99, 1);
     bs->setLabel(QObject::tr("Find One Recordings Priority"));
     bs->setHelpText(QObject::tr("Find One, Find Weekly and Find Daily "
@@ -1794,9 +1794,9 @@ static BackendSpinBox *GRFindOneRecordRecPriority()
     return bs;
 }
 
-static BackendSpinBox *GROverrideRecordRecPriority()
+static GlobalSpinBox *GROverrideRecordRecPriority()
 {
-    BackendSpinBox *bs = new BackendSpinBox("OverrideRecordRecPriority",
+    GlobalSpinBox *bs = new GlobalSpinBox("OverrideRecordRecPriority",
                                             -99, 99, 1);
     bs->setLabel(QObject::tr("Override Recordings Priority"));
     bs->setHelpText(QObject::tr("Override Recordings will receive this "
@@ -1805,9 +1805,9 @@ static BackendSpinBox *GROverrideRecordRecPriority()
     return bs;
 }
 
-static GlobalLineEdit *DefaultTVChannel()
+static HostLineEdit *DefaultTVChannel()
 {
-    GlobalLineEdit *ge = new GlobalLineEdit("DefaultTVChannel");
+    HostLineEdit *ge = new HostLineEdit("DefaultTVChannel");
     ge->setLabel(QObject::tr("Guide starts at channel"));
     ge->setValue("3");
     ge->setHelpText(QObject::tr("The program guide starts on this channel if "
@@ -1815,25 +1815,25 @@ static GlobalLineEdit *DefaultTVChannel()
     return ge;
 }
 
-static GlobalLineEdit *UnknownTitle()
+static HostLineEdit *UnknownTitle()
 {
-    GlobalLineEdit *ge = new GlobalLineEdit("UnknownTitle");
+    HostLineEdit *ge = new HostLineEdit("UnknownTitle");
     ge->setLabel(QObject::tr("What to call 'unknown' programs"));
     ge->setValue(QObject::tr("Unknown"));
     return ge;
 }
 
-static GlobalLineEdit *UnknownCategory()
+static HostLineEdit *UnknownCategory()
 {
-    GlobalLineEdit *ge = new GlobalLineEdit("UnknownCategory");
+    HostLineEdit *ge = new HostLineEdit("UnknownCategory");
     ge->setLabel(QObject::tr("What category to give 'unknown' programs"));
     ge->setValue(QObject::tr("Unknown"));
     return ge;
 }
 
-static GlobalCheckBox *SelectChangesChannel()
+static HostCheckBox *SelectChangesChannel()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("SelectChangesChannel");
+    HostCheckBox *gc = new HostCheckBox("SelectChangesChannel");
     gc->setLabel(QObject::tr("Use select to change the channel in the program "
                  "guide"));
     gc->setValue(false);
@@ -1844,9 +1844,9 @@ static GlobalCheckBox *SelectChangesChannel()
     return gc;
 }
 
-static GlobalSpinBox *EPGRecThreshold()
+static HostSpinBox *EPGRecThreshold()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("SelChangeRecThreshold", 1, 600, 1);
+    HostSpinBox *gs = new HostSpinBox("SelChangeRecThreshold", 1, 600, 1);
     gs->setLabel(QObject::tr("Record Threshold"));
     gs->setValue(16);
     gs->setHelpText(QObject::tr("If the option to use Select to change the channel "
@@ -1886,9 +1886,9 @@ public:
      };
 };
 
-static GlobalComboBox *MythLanguage()
+static HostComboBox *MythLanguage()
 {
-    GlobalComboBox *gc = new GlobalComboBox("Language");
+    HostComboBox *gc = new HostComboBox("Language");
     gc->setLabel(QObject::tr("Language"));
     gc->addSelection(QString::fromUtf8("English"), "EN");     // English
     gc->addSelection(QString::fromUtf8("Italiano"), "IT");    // Italian
@@ -1909,9 +1909,9 @@ static GlobalComboBox *MythLanguage()
     return gc;
 }
 
-static GlobalCheckBox *EnableXbox()
+static HostCheckBox *EnableXbox()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("EnableXbox");
+    HostCheckBox *gc = new HostCheckBox("EnableXbox");
     gc->setLabel(QObject::tr("Enable Xbox Hardware"));
     gc->setHelpText(QObject::tr("This enables support for Xbox Specific "
                     "hardware. Requires a frontend restart for changes to "
@@ -1920,9 +1920,9 @@ static GlobalCheckBox *EnableXbox()
     return gc;
 }
 
-static GlobalComboBox *XboxBlinkBIN()
+static HostComboBox *XboxBlinkBIN()
 {
-    GlobalComboBox *gc = new GlobalComboBox("XboxBlinkBIN");
+    HostComboBox *gc = new HostComboBox("XboxBlinkBIN");
     gc->setLabel(QObject::tr("Xbox Linux Distribution"));
     gc->addSelection("GentooX","led");
     gc->addSelection(QObject::tr("Other"),"blink");
@@ -1933,9 +1933,9 @@ static GlobalComboBox *XboxBlinkBIN()
     return gc;
 }
 
-static GlobalComboBox *XboxLEDDefault()
+static HostComboBox *XboxLEDDefault()
 {
-    GlobalComboBox *gc = new GlobalComboBox("XboxLEDDefault");
+    HostComboBox *gc = new HostComboBox("XboxLEDDefault");
     gc->setLabel(QObject::tr("Default LED color"));
     gc->addSelection(QObject::tr("Off"), "nnnn");
     gc->addSelection(QObject::tr("Green"),"gggg");
@@ -1946,9 +1946,9 @@ static GlobalComboBox *XboxLEDDefault()
     return gc;
 }
 
-static GlobalComboBox *XboxLEDRecording()
+static HostComboBox *XboxLEDRecording()
 {
-    GlobalComboBox *gc = new GlobalComboBox("XboxLEDRecording");
+    HostComboBox *gc = new HostComboBox("XboxLEDRecording");
     gc->setLabel(QObject::tr("Recording LED mode"));
     gc->addSelection(QObject::tr("Off"), "nnnn");
     gc->addSelection(QObject::tr("Green"),"gggg");
@@ -1959,9 +1959,9 @@ static GlobalComboBox *XboxLEDRecording()
     return gc;
 }
 
-static GlobalSpinBox *XboxCheckRec()
+static HostSpinBox *XboxCheckRec()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("XboxCheckRec", 1, 600, 2);
+    HostSpinBox *gs = new HostSpinBox("XboxCheckRec", 1, 600, 2);
     gs->setLabel(QObject::tr("Recording Check Frequency"));
     gs->setValue(5);
     gs->setHelpText(QObject::tr("This specifies how frequently "
@@ -1970,9 +1970,9 @@ static GlobalSpinBox *XboxCheckRec()
     return gs;
 }
 
-static GlobalCheckBox *EnableMediaMon()
+static HostCheckBox *EnableMediaMon()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("MonitorDrives");
+    HostCheckBox *gc = new HostCheckBox("MonitorDrives");
     gc->setLabel(QObject::tr("Monitor CD/DVD"));
     gc->setHelpText(QObject::tr("This enables support for monitoring "
                     "your CD/DVD drives for new disks and launching "
@@ -1981,9 +1981,9 @@ static GlobalCheckBox *EnableMediaMon()
     return gc;
 }
 
-static GlobalCheckBox *PVR350OutputEnable()
+static HostCheckBox *PVR350OutputEnable()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("PVR350OutputEnable");
+    HostCheckBox *gc = new HostCheckBox("PVR350OutputEnable");
     gc->setLabel(QObject::tr("Use the PVR-350's TV out / MPEG decoder"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("MythTV can use the PVR-350's TV out and MPEG "
@@ -1993,17 +1993,17 @@ static GlobalCheckBox *PVR350OutputEnable()
     return gc;
 }
 
-static GlobalLineEdit *PVR350VideoDev()
+static HostLineEdit *PVR350VideoDev()
 {
-    GlobalLineEdit *ge = new GlobalLineEdit("PVR350VideoDev");
+    HostLineEdit *ge = new HostLineEdit("PVR350VideoDev");
     ge->setLabel(QObject::tr("Video device for the PVR-350 MPEG decoder"));
     ge->setValue("/dev/video16");
     return ge;
 };
 
-static GlobalSpinBox *PVR350EPGAlphaValue()
+static HostSpinBox *PVR350EPGAlphaValue()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("PVR350EPGAlphaValue", 0, 255, 1);
+    HostSpinBox *gs = new HostSpinBox("PVR350EPGAlphaValue", 0, 255, 1);
     gs->setLabel(QObject::tr("Program Guide Alpha"));
     gs->setValue(164);
     gs->setHelpText(QObject::tr("How much to blend the program guide over the "
@@ -2013,9 +2013,9 @@ static GlobalSpinBox *PVR350EPGAlphaValue()
 }
 
 #ifdef USING_XVMC
-static GlobalCheckBox *UseXVMC()
+static HostCheckBox *UseXVMC()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("UseXVMC");
+    HostCheckBox *gc = new HostCheckBox("UseXVMC");
     gc->setLabel(QObject::tr("Use hardware XvMC MPEG Decoding"));
     gc->setValue(true);
     return gc;
@@ -2023,9 +2023,9 @@ static GlobalCheckBox *UseXVMC()
 #endif
 
 #ifdef USING_XVMC_VLD
-static GlobalCheckBox *UseXvMcVld()
+static HostCheckBox *UseXvMcVld()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("UseXvMcVld");
+    HostCheckBox *gc = new HostCheckBox("UseXvMcVld");
     gc->setLabel(QObject::tr("Use HW XVMC VLD Decoding (Via only)"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("Enables the use of viaXvMC HW Mpeg decoding "
@@ -2064,9 +2064,9 @@ public:
 };
 
 #if USING_DVB
-static BackendSpinBox *DVBMonitorInterval()
+static GlobalSpinBox *DVBMonitorInterval()
 {
-    BackendSpinBox *bs = new BackendSpinBox("DVBMonitorInterval", 0, 240, 5);
+    GlobalSpinBox *bs = new GlobalSpinBox("DVBMonitorInterval", 0, 240, 5);
     bs->setLabel(QObject::tr("Sample interval for DVB signal statistics "
                  "(in seconds)"));
     bs->setValue(0);
@@ -2076,9 +2076,9 @@ static BackendSpinBox *DVBMonitorInterval()
     return bs;
 }
 
-static BackendSpinBox *DVBMonitorRetention()
+static GlobalSpinBox *DVBMonitorRetention()
 {
-    BackendSpinBox *bs = new BackendSpinBox("DVBMonitorRetention", 1, 30, 1);
+    GlobalSpinBox *bs = new GlobalSpinBox("DVBMonitorRetention", 1, 30, 1);
     bs->setLabel(QObject::tr("Length of time to retain DVB signal data "
                              "(in days)"));
     bs->setValue(1);
@@ -2086,9 +2086,9 @@ static BackendSpinBox *DVBMonitorRetention()
 }
 #endif
 
-static BackendCheckBox *LogEnabled()
+static GlobalCheckBox *LogEnabled()
 {
-    BackendCheckBox *bc = new BackendCheckBox("LogEnabled");
+    GlobalCheckBox *bc = new GlobalCheckBox("LogEnabled");
     bc->setLabel(QObject::tr("Log MythTV events to database"));
     bc->setValue(false);
     bc->setHelpText(QObject::tr("If enabled, MythTV modules will send event "
@@ -2097,9 +2097,9 @@ static BackendCheckBox *LogEnabled()
     return bc;
 }
 
-static GlobalSpinBox *LogMaxCount()
+static HostSpinBox *LogMaxCount()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("LogMaxCount", 0, 500, 10);
+    HostSpinBox *gs = new HostSpinBox("LogMaxCount", 0, 500, 10);
     gs->setLabel(QObject::tr("Maximum Number of Entries per Module"));
     gs->setValue(100);
     gs->setHelpText(QObject::tr("If there are more than this number of entries "
@@ -2108,9 +2108,9 @@ static GlobalSpinBox *LogMaxCount()
     return gs;
 }
 
-static GlobalCheckBox *LogCleanEnabled()
+static HostCheckBox *LogCleanEnabled()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("LogCleanEnabled");
+    HostCheckBox *gc = new HostCheckBox("LogCleanEnabled");
     gc->setLabel(QObject::tr("Automatic Log Cleaning Enabled"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("This enables the periodic cleanup of the "
@@ -2119,18 +2119,18 @@ static GlobalCheckBox *LogCleanEnabled()
     return gc;
 }
 
-static GlobalSpinBox *LogCleanPeriod()
+static HostSpinBox *LogCleanPeriod()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("LogCleanPeriod", 0, 60, 1);
+    HostSpinBox *gs = new HostSpinBox("LogCleanPeriod", 0, 60, 1);
     gs->setLabel(QObject::tr("Log Cleanup Frequency (Days)"));
     gs->setValue(14);
     gs->setHelpText(QObject::tr("The number of days between log cleanup runs."));
     return gs;
 }
 
-static GlobalSpinBox *LogCleanDays()
+static HostSpinBox *LogCleanDays()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("LogCleanDays", 0, 60, 1);
+    HostSpinBox *gs = new HostSpinBox("LogCleanDays", 0, 60, 1);
     gs->setLabel(QObject::tr("Number of days to keep acknowledged log "
                  "entries"));
     gs->setValue(14);
@@ -2140,9 +2140,9 @@ static GlobalSpinBox *LogCleanDays()
     return gs;
 }
 
-static GlobalSpinBox *LogCleanMax()
+static HostSpinBox *LogCleanMax()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("LogCleanMax", 0, 60, 1);
+    HostSpinBox *gs = new HostSpinBox("LogCleanMax", 0, 60, 1);
     gs->setLabel(QObject::tr("Number of days to keep unacknowledged log "
                  "entries"));
     gs->setValue(30);
@@ -2152,9 +2152,9 @@ static GlobalSpinBox *LogCleanMax()
     return gs;
 }
 
-static GlobalComboBox *LogPrintLevel()
+static HostComboBox *LogPrintLevel()
 {
-    GlobalComboBox *gc = new GlobalComboBox("LogPrintLevel");
+    HostComboBox *gc = new HostComboBox("LogPrintLevel");
     gc->setLabel(QObject::tr("Log Print Threshold"));
     gc->addSelection(QObject::tr("All Messages"), "8");
     gc->addSelection(QObject::tr("Debug and Higher"), "7");
@@ -2171,9 +2171,9 @@ static GlobalComboBox *LogPrintLevel()
     return gc;
 }
 
-static BackendCheckBox *MythFillEnabled()
+static GlobalCheckBox *MythFillEnabled()
 {
-    BackendCheckBox *bc = new BackendCheckBox("MythFillEnabled");
+    GlobalCheckBox *bc = new GlobalCheckBox("MythFillEnabled");
     bc->setLabel(QObject::tr("Automatically run mythfilldatabase"));
     bc->setValue(false);
     bc->setHelpText(QObject::tr("This enables the automatic execution of "
@@ -2181,9 +2181,9 @@ static BackendCheckBox *MythFillEnabled()
     return bc;
 }
 
-static BackendSpinBox *MythFillPeriod()
+static GlobalSpinBox *MythFillPeriod()
 {
-    BackendSpinBox *bs = new BackendSpinBox("MythFillPeriod", 0, 30, 1);
+    GlobalSpinBox *bs = new GlobalSpinBox("MythFillPeriod", 0, 30, 1);
     bs->setLabel(QObject::tr("mythfilldatabase Run Frequency (Days)"));
     bs->setValue(1);
     bs->setHelpText(QObject::tr("The number of days between mythfilldatabase "
@@ -2191,9 +2191,9 @@ static BackendSpinBox *MythFillPeriod()
     return bs;
 }
 
-static BackendSpinBox *MythFillMinHour()
+static GlobalSpinBox *MythFillMinHour()
 {
-    BackendSpinBox *bs = new BackendSpinBox("MythFillMinHour", 0, 24, 1);
+    GlobalSpinBox *bs = new GlobalSpinBox("MythFillMinHour", 0, 24, 1);
     bs->setLabel(QObject::tr("mythfilldatabase Execution Start"));
     bs->setValue(2);
     bs->setHelpText(QObject::tr("This setting and the following one define a "
@@ -2204,9 +2204,9 @@ static BackendSpinBox *MythFillMinHour()
     return bs;
 }
 
-static BackendSpinBox *MythFillMaxHour()
+static GlobalSpinBox *MythFillMaxHour()
 {
-    BackendSpinBox *bs = new BackendSpinBox("MythFillMaxHour", 0, 24, 1);
+    GlobalSpinBox *bs = new GlobalSpinBox("MythFillMaxHour", 0, 24, 1);
     bs->setLabel(QObject::tr("mythfilldatabase Execution End"));
     bs->setValue(5);
     bs->setHelpText(QObject::tr("This setting and the preceding one define a "
@@ -2217,9 +2217,9 @@ static BackendSpinBox *MythFillMaxHour()
     return bs;
 }
 
-static BackendLineEdit *MythFillDatabasePath()
+static GlobalLineEdit *MythFillDatabasePath()
 {
-    BackendLineEdit *be = new BackendLineEdit("MythFillDatabasePath");
+    GlobalLineEdit *be = new GlobalLineEdit("MythFillDatabasePath");
     be->setLabel(QObject::tr("mythfilldatabase Path"));
     be->setValue("mythfilldatabase");
     be->setHelpText(QObject::tr("Path (including executable) of the "
@@ -2227,9 +2227,9 @@ static BackendLineEdit *MythFillDatabasePath()
     return be;
 }
 
-static BackendLineEdit *MythFillDatabaseArgs()
+static GlobalLineEdit *MythFillDatabaseArgs()
 {
-    BackendLineEdit *be = new BackendLineEdit("MythFillDatabaseArgs");
+    GlobalLineEdit *be = new GlobalLineEdit("MythFillDatabaseArgs");
     be->setLabel(QObject::tr("mythfilldatabase Arguments"));
     be->setValue("");
     be->setHelpText(QObject::tr("Any arguments you want passed to the "
@@ -2237,9 +2237,9 @@ static BackendLineEdit *MythFillDatabaseArgs()
     return be;
 }
 
-static BackendLineEdit *MythFillDatabaseLog()
+static GlobalLineEdit *MythFillDatabaseLog()
 {
-    BackendLineEdit *be = new BackendLineEdit("MythFillDatabaseLog");
+    GlobalLineEdit *be = new GlobalLineEdit("MythFillDatabaseLog");
     be->setLabel(QObject::tr("mythfilldatabase Log Path"));
     be->setValue("");
     be->setHelpText(QObject::tr("Path to use for logging output from "
@@ -2303,9 +2303,9 @@ public:
 };
 
 #ifdef LCD_DEVICE
-static GlobalCheckBox *LCDShowTime()
+static HostCheckBox *LCDShowTime()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("LCDShowTime");
+    HostCheckBox *gc = new HostCheckBox("LCDShowTime");
     gc->setLabel(QObject::tr("LCD Displays Time"));
     gc->setHelpText(QObject::tr("Display current time on idle LCD display. "
                     "Need to restart mythfrontend to (de)activate it."));
@@ -2313,9 +2313,9 @@ static GlobalCheckBox *LCDShowTime()
     return gc;
 }
 
-static GlobalCheckBox *LCDShowMenu()
+static HostCheckBox *LCDShowMenu()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("LCDShowMenu");
+    HostCheckBox *gc = new HostCheckBox("LCDShowMenu");
     gc->setLabel(QObject::tr("LCD Displays Menus"));
     gc->setHelpText(QObject::tr("Display selected menu on LCD display. "
                     "Need to restart mythfrontend to (de)activate it."));
@@ -2323,9 +2323,9 @@ static GlobalCheckBox *LCDShowMenu()
     return gc;
 }
 
-static GlobalCheckBox *LCDShowMusic()
+static HostCheckBox *LCDShowMusic()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("LCDShowMusic");
+    HostCheckBox *gc = new HostCheckBox("LCDShowMusic");
     gc->setLabel(QObject::tr("LCD Displays Music Artist and Title"));
     gc->setHelpText(QObject::tr("Display playing artist and song title in "
                     "MythMusic. Need to restart mythfrontend to (de)activate "
@@ -2334,9 +2334,9 @@ static GlobalCheckBox *LCDShowMusic()
     return gc;
 }
 
-static GlobalCheckBox *LCDShowChannel()
+static HostCheckBox *LCDShowChannel()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("LCDShowChannel");
+    HostCheckBox *gc = new HostCheckBox("LCDShowChannel");
     gc->setLabel(QObject::tr("LCD Displays Channel Information"));
     gc->setHelpText(QObject::tr("Display tuned channel information. Need to "
                     "restart mythfrontend to (de)activate it."));
@@ -2344,9 +2344,9 @@ static GlobalCheckBox *LCDShowChannel()
     return gc;
 }
 
-static GlobalCheckBox *LCDShowVolume()
+static HostCheckBox *LCDShowVolume()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("LCDShowVolume");
+    HostCheckBox *gc = new HostCheckBox("LCDShowVolume");
     gc->setLabel(QObject::tr("LCD Displays Volume Information"));
     gc->setHelpText(QObject::tr("Display volume level information. Need to "
                     "restart mythfrontend to (de)activate it."));
@@ -2354,9 +2354,9 @@ static GlobalCheckBox *LCDShowVolume()
     return gc;
 }
 
-static GlobalCheckBox *LCDShowGeneric()
+static HostCheckBox *LCDShowGeneric()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("LCDShowGeneric");
+    HostCheckBox *gc = new HostCheckBox("LCDShowGeneric");
     gc->setLabel(QObject::tr("LCD Displays Generic Information"));
     gc->setHelpText(QObject::tr("Display generic information. Need to "
                     "restart mythfrontend to (de)activate it."));
@@ -2364,9 +2364,9 @@ static GlobalCheckBox *LCDShowGeneric()
     return gc;
 }
 
-static GlobalCheckBox *LCDBacklightOn()
+static HostCheckBox *LCDBacklightOn()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("LCDBacklightOn");
+    HostCheckBox *gc = new HostCheckBox("LCDBacklightOn");
     gc->setLabel(QObject::tr("LCD Backlight Always On"));
     gc->setHelpText(QObject::tr("Turn on the backlight permanently. Need to "
                     "restart mythfrontend to (de)activate it."));
@@ -2376,9 +2376,9 @@ static GlobalCheckBox *LCDBacklightOn()
 #endif
 
 #ifdef CONFIG_DARWIN
-static GlobalCheckBox *MacGammaCorrect()
+static HostCheckBox *MacGammaCorrect()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("MacGammaCorrect");
+    HostCheckBox *gc = new HostCheckBox("MacGammaCorrect");
     gc->setLabel(QObject::tr("Enable gamma correction for video"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If checked, QuickTime will correct the gamma "
@@ -2387,9 +2387,9 @@ static GlobalCheckBox *MacGammaCorrect()
     return gc;
 }
 
-static GlobalCheckBox *MacYuvConversion()
+static HostCheckBox *MacYuvConversion()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("MacYuvConversion");
+    HostCheckBox *gc = new HostCheckBox("MacYuvConversion");
     gc->setLabel(QObject::tr("Use Altivec-enhanced color space conversion"));
 #ifdef HAVE_ALTIVEC
     gc->setValue(true);
@@ -2402,9 +2402,9 @@ static GlobalCheckBox *MacYuvConversion()
     return gc;
 }
 
-static GlobalCheckBox *MacScaleUp()
+static HostCheckBox *MacScaleUp()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("MacScaleUp");
+    HostCheckBox *gc = new HostCheckBox("MacScaleUp");
     gc->setLabel(QObject::tr("Scale video as necessary"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("If checked, video will be scaled to fit your "
@@ -2413,9 +2413,9 @@ static GlobalCheckBox *MacScaleUp()
     return gc;
 }
 
-static GlobalSpinBox *MacFullSkip()
+static HostSpinBox *MacFullSkip()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("MacFullSkip", 0, 30, 1, true);
+    HostSpinBox *gs = new HostSpinBox("MacFullSkip", 0, 30, 1, true);
     gs->setLabel(QObject::tr("Frames to skip in fullscreen mode"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("Video displayed in fullscreen or non-windowed "
@@ -2426,9 +2426,9 @@ static GlobalSpinBox *MacFullSkip()
     return gs;
 }
 
-static GlobalCheckBox *MacMainEnabled()
+static HostCheckBox *MacMainEnabled()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("MacMainEnabled");
+    HostCheckBox *gc = new HostCheckBox("MacMainEnabled");
     gc->setLabel(QObject::tr("Video in main window"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("If checked, video will be displayed in the "
@@ -2439,9 +2439,9 @@ static GlobalCheckBox *MacMainEnabled()
     return gc;
 }
 
-static GlobalSpinBox *MacMainSkip()
+static HostSpinBox *MacMainSkip()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("MacMainSkip", 0, 30, 1, true);
+    HostSpinBox *gs = new HostSpinBox("MacMainSkip", 0, 30, 1, true);
     gs->setLabel(QObject::tr("Frames to skip"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("Video in the main window will skip this many "
@@ -2450,9 +2450,9 @@ static GlobalSpinBox *MacMainSkip()
     return gs;
 }
 
-static GlobalSpinBox *MacMainOpacity()
+static HostSpinBox *MacMainOpacity()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("MacMainOpacity", 0, 100, 5, false);
+    HostSpinBox *gs = new HostSpinBox("MacMainOpacity", 0, 100, 5, false);
     gs->setLabel(QObject::tr("Opacity"));
     gs->setValue(100);
     gs->setHelpText(QObject::tr("The opacity of the main window. Set to "
@@ -2483,9 +2483,9 @@ public:
     }
 };
 
-static GlobalCheckBox *MacFloatEnabled()
+static HostCheckBox *MacFloatEnabled()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("MacFloatEnabled");
+    HostCheckBox *gc = new HostCheckBox("MacFloatEnabled");
     gc->setLabel(QObject::tr("Video in floating window"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If checked, video will be displayed in a "
@@ -2495,9 +2495,9 @@ static GlobalCheckBox *MacFloatEnabled()
     return gc;
 }
 
-static GlobalSpinBox *MacFloatSkip()
+static HostSpinBox *MacFloatSkip()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("MacFloatSkip", 0, 30, 1, true);
+    HostSpinBox *gs = new HostSpinBox("MacFloatSkip", 0, 30, 1, true);
     gs->setLabel(QObject::tr("Frames to skip"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("Video in the floating window will skip "
@@ -2506,9 +2506,9 @@ static GlobalSpinBox *MacFloatSkip()
     return gs;
 }
 
-static GlobalSpinBox *MacFloatOpacity()
+static HostSpinBox *MacFloatOpacity()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("MacFloatOpacity", 0, 100, 5, false);
+    HostSpinBox *gs = new HostSpinBox("MacFloatOpacity", 0, 100, 5, false);
     gs->setLabel(QObject::tr("Opacity"));
     gs->setValue(100);
     gs->setHelpText(QObject::tr("The opacity of the floating window. Set to "
@@ -2539,9 +2539,9 @@ public:
     }
 };
 
-static GlobalCheckBox *MacDockEnabled()
+static HostCheckBox *MacDockEnabled()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("MacDockEnabled");
+    HostCheckBox *gc = new HostCheckBox("MacDockEnabled");
     gc->setLabel(QObject::tr("Video in the dock"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("If checked, video will be displayed in the "
@@ -2551,9 +2551,9 @@ static GlobalCheckBox *MacDockEnabled()
     return gc;
 }
 
-static GlobalSpinBox *MacDockSkip()
+static HostSpinBox *MacDockSkip()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("MacDockSkip", 0, 30, 1, true);
+    HostSpinBox *gs = new HostSpinBox("MacDockSkip", 0, 30, 1, true);
     gs->setLabel(QObject::tr("Frames to skip"));
     gs->setValue(3);
     gs->setHelpText(QObject::tr("Video in the dock icon will skip this many "
@@ -2580,9 +2580,9 @@ public:
     }
 };
 
-static GlobalCheckBox *MacDesktopEnabled()
+static HostCheckBox *MacDesktopEnabled()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("MacDesktopEnabled");
+    HostCheckBox *gc = new HostCheckBox("MacDesktopEnabled");
     gc->setLabel(QObject::tr("Video on the desktop"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("If checked, video will be displayed on the "
@@ -2592,9 +2592,9 @@ static GlobalCheckBox *MacDesktopEnabled()
     return gc;
 }
 
-static GlobalSpinBox *MacDesktopSkip()
+static HostSpinBox *MacDesktopSkip()
 {
-    GlobalSpinBox *gs = new GlobalSpinBox("MacDesktopSkip", 0, 30, 1, true);
+    HostSpinBox *gs = new HostSpinBox("MacDesktopSkip", 0, 30, 1, true);
     gs->setLabel(QObject::tr("Frames to skip"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("Video on the desktop will skip this many "
@@ -2622,9 +2622,9 @@ public:
 };
 #endif
 
-static GlobalCheckBox *WatchTVGuide()
+static HostCheckBox *WatchTVGuide()
 {
-    GlobalCheckBox *gc = new GlobalCheckBox("WatchTVGuide");
+    HostCheckBox *gc = new HostCheckBox("WatchTVGuide");
     gc->setLabel(QObject::tr("Show the program guide when starting Live TV"));
     gc->setHelpText(QObject::tr("This starts the program guide immediately "
              "upon starting to watch Live TV."));

@@ -696,6 +696,18 @@ public:
     TransCheckBoxSetting() {};
 };
 
+class HostSetting: public SimpleDBStorage, virtual public Configurable {
+public:
+    HostSetting(QString name):
+        SimpleDBStorage("settings", "data") {
+        setName(name);
+    };
+
+protected:
+    virtual QString whereClause(void);
+    virtual QString setClause(void);
+};
+
 class GlobalSetting: public SimpleDBStorage, virtual public Configurable {
 public:
     GlobalSetting(QString name):
@@ -708,16 +720,45 @@ protected:
     virtual QString setClause(void);
 };
 
-class BackendSetting: public SimpleDBStorage, virtual public Configurable {
-public:
-    BackendSetting(QString name):
-        SimpleDBStorage("settings", "data") {
-        setName(name);
-    };
+class HostSlider: public SliderSetting, public HostSetting {
+  public:
+    HostSlider(const QString &name, int min, int max, int step) :
+        SliderSetting(min, max, step),
+        HostSetting(name) { }
+};
 
-protected:
-    virtual QString whereClause(void);
-    virtual QString setClause(void);
+class HostSpinBox: public SpinBoxSetting, public HostSetting {
+  public:
+    HostSpinBox(const QString &name, int min, int max, int step, 
+                  bool allow_single_step = false) :
+        SpinBoxSetting(min, max, step, allow_single_step),
+        HostSetting(name) { }
+};
+
+class HostCheckBox: public CheckBoxSetting, public HostSetting {
+  public:
+    HostCheckBox(const QString &name) :
+        HostSetting(name) { }
+};
+
+class HostComboBox: public ComboBoxSetting, public HostSetting {
+  public:
+    HostComboBox(const QString &name, bool rw = false) :
+        ComboBoxSetting(rw),
+        HostSetting(name) { }
+};
+
+class HostLineEdit: public LineEditSetting, public HostSetting {
+  public:
+    HostLineEdit(const QString &name, bool rw = true) :
+        LineEditSetting(rw),
+        HostSetting(name) { }
+};
+
+class HostImageSelect: public ImageSelectSetting, public HostSetting {
+  public:
+    HostImageSelect(const QString &name) :
+        HostSetting(name) { }
 };
 
 class GlobalSlider: public SliderSetting, public GlobalSetting {
@@ -729,8 +770,8 @@ class GlobalSlider: public SliderSetting, public GlobalSetting {
 
 class GlobalSpinBox: public SpinBoxSetting, public GlobalSetting {
   public:
-    GlobalSpinBox(const QString &name, int min, int max, int step, 
-                  bool allow_single_step = false) :
+    GlobalSpinBox(const QString &name, int min, int max, int step,
+                   bool allow_single_step = false) :
         SpinBoxSetting(min, max, step, allow_single_step),
         GlobalSetting(name) { }
 };
@@ -755,39 +796,10 @@ class GlobalLineEdit: public LineEditSetting, public GlobalSetting {
         GlobalSetting(name) { }
 };
 
-class BackendSlider: public SliderSetting, public BackendSetting {
+class GlobalImageSelect: public ImageSelectSetting, public GlobalSetting {
   public:
-    BackendSlider(const QString &name, int min, int max, int step) :
-        SliderSetting(min, max, step),
-        BackendSetting(name) { }
-};
-
-class BackendSpinBox: public SpinBoxSetting, public BackendSetting {
-  public:
-    BackendSpinBox(const QString &name, int min, int max, int step,
-                   bool allow_single_step = false) :
-        SpinBoxSetting(min, max, step, allow_single_step),
-        BackendSetting(name) { }
-};
-
-class BackendCheckBox: public CheckBoxSetting, public BackendSetting {
-  public:
-    BackendCheckBox(const QString &name) :
-        BackendSetting(name) { }
-};
-
-class BackendComboBox: public ComboBoxSetting, public BackendSetting {
-  public:
-    BackendComboBox(const QString &name, bool rw = false) :
-        ComboBoxSetting(rw),
-        BackendSetting(name) { }
-};
-
-class BackendLineEdit: public LineEditSetting, public BackendSetting {
-  public:
-    BackendLineEdit(const QString &name, bool rw = true) :
-        LineEditSetting(rw),
-        BackendSetting(name) { }
+    GlobalImageSelect(const QString &name) :
+        GlobalSetting(name) { }
 };
 
 

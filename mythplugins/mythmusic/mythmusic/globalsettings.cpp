@@ -14,382 +14,353 @@
 
 // General Settings
 
-class SetMusicDirectory: public GlobalLineEdit {
-public:
-    SetMusicDirectory():
-        GlobalLineEdit("MusicLocation") {
-        setLabel(QObject::tr("Directory to hold music"));
-        setValue("/mnt/store/music/");
-        setHelpText(QObject::tr("This directory must exist, and the user "
+static HostLineEdit *SetMusicDirectory()
+{
+    HostLineEdit *gc = new HostLineEdit("MusicLocation");
+    gc->setLabel(QObject::tr("Directory to hold music"));
+    gc->setValue("/mnt/store/music/");
+    gc->setHelpText(QObject::tr("This directory must exist, and the user "
                     "running MythMusic needs to have write permission "
                     "to the directory."));
-    };
+    return gc;
 };
 
-class MusicAudioDevice: public GlobalComboBox {
-public:
-    MusicAudioDevice() : GlobalComboBox("AudioDevice", true) 
-    {
-        setLabel(QObject::tr("Audio device"));
-        QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
-        fillSelectionsFromDir(dev);
-        dev.setNameFilter("adsp*");
-        fillSelectionsFromDir(dev);
+static HostComboBox *MusicAudioDevice()
+{
+    HostComboBox *gc = new HostComboBox("AudioDevice", true);
+    gc->setLabel(QObject::tr("Audio device"));
+    QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
+    gc->fillSelectionsFromDir(dev);
+    dev.setNameFilter("adsp*");
+    gc->fillSelectionsFromDir(dev);
 
-        dev.setNameFilter("dsp*");
-        dev.setPath("/dev/sound");
-        fillSelectionsFromDir(dev);
-        dev.setNameFilter("adsp*");
-        fillSelectionsFromDir(dev);
-        setHelpText(QObject::tr("Audio Device used for playback."));
-    }
+    dev.setNameFilter("dsp*");
+    dev.setPath("/dev/sound");
+    gc->fillSelectionsFromDir(dev);
+    dev.setNameFilter("adsp*");
+    gc->fillSelectionsFromDir(dev);
+    gc->setHelpText(QObject::tr("Audio Device used for playback."));
+    return gc;
 };
 
-class CDDevice: public GlobalComboBox {
-public:
-    CDDevice() : GlobalComboBox("CDDevice", true) {
-        setLabel(QObject::tr("CD device"));
-        QDir dev("/dev", "cdrom*", QDir::Name, QDir::System);
-        fillSelectionsFromDir(dev);
-        dev.setNameFilter("scd*");
-        fillSelectionsFromDir(dev);
-        dev.setNameFilter("hd*");
-        fillSelectionsFromDir(dev);
+static HostComboBox *CDDevice()
+{
+    HostComboBox *gc = new HostComboBox("CDDevice", true);
+    gc->setLabel(QObject::tr("CD device"));
+    QDir dev("/dev", "cdrom*", QDir::Name, QDir::System);
+    gc->fillSelectionsFromDir(dev);
+    dev.setNameFilter("scd*");
+    gc->fillSelectionsFromDir(dev);
+    dev.setNameFilter("hd*");
+    gc->fillSelectionsFromDir(dev);
 
-        dev.setNameFilter("cdrom*");
-        dev.setPath("/dev/cdroms");
-        fillSelectionsFromDir(dev);
-        setHelpText(QObject::tr("CDRom device used for ripping/playback."));
-    }
+    dev.setNameFilter("cdrom*");
+    dev.setPath("/dev/cdroms");
+    gc->fillSelectionsFromDir(dev);
+    gc->setHelpText(QObject::tr("CDRom device used for ripping/playback."));
+    return gc;
 };
 
-class TreeLevels: public GlobalLineEdit {
-public:
-    TreeLevels():
-        GlobalLineEdit("TreeLevels", true) {
-        setLabel(QObject::tr("Tree Sorting"));
-        setValue("splitartist artist album title");
-        setHelpText(QObject::tr("Order in which to sort the Music "
+static HostLineEdit *TreeLevels()
+{
+    HostLineEdit *gc = new HostLineEdit("TreeLevels", true);
+    gc->setLabel(QObject::tr("Tree Sorting"));
+    gc->setValue("splitartist artist album title");
+    gc->setHelpText(QObject::tr("Order in which to sort the Music "
                     "Tree. Possible values are a space-separated list of "
                     "genre, splitartist, artist, album, and title OR the "
                     "keyword \"directory\" to indicate that "
                     "the onscreen tree mirrors the filesystem."));
-    };
+    return gc;
 };
 
-class PostCDRipScript: public GlobalLineEdit {
-public:
-    PostCDRipScript():
-        GlobalLineEdit("PostCDRipScript") {
-        setLabel(QObject::tr("Script Path"));
-        setValue("");
-        setHelpText(QObject::tr("If present this script will be executed "
+static HostLineEdit *PostCDRipScript()
+{
+    HostLineEdit *gc = new HostLineEdit("PostCDRipScript");
+    gc->setLabel(QObject::tr("Script Path"));
+    gc->setValue("");
+    gc->setHelpText(QObject::tr("If present this script will be executed "
                     "after a CD Rip is completed."));
-    };
+    return gc;
 };
 
-class NonID3FileNameFormat: public GlobalLineEdit {
-public:
-    NonID3FileNameFormat():
-        GlobalLineEdit("NonID3FileNameFormat") {
-        setLabel(QObject::tr("Filename Format"));
-        setValue("GENRE/ARTIST/ALBUM/TRACK_TITLE");
-        setHelpText(QObject::tr("Directory and filename Format used to grab "
+static HostLineEdit *NonID3FileNameFormat()
+{
+    HostLineEdit *gc = new HostLineEdit("NonID3FileNameFormat");
+    gc->setLabel(QObject::tr("Filename Format"));
+    gc->setValue("GENRE/ARTIST/ALBUM/TRACK_TITLE");
+    gc->setHelpText(QObject::tr("Directory and filename Format used to grab "
                     "information if no ID3 information is found."));
-    };
+    return gc;
 };
 
 
-class IgnoreID3Tags: public GlobalCheckBox {
-public:
-    IgnoreID3Tags():
-        GlobalCheckBox("Ignore_ID3") {
-        setLabel(QObject::tr("Ignore ID3 Tags"));
-        setValue(false);
-        setHelpText(QObject::tr("If set, MythMusic will skip checking ID3 tags "
+static HostCheckBox *IgnoreID3Tags()
+{
+    HostCheckBox *gc = new HostCheckBox("Ignore_ID3");
+    gc->setLabel(QObject::tr("Ignore ID3 Tags"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If set, MythMusic will skip checking ID3 tags "
                     "in files and just try to determine Genre, Artist, "
                     "Album, and Track number and title from the "
                     "filename."));
-    };
+    return gc;
 };
 
-class AutoLookupCD: public GlobalCheckBox {
-public:
-    AutoLookupCD():
-        GlobalCheckBox("AutoLookupCD") {
-        setLabel(QObject::tr("Automatically lookup CDs"));
-        setValue(true);
-        setHelpText(QObject::tr("Automatically lookup an audio CD if it is "
+static HostCheckBox *AutoLookupCD()
+{
+    HostCheckBox *gc = new HostCheckBox("AutoLookupCD");
+    gc->setLabel(QObject::tr("Automatically lookup CDs"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("Automatically lookup an audio CD if it is "
                     "present and show its information in the "
                     "Music Selection Tree."));
-    };
+    return gc;
 };
 
-class KeyboardAccelerators: public GlobalCheckBox {
-public:
-    KeyboardAccelerators():
-        GlobalCheckBox("KeyboardAccelerators") {
-        setLabel(QObject::tr("Use Keyboard/Remote Accelerated Buttons"));
-        setValue(true);
-        setHelpText(QObject::tr("If this is not set, you will need "
+static HostCheckBox *KeyboardAccelerators()
+{
+    HostCheckBox *gc = new HostCheckBox("KeyboardAccelerators");
+    gc->setLabel(QObject::tr("Use Keyboard/Remote Accelerated Buttons"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("If this is not set, you will need "
                     "to use arrow keys to select and activate "
                     "various functions."));
-    };
+    return gc;
 };
 
 // Encoder settings
 
-class EncoderType: public GlobalComboBox {
-public:
-    EncoderType():
-        GlobalComboBox("EncoderType") {
-        setLabel(QObject::tr("Encoding"));
-        addSelection(QObject::tr("Ogg Vorbis"), "ogg");
-        addSelection(QObject::tr("Lame (MP3)"), "mp3");
-        setHelpText(QObject::tr("Audio encoder to use for CD ripping. "
+static HostComboBox *EncoderType()
+{
+    HostComboBox *gc = new HostComboBox("EncoderType");
+    gc->setLabel(QObject::tr("Encoding"));
+    gc->addSelection(QObject::tr("Ogg Vorbis"), "ogg");
+    gc->addSelection(QObject::tr("Lame (MP3)"), "mp3");
+    gc->setHelpText(QObject::tr("Audio encoder to use for CD ripping. "
                     "Note that the quality level 'Perfect' will use the "
-		    "FLAC encoder."));
-    };
+		                "FLAC encoder."));
+    return gc;
 };
 
-class DefaultRipQuality: public GlobalComboBox {
-public:
-    DefaultRipQuality():
-        GlobalComboBox("DefaultRipQuality") {
-        setLabel(QObject::tr("Default Rip Quality"));
-        addSelection(QObject::tr("Low"), "0");
-        addSelection(QObject::tr("Medium"), "1");
-        addSelection(QObject::tr("High"), "2");
-        addSelection(QObject::tr("Perfect"), "3");
-        setHelpText(QObject::tr("Default quality for new CD rips."));
-    };
+static HostComboBox *DefaultRipQuality()
+{
+    HostComboBox *gc = new HostComboBox("DefaultRipQuality");
+    gc->setLabel(QObject::tr("Default Rip Quality"));
+    gc->addSelection(QObject::tr("Low"), "0");
+    gc->addSelection(QObject::tr("Medium"), "1");
+    gc->addSelection(QObject::tr("High"), "2");
+    gc->addSelection(QObject::tr("Perfect"), "3");
+    gc->setHelpText(QObject::tr("Default quality for new CD rips."));
+    return gc;
 };
 
-class Mp3UseVBR: public GlobalCheckBox {
-public:
-    Mp3UseVBR():
-        GlobalCheckBox("Mp3UseVBR") {
-        setLabel(QObject::tr("Use variable bitrates"));
-        setValue(false);
-        setHelpText(QObject::tr("If set, the MP3 encoder will use variable "
+static HostCheckBox *Mp3UseVBR()
+{
+    HostCheckBox *gc = new HostCheckBox("Mp3UseVBR");
+    gc->setLabel(QObject::tr("Use variable bitrates"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If set, the MP3 encoder will use variable "
                     "bitrates (VBR) except for the low quality setting. "
                     "The Ogg encoder will always use variable bitrates."));
-    };
+    return gc;
 };
 
-class FilenameTemplate: public GlobalLineEdit {
-public:
-    FilenameTemplate():
-        GlobalLineEdit("FilenameTemplate") {
-        setLabel(QObject::tr("File storage location"));
-        setValue("ARTIST/ALBUM/TRACK-TITLE"); // Don't translate
-        setHelpText(QObject::tr("Defines the location/name for new songs. "
+static HostLineEdit *FilenameTemplate()
+{
+    HostLineEdit *gc = new HostLineEdit("FilenameTemplate");
+    gc->setLabel(QObject::tr("File storage location"));
+    gc->setValue("ARTIST/ALBUM/TRACK-TITLE"); // Don't translate
+    gc->setHelpText(QObject::tr("Defines the location/name for new songs. "
                     "Valid tokens are: GENRE, ARTIST, ALBUM, "
                     "TRACK, TITLE, YEAR, / and -. '-' will be replaced "
                     "by the Token separator"));
-    };
+    return gc;
 };
 
-class TagSeparator: public GlobalLineEdit {
-public:
-    TagSeparator():
-        GlobalLineEdit("TagSeparator") {
-        setLabel(QObject::tr("Token separator"));
-        setValue(QObject::tr(" - "));
-        setHelpText(QObject::tr("Filename tokens will be separated by "
+static HostLineEdit *TagSeparator()
+{
+    HostLineEdit *gc = new HostLineEdit("TagSeparator");
+    gc->setLabel(QObject::tr("Token separator"));
+    gc->setValue(QObject::tr(" - "));
+    gc->setHelpText(QObject::tr("Filename tokens will be separated by "
                     "this string."));
-    };
+    return gc;
 };
 
-class NoWhitespace: public GlobalCheckBox {
-public:
-    NoWhitespace():
-    GlobalCheckBox("NoWhitespace") {
-        setLabel(QObject::tr("Replace ' ' with '_'"));
-        setValue(false);
-        setHelpText(QObject::tr("If set, whitespace characters in filenames "
+static HostCheckBox *NoWhitespace()
+{
+    HostCheckBox *gc = new HostCheckBox("NoWhitespace");
+    gc->setLabel(QObject::tr("Replace ' ' with '_'"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If set, whitespace characters in filenames "
                     "will be replaced with underscore characters."));
-    };
+    return gc;
 };
 
-class ParanoiaLevel: public GlobalComboBox {
-public:
-    ParanoiaLevel():
-        GlobalComboBox("ParanoiaLevel") {
-        setLabel(QObject::tr("Paranoia Level"));
-        addSelection(QObject::tr("Full"), "Full");
-        addSelection(QObject::tr("Faster"), "Faster");
-        setHelpText(QObject::tr("Paranoia level of the CD ripper. Set to "
+static HostComboBox *ParanoiaLevel()
+{
+    HostComboBox *gc = new HostComboBox("ParanoiaLevel");
+    gc->setLabel(QObject::tr("Paranoia Level"));
+    gc->addSelection(QObject::tr("Full"), "Full");
+    gc->addSelection(QObject::tr("Faster"), "Faster");
+    gc->setHelpText(QObject::tr("Paranoia level of the CD ripper. Set to "
                     "faster if you're not concerned about "
                     "possible errors in the audio."));
-    };
+    return gc;
 };
 
-class EjectCD: public GlobalCheckBox {
-public:
-    EjectCD():
-        GlobalCheckBox("EjectCDAfterRipping") {
-        setLabel(QObject::tr("Automatically eject CDs after ripping"));
-        setValue(true);
-        setHelpText(QObject::tr("If set, the CD tray will automatically open "
+static HostCheckBox *EjectCD()
+{
+    HostCheckBox *gc = new HostCheckBox("EjectCDAfterRipping");
+    gc->setLabel(QObject::tr("Automatically eject CDs after ripping"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("If set, the CD tray will automatically open "
                     "after the CD has been ripped."));
-    };
+    return gc;
 };
 
-class SetRatingWeight: public GlobalSpinBox {
-public:
-    SetRatingWeight():
-        GlobalSpinBox("IntelliRatingWeight", 0, 100, 1) {
-        setLabel(QObject::tr("Rating Weight"));
-        setValue(35);
-        setHelpText(QObject::tr("Used in \"Smart\" Shuffle mode. "
+static HostSpinBox *SetRatingWeight()
+{
+    HostSpinBox *gc = new HostSpinBox("IntelliRatingWeight", 0, 100, 1);
+    gc->setLabel(QObject::tr("Rating Weight"));
+    gc->setValue(35);
+    gc->setHelpText(QObject::tr("Used in \"Smart\" Shuffle mode. "
                     "This weighting affects how much strength is "
                     "given to your rating of a given track when "
                     "ordering a group of songs."));
-    };
+    return gc;
 };
 
-class SetPlayCountWeight: public GlobalSpinBox {
-public:
-    SetPlayCountWeight():
-        GlobalSpinBox("IntelliPlayCountWeight", 0, 100, 1) {
-        setLabel(QObject::tr("Play Count Weight"));
-        setValue(25);
-        setHelpText(QObject::tr("Used in \"Smart\" Shuffle mode. "
+static HostSpinBox *SetPlayCountWeight()
+{
+    HostSpinBox *gc = new HostSpinBox("IntelliPlayCountWeight", 0, 100, 1);
+    gc->setLabel(QObject::tr("Play Count Weight"));
+    gc->setValue(25);
+    gc->setHelpText(QObject::tr("Used in \"Smart\" Shuffle mode. "
                     "This weighting affects how much strength is "
                     "given to how many times a given track has been "
                     "played when ordering a group of songs."));
-    };
+    return gc;
 };
 
-class SetLastPlayWeight: public GlobalSpinBox {
-public:
-    SetLastPlayWeight():
-        GlobalSpinBox("IntelliLastPlayWeight", 0, 100, 1) {
-        setLabel(QObject::tr("Last Play Weight"));
-        setValue(25);
-        setHelpText(QObject::tr("Used in \"Smart\" Shuffle mode. "
+static HostSpinBox *SetLastPlayWeight()
+{
+    HostSpinBox *gc = new HostSpinBox("IntelliLastPlayWeight", 0, 100, 1);
+    gc->setLabel(QObject::tr("Last Play Weight"));
+    gc->setValue(25);
+    gc->setHelpText(QObject::tr("Used in \"Smart\" Shuffle mode. "
                     "This weighting affects how much strength is "
                     "given to how long it has been since a given "
                     "track was played when ordering a group of songs."));
-    };
+    return gc;
 };
 
-class SetRandomWeight: public GlobalSpinBox {
-public:
-    SetRandomWeight():
-        GlobalSpinBox("IntelliRandomWeight", 0, 100, 1) {
-        setLabel(QObject::tr("Random Weight"));
-        setValue(15);
-        setHelpText(QObject::tr("Used in \"Smart\" Shuffle mode. "
+static HostSpinBox *SetRandomWeight()
+{
+    HostSpinBox *gc = new HostSpinBox("IntelliRandomWeight", 0, 100, 1);
+    gc->setLabel(QObject::tr("Random Weight"));
+    gc->setValue(15);
+    gc->setHelpText(QObject::tr("Used in \"Smart\" Shuffle mode. "
                     "This weighting affects how much strength is "
                     "given to good old (peudo-)randomness "
                     "when ordering a group of songs."));
-    };
+    return gc;
 };
 
-class UseShowRatings: public GlobalCheckBox {
-public:
-    UseShowRatings():
-        GlobalCheckBox("MusicShowRatings") {
-        setLabel(QObject::tr("Show Song Ratings"));
-        setValue(false);
-        setHelpText(QObject::tr("Show song ratings on the playback screen."));
-    };
+static HostCheckBox *UseShowRatings()
+{
+    HostCheckBox *gc = new HostCheckBox("MusicShowRatings");
+    gc->setLabel(QObject::tr("Show Song Ratings"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Show song ratings on the playback screen."));
+    return gc;
 };
 
-class UseListShuffled: public GlobalCheckBox {
-public:
-    UseListShuffled():
-        GlobalCheckBox("ListAsShuffled") {
-        setLabel(QObject::tr("List as Shuffled"));
-        setValue(false);
-        setHelpText(QObject::tr("List songs on the playback screen "
+static HostCheckBox *UseListShuffled()
+{
+    HostCheckBox *gc = new HostCheckBox("ListAsShuffled");
+    gc->setLabel(QObject::tr("List as Shuffled"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("List songs on the playback screen "
                     "in the order they will be played."));
-    };
+    return gc;
 };
 
-class UseShowWholeTree: public GlobalCheckBox {
-public:
-    UseShowWholeTree():
-        GlobalCheckBox("ShowWholeTree") {
-        setLabel(QObject::tr("Show entire music tree"));
-        setValue(false);
-        setHelpText(QObject::tr("If selected, you can navigate your entire music "
-                    "tree from the playing screen."));
-    };
+static HostCheckBox *UseShowWholeTree()
+{
+    HostCheckBox *gc = new HostCheckBox("ShowWholeTree");
+    gc->setLabel(QObject::tr("Show entire music tree"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If selected, you can navigate your entire "
+                    "music tree from the playing screen."));
+    return gc;
 };
 
 //Player Settings
 
-class PlayMode: public GlobalComboBox {
-public:
-    PlayMode():
-        GlobalComboBox("PlayMode") {
-        setLabel(QObject::tr("Play mode"));
-        addSelection(QObject::tr("Normal"), "Normal");
-        addSelection(QObject::tr("Random"), "Random");
-        addSelection(QObject::tr("Intelligent"), "Intelligent");
-        setHelpText(QObject::tr("Starting shuffle mode for the player.  Can be "
+static HostComboBox *PlayMode()
+{
+    HostComboBox *gc = new HostComboBox("PlayMode");
+    gc->setLabel(QObject::tr("Play mode"));
+    gc->addSelection(QObject::tr("Normal"), "Normal");
+    gc->addSelection(QObject::tr("Random"), "Random");
+    gc->addSelection(QObject::tr("Intelligent"), "Intelligent");
+    gc->setHelpText(QObject::tr("Starting shuffle mode for the player.  Can be "
                     "either normal, random, or intelligent (random)."));
-    };
+    return gc;
 };
 
-class VisualModeDelay: public GlobalSlider {
-public:
-    VisualModeDelay():
-        GlobalSlider("VisualModeDelay", 0, 100, 1) {
-        setLabel(QObject::tr("Delay before Visualizations start (seconds)"));
-        setValue(0);
-        setHelpText(QObject::tr("If set to 0, visualizations will never "
+static HostSlider *VisualModeDelay()
+{
+    HostSlider *gc = new HostSlider("VisualModeDelay", 0, 100, 1);
+    gc->setLabel(QObject::tr("Delay before Visualizations start (seconds)"));
+    gc->setValue(0);
+    gc->setHelpText(QObject::tr("If set to 0, visualizations will never "
                     "automatically start."));
-        };
+    return gc;
 };
 
-class VisualCycleOnSongChange: public GlobalCheckBox {
-public:
-    VisualCycleOnSongChange():
-        GlobalCheckBox("VisualCycleOnSongChange") {
-        setLabel(QObject::tr("Change Visualizer on each song"));
-        setValue(false);
-        setHelpText(QObject::tr("Change the visualizer when the song "
+static HostCheckBox *VisualCycleOnSongChange()
+{
+    HostCheckBox *gc = new HostCheckBox("VisualCycleOnSongChange");
+    gc->setLabel(QObject::tr("Change Visualizer on each song"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Change the visualizer when the song "
                     "change."));
-    };
+    return gc;
 };
 
-class VisualScaleWidth: public GlobalSpinBox {
-public:
-    VisualScaleWidth():
-        GlobalSpinBox("VisualScaleWidth", 1, 2, 1) {
-        setLabel(QObject::tr("Width for Visual Scaling"));
-        setValue(1);
-        setHelpText(QObject::tr("If set to \"2\", visualizations will be "
+static HostSpinBox *VisualScaleWidth()
+{
+    HostSpinBox *gc = new HostSpinBox("VisualScaleWidth", 1, 2, 1);
+    gc->setLabel(QObject::tr("Width for Visual Scaling"));
+    gc->setValue(1);
+    gc->setHelpText(QObject::tr("If set to \"2\", visualizations will be "
                     "scaled in half.  Currently only used by "
                     "the goom visualization.  Reduces CPU load "
                     "on slower machines."));
-    };
+    return gc;
 };
 
-class VisualScaleHeight: public GlobalSpinBox {
-public:
-    VisualScaleHeight():
-        GlobalSpinBox("VisualScaleHeight", 1, 2, 1) {
-        setLabel(QObject::tr("Height for Visual Scaling"));
-        setValue(1);
-        setHelpText(QObject::tr("If set to \"2\", visualizations will be "
+static HostSpinBox *VisualScaleHeight()
+{
+    HostSpinBox *gc = new HostSpinBox("VisualScaleHeight", 1, 2, 1);
+    gc->setLabel(QObject::tr("Height for Visual Scaling"));
+    gc->setValue(1);
+    gc->setHelpText(QObject::tr("If set to \"2\", visualizations will be "
                     "scaled in half.  Currently only used by "
                     "the goom visualization.  Reduces CPU load "
                     "on slower machines."));
-    };
+    return gc;
 };
 
-class VisualizationMode: public GlobalLineEdit {
-public:
-    VisualizationMode():
-        GlobalLineEdit("VisualMode") {
-        setLabel(QObject::tr("Visualizations"));
-        setValue(QObject::tr("Random"));
-        setHelpText(QObject::tr("List of visualizations to use during playback."
+static HostLineEdit *VisualizationMode()
+{
+    HostLineEdit *gc = new HostLineEdit("VisualMode");
+    gc->setLabel(QObject::tr("Visualizations"));
+    gc->setValue(QObject::tr("Random"));
+    gc->setHelpText(QObject::tr("List of visualizations to use during playback."
                     " Possible values are space-separated list of ") +
                     QObject::tr("Random") + ", " + 
                     QObject::tr("MonoScope") + ", " + 
@@ -401,150 +372,143 @@ public:
                     QObject::tr("AlbumArt") + ", " +
                     QObject::tr("Gears") + ", " + QObject::tr("and") + " " + 
                     QObject::tr("Blank"));
-    };
+    return gc;
 };
 
 // CD Writer Settings
 
-class CDWriterEnabled: public GlobalCheckBox {
-public:
-    CDWriterEnabled():
-        GlobalCheckBox("CDWriterEnabled") {
-        setLabel(QObject::tr("Enable CD Writing."));
-        setValue(true);
-        setHelpText(QObject::tr("Requires a SCSI or an IDE-SCSI CD Writer."));
-    };
+static HostCheckBox *CDWriterEnabled()
+{
+    HostCheckBox *gc = new HostCheckBox("CDWriterEnabled");
+    gc->setLabel(QObject::tr("Enable CD Writing."));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("Requires a SCSI or an IDE-SCSI CD Writer."));
+    return gc;
 };
 
-class CDWriterDevice: public GlobalComboBox {
-public:
-    CDWriterDevice():
-        GlobalComboBox("CDWriterDevice") {
+static HostComboBox *CDWriterDevice()
+{
+    HostComboBox *gc = new HostComboBox("CDWriterDevice");
 
-        QStringList args;
-        QStringList result;
+    QStringList args;
+    QStringList result;
 
-        args = "cdrecord";
-        args += "--scanbus";
+    args = "cdrecord";
+    args += "--scanbus";
 
-        QProcess proc(args);
+    QProcess proc(args);
 
-        if (proc.start())
+    if (proc.start())
+    {
+        while (1)
         {
-            while (1)
+            while (proc.canReadLineStdout())
+                result += proc.readLineStdout();
+            if (proc.isRunning())
             {
-                while (proc.canReadLineStdout())
-                    result += proc.readLineStdout();
-                if (proc.isRunning())
-                {
-                    qApp->processEvents();
-                    usleep(10000);
-                }
-                else
-                {
-                    if (!proc.normalExit())
-                        cerr << "Failed to run 'cdrecord --scanbus'\n";
-                    break;
-                }
+                qApp->processEvents();
+                usleep(10000);
+            }
+            else
+            {
+                if (!proc.normalExit())
+                    cerr << "Failed to run 'cdrecord --scanbus'\n";
+                break;
             }
         }
-        else
-            cerr << "Failed to run 'cdrecord --scanbus'\n";
+    }
+    else
+        cerr << "Failed to run 'cdrecord --scanbus'\n";
 
-        while (proc.canReadLineStdout())
-            result += proc.readLineStdout();
+    while (proc.canReadLineStdout())
+        result += proc.readLineStdout();
 
-        for (QStringList::Iterator it = result.begin(); it != result.end();
-             ++it)
+    for (QStringList::Iterator it = result.begin(); it != result.end();
+         ++it)
+    {
+        QString line = *it;
+        if (line.length() > 12)
         {
-            QString line = *it;
-            if (line.length() > 12)
+            if (line[10] == ')' && line[12] != '*')
             {
-                if (line[10] == ')' && line[12] != '*')
-                {
-                    addSelection(line.mid(24, 16), line.mid(1, 5));
-                }
+                gc->addSelection(line.mid(24, 16), line.mid(1, 5));
             }
         }
-
-        setLabel(QObject::tr("CD-Writer Device"));
-        setHelpText(QObject::tr("Select the SCSI Device for CD Writing.  If "
+    }
+    gc->setLabel(QObject::tr("CD-Writer Device"));
+    gc->setHelpText(QObject::tr("Select the SCSI Device for CD Writing.  If "
                     "your IDE device is not present, try adding "
                     "hdd(or hdc/hdb)=ide-scsi to your boot options"));
-    };
+    return gc;
 };
 
-class CDDiskSize: public GlobalComboBox {
-public:
-    CDDiskSize():
-        GlobalComboBox("CDDiskSize") {
-        setLabel(QObject::tr("Disk Size"));
-        addSelection(QObject::tr("650MB/75min"), "1");
-        addSelection(QObject::tr("700MB/80min"), "2");
-        setHelpText(QObject::tr("Default CD Capacity."));
-    };
+static HostComboBox *CDDiskSize()
+{
+    HostComboBox *gc = new HostComboBox("CDDiskSize");
+    gc->setLabel(QObject::tr("Disk Size"));
+    gc->addSelection(QObject::tr("650MB/75min"), "1");
+    gc->addSelection(QObject::tr("700MB/80min"), "2");
+    gc->setHelpText(QObject::tr("Default CD Capacity."));
+    return gc;
 };
 
-class CDCreateDir: public GlobalCheckBox {
-public:
-    CDCreateDir():
-        GlobalCheckBox("CDCreateDir") {
-        setLabel(QObject::tr("Enable directories on MP3 Creation"));
-        setValue(true);
-        setHelpText("");
-    };
+static HostCheckBox *CDCreateDir()
+{
+    HostCheckBox *gc = new HostCheckBox("CDCreateDir");
+    gc->setLabel(QObject::tr("Enable directories on MP3 Creation"));
+    gc->setValue(true);
+    gc->setHelpText("");
+    return gc;
 };
 
-class CDWriteSpeed: public GlobalComboBox {
-public:
-    CDWriteSpeed():
-        GlobalComboBox("CDWriteSpeed") {
-        setLabel(QObject::tr("CD Write Speed"));
-        addSelection(QObject::tr("Auto"), "0");
-        addSelection(QObject::tr("1x"), "1");
-        addSelection(QObject::tr("2x"), "2");
-        addSelection(QObject::tr("4x"), "4");
-        addSelection(QObject::tr("8x"), "8");
-        addSelection(QObject::tr("16x"), "16");
-        setHelpText(QObject::tr("CD Writer speed. Auto will use the recomended "
+static HostComboBox *CDWriteSpeed()
+{
+    HostComboBox *gc = new HostComboBox("CDWriteSpeed");
+    gc->setLabel(QObject::tr("CD Write Speed"));
+    gc->addSelection(QObject::tr("Auto"), "0");
+    gc->addSelection(QObject::tr("1x"), "1");
+    gc->addSelection(QObject::tr("2x"), "2");
+    gc->addSelection(QObject::tr("4x"), "4");
+    gc->addSelection(QObject::tr("8x"), "8");
+    gc->addSelection(QObject::tr("16x"), "16");
+    gc->setHelpText(QObject::tr("CD Writer speed. Auto will use the recomended "
                     "speed."));
-    };
+    return gc;
 };
 
-class CDBlankType: public GlobalComboBox {
-public:
-    CDBlankType():
-        GlobalComboBox("CDBlankType") {
-        setLabel(QObject::tr("CD Blanking Type"));
-        addSelection(QObject::tr("Fast"), "fast");
-        addSelection(QObject::tr("Complete"), "all");
-        setHelpText(QObject::tr("Blanking Method. Fast takes 1 minute. "
+static HostComboBox *CDBlankType()
+{
+    HostComboBox *gc = new HostComboBox("CDBlankType");
+    gc->setLabel(QObject::tr("CD Blanking Type"));
+    gc->addSelection(QObject::tr("Fast"), "fast");
+    gc->addSelection(QObject::tr("Complete"), "all");
+    gc->setHelpText(QObject::tr("Blanking Method. Fast takes 1 minute. "
                     "Complete can take up to 20 minutes."));
-    };
+    return gc;
 };
 
 MusicGeneralSettings::MusicGeneralSettings()
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
     general->setLabel(QObject::tr("General Settings"));
-    general->addChild(new SetMusicDirectory());
-    general->addChild(new MusicAudioDevice());
-    general->addChild(new CDDevice());
-    general->addChild(new TreeLevels());
-    general->addChild(new NonID3FileNameFormat());
-    general->addChild(new IgnoreID3Tags());
-    general->addChild(new AutoLookupCD());
-    general->addChild(new KeyboardAccelerators());
+    general->addChild(SetMusicDirectory());
+    general->addChild(MusicAudioDevice());
+    general->addChild(CDDevice());
+    general->addChild(TreeLevels());
+    general->addChild(NonID3FileNameFormat());
+    general->addChild(IgnoreID3Tags());
+    general->addChild(AutoLookupCD());
+    general->addChild(KeyboardAccelerators());
     addChild(general);
 
     VerticalConfigurationGroup* general2 = new VerticalConfigurationGroup(false);
     general2->setLabel(QObject::tr("CD Recording Settings"));
-    general2->addChild(new CDWriterEnabled());
-    general2->addChild(new CDWriterDevice());
-    general2->addChild(new CDDiskSize());
-    general2->addChild(new CDCreateDir());
-    general2->addChild(new CDWriteSpeed());
-    general2->addChild(new CDBlankType());
+    general2->addChild(CDWriterEnabled());
+    general2->addChild(CDWriterDevice());
+    general2->addChild(CDDiskSize());
+    general2->addChild(CDCreateDir());
+    general2->addChild(CDWriteSpeed());
+    general2->addChild(CDBlankType());
     addChild(general2);
 }
 
@@ -552,23 +516,23 @@ MusicPlayerSettings::MusicPlayerSettings()
 {
     VerticalConfigurationGroup* playersettings = new VerticalConfigurationGroup(false);
     playersettings->setLabel(QObject::tr("Playback Settings"));
-    playersettings->addChild(new PlayMode());
-    playersettings->addChild(new SetRatingWeight());
-    playersettings->addChild(new SetPlayCountWeight());
-    playersettings->addChild(new SetLastPlayWeight());
-    playersettings->addChild(new SetRandomWeight());
-    playersettings->addChild(new UseShowRatings());
-    playersettings->addChild(new UseShowWholeTree());
-    playersettings->addChild(new UseListShuffled());
+    playersettings->addChild(PlayMode());
+    playersettings->addChild(SetRatingWeight());
+    playersettings->addChild(SetPlayCountWeight());
+    playersettings->addChild(SetLastPlayWeight());
+    playersettings->addChild(SetRandomWeight());
+    playersettings->addChild(UseShowRatings());
+    playersettings->addChild(UseShowWholeTree());
+    playersettings->addChild(UseListShuffled());
     addChild(playersettings);
 
     VerticalConfigurationGroup* playersettings2 = new VerticalConfigurationGroup(false);
     playersettings2->setLabel(QObject::tr("Visualization Settings"));
-    playersettings2->addChild(new VisualizationMode());
-    playersettings2->addChild(new VisualCycleOnSongChange());
-    playersettings2->addChild(new VisualModeDelay());
-    playersettings2->addChild(new VisualScaleWidth());
-    playersettings2->addChild(new VisualScaleHeight());
+    playersettings2->addChild(VisualizationMode());
+    playersettings2->addChild(VisualCycleOnSongChange());
+    playersettings2->addChild(VisualModeDelay());
+    playersettings2->addChild(VisualScaleWidth());
+    playersettings2->addChild(VisualScaleHeight());
     addChild(playersettings2);
 }
 
@@ -576,19 +540,19 @@ MusicRipperSettings::MusicRipperSettings()
 {
     VerticalConfigurationGroup* rippersettings = new VerticalConfigurationGroup(false);
     rippersettings->setLabel(QObject::tr("CD Ripper Settings"));
-    rippersettings->addChild(new ParanoiaLevel());
-    rippersettings->addChild(new FilenameTemplate());
-    rippersettings->addChild(new TagSeparator());
-    rippersettings->addChild(new NoWhitespace());
-    rippersettings->addChild(new PostCDRipScript());
-    rippersettings->addChild(new EjectCD());
+    rippersettings->addChild(ParanoiaLevel());
+    rippersettings->addChild(FilenameTemplate());
+    rippersettings->addChild(TagSeparator());
+    rippersettings->addChild(NoWhitespace());
+    rippersettings->addChild(PostCDRipScript());
+    rippersettings->addChild(EjectCD());
     addChild(rippersettings);
 
     VerticalConfigurationGroup* encodersettings = new VerticalConfigurationGroup(false);
     encodersettings->setLabel(QObject::tr("CD Ripper Settings (part 2)"));
-    encodersettings->addChild(new EncoderType());
-    encodersettings->addChild(new DefaultRipQuality());
-    encodersettings->addChild(new Mp3UseVBR());
+    encodersettings->addChild(EncoderType());
+    encodersettings->addChild(DefaultRipQuality());
+    encodersettings->addChild(Mp3UseVBR());
     addChild(encodersettings);
 }
 
