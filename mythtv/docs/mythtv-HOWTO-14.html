@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
+ <TITLE>Installing and using mythtv: mythmusic. </TITLE>
+ <LINK HREF="mythtv-HOWTO-15.html" REL=next>
+ <LINK HREF="mythtv-HOWTO-13.html" REL=previous>
+ <LINK HREF="mythtv-HOWTO.html#toc14" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="mythtv-HOWTO-15.html">Next</A>
+<A HREF="mythtv-HOWTO-13.html">Previous</A>
+<A HREF="mythtv-HOWTO.html#toc14">Contents</A>
+<HR>
+<H2><A NAME="s14">14.</A> <A HREF="mythtv-HOWTO.html#toc14">mythmusic. </A></H2>
+
+<P>[Documentation still being developed.]</P>
+<P>mythmusic has a number of pre-requisites that must be satisfied before it
+is operational.  Depending on your distribution, some of these prerequisites can
+be satisfied through the various package managers.  If your distribution doesn't
+offer pre-compiled versions of the software below, then follow the generic
+instructions for manually compiling and installing the software.</P>
+<P>The pre-requisites for mythtmusic are:
+<UL>
+<LI>MAD</LI>
+<LI>libvorbis-devel</LI>
+<LI>FLAC</LI>
+<LI>libcdaudio</LI>
+<LI>CDParanoia</LI>
+</UL>
+</P>
+
+<H2><A NAME="ss14.1">14.1</A> <A HREF="mythtv-HOWTO.html#toc14.1">Manual installation of pre-requisites</A>
+</H2>
+
+<P>These instructions are for distributions which don't have pre-compiled
+versions of the software necessary to run mythtv.</P>
+<P>Download MAD from 
+<A HREF="http://www.mars.org/home/rob/proj/mpeg/">http://www.mars.org/home/rob/proj/mpeg/</A>  Save it to a directory you
+can find later.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+% tar -xzf mad-0.14.2b.tar.gz
+% cd mad-0.14.2b
+% ./configure
+% make
+% su
+# make install
+# exit
+%
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Download FLAC from 
+<A HREF="http://flac.sourceforge.net">http://flac.sourceforge.net</A> and install:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+% tar -xzf flac-1.0.4.tar.gz
+% cd flac-1.0.4
+% ./configure
+% make
+% su
+# make install
+# exit
+%
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Download and install libcdaudio:
+<BLOCKQUOTE><CODE>
+<PRE>
+% tar -xzf libcdaudio-XXXXX
+% cd libcdaudio-XXXXX
+% ./configure
+% make
+% su
+# make install
+# exit
+%
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Download cdparanoia from the website and copy interface/cdda_interface.h to
+/usr/local/include</P>
+<P>/usr/lib:
+ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
+ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so</P>
+
+<H2><A NAME="ss14.2">14.2</A> <A HREF="mythtv-HOWTO.html#toc14.2">Mandrake 9.0</A>
+</H2>
+
+<P>Mandrake 9.0 has a number of the pre-requisites available on the installation
+CD.  Some of the software you're going to need will have to be obtained from the "
+contrib" or "cooker" development repositories.  Applications downloaded from "
+cooker" come from the development branch, so there may be issues with some
+software.</P>
+
+<P>Install libvorbis-devel using urpmi or the Mandrake Control Center
+installer.</P>
+<P>Install cdparanoia using urpmi or the Mandrake Control Center.</P>
+
+<HR>
+<A HREF="mythtv-HOWTO-15.html">Next</A>
+<A HREF="mythtv-HOWTO-13.html">Previous</A>
+<A HREF="mythtv-HOWTO.html#toc14">Contents</A>
+</BODY>
+</HTML>

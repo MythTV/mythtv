@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
- <TITLE>Installing and using mythtv: Downloading and compiling.</TITLE>
+ <TITLE>Installing and using mythtv: Setting up paths and ldconfig.</TITLE>
  <LINK HREF="mythtv-HOWTO-5.html" REL=next>
  <LINK HREF="mythtv-HOWTO-3.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc4" REL=contents>
@@ -12,161 +12,80 @@
 <A HREF="mythtv-HOWTO-3.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc4">Contents</A>
 <HR>
-<H2><A NAME="s4">4.</A> <A HREF="mythtv-HOWTO.html#toc4">Downloading and compiling.</A></H2>
+<H2><A NAME="s4">4.</A> <A HREF="mythtv-HOWTO.html#toc4">Setting up paths and ldconfig.</A></H2>
 
-<P>Get mythtv from the 
-<A HREF="http://www.mythtv.org">mythtv.org</A>
-web site.  Save the tarball to a directory you can find.</P>
-<P>Get XMLTV from 
-<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download version 0.5.2</P>
-<P>Get lame from 
-<A HREF="http://www.mp3dev.org/mp3">http://www.mp3dev.org/mp3</A>.  Download the source code to v3.92 by
-following the links to sourceforge.net</P>
+<P>There are some paths that need to be modified before starting the main
+compile of mythtv, otherwise you will get errors.</P>
 
-<H2><A NAME="nonintelcpu_"></A> <A NAME="ss4.1">4.1</A> <A HREF="mythtv-HOWTO.html#toc4.1">Notes on compiling on a system with non-Intel processors. </A>
+<H2><A NAME="ss4.1">4.1</A> <A HREF="mythtv-HOWTO.html#toc4.1">Distribution-specific information.</A>
 </H2>
 
-<P>If
-you've got a system with an AMD K6-2 or a VIA C3 processor, make the
-following change in the <CODE>settings.pro</CODE> file.</P>
-<P>Look for 
-<PRE>
--march=pentiumpro
-</PRE>
- 
-and replace it with
-<PRE>
--march=i586
-</PRE>
- 
-before you compile.</P>
-<P>Recent AMD processors, like the Duron, Thunderbird and Athlon don't need this
-change.</P>
+<H3>Mandrake 9.0</H3>
 
-<H2><A NAME="ss4.2">4.2</A> <A HREF="mythtv-HOWTO.html#toc4.2">Building LAME.</A>
-</H2>
-
-<P>Open a shell and switch to the directory where you saved lame.
-<BLOCKQUOTE><CODE>
-<PRE>
-% tar -xzf lame-3.92.tar.gz
-% cd lame-3.92
-% ./configure
-% make
-% make test
-% su
-# make install
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Check that it worked:
-<BLOCKQUOTE><CODE>
-<PRE>
-# ls -l /usr/local/lib
--rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
--rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
-lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
-libmp3lame.so.0.0.0*
-lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
-libmp3lame.so.0.0.0*
--rwxr-xr-x    1 root     root       360197 Nov  4 14:22
-libmp3lame.so.0.0.0*
-
-# exit
-%
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
-<H2><A NAME="ss4.3">4.3</A> <A HREF="mythtv-HOWTO.html#toc4.3">Building XMLTV. </A>
-</H2>
-
-<P><B>NOTE</B>: Red Hat Linux 8.0 users, you <EM>must</EM> download and
-install an updated version of libexpat.  The version that ships with Red Hat
-Linux 8.0 (version 1.95.4) is buggy, and will cause problems with XML::Twig. 
-All other distributions may skip the step and proceed with untar'ing the
-xmltv file.</P>
-<P>Download version 1.95.5 from sourceforge.net:  
-<A HREF="http://sourceforge.net/projects/expat/">http://sourceforge.net/projects/expat/</A></P>
-<P>Open a shell prompt:
-<BLOCKQUOTE><CODE>
-<PRE>
-% tar -xzf expat-1.95.5.tar.gz
-% cd expat-1.95.5
-% ./configure
-% make
-% su
-# make install
-# exit
-%
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Untar the xmltv file:
-<BLOCKQUOTE><CODE>
-<PRE>
-% tar -xjf xmltv-0.5.2.tar.bz2
-% cd xmltv-0.5.2
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Install the xmltv prerequisites:
+<P>As root, create the following file in <CODE>/etc/profile.d</CODE>  On my system
+I call it "mythtv.sh".</P>
+<P>Open a shell, and switch to superuser mode.
+<B>NOTE: ^D</B> means press <B>CTRL</B> and <B>d</B> at the same time.</P>
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
 % su -
-# perl -MCPAN -e shell
-cpan> install XML::Twig
-cpan> install Date::Manip
-Date::Manip is up to date.
-cpan> install LWP
-cpan> install XML::Writer
-cpan> exit
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Change to the XMLTV directory and compile it:
-<BLOCKQUOTE><CODE>
-<PRE>
-% cd xmltv-0.5.2
-% perl Makefile.PL
-</PRE>
-</CODE></BLOCKQUOTE>
+# cd /etc/profile.d
+cat > mythtv.sh
+export QTDIR=/usr/lib/qt3
+export PATH=$PATH:/usr/lib/qt3/bin
+^D
 
-You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
-the grabber required for your location.</P>
-<P>You may get errors about modules not being installed.  They shouldn't matter
-if you're installing North America and have followed the instructions to
-this point.
-<BLOCKQUOTE><CODE>
-<PRE>
-% make
-% make test
-% su 
-# make install
+# chmod a+x mythtv.sh
 # exit
+% exit
 </PRE>
 </CODE></BLOCKQUOTE>
-</P>
 
-<H2><A NAME="ss4.4">4.4</A> <A HREF="mythtv-HOWTO.html#toc4.4">Building mythtv.</A>
+The last two commands are to exit out of the shell.  This way, when you next
+open a shell your new commands will take effect.</P>
+
+<H3>Red Hat Linux 8.0</H3>
+
+<P>[Please submit instructions]</P>
+
+<H3>Gentoo.</H3>
+
+<P>[Please submit instructions]</P>
+
+<H2><A NAME="ss4.2">4.2</A> <A HREF="mythtv-HOWTO.html#toc4.2">Checking that it worked.</A>
 </H2>
 
-<P>Unpack mythtv
+<P>Open a shell and switch to superuser mode again.
 <BLOCKQUOTE><CODE>
 <PRE>
-% tar -xjf mythtv-0.7.tar.bz2
-% cd mythtv-0.7
-% ./configure
-% make
+% su -
+# set
+
+[lots of text]
+QTDIR=/usr/lib/qt3
+PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
 </PRE>
 </CODE></BLOCKQUOTE>
 
-Switch to superuser:
+You should see QTDIR and the path changes you made.</P>
+<P>Next, we need to make sure that the libraries that we're building will be
+found when we need them.</P>
+
+<H2><A NAME="ss4.3">4.3</A> <A HREF="mythtv-HOWTO.html#toc4.3">Modifying <CODE>/etc/ld.so.conf</CODE></A>
+</H2>
+
+<P>Switch to /etc and execute the following:
 <BLOCKQUOTE><CODE>
 <PRE>
-% su
-# make install
+# cd /etc
+# cat >> ld.so.conf
+/usr/local/lib
+^D
+
+# ldconfig
 # exit
+%
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>

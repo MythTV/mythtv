@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
- <TITLE>Installing and using mythtv: MySQL.</TITLE>
+ <TITLE>Installing and using mythtv: Downloading and compiling.</TITLE>
  <LINK HREF="mythtv-HOWTO-6.html" REL=next>
  <LINK HREF="mythtv-HOWTO-4.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc5" REL=contents>
@@ -12,70 +12,161 @@
 <A HREF="mythtv-HOWTO-4.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc5">Contents</A>
 <HR>
-<H2><A NAME="s5">5.</A> <A HREF="mythtv-HOWTO.html#toc5">MySQL.</A></H2>
+<H2><A NAME="s5">5.</A> <A HREF="mythtv-HOWTO.html#toc5">Downloading and compiling.</A></H2>
 
-<H2><A NAME="ss5.1">5.1</A> <A HREF="mythtv-HOWTO.html#toc5.1">Mandrake 9.0</A>
+<P>Get mythtv from the 
+<A HREF="http://www.mythtv.org">mythtv.org</A>
+web site.  Save the tarball to a directory you can find.</P>
+<P>Get XMLTV from 
+<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download version 0.5.2</P>
+<P>Get lame from 
+<A HREF="http://www.mp3dev.org/mp3">http://www.mp3dev.org/mp3</A>.  Download the source code to v3.92 by
+following the links to sourceforge.net</P>
+
+<H2><A NAME="nonintelcpu_"></A> <A NAME="ss5.1">5.1</A> <A HREF="mythtv-HOWTO.html#toc5.1">Notes on compiling on a system with non-Intel processors. </A>
 </H2>
 
-<P>Make sure that mysql is running and started at boot.  Click on Mandrake
-Control Center->System->Services</P>
+<P>If
+you've got a system with an AMD K6-2 or a VIA C3 processor, make the
+following change in the <CODE>settings.pro</CODE> file.</P>
+<P>Look for 
+<PRE>
+-march=pentiumpro
+</PRE>
+ 
+and replace it with
+<PRE>
+-march=i586
+</PRE>
+ 
+before you compile.</P>
+<P>Recent AMD processors, like the Duron, Thunderbird and Athlon don't need this
+change.</P>
 
-<H2><A NAME="ss5.2">5.2</A> <A HREF="mythtv-HOWTO.html#toc5.2">Red Hat Linux 8.0</A>
+<H2><A NAME="ss5.2">5.2</A> <A HREF="mythtv-HOWTO.html#toc5.2">Building LAME.</A>
 </H2>
 
-<P>Make sure that mysql is running and started at boot. Click on GNOME 
-menu>Server Settings>Services and enter the root password when asked. 
-Check "mysqld" and then click Start. Click Save, then close the window.</P>
-<H2><A NAME="ss5.3">5.3</A> <A HREF="mythtv-HOWTO.html#toc5.3">Gentoo.</A>
-</H2>
-
-<P>Please submit content.</P>
-
-<H2><A NAME="ss5.4">5.4</A> <A HREF="mythtv-HOWTO.html#toc5.4">Setting up the initial database.</A>
-</H2>
-
-<P>Setup the initial mysql databases:
+<P>Open a shell and switch to the directory where you saved lame.
 <BLOCKQUOTE><CODE>
 <PRE>
-% cd database
+% tar -xzf lame-3.92.tar.gz
+% cd lame-3.92
+% ./configure
+% make
+% make test
+% su
+# make install
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Check that it worked:
+<BLOCKQUOTE><CODE>
+<PRE>
+# ls -l /usr/local/lib
+-rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
+-rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
+lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
+libmp3lame.so.0.0.0*
+lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
+libmp3lame.so.0.0.0*
+-rwxr-xr-x    1 root     root       360197 Nov  4 14:22
+libmp3lame.so.0.0.0*
+
+# exit
+%
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<H3>Mandrake 9.0</H3>
 
-<P>
+<H2><A NAME="ss5.3">5.3</A> <A HREF="mythtv-HOWTO.html#toc5.3">Building XMLTV. </A>
+</H2>
+
+<P><B>NOTE</B>: Red Hat Linux 8.0 users, you <EM>must</EM> download and
+install an updated version of libexpat.  The version that ships with Red Hat
+Linux 8.0 (version 1.95.4) is buggy, and will cause problems with XML::Twig.
+All other distributions may skip the step and proceed with untar'ing the
+xmltv file.</P>
+<P>Download version 1.95.5 from sourceforge.net:  
+<A HREF="http://sourceforge.net/projects/expat/">http://sourceforge.net/projects/expat/</A></P>
+<P>Open a shell prompt:
 <BLOCKQUOTE><CODE>
 <PRE>
-% mysql -u root &lt; mc.sql
+% tar -xzf expat-1.95.5.tar.gz
+% cd expat-1.95.5
+% ./configure
+% make
+% su
+# make install
+# exit
+%
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<H3>Debian 3.0</H3>
-
-<P>
+<P>Untar the xmltv file:
 <BLOCKQUOTE><CODE>
 <PRE>
-% mysql &lt; mc.sql
+% tar -xjf xmltv-0.5.2.tar.bz2
+% cd xmltv-0.5.2
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Install the xmltv prerequisites:
+<BLOCKQUOTE><CODE>
+<PRE>
+% su -
+# perl -MCPAN -e shell
+cpan> install XML::Twig
+cpan> install Date::Manip
+Date::Manip is up to date.
+cpan> install LWP
+cpan> install XML::Writer
+cpan> exit
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<H3>Red Hat Linux 8.0</H3>
-
-<P>
+<P>Change to the XMLTV directory and compile it:
 <BLOCKQUOTE><CODE>
 <PRE>
-% mysql &lt; mc.sql
+% cd xmltv-0.5.2
+% perl Makefile.PL
+</PRE>
+</CODE></BLOCKQUOTE>
+
+You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
+the grabber required for your location.</P>
+<P>You may get errors about modules not being installed.  They shouldn't matter
+if you're installing North America and have followed the instructions to
+this point.
+<BLOCKQUOTE><CODE>
+<PRE>
+% make
+% make test
+% su
+# make install
+# exit
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>if this returns an error message try switching to root first.</P>
-<P>
+
+<H2><A NAME="ss5.4">5.4</A> <A HREF="mythtv-HOWTO.html#toc5.4">Building mythtv.</A>
+</H2>
+
+<P>Unpack mythtv
+<BLOCKQUOTE><CODE>
+<PRE>
+% tar -xjf mythtv-0.7.tar.bz2
+% cd mythtv-0.7
+% ./configure
+% make
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Switch to superuser:
 <BLOCKQUOTE><CODE>
 <PRE>
 % su
-# mysql &lt; mc.sql
+# make install
 # exit
-%
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>

@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
- <TITLE>Installing and using mythtv: Configuring mythtv.</TITLE>
+ <TITLE>Installing and using mythtv: Setting up a remote control.</TITLE>
  <LINK HREF="mythtv-HOWTO-9.html" REL=next>
  <LINK HREF="mythtv-HOWTO-7.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc8" REL=contents>
@@ -12,232 +12,216 @@
 <A HREF="mythtv-HOWTO-7.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc8">Contents</A>
 <HR>
-<H2><A NAME="s8">8.</A> <A HREF="mythtv-HOWTO.html#toc8">Configuring mythtv.</A></H2>
+<H2><A NAME="s8">8.</A> <A HREF="mythtv-HOWTO.html#toc8">Setting up a remote control.</A></H2>
 
-<P>By this point, all of the prerequisites have been installed,
-<B>mysql</B> is running and has had its initial database setup.  It's now
-time to configure mythtv.</P>
+<P>mythtv does not have native remote control receiver and decoder software
+built-in.  Instead, remote control functions are implemented by cooperating
+with lirc, the Linux Infra Red Control program.  lirc handles the IR
+hardware and passes keystrokes to mythtv, which then acts as if the user had
+pressed the keys on the keyboard.</P>
+<P>lircd has two prerequisites:  dialog, available in Mandrake through the
+"cdialog" RPM, and the kernel source.  Mandrake 9.0 is using the 2.4.19
+kernel, so the easiest thing is to go to 
+<A HREF="http://www.kernel.org">http://www.kernel.org</A> and download
+the full 2.4.19 tar file from 
+<A HREF="http://www.kernel.org/pub/linux/kernel/v2.4/">http://www.kernel.org/pub/linux/kernel/v2.4/</A>.</P>
 
-<H2><A NAME="ss8.1">8.1</A> <A HREF="mythtv-HOWTO.html#toc8.1">Editing the settings.txt file.</A>
+<H2><A NAME="ss8.1">8.1</A> <A HREF="mythtv-HOWTO.html#toc8.1">Obtaining the kernel.</A>
 </H2>
 
-<P>Open a shell and switch to the <CODE>/usr/local/share/mythtv</CODE> directory. 
-You <B>MUST</B> edit the <CODE>settings.txt</CODE> file so that it's
-appropriate for your system.  At a minimum, ensure that the BufferName, RecordFilePrefix
-and PIPBuffername variables are set to directories that exist on your system. 
-By default, these point to <CODE>/mnt/store</CODE>.  For example, you may wish to create
-a <CODE>/var/video</CODE> subdirectory, so you would change <CODE>/mnt/store</CODE>
-to <CODE>/var/video</CODE>
+<P>An easy way is to use the wget command:
 <BLOCKQUOTE><CODE>
 <PRE>
-% su
-# mkdir /var/video
-# chmod a+rwx /var/video
-# exit
+% wget http://www.kernel.org/pub/linux/kernel/v2.4/linux-2.4.19.tar.bz2
 </PRE>
 </CODE></BLOCKQUOTE>
- </P>
-<P>The <CODE>settings.txt</CODE> file is fairly self-explanatory. 
-Currently, mythtv supports two different video encoders, MPEG4 and RTJPEG. 
-Take note that RTJPEG has lower CPU demands, but makes large files, and MPEG4
-has high CPU demands, but makes smaller files.</P>
-<P><B>NOTE</B>: although the width and height can be changed to almost
-anything, if you start mythtv and don't see video or you get "segmentation
-fault" errors, it is likely that the video4linux (v4l) subsystem did not
-like the height and width parameters specified.  It's best to leave the
-default as-is until you're sure that mythtv is operational.</P>
-<P>
-<A NAME="deinterlace_"></A> <B>NOTE</B>: the <CODE>int Deinterlace=1</CODE> variable controls the deinterlacer. 
-Support for deinterlacing requires that your processor have MMX2.  Intel Celeron
-and Pentium Pro CPUs do not have MMX2, so make sure that you've got this set
-to "0" if you have one of these.  If you don't, you will get "Illegal
-Instruction" errors.</P>
-<P>Users in North America can now exit and save the file.  Users in other parts
-of the world need to modify the first line and modify the XMLTVGrabber
-variable to the correct grabber for their region.  <B>tv_grab_uk</B> for the
-UK, etc.  Use the name from the xmltv directory.</P>
 
-<H3>Adding support for an external tuner.</H3>
-
-<P>mythtv supports changing the channel on an external tuner.  If you have
-an external tuner, like a DirecTV or digital cable set top box, the
-following command should be added to your settings.txt file:
+Next, open a shell and login as superuser.
 <BLOCKQUOTE><CODE>
 <PRE>
-str ExternalChannelCommand=/usr/local/bin/changechannel
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>The <B>changechannel</B> program is not supplied with mythtv, so this is
-going to be dependant on what sort of external tuner you have.</P>
-<P>Feel free to browse some of what sort of hardware is available at 
-<A HREF="http://shop.store.yahoo.com/snapstreammedia/cablepacks.html">http://shop.store.yahoo.com/snapstreammedia/cablepacks.html</A>, or if
-you wish to assemble your own, rather than purchase, the following may be
-helpful: 
-<A HREF="http://www.snapstream.com/products/irblaster/sonydss.htm">http://www.snapstream.com/products/irblaster/sonydss.htm</A> for cable
-pinouts for RCA DSS receivers.</P>
-
-<H2><A NAME="ss8.2">8.2</A> <A HREF="mythtv-HOWTO.html#toc8.2">Running setup.</A>
-</H2>
-
-<P>Now that you've edited your <CODE>settings.txt</CODE> file, it's time to run the
-setup program and perform the initial configuration.</P>
-<P>Open a shell, and switch to the setup directory:</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-% cd setup
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P><B>NOTE</B>:Red Hat Linux 8.0 uses an unusual character encoding scheme
-that some programs don't deal well with. As a result, whenever you run setup
-or mythfilldatabase you will have to set a variable to correct this problem.
-Failure to set this variable will result in a lot of UTF-8 errors.</P>
-<P>Red Hat 8.0 users, ensure that you do this:
-<BLOCKQUOTE><CODE>
-<PRE>
-% env LANG=C setup 
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>instead of what all the other distributions should use:</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-% ./setup
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>The setup program will ask you a few questions and then proceed to run the
-XMLTV grabber program.</P>
-
-<H2><A NAME="ss8.3">8.3</A> <A HREF="mythtv-HOWTO.html#toc8.3">Running mythfilldatabase.</A>
-</H2>
-
-<P>Now that the setup program has completed, run <B>mythfilldatabase</B> to
-get one week of data inserted into the database.</P>
-<P>Red Hat 8.0 users, ensure that you do this:
-<BLOCKQUOTE><CODE>
-<PRE>
-% env LANG=C mythfilldatabase
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>All other distributions can execute the following:</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-% mythfilldatabase
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P><B>NOTE</B>:  <B>mythfilldatabase</B> might take a while to complete,
-depending on any number of factors, most of which you can't control.  It's
-best to just let the program run to completion.</P>
-<P><B>mythfilldatabase --manual</B> is another option; the manual option will
-allow you to fine tune channel frequencies and specify which channels will
-be added to the database.</P>
-
-
-<H3>Setting <B>mythfilldatabase</B> to run from <B>cron</B></H3>
-
-<P>In order to keep your database filled, <B>mythfilldatabase</B> should be
-run once a day.</P>
-<P>There are two ways to accomplish this:  either as a user-based cron job, or
-as a system based cron.  If you use a user-based cron, you can select the
-time that the cron job will be run.  A system-based cron job will run at the
-same time as any other system cron jobs.</P>
-<P>If you are a Mandrake 9.0 user and wish to use a system cron job, you can
-perform the following steps:
-<BLOCKQUOTE><CODE>
-<PRE>
-% cd configfiles
-% su
-# cp mythfilldatabasecron /etc/cron.daily
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>If you want to know what time your job will run, you can do the following:
-<BLOCKQUOTE><CODE>
-<PRE>
-# cat /etc/crontab
-SHELL=/bin/bash
-PATH=/sbin:/bin:/usr/sbin:/usr/bin
-MAILTO=root
-HOME=/
-
-# run-parts
-01 * * * * root nice -n 19 run-parts /etc/cron.hourly
-02 4 * * * root nice -n 19 run-parts /etc/cron.daily
-22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
-42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
+% su 
+# mkdir /usr/src
+# mv linux-2.4.19.tar.bz2 /usr/src
+# cd /usr/src
+# tar -xjf linux-2.4.19.tar.bz2
+# chown -R root.root linux-2.4.19
+# ln -sf linux-2.4.19 linux
 # exit
 %
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>We can see from the display that the cron.daily job will run at 0402 every
-morning.</P>
-<P>If you wish to specify a custom time, then the user-based cron job is the
-better method.</P>
-<P>The default <B>configfiles/mythcrontab</B> file will run the <B>mythfilldatabase</B>
-program every day at 0430.  If you want to change this, then open the
-<CODE>configfiles/mythcrontab</CODE> file in your favorite editor and modify it
-as you like.  Once you're satisfied with the time that
-<B>mythfilldatabase</B> will run, save and exit, and return to the shell
-prompt.</P>
-<P>
+
+<H2><A NAME="ss8.2">8.2</A> <A HREF="mythtv-HOWTO.html#toc8.2">Obtaining and compiling lirc.</A>
+</H2>
+
+<P>You're going to need to download and compile lircd.  Go to 
+<A HREF="http://www.lirc.org">http://www.lirc.org</A> and download lirc; as
+of 2002-11-07, the version available is 0.6.6.  Grab the remotes.tgz file as
+well. 
 <BLOCKQUOTE><CODE>
 <PRE>
-% cd configfiles
-% crontab mythcrontab
-% crontab -l  NOTE: this is a lowercase L.
-# The following will run the mythfilldatabase shell script at 0430
-# every day.  Format is
-# minutes hour day_of_month month day_of_week
-# man 5 crontab for more information
-# Need to use a shell script because the QTDIR environment variable isn't
-# being honored by crontab?
-# The next text should be all on the same line.
-30 04 * * * /bin/bash $HOME/mythtv-0.7/MC/programs/mythfilldatabase/mythfilldatabasecron
-% 
+% tar -xjf lirc-0.6.6.tar.bz2
+% cd lirc-0.6.6
+% ./setup.sh
 </PRE>
 </CODE></BLOCKQUOTE>
-</P>
-<P>As you can see, <B>mythfilldatabase</B> will now be run at 0430
-every day.</P>
-<P>If you decide to alter the time that the <B>mythfilldatabase</B> runs,
-you can use the crontab command to open your existing job and edit it in
-place.</P>
-<P>
+
+You're going to need to know what sort of receiver you have and where
+it's connected.  In my case, I have a Pinnacle Studio TV card, with the IR
+receiver connected to COM1 (/dev/ttys0), so once the configuration menu came
+up I did Driver Configuration->Other Serial Port Devices->Pinnacle Systems
+Receiver->OK and on the next page selected COM1->OK.</P>
+<P>Each remote is different; some remote receivers connect directly to your
+capture card and not to a serial port, so make sure that you've got the
+correct one.</P>
+
+<P>You then click "Save Configuration and run configure" to continue.</P>
+<P>Once the configuration step is complete:
 <BLOCKQUOTE><CODE>
 <PRE>
-% crontab -e
+% make
+% su
+# make install
+# chmod 666 /dev/lircd
 </PRE>
 </CODE></BLOCKQUOTE>
-</P>
-<P>The <B>crontab -e</B> command will allow you to edit the existing crontab. 
-<B>NOTE</B>:  By default, the crontab will use <B>vi</B> as your
-editor.  If you don't like to use <B>vi</B>, make sure that you've set
-<CODE>VISUAL</CODE> to something other than <B>vi</B>.</P>
-<P>
+
+Next, we're going to manually start lircd the first time:
 <BLOCKQUOTE><CODE>
 <PRE>
-% export VISUAL=/usr/bin/joe
-% crontab -e
+# /usr/local/sbin/lircd
 </PRE>
 </CODE></BLOCKQUOTE>
-</P>
-<P>This will cause <B>crontab</B> to use <B>joe</B>, a visual editor that
-uses the Wordstar command sequence.  You may use <B>emacs</B>, or any
-other editor that you're comfortable with.  You may also add the
-<CODE>EXPORT</CODE> command to your <CODE>.bashrc</CODE> or to the
-<CODE>/etc/profile.d/mythtv.sh</CODE> file.</P>
-<P>Once you've completed this step, run the <B>mythepg</B> program to check
-that the database has been filled.  The cursor keys will move you around the
-grid, the "I" key will give you more information on a program and ESC will
-exit out back to the shell.</P>
+
+Now, we're going to add the commands necessary for lircd to run each time
+we boot:
+<BLOCKQUOTE><CODE>
+<PRE>
+# cd /etc/rc.d
+# cat >> rc.local
+echo "Starting lircd"
+/usr/local/sbin/lircd
+^D
+# exit
+%
+</PRE>
+</CODE></BLOCKQUOTE>
+ This takes care of the lircd portion, which "listens" for
+the IR signals. If everything went well, the install script for lircd put an
+appropriate configuration file for your remote into <CODE>/etc/lircd.conf</CODE> This
+file maps the buttons on the remote control to the IR pulses coming from the
+receiver.</P>
+<P>The next step is to convert those signals into something that can be used
+to control mythtv.
+<BLOCKQUOTE><CODE>
+<PRE>
+% cd ~/mythtv-0.7/configfiles
+% cp lircrc.example ~/.lircrc
+</PRE>
+</CODE></BLOCKQUOTE>
+ 
+or
+<BLOCKQUOTE><CODE>
+<PRE>
+% cp lircrc.example.pinnaclestudiopctv ~/.lircrc
+</PRE>
+</CODE></BLOCKQUOTE>
+
+if you've got a Pinnacle Studio PCTV remote.
+<BLOCKQUOTE><CODE>
+<PRE>
+% irw
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Start pressing the keys on your remote; <B>irw</B> will
+print the name of the button as it is defined in your
+<CODE>/etc/lircd.conf</CODE>. If you don't see anything at this point, you need
+to troubleshoot further by going back to the lirc home page and investigating
+from there.</P>
+<P>If it is working, then press <B>CTRL-C</B> to abort the program.  Once you
+know that your remote is working, you need to run the <B>irxevent</B>
+program, which takes the key presses and sends them to mythtv. 
+<B>irxevent</B>
+isn't a daemon, so if you know that your remote is working you need to
+invoke it like this: 
+<BLOCKQUOTE><CODE>
+<PRE>
+% irxevent &amp;
+</PRE>
+</CODE></BLOCKQUOTE>
+
+If <B>irxevent</B> isn't running, then mythtv will not respond to your remote
+control.</P>
+<P>Currently, mythtv doesn't have native support for controlling the mixer
+volume and mute settings.  A workaround at this time is to invoke the
+<B>amixer</B> program.  If you wish to define keys to control the mixer,
+the <B>irexec</B> program can accomplish this fairly easily.  The
+configfiles/lircrc.example.pinnaclestudiopctv file has an example of calling
+an external program from a remote control button.</P>
+
+<H2><A NAME="ss8.3">8.3</A> <A HREF="mythtv-HOWTO.html#toc8.3">Additional information for lirc.</A>
+</H2>
+
+<P>Take a look at the lircrc.example files in the <CODE>configfiles/</CODE>
+directory.  In my case, (Pinnacle Studio card) the channel up and down functions
+weren't working, due to the fact that the button names were different than
+the default <CODE>lircrc.example</CODE> file that came with mythtv.</P>
+<P>The <CODE>lircrc.example</CODE> file has this:
+<BLOCKQUOTE><CODE>
+<PRE>
+begin
+    prog = irxevent
+    button = ChannelUp
+    config = Key Up CurrentWindow
+end
+
+begin
+    prog = irxevent
+    button = ChannelDown
+    config = Key Down CurrentWindow
+end
+</PRE>
+</CODE></BLOCKQUOTE>
+
+but the <CODE>/etc/lircd.conf</CODE> that comes in the lircd package 
+defines the buttons for the Pinnacle Studio PCTV as:
+<BLOCKQUOTE><CODE>
+<PRE>
+          channel+                 0x0000000000000017
+          channel-                 0x000000000000001C
+</PRE>
+</CODE></BLOCKQUOTE>
+
+rather than "ChannelUp" and "ChannelDown".  I added the 
+following to my /home/[yourusername]/.lircrc file:
+<BLOCKQUOTE><CODE>
+<PRE>
+begin
+    prog = irxevent
+    button = channel+
+    config = Key Up CurrentWindow
+end
+
+begin
+    prog = irxevent
+    button = channel-
+    config = Key Down CurrentWindow
+end
+</PRE>
+</CODE></BLOCKQUOTE>
+
+which took care of basic functionality.  Because the PCTV Studio remote
+has additional buttons, look at the
+<CODE>configfiles/lircrc.example.pinnaclestudiopctv</CODE> for an example of how
+to define additional buttons, and how to debug potential button name
+conflicts between the <CODE>lircrc.example</CODE> file and how <B>your</B>
+remote defines the button names.</P>
+<P>By examining the button names defined in <CODE>/etc/lircd.conf</CODE> and using
+the <B>irw</B> program to make sure that your remote is working, you can
+create the appropriate mappings in <CODE>.lircrc</CODE> to get excellent remote
+functionality with mythtv.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-9.html">Next</A>

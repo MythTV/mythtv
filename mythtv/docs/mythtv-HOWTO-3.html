@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
- <TITLE>Installing and using mythtv: Setting up paths and ldconfig.</TITLE>
+ <TITLE>Installing and using mythtv: Checking prerequisites.</TITLE>
  <LINK HREF="mythtv-HOWTO-4.html" REL=next>
  <LINK HREF="mythtv-HOWTO-2.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc3" REL=contents>
@@ -12,39 +12,153 @@
 <A HREF="mythtv-HOWTO-2.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc3">Contents</A>
 <HR>
-<H2><A NAME="s3">3.</A> <A HREF="mythtv-HOWTO.html#toc3">Setting up paths and ldconfig.</A></H2>
+<H2><A NAME="s3">3.</A> <A HREF="mythtv-HOWTO.html#toc3">Checking prerequisites.</A></H2>
 
-<P>There are some paths that need to be modified before starting the main
-compile of mythtv, otherwise you will get errors.</P>
-
-<H2><A NAME="ss3.1">3.1</A> <A HREF="mythtv-HOWTO.html#toc3.1">Distribution-specific information.</A>
+<H2><A NAME="ss3.1">3.1</A> <A HREF="mythtv-HOWTO.html#toc3.1">Hardware.</A>
 </H2>
+
+<P>mythtv is a software video encoder, which means that it uses a fairly
+generic "dumb" video capture card, encodes the frames of video using the CPU
+on your motherboard and writes them to disk.  High-end video capture cards
+and devices like the Tivo and RePlay have dedicated encoder chips on them
+which use specialized hardware to convert the video stream to the MPEG-2
+format without using the motherboard CPU, which means that the main CPU only
+has to worry about running the Operating System and reading and writing to
+the disk.  These have fairly low CPU requirements compared to encoding
+video.  Currently, there are no known MPEG-2 encoder cards that have
+video4linux drivers which would be suitable for use with mythtv.  Once the
+drivers are written, support for hardware MPEG-2 encoders can be integrated.</P>
+<P>There are many variables that go into the question: "How fast a CPU do I
+need to run mythtv"?  Obviously, the faster your CPU, the better your
+experience will be with mythtv.  Performing the "Watch TV" function, where
+the CPU is both encoding and decoding video simultaneously to allow Pause,
+Fast Forward and Rewind functions for live TV requires twice as much CPU as
+just encoding or decoding.  mythtv also supports multiple encoder cards in a
+single PC, increasing the CPU requirements if you are going to
+simultaneously encode multiple programs.</P>
+<P>Here are a few data points:
+<UL>
+<LI>A PIII/733Mhz system can encode one video stream using the RTJPEG
+codec using 512x480 capture resolution.  This does not allow for live TV
+watching, but does allow for encoding video and then watching it later.</LI>
+<LI>The developer states that his AMD1800+ system can <B>almost</B>
+encode two MPEG4 video streams and watch one program simultaneously.</LI>
+<LI>A PIII/800Mhz system with 512MB RAM can encode one video
+stream using the RTJPEG codec with 480x480 capture resolution and play it back
+simultaneously, thereby allowing live TV watching.</LI>
+</UL>
+</P>
+
+<H2><A NAME="ss3.2">3.2</A> <A HREF="mythtv-HOWTO.html#toc3.2">Software.</A>
+</H2>
+
+<P>There are a few ways of installing programs on Linux systems; you can either
+use the graphical tools that come with your distribution, or you can use
+command-line utilities.  Either system will get the job done, and it all
+depends on your comfort level with Linux.</P>
+<P>In order to compile mythtv, we need to make sure that the software it
+needs is installed.  As of 2002-11-08, this list includes perl-5.8, mysql,
+gcc, freetype2-devel and qt-devel.  If you're going to use a remote control
+with mythtv, you're going to need the cdialog package in order to compile
+lircd.</P>
+<P>There appears to be issues with ALSA and simultaneously recording and playing 
+sound, which is a core requirement for mythtv.  If you are not running 
+ALSA 0.9.0rc6 and experience lock-ups of your system when trying to use mythtv, 
+then please check the main ALSA website and upgrade to the latest version,
+or see if your distribution has already packaged the latest ALSA drivers.</P>
+
+<H3><A NAME="graphicinstalltools_"></A> Graphical installation tools. </H3>
 
 <H3>Mandrake 9.0</H3>
 
-<P>As root, create the following file in <CODE>/etc/profile.d</CODE>  On my system
-I call it "mythtv.sh".</P>
-<P>Open a shell, and switch to superuser mode.
-<B>NOTE: ^D</B> means press <B>CTRL</B> and <B>d</B> at the same time.</P>
-<P>
+<P>On systems running KDE, a tool which will allow you to see what packages
+are available and if they're installed on your system can be accessed by
+clicking K->Configuration->Packaging->KPackage</P>
+<P>There are many inter-related modules, so make sure that you've got the
+main package for each one, and not a sub package for an unrelated item.  For
+example, there are many modules that have "perl" in them; some are a part of
+the apache web server, others are a part of the perl distribution.  In each
+case, we're looking to make sure that the primary module is getting
+installed.</P>
+<P>Click the magnifying glass or press <B>CTRL-F</B> and enter "perl" as your
+search term.  You should find it under the "Perl" folder.  You need at least
+the perl 5.80 base package installed.  If not, click on the "Mark" button.</P>
+<P>Next, search for mysql - it should be under "Databases".  Make sure that
+mysql and mysql-clients are installed.  If not, click on "Mark".</P>
+<P>Search for gcc.  You're going to need gcc and gcc-c++ installed.</P>
+<P>Search for freetype2.  Make sure that you've got freetype2 and
+freetype2-devel installed.</P>
+<P>Finally, check for qt.  You'll need libqt3-devel (under folder "KDE and
+Qt") and libqt3 ("Libraries").</P>
+<P>Make sure that cdialog is installed if you want to use mythtv with a remote
+control.</P>
+<P>alsa-utils is needed for setting the volume.</P>
+<P>If you marked anything to install, click on Install Marked.  Click "Yes" or
+OK if you get a message about satisfying dependencies.</P>
+
+<H3>Red Hat Linux 8.0</H3>
+
+<P>Red Hat Linux 8.0 does not have the same KDE graphical package manager that some
+other distributions have. You will need to use Red Hat's package manager. 
+This is the same utility you saw upon installation from the Red Hat Linux 8.0 
+installation CD, you can select these packages upon install of Red Hat Linux 8.0 or 
+later. . You can get to this panel by selecting gnomemenu>System 
+Settings>Packages
+If you did a typical Desktop install of Red Hat Linux 8.0 make sure in addition you 
+have selected:
+<UL>
+<LI>KDE Desktop Environment</LI>
+<LI>SQL Database Server -  you will have to click on "details" and make 
+sure "mysql-server" is checked.</LI>
+<LI>Development Tools</LI>
+<LI>X Software Development</LI>
+<LI>KDE Software Development</LI>
+</UL>
+</P>
+<P>Click Install to continue.</P>
+<P>The version of QT supplied with Red Hat Linux 8.0 does not include a
+necessary mysql plugin. You will have to download and install that RPM
+package yourself. First go to 
+<A HREF="http://rpm.pbone.net/">http://rpm.pbone.net/</A> and click on "Search" near the top of the
+page. On the search page unselect all checkboxes except "RedHat 8.X". Next
+select the "Search for RPMs by name in FTP........." radio button. In the
+search field enter "qt-MySQL" then click "Search".  You will be presented
+with a list of mirrors who host this particular RPM, currently called 
+"qt-MySQL-3.0.5-17.i386.rpm". Download the RPM.  I had good luck downloading
+from the ftp.pbone.net mirror. Once downloaded, double click on the RPM
+package. You will be prompted for the root password, enter it, watch the
+progress bar, and you are finished.</P>
+
+<H3><A NAME="CLIinstalltools_"></A> Command-line installation. </H3>
+
+<P> This section details the various methods for installing pre-requisites
+from the command line.</P>
+
+<H3>Mandrake 8.2 and 9.0</H3>
+
+<P>The simplest tool for installing packages from the command line is
+<B>urpmi</B>.</P>
+<P>Open a shell, and execute the following, all on the same line:
 <BLOCKQUOTE><CODE>
 <PRE>
 % su -
-# cd /etc/profile.d
-cat > mythtv.sh
-export QTDIR=/usr/lib/qt3
-export PATH=$PATH:/usr/lib/qt3/bin
-^D
-
-# chmod a+x mythtv.sh
-# exit
-% exit
+# urpmi perl-5.8 mysql gcc gcc-c++ freetype2-devel libqt3-devel cdialog
+alsa-utils
 </PRE>
 </CODE></BLOCKQUOTE>
 
-The last two commands are to exit out of the shell.  This way, when you next
-open a shell your new commands will take effect.</P>
-
+You may get asked a number of questions regarding dependencies.  It's best
+to answer "YES".</P>
+<P>However, you might get this when you execute the command above:
+<BLOCKQUOTE><CODE>
+<PRE>
+[root@pvr root]# urpmi perl-5.8 mysql gcc gcc-c++
+freetype2-devel libqt3-devel cdialog
+everything already installed
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>In that case, you're ready to move onto the next step.</P>
 <H3>Red Hat Linux 8.0</H3>
 
 <P>[Please submit instructions]</P>
@@ -53,42 +167,16 @@ open a shell your new commands will take effect.</P>
 
 <P>[Please submit instructions]</P>
 
-<H2><A NAME="ss3.2">3.2</A> <A HREF="mythtv-HOWTO.html#toc3.2">Checking that it worked.</A>
-</H2>
+<H3>Debian</H3>
 
-<P>Open a shell and switch to superuser mode again.
-<BLOCKQUOTE><CODE>
-<PRE>
-% su -
-# set
-
-[lots of text]
-QTDIR=/usr/lib/qt3
-PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
-</PRE>
-</CODE></BLOCKQUOTE>
-
-You should see QTDIR and the path changes you made.</P>
-<P>Next, we need to make sure that the libraries that we're building will be
-found when we need them.</P>
-
-<H2><A NAME="ss3.3">3.3</A> <A HREF="mythtv-HOWTO.html#toc3.3">Modifying <CODE>/etc/ld.so.conf</CODE></A>
-</H2>
-
-<P>Switch to /etc and execute the following:
-<BLOCKQUOTE><CODE>
-<PRE>
-# cd /etc
-# cat >> ld.so.conf
-/usr/local/lib
-^D
-
-# ldconfig
-# exit
-%
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
+<P>Debian packages for MythTV and some of its add-on modules have been
+packaged by Matt Zimmerman 
+<A HREF="mailto:mdz@debian.org">mailto:mdz@debian.org</A> and are
+available at 
+<A HREF="http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/">http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/</A>, including installation instructions.  All of the prerequisites for
+MythTV are available as Debian packages.</P>
+<P>The mailing list message for this announcement can be accessed at 
+<A HREF="http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html">http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html</A>.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-4.html">Next</A>

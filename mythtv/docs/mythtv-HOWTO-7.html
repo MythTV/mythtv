@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
- <TITLE>Installing and using mythtv: Setting up a remote control.</TITLE>
+ <TITLE>Installing and using mythtv: Setting up ALSA and the mixer.</TITLE>
  <LINK HREF="mythtv-HOWTO-8.html" REL=next>
  <LINK HREF="mythtv-HOWTO-6.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc7" REL=contents>
@@ -12,216 +12,80 @@
 <A HREF="mythtv-HOWTO-6.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc7">Contents</A>
 <HR>
-<H2><A NAME="s7">7.</A> <A HREF="mythtv-HOWTO.html#toc7">Setting up a remote control.</A></H2>
+<H2><A NAME="s7">7.</A> <A HREF="mythtv-HOWTO.html#toc7">Setting up ALSA and the mixer.</A></H2>
 
-<P>mythtv does not have native remote control receiver and decoder software
-built-in.  Instead, remote control functions are implemented by cooperating
-with lirc, the Linux Infra Red Control program.  lirc handles the IR
-hardware and passes keystrokes to mythtv, which then acts as if the user had
-pressed the keys on the keyboard.</P>
-<P>lircd has two prerequisites:  dialog, available in Mandrake through the
-"cdialog" RPM, and the kernel source.  Mandrake 9.0 is using the 2.4.19
-kernel, so the easiest thing is to go to 
-<A HREF="http://www.kernel.org">http://www.kernel.org</A> and download
-the full 2.4.19 tar file from 
-<A HREF="http://www.kernel.org/pub/linux/kernel/v2.4/">http://www.kernel.org/pub/linux/kernel/v2.4/</A>.</P>
+<P>If your video doesn't appear to be in-sync with your audio, it could be
+because you are listening to the real-time audio from your video card rather
+than after it's been processed and synchronized to the video by mythtv.</P>
+<P>What you need to do is to mute the "line-in" of your sound card and also
+set it as the recording source.</P>
+<P>There are two ways to do this.  Graphically, and from the command line.</P>
 
-<H2><A NAME="ss7.1">7.1</A> <A HREF="mythtv-HOWTO.html#toc7.1">Obtaining the kernel.</A>
+<H2><A NAME="ss7.1">7.1</A> <A HREF="mythtv-HOWTO.html#toc7.1">Graphically setting up the mixer.</A>
 </H2>
 
-<P>An easy way is to use the wget command:
-<BLOCKQUOTE><CODE>
-<PRE>
-% wget http://www.kernel.org/pub/linux/kernel/v2.4/linux-2.4.19.tar.bz2
-</PRE>
-</CODE></BLOCKQUOTE>
+<H3>Mandrake 9.0</H3>
 
-Next, open a shell and login as superuser.
+<P>Open Kmix by K->Multimedia->Sound->Kmix</P>
+<P>Click on Settings->Configure  Make sure that "Tick Marks" and "Show
+labels" have "X"'s in them.  This will make it easier to find the correct
+audio source.  Click OK.</P>
+<P>On the mixer page, look for Line-In on your sound card.  You should see
+two LED's - a green one at the top, and a red one at the bottom.  The green
+one at the top is for muting; you want to make sure that the green LED is a
+dark green, meaning that it's "off".  You also want to click on the red LED
+so that it turns bright red, indicating that it's "ON"; this insures that
+the Line-in is used as the source.  Click OK, and make sure that you save
+the settings so that this is your default.</P>
+
+<H3>Red Hat Linux 8.0</H3>
+
+<P>There is some uncertainty (in my mind anyway) about ALSA sound and Red Hat.
+Take everything here with a grain of salt. Here is what my impression of
+how things are right now. The mythtv developer recommends ALSA sound drivers.
+However, Red Hat Linux 8.0 ships with some other sound driver/management
+package.  Installing ALSA looks like a real bear, and includes a kernel
+recompile. Then you have to figure out how to deactivate the Red Hat Linux
+8.0 built in sound package. I decided to give it whirl with the built in
+sound package. I <B>was</B> able to get satisfactory results on my
+machine using the RTJPEG video encoder and turning off MP3 sound
+compression. If I try to use the better MPEG4 video encoder and/or use MP3
+audio compression I get slight sound sync issues and a few skips. I think
+this is because my machine is too slow. However, it is possible that it is
+really because I'm using the wrong sound package. Since I didn't install
+ALSA myself you will need to evaluate the situation on your own. However, I
+will give instructions for how I got the default Red Hat Linux 8.0 sound
+package working with mythtv.</P>
+<P>Red Hat Linux 8.0 does not use some default KDE and Gnome control panels and
+substitutes its own. Sound is one of these cases. To configure sound to
+work with mythtv, select Gnome Menu> Sound &amp; Video>Volume Control. This
+will open up a mixer. Make sure your global volume (on the far left) is
+up. Also make sure that the "line in" section has "mute" checked, and
+"record" checked and the gain is turned up. You may have to experiment
+with volume/gain levels to get the best sound.  If you experience
+difficulty with sound try removing your sound jack from "line in" and
+moving it to "mike in" Then go to the mixer and check "mute" and
+"record" on the "mike in", and turn up the gain.</P>
+
+<H2><A NAME="ss7.2">7.2</A> <A HREF="mythtv-HOWTO.html#toc7.2">Setting the mixer from the command line.</A>
+</H2>
+
+<P>If you're running Mandrake 9.0 and have installed the alsa-utils package,
+then the <B>amixer</B> program can be used to setup the mixer.</P>
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
+% amixer set Master,0 100%,100% unmute
+% amixer set Line,0 100%,100% mute capture
 % su -
-# cd /home/[yourusername]
-# mkdir /usr/src
-# mv linux-2.4.19.tar.bz2 /usr/src
-# cd /usr/src
-# tar -xjf linux-2.4.19.tar.bz2
-# chown -R root.root linux-2.4.19
-# ln -sf linux-2.4.19 linux
+# alsactl store
 # exit
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
-<H2><A NAME="ss7.2">7.2</A> <A HREF="mythtv-HOWTO.html#toc7.2">Obtaining and compiling lirc.</A>
-</H2>
-
-<P>You're going to need to download and compile lircd.  Go to 
-<A HREF="http://www.lirc.org">http://www.lirc.org</A> and download lirc; as
-of 2002-11-07, the version available is 0.6.6.  Grab the remotes.tgz file as
-well. 
-<BLOCKQUOTE><CODE>
-<PRE>
-% tar -xjf lirc-0.6.6.tar.bz2
-% cd lirc-0.6.6
-% ./setup.sh
+% 
 </PRE>
 </CODE></BLOCKQUOTE>
 
-You're going to need to know what sort of receiver you have and where
-it's connected.  In my case, I have a Pinnacle Studio TV card, with the IR
-receiver connected to COM1 (/dev/ttys0), so once the configuration menu came
-up I did Driver Configuration->Other Serial Port Devices->Pinnacle Systems
-Receiver->OK and on the next page selected COM1->OK.</P>
-<P>Each remote is different; some remote receivers connect directly to your
-capture card and not to a serial port, so make sure that you've got the
-correct one.</P>
-
-<P>You then click "Save Configuration and run configure" to continue.</P>
-<P>Once the configuration step is complete:
-<BLOCKQUOTE><CODE>
-<PRE>
-% make
-% su
-# make install
-# chmod 666 /dev/lircd
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Next, we're going to manually start lircd the first time:
-<BLOCKQUOTE><CODE>
-<PRE>
-# /usr/local/sbin/lircd
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Now, we're going to add the commands necessary for lircd to run each time
-we boot:
-<BLOCKQUOTE><CODE>
-<PRE>
-# cd /etc/rc.d
-# cat >> rc.local
-echo "Starting lircd"
-/usr/local/sbin/lircd
-^D
-# exit
-%
-</PRE>
-</CODE></BLOCKQUOTE>
- This takes care of the lircd portion, which "listens" for
-the IR signals. If everything went well, the install script for lircd put an
-appropriate config file for your remote into <CODE>/etc/lircd.conf</CODE> This
-file maps the buttons on the remote control to the IR pulses coming from the
-receiver.</P>
-<P>The next step is to convert those signals into something that can be used
-to control mythtv.
-<BLOCKQUOTE><CODE>
-<PRE>
-% cd ~/mythtv-0.7/configfiles
-% cp lircrc.example ~/.lircrc
-</PRE>
-</CODE></BLOCKQUOTE>
- 
-or
-<BLOCKQUOTE><CODE>
-<PRE>
-% cp lircrc.example.pinnaclestudiopctv ~/.lircrc
-</PRE>
-</CODE></BLOCKQUOTE>
-
-if you've got a Pinnacle Studio PCTV remote.
-<BLOCKQUOTE><CODE>
-<PRE>
-% irw
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Start pressing the keys on your remote; <B>irw</B> will
-print the name of the button as it is defined in your
-<CODE>/etc/lircd.conf</CODE>. If you don't see anything at this point, you need
-to troubleshoot further by going back to the lirc home page and investigating
-from there.</P>
-<P>If it is working, then press <B>CTRL-C</B> to abort the program.  Once you
-know that your remote is working, you need to run the <B>irxevent</B>
-program, which takes the key presses and sends them to mythtv. 
-<B>irxevent</B>
-isn't a daemon, so if you know that your remote is working you need to
-invoke it like this: 
-<BLOCKQUOTE><CODE>
-<PRE>
-% irxevent &amp;
-</PRE>
-</CODE></BLOCKQUOTE>
-
-If <B>irxevent</B> isn't running, then mythtv will not respond to your remote
-control.</P>
-<P>Currently, mythtv doesn't have native support for controlling the mixer
-volume and mute settings.  A workaround at this time is to invoke the
-<B>amixer</B> program.  If you wish to define keys to control the mixer,
-the <B>irexec</B> program can accomplish this fairly easily.  The
-configfiles/lircrc.example.pinnaclestudiopctv file has an example of calling
-an external program from a remote control button.</P>
-
-<H2><A NAME="ss7.3">7.3</A> <A HREF="mythtv-HOWTO.html#toc7.3">Additional information for lirc.</A>
-</H2>
-
-<P>Take a look at the lircrc.example files in the <CODE>configfiles/</CODE>
-directory.  In my case, (Pinnacle Studio card) the channel up and down functions
-weren't working, due to the fact that the button names were different than
-the default <CODE>lircrc.example</CODE> file that came with mythtv.</P>
-<P>The <CODE>lircrc.example</CODE> file has this:
-<BLOCKQUOTE><CODE>
-<PRE>
-begin
-    prog = irxevent
-    button = ChannelUp
-    config = Key Up CurrentWindow
-end
-
-begin
-    prog = irxevent
-    button = ChannelDown
-    config = Key Down CurrentWindow
-end
-</PRE>
-</CODE></BLOCKQUOTE>
-
-but the <CODE>/etc/lircd.conf</CODE> that comes in the lircd package 
-defines the buttons for the Pinnacle Studio PCTV as:
-<BLOCKQUOTE><CODE>
-<PRE>
-          channel+                 0x0000000000000017
-          channel-                 0x000000000000001C
-</PRE>
-</CODE></BLOCKQUOTE>
-
-rather than "ChannelUp" and "ChannelDown".  I added the 
-following to my /home/[yourusername]/.lircrc file:
-<BLOCKQUOTE><CODE>
-<PRE>
-begin
-    prog = irxevent
-    button = channel+
-    config = Key Up CurrentWindow
-end
-
-begin
-    prog = irxevent
-    button = channel-
-    config = Key Down CurrentWindow
-end
-</PRE>
-</CODE></BLOCKQUOTE>
-
-which took care of basic functionality.  Because the PCTV Studio remote
-has additional buttons, look at the
-<CODE>configfiles/lircrc.example.pinnaclestudiopctv</CODE> for an example of how
-to define additional buttons, and how to debug potential button name
-conflicts between the <CODE>lircrc.example</CODE> file and how <B>your</B>
-remote defines the button names.</P>
-<P>By examining the button names defined in <CODE>/etc/lircd.conf</CODE> and using
-the <B>irw</B> program to make sure that your remote is working, you can
-create the appropriate mappings in <CODE>.lircrc</CODE> to get excellent remote
-functionality with mythtv.</P>
+That takes care of setting the volume correctly, and the ALSA startup script
+will restore the volume after a reboot.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-8.html">Next</A>

@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
- <TITLE>Installing and using mythtv: mythweb.</TITLE>
+ <TITLE>Installing and using mythtv: Using mythtv.</TITLE>
  <LINK HREF="mythtv-HOWTO-11.html" REL=next>
  <LINK HREF="mythtv-HOWTO-9.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc10" REL=contents>
@@ -12,51 +12,28 @@
 <A HREF="mythtv-HOWTO-9.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc10">Contents</A>
 <HR>
-<H2><A NAME="s10">10.</A> <A HREF="mythtv-HOWTO.html#toc10">mythweb.</A></H2>
+<H2><A NAME="s10">10.</A> <A HREF="mythtv-HOWTO.html#toc10">Using mythtv.</A></H2>
 
-<P>mythweb allows you to use a web page to control various aspects of your
-mythtv system.  mythweb is a separate application, but it's dependant on
-mythtv being installed and operational.</P>
+<P><B>mythfrontend</B> is the main interface to the mythtv program.  This
+program allows you to choose which of the other modules you'd like to run
+and ensures that programs that you've scheduled for recording actually get
+recorded, so it's important that this program is always running.</P>
 
-<H2><A NAME="ss10.1">10.1</A> <A HREF="mythtv-HOWTO.html#toc10.1">Installation and pre-requisites.</A>
+
+<H2><A NAME="ss10.1">10.1</A> <A HREF="mythtv-HOWTO.html#toc10.1">Using themes with mythtv.</A>
 </H2>
 
-<P>Download mythweb from 
-<A HREF="http://www.mythtv.org/">http://www.mythtv.org/</A> and save it to a location where you can find
-it.  The next step depends on whether your distribution has a web server and
-if you have php support.</P>
-
-<H3>Mandrake 9.0</H3>
-
-<P>Mandrake 9.0 has <B>apache</B> and <B>php</B> pre-packaged, so
-installation is quite simple.  Once you have installed the two programs,
-either with the graphical installer (see instructions in 
-<A HREF="mythtv-HOWTO-2.html#graphicinstalltools_">Graphic Install Tools</A>) or through the
-command line (section 
-<A HREF="mythtv-HOWTO-2.html#CLIinstalltools_">Command Line</A>), and
-you've ensured that the <B>apache</B> server will start at boot using the
-Mandrake Control Center.</P>
-
-<H2><A NAME="ss10.2">10.2</A> <A HREF="mythtv-HOWTO.html#toc10.2">Completing the installation.</A>
-</H2>
-
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-% tar -xjf mythweb-0.7.tar.bz2
-% cd mythweb-0.7
-% su
-# mkdir /var/www/html/mythweb
-# cp -r . /var/www/html/mythweb
-# exit
-%
-</PRE>
-</CODE></BLOCKQUOTE>
-
-To access the web page, open a web browser and use <B>http://[name or ip
-address]/mythweb/</B></P>
-<P><B>NOTE</B>: Make sure that you have a trailing slash on the URL,
-otherwise you will get a <CODE>404 Page not Found</CODE> error.</P>
+<P>mythtv is "themeable", meaning that the visual appearance of the program
+can be modified by the user without re-compiling or altering the program
+functionality.
+<CODE>usr/local/share/mythtv/theme.txt</CODE> allows you to alter the theme
+for mythtv.  The default theme is called "blue".  Other themes that ship
+with mythtv can be found in the <CODE>/usr/local/share/mythtv/themes</CODE>
+directory.  Change the first variable in the <CODE>theme.txt</CODE> file and
+exit and restart <B>mythfrontend</B> for it to take effect.</P>
+<P><B>NOTE</B>: Exiting <B>mythfrontend</B> will stop any recordings you
+have in progress, so make sure that the system isn't busy if you modify the
+theme while <B>mythfrontend</B> is still running.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-11.html">Next</A>

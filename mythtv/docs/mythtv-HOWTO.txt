@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2002-11-12, v1.03
+  2002-11-19, v1.03
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -13,84 +13,116 @@
 
 
 
-  1. Introduction.
-  2. Checking prerequisites.
-     2.1 Hardware.
-     2.2 Software.
-        2.2.1 Graphical installation tools.
-           2.2.1.1 Mandrake 9.0
-           2.2.1.2 Red Hat Linux 8.0
-        2.2.2 Command-line installation.
-           2.2.2.1 Mandrake 8.2 and 9.0
-           2.2.2.2 Red Hat Linux 8.0
-           2.2.2.3 Gentoo.
+  1. How to obtain this document.
+  2. Introduction.
+  3. Checking prerequisites.
+     3.1 Hardware.
+     3.2 Software.
+        3.2.1 Graphical installation tools.
+           3.2.1.1 Mandrake 9.0
+           3.2.1.2 Red Hat Linux 8.0
+        3.2.2 Command-line installation.
+           3.2.2.1 Mandrake 8.2 and 9.0
+           3.2.2.2 Red Hat Linux 8.0
+           3.2.2.3 Gentoo.
+           3.2.2.4 Debian
 
-  3. Setting up paths and ldconfig.
-     3.1 Distribution-specific information.
-        3.1.1 Mandrake 9.0
-        3.1.2 Red Hat Linux 8.0
-        3.1.3 Gentoo.
-     3.2 Checking that it worked.
-     3.3 Modifying /etc/ld.so.conf
+  4. Setting up paths and ldconfig.
+     4.1 Distribution-specific information.
+        4.1.1 Mandrake 9.0
+        4.1.2 Red Hat Linux 8.0
+        4.1.3 Gentoo.
+     4.2 Checking that it worked.
+     4.3 Modifying /etc/ld.so.conf
 
-  4. Downloading and compiling.
-     4.1 Notes on compiling on a system with non-Intel processors.
-     4.2 Building LAME.
-     4.3 Building XMLTV.
-     4.4 Building mythtv.
+  5. Downloading and compiling.
+     5.1 Notes on compiling on a system with non-Intel processors.
+     5.2 Building LAME.
+     5.3 Building XMLTV.
+     5.4 Building mythtv.
 
-  5. MySQL.
-     5.1 Mandrake 9.0
-     5.2 Red Hat Linux 8.0
-     5.3 Gentoo.
-     5.4 Setting up the initial database.
-        5.4.1 Mandrake 9.0
-        5.4.2 Debian 3.0
-        5.4.3 Red Hat Linux 8.0
+  6. MySQL.
+     6.1 Mandrake 9.0
+     6.2 Red Hat Linux 8.0
+     6.3 Gentoo.
+     6.4 Setting up the initial database.
+        6.4.1 Mandrake 9.0
+        6.4.2 Debian 3.0
+        6.4.3 Red Hat Linux 8.0
 
-  6. Setting up alsa and the mixer.
-     6.1 Graphically setting up the mixer.
-        6.1.1 Mandrake 9.0
-        6.1.2 Red Hat Linux 8.0
-     6.2 Setting the mixer from the command line.
+  7. Setting up ALSA and the mixer.
+     7.1 Graphically setting up the mixer.
+        7.1.1 Mandrake 9.0
+        7.1.2 Red Hat Linux 8.0
+     7.2 Setting the mixer from the command line.
 
-  7. Setting up a remote control.
-     7.1 Obtaining the kernel.
-     7.2 Obtaining and compiling lirc.
-     7.3 Additional information for lirc.
+  8. Setting up a remote control.
+     8.1 Obtaining the kernel.
+     8.2 Obtaining and compiling lirc.
+     8.3 Additional information for lirc.
 
-  8. Configuring mythtv.
-     8.1 Editing the settings.txt file.
-        8.1.1 Adding support for an external tuner.
-     8.2 Running setup.
-     8.3 Running mythfilldatabase.
-        8.3.1 Setting mythfilldatabase to run from cron
+  9. Configuring mythtv.
+     9.1 Editing the settings.txt file.
+        9.1.1 Adding support for an external tuner.
+     9.2 Running setup.
+     9.3 Running mythfilldatabase.
+        9.3.1 Setting mythfilldatabase to run from cron
 
-  9. Using mythtv.
-     9.1 Using themes with mythtv.
+  10. Using mythtv.
+     10.1 Using themes with mythtv.
 
-  10. mythweb.
-     10.1 Installation and pre-requisites.
-        10.1.1 Mandrake 9.0
-     10.2 Completing the installation.
-
-  11. mythgallery.
+  11. mythweb.
      11.1 Installation and pre-requisites.
+        11.1.1 Mandrake 9.0
+     11.2 Completing the installation.
 
-  12. mythgame.
-  13. mythmusic.
-  14. Troubleshooting.
-     14.1 Illegal Instruction.
+  12. mythgallery.
+     12.1 Installation and pre-requisites.
+
+  13. mythgame.
+  14. mythmusic.
+     14.1 Manual installation of pre-requisites
+     14.2 Mandrake 9.0
+
+  15. Troubleshooting.
+     15.1 Illegal Instruction.
 
 
   ______________________________________________________________________
 
-  [1m1.  Introduction.[0m
+  [1m1.  How to obtain this document.[0m
 
-  This HOWTO document will focus on mythtv in a North America
-  environment.  Installation instructions for other distributions and
-  regions can be sent to the author for inclusion in other versions of
-  this document.
+  This howto document is maintained at the primary mythtv website:
+  http://www.mythtv.org < http://www.mythtv.org>  The latest version of
+  this document can be found in CVS, accessible either through the
+  ViewCVS <http://www.mythtv.org/cgi-bin/viewcvs.cgi/> web interface, or
+  directly from the CVS repository.  You may download the latest copy of
+  mythtv and the documentation from CVS this way:
+
+
+       % export CVSROOT=:pserver:mythtv@mythtv.org:/var/lib/cvs
+       % mkdir mythtv
+       % cd mythtv
+       % cvs login mythtv
+       Enter password: mythtv
+       % cvs -z3 checkout MC
+
+
+
+  This documentation will be in the docs/ subdirectory.
+
+  [1mNOTE[22m: If you are going to use CVS to compile mythtv rather than using
+  the distribution tarballs, it is [1mstrongly [22mrecommended that you join
+  <http://www.snowman.net/mailman/listinfo/mythtv-commits/> the mythtv-
+  dev mailing list.
+
+
+  [1m2.  Introduction.[0m
+
+  This HOWTO document will focus on mythtv in a North American
+  environment.  If you have installation instructions for a different
+  region or Linux distribution, please send them to the author so that
+  it can be included in other versions of this document.
 
   The document authors are:
 
@@ -102,19 +134,10 @@
 
   +o  Gentoo:
 
-  For users with a Debian system, the mythtv program has been packaged
-  by Matt Zimmerman  <mailto:mdz@debian.org> and is available at
-  http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/
-  <http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/>
-  The mailing list message for this announcement can be accessed at
-  http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html
-  <http://www.snowman.net/pipermail/mythtv-
-  dev/2002-November/001116.html>.
 
+  [1m3.  Checking prerequisites.[0m
 
-  [1m2.  Checking prerequisites.[0m
-
-  [1m2.1.  Hardware.[0m
+  [1m3.1.  Hardware.[0m
 
   mythtv is a software video encoder, which means that it uses a fairly
   generic "dumb" video capture card, encodes the frames of video using
@@ -124,7 +147,10 @@
   video stream to the MPEG-2 format without using the motherboard CPU,
   which means that the main CPU only has to worry about running the
   Operating System and reading and writing to the disk.  These have
-  fairly low CPU requirements compared to encoding video.
+  fairly low CPU requirements compared to encoding video.  Currently,
+  there are no known MPEG-2 encoder cards that have video4linux drivers
+  which would be suitable for use with mythtv.  Once the drivers are
+  written, support for hardware MPEG-2 encoders can be integrated.
 
   There are many variables that go into the question: "How fast a CPU do
   I need to run mythtv"?  Obviously, the faster your CPU, the better
@@ -145,17 +171,18 @@
 
   +o  The developer states that his AMD1800+ system can [1malmost [22mencode two
      MPEG4 video streams and watch one program simultaneously.
+
   +o  A PIII/800Mhz system with 512MB RAM can encode one video stream
      using the RTJPEG codec with 480x480 capture resolution and play it
      back simultaneously, thereby allowing live TV watching.
 
 
-  [1m2.2.  Software.[0m
+  [1m3.2.  Software.[0m
 
   There are a few ways of installing programs on Linux systems; you can
-  either use the graphical tools, or command-line utilities.  Either
-  system will get the job done, and it all depends on your comfort level
-  with Linux.
+  either use the graphical tools that come with your distribution, or
+  you can use command-line utilities.  Either system will get the job
+  done, and it all depends on your comfort level with Linux.
 
   In order to compile mythtv, we need to make sure that the software it
   needs is installed.  As of 2002-11-08, this list includes perl-5.8,
@@ -163,10 +190,17 @@
   remote control with mythtv, you're going to need the cdialog package
   in order to compile lircd.
 
+  There appears to be issues with ALSA and simultaneously recording and
+  playing sound, which is a core requirement for mythtv.  If you are not
+  running ALSA 0.9.0rc6 and experience lock-ups of your system when
+  trying to use mythtv, then please check the main ALSA website and
+  upgrade to the latest version, or see if your distribution has already
+  packaged the latest ALSA drivers.
 
-  [1m2.2.1.  Graphical installation tools.[0m
 
-  [1m2.2.1.1.  Mandrake 9.0[0m
+  [1m3.2.1.  Graphical installation tools.[0m
+
+  [1m3.2.1.1.  Mandrake 9.0[0m
 
   On systems running KDE, a tool which will allow you to see what
   packages are available and if they're installed on your system can be
@@ -204,16 +238,16 @@
   "Yes" or OK if you get a message about satisfying dependencies.
 
 
-  [1m2.2.1.2.  Red Hat Linux 8.0[0m
+  [1m3.2.1.2.  Red Hat Linux 8.0[0m
 
   Red Hat Linux 8.0 does not have the same KDE graphical package manager
-  that some other distros have. You will need to use Red Hat's package
-  manager.  This is the same utility you saw upon installation from the
-  Red Hat Linux 8.0 installation CD, you can select these packages upon
-  install of Red Hat Linux 8.0 or later. . You can get to this panel by
-  selecting gnomemenu>System Settings>Packages If you did a typical
-  Desktop install of Red Hat Linux 8.0 make sure in addition you have
-  selected:
+  that some other distributions have. You will need to use Red Hat's
+  package manager.  This is the same utility you saw upon installation
+  from the Red Hat Linux 8.0 installation CD, you can select these
+  packages upon install of Red Hat Linux 8.0 or later. . You can get to
+  this panel by selecting gnomemenu>System Settings>Packages If you did
+  a typical Desktop install of Red Hat Linux 8.0 make sure in addition
+  you have selected:
 
   +o  KDE Desktop Environment
 
@@ -228,14 +262,27 @@
 
   Click Install to continue.
 
+  The version of QT supplied with Red Hat Linux 8.0 does not include a
+  necessary mysql plugin. You will have to download and install that RPM
+  package yourself. First go to http://rpm.pbone.net/
+  <http://rpm.pbone.net/> and click on "Search" near the top of the
+  page. On the search page unselect all checkboxes except "RedHat 8.X".
+  Next select the "Search for RPMs by name in FTP........." radio
+  button. In the search field enter "qt-MySQL" then click "Search".  You
+  will be presented with a list of mirrors who host this particular RPM,
+  currently called "qt-MySQL-3.0.5-17.i386.rpm". Download the RPM.  I
+  had good luck downloading from the ftp.pbone.net mirror. Once
+  downloaded, double click on the RPM package. You will be prompted for
+  the root password, enter it, watch the progress bar, and you are
+  finished.
 
-  [1m2.2.2.  Command-line installation.[0m
+  [1m3.2.2.  Command-line installation.[0m
 
   This section details the various methods for installing pre-requisites
   from the command line.
 
 
-  [1m2.2.2.1.  Mandrake 8.2 and 9.0[0m
+  [1m3.2.2.1.  Mandrake 8.2 and 9.0[0m
 
   The simplest tool for installing packages from the command line is
   [1murpmi[22m.
@@ -263,26 +310,39 @@
 
   In that case, you're ready to move onto the next step.
 
-  [1m2.2.2.2.  Red Hat Linux 8.0[0m
+  [1m3.2.2.2.  Red Hat Linux 8.0[0m
 
   [Please submit instructions]
 
 
-  [1m2.2.2.3.  Gentoo.[0m
+  [1m3.2.2.3.  Gentoo.[0m
 
   [Please submit instructions]
 
 
+  [1m3.2.2.4.  Debian[0m
 
-  [1m3.  Setting up paths and ldconfig.[0m
+  Debian packages for MythTV and some of its add-on modules have been
+  packaged by Matt Zimmerman  <mailto:mdz@debian.org> and are available
+  at http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/
+  <http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/>,
+  including installation instructions.  All of the prerequisites for
+  MythTV are available as Debian packages.
+
+  The mailing list message for this announcement can be accessed at
+  http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html
+  <http://www.snowman.net/pipermail/mythtv-
+  dev/2002-November/001116.html>.
+
+
+  [1m4.  Setting up paths and ldconfig.[0m
 
   There are some paths that need to be modified before starting the main
   compile of mythtv, otherwise you will get errors.
 
+  [1m4.1.  Distribution-specific information.[0m
 
-  [1m3.1.  Distribution-specific information.[0m
-
-  [1m3.1.1.  Mandrake 9.0[0m
+  [1m4.1.1.  Mandrake 9.0[0m
 
   As root, create the following file in /etc/profile.d  On my system I
   call it "mythtv.sh".
@@ -309,17 +369,17 @@
   you next open a shell your new commands will take effect.
 
 
-  [1m3.1.2.  Red Hat Linux 8.0[0m
+  [1m4.1.2.  Red Hat Linux 8.0[0m
 
   [Please submit instructions]
 
 
-  [1m3.1.3.  Gentoo.[0m
+  [1m4.1.3.  Gentoo.[0m
 
   [Please submit instructions]
 
 
-  [1m3.2.  Checking that it worked.[0m
+  [1m4.2.  Checking that it worked.[0m
 
   Open a shell and switch to superuser mode again.
 
@@ -338,23 +398,24 @@
   Next, we need to make sure that the libraries that we're building will
   be found when we need them.
 
-  [1m3.3.  Modifying /etc/ld.so.conf[0m
+
+  [1m4.3.  Modifying /etc/ld.so.conf[0m
 
   Switch to /etc and execute the following:
 
 
-       # cd /etc
-       # cat >> ld.so.conf
-       /usr/local/lib
-       ^D
+  # cd /etc
+  # cat >> ld.so.conf
+  /usr/local/lib
+  ^D
 
-       # ldconfig
-       # exit
-       %
+  # ldconfig
+  # exit
+  %
 
 
 
-  [1m4.  Downloading and compiling.[0m
+  [1m5.  Downloading and compiling.[0m
 
   Get mythtv from the mythtv.org <http://www.mythtv.org> web site.  Save
   the tarball to a directory you can find.
@@ -367,7 +428,7 @@
   sourceforge.net
 
 
-  [1m4.1.  Notes on compiling on a system with non-Intel processors.[0m
+  [1m5.1.  Notes on compiling on a system with non-Intel processors.[0m
 
   If you've got a system with an AMD K6-2 or a VIA C3 processor, make
   the following change in the settings.pro file.
@@ -388,7 +449,7 @@
   need this change.
 
 
-  [1m4.2.  Building LAME.[0m
+  [1m5.2.  Building LAME.[0m
 
   Open a shell and switch to the directory where you saved lame.
 
@@ -402,25 +463,26 @@
        # make install
 
 
+
   Check that it worked:
 
 
-       # ls -l /usr/local/lib
-       -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
-       -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
-       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
-       libmp3lame.so.0.0.0*
-       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
-       libmp3lame.so.0.0.0*
-       -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
-       libmp3lame.so.0.0.0*
+  # ls -l /usr/local/lib
+  -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
+  -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
+  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
+  libmp3lame.so.0.0.0*
+  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
+  libmp3lame.so.0.0.0*
+  -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
+  libmp3lame.so.0.0.0*
 
-       # exit
-       %
+  # exit
+  %
 
 
 
-  [1m4.3.  Building XMLTV.[0m
+  [1m5.3.  Building XMLTV.[0m
 
   [1mNOTE[22m: Red Hat Linux 8.0 users, you [4mmust[24m download and install an
   updated version of libexpat.  The version that ships with Red Hat
@@ -457,16 +519,14 @@
   Install the xmltv prerequisites:
 
 
-
-  % su -
-  # perl -MCPAN -e shell
-  cpan> install XML::Twig
-  cpan> install Date::Manip
-  Date::Manip is up to date.
-  cpan> install LWP
-  cpan> install XML::Writer
-  cpan> exit
-
+       % su -
+       # perl -MCPAN -e shell
+       cpan> install XML::Twig
+       cpan> install Date::Manip
+       Date::Manip is up to date.
+       cpan> install LWP
+       cpan> install XML::Writer
+       cpan> exit
 
 
   Change to the XMLTV directory and compile it:
@@ -493,7 +553,7 @@
 
 
 
-  [1m4.4.  Building mythtv.[0m
+  [1m5.4.  Building mythtv.[0m
 
   Unpack mythtv
 
@@ -514,27 +574,29 @@
 
 
 
-  [1m5.  MySQL.[0m
+  [1m6.  MySQL.[0m
 
-  [1m5.1.  Mandrake 9.0[0m
+  [1m6.1.  Mandrake 9.0[0m
 
   Make sure that mysql is running and started at boot.  Click on
-  Mandrake Control Center->System->Services
+  Mandrake Control Center->System->Services, find mysql and click the
+  "On Boot" button and the "Start" button if the mysql status shows that
+  it isn't running yet.
 
 
-  [1m5.2.  Red Hat Linux 8.0[0m
+  [1m6.2.  Red Hat Linux 8.0[0m
 
   Make sure that mysql is running and started at boot. Click on GNOME
   menu>Server Settings>Services and enter the root password when asked.
   Check "mysqld" and then click Start. Click Save, then close the
   window.
 
-  [1m5.3.  Gentoo.[0m
+  [1m6.3.  Gentoo.[0m
 
   Please submit content.
 
 
-  [1m5.4.  Setting up the initial database.[0m
+  [1m6.4.  Setting up the initial database.[0m
 
   Setup the initial mysql databases:
 
@@ -543,7 +605,7 @@
 
 
 
-  [1m5.4.1.  Mandrake 9.0[0m
+  [1m6.4.1.  Mandrake 9.0[0m
 
 
 
@@ -551,7 +613,7 @@
 
 
 
-  [1m5.4.2.  Debian 3.0[0m
+  [1m6.4.2.  Debian 3.0[0m
 
 
 
@@ -559,7 +621,7 @@
 
 
 
-  [1m5.4.3.  Red Hat Linux 8.0[0m
+  [1m6.4.3.  Red Hat Linux 8.0[0m
 
 
 
@@ -576,7 +638,9 @@
        # exit
        %
 
-  [1m6.  Setting up alsa and the mixer.[0m
+
+
+  [1m7.  Setting up ALSA and the mixer.[0m
 
   If your video doesn't appear to be in-sync with your audio, it could
   be because you are listening to the real-time audio from your video
@@ -585,14 +649,13 @@
 
   What you need to do is to mute the "line-in" of your sound card and
   also set it as the recording source.
-
   There are two ways to do this.  Graphically, and from the command
   line.
 
 
-  [1m6.1.  Graphically setting up the mixer.[0m
+  [1m7.1.  Graphically setting up the mixer.[0m
 
-  [1m6.1.1.  Mandrake 9.0[0m
+  [1m7.1.1.  Mandrake 9.0[0m
 
   Open Kmix by K->Multimedia->Sound->Kmix
 
@@ -609,25 +672,25 @@
   and make sure that you save the settings so that this is your default.
 
 
-  [1m6.1.2.  Red Hat Linux 8.0[0m
+  [1m7.1.2.  Red Hat Linux 8.0[0m
 
   There is some uncertainty (in my mind anyway) about ALSA sound and Red
   Hat.  Take everything here with a grain of salt. Here is what my
-  impression of things is right now. The mythtv developer recommends
-  ALSA sound drivers.  However, Red Hat Linux 8.0 ships with some other
-  sound driver/managment package.  Installing ALSA looks like a real
-  bear, and includes a kernel recompile. Then you have to figure out how
-  to deactivate the Red Hat Linux 8.0 built in sound package. I decided
-  to give it whirl with the built in sound package. I [1mwas [22mable to get
-  satisfactory results on my machine using the rtjpeg video encoder and
-  turning off MP3 sound compression. If I try to use the better MPEG4
-  video encoder and/or use MP3 audio compression I get slight sound sync
-  issues and a few skips. I think this is because my machine is too
-  slow. However, it is possible that it is really because I'm using the
-  wrong sound package. Since I didn't install ALSA myself you will need
-  to evaluate the situation on your own. However, I will give
-  instructions for how I got the default Red Hat Linux 8.0 sound package
-  working with mythtv.
+  impression of how things are right now. The mythtv developer
+  recommends ALSA sound drivers.  However, Red Hat Linux 8.0 ships with
+  some other sound driver/management package.  Installing ALSA looks
+  like a real bear, and includes a kernel recompile. Then you have to
+  figure out how to deactivate the Red Hat Linux 8.0 built in sound
+  package. I decided to give it whirl with the built in sound package. I
+  [1mwas [22mable to get satisfactory results on my machine using the RTJPEG
+  video encoder and turning off MP3 sound compression. If I try to use
+  the better MPEG4 video encoder and/or use MP3 audio compression I get
+  slight sound sync issues and a few skips. I think this is because my
+  machine is too slow. However, it is possible that it is really because
+  I'm using the wrong sound package. Since I didn't install ALSA myself
+  you will need to evaluate the situation on your own. However, I will
+  give instructions for how I got the default Red Hat Linux 8.0 sound
+  package working with mythtv.
 
   Red Hat Linux 8.0 does not use some default KDE and Gnome control
   panels and substitutes its own. Sound is one of these cases. To
@@ -642,27 +705,27 @@
   the gain.
 
 
-  [1m6.2.  Setting the mixer from the command line.[0m
+  [1m7.2.  Setting the mixer from the command line.[0m
 
   If you're running Mandrake 9.0 and have installed the alsa-utils
   package, then the [1mamixer [22mprogram can be used to setup the mixer.
 
 
 
-       % amixer set Master,0 100%,100% unmute
-       % amixer set Line,0 100%,100% mute capture
-       % su -
-       # alsactl store
-       # exit
-       %
+  % amixer set Master,0 100%,100% unmute
+  % amixer set Line,0 100%,100% mute capture
+  % su -
+  # alsactl store
+  # exit
+  %
 
 
 
-  That takes care of setting the volume correctly, and the alsa startup
+  That takes care of setting the volume correctly, and the ALSA startup
   script will restore the volume after a reboot.
 
 
-  [1m7.  Setting up a remote control.[0m
+  [1m8.  Setting up a remote control.[0m
 
   mythtv does not have native remote control receiver and decoder
   software built-in.  Instead, remote control functions are implemented
@@ -678,7 +741,7 @@
   <http://www.kernel.org/pub/linux/kernel/v2.4/>.
 
 
-  [1m7.1.  Obtaining the kernel.[0m
+  [1m8.1.  Obtaining the kernel.[0m
 
   An easy way is to use the wget command:
 
@@ -690,8 +753,7 @@
   Next, open a shell and login as superuser.
 
 
-       % su -
-       # cd /home/[yourusername]
+       % su
        # mkdir /usr/src
        # mv linux-2.4.19.tar.bz2 /usr/src
        # cd /usr/src
@@ -699,10 +761,11 @@
        # chown -R root.root linux-2.4.19
        # ln -sf linux-2.4.19 linux
        # exit
+       %
 
 
 
-  [1m7.2.  Obtaining and compiling lirc.[0m
+  [1m8.2.  Obtaining and compiling lirc.[0m
 
   You're going to need to download and compile lircd.  Go to
   http://www.lirc.org <http://www.lirc.org> and download lirc; as of
@@ -710,9 +773,10 @@
   as well.
 
 
-       % tar -xjf lirc-0.6.6.tar.bz2
-       % cd lirc-0.6.6
-       % ./setup.sh
+
+  % tar -xjf lirc-0.6.6.tar.bz2
+  % cd lirc-0.6.6
+  % ./setup.sh
 
 
 
@@ -763,16 +827,17 @@
 
   This takes care of the lircd portion, which "listens" for the IR sig-
   nals. If everything went well, the install script for lircd put an
-  appropriate config file for your remote into /etc/lircd.conf This file
-  maps the buttons on the remote control to the IR pulses coming from
-  the receiver.
+  appropriate configuration file for your remote into /etc/lircd.conf
+  This file maps the buttons on the remote control to the IR pulses com-
+  ing from the receiver.
 
   The next step is to convert those signals into something that can be
   used to control mythtv.
 
 
-       % cd ~/mythtv-0.7/configfiles
-       % cp lircrc.example ~/.lircrc
+
+  % cd ~/mythtv-0.7/configfiles
+  % cp lircrc.example ~/.lircrc
 
 
 
@@ -817,7 +882,7 @@
   calling an external program from a remote control button.
 
 
-  [1m7.3.  Additional information for lirc.[0m
+  [1m8.3.  Additional information for lirc.[0m
 
   Take a look at the lircrc.example files in the configfiles/ directory.
   In my case, (Pinnacle Studio card) the channel up and down functions
@@ -825,6 +890,7 @@
   than the default lircrc.example file that came with mythtv.
 
   The lircrc.example file has this:
+
 
 
   begin
@@ -880,7 +946,7 @@
   functionality with mythtv.
 
 
-  [1m8.  Configuring mythtv.[0m
+  [1m9.  Configuring mythtv.[0m
 
   By this point, all of the prerequisites have been installed, [1mmysql [22mis
   running and has had its initial database setup.  It's now time to
@@ -888,7 +954,7 @@
 
 
 
-  [1m8.1.  Editing the settings.txt file.[0m
+  [1m9.1.  Editing the settings.txt file.[0m
 
   Open a shell and switch to the /usr/local/share/mythtv directory.  You
   [1mMUST [22medit the settings.txt file so that it's appropriate for your
@@ -918,9 +984,9 @@
   leave the default as-is until you're sure that mythtv is operational.
 
   [1mNOTE[22m: the int Deinterlace=1 variable controls the deinterlacer.
-  Support for deinterlacing requires that your processor have MMX2.
+  Support for deinterlacing requires that your processor has MMX2.
   Intel Celeron and Pentium Pro CPUs do not have MMX2, so make sure that
-  you've got this set to "0" if you have one of these.  If you don't,
+  you've got this set to "0" if you have one of these.  If you don' t,
   you will get "Illegal Instruction" errors.
 
   Users in North America can now exit and save the file.  Users in other
@@ -929,7 +995,7 @@
   [1mtv_grab_uk [22mfor the UK, etc.  Use the name from the xmltv directory.
 
 
-  [1m8.1.1.  Adding support for an external tuner.[0m
+  [1m9.1.1.  Adding support for an external tuner.[0m
 
   mythtv supports changing the channel on an external tuner.  If you
   have an external tuner, like a DirecTV or digital cable set top box,
@@ -951,7 +1017,8 @@
   <http://www.snapstream.com/products/irblaster/sonydss.htm> for cable
   pinouts for RCA DSS receivers.
 
-  [1m8.2.  Running setup.[0m
+
+  [1m9.2.  Running setup.[0m
 
   Now that you've edited your settings.txt file, it's time to run the
   setup program and perform the initial configuration.
@@ -989,7 +1056,7 @@
   the XMLTV grabber program.
 
 
-  [1m8.3.  Running mythfilldatabase.[0m
+  [1m9.3.  Running mythfilldatabase.[0m
 
   Now that the setup program has completed, run [1mmythfilldatabase [22mto get
   one week of data inserted into the database.
@@ -1018,7 +1085,7 @@
 
 
 
-  [1m8.3.1.  Setting mythfilldatabase  to run from cron[0m
+  [1m9.3.1.  Setting mythfilldatabase  to run from cron[0m
 
   In order to keep your database filled, [1mmythfilldatabase [22mshould be run
   once a day.
@@ -1122,7 +1189,7 @@
   ESC will exit out back to the shell.
 
 
-  [1m9.  Using mythtv.[0m
+  [1m10.  Using mythtv.[0m
 
   [1mmythfrontend [22mis the main interface to the mythtv program.  This
   program allows you to choose which of the other modules you'd like to
@@ -1132,7 +1199,7 @@
 
 
 
-  [1m9.1.  Using themes with mythtv.[0m
+  [1m10.1.  Using themes with mythtv.[0m
 
   mythtv is "themeable", meaning that the visual appearance of the
   program can be modified by the user without re-compiling or altering
@@ -1148,14 +1215,14 @@
   theme while [1mmythfrontend [22mis still running.
 
 
-  [1m10.  mythweb.[0m
+  [1m11.  mythweb.[0m
 
   mythweb allows you to use a web page to control various aspects of
   your mythtv system.  mythweb is a separate application, but it's
   dependant on mythtv being installed and operational.
 
 
-  [1m10.1.  Installation and pre-requisites.[0m
+  [1m11.1.  Installation and pre-requisites.[0m
 
   Download mythweb from http://www.mythtv.org/ <http://www.mythtv.org/>
   and save it to a location where you can find it.  The next step
@@ -1163,7 +1230,7 @@
   php support.
 
 
-  [1m10.1.1.  Mandrake 9.0[0m
+  [1m11.1.1.  Mandrake 9.0[0m
 
   Mandrake 9.0 has [1mapache [22mand [1mphp [22mpre-packaged, so installation is quite
   simple.  Once you have installed the two programs, either with the
@@ -1173,7 +1240,7 @@
   Control Center.
 
 
-  [1m10.2.  Completing the installation.[0m
+  [1m11.2.  Completing the installation.[0m
 
 
 
@@ -1195,13 +1262,13 @@
 
 
 
-  [1m11.  mythgallery.[0m
+  [1m12.  mythgallery.[0m
 
   mythgallery is a photo and slideshow application.  mythgallery is a
   separate application, but it's dependant on mythtv being installed and
   operational.
 
-  [1m11.1.  Installation and pre-requisites.[0m
+  [1m12.1.  Installation and pre-requisites.[0m
 
   Download mythgallery from http://www.mythtv.org/
   <http://www.mythtv.org/> and save it to a location where you can find
@@ -1237,12 +1304,36 @@
      at the first level.
 
 
-  [1m12.  mythgame.[0m
+  [1m13.  mythgame.[0m
 
-  [1m13.  mythmusic.[0m
+  [1m14.  mythmusic.[0m
+
+  [Documentation still being developed.]
 
   mythmusic has a number of pre-requisites that must be satisfied before
-  it is operational.
+  it is operational.  Depending on your distribution, some of these
+  prerequisites can be satisfied through the various package managers.
+  If your distribution doesn't offer pre-compiled versions of the
+  software below, then follow the generic instructions for manually
+  compiling and installing the software.
+
+  The pre-requisites for mythtmusic are:
+
+  +o  MAD
+
+  +o  libvorbis-devel
+
+  +o  FLAC
+
+  +o  libcdaudio
+
+  +o  CDParanoia
+
+
+  [1m14.1.  Manual installation of pre-requisites[0m
+
+  These instructions are for distributions which don't have pre-compiled
+  versions of the software necessary to run mythtv.
 
   Download MAD from http://www.mars.org/home/rob/proj/mpeg/
   <http://www.mars.org/home/rob/proj/mpeg/>  Save it to a directory you
@@ -1260,14 +1351,36 @@
        %
 
 
-  Install libvorbis-devel using urpmi or the Mandrake Control Center
-  installer.
 
-  Download and install flac
+  Download FLAC from http://flac.sourceforge.net
+  <http://flac.sourceforge.net> and install:
 
-  Download and install libcdaudio
 
-  Install cdparanoia using urpmi or the Mandrake Control Center.
+
+       % tar -xzf flac-1.0.4.tar.gz
+       % cd flac-1.0.4
+       % ./configure
+       % make
+       % su
+       # make install
+       # exit
+       %
+
+
+
+  Download and install libcdaudio:
+
+
+       % tar -xzf libcdaudio-XXXXX
+       % cd libcdaudio-XXXXX
+       % ./configure
+       % make
+       % su
+       # make install
+       # exit
+       %
+
+
 
   Download cdparanoia from the website and copy
   interface/cdda_interface.h to /usr/local/include
@@ -1276,9 +1389,25 @@
   -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
 
 
-  [1m14.  Troubleshooting.[0m
 
-  [1m14.1.  Illegal Instruction.[0m
+  [1m14.2.  Mandrake 9.0[0m
+
+  Mandrake 9.0 has a number of the pre-requisites available on the
+  installation CD.  Some of the software you're going to need will have
+  to be obtained from the " contrib" or "cooker" development
+  repositories.  Applications downloaded from " cooker" come from the
+  development branch, so there may be issues with some software.
+
+
+  Install libvorbis-devel using urpmi or the Mandrake Control Center
+  installer.
+
+  Install cdparanoia using urpmi or the Mandrake Control Center.
+
+
+  [1m15.  Troubleshooting.[0m
+
+  [1m15.1.  Illegal Instruction.[0m
 
   This error can happen for the following reasons:
 
