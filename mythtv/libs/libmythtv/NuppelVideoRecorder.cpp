@@ -1106,19 +1106,42 @@ void NuppelVideoRecorder::DoV4L2(void)
 
     vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
+    vfmt.fmt.pix.width = w;
+    vfmt.fmt.pix.height = h;
+    vfmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
+
+    // this is our preferred format, try this first
     if (inpixfmt == FMT_YUV422P)
         vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV422P;
     else
         vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV420;
 
-    vfmt.fmt.pix.width = w;
-    vfmt.fmt.pix.height = h;
-    vfmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
-
     if (ioctl(fd, VIDIOC_S_FMT, &vfmt) < 0)
     {
-        printf("Unable to set desired format\n");
-        exit(0);
+        // this is supported by the cx88 and various ati cards.
+        vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
+
+        if (ioctl(fd, VIDIOC_S_FMT, &vfmt) < 0)
+        {
+            VERBOSE(VB_ALL, "Unable to set desired format");
+            exit(0);
+        }
+        else
+        {
+            // we need to convert the buffer - we can't deal with yuyv directly.
+            if (inpixfmt == FMT_YUV422P)
+            {
+                cerr << "v4l2: yuyv format supported, but yuv422 requested." << endl;
+                cerr << "v4l2: unfortunately, this converter hasn't been written yet." << endl;
+                exit(0);
+            }
+            cerr << "v4l2: format set, getting yuyv from v4l, converting" << endl;
+        }
+    }
+    else
+    {
+        // cool, we can do our preferred format, most likely running on bttv.
+        cerr << "v4l2: format set, getting yuv420 from v4l";
     }
 
     int numbuffers = 5;
@@ -1234,7 +1257,58 @@ again:
         frame = vbuf.index;
 
         if (!paused)
-            BufferIt(buffers[frame], video_buffer_size);
+        {
+            if (vfmt.fmt.pix.pixelformat == V4L2_PIX_FMT_YUYV)
+            {
+                // Convert YUYV to YUV420P
+                unsigned conversion_buffer_size = h * w * 3 / 2;
+                uint8_t conversion_buffer[conversion_buffer_size];
+
+                uint8_t *y_plane = conversion_buffer;
+                uint8_t *cr_plane = y_plane + w * h;
+                uint8_t *cb_plane = cr_plane + w * h / 4;
+
+                uint8_t *src = buffers[frame];
+
+                // Round height to multiple of two.
+                unsigned height = (h / 2) * 2;
+
+                // Treat lines in batches of two, first use color information, then don't
+                unsigned line_size = w * 2;
+
+                for (unsigned line = 0; line < height; line += 2)
+                {
+                    uint8_t *src_endline = src + line_size;
+
+                    // convert first line, use color information
+                    while (src < src_endline)
+                    {
+                        *y_plane++ = *src++;
+                        *cb_plane++ = *src++;
+                        *y_plane++ = *src++;
+                        *cr_plane++ = *src++;
+                    }
+
+                    src_endline = src + line_size;
+
+                    // convert second line, don't use color information
+                    while (src < src_endline)
+                    {
+                        *y_plane++ = *src++;
+                        src++;
+                        *y_plane++ = *src++;
+                        src++;
+                    }
+                }
+
+                BufferIt(conversion_buffer, video_buffer_size);
+            }
+            else
+            {
+                // buffer the frame directly
+                BufferIt(buffers[frame], video_buffer_size);
+            }
+        }
 
         vbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         ioctl(fd, VIDIOC_QBUF, &vbuf);
