@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-12-22, v0.13.05
+<date>2004-01-01, v0.13.06
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -529,7 +529,9 @@ Further documentation on using ATrpms packages can be found in Jarod
 Wilson's <url url="mailto:jcw@wilsonet.com" name="mailto:jcw@wilsonet.com">
 "HOWTO Build a MythTV System on Red Hat Linux 9 w/ATrpms" document, <url
 url="http://pvrhw.goldfish.org/tiki-page.php?pageName=rh9pvr250"
-name="http://pvrhw.goldfish.org/tiki-page.php?pageName=rh9pvr250">. Just
+name="http://pvrhw.goldfish.org/tiki-page.php?pageName=rh9pvr250">.
+Instructions for Fedora may be found at <url
+url="http://wilsonet.com/mythtv/" name="http://wilsonet.com/mythtv/"> Just
 like 3rd-party packages, any 3rd-party documentation problems should be
 brought up with the maintainer.
 
@@ -2220,12 +2222,6 @@ appropriate value.
 
 If you're outside of North America, then some manual interaction will be
 required with XMLTV.
-
-<bf>NOTE</bf>:  If you are in North America, and you enter your Zip/postal
-code and nothing seems to happen for a very very long time, it is possible
-that XMLTV is waiting for you to provide some input.  Use ALT-TAB or
-whatever key combination your window manager uses to switch programs and
-look for a terminal window running XMLTV that may be waiting for input.
 
 Once you have chosen your provider, press RETURN to continue.  XMLTV will
 now begin collecting the initial data for your location.  The screen may
@@ -4935,6 +4931,8 @@ v0.13.03, 2003-12-17.  Add "jittery" troubleshooting step for PVR users.
 v0.13.04, 2003-12-22.  Fix LVM example.
 v0.13.05, 2003-12-22.  Add more information to the LVM example.  And a
 warning which is sure to be ignored.
+v0.13.06, 2004-01-01.  Remove the hang comment from xmltv setup; there's now
+a status window.  Update Jarod's website info.
 -->
 
 <!--

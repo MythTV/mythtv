@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-12-22, v0.13.05
+  2004-01-01, v0.13.06
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -836,9 +836,10 @@
   Wilson's mailto:jcw@wilsonet.com <mailto:jcw@wilsonet.com> "HOWTO
   Build a MythTV System on Red Hat Linux 9 w/ATrpms" document,
   http://pvrhw.goldfish.org/tiki-page.php?pageName=rh9pvr250
-  <http://pvrhw.goldfish.org/tiki-page.php?pageName=rh9pvr250>. Just
-  like 3rd-party packages, any 3rd-party documentation problems should
-  be brought up with the maintainer.
+  <http://pvrhw.goldfish.org/tiki-page.php?pageName=rh9pvr250>.
+  Instructions for Fedora may be found at http://wilsonet.com/mythtv/
+  <http://wilsonet.com/mythtv/> Just like 3rd-party packages, any 3rd-
+  party documentation problems should be brought up with the maintainer.
 
 
   [1m3.2.1.2.  Mandrake[0m
@@ -928,7 +929,6 @@
   On systems running KDE, a tool which will allow you to see what
   packages are available and if they're installed on your system can be
   accessed by clicking K->Configuration->Packaging->KPackage
-
   While the graphical tools are nice, the command line tool is actually
   easier to use.  It's strongly recommended that you use the command
   line tool.
@@ -2872,13 +2872,6 @@
   If you're outside of North America, then some manual interaction will
   be required with XMLTV.
 
-  [1mNOTE[22m:  If you are in North America, and you enter your Zip/postal code
-  and nothing seems to happen for a very very long time, it is possible
-  that XMLTV is waiting for you to provide some input.  Use ALT-TAB or
-  whatever key combination your window manager uses to switch programs
-  and look for a terminal window running XMLTV that may be waiting for
-  input.
-
   Once you have chosen your provider, press RETURN to continue.  XMLTV
   will now begin collecting the initial data for your location.  The
   screen may blank for a few seconds to several minutes, depending on
@@ -2900,7 +2893,6 @@
   have multiple tuners, and each tuner has a different input, so on this
   screen you let MythTV know which device will connect to which input
   source.
-
 
   When you start this screen, you should see a listing of the various
   input connections available on each of the Capture cards you defined
@@ -3032,23 +3024,25 @@
        # cp mythfilldatabasecron /etc/cron.daily
 
 
+
   If you want to know what time your job will run, you can do the
   following:
 
 
-       # cat /etc/crontab
-       SHELL=/bin/bash
-       PATH=/sbin:/bin:/usr/sbin:/usr/bin
-       MAILTO=root
-       HOME=/
 
-       # run-parts
-       01 * * * * root nice -n 19 run-parts /etc/cron.hourly
-       02 4 * * * root nice -n 19 run-parts /etc/cron.daily
-       22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
-       42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
-       # exit
-       $
+  # cat /etc/crontab
+  SHELL=/bin/bash
+  PATH=/sbin:/bin:/usr/sbin:/usr/bin
+  MAILTO=root
+  HOME=/
+
+  # run-parts
+  01 * * * * root nice -n 19 run-parts /etc/cron.hourly
+  02 4 * * * root nice -n 19 run-parts /etc/cron.daily
+  22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
+  42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
+  # exit
+  $
 
 
 
@@ -3095,6 +3089,8 @@
 
 
        $ crontab -e
+
+
 
   The [1mcrontab -e [22mcommand will allow you to edit the existing crontab.
   [1mNOTE[22m:  By default, the crontab will use [1mvi [22mas your editor.  If you
