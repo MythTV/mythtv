@@ -908,8 +908,12 @@ void VideoOutputXvMC::PrepareFrame(VideoFrame *buffer, FrameScanType t)
         (osdframe) ? (xvmc_render_state_t *)(osdframe->buf) : 0;
     Display *display = data->XJ_disp;
 
+    pthread_mutex_unlock(&lock);
+
     SyncSurface(display, render->p_surface);
     SyncSurface(display, (osdrender) ? osdrender->p_surface : 0);
+
+    pthread_mutex_lock(&lock);
 
     render->state |= MP_XVMC_STATE_DISPLAY_PENDING;
     data->p_render_surface_to_show = render;
@@ -976,7 +980,7 @@ void VideoOutputXvMC::Show(FrameScanType scan)
     // away from the decoding process, and coming back from a pause can
     // result in a very low buffer situation, causing jerky playback.
     // Let's just hope that the XvMC driver's a bit threadsafe.
-    if (field != 3)
+    //if (field != 3)
         pthread_mutex_unlock(&lock);
 
     int yoff = dispyoff;
@@ -991,7 +995,7 @@ void VideoOutputXvMC::Show(FrameScanType scan)
                    imgx, imgy, imgw, src_h,
                    dispxoff, yoff, dispwoff, hoff, field);
 
-    if (field != 3)
+    //if (field != 3)
         pthread_mutex_lock(&lock);
 
 /*  Doesn't seem necessary.

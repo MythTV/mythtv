@@ -1805,6 +1805,9 @@ void NuppelVideoPlayer::StartPlaying(void)
         osd = new OSD(video_width, video_height, frame_interval,
                       osdfontname, osdccfontname, osdprefix, osdtheme,
                       dispx, dispy, dispw, disph);
+
+        if (forceVideoOutput != kVideoOutput_Default)
+            osd->DisableFade();
     }
 
     playing = true;

@@ -119,6 +119,8 @@ class OSD : public QObject
     OSDListTreeType *ShowTreeMenu(const QString &name, 
                                   OSDGenericTree *treeToShow);
 
+    void DisableFade(void);
+
  private:
     void SetDefaults();
     TTFFont *LoadFont(QString name, int size); 

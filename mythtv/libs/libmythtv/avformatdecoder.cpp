@@ -255,18 +255,19 @@ void AvFormatDecoder::Reset(void)
 {
     SeekReset();
 
-    //
-    // This breaks channel changes on normal XvMC (and possibly XvMC VLD)
-    //
-#if 0
     // Clear out the existing mpeg streams
     // so we can get a clean set from the 
     // new seek position.
     for (int i = ic->nb_streams - 1; i >= 0; i--)
     {
-        av_remove_stream(ic, ic->streams[i]->id);
+        AVStream *st = ic->streams[i];
+        if (st->codec.codec_type == CODEC_TYPE_AUDIO)
+        {
+            if (st->codec.codec)
+                avcodec_close(&st->codec);
+            av_remove_stream(ic, st->id);
+        }
     }
-#endif
 
     m_positionMap.clear();
     framesPlayed = 0;
@@ -662,11 +663,13 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             continue;
         }
 
-        if (enc->codec) 
+        if (enc->codec && enc->codec_type != CODEC_TYPE_VIDEO) 
         {
             VERBOSE(VB_IMPORTANT, QString("Codec already open, closing first"));
             avcodec_close(enc);
         }
+        else if (enc->codec)
+            continue;
 
         int open_val = avcodec_open(enc, codec);
         if (open_val < 0)
@@ -1215,7 +1218,6 @@ bool AvFormatDecoder::autoSelectAudioTrack()
     if (!audioStreams.size())
         return false;
 
-    bool foundAudio = false;
     int minChannels = 1;
     int maxTracks = (audioStreams.size() - 1);
     int track;
@@ -1225,7 +1227,7 @@ bool AvFormatDecoder::autoSelectAudioTrack()
     int selectedTrack = -1;
     int selectedChannels = -1;
     
-    while ((!foundAudio) && (minChannels >= 0))
+    while ((selectedTrack == -1) && (minChannels >= 0))
     {
         for (track = maxTracks; track >= 0; track--)
         {
@@ -1239,29 +1241,30 @@ bool AvFormatDecoder::autoSelectAudioTrack()
                 if (e->codec_id == CODEC_ID_AC3)
                 {
                     selectedTrack = track;
-                    foundAudio = true;
                     break;
                 }
 
                 if (e->channels > selectedChannels)
                 {
-                    //this is a candidate with more channels
-                    //than the previous, or there was no previous
-                    //so select it.
+                    // this is a candidate with more channels
+                    // than the previous, or there was no previous
+                    // so select it.
+                    selectedChannels = e->channels;
                     selectedTrack = track;
                 }
             }
         }
-        if (!foundAudio)
+        if (selectedTrack == -1)
         {
-        minChannels--;
+            minChannels--;
         }
     }
 
     if (selectedTrack == -1)
     {
-        //no suitable track was found
-    return false;
+        VERBOSE(VB_AUDIO,
+                QString("No suitable audio track exists."));
+        return false;
     }
 
     currentAudioTrack = selectedTrack;
@@ -1281,7 +1284,7 @@ bool AvFormatDecoder::autoSelectAudioTrack()
                 .arg(selectedTrack + 1).arg(wantedAudioStream));
         VERBOSE(VB_AUDIO, 
                 QString("It has %1 channels and we needed at least %2")
-                .arg(selectedChannels).arg(minChannels + 1));
+                .arg(selectedChannels).arg(do_ac3_passthru ? 2 : 1));
     }
     SetupAudioStream();
     CheckAudioParams(e->sample_rate, e->channels, true);

@@ -1942,6 +1942,11 @@ void OSD::SetVisible(OSDSet *set, int length)
     osdlock.unlock();
 }
 
+void OSD::DisableFade(void)
+{
+    totalfadetime = 0;
+}
+
 OSDSurface *OSD::Display(void)
 {
     bool anytodisplay = false;

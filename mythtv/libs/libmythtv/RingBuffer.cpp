@@ -268,10 +268,9 @@ void ThreadedFileWriter::DiskLoop()
     {
         size = BufUsed();
 
-        if ((!in_dtor) &&
-            (!flush) &&
-            (((unsigned) size < tfw_min_write_size) && 
-             ((unsigned) written >= tfw_min_write_size)))
+        if (!size || (!in_dtor && !flush &&
+            (((unsigned)size < tfw_min_write_size) && 
+             ((unsigned)written >= tfw_min_write_size))))
         {
             usleep(500);
             continue;
