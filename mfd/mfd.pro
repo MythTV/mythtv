@@ -6,6 +6,6 @@ TEMPLATE = subdirs
 
 
 # Directories
-SUBDIRS += mdcaplib mfdlib mfd mfdctl clientlib
+SUBDIRS += mdcaplib mfdlib mfd mfdctl
 
 include(config.pro)
