@@ -1,14 +1,19 @@
 #CONFIG += debug
 CONFIG += release
 
-PREFIX = /usr/local
+isEmpty( PREFIX ) {
+    PREFIX = /usr/local
+}
 
 INCLUDEPATH += $${PREFIX}/include
-INCLUDEPATH *= /usr/local/include
 INCLUDEPATH *= $${PREFIX}/include/mythtv
 
 DEFINES += _GNU_SOURCE
 DEFINES += PREFIX=\"$${PREFIX}\"
 release {
         QMAKE_CXXFLAGS_RELEASE = -O3 -march=pentiumpro -fomit-frame-pointer
+    macx {
+        # Don't use -O3, it causes some Qt moc methods to go missing
+        QMAKE_CXXFLAGS_RELEASE = -O2
+    }
 }

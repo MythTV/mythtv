@@ -30,3 +30,7 @@ HEADERS += videogallery.h videoselected.h videodlg.h
 SOURCES += main.cpp metadata.cpp videomanager.cpp videobrowser.cpp videofilter.cpp dbcheck.cpp
 SOURCES += globalsettings.cpp videotree.cpp fileassoc.cpp editmetadata.cpp
 SOURCES += videogallery.cpp videoselected.cpp videodlg.cpp
+
+macx {
+    QMAKE_LFLAGS += -flat_namespace -undefined suppress
+}
