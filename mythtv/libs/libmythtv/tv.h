@@ -159,6 +159,9 @@ class TV
 
     int fftime;
     int rewtime;
+    int stickykeys;
+    bool doing_ff;
+    bool doing_rew;
 
     OSD *osd;
 

@@ -113,8 +113,8 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
             QSqlQuery subquery;
             QString subquerystr;
 
-            subquerystr = QString("SELECT channum FROM channel WHERE "
-                                  "chanid = %1").arg(proginfo->chanid);
+            subquerystr = QString("SELECT channum,name,callsign FROM channel "
+                                  "WHERE chanid = %1").arg(proginfo->chanid);
             subquery = db->exec(subquerystr);
 
             if (subquery.isActive() && subquery.numRowsAffected() > 0)
@@ -122,9 +122,15 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
                 subquery.next();
  
                 proginfo->chanstr = subquery.value(0).toString();
+                proginfo->channame = subquery.value(1).toString();
+                proginfo->chansign = subquery.value(2).toString();
             }
             else
-                proginfo->chanstr = proginfo->chanid;
+            {
+                proginfo->chanstr = "#" + proginfo->chanid;
+                proginfo->channame = "#" + proginfo->chanid;
+                proginfo->chansign = "#" + proginfo->chanid;
+            }
 
             item = new ProgramListItem(listview, proginfo, 0, tv, fileprefix);
         }
@@ -238,6 +244,8 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
     nvp->SetAsPIP();
     nvp->SetOSDFontName(globalsettings->GetSetting("OSDFont"), 
                         installprefix);
+    QString filters = "";
+    nvp->SetVideoFilters(filters);
  
     pthread_create(&decoder, NULL, SpawnDecoder, nvp);
 
@@ -283,7 +291,11 @@ void PlaybackBox::changed(QListViewItem *lvitem)
         
     date->setText(timedate);
 
-    QString chantext = rec->chanstr;
+    QString chantext;
+    if (globalsettings->GetNumSetting("DisplayChanNum") == 0)
+        chantext = rec->channame + " [" + rec->chansign + "]";
+    else
+        chantext = rec->chanstr;
     chan->setText(chantext);
 
     title->setText(rec->title);

@@ -6,6 +6,8 @@ ProgramInfo::ProgramInfo(void)
     startCol = -1;
 
     chanstr = "";
+    chansign = "";
+    channame = "";
 
     recordtype = kUnknown;
     conflicting = false;
@@ -24,6 +26,8 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     category = other.category;
     chanid = other.chanid;
     chanstr = other.chanstr;
+    chansign = other.chansign;
+    channame = other.channame;
 
     startts = other.startts;
     endts = other.endts;
@@ -50,11 +54,11 @@ ProgramInfo *GetProgramAtDateTime(QString channel, const QString &ltime)
     QString thequery;
    
     thequery = QString("SELECT channel.chanid,starttime,endtime,title,subtitle,"
-                       "description,category,channel.channum "
-                       "FROM program,channel WHERE program.chanid = %1 "
-                       "AND starttime < %2 AND endtime > %3 AND "
-                       "program.chanid = channel.chanid;").arg(channel)
-                       .arg(ltime).arg(ltime);
+                       "description,category,channel.channum,channel.callsign, "
+                       "channel.name FROM program,channel WHERE "
+                       "program.chanid = %1 AND starttime < %2 AND "
+                       "endtime > %3 AND program.chanid = channel.chanid;")
+                       .arg(channel).arg(ltime).arg(ltime);
 
     query.exec(thequery);
 
@@ -73,6 +77,8 @@ ProgramInfo *GetProgramAtDateTime(QString channel, const QString &ltime)
         proginfo->description = QString::fromUtf8(query.value(5).toString());
         proginfo->category = QString::fromUtf8(query.value(6).toString());
         proginfo->chanstr = query.value(7).toString();
+        proginfo->chansign = query.value(8).toString();
+        proginfo->channame = query.value(9).toString();
         proginfo->spread = -1;
         proginfo->recordtype = kUnknown;
 

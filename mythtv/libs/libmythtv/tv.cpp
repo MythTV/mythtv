@@ -50,6 +50,7 @@ TV::TV(const QString &startchannel, int capturecardnum, int pipcardnum)
 
     settings->LoadSettingsFiles("settings.txt", theprefix);
     settings->LoadSettingsFiles("mysql.txt", theprefix);
+    settings->LoadSettingsFiles("theme.txt", theprefix);
 
     db_conn = NULL;
     ConnectDB(capturecardnum);
@@ -143,12 +144,17 @@ TVState TV::LiveTV(void)
     if (internalState == kState_RecordingOnly)
     {
         QString cmdline = QString("mythdialog \"MythTV is already recording "
-                                  "'%1' on channel %2.  Do you want to:\" "
-                                  "\"Stop recording and watch TV\" \"Watch the "
-                                  "in-progress recording\" "
-                                  "\"Cancel and go back to the menu\"")
-                                  .arg(curRecording->title)
-                                  .arg(curRecording->chanstr);
+                                  "'%1' on ").arg(curRecording->title);
+
+        if (settings->GetNumSetting("DisplayChanNum") == 0)
+            cmdline += QString("%1 [%2].").arg(curRecording->channame)
+                                          .arg(curRecording->chansign);
+        else
+            cmdline += QString("channel %1.").arg(curRecording->chanstr);
+
+        cmdline += QString("  Do you want to:\" \"Stop recording and watch "
+                           "TV\" \"Watch the in-progress recording\" "
+                           "\"Cancel and go back to the menu\"");
 
         int result = system(cmdline.ascii());
 
@@ -196,8 +202,12 @@ int TV::AllowRecording(ProgramInfo *rcinfo, int timeuntil)
         return 1;
     }
 
-    QString message = "MythTV wants to record \"";
-    message += rcinfo->title + "\" on Channel " + rcinfo->chanstr;
+    QString message = QString("MythTV wants to record \"") + rcinfo->title;
+    if (settings->GetNumSetting("DisplayChanNum") == 0)
+        message += QString("\" on ") + rcinfo->channame + " [" +
+                   rcinfo->chansign + "]";
+    else
+        message += "\" on Channel " + rcinfo->chanstr;
     message += " in %d seconds.  Do you want to:";
 
     QString option1 = "Record and watch while it records";
@@ -872,11 +882,13 @@ void *TV::EventThread(void *param)
 
 void TV::RunTV(void)
 { 
-    frameRate = 29.97; // the default's not used, but give it a default anyway.
-
     paused = false;
     int keypressed;
- 
+
+    stickykeys = settings->GetNumSetting("StickyKeys");
+    doing_ff = false;
+    doing_rew = false;
+
     channelqueued = false;
     channelKeys[0] = channelKeys[1] = channelKeys[2] = ' ';
     channelKeys[3] = 0;
@@ -891,9 +903,18 @@ void TV::RunTV(void)
 
         usleep(1000);
 
-        if (nvp && (keypressed = nvp->CheckEvents()))
+        if (nvp)
         {
-           ProcessKeypress(keypressed);
+            if ((keypressed = nvp->CheckEvents()))
+                ProcessKeypress(keypressed);
+            else if (stickykeys)
+            {
+                if (doing_ff)
+                    DoFF();
+                else if (doing_rew)
+                    DoRew();
+                usleep(50000);
+            }
         }
 
         if (StateIsRecording(internalState))
@@ -974,18 +995,47 @@ void TV::ProcessKeypress(int keypressed)
 
     switch (keypressed) 
     {
-        case 's': case 'S':
-        case 'p': case 'P': DoPause(); break;
-
-        case wsRight: case 'd': case 'D': DoFF(); break;
-
-        case wsLeft: case 'a': case 'A': DoRew(); break;
-
+        case 's': case 'S': case 'p': case 'P': 
+        {
+            doing_ff = false;
+            doing_rew = false;
+            DoPause();
+            break;
+        }
+        case wsRight: case 'd': case 'D': 
+        {
+            if (doing_ff && stickykeys)
+                doing_ff = false;
+            else
+            {
+                doing_ff = true;
+                doing_rew = false;
+                DoFF(); 
+            }
+            break;
+        }
+        case wsLeft: case 'a': case 'A': 
+        {
+            if (doing_rew && stickykeys)
+                doing_rew = false;
+            else
+            {
+                doing_rew = true;
+                doing_ff = false;
+                DoRew(); 
+            }
+            break;
+        }
         case wsEscape: exitPlayer = true; break;
 
 //        case 'e': case 'E': nvp->ToggleEdit(); break;
 //        case ' ': nvp->AdvanceOneFrame(); break;
-        default: break;
+        default: 
+        {
+            doing_ff = false;
+            doing_rew = false;
+            break;
+        }
     }
 
     if (internalState == kState_WatchingLiveTV)

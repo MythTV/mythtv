@@ -6,17 +6,34 @@ str Theme=blue
 int GuiWidth=800
 int GuiHeight=600
 
+# Overall GUI options
+#
 # Do we color the Qt widgets according to the 'qtlook.txt' file in the theme?
 # (only works for the program guide, currently)
 int ThemeQt=0
-
-# Do we display the program title at the bottom of the EPG or not?
-# (default to no)
-#int EPGShowTitle=1
-
 # Generate static thumbnail pixmaps for recordings?  Takes extra time to start
 # the playback/delete dialogs if turned on.
 int GeneratePreviewPixmaps=0
-
 # Play the video back in a little preview window in the playback/delete boxes?
 int PlaybackPreview=1
+# Date format: A meaningful value is "ddd MMMM d" (default); see the QT docs 
+# for formatting
+str DateFormat=ddd MMM d
+# Time format: Meaningful values are "h:mm AP" (default) and "h:mm"; see the
+# QT docs for formatting
+str TimeFormat=h:mm AP
+# Display channel names or just the channel number when showing things to the
+# user.
+int DisplayChanNum=1
+
+# Program Guide Grid specific options
+#
+# Do we display the program title at the bottom of the EPG or not?
+# (default to yes)
+int EPGShowTitle=1
+# Display order of channels.  Meaningful values are chanid, callsign, and 
+# "channum + 0".
+str ChannelSorting=channum + 0
+# Starting channel
+str DefaultTVChannel=3
+

@@ -160,7 +160,8 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
     QDateTime curTime = QDateTime::currentDateTime();
 
     thequery = "SELECT channel.chanid,sourceid,starttime,endtime,title,"
-               "subtitle,description,channel.channum FROM singlerecord,channel "
+               "subtitle,description,channel.channum,channel.callsign,"
+               "channel.name FROM singlerecord,channel "
                "WHERE channel.chanid = singlerecord.chanid;";
 
     query = db->exec(thequery);
@@ -179,6 +180,8 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
             proginfo->subtitle = query.value(5).toString();
             proginfo->description = query.value(6).toString();
             proginfo->chanstr = query.value(7).toString();
+            proginfo->chansign = query.value(8).toString();
+            proginfo->channame = query.value(9).toString();
             proginfo->recordtype = kSingleRecord;
 
             if (proginfo->title == QString::null)
@@ -236,9 +239,10 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
                     (curtime.hour() == hour && curtime.minute() > min)))
                     continue;
 
-                thequery = QString("SELECT channel.chanid,starttime, "
+                thequery = QString("SELECT channel.chanid,starttime,"
                                    "endtime,title,subtitle,description,"
-                                   "channel.channum "
+                                   "channel.channum,channel.callsign,"
+                                   "channel.name "
                                    "FROM program,channel WHERE "
                                    "program.chanid = %1 AND "
                                    "starttime = %2 AND endtime < %3 AND "
@@ -268,6 +272,8 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
                         proginfo->subtitle = subquery.value(4).toString();
                         proginfo->description = subquery.value(5).toString();
                         proginfo->chanstr = subquery.value(6).toString();
+                        proginfo->chansign = subquery.value(7).toString();
+                        proginfo->channame = subquery.value(8).toString();
                         proginfo->recordtype = kTimeslotRecord;
 
                         if (proginfo->title == QString::null)
@@ -312,7 +318,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
 
             thequery = QString("SELECT channel.chanid,sourceid,starttime,"
                                "endtime,title,subtitle,description,"
-                               "channel.channum "
+                               "channel.channum,channel.callsign,channel.name "
                                "FROM program,channel WHERE starttime >= %1 AND "
                                "endtime < %2 AND title = \"%3\" AND "
                                "channel.chanid = program.chanid")
@@ -342,6 +348,8 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
                     proginfo->subtitle = subquery.value(5).toString();
                     proginfo->description = subquery.value(6).toString();
                     proginfo->chanstr = subquery.value(7).toString();
+                    proginfo->chansign = subquery.value(8).toString();
+                    proginfo->channame = subquery.value(9).toString();
 
                     if (chanid > 0)
                         proginfo->recordtype = kChannelRecord;

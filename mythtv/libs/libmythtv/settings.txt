@@ -1,20 +1,6 @@
 # XMLTV grabber to use
 str XMLTVGrab=tv_grab_na
 
-# Program Guide options
-# 
-# Display order of channels.  Meaningful values are chanid, callsign, and 
-# "channum + 0".
-str ChannelSorting=channum + 0
-# Starting channel
-str DefaultTVChannel=3
-# Date format: A meaningful value is "ddd MMMM d" (default); see the QT docs 
-# for formatting
-str DateFormat=ddd MMM d
-# Time format: Meaningful values are "h:mm AP" (default) and "h:mm"; see the
-# QT docs for formatting
-str TimeFormat=h:mm AP
-
 # Live TV options
 #
 # Size of the buffer for watching live tv, in GB
@@ -82,6 +68,9 @@ int Deinterlace=1
 int FastForwardAmount=5
 # How long to skip backwards on a rewind?
 int RewindAmount=5
+# Are the fast forward and rewind keys sticky (auto-repeat after letting go)?
+# (set FastForwardAmount and RewindAmount to 1 for good behavior if this is on)
+int StickyKeys=0
 # How long should the OSD stay up for in seconds?
 int OSDDisplayTime=3
 # Theme to use for the OSD, if 'none' or otherwise doesn't exist, the normal

@@ -69,7 +69,10 @@ ProgramListItem::ProgramListItem(QListView *parent, ProgramInfo *lpginfo,
     }
     else
     {
-        setText(0, pginfo->chanstr);
+        if (globalsettings->GetNumSetting("DisplayChanNum") == 0)
+            setText(0, pginfo->chansign);
+        else
+            setText(0, pginfo->chanstr);
         setText(1, pginfo->startts.toString(dateformat + " " + timeformat));
         setText(2, pginfo->title);
     }

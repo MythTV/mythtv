@@ -98,7 +98,6 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
         while (query.next())
         {
             ProgramInfo *proginfo = new ProgramInfo;
-            QString chanstr;
  
             proginfo->chanid = query.value(0).toString();
             proginfo->startts = QDateTime::fromString(query.value(1).toString(),
@@ -120,8 +119,8 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
             QSqlQuery subquery;
             QString subquerystr;
 
-            subquerystr = QString("SELECT channum FROM channel WHERE "
-                                  "chanid = %1").arg(proginfo->chanid);
+            subquerystr = QString("SELECT channum,name,callsign FROM channel "
+                                  "WHERE chanid = %1").arg(proginfo->chanid);
             subquery = db->exec(subquerystr);
 
             if (subquery.isActive() && subquery.numRowsAffected() > 0)
@@ -129,9 +128,15 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
                 subquery.next();
  
                 proginfo->chanstr = subquery.value(0).toString();
+                proginfo->channame = subquery.value(1).toString();
+                proginfo->chansign = subquery.value(2).toString();
             }
             else
-                proginfo->chanstr = proginfo->chanid;
+            {
+                proginfo->chanstr = "#" + proginfo->chanid;
+                proginfo->channame = proginfo->chanstr;
+                proginfo->chansign = proginfo->chanstr;
+            }
 
             item = new ProgramListItem(listview, proginfo, 1, tv, fileprefix);
         }
@@ -252,6 +257,8 @@ void DeleteBox::startPlayer(ProgramInfo *rec)
     nvp->SetAsPIP();
     nvp->SetOSDFontName(globalsettings->GetSetting("OSDFont"),
                         installprefix);
+    QString filters = "";
+    nvp->SetVideoFilters(filters);
 
     pthread_create(&decoder, NULL, SpawnDecoder, nvp);
 
@@ -299,7 +306,11 @@ void DeleteBox::changed(QListViewItem *lvitem)
         
     date->setText(timedate);
 
-    QString chantext = rec->chanstr;
+    QString chantext;
+    if (globalsettings->GetNumSetting("DisplayChanNum") == 0)
+        chantext = rec->channame + " [" + rec->chansign + "]";
+    else
+        chantext = rec->chanstr;
     chan->setText(chantext);
 
     title->setText(rec->title);

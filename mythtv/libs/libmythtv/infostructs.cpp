@@ -30,11 +30,11 @@ void ChannelInfo::LoadIcon(void)
     if (tempimage->load(iconpath))
     {
         if (screenwidth != 800 || screenheight != 600 || 
-            tempimage->width() != 30 || tempimage->height() != 30)
+            tempimage->width() != 40 || tempimage->height() != 40)
         {
             QImage tmp2;
-            tmp2 = tempimage->smoothScale((int)(30 * wmult), 
-                                          (int)(30 * hmult));
+            tmp2 = tempimage->smoothScale((int)(40 * wmult), 
+                                          (int)(40 * hmult));
             icon->convertFromImage(tmp2);
         }
         else

@@ -672,7 +672,7 @@ void fillData(QValueList<Source> &sourcelist)
         for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
              grabData(*it, xmltv_grabber, -1);
     }
-    else
+    else if (xmltv_grabber == "tv_grab_na")
     {
         for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
             grabData(*it, xmltv_grabber, 1);
@@ -699,6 +699,11 @@ void fillData(QValueList<Source> &sourcelist)
             }
         }
     }
+    else
+    {
+        cout << "Grabbing XMLTV data using " << xmltv_grabber.ascii() 
+             << " is not verified as working.\n";
+    }
 
     clearOldDBEntries();
 }
@@ -709,8 +714,9 @@ int main(int argc, char *argv[])
 
     if (a.argc() > 1)
     {
-        if (a.argv()[1] == "--manual")
+        if (!strcmp(a.argv()[1], "--manual"))
         {
+            cout << "###\n";
             cout << "### Running in manual channel configuration mode.\n";
             cout << "### This will ask you questions about every channel.\n";
             cout << "###\n";

@@ -41,6 +41,7 @@ class ViewScheduled : public QDialog
     QLabel *subtitle;
     QLabel *description;
     QLabel *date;
+    QLabel *chan;
 
     Scheduler *sched;
 

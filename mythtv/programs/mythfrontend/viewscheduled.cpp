@@ -52,13 +52,13 @@ ViewScheduled::ViewScheduled(QString prefix, TV *ltv, QSqlDatabase *ldb,
     vbox->addWidget(desclabel);
 
     listview = new MyListView(this);
-    listview->addColumn("#");
+    listview->addColumn("Chan");
     listview->addColumn("Date");
     listview->addColumn("Title");
  
-    listview->setColumnWidth(0, (int)(40 * wmult));
+    listview->setColumnWidth(0, (int)(80 * wmult));
     listview->setColumnWidth(1, (int)(210 * wmult)); 
-    listview->setColumnWidth(2, (int)(500 * wmult));
+    listview->setColumnWidth(2, (int)(460 * wmult));
     listview->setColumnWidthMode(0, QListView::Manual);
     listview->setColumnWidthMode(1, QListView::Manual);
 
@@ -88,7 +88,7 @@ ViewScheduled::ViewScheduled(QString prefix, TV *ltv, QSqlDatabase *ldb,
     f->setLineWidth((int)(4 * hmult));
     vbox->addWidget(f);     
 
-    QGridLayout *grid = new QGridLayout(vbox, 4, 2, 1);
+    QGridLayout *grid = new QGridLayout(vbox, 5, 2, 1);
     
     title = new QLabel(" ", this);
     title->setFont(QFont("Arial", (int)(20 * hmult), QFont::Bold));
@@ -96,8 +96,13 @@ ViewScheduled::ViewScheduled(QString prefix, TV *ltv, QSqlDatabase *ldb,
     QLabel *datelabel = new QLabel("Airdate: ", this);
     date = new QLabel(" ", this);
 
+    QLabel *chanlabel = new QLabel("Channel: ", this);
+    chan = new QLabel(" ", this);
+
     QLabel *sublabel = new QLabel("Episode: ", this);
     subtitle = new QLabel(" ", this);
+    subtitle->setAlignment(Qt::WordBreak | Qt::AlignLeft | Qt::AlignTop);
+
     QLabel *desclabel = new QLabel("Description: ", this);
     description = new QLabel(" ", this);
     description->setAlignment(Qt::WordBreak | Qt::AlignLeft | Qt::AlignTop);
@@ -105,13 +110,15 @@ ViewScheduled::ViewScheduled(QString prefix, TV *ltv, QSqlDatabase *ldb,
     grid->addMultiCellWidget(title, 0, 0, 0, 1, Qt::AlignLeft);
     grid->addWidget(datelabel, 1, 0, Qt::AlignLeft);
     grid->addWidget(date, 1, 1, Qt::AlignLeft);
-    grid->addWidget(sublabel, 2, 0, Qt::AlignLeft | Qt::AlignTop);
-    grid->addWidget(subtitle, 2, 1, Qt::AlignLeft | Qt::AlignTop);
-    grid->addWidget(desclabel, 3, 0, Qt::AlignLeft | Qt::AlignTop);
-    grid->addWidget(description, 3, 1, Qt::AlignLeft | Qt::AlignTop);
-    
+    grid->addWidget(chanlabel, 2, 0, Qt::AlignLeft);
+    grid->addWidget(chan, 2, 1, Qt::AlignLeft);
+    grid->addWidget(sublabel, 3, 0, Qt::AlignLeft | Qt::AlignTop);
+    grid->addWidget(subtitle, 3, 1, Qt::AlignLeft | Qt::AlignTop);
+    grid->addWidget(desclabel, 4, 0, Qt::AlignLeft | Qt::AlignTop);   
+    grid->addWidget(description, 4, 1, Qt::AlignLeft | Qt::AlignTop);
+ 
     grid->setColStretch(1, 1);
-    grid->setRowStretch(3, 1);
+    grid->setRowStretch(4, 1);
 
     FillList();
 }
@@ -175,6 +182,13 @@ void ViewScheduled::changed(QListViewItem *lvitem)
         
     date->setText(timedate);
 
+    QString chantext;
+    if (globalsettings->GetNumSetting("DisplayChanNum") == 0)
+        chantext = rec->channame + " [" + rec->chansign + "]";
+    else
+        chantext = rec->chanstr;
+    chan->setText(chantext);
+
     title->setText(rec->title);
     if (rec->subtitle != "(null)")
         subtitle->setText(rec->subtitle);
@@ -203,7 +217,9 @@ void ViewScheduled::selected(QListViewItem *lvitem)
 
 void ViewScheduled::handleNotRecording(ProgramInfo *rec)
 {
-    QString message = "Recording this program has been deactivated becuase it conflicts with another scheduled recording.  Do you want to re-enable this recording?";
+    QString message = "Recording this program has been deactivated becuase it "
+                      "conflicts with another scheduled recording.  Do you "
+                      "want to re-enable this recording?";
 
     DialogBox diag(message);
 
@@ -280,7 +296,10 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
     QString button; 
     button = rec->title + QString("\n");
     button += rec->startts.toString(dateformat + " " + timeformat);
-    button += QString(" on channel ") + rec->chanstr;
+    if (globalsettings->GetNumSetting("DisplayChanNum") == 0)
+        button += " on " + rec->channame + " [" + rec->chansign + "]";
+    else
+        button += QString(" on channel ") + rec->chanstr;
 
     diag.AddButton(button);
 
@@ -291,7 +310,10 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
 
         button = info->title + QString("\n");
         button += info->startts.toString(dateformat + " " + timeformat);
-        button += QString(" on channel ") + info->chanstr;
+        if (globalsettings->GetNumSetting("DisplayChanNum") == 0)
+            button += " on " + rec->channame + " [" + rec->chansign + "]";
+        else
+            button += QString(" on channel ") + rec->chanstr;
 
         diag.AddButton(button);
     }

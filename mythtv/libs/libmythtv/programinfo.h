@@ -40,6 +40,8 @@ class ProgramInfo
 
     QString chanid;
     QString chanstr;
+    QString chansign;
+    QString channame;
 
     QDateTime startts;
     QDateTime endts;

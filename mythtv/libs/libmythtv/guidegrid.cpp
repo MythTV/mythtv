@@ -424,7 +424,7 @@ void GuideGrid::paintChannels(QPainter *p)
                 chinfo->LoadIcon();
             if (chinfo->icon)
             {
-                int yoffset = (int)(6 * hmult);
+                int yoffset = (int)(4 * hmult);
                 tmp.drawPixmap((cr.width() - chinfo->icon->width()) / 2, 
                                ydifference * y + yoffset, *(chinfo->icon));
             }
@@ -435,7 +435,7 @@ void GuideGrid::paintChannels(QPainter *p)
         int width = lfm.width(chinfo->chanstr);
         int bheight = lfm.height();
        
-        int yoffset = (int)(36 * hmult); 
+        int yoffset = (int)(43 * hmult); 
         tmp.drawText((cr.width() - width) / 2, 
                      ydifference * y + yoffset + bheight, chinfo->chanstr);
 
