@@ -53,6 +53,7 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent,
     f->setLineWidth((int)(4 * hmult));
     vbox->addWidget(f);    
 
+    programtype = pginfo->IsProgramRecurring();
     recordstatus = pginfo->GetProgramRecordingStatus(QSqlDatabase::database());
 
     if (recordstatus == kTimeslotRecord && programtype == 0)
@@ -92,8 +93,6 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent,
     if (recordstatus == kChannelRecord)
         selectItem = item;
 
-    programtype = pginfo->IsProgramRecurring();
-
     QString msg = "Shouldn't show up.";
     RecordingType rt = kNotRecording;
     if (programtype == 2 ||
@@ -101,7 +100,7 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent,
         recordstatus == kWeekslotRecord)
     {
         msg = tr("Record this program in this timeslot every week");
-        rt = kTimeslotRecord;
+        rt = kWeekslotRecord;
     }
     else if (programtype == 1)
     {
