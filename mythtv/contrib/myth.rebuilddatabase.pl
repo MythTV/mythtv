@@ -175,7 +175,7 @@ foreach my $show (@files) {
 		 		 		 print "Enter title:   ";
 		 		 		 chomp (my $newtitle = <STDIN>);
 		 
-		 		 		 print "Enter subtite: ";
+		 		 		 print "Enter subtitle: ";
 		 		 		 chomp (my $newsubtitle = <STDIN>);
 		 
 		 		 		 ## add records to db
