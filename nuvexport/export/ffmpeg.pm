@@ -112,8 +112,8 @@ package export::ffmpeg;
         else {
         # Do noise reduction
             if ($self->{'noise_reduction'}) {
-                $ffmpeg .= "nice -n $Args{'nice'} ffmpeg -f rawvideo ";
-                $ffmpeg .= "-s " . $episode->{'finfo'}{'width'} . "x" . $episode->{'finfo'}{'height'};
+                $ffmpeg .= "nice -n $Args{'nice'} ffmpeg -f rawvideo";
+                $ffmpeg .= " -s " . $episode->{'finfo'}{'width'} . "x" . $episode->{'finfo'}{'height'};
                 $ffmpeg .= " -r " . $episode->{'finfo'}{'fps'};
                 $ffmpeg .= " -i /tmp/fifodir_$$/vidout -f yuv4mpegpipe -";
                 $ffmpeg .= " 2> /dev/null | ";
