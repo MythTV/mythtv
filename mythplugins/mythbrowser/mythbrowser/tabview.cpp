@@ -35,15 +35,15 @@
 #include <khtmlview.h>
 
 #include "mythtv/mythcontext.h"
+#include "mythtv/mythdbcon.h"
 
 using namespace std;
 
-TabView::TabView(QSqlDatabase *db, QStringList urls,
-         int zoom, int width, int height, WFlags flags)
+TabView::TabView(QStringList urls, int zoom, int width, int height, 
+                 WFlags flags)
 {
     menuIsOpen = false;
 
-    myDb = db;
     mytab = new QTabWidget(this);
     mytab->setGeometry(0,0,width,height);
     QRect rect = mytab->childrenRect();
@@ -224,7 +224,7 @@ void TabView::finishAddBookmark(const char* group, const char* desc, const char*
     if(groupStr.isEmpty() || urlStr.isEmpty())
         return;
 
-    QSqlQuery query(QString::null, myDb);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("INSERT INTO websites (grp, dsc, url) VALUES(:GROUP, :DESC, :URL);");
     query.bindValue(":GROUP",groupStr.utf8());
     query.bindValue(":DESC",descStr.utf8());

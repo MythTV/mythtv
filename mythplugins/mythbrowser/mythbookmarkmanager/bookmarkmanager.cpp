@@ -26,6 +26,9 @@
 #include <qvgroupbox.h>
 #include <qtimer.h>
 
+#include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
+
 #include "bookmarkmanager.h"
 
 using namespace std;
@@ -154,14 +157,12 @@ public:
 
 // ---------------------------------------------------
 
-BookmarksConfig::BookmarksConfig(QSqlDatabase *db,
-                               MythMainWindow *parent,
-                               const char *name)
+BookmarksConfig::BookmarksConfig(MythMainWindow *parent,
+                                 const char *name)
     : MythDialog(parent, name)
 {
     setPalette(parent->palette());
 
-    myDb = db;
 //    myTree = new BookmarkConfigPriv;
 
     // Create the database if not exists
@@ -169,7 +170,7 @@ BookmarksConfig::BookmarksConfig(QSqlDatabase *db,
                          "( grp VARCHAR(255) NOT NULL, dsc VARCHAR(255),"
              " url VARCHAR(255) NOT NULL PRIMARY KEY,"
                          "  updated INT UNSIGNED );");
-    QSqlQuery query(QString::null, myDb);
+    MSqlQuery query(MSqlQuery::InitCon());
     if (!query.exec(queryString)) {
         cerr << "MythBookmarksConfig: Error in creating sql table" << endl;
     }
@@ -206,7 +207,10 @@ void BookmarksConfig::populateListView()
     BookmarkConfigPriv* myTree = new BookmarkConfigPriv;
 
     myTree->groupList.clear();
-    QSqlQuery query("SELECT grp, dsc, url FROM websites ORDER BY grp", myDb);
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec("SELECT grp, dsc, url FROM websites ORDER BY grp");
+
     if (!query.isActive()) {
         cerr << "MythBrowserConfig: Error in loading from DB" << endl;
     } else {
@@ -368,9 +372,11 @@ void BookmarksConfig::slotBookmarksViewExecuted(QListViewItem *item)
     if (!viewItem) { // This is a upper level item, i.e. a "group name"
         // item->setOpen(!(item->isOpen()));
     } else {
-        QSqlQuery query(QString::null, myDb);
+    
+        MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("DELETE FROM websites WHERE url=:URL");
         query.bindValue(":URL",viewItem->myBookmarkSite->url);
+
         if (!query.exec()) {
            cerr << "MythBookmarksConfig: Error in deleting in DB" << endl;
            return;
@@ -399,7 +405,7 @@ void BookmarksConfig::slotWebSiteAdded(const char* group, const char* desc, cons
     if(groupStr->isEmpty() || urlStr->isEmpty())
         return;
 
-    QSqlQuery query(QString::null, myDb);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("INSERT INTO websites (grp, dsc, url) VALUES(:GROUP, :DESC, :URL);");
     query.bindValue(":GROUP",groupStr->utf8());
     query.bindValue(":DESC",descStr->utf8());
@@ -412,14 +418,11 @@ void BookmarksConfig::slotWebSiteAdded(const char* group, const char* desc, cons
 
 // ---------------------------------------------------
 
-Bookmarks::Bookmarks(QSqlDatabase *db,
-                               MythMainWindow *parent,
-                               const char *name)
+Bookmarks::Bookmarks(MythMainWindow *parent, const char *name)
     : MythDialog(parent, name)
 {
     setPalette(parent->palette());
 
-    myDb = db;
 //    myTree = new BookmarkConfigPriv;
 
     // Create the database if not exists
@@ -427,7 +430,7 @@ Bookmarks::Bookmarks(QSqlDatabase *db,
                          "( grp VARCHAR(255) NOT NULL, dsc VARCHAR(255),"
              " url VARCHAR(255) NOT NULL PRIMARY KEY,"
                          "  updated INT UNSIGNED );");
-    QSqlQuery query(QString::null, myDb);
+    MSqlQuery query(MSqlQuery::InitCon());
     if (!query.exec(queryString)) {
         cerr << "MythBookmarksConfig: Error in creating sql table" << endl;
     }
@@ -457,7 +460,10 @@ void Bookmarks::populateListView()
     BookmarkConfigPriv* myTree = new BookmarkConfigPriv;
 
     myTree->groupList.clear();
-    QSqlQuery query("SELECT grp, dsc, url FROM websites ORDER BY grp", myDb);
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec("SELECT grp, dsc, url FROM websites ORDER BY grp");
+
     if (!query.isActive()) {
         cerr << "MythBrowserConfig: Error in loading from DB" << endl;
     } else {

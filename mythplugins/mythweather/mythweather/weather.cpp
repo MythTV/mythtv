@@ -20,7 +20,6 @@
 #include <qregexp.h>
 #include <qnetwork.h>
 #include <qapplication.h>
-#include <qsqldatabase.h>
 #include <qcursor.h>
 #include <qstringlist.h>
 #include <qheader.h>
@@ -32,6 +31,7 @@
 #include "weather.h"
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
 #include <mythtv/inetcomms.h>
 #include <mythtv/httpcomms.h>
 
@@ -39,8 +39,7 @@
 
 using namespace std;
 
-Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent, 
-                 const char *name)
+Weather::Weather(int appCode, MythMainWindow *parent, const char *name)
        : MythDialog(parent, name)
 {
     timeoutCounter = 0;
@@ -51,7 +50,6 @@ Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent,
     weatherTimeoutInt = gContext->GetNumSetting("WeatherTimeout", 20);
     weatherTimeoutInt *= 1000;
     
-    config = db;
     debug = false;
     if (appCode == 1)
         debug = true;
@@ -483,9 +481,10 @@ void Weather::setSetting(QString value, QString data, bool global)
                 thequery = QString("SELECT * FROM settings WHERE value=\"%1\";")
                            .arg(value);
 
-        QSqlQuery query = config->exec(thequery);
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.exec(thequery);
+
         int rows = query.numRowsAffected();
-                
         if (rows > 0)
         {
 
@@ -496,7 +495,7 @@ void Weather::setSetting(QString value, QString data, bool global)
                 thequery = QString("UPDATE settings SET data=\"%1\" WHERE value=\"%2\";")
                         .arg(data).arg(value);
         
-           query = config->exec(thequery);
+           query.exec(thequery);
            rows = query.numRowsAffected();
 
            if (rows == -1)
@@ -514,7 +513,7 @@ void Weather::setSetting(QString value, QString data, bool global)
            else
                 thequery = QString("INSERT INTO settings VALUES ('%1', '%2');").arg(value).arg(data);
 
-           QSqlQuery query = config->exec(thequery);
+           query.exec(thequery);
 
            rows = query.numRowsAffected();
 

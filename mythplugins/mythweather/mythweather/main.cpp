@@ -13,7 +13,6 @@
 using namespace std;
 
 #include <qapplication.h>
-#include <qsqldatabase.h>
 #include <unistd.h>
 
 #include "weather.h"
@@ -52,8 +51,7 @@ void runWeather(void)
 {
     int appCode = 0;
 
-    Weather weatherDat(QSqlDatabase::database(), appCode, 
-                       gContext->GetMainWindow(), "weather");
+    Weather weatherDat(appCode, gContext->GetMainWindow(), "weather");
     weatherDat.exec();
 }
 
@@ -67,8 +65,7 @@ int mythplugin_config(void)
 {
     int appCode = 2;
 
-    Weather weatherDat(QSqlDatabase::database(), appCode,
-                       gContext->GetMainWindow(), "weather");
+    Weather weatherDat(appCode, gContext->GetMainWindow(), "weather");
     weatherDat.exec();
 
     return 0;

@@ -15,7 +15,6 @@
 #include <iostream>
 
 #include <qapplication.h>
-#include <qsqldatabase.h>
 #include <unistd.h>
 
 #include "bookmarkmanager.h"
@@ -43,8 +42,7 @@ int mythplugin_init(const char *libversion)
 
 int mythplugin_run(void)
 {
-    Bookmarks bookmarks(QSqlDatabase::database(),
-                  gContext->GetMainWindow(), "bookmarks");
+    Bookmarks bookmarks(gContext->GetMainWindow(), "bookmarks");
     bookmarks.exec();
 
     return 0;
@@ -52,8 +50,7 @@ int mythplugin_run(void)
 
 int mythplugin_config(void)
 {
-    BookmarksConfig config(QSqlDatabase::database(),
-                          gContext->GetMainWindow(),"bookmarks");
+    BookmarksConfig config(gContext->GetMainWindow(),"bookmarks");
     config.exec();
 
     return 0;

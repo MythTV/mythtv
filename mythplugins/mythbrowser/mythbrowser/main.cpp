@@ -15,11 +15,10 @@
 #include <kapplication.h>
 #include <kcmdlineargs.h>
 #include <klocale.h>
-#include <qsqldatabase.h>
-#include <qsqlquery.h>
 #include "tabview.h"
 
 #include "mythtv/mythcontext.h"
+#include "mythtv/mythdbcon.h"
 #include "mythtv/langsettings.h"
 
 
@@ -34,8 +33,6 @@ static KCmdLineOptions options[] = {
     KCmdLineLastOption
 };
 
-
-QSqlDatabase* db;
 
 int main(int argc, char **argv)
 {
@@ -64,14 +61,13 @@ int main(int argc, char **argv)
     if(height == -1)
         height = a.desktop()->height();
 
-    gContext = new MythContext(MYTH_BINARY_VERSION, true);
-    db = QSqlDatabase::addDatabase("QMYSQL3");
-    if (!gContext->OpenDatabase(db)) {
-        cerr << "Unable to open database:\n"
-             << "Driver error was:" << endl
-             << db->lastError().driverText() << endl
-             << "Database error was:" << endl
-             << db->lastError().databaseText() << endl;
+    gContext = NULL;
+    gContext = new MythContext(MYTH_BINARY_VERSION);
+    gContext->Init(true);
+
+    if (!MSqlQuery::testDBConnection())
+    {
+        printf("couldn't open db\n");
         return -1;
     }
 
@@ -89,7 +85,7 @@ int main(int argc, char **argv)
     gContext->GetScreenSettings(x, width, xm, y, height, ym);
 
     TabView *mainWindow = 
-        new TabView(db, urls, zoom, width, height, Qt::WStyle_Customize | Qt::WStyle_NoBorder);
+        new TabView(urls, zoom, width, height, Qt::WStyle_Customize | Qt::WStyle_NoBorder);
     gContext->SetMainWindow(mainWindow);
     a.setMainWidget(mainWindow);
     mainWindow->setGeometry(x, y, width, height);

@@ -13,7 +13,6 @@
 #ifndef WEATHER_H_
 #define WEATHER_H_
 
-#include <qsqldatabase.h>
 #include <qwidget.h>
 #include <qdialog.h>
 #include <qstringlist.h>
@@ -44,8 +43,7 @@ class Weather : public MythDialog
 {
     Q_OBJECT
   public:
-    Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent, 
-            const char *name = 0);
+    Weather(int appCode, MythMainWindow *parent, const char *name = 0);
     ~Weather();
 
     bool UpdateData();
@@ -88,8 +86,6 @@ class Weather : public MythDialog
 
     void updateBackground();
     void updatePage(QPainter *);
-
-    QSqlDatabase *config;
 
     ifstream accidFile;
     streampos startData;

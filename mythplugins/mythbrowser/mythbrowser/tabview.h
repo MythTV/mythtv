@@ -6,7 +6,6 @@
 #include <kapplication.h>
 #include <kmainwindow.h>
 #include <qtabwidget.h>
-#include <qsqldatabase.h>
 #include <qptrstack.h>
 #include <qptrlist.h>
 #include <qvaluestack.h>
@@ -33,8 +32,7 @@ protected:
     virtual bool eventFilter(QObject* object, QEvent* event);
 
 public:
-    TabView(QSqlDatabase *db, QStringList urls,
-          int zoom, int width, int height, WFlags flags);
+    TabView(QStringList urls, int zoom, int width, int height, WFlags flags);
     ~TabView();
 
 signals:
@@ -62,7 +60,6 @@ private slots:
 private:
     int z,w,h;
     WFlags f;
-    QSqlDatabase       *myDb;
 
     int mouseEmulation, saveMouseEmulation;
 

@@ -1,8 +1,6 @@
 #ifndef BOOKMARKMANAGER_H
 #define BOOKMARKMANAGER_H
 
-#include <qsqldatabase.h>
-
 #include <mythtv/uitypes.h>
 #include <mythtv/xmlparse.h>
 #include <mythtv/oldsettings.h>
@@ -37,9 +35,8 @@ class BookmarksConfig : public MythDialog
 
 public:
 
-    BookmarksConfig(QSqlDatabase *db,
-                   MythMainWindow *parent,
-                   const char *name = 0);
+    BookmarksConfig(MythMainWindow *parent,
+                    const char *name = 0);
     ~BookmarksConfig();
 
 private:
@@ -52,7 +49,6 @@ private:
     MythCheckBox       *scrollmode;
     MythCheckBox       *hidescrollbars;
     MythLineEdit       *browser;
-    QSqlDatabase       *myDb;
     MythListView       *myBookmarksView;
 
 private slots:
@@ -70,9 +66,7 @@ class Bookmarks : public MythDialog
 
 public:
 
-    Bookmarks(QSqlDatabase *db,
-                   MythMainWindow *parent,
-                   const char *name = 0);
+    Bookmarks(MythMainWindow *parent, const char *name = 0);
     ~Bookmarks();
 
 private:
@@ -80,7 +74,6 @@ private:
     void populateListView();
     void setupView();
 
-    QSqlDatabase       *myDb;
     MythListView       *myBookmarksView;
 //    BookmarkConfigPriv *myTree;
 
