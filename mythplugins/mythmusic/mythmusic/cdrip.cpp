@@ -32,12 +32,23 @@ extern "C" {
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythwidgets.h>
 
-using namespace std;
-
 Ripper::Ripper(QSqlDatabase *ldb, QWidget *parent, const char *name)
       : MythDialog(parent, name)
 {
     db = ldb;
+
+    QString cddevice = gContext->GetSetting("CDDevice");
+
+    int cdrom_fd = cd_init_device((char*)cddevice.ascii());
+    if (cdrom_fd == -1)
+    {
+        perror("Could not open cdrom_fd");
+        return;
+    }
+
+    cd_close(cdrom_fd);  //Close the CD tray
+
+    cd_finish(cdrom_fd);
     
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
     Metadata *track = decoder->getMetadata(db, 1);
