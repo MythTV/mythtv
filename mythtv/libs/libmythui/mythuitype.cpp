@@ -1,3 +1,6 @@
+#include <iostream>
+using namespace std;
+
 #include <qfontmetrics.h>
 
 #include "mythuitype.h"
@@ -302,6 +305,7 @@ int MythUIType::GetAlpha(void)
 
 bool MythUIType::keyPressEvent(QKeyEvent *)
 {
+    // cout << "keyPress happening in something called \"" << name() << "\"" << endl;
     return false;
 }
 

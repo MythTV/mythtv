@@ -113,6 +113,13 @@ void MythUIText::Draw(MythPainter *p, int xoffset, int yoffset,
 
 void MythUIText::Pulse(void)
 {
+    //
+    //  Call out base class pulse which will handle any alpha cycling and
+    //  movement
+    //
+    
+    MythUIType::Pulse();
+    
     if (!m_colorCycling)
         return;
 
