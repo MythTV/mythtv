@@ -67,6 +67,8 @@ UIType::UIType(const QString &name)
     m_name = name;
     m_debug = false;
     m_context = -1;
+    has_focus = false;
+    takes_focus = false;
 }
 
 UIType::~UIType()
@@ -89,6 +91,23 @@ QString UIType::Name()
 { 
     return m_name; 
 }
+
+bool UIType::takeFocus()
+{
+    if(takes_focus)
+    {
+        has_focus = true;
+        return true;
+    }
+    has_focus = false;
+    return false;
+}
+
+void UIType::looseFocus()
+{
+    has_focus = false;
+}
+
 
 
 // **************************************************************
@@ -1432,6 +1451,14 @@ GenericTree::GenericTree(const QString a_string)
     my_string = a_string;
 }
 
+GenericTree::GenericTree(QString a_string, QString a_type, int an_int)
+{
+    init();
+    my_string = a_string;
+    my_type = a_type;
+    my_int = an_int;
+}
+
 GenericTree::GenericTree(int an_int)
 {
     init();
@@ -1442,6 +1469,7 @@ void GenericTree::init()
 {
     my_parent = NULL;
     my_string = "";
+    my_type = "";
     my_stringlist.clear();
     my_int = 0;
     my_subnodes.clear();
@@ -1463,7 +1491,16 @@ GenericTree* GenericTree::addNode(QString a_string, int an_int)
     new_node->setInt(an_int);
     new_node->setParent(this);
     my_subnodes.append(new_node);
+    return new_node;
+}
 
+GenericTree* GenericTree::addNode(QString a_string, QString a_type, int an_int)
+{
+    GenericTree *new_node = new GenericTree(a_string);
+    new_node->setInt(an_int);
+    new_node->setType(a_type);
+    new_node->setParent(this);
+    my_subnodes.append(new_node);
     return new_node;
 }
 
@@ -1496,6 +1533,99 @@ GenericTree* GenericTree::findLeaf()
     return this;
 }
 
+
+GenericTree* GenericTree::findNode(QValueList<int> route_of_branches)
+{
+    //
+    //  Starting from *this* node (which will often be root)
+    //  find a set of branches that have id's that match
+    //  the collection passed in route_of_branches. Return
+    //  the end point of those branches (which will often be
+    //  a leaf node).
+    //
+    //  In practical terms, mythmusic will use this to force the
+    //  playback screen's ManagedTreeList to move to a given track
+    //  in a given playlist (for example).
+    //
+
+    return recursiveNodeFinder(route_of_branches);
+}
+
+GenericTree* GenericTree::recursiveNodeFinder(QValueList<int> route_of_branches)
+{
+    if(checkNode(route_of_branches))
+    {
+        return this;
+    }
+    else
+    {
+        QPtrListIterator<GenericTree> it( my_subnodes );
+        GenericTree *my_kids;
+        while( (my_kids = it.current()) != 0)
+        {
+            GenericTree *sub_checker = my_kids->recursiveNodeFinder(route_of_branches);
+            if(sub_checker)
+            {
+                return sub_checker;
+            }
+            else
+            {
+                ++it;
+            }
+        }
+    }
+    return NULL;
+}
+
+bool GenericTree::checkNode(QValueList<int> route_of_branches)
+{
+    bool found_it = true;
+    GenericTree *parent_finder = this;
+
+    for(int i = route_of_branches.count() - 1; i > -1 ; --i)
+    {
+        if(!(parent_finder->getInt() == (*route_of_branches.at(i))))
+        {
+            found_it = false;
+        }
+        if(i > 0)
+        {
+            if(parent_finder->getParent())
+            {
+                parent_finder = parent_finder->getParent();
+            }
+            else
+            {
+                found_it = false;
+            }
+        }
+    }
+    return found_it;
+}
+
+int GenericTree::getChildPosition(GenericTree *which_child)
+{
+    return my_subnodes.findRef(which_child);
+}
+
+int GenericTree::getPosition()
+{
+    if(my_parent)
+    {
+        return my_parent->getChildPosition(this);
+    }
+    return 0;
+}
+
+int GenericTree::siblingCount()
+{
+    if(my_parent)
+    {
+        return my_parent->childCount();
+    }
+    return 1;
+}
+
 void GenericTree::printTree(int margin)
 {
     for(int i = 0; i < margin; i++)
@@ -1517,24 +1647,74 @@ void GenericTree::printTree(int margin)
     }
 }
 
+GenericTree* GenericTree::getChildAt(uint reference)
+{
+    if(reference >= my_subnodes.count())
+    {
+        cerr << "uitypes.o: out of bounds request to GenericTree::getChildAt()" << endl;
+        return NULL;
+    }
+    return my_subnodes.at(reference);
+}
+
 GenericTree* GenericTree::prevSibling(int number_up)
 {
-    //
-    //  Check if there are enough siblings
-    //  to go "up" this high
-    //
-/*
-    if(my_parent->childCount() - 1 < number_up)
-    
-    cout << "I have " << my_parent->childCount() << " siblings " << endl ;
-*/
 
-    return this;
+    if(!my_parent)
+    {
+        //  
+        //  I'm root = no siblings
+        //
+        
+        return NULL;
+    }
+
+    int my_position = my_parent->getChildPosition(this);
+
+    if(my_position < number_up)
+    {
+        //
+        //  not enough siblings "above" me
+        //
+        
+        return NULL;
+    }
+    
+    return my_parent->getChildAt(my_position - number_up);
 }
 
 GenericTree* GenericTree::nextSibling(int number_down)
 {
-    return this;
+    if(!my_parent)
+    {
+        //  
+        //  I'm root = no siblings
+        //
+        
+        return NULL;
+    }
+
+    int my_position = my_parent->getChildPosition(this);
+
+    if(my_position + number_down >= my_parent->childCount())
+    {
+        //
+        //  not enough siblings "below" me
+        //
+        
+        return NULL;
+    }
+    
+    return my_parent->getChildAt(my_position + number_down);
+}
+
+GenericTree* GenericTree::getParent()
+{
+    if(my_parent)
+    {
+        return my_parent;
+    }
+    return NULL;
 }
 
 GenericTree::~GenericTree()
@@ -1551,6 +1731,7 @@ UIManagedTreeListType::UIManagedTreeListType(const QString & name)
     my_tree_data = NULL;
     tree_depth = 0;
     m_justification = (Qt::AlignLeft | Qt::AlignVCenter);
+    active_bin = 0;
 }
 
 UIManagedTreeListType::~UIManagedTreeListType()
@@ -1572,58 +1753,175 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
         return;
     }
 
+    if(!current_node)
+    {
+        cerr << "uitypes.o: I can't draw a UIManagedTreeListType is there is no current_node" << endl;
+        return;
+    }
+
     //
     //  Draw each bin, using current_node and working up
-    //  to tell us what to draw in each bin.
+    //  and/or down to tell us what to draw in each bin.
     //
 
 
     for(int i = bins; i > 0; --i)
     {
-        fontProp *tmpfont = NULL;
-        tmpfont = &m_fontfcns[m_fonts["active"]];
-        p->setFont(tmpfont->face);
-        //p->setBrush(tmpfont->color);
-        p->setPen(QPen(tmpfont->color, (int)(2 * m_wmult)));
-        if(i == bins)
+        GenericTree *hotspot_node = current_node;
+
+        if(i < active_bin)
         {
+            for(int j = 0; j < bins - i; j++)
+            {
+                if(hotspot_node)
+                {
+                    hotspot_node = hotspot_node->getParent();
+                }
+            }
+        }
+        if(i > active_bin)
+        {
+            for(int j = 0; j < i - active_bin; j++)
+            {
+                if(hotspot_node)
+                {
+                    if(hotspot_node->childCount() > 0)
+                    {
+                        hotspot_node = hotspot_node->getChildAt(0);
+                    }
+                    else
+                    {
+                        hotspot_node = NULL;
+                    }
+                }
+            }
+        }
+        
+        if(hotspot_node)
+        {
+            fontProp *tmpfont = NULL;
+
+            if(i == active_bin)
+            {
+                tmpfont = &m_fontfcns[m_fonts["selected"]];
+                p->setFont(tmpfont->face);
+                p->setPen(QPen(tmpfont->color, (int)(2 * m_wmult)));
+            }
+            else
+            {
+                tmpfont = &m_fontfcns[m_fonts["inactive"]];
+                p->setFont(tmpfont->face);
+                p->setPen(QPen(tmpfont->color, (int)(2 * m_wmult)));
+            }
+
             int x_location = bin_corners[i].left();
             int y_location = bin_corners[i].top() + (bin_corners[i].height() / 2)
                              + (QFontMetrics(tmpfont->face).height() / 2);
-            QString msg = current_node->getString();
+
+            if(i == bins)
+            {
+
+                //
+                //  if required, move the hotspot up or down
+                //  (beginning of list, end of list, etc.)
+                //
+                
+                /*
+                int position_in_list = hotspot_node->getPosition();
+                int number_in_list = hotspot_node->siblingCount();
+    
+                int number_of_slots = 0;
+                int another_y_location = y_location - QFontMetrics(tmpfont->face).height();
+                while (another_y_location - QFontMetrics(tmpfont->face).height() > bin_corners[i].top())
+                {
+                    another_y_location -= QFontMetrics(tmpfont->face).height();
+                    ++number_of_slots;
+                }
+                
+                if(position_in_list < number_of_slots)
+                {
+                    for(int j = 0; j < number_of_slots - position_in_list; j++)
+                    {
+                        y_location -= QFontMetrics(tmpfont->face).height();
+                    }
+                }
+                
+                if((number_in_list - position_in_list) <= number_of_slots &&
+                   position_in_list > number_of_slots + 1)
+                {
+                    for(int j = 0; j <= number_of_slots - (number_in_list - position_in_list); j++)
+                    {
+                        y_location += QFontMetrics(tmpfont->face).height();
+                    }
+                }
+                */
+                
+            }
+            
+
+            QString msg = hotspot_node->getString();
             msg = cutDown(msg, &(tmpfont->face), bin_corners[i].width(), bin_corners[i].height());
             p->drawText(x_location, y_location, msg);
+
+            if(i == active_bin)
+            {
+                //
+                //  Draw the highlight pixmap
+                //  NB: should be resizing this elsewhere
+                //
+
+                QImage temp_image = highlight_image.convertToImage();
+                QPixmap temp_pixmap;
+                temp_pixmap.convertFromImage(temp_image.smoothScale(bin_corners[i].width(), QFontMetrics(tmpfont->face).height()));
+                p->drawPixmap(x_location, y_location - QFontMetrics(tmpfont->face).height() + QFontMetrics(tmpfont->face).descent(), temp_pixmap);
+            }
+
+            
+            
+            
+
+            if(i == active_bin)
+            {
+                tmpfont = &m_fontfcns[m_fonts["active"]];
+                p->setFont(tmpfont->face);
+                p->setPen(QPen(tmpfont->color, (int)(2 * m_wmult)));
+            }
+            else
+            {
+                tmpfont = &m_fontfcns[m_fonts["inactive"]];
+                p->setFont(tmpfont->face);
+                p->setPen(QPen(tmpfont->color, (int)(2 * m_wmult)));
+            }
             
             //
             //  Do the ones above
             //
             
             int numb_above = 1;
-            y_location -= QFontMetrics(tmpfont->face).height();
-            while (y_location - QFontMetrics(tmpfont->face).height() > bin_corners[i].top())
+            int still_yet_another_y_location = y_location - QFontMetrics(tmpfont->face).height();
+            while (still_yet_another_y_location - QFontMetrics(tmpfont->face).height() > bin_corners[i].top())
             {
-                GenericTree *above = current_node->prevSibling(numb_above);
+                GenericTree *above = hotspot_node->prevSibling(numb_above);
                 if(above)
                 {
                     msg = above->getString();
                     msg = cutDown(msg, &(tmpfont->face), bin_corners[i].width(), bin_corners[i].height());
-                    p->drawText(x_location, y_location, msg);
+                    p->drawText(x_location, still_yet_another_y_location, msg);
                 }    
-                y_location -= QFontMetrics(tmpfont->face).height();
+                still_yet_another_y_location -= QFontMetrics(tmpfont->face).height();
                 numb_above++;
             }
             
+
             //
             //  Do the ones below
             //
             
-            y_location = bin_corners[i].top() + (bin_corners[i].height() / 2)
-                             + (QFontMetrics(tmpfont->face).height() / 2);
             int numb_below = 1;
             y_location += QFontMetrics(tmpfont->face).height();
             while (y_location < bin_corners[i].bottom())
             {
-                GenericTree *below = current_node->nextSibling(numb_below);
+                GenericTree *below = hotspot_node->nextSibling(numb_below);
                 if(below)
                 {
                     msg = below->getString();
@@ -1633,22 +1931,29 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                 y_location += QFontMetrics(tmpfont->face).height();
                 numb_below++;
             }
+
         }
-        // cout << "Drawing bin " << i << " Want to write " << current_node->getString() << endl;
+        else
+        {
+            //
+            //  This bin is empty
+            //
+            // p->eraseRect(bin_corners[i]);
+        }
     }
 
 
     //
     //  Debugging, draw edges around bins
     //
-    
+    /*
     p->setPen(QColor(255,0,0));
     CornerMap::Iterator it;
     for ( it = bin_corners.begin(); it != bin_corners.end(); ++it )
     {
         p->drawRect(it.data());
     }
-
+    */
 }
 
 QString UIManagedTreeListType::cutDown(QString info, QFont *testFont, int maxwidth, int maxheight)
@@ -1699,6 +2004,15 @@ QString UIManagedTreeListType::cutDown(QString info, QFont *testFont, int maxwid
 
 }
 
+void UIManagedTreeListType::moveToNode(QValueList<int> route_of_branches)
+{
+    current_node = my_tree_data->findNode(route_of_branches);
+    if(!current_node)
+    {
+        current_node = my_tree_data->findLeaf();
+    }
+    emit nodeSelected(current_node->getType(), current_node->getInt());
+}
 
 void UIManagedTreeListType::assignTreeData(GenericTree *a_tree)
 {
@@ -1718,8 +2032,8 @@ void UIManagedTreeListType::assignTreeData(GenericTree *a_tree)
     //
     
     current_node = my_tree_data->findLeaf();
-    
-    current_node->printTree(0);
+    active_bin = bins;
+    //current_node->printTree(0);
 
 }
 
@@ -1728,4 +2042,157 @@ void UIManagedTreeListType::sayHelloWorld()
     cout << "From a UIManagedTreeListType Object: Hello World" << endl ;
 }
 
+void UIManagedTreeListType::popUp()
+{
+    //
+    //  Move the active node to the
+    //  current active node's parent  
+    //
+    
+    if(!current_node->getParent()->getParent())
+    {
+        //
+        //  I be ultimate root
+        //
+        
+        return;
+    }
+    
+    if(active_bin > 1)
+    {
+        --active_bin;
+        current_node = current_node->getParent();
+        emit nodeEntered(current_node->getType(), current_node->getInt());
+    }
+    else if(active_bin < bins)
+    {
+        ++active_bin;
+    }
 
+
+    QRect redraw_coords = bin_corners[2];
+    redraw_coords.moveBy(area.left(),area.top());
+    emit requestUpdate(redraw_coords);
+
+    redraw_coords = bin_corners[1];
+    redraw_coords.moveBy(area.left(),area.top());
+    emit requestUpdate(redraw_coords);
+
+}
+
+void UIManagedTreeListType::pushDown()
+{
+    //
+    //  Move the active node to the
+    //  current active node's first child
+    //
+
+    if(current_node->childCount() < 1)
+    {
+        //
+        //  I be leaf
+        return;
+    }
+
+    if(active_bin < bins)
+    {
+        ++active_bin;
+        current_node = current_node->getChildAt(0);
+        emit nodeEntered(current_node->getType(), current_node->getInt());
+    }
+    else if(active_bin > 1)
+    {
+        --active_bin;
+    }
+
+    QRect redraw_coords = bin_corners[2];
+    redraw_coords.moveBy(area.left(),area.top());
+    emit requestUpdate(redraw_coords);
+
+    redraw_coords = bin_corners[1];
+    redraw_coords.moveBy(area.left(),area.top());
+    emit requestUpdate(redraw_coords);
+
+}
+
+void UIManagedTreeListType::moveUp()
+{
+    //
+    //  Move the active node to the
+    //  current active node's previous
+    //  sibling  
+    //
+
+    GenericTree *new_node = current_node->prevSibling(1);
+    if(new_node)
+    {
+        current_node = new_node;
+        for(int i = active_bin; i <= bins; i++)
+        {
+
+            QRect redraw_coords = bin_corners[i];
+            redraw_coords.moveBy(area.left(),area.top());
+            emit requestUpdate(redraw_coords);
+            emit nodeEntered(current_node->getType(), current_node->getInt());
+        }
+    }
+}
+
+void UIManagedTreeListType::moveDown()
+{
+    //
+    //  Move the active node to the
+    //  current active node's next
+    //  sibling
+    //
+
+    GenericTree *new_node = current_node->nextSibling(1);
+    if(new_node)
+    {
+        current_node = new_node;
+        for(int i = active_bin; i <= bins; i++)
+        {
+            QRect redraw_coords = bin_corners[i];
+            redraw_coords.moveBy(area.left(),area.top());
+            emit requestUpdate(redraw_coords);
+            emit nodeEntered(current_node->getType(), current_node->getInt());
+        }
+    }
+}
+
+// ********************************************************************
+
+UIPushButtonType::UIPushButtonType(const QString &name, QPixmap on, QPixmap off, QPixmap pushed)
+                     : UIType(name)
+{
+    on_pixmap = on;
+    off_pixmap = off;
+    pushed_pixmap = pushed;
+}
+
+
+void UIPushButtonType::Draw(QPainter *p, int drawlayer, int context)
+{
+    context = context;  // Would we ever want to use that?
+
+    if(drawlayer != m_order)
+    {
+        // not my turn
+        return;
+    }
+
+    if(has_focus)
+    {
+        p->drawPixmap(m_displaypos.x(), m_displaypos.y(), on_pixmap);
+    }
+    else
+    {
+        p->drawPixmap(m_displaypos.x(), m_displaypos.y(), off_pixmap);
+    }
+    
+}
+
+void UIPushButtonType::push()
+{
+    cout << "Yamma been pushed" << endl ;
+}

@@ -32,7 +32,7 @@ class DialogBox : public MythDialog
 
 class MythThemedDialog : public MythDialog
 {
-//    Q_OBJECT
+    Q_OBJECT
 
     //
     //  A potential base class for Myth GUI screens that are built
@@ -54,21 +54,27 @@ class MythThemedDialog : public MythDialog
     virtual void parseContainer(QDomElement &);
     virtual void parseFont(QDomElement &);
     virtual void parsePopup(QDomElement &);
-    virtual void updateBackground();
     
     UIType* getUIObject(QString name);
     
     void setContext(int a_context){context = a_context;}
     
+  public slots:
+
+    virtual void updateBackground();
+    virtual void updateForeground();
+    virtual void updateForeground(const QRect &);
+    
   protected:
   
-    virtual void paintEvent(QPaintEvent* e);
-    
+    void paintEvent(QPaintEvent* e);
+
   private:
   
     XMLParse    *theme;
     QDomElement xmldata;                     
     QPixmap     my_background;
+    QPixmap     my_foreground;
     int         context;
     
     QPtrList<LayerSet>  my_containers;

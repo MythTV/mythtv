@@ -83,7 +83,32 @@ MythThemedDialog::MythThemedDialog(QString window_name,
         exit(0);
     }
     loadWindow(xmldata);
+
+    //
+    //  Auto-connect signals we know about
+    //
+    
+
+    //  Loop over containers
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
+    while( (looper = an_it.current()) != 0)
+    {
+        //  Loop over UITypes within each container
+        vector<UIType *> *all_ui_type_objects = looper->getAllTypes();
+        vector<UIType *>::iterator i = all_ui_type_objects->begin();
+        for (; i != all_ui_type_objects->end(); i++)
+        {
+            UIType *type = (*i);
+            connect(type, SIGNAL(requestUpdate()), this, SLOT(updateForeground()));            
+            connect(type, SIGNAL(requestUpdate(const QRect &)), this, SLOT(updateForeground(const QRect &)));
+        }
+        ++an_it;
+    }
+    
+
     updateBackground();
+    //updateForeground();
 }
 
 void MythThemedDialog::loadWindow(QDomElement &element)
@@ -161,6 +186,7 @@ void MythThemedDialog::parsePopup(QDomElement &element)
     cerr << "I don't know how to handle popops yet (I'm going to try and just ignore it)" << endl;
 }
 
+
 void MythThemedDialog::updateBackground()
 {
     //
@@ -191,15 +217,46 @@ void MythThemedDialog::updateBackground()
     setPaletteBackgroundPixmap(my_background);
 }
 
-void MythThemedDialog::paintEvent(QPaintEvent *e)
+void MythThemedDialog::updateForeground()
+{
+    QRect r = this->geometry();
+    updateForeground(r);
+}
+
+void MythThemedDialog::updateForeground(const QRect &r)
 {
     //
-    //  repaint whatever Qt tells us needs to 
-    //  be painted over again
+    //  I should only have to be updating the r
+    //  handed to me, but I can't figure out why
+    //  that doesn't work ... so right now I'm
+    //  always updating the whole dialog
+    //
+    
+    
+    QRect damn_r = this->geometry();
+    
+    /*
+    cout << "I am updating the foreground from " 
+         << damn_r.left()
+         << ","
+         << damn_r.top()
+         << " to "
+         << damn_r.left() + damn_r.width()
+         << ","
+         << damn_r.top() + damn_r.height()
+         << endl;
+    */
+    
+    //
+    //  We paint offscreen onto a pixmap
+    //  and then send out a paint event
+    //
+    //  that lets us just Bit Blt the foreground
+    //  pixmap during actual onscreen painting
     //
 
-    QRect r = e->rect();
-    QPainter p(this);
+    my_foreground = my_background;
+    QPainter whole_dialog_painter(&my_foreground);
     
     QPtrListIterator<LayerSet> an_it(my_containers);
     LayerSet *looper;
@@ -208,13 +265,27 @@ void MythThemedDialog::paintEvent(QPaintEvent *e)
     {
         QRect   container_area = looper->GetAreaRect();
 
+        /*
+        cout << "A container called \"" << looper->GetName() << "\" said its area is " 
+         << container_area.left()
+         << ","
+         << container_area.top()
+         << " to "
+         << container_area.left() + container_area.width()
+         << ","
+         << container_area.top() + container_area.height()
+         << endl;
+        */
+
         //
         //  Only paint if the container's area is valid
         //  and it intersects with whatever Qt told us
         //  needed to be repainted
         //
         
-        if(container_area.isValid() && r.intersects(container_area))
+        if(container_area.isValid() && 
+           damn_r.intersects(container_area) &&
+           looper->GetName().lower() != "background")
         {
             QPixmap container_picture(container_area.size());
             container_picture.fill(this, container_area.topLeft());
@@ -228,7 +299,7 @@ void MythThemedDialog::paintEvent(QPaintEvent *e)
             
             for(int i = 0; i < 9; i++)
             {
-                looper->Draw(&offscreen_painter, i, context);
+                looper->Draw(&offscreen_painter, i, -1);
             }
 
             //  
@@ -238,24 +309,24 @@ void MythThemedDialog::paintEvent(QPaintEvent *e)
             if(offscreen_painter.isActive())
             {
                 offscreen_painter.end();
+                whole_dialog_painter.drawPixmap(container_area.topLeft(), container_picture);
             }
             
-            //
-            //  Ok, the pixmap is done, paint it onto
-            //  the actual window (ie. "this")
-            //
-
-            p.drawPixmap(container_area.topLeft(), container_picture);
         }
         ++an_it;
     }
-                    
 
-    //
-    //  Whatever else may be on this widget
-    //  should get painted as well
-    //
+    if(whole_dialog_painter.isActive())
+    {
+        whole_dialog_painter.end();
+    }
+    update(damn_r);
+}
+
+void MythThemedDialog::paintEvent(QPaintEvent *e)
+{
     MythDialog::paintEvent(e);
+    bitBlt(this, 0, 0, &my_foreground);
 }
 
 UIType* MythThemedDialog::getUIObject(QString name)

@@ -684,6 +684,10 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
             {
                 parseManagedTreeList(container, info);
             }
+            else if (info.tagName() == "pushbutton")
+            {
+                parsePushButton(container, info);
+            }
             else if (info.tagName() == "area")
             {
                 area = parseRect(getFirstText(info));
@@ -1240,6 +1244,15 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     QRect binarea;
     int bins = 1;
 
+/*
+    QPoint uparrow_loc;
+    QPoint dnarrow_loc;
+    QPoint select_loc;
+    QPixmap uparrow_img;
+    QPixmap dnarrow_img;
+*/
+    QPixmap select_img;
+
     //
     //  A Map to store the geometry of
     //  the bins as we parse
@@ -1286,6 +1299,47 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
             {
                 area = parseRect(getFirstText(info));
                 normalizeRect(area);
+            }
+            else if(info.tagName() == "image")
+            {
+                QString imgname = "";
+                QString imgpoint = "";
+                QString file = "";
+
+                imgname = info.attribute("function", "");
+                if (imgname.isNull() || imgname.isEmpty())
+                {
+                    cerr << "Image needs a function\n";
+                    exit(0);
+                }
+
+                file = info.attribute("filename", "");
+                if (file.isNull() || file.isEmpty())
+                {
+                    cerr << "Image needs a filename\n";
+                    exit(0);
+                }
+
+                if (imgname.lower() == "selectionbar")
+                {
+                    QString baseDir = gContext->GetInstallPrefix();
+                    QString themeDir = gContext->FindThemeDir("");
+                    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
+                    baseDir = baseDir + "/share/mythtv/themes/default/";
+                    QFile checkFile(themeDir + file);
+                    if (checkFile.exists())
+                    {
+                        file = themeDir + file;
+                    }
+                    else
+                    {
+                        file = baseDir + file;
+                    }
+                    if(!select_img.load(file))
+                    {
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                    }
+                }
             }
             else if(info.tagName() == "bin")
             {
@@ -1356,6 +1410,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     mtl->setBins(bins);
     mtl->setBinAreas(bin_corners);
     mtl->setOrder(order.toInt());
+    mtl->setHighlightImage(select_img);
 
     //
     //  Perform moegreen/jdanner font magic
@@ -1375,4 +1430,129 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
         mtl->setFonts(fontFunctions, theFonts);
     }
     container->AddType(mtl);
+}
+
+void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
+{
+    QPoint pos = QPoint(0, 0);
+    QPixmap image_on, image_off, image_pushed;
+
+    QString name = element.attribute("name", "");
+    if (name.isNull() || name.isEmpty())
+    {
+        cerr << "PushButton needs a name\n";
+        exit(0);
+    }
+
+    QString order = element.attribute("draworder", "");
+    if (order.isNull() || order.isEmpty())
+    {
+        cerr << "PushButton needs an order\n";
+        exit(0);
+    }
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "position")
+            {
+                pos = parsePoint(getFirstText(info));
+                pos.setX((int)(pos.x() * wmult));
+                pos.setY((int)(pos.y() * hmult));
+            }
+            else if(info.tagName() == "image")
+            {
+                QString imgname = "";
+                QString file = "";
+
+                imgname = info.attribute("function", "");
+                if (imgname.isNull() || imgname.isEmpty())
+                {
+                    cerr << "Image in a push button needs a function\n";
+                    exit(0);
+                }
+
+                file = info.attribute("filename", "");
+                if (file.isNull() || file.isEmpty())
+                {
+                    cerr << "Image in a push button needs a filename\n";
+                    exit(0);
+                }
+
+                if (imgname.lower() == "on")
+                {
+                    QString baseDir = gContext->GetInstallPrefix();
+                    QString themeDir = gContext->FindThemeDir("");
+                    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
+                    baseDir = baseDir + "/share/mythtv/themes/default/";
+                    QFile checkFile(themeDir + file);
+                    if (checkFile.exists())
+                    {
+                        file = themeDir + file;
+                    }
+                    else
+                    {
+                        file = baseDir + file;
+                    }
+                    if(!image_on.load(file))
+                    {
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                    }
+                }
+                if (imgname.lower() == "off")
+                {
+                    QString baseDir = gContext->GetInstallPrefix();
+                    QString themeDir = gContext->FindThemeDir("");
+                    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
+                    baseDir = baseDir + "/share/mythtv/themes/default/";
+                    QFile checkFile(themeDir + file);
+                    if (checkFile.exists())
+                    {
+                        file = themeDir + file;
+                    }
+                    else
+                    {
+                        file = baseDir + file;
+                    }
+                    if(!image_off.load(file))
+                    {
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                    }
+                }
+                if (imgname.lower() == "pushed")
+                {
+                    QString baseDir = gContext->GetInstallPrefix();
+                    QString themeDir = gContext->FindThemeDir("");
+                    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
+                    baseDir = baseDir + "/share/mythtv/themes/default/";
+                    QFile checkFile(themeDir + file);
+                    if (checkFile.exists())
+                    {
+                        file = themeDir + file;
+                    }
+                    else
+                    {
+                        file = baseDir + file;
+                    }
+                    if(!image_pushed.load(file))
+                    {
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                    }
+                }
+            }
+            else
+            {
+                cerr << "Unknown: " << info.tagName() << " in ManagedTreeList\n";
+                exit(0);
+            }
+        }
+    }
+
+
+    UIPushButtonType *pbt = new UIPushButtonType(name, image_on, image_off, image_pushed);
+    pbt->setPosition(pos);
+    container->AddType(pbt);
 }

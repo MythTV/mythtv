@@ -30,24 +30,26 @@ class LayerSet
     LayerSet(const QString &name);
    ~LayerSet();
  
-    void Draw(QPainter *, int, int);
+    void    Draw(QPainter *, int, int);
 
     QString GetName() { return m_name; }
-    void SetName(const QString &name) { m_name = name; }
+    void    SetName(const QString &name) { m_name = name; }
 
-    void SetDrawOrder(int order) { m_order = order; }
-    int GetDrawOrder() const { return m_order; }
+    void    SetDrawOrder(int order) { m_order = order; }
+    int     GetDrawOrder() const { return m_order; }
 
-    void SetAreaRect(QRect area) { m_area = area; }
-    QRect GetAreaRect() { return m_area; }
+    void    SetAreaRect(QRect area) { m_area = area; }
+    QRect   GetAreaRect() { return m_area; }
 
-    void SetContext(int con) { m_context = con; }
-    int GetContext(void) { return m_context; }
+    void    SetContext(int con) { m_context = con; }
+    int     GetContext(void) { return m_context; }
 
-    void SetDebug(bool db) { m_debug = db; }
+    void    SetDebug(bool db) { m_debug = db; }
 
-    void AddType(UIType *);
-    UIType *GetType(const QString &name);
+    void    AddType(UIType *);
+    UIType  *GetType(const QString &name);
+    vector<UIType *> *getAllTypes(){return allTypes;}
+
 
   private:
     bool m_debug;
@@ -62,6 +64,8 @@ class LayerSet
 
 class UIType : public QObject
 {
+  Q_OBJECT
+  
   public:
     UIType(const QString &name);
     virtual ~UIType();
@@ -74,6 +78,20 @@ class UIType : public QObject
     virtual void Draw(QPainter *, int, int);
 
     QString Name();
+    
+  public slots:
+  
+    bool takeFocus();
+    void looseFocus();
+
+  signals:
+  
+    //
+    //  Ask my container to ask Qt to repaint
+    //
+
+    void requestUpdate();
+    void requestUpdate(const QRect &);
 
   protected:
     double m_wmult;
@@ -83,6 +101,8 @@ class UIType : public QObject
     bool m_debug;
     QString m_name;
     LayerSet *m_parent;
+    bool has_focus;
+    bool takes_focus;
 };
 
 class UIBarType : public UIType
@@ -374,24 +394,39 @@ class GenericTree
     GenericTree();
     GenericTree(const QString a_string);
     GenericTree(int an_int);
+    GenericTree(QString a_string, QString a_type, int);
     ~GenericTree();
 
     GenericTree*  addNode(QString a_string);
     GenericTree*  addNode(QString a_string, int an_int);
+    GenericTree*  addNode(QString a_string, QString a_type, int an_int);
     GenericTree*  findLeaf();
+    GenericTree*  findNode(QValueList<int> route_of_branches);
+    GenericTree*  recursiveNodeFinder(QValueList<int> route_of_branches);
+    bool          checkNode(QValueList<int> route_of_branches);
     GenericTree*  nextSibling(int number_down);
     GenericTree*  prevSibling(int number_up);
+    GenericTree*  getParent();
+    GenericTree*  getChildAt(uint reference);
+    int           getChildPosition(GenericTree *which_child);
+    int           getPosition();
     void          init();
     void          setInt(int an_int){my_int = an_int;}
+    int           getInt(){return my_int;}
+    void          setType(QString a_type){my_type = a_type;}
+    QString       getType(){return my_type;}
     void          setParent(GenericTree* a_parent){my_parent = a_parent;}
     const QString getString(){return my_string;}
-    void          printTree(int margin);   // debugging
+    void          printTree(int margin);    // debugging
+    void          printTree(){printTree(0);}// debugging
     int           calculateDepth(int start);
     int           childCount(){return my_subnodes.count();}
+    int           siblingCount();
 
   private:
 
     QString                my_string;
+    QString                my_type;
     QStringList            my_stringlist;
     int                    my_int;
     QPtrList <GenericTree> my_subnodes;
@@ -424,25 +459,34 @@ class UIManagedTreeListType : public UIType
     void    setBinAreas(CornerMap some_bin_corners) { bin_corners = some_bin_corners; }
     void    Draw(QPainter *, int drawlayer, int context);
     void    assignTreeData(GenericTree *a_tree);
+    void    moveToNode(QValueList<int> route_of_branches);
+    void    setHighlightImage(QPixmap an_image){highlight_image = an_image;}
     void    setFonts(QMap<QString, QString> fonts, QMap<QString, fontProp> fontfcn) { 
                           m_fonts = fonts; m_fontfcns = fontfcn; }
     QString cutDown(QString, QFont *, int, int);
     void    setJustification(int jst) { m_justification = jst; }
     int     getJustification() { return m_justification; }
+    
 
   public slots:
 
-    void sayHelloWorld(); // debugging;
+    void    sayHelloWorld(); // debugging;
+    void    popUp();
+    void    pushDown();
+    void    moveUp();
+    void    moveDown();
 
   signals:
 
-    void leafNodeSelected(QString node_string, int node_int);
+    void    nodeSelected(QString, int); //  emit type and int when user selects a node
+    void    nodeEntered(QString, int);  //  emit type and int when user naviagtes to node
 
   private:
 
     QRect area;
     int   bins;
     int   tree_depth;
+    int   active_bin;
 
     CornerMap   bin_corners;
     GenericTree *my_tree_data;
@@ -451,7 +495,37 @@ class UIManagedTreeListType : public UIType
     QMap<QString, QString> m_fonts;
     QMap<QString, fontProp> m_fontfcns;
     int m_justification;
+    QPixmap highlight_image;
 
 };
+
+class UIPushButtonType : public UIType
+{
+    Q_OBJECT
+    
+  public:
+    
+    UIPushButtonType(const QString &name, QPixmap on, QPixmap off, QPixmap pushed);
+
+    void    Draw(QPainter *, int drawlayer, int context);
+    void    setPosition(QPoint pos){m_displaypos = pos;}
+    
+  public slots:  
+  
+    void    push();
+ 
+  signals:
+  
+    void    pushed();
+  
+  private:
+  
+    QPoint  m_displaypos;
+    QPixmap on_pixmap;
+    QPixmap off_pixmap;
+    QPixmap pushed_pixmap;
+    
+};
+
 
 #endif
