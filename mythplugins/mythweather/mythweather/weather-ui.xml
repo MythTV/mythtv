@@ -98,45 +98,45 @@
     </container>
 
     <container name="weatherpages">
-      <textarea name="currenttime-1" draworder="2">
+      <textarea name="currenttime-1" draworder="2" align="right">
         <context>1</context>
         <font>timedate</font>
-        <area>660,120,150,40</area>
+        <area>630,120,130,40</area>
       </textarea>
       <textarea name="currentdate-1" draworder="2">
         <context>1</context>
         <font>timedate</font>
-        <area>440,120,200,40</area>
+        <area>410,120,200,40</area>
       </textarea>
-      <textarea name="currenttime-2" draworder="2">
+      <textarea name="currenttime-2" draworder="2" align="right">
         <context>2</context>
         <font>timedate</font>
-        <area>660,120,150,40</area>
+        <area>630,120,130,40</area>
       </textarea>
       <textarea name="currentdate-2" draworder="2">
         <context>2</context>
         <font>timedate</font>
-        <area>440,120,200,40</area>
+        <area>410,120,200,40</area>
       </textarea>
-      <textarea name="currenttime-3" draworder="2">
+      <textarea name="currenttime-3" draworder="2" align="right">
         <context>3</context>
         <font>timedate</font>
-        <area>660,120,150,40</area>
+        <area>630,120,130,40</area>
       </textarea>
       <textarea name="currentdate-3" draworder="2">
         <context>3</context>
         <font>timedate</font>
-        <area>440,120,200,40</area>
+        <area>410,120,200,40</area>
       </textarea>
-      <textarea name="currenttime-4" draworder="2">
+      <textarea name="currenttime-4" draworder="2" align="right">
         <context>4</context>
         <font>timedate</font>
-        <area>660,120,150,40</area>
+        <area>630,120,130,40</area>
       </textarea>
       <textarea name="currentdate-4" draworder="2">
         <context>4</context>
         <font>timedate</font>
-        <area>440,120,200,40</area>
+        <area>410,120,200,40</area>
       </textarea>
  
       <image name="logo1" draworder="2">
@@ -219,6 +219,7 @@
       </textarea>
       <textarea name="curtemp" draworder="5" align="right">
         <context>1</context>
+        <cutdown>no</cutdown>
         <area>545,437,138,70</area>
         <font>temp</font>
       </textarea>
@@ -289,11 +290,13 @@
       <textarea name="low1" draworder="5" align="center">
         <context>2</context>
         <area>31,489,122,32</area>
+        <cutdown>no</cutdown>
         <font>tempdata</font>
       </textarea>
       <textarea name="high1" draworder="5" align="center">
         <context>2</context>
         <area>152,489,122,32</area>
+        <cutdown>no</cutdown>
         <font>tempdata</font>
       </textarea>
       <textarea name="date2" draworder="5" align="center">
@@ -328,11 +331,13 @@
         <context>2</context>
         <area>276,489,122,32</area>
         <font>tempdata</font>
+        <cutdown>no</cutdown>
       </textarea>
       <textarea name="high2" draworder="5" align="center">
         <context>2</context>
         <area>379,489,122,32</area>
         <font>tempdata</font>
+        <cutdown>no</cutdown>
       </textarea>
       <textarea name="date3" draworder="5" align="center">
         <context>2</context>
@@ -366,11 +371,13 @@
         <context>2</context>
         <area>524,489,122,32</area>
         <font>tempdata</font>
+        <cutdown>no</cutdown>
       </textarea>
       <textarea name="high3" draworder="5" align="center">
         <context>2</context>
         <area>624,489,122,32</area>
         <font>tempdata</font>
+        <cutdown>no</cutdown>
       </textarea>
       <textarea name="updatetime-2" draworder="5">
         <context>2</context>
@@ -398,6 +405,7 @@
       </textarea>
       <textarea name="today-desc" draworder="5">
         <context>3</context>
+        <cutdown>no</cutdown>
         <area>38,230,700,400</area>
         <font>todayfont</font>
         <multiline>yes</multiline>
@@ -423,13 +431,13 @@
       </textarea>
       <textarea name="forecastlbl" draworder="5">
         <context>4</context>
-        <area>260,235,500,40</area>
+        <area>260,235,500,45</area>
         <font>todayfont</font>
         <value>Forecast for</value>
       </textarea>
       <textarea name="forecastdate" draworder="5">
         <context>4</context>
-        <area>480,235,300,40</area>
+        <area>480,235,300,45</area>
         <font>todayfont</font>
       </textarea>
       <textarea name="tempforecast" draworder="5">
