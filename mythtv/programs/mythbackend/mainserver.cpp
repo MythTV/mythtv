@@ -2529,7 +2529,7 @@ void MainServer::PrintStatus(QSocket *socket)
                << elink->getHostname();
             if (!elink->isConnected())
             {
-                os << " (currently not connected).<br>";
+                os << " (currently not connected).<br />";
                 continue;
             }
         }
@@ -2571,7 +2571,7 @@ void MainServer::PrintStatus(QSocket *socket)
             os << " <strong>WARNING</strong>:"
                << " This backend is low on free disk space!";
 
-        os << "<br>\r\n";
+        os << "<br />\r\n";
     }
 
     os << "  </div>\r\n\r\n"
