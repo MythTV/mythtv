@@ -15,11 +15,13 @@
 #include <qurl.h>
 #include <qdatetime.h>
 #include <qvaluelist.h>
+#include <qintdict.h>
 
-enum metadata_type
+enum MetadataType
 {
-    MT_GENERIC = 0,
-    MT_AUDIO
+    MDT_unknown = 0,
+    MDT_audio,
+    MDT_video
 };
 
 class Metadata
@@ -31,13 +33,14 @@ class Metadata
     //  Get 'em
     //
   
-    metadata_type getType(){return type;}
     QUrl          getUrl(){return url;}
     int           getRating(){return rating;}
     int           getId(){return id;}
+    int           getDatabaseId(){return db_id;}
     QDateTime     getLastPlayed(){return last_played;}
     int           getPlayCount(){return play_count;}
     bool          getEphemeral(){return ephemeral;}
+    MetadataType  getType(){return metadata_type;}
         
     //
     //  Set 'em
@@ -61,12 +64,13 @@ class Metadata
             );
 
     QUrl            url;
-    metadata_type   type;
     int             rating;
     int             id;
+    int             db_id;    
     QDateTime       last_played;
     int             play_count;
     bool            ephemeral;
+    MetadataType    metadata_type;
 };
 
 class AudioMetadata : public Metadata
@@ -110,7 +114,7 @@ class AudioMetadata : public Metadata
 
     int     getLength() { return length; }
     void    setLength(int llength) { length = llength; }
-    
+
   private:
 
     QString artist;
@@ -121,25 +125,32 @@ class AudioMetadata : public Metadata
     int tracknum;
     int length;
 
-    int db_id;    
     bool changed;
 };
 
-class MPlaylist
+
+
+class Playlist
 {
   public:
   
-    MPlaylist(QString new_name, QString raw_songlist, uint new_id);
-    uint    getId(){return id;}
-    QString getName(){return name;}
-    uint    getCount(){return song_references.count();}
-    QValueList<uint> getList(){return song_references;}    
+    Playlist(QString new_name, QString raw_songlist, uint new_id, uint new_dbid);
+
+
+    uint             getId(){return id;}
+    uint             getDatabaseId(){return db_id;}
+    QString          getName(){return name;}
+    uint             getCount(){return song_references.count();}
+    QValueList<uint> getList(){return song_references;}
+    void             mapDatabaseToId(QIntDict<Metadata> *the_metadata);    
     
   private:
   
     QString          name;
     QValueList<uint> song_references;
+    QValueList<uint> db_references;
     uint             id;
+    uint             db_id;
 };
 
 #endif

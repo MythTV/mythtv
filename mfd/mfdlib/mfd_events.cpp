@@ -100,3 +100,18 @@ const QString& ServiceEvent::getString()
     return text;
 }
 
+/*
+---------------------------------------------------------------------
+*/
+
+MetadataChangeEvent::MetadataChangeEvent(int which_collection)
+            :QCustomEvent(65427)
+{
+    identifier = which_collection;
+}
+
+int MetadataChangeEvent::getIdentifier()
+{
+    return identifier;
+}
+

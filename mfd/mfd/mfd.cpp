@@ -8,6 +8,8 @@
 
 */
 
+#include "../config.h"
+
 #include <signal.h>
 
 #include <qapplication.h>
@@ -29,6 +31,12 @@ MFD::MFD(QSqlDatabase *ldb, int port, bool log_stdout, int logging_verbosity)
     shutting_down = false;
     watchdog_flag = false;
     port_number = port;
+    metadata_container_identifier = 0;
+    metadata_generation = 4;    // 4? Why 4? ... arbitrary starting point, higher than 3 for obscure iTunes reasons
+    metadata_containers = new QPtrList<MetadataContainer>;
+    metadata_containers->setAutoDelete(true);
+    metadata_id = 1;
+    playlist_id = 1;
 
     //
     //  Assign the database if one exists
@@ -41,10 +49,10 @@ MFD::MFD(QSqlDatabase *ldb, int port, bool log_stdout, int logging_verbosity)
     }
     
     //
-    //  Create the uber metadata container
+    //  Build collections of metadata
     //
     
-    metadata_container = new MetadataContainer(this, db);
+    makeMetadataContainers();
     
     //
     //  Create the log (possibly to stdout)
@@ -80,14 +88,74 @@ MFD::MFD(QSqlDatabase *ldb, int port, bool log_stdout, int logging_verbosity)
     
 }
 
-void MFD::debugSayHello()
-{
-    cout << "Hello from the mfd" << endl;
-}
 
-MetadataContainer*  MFD::getMetadataContainer()
+void MFD::makeMetadataContainers()
 {
-    return metadata_container;
+    //
+    //  This is only called at startup (constructor). It tries to build a
+    //  list of available metadata collections based on either mythlib/gContext
+    //  info or some guesses.
+    //
+    
+
+#ifdef MYTHLIB_SUPPORT    
+        //
+        //  We have a gContext, so build it that way.
+        //
+
+        log("mfd will attempt to build initial metadata collections from myth database", 2);
+        
+        //
+        //  If there is a musicmetadata table, build a DB-based collection
+        //  that is:
+        //
+        //      content  = audio
+        //      location = (this) host
+        //
+         
+        MetadataContainer *new_collection = new MetadataMythDBContainer(
+                                                                        this,
+                                                                        bumpMetadataContainerIdentifier(),
+                                                                        MCCT_audio,
+                                                                        MCLT_host,
+                                                                        db
+                                                                       );
+                                                                       
+        metadata_containers->append(new_collection);
+        
+
+
+/*
+        MetadataContainer *another_new_collection = new MetadataMythDBContainer(
+                                                                        this,
+                                                                        bumpMetadataContainerIdentifier(),
+                                                                        MCCT_audio,
+                                                                        MCLT_host,
+                                                                        db
+                                                                       );
+
+                                                                       
+        metadata_containers->append(another_new_collection);
+*/
+        
+#else
+
+        //
+        //  We have to try and build collections by guessing about the filesystem
+        //
+
+        log("mfd will attempt to build initial metadata collections based on filesystem guesses", 2);
+        
+        //
+        //  Make a set of directories to look in that might contain audio
+        //  files (these are just guesses).
+        //
+        
+        QStringList audio_locations;
+        audio_locations.append("/mnt/store");
+        audio_locations.append("/content");
+#endif
+    
 }
 
 void MFD::customEvent(QCustomEvent *ce)
@@ -195,6 +263,31 @@ void MFD::customEvent(QCustomEvent *ce)
             warning(QString("mfd could not register this service at the request of a plugin: %1")
                     .arg(se->getString()));
         }
+    }
+    else if(ce->type() == 65427)
+    {
+        //
+        //  Some metadata sweeper/monitor claims their data has changed. We
+        //  iterate over the containers and tell the relevant one to update
+        //  
+        
+        MetadataChangeEvent *mce = (MetadataChangeEvent*)ce;
+        QPtrListIterator<MetadataContainer> iterator( *metadata_containers );
+        MetadataContainer *a_container;
+        while ( (a_container = iterator.current()) != 0 )
+        {
+            ++iterator;
+            if(a_container->getIdentifier() == mce->getIdentifier())
+            {
+                if(a_container->tryToUpdate())
+                {
+                    bumpMetadataGeneration();
+                    log(QString("mfd metadata generation counter is now at %1")
+                        .arg(metadata_generation), 2);
+                }
+                break;
+            }
+         }
     }
     else
     {
@@ -435,7 +528,7 @@ void MFD::shutDown()
     //  Turn off the metadata
     //
     
-    metadata_container->shutDown();
+    //metadata_container->shutDown();
     
     
     //
@@ -515,6 +608,195 @@ void MFD::registerMFDService()
     
 }
 
+int MFD::bumpMetadataContainerIdentifier()
+{
+    //
+    //  Every metadatata collection (items and playlists) gets a unique id.
+    //
+    
+    ++metadata_container_identifier;
+    return metadata_container_identifier;
+}
+
+int MFD::bumpMetadataGeneration()
+{
+    //
+    //  Any time anything changes in any metadata collection, we need to
+    //  keep track of the fact that something has changed by augmenting the
+    //  value of metadata_generation
+    //
+    
+    ++metadata_generation;
+    return metadata_generation;
+}
+
+int MFD::bumpMetadataId()
+{
+    //
+    //  For ease of use with the other software (notably the somewhat brain
+    //  dead iTunes), we want every metadata obect to get a unique id
+    //
+    
+    int return_value;
+    bump_metadata_id_mutex.lock();
+    ++metadata_id;
+    return_value = metadata_id;
+    bump_metadata_id_mutex.unlock();
+    return return_value;
+}
+
+int MFD::bumpPlaylistId()
+{
+    //
+    //  For ease of use with the other software (notably the somewhat brain
+    //  dead iTunes), we want every playlist obect to get a unique id
+    //
+    
+    int return_value;
+    bump_playlist_id_mutex.lock();
+    ++playlist_id;
+    return_value = playlist_id;
+    bump_playlist_id_mutex.unlock();
+    return return_value;
+}
+
+
+uint MFD::getAllAudioMetadataCount()
+{
+    //
+    //  Iterate over all Audio collections and count the items
+    //
+
+    uint return_value;
+
+    lockMetadata();
+
+        return_value = 0;
+        MetadataContainer * a_container;
+        for (
+                a_container = metadata_containers->first(); 
+                a_container; 
+                a_container = metadata_containers->next()
+            )
+        {
+            if(a_container->isAudio())
+            {
+                return_value += a_container->getMetadataCount();
+            }
+        }
+    
+    unlockMetadata();
+    return return_value;
+}
+
+uint MFD::getAllAudioPlaylistCount()
+{
+    //
+    //  Iterate over all Audio collections and count the playlists
+    //
+
+    uint return_value;
+
+    lockPlaylists();
+
+        return_value = 0;
+        MetadataContainer * a_container;
+        for (
+                a_container = metadata_containers->first(); 
+                a_container; 
+                a_container = metadata_containers->next()
+            )
+        {
+            if(a_container->isAudio())
+            {
+                return_value += a_container->getPlaylistCount();
+            }
+        }
+    
+    unlockPlaylists();
+    return return_value;
+
+}
+
+void MFD::lockMetadata()
+{
+    metadata_mutex.lock();
+}
+
+void MFD::unlockMetadata()
+{
+    metadata_mutex.unlock();
+}
+
+void MFD::lockPlaylists()
+{
+    playlist_mutex.lock();
+}
+
+void MFD::unlockPlaylists()
+{
+    playlist_mutex.unlock();
+}
+
+Metadata* MFD::getMetadata(int id)
+{
+    //
+    //  Iterate over all Audio collections and return the requested metadata
+    //
+
+    Metadata* return_value = NULL;
+
+    lockMetadata();
+
+        MetadataContainer * a_container;
+        for (
+                a_container = metadata_containers->first(); 
+                a_container; 
+                a_container = metadata_containers->next()
+            )
+        {
+            QIntDict<Metadata> *the_metadata = a_container->getMetadata();
+            if(the_metadata->find(id))
+            {
+                return_value = the_metadata->find(id);
+                a_container = metadata_containers->last();
+            }
+        }
+    
+    unlockMetadata();
+    return return_value;
+}
+
+Playlist* MFD::getPlaylist(int id)
+{
+    //
+    //  Iterate over all Audio collections and return the requested playlist
+    //
+
+    Playlist* return_value = NULL;
+
+    lockPlaylists();
+
+        MetadataContainer * a_container;
+        for (
+                a_container = metadata_containers->first(); 
+                a_container; 
+                a_container = metadata_containers->next()
+            )
+        {
+            QIntDict<Playlist> *the_playlists = a_container->getPlaylists();
+            if(the_playlists->find(id))
+            {
+                return_value = the_playlists->find(id);
+                a_container = metadata_containers->last();
+            }
+        }
+    
+    unlockPlaylists();
+    return return_value;
+    
+}
+
 MFD::~MFD()
 {
     if(plugin_manager)
@@ -535,16 +817,6 @@ MFD::~MFD()
         mfd_log = NULL;
     }
     
-    if(metadata_container)
-    {
-        delete metadata_container;
-        metadata_container = NULL;
-    }
 }
 
 
-
-extern "C" void __MFD__debugSayHello(MFD *an_mfd)
-{
-    an_mfd->debugSayHello();
-}

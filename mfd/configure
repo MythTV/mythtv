@@ -41,12 +41,14 @@ for opt do
       audio="yes"
       daapserver="yes"
       daapclient="yes"
+      mythlib="yes"
   ;;
   --disable-all)
       zeroconfig="no"
       audio="no"
       daapserver="no"
       daapclient="no"
+      mythlib="no"
   ;;
   esac
 done
@@ -107,6 +109,23 @@ echo " "
 
 
 #
+#   Myth lib
+#
+
+if test "$mythlib" = "yes" ; then
+    echo "                    mythlib support: yes"        
+    echo "//  Include mythlib support " >> ./config.h
+    echo " " >> ./config.h
+    echo "#define MYTHLIB_SUPPORT 1" >> ./config.h
+    echo " " >> ./config.h
+    echo "USE_MYTH_LIB = 1 " >> ./options.pro
+fi
+
+if test "$mythlib" = "no" ; then
+    echo "                    mythlib support: no"
+fi
+
+#
 #   Dummy
 #
 
@@ -127,23 +146,6 @@ fi
 
 if test "$zeroconfig" = "no" ; then
     echo "                 zeroconfig support: no"
-fi
-
-#
-#   Myth lib
-#
-
-if test "$mythlib" = "yes" ; then
-    echo "                    mythlib support: yes"        
-    echo "//  Include mythlib support " >> ./config.h
-    echo " " >> ./config.h
-    echo "#define MYTHLIB_SUPPORT 1" >> ./config.h
-    echo " " >> ./config.h
-    echo "USE_MYTH_LIB = 1 " >> ./options.pro
-fi
-
-if test "$mythlib" = "no" ; then
-    echo "                    mythlib support: no"
 fi
 
 #

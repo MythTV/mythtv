@@ -15,119 +15,95 @@
 #include <qintdict.h>
 #include <qptrlist.h>
 #include <qthread.h>
-#include <qmutex.h>
 #include <qwaitcondition.h>
 
 #include "metadata.h"
+#include "mdmonitor.h"
 
 class MFD;
 
-class MetadataMonitor : public QThread
+enum MetadataCollectionContentType
 {
-    //
-    //  Run in the background, and keep checking for metadata changes.
-    //
-    
-  public:
-    
-    MetadataMonitor(MFD *owner, QSqlDatabase *ldb);
-
-    void run();
-    bool sweepMetadata();
-    void switchToNextGeneration();
-    void forceSweep();
-    void stop();
-    int  bumpMetadataGeneration();
-    int  bumpMetadataItem();
-    QIntDict<AudioMetadata>* getCurrent(int *generation_value);
-    QPtrList<MPlaylist>*     getCurrentPlaylists(){return current_playlists;}
-    
-    bool sweepAudio();
-    bool checkAudio();
-
-    void log(const QString &log_message, int verbosity);
-    void warning(const QString &warning_message);
-
-    enum MetadataFileLocation
-    {
-        MFL_FileSystem,
-        MFL_Database,
-        MFL_Both
-    };
-    typedef QMap <QString, MetadataFileLocation> MetadataLoadedMap;
-
-    void buildFileList(QString &directory);
-    
-
-  private:
-  
-    MFD          *parent;
-    QSqlDatabase *db;
-    bool         keep_going;
-    QMutex       keep_going_mutex;    
-
-    QIntDict<AudioMetadata>  *current_metadata;
-    QIntDict<AudioMetadata>  *new_metadata;
-
-    QPtrList<MPlaylist>      *current_playlists;
-
-    
-    int     metadata_generation;
-    int     current_metadata_generation;
-    QMutex  metadata_generation_mutex;   
-
-    int     metadata_item;
-    QMutex  metadata_item_mutex;
-
-    QTime   metadata_sweep_time;
-    bool    force_sweep;
-    QMutex  force_sweep_mutex;
-    
-    QWaitCondition  main_wait_condition;
-
-    QMutex log_mutex;
-    QMutex warning_mutex;
-    
-    MetadataLoadedMap metadata_files;
-
+    MCCT_audio = 0,
+    MCCT_video
 };
 
+enum MetadataCollectionLocationType
+{
+    MCLT_host = 0,
+    MCLT_lan,
+    MCLT_net
+};
 
 class MetadataContainer
 {
     //
-    //  An object that holds metadata
+    //  A base class for objects that hold metadata
     //
 
 
   public:
   
-    MetadataContainer(MFD *owner, QSqlDatabase *ldb);
-    ~MetadataContainer();
+    MetadataContainer(
+                        MFD *l_parent,
+                        int l_unique_identifier,
+                        MetadataCollectionContentType  l_content_type,
+                        MetadataCollectionLocationType l_location_type
+                     );
 
-    void    shutDown();
+    virtual ~MetadataContainer();
 
-    AudioMetadata*           getMetadata(int *generation_value, int metadata_index);
-    QIntDict<AudioMetadata>* getCurrentMetadata();
-    QPtrList<MPlaylist>*     getCurrentPlaylists(){return current_audio_playlists;}
-    void                     lockMetadata();
-    void                     unlockMetadata();
-    uint                     getCurrentGeneration(){return 3;}  // HACK
-    uint                     getMetadataCount();
-    uint                     getMP3Count();
+    void                log(const QString &log_message, int verbosity);
+    void                warning(const QString &warning_message);
+    virtual bool        tryToUpdate();
+    int                 getIdentifier(){return unique_identifier;}
+    bool                isAudio();
+    bool                isLocal();
+    uint                getMetadataCount();
+    uint                getPlaylistCount();
+    QIntDict<Metadata>* getMetadata(){return current_metadata;}
+    QIntDict<Playlist>* getPlaylists(){return current_playlists;}
+
+  protected:
+  
+    MFD *parent;
+    int unique_identifier;
+    
+    MetadataCollectionContentType  content_type;
+    MetadataCollectionLocationType location_type;
+
+    QIntDict<Metadata>   *current_metadata;
+    QIntDict<Playlist>   *current_playlists;
+};
+
+
+class MetadataMythDBContainer: public MetadataContainer
+{
+    //
+    //  A container that works off myth DB tables
+    //
+    
+  public:
+  
+    MetadataMythDBContainer(
+                            MFD *l_parent,
+                            int l_unique_identifier,
+                            MetadataCollectionContentType  l_content_type,
+                            MetadataCollectionLocationType l_location_type,
+                            QSqlDatabase *l_db
+                           );
+
+    ~MetadataMythDBContainer();
+    
+    bool    tryToUpdate();
     
   private:
   
-    MFD                      *parent;
-    QSqlDatabase             *db;
-    QIntDict<AudioMetadata>  *current_audio_metadata;
-    QPtrList<MPlaylist>      *current_audio_playlists;
-    QMutex                   *current_metadata_mutex;
-    MetadataMonitor          *metadata_monitor;
-    int                      current_generation;
+    QSqlDatabase    *db;
+    MetadataMonitor *metadata_monitor;
 
-    uint                     mp3_count;
 };
+                            
 
 
 #endif

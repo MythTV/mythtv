@@ -1,4 +1,4 @@
-;/*
+/*
     daapserver.cpp
 
     (c) 2003 Thor Sigvaldason and Isaac Richards
@@ -50,8 +50,7 @@ extern "C" void parseRequest( httpd *server, void *)
 DaapServer::DaapServer(MFD *owner, int identity)
       :MFDServicePlugin(owner, identity, 3689)
 {
-    all_the_metadata = owner->getMetadataContainer();
-    
+    metadata_containers = owner->getMetadataContainers();    
     QString local_hostname = "unknown";
     char my_hostname[2049];
     if(gethostname(my_hostname, 2048) < 0)
@@ -136,7 +135,7 @@ void DaapServer::run()
 
 void DaapServer::parseIncomingRequest(httpd *server)
 {
-
+    cout << "GOT SOMETHING" << endl;
 
     //
     //  Create a DaapRequest object that will be built up to understand the
@@ -208,16 +207,17 @@ void DaapServer::parseIncomingRequest(httpd *server)
         //  for playing.
         //
 
-        if(daap_request->getDatabaseVersion() != all_the_metadata->getCurrentGeneration() &&
+        
+        if(daap_request->getDatabaseVersion() != parent->getMetadataGeneration() &&
            daap_request->getDatabaseVersion() != 0)
         {
             log(QString("daap client asked for a database request, "
                         "but has stale db reference "
                         "(mfd db# = %1, client db# = %2)")
-                        .arg(all_the_metadata->getCurrentGeneration())
+                        .arg(parent->getMetadataGeneration())
                         .arg(daap_request->getDatabaseVersion()), 9);
 
-            sendUpdate(server, all_the_metadata->getCurrentGeneration());
+            sendUpdate(server, parent->getMetadataGeneration());
         }
         else
         {
@@ -233,13 +233,14 @@ void DaapServer::parseIncomingRequest(httpd *server)
         //  whack.
         //
 
-        if(daap_request->getDatabaseVersion() != all_the_metadata->getCurrentGeneration())
+
+        if(daap_request->getDatabaseVersion() != parent->getMetadataGeneration())
         {
             log(QString("daap client asked for and will get an update "
                         "(mfd db# = %1, client db# = %2)")
-                        .arg(all_the_metadata->getCurrentGeneration())
+                        .arg(parent->getMetadataGeneration())
                         .arg(daap_request->getDatabaseVersion()), 9);
-            sendUpdate(server, all_the_metadata->getCurrentGeneration());
+            sendUpdate(server, parent->getMetadataGeneration());
         }
     }
     
@@ -332,17 +333,15 @@ void DaapServer::sendServerInfo(httpd *server)
              << Tag('mstm') << (u32) 1800 << end 
              << Tag('msup') << (u8) 0 << end 
              << Tag('msau') << (u32) 2 << end 
-             <<
-// Disable some features for now
-/*              Tag('mspi') << (u8) 0 << end 
-             << Tag('msex') << (u8) 0 << end 
-             << Tag('msbr') << (u8) 0 << end 
-             << Tag('msqy') << (u8) 0 << end 
-             << Tag('msix') << (u8) 0 << end 
-             << Tag('msrs') << (u8) 0 << end 
-             <<
-*/        
-                Tag('msdc') << (u32) 1 << end 
+
+             //<< Tag('mspi') << (u8) 1 << end 
+             //<< Tag('msex') << (u8) 1 << end 
+             //<< Tag('msbr') << (u8) 1 << end 
+             //<< Tag('msqy') << (u8) 1 << end 
+             //<< Tag('msix') << (u8) 1 << end 
+             //<< Tag('msrs') << (u8) 1 << end 
+
+             << Tag('msdc') << (u32) 1 << end   //  if only iTunes *did something* with more than 1 database
              
              << end;
 
@@ -441,28 +440,6 @@ void DaapServer::parseVariables(httpd *server, DaapRequest *daap_request)
 void DaapServer::sendUpdate(httpd *server, u32 database_version)
 {
 
-/*
-    //
-    //  Terrible HACK (temporary)
-    //
-
-    if(database_version !=3)
-    {
-        database_version = 3;
-    }
-
-    //
-    //  Even worse HACK
-    //
-
-    if(!first_update)
-    {
-        return;
-    }
-
-    first_update = false;
-*/
-
     TagOutput response;
 
     response << Tag( 'mupd' ) << Tag('mstt') << (u32) DAAP_OK << end 
@@ -520,7 +497,7 @@ void DaapServer::sendMetadata(httpd *server, QString request_path, DaapRequest *
         {
             if( components.count() == 3 )
             {
-                sendDatabase( server, daap_request);
+                sendDatabase( server, daap_request, components[1].toInt());
             } 
             else if ( components.count() == 4 )
             {
@@ -542,12 +519,12 @@ void DaapServer::sendMetadata(httpd *server, QString request_path, DaapRequest *
         {
             if( components.count() == 3 )
             {
-                sendContainers( server, daap_request);
+                sendContainers( server, daap_request, components[1].toInt());
             } 
             else if ( components.count() == 5 && components[4] == "items" )
             {
                 u32 container_id = components[3].toULong();
-                sendContainer(server, container_id);
+                sendContainer(server, container_id, components[1].toInt());
 
             } 
             else 
@@ -566,285 +543,338 @@ void DaapServer::sendMetadata(httpd *server, QString request_path, DaapRequest *
 
 void DaapServer::sendDatabaseList( httpd *server)
 {
-    all_the_metadata = parent->getMetadataContainer();
 
+    //
+    //  Since iTunes (and, therefore, the notion of a "reference" daap
+    //  client) is somewhat brain dead, we have to fold out our *audio*
+    //  collections together to make them look like a single collection
+    //
+    //  So, as far as iTunes is concerned, there is only 1 database which
+    //  contains *all* audio items and containers/playlists.
+    //
+    
     TagOutput response;
-    response << Tag('avdb') << Tag('mstt') << (u32) DAAP_OK << end 
-             << Tag('muty') << (u8) 0 << end 
-             << Tag('mtco') << (u32) 1 << end 
-             << Tag('mrco') << (u32) 1 << end 
-             << Tag('mlcl') 
-                << Tag('mlit') 
-                    << Tag('miid') << (u32) 1 << end 
+    response << Tag('avdb') 
+                << Tag('mstt') << (u32) DAAP_OK << end 
+                << Tag('muty') << (u8) 0 << end 
+                << Tag('mtco') << (u32) 1 << end 
+                << Tag('mrco') << (u32) 1 << end 
+                << Tag('mlcl')
+                    << Tag('mlit')
+                        << Tag('miid') << (u32) 1 << end 
+                        //<< Tag('mper') << (u64) 543675286654 << end 
 
-                    // << Tag('mper') << (u64) 543675286654 << end 
-
-                    << Tag('minm') << service_name.utf8() << end 
-                    << Tag('mimc') << (u32) all_the_metadata->getMetadataCount() << end 
+                        << Tag('minm') << service_name.utf8() << end 
+                        << Tag('mimc') << (u32) parent->getAllAudioMetadataCount() << end 
              
-                    //
-                    // Change this soon to add playlists
-                    //
-                    
-                    << Tag('mctc') << (u32) 1 << end 
+                        << Tag('mctc') << (u32) parent->getAllAudioPlaylistCount() << end 
+                    << end
                 << end 
-             << end 
              << end;
 
     sendTag( server, response.data() );
 
 }
 
-void DaapServer::sendDatabase(httpd *server, DaapRequest *daap_request)
+void DaapServer::sendDatabase(httpd *server, DaapRequest *daap_request, int which_database)
 { 
+    if(which_database != 1)
+    {
+        warning("daap server was asked about a database other than 1");
+        return;
+    }
+
     TagOutput response;
     response << Tag( 'adbs' ) << Tag('mstt') << (u32) DAAP_OK << end 
              << Tag('muty') << (u8) 0 << end 
-             << Tag('mtco') << (u32) all_the_metadata->getMetadataCount() << end 
-             << Tag('mrco') << (u32) all_the_metadata->getMetadataCount() << end 
+             << Tag('mtco') << (u32) parent->getAllAudioMetadataCount() << end 
+             << Tag('mrco') << (u32) parent->getAllAudioPlaylistCount() << end 
              << Tag('mlcl') ;
              
              //
-             // We have to put in a record for every song, adding metadata
-             // according to what the client requested.
+             // Lock all the metadata before we do this
+             //
+             
+             parent->lockMetadata();
+             
+             //
+             // Iterate over all the containers, and then over every item in
+             // each container
              //
              
              u64 meta_codes = daap_request->getParsedMetaContentCodes();
-             all_the_metadata->lockMetadata();
-                current_metadata = all_the_metadata->getCurrentMetadata();
-                QIntDictIterator<AudioMetadata> iterator(*current_metadata);
-                for( ; iterator.current(); ++iterator)
-                {
-                    //if(iterator.current()->getUrl().fileName().section('.', -1,-1) == "mp3")
-                    //{
-                        response << Tag('mlit');
-                        if(meta_codes & DAAP_META_ITEMKIND)
-                        {
-                            response << Tag('mikd') << (u8) 2 << end;
-                        }
-
-                        if(meta_codes & DAAP_META_SONGDATAKIND)
-                        {
-                            //
-                            //  NB ... I think 1 is an internet radio stream
-                            //
-                            response << Tag('asdk') << (u8) 0 << end;
-                        }
-                    
-                        if(meta_codes & DAAP_META_ITEMNAME)
-                        {
-                            response << Tag('minm') << iterator.current()->getTitle().utf8() << end;
-                        }
-
-                        if(meta_codes & DAAP_META_ITEMID)
-                        {
-                            response << Tag('miid') << (u32) iterator.current()->getId() << end;
-                        }
-                    
-                        if(meta_codes & DAAP_META_PERSISTENTID)
-                        {
-                            //
-                        }
-                    
-                        if(meta_codes & DAAP_META_SONGALBUM)
-                        {
-                            response << Tag('asal') << iterator.current()->getAlbum().utf8() << end;
-                        }
-                    
-                        if(meta_codes & DAAP_META_SONGARTIST)
-                        {
-                            response << Tag('asar') << iterator.current()->getArtist().utf8() << end;
-                        }
-
-                        if(meta_codes & DAAP_META_SONGBITRATE)
-                        {
-                            // response << Tag('asbr') << (u16) ...
-                        }
-
-                        if(meta_codes & DAAP_META_SONGBEATSPERMINUTE)
-                        {
-                            // response << Tag('asbt') << (u16) ...
-                        }
-                        
-                        if(meta_codes & DAAP_META_SONGCOMMENT)
-                        {
-                            // response << Tag('ascm') << utf8 ....
-                        }
-
-                        if(meta_codes & DAAP_META_SONGCOMPILATION)
-                        {
-                            response << Tag('asco') << (u8) 0 << end;
-                        }
-    
-                        if(meta_codes & DAAP_META_SONGCOMPOSER)
-                        {
-                            // response << Tag('ascp') << utf8 ....
-                        }
-
-                        if(meta_codes & DAAP_META_SONGDATEADDED)
-                        {
-                            // response << Tag('asda') << (u32) ... (seconds since when ... ?)
-                        }
-
-                        if(meta_codes & DAAP_META_SONGDATEMODIFIED)
-                        {
-                            // response << Tag('asdm') << (u32) ... (seconds since when ... ?)
-                        }
-
-                        if(meta_codes & DAAP_META_SONGDISCCOUNT)
-                        {
-                            // response << Tag('asdc') << (u16) ...
-                        }
-                        
-                        if(meta_codes & DAAP_META_SONGDISCNUMBER)
-                        {
-                            // response << Tag('asdn') << (u16) ...
-                        }
-                        
-                        if(meta_codes & DAAP_META_SONGDISABLED)
-                        {
-                            //
-                            //  Change this soon
-                            //
-
-                            if(iterator.current()->getUrl().fileName().section('.', -1,-1) == "mp3")
-                            {
-                                response << Tag('asdb') << (u8) 0 << end;
-                            }
-                            else
-                            {
-                                response << Tag('asdb') << (u8) 1 << end;
-                            }
-                        }
-
-                        if(meta_codes & DAAP_META_SONGEQPRESET)
-                        {
-                            //
-                        }
-
-                        if(meta_codes & DAAP_META_SONGFORMAT)
-                        {
-                            //
-                            //  Change this soon
-                            //
-
-                            if(iterator.current()->getUrl().fileName().section('.', -1,-1) == "mp3")
-                            {
-                                response << Tag('asfm') << "mp3" << end;
-                            }
-                            else
-                            {
-                                response << Tag('asfm') << "wav" << end;
-                            }
-                        }
-                        
-                        if(meta_codes & DAAP_META_SONGGENRE)
-                        {
-                            if(iterator.current()->getGenre().length() > 0 &&
-                               iterator.current()->getGenre() != "Unknown" &&
-                               iterator.current()->getGenre() != "Unknown Genre")
-                            {
-                                response << Tag('asgn') << iterator.current()->getGenre().utf8() << end;
-                            }
-                        }
-                        
-                        if(meta_codes & DAAP_META_SONGDESCRIPTION)
-                        {
-                            // response << Tag('asdt') << utf8 ...
-                        }
-                        
-                        if(meta_codes & DAAP_META_SONGRELATIVEVOLUME)
-                        {
-                            // response << Tag('asrv') << (u8) ...
-                        }
-                        
-                        if(meta_codes & DAAP_META_SONGSAMPLERATE)
-                        {
-                            // response << Tag('assr') << (u32) ...
-                        }
-                        
-                        if(meta_codes & DAAP_META_SONGSIZE)
-                        {
-                            // response << Tag('assz') << (u32) ...
-                        }
-                        
-                        if(meta_codes & DAAP_META_SONGSTARTTIME)
-                        {
-                            response << Tag('asst') << (u32) 0 << end;
-                        }
-
-                        if(meta_codes & DAAP_META_SONGSTOPTIME)
-                        {
-                            response << Tag('assp') << (u32) iterator.current()->getLength() << end;
-                        }
-                    
-                        if(meta_codes & DAAP_META_SONGTIME)
-                        {
-                            response << Tag('astm') << (u32) iterator.current()->getLength() << end;
-                        }
-                    
-                        if(meta_codes & DAAP_META_SONGTRACKCOUNT)
-                        {
-                            // response << Tag('astc') << (u16) ...
-                        }
-
-                        if(meta_codes & DAAP_META_SONGTRACKNUMBER)
-                        {
-                            response << Tag('astn') << (u16) iterator.current()->getTrack() << end;
-                        }
-                    
-                        if(meta_codes & DAAP_META_SONGUSERRATING)
-                        {
-                            response << Tag('asur') << (u8) (iterator.current()->getRating() * 10) << end;
-                        }
-
-                        if(meta_codes & DAAP_META_SONGYEAR)
-                        {
-                            response << Tag('asyr') << (u16) iterator.current()->getYear() << end;
-                        }
-
-                        if(meta_codes & DAAP_META_SONGDATAURL)
-                        {
-                            // response << Tag('asul') << utf8 .... 
-                        }
-                    
-                        if(meta_codes & DAAP_META_NORMVOLUME)
-                        {
-                            // 
-                        }
-                    
-                        
-                        response << end;
-                    //}
-                } 
-             all_the_metadata->unlockMetadata();
+             MetadataContainer *a_container = NULL;
              
+             for (   
+                    a_container = metadata_containers->first(); 
+                    a_container; 
+                    a_container = metadata_containers->next() 
+                 )
+             {
+                if(a_container->isAudio())
+                {
+             
+                    QIntDict<Metadata>     *which_metadata;
+                    which_metadata = a_container->getMetadata();
+
+                    QIntDictIterator<Metadata> iterator(*which_metadata);
+            
+                    for( ; iterator.current(); ++iterator)
+                    {
+                
+                        if(iterator.current()->getType() == MDT_audio)
+                        {
+                            AudioMetadata *which_item = (AudioMetadata*)iterator.current();
+
+                            response << Tag('mlit');
+                    
+                            if(meta_codes & DAAP_META_ITEMKIND)
+                            {
+                                response << Tag('mikd') << (u8) 2 << end;
+                            }
+
+                            if(meta_codes & DAAP_META_SONGDATAKIND)
+                            {
+                                //
+                                //  NB ... I think 1 is an internet radio stream
+                                //
+                                response << Tag('asdk') << (u8) 0 << end;
+                            }
+                    
+                            if(meta_codes & DAAP_META_ITEMNAME)
+                            {
+                                response << Tag('minm') << which_item->getTitle().utf8() << end;
+                            }
+
+                            if(meta_codes & DAAP_META_ITEMID)
+                            {
+                                response << Tag('miid') << (u32) which_item->getId() << end;
+                            }
+                    
+                            if(meta_codes & DAAP_META_PERSISTENTID)
+                            {
+                                //
+                            }
+                    
+                            if(meta_codes & DAAP_META_SONGALBUM)
+                            {
+                                response << Tag('asal') << which_item->getAlbum().utf8() << end;
+                            }
+                    
+                            if(meta_codes & DAAP_META_SONGARTIST)
+                            {
+                                response << Tag('asar') << which_item->getArtist().utf8() << end;
+                            }
+
+                            if(meta_codes & DAAP_META_SONGBITRATE)
+                            {
+                                // response << Tag('asbr') << (u16) ...
+                            }
+
+                            if(meta_codes & DAAP_META_SONGBEATSPERMINUTE)
+                            {
+                                // response << Tag('asbt') << (u16) ...
+                            }
+                        
+                            if(meta_codes & DAAP_META_SONGCOMMENT)
+                            {
+                                // response << Tag('ascm') << utf8 ....
+                            }
+
+                            if(meta_codes & DAAP_META_SONGCOMPILATION)
+                            {
+                                response << Tag('asco') << (u8) 0 << end;
+                            }
+    
+                            if(meta_codes & DAAP_META_SONGCOMPOSER)
+                            {
+                                // response << Tag('ascp') << utf8 ....
+                            }
+
+                            if(meta_codes & DAAP_META_SONGDATEADDED)
+                            {
+                                // response << Tag('asda') << (u32) ... (seconds since when ... ?)
+                            }
+
+                            if(meta_codes & DAAP_META_SONGDATEMODIFIED)
+                            {
+                                // response << Tag('asdm') << (u32) ... (seconds since when ... ?)
+                            }
+
+                            if(meta_codes & DAAP_META_SONGDISCCOUNT)
+                            {
+                                // response << Tag('asdc') << (u16) ...
+                            }
+                        
+                            if(meta_codes & DAAP_META_SONGDISCNUMBER)
+                            {
+                                // response << Tag('asdn') << (u16) ...
+                            }
+                        
+                            if(meta_codes & DAAP_META_SONGDISABLED)
+                            {
+                                //
+                                //  Change this soon
+                                //
+
+                                if(which_item->getUrl().fileName().section('.', -1,-1) == "mp3")
+                                {
+                                    response << Tag('asdb') << (u8) 0 << end;
+                                }
+                                else
+                                {
+                                    response << Tag('asdb') << (u8) 1 << end;
+                                }
+                            }
+
+                            if(meta_codes & DAAP_META_SONGEQPRESET)
+                            {
+                                //
+                            }
+
+                            if(meta_codes & DAAP_META_SONGFORMAT)
+                            {
+                                //
+                                //  Change this soon
+                                //
+
+                                if(which_item->getUrl().fileName().section('.', -1,-1) == "mp3")
+                                {
+                                    response << Tag('asfm') << "mp3" << end;
+                                }
+                                else
+                                {
+                                    response << Tag('asfm') << "wav" << end;
+                                }
+                            }
+                        
+                            if(meta_codes & DAAP_META_SONGGENRE)
+                            {
+                                if(which_item->getGenre().length() > 0 &&
+                                   which_item->getGenre() != "Unknown" &&
+                                   which_item->getGenre() != "Unknown Genre")
+                                {
+                                    response << Tag('asgn') << which_item->getGenre().utf8() << end;
+                                }
+                            }
+                       
+                            if(meta_codes & DAAP_META_SONGDESCRIPTION)
+                            {
+                                // response << Tag('asdt') << utf8 ...
+                            }
+                        
+                            if(meta_codes & DAAP_META_SONGRELATIVEVOLUME)
+                            {
+                                // response << Tag('asrv') << (u8) ...
+                            }
+                        
+                            if(meta_codes & DAAP_META_SONGSAMPLERATE)
+                            {
+                                // response << Tag('assr') << (u32) ...
+                            }
+                        
+                            if(meta_codes & DAAP_META_SONGSIZE)
+                            {
+                                // response << Tag('assz') << (u32) ...
+                            }
+                        
+                            if(meta_codes & DAAP_META_SONGSTARTTIME)
+                            {
+                                response << Tag('asst') << (u32) 0 << end;
+                            }
+
+                            if(meta_codes & DAAP_META_SONGSTOPTIME)
+                            {
+                                response << Tag('assp') << (u32) which_item->getLength() << end;
+                            }
+                    
+                            if(meta_codes & DAAP_META_SONGTIME)
+                            {
+                                response << Tag('astm') << (u32) which_item->getLength() << end;
+                            }
+                    
+                            if(meta_codes & DAAP_META_SONGTRACKCOUNT)
+                            {
+                                // response << Tag('astc') << (u16) ...
+                            }
+
+                            if(meta_codes & DAAP_META_SONGTRACKNUMBER)
+                            {
+                                response << Tag('astn') << (u16) which_item->getTrack() << end;
+                            }
+                    
+                            if(meta_codes & DAAP_META_SONGUSERRATING)
+                            {
+                                response << Tag('asur') << (u8) (which_item->getRating() * 10) << end;
+                            }
+
+                            if(meta_codes & DAAP_META_SONGYEAR)
+                            {
+                                response << Tag('asyr') << (u16) which_item->getYear() << end;
+                            }
+
+                            if(meta_codes & DAAP_META_SONGDATAURL)
+                            {
+                                // response << Tag('asul') << utf8 .... 
+                            }
+                    
+                            if(meta_codes & DAAP_META_NORMVOLUME)
+                            {
+                                // 
+                            }
+                    
+                        
+                            response << end;
+                       }
+                    }
+                }
+                else
+                {
+                    warning("daapserver got a metadata item off an audio collection that is not of type AudioMetadata");
+                } 
+             }
              response << end 
                       << end;
 
+             parent->unlockMetadata();
+
     sendTag( server, response.data() );
-    
 }
 
 void DaapServer::sendDatabaseItem(httpd *server, u32 song_id)
 {
-    current_metadata = all_the_metadata->getCurrentMetadata();
-    AudioMetadata *which_one = current_metadata->find(song_id);
+    
+
+    Metadata *which_one = parent->getMetadata(song_id);
     if(which_one)
     {
-        QUrl file_url = which_one->getUrl();
-        QString file_path = file_url.path();
-        httpdSendFile( server, (char *) file_path.ascii(), httpdRequestContentRange( server ) );
+        if(which_one->getType() == MDT_audio)
+        {
+            AudioMetadata *which_audio = (AudioMetadata*)which_one;
+            QUrl file_url = which_audio->getUrl();
+            QString file_path = file_url.path();
+            httpdSendFile( server, (char *) file_path.ascii(), httpdRequestContentRange( server ) );
+        }
+        else
+        {
+            warning("daapserver got a reference to a non audio bit of metadata");
+        }
     }
     else
     {
-        cout << "WTF is wrong with looking for " << song_id << endl;
+        warning("daapserver got a bad reference to a metadata item");
     }
-    
+
 }
 
-void DaapServer::sendContainers(httpd *server, DaapRequest *daap_request)
+void DaapServer::sendContainers(httpd *server, DaapRequest *daap_request, int which_database)
 {
+    if(which_database != 1)
+    {
+        warning("daap server was asked about a database other than 1");
+        return;
+    }
+
     TagOutput response;
     response << Tag( 'aply' ) << Tag('mstt') << (u32) DAAP_OK << end 
              << Tag('muty') << (u8) 0 << end 
@@ -853,75 +883,115 @@ void DaapServer::sendContainers(httpd *server, DaapRequest *daap_request)
              << Tag('mlcl');
              
              //
+             // We always have 1 "fake" playlist, which always has id #1 and
+             // is just all the metadata
+             //
+             
+             response << Tag('mlit');
+                
+                if((u64) daap_request->getParsedMetaContentCodes() & DAAP_META_ITEMID)
+                {
+                    response << Tag('miid') << (u32) 1 << end ;
+                }
+             
+                if((u64) daap_request->getParsedMetaContentCodes() & DAAP_META_ITEMNAME)
+                {
+                    response << Tag('minm') << service_name.utf8() << end ;
+                }
+             
+                response << Tag('mimc') << (u32) parent->getAllAudioMetadataCount() << end ;
+             response << end;
+             
+             //
              // For each container, explain it
              //
              
-             current_playlists = all_the_metadata->getCurrentPlaylists();
-             
-             QPtrListIterator<MPlaylist> it( *current_playlists );
-             MPlaylist *a_playlist;
-             while ( (a_playlist = it.current()) != 0 )
+             MetadataContainer *a_container = NULL;
+             for (   
+                     a_container = metadata_containers->first(); 
+                     a_container; 
+                     a_container = metadata_containers->next() 
+                 )
              {
-                ++it;
+                if(a_container->isAudio())
+                {
+            
+            
+                    QIntDict<Playlist> *which_playlists = a_container->getPlaylists();
+                    QIntDictIterator<Playlist> it( *which_playlists );
+
+                    Playlist *a_playlist;
+                    while ( (a_playlist = it.current()) != 0 )
+                    {
+                        ++it;
              
-                response << Tag('mlit');
+                        response << Tag('mlit');
                 
-                    if((u64) daap_request->getParsedMetaContentCodes() & DAAP_META_ITEMID)
-                    {
-                        response << Tag('miid') << (u32) a_playlist->getId() << end ;
-                    }
+                        if((u64) daap_request->getParsedMetaContentCodes() & DAAP_META_ITEMID)
+                        {
+                            response << Tag('miid') << (u32) a_playlist->getId() << end ;
+                        }
              
-                    if((u64) daap_request->getParsedMetaContentCodes() & DAAP_META_ITEMNAME)
-                    {
-                        response << Tag('minm') << a_playlist->getName().utf8() << end ;
-                    }
+                        if((u64) daap_request->getParsedMetaContentCodes() & DAAP_META_ITEMNAME)
+                        {
+                            response << Tag('minm') << a_playlist->getName().utf8() << end ;
+                        }
              
-                    response << Tag('mimc') << (u32) a_playlist->getCount() << end ;
-                response << end;
+                        response << Tag('mimc') << (u32) a_playlist->getCount() << end ;
+                        response << end;
+                    }
+                }
             }
              
-             
-             
-             
-             
-             
-
-             response << end
-             << end;
+            response << end
+            << end;
 
     sendTag( server, response.data() );
+
 }
 
-void DaapServer::sendContainer(httpd *server, u32 container_id)
+void DaapServer::sendContainer(httpd *server, u32 container_id, int which_database)
 {
-    TagOutput response;
-
-    //
-    //  Find the playlist in question
-    //
-
-    QPtrListIterator<MPlaylist> it( *current_playlists );
-    MPlaylist *the_playlist = NULL;
-    MPlaylist *a_playlist;
-    while ( (a_playlist = it.current()) != 0 )
+    if(which_database != 1)
     {
-        if(a_playlist->getId() == container_id)
-        {
-            the_playlist = it.current();
-        }
-        ++it;
-    }
-    if(!the_playlist)
-    {
+        warning("daap server was asked about a database other than 1");
         return;
     }
+
+    //
+    //  Get the playlist in question, unless it's out special "all metadata" playlist (id = 1)
+    //
+
+
+    uint how_many;
+
+    Playlist *the_playlist = NULL;
     
+    if(container_id != 1)
+    {
+        the_playlist = parent->getPlaylist(container_id);
+        if(!the_playlist)
+        {
+            warning("daapserver was asked for a playlist it can't find");
+            return;
+        }
+        else
+        {
+            how_many = the_playlist->getCount();
+        }
+    }
+    else
+    {
+        how_many = parent->getAllAudioMetadataCount();
+    }
     
+    TagOutput response;
 
     response << Tag( 'apso' ) << Tag('mstt') << (u32) DAAP_OK << end 
              << Tag('muty') << (u8) 0 << end 
-             << Tag('mtco') << (u32) the_playlist->getCount() << end 
-             << Tag('mrco') << (u32) the_playlist->getCount() << end 
+             << Tag('mtco') << (u32) how_many << end 
+             << Tag('mrco') << (u32) how_many << end 
+
              << Tag('mlcl');
              
                 //
@@ -929,7 +999,10 @@ void DaapServer::sendContainer(httpd *server, u32 container_id)
                 //
 
                 
-                if(the_playlist->getId() > 1)
+                parent->lockMetadata();
+                parent->lockPlaylists();
+
+                if(container_id != 1)
                 {
                     QValueList<uint> songs_in_list = the_playlist->getList();
                     typedef QValueList<uint> UINTList;
@@ -945,19 +1018,44 @@ void DaapServer::sendContainer(httpd *server, u32 container_id)
                 }
                 else
                 {
-                    current_metadata = all_the_metadata->getCurrentMetadata();
+                    //
+                    //  If it's playlist #1, that's *all* the metadata
+                    //
 
-                    QIntDictIterator<AudioMetadata> iterator(*current_metadata);
-                    for( ; iterator.current(); ++iterator)
+                    MetadataContainer *a_container = NULL;
+                    for (   
+                            a_container = metadata_containers->first(); 
+                            a_container; 
+                            a_container = metadata_containers->next() 
+                        )
                     {
-                        response << Tag('mlit') 
-                                    << Tag('mikd') << (u8) 2  << end
-                                    << Tag('miid') << (u32) iterator.current()->getId() << end 
-                                    << Tag('mcti') << (u32) iterator.current()->getId() << end 
-                                 << end;
+
+                        if(a_container->isAudio())
+                        {
+                            QIntDict<Metadata>     *which_metadata;
+                            which_metadata = a_container->getMetadata();
+
+                            QIntDictIterator<Metadata> iterator(*which_metadata);
+            
+                            for( ; iterator.current(); ++iterator)
+                            {
+                                if(iterator.current()->getType() == MDT_audio)
+                                {
+                                    AudioMetadata *which_item = (AudioMetadata*)iterator.current();
+                                    response << Tag('mlit') 
+                                                << Tag('mikd') << (u8) 2  << end
+                                                << Tag('miid') << (u32) which_item->getId() << end 
+                                                << Tag('mcti') << (u32) which_item->getId() << end 
+                                             << end;
+                                }
+                            }
+                        }
                     }
                 }
-                
+
+                parent->unlockPlaylists();
+                parent->unlockMetadata();
+
              response << end 
              << end;
 

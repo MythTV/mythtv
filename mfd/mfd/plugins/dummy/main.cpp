@@ -82,12 +82,12 @@ bool mfdplugin_run()
 //
 //  This is how the mfd passes commands
 //  to this plugin. Note that the plugin
-//  cannot use the *socket directly to 
+//  cannot use a QSocket directly to 
 //  return data to the client, because
 //  QSocket is not even reentrant, let
 //  alone threadsafe. It uses a reference
-//  in a CustomEvent that gets passed up
-//  to the mfd.
+//  (socket_identifier) in a CustomEvent 
+//  that gets passed up to the mfd.
 //
 
 void mfdplugin_parse_tokens(const QStringList &tokens, int socket_identifier)

@@ -102,8 +102,9 @@ class ServiceEvent : public QCustomEvent
     //
     //  This is used to pass a message up from a plugin and then back down
     //  to services handling plugin. 'fer example, the audio plugin needs to
-    //  let the zeroconfig responder plugin about where and how to connect
-    //  to the macp (Myth Audio Control Protocol). This is how it does so
+    //  let the zeroconfig responder plugin know about where and how to
+    //  connect to the macp (Myth Audio Control Protocol). This is how it
+    //  does so
     //
   
   public:
@@ -117,5 +118,21 @@ class ServiceEvent : public QCustomEvent
     
 };
 
+class MetadataChangeEvent : public QCustomEvent
+{
+    //
+    //  Whenever any metadata container/monitor has found new/changed
+    //  metadata, it emits this.
+    //
+    
+  public:
+  
+    MetadataChangeEvent(int which_collection);
+    int getIdentifier();
+    
+  private:
+  
+    int identifier;
+};
 
 #endif

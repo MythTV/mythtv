@@ -36,21 +36,18 @@ class DaapServer: public MFDServicePlugin
     void    sendUpdate(httpd *server, u32 database_version);
     void    sendMetadata(httpd *server, QString request_path, DaapRequest *daap_request);
     void    sendDatabaseList(httpd *server);
-    void    sendDatabase(httpd *server, DaapRequest *daap_request);
+    void    sendDatabase(httpd *server, DaapRequest *daap_request, int which_database);
     void    sendDatabaseItem(httpd *server, u32 song_id);
-    void    sendContainers(httpd *server, DaapRequest *daap_request);
-    void    sendContainer(httpd *server, u32 container_id);
+    void    sendContainers(httpd *server, DaapRequest *daap_request, int which_database);
+    void    sendContainer(httpd *server, u32 container_id, int which_database);
     bool    wantsToContinue(){return keep_going;}
 
-
-
-
     DaapSessions daap_sessions;
+
   private:
   
-    MetadataContainer        *all_the_metadata;
-    QIntDict<AudioMetadata>  *current_metadata;
-    QPtrList<MPlaylist>      *current_playlists;
+    QPtrList<MetadataContainer> *metadata_containers;
+
     QString service_name;
 
 };

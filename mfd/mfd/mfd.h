@@ -34,9 +34,19 @@ class MFD : public QObject
   
     MFD(QSqlDatabase *db, int port, bool log_stdout, int logging_verbosity);
     ~MFD();
-    MetadataContainer*   getMetadataContainer();
-
-    void    debugSayHello();
+    
+    QPtrList<MetadataContainer>* getMetadataContainers(){return metadata_containers;}
+    uint                         getMetadataGeneration(){return metadata_generation;}
+    int                          bumpMetadataId();
+    int                          bumpPlaylistId();
+    uint                         getAllAudioMetadataCount();
+    uint                         getAllAudioPlaylistCount();
+    void                         lockMetadata();
+    void                         unlockMetadata();
+    void                         lockPlaylists();
+    void                         unlockPlaylists();
+    Metadata*                    getMetadata(int id);
+    Playlist*                    getPlaylist(int id);
     
   public slots:
   
@@ -67,16 +77,33 @@ class MFD : public QObject
     void sendMessage(MFDClientSocket *where, const QString &what);
     void sendMessage(const QString &the_message);
     void doListCapabilities(const QStringList &tokens, MFDClientSocket *socket);
+    void makeMetadataContainers();
 
-    QSqlDatabase               *db;
-    MetadataContainer          *metadata_container;
-    MFDLogger                  *mfd_log;
-    MFDPluginManager           *plugin_manager;
-    MFDServerSocket            *server_socket;
-    QPtrList <MFDClientSocket> connected_clients;
-    bool                       shutting_down;    
-    bool                       watchdog_flag;
-    int                        port_number;
+    int  bumpMetadataContainerIdentifier();
+    int  bumpMetadataGeneration();
+    
+
+    QSqlDatabase                *db;
+    MFDLogger                   *mfd_log;
+    MFDPluginManager            *plugin_manager;
+    MFDServerSocket             *server_socket;
+    QPtrList <MFDClientSocket>  connected_clients;
+    bool                        shutting_down;    
+    bool                        watchdog_flag;
+    int                         port_number;
+
+    QPtrList<MetadataContainer> *metadata_containers;
+    int                         metadata_container_identifier;
+    uint                        metadata_generation;
+    
+    int                         metadata_id;
+    int                         playlist_id;
+
+    QMutex                      bump_metadata_id_mutex;
+    QMutex                      bump_playlist_id_mutex;
+
+    QMutex                      metadata_mutex;
+    QMutex                      playlist_mutex;
 };
 
 #endif  // mfd_h_
