@@ -1001,7 +1001,7 @@ void ThemedMenu::parseMenu(QString menuname, int row, int col)
 
         while (!buttonRows[currentrow].visible)
         {
-            makeRowVisible(oldrow + 1, oldrow);
+            makeRowVisible(oldrow + 1, oldrow, false);
             oldrow = oldrow + 1;
         }
 
@@ -1246,7 +1246,7 @@ void ThemedMenu::positionButtons(bool resetpos)
     }
 }
 
-bool ThemedMenu::makeRowVisible(int newrow, int oldrow)
+bool ThemedMenu::makeRowVisible(int newrow, int oldrow, bool forcedraw)
 {
     if (buttonRows[newrow].visible)
         return true;
@@ -1286,7 +1286,9 @@ bool ThemedMenu::makeRowVisible(int newrow, int oldrow)
     buttonRows[newrow].visible = true;
 
     positionButtons(false);
-    clearToBackground();
+
+    if (forcedraw)
+        clearToBackground();
 
     return true;
 }

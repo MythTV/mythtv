@@ -123,7 +123,7 @@ class ThemedMenu : public MythDialog
                    QString &action);
     void layoutButtons(void);
     void positionButtons(bool resetpos);   
-    bool makeRowVisible(int newrow, int oldrow);
+    bool makeRowVisible(int newrow, int oldrow, bool forcedraw = true);
 
     void handleAction(QString &action);
     bool findDepends(QString file);

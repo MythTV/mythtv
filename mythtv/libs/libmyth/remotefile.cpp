@@ -1,4 +1,3 @@
-#include <qapplication.h>
 #include <qsocket.h>
 #include <qurl.h>
 
@@ -147,7 +146,6 @@ void RemoteFile::Close(void)
     
     lock.unlock();
 
-    qApp->lock();
     if (sock)
     {
         delete sock;
@@ -158,7 +156,6 @@ void RemoteFile::Close(void)
         delete controlSock;
         controlSock = NULL;
     }    
-    qApp->unlock();
 }
 
 void RemoteFile::Reset(void)
@@ -171,12 +168,10 @@ void RemoteFile::Reset(void)
     while (sock->bytesAvailable() > 0)
     {
         lock.lock();
-        qApp->lock();
         avail = sock->bytesAvailable();
         trash = new char[avail + 1];
         sock->readBlock(trash, avail);
         delete [] trash;
-        qApp->unlock();
         lock.unlock();
 
         VERBOSE(VB_NETWORK, QString ("%1 bytes available during reset.")
