@@ -311,23 +311,7 @@ void MFDServicePlugin::run()
         updateSockets();
         waitForSomethingToHappen();
         checkInternalMessages();
-        if(metadata_changed_flag)
-        {
-            //
-            //  The mfd has "pushed" us the information that some collection
-            //  of metadata has changed. Deal with it (default
-            //  implementation is to do nothing)
-            //
-
-            int which_collection;
-            bool external_flag;
-            metadata_changed_mutex.lock();
-                which_collection = metadata_collection_last_changed;
-                external_flag = metadata_change_external_flag;
-                metadata_changed_flag = false;
-            metadata_changed_mutex.unlock();
-            handleMetadataChange(which_collection, external_flag);
-        }
+        checkMetadataChanges();
     }
 
 }
@@ -650,6 +634,27 @@ void MFDServicePlugin::checkInternalMessages()
     if(message.length() > 0)
     {
         handleInternalMessage(message);
+    }
+}
+
+void MFDServicePlugin::checkMetadataChanges()
+{
+    if(metadata_changed_flag)
+    {
+        //
+        //  The mfd has "pushed" us the information that some collection
+        //  of metadata has changed. Deal with it (default
+        //  implementation is to do nothing)
+        //
+
+        int which_collection;
+        bool external_flag;
+        metadata_changed_mutex.lock();
+            which_collection = metadata_collection_last_changed;
+            external_flag = metadata_change_external_flag;
+            metadata_changed_flag = false;
+        metadata_changed_mutex.unlock();
+        handleMetadataChange(which_collection, external_flag);
     }
 }
 

@@ -1479,29 +1479,36 @@ void MetadataServer::sendFullLists(MetadataContainer *container, MdcapOutput *re
     QTime container_timer;
     container_timer.start();
 
+    int playlist_count = 0;
 
     QIntDict<Playlist> *playlists = container->getPlaylists();
+    
+    if(playlists)
+    {
+        playlist_count = playlists->count();
+    }
             
     response->addListGroup();
-
         response->addCollectionId(container->getIdentifier());
         response->addCollectionGeneration(container->getGeneration());
         response->addUpdateType(true);
-        response->addTotalItems(playlists->count());
-        response->addAddedItems(playlists->count());
+        response->addTotalItems(playlist_count);
+        response->addAddedItems(playlist_count);
         response->addDeletedItems(0);
                 
-        response->addAddedListsGroup();
+        if(playlist_count > 0)
+        {
+            response->addAddedListsGroup();
                     
-            QIntDictIterator<Playlist> it( *playlists ); 
-            Playlist *a_playlist;
-            for ( ; (a_playlist = it.current()); ++it )   
-            {
-                addAudioList(response, a_playlist, container);
-            }
+                QIntDictIterator<Playlist> it( *playlists ); 
+                Playlist *a_playlist;
+                for ( ; (a_playlist = it.current()); ++it )   
+                {
+                    addAudioList(response, a_playlist, container);
+                }
                 
-        response->endGroup();
-
+            response->endGroup();
+        }
     response->endGroup();
 }
 
@@ -1510,8 +1517,16 @@ void MetadataServer::sendDeltaLists(MetadataContainer *container, MdcapOutput *r
     QTime container_timer;
     container_timer.start();
 
+    int playlist_count = 0;
 
     QIntDict<Playlist> *playlists = container->getPlaylists();
+    
+    if(playlists)
+    {
+        playlist_count = playlists->count();
+    }
+            
+
     QValueList<int> playlist_additions = container->getPlaylistAdditions();
     QValueList<int> playlist_deletions = container->getPlaylistDeletions();
             
@@ -1520,11 +1535,11 @@ void MetadataServer::sendDeltaLists(MetadataContainer *container, MdcapOutput *r
         response->addCollectionId(container->getIdentifier());
         response->addCollectionGeneration(container->getGeneration());
         response->addUpdateType(false);
-        response->addTotalItems(playlists->count());
+        response->addTotalItems(playlist_count);
         response->addAddedItems(playlist_additions.count());
         response->addDeletedItems(playlist_deletions.count());
                 
-        if(playlist_additions.count() > 0)
+        if(playlist_additions.count() > 0 && playlists)
         {
             response->addAddedListsGroup();
                 QValueList<int>::iterator it;
@@ -1936,10 +1951,25 @@ void MetadataServer::dealWithListCommit(HttpInRequest *http_request, MdcapReques
                         unlockMetadata();
                         return;
                     }
-                    new_playlist->mapIdToDatabase(
-                                                    metadata_container->getMetadata(),
-                                                    metadata_container->getPlaylists()
-                                                );
+                    
+                    QIntDict<Metadata> *all_the_metadata 
+                                    = metadata_container->getMetadata();
+                    QIntDict<Playlist> *all_the_playlist 
+                                    = metadata_container->getPlaylists();
+
+                    if(all_the_metadata && all_the_playlist)
+                    {
+
+                        new_playlist->mapIdToDatabase(
+                                                        all_the_metadata,
+                                                        all_the_playlist
+                                                     );
+                    }
+                    else
+                    {
+                        warning("can't call mapIdToDatabase(), because of "
+                                "NULLs for metadata and/or playlists");
+                    } 
                 unlockMetadata();
             }
 

@@ -14,8 +14,9 @@
 
 #include <iostream>
 using namespace std;
-
+#include <qapplication.h>
 #include "database.h"
+#include "mfd_events.h"
 
 #include "daapclient.h"
 
@@ -1682,8 +1683,6 @@ void Database::doTheMetadataSwap(int new_generation)
 
         new_metadata = NULL;
         new_playlists = NULL;
-
-
     }
     else    //  this was a partial update from the daap server
     {
@@ -1775,6 +1774,16 @@ void Database::doTheMetadataSwap(int new_generation)
     
     generation_delta = new_generation;
     update_type_set = false;
+
+
+    //
+    //  Something changed. Fire off an event (this will tell the
+    //  mfd to tell all the plugins (that care) that it's time
+    //  to update).
+    //
+                
+    MetadataChangeEvent *mce = new MetadataChangeEvent(container_id);
+    QApplication::postEvent(the_mfd, mce);    
 }
 
 void Database::beIgnorant()

@@ -42,6 +42,8 @@ class AudioPlugin: public MFDServicePlugin
     void    stopPlaylistMode();
     void    playFromPlaylist(int augment_index = 0);
     void    nextPrevAudio(bool forward);
+    void    handleMetadataChange(int which_collection, bool external=false);
+        
         
   private:
   

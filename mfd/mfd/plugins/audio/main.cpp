@@ -18,6 +18,7 @@ bool         mfdplugin_init(MFD*, int);
 bool         mfdplugin_run();
 bool         mfdplugin_stop();
 bool         mfdplugin_can_unload();
+void         mfdplugin_metadata_change(int, bool);
 }
 
 bool mfdplugin_init(MFD *owner, int identifier)
@@ -58,4 +59,12 @@ bool mfdplugin_can_unload()
         return false;
     }
     return true;
+}
+
+void mfdplugin_metadata_change(int which_collection, bool external)
+{
+    if(audio_plugin)
+    {
+        audio_plugin->metadataChanged(which_collection, external);
+    }
 }

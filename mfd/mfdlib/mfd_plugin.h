@@ -164,6 +164,7 @@ class MFDServicePlugin : public MFDBasePlugin
     void            sendMessage(const QString &message);
     void            sendInternalMessage(const QString &the_message);
     void            checkInternalMessages();
+    void            checkMetadataChanges();
     virtual void    handleInternalMessage(QString the_message);
 
     virtual void    processRequest(MFDServiceClientSocket *a_client);

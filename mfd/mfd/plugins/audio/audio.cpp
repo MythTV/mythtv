@@ -121,7 +121,7 @@ void AudioPlugin::run()
         updateSockets();
         waitForSomethingToHappen();
         checkInternalMessages();
-        
+        checkMetadataChanges();
     }
 
     stopAudio();
@@ -1067,6 +1067,68 @@ void AudioPlugin::nextPrevAudio(bool forward)
         playFromPlaylist(-1);
     }
 }
+
+void AudioPlugin::handleMetadataChange(int which_collection, bool /*external*/)
+{
+    state_of_play_mutex->lock();
+    playlist_mode_mutex.lock();
+
+        //
+        //  We only care if we are playing something
+        //
+
+        if (!is_playing && !is_paused)
+        {
+            state_of_play_mutex->unlock();
+            playlist_mode_mutex.unlock();
+            return;
+        }
+
+        //
+        //  We need to check if the track we are currently playing has changed
+        //  and/or disappered
+        //
+
+        bool stop_current_track = false;
+        bool exit_current_list  = false;
+        
+        if(which_collection == current_collection)
+        {
+            metadata_server->lockMetadata();
+                MetadataContainer *which_one = metadata_server->getMetadataContainer(which_collection);
+                if(which_one)
+                {
+                    QValueList<int> item_deletions = which_one->getMetadataDeletions();
+                    if (item_deletions.contains(current_metadata))
+                    {
+                        stop_current_track = true;
+                    }
+                    QValueList<int> list_deletions = which_one->getPlaylistDeletions();
+                    if (list_deletions.contains(current_playlist))
+                    {
+                        exit_current_list = true;
+                    }
+                }
+                else
+                {
+                    stop_current_track = true;
+                    exit_current_list = true;
+                } 
+            metadata_server->unlockMetadata();
+        }
+
+    playlist_mode_mutex.unlock();
+    if(exit_current_list)
+    {
+        stopPlaylistMode();
+    }
+    state_of_play_mutex->unlock();
+    if(stop_current_track)
+    {
+        stopAudio();
+    }
+}
+
 
 AudioPlugin::~AudioPlugin()
 {
