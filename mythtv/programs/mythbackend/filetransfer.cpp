@@ -69,8 +69,8 @@ bool FileTransfer::RequestBlock(int size)
     if (!readthreadlive)
         return true;
 
-    if (size > 128000)
-        size = 128000;
+    if (size > 256000)
+        size = 256000;
 
     bool locked = false;
     QTime curtime = QTime::currentTime();
@@ -137,7 +137,7 @@ long long FileTransfer::Seek(long long curpos, long long pos, int whence)
 
 void FileTransfer::DoFTReadThread(void)
 {
-    char *buffer = new char[128001];
+    char *buffer = new char[256001];
 
     readthreadlive = true;
     while (readthreadlive && rbuffer)
