@@ -27,6 +27,11 @@ extern "C" {
 #include <math.h>
 }
 
+#include <mythtv/uitypes.h>
+#include <mythtv/uilistbtntype.h>
+#include <mythtv/xmlparse.h>
+#include <mythtv/dialogbox.h>
+
 #include "gallerysettings.h"
 #include "thumbgenerator.h"
 #include "singleview.h"
@@ -67,7 +72,16 @@ IconView::IconView(QSqlDatabase *db, const QString& galleryDir,
 
 IconView::~IconView()
 {
-    delete m_thumbGen;    
+    UIListBtnTypeItem* item = m_menuType->GetItemFirst();
+    while (item) {
+        Action *act = (Action*) item->getData();
+        if (act)
+            delete act;
+        item = m_menuType->GetItemNext(item);
+    }
+    
+    delete m_thumbGen;
+    delete m_theme;
 }
 
 void IconView::paintEvent(QPaintEvent *e)
@@ -283,7 +297,7 @@ void IconView::keyPressEvent(QKeyEvent *e)
         else if (action == "SELECT" || action == "PLAY")
         {
             if (m_inMenu) {
-                m_menuType->Toggle();
+                pressMenu();
                 menuHandled = true;
             }
             else {
@@ -467,22 +481,21 @@ void IconView::loadTheme()
                   << std::endl;
         exit(-1);
     }
-    connect(m_menuType, SIGNAL(itemChecked(int,bool)),
-            SLOT(slotMenuPressed(int,bool)));
 
-    // Menu Actions (Insert in reverse order)
-    m_actions.insert("SlideShow", &IconView::actionSlideShow);
-    m_actions.insert("Rotate CW", &IconView::actionRotateCW);
-    m_actions.insert("Rotate CCW", &IconView::actionRotateCCW);
-    m_actions.insert("Import", &IconView::actionImport);
-    m_actions.insert("Settings", &IconView::actionSettings);
+    // Menu Actions
 
-    // sucks ... can't use an iterator. qmap sorts items alphabetically
-    m_menuType->AddItem("SlideShow");
-    m_menuType->AddItem("Rotate CW");
-    m_menuType->AddItem("Rotate CCW");
-    m_menuType->AddItem("Import");
-    m_menuType->AddItem("Settings");
+    UIListBtnTypeItem* item;
+    item = new UIListBtnTypeItem(m_menuType, tr("SlideShow"));
+    item->setData(new Action(&IconView::actionSlideShow));
+    item = new UIListBtnTypeItem(m_menuType, tr("Rotate CW"));
+    item->setData(new Action(&IconView::actionRotateCW));
+    item = new UIListBtnTypeItem(m_menuType, tr("Rotate CCW"));
+    item->setData(new Action(&IconView::actionRotateCCW));
+    item = new UIListBtnTypeItem(m_menuType, tr("Import"));
+    item->setData(new Action(&IconView::actionImport));
+    item = new UIListBtnTypeItem(m_menuType, tr("Settings"));
+    item->setData(new Action(&IconView::actionSettings));
+    
     m_menuType->SetActive(false);
 
     container = m_theme->GetSet("view");
@@ -733,6 +746,17 @@ bool IconView::moveRight()
     return true;
 }
 
+void IconView::pressMenu()
+{
+    UIListBtnTypeItem* item = m_menuType->GetItemCurrent();
+
+    if (!item || !item->getData())
+        return;
+
+    Action *act = (Action*) item->getData();
+    (this->*(*act))();
+}
+
 void IconView::actionRotateCW()
 {
     ThumbItem* item = m_itemList.at(m_currRow * m_nCols +
@@ -940,20 +964,5 @@ void IconView::importFromDir(const QString &fromDir, const QString &toDir)
             QString cmd = "cp \"" + fi->absFilePath() + "\" \"" + toDir + "\"";
             system(cmd);
         }
-    }
-}
-
-
-void IconView::slotMenuPressed(int itemPos, bool)
-{
-    const UIListBtnType::UIListBtnTypeItem* item =
-        m_menuType->GetItem(itemPos);
-
-    if (!item)
-        return;
-
-    if (m_actions.contains(item->text)) {
-        Action act = m_actions[item->text];
-        (this->*act)();
     }
 }

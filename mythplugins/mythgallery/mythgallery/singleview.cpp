@@ -24,6 +24,8 @@
 #include <qfileinfo.h>
 #include <qdir.h>
 
+#include <mythtv/mythcontext.h>
+
 #include "singleview.h"
 
 SingleView::SingleView(QSqlDatabase *db, ThumbList itemList,

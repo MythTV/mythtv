@@ -14,6 +14,7 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdialogs.h>
 #include <mythtv/mythplugin.h>
+#include <mythtv/dialogbox.h>
 
 extern "C" {
 int mythplugin_init(const char *libversion);

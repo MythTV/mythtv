@@ -30,6 +30,8 @@
 #include <qfileinfo.h>
 #include <qdir.h>
 
+#include <mythtv/mythcontext.h>
+
 #include "glsingleview.h"
 
 GLSDialog::GLSDialog(QSqlDatabase *db, const ThumbList& itemList,

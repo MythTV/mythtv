@@ -22,16 +22,16 @@
 
 #include <qptrlist.h>
 #include <qdict.h>
-#include <qmap.h>
 #include <qstring.h>
 #include <qpixmap.h>
 
-#include <mythtv/uitypes.h>
-#include <mythtv/xmlparse.h>
 #include <mythtv/mythdialogs.h>
-#include <mythtv/dialogbox.h>
 
 class QSqlDatabase;
+
+class XMLParse;
+class UIListBtnType;
+
 class ThumbGenerator;
 
 class ThumbItem
@@ -60,8 +60,7 @@ typedef QPtrList<ThumbItem> ThumbList;
 
 class IconView : public MythDialog
 {
-    Q_OBJECT
-    
+
 public:
 
     IconView(QSqlDatabase *db, const QString& galleryDir,
@@ -73,10 +72,6 @@ protected:
     void paintEvent(QPaintEvent *e);
     void keyPressEvent(QKeyEvent *e);
     void customEvent(QCustomEvent *e);
-
-private slots:
-
-    void slotMenuPressed(int itemPos, bool);
     
 private:
 
@@ -97,6 +92,8 @@ private:
     void actionSlideShow();
     void actionSettings();
     void actionImport();
+
+    void pressMenu();
 
     void loadThumbnail(ThumbItem *item);
     void importFromDir(const QString &fromDir, const QString &toDir);
@@ -138,7 +135,6 @@ private:
     ThumbGenerator     *m_thumbGen;
 
     typedef void (IconView::*Action)();
-    QMap<QString,Action> m_actions;
 };
 
 
