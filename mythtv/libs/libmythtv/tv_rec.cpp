@@ -2057,16 +2057,30 @@ void TVRec::GetNextProgram(int direction,
     }
     else
     {
-        QDateTime curtime = QDateTime::currentDateTime();
-        starttime = curtime.toString("yyyyMMddhhmm") + "00";
+        // Couldn't get program info, so get the channel info and clear 
+        // everything else.
+        starttime = "";
+        endtime = "";
+        title = "";
+        subtitle = "";
+        desc = "";
+        category = "";
+        seriesid = "";
+        programid = "";
 
-        querystr = QString("SELECT channum FROM channel WHERE chanid = %1;")
+        querystr = QString("SELECT channum, callsign, icon, chanid FROM "
+                           "channel WHERE chanid = %1;")
                            .arg(chanid);
         sqlquery = db_conn->exec(querystr);
 
-        if ((sqlquery.isActive()) && (sqlquery.numRowsAffected() > 0))
-            if (sqlquery.next())
-                channelname = sqlquery.value(0).toString();
+        if (sqlquery.isActive() && sqlquery.numRowsAffected() > 0 && 
+            sqlquery.next())
+        {
+            channelname = sqlquery.value(0).toString();
+            callsign = sqlquery.value(1).toString();
+            iconpath = sqlquery.value(2).toString();
+            chanid = sqlquery.value(3).toString();
+        }
     }
 
     pthread_mutex_unlock(&db_lock);
