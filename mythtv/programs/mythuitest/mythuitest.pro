@@ -5,6 +5,13 @@ INCLUDEPATH += ../../libs/libmythui ../../libs/libmyth
 DEPENDPATH += ../../libs/libmythui ../../libs/libmyth
 
 LIBS += -L../../libs/libmythui -lmythui-$$LIBVERSION
+isEmpty(QMAKE_EXTENSION_SHLIB) {
+  QMAKE_EXTENSION_SHLIB=so
+}
+isEmpty(QMAKE_EXTENSION_LIB) {
+  QMAKE_EXTENSION_LIB=a
+}
+TARGETDEPS += ../../libs/libmyth/libmythui-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 
 macx {
     # OS X complains about indirectly linked libraries
