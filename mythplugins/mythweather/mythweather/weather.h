@@ -124,7 +124,6 @@ class Weather : public MythDialog
 
     QString cityNames[9];
     QString newLocaleHold;
-    QString baseDir;
     QString cfgCity;
 
     int con_attempt;

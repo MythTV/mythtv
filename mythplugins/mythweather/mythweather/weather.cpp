@@ -77,13 +77,6 @@ Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent,
     newlocRect = QRect(0, 0, size().width(), size().height());
 
 
-    if (debug == true)
-        cerr << "MythWeather: Reading InstallPrefix from context.\n";
-
-    baseDir = gContext->GetInstallPrefix();
-    if (debug == true)
-        cerr << "MythWeather: baseDir = " << baseDir << endl;
-
     theme = new XMLParse();
     theme->SetWMult(wmult);
     theme->SetHMult(hmult);
@@ -114,7 +107,7 @@ Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent,
 
     updateBackground();
 
-    QString accid = baseDir + "/share/mythtv/mythweather/accid.dat";
+    QString accid = gContext->GetShareDir() + "mythweather/accid.dat";
 
     accidFile.open(accid, ios::in | ios::binary);
     if (!accidFile)
@@ -934,10 +927,11 @@ void Weather::loadWeatherTypes()
    char temporary[256];
    int wCount = 0;
 
-   ifstream weather_data(baseDir + "/share/mythtv/mythweather/weathertypes.dat", ios::in);
+   ifstream weather_data(gContext->GetShareDir() +
+                         "mythweather/weathertypes.dat", ios::in);
    if (weather_data == NULL)
    {
-        cerr << "MythWeather: Error reading " << baseDir << "/share/mythtv/mythweather/weathertypes.dat...exiting...\n";
+        cerr << "MythWeather: Error reading " << gContext->GetShareDir() << "mythweather/weathertypes.dat...exiting...\n";
         exit(-1); 
    }
 
@@ -2536,8 +2530,7 @@ bool Weather::GetStaticRadarMap()
         return false;
     }
 
-    char *home = getenv("HOME");
-    QString fileprefix = QString(home) + "/.mythtv";
+    QString fileprefix = MythContext::GetConfDir();
 
     QDir dir(fileprefix);
     if (!dir.exists())
@@ -2618,8 +2611,7 @@ bool Weather::GetAnimatedRadarMap()
          return false;
      }
 
-     char *home = getenv("HOME");
-     QString fileprefix = QString(home) + "/.mythtv";
+     QString fileprefix = MythContext::GetConfDir();
 
      QDir dir(fileprefix);
      if (!dir.exists())
