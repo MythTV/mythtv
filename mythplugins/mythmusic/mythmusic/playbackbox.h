@@ -21,6 +21,7 @@ class QListView;
 class QListViewItem;
 class QSlider;
 class ScrollLabel;
+class MyButton;
 
 class PlaybackBox : public QDialog
 {
@@ -48,12 +49,18 @@ class PlaybackBox : public QDialog
     void seek(int);
     void changeSong();
     void stopAll();
+    void toggleShuffle();
+    void toggleRepeat();
+    void editPlaylist();
+    void nextAuto();
 
   private slots:
     void startseek();
     void doneseek();
 
   private:
+    void setupPlaylist(bool toggle = false);
+
     QIODevice *input;
     Output *output;
     Decoder *decoder;
@@ -68,7 +75,10 @@ class PlaybackBox : public QDialog
     QSqlDatabase *db;
 
     QValueList<Metadata> *plist;
+    QValueList<int> playlistorder;
+
     int playlistindex;
+    int shuffleindex;
     Metadata curMeta;
 
     QLabel *timelabel;
@@ -78,6 +88,12 @@ class PlaybackBox : public QDialog
     QPtrList<QListViewItem> listlist;
 
     QSlider *seekbar;
+
+    MyButton *randomize;
+    MyButton *repeat;
+
+    bool shufflemode;
+    bool repeatmode;
 };
 
 #endif

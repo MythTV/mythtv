@@ -97,7 +97,7 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
 
     QVBoxLayout *vbox = new QVBoxLayout(this, 20 * wmult);
 
-    QVBoxLayout *vbox2 = new QVBoxLayout(vbox, 2);
+    QVBoxLayout *vbox2 = new QVBoxLayout(vbox, 2 * wmult);
 
     QGroupBox *topdisplay = new QGroupBox(this);
     vbox2->addWidget(topdisplay);
@@ -108,7 +108,7 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     topdisplay->setFrameShadow(QFrame::Sunken);
     topdisplay->setPaletteBackgroundColor(QColor("grey"));
 
-    QVBoxLayout *framebox = new QVBoxLayout(topdisplay, 10);
+    QVBoxLayout *framebox = new QVBoxLayout(topdisplay, 10 * wmult);
 
     titlelabel = new ScrollLabel(topdisplay);
     titlelabel->setText("  ");
@@ -130,7 +130,7 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
 
     vbox2->addWidget(seekbar);
 
-    QHBoxLayout *controlbox = new QHBoxLayout(vbox2, 2);
+    QHBoxLayout *controlbox = new QHBoxLayout(vbox2, 2 * wmult);
 
     MyButton *prevfileb = new MyButton(this);
     prevfileb->setAutoRaise(true);
@@ -174,6 +174,31 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     controlbox->addWidget(stopb);
     controlbox->addWidget(nextb);
     controlbox->addWidget(nextfileb);
+
+    QHBoxLayout *secondcontrol = new QHBoxLayout(vbox2, 2 * wmult);
+
+    randomize = new MyButton(this);
+    randomize->setAutoRaise(true);
+    randomize->setText("Shuffle: Normal");
+    randomize->setFont(QFont("Arial", 14 * hmult, QFont::Bold));
+    secondcontrol->addWidget(randomize);
+    connect(randomize, SIGNAL(clicked()), this, SLOT(toggleShuffle()));
+
+    repeat = new MyButton(this);
+    repeat->setAutoRaise(true);
+    repeat->setText("Repeat Playlist");
+    repeat->setFont(QFont("Arial", 14 * hmult, QFont::Bold));
+    secondcontrol->addWidget(repeat);
+    connect(repeat, SIGNAL(clicked()), this, SLOT(toggleRepeat()));
+
+    MyButton *pledit = new MyButton(this);
+    pledit->setAutoRaise(true);
+    pledit->setText("Edit Playlist");
+    pledit->setFont(QFont("Arial", 14 * hmult, QFont::Bold));
+    secondcontrol->addWidget(pledit);
+    connect(pledit, SIGNAL(clicked()), this, SLOT(editPlaylist()));
+
+    pledit->setDisabled(true);
 
     playview = new QListView(this);
     playview->addColumn("#");
@@ -228,7 +253,12 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
 
     plist = playlist; 
     playlistindex = 0;
-   
+
+    shufflemode = false;
+    repeatmode = false;  
+
+    setupPlaylist();
+
     if (plist->size() > 0)
     { 
         curMeta = ((*plist)[playlistindex]);
@@ -247,6 +277,53 @@ void PlaybackBox::Show(void)
 {
     showFullScreen();
     setActiveWindow();
+}
+
+void PlaybackBox::setupPlaylist(bool toggle)
+{
+    if (toggle)
+        shufflemode = !shufflemode;
+
+    if (playlistorder.size() > 0)
+        playlistorder.clear();
+
+    if (!shufflemode)
+    {
+        for (int i = 0; i < (int)plist->size(); i++)
+            playlistorder.push_back(i);
+    }
+    else
+    {
+        int max = plist->size();
+        srand((unsigned int)time(NULL));
+
+        int i;
+        bool usedList[max];
+        for (i = 0; i < max; i++)
+            usedList[i] = false;
+
+        bool used = true;
+        int index = 0; 
+        int lastindex = 0;
+
+        for (i = 0; i < max; i++)
+        {
+            while (used)
+            {
+                index = (int)((double)rand() / (RAND_MAX + 1.0) * max);
+                if (usedList[index] == false)
+                    used = false;
+                if (max - i > 50 && abs(index - lastindex) < 10)
+                    used = true;
+            }
+            usedList[index] = true;
+            playlistorder.push_back(index);
+            used = true;
+            lastindex = index;
+        }
+    }
+
+    shuffleindex = playlistorder.findIndex(playlistindex);
 }
 
 void PlaybackBox::play()
@@ -391,6 +468,10 @@ void PlaybackBox::stop(void)
 
     delete input;
     input = 0;
+
+    seekbar->setValue(0);
+    timeString.sprintf("%02d:%02d", 0, 0);
+    timelabel->setText(timeString);
 }
 
 void PlaybackBox::stopAll()
@@ -407,9 +488,11 @@ void PlaybackBox::previous()
 {
     stop();
 
-    playlistindex--;
-    if (playlistindex < 0)
-        playlistindex = plist->size() - 1;
+    shuffleindex--;
+    if (shuffleindex < 0)
+        shuffleindex = plist->size() - 1;
+
+    playlistindex = playlistorder[shuffleindex];
 
     curMeta = ((*plist)[playlistindex]);
     playfile = curMeta.Filename();
@@ -421,14 +504,26 @@ void PlaybackBox::next()
 {
     stop();
 
-    playlistindex++;
-    if (playlistindex >= (int)plist->size())
-        playlistindex = 0;
+    shuffleindex++;
+    if (shuffleindex >= (int)plist->size())
+        shuffleindex = 0;
+
+    playlistindex = playlistorder[shuffleindex];
 
     curMeta = ((*plist)[playlistindex]);
     playfile = curMeta.Filename();
 
     play();
+}
+
+void PlaybackBox::nextAuto()
+{
+    stop();
+
+    if (repeatmode)
+        play();
+    else 
+        next();
 }
 
 void PlaybackBox::seekforward()
@@ -478,6 +573,29 @@ void PlaybackBox::changeSong()
 {
     stop();
     play();
+}
+
+void PlaybackBox::toggleShuffle()
+{
+    setupPlaylist(true);
+    if (shufflemode)
+        randomize->setText("Shuffle: Random");
+    else
+        randomize->setText("Shuffle: Normal"); 
+}
+
+void PlaybackBox::toggleRepeat()
+{
+    repeatmode = !repeatmode;
+
+    if (repeatmode)
+        repeat->setText("Repeat Track");
+    else
+        repeat->setText("Repeat Playlist");
+}
+
+void PlaybackBox::editPlaylist()
+{
 }
 
 void PlaybackBox::closeEvent(QCloseEvent *event)
@@ -566,7 +684,7 @@ void PlaybackBox::customEvent(QCustomEvent *event)
     case DecoderEvent::Finished:
         {
             statusString = tr("Finished playing stream.");
-            next();
+            nextAuto();
             break;
         }
 

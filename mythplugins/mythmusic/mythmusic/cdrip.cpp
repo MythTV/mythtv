@@ -145,12 +145,12 @@ Ripper::Ripper(QSqlDatabase *ldb, QWidget *parent, const char *name)
     
     int screenheight = QApplication::desktop()->height();
     int screenwidth = QApplication::desktop()->width();
-    
+  
     screenwidth = 800; screenheight = 600;
-
+ 
     float wmult = screenwidth / 800.0;
     float hmult = screenheight / 600.0;
-
+ 
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
