@@ -1251,6 +1251,7 @@ LayerSet *XMLParse::GetSet(const QString &text)
 
 void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
 {
+    int context = -1;
     int orientation = 0;
     int imgFillSpace = 0;
     QPixmap *imgFiller = NULL;
@@ -1278,7 +1279,11 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
         QDomElement info = child.toElement();
         if (!info.isNull())
         {
-            if (info.tagName() == "container")
+            if (info.tagName() == "context")
+            {
+                context = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "container")
             {
                 QString confile = getFirstText(info);
                 QString flex = info.attribute("fleximage", "");
@@ -1353,7 +1358,7 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown: " << info.tagName() << " in image\n";
+                cerr << "Unknown: " << info.tagName() << " in statusbar\n";
                 exit(0);
             }
         }
@@ -1370,6 +1375,10 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
     {
         sb->SetFillerImage(*imgFiller);
         delete imgFiller;
+    }
+    if (context != -1)
+    {
+        sb->SetContext(context);
     }
     sb->SetParent(container);
     sb->calculateScreenArea();
