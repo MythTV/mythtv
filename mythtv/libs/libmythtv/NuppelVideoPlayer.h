@@ -118,6 +118,7 @@ class NuppelVideoPlayer
 
     int FlagCommercials(bool showPercentage = false, bool fullSpeed = false,
                         bool *abortFlag = NULL);
+    bool RebuildSeekTable(bool showPercentage = true);
 
     VideoFrame *GetCurrentFrame(int &w, int &h);
     void ReleaseCurrentFrame(VideoFrame *frame);

@@ -3214,6 +3214,97 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
     return(comms_found);
 }
 
+bool NuppelVideoPlayer::RebuildSeekTable(bool showPercentage)
+{
+    int percentage = 0;
+    long long myFramesPlayed = 0;
+    bool looped = false;
+
+    killplayer = false;
+    framesPlayed = 0;
+    disablevideo = true;
+
+    if (OpenFile() < 0)
+        return(0);
+
+    // clear out any existing seektables
+    m_db->lock();
+    m_playbackinfo->ClearPositionMap(MARK_KEYFRAME, m_db->db());
+    m_playbackinfo->ClearPositionMap(MARK_GOP_START, m_db->db());
+    m_playbackinfo->ClearPositionMap(MARK_GOP_BYFRAME, m_db->db());
+    m_db->unlock();
+
+    playing = true;
+
+    InitVideo();
+
+    for (int i = 0; i < MAXTBUFFER; i++)
+        txtbuffers[i].buffer = new unsigned char[text_size];
+
+    ClearAfterSeek();
+
+    QTime flagTime;
+    flagTime.start();
+
+    GetFrame(-1,true);
+    if (showPercentage)
+    {
+        if (totalFrames)
+            printf("           ");
+        else
+            printf("      ");
+        fflush( stdout );
+    }
+
+    while (!eof)
+    {
+        looped = true;
+        myFramesPlayed++;
+        if ((showPercentage) &&
+            ((myFramesPlayed % 100) == 0))
+        {
+            if (totalFrames)
+            {
+                int flagFPS;
+                float elapsed = flagTime.elapsed() / 1000.0;
+
+                if (elapsed)
+                    flagFPS = (int)(myFramesPlayed / elapsed);
+                else
+                    flagFPS = 0;
+
+                percentage = myFramesPlayed * 100 / totalFrames;
+                printf( "\b\b\b\b\b\b\b\b\b\b\b" );
+                printf( "%3d%%/%3dfps", percentage, flagFPS );
+            }
+            else
+            {
+                printf( "\b\b\b\b\b\b" );
+                printf( "%6lld", myFramesPlayed );
+            }
+            fflush( stdout );
+        }
+
+        GetFrame(-1,true);
+    }
+
+    if (showPercentage)
+    {
+        if (totalFrames)
+            printf( "\b\b\b\b\b" );
+        printf( "\b\b\b\b\b\b           \b\b\b\b\b\b\b\b\b\b\b" );
+    }
+
+    playing = false;
+    killplayer = true;
+
+    m_db->lock();
+    decoder->SetPositionMap();
+    m_db->unlock();
+
+    return true;
+}
+
 int NuppelVideoPlayer::GetStatusbarPos(void)
 {
     double spos = 0.0;

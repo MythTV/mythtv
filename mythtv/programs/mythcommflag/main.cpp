@@ -30,6 +30,7 @@ int force = 0;
 
 bool show_percentage = true;
 bool full_speed = true;
+bool rebuild_seektable = false;
 bool be_nice = true;
 
 double fps = 29.97; 
@@ -235,10 +236,20 @@ void FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
     NuppelVideoPlayer *nvp = new NuppelVideoPlayer(mdb, program_info);
     nvp->SetRingBuffer(tmprbuf);
 
-    int comms_found = nvp->FlagCommercials(show_percentage, full_speed);
+    if (rebuild_seektable)
+    {
+        nvp->RebuildSeekTable();
 
-    if (!quiet)
-        printf( "%d\n", comms_found );
+        if (!quiet)
+            printf( "Rebuilt\n" );
+    }
+    else
+    {
+        int comms_found = nvp->FlagCommercials(show_percentage, full_speed);
+
+        if (!quiet)
+            printf( "%d\n", comms_found );
+    }
 
     delete nvp;
     delete tmprbuf;
@@ -331,6 +342,11 @@ int main(int argc, char *argv[])
         else if (!strcmp(a.argv()[argpos], "--sleep"))
         {
             full_speed = false;
+        }
+        else if (!strcmp(a.argv()[argpos], "--rebuild"))
+        {
+            rebuild_seektable = true;
+            be_nice = false;
         }
         else if (!strcmp(a.argv()[argpos], "--force"))
         {
@@ -434,6 +450,7 @@ int main(int argc, char *argv[])
                     "-s OR --starttime starttime  Flag recording with given starttime" << endl <<
                     "-f OR --file filename        Flag recording with specific filename" << endl <<
                     "--sleep                      Give up some cpu time after processing" << endl <<
+                    "--rebuild                    Do not flag commercials, just rebuild seektable" << endl <<
                     "                             each frame." << endl <<
                     "-v OR --verbose debug-level  Prints more information" << endl <<
                     "                             Accepts any combination (separated by comma)" << endl << 
@@ -506,7 +523,12 @@ int main(int argc, char *argv[])
         if (a.argc() == 1)
             printf( "ALL Un-flagged programs\n" );
         printf( "ChanID  Start Time      "
-                "Title                                      Breaks\n" );
+                "Title                                      " );
+        if (rebuild_seektable)
+            printf("Status\n");
+        else
+            printf("Breaks\n");
+
         printf( "------  --------------  "
                 "-----------------------------------------  ------\n" );
     }
