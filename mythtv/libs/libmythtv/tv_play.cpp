@@ -784,9 +784,9 @@ void TV::RunTV(void)
         if (++updatecheck >= 20)
         {
             if (osd && osd->Visible() && update_osd_pos &&
-                internalState == kState_WatchingLiveTV || 
-                internalState == kState_WatchingRecording ||
-                internalState == kState_WatchingPreRecorded)
+                (internalState == kState_WatchingLiveTV || 
+                 internalState == kState_WatchingRecording ||
+                 internalState == kState_WatchingPreRecorded))
             {
                 QString desc = "";
                 int pos = nvp->calcSliderPos(0, desc);

@@ -1214,6 +1214,7 @@ bool NuppelDecoder::DoFastForward(long long desiredFrame)
             }
             keyPos = (*positionMap)[tmpIndex];
         }
+
         if (keyPos == -1)
         {
             VERBOSE(VB_PLAYBACK, QString("No keyframe in position map for %1")
@@ -1242,10 +1243,13 @@ bool NuppelDecoder::DoFastForward(long long desiredFrame)
     }
     else if (!livetv && !watchingrecording)
     {
-        VERBOSE(VB_IMPORTANT, "Did not find keyframe position.");
+        if (lastKey < desiredKey)
+        {
+            VERBOSE(VB_IMPORTANT, "Did not find keyframe position.");
 
-        VERBOSE(VB_PLAYBACK, QString("lastKey: %1 desiredKey: %2")
-                .arg((int)lastKey).arg((int)desiredKey));
+            VERBOSE(VB_PLAYBACK, QString("lastKey: %1 desiredKey: %2")
+                    .arg((int)lastKey).arg((int)desiredKey));
+        }
 
         while (lastKey < desiredKey && !fileend)
         {
@@ -1261,9 +1265,9 @@ bool NuppelDecoder::DoFastForward(long long desiredFrame)
             long long diff = keyPos - ringBuffer->GetTotalReadPosition();
 
             ringBuffer->Seek(diff, SEEK_CUR);
-        }
 
-        framesPlayed = lastKey;
+            framesPlayed = lastKey - 1;
+        }
     }
 
     normalframes = desiredFrame - framesPlayed;
