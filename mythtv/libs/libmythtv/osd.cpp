@@ -87,6 +87,8 @@ OSDImage::~OSDImage()
 OSD::OSD(int width, int height, const QString &filename, const QString &prefix,
          const QString &osdtheme)
 {
+    pthread_mutex_init(&osdlock, NULL);
+
     vid_width = width;
     vid_height = height;
 
@@ -407,6 +409,8 @@ void OSD::SetInfoText(const QString &text, const QString &subtitle,
                       const QString &callsign, const QString &iconpath,
                       int length)
 {
+    pthread_mutex_lock(&osdlock);
+    
     displayframes = time(NULL) + length;
     show_info = true;
 
@@ -435,11 +439,15 @@ void OSD::SetInfoText(const QString &text, const QString &subtitle,
             infoicon = new OSDImage(iconpath, hmult, wmult, false);
         }
     }
+
+    pthread_mutex_unlock(&osdlock);
 }
 
 void OSD::StartPause(int position, bool fill, QString msgtext,
                      QString slidertext, int displaytime)
 {
+    pthread_mutex_lock(&osdlock);
+ 
     pausestatus = msgtext;
     pauseposition = position;
     pauseslidertext = slidertext;
@@ -452,37 +460,47 @@ void OSD::StartPause(int position, bool fill, QString msgtext,
         displaypausetime = time(NULL) + displaytime;
     
     show_pause = true;
+
+    pthread_mutex_unlock(&osdlock);
 }
 
 void OSD::UpdatePause(int position, QString slidertext)
 {
+    pthread_mutex_lock(&osdlock);
     pauseposition = position;
     pauseslidertext = slidertext;
     hidingpause = false;
     pauseyoffset = 0;
+    pthread_mutex_unlock(&osdlock);
 }
 
 void OSD::EndPause(void)
 {
+    pthread_mutex_lock(&osdlock);
     hidingpause = true;
     show_pause = false;
     displaypausetime = 0;
+    pthread_mutex_unlock(&osdlock);
 }
 
 void OSD::SetChannumText(const QString &text, int length)
 {
+    pthread_mutex_lock(&osdlock);
     displayframes = time(NULL) + length;
     show_channum = true;
 
     channumtext = text;
+    pthread_mutex_unlock(&osdlock);
 }
 
+// doesn't really need locked
 void OSD::DialogUp(void)
 {
     if (currentdialogoption > 1)
         currentdialogoption--;
 }
 
+// doesn't really need locked
 void OSD::DialogDown(void)
 {
     if (currentdialogoption < 3)
@@ -493,6 +511,7 @@ void OSD::SetDialogBox(const QString &message, const QString &optionone,
                        const QString &optiontwo, const QString &optionthree,
                        int length)
 {
+    pthread_mutex_lock(&osdlock);
     currentdialogoption = 1;
     dialogmessagetext = message;
     dialogoptionone = optionone;
@@ -501,6 +520,7 @@ void OSD::SetDialogBox(const QString &message, const QString &optionone,
     
     displayframes = time(NULL) + length;
     show_dialog = true;
+    pthread_mutex_unlock(&osdlock);
 }
 
 void OSD::ShowLast(int length)
@@ -520,6 +540,7 @@ void OSD::Display(unsigned char *yuvptr)
     if (!enableosd)
         return;
 
+    pthread_mutex_lock(&osdlock);
     if (show_pause)
     {
         if (displaypausetime > 0 && time(NULL) > displaypausetime)
@@ -549,12 +570,14 @@ void OSD::Display(unsigned char *yuvptr)
         show_info = false; 
 	show_channum = false;
         show_dialog = false;
+        pthread_mutex_unlock(&osdlock);
     	return;
     }
 
     if (show_dialog)
     {
         DisplayDialogNoTheme(yuvptr);
+        pthread_mutex_unlock(&osdlock);
         return;
     }
 
@@ -567,6 +590,8 @@ void OSD::Display(unsigned char *yuvptr)
     {
         DisplayChannumNoTheme(yuvptr);
     }
+
+    pthread_mutex_unlock(&osdlock);
 }
 
 int OSD::CalcNewOffset(OSDImage *image, int curoffset)

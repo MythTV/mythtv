@@ -6,6 +6,7 @@
 #include <qrect.h>
 #include <qpoint.h>
 #include <time.h>
+#include <pthread.h>
 
 class QImage;
 class OSDImage;
@@ -147,6 +148,8 @@ class OSD
 
     int displaypausetime;
     bool pausefilltype;
+
+    pthread_mutex_t osdlock;
 };
     
 #endif

@@ -6,7 +6,7 @@
 #include <qstring.h>
 #include <qpixmap.h>
 #include <qdatetime.h>
-#include <qvaluevector.h>
+#include <vector>
 
 class QFont;
 class ProgramInfo;
@@ -65,7 +65,7 @@ class GuideGrid : public QDialog
     QFont *m_font;
     QFont *m_largerFont;
 
-    QValueVector<ChannelInfo> m_channelInfos;
+    vector<ChannelInfo> m_channelInfos;
     TimeInfo *m_timeInfos[10];
     ProgramInfo *m_programInfos[10][10];
 
