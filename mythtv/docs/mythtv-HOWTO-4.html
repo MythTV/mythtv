@@ -62,14 +62,10 @@ this problem. The first is a system wide solution, the second will only
 apply to your current user.</P>
 <P>The global change is to modify the <CODE>/etc/sysconfig/i18n</CODE> file and set
 <CODE>LANG="en_US"</CODE>.  If you want the change to only affect a single user,
-you could create a file called <CODE>~/.i18n</CODE>:</P>
-<P>
+you could create a file called <CODE>~/.i18n</CODE>:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cat > ~/.i18n
-LANG="en_US"
-^D
-$ exit
+$ echo LANG="en_US" > ~/.i18n
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>

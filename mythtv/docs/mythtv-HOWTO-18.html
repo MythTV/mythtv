@@ -68,8 +68,7 @@ you may need to recompile your kernel. Check your motherboard's chipset
 (look in the "ATA/IDE/MFM/RLL support" section in "make menuconfig") for more
 information.</P>
 <P>Next, check that the hard drive has DMA enabled.  Use the <B>hdparm</B>
-program to check and enable DMA.</P>
-<P>
+program to check and enable DMA.
 <BLOCKQUOTE><CODE>
 <PRE>
 # hdparm -d /dev/hd?
@@ -181,8 +180,7 @@ EndSection
 <P>Ensure that there isn't an <CODE>Option "DPMS"</CODE> in the Monitor
 configuration.</P>
 <P>You can also turn off DPMS from the Command Line, but this will not survive
-a reboot.</P>
-<P>
+a reboot.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ xset -dpms
@@ -232,8 +230,7 @@ CONFIG += debug
 </CODE></BLOCKQUOTE>
 </P>
 <P>Now, you need to clear out the old versions of the software to ensure that
-you're running with the debugging code, then compile and install.</P>
-<P>
+you're running with the debugging code, then compile and install.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ make clean distclean
@@ -246,8 +243,7 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 <P>At this point, you now have debug-enabled software ready.  Let's assume that
-the problem you're having is in the <CODE>setup</CODE> program.</P>
-<P>
+the problem you're having is in the <CODE>setup</CODE> program.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cd setup

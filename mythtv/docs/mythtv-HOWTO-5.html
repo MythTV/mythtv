@@ -27,7 +27,7 @@ If you subscribe to gist.com, you will not need to install XMLTV and can
 mythfilldatabase can obtain the guide data directly from the gist.com
 website.</P>
 <P>Get XMLTV from 
-<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download version 0.5.9</P>
+<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download version 0.5.10</P>
 <P>
 <HR>
 <PRE>
@@ -142,8 +142,8 @@ described in
 <A NAME="untarring_xmltv"></A> Untar the xmltv file:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf xmltv-0.5.9.tar.bz2
-$ cd xmltv-0.5.9
+$ tar -xjf xmltv-0.5.10.tar.bz2
+$ cd xmltv-0.5.10
 </PRE>
 </CODE></BLOCKQUOTE>
 
@@ -159,8 +159,7 @@ have added a cooker mirror by typing:
 and skipping to the compile step.
 </PRE>
 <HR>
-</P>
-<P>
+
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
@@ -177,7 +176,7 @@ cpan> exit
 <P>Change to the XMLTV directory and compile it:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd xmltv-0.5.9
+$ cd xmltv-0.5.10
 $ perl Makefile.PL
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -257,8 +256,7 @@ $ su -
 </CODE></BLOCKQUOTE>
 </P>
 <P>Add mysql to your USE variable.  ie <CODE>USE="mysql ...."</CODE></P>
-<P>Locate the line that contains: <CODE>#/usr/local/portage</CODE> and remove the #</P>
-<P>
+<P>Locate the line that contains: <CODE>#/usr/local/portage</CODE> and remove the #
 <BLOCKQUOTE><CODE>
 <PRE>
 # ACCEPT_KEYWORDS="~x86" emerge mythtv

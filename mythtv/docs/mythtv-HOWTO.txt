@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-04-26, v2.22
+  2003-04-28, v2.23
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -153,6 +153,9 @@
      19.9 Removing unwanted channels.
      19.10 I'd like to use a hardware MPEG-2 encoder.
      19.11 I'd like to use NFS.
+     19.12 I'd like to automatically start mythbackend at system boot time.
+        19.12.1 Log files
+        19.12.2 Mandrake 9.x
 
   ______________________________________________________________________
 
@@ -328,7 +331,6 @@
   the disk faster.  MPEG-4 requires more CPU, but the files are smaller.
   At the default resolution, MPEG-2 creates the largest files of all
   with almost no CPU impact.
-
   See the Troubleshooting ``section'' for more information.
 
   [1m3.1.4.  Video Capture Device[0m
@@ -453,6 +455,7 @@
   http://sourceforge.net/forum/forum.php?forum_id=105850
   <http://sourceforge.net/forum/forum.php?forum_id=105850> for more
   infomation on which cards work with [1mnvtv[22m.
+
   Recent Matrox cards (the G450 and G550) are reported to work with
   kernel patches (for Linux 2.4.19) available at
   http://www.bglug.ca/matrox_tvout/ <http://www.bglug.ca/matrox_tvout/>.
@@ -804,21 +807,18 @@
   LANG="en_US".  If you want the change to only affect a single user,
   you could create a file called ~/.i18n:
 
-       $ cat > ~/.i18n
-       LANG="en_US"
-       ^D
-       $ exit
+       $ echo LANG="en_US" > ~/.i18n
 
   [1m4.2.  Checking QTDIR and the PATH.[0m
 
   Open a new shell and switch to superuser mode.
 
-       $ su
-       # set
+  $ su
+  # set
 
-       [lots of text]
-       QTDIR=/usr/lib/qt3
-       PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
+  [lots of text]
+  QTDIR=/usr/lib/qt3
+  PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
 
   You should see QTDIR and /usr/lib/qt3/bin in your path.
 
@@ -862,7 +862,7 @@
   the guide data directly from the gist.com website.
 
   Get XMLTV from http://xmltv.sourceforge.net
-  <http://xmltv.sourceforge.net>.  Download version 0.5.9
+  <http://xmltv.sourceforge.net>.  Download version 0.5.10
 
   ______________________________________________________________________
   NOTE for Mandrake users:  If you have added a "PLF" mirror, you may skip the
@@ -959,8 +959,8 @@
 
   Untar the xmltv file:
 
-  $ tar -xjf xmltv-0.5.9.tar.bz2
-  $ cd xmltv-0.5.9
+  $ tar -xjf xmltv-0.5.10.tar.bz2
+  $ cd xmltv-0.5.10
 
   Install the xmltv prerequisites:
 
@@ -984,7 +984,7 @@
 
   Change to the XMLTV directory and compile it:
 
-       $ cd xmltv-0.5.9
+       $ cd xmltv-0.5.10
        $ perl Makefile.PL
 
   You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes"
@@ -1104,7 +1104,7 @@
 
   To setup the initial mysql databases:
 
-  $ cd database
+       $ cd database
 
   [1m6.4.1.  Mandrake 9.0[0m
 
@@ -1144,8 +1144,8 @@
 
   This example has no security at all, and allows access from any host.
 
-  $ mysql -u root mythconverg
-  mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
+       $ mysql -u root mythconverg
+       mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
 
   For a more secure setup, you can restrict which machines or subnets
   have access. If you have a complete DNS system operational, you could
@@ -1250,19 +1250,18 @@
 
   Start with the alsa-driver package:
 
-  $ tar -xjf alsa-driver-0.9.x.tar.bz2
-  $ cd alsa-driver-0.9.x
-  $ ./configure --with-cards=XXX --with-sequencer=yes
-  $ make
-  $ su
-  # make install
-  # ./snddevices
-  # exit
-  $
+       $ tar -xjf alsa-driver-0.9.x.tar.bz2
+       $ cd alsa-driver-0.9.x
+       $ ./configure --with-cards=XXX --with-sequencer=yes
+       $ make
+       $ su
+       # make install
+       # ./snddevices
+       # exit
+       $
 
   This will compile and install the kernel modules and initialization
   scripts, as well as create device nodes in /dev.
-
   Install the rest of the packages:
 
        $ cd ~
@@ -1350,13 +1349,13 @@
   Note the spelling in the following commands.
   ______________________________________________________________________
 
-  $ amixer set Master,0 100%,100% unmute
-  $ amixer set Line,0 75%,75% mute captur
-  $ amixer set Capture,0 100%,100% mute captur
-  $ su
-  # alsactl store
-  # exit
-  $
+       $ amixer set Master,0 100%,100% unmute
+       $ amixer set Line,0 75%,75% mute captur
+       $ amixer set Capture,0 100%,100% mute captur
+       $ su
+       # alsactl store
+       # exit
+       $
 
   If you have multiple sound cards, then use the -c parameter to specify
   which card to adjust.  Note that the first card will be "0", the
@@ -1468,12 +1467,12 @@
        # chmod 666 /dev/lircd
 
   At this point, if you're using a serial receiver, check that the link
-  has been correctly made in /dev
+  has been correctly made in /dev:
 
-       $ ls -l /dev/li*
-       lr-xr-xr-x    1 root     root            5 Jan 27 09:00 /dev/lirc -> ttyS0
-       srw-rw-rw-    1 root     root            0 Jan 27 15:01 /dev/lircd=
-       prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
+  $ ls -l /dev/li*
+  lr-xr-xr-x    1 root     root            5 Jan 27 09:00 /dev/lirc -> ttyS0
+  srw-rw-rw-    1 root     root            0 Jan 27 15:01 /dev/lircd=
+  prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
 
   As you can see, there's a link from /dev/lirc to ttyS0, aka "COM1".
 
@@ -1503,11 +1502,11 @@
   For the impatient: Make sure you have an emergency floppy boot disk
   available!
 
-  $ cd /usr/src/linux
-  $ su
-  # make mrproper
-  # cd configs
-  # ls
+       $ cd /usr/src/linux
+       $ su
+       # make mrproper
+       # cd configs
+       # ls
 
   at this point you must look at the file names and determine which
   config file is right for you. For instance if you have an Athlon XP
@@ -1590,11 +1589,11 @@
        # /usr/local/sbin/lircd
 
   Now, we're going to add the commands necessary for lircd to run each
-  time we boot.  Mandrake 9.1 users, you can execute:
+  time we boot. Mandrake 9.1 users, you can execute:
 
-  $ su
-  # chkconfig --level 35 lircd on
-  # exit
+       $ su
+       # chkconfig --level 35 lircd on
+       # exit
 
   All other distributions:
 
@@ -1606,15 +1605,14 @@
        # exit
        $
 
-  This takes care of the lircd portion, which "listens" for the IR sig-
-  nals. If everything went well, the install script for lircd put an
+  This takes care of the lircd portion, which "listens" for the IR
+  signals. If everything went well, the install script for lircd put an
   appropriate configuration file for your remote into /etc/lircd.conf
-  This file maps the buttons on the remote control to the IR pulses com-
-  ing from the receiver.
+  This file maps the buttons on the remote control to the IR pulses
+  coming from the receiver.
 
   The next step is to convert those signals into something that can be
   used to control MythTV.
-
        $ cd ~/mythtv-0.8/configfiles
        $ cp lircrc.example ~/.lircrc
 
@@ -1637,7 +1635,7 @@
   [1mirxevent [22misn't a daemon, so if you know that your remote is working
   you need to invoke it like this:
 
-  $ irxevent &
+       $ irxevent &
 
   If [1mirxevent [22misn't running, then MythTV will not respond to your remote
   control.
@@ -1879,7 +1877,6 @@
 
   The next question will ask you if you wish to clear out your video
   source information.  You should answer "YES" to this as well.
-
   Once the graphical setup starts, you'll see that there are four
   choices.
 
@@ -2021,7 +2018,9 @@
 
   Running mythbackend as a daemon and using the logfile option will
   allow you to have mythbackend automatically start up during the boot
-  process.  For example, you may add this to your rc.local file.
+  process.  For example, you may add this to your rc.local file, or you
+  can follow the steps outlined in the section called ``I'd like to
+  automatically start mythbackend at system boot time''.
 
   [1m9.3.  Configuring a non-master backend.[0m
 
@@ -2110,18 +2109,18 @@
   you like.  Once you're satisfied with the time that [1mmythfilldatabase[0m
   will run, save and exit, and return to the shell prompt.
 
-       $ cd configfiles
-       $ crontab mythcrontab
-       $ crontab -l  NOTE: this is a lowercase L.
-       # The following will run the mythfilldatabase shell script at 0430
-       # every day.  Format is
-       # minutes hour day_of_month month day_of_week
-       # man 5 crontab for more information
-       # Need to use a shell script because the QTDIR environment variable isn't
-       # being honored by crontab?
-       # The next text should be all on the same line.
-       30 04 * * * /bin/bash $HOME/mythtv-0.8/MC/configfiles/mythfilldatabasecron
-       $
+  $ cd configfiles
+  $ crontab mythcrontab
+  $ crontab -l  NOTE: this is a lowercase L.
+  # The following will run the mythfilldatabase shell script at 0430
+  # every day.  Format is
+  # minutes hour day_of_month month day_of_week
+  # man 5 crontab for more information
+  # Need to use a shell script because the QTDIR environment variable isn't
+  # being honored by crontab?
+  # The next text should be all on the same line.
+  30 04 * * * /bin/bash $HOME/mythtv-0.8/MC/configfiles/mythfilldatabasecron
+  $
 
   As you can see, [1mmythfilldatabase [22mwill now be run at 0430 every day.
 
@@ -2408,14 +2407,14 @@
   Download FLAC from http://flac.sourceforge.net
   <http://flac.sourceforge.net> and install:
 
-  $ tar -xzf flac-1.1.0.tar.gz
-  $ cd flac-1.1.0
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $
+       $ tar -xzf flac-1.1.0.tar.gz
+       $ cd flac-1.1.0
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $
 
   Download libcdaudio from libcdaudio.sourceforge.net
   <http://sourceforge.net/project/showfiles.php?group_id=27134> and
@@ -2434,17 +2433,17 @@
   <http://www.xiph.org/paranoia/download/cdparanoia-III-
   alpha9.8.src.tgz>.
 
-       $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
-       $ cd cdparanoia-III-alpha9.8
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # cd /usr/lib
-       # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
-       # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
-       # exit
-       $
+  $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
+  $ cd cdparanoia-III-alpha9.8
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # cd /usr/lib
+  # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
+  # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
+  # exit
+  $
 
   [1m15.2.  Mandrake 9.0[0m
 
@@ -2504,6 +2503,7 @@
   packages for Vorbis, cdparanoia, SDL, and OpenGL (which you probably
   already have installed). To install these all at once, simply type
   (all on the same line):
+
        $ up2date --solvedeps libvorbis libvorbis-devel vorbis-tools cdparanoia-devel cdparanoia-libs cdparanoia SDL-devel SDL
 
   If you get the following message: "None of the packages you requested
@@ -2654,11 +2654,11 @@
 
   Change into the MythWeather directory, then make and make install:
 
-       $ cd mythweather
-       $ make
-       $ su
-       # make install
-       # exit
+  $ cd mythweather
+  $ make
+  $ su
+  # make install
+  # exit
 
   MythWeather uses MSNBC.com as its source for weather data and
   weather.com for its radar image.
@@ -2821,11 +2821,11 @@
 
   Edit your /etc/X11/XF86Config-4 file, and look for:
 
-       Section "ServerFlags"
-           #DontZap # disable <Crtl><Alt><BS> (server abort)
-           #DontZoom # disable <Crtl><Alt><KP_+>/<KP_-> (resolution switching)
-           AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
-       EndSection
+  Section "ServerFlags"
+      #DontZap # disable <Crtl><Alt><BS> (server abort)
+      #DontZoom # disable <Crtl><Alt><KP_+>/<KP_-> (resolution switching)
+      AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
+  EndSection
 
   Add Option "NoPM" "true" and Option "BlankTime" "0"to the ServerFlags
   section.
@@ -2843,6 +2843,7 @@
   In this case, you would need to either delete the Option "DPMS" line,
   or change it to # Option "DPMS" to comment it out.  The next time you
   start XFree this change will take effect.
+
   Finally, check:
 
        Section "Monitor"
@@ -2918,18 +2919,18 @@
   At this point, you now have debug-enabled software ready.  Let's
   assume that the problem you're having is in the setup program.
 
-       $ cd setup
-       $ gdb ./setup
+  $ cd setup
+  $ gdb ./setup
 
-       GNU gdb 5.3-1mdk (Mandrake Linux)
-       Copyright 2002 Free Software Foundation, Inc.
-       GDB is free software, covered by the GNU General Public License, and you are
-       welcome to change it and/or distribute copies of it under certain
-       conditions.
-       Type "show copying" to see the conditions.
-       There is absolutely no warranty for GDB.  Type "show warranty" for details.
-       This GDB was configured as "i586-mandrake-linux-gnu"...
-       (gdb)
+  GNU gdb 5.3-1mdk (Mandrake Linux)
+  Copyright 2002 Free Software Foundation, Inc.
+  GDB is free software, covered by the GNU General Public License, and you are
+  welcome to change it and/or distribute copies of it under certain
+  conditions.
+  Type "show copying" to see the conditions.
+  There is absolutely no warranty for GDB.  Type "show warranty" for details.
+  This GDB was configured as "i586-mandrake-linux-gnu"...
+  (gdb)
 
   [1mgdb [22mhas a number of options, read the man page for more information.
 
@@ -3002,7 +3003,7 @@
   instructions on disabling the sound manager.  If you wish to see what
   application is grabbing a resource, you can use the fuser command:
 
-  # fuser -v /dev/dsp
+       # fuser -v /dev/dsp
 
   To disable aRts in KDE, go to KDE->Control Center->Sound->Sound System
   and uncheck the "Start aRts soundserver on KDE startup" box.  Run #
@@ -3107,14 +3108,14 @@
   Here's an example submitted to the mythtv-dev list by Pat Pflaum
   mailto:pat@netburp.com <mailto:pat@netburp.com> using fvwm:
 
-  $ cat > .xinitrc
-  fvwm &
-  mythfrontend
-  ^D
-  $ cat > .fvwmrc
-  Style "myth*"      NoTitle, NoHandles, Sticky, WindowListSkip, BorderWidth 0
-  ^D
-  $
+       $ cat > .xinitrc
+       fvwm &
+       mythfrontend
+       ^D
+       $ cat > .fvwmrc
+       Style "myth*"      NoTitle, NoHandles, Sticky, WindowListSkip, BorderWidth 0
+       ^D
+       $
 
   The following also works with blackbox:
 
@@ -3273,7 +3274,6 @@
   picture uses the recording resolution for its dimensions. If you check
   the box "Fixed Aspect Ratio" in Setup->Playback, the windowed picture
   will always be resized to normal 4:3 shape.
-
   [1m19.6.  I'd like to save or restore my database[0m
 
   See the [1mmysqldump [22mmanpage for more information.
@@ -3282,11 +3282,10 @@
 
   To restore: (assuming that you've dropped the database)
 
-  $ mysql -u root
-  mysql>create database mythconverg;
-  mysql>exit
-
-  $ mysql -u mythtv -pmythtv mythconverg < mythtv_backup.sql
+       $ mysql -u root
+       mysql>create database mythconverg;
+       mysql>exit
+       $ mysql -u mythtv -pmythtv mythconverg < mythtv_backup.sql
 
   You may need to alter the mysql permissions if this database is being
   shared with multiple systems.  See the ``Modifying access to the MySQL
@@ -3429,12 +3428,12 @@
 
   Add the following to /etc/modules.conf:
 
-       alias char-major-81     videodev
-       alias char-major-81-0   ivtv
-       options ivtv
-       options tuner type=2
-       options msp3400 once=1 simple=1
-       add below ivtv msp3400 saa7115 tuner
+  alias char-major-81     videodev
+  alias char-major-81-0   ivtv
+  options ivtv
+  options tuner type=2
+  options msp3400 once=1 simple=1
+  add below ivtv msp3400 saa7115 tuner
 
   [1mNOTE[22m:  You must specify the tuner type manually.  See
   ~/ivtv/ivtv/driver/tuner.h for a listing of tuners.  In the above
@@ -3477,9 +3476,9 @@
 
   Check that the ivtv driver has created a new video device:
 
-       $ ls -l /dev/v4l/vi*
-       crw-------    1 mythtv   sys       81,   0 Dec 31  1969 /dev/v4l/video0
-       crw-------    1 mythtv   root      81,  32 Dec 31  1969 /dev/v4l/video32
+  $ ls -l /dev/v4l/vi*
+  crw-------    1 mythtv   sys       81,   0 Dec 31  1969 /dev/v4l/video0
+  crw-------    1 mythtv   root      81,  32 Dec 31  1969 /dev/v4l/video32
 
   In this case, the ivtv device is video0.
 
@@ -3527,7 +3526,7 @@
   On the "slave" machine, you'll want to edit the /etc/fstab file and
   add something like:
 
-       masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
+  masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
 
   Then run # fstab -a to re-read the file to mount the file system.
 
@@ -3536,4 +3535,102 @@
   "/var/video".  The rsize and wsize options are used to increase the
   performance of NFS; soft mean that NFS will eventually timeout on an
   error, and the nfsvers is required for filesizes over 2GB.
+
+  [1m19.12.  I'd like to automatically start mythbackend at system boot[0m
+  [1mtime.[0m
+
+  Here's a method for automatically starting mythbackend submitted by
+  Mike Thomson (mailto:linux@m-thomson.net <mailto:linux@m-thomson.net>)
+  and Stu Tomlinson (mailto:stu@nosnilmot.com
+  <mailto:stu@nosnilmot.com>).
+
+  Copy the files from the MythTV contrib directory or from Mike's web
+  site (http://m-thomson.net/mythtv/ <http://m-thomson.net/mythtv/>) as
+  follows:
+
+  etc.rc.d.init.mythbackend should be made executable and copied to
+  /etc/rc.d/init.d/:
+
+       $ cd contrib
+       $ su
+       # chmod a+x etc.rc.d.init.mythbackend
+       # cp etc.rc.d.init.mythbackend /etc/rc.d/init/mythbackend
+
+  etc.sysconfig.mythbackend should be copied to /etc/sysconfig/:
+
+       $ cd contrib
+       $ su
+       # cp etc.sysconfig.mythbackend /etc/sysconfig/mythbackend
+
+  Edit /etc/sysconfig/mythbackend if you want to change the defaults
+  (the userid that should start mythbackend, location of the logfile and
+  (if required) the name and location of the mythbackend binary).
+
+  Use [1mchkconfig [22mto make sure the script is called when entering
+  runlevels 3, 4 or 5:
+
+       $ su
+       # chkconfig 345 mythbackend on
+       # exit
+       $
+
+  [1m19.12.1.  Log files[0m
+
+  By default, the log file for mythbackend will be written to
+  /var/tmp/mythbackend.log. This has been tested and is known to work on
+  Mandrake and Red Hat, but many people prefer to place logs under
+  /var/log/.
+
+  To do this, create a group called mythtv (or anything you prefer) and
+  add your usual MythTV users to that group. If you changed the user
+  that starts mythbackend from the default of root you [4mmust[24m perform this
+  step.
+
+  Create the directory /var/log/mythtv and set its permissions as
+  follows:
+
+       $ su
+       # mkdir /var/log/mythtv
+       # chown root:mythtv /var/log/mythtv
+       # chmod 0775 /var/log/mythtv
+       # exit
+       $ ls -ld /var/log/mythtv
+       drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
+       $
+
+  [1m19.12.2.  Mandrake 9.x[0m
+
+  Mandrake adds one more twist in the form of the msec utility, which
+  runs regularly and (at the default or any higher security level) sets
+  permissions on many files, including those under /var/log.
+
+  To tell msec about the MythTV log files and their directory, you need
+  to edit the /etc/security/msec/perm.local file to include the
+  following:
+
+       # /etc/security/msec/perm.local
+       # Local overrides to the msec program
+       #
+       # Full file path                user.group              permissions
+       /var/log/mythtv/                root.mythtv             775
+       /var/log/mythtv/*               root.mythtv             664
+
+  A copy of the above has been included in the contrib/ directory.  You
+  may add it by typing:
+
+       $ cd contrib
+       $ su
+       # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
+       # exit
+
+  Finally run the msec tool to check and implement your changes.
+
+  $ su
+  # msec
+  # exit
+  $
+
+  [1mNOTE[22m: msec can only [4mreduce[24m the permissions of files, so if you don't
+  get the results you expect, check that you're not asking msec to add
+  missing permissions to the files or directories you created.
 

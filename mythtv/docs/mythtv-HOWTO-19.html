@@ -22,8 +22,7 @@ you view the files created by MythTV.  MythTV doesn't use standard
 Nupplevideo files, which is why you MPlayer complains if you try to view
 them.</P>
 <P>Download the patch to MPlayer from Matt's website. 
-<A HREF="http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/">http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/</A>.</P>
-<P>
+<A HREF="http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/">http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/</A>.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ wget http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/mplayer-0.90pre10+mythtv.patch
@@ -55,8 +54,7 @@ example of a <CODE>.twmrc</CODE> and <CODE>.fvwmrc</CODE> file you may use.</P>
 </H2>
 
 <P>Here's an example submitted to the mythtv-dev list by Pat Pflaum
-<A HREF="mailto:pat@netburp.com">mailto:pat@netburp.com</A> using fvwm:</P>
-<P>
+<A HREF="mailto:pat@netburp.com">mailto:pat@netburp.com</A> using fvwm:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cat > .xinitrc
@@ -209,8 +207,7 @@ resized to normal 4:3 shape.</P>
 <H2><A NAME="ss19.6">19.6</A> <A HREF="mythtv-HOWTO.html#toc19.6">I'd like to save or restore my database</A>
 </H2>
 
-<P>See the <B>mysqldump</B> manpage for more information.</P>
-<P>
+<P>See the <B>mysqldump</B> manpage for more information.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mysqldump -u mythtv -pmythtv mythconverg > mythtv_backup.sql
@@ -223,10 +220,10 @@ $ mysqldump -u mythtv -pmythtv mythconverg > mythtv_backup.sql
 $ mysql -u root
 mysql>create database mythconverg;
 mysql>exit
+$ mysql -u mythtv -pmythtv mythconverg &lt; mythtv_backup.sql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>$ mysql -u mythtv -pmythtv mythconverg &lt; mythtv_backup.sql</P>
 <P>You may need to alter the mysql permissions if this database is being shared
 with multiple systems.  See the 
 <A HREF="mythtv-HOWTO-6.html#modify_perm_mysql">Modifying access to the MySQL database for multiple systems</A> section for more
@@ -237,8 +234,7 @@ information.</P>
 
 <P><B>NOTE</B>:  Performing this step will remove the entire database. 
 You will lose all of your settings and will need to re-run the mc.sql script
-to setup the database structure before running the setup program.</P>
-<P>
+to setup the database structure before running the setup program.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mysql -u root
@@ -304,8 +300,7 @@ inserting a "#" in front of the unwanted entry. This will prevent
 <B>mythfilldatabase</B> from grabbing future listings.</P>
 <P>Next, delete the unwanted item from the channel table so that it will not
 appear in the EPG or when changing channels.  The channels will always have
-"1000" added to them, so for example, assuming that HBO is channel 15:</P>
-<P>
+"1000" added to them, so for example, assuming that HBO is channel 15:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mysql -u root mythconverg
@@ -315,8 +310,7 @@ mysql> delete from channel where chanid = '1015';
 </P>
 <P>Old program data will be removed over the course of a week. However, you may
 want to immediately delete any current program listings for the channel that
-has been removed:</P>
-<P>
+has been removed:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mysql -u root mythconverg
@@ -337,8 +331,7 @@ SEE THE IVTV MAILING LIST.
 hosting a single PVR-250 capture card.</P>
 <P>Install the Mandrake kernel source.  If you are using a different Mandrake
 kernel level (ie, not 2.4.21-0.16mdk as in the example below, then alter the
-<B>urpmi</B> command appropriately.)</P>
-<P>
+<B>urpmi</B> command appropriately.)
 <BLOCKQUOTE><CODE>
 <PRE>
 $ uname -a
@@ -361,8 +354,7 @@ $ cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/ivtv co ivtv
 </CODE></BLOCKQUOTE>
 </P>
 <P>This should create an ivtv directory.  Switch to it and perform the
-following commands:</P>
-<P>
+following commands:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cd ivtv/ivtv/utils
@@ -379,8 +371,7 @@ driver if the <B>wget</B> command fails.</P>
 <P>Place a copy of the <CODE>videodev2.h</CODE> file in the ivtv driver
 subdirectory.  This is the only reason that we installed the kernel-source
 above.  In the future, the ivtv driver may include the <CODE>videodev2.h</CODE>
-file in the distribution.</P>
-<P>
+file in the distribution.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cp /usr/src/linux/include/linux/videodev2.h ~/ivtv/ivtv/driver/
@@ -406,8 +397,7 @@ add below ivtv msp3400 saa7115 tuner
 example, <CODE>tuner type=2</CODE> is a Phillips NTSC.  Use an appropriate tuner
 type for your system and video standard.</P>
 <P>Next, copy the files that were compiled in the driver directory into the
-appropriate modules directory:</P>
-<P>
+appropriate modules directory:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
@@ -429,8 +419,7 @@ seem to impact functionality.</P>
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Check that the card is being recognized on the PCI bus:</P>
-<P>
+<P>Check that the card is being recognized on the PCI bus:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ lspci -v
@@ -448,8 +437,7 @@ Encoder (rev 01)
 <P>If you don't see your card on the PCI bus, make sure that it's been
 installed in a bus-master slot.  For some motherboards, only the PCI slots
 closest to the AGP slot are bus-mastering.</P>
-<P>Check that the ivtv driver has created a new video device:</P>
-<P>
+<P>Check that the ivtv driver has created a new video device:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ ls -l /dev/v4l/vi*
@@ -473,8 +461,7 @@ if you have not already done so, and assign the video source to a video card
 input on the Input Connections screen.</P>
 <P>If you'd like to use the <B>ptune.pl</B> command to check that your card
 is working before trying to use it in MythTV, you'll need to install a
-module first:</P>
-<P>
+module first:
 <BLOCKQUOTE><CODE>
 <PRE>
 # perl -MCPAN -e shell
@@ -497,8 +484,7 @@ $ ./ptune.pl 42
 
 <P>You may want to use a central server to store your files.  </P>
 <P>On the host machine, (in this case, the hostname is "masterbackend") you'll
-want to edit your <CODE>/etc/exports</CODE> file and use something like:</P>
-<P>
+want to edit your <CODE>/etc/exports</CODE> file and use something like:
 <BLOCKQUOTE><CODE>
 <PRE>
 /var/video (rw)
@@ -507,8 +493,7 @@ want to edit your <CODE>/etc/exports</CODE> file and use something like:</P>
 </P>
 <P>To export the <CODE>/var/video</CODE> directory with read / write privileges.</P>
 <P>On the "slave" machine, you'll want to edit the <CODE>/etc/fstab</CODE> file and
-add something like:</P>
-<P>
+add something like:
 <BLOCKQUOTE><CODE>
 <PRE>
 masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
@@ -521,6 +506,126 @@ exporting the directory "/var/video", which we're mounting locally at
 "/var/video".  The rsize and wsize options are used to increase the
 performance of NFS; soft mean that NFS will eventually timeout on an error,
 and the nfsvers is required for filesizes over 2GB.</P>
+<P>
+<A NAME="mythbackend_autostart"></A> </P>
+<H2><A NAME="ss19.12">19.12</A> <A HREF="mythtv-HOWTO.html#toc19.12">I'd like to automatically start mythbackend at system boot time.</A>
+</H2>
+
+<P>Here's a method for automatically starting mythbackend submitted by Mike
+Thomson (
+<A HREF="mailto:linux@m-thomson.net">mailto:linux@m-thomson.net</A>) and Stu Tomlinson (
+<A HREF="mailto:stu@nosnilmot.com">mailto:stu@nosnilmot.com</A>).</P>
+<P>Copy the files from the MythTV <CODE>contrib</CODE> directory or from Mike's web
+site (
+<A HREF="http://m-thomson.net/mythtv/">http://m-thomson.net/mythtv/</A>) as follows:</P>
+<P><CODE>etc.rc.d.init.mythbackend</CODE> should be made executable and copied to
+<CODE>/etc/rc.d/init.d/</CODE>:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd contrib
+$ su
+# chmod a+x etc.rc.d.init.mythbackend
+# cp etc.rc.d.init.mythbackend /etc/rc.d/init/mythbackend
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><CODE>etc.sysconfig.mythbackend</CODE> should be copied to
+<CODE>/etc/sysconfig/</CODE>:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd contrib
+$ su
+# cp etc.sysconfig.mythbackend /etc/sysconfig/mythbackend
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Edit <CODE>/etc/sysconfig/mythbackend</CODE> if you want to change the defaults
+(the userid that should start mythbackend, location of the logfile and (if
+required) the name and location of the mythbackend binary).</P>
+<P>Use <B>chkconfig</B> to make sure the script is called when
+entering runlevels 3, 4 or 5:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# chkconfig 345 mythbackend on
+# exit
+$
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H3>Log files </H3>
+
+<P>By default, the log file for mythbackend will be written to
+<CODE>/var/tmp/mythbackend.log</CODE>. This has been tested and is known to work
+on Mandrake and Red Hat, but many people prefer to place logs under
+<CODE>/var/log/</CODE>.</P>
+<P>To do this, create a group called <CODE>mythtv</CODE> (or anything you prefer)
+and add your usual MythTV users to that group. If you changed the user that
+starts mythbackend from the default of root you <EM>must</EM> perform this
+step.</P>
+<P>Create the directory <CODE>/var/log/mythtv</CODE> and set its
+permissions as follows:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# mkdir /var/log/mythtv
+# chown root:mythtv /var/log/mythtv
+# chmod 0775 /var/log/mythtv
+# exit
+$ ls -ld /var/log/mythtv
+drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
+$
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H3>Mandrake 9.x</H3>
+
+<P>Mandrake adds one more twist in the form of the <CODE>msec</CODE> utility,
+which runs regularly and (at the default or any higher security level) sets
+permissions on many files, including those under <CODE>/var/log</CODE>.</P>
+<P>To tell msec about the MythTV log files and their directory, you need to
+edit the <CODE>/etc/security/msec/perm.local</CODE> file to include the
+following:
+<BLOCKQUOTE><CODE>
+<PRE>
+# /etc/security/msec/perm.local
+# Local overrides to the msec program
+#
+# Full file path                user.group              permissions
+/var/log/mythtv/                root.mythtv             775
+/var/log/mythtv/*               root.mythtv             664
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>A copy of the above has been included in the contrib/ directory.  You may
+add it by typing:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd contrib
+$ su
+# cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Finally run the <CODE>msec</CODE> tool to check and implement your
+changes.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# msec
+# exit
+$
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><B>NOTE</B>: msec can only <EM>reduce</EM> the permissions of files, so if
+you don't get the results you expect, check that you're not asking
+<CODE>msec</CODE> to add missing permissions to the files or directories you
+created.</P>
+
 
 <HR>
 Next

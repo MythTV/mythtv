@@ -21,8 +21,7 @@
 running and started at boot.  Click on Mandrake Control
 Center->System->Services, find mysql and click the "On Boot" button and the
 "Start" button if the mysql status shows that it isn't running yet.</P>
-<P><B>NOTE</B>:  There have been reports that mysql isn't starting at boot.</P>
-<P>
+<P><B>NOTE</B>:  There have been reports that mysql isn't starting at boot.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
@@ -113,8 +112,7 @@ up for no security at all, or with more granularity.  Note that the "%" is
 the wildcard character in MySQL.</P>
 <P><B>NOTE</B>:  The "no security" option is <EM>very</EM> dangerous unless
 you're in a controlled environment.</P>
-<P>This example has no security at all, and allows access from any host.</P>
-<P>
+<P>This example has no security at all, and allows access from any host.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mysql -u root mythconverg
@@ -124,8 +122,7 @@ mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
 </P>
 <P>For a more secure setup, you can restrict which machines or subnets have
 access. If you have a complete DNS system operational, you could do the
-following:</P>
-<P>
+following:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mysql -u root mythconverg
@@ -133,8 +130,7 @@ mysql> grant all on mythconverg.* to mythtv@"%.mydomain.com" identified by "myth
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Finally, if you just want to restrict by IP subnet:</P>
-<P>
+<P>Finally, if you just want to restrict by IP subnet:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mysql -u root mythconverg

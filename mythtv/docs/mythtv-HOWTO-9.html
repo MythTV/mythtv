@@ -29,8 +29,7 @@ The following example is specific for <CODE>/var/video</CODE>, but the same
 instructions would apply if you want to keep the default but don't have the
 directory structure setup yet.</P>
 <P>If you create a <CODE>/var/video</CODE> subdirectory, change
-<CODE>/mnt/store/</CODE> to <CODE>/var/video/</CODE> in the setup screens.</P>
-<P>
+<CODE>/mnt/store/</CODE> to <CODE>/var/video/</CODE> in the setup screens.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
@@ -183,8 +182,7 @@ further items to configure, thereby returning you to the command line.</P>
 backend will obtain guide data for all the video sources you defined during
 setup.</P>
 <P>Once <CODE>mythfilldatabase</CODE> has finished, start the master server before
-continuing.</P>
-<P>
+continuing.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mythbackend
@@ -208,7 +206,9 @@ Valid options are:
 </P>
 <P>Running mythbackend as a daemon and using the logfile option will allow you
 to have mythbackend automatically start up during the boot process.  For
-example, you may add this to your <CODE>rc.local</CODE> file.</P>
+example, you may add this to your <CODE>rc.local</CODE> file, or you can follow
+the steps outlined in the section called 
+<A HREF="mythtv-HOWTO-19.html#mythbackend_autostart">I'd like to automatically start mythbackend at system boot time</A>.</P>
 
 <H2><A NAME="ss9.3">9.3</A> <A HREF="mythtv-HOWTO.html#toc9.3">Configuring a non-master backend.</A>
 </H2>
@@ -289,8 +289,7 @@ morning.</P>
 better method.</P>
 <P>The default <B>configfiles/mythcrontab</B> file will run the <B>mythfilldatabase</B> program every day at 0430.  If you want to change this,
 then open the <CODE>configfiles/mythcrontab</CODE> file in your favorite editor and
-modify it as you like.  Once you're satisfied with the time that <B>mythfilldatabase</B> will run, save and exit, and return to the shell prompt.</P>
-<P>
+modify it as you like.  Once you're satisfied with the time that <B>mythfilldatabase</B> will run, save and exit, and return to the shell prompt.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cd configfiles
@@ -312,8 +311,7 @@ $
 every day.</P>
 <P>If you decide to alter the time that the <B>mythfilldatabase</B> runs,
 you can use the crontab command to open your existing job and edit it in
-place.</P>
-<P>
+place.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ crontab -e
