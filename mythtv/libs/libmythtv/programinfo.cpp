@@ -155,45 +155,62 @@ QString ProgramInfo::MakeUniqueKey(void) const
     return title + ":" + chanid + ":" + startts.toString(Qt::ISODate);
 }
 
+#define INT_TO_LIST(x)       sprintf(tmp, "%i", (x)); list << tmp;
+
+#define DATETIME_TO_LIST(x)  INT_TO_LIST((x).toTime_t())
+
+#define LONGLONG_TO_LIST(x)  INT_TO_LIST((int)((x) >> 32))  \
+                             INT_TO_LIST((int)((x) & 0xffffffffLL))
+
+#define STR_TO_LIST(x)       list << (x);
+
+#define FLOAT_TO_LIST(x)     sprintf(tmp, "%f", (x)); list << tmp;
+
+
 void ProgramInfo::ToStringList(QStringList &list)
 {
-    list << ((title != "") ? title : QString(" "));
-    list << ((subtitle != "") ? subtitle : QString(" "));
-    list << ((description != "") ? description : QString(" "));
-    list << ((category != "") ? category : QString(" "));
-    list << ((chanid != "") ? chanid : QString(" "));
-    list << ((chanstr != "") ? chanstr : QString(" "));
-    list << ((chansign != "") ? chansign : QString(" "));
-    list << ((channame != "") ? channame : QString(" "));
-    list << ((pathname != "") ? pathname : QString(" "));
-    encodeLongLong(list, filesize);
-    list << startts.toString(Qt::ISODate);
-    list << endts.toString(Qt::ISODate);
-    list << QString(" "); // dummy place holder
-    list << QString::number(shareable);
-    list << QString("0"); // dummy place holder
-    list << ((hostname != "") ? hostname : QString(" "));
-    list << QString::number(sourceid);
-    list << QString::number(cardid);
-    list << QString::number(inputid);
-    list << QString::number(recpriority);
-    list << QString::number(recstatus);
-    list << QString::number(recordid);
-    list << QString::number(rectype);
-    list << QString::number(dupin);
-    list << QString::number(dupmethod);
-    list << recstartts.toString(Qt::ISODate);
-    list << recendts.toString(Qt::ISODate);
-    list << QString::number(repeat);
-    list << QString::number(programflags);
-    list << ((recgroup != "") ? recgroup : QString("Default"));
-    list << QString::number(chancommfree);
-    list << ((chanOutputFilters != "") ? chanOutputFilters : QString(" "));
-    list << ((seriesid != "") ? seriesid : QString(" "));
-    list << ((programid != "") ? programid : QString(" "));
-    list << lastmodified.toString(Qt::ISODate);
-    list << QString::number(stars);
-    list << originalAirDate.toString(Qt::ISODate);
+
+    char tmp[11];
+
+    STR_TO_LIST(title)
+    STR_TO_LIST(subtitle)
+    STR_TO_LIST(description)
+    STR_TO_LIST(category)
+    STR_TO_LIST(chanid)
+    STR_TO_LIST(chanstr)
+    STR_TO_LIST(chansign)
+    STR_TO_LIST(channame)
+    STR_TO_LIST(pathname)
+    LONGLONG_TO_LIST(filesize)
+
+    DATETIME_TO_LIST(startts)
+    DATETIME_TO_LIST(endts)
+    STR_TO_LIST("")  // dummy place holder
+    INT_TO_LIST(shareable)
+    INT_TO_LIST(0);  // dummy place holder
+    STR_TO_LIST(hostname)
+    INT_TO_LIST(sourceid)
+    INT_TO_LIST(cardid)
+    INT_TO_LIST(inputid)
+    INT_TO_LIST(recpriority)
+    INT_TO_LIST(recstatus)
+    INT_TO_LIST(recordid)
+    INT_TO_LIST(rectype)
+    INT_TO_LIST(dupin)
+    INT_TO_LIST(dupmethod)
+    DATETIME_TO_LIST(recstartts)
+    DATETIME_TO_LIST(recendts)
+    INT_TO_LIST(repeat)
+    INT_TO_LIST(programflags)
+    STR_TO_LIST((recgroup != "") ? recgroup : "Default")
+    INT_TO_LIST(chancommfree)
+    STR_TO_LIST(chanOutputFilters)
+    STR_TO_LIST(seriesid)
+    STR_TO_LIST(programid)
+    DATETIME_TO_LIST(lastmodified)
+    FLOAT_TO_LIST(stars)
+    DATETIME_TO_LIST(QDateTime(originalAirDate))
+
 }
 
 bool ProgramInfo::FromStringList(QStringList &list, int offset)
@@ -201,6 +218,21 @@ bool ProgramInfo::FromStringList(QStringList &list, int offset)
     QStringList::iterator it = list.at(offset);
     return FromStringList(list, it);
 }
+
+#define _INT_FROM_LIST()       atoi( (*(it++)).ascii() )
+#define INT_FROM_LIST(x)       (x) = _INT_FROM_LIST();
+#define ENUM_FROM_LIST(x, y)   (x) = (y)_INT_FROM_LIST();
+
+#define DATETIME_FROM_LIST(x)  (x).setTime_t((uint)_INT_FROM_LIST());
+#define DATE_FROM_LIST(x)      DATETIME_FROM_LIST(tmp); (x) = tmp.date();
+
+#define LONGLONG_FROM_LIST(x)  (x) = ((long long)(_INT_FROM_LIST()) << 32) | \
+                               ((long long)(_INT_FROM_LIST()) & 0xffffffffLL);
+
+#define STR_FROM_LIST(x)       (x) = *(it++);
+
+#define FLOAT_FROM_LIST(x)     (x) = atof( (*(it++)).ascii() );
+
 
 bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
 {
@@ -212,74 +244,47 @@ bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
         return false;
     }
 
-    title = *(it++);
-    subtitle = *(it++);
-    description = *(it++);
-    category = *(it++);
-    chanid = *(it++);
-    chanstr = *(it++);
-    chansign = *(it++);
-    channame = *(it++);
-    pathname = *(it++);
-    filesize = decodeLongLong(list, it);
-    startts = QDateTime::fromString(*(it++), Qt::ISODate);
-    endts = QDateTime::fromString(*(it++), Qt::ISODate);
-    it++; // dummy place holder
-    shareable = (*(it++)).toInt();
-    it++; // dummy place holder
-    hostname = *(it++);
-    sourceid = (*(it++)).toInt();
-    cardid = (*(it++)).toInt();
-    inputid = (*(it++)).toInt();
-    recpriority = (*(it++)).toInt();
-    recstatus = RecStatusType((*(it++)).toInt());
-    recordid = (*(it++)).toInt();
-    rectype = RecordingType((*(it++)).toInt());
-    dupin = RecordingDupInType((*(it++)).toInt());
-    dupmethod = RecordingDupMethodType((*(it++)).toInt());
-    recstartts = QDateTime::fromString(*(it++), Qt::ISODate);
-    recendts = QDateTime::fromString(*(it++), Qt::ISODate);
-    repeat = (*(it++)).toInt();
-    programflags = (*(it++)).toInt();
-    recgroup = *(it++);
-    chancommfree = (*(it++)).toInt();
-    chanOutputFilters = *(it++);
-    seriesid = *(it++);
-    programid = *(it++);
-    lastmodified = QDateTime::fromString(*(it++), Qt::ISODate);
-    stars = (*(it++)).toFloat();
-    originalAirDate = QDate::fromString(*(it++), Qt::ISODate);
+    QDateTime tmp;
 
-    if (title == " ")
-        title = "";
-    if (subtitle == " ")
-        subtitle = "";
-    if (description == " ")
-        description = "";
-    if (category == " ")
-        category = "";
-    if (pathname == " ")
-        pathname = "";
-    if (hostname == " ")
-        hostname = "";
-    if (chanid == " ")
-        chanid = "";
-    if (chanstr == " ")
-        chanstr = "";
-    if (pathname == " ")
-        pathname = "";
-    if (channame == " ")
-        channame = "";
-    if (chansign == " ")
-        chansign = "";
-    if (recgroup == " ")
-        recgroup = QString("Default");
-    if (chanOutputFilters == " ")
-        chanOutputFilters = "";
-    if (seriesid == " ")
-        seriesid = "";
-    if (programid == " ")
-        programid = "";
+    STR_FROM_LIST(title)
+    STR_FROM_LIST(subtitle)
+    STR_FROM_LIST(description)
+    STR_FROM_LIST(category)
+    STR_FROM_LIST(chanid)
+    STR_FROM_LIST(chanstr)
+    STR_FROM_LIST(chansign)
+    STR_FROM_LIST(channame)
+    STR_FROM_LIST(pathname)
+    LONGLONG_FROM_LIST(filesize)
+
+    DATETIME_FROM_LIST(startts)
+    DATETIME_FROM_LIST(endts)
+    it++; // dummy place holder
+    INT_FROM_LIST(shareable)
+    it++; // dummy place holder
+    STR_FROM_LIST(hostname)
+    INT_FROM_LIST(sourceid)
+    INT_FROM_LIST(cardid)
+    INT_FROM_LIST(inputid)
+    INT_FROM_LIST(recpriority)
+    ENUM_FROM_LIST(recstatus, RecStatusType)
+    INT_FROM_LIST(recordid)
+    ENUM_FROM_LIST(rectype, RecordingType)
+    ENUM_FROM_LIST(dupin, RecordingDupInType)
+    ENUM_FROM_LIST(dupmethod, RecordingDupMethodType)
+    DATETIME_FROM_LIST(recstartts)
+    DATETIME_FROM_LIST(recendts)
+    INT_FROM_LIST(repeat)
+    INT_FROM_LIST(programflags)
+    STR_FROM_LIST(recgroup)
+    INT_FROM_LIST(chancommfree)
+    STR_FROM_LIST(chanOutputFilters)
+    STR_FROM_LIST(seriesid)
+    STR_FROM_LIST(programid)
+    DATETIME_FROM_LIST(lastmodified)
+    FLOAT_FROM_LIST(stars)
+    DATE_FROM_LIST(originalAirDate);
+
 
     return true;
 }

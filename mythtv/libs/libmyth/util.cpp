@@ -253,7 +253,7 @@ bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
 
     QString str = QString::fromUtf8(utf8.data());
 
-    list = QStringList::split("[]:[]", str);
+    list = QStringList::split("[]:[]", str, true);
 
     return true;
 }
@@ -324,16 +324,6 @@ bool WriteStringList(QSocket *socket, QStringList &list)
     {
         VERBOSE(VB_ALL, "writing to unconnected socket in WriteStringList");
         return false;
-    }
-
-    QStringList::iterator iter = list.begin();
-    for (; iter != list.end(); iter++)
-    {
-        if ((*iter) == QString::null)
-        {
-            VERBOSE(VB_ALL, "NULL in string in list in WriteStringList");
-            return false;
-        }
     }
 
     QString str = list.join("[]:[]");
@@ -473,7 +463,7 @@ bool ReadStringList(QSocket *socket, QStringList &list)
 
     QString str = QString::fromUtf8(utf8.data());
 
-    list = QStringList::split("[]:[]", str);
+    list = QStringList::split("[]:[]", str, true);
 
     return true;
 }
