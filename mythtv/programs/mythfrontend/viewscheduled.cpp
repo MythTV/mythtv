@@ -718,12 +718,13 @@ void ViewScheduled::selected()
 
     MythContext::KickDatabase(db);
 
-    if (!rec->recording)
+    if (rec->duplicate)
     {
-        if (rec->duplicate)
-            handleDuplicate(rec);
-        else
-            handleNotRecording(rec);
+         handleDuplicate(rec);
+    }
+    else if (!rec->recording)
+    {
+         handleNotRecording(rec);
     } 
     else if (rec->conflicting)
     {
