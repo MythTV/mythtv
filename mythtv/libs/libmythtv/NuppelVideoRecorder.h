@@ -131,6 +131,9 @@ class NuppelVideoRecorder
 
     RingBuffer *ringBuffer;
     bool weMadeBuffer;
+
+    int keyswritten;
+    int keyframedist;
 };
 
 #endif

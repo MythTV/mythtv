@@ -35,8 +35,8 @@ RingBuffer::RingBuffer(const char *lfilename, long long size)
     fd = open(filename.c_str(), O_WRONLY|O_CREAT|O_LARGEFILE, 0644);
     fd2 = open(filename.c_str(), O_RDONLY|O_LARGEFILE);
 
-    writestart = writepos = 0;
-    readstart = readpos = 0;
+    totalwritepos = writepos = 0;
+    totalreadpos = readpos = 0;
 
     wrapcount = 0;
 }
@@ -65,7 +65,7 @@ int RingBuffer::Read(void *buf, int count)
     }
     else
     {
-        while (readpos + count >= writepos + wrapcount * filesize)
+        while (totalreadpos + count >= totalwritepos)
 	{
             usleep(5);
 	}
@@ -82,12 +82,14 @@ int RingBuffer::Read(void *buf, int count)
 	    ret = read(fd2, (char *)buf + toread, left);
 	    ret += toread;
 
+	    totalreadpos += ret;
 	    readpos = left;
 	}
 	else
         {
             ret = read(fd2, buf, count);
             readpos += ret;
+	    totalreadpos += ret;
         }
     }
     return ret;
@@ -122,19 +124,22 @@ int RingBuffer::Write(const void *buf, int count)
 	    writepos = left;
 
 	    ret += towrite;
+
+	    totalwritepos += ret;
 	    wrapcount++;
         }
 	else
 	{
             ret = write(fd, buf, count);
             writepos += ret;
+	    totalwritepos += ret;
 	}
     }
 
     return ret;
 }
 
-long long RingBuffer::Seek(long long pos, int whence)
+long long RingBuffer::Seek(long pos, int whence)
 {
     long long ret = -1;
     if (normalfile)
@@ -144,7 +149,11 @@ long long RingBuffer::Seek(long long pos, int whence)
     else
     {
         ret = lseek(fd2, pos, whence);
-	readpos = pos;
+
+	if (whence == SEEK_SET)
+	    readpos = ret;
+	else if (whence == SEEK_CUR)
+            readpos += pos;
     }
     return ret;
 }

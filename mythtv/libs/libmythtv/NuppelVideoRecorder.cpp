@@ -11,7 +11,8 @@
 #include "NuppelVideoRecorder.h"
 #include "linearBlend.h"
 
-#define KEYFRAMEDIST 30
+#define KEYFRAMEDISTEND   30
+#define KEYFRAMEDISTSTART 5
 #define BTTV_FIELDNR	_IOR('v' , BASE_VIDIOCPRIVATE+2, unsigned int)
 
 NuppelVideoRecorder::NuppelVideoRecorder(void)
@@ -54,6 +55,9 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
 
     ringBuffer = NULL;
     weMadeBuffer = false;
+
+    keyswritten = 0;
+    keyframedist = KEYFRAMEDISTSTART;
 }
 
 NuppelVideoRecorder::~NuppelVideoRecorder(void)
@@ -533,7 +537,7 @@ int NuppelVideoRecorder::CreateNuppelFile(void)
     fileheader.videoblocks = -1;
     fileheader.audioblocks = -1;
     fileheader.textsblocks = 0;
-    fileheader.keyframedist = KEYFRAMEDIST;
+    fileheader.keyframedist = KEYFRAMEDISTEND;
     ringBuffer->Write(&fileheader, FILEHEADERSIZE);
 
     frameheader.frametype = 'D'; // compressor data
@@ -770,7 +774,7 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
     // see if it's time for a seeker header, sync information and a keyframe
     frameheader.keyframe  = frameofgop;             // no keyframe defaulted
 
-    if (((fnum-startnum)>>1) % KEYFRAMEDIST == 0) {
+    if (((fnum-startnum)>>1) % keyframedist == 0) {
         frameheader.keyframe=0;
         frameofgop=0;
         ringBuffer->Write("RTjjjjjjjjjjjjjjjjjjjjjjjj", FRAMEHEADERSIZE);
@@ -788,6 +792,13 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
         frameheader.timecode     = effectivedsp;  // effective dsp frequency
         // write audio sync info
         ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+
+	if (keyswritten < 7)
+	{
+            keyswritten++;
+	    if (keyswritten > 6)
+                keyframedist = KEYFRAMEDISTEND;
+	}    
     }
 
     linearBlendYUV420(buf, w, h);
@@ -922,7 +933,7 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
     if (firsttc==-1) 
     {
         firsttc = timecode;
-        fprintf(stderr, "first timecode=%d\n", firsttc);
+        //fprintf(stderr, "first timecode=%d\n", firsttc);
     } 
     else 
     {

@@ -47,8 +47,7 @@ int main(int argc, char *argv[])
   while (!nvr->IsRecording())
       usleep(50);
 
-  usleep(800000);
-
+  sleep(1);
   pthread_create(&decode, NULL, SpawnDecode, nvp);
 
   while (!nvp->IsPlaying())

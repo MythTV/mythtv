@@ -198,6 +198,7 @@ int NuppelVideoPlayer::OpenFile(void)
     foundit = 0;
     effdsp = 44100;
 
+    
     while (!foundit) 
     {
         ftype = ' ';
@@ -427,15 +428,21 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
             continue; // the R-frame has no data packet
 
         if (frameheader.frametype == 'S') 
-            if (frameheader.comptype == 'A') 
+	{
+            if (frameheader.comptype == 'A')
+	    {
                 if (frameheader.timecode > 0)
+		{
                     effdsp = frameheader.timecode;
+		}
+	    }
+	}
 
         if (frameheader.packetlength!=0) {
             if (ringBuffer->Read(strm, frameheader.packetlength) != 
                 frameheader.packetlength) 
             {
-                eof=1;
+                eof = 1;
                 return (buf);
             }
         }
@@ -644,8 +651,8 @@ void NuppelVideoPlayer::StartPlaying(void)
 
         if (usecs > -1000000/video_frame_rate) 
         {
-            if (deinterlace)
-                linearBlendYUV420(videobuf3, video_width, video_height);
+            //if (deinterlace)
+            //    linearBlendYUV420(videobuf3, video_width, video_height);
             memcpy(X11videobuf, videobuf3, video_width * video_height);
             memcpy(X11videobuf + video_width * video_height, videobuf3 +
                    video_width * video_height * 5 / 4, video_width * 
@@ -659,7 +666,7 @@ void NuppelVideoPlayer::StartPlaying(void)
 
         if (usecs > 0)
         {
-            //usleep(usecs);
+            //usleep(usecs/4);
         }
 
         tf++;

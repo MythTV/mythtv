@@ -18,7 +18,7 @@ class RingBuffer
     int Read(void *buf, int count);
     int Write(const void *buf, int count);
 
-    long long Seek(long long pos, int whence);
+    long long Seek(long pos, int whence);
 
  private:
     string filename;
@@ -29,10 +29,10 @@ class RingBuffer
     bool writemode;
     
     long long writepos;
-    long long writestart;
+    long long totalwritepos;
 
     long long readpos;
-    long long readstart;
+    long long totalreadpos;
 
     long long filesize;
 
