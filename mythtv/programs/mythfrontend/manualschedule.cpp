@@ -144,7 +144,7 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
     hbox->addWidget(m_starthour);
 
 
-    m_startminute = new MythSpinBox( this, "startminute" );
+    m_startminute = new MythSpinBox( this, "startminute", true );
     m_startminute->setBackgroundOrigin(WindowOrigin);
     m_startminute->setMinValue(-1);
     m_startminute->setMaxValue(60);
@@ -164,7 +164,7 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     hbox->addWidget(label);
 
-    m_duration = new MythSpinBox( this, "duration" );
+    m_duration = new MythSpinBox( this, "duration", true );
     m_duration->setMinValue(1);
     m_duration->setMaxValue(300);
     m_duration->setValue(120);

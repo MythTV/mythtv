@@ -253,8 +253,12 @@ public:
 
 class SpinBoxSetting: public BoundedIntegerSetting {
 protected:
-    SpinBoxSetting(int min, int max, int step):
-        BoundedIntegerSetting(min, max, step) {};
+    SpinBoxSetting(int min, int max, int step, bool allow_single_step = false):
+        BoundedIntegerSetting(min, max, step),
+	sstep(allow_single_step) {};
+
+    bool sstep;
+    
 public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                   const char* widgetName = 0);

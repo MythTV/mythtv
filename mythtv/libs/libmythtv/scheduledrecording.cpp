@@ -107,7 +107,7 @@ public:
 class SRPreRoll: public SpinBoxSetting, public SRSetting {
 public:
     SRPreRoll(const ScheduledRecording& parent):
-        SpinBoxSetting(-60, 60, 1),
+        SpinBoxSetting(-60, 60, 10, true),
         SRSetting(parent, "preroll") {
         setLabel(QObject::tr("Pre-Roll Minutes"));
     };
@@ -116,7 +116,7 @@ public:
 class SRPostRoll: public SpinBoxSetting, public SRSetting {
 public:
     SRPostRoll(const ScheduledRecording& parent):
-        SpinBoxSetting(-60, 240, 1),
+        SpinBoxSetting(-60, 240, 10, true),
         SRSetting(parent, "postroll") {
         setLabel(QObject::tr("Post-Roll Minutes"));
     };

@@ -147,9 +147,35 @@ bool MythSpinBox::eventFilter(QObject* o, QEvent* e)
             else if (action == "DOWN")
                 focusNextPrevChild(true);
             else if (action == "LEFT")
-                stepDown();
+            {
+		if (sstep)
+		{
+		   setValue(value() - 1);
+		}
+		else
+		{
+                   stepDown();
+		}
+            }
             else if (action == "RIGHT")
-                stepUp();
+            {
+		if (sstep)
+		{
+		   setValue(value() + 1);
+		}
+		else
+		{
+                   stepUp();
+		}
+            }
+	    else if (action == "PAGEUP")
+	    {
+		stepDown();
+	    }
+	    else if (action == "PAGEDOWN")
+	    {
+	        stepUp();
+	    }
             else if (action == "SELECT" || action == "ESCAPE")
                 return FALSE;
             else

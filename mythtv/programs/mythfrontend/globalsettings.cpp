@@ -181,7 +181,7 @@ public:
 class JumpAmount: public SpinBoxSetting, public GlobalSetting {
 public:
     JumpAmount():
-        SpinBoxSetting(1, 30, 1),
+        SpinBoxSetting(1, 30, 5, true),
         GlobalSetting("JumpAmount") {
         setLabel(QObject::tr("Jump amount (in minutes)"));
         setValue(10);
@@ -193,7 +193,7 @@ public:
 class FastForwardAmount: public SpinBoxSetting, public GlobalSetting {
 public:
     FastForwardAmount():
-        SpinBoxSetting(1, 600, 1),
+        SpinBoxSetting(1, 600, 5, true),
         GlobalSetting("FastForwardAmount") {
         setLabel(QObject::tr("Fast forward amount (in seconds)"));
         setValue(30);
@@ -205,7 +205,7 @@ public:
 class RewindAmount: public SpinBoxSetting, public GlobalSetting {
 public:
     RewindAmount():
-        SpinBoxSetting(1, 600, 1),
+        SpinBoxSetting(1, 600, 5, true),
         GlobalSetting("RewindAmount") {
         setLabel(QObject::tr("Rewind amount (in seconds)"));
         setValue(5);
@@ -320,7 +320,7 @@ public:
 class AutoExpireFrequency: public SpinBoxSetting, public BackendSetting {
 public:
     AutoExpireFrequency():
-        SpinBoxSetting(1, 60, 1),
+        SpinBoxSetting(1, 60, 10, true),
         BackendSetting("AutoExpireFrequency") {
         setLabel(QObject::tr("Auto Expire Frequency (in minutes)"));
         setHelpText(QObject::tr("Number of minutes the AutoExpire process "
@@ -370,7 +370,7 @@ public:
 class RecordPreRoll: public SpinBoxSetting, public BackendSetting {
 public:
     RecordPreRoll():
-        SpinBoxSetting(0, 600, 1),
+        SpinBoxSetting(0, 600, 60, true),
         BackendSetting("RecordPreRoll") {
         setLabel(QObject::tr("Time to record before start of show "
                  "(in seconds)"));
@@ -381,7 +381,7 @@ public:
 class RecordOverTime: public SpinBoxSetting, public BackendSetting {
 public:
     RecordOverTime():
-        SpinBoxSetting(0, 600, 1),
+        SpinBoxSetting(0, 600, 60, true),
         BackendSetting("RecordOverTime") {
         setLabel(QObject::tr("Time to record past end of show (in seconds)"));
         setValue(0);

@@ -367,12 +367,17 @@ QWidget* SpinBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     label->setBackgroundOrigin(QWidget::WindowOrigin);
     label->setText(getLabel() + ":     ");
 
-    MythSpinBox* spinbox = new MythSpinBox(box);
+    MythSpinBox* spinbox = new MythSpinBox(box, QString(widgetName) + "MythSpinBox", sstep);
     spinbox->setHelpText(getHelpText());
     spinbox->setBackgroundOrigin(QWidget::WindowOrigin);
     spinbox->setMinValue(min);
     spinbox->setMaxValue(max);
-    spinbox->setLineStep(step);
+    // only set step size if greater than default (1), otherwise
+    // this will screw up the single-step/jump behavior of the MythSpinBox
+    if (1 < step)
+    {
+	spinbox->setLineStep(step);
+    }
     spinbox->setValue(intValue());
 
     connect(spinbox, SIGNAL(valueChanged(int)), this, SLOT(setValue(int)));
