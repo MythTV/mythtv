@@ -9,9 +9,11 @@ using namespace std;
 #include "remoteencoder.h"
 #include "programinfo.h"
 
+#ifdef USING_XVMC
 extern "C" {
 #include "../libavcodec/xvmc_render.h"
 }
+#endif
 
 extern pthread_mutex_t avcodeclock;
 
@@ -493,6 +495,7 @@ int get_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic)
 
     nd->inUseBuffers.append(frame);
 
+#ifdef USING_XVMC
     xvmc_render_state_t *render = (xvmc_render_state_t *)frame->buf;
 
     render->state = MP_XVMC_STATE_PREDICTION;
@@ -501,6 +504,7 @@ int get_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic)
     render->start_mv_blocks_num = 0;
     render->filled_mv_blocks_num = 0;
     render->next_free_data_block_num = 0;
+#endif
 
     return 1;
 }
@@ -511,8 +515,10 @@ void release_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic)
 
     assert(pic->type == FF_BUFFER_TYPE_USER);
 
+#ifdef USING_XVMC
     xvmc_render_state_t *render = (xvmc_render_state_t *)pic->data[2];
     render->state &= ~MP_XVMC_STATE_PREDICTION;
+#endif
 
     int i;
     for (i = 0; i < 4; i++)
