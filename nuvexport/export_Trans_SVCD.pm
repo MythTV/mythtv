@@ -156,7 +156,7 @@ package export_Trans_SVCD;
 			$command .= " -Z 480x480";
 		}
 
-		if ($self->{use_cutlist} && $self->{episode}->{cutlist} =~ /\d/) {
+		if ($self->{use_cutlist} && $self->{episode}->{cutlist} && $self->{episode}->{cutlist} =~ /\d/) {
 			@cuts = split("\n", $self->{episode}->{cutlist});
 			my @skiplist;
 			foreach my $cut (@cuts) {
