@@ -787,7 +787,14 @@ void MythListButton::Init()
         m_itemSelInactPix = painter->GetFormatImage();
         m_itemSelInactPix->Assign(itemSelInactPix.convertToImage());
 
-        img.setAlphaBuffer(false);
+        for (int y = 0; y < img.height(); y++)
+        {
+            for (int x = 0; x < img.width(); x++)
+            {
+                uint *p = (uint *)img.scanLine(y) + x;
+                *p = qRgba(0, 0, 0, 255);
+            }
+        }
         
         QPixmap itemSelActPix = QPixmap(img);
         p.begin(&itemSelActPix);
