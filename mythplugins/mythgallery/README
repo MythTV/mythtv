@@ -33,9 +33,6 @@ Follow this by a 'make install'.  It'll put a 'libmythgallery.so' plugin in your
 MythGallery will also read the mysql.txt settings files used by
 MythTV, so any changes you made to those will be carried over into this.
 
-You need to insert database/gallery.sql into your existing database setup
-from MythTV.
-
 After compiling and installing, you will need to enter the setup menu from
 mythfrontend to configure mythgallery; change the directory parameter to
 where you're storing your pictures.

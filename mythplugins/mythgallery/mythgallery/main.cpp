@@ -7,6 +7,7 @@ using namespace std;
 
 #include "iconview.h"
 #include "gallerysettings.h"
+#include "dbcheck.h"
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdialogs.h>
@@ -24,6 +25,8 @@ int mythplugin_init(const char *libversion)
                                     MYTH_BINARY_VERSION))
         return -1;
 
+
+    UpgradeGalleryDatabaseSchema();
 
     GallerySettings settings;
     settings.load(QSqlDatabase::database());

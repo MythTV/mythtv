@@ -11,5 +11,5 @@ target.path = $${PREFIX}/lib/mythtv/plugins
 INSTALLS += target
 
 # Input
-HEADERS += iconview.h singleview.h gallerysettings.h
-SOURCES += iconview.cpp main.cpp singleview.cpp gallerysettings.cpp
+HEADERS += iconview.h singleview.h gallerysettings.h dbcheck.h
+SOURCES += iconview.cpp main.cpp singleview.cpp gallerysettings.cpp dbcheck.cpp
