@@ -1829,39 +1829,39 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                 selected();
                 handled = true;
             }
+            else if (action == "UP")
+            {
+                cursorUp();
+                handled = true;
+            }
+            else if (action == "DOWN")
+            {  
+                cursorDown();
+                handled = true;
+            }
+            else if (action == "LEFT")
+            {
+                cursorLeft();
+                handled = true;
+            }
+            else if (action == "RIGHT")
+            {
+                cursorRight();
+                handled = true;
+            }
+            else if (action == "PAGEUP")
+            {
+                pageUp();
+                handled = true;
+            }
+            else if (action == "PAGEDOWN")
+            {
+                pageDown();
+                handled = true;
+            }
         }
 
-        if (action == "UP")
-        {
-            cursorUp();
-            handled = true;
-        }
-        else if (action == "DOWN")
-        {
-            cursorDown();
-            handled = true;
-        }
-        else if (action == "LEFT")
-        {
-            cursorLeft();
-            handled = true;
-        }
-        else if (action == "RIGHT")
-        {
-            cursorRight();
-            handled = true;
-        }
-        else if (action == "PAGEUP")
-        {
-            pageUp();
-            handled = true;
-        }
-        else if (action == "PAGEDOWN")
-        {
-            pageDown();
-            handled = true;
-        }
-        else if (action == "ESCAPE")
+        if (action == "ESCAPE")
         {
             exitWin();
             handled = true;
