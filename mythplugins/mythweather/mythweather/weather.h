@@ -52,6 +52,7 @@ private slots:
     void cursorRight();
     void holdPage();
     void convertFlip();
+    void resetLocale();
     void newLocale0();
     void newLocale1();
     void newLocale2();
@@ -62,7 +63,6 @@ private slots:
     void newLocale7();
     void newLocale8();
     void newLocale9();
-
 
     void closeConnection();
     void socketReadyRead();
@@ -75,6 +75,7 @@ private slots:
   private:
     QAccel *accel;
 
+    bool validArea;
     bool readReadme;
     bool convertData;
     int updateInterval;

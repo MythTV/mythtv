@@ -36,13 +36,15 @@ Weather::Weather(MythContext *context,
            : MythDialog(context, parent, name)
 {
     m_context = context;
+    validArea = true;
     convertData = false;
     readReadme = false;
     locale = context->GetSetting("locale");
     if (locale.length() == 0)
     {
 	readReadme = true;
-	locale = "BFXX0005";
+	locale = "BFXX0005"; // Show the weather in the Bahamas for
+			     // those who don't read the docs. heh.
     }
 
     QString convertFlag = context->GetSetting("SIUnits");
@@ -106,6 +108,7 @@ Weather::Weather(MythContext *context,
     accel->connectItem(accel->insertItem(Key_Space), this, SLOT(holdPage()));
     accel->connectItem(accel->insertItem(Key_Enter), this, SLOT(convertFlip()));
     accel->connectItem(accel->insertItem(Key_Return), this, SLOT(convertFlip()));
+    accel->connectItem(accel->insertItem(Key_M), this, SLOT(resetLocale()));
     accel->connectItem(accel->insertItem(Key_0), this, SLOT(newLocale0()));
     accel->connectItem(accel->insertItem(Key_1), this, SLOT(newLocale1()));
     accel->connectItem(accel->insertItem(Key_2), this, SLOT(newLocale2()));
@@ -286,9 +289,21 @@ void Weather::holdPage()
  	nextpage_Timer->start((int)(1000 * nextpageInterval));
 	QString txtLocale = city + ", ";
     	if (state.length() == 0)
-        	txtLocale += country + " (" + locale + ")";
+	{
+        	txtLocale += country + " (" + locale;
+		if (validArea == false)
+			txtLocale += " is invalid)";
+		else
+			txtLocale += ")";
+	}
     	else
-        	txtLocale += state + ", " + country + " (" + locale + ")";
+	{
+        	txtLocale += state + ", " + country + " (" + locale;
+                if (validArea == false)
+                        txtLocale += " is invalid)";
+                else
+                        txtLocale += ")";
+	}
 
 	if (readReadme == true)
 		txtLocale += "   No Location Set, Please read the README";
@@ -302,12 +317,20 @@ void Weather::holdPage()
    }
 }
 
+void Weather::resetLocale()
+{
+	locale = m_context->GetSetting("locale");
+	update_timeout();
+}
+
 void Weather::convertFlip()
 {
 	if (convertData == false)
 		convertData = true;
 	else
 		convertData = false;
+
+ 	locale = m_context->GetSetting("locale");
 
 	update_timeout();
 }
@@ -393,9 +416,21 @@ void Weather::update_timeout()
 
     QString txtLocale = city + ", ";
     if (state.length() == 0)
-	txtLocale += country + " (" + locale + ")";
+    {
+	txtLocale += country + " (" + locale;
+                if (validArea == false)
+                        txtLocale += " is invalid)";
+                else
+                        txtLocale += ")";
+    }
     else
-	txtLocale += state + ", " + country + " (" + locale + ")";
+    {
+	txtLocale += state + ", " + country + " (" + locale;
+                if (validArea == false)
+                        txtLocale += " is invalid)";
+                else
+                        txtLocale += ")";
+    }
  
     if (readReadme == true)
                 txtLocale += "   No Location Set, Please read the README";
@@ -406,7 +441,7 @@ void Weather::update_timeout()
     QString todayDesc;
 
     todayDesc = "Today a high of " + highTemp[0] + " and a low of ";
-    todayDesc += lowTemp[0] + ". Currently there is a humity of ";
+    todayDesc += lowTemp[0] + ". Currently there is a humidity of ";
     todayDesc += curHumid + "% and the winds are";
 
     if (winddir == "CALM")
@@ -671,9 +706,21 @@ void Weather::firstLayout()
 
    QString txtLocale = city + ", ";
    if (state.length() == 0)
-       txtLocale += country + " (" + locale + ")";
+   {
+	txtLocale += country + " (" + locale;
+                if (validArea == false)
+                        txtLocale += " is invalid)";
+                else
+                        txtLocale += ")";
+   }
    else
-       txtLocale += state + ", " + country + " (" + locale + ")";
+   {
+        txtLocale += state + ", " + country + " (" + locale;
+                if (validArea == false)
+                        txtLocale += " is invalid)";
+                else
+                        txtLocale += ")";
+   }
 
    if (readReadme == true)
        txtLocale += "   No Location Set, Please read the README";
@@ -758,7 +805,6 @@ void Weather::setupLayout(int pageNum)
 
 /*
 
-	humity
 	pressure
 	wind
 	visi
@@ -1233,7 +1279,7 @@ if (pageNum == 3)
    QString todayDesc;
 
    todayDesc = "Today a high of " + highTemp[0] + " and a low of ";
-   todayDesc += lowTemp[0] + ". Currently there is a humity of ";
+   todayDesc += lowTemp[0] + ". Currently there is a humidity of ";
    todayDesc += curHumid + "% and the winds are";
    if (winddir == "CALM")
          todayDesc += " calm.";
@@ -1305,12 +1351,13 @@ void Weather::UpdateData()
 	    httpData.find("Microsoft VBScript runtime", 0) > 0 ||
 	    httpData.find("Internal Server Error", 0) > 0)
 	{
-		locale = locale + " is invalid";
+		validArea = false;
 		httpData = oldhttpData;
 		return;
 	}
 	else
 	{
+		validArea = true;
 		oldhttpData = httpData;
 	}
 
