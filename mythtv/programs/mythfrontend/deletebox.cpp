@@ -472,7 +472,7 @@ void DeleteBox::UpdateProgressBar(void)
 
 void DeleteBox::timeout(void)
 {
-    if (!nvp)
+    if (!nvp || !pixlabel)
         return;
 
     int w = 0, h = 0;

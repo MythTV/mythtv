@@ -333,10 +333,8 @@ void PlaybackBox::selected(QListViewItem *lvitem)
     ProgramInfo *tvrec = new ProgramInfo(*rec);
     tv->Playback(tvrec);
 
-    sleep(1);
-
     TVState curstate = tv->GetState();
-    while (tv->GetState() == curstate)
+    while (tv->IsPlaying() || tv->ChangingState())
         usleep(50);
 
     startPlayer(rec);
@@ -345,7 +343,7 @@ void PlaybackBox::selected(QListViewItem *lvitem)
 
 void PlaybackBox::timeout(void)
 {
-    if (!nvp)
+    if (!nvp || !pixlabel)
         return;
 
     int w = 0, h = 0;

@@ -52,7 +52,9 @@ class TV
 
     TVState GetState(void) { return internalState; }
     bool ChangingState(void) { return changeState; }
-    
+    bool IsPlaying(void) { return StateIsPlaying(internalState); }
+    bool IsRecording(void) { return StateIsRecording(internalState); }
+
     bool CheckChannel(QString &channum, int &finetuning); 
     bool ChangeExternalChannel(QString &channum);
     QString GetNextChannel(bool direction);
