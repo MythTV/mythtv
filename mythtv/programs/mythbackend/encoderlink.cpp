@@ -74,8 +74,10 @@ TVState EncoderLink::GetState(void)
 
     if (local)
         retval = tv->GetState();
-    else
+    else if (sock)
         retval = (TVState)sock->GetEncoderState(m_capturecardnum);
+    else
+        cerr << "Broken for card: " << m_capturecardnum << endl;
 
     return retval;
 }
@@ -112,7 +114,8 @@ bool EncoderLink::MatchesRecording(ProgramInfo *rec)
     }
     else
     {
-        retval = sock->EncoderIsRecording(m_capturecardnum, rec);
+        if (sock)
+            retval = sock->EncoderIsRecording(m_capturecardnum, rec);
     }
 
     return retval;
@@ -161,8 +164,11 @@ void EncoderLink::StartRecording(ProgramInfo *rec)
 
     if (local)
         tv->StartRecording(rec);
-    else
+    else if (sock)
         sock->StartRecording(m_capturecardnum, rec);
+    else
+        cerr << "Wanted to start recording at: " << m_capturecardnum
+             << "\nbut the server's not here anymore\n";
 }
 
 void EncoderLink::StopRecording(void)
@@ -457,11 +463,11 @@ void EncoderLink::GetInputName(QString &inputname)
     cerr << "Should be local only query: GetInputName\n";
 }
 
-void EncoderLink::SpawnReadThread(QSocket *sock)
+void EncoderLink::SpawnReadThread(QSocket *rsock)
 {
     if (local)
     {
-        tv->SpawnReadThread(sock);
+        tv->SpawnReadThread(rsock);
         return;
     }
 

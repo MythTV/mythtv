@@ -72,7 +72,7 @@ class EncoderLink
                         QString &channelname, QString &chanid);
     void GetInputName(QString &inputname);
 
-    void SpawnReadThread(QSocket *sock);
+    void SpawnReadThread(QSocket *rsock);
     void KillReadThread(void);
     QSocket *GetReadThreadSocket(void);
 
