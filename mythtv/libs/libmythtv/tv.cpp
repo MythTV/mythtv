@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
 
   while (nvp->IsPlaying())
   {
-      usleep(500);
+      usleep(50);
       if ((keypressed = XJ_CheckEvents()))
       {
            switch (keypressed) {
@@ -106,8 +106,8 @@ int main(int argc, char *argv[])
                                    usleep(5);
 
                             nvr->Pause();
-                            while (nvr->GetPause())
-                                 usleep(50);
+                            while (!nvr->GetPause())
+                                 usleep(5);
 				 
                             rbuffer->Reset();
 			    channel->ChannelUp();
@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
 			    usleep(500000);
 			    nvp->ResetPlaying();
 			    while (!nvp->ResetYet())
-                                usleep(50);
+                                usleep(5);
 			    nvp->Unpause();
                           } break;
                case wsDown: {
@@ -127,8 +127,8 @@ int main(int argc, char *argv[])
                                    usleep(5);
 
                             nvr->Pause();
-                            while (nvr->GetPause())
-                                 usleep(50);
+                            while (!nvr->GetPause())
+                                 usleep(5);
 
                             rbuffer->Reset();
 
@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
                             usleep(500000);
                             nvp->ResetPlaying();
                             while (!nvp->ResetYet())
-                                usleep(50);
+                                usleep(5);
                             nvp->Unpause();
                           } break;
                default: break;
@@ -156,7 +156,9 @@ int main(int argc, char *argv[])
           fprintf(stderr, "\r Playing: %f seconds behind realtime (%lld skipped frames)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, nvp->GetFramesSkipped());
       }
   }
-      
+
+  printf("exited for some reason\n");
+  
   nvr->StopRecording();
   
   pthread_join(encode, NULL);

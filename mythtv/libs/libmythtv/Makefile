@@ -3,7 +3,7 @@ DO_MAKE = @ for i in $(SUBDIRS); do make -C $$i $@; done
 
 CXX=g++
 
-#DEBUG=-O0 -g3 -pg
+#DEBUG=-O0 -g3
 OPT=-O6 -march=pentiumpro -fomit-frame-pointer -funroll-loops -fexpensive-optimizations -finline-functions
 
 CXXFLAGS= -Ilib/ -Wall -DMMX -D_GNU_SOURCE -D_REENTRANT $(OPT) $(DEBUG)

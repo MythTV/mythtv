@@ -55,7 +55,8 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
 
     ringBuffer = NULL;
     weMadeBuffer = false;
-
+    paused = false;
+    
     keyswritten = 0;
     keyframedist = KEYFRAMEDISTSTART;
 }
@@ -144,7 +145,7 @@ void NuppelVideoRecorder::Initialize(void)
 int NuppelVideoRecorder::AudioInit(void)
 {
     int afmt, afd;
-    int frag, channels, rate, blocksize;
+    int frag, channels, rate, blocksize = 4096;
 
     if (-1 == (afd = open(audiodevice.c_str(), O_RDONLY)))
     {
@@ -170,9 +171,9 @@ int NuppelVideoRecorder::AudioInit(void)
 
     /* sample rate */
     rate = 44100;
-    ioctl(afd, SNDCTL_DSP_SPEED,    &rate);
+    ioctl(afd, SNDCTL_DSP_SPEED, &rate);
 
-    if (-1 == ioctl(afd, SNDCTL_DSP_GETBLKSIZE,  &blocksize)) 
+    if (-1 == ioctl(afd, SNDCTL_DSP_GETBLKSIZE, &blocksize)) 
     {
         fprintf(stderr, "\n%s\n", "Can't get DSP blocksize, exiting");
         return(1);
@@ -182,6 +183,7 @@ int NuppelVideoRecorder::AudioInit(void)
     close(afd);
   
     audio_buffer_size = blocksize;
+
     return(0); // everything is ok
 }
 
@@ -260,6 +262,12 @@ void NuppelVideoRecorder::StartRecording(void)
     struct video_channel vchan;
     struct video_audio va;
     struct video_tuner vt;
+
+    memset(&mm, 0, sizeof(mm));
+    memset(&vm, 0, sizeof(vm));
+    memset(&vchan, 0, sizeof(vchan));
+    memset(&va, 0, sizeof(va));
+    memset(&vt, 0, sizeof(vt));
 
     if (ioctl(fd, VIDIOCGMBUF, &vm) < 0)
     {
@@ -368,6 +376,7 @@ void NuppelVideoRecorder::StartRecording(void)
     while (encoding) {
 	if (paused)
         {
+            mainpaused = true;
 	    usleep(50);
 	    gettimeofday(&stm, &tzone);
 	    continue;
@@ -394,10 +403,12 @@ void NuppelVideoRecorder::StartRecording(void)
         }
     }
 
-    close(fd);
+    printf("closing encoder\n");
     munmap(buf, vm.size);
     
     KillChildren();
+
+    close(fd);
 }
 
 int NuppelVideoRecorder::SpawnChildren(void)
@@ -430,7 +441,8 @@ int NuppelVideoRecorder::SpawnChildren(void)
 void NuppelVideoRecorder::KillChildren(void)
 {
     childrenLive = false;
-    
+   
+    printf("KillChildren\n"); 
     if (ioctl(fd, VIDIOCSAUDIO, &origaudio)<0) 
         perror("VIDIOCSAUDIO");
 
@@ -521,12 +533,13 @@ int NuppelVideoRecorder::CreateNuppelFile(void)
     char realfname[255];
     static unsigned long int tbls[128];
     static const char finfo[12] = "NuppelVideo";
-    static const char vers[5]   = "0.05";
+    static const char vers[5]   = "0.06";
 
     snprintf(realfname, 250, "%s", sfilename.c_str());
 
     framesWritten = 0;
-
+    last_block = 0;
+    
     if (!ringBuffer)
     {
         ringBuffer = new RingBuffer(sfilename.c_str(), true, true);
@@ -575,7 +588,36 @@ int NuppelVideoRecorder::CreateNuppelFile(void)
 
 void NuppelVideoRecorder::Reset(void)
 {
-    CreateNuppelFile();
+    framesWritten = 0;
+    lf = 0;
+    last_block = 0;
+
+    for (int i = 0; i < video_buffer_count; i++)
+    {
+        vidbuffertype *vidbuf = videobuffer[i];
+        vidbuf->sample = 0;
+	vidbuf->timecode = 0;
+        vidbuf->freeToEncode = 0;
+        vidbuf->freeToBuffer = 1;
+    }
+
+    for (int i = 0; i < audio_buffer_count; i++)
+    {
+        audbuffertype *audbuf = audiobuffer[i];
+        audbuf->sample = 0;
+	audbuf->timecode = 0;
+        audbuf->freeToEncode = 0;
+        audbuf->freeToBuffer = 1;
+    }
+
+    act_video_encode = 0;
+    act_video_buffer = 0;
+    act_audio_encode = 0;
+    act_audio_buffer = 0;
+    act_audio_sample = 0;
+
+    audiobytes = 0;
+    effectivedsp = 0;
 }    
 
 void *NuppelVideoRecorder::WriteThread(void *param)
@@ -604,7 +646,7 @@ void NuppelVideoRecorder::doAudioThread(void)
     unsigned char *buffer;
     long tcres;
 
-    long long act_audio_sample=0;
+    act_audio_sample = 0;
 
     if (-1 == (afd = open(audiodevice.c_str(), O_RDONLY))) 
     {
@@ -658,10 +700,13 @@ void NuppelVideoRecorder::doAudioThread(void)
     trigger = PCM_ENABLE_INPUT;
     ioctl(afd,SNDCTL_DSP_SETTRIGGER,&trigger);
 
+    audiopaused = false;
     while (childrenLive) {
 	if (paused)
 	{
+            audiopaused = true;
             usleep(50);
+	    act = act_audio_buffer;
             continue;
         }
 
@@ -705,31 +750,29 @@ void NuppelVideoRecorder::doAudioThread(void)
 
 void NuppelVideoRecorder::doWriteThread(void)
 {
-    int act;
     int videofirst;
 
     while (childrenLive)
     {
-        act = act_video_encode;
-	
 	if (paused)
 	{
+            actuallypaused = true;
             usleep(50);
-	    actuallypaused = true;
             continue;
 	}
-        if (!videobuffer[act]->freeToEncode && 
+	
+        if (!videobuffer[act_video_encode]->freeToEncode && 
             !audiobuffer[act_audio_encode]->freeToEncode)
         {
             usleep(5);
             continue;
         }
 
-        if (videobuffer[act]->freeToEncode)
+        if (videobuffer[act_video_encode]->freeToEncode)
         {
             if (audiobuffer[act_audio_encode]->freeToEncode) 
             {
-                videofirst = (videobuffer[act]->timecode <=
+                videofirst = (videobuffer[act_video_encode]->timecode <=
                               audiobuffer[act_audio_encode]->timecode);
             }
             else
@@ -740,16 +783,17 @@ void NuppelVideoRecorder::doWriteThread(void)
 
         if (videofirst)
         {
-            if (videobuffer[act]->freeToEncode)
+            if (videobuffer[act_video_encode]->freeToEncode)
             {
-                WriteVideo(videobuffer[act]->buffer, videobuffer[act]->sample,
-                           videobuffer[act]->timecode);
-                videobuffer[act]->sample = 0;
+                WriteVideo(videobuffer[act_video_encode]->buffer, 
+                           videobuffer[act_video_encode]->sample,
+                           videobuffer[act_video_encode]->timecode);
+                videobuffer[act_video_encode]->sample = 0;
+                videobuffer[act_video_encode]->freeToEncode = 0;
+                videobuffer[act_video_encode]->freeToBuffer = 1;
                 act_video_encode++;
                 if (act_video_encode >= video_buffer_count)
                     act_video_encode = 0;
-                videobuffer[act]->freeToEncode = 0;
-                videobuffer[act]->freeToBuffer = 1;
             }
         }
         else
@@ -792,6 +836,8 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
         fnum = 0;
         lf = fnum-2;
         startnum = fnum;
+	lasttimecode = 0;
+	frameofgop = 0;
     }
 
     // count free buffers -- FIXME this can be done with less CPU time!!
@@ -938,18 +984,22 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
 void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
 {
     struct rtframeheader frameheader;
-    static int last_block   = 0;
     static int audio_behind = 0;
-    static int firsttc      = -1;
     double mt;
     double eff;
     double abytes;
+
+    if (last_block == 0)
+    {
+        firsttc = -1;
+    }
 
     if (last_block != 0) 
     {
         if (fnum != (last_block+1)) 
         {
             audio_behind = fnum - (last_block+1);
+            printf("audio behind %d %d\n", last_block, fnum);
         }
     }
 
@@ -1010,10 +1060,12 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
 
         frameheader.packetlength = compressedsize + gaplesssize;
 
-        ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
-        ringBuffer->Write(mp3buf, compressedsize);
-        ringBuffer->Write(mp3gapless, gaplesssize);
-
+        if (frameheader.packetlength > 0)
+        {
+            ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+            ringBuffer->Write(mp3buf, compressedsize);
+            ringBuffer->Write(mp3gapless, gaplesssize);
+        }
         audiobytes += audio_buffer_size;
     } 
     else 

@@ -44,9 +44,11 @@ class NuppelVideoRecorder
     void StartRecording(void);
     void StopRecording(void) { encoding = false; } 
     
-    void Pause(void) { paused = true; actuallypaused = false; }
+    void Pause(void) { paused = true; 
+                       actuallypaused = audiopaused = mainpaused = false; }
     void Unpause(void) { paused = false; }
-    bool GetPause(void) { return actuallypaused; }
+    bool GetPause(void) { return (audiopaused && mainpaused && 
+                                  actuallypaused); }
     
     bool IsRecording(void) { return childrenLive; }
    
@@ -124,7 +126,8 @@ class NuppelVideoRecorder
 
     int act_audio_encode;
     int act_audio_buffer;
-
+    long long act_audio_sample;
+    
     int video_buffer_count;
     int audio_buffer_count;
 
@@ -153,6 +156,11 @@ class NuppelVideoRecorder
     bool livetv;
     bool paused;
     bool actuallypaused;
+    bool audiopaused;
+    bool mainpaused;
+    
+    int last_block;
+    int firsttc;
 };
 
 #endif

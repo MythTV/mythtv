@@ -136,7 +136,6 @@ char *XJ_init(int width, int height, char *window_name, char *icon_name)
   
   XSelectInput(XJ_disp, XJ_win, ExposureMask|KeyPressMask);
   XMapRaised(XJ_disp, XJ_win);
-  XNextEvent(XJ_disp, &XJ_ev);
   
   old_handler = XSetErrorHandler(XJ_error_catcher);
   XSync(XJ_disp, 0);
@@ -256,7 +255,7 @@ char *XJ_init(int width, int height, char *window_name, char *icon_name)
   XJ_started=1;
 
   XJ_toggleFullscreen();
-  
+
   return(sbuf);
 }
 
@@ -329,7 +328,7 @@ void XJ_show(int width, int height)
 {
   XvShmPutImage(XJ_disp, xv_port, XJ_win, XJ_gc, XJ_image, 0, 0, width, 
                 height, 0, 0, curw, curh, False);
-  XSync(XJ_disp, True);
+  XSync(XJ_disp, False);
 }
 
 int XJ_CheckEvents(void)
@@ -350,7 +349,9 @@ int XJ_CheckEvents(void)
       {
 	 XLookupString(&Event.xkey, buf, sizeof(buf), &keySym, &stat);
 	 key = ((keySym&0xff00) != 0?((keySym&0x00ff) + 256):(keySym));
+	 return key;
       } break;
+      default: break;
     }
   }
 

@@ -145,27 +145,32 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     char   ftype;
     char   *space;
 
-    if (!ringBuffer)
+    if (!skipDsp)
     {
-        ringBuffer = new RingBuffer(filename.c_str(), true, false);
-        weMadeBuffer = true;
-	livetv = false;
-    }
-    else 
-        livetv = true;
+        if (!ringBuffer)
+        {
+            ringBuffer = new RingBuffer(filename.c_str(), true, false);
+            weMadeBuffer = true;
+	    livetv = false;
+        }
+        else 
+            livetv = true;
 
-    if (!ringBuffer->IsOpen())
-    {
-        fprintf(stderr, "File not found: %s\n", filename.c_str());
-        return -1;
+        if (!ringBuffer->IsOpen())
+        {
+            fprintf(stderr, "File not found: %s\n", filename.c_str());
+            return -1;
+        }
     }
-
     ringBuffer->Read(&fileheader, FILEHEADERSIZE);
 
-    video_width = fileheader.width;
-    video_height = fileheader.height;
-    video_frame_rate = fileheader.fps;
-    eof = 0;
+    if (!skipDsp)
+    {
+        video_width = fileheader.width;
+        video_height = fileheader.height;
+        video_frame_rate = fileheader.fps;
+        eof = 0;
+    }
 
     space = new char[video_width * video_height * 3 / 2];
 
@@ -194,7 +199,10 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     }
 
     if (skipDsp)
+    {
+        delete [] space;
         return 0;
+    }
 
     startpos = ringBuffer->Seek(0, SEEK_CUR);
 
@@ -407,10 +415,10 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
                              100000) * 4;
                     if (ashift > (30 * bytesperframe)) 
                     {
-                        fprintf(stderr, "Warning: should never happen, "
-                                "huge timecode gap gap=%d atc=%d "
-                                "vtc=%d\n",
-                                ashift, audiotimecode, timecodes[rpos]);
+                        //fprintf(stderr, "Warning: should never happen, "
+                        //        "huge timecode gap gap=%d atc=%d "
+                        //        "vtc=%d\n",
+                        //        ashift, audiotimecode, timecodes[rpos]);
                     } 
                     else 
                     {
@@ -443,7 +451,7 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
 	{
             if (frameheader.comptype == 'A')
 	    {
-                if (frameheader.timecode > 0)
+                if (frameheader.timecode > 0 && frameheader.timecode < 5500000)
 		{
                     effdsp = frameheader.timecode;
 		}
@@ -615,6 +623,8 @@ void NuppelVideoPlayer::StartPlaying(void)
     framesPlayed = 0;
     framesSkipped = 0;
 
+    audiotimecode = 0;
+
     weseeked = 0;
     rewindtime = 0;
     fftime = 0;
@@ -633,11 +643,12 @@ void NuppelVideoPlayer::StartPlaying(void)
             actpre = 0;
             now.tv_sec = 0;
 	    framesPlayed = 0;
-	    resetplaying = false;
-	    actuallyreset = true;
-	    OpenFile(true);
+	    //OpenFile(true);
 	    delete positionMap;
 	    positionMap = new map<long long, long long>;
+
+	    resetplaying = false;
+	    actuallyreset = true;
         }
 	    
         if (paused)
@@ -897,7 +908,9 @@ void NuppelVideoPlayer::DoFastForward(void)
                 }
                 if (frameheader.comptype == 'A')
                     if (frameheader.timecode > 0)
+                    {
                         effdsp = frameheader.timecode;
+                    }
             }
             else if (frameheader.frametype == 'V')
             {

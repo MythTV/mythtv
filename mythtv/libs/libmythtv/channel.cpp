@@ -116,7 +116,7 @@ bool Channel::SetChannelByString(const string &chan)
 
     return SetChannel(i);
 }
-    
+   
 bool Channel::SetChannel(int i)
 {
     int frequency = curList[i].freq * 16 / 1000;
@@ -147,3 +147,9 @@ bool Channel::ChannelDown(void)
 
     return SetChannel(curchannel);
 }
+
+char *Channel::GetCurrentChannelName(void)
+{
+    return curList[curchannel].name;
+}
+

@@ -9,9 +9,9 @@ str BufferName=/mnt/store/ringbuf.nuv
 # Record settings
 # Resolution to capture at
 int Width=704
-int Height=480
+int Height=240
 # Quality level to capture at (higher better, 255 being best)
-int Quality=140
+int Quality=255
 # Motion Levels (lower better, 0 being best)
 int LumaFilter=0
 int ChromaFilter=0
