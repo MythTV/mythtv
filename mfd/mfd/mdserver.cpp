@@ -1315,47 +1315,55 @@ void MetadataServer::sendFullItems(MetadataContainer *container, MdcapOutput *re
 {
     QTime container_timer;
     container_timer.start();
+    
+    int total_items = 0;
 
     QIntDict<Metadata> *metadata = container->getMetadata();
-            
+    if(metadata)
+    {
+        total_items = metadata->count();
+    }
     response->addItemGroup();
 
         response->addCollectionId(container->getIdentifier());
         response->addCollectionGeneration(container->getGeneration());
         response->addUpdateType(true);
-        response->addTotalItems(metadata->count());
-        response->addAddedItems(metadata->count());
+        response->addTotalItems(total_items);
+        response->addAddedItems(total_items);
         response->addDeletedItems(0);
-                
-        response->addAddedItemsGroup();
+        
+        if(total_items > 0)
+        {
+            response->addAddedItemsGroup();
                     
-            QIntDictIterator<Metadata> it( *metadata ); 
-            Metadata *a_metadata;
-            for ( ; (a_metadata = it.current()); ++it )   
-            {
-                if(a_metadata->getType() == MDT_audio)
+                QIntDictIterator<Metadata> it( *metadata ); 
+                Metadata *a_metadata;
+                for ( ; (a_metadata = it.current()); ++it )   
                 {
-                    bool local_equivalent_exists = false;
-                    if(!container->isLocal() && getLocalEquivalent(a_metadata))
+                    if(a_metadata->getType() == MDT_audio)
                     {
-                            local_equivalent_exists = true;
-                    }
+                        bool local_equivalent_exists = false;
+                        if(!container->isLocal() && getLocalEquivalent(a_metadata))
+                        {
+                                local_equivalent_exists = true;
+                        }
                     
-                    AudioMetadata *audio_metadata = (AudioMetadata *)a_metadata;
-                    addAudioItem(response, audio_metadata, local_equivalent_exists);
+                        AudioMetadata *audio_metadata = (AudioMetadata *)a_metadata;
+                        addAudioItem(response, audio_metadata, local_equivalent_exists);
+                    }
+                    else
+                    {
+                        warning("don't know how to handle non audio metadata yet");
+                    }
                 }
-                else
-                {
-                    warning("don't know how to handle non audio metadata yet");
-                }
-            }
                 
-        response->endGroup();
+            response->endGroup();
+        }
 
     response->endGroup();
 
     log(QString("built full update (+%1) mdcap payload in %2 second(s)")
-                .arg(metadata->count())
+                .arg(total_items)
                 .arg(container_timer.elapsed() / 1000.0), 7);
 }
 
@@ -1363,6 +1371,7 @@ void MetadataServer::sendDeltaItems(MetadataContainer *container, MdcapOutput *r
 {
     QTime container_timer;
     container_timer.start();
+    int total_count = 0;
 
 
     //
@@ -1371,6 +1380,10 @@ void MetadataServer::sendDeltaItems(MetadataContainer *container, MdcapOutput *r
     //
         
     QIntDict<Metadata> *metadata = container->getMetadata();
+    if(metadata)
+    {
+        total_count = metadata->count();
+    }
     QValueList<int> metadata_additions = container->getMetadataAdditions();
     QValueList<int> metadata_deletions = container->getMetadataDeletions();
             
@@ -1379,7 +1392,7 @@ void MetadataServer::sendDeltaItems(MetadataContainer *container, MdcapOutput *r
         response->addCollectionId(container->getIdentifier());
         response->addCollectionGeneration(container->getGeneration());
         response->addUpdateType(false);
-        response->addTotalItems(metadata->count());
+        response->addTotalItems(total_count);
         response->addAddedItems(metadata_additions.count());
         response->addDeletedItems(metadata_deletions.count());
                 
