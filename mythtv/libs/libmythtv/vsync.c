@@ -22,13 +22,13 @@
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
-#include <sys/io.h>
 #include <sys/poll.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
 #include <string.h>
 #include "vsync.h"
+#include "mythio.h"
 
 #ifdef USING_OPENGL_VSYNC
 /* OpenGL video sync */
