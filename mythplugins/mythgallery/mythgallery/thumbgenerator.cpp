@@ -48,7 +48,7 @@ ThumbGenerator::~ThumbGenerator()
 void ThumbGenerator::setDirectory(const QString& directory, bool isGallery)
 {
     m_mutex.lock();
-    m_directory = QString(directory.latin1());
+    m_directory = directory;
     m_isGallery = isGallery;
     m_mutex.unlock();
 }
@@ -58,7 +58,7 @@ void ThumbGenerator::addFile(const QString& filePath)
     // Add a file to the list of thumbs.
     // Must remember to call start after adding all the files!
     m_mutex.lock();
-    m_fileList.append(QString(filePath.latin1()));
+    m_fileList.append(filePath);
     m_mutex.unlock();
 }
 
@@ -128,8 +128,8 @@ void ThumbGenerator::run()
 
                 // deep copies all over
                 ThumbData *td = new ThumbData;
-                td->directory = QString(dir.latin1());
-                td->fileName  = QString(file.latin1());
+                td->directory = dir;
+                td->fileName  = file;
                 td->thumb     = image.copy();
 
                 // inform parent we have thumbnail ready for it

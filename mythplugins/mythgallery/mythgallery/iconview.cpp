@@ -994,8 +994,10 @@ void IconView::importFromDir(const QString &fromDir, const QString &toDir)
         } 
         else 
         {
-            cerr << "copying " << fi->absFilePath() << " to " << toDir << "\n";
-            QString cmd = "cp \"" + fi->absFilePath() + "\" \"" + toDir + "\"";
+            cerr << "copying " << fi->absFilePath().local8Bit() 
+                 << " to " << toDir.local8Bit() << "\n";
+            QString cmd = "cp \"" + fi->absFilePath().local8Bit() + 
+                          "\" \"" + toDir.local8Bit() + "\"";
             system(cmd);
         }
     }
