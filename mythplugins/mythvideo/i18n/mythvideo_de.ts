@@ -22,7 +22,7 @@
     <name>FileAssocDialog</name>
     <message>
         <source>Please enter the new extension:</source>
-        <translation>Bitte neue Erweiterung eingeben:</translation>
+        <translation>Bitte die neue Erweiterung eingeben:</translation>
     </message>
     <message>
         <source>Create new extension</source>
@@ -84,14 +84,6 @@
         <translation>Kindersicherungs-PIN</translation>
     </message>
     <message>
-        <source>This PIN is used to control the current Parental Level. If you want to use this feature, then setting the value to all numbers will make your life much easier. If you don&apos;t want to be bothered by PC dialogs, please set it to be blank.</source>
-        <translation type="obsolete">PIN zur Einstellung des aktuellen Kindersicherungs-Levels. Es ist einfacher, wenn Sie für die PIN nur Zahlen verwenden. Lassen Sie den Wert leer, um nicht von PC-Dialogen gestört zu werden.</translation>
-    </message>
-    <message>
-        <source>Aggresive Parental Control</source>
-        <translation type="obsolete">Aggressive Kindersicherung</translation>
-    </message>
-    <message>
         <source>If set, you will not be able to return to this screen and reset the Parental PIN without first entering the current PIN. You have been warned.</source>
         <translation>Falls gesetzt, können Sie nicht mehr zu diesem Menü zurückkehren und die PIN neu setzen, ohne die aktuelle PIN einzugeben. Sie wurden gewarnt.</translation>
     </message>
@@ -112,16 +104,12 @@
         <translation>Falls gesetzt, so werden im Videolisten-Menü alle relevanten Dateien im MythVideo Verzeichnis und darunter, unabhängig davon ob sie eingelesen wurden oder nicht, angezeigt.</translation>
     </message>
     <message>
-        <source>This is the command used for any file that the extension is not specifically defined.</source>
-        <translation type="obsolete">Dies ist der Befehl, der für alle Dateien mit nicht speziell definierten Erweiterungen verwendet wird.</translation>
-    </message>
-    <message>
         <source>General Settings</source>
-        <translation>Allgemeine Einstellungen</translation>
+        <translation>Grundeinstellungen</translation>
     </message>
     <message>
         <source>Player Settings</source>
-        <translation>Wiedergabe Einstellungen</translation>
+        <translation>Wiedergabe</translation>
     </message>
     <message>
         <source>Parental Pin:</source>
@@ -153,11 +141,11 @@
     </message>
     <message>
         <source>Unknown Rating</source>
-        <translation>Unbekannte Beschränkung</translation>
+        <translation>Unbekannte Altersfreigabe</translation>
     </message>
     <message>
         <source>Default Player</source>
-        <translation>Abspielkommando</translation>
+        <translation>Abspielbefehl</translation>
     </message>
     <message>
         <source>Newly scanned files are browsable by default</source>
@@ -166,10 +154,6 @@
     <message>
         <source>If set, newly scanned files in the Video Manager will be marked as browsable and will appear in the &apos;Browse&apos; menu.</source>
         <translation>Falls gesetzt, werden neue Dateien im Videomanager als freigegeben markiert und erscheinen im &apos;Browse&apos; Menü.</translation>
-    </message>
-    <message>
-        <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos; or &apos;MythXine&apos;.</source>
-        <translation type="obsolete">Dieser Befehl wird für alle Dateien verwendet für deren Erweiterung nichts anderes definiert wurde. Sie können auch den Namen eines MythTV Moduls wie z.B. &apos;Internal&apos; oder &apos;MythXine&apos; angeben.</translation>
     </message>
     <message>
         <source>New category</source>
@@ -219,59 +203,59 @@
     </message>
     <message>
         <source>Default View</source>
-        <translation type="unfinished"></translation>
+        <translation>Standardansicht</translation>
     </message>
     <message>
         <source>Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Galerie</translation>
     </message>
     <message>
         <source>Browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Browser</translation>
     </message>
     <message>
         <source>Listings</source>
-        <translation type="unfinished"></translation>
+        <translation>Übersicht</translation>
     </message>
     <message>
         <source>Aggressive Parental Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggressive Kindersicherung</translation>
     </message>
     <message>
         <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dieser Befehl wird für alle Dateien verwendet, für deren Erweiterung nichts anderes festgelegt wurde. Sie können auch den Namen eines MythTV Plugins eingeben, z.B. &apos;Internal&apos;.</translation>
     </message>
     <message>
         <source>Rows to display</source>
-        <translation type="unfinished"></translation>
+        <translation>Wieviele Zeilen anzeigen</translation>
     </message>
     <message>
         <source>Columns to display</source>
-        <translation type="unfinished"></translation>
+        <translation>Wieviele Spalten anzeigen</translation>
     </message>
     <message>
         <source>Show title below thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel unter den Miniaturbildern zeigen</translation>
     </message>
     <message>
         <source>If set, the additional text will make the thumbnails smaller.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, werden durch den zusätzlichen Text die Miniaturbilder kleiner.</translation>
     </message>
     <message>
         <source>Maintain aspect ratio of thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Seitenverhältnis der Miniaturbilder beibehalten</translation>
     </message>
     <message>
         <source>If set, the scaled thumbnails will maintain their original aspect ratio. If not set, they are scaled to match the size of the background icon.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, behalten die Miniaturbilder ihr Seitenverhältnis bei. Ansonsten werden sie passend zum Hintergrundsymbol skaliert.</translation>
     </message>
     <message>
         <source>Video Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Videogalerie</translation>
     </message>
     <message>
         <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Standardansicht für MythVideo. Andere Ansichten können durch drücken der &apos;MENU&apos;-Taste im Popup-Fenster ausgewählt werden.</translation>
     </message>
 </context>
 <context>
@@ -317,14 +301,6 @@
         <translation>IMDB-Nr.:</translation>
     </message>
     <message>
-        <source>0-9: Edit</source>
-        <translation type="obsolete">0-9: Editieren</translation>
-    </message>
-    <message>
-        <source>Menu/Info: Manual IMDB</source>
-        <translation type="obsolete">Menu/Info: IMDB manuell</translation>
-    </message>
-    <message>
         <source>retrieving data...</source>
         <translation>Hole Daten...</translation>
     </message>
@@ -343,10 +319,6 @@
     <message>
         <source>No Videos Found</source>
         <translation>Keine Videos gefunden</translation>
-    </message>
-    <message>
-        <source>Use the left and right arrows</source>
-        <translation type="obsolete">Verwende Links-/Rechts-Pfeiltasten</translation>
     </message>
     <message>
         <source>Directed by</source>
@@ -382,7 +354,7 @@
     </message>
     <message>
         <source>Edit Video Information</source>
-        <translation>Video-Informationen editieren</translation>
+        <translation>Video-Informationen bearbeiten</translation>
     </message>
     <message>
         <source>Name:</source>
@@ -394,11 +366,11 @@
     </message>
     <message>
         <source>File to Always Play Next:</source>
-        <translation>Datei immer anschließend spielen:</translation>
+        <translation>Anschließend abspielen:</translation>
     </message>
     <message>
         <source>Include while Browsing:</source>
-        <translation>Beim Listen berücksichtigen:</translation>
+        <translation>Beim browsen berücksichtigen:</translation>
     </message>
     <message>
         <source>Cover Art:</source>
@@ -414,19 +386,19 @@
     </message>
     <message>
         <source>1</source>
-        <translation type="unfinished">1</translation>
+        <translation>1</translation>
     </message>
     <message>
         <source>PL </source>
-        <translation type="unfinished"></translation>
+        <translation>PL</translation>
     </message>
     <message>
         <source>Category:</source>
-        <translation>Kategorie :</translation>
+        <translation>Kategorie:</translation>
     </message>
     <message>
         <source>Filters video list</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtert die Videoliste</translation>
     </message>
     <message>
         <source>Category :</source>
@@ -446,7 +418,7 @@
     </message>
     <message>
         <source>Runtime :</source>
-        <translation>Spieldauer :</translation>
+        <translation>Laufzeit :</translation>
     </message>
     <message>
         <source>User Rating :</source>
@@ -466,19 +438,11 @@
     </message>
     <message>
         <source>SELECT: Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>SELECT: Bearbeiten</translation>
     </message>
     <message>
         <source></source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MENU: Options</source>
-        <translation type="obsolete">MENÜ: Optionen</translation>
-    </message>
-    <message>
-        <source>Menu - Options</source>
-        <translation type="obsolete">Menü - Optionen</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Parental</source>
@@ -494,7 +458,7 @@
     </message>
     <message>
         <source>Runtime</source>
-        <translation>Spieldauer</translation>
+        <translation>Laufzeit</translation>
     </message>
     <message>
         <source>User Rating</source>
@@ -502,23 +466,19 @@
     </message>
     <message>
         <source>INFO - Action Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>INFO - Aktionenmenü</translation>
     </message>
     <message>
         <source>Up/Down, Page Up/Down: Browse   MENU: Options   INFO: Action Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Auf/Ab, Seite Auf/Ab: Browse   MENÜ: Optionen   INFO: Aktionenmenü</translation>
     </message>
     <message>
         <source>Play File After This:</source>
-        <translation type="unfinished"></translation>
+        <translation>Anschließend abspielen:</translation>
     </message>
 </context>
 <context>
     <name>VideoBrowser</name>
-    <message>
-        <source>Parental Pin:</source>
-        <translation type="obsolete">Kindersicherungs-PIN:</translation>
-    </message>
     <message>
         <source>%1 of %2</source>
         <translation>%1 von %2</translation>
@@ -536,12 +496,85 @@
         <translation>Minuten</translation>
     </message>
     <message>
-        <source>Ok</source>
-        <translation type="obsolete">Ok</translation>
+        <source>Watch This Video</source>
+        <translation>Film ansehen</translation>
+    </message>
+    <message>
+        <source>View Full Plot</source>
+        <translation>Vollst. Beschreibung zeigen</translation>
+    </message>
+    <message>
+        <source>Filter Display</source>
+        <translation>Anzeige filtern</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Abbrechen</translation>
+    </message>
+</context>
+<context>
+    <name>VideoDialog</name>
+    <message>
+        <source>Switch to Browse View</source>
+        <translation>Zur Browse-Ansicht wechseln</translation>
+    </message>
+    <message>
+        <source>Switch to Gallery View</source>
+        <translation>Zur Galerie-Ansicht wechseln</translation>
+    </message>
+    <message>
+        <source>Switch to List View</source>
+        <translation>Zur Übersichts-Ansicht wechseln</translation>
     </message>
     <message>
         <source>Select action</source>
-        <translation type="obsolete">Aktion wählen</translation>
+        <translation>Aktion wählen</translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation>Ok</translation>
+    </message>
+    <message>
+        <source>Parental Pin:</source>
+        <translation>Kindersicherungs-PIN:</translation>
+    </message>
+</context>
+<context>
+    <name>VideoFilterDialog</name>
+    <message>
+        <source>Result of this filter : %1 video(s)</source>
+        <translation>Ergebnis für diesen Filter: %1 Video(s)</translation>
+    </message>
+    <message>
+        <source>Result of this filter : No Videos</source>
+        <translation>Ergebnis für diesen Filter: Keine Videos</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation>Unbekannt</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>Minuten</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation>Alle</translation>
+    </message>
+    <message>
+        <source>Save as default</source>
+        <translation>Als Standard abspeichern</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>Fertig</translation>
+    </message>
+</context>
+<context>
+    <name>VideoGallery</name>
+    <message>
+        <source>Filter Display</source>
+        <translation>Anzeige filtern</translation>
     </message>
     <message>
         <source>Watch This Video</source>
@@ -549,123 +582,30 @@
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation>Kompl. Beschreibung ansehen</translation>
-    </message>
-    <message>
-        <source>Filter Display</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Switch to Video Listings</source>
-        <translation type="obsolete">Zur Videoliste wechseln</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="unfinished">Abbrechen</translation>
-    </message>
-</context>
-<context>
-    <name>VideoDialog</name>
-    <message>
-        <source>Switch to Browse View</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Switch to Gallery View</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Switch to List View</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select action</source>
-        <translation type="unfinished">Aktion wählen</translation>
-    </message>
-    <message>
-        <source>Ok</source>
-        <translation type="unfinished">Ok</translation>
-    </message>
-    <message>
-        <source>Parental Pin:</source>
-        <translation type="unfinished">Kindersicherungs-PIN:</translation>
-    </message>
-</context>
-<context>
-    <name>VideoFilterDialog</name>
-    <message>
-        <source>Result of this filter : %1 video(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Result of this filter : No Videos</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation type="unfinished">Unbekannt</translation>
-    </message>
-    <message>
-        <source>minutes</source>
-        <translation type="unfinished">Minuten</translation>
-    </message>
-    <message>
-        <source>All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Save as default</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Done</source>
-        <translation type="unfinished">Fertig</translation>
-    </message>
-</context>
-<context>
-    <name>VideoGallery</name>
-    <message>
-        <source>Filter Display</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Watch This Video</source>
-        <translation type="unfinished">Film ansehen</translation>
-    </message>
-    <message>
-        <source>View Full Plot</source>
-        <translation type="unfinished">Kompl. Beschreibung ansehen</translation>
+        <translation>Vollst. Beschreibung zeigen</translation>
     </message>
     <message>
         <source>View Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Einzelheiten zeigen</translation>
     </message>
     <message>
         <source>Plain View</source>
-        <translation type="unfinished"></translation>
+        <translation>Einfache Ansicht</translation>
     </message>
     <message>
         <source>Folder View</source>
-        <translation type="unfinished"></translation>
+        <translation>Verzeichnisansicht</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Abbrechen</translation>
+        <translation>Abbrechen</translation>
     </message>
 </context>
 <context>
     <name>VideoManager</name>
     <message>
-        <source>Sorry there were no matches for the title</source>
-        <translation type="obsolete">Leider keine Treffer für den Titel</translation>
-    </message>
-    <message>
         <source>Manually Enter IMDB #</source>
         <translation>Manuelle Eingabe der IMDB-Nr.</translation>
-    </message>
-    <message>
-        <source>Reset Entry</source>
-        <translation type="obsolete">Eintrag zurücksetzen</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -729,7 +669,7 @@
     </message>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Anzeige filtern</translation>
     </message>
     <message>
         <source>Delete this file?</source>
@@ -740,11 +680,11 @@
     <name>VideoSelected</name>
     <message>
         <source>No rating available.</source>
-        <translation type="unfinished">Keine Altersfreigabe vorhanden.</translation>
+        <translation>Keine Altersfreigabe vorhanden.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished">Minuten</translation>
+        <translation>Minuten</translation>
     </message>
 </context>
 <context>
@@ -759,35 +699,35 @@
     </message>
     <message>
         <source>Select action</source>
-        <translation type="unfinished">Aktion wählen</translation>
+        <translation>Aktion wählen</translation>
     </message>
     <message>
         <source>Watch This Video</source>
-        <translation type="unfinished">Film ansehen</translation>
+        <translation>Film ansehen</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation type="unfinished">Kompl. Beschreibung ansehen</translation>
+        <translation>vollst. Beschreibung zeigen</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Anzeige filtern</translation>
     </message>
     <message>
         <source>Switch to Browse View</source>
-        <translation type="unfinished"></translation>
+        <translation>Zur Browse-Ansicht wechseln</translation>
     </message>
     <message>
         <source>Switch to Gallery View</source>
-        <translation type="unfinished"></translation>
+        <translation>Zur Galerie-Ansicht wechseln</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Abbrechen</translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
 </context>
 </TS>

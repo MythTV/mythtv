@@ -2,16 +2,12 @@
 <context>
     <name>DatabaseBox</name>
     <message>
-        <source>Select music to be played:</source>
-        <translation type="obsolete">Bitte Musik auswählen:</translation>
-    </message>
-    <message>
         <source>Active Play Queue</source>
-        <translation>Aktuelle Spielliste</translation>
+        <translation>Aktuelle Playlist</translation>
     </message>
     <message>
         <source>All My Playlists</source>
-        <translation>Alle meine Spiellisten</translation>
+        <translation>Alle Playlists</translation>
     </message>
     <message>
         <source>All My Music</source>
@@ -19,27 +15,27 @@
     </message>
     <message>
         <source>Move to Active Play Queue</source>
-        <translation>In aktuelle Spielliste verschieben</translation>
+        <translation>In aktuelle Playlist verschieben</translation>
     </message>
     <message>
         <source>Delete This Playlist</source>
-        <translation>Diese Spielliste löschen</translation>
+        <translation>Diese Playlist löschen</translation>
     </message>
     <message>
         <source>Rename This Playlist</source>
-        <translation>Diese Spielliste umbenennen</translation>
+        <translation>Diese Playlist umbenennen</translation>
     </message>
     <message>
         <source>Copy To New Playlist</source>
-        <translation>In neue Abspielliste kopieren</translation>
+        <translation>In neue Playlist kopieren</translation>
     </message>
     <message>
         <source>Clear the Active Play Queue</source>
-        <translation>Lösche die aktuelle Warteliste</translation>
+        <translation>Lösche die aktuelle Playlist</translation>
     </message>
     <message>
         <source>Save Back to Playlist Tree</source>
-        <translation>Im Spiellisten-Baum speichern</translation>
+        <translation>Im Playlist-Baum speichern</translation>
     </message>
     <message>
         <source>Blechy Blech Blah</source>
@@ -55,281 +51,170 @@
     </message>
     <message>
         <source>The theme you are using does not contain a &apos;musictree&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ihr aktuelles Layout enthält kein &apos;musictree&apos; Element. Bitte kontaktieren Sie den Autor des Layouts und fragen Sie Ihn nach einer aktuelleren Version.&lt;br&gt;&lt;br&gt;Der folgende Bildschirm wird leer sein. Mit ESC gelangen Sie zurück ins Menü.</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <source>Couldn&apos;t create CD</source>
-        <translation type="unfinished"></translation>
+        <translation>CD konnte nicht erstellt werden</translation>
     </message>
     <message>
         <source>CD Created</source>
-        <translation type="unfinished"></translation>
+        <translation>CD erstellt</translation>
     </message>
     <message>
         <source>CD-RW Blanking Progress</source>
-        <translation type="unfinished"></translation>
+        <translation>CD-RW löschen - Fortschritt</translation>
     </message>
     <message>
         <source>Create Audio CD from Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Audio CD aus Playlist erstellen</translation>
     </message>
     <message>
         <source>Create MP3 CD from Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>MP3 CD aus Playlist erstellen</translation>
     </message>
     <message>
         <source>Clear CD-RW Disk</source>
-        <translation type="unfinished"></translation>
+        <translation>CD-RW löschen</translation>
     </message>
     <message>
         <source>The theme you are using does not contain any info lines in the music element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ihr aktuelles Layout enthält keinerlei &apos;info&apos; Einträge im &apos;music&apos; Element. Bitte kontaktieren Sie den Autor des Layouts und fragen Sie Ihn nach einer aktuelleren Version.&lt;br&gt;&lt;br&gt;Der folgende Bildschirm wird leer sein. Mit ESC gelangen Sie zurück ins Menü.</translation>
     </message>
     <message>
         <source>Artist:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Interpret: </translation>
     </message>
     <message>
         <source>Album:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Album: </translation>
     </message>
     <message>
         <source>Title:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Titel: </translation>
     </message>
     <message>
         <source>Length:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Länge: </translation>
     </message>
     <message>
         <source>Genre: </source>
-        <translation type="unfinished">Genre:</translation>
-    </message>
-</context>
-<context>
-    <name>PlaybackBox</name>
-    <message>
-        <source>Edit Playlist</source>
-        <translation type="unfinished">Spielliste ändern</translation>
-    </message>
-    <message>
-        <source>Visualize</source>
-        <translation type="unfinished">Musik sehen</translation>
-    </message>
-    <message>
-        <source>3 Edit Playlist</source>
-        <translation type="unfinished">3 Liste ändern</translation>
-    </message>
-    <message>
-        <source>4 Visualize</source>
-        <translation type="unfinished">4 Musik sehen</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Smart</source>
-        <translation type="unfinished">1 Mix: Smart</translation>
-    </message>
-    <message>
-        <source>Shuffle: Smart</source>
-        <translation type="unfinished">Mix: Smart</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Rand</source>
-        <translation type="unfinished">1 Mix: Zufall</translation>
-    </message>
-    <message>
-        <source>Shuffle: Rand</source>
-        <translation type="unfinished">Mix: Zufall</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: None</source>
-        <translation type="unfinished">1 Mix: Nein</translation>
-    </message>
-    <message>
-        <source>Shuffle: None</source>
-        <translation type="unfinished">Mix: Nein</translation>
-    </message>
-    <message>
-        <source>2 Repeat: All</source>
-        <translation type="unfinished">2 Wdh: Alle</translation>
-    </message>
-    <message>
-        <source>Repeat: All</source>
-        <translation type="unfinished">Wdh: Alle</translation>
-    </message>
-    <message>
-        <source>2 Repeat: Track</source>
-        <translation type="unfinished">2 Wdh: Lied</translation>
-    </message>
-    <message>
-        <source>Repeat: Track</source>
-        <translation type="unfinished">Wdh: Lied</translation>
-    </message>
-    <message>
-        <source>2 Repeat: None</source>
-        <translation type="unfinished">2 Wdh: Nein</translation>
-    </message>
-    <message>
-        <source>Repeat: None</source>
-        <translation type="unfinished">Wdh: Nein</translation>
-    </message>
-    <message>
-        <source>Playing stream.</source>
-        <translation type="unfinished">Spiele Stream.</translation>
-    </message>
-    <message>
-        <source>Buffering stream.</source>
-        <translation type="unfinished">Puffere Stream.</translation>
-    </message>
-    <message>
-        <source>Stream paused.</source>
-        <translation type="unfinished">Stream angehalten.</translation>
-    </message>
-    <message>
-        <source>Output error.</source>
-        <translation type="unfinished">Ausgabefehler.</translation>
-    </message>
-    <message>
-        <source>Stream stopped.</source>
-        <translation type="unfinished">Stream gestoppt.</translation>
-    </message>
-    <message>
-        <source>Finished playing stream.</source>
-        <translation type="unfinished">Stream beendet.</translation>
-    </message>
-    <message>
-        <source>Decoder error.</source>
-        <translation type="unfinished">Dekodierfehler.</translation>
-    </message>
-    <message>
-        <source>playlist root</source>
-        <translation type="unfinished">Spiellistenstart</translation>
-    </message>
-    <message>
-        <source>kbps</source>
-        <translation type="unfinished">kbps</translation>
-    </message>
-    <message>
-        <source>kHz</source>
-        <translation type="unfinished">kHz</translation>
-    </message>
-    <message>
-        <source>ch</source>
-        <translation type="unfinished">Kanal</translation>
+        <translation>Genre: </translation>
     </message>
 </context>
 <context>
     <name>PlaybackBoxMusic</name>
     <message>
         <source>Edit Playlist</source>
-        <translation type="obsolete">Spielliste ändern</translation>
+        <translation>Playlist ändern</translation>
     </message>
     <message>
         <source>Visualize</source>
-        <translation type="obsolete">Musik sehen</translation>
+        <translation>Musik sehen</translation>
     </message>
     <message>
         <source>3 Edit Playlist</source>
-        <translation type="obsolete">3 Liste ändern</translation>
+        <translation>3 Playlist ändern</translation>
     </message>
     <message>
         <source>4 Visualize</source>
-        <translation type="obsolete">4 Musik sehen</translation>
+        <translation>4 Musik sehen</translation>
     </message>
     <message>
         <source>1 Shuffle: Smart</source>
-        <translation type="obsolete">1 Mix: Smart</translation>
+        <translation>1 Mix: Smart</translation>
     </message>
     <message>
         <source>Shuffle: Smart</source>
-        <translation type="obsolete">Mix: Smart</translation>
+        <translation>Mix: Smart</translation>
     </message>
     <message>
         <source>1 Shuffle: Rand</source>
-        <translation type="obsolete">1 Mix: Zufall</translation>
+        <translation>1 Mix: Zufall</translation>
     </message>
     <message>
         <source>Shuffle: Rand</source>
-        <translation type="obsolete">Mix: Zufall</translation>
+        <translation>Mix: Zufall</translation>
     </message>
     <message>
         <source>1 Shuffle: None</source>
-        <translation type="obsolete">1 Mix: Nein</translation>
+        <translation>1 Mix: Aus</translation>
     </message>
     <message>
         <source>Shuffle: None</source>
-        <translation type="obsolete">Mix: Nein</translation>
+        <translation>Mix: Aus</translation>
     </message>
     <message>
         <source>2 Repeat: All</source>
-        <translation type="obsolete">2 Wdh: Alle</translation>
+        <translation>2 Wdhg: Alle</translation>
     </message>
     <message>
         <source>Repeat: All</source>
-        <translation type="obsolete">Wdh: Alle</translation>
+        <translation>Wdhg: Alle</translation>
     </message>
     <message>
         <source>2 Repeat: Track</source>
-        <translation type="obsolete">2 Wdh: Lied</translation>
+        <translation>2 Wdhg: Lied</translation>
     </message>
     <message>
         <source>Repeat: Track</source>
-        <translation type="obsolete">Wdh: Lied</translation>
+        <translation>Wdhg: Lied</translation>
     </message>
     <message>
         <source>2 Repeat: None</source>
-        <translation type="obsolete">2 Wdh: Nein</translation>
+        <translation>2 Wdhg: Aus</translation>
     </message>
     <message>
         <source>Repeat: None</source>
-        <translation type="obsolete">Wdh: Nein</translation>
+        <translation>Wdhg: Aus</translation>
     </message>
     <message>
         <source>playlist root</source>
-        <translation type="obsolete">Spiellistenstart</translation>
+        <translation>Playlist Start</translation>
     </message>
     <message>
         <source>Playing stream.</source>
-        <translation type="obsolete">Spiele Stream.</translation>
+        <translation>Spiele Stream.</translation>
     </message>
     <message>
         <source>Buffering stream.</source>
-        <translation type="obsolete">Puffere Stream.</translation>
+        <translation>Puffere Stream.</translation>
     </message>
     <message>
         <source>Stream paused.</source>
-        <translation type="obsolete">Stream angehalten.</translation>
+        <translation>Stream angehalten.</translation>
     </message>
     <message>
         <source>kbps</source>
-        <translation type="obsolete">kbps</translation>
+        <translation>kbps</translation>
     </message>
     <message>
         <source>kHz</source>
-        <translation type="obsolete">kHz</translation>
+        <translation>kHz</translation>
     </message>
     <message>
         <source>ch</source>
-        <translation type="obsolete">Kanal</translation>
+        <translation>ch</translation>
     </message>
     <message>
         <source>Output error.</source>
-        <translation type="obsolete">Ausgabefehler.</translation>
+        <translation>Ausgabefehler.</translation>
     </message>
     <message>
         <source>Stream stopped.</source>
-        <translation type="obsolete">Stream gestoppt.</translation>
+        <translation>Stream gestoppt.</translation>
     </message>
     <message>
         <source>Finished playing stream.</source>
-        <translation type="obsolete">Stream beendet.</translation>
+        <translation>Stream beendet.</translation>
     </message>
     <message>
         <source>Decoder error.</source>
-        <translation type="obsolete">Dekodierfehler.</translation>
+        <translation>Dekodierfehler.</translation>
     </message>
 </context>
 <context>
@@ -344,11 +229,11 @@
     </message>
     <message>
         <source>BumpScope</source>
-        <translation type="unfinished"></translation>
+        <translation>BumpScope</translation>
     </message>
     <message>
         <source>Various Artists</source>
-        <translation>Versch. Künstler</translation>
+        <translation>Versch. Interpreten</translation>
     </message>
     <message>
         <source>Ogg Vorbis Audio</source>
@@ -376,7 +261,7 @@
     </message>
     <message>
         <source>Audio Device used for playback.</source>
-        <translation>Audio Gerät für die Wiedergabe.</translation>
+        <translation>Audio Gerätedatei für die Wiedergabe.</translation>
     </message>
     <message>
         <source>CD device</source>
@@ -384,15 +269,11 @@
     </message>
     <message>
         <source>CDRom device used for ripping/playback.</source>
-        <translation>CD Laufwerk für Ripping/Abspielen.</translation>
+        <translation>CD-ROM Gerätedatei für den Import/Abspielen.</translation>
     </message>
     <message>
         <source>Tree Sorting</source>
         <translation>Sortierreihenfolge</translation>
-    </message>
-    <message>
-        <source>Order in which to sort the Music Selection Tree. Possible values are space-separated list of genre, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the actual directory tree.</source>
-        <translation type="obsolete">Sortierreihenfolge in der Musikauswahl. Mögliche Werte sind (durch Leerzeichen getrennt): Genre, Künstler, Album, Titel ODER das Schlüsselwort Verzeichnis. Damit entspricht die Darstellung der tatsächlichen Verzeichnisstruktur.</translation>
     </message>
     <message>
         <source>Script Path</source>
@@ -400,7 +281,7 @@
     </message>
     <message>
         <source>If present this script will be executed after a CD Rip is completed.</source>
-        <translation>Dieses Skript wird, falls vorhanden, nach einem CD Rip ausgeführt.</translation>
+        <translation>Dieses Skript wird, falls vorhanden, nach dem importieren einer CD ausgeführt.</translation>
     </message>
     <message>
         <source>Filename Format</source>
@@ -416,7 +297,7 @@
     </message>
     <message>
         <source>If set, MythMusic will skip checking ID3 tags in files and just try to determine Genre, Artist, Album, and Track number and title from the filename.</source>
-        <translation>Falls gesetzt werden ID3 Marken ignoriert und Genre, Künstler, Album und Titel aus dem Dateinamen bestimmt.</translation>
+        <translation>Falls gesetzt werden ID3 Marken ignoriert und Genre, Interpret, Album und Titel aus dem Dateinamen bestimmt.</translation>
     </message>
     <message>
         <source>Automatically lookup CDs</source>
@@ -428,15 +309,15 @@
     </message>
     <message>
         <source>Use Keyboard/Remote Accelerated Buttons</source>
-        <translation type="unfinished"></translation>
+        <translation>Kurztasten verwenden</translation>
     </message>
     <message>
         <source>If this is not set, you will need to use arrow keys to select and activate various functions.</source>
-        <translation>Falls nicht gesetzt, müssen für verschiedene Funktionen die Pfeiltasten verwendet werden.</translation>
+        <translation>Falls nicht gesetzt, müssen für einige Funktionen die Pfeiltasten verwendet werden.</translation>
     </message>
     <message>
         <source>Encoding</source>
-        <translation>Kodierung</translation>
+        <translation>Audiocodec</translation>
     </message>
     <message>
         <source>Ogg Vorbis</source>
@@ -444,11 +325,11 @@
     </message>
     <message>
         <source>Lame (MP3)</source>
-        <translation>Lame (MP3)</translation>
+        <translation>MP3 (Lame)</translation>
     </message>
     <message>
         <source>Audio encoder to use for CD ripping. Note that the quality level &apos;Perfect&apos; will use the FLAC encoder.</source>
-        <translation>Audio Kodierer für CD Ripping.</translation>
+        <translation>Audiocodec für den CD Import. Bei der Qualtitätsstufe &apos;Perfekt&apos; wird der FLAC-Codec verwendet.</translation>
     </message>
     <message>
         <source>File storage location</source>
@@ -456,7 +337,7 @@
     </message>
     <message>
         <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / and -. &apos;-&apos; will be replaced by the Token separator</source>
-        <translation>Bestimmt das Verzeichnis/Name für neue Lieder. Möglich ist: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / und -. &apos;-&apos; wird durch den Feldtrenner ersetzt</translation>
+        <translation>Bestimmt das Verzeichnis/Name für neue Lieder. Möglich ist: &apos;GENRE&apos;, &apos;ARTIST&apos;, &apos;ALBUM&apos;, &apos;TRACK&apos;, &apos;TITLE&apos;, &apos;YEAR&apos;, &apos;/&apos; und &apos;-&apos;. &apos;-&apos; wird durch den Feldtrenner ersetzt</translation>
     </message>
     <message>
         <source>Token separator</source>
@@ -492,15 +373,15 @@
     </message>
     <message>
         <source>Paranoia level of the CD ripper. Set to faster if you&apos;re not concerned about possible errors in the audio.</source>
-        <translation>Genauigkeit des CD Rippers. Wählen Sie &apos;Schneller&apos; wenn Sie mögliche Audiofehler akzeptieren wollen.</translation>
+        <translation>Genauigkeit für den CD Import. Wählen Sie &apos;Schneller&apos; wenn Sie mögliche Audiofehler akzeptieren wollen.</translation>
     </message>
     <message>
         <source>Automatically eject CDs after ripping</source>
-        <translation>CDs nach dem Rippen auswerfen</translation>
+        <translation>CDs nach dem Import auswerfen</translation>
     </message>
     <message>
         <source>If set, the CD tray will automatically open after the CD has been ripped.</source>
-        <translation>Falls gesetzt, wird die CD Schublade nach dem CD rippen geöffnet.</translation>
+        <translation>Falls gesetzt, wird die Laufwerksschublade nach dem importieren geöffnet.</translation>
     </message>
     <message>
         <source>Rating Weight</source>
@@ -596,15 +477,15 @@
     </message>
     <message>
         <source>Width for Visual Scaling</source>
-        <translation type="unfinished"></translation>
+        <translation>Skalierung der Visual. (in X)</translation>
     </message>
     <message>
         <source>If set to &quot;2&quot;, visualizations will be scaled in half.  Currently only used by the goom visualization.  Reduces CPU load on slower machines.</source>
-        <translation>Ein Faktor 2 halbiert die Visualisierung. Wird momentan nur vom Goom Visualisierer genutzt. Reduziert die CPU Last.</translation>
+        <translation>Bei &apos;2&apos; halbiert sich die Größe der Visualisierung. Diese Einstellung wird momentan nur vom Goom Visualisierer genutzt. Nützlich bei langsamen Rechnern, da die CPU Belastung reduziert wird.</translation>
     </message>
     <message>
         <source>Height for Visual Scaling</source>
-        <translation type="unfinished"></translation>
+        <translation>Skalierung der Visual. (in Y)</translation>
     </message>
     <message>
         <source>Visualizations</source>
@@ -612,39 +493,39 @@
     </message>
     <message>
         <source>List of visualizations to use during playback. Possible values are space-separated list of </source>
-        <translation>Liste der Visualisierungen für die Wiedergabe, durch Leerzeichen getrennt </translation>
+        <translation>Liste der Visualisierungen für die Wiedergabe, durch Leerzeichen getrennt. Verfügbar sind </translation>
     </message>
     <message>
         <source>MonoScope</source>
-        <translation type="unfinished"></translation>
+        <translation>MonoScope</translation>
     </message>
     <message>
         <source>StereoScope</source>
-        <translation type="unfinished"></translation>
+        <translation>StereoScope</translation>
     </message>
     <message>
         <source>Spectrum</source>
-        <translation type="unfinished"></translation>
+        <translation>Spectrum</translation>
     </message>
     <message>
         <source>Goom</source>
-        <translation type="unfinished"></translation>
+        <translation>Goom</translation>
     </message>
     <message>
         <source>Synaesthesia</source>
-        <translation type="unfinished"></translation>
+        <translation>Synaesthesia</translation>
     </message>
     <message>
         <source>Gears</source>
-        <translation type="unfinished"></translation>
+        <translation>Gears</translation>
     </message>
     <message>
         <source>Blank</source>
-        <translation type="unfinished"></translation>
+        <translation>Blank</translation>
     </message>
     <message>
         <source>Default Rip Quality</source>
-        <translation>Standard Rip Qualität</translation>
+        <translation>Import Qualität</translation>
     </message>
     <message>
         <source>Low</source>
@@ -664,51 +545,31 @@
     </message>
     <message>
         <source>Default quality for new CD rips.</source>
-        <translation>Standard Qualität für neue CD Rips. Bei der Einstellung &apos;Perfekt&apos; wird der FLAC Kodierer verwendet.</translation>
+        <translation>Qualitätsstufe für den CD Import. Bei der Einstellung &apos;Perfekt&apos; wird der FLAC-Codec verwendet.</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation>Allgemeines</translation>
+        <translation>Grundeinstellungen</translation>
     </message>
     <message>
         <source>Playback Settings</source>
-        <translation>Wiedergabeoptionen</translation>
+        <translation>Wiedergabe</translation>
     </message>
     <message>
         <source>Visualization Settings</source>
-        <translation>Visualisierungsoptionen</translation>
+        <translation>Visualisierung</translation>
     </message>
     <message>
         <source>CD Ripper Settings</source>
-        <translation>CD Ripper Einstellungen</translation>
+        <translation>CD Import 1/2</translation>
     </message>
     <message>
         <source>MPEG Layer 1/2/3 Audio (MAD decoder)</source>
         <translation>MPEG Layer 1/2/3 Audio (MAD Dekoder)</translation>
     </message>
     <message>
-        <source>music database</source>
-        <translation type="obsolete">Musikdatenbank</translation>
-    </message>
-    <message>
-        <source>cd ripper</source>
-        <translation type="obsolete">CD Ripper</translation>
-    </message>
-    <message>
-        <source>
-
-You have no MythMusic tables in your database.</source>
-        <translation type="obsolete">&lt;br&gt;
-&lt;br&gt;
-MythMusic Tabellen fehlen in der Datenbank.</translation>
-    </message>
-    <message>
-        <source>OK, I&apos;ll read the documentation</source>
-        <translation type="obsolete">Gut, ich werde die Dokumentation lesen</translation>
-    </message>
-    <message>
         <source>Unknown Artist</source>
-        <translation>Unbekannter Künstler</translation>
+        <translation>Unbekannter Interpret</translation>
     </message>
     <message>
         <source>Unknown Album</source>
@@ -720,7 +581,7 @@ MythMusic Tabellen fehlen in der Datenbank.</translation>
     </message>
     <message>
         <source>CD -- none</source>
-        <translation>CD -- Leer</translation>
+        <translation>CD -- leer</translation>
     </message>
     <message>
         <source>All My Music</source>
@@ -764,15 +625,15 @@ MythMusic Tabellen fehlen in der Datenbank.</translation>
     </message>
     <message>
         <source>All My Playlists</source>
-        <translation>Alle Spiellisten</translation>
+        <translation>Alle Playlists</translation>
     </message>
     <message>
         <source>Active Play Queue</source>
-        <translation>Aktuelle Spielliste</translation>
+        <translation>Aktuelle Playlist</translation>
     </message>
     <message>
         <source>Active Play Queue (%1)</source>
-        <translation>Aktuelle Spielliste (%1)</translation>
+        <translation>Aktuelle Playlist (%1)</translation>
     </message>
     <message>
         <source>Something is Wrong</source>
@@ -796,123 +657,123 @@ MythMusic Tabellen fehlen in der Datenbank.</translation>
     </message>
     <message>
         <source>If set, the MP3 encoder will use variable bitrates (VBR) except for the low quality setting. The Ogg encoder will always use variable bitrates.</source>
-        <translation>Falls gesetzt, wird der MP3 Enkoder variable Bitraten (VBR) nutzen, mit Ausnahme der niedrigen Qualitätsstufe. Der Ogg Enkoder arbeitet immer mit variablen Bitraten.</translation>
+        <translation>Falls gesetzt, wird der MP3 Audiocodec variable Bitraten (VBR) nutzen, mit Ausnahme der niedrigen Qualitätsstufe. Der Ogg Audiocodec arbeitet immer mit variablen Bitraten.</translation>
     </message>
     <message>
         <source>AlbumArt</source>
-        <translation type="unfinished"></translation>
+        <translation>Cover</translation>
     </message>
     <message>
         <source>CD Ripper Settings (part 2)</source>
-        <translation>CD Ripper Einstellungen (2)</translation>
+        <translation>CD Import 2/2</translation>
     </message>
     <message>
         <source>Enable CD Writing.</source>
-        <translation type="unfinished"></translation>
+        <translation>CDs brennen erlauben</translation>
     </message>
     <message>
         <source>Requires a SCSI or an IDE-SCSI CD Writer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erfordert einen SCSI oder IDE (mit SCSI Emulation) CD Brenner.</translation>
     </message>
     <message>
         <source>CD-Writer Device</source>
-        <translation type="unfinished"></translation>
+        <translation>CD-Brenner Gerät</translation>
     </message>
     <message>
         <source>Select the SCSI Device for CD Writing.  If your IDE device is not present, try adding hdd(or hdc/hdb)=ide-scsi to your boot options</source>
-        <translation type="unfinished"></translation>
+        <translation>Wählen Sie das SCSI Gerät des CD Brenners aus. Versuchen Sie &apos;hdd=ide-scsi&apos; (bezw. hdc oder hdb) zu Ihren Boot-Optionen hinzuzufügen, falls Ihr IDE Gerät nicht aufgelistet wird</translation>
     </message>
     <message>
         <source>Disk Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Kapazität</translation>
     </message>
     <message>
         <source>650MB/75min</source>
-        <translation type="unfinished"></translation>
+        <translation>650 MB / 75 Min</translation>
     </message>
     <message>
         <source>700MB/80min</source>
-        <translation type="unfinished"></translation>
+        <translation>700 MB / 80 Min</translation>
     </message>
     <message>
         <source>Default CD Capacity.</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard CD Kapazität.</translation>
     </message>
     <message>
         <source>Enable directories on MP3 Creation</source>
-        <translation type="unfinished"></translation>
+        <translation>Erlaube Verzeichnisse für MP3 CDs</translation>
     </message>
     <message>
         <source>CD Write Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Schreibgeschwindigkeit</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch</translation>
     </message>
     <message>
         <source>1x</source>
-        <translation type="unfinished"></translation>
+        <translation>1x</translation>
     </message>
     <message>
         <source>2x</source>
-        <translation type="unfinished"></translation>
+        <translation>2x</translation>
     </message>
     <message>
         <source>4x</source>
-        <translation type="unfinished"></translation>
+        <translation>4x</translation>
     </message>
     <message>
         <source>8x</source>
-        <translation type="unfinished"></translation>
+        <translation>8x</translation>
     </message>
     <message>
         <source>16x</source>
-        <translation type="unfinished"></translation>
+        <translation>16x</translation>
     </message>
     <message>
         <source>CD Writer speed. Auto will use the recomended speed.</source>
-        <translation type="unfinished"></translation>
+        <translation>CD Schreibgeschwindigkeit. Bei &apos;Automatisch&apos; wird die empfohlene Geschwindigkeit verwendet.</translation>
     </message>
     <message>
         <source>CD Blanking Type</source>
-        <translation type="unfinished"></translation>
+        <translation>CD-RW Löschen Methode</translation>
     </message>
     <message>
         <source>Fast</source>
-        <translation type="unfinished"></translation>
+        <translation>Schnell</translation>
     </message>
     <message>
         <source>Complete</source>
-        <translation type="unfinished"></translation>
+        <translation>Vollständig</translation>
     </message>
     <message>
         <source>Blanking Method. Fast takes 1 minute. Complete can take up to 20 minutes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Löschmethode. Bei &apos;Schnell&apos; dauert das löschen 1 Minute, mit &apos;Vollständig&apos; bis zu 20 Minuten.</translation>
     </message>
     <message>
         <source>CD Recording Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>CDs Brennen</translation>
     </message>
     <message>
         <source>Artists</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpreten</translation>
     </message>
     <message>
         <source>Creating CD File System</source>
-        <translation type="unfinished"></translation>
+        <translation>Erzeuge ein CD Dateisystem</translation>
     </message>
     <message>
         <source>Burning CD</source>
-        <translation type="unfinished"></translation>
+        <translation>Brenne die CD</translation>
     </message>
     <message>
         <source>?</source>
-        <translation type="unfinished"></translation>
+        <translation>?</translation>
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortierreihenfolge in der Musikauswahl. Mögliche Werte sind (durch Leerzeichen getrennt): &apos;genre&apos;, &apos;splitartist&apos;, &apos;artist&apos;, &apos;album&apos;, &apos;title&apos; ODER das Schlüsselwort &apos;directory&apos;. Bei &apos;directory&apos; entspricht die Darstellung der tatsächlichen Verzeichnisstruktur.</translation>
     </message>
 </context>
 <context>
@@ -939,7 +800,7 @@ MythMusic Tabellen fehlen in der Datenbank.</translation>
     </message>
     <message>
         <source>Artist: </source>
-        <translation>Künstler:</translation>
+        <translation>Interpret:</translation>
     </message>
     <message>
         <source>Album: </source>
@@ -965,7 +826,7 @@ MythMusic Tabellen fehlen in der Datenbank.</translation>
     </message>
     <message>
         <source>Ripping...</source>
-        <translation>Kodiere...</translation>
+        <translation>Importiere...</translation>
     </message>
 </context>
 <context>
@@ -976,51 +837,51 @@ MythMusic Tabellen fehlen in der Datenbank.</translation>
     </message>
     <message>
         <source>Track Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Titelinformation</translation>
     </message>
     <message>
         <source>Artist:</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpret:</translation>
     </message>
     <message>
         <source>Album:</source>
-        <translation type="unfinished"></translation>
+        <translation>Album:</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel:</translation>
     </message>
     <message>
         <source>Genre:</source>
-        <translation type="unfinished"></translation>
+        <translation>Genre:</translation>
     </message>
     <message>
         <source>Year:</source>
-        <translation type="unfinished"></translation>
+        <translation>Jahr:</translation>
     </message>
     <message>
         <source>Track No.:</source>
-        <translation type="unfinished"></translation>
+        <translation>Lied Nr.:</translation>
     </message>
     <message>
         <source>Rating:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewertung:</translation>
     </message>
     <message>
         <source>Play Count:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wie oft gehört:</translation>
     </message>
     <message>
         <source>Last Play:</source>
-        <translation type="unfinished"></translation>
+        <translation>Zuletzt gehört:</translation>
     </message>
     <message>
         <source>Compilation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Zusammenstellung:</translation>
     </message>
     <message>
         <source>Filename:</source>
-        <translation type="unfinished"></translation>
+        <translation>Dateiname:</translation>
     </message>
 </context>
 </TS>

@@ -82,7 +82,7 @@
     </message>
     <message>
         <source>Blechy Blech Blah</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>All My Music ~ Loading Music Data </source>
@@ -94,7 +94,7 @@
     </message>
     <message>
         <source>The theme you are using does not contain a &apos;musictree&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>あなたの使用しているテーマに&apos;musictree&apos;エレメントがありません。テーマの作者に連絡してください。&lt;br&gt;&lt;br&gt;次の画面は空になるのでメインメニューに戻ります。</translation>
     </message>
     <message>
         <source>OK</source>
@@ -126,27 +126,27 @@
     </message>
     <message>
         <source>The theme you are using does not contain any info lines in the music element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>あなたの使用しているテーマに情報ラインがありません。テーマの作者に連絡してください。&lt;br&gt;&lt;br&gt;次の画面は空になるのでメインメニューに戻ります。</translation>
     </message>
     <message>
         <source>Artist:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>アーチスト:</translation>
     </message>
     <message>
         <source>Album:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>アルバム:</translation>
     </message>
     <message>
         <source>Title:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>タイトル:</translation>
     </message>
     <message>
         <source>Length:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>時間:</translation>
     </message>
     <message>
         <source>Genre: </source>
-        <translation type="unfinished">ジャンル:</translation>
+        <translation>ジャンル:</translation>
     </message>
 </context>
 <context>
@@ -161,11 +161,11 @@
     </message>
     <message>
         <source>Edit Playlist</source>
-        <translation type="unfinished">プレイリスト編集</translation>
+        <translation type="obsolete">プレイリスト編集</translation>
     </message>
     <message>
         <source>Visualize</source>
-        <translation type="unfinished">ビジュアライズ</translation>
+        <translation type="obsolete">ビジュアライズ</translation>
     </message>
     <message>
         <source>Rating</source>
@@ -185,39 +185,39 @@
     </message>
     <message>
         <source>Repeat: Track</source>
-        <translation type="unfinished">リピート: トラック</translation>
+        <translation type="obsolete">リピート: トラック</translation>
     </message>
     <message>
         <source>Repeat: All</source>
-        <translation type="unfinished">リピート: 全て</translation>
+        <translation type="obsolete">リピート: 全て</translation>
     </message>
     <message>
         <source>Playing stream.</source>
-        <translation type="unfinished">再生ストリーム.</translation>
+        <translation type="obsolete">再生ストリーム.</translation>
     </message>
     <message>
         <source>Buffering stream.</source>
-        <translation type="unfinished">バッファーストリーム.</translation>
+        <translation type="obsolete">バッファーストリーム.</translation>
     </message>
     <message>
         <source>Stream paused.</source>
-        <translation type="unfinished">ストリーム停止中.</translation>
+        <translation type="obsolete">ストリーム停止中.</translation>
     </message>
     <message>
         <source>Output error.</source>
-        <translation type="unfinished">出力エラー.</translation>
+        <translation type="obsolete">出力エラー.</translation>
     </message>
     <message>
         <source>Stream stopped.</source>
-        <translation type="unfinished">ストリーム停止中.</translation>
+        <translation type="obsolete">ストリーム停止中.</translation>
     </message>
     <message>
         <source>Finished playing stream.</source>
-        <translation type="unfinished">再生ストリーム終了.</translation>
+        <translation type="obsolete">再生ストリーム終了.</translation>
     </message>
     <message>
         <source>Decoder error.</source>
-        <translation type="unfinished">出コードエラー.</translation>
+        <translation type="obsolete">デコードエラー.</translation>
     </message>
     <message>
         <source>Shuffle: Intelligent</source>
@@ -229,78 +229,27 @@
     </message>
     <message>
         <source>1 Shuffle: None</source>
-        <translation type="unfinished">1 シャッフル: 無し</translation>
+        <translation type="obsolete">1 シャッフル: 無し</translation>
     </message>
     <message>
         <source>Shuffle: None</source>
-        <translation type="unfinished">シャッフル: 無し</translation>
+        <translation type="obsolete">シャッフル: 無し</translation>
     </message>
     <message>
         <source>2 Repeat: All</source>
-        <translation type="unfinished">2 リピート: 全て</translation>
+        <translation type="obsolete">2 リピート: 全て</translation>
     </message>
     <message>
         <source>2 Repeat: Track</source>
-        <translation type="unfinished">2 リピート: トラック</translation>
+        <translation type="obsolete">2 リピート: トラック</translation>
     </message>
     <message>
         <source>2 Repeat: None</source>
-        <translation type="unfinished">2 リピート: 無し</translation>
+        <translation type="obsolete">2 リピート: 無し</translation>
     </message>
     <message>
         <source>Repeat: None</source>
-        <translation type="unfinished">リピート: 無し</translation>
-    </message>
-    <message>
-        <source>3 Edit Playlist</source>
-        <translation type="unfinished">3 プレイリスト編集</translation>
-    </message>
-    <message>
-        <source>4 Visualize</source>
-        <translation type="unfinished">4 ビジュアライズ</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Smart</source>
-        <translation type="unfinished">1 シャッフル: スマート</translation>
-    </message>
-    <message>
-        <source>Shuffle: Smart</source>
-        <translation type="unfinished">シャッフル: スマート</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Rand</source>
-        <translation type="unfinished">1 シャッフル: ランダム</translation>
-    </message>
-    <message>
-        <source>Shuffle: Rand</source>
-        <translation type="unfinished">シャッフル: ランダム</translation>
-    </message>
-    <message>
-        <source>playlist root</source>
-        <translation type="unfinished">プレイリストルート</translation>
-    </message>
-    <message>
-        <source>kbps</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>kHz</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ch</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>PlaybackBoxMusic</name>
-    <message>
-        <source>Edit Playlist</source>
-        <translation type="obsolete">プレイリスト編集</translation>
-    </message>
-    <message>
-        <source>Visualize</source>
-        <translation type="obsolete">ビジュアライズ</translation>
+        <translation type="obsolete">リピート: 無し</translation>
     </message>
     <message>
         <source>3 Edit Playlist</source>
@@ -327,56 +276,119 @@
         <translation type="obsolete">シャッフル: ランダム</translation>
     </message>
     <message>
-        <source>1 Shuffle: None</source>
-        <translation type="obsolete">1 シャッフル: 無し</translation>
-    </message>
-    <message>
-        <source>Shuffle: None</source>
-        <translation type="obsolete">シャッフル: 無し</translation>
-    </message>
-    <message>
-        <source>2 Repeat: All</source>
-        <translation type="obsolete">2 リピート: 全て</translation>
-    </message>
-    <message>
-        <source>Repeat: All</source>
-        <translation type="obsolete">リピート: 全て</translation>
-    </message>
-    <message>
-        <source>2 Repeat: Track</source>
-        <translation type="obsolete">2 リピート: トラック</translation>
-    </message>
-    <message>
-        <source>Repeat: Track</source>
-        <translation type="obsolete">リピート: トラック</translation>
-    </message>
-    <message>
-        <source>2 Repeat: None</source>
-        <translation type="obsolete">2 リピート: 無し</translation>
-    </message>
-    <message>
-        <source>Repeat: None</source>
-        <translation type="obsolete">リピート: 無し</translation>
-    </message>
-    <message>
         <source>playlist root</source>
         <translation type="obsolete">プレイリストルート</translation>
     </message>
+</context>
+<context>
+    <name>PlaybackBoxMusic</name>
+    <message>
+        <source>Edit Playlist</source>
+        <translation type="unfinished">プレイリスト編集</translation>
+    </message>
+    <message>
+        <source>Visualize</source>
+        <translation type="unfinished">ビジュアライズ</translation>
+    </message>
+    <message>
+        <source>3 Edit Playlist</source>
+        <translation type="unfinished">3 プレイリスト編集</translation>
+    </message>
+    <message>
+        <source>4 Visualize</source>
+        <translation type="unfinished">4 ビジュアライズ</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Smart</source>
+        <translation type="unfinished">1 シャッフル: スマート</translation>
+    </message>
+    <message>
+        <source>Shuffle: Smart</source>
+        <translation type="unfinished">シャッフル: スマート</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Rand</source>
+        <translation type="unfinished">1 シャッフル: ランダム</translation>
+    </message>
+    <message>
+        <source>Shuffle: Rand</source>
+        <translation type="unfinished">シャッフル: ランダム</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: None</source>
+        <translation type="unfinished">1 シャッフル: 無し</translation>
+    </message>
+    <message>
+        <source>Shuffle: None</source>
+        <translation type="unfinished">シャッフル: 無し</translation>
+    </message>
+    <message>
+        <source>2 Repeat: All</source>
+        <translation type="unfinished">2 リピート: 全て</translation>
+    </message>
+    <message>
+        <source>Repeat: All</source>
+        <translation type="unfinished">リピート: 全て</translation>
+    </message>
+    <message>
+        <source>2 Repeat: Track</source>
+        <translation type="unfinished">2 リピート: トラック</translation>
+    </message>
+    <message>
+        <source>Repeat: Track</source>
+        <translation type="unfinished">リピート: トラック</translation>
+    </message>
+    <message>
+        <source>2 Repeat: None</source>
+        <translation type="unfinished">2 リピート: 無し</translation>
+    </message>
+    <message>
+        <source>Repeat: None</source>
+        <translation type="unfinished">リピート: 無し</translation>
+    </message>
+    <message>
+        <source>playlist root</source>
+        <translation type="unfinished">プレイリストルート</translation>
+    </message>
     <message>
         <source>Playing stream.</source>
-        <translation type="obsolete">再生ストリーム.</translation>
+        <translation type="unfinished">再生ストリーム.</translation>
     </message>
     <message>
         <source>Buffering stream.</source>
-        <translation type="obsolete">バッファーストリーム.</translation>
+        <translation type="unfinished">バッファーストリーム.</translation>
     </message>
     <message>
         <source>Output error.</source>
-        <translation type="obsolete">出力エラー.</translation>
+        <translation type="unfinished">出力エラー.</translation>
     </message>
     <message>
         <source>Finished playing stream.</source>
-        <translation type="obsolete">再生ストリーム終了.</translation>
+        <translation type="unfinished">再生ストリーム終了.</translation>
+    </message>
+    <message>
+        <source>Stream paused.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>kbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>kHz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stream stopped.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decoder error.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -463,7 +475,7 @@
     </message>
     <message>
         <source>If set, MythMusic will skip checking ID3 tags in files and just try to determine Genre, Artist, Album, and Track number and title from the filename.</source>
-        <translation type="unfinished"></translation>
+        <translation>これをセットするとMythMusicはファイルのID3タグを無視してファイル名からジャンル、アーチスト、アルバム、トラックナンバーとタイトルを取得します。</translation>
     </message>
     <message>
         <source>Automatically lookup CDs</source>
@@ -471,7 +483,7 @@
     </message>
     <message>
         <source>Automatically lookup an audio CD if it is present and show its information in the Music Selection Tree.</source>
-        <translation type="unfinished"></translation>
+        <translation>ミュージック選択画面で音楽CDの内容を自動的に表示します。</translation>
     </message>
     <message>
         <source>Use Keyboard/Remote Accelerated Buttons</source>
@@ -479,7 +491,7 @@
     </message>
     <message>
         <source>If this is not set, you will need to use arrow keys to select and activate various functions.</source>
-        <translation type="unfinished"></translation>
+        <translation>これをセットしないと、矢印キーで機能を選択しなければなりません。</translation>
     </message>
     <message>
         <source>Encoding</source>
@@ -503,7 +515,7 @@
     </message>
     <message>
         <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / and -. &apos;-&apos; will be replaced by the Token separator</source>
-        <translation type="unfinished"></translation>
+        <translation>既定の音楽の場所。使用できるパラメータは: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / と - です。&apos;-&apos;はセパレーターに置き換えられます。</translation>
     </message>
     <message>
         <source>Token separator</source>
@@ -563,7 +575,7 @@
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how many times a given track has been played when ordering a group of songs.</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;スマート&quot;シャッフルモードで使用されます。再生回数が曲順に影響します。</translation>
     </message>
     <message>
         <source>Last Play Weight</source>
@@ -571,7 +583,7 @@
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how long it has been since a given track was played when ordering a group of songs.</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;スマート&quot;シャッフルモードで使用されます。再生されてからの時間が曲順に影響します。</translation>
     </message>
     <message>
         <source>Random Weight</source>
@@ -579,7 +591,7 @@
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to good old (peudo-)randomness when ordering a group of songs.</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;スマート&quot;シャッフルモードで使用されます。</translation>
     </message>
     <message>
         <source>Show Song Ratings</source>
@@ -595,7 +607,7 @@
     </message>
     <message>
         <source>List songs on the playback screen in the order they will be played.</source>
-        <translation type="unfinished"></translation>
+        <translation>再生画面に再生される順に表示する</translation>
     </message>
     <message>
         <source>Show entire music tree</source>
@@ -603,7 +615,7 @@
     </message>
     <message>
         <source>If selected, you can navigate your entire music tree from the playing screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>これを選択すると、再生に全ての音楽を表示します。</translation>
     </message>
     <message>
         <source>Play mode</source>
@@ -623,7 +635,7 @@
     </message>
     <message>
         <source>Starting shuffle mode for the player.  Can be either normal, random, or intelligent (random).</source>
-        <translation type="unfinished"></translation>
+        <translation>再生時のシャッフルモード。ノーマル、ランダム、インテリジェント（ランダム）から選択できます。</translation>
     </message>
     <message>
         <source>Delay before Visualizations start (seconds)</source>
@@ -647,7 +659,7 @@
     </message>
     <message>
         <source>If set to &quot;2&quot;, visualizations will be scaled in half.  Currently only used by the goom visualization.  Reduces CPU load on slower machines.</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;2&quot;をセットするとビジュアリゼーションは半分のサイズになります。現在はグームのみ有効です。遅いマシンでCPU負荷を減らします。</translation>
     </message>
     <message>
         <source>Height for Visual Scaling</source>
@@ -659,35 +671,35 @@
     </message>
     <message>
         <source>List of visualizations to use during playback. Possible values are space-separated list of </source>
-        <translation type="unfinished"></translation>
+        <translation>再生中に使用するビジュアリゼーションのリスト。スペース区切りで並べてください。</translation>
     </message>
     <message>
         <source>MonoScope</source>
-        <translation type="unfinished"></translation>
+        <translation>モノスコープ</translation>
     </message>
     <message>
         <source>StereoScope</source>
-        <translation type="unfinished"></translation>
+        <translation>ステレオスコープ</translation>
     </message>
     <message>
         <source>Spectrum</source>
-        <translation type="unfinished"></translation>
+        <translation>スペクトラム</translation>
     </message>
     <message>
         <source>Goom</source>
-        <translation type="unfinished"></translation>
+        <translation>グーム</translation>
     </message>
     <message>
         <source>Synaesthesia</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Gears</source>
-        <translation type="unfinished"></translation>
+        <translation>ギア</translation>
     </message>
     <message>
         <source>Blank</source>
-        <translation type="unfinished"></translation>
+        <translation>ブランク</translation>
     </message>
     <message>
         <source>Default Rip Quality</source>
@@ -731,7 +743,7 @@
     </message>
     <message>
         <source>MPEG Layer 1/2/3 Audio (MAD decoder)</source>
-        <translation type="unfinished"></translation>
+        <translation>MPEG レイヤー 1/2/3 オーディオ (MAD デコーダー)</translation>
     </message>
     <message>
         <source>music database</source>
@@ -843,7 +855,7 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>If set, the MP3 encoder will use variable bitrates (VBR) except for the low quality setting. The Ogg encoder will always use variable bitrates.</source>
-        <translation type="unfinished"></translation>
+        <translation>これをセットすると、MP3エンコーダーは低品質のときを除いて可変ビットレート(VBR)を使用します。Oggエンコーダーは常に可変ビットレートです。</translation>
     </message>
     <message>
         <source>AlbumArt</source>
@@ -867,7 +879,7 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>Select the SCSI Device for CD Writing.  If your IDE device is not present, try adding hdd(or hdc/hdb)=ide-scsi to your boot options</source>
-        <translation type="unfinished"></translation>
+        <translation>CD書き込みするSCSIデバイスを選択してください。  IDEデバイスがない場合は起動オプションのhdd(又はhdc/hdb)=ide-scsiを試してください</translation>
     </message>
     <message>
         <source>Disk Size</source>
@@ -887,7 +899,7 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>Enable directories on MP3 Creation</source>
-        <translation type="unfinished"></translation>
+        <translation>MP3作成時にディレクトリを使用する</translation>
     </message>
     <message>
         <source>CD Write Speed</source>
@@ -959,7 +971,7 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation type="unfinished"></translation>
+        <translation>ミュージックツリーの並べ方。スペース区切りでキーワードを指定してください。使用できるキーワードは genre, splitartist, artist, album, と title です。</translation>
     </message>
 </context>
 <context>
@@ -1025,43 +1037,43 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>Track Information</source>
-        <translation type="unfinished"></translation>
+        <translation>トラック情報</translation>
     </message>
     <message>
         <source>Artist:</source>
-        <translation type="unfinished"></translation>
+        <translation>アーチスト:</translation>
     </message>
     <message>
         <source>Album:</source>
-        <translation type="unfinished"></translation>
+        <translation>アルバム:</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>タイトル:</translation>
     </message>
     <message>
         <source>Genre:</source>
-        <translation type="unfinished"></translation>
+        <translation>ジャンル:</translation>
     </message>
     <message>
         <source>Year:</source>
-        <translation type="unfinished"></translation>
+        <translation>年:</translation>
     </message>
     <message>
         <source>Track No.:</source>
-        <translation type="unfinished"></translation>
+        <translation>トラックNo:</translation>
     </message>
     <message>
         <source>Rating:</source>
-        <translation type="unfinished"></translation>
+        <translation>レイティング:</translation>
     </message>
     <message>
         <source>Play Count:</source>
-        <translation type="unfinished"></translation>
+        <translation>プレイカウント:</translation>
     </message>
     <message>
         <source>Last Play:</source>
-        <translation type="unfinished"></translation>
+        <translation>ラストプレイ:</translation>
     </message>
     <message>
         <source>Compilation:</source>
@@ -1069,7 +1081,7 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>Filename:</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル名:</translation>
     </message>
 </context>
 </TS>

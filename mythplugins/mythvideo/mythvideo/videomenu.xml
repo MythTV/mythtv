@@ -21,7 +21,7 @@
      <text lang="ES">Listar vídeos</text>
      <text lang="CA">Llistar vídeos</text>
      <text lang="DK">Film oversigt</text>
-     <text lang="DE">Video-Liste</text>
+     <text lang="DE">Liste</text>
      <text lang="PT">Lista de Filmes</text>
      <text lang="SV">Filmlista</text>
      <text lang="FR">Liste des vidéos</text>
@@ -34,6 +34,7 @@
      <type>VIDEO_GALLERY</type>
      <text>Video Gallery</text>
      <text lang="FR">Gallerie vidéo</text>
+     <text lang="DE">Galerie</text>
    <action>GALLERY</action>
    </button>
 

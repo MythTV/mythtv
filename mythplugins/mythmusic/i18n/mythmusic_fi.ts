@@ -114,117 +114,6 @@
     <name>PlaybackBox</name>
     <message>
         <source>Edit Playlist</source>
-        <translation type="unfinished">Muokkaa Soittolistaa</translation>
-    </message>
-    <message>
-        <source>Visualize</source>
-        <translation type="unfinished">Visualisoi</translation>
-    </message>
-    <message>
-        <source>3 Edit Playlist</source>
-        <translation type="unfinished">3 Muokkaa Soittolistaa</translation>
-    </message>
-    <message>
-        <source>4 Visualize</source>
-        <translation type="unfinished">4 Visualisoi</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Smart</source>
-        <translation type="unfinished">1 Satunnaist: Älykäs</translation>
-    </message>
-    <message>
-        <source>Shuffle: Smart</source>
-        <translation type="unfinished">Satunnaist: Älykäs</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Rand</source>
-        <translation type="unfinished">1 Satunnaist: Joku</translation>
-    </message>
-    <message>
-        <source>Shuffle: Rand</source>
-        <translation type="unfinished">Satunnaist: Joku</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: None</source>
-        <translation type="unfinished">1 Satunnaist: Ei Mitään</translation>
-    </message>
-    <message>
-        <source>Shuffle: None</source>
-        <translation type="unfinished">Satunnaist: Ei Mitään</translation>
-    </message>
-    <message>
-        <source>2 Repeat: All</source>
-        <translation type="unfinished">2 Toista: Kaikki</translation>
-    </message>
-    <message>
-        <source>Repeat: All</source>
-        <translation type="unfinished">Toista: Kaikki</translation>
-    </message>
-    <message>
-        <source>2 Repeat: Track</source>
-        <translation type="unfinished">2 Toista: Kappale</translation>
-    </message>
-    <message>
-        <source>Repeat: Track</source>
-        <translation type="unfinished">Toista: Kappale</translation>
-    </message>
-    <message>
-        <source>2 Repeat: None</source>
-        <translation type="unfinished">2 Toista: Ei Mitään</translation>
-    </message>
-    <message>
-        <source>Repeat: None</source>
-        <translation type="unfinished">Toista: Ei Mitään</translation>
-    </message>
-    <message>
-        <source>playlist root</source>
-        <translation type="unfinished">soittolistan juuri</translation>
-    </message>
-    <message>
-        <source>Playing stream.</source>
-        <translation type="unfinished">Soittaa musiikkivirtaa.</translation>
-    </message>
-    <message>
-        <source>Buffering stream.</source>
-        <translation type="unfinished">Puskuroi musiikkivirtaa.</translation>
-    </message>
-    <message>
-        <source>Stream paused.</source>
-        <translation type="unfinished">Musiikkivirta tauotettu.</translation>
-    </message>
-    <message>
-        <source>kbps</source>
-        <translation type="unfinished">kbps</translation>
-    </message>
-    <message>
-        <source>kHz</source>
-        <translation type="unfinished">kHz</translation>
-    </message>
-    <message>
-        <source>ch</source>
-        <translation type="unfinished">kan</translation>
-    </message>
-    <message>
-        <source>Output error.</source>
-        <translation type="unfinished">Virhe ulostulossa.</translation>
-    </message>
-    <message>
-        <source>Stream stopped.</source>
-        <translation type="unfinished">Musiikkivirta lopetettu.</translation>
-    </message>
-    <message>
-        <source>Finished playing stream.</source>
-        <translation type="unfinished">Musiikkivirta soitettu loppuun.</translation>
-    </message>
-    <message>
-        <source>Decoder error.</source>
-        <translation type="unfinished">Purkuvirhe.</translation>
-    </message>
-</context>
-<context>
-    <name>PlaybackBoxMusic</name>
-    <message>
-        <source>Edit Playlist</source>
         <translation type="obsolete">Muokkaa Soittolistaa</translation>
     </message>
     <message>
@@ -330,6 +219,117 @@
     <message>
         <source>Decoder error.</source>
         <translation type="obsolete">Purkuvirhe.</translation>
+    </message>
+</context>
+<context>
+    <name>PlaybackBoxMusic</name>
+    <message>
+        <source>Edit Playlist</source>
+        <translation type="unfinished">Muokkaa Soittolistaa</translation>
+    </message>
+    <message>
+        <source>Visualize</source>
+        <translation type="unfinished">Visualisoi</translation>
+    </message>
+    <message>
+        <source>3 Edit Playlist</source>
+        <translation type="unfinished">3 Muokkaa Soittolistaa</translation>
+    </message>
+    <message>
+        <source>4 Visualize</source>
+        <translation type="unfinished">4 Visualisoi</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Smart</source>
+        <translation type="unfinished">1 Satunnaist: Älykäs</translation>
+    </message>
+    <message>
+        <source>Shuffle: Smart</source>
+        <translation type="unfinished">Satunnaist: Älykäs</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Rand</source>
+        <translation type="unfinished">1 Satunnaist: Joku</translation>
+    </message>
+    <message>
+        <source>Shuffle: Rand</source>
+        <translation type="unfinished">Satunnaist: Joku</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: None</source>
+        <translation type="unfinished">1 Satunnaist: Ei Mitään</translation>
+    </message>
+    <message>
+        <source>Shuffle: None</source>
+        <translation type="unfinished">Satunnaist: Ei Mitään</translation>
+    </message>
+    <message>
+        <source>2 Repeat: All</source>
+        <translation type="unfinished">2 Toista: Kaikki</translation>
+    </message>
+    <message>
+        <source>Repeat: All</source>
+        <translation type="unfinished">Toista: Kaikki</translation>
+    </message>
+    <message>
+        <source>2 Repeat: Track</source>
+        <translation type="unfinished">2 Toista: Kappale</translation>
+    </message>
+    <message>
+        <source>Repeat: Track</source>
+        <translation type="unfinished">Toista: Kappale</translation>
+    </message>
+    <message>
+        <source>2 Repeat: None</source>
+        <translation type="unfinished">2 Toista: Ei Mitään</translation>
+    </message>
+    <message>
+        <source>Repeat: None</source>
+        <translation type="unfinished">Toista: Ei Mitään</translation>
+    </message>
+    <message>
+        <source>playlist root</source>
+        <translation type="unfinished">soittolistan juuri</translation>
+    </message>
+    <message>
+        <source>Playing stream.</source>
+        <translation type="unfinished">Soittaa musiikkivirtaa.</translation>
+    </message>
+    <message>
+        <source>Buffering stream.</source>
+        <translation type="unfinished">Puskuroi musiikkivirtaa.</translation>
+    </message>
+    <message>
+        <source>Stream paused.</source>
+        <translation type="unfinished">Musiikkivirta tauotettu.</translation>
+    </message>
+    <message>
+        <source>kbps</source>
+        <translation type="unfinished">kbps</translation>
+    </message>
+    <message>
+        <source>kHz</source>
+        <translation type="unfinished">kHz</translation>
+    </message>
+    <message>
+        <source>ch</source>
+        <translation type="unfinished">kan</translation>
+    </message>
+    <message>
+        <source>Output error.</source>
+        <translation type="unfinished">Virhe ulostulossa.</translation>
+    </message>
+    <message>
+        <source>Stream stopped.</source>
+        <translation type="unfinished">Musiikkivirta lopetettu.</translation>
+    </message>
+    <message>
+        <source>Finished playing stream.</source>
+        <translation type="unfinished">Musiikkivirta soitettu loppuun.</translation>
+    </message>
+    <message>
+        <source>Decoder error.</source>
+        <translation type="unfinished">Purkuvirhe.</translation>
     </message>
 </context>
 <context>

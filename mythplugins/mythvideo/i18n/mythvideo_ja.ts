@@ -108,11 +108,11 @@
     </message>
     <message>
         <source>Video List browses files</source>
-        <translation type="unfinished"></translation>
+        <translation>見えるファイルを表示する</translation>
     </message>
     <message>
         <source>If set, this will cause the Video List screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation type="unfinished"></translation>
+        <translation>これをセットすると、MythVideoの開始ディレクトリで関連の有るファイルをスキャンされてなくても表示します。</translation>
     </message>
     <message>
         <source>This is the command used for any file that the extension is not specifically defined.</source>
@@ -180,11 +180,11 @@
     </message>
     <message>
         <source>Command to search for movie listings</source>
-        <translation type="unfinished"></translation>
+        <translation>映画リストの検索コマンド</translation>
     </message>
     <message>
         <source>This command must be executable by the user running MythVideo.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythVideoの実行ユーザーが実行できるコマンドを指定してください。</translation>
     </message>
     <message>
         <source>Command to search for movie posters</source>
@@ -192,7 +192,7 @@
     </message>
     <message>
         <source>Command to extract data for movies</source>
-        <translation type="unfinished"></translation>
+        <translation>映画データの解凍コマンド</translation>
     </message>
     <message>
         <source>Directory that holds movie posters</source>
@@ -218,23 +218,23 @@
     </message>
     <message>
         <source>Default View</source>
-        <translation type="unfinished"></translation>
+        <translation>規定のビュー</translation>
     </message>
     <message>
         <source>Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>ギャラリー</translation>
     </message>
     <message>
         <source>Browser</source>
-        <translation type="unfinished"></translation>
+        <translation>ブラウザ</translation>
     </message>
     <message>
         <source>Listings</source>
-        <translation type="unfinished"></translation>
+        <translation>リスト</translation>
     </message>
     <message>
         <source>Aggressive Parental Control</source>
-        <translation type="unfinished"></translation>
+        <translation>積極的な再生制御</translation>
     </message>
     <message>
         <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
@@ -242,15 +242,15 @@
     </message>
     <message>
         <source>Rows to display</source>
-        <translation type="unfinished"></translation>
+        <translation>表示行</translation>
     </message>
     <message>
         <source>Columns to display</source>
-        <translation type="unfinished"></translation>
+        <translation>表示列</translation>
     </message>
     <message>
         <source>Show title below thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>サムネイルのしたにタイトルを表示</translation>
     </message>
     <message>
         <source>If set, the additional text will make the thumbnails smaller.</source>
@@ -258,7 +258,7 @@
     </message>
     <message>
         <source>Maintain aspect ratio of thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>サムネイルのアスペクトレシオを保持する</translation>
     </message>
     <message>
         <source>If set, the scaled thumbnails will maintain their original aspect ratio. If not set, they are scaled to match the size of the background icon.</source>
@@ -266,11 +266,11 @@
     </message>
     <message>
         <source>Video Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオギャラリー</translation>
     </message>
     <message>
         <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythVideoのデフォルトビュー。他のビューはMENUキーを押して出るポップアップから選択できます。</translation>
     </message>
 </context>
 <context>
@@ -453,7 +453,7 @@
     </message>
     <message>
         <source>User Rating :</source>
-        <translation>ユーザー格付け:</translation>
+        <translation>ユーザー格付:</translation>
     </message>
     <message>
         <source>Browse :</source>
@@ -509,15 +509,15 @@
     </message>
     <message>
         <source>INFO - Action Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>INFO - アクションメニュー</translation>
     </message>
     <message>
         <source>Up/Down, Page Up/Down: Browse   MENU: Options   INFO: Action Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Up/Down, Page Up/Down: 移動   MENU: オプション   INFO: アクションメニュー</translation>
     </message>
     <message>
         <source>Play File After This:</source>
-        <translation type="unfinished"></translation>
+        <translation>このファイルの後に再生:</translation>
     </message>
 </context>
 <context>
@@ -564,96 +564,96 @@
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">キャンセル</translation>
+        <translation>キャンセル</translation>
     </message>
 </context>
 <context>
     <name>VideoDialog</name>
     <message>
         <source>Switch to Browse View</source>
-        <translation type="unfinished"></translation>
+        <translation>ブラウズビューに切替え</translation>
     </message>
     <message>
         <source>Switch to Gallery View</source>
-        <translation type="unfinished"></translation>
+        <translation>ギャラリービューに切替え</translation>
     </message>
     <message>
         <source>Switch to List View</source>
-        <translation type="unfinished"></translation>
+        <translation>リストビューに切替え</translation>
     </message>
     <message>
         <source>Select action</source>
-        <translation type="unfinished">動作選択</translation>
+        <translation>動作選択</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>はい</translation>
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished">再生制限ピン:</translation>
+        <translation>再生制限ピン:</translation>
     </message>
 </context>
 <context>
     <name>VideoFilterDialog</name>
     <message>
         <source>Result of this filter : %1 video(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>このフィルタの結果 : %1 個</translation>
     </message>
     <message>
         <source>Result of this filter : No Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>このフィルタの結果 : 該当無し</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">不明</translation>
+        <translation>不明</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished">分</translation>
+        <translation>分</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>全て</translation>
     </message>
     <message>
         <source>Save as default</source>
-        <translation type="unfinished"></translation>
+        <translation>規定で保存</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation type="unfinished">終了</translation>
+        <translation>終了</translation>
     </message>
 </context>
 <context>
     <name>VideoGallery</name>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished">表示絞りこみ</translation>
+        <translation>絞りこみ表示</translation>
     </message>
     <message>
         <source>Watch This Video</source>
-        <translation type="unfinished">このビデオを見る</translation>
+        <translation>このビデオを見る</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation type="unfinished">全ての粗筋を表示する</translation>
+        <translation>全ての粗筋を表示する</translation>
     </message>
     <message>
         <source>View Details</source>
-        <translation type="unfinished"></translation>
+        <translation>詳細を表示する</translation>
     </message>
     <message>
         <source>Plain View</source>
-        <translation type="unfinished"></translation>
+        <translation>プレインビュー</translation>
     </message>
     <message>
         <source>Folder View</source>
-        <translation type="unfinished"></translation>
+        <translation>フォルダービュー</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">キャンセル</translation>
+        <translation>キャンセル</translation>
     </message>
 </context>
 <context>
@@ -743,11 +743,11 @@
     <name>VideoSelected</name>
     <message>
         <source>No rating available.</source>
-        <translation type="unfinished">レイティングは使用できません.</translation>
+        <translation>レイティングは使用できません.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished">分</translation>
+        <translation>分</translation>
     </message>
 </context>
 <context>
@@ -762,35 +762,35 @@
     </message>
     <message>
         <source>Select action</source>
-        <translation type="unfinished">動作選択</translation>
+        <translation>動作選択</translation>
     </message>
     <message>
         <source>Watch This Video</source>
-        <translation type="unfinished">このビデオを見る</translation>
+        <translation>このビデオを見る</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation type="unfinished">全ての粗筋を表示する</translation>
+        <translation>全ての粗筋を表示する</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished">表示絞りこみ</translation>
+        <translation>絞りこみ表示</translation>
     </message>
     <message>
         <source>Switch to Browse View</source>
-        <translation type="unfinished"></translation>
+        <translation>ブラウズビューに切替え</translation>
     </message>
     <message>
         <source>Switch to Gallery View</source>
-        <translation type="unfinished"></translation>
+        <translation>ギャラリービューに切替え</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">キャンセル</translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>はい</translation>
     </message>
 </context>
 </TS>

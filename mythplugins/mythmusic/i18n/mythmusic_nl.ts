@@ -114,115 +114,64 @@
     <name>PlaybackBox</name>
     <message>
         <source>1 Shuffle: None</source>
-        <translation type="unfinished">1 Mengen: Uit</translation>
+        <translation type="obsolete">1 Mengen: Uit</translation>
     </message>
     <message>
         <source>Shuffle: None</source>
-        <translation type="unfinished">Mengen: Uit</translation>
+        <translation type="obsolete">Mengen: Uit</translation>
     </message>
     <message>
         <source>2 Repeat: All</source>
-        <translation type="unfinished">2 Herhalen: Alles</translation>
+        <translation type="obsolete">2 Herhalen: Alles</translation>
     </message>
     <message>
         <source>Repeat: All</source>
-        <translation type="unfinished">Herhalen: Alles</translation>
+        <translation type="obsolete">Herhalen: Alles</translation>
     </message>
     <message>
         <source>2 Repeat: Track</source>
-        <translation type="unfinished">2 Herhalen: Nummer</translation>
+        <translation type="obsolete">2 Herhalen: Nummer</translation>
     </message>
     <message>
         <source>Repeat: Track</source>
-        <translation type="unfinished">Herhalen: Nummer</translation>
+        <translation type="obsolete">Herhalen: Nummer</translation>
     </message>
     <message>
         <source>2 Repeat: None</source>
-        <translation type="unfinished">2 Herhalen: Geen</translation>
+        <translation type="obsolete">2 Herhalen: Geen</translation>
     </message>
     <message>
         <source>Repeat: None</source>
-        <translation type="unfinished">Herhalen: Geen</translation>
+        <translation type="obsolete">Herhalen: Geen</translation>
     </message>
     <message>
         <source>Playing stream.</source>
-        <translation type="unfinished">Bezig afspelen stream.</translation>
+        <translation type="obsolete">Bezig afspelen stream.</translation>
     </message>
     <message>
         <source>Buffering stream.</source>
-        <translation type="unfinished">Bezig bufferen stream.</translation>
+        <translation type="obsolete">Bezig bufferen stream.</translation>
     </message>
     <message>
         <source>Stream paused.</source>
-        <translation type="unfinished">Stream gepauseerd.</translation>
+        <translation type="obsolete">Stream gepauseerd.</translation>
     </message>
     <message>
         <source>Output error.</source>
-        <translation type="unfinished">Uitvoerfout.</translation>
+        <translation type="obsolete">Uitvoerfout.</translation>
     </message>
     <message>
         <source>Stream stopped.</source>
-        <translation type="unfinished">Stream gestopt.</translation>
+        <translation type="obsolete">Stream gestopt.</translation>
     </message>
     <message>
         <source>Finished playing stream.</source>
-        <translation type="unfinished">Stream afgespeeld.</translation>
+        <translation type="obsolete">Stream afgespeeld.</translation>
     </message>
     <message>
         <source>Decoder error.</source>
-        <translation type="unfinished">Decodeerfout.</translation>
+        <translation type="obsolete">Decodeerfout.</translation>
     </message>
-    <message>
-        <source>Edit Playlist</source>
-        <translation type="unfinished">Wijzig Afspeellijst</translation>
-    </message>
-    <message>
-        <source>Visualize</source>
-        <translation type="unfinished">Visuele Effecten</translation>
-    </message>
-    <message>
-        <source>3 Edit Playlist</source>
-        <translation type="unfinished">3 Wijzig Afspeellijst</translation>
-    </message>
-    <message>
-        <source>4 Visualize</source>
-        <translation type="unfinished">4 Visuele Effecten</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Smart</source>
-        <translation type="unfinished">1 Mengen: Slim</translation>
-    </message>
-    <message>
-        <source>Shuffle: Smart</source>
-        <translation type="unfinished">Mengen: Slim</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Rand</source>
-        <translation type="unfinished">1 Mengen: Willekeurig</translation>
-    </message>
-    <message>
-        <source>Shuffle: Rand</source>
-        <translation type="unfinished">Mengen: Willekeurig</translation>
-    </message>
-    <message>
-        <source>playlist root</source>
-        <translation type="unfinished">afspeellijst root</translation>
-    </message>
-    <message>
-        <source>kbps</source>
-        <translation type="unfinished">kbps</translation>
-    </message>
-    <message>
-        <source>kHz</source>
-        <translation type="unfinished">kHz</translation>
-    </message>
-    <message>
-        <source>ch</source>
-        <translation type="unfinished">kan</translation>
-    </message>
-</context>
-<context>
-    <name>PlaybackBoxMusic</name>
     <message>
         <source>Edit Playlist</source>
         <translation type="obsolete">Wijzig Afspeellijst</translation>
@@ -256,52 +205,8 @@
         <translation type="obsolete">Mengen: Willekeurig</translation>
     </message>
     <message>
-        <source>1 Shuffle: None</source>
-        <translation type="obsolete">1 Mengen: Uit</translation>
-    </message>
-    <message>
-        <source>Shuffle: None</source>
-        <translation type="obsolete">Mengen: Uit</translation>
-    </message>
-    <message>
-        <source>2 Repeat: All</source>
-        <translation type="obsolete">2 Herhalen: Alles</translation>
-    </message>
-    <message>
-        <source>Repeat: All</source>
-        <translation type="obsolete">Herhalen: Alles</translation>
-    </message>
-    <message>
-        <source>2 Repeat: Track</source>
-        <translation type="obsolete">2 Herhalen: Nummer</translation>
-    </message>
-    <message>
-        <source>Repeat: Track</source>
-        <translation type="obsolete">Herhalen: Nummer</translation>
-    </message>
-    <message>
-        <source>2 Repeat: None</source>
-        <translation type="obsolete">2 Herhalen: Geen</translation>
-    </message>
-    <message>
-        <source>Repeat: None</source>
-        <translation type="obsolete">Herhalen: Geen</translation>
-    </message>
-    <message>
         <source>playlist root</source>
         <translation type="obsolete">afspeellijst root</translation>
-    </message>
-    <message>
-        <source>Playing stream.</source>
-        <translation type="obsolete">Bezig afspelen stream.</translation>
-    </message>
-    <message>
-        <source>Buffering stream.</source>
-        <translation type="obsolete">Bezig bufferen stream.</translation>
-    </message>
-    <message>
-        <source>Stream paused.</source>
-        <translation type="obsolete">Stream gepauseerd.</translation>
     </message>
     <message>
         <source>kbps</source>
@@ -315,21 +220,116 @@
         <source>ch</source>
         <translation type="obsolete">kan</translation>
     </message>
+</context>
+<context>
+    <name>PlaybackBoxMusic</name>
+    <message>
+        <source>Edit Playlist</source>
+        <translation type="unfinished">Wijzig Afspeellijst</translation>
+    </message>
+    <message>
+        <source>Visualize</source>
+        <translation type="unfinished">Visuele Effecten</translation>
+    </message>
+    <message>
+        <source>3 Edit Playlist</source>
+        <translation type="unfinished">3 Wijzig Afspeellijst</translation>
+    </message>
+    <message>
+        <source>4 Visualize</source>
+        <translation type="unfinished">4 Visuele Effecten</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Smart</source>
+        <translation type="unfinished">1 Mengen: Slim</translation>
+    </message>
+    <message>
+        <source>Shuffle: Smart</source>
+        <translation type="unfinished">Mengen: Slim</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Rand</source>
+        <translation type="unfinished">1 Mengen: Willekeurig</translation>
+    </message>
+    <message>
+        <source>Shuffle: Rand</source>
+        <translation type="unfinished">Mengen: Willekeurig</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: None</source>
+        <translation type="unfinished">1 Mengen: Uit</translation>
+    </message>
+    <message>
+        <source>Shuffle: None</source>
+        <translation type="unfinished">Mengen: Uit</translation>
+    </message>
+    <message>
+        <source>2 Repeat: All</source>
+        <translation type="unfinished">2 Herhalen: Alles</translation>
+    </message>
+    <message>
+        <source>Repeat: All</source>
+        <translation type="unfinished">Herhalen: Alles</translation>
+    </message>
+    <message>
+        <source>2 Repeat: Track</source>
+        <translation type="unfinished">2 Herhalen: Nummer</translation>
+    </message>
+    <message>
+        <source>Repeat: Track</source>
+        <translation type="unfinished">Herhalen: Nummer</translation>
+    </message>
+    <message>
+        <source>2 Repeat: None</source>
+        <translation type="unfinished">2 Herhalen: Geen</translation>
+    </message>
+    <message>
+        <source>Repeat: None</source>
+        <translation type="unfinished">Herhalen: Geen</translation>
+    </message>
+    <message>
+        <source>playlist root</source>
+        <translation type="unfinished">afspeellijst root</translation>
+    </message>
+    <message>
+        <source>Playing stream.</source>
+        <translation type="unfinished">Bezig afspelen stream.</translation>
+    </message>
+    <message>
+        <source>Buffering stream.</source>
+        <translation type="unfinished">Bezig bufferen stream.</translation>
+    </message>
+    <message>
+        <source>Stream paused.</source>
+        <translation type="unfinished">Stream gepauseerd.</translation>
+    </message>
+    <message>
+        <source>kbps</source>
+        <translation type="unfinished">kbps</translation>
+    </message>
+    <message>
+        <source>kHz</source>
+        <translation type="unfinished">kHz</translation>
+    </message>
+    <message>
+        <source>ch</source>
+        <translation type="unfinished">kan</translation>
+    </message>
     <message>
         <source>Output error.</source>
-        <translation type="obsolete">Uitvoerfout.</translation>
+        <translation type="unfinished">Uitvoerfout.</translation>
     </message>
     <message>
         <source>Stream stopped.</source>
-        <translation type="obsolete">Stream gestopt.</translation>
+        <translation type="unfinished">Stream gestopt.</translation>
     </message>
     <message>
         <source>Finished playing stream.</source>
-        <translation type="obsolete">Stream afgespeeld.</translation>
+        <translation type="unfinished">Stream afgespeeld.</translation>
     </message>
     <message>
         <source>Decoder error.</source>
-        <translation type="obsolete">Decodeerfout.</translation>
+        <translation type="unfinished">Decodeerfout.</translation>
     </message>
 </context>
 <context>

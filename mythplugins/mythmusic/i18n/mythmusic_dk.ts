@@ -114,117 +114,6 @@
     <name>PlaybackBox</name>
     <message>
         <source>Edit Playlist</source>
-        <translation type="unfinished">Redigér musikliste</translation>
-    </message>
-    <message>
-        <source>Visualize</source>
-        <translation type="unfinished">Visualisér</translation>
-    </message>
-    <message>
-        <source>3 Edit Playlist</source>
-        <translation type="unfinished">3 Redigér musikliste</translation>
-    </message>
-    <message>
-        <source>4 Visualize</source>
-        <translation type="unfinished">4 Visualisér</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Smart</source>
-        <translation type="unfinished">1 Bland: Smart</translation>
-    </message>
-    <message>
-        <source>Shuffle: Smart</source>
-        <translation type="unfinished">Bland: Smart</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Rand</source>
-        <translation type="unfinished">1 Bland: Tilfældigt</translation>
-    </message>
-    <message>
-        <source>Shuffle: Rand</source>
-        <translation type="unfinished">Bland: Tilfældigt</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: None</source>
-        <translation type="unfinished">1 Bland: Ingen</translation>
-    </message>
-    <message>
-        <source>Shuffle: None</source>
-        <translation type="unfinished">Bland: Ingen</translation>
-    </message>
-    <message>
-        <source>2 Repeat: All</source>
-        <translation type="unfinished">2 Gentag: Alle</translation>
-    </message>
-    <message>
-        <source>Repeat: All</source>
-        <translation type="unfinished">Gentag: Alle</translation>
-    </message>
-    <message>
-        <source>2 Repeat: Track</source>
-        <translation type="unfinished">2 Gentag: Spor</translation>
-    </message>
-    <message>
-        <source>Repeat: Track</source>
-        <translation type="unfinished">Gentag: Spor</translation>
-    </message>
-    <message>
-        <source>2 Repeat: None</source>
-        <translation type="unfinished">2 Gentag: Ingen</translation>
-    </message>
-    <message>
-        <source>Repeat: None</source>
-        <translation type="unfinished">Gentag: Ingen</translation>
-    </message>
-    <message>
-        <source>Playing stream.</source>
-        <translation type="unfinished">Afspiller musik.</translation>
-    </message>
-    <message>
-        <source>Buffering stream.</source>
-        <translation type="unfinished">Forbereder musik.</translation>
-    </message>
-    <message>
-        <source>Stream paused.</source>
-        <translation type="unfinished">Musik sat på pause.</translation>
-    </message>
-    <message>
-        <source>Output error.</source>
-        <translation type="unfinished">Output-fejl.</translation>
-    </message>
-    <message>
-        <source>Stream stopped.</source>
-        <translation type="unfinished">Musik stoppet.</translation>
-    </message>
-    <message>
-        <source>Finished playing stream.</source>
-        <translation type="unfinished">Musik afsluttet.</translation>
-    </message>
-    <message>
-        <source>Decoder error.</source>
-        <translation type="unfinished">Dekoder-fejl.</translation>
-    </message>
-    <message>
-        <source>playlist root</source>
-        <translation type="unfinished">rod af spilleliste</translation>
-    </message>
-    <message>
-        <source>ch</source>
-        <translation type="unfinished">kanaler</translation>
-    </message>
-    <message>
-        <source>kbps</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>kHz</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>PlaybackBoxMusic</name>
-    <message>
-        <source>Edit Playlist</source>
         <translation type="obsolete">Redigér musikliste</translation>
     </message>
     <message>
@@ -288,10 +177,6 @@
         <translation type="obsolete">Gentag: Ingen</translation>
     </message>
     <message>
-        <source>playlist root</source>
-        <translation type="obsolete">rod af spilleliste</translation>
-    </message>
-    <message>
         <source>Playing stream.</source>
         <translation type="obsolete">Afspiller musik.</translation>
     </message>
@@ -302,10 +187,6 @@
     <message>
         <source>Stream paused.</source>
         <translation type="obsolete">Musik sat på pause.</translation>
-    </message>
-    <message>
-        <source>ch</source>
-        <translation type="obsolete">kanaler</translation>
     </message>
     <message>
         <source>Output error.</source>
@@ -322,6 +203,125 @@
     <message>
         <source>Decoder error.</source>
         <translation type="obsolete">Dekoder-fejl.</translation>
+    </message>
+    <message>
+        <source>playlist root</source>
+        <translation type="obsolete">rod af spilleliste</translation>
+    </message>
+    <message>
+        <source>ch</source>
+        <translation type="obsolete">kanaler</translation>
+    </message>
+</context>
+<context>
+    <name>PlaybackBoxMusic</name>
+    <message>
+        <source>Edit Playlist</source>
+        <translation type="unfinished">Redigér musikliste</translation>
+    </message>
+    <message>
+        <source>Visualize</source>
+        <translation type="unfinished">Visualisér</translation>
+    </message>
+    <message>
+        <source>3 Edit Playlist</source>
+        <translation type="unfinished">3 Redigér musikliste</translation>
+    </message>
+    <message>
+        <source>4 Visualize</source>
+        <translation type="unfinished">4 Visualisér</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Smart</source>
+        <translation type="unfinished">1 Bland: Smart</translation>
+    </message>
+    <message>
+        <source>Shuffle: Smart</source>
+        <translation type="unfinished">Bland: Smart</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Rand</source>
+        <translation type="unfinished">1 Bland: Tilfældigt</translation>
+    </message>
+    <message>
+        <source>Shuffle: Rand</source>
+        <translation type="unfinished">Bland: Tilfældigt</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: None</source>
+        <translation type="unfinished">1 Bland: Ingen</translation>
+    </message>
+    <message>
+        <source>Shuffle: None</source>
+        <translation type="unfinished">Bland: Ingen</translation>
+    </message>
+    <message>
+        <source>2 Repeat: All</source>
+        <translation type="unfinished">2 Gentag: Alle</translation>
+    </message>
+    <message>
+        <source>Repeat: All</source>
+        <translation type="unfinished">Gentag: Alle</translation>
+    </message>
+    <message>
+        <source>2 Repeat: Track</source>
+        <translation type="unfinished">2 Gentag: Spor</translation>
+    </message>
+    <message>
+        <source>Repeat: Track</source>
+        <translation type="unfinished">Gentag: Spor</translation>
+    </message>
+    <message>
+        <source>2 Repeat: None</source>
+        <translation type="unfinished">2 Gentag: Ingen</translation>
+    </message>
+    <message>
+        <source>Repeat: None</source>
+        <translation type="unfinished">Gentag: Ingen</translation>
+    </message>
+    <message>
+        <source>playlist root</source>
+        <translation type="unfinished">rod af spilleliste</translation>
+    </message>
+    <message>
+        <source>Playing stream.</source>
+        <translation type="unfinished">Afspiller musik.</translation>
+    </message>
+    <message>
+        <source>Buffering stream.</source>
+        <translation type="unfinished">Forbereder musik.</translation>
+    </message>
+    <message>
+        <source>Stream paused.</source>
+        <translation type="unfinished">Musik sat på pause.</translation>
+    </message>
+    <message>
+        <source>ch</source>
+        <translation type="unfinished">kanaler</translation>
+    </message>
+    <message>
+        <source>Output error.</source>
+        <translation type="unfinished">Output-fejl.</translation>
+    </message>
+    <message>
+        <source>Stream stopped.</source>
+        <translation type="unfinished">Musik stoppet.</translation>
+    </message>
+    <message>
+        <source>Finished playing stream.</source>
+        <translation type="unfinished">Musik afsluttet.</translation>
+    </message>
+    <message>
+        <source>Decoder error.</source>
+        <translation type="unfinished">Dekoder-fejl.</translation>
+    </message>
+    <message>
+        <source>kbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>kHz</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

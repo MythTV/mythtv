@@ -161,11 +161,11 @@
     </message>
     <message>
         <source>Edit Playlist</source>
-        <translation type="unfinished">Editar la llista</translation>
+        <translation type="obsolete">Editar la llista</translation>
     </message>
     <message>
         <source>Visualize</source>
-        <translation type="unfinished">Visualitzar</translation>
+        <translation type="obsolete">Visualitzar</translation>
     </message>
     <message>
         <source>Rating</source>
@@ -185,39 +185,39 @@
     </message>
     <message>
         <source>Repeat: Track</source>
-        <translation type="unfinished">Repetir: Pista</translation>
+        <translation type="obsolete">Repetir: Pista</translation>
     </message>
     <message>
         <source>Repeat: All</source>
-        <translation type="unfinished">Repetir: Tot</translation>
+        <translation type="obsolete">Repetir: Tot</translation>
     </message>
     <message>
         <source>Playing stream.</source>
-        <translation type="unfinished">Reproduint.</translation>
+        <translation type="obsolete">Reproduint.</translation>
     </message>
     <message>
         <source>Buffering stream.</source>
-        <translation type="unfinished">Carregant reproducció.</translation>
+        <translation type="obsolete">Carregant reproducció.</translation>
     </message>
     <message>
         <source>Stream paused.</source>
-        <translation type="unfinished">Reproducció en pausa.</translation>
+        <translation type="obsolete">Reproducció en pausa.</translation>
     </message>
     <message>
         <source>Output error.</source>
-        <translation type="unfinished">Error de sortida.</translation>
+        <translation type="obsolete">Error de sortida.</translation>
     </message>
     <message>
         <source>Stream stopped.</source>
-        <translation type="unfinished">Reproducció parada.</translation>
+        <translation type="obsolete">Reproducció parada.</translation>
     </message>
     <message>
         <source>Finished playing stream.</source>
-        <translation type="unfinished">Reproducció finalitzada.</translation>
+        <translation type="obsolete">Reproducció finalitzada.</translation>
     </message>
     <message>
         <source>Decoder error.</source>
-        <translation type="unfinished">Error de decodificació.</translation>
+        <translation type="obsolete">Error de decodificació.</translation>
     </message>
     <message>
         <source>Shuffle: Intelligent</source>
@@ -237,78 +237,27 @@
     </message>
     <message>
         <source>1 Shuffle: None</source>
-        <translation type="unfinished">1 Aleatori: No</translation>
+        <translation type="obsolete">1 Aleatori: No</translation>
     </message>
     <message>
         <source>Shuffle: None</source>
-        <translation type="unfinished">Aleatori: No</translation>
+        <translation type="obsolete">Aleatori: No</translation>
     </message>
     <message>
         <source>2 Repeat: All</source>
-        <translation type="unfinished">2 Repetir: Tot</translation>
+        <translation type="obsolete">2 Repetir: Tot</translation>
     </message>
     <message>
         <source>2 Repeat: Track</source>
-        <translation type="unfinished">2 Repetir: Pista</translation>
+        <translation type="obsolete">2 Repetir: Pista</translation>
     </message>
     <message>
         <source>2 Repeat: None</source>
-        <translation type="unfinished">2 Reperir: No</translation>
+        <translation type="obsolete">2 Reperir: No</translation>
     </message>
     <message>
         <source>Repeat: None</source>
-        <translation type="unfinished">Repetir: No</translation>
-    </message>
-    <message>
-        <source>3 Edit Playlist</source>
-        <translation type="unfinished">3 Editar Llista</translation>
-    </message>
-    <message>
-        <source>4 Visualize</source>
-        <translation type="unfinished">4 Visualitzar</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Smart</source>
-        <translation type="unfinished">1 Aleatori: Preferit</translation>
-    </message>
-    <message>
-        <source>Shuffle: Smart</source>
-        <translation type="unfinished">Aleatori: Preferit</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Rand</source>
-        <translation type="unfinished">1 Aleatori: Variable</translation>
-    </message>
-    <message>
-        <source>Shuffle: Rand</source>
-        <translation type="unfinished">Aleatori: Variable</translation>
-    </message>
-    <message>
-        <source>playlist root</source>
-        <translation type="unfinished">Llista arrel</translation>
-    </message>
-    <message>
-        <source>kbps</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>kHz</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ch</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>PlaybackBoxMusic</name>
-    <message>
-        <source>Edit Playlist</source>
-        <translation type="obsolete">Editar la llista</translation>
-    </message>
-    <message>
-        <source>Visualize</source>
-        <translation type="obsolete">Visualitzar</translation>
+        <translation type="obsolete">Repetir: No</translation>
     </message>
     <message>
         <source>3 Edit Playlist</source>
@@ -335,60 +284,119 @@
         <translation type="obsolete">Aleatori: Variable</translation>
     </message>
     <message>
-        <source>1 Shuffle: None</source>
-        <translation type="obsolete">1 Aleatori: No</translation>
-    </message>
-    <message>
-        <source>Shuffle: None</source>
-        <translation type="obsolete">Aleatori: No</translation>
-    </message>
-    <message>
-        <source>2 Repeat: All</source>
-        <translation type="obsolete">2 Repetir: Tot</translation>
-    </message>
-    <message>
-        <source>Repeat: All</source>
-        <translation type="obsolete">Repetir: Tot</translation>
-    </message>
-    <message>
-        <source>2 Repeat: Track</source>
-        <translation type="obsolete">2 Repetir: Pista</translation>
-    </message>
-    <message>
-        <source>2 Repeat: None</source>
-        <translation type="obsolete">2 Reperir: No</translation>
-    </message>
-    <message>
-        <source>Repeat: None</source>
-        <translation type="obsolete">Repetir: No</translation>
-    </message>
-    <message>
         <source>playlist root</source>
         <translation type="obsolete">Llista arrel</translation>
     </message>
+</context>
+<context>
+    <name>PlaybackBoxMusic</name>
+    <message>
+        <source>Edit Playlist</source>
+        <translation type="unfinished">Editar la llista</translation>
+    </message>
+    <message>
+        <source>Visualize</source>
+        <translation type="unfinished">Visualitzar</translation>
+    </message>
+    <message>
+        <source>3 Edit Playlist</source>
+        <translation type="unfinished">3 Editar Llista</translation>
+    </message>
+    <message>
+        <source>4 Visualize</source>
+        <translation type="unfinished">4 Visualitzar</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Smart</source>
+        <translation type="unfinished">1 Aleatori: Preferit</translation>
+    </message>
+    <message>
+        <source>Shuffle: Smart</source>
+        <translation type="unfinished">Aleatori: Preferit</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Rand</source>
+        <translation type="unfinished">1 Aleatori: Variable</translation>
+    </message>
+    <message>
+        <source>Shuffle: Rand</source>
+        <translation type="unfinished">Aleatori: Variable</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: None</source>
+        <translation type="unfinished">1 Aleatori: No</translation>
+    </message>
+    <message>
+        <source>Shuffle: None</source>
+        <translation type="unfinished">Aleatori: No</translation>
+    </message>
+    <message>
+        <source>2 Repeat: All</source>
+        <translation type="unfinished">2 Repetir: Tot</translation>
+    </message>
+    <message>
+        <source>Repeat: All</source>
+        <translation type="unfinished">Repetir: Tot</translation>
+    </message>
+    <message>
+        <source>2 Repeat: Track</source>
+        <translation type="unfinished">2 Repetir: Pista</translation>
+    </message>
+    <message>
+        <source>2 Repeat: None</source>
+        <translation type="unfinished">2 Reperir: No</translation>
+    </message>
+    <message>
+        <source>Repeat: None</source>
+        <translation type="unfinished">Repetir: No</translation>
+    </message>
+    <message>
+        <source>playlist root</source>
+        <translation type="unfinished">Llista arrel</translation>
+    </message>
     <message>
         <source>Playing stream.</source>
-        <translation type="obsolete">Reproduint.</translation>
+        <translation type="unfinished">Reproduint.</translation>
     </message>
     <message>
         <source>Buffering stream.</source>
-        <translation type="obsolete">Carregant reproducció.</translation>
+        <translation type="unfinished">Carregant reproducció.</translation>
     </message>
     <message>
         <source>Output error.</source>
-        <translation type="obsolete">Error de sortida.</translation>
+        <translation type="unfinished">Error de sortida.</translation>
     </message>
     <message>
         <source>Stream stopped.</source>
-        <translation type="obsolete">Reproducció parada.</translation>
+        <translation type="unfinished">Reproducció parada.</translation>
     </message>
     <message>
         <source>Finished playing stream.</source>
-        <translation type="obsolete">Reproducció finalitzada.</translation>
+        <translation type="unfinished">Reproducció finalitzada.</translation>
     </message>
     <message>
         <source>Decoder error.</source>
-        <translation type="obsolete">Error de decodificació.</translation>
+        <translation type="unfinished">Error de decodificació.</translation>
+    </message>
+    <message>
+        <source>Repeat: Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stream paused.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>kbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>kHz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ch</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
