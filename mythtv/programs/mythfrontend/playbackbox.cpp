@@ -78,13 +78,13 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     delitem = NULL;
 
 
-    groupnameAsAllProg = gContext->GetNumSetting("DispRecGroupAsAllProg",1);
+    groupnameAsAllProg = gContext->GetNumSetting("DispRecGroupAsAllProg", 0);
     
     recGroupType.clear();
 
     curGroupPassword = QString("");
-    recGroup = gContext->GetSetting("DisplayRecGroup", QString("Default"));
-
+    recGroup = gContext->GetSetting("DisplayRecGroup", QString("All Programs"));
+    VERBOSE( VB_GENERAL, recGroup);
     if(!groupnameAsAllProg)
         groupDisplayName = tr("All Programs");
     else

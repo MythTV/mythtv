@@ -212,6 +212,10 @@ public:
         GlobalSetting("DisplayRecGroup") {
         setLabel(QObject::tr("Default Recording Group to display"));
 
+        addSelection(QObject::tr("All Programs"),
+                     QObject::tr("All Programs"));
+        addSelection(QString("Default"), QString("Default"));
+        
         QSqlDatabase *db = QSqlDatabase::database();
         QString thequery = QString("SELECT DISTINCT recgroup from recorded");
         QSqlQuery query = db->exec(thequery);
@@ -220,9 +224,6 @@ public:
             while (query.next())
                 addSelection(query.value(0).toString(),
                              query.value(0).toString());
-        addSelection(QObject::tr("All Programs"),
-                     QObject::tr("All Programs"));
-        addSelection(QString("Default"), QString("Default"));
 
         setHelpText(QObject::tr("Default Recording Group to display "
                                 "on the view recordings screen."));
@@ -258,7 +259,7 @@ public:
     UseGroupNameAsAllPrograms():
         GlobalSetting("DispRecGroupAsAllProg") {
         setLabel(QObject::tr("Show group name instead of \"all programs\"."));
-        setValue(true);
+        setValue(false);
         setHelpText(QObject::tr("Use the name of the display group currently "
                     "being show in place of the term \"All Programs\" in the"
                     "playback screen."));
