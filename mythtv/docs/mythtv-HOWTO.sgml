@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-05-19, v2.35
+<date>2003-05-22, v2.36
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -893,7 +893,7 @@ running and started at boot. Click on Redhat menu>Server Settings>Services
 and enter the root password when asked. Check "mysqld" and then click Start.
 Click Save, then close the window.
 
-<sect1>Gentoo.
+<sect1>Gentoo
 <p>After installing mysql you need to initialise the database by running
 mysql_install_db as root. 
 
@@ -1227,7 +1227,6 @@ $ su
 </verb></tscreen>
 
 <sect1>Obtaining and compiling lirc.
-
 <p>You're going to need to download and compile lircd.  Go to <url
 url="http://www.lirc.org" name="http://www.lirc.org"> and download lirc; as
 of 2002-11-07, the version available is 0.6.6.  Grab the remotes.tgz file as
@@ -1657,6 +1656,18 @@ running multiple backend systems, the master backend will make all
 decisions about which programs will be recorded on which tuners.  If you
 have only one backend, then it will be its own master.
 
+The master will always choose the first available tuner in the same order as
+you add cards through "setup". In other words, the second card you add will
+only be used when there are two overlapping recordings, the third when there
+are three, and so on. Therefore, you will want to have your largest disk
+space on the master because the tuner on the master will always be the first
+choice. You will then want to add your <ref id="nonmaster_backend" name="other
+backends"> in the order of your preference for recording.
+
+See <ref id="advanced_backend_config" name="Advanced Backend
+Configurations"> for information on configuring multiple backend systems in
+various ways.
+
 <bf>NOTE</bf>: Red Hat 8.0 users, if you haven't followed <ref id="RH80-LANG" name="these">
 steps, you <em>must</em> do so before continuing.
 
@@ -1829,7 +1840,7 @@ example, you may add this to your <tt>rc.local</tt> file, or you can follow
 the steps outlined in the section called <ref id="mythbackend_autostart"
 name="I'd like to automatically start mythbackend at system boot time">.
 
-<sect1>Configuring a non-master backend.
+<sect1>Configuring a non-master backend. <label id="nonmaster_backend">
 <p>Configuration of a non-master backend follows the same general procedure
 as that of the master backend, with the exception that you skip over the
 "Video Sources" step.  All possible video sources need to be defined on the
@@ -1848,7 +1859,7 @@ the correct IP address for the database server.
 
 <bf>NOTE</bf>: Do not run <tt>mythfilldatabase</tt> on a non-master backend.
 
-<sect1>Configuring and running mythfilldatabase
+<sect1>Configuring and running mythfilldatabase.
 <p><bf>NOTE</bf>:  <bf>mythfilldatabase</bf> might take a while to complete,
 depending on any number of factors, most of which you can't control.  It's
 best to just let the program run to completion.
@@ -1954,7 +1965,7 @@ other editor that you're comfortable with.  You may also add the
 <tt>EXPORT</tt> command to your <tt>.bashrc</tt> or to the
 <tt>/etc/profile.d/mythtv.sh</tt> file.
 
-<sect>Configuring mythfrontend
+<sect>Configuring mythfrontend.
 <p>Once you have completed configuration of your backend systems, the next
 step is to configure the frontend client.  You should run the MythTV setup
 program before using any other modules such as MythMusic, etc. to correctly
@@ -2182,7 +2193,7 @@ The pre-requisites for MythMusic are:
 <item>CDParanoia
 </itemize>
 
-<sect1>Manual installation of pre-requisites
+<sect1>Manual installation of pre-requisites.
 <p>These instructions are for distributions which don't have pre-compiled
 versions of the software necessary to run MythTV.
 
@@ -2431,7 +2442,7 @@ Q: How do I delete a playlist?
 A: Highlight the playlist in the selection tree and hit the "i" key then
 select "Delete this Playlist" from the popup.
 
-<sect>MythWeather
+<sect>MythWeather.
 <p>The MythWeather module will obtain the weather information for the
 location that you specify.  You must be running MythTV v0.8 in order to use
 MythWeather.
@@ -2491,7 +2502,7 @@ You may also force mythweather to re-run the configuration by starting it on
 the command line as <tt>mythweather --configure</tt>.  These two options are
 mutually exclusive.
 
-<sect>MythVideo
+<sect>MythVideo.
 <p>The MythVideo application will allow you to use an external program to
 watch media files that are not directly supported by MythTV.
 
@@ -2531,7 +2542,7 @@ replacing it with "tvlistings".
 <bf>NOTE</bf>:  It is highly recommended to run the latest version of XMLTV
 available.  In North America, zap2it, the listings provider, has been
 making numerous changes to their website which negatively impact XMLTV.
-<sect1>MythTV seems to disappear; can't see video
+<sect1>MythTV seems to disappear; can't see video.
 <p>If you're using Gnome as your window manager, try switching to KDE.  For
 Red Hat Linux 8.0 users, edit <tt>/etc/sysconfig/desktop</tt> and
 change "GNOME" to "KDE".
@@ -2753,9 +2764,14 @@ issue with the drivers for your capture card or other hardware, or the CPU
 fan has fallen off/broken and your system is overheating when asked to
 perform a CPU intensive task like encoding video.
 
-<sect1>Troubleshooting audio
+<sect1>Troubleshooting audio.
 <p>By Bruce Markey, <url url="mailto:bjm@lvcm.com"
 name="mailto:bjm@lvcm.com">
+<bf>NOTE</bf>:  the following instructions do not apply to PVR-250/350
+encoders; the MPEG-2 file will have the audio embedded in the stream so it
+is not accessible using <tt>/dev/dsp</tt>.  See <ref
+id="troubleshooting_pvraudio" name="this"> in the PVR-250 <ref id="pvr250"
+name="section"> for more information.
 
 Audio appears to be one of the bigger issues that users run into on the
 mailing list.  If the audio isn't configured correctly, then MythTV will
@@ -3088,7 +3104,7 @@ recording resolution for its dimensions. If you check the box "Fixed
 Aspect Ratio" in Setup->Playback, the windowed picture will always be
 resized to normal 4:3 shape.
 
-<sect1>I'd like to save or restore my database
+<sect1>I'd like to save or restore my database.
 <p>See the <bf>mysqldump</bf> manpage for more information.
 <tscreen><verb>
 $ mysqldump -u mythtv -pmythtv mythconverg > mythtv_backup.sql
@@ -3231,8 +3247,10 @@ $ su
 </verb></tscreen>
 
 The <bf>ivtvfwextract</bf> program extracts the firmware required for the
-card.  You may want to go to the website and download the latest Windows
-driver if the <bf>wget</bf> command fails.
+card.  You may want to go to the Hauppauge website and download the latest
+Windows driver if the <bf>wget</bf> command fails.
+
+Next, compile the driver:
 <tscreen><verb>
 $ cd ~/ivtv/ivtv/driver
 $ make
@@ -3317,6 +3335,22 @@ command to <tt>/etc/rc.d/rc.local</tt>:
 <tscreen><verb>
 # echo "/sbin/modprobe ivtv" >> /etc/rc.d/rc.local
 </verb></tscreen>
+
+By default, the IVTV driver uses a 16Mbps peak rate with a 8Mbps VBR.  This
+will create files at about 4GB/hour.  If you wish to adjust these
+parameters, add the following to your <tt/rc.local/>:
+<tscreen><verb>
+/path/to/ivtv/utils/test_ioctl -c bitrate=2500000,bitrate_peak=8000000
+</verb></tscreen>
+
+<label id="troubleshooting_pvraudio"><bf>NOTE</bf>:  some people complain that
+their PVR-250/350 card is not capturing audio.  The most like source for
+this is that your system is not loading the correct msp3400.o file; ivtv
+uses a custom msp3400.c, and if the resulting module isn't loaded you will
+not get sound.  Switch to your /lib/modules directory and rename the
+existing msp3400.o file, then copy the msp3400.o from the ivtv driver
+directory and re-run depmod.  If that still doesn't work, then check the
+ivtv mailing list for more information.
 
 <sect1>I'd like to use NFS.
 <p>You may want to use a central server to store your files.  
@@ -3466,6 +3500,49 @@ To obtain a list of options:
 # /etc/init.d/mythbackend
 </verb></tscreen>
 
+<sect1>Advanced Backend Configurations <label id="advanced_backend_config">
+<p>MythTV is flexible in the way that you define multiple backend tuner
+configurations.  The only hard-and-fast rule is that the Master Backend
+<em/must/> have a capture device defined, but shouldn't imply that the
+capture device in the MBE must be the first capture card defined in the
+database.
+
+One example of an advanced configuration is the round-robin scheme.  Rather
+than defining all of the cards on the master, you could first go into setup
+on the master to define globals such as the general configuration and the
+channel lineup but not the host-specific configuration item like the capture
+card.  In this example, we will use a 4 tuner configuration, where two
+slaves have one card each and the master has two.
+<enum>
+<item>Add the first capture card on one of the slaves.  Complete the
+configuration, connecting the input source to the card.  This will get
+cardid #1 in the database.  Exit setup.
+<item>Configure the first capture card on the master backend.  This will get
+cardid #2 in the database.  Exit setup.
+<item>Configure the first capture card on the second slave.  This will be
+cardid #3 in the database.  Exit setup.
+<item>Configure the second capture card on the master backend.  This will
+get cardid #4 in the database.  Exit setup.
+</enum>
+
+Using this scheme, the master backend will not use both capture cards until
+one of the following happens:
+<itemize>
+<item>There are four recordings scheduled for the same time
+<item>Both slaves are not available
+</itemize>
+
+The scheduler in MythTV checks whether an encoder is available; if a slave
+backend isn't running, its encoder isn't available, so the scheduler will
+look for the next available encoder.  This makes MythTV very flexible; slave
+tuners can come and go, and as long as there are enough tuners for what
+you'd like to record it doesn't matter which tuner in particular is going to
+be used.
+
+Using this round-robin scheme along with a shared storage directory like
+NFS and enabling the Master Backend Override setting will allow you to view
+content even if the slave backend that recorded a program is not available.
+
 </article>
 <!-- Revision History
 v2.00, 2003-03-14.  Initial release for 0.8.  Added xset command for
@@ -3536,6 +3613,9 @@ checkout anymore" section.
 v2.35, 2003-05-19.  Remove the depmod error advice in the PVR-250 since IVTV has fixed
 their Makefile.  Get rid of stuff that is too hard to keep up with, like the
 status of the ivtv driver and what it can and can't do.
+v2.36, 2003-05-21.  Added instructions on modifying the PVR250 bitrate. 
+Added Advanced Backend Configurations.  Fixed consistency of section
+headers.  PVR-250 audio troubleshooting.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

@@ -213,7 +213,7 @@ recording resolution for its dimensions. If you check the box "Fixed
 Aspect Ratio" in Setup->Playback, the windowed picture will always be
 resized to normal 4:3 shape.</P>
 
-<H2><A NAME="ss19.6">19.6</A> <A HREF="mythtv-HOWTO.html#toc19.6">I'd like to save or restore my database</A>
+<H2><A NAME="ss19.6">19.6</A> <A HREF="mythtv-HOWTO.html#toc19.6">I'd like to save or restore my database.</A>
 </H2>
 
 <P>See the <B>mysqldump</B> manpage for more information.
@@ -375,8 +375,9 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 <P>The <B>ivtvfwextract</B> program extracts the firmware required for the
-card.  You may want to go to the website and download the latest Windows
-driver if the <B>wget</B> command fails.
+card.  You may want to go to the Hauppauge website and download the latest
+Windows driver if the <B>wget</B> command fails.</P>
+<P>Next, compile the driver:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cd ~/ivtv/ivtv/driver
@@ -469,6 +470,24 @@ command to <CODE>/etc/rc.d/rc.local</CODE>:
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P>By default, the IVTV driver uses a 16Mbps peak rate with a 8Mbps VBR.  This
+will create files at about 4GB/hour.  If you wish to adjust these
+parameters, add the following to your <CODE>rc.local</CODE>>:
+<BLOCKQUOTE><CODE>
+<PRE>
+/path/to/ivtv/utils/test_ioctl -c bitrate=2500000,bitrate_peak=8000000
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>
+<A NAME="troubleshooting_pvraudio"></A> <B>NOTE</B>:  some people complain that
+their PVR-250/350 card is not capturing audio.  The most like source for
+this is that your system is not loading the correct msp3400.o file; ivtv
+uses a custom msp3400.c, and if the resulting module isn't loaded you will
+not get sound.  Switch to your /lib/modules directory and rename the
+existing msp3400.o file, then copy the msp3400.o from the ivtv driver
+directory and re-run depmod.  If that still doesn't work, then check the
+ivtv mailing list for more information.</P>
 
 <H2><A NAME="ss19.11">19.11</A> <A HREF="mythtv-HOWTO.html#toc19.11">I'd like to use NFS.</A>
 </H2>
@@ -643,6 +662,49 @@ mythbackend at startup.</P>
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+
+<H2><A NAME="advanced_backend_config"></A> <A NAME="ss19.13">19.13</A> <A HREF="mythtv-HOWTO.html#toc19.13">Advanced Backend Configurations </A>
+</H2>
+
+<P>MythTV is flexible in the way that you define multiple backend tuner
+configurations.  The only hard-and-fast rule is that the Master Backend
+<EM>must</EM>> have a capture device defined, but shouldn't imply that the
+capture device in the MBE must be the first capture card defined in the
+database.</P>
+<P>One example of an advanced configuration is the round-robin scheme.  Rather
+than defining all of the cards on the master, you could first go into setup
+on the master to define globals such as the general configuration and the
+channel lineup but not the host-specific configuration item like the capture
+card.  In this example, we will use a 4 tuner configuration, where two
+slaves have one card each and the master has two.
+<OL>
+<LI>Add the first capture card on one of the slaves.  Complete the
+configuration, connecting the input source to the card.  This will get
+cardid #1 in the database.  Exit setup.</LI>
+<LI>Configure the first capture card on the master backend.  This will get
+cardid #2 in the database.  Exit setup.</LI>
+<LI>Configure the first capture card on the second slave.  This will be
+cardid #3 in the database.  Exit setup.</LI>
+<LI>Configure the second capture card on the master backend.  This will
+get cardid #4 in the database.  Exit setup.</LI>
+</OL>
+</P>
+<P>Using this scheme, the master backend will not use both capture cards until
+one of the following happens:
+<UL>
+<LI>There are four recordings scheduled for the same time</LI>
+<LI>Both slaves are not available</LI>
+</UL>
+</P>
+<P>The scheduler in MythTV checks whether an encoder is available; if a slave
+backend isn't running, its encoder isn't available, so the scheduler will
+look for the next available encoder.  This makes MythTV very flexible; slave
+tuners can come and go, and as long as there are enough tuners for what
+you'd like to record it doesn't matter which tuner in particular is going to
+be used.</P>
+<P>Using this round-robin scheme along with a shared storage directory like
+NFS and enabling the Master Backend Override setting will allow you to view
+content even if the slave backend that recorded a program is not available.</P>
 
 <HR>
 Next

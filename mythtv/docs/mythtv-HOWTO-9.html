@@ -43,6 +43,16 @@ $ su
 running multiple backend systems, the master backend will make all
 decisions about which programs will be recorded on which tuners.  If you
 have only one backend, then it will be its own master.</P>
+<P>The master will always choose the first available tuner in the same order as
+you add cards through "setup". In other words, the second card you add will
+only be used when there are two overlapping recordings, the third when there
+are three, and so on. Therefore, you will want to have your largest disk
+space on the master because the tuner on the master will always be the first
+choice. You will then want to add your 
+<A HREF="#nonmaster_backend">other backends</A> in the order of your preference for recording.</P>
+<P>See 
+<A HREF="mythtv-HOWTO-19.html#advanced_backend_config">Advanced Backend Configurations</A> for information on configuring multiple backend systems in
+various ways.</P>
 <P><B>NOTE</B>: Red Hat 8.0 users, if you haven't followed 
 <A HREF="mythtv-HOWTO-4.html#RH80-LANG">these</A>
 steps, you <EM>must</EM> do so before continuing.</P>
@@ -211,7 +221,7 @@ example, you may add this to your <CODE>rc.local</CODE> file, or you can follow
 the steps outlined in the section called 
 <A HREF="mythtv-HOWTO-19.html#mythbackend_autostart">I'd like to automatically start mythbackend at system boot time</A>.</P>
 
-<H2><A NAME="ss9.3">9.3</A> <A HREF="mythtv-HOWTO.html#toc9.3">Configuring a non-master backend.</A>
+<H2><A NAME="nonmaster_backend"></A> <A NAME="ss9.3">9.3</A> <A HREF="mythtv-HOWTO.html#toc9.3">Configuring a non-master backend. </A>
 </H2>
 
 <P>Configuration of a non-master backend follows the same general procedure
@@ -229,7 +239,7 @@ you've edited the <CODE>/usr/local/share/mythtv/mysql.txt</CODE> file and put
 the correct IP address for the database server.</P>
 <P><B>NOTE</B>: Do not run <CODE>mythfilldatabase</CODE> on a non-master backend.</P>
 
-<H2><A NAME="ss9.4">9.4</A> <A HREF="mythtv-HOWTO.html#toc9.4">Configuring and running mythfilldatabase</A>
+<H2><A NAME="ss9.4">9.4</A> <A HREF="mythtv-HOWTO.html#toc9.4">Configuring and running mythfilldatabase.</A>
 </H2>
 
 <P><B>NOTE</B>:  <B>mythfilldatabase</B> might take a while to complete,
