@@ -13,7 +13,8 @@
 #include <qthread.h>
 #include <qstringlist.h>
 #include <qfile.h>
-
+#include <qsqldatabase.h>
+#include <qprocess.h>
 #include <dvdread/dvd_reader.h>
 #include <dvdread/ifo_types.h>
 #include <dvdread/ifo_read.h>
@@ -25,7 +26,7 @@ class MTD;
 
 class JobThread : public QThread
 {
-
+    
     //
     //  A base class for all mtd threads
     //
@@ -44,6 +45,8 @@ class JobThread : public QThread
     void    problem(const QString &a_problem){problem_string = a_problem;}
     QString getProblem(){return problem_string;}
     QString getJobString(){return job_string;}
+    void    updateSubjobString( int seconds_elapsed, 
+                                const QString &pre_string);
 
     
   protected:
@@ -52,13 +55,56 @@ class JobThread : public QThread
     QString subjob_name;
     double  overall_progress;
     double  subjob_progress;
+    double  sub_to_overall_multiple;
     MTD     *parent;
     QString problem_string;
     QString job_string;
     int     nice_level;
 };
 
-class DVDPerfectThread : public JobThread
+
+class DVDThread : public JobThread
+{
+
+    //
+    //  Base class for all *DVD* related
+    //  job threads (perfect copy, transcode)
+    //
+
+  public:
+  
+    DVDThread(MTD *owner,
+              QMutex *drive_mutex,
+              const QString &dvd_device,
+              int track,
+              const QString &dest_file, 
+              const QString &name,
+              const QString &start_string,
+              int nice_priority);
+
+    ~DVDThread();
+                     
+    virtual void run();    
+
+  protected:
+
+    bool         ripTitle(int title_number,
+                          const QString &to_location,
+                          const QString &extension,
+                          bool multiple_files);
+  
+    RipFile      *ripfile;
+    QMutex       *dvd_device_access;
+    QString      dvd_device_location;
+    QString      destination_file_string;
+    int          dvd_title;
+    dvd_reader_t *the_dvd;
+    dvd_file_t   *title;
+    unsigned char video_data[ 1024 * DVD_VIDEO_LB_LEN ];
+    QString      rip_name;
+};
+
+class DVDPerfectThread : public DVDThread
 {
     //
     //  Fairly simple class that just knows
@@ -78,18 +124,57 @@ class DVDPerfectThread : public JobThread
 
     ~DVDPerfectThread();
                      
-    virtual void run();    
+    virtual void run();
+    
 
+};
+
+class DVDTranscodeThread : public DVDThread
+{
+    
+    //
+    //  An object that can rip a VOB off a DVD
+    //  and then transcode it
+    //
+    
+  public:
+  
+    DVDTranscodeThread(MTD *owner,
+                       QMutex *drive_mutex,
+                       const QString &dvd_device,
+                       int track,
+                       const QString &dest_file,
+                       const QString &name,
+                       const QString &start_string,
+                       int nice_priority,
+                       int quality_level,
+                       QSqlDatabase *ldb,
+                       int which_audio,
+                       int numb_seconds);
+                       
+                      
+    ~DVDTranscodeThread();
+    
+    virtual void run();
+    
+    bool    makeWorkingDirectory();
+    bool    buildTranscodeCommandLine();
+    bool    runTranscode(int run);
+    void    cleanUp();
+    void    wipeClean();
+    
   private:
   
-    RipFile      *ripfile;
-    QMutex       *dvd_device_access;
-    QString      dvd_device_location;
-    int          dvd_title;
-    dvd_reader_t *the_dvd;
-    dvd_file_t   *title;
-    unsigned char video_data[ 1024 * DVD_VIDEO_LB_LEN ];
+    int          quality;
+    QDir         *working_directory;
+    QStringList  tc_arguments;
+    QProcess     *tc_process;
+    bool         two_pass;
+    QSqlDatabase *db;
+    int          audio_track;
+    int          length_in_seconds;
 };
+
 
 #endif  // jobthread_h_
 

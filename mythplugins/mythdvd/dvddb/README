@@ -11,13 +11,13 @@ documentation at:
 Table schema
 ============
 
-        You can get a good sense for how the table is laid out by reading
+        You can get a good sense for how the tables are laid out by reading
 metadata.sql. The main things to realize are:
 
-        1. (once the dvdtranscode table exists) You can define as mainy 
-           rows as you like, but if they are not "sensible" to transcode, 
-           then they won't work. If you know nothing about how transcode 
-           works, you probably don't want to mess with the table.
+        1. In the dvdtranscode table, you can define as many rows as you 
+           like, but if they are not "sensible" to transcode, then they 
+	   won't work. If you know nothing about how transcode works, 
+	   you probably don't want to mess with this table.
 
         2. Because mythdvd is designed to transcode *DVD*'s, this is not
            the place to be thinking of all possible transcode command

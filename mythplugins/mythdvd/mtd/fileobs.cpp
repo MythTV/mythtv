@@ -26,16 +26,22 @@ RipFile::RipFile(const QString &a_base, const QString &an_extension)
     files.clear();
     files.setAutoDelete(true);
     bytes_written = 0;
+    use_multiple_files = true;
 }
 
-bool RipFile::open(int mode)
+bool RipFile::open(int mode, bool multiple_files)
 {
+    use_multiple_files = multiple_files;
     access_mode = mode;
     QString filename = base_name + "_1of"; 
     QFile *new_file = new QFile(filename);
     files.append(new_file);
     active_file = new_file;
     return active_file->open(mode);
+    if(!use_multiple_files)
+    {
+        filesize = 0;
+    }
 }
 
 void RipFile::close()

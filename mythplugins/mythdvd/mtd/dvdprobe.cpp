@@ -540,6 +540,7 @@ bool DVDProbe::probe()
                 new_title->setAngles((uint) title_info->title[i].nr_of_angles);
 
                 ifo_handle_t *video_transport_file = NULL;
+                
                 video_transport_file = ifoOpen(dvd, title_info->title[i].title_set_nr);
                 if(!video_transport_file)
                 {
@@ -597,21 +598,26 @@ bool DVDProbe::probe()
                     //  and now, wave the diving rod over audio bits
                     //
                     
-                    if(video_transport_file->vtsi_mat)
+                    
+                    vtsi_mat_t *vtsi_mat = NULL;
+                    vtsi_mat = video_transport_file->vtsi_mat;
+                    if(vtsi_mat)
                     {
-                        for(int j=0; j < video_transport_file->vtsi_mat->nr_of_vts_audio_streams; j++)
+                        for(int j=0; j < vtsi_mat->nr_of_vts_audio_streams; j++)
                         {
-                            audio_attr_t *audio_attributes = &video_transport_file->vtsi_mat->vts_audio_attr[j];
+                            audio_attr_t *audio_attributes = &vtsi_mat->vts_audio_attr[j];
                             DVDAudio *new_audio = new DVDAudio();
                             new_audio->fill(audio_attributes);
                             new_title->addAudio(new_audio);
                         }
+
                         
                         //
                         //  Figure out size, aspect ratio, etc.
                         //
                         
-                        video_attr_t *video_attributes = &video_transport_file->vtsi_mat->vtsm_video_attr;
+                        
+                        video_attr_t *video_attributes = &vtsi_mat->vts_video_attr;
                       
                         switch(video_attributes->display_aspect_ratio)
                         {
@@ -664,10 +670,11 @@ bool DVDProbe::probe()
                             default:
                                 cerr << "dvdprobe.o: Could not determine for video size for a title." << endl ;
                         }
+                        ifoClose(video_transport_file);
                     }
                     else
                     {
-                        cerr << "Couldn't find any audio information for track " << i+1 << endl;
+                        cerr << "Couldn't find any audio or video information for track " << i+1 << endl;
                     }            
                 }
                 
@@ -710,6 +717,23 @@ bool DVDProbe::probe()
     }
     return false;
 }
+
+DVDTitle* DVDProbe::getTitle(uint which_one)
+{
+
+    DVDTitle *iter;
+    for(iter = titles.first(); iter; iter = titles.next())
+    {
+        if(iter->getTrack() == which_one)
+        {
+            return iter;
+        }
+    }
+    return NULL;
+
+}
+
+
 
 DVDProbe::~DVDProbe()
 {

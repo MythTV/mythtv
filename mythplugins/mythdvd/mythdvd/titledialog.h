@@ -11,6 +11,7 @@
 #define TITLEDIALOG_H_
 
 #include <qtimer.h>
+#include <qsqldatabase.h>
 
 #include <mythtv/mythdialogs.h>
 #include <mythtv/mythcontext.h>
@@ -23,13 +24,18 @@ class TitleDialog : public MythDialog
 
   public:
   
-    TitleDialog(QSocket *a_socket, QString d_name, QPtrList<DVDTitleInfo> *titles, MythMainWindow *parent, const char* name = 0);
+    TitleDialog(QSqlDatabase *ldb,
+                QSocket *a_socket, 
+                QString d_name, 
+                QPtrList<DVDTitleInfo> *titles, 
+                MythMainWindow *parent, 
+                const char* name = 0);
    ~TitleDialog();
 
   public slots:
   
     void viewTitle();
-    void setQuality(int);
+    void setQuality(const QString &a_string);
     void setAudio(int);
     void toggleTitle(bool);
     void changeName(QString new_name);
@@ -46,6 +52,7 @@ class TitleDialog : public MythDialog
     QString                disc_name;
     QPtrList<DVDTitleInfo> *dvd_titles;
     QSocket                *socket_to_mtd;
+    QSqlDatabase           *db;
 };
 
 #endif

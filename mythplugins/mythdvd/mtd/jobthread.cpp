@@ -17,6 +17,9 @@ using namespace std;
 #include <dvdread/nav_read.h>
 
 #include <qdatetime.h>
+#include <qdir.h>
+
+#include <mythtv/mythcontext.h>
 
 #include "jobthread.h"
 #include "mtd.h"
@@ -33,6 +36,7 @@ JobThread::JobThread(MTD *owner, const QString &start_string, int nice_priority)
     problem_string = "";
     job_string = start_string;
     nice_level = nice_priority;
+    sub_to_overall_multiple = 1.0;
 }
 
 void JobThread::run()
@@ -49,32 +53,67 @@ bool JobThread::keepGoing()
     return false;
 }
 
+void JobThread::updateSubjobString( int seconds_elapsed, 
+                                    const QString & pre_string)
+{
+    int estimated_job_time = (int) ( (double) seconds_elapsed / subjob_progress );
+            
+    if(estimated_job_time >= 3600)
+    {
+        subjob_name.sprintf(" %d:%02d:%02d/%d:%02d:%02d",
+                             seconds_elapsed / 3600,
+                             (seconds_elapsed % 3600) / 60,
+                             (seconds_elapsed % 3600) % 60,
+                             estimated_job_time / 3600,
+                             (estimated_job_time % 3600) / 60,
+                             (estimated_job_time % 3600) % 60);
+            
+    }
+    else
+    {
+        subjob_name.sprintf(" %02d:%02d/%02d:%02d",
+                             seconds_elapsed / 60,
+                             seconds_elapsed % 60,
+                             estimated_job_time / 60,
+                             estimated_job_time % 60);
+    }        
+    subjob_name.prepend(pre_string);
+}
 
-DVDPerfectThread::DVDPerfectThread(MTD *owner, 
-                                   QMutex *drive_mutex, 
-                                   const QString &dvd_device, 
-                                   int track, 
-                                   const QString &dest_file, 
-                                   const QString &name,
-                                   const QString &start_string,
-                                   int nice_priority)
+
+/*
+---------------------------------------------------------------------
+*/
+
+DVDThread::DVDThread(MTD *owner, 
+                     QMutex *drive_mutex, 
+                     const QString &dvd_device, 
+                     int track, 
+                     const QString &dest_file, 
+                     const QString &name,
+                     const QString &start_string,
+                     int nice_priority)
                  :JobThread(owner, start_string, nice_priority)
 {
     dvd_device_access = drive_mutex;
-    job_name = QString("Perfect DVD Rip of %1").arg(name);
     dvd_device_location = dvd_device;
     dvd_title = track - 1;
-    ripfile = new RipFile(dest_file, ".mpg");
+    destination_file_string = dest_file;
+    ripfile = NULL;
+    rip_name = name;
 }
 
-void DVDPerfectThread::run()
+void DVDThread::run()
 {
-    //
-    //  Be nice
-    //
-    
-    nice(nice_level);
+    cerr << "jobthread.o: Somebody ran an actual (base class) DVDThread. I don't think that's supposed to happen." << endl;
+}
 
+
+bool DVDThread::ripTitle(int title_number,
+                         const QString &to_location,
+                         const QString &extension,
+                         bool multiple_files)
+{
     //
     //  Can't do much until I have a
     //  lock on the device
@@ -99,23 +138,28 @@ void DVDPerfectThread::run()
             else
             {
                 problem("abandoned job because master control said we need to shut down");
-                return;
+                return false;
             }
         }
     }    
 
-    subjob_name = "Ripping to destination file";
-    
     //
     //  OK, we got the device. 
     //  Lets open our destination file
     //
     
-    if(!ripfile->open(IO_WriteOnly | IO_Raw | IO_Truncate))
+    if(ripfile)
+    {
+        cerr << "jobthread.o: How is it that you already have a ripfile set?" << endl;
+        delete ripfile;
+        ripfile = NULL;
+    }
+    ripfile = new RipFile(to_location, extension);
+    if(!ripfile->open(IO_WriteOnly | IO_Raw | IO_Truncate, multiple_files))
     {
         problem(QString("DVDPerfectThread could not open output file: %1").arg(ripfile->name()));
         dvd_device_access->unlock();
-        return;
+        return false;
     }
 
     //
@@ -131,7 +175,7 @@ void DVDPerfectThread::run()
         problem(QString("DVDPerfectThread could not access this dvd device: %1").arg(dvd_device_location));
         ripfile->remove();
         dvd_device_access->unlock();
-        return;
+        return false;
     }
 
 
@@ -142,7 +186,7 @@ void DVDPerfectThread::run()
         ripfile->remove();
         DVDClose(the_dvd);
         dvd_device_access->unlock();
-        return;
+        return false;
     }
     tt_srpt_t *tt_srpt = vmg_file->tt_srpt;
 
@@ -150,17 +194,17 @@ void DVDPerfectThread::run()
     //  Check title # is valid
     //
 
-    if(dvd_title < 0 || dvd_title > tt_srpt->nr_of_srpts )
+    if(title_number < 0 || title_number > tt_srpt->nr_of_srpts )
     {
-        problem(QString("DVDPerfectThread could not open title number %1").arg(dvd_title + 1));
+        problem(QString("DVDPerfectThread could not open title number %1").arg(title_number + 1));
         ripfile->remove();
         ifoClose(vmg_file);
         DVDClose(the_dvd);
         dvd_device_access->unlock();
-        return;
+        return false;
     }
 
-    ifo_handle_t *vts_file = ifoOpen(the_dvd, tt_srpt->title[dvd_title].title_set_nr);
+    ifo_handle_t *vts_file = ifoOpen(the_dvd, tt_srpt->title[title_number].title_set_nr);
     if(!vts_file)
     {
         problem("DVDPerfectThread could not open the title's info file");
@@ -168,13 +212,13 @@ void DVDPerfectThread::run()
         ifoClose(vmg_file);
         DVDClose(the_dvd);
         dvd_device_access->unlock();
-        return;
+        return false;
     }
 
     //
     //  Determine the program chain (?)
     //
-    int ttn = tt_srpt->title[dvd_title].vts_ttn;
+    int ttn = tt_srpt->title[title_number].vts_ttn;
     vts_ptt_srpt_t *vts_ptt_srpt = vts_file->vts_ptt_srpt;
     int pgc_id = vts_ptt_srpt->title[ ttn - 1 ].ptt[ 0 ].pgcn;
     int pgn = vts_ptt_srpt->title[ ttn - 1 ].ptt[ 0 ].pgn;
@@ -201,7 +245,7 @@ void DVDPerfectThread::run()
     //    
     
     title = DVDOpenFile(the_dvd, 
-                        tt_srpt->title[ dvd_title ].title_set_nr, 
+                        tt_srpt->title[ title_number ].title_set_nr, 
                         DVD_READ_TITLE_VOBS );
     if(!title)
     {
@@ -211,7 +255,7 @@ void DVDPerfectThread::run()
         ifoClose(vmg_file);
         DVDClose(the_dvd);
         dvd_device_access->unlock();
-        return;
+        return false;
     }
     
     int sector_counter = 0;
@@ -265,7 +309,7 @@ void DVDPerfectThread::run()
                 DVDClose(the_dvd);
                 dvd_device_access->unlock();
                 ripfile->remove();
-                return;
+                return false;
             }
             
             //
@@ -317,37 +361,12 @@ void DVDPerfectThread::run()
                 DVDCloseFile( title );
                 DVDClose(the_dvd);
                 dvd_device_access->unlock();
-                return;
+                return false;
             }
             
-            overall_progress = (double) (sector_counter) / (double) (total_sectors);
-            subjob_progress  = overall_progress;
-
-            int elapsed = job_time.elapsed() / 1000;
-            
-            int estimated_job_time =(int) ( (double) elapsed / overall_progress );
-            
-            if(estimated_job_time >= 3600)
-            {
-                subjob_name.sprintf("Ripping to destination file  ~  %d:%02d:%02d/%d:%02d:%02d",
-                                     elapsed / 3600,
-                                     (elapsed % 3600) / 60,
-                                     (elapsed % 3600) % 60,
-                                     estimated_job_time / 3600,
-                                     (estimated_job_time % 3600) / 60,
-                                     (estimated_job_time % 3600) % 60);
-            
-            }
-            else
-            {
-                subjob_name.sprintf("Ripping to destination file  ~  %02d:%02d/%02d:%02d",
-                                     elapsed / 60,
-                                     elapsed % 60,
-                                     estimated_job_time / 60,
-                                     estimated_job_time % 60);
-            }        
-            
-
+            subjob_progress = (double) (sector_counter) / (double) (total_sectors);
+            overall_progress = subjob_progress * sub_to_overall_multiple;
+            updateSubjobString(job_time.elapsed() / 1000, "Ripping to file ~");
             ripfile->writeBlocks(video_data, cur_output_size * DVD_VIDEO_LB_LEN);
 
             sector_counter += next_vobu - cur_pack;
@@ -368,7 +387,7 @@ void DVDPerfectThread::run()
                 DVDCloseFile( title );
                 DVDClose(the_dvd);
                 dvd_device_access->unlock();
-                return;
+                return false;
             }
         }
     }
@@ -383,13 +402,669 @@ void DVDPerfectThread::run()
     DVDClose(the_dvd);
     ripfile->close();
     dvd_device_access->unlock();
-    return;
+    return true;
 }
 
-DVDPerfectThread::~DVDPerfectThread()
+DVDThread::~DVDThread()
 {
     if(ripfile);
     {
         delete ripfile;
     }
 }
+
+/*
+---------------------------------------------------------------------
+*/
+
+DVDPerfectThread::DVDPerfectThread(MTD *owner, 
+                                   QMutex *drive_mutex, 
+                                   const QString &dvd_device, 
+                                   int track, 
+                                   const QString &dest_file, 
+                                   const QString &name,
+                                   const QString &start_string,
+                                   int nice_priority)
+                 :DVDThread(owner,
+                            drive_mutex, 
+                            dvd_device, 
+                            track, 
+                            dest_file, 
+                            name,
+                            start_string,
+                            nice_priority)
+
+{
+}
+
+void DVDPerfectThread::run()
+{
+    //
+    //  Be nice
+    //
+    
+    nice(nice_level);
+    job_name = QString("Perfect DVD Rip of %1").arg(rip_name);
+    if(keepGoing())
+    {
+        ripTitle(dvd_title, destination_file_string, ".mpg", true);
+    }
+}
+
+
+DVDPerfectThread::~DVDPerfectThread()
+{
+}
+
+/*
+---------------------------------------------------------------------
+*/
+
+DVDTranscodeThread::DVDTranscodeThread(MTD *owner, 
+                                       QMutex *drive_mutex, 
+                                       const QString &dvd_device, 
+                                       int track, 
+                                       const QString &dest_file, 
+                                       const QString &name,
+                                       const QString &start_string,
+                                       int nice_priority,
+                                       int quality_level,
+                                       QSqlDatabase *ldb,
+                                       int which_audio,
+                                       int numb_seconds)
+                 :DVDThread(owner,
+                            drive_mutex, 
+                            dvd_device, 
+                            track, 
+                            dest_file, 
+                            name,
+                            start_string,
+                            nice_priority)
+
+{
+    db = ldb;
+    quality = quality_level;
+    working_directory = NULL;
+    tc_process = NULL;
+    two_pass = false;
+    audio_track = which_audio;
+    length_in_seconds = numb_seconds;
+    if(length_in_seconds == 0)
+    {
+        length_in_seconds = 1;
+    }
+}
+
+void DVDTranscodeThread::run()
+{
+    //
+    //  Be nice
+    //
+    
+    nice(nice_level);
+
+    //
+    //  Make working directory
+    //
+
+    if(keepGoing())
+    {
+        if(!makeWorkingDirectory())
+        {
+            return;
+        }    
+    }
+
+    //
+    //  Build the transcode command line. We do this early
+    //  (before ripping) so we can figure out if this is
+    //  a two pass job or not (for the progress display)
+    //
+
+    if(keepGoing())
+    {
+        if(!buildTranscodeCommandLine())
+        {
+            cleanUp();
+            return;
+        }
+        if(two_pass)
+        {
+            job_name = QString("Transcode of %1").arg(rip_name);
+            sub_to_overall_multiple = 0.333333333;
+        }
+        else
+        {
+            job_name = QString("Transcode of %1").arg(rip_name);
+            sub_to_overall_multiple = 0.50;
+        }
+    }
+
+    //
+    //  Rip VOB to working directory
+    //
+
+    if(keepGoing())
+    {
+        QString rip_file_string = QString("%1/%2").arg(working_directory->path()).arg(rip_name);
+        if(!ripTitle(dvd_title, rip_file_string, ".vob", true))
+        {
+            cleanUp();
+            return;
+        }
+    }
+    
+    //
+    //  Run the first (only?) crack at transcoding
+    //    
+    
+    if(keepGoing())
+    {
+        if(!runTranscode(1))
+        {
+            cleanUp();
+            return;
+        }
+    }
+    
+    if(two_pass)
+    {
+        if(keepGoing())
+        {
+            if(!runTranscode(2))
+            {
+                wipeClean();
+            }
+        }
+    }    
+    cleanUp();
+}
+
+bool DVDTranscodeThread::makeWorkingDirectory()
+{
+    QString dir_name = gContext->GetSetting("DVDRipLocation");
+    if( dir_name.length() < 1)
+    {
+        problem("could not find rip directory in settings");
+        return false;
+    }
+    
+    working_directory = new QDir (dir_name);
+    if(!working_directory->exists())
+    {
+        problem("rip directory does not seem to exist");
+        return false;
+    }
+    if(!working_directory->mkdir(rip_name))
+    {
+        problem(QString("could not create directory called \"%1\" in rip directory").arg(rip_name));
+        return false;
+    }
+    if(!working_directory->cd(rip_name))
+    {
+        problem(QString("could not cd into \"%1\"").arg(rip_name));
+        return false;
+    }
+    
+    return true;
+}
+
+bool DVDTranscodeThread::buildTranscodeCommandLine()
+{
+    //
+    //  If our destination file already exists, bail out
+    //
+    
+    QFile a_file(QString("%1.avi").arg(destination_file_string));
+    if(a_file.exists())
+    {
+        problem("transcode cannot run, destination file already exists");
+        return false;
+    }
+    
+    
+    
+    QString tc_command = gContext->GetSetting("TranscodeCommand");
+    if(tc_command.length() < 1)
+    {
+        problem("there is no TranscodeCommand setting for this system");
+        return false;
+    }
+    
+    tc_arguments.clear();
+    tc_arguments.append(tc_command);
+    
+    
+    //
+    //  Now *that* is a query string !
+    //
+    
+    QString q_string = QString("SELECT sync_mode,   "
+                                     " use_yv12,    "
+                                     " cliptop,     "
+                                     " clipbottom,  "
+                                     " clipleft,    "
+                                     " clipright,   "
+                                     " f_resize_h,  "
+                                     " f_resize_w,  "
+                                     " hq_resize_h, "
+                                     " hq_resize_w, "
+                                     " grow_h,      "
+                                     " grow_w,      "
+                                     " clip2top,    "
+                                     " clip2bottom, "
+                                     " clip2left,   "
+                                     " clip2right,  "
+                                     " codec,       "
+                                     " codec_param, "
+                                     " bitrate,     "
+                                     " a_sample_r,  "
+                                     " a_bitrate,   "
+                                     " input,       "
+                                     " name,        "
+                                     " two_pass     "
+                                     
+                                     " FROM dvdtranscode WHERE intid = %1 ;")
+                                     .arg(quality);
+                                     
+    QSqlQuery a_query(q_string, db);
+    if(a_query.isActive() && a_query.numRowsAffected() > 0)
+    {
+        a_query.next();
+    }
+    else
+    {
+        problem(QString("sql query failed: %1").arg(q_string));
+        return false;
+    }       
+    
+    //
+    //  Convert query results to useful variables
+    //                           
+    
+    int       sync_mode = a_query.value(0).toInt();
+    bool       use_yv12 = a_query.value(1).toBool();
+    int         cliptop = a_query.value(2).toInt();
+    int      clipbottom = a_query.value(3).toInt();
+    int        clipleft = a_query.value(4).toInt();
+    int       clipright = a_query.value(5).toInt();
+    int      f_resize_h = a_query.value(6).toInt();
+    int      f_resize_w = a_query.value(7).toInt();
+    int     hq_resize_h = a_query.value(8).toInt();
+    int     hq_resize_w = a_query.value(9).toInt();
+    int          grow_h = a_query.value(10).toInt();
+    int          grow_w = a_query.value(11).toInt();
+    int        clipttop = a_query.value(12).toInt();
+    int     cliptbottom = a_query.value(13).toInt();
+    int       cliptleft = a_query.value(14).toInt();
+    int      cliptright = a_query.value(15).toInt();
+    QString       codec = a_query.value(16).toString();
+    QString codec_param = a_query.value(17).toString();
+    int         bitrate = a_query.value(18).toInt();
+    int      a_sample_r = a_query.value(19).toInt();
+    int       a_bitrate = a_query.value(20).toInt();
+    int   input_setting = a_query.value(21).toInt();
+    QString        name = a_query.value(22).toString();
+               two_pass = a_query.value(23).toBool();
+    
+    //
+    //  And now, another query to get frame rate code and
+    //  input video dimensions from the dvdinput table
+    //
+    
+    q_string = QString("SELECT hsize, vsize, fr_code FROM dvdinput WHERE intid = %1 ;").arg(input_setting);
+    QSqlQuery second_query(q_string, db);
+    if(second_query.isActive() && second_query.numRowsAffected() > 0)
+    {
+        second_query.next();
+    }
+    else
+    {
+        problem(QString("couldn't get dvdinput tuple for an intid of %1").arg(input_setting));
+        return false;
+    }
+
+    int input_hsize = second_query.value(0).toInt();
+    int input_vsize = second_query.value(1).toInt();
+    int fr_code = second_query.value(2).toInt();
+    
+    
+    tc_arguments.append("-i");
+    tc_arguments.append(QString("%1/%2.vob").arg(working_directory->path()).arg(rip_name));
+    tc_arguments.append("-g");
+    tc_arguments.append(QString("%1x%2").arg(input_hsize).arg(input_vsize));
+    tc_arguments.append("-f");
+    tc_arguments.append(QString("0,%1").arg(fr_code));
+                         
+                         
+                         
+    tc_arguments.append("-M");
+    tc_arguments.append(QString("%1").arg(sync_mode));
+    
+    if(use_yv12)
+    {
+        tc_arguments.append("-V");
+    }    
+
+    //
+    //  The order of these is defined by transcode
+    //
+    if(clipbottom != 0 ||
+       cliptop != 0 ||
+       clipleft != 0 ||
+       clipright != 0)
+    {
+        tc_arguments.append("-j");
+        tc_arguments.append(QString("%1,%2,%3,%4")
+                             .arg(cliptop)
+                             .arg(clipleft)
+                             .arg(clipbottom)
+                             .arg(clipright));
+    }
+    if(grow_h > 0 || grow_w > 0)
+    {
+        tc_arguments.append("-X");
+        tc_arguments.append(QString("%1,%2")
+                             .arg(grow_h)
+                             .arg(grow_w));
+    }
+    if(f_resize_h > 0 || f_resize_w > 0)
+    {
+        tc_arguments.append("-B");
+        tc_arguments.append(QString("%1,%2")
+                             .arg(f_resize_h)
+                             .arg(f_resize_w));
+    }
+    if(hq_resize_h > 0 && hq_resize_w > 0)
+    {
+        tc_arguments.append("-Z");
+        tc_arguments.append(QString("%1x%2")
+                             .arg(hq_resize_w)
+                             .arg(hq_resize_h));
+    }
+    if(cliptbottom != 0 ||
+       clipttop != 0 ||
+       cliptleft != 0 ||
+       cliptright != 0)
+    {
+        tc_arguments.append("-Y");
+        tc_arguments.append(QString("%1,%2,%3,%4")
+                             .arg(clipttop)
+                             .arg(cliptleft)
+                             .arg(cliptbottom)
+                             .arg(cliptright));
+    }
+    
+    if(codec.length() < 1)
+    {
+        problem("Yo! Kaka-brain! Can't transcode without a codec");
+        return false;
+    }
+    if(codec.contains("divx") && gContext->GetNumSetting("MTDxvidFlag"))
+    {
+        codec = "xvid";
+    }
+    
+    tc_arguments.append("-y");
+    tc_arguments.append(codec);
+
+    if(codec_param.length() > 0)
+    {
+        tc_arguments.append("-F");
+        tc_arguments.append(codec_param);
+    }
+    
+    if(bitrate > 0)
+    {
+        tc_arguments.append("-w");
+        tc_arguments.append(QString("%1").arg(bitrate));
+    }
+    
+    
+    if(gContext->GetNumSetting("MTDac3Flag") && !name.contains("VCD", false))
+    {
+        tc_arguments.append("-A");
+        tc_arguments.append("-N");
+        tc_arguments.append("0x2000");
+    }
+    else
+    {
+        if(a_sample_r > 0)
+        {
+            tc_arguments.append("-E");
+            tc_arguments.append(QString("%1").arg(a_sample_r));
+        }
+        if(a_bitrate > 0)
+        {
+            tc_arguments.append("-b");
+            tc_arguments.append(QString("%1").arg(a_bitrate));
+        }
+    }
+    if(audio_track > 1)
+    {
+        tc_arguments.append("-a");
+        tc_arguments.append(QString("%1").arg(audio_track - 1));
+    }
+
+    tc_arguments.append("-o");
+    tc_arguments.append(QString("%1.avi").arg(destination_file_string));
+
+    tc_arguments.append("--print_status");
+    tc_arguments.append("20");
+    tc_arguments.append("--color");
+    tc_arguments.append("0");
+    
+
+    if(two_pass)
+    {
+        tc_arguments.append("-R");
+        tc_arguments.append("1,twopass.log");
+    }    
+    
+
+    tc_process = new QProcess(tc_arguments);
+    tc_process->setWorkingDirectory(*working_directory);
+    return true;
+}
+
+bool DVDTranscodeThread::runTranscode(int which_run)
+{
+    //
+    //  Set description strings to let the user 
+    //  know what is going on.
+    //
+
+    subjob_name = "Transcode is thinking ...";
+    subjob_progress = 0.0;
+    uint tick_tock = 3;
+    uint seconds_so_far = 0;
+    double percent_transcoded = 0.0;
+    QTime job_time;
+    bool finally = true;
+    
+    if(which_run > 1)
+    {
+        //
+        //  Second pass
+        //
+        
+        if(tc_process)
+        {
+            delete tc_process;
+            tc_process = NULL;
+        }
+        
+        QString first_pass_string = tc_arguments.last();
+        if(first_pass_string != "1,twopass.log")
+        {
+            problem("Tried to setup seconds pass, but somehow first pass wasn't done properly");
+            return false;
+        }
+        tc_arguments.remove(tc_arguments.last());
+        tc_arguments.append("2,twopass.log");
+        tc_process = new QProcess(tc_arguments);
+        tc_process->setWorkingDirectory(*working_directory);
+        
+    }
+
+    //  Debugging
+    //
+    //cout << "About to run \"" << tc_process->arguments().join(" ") << "\"" << endl;
+    //cout << "with workdir = " << tc_process->workingDirectory().path() << endl;
+
+    if(!tc_process->start())
+    {
+        problem("Could not start transcode");
+        return false;
+    }
+    while(true)
+    {
+        if(!keepGoing())
+        {
+            //
+            //  oh darn ... the mtd wants to shut down
+            //
+
+            tc_process->tryTerminate();
+            sleep(3);
+            tc_process->kill();
+            delete tc_process;
+            tc_process = NULL;
+            return FALSE;
+        }
+        if(tc_process->isRunning())
+        {
+            while(tc_process->canReadLineStdout())
+            {
+                //
+                //  Would be nicd to just connect a SIGNAL here
+                //  rather than polling, but we're talking to a
+                //  a process from inside a thread, so Q_OBJECT
+                //  is not possible
+                //
+
+                QString status_line = tc_process->readLineStdout();
+                status_line = status_line.section("EMT: ", 1, 1);
+                status_line = status_line.section(",",0,0);
+                QString h_string = status_line.section(":",0,0);
+                QString m_string = status_line.section(":",1,1);
+                QString s_string = status_line.section(":", 2,2);
+
+                seconds_so_far = s_string.toUInt() +
+                                 (60 * m_string.toUInt()) +
+                                 (60 * 60 * h_string.toUInt());
+                                      
+                percent_transcoded = (double) ( (double) seconds_so_far / (double) length_in_seconds);
+            }
+            if(seconds_so_far > 0)
+            {
+                if(finally)
+                {
+                    finally = false;
+                    job_time.start();
+                }
+                if(two_pass)
+                {
+                    if(which_run == 1)
+                    {
+                        subjob_progress = percent_transcoded;
+                        overall_progress = 0.333333 + (0.333333 * percent_transcoded);
+                        updateSubjobString(job_time.elapsed() / 1000, "Transcoding Pass 1 of 2 ~");
+                    }
+                    else if(which_run == 2)
+                    {
+                        subjob_progress = percent_transcoded;
+                        overall_progress = 0.666666 + (0.333333 * percent_transcoded);
+                        updateSubjobString(job_time.elapsed() / 1000, "Transcoding Pass 2 of 2 ~");
+                    }
+                }
+                else
+                {
+                    //
+                    //  Set feedback strings and calculate
+                    //  estimated time left
+                    //
+
+                    
+                    subjob_progress = percent_transcoded;
+                    overall_progress = 0.50 + (0.50 * percent_transcoded);
+                    updateSubjobString(job_time.elapsed() / 1000, "Transcoding ~");
+                }
+            }
+            else
+            {
+                ++tick_tock;
+                if (tick_tock > 3)
+                {
+                    tick_tock = 1;
+                }
+                subjob_name = "Transcode is thinking ";
+                for(uint i = 0; i < tick_tock; i++)
+                {
+                    subjob_name += ".";
+                }
+            }
+            sleep(2);
+        }
+        else
+        {
+            bool flag = tc_process->normalExit();
+            delete tc_process;
+            tc_process = NULL;
+            return flag;
+        }
+    }
+
+    //
+    //  Should never get here
+    //
+
+    delete tc_process;
+    tc_process = NULL;
+    return false;
+}
+
+void DVDTranscodeThread::cleanUp()
+{
+    //
+    //  Erase rip file(s) and temporary
+    //  working directory
+    //
+    if(working_directory)
+    {
+        working_directory->remove(QString("%1.vob").arg(rip_name));
+        if(two_pass)
+        {
+            working_directory->remove("twopass.log");
+        }
+        working_directory->cd("..");
+        working_directory->rmdir(rip_name);
+        delete working_directory;
+        working_directory = NULL;
+    }
+}
+
+void DVDTranscodeThread::wipeClean()
+{
+    //
+    //  Clean up and remove any output
+    //  files that may have been
+    //  partially created
+    //
+    cleanUp();
+    QDir d("stupid");
+    d.remove(QString("%1.avi").arg(destination_file_string));
+}
+
+DVDTranscodeThread::~DVDTranscodeThread()
+{
+    if(working_directory)
+    {
+        delete working_directory;
+    }
+    if(tc_process)
+    {
+        delete tc_process;
+    }
+}
+

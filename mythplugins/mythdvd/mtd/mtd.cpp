@@ -24,6 +24,13 @@ DiscCheckingThread::DiscCheckingThread(MTD *owner,
                                        QMutex *drive_access_mutex,
                                        QMutex *mutex_for_titles)
 {
+    //
+    //  This is just a little object that asks the
+    //  DVDProbe object to keep checking the drive to
+    //  see if we have a disc, if the disc has changed,
+    //  etc.
+    //
+    
     have_disc = false;
     dvd_probe = probe;
     dvd_drive_access = drive_access_mutex;
@@ -33,11 +40,22 @@ DiscCheckingThread::DiscCheckingThread(MTD *owner,
 
 bool DiscCheckingThread::keepGoing()
 {
+    //
+    //  When the mtd wants to finish (quit), it
+    //  tells this checking thread to stop 
+    //  running
+    //  
+
     return parent->threadsShouldContinue();
 } 
 
 void DiscCheckingThread::run()
 {
+    //
+    //  Unless the mtd wants to quit,
+    //  keep checking the DVD.
+    //
+
     while(keepGoing())
     {
         while(!dvd_drive_access->tryLock())
@@ -194,7 +212,22 @@ void MTD::checkDisc()
             //  DVD inserted
             //
             emit writeToLog(QString("DVD inserted: %1").arg(dvd_probe->getName()));
+            QPtrList<DVDTitle> *list_of_titles = dvd_probe->getTitles();
             
+            //
+            //  Do not use an iterator, cause 
+            //  we're not mutex locking title access
+            //
+            
+            if(list_of_titles)
+            {
+                for(uint i = 0; i < list_of_titles->count(); i++)
+                {
+                    emit writeToLog(QString("            : Title %1 is of type %2 (dvdinput table)")
+                                            .arg(i+1)
+                                            .arg(list_of_titles->at(i)->getInputID()));
+                }
+            }
         }
     }
     else
@@ -212,6 +245,12 @@ void MTD::checkDisc()
 
 void MTD::cleanThreads()
 {
+    //
+    //  Should probably have the job threads 
+    //  post an event when they are done, but
+    //  this works. 
+    //
+
     JobThread *iterator;
     for(iterator = job_threads.first(); iterator; iterator = job_threads.next() )
     {
@@ -302,7 +341,19 @@ void MTD::parseTokens(const QStringList &tokens, QSocket *socket)
 
 void MTD::shutDown()
 {
+    //
+    //  Setting this flag to false
+    //  will make all the threads 
+    //  shutdown 
+    //
+
     keep_running = false;
+
+    //
+    //  Stop checking the DVD
+    //
+    
+    disc_checking_thread->wait();
 
     //
     //  Get rid of job threads
@@ -391,7 +442,9 @@ void MTD::sendMediaReport(QSocket *socket)
 
         //
         //  For each title, send:
-        //      track/title number, numb chapters, numb angles, hours, minutes, and seconds
+        //      track/title number, numb chapters, numb angles, 
+        //      hours, minutes, seconds, and type of disc
+        //      (from the dvdinput table in the database)
         //
         
         for(uint i = 0; i < dvd_titles->count(); ++i)
@@ -542,5 +595,49 @@ void MTD::startDVD(const QStringList &tokens)
                                                   nice_level);
         job_threads.append(new_job);
         new_job->start();
+    }
+    else if (quality > 0)
+    {
+        while(!titles_mutex->tryLock())
+        {
+            sleep(1);
+        }
+
+        DVDTitle *which_title = dvd_probe->getTitle(dvd_title);
+        titles_mutex->unlock();
+
+        if(!which_title)
+        {
+            cerr << "mtd.o: title number not valid? " << endl;
+            return;
+        }
+        
+        uint numb_seconds = which_title->getPlayLength();
+
+        emit writeToLog(QString("launching job: %1").arg(flat));
+
+        //
+        //  transcoding job
+        //
+ 
+        JobThread *new_job = new DVDTranscodeThread(this, 
+                                                    dvd_drive_access, 
+                                                    dvd_device, 
+                                                    dvd_title, 
+                                                    final_file.name(), 
+                                                    file_name,
+                                                    flat,
+                                                    nice_level,
+                                                    quality,
+                                                    db,
+                                                    audio_track,
+                                                    numb_seconds);
+        job_threads.append(new_job);
+        new_job->start();
+       
+    }
+    else
+    {
+        cerr << "mtd.o: Hmmmmm. Got sent a job with a negative quality parameter. That's just plain weird." << endl;
     }
 }

@@ -82,7 +82,7 @@ if test "$transcode" = "yes" ; then
 fi
 
 if test "$transcode" = "no" ; then
-  echo "        Ripping/Transcoding support will not be included"
+  echo "        Ripping/Transcoding support will *not* be included"
 fi
 
 #

@@ -838,8 +838,10 @@ void DVDRipBox::goRipScreen()
         warning_text->SetText("");
     }
     stopStatusPolling();
-    TitleDialog title_dialog(client_socket, dvd_info->getName(), dvd_info->getTitles(), gContext->GetMainWindow(), "title dialog");
+    block_media_requests = true;
+    TitleDialog title_dialog(db, client_socket, dvd_info->getName(), dvd_info->getTitles(), gContext->GetMainWindow(), "title dialog");
     title_dialog.exec();
+    block_media_requests = false;
     pollStatus();
     showCurrentJob();
     //setContext(3);

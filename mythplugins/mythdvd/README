@@ -1,9 +1,5 @@
                              MythDVD
-                           Release 0.? 
-
-    NB: This README is a little ahead of the code ... does not require any
-        of transcode, nasm, etc. at this point (soon). Does require 
-        libdvdread (and you'll probably want libdvdcss).
+                           Release 0.11
 
 GENERAL INFO
 ------------
@@ -25,7 +21,7 @@ done, don't even bother with this, as it won't work.
 
 Also, you need MythVideo installed if you want to be able to transcode DVDs
 (because mythDVD needs to know where you like to store your videos, and
-that's defined in the mythVideo setup).
+that's defined in the MythVideo setup).
 
 In addition to MythTV's prerequisites, you'll should have these software
 packages installed for *transcoding* to work:
@@ -49,7 +45,8 @@ packages installed for *transcoding* to work:
                 available at the mjpegtools site. This includes 
                 avifile (0.7.38).
 
-         xvid - A useful MPEG-4 compliant video codec.
+         xvid - A useful MPEG-4 compliant video codec, which is far
+		more free than divx. 
                 Currently using 0.9.1
                 http://www.xvid.org/
 
@@ -61,9 +58,10 @@ packages installed for *transcoding* to work:
                 Currently 0.9.0
                 http://fame.sourceforge.net/
 
-    transcode - The core of the ripping/re-encoding process
-                (most of the stuff above are things that
-                transcode wants for full functionality).
+    transcode - The core of the re-encoding process (most
+                of the stuff above are actually things that
+                transcode wants for full functionality). The
+		more codecs you have installed, the better.
                 Developers currently using 0.6.8
                 http://www.theorie.physik.uni-goettingen.de/
                 ~ostreich/transcode/
@@ -83,7 +81,8 @@ on your distribution, there may be pre-packaged versions of these
 applications available. You'll want one or more of:
 
       mplayer - You probably already have this working if you have MythVideo
-                installed. Try to install as many codecs as possible.
+                installed. Try to install as many codecs as possible while
+		you're at it.
                 http://www.mplayerhq.hu/
 
          ogle - Another player.
@@ -111,6 +110,20 @@ Next:
                 make install
 
 
+DATABASE
+--------
+
+    You need to go into the ./dvddb and run the appropriate file. If
+this is your first time installing mythdvd, then you probably just want to
+do a:
+
+	mysql -p -u mythtv < metadata.sql
+
+    As with other myth modules, if you are upgrading a CVS version, run the
+cvs.sql, and if you are moving to a new release version, run the appropriate
+from-x-to-y.sql script (if any).
+
+
 CONFIGURATION
 -------------
 
@@ -128,7 +141,12 @@ these:
           language and/or subtitle preferences, decide on menu mode, etc.
           If you come up with a decent shell script that might be of use
           to others, think about contributing it.
- 
+
+	* You can keep AC3 audio in the transcoded files. For Dolby 5.1,
+	  this is probably a good choice as long as your myth box has
+	  some way to handle 6 channel sounds (e.g. SB Live passthrough). 
+
+	* Try and use xvid. It's free and open.
 
 FOR MORE INFO
 -------------

@@ -100,6 +100,17 @@ public:
     };
 };
 
+class TranscodeCommand: public LineEditSetting, public GlobalSetting {
+public:
+    TranscodeCommand():
+        GlobalSetting("TranscodeCommand"){
+        setLabel("Base transcode command");
+        setValue("/usr/local/bin/transcode");
+        setHelpText("This is the base (without arguments) command "
+                    "to run transcode on your system.");
+    };
+};
+
 class MTDPortNumber: public SpinBoxSetting, public GlobalSetting {
 public:
     MTDPortNumber():
@@ -123,6 +134,33 @@ public:
                     "will log to the window it is started from. "
                     "Otherwise, it will write to a file called  "
                     "mtd.log in the top level ripping directory.");
+     };
+};
+
+
+class MTDac3Flag: public CheckBoxSetting, public GlobalSetting {
+public:
+    MTDac3Flag():
+        GlobalSetting("MTDac3Flag") {
+        setLabel("Transcode AC3 Audio");
+        setValue(false);
+        setHelpText("If set, the mtd (Myth Transcoding Daemon) "
+                    "will preserve AC3 (Dolby Digital) audio in "
+                    "transcoded files. If not, it will convert "
+                    "to 2-channel mp3.");
+     };
+};
+
+
+class MTDxvidFlag: public CheckBoxSetting, public GlobalSetting {
+public:
+    MTDxvidFlag():
+        GlobalSetting("MTDxvidFlag") {
+        setLabel("Use xvid rather than divx");
+        setValue(true);
+        setHelpText("If set, mythdvd will use the (open, free) "
+                    "xvid codec rather than divx whenever "
+                    "possible.");
      };
 };
 
@@ -160,10 +198,13 @@ RipperSettings::RipperSettings()
     rippersettings->setLabel("DVD Ripper Settings");
     rippersettings->addChild(new SetRipDirectory());
     rippersettings->addChild(new TitlePlayCommand());
+    rippersettings->addChild(new TranscodeCommand());
     rippersettings->addChild(new MTDPortNumber());
     rippersettings->addChild(new MTDNiceLevel());
     rippersettings->addChild(new MTDRipSize());
     rippersettings->addChild(new MTDLogFlag());
+    rippersettings->addChild(new MTDac3Flag());
+    rippersettings->addChild(new MTDxvidFlag());
     addChild(rippersettings);
 }
 

@@ -24,7 +24,7 @@ class RipFile
     RipFile(const QString &a_base, const QString &an_extension);
     ~RipFile();
     
-    bool    open(int mode);
+    bool    open(int mode, bool multiple_files);
     void    close();
     void    remove();
     QString name();
@@ -39,6 +39,7 @@ class RipFile
     int             bytes_written;
     int             access_mode;
     QPtrList<QFile> files;
+    bool            use_multiple_files;
 };
 
 #endif  // fileobs_h_

@@ -18,9 +18,20 @@ using namespace std;
 #include "titledialog.h"
 
 
-TitleDialog::TitleDialog(QSocket *a_socket, QString d_name, QPtrList<DVDTitleInfo> *titles, MythMainWindow *parent, const char* name)
+TitleDialog::TitleDialog(QSqlDatabase *ldb,
+                         QSocket *a_socket, 
+                         QString d_name, 
+                         QPtrList<DVDTitleInfo> *titles, 
+                         MythMainWindow *parent, 
+                         const char* name)
             :MythDialog(parent, name)
 {
+    //
+    //  Assign pointer to database
+    //
+    
+    db = ldb;
+
     socket_to_mtd = a_socket;
     disc_name = d_name;
     if(disc_name.length() < 1)
@@ -110,9 +121,26 @@ TitleDialog::TitleDialog(QSocket *a_socket, QString d_name, QPtrList<DVDTitleInf
         title_grid->addWidget(audio, i, 3);
 
         MythComboBox *quality = new MythComboBox(false, firstdiag, QString("%1").arg(i));
-        //  HACK -- perfect only
         quality->insertItem("Perfect");
-        connect(quality, SIGNAL(highlighted(int)), this, SLOT(setQuality(int)));
+        
+        //
+        //  Add other (if any) suitable transcoding possibilites
+        //
+        
+        QString q_string = QString("select name from dvdtranscode "
+                                   "where input = %1 ;")
+                                  .arg(dvd_titles->at(i)->getInputID());
+       
+        QSqlQuery a_query(q_string, db);
+        if(a_query.isActive() && a_query.numRowsAffected() > 0)
+        {
+            while(a_query.next())
+            {
+                quality->insertItem(a_query.value(0).toString());
+            }
+        } 
+        
+        connect(quality, SIGNAL(highlighted(const QString &)), this, SLOT(setQuality(const QString &)));
         title_grid->addWidget(quality, i, 4);
        
 
@@ -129,11 +157,43 @@ TitleDialog::TitleDialog(QSocket *a_socket, QString d_name, QPtrList<DVDTitleInf
 
 }
 
-void TitleDialog::setQuality(int qual_index)
+void TitleDialog::setQuality(const QString &a_string)
 {
     MythComboBox *which_box = (MythComboBox *)sender();
     int which_title = atoi(which_box->name());
-    dvd_titles->at(which_title)->setQuality(qual_index);
+
+
+    if(a_string == "Perfect")
+    {
+        dvd_titles->at(which_title)->setQuality(0);
+    }
+    else
+    {
+        QString q_string = QString ("select intid from dvdtranscode "
+                                    "where name = \"%1\" and "
+                                    "input = %2 ;")
+                                   .arg(a_string)
+                                   .arg(dvd_titles->at(which_title)->getInputID());
+
+        QSqlQuery a_query(q_string, db);
+
+        if(a_query.isActive() && a_query.numRowsAffected() > 0)
+        {
+            a_query.next();
+            if(a_query.numRowsAffected() > 1)
+            {
+                cerr << "titledialog.o: Hey! Dimwit! You've got multiple rows in your "
+                     << "dvdtranscode table with the same name and (dvd)input value."
+                    << endl; 
+            }
+            dvd_titles->at(which_title)->setQuality(a_query.value(0).toInt());
+        
+        }
+        else
+        {
+            cerr << "titledialog.o: I think you've screwed up your dvdtranscode table. Bah!" << endl;
+        }
+    }
 }
 
 void TitleDialog::setAudio(int audio_index)

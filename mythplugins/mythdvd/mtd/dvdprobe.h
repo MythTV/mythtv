@@ -135,6 +135,7 @@ class DVDProbe
     bool                probe();
     QString             getName(){return volume_name;}
     QPtrList<DVDTitle>* getTitles(){return &titles;}
+    DVDTitle*           getTitle(uint which_one);
     
   private:
 
