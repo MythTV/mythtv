@@ -26,20 +26,37 @@
    </button>
 
    <button>
-     <type>GAME</type>
-     <text>Games</text>
-     <text lang="IT">Giochi</text>
-     <text lang="ES">Juegos</text>
-     <text lang="CA">Jocs</text>
-     <text lang="NL">Spelen</text>
-     <text lang="FR">Jeux</text>
-     <text lang="DE">Spiele</text>
-     <text lang="DK">Spil</text>
-     <text lang="PT">Jogos</text>
-     <text lang="SV">Spel</text>
-     <text lang="JA">ゲーム</text>
-     <action>PLUGIN mythgame</action>
-     <depends>mythgame</depends>
+     <type>VIDEO</type>
+     <text>Videos</text>
+     <text lang="IT">Video</text>
+     <text lang="ES">Video</text>
+     <text lang="CA">Vídeo</text>
+     <text lang="NL">Films</text>
+     <text lang="FR">Vidéos</text>
+     <text lang="DE">Videos</text>
+     <text lang="DK">Film</text>
+     <text lang="PT">Filmes</text>
+     <text lang="SV">Video</text>
+     <text lang="JA">ビデオ</text>
+     <action>PLUGIN mythvideo</action>
+     <depends>mythvideo</depends>
+   </button>
+
+   <button>
+     <type>DVD</type>
+     <text>DVD</text>
+     <text lang="DE">DVD</text>
+     <text lang="PT">DVD</text>
+     <text lang="SV">DVD</text>
+     <action>PLUGIN mythdvd</action>
+     <depends>mythdvd</depends>
+   </button>
+
+   <button>
+      <type>FM</type>
+      <text>Radio</text>
+      <action>PLUGIN mythFM</action>
+      <depends>mythFM</depends>
    </button>
 
    <button>
@@ -60,20 +77,20 @@
    </button>
 
    <button>
-     <type>VIDEO</type>
-     <text>Videos</text>
-     <text lang="IT">Video</text>
-     <text lang="ES">Video</text>
-     <text lang="CA">Vídeo</text>
-     <text lang="NL">Films</text>
-     <text lang="FR">Vidéos</text>
-     <text lang="DE">Videos</text>
-     <text lang="DK">Film</text>
-     <text lang="PT">Filmes</text>
-     <text lang="SV">Video</text>
-     <text lang="JA">ビデオ</text>
-     <action>PLUGIN mythvideo</action>
-     <depends>mythvideo</depends>
+     <type>GAME</type>
+     <text>Games</text>
+     <text lang="IT">Giochi</text>
+     <text lang="ES">Juegos</text>
+     <text lang="CA">Jocs</text>
+     <text lang="NL">Spelen</text>
+     <text lang="FR">Jeux</text>
+     <text lang="DE">Spiele</text>
+     <text lang="DK">Spil</text>
+     <text lang="PT">Jogos</text>
+     <text lang="SV">Spel</text>
+     <text lang="JA">ゲーム</text>
+     <action>PLUGIN mythgame</action>
+     <depends>mythgame</depends>
    </button>
 
    <button>
@@ -91,16 +108,6 @@
      <text lang="JA">天気</text>
      <action>PLUGIN mythweather</action>
      <depends>mythweather</depends>
-   </button>
-
-   <button>
-     <type>DVD</type>
-     <text>DVD</text>
-     <text lang="DE">DVD</text>
-     <text lang="PT">DVD</text>
-     <text lang="SV">DVD</text>
-     <action>PLUGIN mythdvd</action>
-     <depends>mythdvd</depends>
    </button>
 
    <button>
@@ -124,6 +131,13 @@
       <text lang="JA">ウェブ</text>
       <action>PLUGIN mythbookmarkmanager</action>
       <depends>mythbookmarkmanager</depends>
+   </button>
+
+   <button>
+      <type>RECIPE</type>
+      <text>Recipes</text>
+      <action>PLUGIN mythRecipe</action>
+      <depends>mythRecipe</depends>
    </button>
 
    <button>

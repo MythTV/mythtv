@@ -1,7 +1,7 @@
 <mythmenu name="SETUP_TVRECPRIORITIES">
 
    <button>
-      <type>TV_RECPRIORITIES</type>
+      <type>TV_RECPRIORITIES_SETTINGS_GENERAL</type>
       <text>General</text>
       <text lang="DE">Allgemeines</text>
       <text lang="DK">Generelt</text>
@@ -13,7 +13,7 @@
    </button>
 
    <button>
-      <type>TV_RECPRIORITIES</type>
+      <type>TV_RECPRIORITIES_CHANNEL</type>
       <text>Set Channel Recording Priorities</text>
       <text lang="DE">Aufnahme- prioritäten</text>
       <text lang="SV">Kanalinspelningsprioriteter</text>

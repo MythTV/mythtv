@@ -1,7 +1,7 @@
 <mythmenu name="TV">
 
    <button>
-      <type>TV</type>
+      <type>TV_WATCH_TV</type>
       <text>Watch TV</text>
       <text lang="IT">Guarda la TV</text>
       <text lang="ES">Ver la TV</text>
@@ -17,7 +17,7 @@
    </button>
 
    <button>
-      <type>TV_SCHEDULE</type>
+      <type>TV_SCHEDULE_RECORDINGS</type>
       <text>Schedule Recordings</text>
       <text lang="IT">Programma una registrazione</text>
       <text lang="ES">Programar Grabaciones</text>
@@ -43,7 +43,7 @@
    </button>
 
    <button>
-      <type>TV_PLAYBACK</type>
+      <type>TV_WATCH_RECORDINGS</type>
       <text>Watch Recordings</text>
       <text lang="IT">Guarda una registrazione</text>
       <text lang="ES">Ver Grabaciones</text>

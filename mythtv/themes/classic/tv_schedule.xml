@@ -1,7 +1,7 @@
 <mythmenu name="SCHEDULE">
 
    <button>
-      <type>TV_SCHEDULE</type>
+      <type>TV_PROGRAM_GUIDE</type>
       <text>Program Guide</text>
       <text lang="IT">Guida programmi</text>
       <text lang="ES">Guía de programas</text>
@@ -53,7 +53,7 @@
    </button>
 
    <button>
-      <type>TV_PROGFIND</type>
+      <type>TV_SEARCH_LISTINGS</type>
       <text>Search Listings</text>
       <text lang="DE">Suche</text>
       <text lang="SV">Sök i TV-tablå</text>
@@ -93,7 +93,7 @@
 -->
 
    <button>
-      <type>TV_SCHEDULE</type>
+      <type>TV_MANUAL_SCHEDULE</type>
       <text>Manual Schedule</text>
       <text lang="ES">Programar Grabaciones</text>
       <text lang="CA">Programar Gravacions</text>
@@ -125,7 +125,6 @@
       <alttext>Priorities</alttext>
       <alttext lang="SV">Prioriteter</alttext>
       <alttext lang="NL">Prioriteiten</alttext>
-      
       <action>TV_SET_RECPRIORITIES</action>
    </button>
 
@@ -142,7 +141,7 @@
       <text lang="PT">Resolver Conflitos</text>
       <text lang="SV">Åtgärda schemakonflikter</text>
       <text lang="JA">予約衝突修正</text>
-      <alttext>Fix Schedule</alttext>
+      <alttext>Fix Conflicts</alttext>
       <alttext lang="FR">Conflits</alttext>
       <alttext lang="ES">Conflictos</alttext>
       <alttext lang="FR">Conflictes</alttext>

@@ -1,7 +1,7 @@
 <mythmenu name="SEARCH">
 
    <button>
-      <type>TV_PROGFIND</type>
+      <type>TV_SEARCH_TITLES</type>
       <text>Titles</text>
       <text lang="DE">Titel</text>
       <text lang="SV">Titel</text>
@@ -11,23 +11,17 @@
    </button>
 
    <button>
-      <type>TV_PROGFIND</type>
-      <text>Keywords</text>
+      <type>TV_SEARCH_DESCRIPTIONS</type>
+      <text>Descriptions</text>
       <text lang="DE">Inhalt</text>
       <text lang="SV">Beskrivning</text>
       <text lang="NL">Beschrijving</text>      
       <text lang="JA">内容</text>
-      <action>TV_SEARCH_KEYWORD</action>
+      <action>TV_SEARCH_DESC</action>
    </button>
 
    <button>
-      <type>TV_PROGFIND</type>
-      <text>People</text>
-      <action>TV_SEARCH_PEOPLE</action>
-   </button>
-
-   <button>
-      <type>TV_PROGFIND</type>
+      <type>TV_SEARCH_CHANNELS</type>
       <text>Channels</text>
       <text lang="DE">Sender</text>
       <text lang="SV">Kanal</text>
@@ -37,17 +31,17 @@
    </button>
 
    <button>
-      <type>TV_PROGFIND</type>
+      <type>TV_SEARCH_CATEGORIES</type>
       <text>Categories</text>
       <text lang="DE">Kategorie</text>
       <text lang="SV">Kategori</text>
-      <text lang="NL">Categorie</text>
+      <text lang="NL">Catergorie</text>
       <text lang="JA">カテゴリー</text>
       <action>TV_SEARCH_CATEGORY</action>
    </button>
 
    <button>
-      <type>TV_PROGFIND</type>
+      <type>TV_SEARCH_MOVIES</type>
       <text>Movies</text>
       <text lang="DE">Spielfilme</text>
       <text lang="SV">Filmer</text>
@@ -57,7 +51,7 @@
    </button>
 
    <button>
-      <type>TV_PROGFIND</type>
+      <type>TV_SEARCH_NEW_TITLES</type>
       <text>New Titles</text>
       <text lang="DE">Neue Titel</text>
       <text lang="SV">Nya titlar</text>

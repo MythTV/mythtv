@@ -1,6 +1,6 @@
 <mythmenu name="TVSETUP">
    <button>
-      <type>SETUP</type>
+      <type>TV_SETTINGS_GENERAL</type>
       <text>General</text>
       <text lang="IT">Generale</text>
       <text lang="ES">General</text>
@@ -16,7 +16,7 @@
    </button>
 
    <button>
-      <type>TV_SCHEDULE</type>
+      <type>TV_SETTINGS_PROGRAM_GUIDE</type>
       <text>Program Guide</text>
       <text lang="IT">Guida programmi</text>
       <text lang="ES">Guía de programas</text>
@@ -32,7 +32,7 @@
    </button>
 
    <button>
-      <type>TV_PLAYBACK</type>
+      <type>TV_SETTINGS_PLAYBACK</type>
       <text>Playback</text>
       <text lang="IT">Riproduzione</text>
       <text lang="ES">Reproducción</text>
@@ -48,7 +48,7 @@
    </button>
 
    <button>
-      <type>TV_SCHEDULE</type>
+      <type>TV_SETTINGS_RECORDING_PROFILES</type>
       <text>Recording Profiles</text>
       <text lang="IT">Registrazione</text>
       <text lang="ES">Grabación</text>
@@ -65,7 +65,7 @@
    </button>
 
    <button>
-      <type>TV_RECPRIORITIES</type>
+      <type>TV_SETTINGS_RECPRIORITIES</type>
       <text>Recording Priorities</text>
       <text lang="DE">Aufnahme- prioritäten</text>
       <text lang="SV">Inspelningsprioriteter</text>
