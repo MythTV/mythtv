@@ -1400,7 +1400,7 @@ void JobQueue::DoTranscodeThread(void)
                       .arg(useCutlist ? "-l" : "");
 
     if (jobQueueCPU < 2)
-        nice(19);
+        nice(17);
 
     bool retry = true;
     int retrylimit = 3;
@@ -1542,66 +1542,13 @@ void JobQueue::DoFlagCommercialsThread(void)
     jobControlFlags[key] = &controlFlagging;
     controlFlagsLock.unlock();
 
-    bool dontSleep = false;
-
-    if (jobQueueCPU < 2)
-        nice(19);
-
-    if (jobQueueCPU)
-        dontSleep = true;
-
-    QString filename = program_info->GetPlaybackURL();
-
-    RingBuffer *tmprbuf = new RingBuffer(filename, false);
-
-    if (!tmprbuf)
-    {
-        QString msg = QString("ERROR in Commercial Flagging.  Could not create "
-                              "new RingBuffer for %1. "
-                              "Program can not be flagged.")
-                              .arg(logDesc);
-        VERBOSE(VB_GENERAL, msg);
-
-        ChangeJobStatus(commthread_db->db(), jobID, JOB_ERRORED,
-                        "Could not create RingBuffer for commercial flagger.");
-
-        delete program_info;
-        delete commthread_db;
-        return;
-    }
-
-    NuppelVideoPlayer *nvp = new NuppelVideoPlayer(commthread_db, program_info);
-    if (!nvp)
-    {
-        QString msg = QString("ERROR in Commercial Flagging.  Could not create "
-                              "new NuppelVideoPlayer for %1. "
-                              "Program can not be flagged.")
-                              .arg(logDesc);
-        VERBOSE(VB_GENERAL, msg);
-
-        ChangeJobStatus(commthread_db->db(), jobID, JOB_ERRORED,
-                        "Could not create NuppelVideoPlayer for "
-                        "commercial flagger.");
-
-        delete tmprbuf;
-        delete program_info;
-        delete commthread_db;
-        return;
-    }
-
-    nvp->SetRingBuffer(tmprbuf);
-
-    QString msg = QString("Started Commercial Flagging for %1.")
+    QString msg = QString("Starting Commercial Flagging for %1.")
                           .arg(logDesc);
     VERBOSE(VB_GENERAL, msg);
-    gContext->LogEntry("commflag", LP_NOTICE, "Commercial Flagging Started",
+    gContext->LogEntry("commflag", LP_NOTICE, "Commercial Flagging Starting",
                        msg);
 
     int breaksFound = 0;
-#ifdef CALL_COMMFLAG_THE_OLD_WAY
-    breaksFound = nvp->FlagCommercials(false, dontSleep,
-                                       &controlFlagging, true);
-#else
     QString cmd = QString("mythcommflag -j --chanid %1 --starttime %2 --force")
                          .arg(program_info->chanid)
                          .arg(program_info->startts.toString("yyyyMMddhhmm00"));
@@ -1622,7 +1569,6 @@ void JobQueue::DoFlagCommercialsThread(void)
     }
 
     breaksFound = myth_system(cmd.ascii());
-#endif
 
     controlFlagsLock.lock();
     if (breaksFound == -1)
@@ -1657,8 +1603,8 @@ void JobQueue::DoFlagCommercialsThread(void)
         gContext->LogEntry("commflag", LP_NOTICE,
                            "Commercial Flagging Finished", msg);
 
-        ChangeJobStatus(commthread_db->db(), jobID, JOB_FINISHED,
-                        "Successfully Completed.");
+        msg = QString("Finished, %1 break(s) found.").arg(breaksFound);
+        ChangeJobStatus(commthread_db->db(), jobID, JOB_FINISHED, msg);
     }
     VERBOSE(VB_GENERAL, msg);
 
@@ -1669,8 +1615,6 @@ void JobQueue::DoFlagCommercialsThread(void)
     runningJobCommands.erase(key);
     controlFlagsLock.unlock();
 
-    delete nvp;
-    delete tmprbuf;
     delete program_info;
     delete commthread_db;
 }
@@ -1715,7 +1659,7 @@ void JobQueue::DoUserJobThread(void)
 
     switch (jobQueueCPU)
     {
-        case  0: nice(19);
+        case  0: nice(17);
                  break;
         case  1: nice(10);
                  break;

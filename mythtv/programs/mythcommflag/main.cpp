@@ -573,7 +573,7 @@ int main(int argc, char *argv[])
         int jobQueueCPU = gContext->GetNumSetting("JobQueueCPU", 0);
 
         if (beNice || jobQueueCPU < 2)
-            nice(19);
+            nice(17);
 
         if (jobQueueCPU)
             fullSpeed = true;
@@ -596,7 +596,7 @@ int main(int argc, char *argv[])
 
     // be nice to other programs since FlagCommercials() can consume 100% CPU
     if (beNice)
-        nice(19);
+        nice(17);
 
     time_now = time(NULL);
     if (!quiet)
