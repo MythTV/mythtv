@@ -1300,7 +1300,7 @@
   <window name="playback">
 
     <font name="active" face="Trebuchet Ms">
-      <color>#ffffff</color>
+      <color>#ddddff</color>
       <size>16</size>
       <size:big>20</size:big>
       <size:small>14</size:small>
@@ -1309,7 +1309,7 @@
     </font>
 
     <font name="inactive" face="Trebuchet Ms">
-      <color>#9999cc</color>
+      <color>#ccccdd</color>
       <size>16</size>
       <size:big>20</size:big>
       <size:small>13</size:small>
@@ -1559,7 +1559,7 @@
     </container>
 
     <container name="video">
-      <area>620,360,160,120</area>
+      <area>620,351,160,120</area>
     </container>
 
     <!-- Confirm delete and legend help popup -->
@@ -1609,16 +1609,16 @@
 
     <font name="active" face="Trebuchet Ms">
       <color>#ffffff</color>
-      <size>15</size>
-      <size:small>11</size:small>
+      <size>18</size>
+      <size:small>15</size:small>
       <shadow>2,2</shadow>
       <bold>yes</bold>
     </font>
 
     <font name="inactive" face="Trebuchet Ms">
       <color>#9999cc</color>
-      <size>15</size>
-      <size:small>11</size:small>
+      <size>18</size>
+      <size:small>15</size:small>
       <shadow>2,2</shadow>
       <bold>yes</bold>
 
@@ -1626,8 +1626,8 @@
 
     <font name="record_font" face="Trebuchet Ms">
       <color>#F7862B</color>
-      <size>15</size>
-      <size:small>11</size:small>
+      <size>18</size>
+      <size:small>15</size:small>
       <shadow>2,2</shadow>
       <bold>yes</bold>
     </font>
@@ -1761,45 +1761,42 @@
     <container name="program_info">
       <area>25,25,750,220</area>
       <textarea name="title" draworder="6">
-        <area>13,5,515,45</area>
+        <area>25,15,515,45</area>
         <font>titleinfo</font>
       </textarea>
       <textarea name="subtitle" draworder="6">
-        <area>13,48,700,35</area>
+        <area>25,48,700,35</area>
         <font>subtitle</font>
       </textarea>
       <textarea name="timedate" draworder="6" align="right">
-        <area>300,155,440,27</area>
-       <font>timedate</font>
+        <area>290,155,440,27</area>
+       <font>info</font>
       </textarea>
-      <textarea name="channelnum" draworder="6" align="right">
-        <area>540,183,70,40</area>
-        <font>info</font>
-      </textarea>
-      <textarea name="channelname" draworder="6" align="left">
-        <area>620,183,230,40</area>
+      <textarea name="channel" draworder="6" align="right">
+        <area>290,180,440,40</area>
         <font>info</font>
       </textarea>
       <textarea name="description" draworder="6">
-        <area>13,75,730,90</area>
+        <area>25,75,715,90</area>
         <font>descinfo</font>
         <multiline>yes</multiline>
+        <value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
       </textarea>
       <textarea name="recordingstatus" draworder="6">
-        <area>13,183,500,35</area>
+        <area>25,180,500,35</area>
         <font>recinfo</font>
       </textarea>
     </container>
 
     <container name="help_info_1">
-      <area>25,25,750,220</area>
+      <area>40,40,750,220</area>
       <textarea name="selectinfo" draworder="6">
-        <area>10,5,500,30</area>
+        <area>20,20,500,30</area>
         <font>info</font>
         <value>Select a letter...</value>
       </textarea>
       <textarea name="pickinfo" draworder="6">
-        <area>10,75,720,120</area>
+        <area>20,75,720,120</area>
         <font>info</font>
         <value>Pick the letter in which the show starts with, then press SELECT or the right arrow</value>
         <multiline>yes</multiline>
@@ -1809,12 +1806,12 @@
     <container name="help_info_2">
       <area>25,25,750,220</area>
       <textarea name="selectprog" draworder="6">
-        <area>10,5,500,30</area>
+        <area>20,20,500,30</area>
         <font>info</font>
         <value>Select a program...</value>
       </textarea>
       <textarea name="pickprog" draworder="6">
-        <area>10,75,720,120</area>
+        <area>20,75,720,120</area>
         <font>info</font>
         <value>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</value>
         <multiline>yes</multiline>
@@ -1824,12 +1821,12 @@
     <container name="noprograms">
       <area>25,25,750,220</area>
       <textarea name="noprog" draworder="6">
-        <area>10,5,500,30</area>
+        <area>20,15,500,30</area>
         <font>info</font>
         <value>No Programs</value>
       </textarea>
       <textarea name="research" draworder="6">
-        <area>10,75,500,120</area>
+        <area>20,75,500,120</area>
         <font>info</font>
         <value>There are no available programs under this search. Please select another search.</value>
         <multiline>yes</multiline>
