@@ -31,6 +31,9 @@ str SeekStatusRect=10,15,150,45
 str SeekSliderRect=175,12,445,45
 # Image to use for the fill slider bar.  Only the first column is used.
 str SeekSliderNormal=slider-normal.png
+# Rectangular area to center the pause status text within.  If this doesn't 
+# exist, the SeekSliderRect is used.
+str SeekSliderTextRect=175,12,445,45
 # Image used to show position on the slider bar.
 # str SeekSliderPosition=slider-position.png
 # Size of the font that's displayed over the slider bar for status messages.

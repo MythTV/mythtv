@@ -370,6 +370,14 @@ bool OSD::LoadTheme(void)
             pausesliderRect.moveBy(x, y);
         }
 
+        bgname = settings->GetSetting("SeekSliderTextRect");
+        if (bgname != "")
+        {
+            pausesliderTextRect = parseRect(bgname);
+            normalizeRect(&pausesliderTextRect);
+            pausesliderTextRect.moveBy(x, y);
+        }
+
         bgname = settings->GetSetting("SeekSliderPosition");
         if (bgname != "")
         {
@@ -380,6 +388,10 @@ bool OSD::LoadTheme(void)
         pausesliderfontsize = settings->GetNumSetting("SeekSliderFontSize");
     }
  
+
+    if (pausesliderTextRect.width() == 0)
+        pausesliderTextRect = pausesliderRect;
+
     return true;
 }
 
@@ -730,7 +742,7 @@ void OSD::DisplayPause(unsigned char *yuvptr)
 
     if (pausesliderfont)
     {
-        QRect temp = pausesliderRect;
+        QRect temp = pausesliderTextRect;
         temp.moveTopLeft(QPoint(temp.left(), temp.top() + pauseyoffset));
         DrawStringCentered(yuvptr, temp, pauseslidertext, pausesliderfont);
     }

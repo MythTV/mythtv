@@ -137,6 +137,7 @@ class OSD
     OSDImage *pausesliderpos;
     QRect pausestatusRect;
     QRect pausesliderRect;
+    QRect pausesliderTextRect;
     QString pausestatus;
     int pausesliderfontsize;
     TTFFont *pausesliderfont;
