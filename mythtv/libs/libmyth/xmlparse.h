@@ -37,6 +37,7 @@ class XMLParse
     void parseImage(LayerSet *, QDomElement &);
     void resizeImage(QPixmap *, QString);
     void parsePushButton(LayerSet *, QDomElement &);
+    void parseTextButton(LayerSet *, QDomElement &);
   
   private:
     QMap<QString, fontProp> fontMap;

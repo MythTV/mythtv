@@ -70,6 +70,7 @@ class UIType : public QObject
     UIType(const QString &name);
     virtual ~UIType();
 
+    void SetOrder(int order) { m_order = order; }
     void SetParent(LayerSet *);
     void SetScreen(double wmult, double hmult) { m_wmult = wmult; m_hmult = hmult; }
     void SetContext(int con) { m_context = con; }
@@ -216,7 +217,6 @@ class UIListType : public UIType
     UIListType(const QString &, QRect, int);
     ~UIListType();
   
-    void SetOrder(int order) { m_order = order; }
     void SetCount(int cnt) { m_count = cnt; 
                              m_selheight = (int)(m_area.height() / m_count); }
 
@@ -293,7 +293,6 @@ class UIImageType : public UIType
     QPoint DisplayPos() { return m_displaypos; }
     void SetPosition(QPoint pos) { m_displaypos = pos; }
   
-    void SetOrder(int order) { m_order = order; }
     void SetFlex(bool flex) { m_flex = flex; }
     void SetImage(QString file) { m_filename = file; }
     void SetImage(QPixmap imgdata) { img = imgdata; }
@@ -453,7 +452,6 @@ class UIManagedTreeListType : public UIType
     UIManagedTreeListType(const QString &name);
     ~UIManagedTreeListType();
 
-    void    setOrder(int order) { m_order = order; }
     void    setArea(QRect an_area) { area = an_area; }
     void    setBins(int l_bins) { bins = l_bins; }
     void    setBinAreas(CornerMap some_bin_corners) { bin_corners = some_bin_corners; }
@@ -527,5 +525,36 @@ class UIPushButtonType : public UIType
     
 };
 
+class UITextButtonType : public UIType
+{
+    Q_OBJECT
+    
+  public:
+  
+    UITextButtonType(const QString &name, QPixmap on, QPixmap off, QPixmap pushed);
+
+    void    Draw(QPainter *, int drawlayer, int context);
+    void    setPosition(QPoint pos){m_displaypos = pos;}
+    void    setText(const QString some_text){m_text = some_text;}
+    void    setFont(fontProp *font) { m_font = font; }
+    
+  public slots:  
+  
+    void    push();
+ 
+  signals:
+  
+    void    pushed();
+  
+  private:
+  
+    QPoint   m_displaypos;
+    QPixmap  on_pixmap;
+    QPixmap  off_pixmap;
+    QPixmap  pushed_pixmap;
+    QString  m_text;
+    fontProp *m_font;
+    
+};
 
 #endif

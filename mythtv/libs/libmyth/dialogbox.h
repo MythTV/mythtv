@@ -55,7 +55,18 @@ class MythThemedDialog : public MythDialog
     virtual void parseFont(QDomElement &);
     virtual void parsePopup(QDomElement &);
     
-    UIType* getUIObject(QString name);
+    
+    //
+    //  Methods to get pointers to dynamically created
+    //  objects
+    //
+
+    UIType*                 getUIObject(QString name);
+    UIManagedTreeListType*  getUIManagedTreeListType(QString name);
+    UITextType*             getUITextType(QString name);
+    UIPushButtonType*       getUIPushButtonType(QString name);
+    UITextButtonType*       getUITextButtonType(QString name);
+    
     
     void setContext(int a_context){context = a_context;}
     

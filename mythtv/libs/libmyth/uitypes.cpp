@@ -67,6 +67,7 @@ UIType::UIType(const QString &name)
     m_name = name;
     m_debug = false;
     m_context = -1;
+    m_order = -1;
     has_focus = false;
     takes_focus = false;
 }
@@ -1293,7 +1294,6 @@ UITextType::UITextType(const QString &name, fontProp *font,
 {
     m_message = text;
     m_font = font;
-
     m_displaysize = displayrect;
     m_cutdown = true;
     m_order = dorder;
@@ -1729,6 +1729,7 @@ UIManagedTreeListType::UIManagedTreeListType(const QString & name)
     bins = 0;
     bin_corners.clear();
     my_tree_data = NULL;
+    current_node = NULL;
     tree_depth = 0;
     m_justification = (Qt::AlignLeft | Qt::AlignVCenter);
     active_bin = 0;
@@ -1755,7 +1756,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
 
     if(!current_node)
     {
-        cerr << "uitypes.o: I can't draw a UIManagedTreeListType is there is no current_node" << endl;
+        cerr << "uitypes.o: I can't draw a UIManagedTreeListType if there is no current_node" << endl;
         return;
     }
 
@@ -1775,7 +1776,10 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
             {
                 if(hotspot_node)
                 {
-                    hotspot_node = hotspot_node->getParent();
+                    if(hotspot_node->getParent())
+                    {
+                        hotspot_node = hotspot_node->getParent();
+                    }
                 }
             }
         }
@@ -1826,7 +1830,6 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                 //  (beginning of list, end of list, etc.)
                 //
                 
-                /*
                 int position_in_list = hotspot_node->getPosition();
                 int number_in_list = hotspot_node->siblingCount();
     
@@ -1845,16 +1848,26 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                         y_location -= QFontMetrics(tmpfont->face).height();
                     }
                 }
-                
-                if((number_in_list - position_in_list) <= number_of_slots &&
-                   position_in_list > number_of_slots + 1)
+                else if((number_in_list - position_in_list) <= number_of_slots &&
+                   position_in_list > number_of_slots)
                 {
-                    for(int j = 0; j <= number_of_slots - (number_in_list - position_in_list); j++)
+                    // MOVE DOWN
+            
+                    if(number_in_list >= number_of_slots * 2 + 1)
+                    { 
+                        for(int j = 0; j <= number_of_slots - (number_in_list - position_in_list); j++)
+                        {
+                            y_location += QFontMetrics(tmpfont->face).height();
+                        }
+                    }
+                    else
                     {
-                        y_location += QFontMetrics(tmpfont->face).height();
+                        for(int j = 0; j <= position_in_list - (number_of_slots + 1); j++)
+                        {
+                            y_location += QFontMetrics(tmpfont->face).height();
+                        }
                     }
                 }
-                */
                 
             }
             
@@ -2196,3 +2209,55 @@ void UIPushButtonType::push()
 {
     cout << "Yamma been pushed" << endl ;
 }
+
+// ********************************************************************
+
+UITextButtonType::UITextButtonType(const QString &name, QPixmap on, QPixmap off, QPixmap pushed)
+                     : UIType(name)
+{
+    on_pixmap = on;
+    off_pixmap = off;
+    pushed_pixmap = pushed;
+    m_text = "";
+}
+
+
+void UITextButtonType::Draw(QPainter *p, int drawlayer, int context)
+{
+    context = context;  // Would we ever want to use that?
+
+    if(drawlayer != m_order)
+    {
+        // not my turn
+        return;
+    }
+
+    if(has_focus)
+    {
+        p->drawPixmap(m_displaypos.x(), m_displaypos.y(), on_pixmap);
+    }
+    else
+    {
+        p->drawPixmap(m_displaypos.x(), m_displaypos.y(), off_pixmap);
+    }
+    p->setFont(m_font->face);
+    p->setBrush(m_font->color);
+    p->setPen(QPen(m_font->color, (int)(2 * m_wmult)));
+    p->drawText(m_displaypos.x(),
+                m_displaypos.y(),
+                off_pixmap.width(),
+                off_pixmap.height(),
+                Qt::AlignCenter,
+                m_text);
+/*
+    p->drawText(area.left(), area.top(), area.width(), area.height(),
+                 m_justification, msg);
+*/
+    
+}
+
+void UITextButtonType::push()
+{
+    cout << "Yamma been pushed" << endl ;
+}
+

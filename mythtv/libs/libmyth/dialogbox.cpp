@@ -108,7 +108,7 @@ MythThemedDialog::MythThemedDialog(QString window_name,
     
 
     updateBackground();
-    //updateForeground();
+    updateForeground();
 }
 
 void MythThemedDialog::loadWindow(QDomElement &element)
@@ -225,34 +225,27 @@ void MythThemedDialog::updateForeground()
 
 void MythThemedDialog::updateForeground(const QRect &r)
 {
+
+    
     //
-    //  I should only have to be updating the r
-    //  handed to me, but I can't figure out why
-    //  that doesn't work ... so right now I'm
-    //  always updating the whole dialog
+    //  Debugging
     //
-    
-    
-    QRect damn_r = this->geometry();
-    
+
     /*
     cout << "I am updating the foreground from " 
-         << damn_r.left()
+         << r.left()
          << ","
-         << damn_r.top()
+         << r.top()
          << " to "
-         << damn_r.left() + damn_r.width()
+         << r.left() + r.width()
          << ","
-         << damn_r.top() + damn_r.height()
+         << r.top() + r.height()
          << endl;
     */
     
     //
     //  We paint offscreen onto a pixmap
-    //  and then send out a paint event
-    //
-    //  that lets us just Bit Blt the foreground
-    //  pixmap during actual onscreen painting
+    //  and then BitBlt it over
     //
 
     my_foreground = my_background;
@@ -265,18 +258,7 @@ void MythThemedDialog::updateForeground(const QRect &r)
     {
         QRect   container_area = looper->GetAreaRect();
 
-        /*
-        cout << "A container called \"" << looper->GetName() << "\" said its area is " 
-         << container_area.left()
-         << ","
-         << container_area.top()
-         << " to "
-         << container_area.left() + container_area.width()
-         << ","
-         << container_area.top() + container_area.height()
-         << endl;
-        */
-
+        
         //
         //  Only paint if the container's area is valid
         //  and it intersects with whatever Qt told us
@@ -284,12 +266,28 @@ void MythThemedDialog::updateForeground(const QRect &r)
         //
         
         if(container_area.isValid() && 
-           damn_r.intersects(container_area) &&
+           r.intersects(container_area) &&
            looper->GetName().lower() != "background")
         {
+            //
+            //  Debugging
+            //
+            /*
+            cout << "A container called \"" << looper->GetName() << "\" said its area is " 
+                 << container_area.left()
+                 << ","
+                 << container_area.top()
+                 << " to "
+                 << container_area.left() + container_area.width()
+                 << ","
+                 << container_area.top() + container_area.height()
+                 << endl;
+            */
+            
             QPixmap container_picture(container_area.size());
-            container_picture.fill(this, container_area.topLeft());
             QPainter offscreen_painter(&container_picture);
+            offscreen_painter.drawPixmap(0, 0, my_background, container_area.left(), container_area.top());
+
 
             // 
             //  is 9 layers hardcoded somewhere?
@@ -320,7 +318,7 @@ void MythThemedDialog::updateForeground(const QRect &r)
     {
         whole_dialog_painter.end();
     }
-    update(damn_r);
+    repaint(r);
 }
 
 void MythThemedDialog::paintEvent(QPaintEvent *e)
@@ -358,3 +356,104 @@ UIType* MythThemedDialog::getUIObject(QString name)
 
     return oops;
 }
+
+UIManagedTreeListType* MythThemedDialog::getUIManagedTreeListType(QString name)
+{
+
+    UIManagedTreeListType* oops = NULL;
+    
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
+
+    while( (looper = an_it.current()) != 0)
+    {
+        UIType *hunter = looper->GetType(name);
+        if(hunter)
+        {
+            UIManagedTreeListType *hunted;
+            if( (hunted = dynamic_cast<UIManagedTreeListType*>(hunter)) )
+            {
+                return hunted;
+            }
+        }
+        ++an_it;
+    }
+
+    return oops;
+}
+
+UITextType* MythThemedDialog::getUITextType(QString name)
+{
+
+    UITextType* oops = NULL;
+    
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
+
+    while( (looper = an_it.current()) != 0)
+    {
+        UIType *hunter = looper->GetType(name);
+        if(hunter)
+        {
+            UITextType *hunted;
+            if( (hunted = dynamic_cast<UITextType*>(hunter)) )
+            {
+                return hunted;
+            }
+        }
+        ++an_it;
+    }
+
+    return oops;
+}
+
+UIPushButtonType* MythThemedDialog::getUIPushButtonType(QString name)
+{
+
+    UIPushButtonType* oops = NULL;
+    
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
+
+    while( (looper = an_it.current()) != 0)
+    {
+        UIType *hunter = looper->GetType(name);
+        if(hunter)
+        {
+            UIPushButtonType *hunted;
+            if( (hunted = dynamic_cast<UIPushButtonType*>(hunter)) )
+            {
+                return hunted;
+            }
+        }
+        ++an_it;
+    }
+
+    return oops;
+}
+
+UITextButtonType* MythThemedDialog::getUITextButtonType(QString name)
+{
+
+    UITextButtonType* oops = NULL;
+    
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
+
+    while( (looper = an_it.current()) != 0)
+    {
+        UIType *hunter = looper->GetType(name);
+        if(hunter)
+        {
+            UITextButtonType *hunted;
+            if( (hunted = dynamic_cast<UITextButtonType*>(hunter)) )
+            {
+                return hunted;
+            }
+        }
+        ++an_it;
+    }
+
+    return oops;
+}
+

@@ -688,6 +688,10 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
             {
                 parsePushButton(container, info);
             }
+            else if (info.tagName() == "textbutton")
+            {
+                parseTextButton(container, info);
+            }
             else if (info.tagName() == "area")
             {
                 area = parseRect(getFirstText(info));
@@ -1409,7 +1413,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     mtl->setArea(area);
     mtl->setBins(bins);
     mtl->setBinAreas(bin_corners);
-    mtl->setOrder(order.toInt());
+    mtl->SetOrder(order.toInt());
     mtl->setHighlightImage(select_img);
 
     //
@@ -1545,7 +1549,7 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown: " << info.tagName() << " in ManagedTreeList\n";
+                cerr << "Unknown: " << info.tagName() << " in PushButton\n";
                 exit(0);
             }
         }
@@ -1554,5 +1558,145 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
 
     UIPushButtonType *pbt = new UIPushButtonType(name, image_on, image_off, image_pushed);
     pbt->setPosition(pos);
+    pbt->SetOrder(order.toInt());
     container->AddType(pbt);
 }
+
+void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
+{
+    QString font = "";
+    QPoint pos = QPoint(0, 0);
+    QPixmap image_on, image_off, image_pushed;
+
+    QString name = element.attribute("name", "");
+    if (name.isNull() || name.isEmpty())
+    {
+        cerr << "TextButton needs a name\n";
+        exit(0);
+    }
+
+    QString order = element.attribute("draworder", "");
+    if (order.isNull() || order.isEmpty())
+    {
+        cerr << "TextButton needs an order\n";
+        exit(0);
+    }
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "position")
+            {
+                pos = parsePoint(getFirstText(info));
+                pos.setX((int)(pos.x() * wmult));
+                pos.setY((int)(pos.y() * hmult));
+            }
+            else if (info.tagName() == "font")
+            {
+                font = getFirstText(info);
+            }
+            else if(info.tagName() == "image")
+            {
+                QString imgname = "";
+                QString file = "";
+
+                imgname = info.attribute("function", "");
+                if (imgname.isNull() || imgname.isEmpty())
+                {
+                    cerr << "Image in a text button needs a function\n";
+                    exit(0);
+                }
+
+                file = info.attribute("filename", "");
+                if (file.isNull() || file.isEmpty())
+                {
+                    cerr << "Image in a text button needs a filename\n";
+                    exit(0);
+                }
+
+                if (imgname.lower() == "on")
+                {
+                    QString baseDir = gContext->GetInstallPrefix();
+                    QString themeDir = gContext->FindThemeDir("");
+                    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
+                    baseDir = baseDir + "/share/mythtv/themes/default/";
+                    QFile checkFile(themeDir + file);
+                    if (checkFile.exists())
+                    {
+                        file = themeDir + file;
+                    }
+                    else
+                    {
+                        file = baseDir + file;
+                    }
+                    if(!image_on.load(file))
+                    {
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                    }
+                }
+                if (imgname.lower() == "off")
+                {
+                    QString baseDir = gContext->GetInstallPrefix();
+                    QString themeDir = gContext->FindThemeDir("");
+                    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
+                    baseDir = baseDir + "/share/mythtv/themes/default/";
+                    QFile checkFile(themeDir + file);
+                    if (checkFile.exists())
+                    {
+                        file = themeDir + file;
+                    }
+                    else
+                    {
+                        file = baseDir + file;
+                    }
+                    if(!image_off.load(file))
+                    {
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                    }
+                }
+                if (imgname.lower() == "pushed")
+                {
+                    QString baseDir = gContext->GetInstallPrefix();
+                    QString themeDir = gContext->FindThemeDir("");
+                    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
+                    baseDir = baseDir + "/share/mythtv/themes/default/";
+                    QFile checkFile(themeDir + file);
+                    if (checkFile.exists())
+                    {
+                        file = themeDir + file;
+                    }
+                    else
+                    {
+                        file = baseDir + file;
+                    }
+                    if(!image_pushed.load(file))
+                    {
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                    }
+                }
+            }
+            else
+            {
+                cerr << "Unknown: " << info.tagName() << " in TextButton\n";
+                exit(0);
+            }
+        }
+    }
+
+    fontProp *testfont = GetFont(font);
+    if (!testfont)
+    {
+        cerr << "Unknown font: " << font << " in textbutton: " << name << endl;
+        exit(0);
+    }
+
+    UITextButtonType *tbt = new UITextButtonType(name, image_on, image_off, image_pushed);
+    tbt->setPosition(pos);
+    tbt->setFont(testfont);
+    tbt->SetOrder(order.toInt());
+    container->AddType(tbt);
+}
+
