@@ -311,7 +311,7 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
  
     listview->SetAllowKeypress(false);
 
-    while (!nvp->IsPlaying())
+    while (nvp && !nvp->IsPlaying())
     {
          if (QTime::currentTime() > curtime)
              break;
