@@ -1166,10 +1166,10 @@ void Scheduler::AddNewRecords(void) {
 "program.starttime, program.endtime, "
 "program.title, program.subtitle, program.description, "
 "channel.channum, channel.callsign, channel.name, "
-"oldrecorded.starttime IS NOT NULL AS oldrecduplicate, program.category, "
+"oldrecorded.endtime, program.category, "
 "record.recpriority + channel.recpriority + "
 "IF(cardinput.preference IS NOT NULL,cardinput.preference,0), "
-"record.dupin, recorded.starttime IS NOT NULL as recduplicate, record.type, "
+"record.dupin, recorded.endtime, record.type, "
 "record.recordid, recordoverride.type, "
 "program.starttime - INTERVAL record.startoffset minute, "
 "program.endtime + INTERVAL record.endoffset minute, "
@@ -1370,12 +1370,14 @@ void Scheduler::AddNewRecords(void) {
         {
             if (p->dupin & kDupsInOldRecorded)
             {
-                if (result.value(10).toInt())
+                if (!result.value(10).isNull() &&
+                    result.value(10).toDateTime() < p->recstartts)
                     p->recstatus = rsPreviousRecording;
             }
             if (p->dupin & kDupsInRecorded)
             {
-                if (result.value(14).toInt())
+                if (!result.value(14).isNull() &&
+                    result.value(14).toDateTime() < p->recstartts)
                     p->recstatus = rsCurrentRecording;
             }
         }
