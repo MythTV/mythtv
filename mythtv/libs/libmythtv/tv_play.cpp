@@ -3833,6 +3833,14 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         SetManualZoom(true);
     else if (action.left(13) == "TOGGLESTRETCH")
     {
+        bool floatRead;
+        float stretch = action.right(action.length() - 13).toFloat(&floatRead);
+        if (floatRead &&
+            stretch <= 2.0 &&
+            stretch >= 0.48)
+        {
+            normal_speed = stretch;   // alter speed before display
+        }
         ChangeTimeStretch(0);   // just display
     }
     else if (action.left(17) == "TOGGLEPICCONTROLS")
@@ -4034,6 +4042,13 @@ void TV::BuildOSDTreeMenu(void)
                              "TOGGLEMANUALZOOM");
 
     item = new OSDGenericTree(treeMenu, tr("Adjust Time Stretch"), "TOGGLESTRETCH");
+    subitem = new OSDGenericTree(item, tr("Adjust"), "TOGGLESTRETCH");
+    subitem = new OSDGenericTree(item, tr("0.5X"), "TOGGLESTRETCH0.5");
+    subitem = new OSDGenericTree(item, tr("0.9X"), "TOGGLESTRETCH0.9");
+    subitem = new OSDGenericTree(item, tr("1.0X"), "TOGGLESTRETCH1.0");
+    subitem = new OSDGenericTree(item, tr("1.1X"), "TOGGLESTRETCH1.1");
+    subitem = new OSDGenericTree(item, tr("1.5X"), "TOGGLESTRETCH1.5");
+    subitem = new OSDGenericTree(item, tr("2.0X"), "TOGGLESTRETCH2.0");
 
 }
 
