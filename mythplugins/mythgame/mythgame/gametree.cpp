@@ -43,54 +43,31 @@ void GameTree::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Game", e, actions);
 
-    for (unsigned int i = 0; i < actions.size(); i++)
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
+        handled = true;
+
         if (action == "SELECT")
-        {
             game_tree_list->select();
-            handled = true;
-        }
         else if (action == "MENU" || action == "INFO") 
-        {
             edit();
-            handled = true;
-        }
         else if (action == "UP")
-        {
             game_tree_list->moveUp();
-            handled = true;
-        }
         else if (action == "DOWN")
-        {
             game_tree_list->moveDown();
-            handled = true;
-        }
         else if (action == "LEFT")
-        {
             game_tree_list->popUp();
-            handled = true;
-        }
         else if (action == "RIGHT")
-        {
             goRight();
-            handled = true;
-        }
         else if (action == "PAGEUP")
-        {
             game_tree_list->pageUp();
-            handled = true;
-        }
         else if (action == "PAGEDOWN")
-        {
             game_tree_list->pageDown();
-            handled = true;
-        }
         else if (action == "TOGGLEFAV")
-        {
             toggleFavorite();
-            handled = true;
-        }
+        else
+            handled = false;
     }
 
     if (!handled)
