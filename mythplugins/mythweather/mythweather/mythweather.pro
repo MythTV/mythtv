@@ -11,7 +11,7 @@ target.path = $${PREFIX}/bin
 INSTALLS += target
 
 installfiles.path = $${PREFIX}/share/mythtv/mythweather
-installfiles.files = weathertypes.dat
+installfiles.files = weathertypes.dat accid.dat
 installimages.path = $${PREFIX}/share/mythtv/mythweather/images
 installimages.files = images/*.png
 

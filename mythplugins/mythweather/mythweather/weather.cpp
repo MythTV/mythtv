@@ -34,30 +34,65 @@ using namespace std;
 
 #include <mythtv/mythcontext.h>
 
-Weather::Weather(QWidget *parent, const char *name)
+Weather::Weather(QSqlDatabase *db, QWidget *parent, const char *name)
        : MythDialog(parent, name)
 {
+    config = db;
     debug = false;
     validArea = true;
     convertData = false;
+    gotLetter = false;
     readReadme = false;
     pastTime = false;
     firstRun = true;
     conError = false;
+    inSetup = false;
+    deepSetup = false;
+    curLetter = 0;
+    curCity = 0;
+    changeTemp = false;
+    changeLoc = false;
+    changeAgg = false;
+    noACCID = false;
+
+
+    if (debug == true)
+        cout << "MythWeather: Reading InstrallPrefix from context.\n";
+
+    baseDir = gContext->GetInstallPrefix();
+    if (debug == true)
+        cout << "MythWeather: baseDir = " << baseDir << endl;
+
+    QString accid = baseDir + "/share/mythtv/mythweather/accid.dat";
+
+    accidFile.open(accid, ios::in | ios::binary);
+    if (!accidFile)
+    {
+	noACCID = true;
+	if (debug == true)
+	     cout << "MythWeather: ACCID Data File Error (file missing!)" << endl;
+    }
+    else
+    	loadAccidBreaks();
+
+    config_Aggressiveness = (gContext->GetSetting("WeatherAggressiveLvl")).toInt();
+    if (config_Aggressiveness > 15)
+	config_Aggressiveness = 15;
 
     if (debug == true)
 	cout << "MythWeather: Reading 'locale' from context.\n";
     locale = gContext->GetSetting("locale");
+    config_Location = locale;
+
     if (locale.length() == 0)
     {
 	if (debug == true)
-		cout << "MythWeather: --- No locale set, using the Bahamas\n";
+		cout << "MythWeather: --- No locale set, entering setup\n";
 	readReadme = true;
-	locale = "BFXX0005"; // Show the weather in the Bahamas for
-			     // those who don't read the docs. heh.
     }
     else
     {
+	QString temp = findNamebyAccid(locale);
 	if (debug == true)
 		cout << "MythWeather: --- Locale: " << locale << endl;
     }
@@ -65,20 +100,16 @@ Weather::Weather(QWidget *parent, const char *name)
     if (debug == true)
 	cout << "MythWeather: Reading 'SIUnits' from context.\n";
     
-    int convertFlag = gContext->GetNumSetting("SIUnits",0);
-    if (convertFlag)
+    QString convertFlag = gContext->GetSetting("SIUnits");
+    if (convertFlag.upper() == "YES")
     {
+	config_Units = 2;
 	if (debug == true)
 		cout << "MythWeather: --- Converting Data\n";
    	convertData = true;
     }
-
-
-    if (debug == true)
-	cout << "MythWeather: Reading InstrallPrefix from context.\n";
-    baseDir = gContext->GetInstallPrefix();
-    if (debug == true)
-	cout << "MythWeather: baseDir = " << baseDir << endl;
+    else
+	config_Units = 1;
 
     updateInterval = 30;
     nextpageInterval = 10;
@@ -103,18 +134,21 @@ Weather::Weather(QWidget *parent, const char *name)
     page2Dia = new QFrame(this);
     page3Dia = new QFrame(this);
     page4Dia = new QFrame(this);
+    page5Dia = new QFrame(this);
 
     page0Dia->setPaletteForegroundColor(main_fgColor);
     page1Dia->setPaletteForegroundColor(main_fgColor);
     page2Dia->setPaletteForegroundColor(main_fgColor);
     page3Dia->setPaletteForegroundColor(main_fgColor);
     page4Dia->setPaletteForegroundColor(main_fgColor);
+    page5Dia->setPaletteForegroundColor(main_fgColor);
    
     page0 = new QHBoxLayout(page0Dia, 0);
     page1 = new QHBoxLayout(page1Dia, 0);
     page2 = new QHBoxLayout(page2Dia, 0);
     page3 = new QHBoxLayout(page3Dia, 0);
     page4 = new QHBoxLayout(page4Dia, 0);
+    page5 = new QHBoxLayout(page5Dia, 0);
 
     currentPage = 0;
     setupLayout(0);
@@ -122,6 +156,7 @@ Weather::Weather(QWidget *parent, const char *name)
     setupLayout(2);
     setupLayout(3);
     setupLayout(4);
+    setupLayout(5);
 
     if (debug == true)
 	cout << "MythWeather: Creating final layout.\n";
@@ -137,7 +172,8 @@ Weather::Weather(QWidget *parent, const char *name)
 
     update_Timer = new QTimer(this);
     connect(update_Timer, SIGNAL(timeout()), SLOT(update_timeout()) );
-    update_Timer->start((int)(10));   
+    if (readReadme == false)
+	update_Timer->start((int)(10));   
 
     nextpage_Timer = new QTimer(this);
     connect(nextpage_Timer, SIGNAL(timeout()), SLOT(nextpage_timeout()) );
@@ -150,10 +186,16 @@ Weather::Weather(QWidget *parent, const char *name)
     accel = new QAccel(this);
     accel->connectItem(accel->insertItem(Key_Left), this, SLOT(cursorLeft()));
     accel->connectItem(accel->insertItem(Key_Right), this, SLOT(cursorRight()));
-    accel->connectItem(accel->insertItem(Key_Space), this, SLOT(holdPage()));
+    accel->connectItem(accel->insertItem(Key_P), this, SLOT(holdPage()));
+    accel->connectItem(accel->insertItem(Key_Space), this, SLOT(convertFlip()));
     accel->connectItem(accel->insertItem(Key_Enter), this, SLOT(convertFlip()));
     accel->connectItem(accel->insertItem(Key_Return), this, SLOT(convertFlip()));
     accel->connectItem(accel->insertItem(Key_M), this, SLOT(resetLocale()));
+    accel->connectItem(accel->insertItem(Key_I), this, SLOT(setupPage()));
+    accel->connectItem(accel->insertItem(Key_Up), this, SLOT(upKey()));
+    accel->connectItem(accel->insertItem(Key_Down), this, SLOT(dnKey()));
+    accel->connectItem(accel->insertItem(Key_PageUp), this, SLOT(pgupKey()));
+    accel->connectItem(accel->insertItem(Key_PageDown), this, SLOT(pgdnKey()));
     accel->connectItem(accel->insertItem(Key_0), this, SLOT(newLocale0()));
     accel->connectItem(accel->insertItem(Key_1), this, SLOT(newLocale1()));
     accel->connectItem(accel->insertItem(Key_2), this, SLOT(newLocale2()));
@@ -175,6 +217,403 @@ Weather::Weather(QWidget *parent, const char *name)
     if (debug == true)
 	cout << "MythWeather: Finish Object Initialization.\n";
 
+    if (readReadme == true)
+    {
+	lastCityNum = (int)(accidBreaks[0]) - 1;
+    	setupPage();
+    }
+
+}
+
+Weather::~Weather()
+{
+	accidFile.close();
+
+	delete [] aggrNum;
+	delete [] letterList;
+	delete [] cityList;
+}
+
+void Weather::loadAccidBreaks()
+{
+	for (int i = 0; i < 26; i++)
+	{
+		if (accidFile.eof())
+		{
+			noACCID = true;
+			if (debug == true)
+			    cout << "MythWeather: ACCID Data File Error (unexpected eof)" << endl;
+		}
+
+		accidFile >> accidBreaks[i];
+		if (accidFile.eof())
+		{
+			i = 26;
+		}
+		accidFile >> accidBreaks[i + 26];
+		if (accidFile.eof())
+		{
+                        i = 26;
+		}
+	}
+
+	startData = accidFile.tellg() + (streampos)1;
+
+
+}
+
+void Weather::saveConfig()
+{
+	QString config_accid; 
+	QString agWriter;
+	QString units;
+
+	if (changeLoc == true)
+	{
+	    if (cityList[4].text().stripWhiteSpace().length() != 0)
+	    {
+		cout << "GREATER THAN ZERO\n";
+	    	config_accid = findAccidbyName(cityList[4].text().stripWhiteSpace());
+	    	gContext->SetSetting("locale", config_accid);
+	    	locale = config_accid;
+	    	setSetting("locale", locale, false);
+	    }
+	}
+
+	if (changeTemp == true)
+	{
+
+	    if (config_Units == 2)
+	    {
+		units = "YES";
+		gContext->SetSetting("SIUnits", "YES");
+		convertData = true;
+	    }
+	    else
+	    {
+		units = "NO";
+		gContext->SetSetting("SIUnits", "NO");
+		convertData = false;
+	    }
+	    setSetting("SIUnits", units, false);
+    	}
+
+ 	if (changeAgg == true)
+	{
+	    agWriter = QString("%1").arg(config_Aggressiveness);
+	    gContext->SetSetting("WeatherAggressiveLvl", agWriter);
+	    setSetting("WeatherAggressiveLvl", agWriter, false);
+	}
+
+	config_accid = "";
+}
+
+void Weather::setSetting(QString value, QString data, bool global)
+{
+	QString thequery;
+
+	if (global == false)
+		thequery = QString("SELECT * FROM settings WHERE value=\"%1\" AND hostname=\"%2\";")
+			   .arg(value).arg(gContext->GetHostName());
+	else
+		thequery = QString("SELECT * FROM settings WHERE value=\"%1\";")
+                           .arg(value);
+
+	QSqlQuery query = config->exec(thequery);
+        int rows = query.numRowsAffected();
+		
+	if (rows > 0)
+	{
+
+	   if (global == false)
+	        thequery = QString("UPDATE settings SET data=\"%1\" WHERE value=\"%2\" AND hostname=\"%3\";")
+                        .arg(data).arg(value).arg(gContext->GetHostName());
+	   else
+	        thequery = QString("UPDATE settings SET data=\"%1\" WHERE value=\"%2\";")
+                        .arg(data).arg(value);
+	
+           query = config->exec(thequery);
+           rows = query.numRowsAffected();
+
+           if (rows == -1)
+           {
+                cerr << "MythWeather: Error executing query!\n";
+                cerr << "MythWeather: QUERY = " << thequery << endl;
+                return;
+           }
+	}	
+	else
+	{
+	   if (global == false)
+		thequery = QString("INSERT INTO settings VALUES ('%1', '%2', '%3');")
+	 		   .arg(value).arg(data).arg(gContext->GetHostName());
+	   else
+		thequery = QString("INSERT INTO settings VALUES ('%1', '%2');").arg(value).arg(data);
+
+	   QSqlQuery query = config->exec(thequery);
+
+	   rows = query.numRowsAffected();
+
+           if (rows == -1)
+           {
+                cerr << "MythWeather: Error executing query!\n";
+                cerr << "MythWeather: QUERY = " << thequery << endl;
+                return;
+           }
+	}
+}
+
+QString Weather::findAccidbyName(QString name)
+{
+    QString accid;
+    if (noACCID == false)
+    {
+        char temp[1024];
+        char *hold;
+
+        accidFile.seekg(startData);
+
+        while (!accidFile.eof())
+        {
+                accidFile.getline(temp, 1023);
+
+                if (strstr(temp, name) != NULL)
+                {
+                        hold = strtok(temp, "::");
+                        hold = strtok(NULL, "::");
+			accid = hold;
+                        hold = strtok(NULL, "::");
+
+			accidFile.seekg(startData);
+
+                        return accid;
+                }
+        }
+
+	accidFile.seekg(startData);
+	accidFile.clear();
+     }
+
+     accid = "<NOTFOUND>";
+
+     return name;
+
+}
+
+QString Weather::findNamebyAccid(QString accid)
+{
+    QString name;
+    if (noACCID == false)
+    {
+	int cnt = 0;
+	char temp[1024];
+	char *hold;
+
+	accidFile.seekg(startData);
+
+	while (!accidFile.eof())
+	{
+		accidFile.getline(temp, 1023);
+		cnt++;
+
+		if (strstr(temp, accid) != NULL)
+		{
+			streampos curp;
+			int rt = 0;
+			
+			hold = strtok(temp, "::");
+                	hold = strtok(NULL, "::");
+                	hold = strtok(NULL, "::");
+
+			curp = accidFile.tellg();
+
+			for (int i = 0; i < 26; i++)
+			{
+				if (curp > accidBreaks[i + 26] && curp < accidBreaks[i + 27])
+				{
+					curLetter = i;
+					cnt = cnt - rt;
+					i = 26;
+				}
+				else
+				{
+					rt = rt + accidBreaks[i]; 
+				}
+			}
+
+			curCity = cnt;
+
+			name = hold;
+			accidFile.seekg(startData);
+			return name;
+		}
+	}
+
+	accidFile.seekg(startData);
+	accidFile.clear();
+    }
+    name = "<NOTFOUND>";
+
+    return name;
+}
+
+void Weather::loadCityData(int dat)
+{
+    if (noACCID == false)
+    {
+	int start = 0;
+	int end = 9;
+
+	if (dat < 0)
+		dat = 0;
+	if (dat > lastCityNum)
+		dat = lastCityNum;
+
+	char temporary[1024];
+	char *hold;
+	accidFile.seekg(startData + accidBreaks[curLetter + 26], ios::beg);
+
+	if (dat > 4) 
+	{
+	    for (int i = 0; i < (dat - 4); i++)
+	    {
+		accidFile.getline(temporary,1023);
+		if (accidFile.eof())
+                {
+                        accidFile.seekg(-25, ios::end);
+                        accidFile.clear();
+                }
+	    }
+	}
+	if (dat < 4)
+	{
+	    if (curLetter != 0)
+	    	backupCity(4 - dat);
+	}
+
+
+	if (curLetter == 0 && dat < 4)
+	{
+		start = 4 - dat;
+		for (int k = 0; k < start; k++)
+		      cityNames[k] = "";
+	}
+
+	for (int j = start; j < end; j++)
+	{
+		accidFile.getline(temporary, 1023);
+/*
+		if (accidFile.eof())
+                {
+                        accidFile.seekg(-25, ios::end);
+                        accidFile.clear();
+                }
+*/
+
+                hold = strtok(temporary, "::");
+                hold = strtok(NULL, "::");
+                hold = strtok(NULL, "::");
+
+	
+		if (hold != NULL)
+		{
+		    if (strcmp(hold, "XXXXXXXXXX") == 0)
+                    {
+			accidFile.seekg(-25, ios::end);
+			accidFile.clear();
+                        for (int k = j; k < 9; k++)
+                                cityNames[k] = "";
+
+                        j = end;
+                    }
+		    else
+		    {
+
+		        cityNames[j] = hold;
+
+		        if ((int)hold[0] != (curLetter + 65))
+                        {
+                             cityNames[j] = "";
+                        }
+
+		     }
+		}
+		else
+		{	
+			cityNames[j] = "";
+		}
+	}
+    }
+
+}
+
+void Weather::updateLetters()
+{
+	int h;
+	int cnt = 0;
+	QString temp;
+
+	for (int j = curLetter - 4; j < (curLetter + 5); j++)
+        {
+		if (j == curLetter)
+			lastCityNum = (int)(accidBreaks[curLetter]) - 1;
+
+                h = j;
+                if (h < 0)
+			h = h + 26;
+		if (h > 25)
+			h = h - 26;
+
+		h = h + 65;
+			
+                temp = QString(" %1 ").arg((char)(h));
+                letterList[cnt].setText(temp);
+                cnt++;
+        }
+
+	loadCityData(0);
+	showCityName();
+
+}
+
+void Weather::backupCity(int num)
+{
+	char temporary[1024];
+	char temp2[1024];
+	char *np;
+	int prev;
+	num++;
+
+	for (int i = num; i > 0; i--)
+	{
+		accidFile.getline(temporary, 1023);
+		strcpy(temp2, temporary);
+
+		np = strtok(temp2, "::");
+
+		if (np != NULL)
+		{
+		    prev = atol(np);
+
+		    prev = -1 * (prev + strlen(temporary) + 1);
+		}
+
+		accidFile.seekg((long)prev, ios::cur);
+	}
+
+	accidFile.getline(temporary, 1023);
+
+
+}
+
+void Weather::showCityName()
+{
+	int cnt = 0;
+	for (int i = 0; i < 9; i++)
+	{
+		cityList[i].setText("  " + cityNames[i]);
+		cnt++;
+	}
 }
 
 void Weather::processEvents()
@@ -259,6 +698,8 @@ void Weather::showtime_timeout()
 
 void Weather::newLocale0()
 {
+    if (inSetup == false)
+    {
 	newLocaleHold = newLocaleHold + "0";
 	lbLocale->setText("New Location: " + newLocaleHold);
 	if (newLocaleHold.length() == 5)
@@ -267,10 +708,23 @@ void Weather::newLocale0()
 		newLocaleHold = "";
 		update_timeout();	
 	}
+    }
 }
 
 void Weather::newLocale1()
 {
+    if (inSetup == true && deepSetup == true && curConfig == 2 && gotLetter == true)
+    {
+	changeLoc = true;
+        curCity = curCity - 25;
+        if (curCity < 0)
+               curCity = 0;
+
+        loadCityData(curCity);
+        showCityName();
+    }
+    else
+    {
         newLocaleHold = newLocaleHold + "1";
         lbLocale->setText("New Location: " + newLocaleHold);
         if (newLocaleHold.length() == 5)
@@ -279,9 +733,22 @@ void Weather::newLocale1()
 		newLocaleHold = "";
                 update_timeout();
         }
+    }
 }
 void Weather::newLocale2()
 {
+    if (inSetup == true && deepSetup == true && curConfig == 2 && gotLetter == true)
+    {
+	changeLoc = true;
+        curCity = curCity - 50;
+        if (curCity < 0)
+               curCity = 0;
+
+        loadCityData(curCity);
+        showCityName();
+    }
+    else
+    {
         newLocaleHold = newLocaleHold + "2";
         lbLocale->setText("New Location: " + newLocaleHold);
         if (newLocaleHold.length() == 5)
@@ -290,9 +757,22 @@ void Weather::newLocale2()
 		newLocaleHold = "";
                 update_timeout();
         }
+    }
 }
 void Weather::newLocale3()
 {
+    if (inSetup == true && deepSetup == true && curConfig == 2 && gotLetter == true)
+    {
+	changeLoc = true;
+        curCity = curCity - 100;
+        if (curCity < 0)
+               curCity = 0;
+
+        loadCityData(curCity);
+        showCityName();
+    }
+    else
+    {
         newLocaleHold = newLocaleHold + "3";
         lbLocale->setText("New Location: " + newLocaleHold);
         if (newLocaleHold.length() == 5)
@@ -301,9 +781,20 @@ void Weather::newLocale3()
 		newLocaleHold = "";
                 update_timeout();
         }
+    }
 }
 void Weather::newLocale4()
 {
+    if (inSetup == true && deepSetup == true && curConfig == 2 && gotLetter == true)
+    {
+	changeLoc = true;
+        curCity = 0;
+
+        loadCityData(curCity);
+        showCityName();
+    }
+    else
+    {
         newLocaleHold = newLocaleHold + "4";
         lbLocale->setText("New Location: " + newLocaleHold);
         if (newLocaleHold.length() == 5)
@@ -312,9 +803,20 @@ void Weather::newLocale4()
 		newLocaleHold = "";
                 update_timeout();
         }
+    }
 }
 void Weather::newLocale5()
 {
+    if (inSetup == true && deepSetup == true && curConfig == 2 && gotLetter == true)
+    {
+	changeLoc = true;
+        curCity = (int)(lastCityNum / 2);
+
+        loadCityData(curCity);
+        showCityName();
+    }
+    else
+    {
         newLocaleHold = newLocaleHold + "5";
         lbLocale->setText("New Location: " + newLocaleHold);
         if (newLocaleHold.length() == 5)
@@ -323,9 +825,20 @@ void Weather::newLocale5()
 		newLocaleHold = "";
                 update_timeout();
         }
+    }
 }
 void Weather::newLocale6()
 {
+    if (inSetup == true && deepSetup == true && curConfig == 2 && gotLetter == true)
+    {
+	changeLoc = true;
+        curCity = lastCityNum;
+
+        loadCityData(curCity);
+        showCityName();
+    }
+    else
+    {
         newLocaleHold = newLocaleHold + "6";
         lbLocale->setText("New Location: " + newLocaleHold);
         if (newLocaleHold.length() == 5)
@@ -334,9 +847,22 @@ void Weather::newLocale6()
 		newLocaleHold = "";
                 update_timeout();
         }
+    }
 }
 void Weather::newLocale7()
 {
+    if (inSetup == true && deepSetup == true && curConfig == 2 && gotLetter == true)
+    {
+	changeLoc = true;
+	curCity = curCity + 25;
+	if (curCity > lastCityNum)
+                curCity = lastCityNum;
+
+        loadCityData(curCity);
+        showCityName();
+    }
+    else
+    {
         newLocaleHold = newLocaleHold + "7";
         lbLocale->setText("New Location: " + newLocaleHold);
         if (newLocaleHold.length() == 5)
@@ -345,9 +871,22 @@ void Weather::newLocale7()
 		newLocaleHold = "";
                 update_timeout();
         }
+    }
 }
 void Weather::newLocale8()
 {
+    if (inSetup == true && deepSetup == true && curConfig == 2 && gotLetter == true)
+    {
+	changeLoc = true;
+        curCity = curCity + 50;
+	if (curCity > lastCityNum)
+                curCity = lastCityNum;
+
+        loadCityData(curCity);
+        showCityName();
+    }
+    else
+    {
         newLocaleHold = newLocaleHold + "8";
         lbLocale->setText("New Location: " + newLocaleHold);
         if (newLocaleHold.length() == 5)
@@ -356,10 +895,23 @@ void Weather::newLocale8()
 		newLocaleHold = "";
                 update_timeout();
         }
+    }
 }
 
 void Weather::newLocale9()
 {
+    if (inSetup == true && deepSetup == true && curConfig == 2 && gotLetter == true)
+    {
+   	changeLoc = true;
+        curCity = curCity + 100;
+        if (curCity > lastCityNum)
+                curCity = lastCityNum;
+
+       	loadCityData(curCity);
+        showCityName();
+    }
+    else
+    {
         newLocaleHold = newLocaleHold + "9";
         lbLocale->setText("New Location: " + newLocaleHold);
         if (newLocaleHold.length() == 5)
@@ -368,11 +920,14 @@ void Weather::newLocale9()
 		newLocaleHold = "";
                 update_timeout();
         }
+    }
 }
 
 
 void Weather::holdPage()
 {
+  if (inSetup == false)
+  {
    if (nextpage_Timer->isActive() == false)
    {
  	nextpage_Timer->start((int)(1000 * nextpageInterval));
@@ -404,16 +959,105 @@ void Weather::holdPage()
 	nextpage_Timer->stop();
 	lbLocale->setText(lbLocale->text() + "  - PAUSED -");
    }
+  }
 }
 
 void Weather::resetLocale()
 {
+     if (inSetup == false)
+     {
 	locale = gContext->GetSetting("locale");
 	update_timeout();
+     }
+}
+
+void Weather::setupPage()
+{
+    if (inSetup == false)
+    {
+	if (noACCID == false)
+	     lbUpdated->setText("Configuring MythWeather...");
+	else
+	     lbUpdated->setText("Missing ACCID data file!");
+
+	lbLocale->setText("Use the right arrow key to select unit conversion...");
+	inSetup = true;
+  	nextpage_Timer->stop();
+	showLayout(5);
+    }
+    else
+    {
+	unitType->show();
+        location->hide();
+        aggressv->hide();
+        lbUnits->setPaletteBackgroundColor(topbot_bgColor);
+        lbLocal->setPaletteBackgroundColor(main_bgColor);
+        lbAggr->setPaletteBackgroundColor(main_bgColor);
+
+	lbLocale->setText("Configuration Changes Saved.");
+	lbUpdated->setText("Updating...");
+	inSetup = false;
+	deepSetup = false;
+	curConfig = 1;
+	gotLetter = false;
+	
+	saveConfig();
+
+	if (readReadme == true)
+	{
+		readReadme = false;
+		update_Timer->start((int)(10));
+		showLayout(0);
+	}
+	else
+	{
+		firstRun = true;	
+
+		if (changeLoc == true || changeTemp == true)
+		{
+			lbLocale->setText("New Locale: " + cityList[4].text());
+			update_Timer->changeInterval((int)(100));
+		}
+		else
+		{
+			QString txtLocale = city + ", ";
+    			if (state.length() == 0)
+    			{
+        			txtLocale += country + " (" + locale;
+                		if (validArea == false)
+                        		txtLocale += " is invalid)";
+                		else
+                        		txtLocale += ")";
+    			}
+    			else
+    			{
+        			txtLocale += state + ", " + country + " (" + locale;
+                		if (validArea == false)
+                        		txtLocale += " is invalid)";
+                		else
+                        		txtLocale += ")";
+    			}
+			lbLocale->setText(txtLocale);
+			lbUpdated->setText("Last Update: " + updated);
+		}
+
+		nextpage_Timer->changeInterval((int)(1000 * nextpageInterval));
+		if (validArea == true)
+			showLayout(1);
+		else
+			showLayout(0);
+	}
+
+	changeTemp = false;
+	changeLoc = false;
+	changeAgg = false;
+    }
 }
 
 void Weather::convertFlip()
 {
+    if (inSetup == false)
+    {
 	if (convertData == false)
         {
 		if (debug == true)	
@@ -428,40 +1072,396 @@ void Weather::convertFlip()
 	}
 
 	update_timeout();
+    }
+}
+
+void Weather::upKey()
+{
+   if (inSetup == true)
+   {
+	if (deepSetup == false)
+	{
+	curConfig--;
+	if (curConfig == 0)
+		curConfig = 3;
+
+	switch (curConfig)
+        {
+                case 1:
+			unitType->show();
+			location->hide();
+			aggressv->hide();
+			lbLocale->setText("Use the right arrow key to select unit conversion...");
+                        lbUnits->setPaletteBackgroundColor(topbot_bgColor);
+                        lbLocal->setPaletteBackgroundColor(main_bgColor);
+                        lbAggr->setPaletteBackgroundColor(main_bgColor);
+                        break;
+                case 2:
+			unitType->hide();
+                        location->show();
+                        aggressv->hide();
+			lbLocale->setText("Use the right arrow key to select your location...");
+                        lbLocal->setPaletteBackgroundColor(topbot_bgColor);
+                        lbUnits->setPaletteBackgroundColor(main_bgColor);
+                        lbAggr->setPaletteBackgroundColor(main_bgColor);
+                        break;
+                case 3:
+			unitType->hide();
+                        location->hide();
+                        aggressv->show();
+			lbLocale->setText("Use the right arrow key to select the aggressiveness level...");
+                        lbAggr->setPaletteBackgroundColor(topbot_bgColor);
+                        lbUnits->setPaletteBackgroundColor(main_bgColor);
+                        lbLocal->setPaletteBackgroundColor(main_bgColor);
+                        break;
+	}
+	}
+	else
+	{
+	    if (curConfig == 1)
+	    {
+		changeTemp = true;
+		if (config_Units == 1)
+		{
+			config_Units = 2;
+			SIUnits->setPaletteBackgroundColor(topbot_bgColor);
+			ImpUnits->setPaletteBackgroundColor(main_bgColor);
+			
+		}	
+		else
+		{
+			config_Units = 1;
+			ImpUnits->setPaletteBackgroundColor(topbot_bgColor);
+			SIUnits->setPaletteBackgroundColor(main_bgColor);
+		}
+	    }
+
+	    if (curConfig == 2)
+	    {
+		if (gotLetter == false)
+		{
+			curLetter--;
+			if (curLetter < 0)
+				curLetter = 25;
+	
+			curCity = 0;
+
+			updateLetters();
+		}
+		else
+		{
+    			changeLoc = true;
+
+			if (cityList[3].text().length() > 2)
+                   	{
+
+				curCity--;
+				if (curCity < 0)
+					curCity = 0;
+
+				loadCityData(curCity);
+				showCityName();
+			}
+		}
+		
+	    }
+
+ 	    if (curConfig == 3)
+	    {
+    		changeAgg = true;
+		config_Aggressiveness--;
+		if (config_Aggressiveness < 1)
+			config_Aggressiveness = 15 + config_Aggressiveness;
+		if (config_Aggressiveness > 15)
+			config_Aggressiveness = config_Aggressiveness - 15;
+	
+		updateAggr();
+	    }
+	}
+   }
+}
+
+void Weather::pgupKey()
+{
+    if (inSetup == true && deepSetup == true && curConfig == 2 && gotLetter == true)
+    {
+    	changeLoc =true;
+	curCity = curCity - 9;
+        if (curCity < 0)
+               curCity = 0;
+
+        loadCityData(curCity);
+        showCityName();
+    }
+}
+
+void Weather::pgdnKey()
+{
+    if (inSetup == true && deepSetup == true && curConfig == 2 && gotLetter == true)
+    {
+    	changeLoc =true;
+        curCity = curCity + 9;
+	if (curCity > lastCityNum)
+		curCity = lastCityNum;
+
+        loadCityData(curCity);
+        showCityName();
+    }
+
+}
+
+void Weather::dnKey()
+{
+   if (inSetup == true)
+   {
+	if (deepSetup == false)
+	{
+	curConfig++;
+	if (curConfig == 4)
+		curConfig = 1;
+
+	switch (curConfig)
+	{
+		case 1:
+			unitType->show();
+                        location->hide();
+                        aggressv->hide();
+			lbLocale->setText("Use the right arrow key to select unit conversion...");
+      			lbUnits->setPaletteBackgroundColor(topbot_bgColor);
+			lbLocal->setPaletteBackgroundColor(main_bgColor);
+			lbAggr->setPaletteBackgroundColor(main_bgColor);
+			break;
+		case 2:
+			unitType->hide();
+                        location->show();
+                        aggressv->hide();
+			lbLocale->setText("Use the right arrow key to select your location...");
+        		lbLocal->setPaletteBackgroundColor(topbot_bgColor);
+			lbUnits->setPaletteBackgroundColor(main_bgColor);
+			lbAggr->setPaletteBackgroundColor(main_bgColor);
+			break;
+		case 3:
+			unitType->hide();
+                        location->hide();
+                        aggressv->show();
+			lbLocale->setText("Use the right arrow key to select the aggressiveness level...");
+        		lbAggr->setPaletteBackgroundColor(topbot_bgColor);
+			lbUnits->setPaletteBackgroundColor(main_bgColor);
+			lbLocal->setPaletteBackgroundColor(main_bgColor);
+			break;
+	}
+	}
+	else
+	{
+	    if (curConfig == 1)
+            {
+		changeTemp = true;
+                if (config_Units == 1)
+                {
+                        config_Units = 2;
+                        SIUnits->setPaletteBackgroundColor(topbot_bgColor);
+                        ImpUnits->setPaletteBackgroundColor(main_bgColor);
+
+                }
+                else
+                {
+                        config_Units = 1;
+                        ImpUnits->setPaletteBackgroundColor(topbot_bgColor);
+                        SIUnits->setPaletteBackgroundColor(main_bgColor);
+                }
+            }
+	    if (curConfig == 2)
+	    {
+                if (gotLetter == false)
+                {
+                        curLetter++;
+                        if (curLetter > 25)
+                                curLetter = 0;
+
+			curCity = 0;
+                        updateLetters();
+                }
+		else
+		{
+   		   changeLoc = true;
+
+		   lastCityNum = (int)(accidBreaks[curLetter]) - 1;
+
+		   if (cityList[5].text().length() > 2)
+		   {
+
+			curCity++;
+                        if (curCity > lastCityNum)
+                                curCity = lastCityNum;
+
+			loadCityData(curCity);
+                        showCityName();
+ 		    }
+		
+		}
+
+  	    }
+	    if (curConfig == 3)
+	    {
+    		changeAgg = true;
+		config_Aggressiveness++;
+                if (config_Aggressiveness < 1)
+                        config_Aggressiveness = 15 + config_Aggressiveness;
+                if (config_Aggressiveness > 15)
+                        config_Aggressiveness = config_Aggressiveness - 15;
+
+		updateAggr();
+ 	   }
+	}
+	
+   }
+}
+
+void Weather::updateAggr()
+{
+	QString temp;
+        int h;
+        int cnt = 0;
+
+        for (int i = config_Aggressiveness - 3; i < (config_Aggressiveness + 4); i++)
+        {
+                h = i;
+                if (i < 1)
+                        h = 15 + i;
+                if (i > 15)
+                        h = i - 15;
+
+                if (h == config_Aggressiveness)
+                        aggrNum[cnt].setPaletteBackgroundColor(topbot_bgColor);
+
+                if (h == 1)
+                        temp = " 1  High Speed Connection";
+                else if (h == 8)
+                        temp = " 8  Medium Speed Connection";
+                else if (h == 15)
+                        temp = " 15 Low Speed Connection";
+                else
+                        temp = QString(" %1 ").arg(h);
+                aggrNum[cnt].setText(temp);
+                cnt++;
+       	}
 }
 
 void Weather::cursorLeft()
 {
-   nextpage_Timer->changeInterval((int)(1000 * nextpageIntArrow));
-   int tp = currentPage;
-   tp--;
+   if (inSetup == false)
+   {
+   	nextpage_Timer->changeInterval((int)(1000 * nextpageIntArrow));
+   	int tp = currentPage;
+   	tp--;
+	
+   	if (tp == 0)
+   	     tp = 4;
 
-   if (tp == 0)
-        tp = 4;
+   	if (tp == 3 && pastTime == true)
+		tp = 2;
 
-   if (tp == 3 && pastTime == true)
-	tp = 2;
+   	if (tp == 4 && pastTime == false)
+		tp = 3;
 
-   if (tp == 4 && pastTime == false)
-	tp = 3;
+   	showLayout(tp);
+   }
+   else if (deepSetup == true)
+   {
+	if (curConfig == 1)
+	{
+		lbLocale->setText("Use the right arrow key to select unit conversion...");
+		lbUnits->setPaletteBackgroundColor(topbot_bgColor);
+		if (config_Units == 2)
+			SIUnits->setPaletteBackgroundColor(QColor(0, 0, 0));
+		else
+                        ImpUnits->setPaletteBackgroundColor(QColor(0, 0, 0));
+	
+	}
+	if (curConfig == 2)
+	{
+		if (gotLetter == false)
+                {
+			lbLocale->setText("Use the right arrow key to select your location...");
+                	lbLocal->setPaletteBackgroundColor(topbot_bgColor);
+			
+			letterList[4].setPaletteBackgroundColor(QColor(0, 0, 0));
+			deepSetup = false;
+                }
+                else
+                {
+                        letterList[4].setPaletteBackgroundColor(topbot_bgColor);
+                        cityList[4].setPaletteBackgroundColor(QColor(0, 0, 0));
+			gotLetter = false;
+                }
+	}
+	if (curConfig == 3)
+	{
+		lbLocale->setText("Use the right arrow key to select the aggressiveness level...");
+		lbAggr->setPaletteBackgroundColor(topbot_bgColor);
+		aggrNum[3].setPaletteBackgroundColor(QColor(0, 0, 0));
+	}
 
-   showLayout(tp);
+	if (curConfig != 2)
+		 deepSetup = false;
+   } 
 }
 
 void Weather::cursorRight()
 {
-   nextpage_Timer->changeInterval((int)(1000 * nextpageIntArrow));
-   int tp = currentPage;
-   tp++;
-   if (tp > 4)
-        tp = 1;
+   if (inSetup == false)
+   {
+   	nextpage_Timer->changeInterval((int)(1000 * nextpageIntArrow));
+   	int tp = currentPage;
+   	tp++;
+   	if (tp > 4)
+        	tp = 1;
 
-   if (tp == 3 && pastTime == true)
-        tp = 4;
-   if (tp == 4 && pastTime == false)
-	tp = 1;
+   	if (tp == 3 && pastTime == true)
+   	     tp = 4;
+   	if (tp == 4 && pastTime == false)
+		tp = 1;
 
-   showLayout(tp);
+   	showLayout(tp);
+   }
+   else if (deepSetup == false)
+   {
+	if (curConfig == 1)
+	{
+		lbLocale->setText("Use the up and down arrow keys to select unit conversion...");
+		lbUnits->setPaletteBackgroundColor(QColor(0, 0, 0));
+		if (config_Units == 2)
+                        SIUnits->setPaletteBackgroundColor(topbot_bgColor);
+                else
+                        ImpUnits->setPaletteBackgroundColor(topbot_bgColor);
+	}
+	if (curConfig == 2)
+	{
+		lbLocale->setText("Up and down arrow keys select the first letter in your city name...");
+		lbLocal->setPaletteBackgroundColor(QColor(0, 0, 0));
+
+		letterList[4].setPaletteBackgroundColor(topbot_bgColor);
+                cityList[4].setPaletteBackgroundColor(QColor(0, 0, 0));
+	}
+	if (curConfig == 3)
+	{
+		lbLocale->setText("Use the up and down arrow keys to select the aggressiveness level...");
+		lbAggr->setPaletteBackgroundColor(QColor(0, 0, 0));
+		aggrNum[3].setPaletteBackgroundColor(topbot_bgColor);
+	}
+
+	deepSetup = true;
+   }
+   else if (deepSetup == true)
+   {
+	if (curConfig == 2)
+	{
+		lbLocale->setText("Use the up and down arrow keys to select your city...");
+		gotLetter = true;
+                letterList[4].setPaletteBackgroundColor(QColor(0, 0, 0));
+                cityList[4].setPaletteBackgroundColor(topbot_bgColor);
+	}
+   }
 }
 
 void Weather::status_timeout()
@@ -525,12 +1525,12 @@ void Weather::update_timeout()
     if (result == true)
     {
 
-    if (pastTime == true && currentPage == 3)
+    if (pastTime == true && currentPage == 3 && inSetup == false)
 	nextpage_timeout();
-    if (pastTime == false && currentPage == 4)
+    if (pastTime == false && currentPage == 4 && inSetup == false)
 	nextpage_timeout();
 
-    if (firstRun == true)
+    if (firstRun == true && inSetup == false)
 	nextpage_Timer->start((int)(1000 * nextpageInterval));
 
     QFont timeFont("Arial", (int)(18 * hmult), QFont::Bold);
@@ -731,7 +1731,8 @@ void Weather::update_timeout()
     if (firstRun == true)
     {
     	firstRun = false;
-	nextpage_timeout();
+	if (inSetup == false)
+		nextpage_timeout();
     }
 
     }
@@ -741,10 +1742,6 @@ void Weather::update_timeout()
 
 void Weather::showLayout(int pageNum)
 {
-   if (debug == true)
-	cout << "MythWeather: showLayout() : Showing Layout #" << pageNum << endl;
-
-
    QString pageDesc;
    if (pageNum == 0)
 	hdPart1->setText("please wait...");
@@ -756,6 +1753,8 @@ void Weather::showLayout(int pageNum)
 	hdPart1->setText("today's forecast");
    if (pageNum == 4)
 	hdPart1->setText("tomorrow's forecast");
+   if (pageNum == 5)
+	hdPart1->setText("weather setup");
 
    switch (currentPage)
    {
@@ -768,6 +1767,8 @@ void Weather::showLayout(int pageNum)
 	case 3: page3Dia->hide();
 		break;	
 	case 4: page4Dia->hide();
+		break;
+ 	case 5: page5Dia->hide();
 		break;
    }
 
@@ -790,6 +1791,9 @@ void Weather::showLayout(int pageNum)
         case 4:
 		page4Dia->show();
                 break;
+	case 5:
+		page5Dia->show();
+		break;
 	default: 
 		 page1Dia->show();
    }
@@ -1105,6 +2109,7 @@ void Weather::setupLayout(int pageNum)
    lbCond->setPaletteBackgroundColor(main_bgColor);  
    lbCond->setFont(timeFont);
    lbCond->setMaximumHeight((int)(2*fontMet.height()));
+   lbCond->setMaximumWidth((int)250);
    lbCond->setAlignment( Qt::AlignVCenter | Qt::AlignHCenter );
 
    QHBoxLayout *tHolder = new QHBoxLayout(0, 0, 0);
@@ -1551,6 +2556,163 @@ if (pageNum == 4)
    ext4->addWidget(lbPic5, 0);
    ext4->addWidget(lbTDesc, 0);
 }
+   if (pageNum == 5)
+   {
+	curConfig = 1;
+
+ 	page5Dia->setMaximumWidth((int)(750*wmult));
+	page5Dia->setPaletteBackgroundColor(main_bgColor);
+   	QHBoxLayout *ext5  = new QHBoxLayout(0, 0, 0);
+	QVBoxLayout *ext5v = new QVBoxLayout(0, 10, 10);
+	QLabel *spc = new QLabel("", page5Dia);
+
+	spc->setMinimumWidth((int)2);
+	spc->setMaximumWidth((int)2);
+	spc->setPaletteBackgroundColor(topbot_bgColor);
+
+   	ext5->addStrut((int)(310*wmult));
+
+   	page5->addLayout(ext5, 0);
+
+	lbUnits = new QLabel(" Temperature Units ", page5Dia);
+	lbUnits->setPaletteBackgroundColor(topbot_bgColor);
+	lbUnits->setAlignment(Qt::AlignCenter);
+	lbUnits->setMaximumWidth((int)250);
+	lbUnits->setMinimumWidth((int)250);
+	lbUnits->setMaximumHeight((int)(2*fontMet.height()));
+	lbLocal = new QLabel("Location", page5Dia);
+	lbLocal->setAlignment(Qt::AlignCenter);
+	lbLocal->setMaximumWidth((int)250);
+	lbLocal->setMinimumWidth((int)250);
+	lbLocal->setMaximumHeight((int)(2*fontMet.height()));
+	lbAggr = new QLabel("Aggressiveness", page5Dia);
+	lbAggr->setAlignment(Qt::AlignCenter);
+	lbAggr->setMaximumWidth((int)250);
+	lbAggr->setMinimumWidth((int)250);
+	lbAggr->setMaximumHeight((int)(2*fontMet.height()));
+
+	ext5v->addWidget(lbUnits, 0);
+	ext5v->addWidget(lbLocal, 0);
+	ext5v->addWidget(lbAggr, 0);
+
+	ext5->addLayout(ext5v, 0);
+
+	unitType = new QFrame(page5Dia);
+    	location = new QFrame(page5Dia);
+   	aggressv = new QFrame(page5Dia);
+	unitType->setPaletteBackgroundColor(main_bgColor);
+	location->setPaletteBackgroundColor(main_bgColor);
+	aggressv->setPaletteBackgroundColor(main_bgColor);
+	unitType->setMaximumWidth((int)(498*wmult));
+	unitType->setMinimumWidth((int)(498*wmult));
+	location->setMaximumWidth((int)(498*wmult));
+	location->setMinimumWidth((int)(498*wmult));
+	aggressv->setMaximumWidth((int)(498*wmult));
+	aggressv->setMinimumWidth((int)(498*wmult));
+
+	unitType->hide();
+	aggressv->hide();
+
+	ImpUnits = new QLabel(" 1. Imperial Units (fahrenheit, mph)", unitType);
+	SIUnits = new QLabel(" 2. SI Units (celsius, kph)         ", unitType);
+	ImpUnits->setMaximumHeight((int)(2*fontMet.height()));
+	SIUnits->setMaximumHeight((int)(2*fontMet.height()));
+
+	ImpUnits->setMaximumWidth((int)(398*wmult));
+	ImpUnits->setMinimumWidth((int)(398*wmult));
+	if (config_Units == 1)
+		ImpUnits->setPaletteBackgroundColor(QColor(0, 0, 0));
+	else
+		SIUnits->setPaletteBackgroundColor(QColor(0, 0, 0));
+	SIUnits->setMaximumWidth((int)(398*wmult));
+	SIUnits->setMinimumWidth((int)(398*wmult));
+
+	QVBoxLayout *unitBox = new QVBoxLayout(unitType, 10, 10);
+	QVBoxLayout *aggrBox = new QVBoxLayout(aggressv, 0, 0);
+	QHBoxLayout *locBox = new QHBoxLayout(location, 0, 0);
+	QVBoxLayout *letBox = new QVBoxLayout(0, 0, 0);
+	QVBoxLayout *cityBox = new QVBoxLayout(0, 0, 0);
+
+	locBox->addLayout(letBox, 0);
+	locBox->addLayout(cityBox, 0);
+
+	unitBox->addWidget(ImpUnits, 0);
+	unitBox->addWidget(SIUnits, 0);
+
+	letterList = new QLabel[9](" ", location);
+	cityList = new QLabel[9](" ", location);
+	QString temp;
+        int h;
+        int cnt = 0;
+
+	for (int j = curLetter - 4; j < curLetter + 5; j++)
+        {
+		if (j == 0)
+		{
+			letterList[cnt].setPaletteBackgroundColor(QColor(0, 0, 0));
+			cityList[cnt].setPaletteBackgroundColor(QColor(0, 0, 0));
+		}
+
+		h = j;
+		if (h < 0)
+			h = h + 91;
+		else
+			h = h + 65;
+
+
+		temp = QString(" %1 ").arg((char)(h));
+		letterList[cnt].setText(temp);
+		letterList[cnt].setMaximumHeight((int)(1.5*fontMet.height()));
+		letterList[cnt].setMaximumWidth((int)(50*wmult));
+		letterList[cnt].setMinimumWidth((int)(50*wmult));
+		letBox->addWidget(&letterList[cnt], 0, 0);
+		temp = "some test city!";
+		cityList[cnt].setText(temp);
+                cityList[cnt].setMaximumHeight((int)(1.5*fontMet.height()));
+                cityBox->addWidget(&cityList[cnt], 0, 0);
+		cnt++;
+	}
+
+	loadCityData(curCity);
+	showCityName();
+
+	aggrNum = new QLabel[7](" ", aggressv);
+	cnt = 0;
+
+	for (int i = config_Aggressiveness - 3; i < (config_Aggressiveness + 4); i++)
+	{
+		h = i;
+		if (i < 1)
+			h = 15 + i;
+		if (i > 15)
+			h = i - 15;
+
+		if (h == config_Aggressiveness)
+			aggrNum[cnt].setPaletteBackgroundColor(QColor(0, 0, 0));
+
+		if (h == 1)
+			temp = " 1  High Speed Connection";
+		else if (h == 8)
+			temp = " 8  Medium Speed Connection";
+		else if (h == 15)
+			temp = " 15 Low Speed Connection";
+		else 
+			temp = QString(" %1 ").arg(h);
+		aggrNum[cnt].setText(temp);
+		aggrNum[cnt].setMaximumHeight((int)(1.5*fontMet.height()));
+		aggrBox->addWidget(&aggrNum[cnt], 0, 0);
+		cnt++;
+	}
+	
+
+
+	unitType->show();
+	ext5->addWidget(spc, 0);
+	ext5->addWidget(unitType, 0, 0);
+	ext5->addWidget(location, 0, 0);
+	ext5->addWidget(aggressv, 0, 0);
+
+   }
 
    switch (pageNum)
    {
@@ -1575,6 +2737,10 @@ if (pageNum == 4)
 		page4Dia->hide();
  		mid->addWidget(page4Dia, 0, 0);
                 break;
+	case 5:
+		page5Dia->hide();
+		mid->addWidget(page5Dia, 0, 0);
+		break;
  
    }
 

@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 
     gContext->LoadQtConfig();
 
-    Weather weatherDat;
+    Weather weatherDat(db);
     weatherDat.Show();
     weatherDat.exec();
  

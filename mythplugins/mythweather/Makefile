@@ -9,6 +9,7 @@
 MAKEFILE =	Makefile
 QMAKE    =	qmake
 DEL_FILE =    rm -f
+GUNZIP   =      gunzip -c
 SUBTARGETS =	 \
 		sub-mythweather
 
@@ -17,11 +18,11 @@ first: all
 all: Makefile $(SUBTARGETS)
 
 mythweather/$(MAKEFILE): 
-	cd mythweather && $(QMAKE)  -o $(MAKEFILE)
+	cd mythweather && (gunzip -c accid.dat.gz > accid.dat) && $(QMAKE)  -o $(MAKEFILE)
 sub-mythweather: mythweather/$(MAKEFILE) FORCE
-	cd mythweather && $(MAKE) -f $(MAKEFILE)
+	cd mythweather && (gunzip -c accid.dat.gz > accid.dat) && $(MAKE) -f $(MAKEFILE)
 
-Makefile: mythweather.pro  $(QTDIR)/mkspecs/linux-g++/qmake.conf 
+Makefile: mythweather.pro  $(QTDIR)/mkspecs/default/qmake.conf 
 	$(QMAKE) -o Makefile mythweather.pro
 qmake: qmake_all
 	@$(QMAKE) -o Makefile mythweather.pro

@@ -1,5 +1,5 @@
-                                   MythWeather
-			           Release 0.8e
+                                   MythWeather 
+			           Release 0.8g
 
 BUILD/CONFIGURATION INSTRUCTIONS
 --------------------------------
@@ -8,8 +8,10 @@ Requirements:
 	MythTV (v0.8) installed and working
 	Internet Access (to get the weather!)
 
-If you have met the requirements above, simply type 'make' in the main directory
-to begin compiling.
+
+Once you have unzipped the data file and if you have met the requirements above, 
+simply type 'make' in the main directory to begin compiling. 
+
 
 Compiling note:  If you get an error on building this, that says something
                  about 'mkspecs', then you don't have the QTDIR environment
@@ -22,23 +24,62 @@ Compiling note:  If you get an error on building this, that says something
 Once the make is completed, do a 'make install'.  
 
 - mythweather will go into /usr/local/bin
-- images and weathertype file will be put into the newly created
+- images and data files will be put into the newly created
   /usr/local/share/mythtv/mythweather directory
 
-The software is now installed; use Mythfrontend->TV->Settings->Weather to
-customize the MythWeather module for your setup.
+CONFIGURATION
+-------------
+
+MythWeather configuration is now done in MythWeather...
+
+To enter the configuration section, press 'i'. From here you can select:
+
+1. Units (lets you pick between Imperial and SI)
+2. Location (pick the letter your city begins with, then find your city in the list,
+	     see below for key binding which should make this quicker).
+3. Aggressiveness Value (this is how fast MythWeather will timeout while trying to get 
+			 weather data).
+
+NOTE: You don't need to do anything other than pick the desired setting. Once highlighted,
+      just hit the left arrow key to go to another setting or when you are finished with
+      the configuration, hit the 'i' key again to save. If you want to cancel your changes
+      press the ESCAPE key.
+
+NOTE: If you keep getting "!!! 3 Failed Attempts !!!" (everytime you try), pick a city
+      that is nearby.
+
+NOTE: If you can't find your city but you can find it at MSNBC.com's Weather Site, let me
+      know the city name/accid.
+
 
 MYTHWEATHER KEYBOARD COMMANDS
 -----------------------------
    Left Key 		Goes back one page, this also extends the time spent
 			on the page you are at. 
    Right Key		Goes forward one page, see above.
-   Space		Pause, wait on the current page until space is hit
+   'p' Key		Pause, wait on the current page until space is hit
 			again.
    Numeric Keys		You can check other weather by keying in other ZIP codes.
    Enter Key		Switch between celsius and fahrenheit. Can also
 			be used a way to force a data update.
    'm' Key		Resets the location to the database default, then updates the data.
+
+   From within Configuration:
+   
+       Key      Action
+       ---      ------
+	1	Up 25
+	2	Up 50
+	3	Up 100
+	4	Beginning of List
+	5	Middle of List
+	6	End of List
+	7	Down 25
+	8	Down 50
+	9	Down 100
+	i       Exit & Save Configuration
+       ESC      Exit Without Saving
+
 
 OTHER INFORMATION
 -----------------
@@ -46,34 +87,13 @@ Current the program cycles through the three pages. Each page is
 shown for 10 seconds. When the user intervens and changes the page
 it waits for 20 seconds. The weather data is updated every 30 minutes
 or until the user selects a new zip code (or even the current zip code
-again).  See below for the todo list!
+again). 
 
 
-YOUR_ZIPCODE_OR_AREA_ID Information
------------------------------------
-In the United States this is simply your zip code.
-It can be an Airport code as well. 
-
-If you're not sure what to put here, goto:
-http://www.msnbc.com/news/wea_front.asp?0wl=w3&tab=oth&ta=y
-And type in your city name, select the city you live in.
-
-   For Example
-   -----------
-   If you live in Paris, France -- you would type in Paris.
-   A list of 15 or so 'Paris' cities come up, select 'Paris, France'
-   Now, in your browser's address bar is:
-   http://www.msnbc.com/news/wea_front.asp?pos=&tab=oth&ta=y& \\
-   czstr=Paris%2C+France&action=&inst=n&accid=FRXX0076
-   Your AREA_ID is   FRXX0076
-
-
-TODO LIST
+ TODO LIST
 ---------
-   - Ability to save a new location using MythWeather
    - Radar Map Page
    - Finish list of weather types and icons
-   - Better theme support for customizing colors
 
 KNOWN ISSUES
 ------------

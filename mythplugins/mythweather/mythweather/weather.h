@@ -18,6 +18,7 @@
 #include <qdialog.h>
 #include <qstringlist.h>
 #include <qlayout.h>
+#include <fstream>
 
 #include <mythtv/oldsettings.h>
 #include <mythtv/mythwidgets.h>
@@ -37,7 +38,8 @@ class Weather : public MythDialog
 {
     Q_OBJECT
   public:
-    Weather(QWidget *parent = 0, const char *name = 0);
+    Weather(QSqlDatabase *db, QWidget *parent = 0, const char *name = 0);
+    ~Weather();
 
     bool UpdateData();
     void processEvents();
@@ -50,7 +52,12 @@ private slots:
     void status_timeout();
     void cursorLeft();
     void cursorRight();
+    void upKey();
+    void dnKey();
+    void pgupKey();
+    void pgdnKey();
     void holdPage();
+    void setupPage();
     void convertFlip();
     void resetLocale();
     void newLocale0();
@@ -66,9 +73,26 @@ private slots:
 
 
   private:
+    QSqlDatabase *config;
     QAccel *accel;
 
+    ifstream accidFile;
+    streampos startData;
+    streampos curPos;
+    long accidBreaks[52];
+    int prevPos;
+
+    bool noACCID;
+    bool changeTemp;
+    bool changeLoc;
+    bool changeAgg;
+    int config_Units;
+    int config_Aggressiveness;
+    int curConfig;
     bool debug;
+    bool deepSetup;
+    bool gotLetter;
+    bool inSetup;
     bool validArea;
     bool readReadme;
     bool pastTime;
@@ -78,7 +102,11 @@ private slots:
     int updateInterval;
     int nextpageInterval;
     int nextpageIntArrow;
+    int lastCityNum;
+    int curLetter;
+    int curCity;
 
+    QString cityNames[9];
     QString newLocaleHold;
     QString baseDir;
 
@@ -86,11 +114,23 @@ private slots:
     QTimer *nextpage_Timer;
     QTimer *update_Timer;
     QTimer *status_Timer;
+
+    void saveConfig();
+    QString findAccidbyName(QString);
+    QString findNamebyAccid(QString);
+    void loadCityData(int);
     void fillList();
+    void updateLetters();
+    void loadAccidBreaks();
     bool GetWeatherData();
     bool gotDataHook;
     void setWeatherTypeIcon(QString[]);
     void setWeatherIcon(QString);
+    void backupCity(int);
+    void updateAggr();
+    void showCityName();
+    void setSetting(QString, QString, bool);
+    //void loadCityLetter(int);
 
     QString GetString(QString);
     int GetInt(QString);
@@ -110,6 +150,11 @@ private slots:
     QFrame *page2Dia;
     QFrame *page3Dia;
     QFrame *page4Dia;
+    QFrame *page5Dia;
+
+    QFrame *unitType;
+    QFrame *location;
+    QFrame *aggressv;
  
     QVBoxLayout *mid;
     QVBoxLayout *main;
@@ -118,9 +163,11 @@ private slots:
     QHBoxLayout *page2;
     QHBoxLayout *page3;
     QHBoxLayout *page4;
+    QHBoxLayout *page5;
 
     int currentPage;
 
+    QString config_Location;
     QString locale;
     QString city;
     QString state;
@@ -144,6 +191,14 @@ private slots:
     QString lowTemp[5];
     QString precip[5];
 
+    QLabel *letterList;
+    QLabel *cityList;
+    QLabel *aggrNum;
+    QLabel *ImpUnits;
+    QLabel *SIUnits;
+    QLabel *lbUnits;
+    QLabel *lbLocal;
+    QLabel *lbAggr;
     QLabel *lbPic0;
     QLabel *lbPic1;
     QLabel *lbPic2;
