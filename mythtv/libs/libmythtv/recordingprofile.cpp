@@ -354,7 +354,7 @@ int RecordingProfileEditor::exec(MythContext* context, QSqlDatabase* db) {
 }
 
 void RecordingProfile::fillSelections(QSqlDatabase* db, SelectSetting* setting) {
-    QSqlQuery result = db->exec("SELECT name, id FROM recordingprofiles");
+    QSqlQuery result = db->exec("SELECT name, id FROM recordingprofiles;");
     if (result.isActive() && result.numRowsAffected() > 0)
         while (result.next())
             setting->addSelection(result.value(0).toString(), result.value(1).toString());

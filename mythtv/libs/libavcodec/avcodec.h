@@ -5,8 +5,8 @@
 
 #define LIBAVCODEC_VERSION_INT 0x000406
 #define LIBAVCODEC_VERSION     "0.4.6"
-#define LIBAVCODEC_BUILD       4649
-#define LIBAVCODEC_BUILD_STR   "4649"
+#define LIBAVCODEC_BUILD       4654
+#define LIBAVCODEC_BUILD_STR   "4654"
 
 enum CodecID {
     CODEC_ID_NONE, 
@@ -62,21 +62,19 @@ enum CodecType {
 enum PixelFormat {
     PIX_FMT_YUV420P,
     PIX_FMT_YUV422,
-    PIX_FMT_RGB24,
-    PIX_FMT_BGR24,
+    PIX_FMT_RGB24,     /* 3 bytes, R is first */
+    PIX_FMT_BGR24,     /* 3 bytes, B is first */
     PIX_FMT_YUV422P,
     PIX_FMT_YUV444P,
-    PIX_FMT_RGBA32,
-    PIX_FMT_BGRA32,
+    PIX_FMT_RGBA32,    /* always stored in cpu endianness */
     PIX_FMT_YUV410P,
     PIX_FMT_YUV411P,
-    PIX_FMT_RGB565,
-    PIX_FMT_RGB555,
-//    PIX_FMT_RGB5551,
-    PIX_FMT_BGR565,
-    PIX_FMT_BGR555,
-//    PIX_FMT_GBR565,
-//    PIX_FMT_GBR555
+    PIX_FMT_RGB565,    /* always stored in cpu endianness */
+    PIX_FMT_RGB555,    /* always stored in cpu endianness, most significant bit to 1 */
+    PIX_FMT_GRAY8,
+    PIX_FMT_MONOWHITE, /* 0 is white */
+    PIX_FMT_MONOBLACK, /* 0 is black */
+    PIX_FMT_NB,
 };
 
 /* currently unused, may be used if 24/32 bits samples ever supported */
@@ -147,6 +145,7 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
 #define CODEC_FLAG_LOW_DELAY      0x00080000 /* force low delay / will fail on b frames */
 #define CODEC_FLAG_ALT_SCAN       0x00100000 /* use alternate scan */
 #define CODEC_FLAG_TRELLIS_QUANT  0x00200000 /* use trellis quantization */
+#define CODEC_FLAG_GLOBAL_HEADER  0x00400000 /* place global headers in extradata instead of every keyframe */
 
 /* codec capabilities */
 
@@ -519,6 +518,7 @@ typedef struct AVCodecContext {
 #define FF_BUG_NO_PADDING       16
 #define FF_BUG_AC_VLC           32
 #define FF_BUG_QPEL_CHROMA      64
+#define FF_BUG_STD_QPEL         128
 //#define FF_BUG_FAKE_SCALABILITY 16 //autodetection should work 100%
         
     /**
@@ -895,6 +895,44 @@ typedef struct AVCodecContext {
      */
     int last_predictor_count;
 
+    /**
+     * pre pass for motion estimation
+     * encoding: set by user.
+     * decoding: unused
+     */
+    int pre_me;
+
+    /**
+     * motion estimation pre pass compare function
+     * encoding: set by user.
+     * decoding: unused
+     */
+    int me_pre_cmp;
+
+    /**
+     * ME pre pass diamond size & shape
+     * encoding: set by user.
+     * decoding: unused
+     */
+    int pre_dia_size;
+
+    /**
+     * subpel ME quality
+     * encoding: set by user.
+     * decoding: unused
+     */
+    int me_subpel_quality;
+
+    /**
+     * callback to negotiate the pixelFormat
+     * @param fmt is the list of formats which are supported by the codec,
+     * its terminated by -1 as 0 is a valid format, the formats are ordered by quality
+     * the first is allways the native one
+     * @return the choosen format
+     * encoding: unused
+     * decoding: set by user, if not set then the native format will always be choosen
+     */
+    enum PixelFormat (*get_format)(struct AVCodecContext *s, enum PixelFormat * fmt);
 } AVCodecContext;
 
 typedef struct AVCodec {
@@ -1019,10 +1057,11 @@ void img_resample(ImgReSampleContext *s,
 
 void img_resample_close(ImgReSampleContext *s);
 
-void avpicture_fill(AVPicture *picture, UINT8 *ptr,
-                    int pix_fmt, int width, int height);
+int avpicture_fill(AVPicture *picture, UINT8 *ptr,
+                   int pix_fmt, int width, int height);
 int avpicture_get_size(int pix_fmt, int width, int height);
-void avcodec_get_chroma_sub_sample(int fmt, int *h_shift, int *v_shift);
+void avcodec_get_chroma_sub_sample(int pix_fmt, int *h_shift, int *v_shift);
+const char *avcodec_get_pix_fmt_name(int pix_fmt);
 
 /* convert among pixel formats */
 int img_convert(AVPicture *dst, int dst_pix_fmt,
@@ -1079,6 +1118,41 @@ int avcodec_close(AVCodecContext *avctx);
 void avcodec_register_all(void);
 
 void avcodec_flush_buffers(AVCodecContext *avctx);
+
+typedef struct {
+    /** options' name with default value*/
+    const char* name;
+    /** English text help */
+    const char* help;
+    /** type of variable */
+    int type;
+#define FF_CONF_TYPE_BOOL 1     // boolean - true,1,on  (or simply presence)
+#define FF_CONF_TYPE_DOUBLE 2   // double
+#define FF_CONF_TYPE_INT 3      // integer
+#define FF_CONF_TYPE_STRING 4   // string (finished with \0)
+#define FF_CONF_TYPE_MASK 0x1f	// mask for types - upper bits are various flags
+#define FF_CONF_TYPE_EXPERT 0x20 // flag for expert option
+#define FF_CONF_TYPE_FLAG (FF_CONF_TYPE_BOOL | 0x40)
+#define FF_CONF_TYPE_RCOVERIDE (FF_CONF_TYPE_STRING | 0x80)
+    /** where the parsed value should be stored */
+    void* val;
+    /** min value  (min == max   ->  no limits) */
+    double min;
+    /** maximum value for double/int */
+    double max;
+    /** default boo [0,1]l/double/int value */
+    double defval;
+    /**
+     * default string value (with optional semicolon delimited extra option-list
+     * i.e.   option1;option2;option3
+     * defval might select other then first argument as default
+     */
+    const char* defstr;
+    /** char* list of supported codecs (i.e. ",msmpeg4,h263," NULL - everything */
+    const char* supported;
+} avc_config_t;
+
+void avcodec_getopt(AVCodecContext* avctx, const char* str, avc_config_t** config);
 
 /**
  * Interface for 0.5.0 version
@@ -1162,9 +1236,10 @@ void *av_mallocz(unsigned int size);
 void av_free(void *ptr);
 void __av_freep(void **ptr);
 #define av_freep(p) __av_freep((void **)(p))
+void *av_fast_realloc(void *ptr, int *size, int min_size);
 /* for static data only */
 /* call av_free_static to release all staticaly allocated tables */
-void av_free_static();
+void av_free_static(void);
 void *__av_mallocz_static(void** location, unsigned int size);
 #define av_mallocz_static(p, s) __av_mallocz_static((void **)(p), s)
 

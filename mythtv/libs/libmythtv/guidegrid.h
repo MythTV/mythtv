@@ -65,6 +65,8 @@ class GuideGrid : public MythDialog
     void enter();
     void escape();
 
+    void channelUpdate();
+
     void quickRecord();
     void displayInfo();
 

@@ -89,32 +89,6 @@ void register_avcodec(AVCodec *format)
     format->next = NULL;
 }
 
-void avcodec_get_chroma_sub_sample(int fmt, int *h_shift, int *v_shift){
-    switch(fmt){
-    case PIX_FMT_YUV410P:
-        *h_shift=2;
-        *v_shift=2;
-        break;
-    case PIX_FMT_YUV420P:
-        *h_shift=1;
-        *v_shift=1;
-        break;
-    case PIX_FMT_YUV411P:
-        *h_shift=2;
-        *v_shift=0;
-        break;
-    case PIX_FMT_YUV422P:
-    case PIX_FMT_YUV422:
-        *h_shift=1;
-        *v_shift=0;
-        break;
-    default: //RGB/...
-        *h_shift=0;
-        *v_shift=0;
-        break;
-    }
-}
-
 typedef struct DefaultPicOpaque{
     int last_pic_num;
     uint8_t *data[4];
@@ -152,7 +126,6 @@ int avcodec_default_get_buffer(AVCodecContext *s, AVFrame *pic){
         case PIX_FMT_BGR24:
             pixel_size=3;
             break;
-        case PIX_FMT_BGRA32:
         case PIX_FMT_RGBA32:
             pixel_size=4;
             break;
@@ -212,6 +185,10 @@ void avcodec_default_release_buffer(AVCodecContext *s, AVFrame *pic){
 //printf("R%X\n", pic->opaque);
 }
 
+enum PixelFormat avcodec_default_get_format(struct AVCodecContext *s, enum PixelFormat * fmt){
+    return fmt[0];
+}
+
 void avcodec_get_context_defaults(AVCodecContext *s){
     s->bit_rate= 800*1000;
     s->bit_rate_tolerance= s->bit_rate*10;
@@ -234,6 +211,8 @@ void avcodec_get_context_defaults(AVCodecContext *s){
     s->me_method= ME_EPZS;
     s->get_buffer= avcodec_default_get_buffer;
     s->release_buffer= avcodec_default_release_buffer;
+    s->get_format= avcodec_default_get_format;
+    s->me_subpel_quality=8;
 }
 
 /**
@@ -409,19 +388,6 @@ AVCodec *avcodec_find(enum CodecID id)
     return NULL;
 }
 
-const char *pix_fmt_str[] = {
-    "yuv420p",
-    "yuv422",
-    "rgb24",
-    "bgr24",
-    "yuv422p",
-    "yuv444p",
-    "rgba32",
-    "bgra32",
-    "yuv410p",
-    "yuv411p",
-};
-
 void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
 {
     const char *codec_name;
@@ -461,7 +427,7 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
         if (enc->codec_id == CODEC_ID_RAWVIDEO) {
             snprintf(buf + strlen(buf), buf_size - strlen(buf),
                      ", %s",
-                     pix_fmt_str[enc->pix_fmt]);
+                     avcodec_get_pix_fmt_name(enc->pix_fmt));
         }
         if (enc->width) {
             snprintf(buf + strlen(buf), buf_size - strlen(buf),
@@ -536,99 +502,6 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
     }
 }
 
-/* Picture field are filled with 'ptr' addresses */
-void avpicture_fill(AVPicture *picture, UINT8 *ptr,
-                    int pix_fmt, int width, int height)
-{
-    int size;
-
-    size = width * height;
-    switch(pix_fmt) {
-    case PIX_FMT_YUV420P:
-        picture->data[0] = ptr;
-        picture->data[1] = picture->data[0] + size;
-        picture->data[2] = picture->data[1] + size / 4;
-        picture->linesize[0] = width;
-        picture->linesize[1] = width / 2;
-        picture->linesize[2] = width / 2;
-        break;
-    case PIX_FMT_YUV422P:
-        picture->data[0] = ptr;
-        picture->data[1] = picture->data[0] + size;
-        picture->data[2] = picture->data[1] + size / 2;
-        picture->linesize[0] = width;
-        picture->linesize[1] = width / 2;
-        picture->linesize[2] = width / 2;
-        break;
-    case PIX_FMT_YUV444P:
-        picture->data[0] = ptr;
-        picture->data[1] = picture->data[0] + size;
-        picture->data[2] = picture->data[1] + size;
-        picture->linesize[0] = width;
-        picture->linesize[1] = width;
-        picture->linesize[2] = width;
-        break;
-    case PIX_FMT_RGB24:
-    case PIX_FMT_BGR24:
-        picture->data[0] = ptr;
-        picture->data[1] = NULL;
-        picture->data[2] = NULL;
-        picture->linesize[0] = width * 3;
-        break;
-    case PIX_FMT_RGBA32:
-    case PIX_FMT_BGRA32:
-        picture->data[0] = ptr;
-        picture->data[1] = NULL;
-        picture->data[2] = NULL;
-        picture->linesize[0] = width * 4;
-        break;
-    case PIX_FMT_YUV422:
-        picture->data[0] = ptr;
-        picture->data[1] = NULL;
-        picture->data[2] = NULL;
-        picture->linesize[0] = width * 2;
-        break;
-    default:
-        picture->data[0] = NULL;
-        picture->data[1] = NULL;
-        picture->data[2] = NULL;
-        break;
-    }
-}
-
-int avpicture_get_size(int pix_fmt, int width, int height)
-{
-    int size;
-
-    size = width * height;
-    switch(pix_fmt) {
-    case PIX_FMT_YUV420P:
-        size = (size * 3) / 2;
-        break;
-    case PIX_FMT_YUV422P:
-        size = (size * 2);
-        break;
-    case PIX_FMT_YUV444P:
-        size = (size * 3);
-        break;
-    case PIX_FMT_RGB24:
-    case PIX_FMT_BGR24:
-        size = (size * 3);
-        break;
-    case PIX_FMT_RGBA32:
-    case PIX_FMT_BGRA32:
-        size = (size * 4);
-        break;
-    case PIX_FMT_YUV422:
-        size = (size * 2);
-        break;
-    default:
-        size = -1;
-        break;
-    }
-    return size;
-}
-
 unsigned avcodec_version( void )
 {
   return LIBAVCODEC_VERSION_INT;
@@ -676,7 +549,8 @@ void avcodec_flush_buffers(AVCodecContext *avctx)
            if(s->picture[i].data[0] && (   s->picture[i].type == FF_BUFFER_TYPE_INTERNAL
                                         || s->picture[i].type == FF_BUFFER_TYPE_USER))
             avctx->release_buffer(avctx, (AVFrame*)&s->picture[i]);
-        }
+	}
+	s->last_picture.data[0] = s->next_picture.data[0] = NULL;
         break;
     default:
         //FIXME

@@ -421,7 +421,7 @@ void XvVideoOutput::ToggleFullScreen(void)
         curx = XJ_screenx;
         cury = XJ_screeny;
         curw = XJ_screenwidth;
-        curh = XJ_screenheight;
+        curh = XJ_screenheight + 4;
         hide_cursor();
         decorate(0);
     }

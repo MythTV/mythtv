@@ -1,7 +1,7 @@
 /*
  * huffyuv codec for libavcodec
  *
- * Copyright (c) 2002 Michael Niedermayer <michaelni@gmx.at>
+ * Copyright (c) 2002-2003 Michael Niedermayer <michaelni@gmx.at>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -271,7 +271,7 @@ static int read_huffman_tables(HYuvContext *s, uint8_t *src, int length){
     GetBitContext gb;
     int i;
     
-    init_get_bits(&gb, src, length);
+    init_get_bits(&gb, src, length*8);
     
     for(i=0; i<3; i++){
         read_len_table(s->len[i], &gb);
@@ -295,9 +295,9 @@ static int read_old_huffman_tables(HYuvContext *s){
     GetBitContext gb;
     int i;
 
-    init_get_bits(&gb, classic_shift_luma, sizeof(classic_shift_luma));
+    init_get_bits(&gb, classic_shift_luma, sizeof(classic_shift_luma)*8);
     read_len_table(s->len[0], &gb);
-    init_get_bits(&gb, classic_shift_chroma, sizeof(classic_shift_chroma));
+    init_get_bits(&gb, classic_shift_chroma, sizeof(classic_shift_chroma)*8);
     read_len_table(s->len[1], &gb);
     
     for(i=0; i<256; i++) s->bits[0][i] = classic_add_luma  [i];
@@ -403,7 +403,7 @@ s->bgr32=1;
     case 24:
     case 32:
         if(s->bgr32){
-            avctx->pix_fmt = PIX_FMT_BGRA32;
+            avctx->pix_fmt = PIX_FMT_RGBA32;
         }else{
             avctx->pix_fmt = PIX_FMT_BGR24;
         }
@@ -461,8 +461,6 @@ static int encode_init(AVCodecContext *avctx)
     s->version=2;
     
     avctx->coded_frame= &s->picture;
-    s->picture.pict_type= FF_I_TYPE;
-    s->picture.key_frame= 1;
     
     switch(avctx->pix_fmt){
     case PIX_FMT_YUV420P:
@@ -682,7 +680,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
 
     bswap_buf((uint32_t*)s->bitstream_buffer, (uint32_t*)buf, buf_size/4);
     
-    init_get_bits(&s->gb, s->bitstream_buffer, buf_size);
+    init_get_bits(&s->gb, s->bitstream_buffer, buf_size*8);
 
     p->reference= 0;
     if(avctx->get_buffer(avctx, p) < 0){
@@ -933,6 +931,8 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size,
     init_put_bits(&s->pb, buf, buf_size, NULL, NULL);
     
     *p = *pict;
+    p->pict_type= FF_I_TYPE;
+    p->key_frame= 1;
     
     if(avctx->pix_fmt == PIX_FMT_YUV422P || avctx->pix_fmt == PIX_FMT_YUV420P){
         int lefty, leftu, leftv, y, cy;

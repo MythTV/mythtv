@@ -211,6 +211,7 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel, TV *player,
     accel->connectItem(accel->insertItem(Key_Space), this, SLOT(displayInfo()));
     accel->connectItem(accel->insertItem(Key_Enter), this, SLOT(displayInfo()));
     accel->connectItem(accel->insertItem(Key_R), this, SLOT(quickRecord()));
+    accel->connectItem(accel->insertItem(Key_X), this, SLOT(channelUpdate()));
 
     connect(this, SIGNAL(killTheApp()), this, SLOT(accept()));
 
@@ -419,7 +420,11 @@ void GuideGrid::createProgramLabel(int titlefontsize, int progfontsize)
     currentTime->setPaletteForegroundColor(curTimeChan_fgColor);
 
     ChannelInfo *chinfo = &(m_channelInfos[m_currentStartChannel]);
-    currentChan = new QLabel(chinfo->chanstr + "*" + chinfo->callsign, this);
+    if (m_context->GetNumSetting("DisplayChanNum") != 0)
+        currentChan = new QLabel(chinfo->callsign, this);
+    else
+        currentChan = new QLabel(chinfo->chanstr + "*" + chinfo->callsign, 
+                                 this);
     currentChan->setMinimumWidth((int)(180*wmult));
     currentChan->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
     // CURRENT TIME AND CHANNEL BACKGROUND COLOR
@@ -839,17 +844,22 @@ void GuideGrid::paintChannels(QPainter *p)
                 }
             }
          
-            int width = lfm.width(chinfo->chanstr);
-       
             int yoffset = 0;
             if (showIcon)
                 yoffset = (int)(43 * hmult); 
-            tmp.drawText((cr.width() - width) / 2, 
-                         ydifference * y + yoffset + bheight, chinfo->chanstr);
+
+            if (m_context->GetNumSetting("DisplayChanNum") == 0)
+            {
+                int width = lfm.width(chinfo->chanstr);
+                
+                tmp.drawText((cr.width() - width) / 2, 
+                             ydifference * y + yoffset + bheight, 
+                             chinfo->chanstr);
+            }
 
             tmp.setFont(*m_chanCallsignFont);
             QFontMetrics fm(*m_chanCallsignFont);
-            width = fm.width(chinfo->callsign);
+            int width = fm.width(chinfo->callsign);
             int height = fm.height();
             tmp.drawText((cr.width() - width) / 2, 
                          ydifference * y + yoffset + bheight + height, 
@@ -860,7 +870,13 @@ void GuideGrid::paintChannels(QPainter *p)
         }
         else
         {
-            QString chData = chinfo->chanstr + " " + chinfo->callsign;
+            QString chData;
+
+            if (m_context->GetNumSetting("DisplayChanNum") != 0)
+                chData = chinfo->callsign;
+            else
+                chData = chinfo->chanstr + " " + chinfo->callsign;
+
             int width = lfm.width(chData);
 
             // CHANNEL BACKGROUND COLOR
@@ -2124,3 +2140,10 @@ void GuideGrid::displayInfo()
     fillProgramInfos();
     update(programRect());
 }
+
+void GuideGrid::channelUpdate(void)
+{
+    int chanNum = m_currentRow + m_currentStartChannel;
+    m_player->EPGChannelUpdate(m_channelInfos[chanNum].chanstr);
+}
+

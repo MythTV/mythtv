@@ -29,6 +29,9 @@
 void *av_malloc(unsigned int size)
 {
     void *ptr;
+    
+//    if(size==0) return NULL;
+    
 #if defined (HAVE_MEMALIGN)
     ptr = memalign(16,size);
     /* Why 64? 
@@ -66,6 +69,17 @@ void *av_malloc(unsigned int size)
     /* NOTE: this memset should not be present */
     memset(ptr, 0, size);
     return ptr;
+}
+
+/**
+ * realloc which does nothing if the block is large enogh
+ */
+void *av_fast_realloc(void *ptr, int *size, int min_size){
+    if(min_size < *size) return ptr;
+    
+    *size= min_size + 10*1024;
+
+    return realloc(ptr, *size);
 }
 
 /* NOTE: ptr = NULL is explicetly allowed */

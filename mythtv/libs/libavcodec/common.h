@@ -33,6 +33,10 @@
 #        define ENODATA  61
 #    endif
 
+#ifndef M_PI
+#define M_PI    3.14159265358979323846
+#endif
+
 #endif /* HAVE_AV_CONFIG_H */
 
 /* Suppress restrict if it was not defined in config.h.  */
@@ -79,16 +83,44 @@ typedef INT64 int64_t;
 #        define UINT64_C(c)    (c ## ULL)
 #    endif /* __MINGW32__ */
 
-#    define M_PI    3.14159265358979323846
-#    define M_SQRT2 1.41421356237309504880  /* sqrt(2) */
-
 #    ifdef _DEBUG
 #        define DEBUG
 #    endif
 
 #    define snprintf _snprintf
 
-#else /* CONFIG_WIN32 */
+/* CONFIG_WIN32 end */
+#elif defined (CONFIG_OS2)
+/* OS/2 EMX */
+
+#include <inttypes.h>
+
+typedef unsigned char UINT8;
+typedef unsigned short UINT16;
+typedef unsigned int UINT32;
+typedef unsigned long long UINT64;
+typedef signed char INT8;
+typedef signed short INT16;
+typedef signed int INT32;
+typedef signed long long INT64;
+
+#ifdef HAVE_AV_CONFIG_H
+
+#ifndef INT64_C
+#define INT64_C(c)     (c ## LL)
+#define UINT64_C(c)    (c ## ULL)
+#endif
+
+#ifdef USE_FASTMEMCPY
+#include "fastmemcpy.h"
+#endif
+
+#include <float.h>
+
+#endif /* HAVE_AV_CONFIG_H */
+
+/* CONFIG_OS2 end */
+#else
 
 /* unix */
 
@@ -118,7 +150,7 @@ typedef signed long long INT64;
 #        endif
 #    endif /* HAVE_AV_CONFIG_H */
 
-#endif /* !CONFIG_WIN32 */
+#endif /* !CONFIG_WIN32 && !CONFIG_OS2 */
 
 #ifdef HAVE_AV_CONFIG_H
 
@@ -229,7 +261,7 @@ typedef struct GetBitContext {
     UINT32 cache1;
     int bit_count;
 #endif
-    int size;
+    int size_in_bits;
 } GetBitContext;
 
 static inline int get_bits_count(GetBitContext *s);
@@ -658,6 +690,12 @@ int init_vlc(VLC *vlc, int nb_bits, int nb_codes,
              const void *codes, int codes_wrap, int codes_size);
 void free_vlc(VLC *vlc);
 
+/**
+ *
+ * if the vlc code is invalid and max_depth=1 than no bits will be removed
+ * if the vlc code is invalid and max_depth>1 than the number of bits removed
+ * is undefined
+ */
 #define GET_VLC(code, name, gb, table, bits, max_depth)\
 {\
     int n, index, nb_bits;\

@@ -24,12 +24,12 @@ Watching TV or a recording
 - Page Up to jump ahead the configured number of minutes.  (default is 10)
 - Page Down to jump back the configured number of minutes.  (default is 10)
 
-Without the stickykeys option selected
+Without the stickykeys option selected:
 
 - Left arrow to rewind the configured number of seconds.  (default is 5)
 - Right arrow to fast forward the configured number of seconds. (default is 30)
 
-With the stickykeys option selected
+With the stickykeys option selected:
 
 - Right starts fast forward mode.
 - Left starts rewind mode.
@@ -85,6 +85,8 @@ EPG
 - Pressing R toggles between "Don't record this program" and "Record only this
   showing of the program".  It will not do anything if other recording types
   are selected for the highlighted entry.
+- Pressing X will change the channel to the currently selected channel without
+  leaving the EPG (Most useful in the alternate EPG)
 
 Remote Controls
 ---------------

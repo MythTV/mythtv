@@ -24,7 +24,7 @@ SOURCES += jfdctfst.c mpegaudio.c ac3enc.c mjpeg.c resample.c dsputil.c
 SOURCES += motion_est.c imgconvert.c imgresample.c msmpeg4.c mpeg12.c
 SOURCES += h263dec.c svq1.c rv10.c mpegaudiodec.c pcm.c simple_idct.c
 SOURCES += ratecontrol.c adpcm.c eval.c jfdctint.c dv.c error_resilience.c
-SOURCES += wmadec.c fft.c mdct.c mace.c huffyuv.c mythav.c
+SOURCES += wmadec.c fft.c mdct.c mace.c huffyuv.c mythav.c opts.c
 
 contains( CONFIG_AC3, yes ) {
     SOURCES += a52dec.c
@@ -51,7 +51,11 @@ contains( TARGET_GPROF, yes ) {
 contains( TARGET_MMX, yes ) {
     SOURCES += i386/fdct_mmx.c i386/cputest.c i386/dsputil_mmx.c
     SOURCES += i386/mpegvideo_mmx.c i386/idct_mmx.c i386/motion_est_mmx.c
-    SOURCES += i386/simple_idct_mmx.c
+    SOURCES += i386/simple_idct_mmx.c i386/fft_sse.c
+    contains( TARGET_BUILTIN_VECTOR, yes ) {
+        QMAKE_CFLAGS_RELEASE += -msse
+        QMAKE_CFLAGS_DEBUG += -msse
+    }
 }
 
 contains( TARGET_ARCH_ARMV4L, yes ) {

@@ -249,15 +249,17 @@ static int decode_slice(MpegEncContext *s){
     /* try to detect the padding bug */
     if(      s->codec_id==CODEC_ID_MPEG4
        &&   (s->workaround_bugs&FF_BUG_AUTODETECT) 
-       &&    s->gb.size*8 - get_bits_count(&s->gb) >=0
-       &&    s->gb.size*8 - get_bits_count(&s->gb) < 48
+       &&    s->gb.size_in_bits - get_bits_count(&s->gb) >=0
+       &&    s->gb.size_in_bits - get_bits_count(&s->gb) < 48
 //       &&   !s->resync_marker
        &&   !s->data_partitioning){
         
         const int bits_count= get_bits_count(&s->gb);
-        const int bits_left = s->gb.size*8 - bits_count;
+        const int bits_left = s->gb.size_in_bits - bits_count;
         
-        if(bits_left==0 || bits_left>8){
+        if(bits_left==0){
+            s->padding_bug_score+=16;
+        }else if(bits_left>8){
             s->padding_bug_score++;
         } else if(bits_left != 1){
             int v= show_bits(&s->gb, 8);
@@ -267,17 +269,12 @@ static int decode_slice(MpegEncContext *s){
                 s->padding_bug_score--;
             else
                 s->padding_bug_score++;            
-        }
-        
-        if(s->padding_bug_score > -2)
-            s->workaround_bugs |=  FF_BUG_NO_PADDING;
-        else
-            s->workaround_bugs &= ~FF_BUG_NO_PADDING;
+        }                          
     }
 
     // handle formats which dont have unique end markers
     if(s->msmpeg4_version || (s->workaround_bugs&FF_BUG_NO_PADDING)){ //FIXME perhaps solve this more cleanly
-        int left= s->gb.size*8 - get_bits_count(&s->gb);
+        int left= s->gb.size_in_bits - get_bits_count(&s->gb);
         int max_extra=7;
         
         /* no markers in M$ crap */
@@ -302,7 +299,7 @@ static int decode_slice(MpegEncContext *s){
     }
 
     fprintf(stderr, "slice end not reached but screenspace end (%d left %06X)\n", 
-            s->gb.size*8 - get_bits_count(&s->gb),
+            s->gb.size_in_bits - get_bits_count(&s->gb),
             show_bits(&s->gb, 24));
     return -1;
 }
@@ -344,6 +341,42 @@ static int mpeg4_find_frame_end(MpegEncContext *s, UINT8 *buf, int buf_size){
     return -1;
 }
 
+static void draw_line(uint8_t *buf, int sx, int sy, int ex, int ey, int w, int h, int stride, int color){
+    int t, x, y, f;
+    
+    ex= clip(ex, 0, w-1);
+    ey= clip(ey, 0, h-1);
+    
+    buf[sy*stride + sx]+= color;
+    
+    if(ABS(ex - sx) > ABS(ey - sy)){
+        if(sx > ex){
+            t=sx; sx=ex; ex=t;
+            t=sy; sy=ey; ey=t;
+        }
+        buf+= sx + sy*stride;
+        ex-= sx;
+        f= ((ey-sy)<<16)/ex;
+        for(x= 0; x <= ex; x++){
+            y= ((x*f) + (1<<15))>>16;
+            buf[y*stride + x]+= color;
+        }
+    }else{
+        if(sy > ey){
+            t=sx; sx=ex; ex=t;
+            t=sy; sy=ey; ey=t;
+        }
+        buf+= sx + sy*stride;
+        ey-= sy;
+        if(ey) f= ((ex-sx)<<16)/ey;
+        else   f= 0;
+        for(y= 0; y <= ey; y++){
+            x= ((y*f) + (1<<15))>>16;
+            buf[y*stride + x]+= color;
+        }
+    }
+}
+
 int ff_h263_decode_frame(AVCodecContext *avctx, 
                              void *data, int *data_size,
                              UINT8 *buf, int buf_size)
@@ -368,49 +401,27 @@ uint64_t time= rdtsc();
     if (buf_size == 0) {
         return 0;
     }
-    
+
     if(s->flags&CODEC_FLAG_TRUNCATED){
         int next;
-        ParseContext *pc= &s->parse_context;
         
-        pc->last_index= pc->index;
-
         if(s->codec_id==CODEC_ID_MPEG4){
             next= mpeg4_find_frame_end(s, buf, buf_size);
         }else{
             fprintf(stderr, "this codec doesnt support truncated bitstreams\n");
             return -1;
         }
-        if(next==-1){
-            if(buf_size + FF_INPUT_BUFFER_PADDING_SIZE + pc->index > pc->buffer_size){
-                pc->buffer_size= buf_size + pc->index + 10*1024;
-                pc->buffer= realloc(pc->buffer, pc->buffer_size);
-            }
-
-            memcpy(&pc->buffer[pc->index], buf, buf_size);
-            pc->index += buf_size;
+        
+        if( ff_combine_frame(s, next, &buf, &buf_size) < 0 )
             return buf_size;
-        }
-
-        if(pc->index){
-            if(next + FF_INPUT_BUFFER_PADDING_SIZE + pc->index > pc->buffer_size){
-                pc->buffer_size= next + pc->index + 10*1024;
-                pc->buffer= realloc(pc->buffer, pc->buffer_size);
-            }
-
-            memcpy(&pc->buffer[pc->index], buf, next + FF_INPUT_BUFFER_PADDING_SIZE );
-            pc->index = 0;
-            buf= pc->buffer;
-            buf_size= pc->last_index + next;
-        }
     }
 
 retry:
     
     if(s->bitstream_buffer_size && buf_size<20){ //divx 5.01+ frame reorder
-        init_get_bits(&s->gb, s->bitstream_buffer, s->bitstream_buffer_size);
+        init_get_bits(&s->gb, s->bitstream_buffer, s->bitstream_buffer_size*8);
     }else
-        init_get_bits(&s->gb, buf, buf_size);
+        init_get_bits(&s->gb, buf, buf_size*8);
     s->bitstream_buffer_size=0;
 
     if (!s->context_initialized) {
@@ -427,7 +438,7 @@ retry:
         if(s->avctx->extradata_size && s->picture_number==0){
             GetBitContext gb;
             
-            init_get_bits(&gb, s->avctx->extradata, s->avctx->extradata_size);
+            init_get_bits(&gb, s->avctx->extradata, s->avctx->extradata_size*8);
             ret = ff_mpeg4_decode_picture_header(s, &gb);
         }
         ret = ff_mpeg4_decode_picture_header(s, &s->gb);
@@ -442,6 +453,11 @@ retry:
     avctx->has_b_frames= !s->low_delay;
 
     if(s->workaround_bugs&FF_BUG_AUTODETECT){
+        if(s->padding_bug_score > -2 && !s->data_partitioning)
+            s->workaround_bugs |=  FF_BUG_NO_PADDING;
+        else
+            s->workaround_bugs &= ~FF_BUG_NO_PADDING;
+
         if(s->avctx->fourcc == ff_get_fourcc("XVIX")) 
             s->workaround_bugs|= FF_BUG_XVID_ILACE;
 #if 0
@@ -472,6 +488,14 @@ retry:
         if(s->xvid_build && s->xvid_build<=1)
             s->workaround_bugs|= FF_BUG_QPEL_CHROMA;
 
+#define SET_QPEL_FUNC(postfix1, postfix2) \
+    s->dsp.put_ ## postfix1 = ff_put_ ## postfix2;\
+    s->dsp.put_no_rnd_ ## postfix1 = ff_put_no_rnd_ ## postfix2;\
+    s->dsp.avg_ ## postfix1 = ff_avg_ ## postfix2;
+
+        if(s->lavc_build && s->lavc_build<4653)
+            s->workaround_bugs|= FF_BUG_STD_QPEL;
+        
 //printf("padding_bug_score: %d\n", s->padding_bug_score);
 #if 0
         if(s->divx_version==500)
@@ -489,6 +513,21 @@ retry:
 #endif
     }
     
+    if(s->workaround_bugs& FF_BUG_STD_QPEL){
+        SET_QPEL_FUNC(qpel_pixels_tab[0][ 5], qpel16_mc11_old_c)
+        SET_QPEL_FUNC(qpel_pixels_tab[0][ 7], qpel16_mc31_old_c)
+        SET_QPEL_FUNC(qpel_pixels_tab[0][ 9], qpel16_mc12_old_c)
+        SET_QPEL_FUNC(qpel_pixels_tab[0][11], qpel16_mc32_old_c)
+        SET_QPEL_FUNC(qpel_pixels_tab[0][13], qpel16_mc13_old_c)
+        SET_QPEL_FUNC(qpel_pixels_tab[0][15], qpel16_mc33_old_c)
+
+        SET_QPEL_FUNC(qpel_pixels_tab[1][ 5], qpel8_mc11_old_c)
+        SET_QPEL_FUNC(qpel_pixels_tab[1][ 7], qpel8_mc31_old_c)
+        SET_QPEL_FUNC(qpel_pixels_tab[1][ 9], qpel8_mc12_old_c)
+        SET_QPEL_FUNC(qpel_pixels_tab[1][11], qpel8_mc32_old_c)
+        SET_QPEL_FUNC(qpel_pixels_tab[1][13], qpel8_mc13_old_c)
+        SET_QPEL_FUNC(qpel_pixels_tab[1][15], qpel8_mc33_old_c)
+    }
 
 #if 0 // dump bits per frame / qp / complexity
 {
@@ -571,7 +610,7 @@ retry:
     
     decode_slice(s);
     s->error_status_table[0]|= VP_START;
-    while(s->mb_y<s->mb_height && s->gb.size*8 - get_bits_count(&s->gb)>16){
+    while(s->mb_y<s->mb_height && s->gb.size_in_bits - get_bits_count(&s->gb)>16){
         if(s->msmpeg4_version){
             if(s->mb_x!=0 || (s->mb_y%s->slice_height)!=0)
                 break;
@@ -580,7 +619,7 @@ retry:
                 break;
         }
         
-        if(s->msmpeg4_version!=4 && s->h263_pred)
+        if(s->msmpeg4_version<4 && s->h263_pred)
             ff_mpeg4_clean_buffers(s);
 
         decode_slice(s);
@@ -645,41 +684,40 @@ retry:
     }
 
     MPV_frame_end(s);
-#if 0 //dirty show MVs, we should export the MV tables and write a filter to show them
-{
-  int mb_y;
-  s->has_b_frames=1;
-  for(mb_y=0; mb_y<s->mb_height; mb_y++){
-    int mb_x;
-    int y= mb_y*16 + 8;
-    for(mb_x=0; mb_x<s->mb_width; mb_x++){
-      int x= mb_x*16 + 8;
-      uint8_t *ptr= s->last_picture.data[0];
-      int xy= 1 + mb_x*2 + (mb_y*2 + 1)*(s->mb_width*2 + 2);
-      int mx= (s->motion_val[xy][0]>>1) + x;
-      int my= (s->motion_val[xy][1]>>1) + y;
-      int i;
-      int max;
 
-      if(mx<0) mx=0;
-      if(my<0) my=0;
-      if(mx>=s->width)  mx= s->width -1;
-      if(my>=s->height) my= s->height-1;
-      max= ABS(mx-x);
-      if(ABS(my-y) > max) max= ABS(my-y);
-      /* the ugliest linedrawing routine ... */
-      for(i=0; i<max; i++){
-        int x1= x + (mx-x)*i/max;
-        int y1= y + (my-y)*i/max;
-        ptr[y1*s->linesize + x1]+=100;
-      }
-      ptr[y*s->linesize + x]+=100;
-      s->mbskip_table[mb_x + mb_y*s->mb_width]=0;
+    if((avctx->debug&FF_DEBUG_VIS_MV) && s->last_picture.data[0]){
+        const int shift= 1 + s->quarter_sample;
+        int mb_y;
+        uint8_t *ptr= s->last_picture.data[0];
+        s->low_delay=0; //needed to see the vectors without trashing the buffers
+
+        for(mb_y=0; mb_y<s->mb_height; mb_y++){
+            int mb_x;
+            for(mb_x=0; mb_x<s->mb_width; mb_x++){
+                const int mb_index= mb_x + mb_y*s->mb_width;
+                if(s->co_located_type_table[mb_index] == MV_TYPE_8X8){
+                    int i;
+                    for(i=0; i<4; i++){
+                        int sx= mb_x*16 + 4 + 8*(i&1);
+                        int sy= mb_y*16 + 4 + 8*(i>>1);
+                        int xy= 1 + mb_x*2 + (i&1) + (mb_y*2 + 1 + (i>>1))*(s->mb_width*2 + 2);
+                        int mx= (s->motion_val[xy][0]>>shift) + sx;
+                        int my= (s->motion_val[xy][1]>>shift) + sy;
+                        draw_line(ptr, sx, sy, mx, my, s->width, s->height, s->linesize, 100);
+                    }
+                }else{
+                    int sx= mb_x*16 + 8;
+                    int sy= mb_y*16 + 8;
+                    int xy= 1 + mb_x*2 + (mb_y*2 + 1)*(s->mb_width*2 + 2);
+                    int mx= (s->motion_val[xy][0]>>shift) + sx;
+                    int my= (s->motion_val[xy][1]>>shift) + sy;
+                    draw_line(ptr, sx, sy, mx, my, s->width, s->height, s->linesize, 100);
+                }
+                s->mbskip_table[mb_index]=0;
+            }
+        }
     }
-  }
 
-}
-#endif
 
     if(s->pict_type==B_TYPE || s->low_delay){
         *pict= *(AVFrame*)&s->current_picture;

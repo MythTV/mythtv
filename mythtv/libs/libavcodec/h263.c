@@ -67,15 +67,17 @@ static inline int mpeg4_decode_dc(MpegEncContext * s, int n, int *dir_ptr);
 static inline int mpeg4_decode_block(MpegEncContext * s, DCTELEM * block,
                               int n, int coded, int intra);
 static int h263_pred_dc(MpegEncContext * s, int n, UINT16 **dc_val_ptr);
-static void mpeg4_inv_pred_ac(MpegEncContext * s, INT16 *block, int n,
+static void mpeg4_inv_pred_ac(MpegEncContext * s, DCTELEM *block, int n,
                               int dir);
 static void mpeg4_decode_sprite_trajectory(MpegEncContext * s);
 static inline int ff_mpeg4_pred_dc(MpegEncContext * s, int n, UINT16 **dc_val_ptr, int *dir_ptr);
 
 extern UINT32 inverse[256];
 
-static UINT16 uni_DCtab_lum  [512][2];
-static UINT16 uni_DCtab_chrom[512][2];
+static UINT8 uni_DCtab_lum_len[512];
+static UINT8 uni_DCtab_chrom_len[512];
+static UINT16 uni_DCtab_lum_bits[512];
+static UINT16 uni_DCtab_chrom_bits[512];
 
 #ifdef CONFIG_ENCODERS
 static UINT16 (*mv_penalty)[MAX_MV*2+1]= NULL;
@@ -999,7 +1001,7 @@ static int h263_pred_dc(MpegEncContext * s, int n, UINT16 **dc_val_ptr)
 }
 
 
-void h263_pred_acdc(MpegEncContext * s, INT16 *block, int n)
+void h263_pred_acdc(MpegEncContext * s, DCTELEM *block, int n)
 {
     int x, y, wrap, a, c, pred_dc, scale, i;
     INT16 *dc_val, *ac_val, *ac_val1;
@@ -1309,8 +1311,8 @@ static void init_uni_dc_tab(void)
                 uni_len++;
             }
         }
-        uni_DCtab_lum[level+256][0]= uni_code;
-        uni_DCtab_lum[level+256][1]= uni_len;
+        uni_DCtab_lum_bits[level+256]= uni_code;
+        uni_DCtab_lum_len [level+256]= uni_len;
 
         /* chrominance */
         uni_code= DCtab_chrom[size][0];
@@ -1324,8 +1326,8 @@ static void init_uni_dc_tab(void)
                 uni_len++;
             }
         }
-        uni_DCtab_chrom[level+256][0]= uni_code;
-        uni_DCtab_chrom[level+256][1]= uni_len;
+        uni_DCtab_chrom_bits[level+256]= uni_code;
+        uni_DCtab_chrom_len [level+256]= uni_len;
 
     }
 }
@@ -1446,6 +1448,8 @@ void h263_encode_init(MpegEncContext *s)
         s->intra_ac_vlc_last_length= uni_mpeg4_intra_rl_len + 128*64;
         s->inter_ac_vlc_length     = uni_mpeg4_inter_rl_len;
         s->inter_ac_vlc_last_length= uni_mpeg4_inter_rl_len + 128*64;
+        s->luma_dc_vlc_length= uni_DCtab_lum_len;
+        s->chroma_dc_vlc_length= uni_DCtab_chrom_len;
         s->ac_esc_length= 7+2+1+6+1+12+1;
         break;
     case CODEC_ID_H263P:
@@ -1727,11 +1731,9 @@ void mpeg4_encode_picture_header(MpegEncContext * s, int picture_number)
     int time_div, time_mod;
     
     if(s->pict_type==I_TYPE){
-        if(picture_number - s->last_vo_picture_number >= 300 || picture_number==0){
+        if(!(s->flags&CODEC_FLAG_GLOBAL_HEADER)){
             mpeg4_encode_visual_object_header(s);
             mpeg4_encode_vol_header(s, 0, 0);
-
-            s->last_vo_picture_number= picture_number;
         }
         mpeg4_encode_gop_header(s);
     }
@@ -1854,7 +1856,7 @@ static inline int ff_mpeg4_pred_dc(MpegEncContext * s, int n, UINT16 **dc_val_pt
     return pred;
 }
 
-void mpeg4_pred_ac(MpegEncContext * s, INT16 *block, int n,
+void mpeg4_pred_ac(MpegEncContext * s, DCTELEM *block, int n,
                    int dir)
 {
     int i;
@@ -1909,7 +1911,7 @@ void mpeg4_pred_ac(MpegEncContext * s, INT16 *block, int n,
 
 }
 
-static void mpeg4_inv_pred_ac(MpegEncContext * s, INT16 *block, int n,
+static void mpeg4_inv_pred_ac(MpegEncContext * s, DCTELEM *block, int n,
                               int dir)
 {
     int i;
@@ -1959,10 +1961,10 @@ static inline void mpeg4_encode_dc(PutBitContext * s, int level, int n)
     level+=256;
     if (n < 4) {
 	/* luminance */
-	put_bits(s, uni_DCtab_lum[level][1], uni_DCtab_lum[level][0]);
+	put_bits(s, uni_DCtab_lum_len[level], uni_DCtab_lum_bits[level]);
     } else {
 	/* chrominance */
-	put_bits(s, uni_DCtab_chrom[level][1], uni_DCtab_chrom[level][0]);
+	put_bits(s, uni_DCtab_chrom_len[level], uni_DCtab_chrom_bits[level]);
     }
 #else
     int size, v;
@@ -2333,7 +2335,7 @@ static int h263_decode_gob_header(MpegEncContext *s)
 
         /* We have a GBSC probably with GSTUFF */
     skip_bits(&s->gb, 16); /* Drop the zeros */
-    left= s->gb.size*8 - get_bits_count(&s->gb);
+    left= s->gb.size_in_bits - get_bits_count(&s->gb);
     //MN: we must check the bits left or we might end in a infinite loop (or segfault)
     for(;left>13; left--){
         if(get_bits1(&s->gb)) break; /* Seek the '1' bit */
@@ -2433,7 +2435,7 @@ static inline int mpeg4_is_resync(MpegEncContext *s){
         return 0;
     }
 
-    if(bits_count + 8 >= s->gb.size*8){
+    if(bits_count + 8 >= s->gb.size_in_bits){
         int v= show_bits(&s->gb, 8);
         v|= 0x7F >> (7-(bits_count&7));
                 
@@ -2470,7 +2472,7 @@ static int mpeg4_decode_video_packet_header(MpegEncContext *s)
     int header_extension=0, mb_num, len;
     
     /* is there enough space left for a video packet + header */
-    if( get_bits_count(&s->gb) > s->gb.size*8-20) return -1;
+    if( get_bits_count(&s->gb) > s->gb.size_in_bits-20) return -1;
 
     for(len=0; len<32; len++){
         if(get_bits1(&s->gb)) break;
@@ -2602,7 +2604,7 @@ int ff_h263_resync(MpegEncContext *s){
     //ok, its not where its supposed to be ...
     s->gb= s->last_resync_gb;
     align_get_bits(&s->gb);
-    left= s->gb.size*8 - get_bits_count(&s->gb);
+    left= s->gb.size_in_bits - get_bits_count(&s->gb);
     
     for(;left>16+1+5+5; left-=8){ 
         if(show_bits(&s->gb, 16)==0){
@@ -2656,8 +2658,7 @@ static inline int get_amv(MpegEncContext *s, int n){
                 v+= dx;
             }
         }
-        sum /= 256;
-        sum= RSHIFT(sum<<s->quarter_sample, a);
+        sum= RSHIFT(sum, a+8-s->quarter_sample);
     }
 
     if      (sum < -len) sum= -len;
@@ -3057,7 +3058,7 @@ static int mpeg4_decode_partitioned_mb(MpegEncContext *s, DCTELEM block[6][64])
     /* per-MB end of slice check */
 
     if(--s->mb_num_left <= 0){
-//printf("%06X %d\n", show_bits(&s->gb, 24), s->gb.size*8 - get_bits_count(&s->gb));
+//printf("%06X %d\n", show_bits(&s->gb, 24), s->gb.size_in_bits - get_bits_count(&s->gb));
         if(mpeg4_is_resync(s))
             return SLICE_END;
         else
@@ -3421,8 +3422,8 @@ end:
     }else{
         int v= show_bits(&s->gb, 16);
     
-        if(get_bits_count(&s->gb) + 16 > s->gb.size*8){
-            v>>= get_bits_count(&s->gb) + 16 - s->gb.size*8;
+        if(get_bits_count(&s->gb) + 16 > s->gb.size_in_bits){
+            v>>= get_bits_count(&s->gb) + 16 - s->gb.size_in_bits;
         }
 
         if(v==0)
@@ -4687,7 +4688,7 @@ static int decode_vop_header(MpegEncContext *s, GetBitContext *gb){
              printf("qp:%d fc:%d,%d %s size:%d pro:%d alt:%d top:%d %spel part:%d resync:%d w:%d a:%d\n", 
                  s->qscale, s->f_code, s->b_code, 
                  s->pict_type == I_TYPE ? "I" : (s->pict_type == P_TYPE ? "P" : (s->pict_type == B_TYPE ? "B" : "S")), 
-                 gb->size,s->progressive_sequence, s->alternate_scan, s->top_field_first, 
+                 gb->size_in_bits,s->progressive_sequence, s->alternate_scan, s->top_field_first, 
                  s->quarter_sample ? "q" : "h", s->data_partitioning, s->resync_marker, s->num_sprite_warping_points,
                  s->sprite_warping_accuracy); 
          }
@@ -4742,9 +4743,9 @@ int ff_mpeg4_decode_picture_header(MpegEncContext * s, GetBitContext *gb)
         v = get_bits(gb, 8);
         startcode = ((startcode << 8) | v) & 0xffffffff;
         
-        if(get_bits_count(gb) >= gb->size*8){
-            if(gb->size==1 && s->divx_version){
-                printf("frame skip %d\n", gb->size);
+        if(get_bits_count(gb) >= gb->size_in_bits){
+            if(gb->size_in_bits==8 && s->divx_version){
+                printf("frame skip %d\n", gb->size_in_bits);
                 return FRAME_SKIPED; //divx bug
             }else
                 return -1; //end of stream

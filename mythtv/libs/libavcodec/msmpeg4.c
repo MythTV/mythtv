@@ -502,7 +502,7 @@ static void msmpeg4_encode_motion(MpegEncContext * s,
 static inline void handle_slices(MpegEncContext *s){
     if (s->mb_x == 0) {
         if (s->slice_height && (s->mb_y % s->slice_height) == 0) {
-            if(s->msmpeg4_version != 4){
+            if(s->msmpeg4_version < 4){
                 ff_mpeg4_clean_buffers(s);
             }
             s->first_slice_line = 1;
@@ -691,7 +691,7 @@ static inline int msmpeg4_pred_dc(MpegEncContext * s, int n,
     b = dc_val[ - 1 - wrap];
     c = dc_val[ - wrap];
     
-    if(s->first_slice_line && (n&2)==0 && s->msmpeg4_version!=4){
+    if(s->first_slice_line && (n&2)==0 && s->msmpeg4_version<4){
         b=c=1024;
     }
 
@@ -1195,7 +1195,7 @@ int msmpeg4_decode_picture_header(MpegEncContext * s)
 #if 0
 {
 int i;
-for(i=0; i<s->gb.size*8; i++)
+for(i=0; i<s->gb.size_in_bits; i++)
     printf("%d", get_bits1(&s->gb));
 //    get_bits1(&s->gb);
 printf("END\n");
@@ -1869,7 +1869,7 @@ static inline int msmpeg4_decode_block(MpegEncContext * s, DCTELEM * block,
         if (i > 62){
             i-= 192;
             if(i&(~63)){
-                const int left= s->gb.size*8 - get_bits_count(&s->gb);
+                const int left= s->gb.size_in_bits - get_bits_count(&s->gb);
                 if(((i+192 == 64 && level/qmul==-1) || s->error_resilience<=1) && left>=0){
                     fprintf(stderr, "ignoring overflow at %d %d\n", s->mb_x, s->mb_y);
                     break;

@@ -13,6 +13,7 @@ fi
 
 TMPC="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.c"
 TMPO="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.o"
+TMPE="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}"
 TMPS="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.S"
 TMPH="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.h"
 
@@ -52,6 +53,7 @@ gprof="no"
 v4l="yes"
 audio_oss="yes"
 audio_beos="no"
+dv1394="no"
 network="yes"
 zlib="yes"
 mp3lame="no"
@@ -61,6 +63,7 @@ a52bin="no"
 win32="no"
 mingw32="no"
 cygwin="no"
+os2="no"
 lshared="no"
 extralibs="-lm"
 simpleidct="yes"
@@ -75,6 +78,10 @@ need_inet_aton="no"
 ffserver="no"
 LDFLAGS=-Wl,--warn-common
 FFSLDFLAGS=-Wl,-E
+LIBPREF="lib"
+LIBSUF=".a"
+SLIBPREF="lib"
+SLIBSUF=".so"
 
 # OS specific
 targetos=`uname -s`
@@ -97,6 +104,7 @@ SHFLAGS=-nostart
 # disable linux things
 audio_oss="no"
 v4l="no"
+dv1394="no"
 # enable beos things
 audio_beos="yes"
 # no need for libm, but the inet stuff
@@ -111,6 +119,7 @@ fi ;;
 SunOS)
 v4l="no"
 audio_oss="no"
+dv1394="no"
 make="gmake"
 LDFLAGS=""
 FFSLDFLAGS=""
@@ -120,6 +129,7 @@ extralibs="$extralibs -lsocket -lnsl"
 FreeBSD)
 v4l="no"
 audio_oss="yes"
+dv1394="no"
 make="gmake"
 LDFLAGS="$LDFLAGS -export-dynamic"
 ;;
@@ -133,6 +143,7 @@ Darwin)
 cc="cc"
 v4l="no"
 audio_oss="no"
+dv1394="no"
 SHFLAGS="-dynamiclib"
 extralibs=""
 darwin="yes"
@@ -152,6 +163,7 @@ esac
 MINGW32*)
 v4l="no"
 audio_oss="no"
+dv1394="no"
 ffserver="no"
 network="no"
 mingw32="yes"
@@ -159,6 +171,7 @@ mingw32="yes"
 CYGWIN*)
 v4l="no"
 audio_oss="yes"
+dv1394="no"
 extralibs=""
 cygwin="yes"
 test -f /usr/include/inttypes.h || \
@@ -168,6 +181,26 @@ echo "Missing inttypes.h, please copy cygwin_inttypes.h to" \
 ;;
 Linux)
 LDFLAGS="$LDFLAGS -rdynamic"
+;;
+OS/2)
+TMPE=$TMPE".exe"
+ar="emxomfar -p32"
+strip="echo ignore strip"
+CFLAGS="-Zomf"
+LDFLAGS="-Zomf -Zstack 16384"
+SHFLAGS=""
+FFSLDFLAGS=""
+LIBPREF=""
+LIBSUF=".lib"
+SLIBPREF=""
+SLIBSUF=".dll"
+extralibs=""
+v4l="no"
+audio_oss="no"
+dv1394="no"
+network="no"
+ffserver="no"
+os2="yes"
 ;;
 *) ;;
 esac
@@ -190,13 +223,13 @@ EOF
 
 ldl=-ldl
 
-if $cc -o $TMPO $TMPC -ldl 2> /dev/null  ; then
+if $cc -o $TMPE $TMPC -ldl 2> /dev/null  ; then
 vhook=yes
 dlfcn=yes
 dlopen=yes
 fi
 
-if $cc -o $TMPO $TMPC 2> /dev/null  ; then
+if $cc -o $TMPE $TMPC 2> /dev/null  ; then
 vhook=yes
 dlfcn=yes
 dlopen=yes
@@ -207,12 +240,12 @@ cat > $TMPC << EOF
 int main( void ) { return (int) dlopen("foo", 0); }
 EOF
 
-if $cc -o $TMPO $TMPC -ldl 2> /dev/null  ; then
+if $cc -o $TMPE $TMPC -ldl 2> /dev/null  ; then
 vhook=yes
 dlopen=yes
 fi
 
-if $cc -o $TMPO $TMPC 2> /dev/null  ; then
+if $cc -o $TMPE $TMPC 2> /dev/null  ; then
 vhook=yes
 dlopen=yes
 ldl=""
@@ -226,7 +259,7 @@ int main( void ) { return (int) imlib_load_font("foo"); }
 EOF
 
 imlib2=no
-if $cc -o $TMPO $TMPC -lImlib2 2> /dev/null  ; then
+if $cc -o $TMPE $TMPC -lImlib2 2> /dev/null  ; then
 imlib2=yes
 fi
 
@@ -261,6 +294,8 @@ for opt do
   --disable-audio-oss) audio_oss="no"
   ;;
   --disable-audio-beos) audio_beos="no"
+  ;;
+  --disable-dv1394) dv1394="no"
   ;;
   --disable-network) network="no"
   ;;
@@ -318,7 +353,7 @@ int main(void) {
     return 0;
 }
 EOF
-$cc -o $TMPO $TMPC -faltivec 2> /dev/null || altivec="no"
+$cc -o $TMPO $TMPE -faltivec 2> /dev/null || altivec="no"
 fi
 
 # Can only do mmi on mips
@@ -338,7 +373,7 @@ int main(void) {
     return 0;
 }
 EOF
-$cc -o $TMPO $TMPC 2> /dev/null || mmi="no"
+$cc -o $TMPE $TMPC 2> /dev/null || mmi="no"
 fi
 
 # Checking for CFLAGS
@@ -350,6 +385,7 @@ if test "$win32" = "yes" ; then
     cross_prefix="i386-mingw32msvc-"
     v4l="no"
     audio_oss="no"
+    dv1394="no"
     network="no"
 fi
 
@@ -357,6 +393,7 @@ if test "$mingw32" = "yes" ; then
     cross_prefix=""
     v4l="no"
     audio_oss="no"
+    dv1394="no"
     network="no"
 fi
 
@@ -377,8 +414,8 @@ int main(int argc, char ** argv){
 }
 EOF
 
-if $cc -o $TMPO $TMPC 2>/dev/null ; then
-$TMPO && bigendian="yes"
+if $cc -o $TMPE $TMPC 2>/dev/null ; then
+$TMPE && bigendian="yes"
 else
 echo big/little test failed
 fi
@@ -402,7 +439,7 @@ EOF
 
 _memalign=no
 _malloc_h=no
-if $cc -o $TMPO $TMPC 2> /dev/null ; then
+if $cc -o $TMPE $TMPC 2> /dev/null ; then
 _malloc_h=yes
 _memalign=yes
 # check for memalign - atmos
@@ -414,7 +451,7 @@ string = memalign(64, sizeof(char));
 return 0;
 }
 EOF
-$cc -o $TMPO $TMPC 2> /dev/null || _memalign=no
+$cc -o $TMPE $TMPC 2> /dev/null || _memalign=no
 fi
 
 cat > $TMPC << EOF
@@ -424,7 +461,7 @@ int main( void ) { return *strptime("", "", 0); }
 EOF
 
 strptime=no
-if $cc -o $TMPO $TMPC 2> /dev/null ; then
+if $cc -o $TMPE $TMPC 2> /dev/null ; then
   strptime=yes
 fi
 
@@ -439,8 +476,8 @@ if (zlibVersion() != ZLIB_VERSION)
 return 0;
 }
 EOF
-$cc -o $TMPO $TMPC -lz 2> /dev/null || zlib="no"
-# $TMPO 2> /dev/null > /dev/null || zlib="no"
+$cc -o $TMPE $TMPC -lz 2> /dev/null || zlib="no"
+# $TMPE 2> /dev/null > /dev/null || zlib="no"
 # XXX: more tests needed - runtime test
 fi
 if test "$zlib" = "yes"; then
@@ -455,9 +492,9 @@ int main( void ) { return (lrintf(3.999f) > 0)?0:1; }
 EOF
 
 have_lrintf="no"
-if $cc $extralibs -o $TMPO $TMPC 2> /dev/null ; then
+if $cc $extralibs -o $TMPE $TMPC 2> /dev/null ; then
   have_lrintf="yes"
-  $TMPO 2> /dev/null > /dev/null || have_lrintf="no"
+  $TMPE 2> /dev/null > /dev/null || have_lrintf="no"
 fi
 
 _restrict=
@@ -468,6 +505,23 @@ for restrict_keyword in restrict __restrict__ __restrict; do
     break;
   fi
 done
+
+# test gcc version to see if vector builtins can be used
+# currently only used on i386 for MMX builtins
+cat > $TMPC << EOF
+int main(void) {
+#if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 2)
+return 0;
+#else
+#error no vector builtins
+#endif
+}
+EOF
+
+builtin_vector=no
+if $cc -o $TMPO $TMPC 2> /dev/null ; then
+  builtin_vector=yes
+fi
 
 if test x"$1" = x"-h" -o x"$1" = x"--help" ; then
 cat << EOF
@@ -523,6 +577,7 @@ echo "CPU              $cpu"
 echo "Big Endian       $bigendian"
 if test $cpu = "x86"; then
 echo "MMX enabled      $mmx"
+echo "Vector Builtins  $builtin_vector"
 fi
 if test $cpu = "mips"; then
 echo "MMI enabled      $mmi"
@@ -557,6 +612,10 @@ echo "OPTFLAGS=$CFLAGS" >> config.mak
 echo "LDFLAGS=$LDFLAGS" >> config.mak
 echo "FFSLDFLAGS=$FFSLDFLAGS" >> config.mak
 echo "SHFLAGS=$SHFLAGS" >> config.mak
+echo "LIBPREF=$LIBPREF" >> config.mak
+echo "LIBSUF=$LIBSUF" >> config.mak
+echo "SLIBPREF=$SLIBPREF" >> config.mak
+echo "SLIBSUF=$SLIBSUF" >> config.mak
 if test "$cpu" = "x86" ; then
   echo "TARGET_ARCH_X86=yes" >> config.mak
   echo "#define ARCH_X86 1" >> $TMPH
@@ -572,6 +631,10 @@ elif test "$cpu" = "sparc64" ; then
 elif test "$cpu" = "powerpc" ; then
   echo "TARGET_ARCH_POWERPC=yes" >> config.mak
   echo "#define ARCH_POWERPC 1" >> $TMPH
+  echo "// Enable the next line to get PowerPC performance report" >> $TMPH
+  echo "// #define POWERPC_TBL_PERFORMANCE_REPORT 1" >> $TMPH
+  echo "// Enable the next line to use PMC registers instead of TBL" >> $TMPH
+  echo "// #define POWERPC_PERF_USE_PMC 1" >> $TMPH
 elif test "$cpu" = "mips" ; then
   echo "TARGET_ARCH_MIPS=yes" >> config.mak
   echo "#define ARCH_MIPS 1" >> $TMPH
@@ -584,6 +647,10 @@ if test "$mmx" = "yes" ; then
   echo "TARGET_MMX=yes" >> config.mak
   echo "#define HAVE_MMX 1" >> $TMPH
 fi
+if test "$builtin_vector" = "yes" ; then
+  echo "TARGET_BUILTIN_VECTOR=yes" >> config.mak
+  echo "#define HAVE_BUILTIN_VECTOR 1" >> $TMPH
+fi
 if test "$mmi" = "yes" ; then
   echo "TARGET_MMI=yes" >> config.mak
   echo "#define HAVE_MMI 1" >> $TMPH
@@ -591,6 +658,8 @@ fi
 if test "$altivec" = "yes" ; then
   echo "TARGET_ALTIVEC=yes" >> config.mak
   echo "#define HAVE_ALTIVEC 1" >> $TMPH
+  echo "// Enable the next line to use the reference C code instead of AltiVec" >> $TMPH
+  echo "// #define ALTIVEC_USE_REFERENCE_C_CODE 1" >> $TMPH
 fi
 if test "$gprof" = "yes" ; then
   echo "TARGET_GPROF=yes" >> config.mak
@@ -651,6 +720,11 @@ fi
 if test "$v4l" = "yes" ; then
   echo "#define CONFIG_VIDEO4LINUX 1" >> $TMPH
   echo "CONFIG_VIDEO4LINUX=yes" >> config.mak
+fi
+
+if test "$dv1394" = "yes" ; then
+  echo "#define CONFIG_DV1394 1" >> $TMPH
+  echo "CONFIG_DV1394=yes" >> config.mak
 fi
 
 if test "$dlopen" = "yes" ; then
@@ -761,4 +835,4 @@ else
 	echo "config.h is unchanged"
 fi
 
-rm -f $TMPO $TMPC $TMPS $TMPH
+rm -f $TMPO $TMPC $TMPE $TMPS $TMPH

@@ -135,6 +135,9 @@ bool Channel::SetChannelByString(const QString &chan)
     if (!isopen)
         return false;
 
+    if (curchannelname == chan)
+        return true;
+
     int finetune = 0;
 
     if (pParent->CheckChannel(this, chan, finetune))

@@ -54,6 +54,56 @@ static void DEF(put, pixels8_x2)(UINT8 *block, const UINT8 *pixels, int line_siz
 	:"eax", "memory");
 }
 
+static void DEF(put, pixels8_l2)(uint8_t *dst, uint8_t *src1, uint8_t *src2, int dstStride, int src1Stride, int h)
+{
+    MOVQ_BFE(mm6);
+    __asm __volatile(
+	"testl $1, %0			\n\t"
+        " jz 1f				\n\t"
+	"movq	(%1), %%mm0		\n\t"
+	"movq	(%2), %%mm1		\n\t"
+	"addl	%4, %1			\n\t"
+        "addl	$8, %2			\n\t"
+	PAVGB(%%mm0, %%mm1, %%mm4, %%mm6)
+	"movq	%%mm4, (%3)		\n\t"
+	"addl	%5, %3			\n\t"
+        "decl	%0			\n\t"
+	".balign 8			\n\t"
+	"1:				\n\t"
+	"movq	(%1), %%mm0		\n\t"
+	"movq	(%2), %%mm1		\n\t"
+	"addl	%4, %1			\n\t"
+	"movq	(%1), %%mm2		\n\t"
+	"movq	8(%2), %%mm3		\n\t"
+	"addl	%4, %1			\n\t"
+	PAVGBP(%%mm0, %%mm1, %%mm4,   %%mm2, %%mm3, %%mm5)
+	"movq	%%mm4, (%3)		\n\t"
+	"addl	%5, %3			\n\t"
+	"movq	%%mm5, (%3)		\n\t"
+	"addl	%5, %3			\n\t"
+	"movq	(%1), %%mm0		\n\t"
+	"movq	16(%2), %%mm1		\n\t"
+	"addl	%4, %1			\n\t"
+	"movq	(%1), %%mm2		\n\t"
+	"movq	24(%2), %%mm3		\n\t"
+	"addl	%4, %1			\n\t"
+	"addl	$32, %2			\n\t"
+	PAVGBP(%%mm0, %%mm1, %%mm4,   %%mm2, %%mm3, %%mm5)
+	"movq	%%mm4, (%3)		\n\t"
+	"addl	%5, %3			\n\t"
+	"movq	%%mm5, (%3)		\n\t"
+	"addl	%5, %3			\n\t"
+	"subl	$4, %0			\n\t"
+	"jnz	1b			\n\t"
+#ifdef PIC //Note "+bm" and "+mb" are buggy too (with gcc 3.2.2 at least) and cant be used
+        :"+m"(h), "+a"(src1), "+c"(src2), "+d"(dst)
+#else
+        :"+b"(h), "+a"(src1), "+c"(src2), "+d"(dst)
+#endif
+	:"S"(src1Stride), "D"(dstStride)
+	:"memory");
+}
+
 static void DEF(put, pixels16_x2)(UINT8 *block, const UINT8 *pixels, int line_size, int h)
 {
     MOVQ_BFE(mm6);
@@ -90,7 +140,7 @@ static void DEF(put, pixels16_x2)(UINT8 *block, const UINT8 *pixels, int line_si
 	"movq	9(%1, %3), %%mm3	\n\t"
 	PAVGBP(%%mm0, %%mm1, %%mm4,   %%mm2, %%mm3, %%mm5)
 	"movq	%%mm4, 8(%2)		\n\t"
-	"movq	%%mm5, 8(%2, %3)		\n\t"
+	"movq	%%mm5, 8(%2, %3)	\n\t"
 	"addl	%%eax, %1		\n\t"
 	"addl	%%eax, %2		\n\t"
 	"subl	$4, %0			\n\t"
@@ -98,6 +148,55 @@ static void DEF(put, pixels16_x2)(UINT8 *block, const UINT8 *pixels, int line_si
 	:"+g"(h), "+S"(pixels), "+D"(block)
 	:"r"(line_size)
 	:"eax", "memory");
+}
+
+static void DEF(put, pixels16_l2)(uint8_t *dst, uint8_t *src1, uint8_t *src2, int dstStride, int src1Stride, int h)
+{
+    MOVQ_BFE(mm6);
+    __asm __volatile(
+	"testl $1, %0			\n\t"
+        " jz 1f				\n\t"
+	"movq	(%1), %%mm0		\n\t"
+	"movq	(%2), %%mm1		\n\t"
+	"movq	8(%1), %%mm2		\n\t"
+	"movq	8(%2), %%mm3		\n\t"
+	"addl	%4, %1			\n\t"
+	"addl	$16, %2			\n\t"
+	PAVGBP(%%mm0, %%mm1, %%mm4,   %%mm2, %%mm3, %%mm5)
+	"movq	%%mm4, (%3)		\n\t"
+	"movq	%%mm5, 8(%3)		\n\t"
+	"addl	%5, %3			\n\t"
+	"decl	%0			\n\t"
+	".balign 8			\n\t"
+	"1:				\n\t"
+	"movq	(%1), %%mm0		\n\t"
+	"movq	(%2), %%mm1		\n\t"
+	"movq	8(%1), %%mm2		\n\t"
+	"movq	8(%2), %%mm3		\n\t"
+	"addl	%4, %1			\n\t"
+	PAVGBP(%%mm0, %%mm1, %%mm4,   %%mm2, %%mm3, %%mm5)
+	"movq	%%mm4, (%3)		\n\t"
+	"movq	%%mm5, 8(%3)		\n\t"
+	"addl	%5, %3			\n\t"
+	"movq	(%1), %%mm0		\n\t"
+	"movq	16(%2), %%mm1		\n\t"
+	"movq	8(%1), %%mm2		\n\t"
+	"movq	24(%2), %%mm3		\n\t"
+	"addl	%4, %1			\n\t"
+	PAVGBP(%%mm0, %%mm1, %%mm4,   %%mm2, %%mm3, %%mm5)
+	"movq	%%mm4, (%3)		\n\t"
+	"movq	%%mm5, 8(%3)		\n\t"
+	"addl	%5, %3			\n\t"
+	"addl	$32, %2			\n\t"
+	"subl	$2, %0			\n\t"
+	"jnz	1b			\n\t"
+#ifdef PIC //Note "+bm" and "+mb" are buggy too (with gcc 3.2.2 at least) and cant be used
+	:"+m"(h), "+a"(src1), "+c"(src2), "+d"(dst)
+#else
+	:"+b"(h), "+a"(src1), "+c"(src2), "+d"(dst)
+#endif
+	:"S"(src1Stride), "D"(dstStride)
+	:"memory"); 
 }
 
 static void DEF(put, pixels8_y2)(UINT8 *block, const UINT8 *pixels, int line_size, int h)
@@ -259,6 +358,27 @@ static void DEF(avg, pixels8_x2)(UINT8 *block, const UINT8 *pixels, int line_siz
     } while (--h);
 }
 
+static void DEF(avg, pixels8_l2)(uint8_t *dst, uint8_t *src1, uint8_t *src2, int dstStride, int src1Stride, int h)
+{
+    MOVQ_BFE(mm6);
+    JUMPALIGN();
+    do {
+	__asm __volatile(
+	    "movq  %1, %%mm0		\n\t"
+	    "movq  %2, %%mm1		\n\t"
+	    "movq  %0, %%mm3		\n\t"
+	    PAVGB(%%mm0, %%mm1, %%mm2, %%mm6)
+	    PAVGB(%%mm3, %%mm2, %%mm0, %%mm6)
+	    "movq  %%mm0, %0		\n\t"
+	    :"+m"(*dst)
+	    :"m"(*src1), "m"(*src2)
+	    :"memory");
+	dst += dstStride;
+        src1 += src1Stride;
+        src2 += 8;
+    } while (--h);
+}
+
 static void DEF(avg, pixels16_x2)(UINT8 *block, const UINT8 *pixels, int line_size, int h)
 {
     MOVQ_BFE(mm6);
@@ -282,6 +402,33 @@ static void DEF(avg, pixels16_x2)(UINT8 *block, const UINT8 *pixels, int line_si
 	    :"memory");
 	pixels += line_size;
 	block += line_size;
+    } while (--h);
+}
+
+static void DEF(avg, pixels16_l2)(uint8_t *dst, uint8_t *src1, uint8_t *src2, int dstStride, int src1Stride, int h)
+{
+    MOVQ_BFE(mm6);
+    JUMPALIGN();
+    do {
+	__asm __volatile(
+	    "movq  %1, %%mm0		\n\t"
+	    "movq  %2, %%mm1		\n\t"
+	    "movq  %0, %%mm3		\n\t"
+	    PAVGB(%%mm0, %%mm1, %%mm2, %%mm6)
+	    PAVGB(%%mm3, %%mm2, %%mm0, %%mm6)
+	    "movq  %%mm0, %0		\n\t"
+	    "movq  8%1, %%mm0		\n\t"
+	    "movq  8%2, %%mm1		\n\t"
+	    "movq  8%0, %%mm3		\n\t"
+	    PAVGB(%%mm0, %%mm1, %%mm2, %%mm6)
+	    PAVGB(%%mm3, %%mm2, %%mm0, %%mm6)
+	    "movq  %%mm0, 8%0		\n\t"
+	    :"+m"(*dst)
+	    :"m"(*src1), "m"(*src2)
+	    :"memory");
+	dst += dstStride;
+        src1 += src1Stride;
+        src2 += 16;
     } while (--h);
 }
 

@@ -726,7 +726,7 @@ void ChannelSetting::fillSelections(QSqlDatabase* db, SelectSetting* setting) {
     // channels and how they're stored in the database.  We're just a
     // selector.
 
-    QSqlQuery result = db->exec("SELECT name, chanid FROM channel");
+    QSqlQuery result = db->exec("SELECT name, chanid FROM channel;");
     if (result.isActive() && result.numRowsAffected() > 0)
         while (result.next())
             setting->addSelection(result.value(0).toString(),

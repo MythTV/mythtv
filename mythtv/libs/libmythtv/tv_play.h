@@ -45,8 +45,8 @@ class TV : public QObject
 
     // for the guidegrid to use
     void EmbedOutput(unsigned long wid, int x, int y, int w, int h);
-
     void StopEmbeddingOutput(void);
+    void EPGChannelUpdate(QString chanstr);
    
     bool getRequestDelete(void) { return requestDelete; }
     bool getEndOfRecording(void) { return endOfRecording; }

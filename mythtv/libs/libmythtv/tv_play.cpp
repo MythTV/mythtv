@@ -1418,6 +1418,16 @@ void TV::ChangeColour(bool up)
         osd->SetSettingsText(text, text.length() );
 }
 
+void TV::EPGChannelUpdate(QString chanstr)
+{
+    if (chanstr != "")
+    {
+        chanstr = chanstr.left(3);
+        sprintf(channelKeys, "%s", chanstr.ascii());
+        channelqueued = true; 
+    }
+}
+
 void TV::customEvent(QCustomEvent *e)
 {
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
