@@ -73,6 +73,7 @@ class NuppelVideoRecorder : public RecorderBase
     void Reset(void);
 
     void SetVideoFilters(QString &filters);
+    void SetTranscoding(bool value) { transcoding = value; };
 
     long long GetKeyframePosition(long long desired);
     void GetBlankFrameMap(QMap<long long, int> &blank_frame_map);
@@ -155,6 +156,7 @@ class NuppelVideoRecorder : public RecorderBase
     float video_aspect;
 
     CommDetect *commDetect;
+    bool transcoding;
 
     int mp3quality;
     char *mp3buf;

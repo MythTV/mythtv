@@ -81,6 +81,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(ChannelBase *channel)
     mp3buf = NULL;
 
     commDetect = NULL;
+    transcoding = false;
 
     act_video_encode = 0;
     act_video_buffer = 0;
@@ -3301,6 +3302,12 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
             raw=0;
             compressthis=1;
         }
+    }
+
+    if (transcoding)
+    {
+        raw = 0;
+        compressthis = 1;
     }
 
     // see if it's time for a seeker header, sync information and a keyframe

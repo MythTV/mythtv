@@ -263,6 +263,12 @@ bool DecoderBase::SyncPositionMap(void)
         m_parent->SetFileLength(length, totframes);
         m_parent->SetKeyframeDistance(keyframedist);
         posmapStarted = true;
+
+        VERBOSE(VB_PLAYBACK,
+                QString("SyncPositionMap, new totframes: %1, new length: %2, "
+                        "posMap size: %3")
+                        .arg((long)totframes).arg(length)
+                        .arg(m_positionMap.size()));
     }
     return ret_val;
 }

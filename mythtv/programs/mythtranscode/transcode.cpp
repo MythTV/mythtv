@@ -377,6 +377,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         }
         // Recorder setup
         nvr->SetFrameRate(video_frame_rate);
+        nvr->SetTranscoding(true);
 
         // this is ripped from tv_rec SetupRecording. It'd be nice to merge
         nvr->SetOption("inpixfmt", FMT_YV12);
