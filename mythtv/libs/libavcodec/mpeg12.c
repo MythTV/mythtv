@@ -234,18 +234,25 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
             
             put_bits(&s->pb, 4, s->aspect_ratio_info);
             put_bits(&s->pb, 4, s->frame_rate_index);
-            v = (s->bit_rate + 399) / 400;
-            if (v > 0x3ffff && s->codec_id == CODEC_ID_MPEG1VIDEO)
-                v = 0x3ffff;
-            put_bits(&s->pb, 18, v & 0x3FFFF);
-            put_bits(&s->pb, 1, 1); /* marker */
+
+            if(s->avctx->rc_max_rate){
+                v = (s->avctx->rc_max_rate + 399) / 400;
+                if (v > 0x3ffff && s->codec_id == CODEC_ID_MPEG1VIDEO)
+                    v = 0x3ffff;
+            }else{
+                v= 0x3FFFF;
+            }
 
             if(s->avctx->rc_buffer_size)
                 vbv_buffer_size = s->avctx->rc_buffer_size;
             else
                 /* VBV calculation: Scaled so that a VCD has the proper VBV size of 40 kilobytes */
-                vbv_buffer_size = (( 20 * s->bit_rate) / (1151929 / 2)) * 8 * 1024;	 
-            put_bits(&s->pb, 10, ((vbv_buffer_size + 16383) / 16384) & 0x3FF); 
+                vbv_buffer_size = (( 20 * s->bit_rate) / (1151929 / 2)) * 8 * 1024;
+            vbv_buffer_size= (vbv_buffer_size + 16383) / 16384;
+
+            put_bits(&s->pb, 18, v & 0x3FFFF);
+            put_bits(&s->pb, 1, 1); /* marker */
+            put_bits(&s->pb, 10, vbv_buffer_size & 0x3FF);
             put_bits(&s->pb, 1, 1); /* constrained parameter flag */
             
             ff_write_quant_matrix(&s->pb, s->avctx->intra_matrix);
@@ -281,7 +288,7 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
             put_bits(&s->pb, 1, 1);
             put_bits(&s->pb, 6, (uint32_t)((time_code / fps) % 60));
             put_bits(&s->pb, 6, (uint32_t)((time_code % fps) / MPEG1_FRAME_RATE_BASE));
-            put_bits(&s->pb, 1, 1); /* closed gop */
+            put_bits(&s->pb, 1, 0); /* closed gop */
             put_bits(&s->pb, 1, 0); /* broken link */
         }
 
@@ -392,13 +399,19 @@ void mpeg1_encode_picture_header(MpegEncContext *s, int picture_number)
     // RAL: Forward f_code also needed for B frames
     if (s->pict_type == P_TYPE || s->pict_type == B_TYPE) {
         put_bits(&s->pb, 1, 0); /* half pel coordinates */
-        put_bits(&s->pb, 3, s->f_code); /* forward_f_code */
+        if(s->codec_id == CODEC_ID_MPEG1VIDEO)
+            put_bits(&s->pb, 3, s->f_code); /* forward_f_code */
+        else
+            put_bits(&s->pb, 3, 7); /* forward_f_code */
     }
     
     // RAL: Backward f_code necessary for B frames
     if (s->pict_type == B_TYPE) {
         put_bits(&s->pb, 1, 0); /* half pel coordinates */
-        put_bits(&s->pb, 3, s->b_code); /* backward_f_code */
+        if(s->codec_id == CODEC_ID_MPEG1VIDEO)
+            put_bits(&s->pb, 3, s->b_code); /* backward_f_code */
+        else
+            put_bits(&s->pb, 3, 7); /* backward_f_code */
     }
 
     put_bits(&s->pb, 1, 0); /* extra bit picture */
@@ -406,10 +419,18 @@ void mpeg1_encode_picture_header(MpegEncContext *s, int picture_number)
     if(s->codec_id == CODEC_ID_MPEG2VIDEO){
         put_header(s, EXT_START_CODE);
         put_bits(&s->pb, 4, 8); //pic ext
-        put_bits(&s->pb, 4, s->f_code);
-        put_bits(&s->pb, 4, s->f_code);
-        put_bits(&s->pb, 4, s->b_code);
-        put_bits(&s->pb, 4, s->b_code);
+        if (s->pict_type == P_TYPE || s->pict_type == B_TYPE) {
+            put_bits(&s->pb, 4, s->f_code);
+            put_bits(&s->pb, 4, s->f_code);
+        }else{
+            put_bits(&s->pb, 8, 255);
+        }
+        if (s->pict_type == B_TYPE) {
+            put_bits(&s->pb, 4, s->b_code);
+            put_bits(&s->pb, 4, s->b_code);
+        }else{
+            put_bits(&s->pb, 8, 255);
+        }
         put_bits(&s->pb, 2, s->intra_dc_precision);
         put_bits(&s->pb, 2, s->picture_structure= PICT_FRAME);
         put_bits(&s->pb, 1, s->top_field_first);

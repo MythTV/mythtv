@@ -13,10 +13,10 @@ extern "C" {
 
 #include "common.h"
 
-#define LIBAVCODEC_VERSION_INT 0x000406
-#define LIBAVCODEC_VERSION     "0.4.6"
-#define LIBAVCODEC_BUILD       4676
-#define LIBAVCODEC_BUILD_STR   "4676"
+#define LIBAVCODEC_VERSION_INT 0x000408
+#define LIBAVCODEC_VERSION     "0.4.8"
+#define LIBAVCODEC_BUILD       4677
+#define LIBAVCODEC_BUILD_STR   "4677"
 
 #define LIBAVCODEC_IDENT	"FFmpeg" LIBAVCODEC_VERSION "b" LIBAVCODEC_BUILD_STR
 
@@ -61,11 +61,14 @@ enum CodecID {
     CODEC_ID_AAC,
     CODEC_ID_MPEG4AAC,
     CODEC_ID_ASV1,
+    CODEC_ID_ASV2,
     CODEC_ID_FFV1,
     CODEC_ID_4XM,
     CODEC_ID_VCR1,
     CODEC_ID_CLJR,
     CODEC_ID_MDEC,
+    CODEC_ID_ROQ,
+    CODEC_ID_INTERPLAY_VIDEO,
 
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE,
@@ -88,7 +91,12 @@ enum CodecID {
     /* RealAudio codecs*/
     CODEC_ID_RA_144,
     CODEC_ID_RA_288,
+
+    /* various DPCM codecs */
+    CODEC_ID_ROQ_DPCM,
+    CODEC_ID_INTERPLAY_DPCM,
 };
+#define CODEC_ID_MPEGVIDEO CODEC_ID_MPEG1VIDEO
 
 enum CodecType {
     CODEC_TYPE_UNKNOWN = -1,
@@ -354,8 +362,9 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
 #define FF_QSCALE_TYPE_MPEG2	1
 
 #define FF_BUFFER_TYPE_INTERNAL 1
-#define FF_BUFFER_TYPE_USER     2 ///< Direct rendering buffers
-#define FF_BUFFER_TYPE_SHARED   4 ///< buffer from somewher else, dont dealloc
+#define FF_BUFFER_TYPE_USER     2 ///< Direct rendering buffers (image is (de)allocated by user)
+#define FF_BUFFER_TYPE_SHARED   4 ///< buffer from somewher else, dont dealloc image (data/base)
+#define FF_BUFFER_TYPE_COPY     8 ///< just a (modified) copy of some other buffer, dont dealloc anything
 
 
 #define FF_I_TYPE 1 // Intra
@@ -1306,6 +1315,7 @@ extern AVCodec wmv2_encoder;
 extern AVCodec huffyuv_encoder;
 extern AVCodec h264_encoder;
 extern AVCodec asv1_encoder;
+extern AVCodec asv2_encoder;
 extern AVCodec vcr1_encoder;
 extern AVCodec ffv1_encoder;
 extern AVCodec mdec_encoder;
@@ -1347,13 +1357,18 @@ extern AVCodec amr_nb_encoder;
 extern AVCodec aac_decoder;
 extern AVCodec mpeg4aac_decoder;
 extern AVCodec asv1_decoder;
+extern AVCodec asv2_decoder;
 extern AVCodec vcr1_decoder;
 extern AVCodec cljr_decoder;
 extern AVCodec ffv1_decoder;
 extern AVCodec fourxm_decoder;
 extern AVCodec mdec_decoder;
+extern AVCodec roq_decoder;
+extern AVCodec interplay_video_decoder;
 extern AVCodec ra_144_decoder;
 extern AVCodec ra_288_decoder;
+extern AVCodec roq_dpcm_decoder;
+extern AVCodec interplay_dpcm_decoder;
 
 /* pcm codecs */
 #define PCM_CODEC(id, name) \

@@ -1,4 +1,4 @@
-/* 
+/*
  * MPEG1/2 mux/demux
  * Copyright (c) 2000, 2001, 2002 Fabrice Bellard.
  *
@@ -429,7 +429,7 @@ static int mpegps_probe(AVProbeData *p)
                 code == PROGRAM_STREAM_MAP ||
                 code == PRIVATE_STREAM_1 ||
                 code == PADDING_STREAM)
-                return AVPROBE_SCORE_MAX - 1;
+                return AVPROBE_SCORE_MAX - 2;
             else
                 return 0;
         }

@@ -7,7 +7,6 @@
     (c) 2002, 2003 Thor Sigvaldason, Dan Morphis and Isaac Richards
 */
 
-#include "../../config.h"
 #include "lcddevice.h"
 #include "mythcontext.h"
 #include "mythdialogs.h"

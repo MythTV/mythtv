@@ -5,9 +5,12 @@
 extern "C" {
 #endif
 
-#define LIBAVFORMAT_VERSION_INT 0x000406  
-#define LIBAVFORMAT_VERSION     "0.4.6"
+#define LIBAVFORMAT_VERSION_INT 0x000408  
+#define LIBAVFORMAT_VERSION     "0.4.8"
 #define LIBAVFORMAT_BUILD       4606
+#define LIBAVFORMAT_BUILD_STR   "4606"
+
+#define LIBAVFORMAT_IDENT      "FFmpeg" LIBAVFORMAT_VERSION "b" LIBAVFORMAT_BUILD_STR
 
 #define CONFIG_RISKY 1
 
@@ -59,7 +62,7 @@ int av_new_packet(AVPacket *pkt, int size, int64_t startpos);
 static inline void av_free_packet(AVPacket *pkt)
 {
     if (pkt && pkt->destruct) {
-       pkt->destruct(pkt);
+	pkt->destruct(pkt);
     }
 }
 
@@ -226,7 +229,7 @@ typedef struct AVFormatContext {
     /* decoding: position of the first frame of the component, in
        AV_TIME_BASE fractional seconds. NEVER set this value directly:
        it is deduced from the AVStream values.  */
-    int64_t start_time;
+    int64_t start_time; 
     /* decoding: duration of the stream, in AV_TIME_BASE fractional
        seconds. NEVER set this value directly: it is deduced from the
        AVStream values.  */

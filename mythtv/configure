@@ -19,6 +19,7 @@ TMPH="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.h"
 
 # default parameters
 prefix="/usr/local"
+mandir=""
 cross_prefix=""
 cc="gcc"
 ar="ar"
@@ -51,6 +52,9 @@ case "$cpu" in
   sun4u)
     cpu="sparc64"
   ;;
+  sh4)
+    cpu="sh4"
+  ;;
   *)
     cpu="unknown"
   ;;
@@ -64,14 +68,12 @@ network="yes"
 zlib="yes"
 mp3lame="no"
 vorbis="no"
-lcdproc="no"
 faad="no"
 faadbin="no"
 a52="yes"
 a52bin="no"
 pp="yes"
 shared_pp="no"
-win32="no"
 mingw32="no"
 cygwin="no"
 os2="no"
@@ -98,8 +100,7 @@ risky="yes"
 small="no"
 amr_nb="no"
 amr_nb_fixed="no"
-xvmc="no"
-xvmclib="XvMCNVIDIA"
+sunmlib="no"
 
 # OS specific
 targetos=`uname -s`
@@ -175,7 +176,7 @@ case "$gcc_version" in
 *2.95*) 
 CFLAGS="-no-cpp-precomp -pipe -O3 -fomit-frame-pointer"
 ;;
-*3.3*)
+*3.3*) 
 CFLAGS="-no-cpp-precomp -pipe -O3 -fomit-frame-pointer -mdynamic-no-pic -force_cpusubtype_ALL"
 ;;
 *) 
@@ -190,6 +191,10 @@ dv1394="no"
 ffserver="no"
 network="no"
 mingw32="yes"
+LIBPREF=""
+LIBSUF=".lib"
+SLIBPREF=""
+SLIBSUF=".dll"
 ;;
 CYGWIN*)
 v4l="no"
@@ -264,6 +269,8 @@ for opt do
   case "$opt" in
   --prefix=*) prefix=`echo $opt | cut -d '=' -f 2`
   ;;
+  --mandir=*) mandir=`echo $opt | cut -d '=' -f 2`
+  ;;
   --source-path=*) source_path=`echo $opt | cut -d '=' -f 2`
   ;;
   --cross-prefix=*) cross_prefix=`echo $opt | cut -d '=' -f 2`
@@ -322,15 +329,9 @@ for opt do
   ;;
   --disable-simple_idct) simpleidct="no"
   ;;
-  --enable-win32) win32="yes"
-  ;;
   --enable-mingw32) mingw32="yes"
   ;;
   --enable-shared) lshared="yes"
-  ;;
-  --enable-lcd) lcdproc="yes"
-  ;;
-  --disable-lcd) lcdproc="no"
   ;;
   --disable-mpegaudio-hp) mpegaudio_hp="no"
   ;;
@@ -346,9 +347,7 @@ for opt do
   ;;
   --enable-amr_nb-fixed) amr_nb_fixed="yes"
   ;;
-  --enable-xvmc) xvmc="yes"
-  ;;
-  --with-xvmclib=*) xvmclib=`echo $opt | cut -d '=' -f 2`
+  --enable-sunmlib) sunmlib="yes"
   ;;
   esac
 done
@@ -375,59 +374,70 @@ fi
 TUNECPU="generic"
 if test $tune != "generic"; then
     case $tune in
-       601|ppc601|PowerPC601)
-           CFLAGS="$CFLAGS -mcpu=601"
-           if test $altivec = "yes"; then
-               echo "WARNING: tuning for PPC601 but altivec enabled !";
-           fi
-           TUNECPU=ppc601
-       ;;
-       603*|ppc603*|PowerPC603*)
-           CFLAGS="$CFLAGS -mcpu=603"
-           if test $altivec = "yes"; then
-               echo "WARNING: tuning for PPC603 but altivec enabled !";
-           fi
-           TUNECPU=ppc603
-       ;;
-       604*|ppc604*|PowerPC604*)
-           CFLAGS="$CFLAGS -mcpu=604"
-           if test $altivec = "yes"; then
-               echo "WARNING: tuning for PPC604 but altivec enabled !";
-           fi
-           TUNECPU=ppc604
-       ;;
-       G3|75*|ppc75*|PowerPC75*)
-           CFLAGS="$CFLAGS -mcpu=750 -mtune=750"
-           if test $altivec = "yes"; then
-               echo "WARNING: tuning for PPC75x but altivec enabled !";
-           fi
-           TUNECPU=ppc750
-       ;;
-       G4|745*|ppc745*|PowerPC745*)
-           CFLAGS="$CFLAGS -mcpu=7450 -mtune=7450"
-           if test $altivec = "no"; then
-               echo "WARNING: tuning for PPC745x but altivec disabled !";
-           fi
-           TUNECPU=ppc7450
-       ;;
-       74*|ppc74*|PowerPC74*)
-           CFLAGS="$CFLAGS -mcpu=7400 -mtune=7400"
-           if test $altivec = "no"; then
-               echo "WARNING: tuning for PPC74xx but altivec disabled !";
-           fi
-           TUNECPU=ppc7450
-       ;;
-       G5|970|ppc970|PowerPC970|power4*|Power4*)
-           CFLAGS="$CFLAGS -mcpu=970 -mtune=970 -mpowerpc64 -force_cpusubtype_ALL "
-           if test $altivec = "no"; then
-               echo "WARNING: tuning for PPC970 but altivec disabled !";
-           fi
-           TUNECPU=ppc970
-       ;;
-       *)
-       echo "WARNING: unknown CPU "$tune", ignored"
-       ;;
+	601|ppc601|PowerPC601)
+	    CFLAGS="$CFLAGS -mcpu=601"
+	    if test $altivec = "yes"; then
+		echo "WARNING: tuning for PPC601 but altivec enabled !";
+	    fi
+	    TUNECPU=ppc601
+	;;
+	603*|ppc603*|PowerPC603*)
+	    CFLAGS="$CFLAGS -mcpu=603"
+	    if test $altivec = "yes"; then
+		echo "WARNING: tuning for PPC603 but altivec enabled !";
+	    fi
+	    TUNECPU=ppc603
+	;;
+	604*|ppc604*|PowerPC604*)
+	    CFLAGS="$CFLAGS -mcpu=604"
+	    if test $altivec = "yes"; then
+		echo "WARNING: tuning for PPC604 but altivec enabled !";
+	    fi
+	    TUNECPU=ppc604
+	;;
+	G3|g3|75*|ppc75*|PowerPC75*)
+	    CFLAGS="$CFLAGS -mcpu=750 -mtune=750"
+	    if test $altivec = "yes"; then
+		echo "WARNING: tuning for PPC75x but altivec enabled !";
+	    fi
+	    TUNECPU=ppc750
+	;;
+	G4|g4|745*|ppc745*|PowerPC745*)
+	    CFLAGS="$CFLAGS -mcpu=7450 -mtune=7450"
+	    if test $altivec = "no"; then
+		echo "WARNING: tuning for PPC745x but altivec disabled !";
+	    fi
+	    TUNECPU=ppc7450
+	;;
+	74*|ppc74*|PowerPC74*)
+	    CFLAGS="$CFLAGS -mcpu=7400 -mtune=7400"
+	    if test $altivec = "no"; then
+		echo "WARNING: tuning for PPC74xx but altivec disabled !";
+	    fi
+	    TUNECPU=ppc7400
+	;;
+	G5|g5|970|ppc970|PowerPC970|power4*|Power4*)
+	    CFLAGS="$CFLAGS -mcpu=970 -mtune=970 -mpowerpc64 -force_cpusubtype_ALL "
+	    if test $altivec = "no"; then
+		echo "WARNING: tuning for PPC970 but altivec disabled !";
+	    fi
+	    TUNECPU=ppc970
+	;;
+	*)
+	echo "WARNING: unknown CPU "$tune", ignored"
+	;;
     esac
+fi
+
+# AltiVec flags: The FSF version of GCC differs from the Darwin version 
+if test $cpu = "powerpc"; then
+    if test $altivec = "yes"; then
+        if test "$darwin" = "yes"; then
+            CFLAGS="$CFLAGS -faltivec"
+        else
+            CFLAGS="$CFLAGS -maltivec -mabi=altivec"
+        fi
+    fi
 fi
 
 # See if we have <altivec.h>
@@ -437,7 +447,7 @@ int main( void ) { return 0; }
 EOF
 
 _altivec_h="no"
-if $cc -o $TMPE $TMPC 2> /dev/null ; then
+if $cc $CFLAGS -o $TMPE $TMPC 2> /dev/null ; then
 _altivec_h="yes"
 fi
 
@@ -461,11 +471,7 @@ int main(void) {
 }
 EOF
 fi
-if test "$darwin" = "yes"; then
-$cc -o $TMPE $TMPC -faltivec 2> /dev/null || altivec="no"
-else
-$cc -o $TMPE $TMPC -maltivec -mabi=altivec 2> /dev/null || altivec="no"
-fi
+$cc $CFLAGS -o $TMPE $TMPC 2> /dev/null || altivec="no"
 fi
 
 # Can only do mmi on mips
@@ -493,16 +499,7 @@ if test -z "$CFLAGS"; then
     CFLAGS="-O3"
 fi
 
-if test "$win32" = "yes" ; then
-    cross_prefix="i386-mingw32msvc-"
-    v4l="no"
-    audio_oss="no"
-    dv1394="no"
-    network="no"
-fi
-
 if test "$mingw32" = "yes" ; then
-    cross_prefix=""
     v4l="no"
     audio_oss="no"
     dv1394="no"
@@ -575,6 +572,16 @@ EOF
 strptime=no
 if $cc -o $TMPE $TMPC 2> /dev/null ; then
   strptime=yes
+fi
+
+cat > $TMPC << EOF
+#include <time.h>
+int main( void ) { localtime_r(NULL, NULL); }
+EOF
+
+localtime_r=no
+if $cc -o $TMPE $TMPC 2> /dev/null ; then
+  localtime_r=yes
 fi
 
 if test "$zlib" = "yes"; then
@@ -723,25 +730,6 @@ fi
 #fi
 #fi
 
-
-############################################
-# XVMC probe
-if test "$xvmc" != "no" ; then
-  xvmc="no"
-  cat > $TMPC << EOF
-#include <X11/Xlib.h>
-#include <X11/extensions/Xvlib.h>
-#include <X11/extensions/XvMClib.h>
-int main(void) {
-  (void) XvMCQueryExtension(0,0,0);
-  (void) XvMCCreateContext(0,0,0,0,0,0,0);
-  return 0; }
-EOF
-  if $cc -o $TMPE $TMPC -L/usr/X11R6/lib -lXvMC -l$xvmclib -lXv -lX11 -lXext ; then
-    xvmc="yes"
-  fi
-fi
-
 if test "$sdl" = "no" ; then
    ffplay=no
 fi
@@ -749,6 +737,10 @@ fi
 if test "$small" = "yes"; then
 #  CFLAGS=${CFLAGS//-O3/-Os}
   CFLAGS="$CFLAGS -Os"
+fi
+
+if test x"$mandir" = x""; then
+mandir="${prefix}/man"
 fi
 
 if test x"$1" = x"-h" -o x"$1" = x"--help" ; then
@@ -761,6 +753,7 @@ EOF
 echo "Standard options:"
 echo "  --help                   print this message"
 #echo "  --prefix=PREFIX          install in PREFIX [$prefix]"
+#echo "  --mandir=DIR             man documentation in DIR [PREFIX/man]"
 #echo "  --enable-mp3lame         enable mp3 encoding via libmp3lame [default=no]"
 #echo "  --enable-vorbis          enable vorbis support via libvorbisenc [default=no]"
 #echo "  --enable-faad            enable faad support via libfaad [default=no]"
@@ -774,6 +767,7 @@ echo "  --help                   print this message"
 #echo "  --enable-shared          build shared libraries [default=no]"
 #echo "  --enable-amr_nb          enable amr_nb audio codec"
 #echo "  --enable-amr_nb-fixed    use fixed point for amr-nb codec"
+#echo "  --enable-sunmlib         use Sun medialib [default=no]"
 #echo ""
 echo "Advanced options (experts only):"
 #echo "  --source-path=PATH       path of source code [$source_path]"
@@ -825,11 +819,6 @@ fi
 if test $cpu = "powerpc"; then
 echo "AltiVec enabled  $altivec"
 fi
-echo "lcdproc support   $lcdproc"
-echo "XvMC support      $xvmc"
-if test $xvmc = "yes"; then
-  echo "XvMC Library      $xvmclib"
-fi
 #echo "gprof enabled    $gprof"
 #echo "zlib enabled     $zlib"
 #echo "mp3lame enabled  $mp3lame"
@@ -852,6 +841,7 @@ fi
 #echo "Imlib2 support   $imlib2"
 #echo "freetype support $freetype2"
 #fi
+#echo "Sun medialib support"  $sunmlib
 #echo "AMR-NB float support"  $amr_nb
 #echo "AMR-NB fixed support"  $amr_nb_fixed
 
@@ -883,6 +873,9 @@ elif test "$cpu" = "powerpc" ; then
 elif test "$cpu" = "mips" ; then
   echo "TARGET_ARCH_MIPS=yes" >> config.mak
   echo "#define ARCH_MIPS 1" >> $TMPH
+elif test "$cpu" = "sh4" ; then
+  echo "TARGET_ARCH_SH4=yes" >> config.mak
+  echo "#define ARCH_SH4 1" >> $TMPH
 fi
 echo "#define TUNECPU $TUNECPU" >> $TMPH
 if test "$bigendian" = "yes" ; then
@@ -893,6 +886,9 @@ if test "$mmx" = "yes" ; then
   echo "TARGET_MMX=yes" >> config.mak
   echo "#define HAVE_MMX 1" >> $TMPH
   echo "#define __CPU__ 586" >> $TMPH
+fi
+if test "$mingw32" = "yes" ; then
+  echo "TARGET_MINGW32=yes" >> config.mak
 fi
 #if test "$builtin_vector" = "yes" ; then
 #  echo "TARGET_BUILTIN_VECTOR=yes" >> config.mak
@@ -922,11 +918,21 @@ if test "$strptime" = "yes" ; then
 else
   echo "BUILD_STRPTIME=yes" >> config.mak
 fi
+if test "$localtime_r" = "yes" ; then
+  echo "#define HAVE_LOCALTIME_R 1" >> $TMPH
+else
+  echo "BUILD_LOCALTIME_R=yes" >> config.mak
+fi
 if test "$imlib2" = "yes" ; then
   echo "HAVE_IMLIB2=yes" >> config.mak
 fi
 if test "$freetype2" = "yes" ; then
   echo "HAVE_FREETYPE2=yes" >> config.mak
+fi
+if test "$sunmlib" = "yes" ; then
+  echo "HAVE_MLIB=yes" >> config.mak
+  echo "#define HAVE_MLIB 1" >> $TMPH
+  extralibs="$extralibs -lmlib"
 fi
 if test "$sdl" = "yes" ; then
   echo "CONFIG_SDL=yes" >> config.mak
@@ -944,10 +950,6 @@ fi
 if test "$lshared" = "yes" ; then
   echo "BUILD_SHARED=yes" >> config.mak
   echo "PIC=-fPIC" >> config.mak
-fi
-if test "$lcdproc" = "yes" ; then
-  echo "BUILD_LCD=yes" >> config.mak
-  echo "#define LCD_DEVICE 1" >> $TMPH
 fi
 echo "" >>config.mak
 # if you do not want to use encoders, disable that.
@@ -1043,15 +1045,12 @@ if test "$faadbin" = "yes" ; then
   echo "CONFIG_FAADBIN=yes" >> config.mak
 fi
 
-if test "$win32" = "yes" ; then
-  echo "#define CONFIG_WIN32 1" >> $TMPH
-  echo "CONFIG_WIN32=yes" >> config.mak
-fi
-
 if test "$mingw32" = "yes" ; then
   echo "#define CONFIG_WIN32 1" >> $TMPH
   echo "CONFIG_WIN32=yes" >> config.mak
+  echo "#ifndef __MINGW32__" >> $TMPH
   echo "#define __MINGW32__ 1" >> $TMPH
+  echo "#endif" >> $TMPH
   echo "__MINGW32__=1" >> config.mak
 fi
 
@@ -1111,11 +1110,6 @@ fi
 if test "$risky" = "yes" ; then
   echo "#define CONFIG_RISKY 1" >> $TMPH
   echo "CONFIG_RISKY=yes" >> config.mak
-fi
-if test "$xvmc" = "yes" ; then
-  echo "#define HAVE_XVMC 1" >> $TMPH
-  echo "CONFIG_XVMC=yes" >> config.mak
-  echo "CONFIG_XVMC_LIBS=$xvmclib" >> config.mak
 fi
 
 echo "#define restrict $_restrict" >> $TMPH

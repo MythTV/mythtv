@@ -65,7 +65,7 @@ static inline int mdec_decode_block_intra(MDECContext *a, DCTELEM *block, int n)
 
     /* DC coef */
     if(a->version==2){
-        block[0]= get_sbits(&a->gb, 11);
+        block[0]= 2*get_sbits(&a->gb, 10) + 1024;
     }else{
         component = (n <= 3 ? 0 : n - 4 + 1);
         diff = decode_dc(&a->gb, component);
@@ -89,30 +89,25 @@ static inline int mdec_decode_block_intra(MDECContext *a, DCTELEM *block, int n)
                 i += run;
                 j = scantable[i];
                 level= (level*qscale*quant_matrix[j])>>3;
-                level= (level-1)|1;
+//                level= (level-1)|1;
                 level = (level ^ SHOW_SBITS(re, &a->gb, 1)) - SHOW_SBITS(re, &a->gb, 1);
                 LAST_SKIP_BITS(re, &a->gb, 1);
             } else {
                 /* escape */
                 run = SHOW_UBITS(re, &a->gb, 6)+1; LAST_SKIP_BITS(re, &a->gb, 6);
                 UPDATE_CACHE(re, &a->gb);
-                level = SHOW_SBITS(re, &a->gb, 8); SKIP_BITS(re, &a->gb, 8);
-                if (level == -128) {
-                    level = SHOW_UBITS(re, &a->gb, 8) - 256; LAST_SKIP_BITS(re, &a->gb, 8);
-                } else if (level == 0) {
-                    level = SHOW_UBITS(re, &a->gb, 8)      ; LAST_SKIP_BITS(re, &a->gb, 8);
-                }
+                level = SHOW_SBITS(re, &a->gb, 10); SKIP_BITS(re, &a->gb, 10);
                 i += run;
                 j = scantable[i];
-/*                if(level<0){
+                if(level<0){
                     level= -level;
-                    level= (level*qscale*quant_matrix[j])>>4;
+                    level= (level*qscale*quant_matrix[j])>>3;
                     level= (level-1)|1;
                     level= -level;
-                }else{*/
-                    level= (level*qscale*quant_matrix[j])>>4;
-/*                    level= (level-1)|1;
-                }*/
+                }else{
+                    level= (level*qscale*quant_matrix[j])>>3;
+                    level= (level-1)|1;
+                }
             }
             if (i > 63){
                 fprintf(stderr, "ac-tex damaged at %d %d\n", a->mb_x, a->mb_y);
@@ -129,11 +124,12 @@ static inline int mdec_decode_block_intra(MDECContext *a, DCTELEM *block, int n)
 
 static inline int decode_mb(MDECContext *a, DCTELEM block[6][64]){
     int i;
+    const int block_index[6]= {5,4,0,1,2,3};
 
     a->dsp.clear_blocks(block[0]);
     
-    for(i=5; i>=0; i--){
-        if( mdec_decode_block_intra(a, block[i], i) < 0) 
+    for(i=0; i<6; i++){
+        if( mdec_decode_block_intra(a, block[ block_index[i] ], block_index[i]) < 0) 
             return -1;
     }
     return 0;
@@ -189,39 +185,28 @@ static int decode_frame(AVCodecContext *avctx,
     a->last_dc[2]= 0;
 
     a->bitstream_buffer= av_fast_realloc(a->bitstream_buffer, &a->bitstream_buffer_size, buf_size + FF_INPUT_BUFFER_PADDING_SIZE);
-    for(i=0; 2*i<buf_size; i+=2){
-        ((uint16_t*)a->bitstream_buffer)[i]  = ((uint16_t*)buf)[i+1];
-        ((uint16_t*)a->bitstream_buffer)[i+1]= ((uint16_t*)buf)[i  ];
+    for(i=0; i<buf_size; i+=2){
+        a->bitstream_buffer[i]  = buf[i+1];
+        a->bitstream_buffer[i+1]= buf[i  ];
     }
-//    a->dsp.bswap_buf((uint32_t*)a->bitstream_buffer, (uint32_t*)buf, buf_size/4);
     init_get_bits(&a->gb, a->bitstream_buffer, buf_size*8);
     
+    /* skip over 4 preamble bytes in stream (typically 0xXX 0xXX 0x00 0x38) */
+    skip_bits(&a->gb, 32);
+
     a->qscale=  get_bits(&a->gb, 16);
     a->version= get_bits(&a->gb, 16);
-    skip_bits(&a->gb, 8*8); 
     
-    printf("qscale:%d, version:%d\n", a->qscale, a->version);
+    printf("qscale:%d (0x%X), version:%d (0x%X)\n", a->qscale, a->qscale, a->version, a->version);
     
-    for(a->mb_y=0; a->mb_y<a->mb_height; a->mb_y++){
-        for(a->mb_x=0; a->mb_x<a->mb_width; a->mb_x++){
+    for(a->mb_x=0; a->mb_x<a->mb_width; a->mb_x++){
+        for(a->mb_y=0; a->mb_y<a->mb_height; a->mb_y++){
             if( decode_mb(a, a->block) <0)
                 return -1;
              
             idct_put(a, a->mb_x, a->mb_y);
         }
     }
-
-#if 0    
-int i;
-printf("%d %d\n", 8*buf_size, get_bits_count(&a->gb));
-for(i=get_bits_count(&a->gb); i<8*buf_size; i++){
-    printf("%d", get_bits1(&a->gb));
-}
-
-for(i=0; i<s->avctx->extradata_size; i++){
-    printf("%c\n", ((uint8_t*)s->avctx->extradata)[i]);
-}
-#endif
 
 //    p->quality= (32 + a->inv_qscale/2)/a->inv_qscale;
 //    memset(p->qscale_table, p->quality, p->qstride*a->mb_height);
