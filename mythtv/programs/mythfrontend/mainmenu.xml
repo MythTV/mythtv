@@ -28,8 +28,8 @@
      <text lang="NL">Spelen</text>
      <text lang="FR">Jeux</text>
      <text lang="DE">Spiele</text>
-     <action>EXEC mythgame</action>
-     <depends>gamemenu.xml</depends>
+     <action>PLUGIN mythgame</action>
+     <depends>mythgame</depends>
    </button>
 
    <button>

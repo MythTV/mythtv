@@ -35,6 +35,13 @@
      <action>CONFIGPLUGIN mythmusic</action>
      <depends>mythmusic</depends>
    </button>
+ 
+   <button>
+     <type>GAME</type>
+     <text>Game Settings</text>
+     <action>CONFIGPLUGIN mythgame</action>
+     <depends>mythgame</depends>
+   </button>
 
    <button>
       <type>IMAGES</type>
