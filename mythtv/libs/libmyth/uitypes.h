@@ -1,7 +1,9 @@
 #ifndef UIDATATYPES_H_
 #define UIDATATYPES_H_
 
+#include <qobject.h>
 #include <qstring.h>
+#include <qstringlist.h>
 #include <qrect.h>
 #include <qfile.h>
 #include <qmap.h>
@@ -56,7 +58,7 @@ class LayerSet
     vector<UIType *> *allTypes;
 };
 
-class UIType
+class UIType : public QObject
 {
   public:
     UIType(const QString &name);
@@ -258,6 +260,85 @@ class UIStatusBarType : public UIType
     QPixmap m_container;
     QPixmap m_filler;
     QPoint m_location;
+};
+
+class GenericTree
+{
+    //
+    //  This is used by the UIType below 
+    //  (UIManagedTreeListType) to fill it
+    //  with arbitrary simple data types and
+    //  allow that object to fire SIGNALS
+    //  when nodes, leafnodes, etc. are reached
+    //  by the user
+    //
+
+  public:
+  
+    GenericTree();
+    GenericTree(const QString a_string);
+    GenericTree(int an_int);
+    ~GenericTree();
+    
+    GenericTree* addNode(QString a_string);
+    GenericTree* addNode(QString a_string, int an_int);
+    void         init();
+    void         setInt(int an_int){my_int = an_int;}
+    void         setParent(GenericTree* a_parent){my_parent = a_parent;}
+    QString      getString(){return my_string;}
+
+  private:
+  
+    QString                my_string;
+    QStringList            my_stringlist;
+    int                    my_int;
+    QPtrList <GenericTree> my_subnodes;
+    GenericTree*           my_parent;
+};
+
+class UIManagedTreeListType : public UIType
+{
+    Q_OBJECT
+    
+    //
+    //  The idea here is a generalized notion of a list that
+    //  shows underlying tree data with theme-ui configurable
+    //  control over how much to display, where to display it,
+    //  etc.
+    //
+    //  If you just want a straight list of data, you probably
+    //  don't need this
+    //
+    typedef QMap <int, QRect> CornerMap;
+
+    
+
+  public:
+
+    UIManagedTreeListType(const QString &name);
+    ~UIManagedTreeListType();
+
+    void setArea(QRect an_area){area = an_area;}
+    void setBins(int l_bins){bins = l_bins;}
+    void setBinAreas(CornerMap some_bin_corners){bin_corners = some_bin_corners;}
+    void Draw(QPainter *, int drawlayer, int context);
+    void assignTreeData(GenericTree *a_tree);
+
+  public slots:
+  
+    void sayHelloWorld(); // debugging;
+
+  signals:
+  
+    void leafNodeSelected(QString node_string, int node_int);
+
+  private:
+    
+    QRect area;
+    int   bins;
+    
+    CornerMap   bin_corners;
+    GenericTree *my_tree_data;
 };
 
 #endif

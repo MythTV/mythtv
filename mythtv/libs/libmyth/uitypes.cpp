@@ -63,6 +63,7 @@ void LayerSet::Draw(QPainter *dr, int drawlayer, int context)
 // **************************************************************
 
 UIType::UIType(const QString &name)
+      : QObject(NULL, name)
 {
     m_name = name;
     m_debug = false;
@@ -551,5 +552,104 @@ void UIStatusBarType::Draw(QPainter *dr, int drawlayer, int context)
         dr->drawPixmap(m_location.x(), m_location.y(), m_container);
         dr->drawPixmap(m_location.x(), m_location.y(), m_filler, 0, 0, width + m_fillerSpace);
     }
+}
+
+// ***************************************************************
+
+GenericTree::GenericTree()
+{
+    init();
+}
+
+GenericTree::GenericTree(const QString a_string)
+{
+    init();
+    my_string = a_string;
+}
+
+GenericTree::GenericTree(int an_int)
+{
+    init();
+    my_int = an_int;
+}
+
+void GenericTree::init()
+{
+    my_parent = NULL;
+    my_string = "";
+    my_stringlist.clear();
+    my_int = 0;
+    my_subnodes.clear();
+    //my_subnodes.setAutoDelete(true);
+}
+
+GenericTree* GenericTree::addNode(QString a_string)
+{
+    GenericTree *new_node = new GenericTree(a_string);
+    new_node->setParent(this);
+    my_subnodes.append(new_node);
+    
+    return new_node;
+}
+
+GenericTree* GenericTree::addNode(QString a_string, int an_int)
+{
+    GenericTree *new_node = new GenericTree(a_string);
+    new_node->setInt(an_int);
+    new_node->setParent(this);
+    my_subnodes.append(new_node);
+    
+    return new_node;
+}
+
+GenericTree::~GenericTree()
+{
+}
+
+
+// ***************************************************************
+
+UIManagedTreeListType::UIManagedTreeListType(const QString & name)
+                     : UIType(name)
+{
+    bins = 0;
+    bin_corners.clear();
+    my_tree_data = NULL;
+}
+
+UIManagedTreeListType::~UIManagedTreeListType()
+{
+    //
+    //  Funny, I have yet to see this appear
+    //  (even when it isn't commented out)
+    //
+    cout << "Rage, rage against the dying of the light" << endl;
+}
+
+void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
+{
+    
+    //
+    //  This (obviously) doesn't do much yet.
+    //  The idea is to use the data in my_tree_data
+    //  to list in the available bins.
+    //
+
+    p->setPen(QColor(255,0,0));
+    CornerMap::Iterator it;
+    for ( it = bin_corners.begin(); it != bin_corners.end(); ++it )
+    {
+        p->drawRect(it.data());
+    }
+}
+
+void UIManagedTreeListType::assignTreeData(GenericTree *a_tree)
+{
+    my_tree_data = a_tree;
+}
+
+void UIManagedTreeListType::sayHelloWorld()
+{
+    cout << "From a UIManagedTreeListType Object: Hello World" << endl ;
 }
 

@@ -32,6 +32,7 @@ class XMLParse
     void parseTextArea(LayerSet *, QDomElement &);
     void parseStatusBar(LayerSet *, QDomElement &);
     void parseImage(LayerSet *, QDomElement &);
+    void parseManagedTreeList(LayerSet *, QDomElement &);
     void resizeImage(QPixmap *, QString);
   
   private:

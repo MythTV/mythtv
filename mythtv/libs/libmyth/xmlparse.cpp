@@ -376,6 +376,10 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
             {
                 parseStatusBar(container, info);
             }
+            else if (info.tagName() == "managedtreelist")
+            {
+                parseManagedTreeList(container, info);
+            }
             else if (info.tagName() == "area")
             {
                 area = parseRect(getFirstText(info));
@@ -899,3 +903,80 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
     sb->SetFillerImage(imgFiller);
     container->AddType(sb);
 }
+
+void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
+{
+    QRect area;
+    QRect binarea;
+    int bins = 1; 
+    
+    typedef QMap<int, QRect> CornerMap;
+    CornerMap bin_corners;
+    bin_corners.clear();
+    
+    QString name = element.attribute("name", "");
+    if (name.isNull() || name.isEmpty())
+    {
+        cerr << "ManagedTreeList needs a name\n";
+        exit(0);
+    }
+
+    QString order = element.attribute("draworder", "");
+    if (name.isNull() || name.isEmpty())
+    {
+        cerr << "ManagedTreeList needs an order\n";
+        exit(0);
+    }
+
+    QString bins_string = element.attribute("bins", "");
+    if (bins_string.toInt() > 0)
+    {
+        bins = bins_string.toInt();
+    }
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "area")
+            {
+                area = parseRect(getFirstText(info));
+                normalizeRect(area);
+            }
+            else if(info.tagName() == "binarea")
+            {
+                QString whichbin_string = info.attribute("bin", "");
+                cout << "I got whichbin_string = " << whichbin_string << endl ;
+                int whichbin = whichbin_string.toInt();
+                if(whichbin < 1)
+                {
+                    cerr << "xmlparse.o: Bad setting for bin number in binarea tag" << endl;
+                    exit(0);
+                }
+                if(whichbin > bins + 1)
+                {
+                    cerr << "xmlparse.o: Attempt to set binarea with a bin reference larger than number of bins" << endl ;
+                    exit(0);
+                }
+                binarea = parseRect(getFirstText(info));
+                normalizeRect(binarea);
+                bin_corners[whichbin] = binarea;
+            }
+            else
+            {
+                cerr << "Unknown: " << info.tagName() << " in ManagedTreeList\n";
+                exit(0);
+            }
+        }
+    }
+
+
+    UIManagedTreeListType *mtl = new UIManagedTreeListType(name);
+    mtl->setArea(area);
+    mtl->setBins(bins);
+    mtl->setBinAreas(bin_corners);
+    container->AddType(mtl);
+}
+
