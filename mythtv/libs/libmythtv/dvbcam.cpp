@@ -346,9 +346,6 @@ bool DVBCam::FindCaDescriptors(cCiCaPmt &capmt, const unsigned short *caids, int
                 {
                     if (ca_system_id == caids[i] && ca_pid != 0)
                     {
-                        if (slot == 1 && ca_system_id == 0x0B00)
-                            continue;
-
                         if (first_send)
                             fprintf(stderr,"Adding CA Descriptor (CASID=%0.4X, "
                                     "CAPID=%0.4X)\n", ca_system_id, ca_pid);

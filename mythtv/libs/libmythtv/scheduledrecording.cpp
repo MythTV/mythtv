@@ -382,11 +382,12 @@ void ScheduledRecording::doneRecording(QSqlDatabase* db,
     QString msg;
   
     msg = QString("Finished recording %1 on channel: %2")
-                  .arg(proginfo.title.utf8())
+                  .arg(proginfo.title)
                   .arg(proginfo.chanid);
 
-    VERBOSE(VB_GENERAL, msg);
-    gContext->LogEntry("scheduler", LP_NOTICE, "Finished recording", msg);
+    VERBOSE(VB_GENERAL, msg.local8Bit());
+    gContext->LogEntry("scheduler", LP_NOTICE, "Finished recording", 
+                       msg.utf8());
 
     addHistory(db, proginfo);
 }

@@ -931,7 +931,7 @@ void Scheduler::RunScheduler(void)
                     msg = QString("SUPPRESSED recording '%1' on channel"
                                   " %2 on cardid %3, sourceid %4.  Only"
                                   " %5 Megs of disk space available.")
-                        .arg(nextRecording->title.utf8())
+                        .arg(nextRecording->title.local8Bit())
                         .arg(nextRecording->chanid)
                         .arg(nextRecording->cardid)
                         .arg(nextRecording->sourceid)
@@ -950,7 +950,7 @@ void Scheduler::RunScheduler(void)
                 msg = QString("SUPPRESSED recording \"%1\" on channel: "
                               "%2 on cardid: %3, sourceid %4. Tuner "
                               "is locked by an external application.")
-                    .arg(nextRecording->title.utf8())
+                    .arg(nextRecording->title.local8Bit())
                     .arg(nextRecording->chanid)
                     .arg(nextRecording->cardid)
                     .arg(nextRecording->sourceid);
@@ -1014,12 +1014,13 @@ void Scheduler::RunScheduler(void)
             statuschanged = true;
 
             msg += QString(" \"%1\" on channel: %2 on cardid: %3, "
-                           "sourceid %4").arg(nextRecording->title.utf8())
+                           "sourceid %4").arg(nextRecording->title)
                 .arg(nextRecording->chanid)
                 .arg(nextRecording->cardid)
                 .arg(nextRecording->sourceid);
-            VERBOSE(VB_GENERAL, msg);
-            gContext->LogEntry("scheduler", LP_NOTICE, "Schedule Change", msg);
+            VERBOSE(VB_GENERAL, msg.local8Bit());
+            gContext->LogEntry("scheduler", LP_NOTICE, "Schedule Change", 
+                               msg.utf8());
         }
 
         if (statuschanged)

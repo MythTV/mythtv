@@ -59,7 +59,7 @@ static int SysLogLevel = 3;
 
 // Set these to 'true' for debug output:
 static bool DumpTPDUDataTransfer = false;
-static bool DebugProtocol = true;
+static bool DebugProtocol = false;
 static bool _connected = false;
 
 #define dbgprotocol(a...) if (DebugProtocol) fprintf(stderr, a)
