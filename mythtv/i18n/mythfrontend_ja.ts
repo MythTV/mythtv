@@ -3745,115 +3745,115 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>TXT off</source>
-        <translation type="unfinished"></translation>
+        <translation>TXT オフ</translation>
     </message>
     <message>
         <source>CC off</source>
-        <translation type="unfinished"></translation>
+        <translation>CC オフ</translation>
     </message>
     <message>
         <source>TXT on</source>
-        <translation type="unfinished"></translation>
+        <translation>TXT オン</translation>
     </message>
     <message>
         <source>CC</source>
-        <translation type="unfinished"></translation>
+        <translation>CC</translation>
     </message>
     <message>
         <source>Reactivate it</source>
-        <translation type="unfinished"></translation>
+        <translation>有効にする</translation>
     </message>
     <message>
         <source>TXT</source>
-        <translation type="unfinished"></translation>
+        <translation>TXT</translation>
     </message>
     <message>
         <source>CC/TXT disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>CC/TXT 無効</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished">分</translation>
+        <translation>分</translation>
     </message>
     <message>
         <source>Recording volume of the capture card</source>
-        <translation type="unfinished"></translation>
+        <translation>キャプチャーカードの録画音量</translation>
     </message>
     <message>
         <source>Enable interlaced DCT encoding</source>
-        <translation type="unfinished"></translation>
+        <translation>インターレースドDCTエンコーディング有効</translation>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced DCT encoding.  You probably want this when encoding interlaced video.</source>
-        <translation type="unfinished"></translation>
+        <translation>これをセットすると、MPEG4エンコーダーはインターレースドDCTエンコーディングを使用します。多分インターレースビデオには必要でしょう。</translation>
     </message>
     <message>
         <source>Enable interlaced motion estimation</source>
-        <translation type="unfinished"></translation>
+        <translation>インターレースドモーションエスティメーション有効</translation>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced motion estimation.  You probably want this when encoding interlaced video.</source>
-        <translation type="unfinished"></translation>
+        <translation>これをセットすると、MPEG4エンコーダーはインターレースドモーションエスティメーションを使用します。多分インターレースビデオには必要でしょう。</translation>
     </message>
     <message>
         <source>Keypress Application</source>
-        <translation type="unfinished"></translation>
+        <translation>キープレスアプリケーション</translation>
     </message>
     <message>
         <source>External application or script to run when a keypress is received by lirc</source>
-        <translation type="unfinished"></translation>
+        <translation>lircからキー入力が有った時に実行する外部アプリケーション又はスクリプト</translation>
     </message>
     <message>
         <source>LCD Displays Time</source>
-        <translation type="unfinished"></translation>
+        <translation>LCD表示時間</translation>
     </message>
     <message>
         <source>Display current time on idle LCD display. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="unfinished"></translation>
+        <translation>現在時刻をアイドルLCDディスプレイに表示します。mythfrontendの再起動が必要です。</translation>
     </message>
     <message>
         <source>LCD Displays Menus</source>
-        <translation type="unfinished"></translation>
+        <translation>LCDディスプレイメニュー</translation>
     </message>
     <message>
         <source>Display selected menu on LCD display. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="unfinished"></translation>
+        <translation>LCDディスプレイに選択したメニューを表示します。mythfrontendの再起動が必要です。</translation>
     </message>
     <message>
         <source>LCD Displays Music Artist and Title</source>
-        <translation type="unfinished"></translation>
+        <translation>LCDディスプレイにミュージックアーティストとタイトルを表示する</translation>
     </message>
     <message>
         <source>Display playing artist and song title in MythMusic. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythMusicで再生中のアーティストと曲のタイトルを表示する。mythfrontendの再起動が必要です。</translation>
     </message>
     <message>
         <source>LCD Displays Channel Information</source>
-        <translation type="unfinished"></translation>
+        <translation>LCDディスプレイにチャンネル情報を表示</translation>
     </message>
     <message>
         <source>Display tuned channel information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル情報を表示します。mythfrontendの再起動が必要です。</translation>
     </message>
     <message>
         <source>LCD Displays Volume Information</source>
-        <translation type="unfinished"></translation>
+        <translation>LCDディスプレイにボリューム情報を表示</translation>
     </message>
     <message>
         <source>Display volume level information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="unfinished"></translation>
+        <translation>ボリュームレベルを表示します。mythfrontendの再起動が必要です。</translation>
     </message>
     <message>
         <source>LCD Displays Generic Information</source>
-        <translation type="unfinished"></translation>
+        <translation>LCDに一般情報を表示します</translation>
     </message>
     <message>
         <source>Display generic information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="unfinished"></translation>
+        <translation>一般情報を表示します。mythfrontendの再起動が必要です。</translation>
     </message>
     <message>
         <source>LCD device display</source>
-        <translation type="unfinished"></translation>
+        <translation>LCDデバイスディスプレイ</translation>
     </message>
 </context>
 <context>
@@ -4211,47 +4211,47 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Toggle CC</source>
-        <translation type="unfinished"></translation>
+        <translation>CC切替え</translation>
     </message>
     <message>
         <source>Toggle Teletext</source>
-        <translation type="unfinished"></translation>
+        <translation>テレテキスト切替え</translation>
     </message>
     <message>
         <source>Closed Captioning</source>
-        <translation type="unfinished"></translation>
+        <translation>クローズドキャプション</translation>
     </message>
     <message>
         <source>Commercial Auto-Skip</source>
-        <translation type="unfinished"></translation>
+        <translation>コマーシャル自動スキップ</translation>
     </message>
     <message>
         <source>Turn Auto-Expire OFF</source>
-        <translation type="unfinished"></translation>
+        <translation>自動削除オフ</translation>
     </message>
     <message>
         <source>Turn Auto-Expire ON</source>
-        <translation type="unfinished"></translation>
+        <translation>自動削除オン</translation>
     </message>
     <message>
         <source>Change Aspect Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>アスペクトレシオ変更</translation>
     </message>
     <message>
         <source>Manual Zoom Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>手動ズームモード</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished">分</translation>
+        <translation>分</translation>
     </message>
     <message>
         <source>CC</source>
-        <translation type="unfinished"></translation>
+        <translation>CC</translation>
     </message>
     <message>
         <source>TXT</source>
-        <translation type="unfinished"></translation>
+        <translation>TXT</translation>
     </message>
 </context>
 <context>

@@ -1,3 +1,6 @@
+#ifndef XVMC_RENDER_H_
+#define XVMC_RENDER_H_
+
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
@@ -48,3 +51,5 @@ typedef   struct{
   int next_free_data_block_num;//used in add_mv_block, pointer to next free block
   int pict_type; //this is for skipping frames
 } xvmc_render_state_t;
+
+#endif

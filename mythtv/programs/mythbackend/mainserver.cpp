@@ -2286,11 +2286,27 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     if (qurl.host() != "")
         filename = LocalFilePath(qurl);
 
+    EncoderLink *elink = NULL;
+    QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
+
+    for (; iter != encoderList->end(); ++iter)
+    {
+        if (iter.data()->isLocal())
+            elink = iter.data();
+    }
+
+    if (elink == NULL)
+    {
+        VERBOSE(VB_ALL, QString("Couldn't find backend for: %1 : %2")
+                               .arg(pginfo->title).arg(pginfo->subtitle));
+        QStringList outputlist = "BAD";
+        SendResponse(pbssock, outputlist);
+        delete pginfo;
+        return;
+    }
+
     int len = 0;
     int width = 0, height = 0;
-
-    EncoderLink *elink = encoderList->begin().data();
-
     int secondsin = gContext->GetNumSetting("PreviewPixmapOffset", 64);
 
     unsigned char *data = (unsigned char *)elink->GetScreenGrab(pginfo, 
@@ -2308,12 +2324,18 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
         filename += ".png";
         img.save(filename.ascii(), "PNG");
 
-        delete [] data;
+        QStringList retlist = "OK";
+        SendResponse(pbssock, retlist);    
     }
+    else
+    {
+        VERBOSE(VB_ALL, QString("Not enough video to make thumbnail"));
 
-    QStringList retlist = "OK";
-    SendResponse(pbssock, retlist);    
+        QStringList outputlist = "BAD";
+        SendResponse(pbssock, outputlist);
+    } 
 
+    delete [] data;
     delete pginfo;
 }
 
@@ -2820,6 +2842,7 @@ void MainServer::PrintStatus(QSocket *socket)
 
     // encoder information ---------------------
     QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
+    int numencoders = 0;
     for (; iter != encoderList->end(); ++iter)
     {
         EncoderLink *elink = iter.data();
@@ -2830,6 +2853,7 @@ void MainServer::PrintStatus(QSocket *socket)
         {
             os << "    Encoder " << elink->getCardId() << " is local on "
                << gContext->GetHostName();
+            numencoders++;
         }
         else
         {
@@ -2840,6 +2864,8 @@ void MainServer::PrintStatus(QSocket *socket)
                 os << " (currently not connected).<br />";
                 continue;
             }
+            else
+                numencoders++;
         }
 
         TVState encstate = elink->GetState();
@@ -2961,8 +2987,10 @@ void MainServer::PrintStatus(QSocket *socket)
                   << ((*iter)->recstartts).addSecs(-preRollSeconds)
                                           .toString(shortdateformat) << " "
                   << ((*iter)->recstartts).addSecs(-preRollSeconds)
-                                          .toString(timeformat) << " - "
-                  << (*iter)->channame << " - " << qstrTitle << "<br />"
+                                          .toString(timeformat) << " - ";
+               if (numencoders > 1)
+                   os << "Encoder " << (*iter)->cardid << " - ";
+               os << (*iter)->channame << " - " << qstrTitle << "<br />"
                   << "<span><strong>" << qstrTitle << "</strong> ("
                   << (*iter)->startts.toString(timeformat) << "-"
                   << (*iter)->endts.toString(timeformat) << ")<br />"

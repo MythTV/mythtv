@@ -47,7 +47,7 @@ bool dd_grab_all = false;
 bool dddataretrieved = false;
 QString lastdduserid;
 DataDirectProcessor ddprocessor;
-
+QString graboptions = "";
 
 class ChanInfo
 {
@@ -1055,7 +1055,11 @@ void fixProgramList(QValueList<ProgInfo> *fixlist)
         {
             QValueList<ProgInfo>::iterator tokeep, todelete;
 
-            if((*cur).subtitle != "" && (*i).subtitle == "")
+            if ((*cur).end <= (*cur).start)
+                tokeep = i, todelete = cur;
+            else if ((*i).end <= (*i).start)
+                tokeep = cur, todelete = i;
+            else if ((*cur).subtitle != "" && (*i).subtitle == "")
                 tokeep = cur, todelete = i;
             else if((*i).subtitle != "" && (*cur).subtitle == "")
                 tokeep = i, todelete = cur;
@@ -1718,7 +1722,7 @@ time_t toTime_t(QDateTime &dt)
 
 bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
 {
-    QString xmltv_grabber = source.xmltvgrabber;
+    QString xmltv_grabber = source.xmltvgrabber + graboptions;
 
     if (xmltv_grabber == "datadirect")
         return grabDDData(source, offset, *qCurrentDate);
@@ -2379,6 +2383,16 @@ int main(int argc, char *argv[])
                  cout << "### reading channels from xawtv configfile\n";
             from_xawfile = true;
         }
+        else if (!strcmp(a.argv()[argpos], "--graboptions"))
+        {
+            if (((argpos + 1) >= a.argc()))
+            {
+                printf("missing parameter for --graboptions option\n");
+                return -1;
+            }
+
+            graboptions = QString(" ") + QString(a.argv()[++argpos]);
+        }
         else if (!strcmp(a.argv()[argpos], "--refresh-today"))
         {
             refresh_today = true;
@@ -2443,6 +2457,9 @@ int main(int argc, char *argv[])
             cout << "   Read channels as defined in xawtvrc file given\n";
             cout << "   <sourceid>    = cardinput\n";
             cout << "   <xawtvrcfile> = file to read\n";
+            cout << "\n";
+            cout << "--graboptions <\"options\">\n";
+            cout << "   Pass options to grabber\n";
             cout << "\n";
             cout << "--refresh-today\n";
             cout << "--refresh-second\n";

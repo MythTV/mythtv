@@ -163,9 +163,40 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
     hue = gContext->GetNumSettingOnHost("PlaybackHue", 
                                         gContext->GetHostName(), 0);
 
+    int asp_override = gContext->GetNumSetting("AspectOverride", 0);
+
+    if (asp_override > 0) 
+        AspectOverride(asp_override);
+
     embedding = false;
 
     return true;
+}
+
+void VideoOutput::AspectOverride(int override)
+{
+    switch(override)
+    {
+        default:
+        case 0:
+           break;
+        case 1:
+           XJ_aspect = (16.0 / 9);
+           letterbox = 0;
+           break;
+        case 2:
+           XJ_aspect = (4.0 / 3);
+           letterbox = 1;
+           break;
+        case 3:
+           XJ_aspect = (16.0 / 9);
+           letterbox = 2;
+           break;
+        case 4:
+           XJ_aspect = (4.0 / 3);
+           letterbox = 3;
+           break;
+    }
 }
 
 void VideoOutput::AspectChanged(float aspect)

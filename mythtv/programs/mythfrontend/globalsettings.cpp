@@ -258,7 +258,7 @@ class UseGroupNameAsAllPrograms: public CheckBoxSetting, public GlobalSetting {
 public:
     UseGroupNameAsAllPrograms():
         GlobalSetting("DispRecGroupAsAllProg") {
-        setLabel(QObject::tr("Show group name instead of \"all programs\"."));
+        setLabel(QObject::tr("Show group name instead of \"All Programs\"."));
         setValue(false);
         setHelpText(QObject::tr("Use the name of the display group currently "
                     "being show in place of the term \"All Programs\" in the"
@@ -1068,6 +1068,22 @@ public:
         setValue(0);
         setHelpText(QObject::tr("If using Xinerama, run only on the specified "
                     "screen."));
+    };
+};
+
+class AspectOverride: public ComboBoxSetting, public GlobalSetting {
+public:
+    AspectOverride():
+        GlobalSetting("AspectOverride") {
+        setLabel(QObject::tr("Aspect Override"));
+        addSelection(QObject::tr("Off"), "0");
+        addSelection(QObject::tr("16/9 Anamorphic"), "1");
+        addSelection(QObject::tr("4/3 Normal"), "2");
+        addSelection(QObject::tr("16/9 Zoom"), "3");
+        addSelection(QObject::tr("4/3 Zoom"), "3");
+        setHelpText(QObject::tr("This will override any aspect ratio in the "
+                    "recorded stream, the same as pressing the W Key "
+                    "during playback."));
     };
 };
 
@@ -2171,6 +2187,7 @@ PlaybackSettings::PlaybackSettings()
     general->addChild(new ExperimentalSync());
     general->addChild(new UseVideoTimebase());
     general->addChild(new DecodeExtraAudio());
+    general->addChild(new AspectOverride());
     general->addChild(new PIPLocation());
     addChild(general);
 
@@ -2191,14 +2208,18 @@ PlaybackSettings::PlaybackSettings()
     pbox->addChild(new GeneratePreviewPixmaps());
     pbox->addChild(new PreviewPixmapOffset());
     pbox->addChild(new PlaybackPreview());
-    pbox->addChild(new AllRecGroupPassword());
-    pbox->addChild(new DisplayRecGroup());
-    pbox->addChild(new RememberRecGroup());
-    pbox->addChild(new UseCategoriesAsRecGroups());
-    pbox->addChild(new UseGroupNameAsAllPrograms());
     pbox->addChild(new PBBStartInTitle());
     pbox->addChild(new PBBShowGroupSummary());
     addChild(pbox);
+
+    VerticalConfigurationGroup* pbox2 = new VerticalConfigurationGroup(false);
+    pbox2->setLabel(QObject::tr("View Recordings (Recording Groups)"));
+    pbox2->addChild(new AllRecGroupPassword());
+    pbox2->addChild(new DisplayRecGroup());
+    pbox2->addChild(new RememberRecGroup());
+    pbox2->addChild(new UseCategoriesAsRecGroups());
+    pbox2->addChild(new UseGroupNameAsAllPrograms());
+    addChild(pbox2);
 
     addChild(new HwDecSettings());
 

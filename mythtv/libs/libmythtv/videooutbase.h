@@ -173,6 +173,8 @@ class VideoOutput
     void DoPipResize(int pipwidth, int pipheight);
     void ShutdownPipResize(void);
 
+    void AspectOverride(int override);
+
     int XJ_width, XJ_height;
     float XJ_aspect;
 
