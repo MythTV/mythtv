@@ -95,6 +95,9 @@ str OSDFont=FreeSans.ttf
 # chanid sorts according to the internal database order
 # callsign sorts according to the channel's callsign, like TVLAN, TWC, USA
 str ChannelOrdering=channum + 0
+#
+# Which input on the tuner card to start on?
+str TunerCardInput=Television
 
 # TV options
 # 

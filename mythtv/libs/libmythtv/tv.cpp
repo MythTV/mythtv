@@ -66,10 +66,14 @@ TV::TV(MythContext *lcontext, const QString &startchannel, int capturecardnum,
     if (pipcardnum > 0)
         GetDevices(pipcardnum, pipvideodev, pipaudiodev, pipaudiosamplerate);
 
+    QString inputname = context->GetSetting("TunerCardInput");
+
     channel = new Channel(this, videodev);
     channel->Open();
     channel->SetFormat(context->GetSetting("TVFormat"));
     channel->SetFreqTable(context->GetSetting("FreqTable"));
+    if (inputname != "")
+        channel->SwitchToInput(inputname);
     channel->SetChannelByString(startchannel);
     channel->SetChannelOrdering(chanorder);
     channel->Close();  
@@ -79,6 +83,8 @@ TV::TV(MythContext *lcontext, const QString &startchannel, int capturecardnum,
     {
         pipchannel->SetFormat(context->GetSetting("TVFormat"));
         pipchannel->SetFreqTable(context->GetSetting("FreqTable"));
+        if (inputname != "")
+            pipchannel->SwitchToInput(inputname);
         pipchannel->SetChannelByString(startchannel);
         pipchannel->SetChannelOrdering(chanorder);
         pipchannel->Close();
