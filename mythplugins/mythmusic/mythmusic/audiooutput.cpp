@@ -352,9 +352,12 @@ void MMAudioOutput::run()
 	tv.tv_sec = 5l;
 	tv.tv_usec = 0l;
 
+	mutex()->unlock();
+
 	if (b &&
 	    (! do_select || (select(audio_fd + 1, 0, &afd, 0, &tv) > 0 &&
 			     FD_ISSET(audio_fd, &afd)))) {
+	    mutex()->lock();
 	    l = QMIN(2048, b->nbytes - n);
 	    if (l > 0) {
                 if (needresample && resampctx)
@@ -379,6 +382,8 @@ void MMAudioOutput::run()
 		m = 0;
 	    }
 	}
+	else
+	    mutex()->lock();
 
 	total_written += m;
 
