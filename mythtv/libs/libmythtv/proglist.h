@@ -44,6 +44,7 @@ class ProgLister : public MythDialog
     void setViewFromEdit(void);
     void addSearchRecord(void);
     void deleteKeyword(void);
+    void setViewFromTime(void);
     void select(void);
     void edit(void);
     void upcoming(void);
@@ -61,7 +62,11 @@ class ProgLister : public MythDialog
     ProgListType type;
     QSqlDatabase *db;
     QDateTime startTime;
+    QDateTime searchTime;
+    QString dayFormat;
+    QString hourFormat;
     QString timeFormat;
+    QString fullDateFormat;
     QString channelOrdering;
     QString channelFormat;
 
@@ -106,6 +111,8 @@ class ProgLister : public MythDialog
     MythPushButton *chooseOkButton;
     MythPushButton *chooseDeleteButton;
     MythPushButton *chooseRecordButton;
+    MythComboBox *chooseDay;
+    MythComboBox *chooseHour;
 };
 
 #endif

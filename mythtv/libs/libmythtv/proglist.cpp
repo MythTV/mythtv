@@ -31,8 +31,12 @@ ProgLister::ProgLister(ProgListType pltype, const QString &view,
     type = pltype;
     db = ldb;
     startTime = QDateTime::currentDateTime();
-    timeFormat = gContext->GetSetting("ShortDateFormat") +
-        " " + gContext->GetSetting("TimeFormat");
+    searchTime = startTime;
+
+    dayFormat = gContext->GetSetting("DateFormat");
+    hourFormat = gContext->GetSetting("TimeFormat");
+    timeFormat = gContext->GetSetting("ShortDateFormat") + " " + hourFormat;
+    fullDateFormat = dayFormat + " " + hourFormat;
     channelOrdering = gContext->GetSetting("ChannelOrdering", "channum + 0");
     channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
 
@@ -84,6 +88,8 @@ ProgLister::ProgLister(ProgListType pltype, const QString &view,
     chooseOkButton = NULL;
     chooseDeleteButton = NULL;
     chooseRecordButton = NULL;
+    chooseDay = NULL;
+    chooseHour = NULL;
 
     curView = -1;
     fillViewList(view);
@@ -478,6 +484,28 @@ void ProgLister::deleteKeyword(void)
         chooseListBox->setFocus();
 }
 
+void ProgLister::setViewFromTime(void)
+{
+    if (!choosePopup || !chooseDay || !chooseHour)
+        return;
+
+    int dayOffset = chooseDay->currentItem() - 1;
+    searchTime.setDate(startTime.addDays(dayOffset).date());
+
+    QTime m_hr;
+    m_hr.setHMS(chooseHour->currentItem(), 0, 0);
+    searchTime.setTime(m_hr);
+
+    curView = 0;
+    viewList[curView] = searchTime.toString(fullDateFormat);
+    viewTextList[curView] = viewList[curView];
+
+    choosePopup->done(0);
+
+    curItem = -1;
+    refillAll = true;
+}
+
 void ProgLister::chooseView(void)
 {
     if (type == plChannel || type == plCategory)
@@ -590,6 +618,54 @@ void ProgLister::chooseView(void)
             curItem = -1;
             refillAll = true;
         }
+    }
+    else if (type == plTime)
+    {
+        choosePopup = new MythPopupBox(gContext->GetMainWindow(), "");
+        choosePopup->addLabel(tr("Select Time"));
+
+        chooseDay = new MythComboBox(false, choosePopup);
+
+        for(int m_index = -1; m_index <= 14; m_index++)
+        {
+            chooseDay->insertItem(startTime.addDays(m_index)
+                                  .toString(dayFormat));
+            if (startTime.addDays(m_index).toString("MMdd") ==
+                                searchTime.toString("MMdd"))
+                chooseDay->setCurrentItem(chooseDay->count() - 1);
+        }
+        choosePopup->addWidget(chooseDay);
+
+        chooseHour = new MythComboBox(false, choosePopup);
+
+        QTime m_hr;
+        for(int m_index = 0; m_index < 24; m_index++)
+        {
+            m_hr.setHMS(m_index, 0, 0);
+            chooseHour->insertItem(m_hr.toString(hourFormat));
+            if (m_hr.toString("hh") == searchTime.toString("hh"))
+                chooseHour->setCurrentItem(m_index);
+        }
+        choosePopup->addWidget(chooseHour);
+
+        chooseOkButton = new MythPushButton(choosePopup);
+        chooseOkButton->setText(tr("OK"));
+        choosePopup->addWidget(chooseOkButton);
+
+        connect(chooseOkButton,
+                SIGNAL(clicked()), this, SLOT(setViewFromTime()));
+
+        chooseOkButton->setFocus();
+        choosePopup->ExecPopup();
+
+        delete chooseDay;
+        chooseDay = NULL;
+        delete chooseHour;
+        chooseHour = NULL;
+        delete chooseOkButton;
+        chooseOkButton = NULL;
+        delete choosePopup;
+        choosePopup = NULL;
     }
 }
 
@@ -736,11 +812,17 @@ void ProgLister::fillViewList(const QString &view)
         else
             curView = -1;
     }
-    else if (type == plNewListings || type == plMovies || type == plTime)
+    else if (type == plNewListings || type == plMovies)
     {
         viewList << "";
         viewTextList << "";
         curView = 0;
+    }
+    else if (type == plTime)
+    {
+        curView = 0;
+        viewList[curView] = searchTime.toString(fullDateFormat);
+        viewTextList[curView] = viewList[curView];
     }
 
     if (curView >= (int)viewList.count())
@@ -828,8 +910,8 @@ void ProgLister::fillItemList(void)
     else if (type == plTime) // list by time
     {
         where = QString("WHERE channel.visible = 1 "
-                        "  AND program.endtime > %1 ")
-                        .arg(startstr);
+                        "  AND program.starttime >= %1 ")
+                        .arg(searchTime.toString("yyyyMMddhh0000"));
     }
 
     schedList.FromScheduler();
