@@ -529,10 +529,10 @@ void ScheduledRecording::fillSelections(QSqlDatabase* db, SelectSetting* setting
     QSqlQuery result = db->exec("SELECT recordid FROM record");
     if (result.isActive() && result.numRowsAffected() > 0)
         while (result.next()) {
-            int id = result.value(0).toInt();
+            int recid = result.value(0).toInt();
 
             ScheduledRecording sr;
-            sr.loadByID(db, id);
+            sr.loadByID(db, recid);
 
             QString label;
             QString weekly = "";
@@ -573,7 +573,7 @@ void ScheduledRecording::fillSelections(QSqlDatabase* db, SelectSetting* setting
                 label = "You should not see this";
             }
 
-            setting->addSelection(label, QString::number(id));
+            setting->addSelection(label, QString::number(recid));
         }
 }
 

@@ -326,7 +326,6 @@ class OSDTypeEditSlider : public OSDTypeImage
     QRect m_displayrect;
     int m_maxval;
     int m_curval;
-    int m_drawwidth;
 
     unsigned char *m_drawMap;
 

@@ -35,7 +35,7 @@ bool be_nice = true;
 
 double fps = 29.97; 
 
-void BuildVideoMarkup(QSqlDatabase *db, QString& filename)
+void BuildVideoMarkup(QString& filename)
 {
     ProgramInfo* program_info = new ProgramInfo;
     program_info->recstartts = QDateTime::currentDateTime().addSecs( -180 * 60);
@@ -591,7 +591,7 @@ int main(int argc, char *argv[])
 
     if (isVideo)
     {
-        BuildVideoMarkup(db, filename);
+        BuildVideoMarkup(filename);
     }
     else if (!chanid.isEmpty() && !starttime.isEmpty())
     {

@@ -68,7 +68,6 @@ class UDPNotify : public QObject
     int m_udp_port;
     QHostAddress bcastaddr;
     TV *m_tv;
-    OSD *osd;
 
     QMap<QString, UDPNotifyOSDSet *> setMap;
     vector<UDPNotifyOSDSet *> *setList;

@@ -384,6 +384,7 @@ void PlaybackBox::paintEvent(QPaintEvent *e)
 
 void PlaybackBox::grayOut(QPainter *tmp)
 {
+    (void)tmp;
 /*
     int transparentFlag = gContext->GetNumSetting("PlayBoxShading", 0);
     if (transparentFlag == 0)

@@ -161,7 +161,7 @@ QString HttpComms::getHttp(QString& url, int timeoutMS, int maxRetries,
     int timeoutCount = 0;
     QString res = "";
     HttpComms *httpGrabber = NULL; 
-    int m_debug = 0;
+    int debug = 0;
     QString hostname = "";
 
     while (1) 
@@ -171,7 +171,7 @@ QString HttpComms::getHttp(QString& url, int timeoutMS, int maxRetries,
             hostname = qurl.host();  // hold onto original host
         if (!qurl.hasHost())        // can occur on redirects to partial paths
             qurl.setHost(hostname);
-        if (m_debug > 0)
+        if (debug > 0)
             cerr << "getHttp: grabbing: " << qurl.toString() << endl;
 
         if (httpGrabber != NULL)
@@ -187,7 +187,7 @@ QString HttpComms::getHttp(QString& url, int timeoutMS, int maxRetries,
         // Handle timeout
         if (httpGrabber->isTimedout())
         {
-            if (m_debug > 0) 
+            if (debug > 0) 
                 cerr << "timeout for url:" << url.latin1() << endl;
            
             // Increment the counter and check were not over the limit
@@ -199,7 +199,7 @@ QString HttpComms::getHttp(QString& url, int timeoutMS, int maxRetries,
             }
 
             // Try again
-            if (m_debug > 0) 
+            if (debug > 0) 
                cerr << "attempt # " << (timeoutCount+1) << "/" << maxRetries 
                     << " for url:" << url.latin1() << endl;
 
@@ -209,7 +209,7 @@ QString HttpComms::getHttp(QString& url, int timeoutMS, int maxRetries,
         // Check for redirection
         if (!httpGrabber->getRedirectedURL().isEmpty()) 
         {
-            if (m_debug > 0) 
+            if (debug > 0) 
                 cerr << "redirection:" 
                      << httpGrabber->getRedirectedURL().latin1() << " count:" 
                      << redirectCount << " max:" << maxRedirects << endl;
@@ -227,10 +227,10 @@ QString HttpComms::getHttp(QString& url, int timeoutMS, int maxRetries,
 
     delete httpGrabber;
 
-    if (m_debug > 1)
+    if (debug > 1)
         cerr << "Got " << res.length() << " bytes from url: '" 
              << url.latin1() << "'" << endl;
-    if (m_debug > 2)
+    if (debug > 2)
         cerr << res;
 
     return res;
@@ -246,7 +246,7 @@ bool HttpComms::getHttpFile(QString& filename, QString& url, int timeoutMS,
     QByteArray data(0);
     bool res = false;
     HttpComms *httpGrabber = NULL;
-    int m_debug = 0;
+    int debug = 0;
     QString hostname = "";
 
     while (1)
@@ -256,7 +256,7 @@ bool HttpComms::getHttpFile(QString& filename, QString& url, int timeoutMS,
             hostname = qurl.host();  // hold onto original host
         if (!qurl.hasHost())        // can occur on redirects to partial paths
             qurl.setHost(hostname);
-        if (m_debug > 0)
+        if (debug > 0)
             cerr << "getHttp: grabbing: " << qurl.toString() << endl;
 
         if (httpGrabber != NULL)
@@ -272,7 +272,7 @@ bool HttpComms::getHttpFile(QString& filename, QString& url, int timeoutMS,
         // Handle timeout
         if (httpGrabber->isTimedout())
         {
-            if (m_debug > 0)
+            if (debug > 0)
                 cerr << "timeout for url:" << url.latin1() << endl;
 
             // Increment the counter and check were not over the limit
@@ -284,7 +284,7 @@ bool HttpComms::getHttpFile(QString& filename, QString& url, int timeoutMS,
             }
 
             // Try again
-            if (m_debug > 0)
+            if (debug > 0)
                cerr << "attempt # " << (timeoutCount+1) << "/" << maxRetries
                     << " for url:" << url.latin1() << endl;
 
@@ -294,7 +294,7 @@ bool HttpComms::getHttpFile(QString& filename, QString& url, int timeoutMS,
         // Check for redirection
         if (!httpGrabber->getRedirectedURL().isEmpty())
         {
-            if (m_debug > 0)
+            if (debug > 0)
                 cerr << "redirection:"
                      << httpGrabber->getRedirectedURL().latin1() << " count:"
                      << redirectCount << " max:" << maxRedirects << endl;
@@ -310,7 +310,7 @@ bool HttpComms::getHttpFile(QString& filename, QString& url, int timeoutMS,
 
         if (data.size() > 0)
         {
-            if (m_debug > 0)
+            if (debug > 0)
                 cerr << "getHttpFile: saving to file: " << filename << endl;
 
             QFile file(filename);
@@ -320,21 +320,21 @@ bool HttpComms::getHttpFile(QString& filename, QString& url, int timeoutMS,
                 stream.writeRawBytes( (const char*) (data), data.size() );
                 file.close();
                 res = true;
-                if (m_debug > 0)
+                if (debug > 0)
                     cerr << "getHttpFile: File saved OK" << endl;
             }
             else
-                if (m_debug > 0)
+                if (debug > 0)
                     cerr << "getHttpFile: Failed to open file for writing" << endl;
         }
         else
-           if (m_debug > 0)
+           if (debug > 0)
                cerr << "getHttpFile: nothing to save to file!" << endl;
 
         break;
     }
 
-    if (m_debug > 1)
+    if (debug > 1)
         cerr << "Got " << data.size() << " bytes from url: '"
              << url.latin1() << "'" << endl;
 

@@ -967,9 +967,9 @@ void ProgLister::updateView(QPainter *p)
     container = theme->GetSet("view");
     if (container)
     {  
-        UITextType *type = (UITextType *)container->GetType("curview");
-        if (type && curView >= 0)
-            type->SetText(viewTextList[curView]);
+        UITextType *uitype = (UITextType *)container->GetType("curview");
+        if (uitype && curView >= 0)
+            uitype->SetText(viewTextList[curView]);
 
         container->Draw(&tmp, 4, 0);
         container->Draw(&tmp, 5, 0);

@@ -150,8 +150,6 @@ class UIListTreeType : public UIType
     QRect m_levelsize;
     int m_levelspacing;
 
-    int m_order;
-
     bool    list_tree_active;
 };
 
@@ -210,7 +208,6 @@ class UIListBtnType : public UIType
     void  InsertItem(UIListBtnTypeItem *item);
     void  RemoveItem(UIListBtnTypeItem *item);
 
-    int   m_order;
     QRect m_rect;
     QRect m_contentsRect;
     QRect m_arrowsRect;

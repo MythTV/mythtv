@@ -53,12 +53,12 @@ QSocketDevice *RemoteFile::openSocket(bool control)
     int port = qurl.port();
     QString dir = qurl.path();
 
-    QSocketDevice *sock = new QSocketDevice(QSocketDevice::Stream);
+    QSocketDevice *lsock = new QSocketDevice(QSocketDevice::Stream);
     
-    if (!connectSocket(sock, host, port))
+    if (!connectSocket(lsock, host, port))
     {
         cerr << "Could not connect to server\n";
-        delete sock;
+        delete lsock;
         return NULL;
     }
     
@@ -69,8 +69,8 @@ QSocketDevice *RemoteFile::openSocket(bool control)
     if (control)
     {
         strlist = QString("ANN Playback %1 %2").arg(hostname).arg(false);
-        WriteStringList(sock, strlist);
-        ReadStringList(sock, strlist, true);
+        WriteStringList(lsock, strlist);
+        ReadStringList(lsock, strlist, true);
     }
     else
     {
@@ -79,8 +79,8 @@ QSocketDevice *RemoteFile::openSocket(bool control)
             strlist = QString("ANN FileTransfer %1").arg(hostname);
             strlist << dir;
 
-            WriteStringList(sock, strlist);
-            ReadStringList(sock, strlist, true);
+            WriteStringList(lsock, strlist);
+            ReadStringList(lsock, strlist, true);
 
             recordernum = strlist[1].toInt();
             filesize = decodeLongLong(strlist, 2);
@@ -89,12 +89,12 @@ QSocketDevice *RemoteFile::openSocket(bool control)
         {
             strlist = QString("ANN RingBuffer %1 %2").arg(hostname)
                              .arg(recordernum);
-            WriteStringList(sock, strlist);
-            ReadStringList(sock, strlist, true);
+            WriteStringList(lsock, strlist);
+            ReadStringList(lsock, strlist, true);
         }
     }
     
-    return sock;
+    return lsock;
 }    
 
 long long RemoteFile::GetFileSize(void)

@@ -821,33 +821,33 @@ void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
     if (scaleh > 0 && m_scaleh > 0)
         scaleh = m_scaleh;
 
-    int width = 0, height = 0;
+    int imwidth = 0, imheight = 0;
 
     if (scalew > 0) 
-        width = ((int)(scalew * wmult) / 2) * 2;
+        imwidth = ((int)(scalew * wmult) / 2) * 2;
     else
-        width = ((int)(tmpimage.width() * wmult) / 2) * 2;
+        imwidth = ((int)(tmpimage.width() * wmult) / 2) * 2;
 
     if (scaleh > 0)
-        height = ((int)(scaleh * hmult) / 2) * 2;
+        imheight = ((int)(scaleh * hmult) / 2) * 2;
     else
-        height = ((int)(tmpimage.height() * hmult) / 2) * 2;
+        imheight = ((int)(tmpimage.height() * hmult) / 2) * 2;
 
-    QImage tmp2 = tmpimage.smoothScale(width, height);
+    QImage tmp2 = tmpimage.smoothScale(imwidth, imheight);
 
     m_isvalid = true;
 
-    m_yuv = new unsigned char[width * height * 3 / 2];
+    m_yuv = new unsigned char[imwidth * imheight * 3 / 2];
     m_ybuffer = m_yuv;
-    m_ubuffer = m_yuv + (width * height);
-    m_vbuffer = m_yuv + (width * height * 5 / 4);
+    m_ubuffer = m_yuv + (imwidth * imheight);
+    m_vbuffer = m_yuv + (imwidth * imheight * 5 / 4);
 
-    m_alpha = new unsigned char[width * height];
+    m_alpha = new unsigned char[imwidth * imheight];
 
     rgb32_to_yuv420p(m_ybuffer, m_ubuffer, m_vbuffer, m_alpha, tmp2.bits(),
-                     width, height, tmp2.width());
+                     imwidth, imheight, tmp2.width());
 
-    m_imagesize = QRect(0, 0, width, height);
+    m_imagesize = QRect(0, 0, imwidth, imheight);
 }
 
 void OSDTypeImage::LoadFromQImage(const QImage &img)
@@ -866,20 +866,20 @@ void OSDTypeImage::LoadFromQImage(const QImage &img)
 
     m_isvalid = true;
 
-    int width = (img.width() / 2) * 2;
-    int height = (img.height() / 2) * 2;
+    int imwidth = (img.width() / 2) * 2;
+    int imheight = (img.height() / 2) * 2;
 
-    m_yuv = new unsigned char[width * height * 3 / 2];
+    m_yuv = new unsigned char[imwidth * imheight * 3 / 2];
     m_ybuffer = m_yuv;
-    m_ubuffer = m_yuv + (width * height);
-    m_vbuffer = m_yuv + (width * height * 5 / 4);
+    m_ubuffer = m_yuv + (imwidth * imheight);
+    m_vbuffer = m_yuv + (imwidth * imheight * 5 / 4);
 
-    m_alpha = new unsigned char[width * height];
+    m_alpha = new unsigned char[imwidth * imheight];
 
     rgb32_to_yuv420p(m_ybuffer, m_ubuffer, m_vbuffer, m_alpha, img.bits(),
-                     width, height, img.width());
+                     imwidth, imheight, img.width());
 
-    m_imagesize = QRect(0, 0, width, height);
+    m_imagesize = QRect(0, 0, imwidth, imheight);
 }
 
 void OSDTypeImage::Draw(OSDSurface *surface, int fade, int maxfade, int xoff, 
@@ -890,13 +890,13 @@ void OSDTypeImage::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
 
     unsigned char *dest, *destalpha, *src, *srcalpha;
     unsigned char *udest, *vdest, *usrc, *vsrc;
-    int alpha, iwidth, width;
+    int alpha, iwidth, drawwidth;
 
-    iwidth = width = m_imagesize.width();
-    int height = m_imagesize.height();
+    iwidth = drawwidth = m_imagesize.width();
+    int drawheight = m_imagesize.height();
 
     if (m_drawwidth >= 0)
-        width = m_drawwidth;
+        drawwidth = m_drawwidth;
 
     int ystart = m_displaypos.y();
     int xstart = m_displaypos.x();
@@ -922,15 +922,15 @@ void OSDTypeImage::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
         xstart = 0;
     }
 
-    if (height + ystart > surface->height)
-        height = surface->height - ystart - 1;
-    if (width + xstart > surface->width)
-        width = surface->width - xstart - 1;
+    if (drawheight + ystart > surface->height)
+        drawheight = surface->height - ystart - 1;
+    if (drawwidth + xstart > surface->width)
+        drawwidth = surface->width - xstart - 1;
 
-    if (width == 0 || height == 0)
+    if (drawwidth == 0 || drawheight == 0)
         return;
 
-    QRect destRect = QRect(xstart, ystart, width, height);
+    QRect destRect = QRect(xstart, ystart, drawwidth, drawheight);
     bool needblend = false;
 
     if (m_onlyusefirst || surface->IntersectsDrawn(destRect))
@@ -950,17 +950,17 @@ void OSDTypeImage::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
 
     if (!needblend)
     {
-        for (int y = startline; y < height; y++)
+        for (int y = startline; y < drawheight; y++)
         {
             ysrcwidth = y * iwidth;
             ydestwidth = (y + ystart - startline) * surface->width;
 
             memcpy(surface->y + xstart + ydestwidth,
-                   m_ybuffer + startcol + ysrcwidth, width);
+                   m_ybuffer + startcol + ysrcwidth, drawwidth);
 
             destalpha = surface->alpha + xstart + ydestwidth;
 
-            for (int x = startcol; x < width; x++)
+            for (int x = startcol; x < drawwidth; x++)
             {
                 alpha = *(m_alpha + x + ysrcwidth);
   
@@ -974,8 +974,8 @@ void OSDTypeImage::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
         }
 
         iwidth /= 2;
-        width /= 2;
-        height /= 2;
+        drawwidth /= 2;
+        drawheight /= 2;
 
         ystart /= 2;
         xstart /= 2;
@@ -983,15 +983,15 @@ void OSDTypeImage::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
         startline /= 2;
         startcol /= 2;
 
-        for (int y = startline; y < height; y++)
+        for (int y = startline; y < drawheight; y++)
         {
             uvsrcwidth = y * iwidth;
             uvdestwidth = (y + ystart - startline) * (surface->width / 2);
 
             memcpy(surface->u + xstart + uvdestwidth,
-                   m_ubuffer + startcol + uvsrcwidth, width);
+                   m_ubuffer + startcol + uvsrcwidth, drawwidth);
             memcpy(surface->v + xstart + uvdestwidth,
-                   m_vbuffer + startcol + uvsrcwidth, width);
+                   m_vbuffer + startcol + uvsrcwidth, drawwidth);
         }
 
         return;
@@ -1022,13 +1022,15 @@ void OSDTypeImage::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
     if (m_onlyusefirst)
         (surface->blendcolumnfunc) (src, usrc, vsrc, srcalpha, iwidth, dest,
                                     udest, vdest, destalpha, surface->width,
-                                    width - startcol, height - startline,
+                                    drawwidth - startcol, 
+                                    drawheight - startline,
                                     alphamod, 1, surface->rec_lut,
                                     surface->pow_lut);
     else
         (surface->blendregionfunc) (src, usrc, vsrc, srcalpha, iwidth, dest,
                                     udest, vdest, destalpha, surface->width,
-                                    width - startcol, height - startline,
+                                    drawwidth - startcol, 
+                                    drawheight - startline,
                                     alphamod, 1, surface->rec_lut,
                                     surface->pow_lut);
 }

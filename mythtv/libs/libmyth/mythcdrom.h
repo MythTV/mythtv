@@ -11,14 +11,17 @@ class MythCDROM : public MythMediaDevice
               bool AllowEject);
     virtual ~MythCDROM() {};
 
-    virtual MediaError testMedia(void) = 0;
+    // Commented out functions are implemented in MythMediaDevice, so can't
+    // be abstract here.
+
+    //virtual MediaError testMedia(void) = 0;
     virtual bool mediaChanged(void) = 0;
     virtual bool checkOK(void) = 0;
     virtual bool openDevice(void);
     virtual MediaStatus checkMedia(void) = 0;
-    virtual MediaError eject(void) = 0;
-    virtual MediaError lock(void) = 0;
-    virtual MediaError unlock(void) = 0;
+    //virtual MediaError eject(void) = 0;
+    //virtual MediaError lock(void) = 0;
+    //virtual MediaError unlock(void) = 0;
 
     static MythCDROM* get(QObject* par, const char* devicePath, bool SuperMount,
                           bool AllowEject);

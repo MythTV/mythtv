@@ -374,7 +374,7 @@ SelectManagedListItem::SelectManagedListItem(const QString& baseTxt, ManagedList
     goBack->setText(QString("[ %1 ]").arg(QObject::tr("No Change")));
 }
 
-ManagedListItem* SelectManagedListItem::addSelection(const QString& label, QString value, bool select)
+ManagedListItem* SelectManagedListItem::addSelection(const QString& label, QString value, bool selectit)
 {
     ManagedListItem* ret = NULL;
 
@@ -421,7 +421,7 @@ ManagedListItem* SelectManagedListItem::addSelection(const QString& label, QStri
             setValue(value);
         }
     }
-    else if (select)
+    else if (selectit)
         selectValue(value);
 
 
@@ -430,7 +430,7 @@ ManagedListItem* SelectManagedListItem::addSelection(const QString& label, QStri
     return ret;
 }
 
-ManagedListItem* SelectManagedListItem::addButton(const QString& label, QString value, bool select)
+ManagedListItem* SelectManagedListItem::addButton(const QString& label, QString value, bool selectit)
 {
     ManagedListItem* newItem = new ManagedListItem(label, parentList, this, label);
     newItem->setValue(value);
@@ -438,7 +438,7 @@ ManagedListItem* SelectManagedListItem::addButton(const QString& label, QString 
 
 
     connect(newItem, SIGNAL(selected(ManagedListItem*)), this, SLOT(buttonSelected(ManagedListItem* )));
-    if (select)
+    if (selectit)
         selectValue(value);
     return newItem;
 }

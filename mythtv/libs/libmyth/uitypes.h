@@ -599,7 +599,6 @@ class UITextType : public UIType
     QRect m_altdisplaysize;
     QString m_message;
     QString m_default_msg;
-    QString m_name;
 
     fontProp *m_font;
 

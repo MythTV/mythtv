@@ -879,7 +879,7 @@ void LCD::startMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name,
 
     // Back up one if were at the end so the last item shows up at the bottom 
     // of the display
-    if (counter == it.count())
+    if (counter == it.count() && counter != 1)
         --it;
 
     counter = 1;

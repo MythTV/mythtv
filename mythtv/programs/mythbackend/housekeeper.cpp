@@ -55,7 +55,7 @@ bool HouseKeeper::wantToRun(const QString &dbTag, int period, int minhour,
     lastrun.setTime_t(0);
     if (db->isOpen())
     {
-        gContext->KickDatabase(db);
+        MythContext::KickDatabase(db);
         QString query = QString("SELECT lastrun FROM housekeeping WHERE "
                                 "tag = \"%1\";").arg(dbTag);
         QSqlQuery result = db->exec(query);
@@ -88,7 +88,7 @@ void HouseKeeper::updateLastrun(const QString &dbTag)
 {
     if (db->isOpen())
     {
-        gContext->KickDatabase(db);
+        MythContext::KickDatabase(db);
         QString query = QString("DELETE FROM housekeeping WHERE "
                                 "tag = \"%1\";").arg(dbTag);
         QSqlQuery result = db->exec(query);
@@ -183,7 +183,7 @@ void HouseKeeper::flushLogs()
 
     if (db->isOpen())
     {
-        gContext->KickDatabase(db);
+        MythContext::KickDatabase(db);
         QString dstring = days.toString(QString("yyyy-MM-dd hh:mm:ss"));
         QString query = QString("DELETE FROM mythlog WHERE "
                                 "acknowledged=1 and logdate<\"%1\";")

@@ -238,8 +238,8 @@ class SelectManagedListItem : public ManagedListGroup
     public:
         SelectManagedListItem(const QString& baseText, ManagedListGroup* pGroup, ManagedList* parentList,
                               QObject* _parent=NULL, const char* _name=0);
-        virtual ManagedListItem* addSelection(const QString& label, QString value=QString::null, bool select=false);
-        virtual ManagedListItem* addButton(const QString& label, QString value=QString::null, bool select=false);
+        virtual ManagedListItem* addSelection(const QString& label, QString value=QString::null, bool selectit=false);
+        virtual ManagedListItem* addButton(const QString& label, QString value=QString::null, bool selectit=false);
 
         virtual void clearSelections(void);
 

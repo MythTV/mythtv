@@ -708,7 +708,7 @@ void RecordingProfile::loadByID(QSqlDatabase* db, int profileId) {
 
 bool RecordingProfile::loadByCard(QSqlDatabase* db, QString name, int cardid) {
     QString hostname = gContext->GetHostName();
-    int id = 0;
+    int recid = 0;
     QString query = QString("SELECT recordingprofiles.id, "
                    "profilegroups.hostname, profilegroups.is_default FROM "
                    "recordingprofiles,profilegroups,capturecard WHERE "
@@ -722,16 +722,16 @@ bool RecordingProfile::loadByCard(QSqlDatabase* db, QString name, int cardid) {
         {
             if (result.value(1).toString() == hostname)
             {
-                id = result.value(0).toInt();
+                recid = result.value(0).toInt();
                 break;
             }
             else if (result.value(2).toInt() == 1)
-                id = result.value(0).toInt();
+                recid = result.value(0).toInt();
         }
     }
-    if (id)
+    if (recid)
     {
-        loadByID(db, id);
+        loadByID(db, recid);
         return true;
     }
     else

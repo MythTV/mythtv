@@ -1346,10 +1346,10 @@ int MythPopupBox::showButtonPopup(MythMainWindow *parent, QString title,
     popup.addLabel(message, Medium, true);
     popup.addLabel("");
 
-    for( int i = 0; i < buttonmsgs.size(); i++ )
+    for (unsigned int i = 0; i < buttonmsgs.size(); i++ )
     {
         QButton *but = popup.addButton(buttonmsgs[i]);
-        if (defvalue == i)
+        if (defvalue == (int)i)
             but->setFocus();
     }
 
