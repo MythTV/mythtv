@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.04.02 (xris)
+#Last Updated: 2005.04.03 (xris)
 #
 #  cli.pm
 #
@@ -174,10 +174,10 @@ package nuv_export::cli;
     # Commandline preference/override
         return $args{$arg} if (defined($args{$arg}));
     # Load rc preference
-        $args{$arg} = rc_arg($arg, $package);
+        my $rc_arg = rc_arg($arg, $package);
     # Return the rc preference, or the passed-in default value
-        return defined($args{$arg})
-                ? $args{$arg}
+        return defined($rc_arg)
+                ? $rc_arg
                 : $default;
     }
 
