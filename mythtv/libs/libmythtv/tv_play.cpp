@@ -2022,6 +2022,7 @@ void TV::BrowseStart(void)
 void TV::BrowseEnd(bool change)
 {
     osd->HideSet("program_info");
+    osd->HideSet("channel_number");
 
     if (change)
     {
@@ -2064,8 +2065,12 @@ void TV::BrowseDispInfo(int direction)
     browsestarttime = regexpMap["dbstarttime"];
 
     osd->SetInfoText(regexpMap, osd_display_time);
-
     oset = osd->GetSet("program_info");
+    if (oset)
+        osd->SetVisible(oset, 0);
+
+    osd->SetTextByRegexp("channel_number", regexpMap, osd_display_time);
+    oset = osd->GetSet("channel_number");
     if (oset)
         osd->SetVisible(oset, 0);
 }
