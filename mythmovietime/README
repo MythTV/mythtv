@@ -1,50 +1,30 @@
-MythNews (A RSS News Feed Plugin for MythTV) v0.2 for MythTV 0.17
+MythMovieTime (A movie show times plugin for MythTV) for MythTV 0.17
 ---------------------------------------------------------------------
 
 
 INSTALLATION:
 ---------------------------------------------------------------------
 
-type 'qmake mythnews.pro' in the main directory to create the Makefile.
+edit settings.pro and set your PREFIX
+
+type 'qmake mythmovietime.pro' in the main directory to create the Makefile.
 
 type 'make' in the main directory to begin compiling
 
 Compiling note:  If you get an error on building this, that says
-		something about 'mkspecs', then you don't have the 
-		QTDIR environment variable set.  On debian, this 
-		should be set to /usr/share/qt3.
+                 something about 'mkspecs', then you don't have the 
+                 QTDIR environment variable set.  On debian, this 
+                 should be set to /usr/share/qt3.
 
 Once the make is completed, do a 'make install'.  
 
-- libmythnews.so will go into /usr/local/lib/mythtv/plugins
-- data files will be put into the 
-  /usr/local/share/mythtv/mythnews directory
-- image files and ui file go to /usr/local/share/mythtv/themes/default
+- libmythmovietime.so will go into PREFIX/lib/mythtv/plugins
+- image files and ui file go to PREFIX/share/mythtv/themes/default
 
-Load mythfrontend and you should see entries for mythnews in the main
-menu and in the settings menu
+Load mythfrontend and you should see entries for mythmovietime in the
+info center menu and in the settings menu
 
 
-CONFIGURATION/USAGE:
+USAGE:
 ---------------------------------------------------------------------
 
-Once you have installed mythnews you need to set it up. Go to
-Settings->NEWS Settings (This will setup the mythnews database for you
-automatically). On the Settings page there will be news feed sites on
-the left window. Double clicking or selecting and pressing
-return/space will add them to the database (These will also be shown
-on the right window). If you need to add a custom news feed site then
-add them using the "custom" button. Also set the frequency (in
-minutes) with which the news should be updated (Note: the minimum
-value is 30 Min to prevent DOSing the news sites). Now exit the setup
-page (by pressing ESC).
-
-Go to the NEWS main page and you should see the news feed sites on the
-left column and corresponding news articles on the right). You can
-move between news sites/articles using the UP/DOWN keys and between
-the news sites column and articles column using the LEFT/RIGHT
-keys. Pressing "U" will update all unupdated news. Pressing "F" will
-force updating news from all sites (WARNING: Don't use this key
-frequently unless you want to DOS the news sites and get locked). The
-news gets updated automatically depending on the frequency which you
-set in the setup page.
