@@ -720,19 +720,7 @@ Please enter the correct path and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Set X-Y Scale to the same aspect ratio. For vector games scale may have value&apos;s like 1.5 and even 0.5. For scaling of regular games this will be rounded to an int</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Enable antialiasing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable tranlucency</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Always scale vectorgames to X x Y, keeping their aspect ratio. This overrides the scale options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -757,14 +745,6 @@ Please enter the correct path and try again.</source>
     </message>
     <message>
         <source>Enable samples (if available)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Generate sound even when sound is disabled, this is needed for some games which won&apos;t run without sound</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set volume to x db, (-32 (soft) - 0(loud) )</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -793,6 +773,66 @@ Please enter the correct path and try again.</source>
     </message>
     <message>
         <source>Path to the MAME hiscore.dat file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Atari binary location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Location of the Atari emulator binary.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Atari ROM location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Location of the Atari games.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Odyssey2 binary location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Location of the Odyssey2 emulator binary.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Odyssey2 ROM location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Location of the Odyssey2 games.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythGame Settings -- Atari Emulation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythGame Settings -- Odyssey2 Emulation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set X-Y Scale to the same aspect ratio. For vector games scale may have values like 1.5 and even 0.5. For scaling of regular games this will be rounded to an int</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable translucency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always scale vectorgames to X x Y, keeping their aspect ratio. This overrides the scale options.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generate sound even when sound is disabled. This is needed for some games which won&apos;t run without sound.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set volume to x db, (-32 (soft) - 0 (loud) )</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
