@@ -321,6 +321,12 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
         }
     }
 
+    if (xv_port <= 0)
+    {
+        VERBOSE(VB_ALL, "Invalid xv port");
+        return false;
+    }
+
 #ifndef QWS
     GetMythTVGeometry(data->XJ_disp, XJ_screen_num,
                       &XJ_screenx, &XJ_screeny, 

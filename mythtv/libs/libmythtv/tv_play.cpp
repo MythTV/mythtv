@@ -68,7 +68,7 @@ SleepTimer sleep_timer_array[] =
 const int SSLEEP_MAX = sizeof sleep_timer_array / sizeof sleep_timer_array[0];
 
 const int kMuteTimeout = 800;
-const int kLCDTimeout = 1000;
+const int kLCDTimeout = 30000;
 
 void TV::InitKeys(void)
 {
@@ -2640,6 +2640,7 @@ void TV::UpdateOSDInput(void)
 
 void TV::UpdateLCD(void)
 {
+/*
     if (internalState == kState_WatchingLiveTV)
     {
         QString title, subtitle, callsign, dummy;
@@ -2663,6 +2664,7 @@ void TV::UpdateLCD(void)
     gContext->GetLCDDevice()->setChannelProgress(progress);
 
     lcdTimer->start(kLCDTimeout, true);
+*/
 }
 
 void TV::GetNextProgram(RemoteEncoder *enc, int direction,
