@@ -8,8 +8,22 @@
 #include "uitypes.h"
 #include "xmlparse.h"
 #include "programinfo.h"
+#include "scheduledrecording.h"
 
 class QSqlDatabase;
+
+class ProgramRankInfo : public ProgramInfo
+{
+  public:
+    ProgramRankInfo();
+    ProgramRankInfo(const ProgramRankInfo &other);
+    ProgramRankInfo& operator=(const ProgramInfo&);
+
+
+    int channelRank;
+    int recTypeRank;
+    ScheduledRecording::RecordingType recType;
+};
 
 class RankPrograms : public MythDialog
 {
@@ -41,8 +55,8 @@ class RankPrograms : public MythDialog
   private:
     void FillList(void);
     void SortList();
-    QMap<QString, ProgramInfo> programData;
-    QMap<QString, QString> rankData;
+    QMap<QString, ProgramRankInfo> programData;
+    QMap<QString, QString> origRankData;
 
     void updateBackground(void);
     void updateList(QPainter *);
@@ -54,7 +68,7 @@ class RankPrograms : public MythDialog
     XMLParse *theme;
     QDomElement xmldata;
 
-    ProgramInfo *curitem;
+    ProgramRankInfo *curitem;
 
     QSqlDatabase *db;
 

@@ -723,23 +723,6 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
         }
     }
 
-    QString fileprefix = gContext->GetFilePrefix();
-    QString filename = pginfo->GetRecordFilename(fileprefix);
-    QFile checkFile(filename);
-
-    if (!checkFile.exists())
-    {
-       cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-            << " Strange.  File: " << filename << " doesn't exist." << endl;
-
-       QStringList outputlist;
-       outputlist << "BAD: Tried to delete a file that was in "
-                     "the database but wasn't on the disk.";
-       WriteStringList(pbs->getSocket(), outputlist);
-       delete pginfo;
-       return;
-    }
-
     QSqlQuery query;
     QString thequery;
 
@@ -783,15 +766,32 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
 
     dblock.unlock();
 
-    DeleteStruct *ds = new DeleteStruct;
-    ds->filename = filename;
+    QString fileprefix = gContext->GetFilePrefix();
+    QString filename = pginfo->GetRecordFilename(fileprefix);
+    QFile checkFile(filename);
 
-    pthread_t deletethread;
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    if (checkFile.exists())
+    {
+        DeleteStruct *ds = new DeleteStruct;
+        ds->filename = filename;
 
-    pthread_create(&deletethread, &attr, SpawnDelete, ds);
+        pthread_t deletethread;
+        pthread_attr_t attr;
+        pthread_attr_init(&attr);
+        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+        pthread_create(&deletethread, &attr, SpawnDelete, ds);
+    }
+    else
+    {
+        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+             << " Strange.  File: " << filename << " doesn't exist." << endl;
+
+        QStringList outputlist;
+        outputlist << "BAD: Tried to delete a file that was in "
+                      "the database but wasn't on the disk.";
+        WriteStringList(pbs->getSocket(), outputlist);
+    }
 
     QStringList outputlist = QString::number(recnum);
     WriteStringList(pbs->getSocket(), outputlist);

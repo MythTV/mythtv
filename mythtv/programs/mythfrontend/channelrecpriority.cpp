@@ -110,7 +110,11 @@ void RankChannels::keyPressEvent(QKeyEvent *e)
         case Key_PageDown: case Key_9: pageDown(); break;
         case Key_Right: changeRank(1); break;
         case Key_Left: changeRank(-1); break;
-        case Key_Escape: saveRank(); break;
+        case Key_Escape: saveRank(); 
+                         gContext->SaveSetting("ChannelRankSorting", 
+                                               (int)sortType);
+                         done(MythDialog::Accepted);
+                         break;
         case Key_1: if(sortType == byChannel)
                         break; 
                     sortType = byChannel; 
@@ -335,18 +339,26 @@ void RankChannels::changeRank(int howMuch)
     int tempRank, cnt;
     QPainter p(this);
     QMap<QString, ChannelInfo>::Iterator it;
-    ChannelInfo *tempInfo;
+    ChannelInfo *chanInfo;
 
+    // iterate through channelData till we hit the line where
+    // the cursor currently is
     for (cnt=0, it = channelData.begin(); cnt < inList+inData; cnt++, ++it);
 
-    tempInfo = &(it.data());
+    chanInfo = &(it.data());
 
-    tempRank = tempInfo->rank.toInt() + howMuch;
-    tempInfo->rank = QString::number(tempRank);
-    if (sortType == byRank)
-        SortList();
-    updateList(&p);
-    updateInfo(&p);
+    // inc/dec rank
+    tempRank = chanInfo->rank.toInt() + howMuch;
+    if(tempRank > -100 && tempRank < 100)
+    {
+        chanInfo->rank = QString::number(tempRank);
+
+        // order may change if sorting by rank, so resort
+        if (sortType == byRank)
+            SortList();
+        updateList(&p);
+        updateInfo(&p);
+    }
 }
 
 void RankChannels::applyChannelRankChange(QSqlDatabase *db, QString chanid, 
@@ -355,31 +367,29 @@ void RankChannels::applyChannelRankChange(QSqlDatabase *db, QString chanid,
     QString query = QString("UPDATE channel SET rank = '%1' "
                             "WHERE chanid = '%2';").arg(newrank).arg(chanid);
     QSqlQuery result = db->exec(query);
+    if (!result.isActive())
+        MythContext::DBError("Save rank update", query);
 }
 
 void RankChannels::saveRank(void) 
 {
     QMap<QString, ChannelInfo>::Iterator it;
-    ChannelInfo *tempInfo;
-    QString *tempRank, key;
 
     for (it = channelData.begin(); it != channelData.end(); ++it) 
     {
-        tempInfo = &(it.data());
-        key = QString::number(tempInfo->chanid);
-        tempRank = &rankData[key];
-        if(tempInfo->rank != *tempRank)
-            applyChannelRankChange(db, QString::number(tempInfo->chanid), 
-                                   tempInfo->rank);
-    }
+        ChannelInfo *chanInfo = &(it.data());
+        QString key = QString::number(chanInfo->chanid);
 
-    gContext->SaveSetting("ChannelRankSorting", (int)sortType);
-    done(MythDialog::Accepted);
+        // if this channel's rank changed from when we entered
+        // save new value out to db
+        if (chanInfo->rank != origRankData[key])
+            applyChannelRankChange(db, QString::number(chanInfo->chanid), 
+                                   chanInfo->rank);
+    }
 }
 
 void RankChannels::FillList(void)
 {
-    QString key;
     int cnt = 999;
 
     channelData.clear();
@@ -390,6 +400,7 @@ void RankChannels::FillList(void)
     QSqlQuery result = db->exec(query);
 
     if (result.isActive() && result.numRowsAffected() > 0)
+    {
         while (result.next()) {
             ChannelInfo *chaninfo = new ChannelInfo;
             chaninfo->chanid = result.value(0).toInt();
@@ -398,10 +409,17 @@ void RankChannels::FillList(void)
             chaninfo->iconpath = result.value(3).toString();
             chaninfo->rank = result.value(4).toString();
             channelData[QString::number(cnt)] = *chaninfo;
-            rankData[QString::number(chaninfo->chanid)] = chaninfo->rank;
+
+            // save rank value in map so we don't have to save all channel's
+            // rank values when we exit
+            origRankData[QString::number(chaninfo->chanid)] = chaninfo->rank;
+
             cnt--;
             dataCount++;
         }
+    }
+    else if (!result.isActive())
+        MythContext::DBError("Get channel ranks query", query);
 }
 
 typedef struct RankInfo 
@@ -442,15 +460,16 @@ void RankChannels::SortList()
     sortList::iterator sit;
     ChannelInfo *chanInfo;
     RankInfo *rankInfo;
-    chanMap sdCopy;
-    QString cntStr = "";
+    chanMap cdCopy;
 
+    // copy channelData into sortedList and make a copy
+    // of channelData in cdCopy
     for (i = 0, pit = channelData.begin(); pit != channelData.end(); ++pit, i++)
     {
         chanInfo = &(pit.data());
         RankInfo tmp = {chanInfo, i};
         sortedList.push_back(tmp);
-        sdCopy[pit.key()] = pit.data();
+        cdCopy[pit.key()] = pit.data();
     }
 
     switch(sortType) 
@@ -465,30 +484,37 @@ void RankChannels::SortList()
 
     channelData.clear();
 
+    // rebuild channelData in sortedList order from cdCopy
     for(i = 0, sit = sortedList.begin(); sit != sortedList.end(); i++, ++sit ) 
     {
         rankInfo = &(*sit);
 
-        for (j = 0, pit = sdCopy.begin(); j != rankInfo->cnt; j++, ++pit);
+        // find rankInfo[i] in cdCopy
+        for (j = 0, pit = cdCopy.begin(); j != rankInfo->cnt; j++, ++pit);
 
         chanInfo = &(pit.data());
-        cntStr.sprintf("%d", 999-i);
-        channelData[cntStr] = pit.data();
 
+        // put back into channelData
+        channelData[QString::number(999-i)] = pit.data();
+
+        // if rankInfo[i] is the channel where the cursor
+        // was pre-sort then we need to update to cursor
+        // to the ith position
         if (!cursorChanged && rankInfo->cnt == inList+inData) 
         {
-            inList = dataCount-i-1;
+            inList = dataCount - i - 1;
             if (inList > (int)((int)(listsize / 2) - 1)) 
             {
                 inList = (int)(listsize / 2);
-                inData = dataCount-i-1 - inList;
+                inData = dataCount - i - 1 - inList;
             }
             else
                 inData = 0;
-            if (inData > dataCount-listsize) 
+
+            if (dataCount > listsize && inData > dataCount - listsize) 
             {
-                inList += inData-(dataCount-listsize);
-                inData = dataCount-listsize;
+                inList += inData - (dataCount - listsize);
+                inData = dataCount - listsize;
             }
             cursorChanged = true;
         }
@@ -503,19 +529,8 @@ void RankChannels::updateList(QPainter *p)
     QPainter tmp(&pix);
     
     int pastSkip = (int)inData;
-    int rank;
     pageDowner = false;
     listCount = 0;
-
-    typedef QMap<QString, ChannelInfo> RankData;
-    ChannelInfo *tempInfo;
-  
-    RankData::Iterator it;
-    RankData::Iterator start;
-    RankData::Iterator end;
-
-    start = channelData.begin();
-    end = channelData.end();
 
     LayerSet *container = NULL;
     container = theme->GetSet("selector");
@@ -528,28 +543,29 @@ void RankChannels::updateList(QPainter *p)
             ltype->ResetList();
             ltype->SetActive(true);
 
-            for (it = start; it != end; ++it)
+            QMap<QString, ChannelInfo>::Iterator it;
+            for (it = channelData.begin(); it != channelData.end(); ++it)
             {
                 if (cnt < listsize)
                 {
                     if (pastSkip <= 0)
                     {
-                        tempInfo = &(it.data());
-                        rank = tempInfo->rank.toInt();
+                        ChannelInfo *chanInfo = &(it.data());
+                        int rank = chanInfo->rank.toInt();
 
                         if (cnt == inList)
                         {
                             if (curitem)
                                 delete curitem;
-                            curitem = new ChannelInfo(*tempInfo);
+                            curitem = new ChannelInfo(*chanInfo);
                             ltype->SetItemCurrent(cnt);
                         }
                         
-                        ltype->SetItemText(cnt, 1, tempInfo->chanstr);
-                        ltype->SetItemText(cnt, 2, tempInfo->callsign);
-                        if(tempInfo->rank.toInt() > 0)
+                        ltype->SetItemText(cnt, 1, chanInfo->chanstr);
+                        ltype->SetItemText(cnt, 2, chanInfo->callsign);
+                        if (chanInfo->rank.toInt() > 0)
                             ltype->SetItemText(cnt, 3, "+");
-                        else if(tempInfo->rank.toInt() < 0)
+                        else if (chanInfo->rank.toInt() < 0)
                             ltype->SetItemText(cnt, 3, "-");
                         ltype->SetItemText(cnt, 4, QString::number(abs(rank)));
 

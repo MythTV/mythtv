@@ -463,11 +463,6 @@ public:
     };
 };
 
-class RankSetting: virtual public Setting {
-public:
-    RankSetting();
-};
-
 class QDate;
 class DateSetting: virtual public Setting {
     Q_OBJECT

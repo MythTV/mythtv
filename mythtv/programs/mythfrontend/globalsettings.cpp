@@ -213,6 +213,16 @@ public:
     };
 };
 
+class RecordPreRoll: public SpinBoxSetting, public GlobalSetting {
+public:
+    RecordPreRoll():
+        SpinBoxSetting(0, 600, 1),
+        GlobalSetting("RecordPreRoll") {
+        setLabel("Time to record before start of show (in seconds)");
+        setValue(0);
+    };
+};
+
 class RecordOverTime: public SpinBoxSetting, public GlobalSetting {
 public:
     RecordOverTime():
@@ -996,6 +1006,7 @@ GeneralSettings::GeneralSettings()
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
     general->setLabel("General");
+    general->addChild(new RecordPreRoll());
     general->addChild(new RecordOverTime());
     general->addChild(new PlayBoxOrdering());
     general->addChild(new ChannelOrdering());

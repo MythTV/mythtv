@@ -44,7 +44,7 @@ class RankChannels : public MythDialog
     void FillList(void);
     void SortList();
     QMap<QString, ChannelInfo> channelData;
-    QMap<QString, QString> rankData;
+    QMap<QString, QString> origRankData;
 
     void updateBackground(void);
     void updateList(QPainter *);

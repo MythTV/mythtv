@@ -509,17 +509,8 @@ void Scheduler::CheckRank(ProgramInfo *info,
     int rank, srank, resolved = 0;
 
     rank = info->rank.toInt();
-    rank += info->getChannelRank(info->chanid, db);
-    rank += info->getTypeRank(info->GetProgramRecordingStatus(db));
-//    cerr << "Scheduler::CheckRank()" << endl;
-//    cerr << " title = " << info->title << endl;
-//    cerr << " chanid = " << info->chanid << endl;
-//    cerr << " type = " << info->GetProgramRecordingStatus(db) << endl;
-//    cerr << " rank = " << info->rank << endl;
-//    cerr << " chanrank = " << info->getChannelRank(info->chanid, db) << endl;
-//    cerr << " typerank = " << info->getTypeRank(info->GetProgramRecordingStatus(db)) << endl;
-//    cerr << " totalrank = " << rank << endl;
-//    cerr << endl;
+    rank += info->GetChannelRank(info->chanid, db);
+    rank += info->GetRecordingTypeRank(info->GetProgramRecordingStatus(db));
 
     list<ProgramInfo *>::iterator i = conflictList->begin();
     for (; i != conflictList->end(); i++)
@@ -527,8 +518,8 @@ void Scheduler::CheckRank(ProgramInfo *info,
         ProgramInfo *second = (*i);
 
         srank = second->rank.toInt();
-        srank += info->getChannelRank(second->chanid, db);
-        srank += info->getTypeRank(second->GetProgramRecordingStatus(db));
+        srank += info->GetChannelRank(second->chanid, db);
+        srank += info->GetRecordingTypeRank(second->GetProgramRecordingStatus(db));
 
         if (rank == srank)
             continue;
@@ -1072,6 +1063,8 @@ void Scheduler::DoMultiCard(void)
 
 void Scheduler::RunScheduler(void)
 {
+    int prerollseconds = 0;
+
     int secsleft;
     bool resetIter = false;
     EncoderLink *nexttv = NULL;
@@ -1099,22 +1092,16 @@ void Scheduler::RunScheduler(void)
             FillRecordLists();
             lastupdate = curtime;
             VERBOSE("Found changes in the todo list.");
+
+            // Determine if the user wants us to start recording early
+            // and by how many seconds
+            prerollseconds = gContext->GetNumSetting("RecordPreRoll");
         }
 
         recIter = recordingList.begin();
         while (recIter != recordingList.end())
         {
             nextRecording = (*recIter);
-
-            nextrectime = nextRecording->startts;
-            secsleft = curtime.secsTo(nextrectime);
-
-            bool recording = nextRecording->recording;
-
-//            VERBOSE(secsleft << " seconds until " << nextRecording->title);
-
-            if (secsleft > 35)
-                break;
 
             if (m_tvList->find(nextRecording->cardid) == m_tvList->end())
             {
@@ -1124,6 +1111,26 @@ void Scheduler::RunScheduler(void)
             nexttv = (*m_tvList)[nextRecording->cardid];
             // cerr << "nexttv = " << nextRecording->cardid;
             // cerr << " title: " << nextRecording->title << endl;
+
+            bool recording = nextRecording->recording;
+
+            nextrectime = nextRecording->startts;
+            secsleft = curtime.secsTo(nextrectime);
+
+            if (secsleft - prerollseconds > 35)
+                break;
+
+            if ((recording && !nexttv->isBusy()) || !recording)
+            {
+                // Will use pre-roll settings only if no other
+                // program is currently being recorded
+                secsleft -= prerollseconds;
+            }
+
+//            VERBOSE(secsleft << " seconds until " << nextRecording->title);
+
+            if (secsleft > 35)
+                break;
 
             if (recording && nexttv->GetState() == kState_WatchingLiveTV &&
                 secsleft <= 30 && secsleft > 0)

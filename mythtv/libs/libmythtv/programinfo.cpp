@@ -477,7 +477,7 @@ ScheduledRecording::RecordingType ProgramInfo::GetProgramRecordingStatus(QSqlDat
     return record->getRecordingType();
 }
 
-int ProgramInfo::getChannelRank(QString chanid, QSqlDatabase *db)
+int ProgramInfo::GetChannelRank(QString chanid, QSqlDatabase *db)
 {
     QString thequery;
 
@@ -494,7 +494,7 @@ int ProgramInfo::getChannelRank(QString chanid, QSqlDatabase *db)
     return 0;
 }
 
-int ProgramInfo::getTypeRank(ScheduledRecording::RecordingType type)
+int ProgramInfo::GetRecordingTypeRank(ScheduledRecording::RecordingType type)
 {
     switch(type)
     {

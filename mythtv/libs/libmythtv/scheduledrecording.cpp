@@ -134,10 +134,13 @@ public:
     };
 };
 
-class SRRank: public RankSetting, public SRSetting {
+class SRRank: public SpinBoxSetting, public SRSetting {
 public:
-    SRRank(const ScheduledRecording& parent): SRSetting(parent, "rank") {
-        setVisible(false);
+    SRRank(const ScheduledRecording& parent): 
+        SpinBoxSetting(-99, 99, 1),
+        SRSetting(parent, "rank") {
+        setLabel(QObject::tr("Rank"));
+        setValue(0);
     };
 };
 
@@ -178,7 +181,7 @@ void ScheduledRecording::fromProgramInfo(ProgramInfo* proginfo)
     endTime->setValue(proginfo->endts.time());
     endDate->setValue(proginfo->endts.date());
     category->setValue(proginfo->category);
-    rank->setValue(proginfo->rank);
+    rank->setValue(proginfo->rank.toInt());
 }
 
 void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
@@ -315,7 +318,9 @@ void ScheduledRecording::findAllScheduledPrograms(QSqlDatabase* db,
                 // put currentDateTime() in time fields to prevent
                 // Invalid date/time warnings later
                 proginfo->startts = QDateTime::currentDateTime();
+                proginfo->startts.setTime(QTime(0,0));
                 proginfo->endts = QDateTime::currentDateTime();
+                proginfo->endts.setTime(QTime(0,0));
             }
 
             proginfo->title = QString::fromUtf8(result.value(5).toString());
@@ -583,6 +588,7 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
 
     vbox->addWidget(type->configWidget(this, dialog));
     vbox->addWidget(profile->configWidget(this, dialog));
+    vbox->addWidget(rank->configWidget(this, dialog));
 
 //    f = new QFrame(dialog);
 //    f->setFrameStyle(QFrame::HLine | QFrame::Plain);
@@ -679,7 +685,7 @@ void ScheduledRecording::setEnd(const QDateTime& end) {
 }
 
 void ScheduledRecording::setRank(const QString& newrank) {
-    rank->setValue(newrank);
+    rank->setValue(newrank.toInt());
 }
 
 int ScheduledRecording::getProfileID(void) const {

@@ -692,7 +692,7 @@
       <textarea name="keyinstr" align="center" draworder="0">
         <area>0,570,800,30</area>
         <font>message</font>
-        <value>(1) Sort by Title    (2) Sort by Rank</value>
+        <value>(1) Sort by Channel    (2) Sort by Rank</value>
       </textarea>
     </container>
 
@@ -816,6 +816,13 @@
       <bold>yes</bold>
     </font>
 
+    <font name="tinyinfo" face="Arial">
+      <color>#cccccc</color>
+      <size>10</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
     <font name="grayinfo" face="Arial">
       <color>#777777</color>
       <size>17</size>
@@ -843,6 +850,16 @@
         <font>info</font>
         <value>Program Rankings</value>
       </textarea>
+      <textarea name="ranklabel" draworder="0">
+        <area>625,20,800,40</area>
+        <font>tinyinfo</font>
+        <value>Rank</value>
+      </textarea>
+      <textarea name="finalranklabel" draworder="0">
+        <area>690,20,800,40</area>
+        <font>tinyinfo</font>
+        <value>Final Rank</value>
+      </textarea>
       <image name="filler" draworder="0" fleximage="yes">
         <filename>rk-background.png</filename>
         <position>0,35</position>
@@ -862,9 +879,11 @@
         <fcnfont name="inactive_font" function="inactive"></fcnfont>
         <fcnfont name="active_font" function="selected"></fcnfont>
         <columnpadding>1</columnpadding>
-        <column number="1" width="655" context="-1"></column>
+        <column number="1" width="608" context="-1"></column>
         <column number="2" width="13" context="-1"></column>
-        <column number="3" width="50" context="-1"></column>
+        <column number="3" width="64" context="-1"></column>
+        <column number="4" width="13" context="-1"></column>
+        <column number="5" width="50" context="-1"></column>
         <items>11</items>
         <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>
         <image function="uparrow" filename="uparrow.png" location="755,22"></image>
@@ -877,7 +896,7 @@
     </container>
 
     <container name="program_info">
-      <area>0,400,800,240</area>
+      <area>0,410,800,240</area>
       <textarea name="title" draworder="6">
         <area>20,0,800,50</area>
         <font>title</font>
@@ -887,88 +906,88 @@
         <font>info</font>
       </textarea>
       <textarea name="infotype" draworder="6">
-        <area>20,80,180,30</area>
+        <area>20,70,280,30</area>
         <font>info</font>
         <value>Record Type:</value>
       </textarea>
       <textarea name="type" draworder="6">
-        <area>200,80,430,30</area>
+        <area>200,70,430,30</area>
         <font>info</font>
       </textarea>
       <textarea name="typebracketA" draworder="6">
-        <area>640,80,100,30</area>
+        <area>620,70,100,30</area>
         <font>grayinfo</font>
         <value>[</value>
       </textarea>
       <textarea name="typesign" draworder="6">
-        <area>650,80,100,30</area>
+        <area>630,70,100,30</area>
         <font>grayinfo</font>
       </textarea>
       <textarea name="typerank" draworder="6">
-        <area>663,80,100,30</area>
+        <area>643,70,100,30</area>
         <font>grayinfo</font>
       </textarea>
       <textarea name="typebracketB" draworder="6">
-        <area>688,80,100,30</area>
+        <area>668,70,100,30</area>
         <font>grayinfo</font>
         <value>]</value>
       </textarea>
       <textarea name="infochannel" draworder="6">
-        <area>20,110,160,30</area>
+        <area>20,100,160,30</area>
         <font>info</font>
         <value>Channel:</value>
       </textarea>
       <textarea name="channel" draworder="6">
-        <area>200,110,400,30</area>
+        <area>200,100,400,30</area>
         <font>info</font>
       </textarea>
       <textarea name="channelbracketA" draworder="6">
-        <area>640,110,100,30</area>
+        <area>620,100,100,30</area>
         <font>grayinfo</font>
         <value>[</value>
       </textarea>
       <textarea name="channelsign" draworder="6">
-        <area>650,110,100,30</area>
+        <area>630,100,100,30</area>
         <font>grayinfo</font>
       </textarea>
       <textarea name="channelrank" draworder="6">
-        <area>663,110,100,30</area>
+        <area>643,100,100,30</area>
         <font>grayinfo</font>
       </textarea>
       <textarea name="channelbracketB" draworder="6">
-        <area>688,110,100,30</area>
+        <area>668,100,100,30</area>
         <font>grayinfo</font>
         <value>]</value>
       </textarea>
       <textarea name="inforank" draworder="6">
-        <area>20,140,160,30</area>
+        <area>20,130,160,30</area>
         <font>info</font>
         <value>Rank:</value>
       </textarea>
       <textarea name="rank" draworder="6">
-        <area>200,140,400,30</area>
+        <area>200,130,400,30</area>
         <font>info</font>
       </textarea>
       <textarea name="rankbracketA" draworder="6">
-        <area>640,140,100,30</area>
+        <area>620,130,100,30</area>
         <font>grayinfo</font>
         <value>[</value>
       </textarea>
       <textarea name="ranksign" draworder="6">
-        <area>650,140,100,30</area>
+        <area>630,130,100,30</area>
         <font>grayinfo</font>
       </textarea>
       <textarea name="rankB" draworder="6">
-        <area>663,140,100,30</area>
+        <area>643,130,100,30</area>
         <font>grayinfo</font>
       </textarea>
       <textarea name="rankbracketB" draworder="6">
-        <area>688,140,100,30</area>
+        <area>668,130,100,30</area>
         <font>grayinfo</font>
         <value>]  = </value>
       </textarea>
-      <textarea name="totalrank" draworder="6">
-        <area>730,140,150,30</area>
+      <textarea name="finalrank" draworder="6">
+        <area>709,130,150,30</area>
         <font>yellowinfo</font>
       </textarea>
     </container>

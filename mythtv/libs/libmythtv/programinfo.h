@@ -44,8 +44,8 @@ class ProgramInfo
     void Save(void);
 
     ScheduledRecording::RecordingType GetProgramRecordingStatus(QSqlDatabase *db);
-    int getChannelRank(QString chanid, QSqlDatabase *db);
-    int getTypeRank(ScheduledRecording::RecordingType type);
+    int GetChannelRank(QString chanid, QSqlDatabase *db);
+    int GetRecordingTypeRank(ScheduledRecording::RecordingType type);
 
     void ApplyRecordStateChange(QSqlDatabase *db,
                                 ScheduledRecording::RecordingType newstate);

@@ -24,6 +24,56 @@ using namespace std;
 #include "mythcontext.h"
 #include "remoteutil.h"
 
+// overloaded version of ProgramInfo with additional rank
+// values so we can keep everything together and don't
+// have to hit the db mulitiple times
+ProgramRankInfo::ProgramRankInfo(void) : ProgramInfo()
+{
+    channelRank = 0;
+    recTypeRank = 0;
+    recType = (ScheduledRecording::RecordingType)0;
+}
+
+ProgramRankInfo::ProgramRankInfo(const ProgramRankInfo &other) :
+    ProgramInfo::ProgramInfo(other)
+{
+    channelRank = other.channelRank;
+    recTypeRank = other.recTypeRank;
+    recType = other.recType;
+}
+
+ProgramRankInfo& ProgramRankInfo::operator=(const ProgramInfo &other)
+{
+    title = other.title;
+    subtitle = other.subtitle;
+    description = other.description;
+    category = other.category;
+    chanid = other.chanid;
+    chanstr = other.chanstr;
+    chansign = other.chansign;
+    channame = other.channame;
+    pathname = other.pathname;
+    filesize = other.filesize;
+    hostname = other.hostname;
+
+    startts = other.startts;
+    endts = other.endts;
+    spread = other.spread;
+    startCol = other.startCol;
+
+    conflicting = other.conflicting;
+    recording = other.recording;
+    duplicate = other.duplicate;
+
+    sourceid = other.sourceid;
+    inputid = other.inputid;
+    cardid = other.cardid;
+    schedulerid = other.schedulerid;
+    rank = other.rank;
+
+    return(*this);
+}
+
 RankPrograms::RankPrograms(QSqlDatabase *ldb, MythMainWindow *parent, 
                              const char *name)
             : MythDialog(parent, name)
@@ -88,8 +138,7 @@ RankPrograms::RankPrograms(QSqlDatabase *ldb, MythMainWindow *parent,
 												 (int)byTitle);
 
     SortList(); 
-    inList = 0;
-    inData = 0;
+    inList = inData = 0;
     setNoErase();
 
     gContext->addListener(this);
@@ -118,7 +167,11 @@ void RankPrograms::keyPressEvent(QKeyEvent *e)
         case Key_PageDown: case Key_9: pageDown(); break;
         case Key_Right: changeRank(1); break;
         case Key_Left: changeRank(-1); break;
-        case Key_Escape: saveRank(); break;
+        case Key_Escape: saveRank();
+                         gContext->SaveSetting("ProgramRankSorting", 
+                                               (int)sortType);
+                         done(MythDialog::Accepted);
+                         break;
         case Key_1: if (sortType == byTitle)
                         break; 
                     sortType = byTitle; 
@@ -131,7 +184,9 @@ void RankPrograms::keyPressEvent(QKeyEvent *e)
                     SortList(); 
                     update(fullRect);
                     break;
-        case Key_I: edit(); break;
+        case Key_I: saveRank(); 
+                    edit(); 
+                    break;
         default: MythDialog::keyPressEvent(e); break;
     }
 }
@@ -355,7 +410,7 @@ void RankPrograms::edit(void)
 
     doingSel = true;
 
-    ProgramInfo *rec = curitem;
+    ProgramRankInfo *rec = curitem;
 
     MythContext::KickDatabase(db);
 
@@ -375,7 +430,67 @@ void RankPrograms::edit(void)
 
         ScheduledRecording::signalChange(db);
 
-        FillList();
+        // We need to refetch the rank values since the Advanced
+        // Recording Options page could've been used to change them 
+        QString thequery;
+        int recid = rec->GetScheduledRecording(db)->getRecordID();
+        thequery = QString("SELECT rank, type FROM record WHERE recordid = %1;")
+                           .arg(recid);
+        QSqlQuery query = db->exec(thequery);
+
+        if (query.isActive())
+            if (query.numRowsAffected() > 0)
+            {
+                query.next();
+                QString rank = query.value(0).toString();
+                int rectype = query.value(1).toInt();
+
+                int cnt;
+                QMap<QString, ProgramRankInfo>::Iterator it;
+                ProgramRankInfo *progInfo;
+
+                // iterate through programData till we hit the line where
+                // the cursor currently is
+                for (cnt = 0, it = programData.begin(); cnt < inList+inData; 
+                     cnt++, ++it);
+                progInfo = &(it.data());
+           
+                int rtRanks[5];
+                rtRanks[0] = gContext->GetNumSetting("SingleRecordRank", 0);
+                rtRanks[1] = gContext->GetNumSetting("TimeslotRecordRank", 0);
+                rtRanks[2] = gContext->GetNumSetting("ChannelRecordRank", 0);
+                rtRanks[3] = gContext->GetNumSetting("AllRecordRank", 0);
+                rtRanks[4] = gContext->GetNumSetting("WeekslotRecordRank", 0);
+
+                // set the ranks of that program 
+                progInfo->rank = rank;
+                progInfo->recType = (ScheduledRecording::RecordingType)rectype;
+                progInfo->recTypeRank = rtRanks[progInfo->recType-1];
+
+                // also set the origRankData with new rank so we don't
+                // save to db again when we exit
+                QString key = progInfo->title + ":" + progInfo->chanid + ":" + 
+                              progInfo->startts.toString(Qt::ISODate);
+                origRankData[key] = progInfo->rank;
+
+                SortList();
+            }
+            else
+            {
+                // empty query means this recordid no longer exists
+                // in record so it was deleted
+                // remove it from programData
+                int cnt;
+                QMap<QString, ProgramRankInfo>::Iterator it;
+                for (cnt = 0, it = programData.begin(); cnt < inList+inData; 
+                     cnt++, ++it);
+                programData.remove(it);
+                SortList();
+                inList = inData = 0;
+            }
+        else
+            MythContext::DBError("Get new rank query", query);
+
         update(fullRect);
     }
 
@@ -386,17 +501,21 @@ void RankPrograms::changeRank(int howMuch)
 {
     int tempRank, cnt;
     QPainter p(this);
-    QMap<QString, ProgramInfo>::Iterator it;
-    ProgramInfo *tempInfo;
-
+    QMap<QString, ProgramRankInfo>::Iterator it;
+    ProgramRankInfo *progInfo;
+ 
+    // iterate through programData till we hit the line where
+    // the cursor currently is
     for (cnt = 0, it = programData.begin(); cnt < inList+inData; cnt++, ++it);
+    progInfo = &(it.data());
 
-    tempInfo = &(it.data());
-
-    tempRank = tempInfo->rank.toInt() + howMuch;
+    // inc/dec rank
+    tempRank = progInfo->rank.toInt() + howMuch;
     if(tempRank > -100 && tempRank < 100) 
     {
-        tempInfo->rank = QString::number(tempRank);
+        progInfo->rank = QString::number(tempRank);
+
+        // order may change if sorting by rank, so resort
         if (sortType == byRank)
             SortList();
         updateList(&p);
@@ -406,33 +525,28 @@ void RankPrograms::changeRank(int howMuch)
 
 void RankPrograms::saveRank(void) 
 {
-    QMap<QString, ProgramInfo>::Iterator it;
-    ProgramInfo *tempInfo;
-    QString *tempRank, key;
+    QMap<QString, ProgramRankInfo>::Iterator it;
 
     for (it = programData.begin(); it != programData.end(); ++it) 
     {
-        tempInfo = &(it.data());
-        key = tempInfo->title + ":" + tempInfo->chanid + ":" + 
-              tempInfo->startts.toString(Qt::ISODate);
-        tempRank = &rankData[key];
-        if (tempInfo->rank != *tempRank)
-            tempInfo->ApplyRecordRankChange(db, tempInfo->rank);
+        ProgramRankInfo *progInfo = &(it.data());
+        QString key = progInfo->title + ":" + progInfo->chanid + ":" + 
+                      progInfo->startts.toString(Qt::ISODate);
+
+        // if this program's rank changed from when we entered
+        // save new value out to db
+        if (progInfo->rank != origRankData[key])
+            progInfo->ApplyRecordRankChange(db, progInfo->rank);
     }
     ScheduledRecording::signalChange(db);
-    gContext->SaveSetting("ProgramRankSorting", (int)sortType);
-    done(MythDialog::Accepted);
 }
 
 void RankPrograms::FillList(void)
 {
-    QString key;
-    int cnt = 999;
+    int cnt = 999, rtRanks[5];
+    vector<ProgramInfo *> recordinglist;
 
     programData.clear();
-
-    vector<ProgramInfo *> recordinglist;
-    QString cntStr = "";
 
     allowKeys = false;
     RemoteGetAllScheduledRecordings(recordinglist);
@@ -442,20 +556,107 @@ void RankPrograms::FillList(void)
 
     for (; pgiter != recordinglist.rend(); pgiter++)
     {
-        cntStr.sprintf("%d", cnt);
-        programData[cntStr] = *(*pgiter);
-        key = (*pgiter)->title + ":" + (*pgiter)->chanid + ":" + 
-              (*pgiter)->startts.toString(Qt::ISODate);
-        rankData[key] = (*pgiter)->rank;
+        programData[QString::number(cnt)] = *(*pgiter);
+
+        // save rank value in map so we don't have to save all program's
+        // rank values when we exit
+        QString key = (*pgiter)->title + ":" + (*pgiter)->chanid + ":" + 
+                      (*pgiter)->startts.toString(Qt::ISODate);
+        origRankData[key] = (*pgiter)->rank;
+
         delete (*pgiter);
         cnt--;
         dataCount++;
     }
+
+//    cerr << "RemoteGetAllScheduledRecordings() returned " << programData.size();
+//    cerr << " programs" << endl;
+
+    // get all the recording type rank values
+    rtRanks[0] = gContext->GetNumSetting("SingleRecordRank", 0);
+    rtRanks[1] = gContext->GetNumSetting("TimeslotRecordRank", 0);
+    rtRanks[2] = gContext->GetNumSetting("ChannelRecordRank", 0);
+    rtRanks[3] = gContext->GetNumSetting("AllRecordRank", 0);
+    rtRanks[4] = gContext->GetNumSetting("WeekslotRecordRank", 0);
+    
+    // get channel ranks and recording types associated with each
+    // program from db
+    // (hope this is ok to do here, it's so much lighter doing
+    // it all at once than once per program)
+    QString query = QString("SELECT record.title, record.chanid, "
+                            "record.starttime, record.startdate, "
+                            "record.type, channel.rank "
+                            "FROM record "
+                            "LEFT JOIN channel ON "
+                            "(record.chanid = channel.chanid);");
+
+    QSqlQuery result = db->exec(query);
+   
+//    cerr << "db query returned " << result.numRowsAffected() << " programs";
+//    cerr << endl; 
+    int matches = 0;
+
+    if (result.isActive() && result.numRowsAffected() > 0)
+    {
+        while (result.next()) 
+        {
+            QString title = QString::fromUtf8(result.value(0).toString());
+            QString chanid = result.value(1).toString();
+            QString tempTime = result.value(2).toString();
+            QString tempDate = result.value(3).toString();
+            ScheduledRecording::RecordingType recType = 
+               (ScheduledRecording::RecordingType)result.value(4).toInt();
+            int channelRank = result.value(5).toInt();
+            int recTypeRank = rtRanks[recType-1];
+              
+            // this is so kludgy
+            // since we key off of title+chanid+startts we have
+            // to copy what RemoteGetAllScheduledRecordings()
+            // does so the keys will match 
+            QDateTime startts; 
+            if (recType == ScheduledRecording::SingleRecord ||
+                recType == ScheduledRecording::TimeslotRecord ||
+                recType == ScheduledRecording::WeekslotRecord)
+                startts = QDateTime::fromString(tempDate+":"+tempTime,
+                                                Qt::ISODate);
+            else
+            {
+                startts = QDateTime::currentDateTime();
+                startts.setTime(QTime(0,0));
+            }
+    
+            // make a key for each program
+            QString keyA = title + ":" + chanid + ":" +
+                           startts.toString(Qt::ISODate);
+
+            // find matching program in programData and set
+            // channelRank, recTypeRank and recType
+            QMap<QString, ProgramRankInfo>::Iterator it;
+            for (it = programData.begin(); it != programData.end(); ++it)
+            {
+                ProgramRankInfo *progInfo = &(it.data());
+                QString keyB = progInfo->title + ":" + progInfo->chanid + ":" +
+                               progInfo->startts.toString(Qt::ISODate);
+                if(keyA == keyB)
+                {
+                    progInfo->channelRank = channelRank;
+                    progInfo->recTypeRank = recTypeRank;
+                    progInfo->recType = recType;
+                    matches++;
+                    break;
+                }
+            }
+        }
+    }
+    else
+        MythContext::DBError("Get program ranks query", query);
+
+//    cerr << matches << " matches made" << endl;
 }
 
 typedef struct RankInfo 
 {
-    ProgramInfo *prog;
+    ProgramRankInfo *prog;
     int cnt;
 };
 
@@ -473,35 +674,39 @@ class programRankSort
     public:
         bool operator()(const RankInfo a, const RankInfo b) 
         {
-            if (a.prog->rank.toInt() == b.prog->rank.toInt())
+            int finalA = a.prog->rank.toInt() + a.prog->channelRank +
+                         a.prog->recTypeRank;
+            int finalB = b.prog->rank.toInt() + b.prog->channelRank +
+                         b.prog->recTypeRank;
+
+            if (finalA == finalB)
                 return (a.prog->title > b.prog->title);
-            return (a.prog->rank.toInt() < b.prog->rank.toInt());
+            return (finalA < finalB);
         }
 };
 
 void RankPrograms::SortList() 
 {
-    typedef vector<RankInfo> sortList;
-    typedef QMap<QString, ProgramInfo> progMap;
-    
     int i, j;
     bool cursorChanged = false;
-    sortList sortedList;
-    progMap::Iterator pit;
-    sortList::iterator sit;
-    ProgramInfo *progInfo;
+    vector<RankInfo> sortedList;
+    QMap<QString, ProgramRankInfo>::Iterator pit;
+    vector<RankInfo>::iterator sit;
+    ProgramRankInfo *progInfo;
     RankInfo *rankInfo;
-    progMap sdCopy;
-    QString cntStr = "";
+    QMap<QString, ProgramRankInfo> pdCopy;
 
+    // copy programData into sortedList and make a copy
+    // of programData in pdCopy
     for (i = 0, pit = programData.begin(); pit != programData.end(); ++pit, i++)
     {
         progInfo = &(pit.data());
         RankInfo tmp = {progInfo, i};
         sortedList.push_back(tmp);
-        sdCopy[pit.key()] = pit.data();
+        pdCopy[pit.key()] = pit.data();
     }
 
+    // sort sortedList
     switch(sortType) 
     {
         case byTitle : sort(sortedList.begin(), sortedList.end(), titleSort());
@@ -513,30 +718,37 @@ void RankPrograms::SortList()
 
     programData.clear();
 
+    // rebuild programData in sortedList order from pdCopy
     for (i = 0, sit = sortedList.begin(); sit != sortedList.end(); i++, ++sit)
     {
         rankInfo = &(*sit);
 
-        for (j = 0, pit = sdCopy.begin(); j != rankInfo->cnt; j++, ++pit);
+        // find rankInfo[i] in pdCopy 
+        for (j = 0, pit = pdCopy.begin(); j != rankInfo->cnt; j++, ++pit);
 
         progInfo = &(pit.data());
-        cntStr.sprintf("%d", 999-i);
-        programData[cntStr] = pit.data();
 
+        // put back into programData
+        programData[QString::number(999-i)] = pit.data();
+
+        // if rankInfo[i] is the program where the cursor
+        // was pre-sort then we need to update to cursor
+        // to the ith position
         if (!cursorChanged && rankInfo->cnt == inList+inData) 
         {
-            inList = dataCount-i-1;
+            inList = dataCount - i - 1;
             if (inList > (int)((int)(listsize / 2) - 1)) 
             {
                 inList = (int)(listsize / 2);
-                inData = dataCount-i-1 - inList;
+                inData = dataCount - i - 1 - inList;
             }
             else
                 inData = 0;
-            if (inData > dataCount-listsize) 
+
+            if (dataCount > listsize && inData > dataCount - listsize) 
             {
-                inList += inData-(dataCount-listsize);
-                inData = dataCount-listsize;
+                inList += inData - (dataCount - listsize);
+                inData = dataCount - listsize;
             }
             cursorChanged = true;
         }
@@ -554,19 +766,6 @@ void RankPrograms::updateList(QPainter *p)
     pageDowner = false;
     listCount = 0;
 
-    typedef QMap<QString, ProgramInfo> RankData;
-    ProgramInfo *tempInfo;
-  
-    QString tempSubTitle = "";
-    QString tempRank = "";
-
-    RankData::Iterator it;
-    RankData::Iterator start;
-    RankData::Iterator end;
-
-    start = programData.begin();
-    end = programData.end();
-
     LayerSet *container = NULL;
     container = theme->GetSet("selector");
     if (container)
@@ -578,36 +777,52 @@ void RankPrograms::updateList(QPainter *p)
             ltype->ResetList();
             ltype->SetActive(true);
 
-            for (it = start; it != end; ++it)
+            QMap<QString, ProgramRankInfo>::Iterator it;
+            for (it = programData.begin(); it != programData.end(); ++it)
             {
                 if (cnt < listsize)
                 {
                     if (pastSkip <= 0)
                     {
-                        tempInfo = &(it.data());
+                        ProgramRankInfo *progInfo = &(it.data());
 
-                        tempSubTitle = tempInfo->title;
-                        if ((tempInfo->subtitle).stripWhiteSpace().length() > 0)
+                        QString key = progInfo->title + ":" + 
+                                      progInfo->chanid + ":" +
+                                      progInfo->startts.toString(Qt::ISODate);
+
+                        int progRank = progInfo->rank.toInt();
+                        int finalRank = progRank + progInfo->channelRank +
+                                        progInfo->recTypeRank;
+        
+                        QString tempSubTitle = progInfo->title;
+                        if ((progInfo->subtitle).stripWhiteSpace().length() > 0)
                             tempSubTitle = tempSubTitle + " - \"" + 
-                                           tempInfo->subtitle + "\"";
-
-                        tempRank = tempInfo->rank;
+                                           progInfo->subtitle + "\"";
 
                         if (cnt == inList)
                         {
                             if (curitem)
                                 delete curitem;
-                            curitem = new ProgramInfo(*tempInfo);
+                            curitem = new ProgramRankInfo(*progInfo);
                             ltype->SetItemCurrent(cnt);
                         }
 
                         ltype->SetItemText(cnt, 1, tempSubTitle);
-                        if(tempInfo->rank.toInt() >= 0)
+
+                        if (progRank >= 0)
                             ltype->SetItemText(cnt, 2, "+");
-                        else if(tempInfo->rank.toInt() < 0)
+                        else if (progRank < 0)
                             ltype->SetItemText(cnt, 2, "-");
                         ltype->SetItemText(cnt, 3, 
-                                        QString::number(abs(tempRank.toInt())));
+                                        QString::number(abs(progRank)));
+
+                        if (finalRank >= 0)
+                            ltype->SetItemText(cnt, 4, "+");
+                        else if (finalRank < 0)
+                            ltype->SetItemText(cnt, 4, "-");
+
+                        ltype->SetItemText(cnt, 5, 
+                                           QString::number(abs(finalRank)));
 
                         cnt++;
                         listCount++;
@@ -648,20 +863,22 @@ void RankPrograms::updateList(QPainter *p)
 
 void RankPrograms::updateInfo(QPainter *p)
 {
-    int rectyperank, chanrank, progrank, totalrank;
     QRect pr = infoRect;
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
-    ScheduledRecording::RecordingType rectype; 
 
     if (programData.count() > 0 && curitem)
     {  
-        progrank = curitem->rank.toInt();
-        rectype = curitem->GetProgramRecordingStatus(db);
-        rectyperank = curitem->getTypeRank(rectype);
-        chanrank = curitem->getChannelRank(curitem->chanid, db);
-        totalrank = progrank + rectyperank + chanrank;
+        int progRank, chanrank, rectyperank, finalRank;
+        ScheduledRecording::RecordingType rectype; 
+
+        progRank = curitem->rank.toInt();
+        chanrank = curitem->channelRank;
+        rectyperank = curitem->recTypeRank;
+        finalRank = progRank + chanrank + rectyperank;
+
+        rectype = curitem->recType;
 
         QString subtitle = "";
         if (curitem->subtitle != "(null)")
@@ -754,23 +971,23 @@ void RankPrograms::updateInfo(QPainter *p)
 
             type = (UITextType *)container->GetType("rankB");
             if (type) {
-                type->SetText(QString::number(abs(progrank)));
+                type->SetText(QString::number(abs(progRank)));
             }
 
             type = (UITextType *)container->GetType("ranksign");
             if (type) {
-                if(totalrank >= 0)
+                if (finalRank >= 0)
                     type->SetText("+");
                 else
                     type->SetText("-");
             }
 
-            type = (UITextType *)container->GetType("totalrank");
+            type = (UITextType *)container->GetType("finalrank");
             if (type) {
-                if(totalrank >= 0)
-                    type->SetText("+"+QString::number(totalrank));
+                if (finalRank >= 0)
+                    type->SetText("+"+QString::number(finalRank));
                 else
-                    type->SetText(QString::number(totalrank));
+                    type->SetText(QString::number(finalRank));
             }
         }
        
