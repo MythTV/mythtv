@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
 
     if (!pginfo)
     {
-        cerr << "Couldn't find recording " << chanid << " " << startts << endl;
+        cerr << "Couldn't find recording " << chanid << " " << startts.toString() << endl;
         return -1;
     }
 
