@@ -54,7 +54,6 @@ MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal)
 
 void MythMainWindow::Init(void)
 {
-    
     gContext->GetScreenSettings(xbase, screenwidth, wmult,
                                 ybase, screenheight, hmult);
     setGeometry(xbase, ybase, screenwidth, screenheight);
@@ -349,6 +348,35 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, const char *name)
     vbox = new QVBoxLayout(this, (int)(10 * hmult));
 }
 
+MythPopupBox::MythPopupBox(MythMainWindow *parent, bool graphicPopup,
+                           QColor popupForeground, QColor popupBackground,
+                           QColor popupHighlight, const char *name)
+            : MythDialog(parent, name, false)
+{
+    float wmult, hmult;
+
+    gContext->GetScreenSettings(wmult, hmult);
+
+    setLineWidth(3);
+    setMidLineWidth(3);
+    setFrameShape(QFrame::Panel);
+    setFrameShadow(QFrame::Raised);
+    setFrameStyle(QFrame::Box | QFrame::Plain);
+    setPalette(parent->palette());
+    setFont(parent->font());
+    setCursor(QCursor(Qt::BlankCursor));
+
+    vbox = new QVBoxLayout(this, (int)(10 * hmult));
+
+    if (!graphicPopup)
+        setPaletteBackgroundColor(popupBackground);
+    else
+        gContext->ThemeWidget(this);
+    setPaletteForegroundColor(popupHighlight);
+
+    popupForegroundColor = popupForeground;
+}
+
 void MythPopupBox::addWidget(QWidget *widget, bool setAppearance)
 {
     if (setAppearance == true)
@@ -356,7 +384,70 @@ void MythPopupBox::addWidget(QWidget *widget, bool setAppearance)
          widget->setPalette(palette());
          widget->setFont(font());
     }
+
+    if (widget->isA("QLabel"))
+    {
+        widget->setBackgroundOrigin(ParentOrigin);
+        widget->setPaletteForegroundColor(popupForegroundColor);
+    }
+
     vbox->addWidget(widget);
+}
+
+void MythPopupBox::ShowPopup(int hpadding, int wpadding)
+{
+    const QObjectList *objlist = children();
+    QObjectListIt it(*objlist);
+    QObject *objs;
+
+    while ((objs = it.current()) != 0)
+    {
+        ++it;
+        if (objs->isWidgetType())
+        {
+            QWidget *widget = (QWidget *)objs;
+            widget->adjustSize();
+        }
+    }
+
+    polish();
+
+    int x = 0, y = 0, maxw = 0, poph = 0;
+
+    it = QObjectListIt(*objlist);
+    while ((objs = it.current()) != 0)
+    {
+        ++it;
+        if (objs->isWidgetType())
+        {
+            QWidget *widget = (QWidget *)objs;
+            poph += widget->height();
+            if (widget->width() > maxw)
+                maxw = widget->width();
+        }
+    }
+
+    poph += (int)(hpadding * hmult);
+    setMinimumHeight(poph);
+
+    maxw += (int)(wpadding * wmult);
+
+    int width = (int)(800 * wmult);
+    int height = (int)(600 * hmult);
+
+    if (parentWidget())
+    {
+        width = parentWidget()->width();
+        height = parentWidget()->height();
+    }
+
+    x = (int)(width / 2) - (int)(maxw / 2);
+    y = (int)(height / 2) - (int)(poph / 2);
+
+    setFixedSize(maxw, poph);
+    setGeometry(x, y, maxw, poph);
+
+    Show();
 }
 
 MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)

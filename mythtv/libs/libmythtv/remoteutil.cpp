@@ -68,6 +68,14 @@ void RemoteQueueTranscode(ProgramInfo *pginfo, int state)
     gContext->SendReceiveStringList(strlist);
 }
 
+void RemoteStopRecording(ProgramInfo *pginfo)
+{
+    QStringList strlist = QString("STOP_RECORDING");
+    pginfo->ToStringList(strlist);
+
+    gContext->SendReceiveStringList(strlist);
+}
+
 void RemoteDeleteRecording(ProgramInfo *pginfo)
 {
     QStringList strlist = QString("DELETE_RECORDING");

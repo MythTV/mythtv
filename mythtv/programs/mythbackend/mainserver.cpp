@@ -2,6 +2,7 @@
 #include <qsqldatabase.h>
 #include <qdatetime.h>
 #include <qfile.h>
+#include <qdir.h>
 #include <qurl.h>
 #include <qthread.h>
 #include <qwaitcondition.h>
@@ -226,6 +227,10 @@ void MainServer::ProcessRequest(QSocket *sock)
     else if (command == "QUEUE_TRANSCODE_STOP")
     {
         HandleQueueTranscode(listline, pbs, TRANSCODE_STOP);
+    }
+    else if (command == "STOP_RECORDING")
+    {
+        HandleStopRecording(listline, pbs);
     }
     else if (command == "DELETE_RECORDING")
     {
@@ -763,6 +768,139 @@ static void *SpawnDelete(void *param)
     delete ds;
 
     return NULL;
+}
+
+void MainServer::HandleStopRecording(QStringList &slist, PlaybackSock *pbs)
+{
+    ProgramInfo *pginfo = new ProgramInfo();
+    pginfo->FromStringList(slist, 1);
+
+    DoHandleStopRecording(pginfo, pbs);
+}
+
+void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
+{
+    QSocket *pbssock = NULL;
+    if (pbs)
+        pbssock = pbs->getSocket();
+
+    if (ismaster && pginfo->hostname != gContext->GetHostName())
+    {
+        PlaybackSock *slave = getSlaveByHostname(pginfo->hostname);
+
+        int num = -1;
+
+        if (slave)
+        {
+            num = slave->StopRecording(pginfo);
+
+            if (num > 0)
+                (*encoderList)[num]->StopRecording();
+
+            if (pbssock)
+            {
+                QStringList outputlist = "0";
+                SendResponse(pbssock, outputlist);
+            }
+ 
+            delete pginfo;
+            return;
+        }
+    }
+
+    int recnum = -1;
+
+    QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
+    for (; iter != encoderList->end(); ++iter)
+    {
+        EncoderLink *elink = iter.data();
+
+        if (elink->isLocal() && elink->MatchesRecording(pginfo))
+        {
+            recnum = iter.key();
+
+            elink->StopRecording();
+
+            while (elink->IsBusyRecording() ||
+                   elink->GetState() == kState_ChangingState)
+            {
+                usleep(100);
+            }
+        }
+    }
+
+    QString thequery;
+    QSqlQuery query;
+
+    dblock.lock();
+
+    MythContext::KickDatabase(m_db);
+
+    QString startts = pginfo->startts.toString("yyyyMMddhhmm");
+    startts += "00";
+    QString endts = pginfo->endts.toString("yyyyMMddhhmm");
+    endts += "00";
+    QDateTime now(QDateTime::currentDateTime());
+    QString newendts = now.toString("yyyyMMddhhmm");
+    newendts += "00";
+
+    // Set the recorded end time to the current time
+    // (we're stopping the recording so it'll never get to its originally 
+    // intended end time)
+    thequery = QString("UPDATE recorded SET starttime = %1, endtime = %2 "
+                       "WHERE chanid = %3 AND title = \"%4\" AND "
+                       "starttime = %5 AND endtime = %6;")
+                       .arg(startts).arg(newendts).arg(pginfo->chanid)
+                       .arg(pginfo->title.utf8()).arg(startts).arg(endts);
+
+    query = m_db->exec(thequery);
+
+    if (!query.isActive())
+    {
+        MythContext::DBError("Stop recording program update", query);
+    }
+
+    dblock.unlock();
+
+    // If we change the recording times we must also adjust the .nuv file's name
+    QString fileprefix = gContext->GetFilePrefix();
+    QString oldfilename = pginfo->GetRecordFilename(fileprefix);
+    pginfo->endts = now;
+    QString newfilename = pginfo->GetRecordFilename(fileprefix);
+    QFile checkFile(oldfilename);
+
+    if (checkFile.exists())
+    {
+        if (!QDir::root().rename(oldfilename, newfilename, TRUE))
+        {
+            VERBOSE(VB_IMPORTANT, QString("Could not rename: %1 to %2")
+                                         .arg(oldfilename, newfilename));
+        }
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, QString("File: %1 does not exist.")
+                                     .arg(oldfilename));
+
+        if (pbssock)
+        {
+            QStringList outputlist;
+            outputlist << "BAD: Tried to rename a file that was in "
+                          "the database but wasn't on the disk.";
+            SendResponse(pbssock, outputlist);
+
+            delete pginfo;
+            return;
+        }
+    }
+
+    if (pbssock)
+    {
+        QStringList outputlist = QString::number(recnum);
+        SendResponse(pbssock, outputlist);
+    }
+
+    delete pginfo;
 }
 
 void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)

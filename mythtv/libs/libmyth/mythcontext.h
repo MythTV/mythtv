@@ -67,7 +67,7 @@ class MythEvent : public QCustomEvent
     QString extradata;
 };
 
-#define MYTH_BINARY_VERSION "0.12.09172003-1"
+#define MYTH_BINARY_VERSION "0.12.09192003-1"
 
 extern int print_verbose_messages;
 
@@ -169,7 +169,7 @@ class MythContext : public QObject
 
     bool m_themeloaded;
     QString m_themepathname;
-    QPixmap m_backgroundimage;
+    QPixmap *m_backgroundimage;
     QPalette m_palette;
 
     int m_xbase, m_ybase;
@@ -187,7 +187,6 @@ class MythContext : public QObject
     QMutex dbLock;
 
     QMap<QString, QImage> imageCache;
-    QMap<QString, QPixmap> pixmapCache;
 
     LCD *lcd_device;
 

@@ -50,6 +50,8 @@ class MainServer : public QObject
 
     // playback
     void HandleQueryRecordings(QString type, PlaybackSock *pbs);
+    void HandleStopRecording(QStringList &slist, PlaybackSock *pbs);
+    void DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs);
     void HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs);
     void DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs);
     void HandleQueryFreeSpace(PlaybackSock *pbs);

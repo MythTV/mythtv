@@ -119,11 +119,17 @@ class MythPopupBox : public MythDialog
 {
   public:
     MythPopupBox(MythMainWindow *parent, const char *name = 0);
+    MythPopupBox(MythMainWindow *parent, bool graphicPopup, 
+                 QColor popupForeground, QColor popupBackground,
+                 QColor popupHighlight, const char *name = 0);
 
     void addWidget(QWidget *widget, bool setAppearance = true);
 
+    void ShowPopup(int hpadding = 0, int wpadding = 0);
+
   private:
     QVBoxLayout *vbox;
+    QColor popupForegroundColor;
 };
 
 class MythProgressDialog: public MythDialog

@@ -1193,21 +1193,25 @@ void Scheduler::RunScheduler(void)
 
             if (recording && nexttv->isLowOnFreeSpace())
             {
-                QString msg = QString("SUPPRESSED recording \"%1\" on channel: "
-                                      "%2 on cardid: %3, sourceid %4.  Only "
-                                      "%5 Megs of disk space available.")
-                                      .arg(nextRecording->title)
-                                      .arg(nextRecording->chanid)
-                                      .arg(nextRecording->cardid)
-                                      .arg(nextRecording->sourceid)
-                                      .arg(nexttv->getFreeSpace());
+                FillEncoderFreeSpaceCache();
+                if (nexttv->isLowOnFreeSpace())
+                {
+                    QString msg = QString("SUPPRESSED recording '%1' on channel"
+                                          " %2 on cardid %3, sourceid %4.  Only"
+                                          " %5 Megs of disk space available.")
+                                          .arg(nextRecording->title)
+                                          .arg(nextRecording->chanid)
+                                          .arg(nextRecording->cardid)
+                                          .arg(nextRecording->sourceid)
+                                          .arg(nexttv->getFreeSpace());
 
-                VERBOSE(VB_GENERAL, msg);
+                    VERBOSE(VB_GENERAL, msg);
 
-                RemoveRecording(nextRecording);
-                nextRecording = NULL;
-                recIter = recordingList.begin();
-                continue;
+                    RemoveRecording(nextRecording);
+                    nextRecording = NULL;
+                    recIter = recordingList.begin();
+                    continue;
+                }
             }
 
             if (recording && nexttv->isTunerLocked())

@@ -8,6 +8,7 @@
 class QPixmap;
 class QImage;
 class QPainter;
+class QFont;
 
 bool WriteStringList(QSocket *socket, QStringList &list);
 bool ReadStringList(QSocket *socket, QStringList &list);
@@ -27,5 +28,7 @@ QRgb blendColors(QRgb source, QRgb add, int alpha);
 
 #define MYTH_SYSTEM_DONT_BLOCK_LIRC (1)
 int myth_system(const QString &command, int flags = 0);
+
+QString cutDownString(QString text, QFont *testFont, int maxwidth);
 
 #endif

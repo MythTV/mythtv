@@ -41,6 +41,7 @@ MythContext::MythContext(const QString &binversion, bool gui, bool lcd)
 
     language = "";
     m_themeloaded = false;
+    m_backgroundimage = NULL;
 
     m_db = QSqlDatabase::addDatabase("QMYSQL3", "MythContext");
 
@@ -90,7 +91,6 @@ MythContext::MythContext(const QString &binversion, bool gui, bool lcd)
 MythContext::~MythContext()
 {
     imageCache.clear();
-    pixmapCache.clear();
 
     if (m_settings)
         delete m_settings;
@@ -206,13 +206,16 @@ void MythContext::LoadQtConfig(void)
     m_qtThemeSettings->ReadSettings(themedir);
     m_themeloaded = false;
 
+    if (m_backgroundimage)
+        delete m_backgroundimage;
+    m_backgroundimage = NULL;
+
     InitializeScreenSettings();
 }
 
 void MythContext::UpdateImageCache(void)
 {
     imageCache.clear();
-    pixmapCache.clear();
 
     ClearOldImageCache();
     CacheThemeImages();
@@ -715,8 +718,8 @@ void MythContext::ThemeWidget(QWidget *widget)
     if (m_themeloaded)
     {
         widget->setPalette(m_palette);
-        if (m_backgroundimage.width() > 0)
-            widget->setPaletteBackgroundPixmap(m_backgroundimage);
+        if (m_backgroundimage->width() > 0)
+            widget->setPaletteBackgroundPixmap(*m_backgroundimage);
         return;
     }
 
@@ -734,7 +737,7 @@ void MythContext::ThemeWidget(QWidget *widget)
         if (bgpixmap)
         {
             widget->setPaletteBackgroundPixmap(*bgpixmap);
-            m_backgroundimage = *bgpixmap;
+            m_backgroundimage = new QPixmap(*bgpixmap);
         }
     }
     else if (m_qtThemeSettings->GetSetting("TiledBackgroundPixmap") != "")
@@ -756,7 +759,7 @@ void MythContext::ThemeWidget(QWidget *widget)
             tmp.drawTiledPixmap(0, 0, width, height, *bgpixmap);
             tmp.end();
 
-            m_backgroundimage = background;
+            m_backgroundimage = new QPixmap(background);
             widget->setPaletteBackgroundPixmap(background);
         }
     }
@@ -850,19 +853,9 @@ QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache)
         QFile cachecheck(cachefilepath);
         if (cachecheck.exists() && fromcache)
         {
-            //if (pixmapCache.contains(cachefilepath))
-            //{
-            //    return new QPixmap(pixmapCache[cachefilepath]);
-            //}
-
             QPixmap *ret = new QPixmap(cachefilepath);
             if (ret)
-            {
-                //pixmapCache[cachefilepath] = *ret;
                 return ret;
-            }
-
-            delete ret;
         }
     }
 

@@ -324,9 +324,12 @@ void ManualBox::startClicked(void)
     progInfo.category = m_categoryString;
     progInfo.chanid = m_chanidString;
 
-    progInfo.startts = QDateTime::currentDateTime();
-    progInfo.endts = QDateTime::currentDateTime().addSecs(m_duration->value() * 60);
-    
+    QDateTime now = QDateTime::currentDateTime();
+    // Make sure we set the seconds to 0
+    now = now.addSecs(-now.time().second());
+    progInfo.startts = now;
+    progInfo.endts = now.addSecs(m_duration->value() * 60);
+ 
     progInfo.Save(db);
 
     progInfo.ApplyRecordStateChange(db, kSingleRecord);

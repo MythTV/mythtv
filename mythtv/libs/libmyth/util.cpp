@@ -18,6 +18,7 @@ extern "C" {
 #include <qimage.h>
 #include <qpainter.h>
 #include <qpixmap.h>
+#include <qfont.h>
 
 #ifdef USE_LIRC
 #include "lircevent.h"
@@ -280,5 +281,31 @@ int myth_system(const QString &command, int flags)
 #endif
 
     return system(command);
+}
+
+QString cutDownString(QString text, QFont *testFont, int maxwidth)
+{
+    QFontMetrics fm(*testFont);
+
+    int curFontWidth = fm.width(text);
+    if (curFontWidth > maxwidth)
+    {
+        QString testInfo = "";
+        curFontWidth = fm.width(testInfo);
+        int tmaxwidth = maxwidth - fm.width("LLL");
+        int count = 0;
+
+        while (curFontWidth < tmaxwidth)
+        {
+            testInfo = text.left(count);
+            curFontWidth = fm.width(testInfo);
+            count = count + 1;
+        }
+
+        testInfo = testInfo + "...";
+        text = testInfo;
+    }
+
+    return text;
 }
 

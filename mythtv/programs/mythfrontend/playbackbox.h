@@ -45,14 +45,25 @@ class PlaybackBox : public MythDialog
     void pageUp() { cursorUp(true); }
     void selected();
     void playSelected();
+    void stopSelected();
     void deleteSelected();
     void expireSelected();
+    void showActionsSelected();
 
+    void doPlay();
+
+    void askStop();
+    void doStop();
+    void noStop();
+
+    void askDelete();
     void doDelete();
     void noDelete();
 
     void doAutoExpire();
     void noAutoExpire();
+
+    void doCancel();
 
     void exitWin();
 
@@ -68,8 +79,10 @@ class PlaybackBox : public MythDialog
     QPixmap getPixmap(ProgramInfo *);
     QPainter backup;
     void play(ProgramInfo *);
+    void stop(ProgramInfo *);
     void remove(ProgramInfo *);
     void expire(ProgramInfo *);
+    void showActions(ProgramInfo *);
 
     bool skipUpdate;
     bool noUpdate;
@@ -104,7 +117,11 @@ class PlaybackBox : public MythDialog
 
     void doRemove(ProgramInfo *);
     void promptEndOfRecording(ProgramInfo *);
-    void showDeletePopup(int);
+    void showDeletePopup(ProgramInfo *, int);
+    void showActionPopup(ProgramInfo *program);
+    void initPopup(MythPopupBox *popup, ProgramInfo *program, 
+                   QString message, QString message2);
+    void cancelPopup();
 
     bool fileExists(ProgramInfo *pginfo);
 
@@ -154,6 +171,8 @@ class PlaybackBox : public MythDialog
     QColor popupHighlight;
 
     bool expectingPopup;
+
+    QFont bigFont, medFont;
 };
 
 #endif
