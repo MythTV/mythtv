@@ -64,6 +64,9 @@ ProgramInfo::ProgramInfo(void)
     hasAirDate = false;
     repeat = false;
 
+    seriesid = "";
+    programid = "";
+
     record = NULL;
 }   
         
@@ -952,6 +955,7 @@ void ProgramInfo::StartedRecording(QSqlDatabase *db)
 
     starts += "00";
     ends += "00";
+    seriesid += "";
 
     QSqlQuery query(QString::null, db);
 
