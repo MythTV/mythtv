@@ -722,7 +722,9 @@ void ProgLister::fillItemList(void)
                         "GROUP BY starttime,endtime,channum,callsign "
                         "ORDER BY program.starttime,%5 "
                         "LIMIT 500;")
-                        .arg(viewList[curView].utf8()).arg(viewList[curView].utf8()).arg(viewList[curView].utf8())
+                        .arg(viewList[curView].utf8())
+                        .arg(viewList[curView].utf8())
+                        .arg(viewList[curView].utf8())
                         .arg(startTime.toString("yyyyMMddhhmm50"))
                         .arg(channelOrdering);
     }
@@ -752,14 +754,13 @@ void ProgLister::fillItemList(void)
     else if (type == plMovies) // list movies
     {
         where = QString("WHERE channel.visible = 1 "
-                        "AND (program.category_type LIKE \"\%%1\%\" "
+                        "AND (program.category_type = 'movie' "
                         "OR programid LIKE \"MV\%\") "
-                        "AND program.endtime > %2 "
+                        "AND program.endtime > %1 "
                         "AND program.chanid = channel.chanid "
                         "GROUP BY starttime,endtime,channum,callsign "
-                        "ORDER BY program.starttime,%3 "
+                        "ORDER BY program.starttime,%2 "
                         "LIMIT 500;")
-                        .arg(tr("Movie").utf8())
                         .arg(startTime.toString("yyyyMMddhhmm50"))
                         .arg(channelOrdering);
     }

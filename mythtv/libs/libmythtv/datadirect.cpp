@@ -93,11 +93,6 @@ bool DDStructureParser::startElement(const QString &pnamespaceuri,
     {
         curr_program.clearValues();
         curr_program.programid = pxmlatts.value("id");
-
-        if (curr_program.programid.left(2) == QString("MV"))
-        {
-           curr_program.showtype = "Movie";
-        }
     }
     else if (currtagname == "crew") 
     {
@@ -204,19 +199,32 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
             staravg = (fullstarcount + (halfstarcount * .5)) / 4;
         }
 
+        QString cat_type = "";
+        QString prefix = curr_program.programid.left(2);
+
+        if (prefix == "MV")
+           cat_type = "movie";
+        else if (prefix == "EP")
+           cat_type = "series";
+        else if (prefix == "SP")
+           cat_type = "sports";
+        else if (prefix == "SH")
+           cat_type = "tvshow";
+
         query.prepare("INSERT INTO dd_program (programid, title, subtitle, "
-                      "description, showtype, mpaarating, starrating, stars, "
-                      "runtime, year, seriesid, colorcode, "
+                      "description, showtype, category_type, mpaarating, "
+                      "starrating, stars, runtime, year, seriesid, colorcode, "
                       "syndicatedepisodenumber, originalairdate) "
                       "VALUES(:PROGRAMID,:TITLE,:SUBTITLE,:DESCRIPTION,"
-                      ":SHOWTYPE,:MPAARATING,:STARRATING,:STARS,:RUNTIME,"
-                      ":YEAR,:SERIESID,:COLORCODE,:SYNDNUM,"
+                      ":SHOWTYPE,:CATTYPE,:MPAARATING,:STARRATING,:STARS,"
+                      ":RUNTIME,:YEAR,:SERIESID,:COLORCODE,:SYNDNUM,"
                       ":ORIGINALAIRDATE);");
         query.bindValue(":PROGRAMID", curr_program.programid);
         query.bindValue(":TITLE", curr_program.title.utf8());
         query.bindValue(":SUBTITLE", curr_program.subtitle.utf8());
         query.bindValue(":DESCRIPTION", curr_program.description.utf8());
         query.bindValue(":SHOWTYPE", curr_program.showtype.utf8()); 
+        query.bindValue(":CATTYPE", cat_type);
         query.bindValue(":MPAARATING", curr_program.mpaaRating);
         query.bindValue(":STARRATING", curr_program.starRating);
         query.bindValue(":STARS", staravg);
@@ -390,14 +398,14 @@ void DataDirectProcessor::updateProgramViewTable(int sourceid)
                        "title, subtitle, description, airdate, stars, "
                        "previouslyshown, stereo, subtitled, hdtv, "
                        "closecaptioned, partnumber, parttotal, seriesid, "
-                       "originalairdate, category, category_type, colorcode, "
+                       "originalairdate, showtype, category_type, colorcode, "
                        "syndicatedepisodenumber, tvrating, mpaarating, "
                        "programid) "
-                       "SELECT chanid, scheduletime, endtime, title, subtitle, "
-                       "description, year, stars, repeat, stereo, "
+                       "SELECT chanid, scheduletime, endtime, title, "
+                       "subtitle, description, year, stars, repeat, stereo, "
                        "subtitled, hdtv, closecaptioned, partnumber, "
                        "parttotal, seriesid, originalairdate, showtype, "
-                       "showtype, colorcode, syndicatedepisodenumber, "
+                       "category_type, colorcode, syndicatedepisodenumber, "
                        "tvrating, mpaarating, dd_program.programid "
                        "FROM channel, dd_schedule, dd_program WHERE "
                        " ( (dd_schedule.programid = dd_program.programid) AND "
@@ -560,9 +568,10 @@ void DataDirectProcessor::createTempTables()
     table = "( programid char(12) NOT NULL, seriesid char(12), "
             "title varchar(120), subtitle varchar(150), description text, "
             "mpaarating char(5), starrating char(5), runtime time, "
-            "year char(4), showtype char(30), colorcode char(20), "
-            "originalairdate date, syndicatedepisodenumber char(20), "
-            "stars float unsigned, PRIMARY KEY (programid))";
+            "year char(4), showtype char(30), category_type char(64), "
+            "colorcode char(20), originalairdate date, "
+            "syndicatedepisodenumber char(20), stars float unsigned, "
+            "PRIMARY KEY (programid))";
     createATempTable("dd_program", table); 
 
     table = "( chanid int unsigned NOT NULL, starttime datetime NOT NULL, "
