@@ -1,4 +1,4 @@
-#include <math.h>
+
 #include <iostream>
 using namespace std;
 
@@ -2380,6 +2380,75 @@ GenericTree* GenericTree::getChildByName(QString a_name)
     return oops;
 }
 
+void GenericTree::sortByString()
+{
+
+    bool something_changed = false;
+    if(my_ordered_subnodes.count() > 1)
+    {
+        something_changed = true;
+    }
+    while(something_changed)
+    {
+        something_changed = false;
+        for(uint i = 0; i < my_ordered_subnodes.count() - 1;)
+        {
+            if(QString::localeAwareCompare
+                (
+                    my_ordered_subnodes.at(i)->getString().lower(),
+                    my_ordered_subnodes.at(i+1)->getString().lower()
+                ) 
+            > 0)
+            {
+                something_changed = true;
+                GenericTree *temp = my_ordered_subnodes.take(i + 1);
+                my_ordered_subnodes.insert(i, temp); 
+            }
+            ++i;
+        }
+    }
+
+    QPtrListIterator<GenericTree> it( my_subnodes );
+    GenericTree *my_kids;
+    while( (my_kids = it.current()) != 0)
+    {
+        my_kids->sortByString();
+        ++it;
+    }
+}
+
+void GenericTree::sortBySelectable()
+{
+    bool something_changed = false;
+    if(my_ordered_subnodes.count() > 1)
+    {
+        something_changed = true;
+    }
+    while(something_changed)
+    {
+        something_changed = false;
+        for(uint i = 0; i < my_ordered_subnodes.count() - 1;)
+        {
+            if(my_ordered_subnodes.at(i)->isSelectable() &&
+               !my_ordered_subnodes.at(i+1)->isSelectable())
+            {
+                something_changed = true;
+                GenericTree *temp = my_ordered_subnodes.take(i + 1);
+                my_ordered_subnodes.insert(i, temp); 
+            }
+            ++i;
+        }
+    }
+
+    QPtrListIterator<GenericTree> it( my_subnodes );
+    GenericTree *my_kids;
+    while( (my_kids = it.current()) != 0)
+    {
+        my_kids->sortBySelectable();
+        ++it;
+    }
+}
+
 GenericTree::~GenericTree()
 {
     delete my_attributes;
@@ -2405,6 +2474,7 @@ UIManagedTreeListType::UIManagedTreeListType(const QString & name)
     visual_order = -1;
     show_whole_tree = false;
     scrambled_parents = false;
+    color_selectables = false;
 }
 
 UIManagedTreeListType::~UIManagedTreeListType()
@@ -2621,6 +2691,10 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
             {
                 font_name = "selected";
             }
+            if(i == active_bin && color_selectables && hotspot_node->isSelectable())
+            {
+                font_name = "selectable";
+            }
 
             
 
@@ -2717,7 +2791,11 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                 GenericTree *above = hotspot_node->prevSibling(numb_above, visual_order);
                 if(above)
                 {
-                    if(above == active_node)
+                    if(i == active_bin && color_selectables && above->isSelectable())
+                    {
+                        font_name = "selectable";
+                    }
+                    else if(above == active_node)
                     {
                         font_name = "selected";
                     }
@@ -2753,7 +2831,11 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                 GenericTree *below = hotspot_node->nextSibling(numb_below, visual_order);
                 if(below)
                 {
-                    if(below == active_node)
+                    if(i == active_bin && color_selectables && below->isSelectable())
+                    {
+                        font_name = "selectable";
+                    }
+                    else if(below == active_node)
                     {
                         font_name = "selected";
                     }

@@ -518,6 +518,8 @@ class GenericTree
     void          buildFlatListOfSubnodes(int ordering_index, bool scrambled_parents);
     GenericTree*  nextPrevFromFlatList(bool forward_or_back, bool wrap_around, GenericTree *active);
     GenericTree*  getChildByName(QString a_name);
+    void          sortByString();
+    void          sortBySelectable();
 
   private:
 
@@ -585,6 +587,9 @@ class UIManagedTreeListType : public UIType
     void    setVisualOrdering(int an_int){visual_order = an_int;}    
     void    showWholeTree(bool yes_or_no){ show_whole_tree = yes_or_no; }
     void    scrambleParents(bool yes_or_no){ scrambled_parents = yes_or_no; }
+    void    colorSelectables(bool yes_or_no){color_selectables = yes_or_no; }
+    void    sortTreeByString(){if(my_tree_data) my_tree_data->sortByString(); }
+    void    sortTreeBySelectable(){if(my_tree_data) my_tree_data->sortBySelectable();}
 
   public slots:
 
@@ -633,6 +638,7 @@ class UIManagedTreeListType : public UIType
     QValueList <int>        route_to_active;
     bool                    show_whole_tree;
     bool                    scrambled_parents;
+    bool                    color_selectables;
 
 };
 
