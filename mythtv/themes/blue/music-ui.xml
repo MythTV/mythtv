@@ -151,7 +151,7 @@
             </image>
             
         </container>
-
+ 
         <!--
             The view of playlists; tracks at the top
         -->
@@ -173,10 +173,10 @@
                 <!--
                     An image to show the current navigation node
                 -->
-                <image function="selectionbar" filename="selectionbar.png"  fleximage="no"></image>
+                <image function="selectionbar" filename="cr-selectbar.png"   location="-12,-5" padding="12" fleximage="no"></image>
                 <!--
                     Some arrow images
-                -->
+                 -->
                 <image function="uparrow" filename="uparrow.png"  location="785,12"></image>
                 <image function="downarrow" filename="downarrow.png"  location="785,268"></image>
                 <image function="leftarrow" filename="mm_left_arrow.png"></image>
