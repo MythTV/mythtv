@@ -206,7 +206,7 @@ void MythToolButton::drawButton(QPainter *p)
 
 void MythPushButton::drawButton( QPainter * p )
 {
-   int diw = 0;
+    int diw = 0;
     if ( isDefault() || autoDefault() ) {
         diw = style().pixelMetric(QStyle::PM_ButtonDefaultIndicator, this);
 

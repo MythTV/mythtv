@@ -158,7 +158,7 @@ PlaybackBox::PlaybackBox(MythContext *context, BoxType ltype, QWidget *parent,
         vbox->addWidget(freespace);
 
         progressbar = new QProgressBar(this);
-        progressbar->setBackgroundMode(PaletteBase);
+        progressbar->setBackgroundOrigin(WindowOrigin);
         UpdateProgressBar();
         vbox->addWidget(progressbar);
     }

@@ -15,6 +15,6 @@ DEFINES += EXTRA_LOCKING
 
 release {
         DEFINES += MMX
-        QMAKE_CXXFLAGS_RELEASE = -O6 -march=pentiumpro -fomit-frame-pointer -funroll-loops -fexpensive-optimizations -finline-functions -fno-rtti -fno-exceptions
+        QMAKE_CXXFLAGS_RELEASE = -O6 -march=pentiumpro -fomit-frame-pointer -funroll-loops -fexpensive-optimizations -finline-functions 
 }
 

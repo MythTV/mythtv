@@ -40,8 +40,6 @@ DialogBox::DialogBox(MythContext *context, const QString &text,
 void DialogBox::AddButton(const QString &title)
 {
     MythPushButton *button = new MythPushButton(title, this);
-    button->setBackgroundMode(X11ParentRelative);
-
     buttongroup->insert(button);
 
     box->addWidget(button, 0);
