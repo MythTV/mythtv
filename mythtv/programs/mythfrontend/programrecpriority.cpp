@@ -498,7 +498,19 @@ void ProgramRecPriority::edit(void)
                      cnt++, ++it);
                 programData.remove(it);
                 SortList();
-                inList = inData = 0;
+                delete curitem;
+                curitem = NULL;
+                dataCount--;
+
+                if (cnt >= dataCount)
+                    cnt = dataCount - 1;
+                if (dataCount <= listsize || cnt <= listsize / 2)
+                    inData = 0;
+                else if (cnt >= dataCount - listsize + listsize / 2)
+                    inData = dataCount - listsize;
+                else
+                    inData = cnt - listsize / 2;
+                inList = cnt - inData;
             }
         else
             MythContext::DBError("Get new recording priority query", query);
