@@ -79,7 +79,7 @@ public:
 protected slots:
      void fillProviderSelections(const QString& maybePostalCode) {
          if (QRegExp("\\d{5}").exactMatch(maybePostalCode) ||
-             QRegExp("[a-z]\\d[a-z]\\d[a-z]\\d").exactMatch(maybePostalCode))
+             QRegExp("[a-z]\\d[a-z]\\d[a-z]\\d", false).exactMatch(maybePostalCode))
                  provider->fillSelections(maybePostalCode);
      }
 
