@@ -50,7 +50,7 @@
     #  Setting require_cutlist to yes will tell nuvexport to show only those
     #    recordings that have a cutlist
     #
-    require_cutlist=yes
+    #require_cutlist=yes
 
 </nuvexport>
 

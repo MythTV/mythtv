@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.10.03 (xris)
+#Last Updated: 2005.04.03 (xris)
 #
 #   mythtv::recordings
 #
@@ -137,7 +137,11 @@ package mythtv::recordings;
         }
 
     # No shows found?
-        die 'Found '.@Files." files, but no matching database entries.\n\n" unless ($num_shows);
+        unless ($num_shows) {
+            die 'Found '.@Files." files, but no matching database entries.\n"
+                .(arg('require_cutlist') ? "Perhaps you should try disabling require_cutlist?\n" : '')
+                ."\n";
+        }
     }
 
 
