@@ -2558,7 +2558,8 @@ void MainServer::PrintStatus(QSocket *socket)
                   << " " << ((*iter)->recstartts).toString(timeformat) << " - "
                   << (*iter)->channame << " - "
                   << qstrTitle << "<span><strong>" << qstrTitle << "</strong>"
-                  << (qstrSubtitle == "" ? "" : " (" + qstrSubtitle + ")" )
+                  << (qstrSubtitle == "" ? QString("") : " (" + qstrSubtitle +
+                     ")" )
                   << "<br /><br />" << qstrDescription << "<br /><br />"
                   << "This recording will start "  << timeToRecstart
                   << " using encoder " << (*iter)->cardid << " with the '";
