@@ -3,6 +3,7 @@
 
 #include <qmap.h>
 
+#include "NuppelVideoPlayer.h"
 #include "mythcontext.h"
 
 enum commMapValues {
@@ -68,6 +69,7 @@ class CommDetect
 
     void SetMinMaxPixels(VideoFrame *frame);
 
+    void SearchForLogo(NuppelVideoPlayer *nvp, bool fullSpeed, bool verbose);
     void SetLogoMaskArea();
     void GetLogoMask(unsigned char *mask);
     void SetLogoMask(unsigned char *mask);

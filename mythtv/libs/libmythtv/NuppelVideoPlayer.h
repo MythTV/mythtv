@@ -11,7 +11,6 @@
 #include "osd.h"
 #include "jitterometer.h"
 #include "recordingprofile.h"
-#include "commercial_skip.h"
 #include "videooutbase.h"
 
 extern "C" {
@@ -44,6 +43,8 @@ class NuppelVideoPlayer
  public:
     NuppelVideoPlayer(QSqlDatabase *ldb = NULL, ProgramInfo *info = NULL);
    ~NuppelVideoPlayer();
+
+    friend class CommDetect;
 
     void SetParentWidget(QWidget *widget) { parentWidget = widget; }
 
@@ -318,7 +319,7 @@ class NuppelVideoPlayer
     long long rewindtime, fftime;
     RemoteEncoder *nvr_enc;
 
-    CommDetect *commDetect;
+    class CommDetect *commDetect;
 
     int totalLength;
     long long totalFrames;

@@ -3188,82 +3188,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
         gContext->GetNumSetting("CommSkipAllBlanks", 1));
 
     if (commercialskipmethod & COMM_DETECT_LOGO)
-    {
-        int secs = 10;
-        int loops = 8;
-        int maxLoops = 12;
-        int loop = 0;
-        int sampleSpacing = 1;
-        int seekIncrement = (int)(sampleSpacing * 60 * video_frame_rate);
-        long long seekFrame = seekIncrement;
-        long long endFrame = seekFrame + (long long)(secs * video_frame_rate);
-        int counter = 0;
-        unsigned char mask[loops][video_height * video_width];
-
-        if (showPercentage)
-        {
-            printf( "Logo Search" );
-            fflush( stdout );
-        }
-
-        GetFrame(1,true);
-
-        while(counter < loops && loop < maxLoops && !eof) 
-        {
-            JumpToFrame(seekFrame);
-            ClearAfterSeek();
-
-            for (int i = 0; i < (int)(secs * video_frame_rate) && !eof; i++)
-            {
-                GetFrame(1,true);
-
-                commDetect->SetMinMaxPixels(videoOutput->GetLastDecodedFrame());
-
-                // sleep a little so we don't use all cpu even if we're niced
-                if (!fullSpeed)
-                    usleep(10000);
-            }
-
-            commDetect->GetLogoMask(mask[counter]);
-
-            int pixelsInMask = 0;
-            for (int i = 0; i < (video_width * video_height); i++)
-                if (mask[counter][i])
-                    pixelsInMask++;
-
-            if (pixelsInMask < (int)(video_width * video_height * .10))
-                counter++;
-
-            seekFrame += seekIncrement;
-            endFrame += seekIncrement;
-
-            loop++;
-        }
-
-        for (int i=0; i < (video_width * video_height); i++)
-        {
-            int sum = 0;
-            for (int loop=0; loop < counter; loop++)
-                if (mask[loop][i])
-                    sum++;
-
-            if (sum > (int)(counter * .33))
-                mask[0][i] = 1;
-            else
-                mask[0][i] = 0;
-        }
-
-        commDetect->SetLogoMask(mask[0]);
-
-        JumpToFrame(0);
-        ClearAfterSeek();
-
-        if (showPercentage)
-        {
-            printf( "\b\b\b\b\b\b\b\b\b\b\b" );
-            fflush( stdout );
-        }
-    }
+        commDetect->SearchForLogo(this, fullSpeed, showPercentage);
 
     QTime flagTime;
     flagTime.start();
@@ -3542,18 +3467,18 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
                     QString comm_msg;
                     int skipped_seconds = (int)((commBreakIter.key() -
                             framesPlayed) / video_frame_rate);
-                    int skipMin = skipped_seconds / 60;
-                    int skipSec = skipped_seconds % 60;
+                    QString skipTime;
+                    skipTime.sprintf("%d:%02d", skipped_seconds / 60,
+                                     abs(skipped_seconds) % 60);
                     if (autocommercialskip == 1)
                     {
-                        comm_msg = QString(QObject::tr("Skip %1:%2"))
-                                   .arg(skipMin).arg(skipSec);
+                        comm_msg = QString(QObject::tr("Skip %1"))
+                                           .arg(skipTime);
                     }
                     else if (autocommercialskip == 2)
                     {
-                        comm_msg = QString(QObject::tr(
-                                   "Commercial: %1:%2")) 
-                                   .arg(skipMin).arg(skipSec);
+                        comm_msg = QString(QObject::tr("Commercial: %1"))
+                                           .arg(skipTime);
                     }
                     QString desc;
                     int spos = calcSliderPos(desc);
@@ -3851,10 +3776,10 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
         {
             int skipped_seconds = (int)((commBreakIter.key() -
                     framesPlayed) / video_frame_rate);
-            int skipMin = skipped_seconds / 60;
-            int skipSec = skipped_seconds % 60;
-            QString comm_msg = QString(QObject::tr("Skip %1:%2"))
-                                       .arg(skipMin).arg(skipSec);
+            QString skipTime;
+            skipTime.sprintf("%d:%02d", skipped_seconds / 60,
+                             abs(skipped_seconds) % 60);
+            QString comm_msg = QString(QObject::tr("Skip %1")).arg(skipTime);
             QString desc;
             int spos = calcSliderPos(desc);
             osd->StartPause(spos, false, comm_msg, desc, 2);
