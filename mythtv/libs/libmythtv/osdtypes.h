@@ -144,6 +144,8 @@ class OSDTypeImage : public OSDType
     OSDTypeImage(const QString &name, const QString &filename, 
                  QPoint displaypos, float wmult, float hmult, int scalew = -1, 
                  int scaleh = -1);
+    OSDTypeImage(const OSDTypeImage &other);
+    OSDTypeImage(const QString &name);    
    ~OSDTypeImage();
 
     void LoadImage(const QString &filename, float wmult, float hmult, 
@@ -172,6 +174,26 @@ class OSDTypeImage : public OSDType
     unsigned char *m_alpha;
 };
 
+class OSDTypePosSlider : public OSDTypeImage
+{
+  public:
+    OSDTypePosSlider(const QString &name, const QString &filename,
+                      QRect displayrect, float wmult, float hmult,
+                      int scalew = -1, int scaleh = -1);
+   ~OSDTypePosSlider();
+
+    void SetRectangle(QRect rect) { m_displayrect = rect; }
+    QRect ImageSize() { return m_imagesize; }
+
+    void SetPosition(int pos);
+    int GetPosition() { return m_curval; }
+
+  private:
+    QRect m_displayrect;
+    int m_maxval;
+    int m_curval;
+};
+
 class OSDTypeFillSlider : public OSDTypeImage
 {
   public:
@@ -195,6 +217,42 @@ class OSDTypeFillSlider : public OSDTypeImage
     int m_curval;
     int m_drawwidth;
 };
+
+class OSDTypeEditSlider : public OSDTypeImage
+{
+  public:
+    OSDTypeEditSlider(const QString &name, const QString &bluefilename,
+                      const QString &redfilename, QRect displayrect, 
+                      float wmult, float hmult,
+                      int scalew = -1, int scaleh = -1);
+   ~OSDTypeEditSlider();
+
+    void SetRectangle(QRect rect) { m_displayrect = rect; }
+    QRect ImageSize() { return m_imagesize; }
+
+    void ClearAll(void);
+    void SetRange(int start, int end);
+
+    void Draw(unsigned char *screenptr, int vid_width, int vid_height,
+              int fade, int maxfade, int xoff, int yoff);
+
+  private:
+    QRect m_displayrect;
+    int m_maxval;
+    int m_curval;
+    int m_drawwidth;
+
+    int *m_drawMap;
+
+    bool m_risvalid;
+    unsigned char *m_ryuv;
+    unsigned char *m_rybuffer;
+    unsigned char *m_rubuffer;
+    unsigned char *m_rvbuffer;
+    unsigned char *m_ralpha;
+    QRect m_rimagesize;
+};
+
 
 class OSDTypeBox : public OSDType
 {

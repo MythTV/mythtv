@@ -77,6 +77,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
     advancevideo = resetvideo = advancedecoder = false;
 
     totalLength = 0;
+    totalFrames = 0;
 
     avcodec_init();
     avcodec_register_all();
@@ -415,6 +416,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
                 haspositionmap = true;
                 totalLength = (int)((ste.keyframe_number * keyframedist * 1.0) /
                                      video_frame_rate);
+                totalFrames = (long long)ste.keyframe_number * keyframedist;
             }
         }
 
@@ -1847,6 +1849,12 @@ bool NuppelVideoPlayer::EnableEdit(void)
             usleep(50);
         seekamount = keyframedist;
         seekamountpos = 2;
+
+        deleteMap.clear();
+
+        AddMark(1000, 0);
+        AddMark(20000, 1);
+        AddMark(30000, 0);
     }
     return editmode;   
 }
@@ -1862,6 +1870,7 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
             rewindtime = seekamount;
             while (rewindtime != 0)
                 usleep(50);
+            UpdateEditSlider();
             break;           
         }
         case wsRight: case 'd': case 'D':
@@ -1869,6 +1878,7 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
             fftime = seekamount;
             while (fftime != 0)
                 usleep(50);
+            UpdateEditSlider();
             break;
         }
         case wsUp: 
@@ -1965,6 +1975,27 @@ void NuppelVideoPlayer::UpdateTimeDisplay(void)
 
         osd->SetVisible(timedisplay, -1);
     }
+}
+
+void NuppelVideoPlayer::HandleSelect(void)
+{
+}
+
+void NuppelVideoPlayer::UpdateEditSlider(void)
+{
+    osd->DoEditSlider(deleteMap, framesPlayed, totalFrames);
+}
+
+void NuppelVideoPlayer::AddMark(long long frames, int type)
+{
+    deleteMap[frames] = type;
+    UpdateEditSlider();
+}
+
+void NuppelVideoPlayer::DeleteMark(long long frames)
+{
+    deleteMap.remove(frames);
+    UpdateEditSlider();
 }
 
 char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,

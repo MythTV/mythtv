@@ -27,12 +27,15 @@ OSD::OSD(int width, int height, int framerate, const QString &filename,
     vid_height = height;
     fps = framerate;
 
+    editarrowleft = editarrowright = NULL;
+
     wmult = vid_width / 640.0;
     hmult = vid_height / 480.0;
 
     fontname = filename;
     fontprefix = prefix;
     m_setsvisible = false;
+    setList = NULL;
 
     setList = new vector<OSDSet *>;
 
@@ -75,6 +78,11 @@ OSD::~OSD(void)
             delete set;
     }
 
+    if (editarrowleft)
+        delete editarrowleft;
+    if (editarrowright)
+        delete editarrowright;
+
     delete setList;
 }
 
@@ -95,6 +103,9 @@ void OSD::SetNoThemeDefaults(void)
         if (chanfont) 
             fontMap[name] = chanfont;
     }
+  
+    if (!chanfont)
+        return;
 
     OSDSet *container = GetSet("channel_number");
     if (!container)
@@ -235,7 +246,10 @@ TTFFont *OSD::LoadFont(QString name, int size)
 
     if (font->isValid())
         return font;
-    
+   
+    cerr << "Unable to find font: " << name << endl;
+    cerr << "No OSD will be displayed.\n";
+
     delete font;
     return NULL;
 }
@@ -298,6 +312,11 @@ bool OSD::LoadTheme(void)
 
         if (infofont)
             fontMap[name] = infofont;
+        else
+        {
+            delete settings;
+            return false;
+        }
 
         coords = settings->GetSetting("InfoIconPosition");
         if (coords.length() > 1) 
@@ -477,15 +496,6 @@ bool OSD::LoadTheme(void)
             text->SetCentered(true);
             container->AddType(text);
         }
-
-/*
-        bgname = settings->GetSetting("SeekSliderPosition");
-        if (bgname != "")
-        {
-            bgname = themepath + bgname;
-            pausesliderpos = new OSDImage(bgname, hmult, wmult, true);
-        }
-*/
     }
 
     totalfadeframes = settings->GetNumSetting("FadeAwayFrames");
@@ -521,6 +531,60 @@ bool OSD::LoadTheme(void)
         channelnumber->AddType(chantext);
     }
 
+    if (settings->GetSetting("EditSliderRect") != "")
+    {
+        QString esect = settings->GetSetting("EditSliderRect");
+
+        QRect esRect = parseRect(esect);
+        if (esRect.top() == -1)
+            esRect.moveBy(0, vid_height - esRect.height());
+
+        normalizeRect(&esRect);
+
+        name = "editslider";
+        OSDSet *set = new OSDSet(name, true, vid_width, vid_height, wmult, 
+                                 hmult);
+        AddSet(set, name);
+
+        QString bluename = settings->GetSetting("EditSliderNormal");
+        QString redname = settings->GetSetting("EditSliderDelete");
+
+        bluename = themepath + bluename;
+        redname = themepath + redname;
+
+        OSDTypeEditSlider *tes = new OSDTypeEditSlider(name, bluename, redname,
+                                                       esRect, wmult, hmult);
+        set->AddType(tes);
+
+        QString posname = settings->GetSetting("EditSliderPosition");
+        posname = themepath + posname;
+
+        QRect posRect = esRect;
+        int yoff = settings->GetNumSetting("EditSliderYOffset");
+        posRect.moveBy(0, (int)(yoff * hmult));
+
+        name = "editposition";
+        OSDTypePosSlider *pos = new OSDTypePosSlider(name, posname, posRect,
+                                                     wmult, hmult);
+        pos->SetPosition(0);
+        set->AddType(pos);
+
+        QString leftname = settings->GetSetting("EditSliderLeftArrow");
+        QString rightname = settings->GetSetting("EditSliderRightArrow");
+
+        leftname = themepath + leftname;
+        rightname = themepath + rightname;
+
+        name = "arrowimage";
+        editarrowleft = new OSDTypeImage(name, leftname, QPoint(0, 0), 
+                                         wmult, hmult);
+        editarrowright = new OSDTypeImage(name, rightname, QPoint(0, 0),
+                                          wmult, hmult);
+
+        editarrowRect = esRect;
+        editarrowRect.moveBy(0, -(editarrowleft->ImageSize().height()));
+    }
+    
     delete settings;
 
     return true;
@@ -825,6 +889,20 @@ int OSD::GetDialogResponse(const QString &name)
     return -1;
 }
 
+void OSD::ShowEditArrow(long long number, int type)
+{
+    pthread_mutex_lock(&osdlock);
+
+    pthread_mutex_unlock(&osdlock);
+}
+
+void OSD::HideEditArrow(long long number)
+{
+    pthread_mutex_lock(&osdlock);
+
+    pthread_mutex_unlock(&osdlock);
+}
+
 OSDSet *OSD::ShowText(const QString &name, const QString &message, int xpos,
                       int ypos, int width, int height, int secs)
 {
@@ -874,6 +952,71 @@ OSDSet *OSD::ShowText(const QString &name, const QString &message, int xpos,
     return set;
 }
 
+void OSD::DoEditSlider(QMap<long long, int> deleteMap, long long curFrame,
+                       long long totalFrames)
+{
+    pthread_mutex_lock(&osdlock);
+
+    QString name = "editslider";
+    OSDSet *set = GetSet(name);
+    if (set)
+    {
+        OSDTypeEditSlider *tes = (OSDTypeEditSlider *)set->GetType(name);
+        if (tes)
+        {
+            tes->ClearAll();
+
+            bool indelete = false;
+            int startpos = 0;
+            int endpos = 0;
+
+            QMap<long long, int>::Iterator i = deleteMap.begin();
+            for (; i != deleteMap.end(); ++i)
+            {
+                long long frame = i.key();
+                int direction = i.data();
+
+                if (direction == 0 && !indelete)
+                {
+                    startpos = 0;
+                    endpos = frame * 1000 / totalFrames;
+                    tes->SetRange(startpos, endpos);
+                }
+                else if (direction == 0 && indelete)
+                {
+                    endpos = frame * 1000 / totalFrames;
+                    tes->SetRange(startpos, endpos);
+                    indelete = false;
+                }
+                else if (direction == 1 && !indelete)
+                {
+                    startpos = frame * 1000 / totalFrames;
+                    indelete = true;
+                }
+            }
+           
+            if (indelete)
+            {
+                endpos = 1000;
+                tes->SetRange(startpos, endpos);
+            }
+        }
+
+        name = "editposition";
+        OSDTypePosSlider *pos = (OSDTypePosSlider *)set->GetType(name);
+        if (pos)
+        {
+            int num = curFrame * 1000 / totalFrames;
+            pos->SetPosition(num);
+        }
+
+        set->Display();
+        m_setsvisible = true;
+    }
+
+    pthread_mutex_unlock(&osdlock);
+}
+
 void OSD::SetVisible(OSDSet *set, int length)
 {
     pthread_mutex_lock(&osdlock);
@@ -888,6 +1031,8 @@ void OSD::SetVisible(OSDSet *set, int length)
 void OSD::Display(unsigned char *yuvptr)
 {
     bool anytodisplay = false;
+    if (!setList)
+        return;
 
     vector<OSDSet *> removeList;
 

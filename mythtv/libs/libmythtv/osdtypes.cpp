@@ -1,6 +1,9 @@
 #include <qimage.h>
 #include <math.h>
 
+#include <iostream>
+using namespace std;
+
 #include "yuv2rgb.h"
 #include "osdtypes.h"
 #include "ttfont.h"
@@ -307,12 +310,45 @@ OSDTypeImage::OSDTypeImage(const QString &name, const QString &filename,
     LoadImage(filename, wmult, hmult, scalew, scaleh);
 }
 
+OSDTypeImage::OSDTypeImage(const OSDTypeImage &other)
+            : OSDType(other.m_name)
+{
+    m_filename = other.m_filename;
+    m_displaypos = other.m_displaypos;
+    m_imagesize = other.m_imagesize;
+    m_isvalid = other.m_isvalid;
+    m_name = other.m_name;
+
+    m_alpha = m_yuv = NULL;
+    if (m_isvalid)
+    {
+        int size = m_imagesize.width() * m_imagesize.height() * 3 / 2;
+        m_yuv = new unsigned char[size];
+        memcpy(m_yuv, other.m_yuv, size);
+
+
+        size = m_imagesize.width() * m_imagesize.height();
+        m_alpha = new unsigned char[size];
+        memcpy(m_alpha, other.m_alpha, size);
+
+        m_ybuffer = m_yuv;
+        m_ubuffer = m_yuv + (m_imagesize.width() * m_imagesize.height());
+        m_vbuffer = m_yuv + (m_imagesize.width() * m_imagesize.height() * 
+                             5 / 4);
+    } 
+}
+
+OSDTypeImage::OSDTypeImage(const QString &name)
+            : OSDType(name)
+{
+}
+
 OSDTypeImage::~OSDTypeImage()
 {
     if (m_yuv)
-        delete m_yuv;
+        delete [] m_yuv;
     if (m_alpha)
-        delete m_alpha;
+        delete [] m_alpha;
 }
 
 void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
@@ -321,9 +357,9 @@ void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
     if (m_isvalid)
     {
         if (m_yuv)
-            delete m_yuv;
+            delete [] m_yuv;
         if (m_alpha)
-            delete m_alpha;
+            delete [] m_alpha;
 
         m_isvalid = false;
         m_yuv = NULL;
@@ -467,6 +503,40 @@ void OSDTypeImage::Draw(unsigned char *screenptr, int vid_width, int vid_height,
     }
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+
+OSDTypePosSlider::OSDTypePosSlider(const QString &name,
+                                   const QString &filename,
+                                   QRect displayrect, float wmult,
+                                   float hmult, int scalew, int scaleh)
+               : OSDTypeImage(name, filename, displayrect.topLeft(), wmult,
+                              hmult, scalew, scaleh)
+{
+    m_maxval = 1000;
+    m_curval = 0;
+    m_displayrect = displayrect;
+}
+
+OSDTypePosSlider::~OSDTypePosSlider()
+{
+}
+
+void OSDTypePosSlider::SetPosition(int pos)
+{
+    m_curval = pos;
+    if (m_curval > 1000)
+        m_curval = 1000;
+    if (m_curval < 0)
+        m_curval = 0;
+
+    int xpos = (int)((m_displayrect.width() / 1000.0) * m_curval);
+    int width = m_imagesize.width() / 2;
+
+    xpos = m_displayrect.left() + xpos - width;
+
+    m_displaypos.setX(xpos);
+}
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 OSDTypeFillSlider::OSDTypeFillSlider(const QString &name, 
@@ -592,6 +662,223 @@ void OSDTypeFillSlider::Draw(unsigned char *screenptr, int vid_width,
             src = m_vbuffer + ysrcwidth;
 
             tmp1 = (*src - *dest) * alpha;
+            tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+            *dest = tmp2 & 0xff;
+        }
+    }
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+OSDTypeEditSlider::OSDTypeEditSlider(const QString &name,
+                                     const QString &bluefilename,
+                                     const QString &redfilename,
+                                     QRect displayrect, float wmult,
+                                     float hmult, int scalew, int scaleh)
+                 : OSDTypeImage(name)
+{
+    m_maxval = 1000;
+    m_curval = 0;
+    m_displayrect = displayrect;
+    m_drawwidth = displayrect.width();
+
+    m_drawMap = new int[m_drawwidth + 1];
+    for (int i = 0; i < m_drawwidth; i++)
+         m_drawMap[i] = 0;
+
+    m_displaypos = displayrect.topLeft();
+    
+    m_yuv = m_alpha = NULL;
+    m_isvalid = false;
+
+    m_ryuv = m_ralpha = NULL;
+    m_risvalid = false;
+
+    LoadImage(redfilename, wmult, hmult, scalew, scaleh);
+    if (m_isvalid)
+    {
+        m_risvalid = m_isvalid;
+        m_ralpha = m_alpha;
+        m_ryuv = m_yuv;
+        m_rimagesize = m_imagesize;
+        m_rybuffer = m_ybuffer;
+        m_rubuffer = m_ubuffer;
+        m_rvbuffer = m_vbuffer;
+
+        m_isvalid = false;
+        m_alpha = m_yuv = NULL;
+    }
+
+    LoadImage(bluefilename, wmult, hmult, scalew, scaleh);
+}
+
+OSDTypeEditSlider::~OSDTypeEditSlider()
+{
+    if (m_ryuv)
+        delete [] m_ryuv;
+    if (m_ralpha)
+        delete [] m_ralpha;
+}
+
+void OSDTypeEditSlider::ClearAll(void)
+{
+    for (int i = 0; i < m_drawwidth; i++)
+        m_drawMap[i] = 0;
+}
+
+void OSDTypeEditSlider::SetRange(int start, int end)
+{
+    start = (int)((m_drawwidth / 1000.0) * start);
+    end = (int)((m_drawwidth / 1000.0) * end);
+
+    if (start < 0)
+        start = 0;
+    if (start >= m_drawwidth) 
+        start = m_drawwidth - 1;
+    if (end < 0)
+        end = 0;
+    if (end >= m_drawwidth)
+        end = m_drawwidth - 1;
+
+    if (end < start)
+    {
+        int tmp = start;
+        start = end;
+        end = tmp;
+    }
+
+    for (int i = start; i < end; i++)
+        m_drawMap[i] = 1;
+}
+
+void OSDTypeEditSlider::Draw(unsigned char *screenptr, int vid_width,
+                             int vid_height, int fade, int maxfade,
+                             int xoff, int yoff)
+{           
+    if (!m_isvalid || !m_risvalid)
+        return;
+            
+    unsigned char *dest, *src;
+    int a, tmp1, tmp2; 
+            
+    int iwidth, riwidth, width;
+    iwidth = m_imagesize.width();
+    riwidth = m_rimagesize.width();
+    width = m_drawwidth;
+    int height = m_imagesize.height();
+
+    int ystart = m_displaypos.y();
+    int xstart = m_displaypos.x();
+            
+    xstart += xoff;
+    ystart += yoff;
+
+    ystart = (ystart / 2) * 2;
+    xstart = (xstart / 2) * 2;
+
+    if (height + ystart > vid_height)
+        height = vid_height - ystart - 1;
+    if (width + xstart > vid_width)  
+        width = vid_width - xstart - 1;
+                 
+    int ysrcwidth;              
+    int ydestwidth;
+    
+    int alphamod = 255;
+    
+    if (maxfade > 0 && fade >= 0)
+        alphamod = (int)((((float)(fade) / maxfade) * 256.0) + 0.5);
+
+    unsigned char *alpha;
+    unsigned char *ybuf;
+    unsigned char *ubuf;
+    unsigned char *vbuf;
+
+    for (int y = 0; y < height; y++)
+    {
+        ydestwidth = (y + ystart) * vid_width;
+
+        for (int x = 0; x < width; x++)
+        {
+            if (m_drawMap[x] == 0)
+            {
+                alpha = m_alpha;
+                ybuf = m_ybuffer;
+                ysrcwidth = y * iwidth;
+            }
+            else
+            {
+                alpha = m_ralpha;
+                ybuf = m_rybuffer;
+                ysrcwidth = y * riwidth;
+            }
+
+            a = *(alpha + ysrcwidth);
+        
+            if (a == 0)
+                continue;
+
+            a = ((a * alphamod) + 0x80) >> 8;
+
+            dest = screenptr + x + xstart + ydestwidth;
+            src = ybuf + ysrcwidth;
+
+            tmp1 = (*src - *dest) * a;
+            tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+            *dest = tmp2 & 0xff;
+        }
+    }
+
+    width /= 2;
+    height /= 2;
+    iwidth /= 2;
+    riwidth /= 2;
+
+    ystart /= 2;
+    xstart /= 2;
+
+    unsigned char *destuptr = screenptr + (vid_width * vid_height);
+    unsigned char *destvptr = screenptr + (vid_width * vid_height * 5 / 4);
+
+    for (int y = 0; y < height; y++)
+    {
+        ydestwidth = (y + ystart) * (vid_width / 2);
+
+        for (int x = 0; x < width; x++)
+        {
+            if (m_drawMap[x * 2] == 0)
+            {
+                alpha = m_alpha;
+                ubuf = m_ubuffer;
+                vbuf = m_vbuffer;
+                ysrcwidth = y * iwidth;
+            }
+            else
+            {
+                alpha = m_ralpha;
+                ubuf = m_rubuffer;
+                vbuf = m_rvbuffer;
+                ysrcwidth = y * riwidth;
+            }
+
+            a = *(alpha + y * 2 * iwidth);
+
+            if (a == 0)
+                continue;
+
+            a = ((a * alphamod) + 0x80) >> 8;
+
+            dest = destuptr + x + xstart + ydestwidth;
+            src = ubuf + ysrcwidth;
+
+            tmp1 = (*src - *dest) * a;
+            tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+            *dest = tmp2 & 0xff;
+
+            dest = destvptr + x + xstart + ydestwidth;
+            src = vbuf + ysrcwidth;
+
+            tmp1 = (*src - *dest) * a;
             tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
             *dest = tmp2 & 0xff;
         }

@@ -14,6 +14,7 @@ using namespace std;
 class QImage;
 class TTFFont;
 class OSDSet;
+class OSDTypeImage;
  
 class OSD
 {
@@ -50,12 +51,19 @@ class OSD
 
     OSDSet *ShowText(const QString &name, const QString &message, int xpos,
                      int ypos, int width, int height, int secs);
+
+    void ShowEditArrow(long long number, int type);
+    void HideEditArrow(long long number);
+
     void AddSet(OSDSet *set, QString name, bool withlock = true);
-  
+
     void SetVisible(OSDSet *set, int length);
  
     OSDSet *GetSet(const QString &text);
     TTFFont *GetFont(const QString &text);
+
+    void DoEditSlider(QMap<long long, int> deleteMap, long long curFrame,
+                      long long totalFrames);
  
  private:
     void SetNoThemeDefaults();
@@ -96,6 +104,10 @@ class OSD
     QMap<QString, TTFFont *> fontMap;
 
     QMap<QString, int> dialogResponseList;
+
+    OSDTypeImage *editarrowleft;
+    OSDTypeImage *editarrowright;
+    QRect editarrowRect;
 };
     
 #endif

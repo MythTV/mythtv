@@ -155,6 +155,10 @@ class NuppelVideoPlayer
 
     void UpdateTimeDisplay(void);
     void UpdateSeekAmount(bool up);
+    void UpdateEditSlider(void);
+    void AddMark(long long frames, int type);
+    void DeleteMark(long long frames);
+    void HandleSelect(void);
 
     int audiofd;
 
@@ -252,6 +256,7 @@ class NuppelVideoPlayer
     bool actuallyreset;
 
     int totalLength;
+    long long totalFrames;
 
     QString osdfilename;
     QString osdprefix;
@@ -290,6 +295,8 @@ class NuppelVideoPlayer
     int seekamount;
     int seekamountpos;
     OSDSet *timedisplay;
+
+    QMap<long long, int> deleteMap;
 };
 
 #endif

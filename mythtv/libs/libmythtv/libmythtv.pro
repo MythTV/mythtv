@@ -12,7 +12,7 @@ INCLUDEPATH += ../libNuppelVideo ../
 TARGETDEPS = ../libNuppelVideo/libNuppelVideo.a
 
 installfiles.path = $${PREFIX}/share/mythtv
-installfiles.files = helr.ttf
+installfiles.files = FreeSans.ttf
 installfiles.files += settings.txt
 
 INSTALLS = installfiles

@@ -29,7 +29,7 @@ using namespace std;
 #include "ttfont.h"
 
 
-static char         have_library = 0;
+static int          have_library = 0;
 static FT_Library   the_library;
 
 #define FT_VALID(handle) ((handle) && (handle)->clazz != NULL)
@@ -448,11 +448,6 @@ TTFFont::~TTFFont()
       free(glyphs);
    if (glyphs_cached)
       free(glyphs_cached);
-
-   have_library--;
-
-   if (!have_library)
-       FT_Done_FreeType(the_library);
 }
 
 TTFFont::TTFFont(char *file, int size, int video_width, int video_height)
@@ -473,19 +468,14 @@ TTFFont::TTFFont(char *file, int size, int video_width, int video_height)
 	if (error) {
 	   return;
         }
+        have_library++;
    }
-   have_library++;
 
    fontsize = size;
    library = the_library;
    error = FT_New_Face(library, file, 0, &face);
    if (error)
    {
-        have_library--;
- 
-        if (!have_library)
-            FT_Done_FreeType(the_library);
-
 	return;
    }
 

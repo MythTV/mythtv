@@ -45,8 +45,6 @@ str SeekStatusRect=10,15,150,45
 str SeekSliderRect=175,12,445,45
 # Image to use for the fill slider bar.  Only the first column is used.
 str SeekSliderNormal=slider-normal.png
-# Image to use for the delete portion of the fill slider.
-str SeekSliderDelete=slider-red.png
 # Rectangular area to center the pause status text within.  If this doesn't 
 # exist, the SeekSliderRect is used.
 str SeekSliderTextRect=175,12,445,45
@@ -55,3 +53,11 @@ str SeekSliderTextRect=175,12,445,45
 # Size of the font that's displayed over the slider bar for status messages.
 # Not shown if this setting is not present.
 int SeekSliderFontSize=14
+
+str EditSliderRect=50,-1,600,65
+str EditSliderNormal=slider-normal.png
+str EditSliderDelete=slider-red.png
+str EditSliderPosition=position-indicator.png
+int EditSliderYOffset=-12
+int EditSliderLeftArrow=cut-end.png
+int EditSliderRightArrow=cut-start.png
