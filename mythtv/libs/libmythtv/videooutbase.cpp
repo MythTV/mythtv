@@ -371,6 +371,31 @@ void VideoOutput::GetDrawSize(int &xoff, int &yoff, int &width, int &height)
     height = imgh;
 }
 
+void VideoOutput::GetVisibleSize(int &xoff, int &yoff, int &width, int &height)
+{
+    xoff   = imgx;
+    yoff   = imgy;
+    width  = imgw;
+    height = imgh;
+
+    switch (letterbox)
+    {
+        case kLetterbox_4_3_Zoom:
+            width = (imgw*3)/4;
+            xoff = imgw/8;
+            height = (imgh*3)/4;
+            yoff = imgh/8;
+            break;
+        case kLetterbox_16_9_Stretch:
+        case kLetterbox_16_9_Zoom:
+            width = (imgw*3)/4;
+            xoff = imgw/8;
+            break;
+        default:
+            break;
+    }
+}
+
 void VideoOutput::MoveResize(void)
 {
     int yoff, xoff;

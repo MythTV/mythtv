@@ -113,6 +113,7 @@ class VideoOutput
     virtual void Zoom(int direction);
  
     virtual void GetDrawSize(int &xoff, int &yoff, int &width, int &height);
+    virtual void GetVisibleSize(int &xoff, int &yoff, int &width, int &height);
 
     virtual int GetRefreshRate(void) = 0;
 

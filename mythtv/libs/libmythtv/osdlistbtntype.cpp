@@ -88,6 +88,35 @@ OSDListTreeType::OSDListTreeType(const QString &name, const QRect &area,
     m_margin = 0;
 }
 
+void OSDListTreeType::Reinit(float wchange, float hchange, float wmult,
+                              float hmult)
+{
+    m_wmult = wmult;
+    m_hmult = hmult;
+    int width = (int)(m_totalarea.width() * wchange);
+    int height = (int)(m_totalarea.height() * hchange);
+    int x = (int)(m_totalarea.x() * wchange);
+    int y = (int)(m_totalarea.y() * hchange);
+
+    m_totalarea = QRect(x, y, width, height);
+
+    width = (int)(m_levelsize.width() * wchange);
+    height = (int)(m_levelsize.height() * hchange);
+    x = (int)(m_levelsize.x() * wchange);
+    y = (int)(m_levelsize.y() * hchange);
+
+    m_levelsize = QRect(x, y, width, height);
+
+    QPtrListIterator<OSDListBtnType> it(listLevels);
+    OSDListBtnType *child;
+
+    while ((child = it.current()) != 0)
+    {
+        child->Reinit(wchange, hchange, wmult, hmult);
+        ++it;
+    }
+}
+
 void OSDListTreeType::SetItemRegColor(const QColor& beg, const QColor& end,
                                       uint alpha)
 {
@@ -387,6 +416,20 @@ OSDListBtnType::~OSDListBtnType()
     Reset();
 }
 
+void OSDListBtnType::Reinit(float wchange, float hchange, float wmult,
+                              float hmult)
+{
+    m_wmult = wmult;
+    m_hmult = hmult;
+
+    int width = (int)(m_rect.width() * wchange);
+    int height = (int)(m_rect.height() * hchange);
+    int x = (int)(m_rect.x() * wchange);
+    int y = (int)(m_rect.y() * hchange);
+
+    m_rect = QRect(x, y, width, height);
+}
+
 void OSDListBtnType::SetItemRegColor(const QColor& beg, const QColor& end, 
                                      uint alpha)
 {
@@ -657,7 +700,7 @@ void OSDListBtnType::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
     OSDListBtnTypeItem *it = m_itemList.current();
     while (it && (y - m_rect.y()) <= (m_contentsRect.height() - m_itemHeight)) 
     {
-        it->paint(surface, font, fade, maxfade, m_rect.x(), y);
+        it->paint(surface, font, fade, maxfade, m_rect.x()+ xoff, y + yoff);
 
         y += m_itemHeight + m_itemSpacing;
 
@@ -668,22 +711,22 @@ void OSDListBtnType::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
     {
         if (m_showUpArrow)
             m_upArrowActPix.Draw(surface, fade, maxfade, 
-                                 m_rect.x() + m_arrowsRect.x(),
-                                 m_rect.y() + m_arrowsRect.y());
+                                 m_rect.x() + m_arrowsRect.x() + xoff,
+                                 m_rect.y() + m_arrowsRect.y() + yoff);
         else
             m_upArrowRegPix.Draw(surface, fade, maxfade,
-                                 m_rect.x() + m_arrowsRect.x(),
-                                 m_rect.y() + m_arrowsRect.y());
+                                 m_rect.x() + m_arrowsRect.x() + xoff,
+                                 m_rect.y() + m_arrowsRect.y() + yoff);
         if (m_showDnArrow)
             m_dnArrowActPix.Draw(surface, fade, maxfade,
                                  m_rect.x() + m_arrowsRect.x() +
-                                 m_upArrowRegPix.width() + m_itemMargin,
-                                 m_rect.y() + m_arrowsRect.y());
+                                 m_upArrowRegPix.width() + m_itemMargin + xoff,
+                                 m_rect.y() + m_arrowsRect.y() + yoff);
         else
             m_dnArrowRegPix.Draw(surface, fade, maxfade,
                                  m_rect.x() + m_arrowsRect.x() +
-                                 m_upArrowRegPix.width() + m_itemMargin,
-                                 m_rect.y() + m_arrowsRect.y());
+                                 m_upArrowRegPix.width() + m_itemMargin + xoff,
+                                 m_rect.y() + m_arrowsRect.y() + yoff);
     }
 }
 
@@ -894,7 +937,7 @@ OSDListBtnTypeItem::OSDListBtnTypeItem(OSDListBtnType* lbtype,
     else
         m_checkRect = QRect(0,0,0,0);
 
-    if (showArrow) 
+    if (m_showArrow) 
         m_arrowRect = QRect(width - aw - margin, (height - ah)/2,
                             aw, ah);
     else
@@ -913,7 +956,7 @@ OSDListBtnTypeItem::OSDListBtnTypeItem(OSDListBtnType* lbtype,
                        0,
                        width - 2*margin -
                        (m_checkable ? m_checkRect.width() + margin : 0) -
-                       (showArrow ? m_arrowRect.width() + margin : 0) -
+                       (m_showArrow ? m_arrowRect.width() + margin : 0) -
                        (m_pixmap ? m_pixmapRect.width() + margin : 0),
                        height);
 

@@ -38,6 +38,8 @@ OSDSet::OSDSet(const QString &name, bool cache, int screenwidth,
     m_screenheight = screenheight;
     m_wmult = wmult;
     m_hmult = hmult;
+    m_xoffsetbase = 0;
+    m_yoffsetbase = 0;
 
     m_notimeout = false;
     m_fadetime = -1;
@@ -63,6 +65,8 @@ OSDSet::OSDSet(const OSDSet &other)
     m_frameint = other.m_frameint;
     m_wmult = other.m_wmult;
     m_hmult = other.m_hmult;
+    m_xoffsetbase = other.m_xoffsetbase;
+    m_yoffsetbase = other.m_yoffsetbase;
     m_cache = other.m_cache;
     m_name = other.m_name;
     m_notimeout = other.m_notimeout;
@@ -157,6 +161,8 @@ void OSDSet::Reinit(int screenwidth, int screenheight, int xoff, int yoff,
     m_screenheight = screenheight;
     m_wmult = wmult;
     m_hmult = hmult;
+    m_xoffsetbase = xoff;
+    m_yoffsetbase = yoff;
 
     vector<OSDType *>::iterator iter = allTypes->begin();
     for (;iter != allTypes->end(); iter++)
@@ -204,8 +210,7 @@ void OSDSet::Reinit(int screenwidth, int screenheight, int xoff, int yoff,
         }
         else if (OSDListTreeType *item = dynamic_cast<OSDListTreeType*>(type))
         {
-            (void)item;
-            cerr << "FIXME: Implement OSDListTreeType reinit\n";
+            item->Reinit(wchange, hchange, wmult, hmult);
         }
         else
         {
@@ -360,7 +365,8 @@ void OSDSet::Draw(OSDSurface *surface, bool actuallydraw)
         for (; i != allTypes->end(); i++)
         {
             OSDType *type = (*i);
-            type->Draw(surface, m_fadetime, m_maxfade, m_xoff, m_yoff);
+            type->Draw(surface, m_fadetime, m_maxfade, m_xoff + m_xoffsetbase,
+                       m_yoff + m_yoffsetbase);
 
             if (m_wantsupdates)
                 m_lastupdate = (m_timeleft + 999999) / 1000000;

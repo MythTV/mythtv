@@ -60,6 +60,8 @@ class OSDListTreeType : public OSDType
                     const QRect &levelsize, int levelspacing,
                     float wmult, float hmult);
 
+    void Reinit(float wchange, float hchange, float wmult, float hmult);
+
     void SetFontActive(TTFFont *font);
     void SetFontInactive(TTFFont *font);
     void SetSpacing(int spacing);
@@ -129,6 +131,8 @@ class OSDListBtnType : public OSDType
                    float wmult, float hmult,
                    bool showScrollArrows = false);
     ~OSDListBtnType();
+
+    void  Reinit(float wchange, float hchange, float wmult, float hmult);
 
     void  SetFontActive(TTFFont *font);
     void  SetFontInactive(TTFFont *font);

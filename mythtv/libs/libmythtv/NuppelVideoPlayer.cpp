@@ -477,21 +477,26 @@ void NuppelVideoPlayer::InitVideo(void)
     }
 }
 
-void NuppelVideoPlayer::ReinitVideo(void)
+void NuppelVideoPlayer::ReinitOSD(void)
 {
-    InitFilters();
-    videoOutput->InputChanged(video_width, video_height, video_aspect);
-
     if (osd)
     {
         int dispx = 0, dispy = 0;
         int dispw = video_width, disph = video_height;
 
-        videoOutput->GetDrawSize(dispx, dispy, dispw, disph);
+        videoOutput->GetVisibleSize(dispx, dispy, dispw, disph);
 
         osd->Reinit(video_width, video_height, frame_interval,
                     dispx, dispy, dispw, disph);
     }
+}
+
+void NuppelVideoPlayer::ReinitVideo(void)
+{
+    InitFilters();
+    videoOutput->InputChanged(video_width, video_height, video_aspect);
+
+    ReinitOSD();
 
     ClearAfterSeek();
 }
@@ -2690,13 +2695,19 @@ int NuppelVideoPlayer::GetLetterbox(void)
 void NuppelVideoPlayer::ToggleLetterbox(int letterboxMode)
 {
     if (videoOutput)
+    {
         videoOutput->ToggleLetterbox(letterboxMode);
+        ReinitOSD();
+    }
 }
 
 void NuppelVideoPlayer::Zoom(int direction)
 {
     if (videoOutput)
+    {
         videoOutput->Zoom(direction);
+        ReinitOSD();
+    }
 }
 
 void NuppelVideoPlayer::ExposeEvent(void)

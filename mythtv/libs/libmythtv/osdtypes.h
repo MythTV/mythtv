@@ -98,6 +98,9 @@ class OSDSet : public QObject
     int m_xoff;
     int m_yoff;
 
+    int m_xoffsetbase;
+    int m_yoffsetbase;
+
     bool m_allowfade;
 
     QMap<QString, OSDType *> typeList;
