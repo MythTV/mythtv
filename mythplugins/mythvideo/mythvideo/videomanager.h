@@ -39,6 +39,7 @@ class VideoManager : public MythDialog
     void pageDown() { cursorDown(true); }
     void pageUp() { cursorUp(true); }
     void exitWin();
+    void GetMovieListingTimeOut();
 
   protected:
     void paintEvent(QPaintEvent *);
@@ -139,6 +140,10 @@ class VideoManager : public MythDialog
     int movieRuntime;
     QString movieNumber;
     
+    QTimer *urlTimer;
+    int GetMovieListingTimeoutCounter;
+    bool stopProcessing;
+    QString theMovieName;
 
 };
 

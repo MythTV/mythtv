@@ -51,6 +51,9 @@ VideoManager::VideoManager(QSqlDatabase *ldb,
     listCountMovie = 0;
     dataCountMovie = 0;
 
+    GetMovieListingTimeoutCounter = 0;
+    stopProcessing = false;
+
     m_state = 0;
     InetGrabber = NULL;
 
@@ -83,6 +86,9 @@ VideoManager::VideoManager(QSqlDatabase *ldb,
     accel->connectItem(accel->insertItem(Key_9), this, SLOT(num9()));
 
     connect(this, SIGNAL(killTheApp()), this, SLOT(accept()));
+
+    urlTimer = new QTimer(this);
+    connect(urlTimer, SIGNAL(timeout()), SLOT(GetMovieListingTimeOut()));
 
     theme = new XMLParse();
     theme->SetWMult(wmult);
@@ -556,6 +562,7 @@ int VideoManager::GetMovieListing(QString movieName)
 {
     int ret = -1;
     QString host = "us.imdb.com";
+    theMovieName = movieName;
 
     QUrl url("http://" + host + "/Tsearch?title=" + movieName + "&type=fuzzy&from_year=1890"
            + "&to_year=2010&sort=smart&tv=off&x=12&y=14"
@@ -572,10 +579,18 @@ int VideoManager::GetMovieListing(QString movieName)
 
     InetGrabber = new INETComms(url);
 
+    urlTimer->stop();
+    urlTimer->start(5000);
+
+    stopProcessing = false;
     while (!InetGrabber->isDone())
     {
         qApp->processEvents();
+	if (stopProcessing)
+		return 1;
     }
+
+    urlTimer->stop();
 
     QString res;
     res = InetGrabber->getData();
@@ -1152,6 +1167,7 @@ void VideoManager::exitWin()
         backup.end();
         update(fullRect());
         noUpdate = false;
+	urlTimer->stop();
     }
     else
         emit killTheApp();
@@ -1580,6 +1596,29 @@ void VideoManager::ResetCurrentItem()
 
     curitem->updateDatabase(db);
     RefreshMovieList();
+}
+
+void VideoManager::GetMovieListingTimeOut()
+{
+    //Increment the counter and check were not over the limit
+    if(++GetMovieListingTimeoutCounter != 3)
+    {
+        //Try again
+        GetMovieListing(theMovieName);
+    }
+    else
+    {
+        GetMovieListingTimeoutCounter = 0;
+        cerr << "Failed to contact  server" << endl;
+
+        //Set the stopProcessing var so the other thread knows what to do
+        stopProcessing = true;
+
+        //Let the exitWin method take care of closing the dialog screen
+        exitWin();
+    }
+
+    return;
 }
 
 QRect VideoManager::fullRect() const
