@@ -33,14 +33,5 @@ class RootSRGroup : public ManagedListGroup
          class SRStorageOptionsGroup* storageOptions;
          
          class SRRecordingType* recType;
-#if 0         
-         class SRProfileSelector* profile;
-         class SRDupSettingsGroup* dupSettings;
-         class SROffsetGroup* offsetGroup;
-         class SRAutoExpire* autoExpire;
-         class SRRecPriority* recPriority;
-         class SREpisodesGroup* episodes;
-         class SRRecGroup* recGroup;
-#endif
 };
 #endif

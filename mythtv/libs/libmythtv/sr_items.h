@@ -227,7 +227,8 @@ class SREndOffset : public SRBoundedIntegerSetting
                      : SRBoundedIntegerSetting( -120, 240, 10, 1, _parent, "endoffsetList", "endoffset",
                                                 _group, _list)
         {
-            setTemplates(QObject::tr("End recording %1 minutes early"), QObject::tr("End recording %1 minute early"),
+            setTemplates(QObject::tr("End recording %1 minutes early"), 
+                         QObject::tr("End recording %1 minute early"),
                          QObject::tr("End recording on time"), QObject::tr("End recording %1 minute late"),
                          QObject::tr("End recording %1 minutes late"));
 
@@ -284,7 +285,8 @@ class SRRecSearchType: public IntegerSetting, public SimpleSRSetting
 class SRProfileSelector: public SRSelectSetting {
     public:
         SRProfileSelector(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
-            : SRSelectSetting(_parent, "profileList", QObject::tr("[ Select recording Profile ]"), _group, "profile", _list )
+            : SRSelectSetting(_parent, "profileList", QObject::tr("[ Select recording Profile ]"), _group,
+                              "profile", _list )
         {
             _parent.setProfileObj(this);
         }
@@ -306,7 +308,8 @@ class SRSchedOptionsGroup : public ManagedListGroup
     Q_OBJECT
 
     public:
-        SRSchedOptionsGroup(ScheduledRecording& _rec, ManagedList* _list, ManagedListGroup* _group, QObject* _parent);
+        SRSchedOptionsGroup(ScheduledRecording& _rec, ManagedList* _list, ManagedListGroup* _group, 
+                            QObject* _parent);
 
         void setEnabled(bool isScheduled, bool multiEpisode);
 
@@ -331,7 +334,8 @@ class SRStorageOptionsGroup : public ManagedListGroup
     Q_OBJECT
 
     public:
-        SRStorageOptionsGroup(ScheduledRecording& _rec, ManagedList* _list, ManagedListGroup* _group, QObject* _parent);
+        SRStorageOptionsGroup(ScheduledRecording& _rec, ManagedList* _list, ManagedListGroup* _group, 
+                              QObject* _parent);
 
         void setEnabled(bool isScheduled, bool multiEpisode);
 
@@ -349,25 +353,6 @@ class SRStorageOptionsGroup : public ManagedListGroup
 
         ScheduledRecording& schedRec;
 };
-
-
-class SRDupSettingsGroup : public ManagedListGroup
-{
-    Q_OBJECT
-    public:
-        SRDupSettingsGroup(ScheduledRecording& _rec, ManagedList* _list, ManagedListGroup* _group, QObject* _parent);
-        virtual void doGoBack();
-        void syncText();
-
-    public slots:
-        void itemChanged(ManagedListItem*);
-
-    protected:
-
-        SRDupIn* dupLocItem;
-        SRDupMethod* dupMethItem;
-};
-
 
 
 class SRChannel: public ChannelSetting, public SimpleSRSetting
@@ -491,7 +476,8 @@ class SRAutoExpire: public SRBoolSetting
 {
     public:
         SRAutoExpire(ScheduledRecording& _parent, ManagedListGroup* _group, ManagedList* _list)
-                    : SRBoolSetting(_parent, QObject::tr("Allow auto expire"), QObject::tr("Don't allow auto expire"),
+                    : SRBoolSetting(_parent, QObject::tr("Allow auto expire"), 
+                                     QObject::tr("Don't allow auto expire"),
                                     "autoExpireItem", "autoexpire", _group, _list )
         {
             _parent.setAutoExpireObj(this);
@@ -505,8 +491,8 @@ class SRMaxNewest: public SRBoolSetting
     public:
         SRMaxNewest(ScheduledRecording& _parent, ManagedListGroup* _group, ManagedList* _list)
                    : SRBoolSetting(_parent, QObject::tr("Delete oldest if this would exceede the max episodes"),
-                                   QObject::tr("Don't record if this would exceed the max episodes"), "maxnewestItem",
-                                   "maxnewest", _group, _list )
+                                   QObject::tr("Don't record if this would exceed the max episodes"),
+                                   "maxnewestItem", "maxnewest", _group, _list )
         {
             setValue(false);
             _parent.setMaxNewestObj(this);
@@ -523,38 +509,10 @@ class SRMaxEpisodes : public SRBoundedIntegerSetting
                  : SRBoundedIntegerSetting( 0, 100, 5, 1, _parent, "maxepisodesList", "maxepisodes",
                                             _group, _list)
     {
-        setTemplates("", "", QObject::tr("No episode limit"), QObject::tr("Keep only one episode."), QObject::tr("Keep at most %1 episodes"));
+        setTemplates("", "", QObject::tr("No episode limit"), 
+                     QObject::tr("Keep only one episode."), QObject::tr("Keep at most %1 episodes"));
         _parent.setMaxEpisodesObj(this);
     }
-};
-
-
-class SREpisodesGroup : public ManagedListGroup
-{
-    Q_OBJECT
-
-    public:
-        SREpisodesGroup(ScheduledRecording& _rec, ManagedList* _list, ManagedListGroup* _group, QObject* _parent);
-
-        virtual void doGoBack()
-        {
-            syncText();
-            ManagedListGroup::doGoBack();
-        }
-
-
-        void syncText();
-
-    public slots:
-        void itemChanged(ManagedListItem*)
-        {
-            maxNewest->getItem()->setEnabled(maxEpisodes->getValue().toInt() !=0);
-            syncText();
-        }
-
-    protected:
-        SRMaxNewest* maxNewest;
-        SRMaxEpisodes* maxEpisodes;
 };
 
 
@@ -566,7 +524,7 @@ class SRRecPriority: public SRBoundedIntegerSetting
                                                _group, _list)
         {
             setTemplates( QObject::tr("Reduce priority by %1"), QObject::tr("Reduce priority by %1"),
-			  QObject::tr("Normal recording priority"),
+                          QObject::tr("Normal recording priority"),
                           QObject::tr("Raise priority by %1"), QObject::tr("Raise priority by %1") );
             setValue(0);
             _parent.setRecPriorityObj(this);

@@ -3,95 +3,10 @@
 #include <qlayout.h>
 #include "mythdialogs.h"
 
-void SRDupSettingsGroup::itemChanged(ManagedListItem*)
-{
-    syncText();
-}
 
 
-SRDupSettingsGroup::SRDupSettingsGroup(ScheduledRecording& _rec, ManagedList* _list, ManagedListGroup* _group, QObject* _parent)
-                  : ManagedListGroup(QObject::tr("Duplicate detection"), _group, _list, _parent, "depGroup")
-{
-    dupMethItem = new SRDupMethod(_rec, _list, this);
-    addItem(dupMethItem->getItem(), -1);
-
-    connect(dupMethItem->getItem(), SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
-
-    dupLocItem = new SRDupIn(_rec, _list, this);
-    addItem(dupLocItem->getItem(), -1);
-
-    connect(dupMethItem->getItem(), SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
-
-    syncText();
-}
-
-void SRDupSettingsGroup::doGoBack()
-{
-    syncText();
-    ManagedListGroup::doGoBack();
-}
-
-
-void SRDupSettingsGroup::syncText()
-{
-    int meth;
-    int loc;
-    //cerr << dupMethItem->getItem()->getValue() << " - " << dupMethItem->getItem()->getText() << endl;
-
-    meth = dupMethItem->getItem()->getValue().toInt();
-    loc = dupLocItem->getItem()->getValue().toInt();
-
-
-    text = dupMethItem->getItem()->getText();
-
-    if ((meth != kDupCheckNone) && (meth != kDupCheckNewEpi))
-    {
-        if (loc == kDupsInAll)
-            text += ", in current and previous recordings";
-        else if (kDupsInRecorded)
-            text += ", in current recordings only";
-        else if (kDupsInOldRecorded)
-            text += ", in previous recordings only";
-    }
-}
-
-
-
-
-SREpisodesGroup::SREpisodesGroup(ScheduledRecording& _rec, ManagedList* _list, ManagedListGroup* _group, QObject* _parent)
-                  : ManagedListGroup(QObject::tr("Duplicate detection"), _group, _list, _parent, "depGroup")
-{
-
-    maxEpisodes = new SRMaxEpisodes(_rec, this, _list);
-    addItem(maxEpisodes->getItem(), -1);
-
-    connect(maxEpisodes->getItem(), SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
-
-    maxNewest = new SRMaxNewest(_rec, this, _list);
-    addItem(maxNewest->getItem(), -1);
-
-    connect(maxNewest->getItem(), SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
-
-    syncText();
-}
-
-
-void SREpisodesGroup::syncText()
-{
-    int maxEpi;
-
-    maxEpi = maxEpisodes->getItem()->getValue().toInt();
-
-    text = maxEpisodes->getItem()->getText();
-
-    if (maxEpi != 0)
-        text += QString(", %1").arg(maxNewest->getItem()->getText());
-
-}
-
-
-
-SRSchedOptionsGroup::SRSchedOptionsGroup(ScheduledRecording& _rec, ManagedList* _parentList, ManagedListGroup* _group, QObject* _parent)
+SRSchedOptionsGroup::SRSchedOptionsGroup(ScheduledRecording& _rec, ManagedList* _parentList, 
+                                         ManagedListGroup* _group, QObject* _parent)
                    : ManagedListGroup( QObject::tr("Scheduling Options"), _group, _parentList,
                                        _parent, "schedOpts"),
                      schedRec(_rec)
@@ -149,8 +64,8 @@ void SRSchedOptionsGroup::setEnabled(bool isScheduled, bool multiEpisode)
 }
 
 
-SRStorageOptionsGroup::SRStorageOptionsGroup(ScheduledRecording& _rec, ManagedList* _parentList, ManagedListGroup* _group,
-                                             QObject* _parent)
+SRStorageOptionsGroup::SRStorageOptionsGroup(ScheduledRecording& _rec, ManagedList* _parentList, 
+                                             ManagedListGroup* _group, QObject* _parent)
                      : ManagedListGroup(QObject::tr("Storage Options"), _group, _parentList,
                                         _parent, "storageOpts"),
                        schedRec(_rec)
@@ -198,8 +113,8 @@ void SRRecGroup::showNewRecGroup()
     QString newGroup;
 
     bool ok = MythPopupBox::showGetTextPopup(gContext->GetMainWindow(), QObject::tr("Create New Recording Group"),
-                                       QObject::tr("Using your keyboard or the numbers keys on your remote enter the group name"),
-                                       newGroup);
+                                             QObject::tr("Using your keyboard or the numbers keys on your remote"
+                                                         " enter the group name"), newGroup);
     if (ok)
     {
         addSelection(QString(QObject::tr("Store in the \"%1\" recording group")).arg(newGroup), newGroup, true);
