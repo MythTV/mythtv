@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-09-17, v2.75
+  2003-09-18, v2.76
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -4954,7 +4954,11 @@
   [1mupdatedb [22mas root and then do a locate msp3400 to find all the
   msp3400.o.gz files that may be on your system.  For example, Mandrake
   has a msp3400.o.gz in the 3rdparty subdirectory which will take
-  precedence over the custom version created by ivtv.
+  precedence over the custom version created by ivtv.  You can check if
+  you have the correct msp3400 loaded by typing (as root): modinfo
+  msp3400 | grep "parm: *standard".  If you don't get a line that says:
+  "parm:        standard int", then you're not loading the correct
+  msp3400.
 
   [1mNOTE[22m:  Some people report "ghosting" issues with their PVR-250s, where
   there is a faint copy of whatever is on the screen appearing to the
@@ -5021,10 +5025,12 @@
   /etc/rc.d/init.d/:
 
 
-       $ cd contrib
-       $ su
-       # chmod a+x etc.rc.d.init.d.mythbackend
-       # cp etc.rc.d.init.d.mythbackend /etc/rc.d/init.d/mythbackend
+
+  $ cd contrib
+  $ su
+  # chmod a+x etc.rc.d.init.d.mythbackend
+  # cp etc.rc.d.init.d.mythbackend /etc/rc.d/init.d/mythbackend
+
 
 
   etc.sysconfig.mythbackend should be copied to /etc/sysconfig/:
@@ -5088,12 +5094,13 @@
   to edit the /etc/security/msec/perm.local file to include the
   following:
 
-  # /etc/security/msec/perm.local
-  # Local overrides to the msec program
-  #
-  # Full file path                user.group              permissions
-  /var/log/mythtv/                root.mythtv             775
-  /var/log/mythtv/*               root.mythtv             664
+
+       # /etc/security/msec/perm.local
+       # Local overrides to the msec program
+       #
+       # Full file path                user.group              permissions
+       /var/log/mythtv/                root.mythtv             775
+       /var/log/mythtv/*               root.mythtv             664
 
 
 
@@ -5138,8 +5145,6 @@
 
 
        # /etc/init.d/mythbackend stop
-
-
 
   To obtain a list of options:
 
@@ -5202,6 +5207,8 @@
   MythTV creates large files.  The partitions that your distribution
   sets up for you may not be optimized for large files.
 
+
+
   [1m20.14.1.  Ext3[0m
 
   With Ext3, your biggest gain is that in case of a crash and reboot you
@@ -5214,7 +5221,7 @@
   already been created using [1mfdisk[22m.
 
 
-  # mkfs.ext3 -T largefile4 -m 0 /dev/hdb1
+       # mkfs.ext3 -T largefile4 -m 0 /dev/hdb1
 
 
 
@@ -5278,6 +5285,7 @@
 
   # fdisk /dev/hda .... create partition 5, save partition table and
   reboot if you have to
+
   Create the LVM physical volume from the partitions (repeat if you have
   multiple partitions to use):
 
@@ -5326,6 +5334,7 @@
 
   Create the new LVM physical volume:
 
+
   # pvcreate /dev/hdb1
 
   Add the new physical volume to the volume group:
@@ -5339,6 +5348,7 @@
 
   Once you've completed one of the following two procedures, use [1mdf [22mto
   check that you've got more space.
+
 
   [1m20.15.1.  ReiserFS[0m
 

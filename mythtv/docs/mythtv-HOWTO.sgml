@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-09-17, v2.75
+<date>2003-09-18, v2.76
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -4001,7 +4001,10 @@ perform an <bf>updatedb</bf> as root and then do a <tt>locate msp3400</tt>
 to find all the <tt>msp3400.o.gz</tt> files that may be on your system.  For
 example, Mandrake has a <tt>msp3400.o.gz</tt> in the <tt>3rdparty</tt>
 subdirectory which will take precedence over the custom version created by
-ivtv.
+ivtv.  You can check if you have the correct msp3400 loaded by typing (as
+root): <tt>modinfo msp3400 | grep "parm: *standard"</tt>.  If you don't get
+a line that says: "parm:        standard int", then you're not loading the
+correct msp3400.
 
 <bf>NOTE</bf>:  Some people report "ghosting" issues with their PVR-250s,
 where there is a faint copy of whatever is on the screen appearing to the
@@ -4572,6 +4575,7 @@ v2.74, 2003-09-15.  Update the PVR-250 modules.conf.  Add a little more to
 PVR-250 troubleshooting.
 v2.75, 2003-09-17.  Don't connect line level stuff to the mic input.  Bad
 things can happen. Holger.Beetz at debitel.net
+v2.76, 2003-09-18.  Add a check for "Am I running the correct msp3400"?
 -->
 
 <!--

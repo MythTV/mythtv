@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-09-17, v2.75
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-09-18, v2.76
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -4567,7 +4567,10 @@ perform an <B>updatedb</B> as root and then do a <CODE>locate msp3400</CODE>
 to find all the <CODE>msp3400.o.gz</CODE> files that may be on your system.  For
 example, Mandrake has a <CODE>msp3400.o.gz</CODE> in the <CODE>3rdparty</CODE>
 subdirectory which will take precedence over the custom version created by
-ivtv.</P>
+ivtv.  You can check if you have the correct msp3400 loaded by typing (as
+root): <CODE>modinfo msp3400 | grep "parm: *standard"</CODE>.  If you don't get
+a line that says: "parm:        standard int", then you're not loading the
+correct msp3400.</P>
 <P><B>NOTE</B>:  Some people report "ghosting" issues with their PVR-250s,
 where there is a faint copy of whatever is on the screen appearing to the
 right of the image.  If you have this issue, it's fairly obvious.  This is a
