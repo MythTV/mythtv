@@ -1,0 +1,200 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
+ <TITLE>Installing mythtv: Downloading and compiling.</TITLE>
+ <LINK HREF="mythtv-HOWTO-5.html" REL=next>
+ <LINK HREF="mythtv-HOWTO-3.html" REL=previous>
+ <LINK HREF="mythtv-HOWTO.html#toc4" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="mythtv-HOWTO-5.html">Next</A>
+<A HREF="mythtv-HOWTO-3.html">Previous</A>
+<A HREF="mythtv-HOWTO.html#toc4">Contents</A>
+<HR>
+<H2><A NAME="s4">4.</A> <A HREF="mythtv-HOWTO.html#toc4">Downloading and compiling.</A></H2>
+
+<P>Get mythtv from the 
+<A HREF="http://www.mythtv.org">mythtv.org</A>
+web site.  Save the tarball to a directory you can find.</P>
+<P>Get XMLTV from 
+<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download version 0.5.2</P>
+<P>Get lame from 
+<A HREF="http://www.mp3dev.org/mp3">http://www.mp3dev.org/mp3</A>.  Download the source code to v3.92 by
+following the links to sourceforge.net</P>
+
+<H2><A NAME="ss4.1">4.1</A> <A HREF="mythtv-HOWTO.html#toc4.1">Notes on compiling on a system with non-Intel processors. </A>
+</H2>
+
+<P>If
+you've got a system with an AMD K6-2 or a VIA C3 processor, make the
+following change in the <CODE>settings.pro</CODE> file.</P>
+<P>Look for 
+<PRE>
+-march=pentiumpro
+</PRE>
+ 
+and replace it with
+<PRE>
+-march=i586
+</PRE>
+ 
+before you compile.</P>
+<P>Recent AMD processors, like the Duron, Thunderbird and Athalon don't need this
+change.</P>
+
+<H2><A NAME="ss4.2">4.2</A> <A HREF="mythtv-HOWTO.html#toc4.2">Building LAME.</A>
+</H2>
+
+<P>Open a shell and switch to the directory where you saved lame.
+<BLOCKQUOTE><CODE>
+<PRE>
+% tar -xzf lame-3.92.tar.gz
+% cd lame-3.92
+% ./configure
+% make
+% su
+# make install
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Check that it worked:
+<BLOCKQUOTE><CODE>
+<PRE>
+# ls -l /usr/local/lib
+-rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
+-rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
+lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
+libmp3lame.so.0.0.0*
+lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
+libmp3lame.so.0.0.0*
+-rwxr-xr-x    1 root     root       360197 Nov  4 14:22
+libmp3lame.so.0.0.0*
+
+# exit
+%
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss4.3">4.3</A> <A HREF="mythtv-HOWTO.html#toc4.3">Building XMLTV.</A>
+</H2>
+
+<P>Untar the xmltv file:
+<BLOCKQUOTE><CODE>
+<PRE>
+% tar -xjf xmltv-0.5.2.tar.bz2
+% cd xmltv-0.5.2
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Install the xmltv prerequisites:
+<BLOCKQUOTE><CODE>
+<PRE>
+% su -
+# perl -MCPAN -e shell
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Check to see which version of TWIG is being offered by CPAN.  If it's 3.08,
+we need to download it from the author's web site, because 3.08 has a problem
+with perl 5.8. As of 2002-11-02:
+<BLOCKQUOTE><CODE>
+<PRE>
+cpan> i /TWIG/
+Author          STWIGGER ("Simon Twigger" &lt;simont@mcw.edu>)
+Distribution    M/MI/MIROD/XML-Twig-3.08.tar.gz
+Module          XML::Twig       (M/MI/MIROD/XML-Twig-3.08.tar.gz)
+3 items found
+
+cpan>
+</PRE>
+</CODE></BLOCKQUOTE>
+
+This means that we need to do something a little different later on.  If
+it's 3.09 or better, then execute:
+<BLOCKQUOTE><CODE>
+<PRE>
+cpan> install XML::Twig
+</PRE>
+</CODE></BLOCKQUOTE>
+
+and then the rest of the commands (no matter what the TWIG version was):
+<BLOCKQUOTE><CODE>
+<PRE>
+cpan> install Date::Manip
+Date::Manip is up to date.
+cpan> install LWP
+cpan> install XML::Writer
+cpan> exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Download the 3.09 version of XMLTWIG from 
+<A HREF="http://www.xmltwig.com/xmltwig/">http://www.xmltwig.com/xmltwig/</A>
+<BLOCKQUOTE><CODE>
+<PRE>
+% tar -xzf XML-Twig-3.09.tar.gz
+% cd XML-Twig-3.09
+% perl Makefile.PL
+% make
+% make test
+% su
+# make install
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Change to the XMLTV directory and compile it:
+<BLOCKQUOTE><CODE>
+<PRE>
+% cd xmltv-0.5.2
+% perl Makefile.PL
+</PRE>
+</CODE></BLOCKQUOTE>
+
+You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
+the grabber required for your location.</P>
+<P>You may get errors about modules not being installed.  They shouldn't matter
+if you're installing North America and have followed the instructions to
+this point.
+<BLOCKQUOTE><CODE>
+<PRE>
+% make
+% make test
+% su 
+# make install
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss4.4">4.4</A> <A HREF="mythtv-HOWTO.html#toc4.4">Building mythtv.</A>
+</H2>
+
+<P>Unpack mythtv
+<BLOCKQUOTE><CODE>
+<PRE>
+% tar -xjf mythtv-0.7.tar.bz2
+% cd mythtv-0.7
+% ./configure
+% make
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Switch to superuser:
+<BLOCKQUOTE><CODE>
+<PRE>
+% su
+# make install
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<HR>
+<A HREF="mythtv-HOWTO-5.html">Next</A>
+<A HREF="mythtv-HOWTO-3.html">Previous</A>
+<A HREF="mythtv-HOWTO.html#toc4">Contents</A>
+</BODY>
+</HTML>

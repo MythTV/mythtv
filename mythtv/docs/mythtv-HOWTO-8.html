@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
+ <TITLE>Installing mythtv: Configuring mythtv.</TITLE>
+ <LINK HREF="mythtv-HOWTO-9.html" REL=next>
+ <LINK HREF="mythtv-HOWTO-7.html" REL=previous>
+ <LINK HREF="mythtv-HOWTO.html#toc8" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="mythtv-HOWTO-9.html">Next</A>
+<A HREF="mythtv-HOWTO-7.html">Previous</A>
+<A HREF="mythtv-HOWTO.html#toc8">Contents</A>
+<HR>
+<H2><A NAME="s8">8.</A> <A HREF="mythtv-HOWTO.html#toc8">Configuring mythtv.</A></H2>
+
+<P>By this point, all of the prerequisites have been installed,
+<B>mysql</B> is running and has had it's initial database setup.  It's now
+time to configure mythtv.</P>
+<P>Open a shell and switch to the <CODE>/usr/local/share/mythtv</CODE> directory. 
+You <B>MUST</B> edit the <CODE>settings.txt</CODE> file so that it's
+appropriate for your system.  At a minimum, ensure that the BufferName, RecordFilePrefix
+and PIPBuffername variables are set to directories that exist on your system. 
+By default, these point to <CODE>/mnt/store</CODE>.  For example, you may wish to create
+a <CODE>/var/video</CODE> subdirectory, so you would change <CODE>/mnt/store</CODE>
+to <CODE>/var/video</CODE>
+<BLOCKQUOTE><CODE>
+<PRE>
+% su
+# mkdir /var/video
+# chmod a+rwx /var/video
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+
+The <CODE>settings.txt</CODE> file is fairly self-explanatory.  </P>
+<P><B>NOTE</B>: although the width and height can be changed to almost
+anything, if you start mythtv and don't see video, it is likely that the
+video4linux (v4l) subsystem did not like the height and width parameters
+specified.  It's best to leave the default as-is until you're sure that
+mythtv is operational.</P>
+<P>Users in North America can now exit and save the file.  Users in other parts
+of the world need to modify the first line and modify the XMLTVGrabber
+variable to the correct grabber for their region.  <B>tv_grab_uk</B> for the
+UK, etc.  Use the name from the xmltv directory.</P>
+
+<HR>
+<A HREF="mythtv-HOWTO-9.html">Next</A>
+<A HREF="mythtv-HOWTO-7.html">Previous</A>
+<A HREF="mythtv-HOWTO.html#toc8">Contents</A>
+</BODY>
+</HTML>

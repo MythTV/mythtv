@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
+ <TITLE>Installing mythtv: Setting up alsa and the mixer.</TITLE>
+ <LINK HREF="mythtv-HOWTO-7.html" REL=next>
+ <LINK HREF="mythtv-HOWTO-5.html" REL=previous>
+ <LINK HREF="mythtv-HOWTO.html#toc6" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="mythtv-HOWTO-7.html">Next</A>
+<A HREF="mythtv-HOWTO-5.html">Previous</A>
+<A HREF="mythtv-HOWTO.html#toc6">Contents</A>
+<HR>
+<H2><A NAME="s6">6.</A> <A HREF="mythtv-HOWTO.html#toc6">Setting up alsa and the mixer.</A></H2>
+
+<P>If your video doesn't appear to be in-sync with your audio, it could be
+because you are listening to the real-time audio from your video card rather
+than after it's been processed and synchronized to the video by mythtv.</P>
+<P>What you need to do is to mute the "line-in" of your sound card and also
+set it as the recording source.</P>
+<P>There are two ways to do this.  Graphically, and from the command line.</P>
+
+<H2><A NAME="ss6.1">6.1</A> <A HREF="mythtv-HOWTO.html#toc6.1">Graphically setting up the mixer.</A>
+</H2>
+
+<P>Open Kmix by K->Multimedia->Sound->Kmix</P>
+<P>Click on Settings->Configure  Make sure that "Tick Marks" and "Show
+labels" have "X"'s in them.  This will make it easier to find the correct
+audio source.  Click OK.</P>
+<P>On the mixer page, look for Line-In on your sound card.  You should see
+two LED's - a green one at the top, and a red one at the bottom.  The green
+one at the top is for muting; you want to make sure that the green LED is a
+dark green, meaning that it's "off".  You also want to click on the red LED
+so that it turns bright red, indicating that it's "ON"; this insures that
+the Line-in is used as the source.  Click OK, and make sure that you save
+the settings so that this is your default.</P>
+
+<H2><A NAME="ss6.2">6.2</A> <A HREF="mythtv-HOWTO.html#toc6.2">Setting the mixer from the command line.</A>
+</H2>
+
+<P>If you're running Mandrake 9.0 and have installed the alsa-utils package,
+then the <B>amixer</B> program can be used to setup the mixer.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+% amixer set Master,0 100%,100% unmute
+% amixer set Line,0 100%,100% mute capture
+% su -
+# alsactl store
+# exit
+% 
+</PRE>
+</CODE></BLOCKQUOTE>
+
+That takes care of setting the volume correctly, and the alsa startup script
+will restore the volume after a reboot.</P>
+
+<HR>
+<A HREF="mythtv-HOWTO-7.html">Next</A>
+<A HREF="mythtv-HOWTO-5.html">Previous</A>
+<A HREF="mythtv-HOWTO.html#toc6">Contents</A>
+</BODY>
+</HTML>
