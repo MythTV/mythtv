@@ -889,19 +889,24 @@ void ProgramInfo::StartedRecording(QSqlDatabase *db)
     QString sqlsubtitle = subtitle;
     QString sqldescription = description;
     QString sqlcategory = category;
+    QString sqlrecgroup = recgroup;
 
     sqltitle.replace(QRegExp("\""), QString("\\\""));
     sqlsubtitle.replace(QRegExp("\""), QString("\\\""));
     sqldescription.replace(QRegExp("\""), QString("\\\""));
     sqlcategory.replace(QRegExp("\""), QString("\\\""));
+    sqlrecgroup.replace(QRegExp("\""), QString("\\\""));
 
     QString query;
     query = QString("INSERT INTO recorded (chanid,starttime,endtime,title,"
-                    "subtitle,description,hostname,category,autoexpire,recordid) "
-                    "VALUES(%1,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\",\"%7\",\"%8\"")
+                    "subtitle,description,hostname,category,recgroup,"
+                    "autoexpire,recordid) "
+                    "VALUES(%1,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\",\"%7\","
+                        "\"%8\",\"%9\"")
                     .arg(chanid).arg(starts).arg(ends).arg(sqltitle.utf8()) 
                     .arg(sqlsubtitle.utf8()).arg(sqldescription.utf8())
-                    .arg(gContext->GetHostName()).arg(sqlcategory.utf8());
+                    .arg(gContext->GetHostName()).arg(sqlcategory.utf8())
+                    .arg(sqlrecgroup.utf8());
     query += QString(",%1,%2);")
                     .arg(record->GetAutoExpire()).arg(recordid);
 
