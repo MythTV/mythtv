@@ -29,3 +29,7 @@ HEADERS += iconview.h singleview.h gallerysettings.h dbcheck.h
 HEADERS += thumbgenerator.h qtiffio.h galleryutil.h constants.h
 SOURCES += iconview.cpp main.cpp singleview.cpp gallerysettings.cpp dbcheck.cpp
 SOURCES += thumbgenerator.cpp qtiffio.cpp galleryutil.cpp
+
+macx {
+    QMAKE_LFLAGS += -flat_namespace -undefined suppress
+}

@@ -25,7 +25,7 @@ int mythplugin_config(void);
 void runGallery(void)
 {
     QTranslator translator( 0 );
-    translator.load(PREFIX + QString("/share/mythtv/i18n/mythgallery_") +
+    translator.load(gContext->GetTranslationsDir() + QString("mythgallery_") +
                     QString(gContext->GetSetting("Language").lower()) +
                     QString(".qm"), ".");
     qApp->installTranslator(&translator);
@@ -104,7 +104,7 @@ int mythplugin_run(void)
 int mythplugin_config(void)
 {
     QTranslator translator( 0 );
-    translator.load(PREFIX + QString("/share/mythtv/i18n/mythgallery_") +
+    translator.load(gContext->GetTranslationsDir() + QString("mythgallery_") +
                     QString(gContext->GetSetting("Language").lower()) +
                     QString(".qm"), ".");
     qApp->installTranslator(&translator);
