@@ -602,7 +602,7 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
     }
 
     // now delete any markups for this program
-    thequery = QString("DELETE FROM markup WHERE chanid = %1 "
+    thequery = QString("DELETE FROM recordedmarkup WHERE chanid = %1 "
                        "AND starttime = %2;")
                        .arg(pginfo->chanid).arg(startts);
 

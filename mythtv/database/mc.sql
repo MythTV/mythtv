@@ -150,7 +150,7 @@ CREATE TABLE IF NOT EXISTS favorites (
     PRIMARY KEY (favid)
 );
 
-CREATE TABLE IF NOT EXISTS markup
+CREATE TABLE IF NOT EXISTS recordedmarkup
 (
     chanid INT UNSIGNED NOT NULL,
     starttime TIMESTAMP NOT NULL,

@@ -601,7 +601,7 @@ void ProgramInfo::SetBlankFrameList(QMap<long long, int> &frames,
     QString starts = startts.toString("yyyyMMddhhmm");
     starts += "00";
 
-    QString querystr = QString("DELETE FROM markup "
+    QString querystr = QString("DELETE FROM recordedmarkup "
                                "WHERE chanid = '%1' AND starttime = '%2' "
                                "AND type = %3;"
                                ).arg(chanid).arg(starts).arg(MARK_BLANK_FRAME);
@@ -616,7 +616,7 @@ void ProgramInfo::SetBlankFrameList(QMap<long long, int> &frames,
         char tempc[128];
         sprintf(tempc, "%lld", frame );
         frame_str += tempc;
-        QString querystr = QString("INSERT markup (chanid, starttime, "
+        QString querystr = QString("INSERT recordedmarkup (chanid, starttime, "
                                    "mark, type) values ( '%1', '%2', %3, "
                                    "%4);").arg(chanid).arg(starts)
                                    .arg(frame_str).arg(MARK_BLANK_FRAME);
@@ -636,7 +636,7 @@ void ProgramInfo::GetBlankFrameList(QMap<long long, int> &frames,
     QString starts = startts.toString("yyyyMMddhhmm");
     starts += "00";
 
-    QString querystr = QString("SELECT mark, type FROM markup WHERE "
+    QString querystr = QString("SELECT mark, type FROM recordedmarkup WHERE "
                                "chanid = '%1' AND starttime = '%2' "
                                "AND type = %3 "
                                "ORDER BY mark;")
@@ -658,7 +658,7 @@ void ProgramInfo::SetCommBreakList(QMap<long long, int> &frames,
     QString starts = startts.toString("yyyyMMddhhmm");
     starts += "00";
 
-    QString querystr = QString("DELETE FROM markup "
+    QString querystr = QString("DELETE FROM recordedmarkup "
                                "WHERE chanid = '%1' AND starttime = '%2' "
                                "AND (type = %3 OR type = %4);"
                                ).arg(chanid).arg(starts)
@@ -677,7 +677,7 @@ void ProgramInfo::SetCommBreakList(QMap<long long, int> &frames,
         sprintf(tempc, "%lld", frame );
         frame_str += tempc;
         
-        querystr = QString("INSERT markup (chanid, starttime, "
+        querystr = QString("INSERT recordedmarkup (chanid, starttime, "
                                "mark, type) values ( '%1', '%2', %3, "
                                "%4);").arg(chanid).arg(starts)
                                .arg(frame_str).arg(mark_type);
@@ -697,7 +697,7 @@ void ProgramInfo::GetCommBreakList(QMap<long long, int> &frames,
     QString starts = startts.toString("yyyyMMddhhmm");
     starts += "00";
 
-    QString querystr = QString("SELECT mark, type FROM markup WHERE "
+    QString querystr = QString("SELECT mark, type FROM recordedmarkup WHERE "
                                "chanid = '%1' AND starttime = '%2' "
                                "AND (type = %3 OR type = %4) "
                                "ORDER BY mark;")
