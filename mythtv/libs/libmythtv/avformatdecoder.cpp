@@ -35,6 +35,9 @@ AvFormatDecoder::~AvFormatDecoder()
 {
     if (ic)
     {
+        ic->iformat->flags |= AVFMT_NOFILE;
+
+        av_free(ic->pb.buffer);
         av_close_input_file(ic);
         ic = NULL;
     }
