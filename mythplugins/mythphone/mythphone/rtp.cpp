@@ -776,11 +776,11 @@ void rtp::CloseSocket()
 
 bool rtp::isSpeakerHungry()
 {
-    if (!SpeakerOn)
-        return false;    
-
     if (rxMode == RTP_RX_AUDIO_TO_SPEAKER)
     {
+        if (!SpeakerOn)
+            return false;    
+
 #ifndef WIN32
         int bytesQueued;
         audio_buf_info info;
