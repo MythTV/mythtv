@@ -47,21 +47,13 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
 
     playingSomething = false;
 
-    // Number of items available in list, showData.count() for "All Programs"
-    // In other words, this is the number of shows selected by the title selec.
-    titleitems = 0;         
-    
-    // How full the actual list is (list in this context being the number
-    // of spaces available for data to be shown).
-    listCount = 0;          
-
     inTitle = gContext->GetNumSetting("PlaybackBoxStartInTitle", 0);
 
- 
-    skipNum = 0;            // Amount of records to skip (for scrolling)
+    progLists[""];
+    titleList << "";
+    progIndex = 0;
+    titleIndex = 0;
 
-    curShowing = 0;         // Where in the list (0 - # in list)
-    pageDowner = false;     // Is there enough records to page down?
     skipUpdate = false;
     skipCnt = 0;
     
@@ -77,7 +69,6 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     graphicPopup = true;
     expectingPopup = false;
 
-    titleData = NULL;
     popup = NULL;
     curitem = NULL;
     delitem = NULL;
@@ -167,8 +158,6 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
 
     connected = FillList();
 
-    curTitle = 0;
-
     playbackPreview = gContext->GetNumSetting("PlaybackPreview");
     generatePreviewPixmap = gContext->GetNumSetting("GeneratePreviewPixmaps");
     dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
@@ -209,9 +198,6 @@ PlaybackBox::~PlaybackBox(void)
         delete curitem;
     if (delitem)
         delete delitem;
-        
-    if (titleData)
-        delete [] titleData;
 }
 
 /* blocks until playing has stopped */
@@ -412,16 +398,18 @@ void PlaybackBox::updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix)
         container->ClearAllText();
         QPainter tmp(&pix);
         QMap<QString, QString> infoMap;
-        if(titleData[curTitle] == groupDisplayName)
-            infoMap["title"] = titleData[curTitle];
+        if(titleList[titleIndex] == "")
+            infoMap["title"] = groupDisplayName;
         else
             infoMap["title"] = QString("%1 - %2").arg(groupDisplayName)
-                                                 .arg(titleData[curTitle]);
-        
-        if( countInGroup > 1  )
+                                                 .arg(titleList[titleIndex]);
+
+        int countInGroup = progLists[""].count();
+        if (countInGroup > 1)
             infoMap["description"] = QString(tr("There are %1 recordings in "
-                                                "this display group")).arg(countInGroup);
-        else if( countInGroup == 1  )
+                                                "this display group"))
+                                                .arg(countInGroup);
+        else if (countInGroup == 1)
             infoMap["description"] = QString(tr("There is one recording in "
                                                  "this display group"));
         else
@@ -452,8 +440,6 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
         
     if (playingVideo == true)
         state = kChanging;
-
-    
 
     LayerSet *container = NULL;
     if (type != Delete)
@@ -546,15 +532,10 @@ void PlaybackBox::updateInfo(QPainter *p)
     bool updateGroup = (inTitle && haveGroupInfoSet);
     pix.fill(this, pr.topLeft());
     
-
-    if (showData.count() > 0 && curitem && !updateGroup)
-    {
+    if (titleList.count() > 1 && curitem && !updateGroup)
         updateProgramInfo(p, pr, pix);
-    }
-    else if(updateGroup)
-    {
+    else if (updateGroup)
         updateGroupInfo(p, pr, pix);
-    }
     else
     {
         QPainter tmp(&pix);
@@ -772,11 +753,6 @@ void PlaybackBox::updateUsage(QPainter *p)
 
 void PlaybackBox::updateShowTitles(QPainter *p)
 {
-    int cnt = 0;
-    int h = 0;
-    int pastSkip = (int)skipNum;
-    pageDowner = false;
-
     QString tempTitle;
     QString tempSubTitle;
     QString tempDate;
@@ -794,175 +770,137 @@ void PlaybackBox::updateShowTitles(QPainter *p)
 
     container = theme->GetSet("selector");
 
-    typedef QMap<QString, ProgramInfo> ShowData;
     ProgramInfo *tempInfo;
 
-    ShowData::Iterator it;
-    ShowData::Iterator start;
-    ShowData::Iterator end;
-    if (titleData && titleData[curTitle] != groupDisplayName)
-    {
-        start = showData.begin();
-        end = showData.end();
-    }
+    ProgramList *plist;
+    if (titleList.count() > 1)
+        plist = &progLists[titleList[titleIndex]];
     else
+        plist = &progLists[""];
+
+    int progCount = plist->count();
+
+    if (curitem)
     {
-        start = showDateData.begin();
-        end = showDateData.end();
+        delete curitem;
+        curitem = NULL;
     }
 
-    
-
-    if (container && titleData)
+    if (container && titleList.count() > 1)
     {
-        int itemCnt = 0;
         UIListType *ltype = (UIListType *)container->GetType("toptitles");
         if (ltype)
         {
-            int cnt = 0;
             ltype->ResetList();
             ltype->SetActive(inTitle);
 
-            itemCnt = ltype->GetItems();
-            for (int i = curTitle - itemCnt; i < curTitle; i++)
-            {
-                h = i;
-                if (i < 0)
-                    h = i + showList.count();
-                if (i > (signed int)(showList.count() - 1))
-                    h = i - showList.count();
+            int h = titleIndex - ltype->GetItems() +
+                ltype->GetItems() * titleList.count();
+            h = h % titleList.count();
 
-                ltype->SetItemText(cnt, titleData[h]);
-                cnt++;
+            for (int cnt = 0; cnt < ltype->GetItems(); cnt++)
+            {
+                if (titleList[h] == "")
+                    ltype->SetItemText(cnt, groupDisplayName);
+                else
+                    ltype->SetItemText(cnt, titleList[h]);
+                h = ++h % titleList.count();
              }
         }
 
         ltype = (UIListType *)container->GetType("bottomtitles");
         if (ltype)
         {
-            int cnt = 0;
             ltype->ResetList();
             ltype->SetActive(inTitle);
 
-            itemCnt = ltype->GetItems();
+            int h = titleIndex + 1;
+            h = h % titleList.count();
 
-            for (int i = curTitle + 1; i <= (curTitle + itemCnt); i++)
+            for (int cnt = 0; cnt < ltype->GetItems(); cnt++)
             {
-                h = i;
-                if (i < 0)
-                    h = i + showList.count();
-                if (i > (signed int)(showList.count() - 1))
-                    h = i - showList.count();
-
-                ltype->SetItemText(cnt, titleData[h]);
-                cnt++;
+                if (titleList[h] == "")
+                    ltype->SetItemText(cnt, groupDisplayName);
+                else
+                    ltype->SetItemText(cnt, titleList[h]);
+                h = ++h % titleList.count();
             }
         }
 
         UITextType *typeText = (UITextType *)container->GetType("current");
         if (typeText)
-            typeText->SetText(titleData[curTitle]);
+        {
+            if (titleList[titleIndex] == "")
+                typeText->SetText(groupDisplayName);
+            else
+                typeText->SetText(titleList[titleIndex]);
+        }
 
         ltype = (UIListType *)container->GetType("showing");
         if (ltype)
         {
-          ltype->ResetList();
-          ltype->SetActive(!inTitle);
-  
-          titleitems = 0;
-          for (it = start; it != end; ++it)
-          {
-             if (cnt < listsize)
-             {
-                 match = (it.key()).left((it.key()).find("-!-"));
-                 if (match == (titleData[curTitle]).lower() 
-                     || titleData[curTitle] == groupDisplayName)
-                 {
-                     if (pastSkip <= 0)
-                     {
-                         tempInfo = &(it.data());
+            ltype->ResetList();
+            ltype->SetActive(!inTitle);
 
-                         tempCurrent = RemoteGetRecordingStatus(tempInfo,
-                                                                overrectime,
-                                                                underrectime);
-
-                         if (titleData[curTitle] == groupDisplayName)
-                             tempSubTitle = tempInfo->title; 
-                         else
-                              tempSubTitle = tempInfo->subtitle;
-                           if (tempSubTitle.stripWhiteSpace().length() == 0)
-                             tempSubTitle = tempInfo->title;
-                         if ((tempInfo->subtitle).stripWhiteSpace().length() > 0 
-                             && titleData[curTitle] == groupDisplayName)
-                         {
-                             tempSubTitle = tempSubTitle + " - \"" + 
-                                            tempInfo->subtitle + "\"";
-                         }
-
-                         tempDate = (tempInfo->startts).toString(showDateFormat);
-                         tempTime = (tempInfo->startts).toString(showTimeFormat);
-
-                         long long size = tempInfo->filesize;
-                         tempSize.sprintf("%0.2f GB",
-                                          size / 1024.0 / 1024.0 / 1024.0);
-
-                         if (cnt == curShowing)
-                         {
-                             if (curitem)
-                                 delete curitem;
-                             curitem = new ProgramInfo(*tempInfo);
-                             ltype->SetItemCurrent(cnt);
-                         }
-
-                         ltype->SetItemText(cnt, 1, tempSubTitle);
-                         ltype->SetItemText(cnt, 2, tempDate);
-                         ltype->SetItemText(cnt, 3, tempTime);
-                         ltype->SetItemText(cnt, 4, tempSize);
-                         if (tempCurrent == 1)
-                             ltype->EnableForcedFont(cnt, "recording");
-                         else if (tempCurrent > 1)
-                             ltype->EnableForcedFont(cnt, "recording"); // FIXME: change to overunderrecording, fall back to recording. 
-
-                         cnt++;
-                     }
-                     pastSkip--;
-                     titleitems++;
-                     pageDowner = false;
-
-                 }  // match else
-                 //else
-                 //    pageDowner = true;
-            } // cnt < listsiz else
+            int skip;
+            if (progCount <= listsize || progIndex <= listsize / 2)
+                skip = 0;
+            else if (progIndex >= progCount - listsize + listsize / 2)
+                skip = progCount - listsize;
             else
+                skip = progIndex - listsize / 2;
+
+            ltype->SetUpArrow(skip > 0);
+            ltype->SetDownArrow(skip + listsize < progCount);
+
+            int cnt;
+            for (cnt = 0; cnt < listsize; cnt++)
             {
-                match = (it.key()).left( (it.key()).find("-!-") );
-                if (match == (titleData[curTitle]).lower() || 
-                    titleData[curTitle] == groupDisplayName)
+                if (cnt + skip >= progCount)
+                    break;
+
+                tempInfo = plist->at(skip+cnt);
+
+                tempCurrent = RemoteGetRecordingStatus(tempInfo, overrectime,
+                                                     underrectime);
+
+                if (titleList[titleIndex] == "")
+                    tempSubTitle = tempInfo->title; 
+                else
+                    tempSubTitle = tempInfo->subtitle;
+                if (tempSubTitle.stripWhiteSpace().length() == 0)
+                    tempSubTitle = tempInfo->title;
+                if ((tempInfo->subtitle).stripWhiteSpace().length() > 0 
+                    && titleList[titleIndex] == "")
                 {
-                    titleitems++;
-                    pageDowner = true;
+                    tempSubTitle = tempSubTitle + " - \"" + 
+                        tempInfo->subtitle + "\"";
                 }
-            } 
-            // end of cnt < listsize if
-         }
-         // for (iterator)
-       } 
-       // end of type check
- 
-       ltype->SetDownArrow(pageDowner);
-       if (skipNum > 0)
-           ltype->SetUpArrow(true);
-       else
-           ltype->SetUpArrow(false);
 
+                tempDate = (tempInfo->startts).toString(showDateFormat);
+                tempTime = (tempInfo->startts).toString(showTimeFormat);
+
+                long long size = tempInfo->filesize;
+                tempSize.sprintf("%0.2f GB", size / 1024.0 / 1024.0 / 1024.0);
+
+                if (skip + cnt == progIndex)
+                {
+                    curitem = new ProgramInfo(*tempInfo);
+                    ltype->SetItemCurrent(cnt);
+                }
+
+                ltype->SetItemText(cnt, 1, tempSubTitle);
+                ltype->SetItemText(cnt, 2, tempDate);
+                ltype->SetItemText(cnt, 3, tempTime);
+                ltype->SetItemText(cnt, 4, tempSize);
+                if (tempCurrent == 1)
+                    ltype->EnableForcedFont(cnt, "recording");
+                else if (tempCurrent > 1)
+                    ltype->EnableForcedFont(cnt, "recording"); // FIXME: change to overunderrecording, fall back to recording. 
+            }
+
+        } 
     } 
-    // end of container check
-    if (titleData && titleData[curTitle] != groupDisplayName)
-        countInGroup = cnt;
-    else
-        countInGroup = showData.size();
-
-    listCount = cnt;
 
     // DRAW LAYERS
     if (container && type != Delete)
@@ -992,7 +930,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
 
     leftRight = false;
 
-    if (showData.count() == 0)
+    if (titleList.count() <= 1)
     {
         LayerSet *norec = theme->GetSet("norecordings_list");
         if (type != Delete && norec)
@@ -1004,7 +942,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
     tmp.end();
     p->drawPixmap(pr.topLeft(), pix);
 
-    if (showData.count() == 0)
+    if (titleList.count() <= 1)
         update(infoRect);
 }
 
@@ -1042,27 +980,10 @@ void PlaybackBox::cursorDown(bool page, bool newview)
 {
     if (inTitle == true || newview)
     {
-        skipNum = 0;
-        curShowing = 0;
-        if (page == false)
-            curTitle++;
-        else if (page == true)
-            curTitle = curTitle + 5;
+        titleIndex += (page ? 5 : 1);
+        titleIndex = titleIndex % (int)titleList.count();
 
-        if (curTitle >= (signed int)showList.count() && page == true)
-            curTitle = curTitle - (signed int)showList.count();
-        else if (curTitle >= (signed int)showList.count() && page == false)
-            curTitle = 0;
-
-        if (curTitle < 0)
-            curTitle = 0;
-
-        while (titleData[curTitle] == "***FILLER***")
-        {
-            curTitle++;
-            if (curTitle >= (signed int)showList.count())
-                curTitle = 0;
-        }
+        progIndex = 0;
 
         if (newview)
             inTitle = false;
@@ -1070,58 +991,18 @@ void PlaybackBox::cursorDown(bool page, bool newview)
         skipUpdate = false;
         update(fullRect);
     }
-    else
+    else 
     {
-        if (page == false)
+        int progCount = progLists[titleList[titleIndex]].count();
+        if (progIndex < progCount - 1) 
         {
-            if (curShowing > (int)((int)(listsize / 2) - 1) 
-                && ((int)(skipNum + listsize) <= (int)(titleitems - 1)) 
-                && pageDowner == true)
-            {
-                skipNum++;
-                curShowing = (int)(listsize / 2);
-            }
-            else
-            {
-                curShowing++;
+            progIndex += (page ? listsize : 1);
+            if (progIndex > progCount - 1)
+                progIndex = progCount - 1;
 
-                if (curShowing >= listCount)
-                    curShowing = listCount - 1;
-            }
-
+            skipUpdate = false;
+            update(fullRect);
         }
-        else if (page == true && pageDowner == true)
-        {
-            if (curShowing >= (int)(listsize / 2) || skipNum != 0)
-            {
-                skipNum = skipNum + listsize;
-            }
-            else if (curShowing < (int)(listsize / 2) && skipNum == 0)
-            {
-                skipNum = (int)(listsize / 2) + curShowing;
-                curShowing = (int)(listsize / 2);
-            }
-        }
-        else if (page == true && pageDowner == false)
-        {
-            curShowing = listsize - 1;
-        }
-
-        if ((int)(skipNum + curShowing) >= (int)(titleitems - 1))
-        {
-            skipNum = titleitems - listsize;
-            curShowing = listsize - 1;
-        }
-        else if ((int)(skipNum + listsize) >= (int)titleitems)
-        {
-            skipNum = titleitems - listsize;
-        }
-
-        if (curShowing >= listCount)
-            curShowing = listCount - 1;
-
-        skipUpdate = false;
-        update(fullRect);
     }
 }
 
@@ -1129,25 +1010,11 @@ void PlaybackBox::cursorUp(bool page, bool newview)
 {
     if (inTitle == true || newview)
     {
-        curShowing = 0;
-        skipNum = 0;
+        titleIndex -= (page ? 5 : 1);
+        titleIndex += 5 * titleList.count();
+        titleIndex = titleIndex % titleList.count();
 
-        if (page == false)
-            curTitle--;
-          else
-            curTitle = curTitle - 5;
-
-        if (curTitle < 0 && page == false)
-            curTitle = (signed int)showList.count() - 1;
-        if (curTitle < 0 && page == true)
-            curTitle = (signed int)showList.count() + curTitle;
-
-        while (titleData[curTitle] == "***FILLER***")
-        {
-           curTitle--;
-           if (curTitle < 0)
-               curTitle = showList.count() - 1;
-        }
+        progIndex = 0;
 
         if (newview)
             inTitle = false;
@@ -1155,137 +1022,113 @@ void PlaybackBox::cursorUp(bool page, bool newview)
         skipUpdate = false;
         update(fullRect);
     }
-    else
+    else 
     {
-        if (page == false)
+        if (progIndex > 0) 
         {
-            if (curShowing < ((int)(listsize / 2) + 1) && skipNum > 0)
-            {
-                curShowing = (int)(listsize / 2);
-                skipNum--;
-                if (skipNum < 0)
-                {
-                     skipNum = 0;
-                     curShowing--;
-                }
-            }
-            else
-            {
-                curShowing--;
-            }
-        }
-        else if (page == true && skipNum > 0)
-        {
-            skipNum = skipNum - listsize;
-            if (skipNum < 0)
-            {
-                curShowing = curShowing + skipNum;
-                skipNum = 0;
-                if (curShowing < 0)
-                    curShowing = 0;
-            }
+            progIndex -= (page ? listsize : 1);
+            if (progIndex < 0)
+                progIndex = 0;
 
-            if (curShowing > (int)(listsize / 2))        
-            {
-                curShowing = (int)(listsize / 2);
-                skipNum = skipNum + (int)(listsize / 2) - 1;
-            }
-        }
-        else if (page == true)
-        {
-            skipNum = 0;
-            curShowing = 0;
-        }
-
-        if (curShowing > -1)
-        {
             skipUpdate = false;
             update(fullRect);
         }
-        else
-            curShowing = 0;
     }
 }
 
 bool PlaybackBox::FillList()
 {
-    QString chanid = "";
-    typedef QMap<QString,QString> ShowData;
-    
-    
-    int cnt = 999;
-    if (listOrder == 0 && type != Delete)
-        cnt = 100;
+    ProgramInfo *p;
 
-    showData.clear();
-    showDateData.clear();
-    if (showList.count() > 0)
+    // Save some information so we can find our place again.
+    QString oldtitle = titleList[titleIndex];
+    QString oldchanid;
+    QDateTime oldstartts;
+    p = progLists[oldtitle].at(progIndex);
+    if (p)
     {
-        showList.clear();
+        oldchanid = p->chanid;
+        oldstartts = p->startts;
     }
 
-    if (titleData)
-        delete [] titleData;
-    titleData = NULL;
-
-    showList[""] = groupDisplayName;
+    titleList.clear();
+    progLists.clear();
+    // Clear autoDelete for the "all" list since it will share the
+    // objects with the title lists.
+    progLists[""].setAutoDelete(false);
 
     fillRecGroupPasswordCache();
 
     vector<ProgramInfo *> *infoList;
-    infoList = RemoteGetRecordedList(type == Delete);
+    infoList = RemoteGetRecordedList(listOrder == 0 || type == Delete);
     if (infoList)
     {
-        QString temp;
-
         vector<ProgramInfo *>::iterator i = infoList->begin();
-        for (; i != infoList->end(); i++)
+        for ( ; i != infoList->end(); i++)
         {
-            if (((((*i)->recgroup == recGroup) ||
+            p = *i;
+            if ((((p->recgroup == recGroup) ||
                   (recGroup == "All Programs")) &&
                  (recGroupPassword == curGroupPassword)) ||
                 ((recGroupType[recGroup] == "category") &&
-                 ((*i)->category == recGroup ) &&
-                 ( !recGroupPwCache.contains((*i)->recgroup))))
+                 (p->category == recGroup ) &&
+                 ( !recGroupPwCache.contains(p->recgroup))))
             {
-                showList[((*i)->title).lower()] = (*i)->title;
-                temp = QString("%1-!-%2").arg(((*i)->title).lower()).arg(cnt);
-                showData[temp] = *(*i);
-                temp = QString("%1").arg(cnt);
-                showDateData[temp] = *(*i);
-                if (listOrder == 0 && type != Delete)
-                    cnt++;
-                else 
-                    cnt--;
+                progLists[""].prepend(p);
+                progLists[p->title].prepend(p);
             }
-            delete (*i);
+            else
+                delete p;
         }
         delete infoList;
     }
 
-    if ((signed int)showList.count() < (listsize - 1))
+    titleList = progLists.keys();
+
+    // Try to find our old place in the title list.  Scan the new
+    // titles backwards until we find where we were or go past.  This
+    // is somewhat inefficient, but it works.
+    titleIndex = titleList.count() - 1;
+    for (int i = titleIndex; i >= 0; i--)
     {
-        QString temp;
-        titleData = new QString[listsize - 1];
-        for (int j = showList.count(); j < (listsize - 1); j++)
-        {
-            temp = QString("%1").arg(j);
-            showList[temp] = "***FILLER***";
-            titleData[j] = "***FILLER***";
-        }
+        if (oldtitle > titleList[i])
+            break;
+
+        titleIndex = i;
+
+        if (oldtitle == titleList[i])
+            break;
     }
+
+    // Now do pretty much the same thing for the individual shows on
+    // the specific program list if needed.
+    if (oldtitle != titleList[titleIndex] || oldchanid.isNull())
+        progIndex = 0;
     else
-        titleData = new QString[showList.count() + 1];
-
-    cnt = 0;
-
-    ShowData::Iterator it;
-    for (it = showList.begin(); it != showList.end(); ++it)
     {
-        if (it.data() != "***FILLER***")
+        ProgramList *l = &progLists[oldtitle];
+        progIndex = l->count() - 1;
+
+        for (int i = progIndex; i >= 0; i--)
         {
-            titleData[cnt] = it.data();
-            cnt++;
+            p = l->at(i);
+
+            if (listOrder == 0 || type == Delete)
+            {
+                if (oldstartts > p->startts)
+                    break;
+            }
+            else
+            {
+                if (oldstartts < p->startts)
+                    break;
+            }
+
+            progIndex = i;
+
+            if (oldchanid == p->chanid &&
+                oldstartts == p->startts)
+                break;
         }
     }
 
@@ -1567,58 +1410,8 @@ void PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory)
     RemoteDeleteRecording(rec, forgetHistory);
     ScheduledRecording::signalChange(QSqlDatabase::database());
 
-    if (titleitems == 1)
-    {
-        inTitle = true;
-        curTitle = 0;
-        curShowing = 0;
-        skipNum = 0;
-        connected = FillList();
-    }
-    else 
-    {
-        titleitems--;
-        if (titleitems < listsize)
-            listCount--;
+    connected = FillList();
 
-        connected = FillList();
-
-        if (skipNum < 0)
-            skipNum = 0;
-
-        if (inTitle == false)
-        {
-            if ((int)(skipNum + curShowing) >= (int)(titleitems - 1))
-            {
-                skipNum = titleitems - listsize;
-                curShowing = listsize - 1;
-            }
-            else if ((int)(skipNum + listsize) >= (int)titleitems)
-            {
-                skipNum = titleitems - listsize;
-                if (skipNum >= 0)
-                    curShowing++;
-            }
-
-            if (curShowing >= listCount)
-                curShowing = listCount - 1;
-        }
-        else
-        {
-            if (curTitle >= (signed int)showList.count())
-                curTitle = 0;
-
-            if (curTitle < 0)
-                curTitle = 0;
-
-            while (titleData[curTitle] == "***FILLER***")
-            {
-                curTitle++;
-                if (curTitle >= (signed int)showList.count())
-                    curTitle = 0;
-            }
-        }
-    }
     update(fullRect);
 }
 
@@ -1969,7 +1762,7 @@ void PlaybackBox::doBeginFlagging()
 
     QSqlDatabase *db = QSqlDatabase::database();
 
-    ProgramInfo *tmpItem = findMatchingProgInShowDateData(curitem);
+    ProgramInfo *tmpItem = findMatchingProg(curitem);
     QString detectionHost = gContext->GetSetting("CommercialSkipHost");
 
     if (detectionHost == "Default")
@@ -2055,18 +1848,19 @@ void PlaybackBox::doDeleteForgetHistory(void)
     timer->start(500);
 }
 
-ProgramInfo *PlaybackBox::findMatchingProgInShowDateData(ProgramInfo *pginfo)
+ProgramInfo *PlaybackBox::findMatchingProg(ProgramInfo *pginfo)
 {
-    QMap<QString, ProgramInfo>::Iterator it;
+    ProgramInfo *p;
+    ProgramList *l = &progLists[""];
 
-    for (it = showDateData.begin(); it != showDateData.end(); it++)
+    for (p = l->first(); p; p = l->next())
     {
-        if (((*it).startts == pginfo->startts) &&
-            ((*it).chanid == pginfo->chanid))
-            return(&(*it));
+        if (p->startts == pginfo->startts &&
+            p->chanid == pginfo->chanid)
+            return p;
     }
 
-    return(NULL);
+    return NULL;
 }
 
 void PlaybackBox::noAutoExpire(void)
@@ -2079,7 +1873,7 @@ void PlaybackBox::noAutoExpire(void)
     QSqlDatabase *db = QSqlDatabase::database();
     delitem->SetAutoExpire(false, db);
 
-    ProgramInfo *tmpItem = findMatchingProgInShowDateData(delitem);
+    ProgramInfo *tmpItem = findMatchingProg(delitem);
     if (tmpItem)
         tmpItem->programflags &= ~FL_AUTOEXP;
 
@@ -2101,7 +1895,7 @@ void PlaybackBox::doAutoExpire(void)
     QSqlDatabase *db = QSqlDatabase::database();
     delitem->SetAutoExpire(true, db);
 
-    ProgramInfo *tmpItem = findMatchingProgInShowDateData(delitem);
+    ProgramInfo *tmpItem = findMatchingProg(delitem);
     if (tmpItem)
         tmpItem->programflags |= FL_AUTOEXP;
 
@@ -2147,7 +1941,7 @@ void PlaybackBox::UpdateProgressBar(void)
 
 void PlaybackBox::timeout(void)
 {
-    if (showData.count() == 0)
+    if (titleList.count() <= 1)
         return;
 
     update(videoRect);
@@ -2171,7 +1965,7 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
             showIconHelp();
         else if (action == "MENU")
             showMenu();
-        else if (showData.count() > 0)
+        else if (titleList.count() > 1)
         {
             if (action == "DELETE")
                 deleteSelected();
@@ -2655,10 +2449,9 @@ void PlaybackBox::chooseSetViewGroup(void)
     else
         gContext->SaveSetting("DisplayRecGroupIsCategory", 1);
 
-    inTitle = true;
-    curTitle = 0;
-    curShowing = 0;
-    skipNum = 0;
+    inTitle = gContext->GetNumSetting("PlaybackBoxStartInTitle", 0);
+    titleIndex = 0;
+    progIndex = 0;
 
     connected = FillList();
     skipUpdate = false;
@@ -2815,10 +2608,9 @@ void PlaybackBox::changeSetRecGroup(void)
     QSqlDatabase *m_db = QSqlDatabase::database();
     delitem->ApplyRecordRecGroupChange(m_db, newRecGroup);
     
-    inTitle = true;
-    curTitle = 0;
-    curShowing = 0;
-    skipNum = 0;
+    inTitle = gContext->GetNumSetting("PlaybackBoxStartInTitle", 0);
+    titleIndex = 0;
+    progIndex = 0;
 
     connected = FillList();
     skipUpdate = false;

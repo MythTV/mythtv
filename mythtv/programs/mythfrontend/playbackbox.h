@@ -7,6 +7,7 @@
 #include "mythdialogs.h"
 #include "uitypes.h"
 #include "xmlparse.h"
+#include "programinfo.h"
 
 #include <pthread.h>
 
@@ -113,21 +114,16 @@ class PlaybackBox : public MythDialog
     void parsePopup(QDomElement &);
     void parseContainer(QDomElement &);
 
-    int skipNum;
     int skipCnt;
-    int listCount;
-    int countInGroup;
     bool inTitle;
     bool playingVideo;
     bool leftRight;
-    int curTitle;
-    int curShowing;
-    QString *titleData;
-    QMap<QString, QString> showList;
-    QMap<QString, ProgramInfo> showData;
-    QMap<QString, ProgramInfo> showDateData;
+    int titleIndex;
+    int progIndex;
+    QStringList titleList;
+    QMap<QString, ProgramList> progLists;
 
-    ProgramInfo *findMatchingProgInShowDateData(ProgramInfo *);
+    ProgramInfo *findMatchingProg(ProgramInfo *);
 
     BoxType type;
 
@@ -210,7 +206,6 @@ class PlaybackBox : public MythDialog
     QRect videoRect;
 
     int listsize;
-    int titleitems;
 
     QColor popupForeground;
     QColor popupBackground;
