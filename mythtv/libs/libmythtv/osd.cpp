@@ -349,8 +349,6 @@ void OSD::parseImage(OSDSet *container, QDomElement &element)
             else if (info.tagName() == "staticsize")
             {
                 scale = parsePoint(getFirstText(info));
-                scale.setX((int)(scale.x() * wmult));
-                scale.setY((int)(scale.y() * hmult));
             }
             else
             {
