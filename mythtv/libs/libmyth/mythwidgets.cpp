@@ -134,166 +134,308 @@ void MythLineEdit::setText(const QString& text) {
     setCursorPosition(pos);
 }
 
+// thor feb 18 2003
 
-
-LineEditHintBox::LineEditHintBox( QWidget * parent, const char * name)
-    : QLabel(parent, name)
-{
-}
-
-LineEditHintBox::~LineEditHintBox()
-{
-}
-
-void LineEditHintBox::showShift(bool shift)
-{
-    //
-    //  At some point an up/down arrow pixmap 
-    //  might be a nice improvement
-    //
-
-    if(shift)
-    {
-        setText("[CAPS]");
-    }
-    else
-    {
-        setText("[nocaps]");
-    }
-}
-
-
-void LineEditHintBox::showCycle(QString current_choice, QString set)
-{
-    int index;
-    QString aString;
-
-    //
-    //  Show the characters in the current set being cycled
-    //  through, with the current choice in bold. If the current
-    //  character is uppercase X (interpreted as desctructive
-    //  backspace) or an underscore (interpreted as a space)
-    //  then show these special cases in red.
-    //
-    
-
-    aString  = "<B>";
-    if(current_choice == "_" || current_choice == "X")
-    {
-        aString += "<FONT COLOR=\"#ff0000\">";
-        aString += current_choice;
-        aString += "</FONT>";
-    }
-    else
-    {
-        aString += "<FONT COLOR=\"#00ffff\">";
-        aString += current_choice;
-        aString += "</FONT>";
-    }
-    aString += "</B>";
-    
-    index = set.find(current_choice);
-    int length = set.length();
-    if(index < 0 || index > length)
-    {
-        cerr << "libmyth: LineEditHintBox passed a choice of \"" << current_choice << "\" which is not in set \"" << set << "\"" << endl;
-        setText("????");
-        return;
-    }
-    else
-    {
-        set.replace(index, current_choice.length(), aString);
-        setText(set);
-    }    
-}
-
-
-
-KeypadLineEdit::KeypadLineEdit( QWidget * parent, const char * name)
-    : QLineEdit(parent, name)
+MythRemoteLineEdit::MythRemoteLineEdit( QWidget * parent, const char * name)
+    : QTextEdit(parent, name)
 {
     this->Init();
 }
 
-KeypadLineEdit::KeypadLineEdit( const QString & contents, QWidget * parent, const char * name)
-    : QLineEdit(contents, parent, name)
+MythRemoteLineEdit::MythRemoteLineEdit( const QString & contents, QWidget * parent, const char * name)
+    : QTextEdit(parent, name)
 {
     this->Init();
+    setText(contents);
 }
 
-void KeypadLineEdit::Init()
+void MythRemoteLineEdit::Init()
 {
+    //
+    //  Bunch of default values
+    //
+
     cycle_timer = new QTimer();
     shift = false;
     active_cycle = false;
     current_choice = "";
     current_set = "";
     
+    //
+    //  We need to start out in PlainText format
+    //  and only toggle RichText on if we are in
+    //  the middle of a character cycle. That's
+    //  the only way to do all this in a way which
+    //  works across most 3.x.x versions of Qt.
+    //
+
+    setTextFormat(Qt::PlainText);    
+
+    cycle_time = 2000;
+
+    pre_cycle_text_upto = "";
+    pre_cycle_text_from = "";
+    pre_cycle_para = 0;
+    pre_cycle_pos  = 0;
+
+    col_unselected.setRgb(100, 100, 100);
+    col_selected.setRgb(0, 255, 255);
+    col_special.setRgb(255, 0, 0);
+
+    assignHexColors();
+
+    //
+    //  Try and make sure it doesn't ever change
+    //    
+    setWordWrap(QTextEdit::NoWrap);
+    QScrollView::setVScrollBarMode(QScrollView::AlwaysOff);
+    QScrollView::setHScrollBarMode(QScrollView::AlwaysOff);
+    
+
     connect(cycle_timer, SIGNAL(timeout()), this, SLOT(endCycle()));
 }
 
-void KeypadLineEdit::endCycle()
+
+void MythRemoteLineEdit::startCycle(QString current_choice, QString set)
 {
-    //
-    //  The timer ran out or the user pressed a key
-    //  outside of the current set of choices
-    //
-    if(current_choice == "_")       //  Space
+    int end_paragraph;
+    int end_position;
+    int dummy;
+    int dummy_two;
+    
+    if(active_cycle)
     {
-        insert(" ");
-    } 
-    else if (current_choice == "X") //  destructive backspace
-    {
-        backspace();
-    }
-    else if(shift)
-    {
-        insert(current_choice.upper());
+        cerr << "libmyth: MythRemoteLineEdit was asked to start a cycle when a cycle was already active." << endl;
     }
     else
     {
-        insert(current_choice);
+        cycle_timer->start(cycle_time, true);
+        active_cycle = true;
+        //
+        //  Amazingly, Qt (version < 3.1.1) only lets us pull
+        //  text out in segments by fiddling around
+        //  with selecting it. Oh well.
+        //
+        getCursorPosition(&pre_cycle_para, &pre_cycle_pos);
+        selectAll(true);
+        getSelection(&dummy, &dummy_two, &end_paragraph, &end_position);
+        setSelection(pre_cycle_para, pre_cycle_pos, end_paragraph, end_position, 0);
+        pre_cycle_text_from = selectedText();
+        setSelection(0, 0, pre_cycle_para, pre_cycle_pos, 0);
+        pre_cycle_text_upto = selectedText();
+        selectAll(false);
+        setCursorPosition(pre_cycle_para, pre_cycle_pos);        
+        updateCycle(current_choice, set); // Show the user their options
     }
-    active_cycle = false;
-    current_choice = "";
-    current_set = "";
-    emit cycleState("",""); 
 }
 
-KeypadLineEdit::~KeypadLineEdit()
+void MythRemoteLineEdit::setCharacterColors(QColor unselected, QColor selected, QColor special)
 {
-    if(cycle_timer)
+    col_unselected = unselected;
+    col_selected = selected;
+    col_special = special;
+    assignHexColors();
+}
+
+void MythRemoteLineEdit::updateCycle(QString current_choice, QString set)
+{
+    int index;
+    QString aString, bString;
+
+    //
+    //  Show the characters in the current set being cycled
+    //  through, with the current choice in a different color. If the current
+    //  character is uppercase X (interpreted as desctructive
+    //  backspace) or an underscore (interpreted as a space)
+    //  then show these special cases in yet another color.
+    //
+    
+    if(shift)
     {
-        delete cycle_timer;
+        set = set.upper();
+        current_choice = current_choice.upper();
+    }
+
+    bString  = "<B>";
+    if(current_choice == "_" || current_choice == "X")
+    {
+        bString += "<FONT COLOR=\"#";
+        bString += hex_special;
+        bString += "\">";
+        bString += current_choice;
+        bString += "</FONT>";
+    }
+    else
+    {
+        bString += "<FONT COLOR=\"#";
+        bString += hex_selected;
+        bString += "\">";
+        bString += current_choice;
+        bString += "</FONT>";
+    }
+    bString += "</B>";
+
+    index = set.find(current_choice);
+    int length = set.length();
+    if(index < 0 || index > length)
+    {
+        cerr << "libmyth: MythRemoteLineEdit passed a choice of \"" << current_choice << "\" which is not in set \"" << set << "\"" << endl;
+        setText("????");
+        return;
+    }
+    else
+    {
+        set.replace(index, current_choice.length(), bString);
+    }    
+    
+        
+    aString = pre_cycle_text_upto;
+    aString += "<FONT COLOR=\"#";
+    aString += hex_unselected;
+    aString += "\">[";
+    aString += set;
+    aString += "]</FONT>";
+    aString += pre_cycle_text_from;
+    setTextFormat(Qt::RichText);
+    setText(aString);
+    setCursorPosition(pre_cycle_para, pre_cycle_pos);
+
+    //
+    //  If current selection is delete, 
+    //  select the character that may well
+    //  get deleted
+    //
+    
+    if(current_choice == "X" && pre_cycle_pos > 0)
+    {
+        setSelection(pre_cycle_para, pre_cycle_pos - 1, pre_cycle_para, pre_cycle_pos, 0);
     }
 }
 
-void KeypadLineEdit::keyPressEvent(QKeyEvent *e)
+
+
+void MythRemoteLineEdit::assignHexColors()
+{
+    char text[1024];
+    
+    sprintf(text, "%.2X%.2X%.2X", col_unselected.red(), col_unselected.green(), col_unselected.blue());
+    hex_unselected = text;
+    
+    sprintf(text, "%.2X%.2X%.2X", col_selected.red(), col_selected.green(), col_selected.blue());
+    hex_selected = text;
+    
+    sprintf(text, "%.2X%.2X%.2X", col_special.red(), col_special.green(), col_special.blue());
+    hex_special = text;
+    
+}
+
+void MythRemoteLineEdit::endCycle()
+{
+    QString aString;
+    
+    if(active_cycle)
+    {
+        //
+        //  The timer ran out or the user pressed a key
+        //  outside of the current set of choices
+        //
+        if(current_choice == "_")       //  Space
+        {
+            aString  = pre_cycle_text_upto;
+            aString += " ";
+            aString += pre_cycle_text_from;
+        } 
+        else if (current_choice == "X") // destructive backspace
+        {
+            //
+            //  Deal with special case in a way
+            //  that all 3.x.x versions of Qt
+            //  can handle
+            //
+            
+            if(pre_cycle_text_upto.length() > 0)
+            {
+                aString = pre_cycle_text_upto.left(pre_cycle_text_upto.length() - 1);
+            }
+            else
+            {
+                aString = "";
+            }
+            aString += pre_cycle_text_from;
+            pre_cycle_pos--;
+        }
+        else if(shift)
+        {
+            aString  = pre_cycle_text_upto;
+            aString += current_choice.upper();
+            aString += pre_cycle_text_from;
+        }
+        else
+        {
+            aString  = pre_cycle_text_upto;
+            aString += current_choice;
+            aString += pre_cycle_text_from;
+        }
+
+        setTextFormat(Qt::PlainText);
+        setText(aString);
+        setCursorPosition(pre_cycle_para, pre_cycle_pos + 1);
+        active_cycle = false;
+        current_choice = "";
+        current_set = "";
+    }
+}
+
+void MythRemoteLineEdit::setText(const QString& text) 
+{
+    int para, pos;
+    
+    //
+    //  Isaac had this in the original version
+    //  of MythLineEdit, and I'm sure he had
+    //  a reason ...
+    //    
+    getCursorPosition(&para, &pos);
+    QTextEdit::setText(text);
+    setCursorPosition(para, pos);
+
+}
+
+
+
+void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
-
-    //
-    //  If you want to mess arround with other ways to allocate
-    //  key presses you can just add entried between the quotes
-    //
 
     switch(e->key())
     {
         case Key_Up:
+            handled = true;
+            endCycle();
             focusNextPrevChild(FALSE);
             break;
    
         case Key_Down:
+            handled = true;
+            endCycle();
             focusNextPrevChild(TRUE);
             break;
     
         case Key_Enter:
         case Key_Return:
         case Key_Space:
+            handled = true;
+            endCycle();
             e->ignore();
+            break;
+
+            //
+            //  If you want to mess arround with other ways to allocate
+            //  key presses you can just add entried between the quotes
+            //
 
         case Key_1:
-            cycleKeys("X_-/.?()");
+            cycleKeys("_X-/.?()");
             handled = true;
             break;
 
@@ -345,11 +487,12 @@ void KeypadLineEdit::keyPressEvent(QKeyEvent *e)
     
     if(handled == false)
     {
-        QLineEdit::keyPressEvent(e);
+        endCycle();
+        QTextEdit::keyPressEvent(e);
     }
 }
 
-void KeypadLineEdit::setCycleTime(float desired_interval)
+void MythRemoteLineEdit::setCycleTime(float desired_interval)
 {
 
     if(desired_interval < 0.5 || desired_interval > 10.0)
@@ -363,7 +506,7 @@ void KeypadLineEdit::setCycleTime(float desired_interval)
 }
 
 
-void KeypadLineEdit::cycleKeys(QString cycle_list)
+void MythRemoteLineEdit::cycleKeys(QString cycle_list)
 {
     int index;
     
@@ -383,6 +526,7 @@ void KeypadLineEdit::cycleKeys(QString cycle_list)
                 index = -1;
             }
             current_choice = current_set.mid(index + 1, 1);
+            updateCycle(current_choice, current_set);
         }
         else
         {
@@ -391,10 +535,10 @@ void KeypadLineEdit::cycleKeys(QString cycle_list)
             //  to another keypad key
             //
             endCycle();
-            active_cycle = true;
             current_choice = cycle_list.left(1);
             current_set = cycle_list;
-            cycle_timer->changeInterval(cycle_time);            
+            cycle_timer->changeInterval(cycle_time);
+            startCycle(current_choice, current_set);
         }
                 
     }
@@ -403,25 +547,19 @@ void KeypadLineEdit::cycleKeys(QString cycle_list)
         //
         //  First press with no cycle of any type active
         //
-        active_cycle = true;
-        cycle_timer->start(cycle_time, true);
         current_choice = cycle_list.left(1);
         current_set = cycle_list;
+        startCycle(current_choice, current_set);
     }
-    
-    QString temp_choice = current_choice;
-    QString temp_set = current_set;
-    
-    if(shift)
-    {
-        temp_choice = current_choice.upper();
-        temp_set = current_set.upper();
-    }    
-    emit cycleState(temp_choice, temp_set);   // tell the hint box
 }
 
-void KeypadLineEdit::toggleShift()
+void MythRemoteLineEdit::toggleShift()
 {
+    //
+    //  Toggle uppercase/lowercase and
+    //  update the cycle display if it's
+    //  active
+    //
 
     QString temp_choice = current_choice;
     QString temp_set = current_set;
@@ -436,124 +574,26 @@ void KeypadLineEdit::toggleShift()
         temp_choice = current_choice.upper();
         temp_set = current_set.upper();
     }
-    emit shiftState(shift);
-    emit cycleState(temp_choice, temp_set);   // tell the hint box
-    
+    if(active_cycle)
+    {
+        updateCycle(temp_choice, temp_set);  
+    }
 }
 
-void KeypadLineEdit::focusInEvent(QFocusEvent *e)
-{
-    emit askParentToChangeHelpText();
-    QLineEdit::focusInEvent(e);
-}
-
-
-
-MythRemoteLineEdit::MythRemoteLineEdit( QWidget * parent, const char * name)
-    : QWidget(parent, name)
-{
-    editor = new KeypadLineEdit(this);
-    character_hint = new LineEditHintBox(this);
-    shift_hint = new LineEditHintBox(this);
-    this->Init();
-}
-
-MythRemoteLineEdit::MythRemoteLineEdit(const QString &contents, QWidget * parent, const char * name)
-    : QWidget(parent, name)
-{
-    editor = new KeypadLineEdit(contents, this);
-    character_hint = new LineEditHintBox(this);
-    shift_hint = new LineEditHintBox(this);
-    this->Init();
-}
-
-void MythRemoteLineEdit::Init()
-{
-    character_hint->setFrameStyle(QFrame::Panel | QFrame::Raised);
-    character_hint->show();
-    character_hint->setTextFormat(Qt::RichText);
-    character_hint->setAlignment(Qt::AlignCenter);
-    character_hint->setFocusPolicy(QWidget::NoFocus);
-        
-    shift_hint->setFrameStyle(QFrame::Panel | QFrame::Raised);
-    shift_hint->show();
-    shift_hint->setTextFormat(Qt::RichText);
-    shift_hint->setAlignment(Qt::AlignCenter);
-    shift_hint->setFocusPolicy(QWidget::NoFocus);
-
-    editor->show();
-    editor->setCycleTime(2.0);
-    
-    connect(editor, SIGNAL(shiftState(bool)), shift_hint, SLOT(showShift(bool)));
-    connect(editor, SIGNAL(cycleState(QString, QString)), character_hint, SLOT(showCycle(QString, QString)));
-    connect(editor, SIGNAL(textChanged(const QString &)), this, SLOT(textHasChanged(const QString &)));
-    connect(editor, SIGNAL(askParentToChangeHelpText()), this, SLOT(honorRequestToChangeHelpText()));
-    
-    shift_hint->showShift(false);   //  Set intial shifted state
-    
-}
-
-void MythRemoteLineEdit::textHasChanged(const QString &text)
-{
-    emit textChanged(text);
-}
-
-
-void MythRemoteLineEdit::setGeometry(int x, int y, int w, int h)
-{
-    //
-    //  Should be a less kludgy way to do this
-    //  but I can't for the life of me figure out
-    //  how themed menu sets this stuff ???
-    //
-    QWidget::setGeometry(x, y, w, h);
-    
-
-    //  This sucks:
-    QFontMetrics fm = fontMetrics();
-    int widget_height = fm.height() + 8;    
-    int space_above = (h - widget_height) / 2 ;
-    editor->setGeometry(0, space_above, w - 130, widget_height);
-    character_hint->setGeometry(w - 130 + 5, space_above, 60, widget_height);
-    shift_hint->setGeometry(w - 130 + 70, space_above, 60, widget_height);
-
-
-}
-
-void MythRemoteLineEdit::setCycleTime(float desired_interval)
-{
-    editor->setCycleTime(desired_interval);
-}
-
-
-void MythRemoteLineEdit::setText(const QString& text) 
-{
-    int pos = editor->cursorPosition();
-    editor->setText(text);
-    editor->setCursorPosition(pos);
-}
-
-void MythRemoteLineEdit::honorRequestToChangeHelpText(void)
+void MythRemoteLineEdit::focusInEvent(QFocusEvent *e)
 {
     emit changeHelpText(helptext);
+    QTextEdit::focusInEvent(e);
 }
+
 
 MythRemoteLineEdit::~MythRemoteLineEdit()
 {
-    if(editor)
+    if(cycle_timer)
     {
-        delete editor;
-    }  
-    if(character_hint)
-    {
-        delete character_hint;
-    } 
-    if(shift_hint)
-    {
-        delete shift_hint;
-    } 
+        delete cycle_timer;
+    }
 }
-
 
 
 

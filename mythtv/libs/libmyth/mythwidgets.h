@@ -6,6 +6,7 @@
 #include <qspinbox.h>
 #include <qslider.h>
 #include <qlineedit.h>
+#include <qtextedit.h>
 #include <qpushbutton.h>
 #include <qtoolbutton.h>
 #include <qdialog.h>
@@ -129,53 +130,31 @@ class MythLineEdit : public QLineEdit
 
 
 
-//    Challenge: Use only keys 0-9 (that's it)
-    
-class LineEditHintBox : public QLabel
+//  thor feb 18 (serious redo)
+//  Challenge: Use only keys 0-9 (that's it)
+class MythRemoteLineEdit : public QTextEdit
 {
     Q_OBJECT
 
     //
-    //  A little hint box that goes beside
-    //  the actual text editing box. There
-    //  are two of these. One shows the
-    //  state of shift'ing, and the other
-    //  the current characters that the 
-    //  current keypress will cycle through
-    //
-
-    public:
-        LineEditHintBox(QWidget * parent, const char * name = 0 );
-        ~LineEditHintBox();
-        
-    public slots:
-
-        void    showShift(bool);
-        void    showCycle(QString current_choice, QString set);
-
-};
-
-class KeypadLineEdit : public QLineEdit
-{
-    Q_OBJECT
-
-    //
-    //  The actual editor part of
-    //  the compound widget
+    //  A Line edit that does special
+    //  things when you press number keys
     //
     
     public:
     
-        KeypadLineEdit( QWidget * parent, const char * name = 0 );
-        KeypadLineEdit( const QString & contents, QWidget * parent, const char * name = 0 );    
-        ~KeypadLineEdit();
+        MythRemoteLineEdit( QWidget * parent, const char * name = 0 );
+        MythRemoteLineEdit( const QString & contents, QWidget * parent, const char * name = 0 );    
+        ~MythRemoteLineEdit();
+        void setHelpText(QString help) { helptext = help; }
         void setCycleTime(float desired_interval); // in seconds
+        void setCharacterColors(QColor unselected, QColor selected, QColor special);
 
     signals:
     
         void    shiftState(bool);
         void    cycleState(QString current_choice, QString set);
-        void    askParentToChangeHelpText(void);
+        void    changeHelpText(QString);
 
     protected:
     
@@ -184,6 +163,9 @@ class KeypadLineEdit : public QLineEdit
 
     private slots:
 
+        virtual void setText(const QString& text);
+        void    startCycle(QString current_choice, QString set);
+        void    updateCycle(QString current_choice, QString set);
         void    endCycle();
 
     private:
@@ -191,6 +173,7 @@ class KeypadLineEdit : public QLineEdit
         void    Init(void);
         void    cycleKeys(QString cycleList);
         void    toggleShift(void);
+        void    assignHexColors();
 
         bool    shift;
         QTimer  *cycle_timer;
@@ -198,63 +181,25 @@ class KeypadLineEdit : public QLineEdit
         QString current_choice;
         QString current_set;
         int     cycle_time;
-};
+        QString helptext;
 
-//  thor feb 17 2003
-//
-//  Alternative to MythLineEdit that lets you enter
-//  text using only (!) the keys 0-9 on a keypad/remote control
-//
-class MythRemoteLineEdit : public QWidget
-{
-    Q_OBJECT
-
-    //
-    //  A container that holds the
-    //  hint boxes and the editor and
-    //  co-ordinates their actions
-    //
-            
-    public:
-    
-        MythRemoteLineEdit( QWidget * parent, const char * name = 0 );
-        MythRemoteLineEdit( const QString & contents, QWidget * parent, const char * name = 0 );    
-        ~MythRemoteLineEdit();
-        void setCycleTime(float desired_interval); //seconds
-        void setHelpText(QString help) { helptext = help; }
-
-        //
-        //  These are three widgets inside
-        //  the container. They should really
-        //  be private, but are public for
-        //  the time being (so you can hack
-        //  settings on them like
-        //  MythRemoteLineEdit->editor->setPalette()
-        //  and so on)
-        //
-
-        KeypadLineEdit      *editor;
-        LineEditHintBox     *character_hint;
-        LineEditHintBox     *shift_hint;
+        int     pre_cycle_para;
+        int     pre_cycle_pos;
+        QString pre_cycle_text_upto;
+        QString pre_cycle_text_from;
 
         
-    public slots:
-    
-        void setGeometry(int x, int y, int w, int h);
-        virtual void setText(const QString& text);
-        void textHasChanged(const QString &);
-        void honorRequestToChangeHelpText(void);
-
-    signals:
-        void changeHelpText(QString);
-        void textChanged(const QString &);
-
-    private:
-    
-        void    Init(void);
-        QString helptext;
-    
+        QColor  col_unselected;
+        QColor  col_selected;
+        QColor  col_special;
+        
+        QString  hex_unselected;
+        QString  hex_selected;
+        QString  hex_special;
+        
 };
+
+
 
 
 class MythTable : public QTable
