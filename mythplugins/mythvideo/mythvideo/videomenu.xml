@@ -24,14 +24,5 @@
      <action>MANAGER</action>
    </button>
   
-   <button>
-     <type>SETUP</type>
-     <text>Setup</text>
-     <text lang="ES">Configurar</text>
-     <text lang="CA">Configurar</text>
-     <action>MENU video_settings.xml</action>
-   </button>
-
-
 </mythmenu>
 

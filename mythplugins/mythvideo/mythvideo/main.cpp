@@ -24,13 +24,7 @@ using namespace std;
 
 #include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
-
-#ifdef ENABLE_LIRC
-#include "lirc_client.h"
-
-int lfd;
-struct lirc_config *config;
-#endif
+#include <mythtv/mythplugin.h>
 
 enum VideoFileLocation
 {
@@ -38,6 +32,7 @@ enum VideoFileLocation
     kDatabase,
     kBoth
 };
+
 typedef QMap <QString, VideoFileLocation> VideoLoadedMap;
 
 struct GenericData
@@ -47,72 +42,75 @@ struct GenericData
     QString startdir;
 };
 
-MythContext *gContext;
-void runMenu(QString, QSqlDatabase *, QString);
+void runMenu(QString, const QString &, QSqlDatabase *, QString);
 void VideoCallback(void *, QString &);
 void SearchDir(QSqlDatabase *, QString &);
 void BuildFileList(QString &, VideoLoadedMap &);
 
-int main(int argc, char *argv[])
+extern "C" {
+int mythplugin_init(const char *libversion);
+int mythplugin_run(void);
+int mythplugin_config(void);
+}
+
+int mythplugin_init(const char *libversion)
 {
-    QApplication a(argc, argv);
-    QTranslator translator( 0 );
-    
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-
-#ifdef ENABLE_LIRC
-    lfd=lirc_init("mythvideo",1);
-    lirc_readconfig(NULL,&config,NULL);
-#endif
-
-    QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
-    if (!db)
+    QString lib = libversion;
+    if (lib != MYTH_BINARY_VERSION)
     {
-        printf("Couldn't connect to database\n");
+        cerr << "This plugin was compiled against libmyth version: "
+             << MYTH_BINARY_VERSION
+             << "\nbut the library is version: " << libversion << endl;
+        cerr << "You probably want to recompile everything, and do a\n"
+             << "'make distclean' first.\n";
         return -1;
     }
-    if (!gContext->OpenDatabase(db))
-    {
-        printf("couldn't open db\n");
-        return -1;
-    }
-
-    gContext->LoadQtConfig();
-
-    translator.load(PREFIX + QString("/share/mythtv/i18n/mythvideo_") + 
-                    QString(gContext->GetSetting("Locale")) + QString(".qm"),
-                    ".");
-    a.installTranslator(&translator);
-
-    MythMainWindow *mainWindow = new MythMainWindow();
-    mainWindow->Show();
-    gContext->SetMainWindow(mainWindow);
-
-    QString themename = gContext->GetSetting("Theme");
-    QString themedir = gContext->FindThemeDir(themename);
-    if (themedir == "")
-    {
-        cerr << "Couldn't find theme " << themename << endl;
-        db->close();
-        delete gContext;
-        exit(0);
-    }
-
-    QString startdir = gContext->GetSetting("VideoStartupDir", 
-                                            "/share/Movies/dvd");
-
-    runMenu(themedir, db, startdir);
-
-    db->close();
-
-    delete gContext;
 
     return 0;
 }
 
-void runMenu(QString themedir, QSqlDatabase *db, QString startdir)
+int mythplugin_run(void)
 {
-    ThemedMenu *diag = new ThemedMenu(themedir.ascii(), "videomenu.xml",
+    QTranslator translator( 0 );
+    translator.load(PREFIX + QString("/share/mythtv/i18n/mythvideo_") + 
+                    QString(gContext->GetSetting("Locale")) + QString(".qm"),
+                    ".");
+    qApp->installTranslator(&translator);
+
+    QString startdir = gContext->GetSetting("VideoStartupDir", 
+                                            "/share/Movies/dvd");
+
+    QString themedir = gContext->GetThemeDir();
+    runMenu(themedir, "videomenu.xml", QSqlDatabase::database(), startdir);
+
+    qApp->removeTranslator(&translator);
+
+    return 0;
+}
+
+int mythplugin_config(void)
+{
+    QTranslator translator( 0 );
+    translator.load(PREFIX + QString("/share/mythtv/i18n/mythvideo_") +
+                    QString(gContext->GetSetting("Locale")) + QString(".qm"),
+                    ".");
+    qApp->installTranslator(&translator);
+
+    QString startdir = gContext->GetSetting("VideoStartupDir",
+                                            "/share/Movies/dvd");
+
+    QString themedir = gContext->GetThemeDir();
+    runMenu(themedir, "video_settings.xml", QSqlDatabase::database(), startdir);
+
+    qApp->removeTranslator(&translator);
+
+    return 0;
+}
+
+void runMenu(QString themedir, const QString &menuname, 
+             QSqlDatabase *db, QString startdir)
+{
+    ThemedMenu *diag = new ThemedMenu(themedir.ascii(), menuname,
                                       gContext->GetMainWindow(), "videomenu");
 
     GenericData data;

@@ -4,10 +4,10 @@
 
 include ( ../settings.pro )
 
-TEMPLATE = app
-CONFIG += thread
+TEMPLATE = lib
+CONFIG += plugin thread
 TARGET = mythvideo
-target.path = $${PREFIX}/bin
+target.path = $${PREFIX}/lib/mythtv/plugins
 INSTALLS += target
 
 uifiles.path = $${PREFIX}/share/mythtv/themes/default
@@ -22,11 +22,12 @@ trans.files = mythvideo_it.qm
 
 INSTALLS += installfiles trans uifiles installimages
 
-LIBS += -L$${PREFIX}/lib -lmyth-$$LIBVERSION
-
 # Input
 
-HEADERS += metadata.h videomanager.h inetcomms.h videobrowser.h globalsettings.h videotree.h
+HEADERS += metadata.h videomanager.h inetcomms.h videobrowser.h 
+HEADERS += globalsettings.h videotree.h
 
-SOURCES += main.cpp metadata.cpp videomanager.cpp inetcomms.cpp videobrowser.cpp globalsettings.cpp videotree.cpp
+SOURCES += main.cpp metadata.cpp videomanager.cpp inetcomms.cpp 
+SOURCES += videobrowser.cpp globalsettings.cpp videotree.cpp
+
 TRANSLATIONS = mythvideo_it.ts
