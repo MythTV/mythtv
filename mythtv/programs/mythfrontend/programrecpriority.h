@@ -47,6 +47,7 @@ class ProgramRecPriority : public MythDialog
     void changeRecPriority(int howMuch);
     void saveRecPriority(void);
     void edit();
+    void upcoming();
 
   protected:
     void paintEvent(QPaintEvent *);

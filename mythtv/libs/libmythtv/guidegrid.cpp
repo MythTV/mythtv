@@ -26,6 +26,7 @@ using namespace std;
 #include "oldsettings.h"
 #include "tv.h"
 #include "progfind.h"
+#include "proglist.h"
 #include "util.h"
 #include "remoteutil.h"
 
@@ -380,6 +381,8 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
             }
             else if (action == "INFO")
                 editScheduled();
+            else if (action == "UPCOMING")
+                upcoming();
             else if (action == "TOGGLERECORD")
                 quickRecord();
             else if (action == "TOGGLEFAV")
@@ -1607,6 +1610,23 @@ void GuideGrid::editScheduled()
     m_recList.FromScheduler();
     fillProgramInfos();
     repaint(fullRect, false);
+}
+
+void GuideGrid::upcoming()
+{
+    ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
+
+    if (!pginfo)
+        return;
+
+    if (pginfo->title == unknownTitle)
+        return;
+
+    ProgLister *pl = new ProgLister(plTitle, pginfo->title,
+                                   QSqlDatabase::database(),
+                                   gContext->GetMainWindow(), "proglist");
+    pl->exec();
+    delete pl;
 }
 
 void GuideGrid::channelUpdate(void)

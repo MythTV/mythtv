@@ -21,6 +21,7 @@
 #include <cassert>
 
 #include "progfind.h"
+#include "proglist.h"
 #include "infodialog.h"
 #include "infostructs.h"
 #include "programinfo.h"
@@ -185,6 +186,8 @@ void ProgFinder::keyPressEvent(QKeyEvent *e)
             pageDown();
         else if (action == "SELECT" || action == "INFO")
             select();
+        else if (action == "UPCOMING")
+            upcoming();
         else if (action == "MENU" || action == "ESCAPE")
             escape();
         else if (action == "TOGGLERECORD")
@@ -560,6 +563,25 @@ void ProgFinder::select()
 {
     if (inSearch == 2)
         getInfo();
+    else
+        cursorRight();
+}
+
+void ProgFinder::upcoming()
+{
+    if (inSearch == 2)
+    {
+        ProgramInfo *curPick = showData[curShow];
+
+        if (!curPick)
+            return;
+
+        ProgLister *pl = new ProgLister(plTitle, curPick->title,
+                                        QSqlDatabase::database(),
+                                        gContext->GetMainWindow(), "proglist");
+        pl->exec();
+        delete pl;
+    }
     else
         cursorRight();
 }

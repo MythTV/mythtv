@@ -18,6 +18,7 @@ using namespace std;
 #include "programrecpriority.h"
 #include "scheduledrecording.h"
 #include "infodialog.h"
+#include "proglist.h"
 #include "tv.h"
 
 #include "dialogbox.h"
@@ -223,6 +224,11 @@ void ProgramRecPriority::keyPressEvent(QKeyEvent *e)
             {
                 saveRecPriority();
                 edit();
+            }
+            else if (action == "UPCOMING")
+            {
+                saveRecPriority();
+                upcoming();
             }
             else
                 handled = false;
@@ -517,6 +523,20 @@ void ProgramRecPriority::edit(void)
 
         update(fullRect);
     }
+}
+
+void ProgramRecPriority::upcoming(void)
+{
+    if (!curitem)
+        return;
+
+    ProgramRecPriorityInfo *rec = curitem;
+
+    ProgLister *pl = new ProgLister(plTitle, rec->title,
+                                   QSqlDatabase::database(),
+                                   gContext->GetMainWindow(), "proglist");
+    pl->exec();
+    delete pl;
 }
 
 void ProgramRecPriority::changeRecPriority(int howMuch) 

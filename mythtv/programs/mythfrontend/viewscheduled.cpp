@@ -15,6 +15,7 @@ using namespace std;
 #include "viewscheduled.h"
 #include "scheduledrecording.h"
 #include "infodialog.h"
+#include "proglist.h"
 #include "tv.h"
 
 #include "dialogbox.h"
@@ -99,6 +100,8 @@ void ViewScheduled::keyPressEvent(QKeyEvent *e)
                 selected();
             else if (action == "MENU" || action == "INFO")
                 edit();
+            else if (action == "UPCOMING")
+                upcoming();
             else if (action == "ESCAPE")
                 done(MythDialog::Accepted);
             else if (action == "UP")
@@ -518,6 +521,20 @@ void ViewScheduled::edit()
         return;
 
     p->EditScheduled(db);
+}
+
+void ViewScheduled::upcoming()
+{
+    ProgramInfo *p = recList[listPos];
+
+    if (!p)
+        return;
+
+    ProgLister *pl = new ProgLister(plTitle, p->title,
+                                   QSqlDatabase::database(),
+                                   gContext->GetMainWindow(), "proglist");
+    pl->exec();
+    delete pl;
 }
 
 void ViewScheduled::selected()

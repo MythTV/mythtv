@@ -21,6 +21,7 @@ class ViewScheduled : public MythDialog
 
   protected slots:
     void edit();
+    void upcoming();
     void selected();
     void cursorDown(bool page = false);
     void cursorUp(bool page = false);

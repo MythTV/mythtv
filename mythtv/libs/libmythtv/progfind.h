@@ -49,6 +49,7 @@ class ProgFinder : public MythDialog
     void pageUp();
     void pageDown();
     void select();
+    void upcoming();
     void quickRecord();
     void customEvent(QCustomEvent *e);
 
