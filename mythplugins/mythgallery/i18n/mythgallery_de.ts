@@ -27,11 +27,11 @@
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler</translation>
     </message>
     <message>
         <source>Sorry: OpenGL support not available</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenGL Unterstützung nicht verfügbar</translation>
     </message>
 </context>
 <context>
@@ -82,27 +82,27 @@
     </message>
     <message>
         <source>Use OpenGL transitions</source>
-        <translation type="unfinished"></translation>
+        <translation>Nutze OpenGL Übergänge</translation>
     </message>
     <message>
         <source>Check this to enable OpenGL based slideshow transitions</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiviert OpenGL basierende Übergänge für den Diaschaumodus</translation>
     </message>
     <message>
         <source>Type of OpenGL transition</source>
-        <translation type="unfinished"></translation>
+        <translation>Art des OpenGL Übergangs</translation>
     </message>
     <message>
         <source>This is the type of OpenGL transition used between pictures in slideshow mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestimmt welcher OpenGL Übergang im Diaschaumodus verwendet wird.</translation>
     </message>
     <message>
         <source>Gallery Directory does not exist or is unreadable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bilderverzeichnis existiert nicht oder ist nicht lesbar.</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
 </context>
 <context>
@@ -157,7 +157,7 @@
     </message>
     <message>
         <source>Folder: </source>
-        <translation type="unfinished"></translation>
+        <translation>Verzeichnis:</translation>
     </message>
 </context>
 </TS>
