@@ -221,12 +221,24 @@ public:
         GlobalSetting("PlaybackExitPrompt") {
         setLabel("Prompt on playback exit");
         setValue(false);
-        setHelpText("If this is set, a menu will be displayed when you exit "
-                    "playback, with alternative options to save your position, "
+        setHelpText("If this is set, when you exit playback a menu will be "
+                    "displayed with options to save your position, "
                     "delete the recording, or continue watching");
     };
 };
 
+
+class EndOfRecordingExitPrompt: public CheckBoxSetting, public GlobalSetting {
+public:
+    EndOfRecordingExitPrompt():
+        GlobalSetting("EndOfRecordingExitPrompt") {
+        setLabel("Prompt at end of recording");
+        setValue(false);
+        setHelpText("If this is set, when a recording is finished playing a "
+                    "menu will be displayed allowing you to delete the "
+                    "recording if you want.");
+    };
+};
 
 class GeneratePreviewPixmaps: public CheckBoxSetting, public GlobalSetting {
 public:
@@ -578,6 +590,7 @@ PlaybackSettings::PlaybackSettings(MythContext *context)
     general->addChild(new AudioOutputDevice());
     general->addChild(new Deinterlace());
     general->addChild(new PlaybackExitPrompt());
+    general->addChild(new EndOfRecordingExitPrompt());
     general->addChild(new FixedAspectRatio());
     addChild(general);
 

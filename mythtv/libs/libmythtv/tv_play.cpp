@@ -49,6 +49,7 @@ TV::TV(MythContext *lcontext)
     prbuffer = NULL;
     nvp = NULL;
     requestDelete = false;
+    endOfRecording = false;
 
     m_context->addListener(this);
 }
@@ -630,6 +631,7 @@ void TV::RunTV(void)
             {
                 nextState = RemovePlaying(internalState);
                 changeState = true;
+                endOfRecording = true;
             }
         }
 

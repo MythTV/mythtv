@@ -43,8 +43,9 @@ class TV : public QObject
 
     void EmbedOutput(unsigned long wid, int x, int y, int w, int h);
     void StopEmbeddingOutput(void);
-
+   
     bool getRequestDelete(void) { return requestDelete; }
+    bool getEndOfRecording(void) { return endOfRecording; }
 
     void customEvent(QCustomEvent *e);
 
@@ -157,6 +158,8 @@ class TV : public QObject
     QString dialogname;
     bool editmode;
     bool requestDelete;
+    bool endOfRecording;
+
     ProgramInfo *playbackinfo;
 };
 

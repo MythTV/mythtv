@@ -58,6 +58,9 @@ class PlaybackBox : public MythDialog
     void killPlayer(void);
     void startPlayer(ProgramInfo *rec);
 
+    void doRemove(QListViewItem *);
+    void promptEndOfRecording(QListViewItem *);
+
     QTimer *timer;
     NuppelVideoPlayer *nvp;
     RingBuffer *rbuffer;

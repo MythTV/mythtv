@@ -459,6 +459,11 @@ void PlaybackBox::play(QListViewItem *lvitem)
     {
         remove(lvitem);
     }
+    else if (tv->getEndOfRecording() && 
+             m_context->GetNumSetting("EndOfRecordingExitPrompt"))
+    {
+        promptEndOfRecording(lvitem);
+    }
 
     delete tv;
 
@@ -467,6 +472,36 @@ void PlaybackBox::play(QListViewItem *lvitem)
     ignoreevents = false;
 
     timer->start(1000 / 30);
+}
+
+void PlaybackBox::doRemove(QListViewItem *lvitem)
+{
+    ProgramListItem *pgitem = (ProgramListItem *)lvitem;
+    if (!pgitem)
+    {
+        ignoreevents = false;
+        return;
+    }
+
+    ProgramInfo *rec = pgitem->getProgramInfo();
+
+    m_context->DeleteRecording(rec);
+
+    if (lvitem->itemBelow())
+    {
+        listview->setCurrentItem(lvitem->itemBelow());
+        listview->setSelected(lvitem->itemBelow(), true);
+    }
+    else if (lvitem->itemAbove())
+    {
+        listview->setCurrentItem(lvitem->itemAbove());
+        listview->setSelected(lvitem->itemAbove(), true);
+    }
+    else
+        changed(NULL);
+
+    delete lvitem;
+
 }
 
 void PlaybackBox::remove(QListViewItem *lvitem)
@@ -519,22 +554,66 @@ void PlaybackBox::remove(QListViewItem *lvitem)
 
     if (result == 1)
     {
-        m_context->DeleteRecording(rec);
+        doRemove(lvitem);
+    }
 
-        if (lvitem->itemBelow())
-        {
-            listview->setCurrentItem(lvitem->itemBelow());
-            listview->setSelected(lvitem->itemBelow(), true);
-        }
-        else if (lvitem->itemAbove())
-        {
-            listview->setCurrentItem(lvitem->itemAbove());
-            listview->setSelected(lvitem->itemAbove(), true);
-        }
-        else
-            changed(NULL);
+    ignoreevents = false;
 
-        delete lvitem;
+    timer->start(1000 / 30);    
+}
+
+void PlaybackBox::promptEndOfRecording(QListViewItem *lvitem)
+{
+    if (!lvitem || ignoreevents)
+        return;
+
+    killPlayer();
+
+    ignoreevents = true;
+
+    ProgramListItem *pgitem = (ProgramListItem *)lvitem;
+    if (!pgitem)
+    {
+        ignoreevents = false;
+        return;
+    }
+
+    ProgramInfo *rec = pgitem->getProgramInfo();
+
+    QString message = "You have finished watching:<br><br>";
+    message += rec->title;
+    message += "<br>";
+    
+    QDateTime startts = rec->startts;
+    QDateTime endts = rec->endts;
+
+    QString timedate = endts.date().toString(dateformat) + QString(", ") +
+                       startts.time().toString(timeformat) + QString(" - ") +
+                       endts.time().toString(timeformat);
+
+    message += timedate;
+    message += "<br>";
+    if (rec->subtitle != "(null)")
+        message += rec->subtitle;
+    message += "<br>";
+    if (rec->description != "(null)")
+        message += rec->description;
+
+    message += "<br><br>Would you like to delete this recording?  It will "
+               "be gone forever.";
+
+    DialogBox diag(m_context, message);
+
+    diag.AddButton("Yes, get rid of it");
+    diag.AddButton("No, I might want to watch it again.");
+
+    diag.Show();
+
+    int result = diag.exec();
+
+    if (result == 1)
+    {
+	doRemove(lvitem);
     }
 
     ignoreevents = false;
