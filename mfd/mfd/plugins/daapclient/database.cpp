@@ -974,6 +974,7 @@ void Database::parseContainers(TagInput& dmap_data, int how_many)
             new_playlist->waitingForList(true);
             new_playlists->insert(new_playlist->getId(), new_playlist);
             
+        }
         else
         {
             warning("got incomplete data for a playlist, "
