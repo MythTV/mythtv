@@ -292,7 +292,7 @@ public:
     };
 
     virtual void fillSelections(QSqlDatabase *db) {
-        addSelection(QString("Default"), QString("Default"));
+        addSelection(QObject::tr("Default"), QString("Default"));
 
         QString thequery = QString("SELECT DISTINCT recgroup from recorded "
                                    "WHERE recgroup <> '%1'")

@@ -1671,6 +1671,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             {
                 NormalSpeed();
                 StopFFRew();
+                nvp->SetBookmark(); 
 
                 requestDelete = true;
                 exitPlayer = true;
@@ -3590,6 +3591,9 @@ void TV::BuildOSDTreeMenu(void)
         if (autoCommercialSkip != 2)
             subitem = new OSDGenericTree(item, tr("Auto-Skip Notify"),
                                          "TOGGLECOMMSKIP2");
+        if (autoCommercialSkip != 3)
+            subitem = new OSDGenericTree(item, tr("Auto-Skip Pre-Notify"),
+                                         "TOGGLECOMMSKIP3");
         if (autoCommercialSkip != 1)
             subitem = new OSDGenericTree(item, tr("Auto-Skip ON"),
                                          "TOGGLECOMMSKIP1");
@@ -3694,6 +3698,8 @@ void TV::SetAutoCommercialSkip(int skipMode)
         desc = tr("Auto-Skip ON");
     else if (autoCommercialSkip == 2)
         desc = tr("Auto-Skip Notify");
+    else if (autoCommercialSkip == 3)
+        desc = tr("Auto-Skip Pre-Notify");
 
     nvp->SetAutoCommercialSkip(autoCommercialSkip);
 

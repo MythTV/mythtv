@@ -94,10 +94,15 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     curGroupPassword = QString("");
     recGroup = gContext->GetSetting("DisplayRecGroup", QString("All Programs"));
     VERBOSE( VB_GENERAL, recGroup);
-    if(!groupnameAsAllProg)
-        groupDisplayName = tr("All Programs");
+    if(groupnameAsAllProg)
+    {
+        if ((recGroup == "Default") || (recGroup == "All Programs"))
+            groupDisplayName = tr(recGroup);
+        else
+            groupDisplayName = recGroup;
+    }
     else
-        groupDisplayName = recGroup;
+        groupDisplayName = tr("All Programs");
 
     recGroupPassword = getRecGroupPassword(recGroup);
 
@@ -1237,7 +1242,7 @@ bool PlaybackBox::FillList()
         for (; i != infoList->end(); i++)
         {
             if (((((*i)->recgroup == recGroup) ||
-                  (recGroup == tr("All Programs"))) &&
+                  (recGroup == "All Programs")) &&
                  (recGroupPassword == curGroupPassword)) ||
                 ((recGroupType[recGroup] == "category") &&
                  ((*i)->category == recGroup ) &&
@@ -2521,13 +2526,22 @@ void PlaybackBox::showRecGroupChooser(void)
     recGroupType.clear();
 
     recGroupType[recGroup] = tmpType;
-    groups += recGroup;
+
+    if ((recGroup == "Default") || (recGroup == "All Programs"))
+        groups += tr(recGroup);
+    else
+        groups += recGroup;
+
     if (query.isActive() && query.numRowsAffected() > 0)
         while (query.next())
             if (query.value(0).toString() != recGroup)
             {
                 QString key = query.value(0).toString();
-                groups += key;
+
+                if (key == "Default")
+                    groups += tr("Default");
+                else
+                    groups += key;
                 recGroupType[key] = "recgroup";
             }
 
@@ -2548,10 +2562,10 @@ void PlaybackBox::showRecGroupChooser(void)
                 }
     }
 
-    if (recGroup != tr("All Programs"))
+    if (recGroup != "All Programs")
     {
         groups += tr("All Programs");
-        recGroupType[tr("All Programs")] = "recgroup";
+        recGroupType["All Programs"] = "recgroup";
     }
 
     QGridLayout *grid = new QGridLayout(1, 2, (int)(10 * wmult));
@@ -2608,6 +2622,11 @@ void PlaybackBox::chooseSetViewGroup(void)
     if(groupnameAsAllProg)
         groupDisplayName = recGroup;
 
+    if (recGroup == tr("Default"))
+        recGroup = "Default";
+    if (recGroup == tr("All Programs"))
+        recGroup = "All Programs";
+
     if (recGroupPassword != "" )
     {
 
@@ -2654,6 +2673,11 @@ void PlaybackBox::chooseComboBoxChanged(void)
 
     QString newGroup = chooseComboBox->currentText();
 
+    if (newGroup == tr("Default"))
+        newGroup = "Default";
+    if (newGroup == tr("All Programs"))
+        newGroup = "All Programs";
+
     chooseGroupPassword = getRecGroupPassword(newGroup);
 }
 
@@ -2661,7 +2685,7 @@ QString PlaybackBox::getRecGroupPassword(QString group)
 {
     QString result = QString("");
 
-    if (group == tr("All Programs"))
+    if (group == "All Programs")
     {
         result = gContext->GetSetting("AllRecGroupPassword");
     }
@@ -2723,11 +2747,18 @@ void PlaybackBox::showRecGroupChanger(void)
     QString thequery = QString("SELECT DISTINCT recgroup from recorded");
     QSqlQuery query = m_db->exec(thequery);
 
-    groups += delitem->recgroup;
+    if (delitem->recgroup == "Default")
+        groups += tr("Default");
+    else
+        groups += delitem->recgroup;
+
     if (query.isActive() && query.numRowsAffected() > 0)
         while (query.next())
             if (query.value(0).toString() != delitem->recgroup)
-                groups += query.value(0).toString();
+                if (query.value(0).toString() == "Default")
+                    groups += tr("Default");
+                else
+                    groups += query.value(0).toString();
 
     chooseComboBox = new MythComboBox(false, choosePopup);
     chooseComboBox->insertStringList(groups);
@@ -2777,6 +2808,9 @@ void PlaybackBox::changeSetRecGroup(void)
 
     if (newRecGroup == "" ) 
         return;
+
+    if (newRecGroup == tr("Default"))
+        newRecGroup = "Default";
 
     QSqlDatabase *m_db = QSqlDatabase::database();
     delitem->ApplyRecordRecGroupChange(m_db, newRecGroup);
@@ -2833,7 +2867,11 @@ void PlaybackBox::showRecGroupPasswordChanger(void)
     label->setPaletteForegroundColor(popupForeground);
     grid->addWidget(label, 0, 0, Qt::AlignLeft);
 
-    label = new QLabel(recGroup, choosePopup);
+    if ((recGroup == "Default") || (recGroup == "All Programs"))
+        label = new QLabel(tr(recGroup), choosePopup);
+    else
+        label = new QLabel(recGroup, choosePopup);
+
     label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
     label->setBackgroundOrigin(ParentOrigin);
     label->setPaletteForegroundColor(popupForeground);
@@ -2913,7 +2951,7 @@ void PlaybackBox::changeRecGroupPassword(void)
     if (chooseOldPassword->text() != recGroupPassword)
         return;
 
-    if (recGroup == tr("All Programs"))
+    if (recGroup == "All Programs")
     {
         gContext->SaveSetting("AllRecGroupPassword", newPassword);
     }

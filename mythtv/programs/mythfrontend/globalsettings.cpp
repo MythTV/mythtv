@@ -211,9 +211,8 @@ public:
         GlobalSetting("DisplayRecGroup") {
         setLabel(QObject::tr("Default Recording Group to display"));
 
-        addSelection(QObject::tr("All Programs"),
-                     QObject::tr("All Programs"));
-        addSelection(QString("Default"), QString("Default"));
+        addSelection(QObject::tr("All Programs"), QString("All Programs"));
+        addSelection(QObject::tr("Default"), QString("Default"));
         
         QSqlDatabase *db = QSqlDatabase::database();
         QString thequery = QString("SELECT DISTINCT recgroup from recorded");
@@ -221,8 +220,9 @@ public:
 
         if (query.isActive() && query.numRowsAffected() > 0)
             while (query.next())
-                addSelection(query.value(0).toString(),
-                             query.value(0).toString());
+                if (query.value(0).toString() != "Default")
+                    addSelection(query.value(0).toString(),
+                                 query.value(0).toString());
 
         setHelpText(QObject::tr("Default Recording Group to display "
                                 "on the view recordings screen."));
@@ -417,6 +417,7 @@ public:
         setLabel(QObject::tr("Automatically Skip Commercials"));
         addSelection(QObject::tr("Off"), "0");
         addSelection(QObject::tr("Notify, but do not skip"), "2");
+        addSelection(QObject::tr("Pre-Notify, but do not skip"), "3");
         addSelection(QObject::tr("Automatically Skip"), "1");
         setHelpText(QObject::tr("Automatically skip commercial breaks that "
                     "have been flagged during Automatic Commercial Flagging "

@@ -3677,6 +3677,33 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
         if (commBreakIter == commBreakMap.end())
             return;
 
+        if ((autocommercialskip == 3) &&
+            (commBreakIter.data() == MARK_COMM_START) && 
+            (framesPlayed >= (commBreakIter.key() - (2 * video_frame_rate))) &&
+            (framesPlayed < commBreakIter.key()) &&
+            (osd) && (!osd->Visible()))
+        {
+            QMap<long long, int>::Iterator nextIter = commBreakIter;
+
+            nextIter++;
+            if ((nextIter == commBreakMap.end()) ||
+                (nextIter.data() == MARK_COMM_START) ||
+                (nextIter.key() == totalFrames))
+                return;
+
+            int skipped_seconds = (int)((nextIter.key() -
+                    commBreakIter.key()) / video_frame_rate);
+            QString skipTime;
+            skipTime.sprintf("%d:%02d", skipped_seconds / 60,
+                             abs(skipped_seconds) % 60);
+            QString comm_msg = QString(QObject::tr("Commercial: %1"))
+                             .arg(skipTime);
+            QString desc;
+            int spos = calcSliderPos(desc);
+            osd->StartPause(spos, false, comm_msg, desc, 2);
+            return;
+        }
+
         if ((commBreakIter.data() == MARK_COMM_START) && 
             (framesPlayed >= commBreakIter.key()))
         {
@@ -3706,7 +3733,8 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
                         comm_msg = QString(QObject::tr("Skip %1"))
                                            .arg(skipTime);
                     }
-                    else if (autocommercialskip == 2)
+                    else if ((autocommercialskip == 2) ||
+                             (autocommercialskip == 3))
                     {
                         comm_msg = QString(QObject::tr("Commercial: %1"))
                                            .arg(skipTime);
