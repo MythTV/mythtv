@@ -1910,7 +1910,6 @@ void NuppelVideoPlayer::StartPlaying(void)
                 eof = 1;
             else
                 JumpToFrame(deleteIter.key());
-            ++deleteIter;
         }
     }
 
@@ -2262,9 +2261,10 @@ void NuppelVideoPlayer::SetDeleteIter(void)
                 break;
         }
 
-        if (deleteIter != deleteMap.begin())
+        if ((deleteIter == deleteMap.end()) &&
+            (deleteIter != deleteMap.begin()))
             --deleteIter;
-        if (deleteIter.data() == 0)
+        else if (deleteIter.data() == 0)
             ++deleteIter;
     }
 }
