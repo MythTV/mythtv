@@ -46,6 +46,9 @@ class SRRecPriority;
 class SRRecGroup;
 class SRSeriesid;
 class SRProgramid;
+class SRFindDay;
+class SRFindTime;
+class SRFindId;
 
 class ScheduledRecording: public ConfigurationGroup, public ConfigurationDialog {
     Q_OBJECT
@@ -144,6 +147,9 @@ public:
     void setRecGroupObj(SRRecGroup* val) {recgroup = val;}
     void setSeriesIDObj(SRSeriesid* val) {seriesid = val;}
     void setProgramIDObj(SRProgramid* val) {programid = val;}
+    void setFindDayObj(SRFindDay* val) {findday = val;}
+    void setFindTimeObj(SRFindTime* val) {findtime = val;}
+    void setFindIdObj(SRFindId* val) {findid = val;}
     
     void ToMap(QMap<QString, QString>& infoMap);
     
@@ -203,6 +209,9 @@ protected:
     class SRRecGroup* recgroup;
     class SRSeriesid* seriesid;
     class SRProgramid* programid;
+    class SRFindDay* findday;
+    class SRFindTime* findtime;
+    class SRFindId* findid;
     
     ProgramInfo* m_pginfo;
     QGuardedPtr<RootSRGroup> rootGroup;

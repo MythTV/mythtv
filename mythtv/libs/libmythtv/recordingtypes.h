@@ -11,7 +11,9 @@ enum RecordingType
     kWeekslotRecord,
     kFindOneRecord,
     kOverrideRecord,
-    kDontRecord
+    kDontRecord,
+    kFindDailyRecord,
+    kFindWeeklyRecord
 };
 
 int RecTypePriority(RecordingType rectype);

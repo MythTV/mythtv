@@ -1365,9 +1365,25 @@ void Scheduler::AddNewRecords(void) {
                  << "/" << whereclauses[clause] << endl;
     }
 
+    QString progfindid = QString(
+"(CASE record.type "
+"  WHEN %1 "
+"   THEN to_days(date_sub(program.starttime, interval "
+"                time_format(record.findtime, '%H:%i') hour_minute)) "
+"  WHEN %2 "
+"   THEN floor((to_days(date_sub(program.starttime, interval "
+"               time_format(record.findtime, '%H:%i') hour_minute)) - "
+"               record.findday)/7) * 7 + record.findday "
+"  WHEN %3 "
+"   THEN record.findid "
+"  ELSE 0 "
+" END) ")
+        .arg(kFindDailyRecord)
+        .arg(kFindWeeklyRecord)
+        .arg(kOverrideRecord);
+
     for (clause = 0; clause < fromclauses.count(); clause++)
     {
-
     QString query = QString(
 "SELECT DISTINCT channel.chanid, channel.sourceid, "
 "program.starttime, program.endtime, "
@@ -1385,7 +1401,8 @@ void Scheduler::AddNewRecords(void) {
 "channel.commfree, capturecard.cardid, "
 "cardinput.cardinputid, UPPER(cardinput.shareable) = 'Y' AS shareable, "
 "program.seriesid, program.programid, program.category_type, "
-"program.airdate, program.stars, program.originalairdate "
+"program.airdate, program.stars, program.originalairdate, ")
++ progfindid + QString(
 
 "FROM record, program ") + fromclauses[clause] + QString(
 
@@ -1401,6 +1418,9 @@ void Scheduler::AddNewRecords(void) {
 "      (program.programid <> '' AND NOT "
 "       (program.category_type = 'series' AND program.programid LIKE '%0000') "
 "       AND program.programid = oldrecorded.programid) "
+"      OR "
+"      (oldrecorded.findid <> 0 AND "
+"        oldrecorded.findid = ") + progfindid + QString(") "
 "      OR "
 "      ( "
 "       (program.programid = '' OR oldrecorded.programid = '') "
@@ -1423,6 +1443,9 @@ void Scheduler::AddNewRecords(void) {
 "       (program.category_type = 'series' AND program.programid LIKE '%0000') "
 "       AND program.programid = recorded.programid) "
 "      OR "
+"      (recorded.findid <> 0 AND "
+"        recorded.findid = ") + progfindid + QString(") "
+"      OR "
 "      ( "
 "       (program.programid = '' OR recorded.programid = '') "
 "       AND "
@@ -1438,19 +1461,21 @@ void Scheduler::AddNewRecords(void) {
 "WHERE ") + whereclauses[clause] + QString(" AND "
 
 "((record.type = %1 " // allrecord
-"OR record.type = %2) " // findonerecord
+"OR record.type = %2 " // findonerecord
+"OR record.type = %3 " // finddailyrecord
+"OR record.type = %4) " // findweeklyrecord
 " OR "
 " ((record.station = channel.callsign) " // channel matches
 "  AND "
-"  ((record.type = %3) " // channelrecord
+"  ((record.type = %5) " // channelrecord
 "   OR"
 "   ((TIME_TO_SEC(record.starttime) = TIME_TO_SEC(program.starttime)) " // timeslot matches
 "    AND "
-"    ((record.type = %4) " // timeslotrecord
+"    ((record.type = %6) " // timeslotrecord
 "     OR"
 "     ((DAYOFWEEK(record.startdate) = DAYOFWEEK(program.starttime) "
 "      AND "
-"      ((record.type = %5) " // weekslotrecord
+"      ((record.type = %7) " // weekslotrecord
 "       OR"
 "       ((TO_DAYS(record.startdate) = TO_DAYS(program.starttime)) " // date matches
 "        AND "
@@ -1468,6 +1493,8 @@ void Scheduler::AddNewRecords(void) {
 ") ")
         .arg(kAllRecord)
         .arg(kFindOneRecord)
+        .arg(kFindDailyRecord)
+        .arg(kFindWeeklyRecord)
         .arg(kChannelRecord)
         .arg(kTimeslotRecord)
         .arg(kWeekslotRecord);
@@ -1538,6 +1565,7 @@ void Scheduler::AddNewRecords(void) {
         else
             p->originalAirDate = QDate::fromString(result.value(30).toString(), Qt::ISODate);
 
+        p->findid = result.value(33).toInt();
 
         if (!recTypeRecPriorityMap.contains(p->rectype))
             recTypeRecPriorityMap[p->rectype] = 
@@ -1638,7 +1666,7 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
 "record.subtitle, record.description, record.recpriority, record.type, "
 "channel.name, record.recordid, record.recgroup, record.dupin, "
 "record.dupmethod, channel.commfree, channel.channum, record.station, "
-"record.seriesid, record.programid, record.category "
+"record.seriesid, record.programid, record.category, record.findid "
 "FROM record "
 "LEFT JOIN channel ON channel.callsign = record.station "
 "GROUP BY recordid "
@@ -1696,6 +1724,7 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
             proginfo->seriesid = result.value(18).toString();
             proginfo->programid = result.value(19).toString();
             proginfo->category = result.value(20).toString();
+            proginfo->findid = result.value(21).toInt();
             
             proginfo->recstartts = proginfo->startts;
             proginfo->recendts = proginfo->endts;

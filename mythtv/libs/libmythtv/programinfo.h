@@ -276,6 +276,7 @@ class ProgramInfo
     bool conflictfixed;
 
     QString schedulerid;
+    int findid;
 
     int programflags;
     QString chanOutputFilters;

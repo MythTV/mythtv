@@ -61,6 +61,9 @@ ScheduledRecording::ScheduledRecording()
     category = new SRCategory(*this);
     seriesid = new SRSeriesid(*this);
     programid = new SRProgramid(*this);
+    findday = new SRFindDay(*this);
+    findtime = new SRFindTime(*this);
+    findid = new SRFindId(*this);
     search = new SRRecSearchType(*this);
     
     rootGroup = new RootSRGroup(*this);
@@ -428,9 +431,9 @@ void ScheduledRecording::addHistory(QSqlDatabase* db,
 
     result.prepare("REPLACE INTO oldrecorded (chanid,starttime,"
                    "endtime,title,subtitle,description,category,"
-                   "seriesid,programid) "
+                   "seriesid,programid,findid) "
                    "VALUES(:CHANID,:START,:END,:TITLE,:SUBTITLE,:DESC,"
-                   ":CATEGORY,:SERIESID,:PROGRAMID);");
+                   ":CATEGORY,:SERIESID,:PROGRAMID,:FINDID);");
     result.bindValue(":CHANID", proginfo.chanid);
     result.bindValue(":START", proginfo.recstartts.toString(Qt::ISODate));
     result.bindValue(":END", proginfo.recendts.toString(Qt::ISODate));
@@ -440,6 +443,7 @@ void ScheduledRecording::addHistory(QSqlDatabase* db,
     result.bindValue(":CATEGORY", proginfo.category.utf8());
     result.bindValue(":SERIESID", proginfo.seriesid.utf8());
     result.bindValue(":PROGRAMID", proginfo.programid.utf8());
+    result.bindValue(":FINDID", proginfo.findid);
 
     result.exec();
 
@@ -462,11 +466,13 @@ void ScheduledRecording::forgetHistory(QSqlDatabase* db,
 
     result.prepare("DELETE FROM oldrecorded WHERE title = :TITLE AND "
                    "((subtitle = :SUBTITLE AND description = :DESC) OR "
-                   "(programid <> '' AND programid = :PROGRAMID))");
+                   "(programid <> '' AND programid = :PROGRAMID) OR "
+                   "(findid <> 0 AND findid = :FINDID))");
     result.bindValue(":TITLE", proginfo.title.utf8());
     result.bindValue(":SUBTITLE", proginfo.subtitle.utf8());
     result.bindValue(":DESC", proginfo.description.utf8());
     result.bindValue(":PROGRAMID", proginfo.programid);
+    result.bindValue(":FINDID", proginfo.findid);
     
     result.exec();
     if (!result.isActive())
@@ -553,6 +559,14 @@ void ScheduledRecording::fillSelections(QSqlDatabase* db, SelectSetting* setting
                 break;
             case kFindOneRecord:
                 label = QString("%1").arg(sr.title->getValue());
+                break;
+            case kFindWeeklyRecord:
+                weekly = QDate(sr.startDate->dateValue()).toString("dddd")+"s ";
+            case kFindDailyRecord:
+                label = QString("%1 (after %2%3")
+                    .arg(sr.title->getValue())
+                    .arg(weekly)
+                    .arg(sr.findtime->timeValue().toString());
                 break;
             case kChannelRecord:
                 label = QString("%1 on channel %2")
@@ -661,6 +675,9 @@ void ScheduledRecording::setDefault(QSqlDatabase *db, bool haschannel)
     endTime->setValue(time);
     seriesid->setValue("");
     programid->setValue("");
+    findday->setValue(-1);
+    findtime->setValue(QTime::fromString("00:00:00", Qt::ISODate));
+    findid->setValue(0);
     category->setValue("");
     search->setValue(kNoSearch);
 
@@ -717,6 +734,12 @@ void ScheduledRecording::setProgram(ProgramInfo *proginfo, QSqlDatabase* db)
         endTime->setValue(proginfo->endts.time());
         seriesid->setValue(proginfo->seriesid);
         programid->setValue(proginfo->programid);
+        if (findday->intValue() < 0)
+        {
+            findday->setValue((proginfo->startts.date().dayOfWeek() + 1) % 7);
+            findtime->setValue(proginfo->startts.time());
+        }
+        findid->setValue(proginfo->findid);
         category->setValue(proginfo->category);
         
         if (db)

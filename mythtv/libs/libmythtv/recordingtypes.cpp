@@ -12,10 +12,12 @@ int RecTypePriority(RecordingType rectype)
         case kSingleRecord:   return 3; break;
         case kFindOneRecord:  return 4; break;
         case kWeekslotRecord: return 5; break;
-        case kTimeslotRecord: return 6; break;
-        case kChannelRecord:  return 7; break;
-        case kAllRecord:      return 9; break;
-        default: return 9;
+        case kFindWeeklyRecord: return 6; break;
+        case kTimeslotRecord: return 7; break;
+        case kFindDailyRecord: return 8; break;
+        case kChannelRecord:  return 9; break;
+        case kAllRecord:      return 10; break;
+        default: return 11;
      }
 }
 

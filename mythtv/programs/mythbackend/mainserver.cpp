@@ -713,7 +713,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                "recorded.recgroup,record.dupin,record.dupmethod,"
                "record.recordid,outputfilters,"
                "recorded.seriesid,recorded.programid,recorded.filesize, "
-               "recorded.lastmodified "
+               "recorded.lastmodified, recorded.findid "
                "FROM recorded "
                "LEFT JOIN record ON recorded.recordid = record.recordid "
                "LEFT JOIN channel ON recorded.chanid = channel.chanid "
@@ -760,6 +760,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             proginfo->lastmodified =
                       QDateTime::fromString(query.value(24).toString(),
                                             Qt::ISODate);
+            proginfo->findid = query.value(25).toInt();
 
             if (proginfo->hostname.isEmpty() || proginfo->hostname.isNull())
                 proginfo->hostname = gContext->GetHostName();

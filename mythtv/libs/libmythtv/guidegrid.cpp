@@ -844,6 +844,8 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
                     recFlag = 5;
                     break;
                 case kFindOneRecord:
+                case kFindDailyRecord:
+                case kFindWeeklyRecord:
                     recFlag = 6;
                     break;
                 case kOverrideRecord:

@@ -177,16 +177,18 @@ class SRRecordingType : public SRSelectSetting
 
             if (haschannel)
                 addSelection(QObject::tr("Record only this showing"), kSingleRecord);
-
             addSelection(QObject::tr("Record one showing of this title"), kFindOneRecord);
 
             if (haschannel)
-            {
                 addSelection(QObject::tr("Record in this timeslot every week"), kWeekslotRecord);
-                addSelection(QObject::tr("Record in this timeslot every day"),  kTimeslotRecord);
-                addSelection(QObject::tr("Record at any time on this channel"), kChannelRecord);
-            }
+            addSelection(QObject::tr("Record one showing of this title every week"), kFindWeeklyRecord);
 
+            if (haschannel)
+                addSelection(QObject::tr("Record in this timeslot every day"),  kTimeslotRecord);
+            addSelection(QObject::tr("Record one showing of this title every day"), kFindDailyRecord);
+
+            if (haschannel)
+                addSelection(QObject::tr("Record at any time on this channel"), kChannelRecord);
            addSelection(QObject::tr("Record at any time on any channel"), kAllRecord);
         }
 
@@ -489,6 +491,36 @@ class SRProgramid: public LineEditSetting, public SimpleSRSetting
         {
             setVisible(false);
         };
+};
+
+class SRFindDay: public IntegerSetting, public SimpleSRSetting
+{
+    public:
+        SRFindDay(ScheduledRecording& parent)
+            : SimpleSRSetting(parent, "findday")
+        {
+            setVisible(false);
+        }
+};
+
+class SRFindTime: public TimeSetting, public SimpleSRSetting
+{
+    public:
+        SRFindTime(ScheduledRecording& parent)
+            : SimpleSRSetting(parent, "findtime")
+        {
+            setVisible(false);
+        }
+};
+
+class SRFindId: public IntegerSetting, public SimpleSRSetting
+{
+    public:
+        SRFindId(ScheduledRecording& parent)
+            : SimpleSRSetting(parent, "findid")
+        {
+            setVisible(false);
+        }
 };
 
 class SRAutoTranscode: public SRSelectSetting 

@@ -491,7 +491,7 @@ void ProgramRecPriority::edit(void)
                      cnt++, ++it);
                 progInfo = &(it.data());
            
-                int rtRecPriors[8];
+                int rtRecPriors[10];
                 rtRecPriors[0] = gContext->GetNumSetting("SingleRecordRecPrior", 0);
                 rtRecPriors[1] = gContext->GetNumSetting("TimeslotRecordRecPrior", 0);
                 rtRecPriors[2] = gContext->GetNumSetting("ChannelRecordRecPrior", 0);
@@ -500,6 +500,8 @@ void ProgramRecPriority::edit(void)
                 rtRecPriors[5] = gContext->GetNumSetting("FindOneRecordRecPrior", 0);
                 rtRecPriors[6] = gContext->GetNumSetting("OverrideRecordRecPrior", 0);
                 rtRecPriors[7] = gContext->GetNumSetting("OverrideRecordRecPrior", 0);
+                rtRecPriors[8] = gContext->GetNumSetting("FindOneRecordRecPrior", 0);
+                rtRecPriors[9] = gContext->GetNumSetting("FindOneRecordRecPrior", 0);
 
                 // set the recording priorities of that program 
                 progInfo->recpriority = recPriority;
@@ -600,7 +602,7 @@ void ProgramRecPriority::saveRecPriority(void)
 
 void ProgramRecPriority::FillList(void)
 {
-    int cnt = 999, rtRecPriors[8];
+    int cnt = 999, rtRecPriors[10];
     vector<ProgramInfo *> recordinglist;
 
     programData.clear();
@@ -635,6 +637,8 @@ void ProgramRecPriority::FillList(void)
     rtRecPriors[5] = gContext->GetNumSetting("FindOneRecordRecPriority", 0);
     rtRecPriors[6] = gContext->GetNumSetting("OverrideRecordRecPriority", 0);
     rtRecPriors[7] = gContext->GetNumSetting("OverrideRecordRecPriority", 0);
+    rtRecPriors[8] = gContext->GetNumSetting("FindOneRecordRecPriority", 0);
+    rtRecPriors[9] = gContext->GetNumSetting("FindOneRecordRecPriority", 0);
     
     // get channel recording priorities and recording types associated with each
     // program from db
@@ -666,7 +670,8 @@ void ProgramRecPriority::FillList(void)
             int channelRecPriority = result.value(6).toInt();
             int recTypeRecPriority = rtRecPriors[recType-1];
 
-            if (recType == kAllRecord || recType == kFindOneRecord)
+            if (recType == kAllRecord || recType == kFindOneRecord ||
+                recType == kFindDailyRecord || recType == kFindWeeklyRecord)
                 channelRecPriority = 0;
 
             // find matching program in programData and set
@@ -1046,6 +1051,12 @@ void ProgramRecPriority::updateInfo(QPainter *p)
                     case kFindOneRecord:
                         text = tr("Recording one showing");
                         break;
+                    case kFindDailyRecord:
+                        text = tr("Recording a showing daily");
+                        break;
+                    case kFindWeeklyRecord:
+                        text = tr("Recording a showing weekly");
+                        break;
                     case kDontRecord:
                         text = tr("Not allowed to record this showing");
                         break;
@@ -1073,7 +1084,8 @@ void ProgramRecPriority::updateInfo(QPainter *p)
 
             type = (UITextType *)container->GetType("channel");
             if (type) {
-                if (rectype != kAllRecord && rectype != kFindOneRecord)
+                if (rectype != kAllRecord && rectype != kFindOneRecord &&
+                    rectype != kFindDailyRecord && rectype != kFindWeeklyRecord)
                     type->SetText(curitem->ChannelText(channelFormat));
                 else
                     type->SetText(tr("Any"));
@@ -1081,7 +1093,8 @@ void ProgramRecPriority::updateInfo(QPainter *p)
 
             type = (UITextType *)container->GetType("longchannel");
             if (type) {
-                if (rectype != kAllRecord && rectype != kFindOneRecord)
+                if (rectype != kAllRecord && rectype != kFindOneRecord &&
+                    rectype != kFindDailyRecord && rectype != kFindWeeklyRecord)
                     type->SetText(curitem->ChannelText(longChannelFormat));
                 else
                     type->SetText(tr("Any"));

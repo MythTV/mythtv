@@ -59,6 +59,7 @@ ProgramInfo::ProgramInfo(void)
     cardid = 0;
     shareable = false;
     schedulerid = "";
+    findid = 0;
     recpriority = 0;
     recgroup = QString("Default");
 
@@ -134,6 +135,7 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     cardid = other.cardid;
     shareable = other.shareable;
     schedulerid = other.schedulerid;
+    findid = other.findid;
     recpriority = other.recpriority;
     recgroup = other.recgroup;
     programflags = other.programflags;
@@ -198,7 +200,7 @@ void ProgramInfo::ToStringList(QStringList &list)
     DATETIME_TO_LIST(endts)
     STR_TO_LIST(QString::null) // dummy place holder
     INT_TO_LIST(shareable)
-    INT_TO_LIST(0);            // dummy place holder
+    INT_TO_LIST(findid);
     STR_TO_LIST(hostname)
     INT_TO_LIST(sourceid)
     INT_TO_LIST(cardid)
@@ -277,7 +279,7 @@ bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     DATETIME_FROM_LIST(endts)
     NEXT_STR() // dummy place holder
     INT_FROM_LIST(shareable)
-    NEXT_STR() // dummy place holder
+    INT_FROM_LIST(findid)
     STR_FROM_LIST(hostname)
     INT_FROM_LIST(sourceid)
     INT_FROM_LIST(cardid)
@@ -747,6 +749,8 @@ int ProgramInfo::GetRecordingTypeRecPriority(RecordingType type)
         case kAllRecord:
             return gContext->GetNumSetting("AllRecordRecPriority", 0);
         case kFindOneRecord:
+        case kFindDailyRecord:
+        case kFindWeeklyRecord:
             return gContext->GetNumSetting("FindOneRecordRecPriority", 0);
         case kOverrideRecord:
         case kDontRecord:
@@ -823,9 +827,15 @@ void ProgramInfo::ToggleRecord(QSqlDatabase *db)
             ApplyRecordStateChange(db, kWeekslotRecord);
             break;
         case kWeekslotRecord:
+            ApplyRecordStateChange(db, kFindWeeklyRecord);
+            break;
+        case kFindWeeklyRecord:
             ApplyRecordStateChange(db, kTimeslotRecord);
             break;
         case kTimeslotRecord:
+            ApplyRecordStateChange(db, kFindDailyRecord);
+            break;
+        case kFindDailyRecord:
             ApplyRecordStateChange(db, kChannelRecord);
             break;
         case kChannelRecord:
@@ -865,6 +875,9 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
     if (rectype == kFindOneRecord)
         return true;
 
+    if (findid && other.findid)
+        return findid == other.findid;
+
     if (dupmethod & kDupCheckNone)
         return false;
 
@@ -872,12 +885,7 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
         return false;
 
     if (programid != "" && other.programid != "")
-    {
-        if (programid == other.programid)
-            return true;
-        else
-            return false;
-    }
+        return programid == other.programid;
 
     if ((dupmethod & kDupCheckSub) &&
         ((subtitle == "") ||
@@ -981,10 +989,11 @@ void ProgramInfo::StartedRecording(QSqlDatabase *db)
     query.prepare("INSERT INTO recorded (chanid,starttime,endtime,title,"
                   " subtitle,description,hostname,category,recgroup,"
                   " autoexpire,recordid,seriesid,programid,stars,"
-                  " previouslyshown,originalairdate)"
+                  " previouslyshown,originalairdate,findid)"
                   " VALUES(:CHANID,:STARTS,:ENDS,:TITLE,:SUBTITLE,:DESC,"
                   " :HOSTNAME,:CATEGORY,:RECGROUP,:AUTOEXP,:RECORDID,"
-                  " :SERIESID,:PROGRAMID,:STARS,:REPEAT,:ORIGAIRDATE);");
+                  " :SERIESID,:PROGRAMID,:STARS,:REPEAT,:ORIGAIRDATE,"
+                  " :FINDID);");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTS", starts);
     query.bindValue(":ENDS", ends);
@@ -998,6 +1007,7 @@ void ProgramInfo::StartedRecording(QSqlDatabase *db)
     query.bindValue(":RECORDID", recordid);
     query.bindValue(":SERIESID", seriesid.utf8());
     query.bindValue(":PROGRAMID", programid.utf8());
+    query.bindValue(":FINDID", findid);
     query.bindValue(":STARS", stars);
     query.bindValue(":REPEAT", repeat);
     query.bindValue(":ORIGAIRDATE", originalAirDate.toString());
@@ -1812,6 +1822,10 @@ QString ProgramInfo::RecTypeChar(void)
         return QObject::tr("A", "RecTypeChar");
     case kFindOneRecord:
         return QObject::tr("F", "RecTypeChar");
+    case kFindDailyRecord:
+        return QObject::tr("d", "RecTypeChar");
+    case kFindWeeklyRecord:
+        return QObject::tr("w", "RecTypeChar");
     case kOverrideRecord:
     case kDontRecord:
         return QObject::tr("O", "RecTypeChar");
@@ -1837,6 +1851,10 @@ QString ProgramInfo::RecTypeText(void)
         return QObject::tr("All Recording");
     case kFindOneRecord:
         return QObject::tr("Find One Recording");
+    case kFindDailyRecord:
+        return QObject::tr("Find Daily Recording");
+    case kFindWeeklyRecord:
+        return QObject::tr("Find Weekly Recording");
     case kOverrideRecord:
     case kDontRecord:
         return QObject::tr("Override Recording");
@@ -2334,6 +2352,14 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
     if (programid  != "")
         msg += QObject::tr("Program ID") + ":  " + programid + "\n";
 
+    if (findid > 0)
+    {
+        QString dfmt = gContext->GetSetting("OldDateFormat", "M/d/yyyy");
+        QDate fdate = QDate::QDate (1970, 1, 1);
+        fdate = fdate.addDays(findid - 719528);
+        msg += QString("%1: %2 ( %3 )\n").arg(QObject::tr("Find ID"))
+                       .arg(findid).arg(fdate.toString(dfmt));
+    }
     QString role = "", pname = "";
 
     if (endts != startts)
@@ -2474,9 +2500,10 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
                 addov = button++;
             }
             if (rectype != kFindOneRecord &&
-                !(catType == "series" &&
+                !(findid == 0 && catType == "series" &&
                   programid.contains(QRegExp("0000$"))) &&
-                ((!(dupmethod & kDupCheckNone) && programid != "") ||
+                ((!(dupmethod & kDupCheckNone) && programid != "" && 
+                  findid != 0) ||
                  ((dupmethod & kDupCheckSub) && subtitle != "") ||
                  ((dupmethod & kDupCheckDesc) && description != "")))
             {
@@ -2795,6 +2822,7 @@ bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
                 p->inputid = s->inputid;
                 p->dupin = s->dupin;
                 p->dupmethod = s->dupmethod;
+                p->findid = s->findid;
             }
         }
 
@@ -2810,8 +2838,9 @@ bool ProgramList::FromOldRecorded(QSqlDatabase *db, const QString sql)
     QSqlQuery query(QString::null, db);
 
     query.prepare("SELECT oldrecorded.chanid, starttime, endtime, "
-                  " title, subtitle, description, category, seriesid, programid, "
-                  " channel.channum, channel.callsign, channel.name "
+                  " title, subtitle, description, category, seriesid, "
+                  " programid, channel.channum, channel.callsign, "
+                  " channel.name, findid "
                   " FROM oldrecorded "
                   " LEFT JOIN channel ON oldrecorded.chanid = channel.chanid "
                   + sql);
@@ -2843,6 +2872,7 @@ bool ProgramList::FromOldRecorded(QSqlDatabase *db, const QString sql)
         p->chanstr = query.value(9).toString();
         p->chansign = QString::fromUtf8(query.value(10).toString());
         p->channame = QString::fromUtf8(query.value(11).toString());
+        p->findid = query.value(12).toInt();
         p->recstatus = rsPreviousRecording;
 
         append(p);
