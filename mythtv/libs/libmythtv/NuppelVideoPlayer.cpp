@@ -1417,32 +1417,25 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             }
 
             video_actually_paused = true;
-            if (livetv && ringBuffer->GetFreeSpace() < -1000)
-            {
-                paused = false;
-                cout << "forced unpause\n";
-            }
-            else
-            {
-                //printf("video waiting for unpause\n");
-                usleep(5000);
 
-                if (!disablevideo)
-                {
-                    memcpy(vbuffer[MAXVBUFFER], pause_buf, video_size);
-                    frame.buf = vbuffer[MAXVBUFFER];
-                    if (videoFilters.size() > 0)
-                        process_video_filters(&frame, &videoFilters[0],
-                                              videoFilters.size());
-                    if (pipplayer)
-                        ShowPip(vbuffer[MAXVBUFFER]);
-                    osd->Display(vbuffer[MAXVBUFFER]);
-                    videoOutput->Show(vbuffer[MAXVBUFFER], video_width, 
-                                      video_height);
-                    ResetNexttrigger(&nexttrigger);
-                }
-                continue;
+            //printf("video waiting for unpause\n");
+            usleep(5000);
+
+            if (!disablevideo)
+            {
+                memcpy(vbuffer[MAXVBUFFER], pause_buf, video_size);
+                frame.buf = vbuffer[MAXVBUFFER];
+                if (videoFilters.size() > 0)
+                    process_video_filters(&frame, &videoFilters[0],
+                                          videoFilters.size());
+                if (pipplayer)
+                    ShowPip(vbuffer[MAXVBUFFER]);
+                osd->Display(vbuffer[MAXVBUFFER]);
+                videoOutput->Show(vbuffer[MAXVBUFFER], video_width, 
+                                  video_height);
+                ResetNexttrigger(&nexttrigger);
             }
+            continue;
         }
 	video_actually_paused = false;
 
@@ -1746,6 +1739,8 @@ void NuppelVideoPlayer::StartPlaying(void)
     pthread_create(&output_audio, NULL, kickoffOutputAudioLoop, this);
     pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);
 
+    int pausecheck = 0;
+
     while (!eof && !killplayer)
     {
 	if (resetplaying)
@@ -1765,12 +1760,18 @@ void NuppelVideoPlayer::StartPlaying(void)
         if (paused)
 	{ 
             actuallypaused = true;
-            if (livetv && ringBuffer->GetFreeSpace() < -1000)
+            pausecheck++;
+
+            if (!(pausecheck % 20))
             {
-                paused = false;
-		printf("forced unpause\n");
-	    }
-            else if (advancedecoder)
+                if (livetv && ringBuffer->GetFreeSpace() < -1000)
+                {
+                    Unpause();
+		    printf("forced unpause\n");
+	        }
+                pausecheck = 0;
+            }
+            if (advancedecoder)
             {
                 if (vbuffer_numvalid() <= 1)
                 {
@@ -1817,7 +1818,7 @@ void NuppelVideoPlayer::StartPlaying(void)
             else
             {
                 //printf("startplaying waiting for unpause\n");
-                usleep(50);
+                usleep(500);
                 continue;
             }
 	}

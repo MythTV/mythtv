@@ -579,6 +579,8 @@ void TV::RunTV(void)
     doing_rew = false;
     ff_rew_scaling = 1.0;
 
+    int pausecheck = 0;
+
     channelqueued = false;
     channelKeys[0] = channelKeys[1] = channelKeys[2] = ' ';
     channelKeys[3] = 0;
@@ -637,11 +639,13 @@ void TV::RunTV(void)
         if (internalState == kState_WatchingLiveTV || 
             internalState == kState_WatchingRecording)
         {
-            if (paused)
+            pausecheck++;
+            if (paused && !(pausecheck % 20))
             {
                 QString desc = "";
                 int pos = calcSliderPos(0, desc);
                 osd->UpdatePause(pos, desc);
+                pausecheck = 0;
             }
 
             if (channelqueued && nvp->GetOSD() && !osd->Visible())
