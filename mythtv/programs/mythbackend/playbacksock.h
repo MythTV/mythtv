@@ -34,6 +34,10 @@ class PlaybackSock
     void GenPreviewPixmap(ProgramInfo *pginfo);
     bool CheckFile(ProgramInfo *pginfo);
 
+    int GetEncoderState(int capturecardnum);
+    bool EncoderIsRecording(int capturecardnum, ProgramInfo *pginfo);
+    void StartRecording(int capturecardnum, ProgramInfo *pginfo);
+
   private:
     void SendReceiveStringList(QStringList &strlist);
 

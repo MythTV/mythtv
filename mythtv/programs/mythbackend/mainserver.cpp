@@ -1,3 +1,4 @@
+#include <qapplication.h>
 #include <qsqldatabase.h>
 #include <qfile.h>
 #include <qurl.h>
@@ -41,6 +42,13 @@ MainServer::MainServer(bool master, int port, int statusport,
     statusserver = new HttpStatus(this, statusport);    
 
     gContext->addListener(this);
+
+    
+    if (!ismaster)
+    {
+        masterServerReconnect = new QTimer(this);
+        //masterServerReconnect->start(1000, true);
+    }
 }
 
 MainServer::~MainServer()
@@ -49,6 +57,8 @@ MainServer::~MainServer()
 
     if (statusserver)
         delete statusserver;
+    if (masterServerReconnect)
+        delete masterServerReconnect;
 }
 
 void MainServer::newConnection(QSocket *socket)
@@ -130,6 +140,13 @@ void MainServer::readSocket(void)
                     cerr << "Bad QUERY_RECORDER\n";
                 else
                     HandleRecorderQuery(listline, tokens, pbs);
+            }
+            else if (command == "QUERY_REMOTEENCODER")
+            {
+                if (tokens.size() != 2)
+                    cerr << "Bad QUERY_REMOTEENCODER\n";
+                else
+                    HandleRemoteEncoder(listline, tokens, pbs);
             }
             else if (command == "GET_RECORDER_NUM")
             {
@@ -1012,6 +1029,51 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     WriteStringList(pbs->getSocket(), retlist);    
 }
 
+void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
+                                     PlaybackSock *pbs)
+{
+    int recnum = commands[1].toInt();
+
+    QMap<int, EncoderLink *>::Iterator iter = encoderList->find(recnum);
+    if (iter == encoderList->end())
+    {
+        cerr << "Unknown encoder.\n";
+        exit(0);
+    }
+
+    EncoderLink *enc = iter.data();
+
+    QString command = slist[1];
+
+    QStringList retlist;
+
+    if (command == "GET_STATE")
+    {
+        retlist << QString::number((int)enc->GetState());
+    }
+    else if (command == "MATCHES_RECORDING")
+    {
+        ProgramInfo *pginfo = new ProgramInfo();
+        pginfo->FromStringList(slist, 2);
+
+        retlist << QString::number((int)enc->MatchesRecording(pginfo));
+
+        delete pginfo;
+    }
+    else if (command == "START_RECORDING")
+    {
+        ProgramInfo *pginfo = new ProgramInfo();
+        pginfo->FromStringList(slist, 2);
+  
+        enc->StartRecording(pginfo);
+
+        retlist << "OK";
+        delete pginfo;
+    }
+
+    WriteStringList(pbs->getSocket(), retlist);
+}
+
 void MainServer::HandleFileTransferQuery(QStringList &slist, 
                                          QStringList &commands,
                                          PlaybackSock *pbs)
@@ -1347,6 +1409,64 @@ bool MainServer::isRingBufSock(QSocket *sock)
     }
 
     return false;
+}
+
+void MainServer::masterServerDied(void)
+{
+    delete masterServerSock;
+    masterServerSock = NULL;
+    masterServerReconnect->start(1000);
+}
+
+void MainServer::reconnectTimeout(void)
+{
+    masterServerSock = new QSocket();
+
+    QString server = gContext->GetSetting("MasterServerIP", "localhost");
+    int port = gContext->GetNumSetting("MasterServerPort", 6543);
+
+    cerr << "Attempting to connect to master server\n";
+
+    masterServerSock->connectToHost(server, port);
+
+    int num = 0;
+    while (masterServerSock->state() == QSocket::HostLookup ||
+           masterServerSock->state() == QSocket::Connecting)
+    {
+        qApp->processEvents();
+        usleep(50);
+        num++;
+        if (num > 100)
+        {
+            cerr << "Connection to master server timed out.\n";
+            masterServerReconnect->start(1000);
+            delete masterServerSock;
+            masterServerSock = NULL;
+            return;
+        }
+    }
+
+    if (masterServerSock->state() != QSocket::Connected)
+    {
+        cerr << "Could not connect to master server\n";
+        masterServerReconnect->start(1000);
+        delete masterServerSock;
+        masterServerSock = NULL;
+    }
+
+    cerr << "done\n";
+
+    QString str = QString("ANN SlaveBackend %1 %2")
+                          .arg(gContext->GetHostName())
+                          .arg(gContext->GetSetting("BackendServerIP"));
+
+    QStringList strlist = str;
+    WriteStringList(masterServerSock, strlist);
+    ReadStringList(masterServerSock, strlist);
+
+    connect(masterServerSock, SIGNAL(readyRead()), this, SLOT(readSocket()));
+    connect(masterServerSock, SIGNAL(connectionClosed()), this, 
+            SLOT(masterServerDied()));
 }
 
 void MainServer::PrintStatus(QSocket *socket)

@@ -106,3 +106,36 @@ bool PlaybackSock::CheckFile(ProgramInfo *pginfo)
     bool exists = strlist[0].toInt();
     return exists;
 }
+
+int PlaybackSock::GetEncoderState(int capturecardnum)
+{
+    QStringList strlist = QString("QUERY_REMOTEENCODER %1").arg(capturecardnum);
+    strlist << "GET_STATE";
+
+    gContext->SendReceiveStringList(strlist);
+
+    int state = strlist[0].toInt();
+    return state;
+}
+
+bool PlaybackSock::EncoderIsRecording(int capturecardnum, ProgramInfo *pginfo)
+{
+    QStringList strlist = QString("QUERY_REMOTEENCODER %1").arg(capturecardnum);
+    strlist << "MATCHES_RECORDING";
+    pginfo->ToStringList(strlist);
+
+    gContext->SendReceiveStringList(strlist);
+
+    bool ret = strlist[0].toInt();
+    return ret;
+}
+
+void PlaybackSock::StartRecording(int capturecardnum, ProgramInfo *pginfo)
+{
+    QStringList strlist = QString("QUERY_REMOTEENCODER %1").arg(capturecardnum);
+    strlist << "START_RECORDING";
+    pginfo->ToStringList(strlist);
+
+    gContext->SendReceiveStringList(strlist);
+}
+

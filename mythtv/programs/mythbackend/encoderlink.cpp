@@ -60,7 +60,6 @@ bool EncoderLink::isConnected(void)
     return false;
 }
 
-// XXX
 TVState EncoderLink::GetState(void)
 {
     TVState retval = kState_Error;
@@ -68,18 +67,14 @@ TVState EncoderLink::GetState(void)
     if (local)
         retval = tv->GetState();
     else
-    {
-    }
+        retval = (TVState)sock->GetEncoderState(m_capturecardnum);
 
     return retval;
 }
 
-// XXX
 bool EncoderLink::MatchesRecording(ProgramInfo *rec)
 {
     bool retval = false;
-
-   
     ProgramInfo *tvrec = NULL;
 
     if (local)
@@ -96,6 +91,10 @@ bool EncoderLink::MatchesRecording(ProgramInfo *rec)
                 retval = true;
             }
         }
+    }
+    else
+    {
+        retval = sock->EncoderIsRecording(m_capturecardnum, rec);
     }
 
     return retval;
@@ -125,11 +124,12 @@ int EncoderLink::AllowRecording(ProgramInfo *rec, int timeuntil)
     return -1;
 }
 
-// XXX
 void EncoderLink::StartRecording(ProgramInfo *rec)
 {
     if (local)
         tv->StartRecording(rec);
+    else
+        sock->StartRecording(m_capturecardnum, rec);
 }
 
 void EncoderLink::StopRecording(void)

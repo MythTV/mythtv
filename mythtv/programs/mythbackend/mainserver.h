@@ -3,6 +3,7 @@
 
 #include <qmap.h>
 #include <qsocket.h>
+#include <qtimer.h>
 #include <vector>
 using namespace std;
 
@@ -25,6 +26,10 @@ class MainServer : public QObject
 
     void customEvent(QCustomEvent *e);
     void PrintStatus(QSocket *socket);
+
+  protected slots:
+    void reconnectTimeout(void);
+    void masterServerDied(void);
 
   private slots:
     void newConnection(QSocket *);
@@ -53,6 +58,8 @@ class MainServer : public QObject
     void HandleMessage(QStringList &slist, PlaybackSock *pbs);
     void HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs);
     void HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs);
+    void HandleRemoteEncoder(QStringList &slist, QStringList &commands,
+                             PlaybackSock *pbs);
 
     PlaybackSock *getSlaveByHostname(QString &hostname);
     PlaybackSock *getPlaybackBySock(QSocket *socket);
@@ -74,6 +81,7 @@ class MainServer : public QObject
     HttpStatus *statusserver;
 
     QSocket *masterServerSock;
+    QTimer *masterServerReconnect;
 
     bool ismaster;
 };
