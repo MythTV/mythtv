@@ -2213,10 +2213,10 @@ public:
 
 #endif
 
-class LogEnabled: public CheckBoxSetting, public GlobalSetting {
+class LogEnabled: public CheckBoxSetting, public BackendSetting {
 public:
     LogEnabled():
-        GlobalSetting("LogEnabled") {
+        BackendSetting("LogEnabled") {
         setLabel(QObject::tr("Log MythTV events to database"));
         setValue(false);
         setHelpText(QObject::tr("If enabled, MythTV modules will send event "
