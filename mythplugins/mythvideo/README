@@ -31,7 +31,7 @@ You need to also create the videometadata table in your MySQL database, to do so
 
 # exit
 $ cd videodb
-$ mysql -u root < metadata.sql
+$ mysql -u mythtv -p < metadata.sql
 
 
 
