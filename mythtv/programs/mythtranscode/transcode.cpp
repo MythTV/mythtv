@@ -612,11 +612,14 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         frame.frameNumber = 1 + (curFrameNum << 1);
     }
 
-    nvr->WriteSeekTable();
-    if (!kfa_table->isEmpty())
-        nvr->WriteKeyFrameAdjustTable(kfa_table);
-    if (fifow) 
+    if (! fifow)
+    {
+      nvr->WriteSeekTable();
+      if (!kfa_table->isEmpty())
+          nvr->WriteKeyFrameAdjustTable(kfa_table);
+    } else {
         fifow->FIFODrain();
+    }
     return REENCODE_OK;
 }
 
