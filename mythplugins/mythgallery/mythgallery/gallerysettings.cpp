@@ -35,11 +35,22 @@ public:
 class SlideshowTransition: public ComboBoxSetting, public GlobalSetting {
 public:
     SlideshowTransition() : 
-      GlobalSetting("SlideshowTransition") {
+        GlobalSetting("SlideshowTransition") {
         setLabel(QObject::tr("Type of transition"));
         addSelection("none");
-        addSelection("fade"); 
-        addSelection("wipe");
+        addSelection("chess board"); 
+        addSelection("melt down");
+        addSelection("sweep");
+        addSelection("noise");
+        addSelection("growing");
+        addSelection("incoming edges");
+        addSelection("horizontal lines");
+        addSelection("vertical lines");
+        addSelection("circle out");
+        addSelection("multicircle out");
+        addSelection("spiral in");
+        addSelection("blobs");
+        addSelection("random");
         setHelpText(QObject::tr("This is the type of transition used "
                     "between pictures in slideshow mode."));
     }
@@ -78,7 +89,7 @@ GallerySettings::GallerySettings()
     settings->setLabel(QObject::tr("MythGallery Settings"));
     settings->addChild(new MythGalleryDir());
     settings->addChild(new MythGalleryImportDirs());
-    //settings->addChild(new SlideshowTransition());
+    settings->addChild(new SlideshowTransition());
     settings->addChild(new SlideshowBackground());
     settings->addChild(new SlideshowDelay());
     addChild(settings);

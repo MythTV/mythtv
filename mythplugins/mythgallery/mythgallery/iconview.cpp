@@ -281,10 +281,9 @@ void IconView::keyPressEvent(QKeyEvent *e)
                     handled = true;
                 }
                 else {
+                    bool slideShow = (action == "PLAY");
                     SingleView iv(m_db, m_itemList, pos, m_thumbGen,
-                                 gContext->GetMainWindow());
-                    if (action == "PLAY")
-                        iv.startShow();
+                                  slideShow, gContext->GetMainWindow());
                     iv.exec();
                 }
             }
@@ -720,9 +719,8 @@ void IconView::actionSlideShow()
         return;
 
     int pos = m_currRow * m_nCols + m_currCol;
-    SingleView iv(m_db, m_itemList, pos, m_thumbGen,
+    SingleView iv(m_db, m_itemList, pos, m_thumbGen, true,
                  gContext->GetMainWindow());
-    iv.startShow();
     iv.exec();
 }
 
