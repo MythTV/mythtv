@@ -1523,50 +1523,6 @@ void ProgramInfo::DeleteHistory(QSqlDatabase *db)
     record->forgetHistory(db, *this);
 }
 
-void ProgramInfo::setOverride(QSqlDatabase *db, int override)
-{
-    QString sqltitle = title;
-    sqltitle.replace(QRegExp("\'"), "\\'");
-    sqltitle.replace(QRegExp("\""), "\\\"");
-    QString sqlsubtitle = subtitle;
-    sqlsubtitle.replace(QRegExp("\'"), "\\'");
-    sqlsubtitle.replace(QRegExp("\""), "\\\"");
-    QString sqldescription = description;
-    sqldescription.replace(QRegExp("\'"), "\\'");
-    sqldescription.replace(QRegExp("\""), "\\\"");
-
-    QString thequery;
-    QSqlQuery query;
-
-    thequery = QString("DELETE FROM recordoverride WHERE "
-       "recordid = %1 AND station = \"%2\" AND starttime = %3 AND endtime = %4 AND "
-       "title = \"%5\" AND subtitle = \"%6\" AND description = \"%7\";")
-        .arg(recordid).arg(chansign.utf8())
-        .arg(startts.toString("yyyyMMddhhmmss").ascii())
-        .arg(endts.toString("yyyyMMddhhmmss").ascii())
-        .arg(sqltitle.utf8()).arg(sqlsubtitle.utf8())
-        .arg(sqldescription.utf8());
-    query = db->exec(thequery);
-
-    if (!query.isActive())
-        MythContext::DBError("record override update", thequery);
-    else
-    {
-        thequery = QString("INSERT INTO recordoverride SET type = %1, "
-            "recordid = %2, chanid = %3, starttime = %4, endtime = %5, "
-            "title = \"%6\", subtitle = \"%7\", description = \"%8\", " 
-            "station = \"%9\";")
-            .arg(override).arg(recordid).arg(chanid)
-            .arg(startts.toString("yyyyMMddhhmmss").ascii())
-            .arg(endts.toString("yyyyMMddhhmmss").ascii())
-            .arg(sqltitle.utf8()).arg(sqlsubtitle.utf8())
-            .arg(sqldescription.utf8()).arg(chansign.utf8());
-        query = db->exec(thequery);
-        if (!query.isActive())
-            MythContext::DBError("record override update", thequery);
-    }
-}
-
 QString ProgramInfo::RecTypeChar(void)
 {
     switch (rectype)

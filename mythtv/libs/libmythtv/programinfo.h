@@ -265,7 +265,6 @@ class ProgramInfo
 private:
     void handleRecording(QSqlDatabase *db);
     void handleNotRecording(QSqlDatabase *db);
-    void setOverride(QSqlDatabase *db, int override);
 
     class ScheduledRecording* record;
 };
