@@ -22,6 +22,8 @@ using namespace std;
 #include "videofilter.h"
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdialogs.h>
+
+
 VideoManager::VideoManager(QSqlDatabase *ldb,
                            MythMainWindow *parent, const char *name)
             : MythDialog(parent, name)
@@ -1346,30 +1348,6 @@ void VideoManager::videoMenu()
     popup->ShowPopup(this, SLOT(slotDoCancel()));
     
     editButton->setFocus();    
-    
-
-#if 0
-    QPainter p(this);
-    if (m_state == SHOWING_MAINWINDOW || m_state == SHOWING_EDITWINDOW)
-    {
-       backup.flush();
-       backup.begin(this);
-       grayOut(&backup);
-       backup.end();
-
-       movieList.clear();
-       movieList.push_back("manual:Manually Enter IMDB #");
-       movieList.push_back("reset:Reset Entry");
-       movieList.push_back("cancel:Cancel");
-       movieList.push_back("remove:Remove Video");
-       inListMovie = 0;
-       inDataMovie = 0;
-       listCountMovie = 0;
-       dataCountMovie = 0;
-       m_state = SHOWING_IMDBLIST;
-       update(movieListRect);
-    }
-#endif
 }
 
 
@@ -1666,6 +1644,7 @@ void VideoManager::cancelPopup(void)
         popup = NULL;
 
         update(fullRect);
+        qApp->processEvents();
         setActiveWindow();
     }
 }
