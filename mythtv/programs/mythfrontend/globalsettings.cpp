@@ -917,15 +917,18 @@ public:
 class MythDateFormat: public ComboBoxSetting, public GlobalSetting {
 public:
     MythDateFormat():
-        ComboBoxSetting(true), GlobalSetting("DateFormat") {
+        GlobalSetting("DateFormat") {
         setLabel(QObject::tr("Date format"));
-        addSelection(QObject::tr("ddd MMM d"), "ddd MMM d");
-        addSelection(QObject::tr("ddd MMMM d"), "ddd MMMM d");
-        addSelection(QObject::tr("MMM d"), "MMM d");
-        addSelection(QObject::tr("MM/dd"), "MM/dd");
-        addSelection(QObject::tr("MM.dd"), "MM.dd");
-        addSelection(QObject::tr("ddd d MMM"), "ddd d MMM");
-        addSelection(QObject::tr("dd.MM.yyyy"), "dd.MM.yyyy");
+
+        QDate sampdate(2004, 1, 31);
+
+        addSelection(sampdate.toString("ddd MMM d"), "ddd MMM d");
+        addSelection(sampdate.toString("ddd MMMM d"), "ddd MMMM d");
+        addSelection(sampdate.toString("MMM d"), "MMM d");
+        addSelection(sampdate.toString("MM/dd"), "MM/dd");
+        addSelection(sampdate.toString("MM.dd"), "MM.dd");
+        addSelection(sampdate.toString("ddd d MMM"), "ddd d MMM");
+        addSelection(sampdate.toString("dd.MM.yyyy"), "dd.MM.yyyy");
         setHelpText(QObject::tr("Your preferred date format."));
     };
 };
@@ -933,15 +936,18 @@ public:
 class MythShortDateFormat: public ComboBoxSetting, public GlobalSetting {
 public:
     MythShortDateFormat():
-        ComboBoxSetting(true), GlobalSetting("ShortDateFormat") {
+        GlobalSetting("ShortDateFormat") {
         setLabel(QObject::tr("Short Date format"));
-        addSelection(QObject::tr("M/d"), "M/d");
-        addSelection(QObject::tr("d/M"), "d/M");
-        addSelection(QObject::tr("MM/dd"), "MM/dd");
-        addSelection(QObject::tr("dd/MM"), "dd/MM");
-        addSelection(QObject::tr("MM.dd"), "MM.dd");
-        addSelection(QObject::tr("d.M."), "d.M.");
-        addSelection(QObject::tr("dd.MM."), "dd.MM.");
+
+        QDate sampdate(2004, 1, 31);
+   
+        addSelection(sampdate.toString("M/d"), "M/d");
+        addSelection(sampdate.toString("d/M"), "d/M");
+        addSelection(sampdate.toString("MM/dd"), "MM/dd");
+        addSelection(sampdate.toString("dd/MM"), "dd/MM");
+        addSelection(sampdate.toString("MM.dd"), "MM.dd");
+        addSelection(sampdate.toString("d.M."), "d.M.");
+        addSelection(sampdate.toString("dd.MM."), "dd.MM.");
         setHelpText(QObject::tr("Your preferred short date format."));
     };
 };
@@ -949,14 +955,17 @@ public:
 class MythTimeFormat: public ComboBoxSetting, public GlobalSetting {
 public:
     MythTimeFormat():
-        ComboBoxSetting(true), GlobalSetting("TimeFormat") {
+        GlobalSetting("TimeFormat") {
         setLabel(QObject::tr("Time format"));
-        addSelection(QObject::tr("h:mm AP"), "h:mm AP");
-        addSelection(QObject::tr("h:mm ap"), "h:mm ap");
-        addSelection(QObject::tr("hh:mm AP"), "hh:mm AP");
-        addSelection(QObject::tr("hh:mm ap"), "hh:mm ap");
-        addSelection(QObject::tr("h:mm"), "h:mm");
-        addSelection(QObject::tr("hh:mm"), "hh:mm");
+
+        QTime samptime(18, 56, 0);
+
+        addSelection(samptime.toString("h:mm AP"), "h:mm AP");
+        addSelection(samptime.toString("h:mm ap"), "h:mm ap");
+        addSelection(samptime.toString("hh:mm AP"), "hh:mm AP");
+        addSelection(samptime.toString("hh:mm ap"), "hh:mm ap");
+        addSelection(samptime.toString("h:mm"), "h:mm");
+        addSelection(samptime.toString("hh:mm"), "hh:mm");
         setHelpText(QObject::tr("Your preferred time format.  Choose a format "
                     "with \"AP\" in it for an AM/PM display, otherwise "
                     "your time display will be 24-hour or \"military\" "
@@ -1256,7 +1265,7 @@ public:
 class MythLanguage: public ComboBoxSetting, public GlobalSetting {
 public:
     MythLanguage():
-        ComboBoxSetting(true), GlobalSetting("Language") {
+        GlobalSetting("Language") {
         setLabel(QObject::tr("Language"));
         addSelection(QString::fromUtf8("English"), "EN");     // English
         addSelection(QString::fromUtf8("Italiano"), "IT");    // Italian
