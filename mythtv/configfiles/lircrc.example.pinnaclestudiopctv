@@ -257,12 +257,11 @@ end
 #    config = Key  CurrentWindow
 # end
 
-# begin
-#    prog = irxevent
-# Not used for anything yet
-#    button = F_TELETEXT
-#    config = Key  CurrentWindow
-# end
+begin
+   prog = irxevent
+   button = F_TELETEXT
+   config = Key T CurrentWindow
+end
 
 # begin
 #    prog = irxevent
