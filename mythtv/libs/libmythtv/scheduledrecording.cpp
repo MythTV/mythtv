@@ -657,10 +657,17 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
     vbox->addWidget(f);    
 
     vbox->addWidget(type->configWidget(this, dialog));
-    vbox->addWidget(recorddups->configWidget(this, dialog));
-    vbox->addWidget(profile->configWidget(this, dialog));
-    vbox->addWidget(rank->configWidget(this, dialog));
-    vbox->addWidget(autoexpire->configWidget(this, dialog));
+
+    QHBoxLayout* hbox = new QHBoxLayout(vbox, (int)(20 * wmult));
+    QVBoxLayout* vbox1 = new QVBoxLayout(hbox, (int)(20 * wmult));
+    QVBoxLayout* vbox2 = new QVBoxLayout(hbox, (int)(20 * wmult));
+
+    vbox1->addWidget(profile->configWidget(this, dialog));
+    vbox1->addWidget(rank->configWidget(this, dialog));
+
+    vbox2->addWidget(recorddups->configWidget(this, dialog));
+    vbox2->addWidget(autoexpire->configWidget(this, dialog));
+
     vbox->addWidget(maxepisodes->configWidget(this, dialog));
     vbox->addWidget(maxnewest->configWidget(this, dialog));
 
