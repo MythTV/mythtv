@@ -3879,11 +3879,11 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Commercial Skip Notify Amount</source>
-        <translation>Mängd reklamöverhoppningsavisering</translation>
+        <translation>Meddela innan (sekunder)</translation>
     </message>
     <message>
         <source>If set, MythTV will act like a commercial begins this many seconds early.  This can be useful when commercial notification is used in place of automatic skipping.</source>
-        <translation>Om satt kommer MythTV agera som om en reklampaus börja så här många sekunder tidigt. Detta kan vara användbart när &apos;Meddela vid reklamöverhoppning&apos; används i stället för &apos;Hoppa automatiskt&apos;.</translation>
+        <translation>Meddela om reklam så här många sekunder innan då &quot;Meddela innan&quot; används.</translation>
     </message>
     <message>
         <source>Trigger AutoExpire when available disk space is below this value.  Disable AutoExpire by setting to 0.</source>
@@ -5977,15 +5977,15 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     </message>
     <message>
         <source>Auto-Skip OFF</source>
-        <translation>Reklamöverhoppning: AV</translation>
+        <translation>Hoppa ej automatiskt</translation>
     </message>
     <message>
         <source>Auto-Skip ON</source>
-        <translation>Reklamöverhoppning: PÅ</translation>
+        <translation>Hoppa automatiskt</translation>
     </message>
     <message>
         <source>Auto-Skip Notify</source>
-        <translation>Meddela vid reklamöverhoppning</translation>
+        <translation>Meddela</translation>
     </message>
     <message>
         <source>16:9 Zoom</source>
@@ -6153,7 +6153,7 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     </message>
     <message>
         <source>Auto-Skip Pre-Notify</source>
-        <translation>Auto-hoppförvarning</translation>
+        <translation>Meddela innan</translation>
     </message>
     <message>
         <source>Audio track</source>
