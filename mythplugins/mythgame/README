@@ -48,6 +48,17 @@ screenshot section.
 To use the generic PC game stuff, check out the example gamelist.xml file
 in this directory and modify it/add to it as desired.
 
+NES SETTINGS
+-----------------
+
+ROM Screenshots
+Screenshots must be in GIF format and must have an extension of ".gif"
+MythGame will first look to the database for the name of the screenshot. If
+that file is not found, it will then attempt to match an image with the
+the game name from the database.  If that fails, it will then atttempt to 
+find the image with the same name as the ROM file. 
+
+
 Feel free to subscribe to the development mailing list at:
 http://www.mythtv.org/mailman/listinfo/mythtv-dev
 
