@@ -6,6 +6,7 @@
       <text lang="IT">Guida programmi</text>
       <text lang="ES">Guía de programas</text>
       <text lang="CA">Guia de programes</text>
+      <text lang="NL">Programma Gids</text>
       <alttext>Guide</alttext>
       <action>TV_SCHEDULE</action>
    </button>
@@ -16,6 +17,7 @@
       <text lang="IT">Ricerca programmi</text>
       <text lang="ES">Buscar programas</text>
       <text lang="CA">Cercar programes</text>
+      <text lang="NL">Programma Zoeker</text>
       <alttext>Finder</alttext>
       <action>TV_PROGFIND</action>
    </button>
@@ -26,6 +28,7 @@
       <text lang="IT">Registrazione manuale</text>
       <text lang="ES">Grabacion manual</text>
       <text lang="CA">Gravar manualment</text>
+      <text lang="NL">Manuele opname</text>
       <alttext>Manual Record</alttext>
       <action>TV_MANUAL</action>
    </button>
@@ -36,6 +39,7 @@
       <text lang="IT">Correggi i conflitti</text>
       <text lang="ES">Resolver conflictos</text>
       <text lang="CA">Resoldre Conflictes</text>
+      <text lang="NL">Conflicten Oplossen</text>
       <alttext>Fix Conflicts</alttext>
       <action>TV_FIX_CONFLICTS</action>
    </button>

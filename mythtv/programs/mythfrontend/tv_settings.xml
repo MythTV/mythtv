@@ -5,6 +5,7 @@
       <text lang="IT">Generale</text>
       <text lang="ES">General</text>
       <text lang="CA">General</text>
+      <text lang="NL">Algemeen</text>
       <action>SETTINGS GENERAL</action>
    </button>
 
@@ -14,6 +15,7 @@
       <text lang="IT">Guida programmi</text>
       <text lang="ES">Guía de programas</text>
       <text lang="CA">Guia de programes</text>
+      <text lang="NL">Programma Gids</text>
       <action>SETTINGS EPG</action>
    </button>
 
@@ -23,6 +25,7 @@
       <text lang="IT">Riproduzione</text>
       <text lang="ES">Reproducción</text>
       <text lang="CA">Reproducció</text>
+      <text lang="NL">Afspelen</text>
       <action>SETTINGS PLAYBACK</action>
    </button>
 
@@ -32,6 +35,7 @@
       <text lang="IT">Registrazione</text>
       <text lang="ES">Grabación</text>
       <text lang="CA">Gravació</text>
+      <text lang="NL">Opnemen</text>
       <action>SETTINGS RECORDING</action>
    </button>
 

@@ -264,14 +264,13 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 enc->debug = 0;
                 enc->rate_emu = 0;
 
-                if (enc->codec_id == CODEC_ID_MPEG1VIDEO || 
-                    enc->codec_id == CODEC_ID_H264)
-                {
-                    enc->flags|= CODEC_FLAG_TRUNCATED;
-                }
-
                 AVCodec *codec = avcodec_find_decoder(enc->codec_id);
-                if (codec && codec->capabilities & CODEC_CAP_DR1)
+
+                if (codec && codec->capabilities & CODEC_CAP_TRUNCATED)
+                    enc->flags |= CODEC_FLAG_TRUNCATED;
+
+                if (codec && codec->capabilities & CODEC_CAP_DR1 && 
+                    enc->codec_id != CODEC_ID_SVQ3)
                 {
                     enc->flags |= CODEC_FLAG_EMU_EDGE;
                     enc->draw_horiz_band = NULL;
@@ -581,18 +580,24 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     if (mpa_pic.pict_type == FF_I_TYPE ||
                         mpa_pic.pict_type == FF_P_TYPE)
                     {
+                        long long newvpts = 0;
                         if (pkt.pts > 0)
                         {
                             validvpts = true;
-                            lastvpts = (long long int)(pkt.pts * 1.0 * 
+                            newvpts = (long long int)(pkt.pts * 1.0 * 
                                        ic->pts_num / (ic->pts_den / 1000));
                         }
                         else
                         {
                             // guess, based off of the audio timestamp and 
                             // the prebuffer size
-                            lastvpts = lastapts / 90 + (int)(1000.0 / fps) * 3;
+                            newvpts = lastapts / 90 + (int)(1000.0 / fps) * 3;
                         }
+
+                        if (newvpts <= lastvpts)
+                            lastvpts += (int)(1000.0 / fps);
+                        else
+                            lastvpts = newvpts;
                     }
                     else
                         lastvpts += (int)(1000.0 / fps);

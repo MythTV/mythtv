@@ -459,6 +459,7 @@
         <value lang="IT">Registrazioni programmate:</value>
         <value lang="ES">Grabaciones programadas</value>
         <value lang="CA">Gravacions programades</value>
+        <value lang="NL">Geplande Opnames</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
         <filename>cr-background.png</filename>
@@ -471,6 +472,7 @@
         <value lang="IT">Le registrazioni in conflitto sono evidenziate in</value>
         <value lang="ES">Las grabaciones en conflicto est√°n resaltadas en</value>
         <value lang="CA">Les gravacions en conflicte s√≥Ûn les de color</value>
+        <value lang="NL">Conflicterende opnames zijn gekleurd in</value>
       </textarea>
       <textarea name="conyellow" draworder="0">
         <area>452,330,800,40</area>
@@ -479,6 +481,7 @@
         <value lang="IT">giallo</value>
         <value lang="ES">amarillo</value>
         <value lang="CA">groc</value>
+        <value lang="NL">geel</value>
       </textarea>
       <textarea name="disingray" draworder="0">
         <area>20,357,800,40</area>
@@ -487,6 +490,7 @@
         <value lang="IT">Le registrazioni disattivate sono evidenziate in</value>
         <value lang="ES">Las grabaciones desactivadas se resaltan en</value>
         <value lang="CA">Les gravacions desactivades s√≥Ûn de color</value>
+        <value lang="NL">Gedesactiveerde opnames zijn gekleurd in</value>
       </textarea>
       <textarea name="disgray" draworder="0">
         <area>458,357,800,40</area>
@@ -495,6 +499,7 @@
         <value lang="IT">grigio</value>
         <value lang="ES">gris</value>
         <value lang="CA">gris</value>
+        <value lang="NL">grijs</value>
       </textarea>
     </container>
  
@@ -547,6 +552,7 @@
         <value lang="IT">Trasmissione del:</value>
         <value lang="ES">Fecha de emisi√≥Ûn:</value>
         <value lang="CA">Data d'emisi√≥Û:</value>
+        <value lang="NL">Uitzenddatum:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
         <area>180,70,430,30</area>
@@ -559,6 +565,7 @@
         <value lang="IT">Canale:</value>
         <value lang="ES">Canal:</value>
         <value lang="CA">Canal:</value>
+        <value lang="NL">Kanaal:</value>
       </textarea>
       <textarea name="channel" draworder="6">
         <area>180,100,400,30</area>
@@ -571,6 +578,7 @@
         <value lang="IT">Descrizione:</value>
         <value lang="ES">Descripci√≥Ûn:</value>
         <value lang="CA">Descripci√≥Û:</value>
+        <value lang="NL">Beschrijving:</value>
       </textarea>
       <textarea name="description" draworder="6">
         <area>180,130,600,120</area>
@@ -588,6 +596,7 @@
          <value lang="IT">Non hai programmato nessuna registrazione</value>
          <value lang="ES">No tiene programada ninguna grabaci√≥Ûn</value>
          <value lang="CA">No hi ha prevista cap gravaci√≥Û</value>
+         <value lang="NL">Er zijn geen geplande opnames</value>
          <multiline>yes</multiline> 
       </textarea>
     </container>
@@ -600,6 +609,7 @@
          <value lang="IT">Per programmare una registrazione,</value>
          <value lang="ES">Para programar una grabaci√≥Ûn salga y</value>
          <value lang="CA">Per programar una gravaci√≥Û surti i</value>
+         <value lang="NL">Om een opname te plannen, verlaat dit scherm en</value>
       </textarea>
       <textarea name="botline" align="center" draworder="8">
          <area>20,70,760,30</area>
@@ -608,6 +618,7 @@
          <value lang="IT">esci e seleziona "Guida Programmi" o "Ricerca Programmi"</value>
          <value lang="ES">"seleccione "Guia de Programas" o "Busqueda de programas"</value>
          <value lang="CA">vagi a "Guia de programes" Û "Cercar Programes"</value>
+         <value lang="NL">kies "Programmagids" of "Programma Zoeker"</value>
       </textarea>
     </container>
 
@@ -673,6 +684,7 @@
         <value lang="IT">Seleziona una registrazione da cancellare:</value>
         <value lang="ES">Seleccione una grabaci√≥Ûn a borrar:</value>
         <value lang="CA">Esculli una gravaci√≥Û a esborrar:</value>
+        <value lang="NL">Kies een opname om te verwijderen:</value>
         <context>1</context>
       </textarea>
       <textarea name="messageplay" draworder="0">
@@ -682,6 +694,7 @@
         <value lang="IT">Seleziona una registrazione da vedere:</value>
         <value lang="ES">Seleccione una grabaci√≥Ûn a ver:</value>
         <value lang="CA">Esculli la gravaci√≥Û que vol veure:</value>
+        <value lang="NL">Kies een opname om te bekijken:</value>
         <context>0</context>
       </textarea>
     </container>
@@ -750,6 +763,7 @@
         <value lang="IT">Trasmissione del:</value>
         <value lang="ES">Fecha de emisi√≥Ûn:</value>
         <value lang="CA">Data d'emisi√≥Û:</value>
+        <value lang="NL">Uitzenddatum:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
         <area>180,70,430,30</area>
@@ -762,6 +776,7 @@
         <value lang="IT">Canale:</value>
         <value lang="ES">Canal:</value>
         <value lang="CA">Canal:</value>
+        <value lang="NL">Kanaal:</value>
       </textarea>
       <textarea name="channel" draworder="6">
         <area>180,100,400,30</area>
@@ -774,6 +789,7 @@
         <value lang="IT">Descrizione:</value>
         <value lang="ES">Descripci√≥Ûn:</value>
         <value lang="CA">Descripci√≥Û:</value>
+        <value lang="NL">Beschrijving:</value>
       </textarea>
       <textarea name="description" draworder="6">
         <area>180,130,400,120</area>
@@ -800,6 +816,7 @@
         <value lang="IT">Trasmissione del:</value>
         <value lang="ES">Fecha de emisi√≥Ûn:</value>
         <value lang="CA">Data d'emisi√≥Û:</value>
+        <value lang="NL">Uitzenddatum:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
         <area>180,70,430,30</area>
@@ -812,6 +829,7 @@
         <value lang="IT">Canale:</value>
         <value lang="ES">Canal:</value>
         <value lang="CA">Canal:</value>
+        <value lang="NL">Kanaal:</value>
       </textarea>
       <textarea name="channel" draworder="6">
         <area>180,100,400,30</area>
@@ -824,6 +842,7 @@
         <value lang="IT">Descrizione:</value>
         <value lang="ES">Descripci√≥Ûn:</value>
         <value lang="CA">Descripci√≥Û:</value>
+        <value lang="NL">Beschrijving:</value>
       </textarea>
       <textarea name="description" draworder="6">
         <area>180,130,400,90</area>
@@ -863,6 +882,7 @@
          <value lang="IT">Spiacente, nessuna registrazione disponibile</value>
          <value lang="ES">Lo siento, no hay ninguna grabaci√≥Ûn disponible</value>
          <value lang="CA">Ho sento, no hi ha cap gravaci√≥Û disponible</value>
+         <value lang="NL">Sorry, geen opnames aanwezig</value>
       </textarea>
     </container>
 
@@ -874,6 +894,7 @@
          <value lang="IT">Per programmare una registrazione,</value>
          <value lang="ES">Para programar una grabaci√≥Ûn, salga y</value>
          <value lang="CA">Per a programar una gravaci√≥Û, surti i</value>
+         <value lang="NL">Om een opname te plannen, verlaat dit scherm en</value>
       </textarea>
       <textarea name="botline" align="center" draworder="8">
          <area>20,110,580,30</area>
@@ -882,6 +903,7 @@
          <value lang="IT">esci e seleziona 'Programma una registrazione'</value>
          <value lang="ES">seleccione 'Programar grabaciones'</value>
          <value lang="CA">esculli 'Programar gravacions'</value>
+         <value lang="NL">kies 'Opname plannen'</value>
       </textarea>
     </container>
 
@@ -951,6 +973,7 @@
         <value lang="IT">(4) Guida Programmi   **(6) Ricerca Programmi **</value>
         <value lang="ES">(4) Guia de Programas **(6) Busqueda de programas **</value>
         <value lang="CA">(4) Guia de programes **(6) Cerca Programes **</value>
+        <value lang="NL">(4) Programmagids     **(6) Programma Zoeker **</value>
         <context>1</context>
       </textarea>
     </container>
@@ -1030,6 +1053,7 @@
         <value>Select a letter...</value>
         <value lang="ES">Seleccione una letra...</value>
         <value lang="CA">Esculli una lletra...</value>
+        <value lang="NL">Kies een letter...</value>
       </textarea>
       <textarea name="pickinfo" draworder="6">
         <area>10,75,500,60</area>
@@ -1038,6 +1062,7 @@
         <value lang="IT">Seleziona la lettera iniziale del programma e premi OK oppure la freccia destra</value>
         <value lang="ES">Seleccione la letra inicial del programa y pulse OK o cursor derecha</value>
         <value lang="CA">Esculli la lletra inicial del programa i premi OK o fletxa dreta</value>
+        <value lang="NL">Kies de eerste letter van het programma, en druk OK of pijl naar rechts</value>
         <multiline>yes</multiline>
       </textarea>
     </container>
@@ -1051,6 +1076,7 @@
         <value lang="IT">Seleziona un programma...</value>
         <value lang="ES">Seleccione un programa...</value>
         <value lang="CA">Esculli un programa...</value>
+        <value lang="NL">Kies een programma...</value>
       </textarea>
       <textarea name="pickprog" draworder="6">
         <area>10,75,500,120</area>
@@ -1059,6 +1085,7 @@
         <value lang="IT">Seleziona il titolo del programma che vuoi trovare. Quando hai finito torna indietro con la freccia a sinistra. Premendo 'info' potrai impostare la registrazione.</value>
         <value lang="ES">Seleccione el nombre del programa que busca. Cuando lo encuentre vuelva con flecha izquierda. Pulsando 'info' podra determinar las opciones de grabacion.</value>
         <value lang="CA">Cerqui el nom del programa. Quan el trovi retorni amb fletxa esquerra. Prement 'info' podra determinar les opcions de gravacio.</value>
+        <value lang="NL">Kies de titel van het programma dat U zoekt. Druk op pijl naar links wanneer U klaar bent. Druk 'info' als U de opname-opties wilt wijzigen.</value>
         <multiline>yes</multiline>
       </textarea>
     </container>
@@ -1072,6 +1099,7 @@
         <value lang="IT">Nessun programma</value>
         <value lang="ES">Ning√∫˙n progrma</value>
         <value lang="CA">Cap programa</value>
+        <value lang="NL">Geen programma's</value>
       </textarea>
       <textarea name="research" draworder="6">
         <area>10,75,500,120</area>
@@ -1080,6 +1108,7 @@
         <value lang="IT">Non ci sono programmi disponibili con questa ricerca. Seleziona un'altra ricerca.</value>
         <value lang="ES">No encuentro programas con esta busqueda. Pruebe otra.</value>
         <value lang="CA">No trovo cap programa amb aquest criteri. Continui cercant.</value>
+        <value lang="NL">Er zijn geen programma's gevonden. Probeer een andere zoekopdracht.</value>
         <multiline>yes</multiline>
       </textarea>
     </container>

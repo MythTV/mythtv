@@ -805,6 +805,7 @@ public:
         addSelection("Italian", "IT");
         addSelection("Catalan", "CA");
         addSelection("Spanish", "ES");
+        addSelection("Dutch", "NL");
         setHelpText("Your preferred language.");
     };
 };
