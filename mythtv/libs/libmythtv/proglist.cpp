@@ -707,10 +707,12 @@ void ProgLister::fillViewList(const QString &view)
     }
     else if (type == plTitle)
     {
-        viewList << view;
-        viewTextList << view;
         if (view != "")
+        {
+            viewList << view;
+            viewTextList << view;
             curView = 0;
+        }
         else
             curView = -1;
     }
