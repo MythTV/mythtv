@@ -3,168 +3,168 @@
     <name>DatabaseBox</name>
     <message>
         <source>Select music to be played:</source>
-        <translation>Bitte Musik auswählen:</translation>
+        <translation>Vælg musikken, der skal spilles:</translation>
     </message>
     <message>
         <source>Active Play Queue</source>
-        <translation>Aktuelle Spielliste</translation>
+        <translation>Aktiv spillekø</translation>
     </message>
     <message>
         <source>All My Playlists</source>
-        <translation>Alle meine Spiellisten</translation>
+        <translation>Alle mine musiklister</translation>
     </message>
     <message>
         <source>All My Music</source>
-        <translation>Meine Musik</translation>
+        <translation>Al min musik</translation>
     </message>
     <message>
         <source>Move to Active Play Queue</source>
-        <translation>In aktuelle Spielliste verschieben</translation>
+        <translation>Flyt til den aktive spillekø</translation>
     </message>
     <message>
         <source>Delete This Playlist</source>
-        <translation>Diese Spielliste löschen</translation>
+        <translation>Slet denne musikliste</translation>
     </message>
     <message>
         <source>Rename This Playlist</source>
-        <translation>Diese Spielliste umbenennen</translation>
+        <translation>Omdøb denne musikliste</translation>
     </message>
     <message>
         <source>Copy To New Playlist</source>
-        <translation>In neue Abspielliste kopieren</translation>
+        <translation>Kopiér til ny musikliste</translation>
     </message>
     <message>
         <source>Clear the Active Play Queue</source>
-        <translation>Lösche die aktuelle Warteliste</translation>
+        <translation>Ryd den aktive spillekø</translation>
     </message>
     <message>
         <source>Save Back to Playlist Tree</source>
-        <translation>Im Spiellisten-Baum speichern</translation>
+        <translation>Gem tilbage til musikliste træet</translation>
     </message>
 </context>
 <context>
     <name>PlaybackBox</name>
     <message>
         <source>Edit Playlist</source>
-        <translation>Spielliste ändern</translation>
+        <translation>Redigér musikliste</translation>
     </message>
     <message>
         <source>Visualize</source>
-        <translation>Musik sehen</translation>
+        <translation>Visualisér</translation>
     </message>
     <message>
         <source>3 Edit Playlist</source>
-        <translation>3 Liste ändern</translation>
+        <translation>3 Redigér musikliste</translation>
     </message>
     <message>
         <source>4 Visualize</source>
-        <translation>4 Musik sehen</translation>
+        <translation>4 Visualisér</translation>
     </message>
     <message>
         <source>1 Shuffle: Smart</source>
-        <translation>1 Mix: Smart</translation>
+        <translation>1 Bland: Smart</translation>
     </message>
     <message>
         <source>Shuffle: Smart</source>
-        <translation>Mix: Smart</translation>
+        <translation>Bland: Smart</translation>
     </message>
     <message>
         <source>1 Shuffle: Rand</source>
-        <translation>1 Mix: Zufall</translation>
+        <translation>1 Bland: Tilfældigt</translation>
     </message>
     <message>
         <source>Shuffle: Rand</source>
-        <translation>Mix: Zufall</translation>
+        <translation>Bland: Tilfældigt</translation>
     </message>
     <message>
         <source>1 Shuffle: None</source>
-        <translation>1 Mix: Nein</translation>
+        <translation>1 Bland: Ingen</translation>
     </message>
     <message>
         <source>Shuffle: None</source>
-        <translation>Mix: Nein</translation>
+        <translation>Bland: Ingen</translation>
     </message>
     <message>
         <source>2 Repeat: All</source>
-        <translation>2 Wdh: Alle</translation>
+        <translation>2 Gentag: Alle</translation>
     </message>
     <message>
         <source>Repeat: All</source>
-        <translation>Wdh: Alle</translation>
+        <translation>Gentag: Alle</translation>
     </message>
     <message>
         <source>2 Repeat: Track</source>
-        <translation>2 Wdh: Lied</translation>
+        <translation>2 Gentag: Spor</translation>
     </message>
     <message>
         <source>Repeat: Track</source>
-        <translation>Wdh: Lied</translation>
+        <translation>Gentag: Spor</translation>
     </message>
     <message>
         <source>2 Repeat: None</source>
-        <translation>2 Wdh: Nein</translation>
+        <translation>2 Gentag: Ingen</translation>
     </message>
     <message>
         <source>Repeat: None</source>
-        <translation>Wdh: Nein</translation>
+        <translation>Gentag: Ingen</translation>
     </message>
     <message>
         <source>Playing stream.</source>
-        <translation>Spiele Stream.</translation>
+        <translation>Afspiller stykket.</translation>
     </message>
     <message>
         <source>Buffering stream.</source>
-        <translation>Puffere Stream.</translation>
+        <translation>Forlagrer stykket.</translation>
     </message>
     <message>
         <source>Stream paused.</source>
-        <translation>Stream angehalten.</translation>
+        <translation>Stykket er pauset.</translation>
     </message>
     <message>
         <source>Output error.</source>
-        <translation>Ausgabefehler.</translation>
+        <translation>Output fejl.</translation>
     </message>
     <message>
         <source>Stream stopped.</source>
-        <translation>Stream gestoppt.</translation>
+        <translation>Stykket er stoppet.</translation>
     </message>
     <message>
         <source>Finished playing stream.</source>
-        <translation>Stream beendet.</translation>
+        <translation>Færdig med stykket.</translation>
     </message>
     <message>
         <source>Decoder error.</source>
-        <translation>Dekodierfehler.</translation>
+        <translation>Dekoder fejl.</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Searching for music files</source>
-        <translation>Suche nach Musikdateien</translation>
+        <translation>Søger efter musik filer</translation>
     </message>
     <message>
         <source>Updating music database</source>
-        <translation>Aktualisiere Musikdatenbank</translation>
+        <translation>Opdaterer musik databasen</translation>
     </message>
 </context>
 <context>
     <name>Ripper</name>
     <message>
         <source>Please select a quality level and check the album information below:</source>
-        <translation>Bitte wählen Sie eine Qualitätsstufe und prüfen Sie die Albumdaten:</translation>
+        <translation>Vælgt venligst et kvalitets niveau og tjek album informationen nedenfor:</translation>
     </message>
     <message>
         <source>Low</source>
-        <translation>Niedrig</translation>
+        <translation>Lav</translation>
     </message>
     <message>
         <source>Medium</source>
-        <translation>Mittel</translation>
+        <translation>Mellem</translation>
     </message>
     <message>
         <source>High</source>
-        <translation>Hoch</translation>
+        <translation>Høj</translation>
     </message>
     <message>
         <source>Perfect</source>
@@ -172,25 +172,27 @@
     </message>
     <message>
         <source>Artist: </source>
-        <translation>Interpret:</translation>
+        <translation>Kunstner: </translation>
     </message>
     <message>
         <source>Album: </source>
-        <translation>Album:</translation>
+        <translation>Album: </translation>
     </message>
     <message>
         <source>Import this CD</source>
-        <translation>CD importieren</translation>
+        <translation>Importér denne CD</translation>
     </message>
     <message>
         <source>Importing CD:
 </source>
-        <translation>Importiere CD:</translation>
+        <translation>Importerer CD:
+</translation>
     </message>
     <message>
         <source>Copying from CD:
 </source>
-        <translation>Kopiere von CD:</translation>
+        <translation>Kopierer fra CD:
+</translation>
     </message>
 </context>
 </TS>

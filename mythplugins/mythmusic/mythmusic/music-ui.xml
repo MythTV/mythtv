@@ -171,6 +171,8 @@
                 <font>currenttitle</font>
                 <area>190,140,380,40</area>
                 <value>Please Wait...</value>
+                <value lang="DK">Vent venligst...</value>
+                <value lang="DK">Vent venligst...</value>
             </textarea>
 
             <!--
