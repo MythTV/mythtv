@@ -337,6 +337,8 @@ protected:
             RecordingProfileParam(parent, "name") {
 
             setLabel("Profile name");
+            addSelection("Default");
+            addSelection("Live TV");
             addSelection("Custom");
             addSelection("Movies");
         };
