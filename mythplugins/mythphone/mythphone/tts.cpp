@@ -36,7 +36,7 @@ tts::tts()
 {
 #ifdef FESTIVAL_SUPPORT
     if (!ttsInitialised)
-        festival_initialize(true, 210000);
+        festival_initialize(true, 300000);
     ttsInitialised = true;
 #endif
 }
