@@ -42,6 +42,7 @@ TVRec::TVRec(int capturecardnum)
     readthreadlive = false;
     m_capturecardnum = capturecardnum;
     ispip = false;
+    curRecording = NULL;
 
     deinterlace_mode = 0;
 
@@ -152,6 +153,9 @@ void TVRec::StopRecording(void)
         nextState = RemoveRecording(internalState);
         changeState = true;
         prematurelystopped = true;
+
+        while (changeState)
+            usleep(50);
     }
 }
 

@@ -23,10 +23,9 @@ ThemedMenu::ThemedMenu(const char *cdir, const char *menufile,
                        QWidget *parent, const char *name)
           : MythDialog(parent, name)
 {
-    setPalette(QPalette(QColor(250, 250, 250)));
+    ignorekeys = false;
 
     QString dir = QString(cdir) + "/";
-
     QString filename = dir + "theme.xml";
 
     foundtheme = true;
@@ -1314,8 +1313,13 @@ void ThemedMenu::ReloadTheme(void)
 
 void ThemedMenu::keyPressEvent(QKeyEvent *e)
 {
+    if (ignorekeys)
+        return;
+
     bool handled = false;
     ThemedButton *lastbutton = activebutton;
+
+    ignorekeys = true;
 
     switch (e->key())
     {
@@ -1408,6 +1412,8 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
     }
     else
         QDialog::keyPressEvent(e);
+
+    ignorekeys = false;
 } 
 
 QString ThemedMenu::findMenuFile(QString menuname)

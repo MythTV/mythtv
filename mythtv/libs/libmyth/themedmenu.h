@@ -168,6 +168,8 @@ class ThemedMenu : public MythDialog
     bool drawTitle;
 
     QPixmap backgroundPixmap;
+
+    bool ignorekeys;
 };
 
 #endif
