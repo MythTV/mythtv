@@ -169,28 +169,33 @@ void CommercialFlagger::DoFlagCommercialsThread(void)
     NuppelVideoPlayer *nvp = new NuppelVideoPlayer(commthread_db, program_info);
     nvp->SetRingBuffer(tmprbuf);
 
-    QString msg = QString( "Started Commercial Flagging for '%1' recorded from "
+    QString msg = QString( "Started Commercial Flagging for \"%1\" recorded from "
                            "channel %2 at %3" )
                            .arg(program_info->title.local8Bit())
                            .arg(program_info->chanid)
                            .arg(program_info->startts.toString());
     VERBOSE( VB_GENERAL, msg );
+    gContext->LogEntry("commflag", LP_NOTICE, "Commercial Flagging Started", msg);
 
     int breaksFound = nvp->FlagCommercials(false, dontSleep, &abortFlagging);
 
     if ( *(flaggingSems[key]) )
-        msg = QString( "ABORTED Commercial Flagging for '%1' recorded from "
+    {
+        msg = QString( "ABORTED Commercial Flagging for \"%1\" recorded from "
                        "channel %2 at %3" )
                        .arg(program_info->title.local8Bit())
                        .arg(program_info->chanid)
                        .arg(program_info->startts.toString());
-    else
-        msg = QString( "Finished Commercial Flagging for '%1' recorded from "
+        gContext->LogEntry("commflag", LP_WARNING, "Commercial Flagging Aborted", msg);
+    } else {
+        msg = QString( "Finished Commercial Flagging for \"%1\" recorded from "
                        "channel %2 at %3.  Found %4 commercial break(s)." )
                        .arg(program_info->title.local8Bit())
                        .arg(program_info->chanid)
                        .arg(program_info->startts.toString())
                        .arg(breaksFound);
+        gContext->LogEntry("commflag", LP_NOTICE, "Commercial Flagging Finished", msg);
+    }
     VERBOSE( VB_GENERAL, msg );
 
     flaggingSems.erase(key);

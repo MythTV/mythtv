@@ -83,6 +83,7 @@ void AutoExpire::RunExpirer(void)
                                       .arg(pginfo->startts.toString())
                                       .arg((int)(pginfo->filesize/1024/1024));
                 VERBOSE(VB_GENERAL, msg);
+                gContext->LogEntry("autoexpire", LP_NOTICE, "Expired Program", msg);
 
                 QString message =
                            QString("AUTO_EXPIRE %1 %2")
@@ -179,6 +180,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                                           .arg(maxIter.key())
                                           .arg(query.value(1).toString());
                     VERBOSE(VB_GENERAL, msg);
+                    gContext->LogEntry("autoexpire", LP_NOTICE, "Expired program", msg);
 
                     QString message = QString("AUTO_EXPIRE %1 %2")
                                               .arg(query.value(0).toString())

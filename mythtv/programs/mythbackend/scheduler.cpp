@@ -829,10 +829,14 @@ void Scheduler::RunScheduler(void)
             FillRecordLists();
             gettimeofday(&fillend, NULL);
             PrintList();
-            VERBOSE(VB_GENERAL, QString("Scheduled %1 items in %2 seconds.")
+            QString msg;
+            msg = QString("Scheduled %1 items in %2 seconds.")
                     .arg(reclist.size())
                     .arg(((fillend.tv_sec  - fillstart.tv_sec ) * 1000000 +
-                         (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0));
+                         (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0);
+
+            VERBOSE(VB_GENERAL, msg);
+            gContext->LogEntry("scheduler", LP_INFO, "Scheduled items", msg);
 
             lastupdate = curtime;
             startIter = reclist.begin();
@@ -1015,6 +1019,7 @@ void Scheduler::RunScheduler(void)
                 .arg(nextRecording->cardid)
                 .arg(nextRecording->sourceid);
             VERBOSE(VB_GENERAL, msg);
+            gContext->LogEntry("scheduler", LP_NOTICE, "Schedule Change", msg);
         }
 
         if (statuschanged)

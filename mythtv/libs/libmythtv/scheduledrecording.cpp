@@ -398,6 +398,15 @@ void ScheduledRecording::doneRecording(QSqlDatabase* db,
     if (getRecordingType() == kFindOneRecord)
         remove(db);
 
+    QString msg;
+  
+    msg = QString("Finished recording %1 on channel: %2")
+                  .arg(proginfo.title.utf8())
+                  .arg(proginfo.chanid);
+
+    VERBOSE(VB_GENERAL, msg);
+    gContext->LogEntry("scheduler", LP_NOTICE, "Finished recording", msg);
+
     addHistory(db, proginfo);
 }
 
