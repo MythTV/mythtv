@@ -1,8 +1,17 @@
 #ifndef __LINUX_VIDEODEV_H
 #define __LINUX_VIDEODEV_H
 
+#ifdef __FreeBSD__
+#include <sys/types.h>
+typedef unsigned long __u32;
+typedef unsigned short __u16;
+typedef int  __s32;
+typedef unsigned char __u8;
+typedef unsigned long long __u64;
+#else
 #include <linux/types.h>
 #include <linux/version.h>
+#endif /* __FreeBSD__ */
 
 #if 1
 /*
