@@ -23,6 +23,7 @@
 #endif
 
 #include <iostream>
+#include <cerrno>
 using namespace std;
 
 #include "statusbox.h"
