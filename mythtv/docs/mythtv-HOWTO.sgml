@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-08-03, v2.56
+<date>2003-08-18, v2.57
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1028,8 +1028,8 @@ $ su
 <sect1>Manually building MythTV.
 <p>Unpack MythTV
 <tscreen><verb>
-$ tar -xjf mythtv-0.10.tar.bz2
-$ cd mythtv-0.10
+$ tar -xjf mythtv-0.11.tar.bz2
+$ cd mythtv-0.11
 $ ./configure
 $ make
 </verb></tscreen>
@@ -1151,10 +1151,10 @@ you'll need to run the appropriate <bf>mysql</bf> script found in
 the <tt>database/</tt> directory.  Use the same format as above, replacing
 "mc.sql" with the appropriate .sql file:
 
-So, if you're upgrading from MythTV 0.9 to 0.10 on a Mandrake system:
+So, if you're upgrading from MythTV 0.10 to 0.11 on a Mandrake system:
 <tscreen><verb>
 $ cd database
-$ mysql -u root < 0.9-to-0.10.sql
+$ mysql -u root < 0.10-to-0.11.sql
 </verb></tscreen>
 
 <sect2>Modifying access to the MySQL database for multiple systems <label
@@ -1696,7 +1696,7 @@ receiver.
 The next step is to convert those signals into something that can be used
 to control MythTV.
 <tscreen><verb>
-$ cd ~/mythtv-0.10/configfiles
+$ cd ~/mythtv-0.11/configfiles
 $ cp lircrc.example ~/.lircrc
 </verb></tscreen> 
 or
@@ -2215,7 +2215,7 @@ $ crontab -l  NOTE: this is a lowercase L.
 # Need to use a shell script because the QTDIR environment variable isn't
 # being honored by crontab?
 # The next text should be all on the same line.
-30 04 * * * /bin/bash $HOME/mythtv-0.10/configfiles/mythfilldatabasecron
+30 04 * * * /bin/bash $HOME/mythtv-0.11/configfiles/mythfilldatabasecron
 $ 
 </verb></tscreen>
 
@@ -2407,8 +2407,8 @@ Mandrake Control Center.
 <sect1>Completing the installation.
 <p>
 <tscreen><verb>
-$ tar -xjf mythweb-0.10.tar.bz2
-$ cd mythweb-0.10
+$ tar -xjf mythweb-0.11.tar.bz2
+$ cd mythweb-0.11
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -2430,8 +2430,8 @@ operational.
 name="http://www.mythtv.org/"> and save it to a location where you can find
 it.
 <tscreen><verb>
-$ tar -xjf mythgallery-0.10.tar.bz2
-$ cd mythgallery-0.10
+$ tar -xjf mythgallery-0.11.tar.bz2
+$ cd mythgallery-0.11
 $ make
 # su
 # make install
@@ -2817,8 +2817,8 @@ will be rebuilt as you use CDs.
 
 <sect>MythWeather.
 <p>The MythWeather module will obtain the weather information for the
-location that you specify.  You must be running MythTV v0.10 in order to use
-MythWeather.
+location that you specify.  You must be running MythTV v0.10 or later 
+in order to use MythWeather.
 
 <code>
 NOTE for Red Hat Linux 8.0 users: Red Hat 8 users must make the following
@@ -3498,10 +3498,10 @@ this happens, edit your X configuration file to match the display size then
 restart X.
 
 <sect2>MythTV Dimensions
-<p>In 0.10, from "mythfrontend" go to Setup->Appearance.  The default for the
-height and width on 0.10 is "0" - this will cause MythTV to automatically
-size itself to full screen. To ensure that your new dimension settings take
-effect, exit and restart MythTV.
+<p>In 0.10 and later, from "mythfrontend" go to Setup->Appearance.
+The default for the height and width is "0" - this will cause
+MythTV to automatically size itself to full screen. To ensure that
+your new dimension settings take effect, exit and restart MythTV.
 
 <bf>NOTE</bf>: When the GUI is full screen, you may need to set your window
 manager to 'Click to Focus' for windows to stack properly.
