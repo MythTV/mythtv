@@ -540,6 +540,7 @@ int av_find_stream_info(AVFormatContext *ic)
         /* open new codecs */
         for(i=0;i<ic->nb_streams;i++) {
             st = ic->streams[i];
+            st->codec.hurry_up = 1;
             if (st->codec_info_state == CSTATE_NOTFOUND) {
                 /* set to found in case of error */
                 st->codec_info_state = CSTATE_FOUND; 
@@ -627,6 +628,7 @@ int av_find_stream_info(AVFormatContext *ic)
     /* close each codec if there are opened */
     for(i=0;i<ic->nb_streams;i++) {
         st = ic->streams[i];
+        st->codec.hurry_up = 0;
         if (st->codec_info_state == CSTATE_DECODING)
             avcodec_close(&st->codec);
     }

@@ -4,11 +4,22 @@
 #include <qstring.h>
 #include <qrect.h>
 #include <qmap.h>
+#include <qvaluelist.h>
 #include <vector>
 using namespace std;
 
 class TTFFont;
 class OSDType;
+class OSDSurface;
+
+static inline unsigned char blendColorsAlpha(int src, int dest, int alpha)
+{
+    int tmp1, tmp2;
+
+    tmp1 = (src - dest) * alpha;
+    tmp2 = dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+    return tmp2 & 0xff;
+}
 
 class OSDSet
 {
@@ -28,7 +39,7 @@ class OSDSet
     bool GetAllowFade() { return m_allowfade; }
 
     void AddType(OSDType *type);
-    void Draw(unsigned char *yuvptr);
+    void Draw(OSDSurface *surface, bool actuallydraw);
 
     void SetPriority(int priority) { m_priority = priority; }
     int GetPriority() const { return m_priority; }
@@ -39,6 +50,7 @@ class OSDSet
 
     bool Displaying() { return m_displaying; }
     bool HasDisplayed() { return m_hasdisplayed; }
+    bool Fading() { return m_fadetime > 0; }
 
     void Display(bool onoff = true);
     void DisplayFor(int time);
@@ -56,6 +68,9 @@ class OSDSet
     void Reinit(int screenwidth, int screenheight, int xoff, int yoff, 
                 int displaywidth, int displayheight, float wmult, float hmult,
                 int frint);
+
+    void SetWantsUpdates(bool updates) { m_wantsupdates = updates; }
+    bool NeedsUpdate(void) { return m_needsupdate; }
 
   private:
     int m_screenwidth;
@@ -87,6 +102,10 @@ class OSDSet
 
     QMap<QString, OSDType *> typeList;
     vector<OSDType *> *allTypes;
+
+    bool m_wantsupdates;
+    bool m_needsupdate;
+    int m_lastupdate;
 };
 
 class OSDType
@@ -99,8 +118,7 @@ class OSDType
 
     QString Name() { return m_name; }
 
-    virtual void Draw(unsigned char *screenptr, int vid_width, 
-                      int vid_height, int fade, int maxfade, int xoff,
+    virtual void Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
                       int yoff) = 0;
 
   protected:
@@ -138,12 +156,10 @@ class OSDTypeText : public OSDType
 
     QRect DisplayArea() { return m_displaysize; }
 
-    void Draw(unsigned char *screenptr, int vid_width, int vid_height,
-              int fade, int maxfade, int xoff, int yoff);
+    void Draw(OSDSurface *surface, int fade, int maxfade, int xoff, int yoff);
 
   private:
-    void DrawString(unsigned char *screenptr, int vid_width, int vid_height,
-                    QRect rect, const QString &text,
+    void DrawString(OSDSurface *surface, QRect rect, const QString &text,
                     int fade, int maxfade, int xoff, int yoff);
 
     QRect m_displaysize;
@@ -183,8 +199,8 @@ class OSDTypeImage : public OSDType
 
     QRect ImageSize() { return m_imagesize; }
 
-    virtual void Draw(unsigned char *screenptr, int vid_width, int vid_height, 
-                      int fade, int maxfade, int xoff, int yoff);
+    virtual void Draw(OSDSurface *surface, int fade, int maxfade, int xoff, 
+                      int yoff);
 
   protected:
     QRect m_imagesize;
@@ -203,6 +219,9 @@ class OSDTypeImage : public OSDType
 
     int m_scalew, m_scaleh;
     float m_wmult, m_hmult;
+
+    int m_drawwidth;
+    bool m_onlyusefirst;
 };
 
 class OSDTypePosSlider : public OSDTypeImage
@@ -243,14 +262,12 @@ class OSDTypeFillSlider : public OSDTypeImage
     void SetPosition(int pos);
     int GetPosition() { return m_curval; }
 
-    void Draw(unsigned char *screenptr, int vid_width, int vid_height,
-              int fade, int maxfade, int xoff, int yoff);
+    void Draw(OSDSurface *surface, int fade, int maxfade, int xoff, int yoff);
 
   private:
     QRect m_displayrect;
     int m_maxval;
     int m_curval;
-    int m_drawwidth;
 };
 
 class OSDTypeEditSlider : public OSDTypeImage
@@ -270,8 +287,7 @@ class OSDTypeEditSlider : public OSDTypeImage
     void ClearAll(void);
     void SetRange(int start, int end);
 
-    void Draw(unsigned char *screenptr, int vid_width, int vid_height,
-              int fade, int maxfade, int xoff, int yoff);
+    void Draw(OSDSurface *surface, int fade, int maxfade, int xoff, int yoff);
 
   private:
     QRect m_displayrect;
@@ -304,8 +320,7 @@ class OSDTypeBox : public OSDType
     void Reinit(float wchange, float hchange);
     void SetRect(QRect newrect) { size = newrect; }
 
-    void Draw(unsigned char *screenptr, int vid_width, int vid_height, 
-              int fade, int maxfade, int xoff, int yoff);
+    void Draw(OSDSurface *surface, int fade, int maxfade, int xoff, int yoff);
 
   private:
     QRect size;
@@ -345,8 +360,7 @@ class OSDTypePositionRectangle : public OSDType,
 
     void Reinit(float wchange, float hchange);
 
-    void Draw(unsigned char *screenptr, int vid_width, int vid_height,
-              int fade, int maxfade, int xoff, int yoff);
+    void Draw(OSDSurface *surface, int fade, int maxfade, int xoff, int yoff);
 
   private:
     vector<QRect> positions; 
@@ -364,8 +378,7 @@ class OSDTypePositionImage : public virtual OSDTypeImage,
 
     void AddPosition(QPoint pos);
 
-    void Draw(unsigned char *screenptr, int vid_width, int vid_height,
-              int fade, int maxfade, int xoff, int yoff);
+    void Draw(OSDSurface *surface, int fade, int maxfade, int xoff, int yoff);
 
   private:
     vector<QPoint> positions;
@@ -394,8 +407,7 @@ class OSDTypeCC : public OSDType
                    bool teletextmode = false);
     void ClearAllCCText();
 
-    void Draw(unsigned char *screenptr, int vid_width, int vid_height,
-              int fade, int maxfade, int xoff, int yoff);
+    void Draw(OSDSurface *surface, int fade, int maxfade, int xoff, int yoff);
 
   private:
     TTFFont *m_font;

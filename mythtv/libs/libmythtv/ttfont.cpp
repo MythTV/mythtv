@@ -28,6 +28,8 @@ using namespace std;
 #include <string.h>
 #include "ttfont.h"
 
+#include "osdtypes.h"
+#include "osd.h"
 
 static int          have_library = 0;
 static FT_Library   the_library;
@@ -291,31 +293,38 @@ void TTFFont::render_text(Raster_Map *rmap, Raster_Map *rchr, char *text,
     }
 }
 
-void TTFFont::merge_text(unsigned char *yuv, Raster_Map * rmap, int offset_x, 
+void TTFFont::merge_text(OSDSurface *surface, Raster_Map * rmap, int offset_x, 
                          int offset_y, int xstart, int ystart, int width, 
-                         int height, int video_width, int video_height, 
-                         int color, int alphamod)
+                         int height, int color, int alphamod)
 {
     int                 x, y;
     unsigned char      *ptr, *src;
-    unsigned char       a;
+    unsigned char       a, *destalpha;
 
-    unsigned char *uptr, *usrc;
-    unsigned char *vptr, *vsrc;
+    unsigned char *usrc, *vsrc;
  
-    int ucol, vcol;
-
-    uptr = yuv + video_height * video_width;
-    vptr = uptr + (video_height * video_width) / 4;   
     int offset; 
 
-    if (height + ystart > video_height)
-        height = video_height - ystart - 1;
-    if (width + xstart > video_width)
-        width = video_width - xstart - 1;
+    if (height + ystart > surface->height)
+        height = surface->height - ystart - 1;
+    if (width + xstart > surface->width)
+        width = surface->width - xstart - 1;
 
-    int tmp1, tmp2;
- 
+    bool transdest = false; 
+    int newalpha = 0;
+
+    int realstarty = ystart;
+    int realstartx = xstart;    
+
+    if (realstarty < 0)
+        realstarty = 0;
+    if (realstartx < 0)
+        realstartx = 0;
+
+    QRect drawRect(realstartx, realstarty, width, height);
+
+    surface->AddRect(drawRect);
+
     for (y = 0; y < height; y++)
     {
         if (y + ystart < 0)
@@ -332,42 +341,51 @@ void TTFFont::merge_text(unsigned char *yuv, Raster_Map * rmap, int offset_x,
 	    if ((a = *ptr) > 0)
 	    {
                 a = ((a * alphamod) + 0x80) >> 8;
-		src = yuv + (y + ystart) * video_width + (x + xstart);
-		if (color > 0)
+                offset = (y + ystart) * surface->width + (x + xstart);
+
+                destalpha = surface->alpha + offset;
+		src = surface->y + offset;
+
+                newalpha = a;
+
+                if (*destalpha != 0)
                 {
-                    tmp1 = (color - *src) * a;
-                    tmp2 = *src + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-                    *src = tmp2 & 0xff;
-                    if (a >= 230)
-                    {
-                        offset = ((y + ystart + 1) / 2) * (video_width / 2) + 
-                                 (x + xstart + 1) / 2;
-                        usrc = uptr + offset; 
-                        vsrc = vptr + offset; 
-                        ucol = 128;
-                        vcol = 128;
-
-                        tmp1 = (ucol - *usrc) * a;
-                        tmp2 = *usrc + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-                        *usrc = tmp2 & 0xff;
-
-                        tmp1 = (vcol - *vsrc) * a;
-                        tmp2 = *vsrc + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-                        *vsrc = tmp2 & 0xff;
-                    }
+                    transdest = false;
+                    newalpha = surface->pow_lut[a][*destalpha];
+                    *src = blendColorsAlpha(color, *src, newalpha);
+                    *destalpha = *destalpha + ((a * (255 - *destalpha)) / 255);
                 }
                 else
                 {
-                    tmp1 = (color - *src) * a;
-                    tmp2 = *src + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-                    *src = tmp2 & 0xff;
+                    transdest = true;
+                    *src = color;
+                    *destalpha = a;
+                }
+
+		if (color > 0 & a >= 230)
+                {
+                    offset = ((y + ystart + 1) / 2) * (surface->width / 2) +
+                              (x + xstart + 1) / 2;
+                    usrc = surface->u + offset; 
+                    vsrc = surface->v + offset; 
+
+                    if (!transdest)
+                    {
+                        *usrc = blendColorsAlpha(128, *usrc, newalpha);
+                        *vsrc = blendColorsAlpha(128, *vsrc, newalpha);
+                    }
+                    else
+                    {
+                        *usrc = 128; 
+                        *vsrc = 128;
+                    }
                 }
 	    }
         }
     }
 }
 
-void TTFFont::DrawString(unsigned char *yuvptr, int x, int y, 
+void TTFFont::DrawString(OSDSurface *surface, int x, int y, 
                          const QString &text, int maxx, int maxy, 
                          int alphamod)
 {
@@ -377,9 +395,6 @@ void TTFFont::DrawString(unsigned char *yuvptr, int x, int y,
 
    if (text.length() < 1)
         return;
-
-   int video_width = vid_width;
-   int video_height = vid_height;
 
    char *ctext = (char *)text.latin1(); 
 
@@ -447,14 +462,14 @@ void TTFFont::DrawString(unsigned char *yuvptr, int x, int y,
        if (m_color == 0)
            outlinecolor = 255;
 
-       merge_text(yuvptr, rmap, clipx, clipy, x - 1, y - 1, width, height,
-                  video_width, video_height, outlinecolor, alphamod);
-       merge_text(yuvptr, rmap, clipx, clipy, x + 1, y - 1, width, height,
-                  video_width, video_height, outlinecolor, alphamod);
-       merge_text(yuvptr, rmap, clipx, clipy, x - 1, y + 1, width, height,
-                  video_width, video_height, outlinecolor, alphamod);
-       merge_text(yuvptr, rmap, clipx, clipy, x + 1, y + 1, width, height,
-                  video_width, video_height, outlinecolor, alphamod);
+       merge_text(surface, rmap, clipx, clipy, x - 1, y - 1, width, height,
+                  outlinecolor, alphamod);
+       merge_text(surface, rmap, clipx, clipy, x + 1, y - 1, width, height,
+                  outlinecolor, alphamod);
+       merge_text(surface, rmap, clipx, clipy, x - 1, y + 1, width, height,
+                  outlinecolor, alphamod);
+       merge_text(surface, rmap, clipx, clipy, x + 1, y + 1, width, height,
+                  outlinecolor, alphamod);
    }
 
    if (m_shadowxoff > 0 || m_shadowyoff > 0)
@@ -463,13 +478,12 @@ void TTFFont::DrawString(unsigned char *yuvptr, int x, int y,
        if (m_color == 0)
            shadowcolor = 255;
     
-       merge_text(yuvptr, rmap, clipx, clipy, x + m_shadowxoff,
-                  y + m_shadowyoff, width, height, video_width, video_height,
-                  shadowcolor, alphamod);
+       merge_text(surface, rmap, clipx, clipy, x + m_shadowxoff,
+                  y + m_shadowyoff, width, height, shadowcolor, alphamod);
    }
 
-   merge_text(yuvptr, rmap, clipx, clipy, x, y, width, height, 
-              video_width, video_height, m_color, alphamod);
+   merge_text(surface, rmap, clipx, clipy, x, y, width, height, m_color, 
+              alphamod);
 
    destroy_font_raster(rmap);
    destroy_font_raster(rtmp);

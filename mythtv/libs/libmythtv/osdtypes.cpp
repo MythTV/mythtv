@@ -10,11 +10,17 @@ using namespace std;
 #include "osdtypes.h"
 #include "ttfont.h"
 
+#include "osd.h"
+
 #include "mythcontext.h"
 
 OSDSet::OSDSet(const QString &name, bool cache, int screenwidth, 
                int screenheight, float wmult, float hmult, int frint)
 {
+    m_wantsupdates = false;
+    m_lastupdate = 0;
+    m_needsupdate = false;
+
     m_name = name;
     m_cache = cache;
 
@@ -288,14 +294,19 @@ void OSDSet::Hide(void)
     m_notimeout = false;
 }
 
-void OSDSet::Draw(unsigned char *yuvptr)
+void OSDSet::Draw(OSDSurface *surface, bool actuallydraw)
 {
-    vector<OSDType *>::iterator i = allTypes->begin();
-    for (; i != allTypes->end(); i++)
+    if (actuallydraw)
     {
-        OSDType *type = (*i);
-        type->Draw(yuvptr, m_screenwidth, m_screenheight, m_fadetime, 
-                   m_maxfade, m_xoff, m_yoff);
+        vector<OSDType *>::iterator i = allTypes->begin();
+        for (; i != allTypes->end(); i++)
+        {
+            OSDType *type = (*i);
+            type->Draw(surface, m_fadetime, m_maxfade, m_xoff, m_yoff);
+
+            if (m_wantsupdates)
+                m_lastupdate = (m_timeleft + 999999) / 1000000;
+        }
     }
 
     m_hasdisplayed = true;
@@ -327,6 +338,11 @@ void OSDSet::Draw(unsigned char *yuvptr)
 
     if (m_timeleft <= 0 && m_fadetime <= 0)
         m_displaying = false;
+    else if (m_wantsupdates && 
+             ((m_timeleft + 999999) / 1000000 != m_lastupdate))
+        m_needsupdate = true;
+    else
+        m_needsupdate = false; 
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
@@ -403,12 +419,16 @@ void OSDTypeText::Reinit(float wchange, float hchange)
     m_displaysize = QRect(x, y, width, height);
 }
 
-void OSDTypeText::Draw(unsigned char *screenptr, int vid_width, int vid_height,
-                       int fade, int maxfade, int xoff, int yoff)
+void OSDTypeText::Draw(OSDSurface *surface, int fade, int maxfade, int xoff, 
+                       int yoff)
 {
     int textlength = 0;
+
     if (m_message == QString::null)
         return;
+
+    if (m_message.contains("%d"))
+        m_parent->SetWantsUpdates(true);
 
     m_font->CalcWidth(m_message, &textlength);
 
@@ -420,82 +440,75 @@ void OSDTypeText::Draw(unsigned char *screenptr, int vid_width, int vid_height,
         tmp_msg.replace(QRegExp("%BR%"), "\n");
         tmp_msg.replace(QRegExp("\n")," \n ");
 
-        char *orig = strdup((char *)tmp_msg.ascii());
+        QStringList wordlist = QStringList::split(" ", tmp_msg.ascii());
         int length = 0;
         int lines = 0;
-        char line[512];
-        memset(line, '\0', 512);
 
-        char *word = strtok(orig, " ");
-        while (word)
+        QString line = "";
+
+        QStringList::iterator it = wordlist.begin();
+        for (; it != wordlist.end(); ++it)
         {
-            if (word[0] == '%') 
+            QString word = *it;
+            if (word == "%d") 
             {
-                if (word[1] == 'd')
-                {
-                    int timeleft = (m_parent->GetTimeLeft() + 999999) / 1000000;
-                    if (timeleft > 99)
-                        timeleft = 99;
-                    if (timeleft < 0)
-                        timeleft = 0;
-    
-                    sprintf(word, "%d", timeleft);
-                }
+                m_parent->SetWantsUpdates(true);
+                int timeleft = (m_parent->GetTimeLeft() + 999999) / 1000000;
+                if (timeleft > 99)
+                    timeleft = 99;
+                if (timeleft < 0)
+                    timeleft = 0;
+                
+                word = QString::number(timeleft);    
             }
 
-            if ((!length) && (!strcmp(word, "\n")))
-            {
-                word = strtok(NULL, " ");
+            if (!length && word == "\n")
                 continue;
-            }
 
             m_font->CalcWidth(word, &textlength);
             if ((textlength + m_font->SpaceWidth() + length > maxlength) ||
-                (!strcmp(word, "\n")))
+                (word == "\n"))
             {
                 QRect drawrect = m_displaysize;
                 drawrect.setTop(m_displaysize.top() + 
                                 m_font->Size() * (lines) * 3 / 2);
-                DrawString(screenptr, vid_width, vid_height, drawrect, line, 
-                           fade, maxfade, xoff, yoff);
+                DrawString(surface, drawrect, line, fade, maxfade, xoff, yoff);
                 length = 0;
-                memset(line, '\0', 512);
+
+                line = "";
                 lines++;
 
-                if (!strcmp(word, "\n"))
+                if (word == "\n")
                 {
-                    word[0] = '\0';
+                    word = "";
                     textlength = 0;
                 }
             }
+
             if (length == 0)
             {
                 length = textlength;
-                strcpy(line, word);
+                line = word;
             }
             else
             {
-                if (length)
-                    strcat(line, " ");
+                line += " " + word;
                 length += textlength + m_font->SpaceWidth();
-                strcat(line, word);
             }
-            word = strtok(NULL, " ");
         }
+
         QRect drawrect = m_displaysize;
         drawrect.setTop(m_displaysize.top() + m_font->Size() * (lines) * 3 / 2);
-        DrawString(screenptr, vid_width, vid_height, drawrect, line, fade, 
-                   maxfade, xoff, yoff);
-        free(orig);                   
+        DrawString(surface, drawrect, line, fade, maxfade, xoff, yoff);
     }           
     else        
-        DrawString(screenptr, vid_width, vid_height, m_displaysize, m_message, 
-                   fade, maxfade, xoff, yoff);
+        DrawString(surface, m_displaysize, m_message, fade, maxfade, xoff, 
+                   yoff);
 }           
   
-void OSDTypeText::DrawString(unsigned char *screenptr, int vid_width,
-                             int vid_height, QRect rect, const QString &text, 
-                             int fade, int maxfade, int xoff, int yoff)
+void OSDTypeText::DrawString(OSDSurface *surface, QRect rect, 
+                             const QString &text, int fade, int maxfade, 
+                             int xoff, int yoff)
 {
     if (m_centered || m_right)
     {
@@ -517,11 +530,11 @@ void OSDTypeText::DrawString(unsigned char *screenptr, int vid_width,
     int maxx = rect.right();
     int maxy = rect.bottom();
 
-    if (maxx > vid_width)
-        maxx = vid_width;
+    if (maxx > surface->width)
+        maxx = surface->width;
 
-    if (maxy > vid_height)
-        maxy = vid_height;
+    if (maxy > surface->height)
+        maxy = surface->height;
 
     int alphamod = 255;
 
@@ -532,7 +545,7 @@ void OSDTypeText::DrawString(unsigned char *screenptr, int vid_width,
     if (m_usingalt && m_altfont)
         font = m_altfont;
 
-    font->DrawString(screenptr, x, y, text, maxx, maxy, alphamod);
+    font->DrawString(surface, x, y, text, maxx, maxy, alphamod);
 } 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -542,6 +555,9 @@ OSDTypeImage::OSDTypeImage(const QString &name, const QString &filename,
                            int scalew, int scaleh)
             : OSDType(name)
 {
+    m_drawwidth = -1;
+    m_onlyusefirst = false;
+
     m_filename = filename;
     m_displaypos = displaypos;
 
@@ -560,6 +576,9 @@ OSDTypeImage::OSDTypeImage(const QString &name, const QString &filename,
 OSDTypeImage::OSDTypeImage(const OSDTypeImage &other)
             : OSDType(other.m_name)
 {
+    m_drawwidth = other.m_drawwidth;
+    m_onlyusefirst = other.m_onlyusefirst;
+
     m_filename = other.m_filename;
     m_displaypos = other.m_displaypos;
     m_imagesize = other.m_imagesize;
@@ -590,6 +609,9 @@ OSDTypeImage::OSDTypeImage(const OSDTypeImage &other)
 OSDTypeImage::OSDTypeImage(const QString &name)
             : OSDType(name)
 {
+    m_drawwidth = -1;
+    m_onlyusefirst = false;
+
     m_yuv = NULL;
     m_alpha = NULL;
     m_ybuffer = NULL;
@@ -641,21 +663,6 @@ void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
 
     QImage tmpimage(filename);
 
-/*
-    if (tmpimage.width() == 0)
-    {
-        QString url = gContext->GetMasterHostPrefix();
-        if (url.length() < 1)
-            return;
-
-        url += filename;
-
-        QImage *cached = gContext->CacheRemotePixmap(url, false);
-        if (cached)
-            tmpimage = *cached;
-    }
-*/
-
     if (tmpimage.width() == 0)
         return;
 
@@ -693,18 +700,21 @@ void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
     m_imagesize = QRect(0, 0, width, height);
 }
 
-void OSDTypeImage::Draw(unsigned char *screenptr, int vid_width, int vid_height,
-                        int fade, int maxfade, int xoff, int yoff)
+void OSDTypeImage::Draw(OSDSurface *surface, int fade, int maxfade, int xoff, 
+                        int yoff)
 {
     if (!m_isvalid)
         return;
 
-    unsigned char *dest, *src;
-    int alpha, tmp1, tmp2;
+    unsigned char *dest, *destalpha, *src, *srcalpha;
+    unsigned char *udest, *vdest, *usrc, *vsrc;
+    int alpha, iwidth, width;
 
-    int iwidth,width;
     iwidth = width = m_imagesize.width();
     int height = m_imagesize.height();
+
+    if (m_drawwidth >= 0)
+        width = m_drawwidth;
 
     int ystart = m_displaypos.y();
     int xstart = m_displaypos.x();
@@ -715,10 +725,13 @@ void OSDTypeImage::Draw(unsigned char *screenptr, int vid_width, int vid_height,
     ystart = (ystart / 2) * 2;
     xstart = ((xstart + 1) / 2) * 2;
 
-    if (height + ystart > vid_height)
-        height = vid_height - ystart - 1;
-    if (width + xstart > vid_width)
-        width = vid_width - xstart - 1;
+    if (height + ystart > surface->height)
+        height = surface->height - ystart - 1;
+    if (width + xstart > surface->width)
+        width = surface->width - xstart - 1;
+
+    if (width == 0 || height == 0)
+        return;
 
     int startline = 0;
     int startcol = 0;
@@ -734,77 +747,160 @@ void OSDTypeImage::Draw(unsigned char *screenptr, int vid_width, int vid_height,
         startcol = 0 - xstart;
         xstart = 0;
     }
-   
+
+    QRect destRect = QRect(xstart, ystart, width, height);
+    bool needblend = false;
+
+    if (m_onlyusefirst || surface->IntersectsDrawn(destRect))
+        needblend = true;
+    surface->AddRect(destRect);
+    
     int ysrcwidth;
     int ydestwidth;
 
+    int uvsrcwidth;
+    int uvdestwidth;
+
     int alphamod = 255;
+    bool transdest = false;
+
+    int newalpha = 0;
 
     if (maxfade > 0 && fade >= 0)
         alphamod = (int)((((float)(fade) / maxfade) * 256.0) + 0.5);
 
-    for (int y = startline; y < height; y++)
+    if (!needblend)
     {
-        ysrcwidth = y * width;
-        ydestwidth = (y + ystart - startline) * vid_width;
-
-        for (int x = startcol; x < width; x++)
+        for (int y = startline; y < height; y++)
         {
-            alpha = *(m_alpha + x + ysrcwidth);
+            ysrcwidth = y * iwidth;
+            ydestwidth = (y + ystart - startline) * surface->width;
 
-            if (alpha == 0)
-                continue;
+            memcpy(surface->y + xstart + ydestwidth,
+                   m_ybuffer + startcol + ysrcwidth, width);
 
-            alpha = ((alpha * alphamod) + 0x80) >> 8;
+            destalpha = surface->alpha + xstart + ydestwidth;
 
-            dest = screenptr + (x + xstart - startcol) + ydestwidth;
-            src = m_ybuffer + x + ysrcwidth;
+            for (int x = startcol; x < width; x++)
+            {
+                alpha = *(m_alpha + x + ysrcwidth);
+  
+                if (alpha == 0)
+                    *destalpha = 0;
+                else
+                    *destalpha = ((alpha * alphamod) + 0x80) >> 8;
 
-            tmp1 = (*src - *dest) * alpha;
-            tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            *dest = tmp2 & 0xff;
+                destalpha++;
+            }
         }
+
+        iwidth /= 2;
+        width /= 2;
+        height /= 2;
+
+        ystart /= 2;
+        xstart /= 2;
+
+        startline /= 2;
+        startcol /= 2;
+
+        for (int y = startline; y < height; y++)
+        {
+            uvsrcwidth = y * iwidth;
+            uvdestwidth = (y + ystart - startline) * (surface->width / 2);
+
+            memcpy(surface->u + xstart + uvdestwidth,
+                   m_ubuffer + startcol + uvsrcwidth, width);
+            memcpy(surface->v + xstart + uvdestwidth,
+                   m_vbuffer + startcol + uvsrcwidth, width);
+        }
+
+        return;
     }
 
-    width /= 2;
-    height /= 2;
+    int startingx = startcol;
+    if (m_onlyusefirst)
+        startingx = 0;
 
-    ystart /= 2;
-    xstart /= 2;
-
-    startline /= 2;
-    startcol /= 2;
-
-    unsigned char *destuptr = screenptr + (vid_width * vid_height);
-    unsigned char *destvptr = screenptr + (vid_width * vid_height * 5 / 4);
-
+    // overlap with something we've already drawn..
     for (int y = startline; y < height; y++)
     {
-        ysrcwidth = y * width;
-        ydestwidth = (y + ystart - startline) * (vid_width / 2);
+        ysrcwidth = y * iwidth;
+        ydestwidth = (y + ystart - startline) * surface->width;
+
+        dest = surface->y + xstart + ydestwidth;
+        destalpha = surface->alpha + xstart + ydestwidth;
+        src = m_ybuffer + ysrcwidth + startingx;
+
+        srcalpha = m_alpha + ysrcwidth + startingx;
+
+        uvsrcwidth = ysrcwidth / 4;
+        uvdestwidth = ydestwidth / 4;
+
+        udest = surface->u + xstart / 2 + uvdestwidth;
+        usrc = m_ubuffer + uvsrcwidth + startingx / 2;
+
+        vdest = surface->v + xstart / 2 + uvdestwidth;
+        vsrc = m_vbuffer + uvsrcwidth + startingx / 2;
 
         for (int x = startcol; x < width; x++)
         {
-            alpha = *(m_alpha + x * 2 + y * 2 * iwidth);
+            alpha = *srcalpha;
 
             if (alpha == 0)
-                continue;
+                goto imagedrawend;
 
             alpha = ((alpha * alphamod) + 0x80) >> 8;
 
-            dest = destuptr + (x + xstart - startcol) + ydestwidth;
-            src = m_ubuffer + x + ysrcwidth;
+            newalpha = alpha;
 
-            tmp1 = (*src - *dest) * alpha;
-            tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            *dest = tmp2 & 0xff;
+            if (*destalpha != 0)
+            {
+                transdest = false;
+                newalpha = surface->pow_lut[alpha][*destalpha];
+                *dest = blendColorsAlpha(*src, *dest, newalpha);
+                *destalpha = *destalpha + ((alpha * (255 - *destalpha)) / 255);
+            }
+            else
+            {
+                transdest = true;
+                *dest = *src;
+                *destalpha = alpha;
+            }
 
-            dest = destvptr + (x + xstart - startcol) + ydestwidth;
-            src = m_vbuffer + x + ysrcwidth;
+            if ((y % 2 == 0) && (x % 2 == 0))
+            {
+                if (!transdest)
+                {
+                    *udest = blendColorsAlpha(*usrc, *udest, newalpha);
+                    *vdest = blendColorsAlpha(*vsrc, *vdest, newalpha);
+                }
+                else
+                {
+                    *udest = *usrc;
+                    *vdest = *vsrc;
+                }
+            }
 
-            tmp1 = (*src - *dest) * alpha;
-            tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            *dest = tmp2 & 0xff;
+imagedrawend:
+            if ((y % 2 == 0) && (x % 2 == 0))
+            {
+                udest++;
+                vdest++;
+                if (!m_onlyusefirst)
+                {
+                    usrc++;
+                    vsrc++;
+                }
+            }
+
+            dest++;
+            destalpha++;
+            if (!m_onlyusefirst)
+            {
+                src++;
+                srcalpha++;
+            }
         }
     }
 }
@@ -868,6 +964,7 @@ OSDTypeFillSlider::OSDTypeFillSlider(const QString &name,
     m_maxval = 1000;
     m_curval = 0;
     m_drawwidth = 0;
+    m_onlyusefirst = true;
     m_displayrect = displayrect;
 }
 
@@ -899,123 +996,13 @@ void OSDTypeFillSlider::SetPosition(int pos)
     m_drawwidth = (int)((m_displayrect.width() / 1000.0) * m_curval);
 }
 
-void OSDTypeFillSlider::Draw(unsigned char *screenptr, int vid_width, 
-                             int vid_height, int fade, int maxfade, 
+void OSDTypeFillSlider::Draw(OSDSurface *surface, int fade, int maxfade, 
                              int xoff, int yoff)
 {
     if (!m_isvalid)
         return;
 
-    unsigned char *dest, *src;
-    int alpha, tmp1, tmp2;
-
-    int iwidth,width;
-    iwidth = m_imagesize.width();
-    width = m_drawwidth;
-    int height = m_imagesize.height();
-
-    int ystart = m_displaypos.y();
-    int xstart = m_displaypos.x();
-
-    xstart += xoff;
-    ystart += yoff;
-
-    ystart = (ystart / 2) * 2;
-    xstart = (xstart / 2) * 2;
-
-    if (height + ystart > vid_height)
-        height = vid_height - ystart - 1;
-    if (width + xstart > vid_width)
-        width = vid_width - xstart - 1;
-
-    int startline = 0;
-    int startcol = 0;
-
-    if (ystart < 0)
-    {
-        startline = 0 - ystart;
-        ystart = 0;
-    }
-
-    if (xstart < 0)
-    {
-        startcol = 0 - xstart;
-        xstart = 0;
-    }
-
-    int ysrcwidth;
-    int ydestwidth;
-
-    int alphamod = 255;
-
-    if (maxfade > 0 && fade >= 0)
-        alphamod = (int)((((float)(fade) / maxfade) * 256.0) + 0.5);
-
-    for (int y = startline; y < height; y++)
-    {
-        ysrcwidth = y * iwidth;
-        ydestwidth = (y + ystart - startline) * vid_width;
-
-        for (int x = startcol; x < width; x++)
-        {
-            alpha = *(m_alpha + ysrcwidth);
-
-            if (alpha == 0)
-                continue;
-
-            alpha = ((alpha * alphamod) + 0x80) >> 8;
-
-            dest = screenptr + (x + xstart - startcol) + ydestwidth;
-            src = m_ybuffer + ysrcwidth;
-
-            tmp1 = (*src - *dest) * alpha;
-            tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            *dest = tmp2 & 0xff;
-        }
-    }
-
-    width /= 2;
-    height /= 2;
-    iwidth /= 2;
-
-    ystart /= 2;
-    xstart /= 2;
-
-    startline /= 2;
-    startcol /= 2;
-
-    unsigned char *destuptr = screenptr + (vid_width * vid_height);
-    unsigned char *destvptr = screenptr + (vid_width * vid_height * 5 / 4);
-
-    for (int y = startline; y < height; y++)
-    {
-        ysrcwidth = y * iwidth;
-        ydestwidth = (y + ystart - startline) * (vid_width / 2);
-
-        for (int x = startcol; x < width; x++)
-        {
-            alpha = *(m_alpha + y * 2 * iwidth);
-
-            if (alpha == 0)
-                continue;
-
-            alpha = ((alpha * alphamod) + 0x80) >> 8;
-
-            dest = destuptr + (x + xstart - startcol) + ydestwidth;
-            src = m_ubuffer + ysrcwidth;
-
-            tmp1 = (*src - *dest) * alpha;
-            tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            *dest = tmp2 & 0xff;
-
-            dest = destvptr + (x + xstart - startcol) + ydestwidth;
-            src = m_vbuffer + ysrcwidth;
-
-            tmp1 = (*src - *dest) * alpha;
-            tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            *dest = tmp2 & 0xff;
-        }
-    }
+    OSDTypeImage::Draw(surface, fade, maxfade, xoff, yoff);
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1154,15 +1141,15 @@ void OSDTypeEditSlider::SetRange(int start, int end)
         m_drawMap[i] = 1;
 }
 
-void OSDTypeEditSlider::Draw(unsigned char *screenptr, int vid_width,
-                             int vid_height, int fade, int maxfade,
+void OSDTypeEditSlider::Draw(OSDSurface *surface, int fade, int maxfade,
                              int xoff, int yoff)
 {           
     if (!m_isvalid || !m_risvalid)
         return;
             
-    unsigned char *dest, *src;
-    int a, tmp1, tmp2; 
+    unsigned char *dest, *destalpha, *src, *rsrc, *srcalpha, *rsrcalpha;
+    unsigned char *udest, *vdest, *usrc, *rusrc, *vsrc, *rvsrc;
+    int a; 
             
     int iwidth, riwidth, width;
     iwidth = m_imagesize.width();
@@ -1179,11 +1166,14 @@ void OSDTypeEditSlider::Draw(unsigned char *screenptr, int vid_width,
     ystart = (ystart / 2) * 2;
     xstart = (xstart / 2) * 2;
 
-    if (height + ystart > vid_height)
-        height = vid_height - ystart - 1;
-    if (width + xstart > vid_width)  
-        width = vid_width - xstart - 1;
-                
+    if (height + ystart > surface->height)
+        height = surface->height - ystart - 1;
+    if (width + xstart > surface->width)
+        width = surface->width - xstart - 1;
+
+    if (width == 0 || height == 0)
+        return;
+
     int startline = 0;
     int startcol = 0;
 
@@ -1198,11 +1188,21 @@ void OSDTypeEditSlider::Draw(unsigned char *screenptr, int vid_width,
         startcol = 0 - xstart;
         xstart = 0;
     }
+
+    QRect destRect = QRect(xstart, ystart, width, height);
+    surface->AddRect(destRect);
  
     int ysrcwidth;              
+    int rysrcwidth;
     int ydestwidth;
-    
+   
+    int uvsrcwidth;
+    int ruvsrcwidth;
+    int uvdestwidth;
+ 
     int alphamod = 255;
+    bool transdest = false;
+    int newalpha = 0;
     
     if (maxfade > 0 && fade >= 0)
         alphamod = (int)((((float)(fade) / maxfade) * 256.0) + 0.5);
@@ -1214,94 +1214,92 @@ void OSDTypeEditSlider::Draw(unsigned char *screenptr, int vid_width,
 
     for (int y = startline; y < height; y++)
     {
-        ydestwidth = (y + ystart - startline) * vid_width;
+        ysrcwidth = y * iwidth; 
+        rysrcwidth = y * riwidth;
+        ydestwidth = (y + ystart - startline) * surface->width;
+
+        dest = surface->y + xstart + ydestwidth;
+        destalpha = surface->alpha + xstart + ydestwidth;
+        src = m_ybuffer + ysrcwidth;
+        rsrc = m_rybuffer + rysrcwidth;
+
+        srcalpha = m_alpha + ysrcwidth;
+        rsrcalpha = m_ralpha + rysrcwidth;
+
+        uvdestwidth = ydestwidth / 4;
+        uvsrcwidth = ysrcwidth / 4;
+        ruvsrcwidth = rysrcwidth / 4;
+
+        udest = surface->u + xstart / 2 + uvdestwidth;
+        usrc = m_ubuffer + uvsrcwidth;
+        rusrc = m_rubuffer + ruvsrcwidth;
+
+        vdest = surface->v + xstart / 2 + uvdestwidth;
+        vsrc = m_vbuffer + uvsrcwidth;
+        rvsrc = m_rvbuffer + ruvsrcwidth;
 
         for (int x = startcol; x < width; x++)
         {
             if (m_drawMap[x] == 0)
             {
-                alpha = m_alpha;
-                ybuf = m_ybuffer;
-                ysrcwidth = y * iwidth;
+                alpha = srcalpha;
+                ybuf = src;
+                ubuf = usrc;
+                vbuf = vsrc; 
             }
             else
             {
-                alpha = m_ralpha;
-                ybuf = m_rybuffer;
-                ysrcwidth = y * riwidth;
+                alpha = rsrcalpha;
+                ybuf = rsrc;
+                ubuf = rusrc;
+                vbuf = rvsrc;
             }
 
-            a = *(alpha + ysrcwidth);
-        
-            if (a == 0)
-                continue;
+            if (*alpha == 0)
+                goto editsliderdrawend;
+
+            a = *alpha;
 
             a = ((a * alphamod) + 0x80) >> 8;
+            newalpha = a;
 
-            dest = screenptr + (x + xstart - startcol) + ydestwidth;
-            src = ybuf + ysrcwidth;
-
-            tmp1 = (*src - *dest) * a;
-            tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            *dest = tmp2 & 0xff;
-        }
-    }
-
-    width /= 2;
-    height /= 2;
-    iwidth /= 2;
-    riwidth /= 2;
-
-    ystart /= 2;
-    xstart /= 2;
-
-    startline /= 2;
-    startcol /= 2;
-
-    unsigned char *destuptr = screenptr + (vid_width * vid_height);
-    unsigned char *destvptr = screenptr + (vid_width * vid_height * 5 / 4);
-
-    for (int y = startline; y < height; y++)
-    {
-        ydestwidth = (y + ystart - startline) * (vid_width / 2);
-
-        for (int x = startcol; x < width; x++)
-        {
-            if (m_drawMap[x * 2] == 0)
+            if (*destalpha != 0)
             {
-                alpha = m_alpha;
-                ubuf = m_ubuffer;
-                vbuf = m_vbuffer;
-                ysrcwidth = y * iwidth;
+                transdest = false;
+                newalpha = surface->pow_lut[a][*destalpha];
+                *dest = blendColorsAlpha(*ybuf, *dest, newalpha);
+                *destalpha = *destalpha + ((a * (255 - *destalpha)) / 255);
             }
             else
             {
-                alpha = m_ralpha;
-                ubuf = m_rubuffer;
-                vbuf = m_rvbuffer;
-                ysrcwidth = y * riwidth;
+                transdest = true;
+                *dest = *ybuf;
+                *destalpha = a;
             }
 
-            a = *(alpha + y * 2 * iwidth);
+            if ((y % 2 == 0) && (x % 2 == 0))
+            {
+                if (!transdest)
+                {
+                    *udest = blendColorsAlpha(*ubuf, *udest, newalpha);
+                    *vdest = blendColorsAlpha(*vbuf, *vdest, newalpha);
+                }
+                else
+                {
+                    *udest = *ubuf;
+                    *vdest = *vbuf;
+                }
+            }
 
-            if (a == 0)
-                continue;
+editsliderdrawend:
+            if ((y % 2 == 0) && (x % 2 == 0))
+            {
+                udest++;
+                vdest++;
+            }
 
-            a = ((a * alphamod) + 0x80) >> 8;
-
-            dest = destuptr + (x + xstart - startcol) + ydestwidth;
-            src = ubuf + ysrcwidth;
-
-            tmp1 = (*src - *dest) * a;
-            tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            *dest = tmp2 & 0xff;
-
-            dest = destvptr + (x + xstart - startcol) + ydestwidth;
-            src = vbuf + ysrcwidth;
-
-            tmp1 = (*src - *dest) * a;
-            tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            *dest = tmp2 & 0xff;
+            dest++;
+            destalpha++;
         }
     }
 }
@@ -1334,10 +1332,10 @@ void OSDTypeBox::Reinit(float wchange, float hchange)
     size = QRect(x, y, width, height);
 }
 
-void OSDTypeBox::Draw(unsigned char *screenptr, int vid_width, int vid_height,
-                      int fade, int maxfade, int xoff, int yoff)
+void OSDTypeBox::Draw(OSDSurface *surface, int fade, int maxfade, int xoff, 
+                      int yoff)
 {
-    unsigned char *src;
+    unsigned char *dest, *destalpha;
     unsigned char alpha = 192;
 
     QRect disprect = size;
@@ -1350,29 +1348,63 @@ void OSDTypeBox::Draw(unsigned char *screenptr, int vid_width, int vid_height,
 
     if (xstart < 0)
         xstart = 0;
-    if (xend > vid_width)
-        xend = vid_width;
+    if (xend > surface->width)
+        xend = surface->width;
     if (ystart < 0)
         ystart = 0;
-    if (yend > vid_height)
-        yend = vid_height;
+    if (yend > surface->height)
+        yend = surface->height;
 
-    int tmp1, tmp2;
+    int height = yend - ystart + 1, width = xend - xstart + 1;
+
+    QRect destRect = QRect(xstart, ystart, width, height); 
+    bool needblend = false;
+
+    if (surface->IntersectsDrawn(destRect))
+        needblend = true;
+    surface->AddRect(destRect);
+
     int alphamod = 255;
     if (maxfade > 0 && fade >= 0)
         alphamod = (int)((((float)(fade) / maxfade) * 256.0) + 0.5);
 
     alpha = ((alpha * alphamod) + 0x809) >> 8;
+    int newalpha, ydestwidth;
+
+    if (!needblend)
+    {
+        for (int y = ystart; y < yend; y++)
+        {
+            ydestwidth = y * surface->width;
+            
+            memset(surface->y + xstart + ydestwidth, 0, width);
+            memset(surface->alpha + xstart + ydestwidth, alpha, width);
+        }
+
+        return;
+    }
 
     for (int y = ystart; y < yend; y++)
     {
+        dest = surface->y + y * surface->width + xstart;
+        destalpha = surface->alpha + y * surface->width + xstart;
+
         for (int x = xstart; x < xend; x++)
         {
-            src = screenptr + x + y * vid_width;
+            if (*destalpha != 0)
+            {
+                newalpha = surface->pow_lut[alpha][*destalpha];
+                *dest = blendColorsAlpha(0, *dest, newalpha);
+                *destalpha = *destalpha + ((alpha * (255 - *destalpha)) / 255);
+            }
+            else
+            {
+                *dest = 0;
+                *destalpha = alpha;
+            }
 
-            tmp1 = (0 - *src) * alpha;
-            tmp2 = *src + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-            *src = tmp2 & 0xff;
+            dest++;
+            destalpha++;
         }
     }
 }
@@ -1464,11 +1496,9 @@ void OSDTypePositionRectangle::AddPosition(QRect rect)
     m_numpositions++;
 }
 
-void OSDTypePositionRectangle::Draw(unsigned char *screenptr, int vid_width, 
-                                    int vid_height, int fade, int maxfade, 
+void OSDTypePositionRectangle::Draw(OSDSurface *surface, int fade, int maxfade, 
                                     int xoff, int yoff)
 {
-    vid_height = vid_height;
     fade = fade;
     maxfade = maxfade;
     xoff = xoff;
@@ -1485,44 +1515,54 @@ void OSDTypePositionRectangle::Draw(unsigned char *screenptr, int vid_width,
     int xstart = rect.left();
     int xend = rect.right();
 
+    int height = yend - ystart + 1, width = xend - xstart + 1;
+
+    QRect destRect = QRect(xstart, ystart, width, height);
+    surface->AddRect(destRect);
+
     for (int y = ystart; y < yend; y++)
     {
-        if (y < 0 || y >= vid_height)
+        if (y < 0 || y >= surface->height)
             continue;
 
         for (int x = xstart; x < xstart + 2; x++)
         {
-            if (x < 0 || x >= vid_width)
+            if (x < 0 || x >= surface->width)
                 continue;
-            src = screenptr + x + y * vid_width;
+
+            src = surface->y + x + y * surface->width;
             *src = 255;
         }
+
         for (int x = xend - 2; x < xend; x++)
         {
-            if (x < 0 || x >= vid_width)
+            if (x < 0 || x >= surface->width)
                 continue;
-            src = screenptr + x + y * vid_width;
+
+            src = surface->y + x + y * surface->width;
             *src = 255;
         }
     }
 
     for (int x = xstart; x < xend; x++)
     {
-        if (x < 0 || x >= vid_width)
+        if (x < 0 || x >= surface->width)
             continue;
 
         for (int y = ystart; y < ystart + 2; y++)
         {
-            if (y < 0 || y >= vid_height)
+            if (y < 0 || y >= surface->height)
                 continue;
-            src = screenptr + x + y * vid_width;
+
+            src = surface->y + x + y * surface->width;
             *src = 255;
         }
         for (int y = yend - 2; y < yend; y++)
         {
-            if (y < 0 || y >= vid_height)
+            if (y < 0 || y >= surface->height)
                 continue;
-            src = screenptr + x + y * vid_width;
+
+            src = surface->y + x + y * surface->width;
             *src = 255;
         }
     }
@@ -1572,8 +1612,7 @@ void OSDTypePositionImage::AddPosition(QPoint pos)
     m_numpositions++;
 }
 
-void OSDTypePositionImage::Draw(unsigned char *screenptr, int vid_width,
-                                int vid_height, int fade, int maxfade,
+void OSDTypePositionImage::Draw(OSDSurface *surface, int fade, int maxfade,
                                 int xoff, int yoff)
 {
     if (m_curposition < 0 || m_curposition >= m_numpositions)
@@ -1582,8 +1621,7 @@ void OSDTypePositionImage::Draw(unsigned char *screenptr, int vid_width,
     QPoint pos = positions[m_curposition];
 
     OSDTypeImage::SetPosition(pos);
-    OSDTypeImage::Draw(screenptr, vid_width, vid_height, fade, maxfade, xoff, 
-                       yoff);
+    OSDTypeImage::Draw(surface, fade, maxfade, xoff, yoff);
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1649,8 +1687,8 @@ void OSDTypeCC::ClearAllCCText()
     }
 }
 
-void OSDTypeCC::Draw(unsigned char *screenptr, int vid_width, int vid_height,
-                     int fade, int maxfade, int xoff, int yoff)
+void OSDTypeCC::Draw(OSDSurface *surface, int fade, int maxfade, int xoff, 
+                     int yoff)
 {
     // not used
     fade = fade;
@@ -1685,18 +1723,18 @@ void OSDTypeCC::Draw(unsigned char *screenptr, int vid_width, int vid_height,
             int maxx = x + textlength;
             int maxy = y + m_font->Size() * 3 / 2;
 
-            if (maxx > vid_width)
-                maxx = vid_width;
+            if (maxx > surface->width)
+                maxx = surface->width;
 
-            if (maxy > vid_height)
-                maxy = vid_height;
+            if (maxy > surface->height)
+                maxy = surface->height;
 
             QRect rect = QRect(0, 0, textlength + 4, 
                                (m_font->Size() * 3 / 2) + 3);
             m_box->SetRect(rect);
-            m_box->Draw(screenptr, vid_width, vid_height, 0, 0, x - 2, y - 2);
+            m_box->Draw(surface, 0, 0, x - 2, y - 2);
 
-            m_font->DrawString(screenptr, x, y + 2, cc->text, maxx, maxy, 255); 
+            m_font->DrawString(surface, x, y + 2, cc->text, maxx, maxy, 255); 
         }
     }
 }

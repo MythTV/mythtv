@@ -5,10 +5,12 @@
 #include <qstringlist.h>
 #include <qrect.h>
 #include <qpoint.h>
+#include <qvaluevector.h>
 #include <time.h>
-#include <pthread.h>
 #include <qmap.h>
 #include <qdom.h>
+#include <qmutex.h>
+#include <qregion.h>
 
 #include <vector>
 using namespace std;
@@ -20,6 +22,86 @@ class OSDTypeImage;
 class OSDTypePositionIndicator;
 
 #include "frame.h"
+
+class OSDSurface
+{
+  public:
+    OSDSurface(int w, int h)
+    {
+        yuvbuffer = new unsigned char[w * h * 3 / 2];
+        y = yuvbuffer;
+        u = yuvbuffer + w * h;
+        v = u + w * h / 4;
+        alpha = new unsigned char[w * h];
+
+        width = w;
+        height = h;
+
+        size = width * height;
+
+        for (int i = 0; i < 256; i++)
+        {
+            for (int j = 0; j < 256; j++)
+            {
+                int divisor = (i + (j * (255 - i)) / 255);
+                if (divisor > 0) 
+                    pow_lut[i][j] = (i * 255) / divisor;
+                else
+                    pow_lut[i][j] = 0;
+            }
+        }
+
+        Clear();
+    }
+
+   ~OSDSurface()
+    {
+        delete [] yuvbuffer;
+        delete [] alpha;
+    }
+
+    void Clear(void)
+    {
+        memset(y, 0, size);
+        memset(u, 127, size / 4);
+        memset(v, 127, size / 4);
+        memset(alpha, 0, size);
+        usedRegions = QRegion();
+    }
+
+    bool IntersectsDrawn(QRect &newrect)
+    {
+        QMemArray<QRect> rects = usedRegions.rects();
+        QMemArray<QRect>::Iterator it = rects.begin();
+        for (; it != rects.end(); ++it)
+            if (newrect.intersects(*it))
+                return true;
+        return false;
+    }
+
+    void AddRect(QRect &newrect)
+    {
+        usedRegions = usedRegions.unite(newrect);
+    }
+
+
+    unsigned char *yuvbuffer;
+
+    // just pointers into yuvbuffer
+    unsigned char *y;
+    unsigned char *u;
+    unsigned char *v;
+
+    unsigned char *alpha;
+
+    int width;
+    int height;
+    int size;
+
+    QRegion usedRegions;
+
+    unsigned char pow_lut[256][256];
+};
  
 class OSD
 {
@@ -74,7 +156,8 @@ class OSD
 
     void ShowEditArrow(long long number, long long totalframes, int type);
     void HideEditArrow(long long number, int type);
-    void UpdateEditText(const QString &seek_amount, const QString &deletemarker, const QString &edittime, const QString &framecnt);
+    void UpdateEditText(const QString &seek_amount, const QString &deletemarker,
+                        const QString &edittime, const QString &framecnt);
     void DoEditSlider(QMap<long long, int> deleteMap, long long curFrame,
                       long long totalFrames);
 
@@ -84,7 +167,9 @@ class OSD
                 int dispw, int disph);
 
     void SetFrameInterval(int frint);
- 
+
+    static void BlendSurfaceToYUV(OSDSurface *surface, unsigned char *yuvptr);
+
  private:
     void SetDefaults();
     TTFFont *LoadFont(QString name, int size); 
@@ -123,7 +208,7 @@ class OSD
     float hmult, wmult;
     int xoffset, yoffset, displaywidth, displayheight;
 
-    pthread_mutex_t osdlock;
+    QMutex osdlock;
 
     bool m_setsvisible;
 
@@ -142,6 +227,9 @@ class OSD
     OSDTypeImage *editarrowleft;
     OSDTypeImage *editarrowright;
     QRect editarrowRect;
+
+    OSDSurface *drawSurface;
+    bool changed;
 };
     
 #endif

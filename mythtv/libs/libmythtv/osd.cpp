@@ -24,8 +24,7 @@ OSD::OSD(int width, int height, int frint, const QString &font,
          const QString &ccfont, const QString &prefix, const QString &osdtheme,
          int dispx, int dispy, int dispw, int disph)
 {
-    pthread_mutex_init(&osdlock, NULL);
-
+    changed = false;
     vid_width = width;
     vid_height = height;
     frameint = frint;
@@ -68,6 +67,8 @@ OSD::OSD(int width, int height, int frint, const QString &font,
     }
 
     SetDefaults();
+
+    drawSurface = new OSDSurface(displaywidth, displayheight);
 }
 
 OSD::~OSD(void)
@@ -94,6 +95,7 @@ OSD::~OSD(void)
         delete editarrowright;
 
     delete setList;
+    delete drawSurface;
 }
 
 void OSD::SetFrameInterval(int frint)
@@ -173,6 +175,9 @@ void OSD::Reinit(int width, int height, int frint, int dispx, int dispy,
             set->Reinit(vid_width, vid_height, dispx, dispy, dispw, disph, 
                         wmult, hmult, frameint);
     }
+
+    delete drawSurface;
+    drawSurface = new OSDSurface(displaywidth, displayheight);
 }
 
 QString OSD::FindTheme(QString name)
@@ -917,18 +922,18 @@ QRect OSD::parseRect(QString text)
 
 void OSD::ClearAllText(const QString &name)
 {
-    pthread_mutex_lock(&osdlock);
+    osdlock.lock();
     OSDSet *container = GetSet(name);
     if (container)
         container->ClearAllText();
 
-    pthread_mutex_unlock(&osdlock);
+    osdlock.unlock();
 }
 
 void OSD::SetTextByRegexp(const QString &name,
                           QMap<QString, QString> &regexpMap, int length)
 {
-    pthread_mutex_lock(&osdlock);
+    osdlock.lock();
     OSDSet *container = GetSet(name);
     if (container)
     {
@@ -947,13 +952,14 @@ void OSD::SetTextByRegexp(const QString &name,
         }
 
         m_setsvisible = true;
+        changed = true;
     }
-    pthread_mutex_unlock(&osdlock);
+    osdlock.unlock();
 }
 
 void OSD::SetInfoText(QMap<QString, QString> regexpMap, int length)
 {
-    pthread_mutex_lock(&osdlock);
+    osdlock.lock();
     OSDSet *container = GetSet("program_info");
     if (container)
     {
@@ -967,8 +973,9 @@ void OSD::SetInfoText(QMap<QString, QString> regexpMap, int length)
 
         container->DisplayFor(length * 1000000);
         m_setsvisible = true;
+        changed = true;
     }
-    pthread_mutex_unlock(&osdlock);
+    osdlock.unlock();
 }
 
 void OSD::SetInfoText(const QString &text, const QString &subtitle,
@@ -983,7 +990,7 @@ void OSD::SetInfoText(const QString &text, const QString &subtitle,
 
     bool hassubtitle = true;
 
-    pthread_mutex_lock(&osdlock);
+    osdlock.lock();
     OSDSet *container = GetSet("program_info");
     if (container)
     {
@@ -1019,8 +1026,9 @@ void OSD::SetInfoText(const QString &text, const QString &subtitle,
 
         container->DisplayFor(length * 1000000);
         m_setsvisible = true;
+        changed = true;
     }
-    pthread_mutex_unlock(&osdlock);
+    osdlock.unlock();
 }
 
 void OSD::StartPause(int position, bool fill, QString msgtext,
@@ -1028,7 +1036,7 @@ void OSD::StartPause(int position, bool fill, QString msgtext,
 {
     fill = fill;
 
-    pthread_mutex_lock(&osdlock);
+    osdlock.lock();
     OSDSet *container = GetSet("status");
     if (container)
     {
@@ -1048,13 +1056,14 @@ void OSD::StartPause(int position, bool fill, QString msgtext,
         else
             container->Display();
         m_setsvisible = true;
+        changed = true;
     }
-    pthread_mutex_unlock(&osdlock);
+    osdlock.unlock();
 }
 
 void OSD::UpdatePause(int position, QString slidertext)
 {
-    pthread_mutex_lock(&osdlock);
+    osdlock.lock();
     OSDSet *container = GetSet("status");
     if (container)
     {
@@ -1067,25 +1076,27 @@ void OSD::UpdatePause(int position, QString slidertext)
             slider->SetPosition(position);
 
         m_setsvisible = true;
+        changed = true;
     }
-    pthread_mutex_unlock(&osdlock);
+    osdlock.unlock();
 }
 
 void OSD::EndPause(void)
 {
-    pthread_mutex_lock(&osdlock);
+    osdlock.lock();
     OSDSet *container = GetSet("status");
     if (container)
     {
         container->Hide();
         m_setsvisible = true;
+        changed = true;
     }
-    pthread_mutex_unlock(&osdlock);
+    osdlock.unlock();
 }
 
 void OSD::SetChannumText(const QString &text, int length)
 {
-    pthread_mutex_lock(&osdlock);
+    osdlock.lock();
     OSDSet *container = GetSet("channel_number");
     if (container)
     {
@@ -1095,15 +1106,16 @@ void OSD::SetChannumText(const QString &text, int length)
 
         container->DisplayFor(length * 1000000);
         m_setsvisible = true;
+        changed = true;
     }
 
-    pthread_mutex_unlock(&osdlock);
+    osdlock.unlock();
 }
 
 void OSD::AddCCText(const QString &text, int x, int y, int color, 
                     bool teletextmode)
 {
-    pthread_mutex_lock(&osdlock);
+    osdlock.lock();
     OSDSet *container = GetSet("cc_page");
     if (container)
     {
@@ -1113,13 +1125,14 @@ void OSD::AddCCText(const QString &text, int x, int y, int color,
 
         container->Display();
         m_setsvisible = true;
+        changed = true;
     }
-    pthread_mutex_unlock(&osdlock);
+    osdlock.unlock();
 }
 
 void OSD::ClearAllCCText()
 {
-    pthread_mutex_lock(&osdlock);
+    osdlock.lock();
     OSDSet *container = GetSet("cc_page");
     if (container)
     {
@@ -1131,13 +1144,14 @@ void OSD::ClearAllCCText()
 
         container->Display(false);
         m_setsvisible = true;
+        changed = true;
     }
-    pthread_mutex_unlock(&osdlock);
+    osdlock.unlock();
 }
 
 void OSD::SetSettingsText(const QString &text, int length)
 {
-    pthread_mutex_lock(&osdlock);
+    osdlock.lock();
     OSDSet *container = GetSet("settings");
     if (container)
     {
@@ -1147,15 +1161,16 @@ void OSD::SetSettingsText(const QString &text, int length)
 
         container->DisplayFor(length * 1000000);
         m_setsvisible = true;
+        changed = true;
     }
 
-    pthread_mutex_unlock(&osdlock);
+    osdlock.unlock();
 }
 
 void OSD::NewDialogBox(const QString &name, const QString &message, 
                        QStringList &options, int length)
 {
-    pthread_mutex_lock(&osdlock);
+    osdlock.lock();
     OSDSet *container = GetSet(name);
     if (container)
     {
@@ -1227,9 +1242,11 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
         container->DisplayFor(length * 1000000);
     else
         container->Display();
-    m_setsvisible = true;
 
-    pthread_mutex_unlock(&osdlock);
+    m_setsvisible = true;
+    changed = true;
+
+    osdlock.unlock();
 }
 
 void OSD::HighlightDialogSelection(OSDSet *container, int num)
@@ -1261,18 +1278,21 @@ void OSD::HighlightDialogSelection(OSDSet *container, int num)
 
 void OSD::TurnDialogOff(const QString &name)
 {
-    pthread_mutex_lock(&osdlock);
+    osdlock.lock();
+
     OSDSet *container = GetSet(name);
     if (container)
     {
         container->Hide();
+        changed = true;
     }
-    pthread_mutex_unlock(&osdlock);
+
+    osdlock.unlock();
 }
 
 void OSD::DialogUp(const QString &name)
 {
-    pthread_mutex_lock(&osdlock);
+    osdlock.lock();
     OSDSet *container = GetSet(name);
     if (container)
     {
@@ -1286,14 +1306,15 @@ void OSD::DialogUp(const QString &name)
 
             int selected = type->GetPosition() + type->GetOffset();
             HighlightDialogSelection(container, selected);
+            changed = true;
         }
     }
-    pthread_mutex_unlock(&osdlock);
+    osdlock.unlock();
 }
 
 void OSD::DialogDown(const QString &name)
 {
-    pthread_mutex_lock(&osdlock);
+    osdlock.lock();
     OSDSet *container = GetSet(name);
     if (container)
     {
@@ -1307,9 +1328,10 @@ void OSD::DialogDown(const QString &name)
 
             int selected = type->GetPosition() + type->GetOffset();
             HighlightDialogSelection(container, selected);
+            changed = true;
         }
     }
-    pthread_mutex_unlock(&osdlock);
+    osdlock.unlock();
 }
 
 bool OSD::DialogShowing(const QString &name)
@@ -1349,7 +1371,7 @@ void OSD::ShowEditArrow(long long number, long long totalframes, int type)
     xpos = editarrowRect.left() + xpos;
     int ypos = editarrowRect.top();
 
-    pthread_mutex_lock(&osdlock);
+    osdlock.lock();
 
     OSDSet *set = new OSDSet(name, false, vid_width, vid_height, wmult, hmult,
                              frameint);
@@ -1372,7 +1394,9 @@ void OSD::ShowEditArrow(long long number, long long totalframes, int type)
     set->AddType(image);
     set->Display();
 
-    pthread_mutex_unlock(&osdlock);
+    changed = true;
+
+    osdlock.unlock();
 }
 
 void OSD::HideEditArrow(long long number, int type)
@@ -1380,29 +1404,33 @@ void OSD::HideEditArrow(long long number, int type)
     char name[128];
     sprintf(name, "%lld-%d", number, type);
 
-    pthread_mutex_lock(&osdlock);
+    osdlock.lock();
     OSDSet *set = GetSet(name);
     if (set)
         set->Hide();
-    pthread_mutex_unlock(&osdlock);
+
+    changed = true;
+    osdlock.unlock();
 }
 
 void OSD::HideSet(const QString &name)
 {
-    pthread_mutex_lock(&osdlock);
+    osdlock.lock();
 
     OSDSet *set = GetSet(name);
     if (set)
     {
         set->Hide();
     }
-    pthread_mutex_unlock(&osdlock);
+
+    changed = true;
+    osdlock.unlock();
 }
 
 void OSD::UpdateEditText(const QString &seek_amount, const QString &deletemarker, 
 		           const QString &edittime, const QString &framecnt)
 {
-    pthread_mutex_lock(&osdlock);
+    osdlock.lock();
 
     QString name = "editmode";
     OSDSet *set = GetSet(name);
@@ -1423,15 +1451,16 @@ void OSD::UpdateEditText(const QString &seek_amount, const QString &deletemarker
 
         set->Display();
         m_setsvisible = true;
+        changed = true;
     }
 
-    pthread_mutex_unlock(&osdlock);
+    osdlock.unlock();
 }
 
 void OSD::DoEditSlider(QMap<long long, int> deleteMap, long long curFrame,
                        long long totalFrames)
 {
-    pthread_mutex_lock(&osdlock);
+    osdlock.lock();
 
     QString name = "editmode";
     OSDSet *set = GetSet(name);
@@ -1493,33 +1522,47 @@ void OSD::DoEditSlider(QMap<long long, int> deleteMap, long long curFrame,
 
         set->Display();
         m_setsvisible = true;
+        changed = true;
     }
 
-    pthread_mutex_unlock(&osdlock);
+    osdlock.unlock();
 }
 
 void OSD::SetVisible(OSDSet *set, int length)
 {
-    pthread_mutex_lock(&osdlock);
+    osdlock.lock();
     if (length > 0)
         set->DisplayFor(length * 1000000);
     else
         set->Display();
     m_setsvisible = true;
-    pthread_mutex_unlock(&osdlock);
+    changed = true;
+    osdlock.unlock();
 }
 
 void OSD::Display(VideoFrame *frame)
 {
+    //QTime timer;
+    //timer.start();
+
     bool anytodisplay = false;
     if (!setList || frame->codec != FMT_YV12)
         return;
 
-    unsigned char *yuvptr = frame->buf;
+    bool actuallydraw = false;
+ 
+    if (changed)
+    {
+        actuallydraw = true;
+        changed = false; 
+    }
+
+    if (actuallydraw)
+        drawSurface->Clear();
 
     vector<OSDSet *> removeList;
 
-    pthread_mutex_lock(&osdlock);
+    osdlock.lock();
     vector<OSDSet *>::iterator i = setList->begin();
     for (; i != setList->end(); i++)
     {
@@ -1533,12 +1576,19 @@ void OSD::Display(VideoFrame *frame)
                 timedisp->SetText(thetime);
             }
 
-            container->Draw(yuvptr);
+            if (container->Fading())
+                changed = true;
+
+            container->Draw(drawSurface, actuallydraw);
             anytodisplay = true;
             if (container->GetTimeLeft() == 0 && totalfadetime > 0)
             {
                 container->FadeFor(totalfadetime);
+                changed = true;
             }
+
+            if (container->NeedsUpdate())
+                changed = true;
         }
         else if (container->HasDisplayed())
         {
@@ -1554,9 +1604,18 @@ void OSD::Display(VideoFrame *frame)
         removeList.pop_back();
     }
 
-    pthread_mutex_unlock(&osdlock);
+    osdlock.unlock();
 
     m_setsvisible = anytodisplay;
+
+    if (m_setsvisible)
+    {
+        unsigned char *yuvptr = frame->buf;
+        BlendSurfaceToYUV(drawSurface, yuvptr);
+    }
+
+    //int msecs = timer.elapsed();
+    //cout << "drawing took: " << msecs << endl;
 }
 
 bool OSD::Visible(void)
@@ -1594,7 +1653,7 @@ class comp
 void OSD::AddSet(OSDSet *set, QString name, bool withlock)
 {
     if (withlock)
-        pthread_mutex_lock(&osdlock);
+        osdlock.lock();
 
     setMap[name] = set;
     setList->push_back(set);
@@ -1602,7 +1661,7 @@ void OSD::AddSet(OSDSet *set, QString name, bool withlock)
     sort(setList->begin(), setList->end(), comp());     
 
     if (withlock)
-        pthread_mutex_unlock(&osdlock);
+        osdlock.unlock();
 }
 
 void OSD::RemoveSet(OSDSet *set)
@@ -1617,4 +1676,70 @@ void OSD::RemoveSet(OSDSet *set)
         setList->erase(i);
 
     delete set;
+}
+
+void OSD::BlendSurfaceToYUV(OSDSurface *surface, unsigned char *yuvptr)
+{
+    unsigned char *uptrdest = yuvptr + surface->width * surface->height;
+    unsigned char *vptrdest = uptrdest + surface->width * surface->height / 4;
+
+    QMemArray<QRect> rects = surface->usedRegions.rects();
+    QMemArray<QRect>::Iterator it = rects.begin();
+    for (; it != rects.end(); ++it)
+    {
+        QRect drawRect = *it;
+
+        int startcol, startline, endcol, endline;
+        startcol = drawRect.left();
+        startline = drawRect.top();
+        endcol = drawRect.right();
+        endline = drawRect.bottom();
+
+        unsigned char *src, *usrc, *vsrc;
+        unsigned char *dest, *udest, *vdest;
+        unsigned char *alpha;
+
+        int yoffset;
+
+        for (int y = startline; y <= endline; y++)
+        {
+            yoffset = y * surface->width;
+
+            src = surface->y + yoffset + startcol;
+            dest = yuvptr + yoffset + startcol;
+            alpha = surface->alpha + yoffset + startcol;
+
+            usrc = surface->u + yoffset / 4 + startcol / 2;
+            udest = uptrdest + yoffset / 4 + startcol / 2;
+
+            vsrc = surface->v + yoffset / 4 + startcol / 2;
+            vdest = vptrdest + yoffset / 4 + startcol / 2;
+
+            for (int x = startcol; x <= endcol; x++)
+            {
+                if (*alpha == 0)
+                    goto blendimageend;
+
+                *dest = blendColorsAlpha(*src, *dest, *alpha);
+
+                if ((y % 2 == 0) && (x % 2 == 0))
+                {
+                    *udest = blendColorsAlpha(*usrc, *udest, *alpha);
+                    *vdest = blendColorsAlpha(*vsrc, *vdest, *alpha);
+                }
+
+blendimageend:
+                if ((y % 2 == 0) && (x % 2 == 0))
+                {
+                    usrc++;
+                    udest++;
+                    vsrc++;
+                    vdest++;
+                }
+                src++;
+                dest++;
+                alpha++;
+            }
+        }
+    }
 }
