@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
  <TITLE>Installing and using MythTV: System Configuration Requirements for Compiling MythTV </TITLE>
  <LINK HREF="mythtv-HOWTO-5.html" REL=next>
  <LINK HREF="mythtv-HOWTO-3.html" REL=previous>
@@ -74,7 +74,7 @@ command be run twice. Red Hat will also frequently "forget" about the path.
 It's recommended to run <B>/sbin/ldconfig</B> after installing every
 package. Failing that, always run it if you get an unexpected error about
 not finding libraries.</P>
-<H2><A NAME="ss4.3">4.3</A> <A HREF="mythtv-HOWTO.html#toc4.3">Shell-Alias Requirements for MythTV</A>
+<H2><A NAME="ss4.3">4.3</A> <A HREF="mythtv-HOWTO.html#toc4.3">Environment variable Requirements for MythTV</A>
 </H2>
 
 <H3>General requirements</H3>
@@ -88,21 +88,18 @@ as a part of the installation of the software prerequisites detailed
 earlier.</P>
 <P>One way to do this is as follows: 
 <A NAME="Checking_that_it_worked"></A> </P>
-<P>Open a new shell and switch to superuser mode.
+<P>Open a shell and execute the following:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ su
-# set
-[lots of text]
-        
-PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
-QTDIR=/usr/lib/qt3
-
-[lots more text]
+$ echo $PATH
+/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
+$ echo $QTDIR
+/usr/lib/qt3
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>You should see <CODE>QTDIR</CODE> and <CODE>/usr/lib/qt3/bin</CODE> in your path.</P>
+<P>You should see a value like <CODE>/usr/lib/qt3</CODE> for <CODE>QTDIR</CODE>
+and <CODE>/usr/lib/qt3/bin</CODE> should be in $PATH.</P>
 <P>If you don't, do not proceed past this step until you have resolved this
 error. You may need to manually specify the QTDIR and PATH at the shell
 prompt before compiling.</P>

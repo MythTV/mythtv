@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
  <TITLE>Installing and using MythTV: Setting up a remote control.</TITLE>
  <LINK HREF="mythtv-HOWTO-9.html" REL=next>
  <LINK HREF="mythtv-HOWTO-7.html" REL=previous>
@@ -131,7 +131,7 @@ prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>As you can see, there's a link from /dev/lirc to ttyS0, aka "COM1", which is
+<P>As you can see, there's a link from /dev/lirc to ttyS0, a.k.a. "COM1", which is
 appropriate for the Pinnacle Systems PCTV Pro.  However, you may notice
 something like this:
 <BLOCKQUOTE><CODE>
@@ -140,7 +140,7 @@ crw-------    1 root     root      61,   0 Dec 31  1969 lirc
 </PRE>
 </CODE></BLOCKQUOTE>
 
-Some IR receivers (including some homebrew's) use a character device as
+Some IR receivers (including some homebrew units) use a character device as
 their data interface as opposed to a link to a serial port.  If the <CODE>make
 install</CODE> step has created a character device for you, don't replace it
 with a link to a COM port.</P>
@@ -228,7 +228,7 @@ you must do to make lirc work is go to the "character devices" section
 and change "Standard/generic (8250/16550 and compatible UARTs) serial  
 support" from "y" to "m". Now if you want you can have a look around.  
 For instance, you might wish to turn off ham radio support, or perhaps  
-turn off pcmcia support if you are not on a laptop. But be careful!  
+turn off PCMCIA support if you are not on a laptop. But be careful!  
 Only change things you know you can change. If you are not sure, just  
 stick to the one required change. Click "save and exit".
 Next:
@@ -550,8 +550,8 @@ mythbackend setup screen for Input Connections.</P>
 <P>This csh script will be called each time MythTV needs to change the channel.
 Below is a copy of the script followed by the corresponding perl script.
 Make sure both are in your path. Also make sure you leave the #!/bin/csh
-setting and not change it to bourne or bash. This will create a frustrating
-symptom to diagnose where MythTV cannot open /dev/device. Unlike bourne or
+setting and not change it to Bourne or bash. This will create a frustrating
+symptom to diagnose where MythTV cannot open /dev/device. Unlike Bourne or
 bash, csh scripts automatically close parent file descriptors before they
 start.
 <BLOCKQUOTE><CODE>
@@ -572,7 +572,7 @@ $ exit
 <P>See <CODE>contrib/channel.pl</CODE> for the actual file.  Copy it to
 <CODE>/usr/local/bin/</CODE></P>
 <P>The last statement within the perl script is the lirc rc command. This is
-the command that transmits the code to your cable/dss box. Make sure to have
+the command that transmits the code to your cable/DSS box. Make sure to have
 the IRDA device within a few feet of the box.</P>
 
 <HR>

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
  <TITLE>Installing and using MythTV: Checking prerequisites. </TITLE>
  <LINK HREF="mythtv-HOWTO-4.html" REL=next>
  <LINK HREF="mythtv-HOWTO-2.html" REL=previous>
@@ -43,7 +43,7 @@ convert the video stream to the MPEG-2 format without using the motherboard
 CPU.  The main CPU has the responsibility of running the Operating System
 and reading and writing the encoded frames to the disk.  These tasks have
 fairly low CPU requirements compared to encoding video, which is why a
-device like a Series 1 Tivo can run with only 16MB of RAM and a 54Mhz CPU.</P>
+device like a Series 1 Tivo can run with only 16MB of RAM and a 54MHz CPU.</P>
 <P>There are many variables that go into the question: "How fast a CPU do I
 need to run MythTV"?  Obviously, the faster your CPU, the better your
 experience will be with MythTV.  If you are using the software MPEG-4
@@ -52,21 +52,21 @@ encoding and decoding video simultaneously to allow Pause, Fast Forward and
 Rewind functions for live TV requires more CPU then just encoding or
 decoding.  MythTV also supports multiple encoder cards in a single PC,
 thereby increasing the CPU requirements if you plan on simultaneously
-encoding multiple programs.  As a general guideline, plan on 1Ghz per
+encoding multiple programs.  As a general guideline, plan on 1GHz per
 encoder.</P>
 <P>Here are a few data points:
 <UL>
-<LI>A PIII/733Mhz system can encode one video stream using the MPEG-4
+<LI>A PIII/733MHz system can encode one video stream using the MPEG-4
 codec using 480x480 capture resolution.  This does not allow for live TV
 watching, but does allow for encoding video and then watching it later.</LI>
 <LI>The developer states that his AMD1800+ system can <B>almost</B>
 encode two MPEG-4 video streams and watch one program simultaneously.</LI>
-<LI>A PIII/800Mhz system with 512MB RAM can encode one video
+<LI>A PIII/800MHz system with 512MB RAM can encode one video
 stream using the RTJPEG codec with 480x480 capture resolution and play it back
 simultaneously, thereby allowing live TV watching.</LI>
-<LI>A dual Celeron/450Mhz is able to view a 480x480 MPEG-4/3300Kbps file
+<LI>A dual Celeron/450MHz is able to view a 480x480 MPEG-4/3300kbps file
 created on a different system with 30% CPU usage.</LI>
-<LI>A P4 2.4Ghz machine can encode two 3300Kbps 480x480 MPEG-4 files and
+<LI>A P4 2.4GHz machine can encode two 3300Kbps 480x480 MPEG-4 files and
 simultaneously serve content to a remote frontend.</LI>
 </UL>
 </P>
@@ -106,7 +106,7 @@ information.</P>
 
 <P>MythTV creates large files, many in excess of 2GB.  You <EM>must</EM> use a
 filesystem that will allow you to create large files.  Filesystems known to
-have issues are FAT and FAT32.</P>
+have problems with large files are FAT and FAT32.</P>
 <P>
 <A NAME="video_capture_device"></A> </P>
 <H3>Video Capture Device </H3>
@@ -155,7 +155,7 @@ drastically reduces the CPU requirements for encoding.</P>
 <P>
 <UL>
 <LI>An Athlon 1800XP can decode a 720x480 8Mbps MPEG-2 file using 10% CPU</LI>
-<LI>An Athlon 1Ghz can decode a 720x480 16Mbps MPEG-2 file using 30-50%
+<LI>An Athlon 1GHz can decode a 720x480 16Mbps MPEG-2 file using 30-50%
 CPU, can decode a 480x480 16Mbps MPEG-2 using 30% CPU and approximately 30%
 for Live TV at 416x480.</LI>
 <LI>A P3-550 can decode a 480x480 16Mbps MPEG-2 file with 55% CPU.</LI>
@@ -166,25 +166,31 @@ for Live TV at 416x480.</LI>
 <P>See the 
 <A HREF="mythtv-HOWTO-19.html#pvr250">I'd like to use a hardware MPEG-2 encoder</A>
 section for information on installing a PVR-250 on Mandrake 9.1.</P>
-<P><B>NOTE</B>:  The ATI All-in-Wonder cards <EM>will not</EM> work as a
-MythTV capture device.  The cards do not use the V4L drivers, and the gatos
-drivers that are available provide a limited subset of the V4L API.</P>
+<P><B>NOTE</B>: The ATI All-in-Wonder cards <EM>will not</EM> work as a
+MythTV capture device, as the 
+<A HREF="http://gatos.sourceforge.net">GATOS</A> drivers that are available provide only a limited subset
+of the V4L API.</P>
 
 <H3>Sound card</H3>
 
 <P>The system needs a sound card or an onboard equivalent on the motherboard
 to play back and in most cases, to record sound. Any sound card that can be
 operated by the ALSA (Advanced Linux Sound Architecture) kernel modules will
-work with MythTV.</P>
-<P>The usual practice for capturing the audio associated with the video is to
-run a jumper cable from an audio output on the video capture card to the
-Line input on the sound card. Some video capture cards use internal audio
-tuners that work with the kernel btaudio module, thereby eliminating the
-patch cable. This is useful if you will be using multiple capture cards in a
-single chassis, since each capture card will not need its own sound card.
-See the 
-<A HREF="mythtv-HOWTO-19.html#btaudio">btaudio</A> section for more
-information.</P>
+work with MythTV.  However, some cards and drivers will provide better
+quality or compatibility than others.  In particular, many audio
+devices included on motherboards can be problematic.</P>
+<P>The usual practice for capturing the audio associated with the video
+is to run a cable from an audio output on the video capture card to
+the Line input on a sound card. However, some video capture cards
+provide onboard audio capabilities that work with the kernel
+<CODE>btaudio</CODE> module instead, thereby eliminating the need for a
+cable.  This is useful if you will be using multiple capture cards in
+a single chassis, since each capture card will not need its own sound
+card.  Note that a separate sound card is still required for playback
+when using <CODE>btaudio</CODE>, and that often the audio recorded in this
+way will be mono only.  See the 
+<A HREF="mythtv-HOWTO-19.html#btaudio">btaudio</A>
+section for more information.</P>
 <P><B>NOTE</B>:  The PVR-250/350 does not require a sound card for audio
 capture.</P>
 
@@ -194,25 +200,20 @@ capture.</P>
 recommended that you use a card which supports XVideo (XV) extensions. If
 your card does not support XV, color conversion and scaling will be
 performed by your CPU rather than the video card.  This is very CPU
-intensive.  Check the XFree86 documentation for details if you are uncertain
-about your preferred card.  You may also run <CODE>xvinfo</CODE>; look for your
-video card to be listed as one of the adapters.</P>
+and memory intensive and will often result in dropped frames and a
+corresponding degradation of quality.  Check the XFree86 documentation
+for details if you are uncertain about your preferred card.  You may
+also run <CODE>xvinfo</CODE>; look for your video card to be listed as one
+of the adapters.</P>
 
-<P>If you want to use MythTV with a standard television, there are two things
-that you're going to need:</P>
-<P>1. A physical connection from your video card to your TV set, which can
+<P>If you want to use MythTV with a standard television, you will need a
+physical connection from your video card to your TV set, which can
 either be a TV-out port on the card itself, or an external adapter that
 converts the VGA signal to an appropriate video signal. "Appropriate"
 depends on a number of factors, such as video standard (NTSC vs PAL) type of
 input connection (Composite vs SVideo), etc.</P>
-<P>2. An X driver for your video card that supports the XVideo extensions. 
-These extensions transfer some of the processing needed to display
-full-motion video from the CPU to the card's own hardware. While it is
-<EM>possible</EM> to run MythTV on a card that does not have XVideo
-extentions it will require massive amounts of CPU and will most likely
-result in frame drops.</P>
-<P>Both these requirements must be met.  There are X drivers that support
-XVideo on their VGA outputs, but not on their TV outputs.</P>
+<P>Note that with some video cards and X drivers, Xvideo extensions are
+only supported on the VGA output, and not on the TV output.</P>
 
 <H3>Cards with TV out</H3>
 
@@ -270,7 +271,7 @@ SVideo ports. Reported to work with the proprietary Matrox X driver.</LI>
 <LI>Matrox Millennium 450GX AGP. Uses external adapter to provide
 Composite and SVideo ports. TV-out implementation does <EM>NOT</EM> support XVideo.</LI>
 <LI>Matrox Millennium 550GX AGP. Uses external adapter to provide
-Composite and sVideo ports. TV-out implementation does <EM>NOT</EM> support XVideo.</LI>
+Composite and S-Video ports. TV-out implementation does <EM>NOT</EM> support XVideo.</LI>
 </UL>
 </P>
 
@@ -369,10 +370,10 @@ perform.  See your package documentation.</P>
 some themes have been packaged by 
 <A HREF="mailto:Axel.Thimm@physik.fu-berlin.de">mailto:Axel.Thimm@physik.fu-berlin.de</A> and are available at 
 <A HREF="http://atrpms.physik.fu-berlin.de/topic/multimedia/">http://atrpms.physik.fu-berlin.de/topic/multimedia/</A>. All of the
-prerequisites for MythTV (such as XMLTV) are available as rpm packages. If
+prerequisites for MythTV (such as XMLTV) are available as RPM packages. If
 you have problems with the RPMs, please send him email directly.</P>
-<P>Given the large number of dependent rpms you are advised to use tools like
-apt or yum for automatic retrieval and installation of the required rpms.
+<P>Given the large number of dependent RPMs you are advised to use tools like
+apt or yum for automatic retrieval and installation of the required RPMs.
 (
 <A HREF="http://atrpms.physik.fu-berlin.de/install.html">http://atrpms.physik.fu-berlin.de/install.html</A>) In this case a
 special meta-package called mythtv-suite will allow you to install all of

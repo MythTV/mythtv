@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
  <TITLE>Installing and using MythTV: MySQL.</TITLE>
  <LINK HREF="mythtv-HOWTO-7.html" REL=next>
  <LINK HREF="mythtv-HOWTO-5.html" REL=previous>
@@ -51,7 +51,7 @@ Click Save, then close the window.</P>
 <H2><A NAME="ss6.3">6.3</A> <A HREF="mythtv-HOWTO.html#toc6.3">Gentoo</A>
 </H2>
 
-<P>After installing mysql you need to initialise the database by running
+<P>After installing mysql you need to initialize the database by running
 mysql_install_db as root. </P>
 
 <H2><A NAME="ss6.4">6.4</A> <A HREF="mythtv-HOWTO.html#toc6.4">Setting up the initial database.</A>
@@ -124,7 +124,7 @@ $ mysql -u root &lt; 0.9-to-0.10.sql
 
 <P>If you're going to have multiple systems accessing a master database,
 you must grant access to the database from remote systems.  By default, the
-<CODE>mc.sql</CODE> script is only granting access to the localhost.</P>
+<CODE>mc.sql</CODE> script is only granting access to the local host.</P>
 <P>To allow other hosts access to your master database, you can either set it
 up for no security at all, or with more granularity.  Note that the "%" is
 the wildcard character in MySQL.</P>
