@@ -152,7 +152,7 @@ long long ThreadedFileWriter::Seek(long long pos, int whence)
     while(BufUsed() > 0)
 	usleep(5000);
 
-    return lseek64(fd, pos, whence);
+    return lseek(fd, pos, whence);
 }
 
 void ThreadedFileWriter::DiskLoop()
@@ -521,7 +521,7 @@ int RingBuffer::Read(void *buf, int count)
 	    ret = safe_read(fd2, buf, toread);
 	    
 	    int left = count - toread;
-	    lseek64(fd2, 0, SEEK_SET);
+	    lseek(fd2, 0, SEEK_SET);
 
 	    ret = safe_read(fd2, (char *)buf + toread, left);
 	    ret += toread;
@@ -643,7 +643,7 @@ long long RingBuffer::Seek(long long pos, int whence)
         if (remotefile)
             ret = remotefile->Seek(pos, whence, readpos);
         else
-            ret = lseek64(fd2, pos, whence);
+            ret = lseek(fd2, pos, whence);
 
         if (whence == SEEK_SET)
             readpos = ret;
@@ -659,7 +659,7 @@ long long RingBuffer::Seek(long long pos, int whence)
         {
             if (whence == SEEK_SET)
             {
-                ret = lseek64(fd2, pos, whence);
+                ret = lseek(fd2, pos, whence);
             }
             else if (whence == SEEK_CUR)
             {
@@ -667,7 +667,7 @@ long long RingBuffer::Seek(long long pos, int whence)
                 while (realseek > filesize)
                     realseek -= filesize;
 
-                ret = lseek64(fd2, realseek, SEEK_SET);
+                ret = lseek(fd2, realseek, SEEK_SET);
             }
 	}
 
