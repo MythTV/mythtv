@@ -16,6 +16,7 @@ using namespace std;
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythwidgets.h>
+#include <mythtv/lcddevice.h>
 
 PlaybackBox::PlaybackBox(MythMainWindow *parent, QString window_name,
                          QString theme_filename, 
@@ -24,9 +25,7 @@ PlaybackBox::PlaybackBox(MythMainWindow *parent, QString window_name,
 
            : MythThemedDialog(parent, window_name, theme_filename, name)
 {
-    //
     //  A few internal variable defaults
-    //
  
     input = NULL;
     output = NULL;
@@ -37,7 +36,7 @@ PlaybackBox::PlaybackBox(MythMainWindow *parent, QString window_name,
     waiting_for_playlists_timer = NULL;
     playlist_tree = NULL;
     
- 
+    lcd_volume_visible = false; 
     isplaying = false;
     tree_is_done = false;
     first_playlist_check = true;
@@ -49,122 +48,100 @@ PlaybackBox::PlaybackBox(MythMainWindow *parent, QString window_name,
     visualizer_status = 0;
     curMeta = NULL;
 
-    //
-    //  Set our pointers the playlists and the
-    //  metadata containers
-    //
+    // Set our pointers the playlists and the metadata containers
 
     all_playlists = the_playlists;
     all_music = the_music;
 
-    //
-    //  Get some user set options
-    //
+    // Get some user set options
 
     show_whole_tree = gContext->GetNumSetting("ShowWholeTree", 1);
     keyboard_accelerators = gContext->GetNumSetting("KeyboardAccelerators", 1);
-    if(!keyboard_accelerators)
-    {
+    if (!keyboard_accelerators)
         show_whole_tree = false;
-    }
+
     showrating = gContext->GetNumSetting("MusicShowRatings", 0);
     listAsShuffled = gContext->GetNumSetting("ListAsShuffled", 0);
     cycle_visualizer = gContext->GetNumSetting("VisualCycleOnSongChange", 0);
 
-    //
-    //  Through the magic of themes, our "GUI" already exists
-    //  we just need to wire up it
-    //
+    // Through the magic of themes, our "GUI" already exists we just need to 
+    // wire up it
 
     wireUpTheme();
 
-    //
-    //  Possibly (user-defined) control the volume
-    //
+    // Possibly (user-defined) control the volume
     
     volume_control = NULL;
     volume_display_timer = new QTimer(this);
-    if(gContext->GetNumSetting("MythControlsVolume", 0))
+    if (gContext->GetNumSetting("MythControlsVolume", 0))
     {
         volume_control = new VolumeControl(true);
         volume_display_timer->start(2000);
         connect(volume_display_timer, SIGNAL(timeout()), this, SLOT(hideVolume()));
     }
     
-    //
-    //  Figure out the shuffle mode
-    //
+    // Figure out the shuffle mode
 
     QString playmode = gContext->GetSetting("PlayMode");
     if (playmode.lower() == "random")
-    {
         setShuffleMode(SHUFFLE_RANDOM);
-    }
     else if (playmode.lower() == "intelligent")
-    {
         setShuffleMode(SHUFFLE_INTELLIGENT);
-    }
     else
-    {
         setShuffleMode(SHUFFLE_OFF);
-    }
 
-    
-    //
-    //  Set some button values
-    //
+    // Set some button values
     
     if (!keyboard_accelerators) 
     {
-        if(pledit_button)
+        if (pledit_button)
             pledit_button->setText(tr("Edit Playlist"));
-        if(vis_button)
+        if (vis_button)
             vis_button->setText(tr("Visualize"));
-        if(!assignFirstFocus())
+        if (!assignFirstFocus())
         {
-            cerr << "playbackbox.o: Could not find a button to assign focus to. What's in your theme?" << endl;
+            cerr << "playbackbox.o: Could not find a button to assign focus "
+                    "to. What's in your theme?" << endl;
             exit(0);
         }
     } 
     else 
     {
-        if(pledit_button)
+        if (pledit_button)
             pledit_button->setText(tr("3 Edit Playlist"));
-        if(vis_button)
+        if (vis_button)
             vis_button->setText(tr("4 Visualize"));
     }
 
-    //  
-    //  We set a timer to load the playlists. We do this
-    //  for two reasons: (1) the playlists may not be fully
-    //  loaded, and (2) even if they are fully loaded, they
-    //  do take a while to write out a GenericTree for navigation
-    //  use, and that slows down the appearance of this dialog
-    //  if we were to do it right here.
-    //
+    // Set please wait on the LCD
+    QPtrList<LCDTextItem> textItems;
+    textItems.setAutoDelete(true);
 
+    textItems.append(new LCDTextItem(1, ALIGN_CENTERED, "Please Wait", 
+                     "Generic"));
+    gContext->GetLCDDevice()->switchToGeneric(&textItems);
+
+    // We set a timer to load the playlists. We do this for two reasons: 
+    // (1) the playlists may not be fully loaded, and (2) even if they are 
+    // fully loaded, they do take a while to write out a GenericTree for 
+    // navigation use, and that slows down the appearance of this dialog
+    // if we were to do it right here.
 
     waiting_for_playlists_timer = new QTimer(this);
-    connect(waiting_for_playlists_timer, SIGNAL(timeout()), this, SLOT(checkForPlaylists()));
+    connect(waiting_for_playlists_timer, SIGNAL(timeout()), this, 
+            SLOT(checkForPlaylists()));
     waiting_for_playlists_timer->start(100);
 
     setRepeatMode(REPEAT_ALL);
     
-    //
-    //  Warm up the visualizer
-    //
+    // Warm up the visualizer
     
     mainvisual = new MainVisual(this);
-    if(visual_blackhole)
-    {
+    if (visual_blackhole)
         mainvisual->setGeometry(visual_blackhole->getScreenArea());
-    }
     else
-    {
         mainvisual->setGeometry(screenwidth + 10, screenheight + 10, 160, 160);
-    }
     mainvisual->show();   
-    
  
     visual_mode = gContext->GetSetting("VisualMode");
     visual_mode.simplifyWhiteSpace();
@@ -173,34 +150,26 @@ PlaybackBox::PlaybackBox(MythMainWindow *parent, QString window_name,
     QString visual_delay = gContext->GetSetting("VisualModeDelay");
     bool delayOK;
     visual_mode_delay = visual_delay.toInt(&delayOK);
-    if(!delayOK)
-    {
+    if (!delayOK)
     	visual_mode_delay = 0;
-    }
-    if(visual_mode_delay > 0)
+    if (visual_mode_delay > 0)
     {
         visual_mode_timer->start(visual_mode_delay * 1000);
         connect(visual_mode_timer, SIGNAL(timeout()), this, SLOT(visEnable()));
     }
     visualizer_status = 1;
 
+    // Temporary workaround for visualizer Bad X Requests
     //
-    //  Temporary workaround for visualizer Bad X Requests
+    // start on Blank, and then set the "real" mode after
+    // the playlist timer fires. Seems to work.
     //
-    //  start on Blank, and then set the "real" mode after
-    //  the playlist timer fires. Seems to work.
-    //
-    //  Suspicion: in most modes, SDL is not happy if the
-    //  window doesn't fully exist yet  (????)
-    //
+    // Suspicion: in most modes, SDL is not happy if the
+    // window doesn't fully exist yet  (????)
     
     mainvisual->setVisual("Blank");
-//    mainvisual->setVisual(visual_mode);
 
-    //
-    //  Ready to go. Let's update the foreground just to
-    //  be safe.
-    //
+    // Ready to go. Let's update the foreground just to be safe.
 
     updateForeground();
 }
@@ -223,28 +192,28 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
     switch (e->key())
     {
         case Key_PageDown:
-            if(next_button)
+            if (next_button)
                 next_button->push();
             else
                 next();
             handled = true;
             break;
         case Key_PageUp:
-            if(prev_button)
+            if (prev_button)
                 prev_button->push();
             else
                 previous();
             handled = true;
             break;
         case Key_F:
-            if(ff_button)
+            if (ff_button)
                 ff_button->push();
             else
                 seekforward();
             handled = true;
             break;
         case Key_R:
-            if(rew_button)
+            if (rew_button)
                 rew_button->push();
             else
                 seekback();
@@ -253,14 +222,14 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
         case Key_P:
             if (isplaying)
             {
-                if(pause_button)
+                if (pause_button)
                     pause_button->push();
                 else
                     pause();
             }
             else
             {
-                if(play_button)
+                if (play_button)
                     play_button->push();
                 else
                     play();
@@ -268,7 +237,7 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
             handled = true;
             break;
         case Key_S:
-            if(stop_button)
+            if (stop_button)
                 stop_button->push();
             else
                 stop();
@@ -283,21 +252,21 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
             handled = true;
             break;
         case Key_1:
-            if(shuffle_button)
+            if (shuffle_button)
                 shuffle_button->push();
             else
                 toggleShuffle();
             handled = true;
             break;
         case Key_2:
-            if(repeat_button)
+            if (repeat_button)
                 repeat_button->push();
             else
                 toggleRepeat();
             handled = true;
             break;
         case Key_3:
-            if(pledit_button)
+            if (pledit_button)
                 pledit_button->push();
             else
                 editPlaylist();
@@ -329,13 +298,10 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
             QString visual_workaround = mainvisual->getCurrentVisual();
             mainvisual->setVisual("Blank");
             if(visual_blackhole)
-            {
                 mainvisual->setGeometry(visual_blackhole->getScreenArea());
-            }
             else
-            {
-                mainvisual->setGeometry(screenwidth + 10, screenheight + 10, 160, 160);
-            }
+                mainvisual->setGeometry(screenwidth + 10, screenheight + 10, 
+                                        160, 160);
             setUpdatesEnabled(true);
             mainvisual->setVisual(visual_workaround);
             handled = true;
@@ -371,7 +337,7 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                     handled = true;
                     break;
                 case Key_4:
-                    if(vis_button)
+                    if (vis_button)
                         vis_button->push();
                     else
                         visEnable();
@@ -418,75 +384,59 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
 
 void PlaybackBox::checkForPlaylists()
 {
-    if(first_playlist_check)
+    if (first_playlist_check)
     {
         first_playlist_check = false;
         repaint();
         return;
     }
 
-    //
-    //  This is only done off a timer on startup
-    //
+    // This is only done off a timer on startup
 
-    if(all_playlists->doneLoading() &&
-       all_music->doneLoading())
+    if (all_playlists->doneLoading() &&
+        all_music->doneLoading())
     {
-        if(tree_is_done)
+        if (tree_is_done)
         {
             music_tree_list->showWholeTree(show_whole_tree);
             waiting_for_playlists_timer->stop();
             QValueList <int> branches_to_current_node;
-            branches_to_current_node.append(0);                  //  Root node
-            branches_to_current_node.append(1);                  //  We're on a playlist (not "My Music")
-            branches_to_current_node.append(0);                  //  Active play Queue
+            branches_to_current_node.append(0); //  Root node
+            branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
+            branches_to_current_node.append(0); //  Active play Queue
             music_tree_list->moveToNodesFirstChild(branches_to_current_node);
             music_tree_list->refresh();
-            if(show_whole_tree)
-            {
+            if (show_whole_tree)
                 setContext(1);
-            }
             else
-            {
                 setContext(2);
-            }
             updateForeground();
             mainvisual->setVisual(visual_mode);
         }
         else
-        {
             constructPlaylistTree();
-        }
     }
     else
     {
-        //
-        //  Visual Feedback ...
-        //
+        // Visual Feedback ...
     }
-
-
 }
 
 void PlaybackBox::changeVolume(bool up_or_down)
 {
-    if(volume_control)
+    if (volume_control)
     {
-        if(up_or_down)
-        {
+        if (up_or_down)
             volume_control->AdjustCurrentVolume(2);
-        }
         else
-        {
             volume_control->AdjustCurrentVolume(-2);
-        }
         showVolume(true);
     }
 }
 
 void PlaybackBox::toggleMute()
 {
-    if(volume_control)
+    if (volume_control)
     {
         volume_control->ToggleMute();
         showVolume(true);
@@ -495,9 +445,10 @@ void PlaybackBox::toggleMute()
 
 void PlaybackBox::showVolume(bool on_or_off)
 {
-    if(volume_control)
+    float volume_level;
+    if (volume_control)
     {
-        if(volume_status)
+        if (volume_status)
         {
             if(on_or_off)
             {
@@ -505,11 +456,39 @@ void PlaybackBox::showVolume(bool on_or_off)
                 volume_status->SetOrder(0);
                 volume_status->refresh();
                 volume_display_timer->changeInterval(2000);
+                if (!lcd_volume_visible)
+                {
+                    lcd_volume_visible = true;
+                    gContext->GetLCDDevice()->switchToVolume("Music");
+                }
+                if (volume_control->GetMute())
+                    volume_level = 0.0;
+                else
+                    volume_level = (float)volume_control->GetCurrentVolume() / 
+                                   (float)100;
+
+                gContext->GetLCDDevice()->setVolumeLevel(volume_level);
             }
             else
             {
-                volume_status->SetOrder(-1);
-                volume_status->refresh();
+                if (volume_status->getOrder() != -1)
+                {
+                    volume_status->SetOrder(-1);
+                    volume_status->refresh();
+
+                    //Show the artist stuff on the LCD
+                    QPtrList<LCDTextItem> textItems;
+                    textItems.setAutoDelete(true);
+
+                    textItems.append(new LCDTextItem(1, ALIGN_CENTERED,
+                                     curMeta->Artist() +" [" + 
+                                     curMeta->Album() + "] " +
+                                     curMeta->Title(), "Generic", true));
+
+                    gContext->GetLCDDevice()->switchToGeneric(&textItems);
+
+                    lcd_volume_visible = false;
+                }
             }
         }
     }
@@ -524,19 +503,13 @@ void PlaybackBox::resetTimer()
 void PlaybackBox::play()
 {
     if (isplaying)
-    {
         stop();
-    }
 
-    if(curMeta)
-    {
+    if (curMeta)
         playfile = curMeta->Filename();
-    }
     else
     {
-        //
-        //  Perhaps we can descend to something playable?
-        //
+        // Perhaps we can descend to something playable?
         wipeTrackInfo();
         return;
     }
@@ -575,14 +548,10 @@ void PlaybackBox::play()
         input = streaminput.socket();
     } 
     else
-    {
         input = new QFile(playfile);
-    }
 
     if (decoder && !decoder->factory()->supports(sourcename))
-    {
         decoder = 0;
-    }
 
     if (!decoder) 
     {
@@ -614,13 +583,9 @@ void PlaybackBox::play()
         if (output)
         {
             if (startoutput)
-            {
                 output->start();
-            }
             else
-            {
                 output->resetTime();
-            }
         }
 
         decoder->start();
@@ -636,7 +601,6 @@ void PlaybackBox::visEnable()
     if (!visualizer_status != 2 && isplaying)
     {
         setUpdatesEnabled(false);
-        //visual_mode_timer->stop();
         mainvisual->setGeometry(0, 0, screenwidth, screenheight);
         visualizer_status = 2;
     }
@@ -646,7 +610,7 @@ void PlaybackBox::CycleVisualizer()
 {
     QString new_visualizer;
 
-    //Only change the visualizer if there is more than 1 visualizer
+    // Only change the visualizer if there is more than 1 visualizer
     // and the user currently has a visualizer active
     if (mainvisual->numVisualizers() > 1 && visualizer_status > 0)
     {
@@ -773,17 +737,14 @@ void PlaybackBox::stop(void)
     int maxh = maxTime / 3600;
     int maxm = (maxTime / 60) % 60;
     int maxs = maxm % 60;
-    if(maxh > 0)
-    {
+    if (maxh > 0)
         time_string.sprintf("%d:%02d:%02d", maxh, maxm, maxs);
-    }
     else
-    {
         time_string.sprintf("%02d:%02d", maxm, maxs);
-    }
-    if(time_text)
+
+    if (time_text)
         time_text->SetText(time_string);
-    if(info_text)
+    if (info_text)
         info_text->SetText("");
 
     isplaying = false;
@@ -791,7 +752,7 @@ void PlaybackBox::stop(void)
 
 void PlaybackBox::stopAll()
 {
-    gContext->LCDswitchToTime();
+    gContext->GetLCDDevice()->switchToTime();
     stop();
 
     if (decoder) 
@@ -803,19 +764,15 @@ void PlaybackBox::stopAll()
 
 void PlaybackBox::previous()
 {
-    if(repeatmode == REPEAT_ALL)
+    if (repeatmode == REPEAT_ALL)
     {
-        if(music_tree_list->prevActive(true, show_whole_tree))
-        {
+        if (music_tree_list->prevActive(true, show_whole_tree))
             music_tree_list->activate();
-        }
     }
     else
     {
-        if(music_tree_list->prevActive(false, show_whole_tree))
-        {
+        if (music_tree_list->prevActive(false, show_whole_tree))
             music_tree_list->activate();
-        }
     }
      
     if (visualizer_status > 0 && cycle_visualizer)
@@ -824,26 +781,18 @@ void PlaybackBox::previous()
 
 void PlaybackBox::next()
 {
-    if(repeatmode == REPEAT_ALL)
+    if (repeatmode == REPEAT_ALL)
     {
-        //
-        //  Grab the next track after this
-        //  one. First flag is to wrap around
-        //  to the beginning of the list. Second
-        //  decides if we will traverse up and down
-        //  tree.
-        //
-        if(music_tree_list->nextActive(true, show_whole_tree))
-        {
+        // Grab the next track after this one. First flag is to wrap around
+        // to the beginning of the list. Second decides if we will traverse up 
+        // and down the tree.
+        if (music_tree_list->nextActive(true, show_whole_tree))
             music_tree_list->activate();
-        }
     }
     else
     {
-        if(music_tree_list->nextActive(false, show_whole_tree))
-        {
+        if (music_tree_list->nextActive(false, show_whole_tree))
             music_tree_list->activate();
-        }
     }
      
     if (visualizer_status > 0 && cycle_visualizer)
@@ -905,7 +854,6 @@ void PlaybackBox::seek(int pos)
 
 void PlaybackBox::setShuffleMode(unsigned int mode)
 {
-
     shufflemode = mode;
 
     switch (shufflemode)
@@ -942,14 +890,10 @@ void PlaybackBox::setShuffleMode(unsigned int mode)
             break;
     }
     music_tree_list->setTreeOrdering(shufflemode + 1);
-    if(listAsShuffled)
-    {
+    if (listAsShuffled)
         music_tree_list->setVisualOrdering(shufflemode + 1);
-    }
     else
-    {
         music_tree_list->setVisualOrdering(1);
-    }
     music_tree_list->refresh();
 }
 
@@ -961,20 +905,15 @@ void PlaybackBox::toggleShuffle(void)
 void PlaybackBox::increaseRating()
 {
     if(!curMeta)
-    {
         return;
-    }
 
-    //
-    //  Rationale here is that if you can't get 
-    //  visual feedback on ratings adjustments,
-    //  you probably should not be changing them
-    //
+    // Rationale here is that if you can't get visual feedback on ratings 
+    // adjustments, you probably should not be changing them
 
-    if(showrating)
+    if (showrating)
     {
         curMeta->incRating();
-        if(ratings_image)
+        if (ratings_image)
             ratings_image->setRepeat(curMeta->Rating());
     }
 }
@@ -982,13 +921,12 @@ void PlaybackBox::increaseRating()
 void PlaybackBox::decreaseRating()
 {
     if(!curMeta)
-    {
         return;
-    }
-    if(showrating)
+
+    if (showrating)
     {
         curMeta->decRating();
-        if(ratings_image)
+        if (ratings_image)
             ratings_image->setRepeat(curMeta->Rating());
     }
 }
@@ -997,10 +935,9 @@ void PlaybackBox::setRepeatMode(unsigned int mode)
 {
     repeatmode = mode;
 
-    if(!repeat_button)
-    {
+    if (!repeat_button)
         return;
-    }
+
     switch (repeatmode)
     {
         case REPEAT_ALL:
@@ -1040,13 +977,10 @@ void PlaybackBox::constructPlaylistTree()
     playlist_tree->setAttribute(2, 0);
     playlist_tree->setAttribute(3, 0);
 
-    //
-    //  We ask the playlist object to write out the whole
-    //  tree (all playlists and all music). It will set
-    //  attributes for nodes in the tree, such as whether
-    //  a node is selectable, how it can be ordered (normal,
-    //  random, intelligent), etc. 
-    //
+    // We ask the playlist object to write out the whole tree (all playlists 
+    // and all music). It will set attributes for nodes in the tree, such as 
+    // whether a node is selectable, how it can be ordered (normal, random, 
+    // intelligent), etc. 
 
     all_playlists->writeTree(playlist_tree);
     music_tree_list->assignTreeData(playlist_tree);
@@ -1055,13 +989,11 @@ void PlaybackBox::constructPlaylistTree()
 
 void PlaybackBox::editPlaylist()
 {
-    //
-    //  Get a reference to the current track
-    //  
+    // Get a reference to the current track
 
     QValueList <int> branches_to_current_node;
 
-    if(curMeta)
+    if (curMeta)
     {
         QValueList <int> *a_route;
         a_route = music_tree_list->getRouteToActive();
@@ -1069,15 +1001,13 @@ void PlaybackBox::editPlaylist()
     }
     else
     {
-        //
-        //  No current metadata, so when we come back we'll
-        //  try and play the first thing on the active queue
-        //
+        // No current metadata, so when we come back we'll try and play the 
+        // first thing on the active queue
         
         branches_to_current_node.clear();
-        branches_to_current_node.append(0);                  //  Root node
-        branches_to_current_node.append(1);                  //  We're on a playlist (not "My Music")
-        branches_to_current_node.append(0);                  //  Active play Queue
+        branches_to_current_node.append(0); //  Root node
+        branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
+        branches_to_current_node.append(0); //  Active play Queue
     }
 
     visual_mode_timer->stop();
@@ -1087,14 +1017,11 @@ void PlaybackBox::editPlaylist()
     if (visual_mode_delay > 0)
         visual_mode_timer->start(visual_mode_delay * 1000);
 
-    //
-    //  OK, we're back ....
-    //  now what do we do? see if we can find the same track 
-    //  at the same level
-    //
+    // OK, we're back ....
+    // now what do we do? see if we can find the same track at the same level
 
     constructPlaylistTree();
-    if(music_tree_list->tryToSetActive(branches_to_current_node))
+    if (music_tree_list->tryToSetActive(branches_to_current_node))
     {
         //  All is well
     }
@@ -1103,13 +1030,12 @@ void PlaybackBox::editPlaylist()
         stop();
         wipeTrackInfo();
         branches_to_current_node.clear();
-        branches_to_current_node.append(0);                  //  Root node
-        branches_to_current_node.append(1);                  //  We're on a playlist (not "My Music")
-        branches_to_current_node.append(0);                  //  Active play Queue
+        branches_to_current_node.append(0); //  Root node
+        branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
+        branches_to_current_node.append(0); //  Active play Queue
         music_tree_list->moveToNodesFirstChild(branches_to_current_node);
     }
     music_tree_list->refresh();
-    
 }
 
 void PlaybackBox::closeEvent(QCloseEvent *event)
@@ -1164,24 +1090,31 @@ void PlaybackBox::customEvent(QCustomEvent *event)
             int maxm = (maxTime / 60) % 60;
             int maxs = maxTime % 60;
             
-            if(maxh > 0)
-            {
-                time_string.sprintf("%d:%02d:%02d / %02d:%02d:%02d", eh, em, es, maxh, maxm, maxs);
-            }
+            if (maxh > 0)
+                time_string.sprintf("%d:%02d:%02d / %02d:%02d:%02d", eh, em, 
+                                    es, maxh, maxm, maxs);
             else
-            {
-                time_string.sprintf("%02d:%02d / %02d:%02d", em, es, maxm, maxs);
-            }
+                time_string.sprintf("%02d:%02d / %02d:%02d", em, es, maxm, 
+                                    maxs);
             
-            //percent_heard = ((float)rs / (float)curMeta->Length()) * 1000.0;
-            //gContext->LCDsetChannelProgress(percent_heard);
+            float percent_heard = ((float)rs / 
+                                   (float)curMeta->Length()) * 1000.0;
+            // Changed to use the Channel stuff as it allows us to
+            // display Artist, Album, and Title, as well as a progress bar
+            gContext->GetLCDDevice()->setGenericProgress(percent_heard);
+
+            QPtrList<LCDTextItem> textItems;
+            textItems.setAutoDelete(true);
+
+            textItems.append(new LCDTextItem(3, ALIGN_RIGHT,
+                                             time_string, "Generic"));
+
+            gContext->GetLCDDevice()->outputText(&textItems);
 
             QString info_string;
 
-            //
             //  Hack around for cd bitrates
-            //
-            if(oe->bitrate() < 2000)
+            if (oe->bitrate() < 2000)
             {
                 info_string.sprintf("%d kbps   %.1f kHz   %s ch",
                                    oe->bitrate(), float(oe->frequency()) / 1000.0,
@@ -1194,19 +1127,19 @@ void PlaybackBox::customEvent(QCustomEvent *event)
                                    oe->channels() > 1 ? "2" : "1");
             }
         
-            if(curMeta)
+            if (curMeta)
             {
-                if(time_text)
+                if (time_text)
                     time_text->SetText(time_string);
-                if(info_text)
+                if (info_text)
                     info_text->SetText(info_string);
-                if(current_visualization_text)
+                if (current_visualization_text)
                     current_visualization_text->SetText(mainvisual->getCurrentVisual());
             }
 
             break;
         }
-    case OutputEvent::Error:
+        case OutputEvent::Error:
         {
             statusString = tr("Output error.");
 
@@ -1221,20 +1154,19 @@ void PlaybackBox::customEvent(QCustomEvent *event)
 
             break;
         }
-    case DecoderEvent::Stopped:
+        case DecoderEvent::Stopped:
         {
             statusString = tr("Stream stopped.");
 
             break;
         }
-    case DecoderEvent::Finished:
+        case DecoderEvent::Finished:
         {
             statusString = tr("Finished playing stream.");
             nextAuto();
             break;
         }
-
-    case DecoderEvent::Error:
+        case DecoderEvent::Error:
         {
             stopAll();
             QApplication::sendPostedEvents();
@@ -1255,62 +1187,66 @@ void PlaybackBox::customEvent(QCustomEvent *event)
 
 void PlaybackBox::wipeTrackInfo()
 {
-        if(title_text)
+        if (title_text)
             title_text->SetText("");
-        if(artist_text)
+        if (artist_text)
             artist_text->SetText("");
-        if(album_text)
+        if (album_text)
             album_text->SetText("");
-        if(time_text)
+        if (time_text)
             time_text->SetText("");
-        if(info_text)
+        if (info_text)
             info_text->SetText("");
-        if(ratings_image)
+        if (ratings_image)
             ratings_image->setRepeat(0);
-        if(current_visualization_text)
+        if (current_visualization_text)
             current_visualization_text->SetText("");
 }
 
 void PlaybackBox::handleTreeListSignals(int node_int, IntVector *attributes)
 {
-    //  Debugging
-    //  cout << "User selected int=" << node_int << endl ;
-    
-    if(attributes->size() < 4)
+    if (attributes->size() < 4)
     {
-        cerr << "playbackbox.o: Worringly, a managed tree list is handing back item attributes of the wrong size" << endl;
+        cerr << "playbackbox.o: Worringly, a managed tree list is handing "
+                "back item attributes of the wrong size" << endl;
         return;
     }
-    if(attributes->at(0) == 1)
+
+    if (attributes->at(0) == 1)
     {
-        //
         //  It's a track
-        //
 
         curMeta = all_music->getMetadata(node_int);
-        if(title_text)
+        if (title_text)
             title_text->SetText(curMeta->Title());
-        if(artist_text)
+        if (artist_text)
             artist_text->SetText(curMeta->Artist());
-        if(album_text)
+        if (album_text)
             album_text->SetText(curMeta->Album());
+
+        // Set the Artist and Tract on the LCD
+        QPtrList<LCDTextItem> textItems;
+        textItems.setAutoDelete(true);
+
+        textItems.append(new LCDTextItem(1, ALIGN_CENTERED,
+                         curMeta->Artist() + " [" + curMeta->Album() + "] " +
+                         curMeta->Title(), "Generic", true));
+
+        gContext->GetLCDDevice()->outputText(&textItems);
+
         maxTime = curMeta->Length() / 1000;
 
         QString time_string;
         int maxh = maxTime / 3600;
         int maxm = (maxTime / 60) % 60;
         int maxs = maxm % 60;
-        if(maxh > 0)
-        {
+        if (maxh > 0)
             time_string.sprintf("%d:%02d:%02d", maxh, maxm, maxs);
-        }
         else
-        {
             time_string.sprintf("%02d:%02d", maxm, maxs);
-        }
-        if(time_text)
+        if (time_text)
             time_text->SetText(time_string);
-        if(showrating)
+        if (showrating)
         {
             if(ratings_image)
                 ratings_image->setRepeat(curMeta->Rating());
@@ -1329,25 +1265,20 @@ void PlaybackBox::handleTreeListSignals(int node_int, IntVector *attributes)
 
 void PlaybackBox::wireUpTheme()
 {
-    //playlist_tree = new GenericTree("playlist root", "root", 0);
-    //all_playlists->writeTree(playlist_tree);
-
+    // The self managed music tree list
     //
-    //  The self managed music tree list
-    //
-    //  Complain if we can't find this
-    //
+    // Complain if we can't find this
     music_tree_list = getUIManagedTreeListType("musictreelist");
-    if(!music_tree_list)
+    if (!music_tree_list)
     {
-        cerr << "playbackbox.o: Couldn't find a music tree list in your theme" << endl;
+        cerr << "playbackbox.o: Couldn't find a music tree list in your theme" 
+             << endl;
         exit(0);
     }
-    connect(music_tree_list, SIGNAL(nodeSelected(int, IntVector*)), this, SLOT(handleTreeListSignals(int, IntVector*)));
+    connect(music_tree_list, SIGNAL(nodeSelected(int, IntVector*)), 
+            this, SLOT(handleTreeListSignals(int, IntVector*)));
 
-    //
-    //  All the other GUI elements are **optional**
-    //
+    // All the other GUI elements are **optional**
     title_text = getUITextType("title_text");
     artist_text = getUITextType("artist_text");
     time_text = getUITextType("time_text");
@@ -1356,69 +1287,56 @@ void PlaybackBox::wireUpTheme()
     ratings_image = getUIRepeatedImageType("ratings_image");
     current_visualization_text = getUITextType("current_visualization_text");
     volume_status = getUIStatusBarType("volume_status");
-    if(volume_status)
+    if (volume_status)
     {
         volume_status->SetTotal(100);
         volume_status->SetOrder(-1);
     }
     visual_blackhole = getUIBlackHoleType("visual_blackhole");
 
-    //
     //  Buttons
-    //
     prev_button = getUIPushButtonType("prev_button");
-    if(prev_button)
-    {
+    if (prev_button)
         connect(prev_button, SIGNAL(pushed()), this, SLOT(previous()));
-    }
+
     rew_button = getUIPushButtonType("rew_button");
-    if(rew_button)
-    {
+    if (rew_button)
         connect(rew_button, SIGNAL(pushed()), this, SLOT(seekback()));
-    }
+
     pause_button = getUIPushButtonType("pause_button");
-    if(pause_button)
-    {
+    if (pause_button)
         connect(pause_button, SIGNAL(pushed()), this, SLOT(pause()));
-    }
+
     play_button = getUIPushButtonType("play_button");
-    if(play_button)
-    {
+    if (play_button)
         connect(play_button, SIGNAL(pushed()), this, SLOT(play()));
-    }
+
     stop_button = getUIPushButtonType("stop_button");
-    if(stop_button)
-    {
+    if (stop_button)
         connect(stop_button, SIGNAL(pushed()), this, SLOT(stop()));
-    }
+
     ff_button = getUIPushButtonType("ff_button");
-    if(ff_button)
-    {
+    if (ff_button)
         connect(ff_button, SIGNAL(pushed()), this, SLOT(seekforward()));
-    }
+
     next_button = getUIPushButtonType("next_button");
-    if(next_button)
-    {
+    if (next_button)
         connect(next_button, SIGNAL(pushed()), this, SLOT(next()));
-    }
+
     shuffle_button = getUITextButtonType("shuffle_button");
-    if(shuffle_button)
-    {
+    if (shuffle_button)
         connect(shuffle_button, SIGNAL(pushed()), this, SLOT(toggleShuffle()));
-    }
+
     repeat_button = getUITextButtonType("repeat_button");
-    if(repeat_button)
-    {
+    if (repeat_button)
         connect(repeat_button, SIGNAL(pushed()), this, SLOT(toggleRepeat()));
-    }
+
     pledit_button = getUITextButtonType("pledit_button");
-    if(pledit_button)
-    {
+    if (pledit_button)
         connect(pledit_button, SIGNAL(pushed()), this, SLOT(editPlaylist()));
-    }
+
     vis_button = getUITextButtonType("vis_button");
-    if(vis_button)
-    {
+    if (vis_button)
         connect(vis_button, SIGNAL(pushed()), this, SLOT(visEnable()));
-    }
 }
+

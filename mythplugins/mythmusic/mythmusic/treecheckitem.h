@@ -45,6 +45,9 @@ class PlaylistItem : public QListViewItem
     PlaylistItem(QListViewItem *parent, const QString &title);
     PlaylistItem(QListViewItem *parent, QListViewItem *after, const QString &title);
     virtual void userSelectedMe(){} // pure virtual, should always be reimplemented
+    QString getText() { return text; }
+  private:
+    QString text;
 };
 
 class PlaylistTitle : public PlaylistItem

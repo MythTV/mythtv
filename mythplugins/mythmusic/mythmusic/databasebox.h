@@ -6,10 +6,12 @@
 #include <qstringlist.h>
 #include <qthread.h>
 #include <qtimer.h>
+#include <qptrlist.h>
 
 #include "metadata.h"
 #include "playlist.h"
 #include <mythtv/mythwidgets.h>
+#include <mythtv/lcddevice.h>
 
 class QSqlDatabase;
 class QListViewItem;
@@ -45,7 +47,6 @@ class DatabaseBox : public MythDialog
     void setCDTitle(const QString& title);
     void fillCD(void);
     
-
   protected slots:
     void selected(QListViewItem *);
     void doMenus(QListViewItem *);
@@ -64,15 +65,23 @@ class DatabaseBox : public MythDialog
     void occasionallyCheckCD();
     void keepFilling();
     void showWaiting();
-    
+    void updateLCDMenu(QKeyEvent *e);
+  
   private:
-
     void doSelected(QListViewItem *, bool cd_flag);
     void doPlaylistPopup(TreeCheckItem *item_ptr);
     void doActivePopup(PlaylistTitle *item_ptr);
     void checkParent(QListViewItem *);
-    
-    void checkTree();    //Given the current playlist and ListView, check the tree appropriately
+    LCDMenuItem *buildLCDMenuItem(TreeCheckItem *item_ptr, bool curMenuItem);
+    LCDMenuItem *buildLCDMenuItem(QListViewItem *item_ptr, bool curMenuItem);
+    void buildMenuTree(QPtrList<LCDMenuItem> *menuItems,
+                       TreeCheckItem *item_ptr, int level);
+    void buildMenuTree(QPtrList<LCDMenuItem> *menuItems,
+                       QListViewItem *item_ptr, int level);
+
+    QString indentMenuItem(QString itemLevel);
+ 
+    void checkTree();
     QPixmap getPixmap(QString &level);
 
     CDCheckItem         *cditem;

@@ -214,17 +214,19 @@ void TreeCheckItem::pickPixmap(void)
 PlaylistItem::PlaylistItem(QListView *parent, const QString &title)
     : QListViewItem(parent, title)
 {
-    
+    text = title;    
 }
 
 PlaylistItem::PlaylistItem(QListViewItem *parent, const QString &title)
     : QListViewItem(parent, title)
 {
+    text = title;
 }
 
 PlaylistItem::PlaylistItem(QListViewItem *parent, QListViewItem *after, const QString &title)
     : QListViewItem(parent, after, title)
 {
+    text = title;
 }
 
 bool PlaylistTitle::isDefault()

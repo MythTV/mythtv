@@ -100,7 +100,7 @@ Ripper::Ripper(QSqlDatabase *ldb, MythMainWindow *parent, const char *name)
     qualitygroup->insert(perfectflac);
 
     qualitygroup->setRadioButtonExclusive(true);
-    qualitygroup->setButton(1);
+    qualitygroup->setButton(gContext->GetNumSetting("DefaultRipQuality", 1));
 
     QGridLayout *grid = new QGridLayout(vbox, 1, 1, 20);
     

@@ -342,7 +342,7 @@ void runMenu(QString paths, QString startdir,
 
     if (diag->foundTheme())
     {
-        gContext->LCDswitchToTime();
+        gContext->GetLCDDevice()->switchToTime();
         diag->exec();
     }
     else

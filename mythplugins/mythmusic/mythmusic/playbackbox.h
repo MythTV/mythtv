@@ -110,6 +110,7 @@ class PlaybackBox : public MythThemedDialog
     unsigned int repeatmode;
 
     bool isplaying;
+    bool lcd_volume_visible;
 
     MainVisual *mainvisual;
 

@@ -462,6 +462,19 @@ public:
     };
 };
 
+class DefaultRipQuality: public ComboBoxSetting, public GlobalSetting {
+public:
+    DefaultRipQuality():
+        GlobalSetting("DefaultRipQuality") {
+        setLabel("Default Rip Quality");
+        addSelection("Low", "0");
+        addSelection("Medium", "1");
+        addSelection("High", "2");
+        addSelection("Perfect", "3");
+        setHelpText("Default quality for new CD rips.");
+    };
+};
+
 GeneralSettings::GeneralSettings()
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
@@ -508,6 +521,7 @@ RipperSettings::RipperSettings()
     rippersettings->addChild(new CDRipPath());
     rippersettings->addChild(new PostCDRipScript());
     rippersettings->addChild(new EncoderType());
+    rippersettings->addChild(new DefaultRipQuality());
     rippersettings->addChild(new ParanoiaLevel());
     rippersettings->addChild(new EjectCD());
     addChild(rippersettings);
