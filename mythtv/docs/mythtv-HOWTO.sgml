@@ -3,7 +3,7 @@
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-01-01, v1.061
+<date>2003-01-05, v1.062
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -172,22 +172,17 @@ sure "mysql-server" is checked.  (only required on the master system)
 <item>Development Tools
 <item>X Software Development
 <item>KDE Software Development
+<item>Kernel Development
 </itemize>
 
 Click Install to continue.
 
-The version of QT supplied with Red Hat Linux 8.0 does not include a
-necessary mysql plugin. You will have to download and install that RPM
-package yourself. First go to <url url="http://rpm.pbone.net/"
-name="http://rpm.pbone.net/"> and click on "Search" near the top of the
-page. On the search page unselect all checkboxes except "RedHat 8.X". Next
-select the "Search for RPMs by name in FTP........." radio button. In the
-search field enter "qt-MySQL" then click "Search".  You will be presented
-with a list of mirrors who host this particular RPM, currently called 
-"qt-MySQL-3.0.5-17.i386.rpm". Download the RPM.  I had good luck downloading
-from the ftp.pbone.net mirror. Once downloaded, double click on the RPM
-package. You will be prompted for the root password, enter it, watch the
-progress bar, and you are finished.
+You can not install qt-MySQL, a necessary prerequisite, graphically. To  
+install this package using the command line do
+
+<tscreen><verb>
+$ up2date --solvedeps qt-MySQL
+</verb></tscreen>
 
 <sect2>Command-line installation. <label id="CLIinstalltools_">
 <p> This section details the various methods for installing pre-requisites
@@ -377,13 +372,16 @@ found when we need them.
 /usr/local/lib
 ^D
 
-# ldconfig
+# /sbin/ldconfig
 # exit
 $ 
 </verb></tscreen>
 
 <bf>NOTE</bf>:  It appears that Red Hat Linux 8.0 requires that the
-<bf>ldconfig</bf> command needs to be run twice.
+<bf>ldconfig</bf> command needs to be run twice. Red Hat will also
+frequently "forget" about the path. It's recommended to run
+<bf>/sbin/ldconfig</bf> after installing every package. Failing that, always
+run it if you get an unexpected error about not finding libraries.
 
 <sect>Downloading and compiling.
 
@@ -461,6 +459,15 @@ $ su
 # make install
 # exit
 $ 
+</verb></tscreen>
+
+If you get errors installing XML::Twig or other XMLTV prerequisites,  
+try deleting the old versions of libexpat
+<tscreen><verb>
+$ su
+# rm -f /usr/lib/libexpat*
+# /sbin/ldconfig
+# exit
 </verb></tscreen>
 
 <bf>NOTE</bf>:  Red Hat Linux 8.0 users, make sure that you set your LANG as
@@ -664,15 +671,16 @@ the settings so that this is your default.
 
 <sect2>Red Hat Linux 8.0
 <sect3>Using OSS drivers.
+
 <p>Red Hat Linux 8.0 ships with OSS sound drivers rather than the ALSA
-drivers recommended by the mythtv team. The OSS drivers do work, but some
-people report problems (sync and jitter) with OSS. In addition, OSS does not
-support full duplex, which is required if you want to record and play sound
-using just one sound card. ALSA has good full duplex support, and also has
-drivers for some built-in (motherboard) sound cards that OSS does not.
-Installing ALSA is less painful than you might think, so we encourgage you
-to go that route. For those of you who do not wish to install ALSA you must
-do this:
+drivers recommended by the mythtv team. The OSS drivers do work for some
+people, and for some cards, but others report problems (sync and jitter)
+with OSS. In addition, OSS does not support full duplex on some cards, which
+is required if you want to record and play sound using just one sound card.
+ALSA has good full duplex support, and also has drivers for some built-in
+(motherboard) sound cards that OSS does not. Installing ALSA is less painful
+than you might think, so we encourgage you to go that route. For those of
+you who do not wish to install ALSA you must do this:
 
 To configure sound to work with mythtv, select 
 <verb>RedHat Menu>Sound & Video>Volume Control</verb>
@@ -825,14 +833,18 @@ to mute it.  You can now press ESC to exit out of the <bf>alsamixer</bf>
 program.
  
 <sect>Setting up a remote control.
-
 <p>mythtv does not have native remote control receiver and decoder software
 built-in.  Instead, remote control functions are implemented by cooperating
-with <bf>lirc</bf>, the Linux Infra Red Control program.  <bf>lirc</bf> handles the IR
-hardware and passes keystrokes to mythtv, which then acts as if the user had
-pressed the keys on the keyboard.
+with <bf>lirc</bf>, the Linux Infra Red Control program.  <bf>lirc</bf>
+handles the IR hardware and passes keystrokes to mythtv, which then acts as
+if the user had pressed the keys on the keyboard.
 
-lircd has two prerequisites:  <bf>dialog</bf>, available in Mandrake through the
+Some IR devices require a kernel recompile, and some don't. However, all at
+least require having the kernel source available as a resource for the lirc
+build process. 
+
+<sect1>Mandrake
+<p>lircd has two prerequisites:  <bf>dialog</bf>, available in Mandrake through the
 "cdialog" RPM, and the kernel source.  Mandrake 9.0 is using the 2.4.19
 kernel, so the easiest thing is to go to <url url="http://www.kernel.org"
 name="http://www.kernel.org"> and download
@@ -840,8 +852,7 @@ the full 2.4.19 tar file from <url
 url="http://www.kernel.org/pub/linux/kernel/v2.4/"
 name="http://www.kernel.org/pub/linux/kernel/v2.4/">.
 
-<sect1>Obtaining the kernel.
-
+<sect2>Obtaining the kernel.
 <p>An easy way is to use the wget command:
 <tscreen><verb>
 $ wget http://www.kernel.org/pub/linux/kernel/v2.4/linux-2.4.19.tar.bz2
@@ -859,6 +870,17 @@ $ su
 $ 
 </verb></tscreen>
 
+<sect1>Red Hat Linux 8.0
+<p>You should already have the source from the "Kernel Development" package
+you installed in section 3.2. Ensure that a symlink has been created:
+
+<tscreen><verb>
+$ cd /usr/src
+$ su
+# ln -s linux-2.4.18-x.x.x linux
+# exit
+</verb></tscreen>
+
 <sect1>Obtaining and compiling lirc.
 
 <p>You're going to need to download and compile lircd.  Go to <url
@@ -870,17 +892,26 @@ $ tar -xjf lirc-0.6.6.tar.bz2
 $ cd lirc-0.6.6
 $ ./setup.sh
 </verb></tscreen>
-You're going to need to know what sort of receiver you have and where
-it's connected.  In my case, I have a Pinnacle Studio TV card, with the IR
-receiver connected to COM1 (/dev/ttys0), so once the configuration menu came
-up I did Driver Configuration->Other Serial Port Devices->Pinnacle Systems
-Receiver->OK and on the next page selected COM1->OK.
+You're going to need to know what sort of receiver you have and where it's
+connected.  In the case of the Pinnacle Studio TV card, with the IR receiver
+connected to COM1 (/dev/ttys0), once the configuration menu comes up,
+perform the configuration by going to Driver Configuration->Other Serial
+Port Devices->Pinnacle Systems Receiver->OK and on the next page select
+COM1->OK.
 
 Each remote is different; some remote receivers connect directly to your
 capture card and not to a serial port, so make sure that you've got the
 correct one.
 
-<p>You then click "Save Configuration and run configure" to continue.
+You then click "Save Configuration and run configure" to continue.
+
+Make sure you read the last text generated by the configure step. It will
+tell you if you require a kernel recompile, and what the name of your kernel
+module will be (if necessary). For instance a home-built receiver may
+require a kernel recompile, so you would be notified that you will have to
+load the lirc_serial module. If you did not get any such messages skip the
+kernel recompile steps below and go directly to making and installing the
+lirc driver.
 
 Once the configuration step is complete:
 <tscreen><verb>
@@ -889,10 +920,114 @@ $ su
 # make install
 # chmod 666 /dev/lircd
 </verb></tscreen>
+
+<sect2>Recompiling your kernel on Red Hat Linux
+<p>Don't Panic! Red Hat makes a kernel recompile very easy. They provide  
+configuration files that make it so you can recompile your kernel with  
+Red Hat defaults. And as a side benefit, your kernel will be compiled  
+specifically for your architecture. For a more detailed description (or  
+if you run into trouble) of how to do this go to  
+<url url="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/ 
+ch-custom-kernel.html" name="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/ 
+ch-custom-kernel.html">
+
+For the impatient:
+Make sure you have an emergency floppy boot disk available!
+<tscreen><verb>
+$ cd /usr/src/linux
+$ su
+# make mrproper
+# cd configs
+# ls
+</verb></tscreen>
+
+at this point you must look at the file names and determine which  
+config file is right for you. For instance if you have an Athlon XP you  
+should choose "kernel-2.4.18-athlon.config" but if you have a dual  
+processor P4 you might choose "kernel-2.4.18-i686-smp.config"
+
+<tscreen><verb>
+# cp yourconfig.config ../.config
+# cd ../
+# make xconfig
+</verb></tscreen>
+
+At this point you will get a graphical configuration utility. All that  
+you must do to make lirc work is go to the "character devices" section  
+and change "Standard/generic (8250/16550 and compatible UARTs) serial  
+support" from "y" to "m". Now if you want you can have a look around.  
+For instance, you might wish to turn off ham radio support, or perhaps  
+turn off pcmcia support if you are not on a laptop. But be careful!  
+Only change things you know you can change. If you are not sure, just  
+stick to the one required change. Click "save and exit".
+Next:
+<tscreen><verb>
+# make dep
+# make clean
+# make bzImage modules
+# make modules_install
+# make install
+</verb></tscreen>
+
+if you are using <bf>grub</bf>, that should be it, reboot and select your custom  
+kernel upon boot. If you are using <bf>lilo</bf>, change your lilo configuration  
+according to  
+<url url="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/ 
+s1-custom-kernel-bootloader.html" name="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/ 
+s1-custom-kernel-bootloader.html"> Remember, if you have any custom  
+kernel modules (alsa, etc) you will have to recompile/reinstall those.
+
+<sect1>Completing the lirc install.
+<p>If configure did not mention anything about a kernel module, then you  
+are finished. If it did mention a kernel module, you must edit  
+the <tt>/etc/modules.conf</tt> file. Add this line as the first thing in the file.  
+It must come first, or it may not work.
+<tscreen><verb>
+alias char-major-61 XXX
+</verb></tscreen>
+
+replace XXX with the name which you determined earlier, which in this
+example was "lirc_serial"
+
+<tscreen><verb>
+$ su
+# modprobe lirc_serial
+# /sbin/ldconfig
+</verb></tscreen>
+
 Next, we're going to manually start lircd the first time:
 <tscreen><verb>
 # /usr/local/sbin/lircd
 </verb></tscreen>
+
+If this fails, complaining of a missing <tt>lircd.conf</tt> file, then you
+must find or make one. First look for a premade configuration file at <url
+url="http://lirc.sourceforge.net/remotes/"
+name="http://lirc.sourceforge.net/remotes/">.  If you find one your remote
+there, download the file, name it <tt>lircd.conf</tt> and put it in your
+<tt>/etc</tt> directory. If you couldn't find your remote, you must make
+your own <tt>lircd.conf</tt> file.
+
+To make your own <tt>lircd.conf</tt> file
+<tscreen><verb>
+$ irrecord myremote
+</verb></tscreen>
+
+Follow the on-screen directions to train your remote and define keys. If  
+your remote ends up working well, you should consider submitting your  
+<tt>lircd.conf</tt> file back to the lirc developers. Once finished:
+
+<tscreen><verb>
+$ su
+# cp myremote /etc/lircd.conf
+</verb></tscreen>
+
+now try to start lircd again:
+
+<tscreen><verb>
+# /usr/local/sbin/lircd
+</verb></tscreen>
+
 Now, we're going to add the commands necessary for lircd to run each time
 we boot:
 <tscreen><verb>
@@ -1725,6 +1860,14 @@ execution.  When the program segfaults, type <tt>bt</tt> to get the
 backtrace.  The backtrace should be posted to the mythtv-dev mailing list,
 along with the steps you followed to get the program to crash.
 
+If you <bf>gdb</bf> keeps pausing during the debug, printing things like
+"SIG32", you need to type in:
+<tscreen><verb>
+(gdb) handle SIG32 nostop
+(gdb) handle SIG33 nostop
+</verb</tscreen> so that the program will continue to execute rather than
+stopping.
+
 <sect1>Mythtv makes my system crash. 
 <p>mythtv <em>can not</em> crash your system - it is a user-level program. 
 If your system is crashing when you run mythtv, then you have some
@@ -1778,6 +1921,9 @@ this level to 75% to 85% may result in better audio quality.
 Master mixer - sets the level for the analog signal sent to line-out or the
 speakers.
 
+You may also want to ensure that <tt>/dev/dsp</tt> hasn't already been
+grabbed by another process, like <bf>esd</bf>.  If <tt>/dev/dsp</tt> isn't
+available, then mythtv won't work.
 
 <sect>Miscellaneous.
 <sect1>I'd like to watch the files without using mythtv / I'd like to convert the files to some other format.
@@ -1989,6 +2135,9 @@ code have any basis in reality. Not that they'll read it.
 v1.060, 2003-01-01.  Added debugging instructions.
 v1.061, 2003-01-01.  Added Bruce Markey's troubleshooting audio stuff. 
 Added instruction for deleting the database.
+v1.062, 2003-01-05.  A little more on sound troubleshooting.  Added "handle"
+instructions for GDB.  Modified RH8 docs per Cedar.  Added more lircd
+information from Cedar.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-01-01, v1.061
+  2003-01-05, v1.062
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -60,10 +60,14 @@
      7.2 Setting the mixer from the command line.
 
   8. Setting up a remote control.
-     8.1 Obtaining the kernel.
-     8.2 Obtaining and compiling lirc.
-     8.3 Additional information for lirc.
-     8.4 Configuring lirc for use with an IR blaster.
+     8.1 Mandrake
+        8.1.1 Obtaining the kernel.
+     8.2 Red Hat Linux 8.0
+     8.3 Obtaining and compiling lirc.
+        8.3.1 Recompiling your kernel on Red Hat Linux
+     8.4 Completing the lirc install.
+     8.5 Additional information for lirc.
+     8.6 Configuring lirc for use with an IR blaster.
 
   9. Configuring mythtv.
      9.1 Editing the settings.txt file.
@@ -134,7 +138,6 @@
   the distribution tarballs, it is [1mstrongly [22mrecommended that you join
   <http://www.snowman.net/mailman/listinfo/mythtv-commits/> the mythtv-
   dev mailing list.
-
   This HOWTO is for mythtv v0.7.
 
   [1m2.  Introduction.[0m
@@ -202,6 +205,7 @@
   +o  A PIII/800Mhz system with 512MB RAM can encode one video stream
      using the RTJPEG codec with 480x480 capture resolution and play it
      back simultaneously, thereby allowing live TV watching.
+
   +o  A dual Celeron/450Mhz is able to view a 480x480 MPEG4/3300Kbps file
      created on a different system with 30% CPU usage.
 
@@ -296,21 +300,14 @@
 
   +o  KDE Software Development
 
+  +o  Kernel Development
+
   Click Install to continue.
 
-  The version of QT supplied with Red Hat Linux 8.0 does not include a
-  necessary mysql plugin. You will have to download and install that RPM
-  package yourself. First go to http://rpm.pbone.net/
-  <http://rpm.pbone.net/> and click on "Search" near the top of the
-  page. On the search page unselect all checkboxes except "RedHat 8.X".
-  Next select the "Search for RPMs by name in FTP........." radio
-  button. In the search field enter "qt-MySQL" then click "Search".  You
-  will be presented with a list of mirrors who host this particular RPM,
-  currently called "qt-MySQL-3.0.5-17.i386.rpm". Download the RPM.  I
-  had good luck downloading from the ftp.pbone.net mirror. Once
-  downloaded, double click on the RPM package. You will be prompted for
-  the root password, enter it, watch the progress bar, and you are
-  finished.
+  You can not install qt-MySQL, a necessary prerequisite, graphically.
+  To install this package using the command line do
+
+       $ up2date --solvedeps qt-MySQL
 
   [1m3.2.2.  Command-line installation.[0m
 
@@ -500,12 +497,15 @@
        /usr/local/lib
        ^D
 
-       # ldconfig
+       # /sbin/ldconfig
        # exit
        $
 
   [1mNOTE[22m:  It appears that Red Hat Linux 8.0 requires that the [1mldconfig[0m
-  command needs to be run twice.
+  command needs to be run twice. Red Hat will also frequently "forget"
+  about the path. It's recommended to run [1m/sbin/ldconfig [22mafter
+  installing every package. Failing that, always run it if you get an
+  unexpected error about not finding libraries.
 
   [1m5.  Downloading and compiling.[0m
 
@@ -587,6 +587,14 @@
        # exit
        $
 
+  If you get errors installing XML::Twig or other XMLTV prerequisites,
+  try deleting the old versions of libexpat
+
+       $ su
+       # rm -f /usr/lib/libexpat*
+       # /sbin/ldconfig
+       # exit
+
   [1mNOTE[22m:  Red Hat Linux 8.0 users, make sure that you set your LANG as
   described in ``Section 4''.
 
@@ -620,11 +628,11 @@
   matter if you're installing North America and have followed the
   instructions to this point.
 
-  $ make
-  $ make test
-  $ su
-  # make install
-  # exit
+       $ make
+       $ make test
+       $ su
+       # make install
+       # exit
 
   [1m5.4.  Manually building mythtv.[0m
 
@@ -713,6 +721,7 @@
   started at boot.  Click on Mandrake Control Center->System->Services,
   find mysql and click the "On Boot" button and the "Start" button if
   the mysql status shows that it isn't running yet.
+
   [1m6.2.  Red Hat Linux 8.0[0m
 
   If this is the master system, make sure that mysql is running and
@@ -748,8 +757,8 @@
 
   [1m6.4.4.  Gentoo[0m
 
-       $ su
-       # mysql < /usr/share/mythtv/database/mc.sql
+  $ su
+  # mysql < /usr/share/mythtv/database/mc.sql
 
   [1m7.  Setting up ALSA and the mixer.[0m
 
@@ -787,14 +796,15 @@
   [1m7.1.2.1.  Using OSS drivers.[0m
 
   Red Hat Linux 8.0 ships with OSS sound drivers rather than the ALSA
-  drivers recommended by the mythtv team. The OSS drivers do work, but
-  some people report problems (sync and jitter) with OSS. In addition,
-  OSS does not support full duplex, which is required if you want to
-  record and play sound using just one sound card. ALSA has good full
-  duplex support, and also has drivers for some built-in (motherboard)
-  sound cards that OSS does not.  Installing ALSA is less painful than
-  you might think, so we encourgage you to go that route. For those of
-  you who do not wish to install ALSA you must do this:
+  drivers recommended by the mythtv team. The OSS drivers do work for
+  some people, and for some cards, but others report problems (sync and
+  jitter) with OSS. In addition, OSS does not support full duplex on
+  some cards, which is required if you want to record and play sound
+  using just one sound card.  ALSA has good full duplex support, and
+  also has drivers for some built-in (motherboard) sound cards that OSS
+  does not. Installing ALSA is less painful than you might think, so we
+  encourgage you to go that route. For those of you who do not wish to
+  install ALSA you must do this:
 
   To configure sound to work with mythtv, select
 
@@ -871,6 +881,7 @@
   configuration to ensure that you don't end up with mysterious
   conflicts in the future.  You should end up with a /etc/modules.conf
   file that has this configuration:
+
        alias char-major-116 snd
        alias snd-card-0 snd-XXX
        # module options should go here
@@ -916,7 +927,7 @@
 
   Test the driver by playing a simple file:
 
-       $ aplay /usr/share/sounds/info.wav
+  $ aplay /usr/share/sounds/info.wav
 
   If it works, you're done installing ALSA!
 
@@ -952,6 +963,12 @@
   handles the IR hardware and passes keystrokes to mythtv, which then
   acts as if the user had pressed the keys on the keyboard.
 
+  Some IR devices require a kernel recompile, and some don't. However,
+  all at least require having the kernel source available as a resource
+  for the lirc build process.
+
+  [1m8.1.  Mandrake[0m
+
   lircd has two prerequisites:  [1mdialog[22m, available in Mandrake through
   the "cdialog" RPM, and the kernel source.  Mandrake 9.0 is using the
   2.4.19 kernel, so the easiest thing is to go to http://www.kernel.org
@@ -959,25 +976,36 @@
   http://www.kernel.org/pub/linux/kernel/v2.4/
   <http://www.kernel.org/pub/linux/kernel/v2.4/>.
 
-  [1m8.1.  Obtaining the kernel.[0m
+  [1m8.1.1.  Obtaining the kernel.[0m
 
   An easy way is to use the wget command:
 
-       $ wget http://www.kernel.org/pub/linux/kernel/v2.4/linux-2.4.19.tar.bz2
+  $ wget http://www.kernel.org/pub/linux/kernel/v2.4/linux-2.4.19.tar.bz2
 
   Next, open a shell and login as superuser.
 
-  $ su
-  # mkdir /usr/src
-  # mv linux-2.4.19.tar.bz2 /usr/src
-  # cd /usr/src
-  # tar -xjf linux-2.4.19.tar.bz2
-  # chown -R root.root linux-2.4.19
-  # ln -sf linux-2.4.19 linux
-  # exit
-  $
+       $ su
+       # mkdir /usr/src
+       # mv linux-2.4.19.tar.bz2 /usr/src
+       # cd /usr/src
+       # tar -xjf linux-2.4.19.tar.bz2
+       # chown -R root.root linux-2.4.19
+       # ln -sf linux-2.4.19 linux
+       # exit
+       $
 
-  [1m8.2.  Obtaining and compiling lirc.[0m
+  [1m8.2.  Red Hat Linux 8.0[0m
+
+  You should already have the source from the "Kernel Development"
+  package you installed in section 3.2. Ensure that a symlink has been
+  created:
+
+       $ cd /usr/src
+       $ su
+       # ln -s linux-2.4.18-x.x.x linux
+       # exit
+
+  [1m8.3.  Obtaining and compiling lirc.[0m
 
   You're going to need to download and compile lircd.  Go to
   http://www.lirc.org <http://www.lirc.org> and download lirc; as of
@@ -989,17 +1017,25 @@
        $ ./setup.sh
 
   You're going to need to know what sort of receiver you have and where
-  it's connected.  In my case, I have a Pinnacle Studio TV card, with
-  the IR receiver connected to COM1 (/dev/ttys0), so once the configura-
-  tion menu came up I did Driver Configuration->Other Serial Port
-  Devices->Pinnacle Systems Receiver->OK and on the next page selected
-  COM1->OK.
+  it's connected.  In the case of the Pinnacle Studio TV card, with the
+  IR receiver connected to COM1 (/dev/ttys0), once the configuration
+  menu comes up, perform the configuration by going to Driver Configura-
+  tion->Other Serial Port Devices->Pinnacle Systems Receiver->OK and on
+  the next page select COM1->OK.
 
   Each remote is different; some remote receivers connect directly to
   your capture card and not to a serial port, so make sure that you've
   got the correct one.
 
   You then click "Save Configuration and run configure" to continue.
+
+  Make sure you read the last text generated by the configure step. It
+  will tell you if you require a kernel recompile, and what the name of
+  your kernel module will be (if necessary). For instance a home-built
+  receiver may require a kernel recompile, so you would be notified that
+  you will have to load the lirc_serial module. If you did not get any
+  such messages skip the kernel recompile steps below and go directly to
+  making and installing the lirc driver.
 
   Once the configuration step is complete:
 
@@ -1008,20 +1044,113 @@
        # make install
        # chmod 666 /dev/lircd
 
+  [1m8.3.1.  Recompiling your kernel on Red Hat Linux[0m
+
+  Don't Panic! Red Hat makes a kernel recompile very easy. They provide
+  configuration files that make it so you can recompile your kernel with
+  Red Hat defaults. And as a side benefit, your kernel will be compiled
+  specifically for your architecture. For a more detailed description
+  (or if you run into trouble) of how to do this go to
+  http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/
+  ch-custom-kernel.html
+  <http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/
+  ch-custom-kernel.html>
+
+  For the impatient: Make sure you have an emergency floppy boot disk
+  available!
+
+       $ cd /usr/src/linux
+       $ su
+       # make mrproper
+       # cd configs
+       # ls
+
+  at this point you must look at the file names and determine which
+  config file is right for you. For instance if you have an Athlon XP
+  you should choose "kernel-2.4.18-athlon.config" but if you have a dual
+  processor P4 you might choose "kernel-2.4.18-i686-smp.config"
+
+       # cp yourconfig.config ../.config
+       # cd ../
+       # make xconfig
+
+  At this point you will get a graphical configuration utility. All that
+  you must do to make lirc work is go to the "character devices" section
+  and change "Standard/generic (8250/16550 and compatible UARTs) serial
+  support" from "y" to "m". Now if you want you can have a look around.
+  For instance, you might wish to turn off ham radio support, or perhaps
+  turn off pcmcia support if you are not on a laptop. But be careful!
+  Only change things you know you can change. If you are not sure, just
+  stick to the one required change. Click "save and exit".  Next:
+
+       # make dep
+       # make clean
+       # make bzImage modules
+       # make modules_install
+       # make install
+
+  if you are using [1mgrub[22m, that should be it, reboot and select your
+  custom kernel upon boot. If you are using [1mlilo[22m, change your lilo
+  configuration according to
+  http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/
+  s1-custom-kernel-bootloader.html
+  <http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/
+  s1-custom-kernel-bootloader.html> Remember, if you have any custom
+  kernel modules (alsa, etc) you will have to recompile/reinstall those.
+
+  [1m8.4.  Completing the lirc install.[0m
+
+  If configure did not mention anything about a kernel module, then you
+  are finished. If it did mention a kernel module, you must edit the
+  /etc/modules.conf file. Add this line as the first thing in the file.
+  It must come first, or it may not work.
+
+       alias char-major-61 XXX
+
+  replace XXX with the name which you determined earlier, which in this
+  example was "lirc_serial"
+
+       $ su
+       # modprobe lirc_serial
+       # /sbin/ldconfig
+
   Next, we're going to manually start lircd the first time:
+
+       # /usr/local/sbin/lircd
+
+  If this fails, complaining of a missing lircd.conf file, then you must
+  find or make one. First look for a premade configuration file at
+  http://lirc.sourceforge.net/remotes/
+  <http://lirc.sourceforge.net/remotes/>.  If you find one your remote
+  there, download the file, name it lircd.conf and put it in your /etc
+  directory. If you couldn't find your remote, you must make your own
+  lircd.conf file.
+
+  To make your own lircd.conf file
+
+       $ irrecord myremote
+
+  Follow the on-screen directions to train your remote and define keys.
+  If your remote ends up working well, you should consider submitting
+  your lircd.conf file back to the lirc developers. Once finished:
+
+       $ su
+       # cp myremote /etc/lircd.conf
+
+  now try to start lircd again:
 
        # /usr/local/sbin/lircd
 
   Now, we're going to add the commands necessary for lircd to run each
   time we boot:
 
-  # cd /etc/rc.d
-  # cat >> rc.local
-  echo "Starting lircd"
-  /usr/local/sbin/lircd
-  ^D
-  # exit
-  $
+       # cd /etc/rc.d
+       # cat >> rc.local
+       echo "Starting lircd"
+       /usr/local/sbin/lircd
+       ^D
+       # exit
+       $
 
   This takes care of the lircd portion, which "listens" for the IR sig-
   nals. If everything went well, the install script for lircd put an
@@ -1066,7 +1195,7 @@
   configfiles/lircrc.example.pinnaclestudiopctv file has an example of
   calling an external program from a remote control button.
 
-  [1m8.3.  Additional information for lirc.[0m
+  [1m8.5.  Additional information for lirc.[0m
 
   Take a look at the lircrc.example files in the configfiles/ directory.
   In my case, (Pinnacle Studio card) the channel up and down functions
@@ -1090,8 +1219,8 @@
   but the /etc/lircd.conf that comes in the lircd package defines the
   buttons for the Pinnacle Studio PCTV as:
 
-                 channel+                 0x0000000000000017
-                 channel-                 0x000000000000001C
+            channel+                 0x0000000000000017
+            channel-                 0x000000000000001C
 
   rather than "ChannelUp" and "ChannelDown".  I added the following to
   my /home/[yourusername]/.lircrc file:
@@ -1119,7 +1248,7 @@
   the appropriate mappings in .lircrc to get excellent remote
   functionality with mythtv.
 
-  [1m8.4.  Configuring lirc for use with an IR blaster.[0m
+  [1m8.6.  Configuring lirc for use with an IR blaster.[0m
 
   By Carlos Talbot,  <mailto:carlos@talbot.net>
 
@@ -1214,44 +1343,44 @@
   /dev/device. Unlike bourne or bash, csh scripts automatically close
   parent file descriptors before they start.
 
-  $ cd /usr/local/bin
-  # su
-  # cat > change_channel.csh
-  #!/bin/csh
-  echo "changing to $1"
-  /usr/local/bin/channel.pl $1 &
-  ^D
-  # chmod a+x change_channel.csh
-  # exit
-  $ exit
+       $ cd /usr/local/bin
+       # su
+       # cat > change_channel.csh
+       #!/bin/csh
+       echo "changing to $1"
+       /usr/local/bin/channel.pl $1 &
+       ^D
+       # chmod a+x change_channel.csh
+       # exit
+       $ exit
 
   The following file should be saved as /usr/local/bin/channel.pl
 
-       #!/usr/bin/perl
+  #!/usr/bin/perl
 
-       # make sure to set this string to
-       # the corresponding remote in /etc/lircd.conf
-       $remote_name = "gi-motorola-dct2000";
+  # make sure to set this string to
+  # the corresponding remote in /etc/lircd.conf
+  $remote_name = "gi-motorola-dct2000";
 
-       sub change_channel {
-               my($channel_digit) = @_;
-               system ("rc SEND_ONCE $remote_name $channel_digit");
-               sleep 1;
-       }
+  sub change_channel {
+          my($channel_digit) = @_;
+          system ("rc SEND_ONCE $remote_name $channel_digit");
+          sleep 1;
+  }
 
-       $channel=$ARGV[0];
-       sleep 1;
-       if (length($channel) > 2) {
-               change_channel(substr($channel,0,1));
-               change_channel(substr($channel,1,1));
-               change_channel(substr($channel,2,1));
-       } elsif (length($channel) > 1) {
-               change_channel(substr($channel,0,1));
-               change_channel(substr($channel,1,1));
-       } else {
-               change_channel(substr($channel,0,1));
-       }
-       system ("rc SEND_ONCE $remote_name ENTER");
+  $channel=$ARGV[0];
+  sleep 1;
+  if (length($channel) > 2) {
+          change_channel(substr($channel,0,1));
+          change_channel(substr($channel,1,1));
+          change_channel(substr($channel,2,1));
+  } elsif (length($channel) > 1) {
+          change_channel(substr($channel,0,1));
+          change_channel(substr($channel,1,1));
+  } else {
+          change_channel(substr($channel,0,1));
+  }
+  system ("rc SEND_ONCE $remote_name ENTER");
 
   The last statement within the perl script is the lirc rc command. This
   is the command that transmits the code to your cable/dss box. Make
@@ -1371,26 +1500,25 @@
   If you want to know what time your job will run, you can do the
   following:
 
-  # cat /etc/crontab
-  SHELL=/bin/bash
-  PATH=/sbin:/bin:/usr/sbin:/usr/bin
-  MAILTO=root
-  HOME=/
+       # cat /etc/crontab
+       SHELL=/bin/bash
+       PATH=/sbin:/bin:/usr/sbin:/usr/bin
+       MAILTO=root
+       HOME=/
 
-  # run-parts
-  01 * * * * root nice -n 19 run-parts /etc/cron.hourly
-  02 4 * * * root nice -n 19 run-parts /etc/cron.daily
-  22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
-  42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
-  # exit
-  $
+       # run-parts
+       01 * * * * root nice -n 19 run-parts /etc/cron.hourly
+       02 4 * * * root nice -n 19 run-parts /etc/cron.daily
+       22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
+       42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
+       # exit
+       $
 
   We can see from the display that the cron.daily job will run at 0402
   every morning.
 
   If you wish to specify a custom time, then the user-based cron job is
   the better method.
-
   The default [1mconfigfiles/mythcrontab [22mfile will run the [1mmythfilldatabase[0m
   program every day at 0430.  If you want to change this, then open the
   configfiles/mythcrontab file in your favorite editor and modify it as
@@ -1533,6 +1661,7 @@
   mythgallery is a photo and slideshow application.  mythgallery is a
   separate application, but it's dependant on mythtv being installed and
   operational.
+
   [1m12.1.  Installation and pre-requisites.[0m
 
   Download mythgallery from http://www.mythtv.org/
@@ -1636,19 +1765,19 @@
   <http://www.xiph.org/paranoia/download/cdparanoia-III-
   alpha9.8.src.tgz>.
 
-  $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
-  $ cd cdparanoia-III-alpha9.8
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  <!-- see if the next step is a Mandrake only issue -->
-  # cp interface/cdda_interface.h /usr/local/include
-  # cd /usr/lib
-  # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
-  # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
-  # exit
-  $
+       $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
+       $ cd cdparanoia-III-alpha9.8
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       <!-- see if the next step is a Mandrake only issue -->
+       # cp interface/cdda_interface.h /usr/local/include
+       # cd /usr/lib
+       # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
+       # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
+       # exit
+       $
 
   [1m14.2.  Mandrake 9.0[0m
 
@@ -1798,9 +1927,9 @@
   Edit the settings.pro file.  Make sure that the top of the file looks
   like this:
 
-  $ cat settings.pro
-  CONFIG += debug
-  #CONFIG += release
+       $ cat settings.pro
+       CONFIG += debug
+       #CONFIG += release
 
   Now, you need to clear out the old versions of the software to ensure
   that you're running with the debugging code, then compile and install.
@@ -1815,18 +1944,18 @@
   At this point, you now have debug-enabled software ready.  Let's
   assume that the problem you're having is in the setup program.
 
-       $ cd setup
-       $ gdb ./setup
+  $ cd setup
+  $ gdb ./setup
 
-       GNU gdb 5.2.1-2mdk (Mandrake Linux)
-       Copyright 2002 Free Software Foundation, Inc.
-       GDB is free software, covered by the GNU General Public License, and you are
-       welcome to change it and/or distribute copies of it under certain
-       conditions.
-       Type "show copying" to see the conditions.
-       There is absolutely no warranty for GDB.  Type "show warranty" for details.
-       This GDB was configured as "i586-mandrake-linux-gnu"...
-       (gdb)
+  GNU gdb 5.2.1-2mdk (Mandrake Linux)
+  Copyright 2002 Free Software Foundation, Inc.
+  GDB is free software, covered by the GNU General Public License, and you are
+  welcome to change it and/or distribute copies of it under certain
+  conditions.
+  Type "show copying" to see the conditions.
+  There is absolutely no warranty for GDB.  Type "show warranty" for details.
+  This GDB was configured as "i586-mandrake-linux-gnu"...
+  (gdb)
 
   [1mgdb [22mhas a number of options, read the man page for more information.
 
@@ -1834,6 +1963,14 @@
   the program segfaults, type bt to get the backtrace.  The backtrace
   should be posted to the mythtv-dev mailing list, along with the steps
   you followed to get the program to crash.
+
+  If you [1mgdb [22mkeeps pausing during the debug, printing things like
+  "SIG32", you need to type in:
+
+       (gdb) handle SIG32 nostop
+       (gdb) handle SIG33 nostop
+
+  so that the program will continue to execute rather than stopping.
 
   [1m15.10.  Mythtv makes my system crash.[0m
 
@@ -1891,6 +2028,10 @@
 
   Master mixer - sets the level for the analog signal sent to line-out
   or the speakers.
+
+  You may also want to ensure that /dev/dsp hasn't already been grabbed
+  by another process, like [1mesd[22m.  If /dev/dsp isn't available, then
+  mythtv won't work.
 
   [1m16.  Miscellaneous.[0m
 
@@ -1956,6 +2097,7 @@
   [1mNOTE[22m:It should be clear that using the development version of mythtv
   may cause loss of data on your system.  There is no guarantee that the
   development version of mythtv will work for you.
+
   [1mTHERE IS NO GUARANTEE THAT THESE INSTRUCTIONS WILL WORK.  USE AT YOUR[0m
   [1mOWN RISK.[0m
 
@@ -2015,7 +2157,7 @@
   Once the setup wizard is done: to run the new version of mythtv, you
   must first start the back-end server:
 
-  $ mythbackend &
+       $ mythbackend &
 
   and then run the front-end client:
 

@@ -98,14 +98,17 @@ found when we need them.</P>
 /usr/local/lib
 ^D
 
-# ldconfig
+# /sbin/ldconfig
 # exit
 $ 
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 <P><B>NOTE</B>:  It appears that Red Hat Linux 8.0 requires that the
-<B>ldconfig</B> command needs to be run twice.</P>
+<B>ldconfig</B> command needs to be run twice. Red Hat will also
+frequently "forget" about the path. It's recommended to run
+<B>/sbin/ldconfig</B> after installing every package. Failing that, always
+run it if you get an unexpected error about not finding libraries.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-5.html">Next</A>

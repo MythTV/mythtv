@@ -183,6 +183,16 @@ information.</P>
 execution.  When the program segfaults, type <CODE>bt</CODE> to get the
 backtrace.  The backtrace should be posted to the mythtv-dev mailing list,
 along with the steps you followed to get the program to crash.</P>
+<P>If you <B>gdb</B> keeps pausing during the debug, printing things like
+"SIG32", you need to type in:
+<BLOCKQUOTE><CODE>
+<PRE>
+(gdb) handle SIG32 nostop
+(gdb) handle SIG33 nostop
+</PRE>
+</CODE></BLOCKQUOTE>
+ so that the program will continue to execute rather than
+stopping.</P>
 
 <H2><A NAME="ss15.10">15.10</A> <A HREF="mythtv-HOWTO.html#toc15.10">Mythtv makes my system crash. </A>
 </H2>
@@ -232,7 +242,9 @@ volume of 100% is recommended for testing, distortion may occur. Lowering
 this level to 75% to 85% may result in better audio quality.</P>
 <P>Master mixer - sets the level for the analog signal sent to line-out or the
 speakers.</P>
-
+<P>You may also want to ensure that <CODE>/dev/dsp</CODE> hasn't already been
+grabbed by another process, like <B>esd</B>.  If <CODE>/dev/dsp</CODE> isn't
+available, then mythtv won't work.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-16.html">Next</A>

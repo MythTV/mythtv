@@ -102,6 +102,17 @@ $
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P>If you get errors installing XML::Twig or other XMLTV prerequisites,  
+try deleting the old versions of libexpat
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# rm -f /usr/lib/libexpat*
+# /sbin/ldconfig
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 <P><B>NOTE</B>:  Red Hat Linux 8.0 users, make sure that you set your LANG as
 described in 
 <A HREF="mythtv-HOWTO-4.html#RH80-LANG">Section 4</A>.</P>

@@ -127,21 +127,19 @@ sure "mysql-server" is checked.  (only required on the master system)</LI>
 <LI>Development Tools</LI>
 <LI>X Software Development</LI>
 <LI>KDE Software Development</LI>
+<LI>Kernel Development</LI>
 </UL>
 </P>
 <P>Click Install to continue.</P>
-<P>The version of QT supplied with Red Hat Linux 8.0 does not include a
-necessary mysql plugin. You will have to download and install that RPM
-package yourself. First go to 
-<A HREF="http://rpm.pbone.net/">http://rpm.pbone.net/</A> and click on "Search" near the top of the
-page. On the search page unselect all checkboxes except "RedHat 8.X". Next
-select the "Search for RPMs by name in FTP........." radio button. In the
-search field enter "qt-MySQL" then click "Search".  You will be presented
-with a list of mirrors who host this particular RPM, currently called 
-"qt-MySQL-3.0.5-17.i386.rpm". Download the RPM.  I had good luck downloading
-from the ftp.pbone.net mirror. Once downloaded, double click on the RPM
-package. You will be prompted for the root password, enter it, watch the
-progress bar, and you are finished.</P>
+<P>You can not install qt-MySQL, a necessary prerequisite, graphically. To  
+install this package using the command line do</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ up2date --solvedeps qt-MySQL
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
 <H3><A NAME="CLIinstalltools_"></A> Command-line installation. </H3>
 
