@@ -720,6 +720,8 @@ class UIManagedTreeListType : public UIType
 
     UIManagedTreeListType(const QString &name);
     ~UIManagedTreeListType();
+    void    setUpArrowOffset(QPoint& pt) { upArrowOffset = pt;}    
+    void    setDownArrowOffset(QPoint& pt) { downArrowOffset = pt;}    
     void    setSelectPoint(QPoint& pt) { selectPoint = pt;}
     void    setSelectPadding(int pad) {selectPadding = pad;}
     void    setArea(QRect an_area) { area = an_area; }
@@ -819,6 +821,8 @@ class UIManagedTreeListType : public UIType
     bool                    color_selectables;
     QMap<int, QPixmap*>     iconMap;
     QPoint                  selectPoint;
+    QPoint                  upArrowOffset;
+    QPoint                  downArrowOffset;
 };
 
 class UIPushButtonType : public UIType

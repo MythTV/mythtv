@@ -6,6 +6,8 @@ using namespace std;
 #include "mythdialogs.h"
 #include "mythcontext.h"
 
+
+
 LayerSet::LayerSet(const QString &name)
 {
     m_name = name;
@@ -2377,6 +2379,10 @@ UIManagedTreeListType::UIManagedTreeListType(const QString & name)
     selectPadding = 0;
     selectPoint.setX(0);
     selectPoint.setY(0);
+    upArrowOffset.setX(0);
+    upArrowOffset.setY(0);
+    downArrowOffset.setX(0);
+    downArrowOffset.setY(0);
 }
 
 UIManagedTreeListType::~UIManagedTreeListType()
@@ -2661,14 +2667,14 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                 {
                     if (show_whole_tree)
                     {
-                        p->drawPixmap(bin_corners[i].right() - up_arrow_image.width(),
-                                      bin_corners[i].top(),
+                        p->drawPixmap((bin_corners[i].right() - up_arrow_image.width()) + upArrowOffset.x(),
+                                      bin_corners[i].top()  + upArrowOffset.y(),
                                       up_arrow_image);
                     }
                     else
                     {
-                        p->drawPixmap(area.right() - up_arrow_image.width(),
-                                      area.top(),
+                        p->drawPixmap((area.right() - up_arrow_image.width())+ upArrowOffset.x(),
+                                      area.top() + upArrowOffset.y(),
                                       up_arrow_image);
                     }
                 }
@@ -2676,14 +2682,14 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                 {
                     if (show_whole_tree)
                     {
-                        p->drawPixmap(bin_corners[i].right() - down_arrow_image.width(),
-                                      bin_corners[i].bottom() - down_arrow_image.height(),
+                        p->drawPixmap((bin_corners[i].right() - down_arrow_image.width()) + downArrowOffset.x(),
+                                      (bin_corners[i].bottom() - down_arrow_image.height())  + downArrowOffset.y(),
                                       down_arrow_image);
                     }
                     else
                     {
-                        p->drawPixmap(area.right() - down_arrow_image.width(),
-                                      area.bottom() - down_arrow_image.height(),
+                        p->drawPixmap((area.right() - down_arrow_image.width()) + downArrowOffset.x(),
+                                      (area.bottom() - down_arrow_image.height())  + downArrowOffset.y(),
                                       down_arrow_image);
                     }
                 }

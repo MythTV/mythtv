@@ -1900,6 +1900,9 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     QPixmap *icon_img = NULL;
     QPixmap *select_img = NULL;
     QPoint selectPoint(0,0);
+    QPoint upArrowPoint(0,0);
+    QPoint downArrowPoint(0,0);
+    
     
 
     //
@@ -2005,6 +2008,15 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                 }
                 else if (imgname.lower() == "uparrow")
                 {
+                    QString imgpoint = "";
+                    imgpoint = info.attribute("location", "");
+                    if (!imgpoint.isNull() && !imgpoint.isEmpty())
+                    {
+                        upArrowPoint = parsePoint(imgpoint);
+                        upArrowPoint.setX((int)(upArrowPoint.x() * wmult));
+                        upArrowPoint.setY((int)(upArrowPoint.y() * hmult));    
+                    }
+                    
                     uparrow_img = gContext->LoadScalePixmap(file);
                     if (!uparrow_img)
                     {
@@ -2013,6 +2025,14 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                 }
                 else if (imgname.lower() == "downarrow")
                 {
+                    QString imgpoint = "";
+                    imgpoint = info.attribute("location", "");
+                    if (!imgpoint.isNull() && !imgpoint.isEmpty())
+                    {
+                        downArrowPoint = parsePoint(imgpoint);
+                        downArrowPoint.setX((int)(downArrowPoint.x() * wmult));
+                        downArrowPoint.setY((int)(downArrowPoint.y() * hmult));    
+                    }
                     downarrow_img = gContext->LoadScalePixmap(file);
                     if (!downarrow_img)
                     {
@@ -2162,6 +2182,8 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     if (!rightarrow_img)
         rightarrow_img = new QPixmap();
 
+    mtl->setUpArrowOffset(upArrowPoint);
+    mtl->setDownArrowOffset(downArrowPoint);
     mtl->setArrowImages(*uparrow_img, *downarrow_img, *leftarrow_img,
                         *rightarrow_img);
 
