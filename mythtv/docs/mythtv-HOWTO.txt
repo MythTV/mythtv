@@ -335,57 +335,12 @@
 
        % su -
        # perl -MCPAN -e shell
-
-
-
-  Check to see which version of TWIG is being offered by CPAN.  If it's
-  3.08, we need to download it from the author's web site, because 3.08
-  has a problem with perl 5.8. As of 2002-11-02:
-
-
-       cpan> i /TWIG/
-       Author          STWIGGER ("Simon Twigger" <simont@mcw.edu>)
-       Distribution    M/MI/MIROD/XML-Twig-3.08.tar.gz
-       Module          XML::Twig       (M/MI/MIROD/XML-Twig-3.08.tar.gz)
-       3 items found
-
-       cpan>
-
-
-
-  This means that we need to do something a little different later on.
-  If it's 3.09 or better, then execute:
-
-
        cpan> install XML::Twig
-
-
-
-  and then the rest of the commands (no matter what the TWIG version
-  was):
-
-
        cpan> install Date::Manip
        Date::Manip is up to date.
        cpan> install LWP
        cpan> install XML::Writer
        cpan> exit
-
-
-
-  Download the 3.09 version of XMLTWIG from
-  http://www.xmltwig.com/xmltwig/ <http://www.xmltwig.com/xmltwig/>
-
-
-
-  % tar -xzf XML-Twig-3.09.tar.gz
-  % cd XML-Twig-3.09
-  % perl Makefile.PL
-  % make
-  % make test
-  % su
-  # make install
-  # exit
 
 
 
@@ -485,7 +440,6 @@
 
   What you need to do is to mute the "line-in" of your sound card and
   also set it as the recording source.
-
   There are two ways to do this.  Graphically, and from the command
   line.
 
@@ -551,20 +505,18 @@
        % wget http://www.kernel.org/pub/linux/kernel/v2.4/linux-2.4.19.tar.bz2
 
 
-
   Next, open a shell and login as superuser.
 
 
-
-  % su -
-  # cd /home/[yourusername]
-  # mkdir /usr/src
-  # mv linux-2.4.19.tar.bz2 /usr/src
-  # cd /usr/src
-  # tar -xjf linux-2.4.19.tar.bz2
-  # chown -R root.root linux-2.4.19
-  # ln -sf linux-2.4.19 linux
-  # exit
+       % su -
+       # cd /home/[yourusername]
+       # mkdir /usr/src
+       # mv linux-2.4.19.tar.bz2 /usr/src
+       # cd /usr/src
+       # tar -xjf linux-2.4.19.tar.bz2
+       # chown -R root.root linux-2.4.19
+       # ln -sf linux-2.4.19 linux
+       # exit
 
 
 
@@ -617,13 +569,13 @@
   time we boot:
 
 
-  # cd /etc/rc.d
-  # cat >> rc.local
-  echo "Starting lircd"
-  /usr/local/sbin/lircd
-  ^D
-  # exit
-  %
+       # cd /etc/rc.d
+       # cat >> rc.local
+       echo "Starting lircd"
+       /usr/local/sbin/lircd
+       ^D
+       # exit
+       %
 
 
 
@@ -674,6 +626,7 @@
 
   If [1mirxevent [22misn't running, then mythtv will not respond to your remote
   control.
+
 
   Currently, mythtv doesn't have native support for controlling the
   mixer volume and mute settings.  A workaround at this time is to

@@ -93,35 +93,7 @@ Install the xmltv prerequisites:
 <PRE>
 % su -
 # perl -MCPAN -e shell
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Check to see which version of TWIG is being offered by CPAN.  If it's 3.08,
-we need to download it from the author's web site, because 3.08 has a problem
-with perl 5.8. As of 2002-11-02:
-<BLOCKQUOTE><CODE>
-<PRE>
-cpan> i /TWIG/
-Author          STWIGGER ("Simon Twigger" &lt;simont@mcw.edu>)
-Distribution    M/MI/MIROD/XML-Twig-3.08.tar.gz
-Module          XML::Twig       (M/MI/MIROD/XML-Twig-3.08.tar.gz)
-3 items found
-
-cpan>
-</PRE>
-</CODE></BLOCKQUOTE>
-
-This means that we need to do something a little different later on.  If
-it's 3.09 or better, then execute:
-<BLOCKQUOTE><CODE>
-<PRE>
 cpan> install XML::Twig
-</PRE>
-</CODE></BLOCKQUOTE>
-
-and then the rest of the commands (no matter what the TWIG version was):
-<BLOCKQUOTE><CODE>
-<PRE>
 cpan> install Date::Manip
 Date::Manip is up to date.
 cpan> install LWP
@@ -130,22 +102,7 @@ cpan> exit
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Download the 3.09 version of XMLTWIG from 
-<A HREF="http://www.xmltwig.com/xmltwig/">http://www.xmltwig.com/xmltwig/</A>
-<BLOCKQUOTE><CODE>
-<PRE>
-% tar -xzf XML-Twig-3.09.tar.gz
-% cd XML-Twig-3.09
-% perl Makefile.PL
-% make
-% make test
-% su
-# make install
-# exit
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Change to the XMLTV directory and compile it:
+<P>Change to the XMLTV directory and compile it:
 <BLOCKQUOTE><CODE>
 <PRE>
 % cd xmltv-0.5.2
