@@ -259,10 +259,25 @@ void ScheduledRecording::ToMap(QMap<QString, QString>& progMap)
                                    endts.time().toString(timeFormat);
     }
 
+    int recType = type->getValue().toInt();
+
+    if (recType == kFindDailyRecord || recType == kFindWeeklyRecord)
+    {
+        QString findfrom = findtime->timeValue().toString(timeFormat);
+        if (recType == kFindWeeklyRecord)
+        {
+            findfrom = QString("%1, %2")
+                               .arg(QDate::shortDayName(findday->intValue()-1))
+                               .arg(findfrom);
+        }
+        progMap["subtitle"] = QString("(%1 %2) %3")
+                                      .arg(findfrom).arg(tr("or later"))
+                                      .arg(progMap["subtitle"]);
+    }
+
     progMap["searchtype"] = searchType;
     progMap["searchforwhat"] = searchForWhat;
 
-        
     if (searchtitle != "")
     {
         progMap["banner"] = searchtitle;
