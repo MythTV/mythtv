@@ -175,6 +175,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "PLAY", "Play", "Ctrl+P");
     REG_KEY("TV Playback", "NEXTAUDIO", "Switch to the next audio track", "+");
     REG_KEY("TV Playback", "PREVAUDIO", "Switch to the previous audio track", "-");
+    REG_KEY("TV Playback", "SUBCHANNELSEP", "Separator for HDTV subchannels", "_");
     
     REG_KEY("TV Editing", "CLEARMAP", "Clear editing cut points", "C,Q,Home");
     REG_KEY("TV Editing", "LOADCOMMSKIP", "Load cut list from commercial skips",
@@ -1318,7 +1319,11 @@ void TV::ProcessKeypress(QKeyEvent *e)
                      action == "6" || action == "7" || action == "8" ||
                      action == "9")
             {
-                ChannelKey(action.toInt());
+                ChannelKey('0' + action.toInt());
+            }
+            else if (action == "SUBCHANNELSEP")
+            {
+                ChannelKey('_');
             }
             else if (action == "TOGGLEBROWSE" || action == "ESCAPE")
             {
@@ -1803,7 +1808,12 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
             if (ok)
             {
-                ChannelKey(val);
+                ChannelKey('0' + val);
+                handled = true;
+            }
+            if (action == "SUBCHANNELSEP")
+            {
+                ChannelKey('_');
                 handled = true;
             }
         }
@@ -2556,20 +2566,19 @@ void TV::ChannelClear(bool hideosd)
     channelkeysstored = 0;
 }
 
-void TV::ChannelKey(int key)
+void TV::ChannelKey(char key)
 {
-    char thekey = key + '0';
 
     if (channelkeysstored == 4)
     {
         channelKeys[0] = channelKeys[1];
         channelKeys[1] = channelKeys[2];
         channelKeys[2] = channelKeys[3];
-        channelKeys[3] = thekey;
+        channelKeys[3] = key;
     }
     else
     {
-        channelKeys[channelkeysstored] = thekey; 
+        channelKeys[channelkeysstored] = key; 
         channelkeysstored++;
     }
     channelKeys[4] = 0;
@@ -2603,7 +2612,7 @@ void TV::ChannelKey(int key)
             QString chan = QString(chan_no_leading_zero).stripWhiteSpace();
             if (!activerecorder->CheckChannelPrefix(chan, unique))
             {
-                channelKeys[0] = thekey;
+                channelKeys[0] = key;
                 channelKeys[1] = channelKeys[2] = channelKeys[3] = ' ';
                 channelkeysstored = 1;
             }

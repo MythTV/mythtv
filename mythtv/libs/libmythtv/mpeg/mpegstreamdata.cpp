@@ -13,9 +13,10 @@ MPEGStreamData::~MPEGStreamData()
         delete _pmt;
 }
 
-void MPEGStreamData::Reset(int desiredProgram) {
-    if (desiredProgram>0)
-        _desired_program = desiredProgram;
+void MPEGStreamData::Reset(int desiredSubchannel) {
+    if (desiredSubchannel>0)
+        _desired_subchannel = desiredSubchannel;
+    _desired_program = -1;
     SetPAT(0);
     SetPMT(0);
     //for (...) delete (partial_pes_packets::iterator); // TODO delete old PES packets
@@ -24,6 +25,9 @@ void MPEGStreamData::Reset(int desiredProgram) {
     
     _pids_listening[MPEG_PAT_PID] = true;
     _pids_listening[ATSC_PSIP_PID] = true;
+
+    _pids_notlistening.clear();
+    _pids_writing.clear();
     
     _pid_video = _pid_pmt = 0xffffffff;
 }
@@ -78,7 +82,10 @@ bool MPEGStreamData::CreatePAT(const ProgramAssociationTable& pat)
     VERBOSE(VB_RECORD, "CreatePAT()");
     VERBOSE(VB_RECORD, "PAT in input stream");
     VERBOSE(VB_RECORD, pat.toString());
-
+    if (_desired_program < 0) {
+        VERBOSE(VB_RECORD, "Desired program not set yet");
+        return false;
+    }
     _pid_pmt = pat.FindPID(_desired_program);
     VERBOSE(VB_RECORD, QString("desired_program(%1) pid(0x%2)").
             arg(_desired_program).arg(_pid_pmt, 0, 16));
@@ -136,7 +143,11 @@ bool MPEGStreamData::CreatePMT(const ProgramMapTable& pmt)
 
     // Video
     pmt.FindPIDs(StreamID::MPEG2Video, videoPIDs);
-    assert(videoPIDs.size()); // must have video
+    if (videoPIDs.size()<1) 
+    {
+        VERBOSE(VB_RECORD, "No video found old PMT, can not construct new PMT");
+        return false;
+    }
     _pid_video = videoPIDs[0];
     pids.push_back(_pid_video);
     types.push_back(StreamID::MPEG2Video);
@@ -145,7 +156,11 @@ bool MPEGStreamData::CreatePMT(const ProgramMapTable& pmt)
     pmt.FindPIDs(StreamID::AC3Audio,   audioAC3);
     pmt.FindPIDs(StreamID::MPEG2Audio, audioMPEG);
 
-    assert(audioAC3.size()+audioMPEG.size()); // must have audio
+    if (audioAC3.size()+audioMPEG.size()<1)
+    {
+        VERBOSE(VB_RECORD, "No audio found in old PMT, can not construct new PMT");
+        return false;
+    }
 
     for (uint i=0; i<audioAC3.size(); i++) {
         AddAudioPID(audioAC3[i]);
@@ -160,7 +175,10 @@ bool MPEGStreamData::CreatePMT(const ProgramMapTable& pmt)
     
     // Timebase
     int pcrpidIndex = pmt.FindPID(pmt.PCRPID());
-    assert(pcrpidIndex>=0); // there must be some reference stream
+    if (pcrpidIndex<0) {
+        // the timecode reference stream is not in the PMT, add stream to misc record streams
+        AddWritingPID(pmt.PCRPID());
+    }
 
     // Misc
     uint programNumber = 1;

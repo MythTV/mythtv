@@ -83,7 +83,7 @@ extern "C" {
 #ifndef L2_CACHE_SIZE_KB
 #define L2_CACHE_SIZE_KB 512
 #endif
-#define DEFAULT_PROGRAM 1
+#define DEFAULT_SUBCHANNEL 1
 
 #define WHACK_A_BUG_VIDEO 0
 #define WHACK_A_BUG_AUDIO 0
@@ -101,14 +101,9 @@ extern "C" {
 #endif
 
 HDTVRecorder::HDTVRecorder()
-    : RecorderBase(), _atsc_stream_fd(-1), _atsc_stream_data(0), _buffer(0), _buffer_size(0),
-      _error(false), _wait_for_gop(true),
-      _request_recording(false), _request_pause(false), _recording(false), _paused(false),
-      _tspacket_count(0), _nullpacket_count(0), _resync_count(0),
-      _frames_written_count(0), _frames_seen_count(0), _frame_of_first_gop(0),
-      _position_within_gop_header(0), _scanning_pes_header_for_gop(0), _gop_seen(false)
+    : DTVRecorder(), _atsc_stream_data(0), _resync_count(0)
 {
-    _atsc_stream_data = new ATSCStreamData(DEFAULT_PROGRAM);
+    _atsc_stream_data = new ATSCStreamData(DEFAULT_SUBCHANNEL);
 
     //_buffer_size = max((L2_CACHE_SIZE_KB*1024)/2-(16*1024), 8*1024);
     _buffer_size = 2 * 1024 * 1024;
@@ -122,18 +117,12 @@ HDTVRecorder::HDTVRecorder()
 
 HDTVRecorder::~HDTVRecorder()
 {
-    if (_atsc_stream_fd >= 0)
-        close(_atsc_stream_fd);
+    if (_stream_fd >= 0)
+        close(_stream_fd);
     if (_atsc_stream_data)
         delete _atsc_stream_data;
     if (_buffer)
         delete[] _buffer;
-}
-
-void HDTVRecorder::SetOption(const QString &opt, int value)
-{
-    (void)opt;
-    (void)value;
 }
 
 void HDTVRecorder::SetOptionsFromProfile(RecordingProfile *profile,
@@ -158,25 +147,25 @@ bool HDTVRecorder::Open()
 
 #if FAKE_VIDEO
     // open file instead of device
-    if (_atsc_stream_fd >=0)
+    if (_stream_fd >=0)
     {
-        int ret = close(_atsc_stream_fd);
+        int ret = close(_stream_fd);
         assert(ret);
     }
-    _atsc_stream_fd = open(FAKE_VIDEO_FILES[fake_video_index], O_RDWR);
+    _stream_fd = open(FAKE_VIDEO_FILES[fake_video_index], O_RDWR);
     VERBOSE(VB_IMPORTANT, QString("Opened fake video source %1").arg(FAKE_VIDEO_FILES[fake_video_index]));
     fake_video_index = (fake_video_index+1)%FAKE_VIDEO_NUM;
 #else
-    if (_atsc_stream_fd <= 0)
-        _atsc_stream_fd = open(videodevice.ascii(), O_RDWR);
+    if (_stream_fd <= 0)
+        _stream_fd = open(videodevice.ascii(), O_RDWR);
 #endif
-    if (_atsc_stream_fd <= 0)
+    if (_stream_fd <= 0)
     {
         VERBOSE(VB_IMPORTANT, QString("Can't open video device: %1 chanfd = %2")
-                .arg(videodevice).arg(_atsc_stream_fd));
+                .arg(videodevice).arg(_stream_fd));
         perror("open video:");
     }
-    return (_atsc_stream_fd>0);
+    return (_stream_fd>0);
 }
 
 bool readchan(int chanfd, unsigned char* buffer, int dlen) {
@@ -243,18 +232,11 @@ void HDTVRecorder::StartRecording(void)
         return;
     }
 
-    if (!SetupRecording())
-    {
-        VERBOSE(VB_IMPORTANT, QString("HD6 Error initializing recording"));
-        _error = true;
-        return;
-    }
-
     _request_recording = true;
     _recording = true;
 
     // sync device stream so it starts with a valid ts packet
-    if (!syncchan(_atsc_stream_fd, TSPacket::SIZE*unsyncpackets, syncpackets))
+    if (!syncchan(_stream_fd, TSPacket::SIZE*unsyncpackets, syncpackets))
     {
         _error = true;
         return;
@@ -272,7 +254,7 @@ void HDTVRecorder::StartRecording(void)
             continue;
         }
 
-        int len = read(_atsc_stream_fd, &(_buffer[remainder]),
+        int len = read(_stream_fd, &(_buffer[remainder]),
                        _buffer_size - remainder);
 
         if (len < 0)
@@ -299,144 +281,6 @@ void HDTVRecorder::StartRecording(void)
     FinishRecording();
 
     _recording = false;
-}
-
-int HDTVRecorder::GetVideoFd(void)
-{
-    return _atsc_stream_fd;
-}
-
-// start common code to the dvbrecorder class.
-
-bool HDTVRecorder::SetupRecording(void)
-{
-    return true;
-}
-
-void HDTVRecorder::FinishRecording(void)
-{
-    if (curRecording && db_lock && db_conn)
-    {
-        pthread_mutex_lock(db_lock);
-        MythContext::KickDatabase(db_conn);
-
-        curRecording->SetFilesize(ringBuffer->GetRealFileSize(), db_conn);
-        if (_position_map_delta.size())
-        {
-            curRecording->SetPositionMapDelta(_position_map_delta,
-                                              MARK_GOP_BYFRAME, db_conn);
-            _position_map_delta.clear();
-        }
-
-        pthread_mutex_unlock(db_lock);
-    }
-}
-
-void HDTVRecorder::SetVideoFilters(QString &filters)
-{
-    (void)filters;
-}
-
-void HDTVRecorder::Initialize(void)
-{
-    
-}
-
-void HDTVRecorder::HandleGOP() {
-    // group_of_pictures
-    int frameNum = _frames_written_count - 1;
-
-    if (!_gop_seen && _frames_seen_count > 0)
-    {
-        if (_frame_of_first_gop > 0)
-        {
-            // don't set keyframedist...
-            // playback assumes it's 1 in 15
-            // frames, and in ATSC they come
-            // somewhat unevenly.
-            //keyframedist=frameNum-firstgoppos;
-            _gop_seen = true;
-        }
-        else
-            _frame_of_first_gop = (frameNum > 0) ? frameNum : 1;
-    }
-
-    long long startpos = 
-        ringBuffer->GetFileWritePosition();
-
-    if (!_position_map.contains(frameNum))
-    {
-        _position_map_delta[frameNum] = startpos;
-        _position_map[frameNum] = startpos;
-
-        if (curRecording && db_lock && db_conn &&
-            ((_position_map.size() % 30) == 0))
-        {
-            pthread_mutex_lock(db_lock);
-            MythContext::KickDatabase(db_conn);
-            curRecording->SetPositionMap(_position_map, MARK_GOP_BYFRAME, db_conn);
-            curRecording->SetFilesize(startpos, db_conn);
-            pthread_mutex_unlock(db_lock);
-            _position_map_delta.clear();
-        }
-    }
-}
-
-void HDTVRecorder::FindKeyframes(const TSPacket* tspacket)
-{
-    if (!tspacket->HasPayload())
-        return; // no payload to scan...
-  
-    if (tspacket->PayloadStart())
-    { // packet contains start of PES packet
-        _scanning_pes_header_for_gop = true; // start scanning for PES headers
-        _position_within_gop_header = 0; // start looking for first byte of pattern
-    }
-    else if (!_scanning_pes_header_for_gop)
-        return;
-
-    // Scan for PES header codes; specifically picture_start
-    // and group_start (of_pictures).  These should be within
-    // this first TS packet of the PES packet.
-    //   00 00 01 00: picture_start_code
-    //   00 00 01 B8: group_start_code
-    //   (there are others that we don't care about)
-    unsigned int i=tspacket->AFCOffset(); // borked if AFCOffset > 188
-    const unsigned char *buffer=tspacket->data();
-    for (;(i+1<TSPacket::SIZE) && _scanning_pes_header_for_gop; i++)
-    {
-        const unsigned char k = buffer[i];
-        if (0 == _position_within_gop_header)
-            _position_within_gop_header = (k == 0x00) ? 1 : 0;
-        else if (1 == _position_within_gop_header)
-            _position_within_gop_header = (k == 0x00) ? 2 : 0;
-        else 
-        {
-            assert(2 == _position_within_gop_header);
-            if (0x01 != k)
-            {
-                _position_within_gop_header = (k) ? 0 : 2;
-                continue;
-            }
-            assert(0x01 == k);
-            const unsigned char k1 = buffer[i+1];
-            if (0x00 == k1) // picture start
-            {
-                if (_gop_seen || _frame_of_first_gop > 0)
-                    _frames_written_count++;
-                _frames_seen_count++;
-            }
-            else if (0xB8 == k1)
-                HandleGOP();
-            else if (0xB3 == k1 && !_gop_seen)
-                HandleGOP();
-            
-            // video slice ... end of "interesting" headers
-            if (0x01 <= k1 && k1 <= 0xAF)
-                _scanning_pes_header_for_gop = false;
-            _position_within_gop_header = 0;
-        }
-    }
 }
 
 int HDTVRecorder::ResyncStream(unsigned char *buffer, int curr_pos, int len)
@@ -535,7 +379,7 @@ void HDTVRecorder::HandleVideo(const TSPacket* tspacket)
     FindKeyframes(tspacket);
     // decoder needs video, of course (just this PID)
     // delay until first GOP to avoid decoder crash on res change
-    if (_wait_for_gop && !_gop_seen && !_frame_of_first_gop)
+    if (_wait_for_keyframe && !_keyframe_seen)
         return;
 
 #if WHACK_A_BUG_VIDEO
@@ -549,7 +393,7 @@ void HDTVRecorder::HandleVideo(const TSPacket* tspacket)
 void HDTVRecorder::HandleAudio(const TSPacket* tspacket)
 {
     // decoder needs audio, of course (just this PID)
-    if (_wait_for_gop && !_gop_seen && !_frame_of_first_gop)
+    if (_wait_for_keyframe && !_keyframe_seen)
         return;
 
 #if WHACK_A_BUG_AUDIO
@@ -573,14 +417,14 @@ bool HDTVRecorder::ProcessTSPacket(const TSPacket& tspacket)
             // Pass or reject frames based on PID, and parse info from them
             if (lpid == StreamData()->VideoPID())
                 HandleVideo(&tspacket);
-            else if (lpid == 0x1fff) // null packet
-                _nullpacket_count++;
             else if (StreamData()->IsAudioPID(lpid))
                 HandleAudio(&tspacket);
             else if (StreamData()->IsListeningPID(lpid))
                 StreamData()->HandleTables(&tspacket, this);
-            else if (StreamData()->VersionMGT()>=0 && lpid>0x60)
-                VERBOSE(VB_RECORD, QString("Unknown pid 0x%1").arg(lpid, 0, 16));
+            else if (StreamData()->IsWritingPID(lpid))
+                ringBuffer->Write(tspacket.data(), TSPacket::SIZE);
+            else if (StreamData()->VersionMGT()>=0)
+                _ts_stats.IncrPIDCount(lpid);
         }
     }
     return ok;
@@ -611,7 +455,9 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
         const TSPacket *pkt = reinterpret_cast<const TSPacket*>(&buffer[pos]);
         if (ProcessTSPacket(*pkt)) {
             pos += TSPacket::SIZE; // Advance to next TS packet
-            _tspacket_count++;
+            _ts_stats.IncrTSPacketCount();
+            if (0 == _ts_stats.TSPacketCount()%1000000)
+                VERBOSE(VB_RECORD, _ts_stats.toString());
         } else // Let it resync in case of dropped bytes
             buffer[pos] = SYNC_BYTE+1;
     }
@@ -619,28 +465,12 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
     return len - pos;
 }
 
-void HDTVRecorder::StopRecording(void)
-{
-    _request_recording = false;
-}
-
 void HDTVRecorder::Reset(void)
 {
-    _error = false;
+    DTVRecorder::Reset();
 
-    _tspacket_count = 0;
-    _nullpacket_count = 0;
     _resync_count = 0;
-    _frames_written_count = 0;
-    _frames_seen_count = 0;
-
-    _frame_of_first_gop = 0;
-    _position_within_gop_header = 0;
-    _scanning_pes_header_for_gop = false;
-    _gop_seen = false;
-
-    _position_map.clear();
-    _position_map_delta.clear();
+    _ts_stats.Reset();
 
     if (curRecording && db_lock && db_conn)
     {
@@ -650,9 +480,9 @@ void HDTVRecorder::Reset(void)
         pthread_mutex_unlock(db_lock);
     }
 
-    if (_atsc_stream_fd >= 0) 
+    if (_stream_fd >= 0) 
     {
-        int ret = close(_atsc_stream_fd);
+        int ret = close(_stream_fd);
         if (ret < 0) 
         {
             perror("close");
@@ -660,16 +490,16 @@ void HDTVRecorder::Reset(void)
         }
 #if FAKE_VIDEO
         // open file instead of device
-        _atsc_stream_fd = open(FAKE_VIDEO_FILES[fake_video_index], O_RDWR);
+        _stream_fd = open(FAKE_VIDEO_FILES[fake_video_index], O_RDWR);
         VERBOSE(VB_IMPORTANT, QString("Opened fake video source %1").arg(FAKE_VIDEO_FILES[fake_video_index]));
         fake_video_index = (fake_video_index+1)%FAKE_VIDEO_NUM;
 #else
-        _atsc_stream_fd = open(videodevice.ascii(), O_RDWR);
+        _stream_fd = open(videodevice.ascii(), O_RDWR);
 #endif
-        if (_atsc_stream_fd < 0)
+        if (_stream_fd < 0)
         {
             VERBOSE(VB_IMPORTANT, QString("HD1 Can't open video device: %1 chanfd = %2").
-                    arg(videodevice).arg(_atsc_stream_fd));
+                    arg(videodevice).arg(_stream_fd));
             perror("open video");
             return;
         }
@@ -678,59 +508,19 @@ void HDTVRecorder::Reset(void)
     StreamData()->Reset();
 }
 
-void HDTVRecorder::Pause(bool /*clear*/)
-{
-    _paused = false;
-    _request_pause = true;
-}
-
-void HDTVRecorder::Unpause(void)
-{
-    _request_pause = false;
-}
-
-bool HDTVRecorder::GetPause(void)
-{
-    return _paused;
-}
-
-void HDTVRecorder::WaitForPause(void)
-{
-    if (!_paused)
-        if (!pauseWait.wait(1000))
-            VERBOSE(VB_IMPORTANT, QString("Waited too long for recorder to pause"));
-}
-
-bool HDTVRecorder::IsRecording(void)
-{
-    return _recording;
-}
-
-long long HDTVRecorder::GetFramesWritten(void)
-{
-    return _frames_written_count;
-}
-
-long long HDTVRecorder::GetKeyframePosition(long long desired)
-{
-    long long ret = -1;
-
-    if (_position_map.find(desired) != _position_map.end())
-        ret = _position_map[desired];
-
-    return ret;
-}
-
-void HDTVRecorder::GetBlankFrameMap(QMap<long long, int> &blank_frame_map)
-{
-    (void)blank_frame_map;
-}
-
 void HDTVRecorder::ChannelNameChanged(const QString& new_chan)
 {
     if (!_atsc_stream_data && !_buffer) 
         return;
-    RecorderBase::ChannelNameChanged(new_chan);
+
+    _wait_for_keyframe = _wait_for_keyframe_option;
+
+#if FAKE_VIDEO
+    RecorderBase::ChannelNameChanged("51");
+#else
+    DTVRecorder::ChannelNameChanged(new_chan);
+#endif
+
     // look up freqid
     pthread_mutex_lock(db_lock);
     QString thequery = QString("SELECT freqid "
@@ -749,12 +539,12 @@ void HDTVRecorder::ChannelNameChanged(const QString& new_chan)
     VERBOSE(VB_RECORD, QString("Setting frequency for startRecording freqid: %1").arg(freqid));
     pthread_mutex_unlock(db_lock);
 
-    int desired_program = DEFAULT_PROGRAM;
+    int desired_subchannel = DEFAULT_SUBCHANNEL;
     int pos = freqid.find('-');
     if (pos != -1) 
-        desired_program = atoi(freqid.mid(pos+1).ascii());
+        desired_subchannel = atoi(freqid.mid(pos+1).ascii());
     else
         VERBOSE(VB_IMPORTANT,
-                QString("Error: Desired program not specified in freqid \"%1\", Using %2.").arg(freqid).arg(desired_program));
-    StreamData()->Reset(desired_program);
+                QString("Error: Desired subchannel not specified in freqid \"%1\", Using %2.").arg(freqid).arg(desired_subchannel));
+    StreamData()->Reset(desired_subchannel);
 }

@@ -2,6 +2,7 @@
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
 #include "pespacket.h"
 #include "mpegtables.h"
+#include "mythcontext.h"
 
 static inline unsigned int calcOffset(unsigned int cnt) {
     return (cnt*TSPacket::PAYLOAD_SIZE)+TSPacket::HEADER_SIZE;
@@ -12,11 +13,10 @@ bool PESPacket::AddTSPacket(const TSPacket* packet) {
     unsigned int tlen = Length() + (_pesdata-_fullbuffer) + 4/*CRC*/;
 
     if (!tsheader()->PayloadStart()) {
-        cerr<<"Error: We started a PES packet,"
-            <<" without a payloadStart!"<<endl;
+        VERBOSE(VB_RECORD, "Error: We started a PES packet, without a payloadStart!");
         return false;
     } else if (!IsClone()) {
-        cerr<<"Error: Must clone initially to use addPackets()"<<endl;
+        VERBOSE(VB_RECORD, "Error: Must clone initially to use addPackets()");
         return false;
     }
 
@@ -25,8 +25,8 @@ bool PESPacket::AddTSPacket(const TSPacket* packet) {
     const int ccExp = (_ccLast+1)&0xf;
     if (ccExp == cc) {
         if (calcOffset(_cnt)>_allocSize) {
-            cerr<<"Too much data, need to handle...   "
-                <<calcOffset(_cnt)<<":"<<_allocSize<<endl;
+            VERBOSE(VB_RECORD, QString("Too much data, need to handle...   %1:%2").
+                    arg(calcOffset(_cnt)).arg(_allocSize));
             return true;
         }
         memcpy(_fullbuffer+calcOffset(_cnt),
@@ -36,8 +36,7 @@ bool PESPacket::AddTSPacket(const TSPacket* packet) {
     } else if (int(_ccLast) == cc) {
         // do nothing with repeats
     } else {
-        cerr<<"Out of sync!!!  ";
-        cerr<<"Need to wait for next payloadStart"<<endl;
+        VERBOSE(VB_RECORD, "Out of sync!!! Need to wait for next payloadStart");
         return true;
     }
 

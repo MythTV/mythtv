@@ -115,7 +115,7 @@ class ProgInfo
                                       ratings = other.ratings;
                                       repeat = other.repeat;
                                       credits = other.credits;
-				      content = other.content;
+                                      content = other.content;
                                     }
 
     QString startts;
@@ -691,6 +691,28 @@ void ResetIconMap(bool reset_icons)
 } // namespace
 
 // DataDirect stuff
+QString GetFreqId(const QString& freqid, const QString& minor, 
+                  QString& channel)
+{
+    // For NTSC channels, freqid is the same as channel.
+    // For ATSC channels, it's "<fccchannelnumber>-<channelMinor>"
+    // Also for *new* atsc channels, preset channel by appending channelMinor.
+    QString ret;
+    if (freqid == "")
+    {
+        ret = channel;
+    }
+    else 
+    {
+        if (minor != "") 
+        {
+            ret = freqid + "-" + minor;
+            channel = channel + "_" + minor; // default channel number
+        }
+    }
+    return ret;
+}
+
 void DataDirectStationUpdate(Source source)
 {
     QSqlQuery query;
@@ -701,7 +723,8 @@ void DataDirectStationUpdate(Source source)
 
     QSqlQuery query1;
     query1.prepare("SELECT dd_v_station.stationid,dd_v_station.callsign,"
-               "dd_v_station.stationname,dd_v_station.channel "
+               "dd_v_station.stationname,dd_v_station.channel,"
+               "dd_v_station.fccchannelnumber,dd_v_station.channelMinor "
                "FROM dd_v_station LEFT JOIN channel ON "
                "dd_v_station.stationid = channel.xmltvid "
                "AND channel.sourceid = :SOURCEID "
@@ -736,6 +759,9 @@ void DataDirectStationUpdate(Source source)
                 callsign = QString::number(chanid);
             QString name = query1.value(2).toString();
             QString channel = query1.value(3).toString();
+            QString freqid = query1.value(4).toString();
+            QString minor = query1.value(5).toString();
+            freqid = GetFreqId(freqid, minor, channel);
 
             query.prepare("INSERT INTO channel (chanid,channum,sourceid,"
                           "callsign, name, xmltvid, freqid, tvformat) "
@@ -748,7 +774,7 @@ void DataDirectStationUpdate(Source source)
             query.bindValue(":CALLSIGN", callsign);
             query.bindValue(":NAME", name);
             query.bindValue(":XMLTVID", xmltvid);
-            query.bindValue(":FREQID", channel);
+            query.bindValue(":FREQID", freqid);
             query.bindValue(":TVFORMAT", "Default");
         
             if (!query.exec())
@@ -758,21 +784,27 @@ void DataDirectStationUpdate(Source source)
 
     // Now, update the data for channels which do exist
 
-    QSqlQuery dd_station_info("SELECT callsign, stationname, stationid"
-            " FROM dd_v_station;");
+    QSqlQuery dd_station_info("SELECT callsign, stationname, stationid,"
+            "channel, fccchannelnumber, channelMinor FROM dd_v_station;");
 
     if (dd_station_info.first())
     {
         QSqlQuery dd_update;
         dd_update.prepare("UPDATE channel SET callsign = :CALLSIGN,"
-                " name = :NAME WHERE xmltvid = :STATIONID"
+                " name = :NAME, freqid = :FREQID WHERE xmltvid = :STATIONID"
                 " AND sourceid = :SOURCEID;");
         do
         {
+            QString channel = dd_station_info.value(3).toString();
+            QString freqid = dd_station_info.value(4).toString();
+            QString minor = dd_station_info.value(5).toString();
+            freqid = GetFreqId(freqid, minor, channel);
+
             dd_update.bindValue(":CALLSIGN", dd_station_info.value(0));
             dd_update.bindValue(":NAME", dd_station_info.value(1));
             dd_update.bindValue(":STATIONID", dd_station_info.value(2));
             dd_update.bindValue(":SOURCEID", source.id);
+            dd_update.bindValue(":FREQID", freqid);
             if (!dd_update.exec())
             {
                 MythContext::DBError("Updating channel table",
@@ -1261,11 +1293,11 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
             {
                 pginfo->subtitle = getFirstText(info);
             }
-	    else if (info.tagName() == "content")
+            else if (info.tagName() == "content")
             {
                 pginfo->content = getFirstText(info);
             }
-	    
+            
             else if (info.tagName() == "desc" && pginfo->desc == "")
             {
                 pginfo->desc = getFirstText(info);
@@ -1365,19 +1397,19 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
     /* Hack for teveblad grabber to do something with the content tag*/
     if (pginfo->content != "")
     {
-	if (pginfo->category == "film")
-	{
-	    pginfo->subtitle = pginfo->desc;
-	    pginfo->desc = pginfo->content;
-	}
-	else if (pginfo->desc != "") 
-	{
-	    pginfo->desc = pginfo->desc + " - " + pginfo->content;
-	}
+        if (pginfo->category == "film")
+        {
+            pginfo->subtitle = pginfo->desc;
+            pginfo->desc = pginfo->content;
+        }
+        else if (pginfo->desc != "") 
+        {
+            pginfo->desc = pginfo->desc + " - " + pginfo->content;
+        }
         else if (pginfo->desc == "")
-	{
-	    pginfo->desc = pginfo->content;
-	}
+        {
+            pginfo->desc = pginfo->content;
+        }
     }
     
     if (pginfo->airdate == "")

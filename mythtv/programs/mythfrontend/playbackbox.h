@@ -53,8 +53,13 @@ class PlaybackBox : public MythDialog
     void showRecGroupChanger();
     void showRecGroupChooser();
     void showRecGroupPasswordChanger();
+    void showPlayFromPopup();
+    void showRecordingPopup();
+    void showJobPopup();
+    void showStoragePopup();
 
     void doPlay();
+    void doPlayFromBeg();
 
     void askStop();
     void doStop();
@@ -69,6 +74,8 @@ class PlaybackBox : public MythDialog
 
     void doAutoExpire();
     void noAutoExpire();
+    void doPreserveEpisode();
+    void noPreserveEpisode();
 
     void doCancel();
 

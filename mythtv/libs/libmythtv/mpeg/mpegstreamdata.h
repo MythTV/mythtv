@@ -14,8 +14,9 @@ class RingBuffer;
 
 class MPEGStreamData {
   public:
-    MPEGStreamData(int desiredProgram) : 
-        _pat(0), _pmt(0), _desired_program(desiredProgram)
+    MPEGStreamData(int desiredSubchannel) : 
+        _pat(0), _pmt(0), _desired_program(-1),
+        _desired_subchannel(desiredSubchannel)
     {
         _pids_listening[MPEG_PAT_PID] = true;
         _pids_listening[ATSC_PSIP_PID] = true;
@@ -23,7 +24,7 @@ class MPEGStreamData {
         _pid_video = _pid_pmt = 0xffffffff;
     }
     virtual ~MPEGStreamData();
-    virtual void Reset(int desiredProgram = -1);
+    virtual void Reset(int desiredSubchannel = -1);
 
     PSIPTable* AssemblePSIP(const TSPacket* tspacket);
     bool AssemblePSIP(PSIPTable& psip, TSPacket* tspacket);
@@ -49,6 +50,20 @@ class MPEGStreamData {
         return it != _pids_listening.end();
     }
 
+    void AddNotListeningPID(unsigned int pid) { _pids_notlistening[pid] = true; }
+    void RemoveNotListeningPID(unsigned int pid) { _pids_notlistening.erase(pid); }
+    bool IsNotListeningPID(unsigned int pid) const {
+        QMap<unsigned int, bool>::const_iterator it = _pids_notlistening.find(pid);
+        return it != _pids_notlistening.end();
+    }
+
+    void AddWritingPID(unsigned int pid) { _pids_writing[pid] = true; }
+    void RemoveWritingPID(unsigned int pid) { _pids_writing.erase(pid); }
+    bool IsWritingPID(unsigned int pid) const {
+        QMap<unsigned int, bool>::const_iterator it = _pids_writing.find(pid);
+        return it != _pids_writing.end();
+    }
+
     void AddAudioPID(unsigned int pid) { _pids_audio[pid] = true; }
     void RemoveAudioPID(unsigned int pid) { _pids_audio.erase(pid); }
     bool IsAudioPID(unsigned int pid) const {
@@ -64,15 +79,21 @@ class MPEGStreamData {
     inline void HandleAdaptationFieldControl(const TSPacket* tspacket);
 
     int DesiredProgram() const { return _desired_program; }
+    int DesiredSubchannel() const { return _desired_subchannel; }
+  protected:
+    void setDesiredProgram(int p) { _desired_program = p; }
   private:
     ProgramAssociationTable* _pat;
     ProgramMapTable* _pmt;
 
     int _desired_program;
+    int _desired_subchannel;
     unsigned int _pid_video;
     unsigned int _pid_pmt;
 
     QMap<unsigned int, bool> _pids_listening;
+    QMap<unsigned int, bool> _pids_notlistening;
+    QMap<unsigned int, bool> _pids_writing;
     QMap<unsigned int, bool> _pids_audio;
     QMap<unsigned long long, PESPacket*> _partial_pes_packet_cache;
 };

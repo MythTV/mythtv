@@ -3424,7 +3424,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
                 fflush( stdout );
             }
 
-            if (jobID != -1)
+            if (jobID != -1 && (framesRead % 500))
             {
                 m_db->lock();
                 JobQueue::ChangeJobComment(m_db->db(), jobID,

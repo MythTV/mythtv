@@ -142,32 +142,34 @@ void AutoExpire::ExpireEpisodesOverMax(void)
     QMap<QString, int>::Iterator maxIter;
 
     QString fileprefix = gContext->GetFilePrefix();
-    QString querystr = "SELECT title, maxepisodes "
+    QString querystr = "SELECT recordid, maxepisodes, title "
                        "FROM record WHERE maxepisodes > 0 "
-                       "ORDER BY title ASC, maxepisodes DESC";
+                       "ORDER BY recordid ASC, maxepisodes DESC";
 
     QSqlQuery query = db->exec(querystr);
 
     if (query.isActive() && query.numRowsAffected() > 0)
     {
+        VERBOSE(VB_GENERAL, QString("Found %1 record profiles using max episode expiration")
+                                    .arg(query.numRowsAffected()));
         while (query.next()) {
+            VERBOSE(VB_GENERAL, QString(" - %1").arg(query.value(2).toString()));
             maxEpisodes[query.value(0).toString()] = query.value(1).toInt();
         }
     }
 
     for(maxIter = maxEpisodes.begin(); maxIter != maxEpisodes.end(); maxIter++)
     {
-        QString sqltitle(maxIter.key());
-        sqltitle.replace(QRegExp("\'"), "\\'");
-        sqltitle.replace(QRegExp("\""), "\\\"");
-
-        querystr = QString( "SELECT chanid, starttime FROM recorded "
-                            "WHERE title = \"%1\" "
+        querystr = QString( "SELECT chanid, starttime, title FROM recorded "
+                            "WHERE recordid = %1 AND preserve = 0 "
                             "ORDER BY starttime DESC;")
-                            .arg(sqltitle);
+                            .arg(maxIter.key());
 
         query = db->exec(querystr);
 
+        VERBOSE(VB_GENERAL, QString("Found %1 episodes in recording profile %2 using max expiration")
+                                    .arg(query.numRowsAffected())
+                                    .arg(maxIter.key()));
         if (query.isActive() && query.numRowsAffected() > 0)
         {
             int found = 0;
@@ -178,7 +180,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                 {
                     QString msg = QString("Expiring \"%1\" from %2, "
                                           "too many episodes.")
-                                          .arg(maxIter.key())
+                                          .arg(query.value(2).toString())
                                           .arg(query.value(1).toString());
                     VERBOSE(VB_GENERAL, msg);
                     gContext->LogEntry("autoexpire", LP_NOTICE, "Expired program", msg);

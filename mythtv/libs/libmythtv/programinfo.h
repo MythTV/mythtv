@@ -155,7 +155,11 @@ class ProgramInfo
     void SetCommFlagged(int flag, QSqlDatabase *db);
     bool IsCommProcessing(QSqlDatabase *db);
     void SetAutoExpire(bool autoExpire, QSqlDatabase *db);
+    void SetPreserveEpisode(bool preserveEpisode, QSqlDatabase *db);
     bool GetAutoExpireFromRecorded(QSqlDatabase *db);
+    bool GetPreserveEpisodeFromRecorded(QSqlDatabase *db);
+
+    bool UsesMaxEpisodes(QSqlDatabase *db);
 
     int GetAutoRunJobs(QSqlDatabase *db);
 
@@ -188,6 +192,7 @@ class ProgramInfo
                              QSqlDatabase *db);
 
     void DeleteHistory(QSqlDatabase *db);
+    void setIgnoreBookmark(bool ignore) { ignoreBookmark = ignore; }
     QString RecTypeChar(void);
     QString RecTypeText(void);
     QString RecStatusChar(void);
@@ -281,8 +286,8 @@ class ProgramInfo
 
     QString sortTitle;
 
-
 private:
+    bool ignoreBookmark;
     void handleRecording(QSqlDatabase *db);
     void handleNotRecording(QSqlDatabase *db);
 

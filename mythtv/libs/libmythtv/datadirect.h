@@ -62,12 +62,13 @@ class DataDirectLineupMap
         lineupid = "";
         stationid = "";
         channel = "";
+        channelMinor = "";
     }        
 
     QString lineupid; // 100
     QString stationid; // 12
     QString channel; // 5
-// QString channelMinor; // 3
+    QString channelMinor; // 3
 // QDate mapFrom;
 // QDate mapTo;
 // QDate onAirFrom;

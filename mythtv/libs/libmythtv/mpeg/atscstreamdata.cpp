@@ -49,7 +49,7 @@ bool ATSCStreamData::IsRedundant(const PSIPTable &psip) const {
     return false;
 }
 
-#define DECODE_VCT 0
+#define DECODE_VCT 1
 #define DECODE_EIT 0
 #define DECODE_ETT 0
 #define DECODE_STT 0
@@ -62,14 +62,23 @@ void ATSCStreamData::HandleTables(const TSPacket* tspacket, HDTVRecorder* record
         return;
     const int version = psip->Version();
     if (!psip->IsGood()) {
-        VERBOSE(VB_IMPORTANT, QString("PSIP packet failed CRC check"));
+        VERBOSE(VB_RECORD, QString("PSIP packet failed CRC check"));
         HT_RETURN;
     }
     if (!psip->IsCurrent()) // we don't cache the next table, for now
         HT_RETURN;
 
-    assert(1==tspacket->AdaptationFieldControl()); // payload only, ATSC req.
-    assert(!tspacket->ScramplingControl()); // not scrambled ATSC, DVB req. for tables
+
+    if (1!=tspacket->AdaptationFieldControl())
+    { // payload only, ATSC req.
+        VERBOSE(VB_RECORD, QString("PSIP packet has Adaptation Field Control, not ATSC compiant"));
+        HT_RETURN;
+    }
+    if (tspacket->ScramplingControl())
+    { // scrambled! ATSC, DVB require tables not to be scrambled
+        VERBOSE(VB_RECORD, QString("PSIP packet is scrambled, not ATSC/DVB compiant"));
+        HT_RETURN;
+    }
 
     if (IsRedundant(*psip)) {
         if (0x00==psip->TableID())
@@ -81,8 +90,8 @@ void ATSCStreamData::HandleTables(const TSPacket* tspacket, HDTVRecorder* record
 
     switch (psip->TableID()) {
         case 0x00: {
-            CreatePAT(ProgramAssociationTable(*psip));
-            if (recorder) recorder->WritePAT();
+            if (CreatePAT(ProgramAssociationTable(*psip)))
+                if (recorder) recorder->WritePAT();
             HT_RETURN;
         }
         case 0x02: {
@@ -112,8 +121,20 @@ void ATSCStreamData::HandleTables(const TSPacket* tspacket, HDTVRecorder* record
             TerrestrialVirtualChannelTable vct(*psip);
             SetVersionTVCT(vct.TransportStreamID(), version);
             for (uint i=0; i<vct.ChannelCount(); i++) {
-                if (vct.ProgramNumber(i)==(uint)DesiredProgram())
-                    VERBOSE(VB_RECORD, vct.toString(i));
+                VERBOSE(VB_RECORD, vct.toString(i));
+                if (vct.MinorChannel(i)==(uint)DesiredSubchannel()) {
+                    VERBOSE(VB_RECORD, QString("***Desired subchannel %1")
+                            .arg(DesiredSubchannel()));
+                    if (vct.ProgramNumber(i) != DesiredProgram()) {
+                        VERBOSE(VB_RECORD, 
+                                QString("Resetting desired program from %1"
+                                        " to %2").arg(DesiredProgram())
+                                .arg(vct.ProgramNumber(i)));
+                        // Do a (partial?) reset here if old desired
+                        // program is not 0?
+                        setDesiredProgram(vct.ProgramNumber(i));
+                    }
+                }
             }
         }
         break;

@@ -10,6 +10,34 @@
 
 #define IVTV_MBOX_MAX_DATA 16
 
+#define IVTV_SLICED_TELETEXT_B 	(1 << 0)
+#define IVTV_SLICED_CAPTION_625	(1 << 1)
+#define IVTV_SLICED_CAPTION_525	(1 << 2)
+#define IVTV_SLICED_WSS_625	(1 << 3)
+#define IVTV_SLICED_VPS		(1 << 4)
+
+struct ivtv_sliced_vbi_format {
+	unsigned long service_set;	/* one or more of the IVTV_SLICED_ defines */
+	unsigned long packet_size; 	/* the size in bytes of the ivtv_sliced_data packet */
+	unsigned long io_size;		/* maximum number of bytes passed by one read() call */
+	unsigned long reserved;
+};
+
+/* This structure is the same as the proposed v4l2_sliced_data structure */
+/* id is one of the VBI_SLICED_ flags. */
+struct ivtv_sliced_data {
+	unsigned long id;
+	unsigned long line;
+	unsigned char *data;
+};
+
+/* The four bit VBI data type found in the embedded VBI data of an
+   MPEG stream has one of the following values: */
+#define VBI_TYPE_TELETEXT 	0x1 	// Teletext (uses lines 6-22 for PAL, 10-21 for NTSC)
+#define VBI_TYPE_CC 		0x4 	// Closed Captions (line 21 NTSC, line 22 PAL)
+#define VBI_TYPE_WSS 		0x5 	// Wide Screen Signal (line 20 NTSC, line 23 PAL)
+#define VBI_TYPE_VPS 		0x7 	// Video Programming System (PAL) (line 16)
+
 /* allow direct access to the saa7115 registers for testing */
 #define SAA7115_GET_REG         0xFFEE7705
 #define SAA7115_SET_REG         0xFFEE7706
@@ -30,13 +58,14 @@
 #define IVTV_IOC_S_OSD          0xFFEE7788
 #define IVTV_IOC_GET_FB         0xFFEE7789
 
-#define IVTV_IOC_START_DECODE   _IOW('@', 29, struct ivtv_cfg_start_decode)
-#define IVTV_IOC_STOP_DECODE    _IOW('@', 30, struct ivtv_cfg_stop_decode)
-#define IVTV_IOC_G_SPEED        _IOR('@', 31, struct ivtv_speed)
-#define IVTV_IOC_S_SPEED        _IOW('@', 32, struct ivtv_speed)
-#define IVTV_IOC_DEC_STEP       _IOW('@', 33, int)
-#define IVTV_IOC_DEC_FLUSH      _IOW('@', 34, int)
-
+#define IVTV_IOC_START_DECODE  _IOW ('@', 29, struct ivtv_cfg_start_decode)
+#define IVTV_IOC_STOP_DECODE   _IOW ('@', 30, struct ivtv_cfg_stop_decode)
+#define IVTV_IOC_G_SPEED       _IOR ('@', 31, struct ivtv_speed)
+#define IVTV_IOC_S_SPEED       _IOW ('@', 32, struct ivtv_speed)
+#define IVTV_IOC_DEC_STEP      _IOW ('@', 33, int)
+#define IVTV_IOC_DEC_FLUSH     _IOW ('@', 34, int)
+#define IVTV_IOC_S_VBI_MODE    _IOWR('@', 35, struct ivtv_sliced_vbi_format)
+#define IVTV_IOC_G_VBI_MODE    _IOR ('@', 36, struct ivtv_sliced_vbi_format)
 
 /* ioctl for MSP_SET_MATRIX will have to be registered */
 #define MSP_SET_MATRIX     _IOW('m',17,struct msp_matrix)

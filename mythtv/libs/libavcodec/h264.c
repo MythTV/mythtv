@@ -203,7 +203,7 @@ typedef struct H264Context{
     
     uint16_t *mb2b_xy; //FIXME are these 4 a good idea?
     uint16_t *mb2b8_xy;
-    int b_stride;
+    int b_stride; //FIXME use s->b4_stride
     int b8_stride;
 
     int halfpel_flag;
@@ -340,8 +340,8 @@ static inline uint32_t pack16to32(int a, int b){
 
 /**
  * fill a rectangle.
- * @param h height of the recatangle, should be a constant
- * @param w width of the recatangle, should be a constant
+ * @param h height of the rectangle, should be a constant
+ * @param w width of the rectangle, should be a constant
  * @param size the size of val (1 or 4), should be a constant
  */
 static inline void fill_rectangle(void *vp, int w, int h, int stride, uint32_t val, int size){ //FIXME ensure this IS inlined
@@ -760,8 +760,10 @@ static inline int check_intra_pred_mode(H264Context *h, int mode){
     static const int8_t top [7]= {LEFT_DC_PRED8x8, 1,-1,-1};
     static const int8_t left[7]= { TOP_DC_PRED8x8,-1, 2,-1,DC_128_PRED8x8};
     
-    if(mode < 0 || mode > 6)
+    if(mode < 0 || mode > 6) {
+        av_log(h->s.avctx, AV_LOG_ERROR, "out of range intra chroma pred mode at %d %d\n", s->mb_x, s->mb_y);
         return -1;
+    }
     
     if(!(h->top_samples_available&0x8000)){
         mode= top[ mode ];
@@ -980,7 +982,7 @@ static inline void pred_pskip_motion(H264Context * const h, int * const mx, int 
     const int top_ref = h->ref_cache[0][ scan8[0] - 8 ];
     const int left_ref= h->ref_cache[0][ scan8[0] - 1 ];
 
-    tprintf("pred_pskip: (%d) (%d) at %2d %2d", top_ref, left_ref, h->s.mb_x, h->s.mb_y);
+    tprintf("pred_pskip: (%d) (%d) at %2d %2d\n", top_ref, left_ref, h->s.mb_x, h->s.mb_y);
 
     if(top_ref == PART_NOT_AVAILABLE || left_ref == PART_NOT_AVAILABLE
        || (top_ref == 0  && *(uint32_t*)h->mv_cache[0][ scan8[0] - 8 ] == 0)
@@ -2248,7 +2250,7 @@ static int decode_init(AVCodecContext *avctx){
 
     decode_init_vlc(h);
     
-    if(avctx->codec_tag != 0x31637661) // avc1
+    if(avctx->codec_tag != 0x31637661 && avctx->codec_tag != 0x31435641) // avc1
         h->is_avc = 0;
     else {
         if((avctx->extradata_size == 0) || (avctx->extradata == NULL)) {
@@ -2401,18 +2403,23 @@ static void hl_decode_mb(H264Context *h){
             if(!s->encoding){
                 for(i=0; i<16; i++){
                     uint8_t * const ptr= dest_y + h->block_offset[i];
-                    uint8_t *topright= ptr + 4 - linesize;
-                    const int topright_avail= (h->topright_samples_available<<i)&0x8000;
+                    uint8_t *topright;
                     const int dir= h->intra4x4_pred_mode_cache[ scan8[i] ];
                     int tr;
 
-                    if(!topright_avail){
-                        tr= ptr[3 - linesize]*0x01010101;
-                        topright= (uint8_t*) &tr;
-                    }else if(i==5 && h->deblocking_filter){
-                        tr= *(uint32_t*)h->top_border[mb_x+1];
-                        topright= (uint8_t*) &tr;
-                    }
+                    if(dir == DIAG_DOWN_LEFT_PRED || dir == VERT_LEFT_PRED){
+                        const int topright_avail= (h->topright_samples_available<<i)&0x8000;
+                        assert(mb_y || linesize <= h->block_offset[i]);
+                        if(!topright_avail){
+                            tr= ptr[3 - linesize]*0x01010101;
+                            topright= (uint8_t*) &tr;
+                        }else if(i==5 && h->deblocking_filter){
+                            tr= *(uint32_t*)h->top_border[mb_x+1];
+                            topright= (uint8_t*) &tr;
+                        }else
+                            topright= ptr + 4 - linesize;
+                    }else
+                        topright= NULL;
 
                     h->pred4x4[ dir ](ptr, topright, linesize);
                     if(h->non_zero_count_cache[ scan8[i] ]){
@@ -2691,7 +2698,7 @@ static int pred_weight_table(H264Context *h){
 }
 
 /**
- * instantaneos decoder refresh.
+ * instantaneous decoder refresh.
  */
 static void idr(H264Context *h){
     int i;
@@ -2996,6 +3003,7 @@ static int decode_slice_header(H264Context *h){
     h->slice_type= get_ue_golomb(&s->gb);
     if(h->slice_type > 9){
         av_log(h->s.avctx, AV_LOG_ERROR, "slice type too large (%d) at %d %d\n", h->slice_type, s->mb_x, s->mb_y);
+        return -1;
     }
     if(h->slice_type > 4){
         h->slice_type -= 5;
@@ -3027,11 +3035,11 @@ static int decode_slice_header(H264Context *h){
     s->mb_width= h->sps.mb_width;
     s->mb_height= h->sps.mb_height;
     
-    h->b_stride=  s->mb_width*4;
-    h->b8_stride= s->mb_width*2;
+    h->b_stride=  s->mb_width*4 + 1;
+    h->b8_stride= s->mb_width*2 + 1;
 
-    s->mb_x = first_mb_in_slice % s->mb_width;
-    s->mb_y = first_mb_in_slice / s->mb_width; //FIXME AFFW
+    s->resync_mb_x = s->mb_x = first_mb_in_slice % s->mb_width;
+    s->resync_mb_y = s->mb_y = first_mb_in_slice / s->mb_width; //FIXME AFFW
     
     s->width = 16*s->mb_width - 2*(h->sps.crop_left + h->sps.crop_right );
     if(h->sps.frame_mbs_only_flag)
@@ -3060,7 +3068,7 @@ static int decode_slice_header(H264Context *h){
         }
     }
 
-    if(first_mb_in_slice == 0){
+    if(h->slice_num == 0){
         frame_start(h);
     }
 
@@ -3131,7 +3139,7 @@ static int decode_slice_header(H264Context *h){
         }
     }
 
-    if(first_mb_in_slice == 0){
+    if(h->slice_num == 0){
         fill_default_ref_list(h);
     }
 
@@ -3180,9 +3188,11 @@ static int decode_slice_header(H264Context *h){
         slice_group_change_cycle= get_bits(&s->gb, ?);
 #endif
 
+    h->slice_num++;
+
     if(s->avctx->debug&FF_DEBUG_PICT_INFO){
-        av_log(h->s.avctx, AV_LOG_DEBUG, "mb:%d %c pps:%d frame:%d poc:%d/%d ref:%d/%d qp:%d loop:%d\n", 
-               first_mb_in_slice, 
+        av_log(h->s.avctx, AV_LOG_DEBUG, "slice:%d mb:%d %c pps:%d frame:%d poc:%d/%d ref:%d/%d qp:%d loop:%d\n", 
+               h->slice_num, first_mb_in_slice, 
                av_get_pict_type_char(h->slice_type),
                pps_id, h->frame_num,
                s->current_picture_ptr->field_poc[0], s->current_picture_ptr->field_poc[1],
@@ -3614,7 +3624,7 @@ decode_intra_mb:
          //FIXME we should set ref_idx_l? to 0 if we use that later ...
         if(IS_16X16(mb_type)){
             for(list=0; list<2; list++){
-                if(h->ref_count[0]>0){
+                if(h->ref_count[list]>0){
                     if(IS_DIR(mb_type, 0, list)){
                         const int val= get_te0_golomb(&s->gb, h->ref_count[list]);
                         fill_rectangle(&h->ref_cache[list][ scan8[0] ], 4, 4, 8, val, 1);
@@ -5121,12 +5131,11 @@ static int decode_slice(H264Context *h){
             if( ++s->mb_x >= s->mb_width ) {
                 s->mb_x = 0;
                 ff_draw_horiz_band(s, 16*s->mb_y, 16);
-                if( ++s->mb_y >= s->mb_height ) {
-                    tprintf("slice end %d %d\n", get_bits_count(&s->gb), s->gb.size_in_bits);
-                }
+                ++s->mb_y;
             }
 
             if( eos || s->mb_y >= s->mb_height ) {
+                tprintf("slice end %d %d\n", get_bits_count(&s->gb), s->gb.size_in_bits);
                 ff_er_add_slice(s, s->resync_mb_x, s->resync_mb_y, s->mb_x-1, s->mb_y, (AC_END|DC_END|MV_END)&part_mask);
                 return 0;
             }
@@ -5179,6 +5188,7 @@ static int decode_slice(H264Context *h){
             }
 
             if(get_bits_count(&s->gb) >= s->gb.size_in_bits && s->mb_skip_run<=0){
+                tprintf("slice end %d %d\n", get_bits_count(&s->gb), s->gb.size_in_bits);
                 if(get_bits_count(&s->gb) == s->gb.size_in_bits ){
                     ff_er_add_slice(s, s->resync_mb_x, s->resync_mb_y, s->mb_x-1, s->mb_y, (AC_END|DC_END|MV_END)&part_mask);
 
@@ -5487,23 +5497,34 @@ static inline int decode_picture_parameter_set(H264Context *h){
  * finds the end of the current frame in the bitstream.
  * @return the position of the first byte of the next frame, or -1
  */
-static int find_frame_end(ParseContext *pc, const uint8_t *buf, int buf_size){
+static int find_frame_end(H264Context *h, const uint8_t *buf, int buf_size){
     int i;
     uint32_t state;
+    ParseContext *pc = &(h->s.parse_context);
 //printf("first %02X%02X%02X%02X\n", buf[0], buf[1],buf[2],buf[3]);
 //    mb_addr= pc->mb_addr - 1;
     state= pc->state;
-    //FIXME this will fail with slices
-    for(i=0; i<buf_size; i++){
-        state= (state<<8) | buf[i];
+    for(i=0; i<=buf_size; i++){
         if((state&0xFFFFFF1F) == 0x101 || (state&0xFFFFFF1F) == 0x102 || (state&0xFFFFFF1F) == 0x105){
+            tprintf("find_frame_end new startcode = %08x, frame_start_found = %d, pos = %d\n", state, pc->frame_start_found, i);
             if(pc->frame_start_found){
-                pc->state=-1; 
-                pc->frame_start_found= 0;
-                return i-3;
+                // If there isn't one more byte in the buffer
+                // the test on first_mb_in_slice cannot be done yet
+                // do it at next call.
+                if (i >= buf_size) break;
+                if (buf[i] & 0x80) {
+                    // first_mb_in_slice is 0, probably the first nal of a new
+                    // slice
+                    tprintf("find_frame_end frame_end_found, state = %08x, pos = %d\n", state, i);
+                    pc->state=-1; 
+                    pc->frame_start_found= 0;
+                    return i-4;
+                }
             }
-            pc->frame_start_found= 1;
+            pc->frame_start_found = 1;
         }
+        if (i<buf_size)
+            state= (state<<8) | buf[i];
     }
     
     pc->state= state;
@@ -5515,10 +5536,11 @@ static int h264_parse(AVCodecParserContext *s,
                       uint8_t **poutbuf, int *poutbuf_size, 
                       const uint8_t *buf, int buf_size)
 {
-    ParseContext *pc = s->priv_data;
+    H264Context *h = s->priv_data;
+    ParseContext *pc = &h->s.parse_context;
     int next;
     
-    next= find_frame_end(pc, buf, buf_size);
+    next= find_frame_end(h, buf, buf_size);
 
     if (ff_combine_frame(pc, next, (uint8_t **)&buf, &buf_size) < 0) {
         *poutbuf = NULL;
@@ -5541,6 +5563,7 @@ static int decode_nal_units(H264Context *h, uint8_t *buf, int buf_size){
         printf("%X ", buf[i]);
     }
 #endif
+    h->slice_num = 0;
     for(;;){
         int consumed;
         int dst_length;
@@ -5699,7 +5722,7 @@ static int decode_frame(AVCodecContext *avctx,
     }
     
     if(s->flags&CODEC_FLAG_TRUNCATED){
-        int next= find_frame_end(&s->parse_context, buf, buf_size);
+        int next= find_frame_end(h, buf, buf_size);
         
         if( ff_combine_frame(&s->parse_context, next, &buf, &buf_size) < 0 )
             return buf_size;
@@ -5784,7 +5807,7 @@ static int decode_frame(AVCodecContext *avctx,
 #if 0
     /* dont output the last pic after seeking */
     if(s->last_picture_ptr || s->low_delay)
-    //Note this isnt a issue as a IDR pic should flush teh buffers
+    //Note this isnt a issue as a IDR pic should flush the buffers
 #endif
         *data_size = sizeof(AVFrame);
     return get_consumed_bytes(s, buf_index, buf_size);
@@ -6011,7 +6034,7 @@ AVCodec h264_decoder = {
 
 AVCodecParser h264_parser = {
     { CODEC_ID_H264 },
-    sizeof(ParseContext),
+    sizeof(H264Context),
     NULL,
     h264_parse,
     ff_parse_close,

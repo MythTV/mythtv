@@ -17,7 +17,7 @@ extern "C" {
 
 #define FFMPEG_VERSION_INT     0x000409
 #define FFMPEG_VERSION         "0.4.9-pre1"
-#define LIBAVCODEC_BUILD       4734
+#define LIBAVCODEC_BUILD       4736
 
 #define LIBAVCODEC_VERSION_INT FFMPEG_VERSION_INT
 #define LIBAVCODEC_VERSION     FFMPEG_VERSION
@@ -492,7 +492,8 @@ typedef struct AVPanScan{
     uint32_t *mb_type;\
 \
     /**\
-     * Macroblock size: (0->16x16, 1->8x8, 2-> 4x4, 3-> 2x2)\
+     * log2 of the size of the block which a single vector in motion_val represents: \
+     * (4->16x16, 3->8x8, 2-> 4x4, 1-> 2x2)\
      * - encoding: unused\
      * - decoding: set by lavc\
      */\
@@ -1170,6 +1171,7 @@ typedef struct AVCodecContext {
 #define FF_MM_MMXEXT	0x0002 /* SSE integer functions or AMD MMX ext */
 #define FF_MM_SSE	0x0008 /* SSE functions */
 #define FF_MM_SSE2	0x0010 /* PIV SSE2 functions */
+#define FF_MM_3DNOWEXT	0x0020 /* AMD 3DNowExt */
 #endif /* HAVE_MMX */
 
     /**
@@ -1294,6 +1296,7 @@ typedef struct AVCodecContext {
 #define FF_CMP_NSSE 10
 #define FF_CMP_W53  11
 #define FF_CMP_W97  12
+#define FF_CMP_DCTMAX 13
 #define FF_CMP_CHROMA 256
     
     /**
@@ -1684,12 +1687,40 @@ typedef struct AVCodecContext {
      int lowres;
 
     /**
-     * bistream width / height. may be different from width/height if lowres
+     * bitsream width / height. may be different from width/height if lowres
      * or other things are used
      * - encoding: unused
      * - decoding: set by user before init if known, codec should override / dynamically change if needed
      */
     int coded_width, coded_height;
+
+    /**
+     * frame skip threshold
+     * - encoding: set by user
+     * - decoding: unused
+     */
+    int frame_skip_threshold;
+
+    /**
+     * frame skip factor
+     * - encoding: set by user
+     * - decoding: unused
+     */
+    int frame_skip_factor;
+
+    /**
+     * frame skip exponent
+     * - encoding: set by user
+     * - decoding: unused
+     */
+    int frame_skip_exp;
+
+    /**
+     * frame skip comparission function
+     * - encoding: set by user.
+     * - decoding: unused
+     */
+    int frame_skip_cmp;
 
     /**
      * XVMC_VLD (VIA CLE266) Hardware MPEG decoding

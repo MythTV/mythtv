@@ -491,6 +491,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             case CODEC_TYPE_AUDIO:
             {
                 assert(enc->codec_id);
+                enc->channels = 2;
                 bitrate += enc->bit_rate;
                 break;
             }

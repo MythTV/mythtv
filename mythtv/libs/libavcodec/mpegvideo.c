@@ -109,9 +109,10 @@ static uint8_t default_fcode_tab[MAX_MV*2+1];
 enum PixelFormat ff_yuv420p_list[2]= {PIX_FMT_YUV420P, -1};
 
 static void convert_matrix(DSPContext *dsp, int (*qmat)[64], uint16_t (*qmat16)[2][64],
-                           const uint16_t *quant_matrix, int bias, int qmin, int qmax)
+                           const uint16_t *quant_matrix, int bias, int qmin, int qmax, int intra)
 {
     int qscale;
+    int shift=0;
 
     for(qscale=qmin; qscale<=qmax; qscale++){
         int i;
@@ -161,6 +162,23 @@ static void convert_matrix(DSPContext *dsp, int (*qmat)[64], uint16_t (*qmat16)[
                 qmat16[qscale][1][i]= ROUNDED_DIV(bias<<(16-QUANT_BIAS_SHIFT), qmat16[qscale][0][i]);
             }
         }
+        
+        for(i=intra; i<64; i++){
+            int64_t max= 8191;
+            if (dsp->fdct == fdct_ifast
+#ifndef FAAN_POSTSCALE
+                   || dsp->fdct == ff_faandct
+#endif
+                   ) {
+                max= (8191LL*aanscales[i]) >> 14;
+            }
+            while(((max * qmat[qscale][i]) >> shift) > INT_MAX){ 
+                shift++;
+            }
+        }
+    }
+    if(shift){
+        av_log(NULL, AV_LOG_INFO, "Warning, QMAT_SHIFT is larger then %d, overflows possible\n", QMAT_SHIFT - shift);
     }
 }
 
@@ -1120,6 +1138,16 @@ int MPV_encode_init(AVCodecContext *avctx)
         avctx->delay=0;
         s->low_delay=1;
         break;
+    case CODEC_ID_RV20:
+        s->out_format = FMT_H263;
+        avctx->delay=0;
+        s->low_delay=1;
+        s->modified_quant=1;
+        s->h263_aic=1;
+        s->h263_plus=1;
+        s->loop_filter=1;
+        s->unrestricted_mv= s->obmc || s->loop_filter || s->umvplus;
+        break;
     case CODEC_ID_MPEG4:
         s->out_format = FMT_H263;
         s->h263_pred = 1;
@@ -1195,6 +1223,7 @@ int MPV_encode_init(AVCodecContext *avctx)
     s->quant_precision=5;
     
     ff_set_cmp(&s->dsp, s->dsp.ildct_cmp, s->avctx->ildct_cmp);
+    ff_set_cmp(&s->dsp, s->dsp.frame_skip_cmp, s->avctx->frame_skip_cmp);
     
 #ifdef CONFIG_ENCODERS
 #ifdef CONFIG_RISKY
@@ -1235,9 +1264,9 @@ int MPV_encode_init(AVCodecContext *avctx)
     /* for mjpeg, we do include qscale in the matrix */
     if (s->out_format != FMT_MJPEG) {
         convert_matrix(&s->dsp, s->q_intra_matrix, s->q_intra_matrix16, 
-                       s->intra_matrix, s->intra_quant_bias, 1, 31);
+                       s->intra_matrix, s->intra_quant_bias, avctx->qmin, 31, 1);
         convert_matrix(&s->dsp, s->q_inter_matrix, s->q_inter_matrix16, 
-                       s->inter_matrix, s->inter_quant_bias, 1, 31);
+                       s->inter_matrix, s->inter_quant_bias, avctx->qmin, 31, 0);
     }
 
     if(ff_rate_control_init(s) < 0)
@@ -1733,6 +1762,8 @@ void ff_print_debug_info(MpegEncContext *s, AVFrame *pict){
         int h_chroma_shift, v_chroma_shift;
         const int width = s->avctx->width;
         const int height= s->avctx->height;
+        const int mv_sample_log2= 4 - pict->motion_subsample_log2;
+        const int mv_stride= (s->mb_width << mv_sample_log2) + 1;
         s->low_delay=0; //needed to see the vectors without trashing the buffers
 
         avcodec_get_chroma_sub_sample(s->avctx->pix_fmt, &h_chroma_shift, &v_chroma_shift);
@@ -1768,13 +1799,12 @@ void ff_print_debug_info(MpegEncContext *s, AVFrame *pict){
                     if(!USES_LIST(pict->mb_type[mb_index], direction))
                         continue;
 
-                    //FIXME for h264
                     if(IS_8X8(pict->mb_type[mb_index])){
                       int i;
                       for(i=0; i<4; i++){
                         int sx= mb_x*16 + 4 + 8*(i&1);
                         int sy= mb_y*16 + 4 + 8*(i>>1);
-                        int xy= mb_x*2 + (i&1) + (mb_y*2 + (i>>1))*s->b8_stride;
+                        int xy= (mb_x*2 + (i&1) + (mb_y*2 + (i>>1))*mv_stride) << mv_sample_log2-1;
                         int mx= (pict->motion_val[direction][xy][0]>>shift) + sx;
                         int my= (pict->motion_val[direction][xy][1]>>shift) + sy;
                         draw_arrow(ptr, sx, sy, mx, my, width, height, s->linesize, 100);
@@ -1784,7 +1814,21 @@ void ff_print_debug_info(MpegEncContext *s, AVFrame *pict){
                       for(i=0; i<2; i++){
                         int sx=mb_x*16 + 8;
                         int sy=mb_y*16 + 4 + 8*i;
-                        int xy= mb_x*2 + (mb_y*2 + i)*s->b8_stride;
+                        int xy= (mb_x*2 + (mb_y*2 + i)*mv_stride) << mv_sample_log2-1;
+                        int mx=(pict->motion_val[direction][xy][0]>>shift);
+                        int my=(pict->motion_val[direction][xy][1]>>shift);
+                        
+                        if(IS_INTERLACED(pict->mb_type[mb_index]))
+                            my*=2;
+                        
+                        draw_arrow(ptr, sx, sy, mx+sx, my+sy, width, height, s->linesize, 100);
+                      }
+                    }else if(IS_8X16(pict->mb_type[mb_index])){
+                      int i;
+                      for(i=0; i<2; i++){
+                        int sx=mb_x*16 + 4 + 8*i;
+                        int sy=mb_y*16 + 8;
+                        int xy= (mb_x*2 + i + mb_y*2*mv_stride) << mv_sample_log2-1;
                         int mx=(pict->motion_val[direction][xy][0]>>shift);
                         int my=(pict->motion_val[direction][xy][1]>>shift);
                         
@@ -1796,7 +1840,7 @@ void ff_print_debug_info(MpegEncContext *s, AVFrame *pict){
                     }else{
                       int sx= mb_x*16 + 8;
                       int sy= mb_y*16 + 8;
-                      int xy= mb_x*2 + mb_y*2*s->b8_stride;
+                      int xy= (mb_x + mb_y*mv_stride) << mv_sample_log2;
                       int mx= (pict->motion_val[direction][xy][0]>>shift) + sx;
                       int my= (pict->motion_val[direction][xy][1]>>shift) + sy;
                       draw_arrow(ptr, sx, sy, mx, my, width, height, s->linesize, 100);
@@ -1982,9 +2026,8 @@ static int load_input_picture(MpegEncContext *s, AVFrame *pic_arg){
             int64_t time= av_rescale(pic->pts, s->avctx->frame_rate, s->avctx->frame_rate_base*(int64_t)AV_TIME_BASE);
             int64_t last= av_rescale(s->user_specified_pts, s->avctx->frame_rate, s->avctx->frame_rate_base*(int64_t)AV_TIME_BASE);
         
-            if(time < last){            
-                av_log(s->avctx, AV_LOG_ERROR, "Error, Invalid timestamp=%Ld (%Ld), last=%Ld (%Ld)\n", time, pic->pts, last, s->user_specified_pts);
-            }
+            if(time < last)            
+                av_log(s->avctx, AV_LOG_ERROR, "Error, Invalid timestamp=%Ld, last=%Ld\n", pic->pts, s->user_specified_pts);
         }
         s->user_specified_pts= pic->pts;
     }else{
@@ -2007,6 +2050,39 @@ static int load_input_picture(MpegEncContext *s, AVFrame *pic_arg){
     return 0;
 }
 
+static int skip_check(MpegEncContext *s, Picture *p, Picture *ref){
+    int x, y, plane;
+    int score=0;
+    int64_t score64=0;
+    int64_t threshold;
+
+    for(plane=0; plane<3; plane++){
+        const int stride= p->linesize[plane];
+        const int bw= plane ? 1 : 2;
+        for(y=0; y<s->mb_height*bw; y++){
+            for(x=0; x<s->mb_width*bw; x++){
+                int v= s->dsp.frame_skip_cmp[1](s, p->data[plane] + 8*(x + y*stride), ref->data[plane] + 8*(x + y*stride), stride, 8);
+                
+                switch(s->avctx->frame_skip_exp){
+                    case 0: score= FFMAX(score, v); break;
+                    case 1: score+= ABS(v);break;
+                    case 2: score+= v*v;break;
+                    case 3: score64+= ABS(v*v*(int64_t)v);break;
+                    case 4: score64+= v*v*(int64_t)(v*v);break;
+                }
+            }
+        }
+    }
+    
+    if(score) score64= score;
+
+    if(score64 < s->avctx->frame_skip_threshold)
+        return 1;
+    if(score64 < ((s->avctx->frame_skip_factor * (int64_t)s->lambda)>>8))
+        return 1;
+    return 0;
+}
+
 static void select_input_picture(MpegEncContext *s){
     int i;
 
@@ -2022,7 +2098,26 @@ static void select_input_picture(MpegEncContext *s){
             s->reordered_input_picture[0]->coded_picture_number= s->coded_picture_number++;
         }else{
             int b_frames;
+
+            if(s->avctx->frame_skip_threshold || s->avctx->frame_skip_factor){
+                if(skip_check(s, s->input_picture[0], s->next_picture_ptr)){
+//av_log(NULL, AV_LOG_DEBUG, "skip %p %Ld\n", s->input_picture[0]->data[0], s->input_picture[0]->pts);
+                
+                    if(s->input_picture[0]->type == FF_BUFFER_TYPE_SHARED){
+                        for(i=0; i<4; i++)
+                            s->input_picture[0]->data[i]= NULL;
+                        s->input_picture[0]->type= 0;            
+                    }else{
+                        assert(   s->input_picture[0]->type==FF_BUFFER_TYPE_USER 
+                               || s->input_picture[0]->type==FF_BUFFER_TYPE_INTERNAL);
             
+                        s->avctx->release_buffer(s->avctx, (AVFrame*)s->input_picture[0]);
+                    }
+
+                    goto no_output_pic;
+                }
+            }
+
             if(s->flags&CODEC_FLAG_PASS2){
                 for(i=0; i<s->max_b_frames+1; i++){
                     int pict_num= s->input_picture[0]->display_picture_number + i;
@@ -2105,7 +2200,7 @@ static void select_input_picture(MpegEncContext *s){
             }
         }
     }
-    
+no_output_pic:
     if(s->reordered_input_picture[0]){
         s->reordered_input_picture[0]->reference= s->reordered_input_picture[0]->pict_type!=B_TYPE ? 3 : 0;
 
@@ -4149,6 +4244,7 @@ static void encode_mb(MpegEncContext *s, int motion_x, int motion_y)
     case CODEC_ID_H263P:
     case CODEC_ID_FLV1:
     case CODEC_ID_RV10:
+    case CODEC_ID_RV20:
         h263_encode_mb(s, s->block, motion_x, motion_y); break;
 #endif
     case CODEC_ID_MJPEG:
@@ -4178,6 +4274,8 @@ void ff_mpegcontext_flush(MpegEncContext *s){
         s->avctx->release_buffer(s->avctx, (AVFrame*)&s->picture[i]);
     }
     s->current_picture_ptr = s->last_picture_ptr = s->next_picture_ptr = NULL;
+    
+    s->mb_x= s->mb_y= 0;
     
     s->parse_context.state= -1;
     s->parse_context.frame_start_found= 0;
@@ -4571,7 +4669,7 @@ static int encode_thread(AVCodecContext *c, void *arg){
                     current_packet_size= pbBufPtr(&s->pb) - s->ptr_lastgob;
                     
                     if(s->avctx->error_rate && s->resync_mb_x + s->resync_mb_y > 0){
-                        int r= put_bits_count(&s->pb)/8 + s->picture_number + s->codec_id + s->mb_x + s->mb_y;
+                        int r= put_bits_count(&s->pb)/8 + s->picture_number + 16 + s->mb_x + s->mb_y;
                         int d= 100 / s->avctx->error_rate;
                         if(r % d == 0){
                             current_packet_size=0;
@@ -5228,7 +5326,7 @@ static void encode_picture(MpegEncContext *s, int picture_number)
             s->intra_matrix[j] = CLAMP_TO_8BIT((ff_mpeg1_default_intra_matrix[i] * s->qscale) >> 3);
         }
         convert_matrix(&s->dsp, s->q_intra_matrix, s->q_intra_matrix16, 
-                       s->intra_matrix, s->intra_quant_bias, 8, 8);
+                       s->intra_matrix, s->intra_quant_bias, 8, 8, 1);
         s->qscale= 8;
     }
     
@@ -5259,6 +5357,8 @@ static void encode_picture(MpegEncContext *s, int picture_number)
             mpeg4_encode_picture_header(s, picture_number);
         else if (s->codec_id == CODEC_ID_RV10) 
             rv10_encode_picture_header(s, picture_number);
+        else if (s->codec_id == CODEC_ID_RV20) 
+            rv20_encode_picture_header(s, picture_number);
         else if (s->codec_id == CODEC_ID_FLV1)
             ff_flv_encode_picture_header(s, picture_number);
         else
@@ -6377,6 +6477,16 @@ AVCodec rv10_encoder = {
     "rv10",
     CODEC_TYPE_VIDEO,
     CODEC_ID_RV10,
+    sizeof(MpegEncContext),
+    MPV_encode_init,
+    MPV_encode_picture,
+    MPV_encode_end,
+};
+
+AVCodec rv20_encoder = {
+    "rv20",
+    CODEC_TYPE_VIDEO,
+    CODEC_ID_RV20,
     sizeof(MpegEncContext),
     MPV_encode_init,
     MPV_encode_picture,

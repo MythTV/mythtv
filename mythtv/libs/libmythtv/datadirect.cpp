@@ -51,10 +51,14 @@ bool DDStructureParser::startElement(const QString &pnamespaceuri,
     }
     else if (currtagname == "map") 
     {
+        int tmpindex;
         curr_lineupmap.clearValues();
         curr_lineupmap.lineupid = curr_lineup.lineupid;
         curr_lineupmap.stationid = pxmlatts.value("station");
         curr_lineupmap.channel = pxmlatts.value("channel");
+        tmpindex = pxmlatts.index("channelMinor"); // for ATSC
+        if (tmpindex != -1) 
+            curr_lineupmap.channelMinor = pxmlatts.value(tmpindex);
     } 
     else if (currtagname == "schedule") 
     {
@@ -132,7 +136,7 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
         query.bindValue(":CALLSIGN", curr_station.callsign);
         query.bindValue(":STATIONNAME", curr_station.stationname);
         query.bindValue(":AFFILIATE", curr_station.affiliate);
-        query.bindValue(" :FCCCHANNELNUMBER", curr_station.fccchannelnumber);
+        query.bindValue(":FCCCHANNELNUMBER", curr_station.fccchannelnumber);
 
         if (!query.exec())
             MythContext::DBError("Inserting into dd_station", query);
@@ -156,11 +160,13 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
     {
         parent.lineupmaps.append(curr_lineupmap);
 
-        query.prepare("INSERT INTO dd_lineupmap (lineupid, stationid, channel) "
-                      "VALUES(:LINEUPID,:STATIONID,:CHANNEL);");
+        query.prepare("INSERT INTO dd_lineupmap (lineupid, stationid, "
+                      "channel, channelMinor) "
+                      "VALUES(:LINEUPID,:STATIONID,:CHANNEL,:CHANNELMINOR);");
         query.bindValue(":LINEUPID", curr_lineupmap.lineupid);
         query.bindValue(":STATIONID", curr_lineupmap.stationid);
         query.bindValue(":CHANNEL", curr_lineupmap.channel);
+        query.bindValue(":CHANNELMINOR", curr_lineupmap.channelMinor);
         if (!query.exec())
             MythContext::DBError("Inserting into dd_lineupmap", query);
     }
@@ -299,9 +305,9 @@ bool DDStructureParser::characters(const QString& pchars)
     {
         if (pchars.contains("expire"))
         {
-	   QString ExtractDateFromMessage = pchars.right(20);
+           QString ExtractDateFromMessage = pchars.right(20);
            QDateTime EDFM = QDateTime::fromString(ExtractDateFromMessage, Qt::ISODate);
-	   QString ExpirationDate = EDFM.toString(Qt::LocalDate);
+           QString ExpirationDate = EDFM.toString(Qt::LocalDate);
            QString ExpirationDateMessage = "Your subscription expires on " + ExpirationDate;
            cout << ExpirationDateMessage << endl;
 
@@ -378,9 +384,10 @@ void DataDirectProcessor::updateStationViewTable()
         MythContext::DBError("Truncating temporary table dd_v_station", query);
 
     querystr = QString("INSERT INTO dd_v_station (stationid, callsign, "
-                       "stationname, affiliate, fccchannelnumber, channel) "
+                       "stationname, affiliate, fccchannelnumber, channel, "
+                       "channelMinor) "
                        "SELECT dd_station.stationid, callsign, stationname, "
-                       "affiliate, fccchannelnumber, channel "
+                       "affiliate, fccchannelnumber, channel, channelMinor "
                        "FROM dd_station, dd_lineupmap WHERE "
                        " ( (dd_station.stationid = dd_lineupmap.stationid) AND "
                        "   ( dd_lineupmap.lineupid = \"%0\") );")
@@ -556,12 +563,13 @@ void DataDirectProcessor::createTempTables()
             "postal char(6), device char(30) )";
     createATempTable("dd_lineup", table);  
 
-    table = "( lineupid char(100), stationid char(12), channel char(5) )";
+    table = "( lineupid char(100), stationid char(12), channel char(5), "
+        "channelMinor char(3) )";
     createATempTable("dd_lineupmap", table);
 
     table = "( stationid char(12), callsign char(10), stationname varchar(40), "
             "affiliate varchar(25), fccchannelnumber char(15), "
-            "channel char(5) )"; 
+            "channel char(5), channelMinor char(3) )"; 
     createATempTable ("dd_v_station", table);
 
     table = "( programid char(12), stationid char(12), scheduletime datetime, "

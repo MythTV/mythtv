@@ -67,6 +67,7 @@ ProgramInfo::ProgramInfo(void)
 
     seriesid = "";
     programid = "";
+    ignoreBookmark = false;
     catType = "";
 
     sortTitle = "";
@@ -149,7 +150,8 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     originalAirDate = other.originalAirDate;
     stars = other.stars;
     year = other.year;
-    
+    ignoreBookmark = other.ignoreBookmark; 
+   
     record = NULL;
 
     return *this;
@@ -426,10 +428,11 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
 
     if (db)
     {
-        QString thequery = QString("SELECT icon FROM channel WHERE chanid = %1")
-                                   .arg(chanid);
-        QSqlQuery query = db->exec(thequery);
-        if (query.isActive() && query.numRowsAffected() > 0)
+        QSqlQuery query(QString::null, db);
+        query.prepare("SELECT icon FROM channel WHERE chanid = :CHANID ;");
+        query.bindValue(":CHANID", chanid);
+        
+        if (query.exec() && query.isActive() && query.size() > 0)
             if (query.next())
                 progMap["iconpath"] = query.value(0).toString();
     }
@@ -507,37 +510,30 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
                                                  const QString &channel, 
                                                  QDateTime &dtime)
 {
-    QString sqltime = dtime.toString("yyyyMMddhhmm");
-    sqltime += "00"; 
-
-    return GetProgramFromRecorded(db, channel, sqltime);
+    return GetProgramFromRecorded(db, channel, 
+                                  dtime.toString("yyyyMMddhhmm00"));
 }
 
 ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
                                                  const QString &channel, 
                                                  const QString &starttime)
 {
-    QString thequery;
+    QSqlQuery query(QString::null, db);
+    query.prepare("SELECT recorded.chanid,starttime,endtime,title, "
+                  "subtitle,description,channel.channum, "
+                  "channel.callsign,channel.name,channel.commfree, "
+                  "channel.outputfilters,seriesid,programid,filesize, "
+                  "lastmodified,stars,previouslyshown,originalairdate, "
+                  "hostname "
+                  "FROM recorded "
+                  "LEFT JOIN channel "
+                  "ON recorded.chanid = channel.chanid "
+                  "WHERE recorded.chanid = :CHANNEL "
+                  "AND starttime = :STARTTIME ;");
+    query.bindValue(":CHANNEL", channel);
+    query.bindValue(":STARTTIME", starttime);
     
-    thequery = QString("SELECT recorded.chanid,starttime,endtime,title, "
-                       "subtitle,description,channel.channum, "
-                       "channel.callsign,channel.name,channel.commfree, "
-                       "channel.outputfilters,seriesid,programid,filesize, "
-                       "lastmodified,stars,previouslyshown,originalairdate, "
-                       "hostname "
-                       "FROM recorded "
-                       "LEFT JOIN channel "
-                       "ON recorded.chanid = channel.chanid "
-                       "WHERE recorded.chanid = %1 "
-                       "AND starttime = %2;")
-                       .arg(channel).arg(starttime);
-
-    QSqlQuery query = db->exec(thequery);
-
-
-    
-    
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
 
@@ -675,14 +671,11 @@ int ProgramInfo::GetAutoRunJobs(QSqlDatabase *db)
 
 int ProgramInfo::GetChannelRecPriority(QSqlDatabase *db, const QString &chanid)
 {
-    QString thequery;
-
-    thequery = QString("SELECT recpriority FROM channel WHERE chanid = %1;")
-                       .arg(chanid);
-
-    QSqlQuery query = db->exec(thequery);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
+    QSqlQuery query(QString::null, db);
+    query.prepare("SELECT recpriority FROM channel WHERE chanid = :CHANID ;");
+    query.bindValue(":CHANID", chanid);
+    
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
         return query.value(0).toInt();
@@ -750,21 +743,18 @@ void ProgramInfo::ApplyRecordRecGroupChange(QSqlDatabase *db,
                                             const QString &newrecgroup)
 {
     MythContext::KickDatabase(db);
-
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    starts += "00";
-
     QSqlQuery query(QString::null, db);
-    query.prepare("UPDATE recorded SET recgroup = :RECGROUP, "
-                  "starttime = :START WHERE chanid = :CHANID AND "
-                  "starttime = :START2;");
+
+    query.prepare("UPDATE recorded"
+                  " SET recgroup = :RECGROUP"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :START ;");
     query.bindValue(":RECGROUP", newrecgroup.utf8());
-    query.bindValue(":START", starts);
+    query.bindValue(":START", recstartts.toString("yyyyMMddhhmm00"));
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":START2", starts);
 
     if (!query.exec())
-        MythContext::DBError("RecGroup update", query);
+        MythContext::DBError("RecGroup update", query.executedQuery());
 
     recgroup = newrecgroup;
 }
@@ -877,11 +867,8 @@ bool ProgramInfo::IsSameProgramTimeslot(const ProgramInfo &other) const
 
 QString ProgramInfo::GetRecordBasename(void)
 {
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    QString ends = recendts.toString("yyyyMMddhhmm");
-
-    starts += "00";
-    ends += "00";
+    QString starts = recstartts.toString("yyyyMMddhhmm00");
+    QString ends = recendts.toString("yyyyMMddhhmm00");
 
     QString retval = QString("%1_%2_%3.nuv").arg(chanid)
                              .arg(starts).arg(ends);
@@ -891,11 +878,8 @@ QString ProgramInfo::GetRecordBasename(void)
 
 QString ProgramInfo::GetRecordFilename(const QString &prefix)
 {
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    QString ends = recendts.toString("yyyyMMddhhmm");
-
-    starts += "00";
-    ends += "00";
+    QString starts = recstartts.toString("yyyyMMddhhmm00");
+    QString ends = recendts.toString("yyyyMMddhhmm00");
 
     QString retval = QString("%1/%2_%3_%4.nuv").arg(prefix).arg(chanid)
                              .arg(starts).arg(ends);
@@ -942,21 +926,17 @@ void ProgramInfo::StartedRecording(QSqlDatabase *db)
         record->loadByProgram(db, this);
     }
 
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    QString ends = recendts.toString("yyyyMMddhhmm");
-
-    starts += "00";
-    ends += "00";
+    QString starts = recstartts.toString("yyyyMMddhhmm00");
+    QString ends = recendts.toString("yyyyMMddhhmm00");
 
     QSqlQuery query(QString::null, db);
-
     query.prepare("INSERT INTO recorded (chanid,starttime,endtime,title,"
-                  "subtitle,description,hostname,category,recgroup,"
-                  "autoexpire,recordid,seriesid,programid,stars,"
-                  "previouslyshown,originalairdate) "
-                  "VALUES(:CHANID,:STARTS,:ENDS,:TITLE,:SUBTITLE,:DESC,"
-                         ":HOSTNAME,:CATEGORY,:RECGROUP,:AUTOEXP,:RECORDID,"
-                         ":SERIESID,:PROGRAMID,:STARS,:REPEAT,:ORIGAIRDATE);");
+                  " subtitle,description,hostname,category,recgroup,"
+                  " autoexpire,recordid,seriesid,programid,stars,"
+                  " previouslyshown,originalairdate)"
+                  " VALUES(:CHANID,:STARTS,:ENDS,:TITLE,:SUBTITLE,:DESC,"
+                  " :HOSTNAME,:CATEGORY,:RECGROUP,:AUTOEXP,:RECORDID,"
+                  " :SERIESID,:PROGRAMID,:STARS,:REPEAT,:ORIGAIRDATE);");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTS", starts);
     query.bindValue(":ENDS", ends);
@@ -977,8 +957,8 @@ void ProgramInfo::StartedRecording(QSqlDatabase *db)
     if (!query.exec() || !query.isActive())
         MythContext::DBError("WriteRecordedToDB", query);
 
-    query.prepare("DELETE FROM recordedmarkup WHERE chanid = :CHANID "
-                  "AND starttime = :START;");
+    query.prepare("DELETE FROM recordedmarkup WHERE chanid = :CHANID"
+                  " AND starttime = :START;");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":START", starts);
 
@@ -996,248 +976,279 @@ void ProgramInfo::FinishedRecording(QSqlDatabase* db, bool prematurestop)
 void ProgramInfo::SetFilesize(long long fsize, QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
-
     filesize = fsize;
-    QString size(longLongToString(filesize));
 
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    starts += "00";
-
-    QString querystr;
-
-    querystr = QString("UPDATE recorded SET filesize = %1 "
-                       "WHERE chanid = '%2' AND starttime = '%3';")
-                       .arg(size)
-                       .arg(chanid)
-                       .arg(starts);
-
-    QSqlQuery query = db->exec(querystr);
-    if (!query.isActive())
-        MythContext::DBError("File size update", querystr);
+    QSqlQuery query(QString::null, db);
+    query.prepare("UPDATE recorded SET filesize = :FILESIZE"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :STARTTIME ;");
+    query.bindValue(":FILESIZE", longLongToString(fsize));
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+    
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("File size update", 
+                             query.executedQuery());
 }
 
 long long ProgramInfo::GetFilesize(QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
-
-    long long size = 0;
-
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    starts += "00";
-
-    QString querystr = QString("SELECT filesize FROM recorded WHERE "
-                               "chanid = '%1' AND starttime = '%2';")
-                              .arg(chanid).arg(starts);
-
-    QSqlQuery query = db->exec(querystr);
-    if (query.isActive() && query.numRowsAffected() > 0)
+    QSqlQuery query(QString::null, db);
+    
+    query.prepare("SELECT filesize FROM recorded"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :STARTTIME ;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+    
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
-
-        size = stringToLongLong(query.value(0).toString());
+        filesize = stringToLongLong(query.value(0).toString());
     }
+    else
+        filesize = 0;
 
-    filesize = size;
-    return size;
+    return filesize;
 }
 
 void ProgramInfo::SetBookmark(long long pos, QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
+    QSqlQuery query(QString::null, db);
 
-    char position[128];
-    sprintf(position, "%lld", pos);
-
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    starts += "00";
-
-    QString querystr;
-
+    query.prepare("UPDATE recorded"
+                  " SET bookmark = :BOOKMARK"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :STARTTIME ;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+    
     if (pos > 0)
-        querystr = QString("UPDATE recorded SET bookmark = '%1', "
-                           "starttime = '%2' WHERE chanid = '%3' AND "
-                           "starttime = '%4';").arg(position).arg(starts)
-                                               .arg(chanid).arg(starts);
+        query.bindValue(":BOOKMARK", pos);
     else
-        querystr = QString("UPDATE recorded SET bookmark = NULL, "
-                           "starttime = '%1' WHERE chanid = '%2' AND "
-                           "starttime = '%3';").arg(starts).arg(chanid)
-                                               .arg(starts);
-
-    QSqlQuery query = db->exec(querystr);
-    if (!query.isActive())
-        MythContext::DBError("Save position update", querystr);
+        query.bindValue(":BOOKMARK", "NULL");
+    
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("Save position update",
+                             query.executedQuery());
 }
 
 long long ProgramInfo::GetBookmark(QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
-
+    QSqlQuery query(QString::null, db);
     long long pos = 0;
 
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    starts += "00";
+    if (ignoreBookmark)
+        return pos;
+ 
+    query.prepare("SELECT bookmark FROM recorded"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :STARTTIME ;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
 
-    QString querystr = QString("SELECT bookmark FROM recorded WHERE "
-                               "chanid = '%1' AND starttime = '%2';")
-                              .arg(chanid).arg(starts);
-
-    QSqlQuery query = db->exec(querystr);
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
-
         QString result = query.value(0).toString();
-        if (result != QString::null)
-        {
+        if (!result.isEmpty())
             sscanf(result.ascii(), "%lld", &pos);
-        }
     }
-
+    
     return pos;
 }
 
 bool ProgramInfo::IsEditing(QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
+    QSqlQuery query(QString::null, db);
 
-    bool result = false;
+    query.prepare("SELECT editing FROM recorded"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :STARTTIME ;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
 
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    starts += "00";
-
-    QString querystr = QString("SELECT editing FROM recorded WHERE "
-                               "chanid = '%1' AND starttime = '%2';")
-                              .arg(chanid).arg(starts);
-
-    QSqlQuery query = db->exec(querystr);
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
-
-        result = query.value(0).toInt();
+        return query.value(0).toBool();
     }
 
-    return result;
+    return false;
 }
 
 void ProgramInfo::SetEditing(bool edit, QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
-
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    starts += "00";
-
-    QString querystr = QString("UPDATE recorded SET editing = '%1', "
-                               "starttime = '%2' WHERE chanid = '%3' AND "
-                               "starttime = '%4';").arg(edit).arg(starts)
-                                                   .arg(chanid).arg(starts);
-    QSqlQuery query = db->exec(querystr);
-    if (!query.isActive())
-        MythContext::DBError("Edit status update", querystr);
+    QSqlQuery query(QString::null, db);
+    
+    query.prepare("UPDATE recorded"
+                  " SET editing = :EDIT"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :STARTTIME ;");
+    query.bindValue(":EDIT", edit);
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+   
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("Edit status update", 
+                             query.executedQuery());
 }
 
 bool ProgramInfo::IsCommFlagged(QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
+    QSqlQuery query(QString::null, db);
+    
+    query.prepare("SELECT commflagged FROM recorded"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :STARTTIME ;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
 
-    bool result = false;
-
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    starts += "00";
-
-    QString querystr = QString("SELECT commflagged FROM recorded WHERE "
-                               "chanid = '%1' AND starttime = '%2';")
-                              .arg(chanid).arg(starts);
-
-    QSqlQuery query = db->exec(querystr);
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
-
-        result = (query.value(0).toInt() == COMM_FLAG_DONE);
+        return query.value(0).toBool();
     }
 
-    return result;
+    return false;
 }
 
 void ProgramInfo::SetCommFlagged(int flag, QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
+    QSqlQuery query(QString::null, db);
 
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    starts += "00";
-
-    QString querystr = QString("UPDATE recorded SET commflagged = '%1', "
-                               "starttime = '%2' WHERE chanid = '%3' AND "
-                               "starttime = '%4';").arg(flag).arg(starts)
-                                                   .arg(chanid).arg(starts);
-    QSqlQuery query = db->exec(querystr);
-    if (!query.isActive())
-        MythContext::DBError("Commercial Flagged status update", querystr);
+    query.prepare("UPDATE recorded"
+                  " SET commflagged = :FLAG"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :STARTTIME ;");
+    query.bindValue(":FLAG", flag);
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+    
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("Commercial Flagged status update",
+                             query.executedQuery());
 }
 
 bool ProgramInfo::IsCommProcessing(QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
+    QSqlQuery query(QString::null, db);
+    
+    query.prepare("SELECT commflagged FROM recorded"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :STARTTIME ;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
 
-    bool result = false;
-
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    starts += "00";
-
-    QString querystr = QString("SELECT commflagged FROM recorded WHERE "
-                               "chanid = '%1' AND starttime = '%2';")
-                              .arg(chanid).arg(starts);
-
-    QSqlQuery query = db->exec(querystr);
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
-
-        result = (query.value(0).toInt() == COMM_FLAG_PROCESSING);
+        return (query.value(0).toInt() == COMM_FLAG_PROCESSING);
     }
 
-    return result;
+    return false;
+}
+
+void ProgramInfo::SetPreserveEpisode(bool preserveEpisode, QSqlDatabase *db)
+{
+    MythContext::KickDatabase(db);
+
+    QSqlQuery query(QString::null, db);
+
+    query.prepare("UPDATE recorded"
+                  " SET preserve = :PRESERVE"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :STARTTIME ;");
+    query.bindValue(":PRESERVE", preserveEpisode);
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("PreserveEpisode update", query.executedQuery());
 }
 
 void ProgramInfo::SetAutoExpire(bool autoExpire, QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
+    QSqlQuery query(QString::null, db);
 
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    starts += "00";
+    query.prepare("UPDATE recorded"
+                  " SET autoexpire = :AUTOEXPIRE"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :STARTTIME ;");
+    query.bindValue(":AUTOEXPIRE", autoExpire);
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
 
-    QString querystr = QString("UPDATE recorded SET autoexpire = '%1', "
-                               "starttime = '%2' WHERE chanid = '%3' AND "
-                               "starttime = '%4';").arg(autoExpire).arg(starts)
-                                                   .arg(chanid).arg(starts);
-    QSqlQuery query = db->exec(querystr);
-    if (!query.isActive())
-        MythContext::DBError("AutoExpire update", querystr);
+    if(!query.exec() || !query.isActive())
+        MythContext::DBError("AutoExpire update",
+                             query.executedQuery());
 }
 
 bool ProgramInfo::GetAutoExpireFromRecorded(QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
+    QSqlQuery query(QString::null, db);
 
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    starts += "00";
+    query.prepare("SELECT autoexpire FROM recorded"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :STARTTIME ;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
 
-    QString querystr = QString("SELECT autoexpire FROM recorded WHERE "
-                               "chanid = '%1' AND starttime = '%2';")
-                              .arg(chanid).arg(starts);
-
-    bool result = false;
-    QSqlQuery query = db->exec(querystr);
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
-
-        result = query.value(0).toInt();
+        return query.value(0).toBool();
     }
 
-    return(result);
+    return false;
+}
+
+bool ProgramInfo::GetPreserveEpisodeFromRecorded(QSqlDatabase *db)
+{
+    MythContext::KickDatabase(db);
+    QSqlQuery query(QString::null, db);
+
+    query.prepare("SELECT preserve FROM recorded"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :STARTTIME ;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        query.next();
+        return query.value(0).toBool();
+    }
+
+    return false;
+}
+
+bool ProgramInfo::UsesMaxEpisodes(QSqlDatabase *db)
+{
+    MythContext::KickDatabase(db);
+    QSqlQuery query(QString::null, db);
+
+    query.prepare("SELECT maxepisodes FROM record WHERE "
+                  "recordid = :RECID ;");
+    query.bindValue(":RECID", recordid);
+
+    if (query.exec() && query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+        return query.value(0).toInt();
+    }
+
+    return false;
 }
 
 void ProgramInfo::GetCutList(QMap<long long, int> &delMap, QSqlDatabase *db)
@@ -1246,18 +1257,16 @@ void ProgramInfo::GetCutList(QMap<long long, int> &delMap, QSqlDatabase *db)
 //    GetMarkupMap(delMap, db, MARK_CUT_END, true);
 
     delMap.clear();
-
     MythContext::KickDatabase(db);
+    QSqlQuery query(QString::null, db);
 
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    starts += "00";
+    query.prepare("SELECT cutlist FROM recorded"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :STARTTIME ;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
 
-    QString querystr = QString("SELECT cutlist FROM recorded WHERE "
-                               "chanid = '%1' AND starttime = '%2';")
-                              .arg(chanid).arg(starts);
-
-    QSqlQuery query = db->exec(querystr);
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
 
@@ -1314,17 +1323,19 @@ void ProgramInfo::SetCutList(QMap<long long, int> &delMap, QSqlDatabase *db)
     }
 
     MythContext::KickDatabase(db);
+    QSqlQuery query(QString::null, db);
 
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    starts += "00";
+    query.prepare("UPDATE recorded"
+                  " SET cutlist = :CUTLIST"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :STARTTIME ;");
+    query.bindValue(":CUTLIST", cutdata);
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
 
-    QString querystr = QString("UPDATE recorded SET cutlist = \"%1\", "
-                               "starttime = '%2' WHERE chanid = '%3' AND "
-                               "starttime = '%4';").arg(cutdata).arg(starts)
-                                                   .arg(chanid).arg(starts);
-    QSqlQuery query = db->exec(querystr);
-    if (!query.isActive())
-        MythContext::DBError("cutlist update", querystr);
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("cutlist update", 
+                             query.executedQuery());
 }
 
 void ProgramInfo::SetBlankFrameList(QMap<long long, int> &frames,
@@ -1359,50 +1370,47 @@ void ProgramInfo::GetCommBreakList(QMap<long long, int> &frames,
 void ProgramInfo::ClearMarkupMap(QSqlDatabase *db, int type,
                                  long long min_frame, long long max_frame)
 {
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    starts += "00";
-
-    QString min_comp = " ";
-    QString max_comp = " ";
+    QSqlQuery query(QString::null, db);
+    QString comp = "";
 
     if (min_frame >= 0)
     {
         char tempc[128];
-        sprintf(tempc, "AND mark >= %lld", min_frame);
-        min_comp += tempc;
+        sprintf(tempc, " AND mark >= %lld ", min_frame);
+        comp += tempc;
     }
 
     if (max_frame >= 0)
     {
         char tempc[128];
-        sprintf(tempc, "AND mark <= %lld", max_frame);
-        max_comp += tempc;
+        sprintf(tempc, " AND mark <= %lld ", max_frame);
+        comp += tempc;
     }
 
+    if (type != -100)
+        comp += QString(" AND type = :TYPE ");
     
-    QString querystr;
-
     if (isVideo)
     {
-        querystr = QString("DELETE FROM filemarkup "
-                           "WHERE filename = '%1' %2 %3 ")
-                           .arg(pathname).arg(min_comp).arg(max_comp);
+        query.prepare("DELETE FROM filemarkup"
+                      " WHERE filename = :PATH "
+                      + comp + ";");
+        query.bindValue(":PATH", pathname);
     }
     else
     {
-        querystr = QString("DELETE FROM recordedmarkup "
-                           "WHERE chanid = '%1' AND starttime = '%2' %3 %4 ")
-                           .arg(chanid).arg(starts).arg(min_comp).arg(max_comp);
+        query.prepare("DELETE FROM recordedmarkup"
+                      " WHERE chanid = :CHANID"
+                      " AND STARTTIME = :STARTTIME"
+                      + comp + ";");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
     }
+    query.bindValue(":TYPE", type);
     
-    if (type != -100)
-        querystr += QString("AND type = %1;").arg(type);
-    else
-        querystr += QString(";");
-
-    QSqlQuery query = db->exec(querystr);
-    if (!query.isActive())
-        MythContext::DBError("ClearMarkupMap deleting", querystr);
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("ClearMarkupMap deleting", 
+                             query.executedQuery());
 }
 
 void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
@@ -1410,30 +1418,25 @@ void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
                                long long max_frame)
 {
     QMap<long long, int>::Iterator i;
-
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    starts += "00";
-
-    QString querystr;
-
+    QSqlQuery query(QString::null, db);
+    
     if (!isVideo)
     {
         // check to make sure the show still exists before saving markups
-        querystr = QString("SELECT starttime FROM recorded "
-                           "WHERE chanid = '%1' AND starttime = '%2';")
-                           .arg(chanid).arg(starts);
+        query.prepare("SELECT starttime FROM recorded"
+                      " WHERE chanid = :CHANID"
+                      " AND starttime : STARTTIME ;");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
 
-        QSqlQuery check_query = db->exec(querystr);
-        if (!check_query.isActive())
+        if (!query.exec() || !query.isActive())
             MythContext::DBError("SetMarkupMap checking record table",
-                querystr);
+                                 query.executedQuery());
 
-        if (check_query.isActive())
-            if ((check_query.numRowsAffected() == 0) ||
-                (!check_query.next()))
-                return;
+        if (query.size() < 1 || !query.next())
+            return;
     }
-    
+ 
     for (i = marks.begin(); i != marks.end(); ++i)
     {
         long long frame = i.key();
@@ -1457,21 +1460,24 @@ void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
 
         if (isVideo)
         {
-            querystr = QString("INSERT INTO filemarkup (filename, "
-                               "mark, type) values ( '%1', %2, %3);")
-                               .arg(pathname)
-                               .arg(frame_str).arg(mark_type);
+            query.prepare("INSERT INTO filemarkup (filename, mark, type)"
+                          " VALUES ( :PATH , :MARK , :TYPE );");
+            query.bindValue(":PATH", pathname);
         }
         else
         {
-            querystr = QString("INSERT INTO recordedmarkup (chanid, starttime, "
-                               "mark, type) values ( '%1', '%2', %3, %4);")
-                               .arg(chanid).arg(starts)
-                               .arg(frame_str).arg(mark_type);
-        }                   
-        QSqlQuery query = db->exec(querystr);
-        if (!query.isActive())
-            MythContext::DBError("SetMarkupMap inserting", querystr);
+            query.prepare("INSERT INTO recordedmarkup"
+                          " (chanid, starttime, mark, type)"
+                          " VALUES ( :CHANID , :STARTTIME , :MARK , :TYPE );");
+            query.bindValue(":CHANID", chanid);
+            query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+        }
+        query.bindValue(":MARK", frame_str);
+        query.bindValue(":TYPE", mark_type);
+       
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("SetMarkupMap inserting", 
+                                 query.executedQuery());
     }
 }
 
@@ -1482,33 +1488,29 @@ void ProgramInfo::GetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
         marks.clear();
 
     MythContext::KickDatabase(db);
-
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    starts += "00";
-
-    QString querystr;
-
+    QSqlQuery query(QString::null, db);
+    
     if (isVideo)
     {
-        querystr = QString("SELECT mark, type FROM filemarkup WHERE "
-                           "filename = '%1' AND type = %2 "
-                           "ORDER BY mark;")
-                           .arg(pathname)
-                           .arg(type);
-
+        query.prepare("SELECT mark, type FROM filemarkup"
+                      " WHERE filename = :PATH"
+                      " AND type = :TYPE"
+                      " ORDER BY mark;");
+        query.bindValue(":PATH", pathname);
     }
     else
     {
-        querystr = QString("SELECT mark, type FROM recordedmarkup WHERE "
-                           "chanid = '%1' AND starttime = '%2' "
-                           "AND type = %3 "
-                           "ORDER BY mark;")
-                           .arg(chanid).arg(starts)
-                           .arg(type);
+        query.prepare("SELECT mark, type FROM recordedmarkup"
+                      " WHERE chanid = :CHANID"
+                      " AND starttime = :STARTTIME"
+                      " AND type = :TYPE"
+                      " ORDER BY mark;");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
     }
-    
-    QSqlQuery query = db->exec(querystr);
-    if (query.isActive() && query.numRowsAffected() > 0)
+    query.bindValue(":TYPE", type);
+
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         while(query.next())
             marks[stringToLongLong(query.value(0).toString())] =
@@ -1542,30 +1544,28 @@ void ProgramInfo::GetPositionMap(QMap<long long, long long> &posMap, int type,
                                  QSqlDatabase *db)
 {
     posMap.clear();
-
     MythContext::KickDatabase(db);
-
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    starts += "00";
-
-    QString querystr;
+    QSqlQuery query(QString::null, db);
 
     if (isVideo)
     {
-        querystr = QString("SELECT mark, offset FROM filemarkup "
-                   "WHERE filename = '%1' AND type = %2;")
-                   .arg(pathname).arg(type);
+        query.prepare("SELECT mark, offset FROM filemarkup"
+                      " WHERE filename = :PATH"
+                      " AND type = :TYPE ;");
+        query.bindValue(":PATH", pathname);
     }
     else
     {
-        querystr = QString("SELECT mark, offset FROM recordedmarkup "
-                           "WHERE chanid = '%1' AND starttime = '%2' "
-                           "AND type = %3;")
-                           .arg(chanid).arg(starts).arg(type);
+        query.prepare("SELECT mark, offset FROM recordedmarkup"
+                      " WHERE chanid = :CHANID"
+                      " AND starttime = :STARTTIME"
+                      " AND type = :TYPE ;");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
     }
-    
-    QSqlQuery query = db->exec(querystr);
-    if (query.isActive() && query.numRowsAffected() > 0)
+    query.bindValue(":TYPE", type);
+
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         while (query.next())
             posMap[stringToLongLong(query.value(0).toString())] =
@@ -1575,28 +1575,29 @@ void ProgramInfo::GetPositionMap(QMap<long long, long long> &posMap, int type,
 
 void ProgramInfo::ClearPositionMap(int type, QSqlDatabase *db)
 {
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    starts += "00";
-
-    QString querystr;
-
+    QSqlQuery query(QString::null, db);
+  
     if (isVideo)
     {
-        querystr = QString("DELETE FROM filemarkup "
-                           "WHERE filename = '%1' AND type = %2;")
-                           .arg(pathname).arg(type);
+        query.prepare("DELETE FROM filemarkup"
+                      " WHERE filename = :PATH"
+                      " AND type = :TYPE ;");
+        query.bindValue(":PATH", pathname);
     }
     else
     {
-        querystr = QString("DELETE FROM recordedmarkup "
-                           "WHERE chanid = '%1' AND starttime = '%2' "
-                           "AND type = %3;")
-                           .arg(chanid).arg(starts).arg(type);
+        query.prepare("DELETE FROM recordedmarkup"
+                      " WHERE chanid = :CHANID"
+                      " AND starttime = :STARTTIME"
+                      " AND type = :TYPE ;");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
     }
+    query.bindValue(":TYPE", type);
                                
-    QSqlQuery query = db->exec(querystr);
-    if (!query.isActive())
-        MythContext::DBError("clear position map", querystr);
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("clear position map", 
+                             query.executedQuery());
 }
 
 void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
@@ -1604,47 +1605,46 @@ void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
                                  long long max_frame)
 {
     QMap<long long, long long>::Iterator i;
-
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    starts += "00";
-
-    QString min_comp = " ";
-    QString max_comp = " ";
+    QSqlQuery query(QString::null, db);
+    QString comp = "";
 
     if (min_frame >= 0)
     {
         char tempc[128];
-        sprintf(tempc, "AND mark >= %lld", min_frame);
-        min_comp += tempc;
+        sprintf(tempc, " AND mark >= %lld ", min_frame);
+        comp += tempc;
     }
 
     if (max_frame >= 0)
     {
         char tempc[128];
-        sprintf(tempc, "AND mark <= %lld", max_frame);
-        max_comp += tempc;
+        sprintf(tempc, " AND mark <= %lld ", max_frame);
+        comp += tempc;
     }
-
-    QString querystr;
 
     if(isVideo)
     {
-        querystr = QString("DELETE FROM filemarkup "
-                           "WHERE filename = '%1' AND type = %2 %3 %4;")
-                           .arg(pathname).arg(type)
-                           .arg(min_comp).arg(max_comp);
+        query.prepare("DELETE FROM filemarkup"
+                      " WHERE filename = :PATH"
+                      " AND type = :TYPE"
+                      + comp + ";");
+        query.bindValue(":PATH", pathname);
     }
     else
     {
-        querystr = QString("DELETE FROM recordedmarkup "
-                           "WHERE chanid = '%1' AND starttime = '%2' "
-                           "AND type = %3 %4 %5;")
-                           .arg(chanid).arg(starts).arg(type)
-                           .arg(min_comp).arg(max_comp);
+        query.prepare("DELETE FROM recordedmarkup"
+                      " WHERE chanid = :CHANID"
+                      " AND starttime = :STARTTIME"
+                      " AND type = :TYPE"
+                      + comp + ";");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
     }
-    QSqlQuery query = db->exec(querystr);
-    if (!query.isActive())
-        MythContext::DBError("position map clear", querystr);
+    query.bindValue(":TYPE", type);
+    
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("position map clear", 
+                             query.executedQuery());
 
     for (i = posMap.begin(); i != posMap.end(); ++i)
     {
@@ -1667,26 +1667,28 @@ void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
 
         if (isVideo)
         {
-            querystr = QString("INSERT INTO filemarkup (filename, "
-                               "mark, type, offset) values "
-                               "( '%1', %2, %3, \"%4\");")
-                               .arg(pathname)
-                               .arg(frame_str).arg(type)
-                               .arg(offset_str);
+            query.prepare("INSERT INTO filemarkup"
+                          " (filename, mark, type, offset)"
+                          " VALUES"
+                          " ( :PATH , :MARK , :TYPE , :OFFSET );");
+            query.bindValue(":PATH", pathname);
         }
         else
         {        
-            querystr = QString("INSERT INTO recordedmarkup (chanid, starttime, "
-                               "mark, type, offset) values "
-                               "( '%1', '%2', %3, %4, \"%5\");")
-                               .arg(chanid).arg(starts)
-                               .arg(frame_str).arg(type)
-                               .arg(offset_str);
+            query.prepare("INSERT INTO recordedmarkup"
+                          " (chanid, starttime, mark, type, offset)"
+                          " VALUES"
+                          " ( :CHANID , :STARTTIME , :MARK , :TYPE , :OFFSET );");
+            query.bindValue(":CHANID", chanid);
+            query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
         }
+        query.bindValue(":MARK", frame_str);
+        query.bindValue(":TYPE", type);
+        query.bindValue(":OFFSET", offset_str);
         
-        QSqlQuery subquery = db->exec(querystr);
-        if (!subquery.isActive())
-            MythContext::DBError("position map insert", querystr);
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("position map insert", 
+                                 query.executedQuery());
     }
 }
 
@@ -1694,9 +1696,7 @@ void ProgramInfo::SetPositionMapDelta(QMap<long long, long long> &posMap,
                                       int type, QSqlDatabase *db)
 {
     QMap<long long, long long>::Iterator i;
-
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    starts += "00";
+    QSqlQuery query(QString::null, db);
 
     for (i = posMap.begin(); i != posMap.end(); ++i)
     {
@@ -1711,29 +1711,30 @@ void ProgramInfo::SetPositionMapDelta(QMap<long long, long long> &posMap,
        
         QString offset_str = tempc;
 
-        QString querystr;
-
         if (isVideo)
         {
-            querystr = QString("INSERT INTO filemarkup "
-                               "(filename, mark, type, offset) VALUES "
-                               "( '%1', %2, %3, \"%4\");")
-                               .arg(chanid)
-                               .arg(frame_str).arg(type)
-                               .arg(offset_str);
+            query.prepare("INSERT INTO filemarkup"
+                          " (filename, mark, type, offset)"
+                          " VALUES"
+                          " ( :PATH , :MARK , :TYPE , :OFFSET );");
+            query.bindValue(":PATH", pathname);
         }
         else
         {
-            querystr = QString("INSERT INTO recordedmarkup "
-                               "(chanid, starttime, mark, type, offset) VALUES "
-                               "( '%1', '%2', %3, %4, \"%5\");")
-                               .arg(chanid).arg(starts)
-                               .arg(frame_str).arg(type)
-                               .arg(offset_str);
+            query.prepare("INSERT INTO recordedmarkup"
+                          " (chanid, starttime, mark, type, offset)"
+                          " VALUES"
+                          " ( :CHANID , :STARTTIME , :MARK , :TYPE , OFFSET );");
+            query.bindValue(":CHANID", chanid);
+            query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
         }
-        QSqlQuery subquery = db->exec(querystr);
-        if (!subquery.isActive())
-            MythContext::DBError("delta position map insert", querystr);
+        query.bindValue(":MARK", frame_str);
+        query.bindValue(":TYPE", type);
+        query.bindValue(":OFFSET", offset_str);
+        
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("delta position map insert", 
+                                 query.executedQuery());
     }
 }
 
@@ -2019,10 +2020,21 @@ void ProgramInfo::Save(QSqlDatabase *db)
 {
     QSqlQuery query(QString::null, db);
 
-    query.prepare("REPLACE INTO program (chanid,starttime,endtime,"
-                  "title,subtitle,description,category,airdate,"
-                  "stars) VALUES(:CHANID,:STARTTIME,:ENDTIME,:TITLE,"
-                  ":SUBTITLE,:DESCRIPTION,:CATEGORY,:AIRDATE,:STARS);");
+    // This used to be REPLACE INTO...
+    // primary key of table program is chanid,starttime
+    query.prepare("DELETE FROM program"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :STARTTIME ;");
+    query.bindValue(":CHANID", chanid.toInt());
+    query.bindValue(":STARTTIME", startts.toString("yyyyMMddhhmmss"));
+    if (!query.exec())
+        MythContext::DBError("Saving program", 
+                             query.executedQuery());
+
+    query.prepare("INSERT INTO program (chanid,starttime,endtime,"
+                  " title,subtitle,description,category,airdate,"
+                  " stars) VALUES (:CHANID,:STARTTIME,:ENDTIME,:TITLE,"
+                  " :SUBTITLE,:DESCRIPTION,:CATEGORY,:AIRDATE,:STARS);");
     query.bindValue(":CHANID", chanid.toInt());
     query.bindValue(":STARTTIME", startts.toString("yyyyMMddhhmmss"));
     query.bindValue(":ENDTIME", endts.toString("yyyyMMddhhmmss"));
@@ -2034,7 +2046,8 @@ void ProgramInfo::Save(QSqlDatabase *db)
     query.bindValue(":STARS", "0");
 
     if (!query.exec())
-        MythContext::DBError("Saving program", query);
+        MythContext::DBError("Saving program", 
+                             query.executedQuery());
 }
 
 QGridLayout* ProgramInfo::DisplayWidget(QWidget *parent, QString searchtitle)
@@ -2141,26 +2154,24 @@ void ProgramInfo::EditScheduled(QSqlDatabase *db)
 void ProgramInfo::showDetails(QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
-
+    QSqlQuery query(QString::null, db);
     QString oldDateFormat = gContext->GetSetting("OldDateFormat", "M/d/yyyy");
 
-    QString querytext;
     QString category_type, epinum, rating;
     int partnumber = 0, parttotal = 0;
     int stereo = 0, subtitled = 0, hdtv = 0, closecaptioned = 0;
 
     if (endts != startts)
     {
-        querytext = QString("SELECT category_type, partnumber, "
-                            "parttotal, stereo, subtitled, hdtv, "
-                            "closecaptioned, syndicatedepisodenumber "
-                            "FROM program WHERE chanid = %1 "
-                            "AND starttime=\'%2\';")
-                            .arg(chanid).arg(startts.toString(Qt::ISODate));
+        query.prepare("SELECT category_type, partnumber,"
+                      " parttotal, stereo, subtitled, hdtv,"
+                      " closecaptioned, syndicatedepisodenumber"
+                      " FROM program WHERE chanid = :CHANID"
+                      " AND starttime = :STARTTIME ;");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", startts.toString(Qt::ISODate));
 
-        QSqlQuery query = db->exec(querytext);
-
-        if (query.isActive() && query.numRowsAffected())
+        if (query.exec() && query.isActive() && query.size() > 0)
         {
             query.next();
             category_type = query.value(0).toString();
@@ -2173,18 +2184,19 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
             epinum = query.value(7).toString();
         }
 
-        querytext = QString("SELECT rating FROM programrating "
-                            "WHERE chanid = %1 AND starttime=\'%2\';")
-                            .arg(chanid).arg(startts.toString(Qt::ISODate));
+        query.prepare("SELECT rating FROM programrating"
+                      " WHERE chanid = :CHANID"
+                      " AND starttime = :STARTTIME ;");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", startts.toString(Qt::ISODate));
         
-        QSqlQuery rquery = db->exec(querytext);
-        
-        if (rquery.isActive() && rquery.numRowsAffected())
+        if (query.exec() && query.isActive() && query.size() > 0)
         {
-            rquery.next();
-            rating = rquery.value(0).toString();
+            query.next();
+            rating = query.value(0).toString();
         }
     }
+
     if (category_type == "" && programid != "")
     {
         QString prefix = programid.left(2);
@@ -2274,24 +2286,23 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
 
     if (endts != startts)
     {
-        querytext = QString("SELECT role,people.name from credits "
-                    "LEFT JOIN people ON credits.person = people.person "
-                    "LEFT JOIN program ON credits.chanid = program.chanid "
-                    "AND credits.starttime = program.starttime "
-                    "WHERE program.chanid = %1 "
-                    "AND program.starttime=\'%2\' ORDER BY role;")
-                    .arg(chanid).arg(startts.toString(Qt::ISODate));
+        query.prepare("SELECT role,people.name from credits"
+                      " LEFT JOIN people ON credits.person = people.person"
+                      " LEFT JOIN program ON credits.chanid = program.chanid"
+                      " AND credits.starttime = program.starttime"
+                      " WHERE program.chanid = :CHANID"
+                      " AND program.starttime = :STARTTIME ORDER BY role;");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", startts.toString(Qt::ISODate));
 
-        QSqlQuery pquery = db->exec(querytext);
-
-        if (pquery.isActive() && pquery.numRowsAffected())
+        if (query.exec() && query.isActive() && query.size() > 0)
         {
             QString rstr = "", plist = "";
 
-            while(pquery.next())
+            while(query.next())
             {
-                role = pquery.value(0).toString();
-                pname = pquery.value(1).toString();
+                role = query.value(0).toString();
+                pname = query.value(1).toString();
 
                 if (rstr == role)
                     plist += ", " + pname;
@@ -2343,19 +2354,16 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
 int ProgramInfo::getProgramFlags(QSqlDatabase *db)
 {
     int flags = 0;
-
     MythContext::KickDatabase(db);
-        
-    QString starts = recstartts.toString("yyyyMMddhhmm");
-    starts += "00";
+    QSqlQuery query(QString::null, db);
     
-    QString querystr = QString("SELECT commflagged, cutlist, autoexpire, "
-                               "editing, bookmark FROM recorded WHERE "
-                               "chanid = '%1' AND starttime = '%2';")
-                              .arg(chanid).arg(starts);
-    
-    QSqlQuery query = db->exec(querystr);
-    if (query.isActive() && query.numRowsAffected() > 0)
+    query.prepare("SELECT commflagged, cutlist, autoexpire, "
+                  "editing, bookmark FROM recorded WHERE "
+                  "chanid = :CHANID AND starttime = :STARTTIME ;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm"));
+
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
 
@@ -2662,9 +2670,6 @@ bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
         "LEFT JOIN channel ON program.chanid = channel.chanid "
         "%1 ").arg(sql);
 
-            
-
-                
     if (!sql.contains(" GROUP BY "))
         querystr += "GROUP BY program.starttime, channel.channum, "
             "  channel.callsign ";
@@ -2674,10 +2679,13 @@ bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
     if (!sql.contains(" LIMIT "))
         querystr += "LIMIT 1000 ";
 
-    QSqlQuery query = db->exec(querystr);
-    if (!query.isActive())
+    QSqlQuery query(QString::null, db);
+    query.prepare(querystr);
+    
+    if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("ProgramList::FromProgram", querystr);
+        MythContext::DBError("ProgramList::FromProgram", 
+                             query.executedQuery());
         return false;
     }
 
@@ -2746,19 +2754,19 @@ bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
 bool ProgramList::FromOldRecorded(QSqlDatabase *db, const QString sql)
 {
     clear();
+    QSqlQuery query(QString::null, db);
 
-    QString querystr = QString(
-        "SELECT oldrecorded.chanid, starttime, endtime, "
-        "    title, subtitle, description, category, seriesid, programid, "
-        "    channel.channum, channel.callsign, channel.name "
-        "FROM oldrecorded "
-        "LEFT JOIN channel ON oldrecorded.chanid = channel.chanid "
-         "%1 ").arg(sql);
-
-    QSqlQuery query = db->exec(querystr);
-    if (!query.isActive())
+    query.prepare("SELECT oldrecorded.chanid, starttime, endtime, "
+                  " title, subtitle, description, category, seriesid, programid, "
+                  " channel.channum, channel.callsign, channel.name "
+                  " FROM oldrecorded "
+                  " LEFT JOIN channel ON oldrecorded.chanid = channel.chanid "
+                  + sql);
+    
+    if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("ProgramList::FromOldRecorded", querystr);
+        MythContext::DBError("ProgramList::FromOldRecorded", 
+                             query.executedQuery());
         return false;
     }
 

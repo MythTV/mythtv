@@ -91,7 +91,8 @@ QString TerrestrialVirtualChannelTable::toString(int chan) const {
     str.append(QString("Channel #%1 ").arg(chan));
     str.append(QString("name(%1) %2-%3 ").arg(ShortChannelName(chan)).
                arg(MajorChannel(chan)).arg(MinorChannel(chan)));
-    assert(ModulationMode(chan)==4);
+    assert(ModulationMode(chan)==4 ||
+           ModulationMode(chan)==1); // NTSC listing in TVCT
     str.append(QString("cTSID(0x%1)\n").arg(ChannelTransportStreamID(chan), 0, 16));
     str.append(QString(" pnum(%1) ").arg(ProgramNumber(chan)));
     str.append(QString("ETM_loc(%1) ").arg(ETMlocation(chan)));

@@ -172,12 +172,14 @@ typedef struct DSPContext {
     me_cmp_func nsse[5];
     me_cmp_func w53[5];
     me_cmp_func w97[5];
+    me_cmp_func dct_max[5];
 
     me_cmp_func me_pre_cmp[5];
     me_cmp_func me_cmp[5];
     me_cmp_func me_sub_cmp[5];
     me_cmp_func mb_cmp[5];
     me_cmp_func ildct_cmp[5]; //only width 16 used
+    me_cmp_func frame_skip_cmp[5]; //only width 8 used
 
     /**
      * Halfpel motion compensation with rounding (a+b+1)>>1.
@@ -406,6 +408,7 @@ int mm_support(void);
 #define MM_MMXEXT 0x0002 /* SSE integer functions or AMD MMX ext */
 #define MM_SSE    0x0008 /* SSE functions */
 #define MM_SSE2   0x0010 /* PIV SSE2 functions */
+#define MM_3DNOWEXT  0x0020 /* AMD 3DNowExt */
 
 extern int mm_flags;
 

@@ -132,7 +132,7 @@ class TV : public QObject
 
     QString QueuedChannel(void);
     void ChannelClear(bool hideosd = false); 
-    void ChannelKey(int key);
+    void ChannelKey(char key);
     void ChannelCommit(void);
 
     void ToggleInputs(void); 

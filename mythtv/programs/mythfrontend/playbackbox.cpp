@@ -1647,6 +1647,135 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
     expectingPopup = true;
 }
 
+void PlaybackBox::showPlayFromPopup()
+{
+    if (expectingPopup)
+        cancelPopup();
+
+    backup.begin(this);
+    grayOut(&backup);
+    backup.end();
+
+    popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
+                             popupForeground, popupBackground,
+                             popupHighlight, "playfrom popup");
+
+    initPopup(popup, delitem, "", "");
+
+    QButton *playButton = popup->addButton(tr("Play from beginning"), this, SLOT(doPlayFromBeg()));
+    popup->addButton(tr("Play from bookmark"), this, SLOT(doPlay()));
+    
+    popup->ShowPopup(this, SLOT(doCancel()));
+    playButton->setFocus();
+    
+    expectingPopup = true;
+}
+
+void PlaybackBox::showStoragePopup()
+{
+    if (expectingPopup)
+        cancelPopup();
+
+    backup.begin(this);
+    grayOut(&backup);
+    backup.end();
+
+    popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
+                             popupForeground, popupBackground,
+                             popupHighlight, "storage popup");
+
+    initPopup(popup, delitem, "", tr("A preserved episode is ignored in calculations for deleting episodes above the limit.  Auto-expiration is used to remove eligable programs when disk space is low."));
+
+    QSqlDatabase *db = QSqlDatabase::database();
+
+    QButton *storageButton;
+
+    if (delitem && delitem->GetAutoExpireFromRecorded(db))
+        storageButton = popup->addButton(tr("Don't Auto Expire"), this, SLOT(noAutoExpire()));
+    else
+        storageButton = popup->addButton(tr("Auto Expire"), this, SLOT(doAutoExpire()));
+
+    if (delitem && delitem->UsesMaxEpisodes(db))
+    {
+        if (delitem && delitem->GetPreserveEpisodeFromRecorded(db))
+            popup->addButton(tr("Do not preserve this episode"), this, SLOT(noPreserveEpisode()));
+        else
+            popup->addButton(tr("Preserve this episode"), this, SLOT(doPreserveEpisode()));
+    }
+
+    popup->ShowPopup(this, SLOT(doCancel()));
+    storageButton->setFocus();
+    
+    expectingPopup = true;
+}
+
+void PlaybackBox::showRecordingPopup()
+{
+    if (expectingPopup)
+        cancelPopup();
+
+    backup.begin(this);
+    grayOut(&backup);
+    backup.end();
+
+    popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
+                             popupForeground, popupBackground,
+                             popupHighlight, "recording popup");
+
+    initPopup(popup, delitem, "", "");
+
+    QButton *changeButton = popup->addButton(tr("Change Recording Group"), this,
+                     SLOT(showRecGroupChanger()));
+
+    popup->addButton(tr("Edit Recording Schedule"), this,
+                     SLOT(doEditScheduled()));
+    
+    popup->ShowPopup(this, SLOT(doCancel()));
+    changeButton->setFocus();
+    
+    expectingPopup = true;
+}
+
+void PlaybackBox::showJobPopup()
+{
+    if (expectingPopup)
+        cancelPopup();
+
+    backup.begin(this);
+    grayOut(&backup);
+    backup.end();
+
+    popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
+                             popupForeground, popupBackground,
+                             popupHighlight, "job popup");
+
+    initPopup(popup, delitem, "", "");
+
+    QSqlDatabase *db = QSqlDatabase::database();
+
+    QButton *jobButton;
+
+    if (JobQueue::IsJobRunning(db, JOB_TRANSCODE, curitem->chanid,
+                                                  curitem->startts))
+        jobButton = popup->addButton(tr("Stop Transcoding"), this,
+                         SLOT(doBeginTranscoding()));
+    else
+        jobButton = popup->addButton(tr("Begin Transcoding"), this,
+                         SLOT(doBeginTranscoding()));
+
+    if (curitem->IsCommProcessing(db))
+        popup->addButton(tr("Stop Commercial Flagging"), this,
+                         SLOT(doBeginFlagging()));
+    else
+        popup->addButton(tr("Begin Commercial Flagging"), this,
+                         SLOT(doBeginFlagging()));
+
+    popup->ShowPopup(this, SLOT(doCancel()));
+    jobButton->setFocus();
+    
+    expectingPopup = true;
+}
+
 void PlaybackBox::showActionPopup(ProgramInfo *program)
 {
     backup.begin(this);
@@ -1660,38 +1789,30 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
     initPopup(popup, program, "", "");
 
     QSqlDatabase *db = QSqlDatabase::database();
+    QButton *playButton;
 
-    QButton *playButton = popup->addButton(tr("Play"), this, SLOT(doPlay()));
-
+    if (curitem->programflags & FL_BOOKMARK)
+        playButton = popup->addButton(tr("Play from..."), this, SLOT(showPlayFromPopup()));
+    else
+        playButton = popup->addButton(tr("Play"), this, SLOT(doPlay()));
 
     if (RemoteGetRecordingStatus(program, overrectime, underrectime) > 0)
         popup->addButton(tr("Stop Recording"), this, SLOT(askStop()));
+    
+    // Remove this check and the auto expire buttons if a third button is added to the StoragePopup screen
+    // Otherwise for non-max-episode schedules, the popup will only show one button
+    if (delitem && delitem->UsesMaxEpisodes(db))
+    {
+        popup->addButton(tr("Storage Options"), this, SLOT(showStoragePopup()));
+    } else {
+        if (delitem && delitem->GetAutoExpireFromRecorded(db))
+            popup->addButton(tr("Don't Auto Expire"), this, SLOT(noAutoExpire()));
+        else
+            popup->addButton(tr("Auto Expire"), this, SLOT(doAutoExpire()));
+    }
 
-    if (delitem && delitem->GetAutoExpireFromRecorded(db))
-        popup->addButton(tr("Don't Auto Expire"), this, SLOT(noAutoExpire()));
-    else
-        popup->addButton(tr("Auto Expire"), this, SLOT(doAutoExpire()));
-
-    popup->addButton(tr("Change Recording Group"), this,
-                     SLOT(showRecGroupChanger()));
-
-    popup->addButton(tr("Edit Recording Schedule"), this,
-                     SLOT(doEditScheduled()));
-
-    if (JobQueue::IsJobRunning(db, JOB_TRANSCODE, curitem->chanid,
-                                                  curitem->startts))
-        popup->addButton(tr("Stop Transcoding"), this,
-                         SLOT(doBeginTranscoding()));
-    else
-        popup->addButton(tr("Begin Transcoding"), this,
-                         SLOT(doBeginTranscoding()));
-
-    if (curitem->IsCommProcessing(db))
-        popup->addButton(tr("Stop Commercial Flagging"), this,
-                         SLOT(doBeginFlagging()));
-    else
-        popup->addButton(tr("Begin Commercial Flagging"), this,
-                         SLOT(doBeginFlagging()));
+    popup->addButton(tr("Recording Options"), this, SLOT(showRecordingPopup()));
+    popup->addButton(tr("Job Options"), this, SLOT(showJobPopup()));
 
     popup->addButton(tr("Delete"), this, SLOT(askDelete()));
 
@@ -1760,6 +1881,34 @@ void PlaybackBox::doPlay(void)
     cancelPopup();
 
     play(delitem);
+}
+
+void PlaybackBox::doPlayFromBeg(void)
+{
+    delitem->setIgnoreBookmark(true);
+    doPlay();
+}
+
+void PlaybackBox::doPreserveEpisode(void)
+{
+    if (!expectingPopup)
+        return;
+
+    cancelPopup();
+
+    QSqlDatabase *db = QSqlDatabase::database();
+    delitem->SetPreserveEpisode(true, db);
+}
+
+void PlaybackBox::noPreserveEpisode(void)
+{
+    if (!expectingPopup)
+        return;
+
+    cancelPopup();
+
+    QSqlDatabase *db = QSqlDatabase::database();
+    delitem->SetPreserveEpisode(false, db);
 }
 
 void PlaybackBox::askStop(void)

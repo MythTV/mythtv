@@ -39,6 +39,9 @@ Channel::~Channel(void)
 
 bool Channel::Open(void)
 {
+#if FAKE_VIDEO
+    return true;
+#endif
     if (isopen)
         return true;
 
@@ -483,7 +486,16 @@ bool Channel::CheckSignal(int msecTotal, int reqSignal, int input)
     int msecSleep = 500, maxSignal = 0, i = 0;
 
     msecTotal = max(msecSleep, msecTotal);
-
+/*
+    assert(input>=0);
+    assert(videofd>0);
+    if (input<0)
+        input=0;
+    if (videofd<=0) {
+        VERBOSE(VB_IMPORTANT, "CheckSignal called with invalid videofd");
+        return false;
+    }
+*/
     if (input < 0)
         input = 0;
 
