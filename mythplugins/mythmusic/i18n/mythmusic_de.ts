@@ -401,7 +401,7 @@
     </message>
     <message>
         <source>Random</source>
-        <translation>Zufall</translation>
+        <translation>Random</translation>
     </message>
     <message>
         <source>Intelligent</source>
