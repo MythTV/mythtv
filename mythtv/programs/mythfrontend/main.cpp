@@ -5,14 +5,15 @@
 
 #include "guidegrid.h"
 #include "tv.h"
-#include "settings.h"
-#include "themedmenu.h"
 #include "scheduler.h"
 #include "infostructs.h"
-#include "programinfo.h"
 #include "playbackbox.h"
 #include "deletebox.h"
 #include "viewscheduled.h"
+
+#include "libmyth/settings.h"
+#include "libmyth/themedmenu.h"
+#include "libmyth/programinfo.h"
 
 char installprefix[] = "/usr/local";
 

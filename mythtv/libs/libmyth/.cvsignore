@@ -1,0 +1,5 @@
+.qmake.internal.cache
+Makefile
+libmyth.so.*
+moc_dialogbox.cpp
+moc_themedmenu.cpp

@@ -7,10 +7,11 @@
 #include "NuppelVideoRecorder.h"
 #include "NuppelVideoPlayer.h"
 #include "RingBuffer.h"
-#include "settings.h"
 
 #include "channel.h"
-#include "programinfo.h"
+
+#include "libmyth/settings.h"
+#include "libmyth/programinfo.h"
 
 typedef enum 
 {

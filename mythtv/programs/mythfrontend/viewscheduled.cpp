@@ -14,8 +14,9 @@
 #include "tv.h"
 #include "programlistitem.h"
 #include "scheduler.h"
-#include "dialogbox.h"
-#include "settings.h"
+
+#include "libmyth/dialogbox.h"
+#include "libmyth/settings.h"
     
 extern Settings *globalsettings; 
 

@@ -18,13 +18,14 @@
 
 #include "deletebox.h"
 #include "infostructs.h"
-#include "programinfo.h"
 #include "tv.h"
-#include "dialogbox.h"
 #include "programlistitem.h"
-#include "settings.h"
 #include "NuppelVideoPlayer.h"
 #include "yuv2rgb.h"
+
+#include "libmyth/programinfo.h"
+#include "libmyth/settings.h"
+#include "libmyth/dialogbox.h"
 
 extern Settings *globalsettings;
 extern char installprefix[];

@@ -1,7 +1,7 @@
 #include <qapplication.h>
 
-#include "dialogbox.h"
-#include "settings.h"
+#include "libmyth/dialogbox.h"
+#include "libmyth/settings.h"
 
 Settings *globalsettings;
 char installprefix[] = "/usr/local";

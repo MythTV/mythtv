@@ -14,12 +14,13 @@
 
 #include "playbackbox.h"
 #include "infostructs.h"
-#include "programinfo.h"
 #include "tv.h"
 #include "programlistitem.h"
-#include "settings.h"
 #include "NuppelVideoPlayer.h"
 #include "yuv2rgb.h"
+
+#include "libmyth/settings.h"
+#include "libmyth/programinfo.h"
 
 extern Settings *globalsettings;
 extern char installprefix[];

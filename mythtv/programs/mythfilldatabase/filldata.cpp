@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "settings.h"
+#include "libmyth/settings.h"
 
 Settings *globalsettings;
 char installprefix[] = "/usr/local";

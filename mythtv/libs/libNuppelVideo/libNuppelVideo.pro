@@ -8,6 +8,8 @@ CONFIG += thread staticlib
 
 include ( ../settings.pro )
 
+INCLUDEPATH += ../
+
 themes.path = /usr/local/share/mythtv/themes/
 themes.files = defaultosd
 
@@ -27,7 +29,6 @@ HEADERS += effects.h \
            osd.h \
            RingBuffer.h \
            RTjpegN.h \
-           settings.h \
            ttfont.h \
            XJ.h \
            yuv2rgb.h
@@ -40,7 +41,6 @@ SOURCES += effects.cpp \
            osd.cpp \
            RingBuffer.cpp \
            RTjpegN.cpp \
-           settings.cpp \
            ttfont.cpp \
            XJ.cpp \
            yuv2rgb.cpp

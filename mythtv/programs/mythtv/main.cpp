@@ -4,8 +4,16 @@
 #include <unistd.h>
 #include "tv.h"
 
+Settings *globalsettings;
+char installprefix[] = "/usr/local";
+
 int main(int argc, char *argv[])
 {
+    globalsettings = new Settings;
+
+    globalsettings->LoadSettingsFiles("theme.txt", installprefix);
+    globalsettings->LoadSettingsFiles("mysql.txt", installprefix);
+		
     QApplication a(argc, argv);
 
     QString startChannel = "3";

@@ -3,8 +3,8 @@
 #include <stdlib.h>
 
 #include "guidegrid.h"
-#include "settings.h"
-#include "themedmenu.h"
+#include "libmyth/settings.h"
+#include "libmyth/themedmenu.h"
 
 Settings *globalsettings;
 char installprefix[] = "/usr/local";

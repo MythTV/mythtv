@@ -8,7 +8,7 @@ CONFIG += thread staticlib
 
 include ( ../settings.pro )
 
-INCLUDEPATH += ../libNuppelVideo
+INCLUDEPATH += ../libNuppelVideo ../
 TARGETDEPS = ../libNuppelVideo/libNuppelVideo.a 
 
 installfiles.path = /usr/local/share/mythtv
@@ -18,7 +18,7 @@ installfiles.files += settings.txt
 INSTALLS = installfiles
  
 # Input
-HEADERS += channel.h frequencies.h programinfo.h tv.h ../libNuppelVideo/osd.h
+HEADERS += channel.h frequencies.h tv.h ../libNuppelVideo/osd.h
 HEADERS += ../libNuppelVideo/NuppelVideoPlayer.h 
 HEADERS += ../libNuppelVideo/NuppelVideoRecorder.h
-SOURCES += channel.cpp frequencies.c programinfo.cpp tv.cpp
+SOURCES += channel.cpp frequencies.c tv.cpp

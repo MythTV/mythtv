@@ -12,23 +12,25 @@ include ( ../settings.pro )
 
 setting.path = /usr/local/share/mythtv/
 setting.files += theme.txt mysql.txt mainmenu.xml tvmenu.xml
+setting.extra = ldconfig
 
 INSTALLS += setting
 
-INCLUDEPATH += ../mythepg ../mythdialog ../libNuppelVideo ../libmythtv
+INCLUDEPATH += ../mythepg ../mythdialog ../libNuppelVideo ../libmythtv ../
 LIBS += -L../libmythtv -L../libNuppelVideo -L../libavcodec
 LIBS += -lmythtv -lNuppelVideo -lXv -lttf -lmp3lame -lavcodec
+LIBS += -L../libmyth -L/usr/local/lib -lmyth
 
 TARGETDEPS  = ../libNuppelVideo/libNuppelVideo.a ../libmythtv/libmythtv.a
 TARGETDEPS += ../libavcodec/libavcodec.a
 
 # Input
 HEADERS += ../mythepg/guidegrid.h ../mythepg/infodialog.h 
-HEADERS += ../mythepg/infostructs.h ../mythdialog/dialogbox.h 
+HEADERS += ../mythepg/infostructs.h 
 HEADERS += scheduler.h playbackbox.h deletebox.h programlistitem.h 
-HEADERS += viewscheduled.h themedmenu.h
+HEADERS += viewscheduled.h
 
 SOURCES += ../mythepg/guidegrid.cpp ../mythepg/infodialog.cpp 
-SOURCES += ../mythepg/infostructs.cpp ../mythdialog/dialogbox.cpp main.cpp 
+SOURCES += ../mythepg/infostructs.cpp main.cpp 
 SOURCES += scheduler.cpp playbackbox.cpp deletebox.cpp 
-SOURCES += programlistitem.cpp viewscheduled.cpp themedmenu.cpp
+SOURCES += programlistitem.cpp viewscheduled.cpp

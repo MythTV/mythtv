@@ -13,7 +13,7 @@
 #include "yuv2rgb.h"
 #include "ttfont.h"
 #include "osd.h"
-#include "settings.h"
+#include "libmyth/settings.h"
 
 class OSDImage
 {

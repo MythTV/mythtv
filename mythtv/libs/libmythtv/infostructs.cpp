@@ -6,7 +6,7 @@
 #include <qapplication.h>
 
 #include "infostructs.h"
-#include "settings.h"
+#include "libmyth/settings.h"
 
 extern Settings *globalsettings;
 

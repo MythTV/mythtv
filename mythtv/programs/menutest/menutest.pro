@@ -13,10 +13,8 @@ themes.files = blue liquid
 
 INSTALLS += themes
 
-INCLUDEPATH += ../mythfrontend ../libNuppelVideo
+INCLUDEPATH += ../libmyth
+LIBS += -lmyth -L/usr/local/lib -L../libmyth
 
 # Input
-HEADERS += ../mythfrontend/themedmenu.h ../libNuppelVideo/settings.h
-
-SOURCES += main.cpp ../mythfrontend/themedmenu.cpp 
-SOURCES += ../libNuppelVideo/settings.cpp
+SOURCES += main.cpp

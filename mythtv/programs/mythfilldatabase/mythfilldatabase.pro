@@ -11,8 +11,8 @@ INSTALLS = target
 
 include ( ../settings.pro )
 
-INCLUDEPATH += ../libNuppelVideo
+INCLUDEPATH += ../
+LIBS += -lmyth -L/usr/local/lib -L../libmyth
 
 # Input
-HEADERS += ../libNuppelVideo/settings.h
-SOURCES += filldata.cpp ../libNuppelVideo/settings.cpp
+SOURCES += filldata.cpp
