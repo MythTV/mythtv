@@ -364,7 +364,11 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                     visEnable();
             }
             else if (action == "SELECT")
+            {
                 music_tree_list->select();
+                if (visualizer_status > 0 && cycle_visualizer)
+                    CycleVisualizer();
+            }
             else if (action == "REFRESH") 
             {
                 music_tree_list->syncCurrentWithActive();
