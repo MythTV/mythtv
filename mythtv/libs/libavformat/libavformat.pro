@@ -52,5 +52,5 @@ inc.files = avformat.h avio.h
 
 INSTALLS += inc
 
-LIBS += -L ../libavcodec -lmythavcodec-$$LIBVERSION
+LIBS += -L../libavcodec -lmythavcodec-$$LIBVERSION
 
