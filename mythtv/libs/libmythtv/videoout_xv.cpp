@@ -92,6 +92,8 @@ char *XJ_init(int width, int height, char *window_name, char *icon_name)
   XJ_width=width;
   XJ_height=height;
 
+  XInitThreads();
+
   XJ_disp=XOpenDisplay(NULL);
   if(!XJ_disp) {printf("open display failed\n"); return NULL;}
   

@@ -30,11 +30,16 @@ class NuppelVideoPlayer
     void SetFileName(char *lfilename) { filename = lfilename; }
 
     void StartPlaying(void);
-
+    void StopPlaying(void) { killplayer = true; }
+    
     bool IsPlaying(void) { return playing; }
 
     void SetRingBuffer(RingBuffer *rbuf) { ringBuffer = rbuf; }
 
+    bool TogglePause(void) { return (paused = !paused); }
+    void FastForward(float seconds);
+    void Rewind(float seconds);
+    
  private:
     void InitSound(void);
     void WriteAudio(unsigned char *aubuf, int size);
@@ -95,6 +100,7 @@ class NuppelVideoPlayer
 
     RingBuffer *ringBuffer;
     bool weMadeBuffer;
+    bool killplayer;
 };
 
 #endif

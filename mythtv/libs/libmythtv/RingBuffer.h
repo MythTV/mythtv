@@ -20,6 +20,12 @@ class RingBuffer
 
     long long Seek(long pos, int whence);
 
+    long long GetReadPosition(void) { return readpos; }
+    long long GetTotalReadPosition(void) { return totalreadpos; }
+    long long GetWritePosition(void) { return writepos; }
+    long long GetTotalWritePosition(void) { return totalwritepos; }
+    long long GetFileSize(void) { return filesize; }
+    
  private:
     string filename;
     

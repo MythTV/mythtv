@@ -577,7 +577,6 @@ void NuppelVideoPlayer::StartPlaying(void)
     unsigned char *prebuf[MAXPREBUFFERS];
     
     int videosize; 
-    int key;
     
     now.tv_sec = 0;
 
@@ -593,11 +592,15 @@ void NuppelVideoPlayer::StartPlaying(void)
     videobuf3 = new unsigned char[videosize];
 
     playing = true;
+    killplayer = false;
    
-    while (!eof && playing)
+    while (!eof && !killplayer)
     {
         if (paused)
-            goto endofloop;
+	{
+            usleep(50);
+            continue;
+	}
 
         videobuf = GetFrame(&timecode, audiofd <= 0, &audiodata, &audiodatalen);
         if (eof)
@@ -671,25 +674,16 @@ void NuppelVideoPlayer::StartPlaying(void)
 
         tf++;
         fnum++;
-
-endofloop:
-        key = XJ_CheckEvents();
-
-        if (key > 0)
-        {
-            /*if (key == 'p' || key == 'P')
-                PauseVideo();
-            else if (key == wsRight)
-                FFVideo();
-            else if (key == wsLeft)
-                RewVideo();*/
-            if (key == wsEscape)
-                eof = 1;
-        }
     }
 
     playing = false;
     XJ_exit();
 }
 
+void NuppelVideoPlayer::FastForward(float seconds)
+{
+}
 
+void NuppelVideoPlayer::Rewind(float seconds)
+{
+}

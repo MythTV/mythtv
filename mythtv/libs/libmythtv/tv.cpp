@@ -7,6 +7,7 @@
 #include "NuppelVideoRecorder.h"
 #include "NuppelVideoPlayer.h"
 #include "RingBuffer.h"
+#include "XJ.h"
 
 void *SpawnEncode(void *param)
 {
@@ -26,11 +27,22 @@ void *SpawnDecode(void *param)
     return NULL;
 }
 
+#define PAUSEBUFFER (1024 * 1024 * 50)
+long long CalcMaxPausePosition(RingBuffer *rbuffer)
+{
+    long long readpos = rbuffer->GetTotalReadPosition();
+    long long maxwrite = readpos - PAUSEBUFFER + rbuffer->GetFileSize();
+
+    printf("calced: %lld %lld\n", readpos, maxwrite);
+    return maxwrite;
+}
+
 int main(int argc, char *argv[])
 {
   pthread_t encode, decode;
-
-  RingBuffer *rbuffer = new RingBuffer("ringbuf.nuv", 1024 * 1024 * 10);
+  
+  RingBuffer *rbuffer = new RingBuffer("/mnt/store/ringbuf.nuv", 
+		                       1024 * 1024 * 1024 * 5);
   
   NuppelVideoRecorder *nvr = new NuppelVideoRecorder();
   nvr->SetRingBuffer(rbuffer);
@@ -53,9 +65,50 @@ int main(int argc, char *argv[])
   while (!nvp->IsPlaying())
       usleep(50);
 
+  int keypressed;
+  bool paused = false;
+  long long readpos, writepos, maxwritepos = 0;
+
+  cout << endl;
+
   while (nvp->IsPlaying())
+  {
       usleep(50);
-  
+      if ((keypressed = XJ_CheckEvents()))
+      {
+           switch (keypressed) {
+	       case 'p':
+               case 'P': { 
+                             paused = nvp->TogglePause(); 
+			     if (paused)
+                                 maxwritepos = CalcMaxPausePosition(rbuffer);
+                         } break;
+               case wsRight: nvp->FastForward(5); break;
+               case wsLeft: nvp->Rewind(5); break;
+               case wsEscape: nvp->StopPlaying(); break;
+               default: break;
+           }
+      }
+      if (paused)
+      {
+          writepos = rbuffer->GetTotalWritePosition();
+          if (writepos > maxwritepos)
+          {
+              fprintf(stderr, "\r%f left -- Forced unpause.", (float)(maxwritepos - writepos) / 1024 / 1024);
+              paused = nvp->TogglePause();
+          }
+          else 
+              fprintf(stderr, "\rPaused: %f MB (%f%%) left", (float)(maxwritepos - writepos) / 1024 / 1024, (float)(maxwritepos - writepos) / (float)(rbuffer->GetFileSize() - PAUSEBUFFER) * 100);
+      }
+      else
+      {
+          readpos = rbuffer->GetTotalReadPosition();
+          writepos = rbuffer->GetTotalWritePosition();
+
+          fprintf(stderr, "\rPlaying: %f MB behind realtime", (float)(writepos - readpos) / 1024 / 1024);
+      }
+  }
+      
   nvr->StopRecording();
   
   pthread_join(encode, NULL);
