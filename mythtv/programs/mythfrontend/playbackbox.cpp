@@ -382,6 +382,7 @@ void PlaybackBox::paintEvent(QPaintEvent *e)
 
 void PlaybackBox::grayOut(QPainter *tmp)
 {
+/*
     int transparentFlag = gContext->GetNumSetting("PlayBoxShading", 0);
     if (transparentFlag == 0)
         tmp->fillRect(QRect(QPoint(0, 0), size()), 
@@ -389,6 +390,7 @@ void PlaybackBox::grayOut(QPainter *tmp)
     else if (transparentFlag == 1)
         tmp->drawPixmap(0, 0, *bgTransBackup, 0, 0, (int)(800*wmult), 
                         (int)(600*hmult));
+*/
 }
 
 void PlaybackBox::updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix)
@@ -1571,7 +1573,7 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
                              popupForeground, popupBackground,
                              popupHighlight, "action popup");
 
-    initPopup(popup, program, "", tr("Select action:"));
+    initPopup(popup, program, "", "");
 
     QSqlDatabase *db = QSqlDatabase::database();
 
@@ -1615,7 +1617,6 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
                          SLOT(doBeginFlagging()));
 
     popup->addButton(tr("Delete"), this, SLOT(askDelete()));
-    popup->addButton(tr("Cancel"), this, SLOT(doCancel()));
 
     popup->ShowPopup(this, SLOT(doCancel()));
 
