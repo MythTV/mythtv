@@ -176,12 +176,18 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     grid->setColStretch(1, 1);
     grid->setRowStretch(4, 1);
 
-    QPixmap temp((int)(160 * wmult), (int)(120 * hmult));
+    if (globalsettings->GetNumSetting("GeneratePreviewPixmap") == 1 ||
+        globalsettings->GetNumSetting("PlaybackPreview") == 1)
+    {
+        QPixmap temp((int)(160 * wmult), (int)(120 * hmult));
     
-    pixlabel = new QLabel(this);
-    pixlabel->setPixmap(temp);
+        pixlabel = new QLabel(this);
+        pixlabel->setPixmap(temp);
     
-    hbox->addWidget(pixlabel); 
+        hbox->addWidget(pixlabel); 
+    }
+    else
+        pixlabel = NULL;
 
     freespace = new QLabel(" ", this);
     vbox->addWidget(freespace);
@@ -273,8 +279,9 @@ void DeleteBox::changed(QListViewItem *lvitem)
         return;
 
     ProgramInfo *rec = pgitem->getProgramInfo();
-   
-    startPlayer(rec);
+  
+    if (globalsettings->GetNumSetting("PlaybackPreview") == 1) 
+        startPlayer(rec);
 
     QDateTime startts = rec->startts;
     QDateTime endts = rec->endts;
@@ -307,7 +314,7 @@ void DeleteBox::changed(QListViewItem *lvitem)
 
     QPixmap *pix = pgitem->getPixmap();      
                                              
-    if (pix)                                 
+    if (pixlabel && pix)                                 
         pixlabel->setPixmap(*pix);
 
     timer->start(1000 / 30);
@@ -382,7 +389,7 @@ void DeleteBox::selected(QListViewItem *lvitem)
         delete lvitem;
         UpdateProgressBar();
     }    
-    else
+    else if (globalsettings->GetNumSetting("PlaybackPreview") == 1)
         startPlayer(rec);
 
     setActiveWindow();

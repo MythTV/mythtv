@@ -70,6 +70,9 @@ ProgramListItem::ProgramListItem(QListView *parent, ProgramInfo *lpginfo,
 
 QPixmap *ProgramListItem::getPixmap(void)
 {
+    if (globalsettings->GetNumSetting("GeneratePreviewPixmaps") != 1)
+        return NULL;
+
     if (pixmap)
         return pixmap;
 

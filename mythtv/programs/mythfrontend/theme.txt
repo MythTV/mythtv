@@ -13,3 +13,10 @@ int ThemeQt=0
 # Do we display the program title at the bottom of the EPG or not?
 # (default to no)
 #int EPGShowTitle=1
+
+# Generate static thumbnail pixmaps for recordings?  Takes extra time to start
+# the playback/delete dialogs if turned on.
+int GeneratePreviewPixmaps=0
+
+# Play the video back in a little preview window in the playback/delete boxes?
+int PlaybackPreview=1

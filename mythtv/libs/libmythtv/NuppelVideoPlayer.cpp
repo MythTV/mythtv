@@ -550,7 +550,6 @@ unsigned char *NuppelVideoPlayer::DecodeFrame(struct rtframeheader *frameheader,
 
         if (!gotpicture)
         {
-            cout << "nopicture\n";
             return NULL;
         }
 
