@@ -15,7 +15,7 @@ installfiles.files = mythgallery-settings.txt
 
 INSTALLS += installfiles
 
-LIBS += -L/usr/local/lib -lmyth-$$LIBVERSION -lXinerama
+LIBS += -L$${PREFIX}/lib -lmyth-$$LIBVERSION -lXinerama
 
 # Input
 HEADERS += embdata.h iconview.h singleview.h
