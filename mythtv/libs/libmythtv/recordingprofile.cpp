@@ -99,6 +99,7 @@ void RecordingProfile::loadByName(QSqlDatabase* db, QString name) {
 }
 
 void RecordingProfileEditor::load(QSqlDatabase* db) {
+    clearSelections();
     addSelection("(Create new profile)", "0");
     QSqlQuery query = db->exec("SELECT id, name FROM recordingprofiles");
     if (query.isActive() && query.numRowsAffected() > 0)
@@ -107,10 +108,8 @@ void RecordingProfileEditor::load(QSqlDatabase* db) {
 }
 
 int RecordingProfileEditor::exec(QSqlDatabase* db) {
-    if (ConfigurationDialog::exec(db) == QDialog::Accepted) {
+    while (ConfigurationDialog::exec(db) == QDialog::Accepted)
         open(getValue().toInt());
-        return QDialog::Accepted;
-    }
 
     return QDialog::Rejected;
 }
