@@ -1819,8 +1819,13 @@ UITextType::UITextType(const QString &name, fontProp *font,
                        QRect altdisplayrect)
            : UIType(name)
 {
+
     m_name = name;
-    m_message = text;
+    if(text.length())
+        m_message = text;
+    else
+        m_message = " ";    
+    
     m_default_msg = text;
     m_font = font;
     m_displaysize = displayrect;

@@ -434,7 +434,9 @@ class UIImageType : public UIType
     QPixmap GetImage() { return img; }
     int GetSize() { return m_force_x; }
     virtual void Draw(QPainter *, int, int);
-
+    
+    const QString& GetImageFilename() const { return m_filename; }
+    
   public slots:
   
     //
