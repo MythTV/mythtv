@@ -200,8 +200,8 @@ TV::TV(void)
     embedid = 0;
     times_pressed = 0;
     last_channel = "";
-    picAdjustment = 0;
-    recAdjustment = 0;
+    picAdjustment = kPictureAttribute_None;
+    recAdjustment = kPictureAttribute_None;
     doSmartForward = false;
 
     getRecorderPlaybackInfo = false;
@@ -1352,7 +1352,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         return;
     }
 
-    if (picAdjustment)
+    if (picAdjustment != kPictureAttribute_None)
     {
         for (unsigned int i = 0; i < actions.size(); i++)
         {
@@ -1411,7 +1411,12 @@ void TV::ProcessKeypress(QKeyEvent *e)
         else if (action == "TOGGLEPICCONTROLS")
         {
             if (usePicControls)
+            {
+                picAdjustment += 1;
+                if (picAdjustment >= kPictureAttribute_MAX)
+                    picAdjustment = kPictureAttribute_MIN;
                 DoTogglePictureAttribute();
+            }
         }
         else if (action == "SEEKFFWD")
         {
@@ -3261,10 +3266,10 @@ void TV::HandleOSDClosed(int osdType)
     switch (osdType)
     {
         case kOSDFunctionalType_RecPictureAdjust:
-            recAdjustment = 0;
+            recAdjustment = kPictureAttribute_None;
             break;
         case kOSDFunctionalType_PictureAdjust:
-            picAdjustment = 0;
+            picAdjustment = kPictureAttribute_None;
             break;
         case kOSDFunctionalType_SmartForward:
             doSmartForward = false;
@@ -3280,8 +3285,6 @@ void TV::DoTogglePictureAttribute(void)
     int value = 0;
     oset = osd->GetSet("status");
 
-    picAdjustment = (picAdjustment % 5) + 1;
-
     if (osd)
     {
         char *title = "Adjust Picture";
@@ -3289,27 +3292,27 @@ void TV::DoTogglePictureAttribute(void)
 
         switch (picAdjustment)
         {
-            case 1:
+            case kPictureAttribute_Brightness:
                 value = nvp->getVideoOutput()->GetCurrentBrightness();
-                picName = QString(tr("Brightness %1 %")).arg(value);
+                picName = QString("%1 %2 %").arg(tr("Brightness")).arg(value);
                 break;
-            case 2:
+            case kPictureAttribute_Contrast:
                 value = nvp->getVideoOutput()->GetCurrentContrast();
-                picName = QString(tr("Contrast %1 %")).arg(value);
+                picName = QString("%1 %2 %").arg(tr("Contrast")).arg(value);
                 break;
-            case 3:
+            case kPictureAttribute_Colour:
                 value = nvp->getVideoOutput()->GetCurrentColour();
-                picName = QString(tr("Colour %1 %")).arg(value);
+                picName = QString("%1 %2 %").arg(tr("Colour")).arg(value);
                 break;
-            case 4:
+            case kPictureAttribute_Hue:
                 value = nvp->getVideoOutput()->GetCurrentHue();
-                picName = QString(tr("Hue %1 %")).arg(value);
+                picName = QString("%1 %2 %").arg(tr("Hue")).arg(value);
                 break;
-            case 5:
+            case kPictureAttribute_Volume:
                 value = (volumeControl) ? (volumeControl->GetCurrentVolume()) 
                         : 99; 
                 title = "Adjust Volume";
-                picName = QString(tr("Volume %1 %")).arg(value);
+                picName = QString("%1 %2 %").arg(tr("Volume")).arg(value);
                 break;
         }
         osd->StartPause(value*10, true, tr(title), picName, 5, 
@@ -3333,25 +3336,29 @@ void TV::DoToggleRecPictureAttribute(void)
       
         switch (recAdjustment)
         {
-            case 1:
+            case kPictureAttribute_Brightness:
                 activerecorder->ChangeBrightness(true);
                 value = activerecorder->ChangeBrightness(false);
-                recName = QString(tr("Brightness (REC) %1 %")).arg(value);
+                recName = QString("%1 %2 %3 %").arg(tr("Brightness"))
+                                  .arg(tr("(REC)")).arg(value);
                 break;
-            case 2:
+            case kPictureAttribute_Contrast:
                 activerecorder->ChangeContrast(true);
                 value = activerecorder->ChangeContrast(false);
-                recName = QString(tr("Contrast (REC) %1 %")).arg(value);
+                recName = QString("%1 %2 %3 %").arg(tr("Contrast"))
+                                  .arg(tr("(REC)")).arg(value);
                 break;
-            case 3:
+            case kPictureAttribute_Colour:
                 activerecorder->ChangeColour(true);
                 value = activerecorder->ChangeColour(false);
-                recName = QString(tr("Colour (REC) %1 %")).arg(value);
+                recName = QString("%1 %2 %3 %").arg(tr("Colour"))
+                                  .arg(tr("(REC)")).arg(value);
                 break;
-            case 4:
+            case kPictureAttribute_Hue:
                 activerecorder->ChangeHue(true);
                 value = activerecorder->ChangeHue(false);
-                recName = QString(tr("Hue (REC) %1 %")).arg(value);
+                recName = QString("%1 %2 %3 %").arg(tr("Hue"))
+                                  .arg(tr("(REC)")).arg(value);
                 break;
         }
         osd->StartPause(value * 10, true, tr(title), recName, 5,
@@ -3364,19 +3371,19 @@ void TV::DoChangePictureAttribute(int control, bool up, bool rec)
 {
     switch (control)
     {
-        case 1:
+        case kPictureAttribute_Brightness:
             ChangeBrightness(up, rec);
             break;
-        case 2:
+        case kPictureAttribute_Contrast:
             ChangeContrast(up, rec);
             break;
-        case 3:
+        case kPictureAttribute_Colour:
             ChangeColour(up, rec);
             break;
-        case 4:
+        case kPictureAttribute_Hue:
             ChangeHue(up, rec);
             break;
-        case 5:
+        case kPictureAttribute_Volume:
             ChangeVolume(up);
             break;
     }
@@ -3436,6 +3443,11 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         DoToggleCC(action.right(1).toInt() + 4);
     else if (action == "TOGGLEMANUALZOOM")
         SetManualZoom(true);
+    else if (action.left(17) == "TOGGLEPICCONTROLS")
+    {
+        picAdjustment = action.right(1).toInt();
+        DoTogglePictureAttribute();
+    }
     else if (action.left(12) == "TOGGLEASPECT")
     {
         ToggleLetterbox(action.right(1).toInt());
@@ -3598,6 +3610,27 @@ void TV::BuildOSDTreeMenu(void)
                                  QString("%1").arg(kLetterbox_16_9_Zoom));
     subitem = new OSDGenericTree(item, tr("16:9 Stretch"), "TOGGLEASPECT" +
                                  QString("%1").arg(kLetterbox_16_9_Stretch));
+
+    if (usePicControls)
+    {
+        item = new OSDGenericTree(treeMenu, tr("Adjust Picture"));
+        subitem = new OSDGenericTree(item, tr("Brightness"),
+                                     "TOGGLEPICCONTROLS" +
+                                     QString("%1")
+                                           .arg(kPictureAttribute_Brightness));
+        subitem = new OSDGenericTree(item, tr("Contrast"),
+                                     "TOGGLEPICCONTROLS" +
+                                     QString("%1")
+                                           .arg(kPictureAttribute_Contrast));
+        subitem = new OSDGenericTree(item, tr("Colour"),
+                                     "TOGGLEPICCONTROLS" +
+                                         QString("%1")
+                                           .arg(kPictureAttribute_Colour));
+        subitem = new OSDGenericTree(item, tr("Hue"),
+                                     "TOGGLEPICCONTROLS" +
+                                         QString("%1")
+                                           .arg(kPictureAttribute_Hue));
+    }
 
     item = new OSDGenericTree(treeMenu, tr("Manual Zoom Mode"), 
                              "TOGGLEMANUALZOOM");

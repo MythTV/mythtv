@@ -35,10 +35,14 @@ enum VideoOutputType
 
 enum PictureAttribute
 {
-    kPictureAttribute_Brightness = 0,
+    kPictureAttribute_None = 0,
+    kPictureAttribute_MIN = 1,
+    kPictureAttribute_Brightness = 1,
     kPictureAttribute_Contrast,
     kPictureAttribute_Colour,
-    kPictureAttribute_Hue
+    kPictureAttribute_Hue,
+    kPictureAttribute_Volume,
+    kPictureAttribute_MAX
 };
 
 enum PIPLocations
