@@ -41,21 +41,22 @@ class ProgramInfo
     // checks chanid, start/end times, sourceid
     bool IsSameProgramTimeslot(const ProgramInfo& other) const;
 
-    void Save(void);
+    void Save(QSqlDatabase *db);
 
-    ScheduledRecording::RecordingType GetProgramRecordingStatus(QSqlDatabase *db);
-    int GetChannelRank(QString chanid, QSqlDatabase *db);
-    int GetRecordingTypeRank(ScheduledRecording::RecordingType type);
+    RecordingType GetProgramRecordingStatus(QSqlDatabase *db);
+    int GetChannelRank(QSqlDatabase *db, const QString &chanid);
+    int GetRecordingTypeRank(RecordingType type);
 
-    void ApplyRecordStateChange(QSqlDatabase *db,
-                                ScheduledRecording::RecordingType newstate);
+    void ApplyRecordStateChange(QSqlDatabase *db, RecordingType newstate);
     void ApplyRecordTimeChange(QSqlDatabase *db, 
                                const QDateTime &newstartts,
                                const QDateTime &newendts);
     void ApplyRecordRankChange(QSqlDatabase *db,
                                const QString &newrank);
     void ToggleRecord(QSqlDatabase *dB);
-    ScheduledRecording* GetScheduledRecording(QSqlDatabase *db) {
+
+    ScheduledRecording* GetScheduledRecording(QSqlDatabase *db) 
+    {
         GetProgramRecordingStatus(db);
         return record;
     };
@@ -109,16 +110,22 @@ class ProgramInfo
 
     void DeleteHistory(QSqlDatabase *db);
 
-    static void GetProgramRangeDateTime(QPtrList<ProgramInfo> *proglist, 
-                                        QString channel, 
+    static void GetProgramRangeDateTime(QSqlDatabase *db,
+                                        QPtrList<ProgramInfo> *proglist, 
+                                        const QString &channel, 
                                         const QString &ltime, 
                                         const QString &rtime);
-    static ProgramInfo *GetProgramAtDateTime(QString channel, 
+    static ProgramInfo *GetProgramAtDateTime(QSqlDatabase *db, 
+                                             const QString &channel, 
                                              const QString &time);
-    static ProgramInfo *GetProgramAtDateTime(QString channel, QDateTime &dtime);
-    static ProgramInfo *GetProgramFromRecorded(QString channel, 
-                                               QString starttime);
-    static ProgramInfo *GetProgramFromRecorded(QString channel, 
+    static ProgramInfo *GetProgramAtDateTime(QSqlDatabase *db,
+                                             const QString &channel, 
+                                             QDateTime &dtime);
+    static ProgramInfo *GetProgramFromRecorded(QSqlDatabase *db,
+                                               const QString &channel, 
+                                               const QString &starttime);
+    static ProgramInfo *GetProgramFromRecorded(QSqlDatabase *db,
+                                               const QString &channel, 
                                                QDateTime &dtime);
 
     QString title;

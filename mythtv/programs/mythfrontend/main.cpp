@@ -396,6 +396,7 @@ int main(int argc, char **argv)
 
     MythMainWindow *mainWindow = new MythMainWindow();
     mainWindow->Show();
+    mainWindow->Init();
     gContext->SetMainWindow(mainWindow);
 
     lcd_host = gContext->GetSetting("LCDHost");

@@ -435,14 +435,14 @@ void ProgFinder::getInfo()
     if (inSearch == 2)
     {
         showInfo = 1;
-        ProgramInfo *curPick = ProgramInfo::GetProgramAtDateTime(curChannel,
+        ProgramInfo *curPick = ProgramInfo::GetProgramAtDateTime(m_db,
+                                                                 curChannel,
                                                             curDateTime + "50");
 
         if (curPick)
         {
             if ((gContext->GetNumSetting("AdvancedRecord", 0)) ||
-                (curPick->GetProgramRecordingStatus(m_db)
-                    > ScheduledRecording::AllRecord))
+                (curPick->GetProgramRecordingStatus(m_db) > kAllRecord))
             {
                 ScheduledRecording record;
                 record.loadByProgram(m_db, curPick);
@@ -471,22 +471,22 @@ void ProgFinder::getInfo()
 
             switch (rectype)
             {
-                case ScheduledRecording::SingleRecord:
+                case kSingleRecord:
                     data = tr("Recording just this showing");
                     break;
-                case ScheduledRecording::TimeslotRecord:
+                case kTimeslotRecord:
                     data = tr("Recording every day when shown in this timeslot");
                     break;
-                case ScheduledRecording::WeekslotRecord:
+                case kWeekslotRecord:
                     data = tr("Recording every week when shown in this timeslot");
                     break;
-                case ScheduledRecording::ChannelRecord:
+                case kChannelRecord:
                     data = tr("Recording when shown on this channel");
                     break;
-                case ScheduledRecording::AllRecord:
+                case kAllRecord:
                     data = tr("Recording all showings");
                     break;
-                case ScheduledRecording::NotRecording:
+                case kNotRecording:
                     data = tr("Not recording this showing");
                     break;
                 default:
@@ -1135,7 +1135,7 @@ int ProgFinder::checkRecordingStatus(int showNum)
             if (showData[showNum].subtitle == curRecordings[j].subtitle &&
                 showData[showNum].description == curRecordings[j].description)
             {
-                if (curRecordings[j].type == ScheduledRecording::SingleRecord)
+                if (curRecordings[j].type == kSingleRecord)
                 {
                     if (showData[showNum].startdatetime == 
                         curRecordings[j].startdatetime)        
@@ -1144,7 +1144,7 @@ int ProgFinder::checkRecordingStatus(int showNum)
                     }
                 }
             }
-            if (curRecordings[j].type == ScheduledRecording::TimeslotRecord)
+            if (curRecordings[j].type == kTimeslotRecord)
             {
                 if ((showData[showNum].startdatetime).time() == 
                      (curRecordings[j].startdatetime).time()
@@ -1153,7 +1153,7 @@ int ProgFinder::checkRecordingStatus(int showNum)
                     return curRecordings[j].type;
                 }
             }
-            if (curRecordings[j].type == ScheduledRecording::WeekslotRecord)
+            if (curRecordings[j].type == kWeekslotRecord)
             {
                 if ((showData[showNum].startdatetime).time() == 
                      (curRecordings[j].startdatetime).time()
@@ -1164,14 +1164,14 @@ int ProgFinder::checkRecordingStatus(int showNum)
                     return curRecordings[j].type;
                 }
             }
-            if (curRecordings[j].type == ScheduledRecording::ChannelRecord)
+            if (curRecordings[j].type == kChannelRecord)
             {
                 if (showData[showNum].channelID == curRecordings[j].chanid)
                 {
                     return curRecordings[j].type;
                 }
             }
-            if (curRecordings[j].type == ScheduledRecording::AllRecord)
+            if (curRecordings[j].type == kAllRecord)
             {
                 return curRecordings[j].type;
             }
@@ -1314,22 +1314,22 @@ void ProgFinder::selectShowData(QString progTitle)
                 showData[showCount].description = "";
             switch (rectype)
             {
-                case ScheduledRecording::SingleRecord:
+                case kSingleRecord:
                     data = tr("Recording just this showing");
                     break;
-                case ScheduledRecording::TimeslotRecord:
+                case kTimeslotRecord:
                     data = tr("Recording every day when shown in this timeslot");
                     break;
-                case ScheduledRecording::WeekslotRecord:
+                case kWeekslotRecord:
                     data = tr("Recording every week when shown in this timeslot");
                     break;
-                case ScheduledRecording::ChannelRecord:
+                case kChannelRecord:
                     data = tr("Recording when shown on this channel");
                     break;
-                case ScheduledRecording::AllRecord:
+                case kAllRecord:
                     data = tr("Recording all showings");
                     break;
-                case ScheduledRecording::NotRecording:
+                case kNotRecording:
                     data = tr("Not recording this showing");
                     break;
                 default:

@@ -415,7 +415,7 @@ void Scheduler::PruneList(void)
 
         ProgramInfo *first = (*i);
 
-        if (first->GetProgramRecordingStatus(db) > ScheduledRecording::SingleRecord &&
+        if (first->GetProgramRecordingStatus(db) > kSingleRecord &&
             (first->subtitle.length() > 2 && first->description.length() > 2))
         {
             if (first->duplicate)
@@ -515,10 +515,10 @@ void Scheduler::CheckRank(ProgramInfo *info,
 {
     int rank, srank, resolved = 0;
     QString chanid;
-    ScheduledRecording::RecordingType rectype;
+    RecordingType rectype;
 
     if (!channelRankMap.contains(info->chanid))
-        channelRankMap[info->chanid] = info->GetChannelRank(info->chanid, db);
+        channelRankMap[info->chanid] = info->GetChannelRank(db, info->chanid);
 
     rectype = info->GetProgramRecordingStatus(db);
     if (!recTypeRankMap.contains(rectype))
@@ -540,8 +540,8 @@ void Scheduler::CheckRank(ProgramInfo *info,
         ProgramInfo *second = (*i);
 
         if (!channelRankMap.contains(second->chanid))
-            channelRankMap[second->chanid] =
-                second->GetChannelRank(second->chanid, db);
+            channelRankMap[second->chanid] = second->GetChannelRank(db, 
+                                                               second->chanid);
 
         rectype = second->GetProgramRecordingStatus(db);
         if (!recTypeRankMap.contains(rectype))
@@ -789,14 +789,14 @@ void Scheduler::RemoveConflicts(void)
 ProgramInfo *Scheduler::GetBest(ProgramInfo *info, 
                                 list<ProgramInfo *> *conflictList)
 {
-    ScheduledRecording::RecordingType type = info->GetProgramRecordingStatus(db);
+    RecordingType type = info->GetProgramRecordingStatus(db);
     ProgramInfo *best = info;
 
     list<ProgramInfo *>::iterator i;
     for (i = conflictList->begin(); i != conflictList->end(); i++)
     {
         ProgramInfo *test = (*i);
-        ScheduledRecording::RecordingType testtype = test->GetProgramRecordingStatus(db);
+        RecordingType testtype = test->GetProgramRecordingStatus(db);
         if (testtype < type)
         {
             best = test;
@@ -1169,11 +1169,12 @@ void Scheduler::RunScheduler(void)
                 break;
 
             if (recording && nexttv->GetState() == kState_WatchingLiveTV &&
-                secsleft <= 30 && secsleft > 0)
+                secsleft <= 32 && secsleft > 0)
             {
                 QString id = nextRecording->schedulerid; 
                 if (askedList.contains(id) && askedList[id] == false)
                 {
+                    usleep(3000000); //livetv needs time to start
                     nexttv->AllowRecording(nextRecording, secsleft);
                     askedList[id] = true;
                     responseList[id] = false;

@@ -578,7 +578,7 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
                 m_currentEndTime.time().minute());
         QString endtime = temp;
 
-        ProgramInfo::GetProgramRangeDateTime(proglist, chanid, starttime, 
+        ProgramInfo::GetProgramRangeDateTime(m_db, proglist, chanid, starttime, 
                                              endtime);
 
         QDateTime ts = m_currentStartTime;
@@ -703,28 +703,28 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
             if (type)
             {
                 recFlag = 0;
-                ScheduledRecording::RecordingType recordtype;
+                RecordingType recordtype;
                 recordtype = proginfo->GetProgramRecordingStatus(m_db);
-                if (recordtype > ScheduledRecording::NotRecording)
+                if (recordtype > kNotRecording)
                 {
                     switch (recordtype) 
                     {
-                        case ScheduledRecording::SingleRecord:
+                        case kSingleRecord:
                             recFlag = 1;
                             break;
-                        case ScheduledRecording::TimeslotRecord:
+                        case kTimeslotRecord:
                             recFlag = 2;
                             break;
-                        case ScheduledRecording::ChannelRecord:
+                        case kChannelRecord:
                             recFlag = 3;
                             break;
-                        case ScheduledRecording::AllRecord:
+                        case kAllRecord:
                             recFlag = 4;
                             break;
-                        case ScheduledRecording::WeekslotRecord:
+                        case kWeekslotRecord:
                             recFlag = 5;
                             break;
-                        case ScheduledRecording::NotRecording:
+                        case kNotRecording:
                             break;
                     }
                 }
@@ -974,26 +974,26 @@ void GuideGrid::paintInfo(QPainter *p)
     QPainter tmp(&pix);
     QString recStatus = "";
 
-    ScheduledRecording::RecordingType recordtype;
+    RecordingType recordtype;
     recordtype = pginfo->GetProgramRecordingStatus(m_db);
     switch (recordtype) 
     {
-        case ScheduledRecording::SingleRecord:
+        case kSingleRecord:
             recStatus = tr("Recording Once");
             break;
-        case ScheduledRecording::TimeslotRecord:
+        case kTimeslotRecord:
             recStatus = tr("Timeslot Recording");
             break;
-        case ScheduledRecording::WeekslotRecord:
+        case kWeekslotRecord:
             recStatus = tr("Weekly Recording");
             break;
-        case ScheduledRecording::ChannelRecord:
+        case kChannelRecord:
             recStatus = tr("Channel Recording");
             break;
-        case ScheduledRecording::AllRecord:
+        case kAllRecord:
             recStatus = tr("All Recording");
             break;
-        case ScheduledRecording::NotRecording:
+        case kNotRecording:
             recStatus = tr("Not Recording");
             break;
     }
@@ -1471,8 +1471,7 @@ void GuideGrid::displayInfo()
     if (pginfo)
     {
         if ((gContext->GetNumSetting("AdvancedRecord", 0)) ||
-            (pginfo->GetProgramRecordingStatus(m_db)
-                > ScheduledRecording::AllRecord))
+            (pginfo->GetProgramRecordingStatus(m_db) > kAllRecord))
         {
             ScheduledRecording record;
             record.loadByProgram(m_db, pginfo);

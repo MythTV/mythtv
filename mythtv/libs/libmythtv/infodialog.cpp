@@ -21,16 +21,16 @@ using namespace std;
 class RecListItem : public QListViewItem
 {
   public:
-    RecListItem(QListView *parent, QString text, ScheduledRecording::RecordingType type)
+    RecListItem(QListView *parent, QString text, RecordingType type)
                : QListViewItem(parent, text)
              { m_type = type; }
 
    ~RecListItem() { }
 
-    ScheduledRecording::RecordingType GetType(void) { return m_type; }
+    RecordingType GetType(void) { return m_type; }
  
   private:
-    ScheduledRecording::RecordingType m_type;
+    RecordingType m_type;
 };
 
 InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent, 
@@ -54,11 +54,11 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent,
 
     recordstatus = pginfo->GetProgramRecordingStatus(QSqlDatabase::database());
 
-    if (recordstatus == ScheduledRecording::TimeslotRecord && programtype == 0)
+    if (recordstatus == kTimeslotRecord && programtype == 0)
     {
         cerr << "error, somehow set to record timeslot and it doesn't seem to "
                 "have one\n";
-        recordstatus = ScheduledRecording::SingleRecord;
+        recordstatus = kSingleRecord;
     }
 
     RecListItem *selectItem = NULL;
@@ -80,49 +80,47 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent,
             SLOT(advancedEdit(QListViewItem *)));
 
     RecListItem *item = new RecListItem(lview, tr("Record this program whenever"
-                                        " it's shown anywhere"), 
-                                        ScheduledRecording::AllRecord);
-    if (recordstatus == ScheduledRecording::AllRecord)
+                                        " it's shown anywhere"), kAllRecord);
+    if (recordstatus == kAllRecord)
         selectItem = item;
 
     item = new RecListItem(lview, tr("Record this program whenever it's shown "
-                           "on this channel"), 
-                           ScheduledRecording::ChannelRecord);
-    if (recordstatus == ScheduledRecording::ChannelRecord)
+                           "on this channel"), kChannelRecord);
+    if (recordstatus == kChannelRecord)
         selectItem = item;
 
     programtype = pginfo->IsProgramRecurring();
 
     QString msg = "Shouldn't show up.";
-    ScheduledRecording::RecordingType rt = ScheduledRecording::NotRecording;
+    RecordingType rt = kNotRecording;
     if (programtype == 2 ||
         programtype == -1 ||
-        recordstatus == ScheduledRecording::WeekslotRecord)
+        recordstatus == kWeekslotRecord)
     {
         msg = tr("Record this program in this timeslot every week");
-        rt = ScheduledRecording::TimeslotRecord;
+        rt = kTimeslotRecord;
     }
     else if (programtype == 1)
     {
         msg = tr("Record this program in this timeslot every day");
-        rt = ScheduledRecording::TimeslotRecord;
+        rt = kTimeslotRecord;
     }
 
     if (programtype != 0)
     {
         item = new RecListItem(lview, msg, rt);
-        if ((recordstatus == ScheduledRecording::TimeslotRecord) ||
-            (recordstatus == ScheduledRecording::WeekslotRecord))
+        if ((recordstatus == kTimeslotRecord) ||
+            (recordstatus == kWeekslotRecord))
             selectItem = item;
     }
 
     item = new RecListItem(lview, tr("Record only this showing of the program"),
-                           ScheduledRecording::SingleRecord);
-    if (recordstatus == ScheduledRecording::SingleRecord)
+                           kSingleRecord);
+    if (recordstatus == kSingleRecord)
         selectItem = item;
 
     item = new RecListItem(lview, tr("Don't record this program"), 
-                           ScheduledRecording::NotRecording);
+                           kNotRecording);
     if (selectItem == NULL)
         selectItem = item;
 
@@ -155,7 +153,7 @@ QLabel *InfoDialog::getDateLabel(ProgramInfo *pginfo)
 
 void InfoDialog::selected(QListViewItem *selitem)
 {
-    ScheduledRecording::RecordingType currentSelected = ScheduledRecording::NotRecording;
+    RecordingType currentSelected = kNotRecording;
 
     QListViewItem *item = lview->firstChild();
 

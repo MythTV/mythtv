@@ -493,9 +493,9 @@ void ManualSchedule::saveScheduledRecording(void)
            << " to "
 	   << progInfo.endts.toString("hh:mm") << endl;
       
-      progInfo.Save();
+      progInfo.Save(db);
       
-      progInfo.ApplyRecordStateChange(db, ScheduledRecording::SingleRecord);
+      progInfo.ApplyRecordStateChange(db, kSingleRecord);
     }
 }
 

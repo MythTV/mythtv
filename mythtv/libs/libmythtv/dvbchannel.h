@@ -28,11 +28,12 @@ class DVBChannel : public ChannelBase
     virtual void SetFreqTable(const QString &name);
 
     // Empty functions that we don't need
-    virtual void SetFormat(const QString &format) {}
+    virtual void SetFormat(const QString &format) { (void)format; }
     virtual void ToggleInputs() {}
-    virtual void SwitchToInput(const QString &input) {}
+    virtual void SwitchToInput(const QString &input) { (void)input; }
     virtual void SwitchToInput(const QString &input, const QString &chan);
-    virtual void SwitchToInput(int newcapchannel, bool setstarting) {}
+    virtual void SwitchToInput(int newcapchannel, bool setstarting) 
+                                 { (void)newcapchannel; (void)setstarting; }
 
     enum DVB_Type {DVB_S, DVB_T, DVB_C};
 

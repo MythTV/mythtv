@@ -187,7 +187,7 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
     QString dtFmt = gContext->GetSetting("ShortDateFormat");
     QString length;
     int hours, minutes, seconds;
-    ScheduledRecording::RecordingType recordtype;
+    RecordingType recordtype;
 
     progMap["title"] = title;
     progMap["subtitle"] = subtitle;
@@ -214,30 +214,30 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
     progMap["rec_str"] = "";
     progMap["rec_type"] = "";
     switch (recordtype) {
-    case ScheduledRecording::NotRecording:
-             progMap["rec_str"] = QObject::tr("Not Recording");
-             progMap["rec_type"] = "";
-             break;
-    case ScheduledRecording::SingleRecord:
-             progMap["rec_str"] = QObject::tr("Recording Once");
-             progMap["rec_type"] = "R";
-             break;
-    case ScheduledRecording::TimeslotRecord:
-             progMap["rec_str"] = QObject::tr("Timeslot Recording");
-             progMap["rec_type"] = "T";
-             break;
-    case ScheduledRecording::WeekslotRecord:
-             progMap["rec_str"] = QObject::tr("Weekslot Recording");
-             progMap["rec_type"] = "W";
-             break;
-    case ScheduledRecording::ChannelRecord:
-             progMap["rec_str"] = QObject::tr("Channel Recording");
-             progMap["rec_type"] = "C";
-             break;
-    case ScheduledRecording::AllRecord:
-             progMap["rec_str"] = QObject::tr("All Recording");
-             progMap["rec_type"] = "A";
-             break;
+        case kNotRecording:
+            progMap["rec_str"] = QObject::tr("Not Recording");
+            progMap["rec_type"] = "";
+            break;
+        case kSingleRecord:
+            progMap["rec_str"] = QObject::tr("Recording Once");
+            progMap["rec_type"] = "R";
+            break;
+        case kTimeslotRecord:
+            progMap["rec_str"] = QObject::tr("Timeslot Recording");
+            progMap["rec_type"] = "T";
+            break;
+        case kWeekslotRecord:
+            progMap["rec_str"] = QObject::tr("Weekslot Recording");
+            progMap["rec_type"] = "W";
+            break;
+        case kChannelRecord:
+            progMap["rec_str"] = QObject::tr("Channel Recording");
+            progMap["rec_type"] = "C";
+            break;
+        case kAllRecord:
+            progMap["rec_str"] = QObject::tr("All Recording");
+            progMap["rec_type"] = "A";
+            break;
     }
     progMap["rank"] = rank;
 
@@ -256,10 +256,12 @@ int ProgramInfo::CalculateLength(void)
     return startts.secsTo(endts);
 }
 
-void ProgramInfo::GetProgramRangeDateTime(QPtrList<ProgramInfo> *proglist, QString channel, 
-                                          const QString &ltime, const QString &rtime)
+void ProgramInfo::GetProgramRangeDateTime(QSqlDatabase *db,
+                                          QPtrList<ProgramInfo> *proglist, 
+                                          const QString &channel, 
+                                          const QString &ltime,
+                                          const QString &rtime)
 {
-    QSqlQuery query;
     QString thequery;
 
     thequery = QString("SELECT channel.chanid,starttime,endtime,title,subtitle,"
@@ -270,7 +272,7 @@ void ProgramInfo::GetProgramRangeDateTime(QPtrList<ProgramInfo> *proglist, QStri
                        "ORDER BY starttime;")
                        .arg(channel).arg(ltime).arg(rtime);
     // allowed to use default connection
-    query.exec(thequery);
+    QSqlQuery query = db->exec(thequery);
 
     if (query.isActive() && query.numRowsAffected() > 0)
     {
@@ -306,9 +308,10 @@ void ProgramInfo::GetProgramRangeDateTime(QPtrList<ProgramInfo> *proglist, QStri
     }
 }    
 
-ProgramInfo *ProgramInfo::GetProgramAtDateTime(QString channel, const QString &ltime)
-{
-    QSqlQuery query;
+ProgramInfo *ProgramInfo::GetProgramAtDateTime(QSqlDatabase *db,
+                                               const QString &channel, 
+                                               const QString &ltime)
+{ 
     QString thequery;
    
     thequery = QString("SELECT channel.chanid,starttime,endtime,title,subtitle,"
@@ -318,7 +321,7 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(QString channel, const QString &l
                        "endtime > %3 AND program.chanid = channel.chanid;")
                        .arg(channel).arg(ltime).arg(ltime);
 
-    query.exec(thequery);
+    QSqlQuery query = db->exec(thequery);
 
     if (query.isActive() && query.numRowsAffected() > 0)
     {
@@ -354,28 +357,30 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(QString channel, const QString &l
     return NULL;
 }
 
-ProgramInfo *ProgramInfo::GetProgramAtDateTime(QString channel, 
+ProgramInfo *ProgramInfo::GetProgramAtDateTime(QSqlDatabase *db,
+                                               const QString &channel, 
                                                QDateTime &dtime)
 {
     QString sqltime = dtime.toString("yyyyMMddhhmm");
     sqltime += "50"; 
 
-    return GetProgramAtDateTime(channel, sqltime);
+    return GetProgramAtDateTime(db, channel, sqltime);
 }
 
-ProgramInfo *ProgramInfo::GetProgramFromRecorded(QString channel, 
+ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
+                                                 const QString &channel, 
                                                  QDateTime &dtime)
 {
     QString sqltime = dtime.toString("yyyyMMddhhmm");
     sqltime += "00"; 
 
-    return GetProgramFromRecorded(channel, sqltime);
+    return GetProgramFromRecorded(db, channel, sqltime);
 }
 
-ProgramInfo *ProgramInfo::GetProgramFromRecorded(QString channel, 
-                                                 QString starttime)
+ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
+                                                 const QString &channel, 
+                                                 const QString &starttime)
 {
-    QSqlQuery query;
     QString thequery;
    
     thequery = QString("SELECT recorded.chanid,starttime,endtime,title,subtitle,"
@@ -385,7 +390,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QString channel,
                        "recorded.chanid = channel.chanid;")
                        .arg(channel).arg(starttime);
 
-    query.exec(thequery);
+    QSqlQuery query = db->exec(thequery);
 
     if (query.isActive() && query.numRowsAffected() > 0)
     {
@@ -424,6 +429,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QString channel,
 // -1 for no data, 0 for no, 1 for weekdaily, 2 for weekly.
 int ProgramInfo::IsProgramRecurring(void)
 {
+    QSqlDatabase *db = QSqlDatabase::database();
     QDateTime dtime = startts;
 
     int weekday = dtime.date().dayOfWeek();
@@ -436,7 +442,7 @@ int ProgramInfo::IsProgramRecurring(void)
 
         QDateTime checktime = dtime.addDays(daysadd);
 
-        ProgramInfo *nextday = GetProgramAtDateTime(chanid, checktime);
+        ProgramInfo *nextday = GetProgramAtDateTime(db, chanid, checktime);
 
         if (NULL == nextday)
             return -1;
@@ -451,7 +457,7 @@ int ProgramInfo::IsProgramRecurring(void)
     }
 
     QDateTime checktime = dtime.addDays(7);
-    ProgramInfo *nextweek = GetProgramAtDateTime(chanid, checktime);
+    ProgramInfo *nextweek = GetProgramAtDateTime(db, chanid, checktime);
 
     if (NULL == nextweek)
         return -1;
@@ -467,9 +473,10 @@ int ProgramInfo::IsProgramRecurring(void)
     return 0;
 }
 
-ScheduledRecording::RecordingType ProgramInfo::GetProgramRecordingStatus(QSqlDatabase *db)
+RecordingType ProgramInfo::GetProgramRecordingStatus(QSqlDatabase *db)
 {
-    if (record == NULL) {
+    if (record == NULL) 
+    {
         record = new ScheduledRecording();
         record->loadByProgram(db, this);
     }
@@ -477,7 +484,7 @@ ScheduledRecording::RecordingType ProgramInfo::GetProgramRecordingStatus(QSqlDat
     return record->getRecordingType();
 }
 
-int ProgramInfo::GetChannelRank(QString chanid, QSqlDatabase *db)
+int ProgramInfo::GetChannelRank(QSqlDatabase *db, const QString &chanid)
 {
     QString thequery;
 
@@ -491,22 +498,23 @@ int ProgramInfo::GetChannelRank(QString chanid, QSqlDatabase *db)
         query.next();
         return query.value(0).toInt();
     }
+
     return 0;
 }
 
-int ProgramInfo::GetRecordingTypeRank(ScheduledRecording::RecordingType type)
+int ProgramInfo::GetRecordingTypeRank(RecordingType type)
 {
-    switch(type)
+    switch (type)
     {
-        case ScheduledRecording::SingleRecord:
+        case kSingleRecord:
             return gContext->GetNumSetting("SingleRecordRank", 0);
-        case ScheduledRecording::TimeslotRecord:
+        case kTimeslotRecord:
             return gContext->GetNumSetting("TimeslotRecordRank", 0);
-        case ScheduledRecording::WeekslotRecord:
+        case kWeekslotRecord:
             return gContext->GetNumSetting("WeekslotRecordRank", 0);
-        case ScheduledRecording::ChannelRecord:
+        case kChannelRecord:
             return gContext->GetNumSetting("ChannelRecordRank", 0);
-        case ScheduledRecording::AllRecord:
+        case kAllRecord:
             return gContext->GetNumSetting("AllRecordRank", 0);
         default:
             return 0;
@@ -515,7 +523,7 @@ int ProgramInfo::GetRecordingTypeRank(ScheduledRecording::RecordingType type)
 
 // newstate uses same values as return of GetProgramRecordingState
 void ProgramInfo::ApplyRecordStateChange(QSqlDatabase *db, 
-                                         ScheduledRecording::RecordingType newstate)
+                                         RecordingType newstate)
 {
     GetProgramRecordingStatus(db);
     record->setRecordingType(newstate);
@@ -527,7 +535,8 @@ void ProgramInfo::ApplyRecordTimeChange(QSqlDatabase *db,
                                         const QDateTime &newendts)
 {
     GetProgramRecordingStatus(db);
-    if (record->getRecordingType() != ScheduledRecording::NotRecording) {
+    if (record->getRecordingType() != kNotRecording) 
+    {
         record->setStart(newstartts);
         record->setEnd(newendts);
     }
@@ -543,28 +552,29 @@ void ProgramInfo::ApplyRecordRankChange(QSqlDatabase *db,
 
 void ProgramInfo::ToggleRecord(QSqlDatabase *db)
 {
-    ScheduledRecording::RecordingType curType = GetProgramRecordingStatus(db);
+    RecordingType curType = GetProgramRecordingStatus(db);
 
-    switch (curType) {
-    case ScheduledRecording::NotRecording:
-             ApplyRecordStateChange(db, ScheduledRecording::SingleRecord);
-             break;
-    case ScheduledRecording::SingleRecord:
-             ApplyRecordStateChange(db, ScheduledRecording::TimeslotRecord);
-             break;
-    case ScheduledRecording::TimeslotRecord:
-             ApplyRecordStateChange(db, ScheduledRecording::WeekslotRecord);
-             break;
-    case ScheduledRecording::WeekslotRecord:
-             ApplyRecordStateChange(db, ScheduledRecording::ChannelRecord);
-             break;
-    case ScheduledRecording::ChannelRecord:
-             ApplyRecordStateChange(db, ScheduledRecording::AllRecord);
-             break;
-    case ScheduledRecording::AllRecord:
-    default:
-             ApplyRecordStateChange(db, ScheduledRecording::NotRecording);
-             break;
+    switch (curType) 
+    {
+        case kNotRecording:
+            ApplyRecordStateChange(db, kSingleRecord);
+            break;
+        case kSingleRecord:
+            ApplyRecordStateChange(db, kTimeslotRecord);
+            break;
+        case kTimeslotRecord:
+            ApplyRecordStateChange(db, kWeekslotRecord);
+            break;
+        case kWeekslotRecord:
+            ApplyRecordStateChange(db, kChannelRecord);
+            break;
+        case kChannelRecord:
+            ApplyRecordStateChange(db, kAllRecord);
+            break;
+        case kAllRecord:
+        default:
+            ApplyRecordStateChange(db, kNotRecording);
+            break;
     }
 }
 
@@ -673,7 +683,8 @@ void ProgramInfo::StartedRecording(QSqlDatabase *db)
 
 }
 
-void ProgramInfo::FinishedRecording(QSqlDatabase* db) {
+void ProgramInfo::FinishedRecording(QSqlDatabase* db) 
+{
     GetProgramRecordingStatus(db);
     record->doneRecording(db, *this);
 }
@@ -892,20 +903,21 @@ void ProgramInfo::SetCutList(QMap<long long, int> &delMap, QSqlDatabase *db)
 }
 
 void ProgramInfo::SetBlankFrameList(QMap<long long, int> &frames,
-        QSqlDatabase *db, long long min_frame, long long max_frame)
+                                    QSqlDatabase *db, long long min_frame, 
+                                    long long max_frame)
 {
     ClearMarkupMap(db, MARK_BLANK_FRAME, min_frame, max_frame);
     SetMarkupMap(frames, db, MARK_BLANK_FRAME, min_frame, max_frame);
 }
 
 void ProgramInfo::GetBlankFrameList(QMap<long long, int> &frames,
-        QSqlDatabase *db)
+                                    QSqlDatabase *db)
 {
     GetMarkupMap(frames, db, MARK_BLANK_FRAME);
 }
 
 void ProgramInfo::SetCommBreakList(QMap<long long, int> &frames,
-        QSqlDatabase *db)
+                                   QSqlDatabase *db)
 {
     ClearMarkupMap(db, MARK_COMM_START);
     ClearMarkupMap(db, MARK_COMM_END);
@@ -913,7 +925,7 @@ void ProgramInfo::SetCommBreakList(QMap<long long, int> &frames,
 }
 
 void ProgramInfo::GetCommBreakList(QMap<long long, int> &frames,
-        QSqlDatabase *db)
+                                   QSqlDatabase *db)
 {
     GetMarkupMap(frames, db, MARK_COMM_START);
     GetMarkupMap(frames, db, MARK_COMM_END, true);
@@ -957,7 +969,8 @@ void ProgramInfo::ClearMarkupMap(QSqlDatabase *db, int type,
 }
 
 void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
-                  int type, long long min_frame, long long max_frame)
+                               int type, long long min_frame, 
+                               long long max_frame)
 {
     QMap<long long, int>::Iterator i;
 
@@ -1013,7 +1026,7 @@ void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
 }
 
 void ProgramInfo::GetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
-                  int type, bool mergeIntoMap)
+                               int type, bool mergeIntoMap)
 {
     if (!mergeIntoMap)
         marks.clear();
@@ -1165,9 +1178,8 @@ void ProgramInfo::DeleteHistory(QSqlDatabase *db)
     record->forgetHistory(db, *this);
 }
 
-void ProgramInfo::Save(void)
+void ProgramInfo::Save(QSqlDatabase *db)
 {
-    QSqlQuery query;
     QString querystr;
     QString escaped_title;
     QString escaped_subtitle;
@@ -1200,7 +1212,7 @@ void ProgramInfo::Save(void)
                     "0",
                     "0");
 
-    query.exec(querystr.utf8().data());
+    QSqlQuery query = db->exec(querystr.utf8().data());
 }
 
 QGridLayout* ProgramInfo::DisplayWidget(ScheduledRecording* rec,
@@ -1236,19 +1248,19 @@ QGridLayout* ProgramInfo::DisplayWidget(ScheduledRecording* rec,
     if (rec)
     {
         switch (rec->getRecordingType()) {
-        case ScheduledRecording::SingleRecord:
+        case kSingleRecord:
             recDateText += startts.toString(dateFormat + " " + timeFormat);
             break;
-        case ScheduledRecording::WeekslotRecord:
+        case kWeekslotRecord:
             recDateText += startts.toString("dddd")+"s ";
-        case ScheduledRecording::TimeslotRecord:
+        case kTimeslotRecord:
             recDateText += QString("%1 - %2")
                 .arg(startts.toString(timeFormat))
                 .arg(endts.toString(timeFormat));
             break;
-        case ScheduledRecording::ChannelRecord:
-        case ScheduledRecording::AllRecord:
-        case ScheduledRecording::NotRecording:
+        case kChannelRecord:
+        case kAllRecord:
+        case kNotRecording:
             recDateText += "(any)";
             break;
         }

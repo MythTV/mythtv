@@ -315,9 +315,13 @@ void MainServer::customEvent(QCustomEvent *e)
         {
             QStringList tokens = QStringList::split(" ", me->Message());
             QDateTime startts = QDateTime::fromString(tokens[2], Qt::ISODate);
-            ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(tokens[1],
-                                                                     startts);
 
+            dblock.lock();
+            ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(
+                                                      QSqlDatabase::database(),
+                                                                     tokens[1],
+                                                                     startts);
+            dblock.unlock();
             DoHandleDeleteRecording(pinfo, NULL);
 
             return;
@@ -356,14 +360,16 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         bool wantevents = commands[3].toInt();
         VERBOSE("MainServer::HandleAnnounce Playback");
         cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") 
-             << " adding: " << commands[2] << " as a player " << wantevents << endl;
+             << " adding: " << commands[2] << " as a player " 
+             << wantevents << endl;
         PlaybackSock *pbs = new PlaybackSock(socket, commands[2], wantevents);
         playbackList.push_back(pbs);
     }
     else if (commands[1] == "SlaveBackend")
     {
         cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") 
-             << " adding: " << commands[2] << " as a slave backend server" << endl;
+             << " adding: " << commands[2] << " as a slave backend server" 
+             << endl;
         PlaybackSock *pbs = new PlaybackSock(socket, commands[2], false);
         pbs->setAsSlaveBackend();
         pbs->setIP(commands[3]);
@@ -403,6 +409,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
         if (enc->isLocal())
         {
+            dblock.lock();
+
             int dsp_status, soundcardcaps;
             QSqlQuery query;
             QString audiodevice, audiooutputdevice, querytext;
@@ -423,6 +431,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                 query.next();
                 audiooutputdevice = query.value(0).toString();
             }
+
+            dblock.unlock();
 
             if (audiodevice.right(4) == audiooutputdevice.right(4)) //they match
             {
@@ -483,13 +493,13 @@ void MainServer::HandleDone(QSocket *socket)
 
 void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 {
-    QSqlQuery query;
     QString thequery;
 
     QString ip = gContext->GetSetting("BackendServerIP");
     QString port = gContext->GetSetting("BackendServerPort");
 
     dblock.lock();
+    QSqlQuery query;
     MythContext::KickDatabase(QSqlDatabase::database());
 
     thequery = "SELECT recorded.chanid,starttime,endtime,title,subtitle,"
@@ -702,7 +712,6 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
 
 void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
 {
-
     if (ismaster && pginfo->hostname != gContext->GetHostName())
     {
         PlaybackSock *slave = getSlaveByHostname(pginfo->hostname);
@@ -745,7 +754,6 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
         }
     }
 
-    QSqlQuery query;
     QString thequery;
 
     QString startts = pginfo->startts.toString("yyyyMMddhhmm");
@@ -755,6 +763,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
 
     dblock.lock();
 
+    QSqlQuery query;
     MythContext::KickDatabase(QSqlDatabase::database());
 
     thequery = QString("DELETE FROM recorded WHERE chanid = %1 AND title "
@@ -1752,6 +1761,7 @@ QString MainServer::LocalFilePath(QUrl &url)
     if (lpath.section('/', -2, -2) == "channels")
     {
         // This must be an icon request. Check channel.icon to be safe.
+        dblock.lock();
 
         QString querytext;
         QSqlQuery query;
@@ -1771,6 +1781,8 @@ QString MainServer::LocalFilePath(QUrl &url)
         {
             MythContext::DBError("Icon path", query);
         }
+
+        dblock.unlock();
     }
     else
     {

@@ -85,9 +85,12 @@ class NuppelVideoRecorder : public RecorderBase
     void StreamAllocate(void);
     void WriteHeader(bool todumpfile = false);
     void WriteSeekTable(bool todumpfile);
+    void WriteKeyFrameAdjustTable(bool todumpfile,
+                                  QPtrList<struct kfatable_entry> *kfa_table);
     void UpdateSeekTable(int frame_num, bool update_db);
 
     bool SetupAVCodec(void);
+    void SetupRTjpeg(void);
     int AudioInit(bool skipdevice = false);
     void WriteVideo(Frame *frame, bool skipsync = false, bool forcekey = false);
     void WriteAudio(unsigned char *buf, int fnum, int timecode);

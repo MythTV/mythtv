@@ -295,8 +295,8 @@ int main(int argc, char **argv)
     QSqlDatabase *expdb = QSqlDatabase::database("EXPDB");
     expirer = new AutoExpire(true, ismaster, expdb);
 
-//    QSqlDatabase *trandb = QSqlDatabase::database("TRANSDB");
-//    trans = new Transcoder(&tvList, trandb);
+    //QSqlDatabase *trandb = QSqlDatabase::database("TRANSDB");
+    //trans = new Transcoder(&tvList, trandb);
 
     VERBOSE("Verbose mode activated.");
 

@@ -394,6 +394,21 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     return true;
 }
 
+void NuppelVideoRecorder::SetupRTjpeg(void)
+{
+    picture_format = PIX_FMT_YUV420P;
+
+    int setval;
+    rtjc = new RTjpeg();
+    setval = RTJ_YUV420;
+    rtjc->SetFormat(&setval);
+    setval = (int)(h * height_multiplier);
+    rtjc->SetSize(&w, &setval);
+    rtjc->SetQuality(&Q);
+    setval = 2;
+    rtjc->SetIntra(&setval, &M1, &M2);
+}
+
 void NuppelVideoRecorder::Initialize(void)
 {
     int videomegs;
@@ -638,19 +653,7 @@ void NuppelVideoRecorder::StartRecording(void)
         useavcodec = SetupAVCodec();
 
     if (!useavcodec)
-    {
-        picture_format = PIX_FMT_YUV420P;
-
-        int setval;
-        rtjc = new RTjpeg();
-        setval = RTJ_YUV420;
-        rtjc->SetFormat(&setval);
-        setval = (int)(h * height_multiplier);
-        rtjc->SetSize(&w, &setval);
-        rtjc->SetQuality(&Q);
-        setval = 2;
-        rtjc->SetIntra(&setval, &M1, &M2);
-    }
+        SetupRTjpeg();
 
     if (CreateNuppelFile() != 0)
     {
@@ -1506,6 +1509,51 @@ void NuppelVideoRecorder::WriteSeekTable(bool todumpfile)
         curRecording->SetPositionMap(positionMap, MARK_KEYFRAME, db_conn);
         pthread_mutex_unlock(db_lock);
     }
+}
+
+void NuppelVideoRecorder::WriteKeyFrameAdjustTable(bool todumpfile,
+                                     QPtrList<struct kfatable_entry> *kfa_table)
+{
+    int numentries = kfa_table->count();
+
+    struct rtframeheader frameheader;
+    memset(&frameheader, 0, sizeof(frameheader));
+    frameheader.frametype = 'K'; // KFA Table
+    frameheader.packetlength = sizeof(struct kfatable_entry) * numentries;
+
+    long long currentpos = ringBuffer->GetFileWritePosition();
+
+    if (todumpfile)
+        ringBuffer->WriteToDumpFile(&frameheader, sizeof(frameheader));
+    else
+        ringBuffer->Write(&frameheader, sizeof(frameheader));
+
+    char *kfa_buf = new char[frameheader.packetlength];
+    int offset = 0;
+
+    struct kfatable_entry *i = kfa_table->first();
+    for (; i ; i = kfa_table->next())
+    {
+        memcpy(kfa_buf + offset, (const void *)&(*i),
+               sizeof(struct kfatable_entry));
+        offset += sizeof(struct kfatable_entry);
+    }
+
+    if (todumpfile)
+        ringBuffer->WriteToDumpFile(kfa_buf, frameheader.packetlength);
+    else
+        ringBuffer->Write(kfa_buf, frameheader.packetlength);
+
+
+    ringBuffer->WriterSeek(extendeddataOffset +
+                           offsetof(struct extendeddata, keyframeadjust_offset),
+                           SEEK_SET);
+
+    if (todumpfile)
+        ringBuffer->WriteToDumpFile(&currentpos, sizeof(long long));
+    else
+        ringBuffer->Write(&currentpos, sizeof(long long));
+
 }
 
 void NuppelVideoRecorder::UpdateSeekTable(int frame_num, bool use_db)

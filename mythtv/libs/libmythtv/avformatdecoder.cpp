@@ -1,7 +1,7 @@
 #include <iostream>
-using namespace std;
-
 #include <assert.h>
+
+using namespace std;
 
 #include "avformatdecoder.h"
 #include "RingBuffer.h"

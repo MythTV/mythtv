@@ -7,20 +7,20 @@
 #include <list>
 using namespace std;
 
+enum RecordingType
+{
+    kNotRecording = 0,
+    kSingleRecord = 1,
+    kTimeslotRecord,
+    kChannelRecord,
+    kAllRecord,
+    kWeekslotRecord
+};
+
 class ProgramInfo;
 class QSqlDatabase;
 class ScheduledRecording: public ConfigurationGroup, public ConfigurationDialog {
 public:
-    enum RecordingType
-    {
-        NotRecording = 0,
-        SingleRecord = 1,
-        TimeslotRecord,
-        ChannelRecord,
-        AllRecord,
-        WeekslotRecord
-    };
-
     ScheduledRecording();
     //ScheduledRecording(const ScheduledRecording& other);
 

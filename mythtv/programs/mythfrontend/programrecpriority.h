@@ -22,7 +22,7 @@ class ProgramRankInfo : public ProgramInfo
 
     int channelRank;
     int recTypeRank;
-    ScheduledRecording::RecordingType recType;
+    RecordingType recType;
 };
 
 class RankPrograms : public MythDialog

@@ -31,6 +31,9 @@ NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
     hasFullPositionMap = false;
     positionMap = new QMap<long long, long long>;
 
+    hasKeyFrameAdjustMap = false;
+    keyFrameAdjustMap = new QMap<long long, int>;
+
     totalLength = 0;
     totalFrames = 0;
 
@@ -70,6 +73,7 @@ NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
     framesPlayed = 0;
 
     getrawframes = false;
+    getrawvideo = false;
 }
 
 NuppelDecoder::~NuppelDecoder()
@@ -82,6 +86,8 @@ NuppelDecoder::~NuppelDecoder()
         delete [] ffmpeg_extradata;
     if (positionMap)
         delete positionMap;
+    if (keyFrameAdjustMap)
+        delete keyFrameAdjustMap;
     if (buf)
         delete [] buf;
     if (buf2)
@@ -98,6 +104,19 @@ bool NuppelDecoder::CanHandle(char testbuf[2048])
         !strncmp(testbuf, "MythTVVideo", 11))
         return true;
     return false;
+}
+
+QString NuppelDecoder::GetEncodingType(void)
+{
+    QString value = "Unknown";
+    if (mpa_codec)
+    {
+        if (QString(mpa_codec->name) == "mpeg4")
+            value = "MPEG-4";
+    }
+    else
+        value = "RTjpeg";
+    return (value);
 }
 
 int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, 
@@ -264,6 +283,62 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             }
             else
                 cerr << "0 length seek table\n";
+        }
+
+        ringBuffer->Seek(currentpos, SEEK_SET);
+    }
+
+    if (usingextradata && extradata.keyframeadjust_offset > 0 &&
+        hasFullPositionMap && !disablevideo)
+    {
+        long long currentpos = ringBuffer->GetTotalReadPosition();
+        struct rtframeheader kfa_frameheader;
+
+        int kfa_ret = ringBuffer->Seek(extradata.keyframeadjust_offset, 
+                                       SEEK_SET);
+        if (kfa_ret == -1) {
+            perror("keyframeadjust");
+        }
+
+        ringBuffer->Read(&kfa_frameheader, FRAMEHEADERSIZE);
+
+        if (kfa_frameheader.frametype != 'K')
+        {
+            cerr << "Invalid key frame adjust table (frametype "
+                 << (int)kfa_frameheader.frametype << ")\n";
+        }
+        else
+        {
+            if (kfa_frameheader.packetlength > 0)
+            {
+                char *kfa_buf = new char[kfa_frameheader.packetlength];
+                ringBuffer->Read(kfa_buf, kfa_frameheader.packetlength);
+
+                int numentries = kfa_frameheader.packetlength /
+                                 sizeof(struct kfatable_entry);
+                struct kfatable_entry kfate;
+                int offset = 0;
+                int adjust = 0;
+
+                for (int z = 0; z < numentries; z++)
+                {
+                    memcpy(&kfate, kfa_buf + offset,
+                           sizeof(struct kfatable_entry));
+                    offset += sizeof(struct kfatable_entry);
+
+                    (*keyFrameAdjustMap)[kfate.keyframe_number] = kfate.adjust;
+                    adjust += kfate.adjust;
+                }
+                hasKeyFrameAdjustMap = true;
+
+                totalLength -= (int)(adjust / video_frame_rate);
+                totalFrames -= adjust;
+                m_parent->SetFileLength(totalLength, totalFrames);
+
+                delete [] kfa_buf;
+            }
+            else
+                cerr << "0 length key frame adjust table\n";
         }
 
         ringBuffer->Seek(currentpos, SEEK_SET);
@@ -681,14 +756,29 @@ void NuppelDecoder::StoreRawData(unsigned char *newstrm)
     StoredData.append(new RawDataList(frameheader, strmcpy));
 }
 
-void NuppelDecoder::WriteStoredData(RingBuffer *rb)
+void NuppelDecoder::UpdateFrameNumber(long framenum)
+{
+    for (RawDataList *data = StoredData.first(); data; data = StoredData.next())
+    {
+        if (data->frameheader.frametype == 'S' &&
+            data->frameheader.comptype == 'V')
+        {
+            data->frameheader.timecode = framenum;
+        }
+    }
+}
+
+void NuppelDecoder::WriteStoredData(RingBuffer *rb, bool storevid)
 {
     RawDataList *data;
     while(! StoredData.isEmpty()) {
         data = StoredData.first();
-        rb->Write(&(data->frameheader), FRAMEHEADERSIZE);
-        if(data->packet)
-            rb->Write(data->packet, data->frameheader.packetlength);
+        if (storevid || data->frameheader.frametype != 'V')
+        {
+            rb->Write(&(data->frameheader), FRAMEHEADERSIZE);
+            if (data->packet)
+                rb->Write(data->packet, data->frameheader.packetlength);
+        }
         StoredData.removeFirst();
         delete data;
     }
@@ -705,7 +795,7 @@ void NuppelDecoder::GetFrame(int onlyvideo)
         long long currentposition = ringBuffer->GetTotalReadPosition();
 
         if ((ringBuffer->Read(&frameheader, FRAMEHEADERSIZE) != FRAMEHEADERSIZE)
-            || (frameheader.frametype == 'Q'))
+            || (frameheader.frametype == 'Q') || (frameheader.frametype == 'K'))
         {
             m_parent->SetEof();
             return;
@@ -800,6 +890,8 @@ void NuppelDecoder::GetFrame(int onlyvideo)
 
             m_parent->ReleaseNextVideoFrame(true, frameheader.timecode);
             gotvideo = 1;
+            if (getrawframes && getrawvideo)
+                StoreRawData(strm);
             framesPlayed++;
 
             if (!setreadahead)
@@ -873,25 +965,75 @@ void NuppelDecoder::GetFrame(int onlyvideo)
     m_parent->SetFramesPlayed(framesPlayed);
 }
 
+int NuppelDecoder::GetKeyIndex(int keyFrame)
+{
+    if (hasKeyFrameAdjustMap)
+    {
+        int index = 0;
+        int curFrame = 0;
+        QMap <long long, int>::Iterator keyiter = NULL;
+        keyiter = (*keyFrameAdjustMap).begin();
+        while (curFrame < keyFrame)
+        {
+            curFrame += keyframedist;
+            index++;
+            if (keyiter.key() == curFrame)
+            {
+                 curFrame -= keyiter.data();
+                 if (keyiter != (*keyFrameAdjustMap).end())
+                     keyiter++;
+            }
+        }
+        return (index);
+    }
+    else
+       return (lastKey / keyframedist);
+}
+
 bool NuppelDecoder::DoRewind(long long desiredFrame)
 {
     long long storelastKey = lastKey;
-    while (lastKey > desiredFrame)
+    int keyIndex;
+
+    if (hasKeyFrameAdjustMap)
     {
-        lastKey -= keyframedist;
+        keyIndex = GetKeyIndex(lastKey);
+        QMap <long long, int>::Iterator keyiter = NULL;
+        keyiter = (*keyFrameAdjustMap).find(lastKey);
+        if (keyiter != (*keyFrameAdjustMap).end())
+            lastKey += keyiter.data();
+
+        while (lastKey > desiredFrame)
+        {
+            lastKey -= keyframedist;
+            keyIndex--;
+            keyiter = (*keyFrameAdjustMap).find(lastKey);
+            if (keyiter != (*keyFrameAdjustMap).end())
+                lastKey += keyiter.data();
+        }
     }
+    else
+    {
+        while (lastKey > desiredFrame)
+        {
+            lastKey -= keyframedist;
+        }
+        keyIndex = lastKey / keyframedist;
+    }
+
     if (lastKey < 1)
         lastKey = 1;
 
     int normalframes = desiredFrame - lastKey;
-    long long keyPos = (*positionMap)[lastKey / keyframedist];
+    long long keyPos = (*positionMap)[keyIndex];
     long long curPosition = ringBuffer->GetTotalReadPosition();
     long long diff = keyPos - curPosition;
 
     while (ringBuffer->GetFreeSpaceWithReadChange(diff) < 0)
     {
         lastKey += keyframedist;
-        keyPos = (*positionMap)[lastKey / keyframedist];
+        keyIndex++;
+        keyPos = (*positionMap)[keyIndex];
         if (keyPos == 0)
             continue;
         diff = keyPos - curPosition;
@@ -971,12 +1113,37 @@ bool NuppelDecoder::DoFastForward(long long desiredFrame)
 {
     long long number = desiredFrame - framesPlayed;
     long long desiredKey = lastKey;
+    int lastKeyIndex = GetKeyIndex(lastKey);
+    int desiredIndex = lastKeyIndex;
 
-    while (desiredKey <= desiredFrame)
+    if (hasKeyFrameAdjustMap)
     {
-        desiredKey += keyframedist;
+        QMap <long long, int>::Iterator keyiter = NULL;
+        keyiter = (*keyFrameAdjustMap).begin();
+        while (keyiter.key() < lastKey && keyiter != (*keyFrameAdjustMap).end())
+            keyiter++;
+        long long prevKey = desiredKey;
+        while (desiredKey <= desiredFrame)
+        {
+            prevKey = desiredKey;
+            desiredKey += keyframedist;
+            desiredIndex++;
+            if (desiredKey == keyiter.key())
+            {
+                desiredKey -= keyiter.data();
+                keyiter++;
+            }
+        }
+        desiredKey = prevKey;
+        desiredIndex--;
     }
-    desiredKey -= keyframedist;
+    else
+    {
+        while (desiredKey <= desiredFrame)
+            desiredKey += keyframedist;
+        desiredKey -= keyframedist;
+        desiredIndex = desiredKey / keyframedist;
+    }
 
     int normalframes = desiredFrame - desiredKey;
     int fileend = 0;
@@ -988,8 +1155,6 @@ bool NuppelDecoder::DoFastForward(long long desiredFrame)
 
     if (desiredKey != lastKey)
     {
-        int desiredIndex = desiredKey / keyframedist;
-
         if (positionMap->find(desiredIndex) != positionMap->end())
         {
             keyPos = (*positionMap)[desiredIndex];
@@ -997,7 +1162,7 @@ bool NuppelDecoder::DoFastForward(long long desiredFrame)
         else if (livetv || (watchingrecording && nvr_enc &&
                             nvr_enc->IsValidRecorder()))
         {
-            for (int i = lastKey / keyframedist; i <= desiredIndex; i++)
+            for (int i = lastKeyIndex; i <= desiredIndex; i++)
             {
                 if (positionMap->find(i) == positionMap->end())
                     nvr_enc->FillPositionMap(i, desiredIndex, *positionMap);

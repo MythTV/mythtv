@@ -223,7 +223,7 @@ int TV::AllowRecording(const QString &message, int timeuntil)
 {
     if (internalState != kState_WatchingLiveTV)
     {
-        return 1;
+        return 2;
     }
 
     dialogname = "allowrecordingbox";
@@ -2020,13 +2020,18 @@ void TV::EPGChannelUpdate(QString chanstr)
 
 void TV::customEvent(QCustomEvent *e)
 {
-    while (changeState)
-        usleep(100);
-
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
         MythEvent *me = (MythEvent *)e;
         QString message = me->Message();
+
+        if (message.left(14) != "DONE_RECORDING"
+            && message.left(14) != "ASK_RECORDING "
+            && message.left(13) != "LIVE_TV_READY")
+            return;
+
+        while (changeState)
+            usleep(100);
 
         if (internalState == kState_WatchingRecording &&
             message.left(14) == "DONE_RECORDING")
@@ -2154,8 +2159,9 @@ void TV::BrowseDispInfo(int direction)
     browsestarttime = regexpMap["dbstarttime"];
 
     QDateTime startts = QDateTime::fromString(browsestarttime, Qt::ISODate);
-    ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(
-                                      browsechanid, startts );
+    ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(m_db,
+                                                                  browsechanid,
+                                                                  startts);
     if (program_info)
         program_info->ToMap(m_db, regexpMap);
 
@@ -2170,8 +2176,9 @@ void TV::BrowseToggleRecord(void)
     QMap<QString, QString> regexpMap;
     QDateTime startts = QDateTime::fromString(browsestarttime, Qt::ISODate);
 
-    ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(
-                                      browsechanid, startts );
+    ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(m_db,
+                                                                  browsechanid,
+                                                                  startts);
     program_info->ToggleRecord(m_db);
 
     program_info->ToMap(m_db, regexpMap);

@@ -294,6 +294,8 @@ void TVRec::FinishedRecording(void)
 
 void TVRec::HandleStateChange(void)
 {
+    TVState tmpInternalState = internalState;
+
     bool changed = false;
     bool startRecorder = false;
     bool closeRecorder = false;
@@ -302,7 +304,7 @@ void TVRec::HandleStateChange(void)
     QString statename;
     StateToString(nextState, statename);
     QString origname;
-    StateToString(internalState, origname);
+    StateToString(tmpInternalState, origname);
 
     if (nextState == kState_Error)
     {
@@ -310,29 +312,29 @@ void TVRec::HandleStateChange(void)
         exit(-1);
     }
 
-    if (internalState == kState_None && nextState == kState_WatchingLiveTV)
+    if (tmpInternalState == kState_None && nextState == kState_WatchingLiveTV)
     {
-        internalState = nextState;
+        tmpInternalState = nextState;
         changed = true;
 
         startRecorder = true;
 
         watchingLiveTV = true;
     }
-    else if (internalState == kState_WatchingLiveTV && 
+    else if (tmpInternalState == kState_WatchingLiveTV && 
              nextState == kState_None)
     {
         channel->StoreInputChannels();
 
         closeRecorder = true;
 
-        internalState = nextState;
+        tmpInternalState = nextState;
         changed = true;
 
         killRecordingFile = true;
         watchingLiveTV = false;
     }
-    else if (internalState == kState_None && 
+    else if (tmpInternalState == kState_None && 
              nextState == kState_RecordingOnly) 
     {
         SetChannel(true);  
@@ -340,26 +342,26 @@ void TVRec::HandleStateChange(void)
 
         StartedRecording();
 
-        internalState = nextState;
+        tmpInternalState = nextState;
         nextState = kState_None;
         changed = true;
 
         startRecorder = true;
     }   
-    else if ((internalState == kState_RecordingOnly && 
+    else if ((tmpInternalState == kState_RecordingOnly && 
               nextState == kState_None) ||
-             (internalState == kState_WatchingRecording &&
+             (tmpInternalState == kState_WatchingRecording &&
               nextState == kState_WatchingPreRecorded))
     {
         FinishedRecording();
         closeRecorder = true;
-        internalState = nextState;
+        tmpInternalState = nextState;
         changed = true;
         inoverrecord = false;
 
         watchingLiveTV = false;
     }
-    else if (internalState == kState_WatchingLiveTV &&
+    else if (tmpInternalState == kState_WatchingLiveTV &&
              nextState == kState_WatchingRecording)
     {
         channel->StoreInputChannels();
@@ -378,10 +380,10 @@ void TVRec::HandleStateChange(void)
 
         StartedRecording();
 
-        internalState = nextState;
+        tmpInternalState = nextState;
         changed = true;
     }
-    else if (internalState == kState_WatchingRecording &&
+    else if (tmpInternalState == kState_WatchingRecording &&
              nextState == kState_WatchingLiveTV)
     {
         QMap<long long, int> blank_frame_map;
@@ -425,7 +427,7 @@ void TVRec::HandleStateChange(void)
                          QString("/ringbuf%1.nuv").arg(m_capturecardnum);
 
         inoverrecord = false;
-        internalState = nextState;
+        tmpInternalState = nextState;
         changed = true;
 
         if (prevRecording)
@@ -446,15 +448,15 @@ void TVRec::HandleStateChange(void)
             prevRecording = NULL;
         }
     }
-    else if (internalState == kState_WatchingRecording &&
+    else if (tmpInternalState == kState_WatchingRecording &&
              nextState == kState_RecordingOnly)
     {
-        internalState = nextState;
+        tmpInternalState = nextState;
         changed = true;
 
         watchingLiveTV = false;
     }
-    else if (internalState == kState_None && 
+    else if (tmpInternalState == kState_None && 
              nextState == kState_None)
     {
         changed = true;
@@ -521,6 +523,7 @@ void TVRec::HandleStateChange(void)
         channel->SetFd(-1);
     }
 
+    internalState = tmpInternalState;
     changeState = false;
 }
 

@@ -31,11 +31,17 @@ class DecoderBase
     virtual bool DoFastForward(long long desiredFrame) = 0;
 
     virtual bool isLastFrameKey() = 0;
-    virtual void WriteStoredData(RingBuffer *rb) = 0;
-    virtual void SetRawFrameState(bool state) = 0;
-    virtual bool GetRawFrameState() = 0;
+    virtual void WriteStoredData(RingBuffer *rb, bool storevid) = 0;
+    virtual void SetRawAudioState(bool state) = 0;
+    virtual bool GetRawAudioState() = 0;
+    virtual void SetRawVideoState(bool state) = 0;
+    virtual bool GetRawVideoState() = 0;
+
+    virtual void UpdateFrameNumber(long frame) = 0;
 
     virtual void SetPositionMap() = 0;
+
+    virtual QString GetEncodingType(void) = 0;
 
   protected:
     NuppelVideoPlayer *m_parent;

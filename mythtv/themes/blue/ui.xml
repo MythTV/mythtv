@@ -136,6 +136,23 @@
         <catcolor category="MAGAZINE" color="MediumTurquoise"></catcolor>
         <catcolor category="TIEMPO" color="#33ff99"></catcolor>
         <catcolor category="SHOW" color="sienna"></catcolor>
+
+        <!-- categories used by the NextView EPG service -->
+        <!-- (available in some european countries) -->
+        <catcolor category="news" color="DarkOrange3"></catcolor>
+        <catcolor category="music/ballet/dance" color="DarkRed"></catcolor>
+        <catcolor category="sports" color="DarkCyan"></catcolor>
+        <catcolor category="series" color="DarkOrchid"></catcolor>
+        <catcolor category="social/political/economics" color="DarkOrange3"></catcolor>
+        <catcolor category="show/game show" color="MediumTurquoise"></catcolor>
+        <catcolor category="science" color="#33ff99"></catcolor>
+        <catcolor category="technology" color="#33ff99"></catcolor>
+        <catcolor category="kids" color="MediumSlateBlue"></catcolor>
+        <catcolor category="leisure hobbies" color="Red"></catcolor>
+        <catcolor category="tourism/travel" color="#aa00aa"></catcolor>
+        <catcolor category="arts/culture" color="goldenrod"></catcolor>
+        <catcolor category="movie" color="Blue"></catcolor>
+
         <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
         <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png"></recordstatus>
         <recordstatus type="ChannelRecord" image="gg-rs-channel.png"></recordstatus>
@@ -326,6 +343,23 @@
         <catcolor category="MAGAZINE" color="MediumTurquoise"></catcolor>
         <catcolor category="TIEMPO" color="#33ff99"></catcolor>
         <catcolor category="SHOW" color="sienna"></catcolor>
+
+        <!-- categories used by the NextView EPG service -->
+        <!-- (available in some european countries) -->
+        <catcolor category="news" color="DarkOrange3"></catcolor>
+        <catcolor category="music/ballet/dance" color="DarkRed"></catcolor>
+        <catcolor category="sports" color="DarkCyan"></catcolor>
+        <catcolor category="series" color="DarkOrchid"></catcolor>
+        <catcolor category="social/political/economics" color="DarkOrange3"></catcolor>
+        <catcolor category="show/game show" color="MediumTurquoise"></catcolor>
+        <catcolor category="science" color="#33ff99"></catcolor>
+        <catcolor category="technology" color="#33ff99"></catcolor>
+        <catcolor category="kids" color="MediumSlateBlue"></catcolor>
+        <catcolor category="leisure hobbies" color="Red"></catcolor>
+        <catcolor category="tourism/travel" color="#aa00aa"></catcolor>
+        <catcolor category="arts/culture" color="goldenrod"></catcolor>
+        <catcolor category="movie" color="Blue"></catcolor>
+
         <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
         <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png"></recordstatus>
         <recordstatus type="ChannelRecord" image="gg-rs-channel.png"></recordstatus>
@@ -869,17 +903,20 @@
         <area>20,10,800,40</area>
         <font>info</font>
         <value>Program Rankings</value>
+        <value lang="DE">Sendungen Bewertungen</value>
         <value lang="DK">Program rangering</value>
       </textarea>
       <textarea name="ranklabel" draworder="0">
         <area>625,20,800,40</area>
         <font>tinyinfo</font>
         <value>Rank</value>
+        <value lang="DE">Rang</value>
       </textarea>
       <textarea name="finalranklabel" draworder="0">
         <area>690,20,800,40</area>
         <font>tinyinfo</font>
         <value>Final Rank</value>
+        <value lang="DE">Endbewertung</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
         <filename>rk-background.png</filename>
@@ -889,6 +926,7 @@
         <area>0,570,800,30</area>
         <font>message</font>
         <value>(1) Sort by Title    (2) Sort by Rank</value>
+        <value lang="DE">(1) Sortiert nach Sender (2) Sortiert nach Rang</value>
         <value lang="DK">(1) Sortér efter Titel  (2) Sortér efter Rang</value>
       </textarea>
     </container>
@@ -931,6 +969,7 @@
         <area>20,70,280,30</area>
         <font>info</font>
         <value>Record Type:</value>
+        <value lang="DE">Aufnahmemodus:</value>
         <value lang="DK">Optagelsestype:</value>
       </textarea>
       <textarea name="type" draworder="6">
@@ -959,6 +998,7 @@
         <area>20,100,160,30</area>
         <font>info</font>
         <value>Channel:</value>
+        <value lang="DE">Sender:</value>
         <value lang="DK">Kanal:</value>
       </textarea>
       <textarea name="channel" draworder="6">
@@ -987,6 +1027,7 @@
         <area>20,130,160,30</area>
         <font>info</font>
         <value>Rank:</value>
+        <value lang="DE">Rang:</value>
         <value lang="DK">Rang:</value>
       </textarea>
       <textarea name="rank" draworder="6">

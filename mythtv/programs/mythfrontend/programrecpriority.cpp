@@ -31,7 +31,7 @@ ProgramRankInfo::ProgramRankInfo(void) : ProgramInfo()
 {
     channelRank = 0;
     recTypeRank = 0;
-    recType = (ScheduledRecording::RecordingType)0;
+    recType = kNotRecording;
 }
 
 ProgramRankInfo::ProgramRankInfo(const ProgramRankInfo &other) :
@@ -417,8 +417,7 @@ void RankPrograms::edit(void)
     if (rec)
     {
         if ((gContext->GetNumSetting("AdvancedRecord", 0)) ||
-            (rec->GetProgramRecordingStatus(db)
-                > ScheduledRecording::AllRecord))
+            (rec->GetProgramRecordingStatus(db) > kAllRecord))
         {
             ScheduledRecording record;
             record.loadByProgram(db, rec);
@@ -466,7 +465,7 @@ void RankPrograms::edit(void)
 
                 // set the ranks of that program 
                 progInfo->rank = rank;
-                progInfo->recType = (ScheduledRecording::RecordingType)rectype;
+                progInfo->recType = (RecordingType)rectype;
                 progInfo->recTypeRank = rtRanks[progInfo->recType-1];
 
                 // also set the origRankData with new rank so we don't
@@ -606,8 +605,7 @@ void RankPrograms::FillList(void)
             QString chanid = result.value(1).toString();
             QString tempTime = result.value(2).toString();
             QString tempDate = result.value(3).toString();
-            ScheduledRecording::RecordingType recType = 
-               (ScheduledRecording::RecordingType)result.value(4).toInt();
+            RecordingType recType = (RecordingType)result.value(4).toInt();
             int channelRank = result.value(5).toInt();
             int recTypeRank = rtRanks[recType-1];
               
@@ -616,10 +614,9 @@ void RankPrograms::FillList(void)
             // to copy what RemoteGetAllScheduledRecordings()
             // does so the keys will match 
             QDateTime startts; 
-            if (recType == ScheduledRecording::SingleRecord ||
-                recType == ScheduledRecording::TimeslotRecord ||
-                recType == ScheduledRecording::WeekslotRecord)
-                startts = QDateTime::fromString(tempDate+":"+tempTime,
+            if (recType == kSingleRecord || recType == kTimeslotRecord ||
+                recType == kWeekslotRecord)
+                startts = QDateTime::fromString(tempDate + ":" + tempTime,
                                                 Qt::ISODate);
             else
             {
@@ -873,7 +870,7 @@ void RankPrograms::updateInfo(QPainter *p)
     if (programData.count() > 0 && curitem)
     {  
         int progRank, chanrank, rectyperank, finalRank;
-        ScheduledRecording::RecordingType rectype; 
+        RecordingType rectype; 
 
         progRank = curitem->rank.toInt();
         chanrank = curitem->channelRank;
@@ -905,22 +902,22 @@ void RankPrograms::updateInfo(QPainter *p)
                 QString text;
                 switch (rectype)
                 {
-                    case ScheduledRecording::SingleRecord:
+                    case kSingleRecord:
                         text = tr("Recording just this showing");
                         break;
-                    case ScheduledRecording::WeekslotRecord:
+                    case kWeekslotRecord:
                         text = tr("Recording every week");
                         break;
-                    case ScheduledRecording::TimeslotRecord:
+                    case kTimeslotRecord:
                         text = tr("Recording when shown in this timeslot");
                         break;
-                    case ScheduledRecording::ChannelRecord:
+                    case kChannelRecord:
                         text = tr("Recording when shown on this channel");
                         break;
-                    case ScheduledRecording::AllRecord:
+                    case kAllRecord:
                         text = tr("Recording all showings");
                         break;
-                    case ScheduledRecording::NotRecording:
+                    case kNotRecording:
                         text = tr("Not recording this showing");
                         break;
                     default:

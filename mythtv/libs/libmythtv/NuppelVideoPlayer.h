@@ -218,6 +218,9 @@ class NuppelVideoPlayer
     void SetBlankIter(void);
     void SetCommBreakIter(void);
 
+    void ReencoderAddKFA(QPtrList<struct kfatable_entry> *kfa_table,
+                         long curframe, long lastkey, long num_keyframes);
+
     QString filename;
     
     /* rtjpeg_plugin stuff */

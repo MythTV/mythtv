@@ -331,8 +331,8 @@ void ManualBox::startClicked(void)
     progInfo.startts = QDateTime::currentDateTime();
     progInfo.endts = QDateTime::currentDateTime().addSecs(m_duration->value() * 60);
     
-    progInfo.Save();
+    progInfo.Save(db);
 
-    progInfo.ApplyRecordStateChange(db, ScheduledRecording::SingleRecord);
+    progInfo.ApplyRecordStateChange(db, kSingleRecord);
 }
 

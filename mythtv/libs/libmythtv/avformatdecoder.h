@@ -5,6 +5,8 @@
 #include <qmap.h>
 #include <qsqldatabase.h>
 
+#include "programinfo.h"
+#include "format.h"
 #include "decoderbase.h"
 
 extern "C" {
@@ -32,11 +34,18 @@ class AvFormatDecoder : public DecoderBase
     bool DoFastForward(long long desiredFrame);
 
     bool isLastFrameKey(void) { return false; }
-    void WriteStoredData(RingBuffer *rb) { (void)rb; }
-    void SetRawFrameState(bool state) { (void)state; }
-    bool GetRawFrameState(void) { return false; }
+    void WriteStoredData(RingBuffer *rb, bool storevid)
+                           { (void)rb; (void)storevid; }
+    void SetRawAudioState(bool state) { (void)state; }
+    bool GetRawAudioState(void) { return false; }
+    void SetRawVideoState(bool state) { (void)state; }
+    bool GetRawVideoState(void) { return false; }
+
+    void UpdateFrameNumber(long frame) { (void)frame;}
 
     void SetPositionMap(void);
+
+    QString GetEncodingType(void) { return QString("MPEG-2"); }
 
   protected:
     RingBuffer *getRingBuf(void) { return ringBuffer; }

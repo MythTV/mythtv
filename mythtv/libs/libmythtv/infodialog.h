@@ -26,7 +26,7 @@ class InfoDialog : public MythDialog
     QLabel *getDateLabel(ProgramInfo *pginfo);
 
     int programtype;
-    ScheduledRecording::RecordingType recordstatus;
+    RecordingType recordstatus;
     ProgramInfo *myinfo;
 
     MythListView *lview;

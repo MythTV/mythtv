@@ -38,17 +38,17 @@ public:
         SRSetting(parent, "type") {
         setLabel(QObject::tr("Schedule"));
         addSelection(QObject::tr("Do not record this program"),
-                     QString::number(ScheduledRecording::NotRecording));
+                     QString::number(kNotRecording));
         addSelection(QObject::tr("Record only this showing of the program"),
-                     QString::number(ScheduledRecording::SingleRecord));
+                     QString::number(kSingleRecord));
         addSelection(QObject::tr("Record this program in this timeslot every day"),
-                     QString::number(ScheduledRecording::TimeslotRecord));
+                     QString::number(kTimeslotRecord));
         addSelection(QObject::tr("Record this program whenever it's shown on this channel"),
-                     QString::number(ScheduledRecording::ChannelRecord));
+                     QString::number(kChannelRecord));
         addSelection(QObject::tr("Record this program whenever it's shown anywhere"),
-                     QString::number(ScheduledRecording::AllRecord));
+                     QString::number(kAllRecord));
         addSelection(QObject::tr("Record this program in this timeslot every week"),
-                     QString::number(ScheduledRecording::WeekslotRecord));
+                     QString::number(kWeekslotRecord));
     };
 };
 
@@ -254,10 +254,10 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
 "  )"
 " )"
 ");")
-        .arg(AllRecord)
-        .arg(ChannelRecord)
-        .arg(TimeslotRecord)
-        .arg(WeekslotRecord);
+        .arg(kAllRecord)
+        .arg(kChannelRecord)
+        .arg(kTimeslotRecord)
+        .arg(kWeekslotRecord);
 
      QSqlQuery result = db->exec(query);
      QDateTime now = QDateTime::currentDateTime();
@@ -321,9 +321,8 @@ void ScheduledRecording::findAllScheduledPrograms(QSqlDatabase* db,
             proginfo->chanid = result.value(0).toString();
 
             int type = result.value(9).toInt();
-            if (type == ScheduledRecording::SingleRecord ||
-                type == ScheduledRecording::TimeslotRecord ||
-                type == ScheduledRecording::WeekslotRecord) 
+            if (type == kSingleRecord || type == kTimeslotRecord ||
+                type == kWeekslotRecord) 
             {
                 temptime = result.value(1).toString();
                 tempdate = result.value(2).toString();
@@ -398,9 +397,9 @@ bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
 "    )"
 "    AND ")
         .arg(sqltitle.utf8())
-        .arg(AllRecord)
+        .arg(kAllRecord)
         .arg(chanid)
-        .arg(ChannelRecord)
+        .arg(kChannelRecord)
         .arg(proginfo->startts.time().toString(Qt::ISODate))
         .arg(proginfo->endts.time().toString(Qt::ISODate));
 
@@ -423,9 +422,9 @@ query += QString(
 "  )"
 " )"
 ");")
-        .arg(TimeslotRecord)
+        .arg(kTimeslotRecord)
         .arg(proginfo->startts.date().toString(Qt::ISODate))
-        .arg(WeekslotRecord)
+        .arg(kWeekslotRecord)
         .arg(proginfo->startts.date().toString(Qt::ISODate))
         .arg(proginfo->endts.date().toString(Qt::ISODate));
 
@@ -450,11 +449,11 @@ void ScheduledRecording::loadByID(QSqlDatabase* db, int recordID) {
     load(db);
 }
 
-ScheduledRecording::RecordingType ScheduledRecording::getRecordingType(void) const {
-    return (ScheduledRecording::RecordingType)(type->getValue().toInt());
+RecordingType ScheduledRecording::getRecordingType(void) const {
+    return (RecordingType)(type->getValue().toInt());
 }
 
-void ScheduledRecording::setRecordingType(ScheduledRecording::RecordingType newType) {
+void ScheduledRecording::setRecordingType(RecordingType newType) {
     type->setValue((int)newType);
 }
 
@@ -467,7 +466,7 @@ void ScheduledRecording::SetAutoExpire(bool expire) {
 }
 
 void ScheduledRecording::save(QSqlDatabase* db) {
-    if (type->isChanged() && getRecordingType() == NotRecording)
+    if (type->isChanged() && getRecordingType() == kNotRecording)
         remove(db);
     else
         ConfigurationGroup::save(db);
@@ -525,8 +524,10 @@ bool ScheduledRecording::hasChanged(QSqlDatabase* db) {
     return retval;
 }
 
-void ScheduledRecording::doneRecording(QSqlDatabase* db, const ProgramInfo& proginfo) {
-    if (getRecordingType() == SingleRecord)
+void ScheduledRecording::doneRecording(QSqlDatabase* db, 
+                                       const ProgramInfo& proginfo) 
+{
+    if (getRecordingType() == kSingleRecord)
         remove(db);
 
     QString sqltitle = proginfo.title;
@@ -647,17 +648,17 @@ void ScheduledRecording::fillSelections(QSqlDatabase* db, SelectSetting* setting
             QString weekly = "";
 
             switch (sr.getRecordingType()) {
-            case AllRecord:
+            case kAllRecord:
                 label = QString("%1").arg(sr.title->getValue());
                 break;
-            case ChannelRecord:
+            case kChannelRecord:
                 label = QString("%1 on channel %2")
                     .arg(sr.title->getValue())
                     .arg(sr.channel->getSelectionLabel());
                 break;
-            case WeekslotRecord:
+            case kWeekslotRecord:
                 weekly = QDate(sr.startDate->dateValue()).toString("dddd")+"s ";
-            case TimeslotRecord:
+            case kTimeslotRecord:
                 label = QString("%1 on channel %2 (%3%4 - %5)")
                     .arg(sr.title->getValue())
                     .arg(sr.channel->getSelectionLabel())
@@ -665,7 +666,7 @@ void ScheduledRecording::fillSelections(QSqlDatabase* db, SelectSetting* setting
                     .arg(sr.startTime->timeValue().toString())
                     .arg(sr.endTime->timeValue().toString());
                 break;
-            case SingleRecord:
+            case kSingleRecord:
                 label = QString("%1 on channel %2 (%3 %4 - %5)")
                     .arg(sr.title->getValue())
                     .arg(sr.channel->getSelectionLabel())

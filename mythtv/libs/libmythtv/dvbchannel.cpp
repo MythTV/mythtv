@@ -149,6 +149,7 @@ void DVBChannel::GetPID(vector_int& some_pid) const
 
 void DVBChannel::SetFreqTable(const QString &name)
 {
+    (void)name;
     // Might be used for DVB-S vs. -C vs. -T UK vs. -T FI
 }
 
@@ -492,6 +493,7 @@ bool DVBChannel::SetChannelByString(const QString &chan)
 
 void DVBChannel::SwitchToInput(const QString &input, const QString &chan)
 {
-  SetChannelByString(chan);
+    (void)input;
+    SetChannelByString(chan);
 }
 

@@ -38,7 +38,7 @@ void FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
 {
     QMap<long long, int> blanks;
     ProgramInfo *program_info =
-        ProgramInfo::GetProgramFromRecorded(chanid, starttime);
+        ProgramInfo::GetProgramFromRecorded(db, chanid, starttime);
 
     if (!program_info)
     {

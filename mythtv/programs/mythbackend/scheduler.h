@@ -74,7 +74,7 @@ class Scheduler : public QObject
 
     QMap<QString, int> rankMap;
     QMap<QString, int> channelRankMap;
-    QMap<ScheduledRecording::RecordingType, int> recTypeRankMap;
+    QMap<RecordingType, int> recTypeRankMap;
 
     bool hasconflicts;
 

@@ -158,7 +158,7 @@ int main(int argc, char *argv[])
     }
 
     QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
-    ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(chanid, startts);
+    ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(db, chanid, startts);
 
     if (!pginfo)
     {

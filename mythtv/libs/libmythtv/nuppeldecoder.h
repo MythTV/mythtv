@@ -5,8 +5,8 @@
 #include <qptrlist.h>
 
 #include "programinfo.h"
-#include "decoderbase.h"
 #include "format.h"
+#include "decoderbase.h"
 
 #ifdef MMX
 #undef MMX
@@ -18,7 +18,6 @@
 #endif
 
 #include "RTjpegN.h"
-#include "format.h"
 
 extern "C" {
 #include "../libavcodec/avcodec.h"
@@ -53,11 +52,17 @@ class NuppelDecoder : public DecoderBase
     bool DoFastForward(long long desiredFrame);
 
     bool isLastFrameKey(void) { return (lastKey == framesPlayed); }
-    void WriteStoredData(RingBuffer *rb);
-    void SetRawFrameState(bool state) { getrawframes = state; }
-    bool GetRawFrameState(void) { return getrawframes; }
+    void WriteStoredData(RingBuffer *rb, bool writevid);
+    void SetRawAudioState(bool state) { getrawframes = state; }
+    bool GetRawAudioState(void) { return getrawframes; }
+    void SetRawVideoState(bool state) { getrawvideo = state; }
+    bool GetRawVideoState(void) { return getrawvideo; }
+
+    void UpdateFrameNumber(long framenumber);
 
     void SetPositionMap(void);
+
+    QString GetEncodingType(void);
 
   private:
     bool DecodeFrame(struct rtframeheader *frameheader,
@@ -67,6 +72,8 @@ class NuppelDecoder : public DecoderBase
     bool InitAVCodec(int codec);
     void CloseAVCodec(void);
     void StoreRawData(unsigned char *strm);
+
+    int GetKeyIndex(int KeyFrame);
 
     friend int get_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic);
     friend void release_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic);
@@ -91,6 +98,9 @@ class NuppelDecoder : public DecoderBase
 
     bool hasFullPositionMap;
     QMap<long long, long long> *positionMap;
+
+    bool hasKeyFrameAdjustMap;
+    QMap<long long, int> *keyFrameAdjustMap;
 
     int totalLength;
     long long totalFrames;
@@ -122,6 +132,7 @@ class NuppelDecoder : public DecoderBase
 
     QPtrList <RawDataList> StoredData;
     bool getrawframes;
+    bool getrawvideo;
 
     int videosizetotal;
     int videoframesread;

@@ -29,6 +29,7 @@ typedef struct rtframeheader
 			// D .. Addition Data for Compressors
    			//      ct: R .. RTjpeg Tables, F .. FFMpeg extradata
                         // X .. eXtended data, Q .. SeekTable
+                        // K .. KFA table
    
    char comptype;	// V: 0 .. raw YUV420
 			//    1 .. RTJpeg
@@ -104,9 +105,11 @@ typedef struct extendeddata
    int lavc_maxqdiff;
    // seek table offset
    long long seektable_offset;
+   // key frame adjust offset
+   long long keyframeadjust_offset;
    // unused for later -- total size of 128 integers.
    // new fields must be added at the end, above this comment.
-   int expansion[111];
+   int expansion[109];
 } extendeddata;
 
 typedef struct seektable_entry
@@ -114,6 +117,12 @@ typedef struct seektable_entry
    long long file_offset;
    int keyframe_number; 
 } seektable_entry;
+
+typedef struct kfatable_entry
+{
+   int adjust;
+   int keyframe_number;
+} kfatable_entry;
 
 #define FRAMEHEADERSIZE sizeof(rtframeheader)
 #define FILEHEADERSIZE  sizeof(rtfileheader)

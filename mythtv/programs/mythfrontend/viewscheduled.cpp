@@ -683,8 +683,7 @@ void ViewScheduled::edit()
     if (rec)
     {
         if ((gContext->GetNumSetting("AdvancedRecord", 0)) ||
-            (rec->GetProgramRecordingStatus(db)
-                > ScheduledRecording::AllRecord))
+            (rec->GetProgramRecordingStatus(db) > kAllRecord))
         {
             ScheduledRecording record;
             record.loadByProgram(db, rec);
@@ -731,8 +730,7 @@ void ViewScheduled::selected()
     else if (rec)
     {
         if ((gContext->GetNumSetting("AdvancedRecord", 0)) ||
-            (rec->GetProgramRecordingStatus(db)
-                > ScheduledRecording::AllRecord))
+            (rec->GetProgramRecordingStatus(db) > kAllRecord))
         {
             ScheduledRecording record;
             record.loadByProgram(db, rec);

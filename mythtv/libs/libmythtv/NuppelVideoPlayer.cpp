@@ -2603,6 +2603,19 @@ class AudioReencodeBuffer : public AudioOutput
     long long last_audiotime;
 };
 
+void NuppelVideoPlayer::ReencoderAddKFA(
+                                QPtrList<struct kfatable_entry> *kfa_table,
+                                long curframe, long lastkey, long num_keyframes)
+{
+    if (curframe - lastkey != keyframedist)
+    {
+        struct kfatable_entry *kfate = new struct kfatable_entry;
+        kfate->adjust = keyframedist - (curframe - lastkey);
+        kfate->keyframe_number = num_keyframes;
+        kfa_table->append(kfate);
+    }
+}
+
 int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
                                     RecordingProfile &profile,
                                     bool honorCutList, bool forceKeyFrames)
@@ -2616,6 +2629,8 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
      
     int audioframesize;
     int audioFrame = 0;
+
+    QPtrList<struct kfatable_entry> kfa_table;
 
     QDateTime curtime = QDateTime::currentDateTime();
     if (honorCutList && m_playbackinfo)
@@ -2670,10 +2685,17 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
         SetProfileOption(profile, "rtjpegquality");
         SetProfileOption(profile, "rtjpegchromafilter");
         SetProfileOption(profile, "rtjpeglumafilter");
+        nvr->SetupRTjpeg();
     } 
     else 
     {
         cerr << "Unknown video codec: " << setting << endl;
+    }
+
+    if (setting == decoder->GetEncodingType() && !forceKeyFrames &&
+        !deleteMap.isEmpty() && honorCutList)
+    {
+        decoder->SetRawVideoState(true);
     }
 
     setting = profile.byName("audiocodec")->getValue();
@@ -2682,7 +2704,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
         nvr->SetOption("audiocompression", 1);
         SetProfileOption(profile, "mp3quality");
         SetProfileOption(profile, "samplerate");
-        decoder->SetRawFrameState(true);
+        decoder->SetRawAudioState(true);
     } 
     else if (setting == "Uncompressed") 
     {
@@ -2724,18 +2746,16 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
 
     decoder->setExactSeeks(true);
     decoder->GetFrame(0);
-    int tryraw = decoder->GetRawFrameState();
-    if (tryraw)
-        audioOutput = NULL;
-    else
-        audioOutput = new AudioReencodeBuffer(audio_bits, audio_channels);
+    int rawaudio = decoder->GetRawAudioState();
+    audioOutput = new AudioReencodeBuffer(audio_bits, audio_channels);
 
     QMap<long long, int>::Iterator i;
     QMap<long long, int>::Iterator last = deleteMap.end();
     bool writekeyframe = true;
    
     int num_keyframes = 0;
- 
+
+    int did_ff = 0; 
     if (honorCutList && !deleteMap.isEmpty())
     {
         i = deleteMap.begin();
@@ -2749,12 +2769,12 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
         }
     }
 
+    frame.frameNumber = 0;
+    long lastKeyFrame = 0;
     while (!eof)
     {
         frame.buf = vbuffer[vpos];
         frame.timecode = timecodes[vpos];
-        frame.frameNumber = framesPlayed;
-
         if ((!deleteMap.isEmpty()) && honorCutList) 
         {
             if (frame.frameNumber >= i.key()) 
@@ -2763,6 +2783,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
                 {
                     i++;
                     decoder->DoFastForward(i.key());
+                    did_ff = 1;
                 }
                 while((i.data() == 0) && (i != last))
                 {
@@ -2774,29 +2795,56 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
         if (eof)
             break;
 
-        if (tryraw)
+        if (rawaudio)
         {
             // Encoding from NuppelVideo to NuppelVideo with MP3 audio
             // So let's not decode/reencode audio
-            if (!decoder->GetRawFrameState()) 
+            if (!decoder->GetRawAudioState()) 
             {
-                // The Raw stae changed during decode.  This is not good
+                // The Raw state changed during decode.  This is not good
                 delete outRingBuffer;
                 delete nvr;
                 unlink(outputname);
                 return REENCODE_ERROR;
             }
 
-            decoder->WriteStoredData(outRingBuffer);
             if (forceKeyFrames) 
                 writekeyframe = true;
             else
+            {
                 writekeyframe = decoder->isLastFrameKey();
+                if (did_ff == 1 && decoder->GetRawVideoState())
+                {
+                    writekeyframe = true;
+                    did_ff++;
+                }
+                else if (writekeyframe && did_ff)
+                    did_ff = 0;
 
-            if (decoder->isLastFrameKey())
-                nvr->UpdateSeekTable(num_keyframes++, false);
- 
-            nvr->WriteVideo(&frame, true, writekeyframe);
+                if (writekeyframe)
+                {
+                    nvr->UpdateSeekTable(num_keyframes, false);
+                    ReencoderAddKFA(&kfa_table, frame.frameNumber,lastKeyFrame,
+                                    num_keyframes);
+                    num_keyframes++;
+                    lastKeyFrame = frame.frameNumber;
+                }
+            }
+            if (!kfa_table.isEmpty())
+            {
+                //need to correct the frame# and timecode here
+                // Question:  Is it necessary to change the timecodes?
+               decoder->UpdateFrameNumber(frame.frameNumber);
+            }
+
+            if (!did_ff && decoder->GetRawVideoState())
+                decoder->WriteStoredData(outRingBuffer, true);
+            else
+            {
+                decoder->WriteStoredData(outRingBuffer, false);
+                nvr->WriteVideo(&frame, true, writekeyframe);
+            }
+            audioOutput->Reset();
             rtxt = wtxt;
         } 
         else 
@@ -2849,9 +2897,12 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
         }
     
         decoder->GetFrame(0);
+        frame.frameNumber++;
     }
 
     nvr->WriteSeekTable(false);
+    if (!kfa_table.isEmpty())
+        nvr->WriteKeyFrameAdjustTable(false, &kfa_table);
     delete outRingBuffer;
     delete nvr;
     return REENCODE_OK;

@@ -6,6 +6,7 @@ class QSqlDatabase;
 class EncoderLink;
 
 #include <qmap.h>
+#include <qmutex.h>
 #include <list>
 #include <vector>
 #include <qobject.h>
@@ -39,6 +40,7 @@ class Transcoder : public QObject
     int useCutlist;
 
     QMap<int, EncoderLink *> *m_tvList;
+    QMutex *dblock;
     QSqlDatabase *db_conn;
 
     QPtrList <ProgramInfo> TranscodeQueue;
