@@ -176,25 +176,10 @@ Switch to superuser:
 
 <P>[Documentation being finalized]</P>
 <P>There are ebuilds setup for mythtv and for XMLTV.  To use them, do the
-following.</P>
-<P>First, edit your <CODE>/etc/make.conf</CODE> file so that it looks like this:
+following, add the following to your <CODE>/etc/make.conf</CODE>:</P>
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
-# Build-time functionality
-# ========================
-#
-# The USE variable is used to enable optional build-time functionality. For
-# example, quite a few packages have optional X, gtk or GNOME functionality
-# that can only be enabled or disabled at compile-time. Gentoo Linux has a
-# very extensive set of USE variables described in our USE variable HOWTO at
-# http://www.gentoo.org/doc/use-howto.html
-#
-# The available list of use flags with descriptions is in your portage tree.
-# Use 'less' to view them:  --> less /usr/portage/profiles/use.desc &lt;--
-#
-# Example:
-#USE="X gtk gnome -alsa"
-USE="mysql qt dvd X -alsa gtk gnome -esd oss"
 # PORTDIR_OVERLAY is a directory where local ebuilds may be stored without
 #     concern that they will be deleted by rsync updates. Default is not
 #     defined.
@@ -222,11 +207,15 @@ ebuild names are wrong.  The two ebuilds are:</P>
 <A HREF="http://bugs.gentoo.org/show_bug.cgi?id=10536">http://bugs.gentoo.org/show_bug.cgi?id=10536</A></LI>
 </UL>
 </P>
-<P>By default, Gentoo doesn't build QT libraries with SQL support.  To
-enable SQL support you need to rebuild QT by running "emerge qt".</P>
-<P>You will also need to perform an "emerge mysql" step.</P>
-<P>emerge mythtv.  It should download the source then complain about a missing 
-digest.  To fix this </P>
+<P>emerge mythtv:
+<BLOCKQUOTE><CODE>
+<PRE>
+% emerge /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>It should download the source then complain about a missing digest.  To fix
+this,</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -235,20 +224,18 @@ digest.  To fix this </P>
 </CODE></BLOCKQUOTE>
 </P>
 <P>emerge mythtv again and it should compile and install.</P>
-<P>Do the same for xmltv but an additonal step will be required first to fool
-it into thinking XML-Twig is installed.  To achieve this: </P>
+<P>Do the same for xmltv but an additional step will be required first to fool
+it into thinking XML-Twig is installed.  </P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-% emerge inject dev-perl/XML-Twig
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-% emerge mysql
+% su
+# emerge inject dev-perl/XML-Twig
+# emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
+# ebuild /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2.ebuild digest
+# emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
+# exit
+% 
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>

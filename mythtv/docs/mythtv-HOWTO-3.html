@@ -165,6 +165,27 @@ everything already installed
 
 <H3>Gentoo.</H3>
 
+<P>First, edit your <CODE>/etc/make.conf</CODE> file so that it looks like this:
+<BLOCKQUOTE><CODE>
+<PRE>
+# Build-time functionality
+# ========================
+#
+# The USE variable is used to enable optional build-time functionality. For
+# example, quite a few packages have optional X, gtk or GNOME functionality
+# that can only be enabled or disabled at compile-time. Gentoo Linux has a
+# very extensive set of USE variables described in our USE variable HOWTO at
+# http://www.gentoo.org/doc/use-howto.html
+#
+# The available list of use flags with descriptions is in your portage tree.
+# Use 'less' to view them:  --> less /usr/portage/profiles/use.desc &lt;--
+#
+# Example:
+#USE="X gtk gnome -alsa"
+USE="mysql qt dvd X -alsa gtk gnome -esd oss"
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 <P>If KDE has not been installed on your system:
 Edit <CODE>/etc/make.conf</CODE> and locate the "USE" variable.  If the line is commented 
 out, remove the comment.  The line should have at least:
@@ -183,6 +204,24 @@ $emerge kde lame
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P>By default, doesn't build QT libraries with SQL support.  To
+enable SQL support you need to add to your USE variable (USE="mysql") in 
+<CODE>/etc/make.conf</CODE> and rebuild QT by running </P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+% emerge qt
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+% emerge mysql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
 <P>All the necessary files will be downloaded and built.  This will take a lot
 of time, even on a fast machine.</P>
 

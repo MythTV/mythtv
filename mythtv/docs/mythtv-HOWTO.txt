@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2002-11-28, v1.038
+  2002-11-29, v1.039
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -94,7 +94,7 @@
 
   [1m1.  How to obtain this document.[0m
 
-  This howto document is maintained at the primary mythtv website:
+  This HOWTO document is maintained at the primary mythtv website:
   http://www.mythtv.org < http://www.mythtv.org>.  The latest version of
   this document can be found in CVS, accessible either through the
   ViewCVS <http://www.mythtv.org/cgi-bin/viewcvs.cgi/> web interface, or
@@ -305,6 +305,24 @@
 
   [1m3.2.2.3.  Gentoo.[0m
 
+  First, edit your /etc/make.conf file so that it looks like this:
+
+  # Build-time functionality
+  # ========================
+  #
+  # The USE variable is used to enable optional build-time functionality. For
+  # example, quite a few packages have optional X, gtk or GNOME functionality
+  # that can only be enabled or disabled at compile-time. Gentoo Linux has a
+  # very extensive set of USE variables described in our USE variable HOWTO at
+  # http://www.gentoo.org/doc/use-howto.html
+  #
+  # The available list of use flags with descriptions is in your portage tree.
+  # Use 'less' to view them:  --> less /usr/portage/profiles/use.desc <--
+  #
+  # Example:
+  #USE="X gtk gnome -alsa"
+  USE="mysql qt dvd X -alsa gtk gnome -esd oss"
+
   If KDE has not been installed on your system: Edit /etc/make.conf and
   locate the "USE" variable.  If the line is commented out, remove the
   comment.  The line should have at least:
@@ -317,6 +335,14 @@
 
        $emerge kde lame
 
+  By default, doesn't build QT libraries with SQL support.  To enable
+  SQL support you need to add to your USE variable (USE="mysql") in
+  /etc/make.conf and rebuild QT by running
+
+       % emerge qt
+
+       % emerge mysql
+
   All the necessary files will be downloaded and built.  This will take
   a lot of time, even on a fast machine.
 
@@ -324,7 +350,6 @@
 
   There are some paths that need to be modified before starting the main
   compile of mythtv, otherwise you will get errors.
-
   [1m4.1.  Distribution-specific information.[0m
 
   [1m4.1.1.  Mandrake 9.0[0m
@@ -363,10 +388,10 @@
   You can either modify the /etc/sysconfig/i18n file and set
   LANG="en_US", or you can create a file in ~/.i18n:
 
-  % cat > ~/.i18n
-  LANG="en_US"
-  ^D
-  % exit
+       % cat > ~/.i18n
+       LANG="en_US"
+       ^D
+       % exit
 
   By making these modifications, you can follow the "other
   distributions" instructions in the "Configuring mythtv" section later
@@ -376,12 +401,12 @@
 
   Open a shell and switch to superuser mode again.
 
-       % su -
-       # set
+  % su -
+  # set
 
-       [lots of text]
-       QTDIR=/usr/lib/qt3
-       PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
+  [lots of text]
+  QTDIR=/usr/lib/qt3
+  PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
 
   You should see QTDIR and the path changes you made.
 
@@ -430,7 +455,6 @@
 
   Recent AMD processors, like the Duron, Thunderbird and Athlon don't
   need this change.
-
   [1m5.2.  Building LAME.[0m
 
   Open a shell and switch to the directory where you saved lame.
@@ -483,8 +507,8 @@
 
   Untar the xmltv file:
 
-       % tar -xjf xmltv-0.5.3.tar.bz2
-       % cd xmltv-0.5.3
+  % tar -xjf xmltv-0.5.3.tar.bz2
+  % cd xmltv-0.5.3
 
   Install the xmltv prerequisites:
 
@@ -526,34 +550,17 @@
 
   Switch to superuser:
 
-       % su
-       # make install
-       # exit
+  % su
+  # make install
+  # exit
 
   [1m5.5.  Gentoo.[0m
 
   [Documentation being finalized]
 
   There are ebuilds setup for mythtv and for XMLTV.  To use them, do the
-  following.
+  following, add the following to your /etc/make.conf:
 
-  First, edit your /etc/make.conf file so that it looks like this:
-
-       # Build-time functionality
-       # ========================
-       #
-       # The USE variable is used to enable optional build-time functionality. For
-       # example, quite a few packages have optional X, gtk or GNOME functionality
-       # that can only be enabled or disabled at compile-time. Gentoo Linux has a
-       # very extensive set of USE variables described in our USE variable HOWTO at
-       # http://www.gentoo.org/doc/use-howto.html
-       #
-       # The available list of use flags with descriptions is in your portage tree.
-       # Use 'less' to view them:  --> less /usr/portage/profiles/use.desc <--
-       #
-       # Example:
-       #USE="X gtk gnome -alsa"
-       USE="mysql qt dvd X -alsa gtk gnome -esd oss"
        # PORTDIR_OVERLAY is a directory where local ebuilds may be stored without
        #     concern that they will be deleted by rsync updates. Default is not
        #     defined.
@@ -575,24 +582,27 @@
   +o  XMLTV: http://bugs.gentoo.org/show_bug.cgi?id=10536
      <http://bugs.gentoo.org/show_bug.cgi?id=10536>
 
-  By default, Gentoo doesn't build QT libraries with SQL support.  To
-  enable SQL support you need to rebuild QT by running "emerge qt".
+  emerge mythtv:
 
-  You will also need to perform an "emerge mysql" step.
+       % emerge /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0
 
-  emerge mythtv.  It should download the source then complain about a
-  missing digest.  To fix this
+  It should download the source then complain about a missing digest.
+  To fix this,
 
        % ebuild /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0.ebuild digest
 
   emerge mythtv again and it should compile and install.
 
-  Do the same for xmltv but an additonal step will be required first to
-  fool it into thinking XML-Twig is installed.  To achieve this:
+  Do the same for xmltv but an additional step will be required first to
+  fool it into thinking XML-Twig is installed.
 
-       % emerge inject dev-perl/XML-Twig
-
-       % emerge mysql
+       % su
+       # emerge inject dev-perl/XML-Twig
+       # emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
+       # ebuild /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2.ebuild digest
+       # emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
+       # exit
+       %
 
   [1m5.6.  Debian.[0m
 
@@ -626,12 +636,6 @@
 
   [1m6.3.  Gentoo.[0m
 
-  By default, doesn't build QT libraries with SQL support.  To enable
-  SQL support you need to add to your USE variable (USE="mysql") in
-  /etc/make.conf and rebuild QT by running
-
-       % emerge qt
-
   [1m6.4.  Setting up the initial database.[0m
 
   Setup the initial mysql databases:
@@ -640,7 +644,7 @@
 
   [1m6.4.1.  Mandrake 9.0[0m
 
-       % mysql -u root < mc.sql
+  % mysql -u root < mc.sql
 
   [1m6.4.2.  Debian 3.0[0m
 
@@ -758,15 +762,15 @@
 
   Next, open a shell and login as superuser.
 
-  % su
-  # mkdir /usr/src
-  # mv linux-2.4.19.tar.bz2 /usr/src
-  # cd /usr/src
-  # tar -xjf linux-2.4.19.tar.bz2
-  # chown -R root.root linux-2.4.19
-  # ln -sf linux-2.4.19 linux
-  # exit
-  %
+       % su
+       # mkdir /usr/src
+       # mv linux-2.4.19.tar.bz2 /usr/src
+       # cd /usr/src
+       # tar -xjf linux-2.4.19.tar.bz2
+       # chown -R root.root linux-2.4.19
+       # ln -sf linux-2.4.19 linux
+       # exit
+       %
 
   [1m8.2.  Obtaining and compiling lirc.[0m
 
@@ -794,10 +798,10 @@
 
   Once the configuration step is complete:
 
-       % make
-       % su
-       # make install
-       # chmod 666 /dev/lircd
+  % make
+  % su
+  # make install
+  # chmod 666 /dev/lircd
 
   Next, we're going to manually start lircd the first time:
 
@@ -806,13 +810,13 @@
   Now, we're going to add the commands necessary for lircd to run each
   time we boot:
 
-  # cd /etc/rc.d
-  # cat >> rc.local
-  echo "Starting lircd"
-  /usr/local/sbin/lircd
-  ^D
-  # exit
-  %
+       # cd /etc/rc.d
+       # cat >> rc.local
+       echo "Starting lircd"
+       /usr/local/sbin/lircd
+       ^D
+       # exit
+       %
 
   This takes care of the lircd portion, which "listens" for the IR sig-
   nals. If everything went well, the install script for lircd put an
@@ -838,7 +842,6 @@
   button as it is defined in your /etc/lircd.conf. If you don't see any-
   thing at this point, you need to troubleshoot further by going back to
   the lirc home page and investigating from there.
-
   If it is working, then press [1mCTRL-C [22mto abort the program.  Once you
   know that your remote is working, you need to run the [1mirxevent[0m
   program, which takes the key presses and sends them to mythtv.
@@ -887,17 +890,17 @@
   rather than "ChannelUp" and "ChannelDown".  I added the following to
   my /home/[yourusername]/.lircrc file:
 
-       begin
-           prog = irxevent
-           button = channel+
-           config = Key Up CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = channel+
+      config = Key Up CurrentWindow
+  end
 
-       begin
-           prog = irxevent
-           button = channel-
-           config = Key Down CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = channel-
+      config = Key Down CurrentWindow
+  end
 
   which took care of basic functionality.  Because the PCTV Studio
   remote has additional buttons, look at the configfiles/lircrc.exam-
@@ -936,19 +939,19 @@
   Depending on whether you have your serial port driver configured as a
   kernel module you might see the following message during make:
 
-       lirc_sir.c:56:2: warning: #warning
-       "******************************************"
+  lirc_sir.c:56:2: warning: #warning
+  "******************************************"
 
-       lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
+  lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
 
-       lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
+  lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
 
-       lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
+  lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
 
-       lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
+  lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
 
-       lirc_sir.c:61:2: warning: #warning
-       "******************************************"
+  lirc_sir.c:61:2: warning: #warning
+  "******************************************"
 
   If you do receive this statement make sure to run the [1msetserial[0m
   command before you load the lirc_sir module. Follow this with the
@@ -984,10 +987,10 @@
   being received. If everything is configured correctly you should see
   something similar to the following:
 
-       % irw
-       0000000000007ff0 00 1 gi-motorola-dct2000
-       000000000000bff8 00 2 gi-motorola-dct2000
-       000000000000f7f0 00 ENTER gi-motorola-dct2000
+  % irw
+  0000000000007ff0 00 1 gi-motorola-dct2000
+  000000000000bff8 00 2 gi-motorola-dct2000
+  000000000000f7f0 00 ENTER gi-motorola-dct2000
 
   Once you've verified lirc is working you can press [1mCTRL-C [22mto exit [1mirw[0m
   and configure the channel changing script.
@@ -1005,44 +1008,44 @@
   /dev/device. Unlike bourne or bash, csh scripts automatically close
   parent file descriptors before they start.
 
-  % cd /usr/local/bin
-  # su
-  # cat > change_channel.csh
-  #!/bin/csh
-  echo "changing to $1"
-  /usr/local/bin/channel.pl $1 &
-  ^D
-  # chmod a+x change_channel.csh
-  # exit
-  % exit
+       % cd /usr/local/bin
+       # su
+       # cat > change_channel.csh
+       #!/bin/csh
+       echo "changing to $1"
+       /usr/local/bin/channel.pl $1 &
+       ^D
+       # chmod a+x change_channel.csh
+       # exit
+       % exit
 
   The following file should be saved as /usr/local/bin/channel.pl
 
-       #!/usr/bin/perl
+  #!/usr/bin/perl
 
-       # make sure to set this string to
-       # the corresponding remote in /etc/lircd.conf
-       $remote_name = "gi-motorola-dct2000";
+  # make sure to set this string to
+  # the corresponding remote in /etc/lircd.conf
+  $remote_name = "gi-motorola-dct2000";
 
-       sub change_channel {
-               my($channel_digit) = @_;
-               system ("rc SEND_ONCE $remote_name $channel_digit");
-               sleep 1;
-       }
+  sub change_channel {
+          my($channel_digit) = @_;
+          system ("rc SEND_ONCE $remote_name $channel_digit");
+          sleep 1;
+  }
 
-       $channel=$ARGV[0];
-       sleep 1;
-       if (length($channel) > 2) {
-               change_channel(substr($channel,0,1));
-               change_channel(substr($channel,1,1));
-               change_channel(substr($channel,2,1));
-       } elsif (length($channel) > 1) {
-               change_channel(substr($channel,0,1));
-               change_channel(substr($channel,1,1));
-       } else {
-               change_channel(substr($channel,0,1));
-       }
-       system ("rc SEND_ONCE $remote_name ENTER");
+  $channel=$ARGV[0];
+  sleep 1;
+  if (length($channel) > 2) {
+          change_channel(substr($channel,0,1));
+          change_channel(substr($channel,1,1));
+          change_channel(substr($channel,2,1));
+  } elsif (length($channel) > 1) {
+          change_channel(substr($channel,0,1));
+          change_channel(substr($channel,1,1));
+  } else {
+          change_channel(substr($channel,0,1));
+  }
+  system ("rc SEND_ONCE $remote_name ENTER");
 
   The last statement within the perl script is the lirc rc command. This
   is the command that transmits the code to your cable/dss box. Make
@@ -1157,19 +1160,19 @@
   If you want to know what time your job will run, you can do the
   following:
 
-  # cat /etc/crontab
-  SHELL=/bin/bash
-  PATH=/sbin:/bin:/usr/sbin:/usr/bin
-  MAILTO=root
-  HOME=/
+       # cat /etc/crontab
+       SHELL=/bin/bash
+       PATH=/sbin:/bin:/usr/sbin:/usr/bin
+       MAILTO=root
+       HOME=/
 
-  # run-parts
-  01 * * * * root nice -n 19 run-parts /etc/cron.hourly
-  02 4 * * * root nice -n 19 run-parts /etc/cron.daily
-  22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
-  42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
-  # exit
-  %
+       # run-parts
+       01 * * * * root nice -n 19 run-parts /etc/cron.hourly
+       02 4 * * * root nice -n 19 run-parts /etc/cron.daily
+       22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
+       42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
+       # exit
+       %
 
   We can see from the display that the cron.daily job will run at 0402
   every morning.
@@ -1326,13 +1329,13 @@
   <http://www.mythtv.org/> and save it to a location where you can find
   it.
 
-       % tar -xjf mythgallery-0.7.tar.bz2
-       % cd mythgallery-0.7
-       % make
-       # su
-       # make install
-       # exit
-       %
+  % tar -xjf mythgallery-0.7.tar.bz2
+  % cd mythgallery-0.7
+  % make
+  # su
+  # make install
+  # exit
+  %
 
   The configuration file for mythgallery is located in
   /usr/local/share/mythtv.  This file needs to be edited:  ensure that

@@ -10,7 +10,7 @@ development on mythmusic instructions, added text on obtaining document and
 using CVS.  Merged some more RH 8.0 documentation from Cedar McKay.  Applied
 Debian information patch from Matt Zimmerman.
 v1.032, 2002-11-22.  Added stuff on modifying xmltv, changed CVS
-documentation so that it's not dependant on CVSROOT being set, pointer to
+documentation so that it's not dependent on CVSROOT being set, pointer to
 Tarek's DirecTV and external channel changing script, moved text around so
 that external tuner / DirecTV are located under "using mythtv".  Added
 troubleshooting information about KDE vs. Gnome on RH 8.0
@@ -24,6 +24,7 @@ v1.037, 2002-11-28.  Added information on RH 8.0 environment setting by Mike
 Cencula, additional modifications on Genoo by Tony Clark.
 v1.038, 2002-11-28.  Modified the XMLTV version to get, still working on the
 Gentoo instructions.
+v1.039, 2002-11-29.  More work on the Gentoo instructions.
 -->
 <!--
 To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
@@ -34,7 +35,7 @@ To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-11-28, v1.038
+<date>2002-11-29, v1.039
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -46,7 +47,7 @@ necessary.
 <toc>
 
 <sect>How to obtain this document.
-<p>This howto document is maintained at the primary mythtv website:  <url url="
+<p>This HOWTO document is maintained at the primary mythtv website:  <url url="
 http://www.mythtv.org" name="http://www.mythtv.org">.  The latest version of
 this document can be found in CVS, accessible either through the <url
 url="http://www.mythtv.org/cgi-bin/viewcvs.cgi/" name="ViewCVS"> web interface, or directly from the
@@ -233,7 +234,26 @@ In that case, you're ready to move onto the next step.
 <p>[Please submit instructions]
 
 <sect3>Gentoo.
-<p>If KDE has not been installed on your system:
+<p>First, edit your <tt>/etc/make.conf</tt> file so that it looks like this:
+<tscreen><verb>
+# Build-time functionality
+# ========================
+#
+# The USE variable is used to enable optional build-time functionality. For
+# example, quite a few packages have optional X, gtk or GNOME functionality
+# that can only be enabled or disabled at compile-time. Gentoo Linux has a
+# very extensive set of USE variables described in our USE variable HOWTO at
+# http://www.gentoo.org/doc/use-howto.html
+#
+# The available list of use flags with descriptions is in your portage tree.
+# Use 'less' to view them:  --> less /usr/portage/profiles/use.desc <--
+#
+# Example:
+#USE="X gtk gnome -alsa"
+USE="mysql qt dvd X -alsa gtk gnome -esd oss"
+</verb></tscreen>
+
+If KDE has not been installed on your system:
 Edit <tt>/etc/make.conf</tt> and locate the "USE" variable.  If the line is commented 
 out, remove the comment.  The line should have at least:
 <tscreen><verb>
@@ -245,6 +265,19 @@ described in the Gentoo <ref id="Gentoo_build" name="section"> then you also nee
 <tscreen><verb>
 $emerge kde lame
 </verb></tscreen>
+
+By default, doesn't build QT libraries with SQL support.  To
+enable SQL support you need to add to your USE variable (USE="mysql") in 
+<tt>/etc/make.conf</tt> and rebuild QT by running 
+
+<tscreen><verb>
+% emerge qt
+</verb</tscreen>
+
+<tscreen><verb>
+% emerge mysql
+</verb></tscreen>
+
 
 All the necessary files will be downloaded and built.  This will take a lot
 of time, even on a fast machine.
@@ -460,25 +493,9 @@ Switch to superuser:
 <sect1>Gentoo. <label id="Gentoo_build">
 <p>[Documentation being finalized]
 <p>There are ebuilds setup for mythtv and for XMLTV.  To use them, do the
-following.
+following, add the following to your <tt>/etc/make.conf</tt>:
 
-First, edit your <tt>/etc/make.conf</tt> file so that it looks like this:
 <tscreen><verb>
-# Build-time functionality
-# ========================
-#
-# The USE variable is used to enable optional build-time functionality. For
-# example, quite a few packages have optional X, gtk or GNOME functionality
-# that can only be enabled or disabled at compile-time. Gentoo Linux has a
-# very extensive set of USE variables described in our USE variable HOWTO at
-# http://www.gentoo.org/doc/use-howto.html
-#
-# The available list of use flags with descriptions is in your portage tree.
-# Use 'less' to view them:  --> less /usr/portage/profiles/use.desc <--
-#
-# Example:
-#USE="X gtk gnome -alsa"
-USE="mysql qt dvd X -alsa gtk gnome -esd oss"
 # PORTDIR_OVERLAY is a directory where local ebuilds may be stored without
 #     concern that they will be deleted by rsync updates. Default is not
 #     defined.
@@ -503,13 +520,13 @@ name="http://bugs.gentoo.org/show_bug.cgi?id=10533">
 name="http://bugs.gentoo.org/show_bug.cgi?id=10536">
 </itemize>
 
-By default, Gentoo doesn't build QT libraries with SQL support.  To
-enable SQL support you need to rebuild QT by running "emerge qt".
+emerge mythtv:
+<tscreen><verb>
+% emerge /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0
+</verb></tscreen>
 
-You will also need to perform an "emerge mysql" step.
-
-emerge mythtv.  It should download the source then complain about a missing 
-digest.  To fix this 
+It should download the source then complain about a missing digest.  To fix
+this,
 
 <tscreen><verb>
 % ebuild /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0.ebuild digest
@@ -517,17 +534,17 @@ digest.  To fix this
 
 emerge mythtv again and it should compile and install.
 
-Do the same for xmltv but an additonal step will be required first to fool
-it into thinking XML-Twig is installed.  To achieve this: 
+Do the same for xmltv but an additional step will be required first to fool
+it into thinking XML-Twig is installed.  
 
 <tscreen><verb>
-% emerge inject dev-perl/XML-Twig
-</verb></tscreen>
-
-<!-- Build XML-Twig the long way and install. -->
-
-<tscreen><verb>
-% emerge mysql
+% su
+# emerge inject dev-perl/XML-Twig
+# emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
+# ebuild /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2.ebuild digest
+# emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
+# exit
+% 
 </verb></tscreen>
 
 <sect1>Debian.
@@ -554,13 +571,6 @@ the "Start" button if the mysql status shows that it isn't running yet.
 menu>Server Settings>Services and enter the root password when asked.
 Check "mysqld" and then click Start. Click Save, then close the window.
 <sect1>Gentoo.
-<p>By default, doesn't build QT libraries with SQL support.  To
-enable SQL support you need to add to your USE variable (USE="mysql") in 
-<tt>/etc/make.conf</tt> and rebuild QT by running 
-
-<tscreen><verb>
-% emerge qt
-</verb</tscreen>
 
 <sect1>Setting up the initial database.
 <p>Setup the initial mysql databases:
