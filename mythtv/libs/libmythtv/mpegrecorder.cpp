@@ -202,6 +202,8 @@ void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile,
     {
         SetOption("width", 320);
         SetOption("height", 240);
+        SetOption("mpeg2bitrate", 1000);
+        SetOption("mpeg2maxbitrate", 2000);
     }
 }
 

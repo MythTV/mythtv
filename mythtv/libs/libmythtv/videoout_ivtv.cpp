@@ -414,6 +414,7 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
         {
             ShowPip(&tmpframe, pipPlayer);
             drawanyway = true;
+            lastcleared = false;
         }
 
         if (ret >= 0)
