@@ -14,7 +14,6 @@
 #define WEATHER_H_
 
 #include <qsqldatabase.h>
-#include <qsocket.h>
 #include <qwidget.h>
 #include <qdialog.h>
 #include <qstringlist.h>
@@ -27,6 +26,7 @@ class QLabel;
 class QListView;
 class MythContext;
 class Settings;
+class WeatherSock;
 
 struct weatherTypes {
 	int typeNum;
@@ -41,7 +41,9 @@ class Weather : public MythDialog
     Weather(MythContext *context,
 	    QWidget *parent = 0, const char *name = 0);
 
-    void UpdateData();
+    bool UpdateData();
+    void processEvents();
+    QString getLocation();
 
 private slots:
     void update_timeout();
@@ -63,13 +65,6 @@ private slots:
     void newLocale7();
     void newLocale8();
     void newLocale9();
-
-    void closeConnection();
-    void socketReadyRead();
-    void socketConnected();
-    void socketConnectionClosed();
-    void socketClosed();
-    void socketError( int e );
 
 
   private:
@@ -93,9 +88,8 @@ private slots:
     QTimer *nextpage_Timer;
     QTimer *update_Timer;
     QTimer *status_Timer;
-    QSocket *httpSock;
     void fillList();
-    int GetWeatherData();
+    bool GetWeatherData();
     bool gotDataHook;
     void setWeatherTypeIcon(QString[]);
     void setWeatherIcon(QString);

@@ -28,6 +28,7 @@
 #include <unistd.h>
 
 #include "weather.h"
+#include "weathercomms.h"
 
 using namespace std;
 
@@ -138,7 +139,7 @@ Weather::Weather(MythContext *context,
 
     update_Timer = new QTimer(this);
     connect(update_Timer, SIGNAL(timeout()), SLOT(update_timeout()) );
-    update_Timer->start((int)(200));   
+    update_Timer->start((int)(10));   
 
     nextpage_Timer = new QTimer(this);
     connect(nextpage_Timer, SIGNAL(timeout()), SLOT(nextpage_timeout()) );
@@ -177,6 +178,16 @@ Weather::Weather(MythContext *context,
     if (debug == true)
 	cout << "MythWeather: Finish Object Initialization.\n";
 
+}
+
+void Weather::processEvents()
+{
+	qApp->processEvents();
+}
+
+QString Weather::getLocation()
+{
+	return locale;
 }
 
 void Weather::setupColorScheme()
@@ -501,6 +512,7 @@ void Weather::nextpage_timeout()
 
 void Weather::update_timeout()
 {
+    bool result = false;
     if (debug == true)
 	cout << "MythWeather: update_timeout() : Updating....\n";
 
@@ -511,7 +523,10 @@ void Weather::update_timeout()
     	update_Timer->changeInterval((int)(1000 * 60 * updateInterval));
     }
 
-    UpdateData();
+    result = UpdateData();
+
+    if (result == true)
+    {
 
     if (pastTime == true && currentPage == 3)
 	nextpage_timeout();
@@ -721,6 +736,9 @@ void Weather::update_timeout()
     	firstRun = false;
 	nextpage_timeout();
     }
+
+    }
+    
 
 }
 
@@ -1565,61 +1583,19 @@ if (pageNum == 4)
 
 }
 
-void Weather::UpdateData()
+bool Weather::UpdateData()
 {
-	int check = -1;
-	int cnt = 0;
+	lbUpdated->setText("Updating...");
+
+	bool result = false;
 	accel->setEnabled(false);
-	while (check != 0)
-	{
-		if (debug == true)
-			cout << "MythWeather: COMMS : GetWeatherData() ...\n";
-		check = GetWeatherData();
-		if (check == -2)
-		{
-			cnt = 0;
-			while (cnt < 250)
-			{
-				qApp->processEvents();
-				usleep(50);
-				cnt++;
-			}
-		}
-		if (check == 1)
-		{
-			cnt = 0;
-			while (cnt < 750)
-			{
-				qApp->processEvents();
-				usleep(50);
-				cnt++;
-			}
-		}	
-		
-	}
+	if (debug == true)
+	    cout << "MythWeather: COMMS : GetWeatherData() ...\n";
+	result = GetWeatherData();
 	accel->setEnabled(true);
 
-	if (httpData.find("<html>", 0) > 0 || 
-	    httpData.find("Microsoft VBScript runtime", 0) > 0 ||
-	    httpData.find("Internal Server Error", 0) > 0 ||
-	    httpData.find("Bad Request", 0) > 0)
+	if (result == true)
 	{
-		if (debug == true)	
-			cout << "MythWeather: COMMS : Invalid Area Data\n";
-		validArea = false;
-		httpData = oldhttpData;
-		return;
-	}
-	else
-	{
-		if (debug == true)
-			cout << "MythWeather: COMMS : Valid Area Data\n";
-		validArea = true;
-		oldhttpData = httpData;
-	}
-
-
-	//cout << "HTTP DATA: " << httpData << endl;
 
 	updated = GetString("this.swLastUp");
 
@@ -1754,10 +1730,15 @@ void Weather::UpdateData()
 
 	setWeatherTypeIcon(weatherType);
 	setWeatherIcon(description);
+
+	return true;
+
+	}
 /*
 	for (int i = 23; i < 39; i++)
 		cout << i << " ---- " << holdings[i] << endl;
 */
+	return false;
 
 }
 
@@ -1856,195 +1837,46 @@ return ret;
 
 }
 
-int Weather::GetWeatherData()
+bool Weather::GetWeatherData()
 {
 	if (debug == true)
-		cout << "MythWeather: COMMS : Setting status timer and data hook.\n";
+		cout << "MythWeather: Setting status timer and data hook.\n";
+
 	status_Timer->start(100);
-	gotDataHook = false;
-
-	httpSock = new QSocket(this);
-	connect( httpSock, SIGNAL(connected()),
-                SLOT(socketConnected()) );
-        connect( httpSock, SIGNAL(connectionClosed()),
-                SLOT(socketConnectionClosed()) );
-        connect( httpSock, SIGNAL(readyRead()),
-                SLOT(socketReadyRead()) );
-        connect( httpSock, SIGNAL(error(int)),
-                SLOT(socketError(int)) );
-
-	//cerr << "MythWeather: Connecting to host..." << endl;
-	if (debug == true)
-		cout << "MythWeather: Connecting to host...";
-	lbUpdated->setText("Contacting Host...");
-	httpSock->connectToHost("www.msnbc.com", 80);
-
-	con_attempt++;
-
-	int num = 0;
-        while (httpSock->state() == QSocket::HostLookup ||
-               httpSock->state() == QSocket::Connecting)
+	WeatherSock *internetData = new WeatherSock(this, debug);
+	internetData->startConnect();
+	
+	while (internetData->getStatus() == false)
         {
-         qApp->processEvents();
-         usleep(50);
-         num++;
-         if (num > 500)
-         {
-	     if (debug == true)
-			cout << "Error.\n";
-	     char tMsg[1024];
-	     sprintf (tMsg, "Connection Timed Out ... Attempt #%d", con_attempt);
-	     updated = tMsg;
-   	     lbUpdated->setText(updated);
-	     closeConnection();
-
-	     if (httpData.length() == 0)
-	     {
-			cerr << "MythWeather: (2) No Data ... Trying Again ...\n";
-			lbStatus->setText(" ");
-			status_Timer->stop();
-			delete httpSock;
-			return -2;
- 	     }
-	     else
-	     {
-		lbStatus->setText(" ");
-		status_Timer->stop();
-	     	return 1;
-	     }
-         }
+                qApp->processEvents();
+                usleep(100);
         }
 
-        if (httpSock->state() != QSocket::Connected)
-        {
-		if (debug == true)
-			cout << "Error.\n";
-		char tMsg[1024];
-	        sprintf (tMsg, "Error Connecting ... Attempt #%d", con_attempt);
-             	updated = tMsg;
-		lbUpdated->setText(updated);
-	        closeConnection();
-
-		if (httpData.length() == 0)
-                {
-			char tMsg[1024];
-                	sprintf (tMsg, "Error Connecting ... Attempt #%d", con_attempt);
-                	updated = tMsg;
-                	lbUpdated->setText(updated);
-                        cerr << "MythWeather: (1) No Data ... Trying Again ...\n";
-			lbStatus->setText(" ");
-			status_Timer->stop();
-			con_attempt++;
-			delete httpSock;
-			return 1;
-                }
-                else
-	        {
-			delete httpSock;
-			lbStatus->setText(" ");
-	        	status_Timer->stop();
-                	return 1;
-	     	}
-        }
-
-  	while (gotDataHook == false)
-	{
-		qApp->processEvents();
-		usleep(50);
-		if (conError == true)
-		{
-			conError = false;
-			delete httpSock;
-			return 1;
-		}
-	}
-
-	if (debug == true)
-		cout << "MythWeather: COMMS : Got some data...returning\n";
-
-	con_attempt = 0;
 	lbStatus->setText(" ");
-        status_Timer->stop();
- 	delete httpSock;
+	status_Timer->stop();
 
-	return 0;
+	if (internetData->checkError() == 10)
+	{
+		lbUpdated->setText("!!! 3 Failed Attempted !!! Waiting 5 minutes and trying again.");
+		update_Timer->changeInterval((int)(1000 * 60 * 5));
+		cout << "MythWeather: Invalid Area or Fatal Error.\n";
+		delete internetData;
+		return false;
+	}
+	else if (internetData->checkError() == 20)
+	{
+		lbUpdated->setText("*** Invalid Area ID Entered *** Please select a valid area id.");
+		lbLocale->setText(locale + " is invalid");
+                update_Timer->stop();
+                cout << "MythWeather: Invalid Area ID.\n";
+                delete internetData;
+                return false;
+	}
+	else
+		httpData = internetData->getData();
+
+	delete internetData;
+
+	return true;
 }
-
-void Weather::closeConnection()
-    {
-
-	if (debug == true)
-		cout << "MythWeather: COMMS (TCP) : Connection Closed.\n";
-
-        httpSock->close();
-        if ( httpSock->state() == QSocket::Closing ) {
-            // We have a delayed close.
-            connect( httpSock, SIGNAL(delayedCloseFinished()),
-                    SLOT(socketClosed()) );
-        } else {
-            // The socket is closed.
-            socketClosed();
-        }
-    }
-
-    void Weather::socketReadyRead()
-    {
-	if (debug == true)
-                cout << "MythWeather: COMMS (TCP) : Socket Data Ready.\n";
-
-	char tMsg[1024];
-        sprintf (tMsg, "Reading data [%d bytes read]...", httpData.length());
-        updated = tMsg;
-	lbUpdated->setText(updated);
-	//cerr << "MythWeather: Reading Data From Host [";
-        while ( httpSock->canReadLine() ) {
-	    //cerr << ".";
-            httpData = httpData + httpSock->readLine();
-	    sprintf (tMsg, "Reading data [%d bytes read]...", httpData.length());
-            updated = tMsg;
-            lbUpdated->setText(updated);
-        }
-	//cerr << "]\n";
-    }
-
-    void Weather::socketConnected()
-    {
-	if (debug == true)
-                cout << "MythWeather: COMMS (TCP) : Socket Connected.\n";
-
-	lbUpdated->setText("Connected, requesting weather data...");
-	QTextStream os(httpSock);
-	//cerr << "MythWeather: Connected! Requesting Weather Data ...\n";
-        os << "GET /m/chnk/d/weather_d_src.asp?acid=" 
-	   << locale << " HTTP/1.1\n"
-	   << "Connection: close\n"
-	   << "Host: www.msnbc.com\n\n\n";
-	httpData = "";
-    }
-
-    void Weather::socketConnectionClosed()
-    {
-	if (debug == true)
-                cout << "MythWeather: COMMS (TCP) : Connection Closed from Remote.\n";
-
-	gotDataHook = true;
-    }
-
-    void Weather::socketClosed()
-    {
-    }
-
-    void Weather::socketError( int e )
-    {
- 	if (debug == true)
-                cout << "MythWeather: COMMS (TCP) : Error #" << e << ".\n";
-
-	conError = true;
-	char tMsg[1024];
-        sprintf (tMsg, "Error Connecting ... Attempt #%d", con_attempt);
-        updated = tMsg;
-        lbUpdated->setText(updated);
-        closeConnection();
-	e = 0;
-    }
 

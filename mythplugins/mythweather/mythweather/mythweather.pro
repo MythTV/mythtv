@@ -22,5 +22,5 @@ LIBS += -L$${PREFIX}/lib -lmyth-$$LIBVERSION
 
 # Input
 
-HEADERS += weather.h 
-SOURCES += main.cpp weather.cpp 
+HEADERS += weather.h weathercomms.h
+SOURCES += main.cpp weather.cpp weathercomms.cpp
