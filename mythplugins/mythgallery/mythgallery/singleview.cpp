@@ -173,32 +173,30 @@ void SingleView::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
 
-    for (unsigned int i = 0; i < actions.size(); i++)
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
+        handled = true;
+
         if (action == "ROTRIGHT")
         {
             rotateAngle += 90;
-            handled = true;
             redraw = true;
             newzoom = 1;
         }
         else if (action == "ROTLEFT")
         {
             rotateAngle -= 90;
-            handled = true;
             redraw = true;
             newzoom = 1;
         }
         else if (action == "LEFT" || action == "UP")
         {
             retreatFrame(false);
-            handled = true;
             rotateAngle = 0;
         }
         else if (action == "INFO")
         {
-            handled=true;
             QString filename = (*images)[imagepos].filename;
             QFileInfo fi(filename);
             QString info((*images)[imagepos].name);
@@ -227,7 +225,6 @@ void SingleView::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "ZOOMIN")
         {
-            handled = true;
             newzoom = zoomfactor ? (zoomfactor * 2) : 2;
             timerrunning = false;
         }
@@ -245,7 +242,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "SCROLLRIGHT")
         {
-            handled=zoomfactor;
+            handled = zoomfactor;
             sx += screenwidth/2;
             sx = (sx > (zoomed_w-screenwidth)) ? (zoomed_w - screenwidth) : sx;
         }
@@ -280,15 +277,15 @@ void SingleView::keyPressEvent(QKeyEvent *e)
         else if (action == "RIGHT" || action == "DOWN" || action == "SELECT")
         {
             advanceFrame(false);
-            handled = true;
             rotateAngle = 0;
         }
         else if (action == "PLAY")
         {
             timerrunning = !timerrunning;
-            handled = true;
             rotateAngle = 0;
         }
+        else
+            handled = false;
     }
 
     if (handled)
