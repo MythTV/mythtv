@@ -1,5 +1,5 @@
-#ifndef VORBISDECODER_H_
-#define VORBISDECODER_H_
+#ifndef FLACDECODER_H_
+#define FLACDECODER_H_
 
 #include "decoder.h"
 

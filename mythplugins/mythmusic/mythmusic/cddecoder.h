@@ -1,5 +1,5 @@
-#ifndef VORBISDECODER_H_
-#define VORBISDECODER_H_
+#ifndef CDDECODER_H_
+#define CDDECODER_H_
 
 #include "decoder.h"
 
