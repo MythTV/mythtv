@@ -32,7 +32,13 @@ ProgramAssociationTable* ProgramAssociationTable::Create(
     pat->SetLength(PSIP_OFFSET+(count*4));
 
     // create PAT data
-    assert((count*4)<(184-PSIP_OFFSET)); // PAT must be in single TS
+    if ((count * 4) >= (184 - PSIP_OFFSET))
+    { // old PAT must be in single TS for this create function
+        VERBOSE(VB_IMPORTANT, "PAT::Create: Error, old "
+                "PAT size exceeds maximum PAT size.");
+        return 0;
+    }
+
     uint offset = PSIP_OFFSET;
     for (uint i=0; i<count; i++)
     {

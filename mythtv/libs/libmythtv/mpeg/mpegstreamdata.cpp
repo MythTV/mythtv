@@ -114,6 +114,14 @@ bool MPEGStreamData::CreatePAT(const ProgramAssociationTable& pat)
     uint ver = pat.Version();
     ProgramAssociationTable* pat2 =
         ProgramAssociationTable::Create(tsid, ver, pnums, pids);
+
+    if (!pat2)
+    {
+        VERBOSE(VB_IMPORTANT, "MPEGStreamData::CreatePAT: "
+                "Failed to create Program Association Table.");
+        return false;
+    }
+
     pat2->tsheader()->SetContinuityCounter(pat.tsheader()->ContinuityCounter());
 
     VERBOSE(VB_RECORD, QString("pmt_pid(0x%1)").arg(_pid_pmt, 0, 16));

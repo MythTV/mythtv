@@ -87,12 +87,23 @@ QString MasterGuideTable::toString() const {
 }
 
 QString TerrestrialVirtualChannelTable::toString(int chan) const {
+    static QString modnames[6] =
+    {
+        QObject::tr("[Reserved]"),  QObject::tr("Analog"),
+        QObject::tr("SCTE mode 1"), QObject::tr("SCTE mode 2"),
+        QObject::tr("ATSC 8-VSB"),  QObject::tr("ATSC 16-VSB"),
+    };
+
     QString str;
     str.append(QString("Channel #%1 ").arg(chan));
     str.append(QString("name(%1) %2-%3 ").arg(ShortChannelName(chan)).
                arg(MajorChannel(chan)).arg(MinorChannel(chan)));
-    assert(ModulationMode(chan)==4 ||
-           ModulationMode(chan)==1); // NTSC listing in TVCT
+
+    if (ModulationMode(chan) > 5)
+        str.append(QString("mod(UNKNOWN %1) ").arg(ModulationMode(chan)));
+    else
+        str.append(QString("mod(%1) ").arg(modnames[ModulationMode(chan)]));
+
     str.append(QString("cTSID(0x%1)\n").arg(ChannelTransportStreamID(chan), 0, 16));
     str.append(QString(" pnum(%1) ").arg(ProgramNumber(chan)));
     str.append(QString("ETM_loc(%1) ").arg(ETMlocation(chan)));
