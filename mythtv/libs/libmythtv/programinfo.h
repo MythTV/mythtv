@@ -278,6 +278,8 @@ class ProgramInfo
     QString seriesid;
     QString programid;
 
+    QString sortTitle;
+
 
 private:
     void handleRecording(QSqlDatabase *db);

@@ -1083,10 +1083,15 @@ bool PlaybackBox::FillList()
 
     fillRecGroupPasswordCache();
 
+    QMap<QString, QString> sortedList;
+    QRegExp prefixes = tr("^(The |A |An )");
+    QString sTitle = "";
+
     vector<ProgramInfo *> *infoList;
     infoList = RemoteGetRecordedList(listOrder == 0 || type == Delete);
     if (infoList)
     {
+        sortedList[""] = "";
         vector<ProgramInfo *>::iterator i = infoList->begin();
         for ( ; i != infoList->end(); i++)
         {
@@ -1100,6 +1105,9 @@ bool PlaybackBox::FillList()
             {
                 progLists[""].prepend(p);
                 progLists[p->title].prepend(p);
+                sTitle = p->title;
+                sTitle.remove(prefixes);
+                sortedList[sTitle] = p->title;
             }
             else
                 delete p;
@@ -1107,20 +1115,25 @@ bool PlaybackBox::FillList()
         delete infoList;
     }
 
-    titleList = progLists.keys();
+    titleList = sortedList.values();
 
     // Try to find our old place in the title list.  Scan the new
     // titles backwards until we find where we were or go past.  This
     // is somewhat inefficient, but it works.
+
+    oldtitle.remove(prefixes);
     titleIndex = titleList.count() - 1;
     for (int i = titleIndex; i >= 0; i--)
     {
-        if (oldtitle > titleList[i])
+        sTitle = titleList[i];
+        sTitle.remove(prefixes);
+        
+        if (oldtitle > sTitle)
             break;
 
         titleIndex = i;
 
-        if (oldtitle == titleList[i])
+        if (oldtitle == sTitle)
             break;
     }
 

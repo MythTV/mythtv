@@ -68,6 +68,8 @@ ProgramInfo::ProgramInfo(void)
     seriesid = "";
     programid = "";
 
+    sortTitle = "";
+
     record = NULL;
 }   
         
@@ -139,6 +141,8 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
 
     seriesid = other.seriesid;
     programid = other.programid;
+
+    sortTitle = other.sortTitle;
 
     originalAirDate = other.originalAirDate;
     stars = other.stars;

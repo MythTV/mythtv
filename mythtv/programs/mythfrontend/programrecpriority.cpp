@@ -640,7 +640,7 @@ void ProgramRecPriority::FillList(void)
     // program from db
     // (hope this is ok to do here, it's so much lighter doing
     // it all at once than once per program)
-    QString query = QString("SELECT record.title, record.chanid, "
+    QString query = QString("SELECT recordid, record.title, record.chanid, "
                             "record.starttime, record.startdate, "
                             "record.type, channel.recpriority "
                             "FROM record "
@@ -657,33 +657,14 @@ void ProgramRecPriority::FillList(void)
     {
         while (result.next()) 
         {
-            QString title = QString::fromUtf8(result.value(0).toString());
-            QString chanid = result.value(1).toString();
-            QString tempTime = result.value(2).toString();
-            QString tempDate = result.value(3).toString();
-            RecordingType recType = (RecordingType)result.value(4).toInt();
-            int channelRecPriority = result.value(5).toInt();
+            int recordid = result.value(0).toInt();
+            QString title = QString::fromUtf8(result.value(1).toString());
+            QString chanid = result.value(2).toString();
+            QString tempTime = result.value(3).toString();
+            QString tempDate = result.value(4).toString();
+            RecordingType recType = (RecordingType)result.value(5).toInt();
+            int channelRecPriority = result.value(6).toInt();
             int recTypeRecPriority = rtRecPriors[recType-1];
-              
-            // this is so kludgy
-            // since we key off of title+chanid+startts we have
-            // to copy what RemoteGetAllScheduledRecordings()
-            // does so the keys will match 
-            QDateTime startts; 
-            if (recType == kSingleRecord || recType == kTimeslotRecord ||
-                recType == kWeekslotRecord || recType == kOverrideRecord ||
-                recType == kDontRecord)
-                startts = QDateTime::fromString(tempDate + ":" + tempTime,
-                                                Qt::ISODate);
-            else
-            {
-                startts = QDateTime::currentDateTime();
-                startts.setTime(QTime(0,0));
-            }
-    
-            // make a key for each program
-            QString keyA = title + ":" + chanid + ":" +
-                           startts.toString(Qt::ISODate);
 
             // find matching program in programData and set
             // channelRecPriority, recTypeRecPriority and recType
@@ -691,9 +672,12 @@ void ProgramRecPriority::FillList(void)
             for (it = programData.begin(); it != programData.end(); ++it)
             {
                 ProgramRecPriorityInfo *progInfo = &(it.data());
-                QString keyB = progInfo->MakeUniqueKey();
-                if (keyA == keyB)
+
+                if (progInfo->recordid == recordid)
                 {
+                    progInfo->sortTitle = progInfo->title;
+                    progInfo->sortTitle.remove(QRegExp(tr("^(The |A |An )")));
+
                     progInfo->channelRecPriority = channelRecPriority;
                     progInfo->recTypeRecPriority = recTypeRecPriority;
                     progInfo->recType = recType;
@@ -723,9 +707,9 @@ class titleSort
         bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
         {
             if (m_reverse)
-                return (a.prog->title < b.prog->title);
+                return (a.prog->sortTitle < b.prog->sortTitle);
             else
-                return (a.prog->title > b.prog->title);
+                return (a.prog->sortTitle > b.prog->sortTitle);
         }
 
     private:
@@ -753,9 +737,9 @@ class programRecPrioritySort
                 int typeB = RecTypePriority(b.prog->recType);
                 if (typeA == typeB)
                     if (m_reverse)
-                        return (a.prog->title < b.prog->title);
+                        return (a.prog->sortTitle < b.prog->sortTitle);
                     else
-                        return (a.prog->title > b.prog->title);
+                        return (a.prog->sortTitle > b.prog->sortTitle);
 
                 if (m_reverse)
                     return (typeA < typeB);
@@ -784,9 +768,9 @@ class programRecTypeSort
             int typeB = RecTypePriority(b.prog->recType);
             if (typeA == typeB)
                 if (m_reverse)
-                    return (a.prog->title < b.prog->title);
+                    return (a.prog->sortTitle < b.prog->sortTitle);
                 else
-                    return (a.prog->title > b.prog->title);
+                    return (a.prog->sortTitle > b.prog->sortTitle);
 
             if (m_reverse)
                 return (typeA < typeB);

@@ -100,6 +100,9 @@ PreviousBox::PreviousBox(QSqlDatabase *ldb, MythMainWindow *parent,
 
 PreviousBox::~PreviousBox()
 {
+    ProgramInfo *s;
+    for (s = itemList.first(); s; s = itemList.take());
+
     gContext->removeListener(this);
     delete theme;
 }
@@ -391,24 +394,77 @@ void PreviousBox::fillViewList(const QString &view)
         curView = 0;
 }
 
+class titleIDSort
+{
+    public:
+        titleIDSort(bool reverseSort = false) {m_reverse = reverseSort;}
+
+        bool operator()(const ProgramInfo *a, const ProgramInfo *b) 
+        {
+            if (a->sortTitle == b->sortTitle)
+            {
+                if (a->programid == b->programid)
+                    return (a->startts < b->startts);
+                else
+                    return (a->programid < b->programid);
+            }
+            else if (m_reverse)
+                return (a->sortTitle > b->sortTitle);
+            else
+                return (a->sortTitle < b->sortTitle);
+        }
+
+    private:
+        bool m_reverse;
+};
+
+class timeSort
+{
+    public:
+        timeSort(bool reverseSort = false) {m_reverse = reverseSort;}
+
+        bool operator()(const ProgramInfo *a, const ProgramInfo *b) 
+        {
+            if (m_reverse)
+                return (a->startts > b->startts);
+            else
+                return (a->startts < b->startts);
+        }
+
+    private:
+        bool m_reverse;
+};
+
 void PreviousBox::fillItemList(void)
 {
     if (curView < 0)
         return;
 
-    QString where;
+    ProgramInfo *s;
+    for (s = itemList.first(); s; s = itemList.take());
+    itemList.FromOldRecorded(db, "");
+
+    vector<ProgramInfo *> sortedList;
+    for (s = itemList.first(); s; s = itemList.take())
+    {
+        s->sortTitle = s->title;
+        s->sortTitle.remove(QRegExp("^(The |A |An )"));
+        sortedList.push_back(s);
+    }
 
     if (viewList[curView] == "reverse time")
-        where = QString("ORDER BY starttime DESC, oldrecorded.chanid ");
+        sort(sortedList.begin(), sortedList.end(), timeSort(true));
     else if (viewList[curView] == "sort by time")
-        where = QString("ORDER BY starttime, oldrecorded.chanid ");
+        sort(sortedList.begin(), sortedList.end(), timeSort(false));
     else if (viewList[curView] == "reverse title")
-        where = QString("ORDER BY title DESC, programid, starttime ");
+        sort(sortedList.begin(), sortedList.end(), titleIDSort(true));
     else
-        where = QString("ORDER BY title, programid, starttime ");
+        sort(sortedList.begin(), sortedList.end(), titleIDSort(false));
 
-    itemList.FromOldRecorded(db, where);
-    
+    vector<ProgramInfo *>::iterator i = sortedList.begin();
+    for (; i != sortedList.end(); i++)
+        itemList.append(*i);
+
     if (curItem < 0 && itemList.count() > 0)
         curItem = 0;
     else if (curItem >= (int)itemList.count())
