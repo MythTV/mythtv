@@ -1340,7 +1340,10 @@ void Scheduler::AddNewRecords(void) {
                 p->IsSameProgramTimeslot(*r))
             {
                 if (r->reactivate > 0)
+                {
                     r->reactivate = 2;
+                    p->reactivate = -1;
+                }
                 else
                 {
                     delete p;
