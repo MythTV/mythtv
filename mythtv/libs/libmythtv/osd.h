@@ -19,6 +19,7 @@ enum OSDFunctionalType
 {
     kOSDFunctionalType_Default = 0,
     kOSDFunctionalType_PictureAdjust,
+    kOSDFunctionalType_RecPictureAdjust,
     kOSDFunctionalType_SmartForward
 };
 

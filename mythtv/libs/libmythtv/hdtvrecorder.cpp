@@ -798,6 +798,9 @@ void HDTVRecorder::Reset(void)
     framesWritten = 0;
     framesSeen = 0;
     gopset = false;
+    m_in_mpg_headers = false;
+    pict_start_is_gop = false;
+    m_header_sync = 0;
     firstgoppos = 0;
     ts_packets = 0;
     pmt_pid = -1;
