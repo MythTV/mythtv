@@ -140,7 +140,7 @@ void MythContext::LoadSettingsFiles(const QString &filename)
 
 void MythContext::LoadSettingsDatabase(QSqlDatabase *db)
 {
-    QString thequery = "SELECT * FROM settings";
+    QString thequery = "SELECT * FROM settings;";
     QSqlQuery query = db->exec(thequery);
 
     if (query.isActive() && query.numRowsAffected() > 0)
@@ -259,7 +259,7 @@ int MythContext::OpenDatabase(QSqlDatabase *db)
 
 void MythContext::KickDatabase(QSqlDatabase *db)
 {
-    QString query("SELECT NULL");
+    QString query("SELECT NULL;");
     for(unsigned int i = 0 ; i < 2 ; ++i, usleep(50000)) {
         QSqlQuery result = db->exec(query);
         if (result.isActive())
@@ -279,7 +279,7 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
 
         KickDatabase(m_db);
 
-        QString query = QString("SELECT data FROM settings WHERE value = '%1'").arg(key);
+        QString query = QString("SELECT data FROM settings WHERE value = '%1';").arg(key);
         QSqlQuery result = m_db->exec(query);
 
         if (result.isActive() && result.numRowsAffected() > 0) {
@@ -304,7 +304,7 @@ int MythContext::GetNumSetting(const QString &key, int defaultval)
 
         KickDatabase(m_db);
 
-        QString query = QString("SELECT data FROM settings WHERE value = '%1'").arg(key);
+        QString query = QString("SELECT data FROM settings WHERE value = '%1';").arg(key);
         QSqlQuery result = m_db->exec(query);
 
         if (result.isActive() && result.numRowsAffected() > 0) {

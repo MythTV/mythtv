@@ -538,7 +538,7 @@ QWidget* ConfigurationWizard::configWidget(ConfigurationGroup *cg,
 }
 
 void SimpleDBStorage::load(QSqlDatabase* db) {
-    QString querystr = QString("SELECT %1 FROM %2 WHERE %3")
+    QString querystr = QString("SELECT %1 FROM %2 WHERE %3;")
         .arg(column).arg(table).arg(whereClause());
     QSqlQuery query = db->exec(querystr);
 
@@ -551,18 +551,18 @@ void SimpleDBStorage::load(QSqlDatabase* db) {
 }
 
 void SimpleDBStorage::save(QSqlDatabase* db) {
-    QString querystr = QString("SELECT * FROM %1 WHERE %2")
+    QString querystr = QString("SELECT * FROM %1 WHERE %2;")
         .arg(table).arg(whereClause());
     QSqlQuery query = db->exec(querystr);
 
     if (query.isActive() && query.numRowsAffected() > 0) {
         // Row already exists
-        querystr = QString("UPDATE %1 SET %2 WHERE %4")
+        querystr = QString("UPDATE %1 SET %2 WHERE %3;")
             .arg(table).arg(setClause()).arg(whereClause());
         query = db->exec(querystr);
     } else {
         // Row does not exist yet
-        querystr = QString("INSERT INTO %1 SET %2")
+        querystr = QString("INSERT INTO %1 SET %2;")
             .arg(table).arg(setClause());
         query = db->exec(querystr);
     }
@@ -571,14 +571,14 @@ void SimpleDBStorage::save(QSqlDatabase* db) {
 void AutoIncrementStorage::save(QSqlDatabase* db) {
     if (intValue() == 0) {
         // Generate a new, unique ID
-        QString query = QString("INSERT INTO %1 (%2) VALUES (0)").arg(table).arg(column);
+        QString query = QString("INSERT INTO %1 (%2) VALUES (0);").arg(table).arg(column);
         QSqlQuery result = db->exec(query);
         if (!result.isActive() || result.numRowsAffected() < 1) {
             cout << "Failed to insert new entry for ("
                  << table << "," << column << ")\n";
             return;
         }
-        result = db->exec("SELECT LAST_INSERT_ID()");
+        result = db->exec("SELECT LAST_INSERT_ID();");
         if (!result.isActive() || result.numRowsAffected() < 1) {
             cout << "Failed to fetch last insert id" << endl;
             return;

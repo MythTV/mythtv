@@ -47,7 +47,7 @@ QString getResponse(const QString &query, const QString &def)
 
 void configXMLTV()
 {
-    QSqlQuery result = db->exec("SELECT sourceid FROM videosource");
+    QSqlQuery result = db->exec("SELECT sourceid FROM videosource;");
 
     if (!result.isActive() || result.numRowsAffected() < 1) {
         cerr << "No channel sources?  Try again...\n";

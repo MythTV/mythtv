@@ -312,7 +312,7 @@ void RecordingProfile::loadByID(QSqlDatabase* db, int profileId) {
 }
 
 void RecordingProfile::loadByName(QSqlDatabase* db, QString name) {
-    QString query = QString("SELECT id FROM recordingprofiles WHERE name = '%1'").arg(name);
+    QString query = QString("SELECT id FROM recordingprofiles WHERE name = '%1';").arg(name);
     QSqlQuery result = db->exec(query);
     if (result.isActive() && result.numRowsAffected() > 0) {
         result.next();
@@ -325,7 +325,7 @@ void RecordingProfile::loadByName(QSqlDatabase* db, QString name) {
 void RecordingProfileEditor::load(QSqlDatabase* db) {
     clearSelections();
     addSelection("(Create new profile)", "0");
-    QSqlQuery query = db->exec("SELECT name, id FROM recordingprofiles");
+    QSqlQuery query = db->exec("SELECT name, id FROM recordingprofiles;");
     if (query.isActive() && query.numRowsAffected() > 0)
         while (query.next())
             addSelection(query.value(0).toString(), query.value(1).toString());

@@ -657,7 +657,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                 while(1)
                 {
                     querystr.sprintf("SELECT channum FROM channel WHERE "
-                                     "chanid = %d", chanid);
+                                     "chanid = %d;", chanid);
                     if (!query.exec(querystr))
                         break;
 
@@ -761,7 +761,7 @@ void handlePrograms(int id, int offset, QMap<QString,
 
             querystr.sprintf("INSERT INTO program (chanid,starttime,endtime,"
                              "title,subtitle,description,category) VALUES(%d,"
-                             " %s, %s, \"%s\", \"%s\", \"%s\", \"%s\")", 
+                             " %s, %s, \"%s\", \"%s\", \"%s\", \"%s\");", 
                              chanid, (*i).startts.ascii(), 
                              (*i).endts.ascii(), (*i).title.utf8().data(), 
                              (*i).subtitle.utf8().data(), 
@@ -833,7 +833,7 @@ void grabData(Source source, int offset)
 void clearOldDBEntries(void)
 {
     QString querystr = "DELETE FROM program WHERE starttime <= "
-                       "DATE_SUB(CURRENT_DATE, INTERVAL 1 DAY)";
+                       "DATE_SUB(CURRENT_DATE, INTERVAL 1 DAY);";
     QSqlQuery query;
 
     query.exec(querystr);

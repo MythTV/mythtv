@@ -261,7 +261,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             QString subquerystr;
 
             subquerystr = QString("SELECT channum,name,callsign FROM channel "
-                                  "WHERE chanid = %1").arg(proginfo->chanid);
+                                  "WHERE chanid = %1;").arg(proginfo->chanid);
             subquery.exec(subquerystr);
 
             if (subquery.isActive() && subquery.numRowsAffected() > 0)

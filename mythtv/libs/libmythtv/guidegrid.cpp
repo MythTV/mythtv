@@ -472,7 +472,7 @@ void GuideGrid::fillChannelInfos()
         ordering = "channum + 0";
     
     thequery = "SELECT channum,callsign,icon,chanid FROM channel "
-               "ORDER BY " + ordering;
+               "ORDER BY " + ordering + ";";
     query.exec(thequery);
     
     bool set = false;
