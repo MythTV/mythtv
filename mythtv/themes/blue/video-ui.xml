@@ -33,7 +33,7 @@
         <value>Director:</value>
       </textarea>
       <textarea name="director" draworder="4">
-        <area>130,75,350,35</area>
+        <area>140,75,350,35</area>
         <font>metadata</font>
       </textarea>
       <textarea name="yrlbl" draworder="4" align="right">
@@ -42,7 +42,7 @@
         <value>Year:</value>
       </textarea>
       <textarea name="year" draworder="4">
-        <area>730,75,100,35</area>
+        <area>720,75,100,35</area>
         <font>metadata</font>
       </textarea>
       <textarea name="ratlbl" draworder="4">
@@ -51,7 +51,7 @@
         <value>Rated:</value>
       </textarea>
       <textarea name="rating" draworder="4">
-        <area>130,135,650,35</area>
+        <area>140,135,650,35</area>
         <font>metadata</font>
       </textarea>
       <textarea name="lvllbl" draworder="4" align="right">
@@ -69,7 +69,7 @@
         <value>Browsable:</value>
       </textarea>
       <textarea name="browseable" draworder="4">
-        <area>405,105,100,35</area>
+        <area>415,105,100,35</area>
         <font>metadata</font>
       </textarea>
       <textarea name="lenlbl" draworder="4">
@@ -78,7 +78,7 @@
         <value>Runtime:</value>
       </textarea>
       <textarea name="length" draworder="4">
-        <area>405,75,350,35</area>
+        <area>415,75,350,35</area>
         <font>metadata</font>
       </textarea>
       <textarea name="pltlbl" draworder="4">
@@ -97,16 +97,16 @@
         <value>Filename:</value>
       </textarea>
       <textarea name="filename" draworder="4">
-        <area>130,225,600,35</area>
+        <area>140,225,600,35</area>
         <font>metadata</font>
       </textarea>
       <textarea name="cvflbl" draworder="4">
-        <area>30,255,150,35</area>
+        <area>30,250,150,35</area>
         <font>info</font>
         <value>Cover File:</value>
       </textarea>
       <textarea name="coverfile" draworder="4">
-        <area>130,255,600,35</area>
+        <area>140,250,600,35</area>
         <font>metadata</font>
       </textarea>
       <textarea name="imdblbl" draworder="4">
@@ -115,7 +115,7 @@
         <value>IMDB Num.:</value>
       </textarea>
       <textarea name="inetref" draworder="4">
-        <area>130,105,500,35</area>
+        <area>140,105,500,35</area>
         <font>metadata</font>
       </textarea>
     </container>
