@@ -575,7 +575,11 @@ void HttpOutResponse::setPayload(char *new_payload, int new_payload_size)
 {
     if(new_payload_size > MAX_CLIENT_OUTGOING)
     {
-        cerr << "httpresponse.o: something is trying to send an http request with a huge payload size of " << new_payload_size << endl;
+        cerr << "httpresponse.o: something is trying to send an http "
+             << "request with a huge payload size of " 
+             << new_payload_size 
+             << endl;
+
         new_payload_size = MAX_CLIENT_OUTGOING;
     }
 
@@ -583,6 +587,28 @@ void HttpOutResponse::setPayload(char *new_payload, int new_payload_size)
     payload.clear();
 
     payload.insert(payload.end(), new_payload, new_payload + new_payload_size);
+}
+
+void HttpOutResponse::setPayload(QValueVector<char> *new_payload)
+{
+    uint new_payload_size = new_payload->size();
+
+    if(new_payload_size > MAX_CLIENT_OUTGOING)
+    {
+        cerr << "httpresponse.o: something is trying to send an http "
+             << "request with a huge payload size of " 
+             << new_payload_size 
+             << endl;
+
+        new_payload_size = MAX_CLIENT_OUTGOING;
+    }
+
+    payload.clear();
+    
+    for(uint i = 0; i < new_payload_size; i++)
+    {
+        payload.insert(payload.end(), new_payload->at(i));
+    }
 }
 
 void HttpOutResponse::clearPayload()

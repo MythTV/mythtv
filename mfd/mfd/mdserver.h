@@ -16,6 +16,7 @@
 #include <qvaluelist.h>
 
 #include "../mfdlib/mfd_plugin.h"
+#include "../mdcaplib/mdcapoutput.h"
 
 class MFD;
 
@@ -34,7 +35,7 @@ class MetadataServer : public MFDHttpPlugin
     ~MetadataServer();
 
     void    run();
-    void    handleIncoming(HttpInRequest *request, int client_id);
+    void    handleIncoming(HttpInRequest *http_request, int client_id);
 
     void                         lockMetadata();
     void                         unlockMetadata();
@@ -89,6 +90,14 @@ class MetadataServer : public MFDHttpPlugin
     QValueList<int>             getLastDestroyedMetadataList(){return last_destroyed_metadata;}
     QValueList<int>             getLastDestroyedPlaylistList(){return last_destroyed_playlists;}
 
+
+    //
+    //  mdcap related serving functions
+    //
+    
+    void sendServerInfo(HttpInRequest *http_request);
+
+    void sendResponse(HttpInRequest *http_request, MdcapOutput &response);
 
   private:
 

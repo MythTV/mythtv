@@ -16,6 +16,7 @@ using namespace std;
 #include <qstring.h>
 #include <qdict.h>
 #include <qfile.h>
+#include <qvaluevector.h>
 #include <FLAC/all.h>
 
 #include "httpinrequest.h"
@@ -41,6 +42,7 @@ class HttpOutResponse
     void addHeader(const QString &new_header);
     void clearPayload();
     void setPayload(char *new_payload, int new_payload_size);
+    void setPayload(QValueVector<char>* new_payload);
     void addToPayload(const QString &new_content);
     void sendFile(
                     QString file_path, 

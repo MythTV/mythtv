@@ -17,7 +17,10 @@ using namespace std;
 #include "settings.h"
 
 #include "mdserver.h"
-#include "../mfdlib/mfd_events.h"
+#include "mfd_events.h"
+#include "httpoutresponse.h"
+#include "mdcaprequest.h"
+
 
 MetadataServer::MetadataServer(MFD* owner, int port)
                :MFDHttpPlugin(owner, -1, port, "metadata server", 2)
@@ -82,7 +85,7 @@ void MetadataServer::run()
 }
 
 
-void MetadataServer::handleIncoming(HttpInRequest *request, int /* client_id */ )
+void MetadataServer::handleIncoming(HttpInRequest *http_request, int /* client_id */ )
 {
     //
     //  The MfdHttpPlugin class ensures that this function gets called in
@@ -90,13 +93,82 @@ void MetadataServer::handleIncoming(HttpInRequest *request, int /* client_id */ 
     //  about anything that gets called from here!
     //
     
-    //  MdcapRequest *mdcap_request = new MdcapRequest();
     
-    cout << " we are in handleIncoming with an httpRequest " << endl;
-    request->printRequest();
-    request->printHeaders();
+    //
+    //  Create an MdcapRequest object that will be built up to understand the
+    //  request that has just come in from a client
+    //
+
+    MdcapRequest *mdcap_request = new MdcapRequest();
+
+    //
+    //  Start to build up the request by parsing the path of the request.
+    //
     
+    mdcap_request->parsePath(http_request);
     
+    //
+    //  Make sure we understand the path
+    //
+
+    if(mdcap_request->getRequestType() == MDCAP_REQUEST_NOREQUEST)
+    {
+        warning("got a request that had no path/url");
+        delete mdcap_request;
+        mdcap_request = NULL;
+        return;
+    }
+    
+    //
+    //  Send back server info if that's what they asked for
+    //
+    
+    else if(mdcap_request->getRequestType() == MDCAP_REQUEST_SERVINFO )
+    {
+        sendServerInfo(http_request);
+        delete mdcap_request;
+        mdcap_request = NULL;
+        return;
+    }   
+
+    else if(mdcap_request->getRequestType() == MDCAP_REQUEST_LOGIN)
+    {
+        /*
+        u32 session_id = daap_sessions.getNewId();
+        sendLogin( http_request, session_id);
+        delete daap_request;
+        daap_request = NULL;
+        return;
+        */
+    }
+
+
+
+/*
+
+
+    //
+    //  If we've made it this far, then we have a logged in client, so we
+    //  should be able to parse the request to get session ID, etc.
+    //
+
+    parseVariables( http_request, daap_request);
+
+    if(!daap_sessions.isValid(daap_request->getSessionId()))
+    {
+        //
+        //  Hmmm ... this isn't right. The DAAP client did not ask for
+        //  server info or a login, but it does not have a valid session id
+        //  (which it can get by requesting a login).
+        //
+        
+        http_request->getResponse()->setError(403); // forbidden
+        delete daap_request;
+        daap_request = NULL;
+        return;
+    }
+    
+    */
 }
 
 void MetadataServer::lockMetadata()
@@ -915,6 +987,48 @@ Metadata* MetadataServer::getLocalEquivalent(Metadata *which_item)
         return_value = local_mythdigest_dictionary->find(myth_digest);
     }
     return return_value;
+}
+
+
+void MetadataServer::sendResponse(HttpInRequest *http_request, MdcapOutput &response)
+{
+
+    //
+    //  Make sure we don't have any open content code groups in what we're sending
+    //
+    
+    if(response.openGroups())
+    {
+        warning("asked to send mdcap response, but there are open groups");
+        http_request->getResponse()->setError(500);
+        return;
+    }
+
+    //
+    //  Set some header stuff 
+    //
+    
+    http_request->getResponse()->addHeader("Content-Type: application/x-mdcap-tagged");
+    
+    //
+    //  Set the payload
+    //
+    
+    http_request->getResponse()->setPayload(response.getContents());
+}
+
+void MetadataServer::sendServerInfo(HttpInRequest *http_request)
+{
+
+    MdcapOutput response;
+
+    response.addServerInfoGroup();
+       response.addStatus(200); // like http ok!
+       response.addServiceName("metadata server on some host");
+       response.addProtocolVersion();
+    response.endGroup();
+
+    sendResponse( http_request, response);
 }
 
 MetadataServer::~MetadataServer()

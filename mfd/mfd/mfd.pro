@@ -1,6 +1,6 @@
 INCLUDEPATH += ../mfdlib
 DEPENDPATH += ../mfdlib
-LIBS += -Wl,--export-dynamic -L../mfdlib/ -lmfdlib 
+LIBS += -Wl,--export-dynamic -L../mfdlib/ -lmfdlib -L../mdcaplib/ -lmdcap
 
 include ( ../settings.pro )
 
@@ -34,8 +34,8 @@ LIBS += -lmythavcodec-$$LIBVERSION
 LIBS += -Wl,-rpath,$${PREFIX}/lib
 
 HEADERS +=          mfd.h   pluginmanager.h   serversocket.h   logging.h   \
-           mdserver.h   dbcheck.h
+           mdserver.h   dbcheck.h   mdcaprequest.h
 SOURCES += main.cpp mfd.cpp pluginmanager.cpp serversocket.cpp logging.cpp \
-           mdserver.cpp dbcheck.cpp
+           mdserver.cpp dbcheck.cpp mdcaprequest.cpp
 
 
