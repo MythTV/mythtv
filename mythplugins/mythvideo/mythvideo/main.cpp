@@ -22,6 +22,7 @@ using namespace std;
 #include "videotree.h"
 #include "globalsettings.h"
 #include "fileassoc.h"
+#include "dbcheck.h"
 
 #include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
@@ -60,6 +61,7 @@ int mythplugin_init(const char *libversion)
                                     MYTH_BINARY_VERSION))
         return -1;
 
+    UpgradeVideoDatabaseSchema();
 
     GeneralSettings general;
     general.load(QSqlDatabase::database());

@@ -21,8 +21,8 @@ INSTALLS += installfiles uifiles installimages
 
 # Input
 
-HEADERS += metadata.h videomanager.h videobrowser.h 
+HEADERS += metadata.h videomanager.h videobrowser.h dbcheck.h
 HEADERS += globalsettings.h videotree.h fileassoc.h editmetadata.h
 
-SOURCES += main.cpp metadata.cpp videomanager.cpp videobrowser.cpp
+SOURCES += main.cpp metadata.cpp videomanager.cpp videobrowser.cpp dbcheck.cpp
 SOURCES += globalsettings.cpp videotree.cpp fileassoc.cpp editmetadata.cpp

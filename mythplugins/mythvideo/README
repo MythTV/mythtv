@@ -23,18 +23,6 @@ Once the make is completed, you should switch to root and do a 'make install'.
 - libmythvideo.so will go into /usr/local/lib/mythtv/plugins/
 
 
-
-VIDEO METADATA
---------------
-
-You need to also create some video tables in your MySQL database, to do so:
-
-# exit
-$ cd videodb
-$ mysql -u mythtv -p < metadata.sql
-
-
-
 RUNNING MYTHVIDEO
 -----------------
 
