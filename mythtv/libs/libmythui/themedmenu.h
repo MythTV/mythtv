@@ -30,7 +30,7 @@ class ThemedMenu : public MythScreenType
                       int alphaMod = 255);
 
   protected:
-    bool keyPressEvent(QKeyEvent *e);
+    virtual bool keyPressEvent(QKeyEvent *e);
 
   private:
     void Init(const char *cdir, const char *menufile);
