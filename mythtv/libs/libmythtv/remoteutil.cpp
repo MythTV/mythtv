@@ -44,10 +44,10 @@ void RemoteGetFreeSpace(int &totalspace, int &usedspace)
     usedspace = strlist[1].toInt();
 }
 
-bool RemoteGetCheckFile(const QString &url)
+bool RemoteCheckFile(ProgramInfo *pginfo)
 {
-    QString str = "QUERY_CHECKFILE " + url;
-    QStringList strlist = str;
+    QStringList strlist = "QUERY_CHECKFILE";
+    pginfo->ToStringList(strlist);
 
     gContext->SendReceiveStringList(strlist);
 

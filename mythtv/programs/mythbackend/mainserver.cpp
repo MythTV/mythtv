@@ -22,9 +22,10 @@ using namespace std;
 #include "httpstatus.h"
 #include "programinfo.h"
 
-MainServer::MainServer(int port, int statusport, 
+MainServer::MainServer(bool master, int port, int statusport, 
                        QMap<int, EncoderLink *> *tvList)
 {
+    ismaster = master;
     masterServerSock = NULL;
 
     encoderList = tvList;
@@ -102,10 +103,7 @@ void MainServer::readSocket(void)
             }
             else if (command == "QUERY_CHECKFILE")
             {
-                if (tokens.size() != 2)
-                    cerr << "Bad QUERY_CHECKFILE\n";
-                else
-                    HandleQueryCheckFile(tokens[1], pbs);
+                HandleQueryCheckFile(listline, pbs);
             }
             else if (command == "DELETE_RECORDING")
             {
@@ -523,17 +521,44 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
     ProgramInfo *pginfo = new ProgramInfo();
     pginfo->FromStringList(slist, 1);
 
+    if (ismaster && pginfo->hostname != gContext->GetHostName())
+    {
+        PlaybackSock *slave = getSlaveByHostname(pginfo->hostname);
+
+        if (!slave)
+            cerr << "Couldn't find backend for: " << pginfo->title
+                 << " : " << pginfo->subtitle << endl;
+        else
+            slave->DeleteRecording(pginfo);
+
+        QStringList outputlist = "OK";
+        WriteStringList(pbs->getSocket(), outputlist);
+        delete pginfo;
+        return;
+    }
+
+    if (pginfo->hostname != gContext->GetHostName())
+    {
+        cout << "Somehow we got a request to delete a program for: " 
+             << pginfo->hostname << endl;
+
+        QStringList outputlist = "BAD";
+        WriteStringList(pbs->getSocket(), outputlist);
+        delete pginfo;
+        return;
+    }
+
     QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
     for (; iter != encoderList->end(); ++iter)
     {
         EncoderLink *elink = iter.data();
 
-        if (elink->isBusy() && elink->MatchesRecording(pginfo))
+        if (elink->isConnected() && elink->MatchesRecording(pginfo))
         {
             elink->StopRecording();
 
             while (elink->isBusy())
-                usleep(50);
+                usleep(100);
         }
     }
 
@@ -574,7 +599,6 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
     pthread_create(&deletethread, &attr, SpawnDelete, ds);
 
     QStringList outputlist = "OK";
-
     WriteStringList(pbs->getSocket(), outputlist);
 
     delete pginfo;
@@ -608,22 +632,50 @@ void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs)
     WriteStringList(pbs->getSocket(), strlist);
 }
 
-void MainServer::HandleQueryCheckFile(QString filename, PlaybackSock *pbs)
+void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
 {
+    ProgramInfo *pginfo = new ProgramInfo();
+    pginfo->FromStringList(slist, 1);
+
     int exists = 0;
 
-    QUrl qurl(filename);
-    
+    if (ismaster && pginfo->hostname != gContext->GetHostName())
+    {
+        PlaybackSock *slave = getSlaveByHostname(pginfo->hostname);
+
+        if (!slave)
+            cerr << "Couldn't find backend for: " << pginfo->title
+                 << " : " << pginfo->subtitle << endl;
+        else
+            exists = slave->CheckFile(pginfo);
+
+        QStringList outputlist = QString::number(exists);
+        WriteStringList(pbs->getSocket(), outputlist);
+        delete pginfo;
+        return;
+    }
+
+    if (pginfo->hostname != gContext->GetHostName())
+    {
+        cout << "Somehow we got a request to check a file for: "
+             << pginfo->hostname << endl;
+
+        QStringList outputlist = QString::number(exists);
+        WriteStringList(pbs->getSocket(), outputlist);
+        delete pginfo;
+        return;
+    }
+
+    QUrl qurl(pginfo->pathname);
     QFile checkFile(qurl.path());
 
     if (checkFile.exists() == true)
         exists = 1;
 
-    QStringList strlist;
-
-    strlist << QString::number(exists);
-
+    QStringList strlist = QString::number(exists);
     WriteStringList(pbs->getSocket(), strlist);
+
+    delete pginfo;
 }
 
 void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs)
@@ -684,6 +736,8 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
     QStringList strlist;
     int retval = -1;
 
+    EncoderLink *encoder = NULL;
+
     QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
     for (; iter != encoderList->end(); ++iter)
     {
@@ -691,14 +745,35 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
 
         if (elink->isConnected() && !elink->isBusy())
         {
+            encoder = elink;
             retval = iter.key();
             break;
         }
     }
 
     strlist << QString::number(retval);
-    strlist << gContext->GetSetting("BackendServerIP");
-    strlist << gContext->GetSetting("BackendServerPort");
+        
+    if (encoder)
+    {
+        if (encoder->isLocal())
+        {
+            strlist << gContext->GetSetting("BackendServerIP");
+            strlist << gContext->GetSetting("BackendServerPort");
+        }
+        else
+        {
+            strlist << gContext->GetSettingOnHost("BackendServerIP", 
+                                                  encoder->getHostname(),
+                                                  "nohostname");
+            strlist << gContext->GetSettingOnHost("BackendServerPort", 
+                                                  encoder->getHostname(), "-1");
+        }
+    }
+    else
+    {
+        strlist << "nohost";
+        strlist << "-1";
+    }
 
     WriteStringList(pbs->getSocket(), strlist);
 }
@@ -1006,24 +1081,45 @@ void MainServer::HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs)
     ProgramInfo *pginfo = new ProgramInfo();
     pginfo->FromStringList(slist, 1);
 
+    EncoderLink *encoder = NULL;
+
     QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
     for (; iter != encoderList->end(); ++iter)
     {
         EncoderLink *elink = iter.data();
 
-        if (elink->isConnected() && elink->isBusy() && 
-            elink->MatchesRecording(pginfo))
+        if (elink->isConnected() && elink->MatchesRecording(pginfo))
         {
-            retval = iter.key(); 
+            retval = iter.key();
+            encoder = elink;
         }
     }
     
-    QStringList retlist = QString::number(retval);
-    retlist << gContext->GetSetting("BackendServerIP");
-    retlist << gContext->GetSetting("BackendServerPort");
+    QStringList strlist = QString::number(retval);
 
-    WriteStringList(pbs->getSocket(), retlist);    
+    if (encoder)
+    {
+        if (encoder->isLocal())
+        {
+            strlist << gContext->GetSetting("BackendServerIP");
+            strlist << gContext->GetSetting("BackendServerPort");
+        }
+        else
+        {
+            strlist << gContext->GetSettingOnHost("BackendServerIP",
+                                                  encoder->getHostname(),
+                                                  "nohostname");
+            strlist << gContext->GetSettingOnHost("BackendServerPort",
+                                                  encoder->getHostname(), "-1");
+        }
+    }
+    else
+    {
+        strlist << "nohost";
+        strlist << "-1";
+    }
 
+    WriteStringList(pbs->getSocket(), strlist);    
     delete pginfo;
 }
 
@@ -1044,10 +1140,34 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     ProgramInfo *pginfo = new ProgramInfo();
     pginfo->FromStringList(slist, 1);
 
-    QString urlname = pginfo->pathname;
+    if (ismaster && pginfo->hostname != gContext->GetHostName())
+    {
+        PlaybackSock *slave = getSlaveByHostname(pginfo->hostname);
 
-    QUrl qurl = urlname;
+        if (!slave)
+            cerr << "Couldn't find backend for: " << pginfo->title
+                 << " : " << pginfo->subtitle << endl;
+        else
+            slave->GenPreviewPixmap(pginfo);
 
+        QStringList outputlist = "OK";
+        WriteStringList(pbs->getSocket(), outputlist);
+        delete pginfo;
+        return;
+    }
+
+    if (pginfo->hostname != gContext->GetHostName())
+    {
+        cout << "Somehow we got a request to generate a preview pixmap for: "
+             << pginfo->hostname << endl;
+
+        QStringList outputlist = "BAD";
+        WriteStringList(pbs->getSocket(), outputlist);
+        delete pginfo;
+        return;
+    }
+
+    QUrl qurl = pginfo->pathname;
     QString filename = qurl.path();
 
     int len = 0;

@@ -87,3 +87,22 @@ void PlaybackSock::FillProgramInfo(ProgramInfo *pginfo, QString &playbackhost)
 
     pginfo->FromStringList(strlist, 0);
 }
+
+void PlaybackSock::GenPreviewPixmap(ProgramInfo *pginfo)
+{
+    QStringList strlist = QString("QUERY_GENPIXMAP");
+    pginfo->ToStringList(strlist);
+
+    SendReceiveStringList(strlist);
+}
+
+bool PlaybackSock::CheckFile(ProgramInfo *pginfo)
+{
+    QStringList strlist = "QUERY_CHECKFILE";
+    pginfo->ToStringList(strlist);
+
+    gContext->SendReceiveStringList(strlist);
+
+    bool exists = strlist[0].toInt();
+    return exists;
+}

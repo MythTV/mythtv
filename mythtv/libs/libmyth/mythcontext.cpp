@@ -196,10 +196,10 @@ int MythContext::OpenDatabase(QSqlDatabase *db)
     }
     pthread_mutex_unlock(&dbLock);
         
-    db->setDatabaseName(GetSetting("DBName"));
-    db->setUserName(GetSetting("DBUserName"));
-    db->setPassword(GetSetting("DBPassword"));
-    db->setHostName(GetSetting("DBHostName"));
+    db->setDatabaseName(m_settings->GetSetting("DBName"));
+    db->setUserName(m_settings->GetSetting("DBUserName"));
+    db->setPassword(m_settings->GetSetting("DBPassword"));
+    db->setHostName(m_settings->GetSetting("DBHostName"));
  
     return db->open();
 }
@@ -273,48 +273,49 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
 
 int MythContext::GetNumSetting(const QString &key, int defaultval)
 {
+    QString val = QString::number(defaultval);
+    QString retval = GetSetting(key, val);
+
+    return retval.toInt();
+}
+
+QString MythContext::GetSettingOnHost(const QString &key, const QString &host,
+                                      const QString &defaultval)
+{
     bool found = false;
-    int value = defaultval;
+    QString value = defaultval;
 
     pthread_mutex_lock(&dbLock);
-    if (m_db->isOpen()) 
+
+    if (m_db->isOpen())
     {
         KickDatabase(m_db);
 
         QString query = QString("SELECT data FROM settings WHERE value = '%1' "
-                                "AND hostname = '%2';")
-                                .arg(key).arg(m_localhostname);
+                                "AND hostname = '%2';").arg(key).arg(host);
 
         QSqlQuery result = m_db->exec(query);
 
-        if (result.isActive() && result.numRowsAffected() > 0) 
+        if (result.isActive() && result.numRowsAffected() > 0)
         {
             result.next();
-            value = result.value(0).toString().toInt();
+            value = result.value(0).toString();
             found = true;
-        }
-        else
-        {
-            query = QString("SELECT data FROM settings WHERE value = '%1' AND "
-                            "hostname IS NULL;").arg(key);
-
-            result = m_db->exec(query);
-
-            if (result.isActive() && result.numRowsAffected() > 0)
-            {
-                result.next();
-                value = result.value(0).toString().toInt();
-                found = true;
-            }
         }
     }
 
     pthread_mutex_unlock(&dbLock);
 
-    if (found)
-        return value;
+    return value;
+}
 
-    return m_settings->GetNumSetting(key, defaultval); 
+int MythContext::GetNumSettingOnHost(const QString &key, const QString &host,
+                                     int defaultval)
+{
+    QString val = QString::number(defaultval);
+    QString retval = GetSettingOnHost(key, host, val);
+
+    return retval.toInt();
 }
 
 void MythContext::SetPalette(QWidget *widget)

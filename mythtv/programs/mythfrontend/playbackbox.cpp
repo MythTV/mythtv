@@ -530,7 +530,7 @@ void PlaybackBox::play(QListViewItem *lvitem)
     ProgramListItem *pgitem = (ProgramListItem *)lvitem;
     ProgramInfo *rec = pgitem->getProgramInfo();
 
-    if (fileExists(rec->pathname) == false)
+    if (fileExists(rec) == false)
     {
         cerr << "Error: " << rec->pathname << " file not found\n";
         killPlayer();
@@ -753,7 +753,7 @@ void PlaybackBox::timeout(void)
                 ProgramListItem *pgitem = (ProgramListItem *)curitem;
                 ProgramInfo *rec = pgitem->getProgramInfo();
 
-                if (fileExists(rec->pathname) == false)
+                if (fileExists(rec) == false)
                 {
                     title->setText(title->text() + "     Error: File Missing!");
                     QPixmap temp((int)(160 * wmult), (int)(120 * hmult));
@@ -829,12 +829,12 @@ void PlaybackBox::customEvent(QCustomEvent *e)
 */
 }
 
-bool PlaybackBox::fileExists(const QString &pathname)
+bool PlaybackBox::fileExists(ProgramInfo *pginfo)
 {
-    if (pathname.left(7) == "myth://")
-        return RemoteGetCheckFile(pathname);
+    if (pginfo->pathname.left(7) == "myth://")
+        return RemoteCheckFile(pginfo);
 
-    QFile checkFile(pathname);
+    QFile checkFile(pginfo->pathname);
 
     return checkFile.exists();
 }

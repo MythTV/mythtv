@@ -38,7 +38,7 @@ bool EncoderLink::isBusy(void)
 {
     bool retval = false;
 
-    TVState state = tv->GetState();
+    TVState state = GetState();
 
     if (state == kState_RecordingOnly || state == kState_WatchingRecording ||
         state == kState_WatchingLiveTV)
@@ -83,15 +83,18 @@ bool EncoderLink::MatchesRecording(ProgramInfo *rec)
     ProgramInfo *tvrec = NULL;
 
     if (local)
-        tvrec = tv->GetRecording();
-    
-
-    if (tvrec)
     {
-        if (tvrec->chanid == rec->chanid && tvrec->startts == rec->startts &&
-            tvrec->endts == rec->endts)
+        if (isBusy())
+            tvrec = tv->GetRecording();
+
+        if (tvrec)
         {
-            retval = true;
+            if (tvrec->chanid == rec->chanid && 
+                tvrec->startts == rec->startts &&
+                tvrec->endts == rec->endts)
+            {
+                retval = true;
+            }
         }
     }
 
@@ -100,7 +103,7 @@ bool EncoderLink::MatchesRecording(ProgramInfo *rec)
 
 int EncoderLink::AllowRecording(ProgramInfo *rec, int timeuntil)
 {
-    TVState state = tv->GetState();
+    TVState state = GetState();
 
     if (state != kState_WatchingLiveTV)
         return 1;
@@ -129,11 +132,15 @@ void EncoderLink::StartRecording(ProgramInfo *rec)
         tv->StartRecording(rec);
 }
 
-// XXX -- make sure this blocks until stopped remotely
 void EncoderLink::StopRecording(void)
 {
     if (local)
+    {
         tv->StopRecording();
+        return;
+    }
+
+    cerr << "Should be local only query: StopRecording\n";
 }
 
 bool EncoderLink::IsReallyRecording(void)
@@ -455,7 +462,6 @@ long long EncoderLink::SeekRingBuffer(long long curpos, long long pos,
     return -1;
 }
 
-// XXX
 char *EncoderLink::GetScreenGrab(QString filename, int secondsin, 
                                  int &bufferlen, int &video_width, 
                                  int &video_height)
@@ -463,5 +469,7 @@ char *EncoderLink::GetScreenGrab(QString filename, int secondsin,
     if (local)
         return tv->GetScreenGrab(filename, secondsin, bufferlen, video_width,
                                  video_height);
+
+    cerr << "Should be local only query: GetScreenGrab\n";
     return NULL;
 }

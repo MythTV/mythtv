@@ -9,7 +9,7 @@ class RemoteEncoder;
 
 vector<ProgramInfo *> *RemoteGetRecordedList(bool deltype);
 void RemoteGetFreeSpace(int &totalspace, int &usedspace);
-bool RemoteGetCheckFile(const QString &url);
+bool RemoteCheckFile(ProgramInfo *pginfo);
 void RemoteDeleteRecording(ProgramInfo *pginfo);
 bool RemoteGetAllPendingRecordings(vector<ProgramInfo *> &recordinglist);
 vector<ProgramInfo *> *RemoteGetConflictList(ProgramInfo *pginfo,

@@ -18,7 +18,8 @@ class MainServer : public QObject
 {
     Q_OBJECT
   public:
-    MainServer(int port, int statusport, QMap<int, EncoderLink *> *tvList);
+    MainServer(bool master, int port, int statusport, 
+               QMap<int, EncoderLink *> *tvList);
 
    ~MainServer();
 
@@ -39,7 +40,7 @@ class MainServer : public QObject
     void HandleQueryRecordings(QString type, PlaybackSock *pbs);
     void HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleQueryFreeSpace(PlaybackSock *pbs);
-    void HandleQueryCheckFile(QString filename, PlaybackSock *pbs);
+    void HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs);
     void HandleGetPendingRecordings(PlaybackSock *pbs);
     void HandleGetConflictingRecordings(QStringList &slist, QString purge, 
                                         PlaybackSock *pbs);
@@ -73,6 +74,8 @@ class MainServer : public QObject
     HttpStatus *statusserver;
 
     QSocket *masterServerSock;
+
+    bool ismaster;
 };
 
 #endif

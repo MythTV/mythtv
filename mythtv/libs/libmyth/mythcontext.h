@@ -77,6 +77,11 @@ class MythContext : public QObject
     QString GetSetting(const QString &key, const QString &defaultval = "");
     int GetNumSetting(const QString &key, int defaultval = 0);
 
+    QString GetSettingOnHost(const QString &key, const QString &host,
+                             const QString &defaultval = "");
+    int GetNumSettingOnHost(const QString &key, const QString &host,
+                            int defaultval = 0);
+
     void SetSetting(const QString &key, const QString &newValue);
 
     int GetBigFontSize() { return GetNumSetting("QtFontBig", 25); }

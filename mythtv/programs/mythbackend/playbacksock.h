@@ -31,6 +31,8 @@ class PlaybackSock
     void GetFreeSpace(int &totalspace, int &usedspace);
     void DeleteRecording(ProgramInfo *pginfo);
     void FillProgramInfo(ProgramInfo *pginfo, QString &playbackhost);
+    void GenPreviewPixmap(ProgramInfo *pginfo);
+    bool CheckFile(ProgramInfo *pginfo);
 
   private:
     void SendReceiveStringList(QStringList &strlist);

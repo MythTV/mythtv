@@ -214,7 +214,7 @@ int main(int argc, char **argv)
         sched = new Scheduler(&tvList, scdb);
     }
 
-    new MainServer(port, statusport, &tvList);
+    new MainServer(ismaster, port, statusport, &tvList);
 
     a.exec();
 
