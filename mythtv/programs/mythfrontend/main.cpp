@@ -935,7 +935,12 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    UpgradeTVDatabaseSchema();
+    if (!UpgradeTVDatabaseSchema())
+    {
+        VERBOSE(VB_IMPORTANT,
+                "Couldn't upgrade database to new schema, exiting.");
+        return -1;
+    }    
 
     VERBOSE(VB_ALL, QString("%1 version: %2 www.mythtv.org")
                             .arg(binname).arg(MYTH_BINARY_VERSION));

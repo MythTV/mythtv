@@ -10,17 +10,50 @@ using namespace std;
 
 const QString currentDatabaseVersion = "1067";
 
-void UpdateDBVersionNumber(const QString &newnumber)
+static bool UpdateDBVersionNumber(const QString &newnumber);
+static bool performActualUpdate(const QString updates[], QString version,
+                                QString &dbver);
+static bool InitializeDatabase(void);
+
+static bool UpdateDBVersionNumber(const QString &newnumber)
 {
     QSqlDatabase *db_conn = QSqlDatabase::database();
 
-    db_conn->exec("DELETE FROM settings WHERE value='DBSchemaVer';");
-    db_conn->exec(QString("INSERT INTO settings (value, data, hostname) "
-                          "VALUES ('DBSchemaVer', %1, NULL);")
-                         .arg(newnumber));
+    // delete old schema version
+    QString thequery = "DELETE FROM settings WHERE value='DBSchemaVer';";
+    db_conn->exec(thequery);
+    if (db_conn->lastError().type() != QSqlError::None)
+    {
+        QString msg =
+            QString("DB Error (Deleting old DB version number): \n"
+                    "Query was: %1 \nError was: %2 \nnew version: %3")
+            .arg(thequery)
+            .arg(MythContext::DBErrorMessage(db_conn->lastError()))
+            .arg(newnumber);
+        VERBOSE(VB_IMPORTANT, msg);
+        return false;
+    }
+
+    // set new schema version
+    thequery = QString("INSERT INTO settings (value, data, hostname) "
+                       "VALUES ('DBSchemaVer', %1, NULL);").arg(newnumber);
+    db_conn->exec(thequery);
+    if (db_conn->lastError().type() != QSqlError::None)
+    {
+        QString msg =
+            QString("DB Error (Setting new DB version number): \n"
+                    "Query was: %1 \nError was: %2 \nnew version: %3")
+            .arg(thequery)
+            .arg(MythContext::DBErrorMessage(db_conn->lastError()))
+            .arg(newnumber);
+        VERBOSE(VB_IMPORTANT, msg);
+        return false;
+    }
+
+    return true;
 }
 
-void performActualUpdate(const QString updates[], QString version,
+static bool performActualUpdate(const QString updates[], QString version,
                          QString &dbver)
 {
     QSqlDatabase *db_conn = QSqlDatabase::database();
@@ -36,34 +69,38 @@ void performActualUpdate(const QString updates[], QString version,
 
         if (db_conn->lastError().type() != QSqlError::None)
         {
-            cerr << "DB Error (Performing database upgrade):" << endl;
-            cerr << "Query was:" << endl
-                 << thequery << endl
-                 << MythContext::DBErrorMessage(db_conn->lastError()) << endl;
-
-            exit(-13);
+            QString msg =
+                QString("DB Error (Performing database upgrade): \n"
+                        "Query was: %1 \nError was: %2 \nnew version: %3")
+                .arg(thequery)
+                .arg(MythContext::DBErrorMessage(db_conn->lastError()))
+                .arg(version);
+            VERBOSE(VB_IMPORTANT, msg);
+            return false;
         }
 
         counter++;
         thequery = updates[counter];
     }
 
-    UpdateDBVersionNumber(version);
+    if (!UpdateDBVersionNumber(version))
+        return false;
+
     dbver = version;
+    return true;
 }
 
-void InitializeDatabase(void);
-
-void UpgradeTVDatabaseSchema(void)
+bool UpgradeTVDatabaseSchema(void)
 {
     QString dbver = gContext->GetSetting("DBSchemaVer");
 
     if (dbver == currentDatabaseVersion)
-        return;
+        return true;
     
     if (dbver == "")
     {
-        InitializeDatabase();        
+        if (!InitializeDatabase())
+            return false;
         dbver = "1060";
     }
 
@@ -75,7 +112,8 @@ void UpgradeTVDatabaseSchema(void)
 "CREATE TABLE transcoding (chanid INT UNSIGNED, starttime TIMESTAMP, status INT, hostname VARCHAR(255));",
 ""
 };
-        performActualUpdate(updates, "901", dbver);
+        if (!performActualUpdate(updates, "901", dbver))
+            return false;
     }
 
     if (dbver == "901")
@@ -86,7 +124,8 @@ void UpgradeTVDatabaseSchema(void)
 "ALTER TABLE oldrecorded ADD COLUMN category VARCHAR(64) NULL;",
 ""
 };
-        performActualUpdate(updates, "902", dbver);
+        if (!performActualUpdate(updates, "902", dbver))
+            return false;
     }
 
     if (dbver == "902")
@@ -96,7 +135,8 @@ void UpgradeTVDatabaseSchema(void)
 "ALTER TABLE channel ADD rank INT(10) DEFAULT '0' NOT NULL;",
 ""
 };
-        performActualUpdate(updates, "903", dbver);
+        if (!performActualUpdate(updates, "903", dbver))
+            return false;
     }
 
     if (dbver == "903")
@@ -107,7 +147,8 @@ void UpgradeTVDatabaseSchema(void)
 "ALTER TABLE channel ADD hue INT DEFAULT '32768';",
 ""
 };
-        performActualUpdate(updates, "1000", dbver);
+        if (!performActualUpdate(updates, "1000", dbver))
+            return false;
     }
 
     if (dbver == "1000")
@@ -117,7 +158,8 @@ void UpgradeTVDatabaseSchema(void)
 "ALTER TABLE recorded ADD autoexpire INT DEFAULT 0 NOT NULL;",
 ""
 };
-        performActualUpdate(updates, "1001", dbver);
+        if (!performActualUpdate(updates, "1001", dbver))
+            return false;
     }
 
     if (dbver == "1001")
@@ -126,7 +168,8 @@ void UpgradeTVDatabaseSchema(void)
 "ALTER TABLE record ADD maxepisodes INT DEFAULT 0 NOT NULL;",
 ""
 };
-        performActualUpdate(updates, "1002", dbver);
+        if (!performActualUpdate(updates, "1002", dbver))
+            return false;
     }
 
     if (dbver == "1002")
@@ -136,7 +179,8 @@ void UpgradeTVDatabaseSchema(void)
 "ALTER TABLE record ADD maxnewest INT DEFAULT 0 NOT NULL;",
 ""
 };
-        performActualUpdate(updates, "1003", dbver);
+        if (!performActualUpdate(updates, "1003", dbver))
+            return false;
     }
 
     if (dbver == "1003")
@@ -144,7 +188,8 @@ void UpgradeTVDatabaseSchema(void)
         const QString updates[] = {
 ""
 };
-        performActualUpdate(updates, "1004", dbver);
+        if (!performActualUpdate(updates, "1004", dbver))
+            return false;
     }
 
     if (dbver == "1004")
@@ -200,7 +245,8 @@ void UpgradeTVDatabaseSchema(void)
 "DELETE FROM codecparams;",
 ""
 };
-        performActualUpdate(updates, "1005", dbver);
+        if (!performActualUpdate(updates, "1005", dbver))
+            return false;
     }
 
     if (dbver == "1005")
@@ -210,7 +256,8 @@ void UpgradeTVDatabaseSchema(void)
 "ALTER TABLE record CHANGE profile profile VARCHAR(128);",
 ""
 };
-        performActualUpdate(updates, "1006", dbver);
+        if (!performActualUpdate(updates, "1006", dbver))
+            return false;
     }
 
     if (dbver == "1006")
@@ -226,7 +273,8 @@ void UpgradeTVDatabaseSchema(void)
 ");",
 ""
 };
-        performActualUpdate(updates, "1007", dbver);
+        if (!performActualUpdate(updates, "1007", dbver))
+            return false;
     }
 
     if (dbver == "1007")
@@ -279,7 +327,8 @@ void UpgradeTVDatabaseSchema(void)
 ");",
 ""
 };
-        performActualUpdate(updates, "1008", dbver);
+        if (!performActualUpdate(updates, "1008", dbver))
+            return false;
     }
 
     if (dbver == "1008")
@@ -293,7 +342,8 @@ void UpgradeTVDatabaseSchema(void)
 ");",
 ""
 };
-        performActualUpdate(updates, "1009", dbver);
+        if (!performActualUpdate(updates, "1009", dbver))
+            return false;
     }
 
     if (dbver == "1009")
@@ -303,7 +353,8 @@ void UpgradeTVDatabaseSchema(void)
 "ALTER TABLE record ADD COLUMN postroll INT DEFAULT 0 NOT NULL;",
 ""
 };
-        performActualUpdate(updates, "1010", dbver);
+        if (!performActualUpdate(updates, "1010", dbver))
+            return false;
     }
 
     if (dbver == "1010")
@@ -326,7 +377,8 @@ void UpgradeTVDatabaseSchema(void)
 ");",
 ""
 };
-        performActualUpdate(updates, "1011", dbver);
+        if (!performActualUpdate(updates, "1011", dbver))
+            return false;
     }
 
     if (dbver == "1011")
@@ -344,7 +396,8 @@ void UpgradeTVDatabaseSchema(void)
 ");",
 ""
 };
-        performActualUpdate(updates, "1012", dbver);
+        if (!performActualUpdate(updates, "1012", dbver))
+            return false;
     }
 
     if (dbver == "1012")
@@ -355,7 +408,8 @@ void UpgradeTVDatabaseSchema(void)
 "INSERT INTO settings SET value=\"mythfilldatabaseLastRunStatus\";",
 ""
 };
-        performActualUpdate(updates, "1013", dbver);
+        if (!performActualUpdate(updates, "1013", dbver))
+            return false;
     }
 
     if (dbver == "1013")
@@ -374,7 +428,8 @@ void UpgradeTVDatabaseSchema(void)
 "UPDATE settings SET value='ProgramRecPrioritySorting' WHERE value='ProgramRankSorting';",
 ""
 };
-        performActualUpdate(updates, "1014", dbver);
+        if (!performActualUpdate(updates, "1014", dbver))
+            return false;
     }
 
     if (dbver == "1014")
@@ -385,7 +440,8 @@ void UpgradeTVDatabaseSchema(void)
 ""
 };
 
-        performActualUpdate(updates, "1015", dbver);
+        if (!performActualUpdate(updates, "1015", dbver))
+            return false;
     }
 
     if (dbver == "1015")
@@ -407,7 +463,8 @@ void UpgradeTVDatabaseSchema(void)
 ""
 };
 
-        performActualUpdate(updates, "1016", dbver);
+        if (!performActualUpdate(updates, "1016", dbver))
+            return false;
     }
 
     if (dbver == "1016")
@@ -418,7 +475,8 @@ void UpgradeTVDatabaseSchema(void)
 ""
 };
 
-        performActualUpdate(updates, "1017", dbver);
+        if (!performActualUpdate(updates, "1017", dbver))
+            return false;
     }
 
     if (dbver == "1017")
@@ -428,7 +486,8 @@ void UpgradeTVDatabaseSchema(void)
 ""
 };
 
-        performActualUpdate(updates, "1018", dbver);
+        if (!performActualUpdate(updates, "1018", dbver))
+            return false;
     }
 
     if (dbver == "1018")
@@ -438,7 +497,8 @@ void UpgradeTVDatabaseSchema(void)
 ""
 };
 
-        performActualUpdate(updates, "1019", dbver);
+        if (!performActualUpdate(updates, "1019", dbver))
+            return false;
     }
 
     if (dbver == "1019")
@@ -456,7 +516,8 @@ void UpgradeTVDatabaseSchema(void)
 ""
 };
 
-        performActualUpdate(updates, "1020", dbver);
+        if (!performActualUpdate(updates, "1020", dbver))
+            return false;
     }
 
     if (dbver == "1020")
@@ -469,7 +530,8 @@ void UpgradeTVDatabaseSchema(void)
 ""
 };
 
-        performActualUpdate(updates, "1021", dbver);
+        if (!performActualUpdate(updates, "1021", dbver))
+            return false;
     }
 
     if (dbver == "1021")
@@ -479,7 +541,8 @@ void UpgradeTVDatabaseSchema(void)
 ""
 };
 
-        performActualUpdate(updates, "1022", dbver);
+        if (!performActualUpdate(updates, "1022", dbver))
+            return false;
 
         VERBOSE(VB_ALL, QString("This could take a few minutes."));
 
@@ -522,7 +585,8 @@ void UpgradeTVDatabaseSchema(void)
 "ALTER TABLE dvb_sat CHANGE lnb_lof_switch lnb_lof_switch INTEGER DEFAULT 11700000;",
 ""
 };
-        performActualUpdate(updates, "1023", dbver);
+        if (!performActualUpdate(updates, "1023", dbver))
+            return false;
     }
 
     if (dbver == "1023")
@@ -531,7 +595,8 @@ void UpgradeTVDatabaseSchema(void)
 QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAULT 'default';"),
 ""
 };
-        performActualUpdate(updates, "1024", dbver);
+        if (!performActualUpdate(updates, "1024", dbver))
+            return false;
     }
 
     if (dbver == "1024")
@@ -542,7 +607,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE dvb_channel ADD COLUMN pmtcache BLOB;",
 ""
 };
-        performActualUpdate(updates, "1025", dbver);
+        if (!performActualUpdate(updates, "1025", dbver))
+            return false;
     }
 
     if (dbver == "1025")
@@ -555,7 +621,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 ""
 };
 
-        performActualUpdate(updates, "1026", dbver);
+        if (!performActualUpdate(updates, "1026", dbver))
+            return false;
     }
 
     if (dbver == "1026")
@@ -566,7 +633,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE capturecard ADD COLUMN dvb_pkt_buf_size INT NOT NULL DEFAULT 8192;",
 ""
 };
-        performActualUpdate(updates, "1027", dbver);
+        if (!performActualUpdate(updates, "1027", dbver))
+            return false;
     }
 
     if (dbver == "1027")
@@ -589,7 +657,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE capturecard ADD skipbtaudio TINYINT(1) DEFAULT 0;",
 ""
 };
-        performActualUpdate(updates, "1028", dbver);
+        if (!performActualUpdate(updates, "1028", dbver))
+            return false;
     }
 
     if (dbver == "1028") {
@@ -610,7 +679,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 ");",
 ""
 };
-        performActualUpdate(updates, "1029", dbver);
+        if (!performActualUpdate(updates, "1029", dbver))
+            return false;
     }
 
     if (dbver == "1029")
@@ -620,7 +690,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE record CHANGE postroll endoffset INT DEFAULT 0 NOT NULL;",
 ""
 };
-        performActualUpdate(updates, "1030", dbver);
+        if (!performActualUpdate(updates, "1030", dbver))
+            return false;
     }
 
     if (dbver == "1030") 
@@ -630,7 +701,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "UPDATE channel SET visible = 1;",
 ""
 };
-        performActualUpdate(updates, "1031", dbver);
+        if (!performActualUpdate(updates, "1031", dbver))
+            return false;
     }
 
     if (dbver == "1031") {
@@ -638,7 +710,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE capturecard ADD dvb_on_demand TINYINT NOT NULL DEFAULT 0;",
 ""
 };
-        performActualUpdate(updates, "1032", dbver);
+        if (!performActualUpdate(updates, "1032", dbver))
+            return false;
     }
 
     if (dbver == "1032")
@@ -647,7 +720,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "UPDATE record SET dupmethod = 6 WHERE dupmethod = 22;",
 ""
 };
-        performActualUpdate(updates, "1033", dbver);
+        if (!performActualUpdate(updates, "1033", dbver))
+            return false;
     }
 
     if (dbver == "1033")
@@ -657,7 +731,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE program ADD INDEX (title_pronounce);",
 ""
 };
-        performActualUpdate(updates, "1034", dbver);
+        if (!performActualUpdate(updates, "1034", dbver))
+            return false;
     }
 
     if (dbver == "1034")
@@ -679,7 +754,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 ");",
 ""
 };
-        performActualUpdate(updates, "1035", dbver);
+        if (!performActualUpdate(updates, "1035", dbver))
+            return false;
     }
     
     if (dbver == "1035")
@@ -689,7 +765,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE dvb_sat ADD diseqc_pos SMALLINT DEFAULT 0 AFTER diseqc_port;",
 ""
 };
-        performActualUpdate(updates,"1036", dbver);
+        if (!performActualUpdate(updates,"1036", dbver))
+            return false;
     }
 
     if (dbver == "1036")
@@ -700,7 +777,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE recordoverride ADD COLUMN station VARCHAR(20) NOT NULL DEFAULT '';",
 ""
 };
-        performActualUpdate(updates, "1037", dbver);
+        if (!performActualUpdate(updates, "1037", dbver))
+            return false;
     }
 
     if (dbver == "1037")
@@ -737,7 +815,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 ");",
 ""
 };
-        performActualUpdate(updates, "1038", dbver);
+        if (!performActualUpdate(updates, "1038", dbver))
+            return false;
     }
 
     if (dbver == "1038")
@@ -752,7 +831,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 ");",
 ""
 };
-        performActualUpdate(updates, "1039", dbver);
+        if (!performActualUpdate(updates, "1039", dbver))
+            return false;
     }
 
     if (dbver == "1039")
@@ -761,7 +841,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE channel CHANGE name name VARCHAR(64);",
 ""
 };
-        performActualUpdate(updates, "1040", dbver);
+        if (!performActualUpdate(updates, "1040", dbver))
+            return false;
     }
 
     if (dbver == "1040")
@@ -770,7 +851,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE channel ADD outputfilters VARCHAR(255) NULL",
 ""
 };
-        performActualUpdate(updates, "1041", dbver);
+        if (!performActualUpdate(updates, "1041", dbver))
+            return false;
     }
 
     if (dbver == "1041")
@@ -792,7 +874,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE oldrecorded ADD INDEX (programid);",
 ""
 };
-        performActualUpdate(updates, "1042", dbver);
+        if (!performActualUpdate(updates, "1042", dbver))
+            return false;
     }
 
     if (dbver == "1042")
@@ -801,7 +884,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "INSERT INTO settings SET value=\"DataDirectMessage\";",
 ""
 };
-        performActualUpdate(updates, "1043", dbver);
+        if (!performActualUpdate(updates, "1043", dbver))
+            return false;
     }
 
     if (dbver == "1043")
@@ -854,7 +938,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE oldrecorded CHANGE programid programid VARCHAR(12) NOT NULL DEFAULT '';",
 ""
 };
-        performActualUpdate(updates, "1044", dbver);
+        if (!performActualUpdate(updates, "1044", dbver))
+            return false;
     }
 
     if (dbver == "1044")
@@ -866,7 +951,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "UPDATE recorded SET recgroup = 'Default', starttime = starttime WHERE recgroup = '';",
 ""
 };
-        performActualUpdate(updates, "1045", dbver);
+        if (!performActualUpdate(updates, "1045", dbver))
+            return false;
     }
 
     if (dbver == "1045")
@@ -875,7 +961,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "UPDATE recorded SET recgroup = 'Default', starttime = starttime WHERE recgroup = '';",
 ""
 };
-        performActualUpdate(updates, "1046", dbver);
+        if (!performActualUpdate(updates, "1046", dbver))
+            return false;
     }
 
     if (dbver == "1046")
@@ -885,7 +972,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "UPDATE record SET search = 0 WHERE search IS NULL;",
 ""
 };
-        performActualUpdate(updates, "1047", dbver);
+        if (!performActualUpdate(updates, "1047", dbver))
+            return false;
     }
 
     if (dbver == "1047")
@@ -905,7 +993,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 ");",
 ""
 };
-        performActualUpdate(updates, "1048", dbver);
+        if (!performActualUpdate(updates, "1048", dbver))
+            return false;
     }
 
     if (dbver == "1048")
@@ -915,7 +1004,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "UPDATE cardinput SET preference = 0 WHERE preference IS NULL;",
 ""
 };
-        performActualUpdate(updates, "1049", dbver);
+        if (!performActualUpdate(updates, "1049", dbver))
+            return false;
     }
 
     if (dbver == "1049")
@@ -927,7 +1017,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE keyword ADD UNIQUE(phrase,searchtype);",
 ""
 };
-        performActualUpdate(updates, "1050", dbver);
+        if (!performActualUpdate(updates, "1050", dbver))
+            return false;
     }
     
 
@@ -952,7 +1043,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE transcoding CHANGE starttime starttime DATETIME NOT NULL;",
 ""
 };
-        performActualUpdate(updates, "1051", dbver);
+        if (!performActualUpdate(updates, "1051", dbver))
+            return false;
     }
 
     if (dbver == "1051")
@@ -962,7 +1054,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "update record set dupin = 15 where dupin = 0;",
 ""
 };
-        performActualUpdate(updates, "1052", dbver);
+        if (!performActualUpdate(updates, "1052", dbver))
+            return false;
     }
 
     if (dbver == "1052")
@@ -974,7 +1067,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "INSERT INTO settings VALUES ('HaveRepeats', '0', NULL);",
 ""
 };
-        performActualUpdate(updates, "1053", dbver);
+        if (!performActualUpdate(updates, "1053", dbver))
+            return false;
     }
 
     if (dbver == "1053")
@@ -983,7 +1077,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE channel CHANGE freqid freqid VARCHAR(10);",
 ""
 };
-        performActualUpdate(updates, "1054", dbver);
+        if (!performActualUpdate(updates, "1054", dbver))
+            return false;
     }
 
     if (dbver == "1054")
@@ -993,7 +1088,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE channel ADD INDEX channel_src (channum,sourceid);",
 ""
 };
-        performActualUpdate(updates, "1055", dbver);
+        if (!performActualUpdate(updates, "1055", dbver))
+            return false;
     }
 
     if (dbver == "1055")
@@ -1002,7 +1098,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "UPDATE record SET dupmethod=6, dupin=4 WHERE dupmethod=8;",
 ""
 };
-        performActualUpdate(updates, "1056", dbver);
+        if (!performActualUpdate(updates, "1056", dbver))
+            return false;
     }
 
     if (dbver == "1056")
@@ -1032,7 +1129,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE record ADD COLUMN autouserjob4 TINYINT(1) NOT NULL DEFAULT 0;",
 ""
 };
-        performActualUpdate(updates, "1057", dbver);
+        if (!performActualUpdate(updates, "1057", dbver))
+            return false;
 
         if (gContext->GetNumSetting("AutoCommercialFlag", 1))
         {
@@ -1049,7 +1147,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "DROP TABLE IF EXISTS transcoding;",
 ""
 };
-        performActualUpdate(updates, "1058", dbver);
+        if (!performActualUpdate(updates, "1058", dbver))
+            return false;
     }
 
     if (dbver == "1058")
@@ -1058,7 +1157,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "UPDATE program SET category_type='series' WHERE showtype LIKE '%series%';",
 ""
 };
-        performActualUpdate(updates, "1059", dbver);
+        if (!performActualUpdate(updates, "1059", dbver))
+            return false;
     }
 
     if (dbver == "1059")
@@ -1067,7 +1167,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE recorded ADD COLUMN preserve TINYINT(1) NOT NULL DEFAULT 0;",
 ""
 };
-        performActualUpdate(updates, "1060", dbver);
+        if (!performActualUpdate(updates, "1060", dbver))
+            return false;
     }
 
     if (dbver == "1060")
@@ -1081,7 +1182,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE oldrecorded ADD COLUMN oldrecorded.findid INT NOT NULL DEFAULT 0;",
 ""
 };
-        performActualUpdate(updates, "1061", dbver);
+        if (!performActualUpdate(updates, "1061", dbver))
+            return false;
     }
 
     if (dbver == "1061")
@@ -1090,7 +1192,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE record ADD COLUMN inactive TINYINT(1) NOT NULL DEFAULT 0;",
 ""
 };
-        performActualUpdate(updates, "1062", dbver);
+        if (!performActualUpdate(updates, "1062", dbver))
+            return false;
     }
 
     if (dbver == "1062")
@@ -1189,7 +1292,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('atsc',1793,'guide_fixup','3');",
 ""
 };
-        performActualUpdate(updates, "1063", dbver);
+        if (!performActualUpdate(updates, "1063", dbver))
+            return false;
     }
 
     if (dbver == "1063")
@@ -1199,7 +1303,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "chanid int unsigned, starttime datetime, INDEX (recordid));",
 ""
 };
-        performActualUpdate(updates, "1064", dbver);
+        if (!performActualUpdate(updates, "1064", dbver))
+            return false;
     }
 
     if (dbver == "1064")
@@ -1217,8 +1322,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE `record` CHANGE `programid` `programid` VARCHAR( 20 ) NOT NULL;",
 ""
 };
-        performActualUpdate(updates, "1065", dbver);
-
+        if (!performActualUpdate(updates, "1065", dbver))
+            return false;
     }
   
     if (dbver == "1065") 
@@ -1231,7 +1336,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE capturecard ADD COLUMN firewire_model varchar(32) default NULL;",
 ""
 };
-        performActualUpdate(updates, "1066", dbver);
+        if (!performActualUpdate(updates, "1066", dbver))
+            return false;
     } 
  
     if (dbver == "1066")
@@ -1240,21 +1346,27 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "INSERT INTO dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES('dvb', '40999', 'guide_fixup', '4');",
 ""
 };
-        performActualUpdate(updates, "1067", dbver);
-    }   
+        if (!performActualUpdate(updates, "1067", dbver))
+            return false;
+    }
+
+    return true;
 }
 
-void InitializeDatabase(void)
+bool InitializeDatabase(void)
 {
     QSqlDatabase *db_conn = QSqlDatabase::database();
     QSqlQuery qQuery = db_conn->exec("SHOW TABLES;");
     if (qQuery.isActive() && (qQuery.numRowsAffected() > 0))
     {
-        cerr << "Told to create a NEW database schema, but the database already"
-             << "\r\nhas " << qQuery.numRowsAffected() << " tables.\r\n";
-        cerr << "If you are sure this is a good mythtv database, verify\r\n"
-             << "that the settings table has the DBSchemaVer variable.\r\n";
-        exit(-14);
+        QString msg = QString(
+            "Told to create a NEW database schema, but the database\n"
+            "already has %1 tables.\n"
+            "If you are sure this is a good mythtv database, verify\n"
+            "that the settings table has the DBSchemaVer variable.\n")
+            .arg(qQuery.numRowsAffected());
+        VERBOSE(VB_ALL, msg);
+        return false;   
     }
 
     VERBOSE(VB_ALL, "Inserting MythTV initial database information.");
@@ -1717,6 +1829,8 @@ void InitializeDatabase(void)
 };
 
     QString dbver = "";
-    performActualUpdate(updates, "1060", dbver);
+    if (!performActualUpdate(updates, "1060", dbver))
+        return false;
+    return true;
 }
 

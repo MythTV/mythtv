@@ -2,7 +2,7 @@
 #define DBCHECK_H_
 
 // Call after initialing the main db connection.
-void UpgradeTVDatabaseSchema(void);
+bool UpgradeTVDatabaseSchema(void);
 
 #endif
 

@@ -481,7 +481,11 @@ int main(int argc, char **argv)
 
     close(0);
 
-    UpgradeTVDatabaseSchema();
+    if (!UpgradeTVDatabaseSchema())
+    {
+        VERBOSE(VB_IMPORTANT, "Couldn't upgrade database to new schema");
+        return -1;
+    }    
 
     if (printsched || testsched)
     {
