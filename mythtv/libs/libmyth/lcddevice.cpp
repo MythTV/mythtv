@@ -449,15 +449,8 @@ void LCD::veryBadThings(int anError)
     else if (anError == QSocket::ErrSocketRead)
         cerr << "Why? There was an error reading from the socket." << endl ;  
     
-#if (QT_VERSION >= 0x030100)
     socket->clearPendingData();
     socket->close();
-#else
-#warning ***   You should think seriously about upgrading your Qt to 3.1 or higher   ***
-    delete socket;
-    socket = NULL;
-#endif
-    
 }
 
 void LCD::scrollText()

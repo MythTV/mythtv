@@ -1493,8 +1493,9 @@ bool fillData(QValueList<Source> &sourcelist)
                 querystr.sprintf("SELECT COUNT(*) as 'hits' "
                                  "FROM channel LEFT JOIN program USING (chanid) "
                                  "WHERE sourceid = %d AND starttime >= "
-                                 "DATE_ADD(CURRENT_DATE(), INTERVAL %d DAY) "
-                                 "AND starttime < DATE_ADD(CURRENT_DATE(), "
+                                 "DATE_ADD(CURRENT_DATE(), INTERVAL '%d 12' "
+                                 "DAY_HOUR) AND "
+                                 "starttime < DATE_ADD(CURRENT_DATE(), "
                                  "INTERVAL 1+%d DAY) "
                                  "GROUP BY channel.chanid "
                                  "ORDER BY hits DESC LIMIT 1",

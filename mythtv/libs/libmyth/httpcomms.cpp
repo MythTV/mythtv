@@ -1,29 +1,40 @@
 #include <iostream>
+#include <qapplication.h>
+#include <unistd.h>
 using namespace std;
 
 #include "httpcomms.h"
 
 HttpComms::HttpComms(QUrl &url)
-    : http(0)
+         : http(0)
 {
     init(url);
 }
 
-#ifndef ANCIENT_QT
+HttpComms::HttpComms(QUrl &url, int timeoutms)
+         : http(0)
+{
+    init(url);
+    m_timer = new QTimer();
+    m_timer->start(timeoutms, TRUE);
+    connect(m_timer, SIGNAL(timeout()), SLOT(timeout()));
+}
+
 HttpComms::HttpComms(QUrl &url, QHttpRequestHeader &header)
 {
     init(url, header);
 }
-#endif
 
 HttpComms::~HttpComms()
 {
+    if (m_timer)
+        delete m_timer;
+
     delete http;
 }
 
 void HttpComms::init(QUrl &url)
 {
-#ifndef ANCIENT_QT
     QHttpRequestHeader header("GET", url.encodedPathAndQuery());
     QString userAgent = "Mozilla/9.876 (X11; U; Linux 2.2.12-20 i686, en) "
                         "Gecko/25250101 Netscape/5.432b1";
@@ -32,12 +43,8 @@ void HttpComms::init(QUrl &url)
     header.setValue("User-Agent", userAgent);
 
     init(url, header);
-#else
-    cerr << "HttpComms does not work on QT 3.0 (No IMDB grabbing for you)\n";
-#endif
 }
 
-#ifndef ANCIENT_QT
 void HttpComms::init(QUrl &url, QHttpRequestHeader &header)
 {
     http = new QHttp();
@@ -48,41 +55,171 @@ void HttpComms::init(QUrl &url, QHttpRequestHeader &header)
     
     http->setHost(url.host(), port);
 
+    m_debug = 0;
+    m_redirectedURL = "";
     m_done = false;
     m_data = "";
+    m_statusCode = 0;
+    m_responseReason = "";
+    m_timer = NULL;
+    m_timeout = false;
 
     connect(http, SIGNAL(done(bool)), this, SLOT(done(bool)));
     connect(http, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
+    connect(http, SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)),
+            this, SLOT(headerReceived(const QHttpResponseHeader &)));
 
     http->request(header);
 }
-#endif
 
 void HttpComms::stop()
 {
-#ifndef ANCIENT_QT
     disconnect(http, 0, 0, 0);
     http->abort();
-#endif
+
+    if (m_timer)
+        m_timer->stop();
 }
 
 void HttpComms::done(bool error)
 {
-#ifndef ANCIENT_QT
     if (error)
     {
        cout << "MythVideo: NetworkOperation Error on Finish: "
             << http->errorString() << ".\n";
     }
-    else
+    else if (http->bytesAvailable())
         m_data = QString(http->readAll());
 
+    if (m_debug > 1)
+        cerr << "done: " << m_data.length() << " bytes.\n";
+
     m_done = true;
-#endif 
+
+    if (m_timer)
+        m_timer->stop();
 }
 
 void HttpComms::stateChanged(int state)
 {
-    (void)state;
+    if (m_debug > 1) 
+    {
+        switch (state) 
+        {
+            case QHttp::Unconnected: cerr << "unconnected\n"; break;
+            case QHttp::HostLookup: break;
+            case QHttp::Connecting: cerr << "connecting\n"; break;
+            case QHttp::Sending: cerr << "sending\n"; break;
+            case QHttp::Reading: cerr << "reading\n"; break;
+            case QHttp::Connected: cerr << "connected\n"; break;
+            case QHttp::Closing: cerr << "closing\n"; break;
+            default: break;
+        }
+    }
+}
+
+void HttpComms::headerReceived(const QHttpResponseHeader &resp)
+{
+    m_statusCode = resp.statusCode();
+    m_responseReason = resp.reasonPhrase();
+
+    if (m_debug > 1) 
+    {
+        cerr << "Got HTTP response: " << m_statusCode << ":" 
+             << m_responseReason << endl;    
+        cerr << "Keys: " << resp.keys().join(",") << endl;
+    }
+
+    if (resp.statusCode() >= 300 && resp.statusCode() <= 400) 
+    {
+        // redirection
+        QString uri = resp.value("LOCATION");
+        if (m_debug > 0)
+            cerr << "Redirection to: " << uri << endl;
+       
+        m_redirectedURL = resp.value("LOCATION");
+    }
+}
+
+void HttpComms::timeout() 
+{
+   m_timeout = true;
+   m_done = true;
+}
+
+
+// getHttp - static function for grabbing http data for a url
+//           this is a synchronous function, it will block according to the vars
+QString HttpComms::getHttp(QString& url, int timeoutMS, int maxRetries, 
+                           int maxRedirects)
+{
+    int redirectCount = 0;
+    int timeoutCount = 0;
+    QString res = "";
+    HttpComms *httpGrabber = NULL; 
+    int m_debug = 0;
+
+    while (1) 
+    {
+        QUrl qurl(url);
+        if (httpGrabber != NULL)
+            delete httpGrabber; 
+        httpGrabber = new HttpComms(qurl, timeoutMS);
+
+        while (!httpGrabber->isDone())
+        {
+            qApp->processEvents();
+            usleep(10000);
+        }
+
+        // Handle timeout
+        if (httpGrabber->isTimedout())
+        {
+            if (m_debug > 0) 
+                cerr << "timeout for url:" << url.latin1() << endl;
+           
+            // Increment the counter and check were not over the limit
+            if (timeoutCount++ >= maxRetries)
+            {
+                cerr << "Failed to contact server for url: " << url.latin1()
+                     << endl;
+                break;
+            }
+
+            // Try again
+            if (m_debug > 0) 
+               cerr << "attempt # " << (timeoutCount+1) << "/" << maxRetries 
+                    << " for url:" << url.latin1() << endl;
+
+            continue;
+        }
+
+        // Check for redirection
+        if (!httpGrabber->getRedirectedURL().isEmpty()) 
+        {
+            if (redirectCount++ < maxRedirects)
+            {
+                url = httpGrabber->getRedirectedURL();
+                if (m_debug > 0)
+                    cerr << "redirect " << redirectCount << "/" << maxRedirects
+                         << " to url:" << url.latin1() << endl;
+            }
+
+            // Try again
+            timeoutCount = 0;
+            continue;
+        }
+
+        res = httpGrabber->getData();
+        break;
+    }
+
+    delete httpGrabber;
+
+    if (m_debug > 1)
+        cerr << "Got " << res.length() << " bytes from url: '" 
+             << url.latin1() << "'" << endl;
+
+    return res;
 }
 

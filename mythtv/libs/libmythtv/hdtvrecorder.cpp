@@ -12,6 +12,12 @@
      and no audio stutter on stations with >1 audio stream
    * Emits proper keyframe data to recordedmarkup db, enabling seeking
 
+   Oct. 22, 2003:
+   * delay until GOP before writing output stream at start and reset
+     (i.e. channel change)
+   * Rewrite PIDs after channel change to be the same as before, so
+     decoder can follow
+
    References / example code: 
      ATSC standards a.54, a.69 (www.atsc.org)
      ts2pes from mpegutils from dvb (www.linuxtv.org)
@@ -50,6 +56,11 @@ extern "C" {
 
 #define SYNC_BYTE 0x47
 
+// n.b. these PID relationships are only a recommendation from ATSC,
+// but seem to be universal
+#define VIDEO_PID(bp) ((bp)+1)
+#define AUDIO_PID(bp) ((bp)+4)
+
 HDTVRecorder::HDTVRecorder()
             : RecorderBase()
 {
@@ -68,9 +79,8 @@ HDTVRecorder::HDTVRecorder()
 
     pat_pid = 0;
     psip_pid = 0x1ffb;
-    video_pid = 0; // video, audio, base PIDs will be filled in when we 
-    audio_pid = 0; // find them
-    base_pid = 0;
+    base_pid = 0; // will be filled in when we find it
+    first_base_pid = 0;
     ts_packets = 0; // cumulative packet count
 
     // temporary to find lowest PID in first 500 packets
@@ -405,6 +415,18 @@ int HDTVRecorder::ResyncStream(unsigned char *buffer, int curr_pos, int len)
     return pos;
 }
 
+void HDTVRecorder::RewritePID(unsigned char *buffer, int pid)
+{
+    // We need to rewrite the outgoing PIDs to match the first one
+    // the decoder saw ... it does not seem to track PID changes.
+    char b1, b2;
+    // PID is 13 bits starting in byte 1, bit 4
+    b1 = ((pid >> 8) & 0x1F) | (buffer[1] & 0xE0);
+    b2 = (pid & 0xFF);
+    buffer[1] = b1;
+    buffer[2] = b2;
+}
+
 int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
 {
     int pos = 0;
@@ -526,6 +548,11 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
 
             // For now we're using the dirty hack below instead.
             
+            // We should rewrite the PAT to describe just the one
+            // stream we are recording.  Always use the same set of
+            // PIDs // so the decoder has an easier time following
+            // channel changes.
+
             // decoder needs PAT, write it to the stream
             ringBuffer->Write(&buffer[packet_start_pos], 188);
         }
@@ -541,21 +568,33 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
             // downloaded XMLTV data.
 
         }
-        else if (pid == video_pid)
+        else if (pid == VIDEO_PID(base_pid))
         {
             FindKeyframes(buffer, packet_start_pos, pos, 
                     adaptation_field_control, payload_unit_start_indicator);
             // decoder needs video, of course (just this PID)
+            if (gopset || firstgoppos) 
+            {
+                 // delay until first GOP to avoid decoder crash on res change
+                RewritePID(&(buffer[packet_start_pos]), 
+                           VIDEO_PID(first_base_pid));
             ringBuffer->Write(&buffer[packet_start_pos], 188);
         }
-        else if (pid == audio_pid)
+        }
+        else if (pid == AUDIO_PID(base_pid))
         {
             // decoder needs audio, of course (just this PID)
+            if (gopset || firstgoppos) 
+            {
+                RewritePID(&(buffer[packet_start_pos]), 
+                           AUDIO_PID(first_base_pid));
             ringBuffer->Write(&buffer[packet_start_pos], 188);
+        }
         }
         else if (pid == base_pid)
         {
             // decoder needs base PID
+            RewritePID(&(buffer[packet_start_pos]), first_base_pid);
             ringBuffer->Write(&buffer[packet_start_pos], 188);
         }
         else 
@@ -565,19 +604,16 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
             // As a hack until we start decoding PAT, find the lowest
             // video PID in the first 50 packets and record only that
             // stream
-            if ((pid & 0xff01) == 0x0001 && !video_pid) 
+            if ((pid & 0xff0f) == 0x0001 && !base_pid) 
             {
                 if (pid < lowest_video_pid)
                     lowest_video_pid = pid;
                 video_pid_packets++;
                 if (video_pid_packets >= 50) 
                 {
-                    // n.b. these PID relationships are only a
-                    // recommendation from ATSC, but seem to be
-                    // universal
-                    video_pid = lowest_video_pid;
-                    audio_pid = video_pid + 3;
                     base_pid = lowest_video_pid - 1;
+                    if (first_base_pid == 0)
+                        first_base_pid = base_pid;
                 }
             }
         }
@@ -598,8 +634,6 @@ void HDTVRecorder::Reset(void)
     framesWritten = 0;
     gopset = false;
     firstgoppos = 0;
-    video_pid = 0;
-    audio_pid = 0;
     base_pid = 0;
     ts_packets = 0;
     lowest_video_pid = 0x1fff;

@@ -6,7 +6,7 @@ CONFIG += thread dll
 target.path = $${PREFIX}/lib
 INSTALLS = target
 
-VERSION = 0.12.0
+VERSION = 0.13.0
 
 # Input
 HEADERS += dialogbox.h lcddevice.h mythcontext.h mythwidgets.h oldsettings.h  
@@ -31,12 +31,14 @@ using_alsa {
     DEFINES += USE_ALSA
     HEADERS += audiooutputalsa.h
     SOURCES += audiooutputalsa.cpp
+    LIBS += $$ALSA_LIBS
 }
 
 using_lirc {
     DEFINES += USE_LIRC
     HEADERS += lirc.h lircevent.h
     SOURCES += lirc.cpp lircevent.cpp
+    LIBS += $$LIRC_LIBS
 }
 
 INSTALLS += inc

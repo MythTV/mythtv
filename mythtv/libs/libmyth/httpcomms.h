@@ -5,45 +5,54 @@
 #include <qfile.h>
 #include <qurl.h>
 #include <qobject.h>
-
-#if (QT_VERSION < 0x030100)
-#define ANCIENT_QT
-#warning You really should upgrade to qt 3.1.
-#endif
+#include <qtimer.h>
 
 class HttpComms : public QObject
 {
     Q_OBJECT
   public:
     HttpComms(QUrl &url);
-#ifndef ANCIENT_QT
+    HttpComms(QUrl &url, int timeoutms);
     HttpComms(QUrl &url, QHttpRequestHeader &header);
-#endif
+
     virtual ~HttpComms();
 
-#ifndef ANCIENT_QT
     bool isDone(void) { return m_done; }
-#else
-    bool isDone(void) { return true; }
-#endif
     
+    int getStatusCode(void) { return m_statusCode; }
+    QString getResponseReason(void) { return m_responseReason; }
+
     QString getData(void) { return m_data; }
+    QString getRedirectedURL(void)  { return m_redirectedURL; }
+
     void stop();
+
+    bool isTimedout(void) { return m_timeout; }
+
+    static QString getHttp(QString& url, int timeoutMS = 10000, 
+                           int maxRetries = 3, int maxRedirects = 3);
 
   protected:
     void init(QUrl &url);
-#ifndef ANCIENT_QT
     void init(QUrl &url, QHttpRequestHeader &header);
-#endif
     
   private slots:
+    void timeout();
     void done(bool error);
-    void stateChanged ( int state );
+    void stateChanged(int state);
+
+    void headerReceived(const QHttpResponseHeader &resp);
 
   private:
+    int m_statusCode;
+    QString m_redirectedURL;
+    QString m_responseReason;
     QHttp *http;
     bool m_done;
     QString m_data;
+    QTimer* m_timer;
+    bool m_timeout;
+    int  m_debug;
 };
 
 #endif

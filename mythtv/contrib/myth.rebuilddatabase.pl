@@ -15,173 +15,284 @@
 ##
 ## The following options are available to be changed from the command line
 ## (I've put defaults in if you leave them out, except for $dir)
+## --dbhost DBHOSTNAME
 ## --host HOSTNAME
 ## --user DBUSERNAME
 ## --pass DBPASSWORD
-## --dir /MYTHFILESARESTOREDHERE  (must be fully qualified dir)
+## --dir /MYTHFILESARESTOREDHERE
 ## --database DATABASENAME
 ##
 ## use at your own risk, i am not responsible for anything this program may
 ## or may not do.
-
-## unfortunately i used File::Find::Rule which requires a few other modules from
-## search.cpan.org
-##
-## I had to install the following modules, your results may vary:
-## File-Find-Rule-0.09
-## Number-Compare-0.01
-## Text-Glob-0.05
-
-## To install:
-## perl -MCPAN -e shell
-## cpan>install File::Find::Rule
-## cpan>install Number::Compare
-## cpan>install Text::Glob
-## cpan>exit
 
 ## To run:
 ## Ensure that the script is executable
 ## chmod a+x myth.rebuilddatabase.pl
 ## ./myth.rebuilddatabase.pl
 
+## Change log:
+## 9-19-2003: (awithers@anduin.com)
+##  Anduin fights the urge to make code more readable (aka C like).  Battle
+##  of urges ends in stalemate: code was reindented but not "changed" (much).
+##  To make it a little less useless a contribution also did:
+##    - added ability to grab title/subtitle/description from oldrecorded
+##    - support for multiple backends (via separation of host and dbhost
+##      and bothering to insert the host in the recorded table).
+##    - removed dependency on File::Find::Rule stuff
+##    - attempt to determine good default host name
+##    - provide default for --dir from DB (if not provided)
+##    - added --test_mode (for debugging, does everything except INSERT)
+##    - added --try_default (good for when you must specify a command
+##      line option but don't really need to)
+##    - added --quick_run for those occasions where you just don't have
+##      the sort of time to be sitting around hitting enter
+##    - changed all the DB calls to use parameters (avoids escape issues,
+##      and it looks better)
+
 use strict;
 use DBI;
 use Getopt::Long;
-use File::Find::Rule;
+use Sys::Hostname;
 
 ## get command line args
 
-my ($database, $host, $user, $pass, $verbose, $dir);
+my ($verbose, $dir);
+
+my $show_existing = 0;
+my $test_mode = 0;
+my $quick_run = 0;
+my $try_default = 0;
+
+my $host = hostname;
+my $dbhost = $host;
+my $database = "mythconverg";
+my $user = "mythtv";
+my $pass = "mythtv";
+
+my $date_regx = qr/(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)/;
+my $channel_regx = qr/(\d\d\d\d)/;
+
+my $script_name = $0;
+
+if ($0 =~ m/([^\/]+)$/) {
+	$script_name = $1;
+}
+
+my $script_version = "0.0.1";
 
 my $argc=@ARGV;
 if ($argc == 0) {
-   print "usage:  myth.rebuilddatabase.pl --dir /path/to/video/ [options]
+  print "$script_name Version $script_version
+    usage: $script_name [options]
 
-Where [options] is:
---host          - hostname or IP address of the mysql server (default: \"192.168.1.103\")
---user          - DBUSERNAME (default: \"mythtv\")
---pass          - DBPASSWORD (default: \"mythtv\")
---database      - DATABASENAME (default: \"mythconverg\")
-";
-exit(0);
+    Where [options] is:
+      --host          - hostname of this backend (default: \"$host\")
+      --dbhost        - hostname or IP address of the mysql server
+                        (default: \"$dbhost\")
+      --user          - DBUSERNAME (default: \"$user\")
+      --pass          - DBPASSWORD (default: \"$pass\")
+      --database      - DATABASENAME (default: \"$database\")
+      --show_existing - Dumps current recorded table.
+      --dir           - path to recordings (default: queried from db)
+      --try_default   - Try to just run with the defaults.
+      --quick_run     - don't prompt for title/subtitle/description just
+                        use the default
+      --test_mode     - do everything except update the database
+
+    Example 1:
+      Assumption: The script is run on DB/backend machine.
+
+        $script_name --try_default
+
+    Example 2:
+      Assumption: The script is run on a backend other than the DB machine.
+		
+        $script_name --dbhost=mydbserver
+		";
+	exit(0);
 }
 
-GetOptions('verbose+'=>\$verbose, 'database=s'=>\$database, 'host=s'=>\$host, 'user=s'=>\$user, 'pass=s'=>\$pass, 'dir=s'=>\$dir);
+GetOptions('verbose+'=>\$verbose,
+		'database=s'=>\$database,
+		'dbhost=s'=>\$dbhost,
+		'host=s'=>\$host,
+		'user=s'=>\$user,
+		'pass=s'=>\$pass,
+		'dir=s'=>\$dir,
+		'show_existing|se'=>\$show_existing,
+		'try_default|td'=>\$try_default,
+		'quick_run|qr'=>\$quick_run,
+		'test_mode|t|tm'=>\$test_mode
+		);
 
-
-if (!$host) { $host="192.168.1.103"; }
-if (!$database) { $database="mythconverg"; }
-if (!$user) { $user="mythtv"; }
-if (!$pass) { $pass="mythtv"; }
-if (substr($dir,0,1) ne "\/") {
-		 print "--dir must be a fully qualified path (i.e: must begin with a \"\/\")\n";
-		 exit;
-}
-if (substr($dir,length($dir)-1,1) ne "/") {
-		 $dir = $dir."/";
-		 print "Added trailing slash to ($dir)\n\n";
-}
-
-my $dbh = DBI->connect("dbi:mysql:database=$database:host=$host","$user","$pass") or
-		 die "Cannot connect to database ($!)\n";
-my $q = "select title, subtitle, starttime, endtime, chanid from recorded order by starttime";
-my $sth = $dbh->prepare($q);
-$sth->execute or die "Could not execute ($q)\n";
-
-print "\nYour myth database ($database) is reporting the following programs as being recorded:\n\n";
+my $dbh = DBI->connect("dbi:mysql:database=$database:host=$dbhost",
+		"$user","$pass") or die "Cannot connect to database ($!)\n";
 
 my ($starttime, $endtime, $title, $subtitle, $channel);
-my ($syear, $smonth, $sday, $shour, $sminute, $ssecond, $eyear, $emonth, $eday, $ehour, $eminute, $esecond);
+my ($syear, $smonth, $sday, $shour, $sminute, $ssecond, $eyear, $emonth, $eday,
+		$ehour, $eminute, $esecond);
 
-while (my @row=$sth->fetchrow_array) {
-		 $title = $row[0];
-		 $subtitle = $row[1];
-		 $starttime = $row[2];
-		 $endtime = $row[3];
-		 $channel = $row[4];
+my $q = "";
+my $sth;
 
-		 ## get the pieces of the time
-		 $syear = substr($starttime,0,4); $smonth = substr($starttime,4,2); $sday = substr($starttime,6,2);
-		 $shour = substr($starttime,8,2); $sminute = substr($starttime,10,2); $ssecond = substr($starttime,12,2);
-		 
-		 $eyear = substr($endtime,0,4); $emonth = substr($endtime,4,2); $eday = substr($endtime,6,2);
-		 $ehour = substr($endtime,8,2); $eminute = substr($endtime,10,2); $esecond = substr($endtime,12,2);
+if (!$dir) {
+	my $dir_query = "select data from settings where value='RecordFilePrefix' and hostname=(?)";
+	$sth = $dbh->prepare($dir_query);
+	$sth->execute($host) or die "Could not execute ($dir_query)";
+	if (my @row = $sth->fetchrow_array) {
+		$dir = $row[0];
+	}
+}
+
+if (!$dir) {
+	print("Error: no directory found or specified\n");
+	exit 1;
+}
+
+# remove trailing slash
+$dir =~ s/\/$//;
+
+if ($show_existing) {
+	$q = "select title, subtitle, starttime, endtime, chanid from recorded order by starttime";
+	$sth = $dbh->prepare($q);
+	$sth->execute or die "Could not execute ($q)\n";
+
+	print "\nYour myth database ($database) is reporting the following programs as being recorded:\n\n";
+
+	while (my @row=$sth->fetchrow_array) {
+		$title = $row[0];
+		$subtitle = $row[1];
+		$starttime = $row[2];
+		$endtime = $row[3];
+		$channel = $row[4];
+
+## get the pieces of the time
+		if ($starttime =~ m/$date_regx/) {
+			($syear, $smonth, $sday, $shour, $sminute, $ssecond) =
+				($1, $2, $3, $4, $5, $6);
+		}
+
+		if ($endtime =~ m/$date_regx/) {
+			($eyear, $emonth, $eday, $ehour, $eminute, $esecond) =
+				($1, $2, $3, $4, $5, $6);
+		}
 
 ##		 print "Channel $channel\t$smonth/$sday/$syear $shour:$sminute:$ssecond - $ehour:$eminute:$esecond - $title ($subtitle)\n";
-		 print "Channel:    $channel\n";
-		 print "Start time: $smonth/$sday/$syear - $shour:$sminute:$ssecond\n";
-		 print "End time:   $emonth/$eday/$eyear - $ehour:$eminute:$esecond\n";
-		 print "Title:      $title\n";
-		 print "Subtitle:   $subtitle\n\n";
+		print "Channel:    $channel\n";
+		print "Start time: $smonth/$sday/$syear - $shour:$sminute:$ssecond\n";
+		print "End time:   $emonth/$eday/$eyear - $ehour:$eminute:$esecond\n";
+		print "Title:      $title\n";
+		print "Subtitle:   $subtitle\n\n";
+	}
 }
 
 print "\nThese are the files stored in ($dir) and will be checked against\n";
 print "your database to see if the exist.  If they do not, you will be prompted\n";
 print "for a title and subtitle of the entry, and a record will be created.\n\n";
 
-my $count = 0;
-
-## trying to find any .nuv files
-my @files = File::Find::Rule->file()
-                            ->name( '*.nuv' )
-                            ->in( $dir );
+my @files = glob("$dir/*.nuv");
 
 foreach my $show (@files) {
+	my ($channel, $syear, $smonth, $sday, $shour, $sminute, $ssecond,
+			$eyear, $emonth, $eday, $ehour, $eminute, $esecond);
+	my ($starttime, $endtime);
 
-		 ## remove the $dir prefix from the filename
-		 $show = substr($show, length($dir));
+	if ($show =~ m/$channel_regx\_$date_regx\_$date_regx/) {
+		$channel = $1;
 
-		 ## clear enddate so we can check if the .nuv file is properly named
-		 $emonth = ""; $eday = ""; $eyear = "";
+		($syear, $smonth, $sday, $shour, $sminute, $ssecond) =
+			($2, $3, $4, $5, $6, $7);
 
-		 $channel = substr($show,0,4);
-		 $syear = substr($show, 5,4);
-		 $smonth = substr($show, 9,2);
-		 $sday = substr($show,11,2);
-		 $shour = substr($show,13,2);
-		 $sminute = substr($show,15,2);
-		 $ssecond = substr($show,17,2);
-		 $eyear = substr($show,20,4);
-		 $emonth = substr($show,24,2);
-		 $eday = substr($show,26,2);
-		 $ehour = substr($show,28,2);
-		 $eminute = substr($show,30,2);
-		 $esecond = substr($show,32,2);
+		($eyear, $emonth, $eday, $ehour, $eminute, $esecond) =
+			($8, $9, $10, $11, $12, $13);
 
-		 ## make sure it is a valid file name
-		 if ($emonth eq "" or $eday eq "" or $eyear eq "") {
-		 		 ## file is a bust
-		 } else {
-		 		 ## check if this is already in the db
-		 		 ## second hit to the db i know, but performance is not a big issue here
+		$starttime = "$syear$smonth$sday$shour$sminute$ssecond";
+		$endtime = "$eyear$emonth$eday$ehour$eminute$esecond";
 
-		 		 $q = "select chanid, starttime, endtime from recorded where chanid=$channel and starttime='$syear$smonth$sday$shour$sminute$ssecond' and endtime='$eyear$emonth$eday$ehour$eminute$esecond'";
-		 		 $sth = $dbh->prepare($q);
-		 		 $sth->execute or die "Could not execute ($q)\n";
+## check if this is already in the db
+## second hit to the db i know, but performance is not a big
+## issue here
 
-		 		 my $exists=0;
-		 		 while (my @row=$sth->fetchrow_array) {
-		 		 		 $exists=1;
-		 		 }
+		$q = "select title from recorded where chanid=(?) and starttime=(?) and endtime=(?)";
+		$sth = $dbh->prepare($q);
+		$sth->execute($channel, $starttime, $endtime)
+			or die "Could not execute ($q)\n";
 
-		 		 if ($exists) {
-		 		 		 print "Found a match between file and database ($show)\n\n";
-		 		 } else {
-		 		 		 print "Found an orphaned file, creating database record\n";
-		 		 		 print "Channel:       $channel\n";
-		 		 		 print "Start time:    $smonth/$sday/$syear - $shour:$sminute:$ssecond\n";
-		 		 		 print "End time:      $emonth/$eday/$eyear - $ehour:$eminute:$esecond\n";
+		my $exists = 0;
+		my $found_title = "Unknown";
+		if (my @row = $sth->fetchrow_array) {
+			$exists = 1;
+			$found_title = $row[0];
+		}
 
-		 		 		 print "Enter title:   ";
-		 		 		 chomp (my $newtitle = <STDIN>);
-		 
-		 		 		 print "Enter subtitle: ";
-		 		 		 chomp (my $newsubtitle = <STDIN>);
-		 
-		 		 		 ## add records to db
-		 		 		 my $i = "insert into recorded (chanid, starttime, endtime, title, subtitle) values ($channel, '$syear$smonth$sday$shour$sminute$ssecond', '$eyear$emonth$eday$ehour$eminute$esecond', '$newtitle', '$newsubtitle')";
-		 		 		 $sth = $dbh->prepare($i);
-		 		 		 $sth->execute or die "Could not execute ($i)\n";
-		 		 } ## if
-		 } ## if
+		if ($exists) {
+			print("Found a match between file and database\n");
+			print("    File: '$show'\n");
+			print("    Title: '$found_title'\n");
+		} else {
+			my $guess = "select title, subtitle, description from oldrecorded where chanid=(?) and starttime=(?) and endtime=(?)";
+			$sth = $dbh->prepare($guess);
+			$sth->execute($channel, $starttime, $endtime)
+				or die "Could not execute ($guess)\n";
+
+			my $guess_title = "Unknown";
+			my $guess_subtitle = "Unknown";
+			my $guess_description = "Unknown";
+
+			if (my @row = $sth->fetchrow_array) {
+				$guess_title = $row[0];
+				$guess_subtitle = $row[1];
+				$guess_description = $row[2];
+			}
+
+			print "Found an orphaned file, creating database record\n";
+			print "Channel:    $channel\n";
+			print "Start time: $smonth/$sday/$syear - $shour:$sminute:$ssecond\n";
+			print "End time:   $emonth/$eday/$eyear - $ehour:$eminute:$esecond\n";
+
+			my $newtitle = $guess_title;
+			my $newsubtitle = $guess_subtitle;
+			my $newdescription = $guess_description;
+
+			if (!$quick_run) {
+				print "Enter title (default: '$newtitle'): ";
+				chomp(my $tmp_title = <STDIN>);
+				if ($tmp_title) {$newtitle = $tmp_title;}
+
+				print "Enter subtitle (default: '$newsubtitle'): ";
+				chomp(my $tmp_subtitle = <STDIN>);
+				if ($tmp_subtitle) {$newsubtitle = $tmp_subtitle;}
+
+				print "Enter description (default: '$newdescription'): ";
+				chomp(my $tmp_description = <STDIN>);
+				if ($tmp_description) {$newdescription = $tmp_description;}
+			} else {
+				print("QuickRun defaults:\n");
+				print("        title: '$newtitle'\n");
+				print("     subtitle: '$newsubtitle'\n");
+				print("  description: '$newdescription'\n");
+			}
+
+## add records to db
+			my $i = "insert into recorded (chanid, starttime, endtime, title, subtitle, description, hostname) values ((?), (?), (?), (?), (?), (?), (?))";
+
+			$sth = $dbh->prepare($i);
+			if (!$test_mode) {
+				$sth->execute($channel, $starttime, $endtime, $newtitle,
+						$newsubtitle, $newdescription, $host)
+					or die "Could not execute ($i)\n";
+			} else {
+				print("Test mode: insert would have been done\n");
+				print("  Query: '$i'\n");
+				print("  Query params: '$channel', '$starttime', '$endtime',");
+				print("'$newtitle', '$newsubtitle', '$newdescription', '$host'\n");
+				
+			}
+		} ## if
+	} else {
+# file doesn't match
+		print("Skipping illegal file format: $show\n");
+	}
 } ## foreach loop
+
+# vim:sw=4 ts=4 syn=off:

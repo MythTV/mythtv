@@ -200,7 +200,7 @@ int TVRec::StartRecording(ProgramInfo *rcinfo)
         MythEvent me(message);
         gContext->dispatch(me);
 
-        timeout = QDateTime::currentDateTime().addSecs(3);
+        timeout = QDateTime::currentDateTime().addSecs(10);
 
         while (internalState != kState_None &&
                QDateTime::currentDateTime().secsTo(timeout) > 0)
@@ -210,7 +210,7 @@ int TVRec::StartRecording(ProgramInfo *rcinfo)
         {
             gContext->dispatch(me);
 
-            timeout = QDateTime::currentDateTime().addSecs(3);
+            timeout = QDateTime::currentDateTime().addSecs(10);
 
             while (internalState != kState_None &&
                    QDateTime::currentDateTime().secsTo(timeout) > 0)

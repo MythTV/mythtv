@@ -158,6 +158,30 @@
         <catcolor category="arts/culture" color="goldenrod"></catcolor>
         <catcolor category="movie" color="Blue"></catcolor>
 
+       <!-- Categories introduced by tv_grab_uk_rt -->
+        <catcolor category="Animation" color="MediumSlateBlue"></catcolor>
+        <catcolor category="Business" color="DarkOrange3"></catcolor>
+        <catcolor category="Children's Show" color="MediumSlateBlue"></catcolor>
+        <catcolor category="Consumer" color="goldenrod"></catcolor>
+        <catcolor category="Cookery" color="#aa00aa"></catcolor>
+        <catcolor category="Current Affairs" color="DarkOrange3"></catcolor>
+        <catcolor category="Drama Series" color="rosybrown3"></catcolor>
+        <catcolor category="Entertainment" color="DarkOrchid"></catcolor>
+        <catcolor category="Environment" color="#33ff99"></catcolor>
+        <catcolor category="Film" color="Blue"></catcolor>
+        <catcolor category="Game Show" color="orchid"></catcolor>
+        <catcolor category="Gardening" color="Red"></catcolor>
+        <catcolor category="Interests" color="Red"></catcolor>
+        <catcolor category="Music &amp; Arts" color="goldenrod"></catcolor>
+        <catcolor category="News &amp; Current Affairs" color="DarkOrange3"></catcolor>
+        <catcolor category="Religious" color="goldenrod"></catcolor>
+        <catcolor category="Sitcoms" color="DarkOrchid"></catcolor>
+        <catcolor category="Soaps" color="DarkOrchid"></catcolor>
+        <catcolor category="Sport" color="DarkCyan"></catcolor>
+        <catcolor category="Talk Show" color="MediumTurquoise"></catcolor>
+        <catcolor category="Transport" color="#33ff99"></catcolor>
+        <catcolor category="Travel" color="#aa00aa"></catcolor>
+
         <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
         <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png"></recordstatus>
         <recordstatus type="ChannelRecord" image="gg-rs-channel.png"></recordstatus>
@@ -364,6 +388,30 @@
         <catcolor category="tourism/travel" color="#aa00aa"></catcolor>
         <catcolor category="arts/culture" color="goldenrod"></catcolor>
         <catcolor category="movie" color="Blue"></catcolor>
+
+        <!-- Categories introduced by tv_grab_uk_rt -->
+        <catcolor category="Animation" color="MediumSlateBlue"></catcolor>
+        <catcolor category="Business" color="DarkOrange3"></catcolor>
+        <catcolor category="Children's Show" color="MediumSlateBlue"></catcolor>
+        <catcolor category="Consumer" color="goldenrod"></catcolor>
+        <catcolor category="Cookery" color="#aa00aa"></catcolor>
+        <catcolor category="Current Affairs" color="DarkOrange3"></catcolor>
+        <catcolor category="Drama Series" color="rosybrown3"></catcolor>
+        <catcolor category="Entertainment" color="DarkOrchid"></catcolor>
+        <catcolor category="Environment" color="#33ff99"></catcolor>
+        <catcolor category="Film" color="Blue"></catcolor>
+        <catcolor category="Game Show" color="orchid"></catcolor>
+        <catcolor category="Gardening" color="Red"></catcolor>
+        <catcolor category="Interests" color="Red"></catcolor>
+        <catcolor category="Music &amp; Arts" color="goldenrod"></catcolor>
+        <catcolor category="News &amp; Current Affairs" color="DarkOrange3"></catcolor>
+        <catcolor category="Religious" color="goldenrod"></catcolor>
+        <catcolor category="Sitcoms" color="DarkOrchid"></catcolor>
+        <catcolor category="Soaps" color="DarkOrchid"></catcolor>
+        <catcolor category="Sport" color="DarkCyan"></catcolor>
+        <catcolor category="Talk Show" color="MediumTurquoise"></catcolor>
+        <catcolor category="Transport" color="#33ff99"></catcolor>
+        <catcolor category="Travel" color="#aa00aa"></catcolor>
 
         <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
         <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png"></recordstatus>

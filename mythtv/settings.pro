@@ -3,7 +3,7 @@ CONFIG += release
 
 PREFIX = /usr/local
 
-LIBVERSION = 0.12
+LIBVERSION = 0.13
 
 INCLUDEPATH += $${PREFIX}/include
 INCLUDEPATH *= /usr/local/include
@@ -25,7 +25,7 @@ EXTRA_LIBS = -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm -lfreetype
 
 # Native ALSA support
 #CONFIG += using_alsa
-#EXTRA_LIBS += -lasound
+#ALSA_LIBS = -lasound
 
 # DVB support
 #CONFIG += using_dvb
@@ -34,7 +34,7 @@ EXTRA_LIBS = -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm -lfreetype
 
 # Native lirc support
 #CONFIG += using_lirc
-#EXTRA_LIBS += -llirc_client
+#LIRC_LIBS = -llirc_client
 
 # XvMC support, modify as necessary.
 #CONFIG += using_xvmc

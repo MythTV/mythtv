@@ -39,6 +39,7 @@ MythContext::MythContext(const QString &binversion, bool gui, bool lcd)
     m_settings = new Settings;
     m_qtThemeSettings = new Settings;
 
+    isconnecting = false;
     language = "";
     m_themeloaded = false;
     m_backgroundimage = NULL;
@@ -118,6 +119,8 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
     if (serverSock)
         return true;
 
+    isconnecting = true;
+
     serverSock = new QSocket();
 
     cout << "connecting to backend server: " << hostname << ":" << port << endl;
@@ -148,6 +151,7 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
             serverSock->close();
             delete serverSock;
             serverSock = NULL;
+            isconnecting = false;
             return false;
         }
     }
@@ -166,6 +170,7 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
         serverSock->close();
         delete serverSock;
         serverSock = NULL;
+        isconnecting = false;
         return false;
     }
 
@@ -175,6 +180,7 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
     ReadStringList(serverSock, strlist);
 
     connect(serverSock, SIGNAL(readyRead()), this, SLOT(readSocket()));
+    isconnecting = false;
 
     return true;
 }
@@ -971,6 +977,9 @@ void MythContext::SetSetting(const QString &key, const QString &newValue)
 
 bool MythContext::SendReceiveStringList(QStringList &strlist)
 {
+    if (isconnecting)
+        return false;
+
     if (!serverSock)
         ConnectToMasterServer();
 

@@ -312,6 +312,12 @@ void OSDSet::Hide(void)
     m_timeleft = -1;
     m_fadetime = 0;
     m_notimeout = false;
+
+    if (currentOSDFunctionalType)
+    {
+        emit OSDClosed(currentOSDFunctionalType);
+        currentOSDFunctionalType = 0;
+    }
 }
 
 void OSDSet::Draw(OSDSurface *surface, bool actuallydraw)

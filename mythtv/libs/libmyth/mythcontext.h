@@ -13,6 +13,10 @@
 #include <vector>
 using namespace std;
 
+#if (QT_VERSION < 0x030100)
+#error You need Qt version >= 3.1.0 to compile MythTV.
+#endif
+
 class Settings;
 class QSqlDatabase;
 class QSqlQuery;
@@ -67,7 +71,7 @@ class MythEvent : public QCustomEvent
     QString extradata;
 };
 
-#define MYTH_BINARY_VERSION "0.12.10132003-1"
+#define MYTH_BINARY_VERSION "0.13.10232003-1"
 
 extern int print_verbose_messages;
 
@@ -204,40 +208,10 @@ class MythContext : public QObject
     QString themecachedir;
 
     int bigfontsize, mediumfontsize, smallfontsize; 
+
+    bool isconnecting;
 };
 
 extern MythContext *gContext;
-
-#if (QT_VERSION < 0x030100)
-class QMutexLocker
-{
-  public:
-    QMutexLocker(QMutex *);
-   ~QMutexLocker();
-
-    QMutex *mutex() const;
-
-  private:
-    QMutex *mtx;
-};
-
-inline QMutexLocker::QMutexLocker(QMutex *m)
-{
-    mtx = m;
-    if (mtx)
-        mtx->lock();
-}
-
-inline QMutexLocker::~QMutexLocker()
-{
-    if (mtx)
-        mtx->unlock();
-}
-
-inline QMutex *QMutexLocker::mutex() const
-{
-    return mtx;
-}
-#endif
 
 #endif
