@@ -19,6 +19,7 @@ using namespace std;
 #include "cdrip.h"
 #include "playlist.h"
 #include "globalsettings.h"
+#include "dbcheck.h"
 
 #include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
@@ -365,6 +366,7 @@ int mythplugin_init(const char *libversion)
                                     MYTH_BINARY_VERSION))
         return -1;
 
+    UpgradeMusicDatabaseSchema();
 
     GeneralSettings general;
     general.load(QSqlDatabase::database());

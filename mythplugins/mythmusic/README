@@ -69,9 +69,6 @@ Follow this by a 'make install'.  It'll put a 'libmythmusic.so' plugin in your
 MythMusic will also read the mysql.txt settings file used by MythTV, so any 
 changes you made to those will be carried over into this.
 
-The final thing to do is add the musicdb/metadata.sql file to your existing
-database setup from MythTV.
-
 You'll want to go into the Music Settings section of the Setup item from 
 mythfrontend and set at least the path where your music is stored.
 
