@@ -36,7 +36,8 @@ enum MpegTSFilterType {
     MPEGTS_SECTION,
 };
 
-typedef void PESCallback(void *opaque, const uint8_t *buf, int len, int is_start);
+typedef void PESCallback(void *opaque, const uint8_t *buf, int len, 
+                         int is_start, int64_t position);
 
 typedef struct MpegTSPESFilter {
     PESCallback *pes_cb;
@@ -628,6 +629,7 @@ typedef struct PESContext {
     int pes_header_size;
     int64_t pts, dts;
     uint8_t header[MAX_PES_HEADER_SIZE];
+    int64_t startpos;
 } PESContext;
 
 static int64_t get_pts(const uint8_t *p)
@@ -645,7 +647,8 @@ static int64_t get_pts(const uint8_t *p)
 
 /* return non zero if a packet could be constructed */
 static void mpegts_push_data(void *opaque,
-                             const uint8_t *buf, int buf_size, int is_start)
+                             const uint8_t *buf, int buf_size, int is_start,
+                             int64_t position)
 {
     PESContext *pes = opaque;
     MpegTSContext *ts = pes->stream->priv_data;
@@ -654,6 +657,7 @@ static void mpegts_push_data(void *opaque,
     int len, code, codec_type, codec_id;
     
     if (is_start) {
+        pes->startpos = position;
         pes->state = MPEGTS_HEADER;
         pes->data_index = 0;
     }
@@ -759,7 +763,7 @@ static void mpegts_push_data(void *opaque,
             }
             if (len > 0) {
                 AVPacket *pkt = ts->pkt;
-                if (pes->st && av_new_packet(pkt, len, 0) == 0) {
+                if (pes->st && av_new_packet(pkt, len, pes->startpos) == 0) {
                     memcpy(pkt->data, p, len);
                     pkt->stream_index = pes->st->index;
                     pkt->pts = pes->pts;
@@ -800,7 +804,7 @@ static int add_pes_stream(AVFormatContext *s, int pid)
 }
 
 /* handle one TS packet */
-static void handle_packet(AVFormatContext *s, uint8_t *packet)
+static void handle_packet(AVFormatContext *s, uint8_t *packet, int64_t position)
 {
     MpegTSContext *ts = s->priv_data;
     MpegTSFilter *tss;
@@ -862,7 +866,7 @@ static void handle_packet(AVFormatContext *s, uint8_t *packet)
         }
     } else {
         tss->u.pes_filter.pes_cb(tss->u.pes_filter.opaque, 
-                                 p, p_end - p, is_start);
+                                 p, p_end - p, is_start, position);
     }
 }
 
@@ -915,7 +919,7 @@ static int handle_packets(AVFormatContext *s, int nb_packets)
             else
                 continue;
         }
-        handle_packet(s, packet);
+        handle_packet(s, packet, pos);
     }
     return 0;
 }

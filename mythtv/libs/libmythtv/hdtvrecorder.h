@@ -63,6 +63,7 @@ class HDTVRecorder : public RecorderBase
     QMap<long long, long long> positionMap;
 
     long long prev_gop_save_pos;
+    int firstgoppos;
 };
 
 #endif

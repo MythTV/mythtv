@@ -128,6 +128,8 @@ class AvFormatDecoder : public DecoderBase
     float current_aspect;
 
     QPtrList<AVPacket> storedPackets;
+
+    int firstgoppos;
 };
 
 #endif

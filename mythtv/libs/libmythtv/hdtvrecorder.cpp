@@ -55,6 +55,8 @@ HDTVRecorder::HDTVRecorder()
 
     keyframedist = 15;
     gopset = false;
+
+    firstgoppos = 0;
 }
 
 HDTVRecorder::~HDTVRecorder()
@@ -369,8 +371,13 @@ void HDTVRecorder::ProcessData(unsigned char *buffer, int len)
 
                 if (!gopset && frameNum > 0)
                 {
-                    keyframedist = frameNum;
-                    gopset = true;
+                    if (firstgoppos > 0)
+                    {
+                        keyframedist = frameNum - firstgoppos;
+                        gopset = true;
+                    }
+                    else
+                        firstgoppos = frameNum;
                 }
 
                 long long startpos = ringBuffer->GetFileWritePosition();

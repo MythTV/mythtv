@@ -41,7 +41,8 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
 
     exitafterdecoded = false;
     ateof = false;
-    gopset = 0;
+    gopset = false;
+    firstgoppos = 0;
 
     fps = 29.97;
     validvpts = false;
@@ -761,9 +762,14 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
  
                     if (!gopset && frameNum > 0)
                     {
-                        keyframedist = frameNum;
-                        gopset = true;
-                        m_parent->SetVideoParams(-1, -1, -1, keyframedist);
+                        if (firstgoppos > 0)
+                        {
+                            keyframedist = frameNum - firstgoppos;
+                            gopset = true;
+                            m_parent->SetVideoParams(-1, -1, -1, keyframedist);
+                        }
+                        else
+                            firstgoppos = frameNum;
                     }
 
                     lastKey = frameNum;
