@@ -63,12 +63,6 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
     else
         phoneUIStatusBar->DisplayNotification("Not Registered", 5);
   
-    // Set please wait on the LCD
-    QPtrList<LCDTextItem> textItems;
-    textItems.setAutoDelete(true);
-    textItems.append(new LCDTextItem(1, ALIGN_CENTERED, "Please Wait", "Generic"));
-    gContext->GetLCDDevice()->switchToGeneric(&textItems);
-
     // Read the directory into the object structures
     DirContainer = new DirectoryContainer(db);
     DirContainer->Load();
