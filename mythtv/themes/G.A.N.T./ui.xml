@@ -1231,13 +1231,13 @@
       <textarea name="messagedel" draworder="0">
         <area>20,15,800,35</area>
         <font>message</font>
-        <value>Select a recording to permanently delete:</value>
+        <value>Select a recording to permanently erase:</value>
         <context>1</context>
       </textarea>
       <textarea name="messageplay" draworder="0">
         <area>20,15,800,35</area>
         <font>message</font>
-        <value>Select a recording to view:</value>
+        <value>Select a recording to watch:</value>
         <context>0</context>
       </textarea>
     </container>
@@ -1572,7 +1572,7 @@
       <textarea name="pickinfo" draworder="6">
         <area>10,75,500,60</area>
         <font>info</font>
-        <value>Pick the letter in which the show starts with, then hit ENTER or the right arrow</value>
+        <value>Pick the letter in which the show starts with, then press SELECT or the right arrow</value>
         <multiline>yes</multiline>
       </textarea>
     </container>
@@ -1587,7 +1587,7 @@
       <textarea name="pickprog" draworder="6">
         <area>10,75,500,120</area>
         <font>info</font>
-        <value>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting 'info' will allow you to setup recording options.</value>
+        <value>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</value>
         <multiline>yes</multiline>
       </textarea>
     </container>

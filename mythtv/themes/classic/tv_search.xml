@@ -33,7 +33,7 @@
    <button>
       <type>TV_SEARCH_CATEGORIES</type>
       <text>Categories</text>
-      <text lang="DE">Genres</text>
+      <text lang="DE">Kategorien</text>
       <text lang="SV">Kategori</text>
       <text lang="NL">Catergorie</text>
       <text lang="JA">カテゴリー</text>
@@ -63,6 +63,7 @@
    <button>
       <type>TV_SEARCH_POWER</type>
       <text>Advanced</text>
+      <text lang="DE">Erweitert</text>
       <action>TV_SEARCH_POWER</action>
    </button>
 
