@@ -14,7 +14,6 @@
 #include <qbuttongroup.h>
 #include <qlistbox.h>
 #include <qcheckbox.h>
-#include <qwizard.h>
 #include <qimage.h>
 
 #include <vector>
@@ -29,45 +28,97 @@ class MythContext;
 // - Space selects
 
 
-class MythComboBox: public QComboBox {
+class MythComboBox: public QComboBox 
+{
     Q_OBJECT
-public:
+  public:
     MythComboBox(bool rw, QWidget* parent=0, const char* name=0):
         QComboBox(rw, parent, name) {};
-public slots:
+
+    void setHelpText(QString help) { helptext = help; }
+
+  signals:
+    void changeHelpText(QString);
+
+  public slots:
     void insertItem(const QString& item) {
         QComboBox::insertItem(item);
     };
-protected:
-    virtual void keyPressEvent (QKeyEvent* e);
+
+  protected:
+    virtual void keyPressEvent (QKeyEvent *e);
+    virtual void focusInEvent(QFocusEvent *e) { emit changeHelpText(helptext);
+                                                QComboBox::focusInEvent(e); }
+
+  private:
+    QString helptext;
 };
 
-class MythSpinBox: public QSpinBox {
-public:
+class MythSpinBox: public QSpinBox 
+{
+    Q_OBJECT
+  public:
     MythSpinBox(QWidget* parent = NULL, const char* widgetName = 0):
         QSpinBox(parent, widgetName) {};
-protected:
+
+    void setHelpText(QString help) { helptext = help; }
+
+  signals:
+    void changeHelpText(QString);
+
+  protected:
     virtual bool eventFilter (QObject* o, QEvent* e);
+    virtual void focusInEvent(QFocusEvent *e) { emit changeHelpText(helptext);
+                                                QSpinBox::focusInEvent(e); }
+
+  private:
+    QString helptext;
 };
 
-class MythSlider: public QSlider {
-public:
+class MythSlider: public QSlider 
+{
+    Q_OBJECT
+  public:
     MythSlider(QWidget* parent=0, const char* name=0):
         QSlider(parent, name) {};
-protected:
+
+    void setHelpText(QString help) { helptext = help; }
+
+  signals:
+    void changeHelpText(QString);
+
+  protected:
     virtual void keyPressEvent (QKeyEvent* e);
+    virtual void focusInEvent(QFocusEvent *e) { emit changeHelpText(helptext); 
+                                                QSlider::focusInEvent(e); }
+
+  private:
+    QString helptext;
 };
 
-class MythLineEdit : public QLineEdit {
+class MythLineEdit : public QLineEdit 
+{
+    Q_OBJECT
   public:
     MythLineEdit(QWidget *parent=NULL, const char* widgetName=0) :
       QLineEdit(parent, widgetName) { };
 
-    MythLineEdit(const QString& contents, QWidget *parent=NULL, const char* widgetName=0) :
+    MythLineEdit(const QString& contents, QWidget *parent=NULL, 
+                 const char* widgetName=0) :
       QLineEdit(contents, parent, widgetName) { };
 
-protected:
-  virtual void keyPressEvent(QKeyEvent *e);
+    void setHelpText(QString help) { helptext = help; }
+
+  signals:
+    void changeHelpText(QString);
+
+  protected:
+    virtual void keyPressEvent(QKeyEvent *e);
+    virtual void focusInEvent(QFocusEvent *e) { emit changeHelpText(helptext); 
+                                                QLineEdit::focusInEvent(e); }
+
+  private:
+    QString helptext;
 };
 
 class MythTable : public QTable
@@ -102,6 +153,10 @@ class MythToolButton : public QToolButton
 class MythPushButton : public QPushButton
 {
   public:
+    MythPushButton(QWidget *parent, const char *name = 0)
+                 : QPushButton(parent, name)
+                  { setBackgroundOrigin(WindowOrigin); }
+
     MythPushButton(const QString &text, QWidget *parent)
                  : QPushButton(text, parent)
                   { setBackgroundOrigin(WindowOrigin); }
@@ -114,11 +169,22 @@ class MythPushButton : public QPushButton
 
 class MythCheckBox: public QCheckBox
 {
-public:
+    Q_OBJECT
+  public:
     MythCheckBox(QWidget* parent = 0, const char* name = 0):
         QCheckBox(parent, name) {};
-protected:
+    void setHelpText(QString help) { helptext = help; }
+
+  signals:
+    void changeHelpText(QString);
+
+  protected:
     virtual void keyPressEvent(QKeyEvent* e);
+    virtual void focusInEvent(QFocusEvent *e) { emit changeHelpText(helptext); 
+                                                QCheckBox::focusInEvent(e); }
+
+  private:
+    QString helptext;
 };
 
 class MythDialog : public QDialog
@@ -127,7 +193,7 @@ class MythDialog : public QDialog
     MythDialog(MythContext *context, QWidget *parent = 0, const char *name = 0,
                bool modal = FALSE);
     
-    void Show();
+    virtual void Show();
 
     float getHFactor(void) { return hmult; }
     float getWFactor(void) { return wmult; }
@@ -169,17 +235,6 @@ public:
 public slots:
     void setCurrentItem(const QString& text);
     void setCurrentItem(int index) { QListBox::setCurrentItem(index); };
-};
-
-class MythWizard: public QWizard {
-    Q_OBJECT
-public:
-    MythWizard(QWidget* parent=NULL, const char* name=0):
-        QWizard(parent, name, TRUE) {};
-
-    virtual void showPage(QWidget* page);
-
-    virtual void keyPressEvent(QKeyEvent* e);
 };
 
 class MythImageSelector: public QWidget {

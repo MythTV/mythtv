@@ -134,7 +134,6 @@ void TVMenuCallback(void *data, QString &selection)
     else if (sel == "settings themes") {
         ThemeSettings settings(context);
         settings.exec(QSqlDatabase::database());
-        //themesSettings(context);
     } else if (sel == "settings recording") {
         RecordingProfileEditor editor(context, QSqlDatabase::database());
         editor.exec(QSqlDatabase::database());

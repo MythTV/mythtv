@@ -117,8 +117,10 @@ private:
             setName("VideoSourceName");
             setVisible(false);
         };
-        virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0) {
-            (void)parent; (void)widgetName;
+        virtual QWidget* configWidget(ConfigurationGroup *cg, 
+                                      QWidget* parent, 
+                                      const char* widgetName = 0) {
+            (void)cg; (void)parent; (void)widgetName;
             return NULL;
         };
     };
@@ -229,8 +231,9 @@ private:
             setVisible(false);
             setName("ID");
         };
-        virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0) {
-            (void)parent; (void)widgetName;
+        virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+                                      const char* widgetName = 0) {
+            (void)cg; (void)parent; (void)widgetName;
             return NULL;
         };
     };
@@ -341,8 +344,9 @@ private:
             setVisible(false);
             setName("CardInputID");
         };
-        virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0) {
-            (void)parent; (void)widgetName;
+        virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+                                      const char* widgetName = 0) {
+            (void)cg; (void)parent; (void)widgetName;
             return NULL;
         };
     };

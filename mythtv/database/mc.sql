@@ -1,6 +1,8 @@
 CREATE DATABASE mythconverg;
 GRANT ALL ON mythconverg.* TO mythtv@localhost IDENTIFIED BY "mythtv";
+
 USE mythconverg;
+
 CREATE TABLE IF NOT EXISTS recordingprofiles
 (
     id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
@@ -76,6 +78,7 @@ CREATE TABLE IF NOT EXISTS recorded
     title VARCHAR(128) NULL,
     subtitle VARCHAR(128) NULL,
     description TEXT NULL,
+    hostname VARCHAR(255),
     PRIMARY KEY (chanid, starttime),
     INDEX (endtime)
 );
@@ -129,12 +132,14 @@ CREATE TABLE IF NOT EXISTS capturecard
     videodevice VARCHAR(128),
     audiodevice VARCHAR(128),
     cardtype VARCHAR(32) DEFAULT 'V4L',
-    audioratelimit INT
+    audioratelimit INT,
+    hostname VARCHAR(255)
 );
 CREATE TABLE IF NOT EXISTS videosource
 (
     sourceid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
-    name VARCHAR(128)
+    name VARCHAR(128),
+    xmltvgrabber VARCHAR(128)
 );
 CREATE TABLE IF NOT EXISTS cardinput
 (

@@ -56,6 +56,9 @@ bool MythSpinBox::eventFilter(QObject* o, QEvent* e)
 {
     (void)o;
 
+    if (e->type() == QEvent::FocusIn)
+        emit(changeHelpText(helptext));
+
     if (e->type() != QEvent::KeyPress)
         return FALSE;
 
@@ -380,38 +383,6 @@ void MythListBox::keyPressEvent(QKeyEvent* e) {
     case Key_Home:
     case Key_End:
         QListBox::keyPressEvent(e);
-        break;
-    default:
-        e->ignore();
-    }
-}
-
-void MythWizard::showPage(QWidget* page) {
-    QWizard::showPage(page);
-
-    if (indexOf(page) == pageCount()-1) {
-        // last page
-        finishButton()->setEnabled(TRUE);
-        finishButton()->setFocus();
-    } else {
-        nextButton()->setFocus();
-    }
-}
-
-void MythWizard::keyPressEvent(QKeyEvent* e) {
-    switch (e->key()) {
-    case Key_Enter:
-    case Key_Return:
-        if (indexOf(currentPage()) == pageCount()-1)
-            accept();
-        else
-            next();
-        break;
-    case Key_Escape:
-        if (indexOf(currentPage()) == 0)
-            reject();
-        else
-            back();
         break;
     default:
         e->ignore();

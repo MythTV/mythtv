@@ -1,7 +1,7 @@
 # What theme to use.  Themes are stored in /usr/local/share/mythtv/themes/
 str Theme=blue
 
-# The desired dimensions to show the GUI at.  If these are commented out, 
+# The desired dimensions to show the GUI at.  If these are commented out,
 # the GUI will resize to be fullscreen.
 int GuiWidth=800
 int GuiHeight=600
@@ -11,11 +11,7 @@ int GuiHeight=600
 # Do we color the Qt widgets according to the 'qtlook.txt' file in the theme?
 # (only works for the program guide, currently)
 int ThemeQt=1
-# Generate static thumbnail pixmaps for recordings?  Takes extra time to start
-# the playback/delete dialogs if turned on.
-int GeneratePreviewPixmaps=0
-# Play the video back in a little preview window in the playback/delete boxes?
-int PlaybackPreview=1
+
 # Date format: A meaningful value is "ddd MMMM d" (default); see the QT docs 
 # for formatting
 str DateFormat=ddd MMM d
@@ -32,41 +28,5 @@ int QtFontSmall=12
 
 # Program Guide Grid specific options
 #
-# Do we display the program title at the bottom of the EPG or not?
-# (default to yes)
-int EPGShowTitle=1
-# Do we display the channel icon in the EPG?
-# (default to yes)
-int EPGShowChannelIcon=1
-# Sizes of the fonts for the EPG
-int EPGTimeFontSize=13
-int EPGChanFontSize=13
-int EPGChanCallsignFontSize=11
-int EPGProgFontSize=13
-int EPGTitleFontSize=19
-# Display a red line indicating the current time in the EPG
-int EPGShowCurrentTime=0
-# What color line to draw the current time in
-str EPGCurrentTimeColor=red
-#
 # Uncomment this to use the alternative EPG layout
 #int EPGType=1
-#
-# Display order of channels.  Meaningful values are chanid, callsign, and 
-# "channum + 0".
-str ChannelSorting=channum + 0
-# Starting channel
-str DefaultTVChannel=3
-# What to call 'unknown' programs
-str UnknownTitle=Unknown
-# What category to give 'unknown' programs
-#str UnknownCategory=Unknown
-
-# Shutdown and wakeup Options
-#
-# should a quit/shutdown of the frontend be allowed a with "MODIFIER-ESC"?
-# (0:no,  1: MODIFIER=Control, 2: MODIFIER=Meta, 3: MODIFIER=Alt, 
-#  4: without modifier)
-int AllowQuitShutdown=3
-### the shutdown command used to shutdown your machine
-str HaltCommand=halt

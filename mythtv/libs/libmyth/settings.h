@@ -3,16 +3,18 @@
 
 #include <qobject.h>
 #include <qwidget.h>
-#include <qdialog.h>
 #include <qstring.h>
 #include <iostream>
 #include <vector>
+
+#include "mythwidgets.h"
 
 using namespace std;
 
 class QSqlDatabase;
 class QWidget;
 class MythContext;
+class ConfigurationGroup;
 
 class Configurable: virtual public QObject {
     Q_OBJECT
@@ -22,7 +24,7 @@ public:
     virtual ~Configurable() {};
 
     // Create and return a widget for configuring this entity
-    virtual QWidget* configWidget(QWidget* parent,
+    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0) = 0;
 
     virtual void load(QSqlDatabase* db) = 0;
@@ -41,12 +43,16 @@ public:
     void setLabel(QString str) { label = str; };
     QString getLabel(void) const { return label; };
 
+    void setHelpText(QString str) { helptext = str; };
+    QString getHelpText(void) const { return helptext; }
+
     void setVisible(bool b) { visible = b; };
     bool isVisible(void) const { return visible; };
 
 private:
     QString configName;
     QString label;
+    QString helptext;
     bool visible;
 };
 
@@ -76,8 +82,11 @@ protected:
     QString settingValue;
 };
 
-class ConfigurationGroup: virtual public Configurable {
-public:
+class ConfigurationGroup: virtual public Configurable 
+{
+    Q_OBJECT
+  public:
+    ConfigurationGroup(bool luselabel = true) { uselabel = luselabel; }
     virtual ~ConfigurationGroup();
 
 
@@ -91,29 +100,40 @@ public:
 
     virtual void save(QSqlDatabase* db);
 
-protected:
+  signals:
+    void changeHelpText(QString);
+    
+  protected:
     typedef vector<Configurable*> childList;
     childList children;
+    bool uselabel;
 };
 
 class VerticalConfigurationGroup: virtual public ConfigurationGroup {
  public:
-    virtual QWidget* configWidget(QWidget* parent,
+    VerticalConfigurationGroup(bool uselabel = true) 
+                : ConfigurationGroup(uselabel) { }
+
+    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
 };
 
 class HorizontalConfigurationGroup: virtual public ConfigurationGroup {
  public:
-    virtual QWidget* configWidget(QWidget* parent,
+    HorizontalConfigurationGroup(bool uselabel = true) 
+                : ConfigurationGroup(uselabel) { }
+
+    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
 };
 
 class StackedConfigurationGroup: virtual public ConfigurationGroup {
     Q_OBJECT
 public:
-    StackedConfigurationGroup() { top = 0; };
+    StackedConfigurationGroup(bool uselabel = true)
+                : ConfigurationGroup(uselabel) { top = 0; };
 
-    virtual QWidget* configWidget(QWidget* parent,
+    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
 
     void raise(Configurable* child);
@@ -125,10 +145,11 @@ protected:
     unsigned top;
 };
 
-class ConfigurationDialogWidget: public QDialog {
+class ConfigurationDialogWidget: public MythDialog {
 public:
-    ConfigurationDialogWidget(QWidget* parent = NULL, const char* widgetName = 0):
-        QDialog(parent, widgetName, TRUE) {};
+    ConfigurationDialogWidget(MythContext *context, QWidget* parent = NULL, 
+                              const char* widgetName = 0):
+        MythDialog(context, parent, widgetName, TRUE) {};
 
     virtual void keyPressEvent(QKeyEvent* e);
 };
@@ -138,8 +159,8 @@ public:
     ConfigurationDialog(MythContext *context) { m_context = context; }
 
     // Make a modal dialog containing configWidget
-    virtual QDialog* dialogWidget(QWidget* parent,
-                                  const char* widgetName = 0);
+    virtual MythDialog* dialogWidget(QWidget* parent,
+                                     const char* widgetName = 0);
 
     // Show a dialogWidget, and save if accepted
     int exec(QSqlDatabase* db);
@@ -152,12 +173,13 @@ protected:
 class ConfigurationWizard: public ConfigurationDialog,
                            public ConfigurationGroup {
 public:
-    ConfigurationWizard(MythContext *context) : ConfigurationDialog(context)
+    ConfigurationWizard(MythContext *context) : ConfigurationDialog(context),
+                                                ConfigurationGroup(false)
                                              { }
 
-    virtual QDialog* dialogWidget(QWidget* parent,
-                                  const char* widgetName=0);
-    virtual QWidget* configWidget(QWidget* parent,
+    virtual MythDialog* dialogWidget(QWidget* parent,
+                                     const char* widgetName=0);
+    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName=0);
 };
 
@@ -166,14 +188,16 @@ class LabelSetting: virtual public Setting {
 protected:
     LabelSetting() {};
 public:
-    virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
+    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+                                  const char* widgetName = 0);
 };
 
 class LineEditSetting: virtual public Setting {
 protected:
     LineEditSetting() {};
 public:
-    virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
+    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+                                  const char* widgetName = 0);
 };
 
 // TODO: set things up so that setting the value as a string emits
@@ -211,7 +235,8 @@ protected:
     SliderSetting(int min, int max, int step):
         BoundedIntegerSetting(min, max, step) {};
 public:
-    virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
+    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+                                  const char* widgetName = 0);
 };
 
 class SpinBoxSetting: public BoundedIntegerSetting {
@@ -219,7 +244,8 @@ protected:
     SpinBoxSetting(int min, int max, int step):
         BoundedIntegerSetting(min, max, step) {};
 public:
-    virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
+    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+                                  const char* widgetName = 0);
 };
 
 class StringSelectSetting: virtual public Setting {
@@ -268,7 +294,8 @@ protected:
     SelectLabelSetting() {};
 
 public:
-    virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
+    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+                                  const char* widgetName = 0);
 };
 
 class ComboBoxSetting: public StringSelectSetting {
@@ -284,7 +311,8 @@ public:
             Setting::setValue(newValue);
     };
 
-    virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
+    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+                                  const char* widgetName = 0);
 private:
     bool rw;
 };
@@ -292,7 +320,8 @@ private:
 class ListBoxSetting: public StringSelectSetting {
     Q_OBJECT
 public:
-    virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
+    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+                                  const char* widgetName = 0);
 
 protected slots:
     void setValueByLabel(const QString& label);
@@ -300,14 +329,16 @@ protected slots:
 
 class RadioSetting: public StringSelectSetting {
 public:
-    virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
+    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+                                  const char* widgetName = 0);
 };
 
 class ImageSelectSetting: public StringSelectSetting {
     Q_OBJECT
 public:
     virtual ~ImageSelectSetting();
-    virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
+    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
+                                  const char* widgetName = 0);
 
     virtual void addImageSelection(const QString& label,
                                    QImage* image,
@@ -340,14 +371,17 @@ signals:
 
 class CheckBoxSetting: public BooleanSetting {
 public:
-    virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
+    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
+                                  const char* widgetName = 0);
 };
 
 
 class TriggeredConfigurationGroup: virtual public ConfigurationGroup {
     Q_OBJECT
 public:
-    TriggeredConfigurationGroup() {
+    TriggeredConfigurationGroup(bool uselabel = true) 
+           : ConfigurationGroup(uselabel)
+    {
         trigger = configStack = NULL;
     };
 
@@ -368,7 +402,7 @@ protected:
 class TabbedConfigurationGroup: virtual public ConfigurationGroup {
     Q_OBJECT
 public:
-    virtual QWidget* configWidget(QWidget* parent,
+    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
 };
 
@@ -384,7 +418,7 @@ public:
                               bool select=false);
 
     // Use a combobox for now, maybe a modified file dialog later
-    //virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
+    //virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, const char* widgetName = 0);
 
 protected:
     bool mustexist;

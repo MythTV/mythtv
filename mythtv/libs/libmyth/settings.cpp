@@ -12,12 +12,10 @@
 #include <qcombobox.h>
 #include <qgroupbox.h>
 #include <qvgroupbox.h>
-#include <qwizard.h>
 #include <qbuttongroup.h>
 #include <qradiobutton.h>
 #include <qcheckbox.h>
 #include <qwidgetstack.h>
-#include <qdialog.h>
 #include <qtabdialog.h>
 #include <qfile.h>
 #include <qlistview.h>
@@ -26,6 +24,7 @@
 #include <qwidget.h>
 
 #include "mythcontext.h"
+#include "mythwizard.h"
 
 ConfigurationGroup::~ConfigurationGroup()  {
     for(childList::iterator i = children.begin() ;
@@ -61,61 +60,110 @@ void ConfigurationGroup::save(QSqlDatabase* db) {
         (*i)->save(db);
 }
 
-QWidget* VerticalConfigurationGroup::configWidget(QWidget* parent,
-                                                  const char* widgetName) {
-    
+QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg, 
+                                                  QWidget* parent,
+                                                  const char* widgetName) 
+{    
     QGroupBox* widget = new QGroupBox(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
-    QVBoxLayout* layout = new QVBoxLayout(widget, 18);
-    widget->setTitle(getLabel());
+    QVBoxLayout *layout = NULL;
+
+    if (uselabel)
+    {
+        layout = new QVBoxLayout(widget, 10);
+        widget->setInsideMargin(20);
+        widget->setTitle(getLabel());
+    }
+    else
+        layout = new QVBoxLayout(widget, 5);
+
     for(unsigned i = 0 ; i < children.size() ; ++i)
         if (children[i]->isVisible())
-            layout->add(children[i]->configWidget(widget, NULL));
-        
+            layout->add(children[i]->configWidget(cg, widget, NULL));
+      
+    if (cg)
+    {
+        connect(this, SIGNAL(changeHelpText(QString)), cg,
+                SIGNAL(changeHelpText(QString)));
+    } 
+
     return widget;
 }
 
-QWidget* HorizontalConfigurationGroup::configWidget(QWidget* parent,
-                                                    const char* widgetName) {
-
+QWidget* HorizontalConfigurationGroup::configWidget(ConfigurationGroup *cg, 
+                                                    QWidget* parent,
+                                                    const char* widgetName) 
+{
     QGroupBox* widget = new QGroupBox(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
-    QHBoxLayout* layout = new QHBoxLayout(widget, 20);
-    widget->setTitle(getLabel());
+    QHBoxLayout *layout = NULL;
+
+    if (uselabel)
+    {
+        layout = new QHBoxLayout(widget, 10);
+        widget->setInsideMargin(20);
+        widget->setTitle(getLabel());
+    }
+    else
+        layout = new QHBoxLayout(widget, 5);
+
     for(unsigned i = 0 ; i < children.size() ; ++i)
         if (children[i]->isVisible())
-            layout->add(children[i]->configWidget(widget, NULL));
+            layout->add(children[i]->configWidget(cg, widget, NULL));
+
+    if (cg)
+    {
+        connect(this, SIGNAL(changeHelpText(QString)), cg,
+                SIGNAL(changeHelpText(QString)));
+    }
 
     return widget;
 }
 
-QWidget* StackedConfigurationGroup::configWidget(QWidget* parent,
-                                                 const char* widgetName) {
+QWidget* StackedConfigurationGroup::configWidget(ConfigurationGroup *cg, 
+                                                 QWidget* parent,
+                                                 const char* widgetName) 
+{
     QWidgetStack* widget = new QWidgetStack(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
     for(unsigned i = 0 ; i < children.size() ; ++i)
         if (children[i]->isVisible())
-            widget->addWidget(children[i]->configWidget(widget, NULL), i);
+            widget->addWidget(children[i]->configWidget(cg, widget, NULL), i);
 
     widget->raiseWidget(top);
 
     connect(this, SIGNAL(raiseWidget(int)),
             widget, SLOT(raiseWidget(int)));
 
+    if (cg)
+    {
+        connect(this, SIGNAL(changeHelpText(QString)), cg,
+                SIGNAL(changeHelpText(QString)));
+    }
+
     return widget;
 }
 
-QWidget* TabbedConfigurationGroup::configWidget(QWidget* parent,
-                                                const char* widgetName) {
+QWidget* TabbedConfigurationGroup::configWidget(ConfigurationGroup *cg, 
+                                                QWidget* parent,
+                                                const char* widgetName) 
+{
     QTabDialog* widget = new QTabDialog(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
     
     for(unsigned i = 0 ; i < children.size() ; ++i)
         if (children[i]->isVisible())
-            widget->addTab(children[i]->configWidget(widget), children[i]->getLabel());
+            widget->addTab(children[i]->configWidget(cg, widget), 
+                           children[i]->getLabel());
+
+    if (cg)
+    {
+        connect(this, SIGNAL(changeHelpText(QString)), cg,
+                SIGNAL(changeHelpText(QString)));
+    }
 
     return widget;
 };
@@ -179,7 +227,7 @@ void StringSelectSetting::setValue(const QString& newValue)  {
         addSelection(newValue, newValue, true);
 }
 
-QWidget* LabelSetting::configWidget(QWidget* parent,
+QWidget* LabelSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                     const char* widgetName) {
     QWidget* widget = new QHBox(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
@@ -195,10 +243,12 @@ QWidget* LabelSetting::configWidget(QWidget* parent,
     connect(this, SIGNAL(valueChanged(const QString&)),
             value, SLOT(setText(const QString&)));
 
+    cg = cg;
+
     return widget;
 }
 
-QWidget* LineEditSetting::configWidget(QWidget* parent,
+QWidget* LineEditSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                        const char *widgetName) {
     QWidget* widget = new QHBox(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
@@ -207,8 +257,9 @@ QWidget* LineEditSetting::configWidget(QWidget* parent,
     label->setText(getLabel() + ":");
     label->setBackgroundOrigin(QWidget::WindowOrigin);
 
-    QLineEdit* edit = new MythLineEdit(settingValue, widget,
-                                    QString(widgetName) + "-edit");
+    MythLineEdit* edit = new MythLineEdit(settingValue, widget,
+                                          QString(widgetName) + "-edit");
+    edit->setHelpText(getHelpText());
     edit->setBackgroundOrigin(QWidget::WindowOrigin);
     edit->setText( getValue() );
 
@@ -217,10 +268,14 @@ QWidget* LineEditSetting::configWidget(QWidget* parent,
     connect(edit, SIGNAL(textChanged(const QString&)),
             this, SLOT(setValue(const QString&)));
 
+    if (cg)
+        connect(edit, SIGNAL(changeHelpText(QString)), cg, 
+                SIGNAL(changeHelpText(QString)));
+
     return widget;
 }
 
-QWidget* SliderSetting::configWidget(QWidget* parent,
+QWidget* SliderSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                      const char* widgetName) {
     QWidget* widget = new QHBox(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
@@ -229,7 +284,9 @@ QWidget* SliderSetting::configWidget(QWidget* parent,
     label->setText(getLabel() + ":");
     label->setBackgroundOrigin(QWidget::WindowOrigin);
 
-    QSlider* slider = new MythSlider(widget, QString(widgetName) + "-slider");
+    MythSlider* slider = new MythSlider(widget, 
+                                        QString(widgetName) + "-slider");
+    slider->setHelpText(getHelpText());
     slider->setMinValue(min);
     slider->setMaxValue(max);
     slider->setOrientation(QSlider::Horizontal);
@@ -245,10 +302,14 @@ QWidget* SliderSetting::configWidget(QWidget* parent,
     connect(slider, SIGNAL(valueChanged(int)), this, SLOT(setValue(int)));
     connect(this, SIGNAL(valueChanged(int)), slider, SLOT(setValue(int)));
 
+    if (cg)
+        connect(slider, SIGNAL(changeHelpText(QString)), cg,
+                SIGNAL(changeHelpText(QString)));
+
     return widget;
 }
 
-QWidget* SpinBoxSetting::configWidget(QWidget* parent,
+QWidget* SpinBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                       const char* widgetName) {
 
     QWidget* box = new QHBox(parent, widgetName);
@@ -258,7 +319,8 @@ QWidget* SpinBoxSetting::configWidget(QWidget* parent,
     label->setBackgroundOrigin(QWidget::WindowOrigin);
     label->setText(getLabel() + ":");
 
-    QSpinBox* spinbox = new MythSpinBox(box);
+    MythSpinBox* spinbox = new MythSpinBox(box);
+    spinbox->setHelpText(getHelpText());
     spinbox->setBackgroundOrigin(QWidget::WindowOrigin);
     spinbox->setMinValue(min);
     spinbox->setMaxValue(max);
@@ -268,10 +330,15 @@ QWidget* SpinBoxSetting::configWidget(QWidget* parent,
     connect(spinbox, SIGNAL(valueChanged(int)), this, SLOT(setValue(int)));
     connect(this, SIGNAL(valueChanged(int)), spinbox, SLOT(setValue(int)));
 
+    if (cg)
+        connect(spinbox, SIGNAL(changeHelpText(QString)), cg,
+                SIGNAL(changeHelpText(QString)));
+
     return box;
 }
 
-QWidget* SelectLabelSetting::configWidget(QWidget* parent,
+QWidget* SelectLabelSetting::configWidget(ConfigurationGroup *cg,
+                                          QWidget* parent,
                                           const char* widgetName) {
     QWidget* widget = new QHBox(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
@@ -287,10 +354,12 @@ QWidget* SelectLabelSetting::configWidget(QWidget* parent,
     connect(this, SIGNAL(valueChanged(const QString&)),
             value, SLOT(setText(const QString&)));
 
+    cg = cg;
+
     return widget;
 }
 
-QWidget* ComboBoxSetting::configWidget(QWidget* parent,
+QWidget* ComboBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                        const char* widgetName) {
     QWidget* box = new QHBox(parent, widgetName);
     box->setBackgroundOrigin(QWidget::WindowOrigin);
@@ -298,7 +367,9 @@ QWidget* ComboBoxSetting::configWidget(QWidget* parent,
     QLabel* label = new QLabel(box);
     label->setText(getLabel() + ":");
     label->setBackgroundOrigin(QWidget::WindowOrigin);
-    QComboBox* widget = new MythComboBox(rw, box);
+
+    MythComboBox* widget = new MythComboBox(rw, box);
+    widget->setHelpText(getHelpText());
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
     for(unsigned int i = 0 ; i < labels.size() ; ++i)
@@ -313,6 +384,10 @@ QWidget* ComboBoxSetting::configWidget(QWidget* parent,
             widget, SLOT(insertItem(const QString&)));
     connect(this, SIGNAL(selectionsCleared()),
             widget, SLOT(clear()));
+
+    if (cg)
+        connect(widget, SIGNAL(changeHelpText(QString)), cg,
+                SIGNAL(changeHelpText(QString)));
 
     return box;
 }
@@ -330,7 +405,7 @@ void PathSetting::addSelection(const QString& label,
     ComboBoxSetting::addSelection(label, value, select);
 }
 
-QWidget* RadioSetting::configWidget(QWidget* parent,
+QWidget* RadioSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                     const char* widgetName) {
     QButtonGroup* widget = new QButtonGroup(parent, widgetName);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
@@ -344,13 +419,16 @@ QWidget* RadioSetting::configWidget(QWidget* parent,
             button->setDown(true);
     }
 
+    cg = cg;
+
     return widget;
 }
 
-QWidget* CheckBoxSetting::configWidget(QWidget* parent,
+QWidget* CheckBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                        const char* widgetName) {
     
-    QCheckBox* widget = new MythCheckBox(parent, widgetName);
+    MythCheckBox* widget = new MythCheckBox(parent, widgetName);
+    widget->setHelpText(getHelpText());
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
     widget->setText(getLabel());
     widget->setChecked(boolValue());
@@ -359,6 +437,10 @@ QWidget* CheckBoxSetting::configWidget(QWidget* parent,
             this, SLOT(setValue(bool)));
     connect(this, SIGNAL(valueChanged(bool)),
             widget, SLOT(setChecked(bool)));
+
+    if (cg)
+        connect(widget, SIGNAL(changeHelpText(QString)), cg,
+                SIGNAL(changeHelpText(QString)));
 
     return widget;
 }
@@ -378,11 +460,12 @@ void ConfigurationDialogWidget::keyPressEvent(QKeyEvent* e) {
     }
 }
 
-QDialog* ConfigurationDialog::dialogWidget(QWidget* parent,
-                                           const char* widgetName) {
-    QDialog* dialog = new ConfigurationDialogWidget(parent, widgetName);
+MythDialog* ConfigurationDialog::dialogWidget(QWidget* parent,
+                                              const char* widgetName) {
+    MythDialog* dialog = new ConfigurationDialogWidget(m_context, parent, 
+                                                       widgetName);
     QVBoxLayout* layout = new QVBoxLayout(dialog, 20);
-    layout->addWidget(configWidget(dialog));
+    layout->addWidget(configWidget(NULL, dialog));
 
     return dialog;
 }
@@ -390,21 +473,9 @@ QDialog* ConfigurationDialog::dialogWidget(QWidget* parent,
 int ConfigurationDialog::exec(QSqlDatabase* db) {
     load(db);
 
-    QDialog* dialog = dialogWidget(NULL);
-
-    float wmult = 0, hmult = 0;
-    int screenheight = 0, screenwidth = 0;
-    m_context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-
-    dialog->setGeometry(0, 0, screenwidth, screenheight);
-    dialog->setFixedSize(QSize(screenwidth, screenheight));
-
-    dialog->setFont(QFont("Arial", (int)(m_context->GetSmallFontSize()*hmult),
-                    QFont::Bold));
-
-    m_context->ThemeWidget(dialog);
-
-    dialog->showFullScreen();
+    MythDialog* dialog = dialogWidget(NULL);
+    dialog->setCursor(QCursor(Qt::ArrowCursor));
+    dialog->Show();
 
     int ret;
 
@@ -416,16 +487,19 @@ int ConfigurationDialog::exec(QSqlDatabase* db) {
     return ret;
 }
 
-QDialog* ConfigurationWizard::dialogWidget(QWidget* parent,
-                                           const char* widgetName) {
-    QWizard* wizard = new MythWizard(parent, widgetName);
+MythDialog* ConfigurationWizard::dialogWidget(QWidget* parent,
+                                              const char* widgetName) {
+    MythWizard* wizard = new MythWizard(m_context, parent, widgetName, TRUE);
+
+    connect(this, SIGNAL(changeHelpText(QString)), wizard,
+            SLOT(setHelpText(QString)));
 
     unsigned i;
     for(i = 0 ; i < children.size() ; ++i)
         if (children[i]->isVisible()) {
-            QWidget* child = children[i]->configWidget(parent);
+            QWidget* child = children[i]->configWidget(this, parent);
+
             wizard->addPage(child, children[i]->getLabel());
-            wizard->setHelpEnabled(child, false);
             if (i == children.size()-1)
                 // Last page always has finish enabled.  Stuff should
                 // have sane defaults.
@@ -435,8 +509,10 @@ QDialog* ConfigurationWizard::dialogWidget(QWidget* parent,
     return wizard;
 }
 
-QWidget* ConfigurationWizard::configWidget(QWidget* parent,
+QWidget* ConfigurationWizard::configWidget(ConfigurationGroup *cg,
+                                           QWidget* parent,
                                            const char* widgetName) {
+    cg = cg;
     return dialogWidget(parent, widgetName);
 }
 
@@ -492,7 +568,8 @@ void AutoIncrementStorage::save(QSqlDatabase* db) {
     }
 }
 
-QWidget* ListBoxSetting::configWidget(QWidget* parent, const char* widgetName) {
+QWidget* ListBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent, 
+                                      const char* widgetName) {
     QWidget* box = new QVBox(parent, widgetName);
     box->setBackgroundOrigin(QWidget::WindowOrigin);
 
@@ -515,6 +592,10 @@ QWidget* ListBoxSetting::configWidget(QWidget* parent, const char* widgetName) {
             widget, SLOT(setCurrentItem(const QString&)));
     connect(widget, SIGNAL(highlighted(const QString&)),
             this, SLOT(setValueByLabel(const QString&)));
+
+    if (cg)
+        connect(widget, SIGNAL(changeHelpText(QString)), cg,
+                SIGNAL(changeHelpText(QString)));
 
     return box;
 }
@@ -544,7 +625,10 @@ ImageSelectSetting::~ImageSelectSetting() {
     }
 }
 
-QWidget* ImageSelectSetting::configWidget(QWidget* parent, const char* widgetName) {
+QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg, 
+                                          QWidget* parent, 
+                                          const char* widgetName) 
+{
     QWidget* box = new QVBox(parent, widgetName);
     box->setBackgroundOrigin(QWidget::WindowOrigin);
 
@@ -566,6 +650,8 @@ QWidget* ImageSelectSetting::configWidget(QWidget* parent, const char* widgetNam
             widget, SLOT(insertItem(const QString&,QImage*)));
     connect(this, SIGNAL(selectionsCleared()),
             widget, SLOT(clear()));
+
+    cg = cg;
 
     return box;
 }
