@@ -4,4 +4,5 @@ moc_videosource.cpp
 moc_guidegrid.cpp
 moc_infodialog.cpp
 moc_scheduledrecording.cpp
+moc_progfind.cpp
 Makefile

@@ -52,10 +52,10 @@ contains( TARGET_MMX, yes ) {
     SOURCES += i386/fdct_mmx.c i386/cputest.c i386/dsputil_mmx.c
     SOURCES += i386/mpegvideo_mmx.c i386/idct_mmx.c i386/motion_est_mmx.c
     SOURCES += i386/simple_idct_mmx.c i386/fft_sse.c
-    contains( TARGET_BUILTIN_VECTOR, yes ) {
-        QMAKE_CFLAGS_RELEASE += -msse
-        QMAKE_CFLAGS_DEBUG += -msse
-    }
+#    contains( TARGET_BUILTIN_VECTOR, yes ) {
+#        QMAKE_CFLAGS_RELEASE += -msse
+#        QMAKE_CFLAGS_DEBUG += -msse
+#    }
 }
 
 contains( TARGET_ARCH_ARMV4L, yes ) {
