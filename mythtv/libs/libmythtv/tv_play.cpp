@@ -3,7 +3,6 @@
 #include <cstring>
 #include <unistd.h>
 #include <pthread.h>
-#include <qsqldatabase.h>
 #include <qapplication.h>
 #include <qregexp.h>
 #include <qfile.h>
@@ -12,9 +11,11 @@
 #include <iostream>
 using namespace std;
 
+#include "mythdbcon.h"
 #include "tv.h"
 #include "osd.h"
 #include "osdtypes.h"
+#include "osdlistbtntype.h"
 #include "mythcontext.h"
 #include "dialogbox.h"
 #include "remoteencoder.h"
@@ -121,7 +122,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "TOGGLERECCONTROLS", "Turn on the recording picture "
             "adjustment controls", "G");
     REG_KEY("TV Playback", "TOGGLEEDIT", "Start Edit Mode", "E");
-
+    REG_KEY("TV Playback", "GUIDE", "Show the Program Guide", "S");
 
 
     REG_KEY("TV Editing", "CLEARMAP", "Clear editing cut points", "C,Q,Home");
@@ -144,11 +145,20 @@ void *SpawnDecode(void *param)
     return NULL;
 }
 
-TV::TV(QSqlDatabase *db)
+TV::TV(void)
   : QObject()
 {
-    m_db = db;
+    QString dbname = QString("tvplayback%1%2").arg(getpid()).arg(rand());
 
+    m_db = new MythSqlDatabase(dbname);
+
+    if (!m_db || !m_db->isOpen())
+    {
+        VERBOSE(VB_ALL, "Couldn't open DB connection in player, exiting");
+        exit(-1);
+    }
+
+    treeMenu = NULL;
     switchingCards = false;
     dialogname = "";
     playbackinfo = NULL;
@@ -282,6 +292,12 @@ TV::~TV(void)
     }
     if (recorderPlaybackInfo)
         delete recorderPlaybackInfo;
+
+    if (treeMenu)
+        delete treeMenu;
+
+    if (m_db)
+        delete m_db;
 }
 
 TVState TV::GetState(void)
@@ -638,6 +654,8 @@ void TV::HandleStateChange(void)
 
     internalState = tmpInternalState;
     changeState = false;
+
+    BuildOSDTreeMenu();
 
     if (recorder)
         recorder->FrontendReady();
@@ -1165,7 +1183,9 @@ void TV::ProcessKeypress(QKeyEvent *e)
                     dialogname = "";
                     if (result == 1) 
                     {
-                       playbackinfo->SetEditing(false, m_db);
+                       m_db->lock();
+                       playbackinfo->SetEditing(false, m_db->db());
+                       m_db->unlock();
                        editmode = nvp->EnableEdit();
                     }
                     else
@@ -1388,6 +1408,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
             ToggleMute();
         else if (action == "TOGGLEASPECT")
             ToggleLetterbox();
+        //else if (action == "MENU")
+        //    ShowOSDTreeMenu();
         else
             handled = false;
     }
@@ -1481,7 +1503,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 SwitchCards();
             else if (action == "SELECT")
                 ChannelCommit();
-            else if (action == "MENU")
+            else if (action == "MENU" || action == "GUIDE")
                 LoadMenu();
             else if (action == "TOGGLEPIPMODE")
                 TogglePIPView();
@@ -1528,7 +1550,11 @@ void TV::ProcessKeypress(QKeyEvent *e)
             }
             else if (action == "MENU" || action == "TOGGLEEDIT")
             {
-                if (playbackinfo->IsEditing(m_db))
+                m_db->lock();
+                bool isEditing = playbackinfo->IsEditing(m_db->db());
+                m_db->unlock();
+
+                if (isEditing)
                 {
                     nvp->Pause();
 
@@ -1698,7 +1724,9 @@ void TV::DoInfo(void)
         oset->Display(false);
 
         QMap<QString, QString> infoMap;
-        playbackinfo->ToMap(m_db, infoMap);
+        m_db->lock();
+        playbackinfo->ToMap(m_db->db(), infoMap);
+        m_db->unlock();
         osd->ClearAllText("program_info");
         osd->SetText("program_info", infoMap, osd_display_time);
     }
@@ -1919,13 +1947,15 @@ void TV::DoQueueTranscode(void)
                                     "chanid = '%1' AND starttime = '%2';")
                                    .arg(playbackinfo->chanid)
                          .arg(playbackinfo->startts.toString("yyyyMMddhhmmss"));
-            MythContext::KickDatabase(m_db);
-            QSqlQuery result = m_db->exec(query);
+            m_db->lock();
+            MythContext::KickDatabase(m_db->db());
+            QSqlQuery result = m_db->db()->exec(query);
             if (result.isActive() && result.numRowsAffected() > 0)
             {
                 stop = true;
                 abort = true;
             }
+            m_db->unlock();
         }
         if (stop)
         {
@@ -2381,10 +2411,13 @@ void TV::UpdateOSD(void)
 
     if (curPlaybackTime < infoMapTime)
     {
-        curPlaybackInfo = ProgramInfo::GetProgramAtDateTime(m_db,
-                             infoMap["chanid"], curPlaybackTime);
+        m_db->lock();
+        curPlaybackInfo = ProgramInfo::GetProgramAtDateTime(m_db->db(),
+                                                            infoMap["chanid"], 
+                                                            curPlaybackTime);
         if (curPlaybackInfo)
-            curPlaybackInfo->ToMap(m_db, infoMap);
+            curPlaybackInfo->ToMap(m_db->db(), infoMap);
+        m_db->unlock();
     }
 
     osd->ClearAllText("program_info");
@@ -2940,11 +2973,14 @@ void TV::BrowseDispInfo(int direction)
     browsestarttime = infoMap["dbstarttime"];
 
     QDateTime startts = QDateTime::fromString(browsestarttime, Qt::ISODate);
-    ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(m_db,
+
+    m_db->lock();
+    ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(m_db->db(),
                                                                   browsechanid,
                                                                   startts);
     if (program_info)
-        program_info->ToMap(m_db, infoMap);
+        program_info->ToMap(m_db->db(), infoMap);
+    m_db->unlock();
 
     osd->ClearAllText("browse_info");
     osd->SetText("browse_info", infoMap, -1);
@@ -2964,13 +3000,14 @@ void TV::ToggleRecord(void)
 
         QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
 
-        ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(m_db,
+        m_db->lock();
+        ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(m_db->db(),
                                                                       chanid,
                                                                       startts);
 
         if (program_info)
         {
-            program_info->ToggleRecord(m_db);
+            program_info->ToggleRecord(m_db->db());
 
             QString msg = QString("%1 \"%2\"").arg(tr("Record")).arg(title);
 
@@ -2980,18 +3017,23 @@ void TV::ToggleRecord(void)
             delete program_info;
         }
 
+        m_db->unlock();
         return;
     }
 
     QMap<QString, QString> infoMap;
     QDateTime startts = QDateTime::fromString(browsestarttime, Qt::ISODate);
 
-    ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(m_db,
+    m_db->lock();
+
+    ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(m_db->db(),
                                                                   browsechanid,
                                                                   startts);
-    program_info->ToggleRecord(m_db);
+    program_info->ToggleRecord(m_db->db());
 
-    program_info->ToMap(m_db, infoMap);
+    program_info->ToMap(m_db->db(), infoMap);
+
+    m_db->unlock();
 
     osd->ClearAllText("browse_info");
     osd->SetText("browse_info", infoMap, -1);
@@ -3167,7 +3209,9 @@ void TV::DoProgramMenu(void)
     else
         options += tr("Set Commercial Auto-Skip to Notify");
 
-    if (playbackinfo->GetAutoExpireFromRecorded(m_db))
+    m_db->lock();
+
+    if (playbackinfo->GetAutoExpireFromRecorded(m_db->db()))
         options += tr("Don't Auto Expire");
     else
         options += tr("Auto Expire");
@@ -3176,6 +3220,8 @@ void TV::DoProgramMenu(void)
         options += tr("Activate Zoom Mode");
 
     options += tr("Cancel");
+
+    m_db->unlock();
 
     osd->NewDialogBox(dialogname, message, options, 10); 
 }
@@ -3210,16 +3256,18 @@ void TV::ProgramMenuAction(int result)
             break;
 
         case 2:
-            if (playbackinfo->GetAutoExpireFromRecorded(m_db))
+            m_db->lock();
+            if (playbackinfo->GetAutoExpireFromRecorded(m_db->db()))
             {
-                playbackinfo->SetAutoExpire(false, m_db);
+                playbackinfo->SetAutoExpire(false, m_db->db());
                 desc = tr("Auto-Expire OFF");
             }
             else
             {
-                playbackinfo->SetAutoExpire(true, m_db);
+                playbackinfo->SetAutoExpire(true, m_db->db());
                 desc = tr("Auto-Expire ON");
             }
+            m_db->unlock();
             break;
 
         case 3:
@@ -3244,3 +3292,67 @@ void TV::ProgramMenuAction(int result)
         update_osd_pos = false;
     }
 }
+
+void TV::TreeMenuEntered(OSDGenericTree *item)
+{
+    // show help text somewhere, perhaps?
+    (void)item;
+}
+
+void TV::TreeMenuSelected(OSDGenericTree *item)
+{
+    if (item)
+    {
+        cout << "menu action selected: " << item->getAction() << endl;
+    }
+}
+
+void TV::ShowOSDTreeMenu(void)
+{
+    if (nvp->GetOSD())
+    {
+        OSDListTreeType *tree = osd->ShowTreeMenu("menu", treeMenu);
+        if (tree)
+        {
+            connect(tree, SIGNAL(itemSelected(OSDGenericTree *)), 
+                    this, SLOT(TreeMenuSelected(OSDGenericTree *)));
+            connect(tree, SIGNAL(itemEntered(OSDGenericTree *)),
+                    this, SLOT(TreeMenuEntered(OSDGenericTree *)));
+        }
+    }
+}
+
+void TV::BuildOSDTreeMenu(void)
+{
+    if (treeMenu)
+        delete treeMenu;
+
+    treeMenu = new OSDGenericTree(NULL, "treeMenu");
+
+    if (internalState == kState_WatchingLiveTV)
+    {
+        OSDGenericTree *item, *subitem;
+
+        item = new OSDGenericTree(treeMenu, tr("Program Guide"), "GUIDE");
+
+        item = new OSDGenericTree(treeMenu, tr("Picture-in-Picture"));
+        subitem = new OSDGenericTree(item, tr("Enable/Disable"), 
+                                     "TOGGLEPIPMODE");
+        subitem = new OSDGenericTree(item, tr("Swap Channels"), "SWAPPIP");
+        subitem = new OSDGenericTree(item, tr("Change Active Window"),
+                                     "TOGGLEPIPWINDOW");
+
+        item = new OSDGenericTree(treeMenu, tr("Enable Browse Mode"),
+                                  "TOGGLEBROWSE");
+
+        item = new OSDGenericTree(treeMenu, tr("Previous Channel"),
+                                  "PREVCHAN");
+    }
+    else if (StateIsPlaying(internalState))
+    {
+        OSDGenericTree *item;
+
+        item = new OSDGenericTree(treeMenu, tr("Edit Recording"), "TOGGLEEDIT");
+    }
+}
+

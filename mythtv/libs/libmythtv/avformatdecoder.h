@@ -3,7 +3,6 @@
 
 #include <qstring.h>
 #include <qmap.h>
-#include <qsqldatabase.h>
 
 #include "programinfo.h"
 #include "format.h"
@@ -16,11 +15,12 @@ extern "C" {
 }
 
 class ProgramInfo;
+class MythSqlDatabase;
 
 class AvFormatDecoder : public DecoderBase
 {
   public:
-    AvFormatDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
+    AvFormatDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
                     ProgramInfo *pginfo);
    ~AvFormatDecoder();
 
@@ -143,9 +143,6 @@ class AvFormatDecoder : public DecoderBase
     bool gopset;
     bool seen_gop;
     int seq_count;
-
-    QSqlDatabase *m_db;
-    ProgramInfo *m_playbackinfo;
 
     double fps;
 

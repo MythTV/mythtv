@@ -192,8 +192,7 @@ void startManualSchedule(void)
 
 void startTV(void)
 {
-    QSqlDatabase *db = QSqlDatabase::database();
-    TV *tv = new TV(db);
+    TV *tv = new TV();
 
     QTime timer;
     timer.start();
@@ -595,8 +594,7 @@ QString RandTheme(QString &themename, QSqlDatabase *db)
 int internal_play_media(const char *mrl) 
 {
     int res = -1;
-    QSqlDatabase *db = QSqlDatabase::database();
-    TV *tv = new TV(db);
+    TV *tv = new TV();
 
     tv->Init();
     ProgramInfo *pginfo = new ProgramInfo();

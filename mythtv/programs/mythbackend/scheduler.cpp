@@ -514,12 +514,12 @@ void Scheduler::getAllPending(list<ProgramInfo *> *retList)
     }
 }
 
-void Scheduler::getAllPending(QStringList *strList)
+void Scheduler::getAllPending(QStringList &strList)
 {
     QMutexLocker lockit(recordingList_lock);
 
-    (*strList) << QString::number(hasconflicts);
-    (*strList) << QString::number(recordingList.size());
+    strList << QString::number(hasconflicts);
+    strList << QString::number(recordingList.size());
 
     QDateTime now = QDateTime::currentDateTime();
 
@@ -529,7 +529,7 @@ void Scheduler::getAllPending(QStringList *strList)
         ProgramInfo *p = *i;
         if (p->recstatus == rsRecording && p->recendts < now)
             p->recstatus = rsRecorded;
-        p->ToStringList(*strList);
+        p->ToStringList(strList);
     }
 }
 
@@ -547,32 +547,32 @@ list<ProgramInfo *> *Scheduler::getAllScheduled(void)
     return &scheduledList;
 }
 
-void Scheduler::getAllScheduled(QStringList *strList)
+void Scheduler::getAllScheduled(QStringList &strList)
 {
     QMutexLocker lockit(scheduledList_lock);
 
     getAllScheduled();
 
-    (*strList) << QString::number(scheduledList.size());
+    strList << QString::number(scheduledList.size());
 
     list<ProgramInfo *>::iterator i = scheduledList.begin();
     for (; i != scheduledList.end(); i++)
-        (*i)->ToStringList(*strList);
+        (*i)->ToStringList(strList);
 }
 
 void Scheduler::getConflicting(ProgramInfo *pginfo,
                                bool removenonplaying,
-                               QStringList *strlist)
+                               QStringList &strlist)
 {
     QMutexLocker lockit(recordingList_lock);
 
     list<ProgramInfo *> *curList = getConflicting(pginfo, removenonplaying);
 
-    (*strlist) << QString::number(curList->size());
+    strlist << QString::number(curList->size());
 
     list<ProgramInfo *>::iterator i = curList->begin();
     for (; i != curList->end(); i++)
-        (*i)->ToStringList(*strlist);
+        (*i)->ToStringList(strlist);
 
     delete curList;
 }

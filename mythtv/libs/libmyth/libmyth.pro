@@ -11,7 +11,7 @@ VERSION = 0.15.0
 # Input
 HEADERS += dialogbox.h lcddevice.h mythcontext.h mythwidgets.h oldsettings.h  
 HEADERS += remotefile.h settings.h themedmenu.h util.h mythwizard.h
-HEADERS += volumecontrol.h uitypes.h xmlparse.h mythplugin.h
+HEADERS += volumecontrol.h uitypes.h xmlparse.h mythplugin.h mythdbcon.h
 HEADERS += mythdialogs.h audiooutput.h inetcomms.h httpcomms.h mythmedia.h 
 HEADERS += uilistbtntype.h uiphoneentry.h generictree.h
 
@@ -23,7 +23,7 @@ SOURCES += httpcomms.cpp mythmedia.cpp uilistbtntype.cpp uiphoneentry.cpp
 SOURCES += generictree.cpp
 
 inc.path = $${PREFIX}/include/mythtv/
-inc.files  = dialogbox.h lcddevice.h themedmenu.h mythcontext.h 
+inc.files  = dialogbox.h lcddevice.h themedmenu.h mythcontext.h mythdbcon.h
 inc.files += mythwidgets.h remotefile.h util.h oldsettings.h volumecontrol.h
 inc.files += settings.h uitypes.h xmlparse.h mythplugin.h mythdialogs.h
 inc.files += audiooutput.h inetcomms.h httpcomms.h mythmedia.h mythwizard.h

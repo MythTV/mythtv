@@ -4,16 +4,25 @@
 class RingBuffer;
 class NuppelVideoPlayer;
 class RemoteEncoder;
+class MythSqlDatabase;
+class ProgramInfo;
 
 class DecoderBase
 {
   public:
-    DecoderBase(NuppelVideoPlayer *parent) { m_parent = parent; 
-                                             exactseeks = false;
-                                             livetv = false;
-                                             watchingrecording = false;
-                                             nvr_enc = NULL;
-                                             lowbuffers = false; }
+    DecoderBase(NuppelVideoPlayer *parent, MythSqlDatabase *db,
+                ProgramInfo *pginfo) 
+    { 
+        m_parent = parent; 
+        m_db = db;
+        m_playbackinfo = pginfo;
+
+        exactseeks = false;
+        livetv = false;
+        watchingrecording = false;
+        nvr_enc = NULL;
+        lowbuffers = false; 
+    }
     virtual ~DecoderBase() { }
 
     virtual void Reset(void) = 0;
@@ -50,6 +59,9 @@ class DecoderBase
 
   protected:
     NuppelVideoPlayer *m_parent;
+    MythSqlDatabase *m_db;
+    ProgramInfo *m_playbackinfo;
+
     RingBuffer *ringBuffer;
 
     bool exactseeks;

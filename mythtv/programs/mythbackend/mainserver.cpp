@@ -927,7 +927,8 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
             {
                 (*encoderList)[num]->StopRecording();
                 pginfo->recstatus = rsStopped;
-                m_sched->UpdateRecStatus(pginfo);
+                if (m_sched)
+                    m_sched->UpdateRecStatus(pginfo);
             }
 
             if (pbssock)
@@ -963,7 +964,8 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
             if (ismaster)
             {
                 pginfo->recstatus = rsStopped;
-                m_sched->UpdateRecStatus(pginfo);
+                if (m_sched)
+                    m_sched->UpdateRecStatus(pginfo);
             }
         }
     }
@@ -1085,7 +1087,8 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
            {
                (*encoderList)[num]->StopRecording();
                pginfo->recstatus = rsDeleted;
-               m_sched->UpdateRecStatus(pginfo);
+               if (m_sched)
+                   m_sched->UpdateRecStatus(pginfo);
            }
 
            if (pbssock)
@@ -1121,7 +1124,8 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
             if (ismaster)
             {
                 pginfo->recstatus = rsDeleted;
-                m_sched->UpdateRecStatus(pginfo);
+                if (m_sched)
+                    m_sched->UpdateRecStatus(pginfo);
             }
         }
     }
@@ -1321,7 +1325,13 @@ void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs)
 
     QStringList strList;
 
-    m_sched->getAllPending(&strList);
+    if (m_sched)
+        m_sched->getAllPending(strList);
+    else
+    {
+        strList << QString::number(0);
+        strList << QString::number(0);
+    }
 
     SendResponse(pbssock, strList);
 }
@@ -1332,7 +1342,10 @@ void MainServer::HandleGetScheduledRecordings(PlaybackSock *pbs)
 
     QStringList strList;
 
-    m_sched->getAllScheduled(&strList);
+    if (m_sched)
+        m_sched->getAllScheduled(strList);
+    else
+        strList << QString::number(0);
 
     SendResponse(pbssock, strList);
 }
@@ -1350,7 +1363,10 @@ void MainServer::HandleGetConflictingRecordings(QStringList &slist,
 
     QStringList strlist;
 
-    m_sched->getConflicting(pginfo, removenonplaying, &strlist);
+    if (m_sched)
+        m_sched->getConflicting(pginfo, removenonplaying, strlist);
+    else
+        strlist << QString::number(0);
 
     SendResponse(pbssock, strlist);
 
@@ -2844,7 +2860,8 @@ void MainServer::PrintStatus(QSocket *socket)
 
     // upcoming shows ---------------------
     list<ProgramInfo *> recordingList;
-    m_sched->getAllPending(&recordingList);
+    if (m_sched)
+        m_sched->getAllPending(&recordingList);
 
     unsigned int iNum = 10;
     if (recordingList.size() < iNum) 

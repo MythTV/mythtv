@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
     TV::InitKeys();
 
-    TV *tv = new TV(db);
+    TV *tv = new TV();
     tv->Init();
 
     if (a.argc() > 1)

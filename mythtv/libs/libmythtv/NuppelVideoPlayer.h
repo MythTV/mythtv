@@ -23,7 +23,7 @@ using namespace std;
 class VideoOutput;
 class OSDSet;
 class RemoteEncoder;
-class QSqlDatabase;
+class MythSqlDatabase;
 class ProgramInfo;
 class DecoderBase;
 class AudioOutput;
@@ -41,7 +41,7 @@ struct TextContainer
 class NuppelVideoPlayer
 {
  public:
-    NuppelVideoPlayer(QSqlDatabase *ldb = NULL, ProgramInfo *info = NULL);
+    NuppelVideoPlayer(MythSqlDatabase *ldb = NULL, ProgramInfo *info = NULL);
    ~NuppelVideoPlayer();
 
     friend class CommDetect;
@@ -368,8 +368,7 @@ class NuppelVideoPlayer
     WId embedid;
     int embx, emby, embw, embh;
 
-    QSqlDatabase *m_db;
-    QMutex db_lock;
+    MythSqlDatabase *m_db;
     ProgramInfo *m_playbackinfo;
 
     long long bookmarkseek;

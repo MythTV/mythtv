@@ -10,6 +10,7 @@ using namespace std;
 #include "remoteencoder.h"
 #include "programinfo.h"
 #include "mythcontext.h"
+#include "mythdbcon.h"
 
 extern "C" {
 #ifdef USING_XVMC
@@ -22,13 +23,10 @@ extern "C" {
 
 extern pthread_mutex_t avcodeclock;
 
-AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
+AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
                                  ProgramInfo *pginfo)
-               : DecoderBase(parent)
+               : DecoderBase(parent, db, pginfo)
 {
-    m_db = db;
-    m_playbackinfo = pginfo;
-
     ic = NULL;
     directrendering = false;
     video_last_P_pts = lastapts = lastvpts = 0;
@@ -1439,10 +1437,13 @@ void AvFormatDecoder::SetPositionMap(void)
     
     if (m_playbackinfo && m_db) 
     {
+        m_db->lock();
         if (positionMapByFrame)
-            m_playbackinfo->SetPositionMap(posMap, MARK_GOP_BYFRAME, m_db);
+            m_playbackinfo->SetPositionMap(posMap, MARK_GOP_BYFRAME, 
+                                           m_db->db());
         else
-            m_playbackinfo->SetPositionMap(posMap, MARK_GOP_START, m_db);
+            m_playbackinfo->SetPositionMap(posMap, MARK_GOP_START, m_db->db());
+        m_db->unlock();
     }
 }
 
@@ -1450,7 +1451,9 @@ bool AvFormatDecoder::PosMapFromDb()
 {
     // Overwrites current positionmap with entire contents of database
     QMap<long long, long long> posMap;
-    m_playbackinfo->GetPositionMap(posMap, MARK_GOP_BYFRAME, m_db);
+
+    m_db->lock();
+    m_playbackinfo->GetPositionMap(posMap, MARK_GOP_BYFRAME, m_db->db());
     if (!posMap.empty())
     {
         positionMapByFrame = true;
@@ -1464,8 +1467,10 @@ bool AvFormatDecoder::PosMapFromDb()
     {
         // Fall back to map by keyframe number, which assumes an
         // even cadence of keyframes
-        m_playbackinfo->GetPositionMap(posMap, MARK_GOP_START, m_db);
+        m_playbackinfo->GetPositionMap(posMap, MARK_GOP_START, m_db->db());
     }
+
+    m_db->unlock();
 
     if (posMap.empty())
         return false; // no position map in recording

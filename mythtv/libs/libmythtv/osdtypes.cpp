@@ -329,6 +329,7 @@ void OSDSet::Hide(void)
     m_timeleft = -1;
     m_fadetime = 0;
     m_notimeout = false;
+    m_displaying = false;
 
     if (currentOSDFunctionalType)
     {

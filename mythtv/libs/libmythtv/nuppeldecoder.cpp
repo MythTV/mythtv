@@ -11,18 +11,16 @@ using namespace std;
 #include "NuppelVideoPlayer.h"
 #include "remoteencoder.h"
 #include "mythcontext.h"
+#include "mythdbcon.h"
 
 #include "minilzo.h"
 
 pthread_mutex_t avcodeclock = PTHREAD_MUTEX_INITIALIZER;
 
-NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
+NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
                              ProgramInfo *pginfo)
-             : DecoderBase(parent)
+             : DecoderBase(parent, db, pginfo)
 {
-    m_db = db;
-    m_playbackinfo = pginfo;
-
     ffmpeg_extradata = NULL;
     ffmpeg_extradatasize = 0;
 
@@ -470,7 +468,10 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     if (m_playbackinfo && m_db && positionMap)
     {
-        m_playbackinfo->GetPositionMap(*positionMap, MARK_KEYFRAME, m_db);
+        m_db->lock();
+        m_playbackinfo->GetPositionMap(*positionMap, MARK_KEYFRAME, m_db->db());
+        m_db->unlock();
+
         if (positionMap->size() && !livetv && !watchingrecording)
         {
             QMap<long long, long long>::Iterator it;
@@ -1323,6 +1324,11 @@ bool NuppelDecoder::DoFastForward(long long desiredFrame)
 void NuppelDecoder::SetPositionMap(void)
 {
     if (m_playbackinfo && m_db && positionMap)
-        m_playbackinfo->SetPositionMap(*positionMap, MARK_KEYFRAME, m_db);
+    {
+        m_db->lock();
+        m_playbackinfo->SetPositionMap(*positionMap, MARK_KEYFRAME, 
+                                       m_db->db());
+        m_db->unlock();
+    }
 }
 

@@ -33,6 +33,7 @@ class TV;
 class UDPNotifyOSDSet;
 class OSDListTreeType;
 class QKeyEvent;
+class OSDGenericTree;
 
 class OSD : public QObject
 {
@@ -110,7 +111,8 @@ class OSD : public QObject
 
     bool IsRunningTreeMenu(void);
     bool TreeMenuHandleKeypress(QKeyEvent *e);
-    void ShowTreeMenu(const QString &name);
+    OSDListTreeType *ShowTreeMenu(const QString &name, 
+                                  OSDGenericTree *treeToShow);
 
  private:
     void SetDefaults();

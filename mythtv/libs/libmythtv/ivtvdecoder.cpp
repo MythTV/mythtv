@@ -14,19 +14,17 @@ using namespace std;
 #include "remoteencoder.h"
 #include "programinfo.h"
 #include "mythcontext.h"
+#include "mythdbcon.h"
 
 #include "videoout_ivtv.h"
 #include "videodev_myth.h"
 
 bool IvtvDecoder::ntsc = true;
 
-IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
+IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
                          ProgramInfo *pginfo)
-           : DecoderBase(parent)
+           : DecoderBase(parent, db, pginfo)
 {
-    m_db = db;
-    m_playbackinfo = pginfo;
-
     framesRead = 0;
     framesPlayed = 0;
     lastStartFrame = 0;
@@ -180,7 +178,9 @@ int IvtvDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     if (m_playbackinfo && m_db)
     {
-        m_playbackinfo->GetPositionMap(positionMap, MARK_GOP_START, m_db);
+        m_db->lock();
+        m_playbackinfo->GetPositionMap(positionMap, MARK_GOP_START, m_db->db());
+        m_db->unlock();
         if (positionMap.size() && !livetv && !watchingrecording)
         {
             long long totframes = positionMap.size() * keyframedist;
@@ -550,7 +550,11 @@ bool IvtvDecoder::DoFastForward(long long desiredFrame)
 void IvtvDecoder::SetPositionMap(void)
 {
     if (m_playbackinfo && m_db)
-        m_playbackinfo->SetPositionMap(positionMap, MARK_GOP_START, m_db);
+    {
+        m_db->lock();
+        m_playbackinfo->SetPositionMap(positionMap, MARK_GOP_START, m_db->db());
+        m_db->unlock();
+    }
 }
 
 void IvtvDecoder::UpdateFramesPlayed(void)

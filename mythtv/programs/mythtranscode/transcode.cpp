@@ -136,6 +136,9 @@ class AudioReencodeBuffer : public AudioOutput
 
 Transcode::Transcode(QSqlDatabase *db, ProgramInfo *pginfo)
 {
+    QString dbname = QString("transcode%1%2").arg(getpid()).arg(rand());
+    nvpdb = new MythSqlDatabase(dbname);
+
     m_proginfo = pginfo;
     m_db = db;
     nvr = NULL;
@@ -166,6 +169,8 @@ Transcode::~Transcode()
         }
         delete kfa_table;
     }
+    if (nvpdb)
+        delete nvpdb;
 }
 void Transcode::ReencoderAddKFA(long curframe, long lastkey, long num_keyframes)
 {
@@ -231,7 +236,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     int audioframesize;
     int audioFrame = 0;
 
-    nvp = new NuppelVideoPlayer(m_db, m_proginfo);
+    nvp = new NuppelVideoPlayer(nvpdb, m_proginfo);
     nvp->SetNoVideo();
 
     QDateTime curtime = QDateTime::currentDateTime();

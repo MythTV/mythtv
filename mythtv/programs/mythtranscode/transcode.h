@@ -7,6 +7,7 @@
 #include "recordingprofile.h"
 #include "fifowriter.h"
 #include "programinfo.h"
+#include "mythdbcon.h"
 
 #define REENCODE_MPEG2TRANS      2
 #define REENCODE_OK              1
@@ -35,5 +36,6 @@ class Transcode : public QObject
     RingBuffer *outRingBuffer;
     FIFOWriter::FIFOWriter *fifow;
     QPtrList<struct kfatable_entry> *kfa_table;
+    MythSqlDatabase *nvpdb;
 };
 

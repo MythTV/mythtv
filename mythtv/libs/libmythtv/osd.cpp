@@ -957,63 +957,6 @@ void OSD::parseListTree(OSDSet *container, QDomElement &element)
     lb->SetMargin((int)(margin * wmult));
 
     container->AddType(lb);
-
-#if 0
-    OSDGenericTree *testtree = new OSDGenericTree("top_level_menu");
-
-    OSDGenericTree *item, *level;
-
-    level = item = new OSDGenericTree("level1");
-    testtree->addNode(item);
-    item = new OSDGenericTree("level1");
-    testtree->addNode(item);
-    item = new OSDGenericTree("level1");
-    testtree->addNode(item);
-    item = new OSDGenericTree("level1");
-    testtree->addNode(item);
-    item = new OSDGenericTree("level1");
-    testtree->addNode(item);
-    item = new OSDGenericTree("level1");
-    testtree->addNode(item);
-    item = new OSDGenericTree("level1");
-    testtree->addNode(item);
-    item = new OSDGenericTree("level1");
-    testtree->addNode(item);
-    item = new OSDGenericTree("level1");
-    testtree->addNode(item);
-    item = new OSDGenericTree("level2");
-    level->addNode(item);
-    item = new OSDGenericTree("level2");
-    level->addNode(item);
-    item = new OSDGenericTree("level2");
-    level->addNode(item);
-    item = new OSDGenericTree("level2");
-    level->addNode(item);
-    level = item;
-    item = new OSDGenericTree("level3");
-    level->addNode(item);
-    item = new OSDGenericTree("level3");
-    level->addNode(item);
-    item = new OSDGenericTree("level3");
-    level->addNode(item);
-    item = new OSDGenericTree("level3");
-    level->addNode(item);
-    item = new OSDGenericTree("level3");
-    level->addNode(item);
-    level = item;
-    item = new OSDGenericTree("level4");
-    level->addNode(item);
-    item = new OSDGenericTree("level3");
-    level->addNode(item);
-    item = new OSDGenericTree("level3");
-    level->addNode(item);
-    item = new OSDGenericTree("level3");
-    level->addNode(item);
-    item = new OSDGenericTree("level3");
-    level->addNode(item);
-
-    lb->SetAsTree(testtree);
-#endif
 }
 
 void OSD::parseContainer(QDomElement &element)
@@ -2071,20 +2014,24 @@ void OSD::ClearNotify(UDPNotifyOSDSet *notifySet)
     osdlock.unlock();
 }
 
-void OSD::ShowTreeMenu(const QString &name)
+OSDListTreeType *OSD::ShowTreeMenu(const QString &name, 
+                                   OSDGenericTree *treeToShow)
 {
-    if (runningTreeMenu)
-        return;
+    if (runningTreeMenu || !treeToShow)
+        return NULL;
+
+    OSDListTreeType *rettree = NULL;
 
     osdlock.lock();
 
     OSDSet *container = GetSet(name);
     if (container)
     {
-        OSDListTreeType *tree = (OSDListTreeType *)container->GetType("menu");
-        if (tree)
+        rettree = (OSDListTreeType *)container->GetType("menu");
+        if (rettree)
         {
-            runningTreeMenu = tree;
+            rettree->SetAsTree(treeToShow);
+            runningTreeMenu = rettree;
             treeMenuContainer = name;
             container->Display();
             m_setsvisible = true;
@@ -2093,6 +2040,8 @@ void OSD::ShowTreeMenu(const QString &name)
     }
 
     osdlock.unlock();
+
+    return rettree;
 }
 
 bool OSD::IsRunningTreeMenu(void)

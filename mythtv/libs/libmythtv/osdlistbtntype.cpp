@@ -32,9 +32,10 @@
 #include "osdlistbtntype.h"
 
 
-OSDGenericTree::OSDGenericTree(const QString &name, const QString &action,
-                               int check, OSDTypeImage *image)
-                      : GenericTree(name)
+OSDGenericTree::OSDGenericTree(OSDGenericTree *parent, const QString &name, 
+                               const QString &action, int check, 
+                               OSDTypeImage *image)
+              : GenericTree(name)
 {
     m_checkable = check;
     m_action = action;
@@ -42,6 +43,9 @@ OSDGenericTree::OSDGenericTree(const QString &name, const QString &action,
 
     if (!action.isEmpty() && !action.isNull())
         setSelectable(true);
+
+    if (parent)
+        parent->addNode(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -118,8 +122,12 @@ void OSDListTreeType::SetAsTree(OSDGenericTree *toplevel)
 {
     if (treetop)
     {
-        cerr << "Unable to set new top level tree\n";
-        return;
+        listLevels.clear();
+        currentlevel = NULL;
+        treetop = NULL;
+        currentpos = NULL;
+        levels = 0;
+        curlevel = -1;
     }
 
     levels = toplevel->calculateDepth(0) - 1;
@@ -179,6 +187,8 @@ void OSDListTreeType::SetAsTree(OSDGenericTree *toplevel)
 
     currentpos = (OSDGenericTree *)(currentlevel->GetItemFirst()->getData());
     curlevel = 0;
+
+    emit itemEntered(currentpos);
 }
 
 OSDGenericTree *OSDListTreeType::GetCurrentPosition(void)
@@ -244,6 +254,8 @@ bool OSDListTreeType::HandleKeypress(QKeyEvent *e)
             }
             else if (action == "ESCAPE")
                 m_visible = false;
+            else if (action == "SELECT")
+                emit itemSelected(currentpos);
             else
                 handled = false;
         }
@@ -314,6 +326,7 @@ void OSDListTreeType::SetCurrentPosition(void)
         return;
 
     currentpos = (OSDGenericTree *)(lbt->getData());
+    emit itemEntered(currentpos);
 }
  
 //////////////////////////////////////////////////////////////////////////

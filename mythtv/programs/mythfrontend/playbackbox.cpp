@@ -1364,9 +1364,7 @@ void PlaybackBox::play(ProgramInfo *rec)
 
     ProgramInfo *tvrec = new ProgramInfo(*rec);
 
-    QSqlDatabase *db = QSqlDatabase::database();
-
-    TV *tv = new TV(db);
+    TV *tv = new TV();
     tv->Init();
 
     setEnabled(false);

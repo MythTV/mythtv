@@ -23,6 +23,7 @@ using namespace std;
 #include "hdtvrecorder.h"
 #include "NuppelVideoPlayer.h"
 #include "channel.h"
+#include "mythdbcon.h"
 
 #ifdef USING_IVTV
 #include "mpegrecorder.h"
@@ -700,18 +701,10 @@ char *TVRec::GetScreenGrab(ProgramInfo *pginfo, const QString &filename,
 
     QString name = QString("screen%1%2").arg(getpid()).arg(rand());
 
-    QSqlDatabase *screendb = QSqlDatabase::addDatabase("QMYSQL3", name);
-    if (!screendb)
-    {
-        cerr << "Couldn't initialize mysql connection for comm thread\n";
+    MythSqlDatabase *screendb = new MythSqlDatabase(name);
+
+    if (!screendb || !screendb->isOpen())
         return NULL;
-    }
-    if (!gContext->OpenDatabase(screendb))
-    {
-        cerr << "Couldn't open database connection for comm thread\n";
-        QSqlDatabase::removeDatabase(name);
-        return NULL;
-    }
 
     NuppelVideoPlayer *nupvidplay = new NuppelVideoPlayer(screendb, pginfo);
     nupvidplay->SetRingBuffer(tmprbuf);
@@ -722,9 +715,7 @@ char *TVRec::GetScreenGrab(ProgramInfo *pginfo, const QString &filename,
 
     delete nupvidplay;
     delete tmprbuf;
-
-    screendb->close(); 
-    QSqlDatabase::removeDatabase(name);
+    delete screendb;
 
     return retbuf;
 }
@@ -2058,18 +2049,10 @@ void TVRec::DoFlagCommercialsThread(void)
 
     QString name = QString("commercial%1%2").arg(getpid()).arg(rand());
 
-    QSqlDatabase *commthread_db = QSqlDatabase::addDatabase("QMYSQL3", name);
-    if (!commthread_db)
-    {
-        cerr << "Couldn't initialize mysql connection for comm thread\n";
+    MythSqlDatabase *commthread_db = new MythSqlDatabase(name);
+
+    if (!commthread_db || !commthread_db->isOpen())
         return;
-    }
-    if (!gContext->OpenDatabase(commthread_db))
-    {
-        cerr << "Couldn't open database connection for comm thread\n";
-        QSqlDatabase::removeDatabase(name);
-        return;
-    }
 
     nice(19);
 
@@ -2094,9 +2077,7 @@ void TVRec::DoFlagCommercialsThread(void)
     delete nvp;
     delete tmprbuf;
     delete program_info;
-
-    commthread_db->close();
-    QSqlDatabase::removeDatabase(name);
+    delete commthread_db;
 }
 
 void *TVRec::FlagCommercialsThread(void *param)

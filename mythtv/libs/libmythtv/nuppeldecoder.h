@@ -38,7 +38,7 @@ class RawDataList
 class NuppelDecoder : public DecoderBase
 {
   public:
-    NuppelDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
+    NuppelDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
                   ProgramInfo *pginfo);
    ~NuppelDecoder();
 
@@ -127,9 +127,6 @@ class NuppelDecoder : public DecoderBase
 
     long long lastKey;
     long long framesPlayed;
-
-    QSqlDatabase *m_db;
-    ProgramInfo *m_playbackinfo;
 
     QPtrList <RawDataList> StoredData;
     bool getrawframes;

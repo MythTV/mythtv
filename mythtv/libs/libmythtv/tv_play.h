@@ -13,7 +13,7 @@
 
 #include <qobject.h>
 
-class QSqlDatabase;
+class MythSqlDatabase;
 class QDateTime;
 class OSD;
 class RemoteEncoder;
@@ -23,13 +23,14 @@ class RingBuffer;
 class ProgramInfo;
 class MythDialog;
 class UDPNotify;
+class OSDGenericTree;
 
 class TV : public QObject
 {
     Q_OBJECT
   public:
-    TV(QSqlDatabase *db);
-   ~TV(void);
+    TV(void);
+   ~TV();
 
     static void InitKeys(void);
 
@@ -94,6 +95,8 @@ class TV : public QObject
     void UnMute(void);
     void KeyRepeatOK(void);
     void BrowseEndTimer(void) { BrowseEnd(false); }
+    void TreeMenuEntered(OSDGenericTree *item);
+    void TreeMenuSelected(OSDGenericTree *item);
 
   protected:
     void doLoadMenu(void);
@@ -180,6 +183,9 @@ class TV : public QObject
     void DoProgramMenu(void);
     void ProgramMenuAction(int result);
 
+    void BuildOSDTreeMenu(void);
+    void ShowOSDTreeMenu(void);
+
     int osd_display_time;
 
     bool channelqueued;
@@ -249,7 +255,7 @@ class TV : public QObject
 
     ProgramInfo *playbackinfo;
 
-    QSqlDatabase *m_db;
+    MythSqlDatabase *m_db;
 
     VolumeControl *volumeControl;
 
@@ -291,6 +297,8 @@ class TV : public QObject
     int bufferedChannelThreshold;
 
     bool switchingCards;
+
+    OSDGenericTree *treeMenu;
 };
 
 #endif

@@ -203,8 +203,7 @@ void ManualBox::startPlayer(void)
     {
         tvstarting = true;
 
-        QSqlDatabase *db = QSqlDatabase::database();
-        m_tv = new TV(db);
+        m_tv = new TV();
         m_tv->Init(false);
 
         m_tv->EmbedOutput(m_pixlabel->winId(), 0, 0, (int)(320 * wmult),

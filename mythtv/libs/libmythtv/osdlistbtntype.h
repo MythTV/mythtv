@@ -36,8 +36,9 @@ class OSDGenericTree : public GenericTree
 {
   public:
     // This class will _not_ delete the image it's given, if any.
-    OSDGenericTree(const QString &name, const QString &action = "",
-                   int check = -1, OSDTypeImage *image = NULL);
+    OSDGenericTree(OSDGenericTree *parent, const QString &name, 
+                   const QString &action = "", int check = -1, 
+                   OSDTypeImage *image = NULL);
 
     OSDTypeImage *getImage(void) { return m_image; }
     QString getAction(void) { return m_action; }
@@ -75,7 +76,11 @@ class OSDListTreeType : public OSDType
 
     bool IsVisible(void) { return m_visible; }
     void SetVisible(bool visible) { m_visible = visible; }
- 
+
+  signals:
+    void itemSelected(OSDGenericTree *item);
+    void itemEntered(OSDGenericTree *item);
+
   private:
     void FillLevelFromTree(OSDGenericTree *item, OSDListBtnType *list);
     OSDListBtnType *GetLevel(int levelnum);
