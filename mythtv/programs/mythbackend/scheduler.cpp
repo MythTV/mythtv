@@ -1446,14 +1446,10 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
                 proginfo->rectype == kTimeslotRecord ||
                 proginfo->rectype == kWeekslotRecord) 
             {
-                temptime = result.value(1).toString();
-                tempdate = result.value(2).toString();
-                proginfo->startts = QDateTime::fromString(tempdate+":"+temptime,
-                                                          Qt::ISODate);
-                temptime = result.value(3).toString();
-                tempdate = result.value(4).toString();
-                proginfo->endts = QDateTime::fromString(tempdate+":"+temptime,
-                                                        Qt::ISODate);
+                proginfo->startts = QDateTime(result.value(2).toDate(),
+                                              result.value(1).toTime());
+                proginfo->endts = QDateTime(result.value(4).toDate(),
+                                            result.value(3).toTime());
             }
             else 
             {
