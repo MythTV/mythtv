@@ -372,11 +372,11 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
     else
     {
         if (inpixfmt == -1 && outpixfmt == -1)
-            inpixfmt == outpixfmt == FMT_YV12;
+            inpixfmt = outpixfmt = FMT_YV12;
         else if (inpixfmt == -1)
-            inpixfmt == outpixfmt;
+            inpixfmt = outpixfmt;
         else if (outpixfmt == -1)
-            outpixfmt == inpixfmt;
+            outpixfmt = inpixfmt;
     }
 
     switch (inpixfmt)

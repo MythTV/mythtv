@@ -59,6 +59,7 @@ SOURCES += udpnotify.cpp channeleditor.cpp channelsettings.cpp
 using_xv {
     SOURCES += videoout_xv.cpp
     HEADERS += videoout_xv.h
+    DEFINES += USING_XV
 }
 
 using_xvmc {
@@ -69,7 +70,6 @@ using_xvmc {
 using_viahwslice {
     SOURCES += videoout_viaslice.cpp
     HEADERS += videoout_viaslice.h
-    DEFINES += USING_VIASLICE
 }
 
 using_dvb {
