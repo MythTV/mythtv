@@ -213,7 +213,11 @@ public:
     static QString idToName(QSqlDatabase* db, int id);
 
     QString getSourceName(void) const { return name->getValue(); };
-        
+
+    virtual void save(QSqlDatabase* db) {
+        if (name)
+            ConfigurationWizard::save(db);
+    };
 
 private:
     class ID: virtual public IntegerSetting,
