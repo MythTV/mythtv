@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-01-30, v1.087
+  2003-02-01, v1.088
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -1079,6 +1079,27 @@
        # make install
        # chmod 666 /dev/lircd
 
+  At this point, if you're using a serial receiver, check that the link
+  has been correctly made in /dev
+
+       $ ls -l /dev/li*
+       lr-xr-xr-x    1 root     root            5 Jan 27 09:00 /dev/lirc -> ttyS0
+       srw-rw-rw-    1 root     root            0 Jan 27 15:01 /dev/lircd=
+       prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
+
+  As you can see, there's a link from /dev/lirc to ttyS0, aka "COM1".
+
+  If the link was not created, ensure that you ran the make install step
+  as root.  If it still doesn't work, then you must create the link
+  manually.  In this example, the IR device is connected to ttyS0.  If
+  it were connected to "COM2", then use ttyS1, etc.
+
+       $ su
+       # cd /dev
+       # ln -sf ttyS0 lirc
+       # exit
+       $
+
   [1m8.4.1.  Recompiling your kernel on Red Hat Linux[0m
 
   Don't Panic! Red Hat makes a kernel recompile very easy. They provide
@@ -1118,11 +1139,11 @@
   Only change things you know you can change. If you are not sure, just
   stick to the one required change. Click "save and exit".  Next:
 
-  # make dep
-  # make clean
-  # make bzImage modules
-  # make modules_install
-  # make install
+       # make dep
+       # make clean
+       # make bzImage modules
+       # make modules_install
+       # make install
 
   if you are using [1mgrub[22m, that should be it, reboot and select your
   custom kernel upon boot. If you are using [1mlilo[22m, change your lilo
@@ -1239,17 +1260,17 @@
 
   The lircrc.example file has this:
 
-       begin
-           prog = irxevent
-           button = ChannelUp
-           config = Key Up CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = ChannelUp
+      config = Key Up CurrentWindow
+  end
 
-       begin
-           prog = irxevent
-           button = ChannelDown
-           config = Key Down CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = ChannelDown
+      config = Key Down CurrentWindow
+  end
 
   but the /etc/lircd.conf that comes in the lircd package defines the
   buttons for the Pinnacle Studio PCTV as:
@@ -1260,17 +1281,17 @@
   rather than "ChannelUp" and "ChannelDown".  I added the following to
   my /home/[yourusername]/.lircrc file:
 
-  begin
-      prog = irxevent
-      button = channel+
-      config = Key Up CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = channel+
+           config = Key Up CurrentWindow
+       end
 
-  begin
-      prog = irxevent
-      button = channel-
-      config = Key Down CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = channel-
+           config = Key Down CurrentWindow
+       end
 
   which took care of basic functionality.  Because the PCTV Studio
   remote has additional buttons, look at the configfiles/lircrc.exam-
@@ -1309,19 +1330,19 @@
   Depending on whether you have your serial port driver configured as a
   kernel module you might see the following message during make:
 
-  lirc_sir.c:56:2: warning: #warning
-  "******************************************"
+       lirc_sir.c:56:2: warning: #warning
+       "******************************************"
 
-  lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
+       lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
 
-  lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
+       lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
 
-  lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
+       lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
 
-  lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
+       lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
 
-  lirc_sir.c:61:2: warning: #warning
-  "******************************************"
+       lirc_sir.c:61:2: warning: #warning
+       "******************************************"
 
   If you do receive this statement make sure to run the [1msetserial[0m
   command before you load the lirc_sir module. Follow this with the
@@ -1336,15 +1357,15 @@
   The configuration for starting [1mlircd [22mdiffers if you're going to be
   sending and receiving IR versus just receiving.
 
-       # cd /etc/rc.d
-       # cat >> rc.local
-       echo "Starting lircd"
-       setserial /dev/ttySx uart none        # (if required)
-       modprobe lirc_sir
-       /usr/local/sbin/lircd
-       ^D
-       # exit
-       $
+  # cd /etc/rc.d
+  # cat >> rc.local
+  echo "Starting lircd"
+  setserial /dev/ttySx uart none        # (if required)
+  modprobe lirc_sir
+  /usr/local/sbin/lircd
+  ^D
+  # exit
+  $
 
   At this point you have to populate the /etc/lircd.conf file with the
   proper codes for your A/V remote. You should be able to find your
@@ -1357,10 +1378,10 @@
   being received. If everything is configured correctly you should see
   something similar to the following:
 
-  $ irw
-  0000000000007ff0 00 1 gi-motorola-dct2000
-  000000000000bff8 00 2 gi-motorola-dct2000
-  000000000000f7f0 00 ENTER gi-motorola-dct2000
+       $ irw
+       0000000000007ff0 00 1 gi-motorola-dct2000
+       000000000000bff8 00 2 gi-motorola-dct2000
+       000000000000f7f0 00 ENTER gi-motorola-dct2000
 
   Once you've verified lirc is working you can press [1mCTRL-C [22mto exit [1mirw[0m
   and configure the channel changing script.
@@ -1378,44 +1399,44 @@
   /dev/device. Unlike bourne or bash, csh scripts automatically close
   parent file descriptors before they start.
 
-       $ cd /usr/local/bin
-       # su
-       # cat > change_channel.csh
-       #!/bin/csh
-       echo "changing to $1"
-       /usr/local/bin/channel.pl $1 &
-       ^D
-       # chmod a+x change_channel.csh
-       # exit
-       $ exit
+  $ cd /usr/local/bin
+  # su
+  # cat > change_channel.csh
+  #!/bin/csh
+  echo "changing to $1"
+  /usr/local/bin/channel.pl $1 &
+  ^D
+  # chmod a+x change_channel.csh
+  # exit
+  $ exit
 
   The following file should be saved as /usr/local/bin/channel.pl
 
-  #!/usr/bin/perl
+       #!/usr/bin/perl
 
-  # make sure to set this string to
-  # the corresponding remote in /etc/lircd.conf
-  $remote_name = "gi-motorola-dct2000";
+       # make sure to set this string to
+       # the corresponding remote in /etc/lircd.conf
+       $remote_name = "gi-motorola-dct2000";
 
-  sub change_channel {
-          my($channel_digit) = @_;
-          system ("rc SEND_ONCE $remote_name $channel_digit");
-          sleep 1;
-  }
+       sub change_channel {
+               my($channel_digit) = @_;
+               system ("rc SEND_ONCE $remote_name $channel_digit");
+               sleep 1;
+       }
 
-  $channel=$ARGV[0];
-  sleep 1;
-  if (length($channel) > 2) {
-          change_channel(substr($channel,0,1));
-          change_channel(substr($channel,1,1));
-          change_channel(substr($channel,2,1));
-  } elsif (length($channel) > 1) {
-          change_channel(substr($channel,0,1));
-          change_channel(substr($channel,1,1));
-  } else {
-          change_channel(substr($channel,0,1));
-  }
-  system ("rc SEND_ONCE $remote_name ENTER");
+       $channel=$ARGV[0];
+       sleep 1;
+       if (length($channel) > 2) {
+               change_channel(substr($channel,0,1));
+               change_channel(substr($channel,1,1));
+               change_channel(substr($channel,2,1));
+       } elsif (length($channel) > 1) {
+               change_channel(substr($channel,0,1));
+               change_channel(substr($channel,1,1));
+       } else {
+               change_channel(substr($channel,0,1));
+       }
+       system ("rc SEND_ONCE $remote_name ENTER");
 
   The last statement within the perl script is the lirc rc command. This
   is the command that transmits the code to your cable/dss box. Make
@@ -1535,25 +1556,26 @@
   If you want to know what time your job will run, you can do the
   following:
 
-       # cat /etc/crontab
-       SHELL=/bin/bash
-       PATH=/sbin:/bin:/usr/sbin:/usr/bin
-       MAILTO=root
-       HOME=/
+  # cat /etc/crontab
+  SHELL=/bin/bash
+  PATH=/sbin:/bin:/usr/sbin:/usr/bin
+  MAILTO=root
+  HOME=/
 
-       # run-parts
-       01 * * * * root nice -n 19 run-parts /etc/cron.hourly
-       02 4 * * * root nice -n 19 run-parts /etc/cron.daily
-       22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
-       42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
-       # exit
-       $
+  # run-parts
+  01 * * * * root nice -n 19 run-parts /etc/cron.hourly
+  02 4 * * * root nice -n 19 run-parts /etc/cron.daily
+  22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
+  42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
+  # exit
+  $
 
   We can see from the display that the cron.daily job will run at 0402
   every morning.
 
   If you wish to specify a custom time, then the user-based cron job is
   the better method.
+
   The default [1mconfigfiles/mythcrontab [22mfile will run the [1mmythfilldatabase[0m
   program every day at 0430.  If you want to change this, then open the
   configfiles/mythcrontab file in your favorite editor and modify it as
@@ -1644,7 +1666,7 @@
   have an external tuner, such as a DirecTV or digital cable set top
   box, the following command should be added to your settings.txt file:
 
-       str ExternalChannelCommand=/usr/local/bin/changechannel
+  str ExternalChannelCommand=/usr/local/bin/changechannel
 
   The [1mchangechannel [22mprogram is not supplied with MythTV, so this is
   going to be dependent on what sort of external tuner you have.
@@ -1698,7 +1720,6 @@
 
   [1mNOTE[22m: Make sure that you have a trailing slash on the URL, otherwise
   you will get a 404 Page not Found error.
-
   [1m12.  MythGallery.[0m
 
   MythGallery is a photo and slideshow application.  MythGallery is a
@@ -1711,13 +1732,13 @@
   <http://www.mythtv.org/> and save it to a location where you can find
   it.
 
-  $ tar -xjf mythgallery-0.7.tar.bz2
-  $ cd mythgallery-0.7
-  $ make
-  # su
-  # make install
-  # exit
-  $
+       $ tar -xjf mythgallery-0.7.tar.bz2
+       $ cd mythgallery-0.7
+       $ make
+       # su
+       # make install
+       # exit
+       $
 
   The configuration file for MythGallery is located in
   /usr/local/share/mythtv.  This file needs to be edited:  ensure that
@@ -1808,19 +1829,19 @@
   <http://www.xiph.org/paranoia/download/cdparanoia-III-
   alpha9.8.src.tgz>.
 
-       $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
-       $ cd cdparanoia-III-alpha9.8
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       <!-- see if the next step is a Mandrake only issue -->
-       # cp interface/cdda_interface.h /usr/local/include
-       # cd /usr/lib
-       # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
-       # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
-       # exit
-       $
+  $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
+  $ cd cdparanoia-III-alpha9.8
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  <!-- see if the next step is a Mandrake only issue -->
+  # cp interface/cdda_interface.h /usr/local/include
+  # cd /usr/lib
+  # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
+  # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
+  # exit
+  $
 
   [1m14.2.  Mandrake 9.0[0m
 
@@ -1859,7 +1880,6 @@
 
   The MythWeather module will obtain the weather information for the
   location that you specify.
-
   Change into the MythWeather directory, then make and make install:
 
        $ cd mythweather
@@ -1917,15 +1937,15 @@
 
   These are the keyboard commands for MythWeather:
 
-  Left Key             Goes back one page, and extends the time spent
-                       on the page you are on.
-  Right Key            Goes forward one page, see above.
-  Space                Pause, wait on the current page until space is hit
-                       again.
-  Numeric Keys         You can check other weather by keying in other ZIP codes.
-  Enter Key            Switch between celsius and fahrenheit. Can also
-                       be used a way to force a data update.
-  "m" Key              Resets the location to the database default, then updates the data.
+       Left Key             Goes back one page, and extends the time spent
+                            on the page you are on.
+       Right Key            Goes forward one page, see above.
+       Space                Pause, wait on the current page until space is hit
+                            again.
+       Numeric Keys         You can check other weather by keying in other ZIP codes.
+       Enter Key            Switch between celsius and fahrenheit. Can also
+                            be used a way to force a data update.
+       "m" Key              Resets the location to the database default, then updates the data.
 
   [1m16.  MythVideo[0m
 
@@ -2019,7 +2039,6 @@
        directory
 
   then it shouldn't be a problem.
-
   If you get an error like /usr/bin/ld: cannot find -lXext, the compiler
   is telling you that you don't have XFree86-devel installed, and this
   needs to be fixed before MythTV will work correctly.
@@ -2062,23 +2081,23 @@
 
   Finally, check:
 
-       Section "Monitor"
-           Identifier "monitor1"
-           VendorName "Plug'n Play"
-           HorizSync 30-85
-           VertRefresh 50-160
+  Section "Monitor"
+      Identifier "monitor1"
+      VendorName "Plug'n Play"
+      HorizSync 30-85
+      VertRefresh 50-160
 
-           # Sony Vaio C1(X,XS,VE,VN)?
-           # 1024x480 @ 85.6 Hz, 48 kHz hsync
-           ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+      # Sony Vaio C1(X,XS,VE,VN)?
+      # 1024x480 @ 85.6 Hz, 48 kHz hsync
+      ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
 
-           # TV fullscreen mode or DVD fullscreen output.
-           # 768x576 @ 79 Hz, 50 kHz hsync
-           ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+      # TV fullscreen mode or DVD fullscreen output.
+      # 768x576 @ 79 Hz, 50 kHz hsync
+      ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
 
-           # 768x576 @ 100 Hz, 61.6 kHz hsync
-           ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
-       EndSection
+      # 768x576 @ 100 Hz, 61.6 kHz hsync
+      ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+  EndSection
 
   Ensure that there isn't an Option "DPMS" in the Monitor configuration.
 
@@ -2127,18 +2146,18 @@
   At this point, you now have debug-enabled software ready.  Let's
   assume that the problem you're having is in the setup program.
 
-  $ cd setup
-  $ gdb ./setup
+       $ cd setup
+       $ gdb ./setup
 
-  GNU gdb 5.2.1-2mdk (Mandrake Linux)
-  Copyright 2002 Free Software Foundation, Inc.
-  GDB is free software, covered by the GNU General Public License, and you are
-  welcome to change it and/or distribute copies of it under certain
-  conditions.
-  Type "show copying" to see the conditions.
-  There is absolutely no warranty for GDB.  Type "show warranty" for details.
-  This GDB was configured as "i586-mandrake-linux-gnu"...
-  (gdb)
+       GNU gdb 5.2.1-2mdk (Mandrake Linux)
+       Copyright 2002 Free Software Foundation, Inc.
+       GDB is free software, covered by the GNU General Public License, and you are
+       welcome to change it and/or distribute copies of it under certain
+       conditions.
+       Type "show copying" to see the conditions.
+       There is absolutely no warranty for GDB.  Type "show warranty" for details.
+       This GDB was configured as "i586-mandrake-linux-gnu"...
+       (gdb)
 
   [1mgdb [22mhas a number of options, read the man page for more information.
 

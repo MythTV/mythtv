@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-01-30, v1.087
+<date>2003-02-01, v1.088
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -939,6 +939,31 @@ $ make
 $ su
 # make install
 # chmod 666 /dev/lircd
+</verb></tscreen>
+
+At this point, if you're using a serial receiver, check that the link has
+been correctly made in /dev
+
+<tscreen><verb>
+$ ls -l /dev/li*
+lr-xr-xr-x    1 root     root            5 Jan 27 09:00 /dev/lirc -> ttyS0
+srw-rw-rw-    1 root     root            0 Jan 27 15:01 /dev/lircd=
+prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
+</verb></tscreen>
+
+As you can see, there's a link from /dev/lirc to ttyS0, aka "COM1".
+
+If the link was not created, ensure that you ran the <tt>make install</tt>
+step as root.  If it still doesn't work, then you must create the link
+manually.  In this example, the IR device is connected to ttyS0.  If it were
+connected to "COM2", then use ttyS1, etc.
+
+<tscreen><verb>
+$ su
+# cd /dev
+# ln -sf ttyS0 lirc
+# exit
+$
 </verb></tscreen>
 
 <sect2>Recompiling your kernel on Red Hat Linux
@@ -2460,6 +2485,7 @@ etc.  Adjusted section 4 again; didn't know that RH8 sets the paths in the
 RPM install.
 v1.086, 2003-01-29.  More on resolution hints.
 v1.087, 2003-01-30.  Pointer to VCDHelp's webpage on resolution.
+v1.088, 2003-02-01.  Added a section to check on the symlink in lirc.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
