@@ -123,6 +123,8 @@ void XMLParse::parseFont(QDomElement &element)
     QPoint shadowOffset = QPoint(0, 0);
     QString color = "#ffffff";
     QString dropcolor = "#000000";
+    QString hint;
+    QFont::StyleHint styleHint = QFont::AnyStyle;    
     
     bool haveSizeSmall = false;
     bool haveSizeBig = false;
@@ -171,6 +173,14 @@ void XMLParse::parseFont(QDomElement &element)
     {
         haveFace = true;
     }
+    
+   
+    hint = element.attribute("stylehint", "");
+    if (!hint.isNull() && !hint.isEmpty())
+    {
+        styleHint = (QFont::StyleHint)hint.toInt();
+    }
+
     
     
     for (QDomNode child = element.firstChild(); !child.isNull();
@@ -253,25 +263,38 @@ void XMLParse::parseFont(QDomElement &element)
         return;
     }
 
-    if (baseFont && !haveFace)
-        face = baseFont->face.family();
+    
+    
     
     if (baseFont && !haveSize)
         size = baseFont->face.pointSize();
     else    
         size = (int)ceil(size * hmult);
     
-    QFont temp(face, size);
+    
+    // If we don't have to, don't load the font.
+    if (!haveFace && baseFont)
+    {
+        newFont.face = baseFont->face;
+        if(haveSize)
+            newFont.face.setPointSize(size);
+    }
+    else
+    {
+        QFont temp(face, size);
+        temp.setStyleHint(styleHint);
+        newFont.face = temp;
+    }
     
     if (baseFont && !haveBold)
-        temp.setBold(baseFont->face.bold());
+        newFont.face.setBold(baseFont->face.bold());
     else        
     {
         if (bold.lower() == "yes")
-            temp.setBold(true);
+            newFont.face.setBold(true);
     }
     
-    newFont.face = temp;
+    
     
     if (haveColor)
     {
