@@ -1,0 +1,1537 @@
+#!/usr/bin/perl -w
+# Last Updated: 2003.09.22 (xris)
+
+=head1 NAME
+
+nuvexport
+
+This is a perl script designed to export various formats from mythtv nuv
+video files.  Just run the script to see the various available options.
+Descriptions of the various export formats and their requirements are below.
+
+        Main code by:  Chris Petersen
+DivX and WMV code by:  Dennis Lou
+
+=head1 MPEG-BASED NUV
+
+nuvexport supports mpeg-based nuv files like those saved from the Hauppauge PVR
+cards.  In order to get at the mpeg info, however, you will need either mpgtx
+or tcprobe (part of transcode).  Either program should work fine.
+
+=head1 FORMATS/REQUIREMENTS
+
+Except for the basic raw nuv/sql export, all formats require ffmpeg.
+
+=head2 NUV/SQL
+
+I<WARNING: THIS REMOVES THE RECORDED SHOW FROM THE ORIGINATING SERVER.>
+
+This is the most basic export format, and is intended for moving files between
+different backend setups.  It merely copies the nuv file to the specified output
+directory, and extracts all related database info into a matching .sql file.
+
+To import this into another myth setup, just copy the nuv to your video directory
+and run:
+
+	mysql mythconverg < sql_file_name.sql
+
+=head2 SVCD
+
+Super VideoCD's are an mpeg2 enhancement of the original VideoCD format.
+In order to encode an svcd, you need ffmpeg, yuvscaler, and mpeg2enc.  Most of
+these come with the mjpeg package.
+
+You will also need an mp2 audio encoder.  mp2enc comes with mjpeg, but I strongly
+suggest that you grab toolame; it's a much better encoder.
+
+To multiplex the audio and video streams, you can use mjpeg's mplex program, but
+I've had bad luck with this, and suggest that you install transcode in order to
+get tcmplex - it works much better with SVCD mpeg2 files than mplex.
+
+Though this script will not create the bin/cue images needed for burning an SVCD
+under linux, if you want to do so, you will also need the vcdimager program.
+
+=head2 DivX
+
+DivX...  not much to say here, I didn't write the exporter
+
+All you need is ffmpeg.
+
+
+=head2 WMV
+
+Windows Media Video...  not much to say here, I didn't write the exporter
+
+All you need is ffmpeg.
+
+NOTE: Microsoft's Windows Media Player will only play audio from WMV
+files encoded using their Windows Media Audio (WMA) codec.  FFMPEG
+contains a WMA decoder but not an encoder.  Therefore, Windows Media Player
+will have problems with WMV files generated from this script.  If you
+want to use WMV files, you should use mplayer or export to another
+format and use Microsoft's Windows Media Encoder to encode a WMV file.
+
+=cut
+
+# Load some modules that we'll use
+	use DBI;
+	use Getopt::Long;
+
+# A global list of the various programs (and full paths) we'll be needing/using
+	our %Prog;
+
+# Make sure that we have mythtranscode installed
+	$Prog{mythtranscode} = utils::find_program('mythtranscode');
+	die "You need mythtranscode to use this program.\n\n" unless ($Prog{mythtranscode});
+
+# Make sure that we have ffmpeg installed
+	$Prog{ffmpeg} = utils::find_program('ffmpeg');
+	die "You need ffmpeg to use this program.\n\n" unless ($Prog{ffmpeg});
+
+# Make sure that we have nice installed
+	$Prog{nice} = utils::find_program('nice');
+	die "You need ffmpeg to use this program.\n\n" unless ($Prog{nice});
+
+# Load the commandline options
+	my $DEBUG;
+	my %Args = ('debug' => \$DEBUG);
+	GetOptions(\%Args, 'help', 'debug',
+					   'gui|ui:s',
+					   'function|export:s');
+
+# Print the help - for now, this is just perldoc
+	if ($Args{help}) {
+		exec("perldoc $0");
+	}
+
+	if ($Args{function}) {
+		print "function: $Args{function}\n\n";
+		exit;
+	}
+
+	if ($Args{ui}) {
+		print "ui: $Args{ui}\n\n";
+		exit;
+	}
+
+# Find out which encoders are available to use
+	our @Functions;
+	push @Functions, export_SVCD->new,
+					 export_NUV_SQL->new,
+					 export_DivX->new,
+					 export_WMV->new,
+					 export_VCD->new;
+
+# Set up the signal handlers
+	$SIG{INT}  = \&utils::Quit;
+	$SIG{QUIT} = \&utils::Quit;
+
+# Read the mysql.txt file in use by MythTV.
+# could be in a couple places, so try the usual suspects
+	open(CONF, "/usr/share/mythtv/mysql.txt")
+		or open(CONF, "/usr/local/share/mythtv/mysql.txt")
+		or die ("Unable to open /usr/share/mythtv/mysql.txt:  $!\n\n");
+	while (my $line = <CONF>) {
+		chomp($line);
+		$line =~ s/^str //;
+		my ($var, $val) = split(/\=/, $line, 2);
+		next unless ($var && $var =~ /\w/);
+		if ($var eq 'DBHostName') {
+			$db_host = $val;
+		}
+		elsif ($var eq 'DBUserName') {
+			$db_user = $val;
+		}
+		elsif ($var eq 'DBName') {
+			$db_name = $val;
+		}
+		elsif ($var eq 'DBPassword') {
+			$db_pass = $val;
+		}
+	}
+	close CONF;
+
+# Connect to the database
+	my $dbh = DBI->connect("dbi:mysql:database=$db_name:host=$db_host", $db_user, $db_pass)
+		or die "Cannot connect to database: $!\n\n";
+
+# Get the hostname of this machine
+	my $hostname = `hostname`;
+	chomp($hostname);
+
+# Find the directory where the recordings are located, and grab all of the filenames
+	my $q = "SELECT data FROM settings WHERE value='RecordFilePrefix' AND hostname=?";
+	my $sh = $dbh->prepare($q);
+		$sh->execute($hostname) or die "Could not execute ($q):  $!\n\n";
+	our ($video_dir) = $sh->fetchrow_array;
+	die "This host not configured for myth.\n\n" unless ($video_dir);
+	die "Recordings directory $video_dir doesn't exist!\n\n" unless (-d $video_dir);
+	opendir(DIR, $video_dir) or die "Can't open $video_dir:  $!\n\n";
+	my @Files = grep /\.nuv$/, readdir(DIR);
+	closedir DIR;
+	die "No recordings found!\n\n" unless (@Files);
+
+# Parse out the record data for each file
+	our %Shows;
+	$q = "SELECT title, subtitle, description, hostname, cutlist FROM recorded WHERE chanid=? AND starttime=? AND endtime=?";
+	$sh = $dbh->prepare($q);
+	foreach $file (@Files) {
+		next unless ($file =~ /\.nuv$/);
+	# Pull out the various parts that make up the filename
+		($channel,
+			$syear, $smonth, $sday, $shour, $sminute, $ssecond,
+			$eyear, $emonth, $eday, $ehour, $eminute, $esecond) = $file =~/^([a-z0-9]+)_(....)(..)(..)(..)(..)(..)_(....)(..)(..)(..)(..)(..)\.nuv$/i;
+	# Found a bad filename?
+		unless ($channel) {
+			print "Unknown filename format:  $file\n";
+			next;
+		}
+	# Execute the query
+		$sh->execute($channel, "$syear$smonth$sday$shour$sminute$ssecond", "$eyear$emonth$eday$ehour$eminute$esecond")
+			or die "Could not execute ($q):  $!\n\n";
+		my ($show, $episode, $description, $show_hostname, $cutlist) = $sh->fetchrow_array;
+	# Unknown file - someday we should report this
+		next unless ($show);
+	#$description =~ s/(?:''|``)/"/sg;
+		push @{$Shows{$show}}, {'filename'       => $file,
+								'channel'        => $channel,
+								'start_time'     => "$syear$smonth$sday$shour$sminute$ssecond",
+								'end_time'       => "$eyear$emonth$eday$ehour$eminute$esecond",
+								'start_time_sep' => "$syear-$smonth-$sday-$shour-$sminute-$ssecond",
+								'show_name'      => $show,
+								'title'          => ($episode or 'Untitled'),
+								'description'    => ($description or 'No Description'),
+								'hostname'       => $show_hostname,
+								'cutlist'        => $cutlist,
+								'showtime'       => utils::generate_showtime($syear, $smonth, $sday, $shour, $sminute, $ssecond)};
+	}
+	$sh->finish();
+
+# We now have a hash of show names, containing an array of episodes
+# We should probably do some sorting by timestamp (and also count how many shows there are)
+	our $num_shows = 0;
+	foreach $show (sort keys %Shows) {
+		@{$Shows{$show}} = sort {$a->{start_time} <=> $b->{start_time} || $a->{channel} <=> $b->{channel}} @{$Shows{$show}};
+		$num_shows++;
+	}
+
+# No shows found?
+	die 'Found '.@Files." files, but no matching database entries.\n\n" unless ($num_shows);
+
+# Load the chosen gui
+	our $gui = GUI_text->new;
+	$gui->main_loop;
+
+# Exit gracefully, in case we might accidentally execute some code below
+	utils::Quit();
+
+	#####
+	##  Function classes go here
+	#####
+
+package export_SVCD;
+
+	sub new {
+		my $class = shift;
+		my $self  = {
+					 'name'            => 'Export to SVCD',
+					 'enabled'         => 1,
+					 'started'         => 0,
+					 'fifodir'         => "fifodir.$$",
+					 'children'        => [],
+					 'errors'          => undef,
+					 'episode'         => undef,
+					 'savepath'        => '.',
+					 'outfile'         => 'out.mpg',
+					 'tmp_a'           => 'out.mp2',
+					 'tmp_v'           => 'out.m2v',
+					 'use_cutlist'     => 0,
+					 'a_bitrate'       => 192,
+					 'v_bitrate'       => 2500,
+					 'quantisation'    => 5,		# 4 through 6 is probably right...
+					 'noise_reduction' => 1,
+					 @_		#allows user-specified attributes to override the defaults
+					};
+		bless($self, $class);
+	# Make sure that we have an mp2 encoder
+		$Prog{mp2_encoder} = utils::find_program('toolame', 'mp2enc');
+		push @{$self->{errors}}, 'You need toolame or mp2enc to export an svcd.' unless ($Prog{mp2_encoder});
+	# Make sure that we have an mplexer
+		$Prog{mplexer} = utils::find_program('tcmplex', 'mplex');
+		push @{$self->{errors}}, 'You need tcmplex or mplex to export an svcd.' unless ($Prog{mplexer});
+	# Make sure that we have the other necessary programs
+		utils::find_program('mpeg2enc')
+			or push @{$self->{errors}}, 'You need mpeg2enc to export an svcd.';
+		utils::find_program('yuvscaler')
+			or push @{$self->{errors}}, 'You need yuvscaler to export an svcd.';
+	# Do we have yuvdenoise?
+		$Prog{yuvdenoise} = utils::find_program('yuvdenoise');
+	# Any errors?  disable this function
+		$self->{enabled} = 0 if ($self->{errors} && @{$self->{errors}} > 0);
+	# Return
+		return $self;
+	}
+
+	sub gather_data {
+		my $self    = shift;
+		my $default_filename = '';
+	# Get the save path
+		$self->{savepath} = $gui->query_savepath();
+	# Ask the user for the filename
+		if($self->{episode}->{show_name} ne 'Untitled' and $self->{episode}->{title} ne 'Untitled')
+		{
+			$default_filename = $self->{episode}->{show_name}.' - '.$self->{episode}->{title};
+		}
+		elsif($self->{episode}->{show_name} ne 'Untitled')
+		{
+			$default_filename = $self->{episode}->{show_name};
+		}
+		elsif($self->{episode}->{title} ne 'Untitled')
+		{
+			$default_filename = $self->{episode}->{title};
+		}
+
+		$self->{outfile} = $gui->query_filename($default_filename, 'mpg', $self->{savepath});
+	# Ask the user if he/she wants to use the cutlist
+		if ($self->{episode}->{cutlist} && $self->{episode}->{cutlist} =~ /\d/) {
+			$self->{use_cutlist} = $gui->query_text('Enable Myth cutlist?',
+													'yesno',
+													$self->{use_cutlist} ? 'Yes' : 'No');
+		}
+		else {
+			$gui->notify('No cutlist found.  Hopefully this means that you already removed the commercials.');
+		}
+	# Ask the user what audio bitrate he/she wants
+		my $a_bitrate = $gui->query_text('Audio bitrate?',
+										 'int',
+										 $self->{a_bitrate});
+		while ($a_bitrate < 64 && $a_bitrate > 384) {
+			if ($a_bitrate < 64) {
+				$gui->notify('Too low; please choose a bitrate >= 64.');
+			}
+			elsif ($a_bitrate > 384) {
+				$gui->notify('Too high; please choose a bitrate <= 384.');
+			}
+			$a_bitrate = $gui->query_text('Audio bitrate?',
+										  'int',
+										  $self->{a_bitrate});
+		}
+		$self->{a_bitrate} = $a_bitrate;
+	# Ask the user what video bitrate he/she wants, or calculate the max bitrate (2756 max, though we round down a bit since some dvd players can't handle the max)
+	# Then again, mpeg2enc seems to have trouble with bitrates > 2500
+		$self->{v_bitrate} = 2742 - $self->{a_bitrate} ? 2500 : 2742 - $self->{a_bitrate};
+		my $v_bitrate = $gui->query_text('Maximum video bitrate for VBR?',
+										 'int',
+										 $self->{v_bitrate});
+		while ($v_bitrate < 1000 && $v_bitrate > $max_v_bitrate) {
+			if ($v_bitrate < 1000) {
+				$gui->notify('Too low; please choose a bitrate >= 1000.');
+			}
+			elsif ($v_bitrate > $max_v_bitrate) {
+				$gui->notify("Too high; please choose a bitrate <= $self->{v_bitrate}.");
+			}
+			$v_bitrate = $gui->query_text('Maximum video bitrate for VBR?',
+										  'int',
+										  $self->{v_bitrate});
+		}
+		$self->{v_bitrate} = $v_bitrate;
+	# Ask the user what vbr quality (quantisation) he/she wants - 2..31
+		my $quantisation = $gui->query_text('VBR quality/quantisation (2-31)?', 'float', $self->{quantisation});
+		while ($quantisation < 2 && $quantisation > 31) {
+			if ($quantisation < 2) {
+				print "Too low; please choose a number between 2 and 31.\n";
+			}
+			elsif ($quantisation > 31) {
+				print "Too high; please choose a number between 2 and 31\n";
+			}
+			$quantisation = $gui->query_text('VBR quality/quantisation (2-31)?',
+											 'float',
+											 $self->{quantisation});
+		}
+		$self->{quantisation} = $quantisation;
+	# Ask the user what vbr quality (quantisation) he/she wants - 2..31
+		if ($Prog{yuvdenoise}) {
+			$self->{noise_reduction} = $gui->query_text('Enable noise reduction (slower, but better results)?',
+														'yesno',
+														$self->{noise_reduction} ? 'Yes' : 'No');
+		}
+		else {
+			$gui->notify('Couldn\'t find yuvdenoise.  Please install it if you want noise reduction.');
+		}
+	# Do we want bin/cue files, or just an mpeg?
+		# nothing, at the moment.
+	}
+
+	sub execute {
+		my $self = shift;
+	# make sure that the fifo dir is clean
+		if (-e "$self->{fifodir}/vidout" || -e "$self->{fifodir}/audout") {
+			die "Possibly stale mythtranscode fifo's in $self->{fifodir}.\nPlease remove them before running nuvexport.\n\n";
+		}
+	# Gather any necessary data
+		$self->{episode} = shift;
+		$self->gather_data;
+	# Load nuv info
+		my %nuv_info = utils::nuv_info($self->{episode}->{filename});
+	# Set this to true so that the cleanup routine actually runs
+		$self->{started} = 1;
+	# Create a directory for mythtranscode's fifo's
+		unless (-d $self->{fifodir}) {
+			mkdir($self->{fifodir}, 0755) or die "Can't create $self->{fifodir}:  $!\n\n";
+		}
+	# Generate some names for the temporary audio and video files
+		($self->{tmp_a} = $self->{episode}->{filename}) =~ s/\.nuv$/.mp2/;
+		($self->{tmp_v} = $self->{episode}->{filename}) =~ s/\.nuv$/.m2v/;
+	# Here, we have to fork off a copy of mythtranscode
+		my $command = "nice -n 19 mythtranscode -p autodetect -c $self->{episode}->{channel} -s $self->{episode}->{start_time_sep} -f $self->{fifodir} --fifosync";
+		$command .= ' --honorcutlist' if ($self->{use_cutlist});
+		if ($DEBUG) {
+			print "\nmythtranscode command:\n\n$command\n";
+		}
+		else {
+			push @{$self->{children}}, utils::fork_command($command);
+		}
+	# Sleep a bit to let mythtranscode start up
+		if (!$DEBUG) {
+			my $overload = 0;
+			while (++$overload < 30 && !(-e "$self->{fifodir}/audout" && -e "$self->{fifodir}/vidout")) {
+				sleep 1;
+				print "Waiting for mythtranscode to set up the fifos.\n";
+			}
+			unless (-e "$self->{fifodir}/audout" && -e "$self->{fifodir}/vidout") {
+				die "Waited too long for mythtranscode to create its fifos.  Please try again.\n\n";
+			}
+		}
+	# Now we fork off a process to encode the audio
+		if ($Prog{mp2_encoder} =~ /\btoolame$/) {
+			$sample = $nuv_info{audio_sample_rate} / 1000;
+			$command = "nice -n 19 toolame -s $sample -m j -b $self->{a_bitrate} $self->{fifodir}/audout $self->{tmp_a}";
+		}
+		else {
+			$command = "nice -n 19 ffmpeg -f s16le -ar $nuv_info{audio_sample_rate} -ac 2 -i $self->{fifodir}/audout -vn -f wav -"
+					  ." | nice -n 19 mp2enc -b $self->{a_bitrate} -r $nuv_info{audio_sample_rate} -s -o $self->{tmp_a}";
+		}
+		if ($DEBUG) {
+			print "\ntoolame command:\n\n$command\n";
+		}
+		else {
+			push @{$self->{children}}, utils::fork_command($command);
+		}
+	# And lastly, we fork off a process to encode the video
+	# Multiple CPU's?  Let's multiprocess
+		$cpus = utils::num_cpus();
+	# pulldown does NOT work - keeps complaining about unsupport fps even when it's already set to 29.97
+		#my $pulldown = 0;
+	# Build the command to rescale the image and encode the video
+		my $framerate;
+		$command = "nice -n 19 ffmpeg -f rawvideo -s $nuv_info{width}x$nuv_info{height} -r $nuv_info{fps} -i $self->{fifodir}/vidout -f yuv4mpegpipe -";
+	# Certain options for PAL
+		if ($nuv_info{fps} =~ /^2(?:5|4\.9)/) {
+			$command .= " | nice -n 19 yuvdenoise -r 16" if ($self->{noise_reduction});
+			$command .= " | nice -n 19 yuvscaler -v 0 -n p -M BICUBIC -O SVCD";
+			$framerate = 3;
+		}
+	# Other options for NTSC
+		else {
+			# SOMEDAY I'd like to be able to get 3:2 pulldown working properly....
+			#$command .= " | yuvkineco -F 1" if ($pulldown);
+			$command .= " | nice -n 19 yuvdenoise -r 16" if ($self->{noise_reduction});
+			$command .= " | nice -n 19 yuvscaler -v 0 -n n -M BICUBIC -O SVCD";
+			$framerate = 4;
+		}
+	# Finish building $command, and execute it
+		$command .= " | nice -n 19 mpeg2enc --format 5 --quantisation $self->{quantisation} --quantisation-reduction 2"
+					." --video-bitrate $self->{v_bitrate} --aspect 2 --frame-rate $framerate"
+					#.($pulldown ? ' --frame-rate 1 --3-2-pulldown' : " --frame-rate $framerate")
+					." --interlace-mode 1 --motion-search-radius 24 --video-buffer 230"
+					." --nonvideo-bitrate $self->{a_bitrate} --sequence-length 795"
+					." --reduction-4x4 1 --reduction-2x2 1 --keep-hf"
+					.($cpus > 1 ? " --multi-thread $cpus" : '')
+					." -o $self->{tmp_v}";
+		if ($DEBUG) {
+			print "\nmpeg2enc command:\n\n$command\n";
+		}
+		else {
+			push @{$self->{children}}, utils::fork_command($command);
+		}
+	# Wait for child processes to finish
+		1 while (wait > 0);
+		$self->{children} = undef;
+	# Multiplex the streams
+		my $safe_outfile = utils::shell_escape($self->{outfile});
+		if ($Prog{mplexer} =~ /\btcmplex$/) {
+			$command = "nice -n 19 tcmplex -m s -i $self->{tmp_v} -p $self->{tmp_a} -o $safe_outfile";
+		}
+		else {
+			$command = "nice -n 19 mplex -f 5 $self->{tmp_v} $self->{tmp_a} -o $safe_outfile";
+		}
+		if ($DEBUG) {
+			print "\nmultiplex command:\n\n$command\n\n";
+			exit;
+		}
+		system($command);
+	}
+
+	sub cleanup {
+		my $self = shift;
+		return unless ($self->{started});
+	# Make sure any child processes also go away
+		if ($self->{children} && @{$self->{children}}) {
+			foreach my $child (@{$self->{children}}) {
+				kill('INT', $child);
+			}
+			1 while (wait > 0);
+		}
+	# Remove any temporary files
+		foreach my $file ("$self->{fifodir}/audout", "$self->{fifodir}/vidout", $self->{tmp_a}, $self->{tmp_v}) {
+			unlink $file if (-e $file);
+		}
+		rmdir $self->{fifodir} if (-e $self->{fifodir});
+	}
+
+package export_NUV_SQL;
+
+	use File::Copy;
+
+	sub new {
+		my $class = shift;
+		my $self  = {
+					 'name'     => 'Extract .nuv and .sql',
+					 'enabled'  => 1,
+					 'errors'   => undef,
+					 'episode'  => undef,
+					 'savepath' => '.',
+					 'sql_file' => undef,
+					 'copy'     => undef,
+					 @_		#allows user-specified attributes to override the defaults
+					};
+		bless($self, $class);
+	# Return
+		return $self;
+	}
+
+	sub gather_data {
+		my $self = shift;
+	# Make sure the user knows what he/she is doing
+		my $copy = 0;
+
+		if($gui->query_text("\nYou have chosen to extract the .nuv.\n"
+			."This will extract it from the MythTV database into .nuv and .sql \n"
+			."files to import into another MythTV installation.\n"
+			# Make sure the user made the correct choice
+			."Do you want to removed it from this server when finished?",
+			'yesno',
+			'Yes'))
+		{
+			if($gui->query_text("\nAre you sure you want to remove it from this server?",
+				'yesno',
+				'Yes'))
+			{
+				$self->{copy}=0;
+			}
+			else
+			{
+				$self->{copy}=1;
+			}
+		}
+		else
+		{
+			$self->{copy}=1;
+		}
+
+	# Get the savepath
+		$self->{savepath} = $gui->query_savepath();
+	}
+
+	sub execute {
+		my $self = shift;
+	# Gather any necessary data
+		$self->{episode} = shift;
+		$self->gather_data;
+	# Start saving
+		($self->{sql_file} = $self->{episode}->{filename}) =~ s/\.nuv$/.sql/si;
+		open(DATA, ">$self->{savepath}/$self->{sql_file}") or die "Can't create $self->{savepath}/$self->{sql_file}:  $!\n\n";
+	# Define some query-related variables
+		my ($q, $sh);
+	# Load and save the related database info
+		print DATA "USE mythconverg;\n\n";
+		foreach $table ('recorded', 'oldrecorded', 'recordedmarkup') {
+			$q = "SELECT * FROM $table WHERE chanid=? AND starttime=?";
+			$sh = $dbh->prepare($q);
+			$sh->execute($self->{episode}->{channel}, $self->{episode}->{start_time})
+				or die "Count not execute ($q):  $!\n\n";
+			my $count = 0;
+			my @keys = undef;
+			while (my $row = $sh->fetchrow_hashref) {
+			# First row - let's add the insert statement;
+				if ($count++ == 0) {
+					@keys = keys(%$row);
+					print DATA "INSERT INTO $table (", join(', ', @keys), ") VALUES\n\t(";
+				}
+				else {
+					print DATA ",\n\t(";
+				}
+			# Print the data
+				my $count2 = 0;
+				foreach $key (@keys) {
+					print DATA ', ' if ($count2++);
+					print DATA utils::mysql_escape($row->{$key});
+				}
+				print DATA ')';
+			}
+			print DATA ";\n\n";
+		}
+	# Done savig the database info
+		close DATA;
+	# Rename/move the file
+		print "copy=$self->{copy}\n";
+		if($self->{copy}==1)
+		{
+			$gui->notify("\nCopying $video_dir/$self->{episode}->{filename} to $self->{savepath}/$self->{episode}->{filename}\n");
+			copy("$video_dir/$self->{episode}->{filename}", "$self->{savepath}/$self->{episode}->{filename}")
+				or die "Couldn't copy specified .nuv file:  $!\n\n";
+		}
+		else
+		{
+			$gui->notify("\nMoving $video_dir/$self->{episode}->{filename} to $self->{savepath}/$self->{episode}->{filename}\n");
+			move("$video_dir/$self->{episode}->{filename}", "$self->{savepath}/$self->{episode}->{filename}")
+				or die "Couldn't move specified .nuv file:  $!\n\n";
+			# Remove the entry from recordedmarkup
+			$q = 'DELETE FROM recordedmarkup WHERE chanid=? AND starttime=?';
+			$sh = $dbh->prepare($q);
+			$sh->execute($self->{episode}->{channel}, $self->{episode}->{start_time})
+				or die "Could not execute ($q):  $!\n\n";
+			# Remove this entry from the database
+			$q = 'DELETE FROM recorded WHERE chanid=? AND starttime=? AND endtime=?';
+			$sh = $dbh->prepare($q);
+			$sh->execute($self->{episode}->{channel}, $self->{episode}->{start_time}, $self->{episode}->{end_time})
+				or die "Could not execute ($q):  $!\n\n";
+			# Tell the other nodes that changes have been made
+			$q = 'UPDATE settings SET data="yes" WHERE value="RecordChanged"';
+			$sh = $dbh->prepare($q);
+			$sh->execute()
+				or die "Could not execute ($q):  $!\n\n";
+		}
+	}
+
+	sub cleanup {
+		# Nothing to do here
+	}
+
+package export_VCD;
+
+	sub new {
+		my $class = shift;
+		my $self  = {
+					 'name'            => 'Export to VCD',
+					 'enabled'         => 1,
+					 'started'         => 0,
+					 'fifodir'         => "fifodir.$$",
+					 'children'        => [],
+					 'errors'          => undef,
+					 'episode'         => undef,
+					 'savepath'        => '.',
+					 'outfile'         => 'out.mpg',
+					 'tmp_a'           => 'out.mp2',
+					 'tmp_v'           => 'out.m2v',
+					 'use_cutlist'     => 0,
+					 'noise_reduction' => 1,
+					 @_		#allows user-specified attributes to override the defaults
+					};
+		bless($self, $class);
+	# Make sure that we have an mp2 encoder
+		$Prog{mp2_encoder} = utils::find_program('toolame', 'mp2enc');
+		push @{$self->{errors}}, 'You need toolame or mp2enc to export an svcd.' unless ($Prog{mp2_encoder});
+	# Make sure that we have an mplexer
+		$Prog{mplexer} = utils::find_program('tcmplex', 'mplex');
+		push @{$self->{errors}}, 'You need tcmplex or mplex to export an svcd.' unless ($Prog{mplexer});
+	# Any errors?  disable this function
+		$self->{enabled} = 0 if ($self->{errors} && @{$self->{errors}} > 0);
+	# Return
+		return $self;
+	}
+
+	sub gather_data {
+		my $self    = shift;
+		my $default_filename;
+	# Get the save path
+		$self->{savepath} = $gui->query_savepath();
+	# Ask the user for the filename
+		if($self->{episode}->{show_name} ne 'Untitled' and $self->{episode}->{title} ne 'Untitled')
+		{
+			$default_filename = $self->{episode}->{show_name}.' - '.$self->{episode}->{title};
+		}
+		elsif($self->{episode}->{show_name} ne 'Untitled')
+		{
+			$default_filename = $self->{episode}->{show_name};
+		}
+		elsif($self->{episode}->{title} ne 'Untitled')
+		{
+			$default_filename = $self->{episode}->{title};
+		}
+
+		$self->{outfile} = $gui->query_filename($default_filename, 'mpg', $self->{savepath});
+	# Ask the user if he/she wants to use the cutlist
+		if ($self->{episode}->{cutlist} && $self->{episode}->{cutlist} =~ /\d/) {
+			$self->{use_cutlist} = $gui->query_text('Enable Myth cutlist?',
+													'yesno',
+													$self->{use_cutlist} ? 'Yes' : 'No');
+		}
+		else {
+			$gui->notify('No cutlist found.  Hopefully this means that you already removed the commercials.');
+		}
+	# Ask the user if he/she wants noise reduction
+		$self->{noise_reduction} = $gui->query_text('Enable noise reduction (slower, but better results)?',
+													'yesno',
+													$self->{noise_reduction} ? 'Yes' : 'No');
+	# Do we want bin/cue files, or just an mpeg?
+		# nothing, at the moment.
+	}
+
+	sub execute {
+		my $self = shift;
+	# make sure that the fifo dir is clean
+		if (-e "$self->{fifodir}/vidout" || -e "$self->{fifodir}/audout") {
+			die "Possibly stale mythtranscode fifo's in $self->{fifodir}.\nPlease remove them before running nuvexport.\n\n";
+		}
+	# Gather any necessary data
+		$self->{episode} = shift;
+		$self->gather_data;
+	# Load nuv info
+		my %nuv_info = utils::nuv_info($self->{episode}->{filename});
+	# Set this to true so that the cleanup routine actually runs
+		$self->{started} = 1;
+	# Create a directory for mythtranscode's fifo's
+		unless (-d $self->{fifodir}) {
+			mkdir($self->{fifodir}, 0755) or die "Can't create $self->{fifodir}:  $!\n\n";
+		}
+	# Generate some names for the temporary audio and video files
+		($self->{tmp_a} = $self->{episode}->{filename}) =~ s/\.nuv$/.mp2/;
+		($self->{tmp_v} = $self->{episode}->{filename}) =~ s/\.nuv$/.m1v/;
+	# Here, we have to fork off a copy of mythtranscode
+		my $command = "nice -n 19 mythtranscode -p autodetect -c $self->{episode}->{channel} -s $self->{episode}->{start_time_sep} -f $self->{fifodir} --fifosync";
+		$command .= ' --honorcutlist' if ($self->{use_cutlist});
+		push @{$self->{children}}, utils::fork_command($command);
+	# Sleep a bit to let mythtranscode start up
+		my $overload = 0;
+		while (++$overload < 30 && !(-e "$self->{fifodir}/audout" && -e "$self->{fifodir}/vidout")) {
+			sleep 1;
+			print "Waiting for mythtranscode to set up the fifos.\n";
+		}
+		unless (-e "$self->{fifodir}/audout" && -e "$self->{fifodir}/vidout") {
+			die "Waited too long for mythtranscode to create its fifos.  Please try again.\n\n";
+		}
+	# Now we fork off a process to encode the audio
+		if ($Prog{mp2_encoder} =~ /\btoolame$/) {
+			$sample = $nuv_info{audio_sample_rate} / 1000;
+			$command = "nice -n 19 toolame -s $sample -m j -b 192 $self->{fifodir}/audout $self->{tmp_a}";
+		}
+		else {
+			$command = "nice -n 19 ffmpeg -f s16le -ar $nuv_info{audio_sample_rate} -ac 2 -i $self->{fifodir}/audout -vn -f wav -"
+					  ." | nice -n 19 mp2enc -b 192 -r $nuv_info{audio_sample_rate} -s -o $self->{tmp_a}";
+		}
+		push @{$self->{children}}, utils::fork_command($command);
+	# And lastly, we fork off a process to encode the video
+	# Multiple CPU's?  Let's multiprocess
+		$cpus = utils::num_cpus();
+	# pulldown does NOT work - keeps complaining about unsupport fps even when it's already set to 29.97
+		#my $pulldown = 0;
+	# Build the command to rescale the image and encode the video
+		my $framerate;
+		$command = "nice -n 19 ffmpeg -f rawvideo -s $nuv_info{width}x$nuv_info{height} -r $nuv_info{fps} -i $self->{fifodir}/vidout -f yuv4mpegpipe -";
+	# Certain options for PAL
+		if ($nuv_info{fps} =~ /^2(?:5|4\.9)/) {
+			$command .= " | nice -n 19 yuvdenoise -r 16" if ($self->{noise_reduction});
+			$command .= " | nice -n 19 yuvscaler -v 0 -n p -M BICUBIC -O VCD";
+			$framerate = 3;
+		}
+	# Other options for NTSC
+		else {
+			# SOMEDAY I'd like to be able to get 3:2 pulldown working properly....
+			#$command .= " | yuvkineco -F 1" if ($pulldown);
+			$command .= " | nice -n 19 yuvdenoise -r 16" if ($self->{noise_reduction});
+			$command .= " | nice -n 19 yuvscaler -v 0 -n n -O VCD";
+			$framerate = 4;
+		}
+	# Finish building $command, and execute it
+		$command .= " | nice -n 19 mpeg2enc --format 1 --quantisation-reduction 2"
+					." --frame-rate $framerate -n n"
+					#.($pulldown ? ' --frame-rate 1 --3-2-pulldown' : " --frame-rate $framerate")
+					." --sequence-length 600"
+					." --reduction-4x4 1 --reduction-2x2 1 --keep-hf"
+					.($cpus > 1 ? " --multi-thread $cpus" : '')
+					." -o $self->{tmp_v}";
+		push @{$self->{children}}, utils::fork_command($command);
+	# Wait for child processes to finish
+		1 while (wait > 0);
+		$self->{children} = undef;
+	# Multiplex the streams
+		my $safe_outfile = utils::shell_escape($self->{outfile});
+		if ($Prog{mplexer} =~ /\btcmplex$/) {
+			system("nice -n 19 tcmplex -m v -i $self->{tmp_v} -p $self->{tmp_a} -o $safe_outfile");
+		}
+		else {
+			system("nice -n 19 mplex -f 1 $self->{tmp_v} $self->{tmp_a} -o $safe_outfile");
+		}
+	}
+
+	sub cleanup {
+		my $self = shift;
+		return unless ($self->{started});
+	# Make sure any child processes also go away
+		if ($self->{children} && @{$self->{children}}) {
+			foreach my $child (@{$self->{children}}) {
+				kill('INT', $child);
+			}
+			1 while (wait > 0);
+		}
+	# Remove any temporary files
+		foreach my $file ("$self->{fifodir}/audout", "$self->{fifodir}/vidout", $self->{tmp_a}, $self->{tmp_v}) {
+			unlink $file if (-e $file);
+		}
+		rmdir $self->{fifodir} if (-e $self->{fifodir});
+	}
+
+
+package export_DivX;
+
+	sub new {
+		my $class = shift;
+		my $self  = {
+					 'name'        => 'Export DivX',
+					 'enabled'     => 1,
+					 'errors'      => undef,
+					 'episode'     => undef,
+					 'savepath'    => '.',
+					 'outfile'     => 'out.avi',
+					 'use_cutlist' => 0,
+					 'a_bitrate'   => 64,
+					 'v_bitrate'   => 256,
+					 'h_res'       => 320,
+					 'v_res'       => 240,
+					 'sql_file' => undef,
+					 @_		#allows user-specified attributes to override the defaults
+					};
+		bless($self, $class);
+	# Return
+		return $self;
+	}
+
+	sub gather_data {
+		my $self    = shift;
+		my $default_filename;
+	# Get the save path
+		$self->{savepath} = $gui->query_savepath();
+	# Ask the user for the filename
+		if($self->{episode}->{show_name} ne 'Untitled' and $self->{episode}->{title} ne 'Untitled')
+		{
+			$default_filename = $self->{episode}->{show_name}.' - '.$self->{episode}->{title};
+		}
+		elsif($self->{episode}->{show_name} ne 'Untitled')
+		{
+			$default_filename = $self->{episode}->{show_name};
+		}
+		elsif($self->{episode}->{title} ne 'Untitled')
+		{
+			$default_filename = $self->{episode}->{title};
+		}
+
+		$self->{outfile} = $gui->query_filename($default_filename, 'avi', $self->{savepath});
+	# Ask the user if he/she wants to use the cutlist
+		if ($self->{episode}->{cutlist} && $self->{episode}->{cutlist} =~ /\d/) {
+			$self->{use_cutlist} = $gui->query_text('Enable Myth cutlist?',
+													'yesno',
+													$self->{use_cutlist} ? 'Yes' : 'No');
+		}
+		else {
+			$gui->notify('No cutlist found.  Hopefully this means that you already removed the commercials.');
+		}
+	# Ask the user what audio bitrate he/she wants
+		my $a_bitrate = $gui->query_text('Audio bitrate?',
+										 'int',
+										 $self->{a_bitrate});
+		$self->{a_bitrate} = $a_bitrate;
+	# Ask the user what video bitrate he/she wants
+		my $v_bitrate = $gui->query_text('Video bitrate?',
+										 'int',
+										 $self->{v_bitrate});
+		$self->{v_bitrate} = $v_bitrate;
+	# Ask the user what horiz res he/she wants
+		my $h_res = $gui->query_text('Horizontal resolution?', 'int', $self->{h_res});
+		$self->{h_res} = $h_res;
+	# Ask the user what vert res he/she wants
+		my $v_res = $gui->query_text('Vertical resolution?', 'int', $self->{v_res});
+		$self->{v_res} = $v_res;
+	}
+
+	sub execute {
+		my $self = shift;
+	# make sure that the fifo dir is clean
+		if (-e 'fifodir/vidout' || -e 'fifodir/audout') {
+			die "Possibly stale mythtranscode fifo's in fifodir.\nPlease remove them before running nuvexport.\n\n";
+		}
+	# Gather any necessary data
+		$self->{episode} = shift;
+		$self->gather_data;
+	# Load nuv info
+		my %nuv_info = utils::nuv_info($self->{episode}->{filename});
+	# Set this to true so that the cleanup routine actually runs
+		$self->{started} = 1;
+	# Create a directory for mythtranscode's fifo's
+		unless (-d 'fifodir') {
+			mkdir('fifodir', 0755) or die "Can't create fifodir:  $!\n\n";
+		}
+	# Here, we have to fork off a copy of mythtranscode
+		my $command = "nice -n 19 mythtranscode -p autodetect -c $self->{episode}->{channel} -s $self->{episode}->{start_time_sep} -f fifodir";
+		$command .= ' --honorcutlist' if ($self->{use_cutlist});
+		push @{$self->{children}}, utils::fork_command($command);
+	# Sleep a bit to let mythtranscode start up
+		my $overload = 0;
+		while (++$overload < 30 && !(-e 'fifodir/audout' && -e 'fifodir/vidout')) {
+			sleep 1;
+			print "Waiting for mythtranscode to set up the fifos.\n";
+		}
+		unless (-e 'fifodir/audout' && -e 'fifodir/vidout') {
+			die "Waited too long for mythtranscode to create its fifos.  Please try again.\n\n";
+		}
+	# Now we fork off a process to encode everything
+		$safe_outfile = utils::shell_escape($self->{outfile});
+		$command = "nice -n 19 ffmpeg -y -f s16le -ar $nuv_info{audio_sample_rate} -ac 2 -i fifodir/audout -f rawvideo -s $nuv_info{width}x$nuv_info{height} -r $nuv_info{fps} -i fifodir/vidout -b $self->{v_bitrate} -ab $self->{a_bitrate} -s $self->{h_res}x$self->{v_res} $safe_outfile";
+		push @{$self->{children}}, utils::fork_command($command);
+	# Wait for child processes to finish
+		1 while (wait > 0);
+		$self->{children} = undef;
+	}
+
+	sub cleanup {
+		my $self = shift;
+		return unless ($self->{started});
+	# Make sure any child processes also go away
+		if ($self->{children} && @{$self->{children}}) {
+			foreach my $child (@{$self->{children}}) {
+				kill('INT', $child);
+			}
+			1 while (wait > 0);
+		}
+	# Remove any temporary files
+		foreach my $file ('fifodir/audout', 'fifodir/vidout') {
+			unlink $file if (-e $file);
+		}
+		rmdir 'fifodir' if (-e 'fifodir');
+	}
+
+package export_WMV;
+
+	sub new {
+		my $class = shift;
+		my $self  = {
+					 'name'     => 'Export WMV',
+					 'enabled'  => 1,
+					 'errors'   => undef,
+					 'episode'  => undef,
+					 'savepath' => '.',
+					 'outfile'         => 'out.wmv',
+					 'use_cutlist'     => 0,
+					 'a_bitrate'       => 64,
+					 'v_bitrate'       => 256,
+					 'h_res'       => 320,
+					 'v_res'       => 240,
+					 'sql_file' => undef,
+					 @_		#allows user-specified attributes to override the defaults
+					};
+		bless($self, $class);
+	# Any errors?  disable this function
+		$self->{enabled} = 0 if ($self->{errors} && @{$self->{errors}} > 0);
+	# Return
+		return $self;
+	}
+
+	sub gather_data {
+		my $self    = shift;
+		my $default_filename;
+	# Get the save path
+		$self->{savepath} = $gui->query_savepath();
+	# Ask the user for the filename
+		if($self->{episode}->{show_name} ne 'Untitled' and $self->{episode}->{title} ne 'Untitled')
+		{
+			$default_filename = $self->{episode}->{show_name}.' - '.$self->{episode}->{title};
+		}
+		elsif($self->{episode}->{show_name} ne 'Untitled')
+		{
+			$default_filename = $self->{episode}->{show_name};
+		}
+		elsif($self->{episode}->{title} ne 'Untitled')
+		{
+			$default_filename = $self->{episode}->{title};
+		}
+
+		$self->{outfile} = $gui->query_filename($default_filename, 'wmv', $self->{savepath});
+	# Ask the user if he/she wants to use the cutlist
+		if ($self->{episode}->{cutlist} && $self->{episode}->{cutlist} =~ /\d/) {
+			$self->{use_cutlist} = $gui->query_text('Enable Myth cutlist?',
+													'yesno',
+													$self->{use_cutlist} ? 'Yes' : 'No');
+		}
+		else {
+			$gui->notify('No cutlist found.  Hopefully this means that you already removed the commercials.');
+		}
+	# Ask the user what audio bitrate he/she wants
+		my $a_bitrate = $gui->query_text('Audio bitrate?',
+										 'int',
+										 $self->{a_bitrate});
+		$self->{a_bitrate} = $a_bitrate;
+	# Ask the user what video bitrate he/she wants
+		my $v_bitrate = $gui->query_text('Video bitrate?',
+										 'int',
+										 $self->{v_bitrate});
+		$self->{v_bitrate} = $v_bitrate;
+	# Ask the user what horiz res he/she wants
+		my $h_res = $gui->query_text('Horizontal resolution?', 'int', $self->{h_res});
+		$self->{h_res} = $h_res;
+	# Ask the user what vert res he/she wants
+		my $v_res = $gui->query_text('Vertical resolution?', 'int', $self->{v_res});
+		$self->{v_res} = $v_res;
+	}
+
+	sub execute {
+		my $self = shift;
+	# make sure that the fifo dir is clean
+		if (-e 'fifodir/vidout' || -e 'fifodir/audout') {
+			die "Possibly stale mythtranscode fifo's in fifodir.\nPlease remove them before running nuvexport.\n\n";
+		}
+	# Gather any necessary data
+		$self->{episode} = shift;
+		$self->gather_data;
+	# Load nuv info
+		my %nuv_info = utils::nuv_info($self->{episode}->{filename});
+	# Set this to true so that the cleanup routine actually runs
+		$self->{started} = 1;
+	# Create a directory for mythtranscode's fifo's
+		unless (-d 'fifodir') {
+			mkdir('fifodir', 0755) or die "Can't create fifodir:  $!\n\n";
+		}
+	# Here, we have to fork off a copy of mythtranscode
+		my $command = "nice -n 19 mythtranscode -p autodetect -c $self->{episode}->{channel} -s $self->{episode}->{start_time_sep} -f fifodir";
+		$command .= ' --honorcutlist' if ($self->{use_cutlist});
+		push @{$self->{children}}, utils::fork_command($command);
+	# Sleep a bit to let mythtranscode start up
+		my $overload = 0;
+		while (++$overload < 30 && !(-e 'fifodir/audout' && -e 'fifodir/vidout')) {
+			sleep 1;
+			print "Waiting for mythtranscode to set up the fifos.\n";
+		}
+		unless (-e 'fifodir/audout' && -e 'fifodir/vidout') {
+			die "Waited too long for mythtranscode to create its fifos.  Please try again.\n\n";
+		}
+	# Now we fork off a process to encode everything
+		$safe_outfile = utils::shell_escape($self->{outfile});
+		$command = "nice -n 19 ffmpeg -y -f s16le -ar $nuv_info{audio_sample_rate} -ac 2 -i fifodir/audout -f rawvideo -s $nuv_info{width}x$nuv_info{height} -r $nuv_info{fps} -i fifodir/vidout -b $self->{v_bitrate} -ab $self->{a_bitrate} -s $self->{h_res}x$self->{v_res} $safe_outfile";
+		push @{$self->{children}}, utils::fork_command($command);
+	# Wait for child processes to finish
+		1 while (wait > 0);
+		$self->{children} = undef;
+	}
+
+	sub cleanup {
+		my $self = shift;
+		return unless ($self->{started});
+	# Make sure any child processes also go away
+		if ($self->{children} && @{$self->{children}}) {
+			foreach my $child (@{$self->{children}}) {
+				kill('INT', $child);
+			}
+			1 while (wait > 0);
+		}
+	# Remove any temporary files
+		foreach my $file ('fifodir/audout', 'fifodir/vidout') {
+			unlink $file if (-e $file);
+		}
+		rmdir 'fifodir' if (-e 'fifodir');
+	}
+
+
+
+	#####
+	##  GUI Classes go here
+	#####
+
+package GUI_text;
+
+	use File::Path;
+
+	sub new {
+		my $class = shift;
+		my $self  = {
+					 'query_stage'    => 'show',
+					 'show_choice'    => '',
+					 'episode_choice' => undef,
+					 @_		#allows user-specified attributes to override the defaults
+					};
+		return bless($self, $class);
+	}
+
+	sub main_loop {
+		my $self = shift;
+	# Display the show list
+		while (1) {
+		# Clear the screen
+			system('clear');
+		# Stage "quit" means, well, quit...
+			last if ($self->stage eq 'quit');
+		# Are we asking the user which show to encode?
+			if (!$self->{show_choice} || $self->stage eq 'show') {
+				$self->query_shows;
+			}
+		# Nope.  What about the episode choice?
+			elsif (!$self->{episode_choice} || $self->stage eq 'episode') {
+				$self->query_episodes;
+			}
+		# Time to decide what we want to do?
+			elsif ($self->stage eq 'function') {
+				$self->query_functions;
+			}
+		}
+	}
+
+	sub query_shows {
+		my $self = shift;
+	# Build the query
+		my $query = "\nYou have recorded the following shows:\n\n";
+		my ($count, @show_choices);
+		foreach $show (sort keys %Shows) {
+			$count++;
+		# Print out this choice, adjusting space where necessary
+			$query .= '  ';
+			$query .= ' ' if ($num_shows > 10 && $count < 10);
+			$query .= ' ' if ($num_shows > 100 && $count < 100);
+			$query .= "$count. ";
+		# print out the name of this show, and an episode count
+			my $num_episodes = @{$Shows{$show}};
+			$query .= "$show ($num_episodes episode".($num_episodes == 1 ? '' : 's').")\n";
+			$show_choices[$count-1] = $show;
+		}
+		$query .= "\n  q. Quit\n\nChoose a show: ";
+	# Query the user
+		my $choice = $self->query_text($query, 'string', '');
+	# Quit?
+		return $self->stage('quit') if ($choice =~ /^\W*q/i);
+	# Move on to the next stage if the user chose a valid show
+		$choice =~ s/^\D*/0/s;	# suppress warnings
+		if ($choice > 0 && $show_choices[$choice-1]) {
+			$self->{show_choice} = $show_choices[$choice-1];
+			$self->stage('episode');
+		}
+	}
+
+	sub query_episodes {
+		my $self = shift;
+		my $num_episodes = @{$Shows{$self->{show_choice}}};
+	# Define a newline + whitespace so we can tab out extra lines of episode description
+		my $newline = "\n" . ' ' x (4 + length $num_episodes);
+	# Build the query
+		my $query = "\nYou have recorded the following episodes of $self->{show_choice}:\n\n";
+		my ($count, @episode_choices);
+		foreach $episode (@{$Shows{$self->{show_choice}}}) {
+			$count++;
+		# Print out this choice, adjusting space where necessary
+			$query .= '  ';
+			$query .= ' ' if ($num_episodes > 10 && $count < 10);
+			$query .= ' ' if ($num_episodes > 100 && $count < 100);
+			$query .= "$count. ";
+		# print out the name of this show, and an episode count
+			$query .= join($newline, "$episode->{title} ($episode->{showtime})",
+									 $episode->{description})."\n";
+			$episode_choices[$count-1] = $episode;
+		}
+		$query .= "\n  r. Return to shows menu\n  q. Quit\n\nChoose an episode: ";
+	# Query the user
+		my $choice = $self->query_text($query, 'string', '');
+	# Quit?
+		return $self->stage('quit') if ($choice =~ /^\W*q/i);
+	# Backing up a stage?
+		return $self->stage('show') if ($choice =~ /^\W*[rb]/i);
+	# Move on to the next stage if the user chose a valid episode
+		$choice =~ s/^\D*/0/s;	# suppress warnings
+		if ($choice > 0 && $episode_choices[$choice-1]) {
+			$self->{episode_choice} = $episode_choices[$choice-1];
+			$self->stage('function');
+		}
+	}
+
+	sub query_functions {
+		my $self = shift;
+	# Build the query
+		my $query = "What would you like to do with your recording?\n\n"
+				   ."         Show:  $self->{show_choice}\n"
+				   ."      Episode:  $self->{episode_choice}->{title}\n\n";
+	# What are our function options?
+		my ($count);
+		foreach my $function (@Functions) {
+			$count++;
+			$query .= (' ' x (3 - length($count)))."$count. ".$function->{name};
+			$query .= ' (disabled)' unless ($function->{enabled});
+			$query .= "\n";
+		}
+		$query .= "\n  r. Return to episode menu\n  q. Quit\n\nChoose a function: ";
+	# Query the user
+		my $choice = $self->query_text($query, 'string', '');
+	# Quit?
+		return $self->stage('quit') if ($choice =~ /^\W*q/i);
+	# Backing up a stage?
+		return $self->stage('episode') if ($choice =~ /^\W*[rb]/i);
+	# Execute the chosen function, and then quit
+		$choice =~ s/^\D*/0/s;	# suppress warnings
+	# Make sure that this function is enabled
+		if ($choice < 1 || !$Functions[$choice-1]->{enabled}) {
+			if ($Functions[$choice-1]->{errors} && @{$Functions[$choice-1]->{errors}}) {
+				$gui->notify("\n".join("\n", @{$Functions[$choice-1]->{errors}})."\n");
+			}
+			else {
+				$gui->notify('Function "'.$Functions[$choice-1]->{name}."\" is disabled.\n");
+			}
+			$gui->notify("Press ENTER to continue.\n");
+			<STDIN>;
+		}
+		elsif ($Functions[$choice-1]->{enabled}) {
+			$Functions[$choice-1]->execute($self->{episode_choice});
+			$self->stage('quit');
+		}
+	}
+
+	sub query_filename {
+		my $self = shift;
+		my $default  = shift;
+		my $suffix   = shift;
+		my $savepath = shift;
+		my $outfile  = undef;
+		until ($outfile) {
+			$outfile = $self->query_text('Output filename? ', 'string', "$default.$suffix");
+			$outfile =~ s/(?:\.$suffix)?$/.$suffix/si;
+			if (-e "$savepath/$outfile") {
+				if (-f "$savepath/$outfile") {
+					unless ($self->query_text("$savepath/$outfile exists.  Overwrite?", 'yesno', 'No')) {
+						$outfile = undef;
+					}
+				}
+				else {
+					$self->notify("$savepath/$outfile exists and is not a regular file; please choose another.");
+					$outfile = undef;
+				}
+			}
+		}
+		return $outfile;
+	}
+
+	sub query_savepath {
+		$self = shift;
+	# Where are we saving the files to?
+		my $savepath = undef;
+		until ($savepath) {
+			$savepath = $self->query_text('Where would you like to export the files to?', 'string', '.');;
+			$savepath =~ s/\/+$//s;
+			unless ($savepath eq '.') {
+			# Make sure this is a valid directory
+				if (-e $savepath && !-d $savepath) {
+					$savepath = undef;
+					$self->notify("$savepath exists, but is not a directory.");
+				}
+			# Doesn't exist - query the user to create it
+				elsif (!-e $savepath) {
+					my $create = $self->query_text("$savepath doesn't exist.  Create it?", 'yesno', 'Yes');
+					if ($create) {
+			           mkpath($savepath, 1, 0711) or die "Couldn't create $savepath:  $!\n\n";
+					}
+					else {
+						$savepath = undef;
+					}
+				}
+			}
+		}
+		return $savepath;
+	}
+
+	sub query_text {
+		my $self          = shift;
+		my $text          = shift;
+		my $expect        = shift;
+		my $default       = shift;
+		my $default_extra = shift;
+		my $return = undef;
+	# Loop until we get a valid response
+		while (1) {
+		# Ask the question, get the answer
+			print $text,
+				  ($default ? " [$default]".($default_extra ? $default_extra : '').' '
+				  			: ' ');
+			chomp($return = <STDIN>);
+		# Nothing typed, is there a default value?
+			unless ($return =~ /\w/) {
+				next unless (defined $default);
+				$return = $default;
+			}
+		# Looking for a boolean/yesno response?
+			if ($expect =~ /yes.*no|bool/i) {
+				return $return =~ /^\W*[nf0]/i ? 0 : 1;
+			}
+		# Looking for an integer?
+			elsif ($expect =~ /int/i) {
+				$return =~ s/^\D*/0/;
+				if ($return != int($return)) {
+					print "Whole numbers only, please.\n";
+					next;
+				}
+				return $return;
+			}
+		# Looking for a float?
+			elsif ($expect =~ /float/i) {
+				$return =~ s/^\D*/0/;
+				return $return + 0;
+			}
+		# Well, then we must be looking for a string
+			else {
+				return $return;
+			}
+		}
+	}
+
+	sub notify {
+		my $self = shift;
+		print shift, "\n";
+	}
+
+	sub stage {
+		my $self  = shift;
+		my $stage = shift;
+		$self->{query_stage} = $stage if (defined $stage);
+		$self->{query_stage} = 'show' unless ($self->{query_stage});
+		return $self->{query_stage};
+	}
+
+	#####
+	##  Finally, some random (but necessary) subroutines
+	#####
+
+# Make sure we're back in the main variable namespace
+	package utils;
+
+# Returns a nicely-formatted timestamp from a specified time
+	sub generate_showtime {
+		$showtime = '';
+	# Get the
+		my ($year, $month, $day, $hour, $minute, $second) = @_;
+		$month = int($month);
+		$day   = int($day);
+	# Get the current time, so we know whether or not to display certain fields (eg. year)
+		my ($this_second, $this_minute, $this_hour, $ignore, $this_month, $this_year) = localtime;
+		$this_year += 1900;
+		$this_month++;
+	# Default the meridian to AM
+		my $meridian = 'AM';
+	# Generate the showtime string
+		$showtime .= "$month/$day";
+		$showtime .= "/$year" unless ($year == $this_year);
+		if ($hour == 0) {
+			$hour = 12;
+		}
+		elsif ($hour > 12) {
+			$hour -= 12;
+			$meridian = 'PM';
+		}
+		$showtime .= ", $hour:$minute $meridian";
+	# Return
+		return $showtime;
+	}
+
+# This searches the path for the specified programs, and returns the lowest-index-value program found
+	sub find_program {
+	# Load the programs, and get a count of the priorities
+		my(%programs, $num_programs);
+		foreach my $program (@_) {
+			$programs{$program} = ++$num_programs;
+		}
+	# No programs requested?
+		return undef unless ($num_programs > 0);
+	# Search for the program(s)
+		my %found;
+		foreach my $path (split(/:/, $ENV{PATH}), '.') {
+			foreach my $program (keys %programs) {
+				if (-e "$path/$program" && (!$found{name} || $programs{$program} < $programs{$found{name}})) {
+					$found{name} = $program;
+					$found{path} = $path;
+				}
+			# Leave early if we found the highest priority program
+				last if ($found{name} && $programs{$found{name}} == 1);
+			}
+		}
+	# Return
+		return undef unless ($found{path} && $found{name});
+		return $found{path}.'/'.$found{name};
+	}
+
+# Opens a .nuv file and returns information about it
+	sub nuv_info {
+		my $file = shift;
+		my(%info, $buffer);
+	# open the file
+		open(DATA, "$video_dir/$file") or die "Can't open $file:  $!\n\n";
+	# Read the file info header
+		read(DATA, $buffer, 72);
+	# Unpack the data structure
+		($info{finfo},			# "NuppelVideo" + \0
+		 $info{version},        # "0.05" + \0
+		 $info{width},
+		 $info{height},
+		 $info{desiredheight},  # 0 .. as it is
+		 $info{desiredwidth},   # 0 .. as it is
+		 $info{pimode},         # P .. progressive, I .. interlaced  (2 half pics) [NI]
+		 $info{aspect},         # 1.0 .. square pixel (1.5 .. e.g. width=480: width*1.5=720 for capturing for svcd material
+		 $info{fps},
+		 $info{videoblocks},	# count of video-blocks -1 .. unknown   0 .. no video
+		 $info{audioblocks},	# count of audio-blocks -1 .. unknown   0 .. no audio
+		 $info{textsblocks},	# count of text-blocks  -1 .. unknown   0 .. no text
+		 $info{keyframedist}
+			) = unpack('Z12 Z5 xxx i i i i a xxx d d i i i i', $buffer);
+	# Is this even a NUV file?
+		return mpeg_info($file) unless ($info{finfo} =~ /\w/);
+	# Perl occasionally over-reads on the previous read()
+		seek(DATA, 72, 0);
+	# Read and parse the first frame header
+		read(DATA, $buffer, 12);
+		my ($frametype,
+			$comptype,
+			$keyframe,
+			$filters,
+			$timecode,
+			$packetlength) = unpack('a a a a i i', $buffer);
+	# Parse the frame
+		die "Illegal nuv file format:  $file\n\n" unless ($frametype eq 'D');
+	# Read some more stuff if we have to
+		read(DATA, $buffer, $packetlength) if ($packetlength);
+	# Read the remaining frame headers
+		while (12 == read(DATA, $buffer, 12)) {
+		# Parse the frame header
+			($frametype,
+			 $comptype,
+			 $keyframe,
+			 $filters,
+			 $timecode,
+			 $packetlength) = unpack('a a a a i i', $buffer);
+		# Read some more stuff if we have to
+			read(DATA, $buffer, $packetlength) if ($packetlength);
+		# Look for the audio frame
+			if ($frametype eq 'X') {
+				my $frame_version;
+				($frame_version,
+				 $info{video_fourcc},
+				 $info{audio_fourcc},
+				 $info{audio_sample_rate},
+				 $info{audio_bits_per_sample},
+				 $info{audio_channels},
+				 $info{audio_compression_ratio},
+				 $info{audio_quality},
+				 $info{rtjpeg_quality},
+				 $info{rtjpeg_luma_filter},
+				 $info{rtjpeg_chroma_filter},
+				 $info{lavc_bitrate},
+				 $info{lavc_qmin},
+				 $info{lavc_qmax},
+				 $info{lavc_maxqdiff},
+				 $info{seektable_offset},
+				 $info{keyframeadjust_offset}
+				 ) = unpack('iiiiiiiiiiiiiiill', $buffer);
+			# Found the audio data we want - time to leave
+				 last;
+			}
+		# Done reading frames - let's leave
+			else {
+				last;
+			}
+		}
+	# Close the file
+		close DATA;
+	# Make sure some things are actually numbers
+		$info{width}  += 0;
+		$info{height} += 0;
+	# Return
+		return %info;
+	}
+
+# Uses one of two mpeg info programs to load data about mpeg-based nuv files
+	sub mpeg_info {
+		my $file = "$video_dir/".shift;
+		$file =~ s/'/\\'/sg;
+		my %info;
+	# First, we check for the existence of  an mpeg info program
+		my $program = find_program('tcprobe', 'mpgtx');
+	# Nothing found?  Die
+		die "You need tcprobe (transcode) or mpgtx to use this script on mpeg-based nuv files.\n\n" unless ($program);
+	# Grab tcprobe info
+		if ($program =~ /tcprobe$/) {
+			my $data = `$program -i '$file'`;
+			($info{width}, $info{height}) = $data =~ /frame\s+size:\s+-g\s+(\d+)x(\d+)\b/m;
+			($info{fps})                  = $data =~ /frame\s+rate:\s+-f\s+(\d+(?:\.\s+)?)\b/m;
+			($info{audio_sample_rate})    = $data =~ /audio\s+track:.+?-e\s+(\d+)\b/m;
+		}
+	# Grab tcmplex info
+		elsif ($program =~ /mpgtx$/) {
+			my $data = `$program -i '$file'`;
+			($info{width}, $info{height}, $info{fps}) = $data =~ /\bSize\s+\[(\d+)\s*x\s*(\d+)\]\s+(\d+(?:\.\d+)?)\s*fps/m;
+			($info{audio_sample_rate})    = $data =~ /\b(\d+)\s*Hz/m;
+		}
+	# Return
+		return %info;
+	}
+
+# Queries /proc/cpuinfo to find out how many cpu's are available on this machine
+	sub num_cpus {
+		my $cpuinfo = `cat /proc/cpuinfo`;
+		$num = 0;
+		while ($cpuinfo =~ /^processor\s*:\s*\d+/mg) {
+			$num++;
+		}
+		return $num;
+	}
+
+# This subroutine forks and executes one system command - nothing fancy
+	sub fork_command {
+		my $command = shift;
+	# Fork and return the child's pid
+		my $pid = undef;
+		if ($pid = fork) {
+			return $pid
+		}
+	# $pid defined means that this is now the forked child
+		elsif (defined $pid) {
+			system($command);
+		# Don't forget to exit, or we'll keep going back into places that the child shouldn't play
+			exit(0);
+		}
+	# Couldn't fork, guess we have to quit
+		die "Couldn't fork: $!\n\n$command\n\n";
+	}
+
+	sub shell_escape {
+		$file = shift;
+	    $file =~ s/(["\$])/\\$1/sg;
+		return "\"$file\"";
+	}
+
+	sub mysql_escape {
+		$string = shift;
+		return 'NULL' unless (defined $string);
+		$string =~ s/'/\\'/sg;
+		return "'$string'";
+	}
+
+	sub Quit {
+	# Allow the functions to clean up after themselves
+		if (@Functions) {
+			foreach $function (@Functions) {
+				$function->cleanup;
+			}
+		}
+	# Print a nice goodbye message, and leave
+		print "\nThanks for using nuvexport!\n\n";
+		exit;
+	}
+
