@@ -341,7 +341,15 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
                 return true;
             }
         }
-
+        else if(we->orientation()==Qt::Horizontal)
+        {
+            // add back button
+            if(we->delta()>0)
+            {
+                actionBack();
+                return(true);
+            }
+        }
     }
 
     if(menuIsOpen)
