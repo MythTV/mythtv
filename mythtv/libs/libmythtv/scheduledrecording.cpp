@@ -160,6 +160,9 @@ void ScheduledRecording::loadBySearch(QSqlDatabase *db,
             searchType = "(" +  QObject::tr("Unknown Search") + ")";
             break;
         }
+        QString ltitle = QString("%1 %2").arg(forwhat).arg(searchType);
+        title->setValue(ltitle);
+        description->setValue(forwhat);
     } 
 }
 
