@@ -28,7 +28,7 @@ IconView::IconView(MythContext *context, const QString &startdir,
 
     setCursor(QCursor(Qt::BlankCursor));
 
-    context->ThemeWidget(this, screenwidth, screenheight, wmult, hmult);
+    context->ThemeWidget(this);
 
     fgcolor = paletteForegroundColor();
     highlightcolor = fgcolor;

@@ -24,7 +24,7 @@ SingleView::SingleView(MythContext *context, vector<Thumbnail> *imagelist,
 
     setCursor(QCursor(Qt::BlankCursor));
 
-    context->ThemeWidget(this, screenwidth, screenheight, wmult, hmult);
+    context->ThemeWidget(this);
 
     m_font = new QFont("Arial", (int)(context->GetSmallFontSize() * hmult), 
                        QFont::Bold);
