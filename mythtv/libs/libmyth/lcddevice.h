@@ -5,9 +5,10 @@
     a MythTV project object to control an
     LCDproc server
     
-    (c) 2002 Thor Sigvaldason and Isaac Richards
+    (c) 2002, 2003 Thor Sigvaldason and Isaac Richards
 
 */
+
 
 #ifndef LCDDEVICE_H_
 #define LCDDEVICE_H_
@@ -21,7 +22,7 @@
 #include <math.h>
 
 using namespace std;
-#include "../../config.h"
+#include "../../config.h"	// Or we never know if LCD_DEVICE is defined
 
 class LCD : public QObject
 {
@@ -77,7 +78,7 @@ class LCD : public QObject
 				//	mythlcd for an example)
 				//
 				
-		void	switchToChannel(QString channum, QString title, QString substitle);
+		void	switchToChannel(QString channum, QString title, QString subtitle);
 
 				//
 				//	While watching Live/Recording/Pause Buffer, 

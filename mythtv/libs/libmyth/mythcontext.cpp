@@ -14,6 +14,7 @@
 #include "themedmenu.h"
 #include "util.h"
 #include "remotefile.h"
+#include "lcddevice.h"
 
 MythContext::MythContext(bool gui)
            : QObject()
@@ -46,13 +47,19 @@ MythContext::MythContext(bool gui)
 
     serverSock = NULL;
     expectingReply = false;
+	
+	//
+	//	thor feb 7 2003
+	//
+	
+    lcd_device = new LCD();
 }
 
 MythContext::~MythContext()
 {
     imageCache.clear();
 
-    if (m_settings)
+;    if (m_settings)
         delete m_settings;
     if (m_qtThemeSettings)
         delete m_qtThemeSettings;
@@ -537,3 +544,46 @@ void MythContext::dispatch(MythEvent &e)
         obj = listeners.next();
     }
 }
+
+//
+//	thor feb 7 2003
+//
+//	Straight wrapping of the LCD calls
+//	(this may get more complicated at some point)
+//
+
+void MythContext::LCDconnectToHost(QString hostname, unsigned int port)
+{
+	lcd_device->connectToHost(hostname, port);
+}
+
+void MythContext::LCDswitchToTime()
+{
+	lcd_device->switchToTime();
+}
+
+void MythContext::LCDswitchToMusic(QString artist, QString track)
+{
+	lcd_device->switchToMusic(artist, track);
+}
+
+void MythContext::LCDsetLevels(int numb_levels, float *levels)
+{
+	lcd_device->setLevels(numb_levels, levels);
+}
+
+void MythContext::LCDswitchToChannel(QString channum, QString title, QString subtitle)
+{
+	lcd_device->switchToChannel(channum, title, subtitle);
+}
+
+void MythContext::LCDsetChannelProgress(float percentViewed)
+{
+	lcd_device->setChannelProgress(percentViewed);
+}
+
+void MythContext::LCDswitchToNothing()
+{
+	lcd_device->switchToNothing();
+}
+

@@ -5,7 +5,7 @@
     a MythTV project object to control an
     LCDproc server
     
-    (c) 2002 Thor Sigvaldason and Isaac Richards
+    (c) 2002, 2003 Thor Sigvaldason and Isaac Richards
 
 */
 
