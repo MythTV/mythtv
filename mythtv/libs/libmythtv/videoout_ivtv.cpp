@@ -393,6 +393,8 @@ void VideoOutputIvtv::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
         memcpy(frame->buf + (i + yoff) * frame->width + xoff * 4,
                outputbuf + i * pipw * 4, pipw * 4);
     }
+
+    delete [] outputbuf;
 }
 
 void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
