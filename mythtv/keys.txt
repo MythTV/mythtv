@@ -36,6 +36,7 @@ Watching TV or a recording
 - ? to mark/unmark the current channel as a "favorite"
 - U to increase the play speed
 - J to decrease the play speed
+- W to toggle between 4:3 aspect ratio and 16:9
 
 Without the stickykeys option selected:
 
