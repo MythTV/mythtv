@@ -907,6 +907,7 @@ void NuppelDecoder::GetFrame(int avignore)
             if (avignore == -1)
             {
                 framesPlayed++;
+                gotvideo = 1;
                 continue;
             }
 
@@ -1168,21 +1169,37 @@ bool NuppelDecoder::DoFastForward(long long desiredFrame)
 
     long long keyPos = -1;
 
-    if (desiredKey != lastKey)
+    long long tmpKey = desiredKey;
+    int tmpIndex = desiredIndex;
+
+    while (keyPos == -1 && tmpKey > lastKey)
     {
-        if (positionMap->find(desiredIndex) != positionMap->end())
+        if (positionMap->find(tmpIndex) != positionMap->end())
         {
-            keyPos = (*positionMap)[desiredIndex];
+            keyPos = (*positionMap)[tmpIndex];
         }
         else if (livetv || (watchingrecording && nvr_enc &&
                             nvr_enc->IsValidRecorder()))
         {
-            for (int i = lastKeyIndex; i <= desiredIndex; i++)
+            for (int i = lastKeyIndex; i <= tmpIndex; i++)
             {
                 if (positionMap->find(i) == positionMap->end())
-                    nvr_enc->FillPositionMap(i, desiredIndex, *positionMap);
+                    nvr_enc->FillPositionMap(i, tmpIndex, *positionMap);
             }
-            keyPos = (*positionMap)[desiredIndex];
+            keyPos = (*positionMap)[tmpIndex];
+        }
+        if (keyPos == -1)
+        {
+            VERBOSE(VB_PLAYBACK, QString("No keyframe in position map for %1")
+                    .arg((int)tmpKey));
+
+            tmpKey -= keyframedist;
+            tmpIndex--;
+        }
+        else
+        {
+            desiredKey = tmpKey;
+            desiredIndex = tmpIndex;
         }
     }
 

@@ -321,28 +321,46 @@ bool IvtvDecoder::DoFastForward(long long desiredFrame)
 
     long long keyPos = -1;
 
-    //if (desiredKey != lastKey)
-    {
-        int desiredIndex = desiredKey / keyframedist;
+    long long tmpKey = desiredKey;
+    int tmpIndex = tmpKey / keyframedist;
 
-        if (positionMap.find(desiredIndex) != positionMap.end())
+    while (keyPos == -1 && tmpKey >= lastKey)
+    {
+        if (positionMap.find(tmpIndex) != positionMap.end())
         {
-            keyPos = positionMap[desiredIndex];
+            keyPos = positionMap[tmpIndex];
         }
         else if (livetv || (watchingrecording && nvr_enc &&
                             nvr_enc->IsValidRecorder()))
         {
-            for (int i = lastKey / keyframedist; i <= desiredIndex; i++)
+            for (int i = lastKey / keyframedist; i <= tmpIndex; i++)
             {
                 if (positionMap.find(i) == positionMap.end())
-                    nvr_enc->FillPositionMap(i, desiredIndex, positionMap);
+                    nvr_enc->FillPositionMap(i, tmpIndex, positionMap);
             }
-            keyPos = positionMap[desiredIndex];
+            keyPos = positionMap[tmpIndex];
+        }
+        if (keyPos == -1)
+        {
+            VERBOSE(VB_PLAYBACK, QString("No keyframe in position map for %1")
+                    .arg((int)tmpKey));
+
+            tmpKey -= keyframedist;
+            tmpIndex--;
+        }
+        else
+        {
+            desiredKey = tmpKey;
         }
     }
 
     if (keyPos == -1 && desiredKey != lastKey && !livetv && !watchingrecording)
     {
+        VERBOSE(VB_IMPORTANT, "Did not find keyframe position.");
+
+        VERBOSE(VB_PLAYBACK, QString("lastKey: %1 desiredKey: %2")
+                .arg((int)lastKey).arg((int)desiredKey));
+
         while (framesRead < desiredKey + 1 || 
                !positionMap.contains(desiredKey / keyframedist))
         {
