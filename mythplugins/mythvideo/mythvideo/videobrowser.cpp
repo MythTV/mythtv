@@ -16,11 +16,7 @@ using namespace std;
 #include "metadata.h"
 #include "videobrowser.h"
 #include <mythtv/mythcontext.h>
-
-#ifdef ENABLE_LIRC
-#include "lirc_client.h"
-extern struct lirc_config *config;
-#endif
+#include <mythtv/util.h>
 
 VideoBrowser::VideoBrowser(QSqlDatabase *ldb,
                            MythMainWindow *parent, const char *name)
@@ -219,7 +215,7 @@ void VideoBrowser::updatePlayWait(QPainter *p)
   else if (m_state == 4)
   {
     // Play the movie
-    system((QString("%1 ") .arg(m_cmd)).ascii());
+    myth_system((QString("%1 ") .arg(m_cmd)).ascii());
 
     Metadata *childItem = new Metadata;
     Metadata *parentItem = new Metadata(*curitem);
@@ -233,7 +229,7 @@ void VideoBrowser::updatePlayWait(QPainter *p)
         {
             //Load up data about this child
             selected(childItem);
-            system((QString("%1 ") .arg(m_cmd)).ascii());
+            myth_system((QString("%1 ") .arg(m_cmd)).ascii());
         }
 
         delete parentItem;

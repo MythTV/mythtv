@@ -11,6 +11,7 @@ using namespace std;
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythwidgets.h>
 #include <mythtv/uitypes.h>
+#include <mythtv/util.h>
 
 VideoTree::VideoTree(MythMainWindow *parent, QSqlDatabase *ldb,
                      QString window_name, QString theme_filename,
@@ -416,7 +417,7 @@ void VideoTree::handleTreeListSelection(int node_int, IntVector *)
         //  Run the player
         //
         
-        system((QString("%1 ").arg(command)).ascii());
+        myth_system((QString("%1 ").arg(command)).ascii());
 
         //
         //  Go back to tree browsing

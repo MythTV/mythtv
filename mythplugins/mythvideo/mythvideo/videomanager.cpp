@@ -18,11 +18,6 @@ using namespace std;
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdialogs.h>
 
-#ifdef ENABLE_LIRC
-#include "lirc_client.h"
-extern struct lirc_config *config;
-#endif
-
 VideoManager::VideoManager(QSqlDatabase *ldb,
                            MythMainWindow *parent, const char *name)
             : MythDialog(parent, name)
@@ -951,51 +946,6 @@ void VideoManager::parseContainer(QDomElement &element)
         imdbEnterRect = area;
 }
  
-
-
-
-#ifdef ENABLE_LIRC
-
-void VideoManager::dataReceived()
-{
-  //  printf("get lirc data\n");
-    char *code;
-    char *c;
-    int ret;
-    char buffer[200];
-    size_t l;
-
-    while (ret=lirc_nextcode(&code)==0 && code !=NULL)
-    {
-        while ((ret=lirc_code2char(config,code,&c))==0 && c!=NULL)
-        {
-            if (code==NULL) 
-                continue;
-            QString str = QString(c);
-            if (str == "Up")
-	    { 
-                listview->setCurrentItem(listview->currentItem()->itemAbove());
-                listview->setSelected(listview->currentItem(),TRUE);
-   	        listview->ensureItemVisible(listview->currentItem());
-	    }
-            else if (str == "Down")
-   	    {
-                listview->setCurrentItem(listview->currentItem()->itemBelow());
-                listview->setSelected(listview->currentItem(),TRUE);
-	        listview->ensureItemVisible(listview->currentItem());
-	    }
-            else if(str == "Enter")
-	    {
-	        doSelected(listview->currentItem());
-	    }
-        }
-   
-        free(code);
-        if(ret==-1) break;
-    }
-}
-#endif
-
 void VideoManager::exitWin()
 {
     if (m_state != 0)
