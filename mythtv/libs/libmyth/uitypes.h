@@ -171,6 +171,7 @@ class UIImageType : public UIType
   
     void SetOrder(int order) { m_order = order; }
     void SetFlex(bool flex) { m_flex = flex; }
+    void SetImage(QString file) { m_filename = file; }
 
     void LoadImage();
     QPixmap GetImage() { return img; }
