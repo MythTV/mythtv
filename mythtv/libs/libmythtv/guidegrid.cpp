@@ -74,14 +74,10 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
                      const char *name)
          : MythDialog(parent, name)
 {
-    updateLock = new QMutex(true);
-    
     desiredDisplayChans = DISPLAY_CHANS = 6;
     DISPLAY_TIMES = 30;
     int maxchannel = 0;
     m_currentStartChannel = 0;
-    ignoreevents = false;
-    doProgramInfoUpdate = false;
 
     m_player = player;
     m_db = QSqlDatabase::database();
@@ -212,7 +208,6 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
     timeCheck->start(200);
 
     selectState = false;
-    showInfo = false;
 
     updateBackground();
 
@@ -248,7 +243,6 @@ GuideGrid::~GuideGrid()
     }
 
     delete theme;
-    delete updateLock;
 }
 
 void GuideGrid::keyPressEvent(QKeyEvent *e)
@@ -260,9 +254,6 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
     // setFocusPolicy(QWidget::ClickFocus) in constructor is important 
     // or keyRelease events will not be received after a refocus.
     
-    if (ignoreevents)
-        return;
-
     bool handled = false;
 
     QStringList actions;
@@ -275,9 +266,6 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
     if (e->key() != Key_Control)
         keyDown = true;    
 
-    ignoreevents = true;  //prevent customEvent from updating
-    updateLock->lock();    //wait if customEvent is updating 
-    
     if (e->state() == Qt::ControlButton)
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
@@ -350,17 +338,6 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
 
     if (!handled)
         MythDialog::keyPressEvent(e);
-
-    if (doProgramInfoUpdate) 
-    {
-        fillRecordInfos();
-        fillProgramInfos();
-        update(fullRect);
-    }
-    
-    ignoreevents = false;
-
-    updateLock->unlock();
 }
 
 void GuideGrid::keyReleaseEvent(QKeyEvent *e)
@@ -469,7 +446,7 @@ void GuideGrid::timeout()
                                   videoRect.width(), videoRect.height());
     }
 
-    update(curInfoRect);
+    repaint(curInfoRect, false);
 }
 
 void GuideGrid::fillChannelInfos(int &maxchannel, bool gotostartchannel)
@@ -629,8 +606,6 @@ void GuideGrid::fillProgramInfos(void)
     {
         fillProgramRowInfos(y);
     }
-    
-    doProgramInfoUpdate = false;        
 }
 
 void GuideGrid::fillProgramRowInfos(unsigned int row)
@@ -862,17 +837,8 @@ void GuideGrid::customEvent(QCustomEvent *e)
 
         if (message == "SCHEDULE_CHANGE")
         {
-            if (ignoreevents)
-            {
-                doProgramInfoUpdate = true;
-                return;
-            }    
-            updateLock->lock();
-            ignoreevents = true; 
             fillRecordInfos();
             fillProgramInfos();
-            ignoreevents = false;
-            updateLock->unlock();
             update(fullRect);
         }
     }
@@ -880,26 +846,25 @@ void GuideGrid::customEvent(QCustomEvent *e)
 
 void GuideGrid::paintEvent(QPaintEvent *e)
 {
+    qApp->lock();
+
     QRect r = e->rect();
     QPainter p(this);
 
-    if (!showInfo)
-    {
-        updateLock->lock(); 
-        if (r.intersects(infoRect))
-            paintInfo(&p);
-        if (r.intersects(dateRect))
-            paintDate(&p);
-        if (r.intersects(channelRect))
-            paintChannels(&p);
-        if (r.intersects(timeRect))
-            paintTimes(&p);
-        if (r.intersects(programRect))
-            paintPrograms(&p);
-        if (r.intersects(curInfoRect))
-            paintCurrentInfo(&p);
-        updateLock->unlock();
-    }
+    if (r.intersects(infoRect))
+        paintInfo(&p);
+    if (r.intersects(dateRect))
+        paintDate(&p);
+    if (r.intersects(channelRect))
+        paintChannels(&p);
+    if (r.intersects(timeRect))
+        paintTimes(&p);
+    if (r.intersects(programRect))
+        paintPrograms(&p);
+    if (r.intersects(curInfoRect))
+        paintCurrentInfo(&p);
+
+    qApp->unlock();
 }
 
 void GuideGrid::paintDate(QPainter *p)
@@ -1213,7 +1178,7 @@ void GuideGrid::toggleChannelFavorite()
         if (DISPLAY_CHANS > maxchannel)
             DISPLAY_CHANS = maxchannel;
 
-        update(channelRect);
+        repaint(channelRect, false);
     }
 }
 
@@ -1223,7 +1188,7 @@ void GuideGrid::cursorLeft()
     
     if (!test)
     {
-        emit scrollLeft();
+        scrollLeft();
         return;
     }
 
@@ -1233,7 +1198,7 @@ void GuideGrid::cursorLeft()
     if (m_currentCol < 0)
     {
         m_currentCol = 0;
-        emit scrollLeft();
+        scrollLeft();
     }
     else
     {
@@ -1250,7 +1215,7 @@ void GuideGrid::cursorRight()
 
     if (!test)
     {
-        emit scrollRight();
+        scrollRight();
         return;
     }
 
@@ -1262,7 +1227,7 @@ void GuideGrid::cursorRight()
     if (m_currentCol > DISPLAY_TIMES - 1)
     {
         m_currentCol = DISPLAY_TIMES - 1;
-        emit scrollRight();
+        scrollRight();
     }
     else
     {
@@ -1282,7 +1247,7 @@ void GuideGrid::cursorDown()
         if (m_currentRow > DISPLAY_CHANS - 1)
         {
             m_currentRow = DISPLAY_CHANS - 1;
-            emit scrollDown();
+            scrollDown();
         }
         else
         {
@@ -1292,7 +1257,7 @@ void GuideGrid::cursorDown()
         }
     }
     else
-        emit scrollDown();
+        scrollDown();
 }
 
 void GuideGrid::cursorUp()
@@ -1304,7 +1269,7 @@ void GuideGrid::cursorUp()
         if (m_currentRow < 0)
         {
             m_currentRow = 0;
-            emit scrollUp();
+            scrollUp();
         }
         else
         {
@@ -1314,7 +1279,7 @@ void GuideGrid::cursorUp()
         }
     }
     else
-        emit scrollUp();
+        scrollUp();
 }
 
 void GuideGrid::scrollLeft()
@@ -1490,11 +1455,7 @@ void GuideGrid::pageUp()
  
 void GuideGrid::showProgFinder()
 {
-    showInfo = 1;
-
     RunProgramFind();
-
-    showInfo = 0;
 
     setActiveWindow();
     setFocus();
@@ -1515,7 +1476,7 @@ void GuideGrid::enter()
 
     unsetCursor();
     selectState = 1;
-    emit accept();
+    accept();
 }
 
 void GuideGrid::escape()
@@ -1528,7 +1489,7 @@ void GuideGrid::escape()
     }
 
     unsetCursor();
-    emit accept();
+    accept();
 }
 
 void GuideGrid::quickRecord()
@@ -1545,8 +1506,8 @@ void GuideGrid::quickRecord()
 
     fillRecordInfos();
     fillProgramInfos();
-    update(programRect);
-    update(infoRect);
+    repaint(programRect, false);
+    repaint(infoRect, false);
 }
 
 void GuideGrid::editRecording()
@@ -1559,21 +1520,17 @@ void GuideGrid::editRecording()
     if (pginfo->title == unknownTitle)
         return;
 
-    showInfo = 1;
-
     FocusPolicy storeFocus = focusPolicy();
     setFocusPolicy(QWidget::NoFocus);
     pginfo->EditRecording(m_db);
     setFocusPolicy(storeFocus);
-
-    showInfo = 0;
 
     setActiveWindow();
     setFocus();
 
     fillRecordInfos();
     fillProgramInfos();
-    update(fullRect);
+    repaint(fullRect, false);
 }
 
 void GuideGrid::editScheduled()
@@ -1586,21 +1543,17 @@ void GuideGrid::editScheduled()
     if (pginfo->title == unknownTitle)
         return;
 
-    showInfo = 1;
-
     FocusPolicy storeFocus = focusPolicy();
     setFocusPolicy(QWidget::NoFocus);
     pginfo->EditScheduled(m_db);
     setFocusPolicy(storeFocus);
-
-    showInfo = 0;
 
     setActiveWindow();
     setFocus();
 
     fillRecordInfos();
     fillProgramInfos();
-    update(fullRect);
+    repaint(fullRect, false);
 }
 
 void GuideGrid::channelUpdate(void)

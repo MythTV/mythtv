@@ -139,7 +139,6 @@ class GuideGrid : public MythDialog
     int m_currentRow;
     int m_currentCol;
 
-    bool showInfo;
     bool selectState;
     bool showFavorites;
     bool displaychannum;
@@ -164,11 +163,7 @@ class GuideGrid : public MythDialog
 
     QSqlDatabase *m_db;
 
-    bool ignoreevents;
-    bool doProgramInfoUpdate;
     bool keyDown;
-    
-    QMutex *updateLock;
 };
 
 #endif

@@ -169,7 +169,8 @@ class TV : public QObject
     void BrowseChannel(QString &chan);
 
     void DoTogglePictureAttribute(void);
-    void DoChangePictureAttribute(bool up);
+    void DoToggleRecPictureAttribute(void);
+    void DoChangePictureAttribute(int control, bool up, bool rec);
 
     void DoProgramMenu(void);
     void ProgramMenuAction(int result);
@@ -268,6 +269,7 @@ class TV : public QObject
     QTimer *keyrepeatTimer;
     
     int picAdjustment;
+    int recAdjustment;
     bool usePicControls;
 
     bool smartForward;

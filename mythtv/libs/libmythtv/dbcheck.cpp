@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythcontext.h"
 
-const QString currentDatabaseVersion = "1019";
+const QString currentDatabaseVersion = "1020";
 
 void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -430,6 +430,23 @@ void UpgradeTVDatabaseSchema(void)
         performActualUpdate(updates, "1019", dbver);
     }
 
+    if (dbver == "1019")
+    {
+        const QString updates[] = {
+"UPDATE channel set tvformat = 'Default' where tvformat = '';",
+"DELETE FROM keybindings WHERE context = 'TV Playback' and action = 'CONTRASTDOWN';",
+"DELETE FROM keybindings WHERE context = 'TV Playback' and action = 'CONTRASTUP';",
+"DELETE FROM keybindings WHERE context = 'TV Playback' and action = 'BRIGHTDOWN';",
+"DELETE FROM keybindings WHERE context = 'TV Playback' and action = 'BRIGHTUP';",
+"DELETE FROM keybindings WHERE context = 'TV Playback' and action = 'COLORDOWN';",
+"DELETE FROM keybindings WHERE context = 'TV Playback' and action = 'COLORUP';",
+"DELETE FROM keybindings WHERE context = 'TV Playback' and action = 'HUEDOWN';",
+"DELETE FROM keybindings WHERE context = 'TV Playback' and action = 'HUEUP';",
+""
+};
+
+        performActualUpdate(updates, "1020", dbver);
+    }
 }
 
 void InitializeDatabase(void)
