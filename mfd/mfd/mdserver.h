@@ -61,7 +61,9 @@ class MetadataServer : public MFDServicePlugin
                                                     QIntDict<Metadata>* new_metadata,
                                                     QValueList<int> metadata_additions,
                                                     QValueList<int> metadata_deletions,
-                                                    QIntDict<Playlist>* new_playlists
+                                                    QIntDict<Playlist>* new_playlists,
+                                                    QValueList<int> playlist_additions,
+                                                    QValueList<int> playlist_deletions
                                                  );
 
     //uint                         getMetadataVideoGeneration(){return metadata_video_generation;}

@@ -33,25 +33,21 @@ MMusicWatcher::MMusicWatcher(MFD *owner, int identity)
     //  On startup, we want it to sweep
     //
 
-    first_time = true;
     force_sweep = true;
 
     //
-    //  At startup we have no new and no current data. Note that we have 2
-    //  metadata lists, but only 1 playlist one. The metadata can change on
-    //  disc (someone drops in a file), but the playlists can't. At some
-    //  point (once there's a client!), the playlists will get changed and
-    //  we'll need to persist them back. For now, we just load them and
-    //  leave it at that
+    //  At startup we have no new data and no history. We create these lists
+    //  (during a sweep), but the metadata server deletes them
     //
 
-    current_metadata = new QIntDict<Metadata>;
-    new_metadata = new QIntDict<Metadata>;
-    current_playlists = NULL;
+    new_metadata = NULL;
+    previous_metadata.clear();
 
+    new_playlists = NULL;
+    previous_playlists.clear();
 
     //
-    //  Put these collections into a new container that the metadata server
+    //  Get a metadata
     //  provides us
     //
     
@@ -81,12 +77,13 @@ void MMusicWatcher::run()
     while(keep_going)
     {
         //
-        //  Check the metadata every 5 minutes, or whenever something has
-        //  set force sweep on.
+        //  Check to see if our sweep interval has elapsed
         //
 
-        if( metadata_sweep_time.elapsed() >  5000 || force_sweep)
-        //if( metadata_sweep_time.elapsed() >  300000 || force_sweep)
+        int sweep_wait = mfdContext->getNumSetting("music_sweep_time", 5) * 1000;  
+        //int sweep_wait = mfdContext->getNumSetting("music_sweep_time", 5) * 60 * 1000;  
+
+        if( metadata_sweep_time.elapsed() > sweep_wait || force_sweep)
         {
             //
             //  Toggle forced sweeping back off
@@ -110,22 +107,11 @@ void MMusicWatcher::run()
                                                     new_metadata, 
                                                     metadata_additions,
                                                     metadata_deletions,
-                                                    current_playlists
+                                                    new_playlists,
+                                                    playlist_additions,
+                                                    playlist_deletions
                                                  );
                 
-                //
-                //  Out with the old, in with the new
-                //
-                
-                if(current_metadata)
-                {
-                    delete current_metadata;
-                    current_metadata = NULL;
-                }
-                
-                current_metadata = new_metadata;
-                new_metadata = NULL;
-
                 //
                 //  Something changed. Fire off an event (this will tell the
                 //  container "above" me that it's time to update
@@ -204,77 +190,56 @@ bool MMusicWatcher::sweepMetadata()
         return false;
     }
 
+    //
+    //  FIX see if we can talk to the database up here before wasting more
+    //  CPU time
+    //
 
     QTime sweep_timer;
     sweep_timer.start();
     log("beginning content sweep", 3);
+
     bool something_changed = false;
+    
+    //
+    //  Do a quick check of the playlists. This is a bit of a hack at the moment.
+    //
+    
+    
+    QString my_host_name = mfdContext->getHostName();
+    QString quick_pl_query_string = QString("SELECT count(playlistid) FROM musicplaylist WHERE "
+                                      "name != \"backup_playlist_storage\" "
+                                      "AND name != \"default_playlist_storage\" "
+                                      "AND hostname = \"%1\" ;")
+                                      .arg(my_host_name);
 
-    if(first_time)
+
+    QSqlQuery quick_pl_query = db->exec(quick_pl_query_string);
+
+        
+    if(quick_pl_query.isActive())
     {
-        //
-        //  We know we have to rebuild the in-memory Metadata if this is our
-        //  first run
-        //
-        
-        first_time = false;
-        something_changed = true;
-        
-        //
-        //  Since this is the first time, we need to load the playlists
-        //
-        
-        QString host_name = mfdContext->getHostName();
-        QString pl_query_string = QString("SELECT name, songlist, playlistid FROM musicplaylist WHERE "
-                                          "name != \"backup_playlist_storage\" "
-                                          "AND name != \"default_playlist_storage\" "
-                                          "AND hostname = \"%1\" ;")
-                                          .arg(host_name);
-
-
-        QSqlQuery pl_query = db->exec(pl_query_string);
-
-        current_playlists = new QIntDict<Playlist>;
-        current_playlists->setAutoDelete(true);
-        
-                                                                                                                                                                                                                                                                                                                                     
-        
-        if(pl_query.isActive())
+        if(quick_pl_query.numRowsAffected() > 0)
         {
-            if(pl_query.numRowsAffected() > 0)
+            quick_pl_query.next();
+            uint numb_db_playlists = quick_pl_query.value(0).toUInt();
+            if(numb_db_playlists != previous_playlists.count())
             {
-                while(pl_query.next())
-                {
-                    Playlist *new_playlist = new Playlist(
-                                                            container_id,
-                                                            pl_query.value(0).toString(), 
-                                                            pl_query.value(1).toString(),
-                                                            pl_query.value(2).toUInt()
-                                                         );
-                    current_playlists->insert(pl_query.value(2).toUInt(), new_playlist);
-                }
-            }
-            else
-            {
-                warning("found no playlists");
+                something_changed = true;
             }
         }
         else
         {
-            warning("fairly certain your playlist table is hosed");
+            warning("got no playlist count");
         }
-        
-        
     }
     else
     {
-        //
-        //  As this is not the first time, we want to persist what's in memory
-        //  back to the database
-        //
-        //  ... errr ... real soon now
+        warning("fairly certain your playlist table is hosed ... not good");
     }
     
+
+
 
     //
     //  Create a collection of variables that store flags about whether a
@@ -316,6 +281,7 @@ bool MMusicWatcher::sweepMetadata()
                     else
                     {
                         music_files[name] = MFL_in_myth_database;
+                        something_changed = true;
                     }
                 }
             }
@@ -353,25 +319,24 @@ bool MMusicWatcher::sweepMetadata()
             query.exec(querystr);
             music_files.remove(mf_iterator);
             something_changed = true;
-            
         }
         else if(*mf_iterator == MFL_on_file_system)
         {
             if(checkNewMusicFile(mf_iterator.key(), startdir))
             {
-                something_changed = true;
-                
                 //
-                //  If we've scanned say ... 20 files ... someone may well
-                //  be waiting for music data to show up ... so we stop. The
-                //  rest will get caught on the next sweep. Really. And the next
-                //  sweep will come soon, because we set to sweep again right away.
+                //  If we've scanned say ... 20 files ... someone or
+                //  something may well be waiting for music data to show up
+                //  ... so we stop. The rest will get caught on the next
+                //  sweep. Really. And the next sweep will come soon,
+                //  because we set to sweep again right away.
                 //
                 //  Plus, this is also a good way to get back to the main
                 //  run() loop fairly frequently, where we check if the mfd
                 //  is trying to shut us down.
                 //
                 
+                something_changed = true;
                 ++files_scanned;
                 if(files_scanned >= 20)
                 {
@@ -382,7 +347,13 @@ bool MMusicWatcher::sweepMetadata()
                 }
             }
         }
+    }
 
+    if(!something_changed)
+    {
+        log(QString("sweep results: with no changes in %1 second(s)")
+                    .arg(sweep_timer.elapsed() / 1000.0), 3);
+        return false;
     }
 
     //
@@ -390,151 +361,262 @@ bool MMusicWatcher::sweepMetadata()
     //  the above actually showed that the status of music files has changed
     //
 
-    if(something_changed)
-    {
+    new_metadata = new QIntDict<Metadata>;
+    new_metadata->setAutoDelete(true);
+    new_playlists = new QIntDict<Playlist>;
+    new_metadata->setAutoDelete(true);
     
-        //
-        //  Make a new collection
-        //
+    metadata_additions.clear();
+    metadata_deletions.clear();
+    playlist_additions.clear();
+    playlist_deletions.clear();
+       
+    
+    //
+    //  Load the playlists
+    //
         
-        new_metadata = new QIntDict<Metadata>;
-        new_metadata->setAutoDelete(true);
+    QString host_name = mfdContext->getHostName();
+    QString pl_query_string = QString("SELECT name, songlist, playlistid FROM musicplaylist WHERE "
+                                      "name != \"backup_playlist_storage\" "
+                                      "AND name != \"default_playlist_storage\" "
+                                      "AND hostname = \"%1\" ;")
+                                      .arg(host_name);
 
-        //
-        //  Load the metadata
-        //
+
+    QSqlQuery pl_query = db->exec(pl_query_string);
+
         
-        QString aquery =    "SELECT intid, artist, album, title, genre, "
-                            "year, tracknum, length, filename, rating, "
-                            "lastplay, playcount FROM musicmetadata ";
-
-        QSqlQuery query = db->exec(aquery);
-
-        if(query.isActive() && query.numRowsAffected() > 0)
+    if(pl_query.isActive())
+    {
+        if(pl_query.numRowsAffected() > 0)
         {
-            while(query.next())
+            while(pl_query.next())
             {
-            
-                //
-                //  fiddle with the fact that Qt and MySQL can't agree on a friggin
-                //  DateTime format
-                //
-            
-                QString timestamp = query.value(10).toString();
-
-                if(timestamp.contains('-') < 1)
-                {
-                    timestamp.insert(4, '-');
-                    timestamp.insert(7, '-');
-                    timestamp.insert(10, 'T');
-                    timestamp.insert(13, ':');
-                    timestamp.insert(16, ':');
-                }
-
-                AudioMetadata *new_audio = new AudioMetadata
-                                    (
-                                        container_id,
-                                        query.value(0).toInt(),
-                                        QUrl(startdir + query.value(8).toString()),
-                                        query.value(9).toInt(),
-                                        QDateTime::fromString(timestamp, Qt::ISODate),
-                                        query.value(11).toInt(),
-                                        false,
-                                        query.value(1).toString(),
-                                        query.value(2).toString(),
-                                        query.value(3).toString(),
-                                        query.value(4).toString(),
-                                        query.value(5).toInt(),
-                                        query.value(6).toInt(),
-                                        query.value(7).toInt()
-                                    );
-            
-                new_metadata->insert(new_audio->getId(), new_audio);
-
+                Playlist *new_playlist = new Playlist(
+                                                        container_id,
+                                                        pl_query.value(0).toString(), 
+                                                        pl_query.value(1).toString(),
+                                                        pl_query.value(2).toUInt()
+                                                     );
+                new_playlists->insert(pl_query.value(2).toUInt(), new_playlist);
             }
-        
-            //
-            //  Now, within this collection of metadata and playlists, we have a
-            //  complete set. Time to map the numbers the playlists have to the
-            //  metadata id's that exist now in memory
-            //
-            
-            QIntDictIterator<Playlist> pl_it( *current_playlists );
-            for ( ; pl_it.current(); ++pl_it )
-            {
-                pl_it.current()->mapDatabaseToId(new_metadata);
-            }
-            
-            //
-            //  Ah Ha ... so ... we have a new set of metadata ... how does
-            //  it compare to the old set (what are the deltas!)
-            //
-            
-            
-            metadata_additions.clear();
-            metadata_deletions.clear();
-            
-            //
-            //  find everything that's new
-            //
-
-            QIntDictIterator<Metadata> iter(*new_metadata);
-            for (; iter.current(); ++iter)
-            {
-                int an_integer = iter.currentKey();
-                if(!current_metadata->find(an_integer))
-                {
-                    metadata_additions.push_back(an_integer);
-                }
-            }
-            
-            //
-            //  find everything that's old
-            //
-            
-            QIntDictIterator<Metadata> another_iter(*current_metadata);
-            for (; another_iter.current(); ++another_iter)
-            {
-                int an_integer = another_iter.currentKey();
-                if(!new_metadata->find(an_integer))
-                {
-                    metadata_deletions.push_back(an_integer);
-                }
-            }
-            
-            log(QString("found %1 file(s) and %2 playlist(s) "
-                        "in %3 second(s) with %4 additions and %5 deletions ")
-                       .arg(new_metadata->count())
-                       .arg(current_playlists->count())
-                       .arg(sweep_timer.elapsed() / 1000.0)
-                       .arg(metadata_additions.count())
-                       .arg(metadata_deletions.count())
-                       , 2);
-                       
-            
-            return true;
         }
         else
         {
-            if(query.isActive())
+            warning("found no playlists");
+        }
+    }
+    else
+    {
+        warning("fairly certain your playlist table is hosed ... not good");
+    }
+    
+
+
+    //
+    //  Load the metadata
+    //
+        
+    QString aquery =    "SELECT intid, artist, album, title, genre, "
+                        "year, tracknum, length, filename, rating, "
+                        "lastplay, playcount FROM musicmetadata ";
+
+    QSqlQuery m_query = db->exec(aquery);
+
+    if(m_query.isActive() && m_query.numRowsAffected() > 0)
+    {
+        while(m_query.next())
+        {
+            //
+            //  fiddle with the fact that Qt and MySQL can't agree on a friggin
+            //  DateTime format
+            //
+            
+            QString timestamp = m_query.value(10).toString();
+
+            if(timestamp.contains('-') < 1)
             {
-                warning("found no entries while sweeping audio database");
-                return false;
+                timestamp.insert(4, '-');
+                timestamp.insert(7, '-');
+                timestamp.insert(10, 'T');
+                timestamp.insert(13, ':');
+                timestamp.insert(16, ':');
             }
-            else
-            {
-                warning("fairly certain the audio database is screwed up");
-                return false;
-            }
+
+            AudioMetadata *new_audio = new AudioMetadata
+                                (
+                                    container_id,
+                                    m_query.value(0).toInt(),
+                                    QUrl(startdir + m_query.value(8).toString()),
+                                    m_query.value(9).toInt(),
+                                    QDateTime::fromString(timestamp, Qt::ISODate),
+                                    m_query.value(11).toInt(),
+                                    false,
+                                    m_query.value(1).toString(),
+                                    m_query.value(2).toString(),
+                                    m_query.value(3).toString(),
+                                    m_query.value(4).toString(),
+                                    m_query.value(5).toInt(),
+                                    m_query.value(6).toInt(),
+                                    m_query.value(7).toInt()
+                                );
+
+            new_metadata->insert(new_audio->getId(), new_audio);
+
         }
         
     }
     else
     {
-        log(QString("sweep completed with no changes found in %1 second(s)")
-                    .arg(sweep_timer.elapsed() / 1000.0), 3);
+        if(m_query.isActive())
+        {
+            warning("found no entries while sweeping audio database");
+            return false;
+        }
+        else
+        {
+            warning("fairly certain the audio database is screwed up");
+            return false;
+        }
     }
+
+
+
+
+
+    //
+    //  Now, within this collection of metadata and playlists, we have a
+    //  complete set. Time to map the numbers the playlists have to the
+    //  metadata id's that exist now in memory
+    //
+            
+    QIntDictIterator<Playlist> pl_it( *new_playlists );
+    for ( ; pl_it.current(); ++pl_it )
+    {
+        pl_it.current()->mapDatabaseToId(new_metadata);
+    }
+            
+    //
+    //  Ah Ha ... so ... we have a new set of metadata ... how does
+    //  it compare to the old set (what are the deltas!)
+    //
+            
+            
+    //
+    //  find new metadata (additions)
+    //
+
+    QIntDictIterator<Metadata> iter(*new_metadata);
+    for (; iter.current(); ++iter)
+    {
+        int an_integer = iter.currentKey();
+        if(previous_metadata.find(an_integer) == previous_metadata.end())
+        {
+            metadata_additions.push_back(an_integer);
+        }
+    }
+            
+    //
+    //  find old metadata (deletions)
+    //
+            
+    QValueList<int>::iterator other_iter;
+    for ( other_iter = previous_metadata.begin(); other_iter != previous_metadata.end(); ++other_iter )
+    {
+        int an_integer = (*other_iter);
+        if(!new_metadata->find(an_integer))
+        {
+            metadata_deletions.push_back(an_integer);
+        }
+    }
+
+
+    //
+    //  find new playlists (additions)
+    //
+
+    QIntDictIterator<Playlist> apl_iter(*new_playlists);
+    for (; apl_iter.current(); ++apl_iter)
+    {
+        int an_integer = apl_iter.currentKey();
+        if(previous_playlists.find(an_integer) == previous_playlists.end())
+        {
+            playlist_additions.push_back(an_integer);
+        }
+    }
+            
+    //
+    //  find old playlists (deletions)
+    //
+            
+    QValueList<int>::iterator ysom_iter;
+    for ( ysom_iter = previous_playlists.begin(); ysom_iter != previous_playlists.end(); ++ysom_iter )
+    {
+        int an_integer = (*ysom_iter);
+        if(!new_playlists->find(an_integer))
+        {
+            playlist_deletions.push_back(an_integer);
+        }
+    }
+
+
+
+
+    //
+    //  Make copies for next time through
+    //    
     
+    previous_metadata.clear();
+    QIntDictIterator<Metadata> yano_iter(*new_metadata);
+    for (; yano_iter.current(); ++yano_iter)
+    {
+        int an_integer = yano_iter.currentKey();
+        previous_metadata.push_back(an_integer);
+    }
+            
+    
+    previous_playlists.clear();
+    QIntDictIterator<Playlist> syano_iter(*new_playlists);
+    for (; syano_iter.current(); ++syano_iter)
+    {
+        int an_integer = syano_iter.currentKey();
+        previous_playlists.push_back(an_integer);
+    }
+            
+    
+    //
+    //  Ok, final sanity check here. something_changed got set true, so we
+    //  went through the whole exercise of rebuilding the metadata ... if
+    //  our logic flawed, this if will fail
+    //
+    
+    if(metadata_additions.count() != 0 ||
+       metadata_deletions.count() != 0 ||
+       playlist_additions.count() != 0 ||
+       playlist_deletions.count() != 0 )
+    {
+
+        log(QString("sweep results: "
+                    "%1 file(s) (+%2/-%3), "
+                    "%4 playlists (+%5/-%6) "
+                    "in %7 seconds.")
+
+                    .arg(new_metadata->count())
+                    .arg(metadata_additions.count())
+                    .arg(metadata_deletions.count())
+                    
+                    .arg(new_playlists->count())
+                    .arg(playlist_additions.count())
+                    .arg(playlist_deletions.count())
+        
+                    .arg(sweep_timer.elapsed() / 1000.0)
+                    , 2);
+
+        return true;
+    }
+
+    warning("sweep rebuilt metatada, but got no changes ... Aristotle?");
     return false;
 }
 
@@ -687,16 +769,13 @@ bool MMusicWatcher::checkNewMusicFile(const QString &filename, const QString &st
 
 MMusicWatcher::~MMusicWatcher()
 {
-    if(current_metadata)
-    {
-        delete current_metadata;
-    }
     if(new_metadata)
     {
         delete new_metadata;
     }
-    if(current_playlists)
+    if(new_playlists)
     {
-        delete current_playlists;
+        delete new_playlists;
     }
+    
 }

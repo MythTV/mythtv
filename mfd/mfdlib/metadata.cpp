@@ -219,7 +219,7 @@ void Playlist::mapDatabaseToId(QIntDict<Metadata> *the_metadata)
         }
         else
         {
-            warning("playlist had an entry that did not map to any metadata");
+            // warning("playlist had an entry that did not map to any metadata");
         }
     }
 }

@@ -17,6 +17,7 @@
 #include <qthread.h>
 #include <qwaitcondition.h>
 #include <qvaluelist.h>
+#include <qdeepcopy.h>
 
 #include "metadata.h"
 
@@ -75,7 +76,9 @@ class MetadataContainer
                                     QIntDict<Metadata>* new_metadata, 
                                     QValueList<int> metadata_in,
                                     QValueList<int> metadata_out,
-                                    QIntDict<Playlist>* new_playlists
+                                    QIntDict<Playlist>* new_playlists,
+                                    QValueList<int> playlist_in,
+                                    QValueList<int> playlist_out
                                 );
  
   protected:
@@ -89,9 +92,10 @@ class MetadataContainer
     QIntDict<Metadata>   *current_metadata;
     QValueList<int>      metadata_additions;
     QValueList<int>      metadata_deletions;
-    
+
     QIntDict<Playlist>   *current_playlists;
-    
+    QDeepCopy< QValueList<int> >      playlist_additions;
+    QDeepCopy< QValueList<int> >      playlist_deletions;
 };
 
 #endif

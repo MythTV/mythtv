@@ -279,14 +279,16 @@ void MetadataServer::doAtomicDataSwap(
                                         QIntDict<Metadata>* new_metadata,
                                         QValueList<int> metadata_additions,
                                         QValueList<int> metadata_deletions,
-                                        QIntDict<Playlist>* new_playlists
+                                        QIntDict<Playlist>* new_playlists,
+                                        QValueList<int> playlist_additions,
+                                        QValueList<int> playlist_deletions
                                      )
 {
     //
     //  Lock the metadata, find the right container, and swap out its data.
     //  The idea is that a plugin can take as long as it wants to build a
     //  new metadata collection, but this call (which has the needed locks)
-    //  is very quick. Thus the name.
+    //  is fairly quick and all inside a mutex lock. Thus the name.
     //
 
     lockMetadata();
@@ -313,7 +315,9 @@ void MetadataServer::doAtomicDataSwap(
                                 new_metadata, 
                                 metadata_additions,
                                 metadata_deletions,
-                                new_playlists
+                                new_playlists,
+                                playlist_additions,
+                                playlist_deletions
                             );
             if(target->isAudio())
             {

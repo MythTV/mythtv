@@ -44,24 +44,27 @@ class MMusicWatcher: public MFDServicePlugin
   private:
   
     QTime           metadata_sweep_time;
-    bool            first_time;
     bool            force_sweep;
     QMutex          force_sweep_mutex;
     QSqlDatabase    *db;
 
-    QIntDict<Metadata>  *current_metadata;
     QIntDict<Metadata>  *new_metadata;
-    QIntDict<Playlist>  *current_playlists;
+    QIntDict<Playlist>  *new_playlists;
     
     MetadataServer      *metadata_server;
     MetadataContainer   *metadata_container;
-    int                  container_id;
+    int                 container_id;
 
     QValueList<QString> files_to_ignore;
 
     QValueList<int>     metadata_additions;
     QValueList<int>     metadata_deletions;
+    
+    QValueList<int>     playlist_additions;
+    QValueList<int>     playlist_deletions;
 
+    QValueList<int>     previous_metadata;
+    QValueList<int>     previous_playlists;
 };
 
 
