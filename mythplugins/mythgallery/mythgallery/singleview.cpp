@@ -23,8 +23,7 @@ SingleView::SingleView(QSqlDatabase *db, vector<Thumbnail> *imagelist, int pos,
     imageRotateAngle = 0;
     zoomfactor = newzoom = 0;
 
-    m_font = new QFont("Arial", (int)(gContext->GetMediumFontSize() * hmult), 
-                       QFont::Bold);
+    m_font = gContext->GetMediumFont();
 
     images = imagelist;
     imagepos = pos;
