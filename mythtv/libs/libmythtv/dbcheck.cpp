@@ -9,7 +9,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdbcon.h"
 
-const QString currentDatabaseVersion = "1075";
+const QString currentDatabaseVersion = "1076";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -1500,7 +1500,65 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
             return false;
     }
 
-
+    if (dbver = "1075")
+    {
+        const QString updates[] = {
+"CREATE TABLE IF NOT EXISTS recordedprogram ("
+"  chanid int(10) unsigned NOT NULL default '0',"
+"  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
+"  endtime datetime NOT NULL default '0000-00-00 00:00:00',"
+"  title varchar(128) NOT NULL default '',"
+"  subtitle varchar(128) NOT NULL default '',"
+"  description text NOT NULL,"
+"  category varchar(64) NOT NULL default '',"
+"  category_type varchar(64) NOT NULL default '',"
+"  airdate year(4) NOT NULL default '0000',"
+"  stars float unsigned NOT NULL default '0',"
+"  previouslyshown tinyint(4) NOT NULL default '0',"
+"  title_pronounce varchar(128) NOT NULL default '',"
+"  stereo tinyint(1) NOT NULL default '0',"
+"  subtitled tinyint(1) NOT NULL default '0',"
+"  hdtv tinyint(1) NOT NULL default '0',"
+"  closecaptioned tinyint(1) NOT NULL default '0',"
+"  partnumber int(11) NOT NULL default '0',"
+"  parttotal int(11) NOT NULL default '0',"
+"  seriesid varchar(12) NOT NULL default '',"
+"  originalairdate date default NULL,"
+"  showtype varchar(30) NOT NULL default '',"
+"  colorcode varchar(20) NOT NULL default '',"
+"  syndicatedepisodenumber varchar(20) NOT NULL default '',"
+"  programid varchar(20) NOT NULL default '',"
+"  manualid int(10) unsigned NOT NULL default '0',"
+"  PRIMARY KEY  (chanid,starttime,manualid),"
+"  KEY endtime (endtime),"
+"  KEY title (title),"
+"  KEY title_pronounce (title_pronounce),"
+"  KEY seriesid (seriesid),"
+"  KEY programid (programid),"
+"  KEY id_start_end (chanid,starttime,endtime)"
+");",
+"CREATE TABLE IF NOT EXISTS recordedcredits ("
+"  person mediumint(8) unsigned NOT NULL default '0',"
+"  chanid int(10) unsigned NOT NULL default '0',"
+"  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
+"  role set('actor','director','producer','executive_producer','writer','guest_star','host','adapter','presenter','commentator','guest') NOT NULL default '',"
+"  UNIQUE KEY chanid (chanid,starttime,person,role),"
+"  KEY person (person,role)"
+");",
+"CREATE TABLE IF NOT EXISTS recordedrating ("
+"  chanid int(10) unsigned NOT NULL default '0',"
+"  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
+"  system char(8) NOT NULL default '',"
+"  rating char(8) NOT NULL default '',"
+"  UNIQUE KEY chanid (chanid,starttime,system,rating),"
+"  KEY starttime (starttime,system)"
+");",
+""
+       };
+       
+        if (!performActualUpdate(updates, "1076", dbver))
+            return false;
+    }
 
     return true;
 }

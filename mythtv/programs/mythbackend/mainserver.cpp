@@ -1097,6 +1097,33 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
                                    .arg(logInfo));
     }
 
+    query.prepare("DELETE FROM recordedrating "
+                  "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
+    query.bindValue(":CHANID", ds->chanid);
+    query.bindValue(":STARTTIME", ds->recstartts.toString("yyyyMMddhhmm00"));
+    query.exec();
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("Recorded program delete recordedrating",
+                             query);
+
+    query.prepare("DELETE FROM recordedprogram "
+                  "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
+    query.bindValue(":CHANID", ds->chanid);
+    query.bindValue(":STARTTIME", ds->recstartts.toString("yyyyMMddhhmm00"));
+    query.exec();
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("Recorded program delete recordedprogram",
+                             query);
+
+    query.prepare("DELETE FROM recordedcredits "
+                  "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
+    query.bindValue(":CHANID", ds->chanid);
+    query.bindValue(":STARTTIME", ds->recstartts.toString("yyyyMMddhhmm00"));
+    query.exec();
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("Recorded program delete recordedcredits",
+                             query);
+
     sleep(1);
 
     // Notify the frontend so it can requery for Free Space

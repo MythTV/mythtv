@@ -1021,6 +1021,30 @@ void ProgramInfo::StartedRecording()
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Clear markup on record", query);
+
+    query.prepare("INSERT INTO recordedcredits"
+                 " SELECT * FROM credits"
+                 " WHERE chanid = :CHANID AND starttime = :START;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":START", starts);
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("Copy program credits on record", query);
+
+    query.prepare("INSERT INTO recordedprogram"
+                 " SELECT * from program"
+                 " WHERE chanid = :CHANID AND starttime = :START;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":START", starts);
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("Copy program data on record", query);
+
+    query.prepare("INSERT INTO recordedrating"
+                 " SELECT * from programrating"
+                 " WHERE chanid = :CHANID AND starttime = :START;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":START", starts);
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("Copy program ratings on record", query);    
 }
 
 void ProgramInfo::FinishedRecording(bool prematurestop) 
@@ -2232,11 +2256,19 @@ void ProgramInfo::showDetails()
 
     if (endts != startts)
     {
-        query.prepare("SELECT category_type, partnumber,"
-                      " parttotal, stereo, subtitled, hdtv,"
-                      " closecaptioned, syndicatedepisodenumber"
-                      " FROM program WHERE chanid = :CHANID"
-                      " AND starttime = :STARTTIME ;");
+        if (filesize > 0)
+            query.prepare("SELECT category_type, partnumber,"
+                          " parttotal, stereo, subtitled, hdtv,"
+                          " closecaptioned, syndicatedepisodenumber"
+                          " FROM recordedprogram WHERE chanid = :CHANID"
+                          " AND starttime = :STARTTIME ;");
+        else
+            query.prepare("SELECT category_type, partnumber,"
+                          " parttotal, stereo, subtitled, hdtv,"
+                          " closecaptioned, syndicatedepisodenumber"
+                          " FROM program WHERE chanid = :CHANID"
+                          " AND starttime = :STARTTIME ;");
+
         query.bindValue(":CHANID", chanid);
         query.bindValue(":STARTTIME", startts.toString(Qt::ISODate));
 
@@ -2253,9 +2285,15 @@ void ProgramInfo::showDetails()
             epinum = query.value(7).toString();
         }
 
-        query.prepare("SELECT rating FROM programrating"
-                      " WHERE chanid = :CHANID"
-                      " AND starttime = :STARTTIME ;");
+        if (filesize>0)
+            query.prepare("SELECT rating FROM recordedrating"
+                          " WHERE chanid = :CHANID"
+                          " AND starttime = :STARTTIME ;");
+        else
+            query.prepare("SELECT rating FROM programrating"
+                          " WHERE chanid = :CHANID"
+                          " AND starttime = :STARTTIME ;");
+
         query.bindValue(":CHANID", chanid);
         query.bindValue(":STARTTIME", startts.toString(Qt::ISODate));
         
@@ -2364,10 +2402,19 @@ void ProgramInfo::showDetails()
 
     if (endts != startts)
     {
-        query.prepare("SELECT role,people.name from credits"
-                      " LEFT JOIN people ON credits.person = people.person"
-                      " WHERE credits.chanid = :CHANID"
-                      " AND credits.starttime = :STARTTIME ORDER BY role;");
+        if (filesize > 0)
+            query.prepare("SELECT role,people.name FROM recordedcredits"
+                          " AS credits"
+                          " LEFT JOIN people ON credits.person = people.person"
+                          " WHERE credits.chanid = :CHANID"
+                          " AND credits.starttime = :STARTTIME"
+                          " ORDER BY role;");
+        else
+            query.prepare("SELECT role,people.name FROM credits"
+                          " LEFT JOIN people ON credits.person = people.person"
+                          " WHERE credits.chanid = :CHANID"
+                          " AND credits.starttime = :STARTTIME"
+                          " ORDER BY role;");
         query.bindValue(":CHANID", chanid);
         query.bindValue(":STARTTIME", startts.toString(Qt::ISODate));
 
