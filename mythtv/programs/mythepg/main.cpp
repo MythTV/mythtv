@@ -39,7 +39,7 @@ int main(int argc, char **argv)
     gContext->SetMainWindow(mainWindow);
 
     TV::InitKeys();
-    
+
     QString chanstr = RunProgramGuide(startchannel);
 
     int chan = 0;

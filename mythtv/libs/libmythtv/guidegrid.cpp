@@ -253,72 +253,157 @@ GuideGrid::~GuideGrid()
 
 void GuideGrid::keyPressEvent(QKeyEvent *e)
 {
-    //keyDown limits keyrepeats to prevent continued scrolling
-    //after key is released. Note: Qt's keycompress should handle
-    //this but will fail with fast key strokes and keyboard repeat
-    //enabled. Keys will not be marked as autorepeat and flood buffer.
-    //setFocusPolicy(QWidget::ClickFocus) in constructor is important 
-    //or keyRelease events will not be received after a refocus.
+    // keyDown limits keyrepeats to prevent continued scrolling
+    // after key is released. Note: Qt's keycompress should handle
+    // this but will fail with fast key strokes and keyboard repeat
+    // enabled. Keys will not be marked as autorepeat and flood buffer.
+    // setFocusPolicy(QWidget::ClickFocus) in constructor is important 
+    // or keyRelease events will not be received after a refocus.
     
-    if(keyDown && e->key() != Key_Escape && e->key() != Key_C)
-        return; //check for Key_Escape incase something goes wrong 
-                //with KeyRelease events, shouldn't happen.
-       
-    if(e->key() != Key_Control)
-        keyDown = true;    
-
     if (ignoreevents)
         return;
+
+    bool handled = false;
+
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
+
+/*
+    if (actions.size() > 0 && keyDown && actions[0] != "ESCAPE")
+        return; //check for Escape in case something goes wrong 
+                //with KeyRelease events, shouldn't happen.
+*/
+
+    if (e->key() != Key_Control)
+        keyDown = true;    
+
     ignoreevents = true;  //prevent customEvent from updating
     updateLock->lock();    //wait if customEvent is updating 
     
     if (e->state() == Qt::ControlButton)
     {
-        switch (e->key())
+        for (unsigned int i = 0; i < actions.size(); i++)
         {
-            case Key_Left: pageLeft(); break;
-            case Key_Right: pageRight(); break;
-            case Key_Up: pageUp(); break;
-            case Key_Down: pageDown(); break;
-            default: break;
+            QString action = actions[i];
+            if (action == "LEFT")
+                pageLeft();
+            else if (action == "RIGHT")
+                pageRight();
+            else if (action == "UP")
+                pageUp();
+            else if (action == "DOWN")
+                pageDown();
         }
+        handled = true;
     }
     else
     {
-        switch (e->key())
+        for (unsigned int i = 0; i < actions.size(); i++)
         {
-            case Key_Left: case Key_A: cursorLeft(); break;
-            case Key_Right: case Key_D: cursorRight(); break;
-            case Key_Down: case Key_S: cursorDown(); break;
-            case Key_Up: case Key_W: cursorUp(); break;
+            QString action = actions[i];
 
-            case Key_Home: case Key_7: dayLeft(); break;
-            case Key_End: case Key_1: dayRight(); break;
-            case Key_PageUp: case Key_3: pageUp(); break;
-            case Key_PageDown: case Key_9: pageDown(); break;
-            case Key_Less: case Key_Comma: pageLeft(); break;
-            case Key_Greater: case Key_Period: pageRight(); break;
-
-            case Key_4: toggleGuideListing(); break;
-            case Key_6: showProgFinder(); break;   
-
-            case Key_Slash: toggleChannelFavorite(); break;
-
-            case Key_C: case Key_Escape: escape(); break;
-            case Key_M: enter(); break;
-
-            case Key_Space: case Key_Enter: 
-            case Key_Return: editRecording(); break;
-            case Key_I: editScheduled(); break;
-
-            case Key_R: quickRecord(); break;
-            case Key_X: channelUpdate(); break;
-
-            default: MythDialog::keyPressEvent(e);
+            if (action == "LEFT")
+            {
+                cursorLeft();
+                handled = true;
+            }
+            else if (action == "RIGHT")
+            {
+                cursorRight();
+                handled = true;
+            }
+            else if (action == "DOWN")
+            {
+                cursorDown();
+                handled = true;
+            }
+            else if (action == "UP")
+            {
+                cursorUp();
+                handled = true;
+            }
+            else if (action == "PAGEUP")
+            {
+                pageUp();
+                handled = true;
+            }
+            else if (action == "PAGEDOWN")
+            {
+                pageDown();
+                handled = true;
+            }
+            else if (action == "PAGELEFT")
+            {
+                pageLeft();
+                handled = true;
+            }
+            else if (action == "PAGERIGHT")
+            {
+                pageRight();
+                handled = true;
+            }
+            else if (action == "DAYLEFT")
+            {
+                dayLeft();
+                handled = true;
+            }
+            else if (action == "DAYRIGHT")
+            {
+                dayRight();
+                handled = true;
+            }
+            else if (action == "NEXTFAV" || action == "4")
+            {
+                toggleGuideListing();
+                handled = true;
+            }
+            else if (action == "6")
+            {
+                showProgFinder();
+                handled = true;
+            }
+            else if (action == "MENU")
+            {
+                enter();
+                handled = true;
+            }
+            else if (action == "ESCAPE")
+            {
+                escape();
+                handled = true;
+            }
+            else if (action == "SELECT")
+            {
+                editRecording();
+                handled = true;
+            }
+            else if (action == "INFO")
+            {
+                editScheduled();
+                handled = true;
+            }
+            else if (action == "TOGGLERECORD")
+            {
+                quickRecord();
+                handled = true;
+            }
+            else if (action == "TOGGLEFAV")
+            {
+                toggleChannelFavorite();
+                handled = true;
+            }
+            else if (action == "CHANUPDATE")
+            {
+                channelUpdate();
+                handled = true;
+            }
         }
     }
 
-    if(doProgramInfoUpdate) 
+    if (!handled)
+        MythDialog::keyPressEvent(e);
+
+    if (doProgramInfoUpdate) 
     {
         fillRecordInfos();
         fillProgramInfos();
@@ -332,9 +417,9 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
 
 void GuideGrid::keyReleaseEvent(QKeyEvent *e)
 {
-    //note: KeyRelease events may not reflect the released 
-    //key if delayed (key==0 instead).
-    e->key(); //stop compiler warning
+    // note: KeyRelease events may not reflect the released 
+    // key if delayed (key==0 instead).
+    (void)e;
     keyDown = false;
 }
 

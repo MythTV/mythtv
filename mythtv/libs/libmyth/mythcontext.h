@@ -71,7 +71,7 @@ class MythEvent : public QCustomEvent
     QString extradata;
 };
 
-#define MYTH_BINARY_VERSION "0.13.11252003-2"
+#define MYTH_BINARY_VERSION "0.13.11272003-1"
 
 extern int print_verbose_messages;
 
@@ -161,6 +161,8 @@ class MythContext : public QObject
 
     bool IsDoingNetworkStuff(void) { return expectingReply; }
 
+    void SetDisableLibraryPopup(bool check) { disablelibrarypopup = check; }
+
   private slots:
     void readSocket();
 
@@ -213,6 +215,8 @@ class MythContext : public QObject
     int bigfontsize, mediumfontsize, smallfontsize; 
 
     bool isconnecting;
+
+    bool disablelibrarypopup;
 };
 
 extern MythContext *gContext;

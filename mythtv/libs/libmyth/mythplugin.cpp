@@ -1,5 +1,6 @@
 #include "mythplugin.h"
-#include "qdict.h"
+#include <qdict.h>
+#include <qdir.h>
 #include <iostream>
 #include <dlfcn.h>
 
@@ -51,6 +52,33 @@ QDict<MythPluginManager::MythPlugin> MythPluginManager::m_dict;
 void MythPluginManager::init(void)
 {
     m_dict.setAutoDelete(true);
+
+    QString pluginprefix = QString(PREFIX) + "/lib/mythtv/plugins/";
+
+    QDir filterDir(pluginprefix);
+
+    filterDir.setFilter(QDir::Files | QDir::Readable);
+    filterDir.setNameFilter("lib*.so");
+
+    gContext->SetDisableLibraryPopup(true);
+
+    if (filterDir.exists())
+    {
+        QStringList libraries = filterDir.entryList();
+        for (QStringList::iterator i = libraries.begin(); i != libraries.end();
+             i++)
+        {
+            QString library = *i;
+
+            // pull out the base library name
+            library = library.right(library.length() - 3);
+            library = library.left(library.length() - 3);
+
+            init_plugin(library);
+        }
+    }
+
+    gContext->SetDisableLibraryPopup(false);
 }
 
 bool MythPluginManager::init_plugin(const QString & plugname)

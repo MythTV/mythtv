@@ -674,8 +674,6 @@ int main(int argc, char **argv)
 
     VERBOSE(VB_ALL, QString("Enabled verbose msgs :%1").arg(verboseString));
 
-    MythPluginManager::init();
-
     translator.load(PREFIX + QString("/share/mythtv/i18n/mythfrontend_") + 
                     QString(gContext->GetSetting("Language").lower()) + 
                     QString(".qm"), ".");
@@ -704,6 +702,8 @@ int main(int argc, char **argv)
     gContext->SetMainWindow(mainWindow);
 
     InitJumpPoints();
+
+    MythPluginManager::init();
 
     gContext->UpdateImageCache();
 

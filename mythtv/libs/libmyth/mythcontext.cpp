@@ -87,6 +87,8 @@ MythContext::MythContext(const QString &binversion, bool gui, bool lcd)
         lcd_device = new LCD();
     else
         lcd_device = NULL;
+
+    disablelibrarypopup = false;
 }
 
 MythContext::~MythContext()
@@ -1140,10 +1142,13 @@ bool MythContext::TestPopupVersion(const QString &name,
                   "libmyth is at version: " + libversion + ".  You probably " +
                   "want to recompile the " + name + " plugin after doing a " +
                   "make distclean.";
-                  
-    DialogBox dbox(gContext->GetMainWindow(), err);
-    dbox.AddButton("OK");
-    dbox.exec();
+
+    if (gContext->GetMainWindow() && !disablelibrarypopup)
+    {    
+        DialogBox dbox(gContext->GetMainWindow(), err);
+        dbox.AddButton("OK");
+        dbox.exec();
+    }
 
     return false;
 }

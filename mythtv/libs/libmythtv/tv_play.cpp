@@ -59,6 +59,20 @@ void TV::InitKeys(void)
     REG_KEY("TV Frontend", "PLAYBACK", "Play Program", "P");
     REG_KEY("TV Frontend", "TOGGLERECORD", "Toggle recording status of current "
             "program", "R");
+    REG_KEY("TV Frontend", "DAYLEFT", "Page the program guide back one day", 
+            "Home,7");
+    REG_KEY("TV Frontend", "DAYRIGHT", "Page the program guide forward one day",
+            "End,1");
+    REG_KEY("TV Frontend", "PAGELEFT", "Page the program guide left",
+            ",,<");
+    REG_KEY("TV Frontend", "PAGERIGHT", "Page the program guide right",
+            ">,.");
+    REG_KEY("TV Frontend", "TOGGLEFAV", "Toggle the current channel as a "
+            "favorite", "?");
+    REG_KEY("TV Frontend", "NEXTFAV", "Toggle showing all channels or just "
+            "favorites in the program guide.", "/");
+    REG_KEY("TV Frontend", "CHANUPDATE", "Switch channels without exiting "
+            "guide in Live TV mode.", "X");
 
 
 
