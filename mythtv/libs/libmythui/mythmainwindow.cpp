@@ -119,6 +119,7 @@ class MythMainWindowPrivate
 
     bool AllowInput;
 
+    QRegion repaintRegion;
 };
 
 // Make keynum in QKeyEvent be equivalent to what's in QKeySequence
@@ -237,7 +238,7 @@ MythMainWindow::MythMainWindow()
 
     d->AllowInput = true;
 
-    m_repaint_region = QRegion(QRect(0,0,0,0));
+    d->repaintRegion = QRegion(QRect(0,0,0,0));
 }
 
 MythMainWindow::~MythMainWindow()
@@ -274,7 +275,7 @@ void MythMainWindow::drawTimeout(void)
 {
     bool redraw = false;
 
-    if(!m_repaint_region.isEmpty())
+    if(!d->repaintRegion.isEmpty())
     {
         redraw = true;
     }
@@ -328,7 +329,7 @@ void MythMainWindow::drawTimeout(void)
 
     d->painter->End();
     
-    m_repaint_region = QRegion(QRect(0,0,0,0));
+    d->repaintRegion = QRegion(QRect(0,0,0,0));
 }
 
 void MythMainWindow::closeEvent(QCloseEvent *e)
@@ -339,7 +340,7 @@ void MythMainWindow::closeEvent(QCloseEvent *e)
 
 void MythMainWindow::paintEvent(QPaintEvent *pe)
 {
-    m_repaint_region = m_repaint_region.unite(pe->region());
+    d->repaintRegion = d->repaintRegion.unite(pe->region());
 }
 
 void MythMainWindow::Init(void)

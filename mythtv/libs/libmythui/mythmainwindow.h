@@ -89,10 +89,6 @@ class MythMainWindow : public QGLWidget
     QObject *getTarget(QKeyEvent &key);
 
     MythMainWindowPrivate *d;
-
-    bool m_bAllowInput;
-    
-    QRegion m_repaint_region;
 };
 
 MythMainWindow *GetMythMainWindow();

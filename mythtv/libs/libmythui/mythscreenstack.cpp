@@ -82,6 +82,9 @@ void MythScreenStack::PopScreen(void)
         m_Children.pop_back();
         delete top;
         top = NULL;
+
+        if (m_Children.isEmpty())
+            reinterpret_cast<MythMainWindow *>(parent())->update();
     }
 
     topScreen = NULL;
@@ -118,7 +121,11 @@ void MythScreenStack::PopScreen(void)
 
 MythScreenType *MythScreenStack::GetTopScreen(void)
 {
-    return topScreen;
+    if (topScreen)
+        return topScreen;
+    if (!m_DrawOrder.isEmpty())
+        return m_DrawOrder.back();
+    return NULL;
 }
 
 void MythScreenStack::GetDrawOrder(QValueVector<MythScreenType *> &screens)
