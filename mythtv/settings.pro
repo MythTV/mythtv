@@ -66,6 +66,10 @@ DEFINES += USING_OSS
 #EXTRA_LIBS += -ldl -lartsc -lpthread
 #INCLUDEPATH += /usr/include/artsc
 
+# Native JACK support
+#CONFIG += using_jack
+#JACK_LIBS += -ljack
+
 # DVB support
 #CONFIG += using_dvb
 #DEFINES += USING_DVB

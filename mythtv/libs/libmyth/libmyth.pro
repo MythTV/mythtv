@@ -14,7 +14,7 @@ HEADERS += remotefile.h settings.h themedmenu.h util.h mythwizard.h
 HEADERS += volumecontrol.h uitypes.h xmlparse.h mythplugin.h mythdbcon.h
 HEADERS += mythdialogs.h audiooutput.h inetcomms.h httpcomms.h mythmedia.h 
 HEADERS += uilistbtntype.h uiphoneentry.h generictree.h screensaver.h
-HEADERS += managedlist.h DisplayRes.h
+HEADERS += managedlist.h DisplayRes.h audiooutputbase.h
 
 SOURCES += dialogbox.cpp lcddevice.cpp mythcontext.cpp mythwidgets.cpp 
 SOURCES += oldsettings.cpp remotefile.cpp settings.cpp themedmenu.cpp
@@ -22,6 +22,12 @@ SOURCES += util.cpp mythwizard.cpp volumecontrol.h uitypes.cpp xmlparse.cpp
 SOURCES += mythplugin.cpp mythdialogs.cpp audiooutput.cpp inetcomms.cpp 
 SOURCES += httpcomms.cpp mythmedia.cpp uilistbtntype.cpp uiphoneentry.cpp
 SOURCES += generictree.cpp managedlist.cpp DisplayRes.cpp DisplayResX.cpp
+SOURCES += audiooutputbase.cpp
+
+LIBS += -L../libmythsamplerate
+LIBS += -lmythsamplerate-$${LIBVERSION}
+
+INCLUDEPATH += ../libmythsamplerate
 
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = dialogbox.h lcddevice.h themedmenu.h mythcontext.h mythdbcon.h
@@ -95,6 +101,13 @@ using_arts {
     HEADERS += audiooutputarts.h
     SOURCES += audiooutputarts.cpp
     LIBS += $$ARTS_LIBS
+}
+
+using_jack {
+    DEFINES += USE_JACK
+    HEADERS += bio2jack.h audiooutputjack.h
+    SOURCES += bio2jack.c audiooutputjack.cpp
+    LIBS += $$JACK_LIBS
 }
 
 using_directx {

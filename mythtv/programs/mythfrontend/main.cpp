@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <qdir.h>
 #include <qtextcodec.h>
+#include <qwidget.h>
 #include <fcntl.h>
 #include <signal.h>
 
@@ -991,9 +992,17 @@ int main(int argc, char **argv)
 
     gContext->LoadQtConfig();
 
-    MythMainWindow *mainWindow = new MythMainWindow();
-    mainWindow->Show();
-    mainWindow->Init();
+    Qt::WFlags flags = 0;
+    if (gContext->GetNumSetting("RunFrontendInWindow", 0))
+    {
+        flags = Qt::WStyle_Customize | Qt::WStyle_NormalBorder;
+    }
+    else
+    {
+        flags = Qt::WStyle_Customize | Qt::WStyle_NoBorder;
+    }
+
+    MythMainWindow *mainWindow = new MythMainWindow(NULL, 0, false, flags);
     gContext->SetMainWindow(mainWindow);
 
     InitJumpPoints();

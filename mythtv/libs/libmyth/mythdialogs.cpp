@@ -169,8 +169,9 @@ int MythMainWindowPrivate::TranslateKeyNum(QKeyEvent* e)
     return keynum;
 }
 
-MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal)
-              : QDialog(parent, name, modal)
+MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal, 
+                               WFlags flags)
+              : QDialog(parent, name, modal, flags)
 {
     d = new MythMainWindowPrivate;
 
@@ -271,15 +272,10 @@ void MythMainWindow::Init(void)
 
 void MythMainWindow::Show(void)
 {
-    if (gContext->GetNumSetting("RunFrontendInWindow", 0))
-        show();
-    else
-    {
-        showFullScreen();
+    show();
 #ifdef Q_WS_MACX
-        HideMenuBar();
+    HideMenuBar();
 #endif
-    }
 
     setActiveWindow();
 }

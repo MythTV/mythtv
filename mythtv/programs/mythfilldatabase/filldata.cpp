@@ -1830,7 +1830,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                     subquery.bindValue(":CHANID", chanid);
 
                     if (!subquery.exec())
-                        MythContext::DBError("Channel icon change", query);
+                        MythContext::DBError("Channel icon change", subquery);
                 }
             }
         }
@@ -1878,7 +1878,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
 
                     if (!subquery.exec())
                     {
-                        MythContext::DBError("Channel insert", query);
+                        MythContext::DBError("Channel insert", subquery);
                     }
                     else
                     {
@@ -1938,7 +1938,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                 subquery.bindValue(":TVFORMAT", (*i).tvformat);
 
                 if (!subquery.exec())
-                    MythContext::DBError("channel insert", query);
+                    MythContext::DBError("channel insert", subquery);
 
             }
         }

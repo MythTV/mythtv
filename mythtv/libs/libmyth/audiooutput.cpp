@@ -19,6 +19,9 @@ using namespace std;
 #ifdef CONFIG_DARWIN
 #include "audiooutputca.h"
 #endif
+#ifdef USE_JACK
+#include "audiooutputjack.h"
+#endif
 
 AudioOutput *AudioOutput::OpenAudio(QString audiodevice, int audio_bits, 
                                     int audio_channels, int audio_samplerate)
@@ -40,6 +43,16 @@ AudioOutput *AudioOutput::OpenAudio(QString audiodevice, int audio_bits,
                                    audio_channels, audio_samplerate);
 #else
         printf("Audio output device is set to an ARTS device but ARTS support is not compiled in!\n");
+        return NULL;
+#endif
+    }
+    else if (audiodevice.startsWith("JACK:"))
+    {
+#ifdef USE_JACK
+        return new AudioOutputJACK(audiodevice.remove(0, 5), audio_bits,
+                                   audio_channels, audio_samplerate);
+#else
+        printf("Audio output device is set to a JACK device but JACK support is not compiled in!\n");
         return NULL;
 #endif
     }

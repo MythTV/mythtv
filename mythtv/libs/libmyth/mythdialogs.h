@@ -70,7 +70,7 @@ class MythMainWindow : public QDialog
 {
   public:
     MythMainWindow(QWidget *parent = 0, const char *name = 0, 
-                   bool modal = FALSE);
+                   bool modal = FALSE, WFlags flags = 0);
     virtual ~MythMainWindow();
 
     void Init(void);

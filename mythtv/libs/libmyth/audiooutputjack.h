@@ -1,5 +1,5 @@
-#ifndef AUDIOOUTPUTOSS
-#define AUDIOOUTPUTOSS
+#ifndef AUDIOOUTPUTJACK
+#define AUDIOOUTPUTJACK
 
 #include <vector>
 #include <qstring.h>
@@ -9,15 +9,14 @@
 
 using namespace std;
 
-
-class AudioOutputOSS : public AudioOutputBase
+class AudioOutputJACK : public AudioOutputBase
 {
-public:
-    AudioOutputOSS(QString audiodevice, int laudio_bits, 
+  public:
+    AudioOutputJACK(QString audiodevice, int laudio_bits, 
                    int laudio_channels, int laudio_samplerate);
-    virtual ~AudioOutputOSS();
-
-protected:
+    virtual ~AudioOutputJACK();
+    
+  protected:
 
     // You need to implement the following functions
     virtual bool OpenDevice(void);
@@ -26,11 +25,10 @@ protected:
     virtual inline int getSpaceOnSoundcard(void);
     virtual inline int getBufferedOnSoundcard(void);
 
-private:
-    void SetFragSize(void);
-    
-    int audiofd;
-    int numbadioctls;
+  private:
+
+    int audioid;
+
 };
 
 #endif

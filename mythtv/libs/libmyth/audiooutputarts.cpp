@@ -9,7 +9,7 @@ using namespace std;
 
 AudioOutputARTS::AudioOutputARTS(QString audiodevice, int audio_bits, 
                                  int audio_channels, int audio_samplerate)
-               : AudioOutput()
+                : AudioOutput()
 {
     this->audiodevice = audiodevice;
     pcm_handle = NULL;
