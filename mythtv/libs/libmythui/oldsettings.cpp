@@ -10,6 +10,7 @@
 
 
 #include "oldsettings.h"
+#include "mythcontext.h"
 #include <qstring.h>
 #include <fstream>
 #include <cstdlib>
