@@ -2684,9 +2684,9 @@ void SipWatcher::SendSubscribe(SipMsg *authMsg)
     Subscribe.addContact(MyContactUrl);
 
     Subscribe.addEvent("presence");
-    Subscribe.addGenericLine("Accept: application/xpidf+xml\r\n");
-    //Subscribe.addGenericLine("Accept: application/xpidf+xml, text/xml+msrtc.pidf\r\n");
-    //Subscribe.addGenericLine("Supported: com.microsoft.autoextend\r\n");
+    //Subscribe.addGenericLine("Accept: application/xpidf+xml\r\n");
+    Subscribe.addGenericLine("Accept: application/xpidf+xml, text/xml+msrtc.pidf\r\n");
+    Subscribe.addGenericLine("Supported: com.microsoft.autoextend\r\n");
     Subscribe.addNullContent();
 
     parent->Transmit(Subscribe.string(), retxIp = watchedUrl->getHostIp(), retxPort = watchedUrl->getPort());
