@@ -46,7 +46,7 @@ IvtvDecoder::~IvtvDecoder()
 {
 }
 
-void IvtvDecoder::SeekReset(long long newkey, int skipframes, bool needFlush)
+void IvtvDecoder::SeekReset(long long newkey, int skipframes, bool )
 {
     //fprintf(stderr, "seek reset frame = %llu, skip = %d, exact = %d\n", 
     //        newkey, skipframes, exactseeks);

@@ -21,7 +21,7 @@ class RingBuffer
     
    ~RingBuffer();
 
-    bool IsOpen(void) { return (tfw || fd2 > 0 || remotefile); }
+    bool IsOpen(void) { return (tfw || fd2 > -1 || remotefile); }
     
     int Read(void *buf, int count);
     int Write(const void *buf, int count);
