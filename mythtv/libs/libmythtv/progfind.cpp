@@ -334,6 +334,27 @@ void ProgFinder::setupColorScheme()
     curColor = themed->GetSetting("curRecProg_bgColor");
     if (curColor != "")
         recording_bgColor = QColor(curColor);
+
+    curColor = themed->GetSetting("progFindMid_bgColor");
+    if (curColor != "")
+        progFindMid_bgColor = QColor(curColor);
+    else
+	progFindMid_bgColor = QColor(0, 0, 0);
+
+    curColor = themed->GetSetting("progFindMid_fgColor");
+    if (curColor != "")
+        progFindMid_fgColor = QColor(curColor);
+    else
+        progFindMid_fgColor = curProg_fgColor;
+
+    curColor = themed->GetSetting("misChanIcon_bgColor");
+    if (curColor != "")
+	misChanIcon_bgColor = QColor(curColor);
+
+    curColor = themed->GetSetting("misChanIcon_fgColor");
+    if (curColor != "")
+        misChanIcon_fgColor = QColor(curColor);
+
 }
 
 void ProgFinder::setupLayout()
@@ -456,8 +477,8 @@ void ProgFinder::setupLayout()
 	callChan->setMinimumWidth((int)(200*wmult));
 	callChan->setMaximumHeight((int)(200*hmult));
 	callChan->setMinimumHeight((int)(200*hmult));
-	callChan->setPaletteBackgroundColor(QColor(0, 0, 0));
-	callChan->setPaletteForegroundColor(QColor(255, 255, 255));
+	callChan->setPaletteBackgroundColor(misChanIcon_bgColor);
+	callChan->setPaletteForegroundColor(misChanIcon_fgColor);
 	callChan->setFont(callFont);
 
 	leftSide->addWidget(programTitle, 0, 0);
@@ -524,10 +545,10 @@ void ProgFinder::setupLayout()
 	{
 		if (i == (int)(showsPerListing / 2))
 		{
-			(&abcList[i])->setPaletteBackgroundColor(QColor(0, 0, 0));
+			(&abcList[i])->setPaletteBackgroundColor(progFindMid_bgColor);
 			(&progList[i])->setPaletteBackgroundColor(curProg_bgColor);
 			(&showList[i])->setPaletteBackgroundColor(curProg_bgColor);
-			(&abcList[i])->setPaletteForegroundColor(curProg_fgColor);
+			(&abcList[i])->setPaletteForegroundColor(progFindMid_fgColor);
 			(&progList[i])->setPaletteForegroundColor(curProg_fgColor);
 			(&showList[i])->setPaletteForegroundColor(curProg_fgColor);
 		}
@@ -568,14 +589,19 @@ void ProgFinder::cursorLeft()
 		{
 			programTitle->setText("Select a letter...");
 			description->setText("Pick the letter in which the show starts with, then hit ENTER or the right arrow.");
-			(&abcList[(int)(showsPerListing / 2)])->setPaletteBackgroundColor(QColor(0, 0, 0));
+			(&abcList[(int)(showsPerListing / 2)])->setPaletteBackgroundColor(progFindMid_bgColor);
+			(&abcList[(int)(showsPerListing / 2)])->setPaletteForegroundColor(progFindMid_fgColor);
                         (&progList[(int)(showsPerListing / 2)])->setPaletteBackgroundColor(curProg_bgColor);
+			(&progList[(int)(showsPerListing / 2)])->setPaletteForegroundColor(curProg_fgColor);
 			showSearchList();
 		}
 		if (inSearch == 1)
 		{
-                        (&progList[(int)(showsPerListing / 2)])->setPaletteBackgroundColor(QColor(0, 0, 0));
+                        (&progList[(int)(showsPerListing / 2)])->setPaletteBackgroundColor(progFindMid_bgColor);
+			(&progList[(int)(showsPerListing / 2)])->setPaletteForegroundColor(progFindMid_fgColor);
                         (&showList[(int)(showsPerListing / 2)])->setPaletteBackgroundColor(curProg_bgColor);
+			(&showList[(int)(showsPerListing / 2)])->setPaletteForegroundColor(curProg_fgColor);
+			
 			showProgramList();
 			clearShowData();
 		}
@@ -599,8 +625,10 @@ void ProgFinder::cursorRight()
 		    {
 			programTitle->setText("Select a program...");
 			description->setText("Select the title of the program you wish to find. When finished return with the left arrow key. Hitting 'Info' will allow you to setup recording options.");
+			(&abcList[(int)(showsPerListing / 2)])->setPaletteForegroundColor(curProg_fgColor);
 			(&abcList[(int)(showsPerListing / 2)])->setPaletteBackgroundColor(curProg_bgColor);
-                        (&progList[(int)(showsPerListing / 2)])->setPaletteBackgroundColor(QColor(0, 0, 0));
+                        (&progList[(int)(showsPerListing / 2)])->setPaletteBackgroundColor(progFindMid_bgColor);
+			(&progList[(int)(showsPerListing / 2)])->setPaletteForegroundColor(progFindMid_fgColor);
 			selectSearchData();
 		    }
 		    if (gotInitData[curSearch] == 1)
@@ -616,7 +644,9 @@ void ProgFinder::cursorRight()
 			if (gotInitData[curSearch] > 10)
 			{
                             (&progList[(int)(showsPerListing / 2)])->setPaletteBackgroundColor(curProg_bgColor);
-                            (&showList[(int)(showsPerListing / 2)])->setPaletteBackgroundColor(QColor(0, 0, 0));
+			    (&progList[(int)(showsPerListing / 2)])->setPaletteForegroundColor(curProg_fgColor);
+                            (&showList[(int)(showsPerListing / 2)])->setPaletteBackgroundColor(progFindMid_bgColor);
+			    (&showList[(int)(showsPerListing / 2)])->setPaletteForegroundColor(progFindMid_fgColor);
 			    selectShowData(progData[curProgram]);
 			}
 			else

@@ -147,6 +147,10 @@ struct recordingRecord {
     QColor abc_bgColor;
     QColor abc_fgColor;
     QColor recording_bgColor;
+    QColor progFindMid_bgColor;
+    QColor progFindMid_fgColor;
+    QColor misChanIcon_bgColor;
+    QColor misChanIcon_fgColor;
 
     void setupColorScheme();
     void setupLayout();
