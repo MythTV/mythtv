@@ -57,25 +57,6 @@ of the world need to modify the first line and modify the XMLTVGrabber
 variable to the correct grabber for their region.  <B>tv_grab_uk</B> for the
 UK, etc.  Use the name from the xmltv directory.</P>
 
-<H3>Adding support for an external tuner.</H3>
-
-<P>mythtv supports changing the channel on an external tuner.  If you have
-an external tuner, like a DirecTV or digital cable set top box, the
-following command should be added to your settings.txt file:
-<BLOCKQUOTE><CODE>
-<PRE>
-str ExternalChannelCommand=/usr/local/bin/changechannel
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>The <B>changechannel</B> program is not supplied with mythtv, so this is
-going to be dependant on what sort of external tuner you have.</P>
-<P>Feel free to browse some of what sort of hardware is available at 
-<A HREF="http://shop.store.yahoo.com/snapstreammedia/cablepacks.html">http://shop.store.yahoo.com/snapstreammedia/cablepacks.html</A>, or if
-you wish to assemble your own, rather than purchase, the following may be
-helpful: 
-<A HREF="http://www.snapstream.com/products/irblaster/sonydss.htm">http://www.snapstream.com/products/irblaster/sonydss.htm</A> for cable
-pinouts for RCA DSS receivers.</P>
 
 <H2><A NAME="ss9.2">9.2</A> <A HREF="mythtv-HOWTO.html#toc9.2">Running setup.</A>
 </H2>
@@ -137,7 +118,11 @@ depending on any number of factors, most of which you can't control.  It's
 best to just let the program run to completion.</P>
 <P><B>mythfilldatabase --manual</B> is another option; the manual option will
 allow you to fine tune channel frequencies and specify which channels will
-be added to the database.</P>
+be added to the database.  If you are not using the tv_grab_na grabber, you
+must use the <B>--manual</B> option.</P>
+<P><B>mythfilldatabse --file</B> is an option if there isn't an XMLTV grabber
+for your country, but you <B>do</B> have an XML formatted listings file
+created by some other program.</P>
 
 
 <H3>Setting <B>mythfilldatabase</B> to run from <B>cron</B></H3>

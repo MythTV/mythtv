@@ -9,18 +9,22 @@ v1.031, 2002-11-19.  Added text on the ALSA 0.9.0rc5/rc6 hanging bug, started
 development on mythmusic instructions, added text on obtaining document and
 using CVS.  Merged some more RH 8.0 documentation from Cedar McKay.  Applied
 Debian information patch from Matt Zimmerman.
-v1.032, 2002-11-22.  Added stuff on modifying xmltv.
+v1.032, 2002-11-22.  Added stuff on modifying xmltv, changed CVS
+documentation so that it's not dependant on CVSROOT being set, pointer to
+Tarek's DirecTV and external channel changing script, moved text around so
+that external tuner / DirecTV are located under "using mythtv".  Added
+troubleshooting information about KDE vs. Gnome on RH 8.0
 -->
 <!--
 To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
-"% linuxdoc -B txt mythtv-HOWTO.sgml"
+"% linuxdoc -B txt -b 1 mythtv-HOWTO.sgml"  
 -->
 
 <article>
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-11-19, v1.031
+<date>2002-11-22, v1.032
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -33,18 +37,18 @@ necessary.
 
 <sect>How to obtain this document.
 <p>This howto document is maintained at the primary mythtv website:  <url url="
-http://www.mythtv.org" name="http://www.mythtv.org">  The latest version of
+http://www.mythtv.org" name="http://www.mythtv.org">.  The latest version of
 this document can be found in CVS, accessible either through the <url
 url="http://www.mythtv.org/cgi-bin/viewcvs.cgi/" name="ViewCVS"> web interface, or directly from the
 CVS repository.  You may download the latest copy of mythtv and the 
 documentation from CVS this way:
 <tscreen><verb>
-% export CVSROOT=:pserver:mythtv@mythtv.org:/var/lib/cvs
 % mkdir mythtv
 % cd mythtv
-% cvs login mythtv
-Enter password: mythtv
-% cvs -z3 checkout MC
+% cvs -d :pserver:mythtv@mythtv.org:/var/lib/cvs login
+Logging in to :pserver:mythtv@mythtv.org:/var/lib/cvs
+CVS password: mythtv
+% cvs -d :pserver:mythtv@mythtv.org:/var/lib/cvs -z3 checkout MC
 </verb></tscreen>
 This documentation will be in the <tt>docs/</tt> subdirectory.
 
@@ -59,11 +63,12 @@ If you have installation instructions for a different region or Linux
 distribution, please send them to the author so that it can be included in other
 versions of this document.
 
-The document authors are:
+The contributors for this document are:
 <itemize>
 <item>Overall structure and Mandrake 9.0: Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
 <item>Red Hat Linux 8.0: Cedar McKay, <url url="mailto:mythhowto.3.ohthetrees@spamgourmet.com">
 <item>Gentoo:
+<item>Debian: Matthew Zimmerman, <url url="mailto:mdz@debian.org">
 </itemize>
 
 <sect>Checking prerequisites.
@@ -223,7 +228,6 @@ In that case, you're ready to move onto the next step.
 <p>[Please submit instructions]
 
 <sect3>Debian
-
 <p>Debian packages for MythTV and some of its add-on modules have been
 packaged by Matt Zimmerman <url url="mailto:mdz@debian.org"> and are
 available at <url
@@ -764,25 +768,6 @@ of the world need to modify the first line and modify the XMLTVGrabber
 variable to the correct grabber for their region.  <bf>tv_grab_uk</bf> for the
 UK, etc.  Use the name from the xmltv directory.
 
-<sect2>Adding support for an external tuner.
-<!-- Make this better -->
-<p>mythtv supports changing the channel on an external tuner.  If you have
-an external tuner, like a DirecTV or digital cable set top box, the
-following command should be added to your settings.txt file:
-<tscreen><verb>
-str ExternalChannelCommand=/usr/local/bin/changechannel
-</verb></tscreen>
-
-The <bf>changechannel</bf> program is not supplied with mythtv, so this is
-going to be dependant on what sort of external tuner you have.
-
-Feel free to browse some of what sort of hardware is available at <url
-url="http://shop.store.yahoo.com/snapstreammedia/cablepacks.html"
-name="http://shop.store.yahoo.com/snapstreammedia/cablepacks.html">, or if
-you wish to assemble your own, rather than purchase, the following may be
-helpful: <url url="http://www.snapstream.com/products/irblaster/sonydss.htm"
-name="http://www.snapstream.com/products/irblaster/sonydss.htm"> for cable
-pinouts for RCA DSS receivers.
 
 <sect1>Running setup.
 <p>
@@ -835,7 +820,12 @@ best to just let the program run to completion.
 
 <bf>mythfilldatabase --manual</bf> is another option; the manual option will
 allow you to fine tune channel frequencies and specify which channels will
-be added to the database.
+be added to the database.  If you are not using the tv_grab_na grabber, you
+must use the <bf>--manual</bf> option.
+
+<bf>mythfilldatabse --file</bf> is an option if there isn't an XMLTV grabber
+for your country, but you <bf>do</bf> have an XML formatted listings file
+created by some other program.
 
 <!-- get more information on the manual setting -->
 
@@ -953,6 +943,38 @@ exit and restart <bf>mythfrontend</bf> for it to take effect.
 <bf>NOTE</bf>: Exiting <bf>mythfrontend</bf> will stop any recordings you
 have in progress, so make sure that the system isn't busy if you modify the
 theme while <bf>mythfrontend</bf> is still running.
+
+<sect1>Adding DirecTV information to the database.
+<p>A script for adding DirecTV information into the database has been
+written by tarek Lubani <url url="mailto:tarek@tarek.2y.net"> and is
+available at <url url="http://tarek.2y.net/myth/ppv.pl"
+name="http://tarek.2y.net/myth/ppv.pl">.  This is currently an external
+user-supplied program, so if you have issues with the script, please contact
+the author.
+
+<sect1>Adding support for an external tuner.
+<!-- Make this better -->
+<p>mythtv supports changing the channel on an external tuner.  If you have
+an external tuner, like a DirecTV or digital cable set top box, the
+following command should be added to your settings.txt file:
+<tscreen><verb>
+str ExternalChannelCommand=/usr/local/bin/changechannel
+</verb></tscreen>
+
+The <bf>changechannel</bf> program is not supplied with mythtv, so this is
+going to be dependant on what sort of external tuner you have.  An example
+script can be obtained from <url url="http://tarek.2y.net/myth/sony.pl"
+name="http://tarek.2y.net/myth/sony.pl">.  This is currently an external
+user-supplied program, so if you have issues with the script, please contact
+the author.
+
+Feel free to browse some of what sort of hardware is available at <url
+url="http://shop.store.yahoo.com/snapstreammedia/cablepacks.html"
+name="http://shop.store.yahoo.com/snapstreammedia/cablepacks.html">, or if
+you wish to assemble your own, rather than purchase, the following may be
+helpful: <url url="http://www.snapstream.com/products/irblaster/sonydss.htm"
+name="http://www.snapstream.com/products/irblaster/sonydss.htm"> for cable
+pinouts for RCA DSS receivers.
 
 <sect>mythweb.
 <p>mythweb allows you to use a web page to control various aspects of your
@@ -1119,8 +1141,13 @@ name="section">.
 <item>You have an Intel Celeron or Pentium Pro.  If you have either of these
 processors, make sure that your <ref id="deinterlace_" name="deinterlace">
 variable is set correctly.
-<item>If mythtvfilldatabase appears to be failing, edit the
-<tt>/usr/bin/tv_grab_na</tt> file and replace tvlistings2 with tvlistings
 </itemize>
-
+<sect1>mythfilldatabase failing.
+<p>If mythtvfilldatabase appears to be failing, edit the
+<tt>/usr/bin/tv_grab_na</tt> file and replace "tvlistings2" with
+"tvlistings" in line 1187.
+<sect1>mythtv seems to disappear; can't see video
+<p>If you're using Gnome as your window manager, try switching to KDE.  For
+Red Hat Linux 8.0 users, edit <tt>/etc/sysconfig/desktop</tt> and
+change "GNOME" to "KDE".
 </article>

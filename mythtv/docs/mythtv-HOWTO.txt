@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2002-11-19, v1.03
+  2002-11-22, v1.032
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -10,8 +10,6 @@
   ______________________________________________________________________
 
   Table of Contents
-
-
 
   1. How to obtain this document.
   2. Introduction.
@@ -63,13 +61,14 @@
 
   9. Configuring mythtv.
      9.1 Editing the settings.txt file.
-        9.1.1 Adding support for an external tuner.
      9.2 Running setup.
      9.3 Running mythfilldatabase.
         9.3.1 Setting mythfilldatabase to run from cron
 
   10. Using mythtv.
      10.1 Using themes with mythtv.
+     10.2 Adding DirecTV information to the database.
+     10.3 Adding support for an external tuner.
 
   11. mythweb.
      11.1 Installation and pre-requisites.
@@ -78,7 +77,6 @@
 
   12. mythgallery.
      12.1 Installation and pre-requisites.
-
   13. mythgame.
   14. mythmusic.
      14.1 Manual installation of pre-requisites
@@ -86,28 +84,26 @@
 
   15. Troubleshooting.
      15.1 Illegal Instruction.
-
+     15.2 mythfilldatabase failing.
+     15.3 mythtv seems to disappear; can't see video
 
   ______________________________________________________________________
 
   [1m1.  How to obtain this document.[0m
 
   This howto document is maintained at the primary mythtv website:
-  http://www.mythtv.org < http://www.mythtv.org>  The latest version of
+  http://www.mythtv.org < http://www.mythtv.org>.  The latest version of
   this document can be found in CVS, accessible either through the
   ViewCVS <http://www.mythtv.org/cgi-bin/viewcvs.cgi/> web interface, or
   directly from the CVS repository.  You may download the latest copy of
   mythtv and the documentation from CVS this way:
 
-
-       % export CVSROOT=:pserver:mythtv@mythtv.org:/var/lib/cvs
        % mkdir mythtv
        % cd mythtv
-       % cvs login mythtv
-       Enter password: mythtv
-       % cvs -z3 checkout MC
-
-
+       % cvs -d :pserver:mythtv@mythtv.org:/var/lib/cvs login
+       Logging in to :pserver:mythtv@mythtv.org:/var/lib/cvs
+       CVS password: mythtv
+       % cvs -d :pserver:mythtv@mythtv.org:/var/lib/cvs -z3 checkout MC
 
   This documentation will be in the docs/ subdirectory.
 
@@ -116,7 +112,6 @@
   <http://www.snowman.net/mailman/listinfo/mythtv-commits/> the mythtv-
   dev mailing list.
 
-
   [1m2.  Introduction.[0m
 
   This HOWTO document will focus on mythtv in a North American
@@ -124,7 +119,7 @@
   region or Linux distribution, please send them to the author so that
   it can be included in other versions of this document.
 
-  The document authors are:
+  The contributors for this document are:
 
   +o  Overall structure and Mandrake 9.0: Robert Kulagowski,
      <mailto:rkulagow@rocketmail.com>
@@ -134,6 +129,7 @@
 
   +o  Gentoo:
 
+  +o  Debian: Matthew Zimmerman,  <mailto:mdz@debian.org>
 
   [1m3.  Checking prerequisites.[0m
 
@@ -176,7 +172,6 @@
      using the RTJPEG codec with 480x480 capture resolution and play it
      back simultaneously, thereby allowing live TV watching.
 
-
   [1m3.2.  Software.[0m
 
   There are a few ways of installing programs on Linux systems; you can
@@ -196,7 +191,6 @@
   trying to use mythtv, then please check the main ALSA website and
   upgrade to the latest version, or see if your distribution has already
   packaged the latest ALSA drivers.
-
 
   [1m3.2.1.  Graphical installation tools.[0m
 
@@ -236,7 +230,6 @@
 
   If you marked anything to install, click on Install Marked.  Click
   "Yes" or OK if you get a message about satisfying dependencies.
-
 
   [1m3.2.1.2.  Red Hat Linux 8.0[0m
 
@@ -281,7 +274,6 @@
   This section details the various methods for installing pre-requisites
   from the command line.
 
-
   [1m3.2.2.1.  Mandrake 8.2 and 9.0[0m
 
   The simplest tool for installing packages from the command line is
@@ -289,24 +281,18 @@
 
   Open a shell, and execute the following, all on the same line:
 
-
        % su -
        # urpmi perl-5.8 mysql gcc gcc-c++ freetype2-devel libqt3-devel cdialog
        alsa-utils
-
-
 
   You may get asked a number of questions regarding dependencies.  It's
   best to answer "YES".
 
   However, you might get this when you execute the command above:
 
-
        [root@pvr root]# urpmi perl-5.8 mysql gcc gcc-c++
        freetype2-devel libqt3-devel cdialog
        everything already installed
-
-
 
   In that case, you're ready to move onto the next step.
 
@@ -314,11 +300,9 @@
 
   [Please submit instructions]
 
-
   [1m3.2.2.3.  Gentoo.[0m
 
   [Please submit instructions]
-
 
   [1m3.2.2.4.  Debian[0m
 
@@ -333,7 +317,6 @@
   http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html
   <http://www.snowman.net/pipermail/mythtv-
   dev/2002-November/001116.html>.
-
 
   [1m4.  Setting up paths and ldconfig.[0m
 
@@ -350,8 +333,6 @@
   Open a shell, and switch to superuser mode.  [1mNOTE: ^D [22mmeans press [1mCTRL[0m
   and [1md [22mat the same time.
 
-
-
        % su -
        # cd /etc/profile.d
        cat > mythtv.sh
@@ -363,26 +344,20 @@
        # exit
        % exit
 
-
-
   The last two commands are to exit out of the shell.  This way, when
   you next open a shell your new commands will take effect.
-
 
   [1m4.1.2.  Red Hat Linux 8.0[0m
 
   [Please submit instructions]
 
-
   [1m4.1.3.  Gentoo.[0m
 
   [Please submit instructions]
 
-
   [1m4.2.  Checking that it worked.[0m
 
   Open a shell and switch to superuser mode again.
-
 
        % su -
        # set
@@ -391,29 +366,23 @@
        QTDIR=/usr/lib/qt3
        PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
 
-
-
   You should see QTDIR and the path changes you made.
 
   Next, we need to make sure that the libraries that we're building will
   be found when we need them.
 
-
   [1m4.3.  Modifying /etc/ld.so.conf[0m
 
   Switch to /etc and execute the following:
 
+       # cd /etc
+       # cat >> ld.so.conf
+       /usr/local/lib
+       ^D
 
-  # cd /etc
-  # cat >> ld.so.conf
-  /usr/local/lib
-  ^D
-
-  # ldconfig
-  # exit
-  %
-
-
+       # ldconfig
+       # exit
+       %
 
   [1m5.  Downloading and compiling.[0m
 
@@ -427,7 +396,6 @@
   Download the source code to v3.92 by following the links to
   sourceforge.net
 
-
   [1m5.1.  Notes on compiling on a system with non-Intel processors.[0m
 
   If you've got a system with an AMD K6-2 or a VIA C3 processor, make
@@ -437,50 +405,41 @@
 
   -march=pentiumpro
 
-
   and replace it with
 
   -march=i586
-
 
   before you compile.
 
   Recent AMD processors, like the Duron, Thunderbird and Athlon don't
   need this change.
 
-
   [1m5.2.  Building LAME.[0m
 
   Open a shell and switch to the directory where you saved lame.
 
-
-       % tar -xzf lame-3.92.tar.gz
-       % cd lame-3.92
-       % ./configure
-       % make
-       % make test
-       % su
-       # make install
-
-
+  % tar -xzf lame-3.92.tar.gz
+  % cd lame-3.92
+  % ./configure
+  % make
+  % make test
+  % su
+  # make install
 
   Check that it worked:
 
+       # ls -l /usr/local/lib
+       -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
+       -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
+       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
+       libmp3lame.so.0.0.0*
+       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
+       libmp3lame.so.0.0.0*
+       -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
+       libmp3lame.so.0.0.0*
 
-  # ls -l /usr/local/lib
-  -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
-  -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
-  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
-  libmp3lame.so.0.0.0*
-  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
-  libmp3lame.so.0.0.0*
-  -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
-  libmp3lame.so.0.0.0*
-
-  # exit
-  %
-
-
+       # exit
+       %
 
   [1m5.3.  Building XMLTV.[0m
 
@@ -496,7 +455,6 @@
 
   Open a shell prompt:
 
-
        % tar -xzf expat-1.95.5.tar.gz
        % cd expat-1.95.5
        % ./configure
@@ -506,18 +464,12 @@
        # exit
        %
 
-
-
   Untar the xmltv file:
-
 
        % tar -xjf xmltv-0.5.2.tar.bz2
        % cd xmltv-0.5.2
 
-
-
   Install the xmltv prerequisites:
-
 
        % su -
        # perl -MCPAN -e shell
@@ -528,14 +480,10 @@
        cpan> install XML::Writer
        cpan> exit
 
-
   Change to the XMLTV directory and compile it:
-
 
        % cd xmltv-0.5.2
        % perl Makefile.PL
-
-
 
   You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes"
   to the grabber required for your location.
@@ -544,35 +492,26 @@
   matter if you're installing North America and have followed the
   instructions to this point.
 
-
        % make
        % make test
        % su
        # make install
        # exit
 
-
-
   [1m5.4.  Building mythtv.[0m
 
   Unpack mythtv
-
 
        % tar -xjf mythtv-0.7.tar.bz2
        % cd mythtv-0.7
        % ./configure
        % make
 
-
-
   Switch to superuser:
-
 
        % su
        # make install
        # exit
-
-
 
   [1m6.  MySQL.[0m
 
@@ -582,7 +521,6 @@
   Mandrake Control Center->System->Services, find mysql and click the
   "On Boot" button and the "Start" button if the mysql status shows that
   it isn't running yet.
-
 
   [1m6.2.  Red Hat Linux 8.0[0m
 
@@ -595,50 +533,30 @@
 
   Please submit content.
 
-
   [1m6.4.  Setting up the initial database.[0m
 
   Setup the initial mysql databases:
 
-
        % cd database
-
-
 
   [1m6.4.1.  Mandrake 9.0[0m
 
-
-
        % mysql -u root < mc.sql
-
-
 
   [1m6.4.2.  Debian 3.0[0m
 
-
-
        % mysql < mc.sql
-
-
 
   [1m6.4.3.  Red Hat Linux 8.0[0m
 
-
-
        % mysql < mc.sql
-
-
 
   if this returns an error message try switching to root first.
 
-
-
-       % su
-       # mysql < mc.sql
-       # exit
-       %
-
-
+  % su
+  # mysql < mc.sql
+  # exit
+  %
 
   [1m7.  Setting up ALSA and the mixer.[0m
 
@@ -649,9 +567,9 @@
 
   What you need to do is to mute the "line-in" of your sound card and
   also set it as the recording source.
+
   There are two ways to do this.  Graphically, and from the command
   line.
-
 
   [1m7.1.  Graphically setting up the mixer.[0m
 
@@ -670,7 +588,6 @@
   click on the red LED so that it turns bright red, indicating that it's
   "ON"; this insures that the Line-in is used as the source.  Click OK,
   and make sure that you save the settings so that this is your default.
-
 
   [1m7.1.2.  Red Hat Linux 8.0[0m
 
@@ -704,26 +621,20 @@
   the mixer and check "mute" and "record" on the "mike in", and turn up
   the gain.
 
-
   [1m7.2.  Setting the mixer from the command line.[0m
 
   If you're running Mandrake 9.0 and have installed the alsa-utils
   package, then the [1mamixer [22mprogram can be used to setup the mixer.
 
-
-
-  % amixer set Master,0 100%,100% unmute
-  % amixer set Line,0 100%,100% mute capture
-  % su -
-  # alsactl store
-  # exit
-  %
-
-
+       % amixer set Master,0 100%,100% unmute
+       % amixer set Line,0 100%,100% mute capture
+       % su -
+       # alsactl store
+       # exit
+       %
 
   That takes care of setting the volume correctly, and the ALSA startup
   script will restore the volume after a reboot.
-
 
   [1m8.  Setting up a remote control.[0m
 
@@ -740,30 +651,23 @@
   http://www.kernel.org/pub/linux/kernel/v2.4/
   <http://www.kernel.org/pub/linux/kernel/v2.4/>.
 
-
   [1m8.1.  Obtaining the kernel.[0m
 
   An easy way is to use the wget command:
 
-
        % wget http://www.kernel.org/pub/linux/kernel/v2.4/linux-2.4.19.tar.bz2
-
-
 
   Next, open a shell and login as superuser.
 
-
-       % su
-       # mkdir /usr/src
-       # mv linux-2.4.19.tar.bz2 /usr/src
-       # cd /usr/src
-       # tar -xjf linux-2.4.19.tar.bz2
-       # chown -R root.root linux-2.4.19
-       # ln -sf linux-2.4.19 linux
-       # exit
-       %
-
-
+  % su
+  # mkdir /usr/src
+  # mv linux-2.4.19.tar.bz2 /usr/src
+  # cd /usr/src
+  # tar -xjf linux-2.4.19.tar.bz2
+  # chown -R root.root linux-2.4.19
+  # ln -sf linux-2.4.19 linux
+  # exit
+  %
 
   [1m8.2.  Obtaining and compiling lirc.[0m
 
@@ -772,13 +676,9 @@
   2002-11-07, the version available is 0.6.6.  Grab the remotes.tgz file
   as well.
 
-
-
-  % tar -xjf lirc-0.6.6.tar.bz2
-  % cd lirc-0.6.6
-  % ./setup.sh
-
-
+       % tar -xjf lirc-0.6.6.tar.bz2
+       % cd lirc-0.6.6
+       % ./setup.sh
 
   You're going to need to know what sort of receiver you have and where
   it's connected.  In my case, I have a Pinnacle Studio TV card, with
@@ -791,39 +691,29 @@
   your capture card and not to a serial port, so make sure that you've
   got the correct one.
 
-
   You then click "Save Configuration and run configure" to continue.
 
   Once the configuration step is complete:
-
 
        % make
        % su
        # make install
        # chmod 666 /dev/lircd
 
-
-
   Next, we're going to manually start lircd the first time:
 
-
        # /usr/local/sbin/lircd
-
-
 
   Now, we're going to add the commands necessary for lircd to run each
   time we boot:
 
-
-       # cd /etc/rc.d
-       # cat >> rc.local
-       echo "Starting lircd"
-       /usr/local/sbin/lircd
-       ^D
-       # exit
-       %
-
-
+  # cd /etc/rc.d
+  # cat >> rc.local
+  echo "Starting lircd"
+  /usr/local/sbin/lircd
+  ^D
+  # exit
+  %
 
   This takes care of the lircd portion, which "listens" for the IR sig-
   nals. If everything went well, the install script for lircd put an
@@ -834,26 +724,16 @@
   The next step is to convert those signals into something that can be
   used to control mythtv.
 
-
-
-  % cd ~/mythtv-0.7/configfiles
-  % cp lircrc.example ~/.lircrc
-
-
+       % cd ~/mythtv-0.7/configfiles
+       % cp lircrc.example ~/.lircrc
 
   or
 
-
        % cp lircrc.example.pinnaclestudiopctv ~/.lircrc
-
-
 
   if you've got a Pinnacle Studio PCTV remote.
 
-
        % irw
-
-
 
   Start pressing the keys on your remote; [1mirw [22mwill print the name of the
   button as it is defined in your /etc/lircd.conf. If you don't see any-
@@ -866,10 +746,7 @@
   [1mirxevent [22misn't a daemon, so if you know that your remote is working
   you need to invoke it like this:
 
-
        % irxevent &
-
-
 
   If [1mirxevent [22misn't running, then mythtv will not respond to your remote
   control.
@@ -881,7 +758,6 @@
   configfiles/lircrc.example.pinnaclestudiopctv file has an example of
   calling an external program from a remote control button.
 
-
   [1m8.3.  Additional information for lirc.[0m
 
   Take a look at the lircrc.example files in the configfiles/ directory.
@@ -891,34 +767,26 @@
 
   The lircrc.example file has this:
 
+       begin
+           prog = irxevent
+           button = ChannelUp
+           config = Key Up CurrentWindow
+       end
 
-
-  begin
-      prog = irxevent
-      button = ChannelUp
-      config = Key Up CurrentWindow
-  end
-
-  begin
-      prog = irxevent
-      button = ChannelDown
-      config = Key Down CurrentWindow
-  end
-
-
+       begin
+           prog = irxevent
+           button = ChannelDown
+           config = Key Down CurrentWindow
+       end
 
   but the /etc/lircd.conf that comes in the lircd package defines the
   buttons for the Pinnacle Studio PCTV as:
 
-
                  channel+                 0x0000000000000017
                  channel-                 0x000000000000001C
 
-
-
   rather than "ChannelUp" and "ChannelDown".  I added the following to
   my /home/[yourusername]/.lircrc file:
-
 
        begin
            prog = irxevent
@@ -932,8 +800,6 @@
            config = Key Down CurrentWindow
        end
 
-
-
   which took care of basic functionality.  Because the PCTV Studio
   remote has additional buttons, look at the configfiles/lircrc.exam-
   ple.pinnaclestudiopctv for an example of how to define additional but-
@@ -945,14 +811,11 @@
   the appropriate mappings in .lircrc to get excellent remote
   functionality with mythtv.
 
-
   [1m9.  Configuring mythtv.[0m
 
   By this point, all of the prerequisites have been installed, [1mmysql [22mis
   running and has had its initial database setup.  It's now time to
   configure mythtv.
-
-
 
   [1m9.1.  Editing the settings.txt file.[0m
 
@@ -964,13 +827,10 @@
   wish to create a /var/video subdirectory, so you would change
   /mnt/store to /var/video
 
-
        % su
        # mkdir /var/video
        # chmod a+rwx /var/video
        # exit
-
-
 
   The settings.txt file is fairly self-explanatory.  Currently, mythtv
   supports two different video encoders, MPEG4 and RTJPEG.  Take note
@@ -994,30 +854,6 @@
   XMLTVGrabber variable to the correct grabber for their region.
   [1mtv_grab_uk [22mfor the UK, etc.  Use the name from the xmltv directory.
 
-
-  [1m9.1.1.  Adding support for an external tuner.[0m
-
-  mythtv supports changing the channel on an external tuner.  If you
-  have an external tuner, like a DirecTV or digital cable set top box,
-  the following command should be added to your settings.txt file:
-
-
-       str ExternalChannelCommand=/usr/local/bin/changechannel
-
-
-
-  The [1mchangechannel [22mprogram is not supplied with mythtv, so this is
-  going to be dependant on what sort of external tuner you have.
-
-  Feel free to browse some of what sort of hardware is available at
-  http://shop.store.yahoo.com/snapstreammedia/cablepacks.html
-  <http://shop.store.yahoo.com/snapstreammedia/cablepacks.html>, or if
-  you wish to assemble your own, rather than purchase, the following may
-  be helpful: http://www.snapstream.com/products/irblaster/sonydss.htm
-  <http://www.snapstream.com/products/irblaster/sonydss.htm> for cable
-  pinouts for RCA DSS receivers.
-
-
   [1m9.2.  Running setup.[0m
 
   Now that you've edited your settings.txt file, it's time to run the
@@ -1025,11 +861,7 @@
 
   Open a shell, and switch to the setup directory:
 
-
-
        % cd setup
-
-
 
   [1mNOTE[22m:Red Hat Linux 8.0 uses an unusual character encoding scheme that
   some programs don't deal well with. As a result, whenever you run
@@ -1039,22 +871,14 @@
 
   Red Hat 8.0 users, ensure that you do this:
 
-
        % env LANG=C setup
-
-
 
   instead of what all the other distributions should use:
 
-
-
        % ./setup
-
-
 
   The setup program will ask you a few questions and then proceed to run
   the XMLTV grabber program.
-
 
   [1m9.3.  Running mythfilldatabase.[0m
 
@@ -1063,27 +887,24 @@
 
   Red Hat 8.0 users, ensure that you do this:
 
-
        % env LANG=C mythfilldatabase
-
-
 
   All other distributions can execute the following:
 
-
-
        % mythfilldatabase
-
-
 
   [1mNOTE[22m:  [1mmythfilldatabase [22mmight take a while to complete, depending on
   any number of factors, most of which you can't control.  It's best to
   just let the program run to completion.
+
   [1mmythfilldatabase --manual [22mis another option; the manual option will
   allow you to fine tune channel frequencies and specify which channels
-  will be added to the database.
+  will be added to the database.  If you are not using the tv_grab_na
+  grabber, you must use the [1m--manual [22moption.
 
-
+  [1mmythfilldatabse --file [22mis an option if there isn't an XMLTV grabber
+  for your country, but you [1mdo [22mhave an XML formatted listings file
+  created by some other program.
 
   [1m9.3.1.  Setting mythfilldatabase  to run from cron[0m
 
@@ -1098,16 +919,12 @@
   If you are a Mandrake 9.0 user and wish to use a system cron job, you
   can perform the following steps:
 
-
        % cd configfiles
        % su
        # cp mythfilldatabasecron /etc/cron.daily
 
-
-
   If you want to know what time your job will run, you can do the
   following:
-
 
        # cat /etc/crontab
        SHELL=/bin/bash
@@ -1123,8 +940,6 @@
        # exit
        %
 
-
-
   We can see from the display that the cron.daily job will run at 0402
   every morning.
 
@@ -1136,8 +951,6 @@
   configfiles/mythcrontab file in your favorite editor and modify it as
   you like.  Once you're satisfied with the time that [1mmythfilldatabase[0m
   will run, save and exit, and return to the shell prompt.
-
-
 
   % cd configfiles
   % crontab mythcrontab
@@ -1152,31 +965,21 @@
   30 04 * * * /bin/bash $HOME/mythtv-0.7/MC/configfiles/mythfilldatabasecron
   %
 
-
-
   As you can see, [1mmythfilldatabase [22mwill now be run at 0430 every day.
 
   If you decide to alter the time that the [1mmythfilldatabase [22mruns, you
   can use the crontab command to open your existing job and edit it in
   place.
 
-
-
        % crontab -e
-
-
 
   The [1mcrontab -e [22mcommand will allow you to edit the existing crontab.
   [1mNOTE[22m:  By default, the crontab will use [1mvi [22mas your editor.  If you
   don't like to use [1mvi[22m, make sure that you've set VISUAL to something
   other than [1mvi[22m.
 
-
-
        % export VISUAL=/usr/bin/joe
        % crontab -e
-
-
 
   This will cause [1mcrontab [22mto use [1mjoe[22m, a visual editor that uses the
   Wordstar command sequence.  You may use [1memacs[22m, or any other editor
@@ -1188,7 +991,6 @@
   the grid, the "I" key will give you more information on a program and
   ESC will exit out back to the shell.
 
-
   [1m10.  Using mythtv.[0m
 
   [1mmythfrontend [22mis the main interface to the mythtv program.  This
@@ -1196,8 +998,6 @@
   run and ensures that programs that you've scheduled for recording
   actually get recorded, so it's important that this program is always
   running.
-
-
 
   [1m10.1.  Using themes with mythtv.[0m
 
@@ -1214,6 +1014,36 @@
   progress, so make sure that the system isn't busy if you modify the
   theme while [1mmythfrontend [22mis still running.
 
+  [1m10.2.  Adding DirecTV information to the database.[0m
+
+  A script for adding DirecTV information into the database has been
+  written by tarek Lubani  <mailto:tarek@tarek.2y.net> and is available
+  at http://tarek.2y.net/myth/ppv.pl <http://tarek.2y.net/myth/ppv.pl>.
+  This is currently an external user-supplied program, so if you have
+  issues with the script, please contact the author.
+
+  [1m10.3.  Adding support for an external tuner.[0m
+
+  mythtv supports changing the channel on an external tuner.  If you
+  have an external tuner, like a DirecTV or digital cable set top box,
+  the following command should be added to your settings.txt file:
+
+       str ExternalChannelCommand=/usr/local/bin/changechannel
+
+  The [1mchangechannel [22mprogram is not supplied with mythtv, so this is
+  going to be dependant on what sort of external tuner you have.  An
+  example script can be obtained from http://tarek.2y.net/myth/sony.pl
+  <http://tarek.2y.net/myth/sony.pl>.  This is currently an external
+  user-supplied program, so if you have issues with the script, please
+  contact the author.
+
+  Feel free to browse some of what sort of hardware is available at
+  http://shop.store.yahoo.com/snapstreammedia/cablepacks.html
+  <http://shop.store.yahoo.com/snapstreammedia/cablepacks.html>, or if
+  you wish to assemble your own, rather than purchase, the following may
+  be helpful: http://www.snapstream.com/products/irblaster/sonydss.htm
+  <http://www.snapstream.com/products/irblaster/sonydss.htm> for cable
+  pinouts for RCA DSS receivers.
 
   [1m11.  mythweb.[0m
 
@@ -1221,15 +1051,12 @@
   your mythtv system.  mythweb is a separate application, but it's
   dependant on mythtv being installed and operational.
 
-
   [1m11.1.  Installation and pre-requisites.[0m
 
   Download mythweb from http://www.mythtv.org/ <http://www.mythtv.org/>
   and save it to a location where you can find it.  The next step
   depends on whether your distribution has a web server and if you have
   php support.
-
-
   [1m11.1.1.  Mandrake 9.0[0m
 
   Mandrake 9.0 has [1mapache [22mand [1mphp [22mpre-packaged, so installation is quite
@@ -1239,10 +1066,7 @@
   ensured that the [1mapache [22mserver will start at boot using the Mandrake
   Control Center.
 
-
   [1m11.2.  Completing the installation.[0m
-
-
 
        % tar -xjf mythweb-0.7.tar.bz2
        % cd mythweb-0.7
@@ -1252,15 +1076,11 @@
        # exit
        %
 
-
-
   To access the web page, open a web browser and use [1mhttp://[name or ip[0m
   [1maddress]/mythweb/[0m
 
   [1mNOTE[22m: Make sure that you have a trailing slash on the URL, otherwise
   you will get a 404 Page not Found error.
-
-
 
   [1m12.  mythgallery.[0m
 
@@ -1274,7 +1094,6 @@
   <http://www.mythtv.org/> and save it to a location where you can find
   it.
 
-
        % tar -xjf mythgallery-0.7.tar.bz2
        % cd mythgallery-0.7
        % make
@@ -1283,13 +1102,10 @@
        # exit
        %
 
-
-
   The configuration file for mythgallery is located in
   /usr/local/share/mythtv.  This file needs to be edited:  ensure that
   your GalleryDir variable is set to the directory where your pictures
   are stored.
-
 
   +o  Use the arrow keys to move around the thumbnails.
 
@@ -1302,7 +1118,6 @@
 
   +o  Use ESC to go up one level, or to exit out of the module if you're
      at the first level.
-
 
   [1m13.  mythgame.[0m
 
@@ -1329,7 +1144,6 @@
 
   +o  CDParanoia
 
-
   [1m14.1.  Manual installation of pre-requisites[0m
 
   These instructions are for distributions which don't have pre-compiled
@@ -1338,8 +1152,6 @@
   Download MAD from http://www.mars.org/home/rob/proj/mpeg/
   <http://www.mars.org/home/rob/proj/mpeg/>  Save it to a directory you
   can find later.
-
-
 
        % tar -xzf mad-0.14.2b.tar.gz
        % cd mad-0.14.2b
@@ -1350,26 +1162,19 @@
        # exit
        %
 
-
-
   Download FLAC from http://flac.sourceforge.net
   <http://flac.sourceforge.net> and install:
 
-
-
-       % tar -xzf flac-1.0.4.tar.gz
-       % cd flac-1.0.4
-       % ./configure
-       % make
-       % su
-       # make install
-       # exit
-       %
-
-
+  % tar -xzf flac-1.0.4.tar.gz
+  % cd flac-1.0.4
+  % ./configure
+  % make
+  % su
+  # make install
+  # exit
+  %
 
   Download and install libcdaudio:
-
 
        % tar -xzf libcdaudio-XXXXX
        % cd libcdaudio-XXXXX
@@ -1380,15 +1185,11 @@
        # exit
        %
 
-
-
   Download cdparanoia from the website and copy
   interface/cdda_interface.h to /usr/local/include
 
   /usr/lib: ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so ln
   -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
-
-
 
   [1m14.2.  Mandrake 9.0[0m
 
@@ -1398,12 +1199,10 @@
   repositories.  Applications downloaded from " cooker" come from the
   development branch, so there may be issues with some software.
 
-
   Install libvorbis-devel using urpmi or the Mandrake Control Center
   installer.
 
   Install cdparanoia using urpmi or the Mandrake Control Center.
-
 
   [1m15.  Troubleshooting.[0m
 
@@ -1419,8 +1218,15 @@
      these processors, make sure that your ``deinterlace'' variable is
      set correctly.
 
-  +o  If mythtvfilldatabase appears to be failing, edit the
-     /usr/bin/tv_grab_na file and replace tvlistings2 with tvlistings
+  [1m15.2.  mythfilldatabase failing.[0m
 
+  If mythtvfilldatabase appears to be failing, edit the
+  /usr/bin/tv_grab_na file and replace "tvlistings2" with "tvlistings"
+  in line 1187.
 
+  [1m15.3.  mythtv seems to disappear; can't see video[0m
+
+  If you're using Gnome as your window manager, try switching to KDE.
+  For Red Hat Linux 8.0 users, edit /etc/sysconfig/desktop and change
+  "GNOME" to "KDE".
 

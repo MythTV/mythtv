@@ -25,11 +25,20 @@ these, make sure that you you followed the instructions in this
 processors, make sure that your 
 <A HREF="mythtv-HOWTO-9.html#deinterlace_">deinterlace</A>
 variable is set correctly.</LI>
-<LI>If mythtvfilldatabase appears to be failing, edit the
-<CODE>/usr/bin/tv_grab_na</CODE> file and replace tvlistings2 with tvlistings</LI>
 </UL>
 </P>
+<H2><A NAME="ss15.2">15.2</A> <A HREF="mythtv-HOWTO.html#toc15.2">mythfilldatabase failing.</A>
+</H2>
 
+<P>If mythtvfilldatabase appears to be failing, edit the
+<CODE>/usr/bin/tv_grab_na</CODE> file and replace "tvlistings2" with
+"tvlistings" in line 1187.</P>
+<H2><A NAME="ss15.3">15.3</A> <A HREF="mythtv-HOWTO.html#toc15.3">mythtv seems to disappear; can't see video</A>
+</H2>
+
+<P>If you're using Gnome as your window manager, try switching to KDE.  For
+Red Hat Linux 8.0 users, edit <CODE>/etc/sysconfig/desktop</CODE> and
+change "GNOME" to "KDE".</P>
 <HR>
 Next
 <A HREF="mythtv-HOWTO-14.html">Previous</A>
