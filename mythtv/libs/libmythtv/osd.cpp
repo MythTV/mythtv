@@ -159,7 +159,7 @@ void OSD::SetDefaults(void)
         AddSet(container, name);
  
         QRect area = QRect(20, 40, 620, 300);
-        QRect listarea = QRect(20, 40, 294, 300);
+        QRect listarea = QRect(0, 0, 274, 260);
 
         normalizeRect(area);
         normalizeRect(listarea);

@@ -157,6 +157,8 @@ void OSDListTreeType::SetAsTree(OSDGenericTree *toplevel)
         QString levelname = QString("level%1").arg(i + 1);
 
         QRect curlevelarea = m_levelsize;
+        curlevelarea.moveBy(m_totalarea.x(), m_totalarea.y());
+
         curlevelarea.moveBy((m_levelsize.width() + m_levelspacing) * i, 0);
 
         OSDListBtnType *newlevel = new OSDListBtnType(levelname, curlevelarea,
