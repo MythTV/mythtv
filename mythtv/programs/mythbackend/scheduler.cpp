@@ -140,7 +140,7 @@ class comp_proginfo
   public:
     bool operator()(ProgramInfo *a, ProgramInfo *b)
     {
-        return (a->startts < b->startts);
+        return (a->recstartts < b->recstartts);
     }
 };
 
@@ -251,7 +251,7 @@ void Scheduler::PrintList(void)
 
         cout << first->title.leftJustify(22, ' ', true)
              << first->chanstr.rightJustify(4, ' ') << "  " << first->chanid 
-             << first->startts.toString("  MMM dd hh:mmap  ")
+             << first->recstartts.toString("  MMM dd hh:mmap  ")
              << first->sourceid 
              << " " << first->inputid << " " << first->cardid << " -- "  
              << first->conflicting << " " << first->recording << " "
@@ -320,12 +320,7 @@ bool Scheduler::Conflict(ProgramInfo *a, ProgramInfo *b)
             return false;
     }
 
-    if ((a->startts <= b->startts && b->startts < a->endts) ||
-        (a->startts <  b->endts   && b->endts   < a->endts) ||
-        (b->startts <= a->startts && a->startts < b->endts) ||
-        (b->startts <  a->endts   && a->endts   < b->endts))
-        return true;
-    return false;
+    return (a->recstartts < b->recendts && a->recendts > b->recstartts);
 }
 
 void Scheduler::MarkKnownInputs(void)
@@ -406,7 +401,7 @@ void Scheduler::PruneList(void)
     {
         ProgramInfo *rec = (*q);
 
-        if (rec->startts > now)
+        if (rec->recstartts > now)
         {
             break;
         }
@@ -464,7 +459,7 @@ void Scheduler::PruneList(void)
             if (first->IsSameProgram(*second))
             {
                 if (((second->conflicting && !first->conflicting) ||
-                     second->startts < now.addSecs(-15) || first->override == 1) 
+                     second->recstartts < now.addSecs(-15) || first->override == 1) 
                     && second->override != 1 
                     && second->recdups != kRecordDupsAlways)
                 {
@@ -814,13 +809,13 @@ ProgramInfo *Scheduler::GetBest(ProgramInfo *info,
         }
         else if (testtype == type)
         {
-            if (test->startts < info->startts)
+            if (test->recstartts < info->recstartts)
             {
                 best = test;
                 break;
             }
-            if (test->startts.secsTo(test->endts) >
-                info->startts.secsTo(info->endts))
+            if (test->recstartts.secsTo(test->recendts) >
+                info->recstartts.secsTo(info->recendts))
             {
                 best = test;
                 break;
@@ -939,7 +934,7 @@ list<ProgramInfo *> *Scheduler::CopyList(list<ProgramInfo *> *sourcelist)
                     cerr << first->title.leftJustify(22, ' ', true)
                          << first->chanstr.rightJustify(4, ' ') << "  " 
                          << first->chanid 
-                         << first->startts.toString("  MMM dd hh:mmap  ")
+                         << first->recstartts.toString("  MMM dd hh:mmap  ")
                          << endl;
                     cerr << " for recording.  It will be removed.";
                     delete second;
@@ -1218,7 +1213,7 @@ void Scheduler::RunScheduler(void)
 
             bool recording = nextRecording->recording;
 
-            nextrectime = nextRecording->startts;
+            nextrectime = nextRecording->recstartts;
             secsleft = curtime.secsTo(nextrectime);
 
             if (secsleft - prerollseconds > 35)

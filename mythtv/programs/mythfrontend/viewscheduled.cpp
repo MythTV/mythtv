@@ -468,8 +468,8 @@ void ViewScheduled::updateList(QPainter *p)
                             tempSubTitle = tempSubTitle + " - \"" + 
                                            tempInfo->subtitle + "\"";
 
-                        tempDate = (tempInfo->startts).toString(shortdateformat);
-                        tempTime = (tempInfo->startts).toString(timeformat);
+                        tempDate = (tempInfo->recstartts).toString(shortdateformat);
+                        tempTime = (tempInfo->recstartts).toString(timeformat);
 
                         if (displayChanNum)
                             tempChan = tempInfo->chansign;
@@ -641,8 +641,8 @@ void ViewScheduled::updateInfo(QPainter *p)
     if (conflictData.count() > 0 && curitem)
     {  
 
-        QDateTime startts = curitem->startts;
-        QDateTime endts = curitem->endts;
+        QDateTime startts = curitem->recstartts;
+        QDateTime endts = curitem->recendts;
 
         QString timedate = startts.date().toString(dateformat) + ", " +
                            startts.time().toString(timeformat) + " - " +
@@ -903,7 +903,7 @@ void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
  
     QString button; 
     button = rec->title + QString("\n");
-    button += rec->startts.toString(dateformat + " " + timeformat);
+    button += rec->recstartts.toString(dateformat + " " + timeformat);
     if (gContext->GetNumSetting("DisplayChanNum") != 0)
         button += " on " + rec->channame + " [" + rec->chansign + "]";
     else
@@ -917,7 +917,7 @@ void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
         ProgramInfo *info = (*i);
 
         button = info->title + QString("\n");
-        button += info->startts.toString(dateformat + " " + timeformat);
+        button += info->recstartts.toString(dateformat + " " + timeformat);
         if (gContext->GetNumSetting("DisplayChanNum") != 0)
             button += " on " + info->channame + " [" + info->chansign + "]";
         else

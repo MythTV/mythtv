@@ -255,14 +255,15 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
                                                  list<ProgramInfo*>& proglist) {
      QString query = QString(
 "SELECT DISTINCT channel.chanid, channel.sourceid, "
-"program.starttime - INTERVAL preroll minute, "
-"program.endtime + INTERVAL postroll minute, "
+"program.starttime, program.endtime, "
 "program.title, program.subtitle, program.description, "
 "channel.channum, channel.callsign, channel.name, "
 "oldrecorded.starttime IS NOT NULL AS oldrecduplicate, program.category, "
 "record.rank, record.recorddups, "
 "recorded.starttime IS NOT NULL as recduplicate, record.type, "
-"record.recordid, recordoverride.type "
+"record.recordid, recordoverride.type, "
+"program.starttime - INTERVAL record.preroll minute, "
+"program.endtime + INTERVAL record.postroll minute "
 "FROM record "
 " INNER JOIN channel ON (channel.chanid = program.chanid) "
 " INNER JOIN program ON (program.title = record.title) "
@@ -350,6 +351,8 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
              proginfo->rectype = RecordingType(result.value(15).toInt());
              proginfo->recordid = result.value(16).toInt();
              proginfo->override = result.value(17).toInt();
+             proginfo->recstartts = result.value(18).toDateTime();
+             proginfo->recendts = result.value(19).toDateTime();
 
              if (proginfo->override == 2)
              {
@@ -482,7 +485,7 @@ bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
     // Have to split up into parts since .arg() only supports %1-%9
     QString query = QString(
 "SELECT "
-"recordid, preroll, postroll "
+"recordid "
 "FROM record "
 "WHERE "
 "record.title = \"%1\" "
@@ -493,24 +496,15 @@ bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
 "  AND "
 "  ((record.type = %4) " // channelrecord
 "   OR"
-"   ((((TIME_TO_SEC(record.starttime) = TIME_TO_SEC('%5')) " // timeslot matches
+"   (((TIME_TO_SEC(record.starttime) = TIME_TO_SEC('%5')) " // timeslot matches
 "      AND "
 "     (TIME_TO_SEC(record.endtime) = TIME_TO_SEC('%6')) "
-"     ) OR "
-"     (((preroll <> 0) OR (postroll <> 0)) "
-"      AND "
-"      (TIME_TO_SEC(record.starttime) = MOD((TIME_TO_SEC('%7') + (preroll * 60)), 86400)) " // timeslot w/ pre & post-rolls matches
-"      AND "
-"      (TIME_TO_SEC(record.endtime) = MOD((TIME_TO_SEC('%8') - (postroll * 60)), 86400)) "
-"     ) "
-"    ) "
+"    )"
 "    AND ")
         .arg(sqltitle.utf8())
         .arg(kAllRecord)
         .arg(chanid)
         .arg(kChannelRecord)
-        .arg(proginfo->startts.time().toString(Qt::ISODate))
-        .arg(proginfo->endts.time().toString(Qt::ISODate))
         .arg(proginfo->startts.time().toString(Qt::ISODate))
         .arg(proginfo->endts.time().toString(Qt::ISODate));
 
@@ -544,19 +538,6 @@ query += QString(
         if (result.numRowsAffected() > 0) {
             result.next();
             loadByID(db, result.value(0).toInt());
-
-            if (result.value(1).toInt())
-            {
-                startTime->setValue(proginfo->startts.time());
-                startDate->setValue(proginfo->startts.date());
-            }
-
-            if (result.value(2).toInt())
-            {
-                endTime->setValue(proginfo->endts.time());
-                endDate->setValue(proginfo->endts.date());
-            }
-
             return true;
         } else {
             fromProgramInfo(proginfo);

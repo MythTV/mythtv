@@ -59,6 +59,8 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
 
     startts = other.startts;
     endts = other.endts;
+    recstartts = other.recstartts;
+    recendts = other.recendts;
     spread = other.spread;
     startCol = other.startCol;
  
@@ -116,6 +118,8 @@ void ProgramInfo::ToStringList(QStringList &list)
     list << QString::number(recordid);
     list << QString::number(rectype);
     list << QString::number(recdups);
+    list << recstartts.toString(Qt::ISODate);
+    list << recendts.toString(Qt::ISODate);
 }
 
 void ProgramInfo::FromStringList(QStringList &list, int offset)
@@ -151,6 +155,8 @@ void ProgramInfo::FromStringList(QStringList &list, int offset)
     recordid = list[offset + 22].toInt();
     rectype = RecordingType(list[offset + 23].toInt());
     recdups = RecordingDupsType(list[offset + 24].toInt());
+    recstartts = QDateTime::fromString(list[offset + 25], Qt::ISODate);
+    recendts = QDateTime::fromString(list[offset + 26], Qt::ISODate);
 
     if (title == " ")
         title = "";
@@ -1327,6 +1333,8 @@ void ProgramInfo::FillInRecordInfo(vector<ProgramInfo *> &reclist)
             recordid = p->recordid;
             rectype = p->rectype;
             recdups = p->recdups;
+            recstartts = p->recstartts;
+            recendts = p->recendts;
             return;
         }
     }
