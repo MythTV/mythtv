@@ -84,19 +84,21 @@ echo "  --disable-distcc         disable distributed compilation (distcc)"
 #echo "  --enable-amr_nb-fixed    use fixed point for amr-nb codec"
 #echo "  --enable-sunmlib         use Sun medialib [default=no]"
 #echo ""
-echo "Advanced options (experts only):"
+echo "Advanced compile options (experts only):"
 #echo "  --source-path=PATH       path of source code [$source_path]"
 #echo "  --cross-prefix=PREFIX    use PREFIX for compile tools [$cross_prefix]"
 #echo "  --cc=CC                  use C compiler CC [$cc]"
 #echo "  --make=MAKE              use specified make [$make]"
-echo "  --extra-cflags=ECFLAGS   add ECFLAGS to CFLAGS [$CFLAGS]"
+echo "  --extra-cflags=ECFLAGS   add ECFLAGS to list of flags for C/C++ compile"
 #echo "  --extra-ldflags=ELDFLAGS add ELDFLAGS to LDFLAGS [$LDFLAGS]"
 #echo "  --extra-libs=ELIBS       add ELIBS [$ELIBS]"
-echo "  --cpu=CPU                force cpu to CPU [$cpu] (will fail on other CPUs)"
-echo "  --tune=PROCESSOR         tune code for a particular CPU (may fail on other CPUs)"
+echo "  --cpu=CPU                only use instructions available on CPU [$cpu]"
+echo "  --tune=CPU               tune instruction usage for a particular CPU [$tune]"
+echo "  --arch=CPU               equivalent to \"--cpu=CPU --tune=CPU\""
 #echo "  --powerpc-perf-enable    enable performance report on PPC (requires enabling PMC)"
 echo "  --disable-mmx            disable mmx usage"
 echo "  --disable-altivec        disable AltiVec usage"
+echo "Advanced features (experts only):"
 echo "  --disable-audio-oss      disable OSS audio support"
 echo "  --disable-audio-alsa     disable ALSA audio support"
 echo "  --disable-audio-arts     disable aRts audio support"
@@ -127,7 +129,7 @@ echo "  --disable-ivtv           disable ivtv support (PVR-250, PVR-350)"
 echo "  --enable-dvb             enable DVB support (must supply header directory)"
 echo "  --dvb-path=HDRLOC        location of directory containing"
 echo "                           'linux/dvb/frontend.h', not the"
-echo "                           directory with frontend.h [$dvb-path]"
+echo "                           directory with frontend.h [$dvb_path]"
 echo "  --enable-dvb-eit         enable DVB EIT support (--enable-dvb is required)"
 echo "  --disable-x11            disable X11 support"
 echo "  --disable-xrandr         disable X11 resolution switching"
@@ -163,6 +165,37 @@ if test -f /proc/cpuinfo ; then
     fi
     processor_flags=`cat /proc/cpuinfo | grep "flags" | head -n 1`
 fi
+
+# These have to be looked up early for some types of cross-compiling to work
+cpu_overide="no"
+for opt do
+  case "$opt" in
+  --cpu=*)
+          cpu=`echo $opt | cut -d '=' -f 2`
+          cpu_raw="$cpu"
+          processor=""
+          processor_flags=""
+          cpu_overide="yes"
+  ;;
+  --tune=*)
+          tune=`echo $opt | cut -d '=' -f 2`
+          tune_raw="$tune"
+          processor=""
+          processor_flags=""
+  ;;
+  --arch=*)
+          arch=`echo $opt | cut -d '=' -f 2`
+          cpu="$arch"
+          cpu_raw="$arch"
+          tune="$arch"
+          tune_raw="$arch"
+          processor=""
+          processor_flags=""
+  ;;
+  esac
+done
+
+
 
 case "$cpu" in
   i386|i486|i586|i686|i86pc|BePC)
@@ -447,15 +480,11 @@ for opt do
   ;;
   --make=*) make=`echo $opt | cut -d '=' -f 2`
   ;;
-  --extra-cflags=*) CFLAGS="$CFLAGS ${opt#--extra-cflags=}"
+  --extra-cflags=*) ECFLAGS="$${opt#--extra-cflags=}"
   ;;
   --extra-ldflags=*) LDFLAGS=$LDFLAGS ${opt#--extra-ldflags=}
   ;;
   --extra-libs=*) extralibs=${opt#--extra-libs=}
-  ;;
-  --cpu=*) cpu=`echo $opt | cut -d '=' -f 2`
-  ;;
-  --tune=*) tune=`echo $opt | cut -d '=' -f 2`
   ;;
   --disable-ccache) ccache="no"
   ;;
@@ -780,9 +809,14 @@ if test $tune != "generic"; then
             POWERPCMODE="64bits"
 	;;
 	*)
-            ARCHFLAGS="-mcpu=$tune"
+            ARCHFLAGS="-mtune=$tune"
+            TUNECPU="$tune"
 	;;
     esac
+fi
+
+if test x"$cpu_overide" = x"yes"; then
+    ARCHFLAGS="-mcpu=$cpu_raw $ARCHFLAGS"
 fi
 
 # AltiVec flags: The FSF version of GCC differs from the Apple version 
@@ -831,12 +865,17 @@ $cc $CFLAGS $ARCHFLAGS -o $TMPE $TMPC 2> /dev/null || altivec="no"
 fi
 
 # if either tune or cpu is c3 or c3-2 optimize for smallness
-if test x"$tune" = x"c3" -o x"$tune" = x"c3-2" -o x"$cpu" = x"c3" -o x"$cpu" = x"c3-2"; then
+if test x"$cpu_raw" = x"c3" -o x"$cpu_raw" = x"c3-2"; then
+    ARCHFLAGS="-march=$cpu"
+    optimize="small"
+fi
+if test x"$tune" = x"c3" -o x"$tune" = x"c3-2"; then
+    ARCHFLAGS="-march=$tune"
     optimize="small"
 fi
 
 # if no tune setting and we know cpu class look at $processor 
-if test x"$tune" = x"generic" -a x"$cpu" = x"x86"; then
+if test x"$tune" = x"generic" -a x"$cpu_overide" = x"no"; then
    if expr "$processor" : ".*Intel(R) Pentium(R) 4" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
    elif expr "$processor" : ".*Intel(R) Pentium(R) M" > /dev/null ; then
@@ -865,9 +904,23 @@ elif test x"$tune" = x"generic" -a x"$cpu" = x"x86_64"; then
    ARCHFLAGS="-march=k8"
 fi
 
+# if arch flag is present ignore tune and cpu and just use arch
+if test x"$arch" != x""; then
+    ARCHFLAGS="-march=$arch"
+fi
+
 # if architecture specific flags don't work blank them
 echo "int main( void ) { return 0; }" > $TMPC
+TMP_ARCHFLAGS=$ARCHFLAGS
 $cc $CFLAGS $ARCHFLAGS -o $TMPE $TMPC 2> /dev/null || ARCHFLAGS=""
+if test x"$ARCHFLAGS" = x""; then
+    if test "$cpu_overide" = "yes" -o x"$tune_raw" != x""; then
+        echo "ERROR: CPU specific ./configure options failed compile test"
+        echo "       Removing CPU specific compilation options. ($TMP_ARCHFLAGS)"
+        echo ""
+    fi
+fi
+
 
 # Can only do mmi on mips
 if test $mmi = "default"; then
@@ -1513,7 +1566,7 @@ echo "Install prefix   $prefix"
 #echo "Source path      $source_path"
 #echo "C compiler       $cc"
 #echo "make             $make"
-echo "CPU              $cpu"
+echo "CPU              $cpu ($processor)"
 echo "Big Endian       $bigendian"
 #echo "inttypes.h       $inttypes"
 #echo "broken inttypes.h $emu_fast_int"
@@ -1626,6 +1679,7 @@ echo "QMAKE_CXX=$cxx" >> config.mak
 echo "ARCHFLAGS=$ARCHFLAGS" >> config.mak
 echo "PROFILEFLAGS=$PROFILEFLAGS" >> config.mak
 echo "OPTFLAGS=$CFLAGS" >> config.mak
+echo "ECFLAGS=$ECFLAGS" >> config.mak
 #echo "SHCFLAGS=$SHCFLAGS">>config.mak
 #echo "LDFLAGS=$LDFLAGS" >> config.mak
 #echo "FFSLDFLAGS=$FFSLDFLAGS" >> config.mak
