@@ -21,6 +21,9 @@ RecorderBase::RecorderBase(void)
     vbimode = 0;
 
     curRecording = NULL;
+
+    db_conn = NULL;
+    db_lock = NULL;
 }
 
 RecorderBase::~RecorderBase(void)

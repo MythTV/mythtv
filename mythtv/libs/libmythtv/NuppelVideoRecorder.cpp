@@ -40,6 +40,7 @@ extern "C" {
 pthread_mutex_t avcodeclock = PTHREAD_MUTEX_INITIALIZER;
 
 NuppelVideoRecorder::NuppelVideoRecorder(void)
+                   : RecorderBase()
 {
     encoding = false;
     fd = 0;
@@ -1488,7 +1489,7 @@ void NuppelVideoRecorder::WriteSeekTable(bool todumpfile)
     else
         ringBuffer->Write(&currentpos, sizeof(long long));
 
-    if (!todumpfile && curRecording && positionMap.size())
+    if (!todumpfile && curRecording && positionMap.size() && db_lock && db_conn)
     {
         pthread_mutex_lock(db_lock);
         MythContext::KickDatabase(db_conn);
@@ -2793,9 +2794,10 @@ void NuppelVideoRecorder::WriteVideo(Frame *frame, bool skipsync, bool forcekey)
         ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
 
         wantkeyframe = true;
+        sync();
 
-        if ((curRecording) &&
-            ((positionMap.size() % 15) == 0))
+        if (curRecording && db_lock && db_conn && 
+            (positionMap.size() % 15) == 0)
         {
             pthread_mutex_lock(db_lock);
             MythContext::KickDatabase(db_conn);
@@ -2957,7 +2959,7 @@ void NuppelVideoRecorder::WriteVideo(Frame *frame, bool skipsync, bool forcekey)
         {
             commDetect->GetBlankFrameMap(blank_frames);
 
-            if ((curRecording) &&
+            if (curRecording && db_lock && db_conn && 
                 ((blank_frames.size() % 15 ) == 0))
             {
                 pthread_mutex_lock(db_lock);

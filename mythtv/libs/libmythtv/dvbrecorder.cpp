@@ -30,13 +30,15 @@ extern AVInputFormat mpegps_demux;
 
 
 DVBRecorder::DVBRecorder(const DVBChannel* dvbchannel)
-  : isopen(false),
-    dvr_fd(-1),
-    cardnum(0),
-    was_paused(true),
-    pid_changed(true),
-    channel(dvbchannel)
+           : RecorderBase()
 {
+    isopen = false;
+    dvr_fd = -1;
+    cardnum = 0;
+    was_paused = true;
+    pid_changed = true;
+    channel = dvbchannel;
+
     // generic MPEG code from MpegRecorder
     paused = false;
     mainpaused = false;
@@ -297,7 +299,7 @@ bool DVBRecorder::SetupRecording()
 
 void DVBRecorder::FinishRecording()
 {
-    if (curRecording)
+    if (curRecording && db_lock && db_conn)
     {
         pthread_mutex_lock(db_lock);
         MythContext::KickDatabase(db_conn);
@@ -397,7 +399,7 @@ void DVBRecorder::ProcessData(unsigned char *buffer, int len)
 
                 positionMap[keyCount] = startpos;
 
-                if ((curRecording) &&
+                if (curRecording && db_lock && db_conn &&
                     ((positionMap.size() % 30) == 0))
                 {
                     pthread_mutex_lock(db_lock);
