@@ -22,6 +22,7 @@ class XMLParse;
 class UIType;
 class UIManagedTreeListType;
 class UITextType;
+class UIMultiTextType;
 class UIPushButtonType;
 class UITextButtonType;
 class UIRepeatedImageType;
@@ -245,6 +246,7 @@ class MythThemedDialog : public MythDialog
     UIType *getCurrentFocusWidget();
     UIManagedTreeListType *getUIManagedTreeListType(const QString &name);
     UITextType *getUITextType(const QString &name);
+    UIMultiTextType *getUIMultiTextType(const QString &name);
     UIPushButtonType *getUIPushButtonType(const QString &name);
     UITextButtonType *getUITextButtonType(const QString &name);
     UIRepeatedImageType *getUIRepeatedImageType(const QString &name);

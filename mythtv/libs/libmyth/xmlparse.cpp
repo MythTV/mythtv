@@ -837,6 +837,10 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
             {
                 parseTextArea(container, info);
             }
+            else if (info.tagName() == "multitextarea")
+            {
+                parseMultiTextArea(container, info);
+            }
             else if (info.tagName() == "statusbar")
             {
                 parseStatusBar(container, info);
@@ -978,7 +982,7 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown tag in listarea: " << info.tagName() << endl;
+                cerr << "Unknown tag in textarea: " << info.tagName() << endl;
                 return;
             }
         }
@@ -1026,6 +1030,144 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
     text->SetParent(container);
     text->calculateScreenArea();
     container->AddType(text);
+}
+
+void XMLParse::parseMultiTextArea(LayerSet *container, QDomElement &element)
+{
+    int context = -1;
+    QRect area = QRect(0, 0, 0, 0);
+    QRect altArea = QRect(0, 0, 0, 0);
+    QPoint shadowOffset = QPoint(0, 0);
+    QString font = "";
+    QString cutdown = "";
+    QString value = "";
+    QString statictext = "";
+    QString multiline = "";
+    int padding = -1;
+    int drop_delay = -1;
+    int drop_pause = -1;
+    int scroll_delay = -1;
+    int scroll_pause = -1;
+    int draworder = 0;
+
+    QString name = element.attribute("name", "");
+    if (name.isNull() || name.isEmpty())
+    {
+        cerr << "Multitext area needs a name\n";
+        return;
+    }
+
+    QString layerNum = element.attribute("draworder", "");
+    if (layerNum.isNull() && layerNum.isEmpty())
+    {
+        cerr << "Multitext area needs a draworder\n";
+        return;
+    }
+    draworder = layerNum.toInt();
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "context")
+            {
+                context = getFirstText(info).toInt();
+            }
+            else if(info.tagName() == "padding")
+            {
+                padding = getFirstText(info).toInt();
+            }
+            else if(info.tagName() == "dropdelay")
+            {
+                drop_delay = getFirstText(info).toInt();
+            }
+            else if(info.tagName() == "droppause")
+            {
+                drop_pause = getFirstText(info).toInt();
+            }
+            else if(info.tagName() == "scrolldelay")
+            {
+                scroll_delay = getFirstText(info).toInt();
+            }
+            else if(info.tagName() == "scrollpause")
+            {
+                scroll_pause = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "area")
+            {
+                area = parseRect(getFirstText(info));
+                normalizeRect(area);
+            }
+            else if (info.tagName() == "altarea")
+            {
+                altArea = parseRect(getFirstText(info));
+                normalizeRect(altArea);
+            }
+            else if (info.tagName() == "font")
+            {
+                font = getFirstText(info);
+            }
+            else if (info.tagName() == "cutdown")
+            {
+                cutdown = getFirstText(info);
+            }
+            else if (info.tagName() == "shadow")
+            {
+                shadowOffset = parsePoint(getFirstText(info));
+                shadowOffset.setX((int)(shadowOffset.x() * wmult));
+                shadowOffset.setY((int)(shadowOffset.y() * hmult));
+            }
+            else
+            {
+                cerr << "Unknown tag in multitext area: " 
+                     << info.tagName() 
+                     << endl;
+                return;
+            }
+        }
+    }
+
+    fontProp *testfont = GetFont(font);
+    if (!testfont)
+    {
+        cerr << "Unknown font: " << font << " in multitextarea: " << name << endl;
+        return;
+    }
+
+    UIMultiTextType *multitext = new UIMultiTextType(name, testfont, draworder, 
+                                      area, altArea);
+    multitext->SetScreen(wmult, hmult);
+    if (context != -1)
+    {
+        multitext->SetContext(context);
+    }
+
+    if(padding > -1)
+    {
+        multitext->setMessageSpacePadding(padding);
+    }
+    if(drop_delay > -1)
+    {
+        multitext->setDropTimingLength(drop_delay);
+    }
+    if(drop_pause > -1)
+    {
+        multitext->setDropTimingPause(drop_pause);
+    }
+    if(scroll_delay > -1)
+    {
+        multitext->setScrollTimingLength(scroll_delay);
+    }
+    if(scroll_pause > -1)
+    {
+        multitext->setScrollTimingPause(scroll_pause);
+    }
+    
+    multitext->SetParent(container);
+    multitext->calculateScreenArea();
+    container->AddType(multitext);
 }
 
 void XMLParse::parseListArea(LayerSet *container, QDomElement &element)

@@ -1573,6 +1573,266 @@ void UITextType::calculateScreenArea()
     screen_area = r;
 }
 
+// ******************************************************************
+
+UIMultiTextType::UIMultiTextType(
+                                    const QString &name,
+                                    fontProp *font,
+                                    int dorder,
+                                    QRect displayrect,
+                                    QRect altdisplayrect
+                                )
+           : UITextType(name, font, "", dorder, displayrect, altdisplayrect)
+{
+    connect(&transition_timer, SIGNAL(timeout()),
+            this, SLOT(animate()));
+
+    m_justification = (Qt::AlignCenter | Qt::AlignBottom);
+            
+    vertical_transform = 0;
+    horizontal_transform = 0;
+    m_cutdown = false;
+    
+    
+    drop_timing_length = 10;
+    drop_timing_pause = 500;
+    scroll_timing_length = 40;
+    scroll_timing_pause = 4000;
+    message_space_padding = 0;
+
+    current_text_index = -1;
+}
+
+void UIMultiTextType::setTexts(QStringList new_messages)
+{
+    messages = new_messages;
+    for(int i = 0; i < (int) messages.count(); i++)
+    {
+        for(int j = 0; j < message_space_padding; j++)
+        {
+            messages[i].prepend(" ");
+            messages[i].append(" ");
+        }
+    }
+    if(messages.count() > 0)
+    {
+        m_message = messages[0];
+        current_text_index = 0;
+        if(drop_timing_length > 0)
+        {
+            transition_timer.start(drop_timing_length);
+            animation_stage = Animation_Drop;
+            vertical_transform = m_displaysize.height();
+        }
+        else
+        {
+            transition_timer.start(drop_timing_pause);
+            animation_stage = Animation_DropPause;
+            vertical_transform = 0;
+        }
+        
+        horizontal_transform = 0;
+        QFontMetrics fm(m_font->face);
+        max_horizontal_transform = fm.width(m_message) - m_displaysize.width();
+        if(max_horizontal_transform < 0)
+        {
+            max_horizontal_transform = 0;
+            m_justification = (Qt::AlignCenter | Qt::AlignBottom);
+        }
+        else
+        {
+            m_justification = (Qt::AlignLeft | Qt::AlignBottom);
+        }
+    }
+    else
+    {
+        //
+        //  No need to have a timer as there is nothing to cycle through
+        //
+
+        transition_timer.stop();
+    }
+}
+
+void UIMultiTextType::clearTexts()
+{
+    m_message = "";
+    messages.clear();
+    current_text_index = -1;
+    transition_timer.stop();
+    vertical_transform = 0;
+    horizontal_transform = 0;
+    refresh();
+}
+
+void UIMultiTextType::Draw(QPainter *dr, int drawlayer, int context)
+{
+    if (m_context == context || m_context == -1)
+    {
+    
+        if (drawlayer == m_order)
+        {
+            dr->save();
+            dr->translate(-1.0 * horizontal_transform, -1.0 * vertical_transform);
+            bool m_multi = false;
+            if ((m_justification & Qt::WordBreak) > 0)
+            m_multi = true;
+            QPoint fontdrop = m_font->shadowOffset;
+            QString msg = m_message;
+            dr->setFont(m_font->face);
+            if (m_cutdown == true)
+            {
+                msg = cutDown(msg, &(m_font->face), m_multi, m_displaysize.width(), m_displaysize.height());
+            }
+            if (m_cutdown == true && m_debug == true)
+            {
+                cerr << "    +UITextType::CutDown Called.\n";
+            }
+
+            if (drawFontShadow && (fontdrop.x() != 0 || fontdrop.y() != 0))
+            {
+                if (m_debug == true)
+                {
+                    cerr << "    +UITextType::Drawing shadow @ (" 
+                         << (int)(m_displaysize.left() + fontdrop.x()) << ", "
+                         << (int)(m_displaysize.top() + fontdrop.y()) << ")" << endl;
+                }
+                dr->setBrush(m_font->dropColor);
+                dr->setPen(QPen(m_font->dropColor, (int)(2 * m_wmult)));
+                dr->drawText((int)(m_displaysize.left() + fontdrop.x()),
+                               (int)(m_displaysize.top() + fontdrop.y()),
+                               m_displaysize.width(), 
+                               m_displaysize.height(), m_justification, msg);
+            }
+
+            dr->setBrush(m_font->color);
+            dr->setPen(QPen(m_font->color, (int)(2 * m_wmult)));
+            if (m_debug == true)
+                    cerr << "    +UITextType::Drawing @ (" 
+                         << (int)(m_displaysize.left()) << ", " << (int)(m_displaysize.top()) 
+                         << ")" << endl;
+            dr->drawText(m_displaysize.left(), m_displaysize.top(), 
+                          m_displaysize.width() + horizontal_transform, m_displaysize.height(), m_justification, msg);
+            if (m_debug == true)
+            {
+                cerr << "   +UITextType::Draw() <- inside Layer\n";
+                cerr << "       -Message: " << m_message << " (cut: " << msg << ")" <<  endl;
+            }
+            dr->restore();
+            //dr->translate(horizontal_transform, vertical_transform);
+        }
+        else
+        {
+            if (m_debug == true)
+            {
+                 cerr << "   +UITextType::Draw() <- outside (layer = " << drawlayer
+                      << ", widget layer = " << m_order << "\n";
+            }
+        }
+    }
+}
+
+
+void UIMultiTextType::animate()
+{
+    //
+    //  Check which animation stage we're in and move things along appropriately
+    //
+    
+    if(animation_stage == Animation_Drop)
+    {
+        if(vertical_transform > 0)
+        {
+            vertical_transform--;
+            refresh();
+        }
+        else
+        {
+        
+            //
+            //  The drop down is finished.
+            //
+            
+            animation_stage = Animation_DropPause;
+            transition_timer.changeInterval(drop_timing_pause);
+        }
+        return;
+    }
+    else if(animation_stage == Animation_DropPause)
+    {
+        //
+        //  Done pausing after drop
+        //
+        
+        animation_stage = Animation_Scroll;
+        transition_timer.changeInterval(scroll_timing_length);
+        return;
+    }
+    else if(animation_stage == Animation_Scroll)
+    {
+        if(horizontal_transform < max_horizontal_transform)
+        {
+            horizontal_transform++;
+            refresh();
+        }
+        else
+        {
+            animation_stage = Animation_ScrollPause;
+            transition_timer.changeInterval(scroll_timing_pause);
+        }
+        return;
+    }
+    else if(animation_stage == Animation_ScrollPause)
+    {
+        if(messages.count() > 1)
+        {
+            current_text_index++;
+            if(current_text_index >= (int) messages.count())
+            {
+                current_text_index = 0;
+            }
+            m_message = messages[current_text_index];
+            if(drop_timing_length > 0)
+            {
+                transition_timer.start(drop_timing_length);
+                animation_stage = Animation_Drop;
+                vertical_transform = m_displaysize.height();
+            }
+            else
+            {
+                transition_timer.start(drop_timing_pause);
+                animation_stage = Animation_DropPause;
+                vertical_transform = 0;
+            }
+        
+            horizontal_transform = 0;
+            QFontMetrics fm(m_font->face);
+            max_horizontal_transform = fm.width(m_message) - m_displaysize.width();
+            if(max_horizontal_transform < 0)
+            {
+                max_horizontal_transform = 0;
+                m_justification = (Qt::AlignCenter | Qt::AlignBottom);
+            }
+            else
+            {
+                m_justification = (Qt::AlignLeft | Qt::AlignBottom);
+            }
+            refresh();
+        }
+        else
+        {
+            transition_timer.stop();
+        }
+        
+    }
+    else
+    {
+        cerr << "uitypes.o: animation_stage is set to unknown "
+             << "value in UIMutliTextType object"
+             << endl;
+    }
+}
+
 
 // ******************************************************************
 

@@ -1847,6 +1847,27 @@ UITextType* MythThemedDialog::getUITextType(const QString &name)
     return NULL;
 }
 
+UIMultiTextType* MythThemedDialog::getUIMultiTextType(const QString &name)
+{
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
+
+    while( (looper = an_it.current()) != 0)
+    {
+        UIType *hunter = looper->GetType(name);
+        if(hunter)
+        {
+            UIMultiTextType *hunted;
+            if( (hunted = dynamic_cast<UIMultiTextType*>(hunter)) )
+            {
+                return hunted;
+            }
+        }
+        ++an_it;
+    }
+    return NULL;
+}
+
 UIPushButtonType* MythThemedDialog::getUIPushButtonType(const QString &name)
 {
     QPtrListIterator<LayerSet> an_it(my_containers);

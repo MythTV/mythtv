@@ -513,9 +513,10 @@ class UITextType : public UIType
     void SetDisplayArea(const QRect &rect) { m_displaysize = rect; }
     virtual void calculateScreenArea();
 
-    void Draw(QPainter *, int, int);
+    virtual void Draw(QPainter *, int, int);
 
-  private:
+  protected:
+
     //QString cutDown(QString, QFont *, int, int);
     int m_justification;
     QRect m_displaysize;
@@ -528,6 +529,63 @@ class UITextType : public UIType
     fontProp *m_font;
 
     bool m_cutdown;
+
+};
+
+class UIMultiTextType : public UITextType
+{
+
+  Q_OBJECT
+
+  public: 
+
+    enum AnimationStage
+    {
+        Animation_Drop = 0,
+        Animation_DropPause,
+        Animation_Scroll,
+        Animation_ScrollPause
+    };
+
+    UIMultiTextType(
+                    const QString &, 
+                    fontProp *, 
+                    int,
+                    QRect displayrect, 
+                    QRect altdisplayrect
+                   );
+
+    void setTexts(QStringList new_messagep);
+    void clearTexts();
+    void Draw(QPainter*, int, int);
+  
+    void setDropTimingLength(int x){drop_timing_length = x;}
+    void setDropTimingPause(int x){drop_timing_pause = x;}
+    void setScrollTimingLength(int x){scroll_timing_length = x;}
+    void setScrollTimingPause(int x){scroll_timing_pause = x;}
+    
+    void setMessageSpacePadding(int x){message_space_padding = x;}
+    
+  
+  private slots:
+
+    void        animate();
+
+  private:
+
+    QStringList     messages;  
+    int             current_text_index;
+    QTimer          transition_timer;
+    AnimationStage  animation_stage;
+    int             horizontal_transform;
+    int             max_horizontal_transform;
+    int             vertical_transform;
+    int             drop_timing_length;
+    int             drop_timing_pause;
+    int             scroll_timing_length;
+    int             scroll_timing_pause;
+    
+    int             message_space_padding;    
 
 };
 
