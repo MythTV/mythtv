@@ -109,7 +109,10 @@ package export::ffmpeg;
                 $ffmpeg .= " -r " . $episode->{'finfo'}{'fps'};
                 $ffmpeg .= " -i /tmp/fifodir_$$/vidout -f yuv4mpegpipe -";
                 $ffmpeg .= " 2> /dev/null | ";
-                $ffmpeg .= "$NICE yuvdenoise -F -r 16";
+                $ffmpeg .= "$NICE yuvdenoise -r 16";
+                if ($self->{'deinterlace'}) {
+                    $ffmpeg .= " -F";
+                }
                 if ($self->{'crop'}) {
                     $ffmpeg .= " -b $crop_w,$crop_h,-$crop_w,-$crop_h";
                 }
@@ -135,7 +138,7 @@ package export::ffmpeg;
             $ffmpeg .= " -i $videofifo";
 
         # Filters
-            if ($self->{'deinterlace'}) {
+            if ($self->{'deinterlace'} && !$self->{'noise_reduction'}) {
                 $ffmpeg .= " -deinterlace";
             }
 
