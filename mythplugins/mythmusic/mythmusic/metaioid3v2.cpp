@@ -575,6 +575,13 @@ bool MetaIOID3v2::setComment(id3_tag *pTag,
     if (NULL == p_frame)
       return false;
 
+    if (id3_field_settextencoding(&p_frame->fields[0],
+                                  ID3_FIELD_TEXTENCODING_UTF_16) != 0)
+    {
+        id3_frame_delete(p_frame);
+        return false;
+    }
+
     // Write a description in field 1 if needs be.
     if (!desc.isEmpty())
     {

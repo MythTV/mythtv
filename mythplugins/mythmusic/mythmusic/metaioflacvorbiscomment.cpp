@@ -39,7 +39,7 @@ bool MetaIOFLACVorbisComment::write(Metadata* mdata, bool exclusive)
 
     FLAC__Metadata_Chain *chain = FLAC__metadata_chain_new();
     if (!FLAC__metadata_chain_read(chain, mdata->Filename().local8Bit())
-        || !FLAC__metadata_chain_read(chain, mdata->Filename().ascii()))
+        && !FLAC__metadata_chain_read(chain, mdata->Filename().ascii()))
     {
         FLAC__metadata_chain_delete(chain);
         return false;
@@ -140,7 +140,7 @@ Metadata* MetaIOFLACVorbisComment::read(QString filename)
 
     FLAC__Metadata_Chain *chain = FLAC__metadata_chain_new();
     if (!FLAC__metadata_chain_read(chain, filename.local8Bit())
-        || !FLAC__metadata_chain_read(chain, filename.ascii()))
+        && !FLAC__metadata_chain_read(chain, filename.ascii()))
     {
         FLAC__metadata_chain_delete(chain); 
         return NULL;
@@ -219,7 +219,7 @@ Metadata* MetaIOFLACVorbisComment::read(QString filename)
 int MetaIOFLACVorbisComment::getTrackLength(QString filename)
 {
     FLAC__Metadata_Chain *chain = FLAC__metadata_chain_new();
-    if (!FLAC__metadata_chain_read(chain, filename.local8Bit()) ||
+    if (!FLAC__metadata_chain_read(chain, filename.local8Bit()) &&
         !FLAC__metadata_chain_read(chain, filename.ascii()))
     {
         FLAC__metadata_chain_delete(chain); 

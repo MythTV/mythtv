@@ -72,7 +72,7 @@ bool MetaIOMP4::write(Metadata* mdata, bool exclusive)
 
     mp4callback_data_t callback_data;
 
-    callback_data.fd = open(mdata->Filename().ascii(), O_RDWR);
+    callback_data.fd = open(mdata->Filename().local8Bit(), O_RDWR);
     if (callback_data.fd < 0) {
         return false;
     }
@@ -107,7 +107,7 @@ bool MetaIOMP4::write(Metadata* mdata, bool exclusive)
       fclose(callback_data.file);
       return false;
     }
-    mp4ff_mdata->tags = (mp4ff_tag_t*)malloc(6 * sizeof(mp4ff_tag_t));
+    mp4ff_mdata->tags = (mp4ff_tag_t*)malloc(7 * sizeof(mp4ff_tag_t));
     if (!mp4ff_mdata) {
       free(mp4_cb);
       free(mp4ff_mdata);
@@ -131,16 +131,16 @@ bool MetaIOMP4::write(Metadata* mdata, bool exclusive)
     }
 
     mp4ff_mdata->tags[0].item = "artist";
-    mp4ff_mdata->tags[0].value = (char*)mdata->Artist().ascii();
+    mp4ff_mdata->tags[0].value = mdata->Artist().utf8().data();
 
     mp4ff_mdata->tags[1].item = "album";
-    mp4ff_mdata->tags[1].value = (char*)mdata->Album().ascii();
+    mp4ff_mdata->tags[1].value = mdata->Album().utf8().data();
 
     mp4ff_mdata->tags[2].item = "title";
-    mp4ff_mdata->tags[2].value = (char*)mdata->Title().ascii();
+    mp4ff_mdata->tags[2].value = mdata->Title().utf8().data();
 
     mp4ff_mdata->tags[3].item = "genre";
-    mp4ff_mdata->tags[3].value = (char*)mdata->Genre().ascii();
+    mp4ff_mdata->tags[3].value = mdata->Genre().utf8().data();
 
     mp4ff_mdata->tags[4].item = "date";
     mp4ff_mdata->tags[4].value = (char*)malloc(128);
@@ -150,7 +150,10 @@ bool MetaIOMP4::write(Metadata* mdata, bool exclusive)
     mp4ff_mdata->tags[5].value = (char*)malloc(128);
     snprintf(mp4ff_mdata->tags[5].value, 128, "%d", mdata->Track());
 
-    mp4ff_mdata->count = 6;
+    mp4ff_mdata->tags[6].item = "compilation";
+    mp4ff_mdata->tags[6].value = (char*)(mdata->Compilation() ? "1" : "0");
+
+    mp4ff_mdata->count = 7;
 
     mp4ff_meta_update(mp4_cb, mp4ff_mdata);
 
@@ -183,7 +186,7 @@ Metadata* MetaIOMP4::read(QString filename)
 
     mp4callback_data_t callback_data;
     callback_data.fd = 0;
-    callback_data.file = fopen(filename.ascii(), "r");
+    callback_data.file = fopen(filename.local8Bit(), "r");
     if (!callback_data.file)
     {
         return NULL;
@@ -268,12 +271,7 @@ Metadata* MetaIOMP4::read(QString filename)
 
     if (mp4ff_meta_get_compilation(mp4_ifile, &char_storage))
     {
-        //
-        //  Does the returned char_storage tell us anything?
-        //  I dunno?
-        //
-
-        compilation = true;
+        compilation = (0 == strncmp("1", char_storage, 1));
         free(char_storage);
     }
 
@@ -337,14 +335,15 @@ Metadata* MetaIOMP4::read(QString filename)
     metadataSanityCheck(&artist, &album, &title, &genre);
 
     Metadata *retdata = new Metadata(filename, 
-                                     "",
-                                     artist, 
+                                     artist,
+                                     compilation ? artist : "",
                                      album, 
                                      title, 
                                      genre,
                                      year, 
                                      tracknum, 
                                      length,
+                                     0, 0, 0, "",
                                      compilation);
 
     //retdata->setComposer(writer);
@@ -367,7 +366,7 @@ int MetaIOMP4::getTrackLength(QString filename)
 
     mp4callback_data_t callback_data;
     callback_data.fd = 0;
-    callback_data.file = fopen(filename.ascii(), "r");
+    callback_data.file = fopen(filename.local8Bit(), "r");
     if (!callback_data.file)
     {
         return 0;
