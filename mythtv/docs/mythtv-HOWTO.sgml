@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-03-10, v1.104
+<date>2003-03-13, v1.105
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -62,7 +62,7 @@ name="http://www.home.zonnet.nl/erik_nospam.arendse/">.
 
 The contributors to MythTV are:
 <itemize>
-<item>Lead developer:  Isaac Richardson, <url url="mailto:ijr@po.cwru.edu">
+<item>Lead developer:  Isaac Richards, <url url="mailto:ijr@po.cwru.edu">
 <item>Developer:  Matthew Zimmerman, <url url="mailto:mdz@debian.org">
 <item>Developer:  John Danner, <url url="mailto:jdanner@untzuntz.com">
 <item>Developer:  Chris Pinkham, <url url="mailto:cpinkham@bc2va.org">
@@ -2732,6 +2732,7 @@ Altered text on MythTV height/width since we now fullscreen by default.
 Added some more about sound troubleshooting.
 v1.104, 2003-03-10.  Added link to pdf version of docs.  More on 0.8. 
 Removed stuff from mythweather since there's a setup program now.
+v1.105, 2003-03-13.  Isaac's last name was wrong.  Duh.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

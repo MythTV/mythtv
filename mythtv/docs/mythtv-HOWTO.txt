@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-03-10, v1.104
+  2003-03-13, v1.105
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -181,7 +181,7 @@
 
   The contributors to MythTV are:
 
-  +o  Lead developer:  Isaac Richardson,  <mailto:ijr@po.cwru.edu>
+  +o  Lead developer:  Isaac Richards,  <mailto:ijr@po.cwru.edu>
 
   +o  Developer:  Matthew Zimmerman,  <mailto:mdz@debian.org>
 
