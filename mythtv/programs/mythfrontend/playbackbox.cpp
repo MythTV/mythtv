@@ -1656,11 +1656,7 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
              message1 = tr("Are you sure you want to stop:"); break;
     }
     
-    QString message2 = " ";
-    if (types == 1)
-        message2 = tr("Delete this recording?");
-        
-    initPopup(popup, program, message1, message2);
+    initPopup(popup, program, message1, "");
 
     QString tmpmessage;
     const char *tmpslot = NULL;
@@ -1738,7 +1734,7 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
                              popupForeground, popupBackground,
                              popupHighlight, "action popup");
 
-    initPopup(popup, program, " ", tr("Select action:"));
+    initPopup(popup, program, "", tr("Select action:"));
 
     QSqlDatabase *db = QSqlDatabase::database();
 
@@ -1804,23 +1800,17 @@ void PlaybackBox::initPopup(MythPopupBox *popup, ProgramInfo *program,
     titl = cutDownString(titl, &defaultBigFont, (int)(width() / 2));
 
     if (message.stripWhiteSpace().length() > 0)
-    {
         popup->addLabel(message);
-        popup->addLabel("");
-    }
 
     popup->addLabel(program->title, MythPopupBox::Large);
 
     if ((program->subtitle).stripWhiteSpace().length() > 0)
-        popup->addLabel("\"" + program->subtitle + "\"");
-
-    popup->addLabel(timedate);
+        popup->addLabel("\"" + program->subtitle + "\"\n" + timedate);
+    else
+        popup->addLabel(timedate);
 
     if (message2.stripWhiteSpace().length() > 0)
-    {
-        popup->addLabel("");
         popup->addLabel(message2);
-    }
 }
 
 void PlaybackBox::cancelPopup(void)
