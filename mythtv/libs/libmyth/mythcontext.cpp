@@ -15,6 +15,7 @@
 #include "guidegrid.h"
 #include "programinfo.h"
 #include "util.h"
+#include "remoteencoder.h"
 
 using namespace libmyth;
 
@@ -297,7 +298,7 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
 int MythContext::GetNumSetting(const QString &key, int defaultval)
 {
     bool found = false;
-    int value;
+    int value = defaultval;
     pthread_mutex_lock(&dbLock);
     if (m_db->isOpen()) {
 
@@ -524,7 +525,7 @@ void MythContext::DeleteRecording(ProgramInfo *pginfo)
     SendReceiveStringList(strlist);
 }
 
-bool MythContext::GetAllPendingRecordings(list<ProgramInfo *> &recordinglist)
+bool MythContext::GetAllPendingRecordings(vector<ProgramInfo *> &recordinglist)
 {
     QStringList strlist = QString("QUERY_GETALLPENDING");
 
@@ -547,8 +548,8 @@ bool MythContext::GetAllPendingRecordings(list<ProgramInfo *> &recordinglist)
     return conflicting;
 }
 
-list<ProgramInfo *> *MythContext::GetConflictList(ProgramInfo *pginfo, 
-                                                  bool removenonplaying)
+vector<ProgramInfo *> *MythContext::GetConflictList(ProgramInfo *pginfo, 
+                                                    bool removenonplaying)
 {
     QString cmd = QString("QUERY_GETCONFLICTING %1").arg(removenonplaying);
     QStringList strlist = cmd;
@@ -559,7 +560,7 @@ list<ProgramInfo *> *MythContext::GetConflictList(ProgramInfo *pginfo,
     int numrecordings = strlist[0].toInt();
     int offset = 1;
 
-    list<ProgramInfo *> *retlist = new list<ProgramInfo *>;
+    vector<ProgramInfo *> *retlist = new vector<ProgramInfo *>;
 
     for (int i = 0; i < numrecordings; i++)
     {
@@ -573,236 +574,31 @@ list<ProgramInfo *> *MythContext::GetConflictList(ProgramInfo *pginfo,
     return retlist;
 }
 
-int MythContext::GetRecorderNum(ProgramInfo *pginfo)
+RemoteEncoder *MythContext::GetExistingRecorder(ProgramInfo *pginfo)
 {
     QStringList strlist = "GET_RECORDER_NUM";
     pginfo->ToStringList(strlist);
 
     SendReceiveStringList(strlist);
 
-    return strlist[0].toInt();
+    int num = strlist[0].toInt();
+    QString hostname = strlist[1];
+    int port = strlist[2].toInt();
+
+    return new RemoteEncoder(num, hostname, port);
 }
 
-int MythContext::RequestRecorder(void)
+RemoteEncoder *MythContext::RequestRecorder(void)
 {
     QStringList strlist = "GET_FREE_RECORDER";
 
     SendReceiveStringList(strlist);
 
-    int retval = strlist[0].toInt();
-    return retval;
-}
+    int num = strlist[0].toInt();
+    QString hostname = strlist[1];
+    int port = strlist[2].toInt();
 
-bool MythContext::RecorderIsRecording(int recorder)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
-    strlist << "IS_RECORDING";
-
-    SendReceiveStringList(strlist);
-
-    bool retval = strlist[0].toInt();
-    return retval;
-}
-
-float MythContext::GetRecorderFrameRate(int recorder)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
-    strlist << "GET_FRAMERATE";
-
-    SendReceiveStringList(strlist);
-
-    float retval = strlist[0].toFloat();
-    return retval;
-}
-
-long long MythContext::GetRecorderFramesWritten(int recorder)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
-    strlist << "GET_FRAMES_WRITTEN";
-
-    SendReceiveStringList(strlist);
-
-    long long retval = decodeLongLong(strlist, 0);
-
-    return retval;
-}
-
-long long MythContext::GetRecorderFilePosition(int recorder)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
-    strlist << "GET_FILE_POSITION";
-
-    SendReceiveStringList(strlist);
-
-    long long retval = decodeLongLong(strlist, 0);
-
-    return retval;
-}
-
-long long MythContext::GetRecorderFreeSpace(int recorder, 
-                                            long long totalreadpos)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
-    strlist << "GET_FREE_SPACE";
-    encodeLongLong(strlist, totalreadpos);
-
-    SendReceiveStringList(strlist);
-
-    long long retval = decodeLongLong(strlist, 0);
-
-    return retval;
-}
-
-long long MythContext::GetKeyframePosition(int recorder, long long desired)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
-    strlist << "GET_KEYFRAME_POS";
-    encodeLongLong(strlist, desired);
-
-    SendReceiveStringList(strlist);
-
-    long long retval = decodeLongLong(strlist, 0);
-
-    return retval;
-}
-
-void MythContext::SetupRecorderRingBuffer(int recorder, QString &path,
-                                          long long &filesize, 
-                                          long long &fillamount,
-                                          bool pip)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
-    strlist << "SETUP_RING_BUFFER";
-    strlist << QString::number((int)pip);
-
-    SendReceiveStringList(strlist);
-
-    path = strlist[0];
-
-    filesize = decodeLongLong(strlist, 1);
-    fillamount = decodeLongLong(strlist, 3);
-}
-
-void MythContext::SpawnLiveTVRecording(int recorder)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
-    strlist << "SPAWN_LIVETV";
-
-    SendReceiveStringList(strlist);
-}
-
-void MythContext::StopLiveTVRecording(int recorder)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
-    strlist << "STOP_LIVETV";
-
-    SendReceiveStringList(strlist);
-}
-
-void MythContext::PauseRecorder(int recorder)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
-    strlist << "PAUSE";
-
-    SendReceiveStringList(strlist);
-}
-
-void MythContext::ToggleRecorderInputs(int recorder)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
-    strlist << "TOGGLE_INPUTS";
-
-    SendReceiveStringList(strlist);
-}
-
-void MythContext::RecorderChangeChannel(int recorder, bool direction)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
-    strlist << "CHANGE_CHANNEL";
-    strlist << QString::number((int)direction);    
-
-    SendReceiveStringList(strlist);
-}
-
-void MythContext::RecorderSetChannel(int recorder, QString channel)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
-    strlist << "SET_CHANNEL";
-    strlist << channel;
-
-    SendReceiveStringList(strlist);
-}
-
-void MythContext::RecorderChangeContrast(int recorder, bool direction)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
-    strlist << "CHANGE_CONTRAST";
-    strlist << QString::number((int)direction);    
-
-    SendReceiveStringList(strlist);
-}
-
-void MythContext::RecorderChangeBrightness(int recorder, bool direction)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
-    strlist << "CHANGE_BRIGHTNESS";
-    strlist << QString::number((int)direction);    
-
-    SendReceiveStringList(strlist);
-}
-
-void MythContext::RecorderChangeColour(int recorder, bool direction)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
-    strlist << "CHANGE_COLOUR";
-    strlist << QString::number((int)direction);    
-
-    SendReceiveStringList(strlist);
-}
-
-bool MythContext::CheckChannel(int recorder, QString channel)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
-    strlist << "CHECK_CHANNEL";
-    strlist << channel;
-
-    SendReceiveStringList(strlist);
-
-    bool retval = strlist[0].toInt();
-    return retval;
-}
-
-void MythContext::GetRecorderChannelInfo(int recorder, QString &title, 
-                                         QString &subtitle,
-                                         QString &desc, QString &category,
-                                         QString &starttime, QString &endtime,
-                                         QString &callsign, QString &iconpath,
-                                         QString &channelname)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
-    strlist << "GET_PROGRAM_INFO";
-
-    SendReceiveStringList(strlist);
-
-    title = strlist[0];
-    subtitle = strlist[1];
-    desc = strlist[2];
-    category = strlist[3];
-    starttime = strlist[4];
-    endtime = strlist[5];
-    callsign = strlist[6];
-    iconpath = strlist[7];
-    channelname = strlist[8];
-}
-
-void MythContext::GetRecorderInputName(int recorder, QString &inputname)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
-    strlist << "GET_INPUT_NAME";
-
-    SendReceiveStringList(strlist);
-
-    inputname = strlist[0];
+    return new RemoteEncoder(num, hostname, port);
 }
 
 void MythContext::readSocket(void)

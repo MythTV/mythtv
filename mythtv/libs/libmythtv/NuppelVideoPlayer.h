@@ -33,6 +33,7 @@ class NuppelVideoPlayer;
 class XvVideoOutput;
 class OSDSet;
 class MythContext;
+class RemoteEncoder;
 
 class NuppelVideoPlayer
 {
@@ -76,8 +77,8 @@ class NuppelVideoPlayer
     long long GetFramesPlayed(void) { return framesPlayed; }
     void ResetFramesPlayed(void) { framesPlayed = 0; }
 
-    void SetRecorder(MythContext *context, int recordernum) 
-                    { m_context = context; nvr_num = recordernum; }
+    void SetRecorder(MythContext *context, RemoteEncoder *recorder) 
+                    { m_context = context; nvr_enc = recorder; }
 
     OSD *GetOSD(void) { return osd; }
 
@@ -279,7 +280,7 @@ class NuppelVideoPlayer
     long long lastKey;
     
     long long rewindtime, fftime;
-    int nvr_num;
+    RemoteEncoder *nvr_enc;
 
     bool resetplaying;
     bool actuallyreset;

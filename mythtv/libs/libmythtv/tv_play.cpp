@@ -12,6 +12,7 @@ using namespace std;
 #include "osd.h"
 #include "libmyth/mythcontext.h"
 #include "libmyth/dialogbox.h"
+#include "libmyth/remoteencoder.h"
 
 // cheat and put the keycodes here
 #define wsUp            0x52 + 256
@@ -62,7 +63,7 @@ void TV::Init(void)
     if (rewtime <= 0)
         rewtime = 5;
 
-    recorder_num = piprecorder_num = activerecorder_num = -1;
+    recorder = piprecorder = activerecorder = NULL;
     nvp = pipnvp = activenvp = NULL;
     prbuffer = piprbuffer = activerbuffer = NULL;
 
@@ -98,7 +99,7 @@ TVState TV::LiveTV(void)
 {
     if (internalState == kState_None)
     {
-        int testrec = m_context->RequestRecorder();
+        RemoteEncoder *testrec = m_context->RequestRecorder();
 
         if (testrec < 0)
         {
@@ -120,7 +121,7 @@ TVState TV::LiveTV(void)
             return nextState;
         }
 
-        activerecorder_num = recorder_num = testrec;
+        activerecorder = recorder = testrec;
         nextState = kState_WatchingLiveTV;
         changeState = true;
     }
@@ -268,18 +269,18 @@ void TV::HandleStateChange(void)
         long long smudge = 0;
         QString name = "";
 
-        m_context->SetupRecorderRingBuffer(recorder_num, name, filesize, 
-                                           smudge);
+        recorder->Setup();
+        recorder->SetupRingBuffer(name, filesize, smudge);
 
         prbuffer = new RingBuffer(m_context, name, filesize, smudge, 
-                                  recorder_num);
+                                  recorder);
 
         internalState = nextState;
         changed = true;
 
         startPlayer = startRecorder = true;
 
-        m_context->SpawnLiveTVRecording(recorder_num);
+        recorder->SpawnLiveTV();
 
         watchingLiveTV = true;
         sleepBetween = true;
@@ -293,7 +294,7 @@ void TV::HandleStateChange(void)
         internalState = nextState;
         changed = true;
 
-        m_context->StopLiveTVRecording(recorder_num);
+        recorder->StopLiveTV();
 
         watchingLiveTV = false;
     }
@@ -314,14 +315,16 @@ void TV::HandleStateChange(void)
 
         if (nextState == kState_WatchingRecording)
         {
-            recorder_num = m_context->GetRecorderNum(playbackinfo);
-            if (recorder_num < 0)
+            recorder = m_context->GetExistingRecorder(playbackinfo);
+            if (recorder->IsValidRecorder())
             {
                 cout << "ERROR: couldn't find recorder for in-progress "
                      << "recording\n";
                 nextState = kState_WatchingPreRecorded;
+                delete recorder;
             }
-            activerecorder_num = recorder_num;
+            activerecorder = recorder;
+            recorder->Setup();
         }
 
         internalState = nextState;
@@ -416,10 +419,10 @@ void TV::HandleStateChange(void)
  
     if (startRecorder)
     {
-        while (!m_context->RecorderIsRecording(recorder_num))
+        while (!recorder->IsRecording())
             usleep(50);
 
-        frameRate = m_context->GetRecorderFrameRate(recorder_num);
+        frameRate = recorder->GetFrameRate();
     }
 
     if (sleepBetween) 
@@ -435,7 +438,7 @@ void TV::HandleStateChange(void)
 
         activenvp = nvp;
         activerbuffer = prbuffer;
-        activerecorder_num = recorder_num;
+        activerecorder = recorder;
 
         frameRate = nvp->GetFrameRate();
 	osd = nvp->GetOSD();
@@ -443,9 +446,9 @@ void TV::HandleStateChange(void)
 
     if (closeRecorder)
     {
-        m_context->StopLiveTVRecording(recorder_num);
-        if (piprecorder_num > 0)
-            m_context->StopLiveTVRecording(piprecorder_num);
+        recorder->StopLiveTV();
+        if (piprecorder > 0)
+            piprecorder->StopLiveTV();
     }
 
     if (closePlayer)
@@ -469,7 +472,7 @@ void TV::SetupPlayer(void)
     QString filters = "";
     nvp = new NuppelVideoPlayer();
     nvp->SetRingBuffer(prbuffer);
-    nvp->SetRecorder(m_context, recorder_num);
+    nvp->SetRecorder(m_context, recorder);
     nvp->SetOSDFontName(m_context->GetSetting("OSDFont"), 
                         m_context->GetInstallPrefix()); 
     nvp->SetOSDThemeName(m_context->GetSetting("OSDTheme"));
@@ -536,8 +539,10 @@ void TV::TeardownPlayer(void)
 
     nvp = NULL;
     osd = NULL;
-   
-    recorder_num = activerecorder_num = -1;
+  
+    if (recorder) 
+        delete recorder; 
+    recorder = activerecorder = NULL;
  
     if (prbuffer)
     {
@@ -557,6 +562,10 @@ void TV::TeardownPipPlayer(void)
         delete pipnvp;
     }
     pipnvp = NULL;
+
+    if (piprecorder)
+        delete piprecorder;
+    piprecorder = NULL;
 
     delete piprbuffer;
     piprbuffer = NULL;
@@ -950,7 +959,7 @@ int TV::calcSliderPos(int offset, QString &desc)
               ((float)prbuffer->GetFileSize() - prbuffer->GetSmudgeSize());
         ret *= 1000.0;
 
-        long long written = m_context->GetRecorderFramesWritten(recorder_num);
+        long long written = recorder->GetFramesWritten();
         long long played = nvp->GetFramesPlayed();
 
         played += (int)(offset * frameRate);
@@ -998,9 +1007,7 @@ int TV::calcSliderPos(int offset, QString &desc)
     }
 
     if (internalState == kState_WatchingRecording)
-        playbackLen = (int)((
-                    (float)m_context->GetRecorderFramesWritten(recorder_num) / 
-                    frameRate));
+        playbackLen = (int)(((float)recorder->GetFramesWritten() / frameRate));
     else
         playbackLen = nvp->GetLength();
 
@@ -1107,9 +1114,9 @@ void TV::ToggleInputs(void)
     while (!activenvp->GetPause())
         usleep(5);
 
-    m_context->PauseRecorder(activerecorder_num);
+    activerecorder->Pause();
     activerbuffer->Reset();
-    m_context->ToggleRecorderInputs(activerecorder_num);
+    activerecorder->ToggleInputs();
 
     activenvp->ResetPlaying();
     while (!activenvp->ResetYet())
@@ -1136,9 +1143,9 @@ void TV::ChangeChannel(bool up)
     while (!activenvp->GetPause())
         usleep(5);
 
-    m_context->PauseRecorder(activerecorder_num);
+    activerecorder->Pause();
     activerbuffer->Reset();
-    m_context->RecorderChangeChannel(activerecorder_num, up);
+    activerecorder->ChangeChannel(up);
 
     activenvp->ResetPlaying();
     while (!activenvp->ResetYet())
@@ -1205,7 +1212,7 @@ void TV::ChannelCommit(void)
 
 void TV::ChangeChannelByString(QString &name)
 {
-    if (!m_context->CheckChannel(activerecorder_num, name))
+    if (!activerecorder->CheckChannel(name))
         return;
 
     if (activenvp == nvp)
@@ -1219,9 +1226,9 @@ void TV::ChangeChannelByString(QString &name)
     while (!activenvp->GetPause())
         usleep(5);
 
-    m_context->PauseRecorder(activerecorder_num);
+    activerecorder->Pause();
     activerbuffer->Reset();
-    m_context->RecorderSetChannel(activerecorder_num, name);
+    activerecorder->SetChannel(name);
 
     activenvp->ResetPlaying();
     while (!activenvp->ResetYet())
@@ -1240,7 +1247,7 @@ void TV::UpdateOSD(void)
     QString title, subtitle, desc, category, starttime, endtime;
     QString callsign, iconpath, channelname;
 
-    GetChannelInfo(activerecorder_num, title, subtitle, desc, category, 
+    GetChannelInfo(activerecorder, title, subtitle, desc, category, 
                    starttime, endtime, callsign, iconpath, channelname);
 
     osd->SetInfoText(title, subtitle, desc, category, starttime, endtime,
@@ -1253,20 +1260,19 @@ void TV::UpdateOSDInput(void)
     QString dummy = "";
     QString name = "";
 
-    m_context->GetRecorderInputName(activerecorder_num, name);
+    activerecorder->GetInputName(name);
 
     osd->SetInfoText(name, dummy, dummy, dummy, dummy, dummy, dummy, dummy, 
                      osd_display_time);
 }
 
-void TV::GetChannelInfo(int recnum, QString &title, QString &subtitle, 
+void TV::GetChannelInfo(RemoteEncoder *enc, QString &title, QString &subtitle, 
                         QString &desc, QString &category, QString &starttime, 
                         QString &endtime, QString &callsign, QString &iconpath,
                         QString &channelname)
 {
-    m_context->GetRecorderChannelInfo(recnum, title, subtitle, desc,
-                                      category, starttime, endtime, callsign,
-                                      iconpath, channelname);
+    enc->GetChannelInfo(title, subtitle, desc, category, starttime, endtime, 
+                        callsign, iconpath, channelname);
 }
 
 void TV::EmbedOutput(unsigned long wid, int x, int y, int w, int h)
@@ -1290,10 +1296,12 @@ static void embedcb(void *data, unsigned long wid, int x, int y, int w, int h)
 void TV::doLoadMenu(void)
 {
     QString dummy;
-    QString channame;
+    QString channame = "3";
 
-    m_context->GetRecorderChannelInfo(recorder_num, dummy, dummy, dummy, dummy,
-                                      dummy, dummy, dummy, dummy, channame);
+    if (recorder)
+        recorder->GetChannelInfo(dummy, dummy, dummy, dummy, dummy, dummy, 
+                                 dummy, dummy, channame);
+
     QString chanstr = m_context->RunProgramGuide(channame, true, embedcb,
                                                  this);
 
@@ -1339,7 +1347,7 @@ void TV::ChangeBrightness(bool up)
     else
         text = "Brightness -";
 
-    m_context->RecorderChangeBrightness(activerecorder_num, up);
+    activerecorder->ChangeBrightness(up);
 
     if (activenvp == nvp)
         osd->SetSettingsText(text, text.length() );
@@ -1354,7 +1362,7 @@ void TV::ChangeContrast(bool up)
     else
         text = "Contrast -";
 
-    m_context->RecorderChangeContrast(activerecorder_num, up);
+    activerecorder->ChangeContrast(up);
 
     if (activenvp == nvp)
         osd->SetSettingsText(text, text.length() );
@@ -1369,7 +1377,7 @@ void TV::ChangeColour(bool up)
     else
         text = "Color -";
 
-    m_context->RecorderChangeColour(activerecorder_num, up);
+    activerecorder->ChangeColour(up);
 
     if (activenvp == nvp)
         osd->SetSettingsText(text, text.length() );
@@ -1390,7 +1398,7 @@ void TV::customEvent(QCustomEvent *e)
             int cardnum = tokens[1].toInt();
             int filelen = tokens[2].toInt();
 
-            if (cardnum == recorder_num)
+            if (cardnum == recorder->GetRecorderNumber())
             {
                 nvp->SetWatchingRecording(false);
                 nvp->SetLength(filelen);

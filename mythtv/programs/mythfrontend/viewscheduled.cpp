@@ -130,11 +130,11 @@ void ViewScheduled::FillList(void)
     listview->clear();
 
     bool conflicts = false;
-    list<ProgramInfo *> recordinglist;
+    vector<ProgramInfo *> recordinglist;
 
     m_context->GetAllPendingRecordings(recordinglist);
 
-    list<ProgramInfo *>::reverse_iterator pgiter = recordinglist.rbegin();
+    vector<ProgramInfo *>::reverse_iterator pgiter = recordinglist.rbegin();
 
     for (; pgiter != recordinglist.rend(); pgiter++)
         new ProgramListItem(m_context, listview, (*pgiter), 2);
@@ -251,10 +251,11 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
         cerr << thequery << endl;
     }
 
-    list<ProgramInfo *> *conflictlist = m_context->GetConflictList(rec, false);
+    vector<ProgramInfo *> *conflictlist = m_context->GetConflictList(rec, 
+                                                                     false);
 
     QString dstart, dend;
-    list<ProgramInfo *>::iterator i;
+    vector<ProgramInfo *>::iterator i;
     for (i = conflictlist->begin(); i != conflictlist->end(); i++)
     {
         dstart = (*i)->startts.toString("yyyyMMddhhmm");
@@ -276,7 +277,7 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
         }
     }
 
-    list<ProgramInfo *>::iterator iter = conflictlist->begin();
+    vector<ProgramInfo *>::iterator iter = conflictlist->begin();
     for (; iter != conflictlist->end(); iter++)
     {
         delete (*iter);
@@ -292,7 +293,6 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
 
 void ViewScheduled::handleConflicting(ProgramInfo *rec)
 {
-
     DialogBox diag(m_context, "How do you want to resolve this conflict?");
 
     diag.AddButton("Adjust this program's recording time");
@@ -315,7 +315,7 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
 
 void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
 {
-    list<ProgramInfo *> *conflictlist = m_context->GetConflictList(rec, true);
+    vector<ProgramInfo *> *conflictlist = m_context->GetConflictList(rec, true);
 
     QString dateformat = m_context->GetSetting("DateFormat");
     if (dateformat == "")
@@ -340,7 +340,7 @@ void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
 
     diag.AddButton(button);
 
-    list<ProgramInfo *>::iterator i = conflictlist->begin();
+    vector<ProgramInfo *>::iterator i = conflictlist->begin();
     for (; i != conflictlist->end(); i++)
     {
         ProgramInfo *info = (*i);
@@ -361,7 +361,7 @@ void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
 
     if (ret == 0)
     {
-        list<ProgramInfo *>::iterator iter = conflictlist->begin();
+        vector<ProgramInfo *>::iterator iter = conflictlist->begin();
         for (; iter != conflictlist->end(); iter++)
         {
             delete (*iter);
@@ -372,7 +372,7 @@ void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
     }
 
     ProgramInfo *prefer = NULL;
-    list<ProgramInfo *> *dislike = new list<ProgramInfo *>;
+    vector<ProgramInfo *> *dislike = new vector<ProgramInfo *>;
     if (ret == 2)
     {
         prefer = rec;
@@ -397,7 +397,7 @@ void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
     {
         printf("Ack, no preferred recording\n");
         delete dislike;
-        list<ProgramInfo *>::iterator iter = conflictlist->begin();
+        vector<ProgramInfo *>::iterator iter = conflictlist->begin();
         for (; iter != conflictlist->end(); iter++)
         {
             delete (*iter);
@@ -489,7 +489,7 @@ void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
     }
 
     delete dislike;
-    list<ProgramInfo *>::iterator iter = conflictlist->begin();
+    vector<ProgramInfo *>::iterator iter = conflictlist->begin();
     for (; iter != conflictlist->end(); iter++)
     {
         delete (*iter);

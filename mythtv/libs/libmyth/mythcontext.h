@@ -9,14 +9,13 @@
 #include <qptrlist.h>
 #include <qevent.h>
 
-#include <list>
 #include <vector>
 using namespace std;
 
 class Settings;
 class QSqlDatabase;
 class ProgramInfo;
-
+class RemoteEncoder;
 
 class MythEvent : public QCustomEvent
 {
@@ -83,37 +82,12 @@ class MythContext : public QObject
     vector<ProgramInfo *> *GetRecordedList(bool deltype);
     void GetFreeSpace(int &totalspace, int &usedspace);
     void DeleteRecording(ProgramInfo *pginfo);
-    bool GetAllPendingRecordings(list<ProgramInfo *> &recordinglist);
-    list<ProgramInfo *> *GetConflictList(ProgramInfo *pginfo,
-                                         bool removenonplaying);
+    bool GetAllPendingRecordings(vector<ProgramInfo *> &recordinglist);
+    vector<ProgramInfo *> *GetConflictList(ProgramInfo *pginfo,
+                                           bool removenonplaying);
 
-    int RequestRecorder(void);
-    int GetRecorderNum(ProgramInfo *pginfo);
-    bool RecorderIsRecording(int recorder);
-    float GetRecorderFrameRate(int recorder);
-    long long GetRecorderFramesWritten(int recorder);
-    long long GetRecorderFilePosition(int recorder);
-    long long GetRecorderFreeSpace(int recorder, long long totalreadpos);
-    long long GetKeyframePosition(int recorder, long long desired);
-    void SetupRecorderRingBuffer(int recorder, QString &path, 
-                                 long long &filesize, long long &fillamount,
-                                 bool pip = false);
-    void SpawnLiveTVRecording(int recorder);
-    void StopLiveTVRecording(int recorder);
-    void PauseRecorder(int recorder);
-    void ToggleRecorderInputs(int recorder);
-    void RecorderChangeContrast(int recorder, bool direction);
-    void RecorderChangeBrightness(int recorder, bool direction);
-    void RecorderChangeColour(int recorder, bool direction);
-    void RecorderChangeChannel(int recorder, bool direction);
-    void RecorderSetChannel(int recorder, QString channel);
-    bool CheckChannel(int recorder, QString channel);
-    void GetRecorderChannelInfo(int recorder, QString &title, QString &subtitle,
-                                QString &desc, QString &category,
-                                QString &starttime, QString &endtime, 
-                                QString &callsign, QString &iconpath,
-                                QString &channelname);
-    void GetRecorderInputName(int recorder, QString &inputname);
+    RemoteEncoder *RequestRecorder(void);
+    RemoteEncoder *GetExistingRecorder(ProgramInfo *pginfo);
 
     void addListener(QObject *obj);
     void removeListener(QObject *obj);

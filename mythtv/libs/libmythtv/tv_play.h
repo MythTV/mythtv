@@ -16,6 +16,7 @@ class QSqlDatabase;
 class QDateTime;
 class MythContext;
 class OSD;
+class RemoteEncoder;
 
 class TV : public QObject
 {
@@ -77,7 +78,7 @@ class TV : public QObject
     
     void UpdateOSD(void);
     void UpdateOSDInput(void);
-    void GetChannelInfo(int recnum, QString &title, QString &subtitle, 
+    void GetChannelInfo(RemoteEncoder *enc, QString &title, QString &subtitle, 
                         QString &desc, QString &category, QString &starttime, 
                         QString &endtime, QString &callsign, QString &iconpath,
                         QString &channelname);
@@ -145,9 +146,9 @@ class TV : public QObject
     NuppelVideoPlayer *pipnvp;
     NuppelVideoPlayer *activenvp;
 
-    int recorder_num;
-    int piprecorder_num;
-    int activerecorder_num;
+    RemoteEncoder *recorder;
+    RemoteEncoder *piprecorder;
+    RemoteEncoder *activerecorder;
 
     RingBuffer *prbuffer;
     RingBuffer *piprbuffer;

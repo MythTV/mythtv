@@ -6,6 +6,7 @@
 
 class MythContext;
 class RemoteFile;
+class RemoteEncoder;
 
 class ThreadedFileWriter
 {
@@ -39,7 +40,7 @@ class RingBuffer
     RingBuffer(MythContext *context, const QString &lfilename, bool write,
                bool needevents = false);
     RingBuffer(MythContext *context, const QString &lfilename, long long size, 
-               long long smudge, int recordernum = 0);
+               long long smudge, RemoteEncoder *enc = NULL);
     
    ~RingBuffer();
 
@@ -114,6 +115,7 @@ class RingBuffer
 
     MythContext *m_context;
     int recorder_num;
+    RemoteEncoder *remoteencoder;
     RemoteFile *remotefile;
 };
 

@@ -25,7 +25,8 @@ extern "C" {
 #include "../libavcodec/mythav.h"
 }
 
-#include "../libs/libmyth/mythcontext.h"
+#include "../libmyth/mythcontext.h"
+#include "../libmyth/remoteencoder.h"
 
 extern pthread_mutex_t avcodeclock;
 
@@ -77,7 +78,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
     embedid = 0;
     embx = emby = embw = embh = -1;
 
-    nvr_num = -1;
+    nvr_enc = NULL;
 
     paused = 0;
 
@@ -1995,15 +1996,14 @@ bool NuppelVideoPlayer::DoRewind(void)
 long long NuppelVideoPlayer::CalcMaxFFTime(long long ff)
 {
     long long maxtime = (long long)(1.0 * video_frame_rate);
-    if (watchingrecording && nvr_num > 0)
+    if (watchingrecording && nvr_enc && nvr_enc->IsValidRecorder())
         maxtime = (long long)(3.0 * video_frame_rate);
     
     long long ret = ff;
 
-    if (livetv || (watchingrecording && nvr_num > 0))
+    if (livetv || (watchingrecording && nvr_enc && nvr_enc->IsValidRecorder()))
     {
-        long long behind = m_context->GetRecorderFramesWritten(nvr_num) - 
-                           framesPlayed;
+        long long behind = nvr_enc->GetFramesWritten() - framesPlayed;
 	if (behind < maxtime) // if we're close, do nothing
 	    ret = 0;
 	else if (behind - fftime <= maxtime)
@@ -2050,15 +2050,15 @@ bool NuppelVideoPlayer::DoFastForward(void)
     {
         keyPos = (*positionMap)[desiredKey / keyframedist];
     }
-    else if (livetv || (watchingrecording && nvr_num > 0))
+    else if (livetv || (watchingrecording && nvr_enc && 
+                        nvr_enc->IsValidRecorder()))
     {
-        keyPos = m_context->GetKeyframePosition(nvr_num, desiredKey / 
-                                                keyframedist);
+        keyPos = nvr_enc->GetKeyframePosition(desiredKey / keyframedist);
         for (int i = lastKey / keyframedist; i < desiredKey / keyframedist; 
              i++)
         {
             if (positionMap->find(i) == positionMap->end())
-                (*positionMap)[i] = m_context->GetKeyframePosition(nvr_num, i);
+                (*positionMap)[i] = nvr_enc->GetKeyframePosition(i);
         }
     }
 

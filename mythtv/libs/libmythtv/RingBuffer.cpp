@@ -12,6 +12,7 @@ using namespace std;
 #include "RingBuffer.h"
 #include "../libmyth/mythcontext.h"
 #include "../libmyth/remotefile.h"
+#include "../libmyth/remoteencoder.h"
 
 #define TFW_BUF_SIZE (2*1024*1024)
 
@@ -234,10 +235,18 @@ RingBuffer::RingBuffer(MythContext *context, const QString &lfilename,
 }
 
 RingBuffer::RingBuffer(MythContext *context, const QString &lfilename, 
-                       long long size, long long smudge, int recordernum)
+                       long long size, long long smudge, RemoteEncoder *enc)
 {
     m_context = context;
-    recorder_num = recordernum;
+    recorder_num = 0;
+
+    remoteencoder = NULL;
+
+    if (enc)
+    {
+        remoteencoder = enc;
+        recorder_num = enc->GetRecorderNumber();
+    }
 
     normalfile = false;
     filename = (QString)lfilename;
@@ -256,7 +265,7 @@ RingBuffer::RingBuffer(MythContext *context, const QString &lfilename,
     }
     else
     {
-        remotefile = new RemoteFile(filename, false, recordernum);
+        remotefile = new RemoteFile(filename, false, recorder_num);
     }
 
     totalwritepos = writepos = 0;
@@ -635,8 +644,8 @@ long long RingBuffer::GetFreeSpace(void)
 {
     if (!normalfile)
     {
-        if (remotefile)
-            return m_context->GetRecorderFreeSpace(recorder_num, totalreadpos);
+        if (remoteencoder)
+            return remoteencoder->GetFreeSpace(totalreadpos);
         return totalreadpos + filesize - totalwritepos - smudgeamount;
     }
     else

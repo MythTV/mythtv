@@ -505,6 +505,8 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
     }
 
     strlist << QString::number(retval);
+    strlist << m_context->GetSetting("ServerIP");
+    strlist << m_context->GetSetting("ServerPort");
 
     WriteStringList(pbs->getSocket(), strlist);
 }
@@ -808,6 +810,8 @@ void MainServer::HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs)
     }
     
     QStringList retlist = QString::number(retval);
+    retlist << m_context->GetSetting("ServerIP");
+    retlist << m_context->GetSetting("ServerPort");
 
     WriteStringList(pbs->getSocket(), retlist);    
 }
@@ -820,8 +824,8 @@ void MainServer::endConnection(QSocket *socket)
         QSocket *sock = (*it)->getSocket();
         if (sock == socket)
         {
-            playbackList.erase(it);
             delete (*it);
+            playbackList.erase(it);
             return;
         }
     }
@@ -832,8 +836,8 @@ void MainServer::endConnection(QSocket *socket)
         QSocket *sock = (*ft)->getSocket();
         if (sock == socket)
         {
-            fileTransferList.erase(ft);
             delete (*ft);
+            fileTransferList.erase(ft);
             return;
         }
     }
@@ -844,8 +848,8 @@ void MainServer::endConnection(QSocket *socket)
         QSocket *sock = *rt;
         if (sock == socket)
         {
+            delete (*rt);
             ringBufList.erase(rt);
-            delete sock;
             return;
         }
     }
