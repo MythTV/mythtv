@@ -369,6 +369,7 @@ void LCD::init()
     sendToServer("widget_del Channel heartbeat");
     sendToServer("screen_set Channel priority 255");
     sendToServer("widget_add Channel topWidget string");
+    sendToServer("widget_add Channel botWidget string");
     sendToServer("widget_add Channel progressBar hbar");
    
     // The Generic Screen
@@ -687,20 +688,23 @@ void LCD::startChannel(QString channum, QString title, QString subtitle)
     QString aString;
     if (lcd_showchannel)
       sendToServer("screen_set Channel priority 64");
-    channelTimer->start(500, FALSE);
     aString = channum;
-    aString += ": ";
-    aString += title;
+    theMode = 2;
+    assignScrollingText(aString, "topWidget", 1);
+    aString = title;
     if(subtitle.length() > 0)
     {
-        aString += " (";
+        aString += " - '";
         aString += subtitle;
-        aString += ")";
+        aString += "'";
     }
-    theMode = 2;
-    assignScrollingText(aString);
-    progress = 0.0;
-    outputChannel();
+    assignScrollingText(aString, "botWidget", 2);
+    if (lcdHeight > 2)
+    {
+        progress = 0.0;
+        channelTimer->start(500, FALSE);
+        outputChannel();
+    }
 }
 
 void LCD::startGeneric(QPtrList<LCDTextItem> * textItems)

@@ -429,6 +429,8 @@ void OSDListBtnType::SetActive(bool active)
 
 void OSDListBtnType::Reset()
 {
+    QMutexLocker lock(&m_update);
+
     m_clearing = true;
 
     OSDListBtnTypeItem* item = 0;
@@ -490,6 +492,8 @@ void OSDListBtnType::RemoveItem(OSDListBtnTypeItem *item)
 
 void OSDListBtnType::SetItemCurrent(OSDListBtnTypeItem* item)
 {
+    bool locked = m_update.tryLock();
+
     if (m_itemList.find(item) == -1)
         return;
 
@@ -502,10 +506,15 @@ void OSDListBtnType::SetItemCurrent(OSDListBtnTypeItem* item)
         m_showDnArrow = false;
 
     emit itemSelected(m_selItem);
+
+    if (locked)
+        m_update.unlock();
 }
 
 void OSDListBtnType::SetItemCurrent(int current)
 {
+    QMutexLocker lock(&m_update);
+
     OSDListBtnTypeItem* item = m_itemList.at(current);
     if (!item)
         item = m_itemList.first();
@@ -525,6 +534,8 @@ OSDListBtnTypeItem* OSDListBtnType::GetItemFirst()
 
 OSDListBtnTypeItem* OSDListBtnType::GetItemNext(OSDListBtnTypeItem *item)
 {
+    QMutexLocker lock(&m_update);
+
     if (m_itemList.find(item) == -1)
         return 0;
 
@@ -543,11 +554,15 @@ OSDListBtnTypeItem* OSDListBtnType::GetItemAt(int pos)
 
 int OSDListBtnType::GetItemPos(OSDListBtnTypeItem* item)
 {
+    QMutexLocker lock(&m_update);
+
     return m_itemList.find(item);    
 }
 
 void OSDListBtnType::MoveUp()
 {
+    QMutexLocker lock(&m_update);
+
     if (m_itemList.find(m_selItem) == -1)
         return;
 
@@ -557,6 +572,11 @@ void OSDListBtnType::MoveUp()
         item = m_itemList.last();
         if (!item)
             return;
+
+        if (m_itemList.count() > m_itemsVisible)
+            m_topItem = m_itemList.at(m_itemList.count() - m_itemsVisible);
+        else
+            m_topItem = m_itemList.first();
     }
 
     m_selItem = item;
@@ -579,6 +599,8 @@ void OSDListBtnType::MoveUp()
 
 void OSDListBtnType::MoveDown()
 {
+    QMutexLocker lock(&m_update);
+
     if (m_itemList.find(m_selItem) == -1)
         return;
 
@@ -588,6 +610,8 @@ void OSDListBtnType::MoveDown()
         item = m_itemList.first();
         if (!item)
             return;
+
+        m_topItem = item;
     }
 
     m_selItem = item;
@@ -619,6 +643,8 @@ void OSDListBtnType::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
 
     if (!m_visible)
         return;
+
+    QMutexLocker lock(&m_update);
 
     if (!m_initialized)
         Init();

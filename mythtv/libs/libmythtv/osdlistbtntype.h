@@ -27,6 +27,7 @@
 #include <qcolor.h>
 #include <qptrlist.h>
 #include <qevent.h>
+#include <qmutex.h>
 #include "generictree.h"
 
 class OSDListBtnTypeItem;
@@ -210,6 +211,8 @@ class OSDListBtnType : public OSDType
     OSDListBtnTypeItem* m_topItem;
     OSDListBtnTypeItem* m_selItem;
     QPtrList<OSDListBtnTypeItem> m_itemList;
+
+    QMutex    m_update;
 
     bool      m_visible;
 

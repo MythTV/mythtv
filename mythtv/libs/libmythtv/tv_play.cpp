@@ -68,6 +68,7 @@ SleepTimer sleep_timer_array[] =
 const int SSLEEP_MAX = sizeof sleep_timer_array / sizeof sleep_timer_array[0];
 
 const int kMuteTimeout = 800;
+const int kLCDTimeout = 1000;
 
 void TV::InitKeys(void)
 {
@@ -231,6 +232,9 @@ TV::TV(void)
 
     sleepTimer = new QTimer(this);
     connect(sleepTimer, SIGNAL(timeout()), SLOT(SleepEndTimer()));
+
+    lcdTimer = new QTimer(this);
+    connect(lcdTimer, SIGNAL(timeout()), SLOT(UpdateLCD()));
 }
 
 void TV::Init(bool createWindow)
@@ -361,6 +365,13 @@ TV::~TV(void)
 
     if (m_db)
         delete m_db;
+
+    gContext->GetLCDDevice()->switchToTime();
+    if (lcdTimer)
+    {
+        lcdTimer->stop();
+        delete lcdTimer;
+    }
 }
 
 TVState TV::GetState(void)
@@ -494,6 +505,9 @@ int TV::Playback(ProgramInfo *rcinfo)
         nextState = kState_WatchingPreRecorded;
 
     changeState = true;
+
+    gContext->GetLCDDevice()->switchToChannel(rcinfo->chansign, rcinfo->title, rcinfo->subtitle);
+    lcdTimer->start(kLCDTimeout, false);
 
     return 1;
 }
@@ -748,6 +762,9 @@ void TV::HandleStateChange(void)
 
     internalState = tmpInternalState;
     changeState = false;
+
+    if (internalState == kState_WatchingLiveTV)
+        UpdateLCD();
 
     if (recorder)
         recorder->FrontendReady();
@@ -2191,7 +2208,10 @@ void TV::ToggleInputs(void)
     activenvp->Play(1.0, true, false);
 
     if (activenvp == nvp)
+    {
         UpdateOSDInput();
+        UpdateLCD();
+    }
 }
 
 void TV::ToggleChannelFavorite(void)
@@ -2264,6 +2284,7 @@ void TV::ChangeChannel(int direction, bool force)
     if (activenvp == nvp)
     {
         UpdateOSD();
+        UpdateLCD();
         AddPreviousChannel();
     }
 
@@ -2458,6 +2479,7 @@ void TV::ChangeChannelByString(QString &name, bool force)
     if (activenvp == nvp)
     {
         UpdateOSD();
+        UpdateLCD();
         AddPreviousChannel();
     }
 
@@ -2595,6 +2617,33 @@ void TV::UpdateOSDInput(void)
 
     osd->SetInfoText(name, dummy, dummy, dummy, dummy, dummy, dummy, dummy, 
                      osd_display_time);
+}
+
+void TV::UpdateLCD(void)
+{
+    if (internalState == kState_WatchingLiveTV)
+    {
+        QString title, subtitle, callsign, dummy;
+        GetChannelInfo(recorder, title, subtitle, dummy, dummy, dummy, dummy, callsign, dummy, dummy, dummy, dummy, dummy);
+        if ((callsign != lcdCallsign) || (title != lcdTitle) || (subtitle != lcdSubtitle))
+        {
+            gContext->GetLCDDevice()->switchToChannel(callsign, title, subtitle);
+            lcdCallsign = callsign;
+            lcdTitle = title;
+            lcdSubtitle = subtitle;
+        }
+    }
+
+    float progress = 0.0;
+    if (activenvp)
+    {
+        QString dummy;
+        int pos = activenvp->calcSliderPos(dummy);
+        progress = (float)pos / 1000;
+    }
+    gContext->GetLCDDevice()->setChannelProgress(progress);
+
+    lcdTimer->start(kLCDTimeout, true);
 }
 
 void TV::GetNextProgram(RemoteEncoder *enc, int direction,

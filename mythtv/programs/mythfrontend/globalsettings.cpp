@@ -583,7 +583,7 @@ public:
 class RecordOverTime: public SpinBoxSetting, public BackendSetting {
 public:
     RecordOverTime():
-        SpinBoxSetting(0, 600, 60, true),
+        SpinBoxSetting(0, 1800, 60, true),
         BackendSetting("RecordOverTime") {
         setLabel(QObject::tr("Time to record past end of show (in seconds)"));
         setValue(0);

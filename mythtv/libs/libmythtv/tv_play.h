@@ -101,6 +101,7 @@ class TV : public QObject
     void SleepEndTimer(void);
     void TreeMenuEntered(OSDListTreeType *tree, OSDGenericTree *item);
     void TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item);
+    void UpdateLCD(void);
 
   protected:
     void doLoadMenu(void);
@@ -319,6 +320,9 @@ class TV : public QObject
     QTimer *sleepTimer;
 
     char vbimode;
+
+    QTimer *lcdTimer;
+    QString lcdTitle, lcdSubtitle, lcdCallsign;
 };
 
 #endif
