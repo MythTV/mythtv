@@ -563,7 +563,7 @@ void IconView::importFromDir(const QString &fromDir, const QString &toDir)
         else 
         {
             cerr << "copying " << fi->absFilePath() << "to " << toDir << "\n";
-            QString cmd = "cp " + fi->absFilePath() + " " + toDir;
+            QString cmd = "cp \"" + fi->absFilePath() + "\" \"" + toDir + "\"";
             system(cmd);
         }
     }
