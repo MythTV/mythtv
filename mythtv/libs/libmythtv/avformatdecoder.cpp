@@ -470,6 +470,50 @@ int AvFormatDecoder::PacketHasHeader(unsigned char *buf, int len,
     return 0;
 }
 
+static const float avfmpeg1_aspect[16]={
+    0.0000,    1.0000,    0.6735,    0.7031,
+    0.7615,    0.8055,    0.8437,    0.8935,
+    0.9157,    0.9815,    1.0255,    1.0695,
+    1.0950,    1.1575,    1.2015,
+};
+
+static const float avfmpeg2_aspect[16]={
+    0,    1.0,    -3.0/4.0,    -9.0/16.0,    -1.0/2.21,
+};
+
+
+float AvFormatDecoder::GetMpegAspect(AVCodecContext *context,
+                                     int aspect_ratio_info,
+                                     int width, int height)
+{
+    float retval = 0;
+
+    if (aspect_ratio_info > 15)
+        aspect_ratio_info = 15;
+    if (aspect_ratio_info < 0)
+        aspect_ratio_info = 0;
+
+    if (context->sub_id == 1) // mpeg1
+    {
+        float aspect = avfmpeg1_aspect[aspect_ratio_info];
+        if (aspect != 0.0)
+            retval = width / (aspect * height);
+    }
+    else
+    {
+        float aspect = avfmpeg2_aspect[aspect_ratio_info];
+        if (aspect > 0)
+            retval = width / (aspect * height);
+        else if (aspect < 0)
+            retval = -1.0 / aspect;
+    }
+
+    if (retval <= 0)
+        retval = width * 1.0 / height;
+
+    return retval;
+}
+
 void AvFormatDecoder::GetFrame(int onlyvideo)
 {
     AVPacket pkt;
@@ -517,13 +561,20 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     int width = (test[0] << 4) | (test[1] >> 4);
                     int height = ((test[1] & 0xff) << 8) | test[2];
 
-                    if (CheckVideoParams(width, height))
+                    int aspectratioinfo = (test[3] >> 4);
+
+                    float aspect = GetMpegAspect(context, aspectratioinfo, 
+                                                 width, height);
+
+                    if (CheckVideoParams(width, height) || 
+                        aspect != current_aspect)
                     {
                         m_parent->SetVideoParams(width, height, fps,
-                                                 keyframedist, current_aspect);
+                                                 keyframedist, aspect);
                         m_parent->Reinit();
                         current_width = width;
                         current_height = height;
+                        current_aspect = aspect;
                     }
                 }
                  

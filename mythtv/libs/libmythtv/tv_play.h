@@ -118,6 +118,7 @@ class TV : public QObject
 
     void DoInfo(void);
     void DoPause(void);
+    void StopFFRew(void);
     void DoFF(int time);
     void DoRew(int time);
     void DoJumpAhead(void);

@@ -63,7 +63,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     eof = 0;
 
     keyframedist = 30;
-    usepre = 12;
+    usepre = 18;
 
     wtxt = rtxt = 0;
 

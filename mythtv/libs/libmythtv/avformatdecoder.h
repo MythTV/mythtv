@@ -62,6 +62,8 @@ class AvFormatDecoder : public DecoderBase
 
     void InitByteContext(void);
     int PacketHasHeader(unsigned char *buf, int len, unsigned int startcode);
+    float GetMpegAspect(AVCodecContext *context, int aspect_ratio_info,
+                        int width, int height);
 
     void SeekReset(void);
 

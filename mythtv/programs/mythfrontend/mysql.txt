@@ -2,3 +2,11 @@ DBHostName=localhost
 DBUserName=mythtv
 DBPassword=mythtv
 DBName=mythconverg
+
+# Set the following if you want to use something other than the
+# machine's real hostname for identifying settings in the database.
+# This is useful if your hostname changes often, as otherwise
+# you'll need to reconfigure mythtv (or futz with the DB) every time.
+# TWO HOSTS MUST NOT USE THE SAME VALUE
+#
+#LocalHostName=my-unique-identifier-goes-here

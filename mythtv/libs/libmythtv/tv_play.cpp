@@ -904,7 +904,7 @@ void TV::ProcessKeypress(int keypressed)
         }
         case Key_Z:
         {
-            doing_ff_rew = 0;
+            StopFFRew();
             DoSkipCommercials(1);
             break;
         }
@@ -915,13 +915,13 @@ void TV::ProcessKeypress(int keypressed)
         }
         case Key_Q:
         {
-            doing_ff_rew = 0;
+            StopFFRew();
             DoSkipCommercials(-1);
             break;
         }
         case Key_S: case Key_P: 
         {
-            doing_ff_rew = 0;
+            StopFFRew();
             DoPause();
             break;
         }
@@ -929,8 +929,7 @@ void TV::ProcessKeypress(int keypressed)
         {
             if (!stickykeys)
             {
-                doing_ff_rew = 0;
-                ff_rew_index = SSPEED_NORMAL;
+                StopFFRew();
                 DoFF(fftime); 
                 break;
             }
@@ -952,8 +951,7 @@ void TV::ProcessKeypress(int keypressed)
         {
             if (!stickykeys)
             {
-                doing_ff_rew = 0;
-                ff_rew_index = SSPEED_NORMAL;
+                StopFFRew();
                 DoRew(rewtime);
                 break;
             }
@@ -1031,7 +1029,7 @@ void TV::ProcessKeypress(int keypressed)
                     case Key_9: ff_rew_index = SSPEED_FAST_6; break;
 
                     default:
-                       doing_ff_rew = 0;
+                       StopFFRew();
                        was_doing_ff_rew = true;
                        break;
                 }
@@ -1423,6 +1421,38 @@ void TV::DoRew(int time)
         keyRepeat = false;
         keyrepeatTimer->start(300, true);
     }
+}
+
+void TV::StopFFRew(void)
+{
+    if (!doing_ff_rew)
+        return;
+
+    const double ff_offset = 7.00;
+    const double ff_scale = 6.00;
+    const double rew_offset = 0.00;
+    const double rew_scale = 6.00;
+
+    bool muted = false;
+
+    if (volumeControl && !volumeControl->GetMute())
+    {
+        volumeControl->ToggleMute();
+        muted = true;
+    }
+
+    ff_rew_scaling = seek_speed_array[ff_rew_index].scaling;
+    if (doing_ff_rew > 0)
+        activenvp->Rewind(ff_offset + ff_scale * ff_rew_scaling);
+    else
+        activenvp->FastForward(rew_offset + rew_scale * ff_rew_scaling);
+
+    if (muted) 
+        muteTimer->start(600, true);
+
+    doing_ff_rew = 0;
+    ff_rew_index = SSPEED_NORMAL;
+    ff_rew_scaling = 1.0;
 }
 
 void TV::DoJumpAhead(void)

@@ -41,16 +41,20 @@ MythContext::MythContext(const QString &binversion, bool gui)
 
     m_db = QSqlDatabase::addDatabase("QMYSQL3", "MythContext");
 
-    char localhostname[1024];
-    if (gethostname(localhostname, 1024))
-    {
-        cerr << "Error getting local hostname\n";
-        exit(0);
-    }
-    m_localhostname = localhostname;
-
     if (!LoadSettingsFiles("mysql.txt"))
         cerr << "Unable to read configuration file mysql.txt" << endl;
+
+    m_localhostname = m_settings->GetSetting("LocalHostName", NULL);
+    if(m_localhostname == NULL)
+    {
+        char localhostname[1024];
+        if (gethostname(localhostname, 1024))
+        {
+            cerr << "Error getting local hostname\n";
+            exit(0);
+        }
+        m_localhostname = localhostname;
+    }
 
     if (gui)
     {
