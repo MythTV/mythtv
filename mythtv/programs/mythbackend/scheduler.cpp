@@ -830,9 +830,8 @@ void Scheduler::RunScheduler(void)
             gettimeofday(&fillend, NULL);
             PrintList();
             QString msg;
-            msg = QString("Scheduled %1 items in %2 seconds.")
-                    .arg(reclist.size())
-                    .arg(((fillend.tv_sec  - fillstart.tv_sec ) * 1000000 +
+            msg.sprintf("Scheduled %d items in %.1f seconds.", reclist.size(), 
+                        ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
                          (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0);
 
             VERBOSE(VB_GENERAL, msg);

@@ -2804,7 +2804,11 @@ void TV::UpdateOSDInput(void)
     activerecorder->GetInputName(name);
     QString msg = QString ("%1: %2").arg(activerecorder->GetRecorderNumber())
                                     .arg(name);
-    osd->SetSettingsText(msg, 3);
+    if (osd)
+        osd->SetSettingsText(msg, 3);
+    else
+        VERBOSE(VB_IMPORTANT, QString("TV: Unable to show tuner (%1) on OSD.")
+                                      .arg(msg));
 }
 
 void TV::UpdateLCD(void)
