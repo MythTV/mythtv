@@ -9,8 +9,8 @@
    <button>
       <type>TV_SCHEDULE</type>
       <text>Programma una registrazione</text>
-      <alttext>Program Guide</alttext>
-      <action>TV_SCHEDULE</action>
+      <alttext>Schedule</alttext>
+      <action>MENU tv_schedule.xml</action>
    </button>
 
    <button>
