@@ -1092,7 +1092,7 @@ void ProgramInfo::SetBookmark(long long pos, QSqlDatabase *db)
         query.bindValue(":BOOKMARK", posstr);
     }
     else
-        query.bindValue(":BOOKMARK", "NULL");
+        query.bindValue(":BOOKMARK", QString::null);
     
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Save position update",
