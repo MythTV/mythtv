@@ -3074,9 +3074,26 @@ void MainServer::PrintStatus(QSocket *socket)
     if (m_sched)
         m_sched->getAllPending(&recordingList);
 
+    list<ProgramInfo *>::iterator iterCnt = recordingList.begin();
+
     unsigned int iNum = 10;
-    if (recordingList.size() < iNum) 
-        iNum = recordingList.size();
+
+    // count the number of upcoming recordings
+    unsigned int iNumRecordings = 0;
+    while (iterCnt != recordingList.end())
+    {
+        if (!((*iterCnt)->recstatus > rsWillRecord ||     
+               ((*iterCnt)->recstartts) < QDateTime::currentDateTime())) 
+        {                       
+               iNumRecordings++;
+        }
+
+        if (iNumRecordings > iNum) break;
+        iterCnt++;
+    }
+
+    if (iNumRecordings < iNum) 
+        iNum = iNumRecordings;
 
     if (iNum == 0)
         os << "    There are no shows scheduled for recording.\r\n";
@@ -3087,7 +3104,9 @@ void MainServer::PrintStatus(QSocket *socket)
           << " scheduled for recording:\r\n";
 
        os << "    <div id=\"schedule\">\r\n";
+
        list<ProgramInfo *>::iterator iter = recordingList.begin();
+
        for (unsigned int i = 0; (iter != recordingList.end()) && i < iNum; 
             iter++, i++)
        {
