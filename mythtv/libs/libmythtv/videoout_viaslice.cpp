@@ -201,7 +201,8 @@ bool VideoOutputVIA::Init(int width, int height, float aspect,
     XSync(data->XJ_disp, false);
 
     XJ_started = true;
-
+    cout << "Using VIA CLE266 Hardware Decoding\n";
+    
     return true;
 }
 
@@ -453,6 +454,10 @@ void VideoOutputVIA::ProcessFrame(VideoFrame *frame, OSD *osd,
                                   vector<VideoFilter *> &filterList,
                                   NuppelVideoPlayer *pipPlayer)
 {
+    (void)filterList;
+    (void)frame;
+    (void)pipPlayer;
+
     if (osd)
     {
         VideoFrame tmpframe;
