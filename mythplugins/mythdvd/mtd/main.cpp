@@ -72,8 +72,8 @@ int main(int argc, char **argv)
             cerr << "Invalid argument: " << a.argv()[argpos] << endl <<
                     "Valid options are: " << endl <<
                     "-p or --port number  A port number to listen on (default is 2442) " << endl <<
-                    "-d or --daemon       Runs mtd as a daemon (default) " << endl <<
-                    "-n or --nodaemon     Does not run mtd as a daemon " << endl;
+                    "-d or --daemon       Runs mtd as a daemon " << endl <<
+                    "-n or --nodaemon     Does not run mtd as a daemon (default)" << endl;
             return -1;
         }
     }
