@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2004-06-06, v0.15.03
+<date>2004-06-11, v0.15.04
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -93,7 +93,7 @@ seems to be ignoring you.
 grammatical or spelling error, or if the wording of something is just plain
 confusing.
 
-If you'd like to make a new contribution, feel free to email it to me (url
+If you'd like to make a new contribution, feel free to email it to me <url
 url="mailto:rkulagow@rocketmail.com" name="mailto:rkulagow@rocketmail.com">, but
 as the maintainer I retain the right to edit or choose not to use your
 submission.
@@ -916,7 +916,7 @@ Need to get 0B/24.0MB of archives.
 After unpacking 78.7MB of additional disk space will be used.
 Do you want to continue? [Y/n] 
 </verb></tscreen>
-<sect>System Configuration Requirements for Compiling MythTV <label
+<sect>System Configuration Requirements for Compiling MythTV. <label
 id="Setting_up_paths">
 <p>Before you compile MythTV from the current source tarball or from CVS, you 
 may need to modify your system configuration in a few ways.
@@ -1334,36 +1334,6 @@ to DataDirect"> for instructions on moving to to DataDirect if you are
 currently using XMLTV.  If you are starting from a fresh installation, the
 simplest thing is to immediately start using DataDirect.
 
-<sect2>Grabbing channel icons for DataDirect users
-<p>While the DataDirect TV listings service has several advantages, it does
-not support grabbing logo icons for the stations you receive. However, there
-are utilities provided that you can use to grab your initial set of icons
-and to update them if your lineups change.
-
-First, you need to generate or obtain an XML file with the information for
-your stations.
-
-If you have XMLTV software installed, there is a perl script in MythTV's
-<tt>contrib/</tt> directory which will generate this file for you. Run the
-command:
-<tscreen><verb>
-$ perl mkiconmap.pl
-</verb></tscreen>
-
-You will be asked for your zipcode and the service that you use. If there
-are no errors, the <tt>iconmap.xml</tt> file that you need for the next step
-will be created.
-
-If you do not have XMLTV software installed and do not want to install it
-for the sake of this minor task, there is a generic
-<tt>contrib/master_iconmap.xml</tt> which you can copy and use but this may
-not be as complete as using the specific information for your service.
-
-Once you have an <tt>iconmap.xml</tt> file, add the icon information to your
-database and grab any new icons with the command:
-<tscreen><verb>
-$ mythfilldatabase --import-icon-map iconmap.xml --update-icon-map
-</verb></tscreen>
 <label id="manually_building_mythtv">
 <sect1>Manually building MythTV
 <p>Unpack MythTV
@@ -2813,6 +2783,36 @@ uses the Wordstar command sequence.  You may use <bf>emacs</bf>, or any
 other editor that you're comfortable with.  You may also add the
 <tt>EXPORT</tt> command to your <tt>.bashrc</tt> or to the
 <tt>/etc/profile.d/mythtv.sh</tt> file.
+<sect1>Grabbing channel icons for DataDirect users
+<p>While the DataDirect TV listings service has several advantages, it does
+not support grabbing logo icons for the stations you receive. However, there
+are utilities provided with MythTV which you may use to grab your initial
+set of icons and to keep them updated if your lineups change.
+
+First, you need to generate or obtain an XML file with the information for
+your stations.
+
+If you have XMLTV software installed, there is a perl script in MythTV's
+<tt>contrib/</tt> directory which will generate this file for you. Run the
+command:
+<tscreen><verb>
+$ perl mkiconmap.pl
+</verb></tscreen>
+
+You will be asked for your zipcode and the service that you use. If there
+are no errors, the <tt>iconmap.xml</tt> file that you need for the next step
+will be created.
+
+If you do not have XMLTV software installed and do not want to install it
+for the sake of this minor task, there is a generic
+<tt>contrib/master_iconmap.xml</tt> which you can copy and use but this may
+not be as complete as using the specific information for your service.
+
+Once you have an <tt>iconmap.xml</tt> file, add the icon information to your
+database and grab any new icons with the command:
+<tscreen><verb>
+$ mythfilldatabase --import-icon-map iconmap.xml --update-icon-map
+</verb></tscreen>
 
 <sect>Configuring mythfrontend.
 <p>Once you have completed configuration of your backend systems, the next
@@ -4729,8 +4729,7 @@ it, or it has been designed that way, then you're pretty much out of luck
 and will either need to purchase a new sound card, or will need to get
 btaudio <ref id="btaudio" name="operational">.
 
-<sect2>My remote doesn't work / works sometimes and not others / "ghost"
-keypresses
+<sect2>My remote doesn't work / works sometimes and not others / "ghost" keypresses
 <p>This can be due to a number of factors.  The simplest case is the
 "ghost" keypresses.  For me, it was due to compact fluorescent lights in
 the same room as the IR receiver, which the receiver was picking up as
@@ -4752,6 +4751,10 @@ they run.  The following window managers are known to work correctly:
 <item>fvwm
 <item>blackbox  (using "Sloppy Focus" and "Focus New Windows")
 </itemize>
+
+<bf>NOTE</bf>:  You do not need to use <bf>irxevent</bf> if you are using
+MythTV's native LIRC support, so the window manager focus issue does not
+apply in that case.
 
 <sect2>PVR-250 card doesn't show inputs in the setup screen.
 <p>See message <url url=
@@ -6457,7 +6460,8 @@ v0.15.03, 2004-06-06  Re-arrange the troubleshooting section a little
 (suggestion by Kenneth Aafloy, but if you don't like how it looks or
 something is in the wrong place then speak up).  Make some changes right at
 the top.  All sorts of crap changed throughout the document.
-
+v0.15.04, 2004-06-11.  Fix a broken tag.  Fix Bug 11 (icon grabber for DD in wrong
+section)
 -->
 
 <!--

@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-06-06, v0.15.03
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-06-11, v0.15.04
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -37,7 +37,7 @@ necessary.</EM>
 <LI><A NAME="toc3.2">3.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss3.2">Software</A>
 </UL>
 <P>
-<H2><A NAME="toc4">4.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s4">System Configuration Requirements for Compiling MythTV </A></H2>
+<H2><A NAME="toc4">4.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s4">System Configuration Requirements for Compiling MythTV. </A></H2>
 
 <UL>
 <LI><A NAME="toc4.1">4.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss4.1">Software requirements for compiling MythTV</A>
@@ -91,6 +91,7 @@ necessary.</EM>
 <LI><A NAME="toc9.2">9.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss9.2">Post-configuration</A>
 <LI><A NAME="toc9.3">9.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss9.3">Configuring a non-master backend </A>
 <LI><A NAME="toc9.4">9.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss9.4">Configuring and running mythfilldatabase</A>
+<LI><A NAME="toc9.5">9.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss9.5">Grabbing channel icons for DataDirect users</A>
 </UL>
 <P>
 <H2><A NAME="toc10">10.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s10">Configuring mythfrontend.</A></H2>
@@ -288,8 +289,8 @@ seems to be ignoring you.</CAPTION>
 <P>Contributions to the HOWTO are welcome, especially if you find a
 grammatical or spelling error, or if the wording of something is just plain
 confusing.</P>
-<P>If you'd like to make a new contribution, feel free to email it to me (url
-url="mailto:rkulagow@rocketmail.com" name="mailto:rkulagow@rocketmail.com">, but
+<P>If you'd like to make a new contribution, feel free to email it to me 
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A>, but
 as the maintainer I retain the right to edit or choose not to use your
 submission.</P>
 <P>If you would like to submit an update or contribution, please send it as
@@ -1131,7 +1132,7 @@ Do you want to continue? [Y/n]
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<H2><A NAME="Setting_up_paths"></A> <A NAME="s4">4.</A> <A HREF="#toc4">System Configuration Requirements for Compiling MythTV </A></H2>
+<H2><A NAME="Setting_up_paths"></A> <A NAME="s4">4.</A> <A HREF="#toc4">System Configuration Requirements for Compiling MythTV. </A></H2>
 
 <P>Before you compile MythTV from the current source tarball or from CVS, you 
 may need to modify your system configuration in a few ways.</P>
@@ -1609,39 +1610,7 @@ configuration will be imported into MythTV when you first run the
 <A HREF="#MigratingtoDD">Migrating from XMLTV to DataDirect</A> for instructions on moving to to DataDirect if you are
 currently using XMLTV.  If you are starting from a fresh installation, the
 simplest thing is to immediately start using DataDirect.</P>
-
-<H3>Grabbing channel icons for DataDirect users</H3>
-
-<P>While the DataDirect TV listings service has several advantages, it does
-not support grabbing logo icons for the stations you receive. However, there
-are utilities provided that you can use to grab your initial set of icons
-and to update them if your lineups change.</P>
-<P>First, you need to generate or obtain an XML file with the information for
-your stations.</P>
-<P>If you have XMLTV software installed, there is a perl script in MythTV's
-<CODE>contrib/</CODE> directory which will generate this file for you. Run the
-command:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ perl mkiconmap.pl
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>You will be asked for your zipcode and the service that you use. If there
-are no errors, the <CODE>iconmap.xml</CODE> file that you need for the next step
-will be created.</P>
-<P>If you do not have XMLTV software installed and do not want to install it
-for the sake of this minor task, there is a generic
-<CODE>contrib/master_iconmap.xml</CODE> which you can copy and use but this may
-not be as complete as using the specific information for your service.</P>
-<P>Once you have an <CODE>iconmap.xml</CODE> file, add the icon information to your
-database and grab any new icons with the command:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ mythfilldatabase --import-icon-map iconmap.xml --update-icon-map
-</PRE>
-</CODE></BLOCKQUOTE>
-
+<P>
 <A NAME="manually_building_mythtv"></A> </P>
 <H2><A NAME="ss5.5">5.5</A> <A HREF="#toc5.5">Manually building MythTV</A>
 </H2>
@@ -3246,6 +3215,39 @@ uses the Wordstar command sequence.  You may use <B>emacs</B>, or any
 other editor that you're comfortable with.  You may also add the
 <CODE>EXPORT</CODE> command to your <CODE>.bashrc</CODE> or to the
 <CODE>/etc/profile.d/mythtv.sh</CODE> file.</P>
+<H2><A NAME="ss9.5">9.5</A> <A HREF="#toc9.5">Grabbing channel icons for DataDirect users</A>
+</H2>
+
+<P>While the DataDirect TV listings service has several advantages, it does
+not support grabbing logo icons for the stations you receive. However, there
+are utilities provided with MythTV which you may use to grab your initial
+set of icons and to keep them updated if your lineups change.</P>
+<P>First, you need to generate or obtain an XML file with the information for
+your stations.</P>
+<P>If you have XMLTV software installed, there is a perl script in MythTV's
+<CODE>contrib/</CODE> directory which will generate this file for you. Run the
+command:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ perl mkiconmap.pl
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>You will be asked for your zipcode and the service that you use. If there
+are no errors, the <CODE>iconmap.xml</CODE> file that you need for the next step
+will be created.</P>
+<P>If you do not have XMLTV software installed and do not want to install it
+for the sake of this minor task, there is a generic
+<CODE>contrib/master_iconmap.xml</CODE> which you can copy and use but this may
+not be as complete as using the specific information for your service.</P>
+<P>Once you have an <CODE>iconmap.xml</CODE> file, add the icon information to your
+database and grab any new icons with the command:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mythfilldatabase --import-icon-map iconmap.xml --update-icon-map
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
 <H2><A NAME="s10">10.</A> <A HREF="#toc10">Configuring mythfrontend.</A></H2>
 
@@ -5261,7 +5263,7 @@ and will either need to purchase a new sound card, or will need to get
 btaudio 
 <A HREF="#btaudio">operational</A>.</P>
 
-<H3>My remote doesn't work / works sometimes and not others / "ghost"keypresses</H3>
+<H3>My remote doesn't work / works sometimes and not others / "ghost" keypresses</H3>
 
 <P>This can be due to a number of factors.  The simplest case is the
 "ghost" keypresses.  For me, it was due to compact fluorescent lights in
@@ -5283,6 +5285,9 @@ they run.  The following window managers are known to work correctly:</P>
 <LI>blackbox  (using "Sloppy Focus" and "Focus New Windows")</LI>
 </UL>
 </P>
+<P><B>NOTE</B>:  You do not need to use <B>irxevent</B> if you are using
+MythTV's native LIRC support, so the window manager focus issue does not
+apply in that case.</P>
 
 <H3>PVR-250 card doesn't show inputs in the setup screen.</H3>
 
