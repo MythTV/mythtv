@@ -304,10 +304,12 @@ static void mmx_argb32 (uint8_t * image,
 
 yuv2rgb_fun yuv2rgb_init_mmxext (int bpp, int mode)
 {
+#ifdef MMX
     if ((bpp == 16) && (mode == MODE_RGB))
 	return mmxext_rgb16;
     else if ((bpp == 32) && (mode == MODE_RGB))
 	return mmxext_argb32;
+#endif
 
     return NULL; /* Fallback to C */
 }
@@ -318,7 +320,7 @@ yuv2rgb_fun yuv2rgb_init_mmx (int bpp, int mode)
     if ((bpp == 16) && (mode == MODE_RGB))
 	return mmx_rgb16;
     else if ((bpp == 32) && (mode == MODE_RGB))
-	return mmx_argb32;;
+	return mmx_argb32;
 #endif
 
     if ((bpp == 32) && (mode == MODE_RGB))
