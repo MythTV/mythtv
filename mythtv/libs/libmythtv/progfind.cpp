@@ -1631,7 +1631,7 @@ void JaProgFinder::fillSearchData()
     }
 }
 
-// searching subtitle
+// search title_pronounce
 // we hope japanese HIRAGANA and alphabets, numerics is inserted
 // these character must required ZENKAKU
 // because query work not fine, if mysql's default charset latin1
@@ -1644,44 +1644,44 @@ QString JaProgFinder::whereClauseGetSearchData(int charNum)
 
     switch (charNum) {
     case 0:
-        thequery += QString("WHERE ( subtitle >= 'あ' AND subtitle <= 'お') ");
+        thequery += QString("WHERE ( title_pronounce >= 'あ' AND title_pronounce <= 'お') ");
         break;
     case 1:
-        thequery += QString("WHERE ( subtitle >= 'か' AND subtitle <= 'ご') ");
+        thequery += QString("WHERE ( title_pronounce >= 'か' AND title_pronounce <= 'ご') ");
         break;
     case 2:
-        thequery += QString("WHERE ( subtitle >= 'さ' AND subtitle <= 'そ') ");
+        thequery += QString("WHERE ( title_pronounce >= 'さ' AND title_pronounce <= 'そ') ");
         break;
     case 3:
-        thequery += QString("WHERE ( subtitle >= 'た' AND subtitle <= 'ど') ");
+        thequery += QString("WHERE ( title_pronounce >= 'た' AND title_pronounce <= 'ど') ");
         break;
     case 4:
-        thequery += QString("WHERE ( subtitle >= 'な' AND subtitle <= 'の') ");
+        thequery += QString("WHERE ( title_pronounce >= 'な' AND title_pronounce <= 'の') ");
         break;
     case 5:
-        thequery += QString("WHERE ( subtitle >= 'は' AND subtitle <= 'ぽ') ");
+        thequery += QString("WHERE ( title_pronounce >= 'は' AND title_pronounce <= 'ぽ') ");
         break;
     case 6:
-        thequery += QString("WHERE ( subtitle >= 'ま' AND subtitle <= 'も') ");
+        thequery += QString("WHERE ( title_pronounce >= 'ま' AND title_pronounce <= 'も') ");
         break;
     case 7:
-        thequery += QString("WHERE ( subtitle >= 'や' AND subtitle <= 'よ') ");
+        thequery += QString("WHERE ( title_pronounce >= 'や' AND title_pronounce <= 'よ') ");
         break;
     case 8:
-        thequery += QString("WHERE ( subtitle >= 'ら' AND subtitle <= 'ろ') ");
+        thequery += QString("WHERE ( title_pronounce >= 'ら' AND title_pronounce <= 'ろ') ");
         break;
     case 9:
-        thequery += QString("WHERE ( subtitle >= 'わ' AND subtitle <= 'ん') ");
+        thequery += QString("WHERE ( title_pronounce >= 'わ' AND title_pronounce <= 'ん') ");
         break;
     case 10:
-        thequery += QString("WHERE ( subtitle >= 'Ａ' AND subtitle <= 'ｚ') ");
+        thequery += QString("WHERE ( title_pronounce >= 'Ａ' AND title_pronounce <= 'ｚ') ");
         break;
     case 11:
-        thequery += QString("WHERE ( subtitle >= '０' AND subtitle <= '９') ");
+        thequery += QString("WHERE ( title_pronounce >= '０' AND title_pronounce <= '９') ");
         break;
     }
 
-    thequery += QString("AND starttime > %1 ORDER BY subtitle;")
+    thequery += QString("AND starttime > %1 ORDER BY title_pronounce;")
                        .arg(progStart.toString("yyyyMMddhhmm50"));
     return thequery;
 }

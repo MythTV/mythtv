@@ -35,6 +35,7 @@ bool from_file = false;
 bool quiet = false;
 bool no_delete = false;
 bool isNorthAmerica = false;
+bool isJapan = false;
 bool interrupted = false;
 bool refresh_today = false;
 bool refresh_tomorrow = true;
@@ -87,6 +88,7 @@ class ProgInfo
                                       endts = other.endts;
                                       channel = other.channel;
                                       title = other.title;
+                                      pronounce = other.pronounce;
                                       clumpidx = other.clumpidx;
                                       clumpmax = other.clumpmax;
                                       subtitle = other.subtitle;
@@ -106,6 +108,7 @@ class ProgInfo
     QString endts;
     QString channel;
     QString title;
+    QString pronounce;
     QString subtitle;
     QString desc;
     QString category;
@@ -267,6 +270,10 @@ ChanInfo *parseChannel(QDomElement &element, QUrl baseUrl)
                         }
                     }
                 }
+                else if (isJapan && chaninfo->callsign.length() == 0)
+                {
+                    chaninfo->callsign = info.text();
+                }
                 else if (chaninfo->chanstr.length() == 0)
                 {
                     chaninfo->chanstr = info.text();
@@ -424,9 +431,23 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
         QDomElement info = child.toElement();
         if (!info.isNull())
         {
-            if (info.tagName() == "title" && pginfo->title == "")
+            if (info.tagName() == "title")
             {
-                pginfo->title = getFirstText(info);
+                if (isJapan)
+                {
+                    if (info.attribute("lang") == "ja_JP")
+                    {
+                        pginfo->title = getFirstText(info);
+                    }
+                    else if (info.attribute("lang") == "ja_JP@kana")
+                    {
+                        pginfo->pronounce = getFirstText(info);
+                    }
+                }
+                else if (pginfo->title == "")
+                {
+                    pginfo->title = getFirstText(info);
+                }
             }
             else if (info.tagName() == "sub-title" && pginfo->subtitle == "")
             {
@@ -1258,14 +1279,15 @@ void handlePrograms(int id, int offset, QMap<QString,
             }
 
             querystr.sprintf("INSERT INTO program (chanid,starttime,endtime,"
-                             "title,subtitle,description,category,"
+                             "title,title_pronounce,subtitle,description,category,"
                              "category_type,airdate,stars,previouslyshown) "
-                             "VALUES(%d,\"%s\",\"%s\",\"%s\",\"%s\","
+                             "VALUES(%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\","
                              "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%d\");", 
                              chanid, 
                              (*i).start.toString("yyyyMMddhhmmss").ascii(), 
                              (*i).end.toString("yyyyMMddhhmmss").ascii(), 
                              (*i).title.utf8().data(), 
+                             (*i).pronounce.utf8().data(), 
                              (*i).subtitle.utf8().data(), 
                              (*i).desc.utf8().data(), 
                              (*i).category.utf8().data(),
@@ -1449,11 +1471,14 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
         command.sprintf("nice %s --days=4  --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), 
                         configfile.ascii(), filename.ascii());
-    else if (xmltv_grabber == "tv_grab_ja")
-         // Use fixed interval of 3 days for Japanese grabber
-         command.sprintf("nice %s --days 3 --config-file '%s' --output %s",
+    else if (xmltv_grabber == "tv_grab_jp")
+    {
+         // Use fixed interval of 7 days for Japanese grabber
+         command.sprintf("nice %s --days 7 --enable-readstr --config-file '%s' --output %s",
                          xmltv_grabber.ascii(), configfile.ascii(),
                          filename.ascii());
+         isJapan = true;
+    }
     else if (xmltv_grabber == "tv_grab_sn")
         command.sprintf("nice %s --days 1 --offset %d --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), offset, configfile.ascii(),
@@ -1484,7 +1509,7 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
          xmltv_grabber == "tv_grab_nl" ||
          xmltv_grabber == "tv_grab_fr" ||
          xmltv_grabber == "tv_grab_fi" ||
-         xmltv_grabber == "tv_grab_ja"))
+         xmltv_grabber == "tv_grab_jp"))
          command += " --quiet";
 
 
@@ -1601,7 +1626,7 @@ bool fillData(QValueList<Source> &sourcelist)
         if (xmltv_grabber == "tv_grab_uk" || xmltv_grabber == "tv_grab_de" ||
             xmltv_grabber == "tv_grab_fi" || xmltv_grabber == "tv_grab_es" ||
             xmltv_grabber == "tv_grab_nl" || xmltv_grabber == "tv_grab_au" ||
-            xmltv_grabber == "tv_grab_fr" || xmltv_grabber == "tv_grab_ja")
+            xmltv_grabber == "tv_grab_fr" || xmltv_grabber == "tv_grab_jp")
         {
             // tv_grab_uk|de doesn't support the --offset option, so just grab a 
             // week.
