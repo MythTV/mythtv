@@ -61,6 +61,12 @@ extern "C" {
 #include "videoout_xvmc.h" // for hasIDCTAcceleration() call
 #endif
 
+#ifdef CONFIG_DARWIN
+extern "C" {
+int isnan(double);
+}
+#endif
+
 NuppelVideoPlayer::NuppelVideoPlayer(MythSqlDatabase *ldb,
                                      ProgramInfo *info)
     : decoder_lock(true)
