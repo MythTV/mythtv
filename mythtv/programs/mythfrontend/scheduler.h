@@ -65,6 +65,7 @@ class Scheduler
 
       int numcards;
       int numsources;
+      int numinputs;
 
       QMap<int, int> numInputsPerSource;
       QMap<int, vector<int> > sourceToInput;

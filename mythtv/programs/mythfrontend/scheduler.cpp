@@ -40,6 +40,8 @@ void Scheduler::setupCards(void)
     query = db->exec(thequery);
 
     numcards = -1;
+    numinputs = -1;
+    numsources = -1;
 
     if (query.isActive())
         numcards = query.numRowsAffected();
@@ -99,6 +101,8 @@ void Scheduler::setupCards(void)
 
     if (query.isActive() && query.numRowsAffected() > 0)
     {
+        numinputs = query.numRowsAffected();
+
         while (query.next())
         {
             inputToCard[query.value(1).toInt()] = query.value(0).toInt();
@@ -156,7 +160,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
     QSqlQuery query;
     QSqlQuery subquery;
 
-    QDateTime curTime = QDateTime::currentDateTime();
+    QDateTime curDateTime = QDateTime::currentDateTime().addSecs(-60);
 
     thequery = "SELECT channel.chanid,sourceid,starttime,endtime,title,"
                "subtitle,description,channel.channum,channel.callsign,"
@@ -190,7 +194,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
             if (proginfo->description == QString::null)
                 proginfo->description = "";
 
-            if (proginfo->startts < curTime)
+            if (proginfo->startts < curDateTime)
                 delete proginfo;
             else 
                 recordingList.push_back(proginfo);
@@ -220,8 +224,8 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
             hour = starttime.mid(0, 2).toInt();
             min = starttime.mid(3, 2).toInt();
 
-            QDate curdate = QDate::currentDate();
-            QTime curtime = QTime::currentTime();
+            QDate curdate = curDateTime.date();
+            QTime curtime = curDateTime.time();
 
             char startquery[128], endquery[128];
 
@@ -302,8 +306,8 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
             if (title == QString::null)
                 continue;
 
-            QTime curtime = QTime::currentTime();
-            QDate curdate = QDate::currentDate();
+            QTime curtime = curDateTime.time();
+            QDate curdate = curDateTime.date();
             char startquery[128], endquery[128];
 
             sprintf(startquery, "%4d%02d%02d%02d%02d00", curdate.year(),
@@ -376,7 +380,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
         PruneList(); 
         MarkConflicts();
 
-        if (numcards > 1)
+        if (numcards > 1 || numinputs > 1)
         {
             DoMultiCard();
             MarkConflicts();
