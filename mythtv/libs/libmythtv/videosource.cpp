@@ -1269,9 +1269,9 @@ public:
         group->addChild(cardid = new CardID(*this));
         group->addChild(inputname = new InputName(*this));
         group->addChild(sourceid = new SourceID(*this));
+        group->addChild(new InputPreference(*this));
         if (!DVB)
         {
-            group->addChild(new InputPreference(*this));
             group->addChild(new ExternalChannelCommand(*this));
             group->addChild(new PresetTuner(*this));
         }
