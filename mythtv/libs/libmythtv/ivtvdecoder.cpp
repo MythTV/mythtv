@@ -280,9 +280,34 @@ bool IvtvDecoder::DoRewind(long long desiredFrame)
         }
     }
 
+    int iter = 0;
+
+    while (keyPos == 0 && lastKey > 1 && iter < 4)
+    {
+        VERBOSE(VB_PLAYBACK, QString("No keyframe in position map for %1")
+                                     .arg((int)lastKey));
+
+        lastKey -= keyframedist;
+        keyPos = positionMap[lastKey / keyframedist];
+        diff = keyPos - curPosition;
+        normalframes += keyframedist;
+
+        if (keyPos != 0)
+           VERBOSE(VB_PLAYBACK, QString("Using seek position: %1")
+                                       .arg((int)lastKey));
+
+        iter++;
+    }
+
     if (keyPos == 0)
     {
-        cerr << "Unknown seek position: " << lastKey << endl;
+        VERBOSE(VB_GENERAL, QString("Unknown seek position: %1")
+                                    .arg((int)lastKey));
+
+        lastKey = storelastKey;
+        diff = 0;
+        normalframes = 0;
+
         return false;
     }
 
