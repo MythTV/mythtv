@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2005-02-09, v0.17.00
+<date>2005-02-11, v0.17.01
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -77,6 +77,14 @@ like to install MythTV on an XBox.
 See <url url="http://wilsonet.com/mythtv/"
 name="http://wilsonet.com/mythtv/"> for instructions tailored to RedHat's
 Fedora Core distribution.
+<sect1>Upgrading from previous versions.
+<p>The upgrade from previous versions should be transparent.  Any changes to
+the database structure should be applied automatically.
+
+It is <em>strongly</em> recommended that you back up your database before
+installing a new version of MythTV.
+
+See <ref id="backupdb" name="Saving or Restoring the database"> for instructions.
 
 <sect1>How to obtain this document <label id="how_to_obtain">
 <p>This HOWTO document is maintained at the primary MythTV website: <url
@@ -6416,8 +6424,7 @@ $
 </verb></tscreen>
 <sect1>What do the icons on the Watch Recordings screen mean?
 <p>Press "1" or F1 to get a popup.
-<sect1>What is the difference between a PVR-250 and a PVR-350.
-
+<sect1>What is the difference between a PVR-250 and a PVR-350
 <p>This is covered in the hardware section, and extensively covered on the
 Hauppauge website.  Briefly recapping:
 
@@ -6463,7 +6470,34 @@ the Tivo has a direct-connect capability.
 <item>Use a firewire connection.  There is a <tt>6200ch.c</tt> in the MythTV
 contrib directory which may work for you.
 </enum>
+<sect1>Configuring one machine to flag all commercials.
+<p>Commercial flagging can be CPU intensive.  By default, the backend that
+created a recording is the one which will flag commercials.  You may wish to
+use a different machine to run commercial flagging.
 
+On the slower machine:
+
+Start the backend setup program.  Advance through the pages until you get to
+the Job Queue page.  Turn off the setting that says "Allow Commercial
+Detection jobs", thereby preventing any commercial flagging jobs from
+running on this machine.
+
+Next, make sure that "Run Jobs only on original recording host" is turned
+OFF so that new jobs are allowed to run anywhere.
+
+Restart <bf>mythbackend</bf> since it only reads this setting when it starts up.
+
+On the faster machine:
+
+Start the backend setup program.  Advance through the pages until you get to
+the Job Queue page.  Ensure that "Allow Commercial Detection jobs" is turned
+ON for this machine.
+
+Run <bf>mythjobqueue</bf>.  <bf>mythjobqueue</bf> will examine the JobQueue
+and run any jobs it finds.  <bf>mythjobqueue</bf> should be left running so
+that it will pick up any new commercial flagging jobs that are added to the
+queue, otherwise new jobs will be added to the queue and your programs won't
+be flagged until you run manually run <bf>mythjobqueue</bf>.
 
 <sect>Example Configurations.
 <p>This section contains configurations which you may find useful.
@@ -7262,10 +7296,60 @@ $ su
 # cd /usr/src
 # wget http://www.kernel.org/pub/linux/kernel/v2.6/testing/linux-2.6.11-rc3.tar.bz2
 # tar -xjf linux-2.6.11-rc3.tar.bz2
-# cd linux-2.6.11-rc3
+# pushd .
+# cd linux-2.6.11-rc3/drivers/media/dvb/frontends
+# wget http://www.digitalregime.com/patches/nxt2002-qam.patch
+# patch -p0 < nxt2002-qam.patch
+# popd
 </verb></tscreen>
 
-To be continued...
+If you already have a 2.6 kernel running, copy the <tt>.config</tt> file and
+use it as your starting point.  If not, then go straight to the <tt>make
+menuconfig</tt> portion below.
+
+On Debian with a 2.6.10 kernel:
+
+<tscreen><verb>
+# cp /lib/modules/`uname -r`/build/.config .
+# make oldconfig
+</verb></tscreen>
+Read the prompts that come up; for the most part you should be able to
+answer "No".
+<tscreen><verb>
+# make menuconfig
+</verb></tscreen>
+
+Go to the Device Drivers->Multimedia->Digital Video Broadcasting Devices
+
+Enable DVB for Linux and select B2C2/Technisat Air/Sky/CableStar 2 PCI.
+
+Exit menuconfig, then compile modules and the kernel:
+<tscreen><verb>
+# make modules
+# make
+# make install
+</verb></tscreen>
+
+Make any modifications necessary to your boot configuration files; lilo or
+grub.
+
+Download and compile the dvb applications you'll need to configure the card. 
+At the password prompt, press ENTER.
+<tscreen><verb>
+$ cvs -d :pserver:anonymous@linuxtv.org:/cvs/linuxtv login
+$ cvs -d :pserver:anonymous@linuxtv.org:/cvs/linuxtv co dvb-apps dvb-kernel
+$ cd dvb-apps
+$ make
+$ su
+# cp utils/szap/azap /usr/local/bin
+# cp ~/dvb-kernel/firmware/dvb-fe-nxt2002.fw /usr/lib/hotplug/firmware
+# exit
+</verb></tscreen>
+
+Shutdown your machine, install the card and restart.  Ensure that you're
+using your newly compiled kernel.
+
+Once you've rebooted, confirm that the card is detected.
 
 </article>
 <!-- Revision History
@@ -7279,7 +7363,9 @@ section 6 slightly (Suggestions from Max Waterman).  Add a little extra hint
 in LVM section about boot-time messages.  (Wendy Seltzer).  Add caveat about
 IP addresses on general setup page. (James Casbon).  Update "mythtv is
 crashing my system".  Add + key for audio streams.
-
+v0.17.01, 2005-02-11.  Add upgrade instructions at the top.  Add section on
+running commercial flagging on host other than it was recorded on.  Add stuff
+to HDTV QAM section.
 
 -->
 
