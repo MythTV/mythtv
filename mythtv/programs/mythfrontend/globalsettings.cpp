@@ -353,21 +353,28 @@ public:
     };
 };
 
-class MythDateFormat: public LineEditSetting, public GlobalSetting {
+class MythDateFormat: public ComboBoxSetting, public GlobalSetting {
 public:
     MythDateFormat():
-        GlobalSetting("DateFormat") {
+        ComboBoxSetting(true), GlobalSetting("DateFormat") {
         setLabel("Date format");
-        setValue("ddd MMMM d");
+        addSelection("ddd MMMM d");
+        addSelection("ddd MMM d");
+        addSelection("MMM d");
+        addSelection("MM/dd");
+        addSelection("MM.dd");
     };
 };
 
-class MythTimeFormat: public LineEditSetting, public GlobalSetting {
+class MythTimeFormat: public ComboBoxSetting, public GlobalSetting {
 public:
     MythTimeFormat():
-        GlobalSetting("TimeFormat") {
+        ComboBoxSetting(true), GlobalSetting("TimeFormat") {
         setLabel("Time format");
-        setValue("h:mm AP");
+        addSelection("h:mm AP");
+        addSelection("hh:mm AP");
+        addSelection("hh:mm");
+        addSelection("h:mm");
     };
 };
 
