@@ -80,6 +80,7 @@ void SetupMenu(MythContext* context) {
     QString theme = context->FindThemeDir("blue");
     ThemedMenu* menu = new ThemedMenu(context, theme, "setup.xml");
     menu->setCallback(SetupMenuCallback, context);
+    menu->setKillable();
 
     if (menu->foundTheme()) {
             menu->Show();
