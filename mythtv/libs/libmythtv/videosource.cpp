@@ -803,7 +803,8 @@ void CardType::fillSelections(SelectSetting* setting)
                           "MJPEG");
     setting->addSelection(QObject::tr("MPEG-2 Encoder card (PVR-250, PVR-350)"),
                           "MPEG");
-    setting->addSelection(QObject::tr("pcHDTV ATSC capture card"), "HDTV");
+    setting->addSelection(QObject::tr("pcHDTV capture card (HD-2000, HD-3000)"),
+                          "HDTV");
     setting->addSelection(QObject::tr("Digital Video Broadcast card (DVB)"), 
                           "DVB");
 }
