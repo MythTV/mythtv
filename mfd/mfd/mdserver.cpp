@@ -1208,7 +1208,7 @@ void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *m
     if(!container)
     {
         warning("bad container id in mdcap request");
-        http_request->getResponse()->setError(400);
+        http_request->getResponse()->setError(404); // probably another mfd went away
         metadata_mutex.unlock();
         return;
     }
@@ -1284,7 +1284,7 @@ void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *m
                 response.endGroup();
 
             response.endGroup();
-    
+            metadata_mutex.unlock();
             sendResponse(http_request, response);
         }
         else
@@ -1363,7 +1363,7 @@ void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *m
                 
 
             response.endGroup();
-    
+            metadata_mutex.unlock();
             sendResponse(http_request, response);
         }
         
@@ -1410,7 +1410,7 @@ void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *m
                 response.endGroup();
 
             response.endGroup();
-    
+            metadata_mutex.unlock();
             sendResponse(http_request, response);
         }
         else
@@ -1474,7 +1474,7 @@ void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *m
                 }
 
             response.endGroup();
-    
+            metadata_mutex.unlock();
             sendResponse(http_request, response);
         }
         
@@ -1483,9 +1483,9 @@ void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *m
     {
         warning("bad request type from mdcap client");
         http_request->getResponse()->setError(400);
+        metadata_mutex.unlock();
     }    
 
-    metadata_mutex.unlock();
     
 }
 

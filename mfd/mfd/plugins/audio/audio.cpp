@@ -89,7 +89,7 @@ void AudioPlugin::run()
         local_hostname = my_hostname;
     }
 
-    ServiceEvent *se = new ServiceEvent(QString("services add macp %1 MythMusic on %2")
+    ServiceEvent *se = new ServiceEvent(QString("services add macp %1 myth audio control on %2")
                                        .arg(port_number)
                                        .arg(local_hostname));
     QApplication::postEvent(parent, se);

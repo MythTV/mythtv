@@ -147,12 +147,19 @@ void MetadataClient::handleIncoming()
             //
             //  Well, something is borked.
             //
-            
-            cerr << "there is something seriously wrong "
-                 << "with this metdata server: \""
-                 << ip_address
-                 << "\""
-                 << endl;
+            //  This could be that some _other_ mfd went away, taking it's
+            //  metadata with it while we were in the middle of asking
+            //  _this_ mfd about it. Try and recover by going back to basics
+            //
+
+            cerr << "got an error on a request, trying to recover" << endl;
+
+            delete new_response;
+            new_response = NULL;
+            metadata_collections.clear();
+            MdcapRequest update_request("/update", ip_address);
+            update_request.addGetVariable("session-id", session_id);
+            update_request.send(client_socket_to_service);
             
         }
     }

@@ -42,7 +42,8 @@ DaapServer::DaapServer(MFD *owner, int identity)
     {
         local_hostname = my_hostname;
     }
-    service_name = QString("MythMusic (DAAP) on %1").arg(local_hostname); 
+
+    service_name = QString("MythMusic on %1").arg(local_hostname); 
 
     //
     //  Register this (daap) service
