@@ -137,6 +137,7 @@ void initKeys(void)
     REG_KEY("Phone", "ZOOMIN", "Zoom the video window in", ">,.,Z,End");
     REG_KEY("Phone", "ZOOMOUT", "Zoom the video window out", ",,<,Q,Home");
     REG_KEY("Phone", "FULLSCRN", "Show received video full-screen", "P");
+    REG_KEY("Phone", "HANGUP", "Hangup an active call", "O");
     REG_KEY("Phone", "MUTE", "Mute", "|,\\,F9");
 }
 

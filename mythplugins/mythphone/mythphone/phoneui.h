@@ -150,8 +150,6 @@ class PhoneUIBox : public MythThemedDialog
     uchar yuvBuffer1[MAX_YUV_704_576];
     uchar yuvBuffer2[MAX_YUV_704_576];
 
-    bool EscapeHangsUp;
-
     UIManagedTreeListType *DirectoryList;
 
     UIRepeatedImageType   *micAmplitude;

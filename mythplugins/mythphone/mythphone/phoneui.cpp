@@ -157,7 +157,6 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
     addDirectoryPopup = NULL;
     incallPopup = NULL;
     currentCallEntry = 0;
-    EscapeHangsUp = false;
 
 
     // UK Ringback tone is 400Hz+450Hz with cadence 0.4s on 0.2s off 0.4s on 2s off
@@ -394,10 +393,14 @@ void PhoneUIBox::keyPressEvent(QKeyEvent *e)
             DirectoryList->forceLastBin();
             DirectoryList->refresh();
         }
-        else if ((action == "ESCAPE") && (EscapeHangsUp))
+        else if (action == "HANGUP")
         {
-            EscapeHangsUp = false;
             HangUp();
+        }
+        else if (action == "ESCAPE")
+        {
+            HangUp(); // Just in case; to make sure we never leave a call active when we quit!
+            handled = false;
         }
         else
             handled = false;
@@ -421,12 +424,10 @@ void PhoneUIBox::PlaceorAnswerCall(QString url, QString name, QString Mode, bool
             delete currentCallEntry;
         currentCallEntry = new CallRecord(name, url, false, (QDateTime::currentDateTime()).toString());
         phoneUIStatusBar->updateMidCallCaller(((name != 0) && (name.length() > 0)) ? name : url);
-        EscapeHangsUp = true;
         break;
 
     case SIP_ICONNECTING:
         sipStack->AnswerRingingCall(Mode, onLocalLan);
-        EscapeHangsUp = true;
         break;
     default:
         break;
@@ -517,7 +518,7 @@ void PhoneUIBox::ChangeVideoRxResolution()
 
 void PhoneUIBox::MenuButtonPushed()
 {
-    if (EscapeHangsUp) // In a call, show the adjust parameters menu
+    if (State == SIP_CONNECTED) // In a call, show the adjust parameters menu
         showVolume(true);
     else
         doMenuPopup(); // Otherwise show the traditional menu
@@ -701,7 +702,6 @@ void PhoneUIBox::fsmTimerExpiry()
             }
             currentCallEntry = 0;
             ConnectTime = 0;
-            EscapeHangsUp = false;
         }
         else if (State == SIP_CONNECTED)
         {
