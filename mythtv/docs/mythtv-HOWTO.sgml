@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-02-10, v1.090
+<date>2003-02-10, v1.091
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -414,7 +414,7 @@ run it if you get an unexpected error about not finding libraries.
 web site.  Save the tarball to a directory you can find.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
-name="http://xmltv.sourceforge.net">.  Download version 0.5.6
+name="http://xmltv.sourceforge.net">.  Download version 0.5.7
 
 Get lame from <url url="http://www.mp3dev.org/mp3"
 name="http://www.mp3dev.org/mp3">.  Download the source code to v3.93.1 by
@@ -503,8 +503,8 @@ Continuing on:
 
 <label id="untarring_xmltv">Untar the xmltv file:
 <tscreen><verb>
-$ tar -xjf xmltv-0.5.6.tar.bz2
-$ cd xmltv-0.5.6
+$ tar -xjf xmltv-0.5.7.tar.bz2
+$ cd xmltv-0.5.7
 </verb></tscreen>
 Install the xmltv prerequisites:
 <tscreen><verb>
@@ -520,7 +520,7 @@ cpan> exit
 
 Change to the XMLTV directory and compile it:
 <tscreen><verb>
-$ cd xmltv-0.5.6
+$ cd xmltv-0.5.7
 $ perl Makefile.PL
 </verb></tscreen>
 You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
@@ -2516,6 +2516,7 @@ v1.087, 2003-01-30.  Pointer to VCDHelp's webpage on resolution.
 v1.088, 2003-02-01.  Added a section to check on the symlink in lirc.
 v1.089, 2003-02-03.  Added RH80 remote database instructions for v0.8
 v1.090, 2003-02-10.  Added stuff on MythWeather aggressiveness setting.
+v1.091, 2003-02-10.  Update XMLTV version.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
