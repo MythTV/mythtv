@@ -37,7 +37,7 @@ bool DDStructureParser::startElement(const QString &pnamespaceuri,
         curr_lineup.type = pxmlatts.value("type");
         curr_lineup.device = pxmlatts.value("device");
         curr_lineup.postal = pxmlatts.value("postalCode");
-        curr_lineup.displayname = curr_lineup.name + "-" + curr_lineup.type;
+        curr_lineup.displayname = curr_lineup.name + "-" + curr_lineup.type + "-" + curr_lineup.device;
         curr_lineup.lineupid = pxmlatts.value("id");
 
         if (curr_lineup.lineupid.isEmpty()) 
