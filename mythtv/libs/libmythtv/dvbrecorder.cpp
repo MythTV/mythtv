@@ -244,7 +244,44 @@ void DVBRecorder::OpenFilters(uint16_t pid, ES_Type type)
         params.output = DMX_OUT_TS_TAP;
         params.flags = DMX_IMMEDIATE_START;
         params.pes_type = DMX_PES_OTHER;
-        params.pid = _software_filter_option ? DMX_DONT_FILTER : pid;
+
+        if ( _software_filter_option )
+        {
+            params.pes_type = DMX_PES_OTHER;
+            params.pid = DMX_DONT_FILTER;
+        }
+        else
+        {
+            params.pid = pid;
+            switch ( type ) 
+            {
+                case ES_TYPE_VIDEO_MPEG1:
+                case ES_TYPE_VIDEO_MPEG2:
+                case ES_TYPE_VIDEO_MPEG4:
+                case ES_TYPE_VIDEO_H264:
+                    params.pes_type = DMX_PES_VIDEO;
+                    break;
+                case ES_TYPE_AUDIO_MPEG1:
+                case ES_TYPE_AUDIO_MPEG2:
+                case ES_TYPE_AUDIO_AAC:
+                case ES_TYPE_AUDIO_AC3:
+                case ES_TYPE_AUDIO_DTS:
+                    params.pes_type = DMX_PES_AUDIO;
+                    break;
+                case ES_TYPE_TELETEXT:
+                    params.pes_type = DMX_PES_TELETEXT;
+                    break;
+                case ES_TYPE_SUBTITLE:
+                    params.pes_type = DMX_PES_SUBTITLE;
+                    break;
+                case ES_TYPE_DATA:
+                    params.pes_type = DMX_PES_PCR;
+                    break;
+                default:
+                    params.pes_type = DMX_PES_OTHER;
+                    break;
+            }
+        }
 
         int fd_tmp = open(dvbdevice(DVB_DEV_DEMUX,_card_number_option), O_RDWR);
 
