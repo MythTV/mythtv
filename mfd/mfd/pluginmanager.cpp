@@ -37,9 +37,8 @@ bool MFDPluginWrapper::init()
     this->load();
 
     //
-    //  try to resolve (not execute!)
-    //  the five neccesary interface 
-    //  mechanisms
+    //  try to resolve (not execute!) the 4 necessary and 2 optional
+    //  interface mechanisms
     //
     
     if(!(init_function = (Plugin_Init_Function) this->resolve("mfdplugin_init")) ||
@@ -55,14 +54,21 @@ bool MFDPluginWrapper::init()
     if(!(parse_tokens_function = (Plugin_Parse_Tokens_Function) this->resolve("mfdplugin_parse_tokens")))
     {
         log(QString("plugin wrapper could interface with %1 but it has no parseTokens interface (has own service interface?)")
-            .arg(shortName()),6);
+            .arg(shortName()),8);
     }
 
     if(!(capabilities_function = (Plugin_Capabilities_Function) this->resolve("mfdplugin_capabilities")))
     {
         log(QString("plugin wrapper could interface with %1 but it has no capabilites interface (has own service interface?)")
-            .arg(shortName()),6);
+            .arg(shortName()),8);
     }
+
+    if(!(metadata_change_function = (Plugin_Metadata_Change_Function) this->resolve("mfdplugin_metadata_change")))
+    {
+        log(QString("plugin wrapper did not find a metadata change interface in plugin %1")
+            .arg(shortName()),8);
+    }
+
     //
     //  Now try to init
     //
@@ -217,6 +223,14 @@ bool MFDPluginWrapper::tryToUnload()
     return false;
 }
 
+void MFDPluginWrapper::metadataChanged(int which_collection)
+{
+    if(metadata_change_function)
+    {
+        metadata_change_function(which_collection);
+    }
+}
+
 /*
 ---------------------------------------------------------------------
 */
@@ -359,6 +373,19 @@ void MFDPluginManager::stopPlugin(int which_one)
         }
     }
 }
+
+void MFDPluginManager::tellPluginsMetadataChanged(int which_collection)
+{
+    QPtrListIterator<MFDPluginWrapper> iterator( available_plugins );
+    MFDPluginWrapper *a_plugin;
+    while ( (a_plugin = iterator.current()) != 0 )
+    {
+        ++iterator;
+        a_plugin->metadataChanged(which_collection);
+    }
+}
+
+
 
 void MFDPluginManager::stopPlugins()
 {

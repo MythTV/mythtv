@@ -1141,6 +1141,15 @@ void DaapServer::sendContainer(HttpRequest *http_request, u32 container_id, int 
 
 }
 
+void DaapServer::handleMetadataChange(int which_collection)
+{
+    cout << "collection "
+         << which_collection
+         << " changed ... I should do something about that "
+         << endl;
+}
+
+
 DaapServer::~DaapServer()
 {
     //

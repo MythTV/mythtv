@@ -74,6 +74,7 @@ class MFDBasePlugin : public QThread
     virtual void sendMessage(const QString &message);
     virtual void huh(const QStringList &tokens, int socket_identifier);
     bool         keepGoing();
+    void         metadataChanged(int which_collection);
     
 
   protected:
@@ -94,6 +95,10 @@ class MFDBasePlugin : public QThread
     QMutex                  main_wait_mutex;
     
     QString                 name;
+    
+    bool                    metadata_changed_flag;
+    int                     metadata_collection_last_changed;
+    QMutex                  metadata_changed_mutex;
     
 };
 
@@ -156,6 +161,7 @@ class MFDServicePlugin : public MFDBasePlugin
 
     virtual void    processRequest(MFDServiceClientSocket *a_client);
     void            markUnused(ServiceRequestThread *which_one);
+    virtual void    handleMetadataChange(int which_collection);
 
   protected:
 

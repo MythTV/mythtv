@@ -95,12 +95,10 @@ void MMusicWatcher::run()
     while(keep_going)
     {
         //
-        //  Check to see if our sweep interval has elapsed
+        //  Check to see if our sweep interval has elapsed (default is 5 minutes)
         //
 
-        int sweep_wait = mfdContext->getNumSetting("music_sweep_time", 5) * 1000;  
-        //int sweep_wait = mfdContext->getNumSetting("music_sweep_time", 5) * 60 * 1000;  
-
+        int sweep_wait = mfdContext->getNumSetting("music_sweep_time", 5) * 60 * 1000;  
         if( metadata_sweep_time.elapsed() > sweep_wait || force_sweep)
         {
             //
@@ -135,7 +133,7 @@ void MMusicWatcher::run()
                 //  container "above" me that it's time to update
                 //
                 
-                MetadataChangeEvent *mce = new MetadataChangeEvent(unique_identifier);
+                MetadataChangeEvent *mce = new MetadataChangeEvent(container_id);
                 QApplication::postEvent(parent, mce);    
             }
             

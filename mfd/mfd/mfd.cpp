@@ -197,7 +197,8 @@ void MFD::customEvent(QCustomEvent *ce)
         //  Metadata change event occured, tell the plugins that care.
         //        
         
-        // MetadataChangeEvent *mce = (MetadataChangeEvent*)ce;
+        MetadataChangeEvent *mce = (MetadataChangeEvent*)ce;
+        plugin_manager->tellPluginsMetadataChanged(mce->getIdentifier());
                 
     }
     else

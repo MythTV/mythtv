@@ -25,6 +25,8 @@ MFDBasePlugin::MFDBasePlugin(MFD *owner, int identifier, const QString &a_name)
     unique_identifier = identifier;
     keep_going = true;
     name = a_name;
+    metadata_changed_flag = false;
+    metadata_collection_last_changed = 0;
 }
 
 
@@ -125,6 +127,15 @@ bool MFDBasePlugin::keepGoing()
     keep_going_mutex.unlock();
     
     return return_value;
+}
+
+void MFDBasePlugin::metadataChanged(int which_collection)
+{
+    metadata_changed_mutex.lock();
+        metadata_changed_flag = true;
+        metadata_collection_last_changed = which_collection;
+    metadata_changed_mutex.unlock();
+    wakeUp();
 }
 
 MFDBasePlugin::~MFDBasePlugin()
@@ -297,6 +308,21 @@ void MFDServicePlugin::run()
         
         updateSockets();
         waitForSomethingToHappen();
+        if(metadata_changed_flag)
+        {
+            //
+            //  The mfd has "pushed" us the information that some collection
+            //  of metadata has changed. Deal with it (default
+            //  implementation is to do nothing)
+            //
+
+            int which_collection;
+            metadata_changed_mutex.lock();
+                which_collection = metadata_collection_last_changed;
+                metadata_changed_flag = false;
+            metadata_changed_mutex.unlock();
+            handleMetadataChange(which_collection);
+        }
     }
 
 }
@@ -808,6 +834,13 @@ void MFDServicePlugin::markUnused(ServiceRequestThread *which_one)
 void MFDServicePlugin::doSomething(const QStringList&, int)
 {
     warning("has not re-implemented doSomething()");
+}
+
+void MFDServicePlugin::handleMetadataChange(int)
+{
+    //
+    //  Default implementation is to do nothing
+    //
 }
 
 MFDServicePlugin::~MFDServicePlugin()
