@@ -543,6 +543,7 @@ SipFsm::SipFsm(QWidget *parent, const char *name)
     if (natIp.length() == 0)
         natIp = localIp;
     SipFsm::Debug(SipDebugEvent::SipDebugEv, QString("SIP listening on IP Address ") + localIp + ":" + QString::number(localPort) + " NAT address " + natIp + "\n\n");
+    cout << "SIP listening on IP Address " << localIp << ":" << localPort << " NAT address " << natIp << endl;
 
     // Create the timer list
     timerList = new SipTimer;
@@ -587,8 +588,6 @@ void SipFsm::Debug(SipDebugEvent::Type t, QString dbg)
 #else
     if ((debugStream) && ((t == SipDebugEvent::SipTraceRxEv) || (t == SipDebugEvent::SipTraceTxEv)))
         *debugStream << dbg;
-    else
-        cout << dbg;
 #endif
 }
 
