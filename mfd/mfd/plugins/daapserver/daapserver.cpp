@@ -1185,11 +1185,12 @@ void DaapServer::sendDatabaseItem(HttpInRequest *http_request, u32 song_id, Daap
             http_request->getResponse()->addHeader("Content-Type: application/x-dmap-tagged");
             
             //
-            //  If the client is iTunes version 4.5, it needs the word
+            //  If the client is iTunes version 4.5/4.6, it needs the word
             //  "bytes" in the Content Range header
             //
             
-            if(daap_request->getClientType() == DAAP_CLIENT_ITUNES45)
+            if(daap_request->getClientType() == DAAP_CLIENT_ITUNES45 ||
+               daap_request->getClientType() == DAAP_CLIENT_ITUNES46)
             {
                 http_request->getResponse()->setBytesInContentRangeHeader(true);
             }
