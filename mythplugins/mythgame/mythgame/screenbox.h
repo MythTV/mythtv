@@ -4,7 +4,7 @@
 #include <qwidget.h>
 #include <qframe.h>
 
-#include <mythtv/mythwidgets.h>
+#include <mythtv/mythdialogs.h>
 
 #include "selectframe.h"
 #include "rominfo.h"

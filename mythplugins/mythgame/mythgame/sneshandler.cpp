@@ -13,7 +13,7 @@
 #include <unistd.h>
 
 #include <mythtv/mythcontext.h>
-#include <mythtv/mythwidgets.h>
+#include <mythtv/mythdialogs.h>
 
 #include <string>
 #include <math.h>

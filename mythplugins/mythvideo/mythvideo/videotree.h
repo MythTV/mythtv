@@ -5,8 +5,8 @@
 #include <qmutex.h>
 #include <qvaluevector.h>
 
-#include <mythtv/mythwidgets.h>
-#include <mythtv/dialogbox.h>
+#include <mythtv/mythdialogs.h>
+#include <mythtv/uitypes.h>
 
 #include "metadata.h"
 

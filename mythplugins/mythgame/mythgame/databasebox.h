@@ -6,7 +6,7 @@
 
 #include "rominfo.h"
 
-#include <mythtv/mythwidgets.h>
+#include <mythtv/mythdialogs.h>
 
 class QSqlDatabase;
 class QListViewItem;

@@ -9,7 +9,7 @@ using namespace std;
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythwidgets.h>
-
+#include <mythtv/uitypes.h>
 
 VideoTree::VideoTree(QSqlDatabase *ldb,
                      QString window_name,

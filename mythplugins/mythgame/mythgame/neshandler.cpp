@@ -10,7 +10,7 @@
 
 #include <iostream>
 
-#include <mythtv/mythwidgets.h>
+#include <mythtv/mythdialogs.h>
 
 using namespace std;
 

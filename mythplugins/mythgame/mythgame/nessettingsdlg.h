@@ -5,7 +5,7 @@
 #include <qdialog.h>
 #include <qpixmap.h>
 
-#include <mythtv/mythwidgets.h>
+#include <mythtv/mythdialogs.h>
 
 class QVBoxLayout; 
 class QHBoxLayout; 
@@ -20,7 +20,6 @@ class QPushButton;
 class QSlider;
 class QTabWidget;
 class QWidget;
-class MythContext;
 
 class NesSettingsDlg : public MythDialog
 { 
