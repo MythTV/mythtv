@@ -2,6 +2,7 @@
 #define RINGBUFFER
 
 #include <string>
+#include <pthread.h>
 
 using namespace std;
 
@@ -17,6 +18,10 @@ class RingBuffer
     
     int Read(void *buf, int count);
     int Write(const void *buf, int count);
+
+    void TransitionToFile(const string &lfilename);
+    void TransitionToRing(void);
+    bool IsTransitioning(void) { return transitioning; }
 
     long long Seek(long long pos, int whence);
 
@@ -36,7 +41,10 @@ class RingBuffer
 
  private:
     string filename;
-    
+    string savedfilename;
+
+    bool transitioning;    
+
     int fd, fd2;
     
     bool normalfile;
@@ -54,6 +62,10 @@ class RingBuffer
     long long wrapcount;
 
     bool stopreads;
+
+    pthread_rwlock_t rwlock;
+
+    long long transitionpoint;
 };
 
 #endif

@@ -55,6 +55,8 @@ TV::TV(const string &startchannel)
     runMainLoop = false;
     changeState = false;
 
+    watchingLiveTV = false;
+
     pthread_create(&event, NULL, EventThread, this);
 
     while (!runMainLoop)
@@ -84,13 +86,26 @@ TV::~TV(void)
 
 void TV::LiveTV(void)
 {
-    if (internalState != kState_None)
+    if (internalState == kState_RecordingOnly)
     {
-        printf("Error, attempting to watch live tv when there's something "
-               "already going on.\n");
-        return;
+        char cmdline[4096];
+        sprintf(cmdline, "%s \"MythTV is already recording something.  Do you want to:\" \"Stop recording and watch TV\" \"Watch the in-progress recording\" \"Cancel\"", settings->GetSetting("DialogPath").c_str());
+
+        int result = system(cmdline);
+
+        if (result == 0)
+        {
+            nextState = kState_WatchingLiveTV;
+            changeState = true;
+        }
+        else if (result == 1)
+        {
+            nextState = kState_WatchingRecording;
+            inputFilename = outputFilename;
+            changeState = true;
+        }
     }
-    else
+    else if (internalState == kState_None)
     {
         nextState = kState_WatchingLiveTV;
         changeState = true;
@@ -111,7 +126,51 @@ void TV::StartRecording(const string &channelName, int duration,
         else if (internalState == kState_WatchingPreRecorded)
             nextState = kState_WatchingOtherRecording;
         changeState = true;
-    }   
+    }
+    else if (internalState == kState_WatchingLiveTV)
+    {
+        if (recordChannel != channelName)
+        {
+            char cmdline[4096];
+            sprintf(cmdline, "%s \"MythTV wants to record something.  Do you want to:\" \"Record and watch while it Records\" \"Let it record, and go back to the Main Menu\" \"Continue Watching TV\"", settings->GetSetting("DialogPath").c_str());
+ 
+            int result = system(cmdline);
+
+            if (result == 2)
+            {
+            }
+            else if (result == 1)
+            {
+                nextState = kState_None;
+                changeState = true;
+
+                while (GetState() != kState_None)
+                    usleep(50);
+
+                recordChannel = channelName;
+                outputFilename = outputFileName;
+                secsToRecord = duration;
+                nextState = kState_RecordingOnly;
+                changeState = true;
+            }
+            else 
+            {
+                recordChannel = channelName;
+                outputFilename = outputFileName;
+                secsToRecord = duration;
+                nextState = kState_WatchingRecording;
+                changeState = true;
+            }
+        }
+        else
+        {
+            recordChannel = channelName;
+            outputFilename = outputFileName;
+            secsToRecord = duration;
+            nextState = kState_WatchingRecording;
+            changeState = true;
+        }
+    }  
 }
 
 void TV::Playback(const string &inputFileName)
@@ -198,6 +257,11 @@ TVState TV::RemovePlaying(TVState state)
     return kState_Error;
 }
 
+void TV::WriteRecordedRecord(void)
+{
+    // TODO: Flesh out.
+}
+
 void TV::HandleStateChange(void)
 {
     bool changed = false;
@@ -205,6 +269,7 @@ void TV::HandleStateChange(void)
     bool startRecorder = false;
     bool closePlayer = false;
     bool closeRecorder = false;
+    bool killRecordingFile = false;
 
     string statename;
     StateToString(nextState, statename);
@@ -233,6 +298,8 @@ void TV::HandleStateChange(void)
 
         startPlayer = startRecorder = true;
 
+        watchingLiveTV = true;
+
         printf("Changing from %s to %s\n", origname.c_str(), statename.c_str());
     }
     else if (internalState == kState_WatchingLiveTV && 
@@ -243,6 +310,8 @@ void TV::HandleStateChange(void)
 
         internalState = nextState;
         changed = true;
+
+        watchingLiveTV = false;
 
         printf("Changing from %s to %s\n", origname.c_str(), statename.c_str());
     }
@@ -277,6 +346,8 @@ void TV::HandleStateChange(void)
         internalState = nextState;
         changed = true;
 
+        watchingLiveTV = false;
+
         printf("Changing from %s to %s\n", origname.c_str(), statename.c_str());
     }
     else if ((internalState == kState_None && 
@@ -304,6 +375,54 @@ void TV::HandleStateChange(void)
     {
         closePlayer = true;
         
+        internalState = nextState;
+        changed = true;
+
+        watchingLiveTV = false;
+
+        printf("Changing from %s to %s\n", origname.c_str(), statename.c_str());
+    }
+    else if (internalState == kState_RecordingOnly && 
+             nextState == kState_WatchingLiveTV)
+    {
+        TeardownRecorder(true);
+        
+        long long filesize = settings->GetNumSetting("BufferSize");
+        filesize = filesize * 1024 * 1024 * 1024;
+        long long smudge = settings->GetNumSetting("MaxBufferFill");
+        smudge = smudge * 1024 * 1024;
+
+        rbuffer = new RingBuffer(settings->GetSetting("BufferName"), filesize,
+                                 smudge);
+        prbuffer = rbuffer;
+
+        internalState = nextState;
+        changed = true;
+
+        startPlayer = startRecorder = true;
+
+        watchingLiveTV = true;
+
+        printf("Changing from %s to %s\n", origname.c_str(), statename.c_str());
+    }
+    else if (internalState == kState_WatchingLiveTV &&  
+             nextState == kState_WatchingRecording)
+    {
+        rbuffer->TransitionToFile(outputFilename);
+        
+        internalState = nextState;
+        changed = true;
+
+        printf("Changing from %s to %s\n", origname.c_str(), statename.c_str());
+    }
+    else if ((internalState == kState_WatchingRecording &&
+              nextState == kState_WatchingLiveTV) ||
+             (internalState == kState_WatchingPreRecorded &&
+              nextState == kState_WatchingLiveTV))
+    {
+        rbuffer->TransitionToRing();
+        WriteRecordedRecord();
+ 
         internalState = nextState;
         changed = true;
 
@@ -348,7 +467,7 @@ void TV::HandleStateChange(void)
     }
 
     if (closeRecorder)
-        TeardownRecorder();
+        TeardownRecorder(killRecordingFile);
 
     if (closePlayer)
         TeardownPlayer();
@@ -374,7 +493,7 @@ void TV::SetupRecorder(void)
     nvr->Initialize();
 }
 
-void TV::TeardownRecorder(void)
+void TV::TeardownRecorder(bool killFile)
 {
     if (nvr)
     {
@@ -388,6 +507,15 @@ void TV::TeardownRecorder(void)
     {
         delete rbuffer;
         rbuffer = NULL;
+    }
+
+    if (killFile)
+    {
+        unlink(outputFilename.c_str());
+    }
+    else
+    {
+        WriteRecordedRecord();
     }
 }    
 
@@ -472,8 +600,16 @@ void TV::RunTV(void)
             if ((float)nvr->GetFramesWritten() >
                 (float)secsToRecord * frameRate)
             {
-                nextState = RemoveRecording(internalState);
-                changeState = true;
+                if (watchingLiveTV)
+                {
+                    nextState = kState_WatchingLiveTV;
+                    changeState = true;
+                }
+                else
+                {
+                    nextState = RemoveRecording(internalState);
+                    changeState = true;
+                }
             }
         }
 

@@ -19,7 +19,7 @@ RingBuffer::RingBuffer(const string &lfilename, bool write)
     }
     else
     {
-        fd = open(filename.c_str(), O_RDONLY|O_LARGEFILE);
+        fd2 = open(filename.c_str(), O_RDONLY|O_LARGEFILE);
         writemode = false;
     }
 
@@ -28,6 +28,9 @@ RingBuffer::RingBuffer(const string &lfilename, bool write)
     smudgeamount = 0;
 
     stopreads = false;
+    transitioning = false;
+
+    pthread_rwlock_init(&rwlock, NULL);
 }
 
 RingBuffer::RingBuffer(const string &lfilename, long long size, 
@@ -49,6 +52,9 @@ RingBuffer::RingBuffer(const string &lfilename, long long size,
     smudgeamount = smudge;
 
     stopreads = false;
+    transitioning = false;
+
+    pthread_rwlock_init(&rwlock, NULL);
 }
 
 RingBuffer::~RingBuffer(void)
@@ -59,8 +65,41 @@ RingBuffer::~RingBuffer(void)
         close(fd2);
 }
 
+void RingBuffer::TransitionToFile(const string &lfilename)
+{
+    pthread_rwlock_wrlock(&rwlock);
+
+    transitionpoint = totalwritepos;
+    savedfilename = filename;
+    filename = lfilename;
+
+    transitioning = true;
+
+    close(fd);
+    fd = open(filename.c_str(), O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 0644);
+
+    pthread_rwlock_unlock(&rwlock);
+}
+
+void RingBuffer::TransitionToRing(void)
+{
+    pthread_rwlock_wrlock(&rwlock);
+ 
+    transitionpoint = totalwritepos;
+    filename = savedfilename;
+
+    transitioning = true;
+
+    close(fd);
+    fd = open(filename.c_str(), O_WRONLY|O_CREAT|O_LARGEFILE, 0644); 
+
+    pthread_rwlock_unlock(&rwlock);
+}
+
 void RingBuffer::Reset(void)
 {
+    pthread_rwlock_rdlock(&rwlock);
+
     if (!normalfile)
     {
         close(fd);
@@ -74,16 +113,20 @@ void RingBuffer::Reset(void)
 
         wrapcount = 0;
     }
+    
+    pthread_rwlock_unlock(&rwlock);
 }
 
 int RingBuffer::Read(void *buf, int count)
 {
+    pthread_rwlock_rdlock(&rwlock);
+
     int ret = -1;
     if (normalfile)
     {
         if (!writemode)
         {
-            ret = read(fd, buf, count);
+            ret = read(fd2, buf, count);
 	    totalreadpos += ret;
         }
         else
@@ -97,10 +140,32 @@ int RingBuffer::Read(void *buf, int count)
         {
             usleep(50);
             if (stopreads)
+            {
+                pthread_rwlock_unlock(&rwlock);
                 return 0;
+            }
 	}
 
-	if (readpos + count > filesize)
+        if (transitioning && totalreadpos + count >= transitionpoint)
+        {
+            int toread = transitionpoint - totalreadpos;
+            ret = read(fd2, buf, toread);
+
+            int left = count - toread;
+
+            close(fd2);
+
+            fd2 = open(filename.c_str(), O_RDONLY|O_LARGEFILE);
+
+            ret = read(fd2, (char *)buf + toread, left);
+            ret += toread;
+
+            totalreadpos += ret;
+            readpos = left;
+ 
+            transitioning = false;
+        }     
+	else if (readpos + count > filesize)
         {
 	    int toread = filesize - readpos;
 
@@ -122,12 +187,16 @@ int RingBuffer::Read(void *buf, int count)
 	    totalreadpos += ret;
         }
     }
+
+    pthread_rwlock_unlock(&rwlock);
     return ret;
 }
 
 int RingBuffer::Write(const void *buf, int count)
 {
     int ret = -1;
+
+    pthread_rwlock_rdlock(&rwlock);
 
     if (normalfile)
     {
@@ -167,15 +236,19 @@ int RingBuffer::Write(const void *buf, int count)
 	}
     }
 
+    pthread_rwlock_unlock(&rwlock);
+
     return ret;
 }
 
 long long RingBuffer::Seek(long long pos, int whence)
 {
+    pthread_rwlock_rdlock(&rwlock);
+
     long long ret = -1;
     if (normalfile)
     {
-        ret = lseek(fd, pos, whence);
+        ret = lseek(fd2, pos, whence);
 	if (whence == SEEK_SET)
             readpos = ret;
 	else if (whence == SEEK_CUR)
@@ -196,6 +269,8 @@ long long RingBuffer::Seek(long long pos, int whence)
 	}
     }
     return ret;
+
+    pthread_rwlock_unlock(&rwlock);
 }
 
 long long RingBuffer::GetFreeSpace(void)

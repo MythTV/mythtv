@@ -68,7 +68,7 @@ class TV
     void LoadMenu(void);
 
     void SetupRecorder();
-    void TeardownRecorder();
+    void TeardownRecorder(bool killFile = false);
 
     void SetupPlayer();
     void TeardownPlayer();
@@ -81,6 +81,8 @@ class TV
     bool StateIsPlaying(TVState state);
     TVState RemovePlaying(TVState state);
     TVState RemoveRecording(TVState state);
+
+    void WriteRecordedRecord();
 
     NuppelVideoRecorder *nvr;
     NuppelVideoPlayer *nvp;
@@ -114,6 +116,8 @@ class TV
     TVState nextState;
     string inputFilename, outputFilename;
     string recordChannel;
+
+    bool watchingLiveTV;
 };
 
 #endif
