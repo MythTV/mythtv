@@ -444,6 +444,9 @@ void GuideGrid::paintPrograms(QPainter *p)
         {
             ProgramInfo *pginfo = m_programInfos[y][x];
 
+            if (pginfo->recordtype == -1)
+                pginfo->recordtype = GetProgramRecordingStatus(pginfo);
+
             int spread = 1;
             if (pginfo->startts != lastprog)
             {
@@ -468,6 +471,7 @@ void GuideGrid::paintPrograms(QPainter *p)
                     {
                         m_programInfos[y][z]->spread = spread;
                         m_programInfos[y][z]->startCol = x;
+                        m_programInfos[y][z]->recordtype = pginfo->recordtype;
                     }
                 }
               
@@ -489,11 +493,31 @@ void GuideGrid::paintPrograms(QPainter *p)
                              AlignLeft | WordBreak,
                              pginfo->title);
 
-                tmp.setPen(QPen(black, 2));
                 //if (x != 4)
-                    tmp.drawLine((x + spread) * 145 + newxoffset, 92 * y - 1, 
-                                 (x + spread) * 145 + newxoffset, 
-                                 92 * (y + 1) - 1);
+                tmp.drawLine((x + spread) * 145 + newxoffset, 92 * y - 1, 
+                             (x + spread) * 145 + newxoffset, 
+                             92 * (y + 1) - 1);
+
+                if (pginfo->recordtype > 0)
+                {
+                    tmp.setPen(QPen(red, 2));
+                    QString text;
+
+                    if (pginfo->recordtype == 1)
+                        text = "R";
+                    else if (pginfo->recordtype == 2)
+                        text = "T";
+                    else if (pginfo->recordtype == 3) 
+                        text = "A";
+
+                    int width = fm.width(text);
+
+                    tmp.drawText((x + spread) * 145 - width * 1.5, 
+                                 92 * (y + 1) - height, width * 1.5, 
+                                 height, AlignLeft, text);
+             
+                    tmp.setPen(QPen(black, 2));
+                }
 
                 if (m_currentRow == (int)y)
                 {
@@ -503,7 +527,7 @@ void GuideGrid::paintPrograms(QPainter *p)
                    
                         tmp.drawRect(x * 145 + 2 + lastxoffset,
                                      y * 92 + 1, 142 + 145 * (spread - 1) +
-                                     newxoffset, 92 -3);
+                                     newxoffset + 1, 92 - 3);
                         tmp.setPen(QPen(black, 2));
                     }
                 }
@@ -823,4 +847,8 @@ void GuideGrid::displayInfo()
 
     setActiveWindow();
     setFocus();
+
+    pginfo->recordtype = GetProgramRecordingStatus(pginfo);
+
+    update(programRect());
 }
