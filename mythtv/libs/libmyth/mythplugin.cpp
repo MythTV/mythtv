@@ -9,6 +9,16 @@
 
 using namespace std;
 
+// These defines provide portability for different
+// plugin file names.
+#ifdef CONFIG_DARWIN
+const QString kPluginLibPrefix = "lib";
+const QString kPluginLibSuffix = ".dylib";
+#else
+const QString kPluginLibPrefix = "lib";
+const QString kPluginLibSuffix = ".so";
+#endif
+
 MythPlugin::MythPlugin(const QString &libname)
           : QLibrary(libname)
 {
@@ -90,7 +100,7 @@ MythPluginManager::MythPluginManager()
     QDir filterDir(pluginprefix);
 
     filterDir.setFilter(QDir::Files | QDir::Readable);
-    filterDir.setNameFilter("lib*.so");
+    filterDir.setNameFilter(kPluginLibPrefix + "*" + kPluginLibSuffix);
 
     gContext->SetDisableLibraryPopup(true);
 
@@ -103,8 +113,8 @@ MythPluginManager::MythPluginManager()
             QString library = *i;
 
             // pull out the base library name
-            library = library.right(library.length() - 3);
-            library = library.left(library.length() - 3);
+            library = library.right(library.length() - kPluginLibPrefix.length());
+            library = library.left(library.length() - kPluginLibSuffix.length());
 
             init_plugin(library);
         }
@@ -117,8 +127,8 @@ MythPluginManager::MythPluginManager()
 
 bool MythPluginManager::init_plugin(const QString &plugname)
 {
-    QString newname = QString(PREFIX) + "/lib/mythtv/plugins/lib" + plugname +
-                      ".so";
+    QString newname = QString(PREFIX) + "/lib/mythtv/plugins/" +
+                      kPluginLibPrefix + plugname + kPluginLibSuffix;
    
     if (m_dict.find(newname) == 0)
     {
@@ -151,8 +161,8 @@ bool MythPluginManager::init_plugin(const QString &plugname)
 
 bool MythPluginManager::run_plugin(const QString &plugname)
 {
-    QString newname = QString(PREFIX) + "/lib/mythtv/plugins/lib" + plugname +
-                      ".so";
+    QString newname = QString(PREFIX) + "/lib/mythtv/plugins/" +
+                      kPluginLibPrefix + plugname + kPluginLibSuffix;
 
     if (m_dict.find(newname) == 0 && init_plugin(plugname) == false)
     {
