@@ -53,6 +53,8 @@ void MythOpenGLPainter::Begin(QWidget *parent)
     assert(realParent);
 
     realParent->makeCurrent();
+    dgl->qglClearColor(dgl->palette().brush(QPalette::Background));
+    glClear(GL_COLOR_BUFFER_BIT);
     glShadeModel(GL_FLAT);
     glViewport(0, 0, parent->width(), parent->height());
     glMatrixMode(GL_PROJECTION);
@@ -60,7 +62,7 @@ void MythOpenGLPainter::Begin(QWidget *parent)
     glOrtho(0, 800, 600, 0, -999999, 999999);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glEnable(GL_TEXTURE_2D);
+    glTranslatef(0.375, 0.375, 0.0);
 }
 
 void MythOpenGLPainter::End(void)
@@ -111,6 +113,16 @@ void MythOpenGLPainter::RemoveImageFromCache(MythImage *im)
 void MythOpenGLPainter::BindTextureFromCache(MythImage *im, 
                                              bool alphaonly)
 {
+    static bool init_extensions = true;
+    static bool generate_mipmaps = false;
+
+    if (init_extensions)
+    {
+        QString extensions(reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS)));
+        generate_mipmaps = extensions.contains("GL_SGIS_generate_mipmap");
+        init_extensions = false;
+    }
+
     if (m_ImageIntMap.contains(im))
     {
         long val = m_ImageIntMap[im];
@@ -146,8 +158,13 @@ void MythOpenGLPainter::BindTextureFromCache(MythImage *im,
     GLuint tx_id;
     glGenTextures(1, &tx_id);
     glBindTexture(GL_TEXTURE_2D, tx_id);
-    glHint(GL_GENERATE_MIPMAP_HINT, GL_NICEST);
-    glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+
+    if (generate_mipmaps) 
+    {
+        glHint(GL_GENERATE_MIPMAP_HINT_SGIS, GL_NICEST);
+        glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+    }
+
     glTexImage2D(GL_TEXTURE_2D, 0, format, tx.width(), tx.height(), 0,
                  GL_RGBA, GL_UNSIGNED_BYTE, tx.bits());
 
@@ -181,10 +198,10 @@ void MythOpenGLPainter::DrawImage(const QRect &r, MythImage *im,
         double y1 = src.y() / (double)im->height();
         double y2 = y1 + src.height() / (double)im->height();
 
-        glTexCoord2f(x1, y2); glVertex2i(r.x(), r.y());
-        glTexCoord2f(x2, y2); glVertex2i(r.x() + r.width(), r.y());
-        glTexCoord2f(x2, y1); glVertex2i(r.x() + r.width(), r.y() + r.height());
-        glTexCoord2f(x1, y1); glVertex2i(r.x(), r.y()+r.height());
+        glTexCoord2f(x1, y2); glVertex2f(r.x(), r.y());
+        glTexCoord2f(x2, y2); glVertex2f(r.x() + r.width(), r.y());
+        glTexCoord2f(x2, y1); glVertex2f(r.x() + r.width(), r.y() + r.height());
+        glTexCoord2f(x1, y1); glVertex2f(r.x(), r.y()+r.height());
     }
     glEnd();
 
@@ -262,10 +279,10 @@ void MythOpenGLPainter::ReallyDrawText(QColor color, const QRect &r, int alpha)
         double y1 = 0;
         double y2 = 1;
 
-        glTexCoord2f(x1, y2); glVertex2i(r.x(), r.y());
-        glTexCoord2f(x2, y2); glVertex2i(r.x() + r.width(), r.y());
-        glTexCoord2f(x2, y1); glVertex2i(r.x() + r.width(), r.y() + r.height());
-        glTexCoord2f(x1, y1); glVertex2i(r.x(), r.y()+r.height());
+        glTexCoord2f(x1, y2); glVertex2f(r.x(), r.y());
+        glTexCoord2f(x2, y2); glVertex2f(r.x() + r.width(), r.y());
+        glTexCoord2f(x2, y1); glVertex2f(r.x() + r.width(), r.y() + r.height());
+        glTexCoord2f(x1, y1); glVertex2f(r.x(), r.y()+r.height());
     }
     glEnd();
 

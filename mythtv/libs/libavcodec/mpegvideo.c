@@ -1969,9 +1969,8 @@ static int load_input_picture(MpegEncContext *s, AVFrame *pic_arg){
             int64_t time= av_rescale(pic->pts, s->avctx->frame_rate, s->avctx->frame_rate_base*(int64_t)AV_TIME_BASE);
             int64_t last= av_rescale(s->user_specified_pts, s->avctx->frame_rate, s->avctx->frame_rate_base*(int64_t)AV_TIME_BASE);
         
-            if(time <= last){            
-                av_log(s->avctx, AV_LOG_ERROR, "Error, Invalid timestamp=%Ld, last=%Ld\n", pic->pts, s->user_specified_pts);
-                return -1;
+            if(time < last){            
+                av_log(s->avctx, AV_LOG_ERROR, "Error, Invalid timestamp=%Ld (%Ld), last=%Ld (%Ld)\n", time, pic->pts, last, s->user_specified_pts);
             }
         }
         s->user_specified_pts= pic->pts;

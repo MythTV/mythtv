@@ -773,7 +773,8 @@ void TV::HandleStateChange(void)
                 .arg(origname).arg(statename));
     }
 
-    if (kState_None != nextState && !activenvp->IsDecoderThreadAlive())
+    if (kState_None != nextState && activenvp && 
+        !activenvp->IsDecoderThreadAlive())
     {
         VERBOSE(VB_IMPORTANT, "Decoder not alive, and trying to play..");
         if (nextState == kState_WatchingLiveTV)
