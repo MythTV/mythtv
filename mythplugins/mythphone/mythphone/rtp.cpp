@@ -69,6 +69,7 @@ rtp::rtp(QWidget *callingApp, int localPort, QString remoteIP, int remotePort, i
     framesIn = 0;
     framesOut = 0;
     framesOutDiscarded = 0;
+    framesInDiscarded = 0;
     txBuffer = 0;
     recBuffer = 0;
     dtmfIn = "";
@@ -709,7 +710,8 @@ void rtp::CheckSendStatistics()
             QApplication::postEvent(eventWindow, 
                         new RtpEvent(RtpEvent::RtpStatisticsEv, this, now, statsMsPeriod,
                                      pkIn, pkOut, pkMissed, pkLate, bytesIn, bytesOut, 
-                                     bytesToSpeaker, framesIn, framesOut, framesOutDiscarded));
+                                     bytesToSpeaker, framesIn, framesOut, 
+                                     framesInDiscarded, framesOutDiscarded));
     }
 }
 
@@ -1165,6 +1167,8 @@ void rtp::StreamInVideo()
             {
                 cout << "RTP Dropping video frame: Lost Packet\n";
                 rxSeqNum = pJitter->DumpAllJBuffers(true) + 1;
+                framesInDiscarded++;
+                pkMissed++; // Actually may have missed more than one, but good enough for now
             }
             else
             {
@@ -1206,6 +1210,7 @@ void rtp::StreamInVideo()
                     {
                         cout << "SIP: Received video frame size " << pictureIndex << "; too big for buffer\n";
                         freeVideoBuffer(picture);
+                        framesInDiscarded++;
                         picture = 0;
                     }
     
@@ -1223,6 +1228,7 @@ void rtp::StreamInVideo()
                         else
                         {
                             freeVideoBuffer(picture);
+                            framesInDiscarded++;
                             cout << "Discarding frame, app consuming too slowly\n";
                         }
                         rtpMutex.unlock();
@@ -1265,6 +1271,7 @@ void rtp::StreamInVideo()
                 {
                     cout << "No buffers for video frame, dropping\n";
                     rxSeqNum = pJitter->DumpAllJBuffers(true) + 1;
+                    framesInDiscarded++;
                 }
             }   
             videoFrameFirstSeqNum = rxSeqNum;

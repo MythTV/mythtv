@@ -61,6 +61,7 @@ class PhoneUIBox : public MythThemedDialog
 
     void MenuButtonPushed();
     void InfoButtonPushed();
+    void LoopbackButtonPushed();
     void handleTreeListSignals(int, IntVector*);
     void TransmitLocalWebcamImage(uchar *yuvBuffer, int w, int h);
     void OnScreenClockTick();
@@ -133,7 +134,7 @@ class PhoneUIBox : public MythThemedDialog
     void    startRTP();
     void    showStatistics(bool showVideo);
     void    updateAudioStatistics(int pkIn, int pkLost, int pkLate, int pkOut, int bIn, int bOut);
-    void    updateVideoStatistics(int pkIn, int pkLost, int pkLate, int pkOut, int bIn, int bOut, int fIn, int fOut, int fDisc);
+    void    updateVideoStatistics(int pkIn, int pkLost, int pkLate, int pkOut, int bIn, int bOut, int fIn, int fOut, int fDiscIn, int fDiscOut);
 
     void    wireUpTheme();
     DirectoryContainer *DirContainer;
@@ -157,6 +158,7 @@ class PhoneUIBox : public MythThemedDialog
     int screenwidth, screenheight;
     bool fullScreen;
     QRect rxVideoArea;
+    bool loopbackMode;
 
     H263Container *h263;
     QTimer *powerDispTimer;

@@ -260,6 +260,8 @@ class SipContainer
     void notifyCallerDetails(QString cU, QString cN, QString cUrl, bool inAudOnly)
             { callerUser=cU; callerName=cN; callerUrl=cUrl; inAudioOnly=inAudOnly; }
     bool killThread() { return killSipThread; }
+    QString getLocalIpAddress();
+    QString getNatIpAddress();
 
 
   private:
@@ -585,7 +587,6 @@ class SipFsm : public QWidget
     int MsgToEvent(SipMsg *sipMsg);
     QString DetermineNatAddress();
 
-    QString natIp;
     int localPort;
     QPtrList<SipFsmBase> FsmList;
     QSocketDevice *sipSocket;

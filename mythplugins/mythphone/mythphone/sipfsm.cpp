@@ -49,6 +49,7 @@ QStringList EventQ;
 QStringList NotifyQ;
 QMutex EventQLock;
 QString localIp;
+QString natIp;
 
 
 
@@ -235,6 +236,16 @@ void SipContainer::GetSipSDPDetails(QString &ip, int &aport, int &audPay, QStrin
     vidCodec = videoCodec;
     vidRes = videoRes;
     EventQLock.unlock();
+}
+
+QString SipContainer::getLocalIpAddress()
+{
+    return localIp;
+}
+
+QString SipContainer::getNatIpAddress()
+{
+    return natIp;
 }
 
 

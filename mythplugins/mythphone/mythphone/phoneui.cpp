@@ -106,6 +106,7 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
     
     rtpAudio = 0;
     rtpVideo = 0;
+    loopbackMode = false;
 
     powerDispTimer = new QTimer(this);
     connect(powerDispTimer, SIGNAL(timeout()), this, SLOT(DisplayMicSpkPower()));
@@ -307,6 +308,8 @@ void PhoneUIBox::keyPressEvent(QKeyEvent *e)
             MenuButtonPushed();
         else if (action == "INFO")
             InfoButtonPushed();
+        else if (action == "LOOPBACK")
+            LoopbackButtonPushed();
         // Volume controls
         else if (action == "VOLUMEDOWN") 
             changeVolume(false);
@@ -584,7 +587,7 @@ void PhoneUIBox::ChangeVideoRxResolution()
 
 void PhoneUIBox::MenuButtonPushed()
 {
-    if (State == SIP_CONNECTED) // In a call, show the adjust parameters menu
+    if (rtpAudio != 0) // In a call, show the adjust parameters menu
         showVolume(true);
     else
         doMenuPopup(); // Otherwise show the traditional menu
@@ -593,8 +596,50 @@ void PhoneUIBox::MenuButtonPushed()
 
 void PhoneUIBox::InfoButtonPushed()
 {
-    if (State == SIP_CONNECTED) 
+    if (rtpAudio != 0) // In a call, show the adjust parameters menu
         showStatistics(rtpVideo != 0);
+}
+
+
+void PhoneUIBox::LoopbackButtonPushed()
+{
+    if ((!loopbackMode) && (rtpAudio == 0) && (rtpVideo == 0))
+    {
+        int loop = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(), "AskLoopback", "Loopback Audio and video at ...", "Socket on this machine", "NAT Device", 1);
+        QString loopIp;
+        switch (loop)
+        {
+        default:
+        case -1:
+            return;
+        case 0:
+            loopIp = sipStack->getLocalIpAddress();
+            break;
+        case 1:
+            loopIp = sipStack->getNatIpAddress();
+            break;
+        }
+        phoneUIStatusBar->DisplayCallState(QString("Audio and Video Looped to " + loopIp));
+        int lvPort = atoi((const char *)gContext->GetSetting("VideoLocalPort"));
+        int laPort = atoi((const char *)gContext->GetSetting("AudioLocalPort"));
+        rtpAudio = new rtp (this, laPort, loopIp, laPort, 0, -1, 
+                            gContext->GetSetting("MicrophoneDevice"), 
+                            gContext->GetSetting("AudioOutputDevice"));
+        powerDispTimer->start(100);
+        StartVideo(lvPort, loopIp, lvPort, 34, videoResToCifMode(txWidth));
+        loopbackMode = true;
+    }
+    else if (loopbackMode)
+    {
+        phoneUIStatusBar->DisplayCallState("No Active Calls");
+        powerDispTimer->stop();
+        micAmplitude->setRepeat(0);
+        spkAmplitude->setRepeat(0);
+        delete rtpAudio;
+        rtpAudio = 0;
+        StopVideo();
+        loopbackMode = false;
+    }
 }
 
 
@@ -946,7 +991,8 @@ void PhoneUIBox::ProcessVideoRtpStatistics(RtpEvent *stats)
                                               stats->getPeriod());
     updateVideoStatistics(stats->getPkIn(), stats->getPkMissed(), stats->getPkLate(), 
                           stats->getPkOut(), stats->getBytesIn(), stats->getBytesOut(),
-                          stats->getFramesIn(), stats->getFramesOut(), stats->getFramesDiscarded());
+                          stats->getFramesIn(), stats->getFramesOut(), 
+                          stats->getFramesInDiscarded(), stats->getFramesOutDiscarded());
 }
 
 
@@ -1787,7 +1833,7 @@ void PhoneUIBox::updateAudioStatistics(int pkIn, int pkLost, int pkLate, int pkO
 }
 
 
-void PhoneUIBox::updateVideoStatistics(int pkIn, int pkLost, int pkLate, int pkOut, int bIn, int bOut, int fIn, int fOut, int fDisc)
+void PhoneUIBox::updateVideoStatistics(int pkIn, int pkLost, int pkLate, int pkOut, int bIn, int bOut, int fIn, int fOut, int fDiscIn, int fDiscOut)
 {
     if ((!statsPopup) || (videoPkInOutLabel == 0))
         return;
@@ -1798,7 +1844,7 @@ void PhoneUIBox::updateVideoStatistics(int pkIn, int pkLost, int pkLate, int pkO
     //videoBytesInOutLabel->setText("KBytes In/Out: " + QString::number(bIn/1000) + "K / " + QString::number(bOut/1000) + "K");
     if (ConnectTime != 0)
         videoAvgBwLabel->setText("Average Kbps In/Out: " + QString::number(bIn/ConnectTime*8/1000) + "kbps / " + QString::number(bOut/ConnectTime*8/1000) + "kbps");
-    videoFramesInOutDiscLabel->setText("Video Frames In/Out/Discarded: " + QString::number(fIn) + " / " + QString::number(fOut) + " / " + QString::number(fDisc));
+    videoFramesInOutDiscLabel->setText("Video Frames In/Out/Discarded: " + QString::number(fIn) + " / " + QString::number(fOut) + " / " + QString::number(fDiscIn) + " / " + QString::number(fDiscOut));
     if (ConnectTime != 0)
         videoAvgFpsLabel->setText("Average FPS In/Out: " + QString::number(fIn/ConnectTime) + " / " + QString::number(fOut/ConnectTime));
     if ((ConnectTime != 0) && (txClient != 0))

@@ -45,7 +45,7 @@ public:
     enum Type { RxVideoFrame = (QEvent::User + 300), RtpDebugEv, RtpStatisticsEv };
 
     RtpEvent(Type t, QString s="") : QCustomEvent(t) { text=s; }
-    RtpEvent(Type t, rtp *r, QTime tm, int ms, int s1, int s2, int s3, int s4, int s5, int s6, int s7, int s8, int s9, int s10) : QCustomEvent(t) { rtpThread=r; timestamp=tm; msPeriod = ms; pkIn=s1; pkOut=s2; pkMiss=s3; pkLate=s4; byteIn=s5; byteOut=s6; bytePlayed=s7; framesIn=s8; framesOut=s9; framesDisc=s10;}
+    RtpEvent(Type t, rtp *r, QTime tm, int ms, int s1, int s2, int s3, int s4, int s5, int s6, int s7, int s8, int s9, int s10, int s11) : QCustomEvent(t) { rtpThread=r; timestamp=tm; msPeriod = ms; pkIn=s1; pkOut=s2; pkMiss=s3; pkLate=s4; byteIn=s5; byteOut=s6; bytePlayed=s7; framesIn=s8; framesOut=s9; framesInDisc=s10; framesOutDisc=s11;}
     ~RtpEvent()                 {  }
     QString msg()               { return text;}
     rtp *owner()                { return rtpThread; }
@@ -57,7 +57,8 @@ public:
     int getBytesOut()           { return byteOut; }
     int getFramesIn()           { return framesIn; }
     int getFramesOut()          { return framesOut; }
-    int getFramesDiscarded()    { return framesDisc; }
+    int getFramesInDiscarded()  { return framesInDisc; }
+    int getFramesOutDiscarded() { return framesOutDisc; }
     int getPeriod()             { return msPeriod; }
 
 
@@ -73,7 +74,8 @@ private:
     int pkLate;
     int framesIn;
     int framesOut;
-    int framesDisc;
+    int framesInDisc;
+    int framesOutDisc;
     int byteIn;
     int byteOut;
     int bytePlayed;
@@ -358,6 +360,7 @@ private:
     int bytesToSpeaker;
     int framesIn;
     int framesOut;
+    int framesInDiscarded;
     int framesOutDiscarded;
     short micPower;
     short spkPower;

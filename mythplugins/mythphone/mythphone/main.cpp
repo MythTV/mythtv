@@ -143,6 +143,7 @@ void initKeys(void)
     REG_KEY("Phone", "FULLSCRN", "Show received video full-screen", "P");
     REG_KEY("Phone", "HANGUP", "Hangup an active call", "O");
     REG_KEY("Phone", "MUTE", "Mute", "|,\\,F9");
+    REG_KEY("Phone", "LOOPBACK", "Loopback Video", "L");
 }
 
 QString GetMySipIp()
