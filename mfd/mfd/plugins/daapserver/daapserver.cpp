@@ -846,7 +846,7 @@ void DaapServer::addItemToResponse(DaapRequest *daap_request, TagOutput &respons
     
     if(meta_codes & DAAP_META_SONGUSERRATING)
     {
-        response << Tag('asur') << (u8) (which_item->getRating() * 10) << end;
+        response << Tag('asur') << (u8) which_item->getRating() << end;
     }
 
     if(meta_codes & DAAP_META_SONGYEAR)

@@ -44,7 +44,7 @@ class Metadata
                 int l_collection_id,
                 int l_id, 
                 QUrl l_url = QUrl(""),
-                int l_rating = 0,
+                int l_rating = 50,
                 QDateTime l_last_played = QDateTime(),
                 int l_play_count = 0
             );
@@ -106,6 +106,9 @@ class Metadata
     QString       getMythDigest(){ return myth_digest;}
     void          setMythDigest(const QString &new_digest){ myth_digest = new_digest; }
     bool          hasMythDigest(){ if(myth_digest.length() > 0){ return true ; } return false; }
+    
+    void          setChanged(bool y_or_n){changed = y_or_n;}
+    bool          getChanged(){return changed;}
 
   protected:
 
@@ -126,7 +129,7 @@ class Metadata
     int             size;
     QString         myth_digest;
 
-
+    bool            changed;
 };
 
 class AudioMetadata : public Metadata

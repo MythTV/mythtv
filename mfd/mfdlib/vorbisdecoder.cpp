@@ -367,14 +367,15 @@ void VorbisDecoder::run()
 
 AudioMetadata *VorbisDecoder::getMetadata()
 {
-
     QString artist = "", album = "", title = "", genre = "";
     int year = 0, tracknum = 0, length = 0;
 
-    FILE *input = fopen(filename.ascii(), "r");
+    FILE *input = fopen(filename.local8Bit(), "r");
 
     if (!input)
     {
+        warning(QString("DecoderOgg: could not open this file: \"%1\"")
+                        .arg(filename.local8Bit()));
         return NULL;
     }
 
@@ -384,6 +385,8 @@ AudioMetadata *VorbisDecoder::getMetadata()
     if (ov_open(input, &vf, NULL, 0))
     {
         fclose(input);
+        warning(QString("DecoderOgg: ov_open() failed on this file: \"%1\"")
+                        .arg(filename.local8Bit()));
         return NULL;
     }
 
@@ -398,7 +401,6 @@ AudioMetadata *VorbisDecoder::getMetadata()
     year = atoi(getComment(comment, "date").ascii());
 
     ov_clear(&vf);
-
     AudioMetadata *retdata = new AudioMetadata(
                                                 filename, 
                                                 artist, 

@@ -12,7 +12,6 @@
 
 #include <qdir.h>
 #include <qfileinfo.h>
-#include <qregexp.h>
 
 #include "mmusic.h"
 #include "mfd_events.h"
@@ -707,6 +706,7 @@ void MMusicWatcher::compareToMasterList(MusicFileMap &music_files, const QString
         }
         else if(master_list.find(it.key()).data().lastModified() != it.data().lastModified())
         {
+
             //
             //  It's there, but it changed modification dates
             //
@@ -742,7 +742,9 @@ void MMusicWatcher::compareToMasterList(MusicFileMap &music_files, const QString
                 //  ignore list
                 //
                
-                files_to_ignore.push_back(new_item->getUrl().path());
+                files_to_ignore.push_back(file_name);
+                log(QString("file could not be opened/decoded: \"%1\"")
+                    .arg(file_name), 4);
            }
         }
 
@@ -752,7 +754,7 @@ void MMusicWatcher::compareToMasterList(MusicFileMap &music_files, const QString
         
         music_files.remove(it);
 
-        if(counter < music_files_at_a_time)
+        if(counter < music_files_at_a_time && keep_going)
         {
             ++it;
         }
@@ -791,7 +793,7 @@ void MMusicWatcher::checkDatabaseAgainstMaster(const QString &startdir)
     //
     
     MusicFileMap::Iterator it;
-    for ( it = master_list.begin(); it != master_list.end(); it++)
+    for ( it = master_list.begin(); it != master_list.end(); )
     {
         if(!it.data().checkedDatabase())
         {
@@ -842,11 +844,37 @@ void MMusicWatcher::checkDatabaseAgainstMaster(const QString &startdir)
                         //  ignore list
                         //
                         
-                        files_to_ignore.push_back(new_item->getUrl().path());
+                        files_to_ignore.push_back(it.key());
+                        log(QString("file could not be opened and/or decoded: \"%1\"")
+                                    .arg(it.key()), 4);
+                        
                         master_list.remove(it);
                     }
                 }
             }
+            else
+            {
+                //
+                //  We failed to get information about this file.
+                //  Remove it from the master list and put it on the
+                //  ignore list
+                //
+                        
+                files_to_ignore.push_back(it.key());
+                log(QString("file could neither be loaded from database "
+                            "nor opened as a new file: \"%1\"")
+                            .arg(it.key()), 4);
+                        
+                master_list.remove(it);
+            }
+        }
+        if(keep_going)
+        {
+            ++it;
+        }
+        else
+        {
+            it = master_list.end();
         }
     }
 }
@@ -863,22 +891,22 @@ AudioMetadata* MMusicWatcher::loadFromDatabase(
 
     QString non_const_startdir = startdir;
     QString sqlfilename = file_name;
-
     sqlfilename = sqlfilename.remove(0, non_const_startdir.length());
-    sqlfilename.replace(QRegExp("\\\\"), QString("\\\\"));
-    sqlfilename.replace(QRegExp("\""), QString("\\\""));
-    
-    QString aquery =    QString("SELECT intid, artist, album, title, genre, "
-                        "year, tracknum, length, rating, "
-                        "lastplay, playcount, mythdigest, size, date_added, "
-                        "date_modified, format, description, comment, "
-                        "compilation, composer, disc_count, disc_number, "
-                        "track_count, start_time, stop_time, eq_preset, "
-                        "relative_volume, sample_rate, bpm "
-                         "FROM musicmetadata WHERE filename = \"%1\" ;")
-                         .arg(sqlfilename);
 
-    QSqlQuery query(aquery, db);
+    QSqlQuery query(NULL, db);
+
+    query.prepare("SELECT intid, artist, album, title, genre, "
+                  "year, tracknum, length, rating, "
+                  "lastplay, playcount, mythdigest, size, date_added, "
+                  "date_modified, format, description, comment, "
+                  "compilation, composer, disc_count, disc_number, "
+                  "track_count, start_time, stop_time, eq_preset, "
+                  "relative_volume, sample_rate, bpm "
+                  "FROM musicmetadata WHERE filename = ? ;");
+
+    query.bindValue(0, sqlfilename);
+    
+    query.exec();
 
     if (query.isActive())
     {
@@ -1061,7 +1089,7 @@ AudioMetadata* MMusicWatcher::loadFromDatabase(
 }
 
 AudioMetadata *MMusicWatcher::checkNewFile(
-                                            const QString &filename, 
+                                            const QString &filename,
                                             const QString &startdir
                                           )
 {
@@ -1073,8 +1101,7 @@ AudioMetadata *MMusicWatcher::checkNewFile(
     //  (if it's supported and decodable) or we log a warning and then ignore it.
     //
 
-    
-    new_item = getMetadataFromUrl("file://" + startdir + filename);
+    new_item = getMetadataFromFile(filename);
     
     if(new_item)
     {
@@ -1082,15 +1109,15 @@ AudioMetadata *MMusicWatcher::checkNewFile(
         //  Cool ... we could decode it ... give it place in the database.
         //
         
-        QString safe_filename = filename;
-        safe_filename.replace(QRegExp("\\\\"), QString("\\\\"));
-        safe_filename.replace(QRegExp("\""), QString("\\\""));
-
+        QString non_const_startdir = startdir;
+        QString sqlfilename = filename;
+        sqlfilename = sqlfilename.remove(0, non_const_startdir.length());
+        
         QSqlQuery query;
         query.prepare("INSERT INTO musicmetadata (filename, mythdigest) "
                       "values ( ? , ?)");
 
-        query.bindValue(0, safe_filename);
+        query.bindValue(0, sqlfilename);
         query.bindValue(1, new_item->getMythDigest());
         
         query.exec();
@@ -1105,6 +1132,7 @@ AudioMetadata *MMusicWatcher::checkNewFile(
         QSqlQuery retrieve_query;
         retrieve_query.prepare("SELECT intid FROM musicmetadata "
                                "WHERE mythdigest = ? ;");
+        retrieve_query.bindValue(0, new_item->getMythDigest());
         retrieve_query.exec();
         if(retrieve_query.numRowsAffected() < 1)
         {
@@ -1113,8 +1141,20 @@ AudioMetadata *MMusicWatcher::checkNewFile(
             delete new_item;
             return NULL;
         }
+        retrieve_query.next();
+        
+        //
+        //  Set some values for new data
+        //
+
+        QDateTime earliest_possible;
+        earliest_possible.setTime_t(0);
         
         new_item->setDbId(retrieve_query.value(0).toUInt());
+        new_item->setDateAdded(QDateTime::currentDateTime());
+        new_item->setLastPlayed(earliest_possible);
+        
+        log(QString("added audio file: \"%1\"").arg(filename), 4);
         
         //
         //  Fill out its database info.
@@ -1137,7 +1177,7 @@ bool MMusicWatcher::updateMetadata(AudioMetadata *an_item)
     //
     
     
-    AudioMetadata *corrected_item = getMetadataFromUrl(an_item->getUrl());
+    AudioMetadata *corrected_item = getMetadataFromFile(an_item->getUrl().path());
     if(corrected_item)
     {
         //
@@ -1176,39 +1216,6 @@ void MMusicWatcher::persistMetadata(AudioMetadata *an_item)
     //  Save back to database while preserving id number. 
     //
     
-    QString safe_title = an_item->getTitle();
-    safe_title.replace(QRegExp("\\\\"), QString("\\\\"));
-    safe_title.replace(QRegExp("\""), QString("\\\""));
-
-    QString safe_artist = an_item->getArtist();
-    safe_artist.replace(QRegExp("\\\\"), QString("\\\\"));
-    safe_artist.replace(QRegExp("\""), QString("\\\""));
-
-    QString safe_album = an_item->getAlbum();
-    safe_album.replace(QRegExp("\\\\"), QString("\\\\"));
-    safe_album.replace(QRegExp("\""), QString("\\\""));
-
-    QString safe_genre = an_item->getGenre();
-    safe_genre.replace(QRegExp("\\\\"), QString("\\\\"));
-    safe_genre.replace(QRegExp("\""), QString("\\\""));
-
-    QString safe_description = an_item->getDescription();
-    safe_description.replace(QRegExp("\\\\"), QString("\\\\"));
-    safe_description.replace(QRegExp("\""), QString("\\\""));
-
-    QString safe_comment = an_item->getComment();
-    safe_comment.replace(QRegExp("\\\\"), QString("\\\\"));
-    safe_comment.replace(QRegExp("\""), QString("\\\""));
-
-    QString safe_composer = an_item->getComposer();
-    safe_composer.replace(QRegExp("\\\\"), QString("\\\\"));
-    safe_composer.replace(QRegExp("\""), QString("\\\""));
-
-    QString safe_eq_preset = an_item->getEqPreset();
-    safe_eq_preset.replace(QRegExp("\\\\"), QString("\\\\"));
-    safe_eq_preset.replace(QRegExp("\""), QString("\\\""));
-
-
     QString last_played = an_item->getLastPlayed().toString("yyyyMMddhhmmss");
     QString date_added = an_item->getDateAdded().toString("yyyyMMddhhmmss");
     QString date_modified = an_item->getDateModified().toString("yyyyMMddhhmmss");
@@ -1251,10 +1258,10 @@ void MMusicWatcher::persistMetadata(AudioMetadata *an_item)
                   "bpm = ?  "
                   "WHERE intid = ? ;");
 
-    query.bindValue(0,  safe_title);
-    query.bindValue(1,  safe_artist);
-    query.bindValue(2,  safe_album);
-    query.bindValue(3,  safe_genre);
+    query.bindValue(0,  an_item->getTitle());
+    query.bindValue(1,  an_item->getArtist());
+    query.bindValue(2,  an_item->getAlbum());
+    query.bindValue(3,  an_item->getGenre());
     query.bindValue(4,  an_item->getYear());
     query.bindValue(5,  an_item->getTrack());
     query.bindValue(6,  an_item->getLength());
@@ -1266,16 +1273,16 @@ void MMusicWatcher::persistMetadata(AudioMetadata *an_item)
     query.bindValue(12, date_added);
     query.bindValue(13, date_modified);
     query.bindValue(14, an_item->getFormat());
-    query.bindValue(15, safe_description);
-    query.bindValue(16, safe_comment);
+    query.bindValue(15, an_item->getDescription());
+    query.bindValue(16, an_item->getComment());
     query.bindValue(17, an_item->getCompilation());
-    query.bindValue(18, safe_composer);
+    query.bindValue(18, an_item->getComposer());
     query.bindValue(19, an_item->getDiscCount());
     query.bindValue(20, an_item->getDiscNumber());
     query.bindValue(21, an_item->getTrackCount());
     query.bindValue(22, an_item->getStartTime());
     query.bindValue(23, an_item->getStopTime());
-    query.bindValue(24, safe_eq_preset);
+    query.bindValue(24, an_item->getEqPreset());
     query.bindValue(25, an_item->getRelativeVolume());
     query.bindValue(26, an_item->getSampleRate());
     query.bindValue(27, an_item->getBpm());
@@ -1288,20 +1295,19 @@ void MMusicWatcher::persistMetadata(AudioMetadata *an_item)
     if (query.numRowsAffected() < 1)
     {
         warning(QString("failed to update metadata for \"%1\" (intid=%2)")
-                .arg(safe_title)
+                .arg(an_item->getTitle())
                 .arg(an_item->getId()));
     }
 }
 
 
-AudioMetadata* MMusicWatcher::getMetadataFromUrl(QUrl the_url)
+AudioMetadata* MMusicWatcher::getMetadataFromFile(QString file_path)
 {
-    QString file_path = the_url;
-    file_path = file_path.remove("file:");
 
     AudioMetadata *return_value = NULL;
 
     Decoder *decoder = Decoder::create(file_path, NULL, NULL, true);
+    decoder->setParent(this);
     
     if(decoder)
     {
@@ -1322,7 +1328,15 @@ AudioMetadata* MMusicWatcher::getMetadataFromUrl(QUrl the_url)
             return_value->setFormat(file_info.extension(false));
             return_value->setDateModified(QDateTime::currentDateTime());
         }
+        else
+        {
+            cout << "got decoder, but no metadata back" << endl;
+        }
         delete decoder;   
+    }
+    else
+    {
+        cout << "got no decoder" << endl;
     }
     return return_value;
 }

@@ -475,6 +475,15 @@ bool AudioPlugin::playMetadata(int collection_id, int metadata_id)
     if(metadata_to_play->getType() == MDT_audio)
     {
         AudioMetadata *audio_metadata_to_play = (AudioMetadata *)metadata_to_play;
+
+        //
+        //  Note that some metadata values should change
+        //
+        
+        audio_metadata_to_play->setLastPlayed(QDateTime::currentDateTime());
+        audio_metadata_to_play->setPlayCount(audio_metadata_to_play->getPlayCount() + 1);
+        audio_metadata_to_play->setChanged(true);
+
         QUrl url_to_play = audio_metadata_to_play->getUrl();
         metadata_server->unlockMetadata();
         return playUrl(url_to_play);

@@ -74,7 +74,7 @@ class MMusicWatcher: public MFDServicePlugin
     AudioMetadata*  checkNewFile(const QString &file_name, const QString &startdir);
     QDateTime       getQtTimeFromMySqlTime(QString timestamp);
     bool            updateMetadata(AudioMetadata* an_item);
-    AudioMetadata*  getMetadataFromUrl(QUrl a_url);
+    AudioMetadata*  getMetadataFromFile(QString file_path);
     void            persistMetadata(AudioMetadata* an_item);
 
   private:

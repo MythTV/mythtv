@@ -46,6 +46,7 @@ Metadata::Metadata(
     comment = "";
     size = -1;    
     myth_digest = "";
+    changed = false;
 }
 
 void Metadata::setRating(int l_rating)
