@@ -5678,6 +5678,22 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <source>Hierarchy (Default: Auto)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Enable realtime priority threads</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When running mythfrontend with root privileges, some threads can be given enhanced priority. Disable this if mythfrontend freezes during video playback.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable LCD device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use an LCD display to view MythTV status information. Need to restart mythfrontend to (de)activate it.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanProgressPopup</name>

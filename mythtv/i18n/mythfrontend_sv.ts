@@ -5614,6 +5614,22 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
         <source>Hierarchy (Default: Auto)</source>
         <translation>Hierarki (Standard: Auto)</translation>
     </message>
+    <message>
+        <source>Enable realtime priority threads</source>
+        <translation>Aktivera trådar med realtidsprioritet</translation>
+    </message>
+    <message>
+        <source>When running mythfrontend with root privileges, some threads can be given enhanced priority. Disable this if mythfrontend freezes during video playback.</source>
+        <translation>När mythfrontend körs med root-rättigheter kan en del trådar ges utökad prioritet. Avaktivera om mythfrontend hänger sig vid videouppspelning.</translation>
+    </message>
+    <message>
+        <source>Enable LCD device</source>
+        <translation>Aktivera LCD-enhet</translation>
+    </message>
+    <message>
+        <source>Use an LCD display to view MythTV status information. Need to restart mythfrontend to (de)activate it.</source>
+        <translation>Använd en LCD-display för att visa statusinformation. Omstart av mythfrontend krävs för att (av)aktivera.</translation>
+    </message>
 </context>
 <context>
     <name>ScanProgressPopup</name>
