@@ -93,7 +93,7 @@ static void read_tiff_image(QImageIO *iio) {
   //
   const char *fileName;
   QFile *f=dynamic_cast<QFile*>(iio->ioDevice());
-  fileName=f ? f->name() : "QIODevice";
+  fileName=f ? f->name() : QString("QIODevice");
 
   // open without memory mapping.
   //
