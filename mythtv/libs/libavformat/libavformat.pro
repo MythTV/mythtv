@@ -19,6 +19,8 @@ INCLUDEPATH += ../../ ../libavcodec ../libmythtv
 QMAKE_CFLAGS_RELEASE += $$OPTFLAGS -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
 QMAKE_CFLAGS_DEBUG += -g -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
 
+LIBS += $$LOCAL_LIBDIR_X11
+
 # Input
 HEADERS += asf.h avformat.h avi.h avio.h dv.h mpegts.h os_support.h qtpalette.h
 

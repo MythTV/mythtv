@@ -44,6 +44,8 @@ inc.files = avcodec.h rational.h common.h
 
 INSTALLS += inc
 
+LIBS += $$LOCAL_LIBDIR_X11
+
 contains( CONFIG_AC3, yes ) {
     SOURCES += a52dec.c
     !contains( CONFIG_A52BIN, yes ) {
