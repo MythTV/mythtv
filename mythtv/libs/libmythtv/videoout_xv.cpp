@@ -81,7 +81,7 @@ XvVideoOutput::~XvVideoOutput()
 }
 
 void XvVideoOutput::InputChanged(int width, int height, float aspect,
-                                 int num_buffers, unsigned char **out_buffers)
+                                 int num_buffers, VideoFrame *out_buffers)
 {
     pthread_mutex_lock(&lock);
 
@@ -131,7 +131,7 @@ int XvVideoOutput::GetRefreshRate(void)
 }
 
 bool XvVideoOutput::Init(int width, int height, float aspect, int num_buffers, 
-                         unsigned char **out_buffers, unsigned int winid,
+                         VideoFrame *out_buffers, unsigned int winid,
                          int winx, int winy, int winw, int winh, 
                          unsigned int embedid)
 {
@@ -370,8 +370,7 @@ bool XvVideoOutput::Init(int width, int height, float aspect, int num_buffers,
     return true;
 }
 
-bool XvVideoOutput::CreateXvBuffers(int num_buffers, 
-                                    unsigned char **out_buffers)
+bool XvVideoOutput::CreateXvBuffers(int num_buffers, VideoFrame *out_buffers)
 {
     data->XJ_SHMInfo = new XShmSegmentInfo[num_buffers];
     for (int i = 0; i < num_buffers; i++)
@@ -396,24 +395,28 @@ bool XvVideoOutput::CreateXvBuffers(int num_buffers,
         shmctl((data->XJ_SHMInfo)[i].shmid, IPC_RMID, 0);
 
         data->buffers[(unsigned char *)image->data] = image;
-        out_buffers[i] = (unsigned char *)image->data;
+        out_buffers[i].buf = (unsigned char *)image->data;
 
         (data->XJ_SHMInfo)[i].readOnly = False;
 
         XShmAttach(data->XJ_disp, &(data->XJ_SHMInfo)[i]);
-        XSync(data->XJ_disp, 0);
+
+        out_buffers[i].height = XJ_height;
+        out_buffers[i].width = XJ_width;
+        out_buffers[i].bpp = 12;
+        out_buffers[i].size = XJ_height * XJ_width * 3 / 2;
+        out_buffers[i].codec = FMT_YV12;
     }
 
+    XSync(data->XJ_disp, 0);
+
     if (colorid != GUID_I420_PLANAR)
-    {
         scratchspace = new unsigned char[XJ_width * XJ_height * 3 / 2];
-    }
 
     return true;
 }
 
-bool XvVideoOutput::CreateShmBuffers(int num_buffers, 
-                                     unsigned char **out_buffers)
+bool XvVideoOutput::CreateShmBuffers(int num_buffers, VideoFrame *out_buffers)
 {
     data->XJ_SHMInfo = new XShmSegmentInfo[num_buffers];
 
@@ -442,7 +445,7 @@ bool XvVideoOutput::CreateShmBuffers(int num_buffers,
         shmctl((data->XJ_SHMInfo)[i].shmid, IPC_RMID, 0);
 
         data->xbuffers[(unsigned char *)image->data] = image;
-        out_buffers[i] = (unsigned char *)image->data;
+        out_buffers[i].buf = (unsigned char *)image->data;
 
         (data->XJ_SHMInfo)[i].readOnly = False;
 
@@ -452,12 +455,19 @@ bool XvVideoOutput::CreateShmBuffers(int num_buffers,
             return false;
         }
 
-        XSync(data->XJ_disp, 0);
+        out_buffers[i].height = XJ_height;
+        out_buffers[i].width = XJ_width;
+        out_buffers[i].bpp = 12;
+        out_buffers[i].size = XJ_height * XJ_width * 3 / 2;
+        out_buffers[i].codec = FMT_YV12;
     }
+
+    XSync(data->XJ_disp, 0);
+
     return true;
 }
 
-bool XvVideoOutput::CreateXBuffers(int num_buffers, unsigned char **out_buffers)
+bool XvVideoOutput::CreateXBuffers(int num_buffers, VideoFrame *out_buffers)
 {
     for (int i = 0; i < num_buffers; i++)
     {
@@ -470,10 +480,16 @@ bool XvVideoOutput::CreateXBuffers(int num_buffers, unsigned char **out_buffers)
                                         XJ_depth, 0);
 
         data->xbuffers[(unsigned char *)image->data] = image;
-        out_buffers[i] = (unsigned char *)image->data;
+        out_buffers[i].buf = (unsigned char *)image->data;
 
-        XSync(data->XJ_disp, 0);
+        out_buffers[i].height = XJ_height;
+        out_buffers[i].width = XJ_width;
+        out_buffers[i].bpp = 12;
+        out_buffers[i].size = XJ_height * XJ_width * 3 / 2;
+        out_buffers[i].codec = FMT_YV12;
     }
+
+    XSync(data->XJ_disp, 0);
     return true;
 }
 
@@ -631,13 +647,13 @@ void XvVideoOutput::StopEmbedding(void)
     pthread_mutex_unlock(&lock);
 }
 
-void XvVideoOutput::PrepareFrame(unsigned char *buffer, int width, int height)
+void XvVideoOutput::PrepareFrame(VideoFrame *buffer)
 {
     if (xv_port != -1)
     {
         pthread_mutex_lock(&lock);
 
-        XvImage *image = data->buffers[buffer];
+        XvImage *image = data->buffers[buffer->buf];
 
         if (!image)
         {
@@ -647,6 +663,9 @@ void XvVideoOutput::PrepareFrame(unsigned char *buffer, int width, int height)
 
         if (colorid == GUID_YV12_PLANAR)
         {
+            int width = buffer->width;
+            int height = buffer->height;
+
             memcpy(scratchspace, (unsigned char *)image->data + 
                    (width * height), width * height / 4);
             memcpy((unsigned char *)image->data + (width * height),
@@ -698,14 +717,17 @@ void XvVideoOutput::PrepareFrame(unsigned char *buffer, int width, int height)
             return;
 
         unsigned char *sbuf = new unsigned char[curw * curh * 4];
-        XImage *image = data->xbuffers[buffer];
+        XImage *image = data->xbuffers[buffer->buf];
         AVPicture image_in, image_out;
         ImgReSampleContext *scontext;
         int av_format;
+        int width = buffer->width;
+        int height = buffer->height;
 
         avpicture_fill(&image_out, (uint8_t *)sbuf, PIX_FMT_YUV420P,
             curw, curh );
 
+       
         if (( curw == width ) &&
             ( curh == height ))
         {

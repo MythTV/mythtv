@@ -21,21 +21,20 @@ static const char FILTER_NAME[] = "linearblend";
 
 typedef struct ThisFilter
 {
-  int (*filter)(VideoFilter *, Frame *);
-  void (*cleanup)(VideoFilter *);
+    int (*filter)(VideoFilter *, VideoFrame *);
+    void (*cleanup)(VideoFilter *);
 
-  char *name;
-  void *handle; // Library handle;
+    char *name;
+    void *handle; // Library handle;
 
-  /* functions and variables below here considered "private" */
-
+    /* functions and variables below here considered "private" */
 } ThisFilter;
 
 static inline void linearBlend(unsigned char *src, int stride)
 {
 #ifdef MMX
 //  src += 4 * stride;
-  asm volatile(
+    asm volatile(
        "leal (%0, %1), %%eax                           \n\t"
        "leal (%%eax, %1, 4), %%ebx                     \n\t"
 
@@ -76,91 +75,119 @@ static inline void linearBlend(unsigned char *src, int stride)
 
        : : "r" (src), "r" (stride)
        : "%eax", "%ebx"
-  );
+    );
 #else
-  int x;
-//  src += 4 * stride;
-  for (x=0; x<8; x++)
-  {
-     src[0       ] = (src[0       ] + 2*src[stride  ] + src[stride*2])>>2;
-     src[stride  ] = (src[stride  ] + 2*src[stride*2] + src[stride*3])>>2;
-     src[stride*2] = (src[stride*2] + 2*src[stride*3] + src[stride*4])>>2;
-     src[stride*3] = (src[stride*3] + 2*src[stride*4] + src[stride*5])>>2;
-     src[stride*4] = (src[stride*4] + 2*src[stride*5] + src[stride*6])>>2;
-     src[stride*5] = (src[stride*5] + 2*src[stride*6] + src[stride*7])>>2;
-     src[stride*6] = (src[stride*6] + 2*src[stride*7] + src[stride*8])>>2;
-     src[stride*7] = (src[stride*7] + 2*src[stride*8] + src[stride*9])>>2;
+    int a, b, c, x;
 
-     src++;
-  }
+    for (x = 0; x < 2; x++)
+    {
+        a= *(uint32_t*)&src[stride*0];
+        b= *(uint32_t*)&src[stride*1];
+        c= *(uint32_t*)&src[stride*2];
+        a= (a&c) + (((a^c)&0xFEFEFEFEUL)>>1);
+        *(uint32_t*)&src[stride*0]= (a|b) - (((a^b)&0xFEFEFEFEUL)>>1);
+
+        a= *(uint32_t*)&src[stride*3];
+        b= (a&b) + (((a^b)&0xFEFEFEFEUL)>>1);
+        *(uint32_t*)&src[stride*1]= (c|b) - (((c^b)&0xFEFEFEFEUL)>>1);
+
+        b= *(uint32_t*)&src[stride*4];
+        c= (b&c) + (((b^c)&0xFEFEFEFEUL)>>1);
+        *(uint32_t*)&src[stride*2]= (c|a) - (((c^a)&0xFEFEFEFEUL)>>1);
+
+        c= *(uint32_t*)&src[stride*5];
+        a= (a&c) + (((a^c)&0xFEFEFEFEUL)>>1);
+        *(uint32_t*)&src[stride*3]= (a|b) - (((a^b)&0xFEFEFEFEUL)>>1);
+
+        a= *(uint32_t*)&src[stride*6];
+        b= (a&b) + (((a^b)&0xFEFEFEFEUL)>>1);
+        *(uint32_t*)&src[stride*4]= (c|b) - (((c^b)&0xFEFEFEFEUL)>>1);
+
+        b= *(uint32_t*)&src[stride*7];
+        c= (b&c) + (((b^c)&0xFEFEFEFEUL)>>1);
+        *(uint32_t*)&src[stride*5]= (c|a) - (((c^a)&0xFEFEFEFEUL)>>1);
+
+        c= *(uint32_t*)&src[stride*8];
+        a= (a&c) + (((a^c)&0xFEFEFEFEUL)>>1);
+        *(uint32_t*)&src[stride*6]= (a|b) - (((a^b)&0xFEFEFEFEUL)>>1);
+
+        a= *(uint32_t*)&src[stride*9];
+        b= (a&b) + (((a^b)&0xFEFEFEFEUL)>>1);
+        *(uint32_t*)&src[stride*7]= (c|b) - (((c^b)&0xFEFEFEFEUL)>>1);
+
+        src += 4;
+    }
 #endif
 }
 
-int linearBlendFilter(VideoFilter *vf, Frame *frame)
+int linearBlendFilter(VideoFilter *vf, VideoFrame *frame)
 {
-  int width = frame->width;
-  int height = frame->height;
-  unsigned char *yuvptr = frame->buf;
-  int stride = width;
-  int ymax = height - 8;
-  int x,y;
-  unsigned char *src;
-  unsigned char *uoff;
-  unsigned char *voff;
-  vf = vf;
+    int width = frame->width;
+    int height = frame->height;
+    unsigned char *yuvptr = frame->buf;
+    int stride = width;
+    int ymax = height - 8;
+    int x,y;
+    unsigned char *src;
+    unsigned char *uoff;
+    unsigned char *voff;
+    vf = vf;
 
-  for (y = 0; y < ymax; y+=8)
-  {  
-    for (x = 0; x < stride; x+=8)
-    {
-       src = yuvptr + x + y * stride;  
-       linearBlend(src, stride);  
+    if (frame->codec != FMT_YV12)
+        return 1;
+
+    for (y = 0; y < ymax; y+=8)
+    {  
+        for (x = 0; x < stride; x+=8)
+        {
+            src = yuvptr + x + y * stride;  
+            linearBlend(src, stride);  
+        }
     }
-  }
  
-  stride = width / 2;
-  ymax = height / 2 - 8;
+    stride = width / 2;
+    ymax = height / 2 - 8;
   
-  uoff = yuvptr + width * height;
-  voff = yuvptr + width * height * 5 / 4;
+    uoff = yuvptr + width * height;
+    voff = yuvptr + width * height * 5 / 4;
  
-  for (y = 0; y < ymax; y += 8)
-  {
-    for (x = 0; x < stride; x += 8)
+    for (y = 0; y < ymax; y += 8)
     {
-       src = uoff + x + y * stride;
-       linearBlend(src, stride);
+        for (x = 0; x < stride; x += 8)
+        {
+            src = uoff + x + y * stride;
+            linearBlend(src, stride);
        
-       src = voff + x + y * stride;
-       linearBlend(src, stride);
-     }
-  }
+            src = voff + x + y * stride;
+            linearBlend(src, stride);
+        }
+    }
 
-  emms();
+    emms();
 
-  return 0;
+    return 0;
 }
 
 void cleanup(VideoFilter *filter)
 {
-  free(filter);
+    free(filter);
 }
 
 VideoFilter *new_filter(char *options)
 {
-  ThisFilter *filter = malloc(sizeof(ThisFilter));
+    ThisFilter *filter = malloc(sizeof(ThisFilter));
 
-  options = options;
+    options = options;
 
-  if (filter == NULL)
-  {
-    fprintf(stderr,"Couldn't allocate memory for filter\n");
-    return NULL;
-  }
+    if (filter == NULL)
+    {
+        fprintf(stderr,"Couldn't allocate memory for filter\n");
+        return NULL;
+    }
 
-  filter->filter=&linearBlendFilter;
-  filter->cleanup=&cleanup;
-  filter->name = (char *)FILTER_NAME;
-  return (VideoFilter *)filter;
+    filter->filter = &linearBlendFilter;
+    filter->cleanup = &cleanup;
+    filter->name = (char *)FILTER_NAME;
+    return (VideoFilter *)filter;
 }
 

@@ -76,7 +76,8 @@ class NuppelVideoRecorder : public RecorderBase
     bool SetupAVCodec(void);
     void SetupRTjpeg(void);
     int AudioInit(bool skipdevice = false);
-    void WriteVideo(Frame *frame, bool skipsync = false, bool forcekey = false);
+    void WriteVideo(VideoFrame *frame, bool skipsync = false, 
+                    bool forcekey = false);
     void WriteAudio(unsigned char *buf, int fnum, int timecode);
     void WriteText(unsigned char *buf, int len, int timecode, int pagenr);
 

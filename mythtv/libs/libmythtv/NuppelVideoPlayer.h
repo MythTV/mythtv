@@ -103,7 +103,7 @@ class NuppelVideoPlayer
 
     int FlagCommercials(bool showPercentage = false, bool fullSpeed = false);
 
-    unsigned char *GetCurrentFrame(int &w, int &h);
+    VideoFrame *GetCurrentFrame(int &w, int &h);
 
     void SetPipPlayer(NuppelVideoPlayer *pip) { setpipplayer = pip; 
                                                 needsetpipplayer = true; }
@@ -135,13 +135,17 @@ class NuppelVideoPlayer
     void SetAudioParams(int bps, int channels, int samplerate);
     void SetEffDsp(int dsprate);
     void SetFileLength(int total, int frames);
-    unsigned char *GetNextVideoFrame(void);
-    void ReleaseNextVideoFrame(unsigned char *buffer, long long timecode);
-    void DiscardVideoFrame(unsigned char *buffer);
+
+    VideoFrame *GetNextVideoFrame(void);
+    void ReleaseNextVideoFrame(VideoFrame *buffer, long long timecode);
+    void DiscardVideoFrame(VideoFrame *buffer);
+
     void AddAudioData(char *buffer, int len, long long timecode);
     void AddAudioData(short int *lbuffer, short int *rbuffer, int samples,
                       long long timecode);
+
     void AddTextData(char *buffer, int len, long long timecode, char type);
+
     void SetEof(void) { eof = 1; }
     int GetEof(void) { return eof; }
     void SetFramesPlayed(long long played) { framesPlayed = played; }
@@ -202,7 +206,7 @@ class NuppelVideoPlayer
 
     int UpdateDelay(struct timeval *nexttrigger);
 
-    void ShowPip(unsigned char *xvidbuf);
+    void ShowPip(VideoFrame *frame);
     void ShowText();
 
     void UpdateTimeDisplay(void);
@@ -247,11 +251,11 @@ class NuppelVideoPlayer
     int usepre;		/* number of slots to keep full */
     bool prebuffering;	/* don't play until done prebuffering */ 
     int timecodes[MAXVBUFFER];	/* timecode for each slot */
-    unsigned char *vbuffer[MAXVBUFFER+1];	/* decompressed video data */
+    VideoFrame vbuffers[MAXVBUFFER+1];	/* decompressed video data */
 
-    QMap<unsigned char *, int> vbufferMap;
-    QPtrQueue<unsigned char> availableVideoBuffers;
-    QPtrQueue<unsigned char> usedVideoBuffers;
+    QMap<VideoFrame *, int> vbufferMap;
+    QPtrQueue<VideoFrame> availableVideoBuffers;
+    QPtrQueue<VideoFrame> usedVideoBuffers;
 
     int rpos;
 
@@ -397,6 +401,8 @@ class NuppelVideoPlayer
     bool experimentalsync;
 
     bool limitKeyRepeat;
+
+    VideoFrame pauseFrame;
 };
 
 #endif

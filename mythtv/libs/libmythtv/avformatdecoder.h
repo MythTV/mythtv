@@ -8,6 +8,7 @@
 #include "programinfo.h"
 #include "format.h"
 #include "decoderbase.h"
+#include "frame.h"
 
 extern "C" {
 #include "../libavcodec/avcodec.h"
@@ -113,7 +114,7 @@ class AvFormatDecoder : public DecoderBase
 
     double ptsmultiplier;
 
-    QPtrList<unsigned char> inUseBuffers;
+    QPtrList<VideoFrame> inUseBuffers;
 
     int current_width;
     int current_height;

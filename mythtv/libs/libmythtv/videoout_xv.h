@@ -3,6 +3,8 @@
 
 struct XvData;
 
+#include "frame.h"
+
 class XvVideoOutput
 {
   public:
@@ -10,13 +12,13 @@ class XvVideoOutput
    ~XvVideoOutput();
 
     bool Init(int width, int height, float aspect, int num_buffers, 
-              unsigned char **out_buffers, unsigned int winid,
+              VideoFrame *out_buffers, unsigned int winid,
               int winx, int winy, int winw, int winh, unsigned int embedid = 0);
-    void PrepareFrame(unsigned char *buffer, int width, int height);
+    void PrepareFrame(VideoFrame *buffer);
     void Show();
 
     void InputChanged(int width, int height, float aspect,
-                      int num_buffers, unsigned char **out_buffer);
+                      int num_buffers, VideoFrame *out_buffer);
 
     void ToggleFullScreen();
 
@@ -31,9 +33,9 @@ class XvVideoOutput
 
   private:
     void Exit(void);
-    bool CreateXvBuffers(int num_buffers, unsigned char **out_buffers);
-    bool CreateShmBuffers(int num_buffers, unsigned char **out_buffers);
-    bool CreateXBuffers(int num_buffers, unsigned char **out_buffers);
+    bool CreateXvBuffers(int num_buffers, VideoFrame *out_buffers);
+    bool CreateShmBuffers(int num_buffers, VideoFrame *out_buffers);
+    bool CreateXBuffers(int num_buffers, VideoFrame *out_buffers);
     void DeleteXvBuffers();
     void DeleteShmBuffers();
     void DeleteXBuffers();

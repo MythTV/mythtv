@@ -56,9 +56,12 @@ void CommDetect::Init(int w, int h, double fps)
     ClearAllMaps();
 }
 
-void CommDetect::ProcessNextFrame(unsigned char *buf, long long frame_number)
+void CommDetect::ProcessNextFrame(VideoFrame *frame, long long frame_number)
 {
-    frame_ptr = buf;
+    if (frame->codec != FMT_YV12)
+        return;
+
+    frame_ptr = frame->buf;
 
     lastFrameWasBlank = frameIsBlank;
     lastFrameWasSceneChange = sceneHasChanged;

@@ -475,10 +475,12 @@ void PlaybackBox::updateVideo(QPainter *p)
             return;
 
         int w = 0, h = 0;
-        unsigned char *buf = nvp->GetCurrentFrame(w, h);
+        VideoFrame *frame = nvp->GetCurrentFrame(w, h);
 
-        if (w == 0 || h == 0 || !buf)
+        if (w == 0 || h == 0 || !frame)
             return;
+
+        unsigned char *buf = frame->buf;
 
         unsigned char *outputbuf = new unsigned char[w * h * 4];
         yuv2rgb_fun convert = yuv2rgb_init_mmx(32, MODE_RGB);

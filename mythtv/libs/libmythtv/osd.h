@@ -18,6 +18,8 @@ class TTFFont;
 class OSDSet;
 class OSDTypeImage;
 class OSDTypePositionIndicator;
+
+#include "frame.h"
  
 class OSD
 {
@@ -27,7 +29,7 @@ class OSD
         int dispx, int dispy, int dispw, int disph);
    ~OSD(void);
 
-    void Display(unsigned char *yuvptr);
+    void Display(VideoFrame *frame);
 
     void ClearAllText(const QString &name);
     void SetTextByRegexp(const QString &name, QMap<QString, QString> &regexpMap,

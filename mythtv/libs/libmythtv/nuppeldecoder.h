@@ -18,6 +18,7 @@
 #endif
 
 #include "RTjpegN.h"
+#include "frame.h"
 
 extern "C" {
 #include "../libavcodec/avcodec.h"
@@ -66,7 +67,7 @@ class NuppelDecoder : public DecoderBase
 
   private:
     bool DecodeFrame(struct rtframeheader *frameheader,
-                     unsigned char *lstrm, unsigned char *outbuf);
+                     unsigned char *lstrm, VideoFrame *frame);
     bool isValidFrametype(char type);
 
     bool InitAVCodec(int codec);

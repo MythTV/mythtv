@@ -1493,11 +1493,13 @@ void OSD::SetVisible(OSDSet *set, int length)
     pthread_mutex_unlock(&osdlock);
 }
 
-void OSD::Display(unsigned char *yuvptr)
+void OSD::Display(VideoFrame *frame)
 {
     bool anytodisplay = false;
-    if (!setList)
+    if (!setList || frame->codec != FMT_YV12)
         return;
+
+    unsigned char *yuvptr = frame->buf;
 
     vector<OSDSet *> removeList;
 

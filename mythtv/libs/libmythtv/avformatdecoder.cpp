@@ -83,7 +83,7 @@ void AvFormatDecoder::SeekReset(void)
         avcodec_flush_buffers(enc);
     }
 
-    unsigned char *buffer;
+    VideoFrame *buffer;
     for (buffer = inUseBuffers.first(); buffer; buffer = inUseBuffers.next())
     {
         m_parent->DiscardVideoFrame(buffer);
@@ -404,7 +404,9 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
     int width = c->width;
     int height = c->height;
 
-    pic->data[0] = nd->m_parent->GetNextVideoFrame();
+    VideoFrame *frame = nd->m_parent->GetNextVideoFrame();
+
+    pic->data[0] = frame->buf;
     pic->data[1] = pic->data[0] + width * height;
     pic->data[2] = pic->data[1] + width * height / 4;
 
@@ -412,12 +414,12 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
     pic->linesize[1] = width / 2;
     pic->linesize[2] = width / 2;
 
-    pic->opaque = nd;
+    pic->opaque = frame;
     pic->type = FF_BUFFER_TYPE_USER;
 
     pic->age = 256 * 256 * 256 * 64;
 
-    nd->inUseBuffers.append(pic->data[0]);
+    nd->inUseBuffers.append(frame);
 
     return 1;
 }
@@ -682,7 +684,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                         continue;
                     }
 
-                    picdata = mpa_pic.data[0];
+                    VideoFrame *picframe = (VideoFrame *)(mpa_pic.opaque);
 
                     if (!directrendering)
                     {
@@ -695,8 +697,9 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                             mpa_pic_p.linesize[i] = mpa_pic.linesize[i];
                         }
 
-                        picdata = m_parent->GetNextVideoFrame();
-                        avpicture_fill(&tmppicture, picdata, PIX_FMT_YUV420P,
+                        picframe = m_parent->GetNextVideoFrame();
+                        avpicture_fill(&tmppicture, picframe->buf, 
+                                       PIX_FMT_YUV420P,
                                        context->width,
                                        context->height);
                         img_convert(&tmppicture, PIX_FMT_YUV420P, &mpa_pic_p,
@@ -730,8 +733,9 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     else
                         lastvpts += (int)(1000.0 / fps);
 
-                    m_parent->ReleaseNextVideoFrame(picdata, lastvpts);
-                    inUseBuffers.removeRef(picdata);
+                    m_parent->ReleaseNextVideoFrame(picframe, lastvpts);
+                    if (directrendering)
+                        inUseBuffers.removeRef(picframe);
                     gotvideo = 1;
                     framesPlayed++;
 

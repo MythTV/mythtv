@@ -1,28 +1,28 @@
-/*
- *  frame.h
- */
-
 #ifndef _FRAME_H
 #define _FRAME_H 
 
-typedef enum Codec_
+typedef enum FrameType_
 {
-    CODEC_RGB = 0,
-    CODEC_YUV
-} Codec;
+    FMT_NONE = -1,
+    FMT_RGB24 = 0,
+    FMT_YV12,
+    FMT_XVMC_IDCT_MPEG2,
+    FMT_XVMC_MOCO_MPEG2
+} VideoFrameType;
 
-typedef struct Frame_
+typedef struct VideoFrame_
 {
-    Codec codec;
+    VideoFrameType codec;
+    unsigned char *buf;
+
     int height;
     int width;
     int bpp;
-    int frameNumber;
-    unsigned char *buf;
-    int len;
-    int timecode;
-    int is_field;
-} Frame;
+    int size;
 
-#endif // #ifndef _FRAME_H
+    long long frameNumber;
+    long long timecode;
+} VideoFrame;
+
+#endif
 

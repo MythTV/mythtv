@@ -616,11 +616,13 @@ void NuppelDecoder::CloseAVCodec(void)
 }
 
 bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
-                                unsigned char *lstrm, unsigned char *outbuf)
+                                unsigned char *lstrm, VideoFrame *frame)
 {
     int r;
     unsigned int out_len;
     int compoff = 0;
+
+    unsigned char *outbuf = frame->buf;
 
     if (!buf2)
     {
@@ -889,7 +891,7 @@ void NuppelDecoder::GetFrame(int avignore)
                 continue;
             }
 
-            unsigned char *buf = m_parent->GetNextVideoFrame();
+            VideoFrame *buf = m_parent->GetNextVideoFrame();
 
             ret = DecodeFrame(&frameheader, strm, buf);
             if (!ret)

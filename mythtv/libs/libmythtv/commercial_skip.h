@@ -8,6 +8,8 @@
 #define COMMERCIAL_SKIP_SCENE   0x2
 #define COMMERCIAL_SKIP_RATING  0x4
 
+#include "frame.h"
+
 class CommDetect
 {
   public:
@@ -16,7 +18,7 @@ class CommDetect
 
     void Init(int w, int h, double fps);
 
-    void ProcessNextFrame(unsigned char *buf, long long frame_number = -1);
+    void ProcessNextFrame(VideoFrame *frame, long long frame_number = -1);
 
     bool FrameIsBlank(void);
     bool SceneHasChanged(void);

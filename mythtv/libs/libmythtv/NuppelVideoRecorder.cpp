@@ -2269,15 +2269,14 @@ void NuppelVideoRecorder::doWriteThread(void)
         {
             case ACTION_VIDEO:
             {
-                Frame frame;
-                frame.codec = CODEC_YUV;
+                VideoFrame frame;
+                frame.codec = FMT_YV12;
                 frame.width = w;
                 frame.height = h;
                 frame.buf = videobuffer[act_video_encode]->buffer;
-                frame.len = videobuffer[act_video_encode]->bufferlen;
+                frame.size = videobuffer[act_video_encode]->bufferlen;
                 frame.frameNumber = videobuffer[act_video_encode]->sample;
                 frame.timecode = videobuffer[act_video_encode]->timecode;
-                frame.is_field = FALSE;
     
                 WriteVideo(&frame);
 
@@ -2334,7 +2333,8 @@ long long NuppelVideoRecorder::GetKeyframePosition(long long desired)
     return ret;
 }
 
-void NuppelVideoRecorder::WriteVideo(Frame *frame, bool skipsync, bool forcekey)
+void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync, 
+                                     bool forcekey)
 {
     int tmp = 0, r = 0, out_len = OUT_LEN;
     struct rtframeheader frameheader;
@@ -2342,7 +2342,7 @@ void NuppelVideoRecorder::WriteVideo(Frame *frame, bool skipsync, bool forcekey)
     int raw = 0;
     int timeperframe = 40;
     uint8_t *planes[3];
-    int len = frame->len;
+    int len = frame->size;
     int fnum = frame->frameNumber;
     int timecode = frame->timecode;
     unsigned char *buf = frame->buf;
@@ -2564,7 +2564,7 @@ void NuppelVideoRecorder::WriteVideo(Frame *frame, bool skipsync, bool forcekey)
 
     if ((!hardware_encode) && (commDetect) && (!pip_mode))
     {
-        commDetect->ProcessNextFrame(buf, (fnum-startnum)>>1 );
+        commDetect->ProcessNextFrame(frame, (fnum-startnum)>>1 );
         if (commDetect->FrameIsBlank())
         {
             commDetect->GetBlankFrameMap(blank_frames);
