@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2005-03-27, v0.17.04
+<date>2005-04-, v0.18.00
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -108,7 +108,7 @@ name="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html"> or as a PDF
 at <url url="http://www.mythtv.org/docs/mythtv-HOWTO.pdf"
 name="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">.
 
-This HOWTO is for MythTV v0.17.
+This HOWTO is for MythTV v0.18.
 
 <sect1>Document conventions
 <p>The following conventions are used throughout this document.<newline>
@@ -397,11 +397,9 @@ encoding. Using either a G200 MJPEG encoder card, or a MPEG-2 encoder card
 supported by the IvyTV project <url url="http://ivtv.sourceforge.net/"
 name="http://ivtv.sourceforge.net/"> such as the Hauppauge PVR-250, PVR-350,
 Avermedia M179, Hauppauge "Freestyle" or Yuan M600 cards will allow you to
-use dedicated hardware encoders rather than your CPU. Release 0.17 of MythTV
-is able to use these MPEG-2 encoders as an input device for live TV and for
-scheduled recordings.  (The PVR-350 can simultaneously be used as an output
-device.) Using the on-board MPEG-2 encoder drastically reduces the CPU
-requirements for encoding.
+use dedicated hardware encoders rather than your CPU. (The PVR-350 can
+simultaneously be used as an output device.) Using the on-board MPEG-2
+encoder drastically reduces the CPU requirements for encoding.
 
 <bf>NOTE</bf>:  Motherboards with the Via chipset are notoriously bad with
 DMA and have caused numerous issues with ivtv, including hard locks.  See
@@ -908,8 +906,9 @@ Qt") and libqt3 ("Libraries").
 <figure loc="here">
 <eps file="warning.eps" height="1cm">
 <img src="warning.png">
-<caption>NOTE for Mandrake 9.1 users:  Mandrake 9.1 has removed the MySQL modules
-from the default installation.  Ensure that you install libqt3-mysql.
+<caption>NOTE for Mandrake users:  In versions after Mandrake 9.1, Mandrake
+removed the MySQL modules from the default installation.  Ensure that you
+install libqt3-mysql.
 </caption>
 </figure>
 
@@ -953,7 +952,7 @@ $ su
 </verb></tscreen>
 
 <code>
-NOTE for Mandrake 9.1 users: execute the following command.
+NOTE for Mandrake 9.1+ users: execute the following command.
 
 # urpmi libqt3-mysql
 </code>
@@ -1277,7 +1276,7 @@ grabber which is built-in to MythTV.  You <em>do not</em> need to install
 XMLTV, but you need <bf>wget</bf> version 1.9.1 or higher.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
-name="http://xmltv.sourceforge.net">.  Download the latest version (0.5.38).
+name="http://xmltv.sourceforge.net">.  Download the latest version (0.5.39).
 
 <code>
 NOTE for Mandrake users:  If you have added a "PLF" mirror, you may skip the
@@ -1297,81 +1296,6 @@ After downloading, be sure to install both:
 Get lame from <url url="http://lame.sourceforge.net/"
 name="http://lame.sourceforge.net/">.  Download the source code to v3.96.1
 by following the links from "Using" through "Download...".
-
-<sect1>Notes on compiling for different processors
-<label id="cpuspecificoptimizations">
-<p><bf>NOTE</bf>: the following section applies to MythTV 0.17.  If you are
-running CVS, MythTV has a more intelligent <bf>configure</bf> script that
-will auto-detect your system and compile processor-specific optimizations. 
-You will not edit the <tt>settings.pro</tt> file as described below at all;
-run <tt>./configure --help</tt> to obtain the full list of options.  You may
-skip this entire section.
-
-By default, MythTV is compiled for a Pentium Pro or i686 processor. This
-generates good code for most CPUs, but does not take advantage of MMX or
-SSE, and does not work with recent processors that are compatible with older
-Intel processors, such as the Via or IDT low power processors. So you may
-wish to, or need to, change this before compiling. The flags in bold are
-required if you have that CPU.
-
-If you have a system with an AMD processor change the following in the
-<tt>settings.pro</tt> file. Replace <verb>-march=pentiumpro</verb> before
-you compile with one of:
-<itemize>
-<item><bf>-march=k6</bf>        for the AMD K6 with MMX (i586 compatible)
-<item><bf>-march=k6-2</bf>      for the AMD K6 CPU with MMX and 3dNOW! (i586 compatible)
-<item>-march=athlon             for the AMD Athlon CPU with MMX, 3dNOW!, enhanced 3dNOW! and some of SSE. (pentium2 compatible)
-<item>-march=pentiumpro -mmmx   for the AMD Athlon XP CPU with MMX, 3dNOW!, enhanced 3dNOW! and SSE. (pentium3 compatible)
-<item>-march=k8                 for the AMD K8 core based CPUs with x86-64 instruction set support
-                                with MMX, 3dNOW!, enhanced 3dNOW!, SSE and SSE2. (pentium4 compatible)
-</itemize>
-
-<figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
-<caption>
-<bf>NOTE</bf>:  If you wish to compile with the <tt>-march=k8</tt> flag you
-must use gcc v3.4 or higher.
-</caption>
-</figure>
-
-If you have a Via processor change the following in the
-<tt>settings.pro</tt> file. Replace <verb>-march=pentiumpro</verb> before
-you compile with one of:
-<itemize>
-<item><bf>-march=c3</bf>        for the Via C3 CPU with MMX and 3dNOW! instruction set support. (pentium-mmx compatible)
-<item><bf>-march=c3-2</bf>      for the Via C3-2 CPU with MMX and SSE instruction set support. (pentium2 compatible)
-</itemize>
-
-If you have an IDT Winchip processor change the following in the
-<tt>settings.pro</tt> file. Replace <verb>-march=pentiumpro</verb> before
-you compile with one of:
-<itemize>
-<item><bf>-march=winchip-c6</bf>  for the IDT Winchip C6 CPU with MMX (i486 compatible)
-<item><bf>-march=winchip2</bf>    for the IDT Winchip2 CPU, with MMX and 3dNOW! (i486 compatible)
-</itemize>
-
-Finally, if you have an Intel processor other than the Pentium Pro you may
-wish to specify your particular model. Replace
-<verb>-march=pentiumpro</verb> before you compile with one of:
-<itemize>
-<item><bf>-march=i586</bf>        for the Intel Pentium CPU without MMX
-<item><bf>-march=pentium-mmx</bf> for the Intel PentiumMMX CPU based on Pentium core with MMX
-<item>-march=pentium2    for the Intel Pentium2 CPU based on Pentium Pro core with MMX
-<item>-march=pentium3    for the Intel Pentium3 CPU based on Pentium Pro core with MMX and SSE
-<item>-march=pentium-m   for the Intel Pentium-M CPU with MMX, SSE and SSE2.  Used in Centrino notebooks.
-<item>-march=pentium4    for the Intel Pentium4 CPU with MMX, SSE and SSE2
-<item>-march=prescott    for the Intel Pentium4 CPU with MMX, SSE, SSE2 and SSE3
-<item>-march=nocona      for the Intel Pentium4 CPU with 64-bit extensions, MMX, SSE, SSE2 and SSE3
-</itemize>
-
-<bf>NOTE</bf>: If your version of gcc does not support your processor,
-choose the most recent processor supported by your compiler and add any
-extra features, for instance the <tt>-march=winchip-c6</tt> would become
-<tt>-march=i486 -mmmx</tt> for the IDT Winchip C6 CPU. It's also recommended
-that when compiling for the for the Athlon XP you leave the default of
-<verb>-march=pentiumpro</verb> because gcc doesn't properly optimize for the
-Athlon XP.
 
 <sect1>Building LAME
 <p>Open a shell and switch to the directory where you saved lame.
@@ -1431,7 +1355,7 @@ and skip straight to the XMLTV compilation step.
 <p>
 <label id="untarring_xmltv">Untar the xmltv file:
 <tscreen><verb>
-$ tar -xjf xmltv-0.5.38.tar.bz2
+$ tar -xjf xmltv-0.5.39.tar.bz2
 </verb></tscreen>
 Install the xmltv prerequisites.  The following prerequisites are the
 minimum required; when you actually start running the xmltv setup program it
@@ -1450,7 +1374,7 @@ cpan> exit
 
 Change to the XMLTV directory and compile it:
 <tscreen><verb>
-$ cd xmltv-0.5.38
+$ cd xmltv-0.5.39
 $ perl Makefile.PL
 </verb></tscreen>
 You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
@@ -1509,10 +1433,18 @@ simplest thing is to immediately start using DataDirect.
 <sect1>Manually building MythTV
 <p>Unpack MythTV
 <tscreen><verb>
-$ tar -xjf mythtv-0.17.tar.bz2
-$ cd mythtv-0.17
+$ tar -xjf mythtv-0.18.tar.bz2
+$ cd mythtv-0.18
 $ ./configure
 </verb></tscreen>
+
+As of MythTV version 0.18, there is no need to edit the
+<tt>settings.pro</tt> file to set compile-time options.  The
+<bf>configure</bf> script will configure MythTV appropriately for your
+system.  If you wish to change options, run <bf>./configure --help</bf> to
+see what is available and to override and automatically detected options. 
+See the <tt>config.log</tt> file after running <bf>configure</bf> to see
+previous runs.
 
 On a single cpu machine, you would type the following to compile MythTV:
 <tscreen><verb>
@@ -2187,7 +2119,7 @@ to control MythTV.  MythTV now includes native support for lirc and can
 interact directly with 
 
 <tscreen><verb>
-$ cd ~/mythtv-0.17/configfiles
+$ cd ~/mythtv-0.18/configfiles
 $ cp lircrc.example ~/.lircrc
 </verb></tscreen> 
 or
@@ -2206,8 +2138,7 @@ from there.
 
 If it is working, then press <bf>CTRL-C</bf> to abort the program.  Once you
 know that your remote is working, you can either recompile MythTV with
-native lirc support (edit the <tt>settings.pro</tt> file and remove the "#"
-from the lirc option, then make <tt>distclean</tt> and <tt>make</tt>) or you
+native lirc support by enabling it in <bf>configure</bf> or you
 need to run the <bf>irxevent</bf> program, which takes the key presses and
 sends them to MythTV.  If you use native lirc support, you don't need to run
 <bf>irxevent</bf>.  If you are going to use irxevent, then you need to run
@@ -2482,10 +2413,9 @@ skip-innodb
 set-variable=thread_stack=256k
 </verb></tscreen>
 
-Switch to the setup directory and run the setup program:
+Run the setup program:
 <tscreen><verb>
-$ cd setup
-$ ./setup
+$ mythtv-setup
 </verb></tscreen>
 
 The backend setup program will start and offer you a number of choices.  It
@@ -2683,7 +2613,7 @@ mythbackend will print information about connections and what it's doing to
 the console.  If you'd like to see the options that are available for
 mythbackend, type <tt>mythbackend -h</tt> for help.
 
-As of MythTV v0.17, the available options are:
+As of MythTV v0.18, the available options are:
 <tscreen><verb>
 $ mythbackend -h
 Valid options are:
@@ -2995,7 +2925,7 @@ during playback. These filters can be used to improve or modify the video
 image, including hiding the effects of an interlaced image or reducing the
 effects of noise in a poor video signal. The following is a brief
 introduction to introduce you to the filters that are available in MythTV
-version 0.17.
+version 0.18.
 <sect2>Applying filters
 <p>One or more filters can be included in a "filter chain". The filters to
 be used are identified in a "filter string". A filter string is a group of
@@ -3657,6 +3587,11 @@ user-supplied program, so if you have issues with the script, please contact
 the author.
 <!-- REMOVE ME END -->
 
+<sect1>Adding DishTV information to the database
+<p>A script for adding Pay Per View information into the MythTV database for
+DishTV subscribers is available at <url url="http://www.mythppv.com/"
+name="http://www.mythppv.com/">.
+
 <sect1>Adding support for an external tuner
 <p>MythTV supports changing the channel on an external tuner.  If you have
 an external tuner, such as a DirecTV or digital cable set top box, you
@@ -4221,8 +4156,8 @@ Mandrake Control Center.
 <sect1>Completing the installation
 <p>
 <tscreen><verb>
-$ tar -xjf mythweb-0.17.tar.bz2
-$ cd mythweb-0.17
+$ tar -xjf mythweb-0.18.tar.bz2
+$ cd mythweb-0.18
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -4284,8 +4219,8 @@ would perform the following command:
 Once you have satisfied the prerequisites for your distribution, download
 and install the application:
 <tscreen><verb>
-$ tar -xjf mythgallery-0.17.tar.bz2
-$ cd mythgallery-0.17
+$ tar -xjf mythgallery-0.18.tar.bz2
+$ cd mythgallery-0.18
 $ ./configure --enable-opengl
 $ qmake mythgallery.pro
 $ make
@@ -4890,18 +4825,15 @@ discovered a genuine code-bug,  or if the problem is with your system.  In
 order to determine what's going on, you must recompile MythTV with debugging
 support and run MythTV within <bf>gdb</bf>, the GNU debugger.
 
-Edit the settings.pro file.  Make sure that the top of the file looks like this:
-<tscreen><verb>
-$ cat settings.pro
-CONFIG += debug
-#CONFIG += release
-</verb></tscreen>
+Re-run the <bf>configure</bf> script and add <tt>--compile-type=debug</tt>
+to any previous configuration options you may have used.  Check the
+<tt>config.log</tt> file if you have forgotten.
 
 Now, you need to clear out the old versions of the software to ensure that
 you're running with the debugging code, then compile and install.
 <tscreen><verb>
-$ make clean distclean
-$ ./configure
+$ make distclean
+$ ./configure --compile-type=debug
 $ make
 $ su
 # make install
@@ -4912,7 +4844,7 @@ At this point, you now have debug-enabled software ready.  Let's assume that
 the problem you're having is in the <tt>setup</tt> program.
 <tscreen><verb>
 $ cd setup
-$ gdb ./setup
+$ gdb ./mythtv-setup
 
 GNU gdb 5.3-1mdk (Mandrake Linux)
 Copyright 2002 Free Software Foundation, Inc.
@@ -4953,18 +4885,11 @@ You can now continue troubleshooting using <bf/gdb</> as detailed in the
 instructions.
 
 <sect2>Illegal Instruction
-<p>This error can happen for the following reasons:
-<itemize>
-<item>You have an AMD K6-2 or VIA C3 processor.  If you have either of
-these, make sure that you you followed the instructions in this <ref id="cpuspecificoptimizations"
-name="section">.
-<item>You have an early production Intel Celeron, Pentium Pro or Pentium II.  If you have any
-of these processors, make sure that your <ref id="deinterlace_" name="deinterlace">
-variable is set correctly.  Your CPU needs to support SSE instructions for
-deinterlace support.  You may check this by doing a <tt>$ cat
-/proc/cpuinfo</tt> and looking for "sse" in the processor flags section.
-</itemize>
-
+<!-- REMOVE ME in 0.19 -->
+<p>This error used to occur when users compiled MythTV with incorrect CPU
+options.  This should no longer occur with the new <bf>configure</bf>
+script.
+<!-- REMOVE ME END -->
 <sect2>MythTV is crashing your system
 <p>When run as a non-privileged user, MythTV <em>can not</em> crash your
 system.  If your system is crashing when you run MythTV, then you have some
@@ -5016,6 +4941,9 @@ Profiles and adjust the <bf>Default</bf> and <bf>Live TV</bf> options to
 <p>This is due to DPMS, the Display Power Management System, which is used
 to save power by turning off your monitor when the system decides that it's
 not being used or due to a screensaver that has defaulted to a blank screen. 
+MythTV now has DPMS support built-in, and should intelligently handle the
+screen.  Continue reading if you wish to override DPMS and force it off.
+
 Since it's likely that watching TV will not generate keyboard or mouse
 events for a time, you need to turn off DPMS and the screensaver.  There are
 a few ways to do this.  You may also need to check your BIOS for power
@@ -5028,11 +4956,14 @@ Section "ServerFlags"
     #DontZap # disable <Crtl><Alt><BS> (server abort)
     #DontZoom # disable <Crtl><Alt><KP_+>/<KP_-> (resolution switching)
     AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
+
+    Option "blank time" "0"
+    Option "standby time" "0"
+    Option "suspend time" "0"
+    Option "off time" "0"
+    Option "NoPM" "1"
 EndSection
 </verb></tscreen>
-
-Add <tt>Option "NoPM" "true"</tt> and <tt>Option "BlankTime" "0"</tt> to the
-ServerFlags section.
 
 Also, look for:
 <tscreen><verb>
@@ -5088,16 +5019,6 @@ $ xset s off
 You may also combine the command to turn off DPMS and the screensaver:
 <tscreen><verb>
 $ xset -dpms s off
-</verb></tscreen>
-
-There's also:
-<tscreen><verb>
-Section "ServerFlags"
-       Option "blank time" "0"
-       Option "standby time" "0"
-       Option "suspend time" "0"
-       Option "off time" "0"
-EndSection 
 </verb></tscreen>
 
 Finally, depending on your distribution, you may be able to turn it off from
@@ -5224,22 +5145,12 @@ this level to 75% to 85% may result in better audio quality.
 Master mixer - sets the level for the analog signal sent to line-out or the
 speakers.
 
-You may also want to ensure that <tt>/dev/dsp</tt> , or whatever device
-file is being used, hasn't already been grabbed by another process, like
+You may also want to ensure that <tt>/dev/dsp</tt> , or whatever device file
+is being used, hasn't already been grabbed by another process, like
 <bf>esd</bf> or <bf>artsd</bf>.  If the device file isn't available, then
-MythTV won't work.
+MythTV won't work.  You may wish to run <bf>configure</bf> and enable
+support for these.
 
-<figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
-<caption><bf>NOTE</bf>: MythTV now has support for using
-<bf>artsd</bf>.  This is a compile-time option, so you will need to edit the
-<tt>settings.pro</tt> file in the mythtv directory then perform a <tt>make
-distclean; make</tt>, and re-run <tt>make install</tt> as root to add this
-support.  Otherwise, check your window manager documentation for
-instructions on disabling the sound manager.
-</caption>
-</figure>
 If you wish to see what application is grabbing a resource, you can use the
 <tt>fuser</tt> command:
 <tscreen><verb>
@@ -7056,18 +6967,12 @@ If none of the above works, and <bf>irw</bf> still isn't showing keypresses,
 then you will need to ask your question on the LIRC list.
 
 Assuming that <bf>irw</bf> is showing keypresses, you can continue:
-To enable native LIRC support within MythTV, you will need to modify your
-<tt>settings.pro</tt> file and recompile.  Your <tt>settings.pro</tt> should
-look like this:
-<tscreen><verb>
-# Native lirc support
-CONFIG += using_lirc
-LIRC_LIBS = -llirc_client
-</verb></tscreen>
 
 Recompile and install:
 <tscreen><verb>
-$ make distclean; make
+$ make distclean
+$ ./configure --enable-lirc
+$ make
 $ su
 # make install
 </verb></tscreen>
@@ -7563,13 +7468,17 @@ wording on hardware - don't try to turn a crappy system into something
 wonderful; just won't happen.  "run fstab -a to remount" - what the hell was
 I thinking?  Add a comment to the processor flags section that CVS uses
 something different / better.
-
-v0.17.04, 2005-03-  Add xorg.conf.  Add more stuff for screen blanking - who
+v0.17.04, 2005-03-27.  Add xorg.conf.  Add more stuff for screen blanking - who
 knew that it was so hard to turn off DPMS?!?  Comment out all the stuff that
 talks about setting up cron for mythfilldatabase; using the internal method
 is better. Updated urpmi website for Mandrake.  Add note that DirecTV PPV
 script no longer works, and section will be removed in 0.19.
 
+v0.18.00, 2005-04-  Add note that Mandrake > 9.1 needs libqt3-mysql.  Add
+note that you don't need to explicitly disable DPMS.  ./setup is now
+mythtv-setup.  Add DishTV PPV link.  Get rid of references to settings.pro
+since everything is now done in the configure script.  Update debugging to
+reflect new configure script.  Update XMLTV version.
 
 -->
 
