@@ -182,6 +182,7 @@ class MythThemedDialog : public MythDialog
   protected:
 
     void paintEvent(QPaintEvent* e);
+    UIType              *widget_with_current_focus;
 
   private:
 
@@ -192,7 +193,6 @@ class MythThemedDialog : public MythDialog
     int context;
 
     QPtrList<LayerSet>  my_containers;
-    UIType              *widget_with_current_focus;
     QPtrList<UIType>    focus_taking_widgets;
 };
 
