@@ -173,7 +173,8 @@ TMPS="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.S"
 TMPH="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.h"
 
 if test -f /proc/cpuinfo ; then
-    if test x"$processor" = x"" -o x"$processor" = x"$cpu_raw" ; then
+    if test x"$processor" = x"" -o x"$processor" = x"$cpu_raw" -o \
+            x"$processor" = x"unknown" ; then
         processor=`cat /proc/cpuinfo | grep "model name" | head -n 1`
     fi
     processor_flags=`cat /proc/cpuinfo | grep "flags" | head -n 1`
@@ -935,6 +936,8 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
        ARCHFLAGS="-march=pentiumpro -mmmx"
    elif expr "$processor" : ".*AMD Athlon(tm)" > /dev/null ; then
        ARCHFLAGS="-march=athlon"
+   elif expr "$processor" : ".*AMD Athlon(TM)" > /dev/null ; then
+       ARCHFLAGS="-march=athlon"
    elif expr "$processor" : "athlon" > /dev/null ; then
        ARCHFLAGS="-march=athlon"
    elif expr "$processor" : ".*VIA C3 Ezra" > /dev/null ; then
@@ -988,8 +991,8 @@ if test x"$proc_error_msg" = x"yes"; then
     echo "      $PROC_FLAG"
     echo ""
     echo " If you are using a recent CVS checkout, "
-    echo " please e-mail the above to mythtv-dev@mythtv.org"
-    echo " With a subject \"configure did not detect my cpu\""
+    echo " please e-mail the above to mythtv-users@mythtv.org"
+    echo " With the subject \"configure did not detect my cpu\""
     echo ""
 fi
 
