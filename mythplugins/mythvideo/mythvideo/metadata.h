@@ -44,6 +44,7 @@ class Metadata
         length = other.length;
         showlevel = other.showlevel;
         id = other.id;
+        childID = other.childID;
     }
 
    ~Metadata() {}
