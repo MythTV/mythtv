@@ -1331,22 +1331,11 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
 
 void NuppelVideoPlayer::ReduceJitter(struct timeval *nexttrigger)
 {
-  /* Comments and debug variables will be trimmed later */
-
-  /* usleep() will relinqusish the CPU. The scheduler won't start
-     a new time slice until 0-10000usec (or 10000-20000usec)
-     later. Without a realtime scheduling policy, there will
-     always be jitter. This strives to smooth the time spacing
-     between frames. */
-
-  /* Half the frames are delayed until half as late as the
-     previous frame. */
-
     static int cheat = 5000;
     static int fudge = 0;
 
     struct timeval now; 
-    int delay, miss;
+    int delay;
     int cnt = 0;
 
     cheat += 100;
@@ -1357,15 +1346,13 @@ void NuppelVideoPlayer::ReduceJitter(struct timeval *nexttrigger)
             (nexttrigger->tv_usec - now.tv_usec); // uSecs
 
     /* The usleep() is shortened by "cheat" so that this process
-       gets the CPU early for about half the frames. Also, late
-       frames won't be as late. */
+       gets the CPU early for about half the frames. */
 
     if (delay > (cheat - fudge))
         usleep(delay - (cheat - fudge));
 
-    /* if late, draw the frame ASAP. If a little early, the frame
-       is due during this time slice so hold the CPU until half as
-       late as the previous frame (fudge) */
+    /* If late, draw the frame ASAP. If early, hold the CPU until
+       half as late as the previous frame (fudge) */
 
     while (delay + fudge > 0)
     {
@@ -1373,16 +1360,9 @@ void NuppelVideoPlayer::ReduceJitter(struct timeval *nexttrigger)
         
         delay = (nexttrigger->tv_sec - now.tv_sec) * 1000000 +
                 (nexttrigger->tv_usec - now.tv_usec); // uSecs
-
-        if (cnt == 0)
-            miss = delay + fudge;
-
         cnt++;
     }
 
-    // cerr << cheat - fudge << '\t' << miss << '\t';
-    // cerr << 0 - fudge << '\t' << delay << endl;
-    
     fudge = abs(delay / 2);
 
     if (cnt > 1)

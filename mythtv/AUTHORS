@@ -33,7 +33,11 @@ Setup enhancements:
     Dan Schwarz <dschwarz at bellatlantic.net>
 Large amount of documentation:
     Robert Kulagowski <rkulagowski at thrupoint.net>
-Alternative EPG layout:
+Alternative EPG layout, Program Finder:
     John Danner <johndanner at psu.edu>
 Graphical setup UI, database backend for configuration, initial direct rendering support
     Matt Zimmerman <mdz at debian.org>
+Windowed TV features, jump keys, jitter reduction, bug fixes, tech notes:
+    Bruce Markey <bjm at lvcm.com>
+Commercial skipping, non-Xv display support:
+    Chris Pinkham <cpinkham at bc2va.org>
