@@ -794,6 +794,7 @@ void TV::ProcessKeypress(int keypressed)
 
     if (browsemode)
     {
+        int passThru = 0;
         switch (keypressed)
         {
             case wsUp: BrowseDispInfo(BROWSE_UP); break;
@@ -803,8 +804,11 @@ void TV::ProcessKeypress(int keypressed)
             case wsEscape: BrowseEnd(false); break;
             case ' ': case wsEnter: case wsReturn: BrowseEnd(true); break;
             case 'r': case 'R': BrowseToggleRecord(); break;
+            case '[': case ']': case '|': passThru = 1; break;
         }
-        return;
+
+        if (!passThru)
+            return;
     }
 
     if (nvp->GetOSD() && osd->DialogShowing(dialogname))
@@ -1906,7 +1910,7 @@ void TV::ChangeVolume(bool up)
     int curvol = volumeControl->GetCurrentVolume();
     QString text = QString("Volume %1 %").arg(curvol);
 
-    if (osd)
+    if (osd && !browsemode)
         osd->StartPause(curvol * 10, true, "Adjust Volume", text, 5);
 }
 
@@ -1925,7 +1929,7 @@ void TV::ToggleMute(void)
     else
         text = "Mute Off";
  
-    if (osd)
+    if (osd && !browsemode)
         osd->SetSettingsText(text, 5);
 }
 
@@ -2007,6 +2011,10 @@ void TV::BrowseStart(void)
         return;
 
     if (paused)
+        return;
+
+    OSDSet *oset = osd->GetSet("browse_info");
+    if (!oset)
         return;
 
     browsemode = true;
