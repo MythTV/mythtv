@@ -5,30 +5,23 @@ CXX      = g++
 # debug:
 #
 
-CXXFLAGS = -Wall -DLCD_DEVICE -DLCD_DEVICE_DEBUG -I$(QTDIR)/include		
+CXXFLAGS = -Wall -DLCD_DEVICE -DLCD_DEVICE_DEBUG -I$(QTDIR)/include -I../../libs/libmyth
 
 #
 # no debug:
 #
 
-#CXXFLAGS = -Wall -DLCD_DEVICE -I$(QTDIR)/include		
+#CXXFLAGS = -Wall -DLCD_DEVICE -I$(QTDIR)/include -I../../libs/libmyth
 
 
-LINK	 = -Wl,-rpath,$(QTDIR)/lib  -L$(QTDIR)/lib  -L/usr/X11R6/lib  -L/usr/X11R6/lib -lqt-mt -lpthread -lXmu -lICE -lXext -lX11 -lm
+LINK	 = -Wl,-rpath,$(QTDIR)/lib  -L../../libs/libmyth -L../../libs/libmythtv -L$(QTDIR)/lib  -L/usr/X11R6/lib  -L/usr/X11R6/lib -lqt-mt -lpthread -lXmu -lICE -lXext -lX11 -lm -lmyth
 MOC	 = $(QTDIR)/bin/moc
 
-all: 			main.o lcddevice.o moc_lcddevice.o mythlcd.o moc_mythlcd.o
-			$(CXX) lcddevice.o moc_lcddevice.o main.o mythlcd.o moc_mythlcd.o -o mythlcd $(LINK)
+all: 			main.o mythlcd.o moc_mythlcd.o
+			$(CXX) main.o mythlcd.o moc_mythlcd.o -o mythlcd $(LINK)
 
-main.o:			main.cpp lcddevice.h 
+main.o:			main.cpp 
 			$(CXX) $(CXXFLAGS) main.cpp -c
-
-lcddevice.o:		lcddevice.h lcddevice.cpp
-			$(CXX) $(CXXFLAGS) lcddevice.cpp -c
-
-moc_lcddevice.o:	lcddevice.h lcddevice.cpp
-			$(MOC) lcddevice.h -o moc_lcddevice.cpp
-			$(CXX) $(CXXFLAGS) moc_lcddevice.cpp -c
 
 mythlcd.o:		mythlcd.h mythlcd.cpp
 			$(CXX) $(CXXFLAGS) mythlcd.cpp -c
