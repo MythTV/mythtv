@@ -460,12 +460,14 @@ void FileAssocDialog::makeNewExtension()
     //  dialog/widgets
     //
 
-    new_extension_popup = new MythPopupBox(gContext->GetMainWindow(), "new extension popup");
+    new_extension_popup = new MythPopupBox(gContext->GetMainWindow(), 
+                                           "new extension popup");
     gContext->ThemeWidget(new_extension_popup);
     //new_extension_popup->setPaletteForegroundColor(popupHighlight);
 
     QLabel *above_filler = new QLabel("", new_extension_popup);
-    QLabel *message = new QLabel("Please enter the new extension:", new_extension_popup);
+    QLabel *message = new QLabel(tr("Please enter the new extension:"), 
+                                 new_extension_popup);
     QLabel *below_filler = new QLabel("", new_extension_popup);
 
     above_filler->setBackgroundOrigin(ParentOrigin);
@@ -475,8 +477,10 @@ void FileAssocDialog::makeNewExtension()
     
     new_extension_editor = new MythRemoteLineEdit(new_extension_popup);
 
-    MythPushButton *create_button = new MythPushButton("Create new extension", new_extension_popup);
-    MythPushButton *nevermind_button = new MythPushButton("Cancel", new_extension_popup); 
+    MythPushButton *create_button = new MythPushButton(tr("Create new extension"), 
+                                                       new_extension_popup);
+    MythPushButton *nevermind_button = new MythPushButton(tr("Cancel"), 
+                                                          new_extension_popup); 
     
     
     new_extension_popup->addWidget(above_filler, false);
@@ -621,21 +625,21 @@ void FileAssocDialog::wireUpTheme()
     done_button = getUITextButtonType("done_button");
     if(done_button)
     {
-        done_button->setText("Done");
+        done_button->setText(tr("Done"));
         connect(done_button, SIGNAL(pushed()), this, SLOT(saveAndExit()));
     }
 
     new_button = getUITextButtonType("new_button");
     if(new_button)
     {
-        new_button->setText("New");
+        new_button->setText(tr("New"));
         connect(new_button, SIGNAL(pushed()), this, SLOT(makeNewExtension()));
     }
 
     delete_button = getUITextButtonType("delete_button");
     if(delete_button)
     {
-        delete_button->setText("Delete");
+        delete_button->setText(tr("Delete"));
         connect(delete_button, SIGNAL(pushed()), this, SLOT(deleteCurrent()));
     }
     buildFocusList();

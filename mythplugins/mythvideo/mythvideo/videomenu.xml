@@ -6,6 +6,7 @@
      <text lang="ES">Ver vídeos</text>
      <text lang="CA">Veure vídeos</text>
      <text lang="DK">Gennemse film</text>
+     <text lang="PT">Ver Filmes</text>
      <action>BROWSER</action>
    </button>
 
@@ -15,6 +16,7 @@
      <text lang="ES">Listar vídeos</text>
      <text lang="CA">Llistar vídeos</text>
      <text lang="DK">Film oversigt</text>
+     <text lang="PT">Lista de Filmes</text>
      <action>LISTING</action>
    </button>
 
@@ -24,6 +26,7 @@
      <text lang="ES">Gestionar vídeos</text>
      <text lang="CA">Gestionar vídeos</text>
      <text lang="DK">Film opsætning</text>
+     <text lang="PT">Gerir Filmes</text>
      <action>MANAGER</action>
    </button>
   

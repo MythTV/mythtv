@@ -118,7 +118,7 @@ bool VideoTree::checkParentPassword()
     if(password.length() > 0)
     {
         bool ok = false;
-        MythPasswordDialog *pwd = new MythPasswordDialog("Parental Pin:",
+        MythPasswordDialog *pwd = new MythPasswordDialog(tr("Parental Pin:"),
                                                          &ok,
                                                          password,
                                                          gContext->GetMainWindow());
@@ -290,7 +290,7 @@ void VideoTree::buildVideoList()
             //  Nothing survived the requirements
             //
 
-            video_tree_data->addNode("No files found", -1, false);
+            video_tree_data->addNode(tr("No files found"), -1, false);
         }        
     }
     else

@@ -75,8 +75,8 @@ int mythplugin_run(void)
 {
     QTranslator translator( 0 );
     translator.load(PREFIX + QString("/share/mythtv/i18n/mythvideo_") + 
-                    QString(gContext->GetSetting("Locale")) + QString(".qm"),
-                    ".");
+                    QString(gContext->GetSetting("Language").lower()) + 
+                    QString(".qm"), ".");
     qApp->installTranslator(&translator);
 
     QString startdir = gContext->GetSetting("VideoStartupDir", 
@@ -94,8 +94,8 @@ int mythplugin_config(void)
 {
     QTranslator translator( 0 );
     translator.load(PREFIX + QString("/share/mythtv/i18n/mythvideo_") +
-                    QString(gContext->GetSetting("Locale")) + QString(".qm"),
-                    ".");
+                    QString(gContext->GetSetting("Language").lower()) + 
+                    QString(".qm"), ".");
     qApp->installTranslator(&translator);
 
     QString startdir = gContext->GetSetting("VideoStartupDir",
@@ -182,7 +182,7 @@ bool checkParentPassword()
     if(password.length() > 0)
     {
         bool ok = false;
-        MythPasswordDialog *pwd = new MythPasswordDialog("Parental Pin:",
+        MythPasswordDialog *pwd = new MythPasswordDialog(QObject::tr("Parental Pin:"),
                                                          &ok,
                                                          password,
                                                          gContext->GetMainWindow());
@@ -294,8 +294,8 @@ void SearchDir(QSqlDatabase *db, QString &directory)
     int counter = 0;
 
     MythProgressDialog *file_checking =
-                         new MythProgressDialog("Searching for video files",
-                                                query.numRowsAffected());
+               new MythProgressDialog(QObject::tr("Searching for video files"),
+                                      query.numRowsAffected());
 
     if (query.isActive() && query.numRowsAffected() > 0)
     {
@@ -317,7 +317,8 @@ void SearchDir(QSqlDatabase *db, QString &directory)
     delete file_checking;
 
     file_checking =
-        new MythProgressDialog("Updating video database", video_files.size());
+        new MythProgressDialog(QObject::tr("Updating video database"), 
+                               video_files.size());
 
     Metadata *myNewFile = NULL;
 
@@ -329,8 +330,10 @@ void SearchDir(QSqlDatabase *db, QString &directory)
             QString name(iter.key());
             name.replace(quote_regex, "\"\"");
 
-            myNewFile = new Metadata(name, "No Cover", "", 1895, "00000000", 
-                                     "Unknown", "None", 0.0, "NR", 0, 0, 1);
+            myNewFile = new Metadata(name, QObject::tr("No Cover"), "", 
+                                     1895, "00000000", QObject::tr("Unknown"), 
+                                     QObject::tr("None"), 0.0, 
+                                     QObject::tr("NR"), 0, 0, 1);
             myNewFile->guessTitle();
             myNewFile->dumpToDatabase(db);
             if (myNewFile)

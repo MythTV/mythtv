@@ -1,5 +1,5 @@
 USE mythconverg;
-CREATE TABLE videometadata
+CREATE TABLE IF NOT EXISTS videometadata
 (
     intid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
     title VARCHAR(128) NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE videometadata
     INDEX (title)
 );
  
-CREATE TABLE videotypes
+CREATE TABLE IF NOT EXISTS videotypes
 (
     intid       INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
     extension   VARCHAR(128) NOT NULL,

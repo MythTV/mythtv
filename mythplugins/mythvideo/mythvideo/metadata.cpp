@@ -147,13 +147,13 @@ void Metadata::dumpToDatabase(QSqlDatabase *db)
     if (title == "")
         title = filename;
     if (director == "")
-        director = "Unknown";
+        director = QObject::tr("Unknown");
     if (plot == "")
-        plot = "None";
+        plot = QObject::tr("None");
     if (rating == "")
-        rating = "Unknown Rating";
+        rating = QObject::tr("Unknown Rating");
     if (coverfile == "")
-        coverfile = "None";
+        coverfile = QObject::tr("None");
     if (inetref == "")
         inetref = "00000000";
 
@@ -201,13 +201,13 @@ void Metadata::updateDatabase(QSqlDatabase *db)
     if (title == "")
         guessTitle();
     if (director == "")
-        director = "Unknown";
+        director = QObject::tr("Unknown");
     if (plot == "")
-        plot = "None";
+        plot = QObject::tr("None");
     if (rating == "")
-        rating = "Unknown Rating";
+        rating = QObject::tr("Unknown Rating");
     if (coverfile == "")
-        coverfile = "None";
+        coverfile = QObject::tr("None");
     if (inetref == "")
         inetref = "00000000";
 

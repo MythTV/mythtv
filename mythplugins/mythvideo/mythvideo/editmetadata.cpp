@@ -58,7 +58,7 @@ void EditMetadataDialog::fillWidgets()
     {
         for(int i = 1; i < 5; i++)
         {
-            level_select->addItem(i, QString("Level %1").arg(i));
+            level_select->addItem(i, QString(tr("Level %1")).arg(i));
         }
         level_select->setToItem(working_metadata->ShowLevel());
     }
@@ -69,7 +69,7 @@ void EditMetadataDialog::fillWidgets()
         //  with all available videos. 
         //  
 
-        child_select->addItem(0, "None");
+        child_select->addItem(0, tr("None"));
         QString q_string = QString("SELECT intid, title FROM videometadata ORDER BY title ;");
         QSqlQuery a_query(q_string, db);
         if(a_query.isActive() && a_query.numRowsAffected() > 0)
@@ -254,7 +254,7 @@ void EditMetadataDialog::toggleBrowse(bool yes_or_no)
 void EditMetadataDialog::findCoverArt()
 {
     QString *new_coverart_file = new QString("");
-    if(working_metadata->CoverFile() != "No Cover")
+    if(working_metadata->CoverFile() != tr("No Cover"))
     {
         *new_coverart_file = working_metadata->CoverFile();
     }
@@ -347,7 +347,7 @@ void EditMetadataDialog::wireUpTheme()
     done_button = getUITextButtonType("done_button");
     if(done_button)
     {
-        done_button->setText("Done");
+        done_button->setText(tr("Done"));
         connect(done_button, SIGNAL(pushed()), this, SLOT(saveAndExit()));
     }
 

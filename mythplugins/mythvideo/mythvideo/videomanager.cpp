@@ -334,7 +334,7 @@ QMap<QString, QString> VideoManager::parseMovieList(QString data)
  
     if (data.find("Sorry there were no matches for the title") > 0)
     {
-        listing["ERROR"] = "Sorry there were no matches for the title";
+        listing["ERROR"] = tr("Sorry there were no matches for the title");
         return listing;
     }
 
@@ -611,9 +611,9 @@ int VideoManager::GetMovieListing(QString movieName)
         }
     }
 
-    movieList["manual"] = "Manually Enter IMDB #";
-    movieList["reset"] = "Reset Entry";
-    movieList["cancel"] = "Cancel";
+    movieList["manual"] = tr("Manually Enter IMDB #");
+    movieList["reset"] = tr("Reset Entry");
+    movieList["cancel"] = tr("Cancel");
     ret = 2;
 
     return ret;
@@ -947,16 +947,17 @@ void VideoManager::updateInfo(QPainter *p)
        QString plot = curitem->Plot();
        QString userrating = QString("%1").arg(curitem->UserRating());
        QString rating = curitem->Rating();
-       QString length = QString("%1").arg(curitem->Length()) + " minutes";
+       QString length = QString("%1").arg(curitem->Length()) + " " + 
+                        tr("minutes");
        QString level = QString("%1").arg(curitem->ShowLevel());
        QString browseable = "";
        if(curitem->Browse())
        {
-         browseable = "Yes";
+         browseable = tr("Yes");
        }
        else
        {
-         browseable = "No";
+         browseable = tr("No");
        }
 
        LayerSet *container = NULL;
@@ -1438,9 +1439,9 @@ void VideoManager::videoMenu()
        backup.end();
 
        movieList.clear();
-       movieList["manual"] = "Manually Enter IMDB #";
-       movieList["reset"] = "Reset Entry";
-       movieList["cancel"] = "Cancel";
+       movieList["manual"] = tr("Manually Enter IMDB #");
+       movieList["reset"] = tr("Reset Entry");
+       movieList["cancel"] = tr("Cancel");
        inListMovie = 0;
        inDataMovie = 0;
        listCountMovie = 0;
@@ -1629,16 +1630,16 @@ void VideoManager::selected()
 
 void VideoManager::ResetCurrentItem()
 {
-    QString coverFile = "No Cover";
+    QString coverFile = tr("No Cover");
 
     curitem->guessTitle();
     curitem->setCoverFile(coverFile);
     curitem->setYear(1895);
     curitem->setInetRef("00000000");
-    curitem->setDirector("Unknown");
-    curitem->setPlot("None");
+    curitem->setDirector(tr("Unknown"));
+    curitem->setPlot(tr("None"));
     curitem->setUserRating(0.0);
-    curitem->setRating("NR");
+    curitem->setRating(tr("NR"));
     curitem->setLength(0);
     curitem->setShowLevel(1);
 

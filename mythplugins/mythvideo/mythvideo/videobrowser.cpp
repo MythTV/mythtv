@@ -106,7 +106,7 @@ bool VideoBrowser::checkParentPassword()
     if(password.length() > 0)
     {
         bool ok = false;
-        MythPasswordDialog *pwd = new MythPasswordDialog("Parental Pin:",
+        MythPasswordDialog *pwd = new MythPasswordDialog(tr("Parental Pin:"),
                                                          &ok,
                                                          password,
                                                          gContext->GetMainWindow());
@@ -368,6 +368,8 @@ void VideoBrowser::SetCurrentItem()
             inData = 0;
             it = m_list.begin();
         }
+
+        curitem = new Metadata(*(it));
     }
     curitem = new Metadata(*(it));
 }
@@ -379,14 +381,14 @@ void VideoBrowser::updateBrowsing(QPainter *p)
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
 
-    QString vidnum = "The law of the exluded middle is officially OVER!";  
+    QString vidnum;  
     if(m_list.count() > 0)
     {
-        vidnum = QString("%1 of %2").arg(inData + 1).arg(m_list.count());
+        vidnum = QString(tr("%1 of %2")).arg(inData + 1).arg(m_list.count());
     }
     else
     {
-        vidnum = "No Videos";
+        vidnum = tr("No Videos");
     }
 
     LayerSet *container = NULL;
@@ -437,7 +439,7 @@ void VideoBrowser::updateInfo(QPainter *p)
        QString userrating = QString("%1").arg(curitem->UserRating());
        QString rating = curitem->Rating();
        if (rating == "<NULL>")
-           rating = "No rating available.";
+           rating = tr("No rating available.");
        QString length = QString("%1").arg(curitem->Length()) + " minutes";
        QString level = QString("%1").arg(curitem->ShowLevel());
 
