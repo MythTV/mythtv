@@ -776,8 +776,11 @@ void vxmlParser::PlayTTSPrompt(QString prompt, bool dtmfInterrupts)
     //Wave.print();   
     //Wave.saveToFile("/home/mythtv/test1.wav");
 
-    Rtp->Transmit(Wave.getData(), Wave.samples());
-    waitUntilFinished(dtmfInterrupts);
+    if (Wave.getData())
+    {
+        Rtp->Transmit(Wave.getData(), Wave.samples());
+        waitUntilFinished(dtmfInterrupts);
+    }
 }
 
 void vxmlParser::PlaySilence(int ms, bool dtmfInterrupts)
