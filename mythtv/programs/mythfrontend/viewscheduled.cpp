@@ -406,14 +406,14 @@ void ViewScheduled::FillList(void)
         cntStr.sprintf("%d", cnt);
         if (p->conflicting)
             conflictBool = true;
-        if (!p->recording && showLevel != showAll &&
-              (showLevel != showImportant ||
-               p->norecord <= nrOtherShowing))
-            continue;
-        conflictData[cntStr] = *p;
+        if (p->recording || showLevel == showAll ||
+            (showLevel == showImportant && p->norecord > nrOtherShowing))
+        {
+            conflictData[cntStr] = *p;
+            dataCount++;
+            cnt--;
+        }
         delete p;
-        cnt--;
-        dataCount++;
     }
 }
 
