@@ -105,7 +105,9 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     pip = false;
     hardware_encode = false;
     hmjpg_quality = 80;
-    hmjpg_decimation = 2;
+    hmjpg_hdecimation = 2;
+    hmjpg_vdecimation = 2;
+    hmjpg_maxw = 640;
 	
     videoFilterList = "";
 }
@@ -287,22 +289,30 @@ void NuppelVideoRecorder::Initialize(void)
     {
         codec = "mjpeg";
         hardware_encode = true;
+
+        switch (hmjpg_hdecimation)
+        {
+            case 2: w = 352; break;
+            case 4: w = 176; break;
+            default: w = hmjpg_maxw; break;
+        }
+
         if (ntsc)
         {
-            switch (hmjpg_decimation)
+            switch (hmjpg_vdecimation)
             {
-                case 2: w = 352; h = 240; break;
-                case 4: w = 176; h = 120; break;
-                default: w = 720; h = 480; break;
+                case 2: h = 240; break;
+                case 4: h = 120; break;
+                default: h = 480; break;
             }
         }
         else
         {
-            switch (hmjpg_decimation)
+            switch (hmjpg_vdecimation)
             {
-                case 2: w = 352; h = 288; break;
-                case 4: w = 176; h = 144; break;
-                default: w = 720; h = 576; break;
+                case 2: h = 288; break;
+                case 4: h = 144; break;
+                default: h = 576; break;
             }
         }
     }
@@ -665,6 +675,13 @@ again:
 
     if ((vc.type & VID_TYPE_MJPEG_ENCODER) && hardware_encode)
     {
+        if (vc.maxwidth >= 768)
+            hmjpg_maxw = 768;
+        else if (vc.maxwidth >= 704)
+            hmjpg_maxw = 704;
+        else
+            hmjpg_maxw = 640;
+
         DoMJPEG();
         return;
     }
@@ -807,10 +824,50 @@ void NuppelVideoRecorder::DoMJPEG(void)
     //bparm.input = 2;
     //bparm.norm = 1;
     bparm.quality = hmjpg_quality;
-    bparm.decimation = hmjpg_decimation;
 
-    for (int n = 0; n < 14; n++)
-         bparm.APP_data[n] = 0;
+    if (hmjpg_hdecimation == hmjpg_vdecimation)
+    {
+        bparm.decimation = hmjpg_hdecimation;
+    }
+    else
+    {
+        bparm.decimation = 0;
+        bparm.HorDcm = hmjpg_hdecimation;
+        bparm.VerDcm = (hmjpg_vdecimation + 1) / 2;
+
+        if (hmjpg_vdecimation == 1)
+        {
+            bparm.TmpDcm = 1;
+            bparm.field_per_buff = 2;
+        }
+        else
+        {
+            bparm.TmpDcm = 2;
+            bparm.field_per_buff = 1;
+        }
+
+        bparm.img_width = hmjpg_maxw;
+      
+        if (ntsc)
+            bparm.img_height = 240;
+        else 
+            bparm.img_height = 288;
+
+        bparm.img_x = 0;
+        bparm.img_y = 0;
+    }
+
+    bparm.APPn = 0;
+
+    if (hmjpg_vdecimation == 1)
+        bparm.APP_len = 14;
+    else
+        bparm.APP_len = 0;
+
+    bparm.odd_even = !(hmjpg_vdecimation > 1);
+
+    for (int n = 0; n < bparm.APP_len; n++)
+        bparm.APP_data[n] = 0;
 
     if (ioctl(fd, MJPIOC_S_PARAMS, &bparm) < 0)
     {

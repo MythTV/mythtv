@@ -204,12 +204,26 @@ public:
     };
 };
 
-class HardwareMJPEGDecimation: public CodecParam, public SliderSetting {
+class HardwareMJPEGHDecimation: public CodecParam, public ComboBoxSetting {
 public:
-    HardwareMJPEGDecimation(const RecordingProfile& parent):
-        CodecParam(parent, "hardwaremjpegdecimation"),
-        SliderSetting(1, 2, 1) {
-        setLabel("Decimation");
+    HardwareMJPEGHDecimation(const RecordingProfile& parent):
+        CodecParam(parent, "hardwaremjpeghdecimation") {
+        setLabel("Horizontal Decimation");
+        addSelection("1");
+        addSelection("2");
+        addSelection("4");
+        setValue(2);
+    };
+};
+
+class HardwareMJPEGVDecimation: public CodecParam, public ComboBoxSetting {
+public:
+    HardwareMJPEGVDecimation(const RecordingProfile& parent):
+        CodecParam(parent, "hardwaremjpegvdecimation") {
+        setLabel("Vertical Decimation");
+        addSelection("1");
+        addSelection("2");
+        addSelection("4");
         setValue(2);
     };
 };
@@ -251,7 +265,8 @@ public:
         params = new VerticalConfigurationGroup();
         params->setLabel("Hardware MJPEG Parameters");
         params->addChild(new HardwareMJPEGQuality(parent));
-        params->addChild(new HardwareMJPEGDecimation(parent));
+        params->addChild(new HardwareMJPEGHDecimation(parent));
+        params->addChild(new HardwareMJPEGVDecimation(parent));
  
         addTarget("Hardware MJPEG", params);
         codecName->addSelection("Hardware MJPEG");

@@ -55,7 +55,8 @@ class NuppelVideoRecorder
     void SetVideoDevice(QString device) { videodevice = device; }
     void SetTVFormat(QString tvformat);
     void SetHMJPGQuality(int quality) { hmjpg_quality = quality; }
-    void SetHMJPGDecimation(int deci) { hmjpg_decimation = deci; }
+    void SetHMJPGHDecimation(int deci) { hmjpg_hdecimation = deci; }
+    void SetHMJPGVDecimation(int deci) { hmjpg_vdecimation = deci; }
     
     void Initialize(void);
     void StartRecording(void);
@@ -233,7 +234,9 @@ class NuppelVideoRecorder
 
     bool hardware_encode;
     int hmjpg_quality;
-    int hmjpg_decimation;
+    int hmjpg_hdecimation;
+    int hmjpg_vdecimation;
+    int hmjpg_maxw;
 };
 
 #endif

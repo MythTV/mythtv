@@ -153,6 +153,9 @@ public:
 
         addTarget("tv_grab_uk_rt", new XMLTV_generic_config(parent, "tv_grab_uk_rt"));
         grabber->addSelection("United Kingdom (alternative)","tv_grab_uk_rt");
+
+        addTarget("tv_grab_nz", new XMLTV_generic_config(parent, "tv_grab_nz"));
+        grabber->addSelection("New Zealand", "tv_grab_nz");
     };
 };
 

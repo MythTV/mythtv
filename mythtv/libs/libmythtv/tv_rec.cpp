@@ -437,7 +437,8 @@ void TVRec::SetupRecorder(RecordingProfile& profile)
     } else if (setting == "Hardware MJPEG") {
       nvr->SetCodec("hardware-mjpeg");
       nvr->SetHMJPGQuality(profile.byName("hardwaremjpegquality")->getValue().toInt());
-      nvr->SetHMJPGDecimation(profile.byName("hardwaremjpegdecimation")->getValue().toInt());
+      nvr->SetHMJPGHDecimation(profile.byName("hardwaremjpeghdecimation")->getValue().toInt());
+      nvr->SetHMJPGVDecimation(profile.byName("hardwaremjpegvdecimation")->getValue().toInt());
     } else {
       cerr << "Unknown video codec: " << setting << endl;
     }
