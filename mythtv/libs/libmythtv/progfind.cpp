@@ -30,7 +30,7 @@
 
 using namespace std;
 
-#include <mythtv/mythcontext.h>
+#include "libmyth/mythcontext.h"
 
 
 void RunProgramFind(MythContext *context, bool thread,

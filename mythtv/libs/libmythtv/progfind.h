@@ -20,7 +20,7 @@
 #include <qstringlist.h>
 #include <qlayout.h>
 
-#include <mythtv/mythwidgets.h>
+#include "libmyth/mythwidgets.h"
 #include "tv.h"
 
 class QLabel;
