@@ -640,6 +640,13 @@ void VideoOutputXvMC::PrepareFrame(VideoFrame *buffer)
     data->p_render_surface_to_show = render;
 
     data->lastframe = buffer;
+
+    if (needrepaint)
+    {
+        DrawUnusedRects();
+        needrepaint = false;
+    }
+
     pthread_mutex_unlock(&lock);
 }
 
@@ -740,14 +747,16 @@ void VideoOutputXvMC::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
 void VideoOutputXvMC::DrawUnusedRects(void)
 {
     XSetForeground(data->XJ_disp, data->XJ_gc, colorkey);
-    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 0, 0,
+    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, dispx, dispy,
                    dispw, disph);
 
     XSetForeground(data->XJ_disp, data->XJ_gc, XJ_black);
-    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 0, 0, dispw,
-                   dispyoff);
-    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 0,
+    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, dispx, dispy, 
+                   dispw, dispyoff);
+    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, dispx,
                    dispyoff + disphoff, dispw, dispyoff);
+
+    XSync(data->XJ_disp, false);
 }
 
 void VideoOutputXvMC::UpdatePauseFrame(void)
@@ -758,6 +767,9 @@ void VideoOutputXvMC::ProcessFrame(VideoFrame *frame, OSD *osd,
                                    vector<VideoFilter *> &filterList,
                                    NuppelVideoPlayer *pipPlayer)
 {
+    (void)filterList;
+    (void)pipPlayer;
+
     if (!frame)
         frame = data->lastframe;
     if (!frame)
