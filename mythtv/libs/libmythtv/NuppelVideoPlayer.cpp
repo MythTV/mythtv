@@ -141,6 +141,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
 
     cc = false;
     lastccrow = 0;
+
+    limitKeyRepeat = false;
 }
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
@@ -1628,6 +1630,10 @@ bool NuppelVideoPlayer::DoRewind(void)
     if (desiredFrame < 0)
         desiredFrame = 0;
 
+    limitKeyRepeat = false;
+    if (desiredFrame < video_frame_rate)
+        limitKeyRepeat = true;
+
     decoder->DoRewind(desiredFrame);
 
     ClearAfterSeek();
@@ -1637,10 +1643,12 @@ bool NuppelVideoPlayer::DoRewind(void)
 long long NuppelVideoPlayer::CalcMaxFFTime(long long ff)
 {
     long long maxtime = (long long)(1.0 * video_frame_rate);
-    if (watchingrecording && nvr_enc && nvr_enc->IsValidRecorder())
+    if (livetv || (watchingrecording && nvr_enc && nvr_enc->IsValidRecorder()))
         maxtime = (long long)(3.0 * video_frame_rate);
     
     long long ret = ff;
+
+    limitKeyRepeat = false;
 
     if (livetv || (watchingrecording && nvr_enc && nvr_enc->IsValidRecorder()))
     {
@@ -1649,6 +1657,9 @@ long long NuppelVideoPlayer::CalcMaxFFTime(long long ff)
             ret = 0;
         else if (behind - ff <= maxtime)
             ret = behind - maxtime;
+
+        if (behind < maxtime * 3)
+            limitKeyRepeat = true;
     }
     else
     {

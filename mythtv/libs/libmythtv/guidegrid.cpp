@@ -38,24 +38,27 @@ QString RunProgramGuide(QString startchannel, bool thread, TV *player)
     if (startchannel == QString::null)
         startchannel = "";
 
-    GuideGrid gg(gContext->GetMainWindow(), startchannel, player, "guidegrid");
+    GuideGrid *gg = new GuideGrid(gContext->GetMainWindow(), startchannel, 
+                                  player, "guidegrid");
 
-    gg.Show();
+    gg->Show();
 
     if (thread)
     {
         qApp->unlock();
 
-        while (gg.isVisible())
+        while (gg->isVisible())
             usleep(50);
     }
     else
-        gg.exec();
+        gg->exec();
 
-    chanstr = gg.getLastChannel();
+    chanstr = gg->getLastChannel();
 
     if (thread)
         qApp->lock();
+
+    delete gg;
 
     if (thread)
         qApp->unlock();

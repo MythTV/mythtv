@@ -97,6 +97,9 @@ TV::TV(QSqlDatabase *db)
 
     muteTimer = new QTimer(this);
     connect(muteTimer, SIGNAL(timeout()), SLOT(UnMute()));
+
+    keyrepeatTimer = new QTimer(this);
+    connect(keyrepeatTimer, SIGNAL(timeout()), SLOT(KeyRepeatOK()));
 }
 
 void TV::Init(bool createWindow)
@@ -115,6 +118,8 @@ void TV::Init(bool createWindow)
 
     runMainLoop = false;
     changeState = false;
+
+    keyRepeat = true;
 
     if (createWindow)
     {
@@ -1342,6 +1347,9 @@ void TV::DoInfo(void)
 
 void TV::DoFF(int time)
 {
+    if (!keyRepeat)
+        return;
+
     bool muted = false;
 
     if (volumeControl && !volumeControl->GetMute())
@@ -1369,10 +1377,19 @@ void TV::DoFF(int time)
 
     if (muted) 
         muteTimer->start(600, true);
+
+    if (activenvp->GetLimitKeyRepeat())
+    {
+        keyRepeat = false;
+        keyrepeatTimer->start(300, true);
+    }
 }
 
 void TV::DoRew(int time)
 {
+    if (!keyRepeat)
+        return;
+
     bool muted = false;
 
     if (volumeControl && !volumeControl->GetMute())
@@ -1400,10 +1417,19 @@ void TV::DoRew(int time)
 
     if (muted) 
         muteTimer->start(600, true);
+
+    if (activenvp->GetLimitKeyRepeat())
+    {
+        keyRepeat = false;
+        keyrepeatTimer->start(300, true);
+    }
 }
 
 void TV::DoJumpAhead(void)
 {
+    if (!keyRepeat)
+        return;
+
     bool muted = false;
 
     if (volumeControl && !volumeControl->GetMute())
@@ -1427,10 +1453,19 @@ void TV::DoJumpAhead(void)
 
     if (muted) 
         muteTimer->start(600, true);
+
+    if (activenvp->GetLimitKeyRepeat())
+    {
+        keyRepeat = false;
+        keyrepeatTimer->start(300, true);
+    }
 }
 
 void TV::DoJumpBack(void)
 {
+    if (!keyRepeat)
+        return;
+
     bool muted = false;
 
     if (volumeControl && !volumeControl->GetMute())
@@ -1454,6 +1489,12 @@ void TV::DoJumpBack(void)
 
     if (muted) 
         muteTimer->start(600, true);
+
+    if (activenvp->GetLimitKeyRepeat())
+    {
+        keyRepeat = false;
+        keyrepeatTimer->start(300, true);
+    }
 }
 
 void TV::DoQueueTranscode(void)
@@ -2063,6 +2104,11 @@ void TV::EPGChannelUpdate(QString chanstr)
     }
 }
 
+void TV::KeyRepeatOK(void)
+{
+    keyRepeat = true;
+}
+
 void TV::UnMute(void)
 {
     // If muted, unmute
@@ -2103,6 +2149,7 @@ void TV::customEvent(QCustomEvent *e)
 
             if (cardnum == recorder->GetRecorderNumber())
             {
+                menurunning = false;
                 AskAllowRecording(me->ExtraData(), timeuntil);
             }
         }
@@ -2115,6 +2162,7 @@ void TV::customEvent(QCustomEvent *e)
 
             if (cardnum == recorder->GetRecorderNumber())
             {
+                menurunning = false;
                 wantsToQuit = false;
                 exitPlayer = true;
             }

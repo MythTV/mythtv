@@ -241,19 +241,8 @@ public:
     TimeOffset():
         BackendSetting("TimeOffset") {
         setLabel("Time offset for XMLTV listings");
-        addSelection("(None)", "");
-        addSelection("-0100");
-        addSelection("-0200");
-        addSelection("-0300");
-        addSelection("-0400");
-        addSelection("-0500");
-        addSelection("-0600");
-        addSelection("-0700");
-        addSelection("-0800");
-        addSelection("-0900");
-        addSelection("-1000");
-        addSelection("-1100");
-        addSelection("-1200");
+        addSelection("None", "");
+        addSelection("Auto");
         addSelection("+0100");
         addSelection("+0200");
         addSelection("+0300");
@@ -266,9 +255,22 @@ public:
         addSelection("+1000");
         addSelection("+1100");
         addSelection("+1200");
+        addSelection("-1100");
+        addSelection("-1000");
+        addSelection("-0900");
+        addSelection("-0800");
+        addSelection("-0700");
+        addSelection("-0600");
+        addSelection("-0500");
+        addSelection("-0400");
+        addSelection("-0300");
+        addSelection("-0200");
+        addSelection("-0100");
         setHelpText("If your local timezone does not match the timezone "
                     "returned by XMLTV, use this setting to have "
-                    "mythfilldatabase adjust the program start and end times.");
+                    "mythfilldatabase adjust the program start and end times."
+                    "None will disable this feature, Auto will automatically "
+                    "detect your local timezone");
     };
 };
 

@@ -50,6 +50,7 @@ class TV : public QObject
     TVState GetState(void);
     bool IsPlaying(void) { return StateIsPlaying(GetState()); }
     bool IsRecording(void) { return StateIsRecording(GetState()); }
+    bool IsMenuRunning(void) { return menurunning; }
 
     void GetNextProgram(RemoteEncoder *enc, int direction,
                         QMap<QString, QString> &regexpMap);
@@ -82,6 +83,7 @@ class TV : public QObject
   protected slots:
     void SetPreviousChannel(void);
     void UnMute(void);
+    void KeyRepeatOK(void);
 
   protected:
     void doLoadMenu(void);
@@ -232,6 +234,9 @@ class TV : public QObject
     int lastRecorderNum;
     bool getRecorderPlaybackInfo;
     ProgramInfo *recorderPlaybackInfo;
+
+    bool keyRepeat;
+    QTimer *keyrepeatTimer;
 };
 
 #endif

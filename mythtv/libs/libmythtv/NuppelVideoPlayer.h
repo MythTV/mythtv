@@ -146,6 +146,8 @@ class NuppelVideoPlayer
     int GetEof(void) { return eof; }
     void SetFramesPlayed(long long played) { framesPlayed = played; }
 
+    bool GetLimitKeyRepeat(void) { return limitKeyRepeat; }
+
  protected:
     void OutputVideoLoop(void);
 
@@ -394,6 +396,8 @@ class NuppelVideoPlayer
 
     bool reducejitter;
     bool experimentalsync;
+
+    bool limitKeyRepeat;
 };
 
 #endif

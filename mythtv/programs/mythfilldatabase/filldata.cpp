@@ -264,37 +264,51 @@ ChanInfo *parseChannel(QDomElement &element, QUrl baseUrl)
     return chaninfo;
 }
 
-void addTimeOffset(QString &timestr, int config_off, QString offset )
+void addTimeOffset(QString &timestr, int localTimezoneOffset)
 {
+    if (timestr.isEmpty() || localTimezoneOffset < -12 || 
+        localTimezoneOffset > 12)
+        return;
+
     bool ok;
-    int off = offset.stripWhiteSpace().left(3).toInt(&ok, 10);
-            
-    if (ok && (off != config_off))
+
+    QStringList split = QStringList::split(" ", timestr);
+    QString ts = split[0];
+    int ts_offset = localTimezoneOffset;
+    if (split.size() > 1)
     {
-        int diff = config_off - off;
+        QString tmp = split[1];
+        ts_offset = tmp.stripWhiteSpace().left(3).toInt(&ok, 10);
+        if (!ok)
+            ts_offset = localTimezoneOffset;
+    }
+
+    if (ts_offset != localTimezoneOffset)
+    {
+        int diff = localTimezoneOffset - ts_offset;
         int year = 0, month = 0, day = 0, hour = 0, min = 0, sec = 0;
                 
-        if (timestr.length() == 14)
+        if (ts.length() == 14)
         {
-            year  = timestr.left(4).toInt(&ok, 10);
-            month = timestr.mid(4,2).toInt(&ok, 10);
-            day   = timestr.mid(6,2).toInt(&ok, 10);
-            hour  = timestr.mid(8,2).toInt(&ok, 10);
-            min   = timestr.mid(10,2).toInt(&ok, 10);
-            sec   = timestr.mid(12,2).toInt(&ok, 10);
+            year  = ts.left(4).toInt(&ok, 10);
+            month = ts.mid(4,2).toInt(&ok, 10);
+            day   = ts.mid(6,2).toInt(&ok, 10);
+            hour  = ts.mid(8,2).toInt(&ok, 10);
+            min   = ts.mid(10,2).toInt(&ok, 10);
+            sec   = ts.mid(12,2).toInt(&ok, 10);
         }
-        else if (timestr.length() == 12)
+        else if (ts.length() == 12)
         {
-            year  = timestr.left(4).toInt(&ok, 10);
-            month = timestr.mid(4,2).toInt(&ok, 10);
-            day   = timestr.mid(6,2).toInt(&ok, 10);
-            hour  = timestr.mid(8,2).toInt(&ok, 10);
-            min   = timestr.mid(10,2).toInt(&ok, 10);
+            year  = ts.left(4).toInt(&ok, 10);
+            month = ts.mid(4,2).toInt(&ok, 10);
+            day   = ts.mid(6,2).toInt(&ok, 10);
+            hour  = ts.mid(8,2).toInt(&ok, 10);
+            min   = ts.mid(10,2).toInt(&ok, 10);
             sec   = 0;
         }
         else
         {
-            cerr << "Unknown timestamp format: " << timestr << endl;
+            cerr << "Unknown timestamp format: " << ts << endl;
         }
                 
         QDateTime dt = QDateTime(QDate(year, month, day),QTime(hour, min, sec));
@@ -319,57 +333,21 @@ void parseCredits(QDomElement &element, ProgInfo *pginfo)
     }
 }
 
-ProgInfo *parseProgram(QDomElement &element)
+ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
 {
-    QString config_offset = gContext->GetSetting("TimeOffset");
-    
-    bool ok;
-    int config_off = 0;
-
-    if (config_offset != "")
-        config_off = config_offset.left(3).toInt(&ok, 10);
-
     ProgInfo *pginfo = new ProgInfo;
  
     QString text = element.attribute("start", "");
-    QStringList split = QStringList::split(" ", text);
-
-    QString st = split[0];
-    QString offset;
-    if (split.size() > 1)
-        offset = split[1];
-    else
-        offset = config_offset;
-
-    if (config_off >= 0 && config_off <= 24 && offset != "")
-        addTimeOffset(st, config_off, offset);
-
-    pginfo->startts = st;
+    addTimeOffset(text, localTimezoneOffset);
+    pginfo->startts = text;
 
     text = element.attribute("stop", "");
-    split = QStringList::split(" ", text);
-
-    QString et;
-
-    if (split.size() > 0)
-    {
-        et = split[0];
-        if (split.size() > 1)
-            offset = split[1];
-        else
-            offset = config_offset;
-    }
-    else
-        et = "";
-
-    if (config_off >= 0 && config_off <= 24 && offset != "")
-        addTimeOffset(et, config_off, offset);
-
-    pginfo->endts = et;
+    addTimeOffset(text, localTimezoneOffset);
+    pginfo->endts = text;
 
     text = element.attribute("channel", "");
-    split = QStringList::split(" ", text);
-    
+    QStringList split = QStringList::split(" ", text);   
+ 
     pginfo->channel = split[0];
 
     pginfo->start = fromXMLTVDate(pginfo->startts);
@@ -519,6 +497,30 @@ void parseFile(QString filename, QValueList<ChanInfo> *chanlist,
 
     f.close();
 
+    // now we calculate the localTimezoneOffset, so that we can fix
+    // the programdata if needed
+    QString config_offset = gContext->GetSetting("TimeOffset", "None");
+    int localTimezoneOffset = 13;
+
+    if (config_offset == "None")
+    {
+        // we disable this feature by setting it invalid
+        localTimezoneOffset = 13;
+    }
+    else if (config_offset == "Auto")
+    {
+        QDateTime utcdt = QDateTime::currentDateTime(Qt::UTC);
+        QDateTime ldt = QDateTime::currentDateTime();
+        localTimezoneOffset = utcdt.secsTo(ldt) / 3600;
+    }
+    else
+    {
+        bool ok;
+        localTimezoneOffset = config_offset.left(3).toInt(&ok, 10);
+        if (!ok)
+            localTimezoneOffset = 13;
+    }
+
     QDomElement docElem = doc.documentElement();
 
     QUrl baseUrl(docElem.attribute("source-data-url", ""));
@@ -537,7 +539,7 @@ void parseFile(QString filename, QValueList<ChanInfo> *chanlist,
             }
             else if (e.tagName() == "programme")
             {
-                ProgInfo *pginfo = parseProgram(e);
+                ProgInfo *pginfo = parseProgram(e, localTimezoneOffset);
                 (*proglist)[pginfo->channel].push_back(*pginfo);
                 delete pginfo;
             }
