@@ -270,7 +270,8 @@ void ThreadedFileWriter::DiskLoop()
 
         if ((!in_dtor) &&
             (!flush) &&
-            (((unsigned)size < tfw_min_write_size) && (written >= tfw_min_write_size)))
+            (((unsigned) size < tfw_min_write_size) && 
+             ((unsigned) written >= tfw_min_write_size)))
         {
             usleep(500);
             continue;
@@ -302,7 +303,7 @@ void ThreadedFileWriter::DiskLoop()
             size = safe_write(fd, buf+rpos, size);
         }
         
-        if (written < tfw_min_write_size)
+        if ((unsigned) written < tfw_min_write_size)
         {
             written += size;
         }
@@ -584,8 +585,7 @@ int RingBuffer::safe_read(int fd, void *data, unsigned sz)
                 break;
 
             zerocnt++;
-            if ((normalfile && zerocnt > 15) ||
-                zerocnt >= 50) // 3 second timeout with usleep(60000)
+            if (zerocnt >= 50) // 3 second timeout with usleep(60000)
             {
                 break;
             }
@@ -1078,7 +1078,7 @@ int RingBuffer::Read(void *buf, int count)
                 if (!availWait.wait(&availWaitMutex, 15000))
                 {
                     VERBOSE(VB_IMPORTANT,"Couldn't read data from the capture card in 15 "
-                            "seconds.  Game over, man.");
+                            "seconds. Stopping.");
                     StopReads();
                 }
 
