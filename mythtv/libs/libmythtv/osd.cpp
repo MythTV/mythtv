@@ -68,7 +68,7 @@ OSD::OSD(int width, int height, int frint, const QString &font,
 
     SetDefaults();
 
-    drawSurface = new OSDSurface(displaywidth, displayheight);
+    drawSurface = new OSDSurface(width, height);
 }
 
 OSD::~OSD(void)
