@@ -2511,14 +2511,14 @@ void NuppelVideoPlayer::LoadCommBreakList(void)
 char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
                                        int &vh)
 {
+    disablevideo = true;
+
     if (OpenFile() < 0)
         return NULL;
     if (!decoder)
         return NULL;
     if (!hasFullPositionMap)
         return NULL;
-
-    disablevideo = true;
 
     InitVideo();
 
@@ -2728,6 +2728,8 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     int audioframesize;
     int audioFrame = 0;
 
+    disablevideo = true;
+
     QPtrList<struct kfatable_entry> kfa_table;
 
     QDateTime curtime = QDateTime::currentDateTime();
@@ -2859,8 +2861,6 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     }
 
     playing = true;
-
-    disablevideo = true;
 
     InitVideo();
 
@@ -3227,6 +3227,8 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
     blankMap.clear();
     commBreakMap.clear();
 
+    disablevideo = true;
+
     if (OpenFile() < 0)
         return(0);
 
@@ -3236,7 +3238,6 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
 
     playing = true;
 
-    disablevideo = true;
     InitVideo();
 
     for (int i = 0; i < MAXTBUFFER; i++)
