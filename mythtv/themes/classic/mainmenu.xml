@@ -134,6 +134,13 @@
    </button>
 
    <button>
+      <type>PHONE</type>
+      <text>Phone</text>
+      <action>PLUGIN mythphone</action>
+      <depends>mythphone</depends>
+   </button>
+
+   <button>
       <type>RECIPE</type>
       <text>Recipes</text>
       <action>PLUGIN mythRecipe</action>

@@ -173,6 +173,13 @@
    </button>
 
    <button>
+      <type>PHONE</type>
+      <text>Phone Settings</text>
+      <action>CONFIGPLUGIN mythphone</action>
+      <depends>mythphone</depends>
+   </button>
+
+   <button>
      <type>SETTINGS_XBOX</type>
      <text>Xbox Settings</text>
      <text lang="PT">Configurar XBox</text>
