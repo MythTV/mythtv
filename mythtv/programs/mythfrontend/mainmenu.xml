@@ -67,7 +67,7 @@
      <text lang="NL">Het Weer</text>
      <text lang="FR">Météo</text>
      <text lang="DE">Wetter</text>
-     <action>EXEC mythweather</action>
+     <action>PLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
 
