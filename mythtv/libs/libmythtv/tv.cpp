@@ -203,7 +203,6 @@ void TV::HandleStateChange(void)
     bool changed = false;
     bool startPlayer = false;
     bool startRecorder = false;
-    bool pauseBetween = false;
     bool closePlayer = false;
     bool closeRecorder = false;
 
@@ -232,7 +231,7 @@ void TV::HandleStateChange(void)
         internalState = nextState;
         changed = true;
 
-        startPlayer = startRecorder = pauseBetween = true;
+        startPlayer = startRecorder = true;
 
         printf("Changing from %s to %s\n", origname.c_str(), statename.c_str());
     }
@@ -335,11 +334,6 @@ void TV::HandleStateChange(void)
         channel->SetFd(nvr->GetVideoFd());
 
         frameRate = nvr->GetFrameRate();
-    }
-
-    if (pauseBetween)
-    {
-        usleep(500000);
     }
 
     if (startPlayer)
@@ -591,8 +585,6 @@ void TV::ChangeChannel(bool up)
     nvr->Reset();
     nvr->Unpause();
 
-    //usleep(500000);
-
     nvp->ResetPlaying();
     while (!nvp->ResetYet())
         usleep(5);
@@ -666,7 +658,6 @@ void TV::ChangeChannel(char *name)
     nvr->Reset();
     nvr->Unpause();
 
-    usleep(500000);
     nvp->ResetPlaying();
     while (!nvp->ResetYet())
         usleep(5);
