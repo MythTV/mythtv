@@ -8,6 +8,7 @@
 #include <qthread.h>
 
 #include "treecheckitem.h"
+#include <mythtv/uitypes.h>
 
 class QSqlDatabase;
 class AllMusic;
@@ -143,6 +144,7 @@ class MusicNode
     void        printYourself(int indent_amount);   // debugging
     void        clearTracks(){my_tracks.clear();}
     void        putYourselfOnTheListView(TreeCheckItem *parent, bool show_node);
+    void        writeTree(GenericTree *tree_to_write_to, int a_counter);
     void        sort();
     
   private:
@@ -191,6 +193,7 @@ class AllMusic
     void        buildTree();
     void        printTree();    // debugging
     void        sortTree();
+    void        writeTree(GenericTree *tree_to_write_to);
     void        intoTree(Metadata* inserter);
     MusicNode*  findRightNode(Metadata* inserter, uint depth);
     void        setSorting(QString a_paths);

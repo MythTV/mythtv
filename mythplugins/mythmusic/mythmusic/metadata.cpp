@@ -566,6 +566,27 @@ void AllMusic::buildTree()
     }
 }
 
+void AllMusic::writeTree(GenericTree *tree_to_write_to)
+{
+    GenericTree *sub_node = tree_to_write_to->addNode("All My Music", 0);
+    sub_node->setAttribute(0, 0);
+    sub_node->setAttribute(1, 0);
+    sub_node->setAttribute(2, 0);
+    sub_node->setAttribute(3, 0);
+    
+
+    QPtrListIterator<MusicNode> iter( top_nodes );
+    MusicNode *traverse;
+    iter.toFirst();
+    int a_counter = 0;
+    while ( (traverse = iter.current()) != 0 )
+    {
+        traverse->writeTree(sub_node, a_counter);
+        ++a_counter;
+        ++iter;
+    }
+}
+
 void AllMusic::putYourselfOnTheListView(TreeCheckItem *where)
 {
 
@@ -855,6 +876,60 @@ void MusicNode::putYourselfOnTheListView(TreeCheckItem *parent, bool show_node)
     }
     
 }
+
+void MusicNode::writeTree(GenericTree *tree_to_write_to, int a_counter)
+{
+    
+    GenericTree *sub_node = tree_to_write_to->addNode(my_title);
+    sub_node->setAttribute(0, 0);
+    sub_node->setAttribute(1, a_counter);
+    sub_node->setAttribute(2, a_counter);
+    sub_node->setAttribute(3, a_counter);
+    
+    QPtrListIterator<Metadata>  anit(my_tracks);
+    Metadata *a_track;
+    int track_counter = 0;
+    anit.toFirst();
+    while( (a_track = anit.current() ) != 0)
+    {
+        QString title_temp = QString("%1 - %2").arg(a_track->Track()).arg(a_track->Title());
+        GenericTree *subsub_node = sub_node->addNode(title_temp, a_track->ID(), true);
+        subsub_node->setAttribute(0, 1);
+        subsub_node->setAttribute(1, track_counter);    // regular order
+        subsub_node->setAttribute(2, rand());           // random order
+
+        //
+        //  "Intelligent" ordering
+        //
+        QDateTime cTime = QDateTime::currentDateTime();
+        double currentDateTime = cTime.toString("yyyyMMddhhmmss").toDouble();
+        int rating = a_track->Rating();
+        int playcount = a_track->PlayCount();
+        double lastplay = a_track->LastPlay();
+        double ratingValue = (double)rating / 10;
+        double playcountValue = (double)playcount / 50;
+        double lastplayValue = (currentDateTime - lastplay) / currentDateTime * 2000;
+        double rating_value =  (35 * ratingValue - 25 * playcountValue + 25 * lastplayValue + 
+                                15 * (double)rand() / (RAND_MAX + 1.0));
+        int integer_rating = (int) rating_value * 100000;
+        subsub_node->setAttribute(3, integer_rating);   //  "intelligent" order
+        ++track_counter;
+        ++anit;
+    }  
+
+    
+    QPtrListIterator<MusicNode> iter(my_subnodes);
+    MusicNode *sub_traverse;
+    int another_counter = 0;
+    iter.toFirst();
+    while( (sub_traverse = iter.current() ) != 0)
+    {
+        sub_traverse->writeTree(sub_node, another_counter);
+        ++another_counter;
+        ++iter;
+    }
+}
+
 
 void MusicNode::sort()
 {

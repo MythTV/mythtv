@@ -40,15 +40,15 @@ using namespace std;
 static QPtrList<VisFactory> *visfactories = 0;
 
 MainVisual::MainVisual(QWidget *parent, const char *name)
-    : QDialog( parent, name ), vis( 0 ), playing( FALSE ), fps( 20 )
+    : QWidget( parent, name ), vis( 0 ), playing( FALSE ), fps( 20 )
 {
     int screenwidth = 0, screenheight = 0;
     float wmult = 0, hmult = 0;
    
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
-    setGeometry(0, 0, screenwidth, screenheight);
-    setFixedSize(QSize(screenwidth, screenheight));
+    setGeometry(0, 0, parent->width(), parent->height());
+    //setFixedSize(QSize(parent->width(), parent->height()));
 
     setFont(QFont("Arial", (int)(18 * hmult), QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
@@ -56,20 +56,21 @@ MainVisual::MainVisual(QWidget *parent, const char *name)
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
     timer->start(1000 / fps);
-
 }
 
+/*
 void MainVisual::keyPressEvent(QKeyEvent *e)
 {
     if(e->key() == Key_Escape)
     {
-        QDialog::keyPressEvent(e);
+        QWidget::keyPressEvent(e);
     }
     else
     {
         emit keyPress(e);
     }
 }
+*/
 
 MainVisual::~MainVisual()
 {
@@ -266,7 +267,7 @@ void MainVisual::hideEvent(QHideEvent *e)
 {
     setVis(0);
     emit hidingVisualization();
-    QDialog::hideEvent(e);
+    QWidget::hideEvent(e);
 }
 
 void MainVisual::registerVisFactory(VisFactory *vis)
@@ -797,4 +798,5 @@ VisualBase::~VisualBase()
     //	can destruct properly
     //
 }
+
 

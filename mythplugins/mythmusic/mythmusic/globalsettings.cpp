@@ -162,6 +162,19 @@ public:
     };
 };
 
+class UseShowWholeTree: public CheckBoxSetting, public GlobalSetting {
+public:
+    UseShowWholeTree():
+        GlobalSetting("ShowWholeTree") {
+        setLabel("Show entire music tree");
+        setValue(false);
+        setHelpText("If selected, you can navigate your entire music "
+                    "tree from the playing screen. This value will "
+                    "be ignored if keyboard accelerators are turned "
+                    "off.");
+    };
+};
+
 //Player Settings
 
 class PlayMode: public ComboBoxSetting, public GlobalSetting {
@@ -353,6 +366,7 @@ PlayerSettings::PlayerSettings()
     playersettings->setLabel("Playback Settings");
     playersettings->addChild(new PlayMode());
     playersettings->addChild(new UseShowRatings());
+    playersettings->addChild(new UseShowWholeTree());
     playersettings->addChild(new UseListShuffled());
     addChild(playersettings);
 

@@ -62,7 +62,7 @@ class VisualBase
 };
 
 // base class to handle things like frame rate...
-class MainVisual : public QDialog, public Visual
+class MainVisual : public QWidget, public Visual
 {
     Q_OBJECT
 
@@ -101,11 +101,11 @@ public slots:
 
 signals:
     void hidingVisualization();
-    void keyPress(QKeyEvent *e);
+    //void keyPress(QKeyEvent *e);
 
 protected:
 
-    virtual void keyPressEvent(QKeyEvent *e);
+    //virtual void keyPressEvent(QKeyEvent *e);
     
 private:
     VisualBase *vis;

@@ -30,7 +30,7 @@ Spectrum::Spectrum()
     analyzerBarWidth = 6;
     scaleFactor = 2.0;
     falloff = 3.0;
-    fps = 60;
+    fps = 20;
 	
 #ifdef FFTW_SUPPORT
     plan =  rfftw_create_plan(512, FFTW_REAL_TO_COMPLEX, FFTW_ESTIMATE);
@@ -419,12 +419,12 @@ Gears::Gears(QWidget *parent, const char *name)
     // (unlike spectrum, above) so we just use
     // the Qt GL class.
 
-    int screenwidth = 0, screenheight = 0;
-    float wmult = 0.0, hmult = 0.0;
+    //int screenwidth = 0, screenheight = 0;
+    //float wmult = 0.0, hmult = 0.0;
 
-    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-    setGeometry(0, 0, screenwidth, screenheight);
-    setFixedSize(QSize(screenwidth, screenheight));
+    //gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+    setGeometry(0, 0, parent->width(), parent->height());
+    //setFixedSize(QSize(screenwidth, screenheight));
 
     angle = 0.0;
     view_roty = 30.0;

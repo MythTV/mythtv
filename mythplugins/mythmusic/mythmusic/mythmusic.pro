@@ -17,8 +17,10 @@ INSTALLS += target
 
 installfiles.path = $${PREFIX}/share/mythtv
 installfiles.files = musicmenu.xml music_settings.xml
+uifiles.path = $${PREFIX}/share/mythtv/themes/default
+uifiles.files = music-ui.xml images/*.png
 
-INSTALLS += installfiles
+INSTALLS += installfiles uifiles
 
 LIBS += -lmad -lid3tag -logg -lvorbisfile -lvorbis -lvorbisenc -lcdaudio -lFLAC
 LIBS += -lcdda_paranoia -lcdda_interface -L$${PREFIX}/lib -lmyth-$$LIBVERSION

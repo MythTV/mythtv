@@ -15,8 +15,15 @@ static unsigned short rand_pos;
 
 
 static inline int RAND() {
-	++rand_pos;
-	return rand_tab[rand_pos];
+    if(rand_pos < NB_RAND - 1)
+    {
+    	++rand_pos;
+    }
+    if(rand_tab)
+    {
+    	return rand_tab[rand_pos];
+    }
+    return 0;
 }
 
 #define RAND_CLOSE()\

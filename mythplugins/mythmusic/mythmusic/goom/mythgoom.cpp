@@ -22,6 +22,7 @@ Goom::Goom(long int winid)
     fps = 20;
 
     surface = NULL;
+    buffer = NULL;
 
     static char SDL_windowhack[32];
     sprintf(SDL_windowhack, "SDL_WINDOWID=%ld", winid);
@@ -33,7 +34,6 @@ Goom::Goom(long int winid)
         return;
     }
 
-    surface = SDL_SetVideoMode(800, 600, 32, SDL_RESIZABLE);
     SDL_ShowCursor(0);
 
     goom_init(800, 600, 0);
@@ -65,7 +65,7 @@ void Goom::resize(const QSize &newsize)
     size.setHeight((size.height() / 2) * 2);
     size.setWidth((size.width() / 2) * 2);
 
-    surface = SDL_SetVideoMode(size.width(), size.height(), 32, SDL_RESIZABLE);
+    surface = SDL_SetVideoMode(size.width(), size.height(), 32, 0);
     goom_set_resolution(size.width() / scalew, size.height() / scaleh, 0);
 }
 
@@ -110,6 +110,9 @@ bool Goom::draw(QPainter *p, const QColor &back)
         cerr << "No sdl surface\n";
         return false;
     }
+
+    if (!buffer)
+        return false;
 
     if (scalew != 1 || scaleh != 1)
     {

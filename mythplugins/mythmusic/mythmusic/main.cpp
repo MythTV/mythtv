@@ -231,7 +231,8 @@ void SearchDir(QSqlDatabase *db, QString &directory)
 
 void startPlayback(PlaylistsContainer *all_playlists, AllMusic *all_music)
 {
-    PlaybackBox *pbb = new PlaybackBox(all_playlists, all_music);
+    PlaybackBox *pbb = new PlaybackBox("music_play", "music-", 
+                                       all_playlists, all_music);
     pbb->Show();
 
     qApp->unlock();

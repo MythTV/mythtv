@@ -9,6 +9,7 @@
 
 #include "metadata.h"
 #include "treecheckitem.h"
+#include <mythtv/uitypes.h>
 
 class PlaylistsContainer;
 
@@ -61,6 +62,7 @@ class Playlist
     void saveNewPlaylist(QSqlDatabase *a_db, QString a_host);
     void putYourselfOnTheListView(QListViewItem *a_parent);
     void writeMetadata(QPtrList<Metadata> *list_to_write_to);
+    void writeTree(GenericTree *tree_to_write_to, int a_counter);
     void describeYourself(); //  debugging
     void fillSongsFromSonglist();
     void fillSonglistFromSongs();
@@ -75,6 +77,7 @@ class Playlist
     QString getName(){return name;} 
     void    setName(QString a_name){name = a_name;}
     int     getID(){return playlistid;}
+    int     getFirstTrackID();
     void    setID(int x){playlistid = x;}
     bool    containsReference(int to_check, int depth);
 
@@ -117,6 +120,7 @@ class PlaylistsContainer
     void            setActiveWidget(PlaylistTitle *widget);
     PlaylistTitle*  getActiveWidget(){return active_widget;}
     void            writeActive(QPtrList<Metadata> *list_to_write_to);
+    void            writeTree(GenericTree *tree_to_write_to);
     void            clearCDList();
     void            addCDTrack(int x);
     void            removeCDTrack(int x);

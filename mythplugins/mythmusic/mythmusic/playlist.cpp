@@ -1,7 +1,7 @@
 #include <iostream>
 using namespace std;
 #include "playlist.h"
-
+#include "qdatetime.h"
 #include <mythtv/mythcontext.h>
 
 
@@ -381,6 +381,16 @@ void Playlist::putYourselfOnTheListView(QListViewItem *a_listviewitem)
     }  
 }
 
+int Playlist::getFirstTrackID()
+{
+    Track *it = songs.first();
+    if(it)
+    {
+        return it->getValue();
+    }
+    return 0;
+}
+
 Playlist::~Playlist()
 {
 }
@@ -612,6 +622,56 @@ void Playlist::saveNewPlaylist(QSqlDatabase *a_db, QString a_host)
     }
 }
 
+void Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
+{
+    Track *it;
+    for(it = songs.first(); it; it = songs.next())
+    {
+        if(it->getValue() == 0)
+        {
+            cerr << "playlist.o: Oh crap ... how did we get something with an ID of 0 on a playlist?" << endl ;
+        }
+        if(it->getValue() > 0)
+        {
+            // Normal track
+            Metadata *tmpdata = all_available_music->getMetadata(it->getValue());
+            if (tmpdata)
+            {
+                QString a_string = QString("%1 ~ %2").arg(tmpdata->Artist()).arg(tmpdata->Title());
+                GenericTree *added_node = tree_to_write_to->addNode(a_string, it->getValue(), true);
+                ++a_counter;
+                added_node->setAttribute(0, 1);
+                added_node->setAttribute(1, a_counter); //  regular order
+                added_node->setAttribute(2, rand()); //  random order
+                
+                //
+                //  Compute "intelligent" weighting
+                //
+                
+                QDateTime cTime = QDateTime::currentDateTime();
+                double currentDateTime = cTime.toString("yyyyMMddhhmmss").toDouble();
+                int rating = tmpdata->Rating();
+                int playcount = tmpdata->PlayCount();
+                double lastplay = tmpdata->LastPlay();
+                double ratingValue = (double)rating / 10;
+                double playcountValue = (double)playcount / 50;
+                double lastplayValue = (currentDateTime - lastplay) / currentDateTime * 2000;
+                double rating_value =  (35 * ratingValue - 25 * playcountValue + 25 * lastplayValue + 
+                                        15 * (double)rand() / (RAND_MAX + 1.0));
+                int integer_rating = (int) rating_value * 100000;
+                added_node->setAttribute(3, integer_rating); //  "intelligent" order
+            }
+        }
+        if(it->getValue() < 0)
+        {
+            // it's a playlist, recurse (mildly)
+            Playlist *level_down = parent->getPlaylist((it->getValue()) * -1);
+            if (level_down)
+                level_down->writeTree(tree_to_write_to, a_counter);
+        }
+    }  
+}
+
 void Playlist::writeMetadata(QPtrList<Metadata> *list_to_write_to)
 {
     Track *it;
@@ -637,6 +697,41 @@ void Playlist::writeMetadata(QPtrList<Metadata> *list_to_write_to)
         }
     }  
 }
+
+void PlaylistsContainer::writeTree(GenericTree *tree_to_write_to)
+{
+    all_available_music->writeTree(tree_to_write_to);
+
+    GenericTree *sub_node = tree_to_write_to->addNode("All My Playlists", 1);
+    sub_node->setAttribute(0, 1);
+    sub_node->setAttribute(1, 1);
+    sub_node->setAttribute(2, 1);
+    sub_node->setAttribute(3, 1);
+    
+    GenericTree *subsub_node = sub_node->addNode("Active Play Queue", 0);
+    subsub_node->setAttribute(0, 0);
+    subsub_node->setAttribute(1, 0);
+    subsub_node->setAttribute(2, 0);
+    subsub_node->setAttribute(3, 0);
+
+    active_playlist->writeTree(subsub_node, 0);
+
+    QPtrListIterator<Playlist> iterator( *all_other_playlists );  
+    int a_counter = 0;  
+    Playlist *a_list;
+    while( ( a_list = iterator.current() ) != 0)
+    {
+        ++a_counter;
+        GenericTree *new_node = sub_node->addNode(a_list->getName(), a_counter);
+        sub_node->setAttribute(0, 0);
+        sub_node->setAttribute(1, a_counter);
+        sub_node->setAttribute(2, a_counter);
+        sub_node->setAttribute(3, a_counter);
+        a_list->writeTree(new_node, 0);
+        ++iterator;
+    }
+}
+
 
 void PlaylistsContainer::writeActive(QPtrList<Metadata> *list_to_write_to)
 {
