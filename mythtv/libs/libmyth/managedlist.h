@@ -49,8 +49,8 @@ class ManagedListItem : public QObject
         void setText(const QString& newText) { text = newText; emit changed(this); }
  
     public slots:
-        virtual void cursorLeft() { canceled(); }
-        virtual void cursorRight() { selected(); }
+        virtual void cursorLeft(bool page = false) { canceled(); }
+        virtual void cursorRight(bool page = false) { selected(); }
         virtual void select() { selected(); }
         virtual void gotFocus() {}
         
@@ -110,7 +110,8 @@ class IntegerManagedListItem : public ManagedListItem
     Q_OBJECT
     
     public:
-        IntegerManagedListItem(int stepAmt=1,ManagedList* parentList=NULL, QObject* _parent=NULL, const char* _name=0);
+        IntegerManagedListItem(int bigStepAmt = 10, int stepAmt=1,  ManagedList* parentList=NULL, QObject* _parent=NULL, 
+                               const char* _name=0);
         void setTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr, const QString& oneStr, 
                           const QString& posStr);
         void setShortTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr, const QString& oneStr, 
@@ -125,13 +126,14 @@ class IntegerManagedListItem : public ManagedListItem
         const QString& getShortText() const { return shortText; }
         
     public slots:
-        virtual void cursorLeft() { if(enabled) changeValue(-1); }
-        virtual void cursorRight() { if(enabled) changeValue(1); }
+        virtual void cursorLeft(bool page = false) { if(enabled) changeValue(page ? (0 - bigStep) : (0 - step)); }
+        virtual void cursorRight(bool page = false) { if(enabled) changeValue(page ? bigStep : step); }
         
     protected:
         virtual void syncTextToValue();
         void setText(const QString& newText) { text = newText; }
         int step;
+        int bigStep;
         QString negTemplate;
         QString negOneTemplate;
         QString posTemplate;
@@ -171,8 +173,8 @@ class BoolManagedListItem : public ManagedListItem
         
     
     public slots:        
-        virtual void cursorLeft() { if(enabled) setValue(!boolValue()); }
-        virtual void cursorRight() { if(enabled) setValue(!boolValue()); }
+        virtual void cursorLeft(bool page = false) { if(enabled) setValue(!boolValue()); }
+        virtual void cursorRight(bool page = false) { if(enabled) setValue(!boolValue()); }
     
     protected:
         virtual void syncTextToValue();
@@ -191,7 +193,7 @@ class BoundedIntegerManagedListItem : public IntegerManagedListItem
     Q_OBJECT
     
     public: 
-        BoundedIntegerManagedListItem(int minValIn, int maxValIn, int stepIn = 1, ManagedList* parentList=NULL, 
+        BoundedIntegerManagedListItem(int minValIn, int maxValIn, int _bigStep, int _step = 1, ManagedList* parentList=NULL, 
                                       QObject* _parent=NULL, const char* _name=0);
 
         virtual void setValue(int val);
@@ -226,7 +228,7 @@ class ManagedListGroup : public ManagedListItem
         void setParentGroup(ManagedListGroup* pGroup) { parentGroup = pGroup; }
         
         virtual bool hasRight(){ return (itemCount > 0); }
-        virtual void cursorRight();
+        virtual void cursorRight(bool page = false);
         virtual void select();
         
         int getCurIndex() const { return curItem; }
@@ -275,8 +277,8 @@ class SelectManagedListItem : public ManagedListGroup
 
         virtual void clearSelections(void);
         
-        virtual void cursorRight();
-        virtual void cursorLeft();
+        virtual void cursorRight(bool page = false);
+        virtual void cursorLeft(bool page = false);
         virtual void select();
         
         virtual void selectValue(const QString& newValue) { select(newValue, true);}
@@ -470,10 +472,11 @@ class BoolManagedListSetting : public ManagedListSetting
 class IntegerManagedListSetting : public ManagedListSetting
 {
     public:
-        IntegerManagedListSetting(int stepAmt, const QString& ItemName, QString _table, QString _column, ManagedList* _parentList=NULL)
+        IntegerManagedListSetting(int _bigStep, int _step, const QString& ItemName, QString _table, 
+                                  QString _column, ManagedList* _parentList=NULL)
                             : ManagedListSetting(_table, _column, _parentList) 
         {
-            IntegerListItem = new IntegerManagedListItem(stepAmt, _parentList, this, ItemName);
+            IntegerListItem = new IntegerManagedListItem(_bigStep, _step, _parentList, this, ItemName);
             listItem = IntegerListItem;
             connect(listItem, SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
         }
@@ -498,11 +501,11 @@ class IntegerManagedListSetting : public ManagedListSetting
 class BoundedIntegerManagedListSetting : public ManagedListSetting
 {
     public:
-        BoundedIntegerManagedListSetting(int _min, int _max, int stepAmt, const QString& ItemName, 
+        BoundedIntegerManagedListSetting(int _min, int _max, int _bigStep, int _step, const QString& ItemName, 
                                   QString _table, QString _column, ManagedList* _parentList=NULL)
                             : ManagedListSetting(_table, _column, _parentList) 
         {
-            BoundedIntegerListItem = new BoundedIntegerManagedListItem(_min, _max, stepAmt, _parentList, this, ItemName);
+            BoundedIntegerListItem = new BoundedIntegerManagedListItem(_min, _max, _bigStep, _step, _parentList, this, ItemName);
             listItem = BoundedIntegerListItem;
             connect(listItem, SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
         }
@@ -564,8 +567,8 @@ class ManagedList : public QObject
     public slots:
         void cursorDown(bool page = false);
         void cursorUp(bool page = false);
-        void cursorLeft();
-        void cursorRight();
+        void cursorLeft(bool page = false);
+        void cursorRight(bool page = false);
         void select();
         void itemChanged(ManagedListItem* itm);
 

@@ -66,10 +66,11 @@ void BoolManagedListItem::syncTextToValue()
 // IntegerListItem
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-IntegerManagedListItem::IntegerManagedListItem(int stepIn, ManagedList* pList, QObject* _parent, const char* _name)
+IntegerManagedListItem::IntegerManagedListItem(int _bigStep, int _step, ManagedList* pList, QObject* _parent, const char* _name)
                       : ManagedListItem("", pList, _parent, _name)
 {
-    step = stepIn;
+    step = _step;
+    bigStep = _bigStep;
     
     setTemplates("-%1","-%1", "%1", "%1", "%1");
     setShortTemplates("-%1","-%1", "%1", "%1", "%1");
@@ -149,9 +150,9 @@ void IntegerManagedListItem::syncTextToValue()
 // BoundedIntegerListItem
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BoundedIntegerManagedListItem::BoundedIntegerManagedListItem(int minValIn, int maxValIn, int stepIn, ManagedList* pList, 
+BoundedIntegerManagedListItem::BoundedIntegerManagedListItem(int minValIn, int maxValIn, int _bigStep, int stepIn, ManagedList* pList, 
                                                              QObject* _parent, const char* _name)
-                             : IntegerManagedListItem(stepIn, pList, _parent, _name)
+                             : IntegerManagedListItem(_bigStep, stepIn, pList, _parent, _name)
 {
     minVal = minValIn;
     maxVal = maxValIn;
@@ -240,7 +241,7 @@ void ManagedListGroup::doGoBack()
     getParentList()->setCurGroup(parentGroup);
 }
 
-void ManagedListGroup::cursorRight()
+void ManagedListGroup::cursorRight(bool page)
 {
     getParentList()->setCurGroup(this);
 }
@@ -358,7 +359,7 @@ void SelectManagedListItem::clearSelections(void)
 }
 
 
-void SelectManagedListItem::cursorRight()
+void SelectManagedListItem::cursorRight(bool page)
 {
     if(!enabled)
         return;
@@ -373,7 +374,7 @@ void SelectManagedListItem::cursorRight()
     changed();
 }
 
-void SelectManagedListItem::cursorLeft()
+void SelectManagedListItem::cursorLeft(bool page)
 {
     if(!enabled)
         return;
@@ -556,7 +557,20 @@ void ManagedList::cursorDown(bool page)
     if (curGroup)
     {
         int newIndex = curGroup->getCurIndex();
+        
         newIndex += (page ? listSize : 1);
+        
+        if(newIndex >= listSize)
+            newIndex = newIndex - listSize;
+        
+        
+        while(curGroup->getItem(newIndex)->getEnabled() == false)
+        {
+            ++newIndex;
+            if(newIndex >= listSize )
+                newIndex = 0;
+        }
+
         curGroup->setCurIndex(newIndex);
         getParent()->update(listRect);
     }
@@ -568,22 +582,33 @@ void ManagedList::cursorUp(bool page)
     if (curGroup)
     {
         int newIndex = curGroup->getCurIndex();
+        
         newIndex -= (page ? listSize : 1);
+        if(newIndex < 0)
+            newIndex = listSize + newIndex;
+                
+        while(curGroup->getItem(newIndex)->getEnabled() == false)
+        {
+            --newIndex;
+            if(newIndex <= 0 )
+                newIndex = listSize - 1;
+        }
+        
         curGroup->setCurIndex(newIndex);
         getParent()->update(listRect);
     }
 }
 
 
-void ManagedList::cursorLeft()
+void ManagedList::cursorLeft(bool page)
 {
-    curGroup->getCurItem()->cursorLeft();
+    curGroup->getCurItem()->cursorLeft(page);
 }
 
 
-void ManagedList::cursorRight()
+void ManagedList::cursorRight(bool page)
 {
-    curGroup->getCurItem()->cursorRight();
+    curGroup->getCurItem()->cursorRight(page);
 }
 
 

@@ -135,9 +135,13 @@ void RecOptDialog::keyPressEvent(QKeyEvent *e)
         else if (action == "SELECT")
             listMenu.select();
         else if (action == "LEFT")
-            listMenu.cursorLeft();
+            listMenu.cursorLeft(false);
         else if (action == "RIGHT")
-            listMenu.cursorRight();
+            listMenu.cursorRight(false);
+        else if (action == "PAGELEFT")
+            listMenu.cursorLeft(true);
+        else if (action == "PAGERIGHT")
+            listMenu.cursorRight(true);            
         else
             handled = false;
     }
@@ -158,7 +162,7 @@ void RecOptDialog::updateInfo(QPainter *p)
         QMap<QString, QString> infoMap;
         
         if(schedRec)
-            schedRec->toMap(infoMap);
+            schedRec->ToMap(infoMap);
         else
             // this should NEVER happen
             return;
