@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2002-12-20, v1.054
+  2002-12-23, v1.055
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -1647,7 +1647,7 @@
 
        # urpmi.addmedia stealth-contrib ftp://ftp.stealth.net/pub/mirrors/ftp.mandrake.com/Mandrake/9.0/contrib/RPMS
        with ./synthesis.hdlist2.cz
-       # urpmi mad flac libcdaudio cdparanoia libvorbis-devel
+       # urpmi mad flac libcdaudio cdparanoia libvorbis-devel libcdda0-devel
 
   Install libvorbis-devel using urpmi or the Mandrake Control Center
   installer.
@@ -1659,7 +1659,6 @@
   Once all the pre-requisites have been installed, you can proceed with
   getting mythmusic going.
 
-       $ ./configure
        $ make
        $ su
        # make install

@@ -3,7 +3,7 @@
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-12-20, v1.054
+<date>2002-12-23, v1.055
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1556,7 +1556,7 @@ there may be issues with some software.
 <tscreen><verb>
 # urpmi.addmedia stealth-contrib ftp://ftp.stealth.net/pub/mirrors/ftp.mandrake.com/Mandrake/9.0/contrib/RPMS
 with ./synthesis.hdlist2.cz
-# urpmi mad flac libcdaudio cdparanoia libvorbis-devel
+# urpmi mad flac libcdaudio cdparanoia libvorbis-devel libcdda0-devel
 </verb></tscreen>
 
 Install libvorbis-devel using urpmi or the Mandrake Control Center
@@ -1568,7 +1568,6 @@ Install cdparanoia using urpmi or the Mandrake Control Center.
 <p>Once all the pre-requisites have been installed, you can proceed with
 getting mythmusic going.
 <tscreen><verb>
-$ ./configure
 $ make
 $ su
 # make install
@@ -1759,6 +1758,9 @@ Celeron's.  (Newer Celeron's support SSE)
 v1.053, 2002-12-20.  Added a Miscellaneous section so that I could add text about MDZ's mplayer patch.
 v1.054, 2002-12-20.  Changed name of CVS box; added troubleshooting hint on
 CVS checkouts.
+v1.055, 2002-12-23.  James Wiggins (wigginjs@mailbox.sc.edu) Remove the
+"./configure" step from mythmusic - doesn't belong there.  Add
+libcdda0-devel.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
