@@ -106,7 +106,8 @@ package export::transcode;
             }
         # Here, we have to fork off a copy of mythtranscode (no need to use --fifosync with transcode -- it seems to do this on its own)
             $mythtranscode = "nice -n 19 mythtranscode --showprogress -p autodetect -c $episode->{channel} -s $episode->{start_time_sep} -f \"/tmp/fifodir_$$/\"";
-            $mythtranscode .= ' --honorcutlist' if ($self->{'use_cutlist'});
+            # let transcode handle the cutlist -- got too annoyed with the first/last frame(s) showing up no matter what I told mythtranscode
+            #$mythtranscode .= ' --honorcutlist' if ($self->{'use_cutlist'});
         }
     # Figure out the input files
         if ($episode->{'finfo'}{'is_mpeg'}) {
@@ -131,7 +132,7 @@ package export::transcode;
             $transcode .= " -j $h,$w,$h,$w" if ($h || $w);
         }
     # Use the cutlist?  (only for mpeg files -- nuv files are handled by mythtranscode)
-        if ($episode->{'finfo'}{'is_mpeg'} && $self->{'use_cutlist'} && $episode->{'cutlist'} && $episode->{'cutlist'} =~ /\d/) {
+        if ($self->{'use_cutlist'} && $episode->{'cutlist'} && $episode->{'cutlist'} =~ /\d/) {
             my @skiplist;
             foreach my $cut (split("\n", $episode->{'cutlist'})) {
                 push @skiplist, (split(" - ", $cut))[0]."-".(split(" - ", $cut))[1];
