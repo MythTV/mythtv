@@ -87,6 +87,7 @@
 167,AM Snow,snowshow.png
 171,Snow to Ice,snowshow.png
 172,Wintry Mix/Wind,rainsnow.png
+173,Strong Storms,thunshowers.png
 175,PM Light Snow,flurries.png
 178,AM Drizzle,lshowers.png
 189,Strong Storms/Wind,thunshowers.png
@@ -98,6 +99,8 @@
 231,Rain,showers.png
 259,Hvy Rain/Freezing Rain,showers.png
 271,Snow Showers/Windy,snowshow.png
+986,Heavy T-Storms,thunshowers.png
+987,Showers in the Vicinity,lshowers.png
 988,Partly Cloudy/Windy,pcloudy.png
 989,Light Rain Shower,lshowers.png
 990,Light Rain with Thunder,thunshowers.png
