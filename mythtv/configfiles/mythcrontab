@@ -1,0 +1,5 @@
+# The following will run mythfilldatabase at 18:00 every day.  Format is
+# minutes hour day_of_month month day_of_week
+# In the case of mythfilldatabase, we want it to run at 18 daily.
+# man 5 crontab for more information
+0 18 * * * /usr/local/bin/mythfilldatabase

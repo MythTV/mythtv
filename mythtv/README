@@ -56,17 +56,6 @@ the resolution you selected wasn't liked by the v4l subsystem.
 
 See the UPGRADING file for information on upgrading between releases.
 
-Next, you need to run the setup program that should be located in the setup/ 
-subdir.  It will ask you some questions about your hardware, and then run 
-xmltv's grabber to configure your channels.
-
-Once you've run the setup program, just run 'mythfilldata' to download and
-insert a week's worth of program data into the database.  'mythfilldata' should
-be run once a day, if you want to keep your database current.  If you want
-more control over what channels get inserted into the databaes, or need to setup
-finetuning amounts for specific channels (like in xawtv), run 
-'mythfilldatabase --manual' instead.
-
 Once 'mythfilldata' has finished, try running the 'mythepg' binary.  It should 
 be populated with program info.  Just hit escape to exit out of it.
 
@@ -82,12 +71,6 @@ up. This should be pretty simple to figure out.  mythfrontend is designed to
 be the main interface of the application.  It also provides all the support for
 scheduled recordings, so keep in mind that it needs to be running for 
 shows to get recorded.
-
-In the 'configfiles' subdir there are some example lirc config files to get a
-remote working with this stuff.  Just use irxevent and it should all work.
-
-Whew.  If you thought this compile process sucked, I'll accept pretty much
-any patch sent my way that improves it.
 
 Time for some more configuration.  There are a couple .txt files in 
 /usr/local/share/mythtv/.  The theme.txt will let you switch between themes

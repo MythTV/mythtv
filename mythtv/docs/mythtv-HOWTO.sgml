@@ -571,7 +571,41 @@ of the world need to modify the first line and modify the XMLTVGrabber
 variable to the correct grabber for their region.  <bf>tv_grab_uk</bf> for the
 UK, etc.  Use the name from the xmltv directory.
 
+Now that you've edited your <tt>settings.txt</tt> file, it's time to run the
+setup program and perform the initial configuration.
+
+Open a shell, and switch to the setup directory:
+
+<tscreen><verb>
+% cd setup
+% ./setup
+% cd
+</verb></tscreen>
+
+The setup program will ask you a few questions and then proceed to run the
+XMLTV grabber program.
+
+Now that the setup program has completed, run <bf>mythfilldatabase</bf> to
+get one week of data inserted into the database.
+
+<bf>NOTE</bf>:  <bf>mythfilldatabase</bf> might take a while to complete,
+depending on any number of factors, most of which you can't control.  It's
+best to just let the program run to completion.
+
+<bf>mythfilldatabase --manual</bf> is another option; the manual option will
+allow you to fine tune channel frequencies  and specify which channels will be added to
+the database.
+
+<!-- get more information on the manual setting -->
+
+In order to keep your database filled, <bf>mythfilldatabase</bf> should be
+run once a day.
+
+<!-- add section on crontab -->
+
 <sect>Using mythtv.
+
+
 <sect>Using mythweb.
 <sect>Using mythgallery.
 <sect>Using mythgame.
