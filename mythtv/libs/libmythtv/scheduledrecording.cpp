@@ -377,7 +377,8 @@ void ScheduledRecording::doneRecording(QSqlDatabase* db, const ProgramInfo& prog
         remove(db);
 }
 
-MythDialog* ScheduledRecording::dialogWidget(MythContext* context, QWidget* parent, const char* name) {
+MythDialog* ScheduledRecording::dialogWidget(MythContext* context,
+                                             QWidget* parent, const char* name) {
     float wmult, hmult;
     int screenwidth, screenheight;
     context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
@@ -394,18 +395,19 @@ MythDialog* ScheduledRecording::dialogWidget(MythContext* context, QWidget* pare
     titlefield->setBackgroundOrigin(QWidget::WindowOrigin);
     titlefield->setFont(QFont("Arial", (int)(bigfont * hmult), QFont::Bold));
 
-    // xxx, use DateFormat etc.
+    QString dateFormat = context->GetSetting("DateFormat");
+    QString timeFormat = context->GetSetting("TimeFormat");
     
     QString dateText = "Date: ";
     switch (getRecordingType()) {
     case SingleRecord:
         dateText += QDateTime(startDate->dateValue(),
-                             startTime->timeValue()).toString();
+                             startTime->timeValue()).toString(dateFormat + " " + timeFormat);
         break;
     case TimeslotRecord:
         dateText += QString("%1 - %2")
-            .arg(startTime->timeValue().toString())
-            .arg(endTime->timeValue().toString());
+            .arg(startTime->timeValue().toString(timeFormat))
+            .arg(endTime->timeValue().toString(timeFormat));
         break;
     case ChannelRecord:
     case AllRecord:
