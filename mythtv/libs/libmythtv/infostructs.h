@@ -11,7 +11,7 @@ class ChannelInfo
     ChannelInfo() { icon = NULL; }
    ~ChannelInfo() { if (icon) delete icon; }
 
-    void LoadIcon() { icon = new QPixmap(iconpath); }
+    void LoadIcon();
 
     QString callsign;
     QString iconpath;

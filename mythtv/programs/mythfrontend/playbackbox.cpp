@@ -6,6 +6,7 @@
 #include <qsqldatabase.h>
 #include <qlistview.h>
 #include <qdatetime.h>
+#include <qapplication.h>
 
 #include "playbackbox.h"
 #include "infostructs.h"
@@ -22,14 +23,19 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
 
     title = NULL;
 
-    setGeometry(0, 0, 800, 600);
-    setFixedWidth(800);
-    setFixedHeight(600);
+    int screenheight = QApplication::desktop()->height();
+    int screenwidth = QApplication::desktop()->width();
 
-    setFont(QFont("Arial", 16, QFont::Bold));
+    float wmult = screenwidth / 800.0;
+    float hmult = screenheight / 600.0;
+
+    setGeometry(0, 0, screenwidth, screenheight);
+    setFixedSize(QSize(screenwidth, screenheight));
+
+    setFont(QFont("Arial", 16 * hmult, QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
-    QVBoxLayout *vbox = new QVBoxLayout(this, 20);
+    QVBoxLayout *vbox = new QVBoxLayout(this, 20 * wmult);
 
     QLabel *label = new QLabel("Select a recording to view:", this);
     vbox->addWidget(label);
@@ -39,9 +45,9 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     listview->addColumn("Date");
     listview->addColumn("Title");
  
-    listview->setColumnWidth(0, 40);
-    listview->setColumnWidth(1, 210); 
-    listview->setColumnWidth(2, 500);
+    listview->setColumnWidth(0, 40 * wmult);
+    listview->setColumnWidth(1, 210 * wmult); 
+    listview->setColumnWidth(2, 500 * wmult);
     listview->setColumnWidthMode(0, QListView::Manual);
     listview->setColumnWidthMode(1, QListView::Manual);
 
@@ -113,12 +119,12 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
         // TODO: no recordings
     }
    
-    listview->setFixedHeight(300);
+    listview->setFixedHeight(300 * hmult);
 
-    QHBoxLayout *hbox = new QHBoxLayout(vbox, 10);
+    QHBoxLayout *hbox = new QHBoxLayout(vbox, 10 * wmult);
 
     QGridLayout *grid = new QGridLayout(hbox, 4, 2, 1);
-    
+ 
     title = new QLabel(" ", this);
     title->setFont(QFont("Arial", 25, QFont::Bold));
 
@@ -127,6 +133,7 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
 
     QLabel *sublabel = new QLabel("Episode: ", this);
     subtitle = new QLabel(" ", this);
+    subtitle->setAlignment(Qt::WordBreak | Qt::AlignLeft | Qt::AlignTop);
     QLabel *desclabel = new QLabel("Description: ", this);
     description = new QLabel(" ", this);
     description->setAlignment(Qt::WordBreak | Qt::AlignLeft | Qt::AlignTop);
@@ -142,7 +149,7 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     grid->setColStretch(1, 1);
     grid->setRowStretch(3, 1);
 
-    QPixmap temp(160, 120);
+    QPixmap temp(160 * wmult, 120 * hmult);
 
     pixlabel = new QLabel(this);
     pixlabel->setPixmap(temp);
@@ -155,6 +162,7 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
 void PlaybackBox::Show()
 {
     showFullScreen();
+    raise();
     setActiveWindow();
 }
 

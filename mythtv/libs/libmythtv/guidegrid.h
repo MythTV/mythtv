@@ -78,6 +78,9 @@ class GuideGrid : public QDialog
 
     bool selectState;
     bool showInfo;
+
+    int screenwidth, screenheight;
+    float wmult, hmult;
 };
 
 #define CHANNUM_MAX  128

@@ -3,6 +3,7 @@
 #include <qbuttongroup.h>
 #include <qlabel.h>
 #include <qcursor.h>
+#include <qapplication.h>
 
 #include "menubox.h"
 
@@ -10,24 +11,30 @@ MenuBox::MenuBox(const char *text, QWidget *parent = 0,
                  const char *name = 0)
        : QDialog(parent, name)
 {
-    setGeometry(0, 0, 800, 600);
-    setFixedWidth(800);
-    setFixedHeight(600);
+    int screenheight = QApplication::desktop()->height();
+    int screenwidth = QApplication::desktop()->width();
 
-    setFont(QFont("Arial", 40, QFont::Bold));
+    float wmult = screenwidth / 800.0;
+    float hmult = screenheight / 600.0;
+
+    setGeometry(0, 0, screenwidth, screenheight);
+    setFixedWidth(screenwidth);
+    setFixedHeight(screenheight);
+
+    setFont(QFont("Arial", 40 * hmult, QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
     QLabel *maintext = new QLabel(text, this);
     maintext->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
-    maintext->setFont(QFont("Arial", 40, QFont::Bold));
+    maintext->setFont(QFont("Arial", 40 * hmult, QFont::Bold));
 
-    box = new QVBoxLayout(this, 20);
+    box = new QVBoxLayout(this, 20 * wmult);
 
     box->addWidget(maintext, 0);
 
     buttongroup = new QButtonGroup(0);
 
-    setFont(QFont("Arial", 16, QFont::Bold));
+    setFont(QFont("Arial", 16 * hmult, QFont::Bold));
 
     connect(buttongroup, SIGNAL(clicked(int)), this, SLOT(buttonPressed(int)));
 }

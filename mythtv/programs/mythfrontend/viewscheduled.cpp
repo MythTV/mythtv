@@ -6,6 +6,7 @@
 #include <qsqldatabase.h>
 #include <qlistview.h>
 #include <qdatetime.h>
+#include <qapplication.h>
 
 #include "viewscheduled.h"
 #include "infostructs.h"
@@ -24,14 +25,19 @@ ViewScheduled::ViewScheduled(QString prefix, TV *ltv, QSqlDatabase *ldb,
 
     title = NULL;
 
-    setGeometry(0, 0, 800, 600);
-    setFixedWidth(800);
-    setFixedHeight(600);
+    int screenheight = QApplication::desktop()->height();
+    int screenwidth = QApplication::desktop()->width();
 
-    setFont(QFont("Arial", 16, QFont::Bold));
+    float wmult = screenwidth / 800.0;
+    float hmult = screenheight / 600.0;
+
+    setGeometry(0, 0, screenwidth, screenheight);
+    setFixedSize(QSize(screenwidth, screenheight));
+
+    setFont(QFont("Arial", 16 * hmult, QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
-    QVBoxLayout *vbox = new QVBoxLayout(this, 10);
+    QVBoxLayout *vbox = new QVBoxLayout(this, 10 * wmult);
 
     desclabel = new QLabel("Select a recording to view:", this);
     vbox->addWidget(desclabel);
@@ -41,9 +47,9 @@ ViewScheduled::ViewScheduled(QString prefix, TV *ltv, QSqlDatabase *ldb,
     listview->addColumn("Date");
     listview->addColumn("Title");
  
-    listview->setColumnWidth(0, 40);
-    listview->setColumnWidth(1, 210); 
-    listview->setColumnWidth(2, 500);
+    listview->setColumnWidth(0, 40 * wmult);
+    listview->setColumnWidth(1, 210 * wmult); 
+    listview->setColumnWidth(2, 500 * wmult);
     listview->setColumnWidthMode(0, QListView::Manual);
     listview->setColumnWidthMode(1, QListView::Manual);
 
@@ -62,21 +68,21 @@ ViewScheduled::ViewScheduled(QString prefix, TV *ltv, QSqlDatabase *ldb,
 
     sched = new Scheduler(db);
 
-    listview->setFixedHeight(250);
+    listview->setFixedHeight(250 * hmult);
 
     QLabel *key = new QLabel("Conflicting recordings are highlighted in <font color=\"red\">red</font>.<br>Deactivated recordings are highlighted in <font color=\"gray\">gray</font>.", this);
-    key->setFont(QFont("Arial", 12, QFont::Bold));
+    key->setFont(QFont("Arial", 12 * hmult, QFont::Bold));
     vbox->addWidget(key);
 
     QFrame *f = new QFrame(this);
     f->setFrameStyle(QFrame::HLine | QFrame::Plain);
-    f->setLineWidth(4);
+    f->setLineWidth(4 * hmult);
     vbox->addWidget(f);     
 
     QGridLayout *grid = new QGridLayout(vbox, 4, 2, 1);
     
     title = new QLabel(" ", this);
-    title->setFont(QFont("Arial", 20, QFont::Bold));
+    title->setFont(QFont("Arial", 20 * hmult, QFont::Bold));
 
     QLabel *datelabel = new QLabel("Airdate: ", this);
     date = new QLabel(" ", this);

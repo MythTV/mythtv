@@ -6,6 +6,7 @@
 #include <qaccel.h>
 #include <math.h>
 #include <qcursor.h>
+#include <qapplication.h>
 
 #include "guidegrid.h"
 #include "infodialog.h"
@@ -14,15 +15,20 @@
 GuideGrid::GuideGrid(int channel, QWidget *parent, const char *name)
          : QDialog(parent, name)
 {
-    setGeometry(0, 0, 800, 600);
-    setFixedWidth(800);
-    setFixedHeight(600);
+    screenheight = QApplication::desktop()->height();
+    screenwidth = QApplication::desktop()->width();
+
+    wmult = screenwidth / 800.0;
+    hmult = screenheight / 600.0;
+
+    setGeometry(0, 0, screenwidth, screenheight);
+    setFixedSize(QSize(screenwidth, screenheight));
 
     setCursor(QCursor(Qt::BlankCursor));
 
     setPalette(QPalette(QColor(250, 250, 250)));
-    m_font = new QFont("Arial", 11, QFont::Bold);
-    m_largerFont = new QFont("Arial", 13, QFont::Bold);
+    m_font = new QFont("Arial", 11 * hmult, QFont::Bold);
+    m_largerFont = new QFont("Arial", 13 * hmult, QFont::Bold);
 
     m_originalStartTime = QDateTime::currentDateTime();
     m_currentStartTime = m_originalStartTime;
@@ -323,7 +329,7 @@ void GuideGrid::paintChannels(QPainter *p)
 
     QPainter tmp(&pix);
     tmp.setBrush(black);
-    tmp.setPen(QPen(black, 2));
+    tmp.setPen(QPen(black, 2 * wmult));
     tmp.setFont(*m_largerFont);
 
     QString date = m_currentStartTime.toString("ddd");
@@ -331,22 +337,23 @@ void GuideGrid::paintChannels(QPainter *p)
     int datewidth = lfm.width(date);
     int dateheight = lfm.height();
 
-    tmp.drawText((75 - datewidth) / 2, (55 - dateheight) / 2,
+    tmp.drawText((75 * wmult - datewidth) / 2, (55 * hmult - dateheight) / 2,
                  date);
 
     date = m_currentStartTime.toString("MMM d");
     datewidth = lfm.width(date);
 
-    tmp.drawText((75 - datewidth) / 2, (55 - dateheight) / 2 + dateheight,
-                 date);
+    tmp.drawText((75 * wmult - datewidth) / 2, 
+                 (55 * hmult - dateheight) / 2 + dateheight, date);
 
     tmp.setFont(*m_font);
 
     for (unsigned int i = 0; i < 6; i++)
     {
-        tmp.drawLine(0, i * 92 + 48, 74, i * 92 + 48);
+        tmp.drawLine(0, (i * 92 + 48) * hmult, 74 * wmult, 
+                     (i * 92 + 48) * hmult);
     }
-    tmp.drawLine(74, 0, 74, 600);
+    tmp.drawLine(74 * wmult, 0, 74 * wmult, 600 * hmult);
 
     for (unsigned int i = 0; i < 6; i++)
     {
@@ -358,7 +365,8 @@ void GuideGrid::paintChannels(QPainter *p)
         {
             if (!chinfo->icon)
                 chinfo->LoadIcon();
-            tmp.drawPixmap((75 - chinfo->icon->width()) / 2, i * 92 + 55,
+            tmp.drawPixmap((75 * hmult - chinfo->icon->width()) / 2, 
+                           (i * 92 + 55) * hmult,
                            *(chinfo->icon));
         }
         tmp.setFont(*m_largerFont);
@@ -366,14 +374,15 @@ void GuideGrid::paintChannels(QPainter *p)
         int width = lfm.width(chinfo->chanstr);
         int bheight = lfm.height();
             
-        tmp.drawText((75 - width) / 2, i * 92 + 55 + 30 + bheight, 
-                     chinfo->chanstr);
+        tmp.drawText((75 * wmult - width) / 2, 
+                     (i * 92 + 55 + 30) * hmult + bheight, chinfo->chanstr);
 
         tmp.setFont(*m_font);
         QFontMetrics fm(*m_font);
         width = fm.width(chinfo->callsign);
         int height = fm.height();
-        tmp.drawText((75 - width) / 2, i * 92 + 55 + 30 + bheight + height,
+        tmp.drawText((75 * wmult - width) / 2, 
+                     (i * 92 + 55 + 30) * hmult + bheight + height,
                      chinfo->callsign);
     }
 
@@ -390,12 +399,12 @@ void GuideGrid::paintTimes(QPainter *p)
 
     QPainter tmp(&pix);
     tmp.setBrush(black);
-    tmp.setPen(QPen(black, 2));
+    tmp.setPen(QPen(black, 2 * wmult));
     tmp.setFont(*m_largerFont);
 
     for (int i = 0; i < 5; i++)
     {
-        tmp.drawLine(i * 145, 0, i * 145, 48);
+        tmp.drawLine(i * 145 * wmult, 0, i * 145 * wmult, 48 * hmult);
     }
 
     for (int i = 0; i < 5; i++)
@@ -406,11 +415,12 @@ void GuideGrid::paintTimes(QPainter *p)
         int width = fm.width(tinfo->usertime);
         int height = fm.height();
 
-        tmp.drawText((145 - width) / 2 + i * 145, (48 - height) / 2 + height, 
+        tmp.drawText((145 * wmult- width) / 2 + i * 145 * wmult, 
+                     (48 * hmult - height) / 2 + height, 
                      tinfo->usertime);
     }
 
-    tmp.drawLine(0, 48, 800, 48);
+    tmp.drawLine(0, 48 * hmult, 800 * wmult, 48 * hmult);
 
     tmp.end();
 
@@ -424,13 +434,14 @@ void GuideGrid::paintPrograms(QPainter *p)
     pix.fill(this, cr.topLeft());
 
     QPainter tmp(&pix);
-    tmp.setPen(QPen(black, 2));
+    tmp.setPen(QPen(black, 2 * wmult));
 
     tmp.setFont(*m_largerFont);
 
     for (int i = 1; i < 6; i++)
     {
-        tmp.drawLine(0, i * 92 - 1, 800, i * 92 - 1);
+        int ypos = (int)((i * 92) * hmult) - 1;
+        tmp.drawLine(0, ypos, 800 * wmult, ypos);
     }
 
     for (unsigned int y = 0; y < 6; y++)
@@ -439,7 +450,6 @@ void GuideGrid::paintPrograms(QPainter *p)
             break;
 
         QDateTime lastprog;
-        int lastxoffset = 0;
         for (int x = 0; x < 5; x++)
         {
             ProgramInfo *pginfo = m_programInfos[y][x];
@@ -474,33 +484,24 @@ void GuideGrid::paintPrograms(QPainter *p)
                         m_programInfos[y][z]->recordtype = pginfo->recordtype;
                     }
                 }
-              
-                //QTime *ending = pginfo->getEndTime(); 
-                int newxoffset = 0;
-                //if (x + spread < 5)
-                //    newxoffset = (ending->minute() - 
-                //                  m_timeInfos[x + spread]->min) * 100 / 145;
 
-                //delete ending;
+                int maxwidth = (int)((spread * 145 - 15) * wmult);
 
-                if (newxoffset < 10)
-                    newxoffset = 0;
-
-                int maxwidth = spread * 145 - 15 - lastxoffset + newxoffset;
-
-                tmp.drawText(10 + x * 145 + lastxoffset, 
-                             height / 8 + 92 * y, maxwidth, 92,
+                tmp.drawText((10 + x * 145) * wmult, 
+                             height / 8 + (92 * y) * hmult, 
+                             maxwidth, 92 * hmult,
                              AlignLeft | WordBreak,
                              pginfo->title);
 
-                //if (x != 4)
-                tmp.drawLine((x + spread) * 145 + newxoffset, 92 * y - 1, 
-                             (x + spread) * 145 + newxoffset, 
-                             92 * (y + 1) - 1);
+                tmp.setPen(QPen(black, 2 * wmult));
+
+                tmp.drawLine((x + spread) * 145 * wmult, (92 * y - 1) * hmult, 
+                             (x + spread) * 145 * wmult, 
+                             (92 * (y + 1) - 1) * hmult);
 
                 if (pginfo->recordtype > 0)
                 {
-                    tmp.setPen(QPen(red, 2));
+                    tmp.setPen(QPen(red, 2 * wmult));
                     QString text;
 
                     if (pginfo->recordtype == 1)
@@ -512,26 +513,29 @@ void GuideGrid::paintPrograms(QPainter *p)
 
                     int width = fm.width(text);
 
-                    tmp.drawText((x + spread) * 145 - width * 1.5, 
-                                 92 * (y + 1) - height, width * 1.5, 
+                    tmp.drawText((x + spread) * 145 * wmult - width * 1.5, 
+                                 92 * (y + 1) * hmult - height, width * 1.5, 
                                  height, AlignLeft, text);
              
-                    tmp.setPen(QPen(black, 2));
+                    tmp.setPen(QPen(black, 2 * wmult));
                 }
 
                 if (m_currentRow == (int)y)
                 {
                     if ((m_currentCol >= x) && (m_currentCol < (x + spread)))
                     {
-                        tmp.setPen(QPen(red, 2));
-                   
-                        tmp.drawRect(x * 145 + 2 + lastxoffset,
-                                     y * 92 + 1, 142 + 145 * (spread - 1) +
-                                     newxoffset + 1, 92 - 3);
-                        tmp.setPen(QPen(black, 2));
+                        tmp.setPen(QPen(red, 2 * wmult));
+                  
+                        int rectheight = (int)(92 * hmult - 3);
+                        if (y == 5)
+                            rectheight += 1; 
+                        tmp.drawRect((x * 145) * wmult + 2, 
+                                     (y * 92) * hmult + 1, 
+                                     (142 + 145 * (spread - 1)) * wmult + 1,
+                                     rectheight);
+                        tmp.setPen(QPen(black, 2 * wmult));
                     }
                 }
-                lastxoffset = newxoffset;
             }
             lastprog = pginfo->startts;
         }
@@ -544,25 +548,28 @@ void GuideGrid::paintPrograms(QPainter *p)
 
 QRect GuideGrid::fullRect() const
 {
-    QRect r(0, 0, 800, 600);
+    QRect r(0, 0, 800 * wmult, 600 * hmult);
     return r;
 }
 
 QRect GuideGrid::channelRect() const
 {
-    QRect r(0, 0, 75, 600);
+    QRect r(0, 0, 75 * wmult, 600 * hmult);
+
+    if (screenwidth != 800)
+        r.setWidth(r.width() - 1);
     return r;
 }
 
 QRect GuideGrid::timeRect() const
 {
-    QRect r(74, 0, 800, 49);
+    QRect r(74 * wmult, 0, 800 * wmult, 49 * hmult);
     return r;
 }
 
 QRect GuideGrid::programRect() const
 {
-    QRect r(74, 49, 800, 600);
+    QRect r(74 * wmult, 49 * hmult, 800 * wmult, 600 * hmult);
     return r;
 }
 

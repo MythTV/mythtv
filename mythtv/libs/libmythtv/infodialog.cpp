@@ -5,6 +5,7 @@
 #include <qcursor.h>
 #include <qcheckbox.h>
 #include <qvgroupbox.h>
+#include <qapplication.h>
 
 #include "infodialog.h"
 #include "infostructs.h"
@@ -12,33 +13,39 @@
 InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
           : QDialog(parent, name)
 {
-    setGeometry(0, 0, 800, 600);
-    setFixedWidth(800); 
-    setFixedHeight(600);
+    int screenheight = QApplication::desktop()->height();
+    int screenwidth = QApplication::desktop()->width();
 
-    setFont(QFont("Arial", 16, QFont::Bold));
+    float wmult = screenwidth / 800.0;
+    float hmult = screenheight / 600.0;
+
+    setGeometry(0, 0, screenwidth, screenheight);
+    setFixedSize(QSize(screenwidth, screenheight));
+
+    setFont(QFont("Arial", 16 * hmult, QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
     QPushButton *ok = new QPushButton("OK", this, "close");
-    ok->setFont(QFont("Arial", 20, QFont::Bold));
+    ok->setFont(QFont("Arial", 20 * hmult, QFont::Bold));
 
     QPushButton *cancel = new QPushButton("Cancel", this, "cancel");
-    cancel->setFont(QFont("Arial", 20, QFont::Bold));
+    cancel->setFont(QFont("Arial", 20 * hmult, QFont::Bold));
 
     connect(ok, SIGNAL(clicked()), this, SLOT(okPressed()));
     connect(cancel, SIGNAL(clicked()), this, SLOT(reject()));
 
-    QVBoxLayout *vbox = new QVBoxLayout(this, 20);
+    QVBoxLayout *vbox = new QVBoxLayout(this, 20 * wmult);
 
-    QGridLayout *grid = new QGridLayout(vbox, 4, 2, 10);
+    QGridLayout *grid = new QGridLayout(vbox, 4, 2, 10 * wmult);
     
     QLabel *titlefield = new QLabel(pginfo->title, this);
-    titlefield->setFont(QFont("Arial", 25, QFont::Bold));
+    titlefield->setFont(QFont("Arial", 25 * hmult, QFont::Bold));
 
     QLabel *date = getDateLabel(pginfo);
 
     QLabel *subtitlelabel = new QLabel("Episode:", this);
     QLabel *subtitlefield = new QLabel(pginfo->subtitle, this);
+    subtitlefield->setAlignment(Qt::WordBreak | Qt::AlignLeft | Qt::AlignTop);
     QLabel *descriptionlabel = new QLabel("Description:", this);
     QLabel *descriptionfield = new QLabel(pginfo->description, this);
     descriptionfield->setAlignment(Qt::WordBreak | Qt::AlignLeft | 
@@ -58,7 +65,7 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
 
     QFrame *f = new QFrame(this);
     f->setFrameStyle(QFrame::HLine | QFrame::Plain);
-    f->setLineWidth(4);
+    f->setLineWidth(4 * hmult);
     vbox->addWidget(f);    
 
     QVBoxLayout *middleBox = new QVBoxLayout(vbox);
@@ -94,7 +101,7 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
 
     f = new QFrame(this);
     f->setFrameStyle(QFrame::HLine | QFrame::Plain);
-    f->setLineWidth(4);
+    f->setLineWidth(4 * hmult);
     vbox->addWidget(f);   
 
     QHBoxLayout *bottomBox = new QHBoxLayout(vbox);

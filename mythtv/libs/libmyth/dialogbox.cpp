@@ -3,6 +3,7 @@
 #include <qbuttongroup.h>
 #include <qlabel.h>
 #include <qcursor.h>
+#include <qapplication.h>
 
 #include "dialogbox.h"
 
@@ -10,17 +11,22 @@ DialogBox::DialogBox(const QString &text, const char *checkboxtext = 0,
                      QWidget *parent = 0, const char *name = 0)
          : QDialog(parent, name)
 {
-    setGeometry(0, 0, 800, 600);
-    setFixedWidth(800);
-    setFixedHeight(600);
+    int screenheight = QApplication::desktop()->height();
+    int screenwidth = QApplication::desktop()->width();
 
-    setFont(QFont("Arial", 16, QFont::Bold));
+    float wmult = screenwidth / 800.0;
+    float hmult = screenheight / 600.0;
+
+    setGeometry(0, 0, screenwidth, screenheight);
+    setFixedSize(QSize(screenwidth, screenheight));
+
+    setFont(QFont("Arial", 16 * hmult, QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
     QLabel *maintext = new QLabel(text, this);
     maintext->setAlignment(Qt::WordBreak | Qt::AlignLeft | Qt::AlignTop);
 
-    box = new QVBoxLayout(this, 20);
+    box = new QVBoxLayout(this, 20 * wmult);
 
     box->addWidget(maintext, 1);
 
@@ -49,6 +55,7 @@ void DialogBox::AddButton(const QString &title)
 void DialogBox::Show()
 {
     showFullScreen();
+    raise();
     setActiveWindow();
 }
 

@@ -7,6 +7,7 @@
 #include <qlistview.h>
 #include <qdatetime.h>
 #include <qprogressbar.h>
+#include <qapplication.h>
 
 #include <unistd.h>
 #include <stdio.h>
@@ -27,14 +28,20 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
 
     title = NULL;
 
-    setGeometry(0, 0, 800, 600);
-    setFixedWidth(800);
-    setFixedHeight(600);
+    int screenheight = QApplication::desktop()->height();
+    int screenwidth = QApplication::desktop()->width();
 
-    setFont(QFont("Arial", 16, QFont::Bold));
+    float wmult = screenwidth / 800.0;
+    float hmult = screenheight / 600.0;
+
+    setGeometry(0, 0, screenwidth, screenheight);
+    setFixedWidth(screenwidth);
+    setFixedHeight(screenheight);
+
+    setFont(QFont("Arial", 16 * hmult, QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
-    QVBoxLayout *vbox = new QVBoxLayout(this, 15);
+    QVBoxLayout *vbox = new QVBoxLayout(this, 15 * wmult);
 
     QLabel *label = new QLabel("Select a recording to permanantly delete:", this);
     vbox->addWidget(label);
@@ -45,10 +52,10 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     listview->addColumn("Title");
     listview->addColumn("Size");
  
-    listview->setColumnWidth(0, 40);
-    listview->setColumnWidth(1, 185); 
-    listview->setColumnWidth(2, 435);
-    listview->setColumnWidth(3, 90);
+    listview->setColumnWidth(0, 40 * wmult);
+    listview->setColumnWidth(1, 185 * wmult); 
+    listview->setColumnWidth(2, 435 * wmult);
+    listview->setColumnWidth(3, 90 * wmult);
 
     listview->setSorting(1, false);
     listview->setAllColumnsShowFocus(TRUE);
@@ -118,9 +125,9 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
         // TODO: no recordings
     }
    
-    listview->setFixedHeight(225);
+    listview->setFixedHeight(225 * hmult);
 
-    QHBoxLayout *hbox = new QHBoxLayout(vbox, 10);
+    QHBoxLayout *hbox = new QHBoxLayout(vbox, 10 * wmult);
 
     QGridLayout *grid = new QGridLayout(hbox, 4, 2, 1);
     
@@ -132,6 +139,7 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
 
     QLabel *sublabel = new QLabel("Episode: ", this);
     subtitle = new QLabel(" ", this);
+    subtitle->setAlignment(Qt::WordBreak | Qt::AlignLeft | Qt::AlignTop);
     QLabel *desclabel = new QLabel("Description: ", this);
     description = new QLabel(" ", this);
     description->setAlignment(Qt::WordBreak | Qt::AlignLeft | Qt::AlignTop);
@@ -147,7 +155,7 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     grid->setColStretch(1, 1);
     grid->setRowStretch(3, 1);
 
-    QPixmap temp(160, 120);
+    QPixmap temp(160 * wmult, 120 * hmult);
     
     pixlabel = new QLabel(this);
     pixlabel->setPixmap(temp);
@@ -275,6 +283,9 @@ void DeleteBox::selected(QListViewItem *lvitem)
         delete lvitem;
         UpdateProgressBar();
     }    
+
+    setActiveWindow();
+    raise();
 }
 
 void DeleteBox::GetFreeSpaceStats(int &totalspace, int &usedspace)

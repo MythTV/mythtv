@@ -1,5 +1,6 @@
 #include <qimage.h>
 #include <qpixmap.h>
+#include <qapplication.h>
 
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -71,8 +72,28 @@ QPixmap *ProgramListItem::getPixmap(void)
 
     pixmap = new QPixmap();
 
-    if (pixmap->load(filename.c_str()))
+    int screenheight = QApplication::desktop()->height();
+    int screenwidth = QApplication::desktop()->width();
+    
+    float wmult = screenwidth / 800.0;
+    float hmult = screenheight / 600.0;
+
+    QImage *tmpimage = new QImage();
+
+    if (tmpimage->load(filename.c_str()))
+    {
+        if (screenwidth != 800 || screenheight != 600)
+        {
+            QImage tmp2 = tmpimage->smoothScale(160 * wmult, 120 * hmult);
+            pixmap->convertFromImage(tmp2);
+        }
+        else
+            pixmap->convertFromImage(*tmpimage);
+
+        delete tmpimage;
+
         return pixmap;
+    }
 
 cout << "generating pixmap\n";
 
@@ -96,11 +117,24 @@ cout << "done\n";
     }
 
 cout << "loading\n";
-    if (pixmap->load(filename.c_str()))
+    if (tmpimage->load(filename.c_str()))
     {
-cout << "done\n";
+        if (screenwidth != 800 || screenheight != 600)
+        {
+            QImage tmp2 = tmpimage->smoothScale(160 * wmult, 120 * hmult);
+            pixmap->convertFromImage(tmp2);
+        }
+        else
+            pixmap->convertFromImage(*tmpimage);
+
+        delete tmpimage;
+    
+cout << "done\n";    
         return pixmap;
     }
+
+    delete tmpimage;
+    delete pixmap;
 
     return NULL;
 }
