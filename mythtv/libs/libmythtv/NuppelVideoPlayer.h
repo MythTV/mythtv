@@ -111,6 +111,8 @@ class NuppelVideoPlayer
     int audiofree(bool use_lock); // number of free bytes in audio buffer
     int vbuffer_numvalid(void); // number of valid slots in video buffer
     int vbuffer_numfree(void); // number of free slots in the video buffer
+
+    void ResetNexttrigger(struct timeval *tv);
  
     int deinterlace;
     

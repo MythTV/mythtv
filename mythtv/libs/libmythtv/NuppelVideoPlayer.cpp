@@ -610,6 +610,32 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
     }
 }
 
+static void NormalizeTimeval(struct timeval *tv)
+{
+    while (tv->tv_usec > 999999)
+    {
+	tv->tv_sec++;
+	tv->tv_usec -= 1000000;
+    }
+    while (tv->tv_usec < 0)
+    {
+	tv->tv_sec--;
+	tv->tv_usec += 1000000;
+    }
+}
+
+void NuppelVideoPlayer::ResetNexttrigger(struct timeval *nexttrigger)
+{
+    /* when we're paused or prebuffering, we need to update
+       'nexttrigger' before we start playing again. Otherwise,
+       the value of 'nexttrigger' will be far in the past, and
+       the video will play really fast for a while.*/
+    
+    gettimeofday(nexttrigger, NULL);
+    nexttrigger->tv_usec += (int)(1000000 / video_frame_rate);
+    NormalizeTimeval(nexttrigger);
+}
+
 void NuppelVideoPlayer::OutputVideoLoop(void)
 {
     unsigned char *X11videobuf;
@@ -642,6 +668,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             {
                 //printf("video waiting for unpause\n");
                 usleep(50);
+		ResetNexttrigger(&nexttrigger);
                 continue;
             }
         }
@@ -650,6 +677,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         {
             //printf("prebuffering...\n");
             usleep(2000);
+	    ResetNexttrigger(&nexttrigger);
             continue;
         }
 
@@ -706,17 +734,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             }
         }
 
-        /* normalize nexttrigger */
-        while (nexttrigger.tv_usec > 999999)
-        {
-            nexttrigger.tv_sec++;
-            nexttrigger.tv_usec -= 1000000;
-        }
-        while (nexttrigger.tv_usec < 0)
-        {
-            nexttrigger.tv_sec--;
-            nexttrigger.tv_usec += 1000000;
-        }
+	NormalizeTimeval(&nexttrigger);
 
         /* update rpos */
         pthread_mutex_lock(&video_buflock);
@@ -733,36 +751,42 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
 {
     int bytesperframe;
     int space_on_soundcard;
+    unsigned char zeros[1024];
+    
+    bzero(zeros, 1024);
 
     while (!eof && !killplayer)
     {
-        if (paused)
-        {
-            audio_actually_paused = true;
-            ioctl(audiofd, SNDCTL_DSP_RESET, NULL);
-            //printf("audio waiting for unpause\n");
-            usleep(50);
-            continue;
-        }    
-
+	if (audiofd <= 0) 
+	    break;
+	
+	if (paused)
+	{
+	    audio_actually_paused = true;
+	    //ioctl(audiofd, SNDCTL_DSP_RESET, NULL);
+	    //usleep(50);
+	    
+	    WriteAudio(zeros, 1024);
+	    //printf("audio waiting for unpause\n");
+	    continue;
+	}    
+	
         if (prebuffering)
         {
-            //printf("audio thread waiting for prebuffer\n");
-            usleep(200);
-            continue;
+	    WriteAudio(zeros, 1024);
+
+	    //printf("audio thread waiting for prebuffer\n");
+	    continue;
         }
 
-        if (audiofd <= 0) 
-            break;
-
         SetAudiotime(); // once per loop, calculate stuff for a/v sync
-
+	
         /* do audio output */
- 
+	
         /* approximate # of audio bytes for each frame. */
         bytesperframe = 4 * (int)((1.0/video_frame_rate) *
                                   ((double)effdsp/100.0) + 0.5);
-
+	
         // wait for the buffer to fill with enough to play
         if (bytesperframe > audiolen(true))
         { 
@@ -770,10 +794,10 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
             usleep(200);
             continue;
         }
-
+	
         // wait for there to be free space on the sound card so we can write
         // without blocking.  We don't want to block while holding audio_buflock
-
+	
         audio_buf_info info;
         ioctl(audiofd, SNDCTL_DSP_GETOSPACE, &info);
         space_on_soundcard = info.bytes;
