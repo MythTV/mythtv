@@ -1092,7 +1092,7 @@ int main(int argc, char *argv[])
             cout << "   Bypass the grabbers and read data directly from a file\n";
             cout << "   <sourceid> = cardinput\n";
             cout << "   <offset>   = days from today that xmlfile defines\n";
-            cout << "                (-1 meaning from today on all future entries)\n";
+            cout << "                (-1 means to replace all data, up to 10 days)\n";
             cout << "   <xmlfile>  = file to read\n";
             cout << "\n";
             cout << "--xawchannels <sourceid> <xawtvrcfile>\n";
