@@ -150,7 +150,7 @@
     </message>
     <message>
         <source>playlist root</source>
-        <translation type="unfinished"></translation>
+        <translation>Spiellistenstart</translation>
     </message>
     <message>
         <source>kbps</source>
@@ -625,11 +625,11 @@ MythMusic Tabellen fehlen in der Datenbank.</translation>
     </message>
     <message>
         <source>Use variable bitrates</source>
-        <translation type="unfinished"></translation>
+        <translation>Nutze variable Bitraten</translation>
     </message>
     <message>
         <source>If set, the MP3 encoder will use variable bitrates (VBR) except for the low quality setting. The Ogg encoder will always use variable bitrates.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, wird der MP3 Enkoder variable Bitraten (VBR) nutzen, mit Ausnahme der niedrigen Qualitätsstufe. Der Ogg Enkoder arbeitet immer mit variablen Bitraten.</translation>
     </message>
     <message>
         <source>AlbumArt</source>
@@ -637,7 +637,7 @@ MythMusic Tabellen fehlen in der Datenbank.</translation>
     </message>
     <message>
         <source>CD Ripper Settings (part 2)</source>
-        <translation type="unfinished"></translation>
+        <translation>CD Ripper Einstellungen (2)</translation>
     </message>
 </context>
 <context>
@@ -697,7 +697,7 @@ MythMusic Tabellen fehlen in der Datenbank.</translation>
     <name>ThemeUI</name>
     <message>
         <source>Please Wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitte warten...</translation>
     </message>
 </context>
 </TS>
