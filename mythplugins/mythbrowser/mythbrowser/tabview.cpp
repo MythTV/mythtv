@@ -92,7 +92,7 @@ TabView::TabView(QSqlDatabase *db, QStringList urls,
     connect(this,SIGNAL(menuPressed()),this,SLOT(openMenu()));
     connect(this,SIGNAL(closeMenu()),this,SLOT(cancelMenu()));
 
-    setCursor(QCursor(Qt::ArrowCursor));
+    qApp->setOverrideCursor(QCursor(Qt::ArrowCursor));
     qApp->installEventFilter(this);
     mytab->show();
 }
@@ -108,7 +108,7 @@ void TabView::openMenu()
     hadFocus = qApp->focusWidget();
 
     menu = new MyMythPopupBox(this,"popupMenu");
-    menu->addLabel("MythBrowser Menu");
+    menu->addLabel(tr("MythBrowser Menu"));
 
     if(mytab->count()==1) {
         temp = menu->addButton(tr("         Back         "), this, SLOT(actionBack()));
@@ -359,6 +359,7 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
                 return true;
                 break;
             case Qt::Key_Escape:
+                qApp->restoreOverrideCursor();
                 exit(0);
                 break;
             case Qt::Key_Pause:
@@ -394,18 +395,18 @@ PopupBox::PopupBox(QWidget *parent, QString deflt)
 
     QVBoxLayout *lay  = new QVBoxLayout(this, 5);
 
-    QVGroupBox  *vbox = new QVGroupBox("Add New Website",this);
+    QVGroupBox  *vbox = new QVGroupBox(tr("Add New Website"),this);
     lay->addWidget(vbox);
 
-    QLabel *groupLabel = new QLabel("Group:", vbox);
+    QLabel *groupLabel = new QLabel(tr("Group:"), vbox);
     groupLabel->setBackgroundOrigin(QWidget::WindowOrigin);
     group = new QLineEdit(vbox);
 
-    QLabel *descLabel = new QLabel("Description:", vbox);
+    QLabel *descLabel = new QLabel(tr("Description:"), vbox);
     descLabel->setBackgroundOrigin(QWidget::WindowOrigin);
     desc = new QLineEdit(vbox);
 
-    QLabel *urlLabel =new QLabel("URL:", vbox);
+    QLabel *urlLabel =new QLabel(tr("URL:"), vbox);
     urlLabel->setBackgroundOrigin(QWidget::WindowOrigin);
     url = new QLineEdit(vbox);
     url->setText(deflt);

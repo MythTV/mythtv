@@ -94,18 +94,18 @@ PopupBox::PopupBox(QWidget *parent)
 
     QVBoxLayout *lay  = new QVBoxLayout(this, 5);
 
-    QVGroupBox  *vbox = new QVGroupBox("Add New Website",this);
+    QVGroupBox  *vbox = new QVGroupBox(tr("Add New Website"),this);
     lay->addWidget(vbox);
 
-    QLabel *groupLabel = new QLabel("Group:", vbox);
+    QLabel *groupLabel = new QLabel(tr("Group:"), vbox);
     groupLabel->setBackgroundOrigin(QWidget::WindowOrigin);
     group = new QLineEdit(vbox);
 
-    QLabel *descLabel = new QLabel("Description:", vbox);
+    QLabel *descLabel = new QLabel(tr("Description:"), vbox);
     descLabel->setBackgroundOrigin(QWidget::WindowOrigin);
     desc = new QLineEdit(vbox);
 
-    QLabel *urlLabel =new QLabel("URL:", vbox);
+    QLabel *urlLabel =new QLabel(tr("URL:"), vbox);
     urlLabel->setBackgroundOrigin(QWidget::WindowOrigin);
     url = new QLineEdit(vbox);
 
@@ -113,7 +113,7 @@ PopupBox::PopupBox(QWidget *parent)
 
     hbox->addItem(new QSpacerItem(100, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
 
-    MythPushButton *okButton = new MythPushButton("&Ok", this);
+    MythPushButton *okButton = new MythPushButton(tr("&Ok"), this);
     okButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     hbox->addWidget(okButton);
 
@@ -245,7 +245,7 @@ void BookmarksConfig::setupView()
     // Top fancy stuff
     QLabel *topLabel = new QLabel(this);
     topLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    topLabel->setText("MythBrowser Bookmarks Settings");
+    topLabel->setText(tr("MythBrowser Bookmarks Settings"));
 
     vbox->addWidget(topLabel);
 
@@ -253,10 +253,10 @@ void BookmarksConfig::setupView()
     helpLabel->setBackgroundOrigin(QWidget::WindowOrigin);
     helpLabel->setFrameStyle(QFrame::Box + QFrame::Sunken);
     helpLabel->setMargin(int(hmult*4));
-    helpLabel->setText("Press the 'New Bookmark' button to "
+    helpLabel->setText(tr("Press the 'New Bookmark' button to "
                "add a new site/group.\n"
                "Pressing SPACE/Enter on a selected entry "
-               "removes it from the listview.");
+               "removes it from the listview."));
     vbox->addWidget(helpLabel);
 
     // Add List View of Tabs and their bookmaks
@@ -277,7 +277,7 @@ void BookmarksConfig::setupView()
     QHBoxLayout *hbox2 = new QHBoxLayout(vbox);
 
     QLabel *zoomLabel = new QLabel(this);
-    zoomLabel->setText("Zoom [%]:");
+    zoomLabel->setText(tr("Zoom [%]:"));
     zoomLabel->setBackgroundOrigin(QWidget::WindowOrigin);
     zoomLabel->setBackgroundOrigin(QWidget::WindowOrigin);
     hbox2->addWidget(zoomLabel);
@@ -290,7 +290,7 @@ void BookmarksConfig::setupView()
     zoom->setValue(gContext->GetNumSetting("WebBrowserZoomLevel", 20));
 
     QLabel *browserLabel = new QLabel(this);
-    browserLabel->setText("Browser:");
+    browserLabel->setText(tr("Browser:"));
     browserLabel->setBackgroundOrigin(QWidget::WindowOrigin);
     browserLabel->setBackgroundOrigin(QWidget::WindowOrigin);
     hbox2->addWidget(browserLabel);
@@ -305,20 +305,20 @@ void BookmarksConfig::setupView()
     QHBoxLayout *hbox3 = new QHBoxLayout(vbox);
 
     hidescrollbars = new MythCheckBox(this);
-    hidescrollbars->setText("Hide Scrollbars");
+    hidescrollbars->setText(tr("Hide Scrollbars"));
     hidescrollbars->setChecked(gContext->GetNumSetting(
                                                 "WebBrowserHideScrollbars", 0) 
              == 1);
     hbox3->addWidget(hidescrollbars);
 
     scrollmode = new MythCheckBox(this);
-    scrollmode->setText("Scroll Page");
+    scrollmode->setText(tr("Scroll Page"));
     scrollmode->setChecked(gContext->GetNumSetting("WebBrowserScrollMode", 1) 
              == 1);
     hbox3->addWidget(scrollmode);
 
     QLabel *label = new QLabel(this);
-    label->setText("Scroll Speed:");
+    label->setText(tr("Scroll Speed:"));
     label->setBackgroundOrigin(QWidget::WindowOrigin);
     label->setBackgroundOrigin(QWidget::WindowOrigin);
     hbox3->addWidget(label);
@@ -333,20 +333,20 @@ void BookmarksConfig::setupView()
     // Add new bookmark ------------------------------------
     QHBoxLayout *hbox = new QHBoxLayout(vbox);
 
-    MythPushButton *newBookmark = new MythPushButton("&New Bookmark", this);
+    MythPushButton *newBookmark = new MythPushButton(tr("&New Bookmark"), this);
     hbox->addWidget(newBookmark);
 
     connect(newBookmark, SIGNAL(clicked()), this, SLOT(slotAddBookmark()));
 
     QLabel *customSiteLabel = new QLabel(this);
     customSiteLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    customSiteLabel->setText("Add a new Website");
+    customSiteLabel->setText(tr("Add a new Website"));
     hbox->addWidget(customSiteLabel);
 
     // Finish -----------------------------------
     hbox->addItem(new QSpacerItem(100, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
 
-    MythPushButton *finish = new MythPushButton("&Finish", this);
+    MythPushButton *finish = new MythPushButton(tr("&Finish"), this);
     hbox->addWidget(finish);
 
     connect(finish, SIGNAL(clicked()), this, SLOT(slotFinish()));
@@ -500,7 +500,7 @@ void Bookmarks::setupView()
     // Top fancy stuff
     QLabel *topLabel = new QLabel(this);
     topLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    topLabel->setText("MythBrowser: Select group or single site to view");
+    topLabel->setText(tr("MythBrowser: Select group or single site to view"));
 
     QFrame *hbar1 = new QFrame( this, "<hr>", 0 );
     hbar1->setBackgroundOrigin(QWidget::WindowOrigin);

@@ -73,6 +73,13 @@ int main(int argc, char **argv)
              << db->lastError().databaseText() << endl;
         return -1;
     }
+
+    QTranslator translator(0);
+    translator.load(PREFIX + QString("/share/mythtv/i18n/mythbrowser_") +
+                    QString(gContext->GetSetting("Language").lower()) +
+                    QString(".qm"), ".");
+    a.installTranslator(&translator);
+
     gContext->SetSetting("Theme", "blue");
     gContext->LoadQtConfig();
 

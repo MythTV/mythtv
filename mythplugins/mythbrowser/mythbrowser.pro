@@ -2,5 +2,5 @@
 TEMPLATE = subdirs
 
 # Directories
-SUBDIRS = mythbrowser mythbookmarkmanager
+SUBDIRS = mythbrowser mythbookmarkmanager i18n
 

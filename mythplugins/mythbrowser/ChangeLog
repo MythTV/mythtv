@@ -30,3 +30,6 @@ V0.32   - Zoom In and Zoom Out added to the Popup Menu
         - Add 'http://' to a link if missing
         - PREFIX patch from Jim Radford
 
+2004.02.15
+        - i18n patch by Anthony Fok
+
