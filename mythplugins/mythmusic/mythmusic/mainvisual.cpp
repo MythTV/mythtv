@@ -184,7 +184,7 @@ void MainVisual::timeout()
             bitBlt(this, 0, 0, &pixmap);
     } 
 
-    if (! playing && stop)
+    if (!playing && stop)
 	timer->stop();
 }
 

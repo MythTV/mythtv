@@ -47,6 +47,8 @@ Synaesthesia::Synaesthesia(long int winid)
     }
 #endif
 
+    SDL_ShowCursor(0);
+
     setupPalette();
 }
 

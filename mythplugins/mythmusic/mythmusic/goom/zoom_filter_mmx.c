@@ -60,9 +60,9 @@ void zoom_filter_mmx (int prevX, int prevY,
 	  }
 
 	  __asm__ __volatile__ ("
-			   movd %%eax,%%mm6
+			   movd %2,%%mm6
 			   ;// recuperation des deux premiers pixels dans mm0 et mm1
-			   movq (%%edx,%%ebx,4), %%mm0
+			   movq (%3, %1, 4), %%mm0
 			   movq %%mm0, %%mm1	
 			   
 			   ;// depackage du premier pixel
@@ -95,10 +95,10 @@ void zoom_filter_mmx (int prevX, int prevY,
 			   punpckhbw %%mm7, %%mm5
 
 			   /* ajouter la longueur de ligne a esi */
-			   addl 8(%%ebp),%%ebx
+			   addl 8(%%ebp), %1
 	   
 			   ;// recuperation des 2 derniers pixels
-			   movq (%%edx,%%ebx,4), %%mm1
+			   movq (%3, %1, 4), %%mm1
 			   movq %%mm1, %%mm2
 			
 			   ;// depackage des pixels
@@ -117,10 +117,11 @@ void zoom_filter_mmx (int prevX, int prevY,
 			   psrlw $8, %%mm0
 			   packuswb %%mm7, %%mm0
 
-			   movd %%mm0,%%eax
+			   movd %%mm0, %0
 			   "
-							:"=eax"(expix2[loop])
-							:"ebx"(pos),"eax"(coeffs),"edx"(expix1)
+			:"=r" (expix2[loop])
+			:"r" (pos), "r" (coeffs), "r"(expix1)
+			: "memory"
 							
 				);
 	  
