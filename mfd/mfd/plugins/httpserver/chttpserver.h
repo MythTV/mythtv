@@ -1,5 +1,5 @@
-#ifndef HTTPSERVER_H_
-#define HTTPSERVER_H_
+#ifndef CHTTPSERVER_H_
+#define CHTTPSERVER_H_
 /*
 	httpserver.h
 
@@ -12,7 +12,7 @@
 #include <iostream>
 using namespace std; 
 
-#include "mfd_plugin.h"
+#include "httpserver.h"
 
 
 //

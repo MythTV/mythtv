@@ -16,6 +16,7 @@
 #include <qvaluelist.h>
 
 #include "../mfdlib/mfd_plugin.h"
+#include "../mfdlib/httpserver.h"
 #include "../mdcaplib/mdcapoutput.h"
 #include "../mdcaplib/markupcodes.h"
 

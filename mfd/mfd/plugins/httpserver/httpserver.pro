@@ -10,7 +10,7 @@ TARGET = mfdplugin-httpserver
 target.path = $${PREFIX}/lib/mythtv/mfdplugins
 INSTALLS += target
 
-HEADERS +=          httpserver.h
-SOURCES += main.cpp httpserver.cpp
+HEADERS +=          chttpserver.h
+SOURCES += main.cpp chttpserver.cpp
 
 

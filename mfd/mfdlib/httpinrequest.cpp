@@ -15,7 +15,7 @@ using namespace std;
 
 #include "httpinrequest.h"
 #include "httpoutresponse.h"
-#include "mfd_plugin.h"
+#include "httpserver.h"
 
 HttpInRequest::HttpInRequest(MFDHttpPlugin *owner, char *raw_incoming, int incoming_length)
 {

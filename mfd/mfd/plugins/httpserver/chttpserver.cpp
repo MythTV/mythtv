@@ -12,7 +12,7 @@
 
 #include "../../mdserver.h"
 
-#include "httpserver.h"
+#include "chttpserver.h"
 #include "httpinrequest.h"
 #include "httpoutresponse.h"
 
