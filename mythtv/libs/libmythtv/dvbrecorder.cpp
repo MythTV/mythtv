@@ -300,7 +300,7 @@ void DVBRecorder::FinishRecording()
     {
         pthread_mutex_lock(db_lock);
         MythContext::KickDatabase(db_conn);
-        curRecording->SetPositionMap(positionMap, db_conn);
+        curRecording->SetPositionMap(positionMap, MARK_GOP_START, db_conn);
         pthread_mutex_unlock(db_lock);
     }
 }
@@ -463,7 +463,7 @@ void DVBRecorder::TransitionToRing(void)
     {
         pthread_mutex_lock(db_lock);
         MythContext::KickDatabase(db_conn);
-        curRecording->SetPositionMap(positionMap, db_conn);
+        curRecording->SetPositionMap(positionMap, MARK_GOP_START, db_conn);
         pthread_mutex_unlock(db_lock);
 
         delete curRecording;

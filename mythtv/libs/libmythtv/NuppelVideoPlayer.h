@@ -96,7 +96,7 @@ class NuppelVideoPlayer
     bool ReencodeFile(char *inputname, char *outputname,
                       RecordingProfile &profile);
 
-    int FlagCommercials(int show_percentage = false);
+    int FlagCommercials(bool showPercentage = false, bool fullSpeed = false);
 
     unsigned char *GetCurrentFrame(int &w, int &h);
 

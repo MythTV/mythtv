@@ -221,7 +221,7 @@ void MpegRecorder::FinishRecording(void)
     {
         pthread_mutex_lock(db_lock);
         MythContext::KickDatabase(db_conn);
-        curRecording->SetPositionMap(positionMap, db_conn);
+        curRecording->SetPositionMap(positionMap, MARK_GOP_START, db_conn);
         pthread_mutex_unlock(db_lock);
     }
 }
@@ -384,7 +384,7 @@ void MpegRecorder::TransitionToRing(void)
     {
         pthread_mutex_lock(db_lock);
         MythContext::KickDatabase(db_conn);
-        curRecording->SetPositionMap(positionMap, db_conn);
+        curRecording->SetPositionMap(positionMap, MARK_GOP_START, db_conn);
         pthread_mutex_unlock(db_lock);
 
         delete curRecording;

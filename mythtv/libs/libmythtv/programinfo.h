@@ -9,14 +9,16 @@
 
 #define NUMPROGRAMLINES 20
 
-#define MARK_PROCESSING    0
+#define MARK_EDIT_MODE    -2
+#define MARK_PROCESSING   -1
+#define MARK_CUT_END       0
 #define MARK_CUT_START     1
-#define MARK_CUT_END       2
+#define MARK_BOOKMARK      2
 #define MARK_BLANK_FRAME   3
 #define MARK_COMM_START    4
 #define MARK_COMM_END      5
 #define MARK_GOP_START     6
-#define MARK_BOOKMARK      7
+#define MARK_KEYFRAME      7
 #define MARK_SCENE_CHANGE  8
 
 class QSqlDatabase;
@@ -74,8 +76,19 @@ class ProgramInfo
     void SetCommBreakList(QMap<long long, int> &frames, QSqlDatabase *db);
     void GetCommBreakList(QMap<long long, int> &frames, QSqlDatabase *db);
 
-    void GetPositionMap(QMap<long long, long long> &posMap, QSqlDatabase *db);
-    void SetPositionMap(QMap<long long, long long> &posMap, QSqlDatabase *db);
+    void ClearMarkupMap(QSqlDatabase *db, int type = -100,
+                      long long min_frame = -1, long long max_frame = -1);
+    void SetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
+                      int type = -100,
+                      long long min_frame = -1, long long max_frame = -1);
+    void GetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
+                      int type, bool mergeIntoMap = false);
+    bool CheckMarkupFlag(int type, QSqlDatabase *db);
+    void SetMarkupFlag(int type, bool processing, QSqlDatabase *db);
+    void GetPositionMap(QMap<long long, long long> &posMap, int type,
+                        QSqlDatabase *db);
+    void SetPositionMap(QMap<long long, long long> &posMap, int type,
+                        QSqlDatabase *db);
 
     static void GetProgramRangeDateTime(QPtrList<ProgramInfo> *proglist, 
                                         QString channel, 

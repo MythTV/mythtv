@@ -2840,7 +2840,7 @@ bool NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     return true;
 }
 
-int NuppelVideoPlayer::FlagCommercials(int show_percentage)
+int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
 {
     int comms_found = 0;
     int percentage = 0;
@@ -2853,6 +2853,10 @@ int NuppelVideoPlayer::FlagCommercials(int show_percentage)
 
     if (OpenFile() < 0)
         return(0);
+
+    db_lock.lock();
+    m_playbackinfo->SetMarkupFlag(MARK_PROCESSING, true, m_db);
+    db_lock.unlock();
 
     playing = true;
 
@@ -2880,16 +2884,16 @@ int NuppelVideoPlayer::FlagCommercials(int show_percentage)
     // the meat of the offline commercial detection code, scan through whole
     // file looking for indications of commercial breaks
     GetFrame(1,true);
-    if (show_percentage)
+    if (showPercentage)
         printf( "%3d%%", 0 );
 
     while (!eof)
     {
         // sleep a little so we don't use all cpu even if we're niced
-        if (!show_percentage)
+        if (!fullSpeed)
             usleep(10000);
 
-        if ((show_percentage) &&
+        if ((showPercentage) &&
             ((framesPlayed % 100) == 0))
         {
             percentage = framesPlayed * 100 / totalFrames;
@@ -2903,7 +2907,7 @@ int NuppelVideoPlayer::FlagCommercials(int show_percentage)
         GetFrame(1,true);
     }
 
-    if (show_percentage)
+    if (showPercentage)
         printf( "\b\b\b\b      \b\b\b\b\b\b" );
 
     if (commercialskipmethod & 0x01)
@@ -2930,6 +2934,10 @@ int NuppelVideoPlayer::FlagCommercials(int show_percentage)
 
     playing = false;
     killplayer = true;
+
+    db_lock.lock();
+    m_playbackinfo->SetMarkupFlag(MARK_PROCESSING, false, m_db);
+    db_lock.unlock();
 
     return(comms_found);
 }

@@ -6,6 +6,7 @@
 #define COMMERCIAL_SKIP_OFF     0x0
 #define COMMERCIAL_SKIP_BLANKS  0x1
 #define COMMERCIAL_SKIP_SCENE   0x2
+#define COMMERCIAL_SKIP_RATING  0x4
 
 class CommDetect
 {

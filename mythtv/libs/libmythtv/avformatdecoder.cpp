@@ -318,7 +318,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     if (m_playbackinfo && m_db)
     {
-        m_playbackinfo->GetPositionMap(positionMap, m_db);
+        m_playbackinfo->GetPositionMap(positionMap, MARK_GOP_START, m_db);
         if (positionMap.size() > 1)
         {
             haspositionmap = true;
