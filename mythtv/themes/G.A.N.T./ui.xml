@@ -1757,12 +1757,14 @@
       <color>#ffffff</color>
       <size>18</size>
       <size:small>11</size:small>
+      <bold>yes</bold>
     </font>
 
     <font name="inactive" face="Arial">
       <color>#9999cc</color>
       <size>18</size>
       <size:small>11</size:small>
+      <bold>yes</bold>
     </font>
 
 

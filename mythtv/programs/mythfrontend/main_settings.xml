@@ -71,5 +71,11 @@
      <action>SETTINGS XBOXSETTINGS</action>
      <dependssetting>EnableXbox</dependssetting>
    </button>
-
+    
+    <button>
+      <type>PHONE</type>
+      <text>Phone Settings</text>
+      <action>CONFIGPLUGIN mythphone</action>
+      <depends>mythphone</depends>
+   </button>
 </mythmenu>

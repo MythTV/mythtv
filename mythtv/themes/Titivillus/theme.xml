@@ -315,10 +315,21 @@
 
   <buttondef name="SETTINGS_XBOX">
     <image>text-blank.png</image>
-    <watermarkimage>watermark/NOTHING.png</watermarkimage>
+    <watermarkimage>watermark/xbox.png</watermarkimage>
     <offset>0,0</offset>
   </buttondef>
 
+
+<!-- ######################################-->
+<!-- ########     MythPhone        ########-->
+<!-- ######################################-->
+  <buttondef name="PHONE">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/phone.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  
 <!-- ######################################-->
 <!-- ########  music_settings.xml  ########-->
 <!-- ######################################-->
@@ -437,13 +448,13 @@
 
   <buttondef name="TV_SEARCH_WORDS">
     <image>text-blank.png</image>
-    <watermarkimage>watermark/tv_searchlistings.png</watermarkimage>
+    <watermarkimage>watermark/search_words.png</watermarkimage>
     <offset>0,0</offset>
   </buttondef>
 
   <buttondef name="TV_SEARCH_LISTS">
     <image>text-blank.png</image>
-    <watermarkimage>watermark/tv_searchlistings.png</watermarkimage>
+    <watermarkimage>watermark/search_lists.png</watermarkimage>
     <offset>0,0</offset>
   </buttondef>
 
@@ -471,7 +482,7 @@
 
   <buttondef name="TV_SEARCH_TITLES">
     <image>text-blank.png</image>
-    <watermarkimage>watermark/tv_searchlistings.png</watermarkimage>
+    <watermarkimage>watermark/search_new_titles.png</watermarkimage>
     <offset>0,0</offset>
   </buttondef>
 
@@ -505,7 +516,7 @@
 
   <buttondef name="TV_SEARCH_CATEGORIES">
     <image>text-blank.png</image>
-    <watermarkimage>watermark/tv_searchlistings.png</watermarkimage>
+    <watermarkimage>watermark/search_categories.png</watermarkimage>
     <offset>0,0</offset>
   </buttondef>
 

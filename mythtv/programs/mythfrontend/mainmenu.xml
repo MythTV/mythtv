@@ -59,7 +59,14 @@
      <action>MENU optical_menu.xml</action>
      <depends>mythmusic mythdvd</depends>
    </button>
-
+    
+    <button>
+      <type>PHONE</type>
+      <text>Phone</text>
+      <action>PLUGIN mythphone</action>
+      <depends>mythphone</depends>
+   </button>
+   
    <button>
      <type>MENU_UTILITIES_SETUP</type>
      <text>Utilities/Setup</text>
