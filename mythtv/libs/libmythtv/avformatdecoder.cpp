@@ -20,7 +20,6 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
 
     ic = NULL;
     directrendering = false;
-    pkt = NULL;
     lastapts = lastvpts = 0;
     framesPlayed = 0;
     framesRead = 0;
@@ -59,7 +58,6 @@ void AvFormatDecoder::SeekReset(void)
     AVPacketList *pktl = NULL;
     while ((pktl = ic->packet_buffer))
     {
-        *pkt = pktl->pkt;
         ic->packet_buffer = pktl->next;
         av_free(pktl);
     }
@@ -324,6 +322,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             long long totframes = positionMap.size() * keyframedist;
             int length = (int)((totframes * 1.0) / fps);
             m_parent->SetFileLength(length, totframes);            
+            gopset = true;
         }
     }
 

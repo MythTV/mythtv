@@ -60,7 +60,6 @@ class AvFormatDecoder : public DecoderBase
 
     AVFormatContext *ic;
     AVFormatParameters params;
-    AVPacket *pkt;
 
     URLContext readcontext;
 
