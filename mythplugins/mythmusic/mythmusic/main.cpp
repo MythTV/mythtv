@@ -50,13 +50,13 @@ void CheckFreeDBServerFile(void)
     }
 }
 
-Decoder *getDecoder(MythContext *context, QString &filename)
+Decoder *getDecoder(MythContext *context, const QString &filename)
 {
     Decoder *decoder = Decoder::create(context, filename, NULL, NULL, true);
     return decoder;
 }
 
-void CheckFile(MythContext *context, QString &filename)
+void CheckFile(MythContext *context, const QString &filename)
 {
     Decoder *decoder = getDecoder(context, filename);
 
