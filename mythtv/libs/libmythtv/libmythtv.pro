@@ -8,18 +8,28 @@ CONFIG += thread staticlib
 
 include ( ../../settings.pro )
 
-INCLUDEPATH += ../libNuppelVideo ../
-TARGETDEPS = ../libNuppelVideo/libNuppelVideo.a
-DEPENDPATH += ../libmyth ../libNuppelVideo
+INCLUDEPATH += ../libmyth ../
+DEPENDPATH += ../libmyth 
+
+QMAKE_CXXFLAGS_RELEASE += `freetype-config --cflags`
+QMAKE_CXXFLAGS_DEBUG += `freetype-config --cflags`
 
 installfiles.path = $${PREFIX}/share/mythtv
 installfiles.files = FreeSans.ttf
-installfiles.files += settings.txt
 
 INSTALLS = installfiles
  
 # Input
-HEADERS += channel.h frequencies.h recordingprofile.h tv_play.h tv_rec.h
-HEADERS += videosource.h
-SOURCES += channel.cpp frequencies.c recordingprofile.cpp tv_play.cpp tv_rec.cpp
-SOURCES += videosource.cpp
+HEADERS += channel.h effects.h filter.h format.h frame.h frequencies.h 
+HEADERS += guidegrid.h infodialog.h infostructs.h jitterometer.h lzoconf.h 
+HEADERS += minilzo.h mmx.h NuppelVideoPlayer.h NuppelVideoRecorder.h osd.h 
+HEADERS += osdtypes.h programinfo.h recordingprofile.h remoteencoder.h
+HEADERS += remoteutil.h RingBuffer.h RTjpegN.h ttfont.h tv_play.h tv_rec.h 
+HEADERS += videosource.h XJ.h yuv2rgb.h
+
+SOURCES += channel.cpp effects.cpp filter.c frequencies.c guidegrid.cpp
+SOURCES += infodialog.cpp infostructs.cpp jitterometer.cpp minilzo.cpp 
+SOURCES += NuppelVideoPlayer.cpp NuppelVideoRecorder.cpp osd.cpp
+SOURCES += osdtypes.cpp programinfo.cpp recordingprofile.cpp remoteencoder.cpp
+SOURCES += remoteutil.cpp RingBuffer.cpp RTjpegN.cpp ttfont.cpp tv_play.cpp 
+SOURCES += tv_rec.cpp videosource.cpp XJ.cpp yuv2rgb.cpp

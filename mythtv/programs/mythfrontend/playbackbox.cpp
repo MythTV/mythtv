@@ -25,7 +25,8 @@ using namespace std;
 
 #include "libmyth/mythcontext.h"
 #include "libmyth/dialogbox.h"
-#include "libmyth/programinfo.h"
+#include "libmythtv/programinfo.h"
+#include "libmythtv/remoteutil.h"
 
 PlaybackBox::PlaybackBox(MythContext *context, BoxType ltype, QWidget *parent, 
                          const char *name)
@@ -222,7 +223,7 @@ QListViewItem *PlaybackBox::FillList(bool selectsomething)
     ProgramListItem *item = NULL;
 
     vector<ProgramInfo *> *infoList;
-    infoList = m_context->GetRecordedList(type == Delete);
+    infoList = RemoteGetRecordedList(m_context, type == Delete);
     if (infoList)
     {
         vector<ProgramInfo *>::iterator i = infoList->begin();
@@ -491,7 +492,7 @@ void PlaybackBox::doRemove(QListViewItem *lvitem)
 
     ProgramInfo *rec = pgitem->getProgramInfo();
 
-    m_context->DeleteRecording(rec);
+    RemoteDeleteRecording(m_context, rec);
 
     if (lvitem->itemBelow())
     {
@@ -630,7 +631,7 @@ void PlaybackBox::promptEndOfRecording(QListViewItem *lvitem)
 void PlaybackBox::UpdateProgressBar(void)
 {
     int total, used;
-    m_context->GetFreeSpace(total, used);
+    RemoteGetFreeSpace(m_context, total, used);
 
     QString usestr;
     usestr.sprintf("Storage: %d,%03d MB used out of %d,%03d MB total", 

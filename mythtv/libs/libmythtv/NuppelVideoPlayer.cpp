@@ -25,8 +25,8 @@ extern "C" {
 #include "../libavcodec/mythav.h"
 }
 
-#include "../libmyth/mythcontext.h"
-#include "../libmyth/remoteencoder.h"
+#include "mythcontext.h"
+#include "remoteencoder.h"
 
 extern pthread_mutex_t avcodeclock;
 

@@ -9,10 +9,14 @@ CONFIG += thread
 target.path = $${PREFIX}/bin
 INSTALLS = target
 
-INCLUDEPATH += ../../libs
-LIBS += -L../../libs/libmyth -lmyth-$$LIBVERSION -lXinerama
+INCLUDEPATH += ../../libs/ ../../libs/libmyth
+LIBS += -L../../libs/libmyth -L../../libs/libmythtv
+LIBS += -lmythtv -lavcodec -lmyth-$$LIBVERSION -lXinerama
 
 DEPENDPATH += ../../libs/libmyth
+
+TARGETDEPS += ../../libs/libmythtv/libmythtv.a
+TARGETDEPS += ../../libs/libavcodec/libavcodec.a
 
 # Input
 SOURCES += main.cpp

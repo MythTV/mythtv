@@ -12,7 +12,7 @@ using namespace std;
 #include "mainserver.h"
 #include "encoderlink.h"
 
-#include "libmyth/programinfo.h"
+#include "libmythtv/programinfo.h"
 #include "libmyth/mythcontext.h"
 
 QMap<int, EncoderLink *> tvList;

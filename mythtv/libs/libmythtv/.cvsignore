@@ -1,4 +1,6 @@
 .qmake.internal.cache
 moc_recordingprofile.cpp
 moc_videosource.cpp
+moc_guidegrid.cpp
+moc_infodialog.cpp
 Makefile

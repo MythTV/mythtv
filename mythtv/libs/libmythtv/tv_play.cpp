@@ -10,9 +10,11 @@ using namespace std;
 
 #include "tv.h"
 #include "osd.h"
-#include "libmyth/mythcontext.h"
-#include "libmyth/dialogbox.h"
-#include "libmyth/remoteencoder.h"
+#include "mythcontext.h"
+#include "dialogbox.h"
+#include "remoteencoder.h"
+#include "remoteutil.h"
+#include "guidegrid.h"
 
 // cheat and put the keycodes here
 #define wsUp            0x52 + 256
@@ -100,7 +102,7 @@ TVState TV::LiveTV(void)
 {
     if (internalState == kState_None)
     {
-        RemoteEncoder *testrec = m_context->RequestRecorder();
+        RemoteEncoder *testrec = RemoteRequestRecorder(m_context);
 
         if (testrec < 0)
         {
@@ -316,7 +318,7 @@ void TV::HandleStateChange(void)
 
         if (nextState == kState_WatchingRecording)
         {
-            recorder = m_context->GetExistingRecorder(playbackinfo);
+            recorder = RemoteGetExistingRecorder(m_context, playbackinfo);
             if (!recorder->IsValidRecorder())
             {
                 cout << "ERROR: couldn't find recorder for in-progress "
@@ -1308,8 +1310,7 @@ void TV::doLoadMenu(void)
         recorder->GetChannelInfo(dummy, dummy, dummy, dummy, dummy, dummy, 
                                  dummy, dummy, channame);
 
-    QString chanstr = m_context->RunProgramGuide(channame, true, embedcb,
-                                                 this);
+    QString chanstr = RunProgramGuide(m_context, channame, true, embedcb, this);
 
     if (chanstr != "")
     {

@@ -20,6 +20,7 @@ using namespace std;
 
 #include "libmyth/dialogbox.h"
 #include "libmyth/mythcontext.h"
+#include "libmythtv/remoteutil.h"
     
 ViewScheduled::ViewScheduled(MythContext *context, QSqlDatabase *ldb,
                              QWidget *parent, const char *name)
@@ -132,7 +133,7 @@ void ViewScheduled::FillList(void)
     bool conflicts = false;
     vector<ProgramInfo *> recordinglist;
 
-    conflicts = m_context->GetAllPendingRecordings(recordinglist);
+    conflicts = RemoteGetAllPendingRecordings(m_context, recordinglist);
 
     vector<ProgramInfo *>::reverse_iterator pgiter = recordinglist.rbegin();
 
@@ -260,7 +261,7 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
         cerr << thequery << endl;
     }
 
-    vector<ProgramInfo *> *conflictlist = m_context->GetConflictList(rec, 
+    vector<ProgramInfo *> *conflictlist = RemoteGetConflictList(m_context, rec, 
                                                                      false);
 
     QString dstart, dend;
@@ -324,7 +325,8 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
 
 void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
 {
-    vector<ProgramInfo *> *conflictlist = m_context->GetConflictList(rec, true);
+    vector<ProgramInfo *> *conflictlist = RemoteGetConflictList(m_context, rec,
+                                                                true);
 
     QString dateformat = m_context->GetSetting("DateFormat");
     if (dateformat == "")

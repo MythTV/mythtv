@@ -5,6 +5,8 @@
 #include "libmyth/mythcontext.h"
 #include "libmyth/settings.h"
 
+#include "libmythtv/guidegrid.h"
+
 int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
@@ -30,7 +32,7 @@ int main(int argc, char **argv)
 
     context->LoadQtConfig();
     
-    QString chanstr = context->RunProgramGuide(startchannel);
+    QString chanstr = RunProgramGuide(context, startchannel);
 
     int chan = 0;
     

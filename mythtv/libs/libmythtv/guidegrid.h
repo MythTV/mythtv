@@ -20,11 +20,17 @@ class TimeInfo;
 class ChannelInfo;
 class MythContext;
 
-namespace libmyth 
-{
-
 #define MAX_DISPLAY_CHANS 8
 #define DISPLAY_TIMES 30
+
+
+// Use this function to instantiate a guidegrid instance.
+QString RunProgramGuide(MythContext *context, QString startchannel, 
+                        bool thread = false,
+                        void (*embedcb)(void *data, unsigned long wid,
+                                        int x, int y, int w, int h) = NULL,
+                        void *data = NULL);
+
 
 class GuideGrid : public MythDialog
 {
@@ -186,5 +192,4 @@ class GuideGrid : public MythDialog
     QString currentTimeColor;
 };
 
-}
 #endif

@@ -18,8 +18,6 @@ using namespace std;
 #include "oldsettings.h"
 #include "mythcontext.h"
 
-using namespace libmyth;
-
 class RecListItem : public QListViewItem
 {
   public:

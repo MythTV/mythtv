@@ -13,7 +13,7 @@ INSTALLS = target
 CONFIG -= debug
 CONFIG += release
 
-INCLUDEPATH += ../../libs/libNuppelVideo
+INCLUDEPATH += ../../libs/libmythtv
 
 QMAKE_CFLAGS_RELEASE += -Wno-missing-prototypes -O2 -fomit-frame-pointer
 QMAKE_CFLAGS_DEBUG += -Wno-missing-prototypes

@@ -11,10 +11,10 @@ using namespace std;
 
 #include "tv_rec.h"
 #include "osd.h"
-#include "libmyth/mythcontext.h"
-#include "libmyth/dialogbox.h"
+#include "mythcontext.h"
+#include "dialogbox.h"
 #include "recordingprofile.h"
-#include "libmyth/util.h"
+#include "util.h"
 
 void *SpawnEncode(void *param)
 {

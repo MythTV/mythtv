@@ -10,9 +10,9 @@
 using namespace std;
 
 #include "RingBuffer.h"
-#include "../libmyth/mythcontext.h"
-#include "../libmyth/remotefile.h"
-#include "../libmyth/remoteencoder.h"
+#include "mythcontext.h"
+#include "remotefile.h"
+#include "remoteencoder.h"
 
 #define TFW_BUF_SIZE (2*1024*1024)
 

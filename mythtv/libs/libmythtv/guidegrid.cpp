@@ -14,6 +14,7 @@
 #include <qvgroupbox.h>
 #include <qheader.h>
 
+#include <unistd.h>
 #include <iostream>
 using namespace std;
 
@@ -24,7 +25,33 @@ using namespace std;
 #include "programinfo.h"
 #include "oldsettings.h"
 
-using namespace libmyth;
+QString RunProgramGuide(MythContext *context, QString startchannel, bool thread,
+                        void (*embedcb)(void *data, unsigned long wid,
+                                        int x, int y, int w, int h),
+                        void *data)
+{
+    if (thread)
+        qApp->lock();
+
+    GuideGrid gg(context, startchannel, embedcb, data);
+
+    if (thread)
+    {
+        gg.show();
+        qApp->unlock();
+
+        while (gg.isVisible())
+            usleep(50);
+    }
+    else
+        gg.exec();
+
+    QString chanstr = gg.getLastChannel();
+    if (chanstr == QString::null)
+        chanstr = "";
+
+    return chanstr;
+}
 
 GuideGrid::GuideGrid(MythContext *context, const QString &channel, 
                      void (*embedcb)(void *data, unsigned long wid, int x, 

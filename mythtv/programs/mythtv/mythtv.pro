@@ -10,19 +10,15 @@ TARGET = mythtv
 target.path = $${PREFIX}/bin
 INSTALLS = target
 
-INCLUDEPATH += ../../libs/libNuppelVideo ../../libs/libmythtv ../../libs
-LIBS += -L../../libs/libNuppelVideo -L../../libs/libmythtv 
-LIBS += -L../../libs/libavcodec -L../../libs/libmyth
+INCLUDEPATH += ../../libs/libmythtv ../../libs
+LIBS += -L../../libs/libmythtv -L../../libs/libavcodec -L../../libs/libmyth
 
-LIBS += -lmythtv -lNuppelVideo -lavcodec -lmyth-$$LIBVERSION -lXv -lXinerama
-LIBS += -lmp3lame
+LIBS += -lmythtv -lavcodec -lmyth-$$LIBVERSION -lXv -lXinerama -lmp3lame
 
-TARGETDEPS  = ../../libs/libNuppelVideo/libNuppelVideo.a
 TARGETDEPS += ../../libs/libmythtv/libmythtv.a
 TARGETDEPS += ../../libs/libavcodec/libavcodec.a
 
-DEPENDPATH += ../../libs/libNuppelVideo ../../libs/libmythtv ../../libs/libmyth
-DEPENDPATH += ../../libs/libavcodec
+DEPENDPATH += ../../libs/libmythtv ../../libs/libmyth ../../libs/libavcodec
 
 # Input
 SOURCES += main.cpp

@@ -10,8 +10,6 @@
 
 #include "channel.h"
 
-#include "libmyth/programinfo.h"
-
 class QSqlDatabase;
 class QDateTime;
 class MythContext;

@@ -10,7 +10,7 @@ using namespace std;
 
 #include "scheduler.h"
 
-#include "libmyth/programinfo.h"
+#include "libmythtv/programinfo.h"
 
 Scheduler::Scheduler(QSqlDatabase *ldb)
 {

@@ -15,10 +15,11 @@ using namespace std;
 #include "recordingprofile.h"
 
 #include "libmyth/themedmenu.h"
-#include "libmyth/programinfo.h"
+#include "libmythtv/programinfo.h"
 #include "libmyth/mythcontext.h"
 #include "libmyth/dialogbox.h"
 #include "libmythtv/videosource.h"
+#include "libmythtv/guidegrid.h"
 
 #define QUIT     1
 #define HALTWKUP 2
@@ -32,7 +33,7 @@ QString startGuide(MythContext *context)
     if (startchannel == "")
         startchannel = "3";
 
-    return context->RunProgramGuide(startchannel);
+    return RunProgramGuide(context, startchannel);
 }
 
 int startManaged(MythContext *context)

@@ -15,8 +15,6 @@ using namespace std;
 class Settings;
 class QSqlDatabase;
 class QSqlQuery;
-class ProgramInfo;
-class RemoteEncoder;
 
 class MythEvent : public QCustomEvent
 {
@@ -53,11 +51,6 @@ class MythContext : public QObject
 
     void GetScreenSettings(int &width, float &wmult, int &height, float &hmult);
    
-    QString RunProgramGuide(QString startchannel, bool thread = false,
-                            void (*embedcb)(void *data, unsigned long wid,
-                                            int x, int y, int w, int h) = NULL,
-                            void *data = NULL);
- 
     QString FindThemeDir(QString themename);
 
     int OpenDatabase(QSqlDatabase *db);
@@ -80,26 +73,16 @@ class MythContext : public QObject
 
     QPixmap *LoadScalePixmap(QString filename); 
 
-    vector<ProgramInfo *> *GetRecordedList(bool deltype);
-    void GetFreeSpace(int &totalspace, int &usedspace);
-    void DeleteRecording(ProgramInfo *pginfo);
-    bool GetAllPendingRecordings(vector<ProgramInfo *> &recordinglist);
-    vector<ProgramInfo *> *GetConflictList(ProgramInfo *pginfo,
-                                           bool removenonplaying);
-
-    RemoteEncoder *RequestRecorder(void);
-    RemoteEncoder *GetExistingRecorder(ProgramInfo *pginfo);
-
     void addListener(QObject *obj);
     void removeListener(QObject *obj);
     void dispatch(MythEvent &e);
+
+    void SendReceiveStringList(QStringList &strlist);
 
   private slots:
     void readSocket();
 
   private:
-    void SendReceiveStringList(QStringList &strlist);
-
     void SetPalette(QWidget *widget);
 
     Settings *m_settings;

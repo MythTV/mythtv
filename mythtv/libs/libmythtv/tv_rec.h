@@ -10,7 +10,6 @@
 
 #include "channel.h"
 
-#include "libmyth/programinfo.h"
 #include "tv.h"
 
 class QSqlDatabase;

@@ -12,12 +12,8 @@
 //#include "settings.h"
 #include "oldsettings.h"
 #include "themedmenu.h"
-#include "guidegrid.h"
-#include "programinfo.h"
 #include "util.h"
 #include "remoteencoder.h"
-
-using namespace libmyth;
 
 MythContext::MythContext(bool gui)
            : QObject()
@@ -192,34 +188,6 @@ QString MythContext::FindThemeDir(QString themename)
 
     cerr << "Could not find theme: " << themename << endl;
     return "";
-}
-
-QString MythContext::RunProgramGuide(QString startchannel, bool thread,
-                             void (*embedcb)(void *data, unsigned long wid,
-                                             int x, int y, int w, int h),
-                                     void *data)
-{
-    if (thread)
-        qApp->lock();
- 
-    GuideGrid gg(this, startchannel, embedcb, data);
-
-    if (thread)
-    {
-        gg.show();
-        qApp->unlock();
-
-        while (gg.isVisible())
-            usleep(50);
-    }
-    else 
-        gg.exec();
-
-    QString chanstr = gg.getLastChannel();
-    if (chanstr == QString::null)
-        chanstr = "";
-
-    return chanstr;
 }
 
 int MythContext::OpenDatabase(QSqlDatabase *db)
@@ -479,129 +447,6 @@ void MythContext::SendReceiveStringList(QStringList &strlist)
 
     expectingReply = false;
     pthread_mutex_unlock(&serverSockLock);
-}
-
-vector<ProgramInfo *> *MythContext::GetRecordedList(bool deltype)
-{
-    QString str = "QUERY_RECORDINGS ";
-    if (deltype)
-        str += "Delete";
-    else
-        str += "Play";
-
-    QStringList strlist = str;
-
-    SendReceiveStringList(strlist);
-
-    int numrecordings = strlist[0].toInt();
-
-    vector<ProgramInfo *> *info = new vector<ProgramInfo *>;
-    int offset = 1;
-
-    for (int i = 0; i < numrecordings; i++)
-    {
-        ProgramInfo *pginfo = new ProgramInfo();
-        pginfo->FromStringList(strlist, offset);
-        info->push_back(pginfo);
-
-        offset += NUMPROGRAMLINES;
-    }
-
-    return info;
-} 
-
-void MythContext::GetFreeSpace(int &totalspace, int &usedspace)
-{
-    QStringList strlist = QString("QUERY_FREESPACE");
-
-    SendReceiveStringList(strlist);
-
-    totalspace = strlist[0].toInt();
-    usedspace = strlist[1].toInt();
-}
-
-void MythContext::DeleteRecording(ProgramInfo *pginfo)
-{
-    QStringList strlist = QString("DELETE_RECORDING");
-    pginfo->ToStringList(strlist);
-
-    SendReceiveStringList(strlist);
-}
-
-bool MythContext::GetAllPendingRecordings(vector<ProgramInfo *> &recordinglist)
-{
-    QStringList strlist = QString("QUERY_GETALLPENDING");
-
-    SendReceiveStringList(strlist);
-
-    bool conflicting = strlist[0].toInt();
-    int numrecordings = strlist[1].toInt();
-
-    int offset = 2;
-
-    for (int i = 0; i < numrecordings; i++)
-    {
-        ProgramInfo *pginfo = new ProgramInfo();
-        pginfo->FromStringList(strlist, offset);
-        recordinglist.push_back(pginfo);
-
-        offset += NUMPROGRAMLINES;
-    }
-
-    return conflicting;
-}
-
-vector<ProgramInfo *> *MythContext::GetConflictList(ProgramInfo *pginfo, 
-                                                    bool removenonplaying)
-{
-    QString cmd = QString("QUERY_GETCONFLICTING %1").arg(removenonplaying);
-    QStringList strlist = cmd;
-    pginfo->ToStringList(strlist);
-
-    SendReceiveStringList(strlist);
-
-    int numrecordings = strlist[0].toInt();
-    int offset = 1;
-
-    vector<ProgramInfo *> *retlist = new vector<ProgramInfo *>;
-
-    for (int i = 0; i < numrecordings; i++)
-    {
-        ProgramInfo *pginfo = new ProgramInfo();
-        pginfo->FromStringList(strlist, offset);
-        retlist->push_back(pginfo);
-
-        offset += NUMPROGRAMLINES;
-    }
-
-    return retlist;
-}
-
-RemoteEncoder *MythContext::GetExistingRecorder(ProgramInfo *pginfo)
-{
-    QStringList strlist = "GET_RECORDER_NUM";
-    pginfo->ToStringList(strlist);
-
-    SendReceiveStringList(strlist);
-
-    int num = strlist[0].toInt();
-    QString hostname = strlist[1];
-    int port = strlist[2].toInt();
-
-    return new RemoteEncoder(num, hostname, port);
-}
-
-RemoteEncoder *MythContext::RequestRecorder(void)
-{
-    QStringList strlist = "GET_FREE_RECORDER";
-
-    SendReceiveStringList(strlist);
-
-    int num = strlist[0].toInt();
-    QString hostname = strlist[1];
-    int port = strlist[2].toInt();
-
-    return new RemoteEncoder(num, hostname, port);
 }
 
 void MythContext::readSocket(void)

@@ -4,7 +4,7 @@
 #include <qlistview.h>
 #include <qpixmap.h>
 
-#include "libmyth/programinfo.h"
+#include "libmythtv/programinfo.h"
 
 class MythContext;
 class TV;

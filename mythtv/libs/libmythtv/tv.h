@@ -9,8 +9,7 @@
 #include "RingBuffer.h"
 
 #include "channel.h"
-
-#include "libmyth/programinfo.h"
+#include "programinfo.h"
 
 typedef enum 
 {

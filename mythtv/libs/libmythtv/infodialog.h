@@ -12,9 +12,6 @@ class MythContext;
 class QListView;
 class QListViewItem;
 
-namespace libmyth
-{
-
 class InfoDialog : public MythDialog
 {
     Q_OBJECT
@@ -37,7 +34,5 @@ class InfoDialog : public MythDialog
 
     MythListView *lview;
 };
-
-}
 
 #endif
