@@ -70,3 +70,9 @@ using_dvb {
     TARGETDEPS += ../libdvbdev/libdvbdev.a
 }
 
+using_directfb {
+    SOURCES += videoout_directfb.cpp
+    HEADERS += videoout_directfb.h
+    DEFINES += USING_DIRECTFB
+}
+

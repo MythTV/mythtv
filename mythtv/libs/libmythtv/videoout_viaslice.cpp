@@ -393,7 +393,7 @@ void VideoOutputVIA::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
     if (curdata->lastcode > curdata->code )
     {
         //Slice must be in next frame so flush last buffer first.
-        VIASliceReceiveData(curdata->slicecount, data->buffer);
+        VIASliceReceiveData(curdata->slicecount - 1, data->buffer);
         curdata->slicecount = 1;
     }
 
