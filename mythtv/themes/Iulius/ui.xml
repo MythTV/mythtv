@@ -618,7 +618,7 @@
     </font>
 
     <font name="recording_font" face="Arial">
-      <color>#FF5544</color>
+      <color>#FF33FF</color>
       <size>16</size>
       <size:small>11</size:small>
       <bold>yes</bold>
@@ -1215,7 +1215,7 @@
     </font>
 
     <font name="recording_font" face="Arial">
-      <color>#FF5544</color>
+      <color>#FF33FF</color>
       <size>16</size>
       <size:small>11</size:small>
       <bold>yes</bold>
@@ -1496,7 +1496,7 @@
     </font>
 
     <font name="recording_font" face="Arial">
-      <color>#FF5544</color>
+      <color>#FF33FF</color>
       <size>16</size>
       <size:small>11</size:small>
       <bold>yes</bold>
@@ -1686,7 +1686,7 @@
     </font>
 
     <font name="recording_font" face="Arial">
-      <color>#FF5544</color>
+      <color>#FF33FF</color>
       <size>16</size>
       <size:small>11</size:small>
       <bold>yes</bold>
