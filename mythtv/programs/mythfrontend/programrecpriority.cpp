@@ -666,6 +666,9 @@ void ProgramRecPriority::FillList(void)
             int channelRecPriority = result.value(6).toInt();
             int recTypeRecPriority = rtRecPriors[recType-1];
 
+            if (recType == kAllRecord || recType == kFindOneRecord)
+                channelRecPriority = 0;
+
             // find matching program in programData and set
             // channelRecPriority, recTypeRecPriority and recType
             QMap<QString, ProgramRecPriorityInfo>::Iterator it;
