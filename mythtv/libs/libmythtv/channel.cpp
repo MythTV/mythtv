@@ -397,10 +397,10 @@ bool Channel::SetChannelByString(const QString &chan)
 
     // Determine if freqid is id or frequency
     //  freqid is a frequency if and only if it is a valid integer and 
-    //  larger than 50 MHz
+    //  larger than 45 MHz
     bool ok;
     int frequency = freqid.toInt(&ok);
-    bool isFrequency = ok && frequency > 50000;
+    bool isFrequency = ok && frequency > 45000;
 
     SetFormat(tvformat);
 
