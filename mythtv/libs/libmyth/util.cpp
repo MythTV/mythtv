@@ -22,11 +22,17 @@ bool WriteStringList(QSocket *socket, QStringList &list)
 
     int written = 0;
 
-    socket->writeBlock((const char *)&size, sizeof(int));
+    QCString payload;
+
+    payload = payload.setNum(size);
+    payload += "        ";
+    payload.truncate(8);
+    payload += utf8;
+    size = payload.length();
 
     while (size > 0)
     {
-        int temp = socket->writeBlock(utf8.data() + written, size);
+        int temp = socket->writeBlock(payload.data() + written, size);
         written += temp;
         size -= temp;
         if (size > 0)
@@ -45,17 +51,21 @@ bool ReadStringList(QSocket *socket, QStringList &list)
 {
     list.clear();
 
-    while (socket->waitForMore(5) < sizeof(int))
+    while (socket->waitForMore(5) < 8)
     {
         usleep(50);
     }
 
-    int size;
-    socket->readBlock((char *)&size, sizeof(int));
+    QCString sizestr(8 + 1);
+    socket->readBlock(sizestr.data(), 8);
+    sizestr = sizestr.stripWhiteSpace();
+    int size = sizestr.toInt();
 
     QCString utf8(size + 1);
 
     int read = 0;
+    unsigned int zerocnt = 0;
+
     while (size > 0)
     {
         int temp = socket->readBlock(utf8.data() + read, size);
@@ -63,6 +73,13 @@ bool ReadStringList(QSocket *socket, QStringList &list)
         size -= temp;
         if (size > 0)
             qApp->processEvents();
+
+        zerocnt++;
+        if (zerocnt == 10)
+        {
+            printf("EOF readStringList %u\n", read);
+            break; 
+        }
     }
 
     QString str = QString::fromUtf8(utf8.data());

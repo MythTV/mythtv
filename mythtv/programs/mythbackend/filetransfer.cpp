@@ -73,6 +73,9 @@ bool FileTransfer::RequestBlock(int size)
     readrequest = size;
     pthread_mutex_unlock(&readthreadLock);
 
+    while (readrequest > 0 && readthreadlive && !ateof)
+        usleep(500);
+
     return ateof;
 }
 
