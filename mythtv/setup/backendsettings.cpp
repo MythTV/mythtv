@@ -60,10 +60,12 @@ class VbiFormat: public ComboBoxSetting, public BackendSetting {
 public:
     VbiFormat():
         BackendSetting("VbiFormat") {
-        setLabel("Vbi format");
+        setLabel("VBI format");
         addSelection("None");
         addSelection("PAL Teletext");
-        addSelection("NTSC CC");
+        addSelection("NTSC Closed Caption");
+	setHelpText("VBI stands for Vertical Blanking Interrupt.  VBI is used "
+                    "to carry Teletext and Closed Captioning data.");
     };
 };
 
