@@ -22,6 +22,9 @@ Watching TV or a recording
 - Up and down arrow keys change the channel.
 - Type a number to enter a channel number or jump amount (HHMM format).
 - P to pause / play.
+  - You may also add an explicit keybinding for "Play" through the MythWeb
+    keybindings page, returning you to normal speed if you are in slow-motion,
+    rewind, fast forward or pause mode.
 - C to change inputs on TV Tuner card
 - ESC quits
 - I puts the On-screen Display up again.
@@ -44,7 +47,8 @@ Watching TV or a recording
 - ? to mark/unmark the current channel as a "favorite"
 - U to increase the play speed
 - J to decrease the play speed
-- W to cycle through 4:3 aspect ratio, 16:9, and 4:3 Zoom (like pan and scan)
+- W to cycle through 4:3 aspect ratio, 16:9, 4:3 Zoom (like Pan and Scan),
+  16:9 Zoom, and 16:9 Stretch (eliminates black sidebars in TV signal)
 - Left (if a jump amount is entered) to jump back that amount.
 - Right (if a jump amount is entered) to jump ahead that amount.
 
