@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-01-07, v0.13.08
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-01-11, v0.13.09
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -218,9 +218,7 @@ necessary.</EM>
 <A HREF="http://www.mythtv.org">http://www.mythtv.org</A> by Robert
 Kulagowski 
 <A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A>.  (Please note that I
-am <EM>NOT</EM> the author/programmer of the MythTV application!  See the
-<A HREF="#contributors">contributors</A> section below for a list of the
-programmers.) </P>
+am <EM>NOT</EM> the author/programmer of the MythTV application!)</P>
 <P>This document is available as a single-page HTML document at 
 <A HREF="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html">http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html</A> or as a PDF
 at 
@@ -237,9 +235,7 @@ at
 American environment. If you have installation instructions for a different
 region or Linux distribution, please send them to the author so that it can
 be included in other versions of this document.</P>
-<P>Hans Kruse has setup a website that focuses on running MythTV in a non-North
-American environment.  See the website at 
-<A HREF="http://mythtv.nicenemo.net">http://mythtv.nicenemo.net</A>.</P>
+
 <P>Pre-compiled binaries are available for a number of distributions.  See
 section 
 <A HREF="#precompiled">Software::Pre-compiled packages</A> for
@@ -254,35 +250,6 @@ to install MythTV onto a VIA Epia M machine.</P>
 <P>See 
 <A HREF="http://mysettopbox.tv">http://mysettopbox.tv</A> if you'd
 like to install a custom version of Knoppix optimized for MythTV.</P>
-<P>The contributors to MythTV are:
-<A NAME="contributors"></A> 
-<UL>
-<LI>Lead developer:  Isaac Richards, 
-<A HREF="mailto:ijr@po.cwru.edu">mailto:ijr@po.cwru.edu</A></LI>
-<LI>Developer:  Matt Zimmerman, 
-<A HREF="mailto:mdz@debian.org">mailto:mdz@debian.org</A></LI>
-<LI>Developer:  John Danner, 
-<A HREF="mailto:jdanner@untzuntz.com">mailto:jdanner@untzuntz.com</A></LI>
-<LI>Developer:  Chris Pinkham, 
-<A HREF="mailto:cpinkham@bc2va.org">mailto:cpinkham@bc2va.org</A></LI>
-<LI>Overall structure of HOWTO and Mandrake 9.x documentation: Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></LI>
-<LI>Gentoo documentation and package: Tony Clark, 
-<A HREF="mailto:tclark@telia.com">mailto:tclark@telia.com</A></LI>
-<LI>Gentoo documentation and package: Max Kalika, 
-<A HREF="mailto:max@gentoo.org">mailto:max@gentoo.org</A></LI>
-<LI>Debian package: Matt Zimmerman, 
-<A HREF="mailto:mdz@debian.org">mailto:mdz@debian.org</A></LI>
-<LI>Mandrake 8.2 documentation: Harondel J. Sibble, 
-<A HREF="mailto:help@pdscc.com">mailto:help@pdscc.com</A></LI>
-<LI>Mandrake 9.0 and 9.1 packages: Thac, 
-<A HREF="mailto:thac@nyvalls.se">mailto:thac@nyvalls.se</A></LI>
-<LI>Red Hat Linux 9 packages: Axel Thimm, 
-<A HREF="mailto:Axel.Thimm@physik.fu-berlin.de">mailto:Axel.Thimm@physik.fu-berlin.de</A></LI>
-<LI>Alternate setup program for MythTV and listings grabber for Germany: Ben Bucksch, 
-<A HREF="http://www.bucksch.com/1/projects/various/mythtv/">http://www.bucksch.com/1/projects/various/mythtv/</A></LI>
-</UL>
-</P>
 
 <H2><A NAME="s3">3.</A> <A HREF="#toc3">Checking prerequisites. </A></H2>
 
@@ -4913,7 +4880,6 @@ transcoding.</P>
 <P>Once the transcode is complete, mythbackend will replace the old file
 with the new as soon as it is no longer in use.</P>
 
-
 <H2><A NAME="s22">22.</A> <A HREF="#toc22">Example Configurations.</A></H2>
 
 <P>This section contains configurations which you may find useful.</P>
@@ -4943,11 +4909,12 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 <P><B>NOTE</B>:  You do not need to recompile your kernel.</P>
-<P>Download the IVTV driver from Sourceforge:
+<P>Download the latest IVTV driver from Sourceforge.  Check 
+<A HREF="http://sourceforge.net/projects/ivtv/">http://sourceforge.net/projects/ivtv/</A> for the current version. 
+Right now, it's 0.1.7.  Untar the file.
 <BLOCKQUOTE><CODE>
 <PRE>
-$ wget http://ivtv.sourceforge.net/CVS-LATEST.tar.gz
-$ tar -xzf CVS-LATEST.tar.gz
+$ tar -xzf ivtv-0.1.7.tar.gz
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>

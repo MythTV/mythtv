@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2004-01-07, v0.13.08
+  2004-01-11, v0.13.09
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -226,8 +226,7 @@
   This HOWTO document is maintained at the primary MythTV website:
   http://www.mythtv.org <http://www.mythtv.org> by Robert Kulagowski
   <mailto:rkulagow@rocketmail.com>.  (Please note that I am [4mNOT[24m the
-  author/programmer of the MythTV application!  See the ``contributors''
-  section below for a list of the programmers.)
+  author/programmer of the MythTV application!)
 
   This document is available as a single-page HTML document at
   http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html
@@ -253,9 +252,6 @@
   different region or Linux distribution, please send them to the author
   so that it can be included in other versions of this document.
 
-  Hans Kruse has setup a website that focuses on running MythTV in a
-  non-North American environment.  See the website at
-  http://mythtv.nicenemo.net <http://mythtv.nicenemo.net>.
 
   Pre-compiled binaries are available for a number of distributions.
   See section ``Software::Pre-compiled packages'' for more information.
@@ -271,40 +267,6 @@
   See http://mysettopbox.tv <http://mysettopbox.tv> if you'd like to
   install a custom version of Knoppix optimized for MythTV.
 
-  The contributors to MythTV are:
-
-  +o  Lead developer:  Isaac Richards,  <mailto:ijr@po.cwru.edu>
-
-  +o  Developer:  Matt Zimmerman,  <mailto:mdz@debian.org>
-
-  +o  Developer:  John Danner,  <mailto:jdanner@untzuntz.com>
-
-  +o  Developer:  Chris Pinkham,  <mailto:cpinkham@bc2va.org>
-
-  +o  Overall structure of HOWTO and Mandrake 9.x documentation: Robert
-     Kulagowski,  <mailto:rkulagow@rocketmail.com>
-
-  +o  Gentoo documentation and package: Tony Clark,
-     <mailto:tclark@telia.com>
-
-  +o  Gentoo documentation and package: Max Kalika,
-     <mailto:max@gentoo.org>
-
-  +o  Debian package: Matt Zimmerman,  <mailto:mdz@debian.org>
-
-  +o  Mandrake 8.2 documentation: Harondel J. Sibble,
-     <mailto:help@pdscc.com>
-
-  +o  Mandrake 9.0 and 9.1 packages: Thac,  <mailto:thac@nyvalls.se>
-
-  +o  Red Hat Linux 9 packages: Axel Thimm,
-     <mailto:Axel.Thimm@physik.fu-berlin.de>
-
-  +o  Alternate setup program for MythTV and listings grabber for
-     Germany: Ben Bucksch,
-     http://www.bucksch.com/1/projects/various/mythtv/
-     <http://www.bucksch.com/1/projects/various/mythtv/>
-
 
   [1m3.  Checking prerequisites.[0m
 
@@ -315,8 +277,6 @@
   (TCP ports 6543 and 6544) must be open.  It is [4mstrongly[24m recommended
   that you do [4mnot[24m expose the MythTV and MySQL ports to the Internet or
   your "Outside" LAN.
-
-
   [1m3.1.  Hardware.[0m
 
   Hardware selection is a complex topic, one this HOWTO will only
@@ -343,6 +303,7 @@
   hardware selection, mainly because there are so many tradeoffs which
   can be made.  For example, if you have plenty of CPU, you can use
   higher bitrates or capture sizes, etc.
+
   MythTV has two modes of operation.  First, it can function as a
   software video encoder, which means that it uses a fairly generic
   "dumb" video capture card to get frames of video, encodes them using
@@ -381,6 +342,7 @@
      using the RTJPEG codec with 480x480 capture resolution and play it
      back simultaneously, thereby allowing live TV watching.
 
+
   +o  A dual Celeron/450MHz is able to view a 480x480 MPEG-4/3300kbps
      file created on a different system with 30% CPU usage.
 
@@ -404,7 +366,6 @@
   encoding with a single capture card should run adequately in 256MB of
   RAM.  Additional RAM above 256MB will not necessarily increase
   performance, but may be useful if you are running multiple encoders.
-
 
 
   [1m3.1.3.  Hard Disk(s)[0m
@@ -512,6 +473,7 @@
 
   +o  A P3-550 can decode a 480x480 16Mbps MPEG-2 file with 55% CPU.
 
+
   +o  A Celeron 450 (no SSE) can decode a 480x480 16Mbps MPEG-2 file with
      80% CPU.
 
@@ -602,7 +564,6 @@
   search string.
 
 
-
   [1m3.1.8.1.  ATI[0m
 
   ATI makes many cards with TV-out capability, but ATI offers no
@@ -645,7 +606,6 @@
   cards.  See http://www.matrox.com/mga/support/drivers/files/lnx_21.cfm
   <http://www.matrox.com/mga/support/drivers/files/lnx_21.cfm> for
   details.
-
   Newer Matrox cards can be run with a set of kernel patches (for kernel
   2.4.19) and a customized X driver, but this arrangement does not
   support XVideo on TV-out. See
@@ -665,7 +625,6 @@
   +o  Matrox Millennium 550GX AGP. Uses external adapter to provide
      Composite and S-Video ports. TV-out implementation does [4mNOT[24m support
      XVideo.
-
 
 
   [1m3.1.8.3.  nVidia[0m
@@ -713,8 +672,6 @@
 
   MythTV supports the TV-out and MPEG-2 decoder functions in the IvyTV
   driver.
-
-
   [1m3.1.8.6.  Other Options[0m
 
   Some devices with onboard TV-out capability, such as XBoxes converted
@@ -780,6 +737,7 @@
   commonly found in that distribution.  Any issues with MythTV installed
   via a pre-compiled package [1mMUST [22mbe raised with the packager.
 
+
   If you use any of the pre-compiled packages you may not need to
   perform any additional configuration steps in this HOWTO.  The next
   logical step is ``configuring MySQL'', which you may or may not have
@@ -842,6 +800,7 @@
   party documentation problems should be brought up with the maintainer.
 
 
+
   [1m3.2.1.2.  Mandrake[0m
 
   Thac has created RPMs for MythTV for Mandrake 9.0 and 9.1 which may be
@@ -900,6 +859,7 @@
   [1mperl[22m.
 
 
+
   ______________________________________________________________________
   NOTE:  Qt v3.1 is required.
 
@@ -929,6 +889,7 @@
   On systems running KDE, a tool which will allow you to see what
   packages are available and if they're installed on your system can be
   accessed by clicking K->Configuration->Packaging->KPackage
+
   While the graphical tools are nice, the command line tool is actually
   easier to use.  It's strongly recommended that you use the command
   line tool.
@@ -965,8 +926,6 @@
   from the default installation.  Ensure that you install libqt3-mysql.
   ______________________________________________________________________
 
-
-
   Make sure that cdialog is installed if you want to use MythTV with a
   remote control if you need to compile [1mlirc [22mfrom source.
 
@@ -994,6 +953,7 @@
 
   If you did a typical Desktop install of Red Hat Linux 8.0 make sure
   you have selected:
+
 
   +o  KDE Desktop Environment
 
@@ -1093,8 +1053,8 @@
 
   The "ls -l" command will show you a directory listing.  There should
   be two files, one will be named "qt3" and the other will be
-  "qt3-devel".  The full filenames will vary, so one you know the file-
-  name, you can install them with
+  "qt3-devel".  The full filenames will vary, so one you know the
+  filename, you can install them with
 
 
        # rpm -Uvh [filename1]
@@ -1118,6 +1078,7 @@
        $ su
        # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
        # urpmi XFree86-devel perl
+
 
 
        # urpmi libqt3-devel
@@ -1178,7 +1139,6 @@
 
   Before you compile MythTV from the current source tarball or from CVS,
   you may need to modify your system configuration in a few ways.
-
 
   In general, if you install MythTV from pre-packaged binaries for your
   Linux distribution/version, you don't need to be too concerned about
@@ -1244,7 +1204,6 @@
   Failing that, always run it if you get an unexpected error about not
   finding libraries.
 
-
   [1m4.3.  Environment variable Requirements for MythTV[0m
 
   [1m4.3.1.  General requirements[0m
@@ -1279,6 +1238,8 @@
   Also, check that there has been a link created in /usr/lib/qt3/mkspecs
   called default. If not, you'll get errors during the compile. See the
   Troubleshooting Section for more information.
+
+
 
   [1m4.3.2.  Distribution-Specific Notes[0m
 
@@ -5335,7 +5296,6 @@
   with the new as soon as it is no longer in use.
 
 
-
   [1m22.  Example Configurations.[0m
 
   This section contains configurations which you may find useful.
@@ -5366,13 +5326,16 @@
        # urpmi kernel-source
 
 
+
   [1mNOTE[22m:  You do not need to recompile your kernel.
 
-  Download the IVTV driver from Sourceforge:
+  Download the latest IVTV driver from Sourceforge.  Check
+  http://sourceforge.net/projects/ivtv/
+  <http://sourceforge.net/projects/ivtv/> for the current version.
+  Right now, it's 0.1.7.  Untar the file.
 
 
-       $ wget http://ivtv.sourceforge.net/CVS-LATEST.tar.gz
-       $ tar -xzf CVS-LATEST.tar.gz
+       $ tar -xzf ivtv-0.1.7.tar.gz
 
 
 
@@ -5418,14 +5381,16 @@
   that came with the card.
 
 
-       alias char-major-81     videodev
-       alias char-major-81-0   ivtv
-       alias char-major-61 lirc_i2c
-       options ivtv debug=1
-       options tuner type=2
-       options msp3400 once=1 simple=1
-       add below ivtv msp3400 saa7115 tuner
-       add above ivtv lirc_dev lirc_i2c
+
+  alias char-major-81     videodev
+  alias char-major-81-0   ivtv
+  alias char-major-61 lirc_i2c
+  options ivtv debug=1
+  options tuner type=2
+  options msp3400 once=1 simple=1
+  add below ivtv msp3400 saa7115 tuner
+  add above ivtv lirc_dev lirc_i2c
+
 
 
   [1mNOTE[22m:  You must specify the tuner type manually.  See
@@ -5478,8 +5443,6 @@
        crw-------    1 mythtv   sys       81, 224 Dec 31  1969 vbi0
        crw-------    1 mythtv   sys       81,   0 Dec 31  1969 video0
        crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
-
-
 
   In this case, the ivtv device is video0.
 

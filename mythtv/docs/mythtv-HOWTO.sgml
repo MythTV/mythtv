@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2004-01-07, v0.13.08
+<date>2004-01-11, v0.13.09
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -15,9 +15,7 @@ necessary.
 <p>This HOWTO document is maintained at the primary MythTV website: <url
 url="http://www.mythtv.org" name="http://www.mythtv.org"> by Robert
 Kulagowski <url url="mailto:rkulagow@rocketmail.com">.  (Please note that I
-am <em>NOT</em> the author/programmer of the MythTV application!  See the
-<ref id="contributors" name="contributors"> section below for a list of the
-programmers.) 
+am <em>NOT</em> the author/programmer of the MythTV application!)
 
 This document is available as a single-page HTML document at <url
 url="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html"
@@ -41,9 +39,11 @@ American environment. If you have installation instructions for a different
 region or Linux distribution, please send them to the author so that it can
 be included in other versions of this document.
 
+<!-- Website seems to point to a temporary holder page
 Hans Kruse has setup a website that focuses on running MythTV in a non-North
 American environment.  See the website at <url
 url="http://mythtv.nicenemo.net" name="http://mythtv.nicenemo.net">.
+-->
 
 Pre-compiled binaries are available for a number of distributions.  See
 section <ref id="precompiled" name="Software::Pre-compiled packages"> for
@@ -59,24 +59,6 @@ to install MythTV onto a VIA Epia M machine.
 
 See <url url="http://mysettopbox.tv" name="http://mysettopbox.tv"> if you'd
 like to install a custom version of Knoppix optimized for MythTV.
-
-The contributors to MythTV are:<label id="contributors">
-<itemize>
-<item>Lead developer:  Isaac Richards, <url url="mailto:ijr@po.cwru.edu">
-<item>Developer:  Matt Zimmerman, <url url="mailto:mdz@debian.org">
-<item>Developer:  John Danner, <url url="mailto:jdanner@untzuntz.com">
-<item>Developer:  Chris Pinkham, <url url="mailto:cpinkham@bc2va.org">
-<item>Overall structure of HOWTO and Mandrake 9.x documentation: Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<item>Gentoo documentation and package: Tony Clark, <url url="mailto:tclark@telia.com">
-<item>Gentoo documentation and package: Max Kalika, <url url="mailto:max@gentoo.org">
-<item>Debian package: Matt Zimmerman, <url url="mailto:mdz@debian.org">
-<item>Mandrake 8.2 documentation: Harondel J. Sibble, <url url="mailto:help@pdscc.com">
-<item>Mandrake 9.0 and 9.1 packages: Thac, <url url="mailto:thac@nyvalls.se">
-<item>Red Hat Linux 9 packages: Axel Thimm, <url url="mailto:Axel.Thimm@physik.fu-berlin.de">
-<item>Alternate setup program for MythTV and listings grabber for Germany: Ben Bucksch, 
-<url url="http://www.bucksch.com/1/projects/various/mythtv/"
-name="http://www.bucksch.com/1/projects/various/mythtv/">
-</itemize>
 
 <sect>Checking prerequisites. 
 <p>You must ensure that any firewalls (either hardware, or a software
@@ -4305,7 +4287,6 @@ transcoding.
 Once the transcode is complete, mythbackend will replace the old file
 with the new as soon as it is no longer in use.
 
-
 <sect>Example Configurations.
 <p>This section contains configurations which you may find useful.
 <sect1>Hauppauge PVR-250/350 hardware MPEG-2 encoder. <label id="pvr250">
@@ -4335,10 +4316,12 @@ $ su
 
 <bf>NOTE</bf>:  You do not need to recompile your kernel.
 
-Download the IVTV driver from Sourceforge:
+Download the latest IVTV driver from Sourceforge.  Check <url
+url="http://sourceforge.net/projects/ivtv/"
+name="http://sourceforge.net/projects/ivtv/"> for the current version. 
+Right now, it's 0.1.7.  Untar the file.
 <tscreen><verb>
-$ wget http://ivtv.sourceforge.net/CVS-LATEST.tar.gz
-$ tar -xzf CVS-LATEST.tar.gz
+$ tar -xzf ivtv-0.1.7.tar.gz
 </verb></tscreen>
 
 This should create an ivtv directory.  Switch to it and perform the
@@ -4946,6 +4929,9 @@ v0.13.07, 2004-01-05.  Fix typo.  Edit URL for i2c stuff.
 v0.13.08, 2004-01-07.  Change ivtv to CVS-LATEST tarball instead of cvs because
 sourceforge sucks.  Update some other stuff in the PVR-250 example section. 
 Update XMLTV version.
+v0.13.09, 2004-01-11.  Get rid of "Contributors" section.  People come and
+go.  Hans Kruse's website for non-US MythTV people is a temporary holder? 
+Change ivtv section again; tmk is now doing releases on sf, so use that.
 -->
 
 <!--
