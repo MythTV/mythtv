@@ -1556,15 +1556,18 @@ void MMusicWatcher::possiblySaveToDb()
     //
     
     metadata_server->lockMetadata();
-        QIntDict<Playlist> *the_playlists = metadata_container->getPlaylists();
-        
-        QIntDictIterator<Playlist> it( *the_playlists ); 
-        for ( ; it.current(); ++it )
+        if(metadata_container)
         {
-            if(it.current()->internalChange())
+            QIntDict<Playlist> *the_playlists = metadata_container->getPlaylists();
+        
+            QIntDictIterator<Playlist> it( *the_playlists ); 
+            for ( ; it.current(); ++it )
             {
-                persistPlaylist(it.current());
-                it.current()->internalChange(false);
+                if(it.current()->internalChange())
+                {
+                    persistPlaylist(it.current());
+                    it.current()->internalChange(false);
+                }
             }
         }
     metadata_server->unlockMetadata();
