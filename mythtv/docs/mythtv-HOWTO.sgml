@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2004-05-07, v0.14.12
+<date>2004-05-08, v0.14.13
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -5470,23 +5470,33 @@ my database.">.
 <bf>NOTE</bf>: Examine the contents of the backup file to be sure that the
 backup succeeded before modifying your database.
 
-<bf>NOTE</bf>: The MythTV DataDirect grabber requires wget version 1.9.1 or
-later. Verify that this is installed before modifying your database.
+<bf>NOTE</bf>: The MythTV DataDirect grabber requires <bf>wget</bf> version
+1.9.1 or later. Verify that this is installed before modifying your
+database.
 
 Next, start <bf>mysql</bf> and perform the following commands:
 <tscreen><verb>
 $ mysql -u root mythconverg
-mysql>delete from program;
-mysql>delete from channel;
-mysql>truncate table videosource;
+mysql>CREATE TABLE channel_copy SELECT * FROM channel;
 </verb></tscreen>
 
-Run the MythTV setup program and complete the configuration as detailed in
-the section called <ref id="ConfigureDD" name="Configuring the Zap2It.com
-DataDirect service."> and in <ref id="VideoSources" name="Video Sources">.
+Run the MythTV setup program.  When the setup program prompts "Would you
+like to clear all program/channel settings before starting configuration
+[no]" type "yes".
+
+Complete the configuration as detailed in the section called <ref
+id="ConfigureDD" name="Configuring the Zap2It.com DataDirect service."> and
+in <ref id="VideoSources" name="Video Sources">.
 
 Once you're done running setup, run <bf>mythfilldatabase</bf> to populate
 the database with new data.
+
+Finally, run mysql again.  The next command is one long string:
+<tscreen><verb>
+$ mysql -u root mythconverg
+mysql>UPDATE channel,channel_copy SET channel.icon = channel_copy.icon WHERE channel.callsign = channel_copy.callsign;
+</verb></tscreen>
+to restore the channel icons.
 <sect>Example Configurations.
 <p>This section contains configurations which you may find useful.
 <sect1>Hauppauge PVR-250/350 hardware MPEG-2 encoder. <label id="pvr250">
@@ -6306,6 +6316,8 @@ CVS.  Add some forward and backwards pointers in the Migration document.
 v0.14.11, 2004-05-06.  Add section on IRC and how to contribute.  Add wget
 1.9.1 requirement for DataDirect.
 v0.14.12, 2004-05-07.  Update DataDirect section (Bruce Markey)
+v0.14.13, 2004-05-08.  Update DataDirect section (Isaac).  Bruce's truncate
+stuff will now be handled in the code.
 -->
 
 <!--

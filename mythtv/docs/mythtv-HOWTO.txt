@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2004-05-07, v0.14.12
+  2004-05-08, v0.14.13
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -6454,24 +6454,36 @@
   [1mNOTE[22m: Examine the contents of the backup file to be sure that the
   backup succeeded before modifying your database.
 
-  [1mNOTE[22m: The MythTV DataDirect grabber requires wget version 1.9.1 or
+  [1mNOTE[22m: The MythTV DataDirect grabber requires [1mwget [22mversion 1.9.1 or
   later. Verify that this is installed before modifying your database.
   Next, start [1mmysql [22mand perform the following commands:
 
 
        $ mysql -u root mythconverg
-       mysql>delete from program;
-       mysql>delete from channel;
-       mysql>truncate table videosource;
+       mysql>CREATE TABLE channel_copy SELECT * FROM channel;
 
 
 
-  Run the MythTV setup program and complete the configuration as
-  detailed in the section called ``Configuring the Zap2It.com DataDirect
-  service.'' and in ``Video Sources''.
+  Run the MythTV setup program.  When the setup program prompts "Would
+  you like to clear all program/channel settings before starting
+  configuration [no]" type "yes".
+
+  Complete the configuration as detailed in the section called
+  ``Configuring the Zap2It.com DataDirect service.'' and in ``Video
+  Sources''.
 
   Once you're done running setup, run [1mmythfilldatabase [22mto populate the
   database with new data.
+
+  Finally, run mysql again.  The next command is one long string:
+
+
+       $ mysql -u root mythconverg
+       mysql>UPDATE channel,channel_copy SET channel.icon = channel_copy.icon WHERE channel.callsign = channel_copy.callsign;
+
+
+
+  to restore the channel icons.
 
   [1m22.  Example Configurations.[0m
 
@@ -6512,7 +6524,7 @@
   Right now (2004-01-21), it's 0.1.9.  Untar the file.
 
 
-  $ tar -xzf ivtv-0.1.9.tar.gz
+       $ tar -xzf ivtv-0.1.9.tar.gz
 
 
 
@@ -6568,6 +6580,7 @@
        $ make
 
 
+
   Compile the [1mtest_ioctl [22mprogram:
 
 
@@ -6618,12 +6631,11 @@
   located on the same key as the tilde " " and not the single quote.
 
 
-
-  $ su
-  # cd /lib/modules/`uname -r`
-  # pwd
-  /lib/modules/2.4.21-0.16mdk
-  # find . -name "msp3400*" | xargs rm -f
+       $ su
+       # cd /lib/modules/`uname -r`
+       # pwd
+       /lib/modules/2.4.21-0.16mdk
+       # find . -name "msp3400*" | xargs rm -f
 
 
 
@@ -6673,13 +6685,15 @@
        crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
 
 
-
   In this case, the ivtv device is video0.
 
   You can now add this card available to MythTV.  Go into your mythtv
   setup directory on the machine hosting the hardware MPEG-2 card.  When
   you add a new capture card, ensure that you are using the video0
   device.
+
+
+
      [1mNOTE[22m:  As of 2003-04-25 the ivtv driver does not support VBI, so
   closed-captioning is not available.  Leave the VBI device, audio
   device and audio sampling rate limit at the default values.  Change
@@ -6779,10 +6793,11 @@
   going to be version 0.6.6, and that won't work.  Uninstall it:
 
 
-       $ su
-       # urpme lirc lirc-remotes liblirc-devel
-       # rm -rf /dev/lirc*
-       # exit
+
+  $ su
+  # urpme lirc lirc-remotes liblirc-devel
+  # rm -rf /dev/lirc*
+  # exit
 
 
 
@@ -6790,40 +6805,39 @@
   programs on your system:
 
 
+       $ su
+       # updatedb
+       # locate lirc_i2c|grep `uname -r`
+       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_i2c.c
+       /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_i2c.o.gz
 
-  $ su
-  # updatedb
-  # locate lirc_i2c|grep `uname -r`
-  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_i2c.c
-  /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_i2c.o.gz
+       # locate lirc_dev|grep `uname -r`
+       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.c
+       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.h
+       /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.stamp
+       /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.ver
+       /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_dev.o.gz
 
-  # locate lirc_dev|grep `uname -r`
-  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.c
-  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.h
-  /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.stamp
-  /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.ver
-  /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_dev.o.gz
+       # locate irw|grep "/usr"
+       /usr/bin/irw
+       /usr/local/bin/irw
+       /usr/local/man/man1/irw.1
 
-  # locate irw|grep "/usr"
-  /usr/bin/irw
-  /usr/local/bin/irw
-  /usr/local/man/man1/irw.1
+       # locate lircd|grep "/usr"
+       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lircd.conf.RM-050
+       /usr/share/man/man8/lircd.8.bz2
+       /usr/share/doc/lirc-0.6.6/html/lircd.html
+       /usr/sbin/lircd
+       /usr/local/sbin/lircd
+       /usr/local/man/man8/lircd.8
 
-  # locate lircd|grep "/usr"
-  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lircd.conf.RM-050
-  /usr/share/man/man8/lircd.8.bz2
-  /usr/share/doc/lirc-0.6.6/html/lircd.html
-  /usr/sbin/lircd
-  /usr/local/sbin/lircd
-  /usr/local/man/man8/lircd.8
-
-  # locate irxevent|grep "/usr"
-  /usr/share/man/man1/irxevent.1.bz2
-  /usr/share/doc/lirc-0.6.6/html/irxevent.html
-  /usr/share/doc/lirc-0.6.6/irxevent.keys
-  /usr/bin/irxevent
-  /usr/local/bin/irxevent
-  /usr/local/man/man1/irxevent.1
+       # locate irxevent|grep "/usr"
+       /usr/share/man/man1/irxevent.1.bz2
+       /usr/share/doc/lirc-0.6.6/html/irxevent.html
+       /usr/share/doc/lirc-0.6.6/irxevent.keys
+       /usr/bin/irxevent
+       /usr/local/bin/irxevent
+       /usr/local/man/man1/irxevent.1
 
 
 
@@ -6843,9 +6857,8 @@
 
   Download the lirc-0.7.0pre2 tarball:
 
-
-       $ wget http://lirc.sourceforge.net/software/snapshots/lirc-0.7.0pre2.tar.bz2
-       $ tar -xjf lirc-0.7.0pre2.tar.bz2
+  $ wget http://lirc.sourceforge.net/software/snapshots/lirc-0.7.0pre2.tar.bz2
+  $ tar -xjf lirc-0.7.0pre2.tar.bz2
 
 
 
@@ -6854,9 +6867,9 @@
   work correctly.  Download the patch and install:
 
 
-  $ cd lirc-0.7.0pre2
-  $ wget http://delvare.nerim.net/i2c/other/lirc-CVS-i2c-2.8.0.patch
-  $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
+       $ cd lirc-0.7.0pre2
+       $ wget http://delvare.nerim.net/i2c/other/lirc-CVS-i2c-2.8.0.patch
+       $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
 
 
 
@@ -6904,22 +6917,21 @@
   your /var/log/messages and /var/log/lircd files.
 
 
-
-  $ su
-  # modprobe lirc_i2c
-  # lsmod
-  Module                  Size  Used by    Not tainted
-  lirc_i2c                5124   0
-  lirc_dev               10096   1  [lirc_i2c]
-  ...
-  # lircd
-  # tail /var/log/messages
-  Sep 18 15:38:26 frontend kernel: lirc_i2c: chip found @ 0x18 (Hauppauge IR)
-  Sep 18 15:38:26 frontend kernel: lirc_dev: lirc_register_plugin:sample_rate:
-  10
-  ...
-  # tail /var/log/lircd
-  Sep 18 15:24:52 frontend lircd 0.7.0pre2: lircd(hauppauge) ready
+       $ su
+       # modprobe lirc_i2c
+       # lsmod
+       Module                  Size  Used by    Not tainted
+       lirc_i2c                5124   0
+       lirc_dev               10096   1  [lirc_i2c]
+       ...
+       # lircd
+       # tail /var/log/messages
+       Sep 18 15:38:26 frontend kernel: lirc_i2c: chip found @ 0x18 (Hauppauge IR)
+       Sep 18 15:38:26 frontend kernel: lirc_dev: lirc_register_plugin:sample_rate:
+       10
+       ...
+       # tail /var/log/lircd
+       Sep 18 15:24:52 frontend lircd 0.7.0pre2: lircd(hauppauge) ready
 
 
 
@@ -6966,12 +6978,9 @@
   native LIRC support within MythTV, you will need to modify your
   settings.pro file and recompile.  Your settings.pro should look like
   this:
-
-
-
-  # Native lirc support
-  CONFIG += using_lirc
-  LIRC_LIBS = -llirc_client
+       # Native lirc support
+       CONFIG += using_lirc
+       LIRC_LIBS = -llirc_client
 
 
 
