@@ -3,13 +3,13 @@
 
         <font name="active" face="Arial">
             <color>#ffffff</color>
-            <size>16</size>
+            <size>18</size>
             <bold>yes</bold>
         </font>
 
         <font name="inactive" face="Arial">
             <color>#b6b6b6</color>
-            <size>16</size>
+            <size>18</size>
             <bold>yes</bold>
         </font>
     
