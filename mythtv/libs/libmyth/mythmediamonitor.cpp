@@ -41,6 +41,23 @@
 
 using namespace std;
 
+MediaMonitor *theMonitor = NULL;
+
+
+MediaMonitor* MediaMonitor::getMediaMonitor()
+{
+    if(!theMonitor)
+    {
+        if(gContext->GetNumSetting("MonitorDrives") == 1)
+        {
+            theMonitor = new MediaMonitor(NULL, 500, true);
+            theMonitor->addFSTab();
+        }
+    }
+
+    return theMonitor;
+}
+
 // MonitorThread
 MonitorThread::MonitorThread(MediaMonitor* pMon, unsigned long interval) 
              : QThread()

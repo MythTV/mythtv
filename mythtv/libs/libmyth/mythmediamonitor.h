@@ -11,6 +11,8 @@ const int kMediaEventType = 30042;
 
 class MediaMonitor;
 
+MediaMonitor* getMediaMonitor();
+
 class MediaEvent : public QCustomEvent
 {
   public:
@@ -40,12 +42,12 @@ class MonitorThread : public QThread
     unsigned long m_Interval;
 };
 
+class MediaMonitor;
+
 class MediaMonitor : public QObject
 {
     Q_OBJECT
   public:
-    MediaMonitor(QObject* par, unsigned long interval, bool allowEject);
-
     bool addFSTab(void);
     void addDevice(MythMediaDevice* pDevice);
     bool addDevice(const char* dev);
@@ -56,11 +58,14 @@ class MediaMonitor : public QObject
     void startMonitoring(void);
     void stopMonitoring(void);
     QValueList <MythMediaDevice*> getMedias(MediaType mediatype);
-
+    
+    static MediaMonitor* getMediaMonitor();
+    
   public slots:
     void mediaStatusChanged( MediaStatus oldStatus, MythMediaDevice* pMedia);
 
   protected:
+    MediaMonitor(QObject* par, unsigned long interval, bool allowEject);
     QValueList<MythMediaDevice*> m_Devices;
     bool m_Active;
     MonitorThread m_Thread;

@@ -16,8 +16,6 @@
 #include <iostream>
 #include <vector>
 
-#include <mythmediamonitor.h>
-#include <mythmedia.h>
 
 using namespace std;
 
@@ -33,6 +31,9 @@ class QSocket;
 class LCD;
 class MythMainWindow;
 class MythPluginManager;
+class MediaMonitor;
+class MythMediaDevice;
+
 
 enum VerboseMask {
     VB_IMPORTANT = 0x0001,
@@ -164,9 +165,6 @@ class MythContext : public QObject
                             int defaultval = 0);
 
     void SetSetting(const QString &key, const QString &newValue);
-
-    void SetMediaMonitor(MediaMonitor * lmediamonitor);
-    QValueList <MythMediaDevice*> GetMedias(MediaType mediatype);
 
     QFont GetBigFont();
     QFont GetMediumFont();

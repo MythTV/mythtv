@@ -993,14 +993,11 @@ int main(int argc, char **argv)
 
 #ifndef _WIN32
     MediaMonitor *mon = NULL;
-
-    if (gContext->GetNumSetting("MonitorDrives") == 1)
+    mon = MediaMonitor::getMediaMonitor();
+    if (mon)
     {
-        mon = new MediaMonitor(NULL, 500, true);
-        mon->addFSTab();
         VERBOSE(VB_ALL, QString("Starting media monitor."));
         mon->startMonitoring();
-        gContext->SetMediaMonitor(mon);
     }
 #endif
 

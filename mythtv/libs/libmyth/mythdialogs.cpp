@@ -595,7 +595,7 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
             {
                 if ((itr.data().MediaType & (int)pDev->getMediaType()))
                 {
-                    cout << "Found a handler" << endl;
+                    VERBOSE(VB_ALL, "Found a handler");
                     d->exitingtomain = true;
                     d->exitmenucallback = itr.data().callback;
                     QApplication::postEvent(this, new ExitToMainMenuEvent());

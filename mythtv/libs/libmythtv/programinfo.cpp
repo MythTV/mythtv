@@ -314,7 +314,7 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
 
     QString length;
     int hours, minutes, seconds;
-
+    
     progMap["title"] = title;
     progMap["subtitle"] = subtitle;
     progMap["description"] = description;
@@ -2225,14 +2225,13 @@ bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
     return true;
 }
 
-bool ProgramList::FromRecorded(QSqlDatabase *db, const QString sql,
-                               ProgramList &schedList)
+bool ProgramList::FromRecorded(QSqlDatabase *, const QString, ProgramList&)
 {
     clear();
     return false;
 }
 
-bool ProgramList::FromRecord(QSqlDatabase *db, const QString sql)
+bool ProgramList::FromRecord(QSqlDatabase *, const QString)
 {
     clear();
     return false;
