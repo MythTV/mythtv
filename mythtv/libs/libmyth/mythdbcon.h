@@ -40,6 +40,7 @@ class MythSqlDatabase
     {
         if (m_db)
         {
+            m_db->close();
             QSqlDatabase::removeDatabase(m_name);
             m_db = NULL;
         }
