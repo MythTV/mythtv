@@ -36,6 +36,8 @@ enum TreeKeys {
 
 
 
+
+
 class MMTDBItem  : public UIListGenericTree
 {
     public:
@@ -52,6 +54,20 @@ class MMTDBItem  : public UIListGenericTree
         int ID;
         int Key;
 };
+
+
+class MMTShowingItem : public MMTDBItem
+{
+    public:
+        MMTShowingItem(UIListGenericTree* parent, const QString& text, int id, 
+                       int filmID, const QString& theaterID);
+        virtual void populateTree(UIListGenericTree* Tree);
+    
+    protected:
+        int FilmID;
+        QString TheaterID;
+};
+
 
 // MMTMovieMasterItem encapsulates the top level list of movies
 // It's used to handle the "I want to watch movie XXX, when is it on?" question

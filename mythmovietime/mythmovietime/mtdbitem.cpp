@@ -51,14 +51,20 @@ void MMTMovieMasterItem::populateTree(UIListGenericTree*)
     
     MSqlQuery query(MSqlQuery::InitCon());
     
-    query.prepare( "SELECT FilmID, Title FROM movietime_films ORDER BY Title" );
+    // Logic would dictate that we just grab all the movies listed in the
+    // movietime_films table however that table can contain films that are
+    // not actually being shown. So we're forced to do an inner join.
+    query.prepare( "SELECT DISTINCT movie.FilmID, film.title "
+                   "FROM movietime_movies movie "
+                   "INNER JOIN movietime_films film ON film.filmID = movie.filmID "
+                   "ORDER BY title" );
     
     if (query.exec() && query.isActive() && query.size() > 0)
     {
         while (query.next()) 
         {
             tempItem = new MMTMovieItem(this, query.value(1).toString(), 
-                                        query.value(0).toInt(), false);
+                                        query.value(0).toInt());
          
         }
     }
@@ -66,9 +72,62 @@ void MMTMovieMasterItem::populateTree(UIListGenericTree*)
 }
 
 
+MMTShowingItem::MMTShowingItem(UIListGenericTree* parent, const QString& text, int id, 
+                               int filmID, const QString& theaterID)
+              : MMTDBItem(parent, text, KEY_DATE, id )
+{
+    FilmID = filmID;
+    TheaterID = theaterID;
+}
+
+               
+void MMTShowingItem::populateTree(UIListGenericTree*)
+{
+    MMTDBItem* tempItem;
+    
+    MSqlQuery query(MSqlQuery::InitCon());
+    
+    if (TheaterID == "ALL" )
+    {
+        
+        query.prepare( "SELECT DISTINCT rowid, Date "
+                       "FROM movietime_movies "
+                       "WHERE filmid = :FILMID" );
+                   
+        query.bindValue(":FILMID", ID);
+    }        
+    else
+    {
+       query.prepare( "SELECT rowid, Time "
+                      "FROM movietime_showtimes "
+                      "WHERE TimesRowID = :ROWID" );
+                   
+        query.bindValue(":ROWID", ID);
+
+    }
+    
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        while (query.next()) 
+        {
+            tempItem = new MMTDBItem(this, query.value(1).toString(), 
+                                     KEY_TIME, query.value(0).toInt());
+         
+        }
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, "MMTMovieItem::populateTreeWithDates failed to fetch dates" );
+        VERBOSE(VB_IMPORTANT, query.executedQuery());
+        VERBOSE(VB_IMPORTANT, query.lastError().text());
+    }
+    
+}
+
+
 MMTMovieItem::MMTMovieItem(UIListGenericTree* parent, const QString &text, 
                            int filmID, const QString& theaterID)
-                  : MMTDBItem(parent, text, KEY_MOVIE, filmID )
+            : MMTDBItem(parent, text, KEY_MOVIE, filmID )
 {
     TheaterID = theaterID;
 }
@@ -76,22 +135,21 @@ MMTMovieItem::MMTMovieItem(UIListGenericTree* parent, const QString &text,
 void MMTMovieItem::populateTreeWithDates(UIListGenericTree* tree)
 {
 
-    MMTDBItem* tempItem;
+    MMTShowingItem* tempItem;
     
     MSqlQuery query(MSqlQuery::InitCon());
     
     if (TheaterID == "ALL" )
     {
-        query.prepare( "QUERY SELECT DISTINCT 0 as rowid, Date "
+        query.prepare( "SELECT DISTINCT 0 as rowid, Date "
                        "FROM movietime_movies "
                        "WHERE filmid = :FILMID" );
                    
         query.bindValue(":FILMID", ID);
-        query.bindValue(":THEATER", TheaterID);
     }        
     else
     {
-       query.prepare( "QUERY SELECT DISTINCT rowid, Date "
+       query.prepare( "SELECT DISTINCT rowid, Date "
                        "FROM movietime_movies "
                        "WHERE filmid = :FILMID AND "
                        "theaterid = :THEATER" );
@@ -104,14 +162,14 @@ void MMTMovieItem::populateTreeWithDates(UIListGenericTree* tree)
     {
         while (query.next()) 
         {
-            tempItem = new MMTDBItem(this, query.value(1).toString(), 
-                                     KEY_DATE, query.value(0).toInt());
+            tempItem = new MMTShowingItem(this, query.value(1).toString(), 
+                                          query.value(0).toInt(), ID, TheaterID);
          
         }
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "MMTMovieItem::populateTreeWithDates failed to fetch theaters" );
+        VERBOSE(VB_IMPORTANT, "MMTMovieItem::populateTreeWithDates failed to fetch dates" );
         VERBOSE(VB_IMPORTANT, query.executedQuery());
         VERBOSE(VB_IMPORTANT, query.lastError().text());
     }
@@ -209,29 +267,53 @@ void MMTTheaterItem::populateTree(UIListGenericTree* tree)
 
 void MMTTheaterItem::populateTreeWithMovies(UIListGenericTree*)
 {
-    
-}
-
-void MMTTheaterItem::populateTreeWithDates(UIListGenericTree*)
-{
-    MMTDBItem* tempItem;
+    // We're going to create a bunch of children.  One for each movie.
+    MMTMovieItem* tempItem;
     
     MSqlQuery query(MSqlQuery::InitCon());
-    
-    query.prepare( "SELECT rowid,  Date "
-                   "FROM movietime_movies "
-                   "WHERE filmid = :FILMID AND "
-                   "TheaterID = :THEATERID" );
 
-    query.bindValue(":FILMID", FilmID);
-    query.bindValue(":THEATERID", TheaterID);
+    query.prepare("SELECT DISTINCT movie.FilmID, film.Title "
+                  "FROM movietime_movies movie "
+                  "INNER JOIN movietime_films film ON film.FilmID = movie.FilmID "
+                  "WHERE movie.TheaterID = :THEATERID");
+    
+    query.bindValue(":THEATERID", TheaterID);                  
     
     if (query.exec() && query.isActive() && query.size() > 0)
     {
         while (query.next()) 
         {
-            tempItem = new MMTDBItem(this, query.value(1).toString(), 
-                                     KEY_DATE, query.value(0).toInt());
+            tempItem = new MMTMovieItem(this, query.value(1).toString(), 
+                                        query.value(0).toInt(), TheaterID);
+         
+        }
+    }
+}
+
+void MMTTheaterItem::populateTreeWithDates(UIListGenericTree*)
+{
+    MMTShowingItem* tempItem;
+    
+    MSqlQuery query(MSqlQuery::InitCon());
+    
+    if (FilmID > 0 )
+    {
+    
+        query.prepare( "SELECT rowid,  Date "
+                       "FROM movietime_movies "
+                       "WHERE filmid = :FILMID AND "
+                       "TheaterID = :THEATERID" );
+
+        query.bindValue(":FILMID", FilmID);
+        query.bindValue(":THEATERID", TheaterID);
+    }
+    
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        while (query.next()) 
+        {
+            tempItem = new MMTShowingItem(this, query.value(1).toString(), 
+                                          query.value(0).toInt(), FilmID, TheaterID);
          
         }
     }
