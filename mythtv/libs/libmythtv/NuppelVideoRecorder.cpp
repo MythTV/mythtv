@@ -448,6 +448,12 @@ int NuppelVideoRecorder::AudioInit(void)
 
 void NuppelVideoRecorder::InitFilters(void)
 {
+    if (videoFilters.size() > 0)
+    {
+        filters_cleanup(&videoFilters[0], videoFilters.size());
+        videoFilters.clear();
+    }
+
     QStringList filters = QStringList::split(",", videoFilterList);
     for (QStringList::Iterator i = filters.begin(); i != filters.end(); i++)
     {

@@ -861,6 +861,64 @@ bool TVRec::CheckChannel(Channel *chan, const QString &channum, int &finetuning)
     return ret;
 }
 
+bool TVRec::SetVideoFiltersForChannel(Channel *chan, const QString &channum)
+{
+    if (!db_conn)
+        return true;
+
+    pthread_mutex_lock(&db_lock);
+
+    MythContext::KickDatabase(db_conn);
+
+    bool ret = false;
+
+    QString channelinput = chan->GetCurrentInput();
+    QString device = chan->GetDevice();
+    QString videoFilters = "";
+
+    QString thequery = QString("SELECT channel.videofilters FROM "
+                               "channel,capturecard,cardinput "
+                               "WHERE channel.channum = \"%1\" AND "
+                               "channel.sourceid = cardinput.sourceid AND "
+                               "cardinput.inputname = \"%2\" AND "
+                               "cardinput.cardid = capturecard.cardid AND "
+                               "capturecard.videodevice = \"%3\";")
+                              .arg(channum).arg(channelinput).arg(device);
+
+    QSqlQuery query = db_conn->exec(thequery);
+
+    if (!query.isActive())
+        MythContext::DBError("setvideofilterforchannel", query);
+    else if (query.numRowsAffected() > 0)
+    {
+        query.next();
+
+        videoFilters = query.value(0).toString();
+
+        if (videoFilters == QString::null)
+            videoFilters = "";
+
+        if (nvr != NULL)
+        {
+            nvr->SetVideoFilters(videoFilters);
+            nvr->InitFilters();
+        }
+
+        pthread_mutex_unlock(&db_lock);
+        return true;
+    }
+
+    thequery = "SELECT NULL FROM channel;";
+    query = db_conn->exec(thequery);
+
+    if (query.numRowsAffected() == 0)
+        ret = true;
+
+    pthread_mutex_unlock(&db_lock);
+
+    return ret;
+}
+
 QString TVRec::GetNextChannel(Channel *chan, int channeldirection)
 {
     QString ret = "";

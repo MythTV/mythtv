@@ -160,6 +160,7 @@ bool Channel::SetChannelByString(const QString &chan)
 
             curchannelname = chan;
 
+            pParent->SetVideoFiltersForChannel(this, chan);
 	    return true;
         }
         else
@@ -167,6 +168,7 @@ bool Channel::SetChannelByString(const QString &chan)
             if (pParent->ChangeExternalChannel(chan))
             {
                 curchannelname = chan;
+                pParent->SetVideoFiltersForChannel(this, chan);
                 return true;
             }
         }

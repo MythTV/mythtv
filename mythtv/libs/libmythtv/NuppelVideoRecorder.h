@@ -86,12 +86,12 @@ class NuppelVideoRecorder
     void WriteHeader(bool todumpfile = false);
 
     void SetVideoFilters(QString &filters) { videoFilterList = filters; }
+    void InitFilters(void);
 
     void TransitionToFile(const QString &lfilename);
     void TransitionToRing(void);
 
     long long GetKeyframePosition(long long desired);
-
 
  protected:
     static void *WriteThread(void *param);
@@ -104,7 +104,6 @@ class NuppelVideoRecorder
     
  private:
     int AudioInit(void);
-    void InitFilters(void);
     void InitBuffers(void);
     
     int SpawnChildren(void);

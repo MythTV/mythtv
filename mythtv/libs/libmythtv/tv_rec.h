@@ -40,6 +40,7 @@ class TVRec
 
     bool CheckChannel(Channel *chan, const QString &channum, int &finetuning); 
     bool ChangeExternalChannel(const QString &channum);
+    bool SetVideoFiltersForChannel(Channel *chan, const QString &channum);
     QString GetNextChannel(Channel *chan, int channeldirection);
 
     bool IsReallyRecording(void);
