@@ -199,12 +199,12 @@ void TTFFont::render_text(Raster_Map *rmap, Raster_Map *rchr, char *text,
        // Blit-or the resulting small pixmap into the biggest one
        // We do that by hand, and provide also clipping.
 
-       if (use_kerning && previous && j)
-       {
-           FT_Vector delta;
-           FT_Get_Kerning(face, previous, j, FT_KERNING_DEFAULT, &delta);
-           x_offset += delta.x >> 6;
-       }
+       //if (use_kerning && previous && j)
+       //{
+       //    FT_Vector delta;
+       //    FT_Get_Kerning(face, previous, j, FT_KERNING_DEFAULT, &delta);
+       //    x_offset += delta.x >> 6;
+       //}
 
        xmin = (xmin >> 6) + x_offset;
        ymin = (ymin >> 6) + y_offset;
