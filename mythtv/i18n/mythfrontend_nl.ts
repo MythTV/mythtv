@@ -15,11 +15,11 @@
     </message>
     <message>
         <source>Advanced Configuration</source>
-        <translation type="unfinished">Geavanceerde Configuratie</translation>
+        <translation>Geavanceerde Configuratie</translation>
     </message>
     <message>
         <source>Recording Options</source>
-        <translation type="unfinished">Opname Opties</translation>
+        <translation>Opname Opties</translation>
     </message>
     <message>
         <source>Diseqc</source>
@@ -1111,7 +1111,7 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>Recording %1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Neem %1 van %2 op</translation>
     </message>
 </context>
 <context>
@@ -5549,27 +5549,27 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     </message>
     <message>
         <source>Record one showing of this title</source>
-        <translation type="unfinished">Neem een aflevering op van deze serie</translation>
+        <translation>Neem 1 aflevering op van deze serie</translation>
     </message>
     <message>
         <source>Record one showing of this title every week</source>
-        <translation type="unfinished"></translation>
+        <translation>Neem elke week 1 aflevering op van deze serie</translation>
     </message>
     <message>
         <source>Record one showing of this title every day</source>
-        <translation type="unfinished"></translation>
+        <translation>Neem elke dag 1 aflevering op van deze serie</translation>
     </message>
     <message>
         <source>This recording schedule is inactive</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit opnameschema is inactief</translation>
     </message>
     <message>
         <source>This recording schedule is active</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit opnameschema is actief</translation>
     </message>
     <message>
         <source>Delete oldest if this would exceed the max episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Wis oudste indien meer dan max. toegelaten</translation>
     </message>
     <message>
         <source>Record in TS format instead of PS.</source>
