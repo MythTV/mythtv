@@ -95,7 +95,7 @@ bool MadDecoder::initialize()
         input_buf = new char[globalBufferSize];
 
     if (! output_buf)
-        output_buf = new char[globalBufferSize];
+        output_buf = new char[globalBufferSize * 2];
 
     if (! input()->isOpen()) {
         if (! input()->open(IO_ReadOnly)) {

@@ -341,6 +341,8 @@ void runMenu(QString themedir, QSqlDatabase *db, QString paths,
     {
         cerr << "Couldn't find theme " << themedir << endl;
     }
+
+    delete diag;
 }
 
 int main(int argc, char *argv[])
