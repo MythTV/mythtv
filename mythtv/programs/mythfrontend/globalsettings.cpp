@@ -43,7 +43,7 @@ public:
         setValue(true);
         setHelpText(QObject::tr("MythTV can control the PCM and master "
                     "mixer volume.  If you prefer to use an external mixer "
-                    "program, uncheck this box."));
+                    "program, then disable this option."));
     };
 };
 
@@ -111,7 +111,7 @@ public:
         GlobalSetting("PCMMixerVolume") {
         setLabel(QObject::tr("PCM Mixer Volume"));
         setValue(70);
-        setHelpText(QObject::tr("Initial volume for PCM output.  Use of the "
+        setHelpText(QObject::tr("Initial volume for PCM output.  Using the "
                     "volume keys in MythTV will adjust this parameter."));
         };
 };
@@ -124,10 +124,10 @@ public:
                  "Channels"));
         setValue(false);
         setHelpText(QObject::tr("Enable muting of just the left or right "
-                    "channel.  Useful if your broadcaster "
-                    "puts the original language on one channel, and a dubbed "
-                    "version of the program on the other one.  This modifies "
-                    "the behavior of the Mute key."));
+                    "channel.  Useful if your broadcaster puts the "
+                    "original language on one channel, and a dubbed "
+                    "version of the program on the other one.  This "
+                    "modifies the behavior of the Mute key."));
     };
 };
 
@@ -138,7 +138,7 @@ public:
         GlobalSetting("AC3PassThru") {
         setLabel(QObject::tr("Enable AC3 to SPDIF passthrough"));
         setValue(false);
-        setHelpText(QObject::tr("Enable sending AC3 sound directly to your "
+        setHelpText(QObject::tr("Enable sending AC3 audio directly to your "
                     "sound card's SPDIF output, on sources which contain "
                     "AC3 soundtracks (usually digital TV).  Requires that "
                     "the audio output device be set to something suitable."));
@@ -152,9 +152,9 @@ public:
         setLabel(QObject::tr("Deinterlace playback"));
         setValue(false);
         setHelpText(QObject::tr("Make the video look normal on a progressive "
-                    "display (i.e. monitor).  Deinterlace requires that your "
+                    "display (i.e. monitor).  Deinterlacing requires that your "
                     "CPU supports SSE instructions.  Enabling this without "
-                    "proper CPU support will cause the program to segfault. "));
+                    "proper CPU support will cause MythTV to segfault. "));
     };
 };
 
@@ -165,7 +165,7 @@ public:
         setLabel(QObject::tr("Custom Filters"));
         setValue("");
         setHelpText(QObject::tr("Advanced Filter configuration, format:\n"
-                                "[[<filter>=<options>,]...]"));
+                    "[[<filter>=<options>,]...]"));
     };
 };
 
@@ -175,9 +175,12 @@ public:
         GlobalSetting("DecodeExtraAudio") {
         setLabel(QObject::tr("Extra audio buffering"));
         setValue(false);
-        setHelpText(QObject::tr("This attempts to keep extra audio data in "
-                    "the internal buffers.  Try setting this if you're getting "
-                    "crackly audio. (Not used for software encoded video.)"));
+        setHelpText(QObject::tr("Enable this setting if MythTV is playing "
+                    "\"crackly\" audio and you are using hardware encoding. "
+                    "This setting will have no effect "
+                    "on MPEG-4 or RTJPEG video. MythTV will keep extra "
+                    "audio data in its internal buffers to workaround "
+                    "this bug."));
     };
 };
 
@@ -201,7 +204,7 @@ public:
         setLabel(QObject::tr("Password required to view all recordings"));
         setValue("");
         setHelpText(QObject::tr("If given, a password must be entered to "
-                                "view the complete list of all recordings."));
+                    "view the complete list of all recordings."));
     };
 };
 
@@ -225,7 +228,7 @@ public:
                                  query.value(0).toString());
 
         setHelpText(QObject::tr("Default Recording Group to display "
-                                "on the view recordings screen."));
+                    "on the View Recordings screen."));
     };
 };
 
@@ -235,9 +238,9 @@ public:
         GlobalSetting("RememberRecGroup") {
         setLabel(QObject::tr("Save current Recording Group view when changed"));
         setValue(true);
-        setHelpText(QObject::tr("Remember the last selected Recording Group "
-                                "instead of displaying the Default group "
-                                "whenever you enter the playback screen."));
+        setHelpText(QObject::tr("Remember the last selected Recording "
+                    "Group instead of displaying the Default group "
+                    "whenever you enter the playback screen."));
     };
 };
 
@@ -270,10 +273,11 @@ class PBBStartInTitle: public CheckBoxSetting, public GlobalSetting {
 public:
     PBBStartInTitle():
         GlobalSetting("PlaybackBoxStartInTitle") {
-        setLabel(QObject::tr("Start in title section."));
+        setLabel(QObject::tr("Start in Title section"));
         setValue(true);
-        setHelpText(QObject::tr("If set, focus will initially be on the "
-                    "show titles otherwise focus will be on the recordings."));
+        setHelpText(QObject::tr("If enabled, the selector highlight will "
+                    "start on the Program titles window, otherwise the "
+                    "selector will default to the recordings."));
     };
 };
 
@@ -284,7 +288,9 @@ public:
         GlobalSetting("ShowGroupInfo") {
         setLabel(QObject::tr("Show group summary."));
         setValue(false);
-        setHelpText(QObject::tr("While selecting a group, show a group summary instead of showing info about the first episode in that group."));
+        setHelpText(QObject::tr("While selecting a group, show a group "
+                    "summary instead of showing info about the first episode "
+                    "in that group."));
     };
 };
 
@@ -297,7 +303,7 @@ public:
         setLabel(QObject::tr("Jump amount (in minutes)"));
         setValue(10);
         setHelpText(QObject::tr("How many minutes to jump forward or backward "
-                   "when the jump keys are pressed."));
+                    "when the jump keys are pressed."));
     };
 };
 
@@ -361,7 +367,7 @@ public:
 //        addSelection(QObject::tr("All Detection Methods"), "255");
         setHelpText(QObject::tr("This determines the method used by MythTV to "
                     "detect when commercials start and end.  You must have "
-                    "'Automatically Flag Commercials' turned on to use "
+                    "'Automatically Flag Commercials' enabled to use "
                     "anything other than 'Blank Frame'." ));
     };
 };
@@ -372,7 +378,7 @@ public:
         BackendSetting("CommercialSkipCPU") {
 
         setLabel(QObject::tr("CPU Usage"));
-        addSelection(QObject::tr("Low (run 'niced' and give up cpu time every frame)"), "0");
+        addSelection(QObject::tr("Low (run 'niced' and give up CPU time every frame)"), "0");
         addSelection(QObject::tr("Medium (run 'niced')"), "1");
         addSelection(QObject::tr("High (run full-speed)"), "2");
         setHelpText(QObject::tr("This setting determines approximately how "
@@ -404,9 +410,9 @@ public:
             }
 
         setHelpText(QObject::tr("Select 'Default' to run Commercial "
-                                "Detection on the same backend a show was "
-                                "recorded on.  Select a hostname to run all "
-                                "detection jobs on a specific host."));
+                    "Detection on the same backend which created a "
+                    "recording, or select a hostname to run all detection "
+                    "jobs on a specific host."));
     };
 };
 
@@ -455,9 +461,8 @@ public:
         BackendSetting("AggressiveCommDetect") {
         setLabel(QObject::tr("Strict Commercial Detection"));
         setValue(true);
-        setHelpText(QObject::tr("Turn on stricter Commercial Detection code.  "
-                    "If some commercials are not being detected, try turning "
-                    "this setting OFF."));
+        setHelpText(QObject::tr("Enable stricter Commercial Detection code.  "
+                    "Disable if some commercials are not being detected."));
     };
 };
 
@@ -468,7 +473,7 @@ public:
         setLabel(QObject::tr("Skip blank frames after commercials"));
         setValue(true);
         setHelpText(QObject::tr("When using Blank Frame Detection and "
-                    "Auto-Flagging, flag blank frames following commercial "
+                    "Auto-Flagging, include blank frames following commercial "
                     "breaks as part of the commercial break."));
     };
 };
@@ -491,7 +496,7 @@ public:
         SpinBoxSetting(0, 10, 1),
         GlobalSetting("CommNotifyAmount") {
         setLabel(QObject::tr("Commercial Skip Notify Amount"));
-        setHelpText(QObject::tr("If set, Myth will act like a commercial "
+        setHelpText(QObject::tr("If set, MythTV will act like a commercial "
                     "begins this many seconds early.  This can be useful "
                     "when commercial notification is used in place of "
                     "automatic skipping."));
@@ -506,9 +511,9 @@ public:
         BackendSetting("AutoExpireDiskThreshold") {
         setLabel(QObject::tr("Auto Expire Free Disk Space Threshold "
                  "(in Gigabytes)"));
-        setHelpText(QObject::tr("Trigger AutoExpire when free space in "
-                    "Gigabytes goes below this value.  Turn OFF AutoExpire "
-                    "by setting to 0."));
+        setHelpText(QObject::tr("Trigger AutoExpire when available disk "
+                    "space is below this value.  Disable AutoExpire by "
+                    "setting to 0."));
         setValue(0);
     };
 };
@@ -519,9 +524,8 @@ public:
         SpinBoxSetting(1, 60, 10, true),
         BackendSetting("AutoExpireFrequency") {
         setLabel(QObject::tr("Auto Expire Frequency (in minutes)"));
-        setHelpText(QObject::tr("Number of minutes the AutoExpire process "
-                    "will wait between each time that it checks for free disk "
-                    "space."));
+        setHelpText(QObject::tr("How often the AutoExpire process "
+                    "checks for free disk space."));
         setValue(10);
     };
 };
@@ -543,9 +547,9 @@ public:
         BackendSetting("AutoExpireDefault") {
         setLabel(QObject::tr("Auto-Expire Default"));
         setValue(true);
-        setHelpText(QObject::tr("Turn Auto-Expire ON by default when creating "
-                    "new scheduled recordings.  Existing scheduled "
-                    "recordings will keep their current value."));
+        setHelpText(QObject::tr("When enabled, any newly recorded programs "
+                    "will be marked as eligible for Auto-Expiration. "
+                    "Existing recordings will keep their current value."));
     };
 };
 
@@ -594,10 +598,10 @@ public:
         GlobalSetting("PlayBoxOrdering") {
         setLabel(QObject::tr("List Newest Recording First"));
         setValue(true);
-        setHelpText(QObject::tr("If checked (default) the most recent "
-                    "recording will be listed first in the 'Watch Recordings' "
-                    "screen. If unchecked the oldest recording will be listed "
-                    "first."));
+        setHelpText(QObject::tr("When enabled, the most recent recording "
+                    "will be listed first in the 'Watch Recordings' "
+                    "screen, otherwise the oldest recording will be "
+                    "listed first."));
     };
 };
 
@@ -607,7 +611,7 @@ public:
         GlobalSetting("StickyKeys") {
         setLabel(QObject::tr("Sticky keys"));
         setValue(false);
-        setHelpText(QObject::tr("If this is set, fast forward and rewind "
+        setHelpText(QObject::tr("If enabled, fast forward and rewind "
                     "continue after the key is released.  Pressing the key "
                     "again increases the fast forward or rewind speed.  The "
                     "alternate fast forward and rewind keys always behave in "
@@ -634,9 +638,9 @@ public:
         GlobalSetting("FFRewReverse") {
         setLabel(QObject::tr("Reverse direction in fast forward/rewind"));
         setValue(true);
-        setHelpText(QObject::tr("If set, pressing the sticky rewind key "
+        setHelpText(QObject::tr("If enabled, pressing the sticky rewind key "
                     "in fast forward mode switches to rewind mode, and "
-                    "vice versa. If not set, it will decrease the "
+                    "vice versa.  If disabled, it will decrease the "
                     "current speed or switch to play mode if "
                     "the speed can't be decreased further."));
     };
@@ -808,8 +812,8 @@ public:
        GlobalSetting("ReduceJitter") {
        setLabel(QObject::tr("Jitter reduction"));
        setValue(false);
-       setHelpText(QObject::tr("If this is set, frame timing will be adjusted "
-                    "for smoother motion."));
+       setHelpText(QObject::tr("If enabled, frame timing will be adjusted "
+                   "for smoother motion."));
     };
 };
 
@@ -831,7 +835,7 @@ public:
         setLabel(QObject::tr("Video card A/V Sync"));
         setValue(false);
         setHelpText(QObject::tr("Use video card for frame timing (nVidia or "
-                                "OpenGL)."));
+                    "OpenGL)."));
     };
 };
 
@@ -839,12 +843,12 @@ class DefaultCCMode: public CheckBoxSetting, public GlobalSetting {
 public:
     DefaultCCMode():
         GlobalSetting("DefaultCCMode") {
-        setLabel(QObject::tr("Default setting for Closed Captioning"));
+        setLabel(QObject::tr("Always display Closed Captioning"));
         setValue(false);
-        setHelpText(QObject::tr("If this is set, captions will be on by "
-                    "default when playing back recordings or watching "
+        setHelpText(QObject::tr("If enabled, captions will be displayed "
+                    "when playing back recordings or watching "
                     "live TV.  Closed Captioning can be turned on or off "
-                    "by pressing 'T' during playback."));
+                    "by pressing \"T\" during playback."));
     };
 };
 
@@ -853,11 +857,11 @@ public:
     PersistentBrowseMode():
         GlobalSetting("PersistentBrowseMode") {
         setLabel(QObject::tr("Always use Browse mode when changing channels "
-                "in LiveTV"));
+                 "in LiveTV"));
         setValue(false);
-        setHelpText(QObject::tr("If this is set, Browse mode will "
+        setHelpText(QObject::tr("If enabled, Browse mode will "
                     "automatically be activated whenever you use Channel "
-                    "UP/DOWN when watching Live TV."));
+                    "UP/DOWN while watching Live TV."));
     };
 };
 
@@ -867,10 +871,10 @@ public:
        GlobalSetting("AggressiveSoundcardBuffer") {
        setLabel(QObject::tr("Aggressive Soundcard Buffering"));
        setValue(false);
-       setHelpText(QObject::tr("If this is set, MythTV will pretend to have "
-                    "a smaller soundcard buffer than is really present.  This "
-                    "may speed up seeking, but can also cause playback "
-                    "problems."));
+       setHelpText(QObject::tr("If enabled, MythTV will pretend to have "
+                   "a smaller soundcard buffer than is really present.  This "
+                   "may speed up seeking, but can also cause playback "
+                   "problems."));
     };
 };
 
@@ -881,9 +885,9 @@ public:
        setLabel(QObject::tr("Clear Saved Position on playback"));
        setValue(true);
        setHelpText(QObject::tr("Automatically clear saved position on a "
-                    "recording when the recording is played back.  If UNset, "
-                    "you can mark the beginning with rewind then save "
-                    "position."));
+                   "recording when the recording is played back.  If "
+                   "disabled, you can mark the beginning with rewind "
+                   "then save position."));
     };
 };
 
@@ -893,10 +897,11 @@ public:
        GlobalSetting("AltClearSavedPosition") {
        setLabel(QObject::tr("Alternate Clear Saved Position"));
        setValue(true);
-       setHelpText(QObject::tr("If set, during playback the select key "
-                    "(Enter or Space) will alternate between \"Position "
-                    "Saved\" and \"Position Cleared\". If UNset, select "
-                    "will save the current position for each keypress."));
+       setHelpText(QObject::tr("During playback the Select key "
+                   "(Enter or Space) will alternate between \"Position "
+                   "Saved\" and \"Position Cleared\". If disabled, the "
+                   "Select key will save the current position for each "
+                   "keypress."));
     };
 };
 
@@ -906,10 +911,11 @@ public:
        GlobalSetting("UseOutputPictureControls") {
        setLabel(QObject::tr("Use Xv picture controls"));
        setValue(false);
-       setHelpText(QObject::tr("If set, Xv picture controls (brightness, "
+       setHelpText(QObject::tr("If enabled, Xv picture controls (brightness, "
                    "contrast, etc.) are used during playback. These are "
-                   "independent of the v4l controls used for recording. The "
-                   "Xv controls may not work properly on some systems."));
+                   "independent of the Video4Linux controls used for "
+                   "recording. The Xv controls may not work properly on "
+                   "some systems."));
     };
 };
 
@@ -919,7 +925,7 @@ public:
        GlobalSetting("CCBufferWarnings") {
        setLabel(QObject::tr("Enable channel change buffer warnings"));
        setValue(false);
-       setHelpText(QObject::tr("If set, MythTV will warn you whenever you "
+       setHelpText(QObject::tr("If enabled, MythTV will warn you whenever you "
                    "change the channel but are not caught up to live TV."));
     };
 };
@@ -930,10 +936,10 @@ public:
         GlobalSetting("UDPNotifyPort") {
         setLabel(QObject::tr("UDP Notify Port"));
         setValue("6948");
-        setHelpText(QObject::tr("If this is set to a port number, MythTV will "
-                    "listen during playback for connections from the "
-                    "'mythtvosd' or 'mythudprelay' for events.  See the "
-                    "README in contrib/mythnotify/ for more details."));
+        setHelpText(QObject::tr("During playback, MythTV will listen for "
+                    "connections from the \"mythtvosd\" or \"mythudprelay\" "
+                    "programs on this port.  See the README in "
+                    "contrib/mythnotify/ for additional information."));
     };
 };
 
@@ -968,10 +974,10 @@ class GeneratePreviewPixmaps: public CheckBoxSetting, public GlobalSetting {
 public:
     GeneratePreviewPixmaps():
         GlobalSetting("GeneratePreviewPixmaps") {
-        setLabel(QObject::tr("Generate thumbnail preview images for "
-                    "recordings"));
+        setLabel(QObject::tr("Generate thumbnail preview images of "
+                 "recordings"));
         setValue(false);
-        setHelpText(QObject::tr("If set, a static image of the recording will "
+        setHelpText(QObject::tr("If enabled, a static image of the recording will "
                     "be displayed on the \"Watch a Recording\" menu."));
     };
 };
@@ -981,8 +987,9 @@ public:
     PreviewPixmapOffset():
         SpinBoxSetting(0, 600, 1), BackendSetting("PreviewPixmapOffset") {
         setLabel(QObject::tr("Time offset for thumbnail preview images"));
-        setHelpText(QObject::tr("How many seconds into the show to capture "
-                    "the static preview images from."));
+        setHelpText(QObject::tr("MythTV will make a thumbnail image this "
+                    "many seconds from the beginning of the recording. "
+                    "Useful to skip over advertisements."));
         setValue(64);
     };
 };
@@ -993,9 +1000,9 @@ public:
         GlobalSetting("PlaybackPreview") {
         setLabel(QObject::tr("Display live preview of recordings"));
         setValue(true);
-        setHelpText(QObject::tr("If set, a preview of the recording will play "
-                    "in a small window on the \"Watch a Recording\" menu."));
-
+        setHelpText(QObject::tr("When enabled, a preview of the recording "
+                    "will play in a small window on the \"Watch a "
+                    "Recording\" menu."));
     };
 };
 
@@ -1005,10 +1012,10 @@ public:
         GlobalSetting("PlayBoxTransparency") {
         setLabel(QObject::tr("Use Transparent Boxes"));
         setValue(true);
-        setHelpText(QObject::tr("If set, the Watch Recording and Delete "
-                    "Recording screens will use transparency. Unset this "
-                    "option if selecting the recordings is slow."));
-
+        setHelpText(QObject::tr("If enabled, the Watch Recording and Delete "
+                    "Recording screens will use transparency. Disable "
+                    "if selecting the recordings is slow due to high "
+                    "CPU usage."));
     };
 };
 
@@ -1020,10 +1027,10 @@ public:
         addSelection(QObject::tr("Fill"), "0");
         addSelection(QObject::tr("Image"), "1");
         addSelection(QObject::tr("None"), "2");
-        setHelpText(QObject::tr("Fill is the quickest method, but it doesn't "
-                    "look good up close. Image looks good from up close, but "
-                    "is somewhat slow. And of course no shading will be the "
-                    "fastest."));
+
+        setHelpText(QObject::tr("\"Fill\" is the quickest shading method. "
+                    "\"Image\" is somewhat slow, but has a higher visual "
+                    "quality. No shading will be the fastest."));
     };
 };
 
@@ -1042,7 +1049,7 @@ class AllowQuitShutdown: public ComboBoxSetting, public GlobalSetting {
 public:
     AllowQuitShutdown():
         GlobalSetting("AllowQuitShutdown") {
-        setLabel(QObject::tr("System shutdown"));
+        setLabel(QObject::tr("System Exit key"));
         addSelection(QObject::tr("ESC"), "4");
         addSelection(QObject::tr("No exit key"), "0");
         addSelection(QObject::tr("Control-ESC"), "1");
@@ -1059,10 +1066,11 @@ class NoPromptOnExit: public CheckBoxSetting, public GlobalSetting {
 public:
     NoPromptOnExit():
         GlobalSetting("NoPromptOnExit") {
-        setLabel(QObject::tr("No Prompt on Exit"));
-        setValue(false);
-        setHelpText(QObject::tr("If set, you will not be prompted when pressing"
-                    " the exit key.  Instead, MythTV will immediately exit."));
+        setLabel(QObject::tr("Confirm Exit"));
+        setValue(true);
+        setHelpText(QObject::tr("When enabled, MythTV will prompt "
+                    "for confirmation when you press the System Exit "
+                    "key."));
     };
 };
 
@@ -1072,11 +1080,10 @@ public:
         GlobalSetting("HaltCommand") {
         setLabel(QObject::tr("Halt command"));
         setValue("halt");
-        setHelpText(QObject::tr("If you have configured an exit key on the "
-                    "System Shutdown menu, you will be given the opportunity "
+        setHelpText(QObject::tr("If you have configured an exit key using the "
+                    "System Shutdown option, you will be given the opportunity "
                     "to exit MythTV or halt the system completely. "
-                    "Another possibility for this field is "
-                    "poweroff"));
+                    "Another possibility for this field is \"poweroff\""));
     };
 };
 
@@ -1211,8 +1218,8 @@ public:
         GlobalSetting("GuiSizeForTV") {
         setLabel(QObject::tr("Use GUI size for TV playback"));
         setValue(true);
-        setHelpText(QObject::tr("If checked, use the above size for TV. "
-                                "If unchecked, use full screen."));
+        setHelpText(QObject::tr("If enabled, use the above size for TV, "
+                    "otherwise use full screen."));
     };
 };
 
@@ -1223,7 +1230,7 @@ public:
         setLabel(QObject::tr("Separate video modes for GUI and TV playback"));
         setValue(false);
         setHelpText(QObject::tr("Switch X Window video modes for TV. "
-                                "Requires 'xrandr' support."));
+                    "Requires \"xrandr\" support."));
     };
 };
 
@@ -1234,8 +1241,8 @@ public:
         setLabel(QObject::tr("GUI X size (px)"));
         setValue(0);
         setHelpText(QObject::tr("Horizontal resolution for GUI video mode. "
-                                "This mode must be already configured in "
-                                "XF86Config."));
+                    "This mode must be defined in your X configuration "
+                    "file."));
     };
 };
 
@@ -1246,8 +1253,8 @@ public:
         setLabel(QObject::tr("GUI Y size (px)"));
         setValue(0);
         setHelpText(QObject::tr("Vertical resolution for GUI video mode. "
-                                "This mode must be already configured in "
-                                "XF86Config."));
+                    "This mode must be defined in your X configuration "
+                    "file."));
     };
 };
 
@@ -1258,8 +1265,9 @@ public:
         setLabel(QObject::tr("TV X size (px)"));
         setValue(0);
         setHelpText(QObject::tr("Horizontal resolution for playback video "
-                                "mode. This mode must be already configured "
-                                "in XF86Config."));
+                    "mode. "
+                    "This mode must be defined in your X configuration "
+                    "file."));
     };
 };
 
@@ -1270,8 +1278,8 @@ public:
         setLabel(QObject::tr("TV Y size (px)"));
         setValue(0);
         setHelpText(QObject::tr("Vertical resolution for playback video mode. "
-                                "This mode must be already configured in "
-                                "XF86Config."));
+                    "This mode must be defined in your X configuration "
+                    "file."));
     };
 };
 
@@ -1311,7 +1319,7 @@ public:
         GlobalSetting("RunFrontendInWindow") {
         setLabel(QObject::tr("Run the frontend in a window"));
         setValue(false);
-        setHelpText(QObject::tr("Toggles between borderless operation."));
+        setHelpText(QObject::tr("Toggles between windowed and borderless operation."));
     };
 };
 
@@ -1445,11 +1453,10 @@ public:
         GlobalSetting("Style") {
         setLabel(QObject::tr("Qt Style"));
         fillSelections();
-        setHelpText(QObject::tr("This setting will change the qt widget style "
-                    "on startup, if this setting is set to anything other "
-                    "than 'Desktop Style'. Setting this setting to 'Desktop "
-                    "Style' will have no effect on the currently running "
-                    "MythTV session."));
+        setHelpText(QObject::tr("At startup, MythTV will change the Qt "
+                    "widget style to this setting.  If \"Desktop Style\" "
+                    "is selected, MythTV will use the existing desktop "
+                    "setting."));
     };
 
     void fillSelections(void) {
@@ -1503,13 +1510,13 @@ public:
     ATSCCheckSignalWait():
         SpinBoxSetting(1000, 10000, 250),
         BackendSetting("ATSCCheckSignalWait") {
-        setLabel(QObject::tr("Wait for ATSC signal lock (msec)"));
+        setLabel(QObject::tr("Time limit for ATSC signal lock (msec)"));
         setHelpText(QObject::tr("MythTV can check the signal strength "
-                      "When you tune into a HDTV or other over-the-air "
-                      "digital station. This value is the number of "
-                      "milliseconds to allow before we give up trying to "
-                      "get an acceptible signal."));
-        setValue(5000);
+                    "when you tune into a HDTV or other over-the-air "
+                    "digital station. This value is the number of "
+                    "milliseconds to allow before MythTV gives up "
+                    "trying to get an acceptable signal.")); 
+       setValue(5000);
     };
 };
 
@@ -1520,9 +1527,10 @@ public:
         GlobalSetting("ATSCCheckSignalThreshold") {
         setLabel(QObject::tr("ATSC Signal Threshold"));
         setHelpText(QObject::tr("Threshold for a signal to be considered "
-                      "acceptible. If you set this too low Myth may crash, "
-                      "if you set it too low you may not be able to tune "
-                      "to channels on which reception is good."));
+                    "acceptable. If you set this too low MythTV may "
+                    "crash, and if you set it too high you may not be "
+                    "able to tune a channel on which reception would "
+                    "be acceptable."));
         setValue(65);
     };
 };
@@ -1544,9 +1552,9 @@ public:
     LastFreeCard():
         BackendSetting("LastFreeCard") {
         setLabel(QObject::tr("Avoid conflicts between live TV and "
-                             "scheduled shows."));
+                 "scheduled shows."));
         setValue(false);
-        setHelpText(QObject::tr("If set, live TV will choose a tuner card "
+        setHelpText(QObject::tr("If enabled, live TV will choose a tuner card "
                     "that is less likely to have scheduled recordings "
                     "rather than the best card available."));
     };
@@ -1588,10 +1596,11 @@ class EPGScrollType: public CheckBoxSetting, public GlobalSetting {
 public:
     EPGScrollType():
         GlobalSetting("EPGScrollType") {
-        setLabel(QObject::tr("Program Guide Selection Placement"));
+        setLabel(QObject::tr("Floating Program Guide Selector"));
         setValue(true);
-        setHelpText(QObject::tr("If unchecked, the program guide's selector "
-                    "will stay in the middle of the guide at all times."));
+        setHelpText(QObject::tr("If enabled, the program guide's selector "
+                    "will be free to move throughout the guide, otherwise "
+                    "it will stay in the center of the guide at all times."));
     };
 };
 
@@ -1618,7 +1627,7 @@ public:
         GlobalSetting("EPGShowCategoryColors") {
         setLabel(QObject::tr("Display Genre Colors"));
         setHelpText(QObject::tr("Colorize program guide using "
-                    " genre colors. (Not available for all grabbers.)"));
+                    "genre colors. (Not available for all grabbers.)"));
         setValue(true);
     };
 };
@@ -1646,10 +1655,11 @@ class EPGShowFavorites: public CheckBoxSetting, public GlobalSetting {
 public:
     EPGShowFavorites():
         GlobalSetting("EPGShowFavorites") {
-        setLabel(QObject::tr("Display 'favorite' channels"));
-        setHelpText(QObject::tr("If set, the EPG will initally display "
-                    "only the channels marked as favorites. \"4\" will "
-                    "toggle between favorites and all channels."));
+        setLabel(QObject::tr("Only display 'favorite' channels"));
+        setHelpText(QObject::tr("If enabled, the EPG will initially display "
+                    "only the channels marked as favorites. Pressing "
+                    "\"4\" will toggle between displaying favorites and all "
+                    "channels."));
         setValue(false);
     };
 };
@@ -1679,12 +1689,11 @@ public:
     GRSchedMoveHigher():
         BackendSetting("SchedMoveHigher") {
         setLabel(QObject::tr("Reschedule Higher Priorities"));
-        setHelpText(QObject::tr("Move higher priority programs to other cards "
-                                "and showings when resolving conflicts.  This "
-                                "can be used to record lower priority "
-                                "programs that would not otherwise be "
-                                "recorded, but risks missing a higher "
-                                "priority program if the schedule changes."));
+        setHelpText(QObject::tr("Move higher priority programs to other "
+                    "cards and showings when resolving conflicts.  This "
+                    "can be used to record lower priority programs that "
+                    "would otherwise not be recorded, but risks missing "
+                    "a higher priority program if the schedule changes."));
         setValue(false);
     };
 };
@@ -1802,9 +1811,9 @@ public:
         setLabel(QObject::tr("Use select to change the channel in the program "
                  "guide"));
         setValue(false);
-        setHelpText(QObject::tr("If checked the select key will change the "
+        setHelpText(QObject::tr("If enabled, the Select key will change the "
                     "channel while using the program guide during live TV.  "
-                    "If unchecked the select key will bring up the recording "
+                    "If disabled, the select key will bring up the recording "
                     "options screen."));
     };
 };
@@ -1815,10 +1824,10 @@ public:
         SpinBoxSetting(1, 600, 1), GlobalSetting("SelChangeRecThreshold") {
         setLabel(QObject::tr("Record Threshold"));
         setValue(16);
-        setHelpText(QObject::tr("If the option to use select to change the channel "
-                                "is on, pressing select on a show that is at least "
-                                "this many minutes into the future will schedule a "
-                                "recording."));
+        setHelpText(QObject::tr("If the option to use Select to change the channel "
+                    "is on, pressing Select on a show that is at least "
+                    "this many minutes into the future will schedule a "
+                    "recording."));
     };
 };
 
@@ -1894,9 +1903,10 @@ public:
         setLabel(QObject::tr("Xbox Linux Distribution"));
         addSelection("GentooX","led");
         addSelection(QObject::tr("Other"),"blink");
-        setHelpText(QObject::tr("This is used to determine the name of the "
-                    "blink binary led will be used on GentooX, blink "
-                    "otherwise."));
+        setHelpText(QObject::tr("The program used to control the "
+                    "LED on the Xbox is dependant on which distribution is "
+                    "installed. \"led\" will be used on GentooX, \"blink\" "
+                    "on other Xbox distributions."));
     };
 };
 
@@ -1904,13 +1914,13 @@ class XboxLEDDefault: public ComboBoxSetting, public GlobalSetting {
 public:
     XboxLEDDefault():
         GlobalSetting("XboxLEDDefault") {
-        setLabel(QObject::tr("Default LED mode"));
+        setLabel(QObject::tr("Default LED color"));
         addSelection(QObject::tr("Off"), "nnnn");
         addSelection(QObject::tr("Green"),"gggg");
         addSelection(QObject::tr("Orange"),"oooo");
         addSelection(QObject::tr("Red"),"rrrr");
-        setHelpText(QObject::tr("This sets the LED mode when there is nothing "
-                    "else to display"));
+        setHelpText(QObject::tr("Sets the LED color when it is not "
+                    "being used for status indication."));
     };
 };
 
@@ -1923,8 +1933,8 @@ public:
         addSelection(QObject::tr("Green"),"gggg");
         addSelection(QObject::tr("Orange"),"oooo");
         addSelection(QObject::tr("Red"),"rrrr");
-        setHelpText(QObject::tr("This sets the LED mode when a backend is "
-                    "recording"));
+        setHelpText(QObject::tr("Sets the LED color when a backend is "
+                    "recording."));
     };
 };
 
@@ -1935,9 +1945,9 @@ public:
         GlobalSetting("XboxCheckRec") {
         setLabel(QObject::tr("Recording Check Frequency"));
         setValue(5);
-        setHelpText(QObject::tr("This specifies how often in seconds to "
-                    "check if a recording is in progress and update the "
-                    "Xbox LED."));
+        setHelpText(QObject::tr("This specifies how frequently "
+                    "(in seconds) to check if a recording is in " 
+                    "progress in order to update the Xbox LED."));
     };
 };
 
@@ -1991,8 +2001,9 @@ public:
 #ifdef USING_XVMC
 class UseXVMC: public CheckBoxSetting, public GlobalSetting {
 public:
-    UseXVMC(): GlobalSetting("UseXVMC") {
-        setLabel(QObject::tr("Use HW XVMC MPEG Decoding"));
+    UseXVMC(): 
+        GlobalSetting("UseXVMC") {
+        setLabel(QObject::tr("Use hardware XvMC MPEG Decoding"));
         setValue(true);
     };
 };
@@ -2001,8 +2012,9 @@ public:
 #ifdef USING_VIASLICE
 class UseViaSlice: public CheckBoxSetting, public GlobalSetting {
 public:
-    UseViaSlice(): GlobalSetting("UseViaSlice") {
-        setLabel(QObject::tr("Use VIA HW MPEG Decoding"));
+    UseViaSlice(): 
+        GlobalSetting("UseViaSlice") {
+        setLabel(QObject::tr("Use VIA hardware MPEG Decoding"));
         setValue(true);
     };
 };
@@ -2044,9 +2056,12 @@ public:
     DVBMonitorInterval():
         SpinBoxSetting(0, 240, 5),
         BackendSetting("DVBMonitorInterval") {
-        setLabel(QObject::tr("Interval to sample DVB signal stats at "
-                 "(in seconds, 0 = off)"));
+        setLabel(QObject::tr("Sample interval for DVB signal statistics "
+                 "(in seconds)"));
         setValue(0);
+        setHelpText(QObject::tr("MythTV will monitor the DVB signal "
+                    "statistics using the specified interval.  Set to "
+                    "\"0\" to disable."));
     };
 };
 
@@ -2067,11 +2082,11 @@ class LogEnabled: public CheckBoxSetting, public GlobalSetting {
 public:
     LogEnabled():
         GlobalSetting("LogEnabled") {
-        setLabel(QObject::tr("DB Logging Enabled"));
+        setLabel(QObject::tr("Log MythTV events to database"));
         setValue(false);
-        setHelpText(QObject::tr("If checked, the Myth modules will send event "
+        setHelpText(QObject::tr("If enabled, MythTV modules will send event "
                     "details to the database, where they can be viewed with "
-                    "MythLog or emailed out periodically."));
+                    "MythLog or periodically emailed to the administrator."));
     };
 };
 
@@ -2080,7 +2095,7 @@ public:
     LogMaxCount():
         SpinBoxSetting(0,500,10),
         GlobalSetting("LogMaxCount") {
-        setLabel(QObject::tr("Max. Number of Entries per Module"));
+        setLabel(QObject::tr("Maximum Number of Entries per Module"));
         setValue(100);
         setHelpText(QObject::tr("If there are more than this number of entries "
                     "for a module, the oldest log entries will be deleted to "
@@ -2095,8 +2110,8 @@ public:
         setLabel(QObject::tr("Automatic Log Cleaning Enabled"));
         setValue(false);
         setHelpText(QObject::tr("This enables the periodic cleanup of the "
-                    "events stored in the Myth database (see 'DB Logging "
-                    "Enabled' on the previous page)."));
+                    "events stored in the Myth database (see \"Log MythTV "
+                    "events to database\" on the previous page)."));
     };
 };
 
@@ -2107,7 +2122,7 @@ public:
         GlobalSetting("LogCleanPeriod") {
         setLabel(QObject::tr("Log Cleanup Frequency (Days)"));
         setValue(14);
-        setHelpText(QObject::tr("The number of days between log cleanup runs"));
+        setHelpText(QObject::tr("The number of days between log cleanup runs."));
     };
 };
 
@@ -2119,8 +2134,8 @@ public:
         setLabel(QObject::tr("Number of days to keep acknowledged log "
                  "entries"));
         setValue(14);
-        setHelpText(QObject::tr("The number of days before a log entry that has"
-                    " been acknowledged will be deleted by the log cleanup "
+        setHelpText(QObject::tr("The number of days before a log entry that has "
+                    "been acknowledged will be deleted by the log cleanup "
                     "process."));
     };
 };
@@ -2190,9 +2205,10 @@ public:
         setLabel(QObject::tr("mythfilldatabase Execution Start"));
         setValue(2);
         setHelpText(QObject::tr("This setting and the following one define a "
-                    "time period in which the mythfilldatabase process is allowed "
-                    "to run.  Setting Start to 11 and End to 13 would mean "
-                    "that the process would only run between 11 AM and 1 PM."));
+                    "time period when the mythfilldatabase process is "
+                    "allowed to run.  For example, setting Start to 11 and "
+                    "End to 13 would mean that the process would only "
+                    "run between 11 AM and 1 PM."));
     };
 };
 
@@ -2204,9 +2220,10 @@ public:
         setLabel(QObject::tr("mythfilldatabase Execution End"));
         setValue(5);
         setHelpText(QObject::tr("This setting and the preceding one define a "
-                    "time period in which the mythfilldatabase process is allowed "
-                    "to run.  Setting Start to 11 and End to 13 would mean "
-                    "that the process would only run between 11 AM and 1 PM."));
+                    "time period when the mythfilldatabase process is "
+                    "allowed to run.  For example, setting Start to 11 and "
+                    "End to 13 would mean that the process would only "
+                    "run between 11 AM and 1 PM."));
     };
 };
 
@@ -2217,7 +2234,7 @@ public:
         setLabel(QObject::tr("mythfilldatabase Path"));
         setValue("mythfilldatabase");
         setHelpText(QObject::tr("Path (including executable) of the "
-                                "mythfilldatabase program."));
+                    "mythfilldatabase program."));
     };
 };
 
@@ -2228,7 +2245,7 @@ public:
         setLabel(QObject::tr("mythfilldatabase Arguments"));
         setValue("");
         setHelpText(QObject::tr("Any arguments you want passed to the "
-                                "mythfilldatabase program."));
+                    "mythfilldatabase program."));
     };
 };
 
@@ -2239,8 +2256,8 @@ public:
        setLabel(QObject::tr("mythfilldatabase Log Path"));
        setValue("");
        setHelpText(QObject::tr("Path to use for logging output from "
-                               "the mythfilldatabase program.  Leave blank "
-                               "to disable logging."));
+                   "the mythfilldatabase program.  Leave blank "
+                   "to disable logging."));
    };
 };
 
