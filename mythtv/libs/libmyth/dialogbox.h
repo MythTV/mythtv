@@ -66,6 +66,7 @@ class MythThemedDialog : public MythDialog
     UITextType*             getUITextType(QString name);
     UIPushButtonType*       getUIPushButtonType(QString name);
     UITextButtonType*       getUITextButtonType(QString name);
+    UIRepeatedImageType*    getUIRepeatedImageType(QString name);
     
     
     void setContext(int a_context){context = a_context;}

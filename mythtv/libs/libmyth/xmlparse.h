@@ -35,6 +35,7 @@ class XMLParse
     void parseTextArea(LayerSet *, QDomElement &);
     void parseStatusBar(LayerSet *, QDomElement &);
     void parseImage(LayerSet *, QDomElement &);
+    void parseRepeatedImage(LayerSet *, QDomElement &);
     void resizeImage(QPixmap *, QString);
     void parsePushButton(LayerSet *, QDomElement &);
     void parseTextButton(LayerSet *, QDomElement &);

@@ -583,3 +583,28 @@ UITextButtonType* MythThemedDialog::getUITextButtonType(QString name)
     return oops;
 }
 
+UIRepeatedImageType* MythThemedDialog::getUIRepeatedImageType(QString name)
+{
+
+    UIRepeatedImageType* oops = NULL;
+    
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
+
+    while( (looper = an_it.current()) != 0)
+    {
+        UIType *hunter = looper->GetType(name);
+        if(hunter)
+        {
+            UIRepeatedImageType *hunted;
+            if( (hunted = dynamic_cast<UIRepeatedImageType*>(hunter)) )
+            {
+                return hunted;
+            }
+        }
+        ++an_it;
+    }
+
+    return oops;
+}
+

@@ -275,6 +275,91 @@ void XMLParse::parseImage(LayerSet *container, QDomElement &element)
     container->AddType(image);
 }
 
+void XMLParse::parseRepeatedImage(LayerSet *container, QDomElement &element)
+{
+    int context = -1;
+    QString name = element.attribute("name", "");
+    if (name.isNull() || name.isEmpty())
+    {
+        cerr << "Repeated Image needs a name\n";
+        exit(0);
+    }
+
+    QString order = element.attribute("draworder", "");
+    if (order.isNull() || order.isEmpty())
+    {
+        cerr << "Repeated Image needs an order\n";
+        exit(0);
+    }
+
+    QString filename = "";
+    QPoint pos = QPoint(0, 0);
+
+    QPoint scale = QPoint(-1, -1);
+    QPoint skipin = QPoint(0, 0);
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "context")
+            {
+                context = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "filename")
+            {
+                filename = getFirstText(info);
+            }
+            else if (info.tagName() == "position")
+            {
+                pos = parsePoint(getFirstText(info));
+                pos.setX((int)(pos.x() * wmult));
+                pos.setY((int)(pos.y() * hmult));
+            }
+            else if (info.tagName() == "staticsize")
+            {
+                scale = parsePoint(getFirstText(info));
+            }
+            else if (info.tagName() == "skipin")
+            {
+                skipin = parsePoint(getFirstText(info));
+                skipin.setX((int)(skipin.x() * wmult));
+                skipin.setY((int)(skipin.y() * hmult));
+            }
+            else
+            {
+                cerr << "Unknown: " << info.tagName() << " in repeated image\n";
+                exit(0);
+            }
+        }
+    }
+
+    UIRepeatedImageType *image = new UIRepeatedImageType(name, filename, order.toInt(), pos);
+    image->SetScreen(wmult, hmult);
+    if (scale.x() != -1 || scale.y() != -1)
+        image->SetSize(scale.x(), scale.y());
+    image->SetSkip(skipin.x(), skipin.y());
+    QString flex = element.attribute("fleximage", "");
+    if (!flex.isNull() && !flex.isEmpty())
+    {
+        if (flex.lower() == "yes")
+            image->SetFlex(true);
+        else
+            image->SetFlex(false);
+    }
+
+    image->LoadImage();
+    if (context != -1)
+    {
+        image->SetContext(context);
+    }
+    image->SetParent(container);
+    image->calculateScreenArea();
+    container->AddType(image);
+}
+
 void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
 {
     int context = -1;
@@ -667,6 +752,10 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
             else if (info.tagName() == "image")
             {
                 parseImage(container, info);
+            }
+            else if (info.tagName() == "repeatedimage")
+            {
+                parseRepeatedImage(container, info);
             }
             else if (info.tagName() == "listarea")
             {
@@ -1250,13 +1339,11 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     QRect binarea;
     int bins = 1;
 
-/*
-    QPoint uparrow_loc;
-    QPoint dnarrow_loc;
-    QPoint select_loc;
     QPixmap uparrow_img;
-    QPixmap dnarrow_img;
-*/
+    QPixmap downarrow_img;
+    QPixmap leftarrow_img;
+    QPixmap rightarrow_img;
+
     QPixmap select_img;
 
     //
@@ -1345,6 +1432,86 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                         cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
                 }
+                else if (imgname.lower() == "uparrow")
+                {
+                    QString baseDir = gContext->GetInstallPrefix();
+                    QString themeDir = gContext->FindThemeDir("");
+                    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
+                    baseDir = baseDir + "/share/mythtv/themes/default/";
+                    QFile checkFile(themeDir + file);
+                    if (checkFile.exists())
+                    {
+                        file = themeDir + file;
+                    }
+                    else
+                    {
+                        file = baseDir + file;
+                    }
+                    if(!uparrow_img.load(file))
+                    {
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                    }
+                }
+                else if (imgname.lower() == "downarrow")
+                {
+                    QString baseDir = gContext->GetInstallPrefix();
+                    QString themeDir = gContext->FindThemeDir("");
+                    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
+                    baseDir = baseDir + "/share/mythtv/themes/default/";
+                    QFile checkFile(themeDir + file);
+                    if (checkFile.exists())
+                    {
+                        file = themeDir + file;
+                    }
+                    else
+                    {
+                        file = baseDir + file;
+                    }
+                    if(!downarrow_img.load(file))
+                    {
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                    }
+                }
+                else if (imgname.lower() == "leftarrow")
+                {
+                    QString baseDir = gContext->GetInstallPrefix();
+                    QString themeDir = gContext->FindThemeDir("");
+                    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
+                    baseDir = baseDir + "/share/mythtv/themes/default/";
+                    QFile checkFile(themeDir + file);
+                    if (checkFile.exists())
+                    {
+                        file = themeDir + file;
+                    }
+                    else
+                    {
+                        file = baseDir + file;
+                    }
+                    if(!leftarrow_img.load(file))
+                    {
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                    }
+                }
+                else if (imgname.lower() == "rightarrow")
+                {
+                    QString baseDir = gContext->GetInstallPrefix();
+                    QString themeDir = gContext->FindThemeDir("");
+                    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
+                    baseDir = baseDir + "/share/mythtv/themes/default/";
+                    QFile checkFile(themeDir + file);
+                    if (checkFile.exists())
+                    {
+                        file = themeDir + file;
+                    }
+                    else
+                    {
+                        file = baseDir + file;
+                    }
+                    if(!rightarrow_img.load(file))
+                    {
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                    }
+                }
                 else
                 {
                     cerr << "xmlparse.o: I don't know what to do with an image tag who's function is " << imgname << endl;
@@ -1395,7 +1562,8 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                                 cerr << "FcnFont needs a function\n";
                                 exit(0);
                             }
-                            fontFunctions[fontfcn] = fontname;
+                            QString a_string = QString("bin%1-%2").arg(whichbin).arg(fontfcn);
+                            fontFunctions[a_string] = fontname;
                         }
                         else
                         {
@@ -1439,6 +1607,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
         mtl->setFonts(fontFunctions, theFonts);
     }
     mtl->setHighlightImage(select_img);
+    mtl->setArrowImages(uparrow_img, downarrow_img, leftarrow_img, rightarrow_img);
     mtl->makeHighlights();
     mtl->calculateScreenArea();
     container->AddType(mtl);

@@ -317,22 +317,39 @@ class UIImageType : public UIType
     void LoadImage();
     QPixmap GetImage() { return img; }
     int GetSize() { return m_force_x; }
-  
-    void Draw(QPainter *, int, int);
+    virtual void Draw(QPainter *, int, int);
 
   protected:
-    QPoint m_displaypos;
+
+    QPoint  m_displaypos;
     QString m_filename;
-    bool m_isvalid;
-    bool m_flex;
-    bool m_show;
-    int m_drop_x;
-    int m_drop_y;
-    int m_force_x;
-    int m_force_y;
+    bool    m_isvalid;
+    bool    m_flex;
+    bool    m_show;
+    int     m_drop_x;
+    int     m_drop_y;
+    int     m_force_x;
+    int     m_force_y;
     QPixmap img;
 
 };
+
+class UIRepeatedImageType : public UIImageType
+{
+    Q_OBJECT
+    
+  public:
+  
+    UIRepeatedImageType(const QString &, const QString &, int, QPoint);
+    void setRepeat(int how_many);
+    void Draw(QPainter *, int, int);
+    void calculateScreenArea();
+    
+  protected:
+  
+    int m_repeat;
+};
+
 
 class UITextType : public UIType
 {
@@ -416,6 +433,7 @@ class GenericTree
     GenericTree*  addNode(QString a_string, int an_int);
     GenericTree*  addNode(QString a_string, int an_int, bool selectable_flag);
     GenericTree*  findLeaf();
+    GenericTree*  findLeaf(int ordering_index);
     GenericTree*  findNode(QValueList<int> route_of_branches);
     GenericTree*  recursiveNodeFinder(QValueList<int> route_of_branches);
     bool          checkNode(QValueList<int> route_of_branches);
@@ -425,6 +443,7 @@ class GenericTree
     GenericTree*  prevSibling(int number_up, int ordering_index);
     GenericTree*  getParent();
     GenericTree*  getChildAt(uint reference);
+    GenericTree*  getSelectedChild(int ordering_index);
     GenericTree*  getChildAt(uint reference, int ordering_index);
     int           getChildPosition(GenericTree *which_child);
     int           getChildPosition(GenericTree *which_child, int ordering_index);
@@ -443,10 +462,13 @@ class GenericTree
     void          setSelectable(bool flag){selectable = flag;}
     bool          isSelectable(){return selectable;}
     void          setAttribute(uint attribute_position, int value_of_attribute);
+    int           getAttribute(uint which_one);
     IntVector*    getAttributes(){return my_attributes;}
     void          reorderSubnodes(int ordering_index);
     void          setOrderingIndex(int ordering_index){current_ordering_index = ordering_index;}
     int           getOrderingIndex(){return current_ordering_index;}
+    void          becomeSelectedChild();
+    void          setSelectedChild(GenericTree* a_node){my_selected_subnode = a_node;}
     
   private:
 
@@ -456,6 +478,7 @@ class GenericTree
     int                   my_int;
     QPtrList<GenericTree> my_subnodes;
     QPtrList<GenericTree> my_ordered_subnodes;
+    GenericTree*          my_selected_subnode;
     IntVector             *my_attributes;
     GenericTree*          my_parent;
     bool                  selectable;
@@ -490,16 +513,24 @@ class UIManagedTreeListType : public UIType
     void    assignTreeData(GenericTree *a_tree);
     void    moveToNode(QValueList<int> route_of_branches);
     void    setHighlightImage(QPixmap an_image){highlight_image = an_image;}
+    void    setArrowImages(QPixmap up, QPixmap down, QPixmap left, QPixmap right)
+                          {
+                            up_arrow_image = up;
+                            down_arrow_image = down;
+                            left_arrow_image = left;
+                            right_arrow_image = right;
+                          }
     void    setFonts(QMap<QString, QString> fonts, QMap<QString, fontProp> fontfcn) { 
                           m_fonts = fonts; m_fontfcns = fontfcn; }
     QString cutDown(QString, QFont *, int, int);
+    void    drawText(QPainter *p, QString the_text, QString font_name, int x, int y, int bin_number);
     void    setJustification(int jst) { m_justification = jst; }
     int     getJustification() { return m_justification; }
     void    makeHighlights();
     void    syncCurrentWithActive();
     void    calculateScreenArea();
     void    setTreeOrdering(int an_int){tree_order = an_int;}
-    
+    void    setVisualOrdering(int an_int){visual_order = an_int;}    
 
   public slots:
 
@@ -508,8 +539,8 @@ class UIManagedTreeListType : public UIType
     bool    pushDown();
     bool    moveUp();
     bool    moveDown();
-    bool    nextActive();
-    bool    prevActive();
+    bool    nextActive(bool wrap_around);
+    bool    prevActive(bool wrap_around);
     void    select();
     void    activate();
     
@@ -530,11 +561,16 @@ class UIManagedTreeListType : public UIType
     GenericTree *current_node;
     GenericTree *active_node;
     int         tree_order;
+    int         visual_order;
 
     QMap<QString, QString>  m_fonts;
     QMap<QString, fontProp> m_fontfcns;
     int                     m_justification;
     QPixmap                 highlight_image;
+    QPixmap                 up_arrow_image;
+    QPixmap                 down_arrow_image;
+    QPixmap                 left_arrow_image;
+    QPixmap                 right_arrow_image;
     QPtrList<QPixmap>       resized_highlight_images;
     QMap<int, QPixmap*>     highlight_map;
 
