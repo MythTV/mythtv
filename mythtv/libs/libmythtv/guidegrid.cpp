@@ -1881,7 +1881,7 @@ QRect GuideGrid::programRect() const
 
 	if (showProgramBar == 1)
         {
-		programheight = (int)((300*hmult - (min_dateheight * 2.5) + 1) * hmult);
+		programheight = (int)( (int)(300*hmult) - (int)(min_dateheight*2.5*hmult) );
 	}
 	else
 	{
