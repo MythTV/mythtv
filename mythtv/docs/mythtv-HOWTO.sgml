@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2004-08-03, v0.15.07
+<date>2004-09-07, v0.16.00
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -57,6 +57,7 @@ and FLAC
 browser.  With MythWeb, you can schedule recordings, delete files, change
 keybindings and more.  With proper security, you may even schedule a program
 over the Internet and have it immediately acted on by the scheduler.
+<item>MythPhone, phone and videophone using SIP.
 </itemize>
 <sect1>How to obtain this document <label id="how_to_obtain">
 <p>This HOWTO document is maintained at the primary MythTV website: <url
@@ -78,7 +79,7 @@ name="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html"> or as a PDF
 at <url url="http://www.mythtv.org/docs/mythtv-HOWTO.pdf"
 name="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">.
 
-This HOWTO is for MythTV v0.15.1.
+This HOWTO is for MythTV v0.16.
 
 <sect1>Document conventions
 <p>The following conventions are used throughout this document.<newline>
@@ -132,6 +133,11 @@ Really.  Even if there's no one in the mythtv-users IRC group or everyone
 seems to be ignoring you.
 </caption>
 </figure>
+
+<sect1>Bugzilla.
+<p>If you feel you need to contribute to a bug database, use the MythTV
+Bugzilla at <url url="http://www.mythtv.org/bugs/"
+name="http://www.mythtv.org/bugs/">.
    
 <sect1>Contributing to this document
 <p>Contributions to the HOWTO are welcome, especially if you find a
@@ -372,7 +378,7 @@ encoding. Using either a G200 MJPEG encoder card, or a MPEG-2 encoder card
 supported by the IvyTV project <url url="http://ivtv.sourceforge.net/"
 name="http://ivtv.sourceforge.net/"> such as the Hauppauge PVR-250, PVR-350,
 Avermedia M179, Hauppauge "Freestyle" or Yuan M600 cards will allow you to
-use dedicated hardware encoders rather than your CPU. Release 0.15 of MythTV
+use dedicated hardware encoders rather than your CPU. Release 0.16 of MythTV
 is able to use these MPEG-2 encoders as an input device for live TV and for
 scheduled recordings.  (The PVR-350 can simultaneously be used as an output
 device.) Using the on-board MPEG-2 encoder drastically reduces the CPU
@@ -754,6 +760,15 @@ name="http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/">.
 Installation instructions can be found on those pages as well. All of the
 prerequisites for MythTV are available as Debian packages, most of them from
 the official Debian archive.
+
+If you have followed the instructions on the above page you should have added
+<tscreen><verb>
+deb-src http://dijkstra.csh.rit.edu/~mdz/debian unstable mythtv
+</verb></tscreen>
+
+to your <tt>/etc/apt/sources.list</tt> file.  Running <bf>apt-get update</bf> and then
+executing <bf>apt-get build-dep mythtv</bf> should install all the
+pre-requisites required to compile MythTV.
 
 <figure loc="here">
 <eps file="warning.eps" height="1cm">
@@ -1247,6 +1262,12 @@ before you compile.
 Recent AMD processors, like the Duron, Thunderbird and Athlon don't need this
 change.
 
+If you have an AMD64, look for 
+<verb>-march=pentiumpro</verb> 
+and replace it with
+<verb>-march=m64</verb> 
+before you compile.
+
 <sect1>Building LAME
 <p>Open a shell and switch to the directory where you saved lame.
 <tscreen><verb>
@@ -1383,8 +1404,8 @@ simplest thing is to immediately start using DataDirect.
 <sect1>Manually building MythTV
 <p>Unpack MythTV
 <tscreen><verb>
-$ tar -xjf mythtv-0.15.tar.bz2
-$ cd mythtv-0.15
+$ tar -xjf mythtv-0.16.tar.bz2
+$ cd mythtv-0.16
 $ ./configure
 </verb></tscreen>
 
@@ -2161,7 +2182,7 @@ to control MythTV.  MythTV now includes native support for lirc and can
 interact directly with 
 
 <tscreen><verb>
-$ cd ~/mythtv-0.15/configfiles
+$ cd ~/mythtv-0.16/configfiles
 $ cp lircrc.example ~/.lircrc
 </verb></tscreen> 
 or
@@ -2492,8 +2513,9 @@ move to the next page by pressing the space bar.  If you need to move around
 the screen, use the arrow keys to move focus between settings, not the
 mouse.
 
-If you will have multiple backends, then <em>do not</em> use the "127.0.0.1"
-IP address.
+If you will have multiple backends, or if your backend is on one system and
+you're running the frontend on another machine then <em>do not</em> use the
+"127.0.0.1" IP address.
 
 It is very strongly discouraged that you make any changes to the port
 settings from the defaults.
@@ -2936,7 +2958,7 @@ during playback. These filters can be used to improve or modify the video
 image, including hiding the effects of an interlaced image or reducing the
 effects of noise in a poor video signal. The following is a brief
 introduction to introduce you to the filters that are available in MythTV
-version 0.15.
+version 0.16.
 <sect2>Applying filters
 <p>One or more filters can be included in a "filter chain". The filters to
 be used are identified in a "filter string". A filter string is a group of
@@ -3791,8 +3813,8 @@ Mandrake Control Center.
 <sect1>Completing the installation
 <p>
 <tscreen><verb>
-$ tar -xjf mythweb-0.15.tar.bz2
-$ cd mythweb-0.15
+$ tar -xjf mythweb-0.16.tar.bz2
+$ cd mythweb-0.16
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -3850,8 +3872,8 @@ would perform the following command:
 Once you have satisfied the prerequisites for your distribution, download
 and install the application:
 <tscreen><verb>
-$ tar -xjf mythgallery-0.15.tar.bz2
-$ cd mythgallery-0.15
+$ tar -xjf mythgallery-0.16.tar.bz2
+$ cd mythgallery-0.16
 $ ./configure --enable-opengl
 $ qmake mythgallery.pro
 $ make
@@ -4554,6 +4576,16 @@ Check that <tt>/etc/mysql/my.cnf</tt> <em>does not</em> contain
 <tt>127.0.0.1</tt>.  If you change either of these items, restart 
 <bf>MySQL</bf>.
 
+<sect2>MySQL database is corrupt
+<p>If you have reason to believe that your MySQL database is corrupt,
+execute the following commands to attempt to repair it.
+
+<bf>NOTE</bf>: Ensure that there are no programs accessing the database
+while you attempt to repair it.  Make sure that all backend and frontend
+programs have exited.
+
+<tt>mysqlcheck -r -umythtv -p&lt;password&gt; mythconverg</tt>
+
 <sect2>Using a MPEG-2 encoder card and the video appears "jittery"
 <sect2>Using a MPEG-2 encoder card and the video is jumping up and down
 <p>This is a different problem than the one discussed in the previous
@@ -4699,6 +4731,11 @@ the default <tt>harddisks</tt> file, your changes will affect all IDE devices
 devices, rename and/or copy the file to <tt>harddiskhda</tt>,
 <tt>harddiskhdb</tt>, etc.  Edit the file to your liking and on the next
 reboot your setting will be preserved.
+
+<sect2>Frontend appears to be slow at jumping / seeking.
+<sect2>On-screen Display shows incorrect program length.
+<p>This may occur when MythTV doesn't have an accurate seektable.  Run
+<bf>mythcommflag --rebuild</bf>
 
 <sect2>Troubleshooting audio <label id="Troubleshooting_Audio">
 <!-- By Bruce Markey -->
@@ -5661,6 +5698,317 @@ mkisofs -dvd-video -udf -V "$1" . | nice -10 cdrecord speed=1 dev=1,1,0 \
 driveropts=burnfree -dao -v tsize="$TSIZE"s -
 </verb></tscreen>
 
+<sect1>Burning a MythTV recording to a DVD (alternate version)
+<p>
+<!-- by Jeff Couvrette.  See if this can be combined with existing
+instructions? -->
+
+This is specific to MPEG-2 .nuv files created by Hauppauge PVR-X50 video 
+capture cards.
+
+The software packages you will want are:
+<itemize>
+<item>dvd+rw-tools
+<item>dvdauthor
+<item>mjpegtools
+<item>avidemux2
+<item>transcode - not necessary for this, but useful for working with video
+<item>k3b - a gui for burning DVD's and CD's.  Not necessary, but useful.
+</itemize>
+
+1. Find the file you want.
+
+2. Run avidemux2 and open the .nuv file that is the program you want to burn 
+to DVD.
+
+3. You will now cut out the segments you want.  Click twice on "A" when you 
+are at the beginning of the segment you want to save.  Then find the end of 
+the segment, and click "B".
+
+4. Save the raw video stream and audio.  Do that by going to <tt>File->
+Save -> Save Raw Video Stream</tt>.  Save the file as <tt>1.m2v</tt>.  When that's done, go
+to 
+<tt>Audio -> Save Audio</tt>.  Save the file as <tt>1.mp2</tt>
+
+5. Repeat steps 2 & 3 until you have all segments you want saved.
+
+6.  Mplex the video and audio for each segment together in DVD-MPEG2 format.  
+Do that by running
+
+<tt>mplex -f 8 -o 1.mpg 1.m2v 1.mp2</tt>
+
+7.  Create a DVD file system by running
+
+<tt>dvdauthor -o DVD 1.mpg 2.mpg ...</tt>
+
+<tt>dvdauthor -T -o DVD</tt>
+
+8.  Put a blank DVD in your drive and write the video by running
+
+<tt>growisofs -Z /dev/scd0 -dvd-video DVD</tt>
+
+9.  Be sure and check the DVD in a player and then delete all the files you 
+created in this process.
+
+Notes:
+
+You can reduce the size of your files and fit more video on a DVD by using 
+<bf>tcrequant</bf>, which is part of <bf>transcode</bf>.  
+
+The steps above create a DVD that starts playing the video automatically. If
+you want to burn a DVD with menus and multiple video titles, see the next
+section.
+
+<sect1>Creating a DVD with Menus
+<p>
+This assumes that you have already formatted the videos in a 
+DVD-compliant format that works with <bf>dvdauthor</bf>. 
+
+1. CREATING A MENU
+
+This is potentially the most difficult step in creating a DVD with a menu.
+You must capture or create a background image with the appropriate
+resolution and <bf>mplex</bf> it together with an audio file (typically empty
+sound, though you can use sound) and then create overlay images that show
+<enum>
+<item>the menu text
+<item>the highlighted buttons
+<item>the selected buttons  
+</enum>
+
+At this point you use <bf>spumux</bf> to combine the background video with
+the overlay menus.
+
+The background image must be saved as a JPG and the overlay images must be
+PNG with a maximum of three colors.  Four colors are allowed, but the
+transparent background counts as one of the available colors.  In these
+examples, the background file is called <tt>menu.jpg</tt>, the menu text is called
+<tt>menu1.png</tt> and the highlighted and selected buttons are the same and called
+<tt>menu2.png</tt>.
+
+The Steps:
+
+Create a Background 
+
+To get a background image, I use avidemux2 and find the frame that I want to
+use as a background image.  I then save the frame as <tt>menu.jpg</tt> by
+executing <tt>File -> Save -> Save JPG Image</tt>.  Or you can create your
+own background image in the GIMP.  Use the following settings:
+
+     For NTSC Video 
+
+     width: 720
+     height: 480
+     x-axis: 81dpi
+     y-axis: 72dpi
+
+     Convert the background JPG file into a M2V video file
+
+<tt>jpeg2yuv -n 50 -I p -f 29.97 -j menu.jpg | mpeg2enc -n n -f 8 -o menu.m2v
+</tt>
+
+
+     For PAL Video 
+
+     width: 720
+     height: 576
+     x-axis: 75dpi
+     y-axis: 80dpi
+
+     Convert the background JPG file into a M2V video file
+
+<tt>jpeg2yuv -n 50 -I p -f 25 -j menu.jpg | mpeg2enc -n p -f 8 -o 
+menu.m2v</tt>
+
+
+Merge the background you just created with audio 
+
+You will have to have some sort of audio to mplex with the M2V file you just 
+created, so either capture some audio using avidemux2 or another program, or 
+to create empty audio to mplex, use this command
+
+<tt>dd if=/dev/zero bs=4 count=2000 | toolame -b 128 -s 48 /dev/stdin 
+menu.mp2</tt>
+
+This command requires that you have toolame installed, of which I had
+difficulty finding any packages other than source.  It's a hack, but I would
+just try and find a period of silence at least one second long in a PVR-250
+recording and save that using avidemux2.
+
+Merge the M2V video with the MP2 audio
+
+     mplex -f 8 -o menu.mpg menu.m2v menu.mp2
+
+Create the menu buttons in PNG files
+
+This next step is creating the PNG files for the menu text and buttons. 
+This 
+is another 
+step that I find difficult to explain and the steps here are not the
+cleanest 
+way, but they 
+work for me.  If anyone can describe a better way of doing this, please do.
+
+A. Open the background menu.jpg file in the GIMP.  Add a transparent layer 
+over the background and mark where you will want the different buttons to be 
+located.  This layer will later be deleted, so it doesn't have to be clean.  
+When creating this layer, use all the colors you want to use with your
+buttons.  
+Remember, no more than three colors.
+
+B. Delete the Background layer.
+
+C. Change the image to an indexed color mode.  Do this by right-clicking on 
+the image and selecting Image -> Mode -> Indexed.  Enter "4" in the number
+of 
+colors.
+
+D. Create two new layers.
+
+E. In the top layer, you will enter the text for your buttons.  Select the 
+color you want for your text either in the color palette or by using the
+Color 
+Picker Tool.  To use the Color Picker, you must make sure you have that 
+bottom layer selected.  Enter the text for all the buttons on the top layer 
+according to whatever layout you decided on.
+
+F. Now you will create the actual buttons by drawing boxes around the text 
+and filling that area with the Color Fill Tool.  Be sure and select the
+color 
+you want (contrasting to the text) and to create your boxes in the second
+from 
+the top layer.
+
+G. Delete that bottom layer that I told you we would eventually delete.
+
+H. Save the current image as menu2.png.  Do that by right-clicking and 
+selecting File -> Save as, and make the name menu.png.  Click "Export" and
+make 
+sure that "Save Background Color" and "Save Resolution" are selected.
+
+I. Select the bottom layer and change the Opacity to 0%.  Now save the image 
+as menu1.png.
+
+Create the final menu video
+
+To create the DVD menu, an XML file is used.  An example menu.xml file is 
+shown below.  The autoorder line is used to decide what takes precident for 
+ordering.  If your buttons are ordered primarily by rows, then select
+"rows".  If 
+your ordering is by column, then choose "columns".  
+
+
+<tscreen><verb>
+###begin menu.xml###
+<subpictures>
+  <stream>
+    <spu
+     force="yes"
+     start="00:00:00.00"
+     image="menu1.png"
+     select="menu2.png"
+     highlight="menu2.png"
+     autooutline="infer"
+     outlinewidth="6"
+     autoorder="rows"
+    >
+    &lt;/spu>
+  &lt;/stream>
+&lt;/subpictures>
+###end menu.xml###
+</verb></tscreen>
+
+Then create the final menu with
+
+<tt>spumux menu.xml &lt; menu.mpg &gt; menu_final.mpg</tt>
+
+You should see some lines in the output to the console that show
+
+     INFO:  Autodetect ...
+
+The number of these lines that you see should be the same number of buttons 
+you created.  If there are, then good job!
+
+
+2.  Authoring the DVD
+
+To create the dvd structure, an XML file is used.  The below file is an
+example dvd.xml file.  This example file allows for the 4 buttons in the
+menu created earlier and has three video segments making up each of the 4
+video titles.  Each of the separate video segments will be treated as
+separate chapters of one consistent video title.
+
+<tscreen><verb>
+### begin dvd.xml ###
+<dvdauthor dest="DVD">
+  <vmgm>
+    <menus>
+      <pgc>
+        <button>jump title 1;</button> 
+        <button>jump title 2;</button> 
+        <button>jump title 3;</button> 
+        <button>jump title 4;</button> 
+        <vob file="menu_final.mpg" pause="inf" /> 
+      </pgc>
+    </menus>
+  </vmgm>
+  <titleset>
+    <titles>
+      <pgc>
+        <post>call vmgm menu 1;</post> 
+        <vob file="1a.mpg" /> 
+        <vob file="1b.mpg" /> 
+        <vob file="1c.mpg" /> 
+      </pgc>
+    </titles>
+  </titleset>
+  <titleset>
+    <titles>
+      <pgc>
+        <post>call vmgm menu 1;</post> 
+        <vob file="2a.mpg" /> 
+        <vob file="2b.mpg" /> 
+        <vob file="2c.mpg" /> 
+      </pgc>
+    </titles>
+  </titleset>
+  <titleset>
+    <titles>
+      <pgc>
+        <post>call vmgm menu 1;</post> 
+        <vob file="3a.mpg" /> 
+        <vob file="3b.mpg" /> 
+        <vob file="3c.mpg" /> 
+      </pgc>
+    </titles>
+  </titleset>
+  <titleset>
+    <titles>
+      <pgc>
+        <post>call vmgm menu 1;</post> 
+        <vob file="4a.mpg" /> 
+        <vob file="4b.mpg" /> 
+        <vob file="4c.mpg" /> 
+      </pgc>
+    </titles>
+  </titleset>
+</dvdauthor>
+### end dvd.xml ###
+</verb></tscreen>
+
+Create the DVD file structure with
+
+     dvdauthor -x dvd.xml
+
+Test the created DVD file structure with
+
+     xine dvd:/full/path/to/DVD/VIDEO_TS/
+
+Then burn the DVD file structure to a dvd with
+
+     growisofs -Z /dev/scd0 -dvd-video DVD
+
+
 <sect1>Migrating from XMLTV to DataDirect <label id="MigratingtoDD">
 <!-- Mostly from a post by Bruce Markey -->
 <p>DataDirect will use different information for your video sources and
@@ -5744,6 +6092,32 @@ $
 </verb></tscreen>
 <sect1>What do the icons on the Watch Recordings screen mean?
 <p>Press "1" or F1 to get a popup.
+<sect1>What is the difference between a PVR-250 and a PVR-350.
+<p>This is covered in the hardware section.  Briefly recapping:
+
+A PVR-250 is primarily a MPEG-2 encoder.  It has a tuner, composite and
+SVideo connection for video, and an 1/8" audio jack for stereo analog audio.
+
+The PVR-250 MCE (Media Center Edition) contains a FM radio tuner.  This is
+currently not support by MythTV.
+
+The PVR-250 Rev 1 contained an MPEG-2 decoder.  However, this function was
+not connected to any output jacks, and there doesn't appear to be any way to
+pull decoded video from the card, so it's a fairly useless feature.
+
+The PVR-350 has the features of the PVR-250 as well as being able to decode
+MPEG-2.  The encode and decode functions may be used simultaneously.  The
+MPEG-2 decoder function gives superior video quality.  However, the decoder
+function is only available once Linux has started, so you will not see any
+boot-time messages.
+
+Also, the card does not support any 3D functions, making it a poor gamer
+card.
+
+Non-MPEG-2 content will be displayed on the PVR-350 output using framebuffer
+features, placing a large load on the host CPU.
+
+
 <sect>Example Configurations.
 <p>This section contains configurations which you may find useful.
 <sect1>Hauppauge PVR-250/350 hardware MPEG-2 encoder <label id="pvr250">
@@ -6512,40 +6886,23 @@ under one second, even files as large as 10 gigabytes.
 <sect2>XFS
 <p>XFS is a journaling file system originally developed by SGI for Irix, and
 later released as open source.  While not a part of the default RedHat Linux
-9 or Fedora Core installation (although it is a part of Mandrake and Fedora Core 2), it can be
-easily installed via ATrpms.  XFS provides deletion speeds for large files
-only slightly slower than JFS.  According to the test results shown at (<url
+9 or Fedora Core installation (although it is a part of Mandrake and Fedora
+Core 2), it can be easily installed via ATrpms.  XFS provides deletion
+speeds for large files only slightly slower than JFS.  According to the test
+results shown at (<url
 url="http://aurora.zemris.fer.hr/filesystems/big.html"
 name="http://aurora.zemris.fer.hr/filesystems/big.html">), XFS provide
 higher I/O rates than JFS, albeit at a higher CPU loading.  This may cause
 issues if you do not have the spare CPU capacity to handle XFS, potentially
 leading to dropped frames.
+
 </article>
 <!-- Revision History
 
-v0.15.00, 2004-05-25  Bump XMLTV version.  Update link to gossamer threads
-archive.  Add statement that XFS or JFS are really the way to go.  Add Bruce
-Markey's update to the filter docs.  Modify non-master backend config based
-on Scott Rowe's suggestion. Initial version for v00.15.00.  Bruce's mod to
-removing unwanted DD channels.  Chris Pinkham's save icon thing for MySQL
-v3.  Update rest of gossamer-threads links. Axel Thimms' Fedora update.
-Adjust the MySQL v3 instructions since I wasn't paying attention the first
-time.  Instructions for grabbing icons for DataDirect.
-v0.15.01, 2004-05-30  Get rid of a "CVS only" holdover.  Ramon Redondo's
-patch for Gentoo.  Get rid of some doubled doubled words. (Ian Forde)
-v0.15.02, 2004-06-03  Patch by Bill Chmura about 401/200 error with DataDirect.
-v0.15.03, 2004-06-06  Re-arrange the troubleshooting section a little
-(suggestion by Kenneth Aafloy, but if you don't like how it looks or
-something is in the wrong place then speak up).  Make some changes right at
-the top.  All sorts of crap changed throughout the document.
-v0.15.04, 2004-06-11.  Fix a broken tag.  Fix Bug 11 (icon grabber for DD in wrong
-section)
-v0.15.05, 2004-06-17.  Add "What do those icons mean?".  Update website for
-"lame".
-v0.15.06, 2004-07-08.  Add "What is MythTV"?
-v0.15.07, 2004-08-03.  Update link to LVM HOWTO. (Mark Covington).  Add a
-little on mtd (check that it's working interactively first)(Michael Dean).
-Add a "resetting keys".
+v0.16.00, 2004-09-07.  Version bump.  Cedric Teffts' AMD64 settings.pro
+update.  David Greaves' suggestion about mythcommflag and the seektable. Add
+a section on differences between a PVR-250 and a 350. Add bugzilla pointer.
+
 -->
 
 <!--
