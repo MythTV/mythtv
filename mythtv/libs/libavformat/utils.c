@@ -319,6 +319,7 @@ int av_open_input_stream(AVFormatContext **ic_ptr,
         if (pb)
             ic->pb = *pb;
     }
+    ic->build_index = 1;
     ic->iformat = fmt;
     ic->duration = AV_NOPTS_VALUE;
     ic->start_time = AV_NOPTS_VALUE;

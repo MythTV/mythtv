@@ -435,6 +435,8 @@ bool MpegRecorder::SetupRecording(void)
         return false;
     }    
 
+    ic->build_index = 0;
+
     prev_gop_save_pos = -1;
 
     return true;
@@ -565,6 +567,7 @@ void MpegRecorder::Reset(void)
     while ((pktl = ic->packet_buffer))
     {
         ic->packet_buffer = pktl->next;
+        av_free_packet(&pktl->pkt);
         av_free(pktl);
     }
 

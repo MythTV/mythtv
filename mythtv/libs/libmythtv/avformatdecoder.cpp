@@ -456,6 +456,9 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         keyframedist = 1;
     }
 
+    if (livetv || watchingrecording)
+        ic->build_index = 0;
+    
     dump_format(ic, 0, filename, 0);
     if (hasFullPositionMap)
     {

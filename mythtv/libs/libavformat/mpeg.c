@@ -905,7 +905,7 @@ static int mpegps_read_pes_header(AVFormatContext *s,
             len -= 3;
         }
     }
-    if(dts != AV_NOPTS_VALUE && ppos){
+    if(dts != AV_NOPTS_VALUE && ppos && s->build_index){
         int i;
         for(i=0; i<s->nb_streams; i++){
             if(startcode == s->streams[i]->id) {
