@@ -11,7 +11,7 @@ INSTALLS = target
 include ( ../settings.pro )
 
 setting.path = /usr/local/share/mythtv/
-setting.files += theme.txt
+setting.files += theme.txt mysql.txt
 
 INSTALLS += setting
 

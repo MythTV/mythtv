@@ -1034,10 +1034,10 @@ void TV::ConnectDB(void)
         printf("Couldn't initialize mysql connection\n");
         return;
     }
-    db_conn->setDatabaseName("mythconverg");
-    db_conn->setUserName("mythtv");
-    db_conn->setPassword("mythtv");
-    db_conn->setHostName("localhost");
+    db_conn->setDatabaseName(settings->GetSetting("DBName"));
+    db_conn->setUserName(settings->GetSetting("DBUserName"));
+    db_conn->setPassword(settings->GetSetting("DBPassword"));
+    db_conn->setHostName(settings->GetSetting("DBHostName"));
 
     if (!db_conn->open())
     {

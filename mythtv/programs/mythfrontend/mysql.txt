@@ -1,0 +1,4 @@
+str DBHostName=localhost
+str DBUserName=mythtv
+str DBPassword=mythtv
+str DBName=mythconverg

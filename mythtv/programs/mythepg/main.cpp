@@ -18,10 +18,10 @@ int main(int argc, char **argv)
     globalsettings->LoadSettingsFiles("mysql.txt", installprefix);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
-    db->setDatabaseName("mythconverg");
-    db->setUserName("mythtv");
-    db->setPassword("mythtv");
-    db->setHostName("localhost");
+    db->setDatabaseName(globalsettings->GetSetting("DBName"));
+    db->setUserName(globalsettings->GetSetting("DBUserName"));
+    db->setPassword(globalsettings->GetSetting("DBPassword"));
+    db->setHostName(globalsettings->GetSetting("DBHostName"));
 
     if (!db->open())
     {

@@ -294,10 +294,10 @@ int main(int argc, char **argv)
         printf("Couldn't connect to database\n");
         return -1;
     }
-    db->setDatabaseName("mythconverg");
-    db->setUserName("mythtv");
-    db->setPassword("mythtv");
-    db->setHostName("localhost");
+    db->setDatabaseName(globalsettings->GetSetting("DBName"));
+    db->setUserName(globalsettings->GetSetting("DBUserName"));
+    db->setPassword(globalsettings->GetSetting("DBPassword"));
+    db->setHostName(globalsettings->GetSetting("DBHostName"));
 
     QSqlDatabase *subthread = QSqlDatabase::addDatabase("QMYSQL3", "SUBDB");
     if (!subthread)
@@ -305,10 +305,10 @@ int main(int argc, char **argv)
         printf("Couldn't connect to database\n");
         return -1;
     }
-    subthread->setDatabaseName("mythconverg");
-    subthread->setUserName("mythtv");
-    subthread->setPassword("mythtv");
-    subthread->setHostName("localhost");    
+    subthread->setDatabaseName(globalsettings->GetSetting("DBName"));
+    subthread->setUserName(globalsettings->GetSetting("DBUserName"));
+    subthread->setPassword(globalsettings->GetSetting("DBPassword"));
+    subthread->setHostName(globalsettings->GetSetting("DBHostName"));    
 
     if (!db->open() || !subthread->open())
     {
