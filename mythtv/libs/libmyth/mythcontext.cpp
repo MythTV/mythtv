@@ -981,7 +981,9 @@ void MythContext::ThemeWidget(QWidget *widget)
     {
         widget->setPalette(d->m_palette);
         if (d->m_backgroundimage && d->m_backgroundimage->width() > 0)
+        {
             widget->setPaletteBackgroundPixmap(*(d->m_backgroundimage));
+        }
         return;
     }
 
@@ -998,6 +1000,7 @@ void MythContext::ThemeWidget(QWidget *widget)
         bgpixmap = LoadScalePixmap(pmapname);
         if (bgpixmap)
         {
+            widget->setBackgroundOrigin(QWidget::AncestorOrigin);
             widget->setPaletteBackgroundPixmap(*bgpixmap);
             d->m_backgroundimage = new QPixmap(*bgpixmap);
         }
@@ -1022,6 +1025,7 @@ void MythContext::ThemeWidget(QWidget *widget)
             tmp.end();
 
             d->m_backgroundimage = new QPixmap(background);
+            widget->setBackgroundOrigin(QWidget::AncestorOrigin);
             widget->setPaletteBackgroundPixmap(background);
         }
     }
