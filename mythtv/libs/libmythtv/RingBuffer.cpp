@@ -29,6 +29,7 @@ public:
 
     long long Seek(long long pos, int whence);
     unsigned Write(const void *data, unsigned count);
+    void Sync(void);
 
     unsigned BufUsed();  /* # of bytes queued for write by the write thread */
     unsigned BufFree();  /* # of bytes that can be written, without blocking */
@@ -168,6 +169,11 @@ long long ThreadedFileWriter::Seek(long long pos, int whence)
 	usleep(5000);
 
     return lseek(fd, pos, whence);
+}
+
+void ThreadedFileWriter::Sync(void)
+{
+    fdatasync(fd);
 }
 
 void ThreadedFileWriter::DiskLoop()
@@ -1028,6 +1034,11 @@ int RingBuffer::Write(const void *buf, int count)
 
     pthread_rwlock_unlock(&rwlock);
     return ret;
+}
+
+void RingBuffer::Sync(void)
+{
+    tfw->Sync();
 }
 
 long long RingBuffer::GetFileWritePosition(void)
