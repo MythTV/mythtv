@@ -25,7 +25,7 @@ class MameSettingsDlg : public QDialog
     Q_OBJECT
 
 public:
-    MameSettingsDlg( QWidget* parent = 0, const char* name = 0, bool modal = FALSE, WFlags fl = 0 );
+    MameSettingsDlg( QWidget* parent = 0, const char* name = 0, bool modal = FALSE, bool system = false, WFlags fl = 0 );
     ~MameSettingsDlg();
 
     QTabWidget* MameTab;
@@ -74,6 +74,7 @@ public:
     QComboBox* JoyBox;
     QCheckBox* JoyCheck;
     QPushButton* SaveButton;
+    QPushButton* ListButton;
     QCheckBox* DefaultCheck;
     QWidget* ScreenTab;
     QLabel* ScreenPic;
@@ -92,6 +93,7 @@ public:
     void defaultUpdate(int);
     void setBeamLabel(int);
     void setFlickerLabel(int);
+    void loadList();
 
   protected:
 
@@ -102,6 +104,7 @@ public:
     QPixmap Screenshot;
     QPixmap Flyer;
     QPixmap Cabinet;
+    bool bSystem;
 };
 
 #endif // MAMESETTINGSDLG_H

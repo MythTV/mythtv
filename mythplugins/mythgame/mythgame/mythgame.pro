@@ -19,8 +19,9 @@ LIBS += -L/usr/local/lib -lmyth
 
 # Input
 HEADERS += constants.h databasebox.h gamehandler.h mamehandler.h rominfo.h 
-HEADERS += mamerominfo.h treeitem.h mamesettingsdlg.h extendedlistview.h
+HEADERS += mamerominfo.h treeitem.h mamesettingsdlg.h extendedlistview.h selectframe.h
+HEADERS += screenbox.h
 
-SOURCES += databasebox.cpp 
+SOURCES += databasebox.cpp selectframe.cpp screenbox.cpp
 SOURCES += main.cpp gamehandler.cpp mamehandler.cpp rominfo.cpp
 SOURCES += treeitem.cpp mamerominfo.cpp mamesettingsdlg.cpp extendedlistview.cpp

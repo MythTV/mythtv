@@ -5,6 +5,7 @@
 #include "mamerominfo.h"
 #include "mametypes.h"
 #include <qapplication.h>
+#include <map.h>
 
 class MameHandler : public GameHandler
 {
@@ -19,6 +20,7 @@ class MameHandler : public GameHandler
     void error(const QString &e);
     void start_game(RomInfo *romdata);
     void edit_settings(QWidget *parent,RomInfo *romdata);
+    void edit_system_settings(QWidget *parent,RomInfo *romdata);
     RomInfo* create_rominfo(RomInfo* parent);
     QString Systemname() { return systemname; }
     void processGames();
@@ -32,8 +34,7 @@ class MameHandler : public GameHandler
     void SetGameSettings(GameSettings &game_settings, MameRomInfo *rominfo);
     void SaveGameSettings(GameSettings &game_settings, MameRomInfo *romdata);
     void SetDefaultSettings();
-    bool FindImage(QString directories, QString game, QString cloneof, QString *result);
-    struct Prefs general_prefs;
+    void LoadCatfile(map<QString, QString>* pCatMap);
 
     GameSettings defaultSettings;
     bool xmame_version_ok;

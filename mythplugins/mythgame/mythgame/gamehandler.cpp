@@ -62,9 +62,16 @@ void GameHandler::EditSettings(QWidget *parent,RomInfo *romdata)
         handler->edit_settings(parent,romdata);
 }
 
+void GameHandler::EditSystemSettings(QWidget *parent,RomInfo *romdata)
+{
+    GameHandler *handler;
+    if((handler = GetHandler(romdata)))
+        handler->edit_system_settings(parent,romdata);
+}
+
 RomInfo* GameHandler::CreateRomInfo(RomInfo* parent)
 {
-    GameHandler *handler = handlers->first();
+    GameHandler *handler;
     if((handler = GetHandler(parent)))
         return handler->create_rominfo(parent);
     return NULL;

@@ -45,7 +45,15 @@ void TreeItem::pickPixmap(void)
     if (level == "system")
         setPixmap(0, *system);
     else if (level == "gamename")
+    {
+        //QPixmap test;
+        //test.load("/screens/005.png");
+        //setPixmap(0,test);
         setPixmap(0, *game);
+        //Cabinet.load(picfile);
+        //ScaleImageLabel(Cabinet,CabinetPic);
+        //CabinetPic->setPixmap(Cabinet);
+    }
     else if (level == "genre")
         setPixmap(0, *genre);
 }

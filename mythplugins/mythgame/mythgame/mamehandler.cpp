@@ -1,3 +1,4 @@
+#include <fstream.h>
 #include <iostream.h>
 #include "mamehandler.h"
 #include "mamerominfo.h"
@@ -15,6 +16,8 @@
 #include <mythtv/settings.h>
 
 extern Settings *globalsettings;
+
+struct Prefs general_prefs;
 
 MameHandler::~MameHandler()
 {
@@ -61,6 +64,17 @@ void MameHandler::processGames()
         int done_roms = 0;
         float done;
 
+         QSqlDatabase *db = QSqlDatabase::database();
+
+        //remove all metadata entries from the tables, all correct values will be
+        //added as they are found.  This is done so that entries that may no longer be
+        //available or valid are removed each time the game list is remade.
+        sprintf(thequery,"DELETE FROM mamemetadata;");
+        db->exec(thequery);
+        sprintf(thequery,"DELETE FROM gamemetadata WHERE system = \"Mame\";");
+        db->exec(thequery);
+        
+
         for (tmp_counter = 0; tmp_counter < 16; tmp_counter++) {
                 chip[tmp_counter] = "";
         }
@@ -75,8 +89,6 @@ void MameHandler::processGames()
                 supported_games = 0;
                 return;
         }
-
-        QSqlDatabase *db = QSqlDatabase::database();
 
         /* Get number of supported games */
         makecmd_line("-list 2>/dev/null", &vrfycmd, NULL);
@@ -105,6 +117,9 @@ void MameHandler::processGames()
 
         makecmd_line("-listsourcefile 2>/dev/null", &drvcmd, NULL);
         xmame_drv = popen(drvcmd, "r");
+
+        map<QString, QString> CatMap;
+        LoadCatfile(&CatMap);
 
         while (fgets(line, 500, xmame_info)) {
                 if (!strncmp(line, "game (", 6)) {
@@ -330,10 +345,22 @@ void MameHandler::processGames()
                         if (!strcmp(status, "correct\n"))
                         {
                             rom->setStatus(CORRECT);
+
+                            map<QString, QString>::iterator i;;
+                            if ((!CatMap.empty()) && ((i = CatMap.find(rom->Romname().latin1())) != CatMap.end()))
+                            {
+                                rom->setGenre((*i).second);
+                                //cout << "Genre = " << (*i).second.latin1() << endl;
+                            }
+                            else
+                            {
+                                rom->setGenre("Unknown");
+                            }
+                            
                             sprintf(thequery, "INSERT INTO gamemetadata (system,romname,gamename,genre,"
                                               "year) VALUES (\"Mame\",\"%s\","
                                               "\"%s\",\"%s\",%d);", rom->Romname().latin1(),
-                                              rom->Gamename().latin1(), rom->Manu().latin1(), rom->Year());
+                                              rom->Gamename().latin1(), rom->Genre().latin1(), rom->Year());
                             db->exec(thequery);
 
                             sprintf(thequery, "INSERT INTO mamemetadata (romname,manu,cloneof,romof,"
@@ -387,14 +414,21 @@ void MameHandler::edit_settings(QWidget *parent,RomInfo * romdata)
 
     MameSettingsDlg settingsdlg(parent, "gamesettings", true);
     QString ImageFile;
-    if(FindImage(general_prefs.screenshot_dir, mamedata->Romname().latin1(), mamedata->Cloneof().latin1(), &ImageFile))
+    if(mamedata->FindImage("screenshot", &ImageFile))
         settingsdlg.SetScreenshot(ImageFile);
-    if(FindImage(general_prefs.flyer_dir, mamedata->Romname().latin1(), mamedata->Cloneof().latin1(), &ImageFile))
+    if(mamedata->FindImage("flyer", &ImageFile))
         settingsdlg.SetFlyer(ImageFile);
-    if(FindImage(general_prefs.cabinet_dir, mamedata->Romname().latin1(), mamedata->Cloneof().latin1(), &ImageFile))
+    if(mamedata->FindImage("cabinet", &ImageFile))
         settingsdlg.SetCabinet(ImageFile);
     if(settingsdlg.Show(&game_settings, mamedata->Vector()))
         SaveGameSettings(game_settings, mamedata);
+}
+
+void MameHandler::edit_system_settings(QWidget *parent,RomInfo * romdata)
+{
+    MameSettingsDlg settingsDlg(parent, "mamesettings", true, true);
+    if(settingsDlg.Show(&defaultSettings, true))
+        SaveGameSettings(defaultSettings, NULL);    
 }
 
 bool MameHandler::check_xmame_exe()
@@ -805,7 +839,10 @@ void MameHandler::SaveGameSettings(GameSettings &game_settings, MameRomInfo *rom
     QSqlDatabase *db = QSqlDatabase::database();
     char thequery[1024];
     bool exists = false;
-    sprintf(thequery,"SELECT romname FROM mamesettings WHERE romname = \"%s\";", rominfo->Romname().latin1());
+    QString RomName = "default";
+    if(rominfo)
+        RomName = rominfo->Romname();
+    sprintf(thequery,"SELECT romname FROM mamesettings WHERE romname = \"%s\";", RomName.latin1());
     QSqlQuery query = db->exec(thequery);
     if (query.isActive() && query.numRowsAffected() > 0)
     {
@@ -829,7 +866,7 @@ void MameHandler::SaveGameSettings(GameSettings &game_settings, MameRomInfo *rom
                           game_settings.joytype, game_settings.sound, game_settings.samples,
                           game_settings.fake_sound, game_settings.volume,
                           game_settings.cheat, game_settings.extra_options.latin1(),
-                          rominfo->Romname().latin1());
+                          RomName.latin1());
     }
     else
     {
@@ -839,7 +876,7 @@ void MameHandler::SaveGameSettings(GameSettings &game_settings, MameRomInfo *rom
                           "vectorres,analogjoy,mouse,winkeys,grabmouse,joytype,"
                           "sound,samples,fakesound,volume,cheat,extraoption) VALUES "
                           "(\"%s\",%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%f,%f,%d,"
-                          "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,\"%s\");",rominfo->Romname().latin1(),
+                          "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,\"%s\");",RomName.latin1(),
                           game_settings.default_options, game_settings.fullscreen,
                           game_settings.scanlines, game_settings.extra_artwork,
                           game_settings.autoframeskip, game_settings.auto_colordepth,
@@ -894,63 +931,6 @@ void MameHandler::SetDefaultSettings()
     }
 }
 
-
-bool MameHandler::FindImage(QString directories, QString game, QString cloneof, QString *result)
-{
-        QStringList graphic_formats;
-        graphic_formats.append("png");
-        graphic_formats.append("gif");
-        graphic_formats.append("jpg");
-        graphic_formats.append("jpeg");
-        graphic_formats.append("xpm");
-        graphic_formats.append("bmp");
-        graphic_formats.append("pnm");
-        graphic_formats.append("tif");
-        graphic_formats.append("tiff");
-        int i;
-        QStringList dirs;
-        QString imagename;
-        QString games[3];
-        FILE *imagefile;
-
-        *result = "";
-        games[0] = game;
-        if (cloneof == "-") {
-                games[1] = "";
-        } else {
-                games[1] = cloneof;
-                games[2] = "";
-        }
-
-        if (directories != "")
-                dirs = QStringList::split(":",directories);
-        if ((dirs.isEmpty()) && (directories != ""))
-                dirs.append(directories);
-
-        for (i = 0; (games[i] != ""); i++) {
-                for (QStringList::Iterator j = graphic_formats.begin(); j != graphic_formats.end(); j++) {
-                        for (QStringList::Iterator k = dirs.begin(); k != dirs.end(); k++) {
-                                imagename = *k + "/" + games[i] + "." + *j;
-                                if ((imagefile = fopen(imagename, "r"))) {
-                                        *result = imagename;
-                                        fclose(imagefile);
-                                }
-                                if (*result != "")
-                                        break;
-                        }
-                        /* NOTE: This requires that png is the first format in the list */
-                        if (*result != "")
-                                break;
-                }
-                if (*result != "")
-                        break;
-        }
-
-        return (*result != "");
-}
-
-MameHandler* MameHandler::pInstance = 0;
-
 MameHandler* MameHandler::getHandler()
 {
     if(!pInstance)
@@ -964,4 +944,35 @@ RomInfo* MameHandler::create_rominfo(RomInfo *parent)
 {
     return new MameRomInfo(*parent);
 }
+
+void MameHandler::LoadCatfile(map<QString, QString>* pCatMap)
+{
+    QString CatFile = globalsettings->GetSetting("XMameCatFile");
+    fstream fin(CatFile.ascii(), ios::in);
+    if (!fin.is_open())
+        return;
+
+    string strLine;
+    QString strKey;
+    QString strVal;
+    int nSplitPoint = 0;
+    while(!fin.eof())
+    {
+        getline(fin,strLine);
+        if((strLine[0] != ';') && (!strLine.empty()))
+        {
+            if(strLine.find("[VerAdded]") != string::npos)  //don't care about version right now. maybe in the future.
+                break;
+            nSplitPoint = strLine.find('=');
+            if(nSplitPoint != -1)
+            {
+                strKey = strLine.substr(0, nSplitPoint).c_str();
+                strVal = strLine.substr(nSplitPoint + 1, strLine.size()).c_str();
+                (*pCatMap)[strKey] = strVal;
+            }
+        }
+    }
+}   
+
+MameHandler* MameHandler::pInstance = 0;
 

@@ -11,7 +11,7 @@ class ExtendedListView : public QListView
                 QListView(parent, name, f) {}
 
   signals:
-    void RightKeyPressed( QListViewItem * );
+    void KeyPressed( QListViewItem *, int key);
 
   protected:
     void keyPressEvent( QKeyEvent *e );

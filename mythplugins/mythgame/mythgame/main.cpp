@@ -8,6 +8,7 @@ using namespace std;
 
 #include "gamehandler.h"
 #include "databasebox.h"
+#include "screenbox.h"
 #include "rominfo.h"
 
 #include <mythtv/themedmenu.h>
@@ -16,13 +17,21 @@ using namespace std;
 Settings *globalsettings;
 char theprefix[] = PREFIX;
 
-void startDatabaseTree(QSqlDatabase *db, QString &paths,
-                       QValueList<RomInfo> *romlist)
+void startDatabaseTree(QSqlDatabase *db, QString &paths)
 {
-    DatabaseBox dbbox(db, paths, romlist);
-    dbbox.Show();
+    if(globalsettings->GetNumSetting("ShotCount")) // this will be a choice in the settings menu.
+    {
+        ScreenBox screenbox(db, paths);
+        screenbox.Show();
+        screenbox.exec();
+    }
+    else
+    {
+        DatabaseBox dbbox(db, paths);
+        dbbox.Show();
 
-    dbbox.exec();
+        dbbox.exec();
+    }
 }
 
 struct GameCBData
@@ -39,7 +48,7 @@ void GameCallback(void *data, QString &selection)
     QString sel = selection.lower();
 
     if (sel == "game_play")
-        startDatabaseTree(gdata->db, gdata->paths, gdata->romlist);
+        startDatabaseTree(gdata->db, gdata->paths);
 }
 
 bool runMenu(QString themedir, QSqlDatabase *db,
@@ -93,9 +102,14 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    //for each game handler process it's games
-    //TODO: move this to a settings option
-    GameHandler::processAllGames();
+    //this should only run the first time.
+    QString thequery = "SELECT gamename FROM gamemetadata;";
+    QSqlQuery query = db->exec(thequery);
+    if (!query.isActive() || query.numRowsAffected() <= 0)
+    {
+        //for each game handler process it's games
+        GameHandler::processAllGames();
+    }
     QString paths = globalsettings->GetSetting("TreeLevels");
     QValueList<RomInfo> Romlist;
 

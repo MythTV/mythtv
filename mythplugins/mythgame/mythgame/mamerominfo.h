@@ -121,6 +121,8 @@ class MameRomInfo : public RomInfo
     void setTimesplayed(int ltimesplayed) { timesplayed = ltimesplayed; }
     virtual void fillData(QSqlDatabase *db);
 
+    virtual bool FindImage(QString type,QString *result);
+
   protected:
     QString manu;
     QString cloneof;

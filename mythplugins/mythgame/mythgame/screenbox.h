@@ -1,10 +1,11 @@
-#ifndef DATABASEBOX_H_
-#define DATABASEBOX_H_
+#ifndef SCREENBOX_H_
+#define SCREENBOX_H_
 
 #include <qwidget.h>
 #include <qdialog.h>
-#include <qstringlist.h>
+#include <qframe.h>
 
+#include "selectframe.h"
 #include "rominfo.h"
 
 class QSqlDatabase;
@@ -13,22 +14,21 @@ class TreeItem;
 class QLabel;
 class QListView;
 
-class DatabaseBox : public QDialog
+class ScreenBox : public QDialog
 {
     Q_OBJECT
   public:
-    DatabaseBox(QSqlDatabase *ldb, QString &paths,
+    ScreenBox(QSqlDatabase *ldb, QString &paths,
                 QWidget *parent = 0, const char *name = 0);
 
     void Show();
 
   protected slots:
-    void handleKey(QListViewItem *, int);
-    void selected(QListViewItem *);
+    void setImages(QListViewItem *);
     void editSettings(QListViewItem *);
+    void handleKey(QListViewItem *, int);
 
   private:
-    void doSelected(QListViewItem *);
     void checkParent(QListViewItem *);
 
     void fillList(QListView *listview, QString &paths);
@@ -40,7 +40,9 @@ class DatabaseBox : public QDialog
 
     QSqlDatabase *db;
 
-    QValueList<RomInfo> *rlist;
+    SelectFrame *PicFrame;
+    QString leafLevel;
+    QLabel* mGameLabel;
 };
 
 #endif

@@ -2,12 +2,11 @@
 #include <qapplication.h>
 #include <qsqldatabase.h>
 #include <qcursor.h>
-#include <qstringlist.h>
-#include <qpixmap.h>
 #include <iostream.h>
+#include <stdlib.h>
 
 #include "rominfo.h"
-#include "databasebox.h"
+#include "screenbox.h"
 #include "treeitem.h"
 #include "gamehandler.h"
 #include "extendedlistview.h"
@@ -16,7 +15,7 @@
 
 extern Settings *globalsettings;
 
-DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QString &paths,
+ScreenBox::ScreenBox(QSqlDatabase *ldb, QString &paths,
                          QWidget *parent, const char *name)
            : QDialog(parent, name)
 {
@@ -39,38 +38,56 @@ DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QString &paths,
     setFont(QFont("Arial", 16 * hmult, QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
-    QVBoxLayout *vbox = new QVBoxLayout(this, 20 * wmult);
+    QVBoxLayout *vbox = new QVBoxLayout(this, 5, 5);
+
+    mGameLabel = new QLabel(this);
+    mGameLabel->setFixedHeight(23);
+    mGameLabel->setAlignment(Qt::AlignHCenter);
+    mGameLabel->setText("");
 
     ExtendedListView *listview = new ExtendedListView(this);
-    listview->addColumn("Select game to play");
+    listview->setFixedHeight(170);
+    listview->addColumn("Select genre", -1);
 
     listview->setSorting(-1);
     listview->setRootIsDecorated(false);
     listview->setAllColumnsShowFocus(true);
-    listview->setColumnWidth(0, 730 * wmult);
-    listview->setColumnWidthMode(0, QListView::Manual);
+    listview->setColumnWidthMode(0, QListView::Maximum);
+    listview->setResizeMode(QListView::LastColumn);
 
+    PicFrame = new SelectFrame(this);
+    PicFrame->setFixedWidth(790);
+    PicFrame->setFixedHeight(350);
+    PicFrame->setPaletteBackgroundColor( QColor(255,255,255));
+    PicFrame->setFocusPolicy(QWidget::NoFocus);
+
+    connect(listview, SIGNAL(currentChanged(QListViewItem *)), this,
+            SLOT(setImages(QListViewItem*)));
+    connect(PicFrame, SIGNAL(gameChanged(const QString&)), mGameLabel,
+            SLOT(setText(const QString&)));
     connect(listview, SIGNAL(KeyPressed(QListViewItem *, int)), this,
             SLOT(handleKey(QListViewItem *, int)));
-    connect(listview, SIGNAL(returnPressed(QListViewItem *)), this,
-            SLOT(selected(QListViewItem *)));
-    connect(listview, SIGNAL(spacePressed(QListViewItem *)), this,
-            SLOT(selected(QListViewItem *)));
 
     fillList(listview, paths);
 
     vbox->addWidget(listview, 1);
+    vbox->addWidget(mGameLabel, 1);
+    vbox->addWidget(PicFrame, 1);
+
+    PicFrame->setDimensions();
+    PicFrame->setButtons(NULL);
+    PicFrame->setUpdatesEnabled(true);
 
     listview->setCurrentItem(listview->firstChild());
 }
 
-void DatabaseBox::Show()
+void ScreenBox::Show()
 {
     showFullScreen();
     setActiveWindow();
 }
 
-void DatabaseBox::fillList(QListView *listview, QString &paths)
+void ScreenBox::fillList(QListView *listview, QString &paths)
 {
     QString templevel = "system";
     QString temptitle = "All Games";
@@ -78,6 +95,12 @@ void DatabaseBox::fillList(QListView *listview, QString &paths)
                                                 templevel, NULL);
     
     QStringList lines = QStringList::split(" ", paths);
+    int Levels = lines.count();
+
+    if(lines[Levels - 1] == "gamename" && Levels > 1)
+        leafLevel = lines[Levels - 2];
+    else
+        leafLevel = lines[Levels - 1];
 
     QString first = lines.front();
 
@@ -115,7 +138,7 @@ void DatabaseBox::fillList(QListView *listview, QString &paths)
     listview->setOpen(allgames, true);
 }
 
-void DatabaseBox::fillNextLevel(QString level, int num, QString querystr, 
+void ScreenBox::fillNextLevel(QString level, int num, QString querystr, 
                                 QString matchstr, QStringList::Iterator line,
                                 QStringList lines, TreeItem *parent)
 {
@@ -125,7 +148,7 @@ void DatabaseBox::fillNextLevel(QString level, int num, QString querystr,
     QString orderstr = querystr;
  
     bool isleaf = false; 
-    if (level == "gamename")
+    if (level == leafLevel)
     {
         isleaf = true;
     }
@@ -150,22 +173,12 @@ void DatabaseBox::fillNextLevel(QString level, int num, QString querystr,
 
             RomInfo *parentinfo = parent->getRomInfo();
             RomInfo *rinfo;
-            if(isleaf)
-            {
-                rinfo = GameHandler::CreateRomInfo(parentinfo);
-                rinfo->setField(level, current);
-                rinfo->fillData(db);
-            }
-            else
-            {
-                rinfo = new RomInfo(*parentinfo);
-                rinfo->setField(level, current);
-            }
-
+            rinfo = new RomInfo(*parentinfo);
+            rinfo->setField(level, current);
             TreeItem *item = new TreeItem(parent, current, level,
                                                     rinfo);
 
-            if (line != lines.end())
+            if (line != lines.end() && *line != "gamename")
                 fillNextLevel(*line, num + 1, querystr, matchstr2, line, lines,
                               item);
 
@@ -175,54 +188,7 @@ void DatabaseBox::fillNextLevel(QString level, int num, QString querystr,
     }
 }
 
-void DatabaseBox::selected(QListViewItem *item)
-{
-    doSelected(item);
-
-    if (item->parent())
-    {
-        checkParent(item->parent());
-    }
-}
-
-void DatabaseBox::handleKey(QListViewItem *item, int key)
-{
-  TreeItem *tcitem = (TreeItem *)item;
-  switch(key)
-  {
-  case Key_E:
-    editSettings(tcitem);
-    break;
-  default:
-    break;
-  }
-}
-
-void DatabaseBox::editSettings(QListViewItem *item)
-{
-    TreeItem *tcitem = (TreeItem *)item;
-
-    if (tcitem->childCount() <= 0)
-    {
-        GameHandler::EditSettings(this,tcitem->getRomInfo());
-    }
-    else if("system" == tcitem->getLevel())
-    {
-        GameHandler::EditSystemSettings(this,tcitem->getRomInfo());
-    }
-}
-
-void DatabaseBox::doSelected(QListViewItem *item)
-{
-    TreeItem *tcitem = (TreeItem *)item;
-
-    if (tcitem->childCount() <= 0)
-    {
-        GameHandler::Launchgame(tcitem->getRomInfo());
-    }
-}
-
-void DatabaseBox::checkParent(QListViewItem *item)
+void ScreenBox::checkParent(QListViewItem *item)
 {
     TreeItem *tcitem = (TreeItem *)item;
 
@@ -240,4 +206,69 @@ void DatabaseBox::checkParent(QListViewItem *item)
     {
         checkParent(tcitem->parent());
     }
-}    
+}
+
+void ScreenBox::setImages(QListViewItem *item)
+{
+    TreeItem *tcitem = (TreeItem *)item;
+    if(tcitem->getLevel() == leafLevel)
+    {
+        PicFrame->setFocusPolicy(QWidget::TabFocus);
+        RomInfo *romdata = tcitem->getRomInfo();
+        char thequery[1024];
+        QString matchstr = "system = \"" + romdata->System() + "\"";
+        if(romdata->Genre() != "")
+            matchstr+= " AND genre = \"" + romdata->Genre() + "\"";
+        if(romdata->Year() != 0)
+        {
+            QString year;
+            year.sprintf("%d",romdata->Year());
+            matchstr+= " AND year = \"" + year + "\"";
+        }
+        sprintf(thequery, "SELECT DISTINCT gamename FROM gamemetadata WHERE %s "
+                        "ORDER BY gamename DESC;",
+                        matchstr.latin1());
+        QSqlQuery query = db->exec(thequery);
+        if (query.isActive() && query.numRowsAffected() > 0)
+        {
+            RomInfo *rinfo;
+            QPtrList<RomInfo> *romlist = new QPtrList<RomInfo>;
+            while (query.next())
+            {
+                rinfo = GameHandler::CreateRomInfo(romdata);
+                rinfo->setField("gamename",query.value(0).toString());
+                rinfo->fillData(db);
+                romlist->append(rinfo);
+            }
+            PicFrame->setRomlist(romlist);
+        }
+    }
+    else
+    {
+        PicFrame->clearButtons();
+        PicFrame->setFocusPolicy(QWidget::NoFocus);
+    }
+}
+
+void ScreenBox::editSettings(QListViewItem *item)
+{
+    TreeItem *tcitem = (TreeItem *)item;
+
+    if("system" == tcitem->getLevel())
+    {
+        GameHandler::EditSystemSettings(this,tcitem->getRomInfo());
+    }
+}
+
+void ScreenBox::handleKey(QListViewItem *item, int key)
+{
+  TreeItem *tcitem = (TreeItem *)item;
+  switch(key)
+  {
+  case Key_E:
+    editSettings(tcitem);
+    break;
+  default:
+    break;
+  }
+}                

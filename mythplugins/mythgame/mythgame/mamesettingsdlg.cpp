@@ -17,6 +17,9 @@
 #include <qtooltip.h>
 #include <qwhatsthis.h>
 #include <qimage.h>
+#include <qmsgbox.h>
+
+#include "mamehandler.h"
 
 #include <mythtv/settings.h>
 
@@ -25,8 +28,8 @@ extern Settings *globalsettings;
 #define SAVE_SETTINGS 1
 #define DONT_SAVE_SETTINGS 0
 
-MameSettingsDlg::MameSettingsDlg( QWidget* parent,  const char* name, bool modal, WFlags fl )
-    : QDialog( parent, name, modal, fl )
+MameSettingsDlg::MameSettingsDlg( QWidget* parent,  const char* name, bool modal, bool system, WFlags fl )
+    : QDialog( parent, name, modal, fl ), bSystem(system)
 {
     setCursor(QCursor(Qt::BlankCursor));
     if ( !name )
@@ -265,39 +268,49 @@ MameSettingsDlg::MameSettingsDlg( QWidget* parent,  const char* name, bool modal
     SaveButton->setGeometry( QRect( 628, 513, 151, 40 ) ); 
     SaveButton->setText( trUtf8( "Save" ) );
 
-    DefaultCheck = new QCheckBox( SettingsTab, "DefaultCheck" );
-    DefaultCheck->setGeometry( QRect( 8, 3, 190, 31 ) ); 
-    DefaultCheck->setText( trUtf8( "use defaults" ) );
+    if(!bSystem)
+    {
+        DefaultCheck = new QCheckBox( SettingsTab, "DefaultCheck" );
+        DefaultCheck->setGeometry( QRect( 8, 3, 190, 31 ) ); 
+        DefaultCheck->setText( trUtf8( "use defaults" ) );
+    }
     MameTab->insertTab( SettingsTab, trUtf8( "Settings" ) );
 
-    ScreenTab = new QWidget( MameTab, "ScreenTab" );
+    if(!bSystem)
+    {
+        ScreenTab = new QWidget( MameTab, "ScreenTab" );
 
-    ScreenPic = new QLabel( ScreenTab, "ScreenPic" );
-    ScreenPic->setEnabled( TRUE );
-    ScreenPic->setGeometry( QRect( 0, 0, screenwidth, screenheight ) );
-    //ScreenPic->setPixmap( image0 );
-    ScreenPic->setScaledContents( TRUE );
-    MameTab->insertTab( ScreenTab, trUtf8( "ScreenShot" ) );
+        ScreenPic = new QLabel( ScreenTab, "ScreenPic" );
+        ScreenPic->setEnabled( TRUE );
+        ScreenPic->setGeometry( QRect( 0, 0, screenwidth, screenheight ) );
+        ScreenPic->setScaledContents( TRUE );
+        MameTab->insertTab( ScreenTab, trUtf8( "ScreenShot" ) );
 
-    flyer = new QWidget( MameTab, "flyer" );
+        flyer = new QWidget( MameTab, "flyer" );
 
-    FlyerPic = new QLabel( flyer, "FlyerPic" );
-    FlyerPic->setGeometry( QRect( 0, 0, screenwidth, screenheight ) );
-    //FlyerPic->setPixmap( image0 );
-    FlyerPic->setScaledContents( TRUE );
-    MameTab->insertTab( flyer, trUtf8( "Flyer" ) );
+        FlyerPic = new QLabel( flyer, "FlyerPic" );
+        FlyerPic->setGeometry( QRect( 0, 0, screenwidth, screenheight ) );
+        FlyerPic->setScaledContents( TRUE );
+        MameTab->insertTab( flyer, trUtf8( "Flyer" ) );
 
-    cabinet = new QWidget( MameTab, "cabinet" );
+        cabinet = new QWidget( MameTab, "cabinet" );
 
-    CabinetPic = new QLabel( cabinet, "CabinetPic" );
-    CabinetPic->setGeometry( QRect( 0, 0, screenwidth, screenheight ) );
-    //CabinetPic->setPixmap( image0 );
-    CabinetPic->setScaledContents( TRUE );
-    MameTab->insertTab( cabinet, trUtf8( "Cabinet Photo" ) );
+        CabinetPic = new QLabel( cabinet, "CabinetPic" );
+        CabinetPic->setGeometry( QRect( 0, 0, screenwidth, screenheight ) );
+        CabinetPic->setScaledContents( TRUE );
+        MameTab->insertTab( cabinet, trUtf8( "Cabinet Photo" ) );
+    }
 
     // tab order
-    setTabOrder( MameTab, DefaultCheck );
-    setTabOrder( DefaultCheck, FullCheck );
+    if(bSystem)
+    {
+        setTabOrder( MameTab, FullCheck );
+    }
+    else
+    {
+        setTabOrder( MameTab, DefaultCheck );
+        setTabOrder( DefaultCheck, FullCheck );
+    }
     setTabOrder( FullCheck, SkipCheck );
     setTabOrder( SkipCheck, LeftCheck );
     setTabOrder( LeftCheck, RightCheck );
@@ -325,8 +338,11 @@ MameSettingsDlg::MameSettingsDlg( QWidget* parent,  const char* name, bool modal
     setTabOrder( CheatCheck, OptionsEdit );
     setTabOrder( OptionsEdit, SaveButton );
 
-    connect(DefaultCheck, SIGNAL(stateChanged(int)), this,
+    if(!bSystem)
+    {
+        connect(DefaultCheck, SIGNAL(stateChanged(int)), this,
             SLOT(defaultUpdate(int)));
+    }
     connect(VolumeSlider, SIGNAL(valueChanged(int)), VolumeValLabel,
             SLOT(setNum(int)));
     connect(ScaleSlider, SIGNAL(valueChanged(int)), ScaleValLabel,
@@ -338,7 +354,16 @@ MameSettingsDlg::MameSettingsDlg( QWidget* parent,  const char* name, bool modal
     connect(SaveButton, SIGNAL(pressed()), this,
             SLOT(accept()));
 
-
+    if(bSystem)
+    {
+        SettingsFrame->setEnabled(true);
+        ListButton = new QPushButton( SettingsTab, "ListButton" );
+        ListButton->setGeometry( QRect( 28, 513, 250, 40 ) );
+        ListButton->setText( trUtf8( "Reload Game List" ) );
+        setTabOrder( SaveButton, ListButton );
+        connect(ListButton, SIGNAL(pressed()), this,
+                SLOT(loadList()));
+    }
 }
 
 /*  
@@ -352,7 +377,10 @@ MameSettingsDlg::~MameSettingsDlg()
 int MameSettingsDlg::Show(GameSettings *settings, bool vector)
 {
     game_settings = settings;
-    DefaultCheck->setChecked(game_settings->default_options);
+    if(!bSystem)
+    {
+        DefaultCheck->setChecked(game_settings->default_options);
+    }
     VectorGroup->setEnabled(vector);
     FullCheck->setChecked(game_settings->fullscreen);
     SkipCheck->setChecked(game_settings->autoframeskip);
@@ -413,7 +441,8 @@ void MameSettingsDlg::setFlickerLabel(int value)
 
 void MameSettingsDlg::SaveSettings()
 {
-    game_settings->default_options = DefaultCheck->isChecked();
+    if(!bSystem)
+        game_settings->default_options = DefaultCheck->isChecked();
     game_settings->fullscreen = FullCheck->isChecked();
     game_settings->autoframeskip = SkipCheck->isChecked();
     game_settings->rot_left = LeftCheck->isChecked();
@@ -441,23 +470,32 @@ void MameSettingsDlg::SaveSettings()
 
 void MameSettingsDlg::SetScreenshot(QString picfile)
 {
-    Screenshot.load(picfile);
-    ScaleImageLabel(Screenshot,ScreenPic);
-    ScreenPic->setPixmap(Screenshot);
+    if(ScreenPic)
+    {
+        Screenshot.load(picfile);
+        ScaleImageLabel(Screenshot,ScreenPic);
+        ScreenPic->setPixmap(Screenshot);
+    }
 }
 
 void MameSettingsDlg::SetFlyer(QString picfile)
 {
-    Flyer.load(picfile);
-    ScaleImageLabel(Flyer,FlyerPic);
-    FlyerPic->setPixmap(Flyer);
+    if(FlyerPic)
+    {
+        Flyer.load(picfile);
+        ScaleImageLabel(Flyer,FlyerPic);
+        FlyerPic->setPixmap(Flyer);
+    }
 }
 
 void MameSettingsDlg::SetCabinet(QString picfile)
 {
-    Cabinet.load(picfile);
-    ScaleImageLabel(Cabinet,CabinetPic);
-    CabinetPic->setPixmap(Cabinet);
+    if(CabinetPic)
+    {
+        Cabinet.load(picfile);
+        ScaleImageLabel(Cabinet,CabinetPic);
+        CabinetPic->setPixmap(Cabinet);
+    }
 }
 
 void MameSettingsDlg::ScaleImageLabel(QPixmap &pixmap, QLabel *label)
@@ -483,4 +521,9 @@ void MameSettingsDlg::ScaleImageLabel(QPixmap &pixmap, QLabel *label)
         x = (FrameWidth - ImageWidth) / 2;
     }
     label->setGeometry( QRect( x, y, ImageWidth, ImageHeight ) );
+}
+
+void MameSettingsDlg::loadList()
+{
+    MameHandler::getHandler()->processGames();
 }
