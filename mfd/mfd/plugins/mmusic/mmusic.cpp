@@ -78,7 +78,18 @@ MMusicWatcher::MMusicWatcher(MFD *owner, int identity)
     desired_database_version = "1002";
 
     //
-    //  Initialize our contianer and set things up for a clean slate
+    //  pointer to the database
+    //
+    
+    db = parent->getDatabase();
+    if(!db)
+    {
+        warning("cant't talk to database ... I'm out of here");
+        return;
+    }
+
+    //
+    //  Initialize our container and set things up for a clean slate
     //
     
     initialize();
@@ -174,17 +185,6 @@ void MMusicWatcher::run()
     nice(nice_level);
     
     //
-    //  pointer to the database
-    //
-    
-    db = parent->getDatabase();
-    if(!db)
-    {
-        warning("cant't talk to database ... I'm out of here");
-        return;
-    }
-
-    //
     //  Set a time stamp
     //
 
@@ -197,7 +197,7 @@ void MMusicWatcher::run()
         //  minutes). Set to 0 to only sweep when a sweep is forced
         //
 
-        int sweep_wait = mfdContext->getNumSetting("music_sweep_time", 1) * 60 * 1000;  
+        int sweep_wait = mfdContext->getNumSetting("music_sweep_time", 15) * 60 * 1000;  
         if( ( metadata_sweep_time.elapsed() > sweep_wait  &&
               sweep_wait > 0 && keep_going ) || ( force_sweep && keep_going) )
         {
@@ -844,14 +844,11 @@ void MMusicWatcher::checkDatabaseAgainstMaster(const QString &startdir)
     //      File in database & digests match --> excellent
     //
     
-    int delete_me_counter = 0;
-    
     MusicFileMap::Iterator it;
     for ( it = master_list.begin(); it != master_list.end(); )
     {
         if(!it.data().checkedDatabase())
         {
-            ++delete_me_counter;
             AudioMetadata *new_item = loadFromDatabase(it.key(), startdir);
             if(!new_item)
             {
