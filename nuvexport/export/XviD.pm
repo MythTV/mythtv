@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.12.14 (xris)
+#Last Updated: 2005.01.26 (gjhurlbu)
 #
 #  export::XviD
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -44,9 +44,6 @@ package export::XviD;
 
     # Initialize and check for transcode
         $self->init_transcode();
-    # Make sure that we have an mplexer
-        $Prog{'mplexer'} = find_program('tcmplex', 'mplex');
-        push @{$self->{'errors'}}, 'You need tcmplex or mplex to export an svcd.' unless ($Prog{'mplexer'});
 
     # Any errors?  disable this function
         $self->{'enabled'} = 0 if ($self->{'errors'} && @{$self->{'errors'}} > 0);

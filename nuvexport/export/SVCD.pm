@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.12.26 (xris)
+#Last Updated: 2005.01.26 (gjhurlbu)
 #
 #  export::SVCD
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -122,7 +122,9 @@ package export::SVCD;
     # Load nuv info
         load_finfo($episode);
     # PAL or NTSC?
-        my $res = ($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) ? '480x576' : '480x480';
+        my $standard = ($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) ? 'PAL' : 'NTSC';
+        my $res = ($standard eq 'PAL') ? '480x576' : '480x480';
+        my $ntsc = ($standard eq 'PAL') ? '' : '-N';
     # Build the transcode string
         $self->{'transcode_xtra'} = " -y mpeg2enc,mp2enc -Z $res"
                                    .' -F 5,"-q '.$self->{'quantisation'}.'"'    # could add "-M $num_cpus" for multi-cpu here, but it actually seems to slow things down
@@ -148,7 +150,7 @@ package export::SVCD;
             print "Not splitting because combined file size of chunks is < ".(0.97 * $self->{'split_every'} * 1024 * 1024).", which is the requested split size.\n";
         }
     # Multiplex the streams
-        my $command = "nice -n $Args{'nice'} tcmplex -m s"
+        my $command = "nice -n $Args{'nice'} tcmplex -m s $ntsc"
                       .($split_file ? ' -F '.shell_escape($split_file) : '')
                       .' -i '.shell_escape($self->get_outfile($episode, ".$$.m2v"))
                       .' -p '.shell_escape($self->get_outfile($episode, ".$$.mpa"))

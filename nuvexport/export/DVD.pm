@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.12.26 (xris)
+#Last Updated: 2005.01.26 (gjhurlbu)
 #
 #  export::DVD
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
@@ -117,9 +117,11 @@ package export::DVD;
     # Load nuv info
         load_finfo($episode);
     # PAL or NTSC?
-        my $size = ($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) ? '720x576' : '720x480';
+        my $standard = ($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) ? 'PAL' : 'NTSC';
+        my $res = ($standard eq 'PAL') ? '720x576' : '720x480';
+        my $ntsc = ($standard eq 'PAL') ? '' : '-N';
     # Build the transcode string
-        $self->{'transcode_xtra'} = " -y mpeg2enc,mp2enc -Z $size"
+        $self->{'transcode_xtra'} = " -y mpeg2enc,mp2enc -Z $res"
                                    .' -F 8,"-q '.$self->{'quantisation'}
 			           .        ' -Q 2 -V 230 -4 2 -2 1"'
                                    .' -w '.$self->{'v_bitrate'}
@@ -129,7 +131,7 @@ package export::DVD;
     # Execute the parent method
         $self->SUPER::export($episode, ".$$");
     # Multiplex the streams
-        my $command = "nice -n $Args{'nice'} tcmplex -m d"
+        my $command = "nice -n $Args{'nice'} tcmplex -m d $ntsc"
                       .' -i '.shell_escape($self->get_outfile($episode, ".$$.m2v"))
                       .' -p '.shell_escape($self->get_outfile($episode, ".$$.mpa"))
                       .' -o '.shell_escape($self->get_outfile($episode, '.mpg'));
