@@ -58,21 +58,21 @@ class OSD
     
     void DarkenBox(QRect &rect, unsigned char *screen);
     void DrawStringIntoBox(QRect rect, const QString &text, 
-                           unsigned char *screen);
+                           unsigned char *screen, int fadeframes);
 
     void DrawStringCentered(unsigned char *yuvptr, QRect rect,
-                            const QString &text, TTFFont *font);
+                            const QString &text, TTFFont *font, int fadeframes);
 
     void DrawStringWithOutline(unsigned char *yuvptr, QRect rect, 
                                const QString &text, TTFFont *font,
-                               bool rightjustify = false);
+                               int fadeframes, bool rightjustify = false);
 
     void DrawRectangle(QRect &rect, unsigned char *screen);
 
     void BlendImage(OSDImage *image, int xstart, int ystart, 
-                    unsigned char *screen);
+                    unsigned char *screen, int fadeframes);
     void BlendFillSlider(OSDImage *image, int xstart, int ystart,
-                         int drawwidth, unsigned char *screen);
+                         int drawwidth, unsigned char *screen, int fadeframes);
     
     void DisplayDialogNoTheme(unsigned char *yuvptr);
     void DisplayInfo(unsigned char *yuvptr);
@@ -150,6 +150,7 @@ class OSD
     bool hidingpause;
  
     int fadingframes;
+    int pausefadingframes;
     int totalfadeframes;
    
     int CalcNewOffset(OSDImage *image, int curoffset);

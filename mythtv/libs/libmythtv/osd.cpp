@@ -517,7 +517,7 @@ void OSD::StartPause(int position, bool fill, QString msgtext,
     displaypausetime = -1;
     pauseyoffset = 0;
     hidingpause = false;
-    fadingframes = totalfadeframes;
+    pausefadingframes = totalfadeframes;
     
     if (displaytime > 0)
         displaypausetime = time(NULL) + displaytime;
@@ -533,8 +533,8 @@ void OSD::UpdatePause(int position, QString slidertext)
     pauseposition = position;
     pauseslidertext = slidertext;
     hidingpause = false;
-    fadingframes = totalfadeframes;
     pauseyoffset = 0;
+    pausefadingframes = totalfadeframes;
     pthread_mutex_unlock(&osdlock);
 }
 
@@ -544,7 +544,7 @@ void OSD::EndPause(void)
     hidingpause = true;
     show_pause = false;
     displaypausetime = 0;
-    fadingframes = totalfadeframes;
+    pausefadingframes = totalfadeframes;
     pthread_mutex_unlock(&osdlock);
 }
 
@@ -624,8 +624,8 @@ void OSD::Display(unsigned char *yuvptr)
         if (pausemovementperframe == 0)
             hidingpause = false;
 
-        if (fadingframes > 0)
-            fadingframes -= 2;
+        if (pausefadingframes > 0)
+            pausefadingframes -= 2;
 
         pauseyoffset = CalcNewOffset(pausebackground, pauseyoffset);
         if (pauseyoffset < 0)
@@ -689,22 +689,22 @@ void OSD::DisplayDialogNoTheme(unsigned char *yuvptr)
 
     QRect rect = dialogRect;
     rect.setBottom(rect.bottom() - infofontsize * 2 * 3);
-    DrawStringIntoBox(rect, dialogmessagetext, yuvptr);
+    DrawStringIntoBox(rect, dialogmessagetext, yuvptr, fadingframes);
 
     rect = dialogRect;
     rect.setTop(rect.bottom() - infofontsize * 2 * 3);
     rect.setBottom(rect.bottom() - infofontsize * (3 / 2) * 2);
-    DrawStringIntoBox(rect, dialogoptionone, yuvptr);
+    DrawStringIntoBox(rect, dialogoptionone, yuvptr, fadingframes);
 
     rect = dialogRect;
     rect.setTop(rect.bottom() - infofontsize * 2 * 2);
     rect.setBottom(rect.bottom() - infofontsize / 2);
-    DrawStringIntoBox(rect, dialogoptiontwo, yuvptr);
+    DrawStringIntoBox(rect, dialogoptiontwo, yuvptr, fadingframes);
 
     rect = dialogRect;
     rect.setTop(rect.bottom() - infofontsize * 2);
     rect.setBottom(rect.bottom() + infofontsize);
-    DrawStringIntoBox(rect, dialogoptionthree, yuvptr);
+    DrawStringIntoBox(rect, dialogoptionthree, yuvptr, fadingframes);
 
     rect = dialogRect;
     if (currentdialogoption == 1)
@@ -730,16 +730,18 @@ void OSD::DisplayInfo(unsigned char *yuvptr)
     if (infobackground)
     {
         BlendImage(infobackground, infobackground->position.x(),
-                   infobackground->position.y(), yuvptr);
+                   infobackground->position.y(), yuvptr, fadingframes);
         if (useinfoicon && infoicon)
-            BlendImage(infoicon, infoiconpos.x(), infoiconpos.y(), yuvptr);
+            BlendImage(infoicon, infoiconpos.x(), infoiconpos.y(), yuvptr,
+                       fadingframes);
         if (callsignRect.width() > 0)
             DrawStringWithOutline(yuvptr, callsignRect, infocallsign, 
-                                  info_font);
+                                  info_font, fadingframes);
         if (timeRect.width() > 0)
         {
             QString thetime = QTime::currentTime().toString(timeFormat);
-            DrawStringWithOutline(yuvptr, timeRect, thetime, info_font);
+            DrawStringWithOutline(yuvptr, timeRect, thetime, info_font,
+                                  fadingframes);
         }
     }
     else
@@ -755,7 +757,7 @@ void OSD::DisplayInfo(unsigned char *yuvptr)
 
     }
 
-    DrawStringWithOutline(yuvptr, rect, infotext, info_font);
+    DrawStringWithOutline(yuvptr, rect, infotext, info_font, fadingframes);
 
     if (titleRect.width() > 0)
     {
@@ -767,7 +769,7 @@ void OSD::DisplayInfo(unsigned char *yuvptr)
         rect.setBottom(rect.bottom() - infofontsize * 3 / 2);
     }
 
-    DrawStringWithOutline(yuvptr, rect, subtitletext, info_font);
+    DrawStringWithOutline(yuvptr, rect, subtitletext, info_font, fadingframes);
 
     rect = infoRect;
 
@@ -775,12 +777,13 @@ void OSD::DisplayInfo(unsigned char *yuvptr)
         rect.setTop(rect.top() + infofontsize * 3 / 2);
     else
         rect.setTop(rect.top() + infofontsize * 3);
-    DrawStringIntoBox(rect, desctext, yuvptr);
+    DrawStringIntoBox(rect, desctext, yuvptr, fadingframes);
 }
 
 void OSD::DisplayChannumNoTheme(unsigned char *yuvptr)
 {
-    DrawStringWithOutline(yuvptr, channumRect, channumtext, channum_font, true);
+    DrawStringWithOutline(yuvptr, channumRect, channumtext, channum_font, 
+                          fadingframes, true);
 }
 
 void OSD::DisplayPause(unsigned char *yuvptr)
@@ -788,14 +791,16 @@ void OSD::DisplayPause(unsigned char *yuvptr)
     if (pausebackground)
     {
         BlendImage(pausebackground, pausebackground->position.x(),
-                   pausebackground->position.y() + pauseyoffset, yuvptr);
+                   pausebackground->position.y() + pauseyoffset, yuvptr,
+                   pausefadingframes);
     }
  
     if (pausestatusRect.width() > 0)
     {
         QRect temp = pausestatusRect;
         temp.moveTopLeft(QPoint(temp.left(), temp.top() + pauseyoffset));
-        DrawStringWithOutline(yuvptr, temp, pausestatus, info_font);
+        DrawStringWithOutline(yuvptr, temp, pausestatus, info_font,
+                              pausefadingframes);
     }
 
     if (pausesliderRect.width() > 0)
@@ -807,7 +812,8 @@ void OSD::DisplayPause(unsigned char *yuvptr)
             if (width > pausesliderRect.width())
                 width = pausesliderRect.width();
 	    BlendFillSlider(pausesliderfill, pausesliderRect.x(),
-                            pausesliderRect.y() + pauseyoffset, width, yuvptr);
+                            pausesliderRect.y() + pauseyoffset, width, yuvptr,
+                            pausefadingframes);
         }
         else
         {
@@ -815,7 +821,7 @@ void OSD::DisplayPause(unsigned char *yuvptr)
                        pauseposition);
             xpos += pausesliderRect.left();
             BlendImage(pausesliderpos, xpos, pausesliderRect.y() - 3 + 
-                       pauseyoffset, yuvptr);
+                       pauseyoffset, yuvptr, pausefadingframes);
         }
     }
 
@@ -823,12 +829,13 @@ void OSD::DisplayPause(unsigned char *yuvptr)
     {
         QRect temp = pausesliderTextRect;
         temp.moveTopLeft(QPoint(temp.left(), temp.top() + pauseyoffset));
-        DrawStringCentered(yuvptr, temp, pauseslidertext, pausesliderfont);
+        DrawStringCentered(yuvptr, temp, pauseslidertext, pausesliderfont,
+                           pausefadingframes);
     }
 }
 
 void OSD::DrawStringCentered(unsigned char *yuvptr, QRect rect,
-                             const QString &text, TTFFont *font)
+                             const QString &text, TTFFont *font, int fadeframes)
 {
     int textlength = 0;
     font->CalcWidth(text, &textlength);
@@ -838,12 +845,12 @@ void OSD::DrawStringCentered(unsigned char *yuvptr, QRect rect,
     if (xoffset > 0)
         rect.moveBy(xoffset, 0);
 
-    DrawStringWithOutline(yuvptr, rect, text, font);
+    DrawStringWithOutline(yuvptr, rect, text, font, fadeframes);
 }
 
 void OSD::DrawStringWithOutline(unsigned char *yuvptr, QRect rect, 
                                 const QString &text, TTFFont *font,
-                                bool rightjustify)
+                                int fadeframes, bool rightjustify)
 {
     int x = rect.left();
     int y = rect.top();
@@ -853,7 +860,7 @@ void OSD::DrawStringWithOutline(unsigned char *yuvptr, QRect rect,
     int alphamod = 255;
 
     if (totalfadeframes > 0)
-        alphamod = (int)((((float)(fadingframes) / totalfadeframes) * 256.0) +
+        alphamod = (int)((((float)(fadeframes) / totalfadeframes) * 256.0) +
                    0.5);
 
     font->DrawString(yuvptr, x - 1, y - 1, text, maxx, maxy, alphamod, false,
@@ -873,7 +880,7 @@ void OSD::DrawStringWithOutline(unsigned char *yuvptr, QRect rect,
 }    
 
 void OSD::DrawStringIntoBox(QRect rect, const QString &text, 
-                            unsigned char *screen)
+                            unsigned char *screen, int fadeframes)
 {
     int textlength = 0;
     info_font->CalcWidth(text, &textlength);
@@ -908,7 +915,8 @@ void OSD::DrawStringIntoBox(QRect rect, const QString &text,
             {
                 QRect drawrect = rect;
                 drawrect.setTop(rect.top() + infofontsize * (lines) * 3 / 2);
-                DrawStringWithOutline(screen, drawrect, line, info_font);
+                DrawStringWithOutline(screen, drawrect, line, info_font, 
+                                      fadeframes);
                 length = 0;
                 memset(line, '\0', 512);
                 lines++;
@@ -928,12 +936,12 @@ void OSD::DrawStringIntoBox(QRect rect, const QString &text,
         }
         QRect drawrect = rect;
         drawrect.setTop(rect.top() + infofontsize * (lines) * 3 / 2);
-        DrawStringWithOutline(screen, drawrect, line, info_font);
+        DrawStringWithOutline(screen, drawrect, line, info_font, fadeframes);
         free(orig);
     }
     else
     {
-        DrawStringWithOutline(screen, rect, text, info_font);
+        DrawStringWithOutline(screen, rect, text, info_font, fadeframes);
     }
 }
 
@@ -996,7 +1004,7 @@ void OSD::DrawRectangle(QRect &rect, unsigned char *screen)
 }
 
 void OSD::BlendImage(OSDImage *image, int xstart, int ystart, 
-                     unsigned char *screen)
+                     unsigned char *screen, int fadeframes)
 {
     if (!image->isvalid)
         return;
@@ -1016,7 +1024,7 @@ void OSD::BlendImage(OSDImage *image, int xstart, int ystart,
     int alphamod = 255;
 
     if (totalfadeframes > 0)
-        alphamod = (int)((((float)(fadingframes) / totalfadeframes) * 256.0) + 
+        alphamod = (int)((((float)(fadeframes) / totalfadeframes) * 256.0) + 
                    0.5);
 
     for (int y = 0; y < height; y++)
@@ -1083,7 +1091,7 @@ void OSD::BlendImage(OSDImage *image, int xstart, int ystart,
 }
 
 void OSD::BlendFillSlider(OSDImage *image, int xstart, int ystart,
-                          int drawwidth, unsigned char *screen)
+                          int drawwidth, unsigned char *screen, int fadeframes)
 {
     if (!image->isvalid)
         return;
@@ -1102,7 +1110,7 @@ void OSD::BlendFillSlider(OSDImage *image, int xstart, int ystart,
 
     int alphamod = 255;
     if (totalfadeframes > 0)
-        alphamod = (int)((((float)(fadingframes) / totalfadeframes) * 256.0) + 
+        alphamod = (int)((((float)(fadeframes) / totalfadeframes) * 256.0) + 
                    0.5);
 
     for (int y = 0; y < height; y++)
