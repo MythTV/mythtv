@@ -2177,8 +2177,8 @@ public:
         setLabel(QObject::tr("mythfilldatabase Execution Start"));
         setValue(2);
         setHelpText(QObject::tr("This setting and the following one define a "
-                    "time period when the mythfilldatabase process is allowed "
-                    "to run.  Ex. setting Min to 11 and Max to 13 would mean "
+                    "time period in which the mythfilldatabase process is allowed "
+                    "to run.  Setting Start to 11 and End to 13 would mean "
                     "that the process would only run between 11 AM and 1 PM."));
     };
 };
@@ -2191,8 +2191,8 @@ public:
         setLabel(QObject::tr("mythfilldatabase Execution End"));
         setValue(5);
         setHelpText(QObject::tr("This setting and the preceding one define a "
-                    "time period when the mythfilldatabase process is allowed "
-                    "to run.  Ex. setting Min to 11 and Max to 13 would mean "
+                    "time period in which the mythfilldatabase process is allowed "
+                    "to run.  Setting Start to 11 and End to 13 would mean "
                     "that the process would only run between 11 AM and 1 PM."));
     };
 };
