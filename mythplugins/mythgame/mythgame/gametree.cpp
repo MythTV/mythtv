@@ -49,7 +49,9 @@ void GameTree::keyPressEvent(QKeyEvent *e)
         case Key_Down: game_tree_list->moveDown(); break;
         case Key_Left: game_tree_list->popUp(); break;
         case Key_Right: goRight(); break;
-
+        case Key_PageUp: game_tree_list->pageUp(); break;
+        case Key_PageDown: game_tree_list->pageDown(); break;
+          
         default: MythThemedDialog::keyPressEvent(e); break;
     }
 }
