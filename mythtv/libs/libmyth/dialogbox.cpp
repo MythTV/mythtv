@@ -12,7 +12,7 @@
 DialogBox::DialogBox(MythContext *context, const QString &text, 
                      const char *checkboxtext,
                      QWidget *parent, const char *name)
-         : MyDialog(context, parent, name)
+         : MythDialog(context, parent, name)
 {
     QLabel *maintext = new QLabel(text, this);
     maintext->setBackgroundOrigin(WindowOrigin);
@@ -39,7 +39,7 @@ DialogBox::DialogBox(MythContext *context, const QString &text,
 
 void DialogBox::AddButton(const QString &title)
 {
-    MyPushButton *button = new MyPushButton(title, this);
+    MythPushButton *button = new MythPushButton(title, this);
     button->setBackgroundMode(X11ParentRelative);
 
     buttongroup->insert(button);

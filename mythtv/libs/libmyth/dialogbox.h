@@ -11,7 +11,7 @@ class QButtonGroup;
 class QString;
 class MythContext;
 
-class DialogBox : public MyDialog
+class DialogBox : public MythDialog
 {
     Q_OBJECT
   public:

@@ -45,7 +45,7 @@ struct MenuRow
 
 class MythContext;
 
-class ThemedMenu : public MyDialog
+class ThemedMenu : public MythDialog
 {
     Q_OBJECT
   public:

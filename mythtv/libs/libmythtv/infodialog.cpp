@@ -37,7 +37,7 @@ class RecListItem : public QListViewItem
 
 InfoDialog::InfoDialog(MythContext *context, ProgramInfo *pginfo, 
                        QWidget *parent, const char *name)
-          : MyDialog(context, parent, name)
+          : MythDialog(context, parent, name)
 {
     int bigfont = m_context->GetBigFontSize();
     int mediumfont = m_context->GetMediumFontSize();
@@ -95,7 +95,7 @@ InfoDialog::InfoDialog(MythContext *context, ProgramInfo *pginfo,
 
     RecListItem *selectItem = NULL;
 
-    lview = new MyListView(this);
+    lview = new MythListView(this);
     lview->addColumn("Selections");
     lview->setColumnWidth(0, (int)(750 * wmult));
     lview->setSorting(-1, false);

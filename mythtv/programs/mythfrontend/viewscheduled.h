@@ -7,12 +7,11 @@
 
 class QSqlDatabase;
 class QListViewItem;
-class MyListView;
 class QLabel;
 class ProgramInfo;
 class MythContext;
 
-class ViewScheduled : public MyDialog
+class ViewScheduled : public MythDialog
 {
     Q_OBJECT
   public:
@@ -39,7 +38,7 @@ class ViewScheduled : public MyDialog
     QLabel *date;
     QLabel *chan;
 
-    MyListView *listview;
+    MythListView *listview;
 };
 
 #endif

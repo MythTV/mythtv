@@ -39,7 +39,7 @@ private:
 SetRecTimeDialog::SetRecTimeDialog(MythContext *context, ProgramInfo *rec,
                                    QSqlDatabase *ldb, QWidget *parent,
                                    const char *name)
-                : MyDialog(context, parent, name)
+                : MythDialog(context, parent, name)
 {
     m_proginfo = rec;
     db = ldb;
@@ -119,7 +119,7 @@ SetRecTimeDialog::SetRecTimeDialog(MythContext *context, ProgramInfo *rec,
 
     SRTListItem *selectItem = NULL;
 
-    lview = new MyListView(this);
+    lview = new MythListView(this);
     lview->addColumn("Selections");
     lview->setColumnWidth(0, (int)(650 * wmult));
     lview->setSorting(-1, false);

@@ -21,7 +21,7 @@ using namespace std;
 ThemedMenu::ThemedMenu(MythContext *context, const char *cdir, 
                        const char *menufile, 
                        QWidget *parent, const char *name)
-          : MyDialog(context, parent, name)
+          : MythDialog(context, parent, name)
 {
     setPalette(QPalette(QColor(250, 250, 250)));
 

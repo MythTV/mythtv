@@ -8,7 +8,154 @@ using namespace std;
 #include "mythwidgets.h"
 #include "mythcontext.h"
 
-void MyToolButton::drawButton( QPainter * p )
+void MythComboBox::keyPressEvent(QKeyEvent *e)
+{
+    switch (e->key()) {
+    case Key_Up:
+        focusNextPrevChild(false);
+        break;
+    case Key_Down:
+        focusNextPrevChild(true);
+        break;
+    case Key_Left:
+        if (currentItem() == 0)
+            setCurrentItem(count()-1);
+        else
+            setCurrentItem((currentItem() - 1) % count());
+        break;
+    case Key_Right:
+        setCurrentItem((currentItem() + 1) % count());
+        break;
+    case Key_Space:
+        popup();
+        break;
+    default:
+        e->ignore();
+        return;
+    }
+}
+
+bool MythSpinBox::eventFilter(QObject* o, QEvent* e)
+{
+    (void)o;
+
+    if (e->type() != QEvent::KeyPress)
+        return FALSE;
+
+    switch (((QKeyEvent*)e)->key()) {
+    case Key_Up:
+        focusNextPrevChild(false);
+        break;
+    case Key_Down:
+        focusNextPrevChild(true);
+        break;
+    case Key_Left:
+        stepDown();
+        break;
+    case Key_Right:
+        stepUp();
+        break;
+    default:
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+void MythSlider::keyPressEvent(QKeyEvent* e)
+{
+    switch (e->key()) {
+    case Key_Up:
+        focusNextPrevChild(false);
+        break;
+    case Key_Down:
+        focusNextPrevChild(true);
+        break;
+    case Key_Left:
+        setValue(value() - lineStep());
+        break;
+    case Key_Right:
+        setValue(value() + lineStep());
+        break;
+    default:
+        QSlider::keyPressEvent(e);
+    }
+}
+
+void MythLineEdit::keyPressEvent(QKeyEvent *e)
+{
+    switch (e->key()) {
+    case Key_Up:
+        focusNextPrevChild(FALSE);
+        break;
+    case Key_Down:
+        focusNextPrevChild(TRUE);
+        break;
+    default:
+        QLineEdit::keyPressEvent(e);
+    }
+}
+
+void MythTable::keyPressEvent(QKeyEvent *e)
+{
+    bool handled = false;
+
+    if (isEditing() && item(currEditRow(), currEditCol()) &&
+        item(currEditRow(), currEditCol())->editType() == QTableItem::OnTyping)
+        return;
+
+    int tmpRow = currentRow();
+
+    switch (e->key())
+    {
+        case Key_Left:
+        case Key_Right:
+        {
+            handled = true;
+            break;
+        }
+        case Key_Up:
+        {
+            if (tmpRow == 0)
+            {
+                focusNextPrevChild(FALSE);
+                handled = true;
+            }
+            break;
+        }
+        case Key_Down:
+        {
+            if (tmpRow == numRows() - 1)
+            {
+                focusNextPrevChild(TRUE);
+                handled = true;
+            }
+            break;
+        }
+    }
+
+    if (!handled)
+        QTable::keyPressEvent(e);
+}
+
+void MythButtonGroup::moveFocus(int key)
+{
+    QButton *currentSel = selected();
+
+    QButtonGroup::moveFocus(key);
+
+    if (selected() == currentSel)
+    {
+        switch (key)
+        {
+            case Key_Up: focusNextPrevChild(FALSE); break;
+            case Key_Down: focusNextPrevChild(TRUE); break;
+            default: break;
+        }
+    }
+}
+
+void MythToolButton::drawButton(QPainter *p)
 {
     QStyle::SCFlags controls = QStyle::SC_ToolButton;
     QStyle::SCFlags active = QStyle::SC_None;
@@ -56,7 +203,7 @@ void MyToolButton::drawButton( QPainter * p )
     drawButtonLabel(p);
 }
 
-void MyPushButton::drawButton( QPainter * p )
+void MythPushButton::drawButton( QPainter * p )
 {
    int diw = 0;
     if ( isDefault() || autoDefault() ) {
@@ -128,9 +275,9 @@ void MyPushButton::drawButton( QPainter * p )
     drawButtonLabel(p);
 }
 
-MyDialog::MyDialog(MythContext *context, QWidget *parent, const char *name,
-                   bool modal)
-        : QDialog(parent, name, modal)
+MythDialog::MythDialog(MythContext *context, QWidget *parent, const char *name,
+                       bool modal)
+          : QDialog(parent, name, modal)
 {
     m_context = context;
 
@@ -146,14 +293,14 @@ MyDialog::MyDialog(MythContext *context, QWidget *parent, const char *name,
     context->ThemeWidget(this);
 }
 
-void MyDialog::Show(void)
+void MythDialog::Show(void)
 {
     showFullScreen();
     setActiveWindow();
 }
 
-MyListView::MyListView(QWidget *parent)
-          : QListView(parent)
+MythListView::MythListView(QWidget *parent)
+            : QListView(parent)
 {
     allowkeypress = true;
 
@@ -166,7 +313,7 @@ MyListView::MyListView(QWidget *parent)
     setAllColumnsShowFocus(TRUE);
 }
 
-void MyListView::keyPressEvent(QKeyEvent *e)
+void MythListView::keyPressEvent(QKeyEvent *e)
 {
     if (!allowkeypress)
         return;

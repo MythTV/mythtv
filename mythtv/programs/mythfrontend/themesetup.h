@@ -34,7 +34,7 @@ class Thumbnail
     bool isdir;
 };
 
-class ThemeSetup : public MyDialog
+class ThemeSetup : public MythDialog
 {
     Q_OBJECT
   public:

@@ -10,6 +10,8 @@
 #include <qdialog.h>
 #include <qlistview.h>
 #include <qheader.h>
+#include <qtable.h>
+#include <qbuttongroup.h>
 
 class MythContext;
 
@@ -26,31 +28,7 @@ public:
     MythComboBox(bool rw, QWidget* parent=0, const char* name=0):
         QComboBox(rw, parent, name) {};
 protected:
-    virtual void keyPressEvent (QKeyEvent* e) {
-        switch (e->key()) {
-        case Key_Up:
-            focusNextPrevChild(false);
-            break;
-        case Key_Down:
-            focusNextPrevChild(true);
-            break;
-        case Key_Left:
-            if (currentItem() == 0)
-                setCurrentItem(count()-1);
-            else
-                setCurrentItem((currentItem() - 1) % count());
-            break;
-        case Key_Right:
-            setCurrentItem((currentItem() + 1) % count());
-            break;
-        case Key_Space:
-            popup();
-            break;
-        default:
-            e->ignore();
-            return;
-        }
-    }
+    virtual void keyPressEvent (QKeyEvent* e);
 };
 
 
@@ -59,30 +37,7 @@ public:
     MythSpinBox(QWidget* parent = NULL, const char* widgetName = 0):
         QSpinBox(parent, widgetName) {};
 protected:
-    virtual bool eventFilter (QObject* o, QEvent* e) {
-        (void)o;
-
-        if (e->type() != QEvent::KeyPress)
-            return FALSE;
-
-        switch (((QKeyEvent*)e)->key()) {
-        case Key_Up:
-            focusNextPrevChild(false);
-            break;
-        case Key_Down:
-            focusNextPrevChild(true);
-            break;
-        case Key_Left:
-            stepDown();
-            break;
-        case Key_Right:
-            stepUp();
-            break;
-        default:
-            return FALSE;
-        }
-        return TRUE;
-    };
+    virtual bool eventFilter (QObject* o, QEvent* e);
 };
 
 class MythSlider: public QSlider {
@@ -90,24 +45,7 @@ public:
     MythSlider(QWidget* parent=0, const char* name=0):
         QSlider(parent, name) {};
 protected:
-    virtual void keyPressEvent (QKeyEvent* e) {
-        switch (e->key()) {
-        case Key_Up:
-            focusNextPrevChild(false);
-            break;
-        case Key_Down:
-            focusNextPrevChild(true);
-            break;
-        case Key_Left:
-            setValue(value() - lineStep());
-            break;
-        case Key_Right:
-            setValue(value() + lineStep());
-            break;
-        default:
-            QSlider::keyPressEvent(e);
-        }
-    }
+    virtual void keyPressEvent (QKeyEvent* e);
 };
 
 class MythLineEdit : public QLineEdit {
@@ -119,25 +57,29 @@ class MythLineEdit : public QLineEdit {
       QLineEdit(contents, parent, widgetName) { };
 
 protected:
-  virtual void keyPressEvent(QKeyEvent *e) {
-      switch (e->key())
-          {
-          case Key_Up:
-              focusNextPrevChild(FALSE);
-              break;
-          case Key_Down:
-              focusNextPrevChild(TRUE);
-              break;
-          default:
-              QLineEdit::keyPressEvent(e);
-          }
-  };
+  virtual void keyPressEvent(QKeyEvent *e);
 };
 
-class MyToolButton : public QToolButton
+class MythTable : public QTable
 {
   public:
-    MyToolButton(QWidget *parent) : QToolButton(parent)
+    MythTable(QWidget *parent) : QTable(parent) { }
+
+    void keyPressEvent(QKeyEvent *e);
+};
+
+class MythButtonGroup : public QButtonGroup
+{
+  public:
+    MythButtonGroup(QWidget *parent = 0) : QButtonGroup(parent) { }
+
+    void moveFocus(int key);
+};
+
+class MythToolButton : public QToolButton
+{
+  public:
+    MythToolButton(QWidget *parent) : QToolButton(parent)
                     { setFocusPolicy(StrongFocus);
                       setBackgroundOrigin(WindowOrigin); }
 
@@ -147,12 +89,12 @@ class MyToolButton : public QToolButton
     QColor origcolor;
 };
 
-class MyPushButton : public QPushButton
+class MythPushButton : public QPushButton
 {
   public:
-    MyPushButton(const QString &text, QWidget *parent)
-               : QPushButton(text, parent)
-                { setBackgroundOrigin(WindowOrigin); }
+    MythPushButton(const QString &text, QWidget *parent)
+                 : QPushButton(text, parent)
+                  { setBackgroundOrigin(WindowOrigin); }
 
     void drawButton(QPainter *p);
 
@@ -160,11 +102,11 @@ class MyPushButton : public QPushButton
     QColor origcolor;
 };
 
-class MyDialog : public QDialog
+class MythDialog : public QDialog
 {
   public:
-    MyDialog(MythContext *context, QWidget *parent = 0, const char *name = 0,
-             bool modal = FALSE);
+    MythDialog(MythContext *context, QWidget *parent = 0, const char *name = 0,
+               bool modal = FALSE);
     
     void Show();
 
@@ -177,11 +119,11 @@ class MyDialog : public QDialog
     int screenwidth, screenheight;
 };
 
-class MyListView : public QListView
+class MythListView : public QListView
 {
     Q_OBJECT
   public:
-    MyListView(QWidget *parent);
+    MythListView(QWidget *parent);
 
     void SetAllowKeypress(bool allow) { allowkeypress = allow; }
 

@@ -29,7 +29,7 @@ using namespace std;
 
 PlaybackBox::PlaybackBox(MythContext *context, BoxType ltype, QWidget *parent, 
                          const char *name)
-           : MyDialog(context, parent, name)
+           : MythDialog(context, parent, name)
 {
     type = ltype;
 
@@ -48,7 +48,7 @@ PlaybackBox::PlaybackBox(MythContext *context, BoxType ltype, QWidget *parent,
     label->setBackgroundOrigin(WindowOrigin);
     vbox->addWidget(label);
 
-    listview = new MyListView(this);
+    listview = new MythListView(this);
 
     listview->addColumn("Date");
     listview->addColumn("Title");

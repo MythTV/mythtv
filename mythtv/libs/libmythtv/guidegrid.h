@@ -27,7 +27,7 @@ namespace libmyth
 #define MAX_DISPLAY_CHANS 8
 #define DISPLAY_TIMES 30
 
-class GuideGrid : public MyDialog
+class GuideGrid : public MythDialog
 {
     Q_OBJECT
   public:

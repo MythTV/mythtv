@@ -13,7 +13,7 @@ using namespace std;
 
 ThemeSetup::ThemeSetup(MythContext *context,  QSqlDatabase *ldb,
                        QWidget *parent, const char *name)
-          : MyDialog(context, parent, name)
+          : MythDialog(context, parent, name)
 {
     db = ldb;
 

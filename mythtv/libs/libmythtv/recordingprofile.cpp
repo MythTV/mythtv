@@ -40,12 +40,12 @@ void RecordingProfile::loadByName(QSqlDatabase* db, QString name) {
 RecordingProfileBrowser::RecordingProfileBrowser(MythContext* context,
                                                  QWidget* parent,
                                                  QSqlDatabase* _db)
-                       : MyDialog(context, parent), db(_db) 
+                       : MythDialog(context, parent), db(_db) 
 {
 
     QVBoxLayout* vbox = new QVBoxLayout(this, (int)(15 * wmult));
 
-    listview = new MyListView(this);
+    listview = new MythListView(this);
     vbox->addWidget(listview);
 
     listview->addColumn("Profile");

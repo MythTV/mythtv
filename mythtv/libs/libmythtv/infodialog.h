@@ -15,7 +15,7 @@ class QListViewItem;
 namespace libmyth
 {
 
-class InfoDialog : public MyDialog
+class InfoDialog : public MythDialog
 {
     Q_OBJECT
   public:
@@ -35,7 +35,7 @@ class InfoDialog : public MyDialog
     RecordingType recordstatus;
     ProgramInfo *myinfo;
 
-    MyListView *lview;
+    MythListView *lview;
 };
 
 }

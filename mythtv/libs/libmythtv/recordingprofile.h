@@ -384,7 +384,7 @@ private:
     ImageSize* imageSize;
 };
 
-class RecordingProfileBrowser: public MyDialog {
+class RecordingProfileBrowser: public MythDialog {
     Q_OBJECT
 public:
     RecordingProfileBrowser(MythContext* context, QWidget* parent, QSqlDatabase* db);
@@ -398,7 +398,7 @@ protected slots:
     };
 
 protected:
-    MyListView* listview;
+    MythListView* listview;
     map<QListViewItem*,int> idMap;
     QSqlDatabase* db;
 };

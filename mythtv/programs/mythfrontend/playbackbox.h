@@ -7,7 +7,6 @@
 #include <pthread.h>
 
 class QListViewItem;
-class MyListView;
 class QLabel;
 class QProgressBar;
 class NuppelVideoPlayer;
@@ -16,7 +15,7 @@ class QTimer;
 class ProgramInfo;
 class MythContext;
 
-class PlaybackBox : public MyDialog
+class PlaybackBox : public MythDialog
 {
     Q_OBJECT
   public:
@@ -46,7 +45,7 @@ class PlaybackBox : public MyDialog
     QLabel *chan;
     QLabel *pixlabel;
 
-    MyListView *listview;
+    MythListView *listview;
 
     QLabel *freespace;
     QProgressBar *progressbar;

@@ -23,7 +23,7 @@ using namespace std;
     
 ViewScheduled::ViewScheduled(MythContext *context, QSqlDatabase *ldb,
                              QWidget *parent, const char *name)
-             : MyDialog(context, parent, name)
+             : MythDialog(context, parent, name)
 {
     db = ldb;
 
@@ -35,7 +35,7 @@ ViewScheduled::ViewScheduled(MythContext *context, QSqlDatabase *ldb,
     desclabel->setBackgroundOrigin(WindowOrigin);
     vbox->addWidget(desclabel);
 
-    listview = new MyListView(this);
+    listview = new MythListView(this);
     listview->addColumn("Chan");
     listview->addColumn("Date");
     listview->addColumn("Title");

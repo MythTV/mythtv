@@ -30,7 +30,7 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel,
                      void (*embedcb)(void *data, unsigned long wid, int x, 
                                      int y, int w, int h), void *data,
                      QWidget *parent, const char *name)
-         : MyDialog(context, parent, name)
+         : MythDialog(context, parent, name)
 {
     DISPLAY_CHANS = 6;
 

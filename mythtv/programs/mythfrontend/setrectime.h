@@ -14,7 +14,7 @@ class ProgramInfo;
 class MythContext;
 class QDateTimeEdit;
 
-class SetRecTimeDialog : public MyDialog
+class SetRecTimeDialog : public MythDialog
 {
     Q_OBJECT
   public:
@@ -45,7 +45,7 @@ class SetRecTimeDialog : public MyDialog
 
     Scheduler *sched;
 
-    MyListView *lview;
+    MythListView *lview;
 
     ProgramInfo *m_oldproginfo;
     ProgramInfo *m_proginfo;
