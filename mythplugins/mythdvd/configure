@@ -5,10 +5,13 @@
 
 # default parameters
 transcode="no"
+vcdsupport="no"
 
 for opt do
   case "$opt" in
   --enable-transcode) transcode="yes"
+  ;;
+  --enable-vcd) vcdsupport="yes"
   ;;
   esac
 done
@@ -22,6 +25,7 @@ Options: [defaults in brackets after descriptions]
 Standard options:
   --help                   print this message
   --enable-transcode       enable DVD ripping and transcoding [default=no]
+  --enable-vcd		   enable VCD playing [default=no]
 
 EOF
 exit 1
@@ -51,6 +55,14 @@ echo "#" >> ./mtd/config.pro
 cp ./mythdvd/dvdmenu.xml.pre ./mythdvd/dvdmenu.xml
 cp ./mythdvd/dvd_settings.xml.pre ./mythdvd/dvd_settings.xml
 
+if test "$vcdsupport" = "yes" ; then
+    echo "        VCD Playing support will be included"
+    echo "#define VCD_SUPPORT 1" >> ./mythdvd/config.h
+    #
+    #	Make the user menu include a button for VCD playing
+    #
+    cat ./mythdvd/dvdmenu.xml.vcd >> ./mythdvd/dvdmenu.xml
+fi
 
 if test "$transcode" = "yes" ; then
     echo "        Ripping/Transcoding support will be included"
@@ -83,6 +95,10 @@ fi
 
 if test "$transcode" = "no" ; then
   echo "        Ripping/Transcoding support will *not* be included"
+fi
+
+if test "$vcdsupport" = "no" ; then
+  echo "        VCD playing support will *not* be included"
 fi
 
 #

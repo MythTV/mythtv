@@ -18,9 +18,25 @@
 #include <qdir.h>
 #include <qimage.h>
 
+#include "config.h"
+
 /*
 --------------- General Settings ---------------
 */
+
+#ifdef VCD_SUPPORT
+class SetVCDDevice: public LineEditSetting, public GlobalSetting {
+public:
+    SetVCDDevice():
+        GlobalSetting("VCDDeviceLocation") {
+        setLabel("Location of VCD device");
+        setValue("/dev/cdrom");
+        setHelpText("This device must exist, and the user "
+                    "running MythDVD needs to have read permission "
+                    "on the device.");
+    };
+};
+#endif
 
 class SetDVDDevice: public LineEditSetting, public GlobalSetting {
 public:
@@ -39,6 +55,9 @@ GeneralSettings::GeneralSettings()
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
     general->setLabel("General Settings");
     general->addChild(new SetDVDDevice());
+#ifdef VCD_SUPPORT
+    general->addChild(new SetVCDDevice());
+#endif
     addChild(general);
 }
 
@@ -63,14 +82,36 @@ public:
     };
 };
 
+#ifdef VCD_SUPPORT
+class VCDPlayerCommand: public ComboBoxSetting, public GlobalSetting {
+public:
+    VCDPlayerCommand():
+        ComboBoxSetting(true), GlobalSetting("VCDPlayerCommand") {
+        setLabel("VCD Player Command");
+        addSelection("xine -f -g vcdx://");
+        addSelection("mplayer -vcd 1 -cdrom-device %d -fs -zoom -vo xv");
+        setHelpText("This can be any command to launch a VCD player "
+                    "(e.g. MPlayer, xine, etc.). If present, %d will "
+                    "be substituted for the VCD device (e.g. /dev/cdrom).");
+    };
+};
+#endif
+
 
 PlayerSettings::PlayerSettings()
 {
     VerticalConfigurationGroup* playersettings = new VerticalConfigurationGroup(false);
     playersettings->setLabel("DVD Player Settings");
     playersettings->addChild(new PlayerCommand());
+#ifdef VCD_SUPPORT
+    VerticalConfigurationGroup* VCDplayersettings = new VerticalConfigurationGroup(false);
+    VCDplayersettings->setLabel("VCD Player Settings");
+    VCDplayersettings->addChild(new VCDPlayerCommand());
+#endif
     addChild(playersettings);
-
+#ifdef VCD_SUPPORT
+    addChild(VCDplayersettings);
+#endif
 }
 
 /*

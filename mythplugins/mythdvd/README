@@ -4,12 +4,13 @@
 GENERAL INFO
 ------------
 
-MythDVD is a MythTV module (see http://www.mythtv.org) that allows you to play
-DVD's on a myth-box and (optionally) rip DVD's and transcode their video and
-audio content to other (generally smaller) formats. The playing features are
-simply myth-style wrappers for your favourite DVD playing software
-(mplayer, ogle, xine, etc). The transcoding is based on and derived from the
-excellent transcode package (see below).
+MythDVD is a MythTV module (see http://www.mythtv.org) that allows you to
+play DVDs and (optionally) VCDs. It can also be configured to let you rip
+DVDs and transcode their video and audio content to other (generally
+smaller) formats. The playing features are simply myth-style wrappers for
+your favourite DVD/XVCD playing software (mplayer, ogle, xine, etc). The
+transcoding is based on and derived from the excellent transcode package
+(see below).
 
 
 
@@ -60,8 +61,10 @@ packages installed for *transcoding* to work:
     transcode - The core of the re-encoding process (most
                 of the stuff above are actually things that
                 transcode wants for full functionality). The
-		more codecs you have installed, the better.
-                Developers currently using 0.6.8
+		more codecs you have installed, the better. You
+		almost certainly want to install the divx codec,
+		even if you plan to use xvid (see below).
+                Developers currently using 0.6.8.
                 http://www.theorie.physik.uni-goettingen.de/
                 ~ostreich/transcode/
 
@@ -87,15 +90,19 @@ applications available. You'll want one or more of:
          ogle - Another player.
                 http://www.dtek.chalmers.se/groups/dvd/
 
-         xine - Another player.
+         xine - Another player. Almost certainly required for
+		fully functional XVCD playback. 
                 http://xinehq.de/
 
 
-Ok, still with me? To configure the source code for transcoding, type:
+Ok, still with me? To configure the source code for transcoding and xvcd
+viewing, type:
 
-                ./configure --enable-transcode
+                ./configure --enable-transcode --enable-vcd
 
-For just playback, you can do:
+You can toggle xvcd playback functionality with the --enable-vcd argument.
+
+For just DVD playback, you can do:
 
                 ./configure 
 
@@ -107,6 +114,69 @@ Next:
 
                 make
                 make install
+
+
+VCD INFO AND DEPENDENCIES
+-------------------------
+
+To get xine working with the vcdx plugin, you will need to follow these
+instructions in the sequence indicated:
+
+	1. compile and install xine-lib (build from source)
+
+	2. compile and install xine-ui (build from source)
+
+	3. compile and install libcdio (build from source)
+
+	4. compile and install vcdimager (build from source)
+
+	5. compile and install libcdio (yes, again - rebuild it from source)
+	   Make sure that you re-run the configure script to pick up libvcd
+	   from vcdimager.
+
+	6. compile and install xine-vcdx plugin
+
+Unfortunately the package I had for xine did not have the xine-config script
+so it was impossible to build any plugins without going back to the original
+source.
+
+	
+Keybindings with xine are also another area of great joy. In order to
+emulate exisiting usability characteristics, we want the Escape key to take
+us back to the MythTV menu. This means that we need to change the key
+bindings slightly for xine.
+
+The keybindings file can be found at:
+
+	~/.xine/keymap
+
+	1. Locate the vvalue for "Menu" and change it to the following:
+
+		# Jump to Menu.
+		Menu {
+			key = Escape
+			modifier = control
+		}
+
+	2. Locate the value for "Quit" and change it to the following:
+
+		# Quit the program.
+		Quit {
+			key = Escape
+			modifier = none
+		}
+
+The following versions of xine are reccomended for XVCD playback:
+
+	xine-lib-1-rc0a
+	xine-ui-0.9.22
+	xine-vcdx-1-rcd0
+
+Other required libraries
+
+	libcdio-0.62
+	vcdimager-0.7.17-cdio
+
 
 
 DATABASE
@@ -143,7 +213,7 @@ SUBTITLES
 work extremely well, and some generate awful results. If you find that
 MythDVD transcodes a title with subtitles badly, you are encouraged to try
 and use transcode from the command line. Hopefully, future versions of
-transcode will over more robust subtitling capabilites.
+transcode will offer more robust subtitling capabilites.
 
 CONFIGURATION
 -------------

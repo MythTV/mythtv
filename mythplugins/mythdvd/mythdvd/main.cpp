@@ -48,6 +48,63 @@ void startDVDRipper(QSqlDatabase *db)
 }
 #endif
 
+//
+//  VCD Playing only if we were ./configure's for it.
+//
+#ifdef VCD_SUPPORT
+void playVCD()
+{
+    //
+    //  Get the command string to play a VCD
+    //
+    QString command_string = gContext->GetSetting("VCDPlayerCommand");
+    if(command_string.length() < 1)
+    {
+        //
+        //  User probably never did setup
+        //
+        DialogBox *no_player_dialog = new DialogBox(gContext->GetMainWindow(),
+                     "\n\nYou have no VCD Player command defined.");
+        no_player_dialog->AddButton("OK, I'll go run Setup");
+        no_player_dialog->exec();
+        
+        delete no_player_dialog;
+        return;
+    }
+    else
+    {
+        if(command_string.contains("%d"))
+        {
+            //
+            //  Need to do device substitution
+            //
+            QString vcd_device = gContext->GetSetting("VCDDeviceLocation");
+            if(vcd_device.length() < 1)
+            {
+                //
+                //  RTF README
+                //
+                DialogBox *no_device_dialog = new DialogBox(gContext->GetMainWindow(),
+                             "\n\nYou have no VCD Device defined.");
+                no_device_dialog->AddButton("OK, I'll go run Setup");
+                no_device_dialog->exec();
+                
+                delete no_device_dialog;
+                return;
+            }
+            else
+            {
+                command_string = command_string.replace( QRegExp("%d"), vcd_device );
+            }   
+        }
+        myth_system(command_string);
+        gContext->GetMainWindow()->raise();
+        gContext->GetMainWindow()->setActiveWindow();
+        gContext->GetMainWindow()->currentWidget()->setFocus();
+    }            
+}
+#endif
+
 void playDVD()
 {
     //
@@ -116,6 +173,12 @@ void DVDCallback(void *data, QString &selection)
     {
         playDVD();
     }
+#ifdef VCD_SUPPORT
+    if (sel == "vcd_play")
+    {
+        playVCD();
+    }
+#endif
     else if (sel == "dvd_rip")
     {
 #ifdef TRANSCODE_SUPPORT
