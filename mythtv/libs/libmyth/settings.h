@@ -151,6 +151,18 @@ protected:
     unsigned top;
 };
 
+// A dialog which always accepts
+class ConfigurationDialogWidget: public QDialog {
+public:
+    ConfigurationDialogWidget(QWidget* parent = NULL, const char* widgetName = 0):
+        QDialog(parent, widgetName, TRUE) {};
+
+    virtual void closeEvent(QCloseEvent* e) {
+        e->accept();
+        accept();
+    };
+};
+
 class ConfigurationDialog: virtual public Configurable {
 public:
     ConfigurationDialog(MythContext *context) { m_context = context; }

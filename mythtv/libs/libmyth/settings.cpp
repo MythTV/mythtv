@@ -93,7 +93,7 @@ void StackedConfigurationGroup::raise(Configurable* child) {
             emit raiseWidget((int)i);
             return;
         }
-    cout << "BUG: StackedConfigurationGroup::raise(): unrecognized child " << child << endl;
+    cout << "BUG: StackedConfigurationGroup::raise(): unrecognized child " << child << " on setting " << getName() << '/' << getLabel() << endl;
 }
 
 QWidget* LineEditSetting::configWidget(QWidget* parent,
@@ -240,7 +240,7 @@ QWidget* CheckBoxSetting::configWidget(QWidget* parent,
 
 QDialog* ConfigurationDialog::dialogWidget(QWidget* parent,
                                            const char* widgetName) {
-    QDialog* dialog = new QDialog(parent, widgetName, TRUE);
+    QDialog* dialog = new ConfigurationDialogWidget(parent, widgetName);
     QVBoxLayout* layout = new QVBoxLayout(dialog);
     layout->addWidget(configWidget(dialog));
 
