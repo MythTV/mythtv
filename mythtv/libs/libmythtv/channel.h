@@ -4,6 +4,7 @@
 #include <map>
 #include <qstring.h>
 #include "channelbase.h"
+#include "videodev_myth.h" // needed for v4l2_std_id type
 
 using namespace std;
 
@@ -40,7 +41,7 @@ class Channel : public ChannelBase
     int ChangeBrightness(bool up);
     int ChangeContrast(bool up);
     int ChangeHue(bool up);
-    void Channel::SetColourAttribute(int attrib, const char *name);
+    void SetColourAttribute(int attrib, const char *name);
     void SetContrast();
     void SetBrightness();
     void SetColour();
@@ -67,7 +68,8 @@ class Channel : public ChannelBase
     struct CHANLIST *curList;  
     int totalChannels;
 
-    int videomode;
+    int videomode_v4l1;
+    v4l2_std_id videomode_v4l2;
     bool usingv4l2;
 
     QString currentFormat;

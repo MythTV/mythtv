@@ -27,7 +27,8 @@ Channel::Channel(TVRec *parent, const QString &videodevice, bool strength)
     defaultFreqTable = 1;
     totalChannels = 0;
     usingv4l2 = false;
-    videomode = VIDEO_MODE_NTSC;
+    videomode_v4l1 = VIDEO_MODE_NTSC;
+    videomode_v4l2 = V4L2_STD_NTSC;
     currentFormat = "";
     usingATSCstrength = strength;
 }
@@ -50,9 +51,9 @@ bool Channel::Open(void)
         isopen = true;
     else
     {
-         VERBOSE(VB_IMPORTANT, QString("Channel::Open(): Can't open: %1")
-                                       .arg(device));
-         perror(device.ascii());
+         VERBOSE(VB_IMPORTANT,
+                 QString("Channel(%1)::Open(): Can't open video device, "
+                         "error \"%2\"").arg(device).arg(strerror(errno)));
          return false;
     }
 
@@ -91,6 +92,50 @@ void Channel::SetFd(int fd)
     }
 }
 
+static int format_to_mode(const QString& fmt, int v4l_version)
+{
+    if (v4l_version==2)
+    {
+        if (fmt == "NTSC")
+            return V4L2_STD_NTSC;
+        else if (fmt == "ATSC")
+            return V4L2_STD_ATSC_8_VSB;
+        else if (fmt == "PAL")
+            return V4L2_STD_PAL;
+        else if (fmt == "SECAM")
+            return V4L2_STD_SECAM;
+        else if (fmt == "PAL-NC")
+            return V4L2_STD_PAL_Nc;
+        else if (fmt == "PAL-M")
+            return V4L2_STD_PAL_M;
+        else if (fmt == "PAL-N")
+            return V4L2_STD_PAL_N;
+        else if (fmt == "NTSC-JP")
+            return V4L2_STD_NTSC_M_JP;
+        return V4L2_STD_NTSC;
+    }
+    if (v4l_version==1)
+    {
+        if (fmt == "NTSC")
+            return VIDEO_MODE_NTSC;
+        else if (fmt == "ATSC")
+            return VIDEO_MODE_ATSC;
+        else if (fmt == "PAL")
+            return VIDEO_MODE_PAL;
+        else if (fmt == "SECAM")
+            return VIDEO_MODE_SECAM;
+        else if (fmt == "PAL-NC")
+            return 3;
+        else if (fmt == "PAL-M")
+            return 4;
+        else if (fmt == "PAL-N")
+            return 5;
+        else if (fmt == "NTSC-JP")
+            return 6;
+    }
+    return VIDEO_MODE_NTSC;
+}
+
 void Channel::SetFormat(const QString &format)
 {
     if (!Open())
@@ -106,6 +151,9 @@ void Channel::SetFormat(const QString &format)
         fmt = gContext->GetSetting("TVFormat");
     else
         fmt = format;
+
+    videomode_v4l1 = format_to_mode(fmt, 1);
+    videomode_v4l2 = format_to_mode(fmt, 2);
  
     if (usingv4l2)
     {
@@ -115,9 +163,9 @@ void Channel::SetFormat(const QString &format)
 
         while (ioctl(videofd, VIDIOC_ENUMINPUT, &vin) >= 0)
         {
-            QString msg = QString("Probed: %1 - %2").arg(device)
-                            .arg((char *)vin.name);
-            VERBOSE(VB_CHANNEL, msg);
+            VERBOSE(VB_CHANNEL, QString("Channel(%1):SetFormat(): Probed "
+                                        "input: %2, name = %3").
+                    arg(device).arg(vin.index).arg((char *)vin.name));
             channelnames[vin.index] = (char *)vin.name;
             inputChannel[vin.index] = "";
             inputTuneTo[vin.index] = "";
@@ -128,53 +176,18 @@ void Channel::SetFormat(const QString &format)
             capchannels = vin.index;
         }
 
-        if (fmt == "NTSC")
-            videomode = V4L2_STD_NTSC;
-        else if (fmt == "ATSC")
-            videomode = V4L2_STD_ATSC_8_VSB;
-        else if (fmt == "PAL")
-            videomode = V4L2_STD_PAL;
-        else if (fmt == "SECAM")
-            videomode = V4L2_STD_SECAM;
-        else if (fmt == "PAL-NC")
-            videomode = V4L2_STD_PAL_Nc;
-        else if (fmt == "PAL-M")
-            videomode = V4L2_STD_PAL_M;
-        else if (fmt == "PAL-N")
-            videomode = V4L2_STD_PAL_N;
-        else if (fmt == "NTSC-JP")
-            videomode = V4L2_STD_NTSC_M_JP;
-
         pParent->RetrieveInputChannels(inputChannel, inputTuneTo, 
                                        externalChanger, sourceid);
         return;
     }
  
-    int mode = VIDEO_MODE_AUTO;
     struct video_tuner tuner;
 
     memset(&tuner, 0, sizeof(tuner));
 
     ioctl(videofd, VIDIOCGTUNER, &tuner);
     
-    if (fmt == "NTSC")
-        mode = VIDEO_MODE_NTSC;
-    else if (fmt == "ATSC")
-        mode = VIDEO_MODE_ATSC;
-    else if (fmt == "PAL")
-        mode = VIDEO_MODE_PAL;
-    else if (fmt == "SECAM")
-        mode = VIDEO_MODE_SECAM;
-    else if (fmt == "PAL-NC")
-        mode = 3;
-    else if (fmt == "PAL-M")
-        mode = 4;
-    else if (fmt == "PAL-N")
-        mode = 5;
-    else if (fmt == "NTSC-JP")
-        mode = 6;
-
-    tuner.mode = mode;
+    tuner.mode = videomode_v4l1;
     ioctl(videofd, VIDIOCSTUNER, &tuner);
 
     struct video_capability vidcap;
@@ -189,8 +202,9 @@ void Channel::SetFormat(const QString &format)
         test.channel = i;
         ioctl(videofd, VIDIOCGCHAN, &test);
 
-        VERBOSE(VB_CHANNEL, QString("Probed: %1 - %2").arg(device)
-                            .arg(test.name));
+        VERBOSE(VB_CHANNEL, QString("Channel(%1):SetFormat(): Probed "
+                                    "input: %2, name = %3").
+                arg(device).arg(i).arg((char *)test.name));
         channelnames[i] = test.name;
         inputChannel[i] = "";
         inputTuneTo[i] = "";
@@ -202,10 +216,8 @@ void Channel::SetFormat(const QString &format)
     memset(&vc, 0, sizeof(vc));
     vc.channel = currentcapchannel;
     ioctl(videofd, VIDIOCGCHAN, &vc);
-    vc.norm = mode;
+    vc.norm = videomode_v4l1;
     ioctl(videofd, VIDIOCSCHAN, &vc);
-
-    videomode = mode;
 
     pParent->RetrieveInputChannels(inputChannel, inputTuneTo, externalChanger,
                                    sourceid);
@@ -240,8 +252,9 @@ int Channel::SetFreqTable(const QString &name)
         listname = (char *)chanlists[i].name;
     }
 
-    VERBOSE(VB_CHANNEL, QString("Invalid frequency table name %1, using %2.")
-                        .arg(name).arg((char *)chanlists[1].name));
+    VERBOSE(VB_CHANNEL, QString("Channel(%1)::SetFreqTable(): Invalid "
+                                "frequency table name %2, using %3.").
+            arg(device).arg(name).arg((char *)chanlists[1].name));
     SetFreqTable(1);
     return 1;
 }
@@ -339,8 +352,9 @@ bool Channel::SetChannelByString(const QString &chan)
     
     if (!Open())
     {
-        VERBOSE(VB_IMPORTANT, "Channel object wasn't open, can't change "
-                              "channels");
+        VERBOSE(VB_IMPORTANT, QString(
+                    "Channel(%1)::SetChannelByString(): Channel object "
+                    "wasn't open, can't change channels").arg(device));
         return false;
     }
 
@@ -349,8 +363,10 @@ bool Channel::SetChannelByString(const QString &chan)
 
     if (!pParent->CheckChannel(this, chan, db_conn, db_lock, inputName))
     {
-        VERBOSE(VB_IMPORTANT, QString("CheckChannel failed. Please verify "
-                "channel \"%1\" in the \"setup\" Channel Editor.").arg(chan));
+        VERBOSE(VB_IMPORTANT, QString(
+                    "Channel(%1): CheckChannel failed. Please verify "
+                    "channel \"%2\" in the \"setup\" Channel Editor.").
+                arg(device).arg(chan));
         return false;
     }
 
@@ -450,7 +466,8 @@ int signalStrengthATSC(int device, int input)
     int ioctlval = ioctl(device,VIDIOCGSIGNAL,&vsig);
     if (ioctlval == -1) 
     {
-        perror("VIDIOCGSIGNAL problem in channel.h's signalStrengthATSC()");
+        VERBOSE(VB_IMPORTANT, QString("Channel::signalStrengthATSC(), error: %1").
+                arg(strerror(errno)));
         return 0;
     }
 
@@ -473,10 +490,14 @@ int signalStrengthATSC_v4l2(int device, int input)
     int ioctlval = ioctl(device,VIDIOC_G_TUNER, &vsig);
     if (ioctlval == -1)
     {
-        perror("VIDIOC_G_TUNER problem in channel.cpp's signalStrengthATSC_v4l2()");
+        VERBOSE(VB_IMPORTANT, 
+                QString("Channel(%1)::signalStrengthATSC_v4l2(), error: %2").
+                arg(device).arg(strerror(errno)));
         return 0;
     }
-    VERBOSE(VB_CHANNEL, QString("signal strength: %1").arg(vsig.signal));
+    VERBOSE(VB_CHANNEL,
+            QString("Channel(%1)::signalStrengthATSC_v4l2(): signal "
+                    "strength: %1").arg(device).arg(vsig.signal));
 
     return clamp(vsig.signal, 0, 100);
 }
@@ -486,29 +507,23 @@ bool Channel::CheckSignal(int msecTotal, int reqSignal, int input)
     int msecSleep = 500, maxSignal = 0, i = 0;
 
     msecTotal = max(msecSleep, msecTotal);
-/*
-    assert(input>=0);
-    assert(videofd>0);
-    if (input<0)
-        input=0;
-    if (videofd<=0) {
-        VERBOSE(VB_IMPORTANT, "CheckSignal called with invalid videofd");
-        return false;
-    }
-*/
+
     if (input < 0)
         input = 0;
 
-    if (videofd <= 0) 
+    if (videofd < 0) 
     {
-        VERBOSE(VB_IMPORTANT, "CheckSignal called with invalid videofd");
+        VERBOSE(VB_IMPORTANT, QString("Channel(%1)::CheckSignal() called "
+                                      "with invalid videofd").arg(device));
         return false;
     }
 
     if (usingATSCstrength) 
     {
-        VERBOSE(VB_CHANNEL, QString("CheckSignal(%1, %2, %3) usingv4l2(%4)")
-                .arg(msecTotal).arg(reqSignal).arg(input).arg(usingv4l2));
+        VERBOSE(VB_CHANNEL, 
+                QString("Channel(%1)::CheckSignal(%2, %3, %4): "
+                        "usingv4l2(%5)").arg(device).arg(msecTotal).
+                arg(reqSignal).arg(input).arg(bool(usingv4l2)));
 
         for (i = 0; i < (msecTotal / msecSleep) + 1; i++) 
         {
@@ -524,9 +539,10 @@ bool Channel::CheckSignal(int msecTotal, int reqSignal, int input)
             if (maxSignal >= reqSignal) 
                 break;
         }
-        VERBOSE(VB_IMPORTANT, QString("Maximum signal strength detected: %1\% "
-                                      "after %2 msec wait")
-                                      .arg(maxSignal).arg(i * msecSleep));
+        VERBOSE(VB_CHANNEL,
+                QString("Channel(%1)::CheckSignal(): Maximum signal "
+                        "strength detected: %1\% after %2 msec wait").
+                arg(device).arg(maxSignal).arg(i * msecSleep));
 
         if (maxSignal < reqSignal) 
             return false;
@@ -543,8 +559,8 @@ bool Channel::TuneTo(const QString &channum, int finetune)
 
     int frequency = curList[i].freq * 16 / 1000 + finetune;
 
-    VERBOSE(VB_CHANNEL, QString("TuneTo(%1) curList[i].freq(%2)")
-                                .arg(channum).arg(curList[i].freq));
+    VERBOSE(VB_CHANNEL, QString("Channel(%1)::TuneTo(%2): curList[i].freq(%3)").
+            arg(device).arg(channum).arg(curList[i].freq));
 
     return TuneToFrequency(frequency);
 }
@@ -559,31 +575,32 @@ bool Channel::CheckSignalFull(void)
     int signalThreshold = 65;
     if (usingATSCstrength)
     {
-        signalThresholdWait = gContext->GetNumSetting("ATSCCheckSignalWait",
-                                                      5000);
-        signalThreshold = gContext->GetNumSetting("ATSCCheckSignalThreshold",
-                                                  65);
+        signalThresholdWait =
+            gContext->GetNumSetting("ATSCCheckSignalWait", 5000);
+        signalThreshold =
+            gContext->GetNumSetting("ATSCCheckSignalThreshold", 65);
     }
 
     int deviceInput = max(currentcapchannel, 0);
-    VERBOSE(VB_CHANNEL, QString("Checking signal on device input: %1").
-            arg(deviceInput));
+    VERBOSE(VB_CHANNEL, QString("Channel(%1)::CheckSignalFull(): input = %2").
+            arg(device).arg(deviceInput));
 
     return CheckSignal(signalThresholdWait, signalThreshold, deviceInput);
 }
 
 bool Channel::TuneToFrequency(int frequency)
 {
-    VERBOSE(VB_CHANNEL, QString("TuneToFrequency(%1)").arg(frequency));
-
+    VERBOSE(VB_CHANNEL, QString("Channel(%1)::TuneToFrequency(%2)").
+            arg(device).arg(frequency));
+    int ioctlval = 0;
     int signalThresholdWait = 5000;
     int signalThreshold = 65;
     if (usingATSCstrength) 
     {
-        signalThresholdWait = gContext->GetNumSetting("ATSCCheckSignalWait", 
-                                                      5000);
-        signalThreshold = gContext->GetNumSetting("ATSCCheckSignalThreshold", 
-                                                  65);
+        signalThresholdWait =
+            gContext->GetNumSetting("ATSCCheckSignalWait", 5000);
+        signalThreshold =
+            gContext->GetNumSetting("ATSCCheckSignalThreshold", 65);
     }
 
     if (usingv4l2)
@@ -593,9 +610,13 @@ bool Channel::TuneToFrequency(int frequency)
         vf.frequency = frequency;
         vf.type = V4L2_TUNER_ANALOG_TV;
 
-        if (ioctl(videofd, VIDIOC_S_FREQUENCY, &vf) < 0)
+        ioctlval = ioctl(videofd, VIDIOC_S_FREQUENCY, &vf);
+        if (ioctlval < 0)
         {
-            perror("VIDIOC_S_FREQUENCY");
+            VERBOSE(VB_IMPORTANT,
+                    QString("Channel(%1)::TuneToFrequence(): Error %2 "
+                            "while setting frequency (v2): %3").
+                    arg(device).arg(ioctlval).arg(strerror(errno)));
             return false;
         }
         
@@ -604,9 +625,13 @@ bool Channel::TuneToFrequency(int frequency)
                            currentcapchannel);
     }
 
-    if (ioctl(videofd, VIDIOCSFREQ, &frequency) == -1)
+    ioctlval = ioctl(videofd, VIDIOCSFREQ, &frequency);
+    if (ioctlval < 0)
     {
-        perror("VIDIOCSFREQ");
+        VERBOSE(VB_IMPORTANT,
+                QString("Channel(%1)::TuneToFrequence(): Error %2 "
+                        "while setting frequency (v1): %3").
+                arg(device).arg(ioctlval).arg(strerror(errno)));
         return false;
     }
 
@@ -615,24 +640,41 @@ bool Channel::TuneToFrequency(int frequency)
 
 void Channel::SwitchToInput(int newcapchannel, bool setstarting)
 {
+    int ioctlval = 0;
     if (usingv4l2)
     {
-        if (ioctl(videofd, VIDIOC_S_INPUT, &newcapchannel) < 0)
-            perror("VIDIOC_S_INPUT");
-   
-        if (ioctl(videofd, VIDIOC_S_STD, &videomode) < 0)
-            perror("VIDIOC_S_STD");
+        ioctlval = ioctl(videofd, VIDIOC_S_INPUT, &newcapchannel);
+        if (ioctlval < 0)
+            VERBOSE(VB_IMPORTANT,
+                    QString("Channel(%1)::SwitchToInput(): Error %2 "
+                            "while setting input (v2): %3").
+                    arg(device).arg(ioctlval).arg(strerror(errno)));
+
+       ioctlval = ioctl(videofd, VIDIOC_S_STD, &videomode_v4l2);
+        if (ioctlval < 0)
+            VERBOSE(VB_IMPORTANT,
+                    QString("Channel(%1)::SwitchToInput(): Error %2 while "
+                            "setting video mode (v2), \"%3\", trying v4l v1").
+                    arg(device).arg(ioctlval).arg(strerror(errno)));
+        // Fall through to try v4l version 1, pcHDTV
+        // drivers don't work with VIDIOC_S_STD ioctl.
     }
-    else
-    {
-        struct video_channel set;
-        memset(&set, 0, sizeof(set));
-        ioctl(videofd, VIDIOCGCHAN, &set);
-        set.channel = newcapchannel;
-        set.norm = videomode;
-        if (ioctl(videofd, VIDIOCSCHAN, &set) < 0)
-           perror("VIDIOCSCHAN");
-    }
+
+    struct video_channel set;
+    memset(&set, 0, sizeof(set));
+    ioctl(videofd, VIDIOCGCHAN, &set); // read in old settings
+    set.channel = newcapchannel;
+    set.norm = videomode_v4l1;
+    ioctlval = ioctl(videofd, VIDIOCSCHAN, &set); // set new settings
+    if (ioctlval < 0)
+        VERBOSE(VB_IMPORTANT,
+                QString("Channel(%1)::SwitchToInput(): Error %2 "
+                        "while setting video mode (v1): %3").
+                arg(device).arg(ioctlval).arg(strerror(errno)));
+    else if (usingv4l2)
+        VERBOSE(VB_IMPORTANT,
+                QString("Channel(%1)::SwitchToInput(): Setting video mode "
+                        "with v4l version 1 worked").arg(device));
 
     currentcapchannel = newcapchannel;
     curchannelname = "";
@@ -657,7 +699,10 @@ unsigned short *Channel::GetV4L1Field(int attrib, struct video_picture &vid_pic)
         case V4L2_CID_HUE:
             return &vid_pic.hue;
         default:
-            fprintf(stderr, "Channel::SetColourAttribute(): invalid attribute argument: %d\n", attrib);
+            VERBOSE(VB_IMPORTANT,
+                    QString("Channel(%1)::SetColourAttribute(): "
+                            "invalid attribute argument: %2\n").
+                    arg(device).arg(attrib));
     }
     return NULL;
 }
@@ -679,6 +724,10 @@ void Channel::SetColourAttribute(int attrib, const char *name)
             ctrl.id = qctrl.id = attrib;
             if (ioctl(videofd, VIDIOC_QUERYCTRL, &qctrl) < 0)
             {
+                VERBOSE(VB_IMPORTANT,
+                        QString("Channel(%1)::SetColourAttribute(): "
+                                "failed to query controls, error: %2").
+                        arg(device).arg(strerror(errno)));
                 return;
             }
             ctrl.value = (int)((qctrl.maximum - qctrl.minimum) 
@@ -690,6 +739,10 @@ void Channel::SetColourAttribute(int attrib, const char *name)
                                             : ctrl.value;
             if (ioctl(videofd, VIDIOC_S_CTRL, &ctrl) < 0)
             {
+                VERBOSE(VB_IMPORTANT,
+                        QString("Channel(%1)::SetColourAttribute(): "
+                                "failed to set controls, error: %2").
+                        arg(device).arg(strerror(errno)));
                 return;
             }
         }
@@ -702,6 +755,10 @@ void Channel::SetColourAttribute(int attrib, const char *name)
 
         if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
         {
+            VERBOSE(VB_IMPORTANT,
+                    QString("Channel(%1)::SetColourAttribute(): failed "
+                            "to get picture controls, error: %2").
+                    arg(device).arg(strerror(errno)));
             return;
         }
         setfield = GetV4L1Field(attrib, vid_pic);
@@ -710,6 +767,10 @@ void Channel::SetColourAttribute(int attrib, const char *name)
             *setfield = field;
             if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
             {
+                VERBOSE(VB_IMPORTANT,
+                        QString("Channel(%1)::SetColourAttribute(): failed "
+                                "to set picture controls, error: %2").
+                        arg(device).arg(strerror(errno)));
                 return;
             }
         }
@@ -762,13 +823,19 @@ int Channel::ChangeColourAttribute(int attrib, const char *name, bool up)
         ctrl.id = qctrl.id = attrib;
         if (ioctl(videofd, VIDIOC_QUERYCTRL, &qctrl) < 0)
         {
-            perror("VIDIOC_QUERYCTRL");
+            VERBOSE(VB_IMPORTANT,
+                    QString("Channel(%1)::ChangeColourAttribute(): "
+                            "failed to query controls (1), error: %2").
+                    arg(device).arg(strerror(errno)));
             return -1;
         }
 
         if (ioctl(videofd, VIDIOC_G_CTRL, &ctrl) < 0)
         {
-            perror("VIDIOC_G_CTRL");
+            VERBOSE(VB_IMPORTANT,
+                    QString("Channel(%1)::ChangeColourAttribute(): "
+                            "failed to get control, error: %2").
+                    arg(device).arg(strerror(errno)));
             return -1;
         }
         card_value = (int)(65535.0 / (qctrl.maximum - qctrl.minimum) * 
@@ -782,7 +849,10 @@ int Channel::ChangeColourAttribute(int attrib, const char *name, bool up)
 
         if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
         {
-            perror("VIDIOCGPICT");
+            VERBOSE(VB_IMPORTANT,
+                    QString("Channel(%1)::ChangeColourAttribute(): "
+                            "failed to get picture control (1), error: %2").
+                    arg(device).arg(strerror(errno)));
             return -1;
         }
 
@@ -834,7 +904,10 @@ int Channel::ChangeColourAttribute(int attrib, const char *name, bool up)
         ctrl.id = qctrl.id = attrib;
         if (ioctl(videofd, VIDIOC_QUERYCTRL, &qctrl) < 0)
         {
-            perror("VIDIOC_QUERYCTRL");
+            VERBOSE(VB_IMPORTANT,
+                    QString("Channel(%1)::ChangeColourAttribute(): "
+                            "failed to query controls (2), error: %2").
+                    arg(device).arg(strerror(errno)));
             return -1;
         }
         ctrl.value = (int)((qctrl.maximum - qctrl.minimum) / 65535.0 * 
@@ -846,7 +919,10 @@ int Channel::ChangeColourAttribute(int attrib, const char *name, bool up)
                                     : ctrl.value;
         if (ioctl(videofd, VIDIOC_S_CTRL, &ctrl) < 0)
         {
-            perror("VIDIOC_S_CTRL");
+            VERBOSE(VB_IMPORTANT,
+                    QString("Channel(%1)::ChangeColourAttribute(): "
+                            "failed to set control, error: %2").
+                    arg(device).arg(strerror(errno)));
             return -1;
         }
     }
@@ -858,7 +934,10 @@ int Channel::ChangeColourAttribute(int attrib, const char *name, bool up)
 
         if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
         {
-            perror("VIDIOCGPICT");
+            VERBOSE(VB_IMPORTANT,
+                    QString("Channel(%1)::ChangeColourAttribute(): "
+                            "failed to get picture control (2), error: %2").
+                    arg(device).arg(strerror(errno)));
             return -1;
         }
         setfield = GetV4L1Field(attrib, vid_pic);
@@ -867,7 +946,10 @@ int Channel::ChangeColourAttribute(int attrib, const char *name, bool up)
             *setfield = newvalue;
             if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
             {
-                perror("VIDIOCSPICT");
+                VERBOSE(VB_IMPORTANT,
+                        QString("Channel(%1)::ChangeColourAttribute(): "
+                                "failed to set picture control, error: %2").
+                        arg(device).arg(strerror(errno)));
                 return -1;
             }
         }

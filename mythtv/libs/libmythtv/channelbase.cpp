@@ -148,9 +148,9 @@ bool ChannelBase::ChangeExternalChannel(const QString &channum)
     {   // we are the new fork
         for(int i = 3; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
             close(i);
-        int ret=execl("/bin/sh", "sh", "-c", command.ascii(), NULL);
+        int ret = execl("/bin/sh", "sh", "-c", command.ascii(), NULL);
         QString msg("ChannelBase: ");
-        if (EACCES==ret) {
+        if (EACCES == ret) {
             msg.append(QString("Access denied to /bin/sh"
                                " when executing %1\n").arg(command.ascii()));
         }
@@ -160,13 +160,13 @@ bool ChannelBase::ChangeExternalChannel(const QString &channum)
     }
     else
     {   // child contains the pid of the new process
-        int status=0, pid=0;
+        int status = 0, pid = 0;
         VERBOSE(VB_CHANNEL, "Waiting for External Tuning program to exit");
 
         bool timed_out = false;
         uint timeout = 30; // how long to wait in seconds
         time_t start_time = time(0);
-        while (-1!=pid && !timed_out)
+        while (-1 != pid && !timed_out)
         {
             sleep(1);
             pid = waitpid(child, &status, WUNTRACED|WNOHANG);
@@ -174,7 +174,7 @@ bool ChannelBase::ChangeExternalChannel(const QString &channum)
                     .arg(pid).arg(child).arg(status,0,16));
             if (pid==child)
                 break;
-            else if (time(0)>start_time+timeout)
+            else if (time(0) > (time_t)(start_time + timeout))
                 timed_out = true;
         }
         if (timed_out)
