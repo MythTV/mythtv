@@ -10,7 +10,8 @@ mythfrontend
 - D to delete in both "Watch a Recording" and "Delete a Recording".
 - I to edit recording options from the EPG, "Program Finder",
     "Program Rankings", or "Fix Scheduling Conflicts" screens.
-	From the Playback and Delete screens, 'I' edits the auto-expire status.
+    From the Playback and Delete screens, 'I' presents options
+    for recorded shows such as Auto Expire or Stop Recording.
 
 
 Watching TV or a recording

@@ -582,10 +582,10 @@ public:
        GlobalSetting("UseOutputPictureControls") {
        setLabel("Use Xv picture controls");
        setValue(false);
-       setHelpText("If set, this allows the user to change the Xv picture "
-                   "controls (brightness, hue, contrast, color) in addition "
-                   "to the normal support for the same v4l controls.  Breaks "
-                   "on some machines.");
+       setHelpText(QObject::tr("If set, Xv picture controls (brightness, "
+                   "contrast, etc.) are used during playback. These are "
+                   "independent of the v4l controls used for recording. The "
+                   "Xv controls may not work properly on some systems."));
     };
 };
 
