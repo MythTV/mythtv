@@ -966,12 +966,10 @@
         <fcnfont name="inactive_font" function="inactive"></fcnfont>
         <fcnfont name="active_font" function="selected"></fcnfont>
         <columnpadding>1</columnpadding>
-        <column number="1" width="35" context="-1"></column>
-        <column number="2" width="575" context="-1"></column>
+        <column number="1" width="75" context="-1"></column>
+        <column number="2" width="590" context="-1"></column>
         <column number="3" width="17" context="-1"></column>
         <column number="4" width="50" context="-1"></column>
-        <column number="5" width="17" context="-1"></column>
-        <column number="6" width="50" context="-1"></column>
         <items>9</items>
         <image function="selectionbar" filename="rec_priority/tit-trk-selectbar.png" location="-6,-2"></image>
         <image function="uparrow" filename="shared/up_arrow.png" location="755,22"></image>
@@ -984,34 +982,23 @@
     </container>
 
     <container name="channel_info">
-      <area>0,410,740,240</area>
-      
+      <area>0,414,800,240</area>
       <image name="icon" draworder="6">
         <position>20,0</position>
                <filename>blankicon.jpg</filename>
         <staticsize>60,60</staticsize>
       </image>
       <textarea name="title" draworder="6">
-        <area>30,12,740,40</area>
-        
+        <area>120,12,800,40</area>
         <font>title</font>
       </textarea>
-       <textarea name="infosource" draworder="6">
-          <area>30,65,100,30</area>
-          <font>info</font>
-          <value>Source:</value>
-        </textarea>
-        <textarea name="source" draworder="6">
-          <area>150,65,400,30</area>
-           <font>info</font>
-        </textarea>      
-        <textarea name="inforecpriority" draworder="6">
-        <area>20,100,100,30</area>
+      <textarea name="inforecpriority" draworder="6">
+        <area>20,90,160,30</area>
         <font>info</font>
         <value>Priority:</value>
       </textarea>
       <textarea name="recpriority" draworder="6">
-        <area>150,100,400,30</area>
+        <area>200,90,400,30</area>
         <font>info</font>
       </textarea>
     </container>
@@ -1448,7 +1435,7 @@
         <column number="3" width="110" context="0"></column>
         <column number="4" width="110" context="1"></column>
         <items>7</items>
-        <image function="selectionbar" filename="shared/long_bar.png" location="-13,-2"></image>
+        <image function="selectionbar" filename="shared/long_bar.png" location="-20,-12"></image>
         <image function="uparrow" draworder="6" filename="shared/up_arrow.png" location="752,18"></image>
         <image function="downarrow" draworder="6" filename="shared/down_arrow.png" location="752,249"></image>
       </listarea>
