@@ -4,7 +4,7 @@
 #include <qwidget.h>
 #include <qstring.h>
 
-#include <mythtv/mythwidgets.h>
+#include <mythtv/mythdialogs.h>
 
 class QImage;
 class QFont;

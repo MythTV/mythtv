@@ -9,7 +9,7 @@
 #include <vector>
 using namespace std;
 
-#include <mythtv/mythwidgets.h>
+#include <mythtv/mythdialogs.h>
 
 class QFont;
 
