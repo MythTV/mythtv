@@ -79,15 +79,15 @@ extern "C"
 
     struct MD5Context
     {
-        u_int32_t buf[4];
-        u_int32_t bytes[2];
-        u_int32_t in[16];
+        unsigned int buf[4];
+        unsigned int bytes[2];
+        unsigned int in[16];
     };
 
     void MD5Init(struct MD5Context *context);
     void MD5Update(struct MD5Context *context, md5byte const *buf, unsigned len);
     void MD5Final(unsigned char digest[16], struct MD5Context *context);
-    void MD5Transform(u_int32_t buf[4], u_int32_t const in[16]);
+    void MD5Transform(unsigned int buf[4], unsigned int const in[16]);
 
 #ifdef __cplusplus
 }

@@ -33,7 +33,10 @@
 
 #include <string.h>		/* for memcpy() */
 #include <sys/types.h>		/* for stupid systems */
+#ifndef WIN32
 #include <netinet/in.h>		/* for ntohl() */
+#endif
+
 #include "md5digest.h"
 
 
@@ -172,7 +175,7 @@ MD5Init(struct MD5Context *ctx)
 void
 MD5Update(struct MD5Context *ctx, md5byte const *buf, unsigned len)
 {
-    u_int32_t t;
+    unsigned int t;
 
     /* Update byte count */
 
@@ -263,9 +266,9 @@ MD5Final(md5byte digest[16], struct MD5Context *ctx)
  * the data and converts bytes into longwords for this routine.
  */
 void
-MD5Transform(u_int32_t buf[4], u_int32_t const in[16])
+MD5Transform(unsigned int buf[4], unsigned int const in[16])
 {
-    register u_int32_t a, b, c, d;
+    register unsigned int a, b, c, d;
 
     a = buf[0];
     b = buf[1];

@@ -14,18 +14,25 @@
 #include <qtimer.h>
 #include <qptrlist.h>
 #include <qthread.h>
+#include <qwidget.h>
+#include <qsocketdevice.h>
+#include <qdatetime.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifndef WIN32
 #include <sys/ioctl.h>
 #include <fcntl.h>
-
 #include <linux/videodev.h>
 #include <mythtv/mythwidgets.h>
 #include <mythtv/dialogbox.h>
+#endif
 
 #include "sipstack.h"
+
+#ifndef WIN32
 #include "vxml.h"
+#endif
 
 
 class SipEvent : public QCustomEvent
@@ -36,6 +43,19 @@ public:
     SipEvent(Type t) : QCustomEvent(t) {}
     ~SipEvent() {}
 
+};
+
+class SipDebugEvent : public QCustomEvent
+{
+public:
+    enum Type { SipDebugEv = (QEvent::User + 430), SipErrorEv, SipTraceRxEv, SipTraceTxEv  };
+
+    SipDebugEvent(Type t, QString s) : QCustomEvent(t) { text=s;}
+    ~SipDebugEvent() {}
+    QString msg() { return text;}
+
+private:
+    QString text;
 };
 
 
@@ -194,9 +214,15 @@ public:
 // Forward reference.
 class SipFsm;
 class SipTimer;
+class SipThread;
 class SipRegisteredUA;
 class SipRegistrar;
 class SipRegistration;
+class SipContainer;
+
+// Global variable ref
+extern SipContainer  *sipContainer;
+
 
 struct CodecNeg
 {
@@ -216,6 +242,7 @@ class SipContainer
     void UiOpened(QObject *);
     void UiClosed();
     void UiWatch(QStrList uriList);
+    void UiWatch(QString uri);
     void UiStopWatchAll();
     QString UiSendIMMessage(QString DestUrl, QString CallId, QString Msg);
     bool GetNotification(QString &type, QString &url, QString &param1, QString &param2);
@@ -223,28 +250,60 @@ class SipContainer
     int  GetSipState();
     void GetIncomingCaller(QString &u, QString &d, QString &l, bool &audOnly);
     void GetSipSDPDetails(QString &ip, int &aport, int &audPay, QString &audCodec, int &dtmfPay, int &vport, int &vidPay, QString &vidCodec, QString &vidRes);
+    void notifyRegistrationStatus(bool reg, QString To, QString As) { regStatus=reg; regTo=To; regAs=As;}
+    void notifyCallState(int s) { CallState=s;}
+    void notifySDPDetails(QString ip, int aport, int audPay, QString audCodec, int dtmfPay, int vport, int vidPay, QString vidCodec, QString vidRes)
+            { remoteIp=ip; remoteAudioPort=aport; audioPayload=audPay; audioCodec=audCodec;
+              dtmfPayload=dtmfPay; remoteVideoPort=vport; videoPayload=vidPay; videoCodec=vidCodec; videoRes=vidRes; }
+    void notifyCallerDetails(QString cU, QString cN, QString cUrl, bool inAudOnly)
+            { callerUser=cU; callerName=cN; callerUrl=cUrl; inAudioOnly=inAudOnly; }
+    bool killThread() { return killSipThread; }
 
-  protected:
-    static void *SipThread(void *p);
-    void SipThreadWorker();
 
   private:
+	SipThread *sipThread;
+    bool killSipThread;
+    int CallState;
+    bool regStatus;
+    QString regTo;
+    QString regAs;
+    QString callerUser, callerName, callerUrl;
+    bool inAudioOnly;
+    QString remoteIp;
+    int remoteAudioPort;
+    int remoteVideoPort;
+    int audioPayload;
+    int dtmfPayload;
+    int videoPayload;
+    QString audioCodec;
+    QString videoCodec;
+    QString videoRes;
+};
+
+
+
+class SipThread : public QThread
+{
+  public:
+	SipThread(SipContainer *c) { sipContainer = c;};
+	~SipThread() {};
+	virtual void run();
+
+  private:
+    void SipThreadWorker();
     void CheckUIEvents(SipFsm *sipFsm);
     void CheckNetworkEvents(SipFsm *sipFsm);
     void CheckRegistrationStatus(SipFsm *sipFsm);
     void ChangePrimaryCallState(SipFsm *sipFsm, int NewState);
 
-    pthread_t sipthread;
-    QStringList EventQ;
-    bool killSipThread;
+	SipContainer *sipContainer;
     bool FrontEndActive;
     bool vxmlCallActive;
+#ifndef WIN32
     vxmlParser *vxml;
     rtp *Rtp;
+#endif
     int CallState;
-    bool regStatus;
-    QString regTo;
-    QString regAs;
     QString callerUser, callerName, callerUrl;
     bool inAudioOnly;
     QString remoteIp;
@@ -284,6 +343,7 @@ class SipFsmBase
     QString retxIp;
     int retxPort;
     int t1;
+    bool sentAuthenticated;
     SipFsm   *parent;
 
     SipCallId CallId;
@@ -481,6 +541,7 @@ class SipFsm : public QWidget
 
     SipFsm(QWidget *parent = 0, const char * = 0);
     ~SipFsm(void);
+    static void Debug(SipDebugEvent::Type t, QString dbg);
     void NewCall(bool audioOnly, QString uri, QString DispName, QString videoMode, bool DisableNat);
     void HangUp(void);
     void Answer(bool audioOnly, QString videoMode, bool DisableNat);

@@ -40,7 +40,7 @@ public:
     void addRRCopy(QString RR)      { addGenericLine(RR); }
     void addCallId(SipCallId id);
     void addCSeq(int c);
-    void addContact(SipUrl contact);
+    void addContact(SipUrl contact, QString Methods="");
     void addUserAgent(QString ua="MythPhone");     
     void addAllow();
     void addEvent(QString Event);
@@ -158,6 +158,8 @@ public:
     QString getUser() { return thisUser; }
     QString getHost() { return thisHostname; }
     QString getHostIp() { return thisHostIp; }
+    QString formatReqLineUrl();
+    QString formatContactUrl();
     int getPort() { return thisPort; }
     void setHostIp(QString ip) { thisHostIp = ip; }
     void setPort(int p) { thisPort = p; }

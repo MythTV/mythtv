@@ -15,16 +15,24 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <iostream>
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifndef WIN32
+#include <unistd.h>
 #include <sys/ioctl.h>
 #include <netdb.h>
+#endif
+
+#ifdef WIN32
+#include <winsock2.h>
+#endif
 
 using namespace std;
 
+#ifndef WIN32
 #include "config.h"
+#endif
 #include "sipstack.h"
 #include "md5digest.h"
 
@@ -138,14 +146,7 @@ SipMsg &SipMsg::operator= (SipMsg &rhs)
  
 void SipMsg::addRequestLine(SipUrl &Url)
 {
-    Msg = thisMethod + " sip:";
-    if (Url.getUser().length() > 0)
-        Msg += Url.getUser() + "@";
-    Msg += Url.getHost();
-
-    if (Url.getPort() != 5060)
-        Msg += ":" + QString::number(Url.getPort()); 
-    Msg += " SIP/2.0\r\n";
+    Msg = thisMethod + " " + Url.formatReqLineUrl() + " SIP/2.0\r\n";
 }
 
 void SipMsg::addStatusLine(int Code)
@@ -193,9 +194,12 @@ void SipMsg::addCSeq(int c)
     Msg += QString("CSeq: ") + QString::number(c) + " " + thisMethod + "\r\n";
 }
 
-void SipMsg::addContact(SipUrl contact)
+void SipMsg::addContact(SipUrl contact, QString Methods)
 {
-    Msg += "Contact: " + contact.string() + "\r\n";
+    Msg += "Contact: " + contact.formatContactUrl();
+    if (Methods.length()>0)
+        Msg += ";methods=\"" + Methods + "\"";
+    Msg += "\r\n";
 }
 
 void SipMsg::addUserAgent(QString ua)
@@ -235,11 +239,11 @@ void SipMsg::addAuthorization(QString authMethod, QString Username, QString Pass
     else
         Msg += "Authorization: " + authMethod;
     Msg += " username=\"" + Username + "\"";
-    Msg += ",realm=\"" + Realm + "\"";
-    Msg += ",uri=\"" + Uri + "\"";
-    Msg += ",nonce=\"" + Nonce + "\"";
-    Msg += QString(",response=\"") + Response + "\"";
-    Msg += ",algorithm=md5\r\n";
+    Msg += ", realm=\"" + Realm + "\"";
+    Msg += ", uri=\"" + Uri + "\"";
+    Msg += ", nonce=\"" + Nonce + "\"";
+    Msg += QString(", response=\"") + Response + "\"";
+    Msg += ", algorithm=md5\r\n";
 }
 
 void SipMsg::addProxyAuthorization(QString authMethod, QString Username, QString Password, QString Realm, QString Nonce, QString Uri)
@@ -771,13 +775,35 @@ void SipUrl::encode()
 {
     QString PortStr = "";
     thisUrl = "";
-    PortStr = QString(":") + QString::number(thisPort); // Note; some proxies demand the port to be present even if it is 5060
+    if (thisPort != 5060) // Note; some proxies demand the port to be present even if it is 5060
+        PortStr = QString(":") + QString::number(thisPort); 
     if (thisDisplayName.length() > 0)                            
-        thisUrl = "\"" + thisDisplayName + "\"";
+        thisUrl = "\"" + thisDisplayName + "\" ";
     thisUrl += "<sip:";
     if (thisUser.length() > 0)
         thisUrl += thisUser + "@";
     thisUrl += thisHostname + PortStr + ">";
+}
+
+QString SipUrl::formatReqLineUrl()
+{
+    QString s("sip:");
+    if (thisUser.length() > 0)
+        s += thisUser + "@";
+    s += thisHostname;
+    if (thisPort != 5060)
+        s += ":" + QString::number(thisPort);
+    return s;
+}
+
+QString SipUrl::formatContactUrl()
+{
+    QString s("<sip:");
+    s += thisHostIp;
+    if (thisPort != 5060)
+        s += ":" + QString::number(thisPort);
+    s += ">";
+    return s;
 }
 
 SipUrl::~SipUrl()
