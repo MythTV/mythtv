@@ -34,6 +34,23 @@ using namespace std;
 #include "remoteutil.h"
 #include "jobqueue.h"
 
+static int comp_programid(ProgramInfo *a, ProgramInfo *b)
+{
+    if (a->programid == b->programid)
+    {
+	if (a->recstartts == b->recstartts)
+	    return 0;
+	if (a->recstartts < b->recstartts)
+	    return -1;
+	else
+	    return 1;
+    }
+    if (a->programid < b->programid)
+        return -1;
+    else
+        return 1;
+}
+
 PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent, 
                          const char *name)
            : MythDialog(parent, name)
@@ -1122,12 +1139,14 @@ bool PlaybackBox::FillList()
     // Save some information so we can find our place again.
     QString oldtitle = titleList[titleIndex];
     QString oldchanid;
+    QString oldprogramid;
     QDateTime oldstartts;
     p = progLists[oldtitle].at(progIndex);
     if (p)
     {
         oldchanid = p->chanid;
         oldstartts = p->startts;
+        oldprogramid = p->programid;
     }
 
     titleList.clear();
@@ -1200,6 +1219,18 @@ bool PlaybackBox::FillList()
 
     titleList = sortedList.values();
 
+    QString episodeSort = gContext->GetSetting("PlayBoxEpisodeSort", "Date");
+
+    if (episodeSort == "Id")
+    {
+        QMap<QString, ProgramList>::Iterator Iprog;
+        for (Iprog = progLists.begin(); Iprog != progLists.end(); ++Iprog)
+        {
+            if (!Iprog.key().isEmpty())
+                Iprog.data().Sort(comp_programid);
+        }
+    }
+
     // Try to find our old place in the title list.  Scan the new
     // titles backwards until we find where we were or go past.  This
     // is somewhat inefficient, but it works.
@@ -1234,7 +1265,12 @@ bool PlaybackBox::FillList()
         {
             p = l->at(i);
 
-            if (listOrder == 0 || type == Delete)
+            if (episodeSort == "Id")
+            {
+                if (oldprogramid >= p->programid)
+                    break;
+            }
+            else if (listOrder == 0 || type == Delete)
             {
                 if (oldstartts > p->startts)
                     break;

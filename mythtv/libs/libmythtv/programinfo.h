@@ -338,7 +338,8 @@ class ProgramList: public QPtrList<ProgramInfo> {
     };
 
  protected:
-    virtual int compareItems(ProgramInfo *p1, ProgramInfo *p2);
+    virtual int compareItems(QPtrCollection::Item item1,
+                             QPtrCollection::Item item2);
 
  private:
     CompareFunc compareFunc;

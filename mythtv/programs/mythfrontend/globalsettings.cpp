@@ -618,6 +618,28 @@ static GenericCheckBox *PlayBoxOrdering()
     return gc;
 }
 
+static GenericComboBox *PlayBoxEpisodeSort()
+{
+    GenericComboBox *gc = new GenericComboBox("PlayBoxEpisodeSort");
+    gc->setLabel(QObject::tr("Sort Episodes"));
+    gc->addSelection(QObject::tr("Record date"), "Date");
+    gc->addSelection(QObject::tr("Program ID"), "Id");
+    gc->setHelpText(QObject::tr("Selects how to sort a shows episodes"));
+    return gc;
+}
+
+class PlayBoxSettings: public HorizontalConfigurationGroup
+{
+  public:
+    PlayBoxSettings(void) : HorizontalConfigurationGroup(false, false)
+    {
+        setLabel(QObject::tr("Sort shows"));
+        setUseLabel(false);
+        addChild(PlayBoxOrdering());
+        addChild(PlayBoxEpisodeSort());
+    }
+};
+
 static GenericCheckBox *StickyKeys()
 {
     GenericCheckBox *gc = new GenericCheckBox("StickyKeys");
@@ -2733,7 +2755,7 @@ PlaybackSettings::PlaybackSettings()
 
     VerticalConfigurationGroup* pbox = new VerticalConfigurationGroup(false);
     pbox->setLabel(QObject::tr("View Recordings"));
-    pbox->addChild(PlayBoxOrdering());
+    pbox->addChild(new PlayBoxSettings());
     pbox->addChild(GeneratePreviewPixmaps());
     pbox->addChild(PreviewPixmapOffset());
     pbox->addChild(PlaybackPreview());

@@ -30,10 +30,10 @@
     </font>    
     
     <container name="menu">
-      <area>20,20,140,250</area>
+      <area>20,20,140,270</area>
 
       <listbtnarea name="menu" draworder="0">
-        <area>0,77,140,250</area>
+        <area>0,77,140,270</area>
         <gradient type="unselected" start="#DDDDFF" end="#505050" alpha="100">
         </gradient>
         <gradient type="selected" start="#DDDDFF" end="#909090" alpha="255">
@@ -58,7 +58,7 @@
     </container>
 
       <container name="view">
-      <area>150,77,680,550</area>
+      <area>160,77,680,550</area>
 
       <blackhole name="view" draworder="0">
             <area>0,0,680,550</area>
@@ -76,7 +76,7 @@
       </textarea>
 
       <textarea name="help2" draworder="1">
-        <area>225,480,225,35</area>
+        <area>225,480,325,35</area>
         <font>menu</font>
         <value>MENU: Activate Menu</value>
       </textarea>

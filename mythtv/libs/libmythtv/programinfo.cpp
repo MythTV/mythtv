@@ -2904,10 +2904,12 @@ bool ProgramList::FromRecord(QSqlDatabase *, const QString)
     return false;
 }
 
-int ProgramList::compareItems(ProgramInfo *p1, ProgramInfo *p2)
+int ProgramList::compareItems(QPtrCollection::Item item1,
+                              QPtrCollection::Item item2)
 {
     if (compareFunc)
-        return compareFunc(p1, p2);
+        return compareFunc(reinterpret_cast<ProgramInfo *>(item1),
+                           reinterpret_cast<ProgramInfo *>(item2));
     else
         return 0;
 }
