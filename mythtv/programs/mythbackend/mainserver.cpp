@@ -2828,6 +2828,17 @@ bool MainServer::isRingBufSock(QSocket *sock)
 
 void MainServer::masterServerDied(void)
 {
+    vector<PlaybackSock *>::iterator it = playbackList.begin();
+    for (; it != playbackList.end(); it++)
+    {
+        PlaybackSock *pbs = (*it);
+        if (pbs == masterServer)
+        {
+            playbackList.erase(it);
+            break;
+        }
+    }
+
     delete masterServer;
     masterServer = NULL;
     masterServerReconnect->start(1000, true);
