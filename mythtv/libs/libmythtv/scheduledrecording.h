@@ -111,8 +111,6 @@ public:
     // be recorded again)
     void forgetHistory(QSqlDatabase* db, const ProgramInfo& proginfo);
 
-    static bool hasChanged(QSqlDatabase* db);
-
     static void fillSelections(QSqlDatabase* db, SelectSetting* setting);
 
     static void signalChange(int recordid);

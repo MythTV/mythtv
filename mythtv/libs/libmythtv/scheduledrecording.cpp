@@ -391,32 +391,6 @@ void ScheduledRecording::signalChange(int recordid) {
     }
 }
 
-bool ScheduledRecording::hasChanged(QSqlDatabase* db) {
-    QString thequery;
-    
-    bool retval = false;
-
-    thequery = "SELECT data FROM settings WHERE value = \"RecordChanged\";";
-    QSqlQuery query = db->exec(thequery);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
-    {
-        query.next();
-
-        QString value = query.value(0).toString();
-        if (value == "yes")
-        {
-            thequery = "UPDATE settings SET data = \"no\" WHERE value = "
-                       "\"RecordChanged\";";
-            query = db->exec(thequery);
-
-            retval = true;
-        }
-    }
-
-    return retval;
-}
-
 void ScheduledRecording::doneRecording(QSqlDatabase* db, 
                                        const ProgramInfo& proginfo) 
 {
