@@ -1,9 +1,6 @@
 # Customized setings for lirc daemon
 # This is an example file for a Pinnacle Systems PCTV remote control
 # which uses a dumb IR receiver connected to COM1
-# A link has been created in dev by executing (as root)
-# [rootprompt] cd /dev
-# [rootprompt] ln -sf ttyS0 lirc/0
 
 # The hardware driver to use, run lircd --driver=? for a list
 
@@ -20,17 +17,15 @@ DRIVER=pinsys
 HWMOD=serial
 
 # The device node that communicates with the IR device.
-# If you are using a serial device, create a symlink between the actual
-# hardware device and the /dev/lirc/ entry
-# Example for receiver connected to COM1
-# <as root># cd /dev
-# <as root># ln -sf ttyS0 lirc/0
-# or <as root># ln -sf ttyS0 lirc/serial
+# If you are using a receiver that uses a hardware driver, devfs will
+# automatically create a file for you in /dev/lirc
+# If you're using a receiver that doesn't require a special driver
+# just use the actual device
 
-# If you are using devfs, use one of the following and create the symlink
-# as shown above
-DEVICE=/dev/lirc/0
+# If you are using devfs, use one of the following
+# DEVICE=/dev/lirc/0
 # DEVICE=/dev/lirc/serial
+DEVICE=/dev/ttyS0
 
 # Without devfs:
 # If you are using a serial device, create a symlink between the actual
