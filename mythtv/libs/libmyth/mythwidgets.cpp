@@ -1050,7 +1050,18 @@ void MythListBox::keyPressEvent(QKeyEvent* e)
             if (action == "UP" || action == "DOWN" || action == "PAGEUP" ||
                 action == "PAGEDOWN")
             {
-                QListBox::keyPressEvent(e);
+                int key;
+                if (action == "UP")
+                    key = Key_Up;
+                else if (action == "DOWN")
+                    key = Key_Down;
+                else if (action == "PAGEUP")
+                    key = Key_Prior;
+                else if (action == "PAGEDOWN")
+                    key = Key_Next;
+
+                QKeyEvent ev(QEvent::KeyPress, key, 0, Qt::NoButton);
+                QListBox::keyPressEvent(&ev);
                 handled = true;
             }
             else if (action == "MENU")
