@@ -191,8 +191,8 @@ void TTFFont::render_text(Raster_Map *rmap, Raster_Map *rchr, char *text,
            rtmp = rchr;
            clear_raster(rtmp);
 
-           origin.x = -xmin;
-           origin.y = -ymin;
+           origin.x = 0;
+           origin.y = 0;
 
            FT_Glyph_To_Bitmap(&glyphs[j], ft_render_mode_normal, &origin, 1);
            bmap = (FT_BitmapGlyph)(glyphs[j]);
