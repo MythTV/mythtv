@@ -95,12 +95,9 @@ void SingleView::paintEvent(QPaintEvent *e)
         QImage tmp1 = tmpimage.xForm(matrix);
         QImage tmp2;
  
-        if (newzoom > 1)
+        if (newzoom)
             tmp2 = tmp1.smoothScale(screenwidth * newzoom,
                                     screenheight * newzoom,
-                                    QImage::ScaleMax);
-        else if (newzoom)
-            tmp2 = tmp1.smoothScale(screenwidth, screenheight,
                                     QImage::ScaleMax);
         else 
             tmp2 = tmp1.smoothScale(screenwidth, screenheight,
@@ -228,13 +225,13 @@ void SingleView::keyPressEvent(QKeyEvent *e)
         case Key_7: // zoom out
         {
             handled = zoomfactor;
-            newzoom = (zoomfactor < 2) ? zoomfactor : (zoomfactor - 1);
+            newzoom = (zoomfactor < 2) ? zoomfactor : (zoomfactor / 2);
             break;
         }
         case Key_9: // zoom in
         {
             handled = true;
-            newzoom = zoomfactor ? (zoomfactor + 1) : 2;
+            newzoom = zoomfactor ? (zoomfactor * 2) : 2;
             timerrunning = false;
             break;
         }
@@ -345,6 +342,9 @@ void SingleView::advanceFrame(bool doUpdate)
     imagepos++;
     if (imagepos == (int)images->size())
         imagepos = 0;
+
+    if (imagepos == displaypos) // oops, we wrapped
+        return;
 
     if ((*images)[imagepos].isdir)
         advanceFrame(doUpdate);
