@@ -13,7 +13,7 @@ INSTALLS += target
 
 LIBS += -lmyth-$$LIBVERSION $$EXTRA_LIBS
 
-HEADERS += ../mythdvd/config.h
+HEADERS += ../mythdvd/config.h ../mythdvd/dbcheck.h
 
-SOURCES += main.cpp
+SOURCES += main.cpp ../mythdvd/dbcheck.cpp
 

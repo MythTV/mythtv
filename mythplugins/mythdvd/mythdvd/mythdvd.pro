@@ -20,8 +20,8 @@ INSTALLS += installfiles uifiles
 
 LIBS += 
 
-HEADERS += config.h settings.h 
+HEADERS += config.h settings.h dbcheck.h
 
-SOURCES += main.cpp settings.cpp
+SOURCES += main.cpp settings.cpp dbcheck.cpp
 
 

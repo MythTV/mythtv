@@ -5,6 +5,9 @@
       <text lang="DK">Genkodnings indstillinger</text>
       <text lang="PT">Configurações de Cópia</text>
       <text lang="DE">Rippen Einstellungen</text>
+      <text lang="SV">Inställningar för kopiering</text>
+      <text lang="ES">Opciones de "ripear"</text>
+      <text lang="CA">Opcions de volcat</text>
       <action>DVD_SETTINGS_RIP</action>
    </button>
 

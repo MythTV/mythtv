@@ -29,6 +29,7 @@ using namespace std;
 #include "config.h"
 #include "settings.h"
 #include "dvdripbox.h"
+#include "dbcheck.h"
 
 //
 //  Transcode stuff only if we were ./configure'd for it
@@ -244,6 +245,8 @@ int mythplugin_init(const char *libversion)
     if (!gContext->TestPopupVersion("mythdvd", libversion,
                                     MYTH_BINARY_VERSION))
         return -1;
+
+    UpgradeDVDDatabaseSchema();
 
     GeneralSettings gsettings;
     gsettings.load(QSqlDatabase::database());

@@ -5,9 +5,7 @@
       <text>Play DVD</text>
       <text lang="DK">Afspil DVD</text>
       <text lang="PT">Tocar DVD</text>
-      <text lang="SV">Spela DVD</text>
-      <text lang="ES">Ver DVD</text>
-      <text lang="CA">Veure DVD</text>
+      <text lang="DE">DVD spielen</text>
       <action>DVD_PLAY</action>
    </button>
 
@@ -17,9 +15,7 @@
       <text>Rip DVD</text>
       <text lang="DK">Genkod DVD</text>
       <text lang="PT">Copiar DVD</text>
-      <text lang="SV">Kopiera DVD</text>
-      <text lang="ES">"Ripear" DVD</text>
-      <text lang="CA">Volcar DVD</text>
+      <text lang="DE">DVD rippen</text>
       <action>DVD_RIP</action>
    </button>
 

@@ -20,6 +20,7 @@ using namespace std;
 #include <mythtv/mythcontext.h>
 
 #include "../mythdvd/config.h"
+#include "../mythdvd/dbcheck.h"
 #include "mtd.h"
 
 MythContext *gContext;
@@ -112,7 +113,9 @@ int main(int argc, char **argv)
         cerr << "mtd: Couldn't open database. I go away now. " << endl;
         return -1;
     }
-    
+
+    UpgradeDVDDatabaseSchema();
+ 
     //
     //  Figure out port to listen on
     //
