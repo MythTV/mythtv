@@ -89,6 +89,9 @@ ProgramRecPriority::ProgramRecPriority(QSqlDatabase *ldb, MythMainWindow *parent
     bgTransBackup = NULL;
     pageDowner = false;
 
+    channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
+    longChannelFormat = gContext->GetSetting("LongChannelFormat", "<num> <name>");
+
     listCount = 0;
     dataCount = 0;
 
@@ -941,8 +944,16 @@ void ProgramRecPriority::updateInfo(QPainter *p)
 
             type = (UITextType *)container->GetType("channel");
             if (type) {
-                if(curitem->channame != "")
-                    type->SetText(curitem->channame);
+                if(rectype != kAllRecord && rectype != kFindOneRecord)
+                    type->SetText(curitem->ChannelText(channelFormat));
+                else
+                    type->SetText(tr("Any"));
+            }
+
+            type = (UITextType *)container->GetType("longchannel");
+            if (type) {
+                if(rectype != kAllRecord && rectype != kFindOneRecord)
+                    type->SetText(curitem->ChannelText(longChannelFormat));
                 else
                     type->SetText(tr("Any"));
             }

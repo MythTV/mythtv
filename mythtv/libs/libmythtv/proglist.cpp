@@ -34,6 +34,7 @@ ProgLister::ProgLister(ProgListType pltype, const QString &view,
     timeFormat = gContext->GetSetting("ShortDateFormat") +
         " " + gContext->GetSetting("TimeFormat");
     channelOrdering = gContext->GetSetting("ChannelOrdering", "channum + 0");
+    channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
 
     allowEvents = true;
     allowUpdates = true;
@@ -88,8 +89,6 @@ ProgLister::ProgLister(ProgListType pltype, const QString &view,
     updateBackground();
 
     setNoErase();
-
-    displaychannum = gContext->GetNumSetting("DisplayChanNum");
 
     gContext->addListener(this);
 }
@@ -569,7 +568,8 @@ void ProgLister::fillViewList(const QString &view)
     if (type == plChannel) // list by channel
     {
         QString querystr = "SELECT channel.chanid, channel.channum, "
-            "channel.callsign FROM channel WHERE channel.visible = 1 "
+            "channel.callsign, channel.name FROM channel "
+            "WHERE channel.visible = 1 "
             "GROUP BY channum, callsign "
             "ORDER BY " + channelOrdering + ";";
         QSqlQuery query;
@@ -579,17 +579,15 @@ void ProgLister::fillViewList(const QString &view)
             while (query.next())
             {
                 QString chanid = query.value(0).toString();
-                QString chantext;
                 QString channum = query.value(1).toString();
-                if (!displaychannum)
-                    chantext="";
-                else if (channum != QString::null && channum != "")
-                    chantext = channum;
-                else
-                    chantext = "???";
                 QString chansign = query.value(2).toString();
-                if (chansign != QString::null && chansign != "")
-                    chantext = chantext + " " + chansign;
+                QString channame = query.value(3).toString();
+
+                QString chantext = channelFormat;
+                chantext.replace("<num>", channum)
+                    .replace("<sign>", chansign)
+                    .replace("<name>", channame);
+
                 viewList << chanid;
                 viewTextList << chantext;
                 viewCount++;
@@ -852,10 +850,7 @@ void ProgLister::updateList(QPainter *p)
                 ProgramInfo *pi = itemList.at(i+skip);
 
                 ltype->SetItemText(i, 1, pi->startts.toString(timeFormat));
-                if(displaychannum)
-                    ltype->SetItemText(i, 2, pi->chansign);
-                else
-                    ltype->SetItemText(i, 2, pi->chanstr + " " + pi->chansign);
+                ltype->SetItemText(i, 2, pi->ChannelText(channelFormat));
 
                 if (pi->subtitle == "")
                     tmptitle = pi->title;

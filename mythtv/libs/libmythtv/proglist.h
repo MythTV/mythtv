@@ -57,6 +57,7 @@ class ProgLister : public MythDialog
     QDateTime startTime;
     QString timeFormat;
     QString channelOrdering;
+    QString channelFormat;
 
     int curView;
     int viewCount;
@@ -97,8 +98,6 @@ class ProgLister : public MythDialog
     MythRemoteLineEdit *chooseLineEdit;
     MythPushButton *chooseOkButton;
     MythPushButton *chooseDeleteButton;
-
-    int displaychannum;
 };
 
 #endif

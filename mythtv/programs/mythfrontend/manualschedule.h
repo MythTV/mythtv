@@ -53,6 +53,7 @@ class ManualSchedule : public MythDialog
     QLabel *m_pixlabel;
     MythRemoteLineEdit *m_title;
     MythComboBox *m_channel;
+    QStringList m_chanids;
     MythRemoteLineEdit *m_subtitle;
     MythRemoteLineEdit *m_description;
     MythSpinBox *m_duration;

@@ -67,6 +67,9 @@ class ProgramRecPriority : public MythDialog
     XMLParse *theme;
     QDomElement xmldata;
 
+    QString channelFormat;
+    QString longChannelFormat;
+
     ProgramRecPriorityInfo *curitem;
 
     QSqlDatabase *db;

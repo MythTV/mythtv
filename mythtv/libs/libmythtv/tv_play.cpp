@@ -404,16 +404,10 @@ void TV::AskAllowRecording(const QStringList &messages, int timeuntil)
     QString chansign = messages[2];
     QString channame = messages[3];
 
-    QString channel;
-    if (gContext->GetNumSetting("DisplayChanNum") != 0)
-    {
-        if (channame != chansign)
-            channel = channame + " [" +  chansign + "]";
-        else
-            channel = channame;
-    }
-    else
-        channel = chanstr;
+    QString channel = gContext->GetSetting("ChannelFormat", "<num> <sign>");
+    channel.replace("<num>", chanstr)
+        .replace("<sign>", chansign)
+        .replace("<name>", channame);
     
     QString message = QObject::tr("MythTV wants to record \"%1\" on %2"
                                   " in %3 seconds. Do you want to:")

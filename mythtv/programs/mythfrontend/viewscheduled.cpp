@@ -29,7 +29,7 @@ ViewScheduled::ViewScheduled(QSqlDatabase *ldb, MythMainWindow *parent,
 
     dateformat = gContext->GetSetting("ShortDateFormat", "M/d");
     timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
-    displayChanNum = gContext->GetNumSetting("DisplayChanNum");
+    channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
     showAll = !gContext->GetNumSetting("ViewSchedShowLevel", 0);
 
     fullRect = QRect(0, 0, size().width(), size().height());
@@ -276,15 +276,11 @@ void ViewScheduled::updateList(QPainter *p)
 
                 QString temp;
 
-                if (displayChanNum)
-                    temp = p->chansign;
-                else
-                    temp = p->chanstr;
-                ltype->SetItemText(i, 1, temp);
-
                 temp = (p->recstartts).toString(dateformat);
                 temp += " " + (p->recstartts).toString(timeformat);
-                ltype->SetItemText(i, 2, temp);
+                ltype->SetItemText(i, 1, temp);
+
+                ltype->SetItemText(i, 2, p->ChannelText(channelFormat));
 
                 temp = p->title;
                 if ((p->subtitle).stripWhiteSpace().length() > 0)

@@ -1282,12 +1282,33 @@ public:
     };
 };
 
-class DisplayChanNum: public CheckBoxSetting, public GlobalSetting {
+class ChannelFormat: public ComboBoxSetting, public GlobalSetting {
 public:
-    DisplayChanNum():
-        GlobalSetting("DisplayChanNum") {
-        setLabel(QObject::tr("Display channel names instead of numbers"));
-        setValue(false);
+    ChannelFormat():
+        GlobalSetting("ChannelFormat") {
+        setLabel(QObject::tr("Channel format"));
+        addSelection(QObject::tr("number"), "<num>");
+        addSelection(QObject::tr("number callsign"), "<num> <sign>");
+        addSelection(QObject::tr("number name"), "<num> <name>");
+        addSelection(QObject::tr("callsign"), "<sign>");
+        addSelection(QObject::tr("name"), "<name>");
+        setHelpText(QObject::tr("Your preferred channel format."));
+        setValue(1);
+    };
+};
+
+class LongChannelFormat: public ComboBoxSetting, public GlobalSetting {
+public:
+    LongChannelFormat():
+        GlobalSetting("LongChannelFormat") {
+        setLabel(QObject::tr("Long Channel format"));
+        addSelection(QObject::tr("number"), "<num>");
+        addSelection(QObject::tr("number callsign"), "<num> <sign>");
+        addSelection(QObject::tr("number name"), "<num> <name>");
+        addSelection(QObject::tr("callsign"), "<sign>");
+        addSelection(QObject::tr("name"), "<name>");
+        setHelpText(QObject::tr("Your preferred long channel format."));
+        setValue(2);
     };
 };
 
@@ -2221,7 +2242,8 @@ GeneralSettings::GeneralSettings()
     general->addChild(new ChannelOrdering());
     general->addChild(new SmartChannelChange());
     general->addChild(new AdvancedRecord());
-    general->addChild(new DisplayChanNum());
+    general->addChild(new ChannelFormat());
+    general->addChild(new LongChannelFormat());
     addChild(general);
 
     VerticalConfigurationGroup* autoexp = new VerticalConfigurationGroup(false);

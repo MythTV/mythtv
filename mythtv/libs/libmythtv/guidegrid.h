@@ -144,7 +144,7 @@ class GuideGrid : public MythDialog
 
     bool selectState;
     bool showFavorites;
-    bool displaychannum;
+    QString channelFormat;
 
     int desiredDisplayChans;
     int DISPLAY_CHANS;

@@ -140,7 +140,6 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
 
     playbackPreview = gContext->GetNumSetting("PlaybackPreview");
     generatePreviewPixmap = gContext->GetNumSetting("GeneratePreviewPixmaps");
-    displayChanNum = gContext->GetNumSetting("DisplayChanNum");
     dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
     timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
 

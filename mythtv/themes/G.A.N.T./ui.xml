@@ -666,10 +666,10 @@
         <fcnfont name="record_font" function="recording"></fcnfont>
         <fcnfont name="active_font" function="selected"></fcnfont>
         <columnpadding>10</columnpadding>
-        <column number="1" width="60" context="-1"></column>
-        <column number="2" width="170" context="-1"></column>
-        <column number="3" width="440" context="-1"></column>
-        <column number="4" width="30" context="-1"></column>
+        <column number="1" width="150" context="-1"></column>
+        <column number="2" width="110" context="-1"></column>
+        <column number="3" width="430" context="-1"></column>
+        <column number="4" width="20" context="-1"></column>
         <items>9</items>
         <image function="selectionbar" filename="cr-selectbar.png" location="-14,-5"></image>
         <image function="uparrow" filename="uparrow.png" location="755,22"></image>
@@ -687,37 +687,21 @@
         <area>20,0,800,40</area>
         <font>title</font>
       </textarea>
-      <textarea name="subtitle" draworder="6">
-        <area>20,40,579,30</area>
-        <font>info</font>
-      </textarea>
-      <textarea name="infotime" draworder="6">
-        <area>20,70,160,30</area>
-        <font>info</font>
-        <value>Airdate:</value>
-      </textarea>
-      <textarea name="timedate" draworder="6">
-        <area>180,70,600,30</area>
-        <font>info</font>
-      </textarea>
-      <textarea name="infochan" draworder="6">
-        <area>20,100,160,30</area>
-        <font>info</font>
-        <value>Channel:</value>
-      </textarea>
       <textarea name="channel" draworder="6">
-        <area>180,100,400,30</area>
+        <area>20,40,120,30</area>
         <font>info</font>
       </textarea>
-      <textarea name="infodesc" draworder="6">
-        <area>20,130,160,30</area>
+      <textarea name="time" draworder="6">
+        <area>160,40,420,30</area>
         <font>info</font>
-        <value>Description:</value>
+	<value>%STARTDATE%, %STARTTIME% - %ENDTIME%</value>
       </textarea>
-      <textarea name="description" draworder="6">
-        <area>180,130,600,80</area>
+      <textarea name="subdescr" draworder="6">
+        <area>20,70,560,140</area>
         <font>info</font>
-        <multiline>yes</multiline>
+	<multiline>yes</multiline>
+	<value>%SUBTITLE|"|"
+%%DESCRIPTION%</value>
       </textarea>
     </container>
 
@@ -827,10 +811,9 @@
         <fcnfont name="inactive_font" function="inactive"></fcnfont>
         <fcnfont name="active_font" function="selected"></fcnfont>
         <columnpadding>1</columnpadding>
-        <column number="1" width="75" context="-1"></column>
-        <column number="2" width="590" context="-1"></column>
-        <column number="3" width="17" context="-1"></column>
-        <column number="4" width="50" context="-1"></column>
+        <column number="1" width="665" context="-1"></column>
+        <column number="2" width="17" context="-1"></column>
+        <column number="3" width="50" context="-1"></column>
         <items>11</items>
         <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>
         <image function="uparrow" filename="uparrow.png" location="755,22"></image>
@@ -1054,7 +1037,7 @@
         <font>info</font>
         <value>Channel:</value>
       </textarea>
-      <textarea name="channel" draworder="6">
+      <textarea name="longchannel" draworder="6">
         <area>200,100,400,30</area>
         <font>info</font>
       </textarea>
@@ -1283,40 +1266,22 @@
         <area>20,0,579,45</area>
         <font>title</font>
       </textarea>
-      <textarea name="subtitle" draworder="6">
-        <area>20,40,579,30</area>
-        <altarea>20,40,779,30</altarea>
-        <font>info</font>
-      </textarea>
-      <textarea name="infotime" draworder="6">
-        <area>20,70,160,30</area>
-        <font>info</font>
-        <value>Airdate:</value>
-      </textarea>
-      <textarea name="timedate" draworder="6">
-        <area>180,70,430,30</area>
-        <altarea>180,70,600,30</altarea>
-        <font>info</font>
-      </textarea>
-      <textarea name="infochan" draworder="6">
-        <area>20,100,160,30</area>
-        <font>info</font>
-        <value>Channel:</value>
-      </textarea>
       <textarea name="channel" draworder="6">
-        <area>180,100,400,30</area>
+        <area>20,40,120,30</area>
         <font>info</font>
       </textarea>
-      <textarea name="infodesc" draworder="6">
-        <area>20,130,160,30</area>
+      <textarea name="time" draworder="6">
+        <area>160,40,420,30</area>
         <font>info</font>
-        <value>Description:</value>
+	<value>%STARTDATE%, %STARTTIME% - %ENDTIME%</value>
       </textarea>
-      <textarea name="description" draworder="6">
-        <area>180,130,600,120</area>
-        <altarea>180,130,600,90</altarea>
+      <textarea name="subdescr" draworder="6">
+        <area>20,70,560,180</area>
+        <altarea>20,70,580,150</altarea>
         <font>info</font>
-        <multiline>yes</multiline>
+	<multiline>yes</multiline>
+	<value>%SUBTITLE|"|"
+%%DESCRIPTION%</value>
       </textarea>
 
       <image name="commflagged" draworder="6">
@@ -1349,39 +1314,22 @@
         <area>20,0,579,40</area>
         <font>title</font>
       </textarea>
-      <textarea name="subtitle" draworder="6">
-        <area>20,40,579,30</area>
-        <font>info</font>
-      </textarea>
-      <textarea name="infotime" draworder="6">
-        <area>20,70,160,30</area>
-        <font>info</font>
-        <value>Airdate:</value>
-      </textarea>
-      <textarea name="timedate" draworder="6">
-        <area>180,70,430,30</area>
-        <altarea>180,70,600,30</altarea>
-        <font>info</font>
-      </textarea>
-      <textarea name="infochan" draworder="6">
-        <area>20,100,160,30</area>
-        <font>info</font>
-        <value>Channel:</value>
-      </textarea>
       <textarea name="channel" draworder="6">
-        <area>180,100,400,30</area>
+        <area>20,40,120,30</area>
         <font>info</font>
       </textarea>
-      <textarea name="infodesc" draworder="6">
-        <area>20,130,160,30</area>
+      <textarea name="time" draworder="6">
+        <area>160,40,420,30</area>
         <font>info</font>
-        <value>Description:</value>
+	<value>%STARTDATE%, %STARTTIME% - %ENDTIME%</value>
       </textarea>
-      <textarea name="description" draworder="6">
-        <area>180,130,600,90</area>
-        <altarea>180,130,600,90</altarea>
+      <textarea name="subdescr" draworder="6">
+        <area>20,70,560,180</area>
+        <altarea>20,70,580,150</altarea>
         <font>info</font>
-        <multiline>yes</multiline>
+	<multiline>yes</multiline>
+	<value>%SUBTITLE|"|"
+%%DESCRIPTION%</value>
       </textarea>
     </container>
 
@@ -1711,9 +1659,9 @@
         <fcnfont name="record_font" function="recording"></fcnfont>
         <fcnfont name="conflict_font" function="conflicting"></fcnfont>
         <columnpadding>5</columnpadding>
-        <column number="1" width="170" context="-1"></column>
-        <column number="2" width="145" context="-1"></column>
-        <column number="3" width="435" context="-1"></column>
+        <column number="1" width="150" context="-1"></column>
+        <column number="2" width="110" context="-1"></column>
+        <column number="3" width="460" context="-1"></column>
         <items>11</items>
         <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>
         <image function="uparrow" filename="uparrow.png" location="755,22"></image>
@@ -1731,14 +1679,21 @@
         <area>20,0,800,50</area>
         <font>title</font>
       </textarea>
-      <textarea name="subtitle" draworder="6">
-        <area>20,40,579,30</area>
+      <textarea name="channel" draworder="6">
+        <area>20,40,120,30</area>
         <font>info</font>
       </textarea>
-      <textarea name="description" draworder="6">
-        <area>20,70,579,90</area>
+      <textarea name="time" draworder="6">
+        <area>160,40,420,30</area>
         <font>info</font>
-       <multiline>yes</multiline>
+	<value>%STARTDATE%, %STARTTIME% - %ENDTIME%</value>
+      </textarea>
+      <textarea name="subdescr" draworder="6">
+        <area>20,70,560,90</area>
+        <font>info</font>
+	<multiline>yes</multiline>
+	<value>%SUBTITLE|"|"
+%%DESCRIPTION%</value>
       </textarea>
       <textarea name="type" draworder="6">
         <area>20,160,430,30</area>

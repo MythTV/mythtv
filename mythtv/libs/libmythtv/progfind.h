@@ -39,6 +39,7 @@ class ProgFinder : public MythDialog
         QString endDisplay;
         QString channelNum;
         QString channelCallsign;
+        QString channelName;
         QString starttime;
         QString endtime;
 	QDateTime startdatetime;
@@ -145,10 +146,9 @@ class ProgFinder : public MythDialog
 
     QString dateFormat;
     QString timeFormat;
+    QString channelFormat;
 
     bool allowkeypress;
-
-    int displaychannum;
 };
 
 class JaProgFinder : public ProgFinder

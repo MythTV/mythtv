@@ -12,10 +12,12 @@ class ChannelInfo
    ~ChannelInfo() { if (icon) delete icon; }
 
     void LoadIcon(int size);
+    QString Text(QString format);
 
     QString callsign;
     QString iconpath;
     QString chanstr;
+    QString channame;
     int chanid;
     int favid;
     QString recpriority;

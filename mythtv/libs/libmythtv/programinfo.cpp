@@ -283,6 +283,10 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
     QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
     QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
     QString shortDateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
+    QString channelFormat = 
+        gContext->GetSetting("ChannelFormat", "<num> <sign>");
+    QString longChannelFormat = 
+        gContext->GetSetting("LongChannelFormat", "<num> <name>");
 
     QDateTime timeNow = QDateTime::currentDateTime();
 
@@ -314,6 +318,8 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
     progMap["recenddate"] = recendts.toString(shortDateFormat);
     progMap["channum"] = chanstr;
     progMap["chanid"] = chanid;
+    progMap["channel"] = ChannelText(channelFormat);
+    progMap["longchannel"] = ChannelText(longChannelFormat);
     progMap["iconpath"] = "";
 
     seconds = recstartts.secsTo(recendts);
@@ -349,16 +355,6 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
                           recendts.time().toString(timeFormat);
 
     progMap["time"] = timeNow.time().toString(timeFormat);
-
-    if (gContext->GetNumSetting("DisplayChanNum") != 0)
-    {
-        if (channame != chansign)
-            progMap["channel"] = channame + " [" + chansign + "]";
-        else
-            progMap["channel"] = channame;
-    }
-    else
-        progMap["channel"] = chanstr;
 
     QString thequery = QString("SELECT icon FROM channel WHERE chanid = %1")
                                .arg(chanid);
@@ -1623,9 +1619,11 @@ QString ProgramInfo::RecStatusChar(void)
         return "D";
     case rsStopped:
         return "S";
-    case rsWillRecord:
-        return QString::number(cardid);
+    case rsRecorded:
+        return "R";
     case rsRecording:
+        return QString::number(cardid);
+    case rsWillRecord:
         return QString::number(cardid);
     case rsManualOverride:
         return "X";
@@ -1791,6 +1789,15 @@ QString ProgramInfo::RecStatusDesc(void)
     }
 
     return message;
+}
+
+QString ProgramInfo::ChannelText(QString format)
+{
+    format.replace("<num>", chanstr)
+        .replace("<sign>", chansign)
+        .replace("<name>", channame);
+
+    return format;
 }
 
 void ProgramInfo::FillInRecordInfo(vector<ProgramInfo *> &reclist)

@@ -57,7 +57,7 @@ class ViewScheduled : public MythDialog
     bool conflictBool;
     QString dateformat;
     QString timeformat;
-    bool displayChanNum;
+    QString channelFormat;
 
     QRect listRect;
     QRect infoRect;

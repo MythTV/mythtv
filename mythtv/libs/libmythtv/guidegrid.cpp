@@ -170,7 +170,8 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
     unknownTitle = gContext->GetSetting("UnknownTitle", "Unknown");
     unknownCategory = gContext->GetSetting("UnknownCategory", "Unknown");
     currentTimeColor = gContext->GetSetting("EPGCurrentTimeColor", "red");
-    displaychannum = gContext->GetNumSetting("DisplayChanNum");
+    channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
+    channelFormat.replace(" ", "\n");
 
     UIBarType *type = NULL;
     container = theme->GetSet("chanbar");
@@ -511,8 +512,8 @@ void GuideGrid::fillChannelInfos(int &maxchannel, bool gotostartchannel)
     QSqlQuery query;
 
     QString queryall = "SELECT channel.channum, channel.callsign, "
-                       "channel.icon, channel.chanid, favorites.favid "
-                       "FROM channel LEFT JOIN favorites ON "
+                       "channel.icon, channel.chanid, favorites.favid, "
+                       "channel.name FROM channel LEFT JOIN favorites ON "
                        "favorites.chanid = channel.chanid WHERE visible = 1 "
                        "GROUP BY channum, callsign "
                        "ORDER BY " + channelOrdering + ";";
@@ -520,8 +521,8 @@ void GuideGrid::fillChannelInfos(int &maxchannel, bool gotostartchannel)
     if (showFavorites)
     {
         queryfav = "SELECT channel.channum, channel.callsign, "
-                   "channel.icon, channel.chanid, favorites.favid "
-                   "FROM favorites, channel WHERE "
+                   "channel.icon, channel.chanid, favorites.favid, "
+                   "channel.name FROM favorites, channel WHERE "
                    "channel.chanid = favorites.chanid and visible = 1 "
                    "ORDER BY " + channelOrdering + ";";
 
@@ -563,6 +564,9 @@ void GuideGrid::fillChannelInfos(int &maxchannel, bool gotostartchannel)
                 val.chanstr = "";
                 val.chanid = query.value(3).toInt();
                 val.favid = query.value(4).toInt();
+                val.channame = query.value(5).toString();
+                if (val.channame == QString::null)
+                    val.channame = "";
                 val.icon = NULL;
         
                 if (gotostartchannel && val.chanstr == m_startChanStr && !set)
@@ -1049,11 +1053,7 @@ void GuideGrid::paintChannels(QPainter *p)
                 type->ResetImage(y);
             }
 
-            if (!displaychannum)
-                write = chinfo->chanstr + "\n";
-        
-            write = write + callsignstr;
-            type->SetText(y, write);
+            type->SetText(y, chinfo->Text(channelFormat));
         }
     }
 

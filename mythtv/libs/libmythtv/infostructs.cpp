@@ -46,3 +46,13 @@ void ChannelInfo::LoadIcon(int size)
             icon->convertFromImage(tempimage);
     }
 }
+
+QString ChannelInfo::Text(QString format)
+{
+    format.replace("<num>", chanstr)
+        .replace("<sign>", callsign)
+        .replace("<name>", channame);
+
+    return format;
+}
+

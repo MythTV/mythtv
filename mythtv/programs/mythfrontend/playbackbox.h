@@ -175,7 +175,6 @@ class PlaybackBox : public MythDialog
     bool graphicPopup;
     bool playbackPreview;
     bool generatePreviewPixmap;
-    bool displayChanNum;
     QString dateformat;
     QString timeformat;
 

@@ -88,7 +88,8 @@ ChannelRecPriority::ChannelRecPriority(QSqlDatabase *ldb,
     inData = 0;
     setNoErase();
 
-    displaychannum = gContext->GetNumSetting("DisplayChanNum");
+    longchannelformat = 
+        gContext->GetSetting("LongChannelFormat", "<num> <name>");
 
     gContext->addListener(this);
 }
@@ -408,7 +409,7 @@ void ChannelRecPriority::FillList(void)
     channelData.clear();
 
     QString query = QString("SELECT chanid, channum, callsign, icon, "
-                            "recpriority FROM channel;");
+                            "recpriority, name FROM channel;");
 
     QSqlQuery result = db->exec(query);
 
@@ -421,6 +422,7 @@ void ChannelRecPriority::FillList(void)
             chaninfo->callsign = result.value(2).toString();
             chaninfo->iconpath = result.value(3).toString();
             chaninfo->recpriority = result.value(4).toString();
+            chaninfo->channame = result.value(5).toString();
             channelData[QString::number(cnt)] = *chaninfo;
 
             // save recording priority value in map so we don't have to save 
@@ -575,16 +577,14 @@ void ChannelRecPriority::updateList(QPainter *p)
                             ltype->SetItemCurrent(cnt);
                         }
 
-                        if(displaychannum)
-                            ltype->SetItemText(cnt, 1, "");
-                        else
-                            ltype->SetItemText(cnt, 1, chanInfo->chanstr);
-                        ltype->SetItemText(cnt, 2, chanInfo->callsign);
+                        ltype->SetItemText(cnt, 1, 
+                                           chanInfo->Text(longchannelformat));
+
                         if (chanInfo->recpriority.toInt() > 0)
-                            ltype->SetItemText(cnt, 3, "+");
+                            ltype->SetItemText(cnt, 2, "+");
                         else if (chanInfo->recpriority.toInt() < 0)
-                            ltype->SetItemText(cnt, 3, "-");
-                        ltype->SetItemText(cnt, 4, 
+                            ltype->SetItemText(cnt, 2, "-");
+                        ltype->SetItemText(cnt, 3, 
                                            QString::number(abs(recPriority)));
 
                         cnt++;
@@ -652,7 +652,7 @@ void ChannelRecPriority::updateInfo(QPainter *p)
 
             UITextType *type = (UITextType *)container->GetType("title");
             if (type)
-                type->SetText(curitem->callsign);
+                type->SetText(curitem->Text(longchannelformat));
  
             type = (UITextType *)container->GetType("recpriority");
             if (type) {

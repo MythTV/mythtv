@@ -179,6 +179,7 @@ class ProgramInfo
     void FillInRecordInfo(vector<ProgramInfo *> &reclist);
     void EditScheduled(QSqlDatabase *db);
     void EditRecording(QSqlDatabase *db);
+    QString ChannelText(QString);
 
     int getProgramFlags(QSqlDatabase *db);
 

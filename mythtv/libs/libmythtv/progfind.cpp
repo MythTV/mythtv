@@ -70,7 +70,7 @@ ProgFinder::ProgFinder(MythMainWindow *parent, const char *name)
     curSearch = 10;
     searchCount = 37;
 
-    displaychannum = gContext->GetNumSetting("DisplayChanNum");
+    channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
 }
 
 void ProgFinder::Initialize(void)
@@ -333,9 +333,12 @@ void ProgFinder::updateInfo(QPainter *p)
         QString channame = "";
         QString recording = "";
 
-        if(!displaychannum)
-           channum = showData[curShow].channelNum;
-        channame = showData[curShow].channelCallsign;
+        if (channelFormat.contains("<num>"))
+            channum = showData[curShow].channelNum;
+        if (channelFormat.contains("<sign>"))
+            channame = showData[curShow].channelCallsign;
+        else if (channelFormat.contains("<name>"))
+            channame = showData[curShow].channelName;
         title = progData[curProgram];
         timedate = showData[curShow].startDisplay + " - " +
                    showData[curShow].endDisplay;
@@ -1254,7 +1257,7 @@ void ProgFinder::selectShowData(QString progTitle)
     QSqlQuery query(QString::null, m_db);
     query.prepare("SELECT subtitle,starttime,channel.channum,"
                   "channel.callsign,description,endtime,channel.chanid,"
-                  "channel.sourceid "
+                  "channel.sourceid,channel.name "
                   "FROM program,channel "
                   "WHERE program.title = :TITLE AND "
                   "program.chanid = channel.chanid "
@@ -1316,6 +1319,7 @@ void ProgFinder::selectShowData(QString progTitle)
             showData[showCount].subtitle = QString::fromUtf8(query.value(0).toString());
             showData[showCount].description = QString::fromUtf8(query.value(4).toString());
             showData[showCount].channelID = query.value(6).toString();
+            showData[showCount].channelName = query.value(8).toString();
             showData[showCount].starttime = progStart.toString("yyyyMMddhhmm");
             showData[showCount].endtime = progEnd.toString("yyyyMMddhhmm");
             rectype = checkRecordingStatus(showCount);

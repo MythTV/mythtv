@@ -77,7 +77,7 @@ class ChannelRecPriority : public MythDialog
 
     SortType sortType;
 
-    int displaychannum;
+    QString longchannelformat;
 };
 
 #endif

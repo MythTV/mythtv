@@ -74,14 +74,24 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
 
     QString chanorder = gContext->GetSetting("ChannelOrdering", "channum + 0");
 
-    QString thequery= QString("SELECT name FROM channel ORDER BY %1;").arg(chanorder);
+    QString thequery= QString("SELECT chanid, channum, callsign, name "
+                              "FROM channel GROUP BY channum, callsign "
+                              "ORDER BY %1;").arg(chanorder);
 
     query.exec(thequery);
 
+    QString longChannelFormat = 
+        gContext->GetSetting("LongChannelFormat", "<num> <name>");
+
     if (query.isActive() && query.numRowsAffected()) {
       while(query.next()) {
-	QString channel = QString::fromUtf8(query.value(0).toString());
-	m_channel->insertItem(channel);
+          QString channel = longChannelFormat;
+          channel.replace("<num>", query.value(1).toString())
+              .replace("<sign>", query.value(2).toString())
+              .replace("<name>", 
+                       QString::fromUtf8(query.value(3).toString()));
+          m_channel->insertItem(channel);
+          m_chanids << query.value(0).toString();
       }
       
     }
@@ -264,6 +274,9 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
     connect(m_saveButton, SIGNAL(clicked()), this, SLOT(saveClicked()));
     connect(m_exitButton, SIGNAL(clicked()), this, SLOT(exitClicked()));
     connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+
+    m_channel->setFocus();
+    channelChanged();
     
     gContext->addListener(this);
 }
@@ -474,18 +487,19 @@ void ManualSchedule::saveScheduledRecording(void)
 
     QSqlQuery query;
 
-    QString channame=m_channel->currentText();
+    QString chanid = m_chanids[m_channel->currentItem()];
 
-    QString thequery=QString("SELECT chanid FROM channel WHERE name=\"%1\";")
-                            .arg(channame.utf8());
+    QString thequery=QString("SELECT channum, callsign, name FROM channel "
+                             "WHERE chanid=%1;").arg(chanid);
 
     query.exec(thequery);
     
     if (query.isActive() && query.numRowsAffected() && query.next()) {
       
-      QString chanid = query.value(0).toString();
-
       progInfo.chanid = chanid;
+      progInfo.chanstr = query.value(0).toString();
+      progInfo.chansign = query.value(1).toString();
+      progInfo.channame = query.value(2).toString();
 
       cout << "Record scheduled on channel " 
            << chanid << " - " << m_channel->currentText()
@@ -493,7 +507,7 @@ void ManualSchedule::saveScheduledRecording(void)
 	   << progInfo.startts.toString("yyyy/MM/dd hh:mm") 
            << " to "
 	   << progInfo.endts.toString("hh:mm") << endl;
-      
+
       progInfo.Save(db);
       
       progInfo.ApplyRecordStateChange(db, kSingleRecord);

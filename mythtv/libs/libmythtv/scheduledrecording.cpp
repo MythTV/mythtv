@@ -378,7 +378,7 @@ bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
         .arg(kAllRecord)
         .arg(kFindOneRecord)
         .arg(chanid)
-        .arg(station->getValue().utf8())
+        .arg(chansign)
         .arg(kChannelRecord)
         .arg(proginfo->startts.time().toString(Qt::ISODate))
         .arg(proginfo->endts.time().toString(Qt::ISODate));
