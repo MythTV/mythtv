@@ -130,6 +130,12 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
 
     own_vidbufs = false;
 
+    killvideo = false;
+    pausevideo = false;
+
+    killaudio = false;
+    pauseaudio = false;
+
     pthread_mutex_init(&eventLock, NULL);
 }
 
@@ -1285,9 +1291,6 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     int pause_rpos = 0;
     unsigned char *pause_buf = new unsigned char[video_size];
 
-    killvideo = false;
-    pausevideo = false;
-
     while (!eof && !killvideo)
     {
         if (needsetpipplayer)
@@ -1482,9 +1485,6 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
     unsigned char zeros[1024];
     
     bzero(zeros, 1024);
-
-    killaudio = false;
-    pauseaudio = false;
 
     while (!eof && !killaudio)
     {
