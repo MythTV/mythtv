@@ -564,8 +564,6 @@ void RingBuffer::CalcReadAheadThresh(int estbitrate)
     if (fill_min == 0)
         fill_min = -1;
 
-cout << fill_threshold << " " << fill_min << endl;
-
     pthread_rwlock_unlock(&rwlock);
 }
 
@@ -678,7 +676,7 @@ void RingBuffer::ReadAheadThread(void)
         if (pausereadthread)
         {
             readaheadpaused = true;
-            usleep(100);
+            usleep(500);
             totfree = ReadBufFree();
             continue;
         }
@@ -780,7 +778,7 @@ void RingBuffer::ReadAheadThread(void)
 
         pthread_rwlock_unlock(&rwlock);
 
-        if (totfree < READ_AHEAD_BLOCK_SIZE || wantseek)
+        if (readsallowed || wantseek)
             usleep(500);
     }
 
