@@ -147,7 +147,8 @@ DatabaseBox::~DatabaseBox()
 
     all_music->resetListings();
 
-    gContext->GetLCDDevice()->switchToTime();
+    if (class LCD * lcd = LCD::Get())
+        lcd->switchToTime();
 
     delete rootNode;
 }
@@ -164,13 +165,16 @@ void DatabaseBox::showWaiting()
 
         QString a_string = tr("All My Music ~ Loading Music Data ");
 
-        // Set Loading Message on the LCD
-        QPtrList<LCDTextItem> textItems;
-        textItems.setAutoDelete(true);
+        if (class LCD * lcd = LCD::Get())
+        {
+            // Set Loading Message on the LCD
+            QPtrList<LCDTextItem> textItems;
+            textItems.setAutoDelete(true);
 
-        textItems.append(new LCDTextItem(1, ALIGN_CENTERED, 
-                         tr("Loading Music Data"), "Generic", false));
-        gContext->GetLCDDevice()->switchToGeneric(&textItems);
+            textItems.append(new LCDTextItem(1, ALIGN_CENTERED, 
+                             tr("Loading Music Data"), "Generic", false));
+            lcd->switchToGeneric(&textItems);
+        }
 
         for (int i = 0; i < numb_wait_dots; i++)
             a_string += ".";
@@ -1302,6 +1306,10 @@ void ReadCDThread::run()
 
 void DatabaseBox::updateLCDMenu(QKeyEvent * e)
 {
+    class LCD * lcd = LCD::Get();
+    if (lcd == NULL)
+        return;
+
     // Update the LCD with a menu of items
     UIListGenericTree *curItem = tree->GetCurrentPosition();
 
@@ -1321,14 +1329,14 @@ void DatabaseBox::updateLCDMenu(QKeyEvent * e)
         buildMenuTree(menuItems, item_ptr, 1);
 
     if (!menuItems->isEmpty())
-        gContext->GetLCDDevice()->switchToMenu(menuItems, "MythMusic", false);
+        lcd->switchToMenu(menuItems, "MythMusic", false);
 
     //release the container
     delete menuItems;
 
     //Were done, so switch back to the time display
     if (e->key() == Key_Escape)
-        gContext->GetLCDDevice()->switchToTime();
+        lcd->switchToTime();
 }
 
 LCDMenuItem *DatabaseBox::buildLCDMenuItem(TreeCheckItem *item_ptr, 
