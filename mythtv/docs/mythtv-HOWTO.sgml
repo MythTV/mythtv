@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-05-22, v2.36
+<date>2003-05-25, v2.37
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2742,20 +2742,26 @@ information.
 
 Once at the <tt>(gdb)</tt> prompt, type <tt>run</tt> to start program
 execution.  When the program segfaults or appears to lock-up (press CTRL-C),
-type <tt>thread apply all bt full</tt>.
+type 
+<tscreen><verb>(gdb) thread apply all bt full
+</verb></tscreen>
 
 The backtrace information for all the threads should be posted to the
 mythtv-dev mailing list, along with the steps you followed to get the
 program to crash.
 
 If you're trying to troubleshoot and you can't get back to the gdb window
-for some reason, it may be easier to use two systems.
+for some reason, it may be easier to use two systems or to start
+mythfrontend from the text console.
 
-First, connect to the system that you're going to test using <bf/ssh</> or
-<bf/telnet/>, then type <tt>$ export DISPLAY=localhost:0.0</tt>.  This will
-allow the grpahics to be displayed on one machine (the one that you're
-testing) and still have text-mode output available.  You can now continue
-troubleshooting using <bf/gdb/> as detailed in the instructions.
+If you're going to troubleshoot from a remote system, connect to the machine
+that you're going to test using <bf/ssh</> or <bf/telnet</>. Next, type
+<tt>$ export DISPLAY=localhost:0.0</tt>.  This will allow the graphics to be
+displayed on the X console (usually ALT-F6 or ALT-F7) and still give you
+output and control of <bf/mythfrontend</>, either from the <bf/ssh</>
+session, or by switching back to the text console by pressing CTRL-ALT-F1. 
+You can now continue troubleshooting using <bf/gdb</> as detailed in the
+instructions.
 
 <sect1>MythTV makes my system crash. 
 <p>MythTV <em>can not</em> crash your system - it is a user-level program. 
@@ -3503,7 +3509,7 @@ To obtain a list of options:
 <sect1>Advanced Backend Configurations <label id="advanced_backend_config">
 <p>MythTV is flexible in the way that you define multiple backend tuner
 configurations.  The only hard-and-fast rule is that the Master Backend
-<em/must/> have a capture device defined, but shouldn't imply that the
+<em>must</em> have a capture device defined, but shouldn't imply that the
 capture device in the MBE must be the first capture card defined in the
 database.
 
@@ -3616,6 +3622,8 @@ status of the ivtv driver and what it can and can't do.
 v2.36, 2003-05-21.  Added instructions on modifying the PVR250 bitrate. 
 Added Advanced Backend Configurations.  Fixed consistency of section
 headers.  PVR-250 audio troubleshooting.
+v2.37, 2003-05-25.  Fixed dangling close tag.  A little more on
+troubleshooting with gdb.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

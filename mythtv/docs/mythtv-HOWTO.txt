@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-05-22, v2.36
+  2003-05-25, v2.37
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -3427,20 +3427,28 @@
 
   Once at the (gdb) prompt, type run to start program execution.  When
   the program segfaults or appears to lock-up (press CTRL-C), type
-  thread apply all bt full.
+
+
+       (gdb) thread apply all bt full
+
+
 
   The backtrace information for all the threads should be posted to the
   mythtv-dev mailing list, along with the steps you followed to get the
   program to crash.
 
   If you're trying to troubleshoot and you can't get back to the gdb
-  window for some reason, it may be easier to use two systems.
+  window for some reason, it may be easier to use two systems or to
+  start mythfrontend from the text console.
 
-  First, connect to the system that you're going to test using [1mssh [22mor
-  [1mtelnet[22m>, then type $ export DISPLAY=localhost:0.0.  This will allow
-  the grpahics to be displayed on one machine (the one that you're
-  testing) and still have text-mode output available.  You can now
-  continue troubleshooting using [1mgdb[22m> as detailed in the instructions.
+  If you're going to troubleshoot from a remote system, connect to the
+  machine that you're going to test using [1mssh [22mor [1mtelnet[22m. Next, type $
+  export DISPLAY=localhost:0.0.  This will allow the graphics to be
+  displayed on the X console (usually ALT-F6 or ALT-F7) and still give
+  you output and control of [1mmythfrontend[22m, either from the [1mssh [22msession,
+  or by switching back to the text console by pressing CTRL-ALT-F1.  You
+  can now continue troubleshooting using [1mgdb [22mas detailed in the
+  instructions.
 
 
   [1m18.10.  MythTV makes my system crash.[0m
@@ -3478,6 +3486,7 @@
   delayed behind the realtime video.  Once this test succeeds, MythTV
   should work correctly because it writes to and read from /dev/dsp in
   the same way that [1maplay [22mdoes.
+
 
   To record audio along with video the audio signal must be digitized by
   a DSP so that the audio data can be stored in a file. On playback, the
@@ -3610,7 +3619,6 @@
 
   Restart apache for it to take effect.
 
-
   [1m19.  Miscellaneous.[0m
 
   [1m19.1.  I'd like to watch the files without using MythTV / I'd like to[0m
@@ -3620,6 +3628,7 @@
   http://www.mplayerhq.hu <http://www.mplayerhq.hu> that allows you view
   the files created by MythTV.  MythTV doesn't use standard Nupplevideo
   files, which is why you MPlayer complains if you try to view them.
+
   Download the patch to MPlayer from Matt's website.
   http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/
   <http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/>.
@@ -3671,19 +3680,20 @@
   The following also works with blackbox:
 
 
-       $ cat > .xinitrc
-       xset -dpms s off &
-       irxevent &
-       mythfrontend &
-       blackbox
+
+  $ cat > .xinitrc
+  xset -dpms s off &
+  irxevent &
+  mythfrontend &
+  blackbox
 
 
 
   Make sure that your .blackboxrc file has:
 
 
-  session.screen0.focusNewWindows:        True
-  session.screen0.focusModel:     SloppyFocus
+       session.screen0.focusNewWindows:        True
+       session.screen0.focusModel:     SloppyFocus
 
 
 
@@ -3736,7 +3746,6 @@
   720x240 is possible, but isn't a good tradeoff relative to the number
   of vertical lines lost.  In a PAL country, the you would use values
   like 720x576 or x288.
-
   The higher resolutions will be more CPU intensive. If the CPU is
   overtaxed, frames will be dropped causing uneven motion. You will
   likely see the best results at resolutions which average at least 10%
@@ -3813,7 +3822,6 @@
   resolutions'' used.
 
 
-
   [1m19.5.3.  Overscan Dimensions[0m
 
   Because picture edges can be ragged and screen edges aren't straight,
@@ -3878,6 +3886,8 @@
   [1mNOTE[22m:  Performing this step will remove the entire database.  You will
   lose all of your settings and will need to re-run the mc.sql script to
   setup the database structure before running the setup program.
+
+
        $ mysql -u root
        mysql> drop database mythconverg;
        mysql> quit
@@ -3929,7 +3939,6 @@
 
   Once btaudio loads, it should register additional /dev/dsp and
   /dev/mixer devices.  Typing $ dmesg will let you know what's going on.
-
 
   [1m19.9.  Removing unwanted channels.[0m
 
@@ -3992,6 +4001,7 @@
 
   [1mNOTE[22m:  You do not need to recompile your kernel.
 
+
   Download the IVTV driver from CVS:
 
 
@@ -4003,6 +4013,8 @@
 
   This should create an ivtv directory.  Switch to it and perform the
   following commands:
+
+
        $ cd ivtv/ivtv/utils
        $ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_16_21062.exe
        $ su
@@ -4062,16 +4074,15 @@
   Check that the card is being recognized on the PCI bus:
 
 
+       $ lspci -v
+       <snip>
 
-  $ lspci -v
-  <snip>
-
-  00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
-  Encoder (rev 01)
-          Subsystem: Hauppauge computer works Inc.: Unknown device 4801
-          Flags: bus master, medium devsel, latency 32, IRQ 11
-          Memory at d0000000 (32-bit, prefetchable) [size=64M]
-          Capabilities: <available only to root>
+       00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
+       Encoder (rev 01)
+               Subsystem: Hauppauge computer works Inc.: Unknown device 4801
+               Flags: bus master, medium devsel, latency 32, IRQ 11
+               Memory at d0000000 (32-bit, prefetchable) [size=64M]
+               Capabilities: <available only to root>
 
 
 
@@ -4113,7 +4124,6 @@
 
 
        # echo "/sbin/modprobe ivtv" >> /etc/rc.d/rc.local
-
 
 
   By default, the IVTV driver uses a 16Mbps peak rate with a 8Mbps VBR.
@@ -4179,7 +4189,6 @@
   Copy the files from the MythTV contrib directory or from Mike's web
   site (http://m-thomson.net/mythtv/ <http://m-thomson.net/mythtv/>) as
   follows:
-
   etc.rc.d.init.mythbackend should be made executable and copied to
   /etc/rc.d/init.d/:
 
@@ -4188,6 +4197,8 @@
        $ su
        # chmod a+x etc.rc.d.init.d.mythbackend
        # cp etc.rc.d.init.d.mythbackend /etc/rc.d/init.d/mythbackend
+
+
 
   etc.sysconfig.mythbackend should be copied to /etc/sysconfig/:
 
@@ -4250,12 +4261,13 @@
   to edit the /etc/security/msec/perm.local file to include the
   following:
 
-  # /etc/security/msec/perm.local
-  # Local overrides to the msec program
-  #
-  # Full file path                user.group              permissions
-  /var/log/mythtv/                root.mythtv             775
-  /var/log/mythtv/*               root.mythtv             664
+
+       # /etc/security/msec/perm.local
+       # Local overrides to the msec program
+       #
+       # Full file path                user.group              permissions
+       /var/log/mythtv/                root.mythtv             775
+       /var/log/mythtv/*               root.mythtv             664
 
 
 
@@ -4301,8 +4313,6 @@
 
        # /etc/init.d/mythbackend stop
 
-
-
   To obtain a list of options:
 
 
@@ -4314,7 +4324,7 @@
 
   MythTV is flexible in the way that you define multiple backend tuner
   configurations.  The only hard-and-fast rule is that the Master
-  Backend [4mmust[24m> have a capture device defined, but shouldn't imply that
+  Backend [4mmust[24m have a capture device defined, but shouldn't imply that
   the capture device in the MBE must be the first capture card defined
   in the database.
 

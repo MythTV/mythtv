@@ -269,17 +269,27 @@ SIGPIPE       No        Yes     Yes             Broken pipe
 information.</P>
 <P>Once at the <CODE>(gdb)</CODE> prompt, type <CODE>run</CODE> to start program
 execution.  When the program segfaults or appears to lock-up (press CTRL-C),
-type <CODE>thread apply all bt full</CODE>.</P>
+type 
+<BLOCKQUOTE><CODE>
+<PRE>
+(gdb) thread apply all bt full
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 <P>The backtrace information for all the threads should be posted to the
 mythtv-dev mailing list, along with the steps you followed to get the
 program to crash.</P>
 <P>If you're trying to troubleshoot and you can't get back to the gdb window
-for some reason, it may be easier to use two systems.</P>
-<P>First, connect to the system that you're going to test using <B>ssh</B> or
-<B>telnet</B>>, then type <CODE>$ export DISPLAY=localhost:0.0</CODE>.  This will
-allow the grpahics to be displayed on one machine (the one that you're
-testing) and still have text-mode output available.  You can now continue
-troubleshooting using <B>gdb</B>> as detailed in the instructions.</P>
+for some reason, it may be easier to use two systems or to start
+mythfrontend from the text console.</P>
+<P>If you're going to troubleshoot from a remote system, connect to the machine
+that you're going to test using <B>ssh</B> or <B>telnet</B>. Next, type
+<CODE>$ export DISPLAY=localhost:0.0</CODE>.  This will allow the graphics to be
+displayed on the X console (usually ALT-F6 or ALT-F7) and still give you
+output and control of <B>mythfrontend</B>, either from the <B>ssh</B>
+session, or by switching back to the text console by pressing CTRL-ALT-F1. 
+You can now continue troubleshooting using <B>gdb</B> as detailed in the
+instructions.</P>
 
 <H2><A NAME="ss18.10">18.10</A> <A HREF="mythtv-HOWTO.html#toc18.10">MythTV makes my system crash. </A>
 </H2>
