@@ -243,17 +243,22 @@ void handleMedia(void)
 {
     switch (gContext->GetNumSetting("DVDOnInsertDVD", 1))
     {
-       case 0 : // Do nothing
-           break;
-       case 1 : // Display menu (mythdvd)*/
-           mythplugin_run();
-           break;
-       case 2 : // play DVD
-           playDVD();    
-           break;
-       case 3 : //Rip DVD
-           startDVDRipper();
-           break;
+        case 0 : // Do nothing
+            break;
+        case 1 : // Display menu (mythdvd)*/
+            mythplugin_run();
+            break;
+        case 2 : // play DVD
+            playDVD();    
+            break;
+#ifdef TRANSCODE_SUPPORT
+        case 3 : //Rip DVD
+            startDVDRipper();
+            break;
+#endif
+        default:
+            cerr << "mythdvd main.o: handleMedia() does not know what to do"
+                 << endl;
     }
 }
 
