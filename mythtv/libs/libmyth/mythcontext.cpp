@@ -1602,22 +1602,26 @@ void MythContext::LogEntry(const QString &module, int priority,
         if (d->m_db->isOpen())
         {
             KickDatabase(d->m_db);
-    
-            QString querystr = QString("INSERT INTO mythlog (module, priority, "
-                                       "logdate, host, message, details) "
-                                       "values ( '%1', %2, now(), '%3', "
-                                       "'%4','%5' );") 
-                                       .arg(module) 
-                                       .arg(priority)
-                                       .arg(d->m_localhostname)
-                                       .arg(message).arg(details);
-    
-            QSqlQuery result = d->m_db->exec(querystr);
-            if (!result.isActive())
-                MythContext::DBError("LogEntry", querystr);
+
+            QSqlQuery result(QString::null, d->m_db);
+
+            result.prepare("INSERT INTO mythlog (module, priority, "
+                           "logdate, host, message, details) "
+                           "values (:MODULE, :PRIORITY, now(), :HOSTNAME, "
+                           ":MESSAGE, :DETAILS );");
+
+            result.bindValue(":MODULE", module);
+            result.bindValue(":PRIORITY", priority);
+            result.bindValue(":HOSTNAME", d->m_localhostname);
+            result.bindValue(":MESSAGE", message);
+            result.bindValue(":DETAILS", details);
+
+            if (!result.exec() || !result.isActive())
+                MythContext::DBError("LogEntry", result);
 
             if (d->m_logmaxcount > 0)
             {
+                QString querystr;
                 querystr = QString("SELECT logid FROM mythlog WHERE "
                                    "module='%1' ORDER BY logdate ASC") 
                                    .arg(module);
