@@ -49,8 +49,9 @@ default as-is until you're sure that mythtv is operational.</P>
 <P>
 <A NAME="deinterlace_"></A> <B>NOTE</B>: the <CODE>int Deinterlace=1</CODE>
 variable controls the deinterlacer.  Support for deinterlacing requires that
-your processor has SSE (Streaming SIMD Extensions, aka "MMX2").  Intel
-Celeron, Pentium Pro and Pentium II CPUs do not have SSE, so make sure that
+your processor has SSE (Streaming SIMD Extensions, aka "MMX2").  Early Intel
+Celeron (those that don't use the Coppermine 0.18um core and are usually
+&lt;600Mhz), Pentium Pro and Pentium II CPUs do not have SSE, so make sure that
 you've got this set to "0" if you have one of these.  If you don't, you will
 get "Illegal Instruction" errors.</P>
 <P>To determine if you've got SSE, you can:

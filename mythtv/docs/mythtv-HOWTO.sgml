@@ -3,7 +3,7 @@
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-12-17, v1.051
+<date>2002-12-18, v1.052
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1179,8 +1179,9 @@ default as-is until you're sure that mythtv is operational.
 
 <label id="deinterlace_"><bf>NOTE</bf>: the <tt>int Deinterlace=1</tt>
 variable controls the deinterlacer.  Support for deinterlacing requires that
-your processor has SSE (Streaming SIMD Extensions, aka "MMX2").  Intel
-Celeron, Pentium Pro and Pentium II CPUs do not have SSE, so make sure that
+your processor has SSE (Streaming SIMD Extensions, aka "MMX2").  Early Intel
+Celeron (those that don't use the Coppermine 0.18um core and are usually
+<600Mhz), Pentium Pro and Pentium II CPUs do not have SSE, so make sure that
 you've got this set to "0" if you have one of these.  If you don't, you will
 get "Illegal Instruction" errors.
 
@@ -1586,9 +1587,11 @@ your particular system.
 <item>You have an AMD K6-2 or VIA C3 processor.  If you have either of
 these, make sure that you you followed the instructions in this <ref id="nonintelcpu_"
 name="section">.
-<item>You have an Intel Celeron, Pentium Pro or Pentium II.  If you have any
+<item>You have an early production Intel Celeron, Pentium Pro or Pentium II.  If you have any
 of these processors, make sure that your <ref id="deinterlace_" name="deinterlace">
-variable is set correctly.
+variable is set correctly.  Your CPU needs to support SSE instructions for
+deinterlace support.  You may check this by doing a <tt>$ cat
+/proc/cpuinfo</tt> and looking for "sse" in the processor flags section.
 </itemize>
 <sect1>mythfilldatabase failing.
 <p>If mythtvfilldatabase suddenly appears to be failing, check to see what version of
@@ -1718,6 +1721,8 @@ does it have to be done?  No idea...  Modified section on changechannel
 script to make it generic for Tarek's website since he now has Sony and RCA
 scripts.  Added XFree86-devel requirement.  Added compile warning text in
 Troubleshooting section.  Added screen blanking (DPMS) stuff.
+v1.052, 2002-12-18.  Modified section dealing with deinterlace and
+Celeron's.  (Newer Celeron's support SSE)
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
