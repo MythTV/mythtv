@@ -497,6 +497,7 @@ void MythRemoteLineEdit::updateCycle(QString current_choice, QString set)
     aString += set;
     aString += "]</FONT>";
     aString += pre_cycle_text_from;
+    aString.replace("\n", "<br>");
     setTextFormat(Qt::RichText);
     setText(aString);
     setCursorPosition(pre_cycle_para, pre_cycle_pos + set.length());
