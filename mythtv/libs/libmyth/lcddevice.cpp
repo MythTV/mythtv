@@ -1219,7 +1219,7 @@ void LCD::outputLEDs()
 {
     QString aString;
     int mask = 0;
-    if (GetLEDMask)
+    if (0 && GetLEDMask)
         mask = GetLEDMask();
     aString = "output ";
     aString += QString::number(mask);
