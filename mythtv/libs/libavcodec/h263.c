@@ -25,8 +25,7 @@
 
 /**
  * @file h263.c
- * @brief h263/mpeg4 codec
- *
+ * h263/mpeg4 codec.
  */
  
 //#define DEBUG
@@ -199,7 +198,7 @@ void h263_encode_picture_header(MpegEncContext * s, int picture_number)
             put_bits(&s->pb, 3, format);
             
         put_bits(&s->pb,1,0); /* Custom PCF: off */
-        s->umvplus = (s->pict_type == P_TYPE) && s->unrestricted_mv;
+        s->umvplus = s->unrestricted_mv;
         put_bits(&s->pb, 1, s->umvplus); /* Unrestricted Motion Vector */
         put_bits(&s->pb,1,0); /* SAC: off */
         put_bits(&s->pb,1,0); /* Advanced Prediction Mode: off */
@@ -241,7 +240,9 @@ void h263_encode_picture_header(MpegEncContext * s, int picture_number)
         
         /* Unlimited Unrestricted Motion Vectors Indicator (UUI) */
         if (s->umvplus)
-            put_bits(&s->pb,1,1); /* Limited according tables of Annex D */
+//            put_bits(&s->pb,1,1); /* Limited according tables of Annex D */
+            put_bits(&s->pb,2,1); /* unlimited */
+
         put_bits(&s->pb, 5, s->qscale);
     }
 
@@ -295,19 +296,19 @@ static inline int decide_ac_pred(MpegEncContext * s, DCTELEM block[6][64], int d
             if(s->mb_y==0 || s->qscale == qscale_table[xy] || n==2 || n==3){
                 /* same qscale */
                 for(i=1; i<8; i++){
-                    const int level= block[n][s->idct_permutation[i   ]];
+                    const int level= block[n][s->dsp.idct_permutation[i   ]];
                     score0+= ABS(level);
                     score1+= ABS(level - ac_val[i+8]);
-                    ac_val1[i  ]=    block[n][s->idct_permutation[i<<3]];
+                    ac_val1[i  ]=    block[n][s->dsp.idct_permutation[i<<3]];
                     ac_val1[i+8]= level;
                 }
             }else{
                 /* different qscale, we must rescale */
                 for(i=1; i<8; i++){
-                    const int level= block[n][s->idct_permutation[i   ]];
+                    const int level= block[n][s->dsp.idct_permutation[i   ]];
                     score0+= ABS(level);
                     score1+= ABS(level - ROUNDED_DIV(ac_val[i + 8]*qscale_table[xy], s->qscale));
-                    ac_val1[i  ]=    block[n][s->idct_permutation[i<<3]];
+                    ac_val1[i  ]=    block[n][s->dsp.idct_permutation[i<<3]];
                     ac_val1[i+8]= level;
                 }
             }
@@ -318,20 +319,20 @@ static inline int decide_ac_pred(MpegEncContext * s, DCTELEM block[6][64], int d
             if(s->mb_x==0 || s->qscale == qscale_table[xy] || n==1 || n==3){
                 /* same qscale */
                 for(i=1; i<8; i++){
-                    const int level= block[n][s->idct_permutation[i<<3]];
+                    const int level= block[n][s->dsp.idct_permutation[i<<3]];
                     score0+= ABS(level);
                     score1+= ABS(level - ac_val[i]);
                     ac_val1[i  ]= level;
-                    ac_val1[i+8]=    block[n][s->idct_permutation[i   ]];
+                    ac_val1[i+8]=    block[n][s->dsp.idct_permutation[i   ]];
                 }
             }else{
                 /* different qscale, we must rescale */
                 for(i=1; i<8; i++){
-                    const int level= block[n][s->idct_permutation[i<<3]];
+                    const int level= block[n][s->dsp.idct_permutation[i<<3]];
                     score0+= ABS(level);
                     score1+= ABS(level - ROUNDED_DIV(ac_val[i]*qscale_table[xy], s->qscale));
                     ac_val1[i  ]= level;
-                    ac_val1[i+8]=    block[n][s->idct_permutation[i   ]];
+                    ac_val1[i+8]=    block[n][s->dsp.idct_permutation[i   ]];
                 }
             }
         }
@@ -829,10 +830,10 @@ void mpeg4_encode_mb(MpegEncContext * s,
 
                 if(dir[i]){
                     for(j=1; j<8; j++) 
-                        block[i][s->idct_permutation[j   ]]= ac_val[j+8];
+                        block[i][s->dsp.idct_permutation[j   ]]= ac_val[j+8];
                 }else{
                     for(j=1; j<8; j++) 
-                        block[i][s->idct_permutation[j<<3]]= ac_val[j  ];
+                        block[i][s->dsp.idct_permutation[j<<3]]= ac_val[j  ];
                 }
                 s->block_last_index[i]= zigzag_last_index[i];
             }
@@ -1057,7 +1058,7 @@ static void h263_pred_acdc(MpegEncContext * s, DCTELEM *block, int n)
             if (a != 1024) {
                 ac_val -= 16;
                 for(i=1;i<8;i++) {
-                    block[s->idct_permutation[i<<3]] += ac_val[i];
+                    block[s->dsp.idct_permutation[i<<3]] += ac_val[i];
                 }
                 pred_dc = a;
             }
@@ -1066,7 +1067,7 @@ static void h263_pred_acdc(MpegEncContext * s, DCTELEM *block, int n)
             if (c != 1024) {
                 ac_val -= 16 * wrap;
                 for(i=1;i<8;i++) {
-                    block[s->idct_permutation[i   ]] += ac_val[i + 8];
+                    block[s->dsp.idct_permutation[i   ]] += ac_val[i + 8];
                 }
                 pred_dc = c;
             }
@@ -1094,10 +1095,10 @@ static void h263_pred_acdc(MpegEncContext * s, DCTELEM *block, int n)
     
     /* left copy */
     for(i=1;i<8;i++)
-        ac_val1[i    ] = block[s->idct_permutation[i<<3]];
+        ac_val1[i    ] = block[s->dsp.idct_permutation[i<<3]];
     /* top copy */
     for(i=1;i<8;i++)
-        ac_val1[8 + i] = block[s->idct_permutation[i   ]];
+        ac_val1[8 + i] = block[s->dsp.idct_permutation[i   ]];
 }
 
 int16_t *h263_pred_motion(MpegEncContext * s, int block, 
@@ -1473,12 +1474,12 @@ void h263_encode_init(MpegEncContext *s)
         break;
     case CODEC_ID_H263P:
         s->fcode_tab= umv_fcode_tab;
-        s->min_qcoeff= -128;
+        s->min_qcoeff= -127;
         s->max_qcoeff=  127;
         break;
         //Note for mpeg4 & h263 the dc-scale table will be set per frame as needed later 
     default: //nothing needed default table allready set in mpegvideo.c
-        s->min_qcoeff= -128;
+        s->min_qcoeff= -127;
         s->max_qcoeff=  127;
         s->y_dc_scale_table=
         s->c_dc_scale_table= ff_mpeg1_dc_scale_table;
@@ -1506,26 +1507,26 @@ static void h263_encode_block(MpegEncContext * s, DCTELEM * block, int n)
     rl = &rl_inter;
     if (s->mb_intra && !s->h263_aic) {
         /* DC coef */
-	    level = block[0];
+        level = block[0];
         /* 255 cannot be represented, so we clamp */
         if (level > 254) {
             level = 254;
             block[0] = 254;
         }
         /* 0 cannot be represented also */
-        else if (!level) {
+        else if (level < 1) {
             level = 1;
             block[0] = 1;
         }
-	    if (level == 128)
-	        put_bits(&s->pb, 8, 0xff);
-	    else
-	        put_bits(&s->pb, 8, level & 0xff);
-	    i = 1;
+        if (level == 128) //FIXME check rv10
+            put_bits(&s->pb, 8, 0xff);
+        else
+            put_bits(&s->pb, 8, level & 0xff);
+        i = 1;
     } else {
-	    i = 0;
-	    if (s->h263_aic && s->mb_intra)
-	        rl = &rl_intra_aic;
+        i = 0;
+        if (s->h263_aic && s->mb_intra)
+            rl = &rl_intra_aic;
     }
    
     /* AC coefs */
@@ -1548,7 +1549,16 @@ static void h263_encode_block(MpegEncContext * s, DCTELEM * block, int n)
             if (code == rl->n) {
                 put_bits(&s->pb, 1, last);
                 put_bits(&s->pb, 6, run);
-                put_bits(&s->pb, 8, slevel & 0xff);
+                
+                assert(slevel != 0);
+
+                if(slevel < 128 && slevel > -128) 
+                    put_bits(&s->pb, 8, slevel & 0xff);
+                else{
+                    put_bits(&s->pb, 8, 128);
+                    put_bits(&s->pb, 5, slevel & 0x1f);
+                    put_bits(&s->pb, 6, (slevel>>5)&0x3f);
+                }
             } else {
                 put_bits(&s->pb, 1, sign);
             }
@@ -1741,7 +1751,7 @@ static void mpeg4_encode_vol_header(MpegEncContext * s, int vo_number, int vol_n
     ff_mpeg4_stuffing(&s->pb);
 
     /* user data */
-    if(!ff_bit_exact){
+    if(!(s->flags & CODEC_FLAG_BITEXACT)){
         put_bits(&s->pb, 16, 0);
         put_bits(&s->pb, 16, 0x1B2);	/* user_data */
         sprintf(buf, "FFmpeg%sb%s", FFMPEG_VERSION, LIBAVCODEC_BUILD_STR);
@@ -1915,12 +1925,12 @@ void mpeg4_pred_ac(MpegEncContext * s, DCTELEM *block, int n,
             if(s->mb_x==0 || s->qscale == qscale_table[xy] || n==1 || n==3){
                 /* same qscale */
                 for(i=1;i<8;i++) {
-                    block[s->idct_permutation[i<<3]] += ac_val[i];
+                    block[s->dsp.idct_permutation[i<<3]] += ac_val[i];
                 }
             }else{
                 /* different qscale, we must rescale */
                 for(i=1;i<8;i++) {
-                    block[s->idct_permutation[i<<3]] += ROUNDED_DIV(ac_val[i]*qscale_table[xy], s->qscale);
+                    block[s->dsp.idct_permutation[i<<3]] += ROUNDED_DIV(ac_val[i]*qscale_table[xy], s->qscale);
                 }
             }
         } else {
@@ -1931,23 +1941,23 @@ void mpeg4_pred_ac(MpegEncContext * s, DCTELEM *block, int n,
             if(s->mb_y==0 || s->qscale == qscale_table[xy] || n==2 || n==3){
                 /* same qscale */
                 for(i=1;i<8;i++) {
-                    block[s->idct_permutation[i]] += ac_val[i + 8];
+                    block[s->dsp.idct_permutation[i]] += ac_val[i + 8];
                 }
             }else{
                 /* different qscale, we must rescale */
                 for(i=1;i<8;i++) {
-                    block[s->idct_permutation[i]] += ROUNDED_DIV(ac_val[i + 8]*qscale_table[xy], s->qscale);
+                    block[s->dsp.idct_permutation[i]] += ROUNDED_DIV(ac_val[i + 8]*qscale_table[xy], s->qscale);
                 }
             }
         }
     }
     /* left copy */
     for(i=1;i<8;i++)
-        ac_val1[i    ] = block[s->idct_permutation[i<<3]];
+        ac_val1[i    ] = block[s->dsp.idct_permutation[i<<3]];
 
     /* top copy */
     for(i=1;i<8;i++)
-        ac_val1[8 + i] = block[s->idct_permutation[i   ]];
+        ac_val1[8 + i] = block[s->dsp.idct_permutation[i   ]];
 
 }
 
@@ -1970,12 +1980,12 @@ static void mpeg4_inv_pred_ac(MpegEncContext * s, DCTELEM *block, int n,
         if(s->mb_x==0 || s->qscale == qscale_table[xy] || n==1 || n==3){
             /* same qscale */
             for(i=1;i<8;i++) {
-                block[s->idct_permutation[i<<3]] -= ac_val[i];
+                block[s->dsp.idct_permutation[i<<3]] -= ac_val[i];
             }
         }else{
             /* different qscale, we must rescale */
             for(i=1;i<8;i++) {
-                block[s->idct_permutation[i<<3]] -= ROUNDED_DIV(ac_val[i]*qscale_table[xy], s->qscale);
+                block[s->dsp.idct_permutation[i<<3]] -= ROUNDED_DIV(ac_val[i]*qscale_table[xy], s->qscale);
             }
         }
     } else {
@@ -1985,12 +1995,12 @@ static void mpeg4_inv_pred_ac(MpegEncContext * s, DCTELEM *block, int n,
         if(s->mb_y==0 || s->qscale == qscale_table[xy] || n==2 || n==3){
             /* same qscale */
             for(i=1;i<8;i++) {
-                block[s->idct_permutation[i]] -= ac_val[i + 8];
+                block[s->dsp.idct_permutation[i]] -= ac_val[i + 8];
             }
         }else{
             /* different qscale, we must rescale */
             for(i=1;i<8;i++) {
-                block[s->idct_permutation[i]] -= ROUNDED_DIV(ac_val[i + 8]*qscale_table[xy], s->qscale);
+                block[s->dsp.idct_permutation[i]] -= ROUNDED_DIV(ac_val[i + 8]*qscale_table[xy], s->qscale);
             }
         }
     }
@@ -3188,7 +3198,7 @@ int ff_h263_decode_mb(MpegEncContext *s,
                 /* 16x16 motion prediction */
                 s->mv_type = MV_TYPE_16X16;
                 h263_pred_motion(s, 0, &pred_x, &pred_y);
-                if (s->umvplus_dec)
+                if (s->umvplus)
                    mx = h263p_decode_umotion(s, pred_x);
                 else
                    mx = h263_decode_motion(s, pred_x, s->f_code);
@@ -3196,7 +3206,7 @@ int ff_h263_decode_mb(MpegEncContext *s,
                 if (mx >= 0xffff)
                     return -1;
             
-                if (s->umvplus_dec)
+                if (s->umvplus)
                    my = h263p_decode_umotion(s, pred_y);
                 else
                    my = h263_decode_motion(s, pred_y, s->f_code);
@@ -3206,7 +3216,7 @@ int ff_h263_decode_mb(MpegEncContext *s,
                 s->mv[0][0][0] = mx;
                 s->mv[0][0][1] = my;
 
-                if (s->umvplus_dec && (mx - pred_x) == 1 && (my - pred_y) == 1)
+                if (s->umvplus && (mx - pred_x) == 1 && (my - pred_y) == 1)
                    skip_bits1(&s->gb); /* Bit stuffing to prevent PSC */                   
             }
         } else {
@@ -3214,14 +3224,14 @@ int ff_h263_decode_mb(MpegEncContext *s,
             s->mv_type = MV_TYPE_8X8;
             for(i=0;i<4;i++) {
                 mot_val = h263_pred_motion(s, i, &pred_x, &pred_y);
-                if (s->umvplus_dec)
+                if (s->umvplus)
                   mx = h263p_decode_umotion(s, pred_x);
                 else
                   mx = h263_decode_motion(s, pred_x, s->f_code);
                 if (mx >= 0xffff)
                     return -1;
                 
-                if (s->umvplus_dec)
+                if (s->umvplus)
                   my = h263p_decode_umotion(s, pred_y);
                 else    
                   my = h263_decode_motion(s, pred_y, s->f_code);
@@ -3229,7 +3239,7 @@ int ff_h263_decode_mb(MpegEncContext *s,
                     return -1;
                 s->mv[0][i][0] = mx;
                 s->mv[0][i][1] = my;
-                if (s->umvplus_dec && (mx - pred_x) == 1 && (my - pred_y) == 1)
+                if (s->umvplus && (mx - pred_x) == 1 && (my - pred_y) == 1)
                   skip_bits1(&s->gb); /* Bit stuffing to prevent PSC */
                 mot_val[0] = mx;
                 mot_val[1] = my;
@@ -3537,7 +3547,8 @@ static int h263_decode_block(MpegEncContext * s, DCTELEM * block,
         }
     } else if (s->mb_intra) {
         /* DC coef */
-        if (s->h263_rv10 && s->rv10_version == 3 && s->pict_type == I_TYPE) {
+        if(s->h263_rv10){
+          if (s->rv10_version == 3 && s->pict_type == I_TYPE) {
             int component, diff;
             component = (n <= 3 ? 0 : n - 4 + 1);
             level = s->last_dc[component];
@@ -3551,8 +3562,15 @@ static int h263_decode_block(MpegEncContext * s, DCTELEM * block,
             } else {
                 s->rv10_first_dc_coded[component] = 1;
             }
-        } else {
+          } else {
+                level = get_bits(&s->gb, 8);
+          }
+        }else{
             level = get_bits(&s->gb, 8);
+            if((level&0x7F) == 0){
+                fprintf(stderr, "illegal dc %d at %d %d\n", level, s->mb_x, s->mb_y);
+                return -1;
+            }
             if (level == 255)
                 level = 128;
         }
@@ -3579,10 +3597,16 @@ static int h263_decode_block(MpegEncContext * s, DCTELEM * block,
             last = get_bits1(&s->gb);
             run = get_bits(&s->gb, 6);
             level = (int8_t)get_bits(&s->gb, 8);
-            if (s->h263_rv10 && level == -128) {
-                /* XXX: should patch encoder too */
-                level = get_bits(&s->gb, 12);
-		level= (level + ((-1)<<11)) ^ ((-1)<<11); //sign extension
+            if(level == -128){
+                if (s->h263_rv10) {
+                    /* XXX: should patch encoder too */
+                    level = get_bits(&s->gb, 12);
+                    level= (level + ((-1)<<11)) ^ ((-1)<<11); //sign extension
+                }else{
+                    level = get_bits(&s->gb, 5);
+                    level += get_bits(&s->gb, 6)<<5;
+                    level= (level + ((-1)<<10)) ^ ((-1)<<10); //sign extension
+                }
             }
         } else {
             run = rl->table_run[code];
@@ -3931,7 +3955,7 @@ int h263_decode_picture_header(MpegEncContext *s)
             format = get_bits(&s->gb, 3);
             dprintf("ufep=1, format: %d\n", format);
             skip_bits(&s->gb,1); /* Custom PCF */
-            s->umvplus_dec = get_bits(&s->gb, 1); /* Unrestricted Motion Vector */
+            s->umvplus = get_bits(&s->gb, 1); /* Unrestricted Motion Vector */
             skip_bits1(&s->gb); /* Syntax-based Arithmetic Coding (SAC) */
             if (get_bits1(&s->gb) != 0) {
                 s->mv_type = MV_TYPE_8X8; /* Advanced prediction mode */
@@ -4002,8 +4026,9 @@ int h263_decode_picture_header(MpegEncContext *s)
                 return -1;
             s->width = width;
             s->height = height;
-            if (s->umvplus_dec) {
-                skip_bits1(&s->gb); /* Unlimited Unrestricted Motion Vectors Indicator (UUI) */
+            if (s->umvplus) {
+                if(get_bits1(&s->gb)==0) /* Unlimited Unrestricted Motion Vectors Indicator (UUI) */
+                    skip_bits1(&s->gb); 
             }
         }
             
@@ -4380,7 +4405,7 @@ static int decode_vol_header(MpegEncContext *s, GetBitContext *gb){
             
             /* load default matrixes */
             for(i=0; i<64; i++){
-                int j= s->idct_permutation[i];
+                int j= s->dsp.idct_permutation[i];
                 v= ff_mpeg4_default_intra_matrix[i];
                 s->intra_matrix[j]= v;
                 s->chroma_intra_matrix[j]= v;
@@ -4399,14 +4424,14 @@ static int decode_vol_header(MpegEncContext *s, GetBitContext *gb){
                     if(v==0) break;
                     
                     last= v;
-                    j= s->idct_permutation[ ff_zigzag_direct[i] ];
+                    j= s->dsp.idct_permutation[ ff_zigzag_direct[i] ];
                     s->intra_matrix[j]= v;
                     s->chroma_intra_matrix[j]= v;
                 }
 
                 /* replicate last value */
                 for(; i<64; i++){
-		    int j= s->idct_permutation[ ff_zigzag_direct[i] ];
+		    int j= s->dsp.idct_permutation[ ff_zigzag_direct[i] ];
                     s->intra_matrix[j]= v;
                     s->chroma_intra_matrix[j]= v;
                 }
@@ -4421,14 +4446,14 @@ static int decode_vol_header(MpegEncContext *s, GetBitContext *gb){
                     if(v==0) break;
 
                     last= v;
-                    j= s->idct_permutation[ ff_zigzag_direct[i] ];
+                    j= s->dsp.idct_permutation[ ff_zigzag_direct[i] ];
                     s->inter_matrix[j]= v;
                     s->chroma_inter_matrix[j]= v;
                 }
 
                 /* replicate last value */
                 for(; i<64; i++){
-		    int j= s->idct_permutation[ ff_zigzag_direct[i] ];
+		    int j= s->dsp.idct_permutation[ ff_zigzag_direct[i] ];
                     s->inter_matrix[j]= last;
                     s->chroma_inter_matrix[j]= last;
                 }

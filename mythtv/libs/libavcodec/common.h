@@ -1,3 +1,8 @@
+/**
+ * @file common.h
+ * common internal api header.
+ */
+
 #ifndef COMMON_H
 #define COMMON_H
 
@@ -238,7 +243,7 @@ void put_string(PutBitContext * pbc, char *s);
 /* bit input */
 
 typedef struct GetBitContext {
-    uint8_t *buffer, *buffer_end;
+    const uint8_t *buffer, *buffer_end;
 #ifdef ALT_BITSTREAM_READER
     int index;
 #elif defined LIBMPEG2_BITSTREAM_READER
@@ -260,7 +265,7 @@ static inline int get_bits_count(GetBitContext *s);
 
 typedef struct VLC {
     int bits;
-    VLC_TYPE (*table)[2]; // code, bits
+    VLC_TYPE (*table)[2]; ///< code, bits
     int table_size, table_allocated;
 } VLC;
 
@@ -671,7 +676,7 @@ static inline void skip_bits1(GetBitContext *s){
 }
 
 void init_get_bits(GetBitContext *s,
-                   uint8_t *buffer, int buffer_size);
+                   const uint8_t *buffer, int buffer_size);
 
 int check_marker(GetBitContext *s, const char *msg);
 void align_get_bits(GetBitContext *s);
@@ -754,6 +759,14 @@ static inline int get_vlc(GetBitContext *s, VLC *vlc)
     return code;
 }
 
+/**
+ * parses a vlc code, faster then get_vlc()
+ * @param bits is the number of bits which will be read at once, must be 
+ *             identical to nb_bits in init_vlc()
+ * @param max_depth is the number of times bits bits must be readed to completly
+ *                  read the longest vlc code 
+ *                  = (max_vlc_length + bits - 1) / bits
+ */
 static always_inline int get_vlc2(GetBitContext *s, VLC_TYPE (*table)[2],
                                   int bits, int max_depth)
 {

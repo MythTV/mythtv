@@ -18,6 +18,12 @@
  *
  * alternative bitstream reader & writer by Michael Niedermayer <michaelni@gmx.at>
  */
+
+/**
+ * @file common.c
+ * common internal api.
+ */
+
 #include "avcodec.h"
 
 const uint8_t ff_sqrt_tab[128]={
@@ -110,7 +116,7 @@ void put_string(PutBitContext * pbc, char *s)
 /* bit input functions */
 
 void init_get_bits(GetBitContext *s,
-                   uint8_t *buffer, int bit_size)
+                   const uint8_t *buffer, int bit_size)
 {
     const int buffer_size= (bit_size+7)>>3;
 

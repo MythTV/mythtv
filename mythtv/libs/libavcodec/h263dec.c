@@ -1,5 +1,5 @@
 /*
- * H263 decoder
+ * H.263 decoder
  * Copyright (c) 2001 Fabrice Bellard.
  *
  * This library is free software; you can redistribute it and/or
@@ -16,6 +16,12 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+ 
+/**
+ * @file h263dec.c
+ * H.263 decoder.
+ */
+ 
 #include "avcodec.h"
 #include "dsputil.h"
 #include "mpegvideo.h"
@@ -213,7 +219,7 @@ static int decode_slice(MpegEncContext *s){
                         
                     if(++s->mb_x >= s->mb_width){
                         s->mb_x=0;
-                        ff_draw_horiz_band(s);
+                        ff_draw_horiz_band(s, s->mb_y*16, 16);
                         s->mb_y++;
                     }
                     return 0; 
@@ -230,7 +236,7 @@ static int decode_slice(MpegEncContext *s){
             }
         }
         
-        ff_draw_horiz_band(s);
+        ff_draw_horiz_band(s, s->mb_y*16, 16);
         
         s->mb_x= 0;
     }
@@ -530,9 +536,11 @@ retry:
         if(s->divx_version)
             s->workaround_bugs|= FF_BUG_DIRECT_BLOCKSIZE;
 //printf("padding_bug_score: %d\n", s->padding_bug_score);
+        if(s->divx_version==501 && s->divx_build==20020416)
+            s->padding_bug_score= 256*256*256*64;
 #if 0
         if(s->divx_version==500)
-            s->workaround_bugs|= FF_BUG_NO_PADDING;
+            s->padding_bug_score= 256*256*256*64;
 
         /* very ugly XVID padding bug detection FIXME/XXX solve this differently
          * lets hope this at least works

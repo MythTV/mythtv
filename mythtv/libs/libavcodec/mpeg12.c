@@ -1,5 +1,5 @@
 /*
- * MPEG1 encoder / MPEG2 decoder
+ * MPEG1 codec / MPEG2 decoder
  * Copyright (c) 2000,2001 Fabrice Bellard.
  *
  * This library is free software; you can redistribute it and/or
@@ -16,6 +16,12 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+ 
+/**
+ * @file mpeg12.c
+ * MPEG1 codec / MPEG2 decoder.
+ */
+ 
 //#define DEBUG
 #include "avcodec.h"
 #include "dsputil.h"
@@ -1023,8 +1029,8 @@ static int mpeg_decode_mb(MpegEncContext *s,
                     }
                     break;
                 case MT_FIELD:
+                    s->mv_type = MV_TYPE_FIELD;
                     if (s->picture_structure == PICT_FRAME) {
-                        s->mv_type = MV_TYPE_FIELD;
                         for(j=0;j<2;j++) {
                             s->field_select[i][j] = get_bits1(&s->gb);
                             val = mpeg_decode_motion(s, s->mpeg_f_code[i][0],
@@ -1039,7 +1045,6 @@ static int mpeg_decode_mb(MpegEncContext *s,
                             dprintf("fmy=%d\n", val);
                         }
                     } else {
-                        s->mv_type = MV_TYPE_16X16;
                         s->field_select[i][0] = get_bits1(&s->gb);
                         for(k=0;k<2;k++) {
                             val = mpeg_decode_motion(s, s->mpeg_f_code[i][k],
@@ -1653,7 +1658,7 @@ static void mpeg_decode_quant_matrix_extension(MpegEncContext *s)
     if (get_bits1(&s->gb)) {
         for(i=0;i<64;i++) {
             v = get_bits(&s->gb, 8);
-            j= s->idct_permutation[ ff_zigzag_direct[i] ];
+            j= s->dsp.idct_permutation[ ff_zigzag_direct[i] ];
             s->intra_matrix[j] = v;
             s->chroma_intra_matrix[j] = v;
         }
@@ -1661,7 +1666,7 @@ static void mpeg_decode_quant_matrix_extension(MpegEncContext *s)
     if (get_bits1(&s->gb)) {
         for(i=0;i<64;i++) {
             v = get_bits(&s->gb, 8);
-            j= s->idct_permutation[ ff_zigzag_direct[i] ];
+            j= s->dsp.idct_permutation[ ff_zigzag_direct[i] ];
             s->inter_matrix[j] = v;
             s->chroma_inter_matrix[j] = v;
         }
@@ -1669,14 +1674,14 @@ static void mpeg_decode_quant_matrix_extension(MpegEncContext *s)
     if (get_bits1(&s->gb)) {
         for(i=0;i<64;i++) {
             v = get_bits(&s->gb, 8);
-            j= s->idct_permutation[ ff_zigzag_direct[i] ];
+            j= s->dsp.idct_permutation[ ff_zigzag_direct[i] ];
             s->chroma_intra_matrix[j] = v;
         }
     }
     if (get_bits1(&s->gb)) {
         for(i=0;i<64;i++) {
             v = get_bits(&s->gb, 8);
-            j= s->idct_permutation[ ff_zigzag_direct[i] ];
+            j= s->dsp.idct_permutation[ ff_zigzag_direct[i] ];
             s->chroma_inter_matrix[j] = v;
         }
     }
@@ -1700,6 +1705,13 @@ static void mpeg_decode_picture_coding_extension(MpegEncContext *s)
     s->repeat_first_field = get_bits1(&s->gb);
     s->chroma_420_type = get_bits1(&s->gb);
     s->progressive_frame = get_bits1(&s->gb);
+    
+    if(s->picture_structure == PICT_FRAME)
+        s->first_field=0;
+    else{
+        s->first_field ^= 1;
+        memset(s->mbskip_table, 0, s->mb_width*s->mb_height);
+    }
     
     if(s->alternate_scan){
         ff_init_scantable(s, &s->inter_scantable  , ff_alternate_vertical_scan);
@@ -1771,6 +1783,7 @@ static int mpeg_decode_slice(AVCodecContext *avctx,
     Mpeg1Context *s1 = avctx->priv_data;
     MpegEncContext *s = &s1->mpeg_enc_ctx;
     int ret;
+    const int field_pic= s->picture_structure != PICT_FRAME;
 
     start_code = (start_code - 1) & 0xff;
     if (start_code >= s->mb_height){
@@ -1781,12 +1794,26 @@ static int mpeg_decode_slice(AVCodecContext *avctx,
     s->last_dc[1] = s->last_dc[0];
     s->last_dc[2] = s->last_dc[0];
     memset(s->last_mv, 0, sizeof(s->last_mv));
+        
     /* start frame decoding */
-    if (s->first_slice) {
-        s->first_slice = 0;
+    if (s->first_slice && (s->first_field || s->picture_structure==PICT_FRAME)) {
         if(MPV_frame_start(s, avctx) < 0)
             return DECODE_SLICE_FATAL_ERROR;
-            
+        /* first check if we must repeat the frame */
+        s->current_picture.repeat_pict = 0;
+
+        if (s->repeat_first_field) {
+            if (s->progressive_sequence) {
+                if (s->top_field_first)
+                    s->current_picture.repeat_pict = 4;
+                else
+                    s->current_picture.repeat_pict = 2;
+            } else if (s->progressive_frame) {
+                s->current_picture.repeat_pict = 1;
+            }
+        }         
+//        printf("%d \n", s->current_picture.repeat_pict);
+
         if(s->avctx->debug&FF_DEBUG_PICT_INFO){
              printf("qp:%d fc:%2d%2d%2d%2d %s %s %s %s dc:%d pstruct:%d fdct:%d cmv:%d qtype:%d ivlc:%d rff:%d %s\n", 
                  s->qscale, s->mpeg_f_code[0][0],s->mpeg_f_code[0][1],s->mpeg_f_code[1][0],s->mpeg_f_code[1][1],
@@ -1796,6 +1823,7 @@ static int mpeg_decode_slice(AVCodecContext *avctx,
                  s->q_scale_type, s->intra_vlc_format, s->repeat_first_field, s->chroma_420_type ? "420" :"");
         }
     }
+    s->first_slice = 0;
 
     init_get_bits(&s->gb, buf, buf_size*8);
 
@@ -1830,11 +1858,36 @@ static int mpeg_decode_slice(AVCodecContext *avctx,
         dprintf("ret=%d\n", ret);
         if (ret < 0)
             return -1;
-    
+//printf("%d %d\n", s->mb_x, s->mb_y);
+        //FIXME this isnt the most beautifull way to solve the problem ...
+        if(s->picture_structure!=PICT_FRAME){
+            if(s->picture_structure == PICT_BOTTOM_FIELD){
+                s->current_picture.data[0] += s->linesize;
+                s->current_picture.data[1] += s->uvlinesize;
+                s->current_picture.data[2] += s->uvlinesize;
+            } 
+            s->linesize *= 2;
+            s->uvlinesize *= 2;
+        }
         MPV_decode_mb(s, s->block);
+        if(s->picture_structure!=PICT_FRAME){
+            s->linesize /= 2;
+            s->uvlinesize /= 2;
+            if(s->picture_structure == PICT_BOTTOM_FIELD){
+                s->current_picture.data[0] -= s->linesize;
+                s->current_picture.data[1] -= s->uvlinesize;
+                s->current_picture.data[2] -= s->uvlinesize;
+            } 
+        }
 
         if (++s->mb_x >= s->mb_width) {
-            ff_draw_horiz_band(s);
+            if(s->picture_structure==PICT_FRAME){
+                ff_draw_horiz_band(s, 16*s->mb_y, 16);
+            }else{
+                if(!s->first_field){
+                    ff_draw_horiz_band(s, 32*s->mb_y, 32);
+                }
+            }
 
             s->mb_x = 0;
             s->mb_y++;
@@ -1861,7 +1914,7 @@ static int mpeg_decode_slice(AVCodecContext *avctx,
                 }
             }
         }
-        if(s->mb_y >= s->mb_height){
+        if(s->mb_y<<field_pic >= s->mb_height){
             fprintf(stderr, "slice too long\n");
             return DECODE_SLICE_ERROR;
         }
@@ -1869,10 +1922,9 @@ static int mpeg_decode_slice(AVCodecContext *avctx,
 eos: //end of slice
     
     emms_c();
-
+//intf("%d %d %d %d\n", s->mb_y, s->mb_height, s->pict_type, s->picture_number);
     /* end of slice reached */
-    if (/*s->mb_x == 0 &&*/
-        s->mb_y == s->mb_height) {
+    if (s->mb_y<<field_pic == s->mb_height && !s->first_field) {
         /* end of image */
 
         if(s->mpeg2)
@@ -1971,7 +2023,7 @@ static int mpeg1_decode_sequence(AVCodecContext *avctx,
 #endif
     } else {
         for(i=0;i<64;i++) {
-            int j= s->idct_permutation[i];
+            int j= s->dsp.idct_permutation[i];
             v = ff_mpeg1_default_intra_matrix[i];
             s->intra_matrix[j] = v;
             s->chroma_intra_matrix[j] = v;
@@ -1992,7 +2044,7 @@ static int mpeg1_decode_sequence(AVCodecContext *avctx,
 #endif
     } else {
         for(i=0;i<64;i++) {
-            int j= s->idct_permutation[i];
+            int j= s->dsp.idct_permutation[i];
             v = ff_mpeg1_default_non_intra_matrix[i];
             s->inter_matrix[j] = v;
             s->chroma_inter_matrix[j] = v;
@@ -2007,6 +2059,35 @@ static int mpeg1_decode_sequence(AVCodecContext *avctx,
     s->mpeg2 = 0;
     avctx->sub_id = 1; /* indicates mpeg1 */
     return 0;
+}
+
+static void mpeg_decode_user_data(AVCodecContext *avctx, 
+                                  const uint8_t *buf, int buf_size)
+{
+    const uint8_t *p;
+    int len, flags;
+    p = buf;
+    len = buf_size;
+
+    /* we parse the DTG active format information */
+    if (len >= 5 &&
+        p[0] == 'D' && p[1] == 'T' && p[2] == 'G' && p[3] == '1') {
+        flags = p[4];
+        p += 5;
+        len -= 5;
+        if (flags & 0x80) {
+            /* skip event id */
+            if (len < 2)
+                return;
+            p += 2;
+            len -= 2;
+        }
+        if (flags & 0x40) {
+            if (len < 1)
+                return;
+            avctx->dtg_active_format = p[0] & 0x0f;
+        }
+    }
 }
 
 /* handle buffering and image synchronisation */
@@ -2099,6 +2180,10 @@ static int mpeg_decode_frame(AVCodecContext *avctx,
                     mpeg_decode_extension(avctx,
                                           s->buffer, input_size);
                     break;
+                case USER_START_CODE:
+                    mpeg_decode_user_data(avctx, 
+                                          s->buffer, input_size);
+                    break;
                 default:
                     if (start_code >= SLICE_MIN_START_CODE &&
                         start_code <= SLICE_MAX_START_CODE) {
@@ -2112,30 +2197,8 @@ static int mpeg_decode_frame(AVCodecContext *avctx,
 
                         ret = mpeg_decode_slice(avctx, picture,
                                                 start_code, s->buffer, input_size);
+
                         if (ret == DECODE_SLICE_EOP) {
-                            /* got a picture: exit */
-                            /* first check if we must repeat the frame */
-                            avctx->repeat_pict = 0;
-#if 0
-                            if (s2->progressive_frame && s2->repeat_first_field) {
-                                //fprintf(stderr,"\nRepeat this frame: %d! pict: %d",avctx->frame_number,s2->picture_number);
-                                //s2->repeat_first_field = 0;
-                                //s2->progressive_frame = 0;
-                                if (++s->repeat_field > 2)
-                                    s->repeat_field = 0;
-                                avctx->repeat_pict = 1;
-                            }
-#endif                      
-                            if (s2->repeat_first_field) {
-                                if (s2->progressive_sequence) {
-                                    if (s2->top_field_first)
-                                        avctx->repeat_pict = 4;
-                                    else
-                                        avctx->repeat_pict = 2;
-                                } else if (s2->progressive_frame) {
-                                    avctx->repeat_pict = 1;
-                                }
-                            }         
                             *data_size = sizeof(AVPicture);
                             goto the_end;
                         }else if(ret<0){

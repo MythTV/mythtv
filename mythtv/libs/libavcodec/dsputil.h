@@ -16,11 +16,18 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+
+/**
+ * @file dsputil.h
+ * DSP utils.
+ */
+
 #ifndef DSPUTIL_H
 #define DSPUTIL_H
 
 #include "common.h"
 #include "avcodec.h"
+
 
 //#define DEBUG
 /* dct code */
@@ -100,6 +107,9 @@ typedef int (*op_pixels_abs_func)(uint8_t *blk1/*align width (8 or 16)*/, uint8_
 
 typedef int (*me_cmp_func)(void /*MpegEncContext*/ *s, uint8_t *blk1/*align width (8 or 16)*/, uint8_t *blk2/*align 1*/, int line_size)/* __attribute__ ((const))*/;
 
+/**
+ * DSPContext.
+ */
 typedef struct DSPContext {
     /* pixel ops : interface with DCT */
     void (*get_pixels)(DCTELEM *block/*align 16*/, const uint8_t *pixels/*align 8*/, int line_size);
@@ -149,9 +159,41 @@ typedef struct DSPContext {
     /* huffyuv specific */
     void (*add_bytes)(uint8_t *dst/*align 16*/, uint8_t *src/*align 16*/, int w);
     void (*diff_bytes)(uint8_t *dst/*align 16*/, uint8_t *src1/*align 16*/, uint8_t *src2/*align 1*/,int w);
+    
+    /* (I)DCT */
+    void (*fdct)(DCTELEM *block/* align 16*/);
+    
+    /**
+     * block -> idct -> clip to unsigned 8 bit -> dest.
+     * (-1392, 0, 0, ...) -> idct -> (-174, -174, ...) -> put -> (0, 0, ...)
+     * @param line_size size in bytes of a horizotal line of dest
+     */
+    void (*idct_put)(uint8_t *dest/*align 8*/, int line_size, DCTELEM *block/*align 16*/);
+    
+    /**
+     * block -> idct -> add dest -> clip to unsigned 8 bit -> dest.
+     * @param line_size size in bytes of a horizotal line of dest
+     */
+    void (*idct_add)(uint8_t *dest/*align 8*/, int line_size, DCTELEM *block/*align 16*/);
+    
+    /**
+     * idct input permutation.
+     * an example to avoid confusion:
+     * - (->decode coeffs -> zigzag reorder -> dequant -> reference idct ->...)
+     * - (x -> referece dct -> reference idct -> x)
+     * - (x -> referece dct -> simple_mmx_perm = idct_permutation -> simple_idct_mmx -> x)
+     * - (->decode coeffs -> zigzag reorder -> simple_mmx_perm -> dequant -> simple_idct_mmx ->...)
+     */
+    uint8_t idct_permutation[64];
+    int idct_permutation_type;
+#define FF_NO_IDCT_PERM 1
+#define FF_LIBMPEG2_IDCT_PERM 2
+#define FF_SIMPLE_IDCT_PERM 3
+#define FF_TRANSPOSE_IDCT_PERM 4
+
 } DSPContext;
 
-void dsputil_init(DSPContext* p, unsigned mask);
+void dsputil_init(DSPContext* p, AVCodecContext *avctx);
 
 /**
  * permute block according to permuatation.
@@ -159,6 +201,11 @@ void dsputil_init(DSPContext* p, unsigned mask);
  */
 void ff_block_permute(DCTELEM *block, uint8_t *permutation, const uint8_t *scantable, int last);
 
+/**
+ * Empty mmx state.
+ * this must be called between any dsp function and float/double code.
+ * for example sin(); dsp->idct_put(); emms_c(); cos()
+ */
 #define emms_c()
 
 /* should be defined by architectures supporting
@@ -194,11 +241,8 @@ static inline void emms(void)
 
 #define __align8 __attribute__ ((aligned (8)))
 
-void dsputil_init_mmx(DSPContext* c, unsigned mask);
-void dsputil_set_bit_exact_mmx(DSPContext* c, unsigned mask);
-
-void dsputil_init_pix_mmx(DSPContext* c, unsigned mask);
-void dsputil_set_bit_exact_pix_mmx(DSPContext* c, unsigned mask);
+void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx);
+void dsputil_init_pix_mmx(DSPContext* c, AVCodecContext *avctx);
 
 #elif defined(ARCH_ARMV4L)
 
@@ -206,20 +250,20 @@ void dsputil_set_bit_exact_pix_mmx(DSPContext* c, unsigned mask);
    line ptimizations */
 #define __align8 __attribute__ ((aligned (4)))
 
-void dsputil_init_armv4l(DSPContext* c, unsigned mask);
+void dsputil_init_armv4l(DSPContext* c, AVCodecContext *avctx);
 
 #elif defined(HAVE_MLIB)
 
 /* SPARC/VIS IDCT needs 8-byte aligned DCT blocks */
 #define __align8 __attribute__ ((aligned (8)))
 
-void dsputil_init_mlib(DSPContext* c, unsigned mask);
+void dsputil_init_mlib(DSPContext* c, AVCodecContext *avctx);
 
 #elif defined(ARCH_ALPHA)
 
 #define __align8 __attribute__ ((aligned (8)))
 
-void dsputil_init_alpha(DSPContext* c, unsigned mask);
+void dsputil_init_alpha(DSPContext* c, AVCodecContext *avctx);
 
 #elif defined(ARCH_POWERPC)
 
@@ -233,13 +277,13 @@ extern int mm_flags;
 
 #define __align8 __attribute__ ((aligned (16)))
 
-void dsputil_init_ppc(DSPContext* c, unsigned mask);
+void dsputil_init_ppc(DSPContext* c, AVCodecContext *avctx);
 
 #elif defined(HAVE_MMI)
 
 #define __align8 __attribute__ ((aligned (16)))
 
-void dsputil_init_mmi(DSPContext* c, unsigned mask);
+void dsputil_init_mmi(DSPContext* c, AVCodecContext *avctx);
 
 #else
 

@@ -16,6 +16,11 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+
+/**
+ * @file dv.c
+ * DV decoder.
+ */
 #include "avcodec.h"
 #include "dsputil.h"
 #include "mpegvideo.h"
@@ -115,12 +120,12 @@ static int dvvideo_decode_init(AVCodecContext *avctx)
     /* XXX: fix it */
     memset(&s2, 0, sizeof(MpegEncContext));
     s2.avctx = avctx;
-    dsputil_init(&s2.dsp, avctx->dsp_mask);
+    dsputil_init(&s2.dsp, avctx);
     if (DCT_common_init(&s2) < 0)
        return -1;
 
-    s->idct_put[0] = s2.idct_put;
-    memcpy(s->idct_permutation, s2.idct_permutation, 64);
+    s->idct_put[0] = s2.dsp.idct_put;
+    memcpy(s->idct_permutation, s2.dsp.idct_permutation, 64);
     memcpy(s->dv_zigzag[0], s2.intra_scantable.permutated, 64);
 
     /* XXX: use MMX also for idct248 */
@@ -546,11 +551,13 @@ static int dvvideo_decode_frame(AVCodecContext *avctx,
     if (buf_size < packet_size)
         return -1;
     
-    /* XXX: is it correct to assume that 420 is always used in PAL
-       mode ? */
-    s->sampling_411 = !dsf;
+    /* NTSC[dsf == 0] is always 720x480, 4:1:1
+     *  PAL[dsf == 1] is always 720x576, 4:2:0 for IEC 68134[apt == 0]
+     *  but for the SMPTE 314M[apt == 1] it is 720x576, 4:1:1
+     */
+    s->sampling_411 = !dsf || apt;
     if (s->sampling_411) {
-        mb_pos_ptr = dv_place_411;
+        mb_pos_ptr = dsf ? dv_place_411P : dv_place_411;
         avctx->pix_fmt = PIX_FMT_YUV411P;
     } else {
         mb_pos_ptr = dv_place_420;
