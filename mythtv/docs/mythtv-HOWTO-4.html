@@ -111,10 +111,26 @@ the Troubleshooting Section for more information.</P>
 <P>The following instructions work for Mandrake 9.0 and 9.1 using
 <B>bash</B> as the shell, and may be applicable for a distribution which
 uses <CODE>/etc/profile.d</CODE>.</P>
-<P>As root, create the following file in <CODE>/etc/profile.d</CODE> The example
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  Mandrake 10 installs a <CODE>/etc/profile.d/qtdir3.sh</CODE>
+file, but it doesn't include the addition of the PATH variable.  If you're
+running Mandrake 10, don't create a <CODE>mythtv.sh</CODE> file as detailed
+below; edit the <CODE>qtdir3.sh</CODE> file and add the PATH statement within
+the if / fi block.</CAPTION>
+</FIGURE>
+
+As root, create the following file in <CODE>/etc/profile.d</CODE> The example
 filename is "mythtv.sh". Use what you feel is appropriate.</P>
 <P>Open a shell, and switch to superuser mode. 
-<B>NOTE</B>: ^D means press CTRL and d at the same time.
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>: ^D means press CTRL and d at the same time.</CAPTION>
+</FIGURE>
+
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su

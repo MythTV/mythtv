@@ -66,9 +66,15 @@ vidout
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P><B>NOTE</B>: You must use mencoder 1.0PRE1 or later. <B>mencoder</B>
-version 0.9x <EM>WILL NOT WORK!</EM></P>
-<P>Using ffmepg:
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>: You must use mencoder 1.0PRE1 or later. <B>mencoder</B>
+version 0.9x <EM>WILL NOT WORK!</EM></CAPTION>
+</FIGURE>
+
+Using ffmepg:
 <BLOCKQUOTE><CODE>
 <PRE>
 ffmpeg -f u16le -ar 32000 -ac 2 -i audout -f rawvideo -s 640x480 -r 29.97 \
@@ -182,10 +188,16 @@ the GUI X and/or Y are not 0, the upper left corner is positioned at the
 specified coordinates. If the "Run the frontend in a window" box is checked,
 the window will have a frame and can then be dragged to any position on the
 desktop.</P>
-<P><B>NOTE</B>: When the GUI is full screen, you may see windows rapidly
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>: When the GUI is full screen, you may see windows rapidly
 flipping on top of each other. If this happens you will need to set your
-window manager to 'Click to Focus' for windows to stack properly.</P>
-<P>The fonts for the GUI and OSD will scale to whatever sizes you use. Most
+window manager to 'Click to Focus' for windows to stack properly.</CAPTION>
+</FIGURE>
+
+The fonts for the GUI and OSD will scale to whatever sizes you use. Most
 font sizes can be changed in setup selections or in the .xml files under
 <CODE>/usr/local/share/mythtv/</CODE> . Make sure to use fonts large enough
 to be read on a TV screen from a distance.</P>
@@ -241,9 +253,14 @@ information.</P>
 <H2><A NAME="ss21.6">21.6</A> <A HREF="mythtv-HOWTO.html#toc21.6">I'd like to delete the MySQL database.</A>
 </H2>
 
-<P><B>NOTE</B>:  Performing this step will remove the entire database. 
-You will lose all of your settings and will need to re-run the mc.sql script
-to setup the database structure before running the setup program.
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  Performing this step will remove the entire database. You will lose all of your settings and will need to re-run the mc.sql script
+to setup the database structure before running the setup program.</CAPTION>
+</FIGURE>
+
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mysql -u root
@@ -519,10 +536,16 @@ $
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P><B>NOTE</B>: msec can only <EM>reduce</EM> the permissions of files, so if
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>: msec can only <EM>reduce</EM> the permissions of files, so if
 you don't get the results you expect, check that you're not asking
 <CODE>msec</CODE> to add missing permissions to the files or directories you
-created.</P>
+created.</CAPTION>
+</FIGURE>
+</P>
 <H3>Gentoo</H3>
 
 <P>The portage file for MythTV has scripts that will allow you to run
@@ -650,9 +673,15 @@ box, so changing the hostname involves altering the name in the
 operating system and in the MySQL database.  In the examples below, the old
 name of the system was "frontend1" and we're going to change it to
 "kidsroom".</P>
-<P><B>NOTE</B>:  Changing the hostname using direct SQL update commands will
-break things.  You <EM>MUST</EM> use this indirect method.</P>
-<P>1.  Stop all backends.  If you run <B>mythbackend</B> from a terminal
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  Changing the hostname using direct SQL update commands will
+break things.  You <EM>MUST</EM> use this indirect method.</CAPTION>
+</FIGURE>
+ 
+1.  Stop all backends.  If you run <B>mythbackend</B> from a terminal
 session, press control-c. If your backends are started with an init
 script, you would do something like the following:
 <BLOCKQUOTE><CODE>

@@ -17,13 +17,19 @@ Next
 <H2><A NAME="pvr250"></A> <A NAME="ss22.1">22.1</A> <A HREF="mythtv-HOWTO.html#toc22.1">Hauppauge PVR-250/350 hardware MPEG-2 encoder. </A>
 </H2>
 
-<P><B>NOTE</B>:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS
 NOT GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR IVTV DRIVER ASSISTANCE,
 SEE THE IVTV MAILING LIST.  
 <A HREF="https://lists.sourceforge.net/lists/listinfo/ivtv-devel">https://lists.sourceforge.net/lists/listinfo/ivtv-devel</A>  SEE THE
 IVTV FAQ IF YOU HAVE QUESTIONS OR ISSUES.  
-<A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A></P>
-<P>These instructions work for Mandrake 9.1 on a backend machine which is
+<A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A></CAPTION>
+</FIGURE>
+
+These instructions work for Mandrake 9.1 on a backend machine which is
 hosting a single PVR-250 capture card.</P>
 <P>Install the Mandrake kernel source.  If you are using a different Mandrake
 kernel level (ie, not 2.4.21-0.16mdk as in the example below, then alter the
@@ -39,8 +45,14 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P><B>NOTE</B>:  You do not need to recompile your kernel.</P>
-<P>Download the latest IVTV driver from Sourceforge.  Check 
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  You do not need to recompile your kernel.</CAPTION>
+</FIGURE>
+
+Download the latest IVTV driver from Sourceforge.  Check 
 <A HREF="http://sourceforge.net/projects/ivtv/">http://sourceforge.net/projects/ivtv/</A> for the current version. 
 Right now (2004-01-21), it's 0.1.9.  Untar the file.
 <BLOCKQUOTE><CODE>
@@ -81,10 +93,16 @@ KERNELDIR= /usr/src/linux
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P><B>NOTE</B>:  If you are running a distribution / kernel which is using
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  If you are running a distribution / kernel which is using
 the new version of i2c (version 2.8.x, found in the latest Mandrake and
 Cooker) you will need to make the following edit. Look for
-<A NAME="i2c"></A> 
+<A NAME="i2c"></A> </CAPTION>
+</FIGURE>
+
 <BLOCKQUOTE><CODE>
 <PRE>
 # uncomment if you use i2c 2.8.0+
@@ -112,8 +130,14 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P><B>NOTE</B>: You may get warnings about i2c during the compile.  Ignore
-them if they look something like this:
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>: You may get warnings about i2c during the compile.  Ignore
+them if they look something like this:</CAPTION>
+</FIGURE>
+
 <CODE>#warning Using temporary hack for missing I2C driver-ID for saa7114</CODE></P>
 <P>However, if you get an actual compile error where the compile doesn't finish
 and the error looks like:
@@ -122,8 +146,13 @@ initializer</CODE>
 then you didn't uncomment CFLAGS as specified 
 <A HREF="#i2c">above</A>.</P>
 <P>Add the following to <CODE>/etc/modules.conf</CODE>:
-<B>NOTE</B>:  You do not need to add the last line "<CODE>add above...</CODE>"
-if you will not be using the IR remote that came with the card.
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  You do not need to add the last line "<CODE>add above...</CODE>"
+if you will not be using the IR remote that came with the card.</CAPTION>
+</FIGURE>
+
 <BLOCKQUOTE><CODE>
 <PRE>
 alias char-major-81     videodev
@@ -137,12 +166,18 @@ add above ivtv lirc_dev lirc_i2c
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P><B>NOTE</B>:  You must specify the tuner type manually.  See
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  You must specify the tuner type manually.  See
 <CODE>~/ivtv/driver/tuner.h</CODE> for a listing of tuners.  In the above
 example, <CODE>tuner type=2</CODE> is a Phillips NTSC.  Use an appropriate tuner
 type for your system and video standard.  The <CODE>debug=1</CODE> parameter on
-the ivtv line actually means less debugging output will be printed.</P>
-<P>At this point we need to ensure that there are no other versions of
+the ivtv line actually means less debugging output will be printed.</CAPTION>
+</FIGURE>
+
+At this point we need to ensure that there are no other versions of
 <CODE>msp3400.o</CODE> that would be loaded instead of the version that is
 created by ivtv.  Note that in the command below we are using the backtick,
 usually located on the same key as the tilde "&nbsp;" and not the single quote.
@@ -207,9 +242,15 @@ crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
 directory on the machine hosting the hardware MPEG-2 card.
 When you add a new capture card, ensure that you are using the
 <CODE>video0</CODE> device.  </P>
-<P><B>NOTE</B>:  As of 2003-04-25 the ivtv driver does not support VBI, so
-closed-captioning is not available.</P>
-<P>Leave the VBI device, audio device and audio sampling rate limit at the
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  As of 2003-04-25 the ivtv driver does not support VBI, so
+closed-captioning is not available.</CAPTION>
+</FIGURE>
+
+Leave the VBI device, audio device and audio sampling rate limit at the
 default values.  Change the default input to an appropriate setting for your
 configuration.  Change the card type to "Hardware MPEG Encoder Card" and
 press ENTER.</P>
@@ -227,7 +268,10 @@ command to <CODE>/etc/rc.d/rc.local</CODE>:
 </CODE></BLOCKQUOTE>
 </P>
 <P>
-<A NAME="troubleshooting_pvraudio"></A> <B>NOTE</B>:  some people complain
+<A NAME="troubleshooting_pvraudio"></A> <FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  some people complain
 that their PVR-250/350 card is not capturing audio.  The most likely source
 for this is that your system is not loading the correct msp3400.o file; ivtv
 uses a custom msp3400.c, and if the resulting module isn't loaded you will
@@ -242,8 +286,10 @@ subdirectory which will take precedence over the custom version created by
 ivtv.  You can check if you have the correct msp3400 loaded by typing (as
 root): <CODE>modinfo msp3400 | grep "parm: *standard"</CODE>.  If you don't get
 a line that says: "parm:        standard int", then you're not loading the
-correct msp3400.</P>
-<P>Check to ensure that you're loading the correct msp3400 module.
+correct msp3400.</CAPTION>
+</FIGURE>
+
+Check to ensure that you're loading the correct msp3400 module.
 <BLOCKQUOTE><CODE>
 <PRE>
  
@@ -254,10 +300,16 @@ filename:    /lib/modules/2.4.22-9mdk/kernel/drivers/media/video/msp3400.o
 </P>
 <P>Check that the path is correct for your kernel version, and that the driver
 being loaded is in <CODE>/media/video</CODE> and not some other directory.</P>
-<P><B>NOTE</B>:  Some people report "ghosting" issues with their PVR-250s,
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  Some people report "ghosting" issues with their PVR-250s,
 where there is a faint copy of whatever is on the screen appearing to the
 right of the image.  If you have this issue, it's fairly obvious.  This is a
-firmware issue, apparently.  There are two ways around this:
+firmware issue, apparently.  There are two ways around this:</CAPTION>
+</FIGURE>
+
 <OL>
 <LI>Run at 720x480 resolution</LI>
 <LI>Turn off DNR</LI>
@@ -274,11 +326,17 @@ firmware issue, apparently.  There are two ways around this:
 <H2><A NAME="hauppauge_remote"></A> <A NAME="ss22.2">22.2</A> <A HREF="mythtv-HOWTO.html#toc22.2">Hauppauge PVR-250 remote and MythTV's native LIRC support.</A>
 </H2>
 
-<P><B>NOTE</B>:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS
 NOT GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR LIRC DRIVER ASSISTANCE,
 SEE THE LIRC MAILING LIST.  
-<A HREF="http://lists.sourceforge.net/lists/listinfo/lirc-list">http://lists.sourceforge.net/lists/listinfo/lirc-list</A></P>
-<P>These instructions work for Mandrake 9.2 on a frontend machine which is
+<A HREF="http://lists.sourceforge.net/lists/listinfo/lirc-list">http://lists.sourceforge.net/lists/listinfo/lirc-list</A></CAPTION>
+</FIGURE>
+
+These instructions work for Mandrake 9.2 on a frontend machine which is
 hosting a single PVR-250 capture card using MythTV's native LIRC support.</P>
 <P>First, you need to ensure that you've installed the kernel source
 appropriate for the kernel that you're running.  In this case, we're using
@@ -399,13 +457,19 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P><B>NOTE</B>:  If you receive a compile error stating:
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  If you receive a compile error stating:
 <CODE>lirc_i2c.c:296: unknown field 'owner' specified in initializer</CODE>, you
 will need to edit the file and comment out a line in the source code.  See
 message 
 <A HREF="http://www.gossamer-threads.com/perl/mailarc/gforum.cgi?post=86696">http://www.gossamer-threads.com/perl/mailarc/gforum.cgi?post=86696</A>
-for detailed instructions.</P>
-<P>As a part of the <CODE>make install</CODE> process, LIRC will create the
+for detailed instructions.</CAPTION>
+</FIGURE>
+
+As a part of the <CODE>make install</CODE> process, LIRC will create the
 appropriate device for you in <CODE>/dev</CODE>.  Check to make sure:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -654,11 +718,16 @@ it type 0x8e using your partition editor.</P>
 <P><CODE># pvcreate /dev/hdb1</CODE></P>
 <P>Add the new physical volume to the volume group:</P>
 <P><CODE># vgextend VGforMyth /dev/hdb1</CODE></P>
-<P><B>NOTE</B>:  You may get errors at this point stating that there are no
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  You may get errors at this point stating that there are no
 physical volumes available for adding to the LV, even though you know for a
-fact that there are.  You may need to specify the physical volume in the 
-<CODE>/dev/ide/host/bus/target/lun/etc</CODE> format.</P>
-<P>Once you've completed one of the following two procedures, use <B>df</B>
+fact that there are.  You may need to specify the physical volume in the <CODE>/dev/ide/host/bus/target/lun/etc</CODE> format.</CAPTION>
+</FIGURE>
+
+Once you've completed one of the following two procedures, use <B>df</B>
 to check that you've got more space.</P>
 
 <H3>ReiserFS</H3>

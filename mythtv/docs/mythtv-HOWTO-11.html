@@ -14,18 +14,289 @@
 <HR>
 <H2><A NAME="s11">11.</A> <A HREF="mythtv-HOWTO.html#toc11">Using MythTV.</A></H2>
 
-<P><B>NOTE to Red Hat users</B>:Red Hat Linux 9 ships with Gnome as
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE to Red Hat users</B>:Red Hat Linux 9 ships with Gnome as
 the default desktop environment.  However, Gnome seems to have issues with
 window focus and window switching which sometimes cause mythfrontend to
 obscure the video. KDE does not seem to have any such issues. Therefore you
 will need to switch to KDE by selecting RedHatMenu>Extras>System
-Settings>Desktop Switching Tool and choose "KDE".</P>
-
+Settings>Desktop Switching Tool and choose "KDE".</CAPTION>
+</FIGURE>
+</P>
 <H2><A NAME="ss11.1">11.1</A> <A HREF="mythtv-HOWTO.html#toc11.1">Keyboard commands.</A>
 </H2>
 
-<P>The <CODE>keys.txt</CODE> file describes what the various keyboard commands are. 
+<P>The <CODE>keys.txt</CODE> file describes what the various keyboard commands are.
 If you have loaded mythweb, you may change the default keys to your liking.</P>
+<H3>mythfrontend</H3>
+
+<P>
+<BR><CENTER>
+<TABLE BORDER><TR><TD>
+Arrow keys </TD><TD> used to move the highlight point around </TD></TR><TR><TD>
+ALT-F4 </TD><TD> exit out of the application </TD></TR><TR><TD>
+Space/Enter     </TD><TD> take action on the item under the highlight point </TD></TR><TR><TD>
+P </TD><TD> play in both "Watch a Recording" and "Delete a Recording"   </TD></TR><TR><TD>
+D </TD><TD> delete in both "Watch a Recording" and "Delete a Recording" </TD></TR><TR><TD>
+I </TD><TD> edit recording options from the EPG, "Program Finder",&nbsp;"Program Recording Priorities", or "Fix Scheduling Conflicts"&nbsp;screens. From the Playback and Delete screens, 'I' presents&nbsp;options for recorded shows such as Auto Expire or Stop Recording.&nbsp;Pressing 'I' while on the Recording Options screen will take you&nbsp;to the Advanced Recording Options screen.
+</TD></TR></TABLE>
+</CENTER><BR>
+</P>
+<H3>Watching TV or a recording</H3>
+
+<P>
+<BR><CENTER>
+<TABLE BORDER><TR><TD>
+Up or down      </TD><TD> keys change the channel </TD></TR><TR><TD>
+num pad </TD><TD> Type a number to enter a channel number or jump amount (HHMM format) </TD></TR><TR><TD>
+P </TD><TD> pause / play </TD></TR><TR><TD>
+C </TD><TD> change inputs on TV Tuner card </TD></TR><TR><TD>
+ESC </TD><TD> quits </TD></TR><TR><TD>
+I </TD><TD> puts the On-screen Display up again. During playback, 'I' toggles&nbsp;between position and show description info. If a jump amount is&nbsp;entered, jump to that position. </TD></TR><TR><TD>
+M </TD><TD> brings up the electronic program guide (Grid) -- see the EPG section </TD></TR><TR><TD>
+Page Up </TD><TD> jump back the configured number of minutes (default is 10) </TD></TR><TR><TD>
+Page Down       </TD><TD> jump ahead the configured number of minutes (default is 10) </TD></TR><TR><TD>
+End or Z        </TD><TD> skip to next commercial break marker </TD></TR><TR><TD>
+Home or Q       </TD><TD> skip back to previous commercial break marker </TD></TR><TR><TD>
+T </TD><TD> toggle close caption support </TD></TR><TR><TD>
+F </TD><TD> rotate between the various Picture Adjustments (Colour, Hue, etc.)&nbsp;While Picture Adjustment is on-screen, use Left and Right arrows to&nbsp;adjust. These settings adjust the look of the video playback, and are&nbsp;independent of the G-key settings used at record-time. </TD></TR><TR><TD>
+[ or F10        </TD><TD> decrease volume </TD></TR><TR><TD>
+] or F11        </TD><TD> increase volume </TD></TR><TR><TD>
+| or F9 </TD><TD> toggle mute </TD></TR><TR><TD>
+/ </TD><TD> jump to the next "favorite" channel </TD></TR><TR><TD>
+? </TD><TD> mark/unmark the current channel as a "favorite" </TD></TR><TR><TD>
+U </TD><TD> increase the play speed </TD></TR><TR><TD>
+J </TD><TD> decrease the play speed </TD></TR><TR><TD>
+W </TD><TD> cycle through 4:3 aspect ratio, 16:9, and 4:3 Zoom (like pan and scan) </TD></TR><TR><TD>
+Left </TD><TD> (if a jump amount is entered) to jump back that amount </TD></TR><TR><TD>
+Right </TD><TD> (if a jump amount is entered) to jump ahead that amount </TD></TR><TR><TD>
+</TD><TD> </TD></TR><TR><TD>
+</TD><TD> </TD></TR><TR><TD>
+</TD><TD> <B>Without the stickykeys option selected</B> </TD></TR><TR><TD>
+Left </TD><TD> rewind the configured number of seconds (default is 5) </TD></TR><TR><TD>
+Right </TD><TD> fast forward the configured number of seconds (default is 30) </TD></TR><TR><TD>
+&lt; </TD><TD> starts rewind mode as if stickykeys are selected </TD></TR><TR><TD>
+> </TD><TD> starts fast forward mode as if stickykeys are selected </TD></TR><TR><TD>
+</TD><TD> </TD></TR><TR><TD>
+</TD><TD> </TD></TR><TR><TD>
+</TD><TD> <B>With Stickykeys option selected</B> </TD></TR><TR><TD>
+Right </TD><TD> starts fast forward mode </TD></TR><TR><TD>
+Left </TD><TD> starts rewind mode </TD></TR><TR><TD>
+</TD><TD> </TD></TR><TR><TD>
+</TD><TD> </TD></TR><TR><TD>
+</TD><TD> <B>In fast forward or rewind mode:</B> </TD></TR><TR><TD>
+Left/Right      </TD><TD> increases the ff/rew speed </TD></TR><TR><TD>
+0 </TD><TD> plays at normal speed, but leaves the time indicator on screen </TD></TR><TR><TD>
+1 or 2 </TD><TD> plays back more slowly than normal ff/rew speed (1 is slowest) </TD></TR><TR><TD>
+3 </TD><TD> plays back at normal ff/rew speed </TD></TR><TR><TD>
+4-9 </TD><TD> plays back faster than normal ff/rew speed (9 is fastest) </TD></TR><TR><TD>
+Space </TD><TD> exits fast forward or rewind mode </TD></TR><TR><TD>
+</TD><TD> </TD></TR><TR><TD>
+</TD><TD> </TD></TR><TR><TD>
+</TD><TD> <B>While video is paused:</B> </TD></TR><TR><TD>
+Left </TD><TD> rewind 1 frame </TD></TR><TR><TD>
+&lt; </TD><TD> rewind 1 second </TD></TR><TR><TD>
+Right </TD><TD> advance 1 frame </TD></TR><TR><TD>
+&gt; </TD><TD> advance 1 second
+</TD></TR></TABLE>
+</CENTER><BR>
+</P>
+<H3>Watching TV only</H3>
+
+<P>
+<BR><CENTER>
+<TABLE BORDER><TR><TD>
+G       </TD><TD> rotate between the various Picture Adjustments (Colour, Hue, etc.)&nbsp;for recording. These values affect the look of the resulting .nuv&nbsp;file, and are independent of the playback picture settings. While&nbsp;Picture Adjustment is on-screen, use Left and Right arrows to adjust. </TD></TR><TR><TD>
+H       </TD><TD> Channel history. Each repeat steps back through the previous channels. </TD></TR><TR><TD>
+O       </TD><TD> Turns on 'Browse' mode, allowing user to browse channels and program&nbsp;info while watching current show FullScreen. </TD></TR><TR><TD>
+F8      </TD><TD> toggle the sleep timer 30m->1hr->1hr30m->2hr->Off
+</TD></TR></TABLE>
+</CENTER><BR>
+</P>
+<H3>Watching a recording only</H3>
+
+<P>
+<BR><CENTER>
+<TABLE BORDER><TR><TD>
+Space/Enter </TD><TD> set a bookmark at that point. Next time you start the&nbsp;recording, you will automatically jump forward to this point&nbsp;and clear the bookmark. </TD></TR><TR><TD>
+X </TD><TD> queues the current recording for transcoding </TD></TR><TR><TD>
+O </TD><TD> brings up menu to allow toggling settings such as Commercial&nbsp;Auto-Skip, Auto-Expire, etc. </TD></TR><TR><TD>
+E or M </TD><TD> enters/exits edit mode. </TD></TR><TR><TD>
+</TD><TD> </TD></TR><TR><TD>
+</TD><TD> </TD></TR><TR><TD>
+</TD><TD> <B>In edit mode</B> </TD></TR><TR><TD>
+Left/Right      </TD><TD> move forward and backward </TD></TR><TR><TD>
+Up/Down </TD><TD> alter the amount of time you jump forward and backward.&nbsp;Increments are: nearest cutpoint, nearest video keyframe, 1&nbsp;frame, 0.5 seconds, 1 second, 20 seconds, 1 minute, 5 minutes,&nbsp;and 10 minutes. </TD></TR><TR><TD>
+PageUp/PageDown </TD><TD> move forward and backward to the nearest cut point </TD></TR><TR><TD>
+&lt; or > </TD><TD> move forward or backward by 10 times the normal jump amount </TD></TR><TR><TD>
+Space/Enter     </TD><TD> allows you to set or delete a cut point </TD></TR><TR><TD>
+Z </TD><TD> loads the commercial skip list (if one exists) into the cutlist </TD></TR><TR><TD>
+C or Q </TD><TD> clear all cut points in the cutlist
+</TD></TR></TABLE>
+</CENTER><BR>
+</P>
+<H3>LiveTV Browse Mode</H3>
+
+<P>
+<BR><CENTER>
+<TABLE BORDER><TR><TD>
+Left </TD><TD> browse program prior to current listed program </TD></TR><TR><TD>
+Right </TD><TD> browse program following current listed program </TD></TR><TR><TD>
+Up </TD><TD> browse program on channel above current listed channel/program </TD></TR><TR><TD>
+Down </TD><TD> browse program on channel below current listed channel/program </TD></TR><TR><TD>
+/ </TD><TD> browse program on next favorite channel </TD></TR><TR><TD>
+0-9 </TD><TD> enter a channel number to browse </TD></TR><TR><TD>
+Space/Enter     </TD><TD> change channel to channel of current listed program </TD></TR><TR><TD>
+R/r </TD><TD> Toggle recording of current program (cycles through types) </TD></TR><TR><TD>
+ESC/O </TD><TD> Exit Browse mode
+</TD></TR></TABLE>
+</CENTER><BR>
+</P>
+<H3>Playback Recording Zoom Mode</H3>
+
+<P>
+<BR><CENTER>
+<TABLE BORDER><TR><TD>
+Left </TD><TD> Move video to Left </TD></TR><TR><TD>
+Right </TD><TD> Move video to Right </TD></TR><TR><TD>
+Up </TD><TD> Move video Up </TD></TR><TR><TD>
+Down </TD><TD> Move video Down </TD></TR><TR><TD>
+PageUp </TD><TD> Zoom In </TD></TR><TR><TD>
+PageDown        </TD><TD> Zoom Out </TD></TR><TR><TD>
+Space/Enter     </TD><TD> Exit Zoom mode leaving picture at current size and position </TD></TR><TR><TD>
+ESC </TD><TD> Exit Zoom mode and return to original size
+</TD></TR></TABLE>
+</CENTER><BR>
+</P>
+<H3>If you have two or more tuner cards</H3>
+
+<P>
+<BR><CENTER>
+<TABLE BORDER><TR><TD>
+V       </TD><TD> toggle Picture-in-picture on or off </TD></TR><TR><TD>
+B       </TD><TD> toggles the window focus (lets you change channels on the PiP window) </TD></TR><TR><TD>
+N       </TD><TD> swaps the two channels by changing channels on both cards
+</TD></TR></TABLE>
+</CENTER><BR>
+</P>
+<H3>EPG</H3>
+
+<P>
+<BR><CENTER>
+<TABLE BORDER><TR><TD>
+Arrows </TD><TD> are used to move the highlighted program point around </TD></TR><TR><TD>
+A, D, S, W </TD><TD> perform the same as left, right, down and up </TD></TR><TR><TD>
+PageUp/PageDown </TD><TD> move the channel list up or down a page </TD></TR><TR><TD>
+Home/End </TD><TD> move the highlight left or right by one day </TD></TR><TR><TD>
+Ctrl+Left or &lt; </TD><TD> move the highlight left by one page </TD></TR><TR><TD>
+Ctrl+Right or &gt; </TD><TD> move the highlight right by one page </TD></TR><TR><TD>
+9, 3, 7, 1 </TD><TD> (like a numeric keypad) perform the same as PageUp, PageDown,&nbsp;Home and End </TD></TR><TR><TD>
+I </TD><TD> bring up more information about a show, and allow you to&nbsp;schedule a recording. If you select "Record this showing"&nbsp;while watching Live TV you can "Instant Record" a program. </TD></TR><TR><TD>
+Space/Enter </TD><TD> allow you resolve conflicts or change overrides. If the&nbsp;program is not already scheduled to record, it will instead act like&nbsp;pressing 'I'. </TD></TR><TR><TD>
+M </TD><TD> when on a channel will change to that channel </TD></TR><TR><TD>
+ESC or C </TD><TD> exits without changing the channel </TD></TR><TR><TD>
+R </TD><TD> change the current item from Recording/Not-Recording.&nbsp;Successive keypresses cycle through the scheduled recording&nbsp;type list. </TD></TR><TR><TD>
+X </TD><TD> change the channel to the currently selected channel without&nbsp;leaving the EPG (Most useful in the alternate EPG) </TD></TR><TR><TD>
+/ </TD><TD> mark/unmark the current channel as a "favorite" </TD></TR><TR><TD>
+4 </TD><TD> toggle the guide listing between all channels and filtered&nbsp;"favorites"
+</TD></TR></TABLE>
+</CENTER><BR>
+</P>
+<H3>Setting Program or Channel Recording Priorities</H3>
+
+<P>
+<BR><CENTER>
+<TABLE BORDER><TR><TD>
+Right </TD><TD> increases priority value        </TD></TR><TR><TD>
+Left </TD><TD> decreases priority value </TD></TR><TR><TD>
+1 </TD><TD> sorts by title </TD></TR><TR><TD>
+2 </TD><TD> sorts by priority </TD></TR><TR><TD>
+Home/End        </TD><TD> toggle sort priority </TD></TR><TR><TD>
+I </TD><TD> edit recording options      </TD></TR><TR><TD>
+ESC </TD><TD> commits changes and exits
+</TD></TR></TABLE>
+</CENTER><BR>
+</P>
+<H3>Viewing Scheduled Recordings/Resolving Conflicts</H3>
+
+<P>
+<BR><CENTER>
+<TABLE BORDER><TR><TD>
+1 </TD><TD> show all recordings </TD></TR><TR><TD>
+2 </TD><TD> show only important recordings </TD></TR><TR><TD>
+Home/End        </TD><TD> toggle show showing all/important </TD></TR><TR><TD>
+I </TD><TD> edit recording options </TD></TR><TR><TD>
+Space/Enter     </TD><TD> resolve conflict or override
+</TD></TR></TABLE>
+</CENTER><BR>
+</P>
+<H3>Viewing Search Listings</H3>
+
+<P>
+<BR><CENTER>
+<TABLE BORDER><TR><TD>
+Home    </TD><TD> change to the previous view if applicable     </TD></TR><TR><TD>
+End     </TD><TD> change to the next view if applicable </TD></TR><TR><TD>
+M       </TD><TD> select another view if applicable. In the&nbsp;title and description search popup, press&nbsp;M again to edit or delete the selected view.
+</TD></TR></TABLE>
+</CENTER><BR>
+</P>
+<H3>Recording Profiles Setup Screen</H3>
+
+<P>
+<BR><CENTER>
+<TABLE BORDER><TR><TD>
+D       </TD><TD> on a custom profile group displays a popup to delete the group</TD></TR><TR><TD>
+</TD></TR></TABLE>
+</CENTER><BR>
+</P>
+<H3>Recording Groups</H3>
+
+<P>In the Watch Recordings screen, Recording Groups allow you to separate
+programs into user-defined categories, such as "Kids", "Alice", "Bob", etc. 
+This can be used to reduce clutter, or to segregate content if you use the
+PIN function.
+<BR><CENTER>
+<TABLE BORDER><TR><TD>
+M       </TD><TD> change the view or to set a group password </TD></TR><TR><TD>
+I       </TD><TD> move a program from one Recording Group to another
+</TD></TR></TABLE>
+</CENTER><BR>
+</P>
+
+<H3>Remote Controls</H3>
+
+<P>If you are using MythTV with just a remote control then it is suggested that you
+map the remote control keys as described below.  Your remote control may not
+have the same set of keys as those named below, the names are only a suggestion
+that roughly correspond to the function.</P>
+<P>If you are adding new key bindings to the program then consideration of this
+suggested list will help users with remote controls.</P>
+<P>This list assumes a minimal remote control that only has 20 keys, nearly all
+features can be used with this configuration.  If you have more keys then you
+can access all of the features.  With only 16 keys most features are usable.
+<BR><CENTER>
+<TABLE BORDER><TR><TD>
+REMOTE CONTROL </TD><TD> LIRC KEYSTROKE </TD><TD> FUNCTION </TD></TR><TR><TD>
+0 - 9 </TD><TD> 0 - 9 </TD><TD> channel selection, EPG navigation, ff/rew speed setting (with stickykeys)       </TD></TR><TR><TD>
+Left Arrow </TD><TD> Left </TD><TD> scroll left, rewind </TD></TR><TR><TD>
+Right Arrow </TD><TD> Right </TD><TD> scroll right, fast forward </TD></TR><TR><TD>
+Up Arrow </TD><TD> Up </TD><TD> scroll up, channel change up </TD></TR><TR><TD>
+Down Arrow </TD><TD> Down </TD><TD> scroll down, channel change down </TD></TR><TR><TD>
+Select / OK / Play </TD><TD> Space </TD><TD> Select item, play (with stickykeys) set bookmark </TD></TR><TR><TD>
+Cancel </TD><TD> Escape </TD><TD> Cancel, quit playback </TD></TR><TR><TD>
+Menu </TD><TD> m </TD><TD> EPG (from watching TV) edit (from playback). </TD></TR><TR><TD>
+Pause </TD><TD> p </TD><TD> Pause </TD></TR><TR><TD>
+Other key 1 </TD><TD> i </TD><TD> Information </TD></TR><TR><TD>
+Other key 2 </TD><TD> c </TD><TD> Change tuner card input
+</TD></TR></TABLE>
+</CENTER><BR>
+</P>
+
+
 <H2><A NAME="ss11.2">11.2</A> <A HREF="mythtv-HOWTO.html#toc11.2">Using themes with MythTV.</A>
 </H2>
 
@@ -45,9 +316,14 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 <P>The theme will now be available in the mythfrontend Appearance section.</P>
-<P><B>NOTE</B>:  if the theme file you downloaded is a <CODE>bz2</CODE> file, use
-<CODE>tar -xjf</CODE> rather than <CODE>tar -xzf</CODE>.</P>
-
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  if the theme file you downloaded is a <CODE>bz2</CODE> file, use
+<CODE>tar -xjf</CODE> rather than <CODE>tar -xzf</CODE>.</CAPTION>
+</FIGURE>
+</P>
 <H2><A NAME="ss11.3">11.3</A> <A HREF="mythtv-HOWTO.html#toc11.3">Adding DirecTV information to the database.</A>
 </H2>
 

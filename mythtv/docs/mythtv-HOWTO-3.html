@@ -102,10 +102,15 @@ may be useful if you are running multiple encoders.</P>
 on the encoding scheme, the size of the raw images, and the frames per
 second, but typical values for MythTV range from 700 megabytes/hour to 2
 gigabyte/hour for MPEG-4 and larger for MPEG-2 and RTjpeg.</P>
-<P><B>NOTE</B>:  You <EM>must</EM> use DMA for hard drive access to prevent
-choppy or jittery video.  Not all distributions enable DMA at boot time. 
-See the Troubleshooting Section for 
-<A HREF="mythtv-HOWTO-20.html#Setting_DMA">instructions</A> on how to do this.</P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  You <EM>must</EM> use DMA for hard drive access to prevent
+choppy or jittery video.  Not all distributions enable DMA at boot time. See the Troubleshooting Section for 
+<A HREF="mythtv-HOWTO-20.html#Setting_DMA">instructions</A> on how to do this.</CAPTION>
+</FIGURE>
+</P>
 <P>Writing video to disk is sensitive to timing issues; RTjpeg requires less
 CPU with the tradeoff being larger files and needing to write to the disk
 faster.  MPEG-4 requires more CPU, but the files are smaller.  At the
@@ -157,12 +162,22 @@ are not the same.  The All-in-Wonder cards will not work with MythTV.
 </PRE>
 <HR>
 </P>
-<P><B>NOTE</B>: The ATI All-in-Wonder cards (which are not the same as the ATI
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+</FIGURE>
+
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>: The ATI All-in-Wonder cards (which are not the same as the ATI
 TV Wonder, TV Wonder VE or TV Wonder Pro) <EM>will not</EM> work as a MythTV
 capture device because the GATOS 
 <A HREF="http://gatos.sourceforge.net">http://gatos.sourceforge.net</A>
-drivers that are available provide only a limited subset of the V4L API. 
-The TV Wonder series of cards are supported by the Bt8x8 Video4Linux driver.</P>
+drivers that are available provide only a limited subset of the V4L API. The TV Wonder series of cards are supported by the Bt8x8 Video4Linux driver.</CAPTION>
+</FIGURE>
+</P>
 <P>Newer cards may use the CX23881 series of chips; a driver is available at
 <A HREF="http://bytesex.org/cx88/">http://bytesex.org/cx88/</A>.</P>
 <P>After you have installed a suitable capture device, you can check that 
@@ -279,14 +294,26 @@ when using <CODE>btaudio</CODE>, and that often the audio recorded in this
 way will be mono only.  See the 
 <A HREF="mythtv-HOWTO-21.html#btaudio">btaudio</A>
 section for more information.</P>
-<P><B>NOTE</B>:  The MPEG-2 cards supported by the IVTV driver do not require
-a sound card for audio capture.</P>
-<P><B>NOTE</B>:  Plugging a Line-level device into the Mic input is not
+<P>
+<FIGURE>
+<EPS FILE="warning">
+<IMG SRC="warning.png">
+<CAPTION><B>NOTE</B>:  The MPEG-2 cards supported by the IVTV driver do not require
+a sound card for audio capture.</CAPTION>
+</FIGURE>
+</P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  Plugging a Line-level device into the Mic input is not
 recommended.  Line-level devices have higher voltages and can damage the
 sound card.  In addition, even if it doesn't break your card, you will be
 getting Mono sound.  See the Linux MP3 HOWTO at 
 <A HREF="http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-formats/html_single/MP3-HOWTO.html#toc8">http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-formats/html_single/MP3-HOWTO.html#toc8</A>
-for additional information.</P>
+for additional information.</CAPTION>
+</FIGURE>
+</P>
 
 <H3>Video Display Card</H3>
 
@@ -443,11 +470,23 @@ the "Plus" version above)</LI>
 <P>There are a few ways of installing programs on Linux systems; you can
 either use a pre-compiled package, or install from a tarball after
 satisfying any prerequisites.</P>
-<P><B>NOTE</B>: you must have the MySQL database software installed on a
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>: you must have the MySQL database software installed on a
 system to store the master database.  This does not necessarily mean that
-MySQL must run on one of the MythTV boxes.</P>
-<P><B>NOTE</B>:  The following distributions have issues which may prevent a
-successful MythTV installation:
+MySQL must run on one of the MythTV boxes.</CAPTION>
+</FIGURE>
+</P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  The following distributions have issues which may prevent a
+successful MythTV installation:</CAPTION>
+</FIGURE>
+
 <UL>
 <LI>Suse 8.2 - Broken Qt package</LI>
 <LI>Red Hat 8 - does not meet minimum version requirement for Qt (3.1)</LI>
@@ -539,17 +578,23 @@ by Matt Zimmerman
 Installation instructions can be found on those pages as well. All of the
 prerequisites for MythTV are available as Debian packages, most of them from
 the official Debian archive.</P>
-<P><B>NOTE</B>:  Due to the requirement for Qt 3.1, there are no packages for
-Debian woody/stable.</P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  Due to the requirement for Qt 3.1, there are no packages for
+Debian woody/stable.</CAPTION>
+</FIGURE>
+</P>
 
 <P>The Debian packages are configured such that MythTV programs should be
 run as the <CODE>mythtv</CODE> user, which is automatically created during
-installation.  This user has access to write new recordings to disk in
-the default directory, read and write the database, access the audio
-and video devices, and everything else that MythTV needs to do.</P>
+installation.  This user has access to write new recordings to disk in the
+default directory, read and write the database, access the audio and video
+devices, and everything else that MythTV needs to do.</P>
 
-<P>See <CODE>/usr/share/doc/<I>packagename</I>/README.Debian</CODE> for
-more information, including copies of the MythTV documentation.  The
+<P>See <CODE>/usr/share/doc/<I>packagename</I>/README.Debian</CODE> for more
+information, including copies of the MythTV documentation.  The
 <CODE>mythtv-doc</CODE> package contains a copy of this HOWTO in
 <CODE>/usr/share/doc/mythtv-doc</CODE>.</P>
 
@@ -616,12 +661,12 @@ freetype2-devel installed.</P>
 <P>Finally, check for qt.  You'll need libqt3-devel (under folder "KDE and
 Qt") and libqt3 ("Libraries").</P>
 <P>
-<HR>
-<PRE>
-NOTE for Mandrake 9.1 users:  Mandrake 9.1 has removed the MySQL modules
-from the default installation.  Ensure that you install libqt3-mysql.
-</PRE>
-<HR>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION>NOTE for Mandrake 9.1 users:  Mandrake 9.1 has removed the MySQL modules
+from the default installation.  Ensure that you install libqt3-mysql.</CAPTION>
+</FIGURE>
 </P>
 <P>Make sure that cdialog is installed if you want to use MythTV with a remote
 control if you need to compile <B>lirc</B> from source.</P>
@@ -682,7 +727,9 @@ everything already installed
 </CODE></BLOCKQUOTE>
 </P>
 <P>In that case, you're ready to move to the next 
-<A HREF="mythtv-HOWTO-4.html#Setting_up_paths">section</A>.</P>
+<A HREF="mythtv-HOWTO-4.html#Setting_up_paths">section</A>.  Once you have completed installing the pre-requisites,
+exit out of the shell and start a new one to ensure that any environment
+variables setup by the installation have a chance to take effect.</P>
 <H3>Gentoo. </H3>
 
 <P>If Qt has not been installed on your system: Edit

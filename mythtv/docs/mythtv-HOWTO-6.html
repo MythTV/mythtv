@@ -21,7 +21,13 @@
 running and started at boot.  Click on Mandrake Control
 Center->System->Services, find MySQL and click the "On Boot" button and the
 "Start" button if the MySQL status shows that it isn't running yet.</P>
-<P><B>NOTE</B>:  There have been reports that MySQL isn't starting at boot.
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  There have been reports that MySQL isn't starting at boot.</CAPTION>
+</FIGURE>
+
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
@@ -95,10 +101,13 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 
-<B>NOTE</B>: It is good practice to set a root password for MySQL. 
-Instructions for doing so can be found on MySQL's web site at 
-<A HREF="http://www.mysql.com/doc/en/Security.html">http://www.mysql.com/doc/en/Security.html</A>.</P>
-
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>: It is good practice to set a root password for MySQL. Instructions for doing so can be found on MySQL's web site at 
+<A HREF="http://www.mysql.com/doc/en/Security.html">http://www.mysql.com/doc/en/Security.html</A>.</CAPTION>
+</FIGURE>
+</P>
 <H3><A NAME="modify_perm_mysql"></A> Modifying access to the MySQL database for multiple systems </H3>
 
 <P>If you're going to have multiple systems accessing a master database,
@@ -107,9 +116,15 @@ you must grant access to the database from remote systems.  By default, the
 <P>To allow other hosts access to your master database, you can either set it
 up for no security at all, or with more granularity.  Note that the "%" is
 the wildcard character in MySQL.</P>
-<P><B>NOTE</B>:  The "no security" option is <EM>very</EM> dangerous unless
-you're in a controlled environment.</P>
-<P>This example has no security at all, and allows access from any host.
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  The "no security" option is <EM>very</EM> dangerous unless
+you're in a controlled environment.</CAPTION>
+</FIGURE>
+
+This example has no security at all, and allows access from any host.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mysql -u root mythconverg

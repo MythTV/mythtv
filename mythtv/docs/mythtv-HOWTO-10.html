@@ -18,10 +18,15 @@
 step is to configure the frontend client.  </P>
 <P>When you start mythfrontend, you should have a number of choices.  Before
 doing anything, go to TV, then to Setup and configure the frontend client.</P>
-<P><B>NOTE</B>:  You should go through the various setup screens in
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  You should go through the various setup screens in
 mythfrontend before using any other modules such as MythMusic, etc. to
-correctly initialize the database.</P>
-
+correctly initialize the database.</CAPTION>
+</FIGURE>
+</P>
 <H2><A NAME="ss10.1">10.1</A> <A HREF="mythtv-HOWTO.html#toc10.1">General</A>
 </H2>
 
@@ -127,11 +132,17 @@ may be a good example to verify that your filter strings take effect.</P>
 <P>It is a simple deinterlacing filter that ignores parameters and works by
 blending adjacent lines.  It replaces combing in interlaced video with a
 less distracting "ghost" image.</P>
-<P><B>NOTE</B>: This filter is appended to the filter chain when "Deinterlace
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>: This filter is appended to the filter chain when "Deinterlace
 playback" has been checked. If you use "kerneldeint" or "linearblend" for
 deinterlacing in your filter string, you should not check "Deinterlace
-playback".</P>
-<P>o  The "kerneldeint" filter</P>
+playback".</CAPTION>
+</FIGURE>
+
+o  The "kerneldeint" filter</P>
 <P>Kerneldeint is a more complex deinterlacing filter, which applies a filter
 kernel using input from several lines.  It generally removes combing without
 a "ghost" image, sometimes leaving a faint outline of the the image from the
@@ -268,12 +279,17 @@ program.</P>
 card.  The most significant setting is the recording resolution, but you can
 also choose encoding format, audio format, and tweak other encoder specific
 properties.</P>
-<P><B>NOTE</B>: although the width and height can be changed to almost
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>: although the width and height can be changed to almost
 anything, if you start MythTV and don't see video or you get "segmentation
 fault" errors, it is likely that the video4linux (v4l) subsystem did not
 like the height and width parameters specified.  It's best to leave the
-default as-is until you're sure that MythTV is operational.</P>
-
+default as-is until you're sure that MythTV is operational.</CAPTION>
+</FIGURE>
+</P>
 <H2><A NAME="ss10.6">10.6</A> <A HREF="mythtv-HOWTO.html#toc10.6">Xbox Frontends</A>
 </H2>
 

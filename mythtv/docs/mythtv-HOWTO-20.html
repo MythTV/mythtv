@@ -39,9 +39,14 @@ change made: edit the
 <CODE>/usr/lib/perl5/site_perl/5.8.0/XMLTV/ZapListings.pm</CODE> file and
 perform a global search and replace, searching for "tvlistings2" and
 replacing it with "tvlistings".
-<B>NOTE</B>:  It is highly recommended to run the latest version of XMLTV
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  It is highly recommended to run the latest version of XMLTV
 available.  In North America, zap2it, the listings provider, has been
-making numerous changes to their website which negatively impact XMLTV.</P>
+making numerous changes to their website which negatively impact XMLTV.</CAPTION>
+</FIGURE>
+</P>
 <H2><A NAME="Setting_DMA"></A> <A NAME="ss20.3">20.3</A> <A HREF="mythtv-HOWTO.html#toc20.3">Fast CPU, choppy or jittery video. </A>
 </H2>
 
@@ -307,12 +312,17 @@ perform a CPU intensive task like encoding video.</P>
 
 <P>By Bruce Markey, 
 <A HREF="mailto:bjm@lvcm.com">mailto:bjm@lvcm.com</A>
-<B>NOTE</B>:  the following instructions do not apply to PVR-250/350
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  the following instructions do not apply to PVR-250/350
 encoders; the MPEG-2 file will have the audio embedded in the stream so it
 is not accessible using <CODE>/dev/dsp</CODE>.  See 
 <A HREF="mythtv-HOWTO-22.html#troubleshooting_pvraudio">this</A> in the PVR-250 
-<A HREF="mythtv-HOWTO-22.html#pvr250">section</A> for more information.</P>
-<P>Audio appears to be one of the bigger issues that users run into on the
+<A HREF="mythtv-HOWTO-22.html#pvr250">section</A> for more information.</CAPTION>
+</FIGURE>
+
+Audio appears to be one of the bigger issues that users run into on the
 mailing list.  If the audio isn't configured correctly, then MythTV will
 often appear to hang, when in fact it is trying to manipulate the audio
 subsystem and failing.  You may or may not receive error messages indicating
@@ -350,13 +360,19 @@ speakers.</P>
 <P>You may also want to ensure that <CODE>/dev/dsp</CODE> hasn't already been
 grabbed by another process, like <B>esd</B> or <B>artsd</B>.  If
 <CODE>/dev/dsp</CODE> isn't available, then MythTV won't work.  </P>
-<P><B>NOTE</B>: The CVS version of MythTV now has support for using
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>: The CVS version of MythTV now has support for using
 <B>artsd</B>.  This is a compile-time option, so you will need to edit the
 <CODE>settings.pro</CODE> file in the mythtv directory then perform a <CODE>make
 distclean; make</CODE>, and re-run <CODE>make install</CODE> as root to add this
 support.  Otherwise, check your window manager documentation for
-instructions on disabling the sound manager.</P>
-<P>If you wish to see what application is grabbing a resource, you can use the
+instructions on disabling the sound manager.</CAPTION>
+</FIGURE>
+
+If you wish to see what application is grabbing a resource, you can use the
 <CODE>fuser</CODE> command:
 <BLOCKQUOTE><CODE>
 <PRE>

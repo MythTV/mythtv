@@ -17,10 +17,16 @@
 <P>By this point, all of the compile-time prerequisites have been installed,
 <B>mysql</B> is running and has had its initial database setup.  It's now
 time to configure MythTV.</P>
-<P><B>NOTE</B>:  If you're running Debian unstable and you have compiled
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  If you're running Debian unstable and you have compiled
 MythTV from source, you will need to install an additional package before
 you will be able to run MythTV.  Execute the following to install the MySQL
-driver for QT.
+driver for QT.</CAPTION>
+</FIGURE>
+
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su -
@@ -65,24 +71,36 @@ greatest amount of disk space on the Master backend because its tuner will
 always be the first choice. You will then want to add your 
 <A HREF="#nonmaster_backend">other backends</A> in the order of your
 preference for recording.</P>
-<P><B>NOTE</B>:  It is possible to <EM>not</EM> have the cards on the Master
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  It is possible to <EM>not</EM> have the cards on the Master
 backend be the first ones used.  However, if you are new to MythTV it is
 easier to configure the Master backend first before moving on to the Slaves,
 at least until you become more familiar with the MythTV system.  See 
 <A HREF="mythtv-HOWTO-21.html#advanced_backend_config">Advanced Backend Configurations</A> for
-information on configuring multiple backend systems in various ways.</P>
-<P>Because MythTV now uses a database to store all configuration variables,
+information on configuring multiple backend systems in various ways.</CAPTION>
+</FIGURE>
+
+Because MythTV now uses a database to store all configuration variables,
 part of the bootstrap of MythTV is to indicate the location of the MySQL
 database server. If the frontend, backend and MySQL database server are all
 going to be running on the same box, you can continue to the next step.  If
 not, you'll need to edit the <CODE>/usr/local/share/mythtv/mysql.txt</CODE> file
 and change the first line to the IP address of the database server. 
 All other configuration is within the MythTV GUI screens.</P>
-<P><B>NOTE</B>:  Users that have been running the frontend and the backend on
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  Users that have been running the frontend and the backend on
 different machines have stated that they have been having issues with remote
 access to the MySQL database.  The following instructions may or may not
 work.  Add the following to <CODE>/etc/my.cnf</CODE> on the backend machine and
-restart MySQL.
+restart MySQL.</CAPTION>
+</FIGURE>
+
 <BLOCKQUOTE><CODE>
 <PRE>
 skip-innodb
@@ -195,11 +213,17 @@ move to the next setting, all of which should be self-explanatory.</P>
 <P>Once you're done, press RETURN to go back to the Input Connections screen. 
 You would then finish associating the video sources to any other hardware
 devices you have available.</P>
-<P><B>NOTE</B>:  Don't add a video source to a hardware input if you don't
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  Don't add a video source to a hardware input if you don't
 actually have anything connected there.  For example, adding "Cable" to the
 Tuner and to the Composite inputs without having something connected to
-Composite will lead to blank recordings.</P>
-<P>Press ESC to return to the main menu, and press ESC again if you have no
+Composite will lead to blank recordings.</CAPTION>
+</FIGURE>
+
+Press ESC to return to the main menu, and press ESC again if you have no
 further items to configure, thereby returning you to the command line.</P>
 
 <H3>Channel Editor</H3>
@@ -266,15 +290,26 @@ backends as discussed in the section titled
 <A HREF="mythtv-HOWTO-6.html#modify_perm_mysql">Modifying access to the MySQL database for multiple systems</A> and that
 you've edited the <CODE>/usr/local/share/mythtv/mysql.txt</CODE> file and put
 the correct IP address for the database server.</P>
-<P><B>NOTE</B>: Do not run <CODE>mythfilldatabase</CODE> on a non-master backend.</P>
-
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>: Do not run <CODE>mythfilldatabase</CODE> on a non-master backend.</CAPTION>
+</FIGURE>
+</P>
 <H2><A NAME="ss9.4">9.4</A> <A HREF="mythtv-HOWTO.html#toc9.4">Configuring and running mythfilldatabase.</A>
 </H2>
 
-<P><B>NOTE</B>:  <B>mythfilldatabase</B> might take a while to complete,
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  <B>mythfilldatabase</B> might take a while to complete,
 depending on any number of factors, most of which you can't control.  It's
-best to just let the program run to completion.</P>
-<P><B>mythfilldatabase --manual</B> is another option; the manual option will
+best to just let the program run to completion.</CAPTION>
+</FIGURE>
+
+<B>mythfilldatabase --manual</B> is another option; the manual option will
 allow you to fine tune channel frequencies and specify which channels will
 be added to the database.  If you are not using the tv_grab_na grabber, you
 must use the <B>--manual</B> option.</P>
@@ -368,10 +403,14 @@ $ crontab -e
 </CODE></BLOCKQUOTE>
 </P>
 <P>The <B>crontab -e</B> command will allow you to edit the existing crontab.
-<B>NOTE</B>:  By default, the crontab will use <B>vi</B> as your
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  By default, the crontab will use <B>vi</B> as your
 editor.  If you don't like to use <B>vi</B>, make sure that you've set
-<CODE>VISUAL</CODE> to something other than <B>vi</B>.</P>
-<P>
+<CODE>VISUAL</CODE> to something other than <B>vi</B>.</CAPTION>
+</FIGURE>
+
 <BLOCKQUOTE><CODE>
 <PRE>
 $ export VISUAL=/usr/bin/joe
