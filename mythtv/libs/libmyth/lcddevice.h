@@ -171,6 +171,8 @@ class LCD : public QObject
 
     void setupLEDs(int(*LedMaskFunc)(void)) { GetLEDMask = LedMaskFunc; }
 
+    void stopAll(void);
+
   private slots: 
     void veryBadThings(int);       // Communication Errors
     void serverSendingData();      // Data coming back from LCDd
@@ -205,7 +207,6 @@ class LCD : public QObject
     void assignScrollingText(QString theText, QString theWidget = "topWidget", 
                              int theRox = 1);
 
-    void stopAll();
     void startTime();
     void startMusic(QString artist, QString track);
     void startChannel(QString channum, QString title, QString subtitle);

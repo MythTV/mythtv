@@ -1895,6 +1895,9 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
         }
         else if (action == "SELECT")
         {
+            if (lcddev)
+                lcddev->stopAll();
+
             lastbutton = activebutton;
             activebutton = NULL;
             parent->repaint(lastbutton->posRect);

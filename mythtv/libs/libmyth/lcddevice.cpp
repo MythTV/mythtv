@@ -319,7 +319,7 @@ void LCD::init()
 
     sendToServer("screen_add Time");
     sendToServer("widget_del Time heartbeat");
-    sendToServer("screen_set Time priority 254");
+    sendToServer("screen_set Time priority 128");
     sendToServer("widget_add Time timeWidget string");
     sendToServer("widget_add Time topWidget string");
 
@@ -502,7 +502,7 @@ void LCD::stopAll()
 
 void LCD::startTime()
 {
-    sendToServer("screen_set Time priority 254");
+    sendToServer("screen_set Time priority 128");
     timeTimer->start(1000, FALSE);
     outputTime();
     theMode = 0;    
