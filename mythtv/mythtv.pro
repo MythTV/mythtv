@@ -3,6 +3,7 @@
 ######################################################################
 
 TEMPLATE = subdirs
+CONFIG += ordered
 
 # Directories
 SUBDIRS += libs filters programs themes setup i18n
