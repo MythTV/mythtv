@@ -124,12 +124,28 @@ int main(int argc, char **argv)
     QApplication a(argc, argv);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
+    if (!db)
+    {
+        printf("Couldn't connect to database\n");
+        return -1;
+    }
     db->setDatabaseName("mythconverg");
     db->setUserName("mythtv");
     db->setPassword("mythtv");
     db->setHostName("localhost");
 
-    if (!db->open())
+    QSqlDatabase *subthread = QSqlDatabase::addDatabase("QMYSQL3", "SUBDB");
+    if (!subthread)
+    {
+        printf("Couldn't connect to database\n");
+        return -1;
+    }
+    subthread->setDatabaseName("mythconverg");
+    subthread->setUserName("mythtv");
+    subthread->setPassword("mythtv");
+    subthread->setHostName("localhost");    
+
+    if (!db->open() || !subthread->open())
     {
         printf("couldn't open db\n");
         return -1;

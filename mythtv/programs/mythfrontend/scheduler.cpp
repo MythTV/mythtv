@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <qsqldatabase.h>
 #include <qsqlquery.h>
 #include <qstring.h>
 #include <qdatetime.h>
@@ -27,6 +28,7 @@ Scheduler::~Scheduler()
 
 bool Scheduler::CheckForChanges(void)
 {
+    QSqlDatabase *db = QSqlDatabase::database("SUBDB");
     QSqlQuery query;
     char thequery[512];
 
@@ -34,7 +36,7 @@ bool Scheduler::CheckForChanges(void)
 
     sprintf(thequery, "SELECT * FROM settings WHERE value = "
                       "\"RecordChanged\";");
-    query.exec(thequery);
+    query = db->exec(thequery);
 
     if (query.isActive() && query.numRowsAffected() > 0)
     {
@@ -45,7 +47,7 @@ bool Scheduler::CheckForChanges(void)
         {
             sprintf(thequery, "UPDATE settings SET data = \"no\" WHERE "
                               "value = \"RecordChanged\";");
-            query.exec(thequery);
+            query = db->exec(thequery);
 
             retval = true;
         }
@@ -73,12 +75,13 @@ bool Scheduler::FillRecordLists(void)
     }
 
     char thequery[512];
+    QSqlDatabase *db = QSqlDatabase::database("SUBDB");
     QSqlQuery query;
     QSqlQuery subquery;
 
     sprintf(thequery, "SELECT * FROM singlerecord;");
 
-    query.exec(thequery);
+    query = db->exec(thequery);
     if (query.isActive() && query.numRowsAffected() > 0)
     {
         while (query.next())
@@ -98,7 +101,7 @@ bool Scheduler::FillRecordLists(void)
 
     sprintf(thequery, "SELECT * FROM timeslotrecord;");
 
-    query.exec(thequery);
+    query = db->exec(thequery);
     if (query.isActive() && query.numRowsAffected() > 0)
     {
         while (query.next())
@@ -124,10 +127,10 @@ bool Scheduler::FillRecordLists(void)
                     curdate.month(), curdate.day(), hour, min);
 
             sprintf(thequery, "SELECT * FROM program WHERE channum = %s AND "
-                              "starttime >= %s AND endtime < %s AND "
+                              "starttime = %s AND endtime < %s AND "
                               "title = \"%s\";", channum.ascii(), startquery,
                               endquery, title.ascii());
-            subquery.exec(thequery);
+            subquery = db->exec(thequery);
 
             if (subquery.isActive() && subquery.numRowsAffected() > 0)
             {
@@ -150,7 +153,7 @@ bool Scheduler::FillRecordLists(void)
 
     sprintf(thequery, "SELECT * FROM allrecord;");
 
-    query.exec(thequery);
+    query = db->exec(thequery);
     if (query.isActive() && query.numRowsAffected() > 0)
     {
         while (query.next())
@@ -174,7 +177,7 @@ bool Scheduler::FillRecordLists(void)
                               "starttime >= %s AND endtime < %s AND "
                               "title = \"%s\";", startquery,
                               endquery, title.ascii());
-            subquery.exec(thequery);
+            subquery = db->exec(thequery);
 
             if (subquery.isActive() && subquery.numRowsAffected() > 0)
             {
@@ -231,7 +234,8 @@ void Scheduler::RemoveFirstRecording(void)
         sprintf(endt, "%4d%02d%02d%02d%02d00", endtime.date().year(),
                 endtime.date().month(), endtime.date().day(), 
                 endtime.time().hour(), endtime.time().minute());
-        
+    
+        QSqlDatabase *db = QSqlDatabase::database("SUBDB");
         QSqlQuery query;                                          
         char thequery[512];
         sprintf(thequery, "DELETE FROM singlerecord WHERE "
@@ -239,7 +243,7 @@ void Scheduler::RemoveFirstRecording(void)
                           "endtime = %s;", rec->channum.toInt(),
                           startt, endt);
 
-        query.exec(thequery);
+        query = db->exec(thequery);
     }
 
     delete rec;
