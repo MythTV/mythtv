@@ -861,6 +861,7 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
     ScheduledRecording::signalChange(db);
 
     FillList();
+    update(fullRect);
 }
 
 void ViewScheduled::handleConflicting(ProgramInfo *rec)
@@ -1071,4 +1072,5 @@ void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
     ScheduledRecording::signalChange(db);
 
     FillList();
+    update(fullRect);
 }
