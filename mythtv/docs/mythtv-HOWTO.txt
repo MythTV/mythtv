@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-01-14, v1.075
+  2003-01-16, v1.076
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -158,7 +158,7 @@
 
   +o  Developer:  Matthew Zimmerman,  <mailto:mdz@debian.org>
 
-  +o  Overall structure and Mandrake 9.0 documentation: Robert
+  +o  Overall structure of HOWTO and Mandrake 9.0 documentation: Robert
      Kulagowski,  <mailto:rkulagow@rocketmail.com>
 
   +o  Red Hat Linux 8.0 documentation: Cedar McKay,
@@ -691,7 +691,7 @@
        $ su -
        # emerge rsync # make sure portage is up to date.
        # cd /usr/local
-       # tar xvfjp Path_To/mythtv-gentoo-portage.tar-bz2
+       # tar xvfjp Path_To/mythtv-gentoo-portage.tar.bz2
        # vi /etc/make.conf
 
   Add mysql to your USE variable.  ie USE="mysql ...."

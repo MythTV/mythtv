@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-01-14, v1.075
+<date>2003-01-16, v1.076
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -48,7 +48,7 @@ The contributors to MythTV are:
 <itemize>
 <item>Lead developer:  Isaac Richardson, <url url="mailto:ijr@po.cwru.edu">
 <item>Developer:  Matthew Zimmerman, <url url="mailto:mdz@debian.org">
-<item>Overall structure and Mandrake 9.0 documentation: Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
+<item>Overall structure of HOWTO and Mandrake 9.0 documentation: Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
 <item>Red Hat Linux 8.0 documentation: Cedar McKay, <url url="mailto:mythhowto.3.ohthetrees@spamgourmet.com">
 <item>Gentoo documentation and package: Tony Clark, <url url="mailto:tclark@telia.com">
 <item>Debian package: Matthew Zimmerman, <url url="mailto:mdz@debian.org">
@@ -560,7 +560,7 @@ Once you have downloaded the portage file, installation is simple.
 $ su -
 # emerge rsync # make sure portage is up to date.
 # cd /usr/local
-# tar xvfjp Path_To/mythtv-gentoo-portage.tar-bz2
+# tar xvfjp Path_To/mythtv-gentoo-portage.tar.bz2
 # vi /etc/make.conf
 </verb></tscreen>
 
@@ -2276,6 +2276,7 @@ v1.075, 2003-01-14.  Make it clear the Kulagowski is document author, _not_
 developer of MythTV.  Modified version of XMLTV to get; added instruction
 that latest version of XMLTV is usually best because of back-end changes at
 zap2it.
+v1.076, 2003-01-16.  Slight adjustment to Gentoo docs.  Typo in path.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
