@@ -34,7 +34,7 @@
 
 ) I want to run the database on another machine?
 - Ok, first, you'll need to edit the mc.sql script first to setup the proper 
-  permissions for the machine that'll be running mythtv and connecting to the
+  permissions for the machine that'll be running MythTV and connecting to the
   database.  Next, after you've followed all the directions and built all
   MythTV's programs, and after you've done a make install, but before you've 
   run filldata, you need to edit the /usr/local/share/mythtv/mysql.txt file
@@ -79,12 +79,12 @@
 - You need to use compilation flags appropriate for your processor.  Rebuild
   everything from scratch after editing settings.pro.
 
-) mythfrontend works, but when I try to watch TV or play a recording, it
+) Mythfrontend works, but when I try to watch TV or play a recording, it
   crashes with an "Illegal instruction", "Bus error" or "Segmentation fault"
   message every time
 - Do you have deinterlace=1 in settings.txt?  Try disabling it, and if that
   corrects the problem, read and follow the instructions at the top of
-  filters/linearblend/filter_linearblend.c and rebuild mythtv.
+  filters/linearblend/filter_linearblend.c and rebuild MythTV.
 
 ) All of my channels seem to be off by one, and the picture quality is poor
 - The bttv driver is not autodetecting your tuner type correctly, or
