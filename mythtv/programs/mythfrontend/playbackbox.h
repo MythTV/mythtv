@@ -129,6 +129,8 @@ class PlaybackBox : public MythDialog
 
     bool fileExists(ProgramInfo *pginfo);
 
+    void showIconHelp();
+
     QTimer *timer;
     NuppelVideoPlayer *nvp;
     RingBuffer *rbuffer;

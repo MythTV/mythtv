@@ -913,6 +913,11 @@ QButton *MythPopupBox::addButton(QString caption, QObject *target,
     return button;
 }
 
+void MythPopupBox::addLayout(QLayout *layout, int stretch)
+{
+    vbox->addLayout(layout, stretch);
+}
+
 void MythPopupBox::ShowPopup(QObject *target, const char *slot)
 {
     ShowPopupAtXY(-1, -1, target, slot);
@@ -945,10 +950,14 @@ void MythPopupBox::ShowPopupAtXY(int destx, int desty,
         ++it;
         if (objs->isWidgetType())
         {
-            QWidget *widget = (QWidget *)objs;
-            poph += widget->height();
-            if (widget->width() > maxw)
-                maxw = widget->width();
+            QString objname = objs->name();
+            if (objname != "nopopsize")
+            {
+                QWidget *widget = (QWidget *)objs;
+                poph += widget->height();
+                if (widget->width() > maxw)
+                    maxw = widget->width();
+            }
         }
     }
 

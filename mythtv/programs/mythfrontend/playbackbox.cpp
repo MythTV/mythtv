@@ -1809,9 +1809,9 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
         handled = true;
 
         if (action == "ESCAPE")
-        {
             exitWin();
-        }
+        else if (action == "1")
+            showIconHelp();
         else if (showData.count() > 0)
         {
             if (action == "DELETE")
@@ -1947,3 +1947,155 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     return retpixmap;
 }
 
+void PlaybackBox::showIconHelp(void)
+{
+    LayerSet *container = NULL;
+    if (type != Delete)
+        container = theme->GetSet("program_info_play");
+    else
+        container = theme->GetSet("program_info_del");
+
+    if (!container)
+        return;
+
+    MythPopupBox *iconhelp = new MythPopupBox(gContext->GetMainWindow(),
+                                              true, popupForeground,
+                                              popupBackground, popupHighlight,
+                                              "icon help");
+
+    QGridLayout *grid = new QGridLayout(5, 2, (int)(10 * wmult));
+
+    QLabel *label;
+    UIImageType *itype;
+    bool displayme = false;
+
+    label = iconhelp->addLabel("Status Icons", MythPopupBox::Large,
+                               false);
+
+    label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
+
+    itype = (UIImageType *)container->GetType("commflagged");
+    if (itype)
+    {
+        label = new QLabel("Commercials are flagged", iconhelp);
+        label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
+        label->setBackgroundOrigin(ParentOrigin);
+        label->setPaletteForegroundColor(popupForeground);
+        grid->addWidget(label, 0, 1, Qt::AlignLeft);
+         
+        label = new QLabel(iconhelp, "nopopsize");
+
+        itype->ResetFilename();
+        itype->LoadImage();
+        label->setPixmap(itype->GetImage());
+        displayme = true;
+
+        label->setMaximumWidth(width() / 2);
+        label->setBackgroundOrigin(ParentOrigin);
+        label->setPaletteForegroundColor(popupForeground);
+        grid->addWidget(label, 0, 0, Qt::AlignCenter);
+    }
+
+    itype = (UIImageType *)container->GetType("cutlist");
+    if (itype)
+    {
+        label = new QLabel("An editing cutlist is present", iconhelp);
+        label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
+        label->setBackgroundOrigin(ParentOrigin);
+        label->setPaletteForegroundColor(popupForeground);
+        grid->addWidget(label, 1, 1, Qt::AlignLeft);
+
+        label = new QLabel(iconhelp, "nopopsize");
+
+        itype->ResetFilename();
+        itype->LoadImage();
+        label->setPixmap(itype->GetImage());
+        displayme = true;
+
+        label->setMaximumWidth(width() / 2);
+        label->setBackgroundOrigin(ParentOrigin);
+        label->setPaletteForegroundColor(popupForeground);
+        grid->addWidget(label, 1, 0, Qt::AlignCenter);
+    }
+
+    itype = (UIImageType *)container->GetType("autoexpire");
+    if (itype)
+    {
+        label = new QLabel("The program is able to auto-expire", iconhelp);
+        label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
+        label->setBackgroundOrigin(ParentOrigin);
+        label->setPaletteForegroundColor(popupForeground);
+        grid->addWidget(label, 2, 1, Qt::AlignLeft);
+
+        label = new QLabel(iconhelp, "nopopsize");
+
+        itype->ResetFilename();
+        itype->LoadImage();
+        label->setPixmap(itype->GetImage());
+        displayme = true;
+
+        label->setMaximumWidth(width() / 2);
+        label->setBackgroundOrigin(ParentOrigin);
+        label->setPaletteForegroundColor(popupForeground);
+        grid->addWidget(label, 2, 0, Qt::AlignCenter);
+    }
+
+    itype = (UIImageType *)container->GetType("processing");
+    if (itype)
+    {
+        label = new QLabel("Commercials are being flagged", iconhelp);
+        label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
+        label->setBackgroundOrigin(ParentOrigin);
+        label->setPaletteForegroundColor(popupForeground);
+        grid->addWidget(label, 3, 1, Qt::AlignLeft);
+
+        label = new QLabel(iconhelp, "nopopsize");
+
+        itype->ResetFilename();
+        itype->LoadImage();
+        label->setPixmap(itype->GetImage());
+        displayme = true;
+
+        label->setMaximumWidth(width() / 2);
+        label->setBackgroundOrigin(ParentOrigin);
+        label->setPaletteForegroundColor(popupForeground);
+        grid->addWidget(label, 3, 0, Qt::AlignCenter);
+    }
+
+    itype = (UIImageType *)container->GetType("bookmark");
+    if (itype)
+    {
+        label = new QLabel("A bookmark is set", iconhelp);
+        label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
+        label->setBackgroundOrigin(ParentOrigin);
+        label->setPaletteForegroundColor(popupForeground);
+        grid->addWidget(label, 4, 1, Qt::AlignLeft);
+
+        label = new QLabel(iconhelp, "nopopsize");
+
+        itype->ResetFilename();
+        itype->LoadImage();
+        label->setPixmap(itype->GetImage());
+        displayme = true;
+
+        label->setMaximumWidth(width() / 2);
+        label->setBackgroundOrigin(ParentOrigin);
+        label->setPaletteForegroundColor(popupForeground);
+        grid->addWidget(label, 4, 0, Qt::AlignCenter);
+    }
+
+    if (!displayme)
+    {
+        delete iconhelp;
+        return;
+    }
+
+    iconhelp->addLayout(grid);
+
+    QButton *button = iconhelp->addButton("Ok");
+    button->setFocus();
+
+    iconhelp->ExecPopup();
+
+    delete iconhelp;
+}

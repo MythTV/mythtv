@@ -160,6 +160,7 @@ class MythPopupBox : public MythDialog
                  QColor popupHighlight, const char *name = 0);
 
     void addWidget(QWidget *widget, bool setAppearance = true);
+    void addLayout(QLayout *layout, int stretch = 0);
 
     typedef enum { Large, Medium, Small } LabelSize;
 
