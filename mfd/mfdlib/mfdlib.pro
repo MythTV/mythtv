@@ -1,5 +1,9 @@
 include (../settings.pro)
 
+!exists(../config.pro ) {
+    error(Missing config.pro: please run the configure script)
+}
+
 TEMPLATE = lib
 CONFIG += thread dll
 TARGET = mfdlib

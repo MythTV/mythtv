@@ -424,17 +424,17 @@ MFDServiceClientSocket::MFDServiceClientSocket(int identifier, int socket_id, Ty
 
 MFDFileDescriptorWatchingPlugin::MFDFileDescriptorWatchingPlugin(
                                                                  MFDBasePlugin *owner,
+                                                                 QMutex *fwmtx,
                                                                  QMutex *fdmtx,
-                                                                 int *nfds,
-                                                                 fd_set *readfds,
+                                                                 QValueList<int>* fd_list,
                                                                  int time_seconds,
                                                                  int time_usecs
                                                                 )
 {
     parent = owner;
+    file_watching_mutex = fwmtx;
     keep_going = true;
-    numb_file_descriptors = nfds;
-    file_descriptors = readfds;
+    file_descriptors = fd_list;
     file_descriptors_mutex = fdmtx;
     time_wait_seconds = time_seconds;
     time_wait_usecs = time_usecs;
@@ -446,19 +446,57 @@ void MFDFileDescriptorWatchingPlugin::run()
     
     while(keep_going)
     {
-        if(file_descriptors_mutex->tryLock())
+        if(file_watching_mutex->tryLock())
         {
+            //
+            //  Set and zero-out the status of anything we're supposed to be
+            //  watching
+            //
+
+            int nfds = 0;
+	        fd_set readfds;
+
+	    	FD_ZERO(&readfds);
+	    	
+
+	    	file_descriptors_mutex->lock();
+    	    	IntValueList::iterator int_it;
+	        	for (
+	        	        int_it  = file_descriptors->begin(); 
+	    	            int_it != file_descriptors->end(); 
+	    	            ++int_it
+	    	        ) 
+	    	    {
+                    FD_SET((*int_it), &readfds);
+                    if(nfds <= (*int_it))
+                    {
+                        nfds = (*int_it) + 1;
+                    }
+                }
+            file_descriptors_mutex->unlock();
+
+            //
+            //  Set the select() timeout 
+            //
+
             timeout_mutex.lock();
                 timeout.tv_sec = time_wait_seconds;
                 timeout.tv_usec = time_wait_usecs;
             timeout_mutex.unlock();
-    		result = select(*numb_file_descriptors, file_descriptors, NULL, NULL, &timeout);
+            
+            
+            //
+            //  Sit in select until something arrives, or we timeout
+            //
+
+    		result = select(nfds, &readfds, NULL, NULL, &timeout);
+
     		if(result < 0)
     		{
     		    parent->warning("file descriptors watcher got an error on select()");
     		}
-    		file_descriptors_mutex->unlock();
             parent->wakeUp();
+    		file_watching_mutex->unlock();
         }
         else
         {

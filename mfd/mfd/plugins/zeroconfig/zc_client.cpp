@@ -293,6 +293,8 @@ ZeroConfigClient::ZeroConfigClient(MFD *owner, int identifier)
                  :MFDBasePlugin(owner, identifier)
 {
     fd_watcher = NULL;
+    file_descriptors = new IntValueList();
+    file_descriptors_mutex = new QMutex();
 
     //
     //  Keep going (unless told otherwise)
@@ -538,8 +540,13 @@ void ZeroConfigClient::run()
     //  till we get down in our loop
     //
 
-    fd_watcher = new MFDFileDescriptorWatchingPlugin(this, &file_descriptors_mutex, &nfds, &readfds);
-    file_descriptors_mutex.lock();
+    fd_watcher = new MFDFileDescriptorWatchingPlugin(   this, 
+                                                        &file_watching_mutex,
+                                                        file_descriptors_mutex, 
+                                                        file_descriptors, 
+                                                        30,
+                                                        0);
+    file_watching_mutex.lock();
     fd_watcher->start();
     
 
@@ -612,22 +619,42 @@ void ZeroConfigClient::run()
 		fd_watcher->setTimeout(timeout.tv_sec, timeout.tv_usec);
 
         //
-        //  Add our pipe to the watcher thread as one of file descriptors it
-        //  should monitor
+        //  Create the set of things the descriptor watching thread should watch
         //
 
-		FD_SET(fd_watching_pipe[0], &readfds);
-        if(nfds <= fd_watching_pipe[0])
-        {
-            nfds = fd_watching_pipe[0] + 1;
-        }
-        
+        file_descriptors_mutex->lock();
+
+            //
+            //  Zero 'em out.
+            //
+
+            file_descriptors->clear();
+                
+            //
+            //  Add everything the Apple nDNS code said we should watch
+            //
+
+            for(int i = 0; i < nfds; i++)
+            {
+                if(FD_ISSET(i, &readfds))
+                {
+                    file_descriptors->append(i);
+                }
+            }
+            
+    		//
+    		//  Add the read side of the control pipe
+    		//
+    		    
+    	    file_descriptors->append(fd_watching_pipe[0]);
+
+        file_descriptors_mutex->unlock();
         
         //
         //  Let the watching thread watch
         //
 
-        file_descriptors_mutex.unlock();
+        file_watching_mutex.unlock();
 
         //
         //  Sit and wait for something to happen.
@@ -648,7 +675,7 @@ void ZeroConfigClient::run()
         //
 
         write(fd_watching_pipe[1], "X", 1);
-        file_descriptors_mutex.lock();
+        file_watching_mutex.lock();
         char back[2];
         read(fd_watching_pipe[0], back, 2);
 
@@ -666,8 +693,8 @@ void ZeroConfigClient::run()
     //  Stop the sub thread
     //
     
-    file_descriptors_mutex.unlock();
     fd_watcher->stop();
+    file_watching_mutex.unlock();
     fd_watcher->wait();
     delete fd_watcher;
     fd_watcher = NULL;
@@ -797,11 +824,35 @@ void ZeroConfigClient::doSomething(const QStringList &tokens, int socket_identif
 
 ZeroConfigClient::~ZeroConfigClient()
 {
-    log("zeroconfig client is being killed off", 10);
-    dns_questions.clear();
-    available_services.clear();
     if(fd_watcher)
     {
         delete fd_watcher;
     }
+    if(file_descriptors)
+    {
+        if(file_descriptors_mutex)
+        {
+            file_descriptors_mutex->lock();
+            file_descriptors->clear();
+            delete file_descriptors;
+            file_descriptors = NULL;
+            file_descriptors_mutex->unlock();
+        }
+        else
+        {
+            file_descriptors->clear();
+            delete file_descriptors;
+            file_descriptors = NULL;
+        }
+    }
+
+    if(file_descriptors_mutex)
+    {
+        delete file_descriptors_mutex;
+        file_descriptors_mutex = NULL;
+    }
+
+    log("zeroconfig client is being killed off", 10);
+    dns_questions.clear();
+    available_services.clear();
 }

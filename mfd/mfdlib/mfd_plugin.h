@@ -158,15 +158,19 @@ class MFDServicePlugin : public MFDBasePlugin
 
 };
 
+
+typedef QValueList<int> IntValueList;
+
+
 class MFDFileDescriptorWatchingPlugin : public QThread
 {
   public:
   
     MFDFileDescriptorWatchingPlugin(
                                     MFDBasePlugin *owner,
+                                    QMutex *fwmtx,
                                     QMutex *fdmtx,
-                                    int *nfds,
-                                    fd_set *readfds,
+                                    IntValueList* fd_list,
                                     int time_seconds = 2,
                                     int time_usecs = 0
                                     );
@@ -181,13 +185,15 @@ class MFDFileDescriptorWatchingPlugin : public QThread
     bool          keep_going;
     QMutex        keep_going_mutex;
     int           *numb_file_descriptors;
-    fd_set        *file_descriptors;
-    QMutex        *file_descriptors_mutex;
 
     struct  timeval timeout;
     int     time_wait_seconds;
     int     time_wait_usecs;
     QMutex  timeout_mutex;
+
+    QMutex          *file_watching_mutex;
+    QMutex          *file_descriptors_mutex;
+    IntValueList    *file_descriptors;
 };
 
 

@@ -116,9 +116,12 @@ class ZeroConfigClient: public MFDBasePlugin
 
     QPtrList<SocketBuffer>  things_to_do;
     QMutex                  things_to_do_mutex;
-    
+
     MFDFileDescriptorWatchingPlugin *fd_watcher;
-    QMutex file_descriptors_mutex;
+    
+    IntValueList    *file_descriptors;
+    QMutex          *file_descriptors_mutex;
+    QMutex           file_watching_mutex;
 };
 
 #endif  // zc_client_h_

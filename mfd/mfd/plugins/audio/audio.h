@@ -25,6 +25,7 @@ class AudioPlugin: public MFDServicePlugin
   public:
 
     AudioPlugin(MFD *owner, int identity);
+    ~AudioPlugin();
     void    run();
     void    doSomething(const QStringList &tokens, int socket_identifier);
 
@@ -46,7 +47,10 @@ class AudioPlugin: public MFDServicePlugin
     QString     audio_device;
 
     MFDFileDescriptorWatchingPlugin *fd_watcher;
-    QMutex file_descriptors_mutex;
+
+    IntValueList    *file_descriptors;
+    QMutex          *file_descriptors_mutex;
+    QMutex           file_watching_mutex;
     
     int     elapsed_time;
     int     current_channels;
