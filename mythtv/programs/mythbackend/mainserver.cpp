@@ -1290,7 +1290,7 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
             jobHost = pginfo->hostname;
 
         JobQueue::QueueJobs(m_db, jobTypes, pginfo->chanid,
-                            pginfo->recstartts, jobHost);
+                            pginfo->recstartts, "", "", jobHost);
     }
     dblock.unlock();
 

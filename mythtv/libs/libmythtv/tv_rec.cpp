@@ -745,7 +745,7 @@ void TVRec::TeardownRecorder(bool killFile)
                 pthread_mutex_lock(&db_lock);
                 JobQueue::QueueJobs(db_conn, jobTypes,
                                     prevRecording->chanid,
-                                    prevRecording->recstartts, jobHost);
+                                    prevRecording->recstartts, "", "", jobHost);
                 pthread_mutex_unlock(&db_lock);
             }
         }
