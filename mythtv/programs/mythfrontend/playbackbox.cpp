@@ -39,14 +39,43 @@ static int comp_programid(ProgramInfo *a, ProgramInfo *b)
 {
     if (a->programid == b->programid)
     {
-	if (a->recstartts == b->recstartts)
-	    return 0;
-	if (a->recstartts < b->recstartts)
-	    return -1;
-	else
-	    return 1;
+        if (a->recstartts == b->recstartts)
+            return 0;
+        if (a->recstartts < b->recstartts)
+            return -1;
+        else
+            return 1;
     }
     if (a->programid < b->programid)
+        return -1;
+    else
+        return 1;
+}
+
+static int comp_originalAirDate(ProgramInfo *a, ProgramInfo *b)
+{
+    QDate dt1, dt2;
+
+    if (a->hasAirDate)
+        dt1 = a->originalAirDate;
+    else
+        dt1 = a->startts.date();
+
+    if (b->hasAirDate)
+        dt2 = b->originalAirDate;
+    else
+        dt2 = b->startts.date();
+
+    if (dt1 == dt2)
+    {
+        if (a->recstartts == b->recstartts)
+            return 0;
+        if (a->recstartts < b->recstartts)
+            return -1;
+        else
+            return 1;
+    }
+    if (dt1 < dt2)
         return -1;
     else
         return 1;
@@ -1139,6 +1168,7 @@ bool PlaybackBox::FillList()
     QString oldtitle = titleList[titleIndex];
     QString oldchanid;
     QString oldprogramid;
+    QDate oldoriginalAirDate;
     QDateTime oldstartts;
     p = progLists[oldtitle].at(progIndex);
     if (p)
@@ -1146,6 +1176,7 @@ bool PlaybackBox::FillList()
         oldchanid = p->chanid;
         oldstartts = p->startts;
         oldprogramid = p->programid;
+        oldoriginalAirDate = p->originalAirDate;
     }
 
     titleList.clear();
@@ -1220,16 +1251,29 @@ bool PlaybackBox::FillList()
 
     QString episodeSort = gContext->GetSetting("PlayBoxEpisodeSort", "Date");
 
-    if (episodeSort == "Id" && titleView)
+    if (titleView)
     {
-        QMap<QString, ProgramList>::Iterator Iprog;
-        for (Iprog = progLists.begin(); Iprog != progLists.end(); ++Iprog)
+        if (episodeSort == "OrigAirDate")
         {
-            if (!Iprog.key().isEmpty())
-                Iprog.data().Sort(comp_programid);
+            QMap<QString, ProgramList>::Iterator Iprog;
+            for (Iprog = progLists.begin(); Iprog != progLists.end(); ++Iprog)
+            {
+                if (!Iprog.key().isEmpty())
+                    Iprog.data().Sort(comp_originalAirDate);
+            }
+            
+        }
+        else if (episodeSort == "Id")
+        {
+            QMap<QString, ProgramList>::Iterator Iprog;
+            for (Iprog = progLists.begin(); Iprog != progLists.end(); ++Iprog)
+            {
+                if (!Iprog.key().isEmpty())
+                    Iprog.data().Sort(comp_programid);
+            }
         }
     }
-
+    
     // Try to find our old place in the title list.  Scan the new
     // titles backwards until we find where we were or go past.  This
     // is somewhat inefficient, but it works.
@@ -1264,7 +1308,12 @@ bool PlaybackBox::FillList()
         {
             p = l->at(i);
 
-            if (episodeSort == "Id" && titleView && titleIndex > 0)
+            if (episodeSort == "OrigAirDate" && titleView && titleIndex > 0)
+            {
+                if (oldoriginalAirDate > p->originalAirDate)
+                    break;
+            }
+            else if (episodeSort == "Id" && titleView && titleIndex > 0)
             {
                 if (oldprogramid > p->programid)
                     break;

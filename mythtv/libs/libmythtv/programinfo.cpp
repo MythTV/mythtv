@@ -225,6 +225,7 @@ void ProgramInfo::ToStringList(QStringList &list)
     DATETIME_TO_LIST(lastmodified)
     FLOAT_TO_LIST(stars)
     DATETIME_TO_LIST(QDateTime(originalAirDate))
+    INT_TO_LIST(hasAirDate)     
 }
 
 bool ProgramInfo::FromStringList(QStringList &list, int offset)
@@ -304,6 +305,7 @@ bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     DATETIME_FROM_LIST(lastmodified)
     FLOAT_FROM_LIST(stars)
     DATE_FROM_LIST(originalAirDate);
+    INT_FROM_LIST(hasAirDate);
 
     return true;
 }
@@ -1009,7 +1011,7 @@ void ProgramInfo::StartedRecording()
     query.bindValue(":FINDID", findid);
     query.bindValue(":STARS", stars);
     query.bindValue(":REPEAT", repeat);
-    query.bindValue(":ORIGAIRDATE", originalAirDate.toString());
+    query.bindValue(":ORIGAIRDATE", originalAirDate);
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("WriteRecordedToDB", query);

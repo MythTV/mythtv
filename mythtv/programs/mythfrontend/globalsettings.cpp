@@ -558,6 +558,7 @@ static HostComboBox *PlayBoxEpisodeSort()
     HostComboBox *gc = new HostComboBox("PlayBoxEpisodeSort");
     gc->setLabel(QObject::tr("Sort Episodes"));
     gc->addSelection(QObject::tr("Record date"), "Date");
+    gc->addSelection(QObject::tr("Original Air date"), "OrigAirDate");
     gc->addSelection(QObject::tr("Program ID"), "Id");
     gc->setHelpText(QObject::tr("Selects how to sort a shows episodes"));
     return gc;

@@ -1803,9 +1803,15 @@ void Scheduler::AddNewRecords(void) {
         p->stars =  result.value(31).toDouble();
 
         if(result.value(32).isNull())
+        {
             p->originalAirDate = p->startts.date();
+            p->hasAirDate = false;
+        }
         else
-            p->originalAirDate = QDate::fromString(result.value(30).toString(), Qt::ISODate);
+        {
+            p->originalAirDate = QDate::fromString(result.value(32).toString(), Qt::ISODate);
+            p->hasAirDate = true;
+        }
 
         bool inactive = result.value(33).toInt();
         p->findid = result.value(34).toInt();
