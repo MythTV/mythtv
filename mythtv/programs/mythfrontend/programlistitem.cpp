@@ -14,6 +14,9 @@
 
 void MyListView::keyPressEvent(QKeyEvent *e)
 {
+    if (!allowkeypress)
+        return;
+
     if (currentItem() && !currentItem()->isEnabled())
     {
     }

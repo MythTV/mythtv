@@ -13,7 +13,9 @@ class MyListView : public QListView
 {
     Q_OBJECT
   public:
-    MyListView(QWidget *parent) : QListView(parent) {}
+    MyListView(QWidget *parent) : QListView(parent) { allowkeypress = true; }
+ 
+    void SetAllowKeypress(bool allow) { allowkeypress = allow; }
 
   protected:
     void keyPressEvent( QKeyEvent *e );
@@ -21,6 +23,9 @@ class MyListView : public QListView
   signals:
     void playPressed(QListViewItem *);
     void deletePressed(QListViewItem *);
+
+  private:
+    bool allowkeypress;
 };
 
 class ProgramListItem : public QListViewItem

@@ -11,6 +11,7 @@ using namespace std;
 
 #include "RingBuffer.h"
 #include "../libmyth/mythcontext.h"
+#include "../libmyth/remotefile.h"
 
 #define TFW_BUF_SIZE (2*1024*1024)
 
@@ -194,7 +195,7 @@ unsigned ThreadedFileWriter::BufFree()
 /**********************************************************************/
 
 RingBuffer::RingBuffer(MythContext *context, const QString &lfilename, 
-                       bool write)
+                       bool write, bool needevents)
 {
     m_context = context;
     recorder_num = 0;   
@@ -202,7 +203,7 @@ RingBuffer::RingBuffer(MythContext *context, const QString &lfilename,
     normalfile = true;
     filename = (QString)lfilename;
     tfw = NULL;
-    sock = NULL;
+    remotefile = NULL;
     fd2 = -1;
 
     if (write)
@@ -214,8 +215,8 @@ RingBuffer::RingBuffer(MythContext *context, const QString &lfilename,
     }
     else
     {
-        if (filename.left(4) == "myth")
-            sock = m_context->SetupRemoteFile(filename);
+        if (filename.left(7) == "myth://")
+            remotefile = new RemoteFile(filename, needevents);
         else
             fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE);
         writemode = false;
@@ -242,7 +243,7 @@ RingBuffer::RingBuffer(MythContext *context, const QString &lfilename,
     filename = (QString)lfilename;
     filesize = size;
    
-    sock = NULL;
+    remotefile = NULL;
     tfw = NULL;
     fd2 = -1;
 
@@ -255,7 +256,7 @@ RingBuffer::RingBuffer(MythContext *context, const QString &lfilename,
     }
     else
     {
-        sock = m_context->SetupRemoteRingBuffer(recorder_num, filename);
+        remotefile = new RemoteFile(filename, false, recordernum);
     }
 
     totalwritepos = writepos = 0;
@@ -274,12 +275,9 @@ RingBuffer::RingBuffer(MythContext *context, const QString &lfilename,
 RingBuffer::~RingBuffer(void)
 {
     pthread_rwlock_wrlock(&rwlock);
-    if (sock)
+    if (remotefile)
     {
-        if (normalfile)
-            m_context->CloseRemoteFile(sock);
-        else
-            m_context->CloseRemoteRingBuffer(recorder_num, sock);
+        delete remotefile;
     }
     if (tfw)
     {
@@ -295,6 +293,12 @@ RingBuffer::~RingBuffer(void)
 	delete dumpfw; 
 	dumpfw = NULL;
     }
+}
+
+void RingBuffer::Start(void)
+{
+    if (remotefile)
+        remotefile->Start();
 }
 
 void RingBuffer::TransitionToFile(const QString &lfilename)
@@ -325,8 +329,11 @@ void RingBuffer::Reset(void)
 
     if (!normalfile)
     {
-        if (sock)
+        if (remotefile)
         {
+            usleep(10000);
+
+            QSocket *sock = remotefile->getSocket();
             int avail = sock->bytesAvailable();
             char *trash = new char[avail + 1];
             sock->readBlock(trash, avail);
@@ -365,7 +372,8 @@ int RingBuffer::safe_read(int fd, void *data, unsigned sz)
         {
             perror("ERROR: file I/O problem in 'safe_read()'\n");
             errcnt++;
-            if(errcnt==3) break;
+            if (errcnt==3) 
+                break;
         }
         else if (ret > 0)
         {
@@ -375,9 +383,8 @@ int RingBuffer::safe_read(int fd, void *data, unsigned sz)
         if (ret == 0) // EOF returns 0
         {
             zerocnt++;
-            if (zerocnt == 100)
+            if (zerocnt >= 20)
             {
-                printf("EOF\n");
                 break;
             }
         }
@@ -385,30 +392,32 @@ int RingBuffer::safe_read(int fd, void *data, unsigned sz)
            usleep(1000);
         if (stopreads)
         {
-           printf("breaking out of safe_reed: %d of %d\n", tot, sz);
            break;
         }
     }
     return tot;
 }
 
-int RingBuffer::safe_read(QSocket *sock, void *data, unsigned sz)
+int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
 {
     int ret;
     unsigned tot = 0;
     unsigned zerocnt = 0;
 
+    QSocket *sock = rf->getSocket();
+
     while (sock->bytesAvailable() < sz) 
     {
         int reqsize = 128000;
-        m_context->RequestRemoteRingBlock(recorder_num, reqsize);
+        if (rf->RequestBlock(reqsize))
+            break;
+
         zerocnt++;
-        if (zerocnt == 100)
+        if (zerocnt >= 10)
         {
-            printf("EOF %u\n", sz);
             break;
         }
-        usleep(1000);
+        usleep(100);
         if (stopreads)
             break;
     }
@@ -431,9 +440,11 @@ int RingBuffer::Read(void *buf, int count)
     {
         if (!writemode)
         {
-            if (sock)
+            if (remotefile)
             {
-                ret = m_context->ReadRemoteFile(sock, buf, count); 
+                ret = safe_read(remotefile, buf, count);
+                totalreadpos += ret;
+                readpos += ret;
             }
             else
             {
@@ -449,9 +460,9 @@ int RingBuffer::Read(void *buf, int count)
     }
     else
     {
-        if (sock)
+        if (remotefile)
         {
-            ret = safe_read(sock, buf, count);
+            ret = safe_read(remotefile, buf, count);
             readpos += ret;
             totalreadpos += ret;
         } 
@@ -580,8 +591,8 @@ long long RingBuffer::Seek(long long pos, int whence)
     long long ret = -1;
     if (normalfile)
     {
-        if (sock)
-            ret = m_context->SeekRemoteFile(sock, readpos, pos, whence);
+        if (remotefile)
+            ret = remotefile->Seek(pos, whence, readpos);
         else
             ret = lseek64(fd2, pos, whence);
 
@@ -593,9 +604,8 @@ long long RingBuffer::Seek(long long pos, int whence)
     }
     else
     {
-        if (sock)
-            ret = m_context->SeekRemoteRing(recorder_num, sock, readpos,
-                                            pos, whence);
+        if (remotefile)
+            ret = remotefile->Seek(pos, whence, readpos);
         else
             ret = lseek64(fd2, pos, whence);
 
@@ -631,7 +641,7 @@ long long RingBuffer::GetFreeSpace(void)
 {
     if (!normalfile)
     {
-        if (sock)
+        if (remotefile)
             return m_context->GetRecorderFreeSpace(recorder_num, totalreadpos);
         return totalreadpos + filesize - totalwritepos - smudgeamount;
     }

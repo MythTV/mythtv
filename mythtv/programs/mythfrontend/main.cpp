@@ -17,6 +17,11 @@ using namespace std;
 #include "libmyth/themedmenu.h"
 #include "libmyth/programinfo.h"
 #include "libmyth/mythcontext.h"
+#include "libmyth/dialogbox.h"
+
+#define QUIT     1
+#define HALTWKUP 2
+#define HALT     3
 
 ThemedMenu *menu;
 
@@ -133,22 +138,67 @@ void TVMenuCallback(void *data, QString &selection)
     }
 }
 
-bool RunMenu(QString themedir, MythContext *context)
+int handleExit(MythContext *context)
+{
+    QString title = "Do you really want to exit MythTV?";
+
+    DialogBox diag(context, title);
+    diag.AddButton("No");
+    diag.AddButton("Yes, Exit now");
+    diag.AddButton("Yes, Exit and shutdown the computer");
+//    bool haltNwakeup = context->GetNumSetting("UseHaltWakeup");
+//    if (haltNwakeup)
+//        diag.AddButton("Yes, Shutdown and set wakeup time");
+
+    diag.Show();
+
+    int result = diag.exec();
+    switch (result)
+    {
+        case 2: return QUIT;
+        case 3: return HALT;
+//        case 4: return HALTWKUP;
+        default: return 0;
+    }
+
+    return 0;
+}
+
+void haltnow(MythContext *context, int how)
+{
+    QString halt_cmd = context->GetSetting("HaltCommand", "halt");
+    QString haltwkup_cmd = context->GetSetting("HaltCommandWhenWakeup",
+                                               "echo 'would halt now, and set "
+                                               "wakeup time to %1 (secs since "
+                                               "1970) if command was set'");
+
+    if (how == HALTWKUP)
+    {
+    }
+    else if (how == HALT)
+        system(halt_cmd.ascii());
+}
+
+int RunMenu(QString themedir, MythContext *context)
 {
     menu = new ThemedMenu(context, themedir.ascii(), "mainmenu.xml");
     menu->setCallback(TVMenuCallback, context);
-    
+   
+    int exitstatus = 0;
+ 
     if (menu->foundTheme())
     {
-        menu->Show();
-        menu->exec();
+        do {
+            menu->Show();
+            menu->exec();
+        } while (!(exitstatus = handleExit(context)));
     }
     else
     {
         cerr << "Couldn't find theme " << themedir << endl;
     }
 
-    return true;
+    return exitstatus;
 }   
 
 int main(int argc, char **argv)
@@ -181,9 +231,11 @@ int main(int argc, char **argv)
 
     context->LoadQtConfig();
 
-    RunMenu(themedir, context);
+    int exitstatus = RunMenu(themedir, context);
+
+    haltnow(context, exitstatus);
 
     delete context;
 
-    return 0;
+    return exitstatus;
 }

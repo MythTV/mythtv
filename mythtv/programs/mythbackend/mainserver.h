@@ -9,6 +9,7 @@
 #include "server.h"
 #include "playbacksock.h"
 #include "encoderlink.h"
+#include "filetransfer.h"
 
 class MythContext;
 
@@ -27,7 +28,8 @@ class MainServer : public QVBox
     void readSocket();
 
   private:
-    void HandleAnnounce(QStringList commands, QSocket *socket);
+    void HandleAnnounce(QStringList &slist, QStringList commands, 
+                        QSocket *socket);
     void HandleDone(QSocket *socket);
 
     // playback
@@ -40,18 +42,22 @@ class MainServer : public QVBox
     void HandleGetFreeRecorder(PlaybackSock *pbs);
     void HandleRecorderQuery(QStringList &slist, QStringList &commands,
                              PlaybackSock *pbs);
+    void HandleFileTransferQuery(QStringList &slist, QStringList &commands,
+                                 PlaybackSock *pbs); 
 
-    PlaybackSock *getPlaybackByName(QString name);
     PlaybackSock *getPlaybackBySock(QSocket *socket);
+    FileTransfer *getFileTransferByID(int id);
+    FileTransfer *getFileTransferBySock(QSocket *socket);
+
     bool isRingBufSock(QSocket *sock);
 
     QMap<int, EncoderLink *> *encoderList;
 
     MythServer *mythserver;
 
-    QMap<QString, PlaybackSock *> playbackList;
+    vector<PlaybackSock *> playbackList;
     vector<QSocket *> ringBufList;
-    vector<QSocket *> fileTransferList;
+    vector<FileTransfer *> fileTransferList;
 
     MythContext *m_context;
 

@@ -35,6 +35,8 @@ PlaybackBox::PlaybackBox(MythContext *context, BoxType ltype, QWidget *parent,
     m_context = context;
 
     title = NULL;
+    rbuffer = NULL;
+    nvp = NULL;
 
     int screenheight = 0, screenwidth = 0;
     context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
@@ -197,8 +199,9 @@ PlaybackBox::PlaybackBox(MythContext *context, BoxType ltype, QWidget *parent,
     timer = new QTimer(this);
 
     qApp->processEvents();
-    descwidth = screenwidth - desclabel->width() - pixlabel->width() -
-                4 * (int)(10 * wmult);
+    descwidth = screenwidth - desclabel->width() - 4 * (int)(10 * wmult);
+    if (pixlabel)
+        descwidth -= pixlabel->width();
 
     if (item)
     {
@@ -238,6 +241,16 @@ void PlaybackBox::killPlayer(void)
 
     if (nvp)
     {
+        listview->SetAllowKeypress(false);
+        while (!nvp->IsPlaying())
+        {
+            usleep(50);
+            qApp->unlock();
+            qApp->processEvents();
+            qApp->lock();
+        }
+        listview->SetAllowKeypress(true);
+
         nvp->StopPlaying();
         pthread_join(decoder, NULL);
         delete nvp;
@@ -250,7 +263,13 @@ void PlaybackBox::killPlayer(void)
 
 void PlaybackBox::startPlayer(ProgramInfo *rec)
 {
-    rbuffer = new RingBuffer(m_context, rec->pathname, false);
+    if (rbuffer || nvp)
+    {
+        cout << "ERROR: preview window didn't clean up\n";
+        return;
+    }
+
+    rbuffer = new RingBuffer(m_context, rec->pathname, false, true);
 
     nvp = new NuppelVideoPlayer();
     nvp->SetRingBuffer(rbuffer);
@@ -263,13 +282,21 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
     pthread_create(&decoder, NULL, SpawnDecoder, nvp);
 
     QTime curtime = QTime::currentTime();
-    curtime.addSecs(1);
+    curtime = curtime.addSecs(2);
+ 
+    listview->SetAllowKeypress(false);
+
     while (!nvp->IsPlaying())
     {
          if (QTime::currentTime() > curtime)
              break;
          usleep(50);
+         qApp->unlock();
+         qApp->processEvents();
+         qApp->lock();
     }
+
+    listview->SetAllowKeypress(true);
 }
 
 void PlaybackBox::changed(QListViewItem *lvitem)
@@ -367,12 +394,21 @@ void PlaybackBox::play(QListViewItem *lvitem)
     tv->Init();
     tv->Playback(tvrec);
 
+    listview->SetAllowKeypress(false);
     while (tv->IsPlaying() || tv->ChangingState())
+    {
         usleep(50);
+        qApp->unlock();
+        qApp->processEvents();
+        qApp->lock();
+    }
+    listview->SetAllowKeypress(true);
 
     delete tv;
 
-    startPlayer(rec);
+    if (m_context->GetNumSetting("PlaybackPreview") == 1)
+        startPlayer(rec);
+
     timer->start(1000 / 30);
 }
 

@@ -374,6 +374,8 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
             return -1;
         }
     }
+
+    ringBuffer->Start();
     startpos = ringBuffer->GetReadPosition();
     
     if (ringBuffer->Read(&fileheader, FILEHEADERSIZE) != FILEHEADERSIZE)

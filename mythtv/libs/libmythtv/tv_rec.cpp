@@ -1035,8 +1035,6 @@ long long TVRec::SeekRingBuffer(long long curpos, long long pos, int whence)
         long long desired = curpos + pos;
         long long realpos = rbuffer->GetReadPosition();
 
-        cout << realpos << " " << rbuffer->Seek(0, SEEK_CUR) << endl;
-
         pos = desired - realpos;
     }
 

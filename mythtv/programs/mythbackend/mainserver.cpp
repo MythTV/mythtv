@@ -54,12 +54,10 @@ void MainServer::readSocket(void)
         QString command = tokens[0];
         if (command == "ANN")
         {
-            cout << "Command: " << command << endl;
-
             if (tokens.size() < 3 || tokens.size() > 4)
                 cerr << "Bad ANN query\n";
             else
-                HandleAnnounce(tokens, socket);
+                HandleAnnounce(listline, tokens, socket);
             return;
         }
         else if (command == "DONE")
@@ -107,28 +105,27 @@ void MainServer::readSocket(void)
                 else
                     HandleRecorderQuery(listline, tokens, pbs);
             }
-        }
-        else
-        {
-            cout << "unknown connection\n";
+            else if (command == "QUERY_FILETRANSFER")
+            {
+                if (tokens.size() != 2)
+                    cerr << "Bad QUERY_FILETRANSFER\n";
+                else
+                    HandleFileTransferQuery(listline, tokens, pbs);
+            }
         }
     }
 }
 
-void MainServer::HandleAnnounce(QStringList commands, QSocket *socket)
+void MainServer::HandleAnnounce(QStringList &slist, QStringList commands, 
+                                QSocket *socket)
 {
+    QStringList retlist = "OK";
+
     if (commands[1] == "Playback")
     {
         cout << "adding: " << commands[2] << " as a player\n";
         PlaybackSock *pbs = new PlaybackSock(socket, commands[2]);
-        PlaybackSock *existing = getPlaybackByName(commands[2]);
-        if (existing)
-        {
-            QSocket *sock = existing->getSocket();
-            sock->close();
-            delete existing;
-        }
-        playbackList[commands[2]] = pbs;
+        playbackList.push_back(pbs);
     }
     else if (commands[1] == "RingBuffer")
     {
@@ -147,6 +144,19 @@ void MainServer::HandleAnnounce(QStringList commands, QSocket *socket)
 
         enc->SpawnReadThread(socket);
     }
+    else if (commands[1] == "FileTransfer")
+    {
+        cout << "adding: " << commands[2] << " as a remote file transfer\n";
+        QString filename = slist[1];    
+
+        FileTransfer *ft = new FileTransfer(m_context, filename, socket);
+
+        fileTransferList.push_back(ft);
+
+        retlist << QString::number(socket->socket());
+    }
+
+    WriteStringList(socket, retlist);
 }
 
 void MainServer::HandleDone(QSocket *socket)
@@ -223,8 +233,16 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                 proginfo->chansign = "#" + proginfo->chanid;
             }
 
-            proginfo->pathname = proginfo->GetRecordFilename(fileprefix);
-        
+            QString lpath = proginfo->GetRecordFilename(fileprefix);
+            QString ip = m_context->GetSetting("ServerIP");
+            QString port = m_context->GetSetting("ServerPort");
+
+            if (pbs->isLocal())
+                proginfo->pathname = lpath;
+            else
+                proginfo->pathname = QString("myth://") + ip + ":" + port + 
+                                     lpath;
+
             struct stat64 st;
     
             long long size = 0;
@@ -570,12 +588,12 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
 
         retlist << "OK";
     }
-    else if (command == "REQUEST_BLOCK")
+    else if (command == "REQUEST_BLOCK_RINGBUF")
     {
         int size = slist[2].toInt();
 
         enc->RequestRingBufferBlock(size);
-        retlist << "OK";
+        retlist << QString::number(false);
     }
     else if (command == "SEEK_RINGBUF")
     {
@@ -586,7 +604,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         long long ret = enc->SeekRingBuffer(curpos, pos, whence);
         encodeLongLong(retlist, ret);
     }
-    else if (command == "DONE_RINGBUF")
+    else if (command == "STOP_RINGBUF")
     {
         enc->KillReadThread();
 
@@ -596,29 +614,83 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     WriteStringList(pbs->getSocket(), retlist);    
 }
 
+void MainServer::HandleFileTransferQuery(QStringList &slist, 
+                                         QStringList &commands,
+                                         PlaybackSock *pbs)
+{
+    int recnum = commands[1].toInt();
+
+    FileTransfer *ft = getFileTransferByID(recnum);
+    if (!ft)
+    {
+        cerr << "Unknown file transfer socket\n";
+        return;
+    }
+
+    QString command = slist[1];
+
+    QStringList retlist;
+
+    if (command == "IS_OPEN")
+    {
+        bool isopen = ft->isOpen();
+
+        retlist << QString::number(isopen);
+    }
+    else if (command == "STOP")
+    {
+        ft->Stop();
+    }
+    else if (command == "PAUSE")
+    {
+        ft->Pause();
+    }
+    else if (command == "UNPAUSE")
+    {
+        ft->Unpause();
+    }
+    else if (command == "REQUEST_BLOCK")
+    {
+        int size = slist[2].toInt();
+
+        retlist << QString::number(ft->RequestBlock(size));
+    }
+    else if (command == "SEEK")
+    {
+        long long pos = decodeLongLong(slist, 2);
+        int whence = slist[4].toInt();
+        long long curpos = decodeLongLong(slist, 5);
+
+        long long ret = ft->Seek(curpos, pos, whence);
+        encodeLongLong(retlist, ret);
+    }
+
+
+    WriteStringList(pbs->getSocket(), retlist);
+}
+
 void MainServer::endConnection(QSocket *socket)
 {
-    QMap<QString, PlaybackSock *>::Iterator it = playbackList.begin();
+    vector<PlaybackSock *>::iterator it = playbackList.begin();
     for (; it != playbackList.end(); ++it)
     {
-        QSocket *sock = it.data()->getSocket();
+        QSocket *sock = (*it)->getSocket();
         if (sock == socket)
         {
-            cout << "deleting " << it.data()->getHostname() 
-                 << " from player list\n";
             playbackList.erase(it);
+            delete (*it);
             return;
         }
     }
 
-    vector<QSocket *>::iterator ft = fileTransferList.begin();
+    vector<FileTransfer *>::iterator ft = fileTransferList.begin();
     for (; ft != fileTransferList.end(); ++ft)
     {
-        QSocket *sock = *ft;
+        QSocket *sock = (*ft)->getSocket();
         if (sock == socket)
         {
-            cout << "deleting from ft list\n";
             fileTransferList.erase(ft);
+            delete (*ft);
             return;
         }
     }
@@ -629,7 +701,6 @@ void MainServer::endConnection(QSocket *socket)
         QSocket *sock = *rt;
         if (sock == socket)
         {
-            cout << "deleting from ringBuf list\n";
             ringBufList.erase(rt);
             return;
         }
@@ -638,26 +709,50 @@ void MainServer::endConnection(QSocket *socket)
     cout << "unknown socket\n";
 }
 
-PlaybackSock *MainServer::getPlaybackByName(QString name)
-{
-    PlaybackSock *retval = NULL;
-
-    if (playbackList.find(name) != playbackList.end())
-        retval = playbackList[name];
-
-    return retval;
-}
-
 PlaybackSock *MainServer::getPlaybackBySock(QSocket *sock)
 {
     PlaybackSock *retval = NULL;
 
-    QMap<QString, PlaybackSock *>::Iterator it = playbackList.begin();
+    vector<PlaybackSock *>::iterator it = playbackList.begin();
     for (; it != playbackList.end(); ++it)
     {
-        if (sock == it.data()->getSocket())
+        if (sock == (*it)->getSocket())
         {
-            retval = it.data();
+            retval = (*it);
+            break;
+        }
+    }
+
+    return retval;
+}
+
+FileTransfer *MainServer::getFileTransferByID(int id)
+{
+    FileTransfer *retval = NULL;
+
+    vector<FileTransfer *>::iterator it = fileTransferList.begin();
+    for (; it != fileTransferList.end(); ++it)
+    {
+        if (id == (*it)->getSocket()->socket())
+        {
+            retval = (*it);
+            break;
+        }
+    }
+
+    return retval;
+}
+
+FileTransfer *MainServer::getFileTransferBySock(QSocket *sock)
+{
+    FileTransfer *retval = NULL;
+
+    vector<FileTransfer *>::iterator it = fileTransferList.begin();
+    for (; it != fileTransferList.end(); ++it)
+    {
+        if (sock == (*it)->getSocket())
+        {
+            retval = (*it);
             break;
         }
     }

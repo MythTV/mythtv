@@ -14,15 +14,16 @@ VERSION = 0.8.0
 
 # Input
 HEADERS += dialogbox.h guidegrid.h infodialog.h infostructs.h lcddevice.h 
-HEADERS += oldsettings.h programinfo.h settings.h themedmenu.h util.h 
-HEADERS += mythcontext.h mythwidgets.h
+HEADERS += mythcontext.h mythwidgets.h oldsettings.h programinfo.h 
+HEADERS += remotefile.h settings.h themedmenu.h util.h 
 
 SOURCES += dialogbox.cpp guidegrid.cpp infodialog.cpp infostructs.cpp 
-SOURCES += lcddevice.cpp programinfo.cpp settings.cpp themedmenu.cpp
-SOURCES += util.cpp mythcontext.cpp mythwidgets.cpp oldsettings.cpp
+SOURCES += lcddevice.cpp mythcontext.cpp mythwidgets.cpp oldsettings.cpp 
+SOURCES += programinfo.cpp remotefile.cpp settings.cpp themedmenu.cpp
+SOURCES += util.cpp
 
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = dialogbox.h lcddevice.h programinfo.h themedmenu.h mythcontext.h 
-inc.files += mythwidgets.h
+inc.files += mythwidgets.h remotefile.h util.h
 
 INSTALLS += inc

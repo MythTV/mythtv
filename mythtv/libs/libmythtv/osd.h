@@ -66,6 +66,8 @@ class OSD
 
     void DoEditSlider(QMap<long long, int> deleteMap, long long curFrame,
                       long long totalFrames);
+
+    int getTimeType(void) { return timeType; }
  
  private:
     void SetNoThemeDefaults();
@@ -97,6 +99,8 @@ class OSD
     bool m_setsvisible;
 
     int totalfadeframes;
+    int combinedescsub;
+    int timeType;
 
     QString timeFormat;
 

@@ -50,7 +50,17 @@ ThemedMenu::ThemedMenu(MythContext *context, const char *cdir,
     menulevel = 0;
 
     callback = NULL;
-    killable = false;
+    int allowsd = m_context->GetNumSetting("AllowQuitShutdown");
+    killable = (allowsd == 4);
+
+    if (allowsd == 1)
+        exitModifier = Qt::ControlButton;
+    else if (allowsd == 2)
+        exitModifier = Qt::MetaButton;
+    else if (allowsd == 3)
+        exitModifier = Qt::AltButton;
+    else
+        exitModifier = -1;
     
     parseSettings(dir, "theme.xml");
 
@@ -1188,7 +1198,7 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
             QString action = "UPMENU";
             if (menulevel > 1)
                 handleAction(action);
-            else if (killable)
+            else if (killable || e->state() == exitModifier)
                 done(0);
             handled = true;
         }

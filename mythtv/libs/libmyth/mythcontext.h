@@ -84,18 +84,6 @@ class MythContext
                                 QString &channelname);
     void GetRecorderInputName(int recorder, QString &inputname);
 
-    QSocket *SetupRemoteRingBuffer(int recorder, QString url);
-    void CloseRemoteRingBuffer(int recorder, QSocket *sock);
-    void RequestRemoteRingBlock(int recorder, int size);
-    long long SeekRemoteRing(int recorder, QSocket *sock, long long curpos,
-                             long long pos, int whence);
-    
-    QSocket *SetupRemoteFile(QString url);
-    void CloseRemoteFile(QSocket *sock);
-    int ReadRemoteFile(QSocket *sock, void *data, int size);
-    long long SeekRemoteFile(QSocket *Sock, long long curpos, long long pos, 
-                             int whence);
-
   private:
     void SetPalette(QWidget *widget);
 

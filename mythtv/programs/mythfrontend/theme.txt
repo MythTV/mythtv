@@ -61,3 +61,12 @@ str DefaultTVChannel=3
 str UnknownTitle=Unknown
 # What category to give 'unknown' programs
 #str UnknownCategory=Unknown
+
+# Shutdown and wakeup Options
+#
+# should a quit/shutdown of the frontend be allowed a with "MODIFIER-ESC"?
+# (0:no,  1: MODIFIER=Control, 2: MODIFIER=Meta, 3: MODIFIER=Alt, 
+#  4: without modifier)
+int AllowQuitShutdown=3
+### the shutdown command used to shutdown your machine
+str HaltCommand=halt

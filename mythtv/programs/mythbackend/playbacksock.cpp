@@ -25,6 +25,8 @@ PlaybackSock::PlaybackSock(QSocket *lsock, QString lhostname)
 
 PlaybackSock::~PlaybackSock()
 {
+    if (sock)
+        delete sock;
 }
 
 

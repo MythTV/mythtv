@@ -31,7 +31,10 @@ OSD::OSD(int width, int height, int framerate, const QString &filename,
 
     wmult = vid_width / 640.0;
     hmult = vid_height / 480.0;
-
+   
+    combinedescsub = 0;
+    timeType = 0; 
+    totalfadeframes = 0;
     fontname = filename;
     fontprefix = prefix;
     m_setsvisible = false;
@@ -499,6 +502,8 @@ bool OSD::LoadTheme(void)
     }
 
     totalfadeframes = settings->GetNumSetting("FadeAwayFrames");
+    timeType = settings->GetNumSetting("SeekTimeType");
+    combinedescsub = settings->GetNumSetting("InfoCombineDescSub");
 
     if (settings->GetSetting("ChannelNumberRect") != "")
     {
@@ -636,11 +641,19 @@ void OSD::SetInfoText(const QString &text, const QString &subtitle,
         if (type)
             type->SetText(text);
         type = (OSDTypeText *)container->GetType("subtitle");
-        if (type)
+        if (type && combinedescsub != 1)
             type->SetText(subtitle);
         type = (OSDTypeText *)container->GetType("description");
         if (type)
-            type->SetText(desc);
+        {
+            if (subtitle.length() > 1 && combinedescsub == 1)
+            {
+                QString tmpdesc = "\"" + subtitle + "\", " + desc;
+                type->SetText(tmpdesc);
+            }
+            else
+                type->SetText(desc);
+        }
         type = (OSDTypeText *)container->GetType("callsign_text");
         if (type)
             type->SetText(callsign.left(5));

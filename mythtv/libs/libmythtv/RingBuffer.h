@@ -5,7 +5,7 @@
 #include <pthread.h>
 
 class MythContext;
-class QSocket;
+class RemoteFile;
 
 class ThreadedFileWriter
 {
@@ -36,13 +36,14 @@ private:
 class RingBuffer
 {
  public:
-    RingBuffer(MythContext *context, const QString &lfilename, bool write);
+    RingBuffer(MythContext *context, const QString &lfilename, bool write,
+               bool needevents = false);
     RingBuffer(MythContext *context, const QString &lfilename, long long size, 
                long long smudge, int recordernum = 0);
     
    ~RingBuffer();
 
-    bool IsOpen(void) { return (tfw || fd2 > 0 || sock); }
+    bool IsOpen(void) { return (tfw || fd2 > 0 || remotefile); }
     
     int Read(void *buf, int count);
     int Write(const void *buf, int count);
@@ -81,9 +82,11 @@ class RingBuffer
 
     bool IsIOBound(void);
 
+    void Start(void);
+
  private:
     int safe_read(int fd, void *data, unsigned sz);
-    int safe_read(QSocket *sock, void *data, unsigned sz);
+    int safe_read(RemoteFile *rf, void *data, unsigned sz);
 
     QString filename;
 
@@ -111,7 +114,7 @@ class RingBuffer
 
     MythContext *m_context;
     int recorder_num;
-    QSocket *sock;
+    RemoteFile *remotefile;
 };
 
 #endif

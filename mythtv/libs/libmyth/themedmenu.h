@@ -153,7 +153,8 @@ class ThemedMenu : public QDialog
     void *callbackdata;
 
     bool killable;
-   
+    int exitModifier;
+
     MythContext *m_context;
 };
 

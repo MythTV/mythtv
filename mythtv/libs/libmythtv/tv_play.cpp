@@ -939,11 +939,29 @@ int TV::calcSliderPos(int offset, QString &desc)
         int secs = ((int)secsbehind - hours * 3600 - mins * 60);
 
         if (hours > 0)
-            sprintf(text, "%02d:%02d:%02d behind  --  %.2f%% full", hours, mins,
-                    secs, (1000 - ret) / 10);
+        {
+            if (osd->getTimeType() == 0)
+            {
+                sprintf(text, "%02d:%02d:%02d behind  --  %.2f%% full", hours, 
+                        mins, secs, (1000 - ret) / 10);
+            }
+            else
+            {
+                sprintf(text, "%02d:%02d:%02d behind", hours, mins, secs);
+            }
+        }
         else
-            sprintf(text, "%02d:%02d behind  --  %.2f%% full", mins, secs,
-                    (1000 - ret) / 10);
+        {
+            if (osd->getTimeType() == 0)
+            {
+                sprintf(text, "%02d:%02d behind  --  %.2f%% full", mins, secs,
+                        (1000 - ret) / 10);
+            }
+            else
+            {
+                sprintf(text, "%02d:%02d behind", mins, secs);
+            }
+        }
 
         desc = text;
         return (int)(1000 - ret);

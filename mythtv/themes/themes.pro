@@ -8,7 +8,7 @@ TEMPLATE = app
 CONFIG -= moc qt
 
 themes.path = $${PREFIX}/share/mythtv/themes/
-themes.files = blue liquid defaultosd oldosd
+themes.files = blue liquid defaultosd blueosd oldosd
 
 INSTALLS += themes 
 
