@@ -979,30 +979,6 @@
         <translation type="unfinished">O </translation>
     </message>
     <message>
-        <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="obsolete">%02d:%02d:%02d atrás -- %.2f%% cheio</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d behind</source>
-        <translation type="obsolete">%02d:%02d:%02d atrás</translation>
-    </message>
-    <message>
-        <source>%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="obsolete">%02d:%02d atrás -- %.2f%% cheio</translation>
-    </message>
-    <message>
-        <source>%02d:%02d behind</source>
-        <translation type="obsolete">%02d:%02d atrás</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d of %02d:%02d:%02d</source>
-        <translation type="obsolete">%02d:%02d:%02d de %02d:%02d:%02d</translation>
-    </message>
-    <message>
-        <source>%02d:%02d of %02d:%02d</source>
-        <translation type="obsolete">%02d:%02d de %02d:%02d</translation>
-    </message>
-    <message>
         <source>Pre-scaling theme images</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1874,10 +1850,6 @@
     <message>
         <source>Will Record</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Remember this choice and use it automatically in the future</source>
-        <translation type="obsolete">Recordar esta opción y usarla automáticamente en el futuro</translation>
     </message>
     <message>
         <source>Priority</source>
@@ -4072,10 +4044,6 @@ Myth will now exit.</source>
 <context>
     <name>ScheduledRecording</name>
     <message>
-        <source>See a list of all up-coming episodes/playtimes.</source>
-        <translation type="obsolete">Ver a lista de todos os próximos episódios e horários.</translation>
-    </message>
-    <message>
         <source>List upcoming episodes</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4287,14 +4255,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Auto Expire</source>
-        <translation type="obsolete">Permitir que a gravação seja apagada automaticamente</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Cancelar</translation>
-    </message>
-    <message>
         <source>Auto-Skip OFF</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4458,24 +4418,8 @@ Myth will now exit.</source>
         <translation>Gravações Marcadas:</translation>
     </message>
     <message>
-        <source>Conflicting</source>
-        <translation>Conflito</translation>
-    </message>
-    <message>
-        <source>Deactivated</source>
-        <translation>Desactivadas</translation>
-    </message>
-    <message>
-        <source>Airdate:</source>
-        <translation>Data de Emissão:</translation>
-    </message>
-    <message>
         <source>Channel:</source>
         <translation>Canal:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation>Descrição:</translation>
     </message>
     <message>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded</source>
@@ -4556,14 +4500,6 @@ Myth will now exit.</source>
     <message>
         <source>No listings found for this program. </source>
         <translation>Não foram encontradas listas para este programa.</translation>
-    </message>
-    <message>
-        <source>%SUBTITLE|%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Highlighting:</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Show  (1) All  (2) Important</source>

@@ -787,34 +787,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="obsolete">%02d:%02d:%02d en arrière -- %.2f%% plein</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d behind</source>
-        <translation type="obsolete">%02d:%02d:%02d en arrière</translation>
-    </message>
-    <message>
-        <source>%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="obsolete">%02d:%02d en arrière -- %.2f%% plein</translation>
-    </message>
-    <message>
-        <source>%02d:%02d behind</source>
-        <translation type="obsolete">%02d:%02d en arrière</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d of %02d:%02d:%02d</source>
-        <translation type="obsolete">%02d:%02d:%02d de %02d:%02d:%02d</translation>
-    </message>
-    <message>
-        <source>%02d:%02d of %02d:%02d</source>
-        <translation type="obsolete">%02d:%02d de %02d:%02d</translation>
-    </message>
-    <message>
-        <source>Skip %1 seconds</source>
-        <translation type="obsolete">Sauter %1 secondes</translation>
-    </message>
-    <message>
         <source>Not Recording</source>
         <translation>Pas enregistré</translation>
     </message>
@@ -1878,10 +1850,6 @@
     <message>
         <source>Will Record</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Remember this choice and use it automatically in the future</source>
-        <translation type="obsolete">Conserver ce choix et l&apos;utiliser automatiquement dans le futur</translation>
     </message>
     <message>
         <source>Priority</source>
@@ -4076,10 +4044,6 @@ Myth will now exit.</source>
 <context>
     <name>ScheduledRecording</name>
     <message>
-        <source>See a list of all up-coming episodes/playtimes.</source>
-        <translation type="obsolete">Lister tous les prochains épisodes.</translation>
-    </message>
-    <message>
         <source>List upcoming episodes</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4295,10 +4259,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Annuler</translation>
-    </message>
-    <message>
         <source>Auto-Skip OFF</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4454,23 +4414,7 @@ Myth will now exit.</source>
 <context>
     <name>ThemeUI</name>
     <message>
-        <source>%SUBTITLE|%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Scheduled Recordings:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Highlighting:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Conflicting</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Deactivated</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4482,16 +4426,8 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Airdate:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Channel:</source>
         <translation type="unfinished">Station:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="unfinished">Description:</translation>
     </message>
     <message>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded</source>

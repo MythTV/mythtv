@@ -359,14 +359,6 @@
         <translation>中断</translation>
     </message>
     <message>
-        <source>, %0.2f GB free</source>
-        <translation type="obsolete">, %0.2f GB 空き</translation>
-    </message>
-    <message>
-        <source>Yes, but record this episode again next time</source>
-        <translation type="obsolete">はい，でも次回また録画します</translation>
-    </message>
-    <message>
         <source>Yes, delete it</source>
         <translation>はい，消去します</translation>
     </message>
@@ -584,10 +576,6 @@
         <source>Delete</source>
         <translation>削除</translation>
     </message>
-    <message>
-        <source>Movie</source>
-        <translation type="obsolete">映画</translation>
-    </message>
 </context>
 <context>
     <name>ProgramRecPriority</name>
@@ -799,18 +787,6 @@
         <translation>自動削除</translation>
     </message>
     <message>
-        <source>%02d:%02d:%02d of %02d:%02d:%02d</source>
-        <translation type="obsolete">%02d:%02d:%02d / %02d:%02d:%02d</translation>
-    </message>
-    <message>
-        <source>%02d:%02d of %02d:%02d</source>
-        <translation type="obsolete">%02d:%02d / %02d:%02d</translation>
-    </message>
-    <message>
-        <source>Skip %1 seconds</source>
-        <translation type="obsolete">%1秒間スキップ</translation>
-    </message>
-    <message>
         <source>Not Recording</source>
         <translation>録画しない</translation>
     </message>
@@ -879,10 +855,6 @@
         <translation>デインターレース再生</translation>
     </message>
     <message>
-        <source>Make the video look normal on a progressive display (i.e. monitor).  Deinterlace requires that your CPU supports SSE instructions.  Enabling this without proper CPU support will cause the program to segfault. See the HOWTO document for more information.</source>
-        <translation type="obsolete">プログレッシブディスプレイ(例 モニター)で正常にビデオを見られるにする．デインターレースはCPがUSSEをサポートしている必要が有ります．対応してないCPUで有効にした場合セグメンテーションフォールトが起こります．詳細はHOWTOを御覧下さい．</translation>
-    </message>
-    <message>
         <source>Extra audio buffering</source>
         <translation>拡張オーディオバッファリング</translation>
     </message>
@@ -937,10 +909,6 @@
     <message>
         <source>Scene Change Detection</source>
         <translation>場面変更検知</translation>
-    </message>
-    <message>
-        <source>This determines the method used by MythTV to detect when commercials start and end.  You must have automatic commercial turned on to use anything other than &apos;Blank Frame&apos;.</source>
-        <translation type="obsolete">MythTVがCMを検出する手法を選択します．&quot;ブランクフレーム&quot;以外を使う場合は，自動CMスキップを有効にする必要があります．</translation>
     </message>
     <message>
         <source>Automatically Skip Commercials</source>
@@ -1043,10 +1011,6 @@
         <translation>セットアップピンコード</translation>
     </message>
     <message>
-        <source>This PIN is used to control access to the setup menues. If you want to use this feature, then setting the value to all numbers will make your life much easier.  Set it to blank to disable.</source>
-        <translation type="obsolete">ピンコードは設定画面の表示を制限するのに使われます．空白にすれば無効になります．</translation>
-    </message>
-    <message>
         <source>Require Setup PIN</source>
         <translation>セットアップピンを要求する</translation>
     </message>
@@ -1057,10 +1021,6 @@
     <message>
         <source>Reposition after fast forward/rewind</source>
         <translation>早送り・巻き戻しの後に位置を戻す</translation>
-    </message>
-    <message>
-        <source>When exiting sticky keys fast forward/rewind mode, reposition before resuming normal playback.  This is to compensate for the reaction time between seeing where to resume playback and actually exiting fast forward/rewind mode.</source>
-        <translation type="obsolete">スティッキーキーの高速早送り・巻き戻しが終わったとき，再生を再開する前に位置を戻します．これは見た目の再生位置と，実際に早送り・巻き戻しが終わった位置のズレを補正するためのものです．</translation>
     </message>
     <message>
         <source>Number of seconds for OSD information</source>
@@ -1311,16 +1271,8 @@
         <translation>指定されたスクリーンでのみ実行されます．</translation>
     </message>
     <message>
-        <source>GUI width</source>
-        <translation type="obsolete">GUIの幅</translation>
-    </message>
-    <message>
         <source>The width of the GUI.  Do not make the GUI wider than your actual screen resolution.  Set to 0 to automatically scale to fullscreen.</source>
         <translation>実際の画面解像度より大きい値は設定しないでください．0を指定すると自動的にフルスクリーンになります．</translation>
-    </message>
-    <message>
-        <source>GUI height</source>
-        <translation type="obsolete">GUIの高さ</translation>
     </message>
     <message>
         <source>The height of the GUI.  Do not make the GUI taller than your actual screen resolution.  Set to 0 to automatically scale to fullscreen.</source>
@@ -1389,10 +1341,6 @@
     <message>
         <source>Problem reading theme preview image </source>
         <translation>テーマプレビューイメージの読込で問題が発生しました</translation>
-    </message>
-    <message>
-        <source>Display channel names instead of numbers</source>
-        <translation type="obsolete">番号の代わりにチャンネル名を表示する</translation>
     </message>
     <message>
         <source>&quot;Big&quot; font</source>
@@ -1829,10 +1777,6 @@
         <translation>再生全般(その2)</translation>
     </message>
     <message>
-        <source>Commercial: %1 seconds</source>
-        <translation type="obsolete">CM: %1 秒</translation>
-    </message>
-    <message>
         <source>Notify, but do not skip</source>
         <translation>通知するがスキップはしない</translation>
     </message>
@@ -1865,32 +1809,8 @@
         <translation>はい</translation>
     </message>
     <message>
-        <source>Manual Override</source>
-        <translation type="obsolete">手動で上書き</translation>
-    </message>
-    <message>
-        <source>Other Showing</source>
-        <translation type="obsolete">他の番組</translation>
-    </message>
-    <message>
-        <source>Manual Conflict</source>
-        <translation type="obsolete">手動衝突回避</translation>
-    </message>
-    <message>
-        <source>Auto Conflict</source>
-        <translation type="obsolete">自動衝突回避</translation>
-    </message>
-    <message>
-        <source>Overlap</source>
-        <translation type="obsolete">重複</translation>
-    </message>
-    <message>
         <source>Repeat</source>
         <translation>繰り返し</translation>
-    </message>
-    <message>
-        <source>R</source>
-        <translation type="obsolete">R</translation>
     </message>
     <message>
         <source>T</source>
@@ -1927,26 +1847,6 @@
     <message>
         <source>Will Record</source>
         <translation>録画する</translation>
-    </message>
-    <message>
-        <source>Don&apos;t record it</source>
-        <translation type="obsolete">録画しない</translation>
-    </message>
-    <message>
-        <source>Never record this episode</source>
-        <translation type="obsolete">この番組をもう録画しない</translation>
-    </message>
-    <message>
-        <source>Record it anyway</source>
-        <translation type="obsolete">とにかく録画する</translation>
-    </message>
-    <message>
-        <source>The following scheduled recordings conflict with each other.  Which would you like to record?</source>
-        <translation type="obsolete">これらの予約は互いに衝突しています．どちらを録画しますか?</translation>
-    </message>
-    <message>
-        <source>Remember this choice and use it automatically in the future</source>
-        <translation type="obsolete">この選択を覚えておいて，今後は自動的に選択する</translation>
     </message>
     <message>
         <source>Priority</source>
@@ -1987,26 +1887,6 @@
     <message>
         <source>Reverse direction in fast forward/rewind</source>
         <translation>早送り/巻戻し中に向きを反転</translation>
-    </message>
-    <message>
-        <source>If set, pressing the sticky rewind key in fast forward mode will switch to rewind mode, and vice versa.  If not set, doing so will decrease the speed in the current direction or switch to play mode if the speed can&apos;t be decreased further.</source>
-        <translation type="obsolete">これをセットすると，早送りをしているときに巻き戻しキーを押すと巻き戻しモードになります(逆も同じ)．セットしない場合，早送り(巻き戻し)の向きは変えずに速度が下がっていき，最後には再生モードになります．</translation>
-    </message>
-    <message>
-        <source>Use Recording Priorities</source>
-        <translation type="obsolete">録画優先順位を使用する</translation>
-    </message>
-    <message>
-        <source>Use program recording priorities to resolve conflicts.</source>
-        <translation type="obsolete">衝突の解決に番組録画の優先順位を使用する．</translation>
-    </message>
-    <message>
-        <source>Recording Priorities First.</source>
-        <translation type="obsolete">録画優先順位を優先する．</translation>
-    </message>
-    <message>
-        <source>Use recording priorities to resolve conflicts before using traditional conflict resolution.</source>
-        <translation type="obsolete">従来の衝突回避手法を使う前に，録画優先順位を使用して衝突を解決します．</translation>
     </message>
     <message>
         <source>Single Recordings Priority</source>
@@ -2403,20 +2283,12 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>手動キャンセル</translation>
     </message>
     <message>
-        <source>Low Priority</source>
-        <translation type="obsolete">低優先順位</translation>
-    </message>
-    <message>
         <source>Low Disk Space</source>
         <translation>ディスク空き容量不足</translation>
     </message>
     <message>
         <source>Tuner Busy</source>
         <translation>チューナー使用中</translation>
-    </message>
-    <message>
-        <source>This showing conflicts with one or more other scheduled programs.</source>
-        <translation type="obsolete">この番組は他の録画予約と衝突しています．</translation>
     </message>
     <message>
         <source>This showing will be recorded.</source>
@@ -2463,32 +2335,12 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>この番組は以前録画されており，録画一覧から閲覧できます．</translation>
     </message>
     <message>
-        <source>this episode will be recorded at another time instead.</source>
-        <translation type="obsolete">その代わり，この番組は別の時間に録画されます．</translation>
-    </message>
-    <message>
         <source>too many recordings of this program have already been recorded.</source>
         <translation>この番組の録画数が多すぎます．</translation>
     </message>
     <message>
         <source>it was manually cancelled.</source>
         <translation>手動でキャンセルされています．</translation>
-    </message>
-    <message>
-        <source>another program with a higher recording priority will be recorded.</source>
-        <translation type="obsolete">別の優先順位の高い番組が録画されます．</translation>
-    </message>
-    <message>
-        <source>another program was manually chosen to be recorded instead.</source>
-        <translation type="obsolete">代わりに手動で選択された別の番組が録画されます．</translation>
-    </message>
-    <message>
-        <source>another program was automatically chosen to be recorded instead.</source>
-        <translation type="obsolete">代わりに自動的に選択された別の番組が録画されます．</translation>
-    </message>
-    <message>
-        <source>it is covered by another scheduled recording for the same program.</source>
-        <translation type="obsolete">同じ番組が別の予約で録画されます．</translation>
     </message>
     <message>
         <source>there wasn&apos;t enough disk space available.</source>
@@ -2725,10 +2577,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>全般の設定で定義されたシステム全体の周波数テーブルと異なるものを使う以外は，既定値のままにしておいてください．</translation>
     </message>
     <message>
-        <source>tv_grab_na configuration</source>
-        <translation type="obsolete">tv_grab_na設定</translation>
-    </message>
-    <message>
         <source>tv_grab_uk configuration</source>
         <translation>tv_grab_uk設定</translation>
     </message>
@@ -2911,10 +2759,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>External channel change command</source>
         <translation>外部チャンネル変更コマンド</translation>
-    </message>
-    <message>
-        <source>If specified, this command will be run to change the channel for inputs which do not have a tuner.  The first argument will be the channel number.</source>
-        <translation type="obsolete">チューナーが無い入力でチャンネルを変更するためのコマンドを指定します．最初の引数はチャンネル番号です．</translation>
     </message>
     <message>
         <source>Preset tuner to channel</source>
@@ -3201,16 +3045,8 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>XMLTV用タイムオフセット</translation>
     </message>
     <message>
-        <source>If your local timezone does not match the timezone returned by XMLTV, use this setting to have mythfilldatabase adjust the program start and end times.None will disable this feature, Auto will automatically detect your local timezone</source>
-        <translation type="obsolete">ローカルタイムゾーンがXMLTVの出力するタイムゾーンと合わない場合，mythfilldatabaseはこの設定を使って放送時間を修正します．Autoを設定すると自動的にローカルタイムゾーンを検出しようと試みます．</translation>
-    </message>
-    <message>
         <source>Master Backend Override</source>
         <translation>マスターバックエンドオーバーライド</translation>
-    </message>
-    <message>
-        <source>If enabled, the master backend will stream and delete files if it finds them in the video directory. Useful if you are using a central storage location, like an NFS share, and your slave backend isn&apos;t running.</source>
-        <translation type="obsolete">有効にすると，マスターバックエンドはビデオディレクトリで見つかったファイルをストリーム出力したり消去したりするようになります．NFS共有のようなストレージを使っていて，スレーブバックエンドを動作させていないときに役立ちます．</translation>
     </message>
     <message>
         <source>Reconnect wait time (secs)</source>
@@ -3385,10 +3221,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>録画グループ</translation>
     </message>
     <message>
-        <source>Do not adjust BT audio volume.</source>
-        <translation type="obsolete">BTオーディオボリュームを変更しない。</translation>
-    </message>
-    <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
         <translation>これをチェックすると</translation>
     </message>
@@ -3411,10 +3243,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Default Recording Group to display</source>
         <translation>表示する規定の録画グループ</translation>
-    </message>
-    <message>
-        <source>All</source>
-        <translation type="obsolete">全て</translation>
     </message>
     <message>
         <source>Default Recording Group to display on the view recordings screen.</source>
@@ -3471,10 +3299,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Pre Shutdown check-command</source>
         <translation>シャットダウン前のチェックコマンド</translation>
-    </message>
-    <message>
-        <source>A command executed before the backend would shutdown. The return value of the command determines if the backend is allowed to shutdown. 0 - yes, 1 - reinitializes the idleing, 2 - reset the backend to wait for a frontend again</source>
-        <translation type="obsolete">バックエンドがシャットダウンする前のコマンド。コマンドの戻り値でバックエンドはの動作が決まります。0 - シャットダウン, 1 - 再初期化, 2 - リセットしてフロントエンドを待ちます</translation>
     </message>
     <message>
         <source>Block shutdown before client connected</source>
@@ -3747,10 +3571,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>mythfilldatabase実行周期(日数)</translation>
     </message>
     <message>
-        <source>The number of days between mythfilldatabase runs</source>
-        <translation type="obsolete">mythfilldatabase実行間隔日数</translation>
-    </message>
-    <message>
         <source>mythfilldatabase Execution Start</source>
         <translation>mythfilldatabase実行開始</translation>
     </message>
@@ -3787,10 +3607,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>mythfilldatabaseログパス</translation>
     </message>
     <message>
-        <source>Path to use for logging output from mythfilldatabase program.  Leave blank to disable logging.</source>
-        <translation type="obsolete">mythfilldatabaseプログラムが使用するログパス。空白はログを無効にします。</translation>
-    </message>
-    <message>
         <source>Myth Database Logging</source>
         <translation>Myth データベースロギング</translation>
     </message>
@@ -3813,10 +3629,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>CC</source>
         <translation>CC</translation>
-    </message>
-    <message>
-        <source>Reactivate it</source>
-        <translation type="obsolete">有効にする</translation>
     </message>
     <message>
         <source>TXT</source>
@@ -3853,10 +3665,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Keypress Application</source>
         <translation>キープレスアプリケーション</translation>
-    </message>
-    <message>
-        <source>External application or script to run when a keypress is received by lirc</source>
-        <translation type="obsolete">lircからキー入力が有った時に実行する外部アプリケーション又はスクリプト</translation>
     </message>
     <message>
         <source>LCD Displays Time</source>
@@ -4257,10 +4065,6 @@ Myth will now exit.</source>
 <context>
     <name>ScheduledRecording</name>
     <message>
-        <source>See a list of all up-coming episodes/playtimes.</source>
-        <translation type="obsolete">これからの番組を見る</translation>
-    </message>
-    <message>
         <source>List upcoming episodes</source>
         <translation>これからの番組一覧</translation>
     </message>
@@ -4476,34 +4280,6 @@ Myth will now exit.</source>
         <translation>色合い(録画) %1 %</translation>
     </message>
     <message>
-        <source>Program Menu</source>
-        <translation type="obsolete">番組メニュー</translation>
-    </message>
-    <message>
-        <source>Set Commercial Auto-Skip OFF</source>
-        <translation type="obsolete">自動CMスキップを無効にする</translation>
-    </message>
-    <message>
-        <source>Set Commercial Auto-Skip ON</source>
-        <translation type="obsolete">自動CMスキップを有効にする</translation>
-    </message>
-    <message>
-        <source>Set Commercial Auto-Skip to Notify</source>
-        <translation type="obsolete">自動CMスキップを通知する</translation>
-    </message>
-    <message>
-        <source>Don&apos;t Auto Expire</source>
-        <translation type="obsolete">自動削除しない</translation>
-    </message>
-    <message>
-        <source>Auto Expire</source>
-        <translation type="obsolete">自動削除する</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">キャンセル</translation>
-    </message>
-    <message>
         <source>Auto-Skip OFF</source>
         <translation>自動スキップ・オン</translation>
     </message>
@@ -4542,10 +4318,6 @@ Myth will now exit.</source>
     <message>
         <source>Zoom Mode OFF</source>
         <translation>ズームモード OFF</translation>
-    </message>
-    <message>
-        <source>Activate Zoom Mode</source>
-        <translation type="obsolete">ズームモード有効</translation>
     </message>
     <message>
         <source>Auto-Expire OFF</source>
@@ -4667,18 +4439,6 @@ Myth will now exit.</source>
         <translation>録画予約:</translation>
     </message>
     <message>
-        <source>Highlighting:</source>
-        <translation>強調:</translation>
-    </message>
-    <message>
-        <source>Conflicting</source>
-        <translation>衝突</translation>
-    </message>
-    <message>
-        <source>Deactivated</source>
-        <translation>無効</translation>
-    </message>
-    <message>
         <source>Show  (1) All  (2) Important</source>
         <translation>表示  (1) 全て  (2) 重要な物のみ</translation>
     </message>
@@ -4687,16 +4447,8 @@ Myth will now exit.</source>
         <translation>表示:</translation>
     </message>
     <message>
-        <source>Airdate:</source>
-        <translation>日付:</translation>
-    </message>
-    <message>
         <source>Channel:</source>
         <translation>チャンネル:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation>内容:</translation>
     </message>
     <message>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded</source>
@@ -4793,10 +4545,6 @@ Myth will now exit.</source>
     <message>
         <source>No listings found for this program. </source>
         <translation>この番組のリストは見つかりませんでした．</translation>
-    </message>
-    <message>
-        <source>%SUBTITLE|%</source>
-        <translation>%SUBTITLE|%</translation>
     </message>
     <message>
         <source>[</source>

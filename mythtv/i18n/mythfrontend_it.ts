@@ -287,10 +287,6 @@
         <translation>% usato</translation>
     </message>
     <message>
-        <source>, %0.2f GB free</source>
-        <translation type="obsolete">, %0.2f GB free</translation>
-    </message>
-    <message>
         <source>You have finished watching:</source>
         <translation>Hai finito di vedere:</translation>
     </message>
@@ -309,10 +305,6 @@
     <message>
         <source>Delete this recording?</source>
         <translation>Cancellare questa registrazione?</translation>
-    </message>
-    <message>
-        <source>Yes, but record this episode again next time</source>
-        <translation type="obsolete">Sì, ma registra questo episodio in futuro</translation>
     </message>
     <message>
         <source>Yes, delete it</source>
@@ -577,10 +569,6 @@
         <translation>Elimina</translation>
     </message>
     <message>
-        <source>Movie</source>
-        <translation type="obsolete">Film</translation>
-    </message>
-    <message>
         <source>Select Phrase</source>
         <translation>Seleziona la frase</translation>
     </message>
@@ -739,38 +727,6 @@
         <translation>Cancella dopo questa frame</translation>
     </message>
     <message>
-        <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="obsolete">%02d:%02d:%02d in ritardo -- %.2f%% occupato</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d behind</source>
-        <translation type="obsolete">%02d:%02d:%02d in ritardo</translation>
-    </message>
-    <message>
-        <source>%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="obsolete">%02d:%02d in ritardo -- %.2f%% occupato</translation>
-    </message>
-    <message>
-        <source>%02d:%02d behind</source>
-        <translation type="obsolete">%02d:%02d in ritardo</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d of %02d:%02d:%02d</source>
-        <translation type="obsolete">%02d:%02d:%02d di %02d:%02d:%02d</translation>
-    </message>
-    <message>
-        <source>%02d:%02d of %02d:%02d</source>
-        <translation type="obsolete">%02d:%02d di %02d:%02d</translation>
-    </message>
-    <message>
-        <source>Skip %1 seconds</source>
-        <translation type="obsolete">Salta %1 secondi</translation>
-    </message>
-    <message>
-        <source>Commercial: %1 seconds</source>
-        <translation type="obsolete">Pubblicità: %1 secondi</translation>
-    </message>
-    <message>
         <source>Found %1 sec. commercial</source>
         <translation>Trovati %1 sec. di pubblicità</translation>
     </message>
@@ -789,10 +745,6 @@
     <message>
         <source>Repeat</source>
         <translation>Ripeti</translation>
-    </message>
-    <message>
-        <source>R</source>
-        <translation type="obsolete">R</translation>
     </message>
     <message>
         <source>T</source>
@@ -863,10 +815,6 @@
         <translation>Registrazione futura</translation>
     </message>
     <message>
-        <source>Manual Override</source>
-        <translation type="obsolete">Forzatura manuale</translation>
-    </message>
-    <message>
         <source>Previous Recording</source>
         <translation>Registrazione precedente</translation>
     </message>
@@ -875,32 +823,12 @@
         <translation>Registrazione corrente</translation>
     </message>
     <message>
-        <source>Other Showing</source>
-        <translation type="obsolete">Altre programmazioni</translation>
-    </message>
-    <message>
         <source>Max Recordings</source>
         <translation>Massimo num. di registrazioni</translation>
     </message>
     <message>
         <source>Manual Cancel</source>
         <translation>Cancellazione manuale</translation>
-    </message>
-    <message>
-        <source>Low Priority</source>
-        <translation type="obsolete">Bassa priorità</translation>
-    </message>
-    <message>
-        <source>Manual Conflict</source>
-        <translation type="obsolete">Conflitto manuale</translation>
-    </message>
-    <message>
-        <source>Auto Conflict</source>
-        <translation type="obsolete">Conflitto automatico</translation>
-    </message>
-    <message>
-        <source>Overlap</source>
-        <translation type="obsolete">Sovrapposizione</translation>
     </message>
     <message>
         <source>Low Disk Space</source>
@@ -913,10 +841,6 @@
     <message>
         <source>Unknown</source>
         <translation>Sconosciuto</translation>
-    </message>
-    <message>
-        <source>This showing conflicts with one or more other scheduled programs.</source>
-        <translation type="obsolete">Questa programmazione si sovrappone con un altra programmazione.</translation>
     </message>
     <message>
         <source>This showing will be recorded.</source>
@@ -963,32 +887,12 @@
         <translation>questo episodio è stato precedentemente registrato ed è sempre disponibile nella lista delle registrazioni.</translation>
     </message>
     <message>
-        <source>this episode will be recorded at another time instead.</source>
-        <translation type="obsolete">questo episodio sarà registrato in un altro orario.</translation>
-    </message>
-    <message>
         <source>too many recordings of this program have already been recorded.</source>
         <translation>sono già state fatte troppe registrazioni di questo programma.</translation>
     </message>
     <message>
         <source>it was manually cancelled.</source>
         <translation>è stato cancellato manualmente.</translation>
-    </message>
-    <message>
-        <source>another program with a higher recording priority will be recorded.</source>
-        <translation type="obsolete">sarà registrato un altro programma con una priorità maggiore.</translation>
-    </message>
-    <message>
-        <source>another program was manually chosen to be recorded instead.</source>
-        <translation type="obsolete">è stato scelto di registrare un altro programma.</translation>
-    </message>
-    <message>
-        <source>another program was automatically chosen to be recorded instead.</source>
-        <translation type="obsolete">è stato automaticamente scelto di registrare un altro programma.</translation>
-    </message>
-    <message>
-        <source>it is covered by another scheduled recording for the same program.</source>
-        <translation type="obsolete">è coperto da un&apos;altra registrazione dello stesso programma.</translation>
     </message>
     <message>
         <source>there wasn&apos;t enough disk space available.</source>
@@ -1017,26 +921,6 @@
     <message>
         <source>OK</source>
         <translation>OK</translation>
-    </message>
-    <message>
-        <source>Don&apos;t record it</source>
-        <translation type="obsolete">Non registrare</translation>
-    </message>
-    <message>
-        <source>Never record this episode</source>
-        <translation type="obsolete">Non registrare mai questo episodio</translation>
-    </message>
-    <message>
-        <source>Record it anyway</source>
-        <translation type="obsolete">Registra comunque</translation>
-    </message>
-    <message>
-        <source>The following scheduled recordings conflict with each other.  Which would you like to record?</source>
-        <translation type="obsolete">Le seguenti programmazioni sono in conflitto. Quale vuoi registrare?</translation>
-    </message>
-    <message>
-        <source>Remember this choice and use it automatically in the future</source>
-        <translation type="obsolete">Ricorda questa scelta ed utilizzala automaticamente in futuro</translation>
     </message>
     <message>
         <source>Schedule</source>
@@ -3377,10 +3261,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>All</source>
-        <translation type="obsolete">Tutti</translation>
-    </message>
-    <message>
         <source>Default Recording Group to display on the view recordings screen.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4164,10 +4044,6 @@ Myth will now exit.</source>
 <context>
     <name>ScheduledRecording</name>
     <message>
-        <source>See a list of all up-coming episodes/playtimes.</source>
-        <translation type="obsolete">Mostra la lista delle programmazioni dei prossimi episodi.</translation>
-    </message>
-    <message>
         <source>List upcoming episodes</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4407,34 +4283,6 @@ Myth will now exit.</source>
         <translation>Registra</translation>
     </message>
     <message>
-        <source>Program Menu</source>
-        <translation type="obsolete">Menu programmazione</translation>
-    </message>
-    <message>
-        <source>Set Commercial Auto-Skip OFF</source>
-        <translation type="obsolete">Imposta l&apos;autoselezione degli spot OFF</translation>
-    </message>
-    <message>
-        <source>Set Commercial Auto-Skip ON</source>
-        <translation type="obsolete">Imposta l&apos;autoselezione degli spot ON</translation>
-    </message>
-    <message>
-        <source>Set Commercial Auto-Skip to Notify</source>
-        <translation type="obsolete">Imposta l&apos;autImposta l&apos;autoselezione degli spot NOTIFICA</translation>
-    </message>
-    <message>
-        <source>Don&apos;t Auto Expire</source>
-        <translation type="obsolete">Non autocancellare</translation>
-    </message>
-    <message>
-        <source>Auto Expire</source>
-        <translation type="obsolete">Autocancellazione</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Annulla</translation>
-    </message>
-    <message>
         <source>Auto-Skip OFF</source>
         <translation>Salto automatico OFF</translation>
     </message>
@@ -4566,24 +4414,8 @@ Myth will now exit.</source>
 <context>
     <name>ThemeUI</name>
     <message>
-        <source>%SUBTITLE|%</source>
-        <translation>%SUBTITLE|%</translation>
-    </message>
-    <message>
         <source>Scheduled Recordings:</source>
         <translation>Programmazione registrazione:</translation>
-    </message>
-    <message>
-        <source>Highlighting:</source>
-        <translation>Evidenzia:</translation>
-    </message>
-    <message>
-        <source>Conflicting</source>
-        <translation>In conflitto</translation>
-    </message>
-    <message>
-        <source>Deactivated</source>
-        <translation>Disattivato</translation>
     </message>
     <message>
         <source>Show  (1) All  (2) Important</source>
@@ -4594,16 +4426,8 @@ Myth will now exit.</source>
         <translation>Showing:</translation>
     </message>
     <message>
-        <source>Airdate:</source>
-        <translation>In onda:</translation>
-    </message>
-    <message>
         <source>Channel:</source>
         <translation>Canale:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation>Descrizione:</translation>
     </message>
     <message>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded</source>

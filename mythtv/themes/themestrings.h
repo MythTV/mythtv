@@ -1,14 +1,7 @@
 void strings_null() {
-    ThemeUI::tr("%SUBTITLE|"|"%");
     ThemeUI::tr("Scheduled Recordings:");
-    ThemeUI::tr("Highlighting:");
-    ThemeUI::tr("Conflicting");
-    ThemeUI::tr("Deactivated");
     ThemeUI::tr("Show  (1) All  (2) Important");
     ThemeUI::tr("Showing:");
-    ThemeUI::tr("Airdate:");
-    ThemeUI::tr("Channel:");
-    ThemeUI::tr("Description:");
     ThemeUI::tr("You Haven't Scheduled Any Programs To Be Recorded");
     ThemeUI::tr("To schedule a recording, exit this screen and");
     ThemeUI::tr("Select 'Program Guide' or 'Program Finder'");
@@ -36,12 +29,6 @@ void strings_null() {
     ThemeUI::tr("Select 'Program Guide' or 'Program Finder'");
     ThemeUI::tr("Select a recording to permanently delete:");
     ThemeUI::tr("Select a recording to view:");
-    ThemeUI::tr("Airdate:");
-    ThemeUI::tr("Channel:");
-    ThemeUI::tr("Description:");
-    ThemeUI::tr("Airdate:");
-    ThemeUI::tr("Channel:");
-    ThemeUI::tr("Description:");
     ThemeUI::tr("Sorry, No Recordings Available");
     ThemeUI::tr("To schedule a recording, exit this screen and");
     ThemeUI::tr("Select 'Schedule a Recording' from the Main Menu");

@@ -359,14 +359,6 @@
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <source>, %0.2f GB free</source>
-        <translation type="obsolete">, %0.2f GB frei</translation>
-    </message>
-    <message>
-        <source>Yes, but record this episode again next time</source>
-        <translation type="obsolete">Ja, aber diese Folge wieder aufnehmen</translation>
-    </message>
-    <message>
         <source>Yes, delete it</source>
         <translation>Ja, bitte löschen</translation>
     </message>
@@ -571,10 +563,6 @@
     <message>
         <source>OK</source>
         <translation>Ok</translation>
-    </message>
-    <message>
-        <source>Movie</source>
-        <translation type="obsolete">Spielfilm</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -799,34 +787,6 @@
         <translation>Automatisch löschen</translation>
     </message>
     <message>
-        <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="obsolete">%02d:%02d:%02d zurück  -- %.2f%% voll</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d behind</source>
-        <translation type="obsolete">%02d:%02d:%02d zurück</translation>
-    </message>
-    <message>
-        <source>%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="obsolete">%02d:%02d zurück  --  %.2f%% voll</translation>
-    </message>
-    <message>
-        <source>%02d:%02d behind</source>
-        <translation type="obsolete">%02d:%02d zurück</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d of %02d:%02d:%02d</source>
-        <translation type="obsolete">%02d:%02d:%02d von %02d:%02d:%02d</translation>
-    </message>
-    <message>
-        <source>%02d:%02d of %02d:%02d</source>
-        <translation type="obsolete">%02d:%02d von %02d:%02d</translation>
-    </message>
-    <message>
-        <source>Skip %1 seconds</source>
-        <translation type="obsolete">Springe %1 Sekunden</translation>
-    </message>
-    <message>
         <source>Not Recording</source>
         <translation>Nicht aufnehmen</translation>
     </message>
@@ -895,10 +855,6 @@
         <translation>Deinterlace Wiedergabe</translation>
     </message>
     <message>
-        <source>Make the video look normal on a progressive display (i.e. monitor).  Deinterlace requires that your CPU supports SSE instructions.  Enabling this without proper CPU support will cause the program to segfault. See the HOWTO document for more information.</source>
-        <translation type="obsolete">Bildkorrektur für die Wiedergabe über einen Monitor u.ä. Diese Option nutzt die SSE Funktionen des Prozessors und führt zum Programmabsturz falls diese fehlen sollten. Sehen Sie in der Dokumentation für weitere Informationen nach.</translation>
-    </message>
-    <message>
         <source>Extra audio buffering</source>
         <translation>Großer Audiopuffer</translation>
     </message>
@@ -953,10 +909,6 @@
     <message>
         <source>Scene Change Detection</source>
         <translation>Szenenwechsel</translation>
-    </message>
-    <message>
-        <source>This determines the method used by MythTV to detect when commercials start and end.  You must have automatic commercial turned on to use anything other than &apos;Blank Frame&apos;.</source>
-        <translation type="obsolete">Wählt die Methode aus, nach der Anfang und Ende eines Werbeblocks gesucht wird.</translation>
     </message>
     <message>
         <source>Automatically Skip Commercials</source>
@@ -1059,10 +1011,6 @@
         <translation>Setup Pin Code</translation>
     </message>
     <message>
-        <source>This PIN is used to control access to the setup menues. If you want to use this feature, then setting the value to all numbers will make your life much easier.  Set it to blank to disable.</source>
-        <translation type="obsolete">Diese PIN sichert den Zugang zu den Konfigurationsmenüs und sollte für eine einfache Nutzung nur aus Ziffern bestehen. Ein leerer Eintrag schaltet die PIN Kontrolle ab.</translation>
-    </message>
-    <message>
         <source>Require Setup PIN</source>
         <translation>PIN Code abfragen</translation>
     </message>
@@ -1073,10 +1021,6 @@
     <message>
         <source>Reposition after fast forward/rewind</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>When exiting sticky keys fast forward/rewind mode, reposition before resuming normal playback.  This is to compensate for the reaction time between seeing where to resume playback and actually exiting fast forward/rewind mode.</source>
-        <translation type="obsolete">Nach dem Verlassen der &quot;klebrigen Tasten&quot; Funktion vor der Wiedergabe neu positionieren. Dies gleicht die Reaktionszeit zwischen gewünschter und tatsächlicher Wiedergabeposition aus.</translation>
     </message>
     <message>
         <source>Number of seconds for OSD information</source>
@@ -1327,16 +1271,8 @@
         <translation>Geben Sie hier den gewünschten Bildschirm an, falls Sie Xinerama nutzen.</translation>
     </message>
     <message>
-        <source>GUI width</source>
-        <translation type="obsolete">GUI Breite</translation>
-    </message>
-    <message>
         <source>The width of the GUI.  Do not make the GUI wider than your actual screen resolution.  Set to 0 to automatically scale to fullscreen.</source>
         <translation>Die Breite des MythTV Fensters. Stellen Sie die Breite nicht größer als die wirkliche Auflösung ein. Bei &apos;0&apos; wird automatisch auf Vollbild skaliert.</translation>
-    </message>
-    <message>
-        <source>GUI height</source>
-        <translation type="obsolete">GUI Höhe</translation>
     </message>
     <message>
         <source>The height of the GUI.  Do not make the GUI taller than your actual screen resolution.  Set to 0 to automatically scale to fullscreen.</source>
@@ -1405,10 +1341,6 @@
     <message>
         <source>Problem reading theme preview image </source>
         <translation>Kann das Themen Vorschaubild nicht lesen</translation>
-    </message>
-    <message>
-        <source>Display channel names instead of numbers</source>
-        <translation type="obsolete">Sendernamen statt Nummern anzeigen</translation>
     </message>
     <message>
         <source>&quot;Big&quot; font</source>
@@ -1844,10 +1776,6 @@
         <translation>Wiedergabe (2)</translation>
     </message>
     <message>
-        <source>Commercial: %1 seconds</source>
-        <translation type="obsolete">Werbung: %1 sekunden</translation>
-    </message>
-    <message>
         <source>Notify, but do not skip</source>
         <translation>Nur Hinweisen</translation>
     </message>
@@ -1878,26 +1806,6 @@
     <message>
         <source>OK</source>
         <translation>Ok</translation>
-    </message>
-    <message>
-        <source>Manual Override</source>
-        <translation type="obsolete">Überstimmt</translation>
-    </message>
-    <message>
-        <source>Other Showing</source>
-        <translation type="obsolete">Andere Ausstrahlung</translation>
-    </message>
-    <message>
-        <source>Manual Conflict</source>
-        <translation type="obsolete">Manueller Konflikt</translation>
-    </message>
-    <message>
-        <source>Auto Conflict</source>
-        <translation type="obsolete">Autom. Konflikt</translation>
-    </message>
-    <message>
-        <source>Overlap</source>
-        <translation type="obsolete">Überschneidung</translation>
     </message>
     <message>
         <source>Repeat</source>
@@ -1944,26 +1852,6 @@
         <translation>Aufnehmen</translation>
     </message>
     <message>
-        <source>Don&apos;t record it</source>
-        <translation type="obsolete">Nicht aufnehmen</translation>
-    </message>
-    <message>
-        <source>Never record this episode</source>
-        <translation type="obsolete">Diese Folge niemals aufnehmen</translation>
-    </message>
-    <message>
-        <source>Record it anyway</source>
-        <translation type="obsolete">Dennoch aufnehmen</translation>
-    </message>
-    <message>
-        <source>The following scheduled recordings conflict with each other.  Which would you like to record?</source>
-        <translation type="obsolete">Die folgenden geplanten Aufnahmen überlappen sich. Welche davon möchten Sie aufnehmen?</translation>
-    </message>
-    <message>
-        <source>Remember this choice and use it automatically in the future</source>
-        <translation type="obsolete">Diese Auswahl für die Zukunft merken</translation>
-    </message>
-    <message>
         <source>Priority</source>
         <translation>Priorität</translation>
     </message>
@@ -2002,18 +1890,6 @@
     <message>
         <source>Reverse direction in fast forward/rewind</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use Recording Priorities</source>
-        <translation type="obsolete">Aufnahmeprioritäten verwenden</translation>
-    </message>
-    <message>
-        <source>Use program recording priorities to resolve conflicts.</source>
-        <translation type="obsolete">Nutze Aufnahmeprioritäten um Überschneidungen zu vermeiden.</translation>
-    </message>
-    <message>
-        <source>Recording Priorities First.</source>
-        <translation type="obsolete">Aufnahmeprioritäten zuerst.</translation>
     </message>
     <message>
         <source>Single Recordings Priority</source>
@@ -2224,20 +2100,12 @@
         <translation>Manueller Abbruch</translation>
     </message>
     <message>
-        <source>Low Priority</source>
-        <translation type="obsolete">Niedrige Priorität</translation>
-    </message>
-    <message>
         <source>Low Disk Space</source>
         <translation>Knapper Speicherplatz</translation>
     </message>
     <message>
         <source>Tuner Busy</source>
         <translation>Tuner belegt</translation>
-    </message>
-    <message>
-        <source>This showing conflicts with one or more other scheduled programs.</source>
-        <translation type="obsolete">Diese Sendung überschneidet sich mit einer geplanten Aufnahme.</translation>
     </message>
     <message>
         <source>This showing will be recorded.</source>
@@ -2284,32 +2152,12 @@
         <translation>diese Folge schon aufgenommen und noch nicht gelöscht wurde.</translation>
     </message>
     <message>
-        <source>this episode will be recorded at another time instead.</source>
-        <translation type="obsolete">diese Folge wird zu einer anderen Zeit aufgenommen.</translation>
-    </message>
-    <message>
         <source>too many recordings of this program have already been recorded.</source>
         <translation>für diese Serie wurden schon zu viele Folgen aufgenommen.</translation>
     </message>
     <message>
         <source>it was manually cancelled.</source>
         <translation>sie manuell abgebrochen wurde.</translation>
-    </message>
-    <message>
-        <source>another program with a higher recording priority will be recorded.</source>
-        <translation type="obsolete">eine andere Sendung mit höherer Priorität aufgenommen wird.</translation>
-    </message>
-    <message>
-        <source>another program was manually chosen to be recorded instead.</source>
-        <translation type="obsolete">manuell eine andere Sendung zum aufnehmen gewählt wurde.</translation>
-    </message>
-    <message>
-        <source>another program was automatically chosen to be recorded instead.</source>
-        <translation type="obsolete">automatisch eine andere Sendung zum aufnehmen bestimmt wurde.</translation>
-    </message>
-    <message>
-        <source>it is covered by another scheduled recording for the same program.</source>
-        <translation type="obsolete">sie bereits durch eine andere Aufnahme derselben Serie abgedeckt ist.</translation>
     </message>
     <message>
         <source>there wasn&apos;t enough disk space available.</source>
@@ -3162,10 +3010,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>Zeitversatz für XMLTV Listen</translation>
     </message>
     <message>
-        <source>If your local timezone does not match the timezone returned by XMLTV, use this setting to have mythfilldatabase adjust the program start and end times.None will disable this feature, Auto will automatically detect your local timezone</source>
-        <translation type="obsolete">Falls Ihre lokale Zeitzone nicht mit der von XMLTV genutzten übereinstimmt, können Sie damit mythfilldatabase anweisen die Sendezeiten anzupassen. &apos;Auto&apos; wird die lokale Zeitzone automatisch bestimmen</translation>
-    </message>
-    <message>
         <source>Master Backend Override</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3424,10 +3268,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     <message>
         <source>Default Recording Group to display</source>
         <translation>Standard Aufnahmegruppe</translation>
-    </message>
-    <message>
-        <source>All</source>
-        <translation type="obsolete">Alle</translation>
     </message>
     <message>
         <source>Default Recording Group to display on the view recordings screen.</source>
@@ -3810,10 +3650,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     <message>
         <source>Keypress Application</source>
         <translation>Lirc Skript</translation>
-    </message>
-    <message>
-        <source>External application or script to run when a keypress is received by lirc</source>
-        <translation type="obsolete">Externes Skript oder Programm das nach Empfang eines Tastendrucks über Lirc gestartet wird</translation>
     </message>
     <message>
         <source>LCD Displays Time</source>
@@ -4221,10 +4057,6 @@ Myth wird nun beendet.</translation>
 <context>
     <name>ScheduledRecording</name>
     <message>
-        <source>See a list of all up-coming episodes/playtimes.</source>
-        <translation type="obsolete">Liste der kommenden Folgen/Sendezeiten.</translation>
-    </message>
-    <message>
         <source>List upcoming episodes</source>
         <translation>Zeige kommende Folgen</translation>
     </message>
@@ -4440,34 +4272,6 @@ Myth wird nun beendet.</translation>
         <translation>Farbton (REC) %1 %</translation>
     </message>
     <message>
-        <source>Program Menu</source>
-        <translation type="obsolete">Programmenü</translation>
-    </message>
-    <message>
-        <source>Set Commercial Auto-Skip OFF</source>
-        <translation type="obsolete">Werbung überspringen AUS</translation>
-    </message>
-    <message>
-        <source>Set Commercial Auto-Skip ON</source>
-        <translation type="obsolete">Werbung überspringen EIN</translation>
-    </message>
-    <message>
-        <source>Set Commercial Auto-Skip to Notify</source>
-        <translation type="obsolete">Bei Werbung nur hinweisen</translation>
-    </message>
-    <message>
-        <source>Don&apos;t Auto Expire</source>
-        <translation type="obsolete">Nicht autom. löschen</translation>
-    </message>
-    <message>
-        <source>Auto Expire</source>
-        <translation type="obsolete">Automatisch löschen</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Abbrechen</translation>
-    </message>
-    <message>
         <source>Auto-Skip OFF</source>
         <translation>Auto-Sprung AUS</translation>
     </message>
@@ -4506,10 +4310,6 @@ Myth wird nun beendet.</translation>
     <message>
         <source>Zoom Mode OFF</source>
         <translation>Zoom AUS</translation>
-    </message>
-    <message>
-        <source>Activate Zoom Mode</source>
-        <translation type="obsolete">Zoom aktivieren</translation>
     </message>
     <message>
         <source>Auto-Expire OFF</source>
@@ -4631,24 +4431,8 @@ Myth wird nun beendet.</translation>
         <translation>Geplante Aufnahmen:</translation>
     </message>
     <message>
-        <source>Conflicting</source>
-        <translation>Überschneidungen</translation>
-    </message>
-    <message>
-        <source>Deactivated</source>
-        <translation>Blockierte</translation>
-    </message>
-    <message>
-        <source>Airdate:</source>
-        <translation>Sendezeit:</translation>
-    </message>
-    <message>
         <source>Channel:</source>
         <translation>Sender:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation>Inhalt:</translation>
     </message>
     <message>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded</source>
@@ -4721,14 +4505,6 @@ Myth wird nun beendet.</translation>
     <message>
         <source>There are no available programs under this search. Please select another search.</source>
         <translation>Keine Sendungen gefunden. Bitte wählen Sie eine andere Suche.</translation>
-    </message>
-    <message>
-        <source>%SUBTITLE|%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Highlighting:</source>
-        <translation>Hervorgehoben:</translation>
     </message>
     <message>
         <source>Show  (1) All  (2) Important</source>

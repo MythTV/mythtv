@@ -787,34 +787,6 @@
         <translation>Tillad at optagelser auto-udløber</translation>
     </message>
     <message>
-        <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="obsolete">%02d:%02d:%02d bagud  --  %.2f%% fuld</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d behind</source>
-        <translation type="obsolete">%02d:%02d:%02d bagud</translation>
-    </message>
-    <message>
-        <source>%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="obsolete">%02d:%02d bagud  --  %.2f%% fuld</translation>
-    </message>
-    <message>
-        <source>%02d:%02d behind</source>
-        <translation type="obsolete">%02d:%02d bagud</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d of %02d:%02d:%02d</source>
-        <translation type="obsolete">%02d:%02d:%02d af %02d:%02d:%02d</translation>
-    </message>
-    <message>
-        <source>%02d:%02d of %02d:%02d</source>
-        <translation type="obsolete">%02d:%02d af %02d:%02d</translation>
-    </message>
-    <message>
-        <source>Skip %1 seconds</source>
-        <translation type="obsolete">Hop %1 sekunder</translation>
-    </message>
-    <message>
         <source>Not Recording</source>
         <translation>Optager ikke</translation>
     </message>
@@ -883,10 +855,6 @@
         <translation>Deinterlace afspilning</translation>
     </message>
     <message>
-        <source>Make the video look normal on a progressive display (i.e. monitor).  Deinterlace requires that your CPU supports SSE instructions.  Enabling this without proper CPU support will cause the program to segfault. See the HOWTO document for more information.</source>
-        <translation type="obsolete">Få videon til at se normal ud på en progressivt skærm, såsom en monitor. Deinterlace kræver at din CPU understøtter SSE instruktioner. At slå dette til uden denne understøttelse vil få programmet til at gå ned med en lagersegmentfejl. Se HOWTO dokumentet for mere information.</translation>
-    </message>
-    <message>
         <source>Extra audio buffering</source>
         <translation>Ekstra lyd buffering</translation>
     </message>
@@ -941,10 +909,6 @@
     <message>
         <source>Scene Change Detection</source>
         <translation>Scene skift detektion</translation>
-    </message>
-    <message>
-        <source>This determines the method used by MythTV to detect when commercials start and end.  You must have automatic commercial turned on to use anything other than &apos;Blank Frame&apos;.</source>
-        <translation type="obsolete">Dette angiver hvilken metode MythTV skal bruge til at finde reklame start og stop punkter i udsendelser. Du skal have automastic reklame markering slået til for at bruge andet end &apos;Blank ramme&apos;.</translation>
     </message>
     <message>
         <source>Automatically Skip Commercials</source>
@@ -1886,10 +1850,6 @@
     <message>
         <source>Will Record</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Remember this choice and use it automatically in the future</source>
-        <translation type="obsolete">Husk dette valg og brug det automatisk i fremtiden</translation>
     </message>
     <message>
         <source>Priority</source>
@@ -4084,10 +4044,6 @@ Myth will now exit.</source>
 <context>
     <name>ScheduledRecording</name>
     <message>
-        <source>See a list of all up-coming episodes/playtimes.</source>
-        <translation type="obsolete">Se en liste med kommende episoder/visninger.</translation>
-    </message>
-    <message>
         <source>List upcoming episodes</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4299,18 +4255,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Don&apos;t Auto Expire</source>
-        <translation type="obsolete">Unlad auto-udløb</translation>
-    </message>
-    <message>
-        <source>Auto Expire</source>
-        <translation type="obsolete">Auto-udløb</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Afbryd</translation>
-    </message>
-    <message>
         <source>Auto-Skip OFF</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4474,24 +4418,8 @@ Myth will now exit.</source>
         <translation>Planlagte optagelser:</translation>
     </message>
     <message>
-        <source>Conflicting</source>
-        <translation>Konflikter</translation>
-    </message>
-    <message>
-        <source>Deactivated</source>
-        <translation>Deaktiverede</translation>
-    </message>
-    <message>
-        <source>Airdate:</source>
-        <translation>Sendt:</translation>
-    </message>
-    <message>
         <source>Channel:</source>
         <translation>Kanal:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation>Beskrivelse:</translation>
     </message>
     <message>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded</source>
@@ -4568,14 +4496,6 @@ Myth will now exit.</source>
     <message>
         <source>No listings found for this program. </source>
         <translation>Ingen visninger af dette program fundet. </translation>
-    </message>
-    <message>
-        <source>%SUBTITLE|%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Highlighting:</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Show  (1) All  (2) Important</source>

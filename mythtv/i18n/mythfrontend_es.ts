@@ -787,34 +787,6 @@
         <translation>Permitir que las grabaciones autoexpiren</translation>
     </message>
     <message>
-        <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="obsolete">%02d:%02d:%02d atrás -- %.2f%% lleno</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d behind</source>
-        <translation type="obsolete">%02d:%02d:%02d atrás</translation>
-    </message>
-    <message>
-        <source>%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="obsolete">%02d:%02d atrás -- %.2f%% lleno</translation>
-    </message>
-    <message>
-        <source>%02d:%02d behind</source>
-        <translation type="obsolete">%02d:%02d atrás</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d of %02d:%02d:%02d</source>
-        <translation type="obsolete">%02d:%02d:%02d de %02d:%02d:%02d</translation>
-    </message>
-    <message>
-        <source>%02d:%02d of %02d:%02d</source>
-        <translation type="obsolete">%02d:%02d de %02d:%02d</translation>
-    </message>
-    <message>
-        <source>Skip %1 seconds</source>
-        <translation type="obsolete">Salta %1 segundos</translation>
-    </message>
-    <message>
         <source>Not Recording</source>
         <translation>No grabar</translation>
     </message>
@@ -883,10 +855,6 @@
         <translation>Desinetrlinear la reproducción</translation>
     </message>
     <message>
-        <source>Make the video look normal on a progressive display (i.e. monitor).  Deinterlace requires that your CPU supports SSE instructions.  Enabling this without proper CPU support will cause the program to segfault. See the HOWTO document for more information.</source>
-        <translation type="obsolete">Hacer que el vídeo se vea normalmente en una pantalla progresiva (p.ej.: un monitor). El desinterlineado requiere un procesador que soporte instrucciones SSE. Activar esto sin un procesador adecuado provocará fallos. Lea la documentación para más información.</translation>
-    </message>
-    <message>
         <source>Extra audio buffering</source>
         <translation>Búffers extras para el audio</translation>
     </message>
@@ -941,10 +909,6 @@
     <message>
         <source>Scene Change Detection</source>
         <translation>Cambio de escena</translation>
-    </message>
-    <message>
-        <source>This determines the method used by MythTV to detect when commercials start and end.  You must have automatic commercial turned on to use anything other than &apos;Blank Frame&apos;.</source>
-        <translation type="obsolete">ESto determina el método empleado por MythTV para detectar los anuncios. Tiene que tener activa la detección automática de anuncios para usar cualquier otro método distinto a &apos;Fotograma en blanco&apos;.</translation>
     </message>
     <message>
         <source>Automatically Skip Commercials</source>
@@ -1886,10 +1850,6 @@
     <message>
         <source>Will Record</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Remember this choice and use it automatically in the future</source>
-        <translation type="obsolete">Recordar esta opción y usarla automáticamente en el futuro</translation>
     </message>
     <message>
         <source>Priority</source>
@@ -4084,10 +4044,6 @@ Myth will now exit.</source>
 <context>
     <name>ScheduledRecording</name>
     <message>
-        <source>See a list of all up-coming episodes/playtimes.</source>
-        <translation type="obsolete">Ver cuándo se emiten los próximos episodios.</translation>
-    </message>
-    <message>
         <source>List upcoming episodes</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4303,14 +4259,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Don&apos;t Auto Expire</source>
-        <translation type="obsolete">No autoexpirar</translation>
-    </message>
-    <message>
-        <source>Auto Expire</source>
-        <translation type="obsolete">Autoexpirar</translation>
-    </message>
-    <message>
         <source>Auto-Skip OFF</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4470,24 +4418,8 @@ Myth will now exit.</source>
         <translation>Grabaciones programadas</translation>
     </message>
     <message>
-        <source>Conflicting</source>
-        <translation>Conflicto</translation>
-    </message>
-    <message>
-        <source>Deactivated</source>
-        <translation>Desactivadas</translation>
-    </message>
-    <message>
-        <source>Airdate:</source>
-        <translation>Fecha de emisión:</translation>
-    </message>
-    <message>
         <source>Channel:</source>
         <translation>Canal:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation>Descripción:</translation>
     </message>
     <message>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded</source>
@@ -4568,14 +4500,6 @@ Myth will now exit.</source>
     <message>
         <source>No listings found for this program. </source>
         <translation>No se encuentra este programa en la lista.</translation>
-    </message>
-    <message>
-        <source>%SUBTITLE|%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Highlighting:</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Show  (1) All  (2) Important</source>

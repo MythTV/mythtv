@@ -929,6 +929,14 @@ void parseFile(QString filename, QValueList<ChanInfo> *chanlist,
 
     QUrl baseUrl(docElem.attribute("source-data-url", ""));
 
+    QUrl sourceUrl(docElem.attribute("source-info-url", ""));
+    if (sourceUrl.toString() == "http://labs.zap2it.com/")
+    {
+        cerr << "Don't use tv_grab_na_dd, use the internal datadirect grabber."
+             << endl;
+        exit(-1);
+    }
+
     QString aggregatedTitle;
     QString aggregatedDesc;
     QString groupingTitle;

@@ -359,10 +359,6 @@
         <translation>Avbryt</translation>
     </message>
     <message>
-        <source>Yes, but record this episode again next time</source>
-        <translation type="obsolete">Ja, men spela in detta avsnitt igen</translation>
-    </message>
-    <message>
         <source>Yes, delete it</source>
         <translation>Ja, ta bort det</translation>
     </message>
@@ -567,10 +563,6 @@
     <message>
         <source>OK</source>
         <translation>OK</translation>
-    </message>
-    <message>
-        <source>Movie</source>
-        <translation type="obsolete">Film</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -863,10 +855,6 @@
         <translation>Gör &apos;deinterlace&apos; vid uppspelning</translation>
     </message>
     <message>
-        <source>Make the video look normal on a progressive display (i.e. monitor).  Deinterlace requires that your CPU supports SSE instructions.  Enabling this without proper CPU support will cause the program to segfault. See the HOWTO document for more information.</source>
-        <translation type="obsolete">Gör så att video ser normal ut i de fall den visas på en monitor. OBS: Kräver att CPUn stödjer SSE-instruktioner. Om den inte stödjer SSE kommer programmet att krasha. Se dokumentationen för mer information.</translation>
-    </message>
-    <message>
         <source>Extra audio buffering</source>
         <translation>Extra ljudbuffring</translation>
     </message>
@@ -921,10 +909,6 @@
     <message>
         <source>Scene Change Detection</source>
         <translation>Scenbyte</translation>
-    </message>
-    <message>
-        <source>This determines the method used by MythTV to detect when commercials start and end.  You must have automatic commercial turned on to use anything other than &apos;Blank Frame&apos;.</source>
-        <translation type="obsolete">Detta bestämmer metoden som används för att detektera när reklam börjar och slutar. &apos;Automatisk reklamdetektering&apos; måste vara påslagen för att använda något annant än &apos;Svart bild&apos;.</translation>
     </message>
     <message>
         <source>Automatically Skip Commercials</source>
@@ -1027,10 +1011,6 @@
         <translation>Sätt PIN-kod</translation>
     </message>
     <message>
-        <source>This PIN is used to control access to the setup menues. If you want to use this feature, then setting the value to all numbers will make your life much easier.  Set it to blank to disable.</source>
-        <translation type="obsolete">Denna PIN-kod används för att kontrollera åtkomst till inställningsmenyerna. Om du vill använda denna funktion, mata in en sifferkod. Lämna fältet blankt för att stänga av denna funktion.</translation>
-    </message>
-    <message>
         <source>Require Setup PIN</source>
         <translation>Kräv PIN-kod för inställningsmenyer</translation>
     </message>
@@ -1041,10 +1021,6 @@
     <message>
         <source>Reposition after fast forward/rewind</source>
         <translation>Positionera om efter snabbspolning framåt/bakåt</translation>
-    </message>
-    <message>
-        <source>When exiting sticky keys fast forward/rewind mode, reposition before resuming normal playback.  This is to compensate for the reaction time between seeing where to resume playback and actually exiting fast forward/rewind mode.</source>
-        <translation type="obsolete">När snabbspolning framåt/bakåt m h a &quot;klistriga tangenter&quot; används är det svårt att stoppa på exakt rätt ställe. Denna funktion hoppar framåt/bakåt en bit vid stopp för att kompensera för detta.</translation>
     </message>
     <message>
         <source>Number of seconds for OSD information</source>
@@ -1295,16 +1271,8 @@
         <translation>Om Xinerama används, kör endast på den specificerade skärmen.</translation>
     </message>
     <message>
-        <source>GUI width</source>
-        <translation type="obsolete">Bredd</translation>
-    </message>
-    <message>
         <source>The width of the GUI.  Do not make the GUI wider than your actual screen resolution.  Set to 0 to automatically scale to fullscreen.</source>
         <translation>Ange bredden för det grafiska gränssnittet. Ange inte en bredd som är större än den faktiska upplösningen. Sätt till 0 för att automatiskt använda hela bredden.</translation>
-    </message>
-    <message>
-        <source>GUI height</source>
-        <translation type="obsolete">Höjd</translation>
     </message>
     <message>
         <source>The height of the GUI.  Do not make the GUI taller than your actual screen resolution.  Set to 0 to automatically scale to fullscreen.</source>
@@ -1373,10 +1341,6 @@
     <message>
         <source>Problem reading theme preview image </source>
         <translation>Kunde ej läsa temats förhandsvisningsbild</translation>
-    </message>
-    <message>
-        <source>Display channel names instead of numbers</source>
-        <translation type="obsolete">Visa kanalnamn i stället för kanalnummer</translation>
     </message>
     <message>
         <source>&quot;Big&quot; font</source>
@@ -1845,26 +1809,6 @@
         <translation>OK</translation>
     </message>
     <message>
-        <source>Manual Override</source>
-        <translation type="obsolete">Upphäv manuellt</translation>
-    </message>
-    <message>
-        <source>Other Showing</source>
-        <translation type="obsolete">Annan visning</translation>
-    </message>
-    <message>
-        <source>Manual Conflict</source>
-        <translation type="obsolete">Manuell konflikt</translation>
-    </message>
-    <message>
-        <source>Auto Conflict</source>
-        <translation type="obsolete">Automatisk konflikt</translation>
-    </message>
-    <message>
-        <source>Overlap</source>
-        <translation type="obsolete">Överlappa</translation>
-    </message>
-    <message>
         <source>Repeat</source>
         <translation>Upprepa</translation>
     </message>
@@ -1905,26 +1849,6 @@
         <translation>Ska spelas in</translation>
     </message>
     <message>
-        <source>Don&apos;t record it</source>
-        <translation type="obsolete">Spela inte in</translation>
-    </message>
-    <message>
-        <source>Never record this episode</source>
-        <translation type="obsolete">Spela aldrig in detta avsnittet</translation>
-    </message>
-    <message>
-        <source>Record it anyway</source>
-        <translation type="obsolete">Spela in ändå</translation>
-    </message>
-    <message>
-        <source>The following scheduled recordings conflict with each other.  Which would you like to record?</source>
-        <translation type="obsolete">Följande schemalagra inspelningar krockar med varandra. Vilket vill du spela in?</translation>
-    </message>
-    <message>
-        <source>Remember this choice and use it automatically in the future</source>
-        <translation type="obsolete">Kom ihåg detta val och använd det automatiskt i framtiden</translation>
-    </message>
-    <message>
         <source>Priority</source>
         <translation>Prioritet</translation>
     </message>
@@ -1963,26 +1887,6 @@
     <message>
         <source>Reverse direction in fast forward/rewind</source>
         <translation>Motsatt riktning i framåt/bakåtspolning</translation>
-    </message>
-    <message>
-        <source>If set, pressing the sticky rewind key in fast forward mode will switch to rewind mode, and vice versa.  If not set, doing so will decrease the speed in the current direction or switch to play mode if the speed can&apos;t be decreased further..</source>
-        <translation type="obsolete">Om denna funktione är aktiverad kommer &quot;Bakåt/Framåt&quot; att ändra riktning vid spolning, annars kommer hastigheten att minskas/ökas eller återställas till normal hastighet.</translation>
-    </message>
-    <message>
-        <source>Use Recording Priorities</source>
-        <translation type="obsolete">Använd inspelningsprioriteter</translation>
-    </message>
-    <message>
-        <source>Use program recording priorities to resolve conflicts.</source>
-        <translation type="obsolete">Använd inspelningsprioriteter för att lösa inspelningskonflikter.</translation>
-    </message>
-    <message>
-        <source>Recording Priorities First.</source>
-        <translation type="obsolete">Inspelningsprioriteter först.</translation>
-    </message>
-    <message>
-        <source>Use recording priorities to resolve conflicts before using traditional conflict resolution.</source>
-        <translation type="obsolete">Använd inspelningsprioriteter för att lösa konflikter innan traditionell konfliktlösning används.</translation>
     </message>
     <message>
         <source>Single Recordings Priority</source>
@@ -2193,20 +2097,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Low Priority</source>
-        <translation type="obsolete">Låg prioritet</translation>
-    </message>
-    <message>
         <source>Low Disk Space</source>
         <translation>Lågt diskutrymme</translation>
     </message>
     <message>
         <source>Tuner Busy</source>
         <translation>TV-mottagare upptagen</translation>
-    </message>
-    <message>
-        <source>This showing conflicts with one or more other scheduled programs.</source>
-        <translation type="obsolete">Denna visning krockar med en eller flera schemalagda inspelningar.</translation>
     </message>
     <message>
         <source>This showing will be recorded.</source>
@@ -2253,32 +2149,12 @@
         <translation>detta avsnitt har redan spelats in och är fortfarande tillgängligt i listan över inspelningar.</translation>
     </message>
     <message>
-        <source>this episode will be recorded at another time instead.</source>
-        <translation type="obsolete">detta avsnitt kommer att spelas in någon annan tid istället.</translation>
-    </message>
-    <message>
         <source>too many recordings of this program have already been recorded.</source>
         <translation>för många inspelningar av detta program har redan gjorts.</translation>
     </message>
     <message>
         <source>it was manually cancelled.</source>
         <translation>den upphävdes manuellt.</translation>
-    </message>
-    <message>
-        <source>another program with a higher recording priority will be recorded.</source>
-        <translation type="obsolete">ett annat program med högre inspelningsprioritet kommer att spelas in.</translation>
-    </message>
-    <message>
-        <source>another program was manually chosen to be recorded instead.</source>
-        <translation type="obsolete">ett annat program manuellt valdes för inspelning istället.</translation>
-    </message>
-    <message>
-        <source>another program was automatically chosen to be recorded instead.</source>
-        <translation type="obsolete">ett annat program automatiskt valdes för inspelning istället.</translation>
-    </message>
-    <message>
-        <source>it is covered by another scheduled recording for the same program.</source>
-        <translation type="obsolete">den täcks upp av en annan schemaläggning för samma program.</translation>
     </message>
     <message>
         <source>there wasn&apos;t enough disk space available.</source>
@@ -3120,10 +2996,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Time offset for XMLTV listings</source>
         <translation>Tidsförskjutning för XMLTV-tablåinformation</translation>
-    </message>
-    <message>
-        <source>If your local timezone does not match the timezone returned by XMLTV, use this setting to have mythfilldatabase adjust the program start and end times.None will disable this feature, Auto will automatically detect your local timezone</source>
-        <translation type="obsolete">Om din lokala tidszon inte överensstämmer med XMLTV, använd denna inställningen för att korrigera detta. Detta bör inte behövas i Sverige, utan &apos;None&apos; ska kunna användas</translation>
     </message>
     <message>
         <source>Master Backend Override</source>
@@ -4174,10 +4046,6 @@ Myth will now exit.</source>
 <context>
     <name>ScheduledRecording</name>
     <message>
-        <source>See a list of all up-coming episodes/playtimes.</source>
-        <translation type="obsolete">Visa en lista på alla kommande avsnitt/speltider.</translation>
-    </message>
-    <message>
         <source>List upcoming episodes</source>
         <translation>Visa kommande avsnitt</translation>
     </message>
@@ -4393,34 +4261,6 @@ Myth will now exit.</source>
         <translation>Nyans (REC) %1 %</translation>
     </message>
     <message>
-        <source>Program Menu</source>
-        <translation type="obsolete">Programmeny</translation>
-    </message>
-    <message>
-        <source>Set Commercial Auto-Skip OFF</source>
-        <translation type="obsolete">Reklamöverhoppning: AV</translation>
-    </message>
-    <message>
-        <source>Set Commercial Auto-Skip ON</source>
-        <translation type="obsolete">Reklamöverhoppning: PÅ</translation>
-    </message>
-    <message>
-        <source>Set Commercial Auto-Skip to Notify</source>
-        <translation type="obsolete">Meddela vid automatisk reklamöverhoppning</translation>
-    </message>
-    <message>
-        <source>Don&apos;t Auto Expire</source>
-        <translation type="obsolete">Autoradera inte</translation>
-    </message>
-    <message>
-        <source>Auto Expire</source>
-        <translation type="obsolete">Autoradera</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Avbryt</translation>
-    </message>
-    <message>
         <source>Auto-Skip OFF</source>
         <translation>Reklamöverhoppning: AV</translation>
     </message>
@@ -4459,10 +4299,6 @@ Myth will now exit.</source>
     <message>
         <source>Zoom Mode OFF</source>
         <translation>Zoomläge AV</translation>
-    </message>
-    <message>
-        <source>Activate Zoom Mode</source>
-        <translation type="obsolete">Aktivera zoomläge</translation>
     </message>
     <message>
         <source>Auto-Expire OFF</source>
@@ -4584,24 +4420,8 @@ Myth will now exit.</source>
         <translation>Schemalagda inspelningar:</translation>
     </message>
     <message>
-        <source>Conflicting</source>
-        <translation>Kollision</translation>
-    </message>
-    <message>
-        <source>Deactivated</source>
-        <translation>Deaktiverade</translation>
-    </message>
-    <message>
-        <source>Airdate:</source>
-        <translation>Sänt:</translation>
-    </message>
-    <message>
         <source>Channel:</source>
         <translation>Kanal:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation>Beskrivning:</translation>
     </message>
     <message>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded</source>
@@ -4682,14 +4502,6 @@ Myth will now exit.</source>
     <message>
         <source>No listings found for this program. </source>
         <translation>Inga visningar funna av detta program. </translation>
-    </message>
-    <message>
-        <source>%SUBTITLE|%</source>
-        <translation>%SUBTITLE|%</translation>
-    </message>
-    <message>
-        <source>Highlighting:</source>
-        <translation>Markerar:</translation>
     </message>
     <message>
         <source>Show  (1) All  (2) Important</source>

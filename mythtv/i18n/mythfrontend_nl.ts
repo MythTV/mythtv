@@ -359,14 +359,6 @@
         <translation>Annuleer</translation>
     </message>
     <message>
-        <source>, %0.2f GB free</source>
-        <translation type="obsolete">, %0.2f GB vrij</translation>
-    </message>
-    <message>
-        <source>Yes, but record this episode again next time</source>
-        <translation type="obsolete">Ja, maar neem deze aflevering opnieuw op.</translation>
-    </message>
-    <message>
         <source>Yes, delete it</source>
         <translation>Ja, verwijder</translation>
     </message>
@@ -571,10 +563,6 @@
     <message>
         <source>OK</source>
         <translation type="unfinished">OK</translation>
-    </message>
-    <message>
-        <source>Movie</source>
-        <translation type="obsolete">Film</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -797,34 +785,6 @@
     <message>
         <source>Auto Expire</source>
         <translation>Automatisch vervallen</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="obsolete">%02d:%02d:%02d achter  --  %.2f%% vol</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d behind</source>
-        <translation type="obsolete">%02d:%02d:%02d achter</translation>
-    </message>
-    <message>
-        <source>%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="obsolete">%02d:%02d achter  --  %.2f%% vol</translation>
-    </message>
-    <message>
-        <source>%02d:%02d behind</source>
-        <translation type="obsolete">%02d:%02d achter</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d of %02d:%02d:%02d</source>
-        <translation type="obsolete">%02d:%02d:%02d van %02d:%02d:%02d</translation>
-    </message>
-    <message>
-        <source>%02d:%02d of %02d:%02d</source>
-        <translation type="obsolete">%02d:%02d van %02d:%02d</translation>
-    </message>
-    <message>
-        <source>Skip %1 seconds</source>
-        <translation type="obsolete">Sla %1 seconden over</translation>
     </message>
     <message>
         <source>Not Recording</source>
@@ -1892,22 +1852,6 @@
         <translation>Wordt opgenomen</translation>
     </message>
     <message>
-        <source>Don&apos;t record it</source>
-        <translation type="obsolete">Neem niet op</translation>
-    </message>
-    <message>
-        <source>Never record this episode</source>
-        <translation type="obsolete">Nooit opnemen</translation>
-    </message>
-    <message>
-        <source>Record it anyway</source>
-        <translation type="obsolete">Altijd openemen</translation>
-    </message>
-    <message>
-        <source>Remember this choice and use it automatically in the future</source>
-        <translation type="obsolete">Onthou deze keuze en gebruik ze later automatisch</translation>
-    </message>
-    <message>
         <source>Priority</source>
         <translation>Prioriteit</translation>
     </message>
@@ -2214,10 +2158,6 @@
     <message>
         <source>it was manually cancelled.</source>
         <translation>ze handmating onderbroken is.</translation>
-    </message>
-    <message>
-        <source>it is covered by another scheduled recording for the same program.</source>
-        <translation type="obsolete">ze op een ander tijdstip opgenomen wordt.</translation>
     </message>
     <message>
         <source>there wasn&apos;t enough disk space available.</source>
@@ -3321,10 +3261,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Standaard opnamegroep om weer te geven</translation>
     </message>
     <message>
-        <source>All</source>
-        <translation type="obsolete">Alle</translation>
-    </message>
-    <message>
         <source>Default Recording Group to display on the view recordings screen.</source>
         <translation>Standaard opnamegroep om weer te geven.</translation>
     </message>
@@ -4320,22 +4256,6 @@ Myth will now exit.</source>
         <translation>Hue (REC) %1 %</translation>
     </message>
     <message>
-        <source>Program Menu</source>
-        <translation type="obsolete">Opnamemenu</translation>
-    </message>
-    <message>
-        <source>Don&apos;t Auto Expire</source>
-        <translation type="obsolete">Niet automatisch laten vervallen</translation>
-    </message>
-    <message>
-        <source>Auto Expire</source>
-        <translation type="obsolete">Automatisch laten vervallen</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Annuleer</translation>
-    </message>
-    <message>
         <source>Auto-Skip OFF</source>
         <translation>Automatisch overlaan UIT</translation>
     </message>
@@ -4378,10 +4298,6 @@ Myth will now exit.</source>
     <message>
         <source>Zoom Mode OFF</source>
         <translation>Zoom Mode UIT</translation>
-    </message>
-    <message>
-        <source>Activate Zoom Mode</source>
-        <translation type="obsolete">Zoom Mode AAN</translation>
     </message>
     <message>
         <source>Auto-Expire OFF</source>
@@ -4503,24 +4419,8 @@ Myth will now exit.</source>
         <translation>Geplande Opnames:</translation>
     </message>
     <message>
-        <source>Conflicting</source>
-        <translation>Conflicterende</translation>
-    </message>
-    <message>
-        <source>Deactivated</source>
-        <translation>Gedesactiveerde</translation>
-    </message>
-    <message>
-        <source>Airdate:</source>
-        <translation>Uitzenddatum:</translation>
-    </message>
-    <message>
         <source>Channel:</source>
         <translation>Kanaal:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation>Beschrijving:</translation>
     </message>
     <message>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded</source>
@@ -4577,14 +4477,6 @@ Myth will now exit.</source>
     <message>
         <source>There are no available programs under this search. Please select another search.</source>
         <translation>Er zijn geen programma&apos;s gevonden. Probeer een andere zoekopdracht.</translation>
-    </message>
-    <message>
-        <source>%SUBTITLE|%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Highlighting:</source>
-        <translation>Gemarkeerd:</translation>
     </message>
     <message>
         <source>Show  (1) All  (2) Important</source>

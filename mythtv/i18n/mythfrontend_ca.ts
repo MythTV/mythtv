@@ -787,34 +787,6 @@
         <translation>Permetre que les gravacions auto-expirin</translation>
     </message>
     <message>
-        <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="obsolete">%02d:%02d:%02d enrera -- %.2f%% ple</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d behind</source>
-        <translation type="obsolete">%02d:%02d:%02d enrera</translation>
-    </message>
-    <message>
-        <source>%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="obsolete">%02d:%02d enrera -- %.2f%% ple</translation>
-    </message>
-    <message>
-        <source>%02d:%02d behind</source>
-        <translation type="obsolete">%02d:%02d enrera</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d of %02d:%02d:%02d</source>
-        <translation type="obsolete">%02d:%02d:%02d de %02d:%02d:%02d</translation>
-    </message>
-    <message>
-        <source>%02d:%02d of %02d:%02d</source>
-        <translation type="obsolete">%02d:%02d de %02d:%02d</translation>
-    </message>
-    <message>
-        <source>Skip %1 seconds</source>
-        <translation type="obsolete">Salta %1 segons</translation>
-    </message>
-    <message>
         <source>Not Recording</source>
         <translation>No gravar</translation>
     </message>
@@ -883,10 +855,6 @@
         <translation>Reproducció sense interlineat</translation>
     </message>
     <message>
-        <source>Make the video look normal on a progressive display (i.e. monitor).  Deinterlace requires that your CPU supports SSE instructions.  Enabling this without proper CPU support will cause the program to segfault. See the HOWTO document for more information.</source>
-        <translation type="obsolete">Fa que el vídeo es visualitzi normalment en un monitor progressiu (p.ex.: un monitor). Requereix que el processador suporti instruccions SSE. Activant aixo sense disposar del processador adeqüat abortarà l&apos;execució. Per a més informació consulti la documentació.</translation>
-    </message>
-    <message>
         <source>Extra audio buffering</source>
         <translation>Bufrfers d&apos;àudio addicionals</translation>
     </message>
@@ -941,10 +909,6 @@
     <message>
         <source>Scene Change Detection</source>
         <translation>Detecció de canvi d&apos;escena</translation>
-    </message>
-    <message>
-        <source>This determines the method used by MythTV to detect when commercials start and end.  You must have automatic commercial turned on to use anything other than &apos;Blank Frame&apos;.</source>
-        <translation type="obsolete">Determina el mètode util·litzat per MythTV per detectar quan comencen i acaven els anuncis. És necessari activar la detecció automàtica d&apos;anuncis en qualsevol altre valor de &quot;Fotograma negre&quot;.</translation>
     </message>
     <message>
         <source>Automatically Skip Commercials</source>
@@ -1886,10 +1850,6 @@
     <message>
         <source>Will Record</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Remember this choice and use it automatically in the future</source>
-        <translation type="obsolete">Recordar aquesta opció i utilitzarla automàticament en el futur</translation>
     </message>
     <message>
         <source>Priority</source>
@@ -4084,10 +4044,6 @@ Myth will now exit.</source>
 <context>
     <name>ScheduledRecording</name>
     <message>
-        <source>See a list of all up-coming episodes/playtimes.</source>
-        <translation type="obsolete">Veure quan s&apos;edevenen els episodis.</translation>
-    </message>
-    <message>
         <source>List upcoming episodes</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4303,18 +4259,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Don&apos;t Auto Expire</source>
-        <translation type="obsolete">No auto-expira</translation>
-    </message>
-    <message>
-        <source>Auto Expire</source>
-        <translation type="obsolete">Auto-expira</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Cancel·lar</translation>
-    </message>
-    <message>
         <source>Auto-Skip OFF</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4474,24 +4418,8 @@ Myth will now exit.</source>
         <translation>Gravacions programades</translation>
     </message>
     <message>
-        <source>Conflicting</source>
-        <translation>Conflicte</translation>
-    </message>
-    <message>
-        <source>Deactivated</source>
-        <translation>Desactivades</translation>
-    </message>
-    <message>
-        <source>Airdate:</source>
-        <translation>Data d&apos;emisió:</translation>
-    </message>
-    <message>
         <source>Channel:</source>
         <translation>Canal:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation>Descripció:</translation>
     </message>
     <message>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded</source>
@@ -4572,14 +4500,6 @@ Myth will now exit.</source>
     <message>
         <source>No listings found for this program. </source>
         <translation>Aquest programa no el trovo llistat.</translation>
-    </message>
-    <message>
-        <source>%SUBTITLE|%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Highlighting:</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Show  (1) All  (2) Important</source>
