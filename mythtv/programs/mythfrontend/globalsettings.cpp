@@ -2,6 +2,7 @@
 #include <qfile.h>
 #include <qdialog.h>
 #include <qcursor.h>
+#include <qdir.h>
 
 const char* AudioOutputDevice::paths[] = { "/dev/dsp",
                                            "/dev/dsp1",
@@ -19,3 +20,17 @@ AudioOutputDevice::AudioOutputDevice():
     }
 }
 
+ThemeSelector::ThemeSelector():
+    PathSetting(true), GlobalSetting("WhichTheme") {
+
+    setLabel("Theme");
+
+    QDir themes(PREFIX"/share/mythtv/themes");
+    themes.setFilter(QDir::Dirs);
+    const QFileInfoList *fil = themes.entryInfoList();
+    QFileInfoListIterator it( *fil );
+    QFileInfo *theme;
+
+    while ((theme = it.current()) != 0)
+        addSelection(theme->fileName());
+}

@@ -283,6 +283,231 @@ public:
     };
 };
 
+// Theme settings
+
+class ThemeSelector: public PathSetting, public GlobalSetting {
+public:
+    ThemeSelector();
+};
+
+class GuiWidth: public SpinBoxSetting, public GlobalSetting {
+public:
+    GuiWidth():
+        SpinBoxSetting(160, 1600, 16), GlobalSetting("GuiWidth") {
+        setLabel("GUI width");
+    };
+};
+
+class GuiHeight: public SpinBoxSetting, public GlobalSetting {
+public:
+    GuiHeight():
+        SpinBoxSetting(160, 1600, 16), GlobalSetting("GuiHeight") {
+        setLabel("GUI height");
+    };
+};
+
+class ThemeQt: public CheckBoxSetting, public GlobalSetting {
+public:
+    ThemeQt():
+        GlobalSetting("ThemeQt") {
+        setLabel("Decorate Qt widgets according to theme?");
+        setValue(true);
+    };
+};
+
+class GeneratePreviewPixmaps: public CheckBoxSetting, public GlobalSetting {
+public:
+    GeneratePreviewPixmaps():
+        GlobalSetting("GeneratePreviewPixmaps") {
+        setLabel("Generate static thumbnail pixmaps for recordings?");
+        setValue(false);
+    };
+};
+
+class PlaybackPreview: public CheckBoxSetting, public GlobalSetting {
+public:
+    PlaybackPreview():
+        GlobalSetting("PlaybackPreview") {
+        setLabel("Play the video back in a little preview window?");
+        setValue(true);
+    };
+};
+
+class DateFormat: public LineEditSetting, public GlobalSetting {
+public:
+    DateFormat():
+        GlobalSetting("DateFormat") {
+        setLabel("Date format");
+        setValue("ddd MMMM d");
+    };
+};
+
+class TimeFormat: public LineEditSetting, public GlobalSetting {
+public:
+    TimeFormat():
+        GlobalSetting("TimeFormat") {
+        setLabel("Time format");
+        setValue("h:mm AP");
+    };
+};
+
+class DisplayChanNum: public CheckBoxSetting, public GlobalSetting {
+public:
+    DisplayChanNum():
+        GlobalSetting("DisplayChanNum") {
+        setLabel("Display channel numbers instead of names?");
+        setValue(true);
+    };
+};
+
+class QtFontBig: public SpinBoxSetting, public GlobalSetting {
+public:
+    QtFontBig():
+        SpinBoxSetting(1, 48, 1), GlobalSetting("QtFontBig") {
+        setLabel("\"Big\" font");
+        setValue(25);
+    };
+};
+
+class QtFontMedium: public SpinBoxSetting, public GlobalSetting {
+public:
+    QtFontMedium():
+        SpinBoxSetting(1, 48, 1), GlobalSetting("QtFontMedium") {
+        setLabel("\"Medium\" font");
+        setValue(16);
+    };
+};
+
+class QtFontSmall: public SpinBoxSetting, public GlobalSetting {
+public:
+    QtFontSmall():
+        SpinBoxSetting(1, 48, 1), GlobalSetting("QtFontSmall") {
+        setLabel("\"Small\" font");
+        setValue(12);
+    };
+};
+
+// EPG settings
+
+class EPGShowTitle: public CheckBoxSetting, public GlobalSetting {
+public:
+    EPGShowTitle():
+        GlobalSetting("EPGShowTitle") {
+        setLabel("Display the program title at the bottom?");
+        setValue(true);
+    };
+};
+
+class EPGShowChannelIcon: public CheckBoxSetting, public GlobalSetting {
+public:
+    EPGShowChannelIcon():
+        GlobalSetting("EPGShowChannelIcon") {
+        setLabel("Display the channel icon?");
+        setValue(true);
+    };
+};
+
+class EPGTimeFontSize: public SpinBoxSetting, public GlobalSetting {
+public:
+    EPGTimeFontSize():
+        SpinBoxSetting(1, 48, 1), GlobalSetting("EPGTimeFontSize") {
+        setLabel("Font size for time");
+        setValue(13);
+    };
+};
+
+class EPGChanFontSize: public SpinBoxSetting, public GlobalSetting {
+public:
+    EPGChanFontSize():
+        SpinBoxSetting(1, 48, 1), GlobalSetting("EPGChanFontSize") {
+        setLabel("Font size for channel");
+        setValue(13);
+    };
+};
+
+class EPGChanCallsignFontSize: public SpinBoxSetting, public GlobalSetting {
+public:
+    EPGChanCallsignFontSize():
+        SpinBoxSetting(1, 48, 1), GlobalSetting("EPGChanCallsignFontSize") {
+        setLabel("Font size for callsign");
+        setValue(11);
+    };
+};
+
+class EPGProgFontSize: public SpinBoxSetting, public GlobalSetting {
+public:
+    EPGProgFontSize():
+        SpinBoxSetting(1, 48, 1), GlobalSetting("EPGProgFontSize") {
+        setLabel("Font size for program");
+        setValue(13);
+    };
+};
+
+class EPGTitleFontSize: public SpinBoxSetting, public GlobalSetting {
+public:
+    EPGTitleFontSize():
+        SpinBoxSetting(1, 48, 1), GlobalSetting("EPGTitleFontSize") {
+        setLabel("Font size for title");
+        setValue(19);
+    };
+};
+
+class EPGShowCurrentTime: public CheckBoxSetting, public GlobalSetting {
+public:
+    EPGShowCurrentTime():
+        GlobalSetting("EPGShowCurrentTime") {
+        setLabel("Display a line indicating the current time?");
+        setValue(false);
+    };
+};
+
+class EPGCurrentTimeColor: public LineEditSetting, public GlobalSetting {
+public:
+    EPGCurrentTimeColor():
+        GlobalSetting("EPGCurrentTimeColor") {
+        setLabel("Color of line indicating the current time");
+        setValue("red");
+    };
+};
+
+class ChannelSorting: public ComboBoxSetting, public GlobalSetting {
+public:
+    ChannelSorting():
+        GlobalSetting("ChannelSorting") {
+        setLabel("Display order of channels");
+        addSelection("channum + 0");
+        addSelection("chanid");
+        addSelection("callsign");
+    };
+};
+
+class DefaultTVChannel: public SpinBoxSetting, public GlobalSetting {
+public:
+    DefaultTVChannel():
+        SpinBoxSetting(1, 1024, 1), GlobalSetting("DefaultTVChannel") {
+        setLabel("Starting channel");
+        setValue(3);
+    };
+};
+
+class UnknownTitle: public LineEditSetting, public GlobalSetting {
+public:
+    UnknownTitle():
+        GlobalSetting("UnknownTitle") {
+        setLabel("What to call 'unknown' programs");
+        setValue("Unknown");
+    };
+};
+
+class UnknownCategory: public LineEditSetting, public GlobalSetting {
+public:
+    UnknownCategory():
+        GlobalSetting("UnknownCategory") {
+        setLabel("What category to give 'unknown' programs");
+        setValue("Unknown");
+    };
+};
+
 class PlaybackSettings: virtual public ConfigurationWizard {
 public:
     PlaybackSettings(MythContext *context) : ConfigurationWizard(context),
@@ -332,6 +557,38 @@ public:
         addChild(new FreqTable());
         addChild(new RecordOverTime());
         addChild(new ExternalChannelCommand());
+        addChild(new ChannelSorting());
+        addChild(new DefaultTVChannel());
+        addChild(new UnknownTitle());
+        addChild(new UnknownCategory());
+    };
+};
+
+class EPGSettings: virtual public ConfigurationDialog,
+                   virtual public VerticalConfigurationGroup {
+public:
+    EPGSettings(MythContext* context): ConfigurationDialog(context) {
+        addChild(new EPGShowTitle());
+        addChild(new EPGShowChannelIcon());
+        addChild(new EPGTimeFontSize());
+        addChild(new EPGChanFontSize());
+        addChild(new EPGChanCallsignFontSize());
+        addChild(new EPGProgFontSize());
+        addChild(new EPGTitleFontSize());
+        addChild(new EPGShowCurrentTime());
+        addChild(new EPGCurrentTimeColor());
+        
+    };
+};
+
+class ThemeSettings: virtual public ConfigurationDialog,
+                     virtual public VerticalConfigurationGroup {
+public:
+    ThemeSettings(MythContext* context): ConfigurationDialog(context) {
+        addChild(new ThemeSelector());
+        addChild(new GuiWidth());
+        addChild(new GuiHeight());
+        addChild(new ThemeQt());
     };
 };
 
