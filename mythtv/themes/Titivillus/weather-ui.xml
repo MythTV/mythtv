@@ -103,7 +103,7 @@
       <textarea name="loading" draworder="2" align="right"> 
         <font>header</font>
         <area>30,170,400,50</area>
-        <value>Loading...</value>
+        <value>loading...</value>
       </textarea>
       <textarea name="retrieve" draworder="3" align="center">
         <font>timedate</font>
@@ -164,7 +164,7 @@
         <context>1</context>
         <area>0,18,800,45</area>
         <font>header</font>
-        <value>Current Conditions</value>
+        <value>current conditions</value>
       </textarea>
       <textarea name="humiditylbl" draworder="5">
         <context>1</context>
@@ -272,7 +272,7 @@
         <context>2</context>
         <area>0,18,800,45</area>
         <font>header</font>
-        <value>Extended Forecast</value>
+        <value>extended forecast</value>
       </textarea>
       <textarea name="date1" draworder="5" align="center">
         <context>2</context>
@@ -411,7 +411,7 @@
         <context>3</context>
         <area>0,18,800,45</area>
         <font>header</font>
-        <value>Today's Forecast</value>
+        <value>today's forecast</value>
       </textarea>
       <textarea name="updatetime-3" draworder="5">
         <context>3</context>
@@ -442,7 +442,7 @@
         <context>4</context>
         <area>0,18,800,45</area>
         <font>header</font>
-        <value>Tomorrow's Outlook</value>
+        <value>tomorrow's outlook</value>
       </textarea>
       <textarea name="forecastlbl" draworder="5">
         <context>4</context>
@@ -488,7 +488,7 @@
         <context>5</context>
         <area>0,18,800,45</area>
         <font>header</font> 
-        <value>Doppler Radar</value>
+        <value>doppler radar</value>
       </textarea>
       <textarea name="err1" draworder="5" align="center">
         <context>5</context>
