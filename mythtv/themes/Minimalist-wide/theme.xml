@@ -276,13 +276,15 @@
   </buttondef>
 
   <buttondef name="IMAGES">
-    <image>buttons/IMAGES.png</image>
+    <image>buttons/IMAGES_off.png</image>
+    <activeimage>buttons/IMAGES.png</activeimage>
 <!--     <watermarkimage>watermark/gallery.png</watermarkimage> -->
     <offset>50,-100</offset>
   </buttondef>
 
   <buttondef name="GAME">
-    <image>buttons/GAME.png</image>
+    <image>buttons/GAME_off.png</image>
+    <activeimage>buttons/GAME.png</activeimage>
 <!--     <watermarkimage>watermark/game.png</watermarkimage> -->
     <offset>40,-100</offset>
   </buttondef>
@@ -450,7 +452,8 @@
 <!-- #################################-->
 
   <buttondef name="MUSIC_PLAY">
-    <image>buttons/MUSIC_PLAY.png</image>
+    <image>buttons/MUSIC_PLAY_off.png</image>
+    <activeimage>buttons/MUSIC_PLAY.png</activeimage>
 <!--     <watermarkimage>watermark/music.png</watermarkimage> -->
     <offset>50,-100</offset>
   </buttondef>
@@ -683,7 +686,8 @@
 <!-- ##############################-->
 
   <buttondef name="TV_WATCH_TV">
-    <image>buttons/TV_WATCH_TV.png</image>
+    <image>buttons/TV_WATCH_TV_off.png</image>
+    <activeimage>buttons/TV_WATCH_TV.png</activeimage>
 <!--     <watermarkimage>watermark/tv.png</watermarkimage> -->
     <offset>50,-100</offset>
   </buttondef>
@@ -695,7 +699,8 @@
   </buttondef>
 
   <buttondef name="TV_WATCH_RECORDINGS">
-    <image>buttons/TV_WATCH_RECORDINGS.png</image>
+    <image>buttons/TV_WATCH_RECORDINGS_off.png</image>
+    <activeimage>buttons/TV_WATCH_RECORDINGS.png</activeimage>
 <!--     <watermarkimage>watermark/tv_playback.png</watermarkimage> -->
     <offset>50,-100</offset>
   </buttondef>
@@ -745,7 +750,8 @@
 <!-- #################################-->
 
   <buttondef name="VIDEO_BROWSER">
-    <image>buttons/VIDEO_BROWSER.png</image>
+    <image>buttons/VIDEO_BROWSER_off.png</image>
+    <activeimage>buttons/VIDEO_BROWSER.png</activeimage>
 <!--     <watermarkimage>watermark/video_browser.png</watermarkimage> -->
     <offset>50,-100</offset>
   </buttondef>
@@ -785,32 +791,36 @@
   </buttondef>
 
   <buttondef name="MENU_MEDIA_LIBRARY">
-    <image>buttons/MENU_MEDIA_LIBRARY.png</image>
+    <image>buttons/MENU_MEDIA_LIBRARY_off.png</image>
+    <activeimage>buttons/MENU_MEDIA_LIBRARY.png</activeimage>
 <!--     <watermarkimage>watermark/video_browser.png</watermarkimage> -->
     <offset>50,-100</offset>
   </buttondef>
 
   <buttondef name="MENU_MANAGE_RECORDINGS">
-    <image>buttons/MENU_MANAGE_RECORDINGS.png</image>
-
+    <image>buttons/MENU_MANAGE_RECORDINGS_off.png</image>
+    <activeimage>buttons/MENU_MANAGE_RECORDINGS.png</activeimage>
 <!--     <watermarkimage>watermark/video_manager.png</watermarkimage> -->
     <offset>50,-100</offset>
   </buttondef>
 
   <buttondef name="MENU_INFO_CENTER">
-    <image>buttons/MENU_INFO_CENTER.png</image>
+    <image>buttons/MENU_INFO_CENTER_off.png</image>
+    <activeimage>buttons/MENU_INFO_CENTER.png</activeimage>
 <!--     <watermarkimage>watermark/info_center.png</watermarkimage> -->
     <offset>50,-100</offset>
   </buttondef>
 
   <buttondef name="MENU_OPTICAL_DISKS">
-    <image>buttons/MENU_OPTICAL_DISKS.png</image>
+    <image>buttons/MENU_OPTICAL_DISKS_off.png</image>
+    <activeimage>buttons/MENU_OPTICAL_DISKS.png</activeimage>
 <!--     <watermarkimage>watermark/dvd.png</watermarkimage> -->
     <offset>50,-100</offset>
   </buttondef>
 
   <buttondef name="MENU_UTILITIES_SETUP">
-    <image>buttons/MENU_UTILITIES_SETUP.png</image>
+    <image>buttons/MENU_UTILITIES_SETUP_off.png</image>
+    <activeimage>buttons/MENU_UTILITIES_SETUP.png</activeimage>
 <!--     <watermarkimage>watermark/setup.png</watermarkimage> -->
     <offset>50,-100</offset>
   </buttondef>
