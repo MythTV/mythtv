@@ -47,7 +47,7 @@
      <text lang="CA">Vídeo</text>
      <text lang="NL">Films</text>
      <action>EXEC mythvideo</action>
-     <depends>mythvideo-settings.txt</depends>
+     <depends>videomenu.xml</depends>
    </button>
 
    <button>

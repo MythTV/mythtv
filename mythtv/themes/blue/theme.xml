@@ -93,6 +93,11 @@
     <offset>20,20</offset>
   </buttondef>
 
+  <buttondef name="VIDEO">
+    <image>videobutton.png</image>
+    <offset>20,20</offset>
+  </buttondef>
+
   <buttondef name="GAME">
     <image>game.png</image>
     <offset>15,10</offset>
