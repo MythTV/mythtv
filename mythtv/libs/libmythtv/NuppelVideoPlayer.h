@@ -39,6 +39,8 @@ struct TextContainer
     unsigned char *buffer;
 };
 
+typedef  void (*StatusCallback)(int, void*);
+
 class NuppelVideoPlayer
 {
  public:
@@ -64,7 +66,7 @@ class NuppelVideoPlayer
     int OpenFile(bool skipDsp = false);
     void StartPlaying(void);
     void StopPlaying(void) { killplayer = true; decoder_thread_alive = false; }
-    
+
     bool IsPlaying(void) { return playing; }
     bool IsDecoderThreadAlive(void) { return decoder_thread_alive; }
 
@@ -73,8 +75,8 @@ class NuppelVideoPlayer
     void SetAudioSampleRate(int rate) { audio_samplerate = rate; }
 
     void Pause(bool waitvideo = true);
-    bool Play(float speed = 1.0, bool normal = true, 
-              bool unpauseaudio = true); 
+    bool Play(float speed = 1.0, bool normal = true,
+              bool unpauseaudio = true);
     bool GetPause(void);
 
     bool FastForward(float seconds);
@@ -86,7 +88,7 @@ class NuppelVideoPlayer
 
     int GetVideoWidth(void) { return video_width; }
     int GetVideoHeight(void) { return video_height; }
-    float GetFrameRate(void) { return video_frame_rate; } 
+    float GetFrameRate(void) { return video_frame_rate; }
     long long GetTotalFrameCount(void) { return totalFrames; }
     long long GetFramesPlayed(void) { return framesPlayed; }
     int GetSecondsBehind(void);
@@ -95,7 +97,7 @@ class NuppelVideoPlayer
 
     OSD *GetOSD(void) { return osd; }
 
-    void SetOSDFontName(QString filename, QString osdccfont, QString prefix) 
+    void SetOSDFontName(QString filename, QString osdccfont, QString prefix)
     { osdfontname = filename; osdccfontname = osdccfont; osdprefix = prefix; }
 
     void SetOSDThemeName(QString themename) { osdtheme = themename; }
@@ -118,15 +120,15 @@ class NuppelVideoPlayer
 
     int FlagCommercials(bool showPercentage = false, bool fullSpeed = false,
                         bool *abortFlag = NULL);
-    bool RebuildSeekTable(bool showPercentage = true);
+    bool RebuildSeekTable(bool showPercentage = true, StatusCallback cb = NULL, void* cbData = NULL);
 
     VideoFrame *GetCurrentFrame(int &w, int &h);
     void ReleaseCurrentFrame(VideoFrame *frame);
 
-    void SetPipPlayer(NuppelVideoPlayer *pip) { setpipplayer = pip; 
+    void SetPipPlayer(NuppelVideoPlayer *pip) { setpipplayer = pip;
                                                 needsetpipplayer = true; }
     bool PipPlayerSet(void) { return !needsetpipplayer; }
- 
+
     void SetVideoFilters(QString &filters) { videoFilterList = filters; }
 
     void SetWatchingRecording(bool mode);
@@ -147,7 +149,7 @@ class NuppelVideoPlayer
     // decoder stuff..
     void ForceVideoOutputType(VideoOutputType type);
 
-    void SetVideoParams(int width, int height, double fps, 
+    void SetVideoParams(int width, int height, double fps,
                         int keyframedistance, float aspect = 1.33333,
                         FrameScanType scan = kScan_Ignore);
     void SetAudioParams(int bps, int channels, int samplerate);
@@ -194,35 +196,35 @@ class NuppelVideoPlayer
     void decCurrentAudioTrack();
     bool setCurrentAudioTrack(int trackNo);
     int getCurrentAudioTrack();
-    
+
  protected:
     void OutputVideoLoop(void);
     void IvtvVideoLoop(void);
 
     static void *kickoffOutputVideoLoop(void *player);
-   
+
     VideoOutputType forceVideoOutput;
- 
+
  private:
     void InitVideo(void);
 
     void InitFilters(void);
-   
+
     bool GetVideoPause(void);
     void PauseVideo(bool wait = true);
     void UnpauseVideo(void);
 
     void setPrebuffering(bool prebuffer);
- 
+
     bool DecodeFrame(struct rtframeheader *frameheader,
                      unsigned char *strm, unsigned char *outbuf);
     void GetFrame(int onlyvideo, bool unsafe = false);
 
     long long CalcMaxFFTime(long long ff);
-   
+
     bool DoFastForward();
     bool DoRewind();
-   
+
     void ClearAfterSeek(); // caller should not hold any locks
 
     int GetStatusbarPos(void);
@@ -236,7 +238,7 @@ class NuppelVideoPlayer
 
     void JumpToFrame(long long frame);
     void JumpToNetFrame(long long net) { JumpToFrame(framesPlayed + net); }
- 
+
     int tbuffer_numvalid(void); // number of valid slots in the text buffer
     int tbuffer_numfree(void); // number of free slots in the text buffer
 
@@ -268,7 +270,7 @@ class NuppelVideoPlayer
                                   float fps, int video_height);
 
     QString filename;
-    
+
     /* rtjpeg_plugin stuff */
     int eof;
     int video_width;
@@ -289,7 +291,7 @@ class NuppelVideoPlayer
     int text_size;
 
     /* Video circular buffer */
-    bool prebuffering;  /* don't play until done prebuffering */ 
+    bool prebuffering;  /* don't play until done prebuffering */
     QMutex prebuffering_lock;
     QWaitCondition prebuffering_wait;
 
@@ -313,7 +315,7 @@ class NuppelVideoPlayer
     bool paused, previously_paused, pausevideo;
     bool actuallypaused, video_actually_paused;
     QWaitCondition decoderThreadPaused, videoThreadPaused;
- 
+
     bool cc;
     unsigned char ccmode;
 
@@ -321,12 +323,12 @@ class NuppelVideoPlayer
     bool decoder_thread_alive;
 
     RingBuffer *ringBuffer;
-    bool weMadeBuffer; 
+    bool weMadeBuffer;
     bool killplayer;
     bool killvideo;
 
     long long framesPlayed;
-    
+
     bool livetv;
     bool watchingrecording;
     bool editmode;
@@ -412,7 +414,7 @@ class NuppelVideoPlayer
     int avsync_oldavg;
     int refreshrate;
     int frame_interval; // always adjusted for play_speed
-    float play_speed;  
+    float play_speed;
     bool normal_speed;
 
     float warpfactor;
@@ -421,7 +423,7 @@ class NuppelVideoPlayer
     short int *warplbuff;
     short int *warprbuff;
     int warpbuffsize;
- 
+
     bool delay_clipping;
     struct timeval nexttrigger, now;
     VideoSync *videosync;
