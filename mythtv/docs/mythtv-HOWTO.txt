@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-02-16, v1.095
+  2003-02-18, v1.097
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -1897,7 +1897,8 @@
   [1m15.  MythWeather[0m
 
   The MythWeather module will obtain the weather information for the
-  location that you specify.
+  location that you specify.  You must be running the CVS version of
+  MythTV in order to use MythWeather.
 
   Change into the MythWeather directory, then make and make install:
 
@@ -2271,6 +2272,9 @@
 
   # fuser -v /dev/dsp
 
+  To disable aRts in KDE, go to KDE->Control Center->Sound->Sound System
+  and uncheck the "Start aRts soundserver on KDE startup" box.
+
   If you're using multiple sound cards and multiple tuners, use
   alsamixer -c 1 to work with the second sound card.  The first card is
   #0, the second card is #1, etc.
@@ -2318,6 +2322,7 @@
   MythTV is not dependent on any particular window manager.  If you wish
   to run a lightweight window manager, the configfiles/ directory has an
   example of a .twmrc file you may use.
+
   [1m18.3.  I'd like MythTV to automatically startup.[0m
 
   Here's an example submitted to the mythtv-dev list by Pat Pflaum
@@ -2378,6 +2383,7 @@
   720x240 is possible, but isn't a good tradeoff relative to the number
   of vertical lines lost.  In a PAL country, the you would use values
   like 720x576 or x288.
+
   The higher resolutions will be more CPU intensive. If the CPU is
   overtaxed, frames will be dropped causing uneven motion. You will
   likely see the best results at resolutions which average at least 10%
@@ -2488,9 +2494,9 @@
   lose all of your settings and will need to re-run the mc.sql script to
   setup the database structure before running the setup program.
 
-       $ mysql -u root
-       mysql> drop database mythconverg;
-       mysql> quit
+  $ mysql -u root
+  mysql> drop database mythconverg;
+  mysql> quit
 
   [1m18.7.  I'd like to start using the development version of MythTV.[0m
 

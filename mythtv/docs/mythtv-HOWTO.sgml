@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-02-16, v1.095
+<date>2003-02-18, v1.097
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1786,7 +1786,8 @@ your particular system.
 
 <sect>MythWeather
 <p>The MythWeather module will obtain the weather information for the
-location that you specify.
+location that you specify.  You must be running the CVS version of MythTV
+in order to use MythWeather.
 
 Change into the MythWeather directory, then make and make install:
 <tscreen><verb>
@@ -2176,6 +2177,8 @@ If you wish to see what application is grabbing a resource, you can use the
 # fuser -v /dev/dsp
 </verb></tscreen>
 
+To disable aRts in KDE, go to KDE->Control Center->Sound->Sound System and
+uncheck the "Start aRts soundserver on KDE startup" box.
 
 If you're using multiple sound cards and multiple tuners, use <tt>alsamixer
 -c 1</tt> to work with the second sound card.  The first card is #0, the
@@ -2622,6 +2625,9 @@ not symlinking correctly.
 v1.094, 2003-02-15.  Added note about -devel .rpms
 v1.095, 2003-02-16.  Updated XMLTV version.  v0.5.7 fixes NA problems,
 v0.5.8 fixes UK problems.
+v1.096, 2003-02-17.  Added text to MythWeather that it only works with
+MythTV v0.8.
+v1.097, 2003-02-18.  Explicit instructions on disabling arts in KDE.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
