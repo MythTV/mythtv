@@ -1269,7 +1269,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             rpos = (rpos + 1) % MAXVBUFFER;
         pthread_mutex_unlock(&video_buflock);
 
-        sched_yield();
+        //sched_yield();
     }
 
     delete [] pause_buf;
