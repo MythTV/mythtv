@@ -560,7 +560,7 @@
     </message>
     <message>
         <source>Do not record this proram</source>
-        <translation>Não gravar este programa</translation>
+        <translation type="obsolete">Não gravar este programa</translation>
     </message>
     <message>
         <source>Record only this showing</source>
@@ -588,23 +588,23 @@
     </message>
     <message>
         <source>Record only this showing of the program</source>
-        <translation>Gravar este programa apenas esta vez</translation>
+        <translation type="obsolete">Gravar este programa apenas esta vez</translation>
     </message>
     <message>
         <source>Record this program in this timeslot every day</source>
-        <translation>Gravar este programa neste período de tempo todos os dias</translation>
+        <translation type="obsolete">Gravar este programa neste período de tempo todos os dias</translation>
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown on this channel</source>
-        <translation>Gravar este programa sempre que apareça neste canal</translation>
+        <translation type="obsolete">Gravar este programa sempre que apareça neste canal</translation>
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown anywhere</source>
-        <translation>Gravar este programa sempre que esteja programado</translation>
+        <translation type="obsolete">Gravar este programa sempre que esteja programado</translation>
     </message>
     <message>
         <source>Record this program in this timeslot every week</source>
-        <translation>Gravar este programa neste período de tempo todas as semanas</translation>
+        <translation type="obsolete">Gravar este programa neste período de tempo todas as semanas</translation>
     </message>
     <message>
         <source>Profile</source>
@@ -748,10 +748,6 @@
     </message>
     <message>
         <source>Automatically Skip Commercials</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Automatically skip commercial breaks that have been flagged during Automatic Commercial Flagging or by the mythcommflag program.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1911,6 +1907,38 @@
         <source>General playback (part 2)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Commercial: %1 seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pre-Roll Minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Post-Roll Minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notify, but do not skip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically Skip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically skip commercial breaks that have been flagged during Automatic Commercial Flagging or by the mythcommflag program, or just notify that a commercial has been detected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UDP Notify Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If this is set to a port number, MythTV will listen during playback for connections from the &apos;mythtvosd&apos; or &apos;mythudprelay&apos; for events.  See the README in contrib/mythnotify/ for more details.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RankPrograms</name>
@@ -2216,6 +2244,46 @@
     </message>
     <message>
         <source>Hue (REC) %1 %</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Commercial Auto-Skip OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Commercial Auto-Skip ON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Commercial Auto-Skip to Notify</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t Auto Expire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Expire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Cancelar</translation>
+    </message>
+    <message>
+        <source>Auto-Skip OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-Skip ON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-Skip Notify</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -565,7 +565,7 @@
     </message>
     <message>
         <source>Do not record this proram</source>
-        <translation>No gravar aquest programa</translation>
+        <translation type="obsolete">No gravar aquest programa</translation>
     </message>
     <message>
         <source>Record only this showing</source>
@@ -593,23 +593,23 @@
     </message>
     <message>
         <source>Record only this showing of the program</source>
-        <translation>Grava aquest programa només aquesta vegada</translation>
+        <translation type="obsolete">Grava aquest programa només aquesta vegada</translation>
     </message>
     <message>
         <source>Record this program in this timeslot every day</source>
-        <translation>Grava aquest programa in aquesta hora cada dia</translation>
+        <translation type="obsolete">Grava aquest programa in aquesta hora cada dia</translation>
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown on this channel</source>
-        <translation>Grava aquest programa sempre que el trobi en aquest canal</translation>
+        <translation type="obsolete">Grava aquest programa sempre que el trobi en aquest canal</translation>
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown anywhere</source>
-        <translation>Grava aquest programa sempre que el trobi</translation>
+        <translation type="obsolete">Grava aquest programa sempre que el trobi</translation>
     </message>
     <message>
         <source>Record this program in this timeslot every week</source>
-        <translation>Grava aquest programa en aquesta hora cada setmana</translation>
+        <translation type="obsolete">Grava aquest programa en aquesta hora cada setmana</translation>
     </message>
     <message>
         <source>Profile</source>
@@ -825,7 +825,7 @@
     </message>
     <message>
         <source>Automatically skip commercial breaks that have been flagged during Automatic Commercial Flagging or by the mythcommflag program.</source>
-        <translation>Saltar-se els anuncis trobats a la detecció automàtica o amb el programa mythcommflag.</translation>
+        <translation type="obsolete">Saltar-se els anuncis trobats a la detecció automàtica o amb el programa mythcommflag.</translation>
     </message>
     <message>
         <source>Automatically Flag Commercials</source>
@@ -1912,6 +1912,38 @@
         <source>General playback (part 2)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Commercial: %1 seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pre-Roll Minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Post-Roll Minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notify, but do not skip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically Skip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically skip commercial breaks that have been flagged during Automatic Commercial Flagging or by the mythcommflag program, or just notify that a commercial has been detected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UDP Notify Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If this is set to a port number, MythTV will listen during playback for connections from the &apos;mythtvosd&apos; or &apos;mythudprelay&apos; for events.  See the README in contrib/mythnotify/ for more details.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RankPrograms</name>
@@ -2217,6 +2249,46 @@
     </message>
     <message>
         <source>Hue (REC) %1 %</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Commercial Auto-Skip OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Commercial Auto-Skip ON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Commercial Auto-Skip to Notify</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t Auto Expire</source>
+        <translation type="unfinished">No auto-expira</translation>
+    </message>
+    <message>
+        <source>Auto Expire</source>
+        <translation type="unfinished">Auto-expira</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Cancel·lar</translation>
+    </message>
+    <message>
+        <source>Auto-Skip OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-Skip ON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-Skip Notify</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

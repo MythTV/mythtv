@@ -382,7 +382,7 @@
     </message>
     <message>
         <source>Do not record this proram</source>
-        <translation>Optag ikke dette program</translation>
+        <translation type="obsolete">Optag ikke dette program</translation>
     </message>
     <message>
         <source>Record only this showing</source>
@@ -410,23 +410,23 @@
     </message>
     <message>
         <source>Record only this showing of the program</source>
-        <translation>Optag kun denne sending af udsendelsen</translation>
+        <translation type="obsolete">Optag kun denne sending af udsendelsen</translation>
     </message>
     <message>
         <source>Record this program in this timeslot every day</source>
-        <translation>Optag denne udsendelse på dette klokkeslet hver dag</translation>
+        <translation type="obsolete">Optag denne udsendelse på dette klokkeslet hver dag</translation>
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown on this channel</source>
-        <translation>Optag denne udsendelse når den vises på denne kanal</translation>
+        <translation type="obsolete">Optag denne udsendelse når den vises på denne kanal</translation>
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown anywhere</source>
-        <translation>Optag denne udsendelse nårsomhelst, hvorsomhelst</translation>
+        <translation type="obsolete">Optag denne udsendelse nårsomhelst, hvorsomhelst</translation>
     </message>
     <message>
         <source>Record this program in this timeslot every week</source>
-        <translation>Optag denne udsendelse på dette klokkeslet hver uge</translation>
+        <translation type="obsolete">Optag denne udsendelse på dette klokkeslet hver uge</translation>
     </message>
     <message>
         <source>Profile</source>
@@ -754,7 +754,7 @@
     </message>
     <message>
         <source>Automatically skip commercial breaks that have been flagged during Automatic Commercial Flagging or by the mythcommflag program.</source>
-        <translation>Hopper automatisk over reklameblokke der er blevet markeret af automatick reklame markering eller via mythcommflag programmet.</translation>
+        <translation type="obsolete">Hopper automatisk over reklameblokke der er blevet markeret af automatick reklame markering eller via mythcommflag programmet.</translation>
     </message>
     <message>
         <source>Automatically Flag Commercials</source>
@@ -1841,6 +1841,38 @@
         <source>General playback (part 2)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Commercial: %1 seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pre-Roll Minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Post-Roll Minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notify, but do not skip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically Skip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically skip commercial breaks that have been flagged during Automatic Commercial Flagging or by the mythcommflag program, or just notify that a commercial has been detected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UDP Notify Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If this is set to a port number, MythTV will listen during playback for connections from the &apos;mythtvosd&apos; or &apos;mythudprelay&apos; for events.  See the README in contrib/mythnotify/ for more details.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RankPrograms</name>
@@ -2123,6 +2155,46 @@
     </message>
     <message>
         <source>Hue (REC) %1 %</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Commercial Auto-Skip OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Commercial Auto-Skip ON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Commercial Auto-Skip to Notify</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t Auto Expire</source>
+        <translation type="unfinished">Unlad auto-udløb</translation>
+    </message>
+    <message>
+        <source>Auto Expire</source>
+        <translation type="unfinished">Auto-udløb</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Afbryd</translation>
+    </message>
+    <message>
+        <source>Auto-Skip OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-Skip ON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-Skip Notify</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

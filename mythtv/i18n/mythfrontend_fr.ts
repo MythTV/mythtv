@@ -506,7 +506,7 @@
     </message>
     <message>
         <source>Do not record this proram</source>
-        <translation>Ne pas enregistrer ce programme</translation>
+        <translation type="obsolete">Ne pas enregistrer ce programme</translation>
     </message>
     <message>
         <source>Record only this showing</source>
@@ -534,23 +534,23 @@
     </message>
     <message>
         <source>Record only this showing of the program</source>
-        <translation>Enregistrer seulement cette instance du programme</translation>
+        <translation type="obsolete">Enregistrer seulement cette instance du programme</translation>
     </message>
     <message>
         <source>Record this program in this timeslot every day</source>
-        <translation>Enregistrer ce programme chaque jour à ce créneau horaire</translation>
+        <translation type="obsolete">Enregistrer ce programme chaque jour à ce créneau horaire</translation>
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown on this channel</source>
-        <translation>Enregistrer ce programme à chaque apparition sur cette station</translation>
+        <translation type="obsolete">Enregistrer ce programme à chaque apparition sur cette station</translation>
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown anywhere</source>
-        <translation>Enregistrer ce programme à chaque apparition</translation>
+        <translation type="obsolete">Enregistrer ce programme à chaque apparition</translation>
     </message>
     <message>
         <source>Record this program in this timeslot every week</source>
-        <translation>Enregistrer ce programme chaque semaine à ce créneau horaire</translation>
+        <translation type="obsolete">Enregistrer ce programme chaque semaine à ce créneau horaire</translation>
     </message>
     <message>
         <source>Profile</source>
@@ -566,7 +566,7 @@
     </message>
     <message>
         <source>Allow recording even if duplicate episodE</source>
-        <translation>Enregistrer même si copie en double</translation>
+        <translation type="obsolete">Enregistrer même si copie en double</translation>
     </message>
     <message>
         <source>Allow recordings to be Auto-Expired</source>
@@ -763,10 +763,6 @@
     <message>
         <source>Automatically Skip Commercials</source>
         <translation>Automatiquement sauter les commerciaux</translation>
-    </message>
-    <message>
-        <source>Automatically skip commercial breaks that have been flagged during Automatic Commercial Flagging or by the mythcommflag program.</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Automatically Flag Commercials</source>
@@ -1813,6 +1809,42 @@
         <source>General playback (part 2)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Commercial: %1 seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow recording even if duplicate episode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pre-Roll Minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Post-Roll Minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notify, but do not skip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically Skip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically skip commercial breaks that have been flagged during Automatic Commercial Flagging or by the mythcommflag program, or just notify that a commercial has been detected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UDP Notify Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If this is set to a port number, MythTV will listen during playback for connections from the &apos;mythtvosd&apos; or &apos;mythudprelay&apos; for events.  See the README in contrib/mythnotify/ for more details.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RankPrograms</name>
@@ -2118,6 +2150,46 @@
     </message>
     <message>
         <source>Hue (REC) %1 %</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Commercial Auto-Skip OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Commercial Auto-Skip ON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Commercial Auto-Skip to Notify</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t Auto Expire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Expire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
+    </message>
+    <message>
+        <source>Auto-Skip OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-Skip ON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-Skip Notify</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
