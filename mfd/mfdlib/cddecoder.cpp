@@ -372,7 +372,7 @@ AudioMetadata* CdDecoder::getMetadata(int track)
 {
 
     QString artist = "", album = "", title = "", genre = "";
-    int year = 0, length = 0;
+    int year = 0, length = 0, size = 0;
     
     tracknum = track;
 
@@ -448,6 +448,7 @@ AudioMetadata* CdDecoder::getMetadata(int track)
     length = discinfo.disc_track[tracknum - 1].track_length.minutes * 60 +
              discinfo.disc_track[tracknum - 1].track_length.seconds;
     length = length < 0 ? 0 : length;
+    size = length * 176400;
     length *= 1000;
 
     if (artist.lower().left(7) == "various")
@@ -471,6 +472,20 @@ AudioMetadata* CdDecoder::getMetadata(int track)
                                                 tracknum, 
                                                 length
                                               );
+
+    //
+    //  Set some other information we can glean about the track
+    //
+
+    retdata->setTrackCount(discinfo.disc_total_tracks);
+    if(discdata.data_artist_type == CDINDEX_MULTIPLE_ARTIST)
+    {
+        retdata->setCompilation(true);
+    }
+    retdata->setComment("Served by a Myth Box");
+    retdata->setSampleRate(44100);
+    retdata->setBitrate((176400 * 8.0) / 1024);
+    retdata->setSize(size);
 
     cd_finish(cd);
     return retdata;

@@ -260,8 +260,8 @@ class Playlist
     void             addToList(int an_id);
     void             mapDatabaseToId(QIntDict<Metadata> *the_metadata);    
     uint             getCollectionId(){return collection_id;}    
-    bool             waitingForList(){ return waiting_for_list; }
-    void             waitingForList(bool uh_huh_or_nope_not_me){waiting_for_list = uh_huh_or_nope_not_me;}
+    bool             internalChange(){ return internal_change; }
+    void             internalChange(bool uh_huh_or_nope_not_me){internal_change = uh_huh_or_nope_not_me;}
     
   private:
   
@@ -270,7 +270,7 @@ class Playlist
     QValueList<uint> db_references;
     uint             id;
     uint             collection_id;
-    bool             waiting_for_list;
+    bool             internal_change;
 };
 
 #endif

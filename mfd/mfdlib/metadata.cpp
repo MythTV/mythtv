@@ -202,7 +202,8 @@ Playlist::Playlist(int l_collection_id, QString new_name, QString raw_songlist, 
             db_references.append((*it).toUInt());
         }
     }
-    waiting_for_list = false;
+
+    internal_change = false;
 }
 
 void Playlist::mapDatabaseToId(QIntDict<Metadata> *the_metadata)

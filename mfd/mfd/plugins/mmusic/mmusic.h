@@ -76,6 +76,7 @@ class MMusicWatcher: public MFDServicePlugin
     bool            updateMetadata(AudioMetadata* an_item);
     AudioMetadata*  getMetadataFromFile(QString file_path);
     void            persistMetadata(AudioMetadata* an_item);
+    void            updatePlaylists();
 
   private:
 
@@ -88,6 +89,7 @@ class MMusicWatcher: public MFDServicePlugin
 
     QIntDict<Metadata>  *new_metadata;
     QIntDict<Playlist>  *new_playlists;
+    QIntDict<Playlist>  *internal_playlists;
     
     MetadataServer      *metadata_server;
     MetadataContainer   *metadata_container;
