@@ -6,6 +6,11 @@
 #include <qcheckbox.h>
 #include <qvgroupbox.h>
 #include <qapplication.h>
+#include <qlistview.h>
+#include <qheader.h>
+
+#include <iostream>
+using namespace std;
 
 #include "infodialog.h"
 #include "infostructs.h"
@@ -14,6 +19,21 @@
 #include "mythcontext.h"
 
 using namespace libmyth;
+
+class RecListItem : public QListViewItem
+{
+  public:
+    RecListItem(QListView *parent, QString text, RecordingType type)
+               : QListViewItem(parent, text)
+             { m_type = type; }
+
+   ~RecListItem() { }
+
+    RecordingType GetType(void) { return m_type; }
+ 
+  private:
+    RecordingType m_type;
+};
 
 InfoDialog::InfoDialog(MythContext *context, ProgramInfo *pginfo, 
                        QWidget *parent, const char *name)
@@ -35,20 +55,28 @@ InfoDialog::InfoDialog(MythContext *context, ProgramInfo *pginfo,
     setFont(QFont("Arial", (int)(mediumfont * hmult), QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
+    m_context->ThemeWidget(this, screenwidth, screenheight, wmult, hmult);
+
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
     QGridLayout *grid = new QGridLayout(vbox, 4, 2, (int)(10 * wmult));
     
     QLabel *titlefield = new QLabel(pginfo->title, this);
+    titlefield->setBackgroundOrigin(WindowOrigin);
     titlefield->setFont(QFont("Arial", (int)(bigfont * hmult), QFont::Bold));
 
     QLabel *date = getDateLabel(pginfo);
+    date->setBackgroundOrigin(WindowOrigin);
 
     QLabel *subtitlelabel = new QLabel("Episode:", this);
+    subtitlelabel->setBackgroundOrigin(WindowOrigin);
     QLabel *subtitlefield = new QLabel(pginfo->subtitle, this);
+    subtitlefield->setBackgroundOrigin(WindowOrigin);
     subtitlefield->setAlignment(Qt::WordBreak | Qt::AlignLeft | Qt::AlignTop);
     QLabel *descriptionlabel = new QLabel("Description:", this);
+    descriptionlabel->setBackgroundOrigin(WindowOrigin);
     QLabel *descriptionfield = new QLabel(pginfo->description, this);
+    descriptionfield->setBackgroundOrigin(WindowOrigin);
     descriptionfield->setAlignment(Qt::WordBreak | Qt::AlignLeft | 
                                    Qt::AlignTop);
 
@@ -71,15 +99,40 @@ InfoDialog::InfoDialog(MythContext *context, ProgramInfo *pginfo,
     f->setLineWidth((int)(4 * hmult));
     vbox->addWidget(f);    
 
-    QVBoxLayout *middleBox = new QVBoxLayout(vbox);
+    recordstatus = pginfo->GetProgramRecordingStatus();
 
-    norec = new QCheckBox("Don't record this program", this);
-    middleBox->addWidget(norec);
-    connect(norec, SIGNAL(clicked()), this, SLOT(norecPressed()));
+    if (recordstatus == kTimeslotRecord && programtype == 0)
+    {
+        cerr << "error, somehow set to record timeslot and it doesn't seem to "
+                "have one\n";
+        recordstatus = kSingleRecord;
+    }
 
-    recone = new QCheckBox("Record only this showing of the program", this);
-    middleBox->addWidget(recone);
-    connect(recone, SIGNAL(clicked()), this, SLOT(reconePressed()));
+    RecListItem *selectItem = NULL;
+
+    lview = new QListView(this);
+    lview->addColumn("Selections");
+    lview->setColumnWidth(0, (int)(750 * wmult));
+    lview->setSorting(-1, false);
+    lview->setAllColumnsShowFocus(true);
+    lview->setItemMargin((int)(hmult * mediumfont / 2));
+    lview->setFixedHeight((int)(225 * hmult));
+    lview->header()->hide();
+
+    connect(lview, SIGNAL(returnPressed(QListViewItem *)), this,
+            SLOT(selected(QListViewItem *)));
+    connect(lview, SIGNAL(spacePressed(QListViewItem *)), this,
+            SLOT(selected(QListViewItem *)));
+
+    RecListItem *item = new RecListItem(lview, "Record this program whenever "
+                                        "it's shown anywhere", kAllRecord);
+    if (recordstatus == kAllRecord)
+        selectItem = item;
+
+    item = new RecListItem(lview, "Record this program whenever it's shown "
+                                  "on this channel", kChannelRecord);
+    if (recordstatus == kChannelRecord)
+        selectItem = item;
 
     programtype = pginfo->IsProgramRecurring();
 
@@ -88,45 +141,27 @@ InfoDialog::InfoDialog(MythContext *context, ProgramInfo *pginfo,
         msg = "Record this program in this timeslot every day";
     else if (programtype == 2)
         msg = "Record this program in this timeslot every week";
-    rectimeslot = new QCheckBox(msg, this);
     if (programtype != 0)
     {
-        middleBox->addWidget(rectimeslot);
-        connect(rectimeslot, SIGNAL(clicked()), this, 
-                SLOT(rectimeslotPressed()));
-    }
-    else
-        rectimeslot->hide();
-
-    recchannel = new QCheckBox("Record this program whenever it's shown on this channel", this);
-    middleBox->addWidget(recchannel);
-    connect(recchannel, SIGNAL(clicked()), this, SLOT(recchannelPressed()));
-
-    recevery = new QCheckBox("Record this program whenever it's shown anywhere", this);
-    middleBox->addWidget(recevery);
-    connect(recevery, SIGNAL(clicked()), this, SLOT(receveryPressed()));
-
-    vbox->activate();
-
-    recordstatus = pginfo->GetProgramRecordingStatus();
-
-    if (recordstatus == kTimeslotRecord && programtype == 0)
-    {
-        printf("error, somehow set to record timeslot and it doesn't seem to have one\n");
-        recordstatus = kSingleRecord;
+        item = new RecListItem(lview, msg, kTimeslotRecord);
+        if (recordstatus == kTimeslotRecord)
+            selectItem = item;
     }
 
+    item = new RecListItem(lview, "Record only this showing of the program",
+                           kSingleRecord);
     if (recordstatus == kSingleRecord)
-        recone->setChecked(true);
-    else if (recordstatus == kTimeslotRecord)
-        rectimeslot->setChecked(true);
-    else if (recordstatus == kChannelRecord)
-        recchannel->setChecked(true);
-    else if (recordstatus == kAllRecord)
-        recevery->setChecked(true);
-    else
-        norec->setChecked(true);
-    
+        selectItem = item;
+
+    item = new RecListItem(lview, "Don't record this program", kNotRecording);
+    if (selectItem == NULL)
+        selectItem = item;
+
+    vbox->addWidget(lview, 0);
+
+    lview->setCurrentItem(selectItem);
+    lview->setSelected(selectItem, true);
+ 
     myinfo = pginfo;
      
     showFullScreen();
@@ -154,115 +189,31 @@ QLabel *InfoDialog::getDateLabel(ProgramInfo *pginfo)
     return date;
 }
 
-void InfoDialog::norecPressed(void)
-{
-    if (!norec->isChecked())
-        norec->setChecked(true);
-
-    if (recone->isChecked())
-        recone->setChecked(false);
-    if (rectimeslot->isChecked())
-        rectimeslot->setChecked(false);
-    if (recevery->isChecked())
-        recevery->setChecked(false);
-    if (recchannel->isChecked())
-        recchannel->setChecked(false);
-}
-
-void InfoDialog::reconePressed(void)
-{
-    if (!recone->isChecked())
-    {
-        norec->setChecked(true);
-    }
-    else
-    {
-        if (norec->isChecked())
-            norec->setChecked(false);
-        if (rectimeslot->isChecked())
-            rectimeslot->setChecked(false);
-        if (recchannel->isChecked())
-            recchannel->setChecked(false);
-        if (recevery->isChecked())
-            recevery->setChecked(false);
-    }
-}
-
-void InfoDialog::rectimeslotPressed(void)
-{
-    if (!rectimeslot->isChecked())
-    {
-        norec->setChecked(true);
-    }
-    else
-    {
-        if (norec->isChecked())
-            norec->setChecked(false);
-        if (recone->isChecked())
-            recone->setChecked(false);
-        if (recchannel->isChecked())
-            recchannel->setChecked(false);
-        if (recevery->isChecked())
-            recevery->setChecked(false);
-    }
-}
-
-void InfoDialog::recchannelPressed(void)
-{   
-    if (!recchannel->isChecked())
-    {
-        norec->setChecked(true);
-    }
-    else 
-    {
-        if (norec->isChecked())
-            norec->setChecked(false);
-        if (recone->isChecked())
-            recone->setChecked(false);
-        if (rectimeslot->isChecked())
-            rectimeslot->setChecked(false);
-        if (recevery->isChecked())
-            recevery->setChecked(false);
-    }
-}
-
-void InfoDialog::receveryPressed(void)
-{
-    if (!recevery->isChecked())
-    {
-        norec->setChecked(true);
-    }
-    else 
-    {
-        if (norec->isChecked())
-            norec->setChecked(false);
-        if (recone->isChecked())
-            recone->setChecked(false);
-        if (rectimeslot->isChecked())
-            rectimeslot->setChecked(false);
-        if (recchannel->isChecked())
-            recchannel->setChecked(false);
-    }
-}
-
 void InfoDialog::hideEvent(QHideEvent *e)
 {
-    okPressed();
+    selected(NULL);
     QDialog::hideEvent(e);
 }
 
-void InfoDialog::okPressed(void)
+void InfoDialog::selected(QListViewItem *selitem)
 {
     RecordingType currentSelected = kNotRecording;
-    if (recone->isChecked())
-        currentSelected = kSingleRecord;
-    else if (rectimeslot->isChecked())
-        currentSelected = kTimeslotRecord;
-    else if (recchannel->isChecked())
-        currentSelected = kChannelRecord;
-    else if (recevery->isChecked())
-        currentSelected = kAllRecord;
+
+    QListViewItem *item = lview->firstChild();
+
+    while (item && item != lview->currentItem())
+        item = item->nextSibling();
+
+    if (!item)
+        item = lview->firstChild();    
+
+    RecListItem *realitem = (RecListItem *)item;
+
+    currentSelected = realitem->GetType();
 
     if (currentSelected != recordstatus)
         myinfo->ApplyRecordStateChange(currentSelected);   
+
+    if (selitem)
+        accept();
 }

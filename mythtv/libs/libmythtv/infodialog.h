@@ -9,6 +9,8 @@
 class QLabel;
 class QCheckBox;
 class MythContext;
+class QListView;
+class QListViewItem;
 
 namespace libmyth
 {
@@ -21,30 +23,21 @@ class InfoDialog : public QDialog
                QWidget *parent = 0, const char *name = 0);
 
   protected slots:
-    void norecPressed(void);
-    void reconePressed(void);
-    void rectimeslotPressed(void);
-    void recchannelPressed(void);
-    void receveryPressed(void);
+    void selected(QListViewItem *);
 
   protected:
     void hideEvent(QHideEvent *e);
 
   private:
-    void okPressed(void);
     QLabel *getDateLabel(ProgramInfo *pginfo);
   
-    QCheckBox *norec;
-    QCheckBox *recone;
-    QCheckBox *rectimeslot;
-    QCheckBox *recchannel;
-    QCheckBox *recevery;
-
     int programtype;
     RecordingType recordstatus;
     ProgramInfo *myinfo;
 
     MythContext *m_context;
+
+    QListView *lview;
 };
 
 }
