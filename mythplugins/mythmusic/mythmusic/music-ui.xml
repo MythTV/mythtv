@@ -194,7 +194,7 @@
         -->
 
         <container name="trackinfo">
-            <area>0,315,800,160</area>
+            <area>0,315,680,160</area>
 
 
             <textarea name="title_text" draworder="1" align="left">
@@ -218,6 +218,7 @@
             <repeatedimage name="ratings_image" draworder="1" fleximage="no">
                 <filename>mm_rating.png</filename>
                 <position>270,105</position>
+                <orientation>LeftToRight</orientation>
             </repeatedimage>
 
             <textarea name="info_text" draworder="1" align="left">
@@ -234,6 +235,25 @@
                 <area>135,20,122,124</area>
             </blackhole>
 
+        </container>
+
+        <!--
+
+            On screen volume display
+
+        -->
+
+        <container name="volumedisplay">
+            <area>690,315,40,160</area>
+            <image name="volume_background" draworder="-1" fleximage="no">
+                <filename>mm_volume_background.png</filename>
+                <position>0,0</position>
+            </image>
+            <repeatedimage name="volume_ticks" draworder="1" fleximage="no">
+                <filename>mm_volume_tick.png</filename>
+                <position>5,152</position>
+                <orientation>BottomToTop</orientation>
+            </repeatedimage>
         </container>
 
         <!--

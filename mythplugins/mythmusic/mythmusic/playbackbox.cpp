@@ -73,6 +73,19 @@ PlaybackBox::PlaybackBox(QString window_name,
     wireUpTheme();
 
     //
+    //  Possibly (user-defined) control the volume
+    //
+    
+    volume_control = NULL;
+    volume_display_timer = new QTimer();
+    if(gContext->GetNumSetting("MythControlsVolume", 0))
+    {
+        volume_control = new VolumeControl(true);
+        volume_display_timer->start(2000);
+        connect(volume_display_timer, SIGNAL(timeout()), this, SLOT(hideVolume()));
+    }
+    
+    //
     //  Figure out the shuffle mode
     //
 
@@ -148,6 +161,7 @@ PlaybackBox::PlaybackBox(QString window_name,
     if(visual_mode_delay > 0)
     {
         visual_mode_timer->start(visual_mode_delay * 1000);
+        connect(visual_mode_timer, SIGNAL(timeout()), this, SLOT(visEnable()));
     }
     visualizer_status = 1;
 
@@ -176,6 +190,8 @@ PlaybackBox::PlaybackBox(QString window_name,
 void PlaybackBox::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
+
+    resetTimer();
 
     switch (e->key())
     {
@@ -228,6 +244,18 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
             break;
         case Key_6:
             CycleVisualizer();
+            handled = true;
+            break;
+        case '[':
+            changeVolume(false);
+            handled = true;
+            break;
+        case ']':
+            changeVolume(true);
+            handled = true;
+            break;
+        case '|':
+            toggleMute();
             handled = true;
             break;
     }
@@ -356,21 +384,59 @@ PlaybackBox::~PlaybackBox(void)
     stopAll();
 }
 
-/*
+void PlaybackBox::changeVolume(bool up_or_down)
+{
+    if(volume_control)
+    {
+        if(up_or_down)
+        {
+            volume_control->AdjustCurrentVolume(2);
+        }
+        else
+        {
+            volume_control->AdjustCurrentVolume(-2);
+        }
+        showVolume(true);
+    }
+}
+
+void PlaybackBox::toggleMute()
+{
+    if(volume_control)
+    {
+        volume_control->ToggleMute();
+        showVolume(true);
+    }
+}
+
+void PlaybackBox::showVolume(bool on_or_off)
+{
+    if(volume_control)
+    {
+        if(volume_ticks && volume_background)
+        {
+            if(on_or_off)
+            {
+                volume_background->SetOrder(0);
+                volume_ticks->setRepeat(volume_control->GetCurrentVolume() / 2);
+                volume_background->refresh();
+                volume_display_timer->changeInterval(2000);
+            }
+            else
+            {
+                volume_background->SetOrder(-1);
+                volume_ticks->setRepeat(0);
+                volume_background->refresh();
+            }
+        }
+    }
+}
+
 void PlaybackBox::resetTimer()
 {
     if (visual_mode_delay > 0)
         visual_mode_timer->changeInterval(visual_mode_delay * 1000);
 }
-
-void PlaybackBox::restartTimer()
-{
-    if (visual_mode_delay > 0)
-    {
-        visual_mode_timer->start(visual_mode_delay * 1000);
-    }
-}
-*/
 
 void PlaybackBox::play()
 {
@@ -482,7 +548,7 @@ void PlaybackBox::visEnable()
 {
     if (!visualizer_status != 2 && isplaying)
     {
-        visual_mode_timer->stop();
+        //visual_mode_timer->stop();
         mainvisual->setGeometry(0, 0, screenwidth, screenheight);
         visualizer_status = 2;
     }
@@ -1179,6 +1245,12 @@ void PlaybackBox::wireUpTheme()
         cerr << "playbackbox.o: Couldn't find a repeated image called ratings_image in your theme" << endl;
         exit(0);
     }
+
+    //
+    //  Ticks for volume display
+    //  (but don't complain if we can't find it)
+    volume_ticks = getUIRepeatedImageType("volume_ticks");
+    volume_background = getUIImageType("volume_background");
     
     //
     //  Black Hole for visualizer

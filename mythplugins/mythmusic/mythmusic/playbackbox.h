@@ -7,6 +7,7 @@
 
 #include <mythtv/mythwidgets.h>
 #include <mythtv/dialogbox.h>
+#include <mythtv/volumecontrol.h>
 
 #include "mainvisual.h"
 #include "metadata.h"
@@ -63,6 +64,11 @@ class PlaybackBox : public MythThemedDialog
     void checkForPlaylists();
     void handleTreeListSignals(int, IntVector*);
     void visEnable();
+    void changeVolume(bool up_or_down);
+    void toggleMute();
+    void resetTimer();
+    void hideVolume(){showVolume(false);}
+    void showVolume(bool on_or_off);
     
   signals:
   
@@ -122,12 +128,15 @@ class PlaybackBox : public MythThemedDialog
     PlaylistsContainer *all_playlists;
 
     QTimer  *waiting_for_playlists_timer;
+    QTimer  *volume_display_timer;
 
     GenericTree *playlist_tree;
 
     bool cycle_visualizer;
     bool show_whole_tree;
     bool keyboard_accelerators;
+
+    VolumeControl   *volume_control;
 
     //
     //  Theme-related "widgets"
@@ -142,6 +151,8 @@ class PlaybackBox : public MythThemedDialog
     UITextType            *info_text;
     
     UIRepeatedImageType   *ratings_image;
+    UIRepeatedImageType   *volume_ticks;
+    UIImageType           *volume_background;
     UIBlackHoleType       *visual_blackhole;
 
     UIPushButtonType      *prev_button;
