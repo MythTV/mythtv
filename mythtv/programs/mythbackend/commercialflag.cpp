@@ -171,7 +171,7 @@ void CommercialFlagger::DoFlagCommercialsThread(void)
 
     QString msg = QString( "Started Commercial Flagging for '%1' recorded from "
                            "channel %2 at %3" )
-                           .arg(program_info->title.utf8())
+                           .arg(program_info->title.local8Bit())
                            .arg(program_info->chanid)
                            .arg(program_info->startts.toString());
     VERBOSE( VB_GENERAL, msg );
@@ -181,13 +181,13 @@ void CommercialFlagger::DoFlagCommercialsThread(void)
     if ( *(flaggingSems[key]) )
         msg = QString( "ABORTED Commercial Flagging for '%1' recorded from "
                        "channel %2 at %3" )
-                       .arg(program_info->title.utf8())
+                       .arg(program_info->title.local8Bit())
                        .arg(program_info->chanid)
                        .arg(program_info->startts.toString());
     else
         msg = QString( "Finished Commercial Flagging for '%1' recorded from "
                        "channel %2 at %3.  Found %4 commercial break(s)." )
-                       .arg(program_info->title.utf8())
+                       .arg(program_info->title.local8Bit())
                        .arg(program_info->chanid)
                        .arg(program_info->startts.toString())
                        .arg(breaksFound);

@@ -658,8 +658,7 @@ void ScheduledRecording::setDefault(QSqlDatabase *db, bool haschannel)
     autoexpire->setValue(gContext->GetNumSetting("AutoExpireDefault", 0));
 
     recgroup->fillSelections(db);    
-    recgroup->setValue(QObject::tr("Default"));
-
+    recgroup->setValue("Default");
 }
 
 void ScheduledRecording::setProgram(ProgramInfo *proginfo)

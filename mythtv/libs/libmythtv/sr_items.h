@@ -598,7 +598,7 @@ class SRRecGroup: public SRSelectSetting
             : SRSelectSetting(_parent, "recgroupList", QString("[ %1 ]").arg(QObject::tr("Select Recording Group")), 
                               _group, "recgroup", _list ) 
         {
-            setValue(QObject::tr("Default"));
+            setValue("Default");
             _parent.setRecGroupObj(this);
         }
     
@@ -609,7 +609,7 @@ class SRRecGroup: public SRSelectSetting
         
         virtual QString getValue(void) const {
             if(settingValue == "__NEW_GROUP__")
-                return QObject::tr("Default");
+                return QString("Default");
             else
                 return settingValue;
         }    
@@ -619,11 +619,10 @@ class SRRecGroup: public SRSelectSetting
             addButton(QString("[ %1 ]").arg(QObject::tr("Create a new recording group")), "__NEW_GROUP__");
             connect(selectItem, SIGNAL(buttonPressed(ManagedListItem*, ManagedListItem*)), this, SLOT(showNewRecGroup()));
             
-            addSelection("Store in the \"Default\" recording group", QObject::tr("Default"), false);
+            addSelection(QString(QObject::tr("Store in the \"%1\" recording group")).arg(QObject::tr("Default")), "Default", false);
     
             QString thequery = QString("SELECT DISTINCT recgroup from recorded "
-                                       "WHERE recgroup <> '%1'")
-                                       .arg(QString("Default"));
+                                       "WHERE recgroup <> 'Default'");
             QSqlQuery query = db->exec(thequery);
     
             if (query.isActive() && query.numRowsAffected() > 0)
@@ -632,16 +631,13 @@ class SRRecGroup: public SRSelectSetting
                                  query.value(0).toString(), false);
     
             thequery = QString("SELECT DISTINCT recgroup from record "
-                               "WHERE recgroup <> '%1'")
-                               .arg(QString("Default"));
+                               "WHERE recgroup <> 'Default'");
             query = db->exec(thequery);
     
             if (query.isActive() && query.numRowsAffected() > 0)
                 while (query.next())
                     addSelection(QString(QObject::tr("Store in the \"%1\" recording group")).arg(query.value(0).toString()),
                                  query.value(0).toString(), false);
-                                 
-            
         }
         
         

@@ -32,6 +32,7 @@ ProgramInfo::ProgramInfo(void)
     pathname = "";
     filesize = 0;
     hostname = "";
+    programflags = 0;
 
     startts = QDateTime::currentDateTime();
     endts = startts;
@@ -444,7 +445,8 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
                        "subtitle,description,channel.channum, "
                        "channel.callsign,channel.name,channel.commfree, "
                        "channel.outputfilters,seriesid,programid,filesize, "
-                       "lastmodified,stars,previouslyshown,originalairdate "
+                       "lastmodified,stars,previouslyshown,originalairdate, "
+                       "hostname "
                        "FROM recorded "
                        "LEFT JOIN channel "
                        "ON recorded.chanid = channel.chanid "
@@ -495,6 +497,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
             proginfo->originalAirDate = QDate::fromString(query.value(17).toString(),
                                                           Qt::ISODate);
 
+        proginfo->hostname = query.value(18).toString();
 
         proginfo->spread = -1;
 
@@ -1364,7 +1367,8 @@ void ProgramInfo::GetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
     if (query.isActive() && query.numRowsAffected() > 0)
     {
         while(query.next())
-            marks[query.value(0).toInt()] = query.value(1).toInt();
+            marks[stringToLongLong(query.value(0).toString())] =
+                  query.value(1).toInt();
     }
 }
 
@@ -1409,16 +1413,8 @@ void ProgramInfo::GetPositionMap(QMap<long long, long long> &posMap, int type,
     if (query.isActive() && query.numRowsAffected() > 0)
     {
         while (query.next())
-        {
-            QString val = query.value(1).toString();
-            if (val != QString::null)
-            {
-                long long offset = 0;
-                sscanf(val.ascii(), "%lld", &offset);
-
-                posMap[query.value(0).toInt()] = offset;
-            }
-        }
+            posMap[stringToLongLong(query.value(0).toString())] =
+                   stringToLongLong(query.value(1).toString());
     }
 }
 
