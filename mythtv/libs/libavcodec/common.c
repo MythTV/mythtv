@@ -44,18 +44,11 @@ const uint8_t ff_log2_tab[256]={
         7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7
 };
 
-void init_put_bits(PutBitContext *s, 
-                   uint8_t *buffer, int buffer_size,
-                   void *opaque,
-                   void (*write_data)(void *, uint8_t *, int))
+void init_put_bits(PutBitContext *s, uint8_t *buffer, int buffer_size)
 {
     s->buf = buffer;
     s->buf_end = s->buf + buffer_size;
     s->data_out_size = 0;
-    if(write_data!=NULL) 
-    {
-    	fprintf(stderr, "write Data callback is not supported\n");
-    }
 #ifdef ALT_BITSTREAM_WRITER
     s->index=0;
     ((uint32_t*)(s->buf))[0]=0;
@@ -392,30 +385,4 @@ void free_vlc(VLC *vlc)
 int64_t ff_gcd(int64_t a, int64_t b){
     if(b) return ff_gcd(b, a%b);
     else  return a;
-}
-
-void ff_float2fraction(int *nom_arg, int *denom_arg, double f, int max){
-    double best_diff=1E10, diff;
-    int best_denom=1, best_nom=1;
-    int nom, denom, gcd;
-    
-    //brute force here, perhaps we should try continued fractions if we need large max ...
-    for(denom=1; denom<=max; denom++){
-        nom= (int)(f*denom + 0.5);
-        if(nom<=0 || nom>max) continue;
-        
-        diff= ABS( f - (double)nom / (double)denom );
-        if(diff < best_diff){
-            best_diff= diff;
-            best_nom= nom;
-            best_denom= denom;
-        }
-    }
-    
-    gcd= ff_gcd(best_nom, best_denom);
-    best_nom   /= gcd;
-    best_denom /= gcd;
-
-    *nom_arg= best_nom;
-    *denom_arg= best_denom;
 }

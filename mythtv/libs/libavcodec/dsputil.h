@@ -41,6 +41,7 @@ void ff_jpeg_fdct_islow (DCTELEM *data);
 void j_rev_dct (DCTELEM *data);
 
 void ff_fdct_mmx(DCTELEM *block);
+void ff_fdct_mmx2(DCTELEM *block);
 
 /* encoding scans */
 extern const uint8_t ff_alternate_horizontal_scan[64];
@@ -234,6 +235,11 @@ typedef struct DSPContext {
     /* huffyuv specific */
     void (*add_bytes)(uint8_t *dst/*align 16*/, uint8_t *src/*align 16*/, int w);
     void (*diff_bytes)(uint8_t *dst/*align 16*/, uint8_t *src1/*align 16*/, uint8_t *src2/*align 1*/,int w);
+    /**
+     * subtract huffyuv's variant of median prediction
+     * note, this might read from src1[-1], src2[-1]
+     */
+    void (*sub_hfyu_median_prediction)(uint8_t *dst, uint8_t *src1, uint8_t *src2, int w, int *left, int *left_top);
     void (*bswap_buf)(uint32_t *dst, uint32_t *src, int w);
     
     /* (I)DCT */

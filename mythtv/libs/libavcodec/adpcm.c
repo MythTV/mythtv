@@ -21,9 +21,10 @@
 /**
  * @file adpcm.c
  * ADPCM codecs.
- * First version by Francois Revol revol@free.fr
- * Fringe ADPCM codecs (e.g., DK3 and DK4) 
+ * First version by Francois Revol (revol@free.fr)
+ * Fringe ADPCM codecs (e.g., DK3, DK4, Westwood)
  *   by Mike Melanson (melanson@pcisys.net)
+ * CD-ROM XA ADPCM codec by BERO
  *
  * Features and limitations:
  *
@@ -34,6 +35,11 @@
  * XAnim sources (xa_codec.c) http://www.rasnaimaging.com/people/lapus/download.html
  * http://www.cs.ucla.edu/~leec/mediabench/applications.html
  * SoX source code http://home.sprynet.com/~cbagwell/sox.html
+ *
+ * CD-ROM XA:
+ * http://ku-www.ss.titech.ac.jp/~yatsushi/xaadpcm.html
+ * vagpack & depack http://homepages.compuserve.de/bITmASTER32/psx-index.html
+ * readstr http://www.geocities.co.jp/Playtown/2004/
  */
 
 #define BLKSIZE 1024
@@ -67,7 +73,7 @@ static const int step_table[89] = {
     15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767
 };
 
-/* Those are for MS-ADPCM */
+/* These are for MS-ADPCM */
 /* AdaptationTable[], AdaptCoeff1[], and AdaptCoeff2[] are from libsndfile */
 static const int AdaptationTable[] = {
         230, 230, 230, 230, 307, 409, 512, 614,
@@ -80,6 +86,15 @@ static const int AdaptCoeff1[] = {
 
 static const int AdaptCoeff2[] = {
         0, -256, 0, 64, 0, -208, -232
+};
+
+/* These are for CD-ROM XA ADPCM */
+static const int xa_adpcm_table[5][2] = {
+   {   0,   0 },
+   {  60,   0 },
+   { 115, -52 },
+   {  98, -55 },
+   { 122, -60 }
 };
 
 /* end of tables */
@@ -107,6 +122,7 @@ typedef struct ADPCMContext {
 
 /* XXX: implement encoding */
 
+#ifdef CONFIG_ENCODERS
 static int adpcm_encode_init(AVCodecContext *avctx)
 {
     if (avctx->channels > 2)
@@ -219,7 +235,7 @@ static int adpcm_encode_frame(AVCodecContext *avctx,
             *dst++ = 0; /* unknown */
             samples++;
             if (avctx->channels == 2) {
-                c->status[1].prev_sample = (signed short)samples[0];
+                c->status[1].prev_sample = (signed short)samples[1];
 /*                c->status[1].step_index = 0; */
                 *dst++ = (c->status[1].prev_sample) & 0xFF;
                 *dst++ = (c->status[1].prev_sample >> 8) & 0xFF;
@@ -265,6 +281,7 @@ static int adpcm_encode_frame(AVCodecContext *avctx,
     }
     return dst - frame;
 }
+#endif //CONFIG_ENCODERS
 
 static int adpcm_decode_init(AVCodecContext * avctx)
 {
@@ -352,6 +369,74 @@ static inline short adpcm_ms_expand_nibble(ADPCMChannelStatus *c, char nibble)
 
     return (short)predictor;
 }
+
+static void xa_decode(short *out, const unsigned char *in, 
+    ADPCMChannelStatus *left, ADPCMChannelStatus *right, int inc)
+{
+    int i, j;
+    int shift,filter,f0,f1;
+    int s_1,s_2;
+    int d,s,t;
+
+    for(i=0;i<4;i++) {
+
+        shift  = 12 - (in[4+i*2] & 15);
+        filter = in[4+i*2] >> 4;
+        f0 = xa_adpcm_table[filter][0];
+        f1 = xa_adpcm_table[filter][1];
+
+        s_1 = left->sample1;
+        s_2 = left->sample2;
+
+        for(j=0;j<28;j++) {
+            d = in[16+i+j*4];
+
+            t = (signed char)(d<<4)>>4;
+            s = ( t<<shift ) + ((s_1*f0 + s_2*f1+32)>>6);
+            CLAMP_TO_SHORT(s);
+            *out = s;
+            out += inc;
+            s_2 = s_1;
+            s_1 = s;
+        }
+
+        if (inc==2) { /* stereo */
+            left->sample1 = s_1;
+            left->sample2 = s_2;
+            s_1 = right->sample1;
+            s_2 = right->sample2;
+            out = out + 1 - 28*2;
+        }
+
+        shift  = 12 - (in[5+i*2] & 15);
+        filter = in[5+i*2] >> 4;
+
+        f0 = xa_adpcm_table[filter][0];
+        f1 = xa_adpcm_table[filter][1];
+
+        for(j=0;j<28;j++) {
+            d = in[16+i+j*4];
+
+            t = (signed char)d >> 4;
+            s = ( t<<shift ) + ((s_1*f0 + s_2*f1+32)>>6);
+            CLAMP_TO_SHORT(s);
+            *out = s;
+            out += inc;
+            s_2 = s_1;
+            s_1 = s;
+        }
+
+        if (inc==2) { /* stereo */
+            right->sample1 = s_1;
+            right->sample2 = s_2;
+            out -= 1;
+        } else {
+            left->sample1 = s_1;
+            left->sample2 = s_2;
+        }
+    }
+}
+
 
 /* DK3 ADPCM support macro */
 #define DK3_GET_NEXT_NIBBLE() \
@@ -658,6 +743,36 @@ static int adpcm_decode_frame(AVCodecContext *avctx,
             *samples++ = c->status[0].predictor - c->status[1].predictor;
         }
         break;
+    case CODEC_ID_ADPCM_IMA_WS:
+        /* no per-block initialization; just start decoding the data */
+        while (src < buf + buf_size) {
+
+            if (st) {
+                *samples++ = adpcm_ima_expand_nibble(&c->status[0], 
+                    (src[0] >> 4) & 0x0F);
+                *samples++ = adpcm_ima_expand_nibble(&c->status[1], 
+                    src[0] & 0x0F);
+            } else {
+                *samples++ = adpcm_ima_expand_nibble(&c->status[0], 
+                    (src[0] >> 4) & 0x0F);
+                *samples++ = adpcm_ima_expand_nibble(&c->status[0], 
+                    src[0] & 0x0F);
+            }
+
+            src++;
+        }
+        break;
+    case CODEC_ID_ADPCM_XA:
+        c->status[0].sample1 = c->status[0].sample2 = 
+        c->status[1].sample1 = c->status[1].sample2 = 0;
+        while (buf_size >= 128) {
+            xa_decode(samples, src, &c->status[0], &c->status[1], 
+                avctx->channels);
+            src += 128;
+            samples += 28 * 8;
+            buf_size -= 128;
+        }
+        break;
     default:
         *data_size = 0;
         return -1;
@@ -666,7 +781,10 @@ static int adpcm_decode_frame(AVCodecContext *avctx,
     return src - buf;
 }
 
-#define ADPCM_CODEC(id, name)                   \
+
+
+#ifdef CONFIG_ENCODERS
+#define ADPCM_ENCODER(id,name)                  \
 AVCodec name ## _encoder = {                    \
     #name,                                      \
     CODEC_TYPE_AUDIO,                           \
@@ -676,7 +794,13 @@ AVCodec name ## _encoder = {                    \
     adpcm_encode_frame,                         \
     adpcm_encode_close,                         \
     NULL,                                       \
-};                                              \
+};
+#else
+#define ADPCM_ENCODER(id,name)
+#endif
+
+#ifdef CONFIG_DECODERS
+#define ADPCM_DECODER(id,name)                  \
 AVCodec name ## _decoder = {                    \
     #name,                                      \
     CODEC_TYPE_AUDIO,                           \
@@ -687,12 +811,21 @@ AVCodec name ## _decoder = {                    \
     NULL,                                       \
     adpcm_decode_frame,                         \
 };
+#else
+#define ADPCM_DECODER(id,name)
+#endif
+
+#define ADPCM_CODEC(id, name)                   \
+ADPCM_ENCODER(id,name) ADPCM_DECODER(id,name)
 
 ADPCM_CODEC(CODEC_ID_ADPCM_IMA_QT, adpcm_ima_qt);
 ADPCM_CODEC(CODEC_ID_ADPCM_IMA_WAV, adpcm_ima_wav);
 ADPCM_CODEC(CODEC_ID_ADPCM_IMA_DK3, adpcm_ima_dk3);
 ADPCM_CODEC(CODEC_ID_ADPCM_IMA_DK4, adpcm_ima_dk4);
+ADPCM_CODEC(CODEC_ID_ADPCM_IMA_WS, adpcm_ima_ws);
 ADPCM_CODEC(CODEC_ID_ADPCM_MS, adpcm_ms);
 ADPCM_CODEC(CODEC_ID_ADPCM_4XM, adpcm_4xm);
+ADPCM_CODEC(CODEC_ID_ADPCM_XA, adpcm_xa);
+ADPCM_CODEC(CODEC_ID_ADPCM_ADX, adpcm_adx);
 
 #undef ADPCM_CODEC

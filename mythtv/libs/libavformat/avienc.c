@@ -24,6 +24,7 @@
  *  - fill all fields if non streamed (nb_frames for example)
  */
 
+#ifdef CONFIG_ENCODERS
 typedef struct AVIIentry {
     unsigned int flags, pos, len;
 } AVIIentry;
@@ -69,6 +70,7 @@ void end_tag(ByteIOContext *pb, offset_t start)
     put_le32(pb, (uint32_t)(pos - start));
     url_fseek(pb, pos, SEEK_SET);
 }
+#endif //CONFIG_ENCODERS
 
 /* Note: when encoding, the first matching tag is used, so order is
    important if multiple tags possible for a given codec. */
@@ -113,9 +115,6 @@ const CodecTag codec_bmp_tags[] = {
  
     { CODEC_ID_MSMPEG4V1, MKTAG('M', 'P', 'G', '4') }, 
 
-    /* added based on MPlayer */
-    { CODEC_ID_MSMPEG4V1, MKTAG('D', 'I', 'V', '4') }, 
-
     { CODEC_ID_WMV1, MKTAG('W', 'M', 'V', '1') }, 
 
     /* added based on MPlayer */
@@ -144,6 +143,15 @@ const CodecTag codec_bmp_tags[] = {
     { CODEC_ID_VCR1, MKTAG('V', 'C', 'R', '1') },
     { CODEC_ID_FFV1, MKTAG('F', 'F', 'V', '1') },
     { CODEC_ID_XAN_WC4, MKTAG('X', 'x', 'a', 'n') },
+    { CODEC_ID_MSRLE, MKTAG('m', 'r', 'l', 'e') },
+    { CODEC_ID_MSRLE, MKTAG(0x1, 0x0, 0x0, 0x0) },
+    { CODEC_ID_MSVIDEO1, MKTAG('M', 'S', 'V', 'C') },
+    { CODEC_ID_MSVIDEO1, MKTAG('m', 's', 'v', 'c') },
+    { CODEC_ID_MSVIDEO1, MKTAG('C', 'R', 'A', 'M') },
+    { CODEC_ID_MSVIDEO1, MKTAG('c', 'r', 'a', 'm') },
+    { CODEC_ID_MSVIDEO1, MKTAG('W', 'H', 'A', 'M') },
+    { CODEC_ID_MSVIDEO1, MKTAG('w', 'h', 'a', 'm') },
+    { CODEC_ID_CINEPAK, MKTAG('c', 'v', 'i', 'd') },
     { 0, 0 },
 };
 
@@ -200,6 +208,7 @@ enum CodecID codec_get_wav_id(unsigned int tag)
     return codec_get_id(codec_wav_tags, tag);
 }
 
+#ifdef CONFIG_ENCODERS
 /* BITMAPINFOHEADER header */
 void put_bmp_header(ByteIOContext *pb, AVCodecContext *enc, const CodecTag *tags, int for_asf)
 {
@@ -714,3 +723,4 @@ int avienc_init(void)
     av_register_output_format(&avi_oformat);
     return 0;
 }
+#endif //CONFIG_ENCODERS

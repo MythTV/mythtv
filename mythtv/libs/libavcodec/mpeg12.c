@@ -48,10 +48,12 @@
 #define MB_BTYPE_VLC_BITS 6
 #define TEX_VLC_BITS 9
 
+#ifdef CONFIG_ENCODERS
 static void mpeg1_encode_block(MpegEncContext *s, 
                          DCTELEM *block, 
                          int component);
 static void mpeg1_encode_motion(MpegEncContext *s, int val, int f_or_b_code);    // RAL: f_code parameter added
+#endif //CONFIG_ENCODERS
 static void mpeg1_skip_picture(MpegEncContext *s, int pict_num);
 static inline int mpeg1_decode_block_inter(MpegEncContext *s, 
                               DCTELEM *block, 
@@ -92,7 +94,7 @@ static uint32_t mpeg1_chr_dc_uni[512];
 
 static uint8_t mpeg1_index_run[2][64];
 static int8_t mpeg1_max_level[2][64];
-#endif
+#endif //CONFIG_ENCODERS
 
 static void init_2d_vlc_rl(RLTable *rl)
 {
@@ -195,10 +197,10 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
         int n, i;
         uint64_t time_code;
         float best_aspect_error= 1E10;
-        float aspect_ratio= s->avctx->aspect_ratio;
+        float aspect_ratio= av_q2d(s->avctx->sample_aspect_ratio);
         int constraint_parameter_flag;
         
-        if(aspect_ratio==0.0) aspect_ratio= s->width / (float)s->height; //pixel aspect 1:1 (VGA)
+        if(aspect_ratio==0.0) aspect_ratio= 1.0; //pixel aspect 1:1 (VGA)
         
         if (s->current_picture.key_frame) {
             /* mpeg1 header repeated every gop */
@@ -224,7 +226,12 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
             put_bits(&s->pb, 12, s->height);
             
             for(i=1; i<15; i++){
-                float error= mpeg1_aspect[i] - s->width/(s->height*aspect_ratio);
+                float error= aspect_ratio;
+                if(s->codec_id == CODEC_ID_MPEG1VIDEO || i <=1)
+                    error-= mpeg1_aspect[i];
+                else
+                    error-= av_q2d(mpeg2_aspect[i])*s->height/s->width;
+             
                 error= ABS(error);
                 
                 if(error < best_aspect_error){
@@ -255,15 +262,15 @@ static void mpeg1_encode_sequence_header(MpegEncContext *s)
             put_bits(&s->pb, 1, 1); /* marker */
             put_bits(&s->pb, 10, vbv_buffer_size & 0x3FF);
 
-            constraint_parameter_flag=
-                s->width <= 768 && s->height <= 576 &&
+            constraint_parameter_flag= 
+                s->width <= 768 && s->height <= 576 && 
                 s->mb_width * s->mb_height <= 396 &&
                 s->mb_width * s->mb_height * frame_rate_tab[s->frame_rate_index] <= MPEG1_FRAME_RATE_BASE*396*25 &&
                 frame_rate_tab[s->frame_rate_index] <= MPEG1_FRAME_RATE_BASE*30 &&
                 vbv_buffer_size <= 20 &&
                 v <= 1856000/400 &&
                 s->codec_id == CODEC_ID_MPEG1VIDEO;
-
+                
             put_bits(&s->pb, 1, constraint_parameter_flag);
             
             ff_write_quant_matrix(&s->pb, s->avctx->intra_matrix);
@@ -368,7 +375,7 @@ static void mpeg1_skip_picture(MpegEncContext *s, int pict_num)
     put_bits(&s->pb, 1, 1); 
     put_bits(&s->pb, 1, 1); 
 }
-#endif
+#endif //CONFIG_ENCODERS
 
 static void common_init(MpegEncContext *s)
 {
@@ -796,7 +803,9 @@ void ff_mpeg1_encode_init(MpegEncContext *s)
         s->max_qcoeff= 2047;
     }
     s->intra_ac_vlc_length=
-    s->inter_ac_vlc_length= uni_mpeg1_ac_vlc_len;
+    s->inter_ac_vlc_length=
+    s->intra_ac_vlc_last_length=
+    s->inter_ac_vlc_last_length= uni_mpeg1_ac_vlc_len;
 }
 
 static inline void encode_dc(MpegEncContext *s, int diff, int component)
@@ -1658,6 +1667,7 @@ typedef struct Mpeg1Context {
     MpegEncContext mpeg_enc_ctx;
     int mpeg_enc_ctx_allocated; /* true if decoding context allocated */
     int repeat_field; /* true if we must repeat the field */
+    AVPanScan pan_scan; /** some temporary storage for the panscan */
 } Mpeg1Context;
 
 static int mpeg_decode_init(AVCodecContext *avctx)
@@ -1744,7 +1754,6 @@ static void mpeg_decode_sequence_extension(MpegEncContext *s)
     int bit_rate_ext, vbv_buf_ext;
     int frame_rate_ext_n, frame_rate_ext_d;
     int level, profile;
-    float aspect;
 
     skip_bits(&s->gb, 1); /* profil and level esc*/
     profile= get_bits(&s->gb, 3);
@@ -1776,12 +1785,69 @@ static void mpeg_decode_sequence_extension(MpegEncContext *s)
     s->codec_id= s->avctx->codec_id= CODEC_ID_MPEG2VIDEO;
     s->avctx->sub_id = 2; /* indicates mpeg2 found */
 
-    aspect= mpeg2_aspect[s->aspect_ratio_info];
-    if(aspect>0.0)      s->avctx->aspect_ratio= s->width/(aspect*s->height);
-    else if(aspect<0.0) s->avctx->aspect_ratio= -1.0/aspect;
+    if(s->aspect_ratio_info <= 1)
+        s->avctx->sample_aspect_ratio= mpeg2_aspect[s->aspect_ratio_info];
+    else{
+        s->avctx->sample_aspect_ratio= 
+            av_div_q(
+                mpeg2_aspect[s->aspect_ratio_info], 
+                (AVRational){s->width, s->height}
+            );
+    }
     
     if(s->avctx->debug & FF_DEBUG_PICT_INFO)
         printf("profile: %d, level: %d \n", profile, level);
+}
+
+static void mpeg_decode_sequence_display_extension(Mpeg1Context *s1)
+{
+    MpegEncContext *s= &s1->mpeg_enc_ctx;
+    int color_description, w, h;
+
+    skip_bits(&s->gb, 3); /* video format */
+    color_description= get_bits1(&s->gb);
+    if(color_description){
+        skip_bits(&s->gb, 8); /* color primaries */
+        skip_bits(&s->gb, 8); /* transfer_characteristics */
+        skip_bits(&s->gb, 8); /* matrix_coefficients */
+    }
+    w= get_bits(&s->gb, 14);
+    skip_bits(&s->gb, 1); //marker
+    h= get_bits(&s->gb, 14);
+    skip_bits(&s->gb, 1); //marker
+    
+    s1->pan_scan.width= 16*w;
+    s1->pan_scan.height=16*h;
+
+    if(s->aspect_ratio_info > 1)
+        s->avctx->sample_aspect_ratio= 
+            av_div_q(
+                mpeg2_aspect[s->aspect_ratio_info], 
+                (AVRational){w, h}
+            );
+    
+    if(s->avctx->debug & FF_DEBUG_PICT_INFO)
+        printf("sde w:%d, h:%d\n", w, h);
+}
+
+static void mpeg_decode_picture_display_extension(Mpeg1Context *s1)
+{
+    MpegEncContext *s= &s1->mpeg_enc_ctx;
+    int i;
+
+    for(i=0; i<1; i++){ //FIXME count
+        s1->pan_scan.position[i][0]= get_sbits(&s->gb, 16);
+        skip_bits(&s->gb, 1); //marker
+        s1->pan_scan.position[i][1]= get_sbits(&s->gb, 16);
+        skip_bits(&s->gb, 1); //marker
+    }
+   
+    if(s->avctx->debug & FF_DEBUG_PICT_INFO)
+        printf("pde (%d,%d) (%d,%d) (%d,%d)\n", 
+            s1->pan_scan.position[0][0], s1->pan_scan.position[0][1], 
+            s1->pan_scan.position[1][0], s1->pan_scan.position[1][1], 
+            s1->pan_scan.position[2][0], s1->pan_scan.position[2][1]
+        );
 }
 
 static void mpeg_decode_quant_matrix_extension(MpegEncContext *s)
@@ -1884,15 +1950,18 @@ static void mpeg_decode_extension(AVCodecContext *avctx,
     ext_type = get_bits(&s->gb, 4);
     switch(ext_type) {
     case 0x1:
-        /* sequence ext */
         mpeg_decode_sequence_extension(s);
         break;
+    case 0x2:
+        mpeg_decode_sequence_display_extension(s1);
+        break;
     case 0x3:
-        /* quant matrix extension */
         mpeg_decode_quant_matrix_extension(s);
         break;
+    case 0x7:
+        mpeg_decode_picture_display_extension(s1);
+        break;
     case 0x8:
-        /* picture extension */
         mpeg_decode_picture_coding_extension(s);
         break;
     }
@@ -1956,6 +2025,9 @@ static int mpeg_decode_slice(AVCodecContext *avctx,
                 s->current_picture_ptr->repeat_pict = 1;
             }
         }         
+
+        *s->current_picture_ptr->pan_scan= s1->pan_scan;
+
         //printf("%d\n", s->current_picture_ptr->repeat_pict);
 
         if(s->avctx->debug&FF_DEBUG_PICT_INFO){
@@ -1997,8 +2069,8 @@ static int mpeg_decode_slice(AVCodecContext *avctx,
 #ifdef HAVE_VIASLICE
     if (s->avctx->via_hwslice){
         int used = VIA_decode_slice(s, start_code + 1, *buf, buf_size);
-       *buf += used - 1;
-       return 0;
+        *buf += used - 1;
+        return 0;
     }
 #endif
 
@@ -2209,7 +2281,7 @@ static int mpeg1_decode_sequence(AVCodecContext *avctx,
     s->aspect_ratio_info= get_bits(&s->gb, 4);
     if(s->codec_id == CODEC_ID_MPEG1VIDEO){
         aspect= mpeg1_aspect[s->aspect_ratio_info];
-        if(aspect!=0.0) avctx->aspect_ratio= width/(aspect*height);
+        if(aspect!=0.0) avctx->sample_aspect_ratio= av_d2q(aspect, 255);
     }
 
     s->frame_rate_index = get_bits(&s->gb, 4);

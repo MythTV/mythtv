@@ -127,10 +127,48 @@ typedef struct InternalBuffer{
 
 #define INTERNAL_BUFFER_SIZE 32
 
+#define ALIGN(x, a) (((x)+(a)-1)&~((a)-1))
+
+void avcodec_align_dimensions(AVCodecContext *s, int *width, int *height){
+    int w_align= 1;    
+    int h_align= 1;    
+    
+    switch(s->pix_fmt){
+    case PIX_FMT_YUV420P:
+    case PIX_FMT_YUV422:
+    case PIX_FMT_YUV422P:
+    case PIX_FMT_YUV444P:
+    case PIX_FMT_GRAY8:
+    case PIX_FMT_YUVJ420P:
+    case PIX_FMT_YUVJ422P:
+    case PIX_FMT_YUVJ444P:
+        w_align= 16; //FIXME check for non mpeg style codecs and use less alignment
+        h_align= 16;
+        break;
+    case PIX_FMT_YUV411P:
+        w_align=32;
+        h_align=8;
+        break;
+    case PIX_FMT_YUV410P:
+        if(s->codec_id == CODEC_ID_SVQ1){
+            w_align=64;
+            h_align=64;
+        }
+        break;
+    default:
+        w_align= 1;
+        h_align= 1;
+        break;
+    }
+
+    *width = ALIGN(*width , w_align);
+    *height= ALIGN(*height, h_align);
+}
+
 int avcodec_default_get_buffer(AVCodecContext *s, AVFrame *pic){
     int i;
-    const int width = s->width;
-    const int height= s->height;
+    int w= s->width;
+    int h= s->height;
     InternalBuffer *buf;
     
     assert(pic->data[0]==NULL);
@@ -153,10 +191,11 @@ int avcodec_default_get_buffer(AVCodecContext *s, AVFrame *pic){
         pic->age= pic->coded_picture_number - buf->last_pic_num;
         buf->last_pic_num= pic->coded_picture_number;
     }else{
-        int align, h_chroma_shift, v_chroma_shift;
-        int w, h, pixel_size;
+        int h_chroma_shift, v_chroma_shift;
+        int s_align, pixel_size;
         
         avcodec_get_chroma_sub_sample(s->pix_fmt, &h_chroma_shift, &v_chroma_shift);
+        
         switch(s->pix_fmt){
         case PIX_FMT_RGB555:
         case PIX_FMT_RGB565:
@@ -173,13 +212,14 @@ int avcodec_default_get_buffer(AVCodecContext *s, AVFrame *pic){
         default:
             pixel_size=1;
         }
-        
-        if(s->codec_id==CODEC_ID_SVQ1) align=63;
-        else                           align=15;
-    
-        w= (width +align)&~align;
-        h= (height+align)&~align;
-    
+
+        avcodec_align_dimensions(s, &w, &h);
+#if defined(ARCH_POWERPC) || defined(HAVE_MMI) //FIXME some cleaner check
+        s_align= 16;
+#else
+        s_align= 8;
+#endif
+            
         if(!(s->flags&CODEC_FLAG_EMU_EDGE)){
             w+= EDGE_WIDTH*2;
             h+= EDGE_WIDTH*2;
@@ -191,7 +231,7 @@ int avcodec_default_get_buffer(AVCodecContext *s, AVFrame *pic){
             const int h_shift= i==0 ? 0 : h_chroma_shift;
             const int v_shift= i==0 ? 0 : v_chroma_shift;
 
-            pic->linesize[i]= pixel_size*w>>h_shift;
+            pic->linesize[i]= ALIGN(pixel_size*w>>h_shift, s_align);
 
             buf->base[i]= av_mallocz((pic->linesize[i]*h>>v_shift)+16); //FIXME 16
             if(buf->base[i]==NULL) return -1;
@@ -200,7 +240,7 @@ int avcodec_default_get_buffer(AVCodecContext *s, AVFrame *pic){
             if(s->flags&CODEC_FLAG_EMU_EDGE)
                 buf->data[i] = buf->base[i];
             else
-                buf->data[i] = buf->base[i] + (pic->linesize[i]*EDGE_WIDTH>>v_shift) + (EDGE_WIDTH>>h_shift);
+                buf->data[i] = buf->base[i] + ALIGN((pic->linesize[i]*EDGE_WIDTH>>v_shift) + (EDGE_WIDTH>>h_shift), s_align);
         }
         pic->age= 256*256*256*64;
         pic->type= FF_BUFFER_TYPE_INTERNAL;
@@ -272,6 +312,9 @@ void avcodec_get_context_defaults(AVCodecContext *s){
     s->release_buffer= avcodec_default_release_buffer;
     s->get_format= avcodec_default_get_format;
     s->me_subpel_quality=8;
+    s->lmin= FF_QP2LAMBDA * s->qmin;
+    s->lmax= FF_QP2LAMBDA * s->qmax;
+    s->sample_aspect_ratio= (AVRational){0,1};
     
     s->intra_quant_bias= FF_DEFAULT_QUANT_BIAS;
     s->inter_quant_bias= FF_DEFAULT_QUANT_BIAS;
@@ -641,7 +684,7 @@ char av_get_pict_type_char(int pict_type){
 
 int av_reduce(int *dst_nom, int *dst_den, int64_t nom, int64_t den, int64_t max){
     int exact=1, sign=0;
-    int64_t gcd, larger;
+    int64_t gcd;
 
     assert(den != 0);
 
@@ -655,21 +698,33 @@ int av_reduce(int *dst_nom, int *dst_den, int64_t nom, int64_t den, int64_t max)
         sign= 1;
     }
     
-    for(;;){ //note is executed 1 or 2 times 
-        gcd = ff_gcd(nom, den);
-        nom /= gcd;
-        den /= gcd;
+    gcd = ff_gcd(nom, den);
+    nom /= gcd;
+    den /= gcd;
     
-        larger= FFMAX(nom, den);
-    
-        if(larger > max){
-            int64_t div= (larger + max - 1) / max;
-            nom =  (nom + div/2)/div;
-            den =  (den + div/2)/div;
-            exact=0;
-        }else 
-            break;
+    if(nom > max || den > max){
+        AVRational a0={0,1}, a1={1,0};
+        exact=0;
+
+        for(;;){
+            int64_t x= nom / den;
+            int64_t a2n= x*a1.num + a0.num;
+            int64_t a2d= x*a1.den + a0.den;
+
+            if(a2n > max || a2d > max) break;
+
+            nom %= den;
+        
+            a0= a1;
+            a1= (AVRational){a2n, a2d};
+            if(nom==0) break;
+            x= nom; nom=den; den=x;
+        }
+        nom= a1.num;
+        den= a1.den;
     }
+    
+    assert(ff_gcd(nom, den) == 1);
     
     if(sign) nom= -nom;
     

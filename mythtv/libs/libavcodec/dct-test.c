@@ -14,6 +14,7 @@
 
 #include "i386/mmx.h"
 #include "simple_idct.h"
+#include "faandct.h"
 
 #ifndef MAX
 #define MAX(a, b)  (((a) > (b)) ? (a) : (b))
@@ -160,7 +161,11 @@ void dct_error(const char *name, int is_idct,
         fdct_func(block);
         emms(); /* for ff_mmx_idct */
 
-        if (fdct_func == fdct_ifast) {
+        if (fdct_func == fdct_ifast 
+#ifndef FAAN_POSTSCALE        
+            || fdct_func == ff_faandct
+#endif
+            ) {
             for(i=0; i<64; i++) {
                 scale = 8*(1 << (AANSCALE_BITS + 11)) / aanscales[i];
                 block[i] = (block[i] * scale /*+ (1<<(AANSCALE_BITS-1))*/) >> AANSCALE_BITS;
@@ -479,6 +484,7 @@ int main(int argc, char **argv)
             dct_error("IJG-AAN-INT", 0, fdct_ifast, fdct, test);
             dct_error("IJG-LLM-INT", 0, ff_jpeg_fdct_islow, fdct, test);
             dct_error("MMX", 0, ff_fdct_mmx, fdct, test);
+            dct_error("FAAN", 0, ff_faandct, fdct, test);
         } else {
             dct_error("REF-DBL", 1, idct, idct, test);
             dct_error("INT", 1, j_rev_dct, idct, test);

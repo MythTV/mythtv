@@ -301,9 +301,9 @@ typedef struct MpegEncContext {
     int mb_num;                ///< number of MBs of a picture 
     int linesize;              ///< line size, in bytes, may be different from width 
     int uvlinesize;            ///< line size, for chroma in bytes, may be different from width 
-    Picture picture[MAX_PICTURE_COUNT]; ///< main picture buffer 
-    Picture *input_picture[MAX_PICTURE_COUNT]; ///< next pictures on display order for encoding
-    Picture *reordered_input_picture[MAX_PICTURE_COUNT]; ///< pointer to the next pictures in codedorder for encoding
+    Picture *picture;          ///< main picture buffer 
+    Picture **input_picture;   ///< next pictures on display order for encoding
+    Picture **reordered_input_picture; ///< pointer to the next pictures in codedorder for encoding
     
     /** 
      * copy of the previous picture structure.
@@ -331,7 +331,6 @@ typedef struct MpegEncContext {
     
     Picture *last_picture_ptr;     ///< pointer to the previous picture.
     Picture *next_picture_ptr;     ///< pointer to the next picture (for bidir pred) 
-    Picture *new_picture_ptr;      ///< pointer to the source picture for encoding 
     Picture *current_picture_ptr;  ///< pointer to the current picture
     int last_dc[3];                ///< last DC values for MPEG1 
     int16_t *dc_val[3];            ///< used for mpeg4 DC prediction, all 3 arrays must be continuous 
@@ -354,7 +353,9 @@ typedef struct MpegEncContext {
     uint8_t *edge_emu_buffer;     ///< points into the middle of allocated_edge_emu_buffer  
 
     int qscale;                 ///< QP 
-    float frame_qscale;         ///< qscale from the frame level rc FIXME remove
+    int lambda;                 ///< lagrange multipler used in rate distortion
+    int lambda2;                ///< (lambda*lambda) >> FF_LAMBDA_SHIFT 
+    int *lambda_table;
     int adaptive_quant;         ///< use adaptive quantization 
     int dquant;                 ///< qscale difference to prev qscale  
     int pict_type;              ///< I_TYPE, P_TYPE, B_TYPE, ... 
@@ -453,14 +454,14 @@ typedef struct MpegEncContext {
     uint8_t *chroma_dc_vlc_length;
 #define UNI_AC_ENC_INDEX(run,level) ((run)*128 + (level))
 
+    int coded_score[6];
+
     /** precomputed matrix (combine qscale and DCT renorm) */
-    int __align8 q_intra_matrix[32][64];
-    int __align8 q_inter_matrix[32][64];
-    /** identical to the above but for MMX & these are not permutated */
-    uint16_t __align8 q_intra_matrix16[32][64];
-    uint16_t __align8 q_inter_matrix16[32][64];
-    uint16_t __align8 q_intra_matrix16_bias[32][64];
-    uint16_t __align8 q_inter_matrix16_bias[32][64];
+    int (*q_intra_matrix)[64];
+    int (*q_inter_matrix)[64];
+    /** identical to the above but for MMX & these are not permutated, second 64 entries are bias*/
+    uint16_t (*q_intra_matrix16)[2][64];
+    uint16_t (*q_inter_matrix16)[2][64];
     int block_last_index[6];  ///< last non zero coefficient in block
     /* scantables */
     ScanTable __align8 intra_scantable;
@@ -551,8 +552,6 @@ typedef struct MpegEncContext {
     int new_pred;
     int reduced_res_vop;
     int aspect_ratio_info; //FIXME remove
-    int aspected_width;    //FIXME remove
-    int aspected_height;   //FIXME remove
     int sprite_warping_accuracy;
     int low_latency_sprite;
     int data_partitioning;           ///< data partitioning flag from header 
@@ -562,6 +561,7 @@ typedef struct MpegEncContext {
     int low_delay;                   ///< no reordering needed / has no b-frames 
     int vo_type;
     int vol_control_parameters;      ///< does the stream contain the low_delay flag, used to workaround buggy encoders 
+    int intra_dc_threshold;          ///< QP above whch the ac VLC should be used for intra dc 
     PutBitContext tex_pb;            ///< used for data partitioned VOPs 
     PutBitContext pb2;               ///< used for data partitioned VOPs 
 #define PB_BUFFER_SIZE 1024*256
@@ -657,7 +657,7 @@ typedef struct MpegEncContext {
     uint8_t *ptr_lastgob;
     
     DCTELEM (*block)[64]; ///< points to one of the following blocks 
-    DCTELEM blocks[2][6][64] __align8; // for HQ mode we need to keep the best block
+    DCTELEM (*blocks)[6][64]; // for HQ mode we need to keep the best block
     int (*decode_mb)(struct MpegEncContext *s, DCTELEM block[6][64]); // used by some codecs to avoid a switch()
 #define SLICE_OK         0
 #define SLICE_ERROR     -1

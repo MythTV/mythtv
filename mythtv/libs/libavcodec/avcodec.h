@@ -12,10 +12,11 @@ extern "C" {
 #endif
 
 #include "common.h"
+#include "rational.h"
 
 #define FFMPEG_VERSION_INT     0x000408
 #define FFMPEG_VERSION         "0.4.8"
-#define LIBAVCODEC_BUILD       4680
+#define LIBAVCODEC_BUILD       4687
 
 #define LIBAVCODEC_VERSION_INT FFMPEG_VERSION_INT
 #define LIBAVCODEC_VERSION     FFMPEG_VERSION
@@ -39,6 +40,7 @@ enum CodecID {
     CODEC_ID_MJPEG,
     CODEC_ID_MJPEGB,
     CODEC_ID_LJPEG,
+    CODEC_ID_SP5X,
     CODEC_ID_MPEG4,
     CODEC_ID_RAWVIDEO,
     CODEC_ID_MSMPEG4V1,
@@ -62,6 +64,7 @@ enum CodecID {
     CODEC_ID_H264,
     CODEC_ID_INDEO3,
     CODEC_ID_VP3,
+    CODEC_ID_THEORA,
     CODEC_ID_AAC,
     CODEC_ID_MPEG4AAC,
     CODEC_ID_ASV1,
@@ -75,6 +78,12 @@ enum CodecID {
     CODEC_ID_INTERPLAY_VIDEO,
     CODEC_ID_XAN_WC3,
     CODEC_ID_XAN_WC4,
+    CODEC_ID_RPZA,
+    CODEC_ID_CINEPAK,
+    CODEC_ID_WS_VQA,
+    CODEC_ID_MSRLE,
+    CODEC_ID_MSVIDEO1,
+    CODEC_ID_IDCIN,
 
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE,
@@ -91,11 +100,16 @@ enum CodecID {
     CODEC_ID_ADPCM_IMA_WAV,
     CODEC_ID_ADPCM_IMA_DK3,
     CODEC_ID_ADPCM_IMA_DK4,
+    CODEC_ID_ADPCM_IMA_WS,
     CODEC_ID_ADPCM_MS,
     CODEC_ID_ADPCM_4XM,
+    CODEC_ID_ADPCM_XA,
+    CODEC_ID_ADPCM_ADX,
 
 	/* AMR */
     CODEC_ID_AMR_NB,
+    CODEC_ID_AMR_WB,
+
     /* RealAudio codecs*/
     CODEC_ID_RA_144,
     CODEC_ID_RA_288,
@@ -128,7 +142,10 @@ enum CodecType {
  * image data is stored in AVFrame.data[0]. The palette is transported in
  * AVFrame.data[1] and, is 1024 bytes long (256 4-byte entries) and is
  * formatted the same as in PIX_FMT_RGBA32 described above (i.e., it is
- * also endian-specific).
+ * also endian-specific). Note also that the individual RGB palette
+ * components stored in AVFrame.data[1] should be in the range 0..255.
+ * This is important as many custom PAL8 video codecs that were designed
+ * to run on the IBM VGA graphics adapter use 6-bit palette components.
  */
 enum PixelFormat {
     PIX_FMT_YUV420P,   ///< Planar YUV 4:2:0 (1 Cr & Cb sample per 2x2 Y samples)
@@ -192,8 +209,9 @@ typedef struct RcOverride{
 extern int motion_estimation_method;
 
 /* ME algos sorted by quality */
-static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG, 
-                                       ME_X1, ME_EPZS, ME_FULL };
+//FIXME remove IMHO
+static const __attribute__((unused)) int Motion_Est_QTab[] =
+ { ME_ZERO, ME_PHODS, ME_LOG, ME_X1, ME_EPZS, ME_FULL };
 
 
 #define FF_MAX_B_FRAMES 8
@@ -207,6 +225,7 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
 #define CODEC_FLAG_4MV    0x0004  ///< 4 MV per MB allowed 
 #define CODEC_FLAG_QPEL   0x0010  ///< use qpel MC 
 #define CODEC_FLAG_GMC    0x0020  ///< use GMC 
+#define CODEC_FLAG_MV0    0x0040  ///< always try a MB with MV=<0,0> 
 #define CODEC_FLAG_PART   0x0080  ///< use data partitioning 
 /* parent program gurantees that the input for b-frame containing streams is not written to 
    for at least s->max_b_frames+1 frames, if this is not set than the input will be copied */
@@ -227,8 +246,10 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
 #define CODEC_FLAG_GLOBAL_HEADER  0x00400000 ///< place global headers in extradata instead of every keyframe 
 #define CODEC_FLAG_BITEXACT       0x00800000 ///< use only bitexact stuff (except (i)dct) 
 /* Fx : Flag for h263+ extra options */
-#define CODEC_FLAG_H263P_AIC      0x01000000 ///< Advanced intra coding 
+#define CODEC_FLAG_H263P_AIC      0x01000000 ///< H263 Advanced intra coding / MPEG4 AC prediction (remove this)
+#define CODEC_FLAG_AC_PRED        0x01000000 ///< H263 Advanced intra coding / MPEG4 AC prediction
 #define CODEC_FLAG_H263P_UMV      0x02000000 ///< Unlimited motion vector  
+#define CODEC_FLAG_CBP_RD         0x04000000 ///< use rate distortion optimization for cbp
 /* For advanced prediction mode, we reuse the 4MV flag */
 /* Unsupported options :
  * 		Syntax Arithmetic coding (SAC)
@@ -251,6 +272,34 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
    used */
 #define CODEC_CAP_PARSE_ONLY      0x0004
 #define CODEC_CAP_TRUNCATED       0x0008
+
+/**
+ * Pan Scan area.
+ * this specifies the area which should be displayed. Note there may be multiple such areas for one frame
+ */
+typedef struct AVPanScan{
+    /**
+     * id.
+     * - encoding: set by user.
+     * - decoding: set by lavc
+     */
+    int id;
+
+    /**
+     * width and height in 1/16 pel
+     * - encoding: set by user.
+     * - decoding: set by lavc
+     */
+    int width;
+    int height;
+
+    /**
+     * position of the top left corner in 1/16 pel for up to 3 fields/frames.
+     * - encoding: set by user.
+     * - decoding: set by lavc
+     */
+    int16_t position[3][2];
+}AVPanScan;
 
 #define FF_COMMON_FRAME \
     /**\
@@ -304,15 +353,15 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
     int display_picture_number;\
 \
     /**\
-     * quality (between 1 (good) and 31 (bad)) \
+     * quality (between 1 (good) and FF_LAMBDA_MAX (bad)) \
      * - encoding: set by lavc for coded_picture (and set by user for input)\
      * - decoding: set by lavc\
      */\
-    float quality; \
+    int quality; \
 \
     /**\
      * buffer age (1->was last buffer and dint change, 2->..., ...).\
-     * set to something large if the buffer has not been used yet \
+     * set to INT_MAX if the buffer has not been used yet \
      * - encoding: unused\
      * - decoding: MUST be set by get_buffer()\
      */\
@@ -380,6 +429,28 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
      * \
      */\
     int qscale_type;\
+    \
+    /**\
+     * The content of the picture is interlaced.\
+     * - encoding: set by user\
+     * - decoding: set by lavc (default 0)\
+     */\
+    int interlaced_frame;\
+    \
+    /**\
+     * if the content is interlaced, is top field displayed first.\
+     * - encoding: set by user\
+     * - decoding: set by lavc\
+     */\
+    int top_field_first;\
+    \
+    /**\
+     * Pan scan.\
+     * - encoding: set by user\
+     * - decoding: set by lavc\
+     */\
+    AVPanScan *pan_scan;\
+    
 
 #define FF_QSCALE_TYPE_MPEG1	0
 #define FF_QSCALE_TYPE_MPEG2	1
@@ -470,7 +541,7 @@ typedef struct AVCodecContext {
     /**
      * width / height.
      * - encoding: MUST be set by user. 
-     * - decoding: set by user, some codecs might override / change it during playback
+     * - decoding: set by user if known, codec should override / dynamically change if needed
      */
     int width, height;
     
@@ -519,7 +590,7 @@ typedef struct AVCodecContext {
      * @param offset offset into the AVFrame.data from which the slice should be read
      */
     void (*draw_horiz_band)(struct AVCodecContext *s,
-                            AVFrame *src, int offset[4],
+                            const AVFrame *src, int offset[4],
                             int y, int type, int height);
 
     /* audio only */
@@ -662,7 +733,7 @@ typedef struct AVCodecContext {
 #define FF_BUG_XVID_ILACE       4
 #define FF_BUG_UMP4             8
 #define FF_BUG_NO_PADDING       16
-#define FF_BUG_AC_VLC           32
+#define FF_BUG_AC_VLC           0  ///< will be removed, libavcodec can now handle these non compliant files by default
 #define FF_BUG_QPEL_CHROMA      64
 #define FF_BUG_STD_QPEL         128
 #define FF_BUG_QPEL_CHROMA2     256
@@ -848,6 +919,7 @@ typedef struct AVCodecContext {
 #define FF_DCT_MMX     3
 #define FF_DCT_MLIB    4
 #define FF_DCT_ALTIVEC 5
+#define FF_DCT_FAAN    6
     
     /**
      * luminance masking (0-> disabled).
@@ -965,11 +1037,11 @@ typedef struct AVCodecContext {
 #define FF_PRED_MEDIAN 2
     
     /**
-     * aspect ratio (0 if unknown).
+     * sample aspect ratio (0 if unknown).
      * - encoding: set by user.
      * - decoding: set by lavc.
      */
-    float aspect_ratio;
+    AVRational sample_aspect_ratio;
 
     /**
      * the picture in the bitstream.
@@ -1169,8 +1241,13 @@ typedef struct AVCodecContext {
      * Dont touch, used by lavc default_get_buffer()
      */
     void *internal_buffer;
-    
-#define FF_QUALITY_SCALE 256
+
+#define FF_LAMBDA_SHIFT 7
+#define FF_LAMBDA_SCALE (1<<FF_LAMBDA_SHIFT)
+#define FF_QP2LAMBDA 118 ///< factor to convert from H.263 QP to lambda
+#define FF_LAMBDA_MAX (256*128-1)
+
+#define FF_QUALITY_SCALE FF_LAMBDA_SCALE //FIXME maybe remove
     /**
      * global quality for codecs which cannot change it per frame.
      * this should be proportional to MPEG1/2/4 qscale.
@@ -1244,14 +1321,28 @@ typedef struct AVCodecContext {
      */
     unsigned int stream_codec_tag;
 
-    /**  
+    /**
      * scene change detection threshold.
      * 0 is default, larger means fewer detected scene changes
      * - encoding: set by user.
      * - decoding: unused
      */
     int scenechange_threshold;
- 
+
+    /**
+     * minimum lagrange multipler
+     * - encoding: set by user.
+     * - decoding: unused
+     */
+    int lmin;
+
+    /**
+     * maximum lagrange multipler
+     * - encoding: set by user.
+     * - decoding: unused
+     */
+    int lmax;
+   
     /**
      * VIA CLE266 Hardware MPEG decoding
      * - encoding: forbidden
@@ -1357,6 +1448,7 @@ extern AVCodec ac3_encoder;
 extern AVCodec mp2_encoder;
 extern AVCodec mp3lame_encoder;
 extern AVCodec oggvorbis_encoder;
+extern AVCodec faac_encoder;
 extern AVCodec mpeg1video_encoder;
 extern AVCodec mpeg2video_encoder;
 extern AVCodec h263_encoder;
@@ -1396,11 +1488,11 @@ extern AVCodec rv10_decoder;
 extern AVCodec svq1_decoder;
 extern AVCodec svq3_decoder;
 extern AVCodec dvvideo_decoder;
-extern AVCodec dvaudio_decoder;
 extern AVCodec wmav1_decoder;
 extern AVCodec wmav2_decoder;
 extern AVCodec mjpeg_decoder;
 extern AVCodec mjpegb_decoder;
+extern AVCodec sp5x_decoder;
 extern AVCodec mp2_decoder;
 extern AVCodec mp3_decoder;
 extern AVCodec mace3_decoder;
@@ -1411,8 +1503,11 @@ extern AVCodec cyuv_decoder;
 extern AVCodec h264_decoder;
 extern AVCodec indeo3_decoder;
 extern AVCodec vp3_decoder;
+extern AVCodec theora_decoder;
 extern AVCodec amr_nb_decoder;
 extern AVCodec amr_nb_encoder;
+extern AVCodec amr_wb_encoder;
+extern AVCodec amr_wb_decoder;
 extern AVCodec aac_decoder;
 extern AVCodec mpeg4aac_decoder;
 extern AVCodec asv1_decoder;
@@ -1425,6 +1520,12 @@ extern AVCodec mdec_decoder;
 extern AVCodec roq_decoder;
 extern AVCodec interplay_video_decoder;
 extern AVCodec xan_wc3_decoder;
+extern AVCodec rpza_decoder;
+extern AVCodec cinepak_decoder;
+extern AVCodec msrle_decoder;
+extern AVCodec msvideo1_decoder;
+extern AVCodec vqa_decoder;
+extern AVCodec idcin_decoder;
 extern AVCodec ra_144_decoder;
 extern AVCodec ra_288_decoder;
 extern AVCodec roq_dpcm_decoder;
@@ -1451,8 +1552,11 @@ PCM_CODEC(CODEC_ID_ADPCM_IMA_QT, adpcm_ima_qt);
 PCM_CODEC(CODEC_ID_ADPCM_IMA_WAV, adpcm_ima_wav);
 PCM_CODEC(CODEC_ID_ADPCM_IMA_DK3, adpcm_ima_dk3);
 PCM_CODEC(CODEC_ID_ADPCM_IMA_DK4, adpcm_ima_dk4);
+PCM_CODEC(CODEC_ID_ADPCM_IMA_WS, adpcm_ima_ws);
 PCM_CODEC(CODEC_ID_ADPCM_MS, adpcm_ms);
 PCM_CODEC(CODEC_ID_ADPCM_4XM, adpcm_4xm);
+PCM_CODEC(CODEC_ID_ADPCM_XA, adpcm_xa);
+PCM_CODEC(CODEC_ID_ADPCM_ADX, adpcm_adx);
 
 #undef PCM_CODEC
 
@@ -1489,13 +1593,27 @@ ImgReSampleContext *img_resample_full_init(int owidth, int oheight,
                                       int leftBand, int rightBand);
 
 void img_resample(ImgReSampleContext *s, 
-                  AVPicture *output, AVPicture *input);
+                  AVPicture *output, const AVPicture *input);
 
 void img_resample_close(ImgReSampleContext *s);
 
+/**
+ * Allocate memory for a picture.  Call avpicture_free to free it.
+ *
+ * @param picture the picture to be filled in.
+ * @param pix_fmt the format of the picture.
+ * @param width the width of the picture.
+ * @param height the height of the picture.
+ * @return 0 if successful, -1 if not.
+ */
+int avpicture_alloc(AVPicture *picture, int pix_fmt, int width, int height);
+
+/* Free a picture previously allocated by avpicture_alloc. */
+void avpicture_free(AVPicture *picture);
+
 int avpicture_fill(AVPicture *picture, uint8_t *ptr,
                    int pix_fmt, int width, int height);
-int avpicture_layout(AVPicture* src, int pix_fmt, int width, int height,
+int avpicture_layout(const AVPicture* src, int pix_fmt, int width, int height,
                      unsigned char *dest, int dest_size);
 int avpicture_get_size(int pix_fmt, int width, int height);
 void avcodec_get_chroma_sub_sample(int pix_fmt, int *h_shift, int *v_shift);
@@ -1516,15 +1634,16 @@ int avcodec_find_best_pix_fmt(int pix_fmt_mask, int src_pix_fmt,
 
 #define FF_ALPHA_TRANSP       0x0001 /* image has some totally transparent pixels */
 #define FF_ALPHA_SEMI_TRANSP  0x0002 /* image has some transparent pixels */
-int img_get_alpha_info(AVPicture *src, int pix_fmt, int width, int height);
+int img_get_alpha_info(const AVPicture *src,
+		       int pix_fmt, int width, int height);
 
 /* convert among pixel formats */
 int img_convert(AVPicture *dst, int dst_pix_fmt,
-                AVPicture *src, int pix_fmt, 
+                const AVPicture *src, int pix_fmt, 
                 int width, int height);
 
 /* deinterlace a picture */
-int avpicture_deinterlace(AVPicture *dst, AVPicture *src,
+int avpicture_deinterlace(AVPicture *dst, const AVPicture *src,
                           int pix_fmt, int width, int height);
 
 /* external high level API */
@@ -1690,6 +1809,9 @@ void *av_fast_realloc(void *ptr, unsigned int *size, unsigned int min_size);
 void av_free_static(void);
 void *__av_mallocz_static(void** location, unsigned int size);
 #define av_mallocz_static(p, s) __av_mallocz_static((void **)(p), s)
+
+/* add by bero : in adx.c */
+int is_adx(const unsigned char *buf,size_t bufsize);
 
 #ifdef __cplusplus
 }

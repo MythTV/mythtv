@@ -98,6 +98,8 @@ static const CodecTag mov_video_tags[] = {
     { CODEC_ID_DVVIDEO, MKTAG('d', 'v', 'c', 'p') }, /* DV PAL */
 /*    { CODEC_ID_DVVIDEO, MKTAG('A', 'V', 'd', 'v') }, *//* AVID dv */
     { CODEC_ID_VP3, MKTAG('V', 'P', '3', '1') }, /* On2 VP3 */
+    { CODEC_ID_RPZA, MKTAG('r', 'p', 'z', 'a') }, /* Apple Video (RPZA) */
+    { CODEC_ID_CINEPAK, MKTAG('c', 'v', 'i', 'd') }, /* Cinepak */
     { CODEC_ID_NONE, 0 },
 };
 
@@ -118,9 +120,10 @@ static const CodecTag mov_audio_tags[] = {
     { CODEC_ID_MP2, 0x5500736D }, /* MPEG layer 3 *//* XXX: check endianness */
 /*    { CODEC_ID_OGG_VORBIS, MKTAG('O', 'g', 'g', 'S') }, *//* sample files at http://heroinewarrior.com/xmovie.php3 use this tag */
 /* MP4 tags */
-    { CODEC_ID_AAC, MKTAG('m', 'p', '4', 'a') }, /* MPEG 4 AAC or audio ? */
+    { CODEC_ID_MPEG4AAC, MKTAG('m', 'p', '4', 'a') }, /* MPEG-4 AAC */
     /* The standard for mpeg4 audio is still not normalised AFAIK anyway */
     { CODEC_ID_AMR_NB, MKTAG('s', 'a', 'm', 'r') }, /* AMR-NB 3gp */
+    { CODEC_ID_AMR_WB, MKTAG('s', 'a', 'w', 'b') }, /* AMR-WB 3gp */
     { CODEC_ID_NONE, 0 },
 };
 
@@ -850,10 +853,10 @@ static int mov_read_stsd(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
 #endif
 	} else {
             st->codec.codec_id = codec_get_id(mov_audio_tags, format);
-	    if(st->codec.codec_id==CODEC_ID_AMR_NB) //from TS26.244
+	    if(st->codec.codec_id==CODEC_ID_AMR_NB || st->codec.codec_id==CODEC_ID_AMR_WB) //from TS26.244
 	    {
 #ifdef DEBUG
-               printf("AMR-NB audio identified!!\n");
+               printf("AMR-NB or AMR-WB audio identified!!\n");
 #endif
                get_be32(pb);get_be32(pb); //Reserved_8
                get_be16(pb);//Reserved_2
@@ -863,41 +866,26 @@ static int mov_read_stsd(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
                get_be16(pb);//Reserved_2
 
                 //AMRSpecificBox.(10 bytes)
-                
-#ifdef DEBUG
-               int damr_size=
-#endif
+               
                get_be32(pb); //size
-#ifdef DEBUG
-               int damr_type=
-#endif
                get_be32(pb); //type=='damr'
-#ifdef DEBUG
-               int damr_vendor=
-#endif
                get_be32(pb); //vendor
                get_byte(pb); //decoder version
                get_be16(pb); //mode_set
                get_byte(pb); //mode_change_period
                get_byte(pb); //frames_per_sample
 
-#ifdef DEBUG
-               printf("Audio: damr_type=%c%c%c%c damr_size=%d damr_vendor=%c%c%c%c\n",
-                       (damr_type >> 24) & 0xff,
-                       (damr_type >> 16) & 0xff,
-                       (damr_type >> 8) & 0xff,
-                       (damr_type >> 0) & 0xff,
-		       damr_size, 
-                       (damr_vendor >> 24) & 0xff,
-                       (damr_vendor >> 16) & 0xff,
-                       (damr_vendor >> 8) & 0xff,
-                       (damr_vendor >> 0) & 0xff
-		       );
-#endif
-
                st->duration = AV_NOPTS_VALUE;//Not possible to get from this info, must count number of AMR frames
-               st->codec.sample_rate=8000;
-               st->codec.channels=1;
+               if(st->codec.codec_id==CODEC_ID_AMR_NB)
+               {
+                   st->codec.sample_rate=8000;
+                   st->codec.channels=1;
+               }
+               else //AMR-WB
+               {
+                   st->codec.sample_rate=16000;
+                   st->codec.channels=1;
+               }
                st->codec.bits_per_sample=16;
                st->codec.bit_rate=0; /*It is not possible to tell this before we have 
                                        an audio frame and even then every frame can be different*/
@@ -1673,7 +1661,7 @@ static int mov_read_close(AVFormatContext *s)
 }
 
 static AVInputFormat mov_iformat = {
-    "mov",
+    "mov,mp4,m4a,3gp",
     "QuickTime/MPEG4 format",
     sizeof(MOVContext),
     mov_probe,

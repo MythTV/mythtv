@@ -222,6 +222,8 @@ void AvFormatDecoder::InitByteContext(void)
     ic->pb.max_packet_size = 0;
 }
 
+#define ALIGN(x, a) (((x) + (a) - 1) & ~((a) - 1))
+
 int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                               char testbuf[2048])
 {
@@ -286,7 +288,9 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 if (fps < 26 && fps > 24)
                     keyframedist = 12;
 
-                float aspect_ratio = enc->aspect_ratio;
+                float aspect_ratio = av_q2d(enc->sample_aspect_ratio) * 
+                                     enc->width / enc->height;
+
                 if (aspect_ratio <= 0.0)
                     aspect_ratio = (float)enc->width / (float)enc->height;
 
@@ -294,7 +298,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 current_height = enc->height;
                 current_aspect = aspect_ratio;
 
-                m_parent->SetVideoParams(enc->width, enc->height, fps, 
+                m_parent->SetVideoParams(ALIGN(enc->width, 16), 
+                                         ALIGN(enc->height, 16), fps, 
                                          keyframedist, aspect_ratio);
              
                 enc->error_resilience = 2;
@@ -429,7 +434,8 @@ bool AvFormatDecoder::CheckVideoParams(int width, int height)
     if (width == current_width && height == current_height)
         return false;
 
-    cerr << "Video has changed: " << width << " " << height << endl;
+    cerr << "Video has changed: " << width << " " << height << " from: "
+         << current_width << " " << current_height << endl;
 
     for (int i = 0; i < ic->nb_streams; i++)
     {
@@ -513,10 +519,10 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
 
-    int width = c->width;
-    int height = c->height;
-
     VideoFrame *frame = nd->m_parent->GetNextVideoFrame();
+
+    int width = frame->width;
+    int height = frame->height;
 
     pic->data[0] = frame->buf;
     pic->data[1] = pic->data[0] + width * height;
@@ -604,8 +610,8 @@ void release_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic)
 
 }
 
-void render_slice_xvmc(struct AVCodecContext *s, AVFrame *src, int offset[4],
-                       int y, int type, int height)
+void render_slice_xvmc(struct AVCodecContext *s, const AVFrame *src, 
+                       int offset[4], int y, int type, int height)
 {
     (void)offset;
     (void)type;
@@ -653,8 +659,8 @@ void release_avf_buffer_via(struct AVCodecContext *c, AVFrame *pic)
         pic->data[i] = NULL;
 }
 
-void render_slice_via(struct AVCodecContext *s, AVFrame *src, int offset[4],
-                      int y, int type, int height)
+void render_slice_via(struct AVCodecContext *s, const AVFrame *src, 
+                      int offset[4], int y, int type, int height)
 {
     (void)offset;
     (void)type;
@@ -761,7 +767,8 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
     {
         if (gotvideo)
         {
-            if (lowbuffers && onlyvideo == 0 && lastapts < lastvpts + 100)
+            if (lowbuffers && onlyvideo == 0 && lastapts < lastvpts + 100 &&
+                lastapts > lastvpts - 10000)
             {
                 //cout << "behind: " << lastapts << " " << lastvpts << endl;
                 storevideoframes = true;
@@ -836,12 +843,14 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     if (CheckVideoParams(width, height) || 
                         aspect != current_aspect)
                     {
-                        m_parent->SetVideoParams(width, height, fps,
+                        m_parent->SetVideoParams(ALIGN(width, 16), 
+                                                 ALIGN(height, 16), fps,
                                                  keyframedist, aspect);
                         m_parent->ReinitVideo();
                         current_width = width;
                         current_height = height;
                         current_aspect = aspect;
+                        lastvpts = lastapts = 0;
                     }
                 }
                  
@@ -921,6 +930,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                         lastapts += (long long)((double)(data_size * 1000) / 
                                     audio_sample_size / audio_sampling_rate);
                     }
+
                     m_parent->AddAudioData((char *)samples, data_size, 
                                            lastapts);
                     break;

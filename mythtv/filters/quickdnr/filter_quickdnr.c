@@ -205,7 +205,7 @@ int quickdnrMMX(VideoFilter *f, VideoFrame *frame)
   int y;
   uint64_t *buf = (uint64_t *)frame->buf;
   uint64_t *av_p;
-  const uint64_t sign_convert = 0x8080808080808080;
+  const uint64_t sign_convert = 0x8080808080808080LL;
 
   if (!tf->sized) {
     tf->sized = 1;

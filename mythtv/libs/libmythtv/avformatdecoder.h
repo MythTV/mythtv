@@ -57,12 +57,12 @@ class AvFormatDecoder : public DecoderBase
 
     friend int get_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic);
     friend void release_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic);
-    friend void render_slice_xvmc(struct AVCodecContext *c, AVFrame *src, 
+    friend void render_slice_xvmc(struct AVCodecContext *c, const AVFrame *src, 
                                   int offset[4], int y, int type, int height);
 
     friend int get_avf_buffer_via(struct AVCodecContext *c, AVFrame *pic);
     friend void release_avf_buffer_via(struct AVCodecContext *c, AVFrame *pic);
-    friend void render_slice_via(struct AVCodecContext *c, AVFrame *src,
+    friend void render_slice_via(struct AVCodecContext *c, const AVFrame *src,
                                  int offset[4], int y, int type, int height);
 	
     friend int open_avf(URLContext *h, const char *filename, int flags);

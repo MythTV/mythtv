@@ -21,7 +21,7 @@
  
 /**
  * @file ffv1.c
- * FF Video Codec 1 (a experimental lossless codec)
+ * FF Video Codec 1 (an experimental lossless codec)
  */
 
 #include "common.h"
@@ -599,7 +599,7 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size,
     if(!f->ac){
         used_count += put_cabac_terminate(c, 1);
 //printf("pos=%d\n", used_count);
-        init_put_bits(&f->pb, buf + used_count, buf_size - used_count, NULL, NULL);
+        init_put_bits(&f->pb, buf + used_count, buf_size - used_count);
     }
     
     if(1){

@@ -980,13 +980,12 @@ static int mpegts_read_header(AVFormatContext *s,
         if (ts->nb_services <= 0) {
             /* no SDT found, we try to look at the PAT */
 
-            /* First remove the SDT filters from each PID */
-            int i;
-            for (i=0; i < NB_PID_MAX; i++) {
-                if (ts->pids[i])
-                    mpegts_close_filter(ts, ts->pids[i]);
-            }
-            
+           /* First remove the SDT filters from each PID */
+           int i;
+           for (i=0; i < NB_PID_MAX; i++) {
+               if (ts->pids[i])
+                   mpegts_close_filter(ts, ts->pids[i]);
+           }
             url_fseek(pb, pos, SEEK_SET);
             mpegts_scan_pat(ts);
             
@@ -1058,6 +1057,8 @@ AVInputFormat mpegts_demux = {
 int mpegts_init(void)
 {
     av_register_input_format(&mpegts_demux);
+#ifdef CONFIG_ENCODERS
     av_register_output_format(&mpegts_mux);
+#endif
     return 0;
 }

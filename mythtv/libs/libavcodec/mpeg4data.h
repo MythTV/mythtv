@@ -341,23 +341,23 @@ static const uint8_t mb_type_b_tab[4][2] = {
  {1, 1}, {1, 2}, {1, 3}, {1, 4},
 };
 
-static const uint16_t pixel_aspect[16][2]={
- {0, 0},
+static const AVRational pixel_aspect[16]={
+ {0, 1},
  {1, 1},
  {12, 11},
  {10, 11},
  {16, 11},
  {40, 33},
- {0, 0},
- {0, 0},
- {0, 0},
- {0, 0},
- {0, 0},
- {0, 0},
- {0, 0},
- {0, 0},
- {0, 0},
- {0, 0},
+ {0, 1},
+ {0, 1},
+ {0, 1},
+ {0, 1},
+ {0, 1},
+ {0, 1},
+ {0, 1},
+ {0, 1},
+ {0, 1},
+ {0, 1},
 };
 
 /* these matrixes will be permuted for the idct */
@@ -394,4 +394,8 @@ uint8_t ff_mpeg4_c_dc_scale_table[32]={
 
 const uint16_t ff_mpeg4_resync_prefix[8]={
     0x7F00, 0x7E00, 0x7C00, 0x7800, 0x7000, 0x6000, 0x4000, 0x0000
+};
+
+static const uint8_t mpeg4_dc_threshold[8]={
+    99, 13, 15, 17, 19, 21, 23, 0
 };

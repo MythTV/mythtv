@@ -58,7 +58,7 @@ void CommDetect::Init(int w, int h, double fps)
 
 void CommDetect::ProcessNextFrame(VideoFrame *frame, long long frame_number)
 {
-    if (frame->codec != FMT_YV12)
+    if (!frame || frame->codec != FMT_YV12)
         return;
 
     frame_ptr = frame->buf;

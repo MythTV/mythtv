@@ -49,6 +49,9 @@ void avcodec_register_all(void)
     register_avcodec(&oggvorbis_encoder);
     register_avcodec(&oggvorbis_decoder);
 #endif
+#ifdef CONFIG_FAAC
+    register_avcodec(&faac_encoder);
+#endif
     register_avcodec(&mpeg1video_encoder);
 //    register_avcodec(&h264_encoder);
 #ifdef CONFIG_RISKY
@@ -106,9 +109,9 @@ void avcodec_register_all(void)
     register_avcodec(&mpeg_via_decoder);
 #endif
     register_avcodec(&dvvideo_decoder);
-    register_avcodec(&dvaudio_decoder);
     register_avcodec(&mjpeg_decoder);
     register_avcodec(&mjpegb_decoder);
+    register_avcodec(&sp5x_decoder);
     register_avcodec(&mp2_decoder);
     register_avcodec(&mp3_decoder);
     register_avcodec(&mace3_decoder);
@@ -118,6 +121,7 @@ void avcodec_register_all(void)
     register_avcodec(&cyuv_decoder);
     register_avcodec(&h264_decoder);
     register_avcodec(&vp3_decoder);
+    register_avcodec(&theora_decoder);
     register_avcodec(&asv1_decoder);
     register_avcodec(&asv2_decoder);
     register_avcodec(&vcr1_decoder);
@@ -127,6 +131,12 @@ void avcodec_register_all(void)
     register_avcodec(&roq_decoder);
     register_avcodec(&interplay_video_decoder);
     register_avcodec(&xan_wc3_decoder);
+    register_avcodec(&rpza_decoder);
+    register_avcodec(&cinepak_decoder);
+    register_avcodec(&msrle_decoder);
+    register_avcodec(&msvideo1_decoder);
+    register_avcodec(&vqa_decoder);
+    register_avcodec(&idcin_decoder);
 #ifdef CONFIG_AC3
     register_avcodec(&ac3_decoder);
 #endif
@@ -139,13 +149,29 @@ void avcodec_register_all(void)
 
 #ifdef AMR_NB
     register_avcodec(&amr_nb_decoder);
+#ifdef CONFIG_ENCODERS
     register_avcodec(&amr_nb_encoder);
+#endif //CONFIG_ENCODERS
 #endif /* AMR_NB */
+
+#ifdef AMR_WB
+    register_avcodec(&amr_wb_decoder);
+#ifdef CONFIG_ENCODERS
+    register_avcodec(&amr_wb_encoder);
+#endif //CONFIG_ENCODERS
+#endif /* AMR_WB */
+
     /* pcm codecs */
 
+#ifdef CONFIG_ENCODERS
 #define PCM_CODEC(id, name) \
     register_avcodec(& name ## _encoder); \
     register_avcodec(& name ## _decoder); \
+
+#else
+#define PCM_CODEC(id, name) \
+    register_avcodec(& name ## _decoder);
+#endif
 
 PCM_CODEC(CODEC_ID_PCM_S16LE, pcm_s16le);
 PCM_CODEC(CODEC_ID_PCM_S16BE, pcm_s16be);
@@ -161,8 +187,11 @@ PCM_CODEC(CODEC_ID_ADPCM_IMA_QT, adpcm_ima_qt);
 PCM_CODEC(CODEC_ID_ADPCM_IMA_WAV, adpcm_ima_wav);
 PCM_CODEC(CODEC_ID_ADPCM_IMA_DK3, adpcm_ima_dk3);
 PCM_CODEC(CODEC_ID_ADPCM_IMA_DK4, adpcm_ima_dk4);
+PCM_CODEC(CODEC_ID_ADPCM_IMA_WS, adpcm_ima_ws);
 PCM_CODEC(CODEC_ID_ADPCM_MS, adpcm_ms);
 PCM_CODEC(CODEC_ID_ADPCM_4XM, adpcm_4xm);
+PCM_CODEC(CODEC_ID_ADPCM_XA, adpcm_xa);
+PCM_CODEC(CODEC_ID_ADPCM_ADX, adpcm_adx);
 
 #undef PCM_CODEC
 }

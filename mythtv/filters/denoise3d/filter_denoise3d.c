@@ -436,7 +436,7 @@ denoiseMMX (uint8_t * Frame,    // mpi->planes[x]
         BlockCur += 32;
         BlockPrev += 32;
     }
-    for (X; X < W - 7; X += 8)
+    for (/*X*/; X < W - 7; X += 8)
     {
         movq_m2r (BlockPrev[0], mm0);
         movq_r2r (mm0, mm1);
@@ -466,7 +466,7 @@ denoiseMMX (uint8_t * Frame,    // mpi->planes[x]
         BlockCur += 8;
         BlockPrev += 8;
     }
-    for (X; X < W; X++)
+    for (/*X*/; X < W; X++)
     {
         FramePrev[X] = Frame[X] = LowPass (Line[X], Frame[X], Temporal);
     }
@@ -536,7 +536,7 @@ denoiseMMX (uint8_t * Frame,    // mpi->planes[x]
             BlockCur += 8;
             BlockPrev += 8;
         }
-        for (X; X < W; X++)
+        for (/*X*/; X < W; X++)
         {
             prev = LowPass (prev, LineCur[X], Horizontal);
             Line[X] = LowPass (Line[X], prev, Vertical);
