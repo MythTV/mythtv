@@ -15,6 +15,9 @@
 
 #include "mfdinfo.h"
 
+typedef QValueVector<int> IntVector;
+
+
 class MfeDialog : public MythThemedDialog
 {
 
@@ -32,10 +35,10 @@ class MfeDialog : public MythThemedDialog
     ~MfeDialog();
 
     void keyPressEvent(QKeyEvent *e);
+    void clearPlayingDisplay();
 
   public slots:
 
-    typedef QValueVector<int> IntVector;
     void handleTreeListSignals(int node_int, IntVector *attributes);
     void mfdDiscovered(int which_mfd, QString name, QString host, bool found);
     void paused(int which_mfd, bool paused); 
@@ -70,7 +73,10 @@ class MfeDialog : public MythThemedDialog
     UITextType            *container_text;
     UITextType            *metadata_text;
     UITextType            *audio_text;
+
+    GenericTree           *no_mfds_tree;
 };
+
 
 
 #endif

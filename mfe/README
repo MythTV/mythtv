@@ -8,4 +8,4 @@ There is no configure:
     qmake
     make
     make install
-    mythfrontend mfe
+    mythfrontend mythmfe 

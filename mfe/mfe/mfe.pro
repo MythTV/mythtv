@@ -4,7 +4,7 @@ include ( ../settings.pro )
 
 TEMPLATE = lib
 CONFIG += plugin thread
-TARGET = mfe
+TARGET = mythmfe
 target.path = $${PREFIX}/lib/mythtv/plugins
 INSTALLS += target
 

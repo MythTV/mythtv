@@ -36,6 +36,16 @@ MfeDialog::MfeDialog(
     current_mfd = NULL;
     available_mfds.setAutoDelete(true);
     connectUpMfd();
+
+    //
+    //  Build our backstop GenericTree data to show when there is no mfd
+    //  available anywhere
+    //
+    
+    no_mfds_tree = new GenericTree("", 0, false);
+    no_mfds_tree->addNode("", 0, false);
+    music_tree_list->assignTreeData(no_mfds_tree);
+        
     
     //
     //  Redraw ourselves
@@ -101,7 +111,16 @@ void MfeDialog::keyPressEvent(QKeyEvent *e)
         MythThemedDialog::keyPressEvent(e);
 }
 
-void MfeDialog::handleTreeListSignals(int node_int, IntVector *attributes)
+void MfeDialog::clearPlayingDisplay()
+{
+    playlist_text->SetText("");
+    container_text->SetText("");
+    metadata_text->SetText("");
+    audio_text->SetText("");
+
+}
+
+void MfeDialog::handleTreeListSignals(int node_int, QValueVector<int> *attributes)
 {
     if(attributes->at(1) == 1)
     {
@@ -208,30 +227,43 @@ void MfeDialog::mfdDiscovered(int which_mfd, QString name, QString host, bool fo
             if(current_mfd == NULL)
             {
                 current_mfd = new_mfd;
-                mfd_text->SetText(QString("%1 (%2)").arg(name).arg(host));
             }
+            mfd_text->SetText(QString("%1 (%2) [%3]")
+                                .arg(current_mfd->getName())
+                                .arg(current_mfd->getHost())
+                                .arg(available_mfds.count()));
         }
     }
     else
     {
+        bool redo_current = false;
+        if(current_mfd->getId() == which_mfd)
+        {
+            redo_current = true;
+        }
         if(!available_mfds.remove(which_mfd))
         {
             cerr << "mfedialog.o: can't remove mfd that does not exist" << endl;
         }
-        if(current_mfd->getId() == which_mfd)
+        
+        if(redo_current)
         {
             if(available_mfds.count() > 0)
             {
+                cout << "doin dat" << endl;
                 current_mfd = available_mfds[0];
-                mfd_text->SetText(QString("%1 (%2)")
+                mfd_text->SetText(QString("%1 (%2) [%3]")
                                   .arg(current_mfd->getName())
-                                  .arg(current_mfd->getHost()));
+                                  .arg(current_mfd->getHost())
+                                  .arg(available_mfds.count()));
             }
             else
             {
                 current_mfd = NULL;
                 mfd_text->SetText("--none--");
+                music_tree_list->assignTreeData(no_mfds_tree);
             }
+            updateForeground();
         }
     }
 }
@@ -270,8 +302,11 @@ void MfeDialog::changeMetadata(int which_mfd, GenericTree *new_tree)
 
 void MfeDialog::cycleMfd()
 {
+    clearPlayingDisplay();
     if(current_mfd && available_mfds.count() > 1)
     {
+        QStringList route_to_current = music_tree_list->getRouteToCurrent();
+        current_mfd->setPreviousTreePosition(route_to_current);
         QIntDictIterator<MfdInfo> it( available_mfds ); 
         for ( ; it.current(); ++it )
         {
@@ -283,15 +318,38 @@ void MfeDialog::cycleMfd()
                     it.toFirst();
                 }
                 current_mfd = it.current();
+                GenericTree *switched_metadata = current_mfd->getMetadata();
+                if(switched_metadata)
+                {
+                    music_tree_list->assignTreeData(current_mfd->getMetadata());
+                    QStringList route_to_current = current_mfd->getPreviousTreePosition();
+                    if( route_to_current.count() > 0)
+                    {
+                        if(!music_tree_list->tryToSetCurrent(route_to_current))
+                        {
+                            //music_tree_list->setActiveBin(current_bin);
+                        }
+                        else
+                        {
+                            music_tree_list->setCurrentNode(current_mfd->getMetadata()->findLeaf());
+                        }
+                    }
+                }
+                else
+                {
+                    music_tree_list->assignTreeData(no_mfds_tree);
+                }
                 break;
             }
         }
     }
 
-    mfd_text->SetText(QString("%1 (%2)")
+    mfd_text->SetText(QString("%1 (%2) [%3]")
                       .arg(current_mfd->getName())
-                      .arg(current_mfd->getHost()));
+                      .arg(current_mfd->getHost())
+                      .arg(available_mfds.count()));
 
+    updateForeground();
 }
 
 void MfeDialog::stopAudio()
@@ -371,5 +429,10 @@ void MfeDialog::playing(
 MfeDialog::~MfeDialog()
 {
     available_mfds.clear();
+    if(no_mfds_tree)
+    {
+        delete no_mfds_tree;
+        no_mfds_tree = NULL;
+    }
 }
 

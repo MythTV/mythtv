@@ -13,6 +13,7 @@ MfdInfo::MfdInfo( int an_id, const QString &a_name, const QString &a_host)
     id = an_id;
     name = a_name;
     host = a_host;
+    tree_data = NULL;
 }
 
 MfdInfo::~MfdInfo()

@@ -9,6 +9,7 @@
 */
 
 #include <qstring.h>
+#include <qstringlist.h>
 
 #include <mythtv/generictree.h>
 
@@ -20,11 +21,16 @@ class MfdInfo
     MfdInfo(int an_id, const QString &a_name, const QString &a_host);
     ~MfdInfo();
 
-    int  getId(){ return id; }
-    void setMetadata(GenericTree *new_tree){ tree_data=new_tree; }
+    int          getId(){ return id; }
+
+    void         setMetadata(GenericTree *new_tree){ tree_data=new_tree; }
+    GenericTree* getMetadata(){ return tree_data; } 
+      
+    QString      getName(){return name;}
+    QString      getHost(){return host;}
     
-    QString getName(){return name;}
-    QString getHost(){return host;}
+    void         setPreviousTreePosition(QStringList tree_list){previous_tree_position = tree_list;}
+    QStringList  getPreviousTreePosition(){return previous_tree_position;}
 
   private:
   
@@ -32,6 +38,7 @@ class MfdInfo
     QString     name;
     QString     host;
     GenericTree *tree_data;
+    QStringList previous_tree_position;
 };
 
 

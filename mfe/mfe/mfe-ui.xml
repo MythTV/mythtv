@@ -32,12 +32,12 @@
                     <area>10,16,230,250</area>
                     <fcnfont name="active" function="active"></fcnfont>
                     <fcnfont name="inactive" function="inactive"></fcnfont>
-                    <fcnfont name="selected" function="selected"></fcnfont>
+                    <fcnfont name="active" function="selected"></fcnfont>
                 </bin>
                 <bin number="2">
                     <area>240,10,550,270</area>
                     <fcnfont name="active" function="active"></fcnfont>
-                    <fcnfont name="selected" function="selected"></fcnfont>
+                    <fcnfont name="active" function="selected"></fcnfont>
                     <fcnfont name="inactive" function="inactive"></fcnfont>
                 </bin>
             </managedtreelist>
