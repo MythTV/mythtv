@@ -252,6 +252,11 @@ void PhoneUIBox::videoCifModeToRes(QString cifMode, int &w, int &h)
         w = 128;
         h = 96;
     }
+    if (cifMode == "CIF")
+    {
+        w = 352;
+        h = 288;
+    }
     if (cifMode == "4CIF")
     {
         w = 704;
