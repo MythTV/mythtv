@@ -124,6 +124,7 @@ void MythMainWindow::keyPressEvent(QKeyEvent *e)
 
 void MythMainWindow::customEvent(QCustomEvent *ce)
 {
+    (void)ce;
 #ifdef USE_LIRC
     if (ce->type() == kLircKeycodeEventType && !ignore_lirc_keys) 
     {
@@ -198,18 +199,12 @@ MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
 
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
-    int x = 0, y = 0, w = 0, h = 0;
-#ifndef QWS
-    GetMythTVGeometry(qt_xdisplay(), qt_xscreen(), &x, &y, &w, &h);
-#endif
-
     setFont(QFont("Arial", (int)(gContext->GetMediumFontSize() * hmult),
             QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
     if (setsize)
     {
-        setGeometry(x, y, screenwidth, screenheight);
         setFixedSize(QSize(screenwidth, screenheight));
         gContext->ThemeWidget(this);
     }
@@ -358,11 +353,6 @@ MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)
     float wmult, hmult;
 
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-
-    int x = 0, y = 0, w = 0, h = 0;
-#ifndef QWS
-    GetMythTVGeometry(qt_xdisplay(), qt_xscreen(), &x, &y, &w, &h);
-#endif
 
     setFont(QFont("Arial", (int)(gContext->GetMediumFontSize() * hmult),
             QFont::Bold));
