@@ -87,13 +87,8 @@ information on configuring multiple backend systems in various ways.</CAPTION>
 part of the bootstrap of MythTV is to indicate the location of the MySQL
 database server. If the frontend, backend and MySQL database server are all
 going to be running on the same box, you can continue to the next step.  If
-not, you'll need to edit the <CODE>/usr/local/share/mythtv/mysql.txt</CODE> or
-<CODE>~/.mythtv/mysql.txt</CODE> file and change the first line to the IP
-address of the database server.  Customizing <CODE>~/.mythtv/mysql.txt</CODE> is
-preferred, since changes to <CODE>/usr/local/share/mythtv/mysql.txt</CODE> will
-be lost the next time you upgrade. All other configuration is within the
-MythTV GUI screens.</P>
-
+not, you'll need to change the Host Name in the "Database Configuration"
+screen of the mythfrontend program.</P>
 <P>
 <FIGURE>
 <EPS FILE="stop.eps">
@@ -174,8 +169,11 @@ you back to the main configuration screen.</P>
 keys to move around and to make your choices, and press RETURN when
 complete.  Pressing RETURN will take you back to the Capture Cards screen;
 if you have additional capture cards in this machine, press the space bar
-when the highlight is on the (New Capture Card) row to define another card. 
-Once you have no additional cards to setup, press ESC.</P>
+when the highlight is on the (New Capture Card) row to define another card. </P>
+<P>If you have made a mistake, you can delete a card by highlighting it and 
+pressing the 'D' key, or you can highlight it and press the RETURN or 'E'
+key to edit it.</P>
+<P>Once you have no additional cards to setup, press ESC.</P>
 
 <H3><A NAME="VideoSources"></A> Video Sources </H3>
 
@@ -324,9 +322,8 @@ the steps outlined in the section called
 <P>Ensure that you've granted access to the master MySQL database for remote
 backends as discussed in the section titled 
 <A HREF="mythtv-HOWTO-6.html#modify_perm_mysql">Modifying access to the MySQL database for multiple systems</A> and that
-you've edited the <CODE>/usr/local/share/mythtv/mysql.txt</CODE> or
-<CODE>~/.mythtv/mysql.txt</CODE> file and put the correct IP
-address for the database server.</P>
+you have the correct IP address for the database server in the "Database
+Configuration" screen of the setup application on this slave backend.</P>
 <P>Make sure that the IP addresses on the General setup screen are accurate. 
 If the slave backend can't communicate with the master backend due to IP
 address misconfiguration then MythTV will not function properly.</P>

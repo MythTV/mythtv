@@ -42,6 +42,8 @@ ALT-F4 </TD><TD> exit out of the application </TD></TR><TR><TD>
 Space/Enter     </TD><TD> take action on the item under the highlight point </TD></TR><TR><TD>
 P </TD><TD> play in both "Watch a Recording" and "Delete a Recording"   </TD></TR><TR><TD>
 D </TD><TD> delete in both "Watch a Recording" and "Delete a Recording" </TD></TR><TR><TD>
+U </TD><TD> to view details for the currently selected show on the Watch&nbsp;or Delete screens, EPG, "Program Finder", "Fix Scheduling&nbsp;Conflicts" or search results screens </TD></TR><TR><TD>
+O </TD><TD> to list the upcoming episodes for the currently selected show&nbsp;on the EPG, "Program Finder", "Program Recording Priorities",&nbsp;"Fix Scheduling Conflicts" or search results screens </TD></TR><TR><TD>
 I </TD><TD> edit recording options from the EPG, "Program Finder",&nbsp;"Program Recording Priorities", or "Fix Scheduling Conflicts"&nbsp;screens. From the Playback and Delete screens, 'I' presents&nbsp;options for recorded shows such as Auto Expire or Stop Recording.&nbsp;Pressing 'I' while on the Recording Options screen will take you&nbsp;to the Advanced Recording Options screen.
 </TD></TR></TABLE>
 </CENTER><BR>
@@ -53,7 +55,7 @@ I </TD><TD> edit recording options from the EPG, "Program Finder",&nbsp;"Program
 <TABLE BORDER><TR><TD>
 Up or down      </TD><TD> keys change the channel </TD></TR><TR><TD>
 num pad </TD><TD> Type a number to enter a channel number or jump amount (HHMM format) </TD></TR><TR><TD>
-P </TD><TD> pause / play </TD></TR><TR><TD>
+P </TD><TD> pause / play. You may also add an explicit keybinding for 'Play' through&nbsp;MythWeb, returning you to normal speed if you are in slow motion, rewind&nbsp;fast forward or pause mode. </TD></TR><TR><TD>
 C </TD><TD> change inputs on TV Tuner card </TD></TR><TR><TD>
 ESC </TD><TD> quits </TD></TR><TR><TD>
 I </TD><TD> puts the On-screen Display up again. During playback, 'I' toggles&nbsp;between position and show description info. If a jump amount is&nbsp;entered, jump to that position. </TD></TR><TR><TD>
@@ -71,7 +73,10 @@ F </TD><TD> rotate between the various Picture Adjustments (Colour, Hue, etc.)&n
 ? </TD><TD> mark/unmark the current channel as a "favorite" </TD></TR><TR><TD>
 U </TD><TD> increase the play speed </TD></TR><TR><TD>
 J </TD><TD> decrease the play speed </TD></TR><TR><TD>
+A </TD><TD> Adjust time stretch (speed up or slow down normal play of audio and video </TD></TR><TR><TD>
 W </TD><TD> cycle through 4:3 aspect ratio, 16:9, 4:3 Zoom (like Pan and Scan),&nbsp;16:9 Zoom, and 16:9 Stretch (eliminates black sidebars in TV signal) </TD></TR><TR><TD>
+F8 </TD><TD> toggle the sleep timer 30m->1hr->1hr30m->2hr->Off </TD></TR><TR><TD>
+CTRL-B </TD><TD> Jump to the beginning of the recording / ringbuffer </TD></TR><TR><TD>
 Left </TD><TD> (if a jump amount is entered) to jump back that amount </TD></TR><TR><TD>
 Right </TD><TD> (if a jump amount is entered) to jump ahead that amount </TD></TR><TR><TD>
 </TD><TD> </TD></TR><TR><TD>
@@ -113,30 +118,7 @@ Right </TD><TD> advance 1 frame </TD></TR><TR><TD>
 G       </TD><TD> rotate between the various Picture Adjustments (Colour, Hue, etc.)&nbsp;for recording. These values affect the look of the resulting .nuv&nbsp;file, and are independent of the playback picture settings. While&nbsp;Picture Adjustment is on-screen, use Left and Right arrows to adjust. </TD></TR><TR><TD>
 H       </TD><TD> Channel history. Each repeat steps back through the previous channels. </TD></TR><TR><TD>
 O       </TD><TD> Turns on 'Browse' mode, allowing user to browse channels and program&nbsp;info while watching current show FullScreen. </TD></TR><TR><TD>
-F8      </TD><TD> toggle the sleep timer 30m->1hr->1hr30m->2hr->Off </TD></TR><TR><TD>
 Y       </TD><TD> switch between multiple capture cards.&nbsp; <B>NOTE</B>:you will lose your LiveTV buffer on your current card. Useful&nbsp;for different-sourced cards (such as Dish Network on one, HDTV over-the-air on another card.) </TD></TR><TR><TD>
-</TD></TR></TABLE>
-</CENTER><BR>
-</P>
-<H3>Watching a recording only</H3>
-
-<P>
-<BR><CENTER>
-<TABLE BORDER><TR><TD>
-Space/Enter </TD><TD> set a bookmark at that point. Next time you start the&nbsp;recording, you will automatically jump forward to this point&nbsp;and clear the bookmark. </TD></TR><TR><TD>
-X </TD><TD> queues the current recording for transcoding </TD></TR><TR><TD>
-O </TD><TD> brings up menu to allow toggling settings such as Commercial&nbsp;Auto-Skip, Auto-Expire, etc. </TD></TR><TR><TD>
-E or M </TD><TD> enters/exits edit mode. </TD></TR><TR><TD>
-</TD><TD> </TD></TR><TR><TD>
-</TD><TD> </TD></TR><TR><TD>
-</TD><TD> <B>In edit mode</B> </TD></TR><TR><TD>
-Left/Right      </TD><TD> move forward and backward </TD></TR><TR><TD>
-Up/Down </TD><TD> alter the amount of time you jump forward and backward.&nbsp;Increments are: nearest cutpoint, nearest video keyframe, 1&nbsp;frame, 0.5 seconds, 1 second, 20 seconds, 1 minute, 5 minutes,&nbsp;and 10 minutes. </TD></TR><TR><TD>
-PageUp/PageDown </TD><TD> move forward and backward to the nearest cut point </TD></TR><TR><TD>
-&lt; or > </TD><TD> move forward or backward by 10 times the normal jump amount </TD></TR><TR><TD>
-Space/Enter     </TD><TD> allows you to set or delete a cut point </TD></TR><TR><TD>
-Z </TD><TD> loads the commercial skip list (if one exists) into the cutlist </TD></TR><TR><TD>
-C or Q </TD><TD> clear all cut points in the cutlist
 </TD></TR></TABLE>
 </CENTER><BR>
 </P>
@@ -184,6 +166,30 @@ N       </TD><TD> swaps the two channels by changing channels on both cards
 </TD></TR></TABLE>
 </CENTER><BR>
 </P>
+<H3>Watching a recording only</H3>
+
+<P>
+<BR><CENTER>
+<TABLE BORDER><TR><TD>
+Space/Enter </TD><TD> set a bookmark at that point. Next time you start the&nbsp;recording, you will automatically jump forward to this point&nbsp;and clear the bookmark. </TD></TR><TR><TD>
+X </TD><TD> queues the current recording for transcoding </TD></TR><TR><TD>
+O </TD><TD> brings up menu to allow toggling settings such as Commercial&nbsp;Auto-Skip, Auto-Expire, etc. </TD></TR><TR><TD>
+D </TD><TD> exits the current recording and displays the Delete menu </TD></TR><TR><TD>
+E or M </TD><TD> enters/exits edit mode. </TD></TR><TR><TD>
+</TD><TD> </TD></TR><TR><TD>
+</TD><TD> </TD></TR><TR><TD>
+</TD><TD> <B>In edit mode</B> </TD></TR><TR><TD>
+Left/Right      </TD><TD> move forward and backward </TD></TR><TR><TD>
+Up/Down </TD><TD> alter the amount of time you jump forward and backward.&nbsp;Increments are: nearest cutpoint, nearest video keyframe, 1&nbsp;frame, 0.5 seconds, 1 second, 20 seconds, 1 minute, 5 minutes,&nbsp;and 10 minutes. </TD></TR><TR><TD>
+PageUp/PageDown </TD><TD> move forward and backward to the nearest cut point </TD></TR><TR><TD>
+&lt; or > </TD><TD> move forward or backward by 10 times the normal jump amount </TD></TR><TR><TD>
+Space/Enter     </TD><TD> allows you to set or delete a cut point </TD></TR><TR><TD>
+Z </TD><TD> loads the commercial skip list (if one exists) into the cutlist </TD></TR><TR><TD>
+C or Q </TD><TD> clear all cut points in the cutlist </TD></TR><TR><TD>
+I </TD><TD> Inverts the cutlist
+</TD></TR></TABLE>
+</CENTER><BR>
+</P>
 <H3>EPG</H3>
 
 <P>
@@ -202,8 +208,8 @@ M </TD><TD> when on a channel will change to that channel </TD></TR><TR><TD>
 ESC or C </TD><TD> exits without changing the channel </TD></TR><TR><TD>
 R </TD><TD> change the current item from Recording/Not-Recording.&nbsp;Successive keypresses cycle through the scheduled recording&nbsp;type list. </TD></TR><TR><TD>
 X </TD><TD> change the channel to the currently selected channel without&nbsp;leaving the EPG (Most useful in the alternate EPG) </TD></TR><TR><TD>
-/ </TD><TD> mark/unmark the current channel as a "favorite" </TD></TR><TR><TD>
-4 </TD><TD> toggle the guide listing between all channels and filtered&nbsp;"favorites"
+? </TD><TD> mark/unmark the current channel as a "favorite" </TD></TR><TR><TD>
+/ or 4 </TD><TD> toggle the guide listing between all channels and filtered&nbsp;"favorites"
 </TD></TR></TABLE>
 </CENTER><BR>
 </P>
@@ -268,7 +274,17 @@ I       </TD><TD> move a program from one Recording Group to another
 </TD></TR></TABLE>
 </CENTER><BR>
 </P>
+<H3>Watch Recordings Screen</H3>
 
+<P>
+<BR><CENTER>
+<TABLE BORDER><TR><TD>
+1 or F1 </TD><TD> Meaning of the icons </TD></TR><TR><TD>
+/ </TD><TD> Tags a recording. Tagged recordings can be played&nbsp;either in order or shuffled and deleted as a group.&nbsp;You can also change the recording group for several recordings&nbsp;at once by tagging them and using the popup INFO menu to change&nbsp;the recording group. </TD></TR><TR><TD>
+? </TD><TD> Clear the tagged list.
+</TD></TR></TABLE>
+</CENTER><BR>
+</P>
 <H3>Remote Controls</H3>
 
 <P>If you are using MythTV with just a remote control then it is suggested that you
@@ -549,7 +565,8 @@ command" with the "Wakeup time format" suitable for that tool.</P>
 
 <P>If your MySQL server and your Master backend are not on the same machine,
 you can have the Master backend wake your MySQL server using WOL. You will
-find the settings for this in mysql.txt. The meanings are the same as
+find the settings for this in the second page of the setup program,
+or at the end of mysql.txt.  The meanings are the same as
 discussed in "The WakeOnLan settings" above.</P>
 
 <H3>Tips/Tricks:</H3>

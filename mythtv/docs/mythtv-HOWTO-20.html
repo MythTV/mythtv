@@ -69,13 +69,6 @@ first choice is the better solution.</P>
 <P>You didn't set your <CODE>QTDIR</CODE>.  Re-read the section on 
 <A HREF="mythtv-HOWTO-4.html#Setting_up_paths">Setting up paths</A>.</P>
 
-<H3>Settings get reset at every compile.</H3>
-
-<P>MythTV will overwrite any settings in <CODE>/usr/local/share/mythtv</CODE>.
-If you want to make sure that you don't lose your modifications, make a
-directory <CODE>~/.mythtv</CODE> and copy your mysql.txt file to this
-location.</P>
-
 <H2><A NAME="ss20.2">20.2</A> <A HREF="mythtv-HOWTO.html#toc20.2">Debugging</A>
 </H2>
 
@@ -434,7 +427,7 @@ grabbed by another process, like <B>esd</B> or <B>artsd</B>.  If
 <FIGURE>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>: The CVS version of MythTV now has support for using
+<CAPTION><B>NOTE</B>: MythTV now has support for using
 <B>artsd</B>.  This is a compile-time option, so you will need to edit the
 <CODE>settings.pro</CODE> file in the mythtv directory then perform a <CODE>make
 distclean; make</CODE>, and re-run <CODE>make install</CODE> as root to add this

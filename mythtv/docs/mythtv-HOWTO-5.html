@@ -79,8 +79,8 @@ After downloading, be sure to install both:
 <HR>
 </P>
 <P>Get lame from 
-<A HREF="http://lame.sourceforge.net/">http://lame.sourceforge.net/</A>.  Download the source code to v3.93.1
-by following the links from "About".</P>
+<A HREF="http://lame.sourceforge.net/">http://lame.sourceforge.net/</A>.  Download the source code to v3.96.1
+by following the links from "Using" through "Download...".</P>
 
 <H2><A NAME="cpuspecificoptimizations"></A> <A NAME="ss5.1">5.1</A> <A HREF="mythtv-HOWTO.html#toc5.1">Notes on compiling for different processors</A>
 </H2>
@@ -99,8 +99,8 @@ required if you have that CPU.</P>
  before
 you compile with one of:
 <UL>
-<LI><B>-march=K6</B>        for the AMD K6 with MMX (i586 compatible)</LI>
-<LI><B>-march=K6-2</B>      for the AMD K6 CPU with MMX and 3dNOW! (i586 compatible)</LI>
+<LI><B>-march=k6</B>        for the AMD K6 with MMX (i586 compatible)</LI>
+<LI><B>-march=k6-2</B>      for the AMD K6 CPU with MMX and 3dNOW! (i586 compatible)</LI>
 <LI>-march=athlon             for the AMD Athlon CPU with MMX, 3dNOW!, enhanced 3dNOW! and some of SSE. (pentium2 compatible)</LI>
 <LI>-march=pentiumpro -mmmx   for the AMD Athlon XP CPU with MMX, 3dNOW!, enhanced 3dNOW! and SSE. (pentium3 compatible)</LI>
 <LI>-march=k8                 for the AMD K8 core based CPUs with x86-64 instruction set support
@@ -343,21 +343,15 @@ $ make
 </CODE></BLOCKQUOTE>
 </P>
 <P>If you want to build MythTV on a multi-CPU machine (or with
-<B>distcc</B>), you may run into issues with the standard build in MythTV.
-The easiest solution is to build the libraries first.  In the following
-example, we will have two concurrent jobs executing.  Do not set the number
-of jobs too high, or your compile will actually take longer to complete than
-it would if you did a "normal" build.
+<B>distcc</B>), specify "-j numjobs".  In the following example, we will
+have two concurrent jobs executing.  Do not set the number of jobs too high,
+or your compile will actually take longer to complete than it would if you
+did a "normal" build.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ qmake mythtv.pro
 $ make qmake
-$ make -C libs/libavcodec -j2
-$ make -C libs/libavformat -j2
-$ make -C libs/libmyth -j2 
-$ make -C libs/libmythtv -j2
-$ make -C libs -j2
-$ make -j2
+$ make -j 2
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -368,18 +362,10 @@ participating, you would do something like:
 $ export DISTCC_HOSTS='localhost red blue'
 $ qmake mythtv.pro
 $ make qmake
-$ make -C libs/libavcodec -j6 CC=distcc
-$ make -C libs/libavformat -j6 CC=distcc
-$ make -C libs/libmyth -j6 CXX=distcc
-$ make -C libs/libmythtv -j6 CXX=distcc
-$ make -C libs -j6 CXX=distcc
-$ make -j6 CXX=distcc
+$ make -j 6 CXX=distcc
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Explicitly specifying the directories ensures that <B>make</B> has all
-dependencies satisfied before proceeding.  For example, <CODE>libmyth</CODE> may
-fail to compile if <CODE>libavformat</CODE> hasn't finished yet.</P>
 <P>The actual speed-up, if any, is dependant on a number of factors, such as
 number of CPUs / hosts, etc.  The <B>distcc</B> documentation recommends
 using a <CODE>-j</CODE> value of twice the number of CPUs available to keep all
@@ -388,13 +374,12 @@ of them busy.</P>
 illustration; your actual results may vary.  The test involves a complete
 <CODE>make distclean</CODE> to the final binary.
 <UL>
-<LI>Celeron 2.4Ghz and PIII/733 running distcc, -j4:  17m:57s</LI>
-<LI>Celeron 2.4Ghz, -j4:  26m:57s</LI>
-<LI>Celeron 2.4Ghz, "regular" make:  26m:55s</LI>
+<LI>P4 3.2Ghz HT: "standard" make: 12m 49s</LI>
+<LI>P4 3.2Ghz HT: make -j 2: 11m 24s </LI>
 </UL>
 </P>
 <P>In the above example, we see that with a single CPU, a multi-stage
-<B>make</B> does not decrease compile time.</P>
+<B>make</B> does not significantly decrease compile time.</P>
 <P>Once the compile is done, switch to superuser:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -458,18 +443,16 @@ your frontend machine</LI>
 compilation procedure is the same as when you're setting up both a backend
 and a frontend.  However, you <EM>will</EM> need to install the database
 access libraries.</P>
-<P>Once MythTV is compiled and installed, you must change your
-<CODE>/usr/local/share/mythtv/mysql.txt</CODE> or <CODE>~/.mythtv/mysql.txt</CODE>
-file's "DBHostName" field to point to your Master backend's IP address.</P>
-<P><B>NOTE</B>: The <CODE>/usr/local/share/mythtv/mysql.txt</CODE> file is
-overwritten each time you upgrade, so any changes you make there will be
-lost.  Use <CODE>~/.mythtv/mysql.txt</CODE> to avoid losing your custom
-configuration.</P>
-<P>Run the MythTV setup program on your Master backend. Under the "General"
+<P>Once MythTV is compiled and installed:
+<LI>Run the MythTV setup program on your Master backend. Under the "General"
 menu, change the IP address of the current machine (by default, "127.0.0.1")
 to the real external IP address - 127.0.0.1 is the loopback address and no
 external machine can access it. Change the Master Server IP setting to the
-same IP address as well.</P>
+same IP address as well.</LI>
+<LI>Run the mythfrontend program on your frontend machine,
+and a "Database Configuration" screen should appear.
+Set the "Host name" field to point to your Master backend's IP address.</LI>
+</P>
 
 <H2><A NAME="Gentoo_build"></A> <A NAME="ss5.6">5.6</A> <A HREF="mythtv-HOWTO.html#toc5.6">Gentoo </A>
 </H2>

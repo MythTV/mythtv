@@ -249,9 +249,11 @@ operate in the United States - the HD-2000 and HD-3000 cards available from
 <A HREF="http://www.pchdtv.com/">http://www.pchdtv.com/</A> and the
 Air2PC-ATSC-PCI available from 
 <A HREF="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103">http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103</A>
-These cards can only be used to capture over-the-air HDTV.  There are no known
-capture devices which will allow you to capture the HDTV output from a
-set-top box commonly found with digital cable systems or satellite systems.</P>
+or 
+<A HREF="http://mythic.tv/">http://mythic.tv/</A>. The Air2PC card
+can be configured to capture unencrypted QAM and 8VSB.  8VSB is the standard
+used for over-the-air ATSC signals, QAM is used on cable TV systems.  The
+Air2PC is supported using the linux-dvb drivers.</P>
 <P>To playback HDTV content, plan on a powerful CPU.  "How powerful?" depends
 on a number of factors, such as the capture resolution, whether the video is
 progressive or interlaced, and whether your display card has hardware-assist
@@ -263,22 +265,27 @@ Weave" deinterlacing, or if you have an NVIDIA card with MPEG-2 hardware
 accelleration.  If you enable the hardware accelleration, you may be able to
 use a 1.8GHz processor.</P>
 
+<H3>Firewire.</H3>
+
+<P>You may use the Firewire output of the DCT6200 or the SA3250.</P>
+
 <H3>Hardware known NOT to work and other issues</H3>
 
 <P>
 <UL>
 <LI>Hauppauge WinTV-D or -HD (no driver)</LI>
 <LI>Hauppauge WinTV-USB series</LI>
-<LI>Hauppauge WinTV-PVR-usb, usb2 or PCI cards (no driver - this is not the PVR-250/350
+<LI>Hauppauge WinTV-PVR-usb, or PCI cards (no driver - this is not the PVR-250/350
 series of cards supported by the IvyTV driver)</LI>
+<LI>Hauppauge WinTV-PVR-USB2 (driver available at http://justiceforall.free.fr/pvrusb2.html, no MythTV support)</LI>
 <LI>ATI All-in-Wonder series</LI>
 </UL>
 </P>
-<P>There are no known capture cards for digital cable.  You must use the
-set-top box provided by your digital cable provider and capture the analog
-video output using either composite or S-Video.</P>
-<P>There are no known capture cards for HDTV content.</P>
-<P>There are no known capture cards for component (RGB or YPbPr) video.</P>
+<P>There are no known consumer-level capture devices which will allow you to
+capture the HDTV output (either DVI or HDMI) from a set-top box commonly
+found with digital cable systems or satellite systems.</P>
+<P>There are no known consumer-level capture devices which will allow you to
+capture component output from a set-top box.</P>
 <H3>Sound card</H3>
 
 <P>The system needs a sound card or an on-board equivalent on the motherboard

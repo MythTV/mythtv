@@ -614,8 +614,10 @@ distribution, or get the latest versions from
 <A HREF="http://www.sistina.com/products_lvm.htm">http://www.sistina.com/products_lvm.htm</A> and build them manually.</P>
 <P>Check that the <B>vgscan</B> program is being run at some point during
 your boot sequence - most distributions do this by default. Look for a
-message during boot up that looks like this:
-<CODE>vgscan -- reading all physical volumes (this may take a while...)</CODE></P>
+message during boot up that looks like this: <CODE>vgscan -- reading all
+physical volumes (this may take a while...)</CODE> If you don't see any
+messages during boot, you may need to install a LVM init script or confirm
+that you have all of the LVM packages installed from your distribution.</P>
 <P>LVM uses a few concepts you should be familiar with before starting.
 <UL>
 <LI>PV (Physical Volume).  The actual partition on the hard drive.</LI>

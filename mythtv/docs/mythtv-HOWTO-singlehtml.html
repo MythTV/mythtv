@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-01-12, v0.16.06
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-02-, v0.17.00
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -21,12 +21,13 @@ necessary.</EM>
 
 <UL>
 <LI><A NAME="toc1.1">1.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.1">What is MythTV?</A>
-<LI><A NAME="toc1.2">1.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.2">How to obtain this document </A>
-<LI><A NAME="toc1.3">1.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.3">Document conventions</A>
-<LI><A NAME="toc1.4">1.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.4">Mailing lists / getting help</A>
-<LI><A NAME="toc1.5">1.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.5">IRC</A>
-<LI><A NAME="toc1.6">1.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.6">Bugzilla.</A>
-<LI><A NAME="toc1.7">1.7</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.7">Contributing to this document</A>
+<LI><A NAME="toc1.2">1.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.2">QuickStart</A>
+<LI><A NAME="toc1.3">1.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.3">How to obtain this document </A>
+<LI><A NAME="toc1.4">1.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.4">Document conventions</A>
+<LI><A NAME="toc1.5">1.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.5">Mailing lists / getting help</A>
+<LI><A NAME="toc1.6">1.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.6">IRC</A>
+<LI><A NAME="toc1.7">1.7</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.7">Bugzilla</A>
+<LI><A NAME="toc1.8">1.8</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.8">Contributing to this document</A>
 </UL>
 <P>
 <H2><A NAME="toc2">2.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s2">Introduction.</A></H2>
@@ -61,10 +62,8 @@ necessary.</EM>
 <H2><A NAME="toc6">6.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s6">MySQL.</A></H2>
 
 <UL>
-<LI><A NAME="toc6.1">6.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss6.1">Mandrake 9.0</A>
-<LI><A NAME="toc6.2">6.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss6.2">Red Hat Linux and Fedora Core</A>
-<LI><A NAME="toc6.3">6.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss6.3">Gentoo</A>
-<LI><A NAME="toc6.4">6.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss6.4">Setting up the initial database</A>
+<LI><A NAME="toc6.1">6.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss6.1">Distribution-specific information.</A>
+<LI><A NAME="toc6.2">6.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss6.2">Setting up the initial database</A>
 </UL>
 <P>
 <H2><A NAME="toc7">7.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s7">Configuring Sound.</A></H2>
@@ -266,7 +265,25 @@ over the Internet and have it immediately acted on by the scheduler.</LI>
 <LI>MythPhone, phone and videophone using SIP.</LI>
 </UL>
 </P>
-<H2><A NAME="how_to_obtain"></A> <A NAME="ss1.2">1.2</A> <A HREF="#toc1.2">How to obtain this document </A>
+<H2><A NAME="ss1.2">1.2</A> <A HREF="#toc1.2">QuickStart</A>
+</H2>
+
+<P>Custom mini-distributions are available to make it easier to install
+MythTV.  A mini-distribution removes many of the "general purpose"
+workstation / server software packages that may be installed by default if
+you use one of the big-name OS packages.</P>
+<P>See 
+<A HREF="http://mysettopbox.tv">http://mysettopbox.tv</A> if you'd
+like to install a custom version of Knoppix optimized for MythTV.</P>
+<P>See 
+<A HREF="http://linpvr.org/">http://linpvr.org/</A> if you'd like
+to install MythTV onto a VIA Epia M machine.</P>
+
+<P>See 
+<A HREF="http://wilsonet.com/mythtv/">http://wilsonet.com/mythtv/</A> for instructions tailored to RedHat's
+Fedora Core distribution.</P>
+
+<H2><A NAME="how_to_obtain"></A> <A NAME="ss1.3">1.3</A> <A HREF="#toc1.3">How to obtain this document </A>
 </H2>
 
 <P>This HOWTO document is maintained at the primary MythTV website: 
@@ -287,9 +304,9 @@ archives, or post your question to the MythTV-users mailing list. </CAPTION>
 <A HREF="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html">http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html</A> or as a PDF
 at 
 <A HREF="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">http://www.mythtv.org/docs/mythtv-HOWTO.pdf</A>.</P>
-<P>This HOWTO is for MythTV v0.16.</P>
+<P>This HOWTO is for MythTV v0.17.</P>
 
-<H2><A NAME="ss1.3">1.3</A> <A HREF="#toc1.3">Document conventions</A>
+<H2><A NAME="ss1.4">1.4</A> <A HREF="#toc1.4">Document conventions</A>
 </H2>
 
 <P>The following conventions are used throughout this document.<BR>
@@ -311,7 +328,7 @@ at
 </FIGURE>
 </P>
 
-<H2><A NAME="ss1.4">1.4</A> <A HREF="#toc1.4">Mailing lists / getting help</A>
+<H2><A NAME="ss1.5">1.5</A> <A HREF="#toc1.5">Mailing lists / getting help</A>
 </H2>
 
 <P>It's recommended that you join the user list at 
@@ -322,7 +339,7 @@ the developer list strictly for development-related issues.</P>
 <P>Searchable archives for the lists are available at 
 <A HREF="http://www.gossamer-threads.com/lists/mythtv/">http://www.gossamer-threads.com/lists/mythtv/</A>.</P>
 
-<H2><A NAME="ss1.5">1.5</A> <A HREF="#toc1.5">IRC</A>
+<H2><A NAME="ss1.6">1.6</A> <A HREF="#toc1.6">IRC</A>
 </H2>
 
 <P>There are two IRC channels dedicated to MythTV which can be found on
@@ -344,14 +361,14 @@ seems to be ignoring you.</CAPTION>
 </FIGURE>
 </P>
 
-<H2><A NAME="ss1.6">1.6</A> <A HREF="#toc1.6">Bugzilla.</A>
+<H2><A NAME="ss1.7">1.7</A> <A HREF="#toc1.7">Bugzilla</A>
 </H2>
 
 <P>If you feel you need to contribute to a bug database, use the MythTV
 Bugzilla at 
 <A HREF="http://www.mythtv.org/bugs/">http://www.mythtv.org/bugs/</A>.</P>
 
-<H2><A NAME="ss1.7">1.7</A> <A HREF="#toc1.7">Contributing to this document</A>
+<H2><A NAME="ss1.8">1.8</A> <A HREF="#toc1.8">Contributing to this document</A>
 </H2>
 
 <P>Contributions to the HOWTO are welcome, especially if you find a
@@ -378,23 +395,6 @@ doc.patch</B> and mail it to the address above.</P>
 American environment. If you have installation instructions for a different
 region or Linux distribution, please send them to the author so that it can
 be included in other versions of this document.</P>
-<P>Pre-compiled binaries are available for a number of distributions.  See
-section 
-<A HREF="#precompiled">Software::Pre-compiled packages</A> for
-more information.</P>
-<P>Custom mini-distributions are also available to make it easier to install
-MythTV.  A mini-distribution removes many of the "general purpose"
-workstation / server software packages that may be installed by default if
-you use one of the big-name OS packages.</P>
-<P>See 
-<A HREF="http://linpvr.org/">http://linpvr.org/</A> if you'd like
-to install MythTV onto a VIA Epia M machine.</P>
-<P>See 
-<A HREF="http://mysettopbox.tv">http://mysettopbox.tv</A> if you'd
-like to install a custom version of Knoppix optimized for MythTV.</P>
-<P>See 
-<A HREF="http://bit.blkbk.com/">http://bit.blkbk.com/</A> if you'd
-like to install MythTV on an XBox.</P>
 
 <H2><A NAME="s3">3.</A> <A HREF="#toc3">Checking prerequisites. </A></H2>
 
@@ -633,9 +633,11 @@ operate in the United States - the HD-2000 and HD-3000 cards available from
 <A HREF="http://www.pchdtv.com/">http://www.pchdtv.com/</A> and the
 Air2PC-ATSC-PCI available from 
 <A HREF="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103">http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103</A>
-These cards can only be used to capture over-the-air HDTV.  There are no known
-capture devices which will allow you to capture the HDTV output from a
-set-top box commonly found with digital cable systems or satellite systems.</P>
+or 
+<A HREF="http://mythic.tv/">http://mythic.tv/</A>. The Air2PC card
+can be configured to capture unencrypted QAM and 8VSB.  8VSB is the standard
+used for over-the-air ATSC signals, QAM is used on cable TV systems.  The
+Air2PC is supported using the linux-dvb drivers.</P>
 <P>To playback HDTV content, plan on a powerful CPU.  "How powerful?" depends
 on a number of factors, such as the capture resolution, whether the video is
 progressive or interlaced, and whether your display card has hardware-assist
@@ -647,22 +649,27 @@ Weave" deinterlacing, or if you have an NVIDIA card with MPEG-2 hardware
 accelleration.  If you enable the hardware accelleration, you may be able to
 use a 1.8GHz processor.</P>
 
+<H3>Firewire.</H3>
+
+<P>You may use the Firewire output of the DCT6200 or the SA3250.</P>
+
 <H3>Hardware known NOT to work and other issues</H3>
 
 <P>
 <UL>
 <LI>Hauppauge WinTV-D or -HD (no driver)</LI>
 <LI>Hauppauge WinTV-USB series</LI>
-<LI>Hauppauge WinTV-PVR-usb, usb2 or PCI cards (no driver - this is not the PVR-250/350
+<LI>Hauppauge WinTV-PVR-usb, or PCI cards (no driver - this is not the PVR-250/350
 series of cards supported by the IvyTV driver)</LI>
+<LI>Hauppauge WinTV-PVR-USB2 (driver available at http://justiceforall.free.fr/pvrusb2.html, no MythTV support)</LI>
 <LI>ATI All-in-Wonder series</LI>
 </UL>
 </P>
-<P>There are no known capture cards for digital cable.  You must use the
-set-top box provided by your digital cable provider and capture the analog
-video output using either composite or S-Video.</P>
-<P>There are no known capture cards for HDTV content.</P>
-<P>There are no known capture cards for component (RGB or YPbPr) video.</P>
+<P>There are no known consumer-level capture devices which will allow you to
+capture the HDTV output (either DVI or HDMI) from a set-top box commonly
+found with digital cable systems or satellite systems.</P>
+<P>There are no known consumer-level capture devices which will allow you to
+capture component output from a set-top box.</P>
 <H3>Sound card</H3>
 
 <P>The system needs a sound card or an on-board equivalent on the motherboard
@@ -1507,8 +1514,8 @@ After downloading, be sure to install both:
 <HR>
 </P>
 <P>Get lame from 
-<A HREF="http://lame.sourceforge.net/">http://lame.sourceforge.net/</A>.  Download the source code to v3.93.1
-by following the links from "About".</P>
+<A HREF="http://lame.sourceforge.net/">http://lame.sourceforge.net/</A>.  Download the source code to v3.96.1
+by following the links from "Using" through "Download...".</P>
 
 <H2><A NAME="cpuspecificoptimizations"></A> <A NAME="ss5.1">5.1</A> <A HREF="#toc5.1">Notes on compiling for different processors</A>
 </H2>
@@ -1527,8 +1534,8 @@ required if you have that CPU.</P>
  before
 you compile with one of:
 <UL>
-<LI><B>-march=K6</B>        for the AMD K6 with MMX (i586 compatible)</LI>
-<LI><B>-march=K6-2</B>      for the AMD K6 CPU with MMX and 3dNOW! (i586 compatible)</LI>
+<LI><B>-march=k6</B>        for the AMD K6 with MMX (i586 compatible)</LI>
+<LI><B>-march=k6-2</B>      for the AMD K6 CPU with MMX and 3dNOW! (i586 compatible)</LI>
 <LI>-march=athlon             for the AMD Athlon CPU with MMX, 3dNOW!, enhanced 3dNOW! and some of SSE. (pentium2 compatible)</LI>
 <LI>-march=pentiumpro -mmmx   for the AMD Athlon XP CPU with MMX, 3dNOW!, enhanced 3dNOW! and SSE. (pentium3 compatible)</LI>
 <LI>-march=k8                 for the AMD K8 core based CPUs with x86-64 instruction set support
@@ -1771,21 +1778,15 @@ $ make
 </CODE></BLOCKQUOTE>
 </P>
 <P>If you want to build MythTV on a multi-CPU machine (or with
-<B>distcc</B>), you may run into issues with the standard build in MythTV.
-The easiest solution is to build the libraries first.  In the following
-example, we will have two concurrent jobs executing.  Do not set the number
-of jobs too high, or your compile will actually take longer to complete than
-it would if you did a "normal" build.
+<B>distcc</B>), specify "-j numjobs".  In the following example, we will
+have two concurrent jobs executing.  Do not set the number of jobs too high,
+or your compile will actually take longer to complete than it would if you
+did a "normal" build.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ qmake mythtv.pro
 $ make qmake
-$ make -C libs/libavcodec -j2
-$ make -C libs/libavformat -j2
-$ make -C libs/libmyth -j2 
-$ make -C libs/libmythtv -j2
-$ make -C libs -j2
-$ make -j2
+$ make -j 2
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -1796,18 +1797,10 @@ participating, you would do something like:
 $ export DISTCC_HOSTS='localhost red blue'
 $ qmake mythtv.pro
 $ make qmake
-$ make -C libs/libavcodec -j6 CC=distcc
-$ make -C libs/libavformat -j6 CC=distcc
-$ make -C libs/libmyth -j6 CXX=distcc
-$ make -C libs/libmythtv -j6 CXX=distcc
-$ make -C libs -j6 CXX=distcc
-$ make -j6 CXX=distcc
+$ make -j 6 CXX=distcc
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Explicitly specifying the directories ensures that <B>make</B> has all
-dependencies satisfied before proceeding.  For example, <CODE>libmyth</CODE> may
-fail to compile if <CODE>libavformat</CODE> hasn't finished yet.</P>
 <P>The actual speed-up, if any, is dependant on a number of factors, such as
 number of CPUs / hosts, etc.  The <B>distcc</B> documentation recommends
 using a <CODE>-j</CODE> value of twice the number of CPUs available to keep all
@@ -1816,13 +1809,12 @@ of them busy.</P>
 illustration; your actual results may vary.  The test involves a complete
 <CODE>make distclean</CODE> to the final binary.
 <UL>
-<LI>Celeron 2.4Ghz and PIII/733 running distcc, -j4:  17m:57s</LI>
-<LI>Celeron 2.4Ghz, -j4:  26m:57s</LI>
-<LI>Celeron 2.4Ghz, "regular" make:  26m:55s</LI>
+<LI>P4 3.2Ghz HT: "standard" make: 12m 49s</LI>
+<LI>P4 3.2Ghz HT: make -j 2: 11m 24s </LI>
 </UL>
 </P>
 <P>In the above example, we see that with a single CPU, a multi-stage
-<B>make</B> does not decrease compile time.</P>
+<B>make</B> does not significantly decrease compile time.</P>
 <P>Once the compile is done, switch to superuser:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -1886,18 +1878,16 @@ your frontend machine</LI>
 compilation procedure is the same as when you're setting up both a backend
 and a frontend.  However, you <EM>will</EM> need to install the database
 access libraries.</P>
-<P>Once MythTV is compiled and installed, you must change your
-<CODE>/usr/local/share/mythtv/mysql.txt</CODE> or <CODE>~/.mythtv/mysql.txt</CODE>
-file's "DBHostName" field to point to your Master backend's IP address.</P>
-<P><B>NOTE</B>: The <CODE>/usr/local/share/mythtv/mysql.txt</CODE> file is
-overwritten each time you upgrade, so any changes you make there will be
-lost.  Use <CODE>~/.mythtv/mysql.txt</CODE> to avoid losing your custom
-configuration.</P>
-<P>Run the MythTV setup program on your Master backend. Under the "General"
+<P>Once MythTV is compiled and installed:
+<LI>Run the MythTV setup program on your Master backend. Under the "General"
 menu, change the IP address of the current machine (by default, "127.0.0.1")
 to the real external IP address - 127.0.0.1 is the loopback address and no
 external machine can access it. Change the Master Server IP setting to the
-same IP address as well.</P>
+same IP address as well.</LI>
+<LI>Run the mythfrontend program on your frontend machine,
+and a "Database Configuration" screen should appear.
+Set the "Host name" field to point to your Master backend's IP address.</LI>
+</P>
 
 <H2><A NAME="Gentoo_build"></A> <A NAME="ss5.6">5.6</A> <A HREF="#toc5.6">Gentoo </A>
 </H2>
@@ -1921,8 +1911,10 @@ Add mysql to your USE variable.  i.e. <CODE>USE="mysql ...."</CODE>
 </P>
 <H2><A NAME="mysql"></A> <A NAME="s6">6.</A> <A HREF="#toc6">MySQL.</A></H2>
 
-<H2><A NAME="ss6.1">6.1</A> <A HREF="#toc6.1">Mandrake 9.0</A>
+<H2><A NAME="ss6.1">6.1</A> <A HREF="#toc6.1">Distribution-specific information.</A>
 </H2>
+
+<H3>Mandrake 9.0</H3>
 
 <P>If this is the system maintaining the database, make sure that MySQL is
 running and started at boot.  Click on Mandrake Control
@@ -1946,8 +1938,7 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss6.2">6.2</A> <A HREF="#toc6.2">Red Hat Linux and Fedora Core</A>
-</H2>
+<H3>Red Hat Linux and Fedora Core</H3>
 
 <P>If this is the system maintaining the database, make sure that MySQL is
 running and started at boot. Click on Redhat menu>Server Settings>Services
@@ -1962,13 +1953,12 @@ Click Save, then close the window.</P>
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss6.3">6.3</A> <A HREF="#toc6.3">Gentoo</A>
-</H2>
+<H3>Gentoo</H3>
 
 <P>After installing MySQL you need to initialize the database by running
 mysql_install_db as root. </P>
 
-<H2><A NAME="ss6.4">6.4</A> <A HREF="#toc6.4">Setting up the initial database</A>
+<H2><A NAME="ss6.2">6.2</A> <A HREF="#toc6.2">Setting up the initial database</A>
 </H2>
 
 <P>This step is only required on the system maintaining the database, which
@@ -2127,145 +2117,13 @@ Video>Volume Control
 "mute" and "record" checked and that the gain is turned up. You may have to
 experiment with volume/gain levels to get the best sound.  </P>
 
-<H3>Using ALSA drivers.</H3>
+<H3>Using ALSA.</H3>
 
-<P>For those of you who do want to install ALSA please follow the 
-directions below, compiled with much assistance from Gregorio Gervasio.</P>
-<P>First you must find out the name of your driver, which isn't necessarily the
-same as the name of your sound card. Go to 
-<A HREF="http://www.alsa-project.org/alsa-doc/">http://www.alsa-project.org/alsa-doc/</A>, find your sound card on the
-list and click "details". Near the top it will say something like "The
-module options for snd-XXX", where XXX is the name of your driver. In the
-instructions below, replace "XXX" with the name of your driver.</P>
-<P>Download the development release (0.9.x) from the ALSA web site 
-<A HREF="http://www.alsa-project.org">http://www.alsa-project.org</A>.  You
-need at least three files:
-<UL>
-<LI>alsa-driver-0.9.x.tar.bz2</LI>
-<LI>alsa-lib-0.9.x.tar.bz2</LI>
-<LI>alsa-utils-0.9.x.tar.bz2</LI>
-</UL>
-</P>
-<P>Start with the alsa-driver package:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ tar -xjf alsa-driver-0.9.x.tar.bz2
-$ cd alsa-driver-0.9.x
-$ ./configure --with-cards=XXX --with-sequencer=yes
-</PRE>
-</CODE></BLOCKQUOTE>
-
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>: Red Hat/Fedora users, you may need to perform the following step to
-allow the compile to continue:</CAPTION>
-</FIGURE>
-
-<BLOCKQUOTE><CODE>
-<PRE>
-mkdir -p include/linux
-touch include/linux/workqueue.h
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Continuing on:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ make
-$ su
-# make install
-# ./snddevices
-# exit
-$
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>This will compile and install the kernel modules and initialization
-scripts, as well as create device nodes in /dev.</P>
-<P>Install the rest of the packages:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cd ~
-$ tar -xjf alsa-lib-0.9.x.tar.bz2
-$ cd alsa-lib-0.9.x
-$ ./configure
-$ make
-$ su
-# make install
-# exit
-$ cd ..
-$ tar -xjf alsa-utils-0.9.x.tar.bz2
-$ cd alsa-utils-0.9.x
-$ ./configure
-$ make
-$ su
-# make install
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Next, you must edit <CODE>/etc/modules.conf</CODE> so that the ALSA modules are
-loaded automatically. The first step is to remove your old OSS
-configuration to ensure that you don't end up with mysterious conflicts in
-the future.  You should end up with a <CODE>/etc/modules.conf</CODE> file that has
-this configuration:
-<BLOCKQUOTE><CODE>
-<PRE>
-alias char-major-116 snd
-alias snd-card-0 snd-XXX
-# module options should go here
-# OSS/Free portion
-alias char-major-14 soundcore
-alias sound-slot-0 snd-card-0
-# card #1
-alias sound-service-0-0 snd-mixer-oss
-alias sound-service-0-1 snd-seq-oss
-alias sound-service-0-3 snd-pcm-oss
-alias sound-service-0-8 snd-seq-oss
-alias sound-service-0-12 snd-pcm-oss
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>"XXX" should be the ALSA driver name for your sound card/chip. In some rare
-cases you need to supply extra options to the driver. These options are
-descried in the "INSTALL" file in the alsa-driver directory or at 
-<A HREF="http://www.alsa-project.org/alsa-doc/">http://www.alsa-project.org/alsa-doc/</A>.</P>
-<P>For now we will assume that no extra options are required.  The next step is
-to ensure that the ALSA drivers are started during boot-up.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# cd /etc/rc.d/init.d
-# /sbin/chkconfig --add alsasound
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>The next set of instructions will cause the ALSA volume/mixer/etc. state to
-be saved when the machine is shut down properly. Note that the mixer
-settings won't get restored the next time you boot unless you ran the
-shutdown script or you've explicitly saved the state which you can do
-as root with:
-<BLOCKQUOTE><CODE>
-<PRE>
-# alsactl -f /etc/asound.state store
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Reboot your machine.  Login and adjust the sound levels using "alsamixer". 
-You should increase the main volume (the first slider) and the PCM volume,
-and unmute them by hitting "m".  For MythTV, if your tuner card audio output
-is patched to the Line-In input of your sound card, set the Line input for
-capture by pressing SPACE at the slider and mute it by pressing "M". If
-you've patched your tuner card to the Mic-In port of your sound card, follow
-the same instructions but make sure that you're on the Mic slider.</P>
-<P>Test the driver by playing a simple file:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ aplay /usr/share/sounds/info.wav
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>If it works, you're done installing ALSA!</P>
+<P>If you'd like to use ALSA, you'll need to correctly setup your
+<CODE>asoundrc</CODE> file. Configuring this file is beyond the scope of this
+HOWTO.  Once ALSA is working correctly, change the output sound device in
+mythfrontend->setup->Audio from <CODE>/dev/dsp</CODE> to <CODE>ALSA:default</CODE>.
+This field may be edited to suit your ALSA requirements.</P>
 
 <H2><A NAME="ss7.2">7.2</A> <A HREF="#toc7.2">Setting the mixer from the command line</A>
 </H2>
@@ -2991,13 +2849,8 @@ information on configuring multiple backend systems in various ways.</CAPTION>
 part of the bootstrap of MythTV is to indicate the location of the MySQL
 database server. If the frontend, backend and MySQL database server are all
 going to be running on the same box, you can continue to the next step.  If
-not, you'll need to edit the <CODE>/usr/local/share/mythtv/mysql.txt</CODE> or
-<CODE>~/.mythtv/mysql.txt</CODE> file and change the first line to the IP
-address of the database server.  Customizing <CODE>~/.mythtv/mysql.txt</CODE> is
-preferred, since changes to <CODE>/usr/local/share/mythtv/mysql.txt</CODE> will
-be lost the next time you upgrade. All other configuration is within the
-MythTV GUI screens.</P>
-
+not, you'll need to change the Host Name in the "Database Configuration"
+screen of the mythfrontend program.</P>
 <P>
 <FIGURE>
 <EPS FILE="stop.eps">
@@ -3078,8 +2931,11 @@ you back to the main configuration screen.</P>
 keys to move around and to make your choices, and press RETURN when
 complete.  Pressing RETURN will take you back to the Capture Cards screen;
 if you have additional capture cards in this machine, press the space bar
-when the highlight is on the (New Capture Card) row to define another card. 
-Once you have no additional cards to setup, press ESC.</P>
+when the highlight is on the (New Capture Card) row to define another card. </P>
+<P>If you have made a mistake, you can delete a card by highlighting it and 
+pressing the 'D' key, or you can highlight it and press the RETURN or 'E'
+key to edit it.</P>
+<P>Once you have no additional cards to setup, press ESC.</P>
 
 <H3><A NAME="VideoSources"></A> Video Sources </H3>
 
@@ -3228,9 +3084,8 @@ the steps outlined in the section called
 <P>Ensure that you've granted access to the master MySQL database for remote
 backends as discussed in the section titled 
 <A HREF="#modify_perm_mysql">Modifying access to the MySQL database for multiple systems</A> and that
-you've edited the <CODE>/usr/local/share/mythtv/mysql.txt</CODE> or
-<CODE>~/.mythtv/mysql.txt</CODE> file and put the correct IP
-address for the database server.</P>
+you have the correct IP address for the database server in the "Database
+Configuration" screen of the setup application on this slave backend.</P>
 <P>Make sure that the IP addresses on the General setup screen are accurate. 
 If the slave backend can't communicate with the master backend due to IP
 address misconfiguration then MythTV will not function properly.</P>
@@ -3430,7 +3285,17 @@ $ mythfilldatabase --import-icon-map iconmap.xml --update-icon-map
 
 <P>Once you have completed configuration of your backend systems, the next
 step is to configure the frontend client.  </P>
-<P>When you start mythfrontend, you should have a number of choices.  Before
+<P>When you start mythfrontend for the first time, it will attempt to
+connect to a configuration database on the local machine.  If there is none,
+a "Database Configuration" screen will appear, and you will need to
+fill in some details.  The "Host name" field needs the backend or
+database server's IP address or DNS name, and the User or password fields
+may need to be set to match your database user accounts.  After editing those
+fields, press enter twice to write these configurations on your local machine,
+and attempt to connect to the database.  If you make any mistakes, the screens
+will pop up again.</P>
+<P>Now that mythfrontend has started up,
+you should have a number of buttons/choices.  Before
 doing anything, go to TV, then to Setup and configure the frontend client.</P>
 <P>
 <FIGURE>
@@ -3661,12 +3526,12 @@ The following types of hardware encoding cards are supported:
 <UL>
 <LI>MJPEG - Zoran-based cards; see 
 <A HREF="http://mjpeg.sourceforge.net">http://mjpeg.sourceforge.net</A></LI>
-<LI>MPEG-2 - iTVC15 based cards (Hauppauge PVR-250/PVR-350); see 
-<A HREF="http://ivtv.sourceforge.net">http://ivtv.sourceforge.net</A> and
-the Air2PC-ATSC-PCI see 
-<A HREF="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103">http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103</A>.</LI>
+<LI>MPEG-2 - iTVC15/16 based cards (Hauppauge PVR-250/PVR-350); see 
+<A HREF="http://ivtv.sourceforge.net">http://ivtv.sourceforge.net</A> </LI>
 <LI>HDTV - pcHDTV cards; see 
-<A HREF="http://pchdtv.com">http://pchdtv.com</A></LI>
+<A HREF="http://pchdtv.com">http://pchdtv.com</A> and
+the Air2PC-ATSC-PCI see 
+<A HREF="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103">http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103</A></LI>
 <LI>DVB - cards supporting DVB; see 
 <A HREF="http://linuxtv.org">http://linuxtv.org</A></LI>
 </UL>
@@ -3805,6 +3670,8 @@ ALT-F4 </TD><TD> exit out of the application </TD></TR><TR><TD>
 Space/Enter     </TD><TD> take action on the item under the highlight point </TD></TR><TR><TD>
 P </TD><TD> play in both "Watch a Recording" and "Delete a Recording"   </TD></TR><TR><TD>
 D </TD><TD> delete in both "Watch a Recording" and "Delete a Recording" </TD></TR><TR><TD>
+U </TD><TD> to view details for the currently selected show on the Watch&nbsp;or Delete screens, EPG, "Program Finder", "Fix Scheduling&nbsp;Conflicts" or search results screens </TD></TR><TR><TD>
+O </TD><TD> to list the upcoming episodes for the currently selected show&nbsp;on the EPG, "Program Finder", "Program Recording Priorities",&nbsp;"Fix Scheduling Conflicts" or search results screens </TD></TR><TR><TD>
 I </TD><TD> edit recording options from the EPG, "Program Finder",&nbsp;"Program Recording Priorities", or "Fix Scheduling Conflicts"&nbsp;screens. From the Playback and Delete screens, 'I' presents&nbsp;options for recorded shows such as Auto Expire or Stop Recording.&nbsp;Pressing 'I' while on the Recording Options screen will take you&nbsp;to the Advanced Recording Options screen.
 </TD></TR></TABLE>
 </CENTER><BR>
@@ -3816,7 +3683,7 @@ I </TD><TD> edit recording options from the EPG, "Program Finder",&nbsp;"Program
 <TABLE BORDER><TR><TD>
 Up or down      </TD><TD> keys change the channel </TD></TR><TR><TD>
 num pad </TD><TD> Type a number to enter a channel number or jump amount (HHMM format) </TD></TR><TR><TD>
-P </TD><TD> pause / play </TD></TR><TR><TD>
+P </TD><TD> pause / play. You may also add an explicit keybinding for 'Play' through&nbsp;MythWeb, returning you to normal speed if you are in slow motion, rewind&nbsp;fast forward or pause mode. </TD></TR><TR><TD>
 C </TD><TD> change inputs on TV Tuner card </TD></TR><TR><TD>
 ESC </TD><TD> quits </TD></TR><TR><TD>
 I </TD><TD> puts the On-screen Display up again. During playback, 'I' toggles&nbsp;between position and show description info. If a jump amount is&nbsp;entered, jump to that position. </TD></TR><TR><TD>
@@ -3834,7 +3701,10 @@ F </TD><TD> rotate between the various Picture Adjustments (Colour, Hue, etc.)&n
 ? </TD><TD> mark/unmark the current channel as a "favorite" </TD></TR><TR><TD>
 U </TD><TD> increase the play speed </TD></TR><TR><TD>
 J </TD><TD> decrease the play speed </TD></TR><TR><TD>
+A </TD><TD> Adjust time stretch (speed up or slow down normal play of audio and video </TD></TR><TR><TD>
 W </TD><TD> cycle through 4:3 aspect ratio, 16:9, 4:3 Zoom (like Pan and Scan),&nbsp;16:9 Zoom, and 16:9 Stretch (eliminates black sidebars in TV signal) </TD></TR><TR><TD>
+F8 </TD><TD> toggle the sleep timer 30m->1hr->1hr30m->2hr->Off </TD></TR><TR><TD>
+CTRL-B </TD><TD> Jump to the beginning of the recording / ringbuffer </TD></TR><TR><TD>
 Left </TD><TD> (if a jump amount is entered) to jump back that amount </TD></TR><TR><TD>
 Right </TD><TD> (if a jump amount is entered) to jump ahead that amount </TD></TR><TR><TD>
 </TD><TD> </TD></TR><TR><TD>
@@ -3876,30 +3746,7 @@ Right </TD><TD> advance 1 frame </TD></TR><TR><TD>
 G       </TD><TD> rotate between the various Picture Adjustments (Colour, Hue, etc.)&nbsp;for recording. These values affect the look of the resulting .nuv&nbsp;file, and are independent of the playback picture settings. While&nbsp;Picture Adjustment is on-screen, use Left and Right arrows to adjust. </TD></TR><TR><TD>
 H       </TD><TD> Channel history. Each repeat steps back through the previous channels. </TD></TR><TR><TD>
 O       </TD><TD> Turns on 'Browse' mode, allowing user to browse channels and program&nbsp;info while watching current show FullScreen. </TD></TR><TR><TD>
-F8      </TD><TD> toggle the sleep timer 30m->1hr->1hr30m->2hr->Off </TD></TR><TR><TD>
 Y       </TD><TD> switch between multiple capture cards.&nbsp; <B>NOTE</B>:you will lose your LiveTV buffer on your current card. Useful&nbsp;for different-sourced cards (such as Dish Network on one, HDTV over-the-air on another card.) </TD></TR><TR><TD>
-</TD></TR></TABLE>
-</CENTER><BR>
-</P>
-<H3>Watching a recording only</H3>
-
-<P>
-<BR><CENTER>
-<TABLE BORDER><TR><TD>
-Space/Enter </TD><TD> set a bookmark at that point. Next time you start the&nbsp;recording, you will automatically jump forward to this point&nbsp;and clear the bookmark. </TD></TR><TR><TD>
-X </TD><TD> queues the current recording for transcoding </TD></TR><TR><TD>
-O </TD><TD> brings up menu to allow toggling settings such as Commercial&nbsp;Auto-Skip, Auto-Expire, etc. </TD></TR><TR><TD>
-E or M </TD><TD> enters/exits edit mode. </TD></TR><TR><TD>
-</TD><TD> </TD></TR><TR><TD>
-</TD><TD> </TD></TR><TR><TD>
-</TD><TD> <B>In edit mode</B> </TD></TR><TR><TD>
-Left/Right      </TD><TD> move forward and backward </TD></TR><TR><TD>
-Up/Down </TD><TD> alter the amount of time you jump forward and backward.&nbsp;Increments are: nearest cutpoint, nearest video keyframe, 1&nbsp;frame, 0.5 seconds, 1 second, 20 seconds, 1 minute, 5 minutes,&nbsp;and 10 minutes. </TD></TR><TR><TD>
-PageUp/PageDown </TD><TD> move forward and backward to the nearest cut point </TD></TR><TR><TD>
-&lt; or > </TD><TD> move forward or backward by 10 times the normal jump amount </TD></TR><TR><TD>
-Space/Enter     </TD><TD> allows you to set or delete a cut point </TD></TR><TR><TD>
-Z </TD><TD> loads the commercial skip list (if one exists) into the cutlist </TD></TR><TR><TD>
-C or Q </TD><TD> clear all cut points in the cutlist
 </TD></TR></TABLE>
 </CENTER><BR>
 </P>
@@ -3947,6 +3794,30 @@ N       </TD><TD> swaps the two channels by changing channels on both cards
 </TD></TR></TABLE>
 </CENTER><BR>
 </P>
+<H3>Watching a recording only</H3>
+
+<P>
+<BR><CENTER>
+<TABLE BORDER><TR><TD>
+Space/Enter </TD><TD> set a bookmark at that point. Next time you start the&nbsp;recording, you will automatically jump forward to this point&nbsp;and clear the bookmark. </TD></TR><TR><TD>
+X </TD><TD> queues the current recording for transcoding </TD></TR><TR><TD>
+O </TD><TD> brings up menu to allow toggling settings such as Commercial&nbsp;Auto-Skip, Auto-Expire, etc. </TD></TR><TR><TD>
+D </TD><TD> exits the current recording and displays the Delete menu </TD></TR><TR><TD>
+E or M </TD><TD> enters/exits edit mode. </TD></TR><TR><TD>
+</TD><TD> </TD></TR><TR><TD>
+</TD><TD> </TD></TR><TR><TD>
+</TD><TD> <B>In edit mode</B> </TD></TR><TR><TD>
+Left/Right      </TD><TD> move forward and backward </TD></TR><TR><TD>
+Up/Down </TD><TD> alter the amount of time you jump forward and backward.&nbsp;Increments are: nearest cutpoint, nearest video keyframe, 1&nbsp;frame, 0.5 seconds, 1 second, 20 seconds, 1 minute, 5 minutes,&nbsp;and 10 minutes. </TD></TR><TR><TD>
+PageUp/PageDown </TD><TD> move forward and backward to the nearest cut point </TD></TR><TR><TD>
+&lt; or > </TD><TD> move forward or backward by 10 times the normal jump amount </TD></TR><TR><TD>
+Space/Enter     </TD><TD> allows you to set or delete a cut point </TD></TR><TR><TD>
+Z </TD><TD> loads the commercial skip list (if one exists) into the cutlist </TD></TR><TR><TD>
+C or Q </TD><TD> clear all cut points in the cutlist </TD></TR><TR><TD>
+I </TD><TD> Inverts the cutlist
+</TD></TR></TABLE>
+</CENTER><BR>
+</P>
 <H3>EPG</H3>
 
 <P>
@@ -3965,8 +3836,8 @@ M </TD><TD> when on a channel will change to that channel </TD></TR><TR><TD>
 ESC or C </TD><TD> exits without changing the channel </TD></TR><TR><TD>
 R </TD><TD> change the current item from Recording/Not-Recording.&nbsp;Successive keypresses cycle through the scheduled recording&nbsp;type list. </TD></TR><TR><TD>
 X </TD><TD> change the channel to the currently selected channel without&nbsp;leaving the EPG (Most useful in the alternate EPG) </TD></TR><TR><TD>
-/ </TD><TD> mark/unmark the current channel as a "favorite" </TD></TR><TR><TD>
-4 </TD><TD> toggle the guide listing between all channels and filtered&nbsp;"favorites"
+? </TD><TD> mark/unmark the current channel as a "favorite" </TD></TR><TR><TD>
+/ or 4 </TD><TD> toggle the guide listing between all channels and filtered&nbsp;"favorites"
 </TD></TR></TABLE>
 </CENTER><BR>
 </P>
@@ -4031,7 +3902,17 @@ I       </TD><TD> move a program from one Recording Group to another
 </TD></TR></TABLE>
 </CENTER><BR>
 </P>
+<H3>Watch Recordings Screen</H3>
 
+<P>
+<BR><CENTER>
+<TABLE BORDER><TR><TD>
+1 or F1 </TD><TD> Meaning of the icons </TD></TR><TR><TD>
+/ </TD><TD> Tags a recording. Tagged recordings can be played&nbsp;either in order or shuffled and deleted as a group.&nbsp;You can also change the recording group for several recordings&nbsp;at once by tagging them and using the popup INFO menu to change&nbsp;the recording group. </TD></TR><TR><TD>
+? </TD><TD> Clear the tagged list.
+</TD></TR></TABLE>
+</CENTER><BR>
+</P>
 <H3>Remote Controls</H3>
 
 <P>If you are using MythTV with just a remote control then it is suggested that you
@@ -4312,7 +4193,8 @@ command" with the "Wakeup time format" suitable for that tool.</P>
 
 <P>If your MySQL server and your Master backend are not on the same machine,
 you can have the Master backend wake your MySQL server using WOL. You will
-find the settings for this in mysql.txt. The meanings are the same as
+find the settings for this in the second page of the setup program,
+or at the end of mysql.txt.  The meanings are the same as
 discussed in "The WakeOnLan settings" above.</P>
 
 <H3>Tips/Tricks:</H3>
@@ -5406,13 +5288,6 @@ first choice is the better solution.</P>
 <P>You didn't set your <CODE>QTDIR</CODE>.  Re-read the section on 
 <A HREF="#Setting_up_paths">Setting up paths</A>.</P>
 
-<H3>Settings get reset at every compile.</H3>
-
-<P>MythTV will overwrite any settings in <CODE>/usr/local/share/mythtv</CODE>.
-If you want to make sure that you don't lose your modifications, make a
-directory <CODE>~/.mythtv</CODE> and copy your mysql.txt file to this
-location.</P>
-
 <H2><A NAME="ss20.2">20.2</A> <A HREF="#toc20.2">Debugging</A>
 </H2>
 
@@ -5561,7 +5436,7 @@ need to be edited for your setup.  Go to Settings->TV Settings->Recording
 Profiles and adjust the <B>Default</B> and <B>Live TV</B> options to
 480 or 576 from their defaults.</P>
 
-<H3>Screen goes blank but returns when mouse if moved or keyboard is used</H3>
+<H3>Screen goes blank but returns when mouse is moved or keyboard is used</H3>
 
 <P>This is due to DPMS, the Display Power Management System, which is used
 to save power by turning off your monitor when the system decides that it's
@@ -5771,7 +5646,7 @@ grabbed by another process, like <B>esd</B> or <B>artsd</B>.  If
 <FIGURE>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>: The CVS version of MythTV now has support for using
+<CAPTION><B>NOTE</B>: MythTV now has support for using
 <B>artsd</B>.  This is a compile-time option, so you will need to edit the
 <CODE>settings.pro</CODE> file in the mythtv directory then perform a <CODE>make
 distclean; make</CODE>, and re-run <CODE>make install</CODE> as root to add this
@@ -7755,8 +7630,10 @@ distribution, or get the latest versions from
 <A HREF="http://www.sistina.com/products_lvm.htm">http://www.sistina.com/products_lvm.htm</A> and build them manually.</P>
 <P>Check that the <B>vgscan</B> program is being run at some point during
 your boot sequence - most distributions do this by default. Look for a
-message during boot up that looks like this:
-<CODE>vgscan -- reading all physical volumes (this may take a while...)</CODE></P>
+message during boot up that looks like this: <CODE>vgscan -- reading all
+physical volumes (this may take a while...)</CODE> If you don't see any
+messages during boot, you may need to install a LVM init script or confirm
+that you have all of the LVM packages installed from your distribution.</P>
 <P>LVM uses a few concepts you should be familiar with before starting.
 <UL>
 <LI>PV (Physical Volume).  The actual partition on the hard drive.</LI>

@@ -16,7 +16,17 @@
 
 <P>Once you have completed configuration of your backend systems, the next
 step is to configure the frontend client.  </P>
-<P>When you start mythfrontend, you should have a number of choices.  Before
+<P>When you start mythfrontend for the first time, it will attempt to
+connect to a configuration database on the local machine.  If there is none,
+a "Database Configuration" screen will appear, and you will need to
+fill in some details.  The "Host name" field needs the backend or
+database server's IP address or DNS name, and the User or password fields
+may need to be set to match your database user accounts.  After editing those
+fields, press enter twice to write these configurations on your local machine,
+and attempt to connect to the database.  If you make any mistakes, the screens
+will pop up again.</P>
+<P>Now that mythfrontend has started up,
+you should have a number of buttons/choices.  Before
 doing anything, go to TV, then to Setup and configure the frontend client.</P>
 <P>
 <FIGURE>
@@ -247,12 +257,12 @@ The following types of hardware encoding cards are supported:
 <UL>
 <LI>MJPEG - Zoran-based cards; see 
 <A HREF="http://mjpeg.sourceforge.net">http://mjpeg.sourceforge.net</A></LI>
-<LI>MPEG-2 - iTVC15 based cards (Hauppauge PVR-250/PVR-350); see 
-<A HREF="http://ivtv.sourceforge.net">http://ivtv.sourceforge.net</A> and
-the Air2PC-ATSC-PCI see 
-<A HREF="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103">http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103</A>.</LI>
+<LI>MPEG-2 - iTVC15/16 based cards (Hauppauge PVR-250/PVR-350); see 
+<A HREF="http://ivtv.sourceforge.net">http://ivtv.sourceforge.net</A> </LI>
 <LI>HDTV - pcHDTV cards; see 
-<A HREF="http://pchdtv.com">http://pchdtv.com</A></LI>
+<A HREF="http://pchdtv.com">http://pchdtv.com</A> and
+the Air2PC-ATSC-PCI see 
+<A HREF="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103">http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103</A></LI>
 <LI>DVB - cards supporting DVB; see 
 <A HREF="http://linuxtv.org">http://linuxtv.org</A></LI>
 </UL>
