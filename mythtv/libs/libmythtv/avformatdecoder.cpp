@@ -1331,7 +1331,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame)
     if (!m_positionMap.empty())
         last_frame = m_positionMap[m_positionMap.size()-1].index * keyframedist;
 
-    if (desiredFrame > last_frame) 
+    //if (desiredFrame > last_frame) 
     //cerr << "Map still doesn't cover" << endl;
 
     while (desiredFrame > last_frame)
