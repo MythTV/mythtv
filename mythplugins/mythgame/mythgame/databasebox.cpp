@@ -46,6 +46,8 @@ DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QString &paths,
 
     listview->setCurrentItem(listview->firstChild());
     listview->setSelected(listview->firstChild(), true);
+
+    listview->setFocus();
 }
 
 void DatabaseBox::fillList(QListView *listview, QString &paths)

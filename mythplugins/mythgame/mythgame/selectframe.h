@@ -17,7 +17,8 @@ class SelectFrame : public QFrame
     Q_OBJECT
   public:
     SelectFrame(QWidget * parent = 0, const char * name = 0, WFlags f = 0);
-    SelectFrame();
+   ~SelectFrame();
+
     void setDimensions();
     void setRomlist(QPtrList<RomInfo> *romlist);
     void setButtons(RomInfo* first);

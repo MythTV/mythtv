@@ -66,6 +66,8 @@ ScreenBox::ScreenBox(QSqlDatabase *ldb, QString &paths, MythMainWindow *parent,
 
     listview->setCurrentItem(listview->firstChild());
     listview->setSelected(listview->firstChild(), true);
+
+    listview->setFocus();
 }
 
 void ScreenBox::fillList(QListView *listview, QString &paths)

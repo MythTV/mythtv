@@ -388,6 +388,9 @@ void MameHandler::processGames()
                                               rom->Num_players(), rom->Num_buttons());
                             db->exec(thequery);
                         }
+
+                        delete rom;
+
                         done_roms++;
                         done = (float) ((float) (done_roms) /
                                          (float) (supported_games));

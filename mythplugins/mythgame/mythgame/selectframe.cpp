@@ -199,6 +199,23 @@ SelectFrame::SelectFrame(QWidget * parent, const char * name, WFlags f):
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 }
 
+SelectFrame::~SelectFrame()
+{
+    if(RomList)
+    {
+        RomList->setAutoDelete(true);
+        RomList->clear();
+        delete RomList;
+    }
+
+    if (mButtons)
+    {
+        for (int i = 0; i < mRows; i++)
+            delete [] mButtons[i];
+        delete [] mButtons;
+    }
+}
+
 void SelectFrame::setDimensions()
 {
     const int ScrollWidth = mScrollBar->sizeHint().width(); 
