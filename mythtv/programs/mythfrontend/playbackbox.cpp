@@ -1803,69 +1803,42 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
 
-    for (unsigned int i = 0; i < actions.size(); i++)
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
-
-        if (showData.count() > 0)
-        {
-            if (action == "DELETE")
-            {
-                deleteSelected();
-                handled = true;
-            }
-            else if (action == "PLAYBACK")
-            {
-                playSelected();
-                handled = true;
-            }
-            else if (action == "MENU" || action == "INFO")
-            {
-                showActionsSelected();
-                handled = true;
-            }
-            else if (action == "SELECT")
-            {
-                selected();
-                handled = true;
-            }
-            else if (action == "UP")
-            {
-                cursorUp();
-                handled = true;
-            }
-            else if (action == "DOWN")
-            {  
-                cursorDown();
-                handled = true;
-            }
-            else if (action == "LEFT")
-            {
-                cursorLeft();
-                handled = true;
-            }
-            else if (action == "RIGHT")
-            {
-                cursorRight();
-                handled = true;
-            }
-            else if (action == "PAGEUP")
-            {
-                pageUp();
-                handled = true;
-            }
-            else if (action == "PAGEDOWN")
-            {
-                pageDown();
-                handled = true;
-            }
-        }
+        handled = true;
 
         if (action == "ESCAPE")
         {
             exitWin();
-            handled = true;
         }
+        else if (showData.count() > 0)
+        {
+            if (action == "DELETE")
+                deleteSelected();
+            else if (action == "PLAYBACK")
+                playSelected();
+            else if (action == "MENU" || action == "INFO")
+                showActionsSelected();
+            else if (action == "SELECT")
+                selected();
+            else if (action == "UP")
+                cursorUp();
+            else if (action == "DOWN")
+                cursorDown();
+            else if (action == "LEFT")
+                cursorLeft();
+            else if (action == "RIGHT")
+                cursorRight();
+            else if (action == "PAGEUP")
+                pageUp();
+            else if (action == "PAGEDOWN")
+                pageDown();
+            else
+                handled = false;
+        }
+        else
+            handled = false;
     }
 
     if (!handled)

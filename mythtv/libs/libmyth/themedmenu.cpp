@@ -1658,9 +1658,11 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("menu", e, actions);
 
-    for (unsigned int i = 0; i < actions.size(); i++)
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
+        handled = true;
+
         if (action == "UP")
         { 
             if (currentrow > 0)
@@ -1668,13 +1670,11 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
 
             if (currentcolumn >= buttonRows[currentrow].numitems)
                 currentcolumn = buttonRows[currentrow].numitems - 1;
-            handled = true;
         }
         else if (action == "LEFT")
         {
             if (currentcolumn > 0)
                 currentcolumn--;
-            handled = true;
         }
         else if (action == "DOWN")
         {
@@ -1683,19 +1683,16 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
 
             if (currentcolumn >= buttonRows[currentrow].numitems)
                 currentcolumn = buttonRows[currentrow].numitems - 1;
-            handled = true;
         }
         else if (action == "RIGHT")
         {
             if (currentcolumn < buttonRows[currentrow].numitems - 1)
                 currentcolumn++;
-            handled = true;
         }
         else if (action == "SELECT")
         {
             handleAction(activebutton->action);
             lastbutton = NULL;
-            handled = true;
         }
         else if (action == "ESCAPE")
         {
@@ -1705,8 +1702,9 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
             else if (killable || e->state() == exitModifier)
                 done(0);
             lastbutton = NULL;
-            handled = true;
         }
+        else
+            handled = false;
     }
 
     if (!handled)

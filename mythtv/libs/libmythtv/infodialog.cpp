@@ -178,35 +178,29 @@ bool InfoDialog::eventFilter(QObject *o, QEvent *e)
 
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Qt", ke, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("qt", ke, actions);
 
-    for (unsigned int i = 0; i < actions.size(); i++)
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
+        handled = true;
+
         if (action == "MENU" || action == "INFO")
-        {
-            handled = true;
             advancedEdit(lview->currentItem());
-        }
         else if (action == "SELECT")
-        {
-            handled = true;
             selected(lview->currentItem());
-        }
         else if (action == "0" || action == "1" || action == "2" ||
                  action == "3" || action == "4" || action == "5" ||
                  action == "6" || action == "7" || action == "8" ||
                  action == "9")
         {
-            handled = true;
             numberPress(lview->currentItem(), action.toInt());
         }
+        else
+            handled = false;
     }
 
-    if (handled)
-        return true;
-
-    return false;
+    return handled;
 }
 
 void InfoDialog::selected(QListViewItem *selitem)

@@ -92,54 +92,31 @@ void ViewScheduled::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
+            handled = true;
+
             if (action == "SELECT")
-            {
                 selected();
-                handled = true;
-            }
             else if (action == "MENU" || action == "INFO")
-            {
                 edit();
-                handled = true;
-            }
             else if (action == "ESCAPE")
-            {
                 done(MythDialog::Accepted);
-                handled = true;
-            }
             else if (action == "UP")
-            {
                 cursorUp();
-                handled = true;
-            }
             else if (action == "DOWN")
-            {
                 cursorDown();
-                handled = true;
-            }
             else if (action == "PAGEUP")
-            {
                 pageUp();
-                handled = true;
-            }
             else if (action == "PAGEDOWN")
-            {
                 pageDown();
-                handled = true;
-            }
             else if (action == "1")
-            {
                 setShowAll(true);
-                handled = true;
-            }
             else if (action == "2")
-            {
                 setShowAll(false);
-                handled = true;
-            }
+            else
+                handled = false;
         }
     }
 

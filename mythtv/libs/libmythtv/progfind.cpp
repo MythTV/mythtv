@@ -158,60 +158,33 @@ void ProgFinder::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
 
-    for (unsigned int i = 0; i < actions.size(); i++)
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
+        handled = true;
 
         if (action == "UP")
-        {
             cursorUp();
-            handled = true;
-        }
         else if (action == "DOWN")
-        {
             cursorDown();
-            handled = true;
-        }
         else if (action == "LEFT")
-        {
             cursorLeft();
-            handled = true;
-        }
         else if (action == "RIGHT")
-        {
             cursorRight();
-            handled = true;
-        }
         else if (action == "PAGEUP")
-        {
             pageUp();
-            handled = true;
-        }
         else if (action == "PAGEDOWN")
-        {
             pageDown();
-            handled = true;
-        }
         else if (action == "SELECT" || action == "INFO")
-        {
             select();
-            handled = true;
-        }
         else if (action == "MENU" || action == "ESCAPE")
-        {
             escape();
-            handled = true;
-        }
         else if (action == "TOGGLERECORD")
-        {
             quickRecord();
-            handled = true;
-        }
         else if (action == "4")
-        {
             showGuide();
-            handled = true;
-        }
+        else
+            handled = false;
     }
 
     if (!handled)

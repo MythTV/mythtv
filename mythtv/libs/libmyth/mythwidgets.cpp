@@ -20,33 +20,29 @@ void MythComboBox::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
+            handled = true;
+
             if (action == "UP")
-            {
                 focusNextPrevChild(false);
-                handled = true;
-            }
             else if (action == "DOWN")
-            {
                 focusNextPrevChild(true);
-                handled = true;
-            }
             else if (action == "LEFT")
             {
                 if (currentItem() == 0)
                     setCurrentItem(count()-1);
                 else if (count() > 0)
                     setCurrentItem((currentItem() - 1) % count());
-                handled = true;
             }
             else if (action == "RIGHT")
             {
                 if (count() > 0)
                     setCurrentItem((currentItem() + 1) % count());
-                handled = true;
             }
+            else
+                handled = false;
         }
     }
 
@@ -82,24 +78,19 @@ void MythCheckBox::keyPressEvent(QKeyEvent* e)
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
+            handled = true;
+
             if (action == "UP")
-            {
                 focusNextPrevChild(false);
-                handled = true;
-            }
             else if (action == "DOWN")
-            {
                 focusNextPrevChild(true);
-                handled = true;
-            }
             else if (action == "LEFT" || action == "RIGHT")
-            {
                 toggle();
-                handled = true;
-            }
+            else
+                handled = false;
         }
     }
 
@@ -146,31 +137,23 @@ bool MythSpinBox::eventFilter(QObject* o, QEvent* e)
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", (QKeyEvent *)e, 
                                                      actions))
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
+            handled = true;
+
             if (action == "UP")
-            {
                 focusNextPrevChild(false);
-                handled = true;
-            }
             else if (action == "DOWN")
-            {
                 focusNextPrevChild(true);
-                handled = true;
-            }
             else if (action == "LEFT")
-            {
                 stepDown();
-                handled = true;
-            }
             else if (action == "RIGHT")
-            {
                 stepUp();
-                handled = true;
-            }
             else if (action == "SELECT" || action == "ESCAPE")
                 return FALSE;
+            else
+                handled = false;
         }
     }
 
@@ -199,34 +182,23 @@ void MythSlider::keyPressEvent(QKeyEvent* e)
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
+            handled = true;
+
             if (action == "UP")
-            {
                 focusNextPrevChild(false);
-                handled = true;
-            }
             else if (action == "DOWN")
-            {
                 focusNextPrevChild(true);
-                handled = true;
-            }
             else if (action == "LEFT")
-            {
                 setValue(value() - lineStep());
-                handled = true;
-            }
             else if (action == "RIGHT")
-            {
                 setValue(value() + lineStep());
-                handled = true;
-            }
             else if (action == "SELECT")
-            {
                 e->ignore();
-                handled = true;
-            }
+            else
+                handled = false;
         }
     }
 
@@ -256,24 +228,19 @@ void MythLineEdit::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
+            handled = true;
+
             if (action == "UP")
-            {
                 focusNextPrevChild(false);
-                handled = true;
-            }
             else if (action == "DOWN")
-            {
                 focusNextPrevChild(true);
-                handled = true;
-            }
             else if (action == "SELECT" && e->text().isNull())
-            {
                 e->ignore();
-                handled = true;
-            }
+            else
+                handled = false;
         }
     }
 
@@ -577,12 +544,13 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
+            handled = true;
+
             if (action == "UP")
             {
-                handled = true;
                 endCycle();
                 // Need to call very base one because
                 // QTextEdit reimplements it to tab
@@ -593,18 +561,19 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
             }
             else if (action == "DOWN")
             {
-                handled = true;
                 endCycle();
                 QWidget::focusNextPrevChild(true);
                 emit tryingToLooseFocus(true);
             }
+            else
+                handled = false;
         }
     }
 
     if (handled)
         return;
 
-    switch(e->key())
+    switch (e->key())
     {
         case Key_Enter:
         case Key_Return:
@@ -616,7 +585,7 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
             //  Only eat Key_Space if we are in a cycle
             
         case Key_Space:
-            if(active_cycle)
+            if (active_cycle)
             {
                 handled = true;
                 endCycle();
@@ -678,7 +647,7 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
             break;
     }
     
-    if(handled == false)
+    if (!handled)
     {
         endCycle();
         QTextEdit::keyPressEvent(e);
@@ -688,7 +657,7 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
 
 void MythRemoteLineEdit::setCycleTime(float desired_interval)
 {
-    if(desired_interval < 0.5 || desired_interval > 10.0)
+    if (desired_interval < 0.5 || desired_interval > 10.0)
     {
         cerr << "libmyth: Did not accept key cycle interval of " << desired_interval << " seconds" << endl; 
     }
@@ -801,9 +770,10 @@ void MythTable::keyPressEvent(QKeyEvent *e)
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", (QKeyEvent *)e,
                                                      actions))
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
+
             if (action == "UP")
             {
                 if (tmpRow == 0)
@@ -821,9 +791,7 @@ void MythTable::keyPressEvent(QKeyEvent *e)
                 }
             }
             else if (action == "LEFT" || action == "RIGHT")
-            {
                 handled = true;
-            }
         }
     }
 
@@ -927,7 +895,7 @@ void MythPushButton::keyPressEvent(QKeyEvent *e)
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", (QKeyEvent *)e,
                                                      actions))
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             if (action == "SELECT")
@@ -950,7 +918,7 @@ void MythPushButton::keyReleaseEvent(QKeyEvent *e)
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", (QKeyEvent *)e,
                                                      actions))
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             if (action == "SELECT")
@@ -1006,12 +974,15 @@ void MythListView::keyPressEvent(QKeyEvent *e)
 
     }
 
+    bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Qt", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions);
 
-    for (unsigned int i = 0; i < actions.size(); i++)
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
+        handled = true;
+
         if (action == "UP" && currentItem() == firstChild())
         {
             // Key_Up at top of list allows focus to move to other widgets
@@ -1034,6 +1005,8 @@ void MythListView::keyPressEvent(QKeyEvent *e)
             emit spacePressed(currentItem());
             return;
         }
+        else
+            handled = false;
     }
 
     QListView::keyPressEvent(e);
@@ -1070,7 +1043,7 @@ void MythListBox::keyPressEvent(QKeyEvent* e)
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             if (action == "UP" || action == "DOWN" || action == "PAGEUP" ||

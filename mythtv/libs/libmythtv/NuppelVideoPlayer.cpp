@@ -1964,14 +1964,17 @@ void NuppelVideoPlayer::DisableEdit(void)
 
 bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
 {
+    bool handled = false;
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("TV Editing", e, actions);
 
     if (dialogname != "")
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
+            handled = true;
+
             if (action == "UP")
                 osd->DialogUp(dialogname);
             else if (action == "DOWN")
@@ -1983,6 +1986,8 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
                 osd->TurnDialogOff(dialogname);
                 HandleResponse();
             }
+            else
+                handled = false;
         }
 
         return true;
@@ -1992,9 +1997,11 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
     bool exactstore = exactseeks;
     decoder->setExactSeeks(true);
 
-    for (unsigned int i = 0; i < actions.size(); i++)
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
+        handled = true;
+
         if (action == "SELECT")
             HandleSelect();
         else if (action == "LEFT")
@@ -2032,7 +2039,6 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
         {
             UpdateSeekAmount(false);
             UpdateTimeDisplay();
-            break; 
         }
         else if (action == "CLEARMAP")
         {
@@ -2076,7 +2082,6 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
             HandleArbSeek(true);
             seekamount = old_seekamount;
             UpdateTimeDisplay();
-            break;
         }
 #define FFREW_MULTICOUNT 10
         else if (action == "BIGJUMPREW")
@@ -2112,8 +2117,9 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
         {
             DisableEdit();
             retval = false;
-            break;
         }
+        else
+            handled = false;
     }
 
     decoder->setExactSeeks(exactstore);
@@ -3002,7 +3008,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
         }
 
         if (frame.timecode < lasttimecode)
-            frame.timecode = lasttimecode + vidFrameTime;
+            frame.timecode = (long long)(lasttimecode + vidFrameTime);
         lasttimecode = frame.timecode;
 
         if (eof)

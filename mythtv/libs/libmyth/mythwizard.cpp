@@ -540,16 +540,17 @@ void MythWizard::keyPressEvent(QKeyEvent* e)
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
+            handled = true;
+
             if (action == "SELECT")
             {
                 if (indexOf(currentPage()) == pageCount()-1)
                     accept();
                 else
                     next();
-                handled = true;
             }
             else if (action == "ESCAPE")
             {
@@ -561,8 +562,9 @@ void MythWizard::keyPressEvent(QKeyEvent* e)
                     QApplication::postEvent(gContext->GetMainWindow(), 
                                             new ExitToMainMenuEvent());
                 }
-                handled = true;
             }
+            else
+                handled = false;
         }
     }
 

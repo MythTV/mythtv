@@ -282,9 +282,11 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
     
     if (e->state() == Qt::ControlButton)
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
+            handled = true;
+
             if (action == "LEFT")
                 pageLeft();
             else if (action == "RIGHT")
@@ -293,110 +295,58 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
                 pageUp();
             else if (action == "DOWN")
                 pageDown();
+            else
+                handled = false;
         }
         handled = true;
     }
     else
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
+            handled = true;
 
             if (action == "LEFT")
-            {
                 cursorLeft();
-                handled = true;
-            }
             else if (action == "RIGHT")
-            {
                 cursorRight();
-                handled = true;
-            }
             else if (action == "DOWN")
-            {
                 cursorDown();
-                handled = true;
-            }
             else if (action == "UP")
-            {
                 cursorUp();
-                handled = true;
-            }
             else if (action == "PAGEUP")
-            {
                 pageUp();
-                handled = true;
-            }
             else if (action == "PAGEDOWN")
-            {
                 pageDown();
-                handled = true;
-            }
             else if (action == "PAGELEFT")
-            {
                 pageLeft();
-                handled = true;
-            }
             else if (action == "PAGERIGHT")
-            {
                 pageRight();
-                handled = true;
-            }
             else if (action == "DAYLEFT")
-            {
                 dayLeft();
-                handled = true;
-            }
             else if (action == "DAYRIGHT")
-            {
                 dayRight();
-                handled = true;
-            }
             else if (action == "NEXTFAV" || action == "4")
-            {
                 toggleGuideListing();
-                handled = true;
-            }
             else if (action == "6")
-            {
                 showProgFinder();
-                handled = true;
-            }
             else if (action == "MENU")
-            {
                 enter();
-                handled = true;
-            }
             else if (action == "ESCAPE")
-            {
                 escape();
-                handled = true;
-            }
             else if (action == "SELECT")
-            {
                 editRecording();
-                handled = true;
-            }
             else if (action == "INFO")
-            {
                 editScheduled();
-                handled = true;
-            }
             else if (action == "TOGGLERECORD")
-            {
                 quickRecord();
-                handled = true;
-            }
             else if (action == "TOGGLEFAV")
-            {
                 toggleChannelFavorite();
-                handled = true;
-            }
             else if (action == "CHANUPDATE")
-            {
                 channelUpdate();
-                handled = true;
-            }
+            else
+                handled = false;
         }
     }
 

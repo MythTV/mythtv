@@ -107,46 +107,29 @@ void ChannelRecPriority::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
+            handled = true;
+
             if (action == "UP")
-            {
                 cursorUp();
-                handled = true;
-            }
             else if (action == "DOWN")
-            {
                 cursorDown();
-                handled = true;
-            }
             else if (action == "PAGEUP")
-            {
                 pageUp();
-                handled = true;
-            }
             else if (action == "PAGEDOWN")
-            {
                 pageDown();
-                handled = true;
-            }
             else if (action == "RIGHT")
-            {
                 changeRecPriority(1);
-                handled = true;
-            }
             else if (action == "LEFT")
-            {
                 changeRecPriority(-1);
-                handled = true;
-            }
             else if (action == "ESCAPE")
             {
                 saveRecPriority(); 
                 gContext->SaveSetting("ChannelRecPrioritySorting",
                                       (int)sortType);
                 done(MythDialog::Accepted);
-                handled = true;
             }
             else if (action == "1")
             {
@@ -156,7 +139,6 @@ void ChannelRecPriority::keyPressEvent(QKeyEvent *e)
                     SortList();     
                     update(fullRect);
                 }
-                handled = true;
             }
             else if (action == "2")
             {
@@ -166,8 +148,9 @@ void ChannelRecPriority::keyPressEvent(QKeyEvent *e)
                     SortList(); 
                     update(fullRect);
                 }
-                handled = true;
             }
+            else
+                handled = false;
         }
     }
 

@@ -605,12 +605,16 @@ void MythDialog::keyPressEvent( QKeyEvent *e )
     if (e->state() != 0)
         return;
 
+    bool handled = false;
     QStringList actions;
+
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
+            handled = true;
+
             if (action == "ESCAPE")
                 reject();
             else if (action == "UP" || action == "LEFT")
@@ -635,6 +639,8 @@ void MythDialog::keyPressEvent( QKeyEvent *e )
             }
             else if (action == "MENU")
                 emit menuButtonPressed();
+            else
+                handled = false;
         }
     }
 }
@@ -854,9 +860,10 @@ void MythPopupBox::keyPressEvent(QKeyEvent *e)
     bool handled = false;
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions);
-    for (unsigned int i = 0; i < actions.size(); i++)
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
+
         if (action == "ESCAPE")
         {
             emit popupDone();
@@ -1019,7 +1026,7 @@ void MythProgressDialog::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             if (action == "ESCAPE")
@@ -1749,14 +1756,18 @@ MythPasswordDialog::MythPasswordDialog(QString message,
 
 void MythPasswordDialog::keyPressEvent(QKeyEvent *e)
 {
+    bool handled = false;
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             if (action == "ESCAPE")
+            {
+                handled = true;
                 MythDialog::keyPressEvent(e);
+            }
         }
     }
 }
@@ -1860,12 +1871,15 @@ Myth2ButtonDialog::Myth2ButtonDialog(MythMainWindow *parent, QString title1,
 
 void Myth2ButtonDialog::keyPressEvent(QKeyEvent *e)
 {
+    bool handled = false;
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
+            handled = true;
+
             if (action == "ESCAPE")
                 done(0);
             else if (action == "SELECT")
@@ -1882,6 +1896,8 @@ void Myth2ButtonDialog::keyPressEvent(QKeyEvent *e)
                 else
                     but1->setFocus();
             }
+            else
+                handled = false;
         }
     }
 }
@@ -1992,44 +2008,27 @@ void MythImageFileDialog::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
+            handled = true;
+
             if (action == "UP")
-            {
                 file_browser->moveUp();
-                handled = true;
-            }
             else if (action == "DOWN")
-            {
                 file_browser->moveDown();
-                handled = true;
-            }
             else if (action == "LEFT")
-            {
                 file_browser->popUp();
-                handled = true;
-            }
             else if (action == "RIGHT")
-            {
                 file_browser->pushDown();
-                handled = true;
-            }
             else if (action == "PAGEUP")
-            {
                 file_browser->pageUp();
-                handled = true;
-            }
             else if (action == "PAGEDOWN")
-            {
                 file_browser->pageDown();
-                handled = true;
-            }
             else if (action == "SELECT")
-            {
                 file_browser->select();
-                handled = true;
-            }
+            else
+                handled = false;
         }
     }
 

@@ -538,19 +538,17 @@ void ConfigurationDialogWidget::keyPressEvent(QKeyEvent* e)
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
+            handled = true;
+
             if (action == "SELECT")
-            {
-                handled = true;
                 accept();
-            }
             else if (action == "ESCAPE")
-            {
-                handled = true;
                 reject();
-            }
+            else
+                handled = false;
         }
     }
 
