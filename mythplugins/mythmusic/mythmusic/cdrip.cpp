@@ -11,6 +11,7 @@
 #include <qvbox.h>
 #include <qprogressbar.h>
 #include <qradiobutton.h>
+#include <qsqldatabase.h>
 #include <iostream>
 
 #include <unistd.h>
@@ -104,13 +105,15 @@ Ripper::Ripper(QSqlDatabase *ldb, MythMainWindow *parent, const char *name)
     
     QLabel *artistl = new QLabel(tr("Artist: "), firstdiag);
     artistl->setBackgroundOrigin(WindowOrigin);
-    artistedit = new MythLineEdit(firstdiag);
-    artistedit->setRW();
+    artistedit = new MythComboBox(true, firstdiag);
+    fillComboBox(*artistedit, "artist");
     if (track)
     {
-        artistedit->setText(track->Artist());
+        artistedit->setCurrentText(track->Artist());
         artistname = track->Artist();
     }
+    connect(artistedit, SIGNAL(activated(const QString &)),
+            artistedit, SIGNAL(textChanged(const QString &)));
     connect(artistedit, SIGNAL(textChanged(const QString &)),
             this, SLOT(artistChanged(const QString &)));
 
@@ -125,14 +128,30 @@ Ripper::Ripper(QSqlDatabase *ldb, MythMainWindow *parent, const char *name)
     }
     connect(albumedit, SIGNAL(textChanged(const QString &)), 
             this, SLOT(albumChanged(const QString &))); 
+
+    QLabel *genrelabel = new QLabel(tr("Genre: "), firstdiag);
+    genrelabel->setBackgroundOrigin(WindowOrigin);
+    genreedit = new MythComboBox(true, firstdiag);
+    fillComboBox (*genreedit, "genre");
+    if (track)
+    {
+       genreedit->setCurrentText(track->Genre());
+       genrename = track->Genre();
+    }
+    connect(genreedit, SIGNAL(activated(const QString &)),
+            genreedit, SIGNAL(textChanged(const QString &)));
+    connect(genreedit, SIGNAL(textChanged(const QString &)),
+            this, SLOT(genreChanged(const QString &)));
  
     grid->addMultiCellWidget(artistl, 0, 0, 0, 0);
     grid->addMultiCellWidget(artistedit,  0, 0, 1, 2);
     grid->addMultiCellWidget(albuml, 1, 1, 0, 0);
     grid->addMultiCellWidget(albumedit,  1, 1, 1, 2);
+    grid->addMultiCellWidget(genrelabel, 2, 2, 0, 0);
+    grid->addMultiCellWidget(genreedit, 2, 2, 1, 2);
 
     table = new MythTable(firstdiag);
-    grid->addMultiCellWidget(table, 2, 2, 0, 2);
+    grid->addMultiCellWidget(table, 3, 3, 0, 2);
     table->setNumCols(3);
     table->setTopMargin(0);    
     table->setLeftMargin(0);
@@ -224,6 +243,20 @@ void Ripper::albumChanged(const QString &newalbum)
     delete decoder;
 }
 
+void Ripper::genreChanged(const QString &newgenre)
+{
+    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
+    Metadata *data = decoder->getMetadata(db, 1);
+
+    data->setGenre(newgenre);
+    decoder->commitMetadata(data);
+
+    genrename = newgenre;
+
+    delete data;
+    delete decoder;
+} 
+
 void Ripper::tableChanged(int row, int col)
 {
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
@@ -234,6 +267,30 @@ void Ripper::tableChanged(int row, int col)
 
     delete data;
     delete decoder;
+}
+
+void Ripper::fillComboBox (MythComboBox & box, const QString & db_column)
+{
+   QString querystr = QString("SELECT DISTINCT %1 FROM musicmetadata;")
+                             .arg(db_column);
+      
+   QSqlQuery query(querystr, db);
+   
+   QValueList<QString> list;
+   
+   if (query.isActive() && query.numRowsAffected() > 0)
+   {
+       while (query.next())
+       {
+           list.push_front(query.value(0).toString());
+       }
+   }
+   
+   QStringList strlist(list);
+   
+   strlist.sort();
+   
+   box.insertStringList(strlist);
 }
 
 void Ripper::fixFilename(QString &filename, const QString &addition)

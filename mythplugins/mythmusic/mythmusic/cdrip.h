@@ -31,10 +31,13 @@ class Ripper : public MythDialog
     void ripthedisc();
     void artistChanged(const QString &newartist);
     void albumChanged(const QString &newalbum);
+    void genreChanged(const QString &newgenre);
     void tableChanged(int row, int col);
     void reject();
 
   private:
+    void fillComboBox (MythComboBox &, const QString &);
+
     int ripTrack(QString &cddevice, Encoder *encoder, int tracknum);
     void fixFilename(QString &filename, const QString &addition);
     void ejectCD(QString &cddev);
@@ -43,8 +46,9 @@ class Ripper : public MythDialog
     QVBoxLayout *bigvb;
     QFrame *firstdiag;
 
-    MythLineEdit *artistedit;
+    MythComboBox *artistedit;
     MythLineEdit *albumedit;
+    MythComboBox *genreedit;
 
     MythTable *table;
 
@@ -56,7 +60,7 @@ class Ripper : public MythDialog
 
     int totaltracks;
 
-    QString albumname, artistname;
+    QString albumname, artistname, genrename;
 };
 
 #endif
