@@ -1227,59 +1227,6 @@ void OSD::HideEditArrow(long long number, int type)
     pthread_mutex_unlock(&osdlock);
 }
 
-OSDSet *OSD::ShowText(const QString &name, const QString &message, int xpos,
-                      int ypos, int width, int height, int secs)
-{
-    pthread_mutex_lock(&osdlock);
-
-    OSDSet *set = GetSet(name);
-    if (set)
-    {
-        OSDTypeText *text = (OSDTypeText *)set->GetType("message");
-        if (text)
-            text->SetText(message);
-
-        if (secs > 0)
-            set->DisplayFor(secs * fps);
-        else
-            set->Display();
-        m_setsvisible = true;
-        pthread_mutex_unlock(&osdlock);
-        return set;
-    }
-
-    set = new OSDSet(name, false, vid_width, vid_height, wmult, hmult);
-    set->SetPriority(3);
-    set->SetFrameRate(fps);
-    AddSet(set, name, false);
-
-    TTFFont *font = GetFont("channelfont");
-    if (!font)
-    {
-        delete set;
-        pthread_mutex_unlock(&osdlock);
-        return NULL;
-    }
-
-    QRect rect = QRect(xpos, ypos, width, height); 
-    OSDTypeText *text = new OSDTypeText("message", font, message, rect);
-    text->SetMultiLine(true);
-    set->AddType(text);
-
-    if (secs > 0)
-        set->DisplayFor(secs * fps);
-    else
-    {
-        set->SetAllowFade(false);
-        set->Display();
-    }
-
-    m_setsvisible = true;
-
-    pthread_mutex_unlock(&osdlock);
-    return set;
-}
-
 void OSD::HideSet(const QString &name)
 {
     pthread_mutex_lock(&osdlock);
@@ -1289,6 +1236,32 @@ void OSD::HideSet(const QString &name)
     {
         set->Hide();
     }
+    pthread_mutex_unlock(&osdlock);
+}
+
+void OSD::UpdateEditText(const QString &seek_amount, 
+                         const QString &deletemarker, const QString &edittime)
+{
+    pthread_mutex_lock(&osdlock);
+
+    QString name = "editmode";
+    OSDSet *set = GetSet(name);
+    if (set)
+    {
+        OSDTypeText *text = (OSDTypeText *)set->GetType("seekamount");
+        if (text && seek_amount != QString::null)
+            text->SetText(seek_amount);
+        text = (OSDTypeText *)set->GetType("cutindicator");
+        if (text && deletemarker != QString::null)
+            text->SetText(deletemarker);
+        text = (OSDTypeText *)set->GetType("timedisplay");
+        if (text && edittime != QString::null)
+            text->SetText(edittime);
+
+        set->Display();
+        m_setsvisible = true;
+    }
+
     pthread_mutex_unlock(&osdlock);
 }
 

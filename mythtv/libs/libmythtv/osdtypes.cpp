@@ -243,6 +243,7 @@ OSDTypeText::OSDTypeText(const OSDTypeText &other)
     m_centered = other.m_centered;
     m_multiline = other.m_multiline;
     m_usingalt = other.m_usingalt;
+    m_right = other.m_right;
 }
 
 OSDTypeText::~OSDTypeText()

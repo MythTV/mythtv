@@ -112,6 +112,18 @@
       <filename>cut-start.png</filename>
       <area>25,400,590,65</area>
     </editarrow>
+    <textarea name="timedisplay" align="right">
+      <area>270,30,330,30</area>
+      <font>settings</font>
+    </textarea>
+    <textarea name="cutindicator">
+      <area>40,30,100,30</area>
+      <font>settings</font>
+    </textarea>
+    <textarea name="seekamount" align="right">
+      <area>200,390,400,30</area>
+      <font>infofont</font>
+    </textarea>
   </container>
 
   <container name="settings">

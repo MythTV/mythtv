@@ -2805,9 +2805,6 @@ void NuppelVideoPlayer::DisableEdit(void)
     QMap<long long, int>::Iterator i = deleteMap.begin();
     for (; i != deleteMap.end(); ++i)
         osd->HideEditArrow(i.key(), i.data());
-    osd->HideSet("seek_desc");
-    osd->HideSet("deletemarker");
-    osd->HideSet("edittime_display");
     osd->HideSet("editmode");
 
     timedisplay = NULL;
@@ -2933,12 +2930,6 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
 
 void NuppelVideoPlayer::UpdateSeekAmount(bool up)
 {
-    QRect rect;
-    rect.setTop(video_height * 3 / 16);
-    rect.setBottom(video_height * 6 / 16);
-    rect.setLeft(video_width * 5 / 16);
-    rect.setRight(video_width * 15 / 16);
-
     if (seekamountpos > 0 && !up)
         seekamountpos--;
     if (seekamountpos < 9 && up) 
@@ -2963,67 +2954,32 @@ void NuppelVideoPlayer::UpdateSeekAmount(bool up)
         default: text = "error"; seekamount = fps; break;
     }
 
-    osd->ShowText("seek_desc", text, rect.left(), rect.top(), rect.width(),
-                  rect.height(), 2);
+    osd->UpdateEditText(text, QString::null, QString::null);
 }
 
 void NuppelVideoPlayer::UpdateTimeDisplay(void)
 {
-    if (!timedisplay)
-    {
-        timedisplay = new OSDSet("edittime_display", false, video_width, 
-                                 video_height, video_width / 640.0, 
-                                 video_height / 480.0);
+    int hours = 0;
+    int mins = 0;
+    int secs = 0;
+    int frames = 0;
 
-        TTFFont *font = osd->GetFont("channelfont");
-        QRect rect;
-        rect.setTop(video_height * 1 / 16);
-        rect.setBottom(video_height * 2 / 8);
-        rect.setLeft(video_width / 2 - 50);
-        rect.setRight(video_width * 15 / 16);
+    int fps = (int)ceil(video_frame_rate);
 
-        OSDTypeText *text = new OSDTypeText("timedisp", font, "", rect);
-        timedisplay->AddType(text);
+    hours = (framesPlayed / fps) / 60 / 60;
+    mins = (framesPlayed / fps) / 60 - (hours * 60);
+    secs = (framesPlayed / fps) - (mins * 60) - (hours * 60 * 60);
+    frames = framesPlayed - ((secs * fps) + (mins * 60 * fps) + 
+                             (hours * 60 * 60 * fps));
 
-        timedisplay->SetAllowFade(false);
-        osd->SetVisible(timedisplay, -1);
-        osd->AddSet(timedisplay, "edittime_display");
-    }
+    char timestr[128];
+    sprintf(timestr, "%1d:%02d:%02d.%02d", hours, mins, secs, frames);
 
-    if (!timedisplay)
-        return;
-
-    OSDTypeText *text = (OSDTypeText *)timedisplay->GetType("timedisp");
-    if (text)
-    {
-        int hours = 0;
-        int mins = 0;
-        int secs = 0;
-        int frames = 0;
-
-        int fps = (int)ceil(video_frame_rate);
-
-        hours = (framesPlayed / fps) / 60 / 60;
-        mins = (framesPlayed / fps) / 60 - (hours * 60);
-        secs = (framesPlayed / fps) - (mins * 60) - (hours * 60 * 60);
-        frames = framesPlayed - ((secs * fps) + (mins * 60 * fps) + 
-                                 (hours * 60 * 60 * fps));
-
-        char timestr[128];
-        sprintf(timestr, "%1d:%02d:%02d.%02d", hours, mins, secs, frames);
-        text->SetText(timestr);
-
-        osd->SetVisible(timedisplay, -1);
-    }
-
+    QString cutmarker = "";
     if (IsInDelete(framesPlayed))
-    {
-        osd->ShowText("deletemarker", "cut", video_width / 8, 
-                      video_height / 16, video_width / 2, 
-                      video_height / 8, -1);
-    }
-    else
-        osd->HideSet("deletemarker");
+        cutmarker = "cut";
+
+    osd->UpdateEditText(QString::null, cutmarker, timestr);
 }
 
 void NuppelVideoPlayer::HandleSelect(void)

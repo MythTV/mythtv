@@ -56,12 +56,7 @@ class OSD
 
     bool Visible(void);
 
-    OSDSet *ShowText(const QString &name, const QString &message, int xpos,
-                     int ypos, int width, int height, int secs);
     void HideSet(const QString &name);
-
-    void ShowEditArrow(long long number, long long totalframes, int type);
-    void HideEditArrow(long long number, int type);
 
     void AddSet(OSDSet *set, QString name, bool withlock = true);
 
@@ -70,6 +65,10 @@ class OSD
     OSDSet *GetSet(const QString &text);
     TTFFont *GetFont(const QString &text);
 
+    void ShowEditArrow(long long number, long long totalframes, int type);
+    void HideEditArrow(long long number, int type);
+    void UpdateEditText(const QString &seek_amount,
+                        const QString &deletemarker, const QString &edittime);
     void DoEditSlider(QMap<long long, int> deleteMap, long long curFrame,
                       long long totalFrames);
 
