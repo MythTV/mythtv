@@ -12,7 +12,7 @@ class ChannelEditor: public VerticalConfigurationGroup,
     Q_OBJECT
 public:
     ChannelEditor();
-    virtual int exec(QSqlDatabase* db);
+    virtual int exec();
 
 public slots:
     void menu(int);
@@ -24,7 +24,6 @@ public slots:
 
 private:
     ChannelListSetting* list;
-    QSqlDatabase* db;
     int id;
 
     TransButtonSetting *buttonScan;
@@ -36,14 +35,13 @@ class ChannelID;
 class ChannelWizard: public ConfigurationWizard {
     Q_OBJECT
 public:
-    ChannelWizard(int id, QSqlDatabase* _db);
+    ChannelWizard(int id);
     QString getCardtype();
     bool cardTypesInclude(const QString& cardtype); 
     int countCardtypes();
 
 private:
     ChannelID *cid;
-    QSqlDatabase* db;
 };
 
 class ChannelListSetting: public ListBoxSetting {
@@ -55,9 +53,8 @@ public:
         currentHideMode = false;
     };
 
-    void save(QSqlDatabase* _db) { (void)_db; };
-    void load(QSqlDatabase* _db) {
-        db = _db;
+    void save() {};
+    void load() {
         fillSelections();
     };
 
@@ -89,7 +86,6 @@ public slots:
     };
 
 private:
-    QSqlDatabase* db;
     QString currentSourceID;
     QString currentSortMode;
     bool currentHideMode;

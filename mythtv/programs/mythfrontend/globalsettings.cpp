@@ -1,5 +1,6 @@
 #include "config.h"
 #include "mythcontext.h"
+#include "mythdbcon.h"
 #include "dbsettings.h"
 #include "langsettings.h"
 
@@ -224,11 +225,10 @@ static HostComboBox *DisplayRecGroup()
     gc->addSelection(QObject::tr("All Programs"), QString("All Programs"));
     gc->addSelection(QObject::tr("Default"), QString("Default"));
 
-    QSqlDatabase *db = QSqlDatabase::database();
-    QString thequery = QString("SELECT DISTINCT recgroup from recorded");
-    QSqlQuery query = db->exec(thequery);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT DISTINCT recgroup from recorded");
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
         while (query.next())
             if (query.value(0).toString() != "Default")
             {
@@ -1506,9 +1506,9 @@ public:
             addSelection(*iter);
     };
 
-    void load(QSqlDatabase *db) {
+    void load() {
         fillSelections();
-        HostComboBox::load(db);
+        HostComboBox::load();
     };
 };
 

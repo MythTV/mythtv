@@ -60,7 +60,6 @@ void *SpawnScanner(void *param)
 
 TVRec::TVRec(int capturecardnum) 
 {
-    db_conn = NULL;
     channel = NULL;
     rbuffer = NULL;
 
@@ -79,10 +78,6 @@ TVRec::TVRec(int capturecardnum)
     profileName = "";
     autoTranscode = 0;
 
-    pthread_mutex_init(&db_lock, NULL);
-
-    ConnectDB(capturecardnum);
-
     QString chanorder = gContext->GetSetting("ChannelOrdering", "channum + 0");
 
     audiosamplerate = -1;
@@ -97,10 +92,9 @@ TVRec::TVRec(int capturecardnum)
     {
 #ifdef USING_DVB
         channel = new DVBChannel(videodev.toInt(), this);
-        channel->SetDB(db_conn, &db_lock);
         channel->Open();
 
-        scanner = new SIScan((DVBChannel *)channel, db_conn, &db_lock, 1);
+        scanner = new SIScan((DVBChannel *)channel, 1);
         pthread_create(&scanner_thread, NULL, SpawnScanner, scanner);
 
         if (inputname.isEmpty())
@@ -205,10 +199,6 @@ TVRec::~TVRec(void)
         delete rbuffer;
     if (nvr)
         delete nvr;
-    if (db_conn)
-        DisconnectDB();
-
-    pthread_mutex_destroy(&db_lock);
 }
 
 TVState TVRec::GetState(void)
@@ -402,15 +392,10 @@ void TVRec::StartedRecording(void)
     if (!curRecording)
         return;
 
-    pthread_mutex_lock(&db_lock);
-    MythContext::KickDatabase(db_conn);
-
-    curRecording->StartedRecording(db_conn);
+    curRecording->StartedRecording();
 
     if (curRecording->chancommfree != 0)
-        curRecording->SetCommFlagged(COMM_FLAG_COMMFREE, db_conn);
-
-    pthread_mutex_unlock(&db_lock);
+        curRecording->SetCommFlagged(COMM_FLAG_COMMFREE);
 
     MythEvent me("RECORDING_LIST_CHANGE");
     gContext->dispatch(me);
@@ -420,11 +405,8 @@ void TVRec::FinishedRecording(void)
 {
     if (!curRecording)
         return;
-    pthread_mutex_lock(&db_lock);
-    MythContext::KickDatabase(db_conn);
 
-    curRecording->FinishedRecording(db_conn, prematurelystopped);
-    pthread_mutex_unlock(&db_lock);
+    curRecording->FinishedRecording(prematurelystopped);
 }
 
 void TVRec::HandleStateChange(void)
@@ -513,10 +495,6 @@ void TVRec::HandleStateChange(void)
  
     if (startRecorder)
     {
-        pthread_mutex_lock(&db_lock);
-
-        MythContext::KickDatabase(db_conn);
-
         RecordingProfile profile;
 
         prematurelystopped = false;
@@ -524,28 +502,26 @@ void TVRec::HandleStateChange(void)
         if (curRecording)
         {
             profileName = curRecording->GetScheduledRecording(
-                                                db_conn)->getProfileName();
+                                                  )->getProfileName();
             bool foundProf = false;
             if (profileName != NULL)
-                foundProf = profile.loadByCard(db_conn, profileName,
+                foundProf = profile.loadByCard(profileName,
                                                m_capturecardnum);
 
             if (!foundProf)
             {
                 profileName = QString("Default");
-                profile.loadByCard(db_conn, profileName, m_capturecardnum);
+                profile.loadByCard(profileName, m_capturecardnum);
             }
         }
         else
         {
             profileName = "Live TV";
-            profile.loadByCard(db_conn, profileName, m_capturecardnum);
+            profile.loadByCard(profileName, m_capturecardnum);
         }
 
         QString msg = QString("Using profile '%1' to record").arg(profileName);
         VERBOSE(VB_RECORD, msg);
-
-        pthread_mutex_unlock(&db_lock);
 
         // Determine whether to automatically run the transcoder or not
         autoTranscode = profile.byName("autotranscode")->getValue().toInt();
@@ -576,7 +552,6 @@ void TVRec::HandleStateChange(void)
         if (!error)
         {
             nvr->SetRecording(curRecording);
-            nvr->SetDB(db_conn, &db_lock);
             if (channel != NULL)
             {
                 nvr->ChannelNameChanged(channel->GetCurrentName());
@@ -784,18 +759,13 @@ void TVRec::TeardownRecorder(bool killFile)
 
     if ((prevRecording) && (!killFile))
     {
-        pthread_mutex_lock(&db_lock);
-        MythContext::KickDatabase(db_conn);
-        prevRecording->SetBlankFrameList(blank_frame_map, db_conn);
-        pthread_mutex_unlock(&db_lock);
+        prevRecording->SetBlankFrameList(blank_frame_map);
 
         if (!prematurelystopped)
         {
             int jobTypes;
 
-            pthread_mutex_lock(&db_lock);
-            jobTypes = prevRecording->GetAutoRunJobs(db_conn);
-            pthread_mutex_unlock(&db_lock);
+            jobTypes = prevRecording->GetAutoRunJobs();
 
             if (prevRecording->chancommfree)
                 jobTypes = jobTypes & (~JOB_COMMFLAG);
@@ -810,11 +780,9 @@ void TVRec::TeardownRecorder(bool killFile)
                 if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
                     jobHost = gContext->GetHostName();
 
-                pthread_mutex_lock(&db_lock);
-                JobQueue::QueueJobs(db_conn, jobTypes,
+                JobQueue::QueueJobs(jobTypes,
                                     prevRecording->chanid,
                                     prevRecording->recstartts, "", "", jobHost);
-                pthread_mutex_unlock(&db_lock);
             }
         }
     }
@@ -832,14 +800,11 @@ char *TVRec::GetScreenGrab(ProgramInfo *pginfo, const QString &filename,
 {
     RingBuffer *tmprbuf = new RingBuffer(filename, false);
 
-    QString name = QString("screen%1%2").arg(getpid()).arg(rand());
 
-    MythSqlDatabase *screendb = new MythSqlDatabase(name);
-
-    if (!screendb || !screendb->isOpen())
+    if (!MSqlQuery::testDBConnection())
         return NULL;
 
-    NuppelVideoPlayer *nupvidplay = new NuppelVideoPlayer(screendb, pginfo);
+    NuppelVideoPlayer *nupvidplay = new NuppelVideoPlayer(pginfo);
     nupvidplay->SetRingBuffer(tmprbuf);
     nupvidplay->SetAudioSampleRate(gContext->GetNumSetting("AudioSampleRate"));
 
@@ -848,7 +813,6 @@ char *TVRec::GetScreenGrab(ProgramInfo *pginfo, const QString &filename,
 
     delete nupvidplay;
     delete tmprbuf;
-    delete screendb;
 
     return retbuf;
 }
@@ -858,35 +822,31 @@ void TVRec::SetChannel(bool needopen)
     if (needopen && channel)
         channel->Open();
 
-    pthread_mutex_lock(&db_lock);
-    MythContext::KickDatabase(db_conn);
-
-    QString thequery = QString("SELECT channel.channum,cardinput.inputname "
-                               "FROM channel,capturecard,cardinput WHERE "
-                               "channel.chanid = %1 AND "
-                               "cardinput.cardid = capturecard.cardid AND "
-                               "cardinput.sourceid = %2 AND "
-                               "capturecard.cardid = %3;")
-                               .arg(curRecording->chanid)
-                               .arg(curRecording->sourceid)
-                               .arg(curRecording->cardid);
-
-    QSqlQuery query = db_conn->exec(thequery);
-    
     QString inputname = "";
     QString chanstr = "";
-  
-    if (query.isActive() && query.numRowsAffected() > 0)
+ 
+    MSqlQuery query(MSqlQuery::InitCon());   
+    query.prepare("SELECT channel.channum,cardinput.inputname "
+                  "FROM channel,capturecard,cardinput WHERE "
+                  "channel.chanid = :CHANID AND "
+                  "cardinput.cardid = capturecard.cardid AND "
+                  "cardinput.sourceid = :SOURCEID AND "
+                  "capturecard.cardid = :CARDID ;");
+    query.bindValue(":CHANID", curRecording->chanid);
+    query.bindValue(":SOURCEID", curRecording->sourceid);
+    query.bindValue(":CARDID", curRecording->cardid);
+
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
 
         chanstr = query.value(0).toString();
         inputname = query.value(1).toString();
-    } else {
+    } 
+    else 
+    {
         MythContext::DBError("SetChannel", query);
     }
-
-    pthread_mutex_unlock(&db_lock);
 
     if (channel)
         channel->SwitchToInput(inputname, chanstr);
@@ -1005,11 +965,6 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
     airdate = "";
     stars = "";
     
-    if (!db_conn)
-        return;
-    pthread_mutex_lock(&db_lock);
-
-    MythContext::KickDatabase(db_conn);
 
     char curtimestr[128];
     time_t curtime;
@@ -1026,24 +981,25 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
     channelname = chan->GetCurrentName();
     QString channelinput = chan->GetCurrentInput();
  
-    QString thequery = QString("SELECT starttime,endtime,title,subtitle,"
-                               "description,category,callsign,icon,"
-                               "channel.chanid, seriesid, programid, "
-                               "channel.outputfilters, previouslyshown, originalairdate, stars "
-                               "FROM program,channel,capturecard,cardinput "
-                               "WHERE channel.channum = \"%1\" "
-                               "AND starttime < %2 AND endtime > %3 AND "
-                               "program.chanid = channel.chanid AND "
-                               "channel.sourceid = cardinput.sourceid AND "
-                               "cardinput.cardid = capturecard.cardid AND "
-                               "capturecard.cardid = \"%4\" AND "
-                               "capturecard.hostname = \"%5\";")
-                               .arg(channelname).arg(curtimestr).arg(curtimestr)
-                               .arg(m_capturecardnum).arg(gContext->GetHostName());
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT starttime,endtime,title,subtitle,"
+                  "description,category,callsign,icon,"
+                  "channel.chanid, seriesid, programid, "
+                  "channel.outputfilters, previouslyshown, originalairdate, stars "
+                  "FROM program,channel,capturecard,cardinput "
+                  "WHERE channel.channum = :CHANNAME "
+                  "AND starttime < :CURTIME AND endtime > :CURTIME AND "
+                  "program.chanid = channel.chanid AND "
+                  "channel.sourceid = cardinput.sourceid AND "
+                  "cardinput.cardid = capturecard.cardid AND "
+                  "capturecard.cardid = :CARDID AND "
+                  "capturecard.hostname = :HOSTNAME ;");
+    query.bindValue(":CHANNAME", channelname);
+    query.bindValue(":CURTIME", curtimestr);
+    query.bindValue(":CARDID", m_capturecardnum);
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
 
-    QSqlQuery query = db_conn->exec(thequery);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
 
@@ -1068,21 +1024,20 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
     {
         // couldn't find a matching program for the current channel.
         // get the information about the channel anyway
-        QString thequery = QString("SELECT callsign,icon, channel.chanid, "
-                                   "channel.outputfilters "
-                                   "FROM channel,capturecard,cardinput "
-                                   "WHERE channel.channum = \"%1\" AND "
-                                   "channel.sourceid = cardinput.sourceid AND "
-                                   "cardinput.cardid = capturecard.cardid AND "
-                                   "capturecard.cardid = \"%2\" AND "
-                                   "capturecard.hostname = \"%3\";")
-                                   .arg(channelname)
-                                   .arg(m_capturecardnum)
-                                   .arg(gContext->GetHostName());
+        
+        query.prepare("SELECT callsign,icon, channel.chanid, "
+                      "channel.outputfilters "
+                      "FROM channel,capturecard,cardinput "
+                      "WHERE channel.channum = :CHANNUM AND "
+                      "channel.sourceid = cardinput.sourceid AND "
+                      "cardinput.cardid = capturecard.cardid AND "
+                      "capturecard.cardid = :CARDID AND "
+                      "capturecard.hostname = :HOSTNAME ;");
+        query.bindValue(":CHANNUM", channelname);
+        query.bindValue(":CARDID", m_capturecardnum);
+        query.bindValue(":HOSTNAME", gContext->GetHostName());
 
-        QSqlQuery query = db_conn->exec(thequery);
-
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.exec() && query.isActive() && query.size() > 0)
         {
             query.next();
 
@@ -1092,42 +1047,6 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
             outputFilters = query.value(3).toString();
         }
      }
-
-    pthread_mutex_unlock(&db_lock);
-}
-
-void TVRec::ConnectDB(int cardnum)
-{
-    QString name = QString("TV%1%2").arg(cardnum).arg(rand());
-
-    pthread_mutex_lock(&db_lock);
-
-    db_conn = QSqlDatabase::addDatabase("QMYSQL3", name);
-    if (!db_conn)
-    {
-        pthread_mutex_unlock(&db_lock);
-        printf("Couldn't initialize mysql connection\n");
-        return;
-    }
-    if (!gContext->OpenDatabase(db_conn))
-    {
-        printf("Couldn't open database\n");
-    }
-
-    pthread_mutex_unlock(&db_lock);
-}
-
-void TVRec::DisconnectDB(void)
-{
-    pthread_mutex_lock(&db_lock);
-
-    if (db_conn)
-    {
-        db_conn->close();
-        delete db_conn;
-    }
-
-    pthread_mutex_unlock(&db_lock);
 }
 
 void TVRec::GetDevices(int cardnum, QString &video, QString &vbi, 
@@ -1143,28 +1062,26 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
     startchan = "3";
     type = "V4L";
 
-    pthread_mutex_lock(&db_lock);
-
-    MythContext::KickDatabase(db_conn);
-
-    QString thequery = QString("SELECT videodevice,vbidevice,audiodevice,"
-                               "audioratelimit,defaultinput,cardtype,"
-                               "dvb_swfilter, dvb_recordts,"
-                               "dvb_wait_for_seqstart,dvb_dmx_buf_size,"
-                               "dvb_pkt_buf_size, skipbtaudio, dvb_on_demand,"
-                               "firewire_port, firewire_node, firewire_speed,"
-                               "firewire_model "
-                               "FROM capturecard WHERE cardid = %1;")
-                              .arg(cardnum);
-
-    QSqlQuery query = db_conn->exec(thequery);
 
     int testnum = 0;
-
     QString test;
-    if (!query.isActive())
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT videodevice,vbidevice,audiodevice,"
+                  "audioratelimit,defaultinput,cardtype,"
+                  "dvb_swfilter, dvb_recordts,"
+                  "dvb_wait_for_seqstart,dvb_dmx_buf_size,"
+                  "dvb_pkt_buf_size, skipbtaudio, dvb_on_demand,"
+                  "firewire_port, firewire_node, firewire_speed,"
+                  "firewire_model "
+                  "FROM capturecard WHERE cardid = :CARDID ;");
+    query.bindValue(":CARDID", cardnum);
+
+    if (!query.exec() || !query.isActive())
+    {
         MythContext::DBError("getdevices", query);
-    else if (query.numRowsAffected() > 0)
+    }
+    else if (query.size() > 0)
     {
         query.next();
 
@@ -1203,20 +1120,21 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
         firewire_opts.speed = query.value(15).toInt();
         test = query.value(16).toString();
         if (test != QString::null)
-	   firewire_opts.model = QString::fromUtf8(test);
+            firewire_opts.model = QString::fromUtf8(test);
     }
 
-    thequery = QString("SELECT if(startchan!='', startchan, '3') "
-                       "FROM capturecard,cardinput WHERE inputname = \"%1\" "
-                       "AND capturecard.cardid = %2 "
-                       "AND capturecard.cardid = cardinput.cardid;")
-                       .arg(defaultinput).arg(cardnum);
+    query.prepare("SELECT if(startchan!='', startchan, '3') "
+                  "FROM capturecard,cardinput WHERE inputname = :INPUTNAME "
+                  "AND capturecard.cardid = :CARDID "
+                  "AND capturecard.cardid = cardinput.cardid;");
+    query.bindValue(":INPUTNAME", defaultinput);
+    query.bindValue(":CARDID", cardnum);
 
-    query = db_conn->exec(thequery);
-
-    if (!query.isActive())
+    if (!query.exec() || !query.isActive())
+    {
         MythContext::DBError("getstartchan", query);
-    else if (query.numRowsAffected() > 0)
+    }
+    else if (query.size() > 0)
     {
         query.next();
 
@@ -1224,8 +1142,6 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
         if (test != QString::null)
             startchan = QString::fromUtf8(test);
     }
-
-    pthread_mutex_unlock(&db_lock);
 }
 
 bool TVRec::CheckChannel(QString name)
@@ -1233,77 +1149,69 @@ bool TVRec::CheckChannel(QString name)
     if (!channel)
         return false;
 
-    QSqlDatabase* dummy1;
-    pthread_mutex_t* dummy2;
     QString dummyID;
-    return CheckChannel(channel, name, dummy1, dummy2, dummyID);
+    return CheckChannel(channel, name, dummyID);
 }
 
 bool TVRec::CheckChannel(ChannelBase *chan, const QString &channum, 
-                         QSqlDatabase *&a_db_conn, pthread_mutex_t *&a_db_lock, QString& inputName)
+                         QString& inputName)
 {
     if (!chan)
         return false;
 
-    if (!db_conn)
-        return true;
-
     inputName = "";
     
-    a_db_conn = db_conn;
-    a_db_lock = &db_lock;
-
-    pthread_mutex_lock(&db_lock);
-    MythContext::KickDatabase(db_conn);
-
     bool ret = false;
 
     QString channelinput = chan->GetCurrentInput();
 
-    QString thequery = QString("SELECT channel.chanid FROM "
-                               "channel,capturecard,cardinput "
-                               "WHERE channel.channum = \"%1\" AND "
-                               "channel.sourceid = cardinput.sourceid AND "
-                               "cardinput.inputname = \"%2\" AND "
-                               "cardinput.cardid = capturecard.cardid AND "
-                               "capturecard.cardid = \"%3\" AND "
-                               "capturecard.hostname = \"%4\";")
-                               .arg(channum).arg(channelinput)
-                               .arg(m_capturecardnum)
-                               .arg(gContext->GetHostName());
+    MSqlQuery query(MSqlQuery::InitCon());
 
-    QSqlQuery query = db_conn->exec(thequery);
+    if (!query.isConnected())
+        return true;
 
-    if (!query.isActive())
-        MythContext::DBError("checkchannel", query);
-    else if (query.numRowsAffected() > 0)
+    query.prepare("SELECT channel.chanid FROM "
+                  "channel,capturecard,cardinput "
+                  "WHERE channel.channum = :CHANNUM AND "
+                  "channel.sourceid = cardinput.sourceid AND "
+                  "cardinput.inputname = :INPUT AND "
+                  "cardinput.cardid = capturecard.cardid AND "
+                  "capturecard.cardid = :CARDID AND "
+                  "capturecard.hostname = :HOSTNAME ;");
+    query.bindValue(":CHANNUM", channum);
+    query.bindValue(":INPUT", channelinput);
+    query.bindValue(":CARDID", m_capturecardnum);
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
+
+    if (!query.exec() || !query.isActive())
     {
-        pthread_mutex_unlock(&db_lock);
+        MythContext::DBError("checkchannel", query);
+    }
+    else if (query.size() > 0)
+    {
         return true;
     }
     VERBOSE( VB_CHANNEL, QString("Failed to find channel(%1) on current input (%2) of card (%3).")
                          .arg(channum).arg(channelinput).arg(m_capturecardnum) );
 
-
     // We didn't find it on the current input let's widen the search
-    thequery = QString("SELECT channel.chanid, cardinput.inputname FROM "
-                       "channel,capturecard,cardinput "
-                       "WHERE channel.channum = \"%1\" AND "
-                       "channel.sourceid = cardinput.sourceid AND "
-                       "cardinput.cardid = capturecard.cardid AND "
-                       "capturecard.cardid = \"%2\" AND "
-                       "capturecard.hostname = \"%3\";")
-                       .arg(channum)
-                       .arg(m_capturecardnum)
-                       .arg(gContext->GetHostName());
-
-    query = db_conn->exec(thequery);
+    query.prepare("SELECT channel.chanid, cardinput.inputname FROM "
+                  "channel,capturecard,cardinput "
+                  "WHERE channel.channum = :CHANNUM AND "
+                  "channel.sourceid = cardinput.sourceid AND "
+                  "cardinput.cardid = capturecard.cardid AND "
+                  "capturecard.cardid = :CARDID AND "
+                  "capturecard.hostname = :HOSTNAME ;");
+    query.bindValue(":CHANNUM", channum);
+    query.bindValue(":CARDID", m_capturecardnum);
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
 
     if (!query.isActive())
-        MythContext::DBError("checkchannel", query);
-    else if (query.numRowsAffected() > 0)
     {
-        
+        MythContext::DBError("checkchannel", query);
+    } 
+    else if (query.size() > 0)
+    {
         query.next();
         QString test = query.value(1).toString();
         if (test != QString::null)
@@ -1312,7 +1220,6 @@ bool TVRec::CheckChannel(ChannelBase *chan, const QString &channum,
         VERBOSE( VB_CHANNEL, QString("Found channel(%1) on another input (%2) of card (%3).")
                              .arg(channum).arg(inputName).arg(m_capturecardnum) );
 
-        pthread_mutex_unlock(&db_lock);
         return true;
     }
 
@@ -1321,13 +1228,10 @@ bool TVRec::CheckChannel(ChannelBase *chan, const QString &channum,
 
                                                                   
     
-    thequery = "SELECT NULL FROM channel;";
-    query = db_conn->exec(thequery);
+    query.prepare("SELECT NULL FROM channel;");
 
-    if (query.numRowsAffected() == 0)
+    if (query.exec() && query.size() == 0)
         ret = true;
-
-    pthread_mutex_unlock(&db_lock);
 
     return ret;
 }
@@ -1346,18 +1250,17 @@ bool TVRec::CheckChannelPrefix(QString name, bool &unique)
     if (!channel)
         return false;
 
-    if (!db_conn)
-        return true;
-
-    pthread_mutex_lock(&db_lock);
-    MythContext::KickDatabase(db_conn);
-
     bool ret = false;
     unique = false;
 
     QString channelinput = channel->GetCurrentInput();
 
-    QString thequery = QString("SELECT channel.chanid FROM "
+    MSqlQuery query(MSqlQuery::InitCon());
+  
+    if (!query.isConnected())
+        return true;
+
+    QString querystr = QString("SELECT channel.chanid FROM "
                                "channel,capturecard,cardinput "
                                "WHERE channel.channum LIKE \"%1%%\" AND "
                                "channel.sourceid = cardinput.sourceid AND "
@@ -1365,36 +1268,34 @@ bool TVRec::CheckChannelPrefix(QString name, bool &unique)
                                "cardinput.cardid = capturecard.cardid AND "
                                "capturecard.cardid = \"%3\" AND "
                                "capturecard.hostname = \"%4\";")
-                               .arg(name).arg(channelinput)
+                               .arg(name)
+                               .arg(channelinput)
                                .arg(m_capturecardnum)
                                .arg(gContext->GetHostName());
 
-    QSqlQuery query = db_conn->exec(thequery);
+    query.prepare(querystr);
 
-    if (!query.isActive())
-        MythContext::DBError("checkchannel", query);
-    else if (query.numRowsAffected() > 0)
+    if (!query.exec() || !query.isActive())
     {
-        pthread_mutex_unlock(&db_lock);
-
-        if (query.numRowsAffected() == 1)
+        MythContext::DBError("checkchannel", query);
+    }
+    else if (query.size() > 0)
+    {
+        if (query.size() == 1)
         {
             unique = CheckChannel(name);
         }
-
         return true;
     }
 
-    thequery = "SELECT NULL FROM channel;";
-    query = db_conn->exec(thequery);
+    query.prepare("SELECT NULL FROM channel;");
+    query.exec();
 
-    if (query.numRowsAffected() == 0) 
+    if (query.size() == 0) 
     {
         unique = true;
         ret = true;
     }
-
-    pthread_mutex_unlock(&db_lock);
 
     return ret;
 }
@@ -1404,35 +1305,33 @@ bool TVRec::SetVideoFiltersForChannel(ChannelBase *chan, const QString &channum)
     if (!chan)
         return false;
 
-    if (!db_conn)
-        return true;
-
-    pthread_mutex_lock(&db_lock);
-
-    MythContext::KickDatabase(db_conn);
-
     bool ret = false;
 
     QString channelinput = chan->GetCurrentInput();
     QString videoFilters = "";
 
-    QString thequery = QString("SELECT channel.videofilters FROM "
-                               "channel,capturecard,cardinput "
-                               "WHERE channel.channum = \"%1\" AND "
-                               "channel.sourceid = cardinput.sourceid AND "
-                               "cardinput.inputname = \"%2\" AND "
-                               "cardinput.cardid = capturecard.cardid AND "
-                               "capturecard.cardid = \"%3\" AND "
-                               "capturecard.hostname = \"%4\";")
-                               .arg(channum).arg(channelinput)
-                               .arg(m_capturecardnum)
-                               .arg(gContext->GetHostName());
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (!query.isConnected())
+        return true;
 
-    QSqlQuery query = db_conn->exec(thequery);
+    query.prepare("SELECT channel.videofilters FROM "
+                  "channel,capturecard,cardinput "
+                  "WHERE channel.channum = :CHANNUM AND "
+                  "channel.sourceid = cardinput.sourceid AND "
+                  "cardinput.inputname = :INPUT AND "
+                  "cardinput.cardid = capturecard.cardid AND "
+                  "capturecard.cardid = :CARDID AND "
+                  "capturecard.hostname = :HOSTNAME ;");
+    query.bindValue(":CHANNUM", channum);
+    query.bindValue(":INPUT", channelinput);
+    query.bindValue(":CARDID", m_capturecardnum);
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
 
-    if (!query.isActive())
+    if (!query.exec() || !query.isActive())
+    {
         MythContext::DBError("setvideofilterforchannel", query);
-    else if (query.numRowsAffected() > 0)
+    }
+    else if (query.size() > 0)
     {
         query.next();
 
@@ -1443,17 +1342,14 @@ bool TVRec::SetVideoFiltersForChannel(ChannelBase *chan, const QString &channum)
             nvr->SetVideoFilters(videoFilters);
         }
 
-        pthread_mutex_unlock(&db_lock);
         return true;
     }
 
-    thequery = "SELECT NULL FROM channel;";
-    query = db_conn->exec(thequery);
+    query.prepare("SELECT NULL FROM channel;");
+    query.exec();
 
-    if (query.numRowsAffected() == 0)
+    if (query.size() == 0)
         ret = true;
-
-    pthread_mutex_unlock(&db_lock);
 
     return ret;
 }
@@ -1466,60 +1362,57 @@ int TVRec::GetChannelValue(const QString &channel_field, ChannelBase *chan,
 
     int retval = -1;
 
-    if (!db_conn)
+    
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (!query.isConnected())
         return retval;
-
-    pthread_mutex_lock(&db_lock);
-
-    MythContext::KickDatabase(db_conn);
 
     QString channelinput = chan->GetCurrentInput();
    
-    QString thequery = QString("SELECT channel.%1 FROM "
-                               "channel,capturecard,cardinput "
-                               "WHERE channel.channum = \"%2\" AND "
-                               "channel.sourceid = cardinput.sourceid AND "
-                               "cardinput.inputname = \"%3\" AND "
-                               "cardinput.cardid = capturecard.cardid AND "
-                               "capturecard.cardid = \"%4\" AND "
-                               "capturecard.hostname = \"%5\";")
-                               .arg(channel_field).arg(channum)
-                               .arg(channelinput).arg(m_capturecardnum)
-                               .arg(gContext->GetHostName());
+    query.prepare(QString("SELECT channel.%1 FROM "
+                  "channel,capturecard,cardinput "
+                  "WHERE channel.channum = :CHANNUM AND "
+                  "channel.sourceid = cardinput.sourceid AND "
+                  "cardinput.inputname = :INPUT AND "
+                  "cardinput.cardid = capturecard.cardid AND "
+                  "capturecard.cardid = :CARDID AND "
+                  "capturecard.hostname = :HOSTNAME ;")
+                  .arg(channel_field));
+    query.bindValue(":CHANNUM", channum);
+    query.bindValue(":INPUT", channelinput);
+    query.bindValue(":CARDID", m_capturecardnum);
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
 
-    QSqlQuery query = db_conn->exec(thequery);
-
-    if (!query.isActive())
+    if (!query.exec() || !query.isActive())
+    {
         MythContext::DBError("getchannelvalue", query);
-    else if (query.numRowsAffected() > 0)
+    }
+    else if (query.size() > 0)
     {
         query.next();
 
         retval = query.value(0).toInt();
     }
 
-    pthread_mutex_unlock(&db_lock);
     return retval;
 }
 
-void TVRec::SetChannelValue(QString &field_name,int value, ChannelBase *chan,
+void TVRec::SetChannelValue(QString &field_name, int value, ChannelBase *chan,
                             const QString &channum)
 {
     if (!chan)
         return;
 
-    if (!db_conn)
+    
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (!query.isConnected())
         return;
-
-    pthread_mutex_lock(&db_lock);
-
-    MythContext::KickDatabase(db_conn);
 
     QString channelinput = chan->GetCurrentInput();
 
     // Only mysql 4.x can do multi table updates so we need two steps to get 
     // the sourceid from the table join.
-    QString thequery = QString("SELECT channel.sourceid FROM "
+    QString querystr = QString("SELECT channel.sourceid FROM "
                                "channel,cardinput,capturecard "
                                "WHERE channel.channum = \"%1\" AND "
                                "channel.sourceid = cardinput.sourceid AND "
@@ -1531,12 +1424,14 @@ void TVRec::SetChannelValue(QString &field_name,int value, ChannelBase *chan,
                                .arg(m_capturecardnum)
                                .arg(gContext->GetHostName());
 
-    QSqlQuery query = db_conn->exec(thequery);
+    query.prepare(querystr);
     int sourceid = -1;
 
-    if (!query.isActive())
+    if (!query.exec() || !query.isActive())
+    {
         MythContext::DBError("setchannelvalue", query);
-    else if (query.numRowsAffected() > 0)
+    }
+    else if (query.size() > 0)
     {
         query.next();
         sourceid = query.value(0).toInt();
@@ -1544,15 +1439,15 @@ void TVRec::SetChannelValue(QString &field_name,int value, ChannelBase *chan,
 
     if (sourceid != -1)
     {
-        thequery = QString("UPDATE channel SET channel.%1=\"%2\" "
+        querystr = QString("UPDATE channel SET channel.%1=\"%2\" "
                            "WHERE channel.channum = \"%3\" AND "
                            "channel.sourceid = \"%4\";")
                            .arg(field_name).arg(value).arg(channum)
                            .arg(sourceid);
-        query = db_conn->exec(thequery);
+        query.prepare(querystr);
+        query.exec();
     }
 
-    pthread_mutex_unlock(&db_lock);
 }
 
 QString TVRec::GetNextChannel(ChannelBase *chan, int channeldirection)
@@ -1592,9 +1487,6 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
                              int cardid, QString channelorder,
                              int channeldirection, QString &chanid)
 {
-    pthread_mutex_lock(&db_lock);
-
-    MythContext::KickDatabase(db_conn);
 
     if (channum[0].isLetter() && channelorder == "channum + 0")
     {
@@ -1606,7 +1498,9 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
         channelorder = "channum";
     }
 
-    QString thequery = QString("SELECT %1 FROM "
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString querystr = QString("SELECT %1 FROM "
                                "channel,capturecard,cardinput "
                                "WHERE channel.channum = \"%2\" AND "
                                "channel.sourceid = cardinput.sourceid AND "
@@ -1617,11 +1511,11 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
                                .arg(cardid)
                                .arg(gContext->GetHostName());
 
-    QSqlQuery query = db_conn->exec(thequery);
+    query.prepare(querystr);
 
     QString id = QString::null;
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
 
@@ -1634,7 +1528,7 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
         cerr << "(" << cardid << " " << channelinput << " )\n";
         cerr << "in setup is wrong\n";
 
-        thequery = QString("SELECT %1 FROM channel,capturecard,cardinput "
+        querystr = QString("SELECT %1 FROM channel,capturecard,cardinput "
                            "WHERE channel.sourceid = cardinput.sourceid AND "
                            "cardinput.cardid = capturecard.cardid AND "
                            "capturecard.cardid = \"%2\" AND "
@@ -1643,17 +1537,17 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
                            .arg(cardid).arg(gContext->GetHostName())
                            .arg(channelorder);
        
-        query = db_conn->exec(thequery);
+        query.prepare(querystr);
 
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.exec() && query.isActive() && query.size() > 0)
         {
             query.next();
             id = query.value(0).toString();
         }
     }
 
-    if (id == QString::null) {
-        pthread_mutex_unlock(&db_lock);
+    if (id == QString::null) 
+    {
         cerr << "Couldn't find any channels in the database, please make sure "
              << "\nyour inputs are associated properly with your cards.\n";
         channum = "";
@@ -1689,7 +1583,7 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
                                 .arg(cardid)
                                 .arg(gContext->GetHostName());
 
-    thequery = QString("SELECT channel.channum, channel.chanid "
+    querystr = QString("SELECT channel.channum, channel.chanid "
                        "FROM channel,capturecard,"
                        "cardinput%1 WHERE "
                        "channel.%2 %3 \"%4\" %5 AND %6 "
@@ -1698,11 +1592,13 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
                        .arg(comp).arg(id).arg(wherefavorites)
                        .arg(wherepart).arg(channelorder).arg(ordering);
 
-    query = db_conn->exec(thequery);
+    query.prepare(querystr);
 
-    if (!query.isActive())
+    if (!query.exec() || !query.isActive())
+    {
         MythContext::DBError("getnextchannel", query);
-    else if (query.numRowsAffected() > 0)
+    }
+    else if (query.size() > 0)
     {
         query.next();
 
@@ -1718,7 +1614,7 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
             comp = ">";
 
         // again, %9 is the limit for this
-        thequery = QString("SELECT channel.channum, channel.chanid "
+        querystr = QString("SELECT channel.channum, channel.chanid "
                            "FROM channel,capturecard,"
                            "cardinput%1 WHERE "
                            "channel.%2 %3 \"%4\" %5 AND %6 "
@@ -1727,11 +1623,13 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
                            .arg(comp).arg(id).arg(wherefavorites)
                            .arg(wherepart).arg(channelorder).arg(ordering);
 
-        query = db_conn->exec(thequery);
+        query.prepare(querystr);
  
-        if (!query.isActive())
+        if (!query.exec() || !query.isActive())
+        {
             MythContext::DBError("getnextchannel", query);
-        else if (query.numRowsAffected() > 0)
+        }
+        else if (query.size() > 0)
         { 
             query.next();
 
@@ -1739,8 +1637,6 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
             chanid = query.value(1).toString();
         }
     }
-
-    pthread_mutex_unlock(&db_lock);
 
     return;
 }
@@ -1916,11 +1812,10 @@ void TVRec::ToggleChannelFavorite(void)
     QString channum = channel->GetCurrentName();
     QString channelinput = channel->GetCurrentInput();
 
-    pthread_mutex_lock(&db_lock);
 
-    MythContext::KickDatabase(db_conn);
+    MSqlQuery query(MSqlQuery::InitCon());
 
-    QString thequery = QString("SELECT channel.chanid FROM "
+    QString querystr = QString("SELECT channel.chanid FROM "
                                "channel,capturecard,cardinput "
                                "WHERE channel.channum = \"%1\" AND "
                                "channel.sourceid = cardinput.sourceid AND "
@@ -1932,11 +1827,11 @@ void TVRec::ToggleChannelFavorite(void)
                                .arg(m_capturecardnum)
                                .arg(gContext->GetHostName());
 
-    QSqlQuery query = db_conn->exec(thequery);
+    query.prepare(querystr);
 
     QString chanid = QString::null;
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
 
@@ -1944,7 +1839,6 @@ void TVRec::ToggleChannelFavorite(void)
     }
     else
     {
-        pthread_mutex_unlock(&db_lock);
         cerr << "Channel: \'" << channum << "\' was not found in the database.";
         cerr << "\nMost likely, your DefaultTVChannel setting is wrong.";
         cerr << "\nCould not toggle favorite.\n";
@@ -1952,37 +1846,40 @@ void TVRec::ToggleChannelFavorite(void)
     }
 
     // Check if favorite exists for that chanid...
-    thequery = QString("SELECT favorites.favid FROM favorites WHERE "
+    querystr = QString("SELECT favorites.favid FROM favorites WHERE "
                        "favorites.chanid = \"%1\""
                        "LIMIT 1;")
                        .arg(chanid);
 
-    query = db_conn->exec(thequery);
+    query.prepare(querystr);
 
-    if (!query.isActive())
+    if (!query.exec() || !query.isActive())
+    {
         MythContext::DBError("togglechannelfavorite", query);
-    else if (query.numRowsAffected() > 0)
+    }
+    else if (query.size() > 0)
     {
         // We have a favorites record...Remove it to toggle...
         query.next();
         QString favid = query.value(0).toString();
 
-        thequery = QString("DELETE FROM favorites WHERE favid = \"%1\"")
+        querystr = QString("DELETE FROM favorites WHERE favid = \"%1\"")
                            .arg(favid);
 
-        query = db_conn->exec(thequery);
+        query.prepare(querystr);
+        query.exec();
         VERBOSE(VB_RECORD, "Removing Favorite.");
     }
     else
     {
         // We have no favorites record...Add one to toggle...
-        thequery = QString("INSERT INTO favorites (chanid) VALUES (\"%1\")")
+        querystr = QString("INSERT INTO favorites (chanid) VALUES (\"%1\")")
                            .arg(chanid);
 
-        query = db_conn->exec(thequery);
+        query.prepare(querystr);
+        query.exec();
         VERBOSE(VB_RECORD, "Adding Favorite.");
     }
-    pthread_mutex_unlock(&db_lock);
 }
 
 int TVRec::ChangeContrast(bool direction)
@@ -2063,6 +1960,7 @@ void TVRec::GetNextProgram(int direction,
     QString compare = "<";
     QString sortorder = "";
 
+
     querystr = QString("SELECT title, subtitle, description, category, "
                        "starttime, endtime, callsign, icon, channum, "
                        "program.chanid, seriesid, programid "
@@ -2110,11 +2008,11 @@ void TVRec::GetNextProgram(int direction,
                      "order by starttime %4 limit 1;")
                      .arg(chanid).arg(starttime).arg(compare).arg(sortorder);
 
-    pthread_mutex_lock(&db_lock);
+    MSqlQuery sqlquery(MSqlQuery::InitCon());
 
-    QSqlQuery sqlquery = db_conn->exec(querystr);
+    sqlquery.prepare(querystr);
 
-    if ((sqlquery.isActive()) && (sqlquery.numRowsAffected() > 0))
+    if (sqlquery.exec() && sqlquery.isActive() && sqlquery.size() > 0)
     {
         if (sqlquery.next())
         {
@@ -2148,9 +2046,9 @@ void TVRec::GetNextProgram(int direction,
         querystr = QString("SELECT channum, callsign, icon, chanid FROM "
                            "channel WHERE chanid = %1;")
                            .arg(chanid);
-        sqlquery = db_conn->exec(querystr);
+        sqlquery.prepare(querystr);
 
-        if (sqlquery.isActive() && sqlquery.numRowsAffected() > 0 && 
+        if (sqlquery.exec() && sqlquery.isActive() && sqlquery.size() > 0 && 
             sqlquery.next())
         {
             channelname = sqlquery.value(0).toString();
@@ -2160,7 +2058,6 @@ void TVRec::GetNextProgram(int direction,
         }
     }
 
-    pthread_mutex_unlock(&db_lock);
 }
 
 void TVRec::GetChannelInfo(QString &title, QString &subtitle, QString &desc,
@@ -2303,22 +2200,22 @@ void TVRec::RetrieveInputChannels(map<int, QString> &inputChannel,
     if (!channel)
         return;
 
-    pthread_mutex_lock(&db_lock);
-    MythContext::KickDatabase(db_conn);
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString querystr = QString("SELECT inputname, trim(externalcommand), "
+                               "if(tunechan='', 'Undefined', tunechan), "
+                               "if(startchan, startchan, ''), sourceid "
+                               "FROM capturecard, cardinput "
+                               "WHERE capturecard.cardid = %1 "
+                               "AND capturecard.cardid = cardinput.cardid;")
+                               .arg(m_capturecardnum);
 
-    QString query = QString("SELECT inputname, trim(externalcommand), "
-                            "if(tunechan='', 'Undefined', tunechan), "
-                            "if(startchan, startchan, ''), sourceid "
-                            "FROM capturecard, cardinput "
-                            "WHERE capturecard.cardid = %1 "
-                            "AND capturecard.cardid = cardinput.cardid;")
-                            .arg(m_capturecardnum);
+    query.prepare(querystr);
 
-    QSqlQuery result = db_conn->exec(query);
-
-    if (!result.isActive())
-        MythContext::DBError("RetrieveInputChannels", result);
-    else if (!result.numRowsAffected())
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("RetrieveInputChannels", query);
+    }
+    else if (!query.size())
     {
         cerr << "Error getting inputs for the capturecard.  Perhaps you have\n"
                 "forgotten to bind video sources to your card's inputs?\n";
@@ -2327,17 +2224,16 @@ void TVRec::RetrieveInputChannels(map<int, QString> &inputChannel,
     {
         int cap;
 
-        while (result.next())
+        while (query.next())
         {
-            cap = channel->GetInputByName(result.value(0).toString());
-            externalChanger[cap] = result.value(1).toString();
-            inputTuneTo[cap] = result.value(2).toString();
-            inputChannel[cap] = result.value(3).toString();
-            sourceid[cap] = result.value(4).toString();
+            cap = channel->GetInputByName(query.value(0).toString());
+            externalChanger[cap] = query.value(1).toString();
+            inputTuneTo[cap] = query.value(2).toString();
+            inputChannel[cap] = query.value(3).toString();
+            sourceid[cap] = query.value(4).toString();
         }
     }
 
-    pthread_mutex_unlock(&db_lock);
 }
 
 void TVRec::StoreInputChannels(map<int, QString> &inputChannel)
@@ -2345,10 +2241,9 @@ void TVRec::StoreInputChannels(map<int, QString> &inputChannel)
     if (!channel)
         return;
 
-    QString query, input;
+    QString querystr, input;
 
-    pthread_mutex_lock(&db_lock);
-    MythContext::KickDatabase(db_conn);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     for (int i = 0;; i++)
     {
@@ -2356,16 +2251,16 @@ void TVRec::StoreInputChannels(map<int, QString> &inputChannel)
         if (input.isEmpty())
             break;
 
-        query = QString("UPDATE cardinput set startchan = '%1' "
-                        "WHERE cardid = %2 AND inputname = '%3';")
-                        .arg(inputChannel[i]).arg(m_capturecardnum).arg(input);
+        querystr = QString("UPDATE cardinput set startchan = '%1' "
+                           "WHERE cardid = %2 AND inputname = '%3';")
+                           .arg(inputChannel[i]).arg(m_capturecardnum)
+                           .arg(input);
 
-        QSqlQuery result = db_conn->exec(query);
+        query.prepare(querystr);
 
-        if (!result.isActive())
-            MythContext::DBError("StoreInputChannels", result);
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("StoreInputChannels", query);
     }
 
-    pthread_mutex_unlock(&db_lock);
 }
 

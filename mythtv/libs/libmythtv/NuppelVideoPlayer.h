@@ -44,7 +44,7 @@ typedef  void (*StatusCallback)(int, void*);
 class NuppelVideoPlayer
 {
  public:
-    NuppelVideoPlayer(MythSqlDatabase *ldb = NULL, ProgramInfo *info = NULL);
+    NuppelVideoPlayer(ProgramInfo *info = NULL);
    ~NuppelVideoPlayer();
 
     friend class CommDetect;
@@ -403,7 +403,6 @@ class NuppelVideoPlayer
     WId embedid;
     int embx, emby, embw, embh;
 
-    MythSqlDatabase *m_db;
     ProgramInfo *m_playbackinfo;
 
     long long bookmarkseek;

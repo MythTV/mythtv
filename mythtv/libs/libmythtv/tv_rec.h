@@ -12,7 +12,6 @@
 #include <map>
 using namespace std;
 
-class QSqlDatabase;
 class QSocket;
 class ChannelBase;
 class ProgramInfo;
@@ -79,7 +78,7 @@ class TVRec
     bool IsRecording(void) { return StateIsRecording(internalState); }
 
     bool CheckChannel(ChannelBase *chan, const QString &channum, 
-                      QSqlDatabase *& a_db_conn, pthread_mutex_t *&a_db_lock, QString& inputID); 
+                      QString& inputID); 
     void SetChannelValue(QString &field_name,int value, ChannelBase *chan,
                          const QString &channum);
     int GetChannelValue(const QString &channel_field, ChannelBase *chan, 
@@ -167,9 +166,6 @@ class TVRec
                     QString &type, dvb_options_t &dvb_opts, firewire_options_t &firewire_opts,
                     bool &skip_bt);
 
-    void ConnectDB(int cardnum);
-    void DisconnectDB(void);
-
     void SetupRecorder(class RecordingProfile& profile);
     void TeardownRecorder(bool killFile = false);
     
@@ -188,9 +184,6 @@ class TVRec
     RecorderBase *nvr;
     RingBuffer *rbuffer;
     ChannelBase *channel;
-
-    QSqlDatabase *db_conn;
-    pthread_mutex_t db_lock;
 
     TVState internalState;
 

@@ -21,24 +21,26 @@ using namespace std;
 #include <lcddevice.h>
 #include "mythlcd.h"
 #include "libmyth/mythcontext.h"
+#include "libmyth/mythdbcon.h"
 
-QSqlDatabase* db;
 
 int main(int argc, char **argv)
 {
     QString lcd_host;
     int	lcd_port;
     QApplication a(argc, argv);
-    gContext = new MythContext(MYTH_BINARY_VERSION, FALSE);
 
-    db = QSqlDatabase::addDatabase("QMYSQL3");
-    if (!gContext->OpenDatabase(db))
+    gContext = NULL;
+    gContext = new MythContext(MYTH_BINARY_VERSION);
+    gContext->Init(false);
+
+    if (!MSqlQuery::testDBConnection())
     {
-        cerr << "Unable to open database:\n"
-             << "Driver error was:" << endl
-             << db->lastError().driverText() << endl
-             << "Database error was:" << endl
-             << db->lastError().databaseText() << endl;
+        cerr << "Unable to open database.\n" << endl;
+             //<< "Driver error was:" << endl
+             //<< db->lastError().driverText() << endl
+             //<< "Database error was:" << endl
+             //<< db->lastError().databaseText() << endl;
 
         return -1;
     }

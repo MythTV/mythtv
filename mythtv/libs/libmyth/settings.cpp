@@ -27,6 +27,7 @@
 
 #include "mythcontext.h"
 #include "mythwizard.h"
+#include "mythdbcon.h"
 
 QWidget* Configurable::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                     const char* widgetName) 
@@ -58,18 +59,18 @@ Setting* ConfigurationGroup::byName(QString name) {
     return NULL;
 }
 
-void ConfigurationGroup::load(QSqlDatabase* db) {
+void ConfigurationGroup::load() {
     for(childList::iterator i = children.begin() ;
         i != children.end() ;
         ++i )
-        (*i)->load(db);
+        (*i)->load();
 }
 
-void ConfigurationGroup::save(QSqlDatabase* db) {
+void ConfigurationGroup::save() {
     for(childList::iterator i = children.begin() ;
         i != children.end() ;
         ++i )
-        (*i)->save(db);
+        (*i)->save();
 }
 
 QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg, 
@@ -215,11 +216,11 @@ void StackedConfigurationGroup::raise(Configurable* child) {
     cout << "BUG: StackedConfigurationGroup::raise(): unrecognized child " << child << " on setting " << getName() << '/' << getLabel() << endl;
 }
 
-void StackedConfigurationGroup::save(QSqlDatabase* db) {
+void StackedConfigurationGroup::save() {
     if (saveAll)
-        ConfigurationGroup::save(db);
+        ConfigurationGroup::save();
     else if (top < children.size())
-        children[top]->save(db);
+        children[top]->save();
 }
 
 void TriggeredConfigurationGroup::setTrigger(Configurable* _trigger) {
@@ -713,10 +714,10 @@ MythDialog* ConfigurationDialog::dialogWidget(MythMainWindow *parent,
     return dialog;
 }
 
-int ConfigurationDialog::exec(QSqlDatabase* db, bool saveOnAccept, bool doLoad) 
+int ConfigurationDialog::exec(bool saveOnAccept, bool doLoad) 
 {
     if (doLoad)
-        load(db);
+        load();
 
     MythDialog* dialog = dialogWidget(gContext->GetMainWindow());
     dialog->Show();
@@ -724,7 +725,7 @@ int ConfigurationDialog::exec(QSqlDatabase* db, bool saveOnAccept, bool doLoad)
     int ret;
 
     if ((ret = dialog->exec()) == QDialog::Accepted && saveOnAccept)
-        save(db);
+        save();
 
     delete dialog;
 
@@ -754,64 +755,79 @@ MythDialog* ConfigurationWizard::dialogWidget(MythMainWindow *parent,
     return wizard;
 }
 
-void SimpleDBStorage::load(QSqlDatabase* db) {
+void SimpleDBStorage::load() 
+{
     QString querystr = QString("SELECT %1 FROM %2 WHERE %3;")
         .arg(column).arg(table).arg(whereClause());
-    QSqlQuery query = db->exec(querystr);
+    
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec(querystr);
 
-    if (query.isActive() && query.numRowsAffected() > 0) {
+    if (query.isActive() && query.size() > 0) 
+    {
         query.next();
         QString result = query.value(0).toString();
-        if (result != QString::null) {
+        if (result != QString::null) 
+        {
           result = QString::fromUtf8(query.value(0).toString());
           setValue(result);
           setUnchanged();
         }
-   }
- }
+    }
+}
 
-void SimpleDBStorage::save(QSqlDatabase* db) {
+void SimpleDBStorage::save() 
+{
     if (!isChanged())
         return;
 
     QString querystr = QString("SELECT * FROM %1 WHERE %2;")
         .arg(table).arg(whereClause());
-    QSqlQuery query = db->exec(querystr);
 
-    if (query.isActive() && query.numRowsAffected() > 0) {
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec(querystr);
+
+    if (query.isActive() && query.size() > 0) {
         // Row already exists
         querystr = QString("UPDATE %1 SET %2 WHERE %3;")
             .arg(table).arg(setClause()).arg(whereClause());
-        query = db->exec(querystr);
+        query.exec(querystr);
         if (!query.isActive())
             MythContext::DBError("simpledbstorage update", querystr);
     } else {
         // Row does not exist yet
         querystr = QString("INSERT INTO %1 SET %2;")
             .arg(table).arg(setClause());
-        query = db->exec(querystr);
+        query.exec(querystr);
         if (!query.isActive())
             MythContext::DBError("simpledbstorage update", querystr);
     }
 }
 
-void AutoIncrementStorage::save(QSqlDatabase* db) {
-    if (intValue() == 0) {
+void AutoIncrementStorage::save() {
+    if (intValue() == 0) 
+    {
         // Generate a new, unique ID
-        QString query = QString("INSERT INTO %1 (%2) VALUES (0);").arg(table).arg(column);
-        QSqlQuery result = db->exec(query);
-        if (!result.isActive() || result.numRowsAffected() < 1) {
-            MythContext::DBError("inserting row", result);
+        QString querystr = QString("INSERT INTO %1 (%2) VALUES (0);")
+                                .arg(table).arg(column);
+
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.exec(querystr);
+
+        if (!query.isActive() || query.numRowsAffected() < 1) 
+        {
+            MythContext::DBError("inserting row", query);
             return;
         }
-        result = db->exec("SELECT LAST_INSERT_ID();");
-        if (!result.isActive() || result.numRowsAffected() < 1) {
-            MythContext::DBError("selecting last insert id", result);
+        query.exec("SELECT LAST_INSERT_ID();");
+        if (!query.isActive() || query.size() < 1) 
+        {
+            MythContext::DBError("selecting last insert id", query);
             return;
         }
 
-        result.next();
-        setValue(result.value(0).toInt());
+        query.next();
+        setValue(query.value(0).toInt());
     }
 }
 
@@ -995,17 +1011,18 @@ HostnameSetting::HostnameSetting(void)  {
     setValue(gContext->GetHostName());
 }
 
-void ChannelSetting::fillSelections(QSqlDatabase* db, SelectSetting* setting) {
+void ChannelSetting::fillSelections(SelectSetting* setting) {
 
     // this should go somewhere else, in something that knows about
     // channels and how they're stored in the database.  We're just a
     // selector.
 
-    QSqlQuery result = db->exec("SELECT name, chanid FROM channel;");
-    if (result.isActive() && result.numRowsAffected() > 0)
-        while (result.next())
-            setting->addSelection(result.value(0).toString(),
-                                  QString::number(result.value(1).toInt()));
+    MSqlQuery query(MSqlQuery::InitCon()); 
+    query.prepare("SELECT name, chanid FROM channel;");
+    if (query.exec() && query.isActive() && query.size() > 0)
+        while (query.next())
+            setting->addSelection(query.value(0).toString(),
+                                  QString::number(query.value(1).toInt()));
 }
 
 QWidget* ButtonSetting::configWidget(ConfigurationGroup* cg, QWidget* parent,
@@ -1094,9 +1111,9 @@ MythDialog* ConfigurationPopupDialog::dialogWidget(MythMainWindow* parent,
     return dialog;
 }
 
-int ConfigurationPopupDialog::exec(QSqlDatabase* db, bool saveOnAccept)
+int ConfigurationPopupDialog::exec(bool saveOnAccept)
 {
-    load(db);
+    load();
 
     dialog = (ConfigPopupDialogWidget*)dialogWidget(gContext->GetMainWindow());
     dialog->ShowPopup(this);
@@ -1104,7 +1121,7 @@ int ConfigurationPopupDialog::exec(QSqlDatabase* db, bool saveOnAccept)
     int ret;
 
     if ((ret = dialog->exec()) == QDialog::Accepted && saveOnAccept)
-        save(db);
+        save();
 
     return ret;
 }

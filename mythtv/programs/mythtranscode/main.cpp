@@ -14,10 +14,9 @@ using namespace std;
 #include "programinfo.h"
 #include "jobqueue.h"
 #include "mythcontext.h"
+#include "mythdbcon.h"
 #include "transcode.h"
 #include "mpeg2trans.h"
-
-QSqlDatabase *db;
 
 void StoreTranscodeState(ProgramInfo *pginfo, int status, bool useCutlist);
 void UpdatePositionMap(QMap <long long, long long> &posMap, QString mapfile,
@@ -62,7 +61,9 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv, false);
 
     //  Load the context
-    gContext = new MythContext(MYTH_BINARY_VERSION,false);
+    gContext = NULL;
+    gContext = new MythContext(MYTH_BINARY_VERSION);
+    gContext->Init(false);
 
     int found_starttime = 0;
     int found_chanid = 0;
@@ -229,26 +230,23 @@ int main(int argc, char *argv[])
          return -1;
     }
 
-    db = QSqlDatabase::addDatabase("QMYSQL3");
-    if (!db)
-    {
-        printf("Couldn't connect to database\n");
-        return -1;
-    }
+    //if (!db)
+    //{
+    //    printf("Couldn't connect to database\n");
+    //    return -1;
+    //}
 
-    if (!gContext->OpenDatabase(db))
+    if (!MSqlQuery::testDBConnection())
     {
         printf("couldn't open db\n");
         return -1;
     }
 
-    MythContext::KickDatabase(db);
-
     ProgramInfo *pginfo = NULL;
     if (!found_infile)
     {
         QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
-        pginfo = ProgramInfo::GetProgramFromRecorded(db, chanid, startts);
+        pginfo = ProgramInfo::GetProgramFromRecorded(chanid, startts);
 
         if (!pginfo)
         {
@@ -274,9 +272,9 @@ int main(int argc, char *argv[])
     int jobID = -1;
     if (use_db)
     {
-        jobID = JobQueue::GetJobID(db, JOB_TRANSCODE, pginfo->chanid,
+        jobID = JobQueue::GetJobID(JOB_TRANSCODE, pginfo->chanid,
                                    pginfo->startts);
-        JobQueue::ChangeJobStatus(db, jobID, JOB_RUNNING);
+        JobQueue::ChangeJobStatus(jobID, JOB_RUNNING);
     }
 
     if (found_infile)
@@ -287,7 +285,7 @@ int main(int argc, char *argv[])
         UpdatePositionMap(posMap, tmpfile + ".map", NULL);
         exit(0);
     }
-    Transcode *transcode = new Transcode(db, pginfo);
+    Transcode *transcode = new Transcode(pginfo);
 
     VERBOSE(VB_GENERAL, QString("Transcoding from %1 to %2")
                         .arg(infile).arg(tmpfile));
@@ -304,7 +302,7 @@ int main(int argc, char *argv[])
     if (result == REENCODE_MPEG2TRANS)
     {
         if (useCutlist)
-            pginfo->GetCutList(deleteMap, db);
+            pginfo->GetCutList(deleteMap);
         MPEG2trans *mpeg2trans = new MPEG2trans(&deleteMap);
         if (build_index)
         {
@@ -324,14 +322,14 @@ int main(int argc, char *argv[])
     if (result == REENCODE_OK)
     {
         if (use_db)
-            JobQueue::ChangeJobStatus(db, jobID, JOB_STOPPING);
+            JobQueue::ChangeJobStatus(jobID, JOB_STOPPING);
         VERBOSE(VB_GENERAL, QString("Transcoding %1 done").arg(infile));
         retval = 0;
     } 
     else if (result == REENCODE_CUTLIST_CHANGE)
     {
         if (use_db)
-            JobQueue::ChangeJobStatus(db, jobID, JOB_RETRY);
+            JobQueue::ChangeJobStatus(jobID, JOB_RETRY);
         VERBOSE(VB_GENERAL, QString("Transcoding %1 aborted because of "
                                     "cutlist update").arg(infile));
         retval = 1;
@@ -339,7 +337,7 @@ int main(int argc, char *argv[])
     else if (result == REENCODE_STOPPED)
     {
         if (use_db)
-            JobQueue::ChangeJobStatus(db, jobID, JOB_ABORTING);
+            JobQueue::ChangeJobStatus(jobID, JOB_ABORTING);
         VERBOSE(VB_GENERAL, QString("Transcoding %1 stopped because of "
                                     "stop command").arg(infile));
         retval = 1;
@@ -347,7 +345,7 @@ int main(int argc, char *argv[])
     else
     {
         if (use_db)
-            JobQueue::ChangeJobStatus(db, jobID, JOB_ERRORING);
+            JobQueue::ChangeJobStatus(jobID, JOB_ERRORING);
         VERBOSE(VB_GENERAL, QString("Transcoding %1 failed").arg(infile));
         retval = -1;
     }
@@ -362,7 +360,7 @@ void UpdatePositionMap(QMap <long long, long long> &posMap, QString mapfile,
 {
     if (pginfo)
     {
-        pginfo->SetPositionMap(posMap, MARK_GOP_BYFRAME, db);
+        pginfo->SetPositionMap(posMap, MARK_GOP_BYFRAME);
     }
     else if (mapfile)
     {

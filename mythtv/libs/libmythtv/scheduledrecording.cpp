@@ -72,11 +72,11 @@ ScheduledRecording::ScheduledRecording()
 }
 
 
-void ScheduledRecording::load(QSqlDatabase *db)
+void ScheduledRecording::load()
 {
     if (getRecordID())
     {
-        ConfigurationGroup::load(db);
+        ConfigurationGroup::load();
         
         QString tmpType = type->getValue();
         type->clearSelections();
@@ -89,38 +89,39 @@ void ScheduledRecording::load(QSqlDatabase *db)
         
         type->setValue(tmpType);
         type->setUnchanged();
-        fetchChannelInfo(db);
+        fetchChannelInfo();
     }
 }
 
 
 
-void ScheduledRecording::loadByProgram(QSqlDatabase* db, ProgramInfo* proginfo) 
+void ScheduledRecording::loadByProgram(ProgramInfo* proginfo) 
 {
     m_pginfo = proginfo;
     
     if (proginfo->recordid)
-        loadByID(db, proginfo->recordid);
+        loadByID(proginfo->recordid);
     else
-        setDefault(db, true);
+        setDefault(true);
 
     if (search->intValue() == kNoSearch ||
         search->intValue() == kManualSearch)
-        setProgram(proginfo, db);
+        setProgram(proginfo);
 }
 
-void ScheduledRecording::loadBySearch(QSqlDatabase *db,
-                                      RecSearchType lsearch,
+void ScheduledRecording::loadBySearch(RecSearchType lsearch,
                                       QString textname,
                                       QString forwhat)
 {
+    MSqlQuery query(MSqlQuery::InitCon());
+
     int rid = 0;
     QString thequery = QString("SELECT recordid FROM record WHERE "
                                "search = %1 AND description LIKE '%2'")
-        .arg(lsearch).arg(forwhat);
-    QSqlQuery query = db->exec(thequery);
+                               .arg(lsearch).arg(forwhat);
+    query.prepare(thequery);
 
-    if (query.isActive())
+    if (query.exec() && query.isActive())
     {
         if (query.next())
             rid = query.value(0).toInt();
@@ -129,10 +130,10 @@ void ScheduledRecording::loadBySearch(QSqlDatabase *db,
         MythContext::DBError("loadBySearch", query);
 
     if (rid)
-        loadByID(db, rid);
+        loadByID(rid);
     else
     {
-        setDefault(db, false);
+        setDefault(false);
         search->setValue(lsearch);
         searchForWhat = forwhat;
         
@@ -160,22 +161,24 @@ void ScheduledRecording::loadBySearch(QSqlDatabase *db,
     } 
 }
 
-void ScheduledRecording::fetchChannelInfo(QSqlDatabase *db)
+void ScheduledRecording::fetchChannelInfo()
 {
     
     if (channel->getValue().toInt() > 0)
     {
+        MSqlQuery query(MSqlQuery::InitCon());
+
         QString queryStr(QString("SELECT channum, callsign, name FROM channel "
                                  "WHERE chanid = '%1';").arg(channel->getValue()));
     
-        QSqlQuery result = db->exec(queryStr);
+        query.prepare(queryStr);
         
-        if (result.isActive() && result.numRowsAffected() > 0)
+        if (query.exec() && query.isActive() && query.size() > 0)
         {
-            result.next();
-            chanstr =  result.value(0).toString();
-            chansign =  result.value(1).toString();
-            channame =  result.value(2).toString();
+            query.next();
+            chanstr =  query.value(0).toString();
+            chansign =  query.value(1).toString();
+            channame =  query.value(2).toString();
         }
     }
     else
@@ -206,7 +209,7 @@ void ScheduledRecording::ToMap(QMap<QString, QString>& progMap)
                     search->intValue() != kManualSearch)
     {
         searchtitle = title->getValue();
-        m_pginfo->ToMap(NULL, progMap);
+        m_pginfo->ToMap(progMap);
     }
     else
     {
@@ -300,9 +303,9 @@ void ScheduledRecording::ToMap(QMap<QString, QString>& progMap)
 }
 
 
-void ScheduledRecording::loadByID(QSqlDatabase* db, int recordID) {
+void ScheduledRecording::loadByID(int recordID) {
     id->setValue(recordID);
-    load(db);
+    load();
 }
 
 RecordingType ScheduledRecording::getRecordingType(void) const {
@@ -366,32 +369,38 @@ bool ScheduledRecording::GetMaxNewest(void) const {
     return(maxnewest->getValue().toInt());
 }
 
-void ScheduledRecording::save(QSqlDatabase* db) 
+void ScheduledRecording::save() 
 {
     if (type->isChanged() && getRecordingType() == kNotRecording)
     {
-        remove(db);
+        remove();
     }
     else
     {
-        ConfigurationGroup::save(db);
+        ConfigurationGroup::save();
     }
     signalChange(getRecordID());
 }
 
-void ScheduledRecording::remove(QSqlDatabase* db) {
+void ScheduledRecording::remove() 
+{
     if (!getRecordID())
         return;
 
-    QString query = QString("DELETE FROM record WHERE recordid = %1")
-                            .arg(getRecordID());
-    db->exec(query);
-    query = QString("UPDATE recordid FROM recorded SET recordid = NULL "
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString querystr = QString("DELETE FROM record WHERE recordid = %1")
+                               .arg(getRecordID());
+    query.prepare(querystr);
+    query.exec();
+
+    // FIXME: query has no exec, why?
+    querystr = QString("UPDATE recordid FROM recorded SET recordid = NULL "
                     "WHERE recordid = %1")
                     .arg(getRecordID());
 }
 
-void ScheduledRecording::signalChange(int recordid) {
+void ScheduledRecording::signalChange(int recordid) 
+{
     if (gContext->IsBackend())
     {
         MythEvent me(QString("RESCHEDULE_RECORDINGS %1").arg(recordid));
@@ -407,11 +416,10 @@ void ScheduledRecording::signalChange(int recordid) {
     }
 }
 
-void ScheduledRecording::doneRecording(QSqlDatabase* db, 
-                                       const ProgramInfo& proginfo) 
+void ScheduledRecording::doneRecording(const ProgramInfo& proginfo) 
 {
     if (getRecordingType() == kFindOneRecord)
-        remove(db);
+        remove();
 
     QString msg;
   
@@ -423,13 +431,12 @@ void ScheduledRecording::doneRecording(QSqlDatabase* db,
     gContext->LogEntry("scheduler", LP_NOTICE, "Finished recording", 
                        msg.utf8());
 
-    addHistory(db, proginfo);
+    addHistory(proginfo);
 }
 
-void ScheduledRecording::addHistory(QSqlDatabase* db, 
-                                    const ProgramInfo& proginfo) 
+void ScheduledRecording::addHistory(const ProgramInfo& proginfo) 
 {
-    MSqlQuery result(QString::null, db);
+    MSqlQuery result(MSqlQuery::InitCon());
 
     result.prepare("REPLACE INTO oldrecorded (chanid,starttime,"
                    "endtime,title,subtitle,description,category,"
@@ -461,10 +468,9 @@ void ScheduledRecording::addHistory(QSqlDatabase* db,
     }
 }
 
-void ScheduledRecording::forgetHistory(QSqlDatabase* db,
-                                       const ProgramInfo& proginfo)
+void ScheduledRecording::forgetHistory(const ProgramInfo& proginfo)
 {
-    MSqlQuery result(QString::null, db);
+    MSqlQuery result(MSqlQuery::InitCon());
 
     result.prepare("DELETE FROM oldrecorded WHERE title = :TITLE AND "
                    "((subtitle = :SUBTITLE AND description = :DESC) OR "
@@ -498,40 +504,34 @@ void ScheduledRecording::runProgList(void)
     if(search->intValue() && getRecordID())
     {
         ScheduledRecording rule;
-        rule.loadByID(QSqlDatabase::database(), getRecordID());
+        rule.loadByID(getRecordID());
 
         switch (search->intValue())
         {
         case kTitleSearch:
             pl = new ProgLister(plTitleSearch, rule.description->getValue(),
-                                QSqlDatabase::database(),
                                 gContext->GetMainWindow(), "proglist");
             break;
         case kKeywordSearch:
             pl = new ProgLister(plKeywordSearch, rule.description->getValue(),
-                                QSqlDatabase::database(),
                                 gContext->GetMainWindow(), "proglist");
             break;
         case kPeopleSearch:
             pl = new ProgLister(plPeopleSearch, rule.description->getValue(),
-                                QSqlDatabase::database(),
                                 gContext->GetMainWindow(), "proglist");
             break;
         case kPowerSearch:
             pl = new ProgLister(plSQLSearch, rule.description->getValue(),
-                                QSqlDatabase::database(),
                                 gContext->GetMainWindow(), "proglist");
             break;
         default:
             pl = new ProgLister(plTitle, title->getValue(),
-                                QSqlDatabase::database(),
                                 gContext->GetMainWindow(), "proglist");
             break;
         }
     }
     else
         pl = new ProgLister(plTitle, title->getValue(),
-                            QSqlDatabase::database(),
                             gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;
@@ -540,17 +540,21 @@ void ScheduledRecording::runProgList(void)
 void ScheduledRecording::runShowDetails(void)
 {
     if (m_pginfo)
-        m_pginfo->showDetails(QSqlDatabase::database());
+        m_pginfo->showDetails();
 }
 
-void ScheduledRecording::fillSelections(QSqlDatabase* db, SelectSetting* setting) {
-    QSqlQuery result = db->exec("SELECT recordid FROM record");
-    if (result.isActive() && result.numRowsAffected() > 0)
-        while (result.next()) {
+void ScheduledRecording::fillSelections(SelectSetting* setting) 
+{
+    MSqlQuery result(MSqlQuery::InitCon());
+    result.prepare("SELECT recordid FROM record");
+    if (result.exec() && result.isActive() && result.size() > 0)
+    {
+        while (result.next()) 
+        {
             int recid = result.value(0).toInt();
 
             ScheduledRecording sr;
-            sr.loadByID(db, recid);
+            sr.loadByID(recid);
 
             QString label;
             QString weekly = "";
@@ -601,16 +605,19 @@ void ScheduledRecording::fillSelections(QSqlDatabase* db, SelectSetting* setting
 
             setting->addSelection(label, QString::number(recid));
         }
+    }
 }
 
-void ScheduledRecordingEditor::load(QSqlDatabase* db) {
+void ScheduledRecordingEditor::load() 
+{
     clearSelections();
-    ScheduledRecording::fillSelections(db, this);
+    ScheduledRecording::fillSelections(this);
 }
 
 
-int ScheduledRecordingEditor::exec(QSqlDatabase* db) {
-    while (ConfigurationDialog::exec(db) == QDialog::Accepted)
+int ScheduledRecordingEditor::exec() 
+{
+    while (ConfigurationDialog::exec() == QDialog::Accepted)
         open(getValue().toInt());
 
     return QDialog::Rejected;
@@ -620,10 +627,10 @@ void ScheduledRecordingEditor::open(int id) {
     ScheduledRecording* sr = new ScheduledRecording();
 
     if (id != 0)
-        sr->loadByID(db,id);
+        sr->loadByID(id);
 
-    if (sr->exec(db) == QDialog::Accepted)
-        sr->save(db);
+    if (sr->exec() == QDialog::Accepted)
+        sr->save();
     delete sr;
 }
 
@@ -661,7 +668,7 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent, const char 
 
 
 
-void ScheduledRecording::setDefault(QSqlDatabase *db, bool haschannel)
+void ScheduledRecording::setDefault(bool haschannel)
 {
     id->setValue(0);
     title->setValue("");
@@ -695,7 +702,7 @@ void ScheduledRecording::setDefault(QSqlDatabase *db, bool haschannel)
     type->addNormalSelections(haschannel, search->intValue() == kManualSearch);
     type->setValue(kNotRecording);
     
-    profile->fillSelections(db);
+    profile->fillSelections();
     profile->setValue(QObject::tr("Default"));
     
     dupin->setValue(kDupsInAll);
@@ -716,13 +723,13 @@ void ScheduledRecording::setDefault(QSqlDatabase *db, bool haschannel)
     autouserjob3->setValue(0);
     autouserjob4->setValue(0);
 
-    recgroup->fillSelections(db);    
+    recgroup->fillSelections();    
     recgroup->setValue("Default");
 
     inactive->setValue(0);
 }
 
-void ScheduledRecording::setProgram(ProgramInfo *proginfo, QSqlDatabase* db)
+void ScheduledRecording::setProgram(ProgramInfo *proginfo)
 {
     m_pginfo = proginfo;
     if (proginfo)
@@ -746,8 +753,7 @@ void ScheduledRecording::setProgram(ProgramInfo *proginfo, QSqlDatabase* db)
         findid->setValue(proginfo->findid);
         category->setValue(proginfo->category);
         
-        if (db)
-            fetchChannelInfo(db);
+        fetchChannelInfo();
     }
 }
 

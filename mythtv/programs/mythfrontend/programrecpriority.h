@@ -10,7 +10,6 @@
 #include "programinfo.h"
 #include "scheduledrecording.h"
 
-class QSqlDatabase;
 
 class ProgramRecPriorityInfo : public ProgramInfo
 {
@@ -36,8 +35,7 @@ class ProgramRecPriority : public MythDialog
         byRecType
     };
 
-    ProgramRecPriority(QSqlDatabase *ldb, MythMainWindow *parent, 
-                 const char *name = 0);
+    ProgramRecPriority(MythMainWindow *parent, const char *name = 0);
     ~ProgramRecPriority();
 
   protected slots:
@@ -76,8 +74,6 @@ class ProgramRecPriority : public MythDialog
     QString longChannelFormat;
 
     ProgramRecPriorityInfo *curitem;
-
-    QSqlDatabase *db;
 
     QPixmap myBackground;
     QPixmap *bgTransBackup;

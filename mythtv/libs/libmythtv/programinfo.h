@@ -77,7 +77,6 @@ enum RecStatusType {
     rsTunerBusy = 12
 };
 
-class QSqlDatabase;
 class ScheduledRecording;
 class QGridLayout;
 
@@ -102,34 +101,32 @@ class ProgramInfo
     // checks chanid, start/end times, sourceid
     bool IsSameProgramTimeslot(const ProgramInfo& other) const;
 
-    void Save(QSqlDatabase *db);
+    void Save();
 
-    RecordingType GetProgramRecordingStatus(QSqlDatabase *db);
-    QString GetProgramRecordingProfile(QSqlDatabase *db);
+    RecordingType GetProgramRecordingStatus();
+    QString GetProgramRecordingProfile();
 
-    int GetChannelRecPriority(QSqlDatabase *db, const QString &chanid);
+    int GetChannelRecPriority(const QString &chanid);
     int GetRecordingTypeRecPriority(RecordingType type);
 
-    void ApplyRecordStateChange(QSqlDatabase *db, RecordingType newstate);
-    void ApplyRecordTimeChange(QSqlDatabase *db, 
-                               const QDateTime &newstartts,
+    void ApplyRecordStateChange(RecordingType newstate);
+    void ApplyRecordTimeChange(const QDateTime &newstartts,
                                const QDateTime &newendts);
-    void ApplyRecordRecPriorityChange(QSqlDatabase *db, int);
-    void ApplyRecordRecGroupChange(QSqlDatabase *db,
-                               const QString &newrecgroup);
-    void ToggleRecord(QSqlDatabase *dB);
+    void ApplyRecordRecPriorityChange(int);
+    void ApplyRecordRecGroupChange(const QString &newrecgroup);
+    void ToggleRecord();
 
-    ScheduledRecording* GetScheduledRecording(QSqlDatabase *db);
+    ScheduledRecording* GetScheduledRecording();
 
-    int getRecordID(QSqlDatabase *db);
+    int getRecordID();
 
-    void StartedRecording(QSqlDatabase *db);
-    void FinishedRecording(QSqlDatabase* db, bool prematurestop);
+    void StartedRecording();
+    void FinishedRecording(bool prematurestop);
 
     QGridLayout* DisplayWidget(QWidget *parent = NULL,
                                QString searchtitle = "");
 
-    void showDetails(QSqlDatabase *db);
+    void showDetails();
 
     QString GetRecordBasename(void);
     QString GetRecordFilename(const QString &prefix);
@@ -142,57 +139,54 @@ class ProgramInfo
     void ToStringList(QStringList &list);
     bool FromStringList(QStringList &list, int offset);
     bool FromStringList(QStringList &list, QStringList::iterator &it);
-    void ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap);
+    void ToMap(QMap<QString, QString> &progMap);
 
-    void SetFilesize(long long fsize, QSqlDatabase *db);
-    long long GetFilesize(QSqlDatabase *db);
-    void SetBookmark(long long pos, QSqlDatabase *db);
-    long long GetBookmark(QSqlDatabase *db);
-    bool IsEditing(QSqlDatabase *db);
-    void SetEditing(bool edit, QSqlDatabase *db);
-    bool IsCommFlagged(QSqlDatabase *db);
-    void SetDeleteFlag(bool deleteFlag, QSqlDatabase *db);
+    void SetFilesize(long long fsize);
+    long long GetFilesize();
+    void SetBookmark(long long pos);
+    long long GetBookmark();
+    bool IsEditing();
+    void SetEditing(bool edit);
+    bool IsCommFlagged();
+    void SetDeleteFlag(bool deleteFlag);
     // 1 = flagged, 2 = processing
-    void SetCommFlagged(int flag, QSqlDatabase *db);
-    bool IsCommProcessing(QSqlDatabase *db);
-    void SetAutoExpire(bool autoExpire, QSqlDatabase *db);
-    void SetPreserveEpisode(bool preserveEpisode, QSqlDatabase *db);
-    bool GetAutoExpireFromRecorded(QSqlDatabase *db);
-    bool GetPreserveEpisodeFromRecorded(QSqlDatabase *db);
+    void SetCommFlagged(int flag);
+    bool IsCommProcessing();
+    void SetAutoExpire(bool autoExpire);
+    void SetPreserveEpisode(bool preserveEpisode);
+    bool GetAutoExpireFromRecorded();
+    bool GetPreserveEpisodeFromRecorded();
 
-    bool UsesMaxEpisodes(QSqlDatabase *db);
+    bool UsesMaxEpisodes();
 
-    int GetAutoRunJobs(QSqlDatabase *db);
+    int GetAutoRunJobs();
 
-    void GetCutList(QMap<long long, int> &delMap, QSqlDatabase *db);
-    void SetCutList(QMap<long long, int> &delMap, QSqlDatabase *db);
+    void GetCutList(QMap<long long, int> &delMap);
+    void SetCutList(QMap<long long, int> &delMap);
 
-    void SetBlankFrameList(QMap<long long, int> &frames, QSqlDatabase *db,
+    void SetBlankFrameList(QMap<long long, int> &frames,
                            long long min_frame = -1, long long max_frame = -1);
-    void GetBlankFrameList(QMap<long long, int> &frames, QSqlDatabase *db);
+    void GetBlankFrameList(QMap<long long, int> &frames);
 
-    void SetCommBreakList(QMap<long long, int> &frames, QSqlDatabase *db);
-    void GetCommBreakList(QMap<long long, int> &frames, QSqlDatabase *db);
+    void SetCommBreakList(QMap<long long, int> &frames);
+    void GetCommBreakList(QMap<long long, int> &frames);
 
-    void ClearMarkupMap(QSqlDatabase *db, int type = -100,
+    void ClearMarkupMap(int type = -100,
                       long long min_frame = -1, long long max_frame = -1);
-    void SetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
+    void SetMarkupMap(QMap<long long, int> &marks,
                       int type = -100,
                       long long min_frame = -1, long long max_frame = -1);
-    void GetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
+    void GetMarkupMap(QMap<long long, int> &marks,
                       int type, bool mergeIntoMap = false);
-    bool CheckMarkupFlag(int type, QSqlDatabase *db);
-    void SetMarkupFlag(int type, bool processing, QSqlDatabase *db);
-    void GetPositionMap(QMap<long long, long long> &posMap, int type,
-                        QSqlDatabase *db);
-    void ClearPositionMap(int type, QSqlDatabase *db);
+    bool CheckMarkupFlag(int type);
+    void SetMarkupFlag(int type, bool processing);
+    void GetPositionMap(QMap<long long, long long> &posMap, int type);
+    void ClearPositionMap(int type);
     void SetPositionMap(QMap<long long, long long> &posMap, int type,
-                        QSqlDatabase *db,
                         long long min_frame = -1, long long max_frame = -1);
-    void SetPositionMapDelta(QMap<long long, long long> &posMap, int type,
-                             QSqlDatabase *db);
+    void SetPositionMapDelta(QMap<long long, long long> &posMap, int type);
 
-    void DeleteHistory(QSqlDatabase *db);
+    void DeleteHistory();
     void setIgnoreBookmark(bool ignore) { ignoreBookmark = ignore; }
     QString RecTypeChar(void);
     QString RecTypeText(void);
@@ -200,20 +194,17 @@ class ProgramInfo
     QString RecStatusText(void);
     QString RecStatusDesc(void);
     void FillInRecordInfo(vector<ProgramInfo *> &reclist);
-    void EditScheduled(QSqlDatabase *db);
-    void EditRecording(QSqlDatabase *db);
+    void EditScheduled();
+    void EditRecording();
     QString ChannelText(QString);
 
-    int getProgramFlags(QSqlDatabase *db);
+    int getProgramFlags();
 
-    static ProgramInfo *GetProgramAtDateTime(QSqlDatabase *db,
-                                             const QString &channel, 
+    static ProgramInfo *GetProgramAtDateTime(const QString &channel, 
                                              QDateTime &dtime);
-    static ProgramInfo *GetProgramFromRecorded(QSqlDatabase *db,
-                                               const QString &channel, 
+    static ProgramInfo *GetProgramFromRecorded(const QString &channel, 
                                                const QString &starttime);
-    static ProgramInfo *GetProgramFromRecorded(QSqlDatabase *db,
-                                               const QString &channel, 
+    static ProgramInfo *GetProgramFromRecorded(const QString &channel, 
                                                QDateTime &dtime);
     int SecsTillStart() const { return QDateTime::currentDateTime().secsTo(startts); }
 
@@ -290,8 +281,8 @@ class ProgramInfo
 
 private:
     bool ignoreBookmark;
-    void handleRecording(QSqlDatabase *db);
-    void handleNotRecording(QSqlDatabase *db);
+    void handleRecording();
+    void handleNotRecording();
 
     class ScheduledRecording* record;
 };
@@ -314,23 +305,23 @@ class ProgramList: public QPtrList<ProgramInfo> {
         return FromScheduler(dummyConflicts);
     };
 
-    bool FromProgram(QSqlDatabase *db, const QString sql,
+    bool FromProgram(const QString sql,
                      ProgramList &schedList);
-    bool FromProgram(QSqlDatabase *db, const QString sql) {
+    bool FromProgram(const QString sql) {
         ProgramList dummySched;
-        return FromProgram(db, sql, dummySched);
+        return FromProgram(sql, dummySched);
     }
 
-    bool FromOldRecorded(QSqlDatabase *db, const QString sql);
+    bool FromOldRecorded(const QString sql);
 
-    bool FromRecorded(QSqlDatabase *db, const QString sql,
+    bool FromRecorded(const QString sql,
                       ProgramList &schedList);
-    bool FromRecorded(QSqlDatabase *db, const QString sql) {
+    bool FromRecorded(const QString sql) {
         ProgramList dummySched;
-        return FromRecorded(db, sql, dummySched);
+        return FromRecorded(sql, dummySched);
     }
 
-    bool FromRecord(QSqlDatabase *db, const QString sql);
+    bool FromRecord(const QString sql);
 
     typedef int (*CompareFunc)(ProgramInfo *p1, ProgramInfo *p2);
     void Sort(CompareFunc func) {

@@ -15,7 +15,9 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
+    gContext->Init();
 
     QString themename = gContext->GetSetting("Theme");
     QString themedir = gContext->FindThemeDir(themename);
@@ -25,13 +27,7 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
-    QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
-    if (!db)
-    {
-        printf("Couldn't connect to database\n");
-        return -1;
-    }
-    if (!gContext->OpenDatabase(db))
+    if (!MSqlQuery::testDBConnection())
     {
         printf("couldn't open db\n");
         return -1;

@@ -24,9 +24,8 @@ using namespace std;
 
 pthread_mutex_t avcodeclock = PTHREAD_MUTEX_INITIALIZER;
 
-NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
-                             ProgramInfo *pginfo)
-    : DecoderBase(parent, db, pginfo),
+NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
+    : DecoderBase(parent, pginfo),
       gf(0), rtjd(0), video_width(0), video_height(0), video_size(0),
       video_frame_rate(0.0f), audio_samplerate(44100), 
 #ifdef WORDS_BIGENDIAN

@@ -15,6 +15,7 @@
 #include "frequencies.h"
 #include "tv.h"
 #include "mythcontext.h"
+#include "mythdbcon.h"
 
 #include <iostream>
 using namespace std;
@@ -404,10 +405,7 @@ bool Channel::SetChannelByString(const QString &chan)
         return false;
     }
 
-    QSqlDatabase *db_conn;
-    pthread_mutex_t *db_lock;
-
-    if (!pParent->CheckChannel(this, chan, db_conn, db_lock, inputName))
+    if (!pParent->CheckChannel(this, chan, inputName))
     {
         VERBOSE(VB_IMPORTANT, QString(
                     "Channel(%1): CheckChannel failed. Please verify "
@@ -424,7 +422,8 @@ bool Channel::SetChannelByString(const QString &chan)
         return true;
     }
 
-    pthread_mutex_lock(db_lock);
+    MSqlQuery query(MSqlQuery::InitCon());
+
     QString thequery = QString("SELECT finetune, freqid, tvformat, "
                                    "freqtable, commfree "
                                "FROM channel "
@@ -433,13 +432,12 @@ bool Channel::SetChannelByString(const QString &chan)
                                "channel.sourceid = \"%2\";")
                                .arg(chan)
                                .arg(sourceid[currentcapchannel]);
+    query.prepare(thequery);
 
-    QSqlQuery query = db_conn->exec(thequery);
-    if (!query.isActive())
+    if (!query.exec() || !query.isActive())
         MythContext::DBError("fetchtuningparams", query);
-    if (query.numRowsAffected() <= 0)
+    if (query.size() <= 0)
     {
-        pthread_mutex_unlock(db_lock);
         return false;
     }
     query.next();
@@ -457,8 +455,6 @@ bool Channel::SetChannelByString(const QString &chan)
 
     if (tvformat.isNull() || tvformat.isEmpty())
         tvformat = "Default";
-
-    pthread_mutex_unlock(db_lock);
 
     // Determine if freqid is id or frequency
     //  freqid is a frequency if and only if it is a valid integer and 

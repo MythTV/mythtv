@@ -13,7 +13,6 @@
 
 #include <qobject.h>
 
-class MythSqlDatabase;
 class QDateTime;
 class OSD;
 class RemoteEncoder;
@@ -277,8 +276,6 @@ class TV : public QObject
     bool zoomMode;
 
     ProgramInfo *playbackinfo;
-
-    MythSqlDatabase *m_db;
 
     WId embedid;
     int embx, emby, embw, embh;

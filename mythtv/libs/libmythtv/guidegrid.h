@@ -18,7 +18,6 @@ using namespace std;
 class ProgramInfo;
 class TimeInfo;
 class ChannelInfo;
-class QSqlDatabase;
 class TV;
 class QTimer;
 class QWidget;
@@ -167,8 +166,6 @@ class GuideGrid : public MythDialog
     QString currentTimeColor;
 
     QTimer *timeCheck;
-
-    QSqlDatabase *m_db;
 
     bool keyDown;
 

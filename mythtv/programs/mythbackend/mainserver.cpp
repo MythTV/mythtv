@@ -92,9 +92,8 @@ class ProcessRequestThread : public QThread
 
 MainServer::MainServer(bool master, int port, int statusport, 
                        QMap<int, EncoderLink *> *tvList,
-                       QSqlDatabase *db, Scheduler *sched)
+                       Scheduler *sched)
 {
-    m_db = db;
     m_sched = sched;
 
     ismaster = master;
@@ -449,15 +448,12 @@ void MainServer::customEvent(QCustomEvent *e)
             QStringList tokens = QStringList::split(" ", me->Message());
             QDateTime startts = QDateTime::fromString(tokens[2], Qt::ISODate);
 
-            dblock.lock();
-            ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(m_db,
-                                                                     tokens[1],
+            ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(tokens[1],
                                                                      startts);
-            dblock.unlock();
             if (pinfo)
             {
                 if (gContext->GetSetting("RerecordAutoExpired", 0))
-                    pinfo->DeleteHistory(m_db);
+                    pinfo->DeleteHistory();
                 DoHandleDeleteRecording(pinfo, NULL);
             }
             else
@@ -613,31 +609,30 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
         if (enc->isLocal())
         {
-            dblock.lock();
-
             int dsp_status, soundcardcaps;
             QString audiodevice, audiooutputdevice, querytext;
             QString cardtype;
 
+            MSqlQuery query(MSqlQuery::InitCon());
             querytext = QString("SELECT audiodevice,cardtype FROM capturecard "
                                 "WHERE cardid=%1;").arg(recnum);
-            MSqlQuery query = m_db->exec(querytext);
-            if (query.isActive() && query.numRowsAffected())
+            query.prepare(querytext);
+
+            if (query.exec() && query.isActive() && query.size())
             {
                 query.next();
                 audiodevice = query.value(0).toString();
                 cardtype = query.value(1).toString();
             }
 
-            query = m_db->exec("SELECT data FROM settings WHERE "
+            query.prepare("SELECT data FROM settings WHERE "
                                "value ='AudioOutputDevice';");
-            if (query.isActive() && query.numRowsAffected())
+
+            if (query.exec() && query.isActive() && query.size())
             {
                 query.next();
                 audiooutputdevice = query.value(0).toString();
             }
-
-            dblock.unlock();
 
             if (audiodevice.right(4) == audiooutputdevice.right(4) &&
                 (cardtype == "V4L" || cardtype == "MJPEG")) //they match
@@ -716,45 +711,40 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     QString playbackhost = pbs->getHostname();
 
     QString fs_db_name = "";
-    MythSqlDatabase *updatefs_mdb = NULL;
-    QSqlDatabase *updatefs_db = NULL;
 
-    QString thequery;
 
     QString ip = gContext->GetSetting("BackendServerIP");
     QString port = gContext->GetSetting("BackendServerPort");
 
-    dblock.lock();
-    MythContext::KickDatabase(m_db);
-
-    thequery = "SELECT recorded.chanid,recorded.starttime,recorded.endtime,"
-               "recorded.title,recorded.subtitle,recorded.description,"
-               "recorded.hostname,channum,name,callsign,commflagged,cutlist,"
-               "recorded.autoexpire,editing,bookmark,recorded.category,"
-               "recorded.recgroup,record.dupin,record.dupmethod,"
-               "record.recordid,outputfilters,"
-               "recorded.seriesid,recorded.programid,recorded.filesize, "
-               "recorded.lastmodified, recorded.findid "
-               "FROM recorded "
-               "LEFT JOIN record ON recorded.recordid = record.recordid "
-               "LEFT JOIN channel ON recorded.chanid = channel.chanid "
-               "WHERE recorded.deletepending = 0 "
-               "ORDER BY recorded.starttime";
+    QString thequery = "SELECT recorded.chanid,recorded.starttime,recorded.endtime,"
+                       "recorded.title,recorded.subtitle,recorded.description,"
+                       "recorded.hostname,channum,name,callsign,commflagged,cutlist,"
+                       "recorded.autoexpire,editing,bookmark,recorded.category,"
+                       "recorded.recgroup,record.dupin,record.dupmethod,"
+                       "record.recordid,outputfilters,"
+                       "recorded.seriesid,recorded.programid,recorded.filesize, "
+                       "recorded.lastmodified, recorded.findid "
+                       "FROM recorded "
+                       "LEFT JOIN record ON recorded.recordid = record.recordid "
+                       "LEFT JOIN channel ON recorded.chanid = channel.chanid "
+                       "WHERE recorded.deletepending = 0 "
+                       "ORDER BY recorded.starttime";
 
     if (type == "Delete")
         thequery += " DESC";
     thequery += ";";
-
-    MSqlQuery query = m_db->exec(thequery);
 
     QStringList outputlist;
     QString fileprefix = gContext->GetFilePrefix();
     QMap<QString, QString> backendIpMap;
     QMap<QString, QString> backendPortMap;
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(thequery);
+
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
-        outputlist << QString::number(query.numRowsAffected());
+        outputlist << QString::number(query.size());
 
         while (query.next())
         {
@@ -844,14 +834,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 
                     proginfo->filesize = size;
 
-                    if (!updatefs_db)
-                    {
-                        fs_db_name = QString("updatefilesize%1%2")
-                                             .arg(getpid()).arg(rand());
-                        updatefs_mdb = new MythSqlDatabase(fs_db_name);
-                        updatefs_db = updatefs_mdb->db();
-                    }
-                    proginfo->SetFilesize(size, updatefs_db);
+                    proginfo->SetFilesize(size);
                 }
             }
             else
@@ -870,14 +853,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                     {
                         slave->FillProgramInfo(proginfo, playbackhost);
 
-                        if (!updatefs_db)
-                        {
-                            fs_db_name = QString("updatefilesize%1%2")
-                                                 .arg(getpid()).arg(rand());
-                            updatefs_mdb = new MythSqlDatabase(fs_db_name);
-                            updatefs_db = updatefs_mdb->db();
-                        }
-                        proginfo->SetFilesize(proginfo->filesize, updatefs_db);
+                        proginfo->SetFilesize(proginfo->filesize);
                     }
                     else
                     {
@@ -905,11 +881,6 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     }
     else
         outputlist << "0";
-
-    dblock.unlock();
-
-    if (updatefs_mdb)
-        delete updatefs_mdb;
 
     SendResponse(pbssock, outputlist);
 }
@@ -1002,9 +973,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     QString name = QString("deleteThread%1%2").arg(getpid()).arg(rand());
     QFile checkFile(ds->filename);
 
-    MythSqlDatabase *delete_db = new MythSqlDatabase(name);
-
-    if (!delete_db || !delete_db->isOpen() || !delete_db->db())
+    if (!MSqlQuery::testDBConnection())
     {
         QString msg = QString("ERROR opening database connection for Delete "
                               "Thread for chanid %1 recorded at %2.  Program "
@@ -1015,30 +984,25 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
                            QString("Unable to open database connection for %1. "
                                    "Program will NOT be deleted.")
                                    .arg(logInfo));
-        if (delete_db)
-            delete delete_db;
 
         deletelock.unlock();
         return;
     }
 
     ProgramInfo *pginfo;
-    pginfo = ProgramInfo::GetProgramFromRecorded(delete_db->db(),
-                                                 ds->chanid,
+    pginfo = ProgramInfo::GetProgramFromRecorded(ds->chanid,
                                                  ds->recstartts);
     if (pginfo == NULL)
     {
         QString msg = QString("ERROR retrieving program info when trying to "
                               "delete program for chanid %1 recorded at %2. "
-							  "Recording will NOT be deleted.")
+                              "Recording will NOT be deleted.")
                               .arg(ds->chanid).arg(ds->recstartts.toString());
         VERBOSE(VB_GENERAL, msg);
         gContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
                            QString("Unable to retrieve program info for %1. "
                                    "Program will NOT be deleted.")
                                    .arg(logInfo));
-        if (delete_db)
-            delete delete_db;
 
         deletelock.unlock();
         return;
@@ -1058,12 +1022,12 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
                                    .arg(ds->filename).arg(logInfo));
         deletelock.unlock();
 
-        pginfo->SetDeleteFlag(false, delete_db->db());
+        pginfo->SetDeleteFlag(false);
         delete pginfo;
         return;
     }
 
-    JobQueue::DeleteAllJobs(delete_db->db(), ds->chanid, ds->recstartts);
+    JobQueue::DeleteAllJobs(ds->chanid, ds->recstartts);
 
     QString filename;
     bool followLinks = gContext->GetNumSetting("DeletesFollowLinks", 0);
@@ -1088,11 +1052,8 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
                            QString("File %1 for %2 could not be deleted.")
                                    .arg(ds->filename).arg(logInfo));
 
-        pginfo->SetDeleteFlag(false, delete_db->db());
+        pginfo->SetDeleteFlag(false);
         delete pginfo;
-
-        if (delete_db)
-            delete delete_db;
 
         deletelock.unlock();
         return;
@@ -1107,7 +1068,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     }
     unlink(filename.ascii());
 
-    MSqlQuery query(QString::null, delete_db->db());
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM recorded WHERE chanid = :CHANID AND "
                   "title = :TITLE AND starttime = :STARTTIME AND "
                   "endtime = :ENDTIME;");
@@ -1149,7 +1110,6 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     ScheduledRecording::signalChange(0);
 
     delete pginfo;
-    delete delete_db;
 
     deletelock.unlock();
 }
@@ -1275,9 +1235,6 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
         return;
     }
 
-    dblock.lock();
-
-    MythContext::KickDatabase(m_db);
 
     QString startts = pginfo->recstartts.toString("yyyyMMddhhmm");
     startts += "00";
@@ -1294,7 +1251,7 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
     VERBOSE(VB_RECORD, QString("Host %1 updating endtime to %2")
                                .arg(gContext->GetHostName()).arg(newendts));
     
-    MSqlQuery query(QString::null, m_db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE recorded SET starttime = :NEWSTARTTIME, "
                   "endtime = :NEWENDTIME WHERE chanid = :CHANID AND "
                   "title = :TITLE AND starttime = :STARTTIME AND "
@@ -1312,8 +1269,6 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
     {
         MythContext::DBError("Stop recording program update", query);
     }
-
-    dblock.unlock();
 
     // If we change the recording times we must also adjust the .nuv file's name
     QString fileprefix = gContext->GetFilePrefix();
@@ -1358,8 +1313,7 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
 
     int jobTypes;
 
-    dblock.lock();
-    jobTypes = pginfo->GetAutoRunJobs(m_db);
+    jobTypes = pginfo->GetAutoRunJobs();
 
     if (pginfo->chancommfree)
         jobTypes = jobTypes & (~JOB_COMMFLAG);
@@ -1374,10 +1328,9 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
         if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
             jobHost = pginfo->hostname;
 
-        JobQueue::QueueJobs(m_db, jobTypes, pginfo->chanid,
+        JobQueue::QueueJobs(jobTypes, pginfo->chanid,
                             pginfo->recstartts, "", "", jobHost);
     }
-    dblock.unlock();
 
     delete pginfo;
 }
@@ -1469,10 +1422,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
         ds->recstartts = pginfo->recstartts;
         ds->recendts = pginfo->recendts;
 
-        dblock.lock();
-        MythContext::KickDatabase(m_db);
-        pginfo->SetDeleteFlag(true, m_db);
-        dblock.unlock();
+        pginfo->SetDeleteFlag(true);
 
         pthread_t deleteThread;
         pthread_attr_t attr;
@@ -1559,7 +1509,7 @@ void MainServer::HandleForgetRecording(QStringList &slist, PlaybackSock *pbs)
     if (pbs)
         pbssock = pbs->getSocket();
 
-    pginfo->DeleteHistory(m_db);
+    pginfo->DeleteHistory();
 
     if (pbssock)
     {
@@ -1711,21 +1661,16 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
 
 void MainServer::getGuideDataThrough(QDateTime &GuideDataThrough)
 {
-    QString querytext;
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT max(endtime) FROM program;");
 
-    querytext = QString("SELECT max(endtime) FROM program;");
-
-    dblock.lock();
-    MSqlQuery query = m_db->exec(querytext);
-
-    if (query.isActive() && query.numRowsAffected())
+    if (query.exec() && query.isActive() && query.size())
     {
         query.next();
         if (query.isValid())
             GuideDataThrough = QDateTime::fromString(query.value(0).toString(),
                                                      Qt::ISODate);
     }
-    dblock.unlock();
 }
 
 void MainServer::HandleQueryGuideDataThrough(PlaybackSock *pbs)
@@ -1836,15 +1781,14 @@ void MainServer::HandleLockTuner(PlaybackSock *pbs)
                                   .arg(retval).arg(pbshost);
             VERBOSE(VB_GENERAL, msg);
 
-            QString querystr = QString("SELECT videodevice, audiodevice, "
-                                       "vbidevice "
-                                       "FROM capturecard "
-                                       "WHERE cardid = %1;")
-                                       .arg(retval);
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare("SELECT videodevice, audiodevice, "
+                          "vbidevice "
+                          "FROM capturecard "
+                          "WHERE cardid = :CARDID ;");
+            query.bindValue(":CARDID", retval);
 
-            MSqlQuery query = m_db->exec(querystr);
-
-            if (query.isActive() && query.numRowsAffected())
+            if (query.exec() && query.isActive() && query.size())
             {
                 // Success
                 query.next();
@@ -2964,17 +2908,17 @@ QString MainServer::LocalFilePath(QUrl &url)
     if (lpath.section('/', -2, -2) == "channels")
     {
         // This must be an icon request. Check channel.icon to be safe.
-        dblock.lock();
-
         QString querytext;
 
         QString file = lpath.section('/', -1);
         lpath = "";
 
+        MSqlQuery query(MSqlQuery::InitCon());
         querytext = QString("SELECT icon FROM channel "
                             "WHERE icon LIKE '%%1';").arg(file);
-        MSqlQuery query = m_db->exec(querytext);
-        if (query.isActive() && query.numRowsAffected())
+        query.prepare(querytext);
+
+        if (query.exec() && query.isActive() && query.numRowsAffected())
         {
             query.next();
             lpath = query.value(0).toString();
@@ -2983,8 +2927,6 @@ QString MainServer::LocalFilePath(QUrl &url)
         {
             MythContext::DBError("Icon path", query);
         }
-
-        dblock.unlock();
     }
     else
     {
@@ -3123,8 +3065,6 @@ void MainServer::ShutSlaveBackendsDown(QString &haltcmd)
 #if USING_DVB
 void MainServer::PrintDVBStatus(QTextStream& os)
 {
-    dblock.lock();
-
     QString querytext;
 
     bool doneAnything = false;
@@ -3133,15 +3073,16 @@ void MainServer::PrintDVBStatus(QTextStream& os)
         "    <h2>DVB Signal Information</h2>\r\n" <<
         "    Details of DVB error statistics for last 48 hours:<br />\r\n";
 
-    QString outerqry =
-        "SELECT starttime,endtime FROM recorded "
-        "WHERE starttime >= DATE_SUB(NOW(), INTERVAL 48 HOUR) "
-        "ORDER BY starttime;";
 
-    MSqlQuery oquery = m_db->exec(outerqry);
 
-    if (oquery.isActive() && oquery.numRowsAffected())
+    MSqlQuery oquery(MSqlQuery::InitCon());
+    oquery.prepare("SELECT starttime,endtime FROM recorded "
+                   "WHERE starttime >= DATE_SUB(NOW(), INTERVAL 48 HOUR) "
+                   "ORDER BY starttime;");
+
+    if (oquery.exec() && oquery.isActive() && oquery.size() > 0)
     {
+        MSqlQuery query(MSqlQuery::InitCon());
         querytext = QString("SELECT cardid,"
                             "max(fe_ss),min(fe_ss),avg(fe_ss),"
                             "max(fe_snr),min(fe_snr),avg(fe_snr),"
@@ -3152,7 +3093,6 @@ void MainServer::PrintDVBStatus(QTextStream& os)
                             "WHERE sampletime BETWEEN ? AND ? "
                             "GROUP BY cardid");
 
-        MSqlQuery query = m_db->exec(NULL);
         query.prepare(querytext);
         
         while (oquery.next())
@@ -3167,7 +3107,7 @@ void MainServer::PrintDVBStatus(QTextStream& os)
                 cout << query.lastError().databaseText() << "\r\n" 
                      << query.lastError().driverText() << "\r\n";
             
-            if (query.isActive() && query.numRowsAffected())
+            if (query.isActive() && query.size() > 0)
             {
                 os << "    <br />Recording period from " 
                    << t_start.toString() << 
@@ -3196,8 +3136,6 @@ void MainServer::PrintDVBStatus(QTextStream& os)
         os << "    <br />There is no DVB signal quality data available to "
             "display.<br />\r\n";
     }
-
-    dblock.unlock();
 
     os << "  </div>\r\n";
 }
@@ -3498,9 +3436,7 @@ void MainServer::PrintStatus(QSocket *socket)
                   << qstrDescription << "<br /><br />"
                   << "This recording will start "  << timeToRecstart
                   << " using encoder " << (*iter)->cardid << " with the '";
-               dblock.lock();
-               os << (*iter)->GetProgramRecordingProfile(m_db);
-               dblock.unlock();
+               os << (*iter)->GetProgramRecordingProfile();
                os << "' profile.</span></a><hr />\r\n";
            }
        }
@@ -3514,11 +3450,9 @@ void MainServer::PrintStatus(QSocket *socket)
     // Job Queue Entries -----------------
     QMap<int, JobQueueEntry> jobs;
     QMap<int, JobQueueEntry>::Iterator it;
-    dblock.lock();
-    JobQueue::GetJobsInQueue(m_db, jobs,
+    JobQueue::GetJobsInQueue(jobs,
                              JOB_LIST_NOT_DONE | JOB_LIST_ERROR |
                              JOB_LIST_RECENT);
-    dblock.unlock();
 
     if (jobs.size())
     {
@@ -3536,10 +3470,8 @@ void MainServer::PrintStatus(QSocket *socket)
         {
             ProgramInfo *pginfo;
 
-            dblock.lock();
-            pginfo = ProgramInfo::GetProgramFromRecorded(m_db, it.data().chanid,
+            pginfo = ProgramInfo::GetProgramFromRecorded(it.data().chanid,
                                                          it.data().starttime);
-            dblock.unlock();
 
             if (!pginfo)
                 continue;
@@ -3658,24 +3590,20 @@ void MainServer::PrintStatus(QSocket *socket)
 
     os << "    </div>\r\n";    // end of disk status and load average
 
-    dblock.lock();
-
     QString querytext;
     int DaysOfData;
     QDateTime GuideDataThrough;
 
-    querytext = QString("SELECT max(endtime) FROM program;");
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT max(endtime) FROM program;");
 
-    MSqlQuery query = m_db->exec(querytext);
-
-    if (query.isActive() && query.numRowsAffected())
+    if (query.exec() && query.isActive() && query.size())
     {
         query.next();
         if (query.isValid())
             GuideDataThrough = QDateTime::fromString(query.value(0).toString(),
                                                      Qt::ISODate);
     }
-    dblock.unlock();
 
     QString mfdLastRunStart, mfdLastRunEnd, mfdLastRunStatus;
     QString DataDirectMessage;

@@ -13,8 +13,7 @@ class RingBuffer;
 class DecoderBase
 {
   public:
-    DecoderBase(NuppelVideoPlayer *parent, MythSqlDatabase *db,
-                ProgramInfo *pginfo);
+    DecoderBase(NuppelVideoPlayer *parent, ProgramInfo *pginfo);
     virtual ~DecoderBase() { }
 
     virtual void Reset(void);
@@ -79,7 +78,6 @@ class DecoderBase
     } PosMapEntry;
 
     NuppelVideoPlayer *m_parent;
-    MythSqlDatabase *m_db;
     ProgramInfo *m_playbackinfo;
 
     RingBuffer *ringBuffer;

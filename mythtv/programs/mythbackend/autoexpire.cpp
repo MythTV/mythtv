@@ -21,10 +21,10 @@ using namespace std;
 
 #include "programinfo.h"
 #include "libmyth/mythcontext.h"
+#include "libmyth/mythdbcon.h"
 
-AutoExpire::AutoExpire(bool runthread, bool master, QSqlDatabase *ldb)
+AutoExpire::AutoExpire(bool runthread, bool master)
 {
-    db = ldb;
     isMaster = master;
 
     threadrunning = runthread;
@@ -146,9 +146,10 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                        "FROM record WHERE maxepisodes > 0 "
                        "ORDER BY recordid ASC, maxepisodes DESC";
 
-    QSqlQuery query = db->exec(querystr);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(querystr);
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         VERBOSE(VB_FILE, QString("Found %1 record profiles using max episode expiration")
                                     .arg(query.numRowsAffected()));
@@ -165,12 +166,12 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                             "ORDER BY starttime DESC;")
                             .arg(maxIter.key());
 
-        query = db->exec(querystr);
+        query.prepare(querystr);
 
         VERBOSE(VB_FILE, QString("Found %1 episodes in recording profile %2 using max expiration")
                                     .arg(query.numRowsAffected())
                                     .arg(maxIter.key()));
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.exec() && query.isActive() && query.size() > 0)
         {
             int found = 0;
             while (query.next()) {
@@ -246,6 +247,8 @@ void AutoExpire::ClearExpireList(void)
 void AutoExpire::FillOldestFirst(void)
 {
     QString fileprefix = gContext->GetFilePrefix();
+
+    MSqlQuery query(MSqlQuery::InitCon());
     QString querystr = QString(
                "SELECT recorded.chanid,starttime,endtime,title,subtitle, "
                "description,hostname,channum,name,callsign,seriesid,programid "
@@ -256,9 +259,9 @@ void AutoExpire::FillOldestFirst(void)
                "ORDER BY autoexpire ASC, starttime DESC")
                .arg(gContext->GetHostName());
 
-    QSqlQuery query = db->exec(querystr);
+    query.prepare(querystr);
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
         while (query.next()) {
             ProgramInfo *proginfo = new ProgramInfo;
 

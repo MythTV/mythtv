@@ -31,6 +31,7 @@
 using namespace std;
 
 #include "libmyth/mythcontext.h"
+#include "libmyth/mythdbcon.h"
 
 void RunProgramFind(bool thread, bool ggActive)
 {
@@ -78,7 +79,6 @@ ProgFinder::ProgFinder(MythMainWindow *parent, const char *name, bool gg)
 void ProgFinder::Initialize(void)
 {
     running = true;
-    m_db = QSqlDatabase::database();
     
     allowkeypress = true;
     inFill = false;
@@ -364,7 +364,7 @@ void ProgFinder::updateInfo(QPainter *p)
             else
             {
                 QMap<QString, QString> infoMap;
-                showData[curShow]->ToMap(m_db, infoMap);
+                showData[curShow]->ToMap(infoMap);
                 container->SetText(infoMap);
             }
         }
@@ -453,9 +453,9 @@ void ProgFinder::getInfo(bool toggle)
         if (curPick)
         {
             if (toggle)
-                curPick->ToggleRecord(m_db);
+                curPick->ToggleRecord();
             else
-                curPick->EditRecording(m_db);
+                curPick->EditRecording();
         }
         else
             return;
@@ -578,7 +578,6 @@ void ProgFinder::upcoming()
             return;
 
         ProgLister *pl = new ProgLister(plTitle, curPick->title,
-                                        QSqlDatabase::database(),
                                         gContext->GetMainWindow(), "proglist");
         pl->exec();
         delete pl;
@@ -596,7 +595,7 @@ void ProgFinder::details()
         if (!curPick)
             return;
 
-        curPick->showDetails(QSqlDatabase::database());
+        curPick->showDetails();
     }
     else
         cursorRight();
@@ -948,11 +947,13 @@ void ProgFinder::selectSearchData()
     QString thequery;
     QString data;
 
+    MSqlQuery query(MSqlQuery::InitCon());
     thequery = whereClauseGetSearchData(curSearch);
 
-    QSqlQuery query = m_db->exec(thequery);
-
-    int rows = query.numRowsAffected();
+    query.prepare(thequery);
+    query.exec();
+    
+    int rows = query.size();
 
     if (rows == -1)
     {
@@ -1088,7 +1089,7 @@ void ProgFinder::selectShowData(QString progTitle, int newCurShow)
         .arg(progTitle.utf8().replace("'", "\\'"))
         .arg(progStart.toString("yyyyMMddhhmm50"));
 
-    showData.FromProgram(m_db, querystr, schedList);
+    showData.FromProgram(querystr, schedList);
 
     showCount = showData.count();
     if (showCount < showsPerListing)
@@ -1117,9 +1118,11 @@ void ProgFinder::getSearchData(int charNum)
 
     thequery = whereClauseGetSearchData(charNum);
 
-    QSqlQuery query = m_db->exec(thequery);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(thequery);
+    query.exec();
 
-    int rows = query.numRowsAffected();
+    int rows = query.size();
 
     if (rows == -1)
     {

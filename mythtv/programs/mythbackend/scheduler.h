@@ -2,7 +2,6 @@
 #define SCHEDULER_H_
 
 class ProgramInfo;
-class QSqlDatabase;
 class EncoderLink;
 class MainServer;
 
@@ -23,8 +22,7 @@ typedef RecList::iterator RecIter;
 class Scheduler : public QObject
 {
   public:
-    Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList, 
-              QSqlDatabase *ldb);
+    Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList);
     ~Scheduler();
 
     void Reschedule(int recordid);
@@ -84,7 +82,6 @@ class Scheduler : public QObject
                              bool &blockShutdown);
     void ShutdownServer(int prerollseconds);
 
-    QSqlDatabase *db;
 
     QValueList<int> reschedQueue;
     QMutex reschedLock;

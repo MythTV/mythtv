@@ -16,13 +16,11 @@ public:
         setLabel(QObject::tr("Select your preferred language"));
     };
     
-    virtual void load(QSqlDatabase* db) {
-        (void)db;
+    virtual void load() {
         LanguageSettings::fillSelections(this);
     };
     
-    virtual void save(QSqlDatabase* db) {
-        (void)db;
+    virtual void save() {
         gContext->SetSetting("Language", getValue());
         gContext->SaveSetting("Language", getValue());
         LanguageSettings::reload();
@@ -104,7 +102,7 @@ void LanguageSettings::prompt(bool force)
     if (force || d.m_language.isEmpty())
     {
         LangEditor *ed = new LangEditor();
-        ed->exec(NULL);
+        ed->exec();
         delete ed;
     }
     // Always update the database, even if there's

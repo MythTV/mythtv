@@ -68,7 +68,7 @@ protected:
             ProfileGroupParam(parent, "hostname") {
             setLabel(QObject::tr("Hostname"));
         };
-        void fillSelections(QSqlDatabase *db);
+        void fillSelections();
     };
 
     class CardInfo: public ComboBoxSetting, public ProfileGroupParam {
@@ -80,12 +80,12 @@ protected:
     };
 
 public:
-    ProfileGroup(QSqlDatabase* _db);
+    ProfileGroup();
 
     virtual void loadByID(int id);
 
-    static void fillSelections(QSqlDatabase* db, SelectSetting* setting);
-    static void getHostNames(QSqlDatabase* db, QStringList* hostnames);
+    static void fillSelections(SelectSetting* setting);
+    static void getHostNames(QStringList* hostnames);
     int getProfileNum(void) const {
         return id->intValue();
     };
@@ -95,7 +95,7 @@ public:
     };
 
     QString getName(void) const { return name->getValue(); };
-    static QString getName(QSqlDatabase* db, int group);
+    static QString getName(int group);
     void setName(QString newName) { name->setValue(newName); };
     bool allowedGroupName(void);
 
@@ -104,25 +104,22 @@ private:
     Name* name;
     HostName* host;
     Is_default* is_default;
-    QSqlDatabase* db;
 };
 
 class ProfileGroupEditor: public ListBoxSetting, public ConfigurationDialog {
     Q_OBJECT
 public:
-    ProfileGroupEditor(QSqlDatabase* _db):
-        db(_db) {};
+    ProfileGroupEditor() {};
 
-    virtual int exec(QSqlDatabase* db);
-    virtual void load(QSqlDatabase* db);
-    virtual void save(QSqlDatabase* db) { (void)db; };
+    virtual int exec();
+    virtual void load();
+    virtual void save() {};
 
 protected slots:
     void open(int id);
     void callDelete(void);
 
 protected:
-    QSqlDatabase* db;
     MythDialog* dialog;
     bool redraw;
 };

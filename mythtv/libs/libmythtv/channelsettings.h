@@ -10,6 +10,7 @@
 #include "mythwidgets.h"
 #include "mythwizard.h"
 #include "mythcontext.h"
+#include "mythdbcon.h"
 
 class ChannelID: public IntegerSetting, public TransientStorage {
 public:
@@ -24,26 +25,29 @@ public:
         return NULL;
     };
 
-    void load(QSqlDatabase* _db) { db = _db; };
-    void save(QSqlDatabase* db) {
+    void load() { };
+    void save() 
+    {
         if (intValue() == 0) {
             setValue(findHighest());
 
-            QSqlQuery query;
+            MSqlQuery query(MSqlQuery::InitCon());
             
-            query = db->exec(QString("SELECT %1 FROM %2 WHERE %3='%4'")
-                             .arg(field).arg(table).arg(field).arg(getValue()));
+            QString querystr = QString("SELECT %1 FROM %2 WHERE %3='%4'")
+                             .arg(field).arg(table).arg(field).arg(getValue());
+            query.prepare(querystr);
 
-            if (!query.isActive())
+            if (!query.exec() && !query.isActive())
                 MythContext::DBError("ChannelID::save", query);
 
-            if (query.numRowsAffected())
+            if (query.size())
                 return;
 
-            query = db->exec(QString("INSERT INTO %1 SET %2=%3")
-                             .arg(table).arg(field).arg(getValue()));
+            querystr = QString("INSERT INTO %1 SET %2=%3")
+                             .arg(table).arg(field).arg(getValue());
+            query.prepare(querystr);
 
-            if (!query.isActive())
+            if (!query.exec() || !query.isActive())
                 MythContext::DBError("ChannelID::save", query);
 
             if (query.numRowsAffected() != 1)
@@ -54,16 +58,19 @@ public:
     int findHighest(int floor = 1000)
     {
         int tmpfloor = floor;
-        QSqlQuery query;
+        MSqlQuery query(MSqlQuery::InitCon());
         
-        query = db->exec(QString("SELECT %1 FROM %2")
-                         .arg(field).arg(table));
-        if (!query.isActive()) {
+        QString querystr = QString("SELECT %1 FROM %2")
+                                .arg(field).arg(table);
+        query.prepare(querystr);
+
+        if (!query.exec() || !query.isActive()) 
+        {
             MythContext::DBError("finding highest id", query);
             return floor;
         }
 
-        if (query.numRowsAffected() > 0)
+        if (query.size() > 0)
             while (query.next())
                 if (tmpfloor <= query.value(0).toInt())
                     tmpfloor = query.value(0).toInt() + 1;
@@ -77,7 +84,6 @@ public:
 
 protected:
     QString field,table;
-    QSqlDatabase* db;
 };
 
 class CSetting: public SimpleDBStorage {
@@ -100,7 +106,7 @@ class ChannelOptionsCommon: public VerticalConfigurationGroup {
     Q_OBJECT
 public:
     ChannelOptionsCommon(const ChannelID& id);
-    void load(QSqlDatabase* _db);
+    void load();
 public slots:
     void onAirGuideChanged(bool);
     void sourceChanged(const QString&);
@@ -108,7 +114,6 @@ public slots:
 protected:
     OnAirGuide *onairguide;
     XmltvID    *xmltvID;
-    QSqlDatabase *db;
 };
 
 class ChannelOptionsV4L: public VerticalConfigurationGroup {

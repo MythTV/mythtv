@@ -2,6 +2,7 @@
 #include "videosource.h"
 #include "profilegroup.h"
 #include "libmyth/mythcontext.h"
+#include "libmyth/mythdbcon.h"
 #include <qsqldatabase.h>
 #include <qheader.h>
 #include <qcursor.h>
@@ -20,20 +21,19 @@ QString ProfileGroupParam::setClause(void) {
         .arg(getValue().utf8());
 }
 
-void ProfileGroup::HostName::fillSelections(QSqlDatabase *db)
+void ProfileGroup::HostName::fillSelections()
 {
     QStringList hostnames;
-    ProfileGroup::getHostNames(db, &hostnames);
+    ProfileGroup::getHostNames(&hostnames);
     for(QStringList::Iterator it = hostnames.begin();
                  it != hostnames.end(); it++)
         this->addSelection(*it);
 }
 
-ProfileGroup::ProfileGroup(QSqlDatabase *_db)
+ProfileGroup::ProfileGroup()
 {
     // This must be first because it is needed to load/save the other settings
     addChild(id = new ID());
-    db = _db;
     addChild(is_default = new Is_default(*this));
 
     ConfigurationGroup* profile = new VerticalConfigurationGroup(false);
@@ -44,25 +44,35 @@ ProfileGroup::ProfileGroup(QSqlDatabase *_db)
     CardType::fillSelections(cardInfo);
     host = new HostName(*this);
     profile->addChild(host);
-    host->fillSelections(db);
+    host->fillSelections();
     addChild(profile);
 };
 
 void ProfileGroup::loadByID(int profileId) {
     id->setValue(profileId);
-    load(db);
+    load();
 }
 
-void ProfileGroup::fillSelections(QSqlDatabase* db, SelectSetting* setting) {
+void ProfileGroup::fillSelections(SelectSetting* setting) {
     QStringList cardtypes;
     QString transcodeID;
-    QSqlQuery result = db->exec("SELECT DISTINCT cardtype FROM capturecard;");
-    if (result.isActive() && result.numRowsAffected() > 0)
+
+    MSqlQuery result(MSqlQuery::InitCon());
+
+    result.prepare("SELECT DISTINCT cardtype FROM capturecard;");
+
+    if (result.exec() && result.isActive() && result.size() > 0)
+    {
         while (result.next())
+        {
             cardtypes.append(result.value(0).toString());
-    result = db->exec("SELECT name,id,hostname,is_default,cardtype "
+        }
+    }
+
+    result.prepare("SELECT name,id,hostname,is_default,cardtype "
                       "FROM profilegroups;");
-    if (result.isActive() && result.numRowsAffected() > 0)
+
+    if (result.exec() && result.isActive() && result.size() > 0)
         while (result.next())
         {
             // Only show default profiles that match installed cards
@@ -88,49 +98,60 @@ void ProfileGroup::fillSelections(QSqlDatabase* db, SelectSetting* setting) {
         setting->addSelection(QObject::tr("Transcoders"), transcodeID);
 }
 
-QString ProfileGroup::getName(QSqlDatabase *db, int group)
+QString ProfileGroup::getName(int group)
 {
-    QString query = QString("SELECT name from profilegroups WHERE id = %1")
+    MSqlQuery result(MSqlQuery::InitCon());
+    QString querystr = QString("SELECT name from profilegroups WHERE id = %1")
                             .arg(group);
-    QSqlQuery result = db->exec(query);
-    if (result.isActive() && result.numRowsAffected() > 0)
+    result.prepare(querystr);
+
+    if (result.exec() && result.isActive() && result.size() > 0)
     {
         result.next();
         return QString::fromUtf8(result.value(0).toString());
     }
+
     return NULL;
 }
 
 bool ProfileGroup::allowedGroupName(void)
 {
-    QString query = QString("SELECT DISTINCT id FROM profilegroups WHERE "
+    MSqlQuery result(MSqlQuery::InitCon());
+    QString querystr = QString("SELECT DISTINCT id FROM profilegroups WHERE "
                             "name = '%1' AND hostname = '%2';")
                             .arg(getName()).arg(host->getValue());
-    QSqlQuery result = db->exec(query.utf8());
-    if (result.isActive() && result.numRowsAffected() > 0)
+    result.prepare(querystr);
+
+    if (result.exec() && result.isActive() && result.size() > 0)
         return false;
     return true;
 }
 
-void ProfileGroup::getHostNames(QSqlDatabase* db, QStringList *hostnames)
+void ProfileGroup::getHostNames(QStringList *hostnames)
 {
     hostnames->clear();
-    QString query = QString("SELECT DISTINCT hostname from capturecard");
-    QSqlQuery result = db->exec(query);
-    if (result.isActive() && result.numRowsAffected() > 0)
+
+    MSqlQuery result(MSqlQuery::InitCon());
+
+    result.prepare("SELECT DISTINCT hostname from capturecard");
+
+    if (result.exec() && result.isActive() && result.size() > 0)
+    {
         while (result.next())
             hostnames->append(result.value(0).toString());
+    }
 }
 
 void ProfileGroupEditor::open(int id) {
 
-    ProfileGroup* profilegroup = new ProfileGroup(db);
+    ProfileGroup* profilegroup = new ProfileGroup();
 
     bool isdefault = false;
     bool show_profiles = true;
     bool newgroup = false;
     int profileID;
     QString pgName;
+
     if (id != 0)
     {
         profilegroup->loadByID(id);
@@ -144,18 +165,22 @@ void ProfileGroupEditor::open(int id) {
         profilegroup->setName(pgName);
         newgroup = true;
     }
+
     if (! isdefault)
     {
-        if (profilegroup->exec(db, false) == QDialog::Accepted &&
+        if (profilegroup->exec(false) == QDialog::Accepted &&
             profilegroup->allowedGroupName())
         {
-            profilegroup->save(db);
+            profilegroup->save();
             profileID = profilegroup->getProfileNum();
             QValueList <int> found;
-            QString query = QString("SELECT name FROM recordingprofiles WHERE "
+            
+            MSqlQuery result(MSqlQuery::InitCon());
+            QString querystr = QString("SELECT name FROM recordingprofiles WHERE "
                                     "profilegroup = %1").arg(profileID);
-            QSqlQuery result = db->exec(query);
-            if (result.isActive() && result.numRowsAffected() > 0)
+            result.prepare(querystr);
+
+            if (result.exec() && result.isActive() && result.size() > 0)
             {
                 while (result.next())
                 {
@@ -174,37 +199,42 @@ void ProfileGroupEditor::open(int id) {
                         skip = true;
                 if (! skip)
                 {
-                    query = QString("INSERT INTO recordingprofiles SET "
+                    
+                    querystr = QString("INSERT INTO recordingprofiles SET "
                                     "name = '%1', profilegroup = %2")
                                     .arg(availProfiles[i]).arg(profileID);
-                    QSqlQuery result = db->exec(query);
+                    result.prepare(querystr);
+                    result.exec();
                 }
             }
         }
         else if (newgroup)
             show_profiles = false;
     }
+
     if (show_profiles)
     {
         pgName = profilegroup->getName();
         profileID = profilegroup->getProfileNum();
-        RecordingProfileEditor editor(db,profileID,pgName);
-        editor.exec(db);
+        RecordingProfileEditor editor(profileID, pgName);
+        editor.exec();
     }
     delete profilegroup;
 };
 
-void ProfileGroupEditor::load(QSqlDatabase* db) {
+void ProfileGroupEditor::load() 
+{
     clearSelections();
-    ProfileGroup::fillSelections(db, this);
+    ProfileGroup::fillSelections(this);
     addSelection(QObject::tr("(Create new profile group)"), "0");
 }
 
-int ProfileGroupEditor::exec(QSqlDatabase* db) {
+int ProfileGroupEditor::exec() 
+{
     int ret;
     do {
     redraw = false;
-    load(db);
+    load();
     dialog = new ConfigurationDialogWidget(gContext->GetMainWindow());
     connect(dialog, SIGNAL(menuButtonPressed()), this, SLOT(callDelete()));
     int width = 0, height = 0;
@@ -230,14 +260,17 @@ int ProfileGroupEditor::exec(QSqlDatabase* db) {
 void ProfileGroupEditor::callDelete(void)
 {
     int id = getValue().toInt();
-    QString query = QString("SELECT id FROM profilegroups WHERE "
+    
+    MSqlQuery result(MSqlQuery::InitCon());
+    QString querystr = QString("SELECT id FROM profilegroups WHERE "
                             "id = %1 AND is_default = 0;").arg(id);
-    QSqlQuery result = db->exec(query);
-    if (result.isActive() && result.numRowsAffected() > 0)
+    result.prepare(querystr);
+    
+    if (result.exec() && result.isActive() && result.size() > 0)
     {
         result.next();
         QString message = QObject::tr("Delete profile group:") + 
-                          QString("\n'%1'?").arg(ProfileGroup::getName(db, id));
+                          QString("\n'%1'?").arg(ProfileGroup::getName(id));
 
         int value = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(),
                                                    "", message, 
@@ -246,19 +279,26 @@ void ProfileGroupEditor::callDelete(void)
 
         if (value == 0)
         {
-            query = QString("DELETE codecparams FROM codecparams, "
+            querystr = QString("DELETE codecparams FROM codecparams, "
                             "recordingprofiles WHERE " 
                             "codecparams.profile = recordingprofiles.id "
                             "AND recordingprofiles.profilegroup = %1").arg(id);
-            db->exec(query);
-            query = QString("DELETE FROM recordingprofiles WHERE "
+            result.prepare(querystr);
+            result.exec();
+
+            querystr = QString("DELETE FROM recordingprofiles WHERE "
                             "profilegroup = %1").arg(id);
-            db->exec(query);
-            query = QString("DELETE FROM profilegroups WHERE id = %1;").arg(id);
-            db->exec(query);
+            result.prepare(querystr);
+            result.exec();
+
+            querystr = QString("DELETE FROM profilegroups WHERE id = %1;").arg(id);
+            result.prepare(querystr);
+            result.exec();
+
             redraw = true;
             dialog->done(QDialog::Rejected);
         }
     }
+
 }
 

@@ -39,13 +39,15 @@ void DVBTransportList::fillSelections(void)
     clearSelections();
     addSelection("(New Transport)");
 
+    MSqlQuery query(MSqlQuery::InitCon());
+
     QString querystr = QString("SELECT mplexid, networkid, transportid, "
                        " frequency, symbolrate, modulation FROM dtv_multiplex channel "
                        " WHERE sourceid=%1 ORDER by networkid, transportid ")
                        .arg(strSourceID);
+    query.prepare(querystr);
 
-    QSqlQuery query = db->exec(querystr);
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         while(query.next()) 
         {
@@ -69,17 +71,22 @@ public:
         setLabel(QObject::tr("Video Source"));
     };
 
-    void save(QSqlDatabase* db) { (void)db; };
-    void load(QSqlDatabase* db) {
-        QSqlQuery query = db->exec(QString(
+    void save() { };
+    void load() 
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+
+        QString querystr = QString(
         "SELECT DISTINCT videosource.name, videosource.sourceid "
         "FROM cardinput, videosource, capturecard "
         "WHERE cardinput.sourceid=videosource.sourceid "
         "AND cardinput.cardid=capturecard.cardid "
         "AND capturecard.cardtype in (\"DVB\") "
-        "AND capturecard.hostname=\"%1\"").arg(gContext->GetHostName()));
+        "AND capturecard.hostname=\"%1\"").arg(gContext->GetHostName());
 
-        if (query.isActive() && query.numRowsAffected() > 0)
+        query.prepare(querystr);
+
+        if (query.exec() && query.isActive() && query.size() > 0)
             while(query.next())
                 addSelection(query.value(0).toString(),
                              query.value(1).toString());
@@ -87,7 +94,7 @@ public:
 };
 
 DVBTransportsEditor::DVBTransportsEditor():
-    VerticalConfigurationGroup(false) , m_db(0)
+    VerticalConfigurationGroup(false)
 {
     setLabel(tr("DVB Transport Editor"));
     setUseLabel(true);
@@ -106,19 +113,22 @@ DVBTransportsEditor::DVBTransportsEditor():
 
 void DVBTransportsEditor::videoSource(const QString& str )
 {
-    if (!m_db)
-        return;
+    MSqlQuery query(MSqlQuery::InitCon());
+
     bool fEnable = false;
-    QSqlQuery query = m_db->exec(QString(
+
+    QString querystr = QString(
         "SELECT count(cardtype) "
         "FROM cardinput, videosource, capturecard "
         "WHERE cardinput.sourceid=videosource.sourceid "
         "AND cardinput.cardid=capturecard.cardid "
         "AND capturecard.cardtype in (\"DVB\") "
         "AND videosource.sourceid = %1 "
-        "AND capturecard.hostname=\"%2\"").arg(str).arg(gContext->GetHostName()));
+        "AND capturecard.hostname=\"%2\"").arg(str).arg(gContext->GetHostName());
+    
+    query.prepare(querystr);
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
          query.next();
          if (query.value(0).toInt() > 0)
@@ -128,18 +138,16 @@ void DVBTransportsEditor::videoSource(const QString& str )
     m_list->setEnabled(fEnable);
 }
 
-int DVBTransportsEditor::exec(QSqlDatabase* _db)
+int DVBTransportsEditor::exec()
 {
-    m_db = _db;
-
-    while (ConfigurationDialog::exec(m_db) == QDialog::Accepted)  {}
+    while (ConfigurationDialog::exec() == QDialog::Accepted)  {}
     return QDialog::Rejected;
 }
 
 void DVBTransportsEditor::edit()
 {
-    DVBTransportWizard dvbt(m_nID,m_videoSource->getValue().toInt(),m_db);
-    dvbt.exec(m_db);
+    DVBTransportWizard dvbt(m_nID,m_videoSource->getValue().toInt());
+    dvbt.exec();
     m_list->fillSelections();
 }
 
@@ -156,10 +164,14 @@ void DVBTransportsEditor::del() {
                                              tr("Yes, delete the transport"),
                                              tr("No, don't"), 2);
 
-    if (val == 0) {
-        QSqlQuery query = m_db->exec(QString("DELETE FROM dtv_multiplex "
+    if (val == 0) 
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        QSstring querystr = QString("DELETE FROM dtv_multiplex "
                                  "WHERE mplexid ='%1'").arg(m_nID));
-        if (!query.isActive())
+        query.prepare(querystr):
+
+        if (!query.exec() || !query.isActive())
             MythContext::DBError("TransportEditor Delete DVBTransport", query);
         m_list->fillSelections();
     }
@@ -418,8 +430,8 @@ public:
     };
 };
 
-DVBTransportWizard::DVBTransportWizard(int id, unsigned _nVideoSourceID, QSqlDatabase* _db) :
-              ConfigurationWizard(), db(_db)
+DVBTransportWizard::DVBTransportWizard(int id, unsigned _nVideoSourceID) :
+              ConfigurationWizard()
 {
     setLabel(QObject::tr("DVB Transport"));
 
@@ -432,17 +444,20 @@ DVBTransportWizard::DVBTransportWizard(int id, unsigned _nVideoSourceID, QSqlDat
     int iVideoDev = -1;
 
     //Work out what kind of card we've got
-    QSqlQuery query = db->exec(QString(
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString querystr = QString(
            "SELECT capturecard.videodevice FROM cardinput,capturecard "
            " WHERE capturecard.cardid = cardinput.cardid "
            " AND cardinput.sourceid=%1 "
            " AND capturecard.cardtype=\"DVB\"").arg(_nVideoSourceID));
+    query.prepare(querystr);
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
         iVideoDev = query.value(0).toInt();
     }
+
     CardUtil::DVB_TYPES nType = CardUtil::ERROR_PROBE;
     if (iVideoDev >= 0)
         nType = CardUtil::cardDVBType(iVideoDev);

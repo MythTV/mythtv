@@ -37,6 +37,7 @@
 #include "frequencies.h"
 #include "siscan.h"
 #include "dvbsignalmonitor.h"
+#include "mythdbcon.h"
 
 #include "scanwizard.h"
 
@@ -236,45 +237,51 @@ VideoSourceSetting::VideoSourceSetting()
     setLabel(QObject::tr("Video Source"));
 }
 
-void VideoSourceSetting::load(QSqlDatabase* db)
+void VideoSourceSetting::load()
 {
-    QSqlQuery query = db->exec(QString(
+    MSqlQuery query(MSqlQuery::InitCon());
+    
+    QString querystr = QString(
         "SELECT DISTINCT videosource.name, videosource.sourceid "
         "FROM cardinput, videosource, capturecard "
         "WHERE cardinput.sourceid=videosource.sourceid "
         "AND cardinput.cardid=capturecard.cardid "
         "AND capturecard.cardtype in (\"DVB\") "
-        "AND capturecard.hostname=\"%1\"").arg(gContext->GetHostName()));
+        "AND capturecard.hostname=\"%1\"").arg(gContext->GetHostName());
+    
+    query.prepare(querystr);
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
         while(query.next())
             addSelection(query.value(0).toString(),
                          query.value(1).toString());
 }
 
-TransportSetting::TransportSetting() : nSourceID(0), db(0)
+TransportSetting::TransportSetting() : nSourceID(0)
 {
     setLabel(QObject::tr("Transport"));
 }
 
-void TransportSetting::load(QSqlDatabase* _db)
+void TransportSetting::load()
 {
-    db = _db;
     refresh();
 }
 
 void TransportSetting::refresh()
 {
     clearSelections();
-    if (!db)
-        return;
-    QSqlQuery query = db->exec(QString(
-           "SELECT mplexid, networkid, transportid, "
+    
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString querystr = QString(
+               "SELECT mplexid, networkid, transportid, "
                " frequency, symbolrate, modulation FROM dtv_multiplex channel "
                " WHERE sourceid=%1 ORDER by networkid, transportid ")
-               .arg(nSourceID));
+               .arg(nSourceID);
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    query.prepare(querystr);
+
+    if (query.exec() && query.isActive() && query.size() > 0)
         while(query.next())
         {
             QString DisplayText;
@@ -311,22 +318,21 @@ void TransportSetting::sourceID(const QString& str)
     refresh();
 }
 
-CaptureCardSetting::CaptureCardSetting() : nSourceID(0), db(0)
+CaptureCardSetting::CaptureCardSetting() : nSourceID(0)
 {
     setLabel(QObject::tr("Capture Card"));
 }
 
-void CaptureCardSetting::load(QSqlDatabase* _db)
+void CaptureCardSetting::load()
 {
-    db = _db;
     refresh();
 }
 
 void CaptureCardSetting::refresh()
 {
     clearSelections();
-    if (!db)
-        return;
+
+    MSqlQuery query(MSqlQuery::InitCon());
 
     QString thequery = QString("SELECT DISTINCT cardtype,videodevice,capturecard.cardid "
                                "FROM capturecard, videosource, cardinput "
@@ -336,10 +342,9 @@ void CaptureCardSetting::refresh()
                                "AND capturecard.cardtype=\"DVB\" "
                                "AND capturecard.hostname=\"%2\";")
                               .arg(nSourceID).arg(gContext->GetHostName());
+    query.prepare(thequery);
 
-    QSqlQuery query = db->exec(thequery);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
         while(query.next())
             addSelection("[ " + query.value(0).toString() + " : " +
                                 query.value(1).toString() + " ]",
@@ -680,11 +685,9 @@ void LogList::updateText(const QString& status)
 
 const QString ScanWizardScanner::strTitle(QObject::tr("Scanning"));
 
-ScanWizardScanner::ScanWizardScanner(ScanWizard *_parent,QSqlDatabase *_db) :
-          parent(_parent), db(_db)
+ScanWizardScanner::ScanWizardScanner(ScanWizard *_parent) :
+          parent(_parent) 
 {
-
-    pthread_mutex_init(&db_lock, NULL);
     scanner = NULL;
     dvbchannel = NULL;
     scanthread_running = false;
@@ -696,7 +699,6 @@ ScanWizardScanner::ScanWizardScanner(ScanWizard *_parent,QSqlDatabase *_db) :
 ScanWizardScanner::~ScanWizardScanner()
 {
     finish();
-    pthread_mutex_destroy(&db_lock);
 }
 
 void ScanWizardScanner::finish()
@@ -960,28 +962,29 @@ void ScanWizardScanner::scan()
 
     // These locks and objects might already exist in videosource need to check
 
-    dvbchannel->SetDB(db,&db_lock);
     if(!dvbchannel->Open())
        return;
 
-    scanner = new SIScan(dvbchannel,db,&db_lock,parent->videoSource());
+    scanner = new SIScan(dvbchannel, parent->videoSource());
     
     scanner->SetForceUpdate(true);
+    
+    MSqlQuery query(MSqlQuery::InitCon());
+
     QString thequery = QString("SELECT freetoaironly FROM cardinput "
                                "WHERE cardinput.cardid=%1 AND "
                                "cardinput.sourceid=%2")
                                .arg(parent->captureCard())
                                .arg(parent->videoSource());
 
-    pthread_mutex_lock(&db_lock);
-    QSqlQuery query = db->exec(thequery);
+    query.prepare(thequery);
+
     bool freetoair = true;
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
         freetoair=query.value(0).toBool();
     }
-    pthread_mutex_unlock(&db_lock);
     scanner->SetFTAOnly(freetoair);
 
     connect(scanner,SIGNAL(ServiceScanComplete(void)),
@@ -1035,9 +1038,9 @@ void ScanWizardScanner::scan()
                         .arg(parent->captureCard())
                         .arg(parent->videoSource());
 
-               pthread_mutex_lock(&db_lock);
-               query = db->exec(thequery);
-               if (query.isActive() && query.numRowsAffected() > 0)
+               query.prepare(thequery);
+
+               if (query.exec() && query.isActive() && query.size() > 0)
                {
                    query.next();
                    if (!dvbchannel->ParseQPSK(parent->frequency(),
@@ -1056,7 +1059,6 @@ void ScanWizardScanner::scan()
                    }
                    else
                        fParseError = true;
-               pthread_mutex_unlock(&db_lock);
                break;
            case CardUtil::QAM:
                if (!dvbchannel->ParseQAM(parent->frequency(),
@@ -1091,11 +1093,11 @@ void ScanWizardScanner::scan()
     pthread_create(&tuner_thread, NULL, SpawnTune, this);
 }
 
-ScanWizard::ScanWizard(QSqlDatabase* _db) :
-    db(_db) , nScanType(ScanTypeSetting::FullScan), nVideoDev(0),
+ScanWizard::ScanWizard() :
+    nScanType(ScanTypeSetting::FullScan), nVideoDev(0),
     nATSCTransport(0)
 {
-    ScanWizardScanner *page3 = new ScanWizardScanner(this,db);
+    ScanWizardScanner *page3 = new ScanWizardScanner(this);
     ScanWizardScanType *page1 = new ScanWizardScanType(this);
     ScanWizardTuningPage *page2 = new ScanWizardTuningPage(this);
 
@@ -1135,7 +1137,7 @@ void ScanWizard::captureCard(const QString& str)
         nCaptureCard = nNewCaptureCard;
 
         //Work out what kind of card we've got
-        nNewVideoDev = CardUtil::videoDeviceFromCardID(db,nCaptureCard);
+        nNewVideoDev = CardUtil::videoDeviceFromCardID(nCaptureCard);
         CardUtil::DVB_TYPES nNewCardType = CardUtil::ERROR_PROBE;
         if (nNewVideoDev >= 0)
         {

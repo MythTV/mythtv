@@ -56,7 +56,7 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent,
     vbox->addWidget(f);    
 
     programtype = myinfo->IsProgramRecurring();
-    recordstatus = myinfo->GetProgramRecordingStatus(QSqlDatabase::database());
+    recordstatus = myinfo->GetProgramRecordingStatus();
 
     if (recordstatus == kTimeslotRecord && programtype == 0)
     {
@@ -252,8 +252,7 @@ void InfoDialog::selected(QListViewItem *selitem)
     currentSelected = realitem->GetType();
 
     if (currentSelected != recordstatus)
-        myinfo->ApplyRecordStateChange(QSqlDatabase::database(),
-                                       currentSelected);
+        myinfo->ApplyRecordStateChange(currentSelected);
 
     if (selitem)
         accept();
@@ -261,13 +260,12 @@ void InfoDialog::selected(QListViewItem *selitem)
 
 void InfoDialog::advancedEdit(QListViewItem *)
 {
-    QSqlDatabase *m_db = QSqlDatabase::database();;
     ScheduledRecording record;
-    record.loadByProgram(m_db, myinfo);
+    record.loadByProgram(myinfo);
 
     setFocusPolicy(QWidget::NoFocus);
     lview->setFocusPolicy(QWidget::NoFocus);
-    record.exec(m_db);
+    record.exec();
 
     reject();
 }
@@ -277,7 +275,6 @@ void InfoDialog::numberPress(QListViewItem *, int num)
     if (num == 5)
     {
         ProgLister *pl = new ProgLister(plTitle, myinfo->title, 
-                                        QSqlDatabase::database(),
                                         gContext->GetMainWindow(), "proglist");
         pl->exec();
         delete pl;

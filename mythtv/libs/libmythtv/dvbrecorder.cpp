@@ -785,17 +785,13 @@ void DVBRecorder::LocalProcessDataPS(unsigned char *buffer, int len)
                                     _position_map_delta[_frames_written_count] = startpos;
                                     _position_map[_frames_written_count] = startpos;
 
-                                    if (curRecording && db_lock && db_conn &&
+                                    if (curRecording &&
                                         ((_position_map_delta.size() % 30) == 0))
                                     {
-                                        pthread_mutex_lock(db_lock);
-                                        MythContext::KickDatabase(db_conn);
                                         curRecording->SetPositionMapDelta(
                                                            _position_map_delta,
-                                                           MARK_GOP_BYFRAME,
-                                                           db_conn);
-                                        curRecording->SetFilesize(startpos, db_conn);
-                                        pthread_mutex_unlock(db_lock);
+                                                           MARK_GOP_BYFRAME);
+                                        curRecording->SetFilesize(startpos);
                                         _position_map_delta.clear();
                                     }
                                 }
@@ -839,12 +835,9 @@ void DVBRecorder::Reset(void)
 {
     DTVRecorder::Reset();
 
-    if (curRecording && db_lock && db_conn)
+    if (curRecording)
     {
-        pthread_mutex_lock(db_lock);
-        MythContext::KickDatabase(db_conn);
-        curRecording->ClearPositionMap(MARK_GOP_BYFRAME, db_conn);
-        pthread_mutex_unlock(db_lock);
+        curRecording->ClearPositionMap(MARK_GOP_BYFRAME);
     }
 }
 

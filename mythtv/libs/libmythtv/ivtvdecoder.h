@@ -28,8 +28,7 @@ struct IvtvQueuedFrame
 class IvtvDecoder : public DecoderBase
 {
   public:
-    IvtvDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
-                    ProgramInfo *pginfo);
+    IvtvDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo);
    ~IvtvDecoder();
 
     static bool CanHandle(char testbuf[2048], const QString &filename);

@@ -49,7 +49,7 @@ Q_OBJECT
 
 public:
 
-    SIScan(DVBChannel* advbchannel,QSqlDatabase *thedb, pthread_mutex_t* _db_lock, int _sourceID);
+    SIScan(DVBChannel* advbchannel, int _sourceID);
     ~SIScan();
 
     void StartScanner();
@@ -106,8 +106,6 @@ private:
     QMap_SDTObject SDT;
 
     NITObject NIT;
-    QSqlDatabase *db;
-    pthread_mutex_t* db_lock;
     DVBChannel *chan;
     int sourceID;
     QValueList<TransportScanList> scanTransports;

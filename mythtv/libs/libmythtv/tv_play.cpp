@@ -202,11 +202,9 @@ void *SpawnDecode(void *param)
 TV::TV(void)
   : QObject()
 {
-    QString dbname = QString("tvplayback%1%2").arg(getpid()).arg(rand());
 
-    m_db = new MythSqlDatabase(dbname);
-
-    if (!m_db || !m_db->isOpen())
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (!query.isConnected())
     {
         VERBOSE(VB_IMPORTANT, "TV: Couldn't open DB connection in player, exiting");
         exit(-18);
@@ -392,9 +390,6 @@ TV::~TV(void)
 
     if (treeMenu)
         delete treeMenu;
-
-    if (m_db)
-        delete m_db;
 
     if (class LCD * lcd = LCD::Get())
         lcd->switchToTime();
@@ -882,7 +877,7 @@ void TV::SetupPlayer(void)
     QString filters = "";
     
     
-    nvp = new NuppelVideoPlayer(m_db, playbackinfo);
+    nvp = new NuppelVideoPlayer(playbackinfo);
     nvp->SetParentWidget(myWindow);
     nvp->SetRingBuffer(prbuffer);
     nvp->SetRecorder(recorder);
@@ -1055,14 +1050,13 @@ void TV::RunTV(void)
 
     if (gContext->GetNumSetting("WatchTVGuide", 0))
     {
-        QString thequery = QString("SELECT keylist FROM keybindings WHERE "
-                                   "context = \"TV Playback\" AND action = \"GUIDE\" AND "
-                                   "hostname = \"%1\";")
-                                  .arg(gContext->GetHostName());
+        MSqlQuery query(MSqlQuery::InitCon()); 
+        query.prepare("SELECT keylist FROM keybindings WHERE "
+                      "context = \"TV Playback\" AND action = \"GUIDE\" AND "
+                      "hostname = :HOSTNAME ;");
+        query.bindValue(":HOSTNAME", gContext->GetHostName());
 
-        QSqlQuery query = m_db->db()->exec(thequery);
-
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.exec() && query.isActive() && query.size() > 0)
         {
             query.next();
 
@@ -1426,9 +1420,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                     int result = osd->GetDialogResponse(dialogname);
                     if (result == 1) 
                     {
-                       m_db->lock();
-                       playbackinfo->SetEditing(false, m_db->db());
-                       m_db->unlock();
+                       playbackinfo->SetEditing(false);
                        editmode = nvp->EnableEdit();
                     }
                     else
@@ -2128,9 +2120,7 @@ void TV::DoInfo(void)
         oset->Display(false);
 
         QMap<QString, QString> infoMap;
-        m_db->lock();
-        playbackinfo->ToMap(m_db->db(), infoMap);
-        m_db->unlock();
+        playbackinfo->ToMap(infoMap);
         osd->ClearAllText("program_info");
         osd->SetText("program_info", infoMap, osd_display_time);
     }
@@ -2339,16 +2329,15 @@ void TV::DoQueueTranscode(void)
     if (internalState == kState_WatchingPreRecorded)
     {
         bool stop = false;
-        m_db->lock();
         if (queuedTranscode)
             stop = true;
-        else if (JobQueue::IsJobRunning(m_db->db(), JOB_TRANSCODE,
+        else if (JobQueue::IsJobRunning(JOB_TRANSCODE,
                                         playbackinfo->chanid,
                                         playbackinfo->startts))
             stop = true;
         if (stop)
         {
-            JobQueue::ChangeJobCmds(m_db->db(), JOB_TRANSCODE,
+            JobQueue::ChangeJobCmds(JOB_TRANSCODE,
                                     playbackinfo->chanid,
                                     playbackinfo->startts, JOB_STOP);
             queuedTranscode = false;
@@ -2362,7 +2351,7 @@ void TV::DoQueueTranscode(void)
             if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
                 jobHost = playbackinfo->hostname;
 
-            if (JobQueue::QueueJob(m_db->db(), JOB_TRANSCODE,
+            if (JobQueue::QueueJob(JOB_TRANSCODE,
                                playbackinfo->chanid, playbackinfo->startts,
                                jobHost, "", "", JOB_USE_CUTLIST))
             {
@@ -2374,7 +2363,6 @@ void TV::DoQueueTranscode(void)
                     osd->SetSettingsText(tr("Try Again"), 3);
             }
         }
-        m_db->unlock();
     }
 }
 
@@ -2844,13 +2832,10 @@ void TV::UpdateOSD(void)
 
     if (curPlaybackTime < infoMapTime)
     {
-        m_db->lock();
-        curPlaybackInfo = ProgramInfo::GetProgramAtDateTime(m_db->db(),
-                                                            infoMap["chanid"], 
+        curPlaybackInfo = ProgramInfo::GetProgramAtDateTime(infoMap["chanid"], 
                                                             curPlaybackTime);
         if (curPlaybackInfo)
-            curPlaybackInfo->ToMap(m_db->db(), infoMap);
-        m_db->unlock();
+            curPlaybackInfo->ToMap(infoMap);
     }
 
     osd->ClearAllText("program_info");
@@ -3578,14 +3563,11 @@ void TV::BrowseDispInfo(int direction)
         browsestarttime = infoMap["dbstarttime"];
 
     QDateTime startts = QDateTime::fromString(browsestarttime, Qt::ISODate);
-    m_db->lock();
-    ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(m_db->db(),
-                                                                  browsechanid,
+    ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(browsechanid,
                                                                   startts);
     
     if (program_info)
-        program_info->ToMap(m_db->db(), infoMap);
-    m_db->unlock();
+        program_info->ToMap(infoMap);
 
     osd->ClearAllText("browse_info");
     osd->SetText("browse_info", infoMap, -1);
@@ -3607,14 +3589,12 @@ void TV::ToggleRecord(void)
 
         QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
 
-        m_db->lock();
-        ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(m_db->db(),
-                                                                      chanid,
+        ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(chanid,
                                                                       startts);
 
         if (program_info)
         {
-            program_info->ToggleRecord(m_db->db());
+            program_info->ToggleRecord();
 
             QString msg = QString("%1 \"%2\"").arg(tr("Record")).arg(title);
 
@@ -3624,23 +3604,17 @@ void TV::ToggleRecord(void)
             delete program_info;
         }
 
-        m_db->unlock();
         return;
     }
 
     QMap<QString, QString> infoMap;
     QDateTime startts = QDateTime::fromString(browsestarttime, Qt::ISODate);
 
-    m_db->lock();
-
-    ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(m_db->db(),
-                                                                  browsechanid,
+    ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(browsechanid,
                                                                   startts);
-    program_info->ToggleRecord(m_db->db());
+    program_info->ToggleRecord();
 
-    program_info->ToMap(m_db->db(), infoMap);
-
-    m_db->unlock();
+    program_info->ToMap(infoMap);
 
     osd->ClearAllText("browse_info");
     osd->SetText("browse_info", infoMap, -1);
@@ -3807,9 +3781,7 @@ void TV::TreeMenuEntered(OSDListTreeType *tree, OSDGenericTree *item)
 
 void TV::DoEditMode(void)
 {
-    m_db->lock();
-    bool isEditing = playbackinfo->IsEditing(m_db->db());
-    m_db->unlock();
+    bool isEditing = playbackinfo->IsEditing();
 
     if (isEditing)
     {
@@ -3977,15 +3949,11 @@ void TV::BuildOSDTreeMenu(void)
     {
         item = new OSDGenericTree(treeMenu, tr("Edit Recording"), "TOGGLEEDIT");
 
-        m_db->lock();
-        MythContext::KickDatabase(m_db->db());
-        if (JobQueue::IsJobRunning(m_db->db(), JOB_TRANSCODE,
+        if (JobQueue::IsJobRunning(JOB_TRANSCODE,
                                    playbackinfo->chanid, playbackinfo->startts))
             item = new OSDGenericTree(treeMenu, tr("Stop Transcoding"), "QUEUETRANSCODE");
         else
             item = new OSDGenericTree(treeMenu, tr("Begin Transcoding"), "QUEUETRANSCODE");
-
-        m_db->unlock();
 
         item = new OSDGenericTree(treeMenu, tr("Commercial Auto-Skip"));
         subitem = new OSDGenericTree(item, tr("Auto-Skip OFF"),
@@ -4005,14 +3973,12 @@ void TV::BuildOSDTreeMenu(void)
                                      (autoCommercialSkip == 1) ? 1 : 0, NULL,
                                      "COMMSKIPGROUP");
 
-        m_db->lock();
-        if (playbackinfo->GetAutoExpireFromRecorded(m_db->db()))
+        if (playbackinfo->GetAutoExpireFromRecorded())
             item = new OSDGenericTree(treeMenu, tr("Turn Auto-Expire OFF"),
                                       "TOGGLEAUTOEXPIRE");
         else
             item = new OSDGenericTree(treeMenu, tr("Turn Auto-Expire ON"),
                                       "TOGGLEAUTOEXPIRE");
-        m_db->unlock();
     }
 
     if (vbimode == 1)
@@ -4120,18 +4086,16 @@ void TV::ToggleAutoExpire(void)
 {
     QString desc = "";
 
-    m_db->lock();
-    if (playbackinfo->GetAutoExpireFromRecorded(m_db->db()))
+    if (playbackinfo->GetAutoExpireFromRecorded())
     {
-        playbackinfo->SetAutoExpire(false, m_db->db());
+        playbackinfo->SetAutoExpire(false);
         desc = tr("Auto-Expire OFF");
     }
     else
     {
-        playbackinfo->SetAutoExpire(true, m_db->db());
+        playbackinfo->SetAutoExpire(true);
         desc = tr("Auto-Expire ON");
     }
-    m_db->unlock();
 
     if (activenvp == nvp && desc != "" )
     {

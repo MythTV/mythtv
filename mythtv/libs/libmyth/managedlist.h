@@ -446,8 +446,8 @@ class ManagedListSetting: public SimpleDBStorage
 
     public:
 
-        virtual void load(QSqlDatabase* db) {
-            SimpleDBStorage::load(db);
+        virtual void load() {
+            SimpleDBStorage::load();
             syncItemFromDB();
         }
 

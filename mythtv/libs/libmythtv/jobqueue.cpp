@@ -19,18 +19,14 @@ using namespace std;
 #include "NuppelVideoPlayer.h"
 #include "mythdbcon.h"
 
-JobQueue::JobQueue(bool master, QSqlDatabase *db)
+JobQueue::JobQueue(bool master)
 {
     isMaster = master;
-    m_db = db;
     m_hostname = gContext->GetHostName();
 
     jobQueueCPU = gContext->GetNumSetting("JobQueueCPU", 0);
 
     jobsRunning = 0;
-
-    if ( !m_db)
-        cerr << "m_db == NULL" << endl;
 
     queuePoll = false;
 
@@ -74,10 +70,8 @@ void JobQueue::customEvent(QCustomEvent *e)
 
             if (tokens[2] == "ID")
             {
-                dblock.lock();
                 jobID = tokens[3].toInt();
-                GetJobInfoFromID(m_db, jobID, jobType, chanid, starttime);
-                dblock.unlock();
+                GetJobInfoFromID(jobID, jobType, chanid, starttime);
             }
             else
             {
@@ -134,9 +128,7 @@ void JobQueue::RunQueueProcesser()
 {
     queuePoll = true;
 
-    dblock.lock();
-    RecoverQueue(m_db);
-    dblock.unlock();
+    RecoverQueue();
 
     sleep(10);
 
@@ -155,8 +147,6 @@ void JobQueue::ProcessQueue(void)
 {
     VERBOSE(VB_JOBQUEUE, "JobQueue::ProcessQueue() started");
 
-    MSqlQuery delquery(QString::null, m_db);
-    MSqlQuery query(QString::null, m_db);
     QString chanid;
     QDateTime starttime;
     QString startts;
@@ -187,9 +177,7 @@ void JobQueue::ProcessQueue(void)
         jobType.clear();
         jobStatus.clear();
 
-        dblock.lock();
-
-        GetJobsInQueue(m_db, jobs);
+        GetJobsInQueue(jobs);
         
         if (jobs.size())
         {
@@ -293,7 +281,7 @@ void JobQueue::ProcessQueue(void)
                         *(jobControlFlags[key]) = JOB_STOP;
                     controlFlagsLock.unlock();
 
-                    // ChangeJobCmds(m_db, id, JOB_RUN);
+                    // ChangeJobCmds(id, JOB_RUN);
                     continue;
                 }
 
@@ -310,7 +298,7 @@ void JobQueue::ProcessQueue(void)
                         *(jobControlFlags[key]) = JOB_PAUSE;
                     controlFlagsLock.unlock();
 
-                    ChangeJobCmds(m_db, id, JOB_RUN);
+                    ChangeJobCmds(id, JOB_RUN);
                     continue;
                 }
 
@@ -327,7 +315,7 @@ void JobQueue::ProcessQueue(void)
                         *(jobControlFlags[key]) = JOB_RUN;
                     controlFlagsLock.unlock();
 
-                    ChangeJobCmds(m_db, id, JOB_RUN);
+                    ChangeJobCmds(id, JOB_RUN);
                     continue;
                 }
 
@@ -344,8 +332,8 @@ void JobQueue::ProcessQueue(void)
                                           .arg(StatusText(JOB_QUEUED));
                         VERBOSE(VB_JOBQUEUE, message);
 
-                        ChangeJobStatus(m_db, id, JOB_QUEUED, "");
-                        ChangeJobCmds(m_db, id, JOB_RUN);
+                        ChangeJobStatus(id, JOB_QUEUED, "");
+                        ChangeJobCmds(id, JOB_RUN);
                     }
                     else
                     {
@@ -361,7 +349,7 @@ void JobQueue::ProcessQueue(void)
                 }
 
                 if ((hostname == "") &&
-                    (!ClaimJob(m_db, id)))
+                    (!ClaimJob(id)))
                 {
                     message = QString("JobQueue: ERROR claiming '%1' job "
                                       "for chanid %2 @ %3.")
@@ -388,22 +376,21 @@ void JobQueue::ProcessQueue(void)
         {
             //VERBOSE(VB_JOBQUEUE, "JobQueue: No Jobs found to process.");
         }
-        dblock.unlock();
 
         sleep(sleepTime);
     }
 }
 
-bool JobQueue::QueueJob(QSqlDatabase* db, int jobType,
-                        QString chanid, QDateTime starttime, QString args,
-                        QString comment, QString host, int flags)
+bool JobQueue::QueueJob(int jobType, QString chanid, QDateTime starttime, 
+                        QString args, QString comment, QString host, int flags)
 {
     QString startts = starttime.toString("yyyyMMddhhmm00");
 
     int tmpStatus = JOB_UNKNOWN;
     int tmpCmd = JOB_UNKNOWN;
     int jobID = -1;
-    MSqlQuery query(QString::null, db);
+    
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT status, id, cmds FROM jobqueue "
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME "
@@ -421,7 +408,7 @@ bool JobQueue::QueueJob(QSqlDatabase* db, int jobType,
     }
     else
     {
-        if ((query.numRowsAffected() > 0) && query.next())
+        if ((query.size() > 0) && query.next())
         {
             tmpStatus = query.value(0).toInt();
             jobID = query.value(1).toInt();
@@ -440,7 +427,7 @@ bool JobQueue::QueueJob(QSqlDatabase* db, int jobType,
         case JOB_ABORTING:
                  return false;
         default:
-                 DeleteJob(db, jobID);
+                 DeleteJob(jobID);
                  break;
     }
     if (! (tmpStatus & JOB_DONE) && (tmpCmd & JOB_STOP))
@@ -470,31 +457,29 @@ bool JobQueue::QueueJob(QSqlDatabase* db, int jobType,
     return true;
 }
 
-bool JobQueue::QueueJobs(QSqlDatabase* db, int jobTypes,
-                         QString chanid, QDateTime starttime, QString args,
-                         QString comment, QString host)
+bool JobQueue::QueueJobs(int jobTypes, QString chanid, QDateTime starttime, 
+                         QString args, QString comment, QString host)
 {
     if (jobTypes & JOB_COMMFLAG)
-        QueueJob(db, JOB_COMMFLAG, chanid, starttime, args, comment, host);
+        QueueJob(JOB_COMMFLAG, chanid, starttime, args, comment, host);
     if (jobTypes & JOB_TRANSCODE)
-        QueueJob(db, JOB_TRANSCODE, chanid, starttime, args, comment, host);
+        QueueJob(JOB_TRANSCODE, chanid, starttime, args, comment, host);
     if (jobTypes & JOB_USERJOB1)
-        QueueJob(db, JOB_USERJOB1, chanid, starttime, args, comment, host);
+        QueueJob(JOB_USERJOB1, chanid, starttime, args, comment, host);
     if (jobTypes & JOB_USERJOB2)
-        QueueJob(db, JOB_USERJOB2, chanid, starttime, args, comment, host);
+        QueueJob(JOB_USERJOB2, chanid, starttime, args, comment, host);
     if (jobTypes & JOB_USERJOB3)
-        QueueJob(db, JOB_USERJOB3, chanid, starttime, args, comment, host);
+        QueueJob(JOB_USERJOB3, chanid, starttime, args, comment, host);
     if (jobTypes & JOB_USERJOB4)
-        QueueJob(db, JOB_USERJOB4, chanid, starttime, args, comment, host);
+        QueueJob(JOB_USERJOB4, chanid, starttime, args, comment, host);
 
     return true;
 }
 
-int JobQueue::GetJobID(QSqlDatabase* db, int jobType, QString chanid,
-                       QDateTime starttime)
+int JobQueue::GetJobID(int jobType, QString chanid, QDateTime starttime)
 {
     QString startts = starttime.toString("yyyyMMddhhmm00");
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT id FROM jobqueue "
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME "
@@ -519,10 +504,10 @@ int JobQueue::GetJobID(QSqlDatabase* db, int jobType, QString chanid,
     return -1;
 }
 
-bool JobQueue::GetJobInfoFromID(QSqlDatabase* db, int jobID, int &jobType,
-                                QString &chanid, QDateTime &starttime)
+bool JobQueue::GetJobInfoFromID(int jobID, int &jobType, QString &chanid, 
+                                QDateTime &starttime)
 {
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT type, chanid, starttime FROM jobqueue "
                   "WHERE id = :ID;");
@@ -550,48 +535,47 @@ bool JobQueue::GetJobInfoFromID(QSqlDatabase* db, int jobID, int &jobType,
     return false;
 }
 
-bool JobQueue::PauseJob(QSqlDatabase* db, int jobID)
+bool JobQueue::PauseJob(int jobID)
 {
     QString message = QString("GLOBAL_JOB PAUSE ID %1").arg(jobID);
     MythEvent me(message);
     gContext->dispatch(me);
 
-    return ChangeJobCmds(db, jobID, JOB_PAUSE);
+    return ChangeJobCmds(jobID, JOB_PAUSE);
 }
 
-bool JobQueue::ResumeJob(QSqlDatabase* db, int jobID)
+bool JobQueue::ResumeJob(int jobID)
 {
     QString message = QString("GLOBAL_JOB RESUME ID %1").arg(jobID);
     MythEvent me(message);
     gContext->dispatch(me);
 
-    return ChangeJobCmds(db, jobID, JOB_RUN);
+    return ChangeJobCmds(jobID, JOB_RUN);
 }
 
-bool JobQueue::RestartJob(QSqlDatabase* db, int jobID)
+bool JobQueue::RestartJob(int jobID)
 {
     QString message = QString("GLOBAL_JOB RESTART ID %1").arg(jobID);
     MythEvent me(message);
     gContext->dispatch(me);
 
-    return ChangeJobCmds(db, jobID, JOB_RESTART);
+    return ChangeJobCmds(jobID, JOB_RESTART);
 }
 
-bool JobQueue::StopJob(QSqlDatabase* db, int jobID)
+bool JobQueue::StopJob(int jobID)
 {
     QString message = QString("GLOBAL_JOB STOP ID %1").arg(jobID);
     MythEvent me(message);
     gContext->dispatch(me);
 
-    return ChangeJobCmds(db, jobID, JOB_STOP);
+    return ChangeJobCmds(jobID, JOB_STOP);
 }
 
-bool JobQueue::DeleteAllJobs(QSqlDatabase* db, QString chanid,
-                             QDateTime starttime)
+bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
 {
     QString key = QString("%1_%2").arg(chanid)
                           .arg(starttime.toString("yyyyMMddhhmm00"));
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     QString message;
 
     query.prepare("UPDATE jobqueue SET status = :ABORTED "
@@ -696,12 +680,12 @@ bool JobQueue::DeleteAllJobs(QSqlDatabase* db, QString chanid,
     return true;
 }
 
-bool JobQueue::DeleteJob(QSqlDatabase* db, int jobID)
+bool JobQueue::DeleteJob(int jobID)
 {
     if (jobID < 0)
         return false;
 
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("DELETE FROM jobqueue WHERE id = :ID;");
 
@@ -718,12 +702,12 @@ bool JobQueue::DeleteJob(QSqlDatabase* db, int jobID)
     return true;
 }
 
-bool JobQueue::ChangeJobCmds(QSqlDatabase* db, int jobID, int newCmds)
+bool JobQueue::ChangeJobCmds(int jobID, int newCmds)
 {
     if (jobID < 0)
         return false;
 
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("UPDATE jobqueue SET cmds = :CMDS WHERE id = :ID;");
 
@@ -741,10 +725,10 @@ bool JobQueue::ChangeJobCmds(QSqlDatabase* db, int jobID, int newCmds)
     return true;
 }
 
-bool JobQueue::ChangeJobCmds(QSqlDatabase* db, int jobType, QString chanid,
+bool JobQueue::ChangeJobCmds(int jobType, QString chanid,
                              QDateTime starttime,  int newCmds)
 {
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("UPDATE jobqueue SET cmds = :CMDS WHERE type = :TYPE "
                   "AND chanid = :CHANID AND starttime = :STARTTIME;");
@@ -765,12 +749,12 @@ bool JobQueue::ChangeJobCmds(QSqlDatabase* db, int jobType, QString chanid,
     return true;
 }
 
-bool JobQueue::ChangeJobFlags(QSqlDatabase* db, int jobID, int newFlags)
+bool JobQueue::ChangeJobFlags(int jobID, int newFlags)
 {
     if (jobID < 0)
         return false;
 
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("UPDATE jobqueue SET flags = :FLAGS WHERE id = :ID;");
 
@@ -788,13 +772,12 @@ bool JobQueue::ChangeJobFlags(QSqlDatabase* db, int jobID, int newFlags)
     return true;
 }
 
-bool JobQueue::ChangeJobStatus(QSqlDatabase* db, int jobID, int newStatus,
-                               QString comment)
+bool JobQueue::ChangeJobStatus(int jobID, int newStatus, QString comment)
 {
     if (jobID < 0)
         return false;
 
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("UPDATE jobqueue SET status = :STATUS, comment = :COMMENT "
                   "WHERE id = :ID;");
@@ -814,12 +797,12 @@ bool JobQueue::ChangeJobStatus(QSqlDatabase* db, int jobID, int newStatus,
     return true;
 }
 
-bool JobQueue::ChangeJobComment(QSqlDatabase* db, int jobID, QString comment)
+bool JobQueue::ChangeJobComment(int jobID, QString comment)
 {
     if (jobID < 0)
         return false;
 
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("UPDATE jobqueue SET comment = :COMMENT "
                   "WHERE id = :ID;");
@@ -838,10 +821,9 @@ bool JobQueue::ChangeJobComment(QSqlDatabase* db, int jobID, QString comment)
     return true;
 }
 
-bool JobQueue::IsJobRunning(QSqlDatabase* db, int jobType, QString chanid,
-                             QDateTime starttime)
+bool JobQueue::IsJobRunning(int jobType, QString chanid, QDateTime starttime)
 {
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT status,cmds FROM jobqueue WHERE type = :TYPE "
                   "AND chanid = :CHANID AND starttime = :STARTTIME;");
@@ -903,11 +885,10 @@ QString JobQueue::StatusText(int status)
     return tr("Undefined");
 }
 
-int JobQueue::GetJobsInQueue(QSqlDatabase* db, QMap<int, JobQueueEntry> &jobs,
-                             int findJobs)
+int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
 {
     JobQueueEntry thisJob;
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     QDateTime recentDate = QDateTime::currentDateTime().addSecs(-4 * 3600);
     int jobCount = 0;
 
@@ -1011,9 +992,9 @@ int JobQueue::GetJobsInQueue(QSqlDatabase* db, QMap<int, JobQueueEntry> &jobs,
     return jobCount;
 }
 
-bool JobQueue::ClaimJob(QSqlDatabase* db, int jobID)
+bool JobQueue::ClaimJob(int jobID)
 {
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("UPDATE jobqueue SET hostname = :HOSTNAME "
                   "WHERE hostname = :EMPTY AND id = :ID;");
@@ -1057,9 +1038,9 @@ bool JobQueue::AllowedToRun(JobQueueEntry job)
     return false;
 }
 
-int JobQueue::GetJobCmd(QSqlDatabase* db, int jobID)
+int JobQueue::GetJobCmd(int jobID)
 {
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT cmds FROM jobqueue WHERE id = :ID;");
 
@@ -1081,9 +1062,9 @@ int JobQueue::GetJobCmd(QSqlDatabase* db, int jobID)
     return JOB_UNKNOWN;
 }
 
-int JobQueue::GetJobFlags(QSqlDatabase* db, int jobID)
+int JobQueue::GetJobFlags(int jobID)
 {
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT flags FROM jobqueue WHERE id = :ID;");
 
@@ -1105,9 +1086,9 @@ int JobQueue::GetJobFlags(QSqlDatabase* db, int jobID)
     return JOB_UNKNOWN;
 }
 
-int JobQueue::GetJobStatus(QSqlDatabase* db, int jobID)
+int JobQueue::GetJobStatus(int jobID)
 {
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT status FROM jobqueue WHERE id = :ID;");
 
@@ -1129,7 +1110,7 @@ int JobQueue::GetJobStatus(QSqlDatabase* db, int jobID)
     return JOB_UNKNOWN;
 }
 
-void JobQueue::RecoverQueue(QSqlDatabase *db, bool justOld)
+void JobQueue::RecoverQueue(bool justOld)
 {
     QMap<int, JobQueueEntry> jobs;
     QString msg;
@@ -1138,7 +1119,7 @@ void JobQueue::RecoverQueue(QSqlDatabase *db, bool justOld)
                   "recover.");
     VERBOSE(VB_JOBQUEUE, msg);
 
-    GetJobsInQueue(db, jobs);
+    GetJobsInQueue(jobs);
         
     if (jobs.size())
     {
@@ -1170,8 +1151,8 @@ void JobQueue::RecoverQueue(QSqlDatabase *db, bool justOld)
                               .arg(StatusText(it.data().status));
                 VERBOSE(VB_JOBQUEUE, msg);
                         
-                ChangeJobStatus(db, it.data().id, JOB_QUEUED, "");
-                ChangeJobCmds(db, it.data().id, JOB_RUN);
+                ChangeJobStatus(it.data().id, JOB_QUEUED, "");
+                ChangeJobCmds(it.data().id, JOB_RUN);
             }
             else
             {
@@ -1188,9 +1169,9 @@ void JobQueue::RecoverQueue(QSqlDatabase *db, bool justOld)
     }
 }
 
-void JobQueue::CleanupOldJobsInQueue(QSqlDatabase* db)
+void JobQueue::CleanupOldJobsInQueue()
 {
-    MSqlQuery delquery(QString::null, db);
+    MSqlQuery delquery(MSqlQuery::InitCon());
     QDateTime donePurgeDate = QDateTime::currentDateTime().addDays(-3);
     QDateTime errorsPurgeDate = QDateTime::currentDateTime().addDays(-7);
 
@@ -1221,20 +1202,15 @@ void JobQueue::ProcessJob(int id, int jobType, QString chanid,
     QString key = QString("%1_%2").arg(chanid)
                           .arg(starttime.toString("yyyyMMddhhmm00"));
 
-    MythSqlDatabase *job_mdb = new MythSqlDatabase(name);
-    QSqlDatabase *job_db;
-    
-    if (!job_mdb)
+    if (!MSqlQuery::testDBConnection())
     {
         VERBOSE(VB_JOBQUEUE, "JobQueue: ERROR: Unable to open database "
                              "connection to process job");
         return;
     }
 
-    job_db = job_mdb->db();
-
-    ChangeJobStatus(job_db, id, JOB_PENDING);
-    ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(job_db, chanid,
+    ChangeJobStatus(id, JOB_PENDING);
+    ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(chanid,
                                                               starttime);
 
     if (!pginfo)
@@ -1244,20 +1220,19 @@ void JobQueue::ProcessJob(int id, int jobType, QString chanid,
                                   .arg(chanid).arg(startts);
         VERBOSE(VB_JOBQUEUE, message);
 
-        ChangeJobStatus(job_db, id, JOB_ERRORED,
+        ChangeJobStatus(id, JOB_ERRORED,
                         "Unable to retrieve Program Info from database");
 
-        delete job_mdb;
         return;
     }
 
     controlFlagsLock.lock();
     
-    ChangeJobStatus(job_db, id, JOB_STARTING);
+    ChangeJobStatus(id, JOB_STARTING);
     runningJobTypes[key] = jobType;
     runningJobIDs[key] = id;
     runningJobDescs[key] = GetJobDescription(jobType);
-    runningJobCommands[key] = GetJobCommand(job_db, jobType, pginfo);
+    runningJobCommands[key] = GetJobCommand(jobType, pginfo);
 
     if ((jobType == JOB_TRANSCODE) ||
         (runningJobCommands[key] == "transcode"))
@@ -1275,7 +1250,7 @@ void JobQueue::ProcessJob(int id, int jobType, QString chanid,
     }
     else
     {
-        ChangeJobStatus(job_db, id, JOB_ERRORED,
+        ChangeJobStatus(id, JOB_ERRORED,
                         "UNKNOWN JobType, unable to process!");
         runningJobTypes.erase(key);
         runningJobIDs.erase(key);
@@ -1284,7 +1259,6 @@ void JobQueue::ProcessJob(int id, int jobType, QString chanid,
     }
 
     controlFlagsLock.unlock();
-    delete job_mdb;
 }
 
 void JobQueue::StartChildJob(void *(*ChildThreadRoutine)(void *),
@@ -1320,11 +1294,10 @@ QString JobQueue::GetJobDescription(int jobType)
     return gContext->GetSetting(descSetting, "Unknown Job");
 }
 
-QString JobQueue::GetJobCommand(QSqlDatabase* db, int jobType,
-                                    ProgramInfo *tmpInfo)
+QString JobQueue::GetJobCommand(int jobType, ProgramInfo *tmpInfo)
 {
     QString command = "";
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     if (jobType == JOB_TRANSCODE)
         return "transcode";
@@ -1386,10 +1359,8 @@ void JobQueue::DoTranscodeThread(void)
 
     childThreadStarted = true;
 
-    dblock.lock();
-    ChangeJobStatus(m_db, jobID, JOB_RUNNING);
-    bool useCutlist = !!(GetJobFlags(m_db, jobID) & JOB_USE_CUTLIST);
-    dblock.unlock();
+    ChangeJobStatus(jobID, JOB_RUNNING);
+    bool useCutlist = !!(GetJobFlags(jobID) & JOB_USE_CUTLIST);
 
     controlFlagsLock.lock();
     jobControlFlags[key] = &controlTranscoding;
@@ -1413,15 +1384,11 @@ void JobQueue::DoTranscodeThread(void)
     while (retry)
     {
         retry = false;
-        dblock.lock();
-        ChangeJobStatus(m_db, jobID, JOB_STARTING);
-        dblock.unlock();
+        ChangeJobStatus(jobID, JOB_STARTING);
 
         myth_system(command.ascii());
 
-        dblock.lock();
-        int status = GetJobStatus(m_db, jobID);
-        dblock.unlock();
+        int status = GetJobStatus(jobID);
 
         QString fileprefix = gContext->GetFilePrefix();
         QString filename = program_info->GetRecordFilename(fileprefix);
@@ -1442,31 +1409,37 @@ void JobQueue::DoTranscodeThread(void)
             rename (tmpfile, filename);
             if (!gContext->GetNumSetting("SaveTranscoding", 0))
                 unlink(oldfile);
-            dblock.lock();
             if (useCutlist)
             {
-                query = QString("DELETE FROM recordedmarkup WHERE "
+                MSqlQuery query(MSqlQuery::InitCon());
+                QString querystr;
+                querystr = QString("DELETE FROM recordedmarkup WHERE "
                                 "chanid = '%1' AND starttime = '%2';")
                                 .arg(program_info->chanid).arg(startts);
-                m_db->exec(query);
-                query = QString("UPDATE recorded SET cutlist = NULL, "
+                query.prepare(querystr);
+                query.exec();
+
+                querystr = QString("UPDATE recorded SET cutlist = NULL, "
                                 "bookmark = NULL, "
                                 "starttime = starttime WHERE "
                                 "chanid = '%1' AND starttime = '%2';")
                                 .arg(program_info->chanid).arg(startts);
-                m_db->exec(query);
+                query.prepare(querystr);
+                query.exec();
             } else {
-                query = QString("DELETE FROM recordedmarkup WHERE "
+                MSqlQuery query(MSqlQuery::InitCon());
+                QString querystr;
+                querystr = QString("DELETE FROM recordedmarkup WHERE "
                                 "chanid = '%1' AND starttime = '%2' "
                                 "AND type = '%3';")
                                 .arg(program_info->chanid).arg(startts)
                                 .arg(MARK_KEYFRAME);
-                m_db->exec(query);
+                query.prepare(querystr);
+                query.exec();
             }
             if (filesize > 0)
-                program_info->SetFilesize(filesize, m_db);
-            ChangeJobStatus(m_db, jobID, JOB_FINISHED);
-            dblock.unlock();
+                program_info->SetFilesize(filesize);
+            ChangeJobStatus(jobID, JOB_FINISHED);
         } else {
             // transcode didn't finish delete partial transcode
             filename += ".tmp";
@@ -1474,16 +1447,14 @@ void JobQueue::DoTranscodeThread(void)
             unlink(filename);
             filename += ".map";
             unlink(filename);
-            dblock.lock();
             if (status == JOB_ABORTING) // Stop command was sent
-                ChangeJobStatus(m_db, jobID, JOB_ABORTED);
+                ChangeJobStatus(jobID, JOB_ABORTED);
             else if (status != JOB_ERRORING && retrylimit) // Recoverable error
             {
                 retry = true;
                 retrylimit--;
             } else // Unrecoerable error
-                ChangeJobStatus(m_db, jobID, JOB_ERRORED);
-            dblock.unlock();
+                ChangeJobStatus(jobID, JOB_ERRORED);
         }
     }
     controlFlagsLock.lock();
@@ -1522,11 +1493,8 @@ void JobQueue::DoFlagCommercialsThread(void)
 
     childThreadStarted = true;
 
-    QString name = QString("commercial%1%2").arg(getpid()).arg(rand());
 
-    MythSqlDatabase *commthread_db = new MythSqlDatabase(name);
-
-    if (!commthread_db || !commthread_db->isOpen())
+    if (!MSqlQuery::testDBConnection())
     {
         QString msg = QString("ERROR in Commercial Flagging.  Could not open "
                               "new database connection for %1. "
@@ -1534,11 +1502,9 @@ void JobQueue::DoFlagCommercialsThread(void)
                               .arg(logDesc);
         VERBOSE(VB_GENERAL, msg);
 
-        dblock.lock();
-        ChangeJobStatus(m_db, jobID, JOB_ERRORED,
+        ChangeJobStatus(jobID, JOB_ERRORED,
                         "Could not open new database connection for "
                         "commercial flagger.");
-        dblock.unlock();
 
         delete program_info;
         return;
@@ -1585,7 +1551,7 @@ void JobQueue::DoFlagCommercialsThread(void)
         gContext->LogEntry("commflag", LP_WARNING,
                            "Commercial Flagging Errored", msg);
 
-        ChangeJobStatus(commthread_db->db(), jobID, JOB_ERRORED,
+        ChangeJobStatus(jobID, JOB_ERRORED,
                         "ERROR: Unable to find mythcommflag.");
     }
     else if ((*(jobControlFlags[key]) == JOB_STOP) ||
@@ -1597,7 +1563,7 @@ void JobQueue::DoFlagCommercialsThread(void)
         gContext->LogEntry("commflag", LP_WARNING,
                            "Commercial Flagging Aborted", msg);
 
-        ChangeJobStatus(commthread_db->db(), jobID, JOB_ABORTED,
+        ChangeJobStatus(jobID, JOB_ABORTED,
                         "Job aborted by user.");
     }
     else if (breaksFound == 254)
@@ -1609,7 +1575,7 @@ void JobQueue::DoFlagCommercialsThread(void)
         gContext->LogEntry("commflag", LP_WARNING,
                            "Commercial Flagging ERRORED", msg);
 
-        ChangeJobStatus(commthread_db->db(), jobID, JOB_ERRORED,
+        ChangeJobStatus(jobID, JOB_ERRORED,
                         "Job ERRORED, unable to open file or init decoder.");
     }
     else if (breaksFound >= 200)
@@ -1620,7 +1586,7 @@ void JobQueue::DoFlagCommercialsThread(void)
         gContext->LogEntry("commflag", LP_WARNING,
                            "Commercial Flagging Errored", msg);
 
-        ChangeJobStatus(commthread_db->db(), jobID, JOB_ERRORED,
+        ChangeJobStatus(jobID, JOB_ERRORED,
                         QString("Job aborted with Error %1.").arg(breaksFound));
     }
     else
@@ -1634,7 +1600,7 @@ void JobQueue::DoFlagCommercialsThread(void)
                            "Commercial Flagging Finished", msg);
 
         msg = QString("Finished, %1 break(s) found.").arg(breaksFound);
-        ChangeJobStatus(commthread_db->db(), jobID, JOB_FINISHED, msg);
+        ChangeJobStatus(jobID, JOB_FINISHED, msg);
     }
     VERBOSE(VB_GENERAL, msg);
 
@@ -1646,7 +1612,6 @@ void JobQueue::DoFlagCommercialsThread(void)
     controlFlagsLock.unlock();
 
     delete program_info;
-    delete commthread_db;
 }
 
 void *JobQueue::UserJobThread(void *param)
@@ -1673,9 +1638,7 @@ void JobQueue::DoUserJobThread(void)
 
     childThreadStarted = true;
 
-    dblock.lock();
-    ChangeJobStatus(m_db, jobID, JOB_RUNNING);
-    dblock.unlock();
+    ChangeJobStatus(jobID, JOB_RUNNING);
 
     QString msg = QString("Started \"%1\" for \"%2\" recorded "
                           "from channel %3 at %4")
@@ -1710,9 +1673,7 @@ void JobQueue::DoUserJobThread(void)
     gContext->LogEntry("jobqueue", LP_NOTICE,
                        QString("Job \"%1\" Finished").arg(jobDesc), msg);
 
-    dblock.lock();
-    ChangeJobStatus(m_db, jobID, JOB_FINISHED, "Successfully Completed.");
-    dblock.unlock();
+    ChangeJobStatus(jobID, JOB_FINISHED, "Successfully Completed.");
 
     controlFlagsLock.lock();
     runningJobIDs.erase(key);

@@ -1,5 +1,6 @@
 #include "recordingprofile.h"
 #include "libmyth/mythcontext.h"
+#include "libmyth/mythdbcon.h"
 #include <qsqldatabase.h>
 #include <qheader.h>
 #include <qcursor.h>
@@ -723,23 +724,29 @@ RecordingProfile::RecordingProfile(QString profName)
     addChild(ac);
 };
 
-void RecordingProfile::loadByID(QSqlDatabase* db, int profileId) {
+void RecordingProfile::loadByID(int profileId) 
+{
     id->setValue(profileId);
-    load(db);
+    load();
 }
 
-bool RecordingProfile::loadByCard(QSqlDatabase* db, QString name, int cardid) {
+bool RecordingProfile::loadByCard(QString name, int cardid) 
+{
     QString hostname = gContext->GetHostName();
     int recid = 0;
-    QString query = QString("SELECT recordingprofiles.id, "
+
+    MSqlQuery result(MSqlQuery::InitCon());
+
+    QString querystr = QString("SELECT recordingprofiles.id, "
                    "profilegroups.hostname, profilegroups.is_default FROM "
                    "recordingprofiles,profilegroups,capturecard WHERE "
                    "profilegroups.id = recordingprofiles.profilegroup "
                    "AND capturecard.cardid = %1 "
                    "AND capturecard.cardtype = profilegroups.cardtype "
                    "AND recordingprofiles.name = '%2';").arg(cardid).arg(name);
-    QSqlQuery result = db->exec(query);
-    if (result.isActive() && result.numRowsAffected() > 0) {
+    result.prepare(querystr);
+
+    if (result.exec() && result.isActive() && result.size() > 0) {
         while (result.next())
         {
             if (result.value(1).toString() == hostname)
@@ -753,75 +760,78 @@ bool RecordingProfile::loadByCard(QSqlDatabase* db, QString name, int cardid) {
     }
     if (recid)
     {
-        loadByID(db, recid);
+        loadByID(recid);
         return true;
     }
     else
         return false;
 }
 
-bool RecordingProfile::loadByGroup(QSqlDatabase* db, QString name, QString group) {
-    QString query = QString("SELECT recordingprofiles.id FROM "
+bool RecordingProfile::loadByGroup(QString name, QString group) 
+{
+    MSqlQuery result(MSqlQuery::InitCon());
+
+    QString querystr = QString("SELECT recordingprofiles.id FROM "
                  "recordingprofiles, profilegroups WHERE "
                  "recordingprofiles.profilegroup = profilegroups.id AND "
                  "profilegroups.name = '%1' AND recordingprofiles.name = '%2';")
                  .arg(group).arg(name);
-    QSqlQuery result = db->exec(query);
-    if (result.isActive() && result.numRowsAffected() > 0) {
+    result.prepare(querystr);
+
+    if (result.exec() && result.isActive() && result.size() > 0) {
         result.next();
-        loadByID(db, result.value(0).toInt());
+        loadByID(result.value(0).toInt());
         return true;
     } else {
         return false;
     }
 }
 
-void RecordingProfile::setCodecTypes(QSqlDatabase *db)
+void RecordingProfile::setCodecTypes()
 {
-    vc->selectCodecs(groupType(db));
-    ac->selectCodecs(groupType(db));
+    vc->selectCodecs(groupType());
+    ac->selectCodecs(groupType());
 }
 
-void RecordingProfileEditor::open(int id) {
-    QString profName = RecordingProfile::getName(db, id);
+void RecordingProfileEditor::open(int id) 
+{
+    QString profName = RecordingProfile::getName(id);
     if (profName.isNull())
         profName = labelName;
     else
         profName = labelName + "->" + profName;
     RecordingProfile* profile = new RecordingProfile(profName);
 
-    profile->loadByID(db,id);
-    profile->setCodecTypes(db);
+    profile->loadByID(id);
+    profile->setCodecTypes();
 
-    if (profile->exec(db) == QDialog::Accepted)
-        profile->save(db);
+    if (profile->exec() == QDialog::Accepted)
+        profile->save();
     delete profile;
 };
 
-RecordingProfileEditor::RecordingProfileEditor(QSqlDatabase* _db,
-                          int id, QString profName)
+RecordingProfileEditor::RecordingProfileEditor(int id, QString profName)
 {
     labelName = profName;
-    db = _db;
     group = id;
     if (! labelName.isNull())
         this->setLabel(labelName);
 }
 
-void RecordingProfileEditor::load(QSqlDatabase* db) {
+void RecordingProfileEditor::load() {
     clearSelections();
     //addSelection("(Create new profile)", "0");
-    RecordingProfile::fillSelections(db, this, group);
+    RecordingProfile::fillSelections(this, group);
 }
 
-int RecordingProfileEditor::exec(QSqlDatabase* db) {
-    while (ConfigurationDialog::exec(db) == QDialog::Accepted)
+int RecordingProfileEditor::exec() {
+    while (ConfigurationDialog::exec() == QDialog::Accepted)
         open(getValue().toInt());
 
     return QDialog::Rejected;
 }
 
-void RecordingProfile::fillSelections(QSqlDatabase* db, SelectSetting* setting, int group)
+void RecordingProfile::fillSelections(SelectSetting* setting, int group)
 {
     if (group == 0)
     {
@@ -830,12 +840,13 @@ void RecordingProfile::fillSelections(QSqlDatabase* db, SelectSetting* setting, 
     }
     else
     {
-        QString query = QString("SELECT name, id FROM recordingprofiles "
+        MSqlQuery result(MSqlQuery::InitCon());
+        QString querystr = QString("SELECT name, id FROM recordingprofiles "
                                 "WHERE profilegroup = %1 ORDER BY id;")
                                 .arg(group);
+        result.prepare(querystr);
 
-        QSqlQuery result = db->exec(query);
-        if (result.isActive() && result.numRowsAffected() > 0)
+        if (result.exec() && result.isActive() && result.size() > 0)
         {
             while (result.next())
             {
@@ -854,7 +865,7 @@ void RecordingProfile::fillSelections(QSqlDatabase* db, SelectSetting* setting, 
     }
 }
 
-void RecordingProfile::fillSelections(QSqlDatabase* db, SelectManagedListItem* setting, int group)
+void RecordingProfile::fillSelections(SelectManagedListItem* setting, int group)
 {
     if (group == 0)
     {
@@ -866,12 +877,13 @@ void RecordingProfile::fillSelections(QSqlDatabase* db, SelectManagedListItem* s
     }
     else
     {
-        QString query = QString("SELECT name, id FROM recordingprofiles "
+        MSqlQuery result(MSqlQuery::InitCon());
+        QString querystr = QString("SELECT name, id FROM recordingprofiles "
                                 "WHERE profilegroup = %1 ORDER BY id;")
                                 .arg(group);
+        result.prepare(querystr);
 
-        QSqlQuery result = db->exec(query);
-        if (result.isActive() && result.numRowsAffected() > 0)
+        if (result.exec() && result.isActive() && result.size() > 0)
         {
             while (result.next())
             {
@@ -890,38 +902,38 @@ void RecordingProfile::fillSelections(QSqlDatabase* db, SelectManagedListItem* s
     }
 }
 
-QString RecordingProfile::groupType(QSqlDatabase *db)
+QString RecordingProfile::groupType()
 {
-    if (db != NULL)
+    MSqlQuery result(MSqlQuery::InitCon());
+    QString querystr = QString("SELECT profilegroups.cardtype FROM "
+                        "profilegroups, recordingprofiles WHERE "
+                        "profilegroups.id = recordingprofiles.profilegroup "
+                        "AND recordingprofiles.id = %1;")
+                        .arg(getProfileNum());
+    result.prepare(querystr);
+
+    if (result.exec() && result.isActive() && result.size() > 0)
     {
-        QString query = QString("SELECT profilegroups.cardtype FROM "
-                            "profilegroups, recordingprofiles WHERE "
-                            "profilegroups.id = recordingprofiles.profilegroup "
-                            "AND recordingprofiles.id = %1;")
-                            .arg(getProfileNum());
-        QSqlQuery result = db->exec(query);
-        if (result.isActive() && result.numRowsAffected() > 0)
-        {
-            result.next();
-            return (result.value(0).toString());
-        }
+        result.next();
+        return (result.value(0).toString());
     }
+
     return NULL;
 }
 
-QString RecordingProfile::getName(QSqlDatabase *db, int id)
+QString RecordingProfile::getName(int id)
 {
-    if (db != NULL)
-    {
-        QString query = QString("SELECT name FROM recordingprofiles WHERE "
+    MSqlQuery result(MSqlQuery::InitCon());
+    QString querystr = QString("SELECT name FROM recordingprofiles WHERE "
                                 "id = %1;").arg(id);
-        QSqlQuery result = db->exec(query);
-        if (result.isActive() && result.numRowsAffected() > 0)
-        {
-            result.next();
-            return (result.value(0).toString());
-        }
+    result.prepare(querystr);
+
+    if (result.exec() && result.isActive() && result.size() > 0)
+    {
+        result.next();
+        return (result.value(0).toString());
     }
+
     return NULL;
 }
 

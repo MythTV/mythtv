@@ -2,6 +2,7 @@
 #define SR_ITEMS_H
 #include <qsqldatabase.h>
 #include "mythcontext.h"
+#include "mythdbcon.h"
 #include "managedlist.h"
 #include "scheduledrecording.h"
 #include "recordingprofile.h"
@@ -297,14 +298,14 @@ class SRProfileSelector: public SRSelectSetting {
         }
 
 
-        virtual void load(QSqlDatabase* db) {
-            fillSelections(db);
-            SRSelectSetting::load(db);
+        virtual void load() {
+            fillSelections();
+            SRSelectSetting::load();
         }
 
-        virtual void fillSelections(QSqlDatabase* db) {
+        virtual void fillSelections() {
             clearSelections();
-            RecordingProfile::fillSelections(db, selectItem, 0);
+            RecordingProfile::fillSelections(selectItem, 0);
         }
 };
 
@@ -702,9 +703,9 @@ class SRRecGroup: public SRSelectSetting
         }
 
 
-        virtual void load(QSqlDatabase *db) {
-            fillSelections(db);
-            SRSelectSetting::load(db);
+        virtual void load() {
+            fillSelections();
+            SRSelectSetting::load();
         }
 
         virtual QString getValue(void) const {
@@ -714,7 +715,7 @@ class SRRecGroup: public SRSelectSetting
                 return settingValue;
         }
 
-        virtual void fillSelections(QSqlDatabase *db)
+        virtual void fillSelections()
         {
             addButton(QString("[ %1 ]").arg(QObject::tr("Create a new recording group")), "__NEW_GROUP__");
             connect(selectItem, SIGNAL(buttonPressed(ManagedListItem*, ManagedListItem*)), this,
@@ -722,12 +723,12 @@ class SRRecGroup: public SRSelectSetting
 
             addSelection(QString(QObject::tr("Store in the \"%1\" recording group"))
                          .arg(QObject::tr("Default")), "Default");
-
+            MSqlQuery query(MSqlQuery::InitCon());
             QString thequery = QString("SELECT DISTINCT recgroup from recorded "
                                        "WHERE recgroup <> 'Default'");
-            QSqlQuery query = db->exec(thequery);
+            query.prepare(thequery);
 
-            if (query.isActive() && query.numRowsAffected() > 0)
+            if (query.exec() && query.isActive() && query.size() > 0)
             {
                 while (query.next())
                 {
@@ -740,9 +741,9 @@ class SRRecGroup: public SRSelectSetting
 
             thequery = QString("SELECT DISTINCT recgroup from record "
                                "WHERE recgroup <> 'Default'");
-            query = db->exec(thequery);
+            query.prepare(thequery);
 
-            if (query.isActive() && query.numRowsAffected() > 0)
+            if (query.exec() && query.isActive() && query.size() > 0)
                 while (query.next())
                 {
                     QString recgroup = QString::fromUtf8(query.value(0).toString());

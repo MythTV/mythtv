@@ -12,7 +12,7 @@
 
 using namespace std;
 
-class QSqlDatabase;
+//class QSqlDatabase;
 class QWidget;
 class ConfigurationGroup;
 class QDir;
@@ -28,8 +28,8 @@ public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
                                   const char* widgetName = 0);
 
-    virtual void load(QSqlDatabase* db) = 0;
-    virtual void save(QSqlDatabase* db) = 0;
+    virtual void load() = 0;
+    virtual void save() = 0;
 
     // A name for looking up the setting
     void setName(QString str) {
@@ -114,9 +114,9 @@ class ConfigurationGroup: virtual public Configurable
 
     virtual Setting* byName(QString name);
 
-    virtual void load(QSqlDatabase* db);
+    virtual void load();
 
-    virtual void save(QSqlDatabase* db);
+    virtual void save();
 
     void setUseLabel(bool useit) { uselabel = useit; }
     void setUseFrame(bool useit) { useframe = useit; }
@@ -159,7 +159,7 @@ public:
                                   const char* widgetName = 0);
 
     void raise(Configurable* child);
-    virtual void save(QSqlDatabase* db);
+    virtual void save();
 
     // save all children, or only the top?
     void setSaveAll(bool b) { saveAll = b; };
@@ -193,7 +193,7 @@ public:
                                      const char* widgetName = 0);
 
     // Show a dialogWidget, and save if accepted
-    int exec(QSqlDatabase* db, bool saveOnExec = true, bool doLoad = true);
+    int exec(bool saveOnExec = true, bool doLoad = true);
 
 protected:
     MythDialog *dialog;
@@ -545,9 +545,9 @@ public:
         setLabel("Channel");
     };
 
-    static void fillSelections(QSqlDatabase* db, SelectSetting* setting);
-    virtual void fillSelections(QSqlDatabase* db) {
-        fillSelections(db, this);
+    static void fillSelections(SelectSetting* setting);
+    virtual void fillSelections() {
+        fillSelections(this);
     };
 };
 
@@ -582,8 +582,8 @@ public:
     DBStorage(QString _table, QString _column):
         table(_table), column(_column) {};
 
-    virtual void load(QSqlDatabase* db) = 0;
-    virtual void save(QSqlDatabase* db) = 0;
+    virtual void load() = 0;
+    virtual void save() = 0;
 
 protected:
     QString getColumn(void) const { return column; };
@@ -600,8 +600,8 @@ public:
 
     virtual ~SimpleDBStorage() {};
 
-    virtual void load(QSqlDatabase* db);
-    virtual void save(QSqlDatabase* db);
+    virtual void load();
+    virtual void save();
 
 protected:
 
@@ -613,8 +613,8 @@ protected:
 
 class TransientStorage: virtual public Setting {
 public:
-    virtual void load(QSqlDatabase* db) { (void)db; }
-    virtual void save(QSqlDatabase* db) { (void)db; }
+    virtual void load() {  }
+    virtual void save() {  }
 };
 
 class AutoIncrementStorage: virtual public IntegerSetting, public DBStorage {
@@ -624,8 +624,8 @@ public:
         setValue(0);
     };
 
-    virtual void load(QSqlDatabase* db) { (void)db; };
-    virtual void save(QSqlDatabase* db);
+    virtual void load() { };
+    virtual void save();
 };
 
 class ButtonSetting: virtual public Setting {
@@ -667,7 +667,7 @@ public:
 
     virtual MythDialog* dialogWidget(MythMainWindow* parent,
                                      const char* widgetName=0);
-    int exec(QSqlDatabase* db, bool saveOnAccept=true);
+    int exec(bool saveOnAccept=true);
 
 public slots:
     void accept() { if (dialog) dialog->accept(); };

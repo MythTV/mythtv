@@ -30,6 +30,7 @@ using namespace std;
 #include "themedmenu.h"
 #include "programinfo.h"
 #include "mythcontext.h"
+#include "mythdbcon.h"
 #include "dialogbox.h"
 #include "guidegrid.h"
 #include "mythplugin.h"
@@ -64,7 +65,6 @@ void startFinder(void)
 void startSearchTitle(void)
 {
   ProgLister searchTitle(plTitleSearch, "",
-                         QSqlDatabase::database(),
                          gContext->GetMainWindow(), "proglist");
 
     qApp->unlock();
@@ -75,7 +75,6 @@ void startSearchTitle(void)
 void startSearchKeyword(void)
 {
   ProgLister searchKeyword(plKeywordSearch, "",
-                        QSqlDatabase::database(),
                         gContext->GetMainWindow(), "proglist");
 
     qApp->unlock();
@@ -86,7 +85,6 @@ void startSearchKeyword(void)
 void startSearchPeople(void)
 {
   ProgLister searchPeople(plPeopleSearch, "",
-                         QSqlDatabase::database(),
                          gContext->GetMainWindow(), "proglist");
 
     qApp->unlock();
@@ -97,7 +95,6 @@ void startSearchPeople(void)
 void startSearchPower(void)
 {
   ProgLister searchPower(plPowerSearch, "",
-                         QSqlDatabase::database(),
                          gContext->GetMainWindow(), "proglist");
 
     qApp->unlock();
@@ -108,7 +105,6 @@ void startSearchPower(void)
 void startSearchChannel(void)
 {
     ProgLister searchChannel(plChannel, "",
-                             QSqlDatabase::database(),
                              gContext->GetMainWindow(), "proglist");
 
     qApp->unlock();
@@ -119,7 +115,6 @@ void startSearchChannel(void)
 void startSearchCategory(void)
 {
   ProgLister searchCategory(plCategory, "",
-                            QSqlDatabase::database(),
                             gContext->GetMainWindow(), "proglist");
 
     qApp->unlock();
@@ -130,7 +125,6 @@ void startSearchCategory(void)
 void startSearchMovie(void)
 {
     ProgLister searchMovie(plMovies, "",
-                           QSqlDatabase::database(),
                            gContext->GetMainWindow(), "proglist");
 
     qApp->unlock();
@@ -141,7 +135,6 @@ void startSearchMovie(void)
 void startSearchNew(void)
 {
     ProgLister searchNew(plNewListings, "",
-                         QSqlDatabase::database(),
                          gContext->GetMainWindow(), "proglist");
 
     qApp->unlock();
@@ -152,7 +145,6 @@ void startSearchNew(void)
 void startSearchTime(void)
 {
   ProgLister searchTime(plTime, "",
-                         QSqlDatabase::database(),
                          gContext->GetMainWindow(), "proglist");
 
     qApp->unlock();
@@ -162,8 +154,7 @@ void startSearchTime(void)
 
 void startManaged(void)
 {
-    QSqlDatabase *db = QSqlDatabase::database();
-    ViewScheduled vsb(db, gContext->GetMainWindow(), "view scheduled");
+    ViewScheduled vsb(gContext->GetMainWindow(), "view scheduled");
 
     qApp->unlock();
     vsb.exec();
@@ -172,8 +163,7 @@ void startManaged(void)
 
 void startProgramRecPriorities(void)
 {
-    QSqlDatabase *db = QSqlDatabase::database();
-    ProgramRecPriority rsb(db, gContext->GetMainWindow(), "recpri scheduled");
+    ProgramRecPriority rsb(gContext->GetMainWindow(), "recpri scheduled");
 
     qApp->unlock();
     rsb.exec();
@@ -182,8 +172,7 @@ void startProgramRecPriorities(void)
 
 void startChannelRecPriorities(void)
 {
-    QSqlDatabase *db = QSqlDatabase::database();
-    ChannelRecPriority rch(db, gContext->GetMainWindow(), "recpri channels");
+    ChannelRecPriority rch(gContext->GetMainWindow(), "recpri channels");
 
     qApp->unlock();
     rch.exec();
@@ -212,8 +201,7 @@ void startDelete(void)
 
 void startPrevious(void)
 {
-    PreviousBox previous( QSqlDatabase::database(), gContext->GetMainWindow(), 
-                    "previous box");
+    PreviousBox previous(gContext->GetMainWindow(), "previous box");
 
     qApp->unlock();
     previous.exec();
@@ -393,7 +381,7 @@ void TVMenuCallback(void *data, QString &selection)
     else if (sel == "settings appearance") 
     {
         AppearanceSettings settings;
-        settings.exec(QSqlDatabase::database());
+        settings.exec();
 
         LanguageSettings::reload();
 
@@ -404,18 +392,18 @@ void TVMenuCallback(void *data, QString &selection)
     } 
     else if (sel == "settings recording") 
     {
-        ProfileGroupEditor editor(QSqlDatabase::database());
-        editor.exec(QSqlDatabase::database());
+        ProfileGroupEditor editor;
+        editor.exec();
     } 
     else if (sel == "settings general") 
     {
         GeneralSettings settings;
-        settings.exec(QSqlDatabase::database());
+        settings.exec();
     } 
     else if (sel == "settings maingeneral") 
     {
         MainGeneralSettings mainsettings;
-        mainsettings.exec(QSqlDatabase::database());
+        mainsettings.exec();
         menu->ReloadExitKey();
         QStringList strlist = QString("REFRESH_BACKEND");
         gContext->SendReceiveStringList(strlist);
@@ -423,17 +411,17 @@ void TVMenuCallback(void *data, QString &selection)
     else if (sel == "settings playback") 
     {
         PlaybackSettings settings;
-        settings.exec(QSqlDatabase::database());
+        settings.exec();
     } 
     else if (sel == "settings epg") 
     {
         EPGSettings settings;
-        settings.exec(QSqlDatabase::database());
+        settings.exec();
     } 
     else if (sel == "settings generalrecpriorities") 
     {
         GeneralRecPrioritiesSettings settings;
-        settings.exec(QSqlDatabase::database());
+        settings.exec();
         ScheduledRecording::signalChange(0);
     } 
     else if (sel == "settings channelrecpriorities") 
@@ -443,7 +431,7 @@ void TVMenuCallback(void *data, QString &selection)
     else if (xbox && sel == "settings xboxsettings")
     {
         XboxSettings settings;
-        settings.exec(QSqlDatabase::database());
+        settings.exec();
 
         xbox->GetSettings();
     }
@@ -522,29 +510,29 @@ int RunMenu(QString themedir)
 
 // If any settings are missing from the database, this will write
 // the default values
-void WriteDefaults(QSqlDatabase* db) 
+void WriteDefaults() 
 {
     PlaybackSettings ps;
-    ps.load(db);
-    ps.save(db);
+    ps.load();
+    ps.save();
     GeneralSettings gs;
-    gs.load(db);
-    gs.save(db);
+    gs.load();
+    gs.save();
     EPGSettings es;
-    es.load(db);
-    es.save(db);
+    es.load();
+    es.save();
     AppearanceSettings as;
-    as.load(db);
-    as.save(db);
+    as.load();
+    as.save();
     MainGeneralSettings mgs;
-    mgs.load(db);
-    mgs.save(db);
+    mgs.load();
+    mgs.save();
     GeneralRecPrioritiesSettings grs;
-    grs.load(db);
-    grs.save(db);
+    grs.load();
+    grs.save();
 }
 
-QString RandTheme(QString &themename, QSqlDatabase *db)
+QString RandTheme(QString &themename)
 {
     QDir themes(gContext->GetThemesParentDir());
     themes.setFilter(QDir::Dirs);
@@ -579,7 +567,7 @@ QString RandTheme(QString &themename, QSqlDatabase *db)
 
     ThemeSelector Theme;
     Theme.setValue(themename);
-    Theme.save(db);
+    Theme.save();
 
     return themename;
 }
@@ -911,8 +899,11 @@ int main(int argc, char **argv)
     if (!dir.exists())
         dir.mkdir(fileprefix);
 
+    gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
-   
+
+    gContext->Init();
+
     // Create priveleged thread, then drop privs
     pthread_t priv_thread;
 
@@ -924,14 +915,13 @@ int main(int argc, char **argv)
     }
     setuid(getuid());
 
-    QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
-    if (!db)
-    {
-        printf("Couldn't connect to database\n");
-        return -1;
-    }
+    //if (!db)
+    //{
+    //    printf("Couldn't connect to database\n");
+    //    return -1;
+    //}
 
-    if (!gContext->OpenDatabase(db))
+    if (!MSqlQuery::testDBConnection())
     {
         printf("couldn't open db\n");
         return -1;
@@ -962,13 +952,13 @@ int main(int argc, char **argv)
 
     LanguageSettings::load("mythfrontend");
 
-    WriteDefaults(db);
+    WriteDefaults();
 
     QString themename = gContext->GetSetting("Theme", "blue");
     bool randomtheme = gContext->GetNumSetting("RandomTheme", 0);
 
     if (randomtheme)
-        themename = RandTheme(themename, db);
+        themename = RandTheme(themename);
 
     QString themedir = gContext->FindThemeDir(themename);
     if (themedir == "")

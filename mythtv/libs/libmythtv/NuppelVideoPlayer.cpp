@@ -67,11 +67,9 @@ int isnan(double);
 }
 #endif
 
-NuppelVideoPlayer::NuppelVideoPlayer(MythSqlDatabase *ldb,
-                                     ProgramInfo *info)
+NuppelVideoPlayer::NuppelVideoPlayer(ProgramInfo *info)
     : decoder_lock(true)
 {
-    m_db = ldb;
     m_playbackinfo = NULL;
     parentWidget = NULL;
 
@@ -651,18 +649,18 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
         delete decoder;
 
     if (NuppelDecoder::CanHandle(testbuf))
-        decoder = new NuppelDecoder(this, m_db, m_playbackinfo);
+        decoder = new NuppelDecoder(this, m_playbackinfo);
 #ifdef USING_IVTV
     else if (!disablevideo && IvtvDecoder::CanHandle(testbuf,
                                                      ringBuffer->GetFilename()))
     {
-        decoder = new IvtvDecoder(this, m_db, m_playbackinfo);
+        decoder = new IvtvDecoder(this, m_playbackinfo);
         disableaudio = true; // no audio with ivtv.
         audio_bits = 16;
     }
 #endif
     else if (AvFormatDecoder::CanHandle(testbuf, ringBuffer->GetFilename()))
-        decoder = new AvFormatDecoder(this, m_db, m_playbackinfo);
+        decoder = new AvFormatDecoder(this, m_playbackinfo);
 
     if (!decoder)
     {
@@ -1879,10 +1877,8 @@ void NuppelVideoPlayer::StartPlaying(void)
 
         decoder->setExactSeeks(seeks);
 
-        QMutexLocker lockit(m_db->mutex());
-
         if (gContext->GetNumSetting("ClearSavedPosition", 1))
-            m_playbackinfo->SetBookmark(0, m_db->db());
+            m_playbackinfo->SetBookmark(0);
     }
 
     LoadBlankList();
@@ -2234,12 +2230,10 @@ void NuppelVideoPlayer::SetBookmark(void)
 {
     if (livetv)
         return;
-    if (!m_db || !m_playbackinfo || !osd)
+    if (!m_playbackinfo || !osd)
         return;
 
-    QMutexLocker lockit(m_db->mutex());
-
-    m_playbackinfo->SetBookmark(framesPlayed, m_db->db());
+    m_playbackinfo->SetBookmark(framesPlayed);
     osd->SetSettingsText(QObject::tr("Position Saved"), 1);
 }
 
@@ -2247,22 +2241,19 @@ void NuppelVideoPlayer::ClearBookmark(void)
 {
     if (livetv)
         return;
-    if (!m_db || !m_playbackinfo || !osd)
+    if (!m_playbackinfo || !osd)
         return;
 
-    QMutexLocker lockit(m_db->mutex());
-
-    m_playbackinfo->SetBookmark(0, m_db->db());
+    m_playbackinfo->SetBookmark(0);
     osd->SetSettingsText(QObject::tr("Position Cleared"), 1);
 }
 
 long long NuppelVideoPlayer::GetBookmark(void)
 {
-    if (!m_db || !m_playbackinfo)
+    if (!m_playbackinfo)
         return 0;
 
-    QMutexLocker lockit(m_db->mutex());
-    return m_playbackinfo->GetBookmark(m_db->db());
+    return m_playbackinfo->GetBookmark();
 }
 
 void NuppelVideoPlayer::DoPause(void)
@@ -2622,13 +2613,11 @@ bool NuppelVideoPlayer::EnableEdit(void)
 {
     editmode = false;
 
-    if (!hasFullPositionMap || !m_playbackinfo || !m_db || !osd)
+    if (!hasFullPositionMap || !m_playbackinfo || !osd)
         return false;
 
     bool alreadyediting = false;
-    m_db->lock();
-    alreadyediting = m_playbackinfo->IsEditing(m_db->db());
-    m_db->unlock();
+    alreadyediting = m_playbackinfo->IsEditing();
 
     if (alreadyediting)
         return false;
@@ -2647,9 +2636,7 @@ bool NuppelVideoPlayer::EnableEdit(void)
     dialogname = "";
 
     QMap<QString, QString> infoMap;
-    m_db->lock();
-    m_playbackinfo->ToMap(m_db->db(), infoMap);
-    m_db->unlock();
+    m_playbackinfo->ToMap(infoMap);
     osd->SetText("editmode", infoMap, -1);
 
     UpdateEditSlider();
@@ -2668,9 +2655,7 @@ bool NuppelVideoPlayer::EnableEdit(void)
              AddMark(it.key(), it.data());
     }
 
-    m_db->lock();
-    m_playbackinfo->SetEditing(true, m_db->db());
-    m_db->unlock();
+    m_playbackinfo->SetEditing(true);
 
     return editmode;
 }
@@ -2679,7 +2664,7 @@ void NuppelVideoPlayer::DisableEdit(void)
 {
     editmode = false;
 
-    if (!m_playbackinfo || !m_db)
+    if (!m_playbackinfo)
         return;
 
     QMap<long long, int>::Iterator i = deleteMap.begin();
@@ -2702,8 +2687,7 @@ void NuppelVideoPlayer::DisableEdit(void)
         hasdeletetable = false;
     }
 
-    QMutexLocker lockit(m_db->mutex());
-    m_playbackinfo->SetEditing(false, m_db->db());
+    m_playbackinfo->SetEditing(false);
 }
 
 bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
@@ -3219,7 +3203,7 @@ bool NuppelVideoPlayer::IsInDelete(long long testframe)
 
 void NuppelVideoPlayer::SaveCutList(void)
 {
-    if (!m_playbackinfo || !m_db)
+    if (!m_playbackinfo)
         return;
 
     long long startpos = 0;
@@ -3279,36 +3263,32 @@ void NuppelVideoPlayer::SaveCutList(void)
     if (indelete)
         deleteMap[totalFrames] = 0;
 
-    QMutexLocker lockit(m_db->mutex());
-    m_playbackinfo->SetMarkupFlag(MARK_UPDATED_CUT, true, m_db->db());
-    m_playbackinfo->SetCutList(deleteMap, m_db->db());
+    m_playbackinfo->SetMarkupFlag(MARK_UPDATED_CUT, true);
+    m_playbackinfo->SetCutList(deleteMap);
 }
 
 void NuppelVideoPlayer::LoadCutList(void)
 {
-    if (!m_playbackinfo || !m_db)
+    if (!m_playbackinfo)
         return;
 
-    QMutexLocker lockit(m_db->mutex());
-    m_playbackinfo->GetCutList(deleteMap, m_db->db());
+    m_playbackinfo->GetCutList(deleteMap);
 }
 
 void NuppelVideoPlayer::LoadBlankList(void)
 {
-    if (!m_playbackinfo || !m_db)
+    if (!m_playbackinfo)
         return;
 
-    QMutexLocker lockit(m_db->mutex());
-    m_playbackinfo->GetBlankFrameList(blankMap, m_db->db());
+    m_playbackinfo->GetBlankFrameList(blankMap);
 }
 
 void NuppelVideoPlayer::LoadCommBreakList(void)
 {
-    if (!m_playbackinfo || !m_db)
+    if (!m_playbackinfo)
         return;
 
-    QMutexLocker lockit(m_db->mutex());
-    m_playbackinfo->GetCommBreakList(commBreakMap, m_db->db());
+    m_playbackinfo->GetCommBreakList(commBreakMap);
 }
 
 char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
@@ -3524,19 +3504,15 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
     if (OpenFile() < 0)
         return(254);
 
-    m_db->lock();
-    m_playbackinfo->SetCommFlagged(COMM_FLAG_PROCESSING, m_db->db());
-    m_db->unlock();
+    m_playbackinfo->SetCommFlagged(COMM_FLAG_PROCESSING);
 
     if (inJobQueue)
     {
-        m_db->lock();
-        jobID = JobQueue::GetJobID(m_db->db(), JOB_COMMFLAG,
+        jobID = JobQueue::GetJobID(JOB_COMMFLAG,
                                   m_playbackinfo->chanid,
                                   m_playbackinfo->startts);
-        JobQueue::ChangeJobStatus(m_db->db(), jobID, JOB_RUNNING,
+        JobQueue::ChangeJobStatus(jobID, JOB_RUNNING,
                                   "0% " + QObject::tr("Completed"));
-        m_db->unlock();
     }
 
     playing = true;
@@ -3545,9 +3521,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
     {
         VERBOSE(VB_IMPORTANT, "NVP: Unable to initialize video for FlagCommercials.");
         playing = false;
-        m_db->lock();
-        m_playbackinfo->SetCommFlagged(COMM_FLAG_NOT_FLAGGED, m_db->db());
-        m_db->unlock();
+        m_playbackinfo->SetCommFlagged(COMM_FLAG_NOT_FLAGGED);
         return(254);
     }
 
@@ -3563,10 +3537,8 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
     {
         if (inJobQueue)
         {
-            m_db->lock();
-            JobQueue::ChangeJobStatus(m_db->db(), jobID, JOB_RUNNING,
+            JobQueue::ChangeJobStatus(jobID, JOB_RUNNING,
                                       QObject::tr("Searching for Logo"));
-            m_db->unlock();
         }
 
         if (showPercentage)
@@ -3606,18 +3578,14 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
         {
             int curCmd;
 
-            m_db->lock();
-            curCmd = JobQueue::GetJobCmd(m_db->db(), jobID);
-            m_db->unlock();
+            curCmd = JobQueue::GetJobCmd(jobID);
 
             if (curCmd == JOB_STOP)
             {
                 playing = false;
                 killplayer = true;
 
-                m_db->lock();
-                m_playbackinfo->SetCommFlagged(COMM_FLAG_NOT_FLAGGED, m_db->db());
-                m_db->unlock();
+                m_playbackinfo->SetCommFlagged(COMM_FLAG_NOT_FLAGGED);
 
                 return(255);
             }
@@ -3625,10 +3593,8 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
             {
                 if (!flaggingPaused && jobID != -1)
                 {
-                    m_db->lock();
-                    JobQueue::ChangeJobStatus(m_db->db(), jobID, JOB_PAUSED,
+                    JobQueue::ChangeJobStatus(jobID, JOB_PAUSED,
                                               QObject::tr("Paused"));
-                    m_db->unlock();
 
                     flaggingPaused = true;
                 }
@@ -3639,11 +3605,9 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
 
         if (flaggingPaused && jobID != -1)
         {
-            m_db->lock();
-            JobQueue::ChangeJobStatus(m_db->db(), jobID, JOB_RUNNING,
+            JobQueue::ChangeJobStatus(jobID, JOB_RUNNING,
                                       QObject::tr("Restarting"));
-            JobQueue::ChangeJobFlags(m_db->db(), jobID, JOB_RUN);
-            m_db->unlock();
+            JobQueue::ChangeJobFlags(jobID, JOB_RUN);
 
             flaggingPaused = false;
         }
@@ -3684,12 +3648,10 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
 
             if ((jobID != -1) && ((currentFrame->frameNumber % 500) == 0))
             {
-                m_db->lock();
-                JobQueue::ChangeJobComment(m_db->db(), jobID,
+                JobQueue::ChangeJobComment(jobID,
                                           QObject::tr("%1% Completed @ %2 fps.")
                                                       .arg(percentage)
                                                       .arg(flagFPS));
-                m_db->unlock();
             }
         }
 
@@ -3719,9 +3681,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
 
         if (blankMap.size())
         {
-            m_db->lock();
-            m_playbackinfo->SetBlankFrameList(blankMap, m_db->db());
-            m_db->unlock();
+            m_playbackinfo->SetBlankFrameList(blankMap);
         }
     }
 
@@ -3729,22 +3689,19 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
 
     if (commBreakMap.size())
     {
-        m_db->lock();
-        m_playbackinfo->SetMarkupFlag(MARK_UPDATED_CUT, true, m_db->db());
-        m_playbackinfo->SetCommBreakList(commBreakMap, m_db->db());
-        m_db->unlock();
+        m_playbackinfo->SetMarkupFlag(MARK_UPDATED_CUT, true);
+        m_playbackinfo->SetCommBreakList(commBreakMap);
     }
     comms_found = commBreakMap.size() / 2;
 
     playing = false;
     killplayer = true;
 
-    m_db->lock();
 
     if (!hasFullPositionMap)
         decoder->SetPositionMap();
 
-    m_playbackinfo->SetCommFlagged(COMM_FLAG_DONE, m_db->db());
+    m_playbackinfo->SetCommFlagged(COMM_FLAG_DONE);
 
     if (jobID != -1)
     {
@@ -3754,14 +3711,13 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
         if (elapsed)
             flagFPS = (int)(totalFrames / elapsed);
 
-        JobQueue::ChangeJobStatus(m_db->db(), jobID, JOB_STOPPING,
+        JobQueue::ChangeJobStatus(jobID, JOB_STOPPING,
                                   QString("100% ") +
                                   QObject::tr("Completed, %1 FPS").arg(flagFPS)
                                   + ", " + QString("%1").arg(comms_found) + " "
                                   + QObject::tr("Commercial Breaks Found"));
     }
 
-    m_db->unlock();
 
     return(comms_found);
 }
@@ -3780,11 +3736,9 @@ bool NuppelVideoPlayer::RebuildSeekTable(bool showPercentage, StatusCallback cb,
         return(0);
 
     // clear out any existing seektables
-    m_db->lock();
-    m_playbackinfo->ClearPositionMap(MARK_KEYFRAME, m_db->db());
-    m_playbackinfo->ClearPositionMap(MARK_GOP_START, m_db->db());
-    m_playbackinfo->ClearPositionMap(MARK_GOP_BYFRAME, m_db->db());
-    m_db->unlock();
+    m_playbackinfo->ClearPositionMap(MARK_KEYFRAME);
+    m_playbackinfo->ClearPositionMap(MARK_GOP_START);
+    m_playbackinfo->ClearPositionMap(MARK_GOP_BYFRAME);
 
     playing = true;
 
@@ -3867,9 +3821,7 @@ bool NuppelVideoPlayer::RebuildSeekTable(bool showPercentage, StatusCallback cb,
     playing = false;
     killplayer = true;
 
-    m_db->lock();
     decoder->SetPositionMap();
-    m_db->unlock();
 
     return true;
 }

@@ -338,7 +338,7 @@ void StatusBox::keyPressEvent(QKeyEvent *e)
                                  QObject::tr("Yes"), QObject::tr("No"), 0);
                 if (retval == 0)
                 {
-                    MSqlQuery query(QString::null, QSqlDatabase::database());
+                    MSqlQuery query(MSqlQuery::InitCon());
                     query.prepare("UPDATE mythlog SET acknowledged = 1 "
                                   "WHERE priority <= :PRIORITY ;");
                     query.bindValue(":PRIORITY", min_level);
@@ -494,7 +494,7 @@ void StatusBox::clicked()
                                    QObject::tr("Yes"), QObject::tr("No"), 0);
             if (retval == 0)
             {
-                MSqlQuery query(QString::null, QSqlDatabase::database());
+                MSqlQuery query(MSqlQuery::InitCon());
                 query.prepare("UPDATE mythlog SET acknowledged = 1 "
                               "WHERE logid = :LOGID ;");
                 query.bindValue(":LOGID", contentData[contentPos]);
@@ -504,13 +504,12 @@ void StatusBox::clicked()
         }
         else if (currentItem == QObject::tr("Job Queue"))
         {
-            QSqlDatabase *db = QSqlDatabase::database();
             QStringList msgs;
             int jobStatus;
             int retval;
 
-            jobStatus = JobQueue::GetJobStatus(db,
-                                               contentData[contentPos].toInt());
+            jobStatus = JobQueue::GetJobStatus(
+                                contentData[contentPos].toInt());
 
             if (jobStatus == JOB_QUEUED)
             {
@@ -521,7 +520,7 @@ void StatusBox::clicked()
                                        QObject::tr("No"), 1);
                 if (retval == 0)
                 {
-                    JobQueue::DeleteJob(db, contentData[contentPos].toInt());
+                    JobQueue::DeleteJob(contentData[contentPos].toInt());
                     doJobQueueStatus();
                 }
             }
@@ -538,12 +537,12 @@ void StatusBox::clicked()
                                        msgs, 2);
                 if (retval == 0)
                 {
-                    JobQueue::PauseJob(db, contentData[contentPos].toInt());
+                    JobQueue::PauseJob(contentData[contentPos].toInt());
                     doJobQueueStatus();
                 }
                 else if (retval == 1)
                 {
-                    JobQueue::StopJob(db, contentData[contentPos].toInt());
+                    JobQueue::StopJob(contentData[contentPos].toInt());
                     doJobQueueStatus();
                 }
             }
@@ -558,12 +557,12 @@ void StatusBox::clicked()
                                        msgs, 2);
                 if (retval == 0)
                 {
-                    JobQueue::ResumeJob(db, contentData[contentPos].toInt());
+                    JobQueue::ResumeJob(contentData[contentPos].toInt());
                     doJobQueueStatus();
                 }
                 else if (retval == 1)
                 {
-                    JobQueue::StopJob(db, contentData[contentPos].toInt());
+                    JobQueue::StopJob(contentData[contentPos].toInt());
                     doJobQueueStatus();
                 }
             }
@@ -576,8 +575,7 @@ void StatusBox::clicked()
                                        QObject::tr("No"), 1);
                 if (retval == 0)
                 {
-                    JobQueue::ChangeJobStatus(db,
-                                              contentData[contentPos].toInt(),
+                    JobQueue::ChangeJobStatus(contentData[contentPos].toInt(),
                                               JOB_QUEUED);
                     doJobQueueStatus();
                 }
@@ -625,7 +623,7 @@ void StatusBox::doListingsStatus()
 
     qdtNow = QDateTime::currentDateTime();
 
-    MSqlQuery query(QString::null, QSqlDatabase::database());
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT max(endtime) FROM program;");
     query.exec();
 
@@ -699,7 +697,7 @@ void StatusBox::doTunerStatus()
     int count = 0;
     doScroll = true;
 
-    MSqlQuery query(QString::null, QSqlDatabase::database());
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT cardid FROM capturecard;");
     query.exec();
 
@@ -771,7 +769,7 @@ void StatusBox::doDVBStatus(void)
                                  "hours:\n");
 
 
-    MSqlQuery oquery(QString::null, QSqlDatabase::database());
+    MSqlQuery oquery(MSqlQuery::InitCon());
     oquery.prepare("SELECT starttime,endtime FROM recorded "
                   "WHERE starttime >= DATE_SUB(NOW(), INTERVAL 48 HOUR) "
                   "ORDER BY starttime;");
@@ -779,7 +777,7 @@ void StatusBox::doDVBStatus(void)
 
     if (oquery.isActive() && oquery.numRowsAffected())
     {
-        MSqlQuery query(QString::null, QSqlDatabase::database());
+        MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT cardid,"
                       "max(fe_ss),min(fe_ss),avg(fe_ss),"
                       "max(fe_snr),min(fe_snr),avg(fe_snr),"
@@ -851,7 +849,7 @@ void StatusBox::doLogEntries(void)
     contentFont.clear();
     contentData.clear();
 
-    MSqlQuery query(QString::null, QSqlDatabase::database());
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT logid, module, priority, logdate, host, "
                   "message, details "
                   "FROM mythlog WHERE acknowledged = 0 "
@@ -911,9 +909,8 @@ void StatusBox::doJobQueueStatus()
     int count = 0;
 
     QString detail;
-    QSqlDatabase *db = QSqlDatabase::database();
 
-    JobQueue::GetJobsInQueue(db, jobs,
+    JobQueue::GetJobsInQueue(jobs,
                              JOB_LIST_NOT_DONE | JOB_LIST_ERROR |
                              JOB_LIST_RECENT);
 
@@ -932,7 +929,7 @@ void StatusBox::doJobQueueStatus()
             QDateTime starttime = it.data().starttime;
             ProgramInfo *pginfo;
 
-            pginfo = ProgramInfo::GetProgramFromRecorded(db, chanid, starttime);
+            pginfo = ProgramInfo::GetProgramFromRecorded(chanid, starttime);
 
             if (!pginfo)
                 continue;
@@ -1168,7 +1165,7 @@ void StatusBox::doMachineStatus()
         contentLines[count] = "   " + QString(QObject::tr("Recordings")) + ": ";
 
         // Perform the database queries
-        MSqlQuery query(QString::null, QSqlDatabase::database());
+        MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT * FROM settings "
                       "WHERE value=\"RecordFilePrefix\" "
                       "AND hostname = :HOSTNAME ;");

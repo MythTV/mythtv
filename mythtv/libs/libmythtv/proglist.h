@@ -23,14 +23,13 @@ enum ProgListType {
     plTime
 };
 
-class QSqlDatabase;
 
 class ProgLister : public MythDialog
 {
     Q_OBJECT
 
   public:
-    ProgLister(ProgListType pltype, const QString &view, QSqlDatabase *ldb, 
+    ProgLister(ProgListType pltype, const QString &view, 
 	       MythMainWindow *parent, const char *name = 0);
     ~ProgLister();
 
@@ -63,7 +62,6 @@ class ProgLister : public MythDialog
 
   private:
     ProgListType type;
-    QSqlDatabase *db;
     QDateTime startTime;
     QDateTime searchTime;
     QString dayFormat;

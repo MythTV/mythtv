@@ -6,6 +6,7 @@
 #include "programinfo.h"
 
 #include "libmyth/mythcontext.h"
+#include "libmyth/mythdbcon.h"
 #include "libmyth/mythdialogs.h"
 
 #include <iostream>
@@ -69,7 +70,9 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
+    gContext->Init();
 
     // Create priveleged thread, then drop privs
     pthread_t priv_thread;
@@ -92,13 +95,13 @@ int main(int argc, char *argv[])
     
     gContext->LoadQtConfig();
 
-    QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
-    if (!db)
-    {
-        printf("Couldn't connect to database\n");
-        return 45; // exit(45)
-    }       
-    if (!gContext->OpenDatabase(db))
+    //if (!db)
+    //{
+    //    printf("Couldn't connect to database\n");
+    //    return 45; // exit(45)
+    //}       
+
+    if (!MSqlQuery::testDBConnection())
     {
         printf("couldn't open db\n");
         return 46; // exit(46)

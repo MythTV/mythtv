@@ -1847,20 +1847,14 @@ void NuppelVideoRecorder::WriteSeekTable(void)
 
     ringBuffer->WriterSeek(0, SEEK_END);
 
-    if (curRecording && db_lock && db_conn)
+    if (curRecording)
     {
-        pthread_mutex_lock(db_lock);
-        MythContext::KickDatabase(db_conn);
-
-        curRecording->SetFilesize(ringBuffer->GetRealFileSize(), db_conn);
+        curRecording->SetFilesize(ringBuffer->GetRealFileSize());
         if (positionMapDelta.size())
         {
-            curRecording->SetPositionMapDelta(positionMapDelta, MARK_KEYFRAME,
-                                              db_conn);
+            curRecording->SetPositionMapDelta(positionMapDelta, MARK_KEYFRAME);
             positionMapDelta.clear();
         } 
-
-        pthread_mutex_unlock(db_lock);
     }
 
     delete [] seekbuf;
@@ -1918,15 +1912,11 @@ void NuppelVideoRecorder::UpdateSeekTable(int frame_num, bool use_db, long offse
         positionMapDelta[ste.keyframe_number] = position;
         positionMap[ste.keyframe_number] = position;
 
-        if (use_db && curRecording && db_lock && db_conn &&
+        if (use_db && curRecording &&
             (positionMapDelta.size() % 15) == 0)
         {
-            pthread_mutex_lock(db_lock);
-            MythContext::KickDatabase(db_conn);
-            curRecording->SetPositionMapDelta(positionMapDelta, MARK_KEYFRAME,
-                                              db_conn);
-            curRecording->SetFilesize(position, db_conn);
-            pthread_mutex_unlock(db_lock);
+            curRecording->SetPositionMapDelta(positionMapDelta, MARK_KEYFRAME);
+            curRecording->SetFilesize(position);
             positionMapDelta.clear();
         }
     }
@@ -2005,12 +1995,9 @@ void NuppelVideoRecorder::Reset(void)
     positionMap.clear();
     positionMapDelta.clear();
 
-    if (curRecording && db_lock && db_conn)
+    if (curRecording)
     {
-        pthread_mutex_lock(db_lock);
-        MythContext::KickDatabase(db_conn);
-        curRecording->ClearPositionMap(MARK_KEYFRAME, db_conn);
-        pthread_mutex_unlock(db_lock);
+        curRecording->ClearPositionMap(MARK_KEYFRAME);
     }
 }
 
@@ -3497,14 +3484,11 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         {
             commDetect->GetBlankFrameMap(blank_frames);
 
-            if (curRecording && db_lock && db_conn && 
+            if (curRecording && 
                 ((blank_frames.size() % 15 ) == 0))
             {
-                pthread_mutex_lock(db_lock);
-                MythContext::KickDatabase(db_conn);
                 curRecording->SetBlankFrameList(blank_frames,
-                    db_conn, prev_bframe_save_pos, (fnum-startnum)>>1 );
-                pthread_mutex_unlock(db_lock);
+                        prev_bframe_save_pos, (fnum-startnum)>>1 );
 
                 prev_bframe_save_pos = ((fnum-startnum)>>1) + 1;
             }

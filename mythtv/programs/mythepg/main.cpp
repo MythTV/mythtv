@@ -3,6 +3,7 @@
 #include <cstdlib>
 
 #include "libmyth/mythcontext.h"
+#include "libmyth/mythdbcon.h"
 #include "libmyth/settings.h"
 
 #include "libmythtv/guidegrid.h"
@@ -12,10 +13,11 @@ int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
 
+    gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
+    gContext->Init();
 
-    QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
-    if (!gContext->OpenDatabase(db))
+    if (!MSqlQuery::testDBConnection())
     {
         printf("couldn't open db\n");
         return -1;

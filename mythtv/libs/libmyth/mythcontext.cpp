@@ -29,6 +29,7 @@
 #include "DisplayRes.h"
 #include "dbsettings.h"
 #include "langsettings.h"
+#include "mythdbcon.h"
 
 // These defines provide portability for different
 // plugin file names.
@@ -64,7 +65,7 @@ class MythContextPrivate
     bool WriteSettingsFile(const DatabaseParams &params,
                            bool overwrite = false);
     bool FindSettingsProbs(void);
-    bool RetryDatabaseConnection(QSqlDatabase *db);
+//    bool RetryDatabaseConnection(QSqlDatabase *db);
     QString getResponse(const QString &query, const QString &def);
     int intResponse(const QString &query, int def);
     bool PromptForDatabaseParams(void);
@@ -94,9 +95,8 @@ class MythContextPrivate
 
     QPtrList<QObject> listeners;
 
-    QSqlDatabase* m_db;
-    QMutex dbLock;
-
+    MDBManager m_dbmanager;
+    
     QMap<QString, QImage> imageCache;
 
     QString language;
@@ -172,7 +172,6 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
     m_themeloaded = false;
     m_backgroundimage = NULL;
 
-    m_db = QSqlDatabase::addDatabase("QMYSQL3", "MythContext");
     screensaver = ScreenSaverControl::get();
     m_baseHeight = 600;
     m_baseWidth = 800;
@@ -397,6 +396,7 @@ bool MythContextPrivate::FindSettingsProbs(void)
     return problems;
 }
 
+/* needs to be refitted...
 bool MythContextPrivate::RetryDatabaseConnection(QSqlDatabase *db)
 {
     while (!parent->OpenDatabase(db, false))
@@ -437,6 +437,7 @@ bool MythContextPrivate::RetryDatabaseConnection(QSqlDatabase *db)
     }
     return true;
 }
+*/
 
 QString MythContextPrivate::getResponse(const QString &query,
                                         const QString &def)
@@ -497,7 +498,7 @@ bool MythContextPrivate::PromptForDatabaseParams(void)
         
         // ask user for database parameters
         DatabaseSettings settings;
-        accepted = (settings.exec(NULL) == QDialog::Accepted);
+        accepted = (settings.exec() == QDialog::Accepted);
         if (!accepted)
             VERBOSE(VB_IMPORTANT, "User canceled database configuration");
     
@@ -555,7 +556,7 @@ bool MythContextPrivate::PromptForDatabaseParams(void)
     return accepted;
 }
 
-MythContext::MythContext(const QString &binversion, bool gui)
+MythContext::MythContext(const QString &binversion)
            : QObject()
 {
     qInitNetworkProtocols();
@@ -571,6 +572,11 @@ MythContext::MythContext(const QString &binversion, bool gui)
     }
 
     d = new MythContextPrivate(this);
+
+}
+
+void MythContext::Init(bool gui)
+{
 
     d->Init(gui);
 
@@ -1204,76 +1210,14 @@ QString MythContext::GetThemeDir(void)
     return d->m_themepathname;
 }
 
-int MythContext::OpenDatabase(QSqlDatabase *db, bool promptOnFailure)
+MDBManager *MythContext::GetDBManager(void)
 {
-    if (promptOnFailure)
-    {
-        // RetryDatabaseConnection will use GUI or console prompts
-        // to edit settings if connection fails
-        return (int)(d->RetryDatabaseConnection(db));
-    }
-    
-    int res = 1;
-    
-    d->dbLock.lock();
-    if (!d->m_db->isOpen()) {
-        d->m_db->setDatabaseName(d->m_settings->GetSetting("DBName"));
-        d->m_db->setUserName(d->m_settings->GetSetting("DBUserName"));
-        d->m_db->setPassword(d->m_settings->GetSetting("DBPassword"));
-        d->m_db->setHostName(d->m_settings->GetSetting("DBHostName"));
-        res = d->m_db->open();
-    }
-    d->dbLock.unlock();
-    
-    if (!res)
-    {
-        VERBOSE(VB_IMPORTANT, "Unable to connect to database!");
-        VERBOSE(VB_IMPORTANT, DBErrorMessage(d->m_db->lastError()));
-    }
-    else if (db)
-    {
-        db->setDatabaseName(d->m_settings->GetSetting("DBName"));
-        db->setUserName(d->m_settings->GetSetting("DBUserName"));
-        db->setPassword(d->m_settings->GetSetting("DBPassword"));
-        db->setHostName(d->m_settings->GetSetting("DBHostName"));
-        
-        res = db->open();
-        if (!res)
-        {
-            VERBOSE(VB_IMPORTANT, "Unable to connect to database!");
-            VERBOSE(VB_IMPORTANT, DBErrorMessage(db->lastError()));
-        }
-    }
-    return res;
-}
-
-void MythContext::KickDatabase(QSqlDatabase *db)
-{
-    // Some explanation is called for.  This exists because the mysql
-    // driver does not gracefully handle the situation where a TCP
-    // socketconnection is dropped (for example due to a timeout).  If
-    // a Unix domain socket connection is lost, the driver
-    // transparently reestablishes the connection and we don't even
-    // notice.  However, when this happens with a TCP connection, the
-    // driver returns an error for the next query to be executed, and
-    // THEN reestablishes the connection (so the second query succeeds
-    // with no intervention).
-    // mdz, 2003/08/11
-
-    QString query("SELECT NULL;");
-    for (unsigned int i = 0 ; i < 2 ; ++i, usleep(50000)) 
-    {
-        QSqlQuery result = db->exec(query);
-        if (result.isActive())
-            break;
-        else
-            DBError("KickDatabase", result);
-    }
+    return &d->m_dbmanager;
 }
 
 void MythContext::DBError(const QString &where, const QSqlQuery& query) 
 {
-    if (query.lastError().type())
+    //if (query.lastError().type())
     {
         cerr << "DB Error (" << where << "):" << endl;
     }
@@ -1324,30 +1268,25 @@ void MythContext::SaveSetting(const QString &key, int newValue)
 
 void MythContext::SaveSetting(const QString &key, const QString &newValue)
 {
-    d->dbLock.lock();
+    MSqlQuery query(MSqlQuery::InitCon());
 
-    if (d->m_db->isOpen()) 
-    {
-        KickDatabase(d->m_db);
+    query.prepare("DELETE FROM settings WHERE value = :KEY "
+                  "AND hostname = :HOSTNAME ;");
+    query.bindValue(":KEY", key);
+    query.bindValue(":HOSTNAME", d->m_localhostname);
+    
+    if (!query.exec() || !query.isActive())
+            MythContext::DBError("Clear setting", query);
 
-        QString querystr = QString("DELETE FROM settings WHERE value = \"%1\" "
-                                   "AND hostname = \"%2\";")
-                                  .arg(key).arg(d->m_localhostname);
+    query.prepare("INSERT settings ( value, data, hostname ) "
+                  "VALUES ( :VALUE, :DATA, :HOSTNAME );");
+    query.bindValue(":VALUE", key);
+    query.bindValue(":DATA", newValue);
+    query.bindValue(":HOSTNAME", d->m_localhostname);
+    
+    if (!query.exec() || !query.isActive())
+            MythContext::DBError("Save new setting", query);
 
-        QSqlQuery result = d->m_db->exec(querystr);
-        if (!result.isActive())
-            MythContext::DBError("Clear setting", querystr);
-
-        querystr = QString("INSERT settings ( value, data, hostname ) "
-                           "VALUES ( \"%1\", \"%2\", \"%3\" );")
-                           .arg(key).arg(newValue).arg(d->m_localhostname);
-
-        result = d->m_db->exec(querystr);
-        if (!result.isActive())
-            MythContext::DBError("Save new setting", querystr);
-    }
-
-    d->dbLock.unlock();
 }
 
 QString MythContext::GetSetting(const QString &key, const QString &defaultval) 
@@ -1355,40 +1294,32 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
     bool found = false;
     QString value;
 
-    d->dbLock.lock();
-
-    if (d->m_db->isOpen()) 
-    {
-        KickDatabase(d->m_db);
-
-        QString query = QString("SELECT data FROM settings WHERE value = '%1' "
-                                "AND hostname = '%2';")
+    MSqlQuery query(MSqlQuery::InitCon());
+    
+    QString querystr = QString("SELECT data FROM settings WHERE value = '%1' "
+                               "AND hostname = '%2';")
                                .arg(key).arg(d->m_localhostname);
+    query.exec(querystr);
 
-        QSqlQuery result = d->m_db->exec(query);
+    if (query.isActive() && query.size() > 0)
+    {
+        query.next();
+        value = QString::fromUtf8(query.value(0).toString());
+        found = true;
+    }
+    else
+    {
+        querystr = QString("SELECT data FROM settings WHERE value = '%1' AND "
+                           "hostname IS NULL;").arg(key);
+        query.exec(querystr);
 
-        if (result.isActive() && result.numRowsAffected() > 0) 
+        if (query.isActive() && query.size() > 0)
         {
-            result.next();
-            value = QString::fromUtf8(result.value(0).toString());
+            query.next();
+            value = QString::fromUtf8(query.value(0).toString());
             found = true;
         }
-        else
-        {
-            query = QString("SELECT data FROM settings WHERE value = '%1' AND "
-                            "hostname IS NULL;").arg(key);
-
-            result = d->m_db->exec(query);
-
-            if (result.isActive() && result.numRowsAffected() > 0) 
-            {
-                result.next();
-                value = QString::fromUtf8(result.value(0).toString());
-                found = true;
-            }
-        }
     }
-    d->dbLock.unlock();
 
     if (found)
         return value;
@@ -1409,26 +1340,18 @@ QString MythContext::GetSettingOnHost(const QString &key, const QString &host,
     bool found = false;
     QString value = defaultval;
 
-    d->dbLock.lock();
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT data FROM settings WHERE value = :VALUE "
+                  "AND hostname = :HOSTNAME ;");
+    query.bindValue(":VALUE", key);
+    query.bindValue(":HOSTNAME", host);
 
-    if (d->m_db->isOpen())
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
-        KickDatabase(d->m_db);
-
-        QString query = QString("SELECT data FROM settings WHERE value = '%1' "
-                                "AND hostname = '%2';").arg(key).arg(host);
-
-        QSqlQuery result = d->m_db->exec(query);
-
-        if (result.isActive() && result.numRowsAffected() > 0)
-        {
-            result.next();
-            value = result.value(0).toString();
-            found = true;
-        }
+        query.next();
+        value = query.value(0).toString();
+        found = true;
     }
-
-    d->dbLock.unlock();
 
     return value;
 }
@@ -2086,52 +2009,54 @@ void MythContext::LogEntry(const QString &module, int priority,
             }
         }
 
-        d->dbLock.lock();
-    
-        if (d->m_db->isOpen())
+
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("INSERT INTO mythlog (module, priority, "
+                      "logdate, host, message, details) "
+                      "values (:MODULE, :PRIORITY, now(), :HOSTNAME, "
+                      ":MESSAGE, :DETAILS );");
+
+        query.bindValue(":MODULE", module);
+        query.bindValue(":PRIORITY", priority);
+        query.bindValue(":HOSTNAME", d->m_localhostname);
+        query.bindValue(":MESSAGE", message);
+        query.bindValue(":DETAILS", details);
+
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("LogEntry", query);
+
+        if (d->m_logmaxcount > 0)
         {
-            KickDatabase(d->m_db);
-
-            QSqlQuery result(QString::null, d->m_db);
-
-            result.prepare("INSERT INTO mythlog (module, priority, "
-                           "logdate, host, message, details) "
-                           "values (:MODULE, :PRIORITY, now(), :HOSTNAME, "
-                           ":MESSAGE, :DETAILS );");
-
-            result.bindValue(":MODULE", module);
-            result.bindValue(":PRIORITY", priority);
-            result.bindValue(":HOSTNAME", d->m_localhostname);
-            result.bindValue(":MESSAGE", message);
-            result.bindValue(":DETAILS", details);
-
-            if (!result.exec() || !result.isActive())
-                MythContext::DBError("LogEntry", result);
-
-            if (d->m_logmaxcount > 0)
+            query.prepare("SELECT logid FROM mythlog WHERE "
+                          "module= :MODULE ORDER BY logdate ASC ;"); 
+            query.bindValue(":MODULE", module);
+            if (!query.exec() || !query.isActive())
             {
-                QString querystr;
-                querystr = QString("SELECT logid FROM mythlog WHERE "
-                                   "module='%1' ORDER BY logdate ASC") 
-                                   .arg(module);
-                result = d->m_db->exec(querystr);
-                howmany = result.size();
+                MythContext::DBError("DelLogEntry#1", query);
+            }
+            else
+            {
+                howmany = query.size();
                 if (howmany > d->m_logmaxcount)
-                {
+                { 
+                    MSqlQuery delquery(MSqlQuery::InitCon());
                     while (howmany > d->m_logmaxcount)
                     {
-                        result.next();
-                        logid = result.value(0).toUInt();
-                        querystr = QString("DELETE FROM mythlog WHERE "
-                                           "logid=%1").arg(logid);
-                        d->m_db->exec(querystr);
+                        query.next();
+                        logid = query.value(0).toUInt();
+                        delquery.prepare("DELETE FROM mythlog WHERE "
+                                         "logid= :LOGID ;");
+                        delquery.bindValue(":LOGID", logid);
+                        
+                        if (!delquery.exec() || !delquery.isActive())
+                        {
+                            MythContext::DBError("DelLogEntry#2", delquery);
+                        }
                         howmany--;
                     }
                 }
             }
         }
-    
-        d->dbLock.unlock();
 
         if (priority <= d->m_logprintlevel)
             VERBOSE(VB_ALL, module + ": " + message);

@@ -16,6 +16,7 @@
 #include <iostream>
 
 #include "libmyth/mythcontext.h"
+#include "libmyth/mythdbcon.h"
 #include "libmyth/langsettings.h"
 #include "libmyth/dialogbox.h"
 #include "libmythtv/videosource.h"
@@ -27,11 +28,9 @@
 
 using namespace std;
 
-QSqlDatabase* db;
-
 void clearCardDB(void)
 {
-    QSqlQuery query;
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.exec("TRUNCATE TABLE capturecard;");
     query.exec("TRUNCATE TABLE cardinput;");
@@ -41,7 +40,7 @@ void clearCardDB(void)
 
 void clearAllDB(void)
 {
-    QSqlQuery query;
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.exec("TRUNCATE TABLE channel;");
     query.exec("TRUNCATE TABLE program;");
@@ -61,19 +60,19 @@ void SetupMenuCallback(void* data, QString& selection) {
 
     if (sel == "general") {
         BackendSettings be;
-        be.exec(db);
+        be.exec();
     } else if (sel == "capture cards") {
-        CaptureCardEditor cce(db);
-        cce.exec(db);
+        CaptureCardEditor cce;
+        cce.exec();
     } else if (sel == "video sources") {
-        VideoSourceEditor vse(db);
-        vse.exec(db);
+        VideoSourceEditor vse;
+        vse.exec();
     } else if (sel == "card inputs") {
-        CardInputEditor cie(db);
-        cie.exec(db);
+        CardInputEditor cie;
+        cie.exec();
     } else if (sel == "channel editor") {
         ChannelEditor ce;
-        ce.exec(db);
+        ce.exec();
     }
 }
 
@@ -105,16 +104,17 @@ int main(int argc, char *argv[])
 #endif
     QApplication a(argc, argv);
 
-    gContext = new MythContext(MYTH_BINARY_VERSION, true);
+    gContext = NULL;
+    gContext = new MythContext(MYTH_BINARY_VERSION);
+    gContext->Init(true);
 
-    db = QSqlDatabase::addDatabase("QMYSQL3");
-    if (!gContext->OpenDatabase(db))
+    if (!MSqlQuery::testDBConnection())
     {
-        cerr << "Unable to open database:\n"
-             << "Driver error was:" << endl
-             << db->lastError().driverText() << endl
-             << "Database error was:" << endl
-             << db->lastError().databaseText() << endl;
+        cerr << "Unable to open database.\n";
+        //     << "Driver error was:" << endl
+        //     << db->lastError().driverText() << endl
+        //     << "Database error was:" << endl
+        //     << db->lastError().databaseText() << endl;
 
         return -1;
     }

@@ -20,15 +20,13 @@ using namespace std;
 
 #include "dialogbox.h"
 #include "mythcontext.h"
+#include "mythdbcon.h"
 #include "scheduledrecording.h"
 #include "infostructs.h"
 
-ChannelRecPriority::ChannelRecPriority(QSqlDatabase *ldb, 
-                                       MythMainWindow *parent, const char *name)
+ChannelRecPriority::ChannelRecPriority(MythMainWindow *parent, const char *name)
                   : MythDialog(parent, name)
 {
-    db = ldb;
-
     curitem = NULL;
     pageDowner = false;
     bgTransBackup = NULL;
@@ -371,15 +369,16 @@ void ChannelRecPriority::changeRecPriority(int howMuch)
     }
 }
 
-void ChannelRecPriority::applyChannelRecPriorityChange(QSqlDatabase *db, 
-                                                       QString chanid, 
+void ChannelRecPriority::applyChannelRecPriorityChange(QString chanid, 
                                                  const QString &newrecpriority) 
 {
-    QString query = QString("UPDATE channel SET recpriority = '%1' "
-                            "WHERE chanid = '%2';").arg(newrecpriority)
-                                                   .arg(chanid);
-    QSqlQuery result = db->exec(query);
-    if (!result.isActive())
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("UPDATE channel SET recpriority = :RECPRI "
+                            "WHERE chanid = CHANID ;");
+    query.bindValue(":RECPRI", newrecpriority);
+    query.bindValue(":CHANID", chanid);
+
+    if (!query.exec() || !query.isActive())
         MythContext::DBError("Save recpriority update", query);
 }
 
@@ -395,9 +394,8 @@ void ChannelRecPriority::saveRecPriority(void)
         // if this channel's recording priority changed from when we entered
         // save new value out to db
         if (chanInfo->recpriority != origRecPriorityData[key])
-            applyChannelRecPriorityChange(db, 
-                                   QString::number(chanInfo->chanid), 
-                                   chanInfo->recpriority);
+            applyChannelRecPriorityChange(QString::number(chanInfo->chanid),
+                                          chanInfo->recpriority);
     }
     ScheduledRecording::signalChange(0);
 }
@@ -408,12 +406,11 @@ void ChannelRecPriority::FillList(void)
 
     channelData.clear();
 
-    QString query = QString("SELECT chanid, channum, sourceid, callsign, "
+    MSqlQuery result(MSqlQuery::InitCon());
+    result.prepare("SELECT chanid, channum, sourceid, callsign, "
                             "icon, recpriority, name FROM channel;");
 
-    QSqlQuery result = db->exec(query);
-
-    if (result.isActive() && result.numRowsAffected() > 0)
+    if (result.exec() && result.isActive() && result.size() > 0)
     {
         while (result.next()) {
             ChannelInfo *chaninfo = new ChannelInfo;
@@ -436,7 +433,7 @@ void ChannelRecPriority::FillList(void)
         }
     }
     else if (!result.isActive())
-        MythContext::DBError("Get channel recording priorities query", query);
+        MythContext::DBError("Get channel recording priorities query", result);
 }
 
 typedef struct RecPriorityInfo 

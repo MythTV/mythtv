@@ -1,4 +1,5 @@
 #include "../libmyth/mythcontext.h"
+#include "../libmyth/mythdbcon.h"
 #include "siparser.h"
 #include <qdatetime.h>
 #include <qtextcodec.h>
@@ -271,24 +272,25 @@ void SIParser::LoadPrivateTypes(uint16_t NetworkID)
                                  return;
     }
 
+    MSqlQuery query(MSqlQuery::InitCon());
+
     QString theQuery = QString("select private_type,private_value from dtv_privatetypes where "
                        "networkid = %1 and sitype = \"%2\"")
                        .arg(NetworkID)
                        .arg(STD);
 
-    pthread_mutex_lock(db_lock);
-    QSqlQuery query = db_conn->exec(theQuery);
+    query.prepare(theQuery);
 
-    if(!query.exec(theQuery))
+    if(!query.exec())
         MythContext::DBError("Loading Private Types for SIParser", query);
 
     if (!query.isActive())
         MythContext::DBError("Loading Private Types for SIParser", query);
 
-    if (query.numRowsAffected() > 0)
+    if (query.size() > 0)
     {
         query.next();
-        for (int x = 0 ; x < query.numRowsAffected() ; x++)
+        for (int x = 0 ; x < query.size() ; x++)
         {
             SIPARSER( QString("Private Type %1 = %2 defined for NetworkID %3")
                      .arg(query.value(0).toString())
@@ -350,8 +352,6 @@ void SIParser::LoadPrivateTypes(uint16_t NetworkID)
     }
     else
         SIPARSER(QString("No Private Types defined for NetworkID %1").arg(NetworkID));
-
-    pthread_mutex_unlock(db_lock);
 
     PrivateTypesLoaded = true;
 }

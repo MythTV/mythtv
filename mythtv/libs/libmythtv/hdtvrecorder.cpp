@@ -70,6 +70,7 @@ using namespace std;
 #include "hdtvrecorder.h"
 #include "RingBuffer.h"
 #include "mythcontext.h"
+#include "mythdbcon.h"
 #include "programinfo.h"
 #include "channel.h"
 #include "mpegtables.h"
@@ -841,12 +842,9 @@ void HDTVRecorder::Reset(void)
     _resync_count = 0;
     _ts_stats.Reset();
 
-    if (curRecording && db_lock && db_conn)
+    if (curRecording)
     {
-        pthread_mutex_lock(db_lock);
-        MythContext::KickDatabase(db_conn);
-        curRecording->ClearPositionMap(MARK_GOP_BYFRAME, db_conn);
-        pthread_mutex_unlock(db_lock);
+        curRecording->ClearPositionMap(MARK_GOP_BYFRAME);
     }
 
     if (_stream_fd >= 0) 
@@ -902,22 +900,25 @@ void HDTVRecorder::ChannelNameChanged(const QString& new_chan)
 #endif
 
     // look up freqid
-    pthread_mutex_lock(db_lock);
+ 
+    MSqlQuery query(MSqlQuery::InitCon());
     QString thequery = QString("SELECT freqid "
                                "FROM channel WHERE channum = \"%1\";")
-        .arg(curChannelName);
-    QSqlQuery query = db_conn->exec(thequery);
-    if (!query.isActive())
-        MythContext::DBError("fetchtuningparamschanid", query);
-    if (query.numRowsAffected() <= 0)
+                              .arg(curChannelName);
+    query.prepare(thequery);
+
+    if (!query.exec() || !query.isActive())
     {
-        pthread_mutex_unlock(db_lock);
+        MythContext::DBError("fetchtuningparamschanid", query);
+    }
+
+    if (query.size() <= 0)
+    {
         return;
     }
     query.next();
     QString freqid(query.value(0).toString());
     VERBOSE(VB_RECORD, QString("Setting frequency for startRecording freqid: %1").arg(freqid));
-    pthread_mutex_unlock(db_lock);
 
     int desired_channel = -1;
     int desired_subchannel = DEFAULT_SUBCHANNEL;
@@ -928,7 +929,11 @@ void HDTVRecorder::ChannelNameChanged(const QString& new_chan)
         desired_subchannel = atoi(freqid.mid(pos+1).ascii());
     }
     else
-        VERBOSE(VB_IMPORTANT,
-                QString("Error: Desired subchannel not specified in freqid \"%1\", Using %2.").arg(freqid).arg(desired_subchannel));
+    {
+        VERBOSE(VB_IMPORTANT, QString("Error: Desired subchannel not "
+                                      "specified in freqid \"%1\", Using %2.")
+                                    .arg(freqid).arg(desired_subchannel));
+    }
+
     StreamData()->Reset(desired_channel, desired_subchannel);
 }

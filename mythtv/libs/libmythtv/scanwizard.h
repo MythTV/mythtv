@@ -75,12 +75,11 @@ class TransportSetting : public ComboBoxSetting
     Q_OBJECT
 protected:
     int nSourceID;
-    QSqlDatabase *db;
 
 public:
     TransportSetting();
-    virtual void load(QSqlDatabase *db);
-    virtual void save(QSqlDatabase *db) { db = db;}
+    virtual void load();
+    virtual void save() {}
 
     void refresh();
 public slots:
@@ -92,8 +91,8 @@ class VideoSourceSetting: public ComboBoxSetting
     Q_OBJECT
 public:
     VideoSourceSetting();
-    virtual void load(QSqlDatabase *db);
-    virtual void save(QSqlDatabase *db) { db = db;}
+    virtual void load();
+    virtual void save() {}
 };
 
 class CaptureCardSetting: public ComboBoxSetting
@@ -101,12 +100,11 @@ class CaptureCardSetting: public ComboBoxSetting
     Q_OBJECT
 protected:
     int nSourceID;
-    QSqlDatabase *db;
 
 public:
     CaptureCardSetting();
-    virtual void load(QSqlDatabase *db);
-    virtual void save(QSqlDatabase *db) { db = db;}
+    virtual void load();
+    virtual void save() { }
     void refresh();
 
 public slots:
@@ -132,7 +130,7 @@ class ScanWizardScanner;
 class ScanWizard: public ConfigurationWizard {
     Q_OBJECT
 public:
-    ScanWizard(QSqlDatabase* _db);
+    ScanWizard();
 
     MythDialog* dialogWidget(MythMainWindow *parent, const char *widgetName);
 
@@ -143,7 +141,6 @@ signals:
     void scan();
 
 private:
-    QSqlDatabase* db;
     QString strFrequency;
     QString strSymbolRate;
     QString strPolarity;
@@ -297,7 +294,7 @@ class ScanWizardScanner :  public VerticalConfigurationGroup
 public:
     static const QString strTitle;
 
-    ScanWizardScanner(ScanWizard *_parent,QSqlDatabase *_db);
+    ScanWizardScanner(ScanWizard *_parent);
     ~ScanWizardScanner();
 
     int transportToTuneTo() { return nTransportToTuneTo;}
@@ -340,8 +337,6 @@ protected:
     };
 
     ScanWizard *parent;
-    QSqlDatabase *db;
-    pthread_mutex_t db_lock;
 
     LogList *log;
 

@@ -9,14 +9,12 @@
 #include "xmlparse.h"
 #include "programinfo.h"
 
-class QSqlDatabase;
 
 class ViewScheduled : public MythDialog
 {
     Q_OBJECT
   public:
-    ViewScheduled(QSqlDatabase *ldb, MythMainWindow *parent, 
-                  const char *name = 0);
+    ViewScheduled(MythMainWindow *parent, const char *name = 0);
     ~ViewScheduled();
 
   protected slots:
@@ -49,8 +47,6 @@ class ViewScheduled : public MythDialog
     void parseContainer(QDomElement &);
     XMLParse *theme;
     QDomElement xmldata;
-
-    QSqlDatabase *db;
 
     QPixmap myBackground;
 

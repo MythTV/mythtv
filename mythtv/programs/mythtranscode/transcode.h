@@ -18,7 +18,7 @@
 class Transcode : public QObject
 {
   public:
-     Transcode(QSqlDatabase *db, ProgramInfo *pginfo);
+     Transcode(ProgramInfo *pginfo);
      ~Transcode();
      int TranscodeFile(char *inputname, char *outputname,
                               QString profileName,
@@ -29,7 +29,6 @@ class Transcode : public QObject
     bool GetProfile(QString profileName, QString encodingType);
     void ReencoderAddKFA(long curframe, long lastkey, long num_keyframes);
     ProgramInfo *m_proginfo;
-    QSqlDatabase *m_db;
     RecordingProfile profile;
     int keyframedist;
     NuppelVideoRecorder *nvr;
@@ -38,7 +37,6 @@ class Transcode : public QObject
     RingBuffer *outRingBuffer;
     FIFOWriter::FIFOWriter *fifow;
     QPtrList<struct kfatable_entry> *kfa_table;
-    MythSqlDatabase *nvpdb;
     bool showprogress;
 };
 

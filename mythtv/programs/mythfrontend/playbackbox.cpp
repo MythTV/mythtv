@@ -29,6 +29,7 @@ using namespace std;
 #include "yuv2rgb.h"
 
 #include "mythcontext.h"
+#include "mythdbcon.h"
 #include "programinfo.h"
 #include "scheduledrecording.h"
 #include "remoteutil.h"
@@ -513,7 +514,6 @@ void PlaybackBox::updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix, QString 
 
 void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
 {
-    QSqlDatabase *m_db = QSqlDatabase::database();
     QMap<QString, QString> infoMap;
     QPainter tmp(&pix);
         
@@ -528,7 +528,7 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
 
     if (container)
     {
-        curitem->ToMap(m_db, infoMap);
+        curitem->ToMap(infoMap);
         
         if ((playbackPreview == 0) &&
             (generatePreviewPixmap == 0))
@@ -1483,7 +1483,6 @@ void PlaybackBox::upcoming()
         return;
 
     ProgLister *pl = new ProgLister(plTitle, curitem->title,
-                                   QSqlDatabase::database(),
                                    gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;
@@ -1496,7 +1495,7 @@ void PlaybackBox::details()
     if (!curitem)
         return;
 
-    curitem->showDetails(QSqlDatabase::database());
+    curitem->showDetails();
 }
 
 void PlaybackBox::selected()
@@ -1803,8 +1802,7 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
         noButton->setFocus();
     else
     {
-        QSqlDatabase *db = QSqlDatabase::database();
-        if (program->GetAutoExpireFromRecorded(db))
+        if (program->GetAutoExpireFromRecorded())
             yesButton->setFocus();
         else
             noButton->setFocus();
@@ -1914,18 +1912,16 @@ void PlaybackBox::showStoragePopup()
 
     initPopup(popup, delitem, "", tr("A preserved episode is ignored in calculations for deleting episodes above the limit.  Auto-expiration is used to remove eligable programs when disk space is low."));
 
-    QSqlDatabase *db = QSqlDatabase::database();
-
     QButton *storageButton;
 
-    if (delitem && delitem->GetAutoExpireFromRecorded(db))
+    if (delitem && delitem->GetAutoExpireFromRecorded())
         storageButton = popup->addButton(tr("Don't Auto Expire"), this, SLOT(noAutoExpire()));
     else
         storageButton = popup->addButton(tr("Auto Expire"), this, SLOT(doAutoExpire()));
 
-    if (delitem && delitem->UsesMaxEpisodes(db))
+    if (delitem && delitem->UsesMaxEpisodes())
     {
-        if (delitem && delitem->GetPreserveEpisodeFromRecorded(db))
+        if (delitem && delitem->GetPreserveEpisodeFromRecorded())
             popup->addButton(tr("Do not preserve this episode"), this, SLOT(noPreserveEpisode()));
         else
             popup->addButton(tr("Preserve this episode"), this, SLOT(doPreserveEpisode()));
@@ -1979,13 +1975,11 @@ void PlaybackBox::showJobPopup()
 
     initPopup(popup, delitem, "", "");
 
-    QSqlDatabase *db = QSqlDatabase::database();
-
     QButton *jobButton;
     QString jobTitle = "";
     QString command = "";
 
-    if (JobQueue::IsJobRunning(db, JOB_TRANSCODE, curitem->chanid,
+    if (JobQueue::IsJobRunning(JOB_TRANSCODE, curitem->chanid,
                                                   curitem->startts))
         jobButton = popup->addButton(tr("Stop Transcoding"), this,
                          SLOT(doBeginTranscoding()));
@@ -1993,7 +1987,7 @@ void PlaybackBox::showJobPopup()
         jobButton = popup->addButton(tr("Begin Transcoding"), this,
                          SLOT(doBeginTranscoding()));
 
-    if (JobQueue::IsJobRunning(db, JOB_COMMFLAG, curitem->chanid,
+    if (JobQueue::IsJobRunning(JOB_COMMFLAG, curitem->chanid,
                                                   curitem->startts))
         popup->addButton(tr("Stop Commercial Flagging"), this,
                          SLOT(doBeginFlagging()));
@@ -2005,7 +1999,7 @@ void PlaybackBox::showJobPopup()
     if (command != "") {
         jobTitle = gContext->GetSetting("UserJobDesc1", tr("User Job") + " #1");
 
-        if (JobQueue::IsJobRunning(db, JOB_USERJOB1, curitem->chanid,
+        if (JobQueue::IsJobRunning(JOB_USERJOB1, curitem->chanid,
                                    curitem->startts))
             popup->addButton(tr("Stop") + " " + jobTitle, this,
                              SLOT(doBeginUserJob1()));
@@ -2018,7 +2012,7 @@ void PlaybackBox::showJobPopup()
     if (command != "") {
         jobTitle = gContext->GetSetting("UserJobDesc2", tr("User Job") + " #2");
 
-        if (JobQueue::IsJobRunning(db, JOB_USERJOB2, curitem->chanid,
+        if (JobQueue::IsJobRunning(JOB_USERJOB2, curitem->chanid,
                                    curitem->startts))
             popup->addButton(tr("Stop") + " " + jobTitle, this,
                              SLOT(doBeginUserJob2()));
@@ -2031,7 +2025,7 @@ void PlaybackBox::showJobPopup()
     if (command != "") {
         jobTitle = gContext->GetSetting("UserJobDesc3", tr("User Job") + " #3");
 
-        if (JobQueue::IsJobRunning(db, JOB_USERJOB3, curitem->chanid,
+        if (JobQueue::IsJobRunning(JOB_USERJOB3, curitem->chanid,
                                    curitem->startts))
             popup->addButton(tr("Stop") + " " + jobTitle, this,
                              SLOT(doBeginUserJob3()));
@@ -2044,7 +2038,7 @@ void PlaybackBox::showJobPopup()
     if (command != "") {
         jobTitle = gContext->GetSetting("UserJobDesc4", tr("User Job") + " #4");
 
-        if (JobQueue::IsJobRunning(db, JOB_USERJOB4, curitem->chanid,
+        if (JobQueue::IsJobRunning(JOB_USERJOB4, curitem->chanid,
                                    curitem->startts))
             popup->addButton(tr("Stop") + " " + jobTitle, this,
                              SLOT(doBeginUserJob4()));
@@ -2071,7 +2065,6 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
 
     initPopup(popup, program, "", "");
 
-    QSqlDatabase *db = QSqlDatabase::database();
     QButton *playButton;
 
     if (curitem->programflags & FL_BOOKMARK)
@@ -2101,11 +2094,11 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
     // Remove this check and the auto expire buttons if a third button is added
     // to the StoragePopup screen.  Otherwise for non-max-episode schedules,
     // the popup will only show one button
-    if (delitem && delitem->UsesMaxEpisodes(db))
+    if (delitem && delitem->UsesMaxEpisodes())
     {
         popup->addButton(tr("Storage Options"), this, SLOT(showStoragePopup()));
     } else {
-        if (delitem && delitem->GetAutoExpireFromRecorded(db))
+        if (delitem && delitem->GetAutoExpireFromRecorded())
             popup->addButton(tr("Don't Auto Expire"), this,
                              SLOT(noAutoExpire()));
         else
@@ -2231,8 +2224,7 @@ void PlaybackBox::doPreserveEpisode(void)
 
     cancelPopup();
 
-    QSqlDatabase *db = QSqlDatabase::database();
-    delitem->SetPreserveEpisode(true, db);
+    delitem->SetPreserveEpisode(true);
 }
 
 void PlaybackBox::noPreserveEpisode(void)
@@ -2242,8 +2234,7 @@ void PlaybackBox::noPreserveEpisode(void)
 
     cancelPopup();
 
-    QSqlDatabase *db = QSqlDatabase::database();
-    delitem->SetPreserveEpisode(false, db);
+    delitem->SetPreserveEpisode(false);
 }
 
 void PlaybackBox::askStop(void)
@@ -2289,11 +2280,9 @@ void PlaybackBox::doEditScheduled()
 
     cancelPopup();
 
-    QSqlDatabase *db = QSqlDatabase::database();
-
     ScheduledRecording record;
-    record.loadByProgram(db, curitem);
-    record.exec(db);
+    record.loadByProgram(curitem);
+    record.exec();
     
     connected = FillList();
     update(fullRect);
@@ -2306,13 +2295,12 @@ void PlaybackBox::doJobQueueJob(int jobType, int jobFlags)
 
     cancelPopup();
 
-    QSqlDatabase *db = QSqlDatabase::database();
     ProgramInfo *tmpItem = findMatchingProg(curitem);
 
-    if (JobQueue::IsJobRunning(db, jobType, curitem->chanid,
+    if (JobQueue::IsJobRunning(jobType, curitem->chanid,
                                curitem->startts))
     {
-        JobQueue::ChangeJobCmds(db, jobType, curitem->chanid,
+        JobQueue::ChangeJobCmds(jobType, curitem->chanid,
                                 curitem->startts, JOB_STOP);
         if ((jobType & JOB_COMMFLAG) && (tmpItem))
         {
@@ -2324,9 +2312,10 @@ void PlaybackBox::doJobQueueJob(int jobType, int jobFlags)
         if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
             jobHost = curitem->hostname;
 
-        JobQueue::QueueJob(db, jobType, curitem->chanid, curitem->startts,
+        JobQueue::QueueJob(jobType, curitem->chanid, curitem->startts,
                            "", "", jobHost, jobFlags);
     }
+
 }
 
 void PlaybackBox::doBeginTranscoding()
@@ -2484,8 +2473,7 @@ void PlaybackBox::noAutoExpire(void)
 
     cancelPopup();
 
-    QSqlDatabase *db = QSqlDatabase::database();
-    delitem->SetAutoExpire(false, db);
+    delitem->SetAutoExpire(false);
 
     ProgramInfo *tmpItem = findMatchingProg(delitem);
     if (tmpItem)
@@ -2506,8 +2494,7 @@ void PlaybackBox::doAutoExpire(void)
 
     cancelPopup();
 
-    QSqlDatabase *db = QSqlDatabase::database();
-    delitem->SetAutoExpire(true, db);
+    delitem->SetAutoExpire(true);
 
     ProgramInfo *tmpItem = findMatchingProg(delitem);
     if (tmpItem)
@@ -3036,9 +3023,10 @@ void PlaybackBox::showRecGroupChooser(void)
     label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
 
     QStringList groups;
-    QSqlDatabase *m_db = QSqlDatabase::database();
-    QString thequery = QString("SELECT DISTINCT recgroup from recorded");
-    QSqlQuery query = m_db->exec(thequery);
+    
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT DISTINCT recgroup from recorded;");
+    query.exec();
 
     QString tmpType = recGroupType[recGroup];
     recGroupType.clear();
@@ -3050,7 +3038,7 @@ void PlaybackBox::showRecGroupChooser(void)
     else
         groups += recGroup;
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.isActive() && query.size() > 0)
         while (query.next())
         {
             QString key = QString::fromUtf8(query.value(0).toString());
@@ -3067,10 +3055,9 @@ void PlaybackBox::showRecGroupChooser(void)
 
     if (gContext->GetNumSetting("UseCategoriesAsRecGroups"))
     {
-        thequery = QString("SELECT DISTINCT category from recorded");
-        query = m_db->exec(thequery);
+        query.prepare("SELECT DISTINCT category from recorded;");
 
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.exec() && query.isActive() && query.size() > 0)
             while (query.next())
             {
                 QString key = QString::fromUtf8(query.value(0).toString());
@@ -3213,12 +3200,12 @@ QString PlaybackBox::getRecGroupPassword(QString group)
     }
     else
     {
-        QSqlDatabase *m_db = QSqlDatabase::database();
-        QString thequery = QString("SELECT password FROM recgrouppassword "
-                                   "WHERE recgroup = '%1';").arg(group);
-        QSqlQuery query = m_db->exec(thequery);
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT password FROM recgrouppassword "
+                                   "WHERE recgroup = :GROUP ;");
+        query.bindValue(":GROUP", group);
 
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.exec() && query.isActive() && query.size() > 0)
             if (query.next())
                 result = query.value(0).toString();
     }
@@ -3233,14 +3220,13 @@ void PlaybackBox::fillRecGroupPasswordCache(void)
 {
     recGroupPwCache.clear();
 
-    QSqlDatabase *m_db = QSqlDatabase::database();
-    QString thequery = QString("SELECT recgroup, password "
-                               "FROM recgrouppassword "
-                               "WHERE password is not null "
-                               "AND password <> '' ");
-    QSqlQuery query = m_db->exec(thequery);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT recgroup, password "
+                  "FROM recgrouppassword "
+                  "WHERE password is not null "
+                  "AND password <> '' ;");
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
         while (query.next())
             recGroupPwCache[query.value(0).toString()] =
                 query.value(1).toString();
@@ -3276,16 +3262,17 @@ void PlaybackBox::showRecGroupChanger(void)
     label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
 
     QStringList groups;
-    QSqlDatabase *m_db = QSqlDatabase::database();
-    QString thequery = QString("SELECT DISTINCT recgroup from recorded");
-    QSqlQuery query = m_db->exec(thequery);
+
 
     if (delitem->recgroup == "Default")
         groups += tr("Default");
     else
         groups += delitem->recgroup;
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT DISTINCT recgroup from recorded");
+
+    if (query.exec() && query.isActive() && query.size() > 0)
         while (query.next())
             if (query.value(0).toString() != delitem->recgroup)
                 if (query.value(0).toString() == "Default")
@@ -3345,8 +3332,6 @@ void PlaybackBox::changeSetRecGroup(void)
     if (newRecGroup == tr("Default"))
         newRecGroup = "Default";
 
-    QSqlDatabase *m_db = QSqlDatabase::database();
-
     if (onPlaylist)
     {
         ProgramInfo *tmpItem;
@@ -3356,11 +3341,11 @@ void PlaybackBox::changeSetRecGroup(void)
         {
             tmpItem = findMatchingProg(*it);
             if (tmpItem)
-                tmpItem->ApplyRecordRecGroupChange(m_db, newRecGroup);
+                tmpItem->ApplyRecordRecGroupChange(newRecGroup);
         }
         playList.clear();
     } else {
-        delitem->ApplyRecordRecGroupChange(m_db, newRecGroup);
+        delitem->ApplyRecordRecGroupChange(newRecGroup);
     }
     
     inTitle = gContext->GetNumSetting("PlaybackBoxStartInTitle", 0);
@@ -3504,19 +3489,23 @@ void PlaybackBox::changeRecGroupPassword(void)
     }
     else
     {
-        QSqlDatabase *m_db = QSqlDatabase::database();
-        QString thequery;
+        MSqlQuery query(MSqlQuery::InitCon());
 
-        thequery = QString("DELETE FROM recgrouppassword "
-                           "WHERE recgroup = '%1'").arg(recGroup);
-        m_db->exec(thequery);
+        query.prepare("DELETE FROM recgrouppassword "
+                           "WHERE recgroup = :RECGROUP ;");
+        query.bindValue(":RECGROUP", recGroup);       
+
+        query.exec();
 
         if (newPassword != "")
         {
-            thequery = QString("INSERT INTO recgrouppassword "
-                               "(recgroup, password) VALUES "
-                               "('%1', '%2')").arg(recGroup).arg(newPassword);
-            m_db->exec(thequery);
+            query.prepare("INSERT INTO recgrouppassword "
+                          "(recgroup, password) VALUES "
+                          "( :RECGROUP , :PASSWD )");
+            query.bindValue(":RECGROUP", recGroup);
+            query.bindValue(":PASSWD", newPassword);
+
+            query.exec();
         }
     }
 }

@@ -13,13 +13,11 @@
 #define CHECKNIT_TIMER 5000
 //#define SISCAN_DEBUG
 
-SIScan::SIScan(DVBChannel* advbchannel,QSqlDatabase *thedb, pthread_mutex_t* _db_lock, int _sourceID)
+SIScan::SIScan(DVBChannel* advbchannel, int _sourceID)
 {
     /* setup links to parents and db connections */
     chan = advbchannel;
     sourceID = _sourceID;
-    db = thedb;
-    db_lock = _db_lock;
 
     /* setup boolean values for thread */
     scannerRunning = false;
@@ -67,27 +65,25 @@ bool SIScan::ScanServicesSourceID(int SourceID)
     if (scanMode == TRANSPORT_LIST)
         return false;
 
+    MSqlQuery query(MSqlQuery::InitCon());
     /* Run DB query to get transports on sourceid SourceID connected to this card */
     QString theQuery = QString("select mplexid, sistandard, transportid from dtv_multiplex where "
                        "sourceid = %1")
                        .arg(SourceID);
+    query.prepare(theQuery);
 
-    pthread_mutex_lock(db_lock);
-    QSqlQuery query = db->exec(theQuery);
-
-    if (!query.isActive())
+    if (!query.exec() || !query.isActive())
         MythContext::DBError("Get Transports for SourceID", query);
 
-    if (query.numRowsAffected() <= 0)
+    if (query.size() <= 0)
     {
         SISCAN(QString("Unable to find any transports for sourceId %1.").arg(sourceID));
-        pthread_mutex_unlock(db_lock);
         return false;
     }
 
     scanTransports.clear();
 
-    transportsCount = transportsToScan = query.numRowsAffected();
+    transportsCount = transportsToScan = query.size();
     int tmp = transportsToScan;
     while (tmp--)
     {
@@ -100,7 +96,6 @@ bool SIScan::ScanServicesSourceID(int SourceID)
         t.FriendlyName = QString("Transport ID %1").arg(query.value(2).toString());
         scanTransports += t;
     }
-    pthread_mutex_unlock(db_lock);
 
     sourceIDTransportTuned = false;
     scanMode = TRANSPORT_LIST;    
@@ -223,8 +218,7 @@ void SIScan::StartScanner()
                         {
                             if ((*i).mplexid == -1)
                             {
-                                pthread_mutex_lock(db_lock);
-                                MSqlQuery query(QString::null, db);
+                                MSqlQuery query(MSqlQuery::InitCon());
                                 query.prepare("INSERT into dtv_multiplex (frequency, "
                                                "modulation, sistandard, sourceid) "
                                                "VALUES (:FREQUENCY,:MODULATION,\"atsc\",:SOURCEID);");
@@ -242,12 +236,11 @@ void SIScan::StartScanner()
                                 if (!query.isActive())
                                     MythContext::DBError("Getting ID of new Transport.", query);
 
-                                if (query.numRowsAffected() > 0)
+                                if (query.size() > 0)
                                 {
                                     query.next();
                                     chan->SetCurrentTransportDBID(query.value(0).toInt());
                                 }
-                                pthread_mutex_unlock(db_lock);
 
                             }
                             timer.start();
@@ -306,6 +299,9 @@ bool SIScan::ATSCScanTransport(int SourceID, int FrequencyBand)
     scanTransports.clear();
 	
     /* Now generate a list of frequencies to scan and add it to the atscScanTransportList */
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
     for (int x = 0 ; x < transportsToScan ; x++)
     {
         TransportScanList a;
@@ -323,20 +319,18 @@ bool SIScan::ATSCScanTransport(int SourceID, int FrequencyBand)
                            .arg(SourceID)
                            .arg(Frequency);
 
-        pthread_mutex_lock(db_lock);
-        QSqlQuery query = db->exec(theQuery);
+        query.prepare(theQuery);
     
-        if (!query.isActive())
+        if (!query.exec() || !query.isActive())
             MythContext::DBError("Check for existing transport", query);
     
-        if (query.numRowsAffected() <= 0)
+        if (query.size() <= 0)
             a.mplexid = -1;
         else
         {
             query.next();
             a.mplexid = query.value(0).toInt();            
         }
-        pthread_mutex_unlock(db_lock);
         scanTransports += a;
 
     }    
@@ -432,20 +426,20 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
     TODO: If you get a Version mismatch and you are not in setupscan mode you will want to issue a
           scan of the other transports that have the same networkID */
 
+    MSqlQuery query(MSqlQuery::InitCon());
     QString versionQuery = QString("SELECT serviceversion,sourceid FROM dtv_multiplex "
                                    "WHERE mplexid = %1")
                                    .arg(DVBTID);
-    pthread_mutex_lock(db_lock);
-    MSqlQuery query(QString::null, db);
+    query.prepare(versionQuery);
 
-    if(!query.exec(versionQuery))
+    if(!query.exec())
         MythContext::DBError("Selecting channel/dtv_multiplex", query);
 
     if (!query.isActive())
          MythContext::DBError("Check Channel full in channel/dtv_multiplex.", query);
 
 
-    if (query.numRowsAffected() > 0)
+    if (query.size() > 0)
     {
         query.next();
 
@@ -455,7 +449,6 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
         {
             SISCAN("Service table up to date for this network.");
             emit ServiceScanUpdateText("Channels up to date");
-            pthread_mutex_unlock(db_lock);
             return;
         }
         else
@@ -464,8 +457,9 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
                                    "WHERE mplexid = %2")
                                    .arg((*s).Version)
                                    .arg(DVBTID);
+            query.prepare(versionQuery);
 
-            if(!query.exec(versionQuery))
+            if(!query.exec())
                 MythContext::DBError("Selecting channel/dtv_multiplex", query);
 
             if (!query.isActive())
@@ -482,21 +476,21 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
                                "mplexid=%1 and videodevice = \"%2\"")
                                .arg(DVBTID)
                                .arg(chan->GetCardNum());
+    query.prepare(FTAQuery); 
 
-    if(!query.exec(FTAQuery))      
+    if(!query.exec())      
         MythContext::DBError("Getting FreeToAir for cardinput", query);
             
     if (!query.isActive())
         MythContext::DBError("Getting FreeToAir for cardinput", query);
 
-    if (query.numRowsAffected() > 0)
+    if (query.size() > 0)
     {
         query.next();
         FTAOnly = query.value(0).toInt();
     }
     else
     {
-        pthread_mutex_unlock(db_lock);
         return;    
     }
 
@@ -514,15 +508,16 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
                                        // Use a different style query here in the future when you are
                                        // parsing other transports..  This will work for now..
                                        .arg(chan->GetCurrentTransportDBID());
+            query.prepare(theQuery);
 
-            if(!query.exec(theQuery))
+            if(!query.exec())
                 MythContext::DBError("Selecting channel/dtv_multiplex", query);
 
             if (!query.isActive())
                 MythContext::DBError("Check Channel full in channel/dtv_multiplex.", query);
 
             // If channel not present add it
-            if (query.numRowsAffected() <= 0)
+            if (query.size() <= 0)
             {
 
                     if ((*s).ServiceName.stripWhiteSpace().isEmpty())
@@ -588,7 +583,6 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
                 emit ServiceScanUpdateText(status);
             }
     }
-    pthread_mutex_unlock(db_lock);
 
 }
 
@@ -681,8 +675,7 @@ void SIScan::UpdateTransportsInDB(NITObject NIT)
 
     for (t = NIT.Transport.begin() ; t != NIT.Transport.end() ; ++t )
     {
-        pthread_mutex_lock(db_lock);
-        MSqlQuery query(QString::null, db);
+        MSqlQuery query(MSqlQuery::InitCon());
         // See if transport already in database
         QString theQuery = QString("select * from dtv_multiplex where NetworkID = %1 and "
                    " TransportID = %2 and Frequency = %3 and sourceID = %4")
@@ -690,14 +683,16 @@ void SIScan::UpdateTransportsInDB(NITObject NIT)
                    .arg((*t).TransportID)
                    .arg((*t).Frequency)
                    .arg(sourceID);
-        if(!query.exec(theQuery))
+        query.prepare(theQuery);
+
+        if(!query.exec())
             MythContext::DBError("Selecting transports", query);
 
         if (!query.isActive())
             MythContext::DBError("Check Transport in dtv_multiplex.", query);
 
         // If transport not present add it, and move on to the next
-        if (query.numRowsAffected() <= 0)
+        if (query.size() <= 0)
         {
             emit TransportScanUpdateText(QString("Transport %1 - %2 Added")
                    .arg((*t).TransportID)
@@ -738,7 +733,6 @@ void SIScan::UpdateTransportsInDB(NITObject NIT)
                 MythContext::DBError("Inserting new transport", query);
             if (!query.isActive())
                 MythContext::DBError("Adding transport to Database.", query);
-            pthread_mutex_unlock(db_lock);
         }
         else
         {
@@ -749,7 +743,6 @@ void SIScan::UpdateTransportsInDB(NITObject NIT)
             SISCAN(QString("Transport TID = %1 NID = %2 already in Database")
                    .arg((*t).TransportID)
                    .arg((*t).NetworkID));
-            pthread_mutex_unlock(db_lock);
         }
     }
 }
@@ -765,16 +758,16 @@ int SIScan::GetDVBTID(uint16_t NetworkID,uint16_t TransportID,int CurrentMplexId
     // and the NetworkID/TransportID
 
     // First see if current one is NULL, if so update those values and return current mplexid
-    pthread_mutex_lock(db_lock);
 
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     QString theQuery;
 
     theQuery = QString("select networkid,transportid from dtv_multiplex where "
                        "mplexid = %1")
                        .arg(CurrentMplexId);
+    query.prepare(theQuery);
 
-    if(!query.exec(theQuery))
+    if(!query.exec())
         MythContext::DBError("Getting mplexid global search", query);
 
     if (!query.isActive())
@@ -788,7 +781,6 @@ int SIScan::GetDVBTID(uint16_t NetworkID,uint16_t TransportID,int CurrentMplexId
 
     if ((query.value(0).toInt() == NetworkID) && (query.value(1).toInt() == TransportID))
     {
-        pthread_mutex_unlock(db_lock);
         return CurrentMplexId;
     }
 
@@ -799,14 +791,14 @@ int SIScan::GetDVBTID(uint16_t NetworkID,uint16_t TransportID,int CurrentMplexId
                            .arg(NetworkID)
                            .arg(TransportID)
                            .arg(CurrentMplexId);
+        query.prepare(theQuery);
 
-        if(!query.exec(theQuery))
+        if(!query.exec())
             MythContext::DBError("Getting mplexid global search", query);
 
         if (!query.isActive())
             MythContext::DBError("Getting mplexid global search", query);
 
-        pthread_mutex_unlock(db_lock);
         return CurrentMplexId;
 
     }
@@ -819,8 +811,9 @@ int SIScan::GetDVBTID(uint16_t NetworkID,uint16_t TransportID,int CurrentMplexId
                        .arg(NetworkID)
                        .arg(TransportID)
                        .arg(CurrentMplexId);
+    query.prepare(theQuery);
 
-    if(!query.exec(theQuery))
+    if(!query.exec())
         MythContext::DBError("Finding matching mplexid", query);
 
     if (!query.isActive())
@@ -830,24 +823,22 @@ int SIScan::GetDVBTID(uint16_t NetworkID,uint16_t TransportID,int CurrentMplexId
 
     // If you got an exact match just return it, since there is no question what
     // mplexid this NetworkId/TransportId is for.
-    if (query.numRowsAffected() == 1)
+    if (query.size() == 1)
     {
 #ifdef SISCAN_DEBUG
         printf("Exact Match!\n");
 #endif
         int tmp = query.value(0).toInt();
-        pthread_mutex_unlock(db_lock);
         return tmp;
     }
 
     // If you got more than 1 hit then all you can do is hope that this NetworkID/TransportID
     // pair belongs to the CurrentMplexId;
-    if (query.numRowsAffected() > 1)
+    if (query.size() > 1)
     {
 #ifdef SISCAN_DEBUG
         printf("more than 1 hit\n");
 #endif
-        pthread_mutex_unlock(db_lock);
         return CurrentMplexId;
     }
 
@@ -857,8 +848,9 @@ int SIScan::GetDVBTID(uint16_t NetworkID,uint16_t TransportID,int CurrentMplexId
                        "networkID = %1 and transportID = %2")
                        .arg(NetworkID)
                        .arg(TransportID);
+    query.prepare(theQuery);
 
-    if(!query.exec(theQuery))
+    if(!query.exec())
         MythContext::DBError("Getting mplexid global search", query);
 
     if (!query.isActive())
@@ -867,26 +859,23 @@ int SIScan::GetDVBTID(uint16_t NetworkID,uint16_t TransportID,int CurrentMplexId
     query.next();
 
     // If you still didn't find this combo return -1 (failure)
-    if (query.numRowsAffected() <= 0)
+    if (query.size() <= 0)
     {
-        pthread_mutex_unlock(db_lock);
         return -1;
     }
 
     // Now you are in trouble.. You found more than 1 match, so just guess that its the first
     // entry in the database..
-    if (query.numRowsAffected() > 1)
+    if (query.size() > 1)
     {
         SISCAN(QString("Found more than 1 match for NetworkID %1 TransportID %2")
                .arg(NetworkID).arg(TransportID));
         int tmp = query.value(0).toInt();
-        pthread_mutex_unlock(db_lock);
         return tmp;
     }
 
     // You found the entries, but it was on a different sourceID, so return that value
     int retval = query.value(0).toInt();
-    pthread_mutex_unlock(db_lock);
 
     return retval;
 
@@ -895,14 +884,13 @@ int SIScan::GetDVBTID(uint16_t NetworkID,uint16_t TransportID,int CurrentMplexId
 int SIScan::GenerateNewChanID()
 {
 
-    // This function must be called with db_lock enabled
-
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     QString theQuery = QString("select max(chanid) as maxchan from channel where sourceid=%1")
                        .arg(sourceID);
+    query.prepare(query);
 
-    if(!query.exec(theQuery))
+    if(!query.exec())
         MythContext::DBError("Calculating new ChanID", query);
 
     if (!query.isActive())
@@ -911,7 +899,7 @@ int SIScan::GenerateNewChanID()
     query.next();
 
     // If transport not present add it, and move on to the next
-    if (query.numRowsAffected() <= 0)
+    if (query.size() <= 0)
         return sourceID * 1000;
 
     int MaxChanID = query.value(0).toInt();
@@ -925,7 +913,7 @@ int SIScan::GenerateNewChanID()
 
 void SIScan::AddEvents()
 {
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     QString theQuery;
     int counter = 0;
 
@@ -962,9 +950,10 @@ void SIScan::AddEvents()
             printf("CHANID QUERY: %s\n",theQuery.ascii());
 #endif
         }
-        pthread_mutex_lock(db_lock);
 
-        if(!query.exec(theQuery))
+        query.prepare(theQuery);
+
+        if(!query.exec())
             MythContext::DBError("Looking up chanID", query);
 
         if (!query.isActive())
@@ -972,10 +961,9 @@ void SIScan::AddEvents()
 
         query.next();
 
-        if (query.numRowsAffected() <= 0)
+        if (query.size() <= 0)
         {
             SISCAN("ChanID not found so event skipped");
-            pthread_mutex_unlock(db_lock);
             events->clear();
             delete events;
             continue;
@@ -985,7 +973,6 @@ void SIScan::AddEvents()
         // Check to see if we are interseted in this channel 
         if (!query.value(1).toBool())
         {
-            pthread_mutex_unlock(db_lock);
             events->clear();
             delete events;
             continue;
@@ -1010,7 +997,7 @@ void SIScan::AddEvents()
             if (!query.isActive())
                 MythContext::DBError("Checking Event", query);
 
-            if (query.numRowsAffected() <= 0)
+            if (query.size() <= 0)
             {
                  counter++;
 
@@ -1037,7 +1024,6 @@ void SIScan::AddEvents()
                    MythContext::DBError("Adding Event", query);
             }
         }
-        pthread_mutex_unlock(db_lock);
 
         if (counter > 0)
         {

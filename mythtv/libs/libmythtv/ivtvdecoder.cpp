@@ -21,9 +21,8 @@ using namespace std;
 
 bool IvtvDecoder::ntsc = true;
 
-IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
-                         ProgramInfo *pginfo)
-           : DecoderBase(parent, db, pginfo)
+IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
+           : DecoderBase(parent, pginfo)
 {
     lastStartFrame = 0;
     videoPlayed = 0;
@@ -210,7 +209,7 @@ int IvtvDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
      
     ringBuffer->CalcReadAheadThresh(8000);
 
-    if ((m_playbackinfo && m_db) || livetv || watchingrecording)
+    if (m_playbackinfo || livetv || watchingrecording)
     {
         recordingHasPositionMap = SyncPositionMap();
         if (recordingHasPositionMap && !livetv && !watchingrecording)

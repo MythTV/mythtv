@@ -14,7 +14,7 @@ using namespace std;
 class HouseKeeper
 {
   public:
-    HouseKeeper(bool runthread, bool master, QSqlDatabase *ldb);
+    HouseKeeper(bool runthread, bool master);
    ~HouseKeeper();
 
   protected:
@@ -22,7 +22,6 @@ class HouseKeeper
     static void *doHouseKeepingThread(void *param);
 
   private:
-    QSqlDatabase *db;
 
     bool wantToRun(const QString &dbTag, int period, int minhour, int maxhour);
     void updateLastrun(const QString &dbTag);

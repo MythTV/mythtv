@@ -195,13 +195,9 @@ class AudioReencodeBuffer : public AudioOutput
     long long last_audiotime;
 };
 
-Transcode::Transcode(QSqlDatabase *db, ProgramInfo *pginfo)
+Transcode::Transcode(ProgramInfo *pginfo)
 {
-    QString dbname = QString("transcode%1%2").arg(getpid()).arg(rand());
-    nvpdb = new MythSqlDatabase(dbname);
-
     m_proginfo = pginfo;
-    m_db = db;
     nvr = NULL;
     nvp = NULL;
     inRingBuffer = NULL;
@@ -231,8 +227,6 @@ Transcode::~Transcode()
         }
         delete kfa_table;
     }
-    if (nvpdb)
-        delete nvpdb;
 }
 void Transcode::ReencoderAddKFA(long curframe, long lastkey, long num_keyframes)
 {
@@ -252,9 +246,9 @@ bool Transcode::GetProfile(QString profileName, QString encodingType)
     {
         bool result = false;
         if (encodingType == "MPEG-2")
-            result = profile.loadByGroup(m_db, "MPEG2", "Transcoders");
+            result = profile.loadByGroup("MPEG2", "Transcoders");
         if (encodingType == "MPEG-4" || encodingType == "RTjpeg")
-            result = profile.loadByGroup(m_db, "RTjpeg/MPEG4",
+            result = profile.loadByGroup("RTjpeg/MPEG4",
                                          "Transcoders");
         if (! result)
         {
@@ -272,7 +266,7 @@ bool Transcode::GetProfile(QString profileName, QString encodingType)
         profileID = profileName.toInt(&isNum);
         // If a bad profile is specified, there will be trouble
         if (isNum && profileID > 0)
-            profile.loadByID(m_db, profileID);
+            profile.loadByID(profileID);
         else
         {
             VERBOSE(VB_IMPORTANT, QString("Couldn't find profile #: %1").
@@ -305,7 +299,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     int jobID = -1;
     if (chkTranscodeDB)
     {
-        jobID = JobQueue::GetJobID(m_db, JOB_TRANSCODE, m_proginfo->chanid,
+        jobID = JobQueue::GetJobID(JOB_TRANSCODE, m_proginfo->chanid,
                                    m_proginfo->startts);
 
         if (jobID < 0)
@@ -315,23 +309,22 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             return REENCODE_ERROR;
         }
 
-        JobQueue::ChangeJobComment(m_db, jobID,
-                                   "0% " + QObject::tr("Completed"));
+        JobQueue::ChangeJobComment(jobID, "0% " + QObject::tr("Completed"));
     }
 
-    nvp = new NuppelVideoPlayer(nvpdb, m_proginfo);
+    nvp = new NuppelVideoPlayer(m_proginfo);
     nvp->SetNoVideo();
 
     QDateTime curtime = QDateTime::currentDateTime();
     QDateTime statustime = curtime;
     if (honorCutList && m_proginfo)
     {
-        if (m_proginfo->IsEditing(m_db) || m_proginfo->IsCommProcessing(m_db))
+        if (m_proginfo->IsEditing() || m_proginfo->IsCommProcessing())
         {
             VERBOSE(VB_IMPORTANT, "Transcoding aborted, cutlist changed");
             return REENCODE_CUTLIST_CHANGE;
         }
-        m_proginfo->SetMarkupFlag(MARK_UPDATED_CUT, false, m_db);
+        m_proginfo->SetMarkupFlag(MARK_UPDATED_CUT, false);
         curtime = curtime.addSecs(60);
     }
 
@@ -766,7 +759,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         if (QDateTime::currentDateTime() > curtime) 
         {
             if (honorCutList && 
-                m_proginfo->CheckMarkupFlag(MARK_UPDATED_CUT, m_db)) 
+                m_proginfo->CheckMarkupFlag(MARK_UPDATED_CUT))
             {
                 unlink(outputname);
                 delete newFrame;
@@ -776,7 +769,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
 
             if (chkTranscodeDB)
             {
-                if (JobQueue::GetJobCmd(m_db, jobID) == JOB_STOP)
+                if (JobQueue::GetJobCmd(jobID) == JOB_STOP)
                 {
                     unlink(outputname);
                     delete newFrame;
@@ -784,7 +777,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                     return REENCODE_STOPPED;
                 }
                 int percentage = curFrameNum * 100 / total_frame_count;
-                JobQueue::ChangeJobComment(m_db, jobID,
+                JobQueue::ChangeJobComment(jobID,
                                            QString("%1% ").arg(percentage) + 
                                            QObject::tr("Completed"));
             }

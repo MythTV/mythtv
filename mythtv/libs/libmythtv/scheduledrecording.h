@@ -10,7 +10,6 @@
 using namespace std;
 
 class ProgramInfo;
-class QSqlDatabase;
 
 class RootSRGroup;
 class RecOptDialog;
@@ -56,7 +55,7 @@ public:
     ScheduledRecording();
     ScheduledRecording(const ScheduledRecording& other);
 
-    virtual void load(QSqlDatabase* db);
+    virtual void load();
     
     virtual MythDialog* dialogWidget(MythMainWindow* parent,
                                      const char* widgetName=0);    
@@ -84,35 +83,35 @@ public:
     void setRecGroup(const QString& recgroup);
 
     
-    virtual void save(QSqlDatabase* db);
+    virtual void save();
 
-    virtual void loadByID(QSqlDatabase* db, int id);
-    virtual void loadByProgram(QSqlDatabase* db, ProgramInfo* proginfo);
-    virtual void loadBySearch(QSqlDatabase *db, RecSearchType lsearch,
+    virtual void loadByID(int id);
+    virtual void loadByProgram(ProgramInfo* proginfo);
+    virtual void loadBySearch(RecSearchType lsearch,
                               QString text, QString what);
 
-    virtual int exec(QSqlDatabase* db, bool saveOnExec = true, bool doLoad = false)
-        { return ConfigurationDialog::exec(db, saveOnExec, doLoad); }    
+    virtual int exec(bool saveOnExec = true, bool doLoad = false)
+        { return ConfigurationDialog::exec(saveOnExec, doLoad); }    
         
-    void remove(QSqlDatabase* db);
+    void remove();
     int getRecordID(void) const { return id->intValue(); };
     QString getProfileName(void) const;
 
-    void findMatchingPrograms(QSqlDatabase* db, list<ProgramInfo*>& proglist);
+    void findMatchingPrograms(list<ProgramInfo*>& proglist);
 
     // Do any necessary bookkeeping after a matching program has been
     // recorded
-    void doneRecording(QSqlDatabase* db, const ProgramInfo& proginfo);
+    void doneRecording(const ProgramInfo& proginfo);
 
     // Remember a program has been reccorded before (means it won't
     // be recorded again)
-    void addHistory(QSqlDatabase* db, const ProgramInfo& proginfo);
+    void addHistory(const ProgramInfo& proginfo);
 
     // Forget whether a program has been recorded before (allows it to
     // be recorded again)
-    void forgetHistory(QSqlDatabase* db, const ProgramInfo& proginfo);
+    void forgetHistory(const ProgramInfo& proginfo);
 
-    static void fillSelections(QSqlDatabase* db, SelectSetting* setting);
+    static void fillSelections(SelectSetting* setting);
 
     static void signalChange(int recordid);
     // Use -1 for recordid when all recordids are potentially
@@ -166,9 +165,9 @@ protected slots:
     void runShowDetails();
 
 protected:
-    virtual void setDefault(QSqlDatabase *db, bool haschannel);
-    virtual void setProgram(ProgramInfo *proginfo, QSqlDatabase *db = NULL);
-    void fetchChannelInfo(QSqlDatabase *db);
+    virtual void setDefault(bool haschannel);
+    virtual void setProgram(ProgramInfo *proginfo);
+    void fetchChannelInfo();
     
     class ID: virtual public IntegerSetting,
               public AutoIncrementStorage 
@@ -237,19 +236,17 @@ protected:
 class ScheduledRecordingEditor: public ListBoxSetting, public ConfigurationDialog {
     Q_OBJECT
 public:
-    ScheduledRecordingEditor(QSqlDatabase* _db):
-        db(_db) {};
+    ScheduledRecordingEditor() {};
     virtual ~ScheduledRecordingEditor() {};
 
-    virtual int exec(QSqlDatabase* db);
-    virtual void load(QSqlDatabase* db);
-    virtual void save(QSqlDatabase* db) { (void)db; };
+    virtual int exec();
+    virtual void load();
+    virtual void save() { };
 
 protected slots:
     void open(int id);
 
 protected:
-    QSqlDatabase* db;
 };
 
 

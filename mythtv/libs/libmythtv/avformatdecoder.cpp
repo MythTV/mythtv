@@ -135,9 +135,8 @@ int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
 }
 
 
-AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
-                                 ProgramInfo *pginfo)
-               : DecoderBase(parent, db, pginfo)
+AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
+               : DecoderBase(parent, pginfo)
 {
     d = new AvFormatDecoderPrivate(this);
     
@@ -478,7 +477,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     ringBuffer->CalcReadAheadThresh(bitrate);
 
-    if ((m_playbackinfo && m_db) || livetv || watchingrecording)
+    if ((m_playbackinfo) || livetv || watchingrecording)
     {
         recordingHasPositionMap = SyncPositionMap();
         if (recordingHasPositionMap && !livetv && !watchingrecording)

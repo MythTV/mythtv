@@ -314,7 +314,6 @@ void ManualBox::stopClicked(void)
 void ManualBox::startClicked(void)
 {
     ProgramInfo progInfo;
-    QSqlDatabase *db = QSqlDatabase::database();
 
     m_startButton->setEnabled(false);
 
@@ -330,8 +329,8 @@ void ManualBox::startClicked(void)
     progInfo.startts = now;
     progInfo.endts = now.addSecs(m_duration->value() * 60);
  
-    progInfo.Save(db);
+    progInfo.Save();
 
-    progInfo.ApplyRecordStateChange(db, kSingleRecord);
+    progInfo.ApplyRecordStateChange(kSingleRecord);
 }
 

@@ -9,7 +9,6 @@
 #include "xmlparse.h"
 #include "programinfo.h"
 
-class QSqlDatabase;
 class ChannelInfo;
 
 class ChannelRecPriority : public MythDialog
@@ -22,8 +21,7 @@ class ChannelRecPriority : public MythDialog
         byRecPriority,
     };
 
-    ChannelRecPriority(QSqlDatabase *ldb, MythMainWindow *parent, 
-                  const char *name = 0);
+    ChannelRecPriority(MythMainWindow *parent, const char *name = 0);
     ~ChannelRecPriority();
 
   protected slots:
@@ -32,7 +30,7 @@ class ChannelRecPriority : public MythDialog
     void pageDown() { cursorDown(true); }
     void pageUp() { cursorUp(true); }
     void changeRecPriority(int howMuch);
-    void applyChannelRecPriorityChange(QSqlDatabase*, QString, const QString&);
+    void applyChannelRecPriorityChange(QString, const QString&);
 
     void saveRecPriority(void);
 
@@ -56,8 +54,6 @@ class ChannelRecPriority : public MythDialog
     QDomElement xmldata;
 
     ChannelInfo *curitem;
-
-    QSqlDatabase *db;
 
     QPixmap myBackground;
     QPixmap *bgTransBackup;

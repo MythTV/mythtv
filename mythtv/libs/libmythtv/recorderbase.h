@@ -20,7 +20,6 @@ class RecorderBase
 
     void SetRingBuffer(RingBuffer *rbuf);
     void SetRecording(ProgramInfo *pginfo);
-    void SetDB(QSqlDatabase *db, pthread_mutex_t *lock);
 
     float GetFrameRate(void) { return video_frame_rate; }
     void SetFrameRate(float rate) { video_frame_rate = rate; }
@@ -76,9 +75,6 @@ class RecorderBase
 
     ProgramInfo *curRecording;
     QString curChannelName;
-
-    QSqlDatabase *db_conn;
-    pthread_mutex_t *db_lock;
 
     QWaitCondition pauseWait;
 };

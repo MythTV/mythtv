@@ -47,11 +47,8 @@ void BuildVideoMarkup(QString& filename)
 
     RingBuffer *tmprbuf = new RingBuffer(filename, false);
 
-    QString name = QString("commflag%1%2").arg(getpid()).arg(rand());
 
-    MythSqlDatabase *mdb = new MythSqlDatabase(name);
-
-    if (!mdb || !mdb->isOpen())
+    if (!MSqlQuery::testDBConnection())
     {
         cerr << "Unable to open commflag db connection\n";
         delete tmprbuf;
@@ -59,7 +56,7 @@ void BuildVideoMarkup(QString& filename)
         return;
     }
 
-    NuppelVideoPlayer *nvp = new NuppelVideoPlayer(mdb, program_info);
+    NuppelVideoPlayer *nvp = new NuppelVideoPlayer(program_info);
     nvp->SetRingBuffer(tmprbuf);
 
     nvp->RebuildSeekTable(!quiet);
@@ -70,17 +67,15 @@ void BuildVideoMarkup(QString& filename)
     delete nvp;
     delete tmprbuf;
     delete program_info;
-    delete mdb;
-
 }
 
-void CopySkipListToCutList(QSqlDatabase *db, QString chanid, QString starttime)
+void CopySkipListToCutList(QString chanid, QString starttime)
 {
     QMap<long long, int> cutlist;
     QMap<long long, int>::Iterator it;
 
     ProgramInfo *pginfo =
-        ProgramInfo::GetProgramFromRecorded(db, chanid, starttime);
+        ProgramInfo::GetProgramFromRecorded(chanid, starttime);
 
     if (!pginfo)
     {
@@ -89,23 +84,23 @@ void CopySkipListToCutList(QSqlDatabase *db, QString chanid, QString starttime)
         exit(-1);
     }
 
-    pginfo->GetCommBreakList(cutlist, db);
+    pginfo->GetCommBreakList(cutlist);
     for (it = cutlist.begin(); it != cutlist.end(); ++it)
         if (it.data() == MARK_COMM_START)
             cutlist[it.key()] = MARK_CUT_START;
         else
             cutlist[it.key()] = MARK_CUT_END;
-    pginfo->SetCutList(cutlist, db);
+    pginfo->SetCutList(cutlist);
 }
 
-int FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
+int FlagCommercials(QString chanid, QString starttime)
 {
     int breaksFound = 0;
     int commDetectMethod = gContext->GetNumSetting("CommercialSkipMethod",
                                                    COMM_DETECT_BLANKS);
     QMap<long long, int> blanks;
     ProgramInfo *program_info =
-        ProgramInfo::GetProgramFromRecorded(db, chanid, starttime);
+        ProgramInfo::GetProgramFromRecorded(chanid, starttime);
 
     if (!program_info)
     {
@@ -122,7 +117,7 @@ int FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
             chanid.ascii(), starttime.ascii(), program_info->title.ascii());
         fflush( stdout );
     
-        if ((!force) && (program_info->IsCommProcessing(db)))
+        if ((!force) && (program_info->IsCommProcessing()))
         {
             printf( "IN USE\n" );
             printf( "                        "
@@ -132,7 +127,7 @@ int FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
     }
     else
     {
-        if ((!force) && (program_info->IsCommProcessing(db)))
+        if ((!force) && (program_info->IsCommProcessing()))
             return(0);
     }
 
@@ -148,7 +143,7 @@ int FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
     blanks.clear();
     if (showBlanks)
     {
-        program_info->GetBlankFrameList(blanks, db);
+        program_info->GetBlankFrameList(blanks);
         if (!blanks.empty())
         {
             QMap<long long, int> comms;
@@ -158,7 +153,7 @@ int FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
 
             printf( "\n" );
 
-            program_info->GetCommBreakList(breaks, db);
+            program_info->GetCommBreakList(breaks);
             if (!breaks.empty())
             {
                 printf( "Breaks (from recordedmarkup table)\n" );
@@ -238,7 +233,7 @@ int FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
             if (justBlanks)
             {
                 printf( "Saving new commercial break list to database.\n" );
-                program_info->SetCommBreakList(breaks, db);
+                program_info->SetCommBreakList(breaks);
             }
 
             delete commDetect;
@@ -248,7 +243,7 @@ int FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
     }
     else if (justBlanks)
     {
-        program_info->GetBlankFrameList(blanks, db);
+        program_info->GetBlankFrameList(blanks);
         if (!blanks.empty())
         {
             QMap<long long, int> comms;
@@ -261,11 +256,11 @@ int FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
             breaks.clear();
             orig_breaks.clear();
 
-            program_info->GetCommBreakList(orig_breaks, db);
+            program_info->GetCommBreakList(orig_breaks);
 
             commDetect->SetBlankFrameMap(blanks);
             commDetect->GetCommBreakMap(breaks);
-            program_info->SetCommBreakList(breaks, db);
+            program_info->SetCommBreakList(breaks);
 
             if (!quiet)
                 printf( "%d -> %d\n",
@@ -284,11 +279,7 @@ int FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
 
     RingBuffer *tmprbuf = new RingBuffer(filename, false);
 
-    QString name = QString("commflag%1%2").arg(getpid()).arg(rand());
-
-    MythSqlDatabase *mdb = new MythSqlDatabase(name);
-
-    if (!mdb || !mdb->isOpen())
+    if (!MSqlQuery::testDBConnection())
     {
         cerr << "Unable to open commflag db connection\n";
         delete tmprbuf;
@@ -296,7 +287,7 @@ int FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
         return(0);
     }
     
-    NuppelVideoPlayer *nvp = new NuppelVideoPlayer(mdb, program_info);
+    NuppelVideoPlayer *nvp = new NuppelVideoPlayer(program_info);
     nvp->SetRingBuffer(tmprbuf);
 
     if (rebuildSeekTable)
@@ -318,7 +309,6 @@ int FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
     delete nvp;
     delete tmprbuf;
     delete program_info;
-    delete mdb;
 
     return breaksFound;
 }
@@ -584,10 +574,12 @@ int main(int argc, char *argv[])
         ++argpos;
     }
 
-    gContext = new MythContext(MYTH_BINARY_VERSION, false);
+    gContext = NULL;
+    gContext = new MythContext(MYTH_BINARY_VERSION);
+    gContext->Init(false);
 
-    QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
-    if (!gContext->OpenDatabase(db))
+
+    if (!MSqlQuery::testDBConnection())
     {
         printf("couldn't open db\n");
         exit(11);
@@ -601,7 +593,7 @@ int main(int argc, char *argv[])
     }
 
     if (copyToCutlist) {
-        CopySkipListToCutList(db, chanid, starttime);
+        CopySkipListToCutList(chanid, starttime);
         exit(0);
     }
 
@@ -623,7 +615,7 @@ int main(int argc, char *argv[])
         testMode = false;
         showPercentage = false;
 
-        int breaksFound = FlagCommercials(db, chanid, starttime);
+        int breaksFound = FlagCommercials(chanid, starttime);
 
         delete gContext;
 
@@ -681,11 +673,11 @@ int main(int argc, char *argv[])
     }
     else if (!chanid.isEmpty() && !starttime.isEmpty())
     {
-        FlagCommercials(db, chanid, starttime);
+        FlagCommercials(chanid, starttime);
     }
     else
     {
-        QSqlQuery recordedquery;
+        MSqlQuery recordedquery(MSqlQuery::InitCon());
         QString querystr = QString("SELECT chanid, starttime "
                                     "FROM recorded "
                                     "WHERE endtime < now() "
@@ -706,12 +698,12 @@ int main(int argc, char *argv[])
 
                 if ( allRecorded )
                 {
-                    FlagCommercials(db, chanid, starttime);
+                    FlagCommercials(chanid, starttime);
                 }
                 else
                 {
                     // check to see if this show is already marked
-                    QSqlQuery markupquery;
+                    MSqlQuery markupquery(MSqlQuery::InitCon());
                     QString markupstr = QString("SELECT count(*) "
                                                 "FROM recordedmarkup "
                                                 "WHERE chanid = %1 "
@@ -727,7 +719,7 @@ int main(int argc, char *argv[])
                         if (markupquery.next())
                         {
                             if (markupquery.value(0).toInt() == 0)
-                                FlagCommercials(db, chanid, starttime);
+                                FlagCommercials(chanid, starttime);
                         }
                     }
                 }

@@ -88,56 +88,55 @@ typedef struct jobqueueentry {
 class JobQueue : public QObject
 {
   public:
-    JobQueue(bool master, QSqlDatabase *db);
+    JobQueue(bool master);
     ~JobQueue(void);
     void customEvent(QCustomEvent *e);
 
-    static bool QueueJob(QSqlDatabase* db, int jobType, QString chanid,
+    static bool QueueJob(int jobType, QString chanid,
                          QDateTime starttime, QString args = "",
                          QString comment = "", QString host = "",
                          int flags = 0);
-    static bool QueueJobs(QSqlDatabase* db, int jobTypes, QString chanid,
+    static bool QueueJobs(int jobTypes, QString chanid,
                          QDateTime starttime, QString args = "",
                          QString comment = "", QString host = "");
 
-    static int GetJobID(QSqlDatabase* db, int jobType, QString chanid,
+    static int GetJobID(int jobType, QString chanid,
                         QDateTime starttime);
-    static bool GetJobInfoFromID(QSqlDatabase* db, int jobID, int &jobType,
+    static bool GetJobInfoFromID(int jobID, int &jobType,
                                  QString &chanid, QDateTime &starttime);
 
-    static bool ChangeJobCmds(QSqlDatabase* db, int jobID, int newCmds);
-    static bool ChangeJobCmds(QSqlDatabase* db, int jobType, QString chanid,
+    static bool ChangeJobCmds(int jobID, int newCmds);
+    static bool ChangeJobCmds(int jobType, QString chanid,
                               QDateTime starttime, int newCmds);
-    static bool ChangeJobFlags(QSqlDatabase* db, int jobID, int newFlags);
-    static bool ChangeJobStatus(QSqlDatabase* db, int jobID, int newStatus,
+    static bool ChangeJobFlags(int jobID, int newFlags);
+    static bool ChangeJobStatus(int jobID, int newStatus,
                                 QString comment = "");
-    static bool ChangeJobComment(QSqlDatabase* db, int jobID,
+    static bool ChangeJobComment(int jobID,
                                  QString comment = "");
-    static bool IsJobRunning(QSqlDatabase* db, int jobType, QString chanid,
+    static bool IsJobRunning(int jobType, QString chanid,
                              QDateTime starttime);
-    static bool PauseJob(QSqlDatabase* db, int jobID);
-    static bool ResumeJob(QSqlDatabase* db, int jobID);
-    static bool RestartJob(QSqlDatabase* db, int jobID);
-    static bool StopJob(QSqlDatabase* db, int jobID);
-    static bool DeleteJob(QSqlDatabase* db, int jobID);
+    static bool PauseJob(int jobID);
+    static bool ResumeJob(int jobID);
+    static bool RestartJob(int jobID);
+    static bool StopJob(int jobID);
+    static bool DeleteJob(int jobID);
 
-    static int GetJobCmd(QSqlDatabase* db, int jobID);
-    static int GetJobFlags(QSqlDatabase* db, int jobID);
-    static int GetJobStatus(QSqlDatabase* db, int jobID);
+    static int GetJobCmd(int jobID);
+    static int GetJobFlags(int jobID);
+    static int GetJobStatus(int jobID);
 
-    static bool DeleteAllJobs(QSqlDatabase* db, QString chanid,
-                                     QDateTime starttime);
+    static bool DeleteAllJobs(QString chanid, QDateTime starttime);
 
     static QString JobText(int jobType);
     static QString StatusText(int status);
 
-    static int GetJobsInQueue(QSqlDatabase* db, QMap<int, JobQueueEntry> &jobs,
+    static int GetJobsInQueue(QMap<int, JobQueueEntry> &jobs,
                               int findJobs = JOB_LIST_NOT_DONE);
 
-    static void RecoverQueue(QSqlDatabase* db, bool justOld = false);
-    static void RecoverOldJobsInQueue(QSqlDatabase* db)
-                                      { RecoverQueue(db, true); }
-    static void CleanupOldJobsInQueue(QSqlDatabase* db);
+    static void RecoverQueue(bool justOld = false);
+    static void RecoverOldJobsInQueue()
+                                      { RecoverQueue(true); }
+    static void CleanupOldJobsInQueue();
 
   private:
     static void *QueueProcesserThread(void *param);
@@ -147,12 +146,12 @@ class JobQueue : public QObject
     void ProcessJob(int id, int jobType, QString chanid, QDateTime starttime);
 
     bool AllowedToRun(JobQueueEntry job);
-    bool ClaimJob(QSqlDatabase* db, int jobID);
+    bool ClaimJob(int jobID);
 
     void StartChildJob(void *(*start_routine)(void *), ProgramInfo *tmpInfo);
 
     QString GetJobDescription(int jobType);
-    QString GetJobCommand(QSqlDatabase* db, int jobType, ProgramInfo *tmpInfo);
+    QString GetJobCommand(int jobType, ProgramInfo *tmpInfo);
 
     static void *TranscodeThread(void *param);
     void DoTranscodeThread(void);
@@ -162,9 +161,6 @@ class JobQueue : public QObject
 
     static void *UserJobThread(void *param);
     void DoUserJobThread(void);
-
-    QMutex dblock;
-    QSqlDatabase *m_db;
 
     QString m_hostname;
 

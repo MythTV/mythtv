@@ -28,6 +28,7 @@ using namespace std;
 #include "manualschedule.h"
 
 #include "libmyth/mythcontext.h"
+#include "libmyth/mythdbcon.h"
 #include "libmyth/dialogbox.h"
 #include "libmythtv/programinfo.h"
 #include "libmythtv/scheduledrecording.h"
@@ -70,20 +71,21 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
     m_channel = new MythComboBox( false, this, "channel");
     m_channel->setBackgroundOrigin(WindowOrigin);
 
-    QSqlQuery query;
 
     QString chanorder = gContext->GetSetting("ChannelOrdering", "channum + 0");
 
-    QString thequery= QString("SELECT chanid, channum, callsign, name "
-                              "FROM channel GROUP BY channum, callsign "
-                              "ORDER BY %1;").arg(chanorder);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT chanid, channum, callsign, name "
+                  "FROM channel GROUP BY channum, callsign "
+                  "ORDER BY :CHANORDER ;");
+    query.bindValue(":CHANORDER", chanorder);
 
-    query.exec(thequery);
+    
 
     QString longChannelFormat = 
         gContext->GetSetting("LongChannelFormat", "<num> <name>");
 
-    if (query.isActive() && query.numRowsAffected()) {
+    if (query.exec() && query.isActive() && query.size()) {
       while(query.next()) {
           QString channel = longChannelFormat;
           channel.replace("<num>", query.value(1).toString())
@@ -292,7 +294,7 @@ void ManualSchedule::recordClicked(void)
     QString channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
     p.chanid = m_chanids[m_channel->currentItem()];
 
-    QSqlQuery query;
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT chanid, channum, callsign, name "
                   "FROM channel WHERE chanid=:CHANID");
     query.bindValue(":CHANID", p.chanid);
@@ -323,12 +325,11 @@ void ManualSchedule::recordClicked(void)
 
     p.title += " (" + tr("Manual Record") + ")";
 
-    QSqlDatabase *db = QSqlDatabase::database();
     ScheduledRecording record;
 
-    record.loadByProgram(db, &p);
+    record.loadByProgram(&p);
     record.setSearchType(kManualSearch);
-    record.exec(db);
+    record.exec();
 
     if (record.getRecordID())
         accept();

@@ -2,7 +2,6 @@
 #define AUTOEXPIRE_H_
 
 class ProgramInfo;
-class QSqlDatabase;
 
 #include <qmap.h> 
 #include <list>
@@ -15,7 +14,7 @@ using namespace std;
 class AutoExpire : public QObject
 {
   public:
-    AutoExpire(bool runthread, bool master, QSqlDatabase *ldb);
+    AutoExpire(bool runthread, bool master);
    ~AutoExpire();
 
     void FillExpireList();
@@ -33,8 +32,6 @@ class AutoExpire : public QObject
     void FillOldestFirst(void);
 
     vector<ProgramInfo *> expireList;
-
-    QSqlDatabase *db;
 
     bool threadrunning;
     bool isMaster;

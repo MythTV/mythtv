@@ -1,6 +1,7 @@
 #include "datadirect.h"
 #include "../libmyth/mythwidgets.h"
 #include "../libmyth/mythcontext.h"
+#include "../libmyth/mythdbcon.h"
 
 #include <qfile.h>
 #include <qstring.h>
@@ -123,7 +124,7 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
     (void)pnamespaceuri;
     (void)plocalname;
 
-    QSqlQuery query;
+    MSqlQuery query(MSqlQuery::DDCon());
 
     if (pqname == "station") 
     {
@@ -312,13 +313,15 @@ bool DDStructureParser::characters(const QString& pchars)
            QString ExpirationDateMessage = "Your subscription expires on " + ExpirationDate;
            cout << ExpirationDateMessage << endl;
 
-           QSqlQuery query;
+           MSqlQuery query(MSqlQuery::DDCon());
 
            QString querystr = (QString("UPDATE settings SET data ='%1' "
                               "WHERE value='DataDirectMessage'")
                               .arg(ExpirationDateMessage));
            // cout << "querystr is:" << querystr << endl;
-           if (!query.exec(querystr))
+           query.prepare(querystr);
+
+           if (!query.exec())
                MythContext::DBError("Updating DataDirect Status Message", query);
         }
     }
@@ -378,7 +381,7 @@ bool DDStructureParser::characters(const QString& pchars)
 
 void DataDirectProcessor::updateStationViewTable() 
 {
-    QSqlQuery query;
+    MSqlQuery query(MSqlQuery::DDCon());
     QString querystr;
    
     if (!query.exec("TRUNCATE TABLE dd_v_station;")) 
@@ -393,14 +396,15 @@ void DataDirectProcessor::updateStationViewTable()
                        " ( (dd_station.stationid = dd_lineupmap.stationid) AND "
                        "   ( dd_lineupmap.lineupid = \"%0\") );")
                       .arg(getLineup());
+    query.prepare(querystr);
 
-    if (!query.exec(querystr))
+    if (!query.exec())
         MythContext::DBError("Populating temporary table dd_v_station", query);
 }
 
 void DataDirectProcessor::updateProgramViewTable(int sourceid) 
 {
-    QSqlQuery query;
+    MSqlQuery query(MSqlQuery::DDCon());
     QString querystr;
    
     if (!query.exec("TRUNCATE TABLE dd_v_program;"))
@@ -423,8 +427,9 @@ void DataDirectProcessor::updateProgramViewTable(int sourceid)
                        " ( (dd_schedule.programid = dd_program.programid) AND "
                        "   (channel.xmltvid = dd_schedule.stationid) AND "
                        "   (channel.sourceid = %0 ));").arg(sourceid);
+    query.prepare(querystr);
 
-    if (!query.exec(querystr))
+    if (!query.exec())
         MythContext::DBError("Populating temporary table dd_v_program", query);
 
     if (!query.exec("ANALYZE TABLE dd_v_program;"))
@@ -579,7 +584,7 @@ bool DataDirectProcessor::grabAllData()
 void DataDirectProcessor::createATempTable(const QString &ptablename, 
                                            const QString &ptablestruct) 
 {
-    QSqlQuery query;
+    MSqlQuery query(MSqlQuery::DDCon());
     QString querystr;
     querystr = "CREATE TEMPORARY TABLE IF NOT EXISTS " + ptablename + " " + 
                ptablestruct + ";";

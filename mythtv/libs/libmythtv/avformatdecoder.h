@@ -28,8 +28,7 @@ class AvFormatDecoder : public DecoderBase
 {
     friend void HandleStreamChange(void*);
   public:
-    AvFormatDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
-                    ProgramInfo *pginfo);
+    AvFormatDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo);
    ~AvFormatDecoder();
 
     void Reset(void);

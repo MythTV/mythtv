@@ -8,15 +8,13 @@
 #include "libmyth/mythdialogs.h"
 #include "libmythtv/programinfo.h"
 
-class QSqlDatabase;
 
 class PreviousBox : public MythDialog
 {
     Q_OBJECT
 
   public:
-    PreviousBox(QSqlDatabase *ldb, 
-	       MythMainWindow *parent, const char *name = 0);
+    PreviousBox(MythMainWindow *parent, const char *name = 0);
     ~PreviousBox();
 
   protected slots:
@@ -39,7 +37,6 @@ class PreviousBox : public MythDialog
 
   private:
     QString view;
-    QSqlDatabase *db;
     QDateTime startTime;
     QDateTime searchTime;
     QString dayFormat;

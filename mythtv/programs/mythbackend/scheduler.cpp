@@ -31,11 +31,9 @@ using namespace std;
 #include "remoteutil.h"
 #include "libmyth/mythdbcon.h"
 
-Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList, 
-                     QSqlDatabase *ldb)
+Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList)
 {
     hasconflicts = false;
-    db = ldb;
     m_tvList = tvList;
 
     m_mainServer = NULL;
@@ -75,13 +73,12 @@ void Scheduler::verifyCards(void)
 {
     QString thequery;
 
-    thequery = "SELECT NULL FROM capturecard;";
-
-    MSqlQuery query = db->exec(thequery);
+    MSqlQuery query(MSqlQuery::SchedCon());
+    query.prepare("SELECT NULL FROM capturecard;");
 
     int numcards = -1;
-    if (query.isActive())
-        numcards = query.numRowsAffected();
+    if (query.exec() && query.isActive())
+        numcards = query.size();
 
     if (numcards <= 0)
     {
@@ -90,25 +87,25 @@ void Scheduler::verifyCards(void)
         exit(5);
     }
 
-    thequery = "SELECT sourceid,name FROM videosource ORDER BY sourceid;";
-
-    query = db->exec(thequery);
+    query.prepare("SELECT sourceid,name FROM videosource ORDER BY sourceid;");
 
     int numsources = -1;
-    if (query.isActive())
+    if (query.exec() && query.isActive())
     {
-        numsources = query.numRowsAffected();
+        numsources = query.size();
 
         int source = 0;
 
         while (query.next())
         {
             source = query.value(0).toInt();
+            MSqlQuery subquery(MSqlQuery::SchedCon());
 
             thequery = QString("SELECT cardinputid FROM cardinput WHERE "
                                "sourceid = %1 ORDER BY cardinputid;")
                               .arg(source);
-            MSqlQuery subquery = db->exec(thequery);
+            subquery.prepare(thequery);
+            subquery.exec();
             
             if (!subquery.isActive() || subquery.numRowsAffected() <= 0)
                 cerr << query.value(1).toString() << " is defined, but isn't "
@@ -238,8 +235,6 @@ bool Scheduler::FillRecordList(void)
     schedMoveHigher = (bool)gContext->GetNumSetting("SchedMoveHigher");
     schedTime = QDateTime::currentDateTime();
 
-    MythContext::KickDatabase(db);
-
     VERBOSE(VB_SCHEDULE, "PruneOldRecords...");
     PruneOldRecords();
     VERBOSE(VB_SCHEDULE, "AddNewRecords...");
@@ -277,7 +272,7 @@ bool Scheduler::FillRecordList(void)
 
 void Scheduler::FillRecordListFromDB(void)
 {
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::SchedCon());
     query.prepare("CREATE TEMPORARY TABLE recordmatch "
                   "(recordid int unsigned, chanid int unsigned, "
                   " starttime datetime, manualid int unsigned, "
@@ -1278,7 +1273,7 @@ void *Scheduler::SchedulerThread(void *param)
 
 void Scheduler::UpdateManuals(int recordid)
 {
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::SchedCon());
 
     query.prepare("SELECT type,title,station,startdate,starttime, "
                   " enddate,endtime "
@@ -1380,8 +1375,8 @@ void Scheduler::UpdateManuals(int recordid)
 void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from, 
                                        QStringList &where)
 {
+    MSqlQuery result(MSqlQuery::SchedCon());
     QString query;
-    MSqlQuery result;
     QString qphrase;
 
     query = QString("SELECT recordid,search,subtitle,description "
@@ -1389,8 +1384,9 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
                     "(recordid = %2 OR %3 = -1) ")
         .arg(kNoSearch).arg(recordid).arg(recordid);
 
-    result = db->exec(query);
-    if (!result.isActive())
+    result.prepare(query);
+
+    if (!result.exec() || !result.isActive())
     {
         MythContext::DBError("BuildNewRecordsQueries", result);
         return;
@@ -1478,11 +1474,10 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
 void Scheduler::UpdateMatches(int recordid) {
     struct timeval dbstart, dbend;
 
-    MythContext::KickDatabase(db);
-    MSqlQuery query;
-
+    MSqlQuery query(MSqlQuery::SchedCon());
     query.prepare("DELETE FROM recordmatch "
                   "WHERE recordid = :RECORDID OR :RECORDID = -1;");
+
     query.bindValue(":RECORDID", recordid);
     query.exec();
     if (!query.isActive())
@@ -1565,7 +1560,9 @@ void Scheduler::UpdateMatches(int recordid) {
         VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query %1...").arg(clause));
 
         gettimeofday(&dbstart, NULL);
-        MSqlQuery result = db->exec(query);
+        MSqlQuery result(MSqlQuery::SchedCon());
+        result.prepare(query);
+        result.exec();
         gettimeofday(&dbend, NULL);
 
         if (!result.isActive())
@@ -1603,7 +1600,7 @@ void Scheduler::AddNewRecords(void) {
     QMap<int, bool> tooManyMap;
     bool checkTooMany = false;
 
-    MSqlQuery rlist(QString::null, db);
+    MSqlQuery rlist(MSqlQuery::SchedCon());
     rlist.prepare("SELECT recordid,title,maxepisodes,maxnewest FROM record;");
 
     rlist.exec();
@@ -1625,7 +1622,7 @@ void Scheduler::AddNewRecords(void) {
 
         if (maxEpisodes && !maxNewest)
         {
-            MSqlQuery epicnt(QString::null, db);
+            MSqlQuery epicnt(MSqlQuery::SchedCon());
 
             epicnt.prepare("SELECT count(*) FROM recorded "
                            "WHERE title = :TITLE;");
@@ -1744,7 +1741,9 @@ void Scheduler::AddNewRecords(void) {
     VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query..."));
 
     gettimeofday(&dbstart, NULL);
-    MSqlQuery result = db->exec(query);
+    MSqlQuery result(MSqlQuery::SchedCon());
+    result.prepare(query);
+    result.exec();
     gettimeofday(&dbend, NULL);
 
     if (!result.isActive())
@@ -1916,9 +1915,10 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
 "GROUP BY recordid "
 "ORDER BY title ASC;");
 
-    MSqlQuery result = db->exec(query);
+    MSqlQuery result(MSqlQuery::SchedCon());
+    result.prepare(query);
 
-    if (result.isActive() && result.numRowsAffected() > 0)
+    if (result.exec() && result.isActive() && result.size() > 0)
         while (result.next()) 
         {
             ProgramInfo *proginfo = new ProgramInfo;

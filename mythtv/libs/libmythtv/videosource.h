@@ -24,14 +24,12 @@ class CardUtil
                         POSITIONER_X_SWITCH_2 };
     static const QString DVB;
 
-    static bool isCardPresent(QSqlDatabase *db, const QString &strType);
+    static bool isCardPresent(const QString &strType);
     static DVB_TYPES cardDVBType(unsigned nVideoDev);
     static DVB_TYPES cardDVBType(unsigned nVideoDev, QString &name);
-    static int CardUtil::videoDeviceFromCardID(QSqlDatabase* db,
-                                               unsigned nCardID);
-    static bool CardUtil::isDVB(QSqlDatabase *db, unsigned nCardID);
-    static DISEQC_TYPES CardUtil::diseqcType(QSqlDatabase *db,
-                                             unsigned nCardID);
+    static int CardUtil::videoDeviceFromCardID(unsigned nCardID);
+    static bool CardUtil::isDVB(unsigned nCardID);
+    static DISEQC_TYPES CardUtil::diseqcType(unsigned nCardID);
 };
 
 class VideoSource;
@@ -110,7 +108,7 @@ class DataDirect_config: public VerticalConfigurationGroup {
 public:
     DataDirect_config(const VideoSource& _parent); 
 
-    virtual void load(QSqlDatabase* db);
+    virtual void load();
 
     QString getLineupID(void) const { return lineupselector->getValue(); };
 
@@ -131,7 +129,7 @@ class XMLTV_uk_config: public VerticalConfigurationGroup {
 public:
     XMLTV_uk_config(const VideoSource& _parent);
 
-    virtual void save(QSqlDatabase* db);
+    virtual void save();
 
 protected:
     const VideoSource& parent;
@@ -143,8 +141,8 @@ class XMLTV_generic_config: public LabelSetting {
 public:
     XMLTV_generic_config(const VideoSource& _parent, QString _grabber);
 
-    virtual void load(QSqlDatabase* db) { (void)db; };
-    virtual void save(QSqlDatabase* db);
+    virtual void load() {};
+    virtual void save();
 
 protected:
     const VideoSource& parent;
@@ -163,16 +161,16 @@ public:
         
     int getSourceID(void) const { return id->intValue(); };
 
-    void loadByID(QSqlDatabase* db, int id);
+    void loadByID(int id);
 
-    static void fillSelections(QSqlDatabase* db, SelectSetting* setting);
-    static QString idToName(QSqlDatabase* db, int id);
+    static void fillSelections(SelectSetting* setting);
+    static QString idToName(int id);
 
     QString getSourceName(void) const { return name->getValue(); };
 
-    virtual void save(QSqlDatabase* db) {
+    virtual void save() {
         if (name)
-            ConfigurationWizard::save(db);
+            ConfigurationWizard::save();
     };
 
 private:
@@ -205,7 +203,6 @@ private:
     Name* name;
 
 protected:
-    QSqlDatabase* db;
 };
 
 class CaptureCard;
@@ -246,10 +243,10 @@ public:
         setVisible(false);
     };
 
-    void save(QSqlDatabase* db) {
+    void save() {
         changed = true;
         settingValue = "";
-        SimpleDBStorage::save(db);
+        SimpleDBStorage::save();
     };
 };
 
@@ -260,10 +257,10 @@ public:
         CCSetting(parent,"vbidevice") {
         setVisible(false);
     };
-    void save(QSqlDatabase* db) {
+    void save() {
         changed = true;
         settingValue = "";
-        SimpleDBStorage::save(db);
+        SimpleDBStorage::save();
     };
 };
 
@@ -315,9 +312,8 @@ class DVBConfigurationGroup: public VerticalConfigurationGroup {
 public:
     DVBConfigurationGroup(CaptureCard& a_parent);
 
-    void load(QSqlDatabase* _db) {
-        db = _db;
-        VerticalConfigurationGroup::load(db);
+    void load() {
+        VerticalConfigurationGroup::load();
     };
 
 public slots:
@@ -327,7 +323,6 @@ private:
     CaptureCard& parent;
 
     DVBDefaultInput* defaultinput;
-    QSqlDatabase *db;
     DVBCardName* cardname;
     DVBCardType* cardtype;
     DVBDiseqcType* diseqctype;
@@ -355,13 +350,12 @@ public:
 
     QString getDvbCard() { return dvbCard; };
 
-    void loadByID(QSqlDatabase* db, int id);
+    void loadByID(int id);
 
-    static void fillSelections(QSqlDatabase* db, SelectSetting* setting);
+    static void fillSelections(SelectSetting* setting);
 
-    void load(QSqlDatabase* _db) {
-        db = _db;
-        ConfigurationWizard::load(db);
+    void load() {
+        ConfigurationWizard::load();
     };
 
 public slots:
@@ -388,7 +382,6 @@ private:
 
 private:
     ID* id;
-    QSqlDatabase* db;
     QString dvbCard;
 };
 
@@ -403,7 +396,7 @@ protected:
 
     int getInputID(void) const;
 
-    void fillSelections(QSqlDatabase* db);
+    void fillSelections();
 
 protected:
     virtual QString setClause(void);
@@ -415,16 +408,15 @@ private:
 class CaptureCardEditor: public ListBoxSetting, public ConfigurationDialog {
     Q_OBJECT
 public:
-    CaptureCardEditor(QSqlDatabase* _db):
-        db(_db) {
+    CaptureCardEditor() {
         setLabel(tr("Capture cards"));
     };
 
     virtual MythDialog* dialogWidget(MythMainWindow* parent,
                                      const char* widgetName=0);
-    virtual int exec(QSqlDatabase* db);
-    virtual void load(QSqlDatabase* db);
-    virtual void save(QSqlDatabase* db) { (void)db; };
+    virtual int exec();
+    virtual void load();
+    virtual void save() { };
 
 public slots:
     void menu();
@@ -432,26 +424,24 @@ public slots:
     void del();
 
 protected:
-    QSqlDatabase* db;
 };
 
 class VideoSourceEditor: public ListBoxSetting, public ConfigurationDialog {
     Q_OBJECT
 public:
-    VideoSourceEditor(QSqlDatabase* _db):
-        db(_db) {
+    VideoSourceEditor() {
         setLabel(tr("Video sources"));
     };
 
     virtual MythDialog* dialogWidget(MythMainWindow* parent,
                                      const char* widgetName=0);
 
-    bool cardTypesInclude(QSqlDatabase* db, const int& SourceID, 
+    bool cardTypesInclude(const int& SourceID, 
                           const QString& thecardtype);
 
-    virtual int exec(QSqlDatabase* db);
-    virtual void load(QSqlDatabase* db);
-    virtual void save(QSqlDatabase* db) { (void)db; };
+    virtual int exec();
+    virtual void load();
+    virtual void save() { };
 
 public slots:
     void menu(); 
@@ -459,24 +449,21 @@ public slots:
     void del();
 
 protected:
-    QSqlDatabase* db;
 };
 
 class CardInputEditor: public ListBoxSetting, public ConfigurationDialog {
 public:
-    CardInputEditor(QSqlDatabase* _db):
-        db(_db) {
+    CardInputEditor() {
         setLabel(QObject::tr("Input connections"));
     };
     virtual ~CardInputEditor();
 
-    virtual int exec(QSqlDatabase* db);
-    virtual void load(QSqlDatabase* db);
-    virtual void save(QSqlDatabase* db) { (void)db; };
+    virtual int exec();
+    virtual void load();
+    virtual void save() { };
 
 protected:
     vector<CardInput*> cardinputs;
-    QSqlDatabase* db;
 };
 
 #endif

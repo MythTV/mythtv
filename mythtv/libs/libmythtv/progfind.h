@@ -22,7 +22,6 @@
 
 class QListView;
 class ProgramInfo;
-class QSqlDatabase;
 class QWidget;
 class TV;
 
@@ -99,8 +98,6 @@ class ProgFinder : public MythDialog
     QString *searchData;
     QString *initData;
     QString *progData;
-
-    QSqlDatabase *m_db;
 
     void showSearchList();
     void showProgramList();

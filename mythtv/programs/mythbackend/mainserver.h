@@ -16,7 +16,6 @@ using namespace std;
 #include "filetransfer.h"
 #include "scheduler.h"
 
-class QSqlDatabase;
 class HttpStatus;
 class ProcessRequestThread;
 
@@ -25,7 +24,7 @@ class MainServer : public QObject
     Q_OBJECT
   public:
     MainServer(bool master, int port, int statusport, 
-               QMap<int, EncoderLink *> *tvList, QSqlDatabase *db,
+               QMap<int, EncoderLink *> *tvList,
                Scheduler *sched);
 
    ~MainServer();
@@ -140,14 +139,12 @@ class MainServer : public QObject
     
     bool ismaster;
 
-    QMutex dblock;
     QMutex deletelock;
     QMutex threadPoolLock;
     vector<ProcessRequestThread *> threadPool;
 
     bool masterBackendOverride;
 
-    QSqlDatabase *m_db;
     Scheduler *m_sched;
 
     QMutex readReadyLock;

@@ -21,14 +21,13 @@ using namespace std;
 #include "scheduledrecording.h"
 #include "dialogbox.h"
 #include "mythcontext.h"
+#include "mythdbcon.h"
 #include "remoteutil.h"
 
-PreviousBox::PreviousBox(QSqlDatabase *ldb, MythMainWindow *parent,
-                       const char *name)
+PreviousBox::PreviousBox(MythMainWindow *parent, const char *name)
             : MythDialog(parent, name)
 {
     view = "";
-    db = ldb;
     startTime = QDateTime::currentDateTime();
     searchTime = startTime;
 
@@ -356,7 +355,6 @@ void PreviousBox::upcoming()
     ProgramInfo *pi = itemList.at(curItem);
 
     ProgLister *pl = new ProgLister(plTitle, pi->title,
-                                   QSqlDatabase::database(),
                                    gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;
@@ -367,7 +365,7 @@ void PreviousBox::details()
     ProgramInfo *pi = itemList.at(curItem);
 
     if (pi)
-        pi->showDetails(QSqlDatabase::database());
+        pi->showDetails();
 }
 
 void PreviousBox::fillViewList(const QString &view)
@@ -440,7 +438,7 @@ void PreviousBox::fillItemList(void)
         return;
 
     ProgramInfo *s;
-    itemList.FromOldRecorded(db, "");
+    itemList.FromOldRecorded("");
 
     vector<ProgramInfo *> sortedList;
     while (itemList.count())
@@ -595,7 +593,7 @@ void PreviousBox::updateInfo(QPainter *p)
         if (container)
         {  
             QMap<QString, QString> infoMap;
-            pi->ToMap(db, infoMap);
+            pi->ToMap(infoMap);
             container->ClearAllText();
             container->SetText(infoMap);
         }
@@ -654,22 +652,22 @@ void PreviousBox::removalDialog()
 
     if (ret == rm_episode)
     {
-        QString thequery;
-        thequery = QString("DELETE FROM oldrecorded "
-                           "WHERE chanid = '%1' AND starttime = '%2'")
-                           .arg(pi->chanid)
-                           .arg(pi->startts.toString(Qt::ISODate));
-        db->exec(thequery);
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("DELETE FROM oldrecorded "
+                      "WHERE chanid = :CHANID AND starttime = :STARTTIME ;");
+        query.bindValue(":CHANID", pi->chanid);
+        query.bindValue(":STARTTIME", pi->startts.toString(Qt::ISODate));
+        query.exec();
         ScheduledRecording::signalChange(0);
         fillItemList();
     }
     else if (ret == rm_title)
     {
-        QString thequery;
-        thequery = QString("DELETE FROM oldrecorded "
-                           "WHERE title = \"%1\"")
-                           .arg(pi->title);
-        db->exec(thequery.utf8());
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("DELETE FROM oldrecorded WHERE title = :TITLE ;");
+        query.bindValue(":TITLE", pi->title.utf8());
+        query.exec();
+
         ScheduledRecording::signalChange(0);
         fillItemList();
     }

@@ -38,8 +38,7 @@ class RawDataList
 class NuppelDecoder : public DecoderBase
 {
   public:
-    NuppelDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
-                  ProgramInfo *pginfo);
+    NuppelDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo);
    ~NuppelDecoder();
 
     static bool CanHandle(char testbuf[2048]);

@@ -18,18 +18,20 @@ static bool InitializeDatabase(void);
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
-    QSqlDatabase *db_conn = QSqlDatabase::database();
-
     // delete old schema version
+    MSqlQuery query(MSqlQuery::InitCon());
+
     QString thequery = "DELETE FROM settings WHERE value='DBSchemaVer';";
-    db_conn->exec(thequery);
-    if (db_conn->lastError().type() != QSqlError::None)
+    query.prepare(thequery);
+    query.exec();
+
+    if (query.lastError().type() != QSqlError::None)
     {
         QString msg =
             QString("DB Error (Deleting old DB version number): \n"
                     "Query was: %1 \nError was: %2 \nnew version: %3")
             .arg(thequery)
-            .arg(MythContext::DBErrorMessage(db_conn->lastError()))
+            .arg(MythContext::DBErrorMessage(query.lastError()))
             .arg(newnumber);
         VERBOSE(VB_IMPORTANT, msg);
         return false;
@@ -38,14 +40,16 @@ static bool UpdateDBVersionNumber(const QString &newnumber)
     // set new schema version
     thequery = QString("INSERT INTO settings (value, data, hostname) "
                        "VALUES ('DBSchemaVer', %1, NULL);").arg(newnumber);
-    db_conn->exec(thequery);
-    if (db_conn->lastError().type() != QSqlError::None)
+    query.prepare(thequery);
+    query.exec();
+
+    if (query.lastError().type() != QSqlError::None)
     {
         QString msg =
             QString("DB Error (Setting new DB version number): \n"
                     "Query was: %1 \nError was: %2 \nnew version: %3")
             .arg(thequery)
-            .arg(MythContext::DBErrorMessage(db_conn->lastError()))
+            .arg(MythContext::DBErrorMessage(query.lastError()))
             .arg(newnumber);
         VERBOSE(VB_IMPORTANT, msg);
         return false;
@@ -57,7 +61,7 @@ static bool UpdateDBVersionNumber(const QString &newnumber)
 static bool performActualUpdate(const QString updates[], QString version,
                          QString &dbver)
 {
-    QSqlDatabase *db_conn = QSqlDatabase::database();
+    MSqlQuery query(MSqlQuery::InitCon());
 
     VERBOSE(VB_ALL, QString("Upgrading to schema version ") + version);
 
@@ -66,15 +70,16 @@ static bool performActualUpdate(const QString updates[], QString version,
 
     while (thequery != "")
     {
-        db_conn->exec(thequery);
+        query.prepare(thequery);
+        query.exec();
 
-        if (db_conn->lastError().type() != QSqlError::None)
+        if (query.lastError().type() != QSqlError::None)
         {
             QString msg =
                 QString("DB Error (Performing database upgrade): \n"
                         "Query was: %1 \nError was: %2 \nnew version: %3")
                 .arg(thequery)
-                .arg(MythContext::DBErrorMessage(db_conn->lastError()))
+                .arg(MythContext::DBErrorMessage(query.lastError()))
                 .arg(version);
             VERBOSE(VB_IMPORTANT, msg);
             return false;
@@ -547,11 +552,11 @@ bool UpgradeTVDatabaseSchema(void)
 
         VERBOSE(VB_ALL, QString("This could take a few minutes."));
 
-        QSqlDatabase *db = QSqlDatabase::database();
 
         QString thequery, chanid, startts;
-        QSqlQuery query;
         QDateTime recstartts;
+
+        MSqlQuery query(MSqlQuery::InitCon());
 
         thequery = QString("SELECT distinct recorded.chanid, "
                            "recorded.starttime "
@@ -559,12 +564,14 @@ bool UpgradeTVDatabaseSchema(void)
                            "WHERE recorded.chanid = recordedmarkup.chanid AND "
                            "recorded.starttime = recordedmarkup.starttime AND "
                            "(type = 4 OR type = 5) ");
-        query = db->exec(thequery);
+        query.prepare(thequery);
 
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.exec() && query.isActive() && query.size() > 0)
         {
+            MSqlQuery query2(MSqlQuery::InitCon());
             while (query.next())
             {
+
                 chanid  = query.value(0).toString();
                 recstartts = query.value(1).toDateTime();
                 startts = recstartts.toString("yyyyMMddhhmm");
@@ -574,8 +581,8 @@ bool UpgradeTVDatabaseSchema(void)
                                    "starttime = %2 WHERE chanid = '%1' AND "
                                    "starttime = '%3';").arg(chanid).arg(startts)
                                                        .arg(startts);
-
-                db->exec(thequery);
+                query2.prepare(thequery);
+                query2.exec();
             }  
         }
     }
@@ -1135,9 +1142,7 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 
         if (gContext->GetNumSetting("AutoCommercialFlag", 1))
         {
-            QSqlDatabase *db = QSqlDatabase::database();
-
-            MSqlQuery query(QString::null, db);
+            MSqlQuery query(MSqlQuery::InitCon());
             query.prepare("UPDATE record SET autocommflag = 1;");
             query.exec();
         }
@@ -1417,16 +1422,17 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 
 bool InitializeDatabase(void)
 {
-    QSqlDatabase *db_conn = QSqlDatabase::database();
-    QSqlQuery qQuery = db_conn->exec("SHOW TABLES;");
-    if (qQuery.isActive() && (qQuery.numRowsAffected() > 0))
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SHOW TABLES;");
+
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         QString msg = QString(
             "Told to create a NEW database schema, but the database\n"
             "already has %1 tables.\n"
             "If you are sure this is a good mythtv database, verify\n"
             "that the settings table has the DBSchemaVer variable.\n")
-            .arg(qQuery.numRowsAffected());
+            .arg(query.size());
         VERBOSE(VB_ALL, msg);
         return false;   
     }

@@ -23,6 +23,7 @@ using namespace std;
 
 #include "dialogbox.h"
 #include "mythcontext.h"
+#include "mythdbcon.h"
 #include "remoteutil.h"
 
 // overloaded version of ProgramInfo with additional recording priority
@@ -82,12 +83,10 @@ ProgramRecPriorityInfo& ProgramRecPriorityInfo::operator=(const ProgramInfo &oth
     return(*this);
 }
 
-ProgramRecPriority::ProgramRecPriority(QSqlDatabase *ldb, MythMainWindow *parent, 
+ProgramRecPriority::ProgramRecPriority(MythMainWindow *parent, 
                              const char *name)
             : MythDialog(parent, name)
 {
-    db = ldb;
-
     curitem = NULL;
     bgTransBackup = NULL;
     pageDowner = false;
@@ -141,7 +140,6 @@ ProgramRecPriority::ProgramRecPriority(QSqlDatabase *ldb, MythMainWindow *parent
 
     updateBackground();
 
-    MythContext::KickDatabase(db);
     FillList();
     sortType = (SortType)gContext->GetNumSetting("ProgramRecPrioritySorting", 
                                                  (int)byTitle);
@@ -453,32 +451,29 @@ void ProgramRecPriority::edit(void)
 
     ProgramRecPriorityInfo *rec = curitem;
 
-    MythContext::KickDatabase(db);
-
     if (rec)
     {
         int recid = 0;
         ScheduledRecording record;
-        record.loadByID(db, rec->recordid);
+        record.loadByID(rec->recordid);
         if (record.getSearchType() == kNoSearch)
-            record.loadByProgram(db, rec);
-        record.exec(db);
+            record.loadByProgram(rec);
+        record.exec();
         recid = record.getRecordID();
 
         // We need to refetch the recording priority values since the Advanced
         // Recording Options page could've been used to change them 
-        QString thequery;
 
         if (!recid)
-            recid = rec->getRecordID(db);
+            recid = rec->getRecordID();
 
-        thequery = QString(
-                   "SELECT recpriority, type, inactive FROM record WHERE recordid = %1;")
-                           .arg(recid);
-        QSqlQuery query = db->exec(thequery);
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT recpriority, type, inactive FROM"
+                      " record WHERE recordid = :RECORDID ;");
+        query.bindValue("RECORDID", recid);
 
-        if (query.isActive())
-            if (query.numRowsAffected() > 0)
+        if (query.exec() && query.isActive())
+            if (query.size() > 0)
             {
                 query.next();
                 int recPriority = query.value(0).toInt();
@@ -560,20 +555,17 @@ void ProgramRecPriority::deactivate(void)
 
     ProgramRecPriorityInfo *rec = curitem;
 
-    MythContext::KickDatabase(db);
-
     if (rec)
     {
-        QString thequery;
+        MSqlQuery query(MSqlQuery::InitCon());
 
-        thequery = QString("SELECT inactive FROM record WHERE recordid = %1")
-                           .arg(rec->recordid);
-
-        QSqlQuery query = db->exec(thequery);
+        query.prepare("SELECT inactive FROM record "
+                      "WHERE recordid = :RECID ;");
+        query.bindValue(":RECID", rec->recordid);
 
         int inactive = 0;
-        if (query.isActive())
-            if (query.numRowsAffected() > 0)
+        if (query.exec() && query.isActive())
+            if (query.size() > 0)
             {
                 query.next();
                 inactive = query.value(0).toInt();
@@ -582,13 +574,12 @@ void ProgramRecPriority::deactivate(void)
                 else
                     inactive = 1;
 
-                QString theupdatequery;
-                theupdatequery = QString("UPDATE record SET inactive = %1 WHERE recordid = %2")
-                                         .arg(inactive).arg(rec->recordid);
+                query.prepare("UPDATE record SET inactive = :INACTIVE "
+                              "WHERE recordid = :RECID ;");
+                query.bindValue(":INACTIVE", inactive);
+                query.bindValue(":RECID", rec->recordid);
 
-                QSqlQuery uquery = db->exec(theupdatequery);
-
-                if (uquery.isActive())
+                if (query.exec() && query.isActive())
                 {
                     ScheduledRecording::signalChange(0);
                     int cnt;
@@ -602,7 +593,7 @@ void ProgramRecPriority::deactivate(void)
                     progInfo = &(it.data());
                     progInfo->recstatus = inactive ? rsInactive : rsWillRecord;
                 } else
-                    MythContext::DBError("Update recording schedule inactive query", uquery);
+                    MythContext::DBError("Update recording schedule inactive query", query);
             }
 
         QPainter p(this);
@@ -618,7 +609,7 @@ void ProgramRecPriority::upcoming(void)
 
     ScheduledRecording record;
 
-    record.loadByID(db, curitem->recordid);
+    record.loadByID(curitem->recordid);
     record.runProgList();
 }
 
@@ -660,7 +651,7 @@ void ProgramRecPriority::saveRecPriority(void)
         // if this program's recording priority changed from when we entered
         // save new value out to db
         if (progInfo->recpriority != origRecPriorityData[key])
-            progInfo->ApplyRecordRecPriorityChange(db, progInfo->recpriority);
+            progInfo->ApplyRecordRecPriorityChange(progInfo->recpriority);
     }
 }
 
@@ -708,19 +699,19 @@ void ProgramRecPriority::FillList(void)
     // program from db
     // (hope this is ok to do here, it's so much lighter doing
     // it all at once than once per program)
-    QString query = QString("SELECT recordid, record.title, record.chanid, "
-                            "record.starttime, record.startdate, "
-                            "record.type, channel.recpriority,  "
-                            "record.inactive "
-                            "FROM record "
-                            "LEFT JOIN channel ON "
-                            "(record.chanid = channel.chanid);");
 
-    QSqlQuery result = db->exec(query);
+    MSqlQuery result(MSqlQuery::InitCon());
+    result.prepare("SELECT recordid, record.title, record.chanid, "
+                   "record.starttime, record.startdate, "
+                   "record.type, channel.recpriority,  "
+                   "record.inactive "
+                   "FROM record "
+                   "LEFT JOIN channel ON "
+                   "(record.chanid = channel.chanid);");
    
     int matches = 0;
 
-    if (result.isActive() && result.numRowsAffected() > 0)
+    if (result.exec() && result.isActive() && result.size() > 0)
     {
         while (result.next()) 
         {
@@ -761,7 +752,7 @@ void ProgramRecPriority::FillList(void)
         }
     }
     else
-        MythContext::DBError("Get program recording priorities query", query);
+        MythContext::DBError("Get program recording priorities query", result);
 
     recMatch.clear();
     ProgramList schedList;

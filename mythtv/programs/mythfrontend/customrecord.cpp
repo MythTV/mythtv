@@ -207,8 +207,7 @@ void CustomRecord::addClicked(void)
 void CustomRecord::testClicked(void)
 {
     ProgLister *pl = new ProgLister(plSQLSearch, m_description->text(),
-				   QSqlDatabase::database(),
-				   gContext->GetMainWindow(), "proglist");
+                                    gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;
 
@@ -219,10 +218,9 @@ void CustomRecord::recordClicked(void)
 {
     QString desc = m_description->text();
 
-    QSqlDatabase *db = QSqlDatabase::database();
     ScheduledRecording record;
-    record.loadBySearch(db, kPowerSearch, m_title->text(), desc);
-    record.exec(db);
+    record.loadBySearch(kPowerSearch, m_title->text(), desc);
+    record.exec();
 
     if (record.getRecordID())
         accept();

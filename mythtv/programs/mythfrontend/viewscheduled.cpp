@@ -22,12 +22,9 @@ using namespace std;
 #include "mythcontext.h"
 #include "remoteutil.h"
 
-ViewScheduled::ViewScheduled(QSqlDatabase *ldb, MythMainWindow *parent, 
-                             const char *name)
+ViewScheduled::ViewScheduled(MythMainWindow *parent, const char *name)
              : MythDialog(parent, name)
 {
-    db = ldb;
-
     dateformat = gContext->GetSetting("ShortDateFormat", "M/d");
     timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
     channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
@@ -461,8 +458,7 @@ void ViewScheduled::updateInfo(QPainter *p)
         ProgramInfo *p = recList[listPos];
         if (p)
         {
-            QSqlDatabase *m_db = QSqlDatabase::database();
-            p->ToMap(m_db, infoMap);
+            p->ToMap(infoMap);
             container->ClearAllText();
             container->SetText(infoMap);
         }
@@ -498,8 +494,7 @@ void ViewScheduled::updateRecStatus(QPainter *p)
         ProgramInfo *p = recList[listPos];
         if (p)
         {
-            QSqlDatabase *m_db = QSqlDatabase::database();
-            p->ToMap(m_db, infoMap);
+            p->ToMap(infoMap);
             container->ClearAllText();
             container->SetText(infoMap);
         }
@@ -524,7 +519,7 @@ void ViewScheduled::edit()
     if (!p)
         return;
 
-    p->EditScheduled(db);
+    p->EditScheduled();
 }
 
 void ViewScheduled::upcoming()
@@ -535,7 +530,6 @@ void ViewScheduled::upcoming()
         return;
 
     ProgLister *pl = new ProgLister(plTitle, p->title,
-                                   QSqlDatabase::database(),
                                    gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;
@@ -546,7 +540,7 @@ void ViewScheduled::details()
     ProgramInfo *p = recList[listPos];
 
     if (p)
-        p->showDetails(QSqlDatabase::database());
+        p->showDetails();
 }
 
 void ViewScheduled::selected()
@@ -555,7 +549,7 @@ void ViewScheduled::selected()
     if (!p)
         return;
 
-    p->EditRecording(db);
+    p->EditRecording();
 }
 
 void ViewScheduled::customEvent(QCustomEvent *e)

@@ -23,6 +23,7 @@ using namespace std;
 
 #include "libmythtv/programinfo.h"
 #include "libmyth/mythcontext.h"
+#include "libmyth/mythdbcon.h"
 #include "libmythtv/dbcheck.h"
 #include "libmythtv/jobqueue.h"
 
@@ -38,7 +39,7 @@ bool setupTVs(bool ismaster)
 {
     QString localhostname = gContext->GetHostName();
 
-    QSqlQuery query;
+    MSqlQuery query(MSqlQuery::InitCon());
 
     if (ismaster)
     {
@@ -63,12 +64,14 @@ bool setupTVs(bool ismaster)
             MythContext::DBError("Querying minimum chanid",
                                  query.lastQuery());
 
-        QSqlQuery records_without_station("SELECT record.chanid,"
+        MSqlQuery records_without_station(MSqlQuery::InitCon());
+        records_without_station.prepare("SELECT record.chanid,"
                 " channel.callsign FROM record LEFT JOIN channel"
                 " ON record.chanid = channel.chanid WHERE record.station='';");
+        records_without_station.exec(); 
         if (records_without_station.first())
         {
-            QSqlQuery update_record;
+            MSqlQuery update_record(MSqlQuery::InitCon());
             update_record.prepare("UPDATE record SET station = :CALLSIGN"
                     " WHERE chanid = :CHANID;");
             do
@@ -88,7 +91,7 @@ bool setupTVs(bool ismaster)
 
     query.exec("SELECT cardid,hostname FROM capturecard ORDER BY cardid;");
 
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         while (query.next())
         {
@@ -429,61 +432,17 @@ int main(int argc, char **argv)
             close(logfd);
     }
 
-    gContext = new MythContext(MYTH_BINARY_VERSION, false);
+    gContext = NULL;
+    gContext = new MythContext(MYTH_BINARY_VERSION);
+    gContext->Init(false);
     gContext->SetBackend(true);
 
-    QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
-    if (!db)
+    if (!MSqlQuery::testDBConnection())
     {
         cerr << "Couldn't connect to database\n";
         return -1;
     }
 
-    QSqlDatabase *subthread = QSqlDatabase::addDatabase("QMYSQL3", "SUBDB");
-    if (!subthread)
-    {
-        cerr << "Couldn't connect to database\n";
-        return -1;
-    }
-
-    QSqlDatabase *expthread = QSqlDatabase::addDatabase("QMYSQL3", "EXPDB");
-    if (!expthread)
-    {
-        cerr << "Couldn't connect to database\n";
-        return -1;
-    }
-
-    QSqlDatabase *hkthread = QSqlDatabase::addDatabase("QMYSQL3", "HKDB");
-    if (!hkthread)
-    {
-        cerr << "Couldn't connect to database\n";
-        return -1;
-    }
-
-    QSqlDatabase *jobthread = QSqlDatabase::addDatabase("QMYSQL3", "JOBDB");
-    if (!jobthread)
-    {
-        cerr << "Couldn't connect to database\n";
-        return -1;
-    }
-
-    QSqlDatabase *msdb = QSqlDatabase::addDatabase("QMYSQL3", "MSDB");
-    if (!msdb)
-    {
-        cerr << "Couldn't connect to database\n";
-        return -1;
-    }
-
-    if (!gContext->OpenDatabase(db, !daemonize && (logfile == "")) ||
-        !gContext->OpenDatabase(subthread, false) ||
-        !gContext->OpenDatabase(expthread, false) ||
-        !gContext->OpenDatabase(hkthread, false) ||
-        !gContext->OpenDatabase(jobthread, false) ||
-        !gContext->OpenDatabase(msdb, false))
-    {
-        cerr << "Couldn't open database\n";
-        return -1;
-    }
 
     close(0);
 
@@ -495,7 +454,7 @@ int main(int argc, char **argv)
 
     if (printsched || testsched)
     {
-        sched = new Scheduler(false, &tvList, db);
+        sched = new Scheduler(false, &tvList);
         if (!testsched && gContext->ConnectToMasterServer())
         {
             cout << "Retrieving Schedule from Master backend.\n";
@@ -533,7 +492,7 @@ int main(int argc, char **argv)
 
     if (printexpire)
     {
-        expirer = new AutoExpire(false, false, db);
+        expirer = new AutoExpire(false, false);
         expirer->FillExpireList();
         expirer->PrintExpireList();
         cleanup();
@@ -578,18 +537,14 @@ int main(int argc, char **argv)
 
     if (ismaster && runsched && !nosched)
     {
-        QSqlDatabase *scdb = QSqlDatabase::database("SUBDB");
-        sched = new Scheduler(true, &tvList, scdb);
+        sched = new Scheduler(true, &tvList);
     }
 
-    QSqlDatabase *expdb = QSqlDatabase::database("EXPDB");
-    expirer = new AutoExpire(true, ismaster, expdb);
+    expirer = new AutoExpire(true, ismaster);
 
-    QSqlDatabase *hkdb = QSqlDatabase::database("HKDB");
-    housekeeping = new HouseKeeper(true, ismaster, hkdb);
+    housekeeping = new HouseKeeper(true, ismaster);
 
-    QSqlDatabase *jobdb = QSqlDatabase::database("JOBDB");
-    jobqueue = new JobQueue(ismaster, jobdb);
+    jobqueue = new JobQueue(ismaster);
 
     VERBOSE(VB_ALL, QString("%1 version: %2 www.mythtv.org")
                             .arg(binname).arg(MYTH_BINARY_VERSION));
@@ -617,7 +572,7 @@ int main(int argc, char **argv)
         }
     }
 
-    new MainServer(ismaster, port, statusport, &tvList, msdb, sched);
+    new MainServer(ismaster, port, statusport, &tvList, sched);
 
     if (ismaster)
     {

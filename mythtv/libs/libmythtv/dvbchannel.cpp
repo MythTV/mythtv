@@ -46,6 +46,7 @@ using namespace std;
 #include "RingBuffer.h"
 #include "recorderbase.h"
 #include "mythcontext.h"
+#include "mythdbcon.h"
 #include "tv_rec.h"
 
 #include "dvbtypes.h"
@@ -137,7 +138,6 @@ bool DVBChannel::Open()
     {
         // TODO: Rename sections to PMap and have it ONLY pull the ProgramMap
         siparser = new DVBSIParser(cardnum);
-        siparser->SetDB(db_conn,db_lock);
         pthread_create(&siparser_thread,NULL,SpawnSectionReader, siparser);
 
         connect(siparser,SIGNAL(NewPMT(PMTObject)),this,
@@ -280,19 +280,13 @@ void DVBChannel::SwitchToInput(const QString &input, const QString &chan)
 bool DVBChannel::GetChannelOptions(QString channum)
 {
 
-    if (db_conn == NULL)
-       return false;
-
-    pthread_mutex_lock(db_lock);
-
     QString         thequery;
-    QSqlQuery       query(QString::null, db_conn);
     QString         inputName;
-
-    MythContext::KickDatabase(db_conn);
 
 // TODO: pParent doesn't exist when you create a DVBChannel from videosource
 //       but this is important (i think) for remote backends
+
+    MSqlQuery query(MSqlQuery::InitCon());
 
     if (pParent == NULL)
         thequery = QString("SELECT chanid, serviceid, mplexid "
@@ -313,15 +307,14 @@ bool DVBChannel::GetChannelOptions(QString channum)
                        "capturecard.cardtype = 'DVB'")
                        .arg(channum).arg(pParent->GetCaptureCardNum());
 
-    query = db_conn->exec(thequery);
+    query.prepare(thequery);
 
-    if (!query.isActive())
+    if (!query.exec() || !query.isActive())
         MythContext::DBError("GetChannelOptions - ChanID", query);
 
-    if (query.numRowsAffected() <= 0)
+    if (query.size() <= 0)
     {
         ERROR("Unable to find channel in database.");
-        pthread_mutex_unlock(db_lock);
         return false;
     }
 
@@ -330,8 +323,6 @@ bool DVBChannel::GetChannelOptions(QString channum)
     chan_opts.serviceID     = query.value(1).toInt();
 
     int mplexid = query.value(2).toInt();
-
-    pthread_mutex_unlock(db_lock);
 
     if (!GetTransportOptions(mplexid))
         return false;
@@ -344,27 +335,19 @@ bool DVBChannel::GetChannelOptions(QString channum)
 bool DVBChannel::GetTransportOptions(int mplexid)
 {
 
-    if (db_conn == NULL)
-       return false;
-
-    pthread_mutex_lock(db_lock);
-
-    QSqlQuery query(QString::null, db_conn);
+    MSqlQuery query(MSqlQuery::InitCon());
     QString thequery;
-
-    MythContext::KickDatabase(db_conn);
 
      // TODO: See previous comment about pParent
     int capturecardnumber;
     if (pParent == NULL) {
        thequery = QString("SELECT cardid FROM capturecard "
                           " WHERE videodevice = %1;").arg(cardnum);
-       query = db_conn->exec(thequery);
-       if (!query.isActive() || query.numRowsAffected() <= 0)
+       query.prepare(thequery);
+       if (!query.exec() || !query.isActive() || query.size() <= 0)
        {
            ERROR(QString("Could not find capture card for transport %1")
                       .arg(mplexid));
-           pthread_mutex_unlock(db_lock);
            return false;
        }
        query.next();
@@ -421,16 +404,15 @@ bool DVBChannel::GetTransportOptions(int mplexid)
 #endif
     }
 
-    query = db_conn->exec(thequery);
+    query.prepare(thequery);
 
-    if (!query.isActive())
+    if (!query.exec() || !query.isActive())
         MythContext::DBError("GetChannelOptions - Options", query);
 
-    if (query.numRowsAffected() <= 0)
+    if (query.size() <= 0)
     {
        ERROR(QString("Could not find dvb tuning parameters for transport %1")
                       .arg(mplexid));
-       pthread_mutex_unlock(db_lock);
        return false;
     }
 
@@ -438,10 +420,8 @@ bool DVBChannel::GetTransportOptions(int mplexid)
 
     if (!ParseTransportQuery(query))
     {
-        pthread_mutex_unlock(db_lock);
         return false;
     }
-    pthread_mutex_unlock(db_lock);
     return true;
 }
 
@@ -730,10 +710,8 @@ bool DVBChannel::CheckModulation(fe_modulation_t& modulation)
         Query parser functions for each of the three types of cards.
  *****************************************************************************/
 
-bool DVBChannel::ParseTransportQuery(QSqlQuery& query)
+bool DVBChannel::ParseTransportQuery(MSqlQuery& query)
 {
-
-    // This function must be called with db_lock held
 
     pthread_mutex_lock(&chan_opts.lock);
 

@@ -308,7 +308,7 @@ bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     return true;
 }
 
-void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
+void ProgramInfo::ToMap(QMap<QString, QString> &progMap)
 {
     QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
     QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
@@ -430,16 +430,14 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
 
     progMap["time"] = timeNow.time().toString(timeFormat);
 
-    if (db)
-    {
-        MSqlQuery query(QString::null, db);
-        query.prepare("SELECT icon FROM channel WHERE chanid = :CHANID ;");
-        query.bindValue(":CHANID", chanid);
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT icon FROM channel WHERE chanid = :CHANID ;");
+    query.bindValue(":CHANID", chanid);
         
-        if (query.exec() && query.isActive() && query.size() > 0)
-            if (query.next())
-                progMap["iconpath"] = query.value(0).toString();
-    }
+    if (query.exec() && query.isActive() && query.size() > 0)
+        if (query.next())
+            progMap["iconpath"] = query.value(0).toString();
 
     progMap["RECSTATUS"] = RecStatusText();
 
@@ -490,8 +488,7 @@ int ProgramInfo::CalculateLength(void)
         return startts.secsTo(endts);
 }
 
-ProgramInfo *ProgramInfo::GetProgramAtDateTime(QSqlDatabase *db,
-                                               const QString &channel, 
+ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel, 
                                                QDateTime &dtime)
 {
     ProgramList schedList;
@@ -505,7 +502,7 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(QSqlDatabase *db,
         .arg(dtime.toString("yyyyMMddhhmm50"));
 
     schedList.FromScheduler();
-    progList.FromProgram(db, querystr, schedList);
+    progList.FromProgram(querystr, schedList);
 
     if (!progList.isEmpty())
     {
@@ -520,7 +517,7 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(QSqlDatabase *db,
                                    "WHERE chanid = \"%1\";")
                                    .arg(channel);
 
-        MSqlQuery query(QString::null, db);
+        MSqlQuery query(MSqlQuery::InitCon());
         query.prepare(querystr);
 
         if (!query.exec() || !query.isActive())
@@ -558,19 +555,16 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(QSqlDatabase *db,
     }
 }
 
-ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
-                                                 const QString &channel, 
+ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel, 
                                                  QDateTime &dtime)
 {
-    return GetProgramFromRecorded(db, channel, 
-                                  dtime.toString("yyyyMMddhhmm00"));
+    return GetProgramFromRecorded(channel, dtime.toString("yyyyMMddhhmm00"));
 }
 
-ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
-                                                 const QString &channel, 
+ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel, 
                                                  const QString &starttime)
 {
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT recorded.chanid,starttime,endtime,title, "
                   "subtitle,description,channel.channum, "
                   "channel.callsign,channel.name,channel.commfree, "
@@ -633,7 +627,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
 
         proginfo->spread = -1;
 
-        proginfo->programflags = proginfo->getProgramFlags(db);
+        proginfo->programflags = proginfo->getProgramFlags();
 
         return proginfo;
     }
@@ -645,7 +639,6 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
 // -1 for no data, 0 for no, 1 for weekdaily, 2 for weekly.
 int ProgramInfo::IsProgramRecurring(void)
 {
-    QSqlDatabase *db = QSqlDatabase::database();
     QDateTime dtime = startts;
 
     int weekday = dtime.date().dayOfWeek();
@@ -658,7 +651,7 @@ int ProgramInfo::IsProgramRecurring(void)
 
         QDateTime checktime = dtime.addDays(daysadd);
 
-        ProgramInfo *nextday = GetProgramAtDateTime(db, chanid, checktime);
+        ProgramInfo *nextday = GetProgramAtDateTime(chanid, checktime);
 
         if (NULL == nextday)
             return -1;
@@ -673,7 +666,7 @@ int ProgramInfo::IsProgramRecurring(void)
     }
 
     QDateTime checktime = dtime.addDays(7);
-    ProgramInfo *nextweek = GetProgramAtDateTime(db, chanid, checktime);
+    ProgramInfo *nextweek = GetProgramAtDateTime(chanid, checktime);
 
     if (NULL == nextweek)
         return -1;
@@ -689,42 +682,42 @@ int ProgramInfo::IsProgramRecurring(void)
     return 0;
 }
 
-RecordingType ProgramInfo::GetProgramRecordingStatus(QSqlDatabase *db)
+RecordingType ProgramInfo::GetProgramRecordingStatus()
 {
     if (record == NULL) 
     {
         record = new ScheduledRecording();
-        record->loadByProgram(db, this);
+        record->loadByProgram(this);
     }
 
     return record->getRecordingType();
 }
 
-QString ProgramInfo::GetProgramRecordingProfile(QSqlDatabase *db)
+QString ProgramInfo::GetProgramRecordingProfile()
 {
     if (record == NULL)
     {
         record = new ScheduledRecording();
-        record->loadByProgram(db, this);
+        record->loadByProgram(this);
     }
 
     return record->getProfileName();
 }
 
-int ProgramInfo::GetAutoRunJobs(QSqlDatabase *db)
+int ProgramInfo::GetAutoRunJobs()
 {
     if (record == NULL) 
     {
         record = new ScheduledRecording();
-        record->loadByProgram(db, this);
+        record->loadByProgram(this);
     }
 
     return record->GetAutoRunJobs();
 }
 
-int ProgramInfo::GetChannelRecPriority(QSqlDatabase *db, const QString &chanid)
+int ProgramInfo::GetChannelRecPriority(const QString &chanid)
 {
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT recpriority FROM channel WHERE chanid = :CHANID ;");
     query.bindValue(":CHANID", chanid);
     
@@ -764,21 +757,19 @@ int ProgramInfo::GetRecordingTypeRecPriority(RecordingType type)
 }
 
 // newstate uses same values as return of GetProgramRecordingState
-void ProgramInfo::ApplyRecordStateChange(QSqlDatabase *db, 
-                                         RecordingType newstate)
+void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
 {
-    GetProgramRecordingStatus(db);
+    GetProgramRecordingStatus();
     if (newstate == kOverrideRecord || newstate == kDontRecord)
         record->makeOverride();
     record->setRecordingType(newstate);
-    record->save(db);
+    record->save();
 }
 
-void ProgramInfo::ApplyRecordTimeChange(QSqlDatabase *db,
-                                        const QDateTime &newstartts, 
+void ProgramInfo::ApplyRecordTimeChange(const QDateTime &newstartts, 
                                         const QDateTime &newendts)
 {
-    GetProgramRecordingStatus(db);
+    GetProgramRecordingStatus();
     if (record->getRecordingType() != kNotRecording) 
     {
         record->setStart(newstartts);
@@ -786,19 +777,16 @@ void ProgramInfo::ApplyRecordTimeChange(QSqlDatabase *db,
     }
 }
 
-void ProgramInfo::ApplyRecordRecPriorityChange(QSqlDatabase *db,
-                                        int newrecpriority)
+void ProgramInfo::ApplyRecordRecPriorityChange(int newrecpriority)
 {
-    GetProgramRecordingStatus(db);
+    GetProgramRecordingStatus();
     record->setRecPriority(newrecpriority);
-    record->save(db);
+    record->save();
 }
 
-void ProgramInfo::ApplyRecordRecGroupChange(QSqlDatabase *db,
-                                            const QString &newrecgroup)
+void ProgramInfo::ApplyRecordRecGroupChange(const QString &newrecgroup)
 {
-    MythContext::KickDatabase(db);
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("UPDATE recorded"
                   " SET recgroup = :RECGROUP"
@@ -814,58 +802,58 @@ void ProgramInfo::ApplyRecordRecGroupChange(QSqlDatabase *db,
     recgroup = newrecgroup;
 }
 
-void ProgramInfo::ToggleRecord(QSqlDatabase *db)
+void ProgramInfo::ToggleRecord()
 {
-    RecordingType curType = GetProgramRecordingStatus(db);
+    RecordingType curType = GetProgramRecordingStatus();
 
     switch (curType) 
     {
         case kNotRecording:
-            ApplyRecordStateChange(db, kSingleRecord);
+            ApplyRecordStateChange(kSingleRecord);
             break;
         case kSingleRecord:
-            ApplyRecordStateChange(db, kFindOneRecord);
+            ApplyRecordStateChange(kFindOneRecord);
             break;
         case kFindOneRecord:
-            ApplyRecordStateChange(db, kWeekslotRecord);
+            ApplyRecordStateChange(kWeekslotRecord);
             break;
         case kWeekslotRecord:
-            ApplyRecordStateChange(db, kFindWeeklyRecord);
+            ApplyRecordStateChange(kFindWeeklyRecord);
             break;
         case kFindWeeklyRecord:
-            ApplyRecordStateChange(db, kTimeslotRecord);
+            ApplyRecordStateChange(kTimeslotRecord);
             break;
         case kTimeslotRecord:
-            ApplyRecordStateChange(db, kFindDailyRecord);
+            ApplyRecordStateChange(kFindDailyRecord);
             break;
         case kFindDailyRecord:
-            ApplyRecordStateChange(db, kChannelRecord);
+            ApplyRecordStateChange(kChannelRecord);
             break;
         case kChannelRecord:
-            ApplyRecordStateChange(db, kAllRecord);
+            ApplyRecordStateChange(kAllRecord);
             break;
         case kAllRecord:
         default:
-            ApplyRecordStateChange(db, kNotRecording);
+            ApplyRecordStateChange(kNotRecording);
             break;
         case kOverrideRecord:
-            ApplyRecordStateChange(db, kDontRecord);
+            ApplyRecordStateChange(kDontRecord);
             break;
         case kDontRecord:
-            ApplyRecordStateChange(db, kOverrideRecord);
+            ApplyRecordStateChange(kOverrideRecord);
             break;
     }
 }
 
-ScheduledRecording* ProgramInfo::GetScheduledRecording(QSqlDatabase *db)
+ScheduledRecording* ProgramInfo::GetScheduledRecording()
 {
-    GetProgramRecordingStatus(db);
+    GetProgramRecordingStatus();
     return record;
 }
 
-int ProgramInfo::getRecordID(QSqlDatabase *db)
+int ProgramInfo::getRecordID()
 {
-    GetProgramRecordingStatus(db);
+    GetProgramRecordingStatus();
     recordid = record->getRecordID();
     return recordid;
 }
@@ -979,20 +967,17 @@ QString ProgramInfo::GetPlaybackURL(QString playbackHost) {
     return tmpURL;
 }
 
-void ProgramInfo::StartedRecording(QSqlDatabase *db)
+void ProgramInfo::StartedRecording()
 {
-    if (!db)
-        return;
-
     if (record == NULL) {
         record = new ScheduledRecording();
-        record->loadByProgram(db, this);
+        record->loadByProgram(this);
     }
 
     QString starts = recstartts.toString("yyyyMMddhhmm00");
     QString ends = recendts.toString("yyyyMMddhhmm00");
 
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("INSERT INTO recorded (chanid,starttime,endtime,title,"
                   " subtitle,description,hostname,category,recgroup,"
                   " autoexpire,recordid,seriesid,programid,stars,"
@@ -1031,19 +1016,18 @@ void ProgramInfo::StartedRecording(QSqlDatabase *db)
         MythContext::DBError("Clear markup on record", query);
 }
 
-void ProgramInfo::FinishedRecording(QSqlDatabase* db, bool prematurestop) 
+void ProgramInfo::FinishedRecording(bool prematurestop) 
 {
-    GetProgramRecordingStatus(db);
+    GetProgramRecordingStatus();
     if (!prematurestop)
-        record->doneRecording(db, *this);
+        record->doneRecording(*this);
 }
 
-void ProgramInfo::SetFilesize(long long fsize, QSqlDatabase *db)
+void ProgramInfo::SetFilesize(long long fsize)
 {
-    MythContext::KickDatabase(db);
     filesize = fsize;
 
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE recorded SET filesize = :FILESIZE"
                   " WHERE chanid = :CHANID"
                   " AND starttime = :STARTTIME ;");
@@ -1056,10 +1040,9 @@ void ProgramInfo::SetFilesize(long long fsize, QSqlDatabase *db)
                              query);
 }
 
-long long ProgramInfo::GetFilesize(QSqlDatabase *db)
+long long ProgramInfo::GetFilesize()
 {
-    MythContext::KickDatabase(db);
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     
     query.prepare("SELECT filesize FROM recorded"
                   " WHERE chanid = :CHANID"
@@ -1078,10 +1061,9 @@ long long ProgramInfo::GetFilesize(QSqlDatabase *db)
     return filesize;
 }
 
-void ProgramInfo::SetBookmark(long long pos, QSqlDatabase *db)
+void ProgramInfo::SetBookmark(long long pos)
 {
-    MythContext::KickDatabase(db);
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("UPDATE recorded"
                   " SET bookmark = :BOOKMARK"
@@ -1104,10 +1086,9 @@ void ProgramInfo::SetBookmark(long long pos, QSqlDatabase *db)
                              query);
 }
 
-long long ProgramInfo::GetBookmark(QSqlDatabase *db)
+long long ProgramInfo::GetBookmark()
 {
-    MythContext::KickDatabase(db);
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     long long pos = 0;
 
     if (ignoreBookmark)
@@ -1130,10 +1111,9 @@ long long ProgramInfo::GetBookmark(QSqlDatabase *db)
     return pos;
 }
 
-bool ProgramInfo::IsEditing(QSqlDatabase *db)
+bool ProgramInfo::IsEditing()
 {
-    MythContext::KickDatabase(db);
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT editing FROM recorded"
                   " WHERE chanid = :CHANID"
@@ -1150,10 +1130,9 @@ bool ProgramInfo::IsEditing(QSqlDatabase *db)
     return false;
 }
 
-void ProgramInfo::SetEditing(bool edit, QSqlDatabase *db)
+void ProgramInfo::SetEditing(bool edit)
 {
-    MythContext::KickDatabase(db);
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     
     query.prepare("UPDATE recorded"
                   " SET editing = :EDIT"
@@ -1168,10 +1147,9 @@ void ProgramInfo::SetEditing(bool edit, QSqlDatabase *db)
                              query);
 }
 
-void ProgramInfo::SetDeleteFlag(bool deleteFlag, QSqlDatabase *db)
+void ProgramInfo::SetDeleteFlag(bool deleteFlag)
 {
-    MythContext::KickDatabase(db);
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("UPDATE recorded"
                   " SET deletepending = :DELETEFLAG"
@@ -1189,10 +1167,9 @@ void ProgramInfo::SetDeleteFlag(bool deleteFlag, QSqlDatabase *db)
         MythContext::DBError("Set delete flag", query);
 }
 
-bool ProgramInfo::IsCommFlagged(QSqlDatabase *db)
+bool ProgramInfo::IsCommFlagged()
 {
-    MythContext::KickDatabase(db);
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     
     query.prepare("SELECT commflagged FROM recorded"
                   " WHERE chanid = :CHANID"
@@ -1209,10 +1186,9 @@ bool ProgramInfo::IsCommFlagged(QSqlDatabase *db)
     return false;
 }
 
-void ProgramInfo::SetCommFlagged(int flag, QSqlDatabase *db)
+void ProgramInfo::SetCommFlagged(int flag)
 {
-    MythContext::KickDatabase(db);
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("UPDATE recorded"
                   " SET commflagged = :FLAG"
@@ -1227,10 +1203,9 @@ void ProgramInfo::SetCommFlagged(int flag, QSqlDatabase *db)
                              query);
 }
 
-bool ProgramInfo::IsCommProcessing(QSqlDatabase *db)
+bool ProgramInfo::IsCommProcessing()
 {
-    MythContext::KickDatabase(db);
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     
     query.prepare("SELECT commflagged FROM recorded"
                   " WHERE chanid = :CHANID"
@@ -1247,11 +1222,9 @@ bool ProgramInfo::IsCommProcessing(QSqlDatabase *db)
     return false;
 }
 
-void ProgramInfo::SetPreserveEpisode(bool preserveEpisode, QSqlDatabase *db)
+void ProgramInfo::SetPreserveEpisode(bool preserveEpisode)
 {
-    MythContext::KickDatabase(db);
-
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("UPDATE recorded"
                   " SET preserve = :PRESERVE"
@@ -1265,10 +1238,9 @@ void ProgramInfo::SetPreserveEpisode(bool preserveEpisode, QSqlDatabase *db)
         MythContext::DBError("PreserveEpisode update", query);
 }
 
-void ProgramInfo::SetAutoExpire(bool autoExpire, QSqlDatabase *db)
+void ProgramInfo::SetAutoExpire(bool autoExpire)
 {
-    MythContext::KickDatabase(db);
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("UPDATE recorded"
                   " SET autoexpire = :AUTOEXPIRE"
@@ -1283,10 +1255,9 @@ void ProgramInfo::SetAutoExpire(bool autoExpire, QSqlDatabase *db)
                              query);
 }
 
-bool ProgramInfo::GetAutoExpireFromRecorded(QSqlDatabase *db)
+bool ProgramInfo::GetAutoExpireFromRecorded()
 {
-    MythContext::KickDatabase(db);
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT autoexpire FROM recorded"
                   " WHERE chanid = :CHANID"
@@ -1303,10 +1274,9 @@ bool ProgramInfo::GetAutoExpireFromRecorded(QSqlDatabase *db)
     return false;
 }
 
-bool ProgramInfo::GetPreserveEpisodeFromRecorded(QSqlDatabase *db)
+bool ProgramInfo::GetPreserveEpisodeFromRecorded()
 {
-    MythContext::KickDatabase(db);
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT preserve FROM recorded"
                   " WHERE chanid = :CHANID"
@@ -1323,10 +1293,9 @@ bool ProgramInfo::GetPreserveEpisodeFromRecorded(QSqlDatabase *db)
     return false;
 }
 
-bool ProgramInfo::UsesMaxEpisodes(QSqlDatabase *db)
+bool ProgramInfo::UsesMaxEpisodes()
 {
-    MythContext::KickDatabase(db);
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT maxepisodes FROM record WHERE "
                   "recordid = :RECID ;");
@@ -1341,14 +1310,13 @@ bool ProgramInfo::UsesMaxEpisodes(QSqlDatabase *db)
     return false;
 }
 
-void ProgramInfo::GetCutList(QMap<long long, int> &delMap, QSqlDatabase *db)
+void ProgramInfo::GetCutList(QMap<long long, int> &delMap)
 {
 //    GetMarkupMap(delMap, db, MARK_CUT_START);
 //    GetMarkupMap(delMap, db, MARK_CUT_END, true);
 
     delMap.clear();
-    MythContext::KickDatabase(db);
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT cutlist FROM recorded"
                   " WHERE chanid = :CHANID"
@@ -1384,7 +1352,7 @@ void ProgramInfo::GetCutList(QMap<long long, int> &delMap, QSqlDatabase *db)
     }
 }
 
-void ProgramInfo::SetCutList(QMap<long long, int> &delMap, QSqlDatabase *db)
+void ProgramInfo::SetCutList(QMap<long long, int> &delMap)
 {
 //    ClearMarkupMap(db, MARK_CUT_START);
 //    ClearMarkupMap(db, MARK_CUT_END);
@@ -1412,8 +1380,7 @@ void ProgramInfo::SetCutList(QMap<long long, int> &delMap, QSqlDatabase *db)
         }
     }
 
-    MythContext::KickDatabase(db);
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("UPDATE recorded"
                   " SET cutlist = :CUTLIST"
@@ -1429,38 +1396,35 @@ void ProgramInfo::SetCutList(QMap<long long, int> &delMap, QSqlDatabase *db)
 }
 
 void ProgramInfo::SetBlankFrameList(QMap<long long, int> &frames,
-                                    QSqlDatabase *db, long long min_frame, 
+                                    long long min_frame, 
                                     long long max_frame)
 {
-    ClearMarkupMap(db, MARK_BLANK_FRAME, min_frame, max_frame);
-    SetMarkupMap(frames, db, MARK_BLANK_FRAME, min_frame, max_frame);
+    ClearMarkupMap(MARK_BLANK_FRAME, min_frame, max_frame);
+    SetMarkupMap(frames, MARK_BLANK_FRAME, min_frame, max_frame);
 }
 
-void ProgramInfo::GetBlankFrameList(QMap<long long, int> &frames,
-                                    QSqlDatabase *db)
+void ProgramInfo::GetBlankFrameList(QMap<long long, int> &frames)
 {
-    GetMarkupMap(frames, db, MARK_BLANK_FRAME);
+    GetMarkupMap(frames, MARK_BLANK_FRAME);
 }
 
-void ProgramInfo::SetCommBreakList(QMap<long long, int> &frames,
-                                   QSqlDatabase *db)
+void ProgramInfo::SetCommBreakList(QMap<long long, int> &frames)
 {
-    ClearMarkupMap(db, MARK_COMM_START);
-    ClearMarkupMap(db, MARK_COMM_END);
-    SetMarkupMap(frames, db);
+    ClearMarkupMap(MARK_COMM_START);
+    ClearMarkupMap(MARK_COMM_END);
+    SetMarkupMap(frames);
 }
 
-void ProgramInfo::GetCommBreakList(QMap<long long, int> &frames,
-                                   QSqlDatabase *db)
+void ProgramInfo::GetCommBreakList(QMap<long long, int> &frames)
 {
-    GetMarkupMap(frames, db, MARK_COMM_START);
-    GetMarkupMap(frames, db, MARK_COMM_END, true);
+    GetMarkupMap(frames, MARK_COMM_START);
+    GetMarkupMap(frames, MARK_COMM_END, true);
 }
 
-void ProgramInfo::ClearMarkupMap(QSqlDatabase *db, int type,
-                                 long long min_frame, long long max_frame)
+void ProgramInfo::ClearMarkupMap(int type, long long min_frame, 
+                                           long long max_frame)
 {
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     QString comp = "";
 
     if (min_frame >= 0)
@@ -1503,12 +1467,12 @@ void ProgramInfo::ClearMarkupMap(QSqlDatabase *db, int type,
                              query);
 }
 
-void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
+void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks,
                                int type, long long min_frame, 
                                long long max_frame)
 {
     QMap<long long, int>::Iterator i;
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     
     if (!isVideo)
     {
@@ -1571,14 +1535,13 @@ void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
     }
 }
 
-void ProgramInfo::GetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
+void ProgramInfo::GetMarkupMap(QMap<long long, int> &marks,
                                int type, bool mergeIntoMap)
 {
     if (!mergeIntoMap)
         marks.clear();
 
-    MythContext::KickDatabase(db);
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     
     if (isVideo)
     {
@@ -1608,34 +1571,32 @@ void ProgramInfo::GetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
     }
 }
 
-bool ProgramInfo::CheckMarkupFlag(int type, QSqlDatabase *db)
+bool ProgramInfo::CheckMarkupFlag(int type)
 {
     QMap<long long, int> flagMap;
 
-    GetMarkupMap(flagMap, db, type);
+    GetMarkupMap(flagMap, type);
 
     return(flagMap.contains(0));
 }
 
-void ProgramInfo::SetMarkupFlag(int type, bool flag, QSqlDatabase *db)
+void ProgramInfo::SetMarkupFlag(int type, bool flag)
 {
-    ClearMarkupMap(db, type);
+    ClearMarkupMap(type);
 
     if (flag)
     {
         QMap<long long, int> flagMap;
 
         flagMap[0] = type;
-        SetMarkupMap(flagMap, db, type);
+        SetMarkupMap(flagMap, type);
     }
 }
 
-void ProgramInfo::GetPositionMap(QMap<long long, long long> &posMap, int type,
-                                 QSqlDatabase *db)
+void ProgramInfo::GetPositionMap(QMap<long long, long long> &posMap, int type)
 {
     posMap.clear();
-    MythContext::KickDatabase(db);
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     if (isVideo)
     {
@@ -1663,9 +1624,9 @@ void ProgramInfo::GetPositionMap(QMap<long long, long long> &posMap, int type,
     }
 }
 
-void ProgramInfo::ClearPositionMap(int type, QSqlDatabase *db)
+void ProgramInfo::ClearPositionMap(int type)
 {
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
   
     if (isVideo)
     {
@@ -1691,11 +1652,10 @@ void ProgramInfo::ClearPositionMap(int type, QSqlDatabase *db)
 }
 
 void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
-                                 QSqlDatabase *db, long long min_frame,
-                                 long long max_frame)
+                                 long long min_frame, long long max_frame)
 {
     QMap<long long, long long>::Iterator i;
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     QString comp = "";
 
     if (min_frame >= 0)
@@ -1783,10 +1743,10 @@ void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
 }
 
 void ProgramInfo::SetPositionMapDelta(QMap<long long, long long> &posMap,
-                                      int type, QSqlDatabase *db)
+                                      int type)
 {
     QMap<long long, long long>::Iterator i;
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     for (i = posMap.begin(); i != posMap.end(); ++i)
     {
@@ -1828,10 +1788,10 @@ void ProgramInfo::SetPositionMapDelta(QMap<long long, long long> &posMap,
     }
 }
 
-void ProgramInfo::DeleteHistory(QSqlDatabase *db)
+void ProgramInfo::DeleteHistory()
 {
-    GetProgramRecordingStatus(db);
-    record->forgetHistory(db, *this);
+    GetProgramRecordingStatus();
+    record->forgetHistory(*this);
 }
 
 QString ProgramInfo::RecTypeChar(void)
@@ -2121,9 +2081,9 @@ void ProgramInfo::FillInRecordInfo(vector<ProgramInfo *> &reclist)
     }
 }
 
-void ProgramInfo::Save(QSqlDatabase *db)
+void ProgramInfo::Save()
 {
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     // This used to be REPLACE INTO...
     // primary key of table program is chanid,starttime
@@ -2238,28 +2198,25 @@ QGridLayout* ProgramInfo::DisplayWidget(QWidget *parent, QString searchtitle)
     return grid;
 }
 
-void ProgramInfo::EditRecording(QSqlDatabase *db)
+void ProgramInfo::EditRecording()
 {
-    MythContext::KickDatabase(db);
-
     if (recordid == 0)
-        EditScheduled(db);
+        EditScheduled();
     else if (recstatus <= rsWillRecord)
-        handleRecording(db);
+        handleRecording();
     else
-        handleNotRecording(db);
+        handleNotRecording();
 }
 
-void ProgramInfo::EditScheduled(QSqlDatabase *db)
+void ProgramInfo::EditScheduled()
 {
-    GetProgramRecordingStatus(db);
-    record->exec(db);
+    GetProgramRecordingStatus();
+    record->exec();
 }
 
-void ProgramInfo::showDetails(QSqlDatabase *db)
+void ProgramInfo::showDetails()
 {
-    MythContext::KickDatabase(db);
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     QString oldDateFormat = gContext->GetSetting("OldDateFormat", "M/d/yyyy");
 
     QString category_type, epinum, rating;
@@ -2464,11 +2421,10 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
     delete details_dialog;
 }
 
-int ProgramInfo::getProgramFlags(QSqlDatabase *db)
+int ProgramInfo::getProgramFlags()
 {
     int flags = 0;
-    MythContext::KickDatabase(db);
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     
     query.prepare("SELECT commflagged, cutlist, autoexpire, "
                   "editing, bookmark FROM recorded WHERE "
@@ -2492,7 +2448,7 @@ int ProgramInfo::getProgramFlags(QSqlDatabase *db)
     return flags;
 }
 
-void ProgramInfo::handleRecording(QSqlDatabase *db)
+void ProgramInfo::handleRecording()
 {
     QDateTime now = QDateTime::currentDateTime();
 
@@ -2574,7 +2530,7 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
         RemoteReactivateRecording(this);
     else if (ret == stop)
     {
-        ProgramInfo *p = GetProgramFromRecorded(db, chanid, recstartts);
+        ProgramInfo *p = GetProgramFromRecorded(chanid, recstartts);
         if (p)
         {
             RemoteStopRecording(p);
@@ -2582,30 +2538,30 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
         }
     }
     else if (ret == addov)
-        ApplyRecordStateChange(db, kDontRecord);
+        ApplyRecordStateChange(kDontRecord);
     else if (ret == forget)
     {
-        GetProgramRecordingStatus(db);
-        record->addHistory(db, *this);
+        GetProgramRecordingStatus();
+        record->addHistory(*this);
     }
     else if (ret == clearov)
-        ApplyRecordStateChange(db, kNotRecording);
+        ApplyRecordStateChange(kNotRecording);
     else if (ret == ednorm)
     {
-        GetProgramRecordingStatus(db);
-        record->exec(db);
+        GetProgramRecordingStatus();
+        record->exec();
     }
     else if (ret == edcust)
     {
-        GetProgramRecordingStatus(db);
+        GetProgramRecordingStatus();
         record->makeOverride();
-        record->exec(db);
+        record->exec();
     }
 
     return;
 }
 
-void ProgramInfo::handleNotRecording(QSqlDatabase *db)
+void ProgramInfo::handleNotRecording()
 {
     QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
 
@@ -2708,27 +2664,27 @@ void ProgramInfo::handleNotRecording(QSqlDatabase *db)
         RemoteReactivateRecording(this);
     else if (ret == addov)
     {
-        ApplyRecordStateChange(db, kOverrideRecord);
+        ApplyRecordStateChange(kOverrideRecord);
         if (recstartts < now)
             RemoteReactivateRecording(this);
     }
     else if (ret == forget)
     {
-        GetProgramRecordingStatus(db);
-        record->forgetHistory(db, *this);
+        GetProgramRecordingStatus();
+        record->forgetHistory(*this);
     }
     else if (ret == clearov)
-        ApplyRecordStateChange(db, kNotRecording);
+        ApplyRecordStateChange(kNotRecording);
     else if (ret == ednorm)
     {
-        GetProgramRecordingStatus(db);
-        record->exec(db);
+        GetProgramRecordingStatus();
+        record->exec();
     }
     else if (ret == edcust)
     {
-        GetProgramRecordingStatus(db);
+        GetProgramRecordingStatus();
         record->makeOverride();
-        record->exec(db);
+        record->exec();
     }
 
     return;
@@ -2771,8 +2727,7 @@ bool ProgramList::FromScheduler(bool &hasConflicts)
     return result;
 }
 
-bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
-                              ProgramList &schedList)
+bool ProgramList::FromProgram(const QString sql, ProgramList &schedList)
 {
     clear();
 
@@ -2797,7 +2752,7 @@ bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
     if (!sql.contains(" LIMIT "))
         querystr += "LIMIT 1000 ";
 
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(querystr);
     
     if (!query.exec() || !query.isActive())
@@ -2870,10 +2825,10 @@ bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
     return true;
 }
 
-bool ProgramList::FromOldRecorded(QSqlDatabase *db, const QString sql)
+bool ProgramList::FromOldRecorded(const QString sql)
 {
     clear();
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT oldrecorded.chanid, starttime, endtime, "
                   " title, subtitle, description, category, seriesid, "
@@ -2919,13 +2874,13 @@ bool ProgramList::FromOldRecorded(QSqlDatabase *db, const QString sql)
     return true;
 }
 
-bool ProgramList::FromRecorded(QSqlDatabase *, const QString, ProgramList&)
+bool ProgramList::FromRecorded(const QString, ProgramList&)
 {
     clear();
     return false;
 }
 
-bool ProgramList::FromRecord(QSqlDatabase *, const QString)
+bool ProgramList::FromRecord(const QString)
 {
     clear();
     return false;

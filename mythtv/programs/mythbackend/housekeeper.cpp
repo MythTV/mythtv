@@ -16,6 +16,7 @@ using namespace std;
 #include "jobqueue.h"
 
 #include "libmyth/mythcontext.h"
+#include "libmyth/mythdbcon.h"
 
 bool HouseKeeper_filldb_running = false;
 
@@ -25,9 +26,8 @@ void reapChild(int /* sig */)
     HouseKeeper_filldb_running = false;
 }
 
-HouseKeeper::HouseKeeper(bool runthread, bool master, QSqlDatabase *ldb)
+HouseKeeper::HouseKeeper(bool runthread, bool master)
 {
-    db = ldb;
     isMaster = master;
 
     threadrunning = runthread;
@@ -53,13 +53,15 @@ bool HouseKeeper::wantToRun(const QString &dbTag, int period, int minhour,
     QDateTime now = QDateTime::currentDateTime();
     QDateTime lastrun;
     lastrun.setTime_t(0);
-    if (db->isOpen())
+
+    MSqlQuery result(MSqlQuery::InitCon());
+    if (result.isConnected())
     {
-        MythContext::KickDatabase(db);
         QString query = QString("SELECT lastrun FROM housekeeping WHERE "
                                 "tag = \"%1\";").arg(dbTag);
-        QSqlQuery result = db->exec(query);
-        if (result.isActive() && result.numRowsAffected() > 0)
+        result.prepare(query);
+
+        if (result.exec() && result.isActive() && result.size() > 0)
         {
             result.next();
             lastrun = result.value(0).toDateTime();
@@ -75,7 +77,8 @@ bool HouseKeeper::wantToRun(const QString &dbTag, int period, int minhour,
         {
             query = QString("INSERT INTO housekeeping(tag,lastrun) "
                             "values(\"%1\",now())").arg(dbTag);
-            db->exec(query);
+            result.prepare(query);
+            result.exec();
 
             runOK = true;
         }
@@ -86,15 +89,17 @@ bool HouseKeeper::wantToRun(const QString &dbTag, int period, int minhour,
 
 void HouseKeeper::updateLastrun(const QString &dbTag)
 {
-    if (db->isOpen())
+    MSqlQuery result(MSqlQuery::InitCon());
+    if (result.isConnected())
     {
-        MythContext::KickDatabase(db);
         QString query = QString("DELETE FROM housekeeping WHERE "
                                 "tag = \"%1\";").arg(dbTag);
-        QSqlQuery result = db->exec(query);
+        result.prepare(query);
+        result.exec();
         query = QString("INSERT INTO housekeeping(tag,lastrun) "
                         "values(\"%1\",now())").arg(dbTag);
-        result = db->exec(query);
+        result.prepare(query);
+        result.exec();
     }
 }
 
@@ -160,12 +165,12 @@ void HouseKeeper::RunHouseKeeping(void)
             }
 
             if (wantToRun("JobQueueCleanup", 1, 0, 24))
-                JobQueue::CleanupOldJobsInQueue(db);
+                JobQueue::CleanupOldJobsInQueue();
         }
 
         dbTag = QString("JobQueueRecover-%1").arg(gContext->GetHostName());
         if (wantToRun(dbTag, 1, 0, 24))
-            JobQueue::RecoverOldJobsInQueue(db);
+            JobQueue::RecoverOldJobsInQueue();
 
         sleep(300);
     }
@@ -181,19 +186,21 @@ void HouseKeeper::flushLogs()
     QDateTime max = QDateTime::currentDateTime();
     max = max.addDays(0 - maxdays);
 
-    if (db->isOpen())
+    MSqlQuery result(MSqlQuery::InitCon());
+    if (result.isConnected())
     {
-        MythContext::KickDatabase(db);
         QString dstring = days.toString(QString("yyyy-MM-dd hh:mm:ss"));
         QString query = QString("DELETE FROM mythlog WHERE "
                                 "acknowledged=1 and logdate<\"%1\";")
                                 .arg(dstring);
-        QSqlQuery result = db->exec(query);
+        result.prepare(query);
+        result.exec();
 
         dstring = max.toString(QString("yyyy-MM-dd hh:mm:ss"));
         query = QString("DELETE FROM mythlog WHERE logdate<\"%1\";")
                                 .arg(dstring);
-        result = db->exec(query);
+        result.prepare(query);
+        result.exec();
     }
 }
 

@@ -41,6 +41,7 @@
 #include "mythwidgets.h"
 #include "mythwizard.h"
 #include "mythcontext.h"
+#include "mythdbcon.h"
 #include "videosource.h"
 
 class DTVTStandard;
@@ -85,9 +86,9 @@ class DVBTransportList: public ListBoxSetting {
 public:
     DVBTransportList() {}
 
-    void save(QSqlDatabase* _db) { (void)_db; };
-    void load(QSqlDatabase* _db) {
-        db = _db;
+    void save() { };
+    void load() 
+    {
         fillSelections();
     };
 public slots:
@@ -95,7 +96,6 @@ public slots:
     void sourceID(const QString& str) { strSourceID=str; fillSelections();}
 
 private:
-    QSqlDatabase* db;
     QString strSourceID;
 };
 
@@ -108,13 +108,12 @@ class DVBTransportsEditor: public VerticalConfigurationGroup ,
 public:
     DVBTransportsEditor();
 
-    void load(QSqlDatabase* _db)
+    void load()
     {
-         m_db = _db;
-         VerticalConfigurationGroup::load(m_db);
+         VerticalConfigurationGroup::load();
     };
 
-    virtual int exec(QSqlDatabase* db);
+    virtual int exec();
 
 public slots:
     void menu(int);
@@ -124,7 +123,6 @@ public slots:
     void videoSource(const QString& str);
 
 private:
-    QSqlDatabase* m_db;
     DVBTransportList* m_list;
     DVBTSourceSetting* m_videoSource;
     DVBTID *m_id;
@@ -135,11 +133,10 @@ class DVBTransportWizard: public ConfigurationWizard
 {
     Q_OBJECT
 public:
-    DVBTransportWizard(int id, unsigned _nVideoSorceID, QSqlDatabase* _db);
+    DVBTransportWizard(int id, unsigned _nVideoSorceID);
 
 private:
     DVBTID *dvbtid;
-    QSqlDatabase* db;
 };
 
 class DVBTransportPage: public HorizontalConfigurationGroup
@@ -151,7 +148,6 @@ protected:
     const DVBTID& id;
 
 private:
-    QSqlDatabase* db;
 
     DTVTStandard*      dtvStandard;
     DvbTATSCModulation* atscmodulation;

@@ -2,6 +2,7 @@
 #include "videosource.h"
 #include "libmyth/mythwidgets.h"
 #include "libmyth/mythcontext.h"
+#include "libmyth/mythdbcon.h"
 #include "datadirect.h"
 
 #include <qapplication.h>
@@ -32,15 +33,18 @@
 
 const QString CardUtil::DVB = "DVB";
 
-bool CardUtil::isCardPresent(QSqlDatabase *db, const QString &strType)
+bool CardUtil::isCardPresent(const QString &strType)
 {
-    QSqlQuery query = db->exec(QString("SELECT count(cardtype)"
-                                       " FROM capturecard, cardinput"
-                                       " WHERE cardinput.cardid = capturecard.cardid"
-                                       " AND capturecard.cardtype=\"%1\""
-                                       " AND capturecard.hostname = \"%2\"")
-                                       .arg(strType).arg(gContext->GetHostName()));
-    if (query.isActive() && query.numRowsAffected() > 0)
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT count(cardtype)"
+                  " FROM capturecard, cardinput"
+                  " WHERE cardinput.cardid = capturecard.cardid"
+                  " AND capturecard.cardtype= :CARDTYPE "
+                  " AND capturecard.hostname = :HOSTNAME ;");
+    query.bindValue(":CARDTYPE", strType);
+    query.bindValue(":CARDTYPE", gContext->GetHostName());
+
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
         int count = query.value(0).toInt();
@@ -99,14 +103,15 @@ enum CardUtil::DVB_TYPES CardUtil::cardDVBType(unsigned nVideoDev)
     return CardUtil::cardDVBType(nVideoDev,name);
 }
 
-int CardUtil::videoDeviceFromCardID(QSqlDatabase *db, unsigned nCardID)
+int CardUtil::videoDeviceFromCardID(unsigned nCardID)
 {
     int iRet = -1;
-    QSqlQuery query = db->exec(QString("SELECT videodevice FROM capturecard "
-                                       " WHERE capturecard.cardid=%1 ")
-                                       .arg(nCardID));
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT videodevice FROM capturecard "
+                  " WHERE capturecard.cardid = :CARDID ;");
+    query.bindValue(":CARDID", nCardID);
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
         iRet = query.value(0).toInt();
@@ -114,14 +119,15 @@ int CardUtil::videoDeviceFromCardID(QSqlDatabase *db, unsigned nCardID)
     return iRet;
 }
 
-bool CardUtil::isDVB(QSqlDatabase *db, unsigned nCardID)
+bool CardUtil::isDVB(unsigned nCardID)
 {
     bool fRet = false;
-    QSqlQuery query = db->exec(QString("SELECT cardtype FROM capturecard "
-                                       " WHERE capturecard.cardid=%1")
-                                       .arg(nCardID));
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT cardtype FROM capturecard "
+                  " WHERE capturecard.cardid= :CARDID ;");
+    query.bindValue(":CARDID", nCardID);
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
         if (query.value(0).toString() == "DVB")
@@ -130,16 +136,16 @@ bool CardUtil::isDVB(QSqlDatabase *db, unsigned nCardID)
     return fRet;
 }
 
-enum CardUtil::DISEQC_TYPES CardUtil::diseqcType(QSqlDatabase *db,
-                                                 unsigned nCardID)
+enum CardUtil::DISEQC_TYPES CardUtil::diseqcType(unsigned nCardID)
 {
     int iRet = 0;
-    QSqlQuery query = db->exec(QString("SELECT dvb_diseqc_type "
-                                       "FROM capturecard "
-                                       " WHERE capturecard.cardid=%1 ")
-                                       .arg(nCardID));
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT dvb_diseqc_type "
+                  "FROM capturecard "
+                  " WHERE capturecard.cardid= :CARDID ;");
+    query.bindValue(":CARDID", nCardID);
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
         iRet = query.value(0).toInt();
@@ -254,9 +260,9 @@ void DataDirectLineupSelector::fillSelections(const QString &uid,
     pdlg.Close();
 }
 
-void DataDirect_config::load(QSqlDatabase* db) 
+void DataDirect_config::load() 
 {
-    VerticalConfigurationGroup::load(db);
+    VerticalConfigurationGroup::load();
     if ((userid->getValue() != lastloadeduserid) || 
         (password->getValue() != lastloadedpassword)) 
     {
@@ -380,8 +386,7 @@ XMLTV_uk_config::XMLTV_uk_config(const VideoSource& _parent)
             provider, SLOT(fillSelections(const QString&)));
 }
 
-void XMLTV_uk_config::save(QSqlDatabase* db) {
-    (void)db;
+void XMLTV_uk_config::save() {
 
     QString waitMsg(QObject::tr("Please wait while MythTV retrieves the "
                                 "list of available channels\n.  You "
@@ -431,8 +436,7 @@ XMLTV_generic_config::XMLTV_generic_config(const VideoSource& _parent,
     setValue(QObject::tr("Configuration will run in the terminal window"));
 }
 
-void XMLTV_generic_config::save(QSqlDatabase* db) {
-    (void)db;
+void XMLTV_generic_config::save() {
 
     QString waitMsg(QObject::tr("Please wait while MythTV retrieves the "
                                 "list of available channels.\nYou "
@@ -565,21 +569,19 @@ VideoSource::VideoSource()
     addChild(group);
 }
 
-bool VideoSourceEditor::cardTypesInclude(QSqlDatabase *db, 
-                                         const int &sourceID, 
+bool VideoSourceEditor::cardTypesInclude(const int &sourceID, 
                                          const QString &thecardtype) 
 {
-    QString querystr = QString("SELECT count(cardtype)"
-                               " FROM cardinput,capturecard "
-                               " WHERE capturecard.cardid = cardinput.cardid "
-                               " AND cardinput.sourceid=%1 "
-                               " AND capturecard.cardtype=\"%2\"")
-                               .arg(sourceID)
-                               .arg(thecardtype);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT count(cardtype)"
+                  " FROM cardinput,capturecard "
+                  " WHERE capturecard.cardid = cardinput.cardid "
+                  " AND cardinput.sourceid= :SOURCEID "
+                  " AND capturecard.cardtype= :CARDTYPE ;");
+    query.bindValue(":SOURCEID", sourceID);
+    query.bindValue(":CARDTYPE", thecardtype);
 
-    QSqlQuery query = db->exec(querystr);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
         int count = query.value(0).toInt();
@@ -591,20 +593,25 @@ bool VideoSourceEditor::cardTypesInclude(QSqlDatabase *db,
     return false;
 }
 
-void VideoSource::fillSelections(QSqlDatabase* db,
-                                 SelectSetting* setting) {
-    QString query = QString("SELECT name, sourceid FROM videosource;");
-    QSqlQuery result = db->exec(query);
+void VideoSource::fillSelections(SelectSetting* setting) 
+{
+    MSqlQuery result(MSqlQuery::InitCon());
+    result.prepare("SELECT name, sourceid FROM videosource;");
 
-    if (result.isActive() && result.numRowsAffected() > 0)
+    if (result.exec() && result.isActive() && result.size() > 0)
+    {
         while (result.next())
+        {
             setting->addSelection(result.value(0).toString(),
                                   result.value(1).toString());
+        }
+    }
 }
 
-void VideoSource::loadByID(QSqlDatabase* db, int sourceid) {
+void VideoSource::loadByID(int sourceid) 
+{
     id->setValue(sourceid);
-    load(db);
+    load();
 }
 
 class VideoDevice: public PathSetting, public CCSetting {
@@ -1016,31 +1023,42 @@ CaptureCard::CaptureCard()
     addChild(new Hostname(*this));
 }
 
-void CaptureCard::fillSelections(QSqlDatabase* db,
-                                 SelectSetting* setting) {
-    QString query = QString("SELECT cardtype, videodevice, cardid, firewire_port, firewire_node "
-                            "FROM capturecard WHERE hostname = \"%1\";")
-                            .arg(gContext->GetHostName());
-    QSqlQuery result = db->exec(query);
+void CaptureCard::fillSelections(SelectSetting* setting) 
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT cardtype, videodevice, cardid, "
+                  " firewire_port, firewire_node "
+                  " FROM capturecard WHERE hostname = :HOSTNAME ;");
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
 
-    if (result.isActive() && result.numRowsAffected() > 0)
-        while (result.next())
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        while (query.next())
+        { 
             // dont like doing this..
-            if(result.value(0).toString() == "FIREWIRE") {
-                     setting->addSelection("[ " + result.value(0).toString() + " Port: " +
-                                  result.value(3).toString() + ", Node: " +
-                                  result.value(4).toString() + "]",
-                                  result.value(2).toString());
-            } else {
-                     setting->addSelection("[ " + result.value(0).toString() + " : " +
-                                  result.value(1).toString() + " ]",
-                                  result.value(2).toString());
+            if(query.value(0).toString() == "FIREWIRE") 
+            {
+                setting->addSelection(
+                      "[ " + query.value(0).toString() + " Port: " +
+                             query.value(3).toString() + ", Node: " +
+                             query.value(4).toString() + "]",
+                             query.value(2).toString());
+            } 
+            else 
+            {
+                setting->addSelection(
+                       "[ " + query.value(0).toString() + " : " +
+                              query.value(1).toString() + " ]",
+                              query.value(2).toString());
             }
+        }
+    }   
 }
 
-void CaptureCard::loadByID(QSqlDatabase* db, int cardid) {
+void CaptureCard::loadByID(int cardid) 
+{
     id->setValue(cardid);
-    load(db);
+    load();
 }
 
 CardType::CardType(const CaptureCard& parent)
@@ -1074,13 +1092,13 @@ public:
         setLabel(QObject::tr("Capture device"));
     };
 
-    virtual void load(QSqlDatabase* db) {
-        fillSelections(db);
-        CISetting::load(db);
+    virtual void load() {
+        fillSelections();
+        CISetting::load();
     };
 
-    void fillSelections(QSqlDatabase* db) {
-        CaptureCard::fillSelections(db, this);
+    void fillSelections() {
+        CaptureCard::fillSelections(this);
     };
 };
 
@@ -1092,15 +1110,15 @@ public:
         addSelection(QObject::tr("(None)"), "0");
     };
 
-    virtual void load(QSqlDatabase* db) {
-        fillSelections(db);
-        CISetting::load(db);
+    virtual void load() {
+        fillSelections();
+        CISetting::load();
     };
 
-    void fillSelections(QSqlDatabase* db) {
+    void fillSelections() {
         clearSelections();
         addSelection(QObject::tr("(None)"), "0");
-        VideoSource::fillSelections(db, this);
+        VideoSource::fillSelections(this);
     };
 };
 
@@ -1252,11 +1270,10 @@ public:
         setHelpText("Select the LNB Settings for DVB-S cards. "
                     "For DVB-C and DVB-T you don't need to set these values. ");
     };
-    void save(QSqlDatabase* db) { (void)db; };
-    void load(QSqlDatabase* db) { (void)db; };
+    void save() {};
+    void load() {};
 
 private:
-    QSqlDatabase* db;
 };
 
 class CardInput: public ConfigurationWizard {
@@ -1292,13 +1309,13 @@ public:
 
     int getInputID(void) const { return id->intValue(); };
 
-    void loadByID(QSqlDatabase* db, int id);
-    void loadByInput(QSqlDatabase* db, int cardid, QString input);
+    void loadByID(int id);
+    void loadByInput(int cardid, QString input);
     QString getSourceName(void) const { return sourceid->getSelectionLabel(); };
 
     void fillDiseqcSettingsInput(QString _pos, QString _port);
 
-    virtual void save(QSqlDatabase* db);
+    virtual void save();
 
 private:
     class ID: virtual public IntegerSetting,
@@ -1320,7 +1337,6 @@ private:
     CardID* cardid;
     InputName* inputname;
     SourceID* sourceid;
-    QSqlDatabase* db;
     DVBLNBChooser *lnbsettings;
     DiseqcPos* diseqcpos;
     DiseqcPort* diseqcport;
@@ -1329,39 +1345,48 @@ private:
     LNBLofHi *lnblofhi;
 };
 
-QString CISetting::whereClause(void) {
+QString CISetting::whereClause(void) 
+{
     return QString("cardinputid = %1").arg(parent.getInputID());
 }
 
-QString CISetting::setClause(void) {
+QString CISetting::setClause(void) 
+{
     return QString("cardinputid = %1, %2 = '%3'")
         .arg(parent.getInputID())
         .arg(getColumn())
         .arg(getValue());
 }
 
-void CardInput::loadByID(QSqlDatabase* db, int inputid) {
+void CardInput::loadByID(int inputid) 
+{
     id->setValue(inputid);
-    load(db);
+    load();
 }
 
-void CardInput::loadByInput(QSqlDatabase* db, int _cardid, QString _inputname) {
-    QString query = QString("SELECT cardinputid FROM cardinput WHERE cardid = %1 AND inputname = '%2';")
-        .arg(_cardid)
-        .arg(_inputname);
-    QSqlQuery result = db->exec(query);
-    if (result.isActive() && result.numRowsAffected() > 0) {
-        result.next();
-        loadByID(db, result.value(0).toInt());
-    } else {
-        load(db); // new
+void CardInput::loadByInput(int _cardid, QString _inputname) 
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT cardinputid FROM cardinput "
+                 "WHERE cardid = :CARDID AND inputname = :INPUTNAME ;");
+    query.bindValue(":CARDID", _cardid);
+    query.bindValue(":INPUTNAME", _inputname);
+
+    if (query.exec() && query.isActive() && query.size() > 0) 
+    {
+        query.next();
+        loadByID(query.value(0).toInt());
+    } 
+    else 
+    {
+        load(); // new
         cardid->setValue(QString::number(_cardid));
         inputname->setValue(_inputname);
     }
 
-    if (CardUtil::isDVB(db,_cardid))
+    if (CardUtil::isDVB(_cardid))
     {
-        int iVideoDev = CardUtil::videoDeviceFromCardID(db,_cardid);
+        int iVideoDev = CardUtil::videoDeviceFromCardID(_cardid);
         CardUtil::DVB_TYPES dvbType;
         if ((iVideoDev >= 0) &&
            ((dvbType = CardUtil::cardDVBType(iVideoDev))>CardUtil::ERROR_PROBE))
@@ -1373,7 +1398,7 @@ void CardInput::loadByInput(QSqlDatabase* db, int _cardid, QString _inputname) {
                 lnblofswitch->setVisible(true);
                 lnbloflo->setVisible(true);
                 lnblofhi->setVisible(true);
-                if (CardUtil::diseqcType(db,_cardid) == CardUtil::POSITIONER_X)
+                if (CardUtil::diseqcType(_cardid) == CardUtil::POSITIONER_X)
                     diseqcpos->setEnabled(true);
                 else
                     diseqcpos->setEnabled(false);
@@ -1389,40 +1414,54 @@ void CardInput::loadByInput(QSqlDatabase* db, int _cardid, QString _inputname) {
     }
 }
 
-void CardInput::save(QSqlDatabase* db) {
+void CardInput::save() 
+{
+
     if (sourceid->getValue() == "0")
+    {
         // "None" is represented by the lack of a row
-        db->exec(QString("DELETE FROM cardinput WHERE cardinputid = %1;").arg(getInputID()));
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("DELETE FROM cardinput WHERE cardinputid = :INPUTID ;");
+        query.bindValue(":INPUTID", getInputID());
+        query.exec();
+    }
     else
-        ConfigurationWizard::save(db);
+    {
+        ConfigurationWizard::save();
+    }
 }
 
-void CardInput::fillDiseqcSettingsInput(QString _pos, QString _port) {
+void CardInput::fillDiseqcSettingsInput(QString _pos, QString _port) 
+{
     if (_port != "")
         diseqcport->setValue(_port);
     if (_pos != "")
         diseqcpos->setValue(_pos);
 }
 
-int CISetting::getInputID(void) const {
+int CISetting::getInputID(void) const 
+{
     return parent.getInputID();
 }
 
-int CCSetting::getCardID(void) const {
+int CCSetting::getCardID(void) const 
+{
     return parent.getCardID();
 }
 
-int CaptureCardEditor::exec(QSqlDatabase* db) {
-    while (ConfigurationDialog::exec(db) == QDialog::Accepted)
+int CaptureCardEditor::exec() 
+{
+    while (ConfigurationDialog::exec() == QDialog::Accepted)
         edit();
 
     return QDialog::Rejected;
 }
 
-void CaptureCardEditor::load(QSqlDatabase* db) {
+void CaptureCardEditor::load() 
+{
     clearSelections();
     addSelection(QObject::tr("(New capture card)"), "0");
-    CaptureCard::fillSelections(db, this);
+    CaptureCard::fillSelections(this);
 }
 
 MythDialog* CaptureCardEditor::dialogWidget(MythMainWindow* parent,
@@ -1440,7 +1479,7 @@ void CaptureCardEditor::menu(void)
     if (getValue().toInt() == 0) 
     {
         CaptureCard cc;
-        cc.exec(db);
+        cc.exec();
     } 
     else 
     {
@@ -1460,8 +1499,8 @@ void CaptureCardEditor::edit(void)
 {
     CaptureCard cc;
     if (getValue().toInt() != 0)
-        cc.loadByID(db,getValue().toInt());
-    cc.exec(db);
+        cc.loadByID(getValue().toInt());
+    cc.exec();
 }
 
 void CaptureCardEditor::del(void)
@@ -1473,18 +1512,19 @@ void CaptureCardEditor::del(void)
                                              tr("No, don't"), 2);
     if (val == 0)
     {
-        QSqlQuery query;
+        MSqlQuery query(MSqlQuery::InitCon());
 
-        query = db->exec(QString("DELETE FROM capturecard"
-                                 " WHERE cardid='%1'").arg(getValue()));
-        if (!query.isActive())
+        query.prepare("DELETE FROM capturecard WHERE cardid= :CARDID ;");
+        query.bindValue(":CARDID", getValue());
+        if (!query.exec() || !query.isActive())
             MythContext::DBError("Deleting Capture Card", query);
 
-        query = db->exec(QString("DELETE FROM cardinput"
-                                 " WHERE cardid='%1'").arg(getValue()));
-        if (!query.isActive())
+        query.prepare("DELETE FROM cardinput WHERE cardid= :CARDID ;");
+        query.bindValue(":CARDID", getValue());
+        if (!query.exec() || !query.isActive())
             MythContext::DBError("Deleting Card Input", query);
-        load(db);
+        
+        load();
     }
 }
 
@@ -1498,17 +1538,17 @@ MythDialog* VideoSourceEditor::dialogWidget(MythMainWindow* parent,
     return dialog;
 }
 
-int VideoSourceEditor::exec(QSqlDatabase* db) {
-    while (ConfigurationDialog::exec(db) == QDialog::Accepted)
+int VideoSourceEditor::exec() {
+    while (ConfigurationDialog::exec() == QDialog::Accepted)
         edit();
 
     return QDialog::Rejected;
 }
 
-void VideoSourceEditor::load(QSqlDatabase* db) {
+void VideoSourceEditor::load() {
     clearSelections();
     addSelection(QObject::tr("(New video source)"), "0");
-    VideoSource::fillSelections(db, this);
+    VideoSource::fillSelections(this);
 }
 
 void VideoSourceEditor::menu()
@@ -1516,7 +1556,7 @@ void VideoSourceEditor::menu()
     if (getValue().toInt() == 0) 
     {
         VideoSource vs;
-        vs.exec(db);
+        vs.exec();
     } 
     else 
     {
@@ -1537,9 +1577,9 @@ void VideoSourceEditor::edit()
 {
     VideoSource vs;
     if (getValue().toInt() != 0)
-        vs.loadByID(db,getValue().toInt());
+        vs.loadByID(getValue().toInt());
 
-    vs.exec(db);
+    vs.exec();
 }
 
 void VideoSourceEditor::del() 
@@ -1552,38 +1592,43 @@ void VideoSourceEditor::del()
 
     if (val == 0)
     {
-        QSqlQuery query = db->exec(QString("DELETE FROM videosource"
-                                           " WHERE sourceid='%1'")
-                                           .arg(getValue()));
-        if (!query.isActive())
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("DELETE FROM videosource WHERE sourceid= :SOURCEID ;");
+        query.bindValue(":SOURCEID", getValue());
+
+        if (!query.exec() || !query.isActive())
             MythContext::DBError("Deleting VideoSource", query);
-        load(db);
+
+        load();
     }
 }
 
-int CardInputEditor::exec(QSqlDatabase* db) {
-    while (ConfigurationDialog::exec(db) == QDialog::Accepted)
-        cardinputs[getValue().toInt()]->exec(db);
+int CardInputEditor::exec() 
+{
+    while (ConfigurationDialog::exec() == QDialog::Accepted)
+        cardinputs[getValue().toInt()]->exec();
 
     return QDialog::Rejected;
 }
 
 
 
-void CardInputEditor::load(QSqlDatabase* db) {
+void CardInputEditor::load() 
+{
     clearSelections();
 
     // We do this manually because we want custom labels.  If
     // SelectSetting provided a facility to edit the labels, we
     // could use CaptureCard::fillSelections
 
-    QString thequery = QString("SELECT cardid, videodevice, cardtype, dvb_diseqc_type, "
-                               "firewire_port, firewire_node "
-                               "FROM capturecard WHERE hostname = \"%1\";")
-                              .arg(gContext->GetHostName());
+    MSqlQuery capturecards(MSqlQuery::InitCon());
+    
+    capturecards.prepare("SELECT cardid, videodevice, cardtype, "
+                         "dvb_diseqc_type, firewire_port, firewire_node "
+                         "FROM capturecard WHERE hostname = :HOSTNAME ;");
+    capturecards.bindValue(":HOSTNAME", gContext->GetHostName());
 
-    QSqlQuery capturecards = db->exec(thequery);
-    if (capturecards.isActive() && capturecards.numRowsAffected() > 0)
+    if (capturecards.exec() && capturecards.isActive() && capturecards.size() > 0)
         while (capturecards.next()) {
             int cardid = capturecards.value(0).toInt();
             QString videodevice(capturecards.value(1).toString());
@@ -1599,7 +1644,7 @@ void CardInputEditor::load(QSqlDatabase* db) {
                 {
                     // IS DVB Check for CardInput class
                     CardInput* cardinput = new CardInput(1);
-                    cardinput->loadByInput(db, cardid, (*it).input);
+                    cardinput->loadByInput(cardid, (*it).input);
 
                     cardinput->fillDiseqcSettingsInput((*it).position,(*it).port);
 
@@ -1622,7 +1667,7 @@ void CardInputEditor::load(QSqlDatabase* db) {
                      i != inputs.end(); ++i)
                 { 
                     CardInput* cardinput = new CardInput();
-                    cardinput->loadByInput(db, cardid, *i);   
+                    cardinput->loadByInput(cardid, *i);   
                     cardinputs.push_back(cardinput);
                     QString index = QString::number(cardinputs.size()-1);
 
@@ -1644,7 +1689,7 @@ void CardInputEditor::load(QSqlDatabase* db) {
                      i != inputs.end(); ++i)
                 {
                     CardInput* cardinput = new CardInput();
-                    cardinput->loadByInput(db, cardid, *i);
+                    cardinput->loadByInput(cardid, *i);
                     cardinputs.push_back(cardinput);
                     QString index = QString::number(cardinputs.size()-1);
 
@@ -1901,8 +1946,8 @@ void CaptureCard::execDVBConfigMenu() {
 
         if (val != 0)
             return;
-        save(db);
-        load(db);
+        save();
+        load();
     }
 
     MythPopupBox *popup = new MythPopupBox(gContext->GetMainWindow(),
@@ -1975,11 +2020,11 @@ public:
 void CaptureCard::execAdvConfigWiz()
 {
     DVBAdvConfigurationWizard acw(*this);
-    acw.exec(db);
+    acw.exec();
 }
 
 void CaptureCard::execDiseqcWiz()
 {
     DVBDiseqcConfigurationWizard diseqcWiz;
-    diseqcWiz.exec(db);
+    diseqcWiz.exec();
 }

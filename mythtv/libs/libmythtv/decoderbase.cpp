@@ -5,11 +5,9 @@
 #include "decoderbase.h"
 #include "programinfo.h"
 
-DecoderBase::DecoderBase(NuppelVideoPlayer *parent, MythSqlDatabase *db,
-                         ProgramInfo *pginfo) 
+DecoderBase::DecoderBase(NuppelVideoPlayer *parent, ProgramInfo *pginfo) 
 { 
     m_parent = parent; 
-    m_db = db;
     m_playbackinfo = pginfo;
     currentAudioTrack = -1;
     
@@ -67,18 +65,17 @@ void DecoderBase::setWatchingRecording(bool mode)
 
 bool DecoderBase::PosMapFromDb(void)
 {
-    if (!m_db || !m_playbackinfo)
+    if (!m_playbackinfo)
         return false;
 
     // Overwrites current positionmap with entire contents of database
     QMap<long long, long long> posMap;
 
-    m_db->lock();
 
     if ((positionMapType == MARK_UNSET) ||
         (keyframedist == -1))
     {
-        m_playbackinfo->GetPositionMap(posMap, MARK_GOP_BYFRAME, m_db->db());
+        m_playbackinfo->GetPositionMap(posMap, MARK_GOP_BYFRAME);
         if (!posMap.empty())
         {
             positionMapType = MARK_GOP_BYFRAME;
@@ -87,7 +84,7 @@ bool DecoderBase::PosMapFromDb(void)
         }
         else
         {
-            m_playbackinfo->GetPositionMap(posMap, MARK_GOP_START, m_db->db());
+            m_playbackinfo->GetPositionMap(posMap, MARK_GOP_START);
             if (!posMap.empty())
             {
                 positionMapType = MARK_GOP_START;
@@ -100,8 +97,7 @@ bool DecoderBase::PosMapFromDb(void)
             }
             else
             {
-                m_playbackinfo->GetPositionMap(posMap, MARK_KEYFRAME,
-                                               m_db->db());
+                m_playbackinfo->GetPositionMap(posMap, MARK_KEYFRAME);
                 if (!posMap.empty())
                 {
                     // keyframedist should be set in the fileheader so no
@@ -113,10 +109,8 @@ bool DecoderBase::PosMapFromDb(void)
     }
     else
     {
-        m_playbackinfo->GetPositionMap(posMap, positionMapType, m_db->db());
+        m_playbackinfo->GetPositionMap(posMap, positionMapType);
     }
-
-    m_db->unlock();
 
     if (posMap.empty())
         return false; // no position map in recording
@@ -334,15 +328,13 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
 
 void DecoderBase::SetPositionMap(void)
 {
-    if (m_playbackinfo && m_db && (positionMapType != MARK_UNSET)) 
+    if (m_playbackinfo && (positionMapType != MARK_UNSET)) 
     {
         QMap<long long, long long> posMap;
         for (unsigned int i=0; i < m_positionMap.size(); i++) 
             posMap[m_positionMap[i].index] = m_positionMap[i].pos;
     
-        m_db->lock();
-        m_playbackinfo->SetPositionMap(posMap, positionMapType, m_db->db());
-        m_db->unlock();
+        m_playbackinfo->SetPositionMap(posMap, positionMapType);
     }
 }
 

@@ -24,9 +24,6 @@ RecorderBase::RecorderBase(void)
 
     curRecording = NULL;
     curChannelName = "";
-
-    db_conn = NULL;
-    db_lock = NULL;
 }
 
 RecorderBase::~RecorderBase(void)
@@ -55,12 +52,6 @@ void RecorderBase::SetRecording(ProgramInfo *pginfo)
     {
         curRecording = new ProgramInfo(*pginfo);
     }
-}
-
-void RecorderBase::SetDB(QSqlDatabase *db, pthread_mutex_t *lock)
-{
-    db_conn = db;
-    db_lock = lock;
 }
 
 void RecorderBase::SetOption(const QString &name, const QString &value)

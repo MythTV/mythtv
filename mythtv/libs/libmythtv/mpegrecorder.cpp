@@ -544,20 +544,14 @@ bool MpegRecorder::SetupRecording(void)
 
 void MpegRecorder::FinishRecording(void)
 {
-    if (curRecording && db_lock && db_conn)
+    if (curRecording)
     {
-        pthread_mutex_lock(db_lock);
-        MythContext::KickDatabase(db_conn);
-
-        curRecording->SetFilesize(ringBuffer->GetRealFileSize(), db_conn);
+        curRecording->SetFilesize(ringBuffer->GetRealFileSize());
         if (positionMapDelta.size())
         {
-            curRecording->SetPositionMapDelta(positionMapDelta, MARK_GOP_START,
-                                              db_conn);
+            curRecording->SetPositionMapDelta(positionMapDelta, MARK_GOP_START);
             positionMapDelta.clear();
         }
-
-        pthread_mutex_unlock(db_lock);
     }
 }
 
@@ -648,15 +642,12 @@ void MpegRecorder::ProcessData(unsigned char *buffer, int len)
                     positionMapDelta[keyCount] = startpos;
                     positionMap[keyCount] = startpos;
 
-                    if (curRecording && db_lock && db_conn &&
+                    if (curRecording &&
                         ((positionMapDelta.size() % 30) == 0))
                     {
-                        pthread_mutex_lock(db_lock);
-                        MythContext::KickDatabase(db_conn);
                         curRecording->SetPositionMapDelta(positionMapDelta,
-                                MARK_GOP_START, db_conn);
-                        curRecording->SetFilesize(startpos, db_conn);
-                        pthread_mutex_unlock(db_lock);
+                                MARK_GOP_START);
+                        curRecording->SetFilesize(startpos);
                         positionMapDelta.clear();
                     }
                 }
@@ -694,12 +685,9 @@ void MpegRecorder::Reset(void)
     positionMap.clear();
     positionMapDelta.clear();
 
-    if (curRecording && db_lock && db_conn)
+    if (curRecording)
     {
-        pthread_mutex_lock(db_lock);
-        MythContext::KickDatabase(db_conn);
-        curRecording->ClearPositionMap(MARK_GOP_START, db_conn);
-        pthread_mutex_unlock(db_lock);
+        curRecording->ClearPositionMap(MARK_GOP_START);
     }
 }
 

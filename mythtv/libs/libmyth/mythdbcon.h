@@ -3,85 +3,119 @@
 
 #include <qsqldatabase.h>
 #include <qmutex.h>
+#include <qsemaphore.h> 
 #include <qstring.h>
+#include <qptrlist.h>
 
 #include <iostream>
 using namespace std;
 
 #include "mythcontext.h"
 
-// small wrapper class for QSqlDatabase
-class MythSqlDatabase
+// Myth & database connections
+
+// Rule #1: Never use QSqlQuery or QSqlDatabase directly.
+// Rule #2: Never use QSqlQuery or QSqlDatabase directly.
+// Rule #3: Use MSqlQuery for all DB stuff.
+
+// MSqlQuery is tied to a connection pool in Mythcontext. DB connections are
+// automatically set up by creating an MSqlQuery object. Use the helper 
+// functions to create an MSqlQuery object e.g. 
+// MSqlQuery query(MSqlQuery::InitCon());
+// The MSqlQuery object gets exclusive access to the connection for its 
+// lifetime. The connection is automatically returned when the MSqlQuery 
+// object is destroyed.
+
+// Note: Due to a bug in some Qt/MySql combinations, QSqlDatabase connections
+// will crash if closed and reopend - so we never close them and keep them in
+// a pool. 
+
+// QSqlDatabase wrapper
+
+class MSqlDatabase
 {
+  friend class MDBManager;
+  friend class MSqlQuery;
   public:
-    MythSqlDatabase(const QString &name)
-    {
-        m_name = name;
-        m_db = QSqlDatabase::addDatabase("QMYSQL3", name);
+    MSqlDatabase(const QString &name);
+   ~MSqlDatabase(void);
 
-        if (!m_db)
-        {
-            cerr << "Unable to init db connection: " << name << endl;
-            return;
-        }
-
-        if (!gContext->OpenDatabase(m_db))
-        {
-            cerr << "Unable to open db connect: " << name << endl;
-            QSqlDatabase::removeDatabase(name);
-            m_db = NULL;
-            return;
-        }
-
-        m_dblock = new QMutex(true);
-    }
-
-   ~MythSqlDatabase()
-    {
-        if (m_db)
-        {
-            m_db->close();
-            QSqlDatabase::removeDatabase(m_name);
-            m_db = NULL;
-        }
-
-        if (m_dblock)
-            delete m_dblock;
-    }
-
-    bool isOpen(void) 
-    { 
-        if (m_db && m_db->isOpen()) 
-            return true;
-        return false;
-    }
-
+  private:
+    bool isOpen(void);
+    bool OpenDatabase(void);
+    bool KickDatabase(void);
     QSqlDatabase *db(void) { return m_db; }
-    QMutex *mutex(void) { return m_dblock; }
-    
-    void lock(void) { m_dblock->lock(); }
-    void unlock(void) { m_dblock->unlock(); }
 
   private:
     QString m_name;
-    QMutex *m_dblock;
     QSqlDatabase *m_db;
 };
 
 
-// QSqlQuery wrapper, QSqlQuery::prepare() is not thread safe in Qt <= 3.3.2
+// DB connection pool
 
-class MSqlQuery : public QSqlQuery
-{ 
+class MDBManager
+{
+  friend class MSqlQuery;
   public:
-    MSqlQuery(QSqlResult * r) : QSqlQuery(r) {}
-    MSqlQuery(const QString& query = QString::null, QSqlDatabase* db = 0)
-                : QSqlQuery(query, db) {}
-    MSqlQuery(const QSqlQuery& other) : QSqlQuery(other) {}
-    
-    bool prepare(const QString& query);
-  
+    MDBManager(void);
+    ~MDBManager(void);
+
+  protected:
+    MSqlDatabase *popConnection(void);
+    void pushConnection(MSqlDatabase *db);
+
+    MSqlDatabase *getSchedCon(void);
+    MSqlDatabase *getDDCon(void);
+
+  private:
+    QPtrList<MSqlDatabase> m_pool;
+    QMutex m_lock;
+    QSemaphore *m_sem;
+    int m_connID;
+
+    MSqlDatabase *m_schedCon;
+    MSqlDatabase *m_DDCon;
 };
 
+
+typedef struct _MSqlQueryInfo
+{
+    MSqlDatabase *db;
+    QSqlDatabase *qsqldb;
+    bool returnConnection;
+} MSqlQueryInfo;
+
+// QSqlQuery wrapper
+
+class MSqlQuery : public QSqlQuery
+{
+  public:
+    // Get DB connection from pool 
+    MSqlQuery(const MSqlQueryInfo &qi);
+    // Returns conneciton to pool
+    ~MSqlQuery();
+
+    // Only updated once during object creation
+    bool isConnected(void) { return m_isConnected; }
+
+    // QSqlQuery::prepare() is not thread safe in Qt <= 3.3.2
+    bool prepare(const QString &query);
+
+    // Checks DB connection + login (login info via Mythcontext)
+    static bool testDBConnection();
+
+    // Only use this in combination with MSqlQuery constructor
+    static MSqlQueryInfo InitCon();
+
+    // Dedicated connections. (Requierd for using temporary SQL tables.)
+    static MSqlQueryInfo SchedCon();
+    static MSqlQueryInfo DDCon();
+
+  private:
+    MSqlDatabase *m_db;
+    bool m_isConnected;
+    bool m_returnConnection;
+};
 
 #endif    

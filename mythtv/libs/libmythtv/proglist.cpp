@@ -21,14 +21,14 @@ using namespace std;
 #include "dialogbox.h"
 #include "mythcontext.h"
 #include "remoteutil.h"
+#include "mythdbcon.h"
 
 ProgLister::ProgLister(ProgListType pltype, const QString &view,
-                       QSqlDatabase *ldb, MythMainWindow *parent,
+                       MythMainWindow *parent,
                        const char *name)
             : MythDialog(parent, name)
 {
     type = pltype;
-    db = ldb;
     startTime = QDateTime::currentDateTime();
     searchTime = startTime;
 
@@ -445,22 +445,24 @@ void ProgLister::setViewFromEdit(void)
             qphrase = viewList[oldview].utf8();
             qphrase.replace("\'", "\\\'");
 
+            MSqlQuery query(MSqlQuery::InitCon());
             querystr = QString("DELETE FROM keyword "
                                "WHERE phrase = '%1' AND searchtype = '%2';")
                                .arg(qphrase).arg(searchtype);
-            QSqlQuery query;
-            query.exec(querystr);
+            query.prepare(querystr);
+            query.exec();
         }
         if (newview < 0)
         {
             qphrase = text.utf8();
             qphrase.replace("\'", "\\\'");
 
+            MSqlQuery query(MSqlQuery::InitCon());
             querystr = QString("REPLACE INTO keyword (phrase, searchtype)"
                                "VALUES('%1','%2');")
                                .arg(qphrase).arg(searchtype);
-            QSqlQuery query;
-            query.exec(querystr);
+            query.prepare(querystr);
+            query.exec();
         }
     }
 
@@ -507,22 +509,24 @@ void ProgLister::setViewFromPowerEdit()
             qphrase = viewList[oldview].utf8();
             qphrase.replace("\'", "\\\'");
 
+            MSqlQuery query(MSqlQuery::InitCon());
             querystr = QString("DELETE FROM keyword "
                                "WHERE phrase = '%1' AND searchtype = '%2';")
                                .arg(qphrase).arg(searchtype);
-            QSqlQuery query;
-            query.exec(querystr);
+            query.prepare(querystr);
+            query.exec();
         }
         if (newview < 0)
         {
             qphrase = text.utf8();
             qphrase.replace("\'", "\\\'");
 
+            MSqlQuery query(MSqlQuery::InitCon());
             querystr = QString("REPLACE INTO keyword (phrase, searchtype)"
                                "VALUES('%1','%2');")
                                .arg(qphrase).arg(searchtype);
-            QSqlQuery query;
-            query.exec(querystr);
+            query.prepare(querystr);
+            query.exec();
         }
     }
     powerPopup->done(0);
@@ -572,8 +576,8 @@ void ProgLister::addSearchRecord(void)
 
 
     ScheduledRecording record;
-    record.loadBySearch(db, searchtype, text, what);
-    record.exec(db);
+    record.loadBySearch(searchtype, text, what);
+    record.exec();
 
     setViewFromEdit();
 }
@@ -592,11 +596,12 @@ void ProgLister::deleteKeyword(void)
     QString qphrase = text.utf8();
     qphrase.replace("\'", "\\\'");
 
+    MSqlQuery query(MSqlQuery::InitCon());
     QString querystr = QString("DELETE FROM keyword "
                                "WHERE phrase = '%1' AND searchtype = '%2';")
                                .arg(qphrase).arg(searchtype);
-    QSqlQuery query;
-    query.exec(querystr);
+    query.prepare(querystr);
+    query.exec();
 
     chooseListBox->removeItem(view + 1);
     viewList.remove(text);
@@ -934,10 +939,13 @@ void ProgLister::powerEdit()
     categoryList.clear();
     categoryList << "";
 
+    MSqlQuery query(MSqlQuery::InitCon());
+
     QString querystr = "SELECT category FROM program GROUP BY category;";
-    QSqlQuery query;
-    query.exec(querystr);
-    if (query.isActive() && query.numRowsAffected())
+    query.prepare(querystr);
+    query.exec();
+
+    if (query.isActive() && query.size())
     {
         while (query.next())
         {
@@ -963,16 +971,17 @@ void ProgLister::powerEdit()
                "WHERE channel.visible = 1 "
                "GROUP BY callsign "
                "ORDER BY " + channelOrdering + ";";
-    QSqlQuery cquery;
-    cquery.exec(querystr);
-    if (cquery.isActive() && cquery.numRowsAffected())
+    query.prepare(querystr);
+    query.exec();
+
+    if (query.isActive() && query.numRowsAffected())
     {
-        while (cquery.next())
+        while (query.next())
         {
-            QString chanid = cquery.value(0).toString();
-            QString channum = cquery.value(1).toString();
-            QString chansign = QString::fromUtf8(cquery.value(2).toString());
-            QString channame = QString::fromUtf8(cquery.value(3).toString());
+            QString chanid = query.value(0).toString();
+            QString channum = query.value(1).toString();
+            QString chansign = QString::fromUtf8(query.value(2).toString());
+            QString channame = QString::fromUtf8(query.value(3).toString());
 
             QString chantext = channelFormat;
             chantext.replace("<num>", channum)
@@ -1067,7 +1076,7 @@ void ProgLister::quickRecord()
     if (!pi)
         return;
 
-    pi->ToggleRecord(db);
+    pi->ToggleRecord();
 }
 
 void ProgLister::select()
@@ -1077,7 +1086,7 @@ void ProgLister::select()
     if (!pi)
         return;
 
-    pi->EditRecording(db);
+    pi->EditRecording();
 }
 
 void ProgLister::edit()
@@ -1087,7 +1096,7 @@ void ProgLister::edit()
     if (!pi)
         return;
 
-    pi->EditScheduled(db);
+    pi->EditScheduled();
 }
 
 void ProgLister::upcoming()
@@ -1098,7 +1107,6 @@ void ProgLister::upcoming()
         return;
 
     ProgLister *pl = new ProgLister(plTitle, pi->title,
-                                   QSqlDatabase::database(),
                                    gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;
@@ -1109,7 +1117,7 @@ void ProgLister::details()
     ProgramInfo *pi = itemList.at(curItem);
 
     if (pi)
-        pi->showDetails(QSqlDatabase::database());
+        pi->showDetails();
 }
 
 void ProgLister::fillViewList(const QString &view)
@@ -1119,14 +1127,16 @@ void ProgLister::fillViewList(const QString &view)
 
     if (type == plChannel) // list by channel
     {
+        MSqlQuery query(MSqlQuery::InitCon()); 
         QString querystr = "SELECT channel.chanid, channel.channum, "
             "channel.callsign, channel.name FROM channel "
             "WHERE channel.visible = 1 "
             "GROUP BY channum, callsign "
             "ORDER BY " + channelOrdering + ";";
-        QSqlQuery query;
-        query.exec(querystr);
-        if (query.isActive() && query.numRowsAffected())
+        query.prepare(querystr);
+        query.exec();
+
+        if (query.isActive() && query.size())
         {
             while (query.next())
             {
@@ -1149,10 +1159,12 @@ void ProgLister::fillViewList(const QString &view)
     }
     else if (type == plCategory) // list by category
     {
+        MSqlQuery query(MSqlQuery::InitCon()); 
         QString querystr = "SELECT category FROM program GROUP BY category;";
-        QSqlQuery query;
-        query.exec(querystr);
-        if (query.isActive() && query.numRowsAffected())
+        query.prepare(querystr);
+        query.exec();
+
+        if (query.isActive() && query.size())
         {
             while (query.next())
             {
@@ -1170,12 +1182,14 @@ void ProgLister::fillViewList(const QString &view)
     else if (type == plTitleSearch || type == plKeywordSearch ||
              type == plPeopleSearch || type == plPowerSearch)
     {
+        MSqlQuery query(MSqlQuery::InitCon()); 
         QString querystr = QString("SELECT phrase FROM keyword "
                                    "WHERE searchtype = '%1';")
                                    .arg(searchtype);
-        QSqlQuery query;
-        query.exec(querystr);
-        if (query.isActive() && query.numRowsAffected())
+        query.prepare(querystr);
+        query.exec();
+
+        if (query.isActive() && query.size())
         {
             while (query.next())
             {
@@ -1196,11 +1210,12 @@ void ProgLister::fillViewList(const QString &view)
                 QString qphrase = view.utf8();
                 qphrase.replace("\'", "\\\'");
 
+                MSqlQuery query(MSqlQuery::InitCon()); 
                 querystr = QString("REPLACE INTO keyword (phrase, searchtype)"
                                    "VALUES('%1','%2');")
                                     .arg(qphrase).arg(searchtype);
-                QSqlQuery rquery;
-                rquery.exec(querystr);
+                query.prepare(querystr);
+                query.exec();
 
                 viewList << qphrase;
                 viewTextList << qphrase;
@@ -1384,7 +1399,7 @@ void ProgLister::fillItemList(void)
     }
 
     schedList.FromScheduler();
-    itemList.FromProgram(db, where, schedList);
+    itemList.FromProgram(where, schedList);
 
     if (curItem < 0 && itemList.count() > 0)
         curItem = 0;
@@ -1534,7 +1549,7 @@ void ProgLister::updateInfo(QPainter *p)
         if (container)
         {  
             QMap<QString, QString> infoMap;
-            pi->ToMap(db, infoMap);
+            pi->ToMap(infoMap);
             container->ClearAllText();
             container->SetText(infoMap);
         }

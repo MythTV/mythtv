@@ -36,17 +36,19 @@ public:
         setLabel(QObject::tr("Video Source"));
     };
 
-    void load(QSqlDatabase* db) {
-        fillSelections(db);
-        CSetting::load(db);
+    void load() {
+        fillSelections();
+        CSetting::load();
     };
 
-    void fillSelections(QSqlDatabase* db) {
+    void fillSelections() 
+    {
         addSelection(QObject::tr("[Not Selected]"), "0");
 
-        QSqlQuery query = db->exec(QString(
-            "SELECT name, sourceid FROM videosource"));
-        if (query.isActive() && query.numRowsAffected() > 0)
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT name, sourceid FROM videosource");
+        
+        if (query.exec() && query.isActive() && query.size() > 0)
             while(query.next())
                 addSelection(query.value(0).toString(),
                              query.value(1).toString());
@@ -215,7 +217,7 @@ public:
 };
 
 ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID& id)
-                    : VerticalConfigurationGroup(false,true), db(NULL)
+                    : VerticalConfigurationGroup(false,true)
 {
     setLabel(QObject::tr("Channel Options - Common"));
     setUseLabel(false);
@@ -262,10 +264,9 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID& id)
 #endif
 };
 
-void ChannelOptionsCommon::load(QSqlDatabase* _db)
+void ChannelOptionsCommon::load()
 {
-    db = _db;
-    VerticalConfigurationGroup::load(_db);
+    VerticalConfigurationGroup::load();
 }
 
 void ChannelOptionsCommon::onAirGuideChanged(bool fValue)
@@ -280,9 +281,11 @@ void ChannelOptionsCommon::sourceChanged(const QString& str)
 {
     (void)str;
 #ifdef USING_DVB
-    if (!db)
-        return;
+
     bool fDVB =false;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
     QString queryStr = QString("SELECT count(cardtype) "
        "FROM capturecard,videosource,cardinput "
        "WHERE cardinput.sourceid=videosource.sourceid "
@@ -291,8 +294,8 @@ void ChannelOptionsCommon::sourceChanged(const QString& str)
        "AND videosource.sourceid=\"%1\" "
        "AND capturecard.hostname=\"%2\"").arg(str).arg(gContext->GetHostName());
 
-    QSqlQuery query = db->exec(queryStr);
-    if (query.isActive() && query.numRowsAffected() > 0)
+    query.prepare(queryStr);
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
         if (query.value(0).toInt())

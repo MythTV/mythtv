@@ -1,6 +1,7 @@
 #include <qsqldatabase.h>
 #include "settings.h"
 #include "mythcontext.h"
+#include "mythdbcon.h"
 #include "mythwidgets.h"
 #include "channeleditor.h"
 
@@ -21,8 +22,8 @@
 #include "scanwizard.h"
 #endif
 
-ChannelWizard::ChannelWizard(int id, QSqlDatabase* _db)
-             : ConfigurationWizard(), db(_db) {
+ChannelWizard::ChannelWizard(int id)
+             : ConfigurationWizard() {
     setLabel(QObject::tr("Channel Options"));
 
     // Must be first.
@@ -45,30 +46,37 @@ ChannelWizard::ChannelWizard(int id, QSqlDatabase* _db)
 }
 
 QString ChannelWizard::getCardtype() {
-    QSqlQuery query = db->exec(QString("SELECT cardtype"
-        " FROM capturecard, cardinput, channel"
-        " WHERE channel.chanid=%1"
-        " AND channel.sourceid = cardinput.sourceid"
-        " AND cardinput.cardid = capturecard.cardid")
-        .arg(cid->getValue()));
-    if (query.isActive() && query.numRowsAffected() > 0)
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT cardtype"
+                  " FROM capturecard, cardinput, channel"
+                  " WHERE channel.chanid = :CHID "
+                  " AND channel.sourceid = cardinput.sourceid"
+                  " AND cardinput.cardid = capturecard.cardid");
+    query.bindValue(":CHID", cid->getValue()); 
+
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
         return query.value(0).toString();
-    } else
+    }
+    else
+    {
         return "";
+    }
 }
 
 bool ChannelWizard::cardTypesInclude(const QString& thecardtype) {
-    QSqlQuery query = db->exec(QString("SELECT count(cardtype)"
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT count(cardtype)"
         " FROM capturecard, cardinput, channel"
-        " WHERE channel.chanid=%1"
+        " WHERE channel.chanid= :CHID "
         " AND channel.sourceid = cardinput.sourceid"
         " AND cardinput.cardid = capturecard.cardid"
-        " AND capturecard.cardtype=\"%2\"")
-        .arg(cid->getValue())
-        .arg(thecardtype));
-    if (query.isActive() && query.numRowsAffected() > 0)
+        " AND capturecard.cardtype= :CARDTYPE ");
+    query.bindValue(":CHID", cid->getValue());
+    query.bindValue(":CARDTYPE", thecardtype);
+
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
         int count = query.value(0).toInt();
@@ -82,13 +90,15 @@ bool ChannelWizard::cardTypesInclude(const QString& thecardtype) {
 }
 
 int ChannelWizard::countCardtypes() {
-    QSqlQuery query = db->exec(QString("SELECT count(DISTINCT cardtype)"
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT count(DISTINCT cardtype)"
         " FROM capturecard, cardinput, channel"
-        " WHERE channel.chanid=%1"
+        " WHERE channel.chanid = :CHID "
         " AND channel.sourceid = cardinput.sourceid"
-        " AND cardinput.cardid = capturecard.cardid")
-        .arg(cid->getValue()));
-    if (query.isActive() && query.numRowsAffected() > 0)
+        " AND cardinput.cardid = capturecard.cardid");
+    query.bindValue(":CHID", cid->getValue());
+
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
         return query.value(0).toInt();
@@ -101,29 +111,42 @@ void ChannelListSetting::fillSelections(void)
     QString currentValue = getValue();
     clearSelections();
     addSelection(QObject::tr("(New Channel)"));
+
     QString querystr = "SELECT channel.name,channum,chanid ";
-    if ((currentSourceID == "") ||
-        (currentSourceID == "Unassigned"))
+
+    if ((currentSourceID == "") || (currentSourceID == "Unassigned"))
+    {
         querystr += ",videosource.name FROM channel "
                     "LEFT JOIN videosource ON "
                     "(channel.sourceid = videosource.sourceid) ";
+    }
     else
+    {
         querystr += QString("FROM channel WHERE sourceid='%1' ")
                            .arg(currentSourceID);
+    }
         
     if (currentSortMode == QObject::tr("Channel Name"))
+    {
         querystr += " ORDER BY channel.name";
+    }
     else if (currentSortMode == QObject::tr("Channel Number"))
+    {
         querystr += " ORDER BY channum + 0";
+    }
 
-    QSqlQuery query = db->exec(querystr);
-    if (query.isActive() && query.numRowsAffected() > 0)
-        while(query.next()) {
+    MSqlQuery query(MSqlQuery::InitCon()); 
+    query.prepare(querystr);
+    
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        while(query.next()) 
+        {
             QString name = QString::fromUtf8(query.value(0).toString());
             QString channum = query.value(1).toString();
             QString chanid = query.value(2).toString();
             QString sourceid = "Unassigned";
-			
+
             if (!query.value(3).toString().isNull())
             {
                 sourceid = query.value(3).toString();
@@ -131,25 +154,31 @@ void ChannelListSetting::fillSelections(void)
                     continue;
             }
  
-            if (channum == "" && currentHideMode) continue;
+            if (channum == "" && currentHideMode) 
+                continue;
 
-            if (name == "") name = "(Unnamed : " + chanid + ")";
+            if (name == "") 
+                name = "(Unnamed : " + chanid + ")";
 
-            if (currentSortMode == QObject::tr("Channel Name")) {
-                if (channum != "") name += " (" + channum + ")";
-            } else if (currentSortMode == QObject::tr("Channel Number")) {
+            if (currentSortMode == QObject::tr("Channel Name")) 
+            {
+                if (channum != "") 
+                    name += " (" + channum + ")";
+            }
+            else if (currentSortMode == QObject::tr("Channel Number")) 
+            {
                 if (channum != "")
                     name = channum + ". " + name;
                 else
                     name = "???. " + name;
             }
 
-            if ((currentSourceID == "") &&
-                (currentSourceID != "Unassigned"))
+            if ((currentSourceID == "") && (currentSourceID != "Unassigned"))
                 name += " (" + sourceid  + ")";
 
             addSelection(name, chanid, (chanid == currentValue) ? true : false);
         }
+    }
 }
 
 class SourceSetting: public ComboBoxSetting {
@@ -159,17 +188,22 @@ public:
         addSelection(QObject::tr("(All)"),"");
     };
 
-    void save(QSqlDatabase* db) { (void)db; };
-    void load(QSqlDatabase* db) {
-        QSqlQuery query = db->exec(QString(
-            "SELECT name, sourceid"
-            " FROM videosource"));
-        if (query.isActive() && query.numRowsAffected() > 0)
+    void save() {};
+    void load() 
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT name, sourceid FROM videosource");
+
+        if (query.exec() && query.isActive() && query.size() > 0)
+        {
             while(query.next())
+            {
                 addSelection(query.value(0).toString(),
                              query.value(1).toString());
+            } 
+        } 
         addSelection(QObject::tr("(Unassigned)"),"Unassigned");
-    };
+    }
 };
 
 class SortMode: public ComboBoxSetting, public TransientStorage {
@@ -234,26 +268,25 @@ ChannelEditor::ChannelEditor():
 #endif
 }
 
-int ChannelEditor::exec(QSqlDatabase* _db) {
-    db = _db;
+int ChannelEditor::exec() {
 
     //Make sure we have dvb card installed
 #ifdef USING_DVB
-    if (!CardUtil::isCardPresent(db, CardUtil::DVB))
+    if (!CardUtil::isCardPresent(CardUtil::DVB))
     {
         buttonScan->setEnabled(false);
         buttonAdvanced->setEnabled(false);
     }
 #endif
 
-    while (ConfigurationDialog::exec(db) == QDialog::Accepted)  {}
+    while (ConfigurationDialog::exec() == QDialog::Accepted)  {}
     return QDialog::Rejected;
 }
 
 void ChannelEditor::edit() {
     id = list->getValue().toInt();
-    ChannelWizard cw(id,db);
-    cw.exec(db);
+    ChannelWizard cw(id);
+    cw.exec();
 
     list->fillSelections();
     list->setFocus();
@@ -271,12 +304,12 @@ void ChannelEditor::del() {
                                              tr("Yes, delete the channel"), 
                                              tr("No, don't"), 2);
 
-    if (val == 0) {
-        QSqlQuery query;
-    
-        query = db->exec(QString("DELETE FROM channel "
-                                 "WHERE chanid ='%1'").arg(id));
-        if (!query.isActive())
+    if (val == 0) 
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("DELETE FROM channel WHERE chanid = :CHID ;");
+        query.bindValue(":CHID", id);
+        if (!query.exec() || !query.isActive())
             MythContext::DBError("ChannelEditor Delete Channel", query);
 
         list->fillSelections();
@@ -306,8 +339,8 @@ void ChannelEditor::menu(int /*iSelected*/) {
 void ChannelEditor::scan()
 {
 #ifdef USING_DVB
-    ScanWizard scanwizard(db);
-    scanwizard.exec(db,false,true);
+    ScanWizard scanwizard();
+    scanwizard.exec(false,true);
 
     list->fillSelections();
     list->setFocus();
@@ -318,7 +351,7 @@ void ChannelEditor::advanced()
 {
 #ifdef USING_DVB
     DVBTransportsEditor advancedDialog;
-    advancedDialog.exec(db);
+    advancedDialog.exec();
 #endif
 }
 

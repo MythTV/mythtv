@@ -19,6 +19,7 @@
 using namespace std;
 
 #include "mythcontext.h"
+#include "mythdbcon.h"
 #include "guidegrid.h"
 #include "infostructs.h"
 #include "programinfo.h"
@@ -78,7 +79,6 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
     m_currentStartChannel = 0;
 
     m_player = player;
-    m_db = QSqlDatabase::database();
 
     m_context = 0;
 
@@ -91,8 +91,6 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
     infoRect = QRect(0, 0, 0, 0);
     curInfoRect = QRect(0, 0, 0, 0);
     videoRect = QRect(0, 0, 0, 0);
-
-    MythContext::KickDatabase(m_db);
 
     jumpToChannelEnabled = gContext->GetNumSetting("EPGEnableJumpToChannel", 0);
     jumpToChannelActive = false;
@@ -529,7 +527,8 @@ void GuideGrid::fillChannelInfos(int &maxchannel, bool gotostartchannel)
     m_channelInfos.clear();
 
     QString queryfav;
-    QSqlQuery query;
+   
+    MSqlQuery query(MSqlQuery::InitCon());
 
     QString queryall = "SELECT channel.channum, channel.callsign, "
                        "channel.icon, channel.chanid, favorites.favid, "
@@ -546,24 +545,27 @@ void GuideGrid::fillChannelInfos(int &maxchannel, bool gotostartchannel)
                    "channel.chanid = favorites.chanid and visible = 1 "
                    "ORDER BY " + channelOrdering + ";";
 
-        query.exec(queryfav);   
+        query.prepare(queryfav);
+        query.exec();   
 
         // If we don't have any favorites, then just show regular listings.
-        if (!query.isActive() || query.numRowsAffected() == 0)
+        if (!query.isActive() || query.size() == 0)
         {
             showFavorites = (!showFavorites);
-            query.exec(queryall);
+            query.prepare(queryall);
+            query.exec();
         }
     }
     else
     {
-        query.exec(queryall);
+        query.prepare(queryall);
+        query.exec();
     }
  
     bool set = false;
     maxchannel = 0;
     
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.isActive() && query.size() > 0)
     {
         while (query.next())
         {
@@ -705,7 +707,7 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
         .arg(m_currentStartTime.toString("yyyyMMddhhmm00"))
         .arg(m_currentEndTime.toString("yyyyMMddhhmm00"));
 
-    proglist->FromProgram(m_db, querystr, m_recList);
+    proglist->FromProgram(querystr, m_recList);
 
     QDateTime ts = m_currentStartTime;
 
@@ -1198,7 +1200,7 @@ void GuideGrid::paintInfo(QPainter *p)
 
     ChannelInfo *chinfo = &(m_channelInfos[chanNum]);
 
-    pginfo->ToMap(m_db, infoMap);
+    pginfo->ToMap(infoMap);
 
     LayerSet *container = theme->GetSet("program_info");
     if (container)
@@ -1258,7 +1260,7 @@ void GuideGrid::generateListings()
 void GuideGrid::toggleChannelFavorite()
 {
     QString thequery;
-    QSqlQuery query;
+    MSqlQuery query(MSqlQuery::InitCon());
 
     // Get current channel id, and make sure it exists...
     int chanNum = m_currentRow + m_currentStartChannel;
@@ -1275,7 +1277,8 @@ void GuideGrid::toggleChannelFavorite()
         thequery = QString("DELETE FROM favorites WHERE favid = '%1'")
                            .arg(favid);
 
-        query.exec(thequery);
+        query.prepare(thequery);
+        query.exec(); 
     }
     else
     {
@@ -1283,7 +1286,8 @@ void GuideGrid::toggleChannelFavorite()
         thequery = QString("INSERT INTO favorites (chanid) VALUES ('%1')")
                            .arg(chanid);
 
-        query.exec(thequery);
+        query.prepare(thequery);
+        query.exec(); 
     }
 
     if (showFavorites)
@@ -1602,7 +1606,7 @@ void GuideGrid::quickRecord()
     if (pginfo->title == unknownTitle)
         return;
 
-    pginfo->ToggleRecord(m_db);
+    pginfo->ToggleRecord();
 
     m_recList.FromScheduler();
     fillProgramInfos();
@@ -1624,7 +1628,7 @@ void GuideGrid::editRecording()
     setFocusPolicy(QWidget::NoFocus);
 
     ProgramInfo *temppginfo = new ProgramInfo(*pginfo);
-    temppginfo->EditRecording(m_db);
+    temppginfo->EditRecording();
     delete temppginfo;
 
     setFocusPolicy(storeFocus);
@@ -1651,7 +1655,7 @@ void GuideGrid::editScheduled()
     setFocusPolicy(QWidget::NoFocus);
 
     ProgramInfo *temppginfo = new ProgramInfo(*pginfo);
-    temppginfo->EditScheduled(m_db);
+    temppginfo->EditScheduled();
     delete temppginfo;
 
     setFocusPolicy(storeFocus);
@@ -1676,7 +1680,6 @@ void GuideGrid::upcoming()
         return;
 
     ProgLister *pl = new ProgLister(plTitle, pginfo->title,
-                                   QSqlDatabase::database(),
                                    gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;
@@ -1692,7 +1695,7 @@ void GuideGrid::details()
     if (pginfo->title == unknownTitle)
         return;
 
-    pginfo->showDetails(QSqlDatabase::database());
+    pginfo->showDetails();
 }
 
 void GuideGrid::channelUpdate(void)

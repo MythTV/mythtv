@@ -32,6 +32,7 @@ class MythPluginManager;
 class MediaMonitor;
 class MythMediaDevice;
 class DisplayRes;
+class MDBManager;
 
 enum VerboseMask {
     VB_IMPORTANT = 0x0001,
@@ -128,7 +129,7 @@ class MythPrivRequest
     void *m_data;
 };
 
-#define MYTH_BINARY_VERSION "0.17.20050220-1"
+#define MYTH_BINARY_VERSION "0.17.20050223-1"
 #define MYTH_PROTO_VERSION "14"
 
 extern int print_verbose_messages;
@@ -139,8 +140,10 @@ class MythContext : public QObject
 {
     Q_OBJECT
   public:
-    MythContext(const QString &binversion, bool gui = true);
+    MythContext(const QString &binversion);
     virtual ~MythContext();
+
+    void Init(bool gui = true);
 
     QString GetMasterHostPrefix(void);
 
@@ -192,9 +195,8 @@ class MythContext : public QObject
 
     QString GetFiltersDir(void);
 
-    int OpenDatabase(QSqlDatabase *db, bool promptOnFailure = true);
-    static void KickDatabase(QSqlDatabase *db);
-    static void DBError(const QString &where, const QSqlQuery& query);
+    MDBManager *GetDBManager(void);
+    static void DBError(const QString &where, const QSqlQuery &query);
     static QString DBErrorMessage(const QSqlError& err);
 
     DatabaseParams GetDatabaseParams(void);

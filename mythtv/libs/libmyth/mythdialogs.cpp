@@ -4,13 +4,13 @@
 #include <qvbox.h>
 #include <qapplication.h>
 #include <qlayout.h>
-#include <qobjectlist.h>
 #include <qdir.h>
 #include <qregexp.h>
 #include <qaccel.h>
 #include <qfocusdata.h>
 #include <qdict.h>
 #include <qsqldatabase.h>
+#include <qobjectlist.h> 
 
 #ifdef QWS
 #include <qwindowsystem_qws.h>
@@ -40,6 +40,7 @@ using namespace std;
 #include "lcddevice.h"
 #include "mythmediamonitor.h"
 #include "screensaver.h"
+#include "mythdbcon.h"
 
 #ifdef USE_LIRC
 static void *SpawnLirc(void *param)
@@ -446,22 +447,19 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
 {
     QString keybind = key;
 
-    QSqlDatabase *db = QSqlDatabase::database(QSqlDatabase::defaultConnection,
-                                              false);
-    if (db && db->isOpen())
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (query.isConnected())
     {
-        QString thequery = QString("SELECT keylist FROM keybindings WHERE "
-                                   "context = \"%1\" AND action = \"%2\" AND "
-                                   "hostname = \"%2\";")
-                                  .arg(context).arg(action)
-                                  .arg(gContext->GetHostName());
+        query.prepare("SELECT keylist FROM keybindings WHERE "
+                      "context = :CONTEXT AND action = :ACTION AND "
+                      "hostname = :HOSTNAME ;");
+        query.bindValue(":CONTEXT", context);
+        query.bindValue(":ACTION", action);
+        query.bindValue(":HOSTNAME", gContext->GetHostName());
     
-        QSqlQuery query = db->exec(thequery);
-    
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.exec() && query.isActive() && query.size() > 0)
         {
             query.next();
-    
             keybind = query.value(0).toString();
         }
         else
@@ -470,17 +468,23 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
             inskey.replace('\\', "\\\\");
             inskey.replace('\"', "\\\"");
     
-            thequery = QString("INSERT INTO keybindings (context, action, "
-                               "description, keylist, hostname) VALUES "
-                               "(\"%1\", \"%2\", \"%3\", \"%4\", \"%5\");")
-                               .arg(context).arg(action).arg(description)
-                               .arg(inskey).arg(gContext->GetHostName());
-    
-            query = db->exec(thequery);
-            if (!query.isActive())
+            query.prepare("INSERT INTO keybindings (context, action, "
+                          "description, keylist, hostname) VALUES "
+                          "( :CONTEXT, :ACTION, :DESCRIPTION, :KEYLIST, "
+                          ":HOSTNAME );");
+            query.bindValue(":CONTEXT", context);
+            query.bindValue(":ACTION", action);
+            query.bindValue(":DESCRIPTION", description);
+            query.bindValue(":KEYLIST", inskey);
+            query.bindValue(":HOSTNAME", gContext->GetHostName());
+
+            if (!query.exec() || !query.isActive())
+            {
                 MythContext::DBError("Insert Keybinding", query);
+            }
         }
     }
+
 
     QKeySequence keyseq(keybind);
 
@@ -517,20 +521,17 @@ void MythMainWindow::RegisterJump(const QString &destination,
 {
     QString keybind = key;
 
-    QSqlDatabase *db = QSqlDatabase::database(QSqlDatabase::defaultConnection,
-                                              false);
-    if (db && db->isOpen())
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (query.isConnected())
     {
-        QString thequery = QString("SELECT keylist FROM jumppoints WHERE "
-                                   "destination = \"%1\" and hostname = \"%2\";")
-                                  .arg(destination).arg(gContext->GetHostName());
+        query.prepare("SELECT keylist FROM jumppoints WHERE "
+                      "destination = :DEST and hostname = :HOST ;");
+        query.bindValue(":DEST", destination);
+        query.bindValue(":HOST", gContext->GetHostName());
     
-        QSqlQuery query = db->exec(thequery);
-    
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.exec() && query.isActive() && query.size() > 0)
         {
             query.next();
-     
             keybind = query.value(0).toString();
         }
         else
@@ -539,18 +540,22 @@ void MythMainWindow::RegisterJump(const QString &destination,
             inskey.replace('\\', "\\\\");
             inskey.replace('\"', "\\\"");
     
-            thequery = QString("INSERT INTO jumppoints (destination, description, "
-                               "keylist, hostname) VALUES (\"%1\", \"%2\", \"%3\", "
-                               "\"%4\");").arg(destination).arg(description)
-                                          .arg(inskey)
-                                          .arg(gContext->GetHostName());
-    
-            query = db->exec(thequery);
-            if (!query.isActive())
+            query.prepare("INSERT INTO jumppoints (destination, description, "
+                          "keylist, hostname) VALUES ( :DEST, :DESC, :KEYLIST, "
+                          ":HOST );");
+            query.bindValue(":DEST", destination);
+            query.bindValue(":DEDC", description);
+            query.bindValue(":KEYLIST", inskey);
+            query.bindValue(":HOST", gContext->GetHostName());
+
+            if (!query.exec() || !query.isActive())
+            { 
                 MythContext::DBError("Insert Jump Point", query);
+            } 
         }
     }
-   
+
+
     JumpData jd = { callback, destination, description };
     d->destinationMap[destination] = jd;
  
@@ -1103,7 +1108,7 @@ bool MythPopupBox::focusNextPrevChild(bool next)
         }
 
         w = (next) ? focusList->prev() : focusList->next();
-    }
+    }   
     while (w && !(candidate && w == startingPoint) && (countdown-- > 0));
 
     if (!candidate)

@@ -149,18 +149,19 @@ int main(int argc, char *argv[])
         ++argpos;
     }
 
-    gContext = new MythContext(MYTH_BINARY_VERSION, false);
+    gContext = NULL;
+    gContext = new MythContext(MYTH_BINARY_VERSION);
+    gContext->Init(false);
 
-    QSqlDatabase *jobdb = QSqlDatabase::addDatabase("QMYSQL3");
-    if (!gContext->OpenDatabase(jobdb))
+    if (!MSqlQuery::testDBConnection())
     {
         printf("couldn't open db\n");
         exit(11);
     }
 
-    jobqueue = new JobQueue(false, jobdb);
+    jobqueue = new JobQueue(false);
 
-	a.exec();
+    a.exec();
 
     delete gContext;
 

@@ -1,4 +1,5 @@
 #include "mythcontext.h"
+#include "mythdbcon.h"
 #include "dvbsignalmonitor.h"
 
 const QString DVBSignalMonitor::TIMEOUT(QObject::tr("Timed out waiting for signal."));
@@ -123,7 +124,8 @@ void DVBRecorder::QualityMonitorSample(int cardid,
         .arg(sample.ss & 0xffff).arg(sample.ber).arg(sample.ub)
         .arg(cont_errors).arg(stream_overflows).arg(bad_packets);
 
-    QSqlQuery result = db_conn->exec(sql);
+    MSqlQuery result(MSqlQuery::InitCon());
+    // = db_conn->exec(sql);
 
     if (!result.isActive())
         MythContext::DBError("DVB quality sample insert failed", result);
@@ -145,14 +147,11 @@ void *DVBRecorder::QualityMonitorThread()
             break;
 
         if (cardid >= 0 &&
-            db_conn != NULL && db_lock != NULL && dvbchannel != NULL &&
+            && dvbchannel != NULL &&
             dvbchannel -> FillFrontendStats(fe_stats))
         {
-            pthread_mutex_lock(db_lock);
 
             QualityMonitorSample(cardid, fe_stats);
-
-            pthread_mutex_unlock(db_lock);
         }
     }
 
@@ -165,30 +164,29 @@ void DVBRecorder::ExpireQualityData()
     RECORD("Expiring DVB quality data older than " << expire_data_days <<
            " day(s)");
 
-    pthread_mutex_lock(db_lock);
 
     QString sql = QString("DELETE FROM dvb_signal_quality "
                           "WHERE sampletime < "
                           "SUBDATE(NOW(), INTERVAL \"%1\" DAY);").
         arg(expire_data_days);
 
-    QSqlQuery query = db_conn->exec(sql);
+    MSqlQuery query(MSqlQuery::InitCon());
+    // = db_conn->exec(sql);
 
     if (!query.isActive())
         MythContext::DBError("Could not expire DVB signal data",
                              query);
 
-    pthread_mutex_unlock(db_lock);
 }
 
 // we need the capture card id and I can't see an easy way to get it
 // from this object
 int DVBRecorder::GetIDForCardNumber(int cardnum)
 {
-    pthread_mutex_lock(db_lock);
     int cardid = -1;
 
-    QSqlQuery result = db_conn->exec(QString("SELECT cardid FROM capturecard "
+    MSqlQuery result(MSqlQuery::InitCon());
+    // = db_conn->exec(QString("SELECT cardid FROM capturecard "
                                         "WHERE videodevice=\"%1\" AND "
                                         " cardtype='DVB';").arg(cardnum));
 
@@ -201,7 +199,6 @@ int DVBRecorder::GetIDForCardNumber(int cardnum)
     else
         RECORD("Could not get cardid for card number " << cardnum);
 
-    pthread_mutex_unlock(db_lock);
 
     return cardid;
 }

@@ -47,20 +47,15 @@ void DTVRecorder::FinishRecording(void)
 {
     (ringBuffer->Seek(0, SEEK_CUR), ringBuffer->Sync()); // stealth call to flush
 
-    if (curRecording && db_lock && db_conn)
+    if (curRecording)
     {
-        pthread_mutex_lock(db_lock);
-        MythContext::KickDatabase(db_conn);
-
-        curRecording->SetFilesize(ringBuffer->GetRealFileSize(), db_conn);
+        curRecording->SetFilesize(ringBuffer->GetRealFileSize());
         if (_position_map_delta.size())
         {
             curRecording->SetPositionMapDelta(_position_map_delta,
-                                              MARK_GOP_BYFRAME, db_conn);
+                                              MARK_GOP_BYFRAME);
             _position_map_delta.clear();
         }
-
-        pthread_mutex_unlock(db_lock);
     }
 }
 
@@ -201,15 +196,12 @@ void DTVRecorder::HandleKeyframe() {
         _position_map_delta[frameNum] = startpos;
         _position_map[frameNum] = startpos;
 
-        if (curRecording && db_lock && db_conn &&
+        if (curRecording &&
             _position_map_delta.size() == 30)
         {
-            pthread_mutex_lock(db_lock);
-            MythContext::KickDatabase(db_conn);
             curRecording->SetPositionMapDelta(_position_map_delta, 
-                                              MARK_GOP_BYFRAME, db_conn);
-            curRecording->SetFilesize(startpos, db_conn);
-            pthread_mutex_unlock(db_lock);
+                                              MARK_GOP_BYFRAME);
+            curRecording->SetFilesize(startpos);
             _position_map_delta.clear();
         }
     }
