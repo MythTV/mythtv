@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythcontext.h"
 
-const QString currentDatabaseVersion = "1009";
+const QString currentDatabaseVersion = "1010";
 
 void UpdateDBVersionNumber(const QString &newnumber)
 {
