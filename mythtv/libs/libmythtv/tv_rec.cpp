@@ -312,12 +312,11 @@ void TVRec::HandleStateChange(void)
     else if (internalState == kState_WatchingRecording &&
              nextState == kState_WatchingLiveTV)
     {
-        nvr->Pause();
+        nvr->Pause(false);
         while (!nvr->GetPause())
             usleep(5);
 
         nvr->TransitionToRing();
-        nvr->Reset();
 
         nvr->Unpause();
 

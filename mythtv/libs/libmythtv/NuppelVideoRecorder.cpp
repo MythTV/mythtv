@@ -673,7 +673,8 @@ void NuppelVideoRecorder::StartRecording(void)
         {
             mainpaused = true;
             usleep(50);
-            gettimeofday(&stm, &tzone);
+            if (cleartimeonpause)
+                gettimeofday(&stm, &tzone);
             continue;
         }
 again:
@@ -834,7 +835,8 @@ again:
         {
            mainpaused = true;
            usleep(50);
-           gettimeofday(&stm, &tzone);
+           if (cleartimeonpause)
+               gettimeofday(&stm, &tzone);
            continue;
         }
         frame = 0;
@@ -974,7 +976,8 @@ void NuppelVideoRecorder::DoMJPEG(void)
         {
            mainpaused = true;
            usleep(50);
-           gettimeofday(&stm, &tzone);
+           if (cleartimeonpause)
+               gettimeofday(&stm, &tzone);
            continue;
         }
         if (ioctl(fd, MJPIOC_SYNC, &bsync) < 0)

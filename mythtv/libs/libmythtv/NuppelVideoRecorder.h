@@ -66,7 +66,9 @@ class NuppelVideoRecorder
     void StartRecording(void);
     void StopRecording(void) { encoding = false; } 
     
-    void Pause(void) { paused = true; pausewritethread = true;
+    void Pause(bool clear = true) 
+                     { cleartimeonpause = clear;
+                       paused = true; pausewritethread = true;
                        actuallypaused = audiopaused = mainpaused = false; }
     void Unpause(void) { paused = false; pausewritethread = false; }
     bool GetPause(void) { return (audiopaused && mainpaused && 
@@ -258,6 +260,8 @@ class NuppelVideoRecorder
     int hmjpg_hdecimation;
     int hmjpg_vdecimation;
     int hmjpg_maxw;
+
+    bool cleartimeonpause;
 };
 
 #endif
