@@ -96,7 +96,7 @@
    
    <button>
      <type>MENU_UTILITIES_SETUP</type>
-     <text>Utilities/Setup</text>
+     <text>Utilities / Setup</text>
      <text lang="IT">Impostazioni</text>
      <text lang="ES">Configurar</text>
      <text lang="CA">Configurar</text>
