@@ -334,7 +334,7 @@ void TVRec::HandleStateChange(void)
  
     if (startRecorder)
     {
-        if (curRecording)
+        if (curRecording && curRecording->recordingprofileid > 0)
             SetupRecorder(curRecording->recordingprofileid);
         else
             SetupRecorder(1);

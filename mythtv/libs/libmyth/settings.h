@@ -56,7 +56,6 @@ public:
     virtual ~Setting() {};
 
     virtual QString getValue(void) const {
-        cerr << "getValue(" << getName() << "): " << settingValue << endl;
         return settingValue;
     };
 
@@ -68,7 +67,6 @@ public:
 
 public slots:
     virtual void setValue(const QString& newValue) {
-        cerr << "setValue(" << getName() << "): " << newValue << endl;
         settingValue = newValue;
         emit valueChanged(settingValue);
     };
@@ -299,7 +297,7 @@ protected:
 public:
     virtual void setValue(QString newValue) {
         if (!rw)
-            cerr << "BUG: attempted to set value of read-only ComboBox as string\n";
+            cout << "BUG: attempted to set value of read-only ComboBox as string\n";
         else
             Setting::setValue(newValue);
     };
@@ -361,7 +359,6 @@ public:
 
 protected slots:
     virtual void triggerChanged(const QString& value) {
-        cerr << "trigger changed: " << value << endl;
         configStack->raise(triggerMap[value]);
     };
 protected:

@@ -93,7 +93,7 @@ void StackedConfigurationGroup::raise(Configurable* child) {
             emit raiseWidget((int)i);
             return;
         }
-    cerr << "BUG: StackedConfigurationGroup::raise(): unrecognized child " << child << endl;
+    cout << "BUG: StackedConfigurationGroup::raise(): unrecognized child " << child << endl;
 }
 
 QWidget* LineEditSetting::configWidget(QWidget* parent,
@@ -337,13 +337,13 @@ void AutoIncrementStorage::save(QSqlDatabase* db) {
         QString query = QString("INSERT INTO %1 (%2) VALUES (0)").arg(table).arg(column);
         QSqlQuery result = db->exec(query);
         if (!result.isActive() || result.numRowsAffected() < 1) {
-            cerr << "Failed to insert new entry for ("
+            cout << "Failed to insert new entry for ("
                  << table << "," << column << ")\n";
             return;
         }
         result = db->exec("SELECT LAST_INSERT_ID()");
         if (!result.isActive() || result.numRowsAffected() < 1) {
-            cerr << "Failed to fetch last insert id" << endl;
+            cout << "Failed to fetch last insert id" << endl;
             return;
         }
 
