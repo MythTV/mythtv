@@ -1778,17 +1778,16 @@ void TVRec::GetNextProgram(int direction,
                         QString &endtime, QString &callsign, QString &iconpath,
                         QString &channelname, QString &chanid)
 {
-    QSqlQuery sqlquery;
     QString querystr;
     QString nextchannum = channelname;
     QString compare = "<";
     QString sortorder = "";
 
-    querystr = QString( "SELECT title, subtitle, description, category, "
-                            "starttime, endtime, callsign, icon, channum, "
-                            "program.chanid "
-                        "FROM program, channel "
-                        "WHERE program.chanid = channel.chanid ");
+    querystr = QString("SELECT title, subtitle, description, category, "
+                       "starttime, endtime, callsign, icon, channum, "
+                       "program.chanid "
+                       "FROM program, channel "
+                       "WHERE program.chanid = channel.chanid ");
 
     switch (direction)
     {
@@ -1827,7 +1826,7 @@ void TVRec::GetNextProgram(int direction,
 
     pthread_mutex_lock(&db_lock);
 
-    sqlquery.exec(querystr);
+    QSqlQuery sqlquery = db_conn->exec(querystr);
 
     if ((sqlquery.isActive()) && (sqlquery.numRowsAffected() > 0))
     {
@@ -1862,7 +1861,7 @@ void TVRec::GetNextProgram(int direction,
 
         querystr = QString("SELECT channum FROM channel WHERE chanid = %1;")
                            .arg(chanid);
-        sqlquery.exec(querystr);
+        sqlquery = db_conn->exec(querystr);
 
         if ((sqlquery.isActive()) && (sqlquery.numRowsAffected() > 0))
             if (sqlquery.next())

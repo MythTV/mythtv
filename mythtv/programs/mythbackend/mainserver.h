@@ -15,6 +15,7 @@ using namespace std;
 #include "encoderlink.h"
 #include "filetransfer.h"
 
+class QSqlDatabase;
 class HttpStatus;
 class ProcessRequestThread;
 
@@ -23,7 +24,7 @@ class MainServer : public QObject
     Q_OBJECT
   public:
     MainServer(bool master, int port, int statusport, 
-               QMap<int, EncoderLink *> *tvList);
+               QMap<int, EncoderLink *> *tvList, QSqlDatabase *db);
 
    ~MainServer();
 
@@ -71,6 +72,8 @@ class MainServer : public QObject
     void HandleRemoteEncoder(QStringList &slist, QStringList &commands,
                              PlaybackSock *pbs);
 
+    void SendResponse(QSocket *pbs, QStringList &commands);
+
     PlaybackSock *getSlaveByHostname(QString &hostname);
     PlaybackSock *getPlaybackBySock(QSocket *socket);
     FileTransfer *getFileTransferByID(int id);
@@ -102,6 +105,8 @@ class MainServer : public QObject
     vector<ProcessRequestThread *> threadPool;
 
     bool masterBackendOverride;
+
+    QSqlDatabase *m_db;
 };
 
 #endif

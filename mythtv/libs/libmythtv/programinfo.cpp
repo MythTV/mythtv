@@ -241,11 +241,9 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
     }
     progMap["rank"] = rank;
 
-    QSqlQuery query;
-    QString thequery;
-    thequery = QString("SELECT icon FROM channel WHERE chanid = %1")
-                       .arg(chanid);
-    query.exec(thequery);
+    QString thequery = QString("SELECT icon FROM channel WHERE chanid = %1")
+                               .arg(chanid);
+    QSqlQuery query = db->exec(thequery);
     if (query.isActive() && query.numRowsAffected() > 0)
         if (query.next())
             progMap["iconpath"] = query.value(0).toString();

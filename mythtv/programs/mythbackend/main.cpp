@@ -228,9 +228,17 @@ int main(int argc, char **argv)
         return -1;
     }
 
+    QSqlDatabase *msdb = QSqlDatabase::addDatabase("QMYSQL3", "MSDB");
+    if (!msdb)
+    {
+        printf("Couldn't connect to database\n");
+        return -1;
+    }
+
     if (!gContext->OpenDatabase(db) || !gContext->OpenDatabase(subthread) ||
         !gContext->OpenDatabase(expthread) ||
-        !gContext->OpenDatabase(transthread))
+        !gContext->OpenDatabase(transthread) ||
+        !gContext->OpenDatabase(msdb))
     {
         printf("couldn't open db\n");
         return -1;
@@ -295,8 +303,8 @@ int main(int argc, char **argv)
     QSqlDatabase *expdb = QSqlDatabase::database("EXPDB");
     expirer = new AutoExpire(true, ismaster, expdb);
 
-    //QSqlDatabase *trandb = QSqlDatabase::database("TRANSDB");
-    //trans = new Transcoder(&tvList, trandb);
+    QSqlDatabase *trandb = QSqlDatabase::database("TRANSDB");
+    trans = new Transcoder(&tvList, trandb);
 
     VERBOSE("Verbose mode activated.");
 
@@ -324,7 +332,7 @@ int main(int argc, char **argv)
        close(nfsfd);
     }
 
-    new MainServer(ismaster, port, statusport, &tvList);
+    new MainServer(ismaster, port, statusport, &tvList, msdb);
 
     a.exec();
 

@@ -78,8 +78,11 @@ class ProcessRequestThread : public QThread
 };
 
 MainServer::MainServer(bool master, int port, int statusport, 
-                       QMap<int, EncoderLink *> *tvList)
+                       QMap<int, EncoderLink *> *tvList,
+                       QSqlDatabase *db)
 {
+    m_db = db;
+
     ismaster = master;
     masterServer = NULL;
 
@@ -317,8 +320,7 @@ void MainServer::customEvent(QCustomEvent *e)
             QDateTime startts = QDateTime::fromString(tokens[2], Qt::ISODate);
 
             dblock.lock();
-            ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(
-                                                      QSqlDatabase::database(),
+            ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(m_db,
                                                                      tokens[1],
                                                                      startts);
             dblock.unlock();
@@ -383,7 +385,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         }
 
         dblock.lock();
-        ScheduledRecording::signalChange(QSqlDatabase::database());
+        ScheduledRecording::signalChange(m_db);
         dblock.unlock();
 
         playbackList.push_back(pbs);
@@ -412,20 +414,19 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             dblock.lock();
 
             int dsp_status, soundcardcaps;
-            QSqlQuery query;
             QString audiodevice, audiooutputdevice, querytext;
 
             querytext = QString("SELECT audiodevice FROM capturecard "
                                 "WHERE cardid=%1;").arg(recnum);
-            query.exec(querytext);
+            QSqlQuery query = m_db->exec(querytext);
             if (query.isActive() && query.numRowsAffected())
             {
                 query.next();
                 audiodevice = query.value(0).toString();
             }
 
-            query.exec("SELECT data FROM settings WHERE "
-                       "value ='AudioOutputDevice';");
+            query = m_db->exec("SELECT data FROM settings WHERE "
+                               "value ='AudioOutputDevice';");
             if (query.isActive() && query.numRowsAffected())
             {
                 query.next();
@@ -491,6 +492,18 @@ void MainServer::HandleDone(QSocket *socket)
     socket->close();
 }
 
+void MainServer::SendResponse(QSocket *socket, QStringList &commands)
+{
+    if (getPlaybackBySock(socket) || getFileTransferBySock(socket))
+    {
+        WriteStringList(socket, commands);
+    }
+    else
+    {
+        cerr << "Unable to write to client socket, as it's no longer there\n";
+    }
+}
+
 void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 {
     QString thequery;
@@ -499,8 +512,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     QString port = gContext->GetSetting("BackendServerPort");
 
     dblock.lock();
-    QSqlQuery query;
-    MythContext::KickDatabase(QSqlDatabase::database());
+    MythContext::KickDatabase(m_db);
 
     thequery = "SELECT recorded.chanid,starttime,endtime,title,subtitle,"
                "description,hostname,channum,name,callsign FROM recorded "
@@ -511,12 +523,9 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
         thequery += " DESC";
     thequery += ";";
 
-    query.exec(thequery);
-
-    dblock.unlock();
+    QSqlQuery query = m_db->exec(thequery);
 
     QStringList outputlist;
-
     QString fileprefix = gContext->GetFilePrefix();
 
     if (query.isActive() && query.numRowsAffected() > 0)
@@ -614,7 +623,9 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     else
         outputlist << "0";
 
-    WriteStringList(pbs->getSocket(), outputlist);
+    dblock.unlock();
+
+    SendResponse(pbs->getSocket(), outputlist);
 }
 
 void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
@@ -649,7 +660,7 @@ void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
 
     delete pginfo;
 
-    WriteStringList(pbs->getSocket(), strlist);
+    SendResponse(pbs->getSocket(), strlist);
 }
 
 void MainServer::HandleQueueTranscode(QStringList &slist, PlaybackSock *pbs)
@@ -664,7 +675,7 @@ void MainServer::HandleQueueTranscode(QStringList &slist, PlaybackSock *pbs)
     gContext->dispatch(me);
 
     QStringList outputlist = "0";
-    WriteStringList(pbs->getSocket(), outputlist);
+    SendResponse(pbs->getSocket(), outputlist);
     delete pginfo;
     return;
 }
@@ -728,7 +739,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
            if (pbs)
            {
                QStringList outputlist = "0";
-               WriteStringList(pbs->getSocket(), outputlist);
+               SendResponse(pbs->getSocket(), outputlist);
            }
 
            delete pginfo;
@@ -763,15 +774,14 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
 
     dblock.lock();
 
-    QSqlQuery query;
-    MythContext::KickDatabase(QSqlDatabase::database());
+    MythContext::KickDatabase(m_db);
 
     thequery = QString("DELETE FROM recorded WHERE chanid = %1 AND title "
                        "= \"%2\" AND starttime = %3 AND endtime = %4;")
                        .arg(pginfo->chanid).arg(pginfo->title.utf8())
                        .arg(startts).arg(endts);
 
-    query.exec(thequery);
+    QSqlQuery query = m_db->exec(thequery);
 
     if (!query.isActive())
     {
@@ -786,7 +796,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
                        "AND starttime = %2;")
                        .arg(pginfo->chanid).arg(startts);
 
-    query.exec(thequery);
+    query = m_db->exec(thequery);
     if (!query.isActive())
     {
         cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
@@ -823,14 +833,17 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
             QStringList outputlist;
             outputlist << "BAD: Tried to delete a file that was in "
                           "the database but wasn't on the disk.";
-            WriteStringList(pbs->getSocket(), outputlist);
+            SendResponse(pbs->getSocket(), outputlist);
+
+            delete pginfo;
+            return;
         }
     }
 
     if (pbs)
     {
         QStringList outputlist = QString::number(recnum);
-        WriteStringList(pbs->getSocket(), outputlist);
+        SendResponse(pbs->getSocket(), outputlist);
     }
 
     delete pginfo;
@@ -840,7 +853,8 @@ void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs)
 {
     struct statfs statbuf;
     int totalspace = -1, usedspace = -1;
-    if (statfs(recordfileprefix.ascii(), &statbuf) == 0) {
+    if (statfs(recordfileprefix.ascii(), &statbuf) == 0) 
+    {
         totalspace = statbuf.f_blocks / (1024*1024/statbuf.f_bsize);
         usedspace = (statbuf.f_blocks - statbuf.f_bfree) / 
                     (1024*1024/statbuf.f_bsize);
@@ -867,14 +881,16 @@ void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs)
     QFile checkFile(filename);
 
     if (!ismaster)
-       if (checkFile.exists())  //found the lockfile, so don't count the space
-       {
-         totalspace = 0;
-         usedspace = 0;
-       }
+    {
+        if (checkFile.exists())  //found the lockfile, so don't count the space
+        {
+            totalspace = 0;
+            usedspace = 0;
+        }
+    }
 
     strlist << QString::number(totalspace) << QString::number(usedspace);
-    WriteStringList(pbs->getSocket(), strlist);
+    SendResponse(pbs->getSocket(), strlist);
 }
 
 void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
@@ -893,7 +909,7 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
              exists = slave->CheckFile(pginfo);
 
              QStringList outputlist = QString::number(exists);
-             WriteStringList(pbs->getSocket(), outputlist);
+             SendResponse(pbs->getSocket(), outputlist);
              delete pginfo;
              return;
         }
@@ -907,7 +923,7 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
         exists = 1;
 
     QStringList strlist = QString::number(exists);
-    WriteStringList(pbs->getSocket(), strlist);
+    SendResponse(pbs->getSocket(), strlist);
 
     delete pginfo;
 }
@@ -916,10 +932,9 @@ void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs)
 {
     dblock.lock();
 
-    MythContext::KickDatabase(QSqlDatabase::database());
+    MythContext::KickDatabase(m_db);
 
-    Scheduler *sched = new Scheduler(false, encoderList, 
-                                     QSqlDatabase::database());
+    Scheduler *sched = new Scheduler(false, encoderList, m_db);
 
     bool conflicts = sched->FillRecordLists(false);
     list<ProgramInfo *> *recordinglist = sched->getAllPending();
@@ -935,7 +950,7 @@ void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs)
     for (; iter != recordinglist->end(); iter++)
         (*iter)->ToStringList(strlist);
 
-    WriteStringList(pbs->getSocket(), strlist);
+    SendResponse(pbs->getSocket(), strlist);
 
     delete sched;
 }
@@ -944,10 +959,9 @@ void MainServer::HandleGetScheduledRecordings(PlaybackSock *pbs)
 {
     dblock.lock();
 
-    MythContext::KickDatabase(QSqlDatabase::database());
+    MythContext::KickDatabase(m_db);
 
-    Scheduler *sched = new Scheduler(false, encoderList,
-                                     QSqlDatabase::database());
+    Scheduler *sched = new Scheduler(false, encoderList, m_db);
 
     list<ProgramInfo *> *recordinglist = sched->getAllScheduled();
 
@@ -961,7 +975,7 @@ void MainServer::HandleGetScheduledRecordings(PlaybackSock *pbs)
     for (; iter != recordinglist->end(); iter++)
         (*iter)->ToStringList(strlist);
 
-    WriteStringList(pbs->getSocket(), strlist);
+    SendResponse(pbs->getSocket(), strlist);
 
     delete sched;
 }
@@ -972,10 +986,9 @@ void MainServer::HandleGetConflictingRecordings(QStringList &slist,
 {
     dblock.lock();
 
-    MythContext::KickDatabase(QSqlDatabase::database());
+    MythContext::KickDatabase(m_db);
 
-    Scheduler *sched = new Scheduler(false, encoderList, 
-                                     QSqlDatabase::database());
+    Scheduler *sched = new Scheduler(false, encoderList, m_db);
 
     bool removenonplaying = purge.toInt();
 
@@ -995,7 +1008,7 @@ void MainServer::HandleGetConflictingRecordings(QStringList &slist,
     for (; iter != conflictlist->end(); iter++)
         (*iter)->ToStringList(strlist); 
 
-    WriteStringList(pbs->getSocket(), strlist);
+    SendResponse(pbs->getSocket(), strlist);
 
     delete sched;
     delete pginfo;
@@ -1058,7 +1071,7 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
         strlist << "-1";
     }
 
-    WriteStringList(pbs->getSocket(), strlist);
+    SendResponse(pbs->getSocket(), strlist);
 }
 
 void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
@@ -1367,7 +1380,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         retlist << "ok";
     }
 
-    WriteStringList(pbs->getSocket(), retlist);    
+    SendResponse(pbs->getSocket(), retlist);    
 }
 
 void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
@@ -1413,7 +1426,7 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
         delete pginfo;
     }
 
-    WriteStringList(pbs->getSocket(), retlist);
+    SendResponse(pbs->getSocket(), retlist);
 }
 
 void MainServer::HandleFileTransferQuery(QStringList &slist, 
@@ -1477,7 +1490,7 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
         retlist << "ok";
     }
 
-    WriteStringList(pbs->getSocket(), retlist);
+    SendResponse(pbs->getSocket(), retlist);
 }
 
 void MainServer::HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs)
@@ -1525,7 +1538,7 @@ void MainServer::HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs)
         strlist << "-1";
     }
 
-    WriteStringList(pbs->getSocket(), strlist);    
+    SendResponse(pbs->getSocket(), strlist);    
     delete pginfo;
 }
 
@@ -1538,7 +1551,7 @@ void MainServer::HandleMessage(QStringList &slist, PlaybackSock *pbs)
 
     QStringList retlist = "OK";
 
-    WriteStringList(pbs->getSocket(), retlist);
+    SendResponse(pbs->getSocket(), retlist);
 }
 
 void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
@@ -1558,7 +1571,7 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
             slave->GenPreviewPixmap(pginfo);
 
         QStringList outputlist = "OK";
-        WriteStringList(pbs->getSocket(), outputlist);
+        SendResponse(pbs->getSocket(), outputlist);
         delete pginfo;
         return;
     }
@@ -1570,7 +1583,7 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
              << pginfo->hostname << endl;
 
         QStringList outputlist = "BAD";
-        WriteStringList(pbs->getSocket(), outputlist);
+        SendResponse(pbs->getSocket(), outputlist);
         delete pginfo;
         return;
     }
@@ -1604,7 +1617,7 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     }
 
     QStringList retlist = "OK";
-    WriteStringList(pbs->getSocket(), retlist);    
+    SendResponse(pbs->getSocket(), retlist);    
 
     delete pginfo;
 }
@@ -1630,7 +1643,9 @@ void MainServer::endConnection(QSocket *socket)
                     if (elink->getSocket() == (*it))
                         elink->setSocket(NULL);
                 }
-                ScheduledRecording::signalChange(QSqlDatabase::database());
+                dblock.lock();
+                ScheduledRecording::signalChange(m_db);
+                dblock.unlock();
             }
             delete (*it);
             playbackList.erase(it);
@@ -1764,14 +1779,13 @@ QString MainServer::LocalFilePath(QUrl &url)
         dblock.lock();
 
         QString querytext;
-        QSqlQuery query;
 
         QString file = lpath.section('/', -1);
         lpath = "";
 
         querytext = QString("SELECT icon FROM channel "
                             "WHERE icon LIKE '%%1';").arg(file);
-        query.exec(querytext);
+        QSqlQuery query = m_db->exec(querytext);
         if (query.isActive() && query.numRowsAffected())
         {
             query.next();
