@@ -636,6 +636,11 @@ float ff_rate_estimate_qscale(MpegEncContext *s)
 //printf("%f ", q);
         q= get_diff_limited_q(s, rce, q);
 //printf("%f ", q);
+	if (q<=0.0)
+        {
+            q = 2.0;
+	    printf("badq: %f\n", q);
+	}
         assert(q>0.0);
 
         if(pict_type==P_TYPE || s->intra_only){ //FIXME type dependant blur like in 2-pass

@@ -1537,7 +1537,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
 
     int number = (int)(secondsin * video_frame_rate);
 
-    long long desiredFrame = framesPlayed + number;
+    long long desiredFrame = number;
     long long desiredKey = 0;
 
     while (desiredKey < desiredFrame)

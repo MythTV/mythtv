@@ -173,7 +173,9 @@ void *runScheduler(void *dummy)
             {
                 // don't record stuff that's already started..
                 if (secsleft > -30)
+                {
                     startRecording(tv, nextRecording);
+                }
 
                 sched->RemoveFirstRecording();
                 nextRecording = sched->GetNextRecording();
@@ -185,8 +187,8 @@ void *runScheduler(void *dummy)
                    secsleft = curtime.secsTo(nextrectime);
                 }
             }
-         //   else 
-         //       cout << secsleft << " secs left until " << nextRecording->title << endl;
+            //else 
+            //    cout << secsleft << " secs left until " << nextRecording->title << endl;
         }
     }
     

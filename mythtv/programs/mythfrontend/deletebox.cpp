@@ -229,8 +229,14 @@ void DeleteBox::startPlayer(ProgramInfo *rec)
 
     pthread_create(&decoder, NULL, SpawnDecoder, nvp);
 
+    QTime curtime = QTime::currentTime();
+    curtime.addSecs(1);
     while (!nvp->IsPlaying())
+    {
+         if (QTime::currentTime() > curtime)
+             break;
          usleep(50);
+    }
 }
 
 void DeleteBox::changed(QListViewItem *lvitem)

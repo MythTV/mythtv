@@ -439,7 +439,7 @@ void fillData(void)
         QSqlQuery query;
         query.exec(querystr);
  
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.isActive() && query.numRowsAffected() > 20)
         {
         }
         else
