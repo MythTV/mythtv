@@ -129,7 +129,7 @@ void TV::LiveTV(void)
            switch (keypressed) {
                case 's': case 'S':
 	       case 'p': case 'P': paused = nvp->TogglePause(); break;
-               case 'i': case 'I': nvp->ShowLastOSD(osd_display_time); break;
+               case 'i': case 'I': UpdateOSD(); break;
                case wsRight: case 'd': case 'D': nvp->FastForward(5); break;
                case wsLeft: case 'a': case 'A': nvp->Rewind(5); break;
                case wsEscape: nvp->StopPlaying(); break;
@@ -201,15 +201,7 @@ void TV::ChangeChannel(bool up)
     while (!nvp->ResetYet())
         usleep(5);
 
-    string title, subtitle, desc, category, starttime, endtime;
-    GetChannelInfo(channel->GetCurrent(), title, subtitle, desc, category, 
-                   starttime, endtime);
-
-    nvp->SetInfoText(title, subtitle, desc, category, starttime, endtime,
-                     osd_display_time);
-    nvp->SetChannelText(channel->GetCurrentName(), osd_display_time);
-
-    nvp->Unpause();
+    UpdateOSD();
 
     channelqueued = false;
     channelKeys[0] = channelKeys[1] = channelKeys[2] = ' ';
@@ -281,15 +273,19 @@ void TV::ChangeChannel(char *name)
     while (!nvp->ResetYet())
         usleep(5);
 
+    UpdateOSD();
+    nvp->Unpause();
+}
+
+void TV::UpdateOSD(void)
+{
     string title, subtitle, desc, category, starttime, endtime;
-    GetChannelInfo(channel->GetCurrent(), title, subtitle, desc, category,
+    GetChannelInfo(channel->GetCurrent(), title, subtitle, desc, category, 
                    starttime, endtime);
 
     nvp->SetInfoText(title, subtitle, desc, category, starttime, endtime,
                      osd_display_time);
     nvp->SetChannelText(channel->GetCurrentName(), osd_display_time);
-
-    nvp->Unpause();
 }
 
 void TV::GetChannelInfo(int lchannel, string &title, string &subtitle,

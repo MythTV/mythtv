@@ -30,7 +30,8 @@ class TV
     
     void ChannelKey(int key);
     void ChannelCommit(void);
-   
+  
+    void UpdateOSD(void); 
     void GetChannelInfo(int lchannel, string &title, string &subtitle, 
                         string &desc, string &category, string &starttime,
                         string &endtime);
