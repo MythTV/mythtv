@@ -29,8 +29,8 @@ VideoTree::VideoTree(MythMainWindow *parent, QSqlDatabase *ldb,
     //
 
     wireUpTheme();
-    video_tree_root = new GenericTree("video root", -1, false);
-    video_tree_data = video_tree_root->addNode("videos", -1, false);
+    video_tree_root = new GenericTree("video root", -2, false);
+    video_tree_data = video_tree_root->addNode("videos", -2, false);
 
     buildVideoList();
     
@@ -365,7 +365,7 @@ void VideoTree::buildVideoList()
                             sub_node = where_to_add->getChildByName(dirname);
                             if(!sub_node)
                             {
-                                sub_node = where_to_add->addNode(dirname, 0, false);
+                                sub_node = where_to_add->addNode(dirname, -1, false);
                             }
                             where_to_add = sub_node;
                         }
@@ -382,7 +382,7 @@ void VideoTree::buildVideoList()
         }
         else
         {
-            video_tree_data->addNode(tr("No files found"), -1, false);
+            video_tree_data->addNode(tr("No files found"), -2, false);
         }
     }
     
@@ -394,7 +394,7 @@ void VideoTree::buildVideoList()
 
 void VideoTree::handleTreeListEntry(int node_int, IntVector*)
 {
-    if(node_int >= 0)
+    if(node_int > -1)
     {
         //
         //  User has navigated to a video file
@@ -489,7 +489,7 @@ void VideoTree::handleTreeListEntry(int node_int, IntVector*)
 
 void VideoTree::playVideo(int node_number)
 {
-    if(node_number > 0)
+    if(node_number > -1)
     {
         //
         //  User has selected a video file
@@ -590,7 +590,7 @@ void VideoTree::playVideo(int node_number)
 
 void VideoTree::handleTreeListSelection(int node_int, IntVector *)
 {
-    if(node_int >= 0)
+    if(node_int > -1)
     {
         //
         //  Play this (chain of?) file(s) 
@@ -599,7 +599,7 @@ void VideoTree::handleTreeListSelection(int node_int, IntVector *)
         int which_file = node_int;
         QTime playing_time;
 
-        while(which_file > 0)
+        while(which_file > -1)
         {
             playing_time.start();
             playVideo(which_file);
@@ -617,17 +617,17 @@ void VideoTree::handleTreeListSelection(int node_int, IntVector *)
                     node_data->setID(which_file);
                     node_data->fillDataFromID(db);
                     which_file = node_data->ChildID();
-                    cout << "Just set which file to " << which_file << endl;
+                    //cout << "Just set which file to " << which_file << endl;
                     delete node_data;
                 }
                 else
                 {
-                    which_file = 0;
+                    which_file = -1;
                 }
             }
             else
             {
-                which_file = 0;
+                which_file = -1;
             }
         }
         
