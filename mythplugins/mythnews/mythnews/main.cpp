@@ -58,6 +58,8 @@ int mythplugin_init(const char *libversion)
                                     MYTH_BINARY_VERSION))
         return -1;
 
+    setupKeys();
+
     return 0;
 }
 
