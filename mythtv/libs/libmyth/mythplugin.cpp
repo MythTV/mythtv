@@ -1,5 +1,6 @@
 #include "mythplugin.h"
 #include <qdict.h>
+#include <qstringlist.h>
 #include <qdir.h>
 #include <iostream>
 #include <dlfcn.h>
