@@ -305,7 +305,8 @@ class MythListBox: public QListBox {
     void focusInEvent(QFocusEvent *e);
 
   public slots:
-    void setCurrentItem(const QString& text);
+    void setCurrentItem(const QString& matchText, bool caseSensitive = true, 
+                        bool partialMatch = false);
     void setCurrentItem(int index) { QListBox::setCurrentItem(index); };
 
   signals:

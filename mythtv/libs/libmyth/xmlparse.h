@@ -35,6 +35,7 @@ class XMLParse
     void parseManagedTreeList(LayerSet *, QDomElement &);
     void parseTextArea(LayerSet *, QDomElement &);
     void parseMultiTextArea(LayerSet *, QDomElement &);
+    void parseRemoteEdit(LayerSet *, QDomElement &);
     void parseStatusBar(LayerSet *, QDomElement &);
     void parseImage(LayerSet *, QDomElement &);
     void parseAnimatedImage(LayerSet *, QDomElement &);

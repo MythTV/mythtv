@@ -1043,11 +1043,39 @@ void MythListView::focusInEvent(QFocusEvent *e)
     setSelected(currentItem(), true);
 }
 
-void MythListBox::setCurrentItem(const QString& matchText) 
+void MythListBox::setCurrentItem(const QString& matchText, bool caseSensitive, 
+                                 bool partialMatch) 
 {
     for (unsigned i = 0 ; i < count() ; ++i)
-        if (text(i) == matchText)
-            setCurrentItem(i);
+    {
+        if (partialMatch)
+        {
+            if (text(i).startsWith(matchText, caseSensitive))
+            {
+                setCurrentItem(i);
+                break;
+            }
+        }
+        else
+        {
+            if (caseSensitive)
+            {
+                if (text(i) == matchText)
+                {
+                    setCurrentItem(i);
+                    break;
+                }
+            }
+            else
+            {    
+                if (text(i).lower() == matchText.lower())
+                {
+                    setCurrentItem(i);
+                    break;
+                }
+            }        
+        }
+    }            
 }
 
 void MythListBox::keyPressEvent(QKeyEvent* e) 

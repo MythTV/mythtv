@@ -2072,6 +2072,27 @@ UITextType* MythThemedDialog::getUITextType(const QString &name)
     return NULL;
 }
 
+UIRemoteEditType* MythThemedDialog::getUIRemoteEditType(const QString &name)
+{
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
+
+    while( (looper = an_it.current()) != 0)
+    {
+        UIType *hunter = looper->GetType(name);
+        if (hunter)
+        {
+            UIRemoteEditType *hunted;
+            if ( (hunted = dynamic_cast<UIRemoteEditType*>(hunter)) )
+            {
+                return hunted;
+            }
+        }
+        ++an_it;
+    }
+    return NULL;
+}
+
 UIMultiTextType* MythThemedDialog::getUIMultiTextType(const QString &name)
 {
     QPtrListIterator<LayerSet> an_it(my_containers);
@@ -2394,6 +2415,124 @@ void MythPasswordDialog::checkPassword(const QString &the_text)
 
 MythPasswordDialog::~MythPasswordDialog()
 {
+}
+
+/*
+---------------------------------------------------------------------
+*/
+
+MythSearchDialog::MythSearchDialog(MythMainWindow *parent, const char *name) 
+                 :MythPopupBox(parent, name)
+{
+    // create the widgets
+    caption = addLabel(QString(""));
+    
+    editor = new MythRemoteLineEdit(this);
+    connect(editor, SIGNAL(textChanged()), this, SLOT(searchTextChanged()));
+    addWidget(editor);
+    editor->setFocus(); 
+    
+    listbox = new MythListBox(this);
+    listbox->setScrollBar(false);
+    listbox->setBottomScrollBar(false);
+    connect(listbox, SIGNAL(accepted(int)), this, SLOT(itemSelected(int)));
+    addWidget(listbox);
+    
+    ok_button = addButton(tr("OK"), this, SLOT(okPressed()));
+    cancel_button = addButton(tr("Cancel"), this, SLOT(cancelPressed()));
+}
+
+void MythSearchDialog::keyPressEvent(QKeyEvent *e)
+{
+    bool handled = false;
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    {
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        {
+            QString action = actions[i];
+            if (action == "ESCAPE")
+            {
+                handled = true;
+                done(-1);        
+            }
+            if (action == "LEFT")
+            {
+                handled = true;
+                focusNextPrevChild(false);
+            }
+            if (action == "RIGHT")
+            {
+                handled = true;
+                focusNextPrevChild(true);
+            }
+            if (action == "SELECT")
+            {
+                handled = true;
+                done(0);
+            }
+        }
+    }
+    if (!handled)
+        MythPopupBox::keyPressEvent(e);
+}
+
+void MythSearchDialog::itemSelected(int index)
+{
+    done(0);
+}
+
+void MythSearchDialog::setCaption(QString text)
+{
+    caption->setText(text);
+}
+
+void MythSearchDialog::setSearchText(QString text)
+{
+    editor->setText(text);
+    editor->setCursorPosition(0, editor->text().length());
+}
+
+void MythSearchDialog::searchTextChanged(void)
+{
+    listbox->setCurrentItem(editor->text(), false,  true);
+    listbox->setTopItem(listbox->currentItem());
+}
+
+QString MythSearchDialog::getResult(void)
+{
+    return listbox->currentText();
+}
+
+void MythSearchDialog::setItems(QStringList items)
+{
+   listbox->insertStringList(items);
+   searchTextChanged();
+}
+
+void MythSearchDialog::okPressed(void)
+{
+    done(0);  
+}
+
+void MythSearchDialog::cancelPressed(void)
+{
+    done(-1);
+}
+
+MythSearchDialog::~MythSearchDialog()
+{
+    if (listbox)
+    {
+        delete listbox;
+        listbox = NULL;
+    }    
+    
+    if (editor)
+    {
+        delete editor;
+        editor = NULL;
+    }    
 }
 
 /*

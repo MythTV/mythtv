@@ -24,6 +24,7 @@ class UITextType;
 class UIMultiTextType;
 class UIPushButtonType;
 class UITextButtonType;
+class UIRemoteEditType;
 class UIRepeatedImageType;
 class UICheckBoxType;
 class UISelectorType;
@@ -258,6 +259,7 @@ class MythThemedDialog : public MythDialog
     UIMultiTextType *getUIMultiTextType(const QString &name);
     UIPushButtonType *getUIPushButtonType(const QString &name);
     UITextButtonType *getUITextButtonType(const QString &name);
+    UIRemoteEditType *getUIRemoteEditType(const QString &name);
     UIRepeatedImageType *getUIRepeatedImageType(const QString &name);
     UICheckBoxType *getUICheckBoxType(const QString &name);
     UISelectorType *getUISelectorType(const QString &name);
@@ -339,6 +341,39 @@ class MythPasswordDialog: public MythDialog
     MythLineEdit        *password_editor;
     QString             target_text;
     bool                *success_flag;
+};
+
+class MythSearchDialog: public MythPopupBox
+{
+  Q_OBJECT
+
+  public:
+
+    MythSearchDialog(MythMainWindow *parent, const char *name = 0); 
+    ~MythSearchDialog();
+
+  public: 
+    void setCaption(QString text);
+    void setSearchText(QString text);
+    void setItems(QStringList items); 
+    QString getResult(void);
+    
+ protected slots:
+    void okPressed(void);
+    void cancelPressed(void);   
+    void searchTextChanged(void);
+    void itemSelected(int index);
+     
+ protected:
+    void keyPressEvent(QKeyEvent *e);
+
+  private:
+  
+    QLabel              *caption;
+    MythRemoteLineEdit  *editor;
+    MythListBox         *listbox;  
+    QButton             *ok_button;
+    QButton             *cancel_button;
 };
 
 class MythImageFileDialog: public MythThemedDialog

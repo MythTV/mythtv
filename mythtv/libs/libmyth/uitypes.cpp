@@ -2010,6 +2010,154 @@ void UITextType::calculateScreenArea()
 
 // ******************************************************************
 
+UIRemoteEditType::UIRemoteEditType(const QString &name, fontProp *font,
+                       const QString &text, int dorder, QRect displayrect)
+           : UIType(name)
+{
+    m_font = font;
+    m_text = text;
+    m_displaysize = displayrect;
+    m_order = dorder;
+    edit = NULL;
+    takes_focus = true;
+}
+
+void UIRemoteEditType::createEdit(MythThemedDialog* parent)
+{
+    m_parentDialog = parent;
+    edit = new MythRemoteLineEdit(parent);
+     
+    edit->setFocusPolicy(QWidget::NoFocus);
+    edit->setText(m_text);
+    edit->setCurrentFont(m_font->face);
+    edit->setMinimumHeight(getScreenArea().height());
+    edit->setMaximumHeight(getScreenArea().height());
+    edit->setGeometry(getScreenArea());
+    edit->setCharacterColors(m_unselected, m_selected, m_special);
+        
+    connect(edit, SIGNAL(tryingToLooseFocus(bool)), 
+            this, SLOT(takeFocusAwayFromEditor(bool)));
+    edit->show();
+}
+
+UIRemoteEditType::~UIRemoteEditType()
+{
+    if (edit)
+    {
+        delete edit;
+        edit = NULL;
+    }    
+}
+
+void UIRemoteEditType::setText(const QString text)
+{
+    m_text = text;
+    if (edit)
+        edit->setText(text);
+    //refresh();
+}
+
+QString UIRemoteEditType::getText()
+{
+    if (edit)
+        return edit->text();
+    else
+        return QString::null;    
+}
+
+void  UIRemoteEditType::setFont(fontProp *font)
+{ 
+    m_font = font;
+    if (edit)
+        edit->setCurrentFont(font->face);
+}
+ 
+void UIRemoteEditType::setCharacterColors(QColor unselected, QColor selected, QColor special)
+{
+    m_unselected = unselected; 
+    m_selected = selected; 
+    m_special = special;
+    
+    if (edit)
+        edit->setCharacterColors(unselected, selected, special);
+}
+
+void UIRemoteEditType::show(void)
+{
+    if (edit)
+        edit->show();
+    
+    UIType::show();    
+}
+
+void UIRemoteEditType::hide(void)
+{
+    if (edit)
+        edit->hide();
+    
+    UIType::hide();    
+}
+
+void UIRemoteEditType::Draw(QPainter *dr, int drawlayer, int context)
+{
+    if (hidden)
+    {
+        return;
+    }
+    
+    if (m_context == context || m_context == -1)
+    {
+        if (drawlayer == m_order)
+        {
+            dr = dr;
+        }
+    }
+}
+
+void UIRemoteEditType::calculateScreenArea()
+{
+    QRect r = m_displaysize;
+    r.moveBy(m_parent->GetAreaRect().left(),
+             m_parent->GetAreaRect().top());
+    screen_area = r;
+}
+
+void UIRemoteEditType::takeFocusAwayFromEditor(bool up_or_down)
+{
+    if (m_parentDialog) 
+        m_parentDialog->nextPrevWidgetFocus(up_or_down);
+    
+    MythRemoteLineEdit * which_editor = (MythRemoteLineEdit *) sender();
+    
+    if (which_editor)
+    {
+        which_editor->clearFocus();
+    }    
+}
+
+bool UIRemoteEditType::takeFocus()
+{
+    if (edit)
+    {
+        edit->setCursorPosition(0, edit->text().length());
+        edit->setFocus();
+    }
+    
+    return UIType::takeFocus();
+}
+
+void UIRemoteEditType::looseFocus()
+{
+    if (edit)
+    {
+        edit->clearFocus();
+    }
+    
+    UIType::looseFocus();
+}
+
+// ******************************************************************
+
 UIMultiTextType::UIMultiTextType(
                                     const QString &name,
                                     fontProp *font,

@@ -776,8 +776,8 @@ void DataDirectStationUpdate(Source source)
     {
         QSqlQuery dd_update;
         dd_update.prepare("UPDATE channel SET callsign = :CALLSIGN,"
-                " name = :NAME, freqid = :FREQID WHERE xmltvid = :STATIONID"
-                " AND sourceid = :SOURCEID;");
+                " name = :NAME, channum = :CHANNEL, freqid = :FREQID "
+                " WHERE xmltvid = :STATIONID AND sourceid = :SOURCEID;");
         do
         {
             QString channel = dd_station_info.value(3).toString();
@@ -795,6 +795,7 @@ void DataDirectStationUpdate(Source source)
             dd_update.bindValue(":CALLSIGN", dd_station_info.value(0));
             dd_update.bindValue(":NAME", dd_station_info.value(1));
             dd_update.bindValue(":STATIONID", dd_station_info.value(2));
+            dd_update.bindValue(":CHANNEL", dd_station_info.value(3));
             dd_update.bindValue(":SOURCEID", source.id);
             dd_update.bindValue(":FREQID", freqid);
             if (!dd_update.exec())

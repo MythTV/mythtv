@@ -19,11 +19,13 @@
 #include "util.h"
 #include "mythdialogs.h"
 #include "generictree.h"
+#include "mythwidgets.h"
 
 using namespace std;
 
 class UIType;
 class MythDialog;
+class MythThemedDialog;
 
 struct fontProp {
     QFont face;
@@ -661,6 +663,47 @@ class UIMultiTextType : public UITextType
 
     int             message_space_padding;
 
+};
+
+class UIRemoteEditType : public UIType
+{
+    Q_OBJECT
+
+  public:
+
+    UIRemoteEditType(const QString &name, fontProp *font, const QString &text, 
+                     int dorder, QRect displayrect);
+    ~UIRemoteEditType();
+    
+    void    createEdit(MythThemedDialog* parent);
+    void    Draw(QPainter *, int drawlayer, int context);
+    void    setArea(QRect area){m_displaysize = area;}
+    void    setText(const QString some_text);
+    QString getText();
+    void    setFont(fontProp *font);
+    void    setCharacterColors(QColor unselected, QColor selected, QColor special);
+    void    calculateScreenArea();
+
+  public slots:
+    void takeFocusAwayFromEditor(bool up_or_down);
+    virtual bool takeFocus();
+    virtual void looseFocus();
+    virtual void show();
+    virtual void hide();
+     
+  signals:
+    void    changed();
+
+  private:
+    MythRemoteLineEdit *edit;
+    QRect    m_displaysize;
+    QString  m_text;
+    fontProp *m_font;
+    QColor   m_unselected; 
+    QColor   m_selected; 
+    QColor   m_special;
+
+    MythThemedDialog* m_parentDialog;
 };
 
 class UIStatusBarType : public UIType
