@@ -289,7 +289,7 @@ void StatusBox::keyPressEvent(QKeyEvent *e)
         else if (action == "MENU")
         {
             if ((inContent) &&
-                (currentItem == "Log Entries"))
+                (currentItem == QObject::tr("Log Entries")))
             {
                 int retval = MythPopupBox::show2ButtonPopup(my_parent,
                                  QString("AckLogEntry"),
@@ -366,7 +366,7 @@ void StatusBox::keyPressEvent(QKeyEvent *e)
             update(SelectRect);
             update(ContentRect);
         }
-        else if ((currentItem == "Log Entries") &&
+        else if ((currentItem == QObject::tr("Log Entries")) &&
                  (logNumberKeys.search(action) == 0))
         {
             min_level = action.toInt();
@@ -394,22 +394,22 @@ void StatusBox::setHelpText()
 
         currentItem = icon_list->GetItemText(icon_list->GetCurrentItem());
 
-        if (currentItem == "Listings Status")
+        if (currentItem == QObject::tr("Listings Status"))
             helptext->SetText(QObject::tr("Listings Status shows the latest "
                                           "status information from "
                                           "mythfilldatabase"));
 
-        if (currentItem == "Tuner Status")
+        if (currentItem == QObject::tr("Tuner Status"))
             helptext->SetText(QObject::tr("Tuner Status shows the current "
                                           "information about the state of "
                                           "backend tuner cards"));
 
-        if (currentItem == "DVB Status")
+        if (currentItem == QObject::tr("DVB Status"))
             helptext->SetText(QObject::tr("DVB Status shows the quality "
                                           "statistics of all DVB cards, if "
                                           "present"));
 
-        if (currentItem == "Log Entries")
+        if (currentItem == QObject::tr("Log Entries"))
             helptext->SetText(QObject::tr("Log Entries shows any unread log "
                                           "entries from the system if you "
                                           "have logging enabled"));
@@ -420,7 +420,7 @@ void StatusBox::setHelpText()
 void StatusBox::clicked()
 {
     if ((inContent) &&
-        (icon_list->GetItemText(icon_list->GetCurrentItem()) == "Log Entries"))
+        (icon_list->GetItemText(icon_list->GetCurrentItem()) == QObject::tr("Log Entries")))
     {
         int retval = MythPopupBox::show2ButtonPopup(my_parent,
                                    QString("AckLogEntry"),
@@ -448,16 +448,16 @@ void StatusBox::clicked()
 
         currentItem = icon_list->GetItemText(icon_list->GetCurrentItem());
 
-        if (currentItem == "Listings Status")
+        if (currentItem == QObject::tr("Listings Status"))
             doListingsStatus();
 
-        if (currentItem == "Tuner Status")
+        if (currentItem == QObject::tr("Tuner Status"))
             doTunerStatus();
 
-        if (currentItem == "DVB Status")
+        if (currentItem == QObject::tr("DVB Status"))
             doDVBStatus();
 
-        if (currentItem == "Log Entries")
+        if (currentItem == QObject::tr("Log Entries"))
             doLogEntries();
     }
 }
