@@ -96,6 +96,9 @@ class AvFormatDecoder : public DecoderBase
 
     QSqlDatabase *m_db;
     ProgramInfo *m_playbackinfo;
+
+    double fps;
+    bool validvpts;
 };
 
 #endif

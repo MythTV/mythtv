@@ -36,6 +36,9 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
     exitafterdecoded = false;
     ateof = false;
     gopset = 0;
+
+    fps = 29.97;
+    validvpts = false;
 }
 
 AvFormatDecoder::~AvFormatDecoder()
@@ -235,7 +238,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     fmt->flags &= ~AVFMT_NOFILE;
 
     bitrate = 0;
-    double fps = 0;
+    fps = 0;
 
     for (int i = 0; i < ic->nb_streams; i++)
     {
@@ -508,7 +511,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                         continue;
                     }
 
-                    if (lastapts != pkt.pts)
+                    if (lastapts != pkt.pts && pkt.pts > 0 && validvpts)
                     {
                         lastapts = pkt.pts;
                     }
@@ -578,11 +581,21 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     if (mpa_pic.pict_type == FF_I_TYPE ||
                         mpa_pic.pict_type == FF_P_TYPE)
                     {
-                        lastvpts = (long long int)(pkt.pts * 1.0 * 
-                                   ic->pts_num / (ic->pts_den / 1000));
+                        if (pkt.pts > 0)
+                        {
+                            validvpts = true;
+                            lastvpts = (long long int)(pkt.pts * 1.0 * 
+                                       ic->pts_num / (ic->pts_den / 1000));
+                        }
+                        else
+                        {
+                            // guess, based off of the audio timestamp and 
+                            // the prebuffer size
+                            lastvpts = lastapts / 90 + (int)(1000.0 / fps) * 3;
+                        }
                     }
                     else
-                        lastvpts += 33;
+                        lastvpts += (int)(1000.0 / fps);
 
                     m_parent->ReleaseNextVideoFrame(true, lastvpts);
                     gotvideo = 1;
