@@ -15,6 +15,7 @@ static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
                                 QString &dbver);
 static bool InitializeDatabase(void);
+bool doUpgradeTVDatabaseSchema(void);
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -97,6 +98,50 @@ static bool performActualUpdate(const QString updates[], QString version,
 }
 
 bool UpgradeTVDatabaseSchema(void)
+{
+    QString dbver = gContext->GetSetting("DBSchemaVer");
+
+    if (dbver == currentDatabaseVersion)
+        return true;
+
+    MSqlQuery lockquery(MSqlQuery::InitCon());
+
+    lockquery.prepare("CREATE TABLE IF NOT EXISTS "
+                      "schemalock ( schemalock int(1));");
+    if (!lockquery.exec())
+    {
+        VERBOSE(VB_IMPORTANT, QString("ERROR: Unable to create database "
+                                      "upgrade lock table: %1")
+                                      .arg(MythContext::DBErrorMessage(
+                                           lockquery.lastError())));
+        return false;
+    }
+
+    VERBOSE(VB_IMPORTANT, "Setting Lock for Database Schema upgrade. If you "
+                          "see a long pause here it means the Schema is "
+                          "already locked and is being upgraded by another "
+                          "Myth process.");
+
+    lockquery.prepare("LOCK TABLE schemalock WRITE;");
+    if (!lockquery.exec())
+    {
+        VERBOSE(VB_IMPORTANT, QString("ERROR: Unable to acquire database "
+                                      "upgrade lock")
+                                      .arg(MythContext::DBErrorMessage(
+                                           lockquery.lastError())));
+        return false;
+    }
+
+    bool ret = doUpgradeTVDatabaseSchema();
+
+    VERBOSE(VB_IMPORTANT, "Database Schema upgrade complete, unlocking.");
+    lockquery.prepare("UNLOCK TABLES;");
+    lockquery.exec();
+
+    return ret;
+}
+
+bool doUpgradeTVDatabaseSchema(void)
 {
     QString dbver = gContext->GetSetting("DBSchemaVer");
 
