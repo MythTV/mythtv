@@ -1501,7 +1501,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>If set, pressing the sticky rewind key in fast forward mode will switch to rewind mode, and vice versa.  If not set, doing so will decrease the speed in the current direction or switch to play mode if the speed can&apos;t be decreased further..</source>
+        <source>If set, pressing the sticky rewind key in fast forward mode will switch to rewind mode, and vice versa.  If not set, doing so will decrease the speed in the current direction or switch to play mode if the speed can&apos;t be decreased further.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

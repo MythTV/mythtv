@@ -1930,7 +1930,7 @@
         <translation>早送り/巻戻し中に向きを反転</translation>
     </message>
     <message>
-        <source>If set, pressing the sticky rewind key in fast forward mode will switch to rewind mode, and vice versa.  If not set, doing so will decrease the speed in the current direction or switch to play mode if the speed can&apos;t be decreased further..</source>
+        <source>If set, pressing the sticky rewind key in fast forward mode will switch to rewind mode, and vice versa.  If not set, doing so will decrease the speed in the current direction or switch to play mode if the speed can&apos;t be decreased further.</source>
         <translation>これをセットすると，早送りをしているときに巻き戻しキーを押すと巻き戻しモードになります(逆も同じ)．セットしない場合，早送り(巻き戻し)の向きは変えずに速度が下がっていき，最後には再生モードになります．</translation>
     </message>
     <message>
