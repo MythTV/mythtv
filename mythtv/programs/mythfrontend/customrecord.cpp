@@ -65,6 +65,9 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
                       "     OR program.subtitle LIKE \"%Japan%\" \n"
                       "     OR program.description LIKE \"%Japan%\") \n");
 
+    m_clause->insertItem(tr("Limit by category"));
+    m_csql << "AND program.category = \"Reality\" \n";
+
     m_clause->insertItem(tr("New episodes only"));
     m_csql << "AND program.previouslyshown = 0 \n";
 
@@ -76,22 +79,25 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
 
     m_clause->insertItem(QString(tr("Category type") +
             " (\"movie\", \"series\", \"sports\" or \"tvshow\")"));
-    m_csql << "AND program.category_type=\"sports\" \n";
+    m_csql << "AND program.category_type = \"sports\" \n";
 
     m_clause->insertItem(tr("Limit movies by the year of release"));
-    m_csql << "AND program.category_type=\"movie\" AND airdate >= 2000 \n";
+    m_csql << "AND program.category_type = \"movie\" AND airdate >= 2000 \n";
 
     m_clause->insertItem(tr("Minimum star rating (0.0 to 1.0 for movies only)"));
     m_csql << "AND program.stars >= 0.75 \n";
 
-    m_clause->insertItem(tr("Limit by category"));
-    m_csql << "AND program.category = \"Reality\" \n";
+    m_clause->insertItem(tr("Exclude one station"));
+    m_csql << "AND channel.callsign != \"GOLF\" \n";
 
     m_clause->insertItem(tr("Match related callsigns"));
     m_csql << "AND channel.callsign LIKE \"HBO%\" \n";
 
-    m_clause->insertItem(tr("Exclude one station"));
-    m_csql << "AND channel.callsign!=\"GOLF\" \n";
+    m_clause->insertItem(tr("Only channels from a specific video source"));
+    m_csql << "AND channel.sourceid = 2 \n";
+
+    m_clause->insertItem(tr("Only channels marked as commercial free"));
+    m_csql << "AND channel.commfree > 0 \n";
 
     m_clause->insertItem(tr("Anytime on a specific day of the week"));
     m_csql << "AND DAYNAME(program.starttime) = \"Tuesday\" \n";
@@ -100,7 +106,7 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
     m_csql << "AND WEEKDAY(program.starttime) < 5 \n";
 
     m_clause->insertItem(tr("Only on weekends"));
-    m_csql << "AND WEEKDAY(program.starttime) > 4 \n";
+    m_csql << "AND WEEKDAY(program.starttime) >= 5 \n";
 
     m_clause->insertItem(tr("Only in primetime"));
     m_csql << QString("AND HOUR(program.starttime) >= 19 \n"
@@ -117,11 +123,8 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
     m_clause->insertItem(tr("Sci-fi B-movies (complete example)"));
     m_csql << QString("AND program.category_type=\"movie\" \n"
               "AND program.category=\"Science fiction\" \n"
-              "AND program.stars <= 0.5 AND airdate < 1965 \n");
-/*
-    m_clause->insertItem(tr(""));
-    m_csql << " \n";
-*/      
+              "AND program.stars <= 0.5 AND airdate < 1970 \n");
+
     vbox->addWidget(m_clause);
 
     //  Add Button
@@ -133,7 +136,6 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
     vbox->addWidget(m_addButton);
 
     // Description edit box
-
     m_description = new MythRemoteLineEdit(6, this, "description" );
     m_description->setBackgroundOrigin(WindowOrigin);
     vbox->addWidget(m_description);
@@ -189,16 +191,15 @@ CustomRecord::~CustomRecord(void)
 
 void CustomRecord::textChanged(void)
 {
-    bool hastext = !m_title->text().isEmpty() &&
-                   !m_description->text().isEmpty();
+    bool hastitle = !m_title->text().isEmpty();
+    bool hasdesc = !m_description->text().isEmpty();
 
-    m_testButton->setEnabled(hastext);
-    m_recordButton->setEnabled(hastext);
+    m_testButton->setEnabled(hasdesc);
+    m_recordButton->setEnabled(hastitle && hasdesc);
 }
 
 void CustomRecord::addClicked(void)
 {
-    // cerr << m_csql[m_clause->currentItem()] << endl;
     m_description->append(m_csql[m_clause->currentItem()]);
 }
 
