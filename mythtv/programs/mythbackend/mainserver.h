@@ -40,6 +40,7 @@ class MainServer : public QVBox
     void HandleQueryRecordings(QString type, PlaybackSock *pbs);
     void HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleQueryFreeSpace(PlaybackSock *pbs);
+    void HandleQueryCheckFile(QString filename, PlaybackSock *pbs);
     void HandleGetPendingRecordings(PlaybackSock *pbs);
     void HandleGetConflictingRecordings(QStringList &slist, QString purge, 
                                         PlaybackSock *pbs);

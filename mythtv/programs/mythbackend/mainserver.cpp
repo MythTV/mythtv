@@ -1,4 +1,5 @@
 #include <qsqldatabase.h>
+#include <qfile.h>
 #include <unistd.h>
 #include <stdlib.h>
 
@@ -87,6 +88,13 @@ void MainServer::readSocket(void)
             else if (command == "QUERY_FREESPACE")
             {
                 HandleQueryFreeSpace(pbs);
+            }
+            else if (command == "QUERY_CHECKFILE")
+            {
+                if (tokens.size() != 2)
+                    cerr << "Bad QUERY_CHECKFILE\n";
+                else
+                    HandleQueryCheckFile(tokens[1], pbs);
             }
             else if (command == "DELETE_RECORDING")
             {
@@ -442,6 +450,22 @@ void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs)
     QStringList strlist;
 
     strlist << QString::number(totalspace) << QString::number(usedspace);
+
+    WriteStringList(pbs->getSocket(), strlist);
+}
+
+void MainServer::HandleQueryCheckFile(QString filename, PlaybackSock *pbs)
+{
+    int exists = 0;
+
+    QFile checkFile(filename);
+
+    if (checkFile.exists() == true)
+        exists = 1;
+
+    QStringList strlist;
+
+    strlist << QString::number(exists);
 
     WriteStringList(pbs->getSocket(), strlist);
 }

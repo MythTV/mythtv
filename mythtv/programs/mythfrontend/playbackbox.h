@@ -62,6 +62,8 @@ class PlaybackBox : public MythDialog
     void doRemove(QListViewItem *);
     void promptEndOfRecording(QListViewItem *);
 
+    bool fileExists(const QString &pathname);
+
     QTimer *timer;
     NuppelVideoPlayer *nvp;
     RingBuffer *rbuffer;

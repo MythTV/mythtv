@@ -13,6 +13,8 @@ vector<ProgramInfo *> *RemoteGetRecordedList(MythContext *context,
 
 void RemoteGetFreeSpace(MythContext *context, int &totalspace, int &usedspace);
 
+bool RemoteGetCheckFile(MythContext *context, const QString &url);
+
 void RemoteDeleteRecording(MythContext *context, ProgramInfo *pginfo);
 
 bool RemoteGetAllPendingRecordings(MythContext *context, 

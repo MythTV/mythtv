@@ -1,4 +1,5 @@
 #include <qstringlist.h>
+#include <qurl.h>
 
 #include "remoteutil.h"
 #include "programinfo.h"
@@ -42,6 +43,22 @@ void RemoteGetFreeSpace(MythContext *context, int &totalspace, int &usedspace)
 
     totalspace = strlist[0].toInt();
     usedspace = strlist[1].toInt();
+}
+
+bool RemoteGetCheckFile(MythContext *context, const QString &url)
+{
+    QString str = "QUERY_CHECKFILE ";
+
+    QUrl qurl(url);
+    str += qurl.path();
+
+    QStringList strlist = str;
+
+    context->SendReceiveStringList(strlist);
+
+    bool exists = strlist[0].toInt();
+
+    return exists;
 }
 
 void RemoteDeleteRecording(MythContext *context, ProgramInfo *pginfo)
