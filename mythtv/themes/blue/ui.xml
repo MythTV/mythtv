@@ -286,7 +286,7 @@
       </listarea>
       <listarea name="showing" draworder="4">
         <area>240,18,600,265</area>
-        <fcnfont name="recfnt" function="recording"></fcnfont>
+        <fcnfont name="recfont" function="recording"></fcnfont>
         <fcnfont name="active" function="active"></fcnfont>
         <fcnfont name="active" function="selected"></fcnfont>
         <fcnfont name="inactive" function="inactive"></fcnfont>
