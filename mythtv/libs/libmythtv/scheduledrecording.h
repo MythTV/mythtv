@@ -61,10 +61,6 @@ public:
     int getRecordID(void) const { return id->intValue(); };
     QString getProfileName(void) const;
 
-    static void findAllProgramsToRecord(QSqlDatabase* db, 
-                                        list<ProgramInfo*>& proglist);
-    static void findAllScheduledPrograms(QSqlDatabase *db, 
-                                         list<ProgramInfo*>& proglist);
     void findMatchingPrograms(QSqlDatabase* db, list<ProgramInfo*>& proglist);
 
     // Do any necessary bookkeeping after a matching program has been

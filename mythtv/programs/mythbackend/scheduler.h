@@ -59,6 +59,8 @@ class Scheduler : public QObject
   private:
     void setupCards(void);
 
+    void findAllProgramsToRecord(list<ProgramInfo*>& proglist);
+    void findAllScheduledPrograms(list<ProgramInfo*>& proglist);
     void MarkKnownInputs(void);
     void MarkConflicts(list<ProgramInfo *> *uselist = NULL);
     void PruneOverlaps(void);
