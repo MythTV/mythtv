@@ -1,3 +1,4 @@
+#include "config.h"
 #include "mythcontext.h"
 #include "dbsettings.h"
 
@@ -2438,7 +2439,7 @@ static GenericCheckBox *MacYuvConversion()
 {
     GenericCheckBox *gc = new GenericCheckBox("MacYuvConversion");
     gc->setLabel(QObject::tr("Use Altivec-enhanced color space conversion"));
-#ifdef USING_ALTIVEC
+#ifdef HAVE_ALTIVEC
     gc->setValue(true);
 #else
     gc->setValue(false);

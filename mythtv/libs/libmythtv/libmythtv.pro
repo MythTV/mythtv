@@ -8,6 +8,7 @@ INSTALLS = target
 
 VERSION = 0.16.0
 
+INCLUDEPATH += ../..
 INCLUDEPATH += ../libmyth ../ ./dvbdev/ ./mpeg/ ../libavcodec ../libmythmpeg2
 DEPENDPATH += ../libmyth ../libavcodec ../libavformat ../libmythmpeg2
 

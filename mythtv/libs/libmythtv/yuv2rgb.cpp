@@ -26,13 +26,14 @@
 #include <cstdio>
 #include <cstdlib>
 #include <inttypes.h>
+#include "config.h"
 
 #ifdef MMX
 #include "mmx.h"
 #define CPU_MMXEXT 0
 #define CPU_MMX 1
 #endif
-#ifdef USING_ALTIVEC
+#ifdef HAVE_ALTIVEC
 #include <Accelerate/Accelerate.h>
 #endif
 #include "yuv2rgb.h"
@@ -560,7 +561,7 @@ static void non_vec_yuv420_2vuy (uint8_t * image, uint8_t * py,
     }
 }
 
-#ifdef USING_ALTIVEC
+#ifdef HAVE_ALTIVEC
 // Altivec code adapted from VLC's i420_yuv2.c (thanks to Titer and Paul Jara) 
 
 #define VEC_NEXT_LINES()                                                    \
@@ -654,7 +655,7 @@ static void altivec_yuv420_2vuy (uint8_t * image, uint8_t * py,
 
 yuv2vuy_fun yuv2vuy_init_altivec (void)
 {
-#ifdef USING_ALTIVEC
+#ifdef HAVE_ALTIVEC
     return altivec_yuv420_2vuy;
 #endif
     return non_vec_yuv420_2vuy; /* Fallback to C */
@@ -694,7 +695,7 @@ static void non_vec_2vuy_yuv420 (uint8_t * image, uint8_t * py,
     }
 }
 
-#ifdef USING_ALTIVEC
+#ifdef HAVE_ALTIVEC
 // Altivec code adapted from VLC's i420_yuv2.c (thanks to Titer and Paul Jara) 
 
 #define VEC_READ_LINE(ptr, y, uv)                                           \
@@ -792,7 +793,7 @@ static void altivec_2vuy_yuv420 (uint8_t * image, uint8_t * py,
 
 vuy2yuv_fun vuy2yuv_init_altivec (void)
 {
-#ifdef USING_ALTIVEC
+#ifdef HAVE_ALTIVEC
     return altivec_2vuy_yuv420;
 #endif
     return non_vec_2vuy_yuv420; /* Fallback to C */

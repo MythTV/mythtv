@@ -127,7 +127,8 @@ contains( TARGET_ARCH_POWERPC, yes ) {
 contains( TARGET_ALTIVEC, yes ) {
     # Altivec support
     CONFIG  += using_altivec
-    DEFINES += USING_ALTIVEC
+    # The USING_ALTIVEC define is deprecated; Altivec code should 
+    # include "config.h" instead.
     macx {
         QMAKE_CFLAGS   += -faltivec
         QMAKE_CXXFLAGS += -faltivec

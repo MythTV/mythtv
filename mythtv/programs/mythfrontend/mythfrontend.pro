@@ -1,3 +1,4 @@
+INCLUDEPATH += ../..
 INCLUDEPATH += ../../libs/libmythtv ../../libs ../../libs/libmyth
 DEPENDPATH += ../../libs/libmythtv ../../libs/libmyth ../../libs/libavcodec
 DEPENDPATH += ../../libs/libavformat
