@@ -23,6 +23,7 @@ using namespace std;
 
 bool interactive = false;
 bool non_us_updating = false;
+bool from_file = false;
 MythContext *context;
 
 class ChanInfo
@@ -754,11 +755,20 @@ void handlePrograms(int id, int offset, QMap<QString,
     }
 }
 
-void grabData(Source source, QString xmltv_grabber, int offset)
+
+void grabDataFromFile(int id, int offset, QString &filename)
 {
     QValueList<ChanInfo> chanlist;
     QMap<QString, QValueList<ProgInfo> > proglist;
 
+    parseFile(filename, &chanlist, &proglist);
+
+    handleChannels(id, &chanlist);
+    handlePrograms(id, offset, &proglist);
+}
+
+void grabData(Source source, QString xmltv_grabber, int offset)
+{
     char tempfilename[128];
     strcpy(tempfilename, "/tmp/mythXXXXXX");
     mkstemp(tempfilename);
@@ -790,13 +800,10 @@ void grabData(Source source, QString xmltv_grabber, int offset)
  
     cout << "------------------ End of XMLTV output ------------------" << endl;
 
-    parseFile(filename, &chanlist, &proglist);
+    grabDataFromFile(source.id, offset, filename);
 
     QFile thefile(filename);
     thefile.remove();
-
-    handleChannels(source.id, &chanlist);
-    handlePrograms(source.id, offset, &proglist);
 }
 
 void clearOldDBEntries(void)
@@ -860,11 +867,15 @@ void fillData(QValueList<Source> &sourcelist)
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv, false);
+    int argpos = 1;
+    int fromfile_id = 1;
+    int fromfile_offset = 0;
+    QString fromfile_name;
 
-    if (a.argc() > 1)
+    while (argpos < a.argc())
     {
         // The manual and update flags should be mutually exclusive.
-        if (!strcmp(a.argv()[1], "--manual"))
+        if (!strcmp(a.argv()[argpos], "--manual"))
         {
             cout << "###\n";
             cout << "### Running in manual channel configuration mode.\n";
@@ -872,12 +883,62 @@ int main(int argc, char *argv[])
             cout << "###\n";
             interactive = true;
         }
-        else if (!strcmp(a.argv()[1], "--update"))
+        else if (!strcmp(a.argv()[argpos], "--update"))
         {
             // For running non-destructive updates on the database for
             // users in xmltv zones that do not provide channel data.
             non_us_updating = true;
         }
+        else if (!strcmp(a.argv()[argpos], "--file"))
+        {
+            if (((argpos + 3) >= a.argc()) ||
+                !strncmp(a.argv()[argpos + 1], "--", 2) ||
+                !strncmp(a.argv()[argpos + 2], "--", 2) ||
+                !strncmp(a.argv()[argpos + 3], "--", 2))
+            {
+                printf("missing or invalid parameters for --file option\n");
+                return -1;
+            }
+
+            fromfile_id = atoi(a.argv()[++argpos]);
+            fromfile_offset = atoi(a.argv()[++argpos]);
+            fromfile_name = a.argv()[++argpos];
+
+            cout << "### bypassing grabbers, reading directly from file\n";
+            from_file = true;
+        }
+        else if (!strcmp(a.argv()[argpos], "--help"))
+        {
+            cout << "usage:\n";
+            cout << "--manual\n";
+            cout << "   Run in manual channel configuration mode\n";
+            cout << "   This will ask you questions about every channel\n";
+            cout << "\n";
+            cout << "--update\n";
+            cout << "   For running non-destructive updates on the database for\n";
+            cout << "   users in xmltv zones that do not provide channel data\n";
+            cout << "\n";
+            cout << "--file <sourceid> <offset> <xmlfile>\n";
+            cout << "   Bypass the grabbers and read data directly from a file\n";
+            cout << "   <sourceid> = cardinput\n";
+            cout << "   <offset>   = days from today that xmlfile defines\n";
+            cout << "                (-1 meaning from today on all future entries)\n";
+            cout << "   <xmlfile>  = file to read\n";
+            cout << "\n";
+            cout << "--help\n";
+            cout << "   This text\n";
+            cout << "\n";
+            cout << "  (Do not use manual or update together\n";
+            cout << "\n";
+            return -1;
+        }
+        else
+        {
+            printf("illegal option: '%s' (use --help)\n", a.argv()[argpos]);
+            return -1;
+        }
+
+        ++argpos;
     }
 
     context = new MythContext(false);
@@ -889,33 +950,40 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    QValueList<Source> sourcelist;
-
-    QSqlQuery sourcequery;
-    QString querystr = QString("SELECT sourceid,name FROM videosource "
-                               "ORDER BY sourceid;");
-    sourcequery.exec(querystr);
-        
-    if (sourcequery.isActive() && sourcequery.numRowsAffected() > 0)
-    {       
-        while (sourcequery.next())
-        {
-            Source newsource;
-            
-            newsource.id = sourcequery.value(0).toInt();
-            newsource.name = sourcequery.value(1).toString();
-            
-            sourcelist.append(newsource);
-        }   
+    if (from_file)
+    {
+        grabDataFromFile(fromfile_id, fromfile_offset, fromfile_name);
     }
     else
     {
-        cerr << "There are no channel sources defined, did you run the setup "
-             << "program?\n";
-        exit(-1);
-    }
+        QValueList<Source> sourcelist;
+
+        QSqlQuery sourcequery;
+        QString querystr = QString("SELECT sourceid,name FROM videosource "
+                                   "ORDER BY sourceid;");
+        sourcequery.exec(querystr);
+        
+        if (sourcequery.isActive() && sourcequery.numRowsAffected() > 0)
+        {       
+            while (sourcequery.next())
+            {
+                Source newsource;
+            
+                newsource.id = sourcequery.value(0).toInt();
+                newsource.name = sourcequery.value(1).toString();
+            
+                sourcelist.append(newsource);
+            }   
+        }
+        else
+        {
+            cerr << "There are no channel sources defined, did you run the "
+                 << "setup program?\n";
+            exit(-1);
+        }
     
-    fillData(sourcelist);
+        fillData(sourcelist);
+    }
 
     delete context;
 
