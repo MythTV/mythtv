@@ -36,6 +36,8 @@ TVRec::TVRec(MythContext *lcontext, const QString &startchannel,
     readthreadlive = false;
     m_capturecardnum = capturecardnum;
 
+    pthread_mutex_init(&db_lock, NULL);
+
     ConnectDB(capturecardnum);
 
     QString chanorder = context->GetSetting("ChannelOrdering");
@@ -219,9 +221,11 @@ void TVRec::WriteRecordedRecord(void)
     if (!curRecording)
         return;
 
+    pthread_mutex_lock(&db_lock);
     context->KickDatabase(db_conn);
 
     curRecording->WriteRecordedToDB(db_conn);
+    pthread_mutex_unlock(&db_lock);
 
     MythEvent me("RECORDING_LIST_CHANGE");
     context->dispatch(me);
@@ -306,6 +310,8 @@ void TVRec::HandleStateChange(void)
  
     if (startRecorder)
     {
+        pthread_mutex_lock(&db_lock);
+
         context->KickDatabase(db_conn);
 
         RecordingProfile profile(context);
@@ -316,6 +322,8 @@ void TVRec::HandleStateChange(void)
                 profile.loadByName(db_conn, "Default");
         else
             profile.loadByName(db_conn, "Live TV");
+
+        pthread_mutex_unlock(&db_lock);
 
         SetupRecorder(profile);
 
@@ -457,6 +465,7 @@ void TVRec::SetChannel(bool needopen)
     if (needopen)
         channel->Open();
 
+    pthread_mutex_lock(&db_lock);
     context->KickDatabase(db_conn);
 
     QString thequery = QString("SELECT channel.channum,cardinput.inputname "
@@ -483,6 +492,8 @@ void TVRec::SetChannel(bool needopen)
     } else {
         cout << "Channel query failed: " << thequery << endl;
     }
+
+    pthread_mutex_unlock(&db_lock);
 
     channel->SwitchToInput(inputname);
     channel->SetChannelByString(chanstr);
@@ -575,6 +586,8 @@ void TVRec::GetChannelInfo(Channel *chan, QString &title, QString &subtitle,
 
     if (!db_conn)
         return;
+    pthread_mutex_lock(&db_lock);
+
     context->KickDatabase(db_conn);
 
     char curtimestr[128];
@@ -631,15 +644,20 @@ void TVRec::GetChannelInfo(Channel *chan, QString &title, QString &subtitle,
         if (test != QString::null)
             iconpath = test;
     }
+
+    pthread_mutex_unlock(&db_lock);
 }
 
 void TVRec::ConnectDB(int cardnum)
 {
     QString name = QString("TV%1%2").arg(cardnum).arg(rand());
 
+    pthread_mutex_lock(&db_lock);
+
     db_conn = QSqlDatabase::addDatabase("QMYSQL3", name);
     if (!db_conn)
     {
+        pthread_mutex_unlock(&db_lock);
         printf("Couldn't initialize mysql connection\n");
         return;
     }
@@ -647,21 +665,29 @@ void TVRec::ConnectDB(int cardnum)
     {
         printf("Couldn't open database\n");
     }
+
+    pthread_mutex_unlock(&db_lock);
 }
 
 void TVRec::DisconnectDB(void)
 {
+    pthread_mutex_lock(&db_lock);
+
     if (db_conn)
     {
         db_conn->close();
         delete db_conn;
     }
+
+    pthread_mutex_unlock(&db_lock);
 }
 
 void TVRec::GetDevices(int cardnum, QString &video, QString &audio, int &rate)
 {
     video = "";
     audio = "";
+
+    pthread_mutex_lock(&db_lock);
 
     context->KickDatabase(db_conn);
 
@@ -691,6 +717,8 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &audio, int &rate)
         else
             rate = -1;
     }
+
+    pthread_mutex_unlock(&db_lock);
 }
 
 bool TVRec::CheckChannel(Channel *chan, const QString &channum, int &finetuning)
@@ -699,6 +727,8 @@ bool TVRec::CheckChannel(Channel *chan, const QString &channum, int &finetuning)
 
     if (!db_conn)
         return true;
+
+    pthread_mutex_lock(&db_lock);
 
     context->KickDatabase(db_conn);
 
@@ -723,6 +753,8 @@ bool TVRec::CheckChannel(Channel *chan, const QString &channum, int &finetuning)
         query.next();
 
         finetuning = query.value(0).toInt();
+
+        pthread_mutex_unlock(&db_lock);
         return true;
     }
 
@@ -731,6 +763,8 @@ bool TVRec::CheckChannel(Channel *chan, const QString &channum, int &finetuning)
 
     if (query.numRowsAffected() == 0)
         ret = true;
+
+    pthread_mutex_unlock(&db_lock);
 
     return ret;
 }
@@ -742,6 +776,8 @@ QString TVRec::GetNextChannel(Channel *chan, bool direction)
     QString channum = chan->GetCurrentName();
     QString channelinput = chan->GetCurrentInput();
     QString device = chan->GetDevice();
+
+    pthread_mutex_lock(&db_lock);
 
     context->KickDatabase(db_conn);
 
@@ -768,8 +804,10 @@ QString TVRec::GetNextChannel(Channel *chan, bool direction)
         id = query.value(0).toString();
     }
 
-    if (id == QString::null)
+    if (id == QString::null) {
+        pthread_mutex_unlock(&db_lock);
         return ret;
+    }
 
     QString comp = ">";
     QString ordering = "";
@@ -826,6 +864,8 @@ QString TVRec::GetNextChannel(Channel *chan, bool direction)
             ret = query.value(0).toString();
         }
     }
+
+    pthread_mutex_unlock(&db_lock);
 
     return ret;
 }

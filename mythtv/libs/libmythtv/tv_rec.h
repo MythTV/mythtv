@@ -120,6 +120,7 @@ class TVRec
     Channel *channel;
 
     QSqlDatabase *db_conn;
+    pthread_mutex_t db_lock;
 
     TVState internalState;
 
