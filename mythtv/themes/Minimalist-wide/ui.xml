@@ -20,9 +20,9 @@
     <font name="chaninfo"  base="info">
       <shadow>1,1</shadow>
       <color>#ffffff</color>
-      <size>15</size>
+      <size>14</size>
       <size:small>12</size:small>
-      <size:big>17</size:big>
+      <size:big>15</size:big>
       <bold>yes</bold>
     </font>
 
@@ -281,7 +281,7 @@
         <font>title</font>
       </textarea>
       <textarea name="subtitle" draworder="6">
-        <area>25,50,1200,34</area>
+        <area>25,50,1200,40</area>
         <font>subtitle</font>
         <value>%SUBTITLE|"|"%</value>
       </textarea>
@@ -582,7 +582,7 @@
         <font>title</font>
       </textarea>
       <textarea name="subtitle" draworder="6">
-        <area>25,50,1200,34</area>
+        <area>25,50,1200,40</area>
         <font>subtitle</font>
         <value>%SUBTITLE|"|"%</value>
       </textarea>
@@ -1097,10 +1097,10 @@
         <fcnfont name="list-active" function="active"></fcnfont>
         <fcnfont name="list-selected" function="selected"></fcnfont>
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
-        <columnpadding>5</columnpadding>
-        <column number="1" width="700" context="-1"></column>
+        <columnpadding>15</columnpadding>
+        <column number="1" width="685" context="-1"></column>
         <column number="2" width="60" context="-1"></column>
-        <column number="3" width="134" context="0"></column>
+        <column number="3" width="144" context="0"></column>
         <column number="4" width="110" context="1"></column>
 
         <items>11</items>
@@ -1150,12 +1150,12 @@
       </textarea>
 
       <textarea name="channel" draworder="6">
-        <area>25,100,160,30</area>
+        <area>25,100,180,33</area>
         <font>info</font>
       </textarea>
 
       <textarea name="timedate" draworder="6">
-        <area>200,100,500,30</area>
+        <area>210,100,500,33</area>
         <font>info</font>
       </textarea>
 
@@ -1337,7 +1337,7 @@
         <font>subtitle</font>
       </textarea>
       <textarea name="timedate" draworder="6" align="right">
-        <area>800,170,440,27</area>
+        <area>800,170,440,30</area>
        <font>info</font>
       </textarea>
       <textarea name="channel" draworder="6" align="right">
@@ -1456,11 +1456,11 @@
         <area>0,433,1280,310</area>
         
         <textarea name="title" draworder="6">
-          <area>40,5,600,40</area>
+          <area>40,5,600,45</area>
           <font>title</font>
         </textarea>
         <textarea name="type" draworder="6">
-          <area>863,15,480,30</area>
+          <area>863,15,480,40</area>
           <font>recstatus</font>
         </textarea>
         
@@ -1519,7 +1519,7 @@
 
     <container name="noprograms_list">
       <textarea name="msg" align="center" draworder="8">
-         <area>0,110,800,70</area>
+         <area>0,110,1000,70</area>
          <font>info</font>
          <value>No listings found for this program. </value>
          <multiline>yes</multiline>
@@ -1599,19 +1599,19 @@
     <container name="program_info">
       <area>0,10,1280,400</area>
       <textarea name="title" draworder="6">
-        <area>20,0,1240,40</area>
+        <area>20,0,1240,50</area>
         <font>title</font>
       </textarea>
       <textarea name="subtitle" draworder="6">
-        <area>20,38,1240,32</area>
+        <area>20,38,1240,40</area>
         <font>subtitle</font>
       </textarea>
       <textarea name="timedate" draworder="6">
-        <area>350,80,600,30</area>
+        <area>540,80,600,30</area>
         <font>info</font>
       </textarea>
       <textarea name="longchannel" draworder="6">
-        <area>20,80,400,30</area>
+        <area>20,80,500,30</area>
         <font>info</font>
       </textarea>
       <textarea name="description" draworder="6">

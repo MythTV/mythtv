@@ -133,7 +133,7 @@
 <!--       <color>white</color> -->
 <!--       <fontname>Kimberley</fontname> -->
       <fontname>Neuropolitical</fontname>
-      <fontsize>23</fontsize>
+      <fontsize>21</fontsize>
       <bold>yes</bold>
       <italics>no</italics>
       <centered>yes</centered>
@@ -153,7 +153,7 @@
 <!--       <color>#000000</color> -->
       <color>#3C5574</color>
       <fontname>Neuropolitical</fontname>
-      <fontsize>23</fontsize>
+      <fontsize>21</fontsize>
       <bold>yes</bold>
       <italics>no</italics>
       <centered>yes</centered>

@@ -280,13 +280,13 @@
 
             <textarea name="title_text" draworder="1" align="left">
                 <font>title</font>
-                <area>35,13,615,40</area>
+                <area>35,13,615,45</area>
                 <cutdown>yes</cutdown>
             </textarea>
 
             <textarea name="artist_text" draworder="1" align="left">
                 <font>subtitle</font>
-                <area>35,68,815,34</area>
+                <area>35,68,815,45</area>
                 <cutdown>yes</cutdown>
             </textarea>
 
@@ -311,7 +311,7 @@
 
             <textarea name="info_text" draworder="1" align="left">
                 <font>info</font>
-                <area>35,150,260,25</area>
+                <area>35,150,260,30</area>
             </textarea>
 
             <textarea name="time_text" draworder="1" align="center">
