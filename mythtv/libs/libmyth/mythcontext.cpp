@@ -508,6 +508,17 @@ void MythContext::SendReceiveStringList(QStringList &strlist)
     WriteStringList(serverSock, strlist);
     ReadStringList(serverSock, strlist);
 
+    while (strlist[0] == "BACKEND_MESSAGE")
+    {
+        // oops, not for us
+        QString message = strlist[1];
+        QString extra = strlist[2];
+
+        MythEvent me(message, extra);
+        dispatch(me);
+
+        ReadStringList(serverSock, strlist);
+    }
 
     expectingReply = false;
     pthread_mutex_unlock(&serverSockLock);
@@ -525,11 +536,14 @@ void MythContext::readSocket(void)
         QStringList strlist;
         ReadStringList(serverSock, strlist);
 
-        QString message = strlist[0];
-        QString extra = strlist[1];
+        QString prefix = strlist[0];
+        QString message = strlist[1];
+        QString extra = strlist[2];
 
-        if (message == "BLAH")
+        if (prefix != "BACKEND_MESSAGE")
         {
+            cerr << "Received a: " << prefix << " message from the backend\n";
+            cerr << "But I don't know what to do with it.\n";
         }
         else
         {

@@ -166,7 +166,8 @@ void MainServer::customEvent(QCustomEvent *e)
     {
         MythEvent *me = (MythEvent *)e;
 
-        broadcast = me->Message();
+        broadcast = "BACKEND_MESSAGE";
+        broadcast << me->Message();
         broadcast << me->ExtraData();
         sendstuff = true;
     }
@@ -448,8 +449,8 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
 
     thequery = QString("DELETE FROM recorded WHERE chanid = %1 AND title "
                        "= \"%2\" AND starttime = %3 AND endtime = %4;")
-                       .arg(pginfo->chanid).arg(pginfo->title).arg(startts)
-                       .arg(endts);
+                       .arg(pginfo->chanid).arg(pginfo->title.utf8())
+                       .arg(startts).arg(endts);
 
     query.exec(thequery);
     if (!query.isActive())
