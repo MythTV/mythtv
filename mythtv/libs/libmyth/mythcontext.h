@@ -71,8 +71,8 @@ class MythContext : public QObject
     void SetSetting(const QString &key, const QString &newValue);
 
     int GetBigFontSize() { return GetNumSetting("QtFontBig", 25); }
-    int GetMediumFontSize() { return GetNumSetting("QtFontMedium", 25); }
-    int GetSmallFontSize() { return GetNumSetting("QtFontSmall", 25); }
+    int GetMediumFontSize() { return GetNumSetting("QtFontMedium", 16); }
+    int GetSmallFontSize() { return GetNumSetting("QtFontSmall", 12); }
 
     void ThemeWidget(QWidget *widget);
 
