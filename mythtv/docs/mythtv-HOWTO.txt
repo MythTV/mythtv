@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-01-09, v1.068
+  2003-01-11, v1.069
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -1871,14 +1871,15 @@
 
   These are the keyboard commands for mythweather:
 
-  Left Key             Goes back one page, and extends the time spent on
-  the page you are on.  Right Key            Goes forward one page, see
-  above.  Space                Pause, wait on the current page until
-  space is hit again.  Numeric Keys         You can check other weather
-  by keying in other ZIP codes.  Enter Key            Switch between
-  celsius and fahrenheit. Can also be used a way to force a data update.
-  "m" Key              Resets the location to the database default, then
-  updates the data.
+       Left Key             Goes back one page, and extends the time spent
+                            on the page you are on.
+       Right Key            Goes forward one page, see above.
+       Space                Pause, wait on the current page until space is hit
+                            again.
+       Numeric Keys         You can check other weather by keying in other ZIP codes.
+       Enter Key            Switch between celsius and fahrenheit. Can also
+                            be used a way to force a data update.
+       "m" Key              Resets the location to the database default, then updates the data.
 
   [1m16.  mythvideo[0m
 
