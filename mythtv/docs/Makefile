@@ -23,7 +23,7 @@ validate: mythtv-HOWTO.sgml
 
 # Generate PDF via HTML using htmldoc
 %.pdf: %-singlehtml.html
-	htmldoc -f $@ $<
+	htmldoc --book -f $@ $<
 
 %.html: %.sgml
 	linuxdoc -B html --split=$(LINUXDOC_HTML_SPLIT) --toc=2 $<
