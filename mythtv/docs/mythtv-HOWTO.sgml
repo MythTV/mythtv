@@ -33,6 +33,8 @@ based encoders.
 v1.043, 2002-11-29.  More RH 8.0 LANG stuff.
 v1.044, 2002-11-29.  Working on the mythmusic install instructions.  Added
 information about creating your own ~/.mythtv to maintain settings.
+v1.045, 2002-12-02.  Started working on the urpmi instructions for
+mythmusic.  Made changes to Mandrake docs to accomodate MDK 8.2.
 -->
 <!--
 To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
@@ -43,7 +45,7 @@ To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-11-29, v1.044
+<date>2002-12-02, v1.045
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -135,7 +137,7 @@ command-line utilities.  Either system will get the job done, and it all
 depends on your comfort level with Linux.
 
 In order to compile mythtv, we need to make sure that the software it
-needs is installed.  As of 2002-11-08, this list includes perl-5.8, mysql,
+needs is installed.  As of 2002-12-02, this list includes perl, mysql,
 gcc, freetype2-devel and qt-devel.  If you're going to use a remote control
 with mythtv, you're going to need the cdialog package in order to compile
 lircd.
@@ -219,27 +221,71 @@ progress bar, and you are finished.
 <p> This section details the various methods for installing pre-requisites
 from the command line.
 
-<sect3>Mandrake 8.2 and 9.0
+<sect3>Mandrake
+<sect4>Special instructions for Mandrake 8.2
+<p>Mandrake 8.2 does not have a pre-packaged libqt3-devel, so you must compile and
+install this manually.  The following command will install the
+pre-requisites for qt3, so don't skip this step.  
+The simplest tool for installing packages from the command line is
+<bf>urpmi</bf>.
+
+Open a shell, and execute the following.  You may get asked a number of
+questions regarding dependencies.  It's best to answer "YES".
+
+<tscreen><verb>
+% urpmi mesa-common-devel libmng1-devel mysql-devel libunixodbc2-devel
+% urpmi postgresql-devel xfree86-static-libs
+</verb></tscreen>
+Once all of the pre-requisites have been installed, the next step is to
+obtain and compile the source RPM.
+
+Go to <url url="http://www.rpmfind.net"
+name="http://www.rpmfind.net"> and search for
+<tt>qt3</tt>.  There will be a number of different versions available.  As
+of 2002-12-02, the latest version for Mandrake is called
+<tt>qt3-3.0.5-7mdk.src.rpm</tt>. Unless you are running <bf>Mandrake
+Cooker</bf> (the beta version of the next release of Mandrake), make sure to
+download the standard "Mandrake" release.  Download the <tt>.src.rpm</tt>
+file to a directory that you can find.  
+<tscreen><verb>
+% su
+# cp qt3-3.0.5-7mdk.src.rpm /usr/src/RPMS/SRPMS
+# cd /usr/src/RPMS/SRPMS
+# rpm --rebuild qt3-3.0.5-7mdk.src.rpm
+# cd ../RPMS
+# rpm -Uvh qt3-3.0.5-7mdk.i386.rpm
+</verb></tscreen>
+Once this has completed (it can take a while, so please be patient),
+continue by following the Mandrake 9.0 instructions.
+
+<sect4>Mandrake 8.2 and 9.0
 <p>The simplest tool for installing packages from the command line is
 <bf>urpmi</bf>.
 
-Open a shell, and execute the following, all on the same line:
+Open a shell, and execute the following, all on the same line. You may get
+asked a number of questions regarding dependencies.  It's best to answer
+"YES".
+
 <tscreen><verb>
-% su -
-# urpmi perl-5.8 mysql gcc gcc-c++ freetype2-devel libqt3-devel cdialog
-alsa-utils
+% su
+# urpmi perl mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
 </verb></tscreen>
-You may get asked a number of questions regarding dependencies.  It's best
-to answer "YES".
+
+<bf>NOTE</bf>: Mandrake 8.2 users, <em>do not</em> execute the following
+command.  You've already manually installed the files in the previous
+section.
+<tscreen><verb>
+# urpmi libqt3-devel
+</verb></tscreen>
 
 However, you might get this when you execute the command above:
 <tscreen><verb>
-[root@pvr root]# urpmi perl-5.8 mysql gcc gcc-c++
-freetype2-devel libqt3-devel cdialog
+[root@pvr root]# urpmi perl mysql gcc gcc-c++ freetype2-devel libqt3-devel cdialog alsa-utils
 everything already installed
 </verb></tscreen>
 
-In that case, you're ready to move onto the next step.
+In that case, you're ready to move to the next <ref
+id="Distribution-specific_information" name="section">.
 <sect3>Red Hat Linux 8.0
 
 <p>[Please submit instructions]
@@ -296,7 +342,8 @@ of time, even on a fast machine.
 <p>There are some paths that need to be modified before starting the main
 compile of mythtv, otherwise you will get errors.
 
-<sect1>Distribution-specific information.
+<sect1>Distribution-specific information. <label
+id="Distribution-specific_information">
 <sect2>Mandrake 9.0
 <p>As root, create the following file in <tt>/etc/profile.d</tt>  On my system
 I call it "mythtv.sh".
@@ -305,7 +352,7 @@ Open a shell, and switch to superuser mode.
 <bf>NOTE: ^D</bf> means press <bf>CTRL</bf> and <bf>d</bf> at the same time.
 
 <tscreen><verb>
-% su -
+% su
 # cd /etc/profile.d
 cat > mythtv.sh
 export QTDIR=/usr/lib/qt3
@@ -342,10 +389,10 @@ LANG="en_US"
 By making these modifications, you can follow the "other distributions"
 instructions in the <ref id="Configuring_mythtv" name="Configuring mythtv"> section later in this document.
 
-<sect1>Checking that it worked.
+<sect1>Checking that it worked. <label id="Checking_that_it_worked">
 <p>Open a shell and switch to superuser mode again.
 <tscreen><verb>
-% su -
+% su
 # set
 
 [lots of text]
@@ -460,7 +507,7 @@ Untar the xmltv file:
 </verb></tscreen>
 Install the xmltv prerequisites:
 <tscreen><verb>
-% su -
+% su
 # perl -MCPAN -e shell
 cpan> install XML::Twig
 cpan> install Date::Manip
@@ -680,7 +727,7 @@ then the <bf>amixer</bf> program can be used to setup the mixer.
 <tscreen><verb>
 % amixer set Master,0 100%,100% unmute
 % amixer set Line,0 100%,100% mute capture
-% su -
+% su
 # alsactl store
 # exit
 % 
@@ -1425,6 +1472,12 @@ there may be issues with some software.
 
 <!-- insert instructions on configuring urpmi for contrib and cooker -->
 
+<tscreen><verb>
+# urpmi.addmedia stealth-contrib ftp://ftp.stealth.net/pub/mirrors/ftp.mandrake.com/Mandrake/9.0/contrib/RPMS
+with ./synthesis.hdlist2.cz
+# urpmi mad flac libcdaudio cdparanoia libvorbis-devel
+</verb></tscreen>
+
 Install libvorbis-devel using urpmi or the Mandrake Control Center
 installer.
 
@@ -1480,3 +1533,11 @@ If you want to make sure that you don't lose your modifications, make a
 directory <tt>~/.mythtv</tt> and copy your settings.txt file to this
 location.
 </article>
+
+<!-- 
+
+% mysql -u root
+> use mythconverg;
+> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
+
+-->

@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2002-11-29, v1.044
+  2002-12-02, v1.045
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -20,7 +20,9 @@
            3.2.1.1 Mandrake 9.0
            3.2.1.2 Red Hat Linux 8.0
         3.2.2 Command-line installation.
-           3.2.2.1 Mandrake 8.2 and 9.0
+           3.2.2.1 Mandrake
+              3.2.2.1.1 Special instructions for Mandrake 8.2
+              3.2.2.1.2 Mandrake 8.2 and 9.0
            3.2.2.2 Red Hat Linux 8.0
            3.2.2.3 Gentoo.
 
@@ -75,7 +77,6 @@
      11.1 Installation and pre-requisites.
         11.1.1 Mandrake 9.0
      11.2 Completing the installation.
-
   12. mythgallery.
      12.1 Installation and pre-requisites.
 
@@ -189,10 +190,10 @@
   done, and it all depends on your comfort level with Linux.
 
   In order to compile mythtv, we need to make sure that the software it
-  needs is installed.  As of 2002-11-08, this list includes perl-5.8,
-  mysql, gcc, freetype2-devel and qt-devel.  If you're going to use a
-  remote control with mythtv, you're going to need the cdialog package
-  in order to compile lircd.
+  needs is installed.  As of 2002-12-02, this list includes perl, mysql,
+  gcc, freetype2-devel and qt-devel.  If you're going to use a remote
+  control with mythtv, you're going to need the cdialog package in order
+  to compile lircd.
 
   There appears to be issues with ALSA and simultaneously recording and
   playing sound, which is a core requirement for mythtv.  If you are not
@@ -283,27 +284,65 @@
   This section details the various methods for installing pre-requisites
   from the command line.
 
-  [1m3.2.2.1.  Mandrake 8.2 and 9.0[0m
+  [1m3.2.2.1.  Mandrake[0m
+
+  [1m3.2.2.1.1.  Special instructions for Mandrake 8.2[0m
+
+  Mandrake 8.2 does not have a pre-packaged libqt3-devel, so you must
+  compile and install this manually.  The following command will install
+  the pre-requisites for qt3, so don't skip this step.  The simplest
+  tool for installing packages from the command line is [1murpmi[22m.
+
+  Open a shell, and execute the following.  You may get asked a number
+  of questions regarding dependencies.  It's best to answer "YES".
+
+       % urpmi mesa-common-devel libmng1-devel mysql-devel libunixodbc2-devel
+       % urpmi postgresql-devel xfree86-static-libs
+
+  Once all of the pre-requisites have been installed, the next step is
+  to obtain and compile the source RPM.
+
+  Go to http://www.rpmfind.net <http://www.rpmfind.net> and search for
+  qt3.  There will be a number of different versions available.  As of
+  2002-12-02, the latest version for Mandrake is called
+  qt3-3.0.5-7mdk.src.rpm. Unless you are running [1mMandrake Cooker [22m(the
+  beta version of the next release of Mandrake), make sure to download
+  the standard "Mandrake" release.  Download the .src.rpm file to a
+  directory that you can find.
+
+       % su
+       # cp qt3-3.0.5-7mdk.src.rpm /usr/src/RPMS/SRPMS
+       # cd /usr/src/RPMS/SRPMS
+       # rpm --rebuild qt3-3.0.5-7mdk.src.rpm
+       # cd ../RPMS
+       # rpm -Uvh qt3-3.0.5-7mdk.i386.rpm
+
+  Once this has completed (it can take a while, so please be patient),
+  continue by following the Mandrake 9.0 instructions.
+
+  [1m3.2.2.1.2.  Mandrake 8.2 and 9.0[0m
 
   The simplest tool for installing packages from the command line is
   [1murpmi[22m.
 
-  Open a shell, and execute the following, all on the same line:
+  Open a shell, and execute the following, all on the same line. You may
+  get asked a number of questions regarding dependencies.  It's best to
+  answer "YES".
 
-       % su -
-       # urpmi perl-5.8 mysql gcc gcc-c++ freetype2-devel libqt3-devel cdialog
-       alsa-utils
+       % su
+       # urpmi perl mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
 
-  You may get asked a number of questions regarding dependencies.  It's
-  best to answer "YES".
+  [1mNOTE[22m: Mandrake 8.2 users, [4mdo[24m [4mnot[24m execute the following command.
+  You've already manually installed the files in the previous section.
+
+       # urpmi libqt3-devel
 
   However, you might get this when you execute the command above:
 
-       [root@pvr root]# urpmi perl-5.8 mysql gcc gcc-c++
-       freetype2-devel libqt3-devel cdialog
+       [root@pvr root]# urpmi perl mysql gcc gcc-c++ freetype2-devel libqt3-devel cdialog alsa-utils
        everything already installed
 
-  In that case, you're ready to move onto the next step.
+  In that case, you're ready to move to the next ``section''.
 
   [1m3.2.2.2.  Red Hat Linux 8.0[0m
 
@@ -313,21 +352,21 @@
 
   First, edit your /etc/make.conf file so that it looks like this:
 
-  # Build-time functionality
-  # ========================
-  #
-  # The USE variable is used to enable optional build-time functionality. For
-  # example, quite a few packages have optional X, gtk or GNOME functionality
-  # that can only be enabled or disabled at compile-time. Gentoo Linux has a
-  # very extensive set of USE variables described in our USE variable HOWTO at
-  # http://www.gentoo.org/doc/use-howto.html
-  #
-  # The available list of use flags with descriptions is in your portage tree.
-  # Use 'less' to view them:  --> less /usr/portage/profiles/use.desc <--
-  #
-  # Example:
-  #USE="X gtk gnome -alsa"
-  USE="mysql qt dvd X -alsa gtk gnome -esd oss"
+       # Build-time functionality
+       # ========================
+       #
+       # The USE variable is used to enable optional build-time functionality. For
+       # example, quite a few packages have optional X, gtk or GNOME functionality
+       # that can only be enabled or disabled at compile-time. Gentoo Linux has a
+       # very extensive set of USE variables described in our USE variable HOWTO at
+       # http://www.gentoo.org/doc/use-howto.html
+       #
+       # The available list of use flags with descriptions is in your portage tree.
+       # Use 'less' to view them:  --> less /usr/portage/profiles/use.desc <--
+       #
+       # Example:
+       #USE="X gtk gnome -alsa"
+       USE="mysql qt dvd X -alsa gtk gnome -esd oss"
 
   If KDE has not been installed on your system: Edit /etc/make.conf and
   locate the "USE" variable.  If the line is commented out, remove the
@@ -367,16 +406,16 @@
   Open a shell, and switch to superuser mode.  [1mNOTE: ^D [22mmeans press [1mCTRL[0m
   and [1md [22mat the same time.
 
-       % su -
-       # cd /etc/profile.d
-       cat > mythtv.sh
-       export QTDIR=/usr/lib/qt3
-       export PATH=$PATH:/usr/lib/qt3/bin
-       ^D
+  % su
+  # cd /etc/profile.d
+  cat > mythtv.sh
+  export QTDIR=/usr/lib/qt3
+  export PATH=$PATH:/usr/lib/qt3/bin
+  ^D
 
-       # chmod a+x mythtv.sh
-       # exit
-       % exit
+  # chmod a+x mythtv.sh
+  # exit
+  % exit
 
   The last two commands are to exit out of the shell.  This way, when
   you next open a shell your new commands will take effect.
@@ -408,18 +447,17 @@
 
   Open a shell and switch to superuser mode again.
 
-  % su -
-  # set
+       % su
+       # set
 
-  [lots of text]
-  QTDIR=/usr/lib/qt3
-  PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
+       [lots of text]
+       QTDIR=/usr/lib/qt3
+       PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
 
   You should see QTDIR and the path changes you made.
 
   Next, we need to make sure that the libraries that we're building will
   be found when we need them.
-
   [1m4.3.  Modifying /etc/ld.so.conf[0m
 
   Switch to /etc and execute the following:
@@ -462,6 +500,7 @@
 
   Recent AMD processors, like the Duron, Thunderbird and Athlon don't
   need this change.
+
   [1m5.2.  Building LAME.[0m
 
   Open a shell and switch to the directory where you saved lame.
@@ -524,14 +563,14 @@
 
   Install the xmltv prerequisites:
 
-       % su -
-       # perl -MCPAN -e shell
-       cpan> install XML::Twig
-       cpan> install Date::Manip
-       Date::Manip is up to date.
-       cpan> install LWP
-       cpan> install XML::Writer
-       cpan> exit
+  % su
+  # perl -MCPAN -e shell
+  cpan> install XML::Twig
+  cpan> install Date::Manip
+  Date::Manip is up to date.
+  cpan> install LWP
+  cpan> install XML::Writer
+  cpan> exit
 
   Change to the XMLTV directory and compile it:
 
@@ -608,13 +647,13 @@
   Do the same for xmltv but an additional step will be required first to
   fool it into thinking XML-Twig is installed.
 
-       % su
-       # emerge inject dev-perl/XML-Twig
-       # emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
-       # ebuild /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2.ebuild digest
-       # emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
-       # exit
-       %
+  % su
+  # emerge inject dev-perl/XML-Twig
+  # emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
+  # ebuild /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2.ebuild digest
+  # emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
+  # exit
+  %
 
   [1m5.6.  Debian.[0m
 
@@ -743,7 +782,7 @@
 
        % amixer set Master,0 100%,100% unmute
        % amixer set Line,0 100%,100% mute capture
-       % su -
+       % su
        # alsactl store
        # exit
        %
@@ -810,10 +849,10 @@
 
   Once the configuration step is complete:
 
-       % make
-       % su
-       # make install
-       # chmod 666 /dev/lircd
+  % make
+  % su
+  # make install
+  # chmod 666 /dev/lircd
 
   Next, we're going to manually start lircd the first time:
 
@@ -854,7 +893,6 @@
   button as it is defined in your /etc/lircd.conf. If you don't see any-
   thing at this point, you need to troubleshoot further by going back to
   the lirc home page and investigating from there.
-
   If it is working, then press [1mCTRL-C [22mto abort the program.  Once you
   know that your remote is working, you need to run the [1mirxevent[0m
   program, which takes the key presses and sends them to mythtv.
@@ -1463,6 +1501,10 @@
   to be obtained from the "contrib" or "cooker" development
   repositories.  Applications downloaded from " cooker" come from the
   development branch, so there may be issues with some software.
+
+       # urpmi.addmedia stealth-contrib ftp://ftp.stealth.net/pub/mirrors/ftp.mandrake.com/Mandrake/9.0/contrib/RPMS
+       with ./synthesis.hdlist2.cz
+       # urpmi mad flac libcdaudio cdparanoia libvorbis-devel
 
   Install libvorbis-devel using urpmi or the Mandrake Control Center
   installer.
