@@ -13,6 +13,7 @@ using namespace std;
 #include "tv.h"
 #include "progfind.h"
 #include "manualbox.h"
+#include "manualschedule.h"
 #include "playbackbox.h"
 #include "viewscheduled.h"
 #include "globalsettings.h"
@@ -87,6 +88,17 @@ int startManual(void)
     return 0;
 }
 
+int startManualSchedule(void)
+{
+    ManualSchedule mansched(gContext->GetMainWindow(), "manual schedule");
+
+    qApp->unlock();
+    mansched.exec();
+    qApp->lock();
+
+    return 0;
+}
+
 void startTV(void)
 {
     QSqlDatabase *db = QSqlDatabase::database();
@@ -135,6 +147,8 @@ void TVMenuCallback(void *data, QString &selection)
         startDelete();
     else if (sel == "tv_manual")
         startManual();
+    else if (sel == "tv_manualschedule")
+        startManualSchedule();
     else if (sel == "tv_fix_conflicts")
         startManaged();
     else if (sel == "tv_progfind")

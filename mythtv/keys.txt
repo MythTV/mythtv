@@ -38,6 +38,8 @@ Without the stickykeys option selected:
 
 - Left arrow to rewind the configured number of seconds.  (default is 5)
 - Right arrow to fast forward the configured number of seconds. (default is 30)
+- < starts rewind mods as if stickykeys are selected.
+- > starts fast forward mode as if stickykeys are selected.
 
 With the stickykeys option selected:
 

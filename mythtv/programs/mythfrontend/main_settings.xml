@@ -24,6 +24,8 @@
    <button>
      <type>TV</type>
      <text>TV Settings</text>
+     <text lang="CA">Configuració de TV</text>
+     <text lang="ES">Configuración de TV</text>
      <text lang="FR">Options TV</text>
      <text lang="DE">TV Einstellungen</text>
      <action>MENU tv_settings.xml</action>

@@ -30,6 +30,7 @@ TARGETDEPS += ../../libs/libavformat/libavformat.a
 
 # Input
 HEADERS += manualbox.h playbackbox.h viewscheduled.h globalsettings.h
+HEADERS += manualschedule.h 
 
 SOURCES += main.cpp manualbox.cpp playbackbox.cpp viewscheduled.cpp
-SOURCES += globalsettings.cpp
+SOURCES += globalsettings.cpp manualschedule.cpp

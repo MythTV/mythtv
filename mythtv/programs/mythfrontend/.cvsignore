@@ -9,4 +9,5 @@ moc_viewscheduled.cpp
 moc_videosource.cpp
 moc_themesetup.cpp
 moc_setrectime.cpp
+moc_manualschedule.cpp
 mythfrontend

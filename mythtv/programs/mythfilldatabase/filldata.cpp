@@ -29,7 +29,7 @@ bool non_us_updating = false;
 bool from_file = false;
 bool quiet = false;
 bool no_delete = false;
-bool isgist = false;
+bool isNorthAmerica = false;
 
 MythContext *gContext;
 
@@ -76,6 +76,7 @@ class ProgInfo
                                       subtitle = other.subtitle;
                                       desc = other.desc;
                                       category = other.category;
+                                      catType = other.catType;
                                       start = other.start;
                                       end = other.end;
                                       airdate = other.airdate;
@@ -92,6 +93,7 @@ class ProgInfo
     QString subtitle;
     QString desc;
     QString category;
+    QString catType;
     QString airdate;
     QString stars;
     QValueList<ProgRating> ratings;
@@ -176,7 +178,7 @@ ChanInfo *parseChannel(QDomElement &element, QUrl baseUrl)
     QString xmltvid = element.attribute("id", "");
     QStringList split = QStringList::split(" ", xmltvid);
 
-    if (!isgist)
+    if (isNorthAmerica)
     {
         chaninfo->xmltvid = split[0];
         chaninfo->chanstr = split[0];
@@ -209,24 +211,9 @@ ChanInfo *parseChannel(QDomElement &element, QUrl baseUrl)
             }
             else if (info.tagName() == "display-name")
             {
-                if (!isgist)
+                if (chaninfo->name.length() == 0)
                 {
-                    if (chaninfo->name.length() == 0)
-                    {
-                        chaninfo->name = info.text();
-                    }
-                }
-                else
-                {
-                    if (chaninfo->callsign == "")
-                    {
-                        chaninfo->callsign = info.text();
-                        chaninfo->name = info.text();
-                    }
-                    else if (chaninfo->chanstr == "")
-                    {
-                        chaninfo->chanstr = QString::number(info.text().toInt());
-                    }
+                    chaninfo->name = info.text();
                 }
             }
         }
@@ -271,30 +258,6 @@ void addTimeOffset(QString &timestr, int config_off, QString offset )
         QDateTime dt = QDateTime(QDate(year, month, day),QTime(hour, min, sec));
         dt = dt.addSecs(diff * 60 * 60);
         timestr = dt.toString("yyyyMMddhhmmss");
-    }
-    else if (isgist)
-    {
-#if 0
-        int year = 0, month = 0, day = 0, hour = 0, min = 0, sec = 0;
-
-        if (timestr.length() == 14)
-        {
-            year  = timestr.left(4).toInt(&ok, 10);
-            month = timestr.mid(4,2).toInt(&ok, 10);
-            day   = timestr.mid(6,2).toInt(&ok, 10);
-            hour  = timestr.mid(8,2).toInt(&ok, 10);
-            min   = timestr.mid(10,2).toInt(&ok, 10);
-            sec   = timestr.mid(12,2).toInt(&ok, 10);
-        }
-
-        int houroff = 0;
-
-        houroff = offset.mid(3, 3).toInt(&ok, 10);
-
-        QDateTime dt = QDateTime(QDate(year, month, day),QTime(hour, min, sec));
-        dt = dt.addSecs(houroff * 60 * 60);
-        timestr = dt.toString("yyyyMMddhhmmss");   
-#endif
     }
 }
 
@@ -371,6 +334,7 @@ ProgInfo *parseProgram(QDomElement &element)
     pginfo->end = fromXMLTVDate(pginfo->endts);
 
     pginfo->subtitle = pginfo->title = pginfo->desc = pginfo->category = "";
+    pginfo->catType = "";
     pginfo->repeat = false;   
  
     for (QDomNode child = element.firstChild(); !child.isNull();
@@ -391,9 +355,25 @@ ProgInfo *parseProgram(QDomElement &element)
             {
                 pginfo->desc = getFirstText(info);
             }
-            else if (info.tagName() == "category" && pginfo->category == "")
+            else if (info.tagName() == "category")
             {
-                pginfo->category = getFirstText(info);
+                QString cat = getFirstText(info);
+                if (pginfo->category == "")
+                {
+                    pginfo->category = cat;
+                }
+                else if (cat == "movie" || cat == "series" || cat == "sports" ||
+                         cat == "tvshow")
+                    /* Hack until we have the new XMLTV DTD with category
+                       "system"s.
+                       I can't use a new tag, because I'd then
+                       be incompliant with the (current) XMLTV (I think),
+                       unless I use XML namespaces etc., and it's category
+                       info after all, just formalized and narrow. */
+                {
+                    if (pginfo->catType == "")
+                        pginfo->catType = cat;
+                }
             }
             else if (info.tagName() == "date" && pginfo->airdate == "")
             {
@@ -450,6 +430,17 @@ ProgInfo *parseProgram(QDomElement &element)
         }
     }
 
+    if (pginfo->category == "" && pginfo->catType != "")
+        pginfo->category = pginfo->catType;
+
+    /* Do what MythWeb does and assume that programmes with
+       star-rating in America are movies. This allows us to
+       unify app code with grabbers which explicitly deliver that
+       info. */
+    if (isNorthAmerica && pginfo->catType == "" &&
+        pginfo->stars != "" && pginfo->airdate != "")
+        pginfo->catType = "movie";
+
     return pginfo;
 }
                   
@@ -480,11 +471,6 @@ void parseFile(QString filename, QValueList<ChanInfo> *chanlist,
     QDomElement docElem = doc.documentElement();
 
     QUrl baseUrl(docElem.attribute("source-data-url", ""));
-
-    if (docElem.attribute("source-info-name") == "Gist Communications, Inc.")
-    {
-        isgist = true;
-    }
 
     QDomNode n = docElem.firstChild();
     while (!n.isNull())
@@ -577,13 +563,6 @@ void fixProgramList(QValueList<ProgInfo> *fixlist)
             if (todelete == i)
                 i = cur;
             fixlist->erase(todelete);
-        }
-        else if (isgist && (*cur).start.date().day() < (*i).start.date().day())
-        {
-            cerr << "removing lead-in program: " << (*cur).title << endl
-                 << (*cur).start.toString("hhmmss").ascii() << " - "
-                 << (*i).start.toString("hhmmss").ascii() << endl << endl;
-            fixlist->erase(cur);
         }
     }
 }
@@ -1022,10 +1001,10 @@ void handlePrograms(int id, int offset, QMap<QString,
             }
 
             querystr.sprintf("INSERT INTO program (chanid,starttime,endtime,"
-                             "title,subtitle,description,category,airdate,"
-                             "stars,previouslyshown) "
+                             "title,subtitle,description,category,"
+                             "category_type,airdate,stars,previouslyshown) "
                              "VALUES(%d,\"%s\",\"%s\",\"%s\",\"%s\","
-                             "\"%s\",\"%s\",\"%s\",\"%s\",\"%d\");", 
+                             "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%d\");", 
                              chanid, 
                              (*i).start.toString("yyyyMMddhhmmss").ascii(), 
                              (*i).end.toString("yyyyMMddhhmmss").ascii(), 
@@ -1033,6 +1012,7 @@ void handlePrograms(int id, int offset, QMap<QString,
                              (*i).subtitle.utf8().data(), 
                              (*i).desc.utf8().data(), 
                              (*i).category.utf8().data(),
+                             (*i).catType.utf8().data(),
                              (*i).airdate.utf8().data(),
                              (*i).stars.utf8().data(),
                              (*i).repeat);
@@ -1197,40 +1177,13 @@ bool grabData(Source source, int offset)
         command.sprintf("nice -19 %s --days=4 --offset %d --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), offset,
                         configfile.ascii(), filename.ascii());
-    else if (xmltv_grabber == "gist")
-    {    
-        QDateTime desiredDate = QDateTime::currentDateTime().addDays(offset);
-        QString day = desiredDate.toString("yyyyMMdd");
-
-        desiredDate.setTime(QTime(12, 0));
-
-        time_t noon = toTime_t(desiredDate);
-
-        struct tm loctime, utctime;
-
-        localtime_r(&noon, &loctime);
-        gmtime_r(&noon, &utctime);
-
-        if (utctime.tm_yday > loctime.tm_yday)
-            utctime.tm_hour += 24;
-        if (utctime.tm_yday < loctime.tm_yday)
-            utctime.tm_hour -= 24;
-
-        int hourdiff = loctime.tm_hour - utctime.tm_hour; 
-        QString reqtz;
-
-        reqtz.sprintf("%+.2d00", hourdiff);
-
-        command.sprintf("wget -nv -O %s --header \"Accept-encoding: gzip\" "
-                        "http://www.gist.com/tv/xmltv/?userid=%s\\&date=%s"
-                        "\\&tz_offset=%s", filename.ascii(),
-                        source.userid.ascii(),
-                        day.ascii(), reqtz.ascii());
-    }
     else
+    {
+        isNorthAmerica = true;
         command.sprintf("nice -19 %s --days 1 --offset %d --config-file '%s' "
                         "--output %s", xmltv_grabber.ascii(),
                         offset, configfile.ascii(), filename.ascii());
+    }
 
     if (quiet &&
         (xmltv_grabber == "tv_grab_na" ||
@@ -1340,8 +1293,7 @@ bool fillData(QValueList<Source> &sourcelist)
         }
         else if (xmltv_grabber == "tv_grab_na" || 
                  xmltv_grabber == "tv_grab_aus" ||
-                 xmltv_grabber == "tv_grab_sn" ||
-                 xmltv_grabber == "gist")
+                 xmltv_grabber == "tv_grab_sn")
         {
             if (!grabData(*it, 1))
                 ++failures;

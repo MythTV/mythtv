@@ -110,8 +110,8 @@ class TV : public QObject
 
     void DoInfo(void);
     void DoPause(void);
-    void DoFF(void);
-    void DoRew(void);
+    void DoFF(int time);
+    void DoRew(int time);
     void DoJumpAhead(void);
     void DoJumpBack(void);
     void DoSkipCommercials(int direction);
@@ -175,8 +175,7 @@ class TV : public QObject
     int fftime;
     int rewtime;
     int stickykeys;
-    bool doing_ff;
-    bool doing_rew;
+    int doing_ff_rew;
     int ff_rew_index;
     float ff_rew_scaling;
 

@@ -66,6 +66,7 @@ CREATE TABLE IF NOT EXISTS program
     subtitle VARCHAR(128) NULL,
     description TEXT NULL,
     category VARCHAR(64) NULL,
+    category_type VARCHAR(64) NULL,
     airdate YEAR NOT NULL,
     stars FLOAT UNSIGNED NOT NULL,
     previouslyshown TINYINT NOT NULL default '0',
@@ -232,7 +233,7 @@ CREATE TABLE IF NOT EXISTS transcoding (
     hostname VARCHAR(255)
 );
 
-INSERT INTO settings VALUES ('DBSchemaVer', 900, NULL);
+INSERT INTO settings VALUES ('DBSchemaVer', 901, NULL);
 
 INSERT INTO recordingprofiles (name) VALUES ('Default');
 INSERT INTO recordingprofiles (name) VALUES ('Live TV');

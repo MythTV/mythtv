@@ -11,6 +11,8 @@
       <text lang="DE">TV Planer</text>
       <alttext>Guide</alttext>
       <alttext lang="FR">Grille</alttext>
+      <alttext lang="ES">Parilla</alttext>
+      <alttext lang="CA">Guia</alttext>
       <action>TV_SCHEDULE</action>
    </button>
 
@@ -25,21 +27,36 @@
       <text lang="DE">Sendung suchen</text>
       <alttext>Finder</alttext>
       <alttext lang="FR">Recherche</alttext>
+      <alttext lang="ES">Buscar</alttext>
+      <alttext lang="CA">Cercar</alttext>
       <action>TV_PROGFIND</action>
    </button>
 
    <button>
       <type>TV_SCHEDULE</type>
-      <text>Manual Recording</text>
+      <text>Instant Recording</text>
       <text lang="IT">Registrazione manuale</text>
-      <text lang="ES">Grabacion manual</text>
-      <text lang="CA">Gravar manualment</text>
+      <text lang="ES">Grabación Instanánea</text>
+      <text lang="CA">Gravar ara</text>
       <text lang="NL">Manuele opname</text>
       <text lang="FR">Enregistrement manuel</text>
       <text lang="DE">Manuelle Aufnahme</text>
-      <alttext>Manual Record</alttext>
+      <alttext>Instant Record</alttext>
       <alttext lang="FR">Enreg. manuel</alttext>
+      <alttext lang="ES">Grab. inst.</alttext>
+      <alttext lang="CA">Grav. inst.</alttext>
       <action>TV_MANUAL</action>
+   </button>
+
+   <button>
+      <type>TV_SCHEDULE</type>
+      <text>Manual Schedule</text>
+      <text lang="ES">Programar Grabaciones</text>
+      <text lang="CA">Programar Gravacions</text>
+      <alttext>Man. Sched.</alttext>
+      <alttext lang="ES">Programar</alttext>
+      <alttext lang="CA">Programar</alttext>
+      <action>TV_MANUALSCHEDULE</action>
    </button>
 
    <button>
@@ -53,6 +70,8 @@
       <text lang="DE">Konflikte beheben</text>
       <alttext>Fix Conflicts</alttext>
       <alttext lang="FR">Conflits</alttext>
+      <alttext lang="ES">Conflictos</alttext>
+      <alttext lang="FR">Conflictes</alttext>
       <action>TV_FIX_CONFLICTS</action>
    </button>
 

@@ -633,8 +633,7 @@ void TV::TeardownPlayer(void)
     }
 
     paused = false;
-    doing_ff = false;
-    doing_rew = false;
+    doing_ff_rew = 0;
     ff_rew_index = SSPEED_NORMAL;
     ff_rew_scaling = 1.0;
 
@@ -683,8 +682,7 @@ void TV::RunTV(void)
     int keypressed;
 
     stickykeys = gContext->GetNumSetting("StickyKeys");
-    doing_ff = false;
-    doing_rew = false;
+    doing_ff_rew = 0;
     ff_rew_scaling = 1.0;
     ff_rew_index = SSPEED_NORMAL;
 
@@ -716,12 +714,12 @@ void TV::RunTV(void)
 
                 ProcessKeypress(keypressed);
             }
-            else if (stickykeys)
+            else if (doing_ff_rew)
             {
-                if (doing_ff)
-                    DoFF();
-                else if (doing_rew)
-                    DoRew();
+                if (doing_ff_rew > 0)
+                    DoFF(1);
+                else
+                    DoRew(1);
                 if (ff_rew_index > SSPEED_NORMAL)
                     usleep(50000);
             }
@@ -887,8 +885,7 @@ void TV::ProcessKeypress(int keypressed)
         }
         case Key_Z:
         {
-            doing_ff = false;
-            doing_rew = false;
+            doing_ff_rew = 0;
             DoSkipCommercials(1);
             break;
         }
@@ -899,54 +896,60 @@ void TV::ProcessKeypress(int keypressed)
         }
         case Key_Q:
         {
-            doing_ff = false;
-            doing_rew = false;
+            doing_ff_rew = 0;
             DoSkipCommercials(-1);
             break;
         }
         case Key_S: case Key_P: 
         {
-            doing_ff = false;
-            doing_rew = false;
+            doing_ff_rew = 0;
             DoPause();
             break;
         }
         case Key_Right: case Key_D: case Key_F8: 
         {
-            if (stickykeys)
+            if (!stickykeys)
             {
-                if (doing_ff)
-                    ff_rew_index = (++ff_rew_index % SSPEED_MAX);
-                else
-                {
-                    doing_ff = true;
-                    ff_rew_index = SSPEED_NORMAL;
-                }
-            }
-            else
+                doing_ff_rew = 0;
                 ff_rew_index = SSPEED_NORMAL;
-
-            doing_rew = false;
-            DoFF(); 
+                DoFF(fftime); 
+                break;
+            }
+            // fall through
+        }
+        case Key_Greater: case Key_Period:
+        {
+            if (doing_ff_rew > 0)
+                ff_rew_index = (++ff_rew_index % SSPEED_MAX);
+            else
+            {
+                doing_ff_rew = 1;
+                ff_rew_index = SSPEED_NORMAL;
+            }
+            DoFF(1); 
             break;
         }
         case Key_Left: case Key_A: case Key_F5:
         {
-            if (stickykeys)
+            if (!stickykeys)
             {
-                if (doing_rew)
-                    ff_rew_index = (++ff_rew_index % SSPEED_MAX);
-                else
-                {
-                    doing_rew = true;
-                    ff_rew_index = SSPEED_NORMAL;
-                }
-            }
-            else
+                doing_ff_rew = 0;
                 ff_rew_index = SSPEED_NORMAL;
-
-            doing_ff = false;
-            DoRew(); 
+                DoRew(rewtime);
+                break;
+            }
+            // fall through
+        }
+        case Key_Less: case Key_Comma:
+        {
+            if (doing_ff_rew < 0)
+                ff_rew_index = (++ff_rew_index % SSPEED_MAX);
+            else
+            {
+                doing_ff_rew = -1;
+                ff_rew_index = SSPEED_NORMAL;
+            }
+            DoRew(1);
             break;
         }
         case Key_PageUp:
@@ -990,7 +993,7 @@ void TV::ProcessKeypress(int keypressed)
 
         default: 
         {
-            if (doing_ff || doing_rew)
+            if (doing_ff_rew)
             {
                 switch (keypressed)
                 {
@@ -1006,8 +1009,7 @@ void TV::ProcessKeypress(int keypressed)
                     case Key_9: ff_rew_index = SSPEED_FAST_6; break;
 
                     default:
-                       doing_ff = false;
-                       doing_rew = false;
+                       doing_ff_rew = 0;
                        was_doing_ff_rew = true;
                        break;
                 }
@@ -1323,7 +1325,7 @@ void TV::DoInfo(void)
     }
 }
 
-void TV::DoFF(void)
+void TV::DoFF(int time)
 {
     bool slidertype = false;
     if (internalState == kState_WatchingLiveTV)
@@ -1336,14 +1338,14 @@ void TV::DoFF(void)
     if (activenvp == nvp)
     {
         QString desc = "";
-        int pos = calcSliderPos((int)(fftime * ff_rew_scaling), desc);
+        int pos = calcSliderPos((int)(time * ff_rew_scaling), desc);
         osd->StartPause(pos, slidertype, scaleString, desc, 2);
     }
 
-    activenvp->FastForward(fftime * ff_rew_scaling);
+    activenvp->FastForward(time * ff_rew_scaling);
 }
 
-void TV::DoRew(void)
+void TV::DoRew(int time)
 {
     bool slidertype = false;
     if (internalState == kState_WatchingLiveTV)
@@ -1356,11 +1358,11 @@ void TV::DoRew(void)
     if (activenvp == nvp)
     {
         QString desc = "";
-        int pos = calcSliderPos(0 - (int)(rewtime * ff_rew_scaling), desc);
+        int pos = calcSliderPos(0 - (int)(time * ff_rew_scaling), desc);
         osd->StartPause(pos, slidertype, scaleString, desc, 2);
     }
 
-    activenvp->Rewind(rewtime * ff_rew_scaling);
+    activenvp->Rewind(time * ff_rew_scaling);
 }
 
 void TV::DoJumpAhead(void)

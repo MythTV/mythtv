@@ -23,6 +23,8 @@
       <text lang="DE">Aufnahmen planen</text>
       <alttext>Schedule</alttext>
       <alttext lang="FR">Programmer</alttext>
+      <alttext lang="ES">Temporizadores</alttext>
+      <alttext lang="CA">Temporitzadors</alttext>
       <action>MENU tv_schedule.xml</action>
    </button>
 
