@@ -200,6 +200,7 @@ int main(int argc, char **argv)
 
     bool daemonize = false;
     bool printsched = false;
+    bool testsched = false;
     bool nosched = false;
     bool printexpire = false;
     for (int argpos = 1; argpos < a.argc(); ++argpos)
@@ -340,6 +341,10 @@ int main(int argc, char **argv)
         else if (!strcmp(a.argv()[argpos],"--printsched"))
         {
             printsched = true;
+        } 
+        else if (!strcmp(a.argv()[argpos],"--testsched"))
+        {
+            testsched = true;
         } 
         else if (!strcmp(a.argv()[argpos],"--nosched"))
         {
@@ -483,17 +488,15 @@ int main(int argc, char **argv)
 
     UpgradeTVDatabaseSchema();
 
-    if (printsched)
+    if (printsched || testsched)
     {
         sched = new Scheduler(false, &tvList, db);
-#if 1
-        if (gContext->ConnectToMasterServer())
+        if (!testsched && gContext->ConnectToMasterServer())
         {
             cout << "Retrieving Schedule from Master backend.\n";
             sched->FillRecordListFromMaster();
         }
         else
-#endif
         {
             cout << "Calculating Schedule from database.\n" <<
                     "Inputs, Card IDs, and Conflict info may be invalid "
