@@ -998,7 +998,11 @@ int main(int argc, char **argv)
     }
     else
     {
+#ifdef Q_WS_MACX
+        flags = Qt::WStyle_Customize | Qt::WStyle_Splash;
+#else
         flags = Qt::WStyle_Customize | Qt::WStyle_NoBorder;
+#endif
     }
 
     MythMainWindow *mainWindow = new MythMainWindow(NULL, 0, false, flags);

@@ -274,7 +274,8 @@ void MythMainWindow::Show(void)
 {
     show();
 #ifdef Q_WS_MACX
-    HideMenuBar();
+    if (!testWFlags(Qt::WStyle_NormalBorder))
+        HideMenuBar();
 #endif
 
     setActiveWindow();
