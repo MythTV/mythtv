@@ -1247,12 +1247,12 @@ void PlaybackBox::play(ProgramInfo *rec)
 
     if (tv->getRequestDelete())
     {
-        remove(rec);
+        remove(tvrec);
     }
     else if (tv->getEndOfRecording() && 
              gContext->GetNumSetting("EndOfRecordingExitPrompt"))
     {
-        promptEndOfRecording(rec);
+        promptEndOfRecording(tvrec);
     }
 
     delete tv;
