@@ -13,12 +13,12 @@ INSTALLS += target
 installfiles.path = $${PREFIX}/share/mythtv/mythweather
 installfiles.files = weathertypes.dat
 installimages.path = $${PREFIX}/share/mythtv/mythweather/images
-installimages.files = images/*
+installimages.files = images/*.png
 
 INSTALLS += installfiles installimages
 
 LIBS += 
-LIBS += -L/usr/local/lib -lmyth-$$LIBVERSION
+LIBS += -L$${PREFIX}/lib -lmyth-$$LIBVERSION
 
 # Input
 
