@@ -1,7 +1,7 @@
 /*
  * 6200ch - an external channel changer for Motorola DCT-6200 Tuner 
  * 
- * Copyright 2004 by Stacey D. Son <mythtv@son.org> 
+ * Copyright 2004,2005 by Stacey D. Son <mythdev@son.org> 
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,24 +27,25 @@
 #include <stdlib.h>
 
 // Motorola DCT-6200 IDs
-#define DCT6200_VENDOR_ID  0x00000ce5
+// Note: there are at least three different vendor IDs for the 6200
+#define DCT6200_VENDOR_ID1 0x00000ce5
+#define DCT6200_VENDOR_ID2 0x00000e5c
+#define DCT6200_VENDOR_ID3 0x00001225
 #define DCT6200_SPEC_ID    0x00005068
 #define DCT6200_SW_VERSION 0x00010101
-#define DCT6200_MODEL_ID   0x0000620a
+#define DCT6200_MODEL_ID1  0x0000620a
+#define DCT6200_MODEL_ID2  0x00006200
 
 #define AVC1394_SUBUNIT_TYPE_6200 (9 << 19)  /* uses a reserved subunit type */ 
 
 #define AVC1394_6200_COMMAND_CHANNEL 0x000007C00   /* 6200 subunit command */
-#define AVC1394_6200_OPERAND_SET 0x67      /* 6200 subunit command operand */
+#define AVC1394_6200_OPERAND_SET 0x20      /* 6200 subunit command operand */
 
 #define CTL_CMD0 AVC1394_CTYPE_CONTROL | AVC1394_SUBUNIT_TYPE_6200 | \
         AVC1394_SUBUNIT_ID_0 | AVC1394_6200_COMMAND_CHANNEL | \
         AVC1394_6200_OPERAND_SET
 
-#define OPERAND0 0x040000FF
-#define OPERAND1 0xFF000000
-
-#define STARTING_NODE 2  /* skip 1394 nodes to avoid error msgs */
+#define STARTING_NODE 1  /* skip 1394 nodes to avoid error msgs */
 
 void usage()
 {
@@ -58,7 +59,8 @@ int main (int argc, char *argv[])
    int device = -1;
    int i;
    int verbose = 0;
-   quadlet_t cmd[3];
+   quadlet_t cmd[2];
+   int dig[3];
    int chn = 550;
 
    if (argc < 2) 
@@ -105,8 +107,11 @@ int main (int argc, char *argv[])
          printf("node %d: vendor_id = 0x%08x model_id = 0x%08x\n", 
                  i, dir.vendor_id, dir.model_id); 
 		
-      if ( (dir.vendor_id == DCT6200_VENDOR_ID) &&
-	   (dir.model_id == DCT6200_MODEL_ID)) {
+      if ( ((dir.vendor_id == DCT6200_VENDOR_ID1) || 
+            (dir.vendor_id == DCT6200_VENDOR_ID2) ||
+            (dir.vendor_id == DCT6200_VENDOR_ID3)) &&
+           ((dir.model_id == DCT6200_MODEL_ID1) ||
+            (dir.model_id == DCT6200_MODEL_ID2)) ) {
             if (dir.unit_spec_id != DCT6200_SPEC_ID)
                fprintf(stderr, "Warning: Unit Spec ID different.\n");
             if (dir.unit_sw_version != DCT6200_SW_VERSION)
@@ -122,23 +127,23 @@ int main (int argc, char *argv[])
         exit(1);
    }
 
-
-   cmd[0] = CTL_CMD0;
-   cmd[1] = OPERAND0 | (chn << 8);
-   cmd[2] = OPERAND1;
+   dig[2] = (chn % 10);
+   dig[1] = (chn % 100)  / 10;
+   dig[0] = (chn % 1000) / 100;
 
    if (verbose)
-      printf("AV/C Command: Opcode=0x%08X Operand0=0x%08X Operand1=0x%08X\n", 
-              cmd[0], cmd[1], cmd[2]);
+      printf("AV/C Command: %d%d%d = Op1=0x%08X Op2=0x%08X Op3=0x%08X\n", 
+            dig[0], dig[1], dig[2], 
+            CTL_CMD0 | dig[0], CTL_CMD0 | dig[1], CTL_CMD0 | dig[2]);
 
-   if (avc1394_send_command_block(handle, device, cmd, 3) != 0) {
-      fprintf(stderr, "Command not accepted\n");
-      raw1394_destroy_handle(handle);	
-      exit(1);
+   for (i=0; i<3; i++) {
+      cmd[0] = CTL_CMD0 | dig[i];
+      cmd[1] = 0x0;
+    
+      avc1394_transaction_block(handle, device, cmd, 2, 1);
+      usleep(500000);  // small delay for button to register
    }
 
-    raw1394_destroy_handle(handle);
-    exit(0);
+   raw1394_destroy_handle(handle);
+   exit(0);
 }
-
-
