@@ -54,9 +54,8 @@ extern "C" void RegistrationCallback(mDNS *const m, ServiceRecordSet *const this
 
 
 ZeroConfigResponder::ZeroConfigResponder(MFD *owner, int identifier)
-                    :MFDServicePlugin(owner, identifier, -1, false)
+                    :MFDServicePlugin(owner, identifier, -1, "zeroconfig responder", false)
 {
-    setName("zeroconfig responder");
 
     //
     //  Hold a pointer to the mfd so we can
@@ -112,7 +111,7 @@ void ZeroConfigResponder::handleRegistrationCallback(
     
     if(!which_service)
     {
-        warning(QString("zeroconfig responder could not find a registered service called %1")
+        warning(QString("could not find a registered service called %1")
                 .arg(service_name));
         return;
     }
@@ -121,25 +120,25 @@ void ZeroConfigResponder::handleRegistrationCallback(
 
         case mStatus_NoError:
             
-            log(QString("zeroconfig responder succesfully registered a service called \"%1\"")
+            log(QString("succesfully registered a service called \"%1\"")
                 .arg(service_name), 1);
             which_service->setRegistered(true);
             break;
 
         case mStatus_NameConflict: 
 
-            warning(QString("zeroconfig responder got a name conflict for \"%1\"").arg(service_name));
+            warning(QString("got a name conflict for \"%1\"").arg(service_name));
             break;
 
         case mStatus_MemFree:      
             
             registered_services.remove(which_service);
-            log(QString("zeroconfig responder removed the following service from memory: \"%1\"")
+            log(QString("removed the following service from memory: \"%1\"")
                 .arg(service_name), 2);
             break;
 
         default:
-            warning(QString("zeroconfig responder got an unknown status from a callback on a service called %1")
+            warning(QString("got an unknown status from a callback on a service called %1")
                     .arg(service_name));                   
             break;
     }
@@ -209,12 +208,12 @@ bool ZeroConfigResponder::formatServiceText(
                 thisPStringLen = (lastPStringOffset - i - 1);
                 if(thisPStringLen < 0)
                 {
-                    warning("zeroconfig responder failed in parsing a service text ... bad things may happen soon");
+                    warning("failed in parsing a service text ... bad things may happen soon");
                 }
                 if (thisPStringLen > 255) 
                 {
                     result = mDNSfalse;
-                    warning("zeroconfig responder: each component of a service text record must be 255 characters or less");
+                    warning(": each component of a service text record must be 255 characters or less");
                     break;
                 } 
                 else 
@@ -249,7 +248,7 @@ bool ZeroConfigResponder::registerService(
     RegisteredService *checker = getServiceByName(service_name);
     if(checker)
     {
-        warning(QString("zeroconfig responder cannot register another service with name of %1")
+        warning(QString("cannot register another service with name of %1")
                 .arg(service_name));
         return false;
     }    
@@ -270,7 +269,7 @@ bool ZeroConfigResponder::registerService(
 
     if(!formatServiceText(service_text.ascii(), f_service_text, &f_service_text_length))
     {
-        warning(QString("zeroconfig responder could not register a service called \"%1\" "
+        warning(QString("could not register a service called \"%1\" "
                         "because the service text was bad: %2")
                 .arg(service_name)
                 .arg(service_text));
@@ -302,7 +301,7 @@ bool ZeroConfigResponder::registerService(
 
     if(strict_service_type.length() < 1)
     {
-        warning(QString("zeroconfig responder could not register a service called \"%1\" "
+        warning(QString("could not register a service called \"%1\" "
                         "because it does not recognize a service type called \"%2\"")
                 .arg(service_name)
                 .arg(service_type));
@@ -326,12 +325,12 @@ bool ZeroConfigResponder::registerService(
                 new_service);                           // context
     if(bstatus != mStatus_NoError)
     {
-        warning("zeroconfig responder could not call mDNS_RegisterService()");
+        warning("could not call mDNS_RegisterService()");
         delete new_service;
         return false;
     }
     
-    log(QString("zeroconfig responder is attempting to register a service called \"%1\"")
+    log(QString("attempting to register a service called \"%1\"")
         .arg(service_name), 3);
     registered_services.append(new_service);
     return true;
@@ -429,7 +428,7 @@ void ZeroConfigResponder::run()
             
             if(result < 0)
             {
-                warning("zero config responder got an error on select()");
+                warning("got an error on select()");
             }
 
             if(FD_ISSET(u_shaped_pipe[0], &readfds))
@@ -445,7 +444,7 @@ void ZeroConfigResponder::run()
         }
     }
 
-    log("zeroconfig responder is leaving its event loop", 10);
+    log("leaving event loop", 10);
 
     removeAllServices();
     
@@ -478,7 +477,7 @@ void ZeroConfigResponder::addRequest(const QStringList &tokens, int socket_ident
         things_to_do.append(sb);
         if(things_to_do.count() > 99)
         {
-            warning(QString("zeroconfig responder object has more than %1 pending commands")
+            warning(QString("object has more than %1 pending commands")
                     .arg(things_to_do.count()));
         }
     things_to_do_mutex.unlock();
@@ -502,7 +501,7 @@ bool ZeroConfigResponder::removeService(const QString &service_name)
     RegisteredService *which_one = getServiceByName(service_name);
     if(!which_one)
     {
-        warning(QString("zeroconfig responder was asked to remove a service it doesn't have: %1")
+        warning(QString("asked to remove a service it doesn't have: %1")
                 .arg(service_name));
         return false;
     }
@@ -515,7 +514,7 @@ void ZeroConfigResponder::doSomething(const QStringList &tokens, int socket_iden
 {
     if(tokens.count() < 3)
     {
-        warning(QString("zeroconfig responder got passed insufficient tokens: %1")
+        warning(QString("got passed insufficient tokens: %1")
                 .arg(tokens.join(" ")));
         huh(tokens, socket_identifier);
         return;
@@ -536,7 +535,7 @@ void ZeroConfigResponder::doSomething(const QStringList &tokens, int socket_iden
     }
     if(tokens.count() < 5)
     {
-        warning(QString("zeroconfig responder got passed insufficient tokens: %1")
+        warning(QString("got passed insufficient tokens: %1")
                 .arg(tokens.join(" ")));
         huh(tokens, socket_identifier);
         return;
@@ -560,7 +559,6 @@ void ZeroConfigResponder::doSomething(const QStringList &tokens, int socket_iden
 
 ZeroConfigResponder::~ZeroConfigResponder()
 {
-    log("zeroconfig responder is being killed off", 10);
     registered_services.clear();
 }
 

@@ -88,7 +88,7 @@ void MFDService::setResolved(uint ip1, uint ip2, uint ip3, uint ip4, uint port_h
     char my_hostname[2049];
     if(gethostname(my_hostname, 2048) < 0)
     {
-        parent->warning("MFDService object could not call gethostname()");
+        warning("could not call gethostname()");
         return;
     }
 
@@ -103,7 +103,7 @@ void MFDService::setResolved(uint ip1, uint ip2, uint ip3, uint ip4, uint port_h
     QString service_hostname = "";
     if(!host_information)
     {
-        parent->warning(QString("MFDService object could not call gethostbyaddr() using ip address %1 (will assume local)")
+        warning(QString("could not call gethostbyaddr() using ip address %1 (will assume local)")
                 .arg(ip_address_string));
     }
     else
@@ -301,10 +301,8 @@ extern "C" void BrowseCallback(mDNS *const m, DNSQuestion *question, const Resou
 
 
 ZeroConfigClient::ZeroConfigClient(MFD *owner, int identifier)
-                 :MFDServicePlugin(owner, identifier, -1, false)
+                 :MFDServicePlugin(owner, identifier, -1, "zeroconfig client", false)
 {
-    setName("zerconfig client");
-
 
     dns_questions.clear();
     dns_questions.setAutoDelete(true);
@@ -357,7 +355,7 @@ void ZeroConfigClient::handleServiceQueryCallback(mDNS *const m, ServiceInfoQuer
                 break;
 
             default:
-                warning(QString("zeroconfig client object got a non-IP4 protocol resolution response for: %1")
+                warning(QString("got a non-IP4 protocol resolution response for: %1")
                         .arg(nameC));
                 break;
 
@@ -365,7 +363,7 @@ void ZeroConfigClient::handleServiceQueryCallback(mDNS *const m, ServiceInfoQuer
     }
     else
     {
-        warning(QString("zeroconfig client object was told it could resove %1, but it didn't know it existed")
+        warning(QString("was told it could resove %1, but it didn't know it existed")
                 .arg(nameC));
     }
     
@@ -428,7 +426,7 @@ void ZeroConfigClient::handleBrowseCallback(mDNS *const m, DNSQuestion *question
             //  YAH, new service found
             //
 
-            log(QString("zeroconfig client found service called \"%1\" (%2%3)")
+            log(QString("found service called \"%1\" (%2%3)")
                        .arg(new_service->getName())
                        .arg(new_service->getType())
                     .arg(new_service->getDomain()),1);
@@ -452,7 +450,7 @@ void ZeroConfigClient::handleBrowseCallback(mDNS *const m, DNSQuestion *question
             mStatus status = mDNS_StartResolveService(m, service_info_query, service_info, ServiceQueryCallback, NULL);    
             if(status != mStatus_NoError )
             {
-                warning(QString("zeroconfig client object could not call a StartResolveService() for %1 (%2%3)")
+                warning(QString("could not call a StartResolveService() for %1 (%2%3)")
                         .arg(nameC)
                         .arg(typeC)
                         .arg(domainC));
@@ -604,7 +602,7 @@ void ZeroConfigClient::run()
             int result = select(nfds, &readfds, NULL, NULL, &timeout);
             if(result < 0)
             {
-                warning("zero config client got an error on select()");
+                warning("got an error on select()");
             }
 
             if(FD_ISSET(u_shaped_pipe[0], &readfds))
@@ -620,7 +618,7 @@ void ZeroConfigClient::run()
         }    
     }
 
-    log("zeroconfig client is leaving its event loop", 10);
+    log("leaving its event loop", 10);
 
     //
     //  We're done and exiting. Clean up a bit.
@@ -690,7 +688,7 @@ void ZeroConfigClient::removeService(const QString &name, const QString &type, c
            a_service->getDomain() == domain)
         {
             sendCoreMFDMessage(a_service->getFormalServiceRemoval());
-            log(QString("zeroconfig client lost service called %1 (%2%3)")
+            log(QString("lost service called %1 (%2%3)")
                        .arg(name)
                        .arg(type)
                        .arg(domain),1);
@@ -699,7 +697,7 @@ void ZeroConfigClient::removeService(const QString &name, const QString &type, c
             return;
         }
     }
-    warning(QString("zeroconfig client was asked to remove a service it didn't know existed: %1 (%2%3)")
+    warning(QString("asked to remove a service it didn't know existed: %1 (%2%3)")
             .arg(name)
             .arg(type)
             .arg(domain));
@@ -712,7 +710,7 @@ void ZeroConfigClient::addRequest(const QStringList &tokens, int socket_identifi
         things_to_do.append(sb);
         if(things_to_do.count() > 99)
         {
-            warning(QString("zeroconfig client object has more than %1 pending commands")
+            warning(QString("more than %1 pending commands")
                     .arg(things_to_do.count()));
         }
     things_to_do_mutex.unlock();
@@ -722,7 +720,7 @@ void ZeroConfigClient::doSomething(const QStringList &tokens, int socket_identif
 {
     if(tokens.count() < 2)
     {
-        warning(QString("zeroconfig client got passed insufficient tokens: %1")
+        warning(QString("got passed insufficient tokens: %1")
                 .arg(tokens.join(" ")));
         huh(tokens, socket_identifier);
         return;
@@ -741,14 +739,13 @@ void ZeroConfigClient::doSomething(const QStringList &tokens, int socket_identif
         }
         return;
     }
-    warning(QString("zeroconfig client got passed tokens is doesn't understand: %1")
+    warning(QString("got passed tokens is doesn't understand: %1")
                 .arg(tokens.join(" ")));
     huh(tokens, socket_identifier);
 }
 
 ZeroConfigClient::~ZeroConfigClient()
 {
-    log("zeroconfig client is being killed off", 10);
     dns_questions.clear();
     available_services.clear();
 }

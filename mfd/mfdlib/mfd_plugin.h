@@ -62,7 +62,7 @@ class MFDBasePlugin : public QThread
 
   public:
 
-    MFDBasePlugin(MFD* owner, int identifier);
+    MFDBasePlugin(MFD* owner, int identifier, const QString &a_name = "unkown");
     ~MFDBasePlugin();
 
     virtual void stop(); 
@@ -73,7 +73,6 @@ class MFDBasePlugin : public QThread
     virtual void sendMessage(const QString &message, int socket_identifier);
     virtual void sendMessage(const QString &message);
     virtual void huh(const QStringList &tokens, int socket_identifier);
-    void         setName(const QString &a_name);
     bool         keepGoing();
     
 
@@ -104,7 +103,7 @@ class MFDCapabilityPlugin : public MFDBasePlugin
   public:
 
 
-    MFDCapabilityPlugin(MFD* owner, int identifier);
+    MFDCapabilityPlugin(MFD* owner, int identifier, const QString &a_name = "unkown");
     ~MFDCapabilityPlugin();
 
     virtual void doSomething(const QStringList &tokens, int socket_identifier);
@@ -127,7 +126,14 @@ class MFDServicePlugin : public MFDBasePlugin
 {
   public:
   
-    MFDServicePlugin(MFD *owner, int identifier, int port, bool l_use_thread_pool = true, uint l_thread_pool_size = 5);
+    MFDServicePlugin(
+                        MFD *owner, 
+                        int identifier, 
+                        int port, 
+                        const QString &a_name = "unkown",
+                        bool l_use_thread_pool = true, 
+                        uint l_minimum_thread_pool_size = 0
+                    );
     ~MFDServicePlugin();
     
     virtual void    run();
@@ -181,7 +187,7 @@ class MFDServicePlugin : public MFDBasePlugin
     //  Insanely clever. A pipe from this object to this object. When
     //  nothing else is going on, the execution loop sits in select(). But
     //  one of the descriptors it pays attention to is the read side of this
-    //  u_shaped pipe. Any other thread can wake us up just by sitting a few
+    //  u_shaped pipe. Any other thread can wake us up just by sending a few
     //  arbitrary bytes into the write end (ie. calling wakeUp()).
     //
 
@@ -195,7 +201,15 @@ class MFDServicePlugin : public MFDBasePlugin
     vector<ServiceRequestThread *> thread_pool;
     QMutex                         thread_pool_mutex;
     uint                           thread_pool_size;
+    uint                           minimum_thread_pool_size;
     bool                           use_thread_pool;
+    
+    //
+    //  A time check to see how long it's been since we last used all our
+    //  threads. If "enough" time has gone by, we can lower the number.
+    //
+    
+    QTime thread_exhaustion_timestamp;
 };
 
 class MFDHttpPlugin : public MFDServicePlugin
@@ -203,7 +217,13 @@ class MFDHttpPlugin : public MFDServicePlugin
 
   public:
   
-    MFDHttpPlugin(MFD *owner, int identifier, int port);
+    MFDHttpPlugin(
+                    MFD *owner, 
+                    int identifier, 
+                    int port, 
+                    const QString &a_name = "unkown",
+                    int l_minimum_thread_pool_size = 0
+                 );
     ~MFDHttpPlugin();
 
     virtual void    processRequest(MFDServiceClientSocket *a_client);

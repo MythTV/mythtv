@@ -14,7 +14,7 @@
 #include "daapclient.h"
 
 DaapClient::DaapClient(MFD *owner, int identity)
-      :MFDServicePlugin(owner, identity, 3689)
+      :MFDServicePlugin(owner, identity, 3689, "daap client")
 {
     client_socket_to_mfd = NULL;
 }

@@ -28,15 +28,14 @@ const int   DAAP_OK = 200;
 
 
 DaapServer::DaapServer(MFD *owner, int identity)
-      :MFDHttpPlugin(owner, identity, 3689)
+      :MFDHttpPlugin(owner, identity, 3689, "daap server", 2)
 {
-    setName("daap server");
     metadata_containers = owner->getMetadataContainers();    
     QString local_hostname = "unknown";
     char my_hostname[2049];
     if(gethostname(my_hostname, 2048) < 0)
     {
-        warning("daapserver could not call gethostname()");
+        warning("could not call gethostname()");
         return;
     }
     else
@@ -139,7 +138,7 @@ void DaapServer::handleIncoming(HttpRequest *http_request, int client_id)
         if(daap_request->getDatabaseVersion() != parent->getMetadataAudioGeneration() &&
            daap_request->getDatabaseVersion() != 0)
         {
-            log(QString("daap client asked for a database request, "
+            log(QString(": a client asked for a database request, "
                         "but has stale db reference "
                         "(mfd db# = %1, client db# = %2)")
                         .arg(parent->getMetadataAudioGeneration())
@@ -164,7 +163,7 @@ void DaapServer::handleIncoming(HttpRequest *http_request, int client_id)
 
         if(daap_request->getDatabaseVersion() != parent->getMetadataAudioGeneration())
         {
-            log(QString("daap client asked for and will get an update "
+            log(QString(": a client asked for and will get an update "
                         "(mfd db# = %1, client db# = %2)")
                         .arg(parent->getMetadataAudioGeneration())
                         .arg(daap_request->getDatabaseVersion()), 9);
@@ -180,7 +179,7 @@ void DaapServer::handleIncoming(HttpRequest *http_request, int client_id)
             http_request->sendResponse(false);
             if(http_request->getHeader("Connection") == "close")
             {
-                warning("daapserver has a hanging /update request, but the client set Connection header to close??");
+                warning("got a hanging /update request, but the client set Connection header to close??");
             }
             else
             {
@@ -206,46 +205,46 @@ void DaapServer::parsePath(HttpRequest *http_request, DaapRequest *daap_request)
     if(the_path == "/server-info")
     {
         daap_request->setRequestType(DAAP_REQUEST_SERVINFO);
-        log("daap client asked for /server-info", 9);
+        log(": a client asked for /server-info", 9);
     }
     else if(the_path == "/content_codes")
     {
         daap_request->setRequestType(DAAP_REQUEST_CONTCODES);
-        log("daap client asked for /content-codes", 9);
+        log(": a client asked for /content-codes", 9);
     }
     else if(the_path == "/login")
     {
         daap_request->setRequestType(DAAP_REQUEST_LOGIN);
-        log("daap client asked for /login", 9);
+        log(": a client asked for /login", 9);
     }
     else if(the_path == "/logout")
     {
         daap_request->setRequestType(DAAP_REQUEST_LOGOUT);
-        log("daap client asked for /logout", 9);
+        log(": a client asked for /logout", 9);
     }
     else if(the_path.startsWith("/update"))
     {
         daap_request->setRequestType(DAAP_REQUEST_UPDATE);
-        log("daap client asked for /update", 9);
+        log(": a client asked for /update", 9);
     }
     else if(the_path.startsWith("/databases"))
     {
         daap_request->setRequestType(DAAP_REQUEST_DATABASES);
-        log(QString("daap client asked for /databases (%1)").arg(the_path), 9);
+        log(QString(": a client asked for /databases (%1)").arg(the_path), 9);
     }
     else if(the_path.startsWith("/resolve"))
     {
         daap_request->setRequestType(DAAP_REQUEST_RESOLVE);
-        log("daap client asked for /resolve", 9);
+        log(": a client asked for /resolve", 9);
     }
     else if(the_path.startsWith("/browse"))
     {
         daap_request->setRequestType(DAAP_REQUEST_BROWSE);
-        log("daap client asked for /browse", 9);
+        log(": a client asked for /browse", 9);
     }
     else
     {
-        warning(QString("daapserver does not understand the path of this request: %1")
+        warning(QString("does not understand the path of this request: %1")
               .arg(the_path));
               
         //
@@ -364,21 +363,21 @@ void DaapServer::parseVariables(HttpRequest *http_request, DaapRequest *daap_req
     {
         daap_request->setSessionId(variable.toULong(&ok));
         if(!ok)
-            warning("daapserver failed to parse session id from client request");
+            warning("failed to parse session id from client request");
     }
 
     if ( ( variable = http_request->getVariable("revision-number" ) ) != NULL)
     {
         daap_request->setDatabaseVersion(variable.toULong(&ok));
         if(!ok)
-            warning("daapserver failed to parse database version from client request");
+            warning("failed to parse database version from client request");
     }
 
     if ( ( variable = http_request->getVariable("delta" ) ) != NULL)
     {
         daap_request->setDatabaseDelta(variable.toULong(&ok));
         if(!ok)
-            warning("daapserver failed to parse database delta from client request");
+            warning("failed to parse database delta from client request");
     }
 
     if ( ( variable = http_request->getVariable("type" ) ) != NULL)
@@ -438,7 +437,7 @@ void DaapServer::sendMetadata(HttpRequest *http_request, QString request_path, D
     
     if(components.count() < 1)
     {
-        warning("daapserver got a client request that made no sense");
+        warning("got a client request that made no sense");
         return;
     }
     
@@ -557,7 +556,7 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
 { 
     if(which_database != 1)
     {
-        warning("daap server was asked about a database other than 1");
+        warning("asked about a database other than 1");
         return;
     }
 
@@ -805,7 +804,7 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
                             }
                             else
                             {
-                                warning("daapserver got a metadata item off an audio collection that is not of type AudioMetadata");
+                                warning("got a metadata item off an audio collection that is not of type AudioMetadata");
                             }
                         }
                     }
@@ -858,7 +857,7 @@ void DaapServer::sendDatabaseItem(HttpRequest *http_request, u32 song_id)
                 skip = range_string.toInt(&ok);
                 if(!ok)
                 {
-                    warning(QString("daapserver did not understand this Range request in an http request %1")
+                    warning(QString("did not understand this Range request in an http request %1")
                             .arg(http_request->getHeader("Range")));
                     skip = 0;
                 }
@@ -869,12 +868,12 @@ void DaapServer::sendDatabaseItem(HttpRequest *http_request, u32 song_id)
         }
         else
         {
-            warning("daapserver got a reference to a non audio bit of metadata");
+            warning("got a reference to a non audio bit of metadata");
         }
     }
     else
     {
-        warning("daapserver got a bad reference to a metadata item");
+        warning("got a bad reference to a metadata item");
     }
 
 }
@@ -883,7 +882,7 @@ void DaapServer::sendContainers(HttpRequest *http_request, DaapRequest *daap_req
 {
     if(which_database != 1)
     {
-        warning("daap server was asked about a database other than 1");
+        warning("asked about a database other than 1");
         return;
     }
 
@@ -969,7 +968,7 @@ void DaapServer::sendContainer(HttpRequest *http_request, u32 container_id, int 
 {
     if(which_database != 1)
     {
-        warning("daap server was asked about a database other than 1");
+        warning("asked about a database other than 1");
         return;
     }
 
@@ -987,7 +986,7 @@ void DaapServer::sendContainer(HttpRequest *http_request, u32 container_id, int 
         the_playlist = parent->getPlaylist(container_id);
         if(!the_playlist)
         {
-            warning("daapserver was asked for a playlist it can't find");
+            warning("asked for a playlist it can't find");
             return;
         }
         else

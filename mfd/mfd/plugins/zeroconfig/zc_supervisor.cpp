@@ -17,11 +17,10 @@
 ZeroConfigSupervisor::ZeroConfigSupervisor(MFD *owner, int identity, 
                                            ZeroConfigClient *a_client,
                                            ZeroConfigResponder *a_responder)
-      :MFDCapabilityPlugin(owner, identity)
+      :MFDCapabilityPlugin(owner, identity, "zeroconfig supervisor")
 {
     zero_config_client = a_client;
     zero_config_responder = a_responder;
-    log("a zeroconfig plugin is being created", 10);
     my_capabilities.append("services");
 }
 
@@ -42,7 +41,7 @@ void ZeroConfigSupervisor::doSomething(const QStringList &tokens, int socket_ide
 
     if(tokens.count() < 2)
     {
-        warning(QString("zeroconfig supervisor was passed a request without sufficient tokens: %1")
+        warning(QString("passed a request without sufficient tokens: %1")
                 .arg(tokens.join(" ")));
         huh(tokens, socket_identifier);
         return;
@@ -50,7 +49,7 @@ void ZeroConfigSupervisor::doSomething(const QStringList &tokens, int socket_ide
 
     if(tokens[0] != "services")
     {
-        warning(QString("zeroconfig supervisor was passed a set of tokens that did not begin with services: %1")
+        warning(QString("passed a set of tokens that did not begin with services: %1")
                 .arg(tokens.join(" ")));
         huh(tokens, socket_identifier);
         return;
@@ -70,7 +69,7 @@ void ZeroConfigSupervisor::doSomething(const QStringList &tokens, int socket_ide
         return;
     }
     
-    warning(QString("zeroconfig supervisor was passed a request it doesn't understand: %1")
+    warning(QString("passed a request it doesn't understand: %1")
             .arg(tokens.join(" ")));
     huh(tokens, socket_identifier);
 }
@@ -79,5 +78,4 @@ void ZeroConfigSupervisor::doSomething(const QStringList &tokens, int socket_ide
 
 ZeroConfigSupervisor::~ZeroConfigSupervisor()
 {
-    log("zeroconfig supervisor is being killed off", 10);
 }

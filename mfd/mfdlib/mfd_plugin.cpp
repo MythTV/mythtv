@@ -1,4 +1,4 @@
-    /*
+/*
 	mfd_plugin.cpp
 
 	(c) 2003 Thor Sigvaldason and Isaac Richards
@@ -19,21 +19,24 @@ using namespace std;
 #include "httpresponse.h"
 
 
-MFDBasePlugin::MFDBasePlugin(MFD *owner, int identifier)
+MFDBasePlugin::MFDBasePlugin(MFD *owner, int identifier, const QString &a_name)
 {
     parent = owner;
     unique_identifier = identifier;
     keep_going = true;
-    name = "unknown";
+    name = a_name;
 }
 
 
 void MFDBasePlugin::log(const QString &log_message, int verbosity)
 {
+    QString named_message = QString("%1 plugin %2")
+                            .arg(name)
+                            .arg(log_message);
     log_mutex.lock();
         if(parent)
         {
-            LoggingEvent *le = new LoggingEvent(log_message, verbosity);
+            LoggingEvent *le = new LoggingEvent(named_message, verbosity);
             QApplication::postEvent(parent, le);    
         }
     log_mutex.unlock();
@@ -42,8 +45,9 @@ void MFDBasePlugin::log(const QString &log_message, int verbosity)
 void MFDBasePlugin::warning(const QString &warning_message)
 {
     warning_mutex.lock();
-        QString warn_string = warning_message;
-        warn_string.prepend("WARNING: ");
+        QString warn_string = QString("WARNING: %1 plugin %2")
+                              .arg(name)
+                              .arg(warning_message);
         log(warn_string, 1);
     warning_mutex.unlock();
 }
@@ -107,11 +111,6 @@ void MFDBasePlugin::wakeUp()
     main_wait_mutex.unlock();
 }
 
-void MFDBasePlugin::setName(const QString &a_name)
-{
-    name = a_name;
-}
-
 bool MFDBasePlugin::keepGoing()
 {
     bool return_value;
@@ -130,8 +129,8 @@ MFDBasePlugin::~MFDBasePlugin()
 ---------------------------------------------------------------------
 */
 
-MFDCapabilityPlugin::MFDCapabilityPlugin(MFD* owner, int identifier)
-                    :MFDBasePlugin(owner, identifier)
+MFDCapabilityPlugin::MFDCapabilityPlugin(MFD* owner, int identifier, const QString &a_name)
+                    :MFDBasePlugin(owner, identifier, a_name)
 {
     things_to_do.clear();
     things_to_do.setAutoDelete(true);
@@ -165,7 +164,7 @@ void MFDCapabilityPlugin::parseTokens(const QStringList &tokens, int socket_iden
         things_to_do.append(sb);
         if(things_to_do.count() > 99)
         {
-            warning(QString("an mfdplugin with unique identifier of %1 has more than %2 pending commands")
+            warning(QString("with unique identifier of %1 has more than %2 pending commands")
                     .arg(unique_identifier)
                     .arg(things_to_do.count()));
         }
@@ -219,18 +218,31 @@ MFDCapabilityPlugin::~MFDCapabilityPlugin()
 ---------------------------------------------------------------------
 */
 
-MFDServicePlugin::MFDServicePlugin(MFD *owner, int identifier, int port, bool l_use_thread_pool, uint l_thread_pool_size)
-                 :MFDBasePlugin(owner, identifier)
+MFDServicePlugin::MFDServicePlugin(
+                                    MFD *owner,
+                                    int identifier, 
+                                    int port, 
+                                    const QString &a_name,
+                                    bool l_use_thread_pool, 
+                                    uint l_minimum_thread_pool_size
+                                  )
+                 :MFDBasePlugin(owner, identifier, a_name)
 {
+    if(l_minimum_thread_pool_size > 20)
+    {
+        warning("was asked to create a crazy number of minimum threads, reducing to 20");
+        l_minimum_thread_pool_size = 20;
+    }
     use_thread_pool = l_use_thread_pool;
-    thread_pool_size = l_thread_pool_size;
+    thread_pool_size = l_minimum_thread_pool_size;
+    minimum_thread_pool_size = l_minimum_thread_pool_size;
     client_socket_identifier = 0;
     port_number = port;
     core_server_socket = NULL;
     client_sockets.setAutoDelete(true);
     if(pipe(u_shaped_pipe) < 0)
     {
-        warning("mfd service plugin could not create a u shaped pipe");
+        warning("could not create a u shaped pipe");
     }
     
     //
@@ -255,16 +267,18 @@ MFDServicePlugin::MFDServicePlugin(MFD *owner, int identifier, int port, bool l_
         }
     }
 
-
+    //
+    //  Set our thread pool exhaustion timestamp
+    //
     
+    thread_exhaustion_timestamp.start();
 }
 
 void MFDServicePlugin::run()
 {
     if(!initServerSocket())
     {
-        warning(QString("%1 plugin could not init its server socker on port %2")
-                .arg(name)
+        warning(QString("could not init server socker on port %1")
                 .arg(port_number));
     }
 
@@ -348,8 +362,7 @@ void MFDServicePlugin::findNewClients()
                 client_sockets.append(new_client);
             client_sockets_mutex.unlock();
 
-            log(QString("%1 plugin has new client (total now %2)")
-                .arg(name)
+            log(QString("has new client (total now %1)")
                 .arg(client_sockets.count()), 3);
             
         }
@@ -394,8 +407,7 @@ void MFDServicePlugin::dropDeadClients()
 
                     client_sockets.remove(a_client);
 
-                    log(QString("%1 plugin lost a client (total now %2)")
-                        .arg(name)
+                    log(QString("lost a client (total now %1)")
                         .arg(client_sockets.count()), 3);
                 }
             }
@@ -407,10 +419,10 @@ void MFDServicePlugin::readClients()
 {
     if(!use_thread_pool)
     {
-        warning(QString("%1 plugin is calling readClients(), but it asked that there be no thread pool")
-                .arg(name));
+        warning("is calling readClients(), but it asked that there be no thread pool");
         return;
     }
+
     //
     //  Find anything with pending data and launch a thread to deal with the
     //  incoming request/command
@@ -437,14 +449,42 @@ void MFDServicePlugin::readClients()
                         {
                             srt = thread_pool.back();
                             thread_pool.pop_back();
+                            if(thread_pool.empty())
+                            {
+                                thread_exhaustion_timestamp.restart();
+                            }
+                        }
+                        else
+                        {
+                            thread_exhaustion_timestamp.restart();
                         }
                     thread_pool_mutex.unlock();
 
                     if (!srt)
                     {
-                        warning(QString("%1 plugin is waiting for free threads ... increase its pool size?")
-                                .arg(name));
-                        usleep(50);
+                        if(thread_pool_size < 100) //  100 is totally arbitrary upper limit FIX?
+                        {
+                            //
+                            //  Make the thread pool bigger by one, as we clearly need an additional thread
+                            //
+                        
+                        
+                            ServiceRequestThread *new_srt = new ServiceRequestThread(this);
+                            new_srt->start();
+                            thread_pool_mutex.lock();
+                                thread_pool.push_back(new_srt);
+                            thread_pool_mutex.unlock();
+                            ++thread_pool_size;
+                            log(QString("added another request thread on demand (there are now %1 of them)")
+                                .arg(thread_pool_size), 2);
+                        
+                        }
+                        else
+                        {
+                            warning(QString("waiting for free threads: thread pool size is already at %1")
+                                    .arg(thread_pool_size));
+                            usleep(50);
+                        }
                     }
                 }
 
@@ -475,13 +515,11 @@ void MFDServicePlugin::sendMessage(const QString &message, int socket_identifier
                 a_client->unlockWriteMutex();
                 if(length < 0)
                 {
-                    warning(QString("%1 plugin client socket could not accept data")
-                            .arg(name));
+                    warning("client socket could not accept data");
                 }
                 else if(length != (int) newlined_message.length())
                 {
-                    warning(QString("%1 plugin client socket did not consume correct amount of data")
-                            .arg(name));
+                    warning("client socket did not consume correct amount of data");
                 }
                 break;
             }
@@ -490,8 +528,7 @@ void MFDServicePlugin::sendMessage(const QString &message, int socket_identifier
 
     if(!message_sent)
     {
-        log(QString("%1 plugin wanted to send a message, but the client socket in question went away")
-            .arg(name), 8);
+        log("wanted to send a message, but the client socket in question went away", 7);
     }
 }
 
@@ -512,13 +549,11 @@ void MFDServicePlugin::sendMessage(const QString &message)
             a_client->unlockWriteMutex();
             if(length < 0)
             {
-                warning(QString("%1 plugin client socket could not accept data")
-                        .arg(name));
+                warning("client socket could not accept data");
             }
             else if(length != (int) newlined_message.length())
             {
-                warning(QString("%1 plugin client socket did not consume correct amount of data")
-                        .arg(name));
+                warning("client socket did not consume correct amount of data");
             }
         }
     client_sockets_mutex.unlock();
@@ -548,6 +583,41 @@ void MFDServicePlugin::wakeUp()
 
 void MFDServicePlugin::waitForSomethingToHappen()
 {
+    //
+    //  If we're using threads and it's been a "long time" since our thread
+    //  pool was exhausted, drop the number of threads to conserve resources
+    //  (reduse, reuse, recycle!!!)
+    //
+
+    if(use_thread_pool)
+    {
+        //
+        //  If we've gone 15 minutes without exhausting the pool, rip one out
+        //
+        //  Why 15 minutes? Why not? This is like setting a screen saver ... 
+        //
+
+        if( (thread_exhaustion_timestamp.elapsed() / 1000) > 15 * 60 &&
+            thread_pool_size > minimum_thread_pool_size)
+        {
+            thread_exhaustion_timestamp.restart();
+            thread_pool_mutex.lock();
+                if(!thread_pool.empty())
+                {
+                    ServiceRequestThread *srt = thread_pool.back();
+                    thread_pool.pop_back();
+                    --thread_pool_size;
+                    srt->killMe();
+                    srt->wait();
+                    delete srt;
+                    srt = NULL;
+                    log(QString("thread pool reduced by one due to lack of demand (size is now %1)")
+                        .arg(thread_pool_size), 2);
+                }
+            thread_pool_mutex.unlock();
+        }
+    }
+
     int nfds = 0;
     fd_set readfds;
 
@@ -607,8 +677,7 @@ void MFDServicePlugin::waitForSomethingToHappen()
     int result = select(nfds, &readfds, NULL, NULL, &timeout);
     if(result < 0)
     {
-        warning(QString("%1 plugin file descriptors watcher got an error on select()")
-                .arg(name));
+        warning("file descriptors watcher got an error on select()");
     }
     
     //
@@ -653,8 +722,7 @@ void MFDServicePlugin::processRequest(MFDServiceClientSocket *a_client)
 
     if(!a_client)
     {
-        warning(QString("%1 plugin tried to run a processRequest() on a client that does not exist")
-                .arg(name));
+        warning("tried to run a processRequest() on a client that does not exist");
         return;
     }
 
@@ -677,8 +745,7 @@ void MFDServicePlugin::processRequest(MFDServiceClientSocket *a_client)
         if(length >= MAX_CLIENT_INCOMING)
         {
             // oh crap
-            warning(QString("%1 plugin client socket is getting too much data")
-                    .arg(name));
+            warning("client socket is getting too much data");
             length = MAX_CLIENT_INCOMING;
         }
     
@@ -703,8 +770,7 @@ void MFDServicePlugin::markUnused(ServiceRequestThread *which_one)
 
 void MFDServicePlugin::doSomething(const QStringList&, int)
 {
-    warning(QString("%1 plugin has not re-implemented doSomething()")
-            .arg(name));
+    warning("has not re-implemented doSomething()");
 }
 
 MFDServicePlugin::~MFDServicePlugin()
@@ -718,8 +784,7 @@ MFDServicePlugin::~MFDServicePlugin()
         while(thread_pool.size() < thread_pool_size)
         {
             sleep(1);
-            warning(QString("%1 plugin is waiting for request threads to finish so it can exit")
-                    .arg(name));
+            warning("waiting for request threads to finish so it can exit");
         }
 
         for(uint i = 0; i < thread_pool_size; i++)
@@ -792,8 +857,14 @@ MFDServicePlugin::~MFDServicePlugin()
 //  Yes, it is an entire friggin' http server
 //
 
-MFDHttpPlugin::MFDHttpPlugin(MFD *owner, int identifier, int port)
-                 :MFDServicePlugin(owner, identifier, port)
+MFDHttpPlugin::MFDHttpPlugin(
+                                MFD *owner, 
+                                int identifier, 
+                                int port, 
+                                const QString &a_name,
+                                int l_minimum_thread_pool_size
+                            )
+                 :MFDServicePlugin(owner, identifier, port, a_name, l_minimum_thread_pool_size)
 {
 }
 
@@ -803,8 +874,7 @@ void MFDHttpPlugin::processRequest(MFDServiceClientSocket *a_client)
 
     if(!a_client)
     {
-        warning(QString("%1 httpd plugin tried to run a processRequest() on a client that does not exist")
-                .arg(name));
+        warning("%1 (httpd) tried to run a processRequest() on a client that does not exist");
         return;
     }
 
@@ -828,8 +898,7 @@ void MFDHttpPlugin::processRequest(MFDServiceClientSocket *a_client)
         if(length >= MAX_CLIENT_INCOMING)
         {
             // oh crap
-            warning(QString("%1 plugin client http socket is getting too much data")
-                    .arg(name));
+            warning("client http socket is getting too much data");
             length = MAX_CLIENT_INCOMING;
         }
 
@@ -854,8 +923,7 @@ void MFDHttpPlugin::processRequest(MFDServiceClientSocket *a_client)
 
 void MFDHttpPlugin::handleIncoming(HttpRequest *, int)
 {
-    warning(QString("%1 plugin called base class handleRequest()")
-            .arg(name));
+    warning("(httpd) called base class handleRequest()");
 }
 
 void MFDHttpPlugin::sendResponse(int client_id, HttpResponse *http_response)
@@ -878,8 +946,7 @@ void MFDHttpPlugin::sendResponse(int client_id, HttpResponse *http_response)
 
     if(!which_client)
     {
-        log(QString("%1 plugin wanted to send an http response, but the client socket in question went away")
-            .arg(name), 8);
+        log("wanted to send an http response, but the client socket in question went away", 7);
     }
     a_client->lockWriteMutex();
         

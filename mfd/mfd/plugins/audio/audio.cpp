@@ -16,9 +16,8 @@
 #include "audiooutput.h"
 
 AudioPlugin::AudioPlugin(MFD *owner, int identity)
-      :MFDServicePlugin(owner, identity, 2343)
+      :MFDServicePlugin(owner, identity, 2343, "audio")
 {
-    setName("audio");
     input = NULL;
     output = NULL;
     decoder = NULL;
@@ -62,7 +61,7 @@ void AudioPlugin::run()
 
     if(gethostname(my_hostname, 2048) < 0)
     {
-        warning("audio plugin could not call gethostname()");
+        warning("could not call gethostname()");
        
     }
     else
@@ -176,7 +175,7 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
 
     if(!ok)
     {
-        warning(QString("audio plugin did not understand these tokens: %1").arg(tokens.join(" ")));
+        warning(QString("did not understand these tokens: %1").arg(tokens.join(" ")));
         huh(tokens, socket_identifier);
     }
 }
@@ -192,7 +191,7 @@ bool AudioPlugin::playAudio(QUrl url)
     
     if(!url.isValid())
     {
-        warning("audio was passed an invalid url");
+        warning(QString("passed an invalid url: %1").arg(url.toString()));
         return false;
     }
     if ( url.isLocalFile())
@@ -201,7 +200,7 @@ bool AudioPlugin::playAudio(QUrl url)
         QFileInfo fi( path );
         if ( ! fi.exists() && fi.extension() != "cda") 
         {
-            warning(QString("audio was passed url to a file that does not exist: %1")
+            warning(QString("passed url to a file that does not exist: %1")
                     .arg(path));
             return false;
         }
@@ -231,7 +230,7 @@ bool AudioPlugin::playAudio(QUrl url)
             output->setBufferSize(output_buffer_size * 1024);
             if(!output->initialize())
             {
-                warning("audio could not initialize an output object");
+                warning("could not initialize an output object");
                 delete output;
                 output = NULL;
                 state_of_play_mutex->unlock();
@@ -269,7 +268,7 @@ bool AudioPlugin::playAudio(QUrl url)
                 decoder = Decoder::create(file_path, input, output);
                 if(!decoder)
                 {
-                    warning(QString("audio passed unsupported file in unsupported format: %1")
+                    warning(QString("passed unsupported file in unsupported format: %1")
                             .arg(file_path));
                     delete output;
                     output = NULL;

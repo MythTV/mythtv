@@ -17,9 +17,8 @@ using namespace std;
 #include "../mfdlib/mfd_events.h"
 
 MetadataServer::MetadataServer(MFD* owner, int port)
-               :MFDServicePlugin(owner, -1, port)
+               :MFDServicePlugin(owner, -1, port, "metadata server")
 {
-    setName("metadata server");
 };
 
 void MetadataServer::run()
@@ -34,7 +33,7 @@ void MetadataServer::run()
 
     if(gethostname(my_hostname, 2048) < 0)
     {
-        warning("metadata server could not call gethostname()");
+        warning("could not call gethostname()");
     }
     else
     {
@@ -85,7 +84,7 @@ void MetadataServer::doSomething(const QStringList &tokens, int socket_identifie
 
     if(!ok)
     {
-        warning(QString("metadata server did not understand these tokens: %1").arg(tokens.join(" ")));
+        warning(QString("did not understand these tokens: %1").arg(tokens.join(" ")));
         huh(tokens, socket_identifier);
     }
 }
