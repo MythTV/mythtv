@@ -28,7 +28,7 @@ privileges to it then MythTV will fail when you attempt to make a recording.
 The following example is specific for <CODE>/var/video</CODE>, but the same
 instructions would apply if you want to keep the default but don't have the
 directory structure setup yet.  See the 
-<A HREF="mythtv-HOWTO-19.html#advancedpartitionformatting">Advanced Partition Formatting</A> section for hints on creating a
+<A HREF="mythtv-HOWTO-21.html#advancedpartitionformatting">Advanced Partition Formatting</A> section for hints on creating a
 partition for MythTV.</P>
 <P>If you create a <CODE>/var/video</CODE> subdirectory, change
 <CODE>/mnt/store/</CODE> to <CODE>/var/video/</CODE> in the setup screens.
@@ -53,7 +53,7 @@ space on the master because the tuner on the master will always be the first
 choice. You will then want to add your 
 <A HREF="#nonmaster_backend">other backends</A> in the order of your preference for recording.</P>
 <P>See 
-<A HREF="mythtv-HOWTO-19.html#advanced_backend_config">Advanced Backend Configurations</A> for information on configuring multiple backend systems in
+<A HREF="mythtv-HOWTO-21.html#advanced_backend_config">Advanced Backend Configurations</A> for information on configuring multiple backend systems in
 various ways.</P>
 <P>Because MythTV now uses a database to store most configuration variables,
 part of the bootstrap of MythTV is to indicate the location of the MySQL
@@ -216,6 +216,8 @@ Valid options are:
 -p or --pidfile filename       Write PID of mythbackend to filename
 -d or --daemon                 Runs mythbackend as a daemon
 -v or --verbose                Prints more information
+--printexpire                  List of auto-expire programs
+--printsched                   Upcoming scheduled programs
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -223,7 +225,7 @@ Valid options are:
 to have mythbackend automatically start up during the boot process.  For
 example, you may add this to your <CODE>rc.local</CODE> file, or you can follow
 the steps outlined in the section called 
-<A HREF="mythtv-HOWTO-19.html#mythbackend_autostart">I'd like to automatically start mythbackend at system boot time</A>.</P>
+<A HREF="mythtv-HOWTO-21.html#mythbackend_autostart">I'd like to automatically start mythbackend at system boot time</A>.</P>
 
 <H2><A NAME="nonmaster_backend"></A> <A NAME="ss9.3">9.3</A> <A HREF="mythtv-HOWTO.html#toc9.3">Configuring a non-master backend. </A>
 </H2>

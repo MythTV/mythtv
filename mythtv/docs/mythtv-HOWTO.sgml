@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-08-19, v2.58
+<date>2003-08-19, v2.59
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -30,6 +30,7 @@ accessible either through the <url
 url="http://cvs.mythtv.org/cgi-bin/viewcvs.cgi/" name="ViewCVS"> web
 interface, or directly from the CVS repository.  You may download the latest
 copy of MythTV and the documentation from CVS this way:
+<label id="cvs">
 <tscreen><verb>
 $ mkdir mythtv
 $ cd mythtv
@@ -58,7 +59,7 @@ Searchable archives for the lists are available at <url
 url="http://www.gossamer-threads.com/archive/MythTV_C2/"
 name="http://www.gossamer-threads.com/archive/MythTV_C2/">.
 
-This HOWTO is for MythTV v0.10.
+This HOWTO is for MythTV v0.11.
 
 <sect>Introduction.
 <p>This HOWTO document will focus on manually building MythTV in a North
@@ -219,7 +220,7 @@ encoding. Using either a G200 MJPEG encoder card, or a WinTV-PVR-250 or 350
 from Hauppauge and the driver from the IvyTV project <url
 url="http://ivtv.sourceforge.net/" name="http://ivtv.sourceforge.net/"> will
 allow you to use dedicated hardware encoders rather than your CPU. Release
-0.10 of MythTV is able to use the PVR-250/350 cards as an input device for
+0.11 of MythTV is able to use the PVR-250/350 cards as an input device for
 live TV and for scheduled recordings.  Using the onboard MPEG-2 encoder
 drastically reduces the CPU requirements for encoding.
 
@@ -859,15 +860,13 @@ Date::Manip at the XMLTV site fixing this and other XMLTV related bugs.
 
 <sect>Downloading and compiling.
 <p>Get MythTV from the <url url="http://www.mythtv.org" name="mythtv.org">
-web site.  Save the tarball to a directory you can find.
+web site.  Save the tarball to a directory you can find.  If you would like
+to run the CVS version of MythTV, follow the instructions located in the
+<ref id="cvs" name="first section">.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
-name="http://xmltv.sourceforge.net">.  Download version 0.5.14 if you're in
+name="http://xmltv.sourceforge.net">.  Download version 0.5.16 if you're in
 North America.
-
-<bf>NOTE</bf>:  0.5.14 is the last version that will work with MythTV 0.10. 
-XMLTV 0.5.15 will only work with CVS versions of MythTV.  Don't install the
-latest version of XMLTV if you're not running CVS.
 
 <code>
 NOTE for Mandrake users:  If you have added a "PLF" mirror, you may skip the
@@ -986,8 +985,8 @@ Continuing on:
 
 <label id="untarring_xmltv">Untar the xmltv file:
 <tscreen><verb>
-$ tar -xjf xmltv-0.5.15.tar.bz2
-$ cd xmltv-0.5.15
+$ tar -xjf xmltv-0.5.16.tar.bz2
+$ cd xmltv-0.5.16
 </verb></tscreen>
 Install the xmltv prerequisites:
 
@@ -1004,7 +1003,7 @@ cpan> exit
 
 Change to the XMLTV directory and compile it:
 <tscreen><verb>
-$ cd xmltv-0.5.15
+$ cd xmltv-0.5.16
 $ perl Makefile.PL
 </verb></tscreen>
 You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
@@ -2098,6 +2097,8 @@ Valid options are:
 -p or --pidfile filename       Write PID of mythbackend to filename
 -d or --daemon                 Runs mythbackend as a daemon
 -v or --verbose                Prints more information
+--printexpire                  List of auto-expire programs
+--printsched                   Upcoming scheduled programs
 </verb></tscreen>
 
 Running mythbackend as a daemon and using the logfile option will allow you
@@ -2406,6 +2407,9 @@ address]/mythweb/</bf>
 
 <bf>NOTE</bf>: Make sure that you have a trailing slash on the URL,
 otherwise you will get a <tt>404 Page not Found</tt> error.
+
+<sect>MythWeb2.
+<p>
 
 <sect>MythGallery.
 <p>MythGallery is a photo and slideshow application.  MythGallery is a
@@ -2882,6 +2886,9 @@ $ mysql -u mythtv -p < metadata.sql
 </verb></tscreen>
 
 See MythVideo's <tt>README</tt> file for additional information.
+
+<sect>MythDVD.
+<p>
 
 <sect>Troubleshooting.
 <sect1>Illegal Instruction.
@@ -3638,7 +3645,10 @@ mysql> delete from program where chanid = '1015';
 NOT GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR IVTV DRIVER ASSISTANCE,
 SEE THE IVTV MAILING LIST.  <url
 url="https://lists.sourceforge.net/lists/listinfo/ivtv-devel"
-name="https://lists.sourceforge.net/lists/listinfo/ivtv-devel">
+name="https://lists.sourceforge.net/lists/listinfo/ivtv-devel">  SEE THE
+IVTV FAQ IF YOU HAVE QUESTIONS OR ISSUES.  <url
+url="http://ivtv.sourceforge.net/FAQ.html"
+name="http://ivtv.sourceforge.net/FAQ.html">
 
 These instructions work for Mandrake 9.1 on a backend machine which is
 hosting a single PVR-250 capture card.
@@ -4110,6 +4120,11 @@ Add the new physical volume to the volume group:
 
 <tt># vgextend VGforMyth /dev/hdb1</tt>
 
+<bf>NOTE</bf>:  You may get errors at this point stating that there are no
+physical volumes available for adding to the LV, even though you know for a
+fact that there are.  You may need to specify the physical volume in the 
+<tt>/dev/ide/host/bus/target/lun/etc</tt> format.
+
 Once you've completed one of the following two procedures, use <bf>df</bf>
 to check that you've got more space.
 
@@ -4264,7 +4279,11 @@ remote option to lirc section.
 v2.56, 2003-08-03.  version 2^8.  ATI All-in-Wonder doesn't work as a capture
 device, so quit asking.  Don't use a FAT filesystem and expect things to
 magically work when creating a 2GB file.
-v2.58, 2003-08-19.  Gentoo updates from Max Kalika <max@gentoo.org>.
+v2.57, 2003-08-18.  Add link back to CVS instructions from "Downloading and
+compiling".  Added additional examples to mythbackend -help
+v2.58/2.59, 2003-08-19.  Version bump.  Added example if LVM needs new method of
+adding partitions. Gentoo updates from Max Kalika max@gentoo.org.  XMLTV
+version update.  Add MythDVD section.  Add MythWeb2 section.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

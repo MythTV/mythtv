@@ -16,13 +16,12 @@
 
 <P>Get MythTV from the 
 <A HREF="http://www.mythtv.org">mythtv.org</A>
-web site.  Save the tarball to a directory you can find.</P>
+web site.  Save the tarball to a directory you can find.  If you would like
+to run the CVS version of MythTV, follow the instructions located in the
+<A HREF="mythtv-HOWTO-1.html#cvs">first section</A>.</P>
 <P>Get XMLTV from 
-<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download version 0.5.14 if you're in
+<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download version 0.5.16 if you're in
 North America.</P>
-<P><B>NOTE</B>:  0.5.14 is the last version that will work with MythTV 0.10. 
-XMLTV 0.5.15 will only work with CVS versions of MythTV.  Don't install the
-latest version of XMLTV if you're not running CVS.</P>
 <P>
 <HR>
 <PRE>
@@ -166,8 +165,8 @@ $
 <A NAME="untarring_xmltv"></A> Untar the xmltv file:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf xmltv-0.5.15.tar.bz2
-$ cd xmltv-0.5.15
+$ tar -xjf xmltv-0.5.16.tar.bz2
+$ cd xmltv-0.5.16
 </PRE>
 </CODE></BLOCKQUOTE>
 
@@ -189,7 +188,7 @@ cpan> exit
 <P>Change to the XMLTV directory and compile it:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd xmltv-0.5.15
+$ cd xmltv-0.5.16
 $ perl Makefile.PL
 </PRE>
 </CODE></BLOCKQUOTE>
