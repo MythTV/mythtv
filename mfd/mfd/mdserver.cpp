@@ -23,6 +23,9 @@ MetadataServer::MetadataServer(MFD* owner, int port)
                :MFDServicePlugin(owner, -1, port, "metadata server")
 {
     metadata_containers = new QPtrList<MetadataContainer>;
+    metadata_containers->setAutoDelete(true);
+    local_audio_metadata_containers = new QPtrList<MetadataContainer>;
+    local_audio_metadata_containers->setAutoDelete(false);
     metadata_audio_generation = 4;  //  don't ask
     container_identifier = 0;
 }
@@ -114,7 +117,16 @@ uint MetadataServer::getMetadataAudioGeneration()
     return return_value;
 }
 
-uint MetadataServer::getAllAudioMetadataCount()
+uint MetadataServer::getMetadataContainerCount()
+{
+    uint return_value = 0;
+    lockMetadata();
+        return_value = metadata_containers->count();
+    unlockMetadata();
+    return return_value;
+}
+
+uint MetadataServer::getAllLocalAudioMetadataCount()
 {
     //
     //  Iterate over all Audio collections and count the items
@@ -127,22 +139,19 @@ uint MetadataServer::getAllAudioMetadataCount()
         return_value = 0;
         MetadataContainer * a_container;
         for (
-                a_container = metadata_containers->first(); 
+                a_container = local_audio_metadata_containers->first(); 
                 a_container; 
-                a_container = metadata_containers->next()
+                a_container = local_audio_metadata_containers->next()
             )
         {
-            if(a_container->isAudio())
-            {
-                return_value += a_container->getMetadataCount();
-            }
+            return_value += a_container->getMetadataCount();
         }
     
     unlockMetadata();
     return return_value;
 }
 
-uint MetadataServer::getAllAudioPlaylistCount()
+uint MetadataServer::getAllLocalAudioPlaylistCount()
 {
     //
     //  Iterate over all Audio collections and count the playlists
@@ -155,15 +164,12 @@ uint MetadataServer::getAllAudioPlaylistCount()
         return_value = 0;
         MetadataContainer * a_container;
         for (
-                a_container = metadata_containers->first(); 
+                a_container = local_audio_metadata_containers->first(); 
                 a_container; 
-                a_container = metadata_containers->next()
+                a_container = local_audio_metadata_containers->next()
             )
         {
-            if(a_container->isAudio())
-            {
-                return_value += a_container->getPlaylistCount();
-            }
+            return_value += a_container->getPlaylistCount();
         }
     
     unlockPlaylists();
@@ -257,6 +263,25 @@ MetadataContainer* MetadataServer::createContainer(
     lockMetadata();
         return_value = new MetadataContainer(parent, bumpContainerId(), content_type, location_type);
         metadata_containers->append(return_value);
+        
+        //
+        //  The metadata_containers pointer list (above) owns this object,
+        //  and will delete them if told to or when it exits. The following
+        //  container(s) are just shortcuts that make it easier to find
+        //  stuff.
+        //
+        
+        //
+        //  NB: at some point, we will add mutex's around these ptr list
+        //  containers, so, for example, video metadata can get accessed
+        //  independently of audio metadata ...
+        //
+
+        if(content_type == MCCT_audio && location_type == MCLT_host)
+        {
+            local_audio_metadata_containers->append(return_value);
+        }
+        
     unlockMetadata();
     
     return return_value;
@@ -285,10 +310,10 @@ void MetadataServer::doAtomicDataSwap(
                                      )
 {
     //
-    //  Lock the metadata, find the right container, and swap out its data.
+    //  Lock the metadata, find the right container, and swap out its data. 
     //  The idea is that a plugin can take as long as it wants to build a
-    //  new metadata collection, but this call (which has the needed locks)
-    //  is fairly quick and all inside a mutex lock. Thus the name.
+    //  new metadata collection, but this call is fairly quick and all
+    //  inside a mutex lock. Thus the name.
     //
 
     lockMetadata();

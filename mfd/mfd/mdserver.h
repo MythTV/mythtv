@@ -42,10 +42,12 @@ class MetadataServer : public MFDServicePlugin
     void                         unlockPlaylists();
 
     QPtrList<MetadataContainer>* getMetadataContainers(){return metadata_containers;}
+    QPtrList<MetadataContainer>* getLocalAudioMetadataContainers(){return local_audio_metadata_containers;}
     MetadataContainer*           getMetadataContainer(int which_one);
     uint                         getMetadataAudioGeneration();
-    uint                         getAllAudioMetadataCount();
-    uint                         getAllAudioPlaylistCount();
+    uint                         getMetadataContainerCount();
+    uint                         getAllLocalAudioMetadataCount();
+    uint                         getAllLocalAudioPlaylistCount();
 
     Metadata*                    getMetadataByUniversalId(uint id);
     Playlist*                    getPlaylistByUniversalId(uint id);
@@ -86,6 +88,7 @@ class MetadataServer : public MFDServicePlugin
 
 
     QPtrList<MetadataContainer> *metadata_containers;
+    QPtrList<MetadataContainer> *local_audio_metadata_containers;
     QMutex                      metadata_mutex;
     QMutex                      playlists_mutex;
 

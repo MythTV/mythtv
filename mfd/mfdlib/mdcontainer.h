@@ -65,6 +65,8 @@ class MetadataContainer
     bool                isLocal();
     uint                getMetadataCount();
     uint                getPlaylistCount();
+    void                setName(const QString &a_name){my_name = a_name;}
+    QString             getName(){return my_name;}
 
     Metadata*           getMetadata(int item_id);
     QIntDict<Metadata>* getMetadata(){return current_metadata;}
@@ -99,6 +101,8 @@ class MetadataContainer
     QIntDict<Playlist>   *current_playlists;
     QDeepCopy< QValueList<int> >      playlist_additions;
     QDeepCopy< QValueList<int> >      playlist_deletions;
+    
+    QString my_name;
 };
 
 #endif
