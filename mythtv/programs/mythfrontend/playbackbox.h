@@ -57,6 +57,7 @@ class PlaybackBox : public MythDialog
     void showRecordingPopup();
     void showJobPopup();
     void showStoragePopup();
+    void showPlaylistPopup();
 
     void doPlay();
     void doPlayFromBeg();
@@ -93,6 +94,13 @@ class PlaybackBox : public MythDialog
     void changeOldPasswordChanged(const QString &newText);
     void doBeginTranscoding();
     void doBeginFlagging();
+    void doClearPlaylist();
+    void doPlaylistDelete();
+    void doPlaylistChangeRecGroup();
+    void togglePlayListTitle(void);
+    void togglePlayListItem(void);
+    void playSelectedPlaylist(bool random);
+    void doPlayList(void);
   protected:
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
@@ -110,7 +118,6 @@ class PlaybackBox : public MythDialog
     void expire(ProgramInfo *);
     void showActions(ProgramInfo *);
 
-    void togglePlayListItem(void);
     void togglePlayListItem(ProgramInfo *pginfo);
     void randomizePlayList(void);
 
@@ -137,6 +144,7 @@ class PlaybackBox : public MythDialog
     int progIndex;
     QStringList titleList;
     QStringList playList;
+    bool onPlaylist;
     QMap<QString, ProgramList> progLists;
 
     ProgramInfo *findMatchingProg(ProgramInfo *);
