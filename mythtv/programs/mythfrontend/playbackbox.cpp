@@ -82,6 +82,10 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     curitem = NULL;
     delitem = NULL;
 
+    if (gContext->GetNumSetting("DisableArrowAccels", 0))
+        arrowAccel = false;
+    else
+        arrowAccel = true;
 
     groupnameAsAllProg = gContext->GetNumSetting("DispRecGroupAsAllProg", 0);
     listOrder = gContext->GetNumSetting("PlayBoxOrdering", 1);    
@@ -1011,7 +1015,7 @@ void PlaybackBox::cursorLeft()
         update(fullRect);
         leftRight = true;
     }
-    else
+    else if (arrowAccel)
         exitWin();
         
 }
@@ -1025,7 +1029,7 @@ void PlaybackBox::cursorRight()
         skipUpdate = false;
         update(fullRect);
     }
-    else
+    else if (arrowAccel)
         showActionsSelected();    
 }
 

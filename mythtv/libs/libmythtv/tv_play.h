@@ -199,6 +199,8 @@ class TV : public QObject
 
     int osd_display_time;
 
+    bool arrowAccel;
+
     bool channelqueued;
     char channelKeys[5];
     int channelkeysstored;

@@ -62,7 +62,10 @@ OSDListTreeType::OSDListTreeType(const QString &name, const QRect &area,
     m_levelsize = levelsize;
     m_levelspacing = levelspacing;
 
-    m_arrowAccel = true;
+    if (gContext->GetNumSetting("DisableArrowAccels", 0))
+        m_arrowAccel = false;
+    else
+        m_arrowAccel = true;
     
     levels = 0;
     curlevel = -1;

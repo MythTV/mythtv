@@ -264,6 +264,11 @@ void TV::Init(bool createWindow)
 
     keyRepeat = true;
 
+    if (gContext->GetNumSetting("DisableArrowAccels", 0))
+        arrowAccel = false;
+    else
+        arrowAccel = true;
+
     if (createWindow)
     {
         MythMainWindow *mainWindow = gContext->GetMainWindow();
@@ -1282,9 +1287,9 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else if (action == "DOWN")
                 osd->DialogDown(dialogname);
             else if (action == "SELECT" || action == "ESCAPE"||
-                     action == "LEFT" || action == "RIGHT")
+                     ((arrowAccel) && (action == "LEFT" || action == "RIGHT")))
             {
-                if (action == "ESCAPE" || action == "LEFT")
+                if (action == "ESCAPE" || (arrowAccel && action == "LEFT"))
                     osd->DialogAbort(dialogname);
                 osd->TurnDialogOff(dialogname);
                 if (dialogname == "alreadybeingedited")

@@ -854,7 +854,12 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, const char *name)
             : MythDialog(parent, name, false)
 {
     float wmult, hmult;
-    arrowAccel = true;
+
+    if (gContext->GetNumSetting("DisableArrowAccels", 0))
+        arrowAccel = false;
+    else
+        arrowAccel = true;
+
     gContext->GetScreenSettings(wmult, hmult);
 
     setLineWidth(3);
@@ -878,7 +883,12 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, bool graphicPopup,
             : MythDialog(parent, name, false)
 {
     float wmult, hmult;
-    arrowAccel = true;
+
+    if (gContext->GetNumSetting("DisableArrowAccels", 0))
+        arrowAccel = false;
+    else
+        arrowAccel = true;
+
     gContext->GetScreenSettings(wmult, hmult);
 
     setLineWidth(3);

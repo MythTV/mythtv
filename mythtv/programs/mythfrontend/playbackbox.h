@@ -131,6 +131,8 @@ class PlaybackBox : public MythDialog
 
     BoxType type;
 
+    bool arrowAccel;
+
     bool killPlayer(void);
     void killPlayerSafe(void);
     void startPlayer(ProgramInfo *rec);
