@@ -15,6 +15,7 @@
 #include <iostream>
 using namespace std;
 
+#include "mythcontext.h"
 #include "NuppelVideoRecorder.h"
 #include "commercial_skip.h"
 #include "../libvbitext/cc.h"
@@ -616,6 +617,7 @@ void NuppelVideoRecorder::StartRecording(void)
     }
 
     StreamAllocate();
+    positionMap.clear();
 
     if (codec.lower() == "rtjpeg")
         useavcodec = false;
@@ -1482,6 +1484,14 @@ void NuppelVideoRecorder::WriteSeekTable(bool todumpfile)
         ringBuffer->WriteToDumpFile(&currentpos, sizeof(long long));
     else
         ringBuffer->Write(&currentpos, sizeof(long long));
+
+    if (!todumpfile && curRecording && positionMap.size())
+    {
+        pthread_mutex_lock(db_lock);
+        MythContext::KickDatabase(db_conn);
+        curRecording->SetPositionMap(positionMap, MARK_KEYFRAME, db_conn);
+        pthread_mutex_unlock(db_lock);
+    }
 }
 
 int NuppelVideoRecorder::CreateNuppelFile(void)
@@ -1544,6 +1554,7 @@ void NuppelVideoRecorder::Reset(void)
     }
 
     seektable->clear();
+    positionMap.clear();
 }
 
 void *NuppelVideoRecorder::WriteThread(void *param)
@@ -2345,15 +2356,8 @@ long long NuppelVideoRecorder::GetKeyframePosition(long long desired)
 {
     long long ret = -1;
 
-    vector<struct seektable_entry>::iterator i = seektable->begin();
-    for (; i != seektable->end(); i++)
-    {
-        if ((*i).keyframe_number == desired)
-        {
-            ret = (*i).file_offset;
-            break;
-        }        
-    }
+    if (positionMap.find(desired) != positionMap.end())
+        ret = positionMap[desired];
 
     return ret;
 }
@@ -2711,6 +2715,7 @@ void NuppelVideoRecorder::WriteVideo(Frame *frame, bool skipsync, bool forcekey)
     int timecode = frame->timecode;
     unsigned char *buf = frame->buf;
     static long long prev_bframe_save_pos = -1;
+    static long long prev_keyframe_save_pos = -1;
 
     memset(&frameheader, 0, sizeof(frameheader));
 
@@ -2767,6 +2772,7 @@ void NuppelVideoRecorder::WriteVideo(Frame *frame, bool skipsync, bool forcekey)
         struct seektable_entry ste;
         ste.file_offset = position;
         ste.keyframe_number = ((fnum - startnum) >> 1) / keyframedist;
+        positionMap[ste.keyframe_number] = position;
 
         seektable->push_back(ste);
 
@@ -2787,6 +2793,18 @@ void NuppelVideoRecorder::WriteVideo(Frame *frame, bool skipsync, bool forcekey)
 
         wantkeyframe = true;
         sync();
+
+        if ((curRecording) &&
+            ((positionMap.size() % 15) == 0))
+        {
+            pthread_mutex_lock(db_lock);
+            MythContext::KickDatabase(db_conn);
+            curRecording->SetPositionMap(positionMap, MARK_KEYFRAME, db_conn,
+                       prev_keyframe_save_pos, (long long)ste.keyframe_number);
+            pthread_mutex_unlock(db_lock);
+
+            prev_keyframe_save_pos = ste.keyframe_number + 1;
+        }
     }
 
     if (videoFilters.size() > 0)
@@ -2939,11 +2957,12 @@ void NuppelVideoRecorder::WriteVideo(Frame *frame, bool skipsync, bool forcekey)
         {
             commDetect->GetBlankFrameMap(blank_frames);
 
-            if ((!livetv) &&
+            if ((curRecording) &&
                 ((blank_frames.size() % 15 ) == 0))
             {
                 pthread_mutex_lock(db_lock);
-                curRecording->ProgramInfo::SetBlankFrameList(blank_frames,
+                MythContext::KickDatabase(db_conn);
+                curRecording->SetBlankFrameList(blank_frames,
                     db_conn, prev_bframe_save_pos, (fnum-startnum)>>1 );
                 pthread_mutex_unlock(db_lock);
 

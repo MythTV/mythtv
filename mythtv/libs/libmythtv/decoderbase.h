@@ -37,6 +37,8 @@ class DecoderBase
     virtual void SetRawFrameState(bool state) = 0;
     virtual bool GetRawFrameState() = 0;
 
+    virtual void SetPositionMap() = 0;
+
   protected:
     NuppelVideoPlayer *m_parent;
     RingBuffer *ringBuffer;

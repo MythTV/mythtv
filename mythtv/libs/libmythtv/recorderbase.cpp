@@ -39,6 +39,12 @@ void RecorderBase::SetRingBuffer(RingBuffer *rbuf)
 
 void RecorderBase::SetRecording(ProgramInfo *pginfo)
 {
+    if (curRecording)
+    {
+        delete curRecording;
+        curRecording = NULL;
+    }
+
     if (pginfo)
     {
         curRecording = new ProgramInfo(*pginfo);

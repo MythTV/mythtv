@@ -15,9 +15,13 @@ using namespace std;
 
 extern pthread_mutex_t avcodeclock;
 
-NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent)
+NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
+                             ProgramInfo *pginfo)
              : DecoderBase(parent)
 {
+    m_db = db;
+    m_playbackinfo = pginfo;
+
     ffmpeg_extradata = NULL;
     ffmpeg_extradatasize = 0;
 
@@ -365,7 +369,32 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     if (haspositionmap)
         return 1;
- 
+
+    if (m_playbackinfo && m_db && positionMap)
+    {
+        m_playbackinfo->GetPositionMap(*positionMap, MARK_KEYFRAME, m_db);
+        if (positionMap->size())
+        {
+            cout << "Position map not found in file, retrieved from database\n";
+            haspositionmap = true;
+
+            QMap<long long, long long>::Iterator it;
+            long long max_keyframe = -1;
+            for (it = positionMap->begin(); it != positionMap->end(); ++it)
+                if (it.key() > max_keyframe)
+                    max_keyframe = it.key();
+
+            if (max_keyframe >= 0)
+            {
+                totalLength = (int)((max_keyframe * keyframedist * 1.0) /
+                                     video_frame_rate);
+                totalFrames = (long long)max_keyframe * keyframedist;
+                m_parent->SetFileLength(totalLength, totalFrames);
+            }
+            return 1;
+        }
+    }
+
     return 0;
 }
 
@@ -1193,5 +1222,11 @@ char *NuppelDecoder::GetScreenGrab(int secondsin)
         return NULL;
 
     return (char *)buf;
+}
+
+void NuppelDecoder::SetPositionMap(void)
+{
+    if (m_playbackinfo && m_db && positionMap)
+        m_playbackinfo->SetPositionMap(*positionMap, MARK_KEYFRAME, m_db);
 }
 

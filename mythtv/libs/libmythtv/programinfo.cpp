@@ -953,17 +953,36 @@ void ProgramInfo::GetPositionMap(QMap<long long, long long> &posMap, int type,
 }
 
 void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
-                                 QSqlDatabase *db)
+                                 QSqlDatabase *db, long long min_frame,
+                                 long long max_frame)
 {
     QMap<long long, long long>::Iterator i;
 
     QString starts = startts.toString("yyyyMMddhhmm");
     starts += "00";
 
+    QString min_comp = " ";
+    QString max_comp = " ";
+
+    if (min_frame >= 0)
+    {
+        char tempc[128];
+        sprintf(tempc, "AND mark >= %lld", min_frame);
+        min_comp += tempc;
+    }
+
+    if (max_frame >= 0)
+    {
+        char tempc[128];
+        sprintf(tempc, "AND mark <= %lld", max_frame);
+        max_comp += tempc;
+    }
+
     QString querystr = QString("DELETE FROM recordedmarkup "
                                "WHERE chanid = '%1' AND starttime = '%2' "
-                               "AND type = %3;")
-                               .arg(chanid).arg(starts).arg(type);
+                               "AND type = %3 %4 %5;")
+                               .arg(chanid).arg(starts).arg(type)
+                               .arg(min_comp).arg(max_comp);
     QSqlQuery query = db->exec(querystr);
     if (!query.isActive())
         MythContext::DBError("position map clear", querystr);
@@ -973,6 +992,12 @@ void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
         long long frame = i.key();
         char tempc[128];
         sprintf(tempc, "%lld", frame);
+
+        if ((min_frame >= 0) && (frame < min_frame))
+            continue;
+
+        if ((max_frame >= 0) && (frame > max_frame))
+            continue;
 
         QString frame_str = tempc;
 

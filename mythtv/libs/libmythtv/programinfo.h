@@ -88,7 +88,8 @@ class ProgramInfo
     void GetPositionMap(QMap<long long, long long> &posMap, int type,
                         QSqlDatabase *db);
     void SetPositionMap(QMap<long long, long long> &posMap, int type,
-                        QSqlDatabase *db);
+                        QSqlDatabase *db,
+                        long long min_frame = -1, long long max_frame = -1);
 
     static void GetProgramRangeDateTime(QPtrList<ProgramInfo> *proglist, 
                                         QString channel, 

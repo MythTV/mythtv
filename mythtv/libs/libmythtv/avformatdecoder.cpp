@@ -814,3 +814,9 @@ char *AvFormatDecoder::GetScreenGrab(int secondsin)
     return NULL;
 }
 
+void AvFormatDecoder::SetPositionMap(void)
+{
+    if (m_playbackinfo && m_db)
+        m_playbackinfo->SetPositionMap(positionMap, MARK_GOP_START, m_db);
+}
+

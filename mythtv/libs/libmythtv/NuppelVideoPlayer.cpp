@@ -492,7 +492,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
         delete decoder;
 
     if (NuppelDecoder::CanHandle(testbuf))
-        decoder = new NuppelDecoder(this);
+        decoder = new NuppelDecoder(this, m_db, m_playbackinfo);
     else if (AvFormatDecoder::CanHandle(testbuf, ringBuffer->GetFilename()))
         decoder = new AvFormatDecoder(this, m_db, m_playbackinfo);
 
@@ -2919,7 +2919,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
     {
         if (totalFrames)
             printf( "\b\b" );
-        printf( "\b\b\b\b      \b\b\b\b\b\b" );
+        printf( "\b\b\b\b        \b\b\b\b\b\b" );
     }
 
     if (commercialskipmethod & 0x01)
@@ -2948,6 +2948,10 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
     killplayer = true;
 
     db_lock.lock();
+
+    if (!haspositionmap)
+        decoder->SetPositionMap();
+
     m_playbackinfo->SetMarkupFlag(MARK_PROCESSING, false, m_db);
     db_lock.unlock();
 

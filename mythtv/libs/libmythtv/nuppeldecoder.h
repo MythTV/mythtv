@@ -4,6 +4,7 @@
 #include <qmap.h>
 #include <qptrlist.h>
 
+#include "programinfo.h"
 #include "decoderbase.h"
 #include "format.h"
 
@@ -37,7 +38,8 @@ class RawDataList
 class NuppelDecoder : public DecoderBase
 {
   public:
-    NuppelDecoder(NuppelVideoPlayer *parent);
+    NuppelDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
+                  ProgramInfo *pginfo);
    ~NuppelDecoder();
 
     void Reset(void);
@@ -56,6 +58,8 @@ class NuppelDecoder : public DecoderBase
     void WriteStoredData(RingBuffer *rb);
     void SetRawFrameState(bool state) { getrawframes = state; }
     bool GetRawFrameState(void) { return getrawframes; }
+
+    void SetPositionMap(void);
 
   private:
     bool DecodeFrame(struct rtframeheader *frameheader,
@@ -114,6 +118,9 @@ class NuppelDecoder : public DecoderBase
 
     long long lastKey;
     long long framesPlayed;
+
+    QSqlDatabase *m_db;
+    ProgramInfo *m_playbackinfo;
 
     QPtrList <RawDataList> StoredData;
     bool getrawframes;

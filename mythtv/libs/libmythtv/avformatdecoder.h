@@ -38,6 +38,8 @@ class AvFormatDecoder : public DecoderBase
     void SetRawFrameState(bool state) { (void)state; }
     bool GetRawFrameState(void) { return false; }
 
+    void SetPositionMap(void);
+
   protected:
     RingBuffer *getRingBuf(void) { return ringBuffer; }
 

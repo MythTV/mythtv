@@ -381,6 +381,7 @@ void TVRec::HandleStateChange(void)
             nvr->GetBlankFrameMap(blank_frame_map);
 
         nvr->TransitionToRing();
+        nvr->SetRecording(NULL);
 
         nvr->Unpause();
 
@@ -1797,6 +1798,19 @@ void TVRec::GetNextProgram(int direction,
             channelname = sqlquery.value(8).toString();
             chanid = sqlquery.value(9).toString();
         }
+    }
+    else
+    {
+        QDateTime curtime = QDateTime::currentDateTime();
+        starttime = curtime.toString("yyyyMMddhhmm") + "00";
+
+        querystr = QString("SELECT channum FROM channel WHERE chanid = %1;")
+                           .arg(chanid);
+        sqlquery.exec(querystr);
+
+        if ((sqlquery.isActive()) && (sqlquery.numRowsAffected() > 0))
+            if (sqlquery.next())
+                channelname = sqlquery.value(0).toString();
     }
 
     pthread_mutex_unlock(&db_lock);

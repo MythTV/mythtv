@@ -313,7 +313,21 @@ void MpegRecorder::ProcessData(unsigned char *buffer, int len)
                 long long startpos = ringBuffer->GetFileWritePosition();
                 startpos += pkt.startpos;
 
-                positionMap[frameNum / keyframedist] = startpos;
+                long long keyCount = frameNum / keyframedist;
+                static long long prev_gop_save_pos = -1;
+
+                positionMap[keyCount] = startpos;
+
+                if ((curRecording) &&
+                    ((positionMap.size() % 30) == 0))
+                {
+                    pthread_mutex_lock(db_lock);
+                    MythContext::KickDatabase(db_conn);
+                    curRecording->SetPositionMap(positionMap, MARK_GOP_START,
+                            db_conn, prev_gop_save_pos, keyCount);
+                    pthread_mutex_unlock(db_lock);
+                    prev_gop_save_pos = keyCount + 1;
+                }
             }
         }
 

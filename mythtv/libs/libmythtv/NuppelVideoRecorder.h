@@ -197,6 +197,7 @@ class NuppelVideoRecorder : public RecorderBase
 
     int keyframedist;
     vector<struct seektable_entry> *seektable;
+    QMap<long long, long long> positionMap;
 
     long long extendeddataOffset;
 
