@@ -614,6 +614,13 @@ void GuideGrid::paintPrograms(QPainter *p)
         int ypos = ydifference * y;
         tmp.drawLine(0, ypos, pr.right(), ypos);
     }
+
+    float tmpwmult = wmult;
+    if (tmpwmult < 1)
+        tmpwmult = 1;
+    float tmphmult = hmult;
+    if (tmphmult < 1)
+        tmphmult = 1;
  
     for (int y = 0; y < DISPLAY_CHANS; y++)
     {
@@ -666,15 +673,24 @@ void GuideGrid::paintPrograms(QPainter *p)
                 {
                     QRgb blendcolor = br.color().rgb();
 
-                    int startx = (int)(x * xdifference + 1 * wmult);
-                    int endx = (int)((x + spread) * xdifference - 2 * wmult);
-                    int starty = (int)(ydifference * y + 1 * hmult);
-                    int endy = (int)(ydifference * (y + 1) - 2 * hmult);
+                    int startx = (int)(x * xdifference + 1 * tmpwmult);
+                    int endx = (int)((x + spread) * xdifference - 2 * tmpwmult);
+                    int starty = (int)(ydifference * y + 1 * tmphmult);
+                    int endy = (int)(ydifference * (y + 1) - 2 * tmphmult);
  
                     if (x == 0)
                         startx--;
                     if (y == 0)
                         starty--;
+
+                    if (startx < 0)
+                        startx = 0;
+                    if (starty < 0)
+                        starty = 0;
+                    if (endx > pr.right())
+                        endx = pr.right();
+                    if (endy > pr.bottom())
+                        endy = pr.bottom();
 
                     unsigned int *data = NULL;
                    
@@ -742,19 +758,19 @@ void GuideGrid::paintPrograms(QPainter *p)
                         tmp.setPen(QPen(red, (int)(3.75 * wmult)));
 
                         int ystart = 1;
-                        int rectheight = (int)(ydifference - 3 * hmult);
+                        int rectheight = (int)(ydifference - 3 * tmphmult);
                         if (y != 0)
                         {
-                            ystart = (int)(ydifference * y + 2 * hmult);
-                            rectheight = (int)(ydifference - 4 * hmult);
+                            ystart = (int)(ydifference * y + 2 * tmphmult);
+                            rectheight = (int)(ydifference - 4 * tmphmult);
                         }
 
                         int xstart = 1;
                         if (x != 0)
-                            xstart = (int)(x * xdifference + 2 * wmult);
-                        int xend = (int)(xdifference * spread - 4 * wmult);
+                            xstart = (int)(x * xdifference + 2 * tmpwmult);
+                        int xend = (int)(xdifference * spread - 4 * tmpwmult);
                         if (x == 0)
-                            xend += (int)(1 * wmult);
+                            xend += (int)(1 * tmpwmult);
 			
                         tmp.drawRect(xstart, ystart, xend, rectheight);
                         tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
