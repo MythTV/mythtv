@@ -10,6 +10,7 @@
       <text lang="PT">Configurações Gerais</text>
       <text lang="SV">Generella inställningar</text>
       <text lang="FR">Options générales</text>
+      <text lang="NL">Algemene Instellingen</text>
       <action>SETTINGS_GENERAL</action>
    </button>
 
@@ -23,6 +24,7 @@
       <text lang="PT">Configurações de Leitura</text>
       <text lang="SV">Spelarinställningar</text>
       <text lang="FR">Configuration du lecteur</text>
+      <text lang="NL">Weergave Instellingen</text>
       <action>SETTINGS_PLAYER</action>
    </button>
 
@@ -35,6 +37,7 @@
       <text lang="DE">Dateitypen</text>
       <text lang="ES">Tipos de archivos</text>
       <text lang="FR">Types de fichier</text>
+      <text lang="NL">Bestandstypes</text>      
       <action>SETTINGS_ASSOCIATIONS</action>
    </button>
 

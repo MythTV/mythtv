@@ -10,6 +10,7 @@
      <text lang="PT">Ver Filmes</text>
      <text lang="SV">Bläddra bland filmer</text>
      <text lang="FR">Liste des vidéos</text>
+     <text lang="NL">Blader door videos</text>
      <action>BROWSER</action>
    </button>
 
@@ -23,6 +24,7 @@
      <text lang="PT">Lista de Filmes</text>
      <text lang="SV">Filmlista</text>
      <text lang="FR">Parcourir les vidéos</text>
+     <text lang="NL">Video Verkenner</text>
      <action>LISTING</action>
    </button>
 
@@ -36,6 +38,7 @@
      <text lang="PT">Gerir Filmes</text>
      <text lang="SV">Filmhanterare</text>
      <text lang="FR">Gestionnaire de vidéos</text>
+     <text lang="NL">Video's Beheren</text>     
      <action>MANAGER</action>
    </button>
   

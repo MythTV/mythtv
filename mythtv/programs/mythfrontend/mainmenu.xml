@@ -102,6 +102,7 @@
      <text lang="DE">Nachrichten</text>
      <text lang="CA">Notícies</text>
      <text lang="ES">Noticias</text>
+     <text lang="NL">Nieuws</text>
      <action>PLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -122,7 +123,7 @@
      <text lang="FR">Configuration</text>
      <text lang="DE">Konfiguration</text>
      <text lang="DK">Konfiguration</text>
-     <text lang="NL">Configuratie</text>
+     <text lang="NL">Instellingen</text>
      <text lang="PT">Configurações</text>
      <text lang="SV">Inställningar</text>
      <action>MENU main_settings.xml</action>

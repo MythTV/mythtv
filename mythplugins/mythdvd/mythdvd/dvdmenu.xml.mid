@@ -9,5 +9,6 @@
       <text lang="ES">"Ripear" DVD</text>
       <text lang="CA">Volcar DVD</text>
       <text lang="FR">Copie DVD</text>
+      <text lang="NL">DVD Rip</text>
       <action>DVD_RIP</action>
    </button>
