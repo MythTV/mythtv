@@ -994,109 +994,120 @@ void *MainServer::SpawnDeleteThread(void *param)
 void MainServer::DoDeleteThread(DeleteStruct *ds)
 {
     QString logInfo = QString("chanid %1 at %2")
-                              .arg(ds->chanid).arg(ds->starttime.toString());
+                              .arg(ds->chanid).arg(ds->recstartts.toString());
                              
     QString name = QString("deleteThread%1%2").arg(getpid()).arg(rand());
-    MythSqlDatabase *delete_db = new MythSqlDatabase(name);
-    QSqlDatabase *db = NULL;
+    QFile checkFile(ds->filename);
 
-    if (!delete_db || !delete_db->isOpen())
+    if (!checkFile.exists())
+    {
+        VERBOSE(VB_ALL, QString("ERROR when trying to delete file: %1. File "
+                                "doesn't exist.  Database metadata"
+                                "will not be removed.")
+                                .arg(ds->filename));
+        gContext->LogEntry("mythbackend", LP_WARNING, "Delete Recording",
+                           QString("File %1 does not exist for %2 when trying "
+                                   "to delete recording.")
+                                   .arg(ds->filename).arg(logInfo));
+        return;
+    }
+
+    MythSqlDatabase *delete_db = new MythSqlDatabase(name);
+
+    if (!delete_db || !delete_db->isOpen() || !delete_db->db())
     {
         QString msg = QString("ERROR opening database connection for Delete "
-                              "Thread for chanid %1 recorded at %2.")
-                              .arg(ds->chanid).arg(ds->starttime.toString());
+                              "Thread for chanid %1 recorded at %2.  Program "
+                              "will NOT be deleted.")
+                              .arg(ds->chanid).arg(ds->recstartts.toString());
         VERBOSE(VB_GENERAL, msg);
         gContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
-                           QString("Unable to open database connection for %1.")
+                           QString("Unable to open database connection for %1. "
+                                   "Program will NOT be deleted.")
                                    .arg(logInfo));
-        delete_db = NULL;
+        if (delete_db)
+            delete delete_db;
+
+        return;
     }
-    else
+
+    JobQueue::DeleteAllJobs(delete_db->db(), ds->chanid, ds->recstartts);
+
+    QString filename;
+    bool followLinks = gContext->GetNumSetting("DeletesFollowLinks", 0);
+
+    filename = ds->filename;
+    if (followLinks)
     {
-        db = delete_db->db();
+        QFileInfo finfo(filename);
+        if (finfo.isSymLink())
+            unlink(finfo.readLink().ascii());
     }
-    QSqlQuery query(QString::null, db);
-
-    if (db)
-        JobQueue::DeleteAllJobs(db, ds->chanid, ds->starttime);
-
-
-    // Take care of deleting any related files
-    QFile checkFile(ds->filename);
+    unlink(filename.ascii());
+    
+    sleep(2);
 
     if (checkFile.exists())
     {
-        QString filename;
-        bool followLinks = gContext->GetNumSetting("DeletesFollowLinks", 0);
-
-        filename = ds->filename;
-        if (followLinks)
-        {
-            QFileInfo finfo(filename);
-            if (finfo.isSymLink())
-                unlink(finfo.readLink().ascii());
-        }
-        unlink(filename.ascii());
-    
-        filename = ds->filename + ".png";
-        if (followLinks)
-        {
-            QFileInfo finfo(filename);
-            if (finfo.isSymLink())
-                unlink(finfo.readLink().ascii());
-        }
-        unlink(filename.ascii());
-    
-        filename = ds->filename + ".bookmark";
-        if (followLinks)
-        {
-            QFileInfo finfo(filename);
-            if (finfo.isSymLink())
-                unlink(finfo.readLink().ascii());
-        }
-        unlink(filename.ascii());
-    
-        filename = ds->filename + ".cutlist";
-        if (followLinks)
-        {
-            QFileInfo finfo(filename);
-            if (finfo.isSymLink())
-                unlink(finfo.readLink().ascii());
-        }
-        unlink(filename.ascii());
-
-        sleep(2);
-
-        // Notify the frontend so it can requery for Free Space
-        MythEvent me("RECORDING_LIST_CHANGE");
-        gContext->dispatch(me);
-    }
-    else
-    {
-        VERBOSE(VB_ALL, QString("Strange, file: %1 doesn't exist.")
-                                .arg(ds->filename));
+        VERBOSE(VB_ALL,
+            QString("Error deleting file: %1. Keeping metadata in database.")
+                    .arg(ds->filename));
         gContext->LogEntry("mythbackend", LP_WARNING, "Delete Recording",
-                           QString("File %1 does not exist for %2.")
+                           QString("File %1 for %2 could not be deleted.")
                                    .arg(ds->filename).arg(logInfo));
+
+        if (delete_db)
+            delete delete_db;
+
+        return;
     }
 
-    if (db)
+    filename = ds->filename + ".png";
+    if (followLinks)
     {
-        query.prepare("DELETE FROM recordedmarkup "
-                      "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
-        query.bindValue(":CHANID", ds->chanid);
-        query.bindValue(":STARTTIME", ds->starttime);
+        QFileInfo finfo(filename);
+        if (finfo.isSymLink())
+            unlink(finfo.readLink().ascii());
+    }
+    unlink(filename.ascii());
 
-        query.exec();
+    QSqlQuery query(QString::null, delete_db->db());
+    query.prepare("DELETE FROM recorded WHERE chanid = :CHANID AND "
+                  "title = :TITLE AND starttime = :STARTTIME AND "
+                  "endtime = :ENDTIME;");
+    query.bindValue(":CHANID", ds->chanid);
+    query.bindValue(":TITLE", ds->title.utf8());
+    query.bindValue(":STARTTIME", ds->recstartts.toString("yyyyMMddhhmm00"));
+    query.bindValue(":ENDTIME", ds->recendts.toString("yyyyMMddhhmm00"));
+    query.exec();
 
-        if (!query.isActive())
-        {
-            MythContext::DBError("Recorded program delete recordedmarkup",
-                                 query);
-            gContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
-                               QString("Error deleting recordedmarkup for %1.")
-                                       .arg(logInfo));
-        }
+    if (!query.isActive())
+    {
+        MythContext::DBError("Recorded program deletion", query);
+        gContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
+                           QString("Error deleting recorded table for %1.")
+                                   .arg(logInfo));
+    }
+
+    sleep(1);
+
+    // Notify the frontend so it can requery for Free Space
+    MythEvent me("RECORDING_LIST_CHANGE");
+    gContext->dispatch(me);
+
+    query.prepare("DELETE FROM recordedmarkup "
+                  "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
+    query.bindValue(":CHANID", ds->chanid);
+    query.bindValue(":STARTTIME", ds->recstartts.toString("yyyyMMddhhmm00"));
+    query.exec();
+
+    if (!query.isActive())
+    {
+        MythContext::DBError("Recorded program delete recordedmarkup",
+                             query);
+        gContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
+                           QString("Error deleting recordedmarkup for %1.")
+                                   .arg(logInfo));
     }
 
     if (delete_db)
@@ -1402,48 +1413,42 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
         }
     }
 
-    QString startts = pginfo->recstartts.toString("yyyyMMddhhmm");
-    startts += "00";
-    QString endts = pginfo->recendts.toString("yyyyMMddhhmm");
-    endts += "00";
-
-    dblock.lock();
-
-    MythContext::KickDatabase(m_db);
-
-    QSqlQuery query(QString::null, m_db);
-    query.prepare("DELETE FROM recorded WHERE chanid = :CHANID AND "
-                  "title = :TITLE AND starttime = :STARTTIME AND "
-                  "endtime = :ENDTIME;");
-    query.bindValue(":CHANID", pginfo->chanid);
-    query.bindValue(":TITLE", pginfo->title.utf8());
-    query.bindValue(":STARTTIME", startts);
-    query.bindValue(":ENDTIME", endts);
-
-    query.exec();
-
-    if (!query.isActive())
-        MythContext::DBError("Recorded program deletion", query);
-
-    dblock.unlock();
-
     QString fileprefix = gContext->GetFilePrefix();
     QString filename = pginfo->GetRecordFilename(fileprefix);
     QFile checkFile(filename);
     bool fileExists = checkFile.exists();
 
-    DeleteStruct *ds = new DeleteStruct;
-    ds->ms = this;
-    ds->filename = filename;
-    ds->chanid = pginfo->chanid;
-    ds->starttime = pginfo->recstartts;
+    if (fileExists)
+    {
+        DeleteStruct *ds = new DeleteStruct;
+        ds->ms = this;
+        ds->filename = filename;
+        ds->title = pginfo->title;
+        ds->chanid = pginfo->chanid;
+        ds->recstartts = pginfo->recstartts;
+        ds->recendts = pginfo->recendts;
 
-    pthread_t deleteThread;
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+        pthread_t deleteThread;
+        pthread_attr_t attr;
+        pthread_attr_init(&attr);
+        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
-    pthread_create(&deleteThread, &attr, SpawnDeleteThread, ds);
+        pthread_create(&deleteThread, &attr, SpawnDeleteThread, ds);
+    }
+    else
+    {
+        QString logInfo = QString("chanid %1 at %2")
+                              .arg(pginfo->chanid)
+                              .arg(pginfo->recstartts.toString());
+        VERBOSE(VB_ALL,
+                QString("ERROR when trying to delete file: %1. File doesn't "
+                        "exist.  Database metadata will not be removed.")
+                        .arg(filename));
+        gContext->LogEntry("mythbackend", LP_WARNING, "Delete Recording",
+                           QString("File %1 does not exist for %2 when trying "
+                                   "to delete recording.")
+                                   .arg(filename).arg(logInfo));
+    }
 
     if (pbssock)
     {

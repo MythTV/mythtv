@@ -53,8 +53,10 @@ class MainServer : public QObject
     {
         MainServer *ms;
         QString chanid;
-        QDateTime starttime;
+        QDateTime recstartts;
+        QDateTime recendts;
         QString filename;
+        QString title;
     } DeleteStruct;
 
     void HandleAnnounce(QStringList &slist, QStringList commands, 
