@@ -388,8 +388,8 @@ void ProgFinder::setupLayout()
 	{
 
    		QLabel *leftFiller = new QLabel("   ", this);
-    		QLabel *currentButton = new QLabel("   (4) Current Programs   ", this);
-    		QLabel *futureButton = new QLabel("   (6) Program Finder   ", this);
+    		QLabel *currentButton = new QLabel(tr("   (4) Current Programs   "), this);
+    		QLabel *futureButton = new QLabel(tr("   (6) Program Finder   "), this);
     		QLabel *rightFiller = new QLabel("   ", this);
 
     		leftFiller->setMaximumWidth((int)(800*wmult));
@@ -436,7 +436,7 @@ void ProgFinder::setupLayout()
 
 	QVBoxLayout *leftSide = new QVBoxLayout(0, 0, 0);
 	
-	programTitle = new QLabel("Select a letter...", topDataFrame);
+	programTitle = new QLabel(tr("Select a letter..."), topDataFrame);
 	programTitle->setFont(titleFont);
 	programTitle->setMaximumWidth((int)(500*wmult));
 	programTitle->setMaximumHeight(titleMetric.height());
@@ -450,7 +450,7 @@ void ProgFinder::setupLayout()
 	subTitle->setPaletteForegroundColor(prog_fgColor);
 	subTitle->setPaletteBackgroundColor(prog_bgColor);
 
-    	description = new QLabel("Pick the letter in which the show starts with, then hit ENTER or the right arrow.", topDataFrame);
+    	description = new QLabel(tr("Pick the letter in which the show starts with, then hit ENTER or the right arrow."), topDataFrame);
 	description->setFont(descFont);
 	description->setMaximumWidth((int)(500*wmult));
 	description->setMaximumHeight((int)(130*hmult));
@@ -504,8 +504,8 @@ void ProgFinder::setupLayout()
 		programListLayout->addStrut((int)(310*hmult));
 
 	QLabel *BlankLbl = new QLabel(" ", programFrame);
-	QLabel *ProgramTitleLbl = new QLabel("Program Title", programFrame);
-	QLabel *ShowTimesLbl = new QLabel("Show Times", programFrame);
+	QLabel *ProgramTitleLbl = new QLabel(tr("Program Title"), programFrame);
+	QLabel *ShowTimesLbl = new QLabel(tr("Show Times"), programFrame);
 
 	BlankLbl->setPaletteBackgroundColor(time_bgColor);
 	BlankLbl->setPaletteForegroundColor(prog_fgColor);
@@ -618,8 +618,8 @@ void ProgFinder::cursorRight()
 		    }
 		    if (gotInitData[curSearch] >= 10)
 		    {
-			programTitle->setText("Select a program...");
-			description->setText("Select the title of the program you wish to find. When finished return with the left arrow key. Hitting 'Info' will allow you to setup recording options.");
+			programTitle->setText(tr("Select a program..."));
+			description->setText(tr("Select the title of the program you wish to find. When finished return with the left arrow key. Hitting 'Info' will allow you to setup recording options."));
 			(&abcList[(int)(showsPerListing / 2)])->setPaletteForegroundColor(curProg_fgColor);
 			(&abcList[(int)(showsPerListing / 2)])->setPaletteBackgroundColor(curProg_bgColor);
                         (&progList[(int)(showsPerListing / 2)])->setPaletteBackgroundColor(progFindMid_bgColor);
@@ -813,8 +813,8 @@ void ProgFinder::showSearchList()
 {
 	if (programTitle->text() == "No Programs")
 	{
-		programTitle->setText("Select a program...");
-    		description->setText("Select the title of the program you wish to find. When finished return with the left arrow key. Hitting 'Info' will allow you to setup recording options");
+		programTitle->setText(tr("Select a program..."));
+    		description->setText(tr("Select the title of the program you wish to find. When finished return with the left arrow key. Hitting 'Info' will allow you to setup recording options"));
 	}
 
 	int curLabel = 0;
@@ -1150,9 +1150,9 @@ void ProgFinder::clearShowData()
 	(&showList[i])->setText("");
     }
 
-    programTitle->setText("Select a program...");
+    programTitle->setText(tr("Select a program..."));
     subTitle->setText("");
-    description->setText("Select the title of the program you wish to find. When finished return with the left arrow key. Hitting 'Info' will allow you to setup recording options");
+    description->setText(tr("Select the title of the program you wish to find. When finished return with the left arrow key. Hitting 'Info' will allow you to setup recording options"));
     callChan->setText("");
     recordingInfo->setText("");
 

@@ -460,12 +460,12 @@ MythDialog* ScheduledRecording::dialogWidget(QWidget* parent, const char* name)
     QLabel* date = new QLabel(dateText,dialog);
     date->setBackgroundOrigin(QWidget::WindowOrigin);
 
-    QLabel *subtitlelabel = new QLabel("Episode:", dialog);
+    QLabel *subtitlelabel = new QLabel(tr("Episode:"), dialog);
     subtitlelabel->setBackgroundOrigin(QWidget::WindowOrigin);
     QLabel *subtitlefield = new QLabel(subtitle->getValue(), dialog);
     subtitlefield->setBackgroundOrigin(QWidget::WindowOrigin);
     subtitlefield->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-    QLabel *descriptionlabel = new QLabel("Description:", dialog);
+    QLabel *descriptionlabel = new QLabel(tr("Description:"), dialog);
     descriptionlabel->setBackgroundOrigin(QWidget::WindowOrigin);
     QLabel *descriptionfield = new QLabel(description->getValue(), dialog);
     descriptionfield->setBackgroundOrigin(QWidget::WindowOrigin);

@@ -383,8 +383,8 @@ void GuideGrid::setupColorScheme()
 void GuideGrid::createProgramBar(QBoxLayout *holdingTank)
 {
     QLabel *leftFiller = NULL;
-    currentButton = new QLabel("   (4) Favorite Programs   ", this);
-    QLabel *futureButton = new QLabel("   (6) Program Finder   ", this);
+    currentButton = new QLabel(tr("   (4) Favorite Programs   "), this);
+    QLabel *futureButton = new QLabel(tr("   (6) Program Finder   "), this);
     QLabel *rightFiller = new QLabel("   ", this);
 
     QTime new_time = QTime::currentTime();
@@ -556,9 +556,9 @@ void GuideGrid::createProgramLabel(int titlefontsize, int progfontsize)
     holdCG->addLayout(holdCGA, 0);
     holdCG->addWidget(descriptionfield, 0, 0);
 
-    QLabel *subtitlelabel = new QLabel("Episode:", this);
-    QLabel *recordinglabel = new QLabel("Recording:", this);
-    QLabel *descriptionlabel = new QLabel("Description:", this);
+    QLabel *subtitlelabel = new QLabel(tr("Episode:"), this);
+    QLabel *recordinglabel = new QLabel(tr("Recording:"), this);
+    QLabel *descriptionlabel = new QLabel(tr("Description:"), this);
     descriptionlabel->setMaximumWidth((int)(125*wmult));
     descriptionlabel->setMaximumHeight((int)(20*hmult));
     descriptionlabel->setBackgroundOrigin(WindowOrigin);
@@ -1742,19 +1742,19 @@ void GuideGrid::updateTopInfo()
     recordtype = pginfo->GetProgramRecordingStatus(m_db);
     switch (recordtype) {
     case ScheduledRecording::NotRecording:
-         recordingfield->setText("Not Recording");
+         recordingfield->setText(tr("Not Recording"));
          break;
     case ScheduledRecording::SingleRecord:
-        recordingfield->setText("Recording Once");
+        recordingfield->setText(tr("Recording Once"));
         break;
     case ScheduledRecording::TimeslotRecord:
-        recordingfield->setText("Timeslot Recording");
+        recordingfield->setText(tr("Timeslot Recording"));
         break;
     case ScheduledRecording::ChannelRecord:
-        recordingfield->setText("Channel Recording");
+        recordingfield->setText(tr("Channel Recording"));
         break;
     case ScheduledRecording::AllRecord:
-        recordingfield->setText("All Recording");
+        recordingfield->setText(tr("All Recording"));
         break;
     }
 
@@ -1980,9 +1980,9 @@ void GuideGrid::generateListings()
     if (showProgramBar == 1)
     {    
         if (showFavorites)
-            currentButton->setText("   (4) All Programs   ");
+            currentButton->setText(tr("   (4) All Programs   "));
         else
-            currentButton->setText("   (4) Favorite Programs   ");
+            currentButton->setText(tr("   (4) Favorite Programs   "));
     }
 
     update(channelRect());

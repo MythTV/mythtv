@@ -152,14 +152,15 @@ TVState TV::LiveTV(void)
 
         if (!testrec->IsValidRecorder())
         {
-            QString title = "MythTV is already using all available inputs for "
-                            "recording.  If you want to watch an in-progress "
-                            "recording, select one from the playback menu.  If "
-                            "you want to watch live TV, cancel one of the "
-                            "in-progress recordings from the delete menu.";
+            QString title = tr("MythTV is already using all available inputs "
+                               "for recording.  If you want to watch an "
+                               "in-progress recording, select one from the "
+                               "playback menu.  If you want to watch live TV, "
+                               "cancel one of the in-progress recordings from "
+                               "the delete menu.");
     
             DialogBox diag(title);
-            diag.AddButton("Cancel and go back to the TV menu");
+            diag.AddButton(tr("Cancel and go back to the TV menu"));
 
             diag.Show();
             diag.exec();
@@ -195,9 +196,9 @@ int TV::AllowRecording(const QString &message, int timeuntil)
         return 1;
     }
 
-    QString option1 = "Record and watch while it records";
-    QString option2 = "Let it record and go back to the Main Menu";
-    QString option3 = "Don't let it record, I want to watch TV";
+    QString option1 = tr("Record and watch while it records");
+    QString option2 = tr("Let it record and go back to the Main Menu");
+    QString option3 = tr("Don't let it record, I want to watch TV");
 
     dialogname = "allowrecordingbox";
 

@@ -381,7 +381,7 @@ void LCD::veryBadThings(int anError)
 		cerr << "Why? There was an error reading from the socket." << endl ;  
 	}
 	
-#if (QT_VERSION >= 0x030102)
+#if (QT_VERSION >= 0x030100)
 	socket->clearPendingData();
 	socket->close();
 #else

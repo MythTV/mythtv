@@ -1,0 +1,41 @@
+<mythmenu name="TV">
+
+   <button>
+      <type>TV</type>
+      <text>Guarda la TV</text>
+      <action>TV_WATCH_LIVE</action>
+   </button>
+
+   <button>
+      <type>TV_SCHEDULE</type>
+      <text>Programma una registrazione</text>
+      <alttext>Program Guide</alttext>
+      <action>TV_SCHEDULE</action>
+   </button>
+
+   <button>
+      <type>TV_PLAYBACK</type>
+      <text>Guarda una registrazione</text>
+      <action>TV_WATCH_RECORDING</action>
+   </button>
+
+   <button>
+      <type>TV_CONFLICTS</type>
+      <text>Correggi i conflitti</text>
+      <alttext>Fix Conflicts</alttext>
+      <action>TV_FIX_CONFLICTS</action>
+   </button>
+
+   <button>
+      <type>TV_DELETE</type>
+      <text>Elimina una registrazione</text>
+      <action>TV_DELETE</action>
+   </button> 
+
+   <button>
+      <type>SETUP</type>
+      <text>Impostazioni</text>
+      <action>MENU tv_settings.xml</action>
+   </button>
+
+</mythmenu>

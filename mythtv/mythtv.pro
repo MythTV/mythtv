@@ -5,4 +5,4 @@
 TEMPLATE = subdirs
 
 # Directories
-SUBDIRS += libs filters programs themes setup
+SUBDIRS += libs filters programs themes setup i18n

@@ -50,12 +50,12 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
     QLabel *date = getDateLabel(pginfo);
     date->setBackgroundOrigin(WindowOrigin);
 
-    QLabel *subtitlelabel = new QLabel("Episode:", this);
+    QLabel *subtitlelabel = new QLabel(tr("Episode:"), this);
     subtitlelabel->setBackgroundOrigin(WindowOrigin);
     QLabel *subtitlefield = new QLabel(pginfo->subtitle, this);
     subtitlefield->setBackgroundOrigin(WindowOrigin);
     subtitlefield->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-    QLabel *descriptionlabel = new QLabel("Description:", this);
+    QLabel *descriptionlabel = new QLabel(tr("Description:"), this);
     descriptionlabel->setBackgroundOrigin(WindowOrigin);
     QLabel *descriptionfield = new QLabel(pginfo->description, this);
     descriptionfield->setBackgroundOrigin(WindowOrigin);
@@ -118,13 +118,15 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
     connect(lview, SIGNAL(spacePressed(QListViewItem *)), this,
             SLOT(selected(QListViewItem *)));
 
-    RecListItem *item = new RecListItem(lview, "Record this program whenever "
-                                        "it's shown anywhere", ScheduledRecording::AllRecord);
+    RecListItem *item = new RecListItem(lview, tr("Record this program whenever"
+                                        " it's shown anywhere"), 
+                                        ScheduledRecording::AllRecord);
     if (recordstatus == ScheduledRecording::AllRecord)
         selectItem = item;
 
-    item = new RecListItem(lview, "Record this program whenever it's shown "
-                                  "on this channel", ScheduledRecording::ChannelRecord);
+    item = new RecListItem(lview, tr("Record this program whenever it's shown "
+                           "on this channel"), 
+                           ScheduledRecording::ChannelRecord);
     if (recordstatus == ScheduledRecording::ChannelRecord)
         selectItem = item;
 
@@ -132,9 +134,9 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
 
     QString msg = "Shouldn't show up.";
     if (programtype == 1)
-        msg = "Record this program in this timeslot every day";
+        msg = tr("Record this program in this timeslot every day");
     else if (programtype == 2 || programtype == -1)
-        msg = "Record this program in this timeslot every week";
+        msg = tr("Record this program in this timeslot every week");
     if (programtype != 0)
     {
         item = new RecListItem(lview, msg, ScheduledRecording::TimeslotRecord);
@@ -142,12 +144,13 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
             selectItem = item;
     }
 
-    item = new RecListItem(lview, "Record only this showing of the program",
+    item = new RecListItem(lview, tr("Record only this showing of the program"),
                            ScheduledRecording::SingleRecord);
     if (recordstatus == ScheduledRecording::SingleRecord)
         selectItem = item;
 
-    item = new RecListItem(lview, "Don't record this program", ScheduledRecording::NotRecording);
+    item = new RecListItem(lview, tr("Don't record this program"), 
+                           ScheduledRecording::NotRecording);
     if (selectItem == NULL)
         selectItem = item;
 
