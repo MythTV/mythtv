@@ -1869,7 +1869,7 @@ void TVRec::GetNextProgram(int direction,
 
     querystr = QString("SELECT title, subtitle, description, category, "
                        "starttime, endtime, callsign, icon, channum, "
-                       "program.chanid, seriesid. programid "
+                       "program.chanid, seriesid, programid "
                        "FROM program, channel "
                        "WHERE program.chanid = channel.chanid ");
 
