@@ -28,7 +28,7 @@ class QWidget;
 
 // Use this function to instantiate a guidegrid instance.
 QString RunProgramGuide(QString startchannel, bool thread = false, 
-                        TV *player = NULL);
+                        TV *player = NULL, bool allowsecondaryepg = true);
 
 
 class GuideGrid : public MythDialog
@@ -36,7 +36,7 @@ class GuideGrid : public MythDialog
     Q_OBJECT
   public:
     GuideGrid(MythMainWindow *parent, const QString &channel, TV *player = NULL,
-              const char *name = 0);
+              bool allowsecondaryepg = true, const char *name = 0);
    ~GuideGrid();
 
     QString getLastChannel(void);

@@ -99,6 +99,8 @@ VideoOutput::VideoOutput()
 
     desired_piph = 128;
     desired_pipw = 160;
+
+    allowpreviewepg = true;
 }
 
 VideoOutput::~VideoOutput()

@@ -2375,9 +2375,14 @@ void TV::doLoadMenu(void)
     }
 
     if (activerecorder)
-       channame = activerecorder->GetCurrentChannel();
+        channame = activerecorder->GetCurrentChannel();
 
-    QString chanstr = RunProgramGuide(channame, true, this);
+    bool allowsecondary = true;
+
+    if (nvp && nvp->getVideoOutput())
+        allowsecondary = nvp->getVideoOutput()->AllowPreviewEPG();
+
+    QString chanstr = RunProgramGuide(channame, true, this, allowsecondary);
 
     if (chanstr != "")
     {

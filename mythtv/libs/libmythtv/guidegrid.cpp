@@ -29,7 +29,8 @@ using namespace std;
 #include "util.h"
 #include "remoteutil.h"
 
-QString RunProgramGuide(QString startchannel, bool thread, TV *player)
+QString RunProgramGuide(QString startchannel, bool thread, TV *player,
+                        bool allowsecondaryepg)
 {
     QString chanstr;
    
@@ -40,7 +41,7 @@ QString RunProgramGuide(QString startchannel, bool thread, TV *player)
         startchannel = "";
 
     GuideGrid *gg = new GuideGrid(gContext->GetMainWindow(), startchannel, 
-                                  player, "guidegrid");
+                                  player, allowsecondaryepg, "guidegrid");
 
     gg->Show();
 
@@ -71,7 +72,7 @@ QString RunProgramGuide(QString startchannel, bool thread, TV *player)
 }
 
 GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
-                     const char *name)
+                     bool allowsecondaryepg, const char *name)
          : MythDialog(parent, name)
 {
     desiredDisplayChans = DISPLAY_CHANS = 6;
@@ -98,14 +99,11 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
     theme = new XMLParse();
     theme->SetWMult(wmult);
     theme->SetHMult(hmult);
-    if (m_player && m_player->IsRunning())
-    {
+    if (m_player && m_player->IsRunning() && allowsecondaryepg)
         theme->LoadTheme(xmldata, "programguide-video");
-    }
     else 
-    {
         theme->LoadTheme(xmldata, "programguide");
-    }
+
     LoadWindow(xmldata);
 
     showFavorites = gContext->GetNumSetting("EPGShowFavorites", 0);

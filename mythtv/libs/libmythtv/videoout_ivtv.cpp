@@ -127,6 +127,8 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
                            WId winid, int winx, int winy, int winw, 
                            int winh, WId embedid)
 {
+    allowpreviewepg = false;
+
     videoDevice = gContext->GetSetting("PVR350VideoDev");
 
     VideoOutput::Init(width, height, aspect, winid, winx, winy, winw, winh, 
@@ -262,7 +264,9 @@ void VideoOutputIvtv::EmbedInWidget(WId wid, int x, int y, int w, int h)
 
     fbstate.status |= IVTVFB_STATUS_GLOBAL_ALPHA;
     fbstate.status &= ~IVTVFB_STATUS_LOCAL_ALPHA;
-    fbstate.alpha = 164;
+
+    int usealpha = gContext->GetNumSetting("PVR350EPGAlphaValue", 164);
+    fbstate.alpha = usealpha;
 
     if (ioctl(fbfd, IVTVFB_IOCTL_SET_STATE, &fbstate) < 0)
         perror("IVTVFB_IOCTL_SET_STATE");

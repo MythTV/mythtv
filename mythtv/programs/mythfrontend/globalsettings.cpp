@@ -1456,6 +1456,19 @@ public:
     };
 };
 
+class PVR350EPGAlphaValue: public SpinBoxSetting, public GlobalSetting {
+public:
+    PVR350EPGAlphaValue():
+        SpinBoxSetting(0, 255, 1),
+        GlobalSetting("PVR350EPGAlphaValue") {
+        setLabel(QObject::tr("Program Guide Alpha"));
+        setValue(164);
+        setHelpText(QObject::tr("How much to blend the program guide over the "
+                    "live TV image.  Higher numbers mean more guide and less "
+                    "TV."));
+    };
+};
+
 #ifdef USING_XVMC
 class UseXVMC: public CheckBoxSetting, public GlobalSetting {
 public:
@@ -1491,6 +1504,7 @@ public:
 
          ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
          settings->addChild(new PVR350VideoDev());
+         settings->addChild(new PVR350EPGAlphaValue());
          addTarget("1", settings);
 
          addTarget("0", new VerticalConfigurationGroup(true));

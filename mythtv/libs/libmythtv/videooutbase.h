@@ -127,6 +127,8 @@ class VideoOutput
     int GetCurrentColour(void) { return colour; }
     int GetCurrentHue(void) { return hue; }
 
+    bool AllowPreviewEPG(void) { return allowpreviewepg; }
+
   protected:
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
                      int needprebuffer, int keepprebuffer);
@@ -201,6 +203,8 @@ class VideoOutput
     unsigned char *piptmpbuf;
 
     ImgReSampleContext *pipscontext;
+
+    bool allowpreviewepg;
 };
 
 #endif
