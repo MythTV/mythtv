@@ -7,7 +7,7 @@ using namespace std;
 #ifdef USING_DIRECTX
 #include "audiooutputdx.h"
 #endif
-#ifndef _WIN32
+#ifdef USING_OSS
 #include "audiooutputoss.h"
 #endif
 #ifdef USE_ALSA
@@ -15,6 +15,9 @@ using namespace std;
 #endif
 #ifdef USE_ARTS
 #include "audiooutputarts.h"
+#endif
+#ifdef CONFIG_DARWIN
+#include "audiooutputca.h"
 #endif
 
 AudioOutput *AudioOutput::OpenAudio(QString audiodevice, int audio_bits, 
@@ -48,6 +51,10 @@ AudioOutput *AudioOutput::OpenAudio(QString audiodevice, int audio_bits,
     else
         return new AudioOutputOSS(audiodevice, audio_bits,
                                   audio_channels, audio_samplerate);
+#elif defined(CONFIG_DARWIN)
+    else
+        return new AudioOutputCA(audiodevice, audio_bits,
+                                 audio_channels, audio_samplerate);
 #endif
 
     return NULL;

@@ -42,7 +42,15 @@ unix {
 }
 
 macx {
-#    SOURCES += audiooutputdarwin.cpp
+    # OS X specific audio layer
+    SOURCES        += audiooutputca.cpp
+    HEADERS        += audiooutputca.h
+    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/CoreAudio.framework
+    LIBS           += -framework CoreAudio
+    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/AudioUnit.framework
+    LIBS           += -framework AudioUnit
+
+
 #    SOURCES += mythcdrom-darwin.cpp
     
     # We use HIToolbox from Carbon to hide the menu bar
