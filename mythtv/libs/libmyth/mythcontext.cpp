@@ -42,6 +42,7 @@ const QString kPluginLibSuffix = ".so";
 #endif
 
 MythContext *gContext = NULL;
+QMutex MythContext::verbose_mutex(true);
 
 int print_verbose_messages = VB_IMPORTANT | VB_GENERAL;
 

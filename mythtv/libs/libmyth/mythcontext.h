@@ -12,6 +12,7 @@
 #include <qsocketdevice.h>
 #include <qstringlist.h>
 #include <qnetwork.h> 
+#include <qmutex.h>
 
 #include <iostream>
 #include <vector>
@@ -81,11 +82,21 @@ struct DatabaseParams {
 };
     
 
+// The verbose_mutex lock is a recursive lock so it is possible (while
+// not recommended) to use a VERBOSE macro within another VERBOSE macro.
+// But waiting for another thread to do something is not safe within a 
+// VERBOSE macro, since those threads may wish to use the VERBOSE macro
+// and this will cause a deadlock.
 #define VERBOSE(mask,args...) \
 do { \
-if ((print_verbose_messages & mask) != 0) \
-    cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz") \
-         << " " << args << endl; \
+    if ((print_verbose_messages & mask) != 0) \
+    { \
+        QDateTime dtmp = QDateTime::currentDateTime(); \
+        QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
+        MythContext::verbose_mutex.lock(); \
+        cout << dtime << " " << args << endl; \
+        MythContext::verbose_mutex.unlock(); \
+    } \
 } while (0)
 
 class MythEvent : public QCustomEvent
@@ -280,6 +291,8 @@ class MythContext : public QObject
     void addPrivRequest(MythPrivRequest::Type t, void *data);
     void waitPrivRequest() const;
     MythPrivRequest popPrivRequest();
+
+    static QMutex verbose_mutex;
 
   private slots:
     void EventSocketRead();
