@@ -75,7 +75,7 @@ MMusicWatcher::MMusicWatcher(MFD *owner, int identity)
     //  This is a "magic" number signifying what we want to see
     //
     
-    desired_database_version = "1002";
+    desired_database_version = "1005";
 
     //
     //  pointer to the database

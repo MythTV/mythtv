@@ -222,5 +222,107 @@ void UpgradeMusicDatabaseSchema(void)
 };
         performActualUpdate(updates, "1003", dbver);
     }
+
+    if (dbver == "1003")
+    {
+        const QString updates[] = {
+"DROP TABLE IF EXISTS smartplaylistcategory;",
+"CREATE TABLE smartplaylistcategory ("
+"    categoryid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,"
+"    name VARCHAR(128) NOT NULL,"
+"    INDEX (name)"
+");",
+
+"INSERT INTO smartplaylistcategory SET categoryid = 1, "
+"    name = \"Decades\";",
+"INSERT INTO smartplaylistcategory SET categoryid = 2, "
+"    name = \"Favourite Tracks\";",
+"INSERT INTO smartplaylistcategory SET categoryid = 3, "
+"    name = \"New Tracks\";",
+
+"DROP TABLE IF EXISTS smartplaylist;",
+"CREATE TABLE smartplaylist ("
+"    smartplaylistid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,"
+"    name VARCHAR(128) NOT NULL,"
+"    categoryid INT UNSIGNED NOT NULL,"
+"    matchtype SET('All', 'Any') NOT NULL DEFAULT 'All',"
+"    orderby VARCHAR(128) NOT NULL DEFAULT '',"
+"    limitto INT UNSIGNED NOT NULL DEFAULT 0,"
+"    INDEX (name),"
+"    INDEX (categoryid)"
+");",
+"DROP TABLE IF EXISTS smartplaylistitem;",
+"CREATE TABLE smartplaylistitem ("
+"    smartplaylistitemid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,"
+"    smartplaylistid INT UNSIGNED NOT NULL,"
+"    field VARCHAR(50) NOT NULL,"
+"    operator VARCHAR(20) NOT NULL,"
+"    value1 VARCHAR(255) NOT NULL,"
+"    value2 VARCHAR(255) NOT NULL,"
+"    INDEX (smartplaylistid)"
+");",
+"INSERT INTO smartplaylist SET smartplaylistid = 1, name = \"1960's\", "
+"    categoryid = 1, matchtype = \"All\", orderby = \"Artist (A)\","
+"    limitto = 0;",
+"INSERT INTO smartplaylistitem SET smartplaylistid = 1, field = \"Year\","
+"    operator = \"is between\", value1 = \"1960\", value2 = \"1969\";",
+
+"INSERT INTO smartplaylist SET smartplaylistid = 2, name = \"1970's\", "
+"    categoryid = 1, matchtype = \"All\", orderby = \"Artist (A)\","
+"    limitto = 0;",
+"INSERT INTO smartplaylistitem SET smartplaylistid = 2, field = \"Year\","
+"    operator = \"is between\", value1 = \"1970\", value2 = \"1979\";",
+
+"INSERT INTO smartplaylist SET smartplaylistid = 3, name = \"1980's\", "
+"    categoryid = 1, matchtype = \"All\", orderby = \"Artist (A)\","
+"    limitto = 0;",
+"INSERT INTO smartplaylistitem SET smartplaylistid = 3, field = \"Year\","
+"    operator = \"is between\", value1 = \"1980\", value2 = \"1989\";",
+
+"INSERT INTO smartplaylist SET smartplaylistid = 4, name = \"1990's\", "
+"    categoryid = 1, matchtype = \"All\", orderby = \"Artist (A)\","
+"    limitto = 0;",
+"INSERT INTO smartplaylistitem SET smartplaylistid = 4, field = \"Year\","
+"    operator = \"is between\", value1 = \"1990\", value2 = \"1999\";",
+
+"INSERT INTO smartplaylist SET smartplaylistid = 5, name = \"2000's\", "
+"    categoryid = 1, matchtype = \"All\", orderby = \"Artist (A)\","
+"    limitto = 0;",
+"INSERT INTO smartplaylistitem SET smartplaylistid = 5, field = \"Year\","
+"    operator = \"is between\", value1 = \"2000\", value2 = \"2009\";",
+
+"INSERT INTO smartplaylist SET smartplaylistid = 6, name = \"Favorite Tracks\", "
+"    categoryid = 2, matchtype = \"All\"," 
+"    orderby = \"Artist (A), Album (A)\", limitto = 0;",
+"INSERT INTO smartplaylistitem SET smartplaylistid = 6, field = \"Rating\","
+"    operator = \"is greater than\", value1 = \"7\", value2 = \"0\";",
+
+"INSERT INTO smartplaylist SET smartplaylistid = 7, name = \"100 Most Played Tracks\", "
+"    categoryid = 2, matchtype = \"All\", orderby = \"Play Count (D)\","
+"    limitto = 100;",
+"INSERT INTO smartplaylistitem SET smartplaylistid = 7, field = \"Play Count\","
+"    operator = \"is greater than\", value1 = \"0\", value2 = \"0\";",
+
+"INSERT INTO smartplaylist SET smartplaylistid = 8, name = \"Never Played Tracks\", "
+"    categoryid = 3, matchtype = \"All\", orderby = \"Artist (A), Album (A)\","
+"    limitto = 0;",
+"INSERT INTO smartplaylistitem SET smartplaylistid = 8, field = \"Play Count\","
+"    operator = \"is equal to\", value1 = \"0\", value2 = \"0\";",
+
+""
+};
+        performActualUpdate(updates, "1004", dbver);
+    }
+
+    if (dbver == "1004")
+    {
+        const QString updates[] = {
+"ALTER TABLE musicmetadata ADD compilation_artist VARCHAR(128) NOT NULL AFTER artist;",
+"ALTER TABLE musicmetadata ADD INDEX (compilation_artist);",
+""
+};
+
+        performActualUpdate(updates, "1005", dbver);
+    }
 }
 
