@@ -576,7 +576,6 @@ void SipMsg::decodeXpidf(QString content)
     QDomDocument xmlContent;
     xmlContent.setContent(content);
     QDomElement rootElm = xmlContent.documentElement();
-    cout << "XPIDF Root Tag " << rootElm.tagName() << endl;
     QDomNode n = rootElm.firstChild();
     while (!n.isNull())
     {
@@ -585,19 +584,21 @@ void SipMsg::decodeXpidf(QString content)
         {
             if (e.tagName() == "address")
             {
-                QString uri = e.attribute("uri");
-                cout << "Tag: address = " << uri << endl;
+                QString uri1, uri2, uri3;
+                // Convert from "sip:abc@xyz;blah" to "abc@xyz"
+                uri1 = e.attribute("uri");
+                if (uri1.startsWith("sip:"))
+                    uri2 = uri1.mid(4);
+                else
+                    uri2 = uri1;
+                uri3 = uri2.section(';',0,0);
+
+                xpidf->setUserHost(uri3.section('@',0,0), uri3.section('@',1,1));
             }
-            if (e.tagName() == "status")
-            {
-                QString status = e.attribute("status");
-                cout << "Tag: status = " << status << endl;
-            }
-            if (e.tagName() == "msnsubstatus")
-            {
-                QString substatus = e.attribute("substatus");
-                cout << "Tag: substatus = " << substatus << endl;
-            }
+            else if (e.tagName() == "status")
+                xpidf->setStatus(e.attribute("status"));
+            else if (e.tagName() == "msnsubstatus")
+                xpidf->setSubStatus(e.attribute("substatus"));
         }
         QDomNode nextNode = n.firstChild();
         if (nextNode.isNull())
@@ -606,6 +607,8 @@ void SipMsg::decodeXpidf(QString content)
             nextNode = n.parentNode().nextSibling();
         n = nextNode;
     }
+
+    cout << "SIP Decode XPIDF: Uri " << xpidf->getUser() << "@" << xpidf->getHost() << " became " << xpidf->getStatus() << "(" << xpidf->getSubstatus() << ")\n";
 }
 
 QPtrList<sdpCodec> *SipMsg::decodeSDPLine(QString sdpLine, QPtrList<sdpCodec> *codecList)

@@ -48,12 +48,12 @@
 
 // Presence Subscriber States
 #define SIP_SUB_IDLE            SIP_IDLE
-#define SIP_SUB_SUBSCRIBED      0x02
+#define SIP_SUB_SUBSCRIBED      0x10
 
 // Presence Watcher States
 #define SIP_WATCH_IDLE          SIP_IDLE
-#define SIP_WATCH_TRYING        0x02
-#define SIP_WATCH_ACTIVE        0x03
+#define SIP_WATCH_TRYING        0x20
+#define SIP_WATCH_ACTIVE        0x21
 
 // Events
 #define SIP_OUTCALL             0x100

@@ -414,7 +414,7 @@ SipFsm::SipFsm(QWidget *parent, const char *name)
             cout << "SIP: Cannot register; proxy, username or password not set\n";
 
         // Test -- watch my PC
-        //CreateWatcherFsm("Mythphone@192.168.254.102");
+        //CreateWatcherFsm("Mythphone@192.168.254.102");//"487658@fwd.pulver.com");//
     }
 
 }
@@ -788,10 +788,17 @@ SipCall *SipFsm::MatchCall(int cr)
 SipFsmBase *SipFsm::MatchCallId(SipCallId &CallId)
 {
     SipFsmBase *it;
+    SipFsmBase *match=0;
     for (it=FsmList.first(); it; it=FsmList.next())
+    {
         if (it->callId() == CallId.string())
-            return it;
-    return 0;
+        {
+            if (match != 0)
+                cerr << "SIP: Oops; we have two FSMs with the same Call Id\n";
+            match = it;
+        }
+    }
+    return match;
 }
 
 SipCall *SipFsm::CreateCallFsm()
@@ -1033,6 +1040,9 @@ QString SipFsmBase::StatetoString(int S)
     case SIP_CONNECTED:         return "CONNECTED";
     case SIP_DISCONNECTING:     return "DISCONNECT ";
     case SIP_CONNECTED_VXML:    return "CONNECT-VXML";  // A false state! Only used to indicate to frontend 
+    case SIP_SUB_SUBSCRIBED:    return "SUB_SUBSCRIBED";
+    case SIP_WATCH_TRYING:      return "WTCH_TRYING"; 
+    case SIP_WATCH_ACTIVE:      return "WTCH_ACTIVE"; 
 
     default:
         break;
@@ -2036,11 +2046,12 @@ SipSubscriber::~SipSubscriber()
 
 int SipSubscriber::FSM(int Event, SipMsg *sipMsg, void *Value)
 {
+    int OldState = State;
+    QString DebugSent = "";
 
     switch (Event | State)
     {
     case SIP_SUB_IDLE_SUBSCRIBE:
-        cout << "SIP Subscriber FSM: Received SUBSCRIBE in IDLE\n";
         ParseSipMsg(Event, sipMsg);
         if (watcherUrl == 0)
             watcherUrl = new SipUrl(sipMsg->getFromUrl());
@@ -2052,17 +2063,18 @@ int SipSubscriber::FSM(int Event, SipMsg *sipMsg, void *Value)
         {
             (parent->Timer())->Start(this, expires*1000, SIP_SUBSCRIBE_EXPIRE); // Expire subscription
             SendNotify(0);
+            DebugSent += "  Sent Notify\n";
             State = SIP_SUB_SUBSCRIBED;
         }
         break;
 
     case SIP_SUB_SUBS_SUBSCRIBE:
-        cout << "SIP Subscriber FSM: Received SUBSCRIBE in SUBSCRIBED\n";
         ParseSipMsg(Event, sipMsg);
         expires = sipMsg->getExpires();
         if (expires == -1) // No expires in SUBSCRIBE, choose default value
             expires = 60;
         BuildSendStatus(200, "SUBSCRIBE", sipMsg->getCSeqValue(), SIP_OPT_CONTACT | SIP_OPT_EXPIRES, expires);
+        DebugSent += "  Sent 200 OK for Subscribe\n";
         if (expires > 0)
             (parent->Timer())->Start(this, expires*1000, SIP_SUBSCRIBE_EXPIRE); // Expire subscription
         else
@@ -2070,31 +2082,37 @@ int SipSubscriber::FSM(int Event, SipMsg *sipMsg, void *Value)
         break;
 
     case SIP_SUB_SUBS_SUBSCRIBE_EXPIRE:
-        cout << "SIP Subscriber FSM: Subscription Expired\n";
         break;
 
     case SIP_SUB_SUBS_RETX:
-        cout << "SIP Subscriber FSM: Received ReTx Timeout\n";
         if (Retransmit(false))
+        {
             (parent->Timer())->Start(this, t1, SIP_RETX);
+            DebugSent += "  Retransmitted last message\n";
+        }
         break;
 
     case SIP_SUB_SUBS_NOTSTATUS:
-        cout << "SIP Subscriber FSM: Received NOTIFY STATUS " << sipMsg->getStatusCode() << "\n";
         (parent->Timer())->Stop(this, SIP_RETX); 
         if (sipMsg->getStatusCode() == 407)
+        {
             SendNotify(sipMsg);
+            DebugSent += "  Sent Notify with Authorization\n";
+        }
         break;
 
     case SIP_SUB_SUBS_PRESENCE_CHANGE:
         myStatus = (char *)Value;
         SendNotify(0);
+        DebugSent += "  Sent Notify\n";
         break;
 
     default:
         cerr << "SIP Subscriber FSM: Unknown Event/State\n";
         break;
     }
+    cout << "Subscriber FSM " << " Event " << EventtoString(Event) << " : "
+         << StatetoString(OldState) << " -> " << StatetoString(State) << endl << DebugSent;
     return State;
 }
 
@@ -2134,7 +2152,13 @@ void SipSubscriber::SendNotify(SipMsg *authMsg)
 
     Notify.addContent("application/xpidf+xml", xpidf.encode());
 
-    parent->Transmit(Notify.string(), retxIp = watcherUrl->getHostIp(), retxPort = watcherUrl->getPort());
+    // Send new transactions to (a) record route, (b) contact URL or (c) configured URL
+    if (recRouteUrl)
+        parent->Transmit(Notify.string(), retxIp = recRouteUrl->getHostIp(), retxPort = recRouteUrl->getPort());
+    else if (contactUrl)
+        parent->Transmit(Notify.string(), retxIp = contactUrl->getHostIp(), retxPort = contactUrl->getPort());
+    else
+        parent->Transmit(Notify.string(), retxIp = watcherUrl->getHostIp(), retxPort = watcherUrl->getPort());
     retx = Notify.string();
     t1 = 500;
     (parent->Timer())->Start(this, t1, SIP_RETX);
@@ -2182,39 +2206,47 @@ SipWatcher::~SipWatcher()
 
 int SipWatcher::FSM(int Event, SipMsg *sipMsg, void *Value)
 {
+    int OldState = State;
+    QString DebugSent = "";
 
     switch (Event | State)
     {
     case SIP_WATCH_IDLE_WATCH:
     case SIP_WATCH_TRYING_WATCH:
-        cout << "SIP Watcher FSM: Received Request to Watch URL\n";
         if ((regProxy == 0) || (regProxy->isRegistered()))
+        {
             SendSubscribe(0);
+            DebugSent += "  Sent Subscribe\n";
+        }
         else
             (parent->Timer())->Start(this, 5000, SIP_WATCH); // Not registered, wait
         State = SIP_WATCH_TRYING;
         break;
 
     case SIP_WATCH_ACTIVE_SUBSCRIBE_EXPIRE:
-        cout << "SIP Watcher FSM: Subscription Expired\n";
         SendSubscribe(0);
+        DebugSent += "  Sent Subscribe\n";
         break;
 
     case SIP_WATCH_TRYING_RETX:
     case SIP_WATCH_ACTIVE_RETX:
-        cout << "SIP Watcher FSM: Received ReTx Timeout\n";
         if (Retransmit(false))
+        {
             (parent->Timer())->Start(this, t1, SIP_RETX);
+            DebugSent += "  Retransmitted last message\n";
+        }
         break;
 
     case SIP_WATCH_TRYING_SUBSTATUS:
         cout << "SIP Watcher FSM: Received SUBSCRIBE STATUS " << sipMsg->getStatusCode() << "\n";
         (parent->Timer())->Stop(this, SIP_RETX); 
         if (sipMsg->getStatusCode() == 407)
+        {
             SendSubscribe(sipMsg);
+            DebugSent += "  Sent Subscribe with Authorization\n";
+        }
         else if (sipMsg->getStatusCode() == 200)
         {
-            cout << "SIP Watcher FSM: Subscription Accepted\n";
             State = SIP_WATCH_ACTIVE;
             expires = sipMsg->getExpires();
             if (expires == -1) // No expires in SUBSCRIBE, choose default value
@@ -2226,10 +2258,12 @@ int SipWatcher::FSM(int Event, SipMsg *sipMsg, void *Value)
     case SIP_WATCH_ACTIVE_SUBSTATUS:
         cout << "SIP Watcher FSM: Received SUBSCRIBE STATUS " << sipMsg->getStatusCode() << "\n";
         if (sipMsg->getStatusCode() == 407)
+        {
             SendSubscribe(sipMsg);
+            DebugSent += "  Sent Subscribe with Authorization\n";
+        }
         else if (sipMsg->getStatusCode() == 200)
         {
-            cout << "SIP Watcher FSM: Re-Subscription Accepted\n";
             expires = sipMsg->getExpires();
             if (expires == -1) // No expires in SUBSCRIBE, choose default value
                 expires = 600;
@@ -2237,22 +2271,23 @@ int SipWatcher::FSM(int Event, SipMsg *sipMsg, void *Value)
         }
         else 
         {
-            cout << "SIP Watcher FSM: Subscription Error; wait then retry\n";
             State = SIP_WATCH_TRYING;
             (parent->Timer())->Start(this, 15000, SIP_WATCH); 
         }
         break;
 
     case SIP_WATCH_ACTIVE_NOTIFY:
-        cout << "SIP Watcher received NOTIFY\n";
         ParseSipMsg(Event, sipMsg);
         BuildSendStatus(200, "NOTIFY", sipMsg->getCSeqValue(), SIP_OPT_CONTACT);
+        DebugSent += "  Sent 200 OK for Notify\n";
         break;
 
     default:
         cerr << "SIP Watcher FSM: Unknown Event " << EventtoString(Event) << " in State " << State << "\n";
         break;
     }
+    cout << "Watcher FSM " << " Event " << EventtoString(Event) << " : "
+         << StatetoString(OldState) << " -> " << StatetoString(State) << endl << DebugSent;
     return State;
 }
 
@@ -2280,9 +2315,9 @@ void SipWatcher::SendSubscribe(SipMsg *authMsg)
     Subscribe.addContact(MyContactUrl);
 
     Subscribe.addEvent("presence");
-    Subscribe.addGenericLine("Accept: application/xpidf+xml, text/xml+msrtc.pidf\r\n");
-    //Subscribe.addGenericLine("Accept: application/xpidf+xml\r\n");
-    Subscribe.addGenericLine("Supported: com.microsoft.autoextend\r\n");
+    Subscribe.addGenericLine("Accept: application/xpidf+xml\r\n");
+    //Subscribe.addGenericLine("Accept: application/xpidf+xml, text/xml+msrtc.pidf\r\n");
+    //Subscribe.addGenericLine("Supported: com.microsoft.autoextend\r\n");
     Subscribe.addNullContent();
 
     parent->Transmit(Subscribe.string(), retxIp = watchedUrl->getHostIp(), retxPort = watchedUrl->getPort());

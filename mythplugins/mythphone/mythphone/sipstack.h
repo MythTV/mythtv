@@ -249,8 +249,14 @@ public:
     SipXpidf(SipUrl &Url);
     SipXpidf();
     ~SipXpidf() {};
-    void setStatus(QString status, QString substatus) { sipStatus = status; sipSubstatus = substatus; };
+    void setUserHost(QString u, QString h) { user = u; host = h; };
+    void setStatus(QString status, QString substatus="") { sipStatus = status; sipSubstatus = substatus; };
+    void setSubStatus(QString substatus) { sipSubstatus = substatus; };
     QString encode();
+    QString getUser()      { return user; };
+    QString getHost()      { return host; };
+    QString getStatus()    { return sipStatus; };
+    QString getSubstatus() { return sipSubstatus; };
 
 private:
     QString user;
