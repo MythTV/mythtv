@@ -23,20 +23,135 @@
 
 #include <qsqldatabase.h>
 #include <qsqlquery.h>
-#include <mythtv/mythcontext.h>
+
 #include <mythtv/mythdbcon.h>
+#include <mythtv/mythcontext.h>
+
 #include "mtdbitem.h"
 
  
- 
 MMTDBItem::MMTDBItem(UIListGenericTree *parent, const QString &text, 
-                     TreeKeys key, int id)
+                     TreeKeys key, int filmID, const QString& theaterID, 
+                     int showingID, int timeID)
          : UIListGenericTree(parent, text, "MMTDBItem")
 {
     Key = key;
-    ID = id;
+    FilmID = filmID;
+    TheaterID = theaterID;
+    ShowingID = showingID;
+    TimeID = timeID;
 }
 
+
+void MMTDBItem::toMap(QMap<QString, QString> &map)
+{
+    bool haveData = false;
+    MSqlQuery query(MSqlQuery::InitCon());
+    
+    // Grab the theater info
+    if (!TheaterID.isEmpty() && (TheaterID != "ALL"))
+    {
+        query.prepare("SELECT Distance, Name, Chain, city, State, "
+                      "street, Postalcode, phone "
+                      "FROM movietime_theaters "
+                      "WHERE theaterID = :THEATERID" );
+        
+        query.bindValue(":THEATERID", TheaterID);
+        
+        if (query.exec() && query.isActive() && query.size() > 0)
+        {
+            haveData = true;
+            query.next();
+            map["theater_ID"]         = TheaterID;
+            map["theater_distance"]   = query.value(0).toString();
+            map["theater_name"]       = query.value(1).toString();
+            map["theater_chain"]      = query.value(2).toString();
+            map["theater_city"]       = query.value(3).toString();
+            map["theater_state"]      = query.value(4).toString();
+            map["theater_street"]     = query.value(5).toString();
+            map["theater_postalcode"] = query.value(6).toString();
+            map["theater_phone"]      = query.value(7).toString();
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, "MMTDBItem::toMap failed to fetch theater info" );
+            VERBOSE(VB_IMPORTANT, query.executedQuery());
+            VERBOSE(VB_IMPORTANT, query.lastError().text());
+        }
+
+    }
+    
+    if( haveData == false)
+    {
+        map["theater_id"]         = "";
+        map["theater_distance"]   = "";
+        map["theater_name"]       = "";
+        map["theater_chain"]      = "";
+        map["theater_city"]       = "";
+        map["theater_state"]      = "";
+        map["theater_street"]     = "";
+        map["theater_postalcode"] = "";
+        map["theater_phone"]      = "";
+    }
+    
+    // Grab the movie info
+    haveData = false;
+    
+    if (FilmID > 0 )
+    {
+        query.prepare("SELECT Title, Description, Runtime, ReleaseDate, colorCode, "
+                      "soundtrack, Soundmix, genre, MPAARating, StarRating,  "
+                      "Certification, Audience, ImageURL, OfficialURL, Language "
+                      "FROM movietime_films "
+                      "WHERE FilmID = :FILMID" );
+        
+        query.bindValue(":FILMID", FilmID);
+        
+        if (query.exec() && query.isActive() && query.size() > 0)
+        {
+            haveData = true;
+            query.next();
+            map["film_id"]              = FilmID;
+            map["film_title"]           = query.value(0).toString();
+            map["film_description"]     = query.value(1).toString();
+            map["film_runtime"]         = query.value(2).toString();
+            map["film_releasedate"]     = query.value(3).toString();
+            map["film_colorcode"]       = query.value(4).toString();
+            map["film_soundtrack"]      = query.value(5).toString();
+            map["film_soundmix"]        = query.value(6).toString();
+            map["film_genre"]           = query.value(7).toString();
+            map["film_mpaarating"]      = query.value(8).toString();
+            map["film_starrating"]      = query.value(9).toString();
+            map["film_certification"]   = query.value(10).toString();
+            map["film_audience"]        = query.value(11).toString();
+            map["film_imageurl"]        = query.value(12).toString();
+            map["film_officialurl"]     = query.value(13).toString();
+            map["film_language"]        = query.value(14).toString();
+        }
+    }
+    
+    if (haveData == false)
+    {
+        map["film_id"]              = "";
+        map["film_title"]           = "";
+        map["film_description"]     = "";
+        map["film_runtime"]         = "";
+        map["film_releasedate"]     = "";
+        map["film_colorcode"]       = "";
+        map["film_soundtrack"]      = "";
+        map["film_soundmix"]        = "";
+        map["film_genre"]           = "";
+        map["film_mpaarating"]      = "";
+        map["film_starrating"]      = "";
+        map["film_certification"]   = "";
+        map["film_audience"]        = "";
+        map["film_imageurl"]        = "";
+        map["film_officialurl"]     = "";
+        map["film_language"]        = "";
+    }    
+    
+}
+ 
 
 MMTMovieMasterItem::MMTMovieMasterItem(UIListGenericTree* parent, const QString &text)
                   : MMTDBItem(parent, text, KEY_MOVIE_MASTER, 0 )
@@ -72,12 +187,10 @@ void MMTMovieMasterItem::populateTree(UIListGenericTree*)
 }
 
 
-MMTShowingItem::MMTShowingItem(UIListGenericTree* parent, const QString& text, int id, 
-                               int filmID, const QString& theaterID)
-              : MMTDBItem(parent, text, KEY_DATE, id )
+MMTShowingItem::MMTShowingItem(UIListGenericTree* parent, const QString& text, 
+                               int filmID, const QString& theaterID, int showingID)
+              : MMTDBItem(parent, text, KEY_DATE, filmID, theaterID, showingID )
 {
-    FilmID = filmID;
-    TheaterID = theaterID;
 }
 
                
@@ -94,7 +207,7 @@ void MMTShowingItem::populateTree(UIListGenericTree*)
                        "FROM movietime_movies "
                        "WHERE filmid = :FILMID" );
                    
-        query.bindValue(":FILMID", ID);
+        query.bindValue(":FILMID", FilmID);
     }        
     else
     {
@@ -102,7 +215,7 @@ void MMTShowingItem::populateTree(UIListGenericTree*)
                       "FROM movietime_showtimes "
                       "WHERE TimesRowID = :ROWID" );
                    
-        query.bindValue(":ROWID", ID);
+        query.bindValue(":ROWID", ShowingID);
 
     }
     
@@ -111,7 +224,7 @@ void MMTShowingItem::populateTree(UIListGenericTree*)
         while (query.next()) 
         {
             tempItem = new MMTDBItem(this, query.value(1).toString(), 
-                                     KEY_TIME, query.value(0).toInt());
+                                     KEY_TIME, FilmID, TheaterID, ShowingID, query.value(0).toInt());
          
         }
     }
@@ -126,11 +239,20 @@ void MMTShowingItem::populateTree(UIListGenericTree*)
 
 
 MMTMovieItem::MMTMovieItem(UIListGenericTree* parent, const QString &text, 
-                           int filmID, const QString& theaterID)
-            : MMTDBItem(parent, text, KEY_MOVIE, filmID )
+                           int filmID, const QString& theaterID, int showingID)
+            : MMTDBItem(parent, text, KEY_MOVIE, filmID, theaterID, showingID )
 {
-    TheaterID = theaterID;
 }
+
+
+void MMTMovieItem::populateTree(UIListGenericTree* tree) 
+{
+    if (!TheaterID.isEmpty())
+        populateTreeWithDates(tree);
+    else
+        populateTreeWithTheaters(tree);
+}
+
 
 void MMTMovieItem::populateTreeWithDates(UIListGenericTree* tree)
 {
@@ -145,7 +267,7 @@ void MMTMovieItem::populateTreeWithDates(UIListGenericTree* tree)
                        "FROM movietime_movies "
                        "WHERE filmid = :FILMID" );
                    
-        query.bindValue(":FILMID", ID);
+        query.bindValue(":FILMID", FilmID);
     }        
     else
     {
@@ -154,7 +276,7 @@ void MMTMovieItem::populateTreeWithDates(UIListGenericTree* tree)
                        "WHERE filmid = :FILMID AND "
                        "theaterid = :THEATER" );
                    
-        query.bindValue(":FILMID", ID);
+        query.bindValue(":FILMID", FilmID);
         query.bindValue(":THEATER", TheaterID);
     }
     
@@ -163,7 +285,7 @@ void MMTMovieItem::populateTreeWithDates(UIListGenericTree* tree)
         while (query.next()) 
         {
             tempItem = new MMTShowingItem(this, query.value(1).toString(), 
-                                          query.value(0).toInt(), ID, TheaterID);
+                                          FilmID, TheaterID, query.value(0).toInt());
          
         }
     }
@@ -189,7 +311,7 @@ void MMTMovieItem::populateTreeWithTheaters(UIListGenericTree* tree)
                    "INNER JOIN movietime_theaters theater on theater.theaterid = film.theaterid "
                    "WHERE film.filmid = :FILMID" );
     
-    query.bindValue(":FILMID", ID);
+    query.bindValue(":FILMID", FilmID);
     
 
     if (query.exec() && query.isActive() && query.size() > 0)
@@ -197,7 +319,7 @@ void MMTMovieItem::populateTreeWithTheaters(UIListGenericTree* tree)
         while (query.next()) 
         {
             tempItem = new MMTTheaterItem(this, query.value(0).toString(), 
-                                          query.value(1).toString(), ID );
+                                          FilmID, query.value(1).toString(), ShowingID );
          
         }
     }
@@ -213,7 +335,7 @@ void MMTMovieItem::populateTreeWithTheaters(UIListGenericTree* tree)
 
 
 MMTTheaterMasterItem::MMTTheaterMasterItem(UIListGenericTree* parent, const QString &text)
-                  : MMTDBItem(parent, text, KEY_THEATER_MASTER, 0 )
+                  : MMTDBItem(parent, text, KEY_THEATER_MASTER)
 {
     populateTree(parent);    
 }
@@ -232,7 +354,7 @@ void MMTTheaterMasterItem::populateTree(UIListGenericTree*)
         while (query.next()) 
         {
             tempItem = new MMTTheaterItem(this, query.value(1).toString(), 
-                                          query.value(0).toString());
+                                          0, query.value(0).toString());
          
         }
     }
@@ -240,12 +362,9 @@ void MMTTheaterMasterItem::populateTree(UIListGenericTree*)
 }
 
 MMTTheaterItem::MMTTheaterItem(UIListGenericTree* parent, const QString &text, 
-                               const QString& theaterID, int filmID, int showingID)
-              : MMTDBItem(parent, text, KEY_THEATER, -1)
+                               int filmID, const QString& theaterID, int showingID, int timeID)
+              : MMTDBItem(parent, text, KEY_THEATER, filmID, theaterID, showingID, timeID)
 {
-    TheaterID = theaterID;
-    FilmID = filmID;
-    ShowingID = showingID;
 }
 
 void MMTTheaterItem::populateTree(UIListGenericTree* tree)
@@ -284,7 +403,7 @@ void MMTTheaterItem::populateTreeWithMovies(UIListGenericTree*)
         while (query.next()) 
         {
             tempItem = new MMTMovieItem(this, query.value(1).toString(), 
-                                        query.value(0).toInt(), TheaterID);
+                                        query.value(0).toInt(), TheaterID, ShowingID);
          
         }
     }
@@ -313,7 +432,7 @@ void MMTTheaterItem::populateTreeWithDates(UIListGenericTree*)
         while (query.next()) 
         {
             tempItem = new MMTShowingItem(this, query.value(1).toString(), 
-                                          query.value(0).toInt(), FilmID, TheaterID);
+                                          FilmID, TheaterID, query.value(0).toInt());
          
         }
     }

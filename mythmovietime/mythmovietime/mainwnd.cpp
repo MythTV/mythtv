@@ -48,7 +48,9 @@ MMTMainWindow::MMTMainWindow(MythMainWindow *parent, const QString &window_name,
                              const QString &theme_filename, const char *name)
              : MythThemedDialog(parent, window_name, theme_filename, name)
 {
+    Info = getContainer("info");
     Tree = getUIListTreeType("movietree");
+    
     if (!Tree)
     {
         DialogBox diag(gContext->GetMainWindow(), 
@@ -62,7 +64,7 @@ MMTMainWindow::MMTMainWindow(MythMainWindow *parent, const QString &window_name,
 
         return;
     }
-
+    
     connect(Tree, SIGNAL(itemEntered(UIListTreeType *, UIListGenericTree *)),
             this, SLOT(entered(UIListTreeType *, UIListGenericTree *)));    
     
@@ -91,6 +93,24 @@ void MMTMainWindow::entered(UIListTreeType *treetype, UIListGenericTree *item)
     {    
         pItem->populateTree(item);    
         Tree->Redraw();
+    }        
+    
+    if (pItem )
+    {
+        QMap<QString, QString> map;
+        
+        pItem->toMap(map);
+        UITextType* textObj;
+        
+        QMap<QString, QString>::Iterator it;
+        for( it = map.begin(); it != map.end(); ++it )
+        {
+            textObj = getUITextType( it.key() );
+            if( textObj )
+            {
+                textObj->SetText( it.data() );
+            }
+        }
     }        
 }
 

@@ -9,12 +9,27 @@
 <mythuitheme>
     <!-- The main MythMovieTime screen -->
     <window name="movietime_main">
+    
+        <font name="info" face="Arial">
+            <color>#ffffff</color>
+            <size>16</size>
+            <bold>yes</bold>
+        </font>
+        
+        <font name="title" face="Arial">
+            <color>#ffffff</color>
+            <size>20</size>
+            <bold>yes</bold>
+        </font>
+        
         <font name="active" face="Arial">
             <color>#ffffff</color>
             <size>18</size>
             <bold>yes</bold>
         </font>
 
+        
+        
         <font name="inactive" face="Arial">
             <color>#9999cc</color>
             <size>18</size>
@@ -37,48 +52,35 @@
 
         <container name="info">
             <area>0,400,800,200</area>
-
             <image name="background" draworder="0" fleximage="no">
                 <filename>music-sel-bg.png</filename>
                 <position>0,0</position>
             </image>
 
-            <textarea name="line1" draworder="1" align="left">
+            <textarea name="theater_name" draworder="1" align="left">
                 <font>active</font>
                 <area>10,0,780,30</area>
                 <cutdown>yes</cutdown>
             </textarea>
 
-            <textarea name="line2" draworder="1" align="left">
-                <font>active</font>
-                <area>10,30,780,30</area>
+            <textarea name="theater_street" draworder="1" align="left">
+                <font>info</font>
+                <area>10,30,780,20</area>
                 <cutdown>yes</cutdown>
             </textarea>
-
-            <textarea name="line3" draworder="1" align="left">
-                <font>active</font>
-                <area>10,60,780,30</area>
+            
+            <textarea name="film_title" draworder="1" align="left">
+                <font>title</font>
+                <area>10,65,780,30</area>
                 <cutdown>yes</cutdown>
             </textarea>
-    
-            <textarea name="line4" draworder="1" align="left">
-                <font>active</font>
-                <area>10,90,780,30</area>
+            <textarea name="film_description" draworder="1" align="left">
+                <font>info</font>
+                <area>10,105,780,80</area>
+                <multiline>yes</multiline>
                 <cutdown>yes</cutdown>
             </textarea>
-
-            <textarea name="line5" draworder="1" align="left">
-                <font>active</font>
-                <area>10,120,780,30</area>
-                <cutdown>yes</cutdown>
-            </textarea>
-    
-            <textarea name="line6" draworder="1" align="left">
-                <font>active</font>
-                <area>10,150,780,30</area>
-                <cutdown>yes</cutdown>
-            </textarea>
-
+            
         </container>
     </window>
 </mythuitheme>

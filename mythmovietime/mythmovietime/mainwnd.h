@@ -60,6 +60,8 @@ class MMTMainWindow : public MythThemedDialog
         //  Theme widgets
         UIListGenericTree   *RootNode;
         UIListTreeType      *Tree;
+        LayerSet            *Info;
+        
         
         MMTDBItem* MoviesRoot;
         MMTDBItem* TheatersRoot;

@@ -42,30 +42,35 @@ class MMTDBItem  : public UIListGenericTree
 {
     public:
         MMTDBItem(UIListGenericTree *parent, const QString &text, 
-                  TreeKeys key, int id);
+                  TreeKeys key, int FilmID = 0, const QString& theaterID = "ALL",
+                  int ShowingID = 0, int TimeID = 0 );
                   
         virtual ~MMTDBItem() { }
 
-        int getKey(void) { return Key; }
-        int getID(void) { return ID; }
+        int getKey(void) const { return Key; }
+        int getFilmID(void) const { return FilmID; }
+        int getShowingID(void) const { return ShowingID; }
+        const QString& getTheaterID(void) const { return TheaterID; }
+        
         virtual void populateTree(UIListGenericTree*) {return;}
+        virtual void toMap(QMap<QString, QString> &map);
         
     protected:
-        int ID;
         int Key;
+        
+        int FilmID;
+        QString TheaterID;
+        int ShowingID;
+        int TimeID;
 };
 
 
 class MMTShowingItem : public MMTDBItem
 {
     public:
-        MMTShowingItem(UIListGenericTree* parent, const QString& text, int id, 
-                       int filmID, const QString& theaterID);
+        MMTShowingItem(UIListGenericTree* parent, const QString& text, int FilmID = 0, 
+                       const QString& theaterID = "", int ShowingID = 0);
         virtual void populateTree(UIListGenericTree* Tree);
-    
-    protected:
-        int FilmID;
-        QString TheaterID;
 };
 
 
@@ -81,21 +86,14 @@ class MMTMovieMasterItem : public MMTDBItem
 class MMTMovieItem : public MMTDBItem
 {
     public:
-        MMTMovieItem(UIListGenericTree* parent, const QString &text, int filmID,
-                     const QString& theaterID = "");
+        MMTMovieItem(UIListGenericTree* parent, const QString &text, int FilmID = 0, 
+                     const QString& theaterID = "", int ShowingID = 0);
         
-        virtual void populateTree(UIListGenericTree* tree) {
-            if (!TheaterID.isEmpty())
-                populateTreeWithDates(tree);
-            else
-                populateTreeWithTheaters(tree);
-        }
+        virtual void populateTree(UIListGenericTree* tree);
                         
     protected:
         void populateTreeWithDates(UIListGenericTree* tree);
         void populateTreeWithTheaters(UIListGenericTree* tree);
-        
-        QString TheaterID;
 };
 
 // MMTTheaterMasterItem encapsulates the top level list of movies
@@ -110,17 +108,13 @@ class MMTTheaterMasterItem : public MMTDBItem
 class MMTTheaterItem : public MMTDBItem
 {
     public:
-        MMTTheaterItem(UIListGenericTree* parent, const QString &text, 
-                       const QString& theaterID, int filmID = 0, int showingID = 0);
+        MMTTheaterItem(UIListGenericTree* parent, const QString &text, int FilmID = 0, 
+                       const QString& theaterID = "", int ShowingID = 0, int timeID = 0);
         virtual void populateTree(UIListGenericTree* Tree);
     
     protected:
         void populateTreeWithMovies(UIListGenericTree* Tree);
         void populateTreeWithDates(UIListGenericTree* Tree);
-        
-        QString TheaterID;
-        int FilmID;
-        int ShowingID;
 };
 
 
