@@ -86,7 +86,7 @@ public:
     VCDPlayerCommand():
         GlobalSetting("VCDPlayerCommand") {
         setLabel(QObject::tr("VCD Player Command"));
-        addValue("mplayer vcd:// -cdrom-device %d -fs -zoom -vo xv");
+        setValue("mplayer vcd:// -cdrom-device %d -fs -zoom -vo xv");
         setHelpText(QObject::tr("This can be any command to launch a VCD player "
                     "(e.g. MPlayer, xine, etc.). If present, %d will "
                     "be substituted for the VCD device (e.g. /dev/cdrom)."));
