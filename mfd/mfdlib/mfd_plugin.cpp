@@ -389,33 +389,51 @@ void MFDServicePlugin::dropDeadClients()
         while ( (a_client = iterator.current()) != 0 )
         {
             ++iterator;
-            bool still_there;
-            if(a_client->waitForMore(30, &still_there) < 1)
+            
+            if(a_client->socket() < 0)
             {
-                if(!still_there)
+                //
+                //  This occasionaly happens when the other end closes the
+                //  connection ...
+                //
+
+                a_client->lockWriteMutex();
+                a_client->unlockWriteMutex();
+                client_sockets.remove(a_client);
+                log(QString("lost a client (total now %1)")
+                            .arg(client_sockets.count()), 3);
+            }
+            else
+            {
+                bool still_there = true;
+                if(a_client->waitForMore(30, &still_there) < 1)
                 {
-                    //
-                    //  No bytes to read, and we didn't even make it through
-                    //  the 30 msec's .... client gone away. We want to
-                    //  remove it from the list ... BUT, if the writeLock is
-                    //  on, some other thread has not yet realized this
-                    //  client has gone away ..
-                    //
-                    //  ... so, sit here and block (bah!) till that other
-                    //  ... thread realizes what's going on
+                    if(!still_there)
+                    {
+                        //
+                        //  No bytes to read, and we didn't even make it
+                        //  through the 30 msec's .... client gone away. We
+                        //  want to remove it from the list ... BUT, if the
+                        //  writeLock is on, some other thread has not yet
+                        //  realized this client has gone away ..
+                        //
+                        //  ... so, sit here and block (bah!) till that
+                        //  ... other thread realizes what's going on
+                        //
                     
-                    a_client->lockWriteMutex();
+                        a_client->lockWriteMutex();
                     
-                    //
-                    //  ah, all ours
-                    //
+                        //
+                        //  ah, all ours
+                        //
                     
-                    a_client->unlockWriteMutex();
+                        a_client->unlockWriteMutex();
 
-                    client_sockets.remove(a_client);
+                        client_sockets.remove(a_client);
 
-                    log(QString("lost a client (total now %1)")
-                        .arg(client_sockets.count()), 3);
+                        log(QString("lost a client (total now %1)")
+                            .arg(client_sockets.count()), 3);
+                    }
                 }
             }
         }
@@ -651,12 +669,16 @@ void MFDServicePlugin::waitForSomethingToHappen()
         while ( (a_client = iterator.current()) != 0 )
         {
             ++iterator;
-            if(!a_client->isReading())
+            int socket_fd = a_client->socket();
+            if(socket_fd > 0)
             {
-                FD_SET(a_client->socket(), &readfds);
-                if(nfds <= a_client->socket())
+                if(!a_client->isReading())
                 {
-                    nfds = a_client->socket() + 1;
+                    FD_SET(socket_fd, &readfds);
+                    if(nfds <= a_client->socket())
+                    {
+                        nfds = a_client->socket() + 1;
+                    }
                 }
             }
         }

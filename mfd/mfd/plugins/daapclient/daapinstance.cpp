@@ -226,7 +226,7 @@ void DaapInstance::run()
     //
     //  Kill off the socket
     //
-    
+
     if(client_socket_to_daap_server)
     {
         delete client_socket_to_daap_server;
