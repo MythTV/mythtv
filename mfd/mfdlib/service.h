@@ -33,10 +33,7 @@ class Service
                 const QString &l_name, 
                 const QString &l_type,
                 ServiceLocationDescription  l_location,
-                uint l_ipone,
-                uint l_iptwo,
-                uint l_ipthree,
-                uint l_ipfour,
+                const QString &l_hostaddress,
                 uint l_port_number
            );
            
@@ -54,10 +51,6 @@ class Service
     ServiceLocationDescription  getLocation(){ return location; }
     QString                     getAddress();
     QString                     getFormalDescription(bool found_or_lost);
-    uint                        getIpOne(){ return ip_address_one; }
-    uint                        getIpTwo(){ return ip_address_two; }
-    uint                        getIpThree(){ return ip_address_three; }
-    uint                        getIpFour(){ return ip_address_four; }
     uint                        getPort(){ return port_number; }
 
     bool    hostKnown();
@@ -69,15 +62,12 @@ class Service
     ~Service();
 
 
-    QString                     name;       // eg. "Steve Job's Music"
-    QString                     type;       // eg. daap, http, etc.
-    QString                     hostname;   // eg. frontendbox
-    ServiceLocationDescription  location;   // eg. host, lan, etc.
-    uint                        ip_address_one;     
-    uint                        ip_address_two;
-    uint                        ip_address_three;
-    uint                        ip_address_four;
-    uint                        port_number;
+    QString                     name;           // eg. "Steve Job's Music"
+    QString                     type;           // eg. daap, http, etc.
+    QString                     hostname;       // eg. frontendbox
+    ServiceLocationDescription  location;       // eg. host, lan, etc.
+    QHostAddress                hostaddress;    // eg. 192.168.1.2
+    uint                        port_number;    // eg. 80
 };
 
 #endif  // service_h_

@@ -303,6 +303,10 @@ bool ZeroConfigResponder::registerService(
     {
         strict_service_type = "_http._tcp.";
     }
+    if(service_type == "rtsp")
+    {
+        strict_service_type = "_rtsp._tcp.";
+    }
 
     if(strict_service_type.length() < 1)
     {

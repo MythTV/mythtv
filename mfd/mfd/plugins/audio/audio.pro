@@ -9,8 +9,8 @@ TARGET = mfdplugin-audio
 target.path = $${PREFIX}/lib/mythtv/mfdplugins
 INSTALLS += target
 
-HEADERS +=          audio.h	  audiolistener.h   
-SOURCES += main.cpp audio.cpp audiolistener.cpp
+HEADERS +=          audio.h	  audiolistener.h   rtspout.h
+SOURCES += main.cpp audio.cpp audiolistener.cpp rtspout.cpp
 
 HEADERS += daapinput.h   ../daapclient/daaprequest.h   ../daapclient/server_types.h 
 SOURCES += daapinput.cpp ../daapclient/daaprequest.cpp

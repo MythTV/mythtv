@@ -16,7 +16,7 @@
 #include "daapinput.h"
 #include "constants.h"
 #include "audiolistener.h"
-
+#include "rtspout.h"
 
 AudioPlugin::AudioPlugin(MFD *owner, int identity)
       :MFDServicePlugin(owner, identity, 2343, "audio")
@@ -31,6 +31,8 @@ AudioPlugin::AudioPlugin(MFD *owner, int identity)
     state_of_play_mutex = new QMutex(true);    
     metadata_server = parent->getMetadataServer();
     stopPlaylistMode();
+    rtsp_out = new RtspOut(owner, -1);
+    rtsp_out->start();
     audio_listener = new AudioListener(this);
 }
 
@@ -1118,6 +1120,16 @@ AudioPlugin::~AudioPlugin()
     {
         delete state_of_play_mutex;
         state_of_play_mutex = NULL;
+    }
+    
+    if(rtsp_out)
+    {
+        rtsp_out->stop();
+        rtsp_out->wakeUp();
+        rtsp_out->wait();
+        
+        delete rtsp_out;
+        rtsp_out = NULL;
     }
     
     if (audio_listener)

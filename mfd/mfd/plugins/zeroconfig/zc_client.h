@@ -54,6 +54,7 @@ class MFDService
     const QString & getLongDescription();
     const QString & getFormalServiceDescription();
     const QString & getFormalServiceRemoval();
+    const QString   getAddress();
 
     uint    getIpOne(){ return ip_address_one; }
     uint    getIpTwo(){ return ip_address_two; }

@@ -115,10 +115,7 @@ ServiceEvent::ServiceEvent(
                                 a_service.getName(),
                                 a_service.getType(),
                                 a_service.getLocation(),
-                                a_service.getIpOne(),
-                                a_service.getIpTwo(),
-                                a_service.getIpThree(),
-                                a_service.getIpFour(),
+                                a_service.getAddress(),
                                 a_service.getPort()
                              );
     }                            

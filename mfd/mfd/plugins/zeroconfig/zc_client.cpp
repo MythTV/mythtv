@@ -203,6 +203,10 @@ const QString MFDService::getShortType()
     {
         short_type = "raop";
     }
+    else if(service_type == "_rtsp._tcp.")
+    {
+        short_type = "rtsp";
+    }
 
     return short_type;
 }
@@ -302,6 +306,17 @@ const QString& MFDService::getFormalServiceRemoval()
                .arg(service_name);
 
     return formal_removal;
+}
+
+const QString MFDService::getAddress()
+{
+    QString address = QString("%1.%2.%3.%4")
+                             .arg(ip_address_one)
+                             .arg(ip_address_two)
+                             .arg(ip_address_three)
+                             .arg(ip_address_four);
+
+    return address;                             
 }
 
 void MFDService::warning(const QString &warn_text)
@@ -449,7 +464,7 @@ void ZeroConfigClient::handleBrowseCallback(mDNS *const m, DNSQuestion *question
     char nameC[256];
     char typeC[256];
     char domainC[256];
-
+    
     if(answer->rrtype != kDNSType_PTR)
     {
         fatal("zeroconfig client object is getting callbacks from Apple code in a format it doesn't understand");
@@ -578,6 +593,7 @@ void ZeroConfigClient::run()
     browseForService(&mDNSStorage, "_mdcap._tcp.");
     browseForService(&mDNSStorage, "_http._tcp.");
     browseForService(&mDNSStorage, "_raop._tcp.");
+    browseForService(&mDNSStorage, "_rtsp._tcp.");
 
     //
     //  Set up some file descriptors and a pipe. This lets a separate thread
@@ -777,15 +793,11 @@ void ZeroConfigClient::sendServiceEvent(MFDService *service, bool created_or_des
     }
 
 
-
     Service *a_service = new Service(
                                         service->getName(),
                                         service->getShortType(),
                                         location,
-                                        service->getIpOne(),
-                                        service->getIpTwo(),
-                                        service->getIpThree(),
-                                        service->getIpFour(),
+                                        service->getAddress(),
                                         service->getPort()
                                     );
 

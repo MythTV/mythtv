@@ -8,6 +8,9 @@
 
 */
 
+#include <iostream>
+using namespace std;
+
 #include "service.h"
 
 Service::Service()
@@ -16,12 +19,7 @@ Service::Service()
     type = "";
     location = SLT_UNKNOWN;
     hostname = "";
-
-    ip_address_one   = 0;
-    ip_address_two   = 0;
-    ip_address_three = 0;
-    ip_address_four  = 0;
-    
+    hostaddress.setAddress("0.0.0.0");
     port_number = 0;
 }
 
@@ -31,10 +29,7 @@ Service::Service(
                     const QString &l_name, 
                     const QString &l_type,
                     ServiceLocationDescription  l_location,
-                    uint l_ipone,
-                    uint l_iptwo,
-                    uint l_ipthree,
-                    uint l_ipfour,
+                    const QString &l_hostaddress,
                     uint l_port_number
                 )
 {
@@ -42,13 +37,21 @@ Service::Service(
     type = l_type;
     location = l_location;
     hostname = "";
-
-    ip_address_one   = l_ipone;
-    ip_address_two   = l_iptwo;
-    ip_address_three = l_ipthree;
-    ip_address_four  = l_ipfour;
-    
     port_number = l_port_number;
+
+    //
+    //  Set the host address
+    //
+    
+    if ( !hostaddress.setAddress(l_hostaddress))
+    {
+        cerr << "Service::Service() could not create a new "
+             << "service called \"" 
+             << name
+             << "\" with a host address of "
+             << l_hostaddress
+             << endl;
+    }
 }
 
 
@@ -64,23 +67,23 @@ Service::Service(
     type = l_type;
     hostname = l_hostname;
     location = l_location;
-
-    ip_address_one   = 0;
-    ip_address_two   = 0;
-    ip_address_three = 0;
-    ip_address_four  = 0;
-    
     port_number = l_port_number;
+    hostaddress.setAddress("0.0.0.0");
 }
 
 QString Service::getAddress()
 {
-    QString the_address = QString("%1.%2.%3.%4")
-                                .arg(ip_address_one)
-                                .arg(ip_address_two)
-                                .arg(ip_address_three)
-                                .arg(ip_address_four);
-    
+
+    if (hostaddress.toIPv4Address() == 0)
+    {
+        cerr << "Service::getAddress() is about to return "
+             << "an address of 0.0.0.0 for a service called \""
+             << name
+             << "\""
+             << endl;
+    }
+ 
+    QString the_address = hostaddress.toString();
     return the_address;
 }
 
@@ -118,14 +121,11 @@ QString Service::getFormalDescription(bool found_or_lost)
             location_string = "unknown";
     }
 
-    return_string = QString("services %1 %2 %3 %4.%5.%6.%7 %8 %9")
+    return_string = QString("services %1 %2 %3 %4 %5 %6")
                .arg(found_string)
                .arg(location_string)
                .arg(type)
-               .arg(ip_address_one)
-               .arg(ip_address_two)
-               .arg(ip_address_three)
-               .arg(ip_address_four)
+               .arg(hostaddress.toString())
                .arg(port_number)
                .arg(name);
                
