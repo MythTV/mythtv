@@ -251,7 +251,7 @@ int main(int argc, char **argv)
     }
 
     if (printexpire) {
-        expirer = new AutoExpire(false, db);
+        expirer = new AutoExpire(false, false, db);
         expirer->FillExpireList();
         expirer->PrintExpireList();
         cleanup();
@@ -293,7 +293,7 @@ int main(int argc, char **argv)
     }
 
     QSqlDatabase *expdb = QSqlDatabase::database("EXPDB");
-    expirer = new AutoExpire(true, expdb);
+    expirer = new AutoExpire(true, ismaster, expdb);
 
 //    QSqlDatabase *trandb = QSqlDatabase::database("TRANSDB");
 //    trans = new Transcoder(&tvList, trandb);

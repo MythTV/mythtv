@@ -82,6 +82,7 @@ private:
     class SRRecordingType* type;
     class SRProfileSelector* profile;
     class SRAutoExpire* autoexpire;
+    class SRMaxEpisodes* maxepisodes;
     class SRChannel* channel;
     class SRTitle* title;
     class SRSubtitle* subtitle;

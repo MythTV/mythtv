@@ -79,6 +79,16 @@ public:
     };
 };
 
+class SRMaxEpisodes: public SpinBoxSetting, public SRSetting {
+public:
+    SRMaxEpisodes(const ScheduledRecording& parent):
+        SpinBoxSetting(0, 60, 1),
+        SRSetting(parent, "maxepisodes") {
+        setLabel(QObject::tr("Number of most recent episodes to keep "
+                             "(set to 0 for ALL)"));
+    };
+};
+
 class SRChannel: public ChannelSetting, public SRSetting {
 public:
     SRChannel(const ScheduledRecording& parent): SRSetting(parent, "chanid") {
@@ -165,6 +175,7 @@ ScheduledRecording::ScheduledRecording() {
     addChild(type = new SRRecordingType(*this));
     addChild(profile = new SRProfileSelector(*this));
     addChild(autoexpire = new SRAutoExpire(*this));
+    addChild(maxepisodes = new SRMaxEpisodes(*this));
     addChild(channel = new SRChannel(*this));
     addChild(title = new SRTitle(*this));
     addChild(subtitle = new SRSubtitle(*this));
@@ -608,6 +619,7 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
     vbox->addWidget(profile->configWidget(this, dialog));
     vbox->addWidget(rank->configWidget(this, dialog));
     vbox->addWidget(autoexpire->configWidget(this, dialog));
+    vbox->addWidget(maxepisodes->configWidget(this, dialog));
 
 //    f = new QFrame(dialog);
 //    f->setFrameStyle(QFrame::HLine | QFrame::Plain);

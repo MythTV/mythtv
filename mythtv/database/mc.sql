@@ -92,7 +92,8 @@ CREATE TABLE IF NOT EXISTS record
     category VARCHAR(64) NULL,
     profile INT UNSIGNED NOT NULL DEFAULT 0,
     rank INT(10) DEFAULT '0' NOT NULL,
-    autoexpire INT DEFAULT '0' NOT NULL,
+    autoexpire INT DEFAULT 0 NOT NULL,
+    maxepisodes INT DEFAULT 0 NOT NULL,
     INDEX (chanid, starttime),
     INDEX (title)
 );
@@ -109,7 +110,7 @@ CREATE TABLE IF NOT EXISTS recorded
     bookmark VARCHAR(128) NULL,
     editing INT UNSIGNED NOT NULL DEFAULT 0,
     cutlist TEXT NULL,
-    autoexpire INT DEFAULT '0' NOT NULL,
+    autoexpire INT DEFAULT 0 NOT NULL,
     PRIMARY KEY (chanid, starttime),
     INDEX (endtime)
 );
@@ -243,7 +244,7 @@ CREATE TABLE IF NOT EXISTS transcoding (
     hostname VARCHAR(255)
 );
 
-INSERT INTO settings VALUES ('DBSchemaVer', 1000, NULL);
+INSERT INTO settings VALUES ('DBSchemaVer', 1002, NULL);
 
 INSERT INTO recordingprofiles (name) VALUES ('Default');
 INSERT INTO recordingprofiles (name) VALUES ('Live TV');

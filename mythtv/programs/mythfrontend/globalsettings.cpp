@@ -247,7 +247,7 @@ public:
         setLabel("Auto Expire Frequency (in minutes)");
         setHelpText("Number of minutes the AutoExpire process will wait "
                     "between each time that it checks for free disk space.");
-        setValue(1);
+        setValue(10);
     };
 };
 

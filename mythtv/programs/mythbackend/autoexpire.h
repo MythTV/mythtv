@@ -14,7 +14,7 @@ using namespace std;
 class AutoExpire : public QObject
 {
   public:
-    AutoExpire(bool runthread, QSqlDatabase *ldb);
+    AutoExpire(bool runthread, bool master, QSqlDatabase *ldb);
    ~AutoExpire();
 
     void FillExpireList();
@@ -27,6 +27,8 @@ class AutoExpire : public QObject
   private:
     void ClearExpireList(void);
 
+    void ExpireEpisodesOverMax(void);
+
     void FillOldestFirst(void);
 
     vector<ProgramInfo *> expireList;
@@ -36,6 +38,7 @@ class AutoExpire : public QObject
     pthread_mutex_t expirerLock;
 
     bool threadrunning;
+    bool isMaster;
 };
 
 #endif

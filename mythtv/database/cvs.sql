@@ -7,7 +7,7 @@ USE mythconverg;
 #
 
 DELETE FROM settings WHERE value='DBSchemaVer';
-INSERT INTO settings VALUES ('DBSchemaVer', 1001, NULL);
+INSERT INTO settings VALUES ('DBSchemaVer', 1002, NULL);
 
 #
 #   Below are the recent alterations to the database.
@@ -15,7 +15,8 @@ INSERT INTO settings VALUES ('DBSchemaVer', 1001, NULL);
 #   when a previously executed command is encountered.
 #
 
+ALTER TABLE record ADD maxepisodes INT DEFAULT 0 NOT NULL;
 
-ALTER TABLE record ADD autoexpire INT DEFAULT '0' NOT NULL;
-ALTER TABLE recorded ADD autoexpire INT DEFAULT '0' NOT NULL;
+ALTER TABLE record ADD autoexpire INT DEFAULT 0 NOT NULL;
+ALTER TABLE recorded ADD autoexpire INT DEFAULT 0 NOT NULL;
 

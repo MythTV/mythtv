@@ -17,9 +17,10 @@ using namespace std;
 #include "programinfo.h"
 #include "libmyth/mythcontext.h"
 
-AutoExpire::AutoExpire(bool runthread, QSqlDatabase *ldb)
+AutoExpire::AutoExpire(bool runthread, bool master, QSqlDatabase *ldb)
 {
     db = ldb;
+    isMaster = master;
 
     pthread_mutex_init(&expirerLock, NULL);
 
@@ -43,9 +44,15 @@ void AutoExpire::RunExpirer(void)
 {
     QString recordfileprefix = gContext->GetSetting("RecordFilePrefix");
 
+    // wait a little for main server to come up and things to settle down
+    sleep(10);
+
     while (1)
     {
         pthread_mutex_lock(&expirerLock);
+
+        if (isMaster)
+            ExpireEpisodesOverMax();
 
         struct statfs statbuf;
         int freespace = -1;
@@ -120,6 +127,64 @@ void *AutoExpire::ExpirerThread(void *param)
     return NULL;
 }
 
+void AutoExpire::ExpireEpisodesOverMax(void)
+{
+    QMap<QString, int> maxEpisodes;
+    QMap<QString, int>::Iterator maxIter;
+
+    QString fileprefix = gContext->GetFilePrefix();
+    QString querystr = "SELECT title, maxepisodes "
+                       "FROM record WHERE maxepisodes > 0 ORDER BY title";
+
+    QSqlQuery query = db->exec(querystr);
+
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        while (query.next()) {
+            maxEpisodes[query.value(0).toString()] = query.value(1).toInt();
+        }
+    }
+
+    for(maxIter = maxEpisodes.begin(); maxIter != maxEpisodes.end(); maxIter++)
+    {
+        QString sqltitle(maxIter.key());
+        sqltitle.replace(QRegExp("\'"), "\\'");
+        sqltitle.replace(QRegExp("\""), "\\\"");
+
+        querystr = QString( "SELECT chanid, starttime FROM recorded "
+                            "WHERE title = \"%1\" "
+                            "ORDER BY starttime DESC;")
+                            .arg(sqltitle);
+
+        query = db->exec(querystr);
+
+        if (query.isActive() && query.numRowsAffected() > 0)
+        {
+            int found = 0;
+            while (query.next()) {
+                found++;
+
+                if (found > maxIter.data())
+                {
+                    QString msg = QString("Expiring \"%1\" from %2, "
+                                          "too many episodes.")
+                                          .arg(maxIter.key())
+                                          .arg(query.value(1).toString());
+                    VERBOSE(msg);
+
+                    QString message = QString("AUTO_EXPIRE %1 %2")
+                                              .arg(query.value(0).toString())
+                                              .arg(query.value(1).toDateTime()
+                                                   .toString(Qt::ISODate));
+
+                    MythEvent me(message);
+                    gContext->dispatchNow(me);
+                }
+            }
+        }
+    }
+}
+
 void AutoExpire::FillExpireList(void)
 {
     int expMethod = gContext->GetNumSetting("AutoExpireMethod", 0);
@@ -130,7 +195,7 @@ void AutoExpire::FillExpireList(void)
     {
         case 1: FillOldestFirst(); break;
 
-		// default falls through so list is empty so no AutoExpire
+        // default falls through so list is empty so no AutoExpire
     }
 }
 
