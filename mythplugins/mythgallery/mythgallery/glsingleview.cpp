@@ -520,7 +520,7 @@ void GLSingleView::loadImage()
         QImage tex = convertToGLFormat(image);
 
         if (t.tex) {
-            glDeleteTextures(a, &t.tex);
+            glDeleteTextures(1, &t.tex);
         }
 
         /* create the texture */
