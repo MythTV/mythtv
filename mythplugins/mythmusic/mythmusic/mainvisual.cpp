@@ -71,12 +71,15 @@ void MainVisual::setVisual( const QString &visualname )
 {
     VisualBase *newvis = 0;
 
-    if(visualname == "Random")
+    allowed_modes = QStringList::split(",", visualname);
+
+    if (allowed_modes.contains("Random"))
     {
         newvis = randomVis(this, winId());
     }
     else 
-        newvis = createVis(visualname, this, winId());
+        newvis = createVis(allowed_modes[rand() % allowed_modes.size()], 
+                           this, winId());
     	
     setVis( newvis );
 }

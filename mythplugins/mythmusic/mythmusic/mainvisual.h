@@ -13,9 +13,10 @@
 
 #include <qwidget.h>
 #include <qdialog.h>
-#include <qarray.h>
+#include <qmemarray.h>
 #include <qpixmap.h>
 #include <qptrlist.h>
+#include <qstringlist.h>
 
 class Buffer;
 class Output;
@@ -105,6 +106,8 @@ private:
     QTimer *timer;
     bool playing;
     int fps;
+
+    QStringList allowed_modes;
 };
 
 class VisFactory
