@@ -100,6 +100,22 @@ software.</P>
 <P>Install libvorbis-devel using urpmi or the Mandrake Control Center
 installer.</P>
 <P>Install cdparanoia using urpmi or the Mandrake Control Center.</P>
+<P>Once all the pre-requisites have been installed, you can proceed with
+getting mythmusic going.
+<BLOCKQUOTE><CODE>
+<PRE>
+% ./configure
+% make
+% su
+# make install
+# exit
+% cd musicdb
+% mysql -u root &lt; metadata.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Edit the <CODE>/usr/local/share/mythtv/mythmusic-settings.txt</CODE> file for
+your particular system.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-15.html">Next</A>

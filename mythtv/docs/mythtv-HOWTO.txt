@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2002-11-24, v1.034
+  2002-11-25, v1.035
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -23,7 +23,6 @@
            3.2.2.1 Mandrake 8.2 and 9.0
            3.2.2.2 Red Hat Linux 8.0
            3.2.2.3 Gentoo.
-           3.2.2.4 Debian
 
   4. Setting up paths and ldconfig.
      4.1 Distribution-specific information.
@@ -37,7 +36,9 @@
      5.1 Notes on compiling on a system with non-Intel processors.
      5.2 Building LAME.
      5.3 Building XMLTV.
-     5.4 Building mythtv.
+     5.4 Manually building mythtv.
+     5.5 Gentoo.
+     5.6 Debian
 
   6. MySQL.
      6.1 Mandrake 9.0
@@ -77,6 +78,7 @@
 
   12. mythgallery.
      12.1 Installation and pre-requisites.
+
   13. mythgame.
   14. mythmusic.
      14.1 Manual installation of pre-requisites
@@ -128,7 +130,7 @@
   +o  Red Hat Linux 8.0: Cedar McKay,
      <mailto:mythhowto.3.ohthetrees@spamgourmet.com>
 
-  +o  Gentoo:
+  +o  Gentoo: Tony Clark,  <mailto:tclark@telia.com>
 
   +o  Debian: Matthew Zimmerman,  <mailto:mdz@debian.org>
 
@@ -305,20 +307,6 @@
 
   [Please submit instructions]
 
-  [1m3.2.2.4.  Debian[0m
-
-  Debian packages for MythTV and some of its add-on modules have been
-  packaged by Matt Zimmerman  <mailto:mdz@debian.org> and are available
-  at http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/
-  <http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/>,
-  including installation instructions.  All of the prerequisites for
-  MythTV are available as Debian packages.
-
-  The mailing list message for this announcement can be accessed at
-  http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html
-  <http://www.snowman.net/pipermail/mythtv-
-  dev/2002-November/001116.html>.
-
   [1m4.  Setting up paths and ldconfig.[0m
 
   There are some paths that need to be modified before starting the main
@@ -376,14 +364,14 @@
 
   Switch to /etc and execute the following:
 
-       # cd /etc
-       # cat >> ld.so.conf
-       /usr/local/lib
-       ^D
+  # cd /etc
+  # cat >> ld.so.conf
+  /usr/local/lib
+  ^D
 
-       # ldconfig
-       # exit
-       %
+  # ldconfig
+  # exit
+  %
 
   [1m5.  Downloading and compiling.[0m
 
@@ -419,28 +407,28 @@
 
   Open a shell and switch to the directory where you saved lame.
 
-  % tar -xzf lame-3.92.tar.gz
-  % cd lame-3.92
-  % ./configure
-  % make
-  % make test
-  % su
-  # make install
+       % tar -xzf lame-3.92.tar.gz
+       % cd lame-3.92
+       % ./configure
+       % make
+       % make test
+       % su
+       # make install
 
   Check that it worked:
 
-       # ls -l /usr/local/lib
-       -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
-       -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
-       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
-       libmp3lame.so.0.0.0*
-       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
-       libmp3lame.so.0.0.0*
-       -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
-       libmp3lame.so.0.0.0*
+  # ls -l /usr/local/lib
+  -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
+  -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
+  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
+  libmp3lame.so.0.0.0*
+  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
+  libmp3lame.so.0.0.0*
+  -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
+  libmp3lame.so.0.0.0*
 
-       # exit
-       %
+  # exit
+  %
 
   [1m5.3.  Building XMLTV.[0m
 
@@ -499,7 +487,7 @@
        # make install
        # exit
 
-  [1m5.4.  Building mythtv.[0m
+  [1m5.4.  Manually building mythtv.[0m
 
   Unpack mythtv
 
@@ -513,6 +501,62 @@
        % su
        # make install
        # exit
+
+  [1m5.5.  Gentoo.[0m
+
+  There are ebuilds setup for mythtv and for XMLTV.  To use them, do the
+  following:
+
+  Create a local portage directory and specify it in /etc/make.conf
+
+       # PORTDIR_OVERLAY is a directory where local ebuilds may be stored without
+       #     concern that they will be deleted by rsync updates. Default is not
+       #     defined.
+       PORTDIR_OVERLAY=/home/[yourusername]/portage
+
+  Next:
+
+       mkdir -p /home/[yourusername]/portage/video-media/mythtv
+       mkdir -p /home/[yourusername]/portage/dev-perl/xmltv
+
+  Download the ebuilds and save them to a directory you can find.  The
+  two ebuilds are:
+
+  +o  mythtv: http://bugs.gentoo.org/show_bug.cgi?id=10533
+     <http://bugs.gentoo.org/show_bug.cgi?id=10533>
+
+  +o  XMLTV: http://bugs.gentoo.org/show_bug.cgi?id=10536
+     <http://bugs.gentoo.org/show_bug.cgi?id=10536>
+
+  emerge mythtv.  It should download the source then complain about a
+  missing digest.  To fix this
+
+       % ebuild /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0.ebuild digest
+
+  emerge mythtv again and it should compile and install.
+
+  Do the same for xmltv but an additonal step will be required first to
+  fool it into thinking XML-Twig is installed.  To achieve this:
+
+       % emerge inject dev-perl/XML-Twig
+
+  Build XML-Twig the long way and install.
+
+       % emerge mysql
+
+  [1m5.6.  Debian[0m
+
+  Debian packages for MythTV and some of its add-on modules have been
+  packaged by Matt Zimmerman  <mailto:mdz@debian.org> and are available
+  at http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/
+  <http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/>,
+  including installation instructions.  All of the prerequisites for
+  MythTV are available as Debian packages.
+
+  The mailing list message for this announcement can be accessed at
+  http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html
+  <http://www.snowman.net/pipermail/mythtv-
+  dev/2002-November/001116.html>.
 
   [1m6.  MySQL.[0m
 
@@ -532,7 +576,11 @@
 
   [1m6.3.  Gentoo.[0m
 
-  Please submit content.
+  By default, doesn't build QT libraries with SQL support.  To enable
+  SQL support you need to add to your USE variable (USE="mysql") in
+  /etc/make.conf and rebuild QT by running
+
+       % emerge qt
 
   [1m6.4.  Setting up the initial database.[0m
 
@@ -550,14 +598,14 @@
 
   [1m6.4.3.  Red Hat Linux 8.0[0m
 
-       % mysql < mc.sql
+  % mysql < mc.sql
 
   if this returns an error message try switching to root first.
 
-  % su
-  # mysql < mc.sql
-  # exit
-  %
+       % su
+       # mysql < mc.sql
+       # exit
+       %
 
   [1m7.  Setting up ALSA and the mixer.[0m
 
@@ -659,16 +707,15 @@
        % wget http://www.kernel.org/pub/linux/kernel/v2.4/linux-2.4.19.tar.bz2
 
   Next, open a shell and login as superuser.
-
-  % su
-  # mkdir /usr/src
-  # mv linux-2.4.19.tar.bz2 /usr/src
-  # cd /usr/src
-  # tar -xjf linux-2.4.19.tar.bz2
-  # chown -R root.root linux-2.4.19
-  # ln -sf linux-2.4.19 linux
-  # exit
-  %
+       % su
+       # mkdir /usr/src
+       # mv linux-2.4.19.tar.bz2 /usr/src
+       # cd /usr/src
+       # tar -xjf linux-2.4.19.tar.bz2
+       # chown -R root.root linux-2.4.19
+       # ln -sf linux-2.4.19 linux
+       # exit
+       %
 
   [1m8.2.  Obtaining and compiling lirc.[0m
 

@@ -18,6 +18,7 @@ v1.033, 2002-11-23.  Fixed the XMLTV/mythfilldatabase instruction to point
 to the correct file.  Slight wording changes to the DirecTV stuff.  Moved
 some CVS parameters around.  Added "DMA" to troubleshooting section.
 v1.034, 2002-11-24.  Added information on setting up mythmusic database.
+v1.035, 2002-11-25.  Added information on Gentoo.
 -->
 <!--
 To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
@@ -28,7 +29,7 @@ To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-11-24, v1.034
+<date>2002-11-25, v1.035
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -71,7 +72,7 @@ The contributors for this document are:
 <itemize>
 <item>Overall structure and Mandrake 9.0: Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
 <item>Red Hat Linux 8.0: Cedar McKay, <url url="mailto:mythhowto.3.ohthetrees@spamgourmet.com">
-<item>Gentoo:
+<item>Gentoo: Tony Clark, <url url="mailto:tclark@telia.com">
 <item>Debian: Matthew Zimmerman, <url url="mailto:mdz@debian.org">
 </itemize>
 
@@ -127,7 +128,6 @@ sound, which is a core requirement for mythtv.  If you are not running
 ALSA 0.9.0rc6 and experience lock-ups of your system when trying to use mythtv, 
 then please check the main ALSA website and upgrade to the latest version,
 or see if your distribution has already packaged the latest ALSA drivers.
-<!-- What:  download latest CVS?  Send to URL of patch? -->
 
 <sect2>Graphical installation tools. <label id="graphicinstalltools_">
 <sect3>Mandrake 9.0
@@ -231,18 +231,6 @@ In that case, you're ready to move onto the next step.
 
 <p>[Please submit instructions]
 
-<sect3>Debian
-<p>Debian packages for MythTV and some of its add-on modules have been
-packaged by Matt Zimmerman <url url="mailto:mdz@debian.org"> and are
-available at <url
-url="http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/"
-name="http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/"
->, including installation instructions.  All of the prerequisites for
-MythTV are available as Debian packages.
-
-The mailing list message for this announcement can be accessed at <url
-url="http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html"
-name="http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html">.
 
 <sect>Setting up paths and ldconfig.
 
@@ -421,8 +409,7 @@ this point.
 # exit
 </verb></tscreen>
 
-<sect1>Building mythtv.
-
+<sect1>Manually building mythtv.
 <p>Unpack mythtv
 <tscreen><verb>
 % tar -xjf mythtv-0.7.tar.bz2
@@ -437,6 +424,69 @@ Switch to superuser:
 # exit
 </verb></tscreen>
 
+<sect1>Gentoo.
+<p>There are ebuilds setup for mythtv and for XMLTV.  To use them, do the
+following:
+
+Create a local portage directory and specify it in <tt>/etc/make.conf</tt>
+<tscreen><verb>
+# PORTDIR_OVERLAY is a directory where local ebuilds may be stored without
+#     concern that they will be deleted by rsync updates. Default is not
+#     defined.
+PORTDIR_OVERLAY=/home/[yourusername]/portage
+</verb></tscreen>
+
+Next:
+<tscreen><verb>
+mkdir -p /home/[yourusername]/portage/video-media/mythtv
+mkdir -p /home/[yourusername]/portage/dev-perl/xmltv
+</verb></tscreen>
+
+Download the ebuilds and save them to a directory you can find.  The two
+ebuilds are:
+
+<itemize>
+<item>mythtv: <url url="http://bugs.gentoo.org/show_bug.cgi?id=10533"
+name="http://bugs.gentoo.org/show_bug.cgi?id=10533">
+<item>XMLTV: <url url="http://bugs.gentoo.org/show_bug.cgi?id=10536"
+name="http://bugs.gentoo.org/show_bug.cgi?id=10536">
+</itemize>
+
+emerge mythtv.  It should download the source then complain about a missing 
+digest.  To fix this 
+
+<tscreen><verb>
+% ebuild /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0.ebuild digest
+</verb></tscreen>
+
+emerge mythtv again and it should compile and install.
+
+Do the same for xmltv but an additonal step will be required first to fool
+it into thinking XML-Twig is installed.  To achieve this: 
+
+<tscreen><verb>
+% emerge inject dev-perl/XML-Twig
+</verb></tscreen>
+
+Build XML-Twig the long way and install.
+
+<tscreen><verb>
+% emerge mysql
+</verb></tscreen>
+
+<sect1>Debian
+<p>Debian packages for MythTV and some of its add-on modules have been
+packaged by Matt Zimmerman <url url="mailto:mdz@debian.org"> and are
+available at <url
+url="http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/"
+name="http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/"
+>, including installation instructions.  All of the prerequisites for
+MythTV are available as Debian packages.
+
+The mailing list message for this announcement can be accessed at <url
+url="http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html"
+name="http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html">.
+
 <sect>MySQL.
 <sect1>Mandrake 9.0
 <p>Make sure that mysql is running and started at boot.  Click on Mandrake
@@ -448,7 +498,15 @@ the "Start" button if the mysql status shows that it isn't running yet.
 menu>Server Settings>Services and enter the root password when asked.
 Check "mysqld" and then click Start. Click Save, then close the window.
 <sect1>Gentoo.
-<p>Please submit content.
+<p>By default, doesn't build QT libraries with SQL support.  To
+enable SQL support you need to add to your USE variable (USE="mysql") in 
+<tt>/etc/make.conf</tt> and rebuild QT by running 
+
+<tscreen><verb>
+% emerge qt
+</verb</tscreen>
+
+
 
 <sect1>Setting up the initial database.
 <p>Setup the initial mysql databases:

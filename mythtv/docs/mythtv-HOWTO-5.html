@@ -148,7 +148,7 @@ this point.
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss5.4">5.4</A> <A HREF="mythtv-HOWTO.html#toc5.4">Building mythtv.</A>
+<H2><A NAME="ss5.4">5.4</A> <A HREF="mythtv-HOWTO.html#toc5.4">Manually building mythtv.</A>
 </H2>
 
 <P>Unpack mythtv
@@ -170,6 +170,79 @@ Switch to superuser:
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+
+<H2><A NAME="ss5.5">5.5</A> <A HREF="mythtv-HOWTO.html#toc5.5">Gentoo.</A>
+</H2>
+
+<P>There are ebuilds setup for mythtv and for XMLTV.  To use them, do the
+following:</P>
+<P>Create a local portage directory and specify it in <CODE>/etc/make.conf</CODE>
+<BLOCKQUOTE><CODE>
+<PRE>
+# PORTDIR_OVERLAY is a directory where local ebuilds may be stored without
+#     concern that they will be deleted by rsync updates. Default is not
+#     defined.
+PORTDIR_OVERLAY=/home/[yourusername]/portage
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Next:
+<BLOCKQUOTE><CODE>
+<PRE>
+mkdir -p /home/[yourusername]/portage/video-media/mythtv
+mkdir -p /home/[yourusername]/portage/dev-perl/xmltv
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Download the ebuilds and save them to a directory you can find.  The two
+ebuilds are:</P>
+<P>
+<UL>
+<LI>mythtv: 
+<A HREF="http://bugs.gentoo.org/show_bug.cgi?id=10533">http://bugs.gentoo.org/show_bug.cgi?id=10533</A></LI>
+<LI>XMLTV: 
+<A HREF="http://bugs.gentoo.org/show_bug.cgi?id=10536">http://bugs.gentoo.org/show_bug.cgi?id=10536</A></LI>
+</UL>
+</P>
+<P>emerge mythtv.  It should download the source then complain about a missing 
+digest.  To fix this </P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+% ebuild /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0.ebuild digest
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>emerge mythtv again and it should compile and install.</P>
+<P>Do the same for xmltv but an additonal step will be required first to fool
+it into thinking XML-Twig is installed.  To achieve this: </P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+% emerge inject dev-perl/XML-Twig
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Build XML-Twig the long way and install.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+% emerge mysql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss5.6">5.6</A> <A HREF="mythtv-HOWTO.html#toc5.6">Debian</A>
+</H2>
+
+<P>Debian packages for MythTV and some of its add-on modules have been
+packaged by Matt Zimmerman 
+<A HREF="mailto:mdz@debian.org">mailto:mdz@debian.org</A> and are
+available at 
+<A HREF="http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/">http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/</A>, including installation instructions.  All of the prerequisites for
+MythTV are available as Debian packages.</P>
+<P>The mailing list message for this announcement can be accessed at 
+<A HREF="http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html">http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html</A>.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-6.html">Next</A>
