@@ -12,7 +12,6 @@
 #include <qfile.h>
 #include <qregexp.h>
 
-#include <iostream>
 using namespace std;
 
 #include "RingBuffer.h"
@@ -109,7 +108,7 @@ ThreadedFileWriter::ThreadedFileWriter(const char *filename,
     if (fd <= 0)
     {
         /* oops! */
-        cerr << "ERROR opening file in ThreadedFileWriter.\n";
+        VERBOSE(VB_IMPORTANT,"ERROR opening file in ThreadedFileWriter.");
         perror(filename);
         exit(1);
     }
@@ -150,7 +149,7 @@ unsigned ThreadedFileWriter::Write(const void *data, unsigned count)
     while (count > BufFree())
     {
         if (first)
-            cerr << "IOBOUND - blocking in ThreadedFileWriter::Write()\n";
+             VERBOSE(VB_IMPORTANT, "IOBOUND - blocking in ThreadedFileWriter::Write()");
         first = 0;
         usleep(5000);
     }
@@ -824,7 +823,7 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
         while (!readsallowed && !stopreads)
         {
             if (!readsAllowedWait.wait(5000))
-                cerr << "taking too long to be allowed to read..\n";
+                 VERBOSE(VB_IMPORTANT, "taking too long to be allowed to read..");
         }
 
     int avail = ReadBufAvail();
@@ -837,13 +836,13 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
         wanttoread = count;
         if (!availWait.wait(&availWaitMutex, 2000))
         {
-            cerr << "Waited 2 seconds for data to become available, waiting "
-                    "again...\n";
+            VERBOSE(VB_IMPORTANT,"Waited 2 seconds for data to become available, waiting "
+                    "again...");
             readErr++;
             if (readErr > 7)
             {
-                cerr << "Waited 14 seconds for data to become available, "
-                        "aborting\n";
+                VERBOSE(VB_IMPORTANT,"Waited 14 seconds for data to become available, "
+                        "aborting");
                 wanttoread = 0;
                 stopreads = true;
                 availWaitMutex.unlock();
@@ -958,8 +957,8 @@ int RingBuffer::Read(void *buf, int count)
             {
                 if (!availWait.wait(&availWaitMutex, 15000))
                 {
-                    cerr << "Couldn't read data from the capture card in 15 "
-                            "seconds.  Game over, man.\n";
+                    VERBOSE(VB_IMPORTANT,"Couldn't read data from the capture card in 15 "
+                            "seconds.  Game over, man.");
                     StopReads();
                 }
 
