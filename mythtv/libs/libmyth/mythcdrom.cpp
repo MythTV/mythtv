@@ -37,7 +37,7 @@ bool MythCDROM::openDevice()
     {
         // If allow eject is on, unlock the door.
         if (m_AllowEject)
-            ioctl(m_DeviceHandle, CDROM_LOCKDOOR, 0);
+            unlock();
         
         return true;
     }
