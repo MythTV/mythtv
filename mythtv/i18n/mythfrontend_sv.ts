@@ -6145,7 +6145,7 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     </message>
     <message>
         <source>2.0X</source>
-        <translation>2,0X</translation>
+        <translation type="obsolete">2,0X</translation>
     </message>
     <message>
         <source>Sleep Off</source>
@@ -6162,6 +6162,18 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>Off</source>
         <translation>Av</translation>
+    </message>
+    <message>
+        <source>1.2X</source>
+        <translation>1,2X</translation>
+    </message>
+    <message>
+        <source>1.3X</source>
+        <translation>1,3X</translation>
+    </message>
+    <message>
+        <source>1.4X</source>
+        <translation>1,4X</translation>
     </message>
 </context>
 <context>

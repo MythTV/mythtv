@@ -6484,10 +6484,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation></translation>
     </message>
     <message>
-        <source>2.0X</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Sleep</source>
         <translation>Slaapstand</translation>
     </message>
@@ -6502,6 +6498,18 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>Off</source>
         <translation>Uit</translation>
+    </message>
+    <message>
+        <source>1.2X</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>1.3X</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>1.4X</source>
+        <translation></translation>
     </message>
 </context>
 <context>

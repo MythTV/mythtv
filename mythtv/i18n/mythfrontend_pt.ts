@@ -6145,10 +6145,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>2.0X</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Sleep</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6162,6 +6158,18 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1.2X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1.3X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1.4X</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

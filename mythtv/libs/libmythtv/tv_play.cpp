@@ -4065,8 +4065,10 @@ void TV::BuildOSDTreeMenu(void)
     subitem = new OSDGenericTree(item, tr("0.9X"), "TOGGLESTRETCH0.9");
     subitem = new OSDGenericTree(item, tr("1.0X"), "TOGGLESTRETCH1.0");
     subitem = new OSDGenericTree(item, tr("1.1X"), "TOGGLESTRETCH1.1");
+    subitem = new OSDGenericTree(item, tr("1.2X"), "TOGGLESTRETCH1.2");
+    subitem = new OSDGenericTree(item, tr("1.3X"), "TOGGLESTRETCH1.3");
+    subitem = new OSDGenericTree(item, tr("1.4X"), "TOGGLESTRETCH1.4");
     subitem = new OSDGenericTree(item, tr("1.5X"), "TOGGLESTRETCH1.5");
-    subitem = new OSDGenericTree(item, tr("2.0X"), "TOGGLESTRETCH2.0");
 
     // add sleep items to menu
 
