@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-10-25, v2.87
+<date>2003-11-01, v2.88
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2348,20 +2348,26 @@ HOME=/
 # exit
 $ 
 </verb></tscreen>
-
 We can see from the display that the cron.daily job will run at 0402 every
 morning.
 
 If you wish to specify a custom time, then the user-based cron job is the
 better method.
 
-The default <bf>configfiles/mythcrontab</bf> file will run the <bf>
-mythfilldatabase</bf> program every day at 0430.  If you want to change this,
-then open the <tt>configfiles/mythcrontab</tt> file in your favorite editor and
-modify it as you like.  Once you're satisfied with the time that <bf>
-mythfilldatabase</bf> will run, save and exit, and return to the shell prompt.
+The default <bf>configfiles/mythcrontab</bf> file will run the
+<bf>mythfilldatabase</bf> program every day at 0430.  Placing a copy of the
+default <bf>configfiles/mythcrontab</bf> into your <tt>~/.mythtv</tt>
+directory will allow you to edit your copy and maintain the original if you
+get into trouble. To change the time used to start the
+<bf>mythfilldatabase</bf> process, open the <tt>~/.mythtv/mythcrontab</tt>
+file in your favorite editor and modify it as you like.  Once you're
+satisfied with the time that <bf>mythfilldatabase</bf> will run, save and
+exit, and return to the shell prompt.
+
 <tscreen><verb>
-$ cd configfiles
+$ cp ~/mythtv/configfiles/mythfilldatabasecron ~/.mythtv
+$ cp ~/mythtv/configfiles/mythcrontab ~/.mythtv
+$ cd ~/.mythtv
 $ crontab mythcrontab
 $ crontab -l  NOTE: this is a lowercase L.
 # The following will run the mythfilldatabase shell script at 0430
@@ -2371,7 +2377,7 @@ $ crontab -l  NOTE: this is a lowercase L.
 # Need to use a shell script because the QTDIR environment variable isn't
 # being honored by crontab?
 # The next text should be all on the same line.
-30 04 * * * /bin/bash $HOME/mythtv-0.12/configfiles/mythfilldatabasecron
+30 04 * * * /bin/bash $HOME/.mythtv/mythfilldatabasecron
 $ 
 </verb></tscreen>
 
@@ -2467,18 +2473,71 @@ implementation of SSE instructions, so if your processor has 3dnow you
 shouldn't have any issues with deinterlacing.
 
 <sect1>Recording 
-<p>Currently, MythTV supports a number of different video encoders. There
-are two software options and two hardware options. The software options are
-MPEG-4 and RTJPEG. The hardware options are MPEG-2 and Hardware MJPEG. Take
-note that RTJPEG has lower CPU demands than MPEG-4, but makes large files,
-while MPEG-4 has higher CPU demands than RTJPEG, but makes smaller files.
-Hardware MJPEG is only for use with MJPEG capture devices (Zoran-based
-cards; see <url url="http://mjpeg.sourceforge.net"
-name="http://mjpeg.sourceforge.net">). MPEG-2 is the format used by the
-hardware-based PVR-x50 encoder. Note that MPEG-2 is not a selectable option
-in the Recording setup option, but this is what PVR-x50 cards will always
-use for initial video capture (which can later be transcoded), regardless of
-what codec you choose for Default and/or Live TV.
+<p>Depending on your capture card, MythTV offers different video encoders. 
+The following types of hardware encoding cards are supported:
+<itemize>
+<item>MJPEG - Zoran-based cards; see <url url="http://mjpeg.sourceforge.net" name="http://mjpeg.sourceforge.net">
+<item>MPEG2 - iTVC15 based cards (Hauppague PVR-250/PVR-350); see <url url="http://ivtv.sourceforce.net" name="http://ivtv.sourceforce.net">
+<item>HDTV - pcHDTV cards; see <url url="http://pchdtv.com" name="http://pchdtv.com">
+<item>DVB - cards supporting DVB; see <url url="http://linuxtv.org" name="http://linuxtv.org">
+</itemize>
+For cards without hardware encoding capabilities (all cards supported by
+V4L not listed above), Myth includes two methods for software encoding:
+RTjpeg and MPEG4.  RTjpeg has significantly fewer CPU demands than MPEG4,
+but it generates larger files than MPEG4 for a given recording.
+
+For DVB and HDTV cards, no further configuration is required after
+setting up the card using the 'setup' program.
+For all other cards, configuration is done through MythFrontend. 
+Selecting 'Recording Profiles' from the 'TV Settings' screen will list
+the profiles currently available for the cards in your system. 
+Depending on what types of cards you have installed you may see:
+<tscreen><verb>
+(Create new profile group)
+Software Encoders
+Hardware MPEG Encoders
+Hardware MJPEG Encoders
+Trancoders
+</verb></tscreen>
+The '(Create new profile group)' option will allow you to create custom
+profiles in case you have multiple backends.  Note that custom profiles
+are per backend and cardtype.  If you have 2 MPEG-2 encoders in a given
+backend system, creating a custom profile will affect both of them.  This
+option should not be needed otherwise.
+
+The 'Transcoders' group is a little different from the others.  Selecting
+this group will result in a menu with the following options: 'RTjpeg/MPEG4'
+and 'MPEG-2'.  These types indicate what transcoder options will be used for
+a given input type (i.e. the 'MPEG-2' settings would be used to transcode
+MPEG-2 files into MPEG-4.  The source of the MPEG-2 stream (DVB, HDTV, or
+PVR-x50) does not matter. Configuration of the options is the same as below
+(although any resolution settings will be ignored).
+
+Selecting any of the other options will show a new screen with a list of
+four profiles:
+<itemize>
+<item>Default
+<item>Live TV
+<item>Low Quality
+<item>High Quality
+</itemize>
+
+The Default profile will be used for any recording which does not otherwise
+have a specific profile assigned. The 'Live TV' profile will be used when
+watching TV.  The remaining two profiles are available for customizing to
+allow for more precise control over what quality is used for a given
+program.
+
+Selecting a profile will allow you to adjust the relevant options for that
+card.  The most significant setting is the recording resolution, but you can
+also choose encoding format, audio format, and tweak other encoder specific
+properties.
+
+<bf>NOTE</bf>: although the width and height can be changed to almost any
+value, if you start MythTV and don't see video or you get "segmentation
+fault" errors, it is likely that the video4linux (v4l) subsystem did not
+like the height and width parameters specified. It's best to leave the
+default as-is until you're sure that MythTV is operational.
 
 <bf>NOTE</bf>: although the width and height can be changed to almost
 anything, if you start MythTV and don't see video or you get "segmentation
@@ -2605,7 +2664,7 @@ Mandrake Control Center.
 
 <bf>NOTE</bf>: Mandrake 9.1 users, perform the following:
 <tscreen><verb>
-# urpmi apache apache2-mod_php php-mysql
+# urpmi apache2 apache2-mod_php php-mysql
 # chkconfig --level 345 httpd on
 # /etc/rc.d/init.d/httpd restart
 </verb></tscreen>
@@ -4241,9 +4300,9 @@ This should create an ivtv directory.  Switch to it and perform the
 following commands:
 <tscreen><verb>
 $ cd ivtv/ivtv/utils
-$ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_17_21199.exe
+$ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_17_21226.exe
 $ su
-# ./ivtvfwextract.pl pvr250_17_21199.exe
+# ./ivtvfwextract.pl pvr250_17_21226.exe
 # exit
 </verb></tscreen>
 
@@ -4955,6 +5014,8 @@ v2.86, 2003-10-24.  Fix typo in themes example.  Replace section on patching
 MPlayer.
 v2.87, 2003-10-25.  Add link to nuvexport website.  Fix broken section header for
 mythtranscode.
+v2.88, 2003-11-01.  Fix PVR-250 firmware version.  Geoffrey Hausheer's 10.5
+revision.  Incorporate bstoneaz suggestion on crontab location.
 -->
 
 <!--

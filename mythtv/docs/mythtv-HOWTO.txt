@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-10-25, v2.87
+  2003-11-01, v2.88
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -3037,13 +3037,20 @@
   the better method.
 
   The default [1mconfigfiles/mythcrontab [22mfile will run the [1mmythfilldatabase[0m
-  program every day at 0430.  If you want to change this, then open the
-  configfiles/mythcrontab file in your favorite editor and modify it as
-  you like.  Once you're satisfied with the time that [1mmythfilldatabase[0m
-  will run, save and exit, and return to the shell prompt.
+  program every day at 0430.  Placing a copy of the default
+  [1mconfigfiles/mythcrontab [22minto your ~/.mythtv directory will allow you
+  to edit your copy and maintain the original if you get into trouble.
+  To change the time used to start the [1mmythfilldatabase [22mprocess, open
+  the ~/.mythtv/mythcrontab file in your favorite editor and modify it
+  as you like.  Once you're satisfied with the time that
+  [1mmythfilldatabase [22mwill run, save and exit, and return to the shell
+  prompt.
 
 
-       $ cd configfiles
+
+       $ cp ~/mythtv/configfiles/mythfilldatabasecron ~/.mythtv
+       $ cp ~/mythtv/configfiles/mythcrontab ~/.mythtv
+       $ cd ~/.mythtv
        $ crontab mythcrontab
        $ crontab -l  NOTE: this is a lowercase L.
        # The following will run the mythfilldatabase shell script at 0430
@@ -3053,7 +3060,7 @@
        # Need to use a shell script because the QTDIR environment variable isn't
        # being honored by crontab?
        # The next text should be all on the same line.
-       30 04 * * * /bin/bash $HOME/mythtv-0.12/configfiles/mythfilldatabasecron
+       30 04 * * * /bin/bash $HOME/.mythtv/mythfilldatabasecron
        $
 
 
@@ -3067,12 +3074,13 @@
 
        $ crontab -e
 
-
-
   The [1mcrontab -e [22mcommand will allow you to edit the existing crontab.
   [1mNOTE[22m:  By default, the crontab will use [1mvi [22mas your editor.  If you
   don't like to use [1mvi[22m, make sure that you've set VISUAL to something
   other than [1mvi[22m.
+
+
+
        $ export VISUAL=/usr/bin/joe
        $ crontab -e
 
@@ -3131,8 +3139,6 @@
   not use the same font settings as defined in Appearance, so if the EPG
   is unreadable this is where you make the adjustments to fonts, number
   of elements displayed, etc.
-
-
   [1m10.4.  Playback[0m
 
   The one configuration item which may cause problems on your system is
@@ -3166,19 +3172,87 @@
 
   [1m10.5.  Recording[0m
 
-  Currently, MythTV supports a number of different video encoders. There
-  are two software options and two hardware options. The software
-  options are MPEG-4 and RTJPEG. The hardware options are MPEG-2 and
-  Hardware MJPEG. Take note that RTJPEG has lower CPU demands than
-  MPEG-4, but makes large files, while MPEG-4 has higher CPU demands
-  than RTJPEG, but makes smaller files.  Hardware MJPEG is only for use
-  with MJPEG capture devices (Zoran-based cards; see
-  http://mjpeg.sourceforge.net <http://mjpeg.sourceforge.net>). MPEG-2
-  is the format used by the hardware-based PVR-x50 encoder. Note that
-  MPEG-2 is not a selectable option in the Recording setup option, but
-  this is what PVR-x50 cards will always use for initial video capture
-  (which can later be transcoded), regardless of what codec you choose
-  for Default and/or Live TV.
+  Depending on your capture card, MythTV offers different video
+  encoders.  The following types of hardware encoding cards are
+  supported:
+
+  +o  MJPEG - Zoran-based cards; see http://mjpeg.sourceforge.net
+     <http://mjpeg.sourceforge.net>
+
+  +o  MPEG2 - iTVC15 based cards (Hauppague PVR-250/PVR-350); see
+     http://ivtv.sourceforce.net <http://ivtv.sourceforce.net>
+
+  +o  HDTV - pcHDTV cards; see http://pchdtv.com <http://pchdtv.com>
+
+  +o  DVB - cards supporting DVB; see http://linuxtv.org
+     <http://linuxtv.org>
+
+     For cards without hardware encoding capabilities (all cards
+     supported by V4L not listed above), Myth includes two methods for
+     software encoding: RTjpeg and MPEG4.  RTjpeg has significantly
+     fewer CPU demands than MPEG4, but it generates larger files than
+     MPEG4 for a given recording.
+
+  For DVB and HDTV cards, no further configuration is required after
+  setting up the card using the 'setup' program.  For all other cards,
+  configuration is done through MythFrontend.  Selecting 'Recording
+  Profiles' from the 'TV Settings' screen will list the profiles
+  currently available for the cards in your system.  Depending on what
+  types of cards you have installed you may see:
+
+
+
+  (Create new profile group)
+  Software Encoders
+  Hardware MPEG Encoders
+  Hardware MJPEG Encoders
+  Trancoders
+
+
+
+  The '(Create new profile group)' option will allow you to create cus-
+  tom profiles in case you have multiple backends.  Note that custom
+  profiles are per backend and cardtype.  If you have 2 MPEG-2 encoders
+  in a given backend system, creating a custom profile will affect both
+  of them.  This option should not be needed otherwise.
+
+  The 'Transcoders' group is a little different from the others.
+  Selecting this group will result in a menu with the following options:
+  'RTjpeg/MPEG4' and 'MPEG-2'.  These types indicate what transcoder
+  options will be used for a given input type (i.e. the 'MPEG-2'
+  settings would be used to transcode MPEG-2 files into MPEG-4.  The
+  source of the MPEG-2 stream (DVB, HDTV, or PVR-x50) does not matter.
+  Configuration of the options is the same as below (although any
+  resolution settings will be ignored).
+
+  Selecting any of the other options will show a new screen with a list
+  of four profiles:
+
+  +o  Default
+
+  +o  Live TV
+
+  +o  Low Quality
+
+  +o  High Quality
+
+  The Default profile will be used for any recording which does not
+  otherwise have a specific profile assigned. The 'Live TV' profile will
+  be used when watching TV.  The remaining two profiles are available
+  for customizing to allow for more precise control over what quality is
+  used for a given program.
+
+  Selecting a profile will allow you to adjust the relevant options for
+  that card.  The most significant setting is the recording resolution,
+  but you can also choose encoding format, audio format, and tweak other
+  encoder specific properties.
+
+  [1mNOTE[22m: although the width and height can be changed to almost any
+  value, if you start MythTV and don't see video or you get
+  "segmentation fault" errors, it is likely that the video4linux (v4l)
+  subsystem did not like the height and width parameters specified. It's
+  best to leave the default as-is until you're sure that MythTV is
+  operational.
 
   [1mNOTE[22m: although the width and height can be changed to almost anything,
   if you start MythTV and don't see video or you get "segmentation
@@ -3192,6 +3266,7 @@
   MythTV is able to control the LED on the Xbox to indicate backend
   recording status.
 
+
   To control the LED, you will need the [1mblink [22mprogram from the xbox-
   linux project, which is installed as /bin/led on GentooX.  On Xebian
   (the new Ed's Debian) you must install it yourself.  On other
@@ -3201,7 +3276,6 @@
   from the Xbox-Linux project site at http://xbox-linux.sf.net/
   <http://xbox-linux.sf.net/>. The program you need is part of the
   eds_i2c_staff module in CVS.  Note the spelling.
-
 
   Once you have installed [1mblink [22myou will need to set permissions.  [1mblink[0m
   needs write permission to the i2c device to function properly.  There
@@ -3254,11 +3328,12 @@
   Once it's on your machine, you must move the file and untar it:
 
 
-       $ su
-       # cp funhouse.tar.gz /usr/local/share/mythtv/themes
-       # cd /usr/local/share/mythtv/themes
-       # tar -xzf funhouse.tar.gz
-       # exit
+
+  $ su
+  # cp funhouse.tar.gz /usr/local/share/mythtv/themes
+  # cd /usr/local/share/mythtv/themes
+  # tar -xzf funhouse.tar.gz
+  # exit
 
 
 
@@ -3267,6 +3342,8 @@
 
   [1mNOTE[22m:  if the theme file you downloaded is a bz2 file, use tar -xjf
   rather than tar -xzf.
+
+
   [1m11.2.  Adding DirecTV information to the database.[0m
 
   A script for adding DirecTV information into the database has been
@@ -3314,6 +3391,7 @@
   PHP support.
 
 
+
   [1m12.1.1.  Mandrake 9.0[0m
 
   Mandrake 9.0 has [1mapache [22mand [1mPHP [22mpre-packaged, so installation is quite
@@ -3326,7 +3404,7 @@
   [1mNOTE[22m: Mandrake 9.1 users, perform the following:
 
 
-       # urpmi apache apache2-mod_php php-mysql
+       # urpmi apache2 apache2-mod_php php-mysql
        # chkconfig --level 345 httpd on
        # /etc/rc.d/init.d/httpd restart
 
@@ -3448,33 +3526,32 @@
   Here is an example script that a user may want to run on import:
 
 
+       #!/bin/csh
 
-  #!/bin/csh
+       if ($#argv == 0) then
+               echo "Usage: $0 dest_dir"
+               exit
+       endif
 
-  if ($#argv == 0) then
-          echo "Usage: $0 dest_dir"
-          exit
-  endif
+       cd $argv[1]
 
-  cd $argv[1]
+       # get stuff over the network
+       wget http://www.somesite.dom/dir/file1.jpg
+       wget http://www.somesite.dom/dir/file2.jpg
+       wget http://www.somesite.dom/dir/file3.jpg
 
-  # get stuff over the network
-  wget http://www.somesite.dom/dir/file1.jpg
-  wget http://www.somesite.dom/dir/file2.jpg
-  wget http://www.somesite.dom/dir/file3.jpg
+       # stuff that requires manual module loading and/or fs mounting
+       modprobe camera_module
+       mount /dev/camera /mnt/camera
+       cp /mnt/camera/* $argv[1]
+       umount /mnt/camera
+       rmmod camera_module
 
-  # stuff that requires manual module loading and/or fs mounting
-  modprobe camera_module
-  mount /dev/camera /mnt/camera
-  cp /mnt/camera/* $argv[1]
-  umount /mnt/camera
-  rmmod camera_module
-
-  # perform some processing
-  foreach pname (`ls *.jpg`)
-          jpegtran -flip vertical $pname > $pname.new
-          mv $pname.new $pname
-  end
+       # perform some processing
+       foreach pname (`ls *.jpg`)
+               jpegtran -flip vertical $pname > $pname.new
+               mv $pname.new $pname
+       end
 
 
 
@@ -3504,6 +3581,7 @@
   +o  CDParanoia
 
 
+
   [1m15.1.  Manual installation of prerequisites.[0m
 
   These instructions are for distributions which don't have pre-compiled
@@ -3513,14 +3591,15 @@
   <http://www.mars.org/home/rob/proj/mpeg/>  Save it to a directory you
   can find later.
 
-  $ tar -xzf mad-0.14.2b.tar.gz
-  $ cd mad-0.14.2b
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $
+
+       $ tar -xzf mad-0.14.2b.tar.gz
+       $ cd mad-0.14.2b
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $
 
 
 
@@ -3561,20 +3640,23 @@
   install:
 
 
-       $ tar -xzf libcdaudio-0.99.9.tar.gz
-       $ cd libcdaudio-0.99.9
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
-       $
+
+  $ tar -xzf libcdaudio-0.99.9.tar.gz
+  $ cd libcdaudio-0.99.9
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
+  $
 
 
 
   Download cdparanoia from http://www.xiph.org/paranoia/down.html
   <http://www.xiph.org/paranoia/download/cdparanoia-III-
   alpha9.8.src.tgz>.
+
+
        $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
        $ cd cdparanoia-III-alpha9.8
        $ ./configure
@@ -3637,6 +3719,8 @@
 
        # urpmi libfftw2 libfftw2-devel
 
+
+
   OpenGL should be installed on practically all distributions.  However,
   you will need the devel module.  In Mandrake 9.1 it may be installed
   by typing:
@@ -3687,7 +3771,6 @@
   getting MythMusic going. Make sure that you run ./configure first.  If
   you wish to use the new visualizations, make sure you install the
   prerequisites.  Run ./configure --help for help.
-
 
 
   ______________________________________________________________________
@@ -3741,7 +3824,6 @@
 
   Genre/Artist/Album/Title Artist/Genre/Album/Title Artist/Album/Title
   (with Genre left as Unknown)
-
   The track number is optional but can be specified with the title by
   using the TRACK_TITLE keyword instead of TITLE.  If TRACK_TITLE is
   used, then the filename can have a space, hyphen, or underscore
@@ -3931,12 +4013,13 @@
   Change into the MythVideo directory, then make and make install:
 
 
-       $ cd mythvideo
-       $ qmake mythvideo.pro
-       $ make
-       $ su
-       # make install
-       # exit
+
+  $ cd mythvideo
+  $ qmake mythvideo.pro
+  $ make
+  $ su
+  # make install
+  # exit
 
 
 
@@ -3946,6 +4029,7 @@
 
        $ cd videodb
        $ mysql -u mythtv -p < metadata.sql
+
 
 
   See MythVideo's README file for additional information.
@@ -3990,11 +4074,12 @@
   ./configure
 
 
-       $ ./configure --enable-transcode
-       $ qmake mythdvd.pro
-       $ make
-       $ su
-       # make install
+
+  $ ./configure --enable-transcode
+  $ qmake mythdvd.pro
+  $ make
+  $ su
+  # make install
 
 
 
@@ -4051,11 +4136,12 @@
   First, you should check that your kernel has been enabled for DMA:
 
 
-       [mythtv@pvr mythtv]$ dmesg |grep DMA
-           ide0: BM-DMA at 0xd800-0xd807, BIOS settings: hda:DMA, hdb:DMA
-           ide1: BM-DMA at 0xd808-0xd80f, BIOS settings: hdc:DMA, hdd:pio
-       hda: 156301488 sectors (80026 MB) w/2048KiB Cache, CHS=9729/255/63, UDMA(33)
-       hdb: 80043264 sectors (40982 MB) w/2048KiB Cache, CHS=4982/255/63, UDMA(33)
+
+  [mythtv@pvr mythtv]$ dmesg |grep DMA
+      ide0: BM-DMA at 0xd800-0xd807, BIOS settings: hda:DMA, hdb:DMA
+      ide1: BM-DMA at 0xd808-0xd80f, BIOS settings: hdc:DMA, hdd:pio
+  hda: 156301488 sectors (80026 MB) w/2048KiB Cache, CHS=9729/255/63, UDMA(33)
+  hdb: 80043264 sectors (40982 MB) w/2048KiB Cache, CHS=4982/255/63, UDMA(33)
 
 
 
@@ -4070,6 +4156,7 @@
 
 
        # hdparm -d /dev/hd?
+
 
 
   will tell you the DMA status for your hard drives.  If you run [1mhdparm[0m
@@ -4132,12 +4219,11 @@
   Edit your /etc/X11/XF86Config-4 file, and look for:
 
 
-
-  Section "ServerFlags"
-      #DontZap # disable <Crtl><Alt><BS> (server abort)
-      #DontZoom # disable <Crtl><Alt><KP_+>/<KP_-> (resolution switching)
-      AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
-  EndSection
+       Section "ServerFlags"
+           #DontZap # disable <Crtl><Alt><BS> (server abort)
+           #DontZoom # disable <Crtl><Alt><KP_+>/<KP_-> (resolution switching)
+           AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
+       EndSection
 
 
 
@@ -4164,23 +4250,24 @@
   Finally, check:
 
 
-       Section "Monitor"
-           Identifier "monitor1"
-           VendorName "Plug'n Play"
-           HorizSync 30-85
-           VertRefresh 50-160
 
-           # Sony Vaio C1(X,XS,VE,VN)?
-           # 1024x480 @ 85.6 Hz, 48 kHz hsync
-           ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+  Section "Monitor"
+      Identifier "monitor1"
+      VendorName "Plug'n Play"
+      HorizSync 30-85
+      VertRefresh 50-160
 
-           # TV fullscreen mode or DVD fullscreen output.
-           # 768x576 @ 79 Hz, 50 kHz hsync
-           ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+      # Sony Vaio C1(X,XS,VE,VN)?
+      # 1024x480 @ 85.6 Hz, 48 kHz hsync
+      ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
 
-           # 768x576 @ 100 Hz, 61.6 kHz hsync
-           ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
-       EndSection
+      # TV fullscreen mode or DVD fullscreen output.
+      # 768x576 @ 79 Hz, 50 kHz hsync
+      ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+
+      # 768x576 @ 100 Hz, 61.6 kHz hsync
+      ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+  EndSection
 
 
 
@@ -4226,8 +4313,6 @@
 
   Edit the settings.pro file.  Make sure that the top of the file looks
   like this:
-
-
        $ cat settings.pro
        CONFIG += debug
        #CONFIG += release
@@ -4251,21 +4336,20 @@
   assume that the problem you're having is in the setup program.
 
 
+       $ cd setup
+       $ gdb ./setup
 
-  $ cd setup
-  $ gdb ./setup
-
-  GNU gdb 5.3-1mdk (Mandrake Linux)
-  Copyright 2002 Free Software Foundation, Inc.
-  GDB is free software, covered by the GNU General Public License, and you are
-  welcome to change it and/or distribute copies of it under certain
-  conditions.
-  Type "show copying" to see the conditions.
-  There is absolutely no warranty for GDB.  Type "show warranty" for details.
-  This GDB was configured as "i586-mandrake-linux-gnu"...
-  (gdb) handle SIGPIPE nostop
-  Signal        Stop      Print   Pass to program Description
-  SIGPIPE       No        Yes     Yes             Broken pipe
+       GNU gdb 5.3-1mdk (Mandrake Linux)
+       Copyright 2002 Free Software Foundation, Inc.
+       GDB is free software, covered by the GNU General Public License, and you are
+       welcome to change it and/or distribute copies of it under certain
+       conditions.
+       Type "show copying" to see the conditions.
+       There is absolutely no warranty for GDB.  Type "show warranty" for details.
+       This GDB was configured as "i586-mandrake-linux-gnu"...
+       (gdb) handle SIGPIPE nostop
+       Signal        Stop      Print   Pass to program Description
+       SIGPIPE       No        Yes     Yes             Broken pipe
 
 
 
@@ -4380,7 +4464,6 @@
   #0, the second card is #1, etc.
 
 
-
   [1m20.12.  I can't see parts of the On Screen Display.[0m
 
   If you're a Red Hat 8.0 user, make sure that you've followed the
@@ -4423,7 +4506,6 @@
   will eventually cause [1mlircd [22mto stop responding; even though [1mlircd [22mis
   configured for the Pinnacle Systems remote, the Tivo remote IR
   patterns are being seen by the IR receiver.
-
   If your remote has been properly configured, and [1mirw [22mand [1mirxevent [22mare
   working correctly, then it's highly likely that your window manager is
   not giving focus correctly to the various Myth programs as they run.
@@ -4443,8 +4525,6 @@
 
 
   [1m20.16.  Where's my "canada-cable" entry gone to?[0m
-
-
 
   [1m20.17.  My channels are off by one.[0m
 
@@ -4510,7 +4590,6 @@
   paths''.
 
 
-
   [1m20.22.  My mouse pointer disappears when placed over the MythTV win-[0m
   [1mdows.[0m
 
@@ -4559,7 +4638,6 @@
   (http://forevermore.net/myth/ <http://forevermore.net/myth/>) are
   better suited for the end user.  However, since [1mmythtranscode [22mcan be a
   useful tool, directions on using it follow.
-
   [1mmythtranscode [22mcreates raw streams, which means that they do not
   contain any container information such as resolution, frame-rate, or
   audio sampling rate.  In order to process the output, you must supply
@@ -4621,7 +4699,6 @@
 
        mplayer -audiofile audout -audio-demuxer 20 -rawaudio rate=32000 \
        -rawvideo on:w=640:h=480:fps=29.97 vidout
-
 
 
   If you wanted to write the raw data to separate audio and video files
@@ -4767,7 +4844,6 @@
   image inside the screen. Underscan is useful for computer monitors so
   that toolbars and scrollbars at the edges can be seen.
 
-
   For best results, match the X display area as close as possible to the
   edges of the physical screen. This can only be adjusted by your tv-out
   device or by the settings for the television set. Many sets have these
@@ -4885,8 +4961,8 @@
   channel 15:
 
 
-       $ mysql -u root mythconverg
-       mysql> delete from channel where chanid = '1015';
+  $ mysql -u root mythconverg
+  mysql> delete from channel where chanid = '1015';
 
 
 
@@ -4895,8 +4971,8 @@
   the channel that has been removed:
 
 
-  $ mysql -u root mythconverg
-  mysql> delete from program where chanid = '1015';
+       $ mysql -u root mythconverg
+       mysql> delete from program where chanid = '1015';
 
 
 
@@ -4946,17 +5022,14 @@
        ^D
        $
 
-
-
   The following also works with blackbox:
 
 
-
-  $ cat > .xinitrc
-  xset -dpms s off &
-  irxevent &
-  mythfrontend &
-  blackbox
+       $ cat > .xinitrc
+       xset -dpms s off &
+       irxevent &
+       mythfrontend &
+       blackbox
 
 
 
@@ -5010,7 +5083,6 @@
 
   Use [1mchkconfig [22mto make sure the script is called when entering
   runlevels 3, 4 or 5:
-
 
 
   $ su
@@ -5268,9 +5340,9 @@
 
 
        $ cd ivtv/ivtv/utils
-       $ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_17_21199.exe
+       $ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_17_21226.exe
        $ su
-       # ./ivtvfwextract.pl pvr250_17_21199.exe
+       # ./ivtvfwextract.pl pvr250_17_21226.exe
        # exit
 
 

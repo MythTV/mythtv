@@ -5,4 +5,4 @@
 # Need to use a shell script because the QTDIR environment variable isn't
 # being honored by crontab?
 # The next text should be all on the same line.
-30 04 * * * /bin/bash $HOME/mythtv-0.7/MC/configfiles/mythfilldatabasecron
+30 04 * * * /bin/bash $HOME/.mythtv/mythfilldatabasecron

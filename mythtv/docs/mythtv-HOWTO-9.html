@@ -302,17 +302,26 @@ HOME=/
 $ 
 </PRE>
 </CODE></BLOCKQUOTE>
-</P>
-<P>We can see from the display that the cron.daily job will run at 0402 every
+
+We can see from the display that the cron.daily job will run at 0402 every
 morning.</P>
 <P>If you wish to specify a custom time, then the user-based cron job is the
 better method.</P>
-<P>The default <B>configfiles/mythcrontab</B> file will run the <B>mythfilldatabase</B> program every day at 0430.  If you want to change this,
-then open the <CODE>configfiles/mythcrontab</CODE> file in your favorite editor and
-modify it as you like.  Once you're satisfied with the time that <B>mythfilldatabase</B> will run, save and exit, and return to the shell prompt.
+<P>The default <B>configfiles/mythcrontab</B> file will run the
+<B>mythfilldatabase</B> program every day at 0430.  Placing a copy of the
+default <B>configfiles/mythcrontab</B> into your <CODE>~/.mythtv</CODE>
+directory will allow you to edit your copy and maintain the original if you
+get into trouble. To change the time used to start the
+<B>mythfilldatabase</B> process, open the <CODE>~/.mythtv/mythcrontab</CODE>
+file in your favorite editor and modify it as you like.  Once you're
+satisfied with the time that <B>mythfilldatabase</B> will run, save and
+exit, and return to the shell prompt.</P>
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd configfiles
+$ cp ~/mythtv/configfiles/mythfilldatabasecron ~/.mythtv
+$ cp ~/mythtv/configfiles/mythcrontab ~/.mythtv
+$ cd ~/.mythtv
 $ crontab mythcrontab
 $ crontab -l  NOTE: this is a lowercase L.
 # The following will run the mythfilldatabase shell script at 0430
@@ -322,7 +331,7 @@ $ crontab -l  NOTE: this is a lowercase L.
 # Need to use a shell script because the QTDIR environment variable isn't
 # being honored by crontab?
 # The next text should be all on the same line.
-30 04 * * * /bin/bash $HOME/mythtv-0.12/configfiles/mythfilldatabasecron
+30 04 * * * /bin/bash $HOME/.mythtv/mythfilldatabasecron
 $ 
 </PRE>
 </CODE></BLOCKQUOTE>

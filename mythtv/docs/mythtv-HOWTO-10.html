@@ -85,18 +85,74 @@ shouldn't have any issues with deinterlacing.</P>
 <H2><A NAME="ss10.5">10.5</A> <A HREF="mythtv-HOWTO.html#toc10.5">Recording </A>
 </H2>
 
-<P>Currently, MythTV supports a number of different video encoders. There
-are two software options and two hardware options. The software options are
-MPEG-4 and RTJPEG. The hardware options are MPEG-2 and Hardware MJPEG. Take
-note that RTJPEG has lower CPU demands than MPEG-4, but makes large files,
-while MPEG-4 has higher CPU demands than RTJPEG, but makes smaller files.
-Hardware MJPEG is only for use with MJPEG capture devices (Zoran-based
-cards; see 
-<A HREF="http://mjpeg.sourceforge.net">http://mjpeg.sourceforge.net</A>). MPEG-2 is the format used by the
-hardware-based PVR-x50 encoder. Note that MPEG-2 is not a selectable option
-in the Recording setup option, but this is what PVR-x50 cards will always
-use for initial video capture (which can later be transcoded), regardless of
-what codec you choose for Default and/or Live TV.</P>
+<P>Depending on your capture card, MythTV offers different video encoders. 
+The following types of hardware encoding cards are supported:
+<UL>
+<LI>MJPEG - Zoran-based cards; see 
+<A HREF="http://mjpeg.sourceforge.net">http://mjpeg.sourceforge.net</A></LI>
+<LI>MPEG2 - iTVC15 based cards (Hauppague PVR-250/PVR-350); see 
+<A HREF="http://ivtv.sourceforce.net">http://ivtv.sourceforce.net</A></LI>
+<LI>HDTV - pcHDTV cards; see 
+<A HREF="http://pchdtv.com">http://pchdtv.com</A></LI>
+<LI>DVB - cards supporting DVB; see 
+<A HREF="http://linuxtv.org">http://linuxtv.org</A></LI>
+</UL>
+
+For cards without hardware encoding capabilities (all cards supported by
+V4L not listed above), Myth includes two methods for software encoding:
+RTjpeg and MPEG4.  RTjpeg has significantly fewer CPU demands than MPEG4,
+but it generates larger files than MPEG4 for a given recording.</P>
+<P>For DVB and HDTV cards, no further configuration is required after
+setting up the card using the 'setup' program.
+For all other cards, configuration is done through MythFrontend. 
+Selecting 'Recording Profiles' from the 'TV Settings' screen will list
+the profiles currently available for the cards in your system. 
+Depending on what types of cards you have installed you may see:
+<BLOCKQUOTE><CODE>
+<PRE>
+(Create new profile group)
+Software Encoders
+Hardware MPEG Encoders
+Hardware MJPEG Encoders
+Trancoders
+</PRE>
+</CODE></BLOCKQUOTE>
+
+The '(Create new profile group)' option will allow you to create custom
+profiles in case you have multiple backends.  Note that custom profiles
+are per backend and cardtype.  If you have 2 MPEG-2 encoders in a given
+backend system, creating a custom profile will affect both of them.  This
+option should not be needed otherwise.</P>
+<P>The 'Transcoders' group is a little different from the others.  Selecting
+this group will result in a menu with the following options: 'RTjpeg/MPEG4'
+and 'MPEG-2'.  These types indicate what transcoder options will be used for
+a given input type (i.e. the 'MPEG-2' settings would be used to transcode
+MPEG-2 files into MPEG-4.  The source of the MPEG-2 stream (DVB, HDTV, or
+PVR-x50) does not matter. Configuration of the options is the same as below
+(although any resolution settings will be ignored).</P>
+<P>Selecting any of the other options will show a new screen with a list of
+four profiles:
+<UL>
+<LI>Default</LI>
+<LI>Live TV</LI>
+<LI>Low Quality</LI>
+<LI>High Quality</LI>
+</UL>
+</P>
+<P>The Default profile will be used for any recording which does not otherwise
+have a specific profile assigned. The 'Live TV' profile will be used when
+watching TV.  The remaining two profiles are available for customizing to
+allow for more precise control over what quality is used for a given
+program.</P>
+<P>Selecting a profile will allow you to adjust the relevant options for that
+card.  The most significant setting is the recording resolution, but you can
+also choose encoding format, audio format, and tweak other encoder specific
+properties.</P>
+<P><B>NOTE</B>: although the width and height can be changed to almost any
+value, if you start MythTV and don't see video or you get "segmentation
+fault" errors, it is likely that the video4linux (v4l) subsystem did not
+like the height and width parameters specified. It's best to leave the
+default as-is until you're sure that MythTV is operational.</P>
 <P><B>NOTE</B>: although the width and height can be changed to almost
 anything, if you start MythTV and don't see video or you get "segmentation
 fault" errors, it is likely that the video4linux (v4l) subsystem did not
