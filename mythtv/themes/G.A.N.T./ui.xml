@@ -666,9 +666,9 @@
         <fcnfont name="record_font" function="recording"></fcnfont>
         <fcnfont name="active_font" function="selected"></fcnfont>
         <columnpadding>10</columnpadding>
-        <column number="1" width="150" context="-1"></column>
-        <column number="2" width="110" context="-1"></column>
-        <column number="3" width="420" context="-1"></column>
+        <column number="1" width="160" context="-1"></column>
+        <column number="2" width="120" context="-1"></column>
+        <column number="3" width="400" context="-1"></column>
         <column number="4" width="20" context="-1"></column>
         <items>9</items>
         <image function="selectionbar" filename="cr-selectbar.png" location="-14,-5"></image>
@@ -1660,9 +1660,9 @@
         <fcnfont name="record_font" function="recording"></fcnfont>
         <fcnfont name="conflict_font" function="conflicting"></fcnfont>
         <columnpadding>5</columnpadding>
-        <column number="1" width="150" context="-1"></column>
-        <column number="2" width="110" context="-1"></column>
-        <column number="3" width="460" context="-1"></column>
+        <column number="1" width="160" context="-1"></column>
+        <column number="2" width="120" context="-1"></column>
+        <column number="3" width="440" context="-1"></column>
         <items>11</items>
         <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>
         <image function="uparrow" filename="uparrow.png" location="755,22"></image>
