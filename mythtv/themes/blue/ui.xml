@@ -503,6 +503,13 @@
       <bold>yes</bold>
     </font>
 
+    <font name="record_font" face="Arial">
+      <color>#33ff33</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
     <font name="norecordfnt" face="Arial">
       <color>#999999</color>
       <size>16</size>
@@ -650,6 +657,7 @@
         <fcnfont name="norecordfnt" function="disabledrecording"></fcnfont>
         <fcnfont name="active_font" function="active"></fcnfont>
         <fcnfont name="inactive_font" function="inactive"></fcnfont>
+        <fcnfont name="record_font" function="recording"></fcnfont>
         <fcnfont name="active_font" function="selected"></fcnfont>
         <columnpadding>10</columnpadding>
         <column number="1" width="60" context="-1"></column>
@@ -1253,8 +1261,9 @@
       <bold>yes</bold>
     </font>
   
-    <font name="recfont" face="Arial">
-      <color>#ffff33</color>
+
+    <font name="record_font" face="Arial">
+      <color>#33ff33</color>
       <size>16</size>
       <size:small>11</size:small>
       <bold>yes</bold>
@@ -1356,7 +1365,7 @@
       </listarea>
       <listarea name="showing" draworder="4">
         <area>240,18,600,265</area>
-        <fcnfont name="recfont" function="recording"></fcnfont>
+        <fcnfont name="record_font" function="recording"></fcnfont>
         <fcnfont name="overunderrecfont" function="overunderrecording"></fcnfont>
         <fcnfont name="active" function="active"></fcnfont>
         <fcnfont name="active" function="selected"></fcnfont>
@@ -1624,8 +1633,8 @@
       <bold>yes</bold>
     </font>
 
-    <font name="recfnt" face="Arial">
-      <color>#ffff33</color>
+    <font name="record_font" face="Arial">
+      <color>#33ff33</color>
       <size>16</size>
       <size:small>11</size:small>
       <bold>yes</bold>
@@ -1712,7 +1721,7 @@
         <fcnfont name="active" function="active"></fcnfont>
         <fcnfont name="active" function="selected"></fcnfont>
         <fcnfont name="inactive" function="inactive"></fcnfont>
-        <fcnfont name="recfnt" function="recording"></fcnfont>
+        <fcnfont name="record_font" function="recording"></fcnfont>
         <items>9</items>
         <image function="selectionbar" filename="pf-sel3.png" location="-8,-7"></image>
       </listarea>

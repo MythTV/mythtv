@@ -291,9 +291,11 @@ void ViewScheduled::updateList(QPainter *p)
                 if (i + skip == listPos)
                     ltype->SetItemCurrent(i);
 
-                if (p->conflicting)
+                if (p->recstatus == rsRecording)
+                    ltype->EnableForcedFont(i, "recording");
+                else if (p->conflicting)
                     ltype->EnableForcedFont(i, "conflictingrecording");
-                else if (!p->recording)
+                else if (!p->recording || p->recstatus < rsRecording)
                     ltype->EnableForcedFont(i, "disabledrecording");
             }
         }
