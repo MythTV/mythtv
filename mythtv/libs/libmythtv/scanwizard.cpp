@@ -30,6 +30,7 @@
  *
  */
 #include <qapplication.h>
+#include <qptrlist.h>
 #include "mythcontext.h"
 #include "dvbchannel.h"
 #include "videosource.h"
@@ -51,7 +52,7 @@ public:
     ScanFrequency(): LineEditSetting()
     {
         setLabel(QObject::tr("Frequency"));
-        setHelpText(QObject::tr("[Common] Frequency (Option has no default)\n"
+        setHelpText(QObject::tr("Frequency (Option has no default)\n"
                     "The frequency for this channel in Hz."));
     };
 };
@@ -62,8 +63,7 @@ public:
         LineEditSetting()
     {
         setLabel(QObject::tr("Symbol Rate"));
-        setHelpText(QObject::tr("[DVB-S/C] Symbol Rate (Option has no default)"
-                    "\n???"));
+        setHelpText(QObject::tr("Symbol Rate (Option has no default)"));
     };
 };
 
@@ -73,8 +73,7 @@ public:
         ComboBoxSetting()
     {
         setLabel(QObject::tr("Polarity"));
-        setHelpText(QObject::tr("[DVB-S] Polarity (Option has no default)\n"
-                    ""));
+        setHelpText(QObject::tr("Polarity (Option has no default)"));
         addSelection(QObject::tr("Horizontal"), "h",true);
         addSelection(QObject::tr("Vertical"), "v");
         addSelection(QObject::tr("Right Circular"), "r");
@@ -88,7 +87,7 @@ public:
         ComboBoxSetting()
     {
         setLabel(QObject::tr("Inversion"));
-        setHelpText(QObject::tr("[Common] Inversion (Default: Auto):\n"
+        setHelpText(QObject::tr("Inversion (Default: Auto):\n"
                     "Most cards can autodetect this now, so leave it at Auto"
                     " unless it won't work."));
         addSelection(QObject::tr("Auto"), "a",true);
@@ -103,8 +102,7 @@ public:
         ComboBoxSetting()
     {
         setLabel(QObject::tr("Bandwidth"));
-        setHelpText(QObject::tr("[DVB-C/T] Bandwidth (Default: Auto)\n"
-                    "???"));
+        setHelpText(QObject::tr("Bandwidth (Default: Auto)\n"));
         addSelection(QObject::tr("Auto"),"a",true);
         addSelection(QObject::tr("6 MHz"),"6");
         addSelection(QObject::tr("7 MHz"),"7");
@@ -131,8 +129,7 @@ public:
         ScanModulationSetting()
     {
         setLabel(QObject::tr("Modulation"));
-        setHelpText(QObject::tr("[DVB-C] Modulation (Default: Auto)\n"
-                    "???"));
+        setHelpText(QObject::tr("Modulation (Default: Auto)"));
     };
 };
 
@@ -142,8 +139,7 @@ public:
         ScanModulationSetting()
     {
         setLabel(QObject::tr("Constellation"));
-        setHelpText(QObject::tr("[DVB-T] Constellation (Default: Auto)\n"
-                    "???"));
+        setHelpText(QObject::tr("Constellation (Default: Auto)"));
     };
 };
 
@@ -161,7 +157,7 @@ public:
         addSelection("6/7");
         addSelection("7/8");
         addSelection("8/9");
-    };
+    }
 };
 
 class ScanFec: public ScanFecSetting, public TransientStorage {
@@ -170,9 +166,8 @@ public:
         ScanFecSetting()
     {
         setLabel(QObject::tr("FEC"));
-        setHelpText(QObject::tr("[DVB-S/C] Forward Error Correction "
-                    "(Default: Auto)\n???"));
-    };
+        setHelpText(QObject::tr("Forward Error Correction (Default: Auto)"));
+    }
 };
 
 class ScanCodeRateLP: public ScanFecSetting, public TransientStorage {
@@ -180,9 +175,8 @@ public:
     ScanCodeRateLP(): ScanFecSetting()
     {
         setLabel(QObject::tr("LP Coderate"));
-        setHelpText(QObject::tr("[DVB-T] Low Priority Code Rate "
-                    "(Default: Auto)\n???"));
-    };
+        setHelpText(QObject::tr("Low Priority Code Rate (Default: Auto)"));
+    }
 };
 
 class ScanCodeRateHP: public ScanFecSetting, public TransientStorage {
@@ -190,8 +184,7 @@ public:
     ScanCodeRateHP(): ScanFecSetting()
     {
         setLabel(QObject::tr("HP Coderate"));
-        setHelpText(QObject::tr("[DVB-T] High Priority Code Rate "
-                    "(Default: Auto)\n???"));
+        setHelpText(QObject::tr("High Priority Code Rate (Default: Auto)"));
     };
 };
 
@@ -201,8 +194,7 @@ public:
         ComboBoxSetting()
     {
         setLabel(QObject::tr("Guard Interval"));
-        setHelpText(QObject::tr("[DVB-T] Guard Interval (Default: Auto)\n"
-                    "???"));
+        setHelpText(QObject::tr("Guard Interval (Default: Auto)"));
         addSelection(QObject::tr("Auto"),"auto");
         addSelection("1/4");
         addSelection("1/8");
@@ -217,8 +209,7 @@ public:
         ComboBoxSetting()
     {
         setLabel(QObject::tr("Trans. Mode"));
-        setHelpText(QObject::tr("[DVB-T] Transmission Mode (Default: Auto)\n"
-                    "???"));
+        setHelpText(QObject::tr("Transmission Mode (Default: Auto)"));
         addSelection(QObject::tr("Auto"),"a");
         addSelection("2K","2");
         addSelection("8K","8");
@@ -231,8 +222,7 @@ public:
         ComboBoxSetting()
     {
         setLabel(QObject::tr("Hierarchy"));
-        setHelpText(QObject::tr("[DVB-T] Hierarchy (Default: Auto)\n"
-                    "???"));
+        setHelpText(QObject::tr("Hierarchy (Default: Auto)"));
         addSelection(QObject::tr("Auto"),"a");
         addSelection(QObject::tr("None"), "n");
         addSelection("1");
@@ -405,138 +395,260 @@ void ScanWizardScanType::scanTypeChanged(const QString& str)
     emit scanTypeChanged((ScanTypeSetting::Type)nType);
 }
 
+class BasePane : public HorizontalConfigurationGroup
+{
+public:
+     void enable(bool fEnable)
+     {
+         Configurable *c;
+         for (c = configurables.first(); c; c = configurables.next())
+            c->setEnabled(fEnable); 
+     } 
+
+protected:
+     void addSetting(Configurable *c) { configurables.append(c);}
+     QPtrList<Configurable> configurables;
+};
+
+class OFDMPane : public BasePane
+{
+public:
+    OFDMPane(ScanWizard *parent)
+    {
+        setUseFrame(false);
+        ScanFrequency *frequency = new ScanFrequency();
+        ScanBandwidth *bandwidth = new ScanBandwidth();
+        ScanInversion *inversion = new ScanInversion();
+        ScanConstellation* constellation = new ScanConstellation();
+
+        ScanCodeRateLP *coderate_lp = new ScanCodeRateLP();
+        ScanCodeRateHP *coderate_hp = new ScanCodeRateHP();
+        ScanTransmissionMode *trans_mode = new ScanTransmissionMode();
+        ScanGuardInterval *guard_interval = new ScanGuardInterval();
+        ScanHierarchy *hierarchy = new ScanHierarchy();
+
+        connect(frequency, SIGNAL(valueChanged(const QString&)),
+            parent, SLOT(frequency(const QString&)));
+        parent->frequency(frequency->getValue());
+        connect(inversion, SIGNAL(valueChanged(const QString&)),
+             parent, SLOT(inversion(const QString&)));
+        parent->inversion(inversion->getValue());
+        connect(bandwidth, SIGNAL(valueChanged(const QString&)),
+            parent, SLOT(bandwidth(const QString&)));
+        parent->bandwidth(bandwidth->getValue());
+        connect(constellation, SIGNAL(valueChanged(const QString&)),
+            parent, SLOT(constellation(const QString&)));
+        parent->constellation(constellation->getValue());
+        connect(coderate_lp, SIGNAL(valueChanged(const QString&)),
+            parent, SLOT(codeRateLP(const QString&)));
+        parent->codeRateLP(coderate_lp->getValue());
+        connect(coderate_hp, SIGNAL(valueChanged(const QString&)),
+            parent, SLOT(codeRateHP(const QString&)));
+        parent->codeRateHP(coderate_hp->getValue());
+        connect(trans_mode, SIGNAL(valueChanged(const QString&)),
+             parent, SLOT(transmissionMode(const QString&)));
+        parent->transmissionMode(trans_mode->getValue());
+        connect(guard_interval, SIGNAL(valueChanged(const QString&)),
+             parent, SLOT(guardInterval(const QString&)));
+        parent->guardInterval(guard_interval->getValue());
+        connect(hierarchy, SIGNAL(valueChanged(const QString&)),
+            parent, SLOT(hierarchy(const QString&)));
+        parent->hierarchy(hierarchy->getValue());
+ 
+        VerticalConfigurationGroup *left=new VerticalConfigurationGroup(false,true);
+        VerticalConfigurationGroup *right=new VerticalConfigurationGroup(false,true);
+
+        left->addChild(frequency);
+        left->addChild(bandwidth);
+        left->addChild(inversion);
+        left->addChild(constellation);
+        right->addChild(coderate_lp);
+        right->addChild(coderate_hp);
+        right->addChild(trans_mode);
+        right->addChild(guard_interval);
+        right->addChild(hierarchy);
+        addChild(left);
+        addChild(right);
+
+        addSetting(frequency);
+        addSetting(bandwidth);
+        addSetting(inversion);
+        addSetting(constellation);
+        addSetting(coderate_lp);
+        addSetting(coderate_hp);
+        addSetting(trans_mode);
+        addSetting(guard_interval);
+        addSetting(hierarchy);
+     }
+};
+
+class QPSKPane : public BasePane
+{
+public:
+    QPSKPane(ScanWizard *parent)
+    {
+        setUseFrame(false);
+        ScanFrequency *frequency = new ScanFrequency();
+        ScanInversion *inversion = new ScanInversion();
+        ScanSymbolRate *symbolrate = new ScanSymbolRate();
+        ScanPolarity *polarity = new ScanPolarity();
+        ScanFec *fec = new ScanFec();
+
+        connect(frequency, SIGNAL(valueChanged(const QString&)),
+            parent, SLOT(frequency(const QString&)));
+        parent->frequency(frequency->getValue());
+        connect(inversion, SIGNAL(valueChanged(const QString&)),
+            parent, SLOT(inversion(const QString&)));
+        parent->inversion(inversion->getValue());
+        connect(symbolrate, SIGNAL(valueChanged(const QString&)),
+            parent, SLOT(symbolRate(const QString&)));
+        parent->symbolRate(symbolrate->getValue());
+        connect(polarity, SIGNAL(valueChanged(const QString&)),
+            parent, SLOT(polarity(const QString&)));
+        parent->polarity(polarity->getValue());
+        connect(fec, SIGNAL(valueChanged(const QString&)),
+            parent, SLOT(fec(const QString&)));
+        parent->fec(fec->getValue());
+  
+        VerticalConfigurationGroup *left=new VerticalConfigurationGroup(false,true);
+        VerticalConfigurationGroup *right=new VerticalConfigurationGroup(false,true);
+
+        left->addChild(frequency);
+        left->addChild(symbolrate);
+        left->addChild(inversion);
+        right->addChild(fec);
+        right->addChild(polarity);
+        addChild(left);
+        addChild(right);     
+
+        addSetting(frequency);
+        addSetting(symbolrate);
+        addSetting(inversion);
+        addSetting(fec);
+        addSetting(polarity);
+    }
+};
+
+class QAMPane : public BasePane
+{
+public:
+    QAMPane(ScanWizard *parent)
+    {
+        setUseFrame(false);
+        ScanFrequency *frequency = new ScanFrequency();
+        ScanModulation *modulation = new ScanModulation();
+        ScanInversion *inversion = new ScanInversion();
+        ScanSymbolRate *symbolrate = new ScanSymbolRate();
+        ScanFec *fec = new ScanFec();
+
+        connect(frequency, SIGNAL(valueChanged(const QString&)),
+            parent, SLOT(frequency(const QString&)));
+        parent->frequency(frequency->getValue());
+        connect(inversion, SIGNAL(valueChanged(const QString&)),
+            parent, SLOT(inversion(const QString&)));
+        parent->inversion(inversion->getValue());
+        connect(symbolrate, SIGNAL(valueChanged(const QString&)),
+            parent, SLOT(symbolRate(const QString&)));
+        parent->symbolRate(symbolrate->getValue());
+        connect(fec, SIGNAL(valueChanged(const QString&)),
+            parent, SLOT(fec(const QString&)));
+        parent->fec(fec->getValue());
+        connect(modulation, SIGNAL(valueChanged(const QString&)),
+            parent, SLOT(modulation(const QString&)));
+        parent->modulation(modulation->getValue());
+  
+        VerticalConfigurationGroup *left=new VerticalConfigurationGroup(false,true);
+        VerticalConfigurationGroup *right=new VerticalConfigurationGroup(false,true);
+
+        left->addChild(frequency);
+        left->addChild(symbolrate);
+        left->addChild(inversion);
+        right->addChild(modulation);
+        right->addChild(fec);
+        addChild(left);
+        addChild(right);     
+
+        addSetting(frequency);
+        addSetting(symbolrate);
+        addSetting(inversion);
+        addSetting(modulation);
+        addSetting(fec);
+    }
+};
+
+class ATSCPane : public BasePane
+{
+public:
+    ATSCPane(ScanWizard *parent)
+    {
+        ScanATSCTransport *atscTransport = new ScanATSCTransport();
+        connect(atscTransport, SIGNAL(valueChanged(const QString&)),
+            parent, SLOT(atscTransport(const QString&)));
+        addChild(atscTransport);
+        addSetting(atscTransport);
+    }
+};
+
+class ErrorPane : public HorizontalConfigurationGroup
+{
+public:
+    ErrorPane(const QString& error)
+    {
+        TransLabelSetting* label = new TransLabelSetting();
+        label->setValue(error);
+        addChild(label);
+    }
+};
+
+class CardTypeSetting : public ComboBoxSetting, public TransientStorage
+{
+public:
+    CardTypeSetting()
+    {
+        addSelection("ERROR_OPEN","ERROR_OPEN");
+        addSelection("ERROR_PROBE","ERROR_PROBE");
+        addSelection("QPSK","QPSK");
+        addSelection("QAM","QAM");
+        addSelection("OFDM","OFDM");
+        addSelection("ATSC","ATSC");
+    }
+};
+
 ScanWizardTuningPage::ScanWizardTuningPage(ScanWizard *parent)
 {
     setLabel(tr("Tuning"));
     setUseLabel(false);
-    //Allocate the controls and set up the signals
-    frequency = new ScanFrequency();
-    symbolrate = new ScanSymbolRate();
-    polarity = new ScanPolarity();
-    fec = new ScanFec();
-    modulation = new ScanModulation();
-    inversion = new ScanInversion();
 
-    bandwidth = new ScanBandwidth();
-    constellation = new ScanConstellation();
-    coderate_lp = new ScanCodeRateLP();
-    coderate_hp = new ScanCodeRateHP();
-    trans_mode = new ScanTransmissionMode();
-    guard_interval = new ScanGuardInterval();
-    hierarchy = new ScanHierarchy();
+    CardTypeSetting *card = new CardTypeSetting();
+    card->setVisible(false);
+    addChild(card);
+     
+    setTrigger(card);
+    setSaveAll(false);
 
-    //set up the signals, and initialise the intial values
-    connect(frequency, SIGNAL(valueChanged(const QString&)),
-        parent, SLOT(frequency(const QString&)));
-    parent->frequency(frequency->getValue());
-    connect(symbolrate, SIGNAL(valueChanged(const QString&)),
-        parent, SLOT(symbolRate(const QString&)));
-    parent->symbolRate(symbolrate->getValue());
-    connect(polarity, SIGNAL(valueChanged(const QString&)),
-        parent, SLOT(polarity(const QString&)));
-    parent->polarity(polarity->getValue());
-    connect(fec, SIGNAL(valueChanged(const QString&)),
-        parent, SLOT(fec(const QString&)));
-    parent->fec(fec->getValue());
-    connect(modulation, SIGNAL(valueChanged(const QString&)),
-        parent, SLOT(modulation(const QString&)));
-    parent->modulation(modulation->getValue());
-    connect(inversion, SIGNAL(valueChanged(const QString&)),
-        parent, SLOT(inversion(const QString&)));
-    parent->inversion(inversion->getValue());
+    addTarget("ERROR_OPEN", new ErrorPane(tr("Failed to open the card")));
+    addTarget("ERROR_PROBE", new ErrorPane(tr("Failed to probe the card")));
+    addTarget("QPSK", qpsk =  new QPSKPane(parent));
+    addTarget("QAM",  qam = new QAMPane(parent));
+    addTarget("OFDM", ofdm = new OFDMPane(parent));
+    addTarget("ATSC", atsc = new ATSCPane(parent));
+}
 
-    connect(bandwidth, SIGNAL(valueChanged(const QString&)),
-        parent, SLOT(bandwidth(const QString&)));
-    parent->bandwidth(bandwidth->getValue());
-    connect(constellation, SIGNAL(valueChanged(const QString&)),
-        parent, SLOT(constellation(const QString&)));
-    parent->constellation(constellation->getValue());
-    connect(coderate_lp, SIGNAL(valueChanged(const QString&)),
-        parent, SLOT(codeRateLP(const QString&)));
-    parent->codeRateLP(coderate_lp->getValue());
-    connect(coderate_hp, SIGNAL(valueChanged(const QString&)),
-        parent, SLOT(codeRateHP(const QString&)));
-    parent->codeRateHP(coderate_hp->getValue());
-    connect(trans_mode, SIGNAL(valueChanged(const QString&)),
-        parent, SLOT(transmissionMode(const QString&)));
-    parent->transmissionMode(trans_mode->getValue());
-    connect(guard_interval, SIGNAL(valueChanged(const QString&)),
-        parent, SLOT(guardInterval(const QString&)));
-    parent->guardInterval(guard_interval->getValue());
-    connect(hierarchy, SIGNAL(valueChanged(const QString&)),
-        parent, SLOT(hierarchy(const QString&)));
-    parent->hierarchy(hierarchy->getValue());
-
-    VerticalConfigurationGroup *left=new VerticalConfigurationGroup(false,true);
-    VerticalConfigurationGroup *right=new VerticalConfigurationGroup(false,true);
-
-    scanType(parent->scanType());
-
-    left->addChild(frequency);
-    left->addChild(inversion);
-    left->addChild(symbolrate);
-    left->addChild(bandwidth);
-    left->addChild(constellation);
-    right->addChild(coderate_lp);
-    right->addChild(coderate_hp);
-    right->addChild(trans_mode);
-    right->addChild(guard_interval);
-    right->addChild(hierarchy);
-    right->addChild(fec);
-    right->addChild(polarity);
-    right->addChild(modulation);
-
-    addChild(left);
-    addChild(right);
+void ScanWizardTuningPage::triggerChanged(const QString& value)
+{
+    TriggeredConfigurationGroup::triggerChanged(value);
 }
 
 void ScanWizardTuningPage::cardTypeChanged(unsigned nType)
 {
-    frequency->setVisible(false);
-    inversion->setVisible(false);
-    bandwidth->setVisible(false);
-    constellation->setVisible(false);
-    coderate_lp->setVisible(false);
-    coderate_hp->setVisible(false);
-    trans_mode->setVisible(false);
-    guard_interval->setVisible(false);
-    hierarchy->setVisible(false);
-    symbolrate->setVisible(false);
-    fec->setVisible(false);
-    polarity->setVisible(false);
-    modulation->setVisible(false);
-
-    switch (nType)
-    {
-    case CardUtil::OFDM:
-        frequency->setVisible(true);
-        inversion->setVisible(true);
-        bandwidth->setVisible(true);
-        constellation->setVisible(true);
-        coderate_lp->setVisible(true);
-        coderate_hp->setVisible(true);
-        trans_mode->setVisible(true);
-        guard_interval->setVisible(true);
-        hierarchy->setVisible(true);
-        break;
-    case CardUtil::QPSK:
-        frequency->setVisible(true);
-        inversion->setVisible(true);
-        symbolrate->setVisible(true);
-        fec->setVisible(true);
-        polarity->setVisible(true);
-        break;
-    case CardUtil::QAM:
-        frequency->setVisible(true);
-        inversion->setVisible(true);
-        symbolrate->setVisible(true);
-        modulation->setVisible(true);
-        fec->setVisible(true);
-    case CardUtil::ATSC:
-        frequency->setVisible(true);
-        modulation->setVisible(true);
-        break;
-    }
+    char *table[] = { "ERROR_OPEN", 
+                      "ERROR_PROBE", 
+                      "QPSK", 
+                      "QAM", 
+                      "OFDM", 
+                      "ATSC"};
+    if (nType <= CardUtil::ATSC)
+        TriggeredConfigurationGroup::triggerChanged(table[nType]);
 }
 
 void  ScanWizardTuningPage::scanType(ScanTypeSetting::Type _type)
@@ -547,20 +659,11 @@ void  ScanWizardTuningPage::scanType(ScanTypeSetting::Type _type)
         fEnable = false;
     else
         fEnable = true;
-    frequency->setEnabled(fEnable);
-    symbolrate->setEnabled(fEnable);
-    polarity->setEnabled(fEnable);
-    fec->setEnabled(fEnable);
-    modulation->setEnabled(fEnable);
-    inversion->setEnabled(fEnable);
 
-    bandwidth->setEnabled(fEnable);
-    constellation->setEnabled(fEnable);
-    coderate_lp->setEnabled(fEnable);
-    coderate_hp->setEnabled(fEnable);
-    trans_mode->setEnabled(fEnable);
-    guard_interval->setEnabled(fEnable);
-    hierarchy->setEnabled(fEnable);
+    ofdm->enable(fEnable);
+    qpsk->enable(fEnable);
+    qam->enable(fEnable);
+    atsc->enable(fEnable);
 }
 
 LogList::LogList() : n(0)
@@ -663,7 +766,12 @@ void ScanWizardScanner::customEvent( QCustomEvent * e )
                            this,SLOT(TableLoaded()));
                 popupProgress->progress((TUNED_PCT*PROGRESS_MAX)/100);
                 if (parent->scanType()==ScanTypeSetting::FullScan)
-                    scanner->ScanTransports();
+                {
+                     if (parent->cardType() == CardUtil::ATSC)
+                        scanner->ATSCScanTransport(parent->videoSource(),parent->atscTransport());
+                     else
+                        scanner->ScanTransports();
+                }
                 else if (parent->scanType()==ScanTypeSetting::FullTransportScan)
                     transportScanComplete();
                 else
@@ -716,11 +824,14 @@ void *ScanWizardScanner::SpawnTune(void *param)
     }
     else if (parent->scanType() == ScanTypeSetting::FullScan)
     {
-        if (!scanner->dvbchannel->TuneTransport(scanner->chan_opts,true))
+        if (parent->cardType() != CardUtil::ATSC)
         {
-            e->intValue(ScanWizardScanner::ScannerEvent::ERROR_TUNE);
-            QApplication::postEvent(scanner,e);
-            return NULL;
+            if (!scanner->dvbchannel->TuneTransport(scanner->chan_opts,true))
+            {
+                e->intValue(ScanWizardScanner::ScannerEvent::ERROR_TUNE);
+                QApplication::postEvent(scanner,e);
+                return NULL;
+            }
         }
     }
     e->intValue(ScanWizardScanner::ScannerEvent::OK);
@@ -834,7 +945,7 @@ void ScanProgressPopup::exec(ScanWizardScanner *parent)
 
 void ScanWizardScanner::cancelScan()
 {
-cerr << "ScanWizardScanner::cancelScan\n";
+//cerr << "ScanWizardScanner::cancelScan\n";
     finish();
     delete popupProgress;
     popupProgress = NULL;
@@ -960,13 +1071,6 @@ void ScanWizardScanner::scan()
                }
                break;
            case CardUtil::ATSC:
-               if (!dvbchannel->ParseATSC(parent->frequency(),
-                                         parent->modulation(),
-                                         chan_opts.tuning))
-               {
-                    fParseError = true;
-                    break;
-               }
                break;
            default:
                MythPopupBox::showOkPopup(gContext->GetMainWindow(),
@@ -988,7 +1092,8 @@ void ScanWizardScanner::scan()
 }
 
 ScanWizard::ScanWizard(QSqlDatabase* _db) :
-    db(_db) , nScanType(ScanTypeSetting::FullScan), nVideoDev(0)
+    db(_db) , nScanType(ScanTypeSetting::FullScan), nVideoDev(0),
+    nATSCTransport(0)
 {
     ScanWizardScanner *page3 = new ScanWizardScanner(this,db);
     ScanWizardScanType *page1 = new ScanWizardScanType(this);
@@ -1043,6 +1148,11 @@ void ScanWizard::captureCard(const QString& str)
            emit cardTypeChanged(nCardType);
         }
      }
+}
+
+void ScanWizard::atscTransport(const QString& str)
+{
+    nATSCTransport = str.toInt();
 }
 
 MythDialog* ScanWizard::dialogWidget(MythMainWindow *parent,

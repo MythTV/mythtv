@@ -46,34 +46,18 @@ void DVBTransportList::fillSelections(void)
 
     QSqlQuery query = db->exec(querystr);
     if (query.isActive() && query.numRowsAffected() > 0)
-        while(query.next()) {
+    {
+        while(query.next()) 
+        {
             QString DisplayText;
-            if (query.value(5).toString() == "8vsb")
-            {
-                QString ChannelNumber;
-                struct CHANLIST* curList = chanlists[0].list;
-                int totalChannels = chanlists[0].count;
-                int findFrequency = (query.value(3).toInt() / 1000) - 1750;
-
-                for (int x = 0 ; x < totalChannels ; x++)
-                {
-                    if (curList[x].freq == findFrequency)
-                        ChannelNumber = QString("%1").arg(curList[x].name);
-                }
-
-                DisplayText = QString("ATSC Channel %1").arg(ChannelNumber);
-            }
-            else
-            {
-                DisplayText = QString("%1 Hz (%2) (%3) (%4)")
+            DisplayText = QString("%1 Hz (%2) (%3) (%4)")
                                   .arg(query.value(3).toString())
                                   .arg(query.value(4).toString())
                                   .arg(query.value(1).toInt())
                                   .arg(query.value(2).toInt());
-            }
             addSelection(DisplayText, query.value(0).toString());
         }
-
+    }
     setHelpText(QObject::tr("This section lists each transport that MythTV "
                 "currently knows about. The display fields are Frequency, "
                 "SymbolRate, NetworkID, and TransportID "));
@@ -252,7 +236,7 @@ public:
     DvbTFrequency(const DVBTID& id):
         LineEditSetting(), DvbTransSetting(id, "frequency") {
         setLabel(QObject::tr("Frequency"));
-        setHelpText(QObject::tr("[Common] Frequency (Option has no default)\n"
+        setHelpText(QObject::tr("Frequency (Option has no default)\n"
                     "The frequency for this channel in Hz."));
     };
 };
@@ -262,8 +246,7 @@ public:
     DvbTSymbolrate(const DVBTID& id):
         LineEditSetting(), DvbTransSetting(id, "symbolrate") {
         setLabel(QObject::tr("Symbol Rate"));
-        setHelpText(QObject::tr("[DVB-S/C] Symbol Rate (Option has no default)"
-                    "\n???"));
+        setHelpText(QObject::tr("Symbol Rate (Option has no default)"));
     };
 };
 
@@ -272,30 +255,11 @@ public:
     DvbTPolarity(const DVBTID& id):
         ComboBoxSetting(), DvbTransSetting(id, "polarity") {
         setLabel(QObject::tr("Polarity"));
-        setHelpText(QObject::tr("[DVB-S] Polarity (Option has no default)\n"
-                    "???"));
+        setHelpText(QObject::tr("Polarity (Option has no default)"));
         addSelection(QObject::tr("Horizontal"), "h");
         addSelection(QObject::tr("Vertical"), "v");
         addSelection(QObject::tr("Right Circular"), "r");
         addSelection(QObject::tr("Left Circular"), "l");
-    };
-};
-
-class DvbTATSCFrequency: public ComboBoxSetting, public DvbTransSetting {
-public:
-    DvbTATSCFrequency(const DVBTID& id):
-        ComboBoxSetting(), DvbTransSetting(id, "frequency") {
-        setLabel(QObject::tr("Broadcast Channel"));
-        setHelpText(QObject::tr("[ATSC] Digital Channel Number"));
-
-        struct CHANLIST* curList = chanlists[0].list;
-        int totalChannels = chanlists[0].count;
-
-        for (int x = 0 ; x < totalChannels ; x++)
-        {
-            QString Frequency = QString("%1").arg((curList[x].freq + 1750)*1000);
-            addSelection(QObject::tr(curList[x].name),Frequency);
-        }
     };
 };
 
@@ -304,8 +268,10 @@ public:
     DvbTATSCModulation(const DVBTID& id):
         ComboBoxSetting(), DvbTransSetting(id, "modulation") {
         setLabel(QObject::tr("Modulation"));
-        setHelpText(QObject::tr("[ATSC] Modulation Used"));
+        setHelpText(QObject::tr("Modulation Used"));
         addSelection(QObject::tr("8VSB"), "8vsb");
+        addSelection(QObject::tr("QAM64"), "qam_64");
+        addSelection(QObject::tr("QAM256"), "qam_256");
     };
 };
 
@@ -316,7 +282,7 @@ public:
     DvbTInversion(const DVBTID& id):
         ComboBoxSetting(), DvbTransSetting(id, "inversion") {
         setLabel(QObject::tr("Inversion"));
-        setHelpText(QObject::tr("[Common] Inversion (Default: Auto):\n"
+        setHelpText(QObject::tr("Inversion (Default: Auto):\n"
                     "Most cards can autodetect this now, so leave it at Auto"
                     " unless it won't work."));
         addSelection(QObject::tr("Auto"), "a");
@@ -330,8 +296,7 @@ public:
     DvbTBandwidth(const DVBTID& id):
         ComboBoxSetting(), DvbTransSetting(id, "bandwidth") {
         setLabel(QObject::tr("Bandwidth"));
-        setHelpText(QObject::tr("[DVB-C/T] Bandwidth (Default: Auto)\n"
-                    "???"));
+        setHelpText(QObject::tr("Bandwidth (Default: Auto)"));
         addSelection(QObject::tr("Auto"),"a");
         addSelection(QObject::tr("6 MHz"),"6");
         addSelection(QObject::tr("7 MHz"),"7");
@@ -357,8 +322,7 @@ public:
     DvbTModulation(const DVBTID& id):
         DvbTModulationSetting(), DvbTransSetting(id, "modulation") {
         setLabel(QObject::tr("Modulation"));
-        setHelpText(QObject::tr("[DVB-C] Modulation (Default: Auto)\n"
-                    "???"));
+        setHelpText(QObject::tr("Modulation (Default: Auto)"));
     };
 };
 
@@ -367,8 +331,7 @@ public:
     DvbTConstellation(const DVBTID& id):
         DvbTModulationSetting(), DvbTransSetting(id, "constellation") {
         setLabel(QObject::tr("Constellation"));
-        setHelpText(QObject::tr("[DVB-T] Constellation (Default: Auto)\n"
-                    "???"));
+        setHelpText(QObject::tr("Constellation (Default: Auto)"));
     };
 };
 
@@ -393,8 +356,7 @@ public:
     DvbTFec(const DVBTID& id):
         DvbTFecSetting(), DvbTransSetting(id, "fec") {
         setLabel(QObject::tr("FEC"));
-        setHelpText(QObject::tr("[DVB-S/C] Forward Error Correction "
-                    "(Default: Auto)\n???"));
+        setHelpText(QObject::tr("Forward Error Correction (Default: Auto)"));
     };
 };
 
@@ -403,8 +365,7 @@ public:
     DvbTCoderateLP(const DVBTID& id):
         DvbTFecSetting(), DvbTransSetting(id, "lp_code_rate") {
         setLabel(QObject::tr("LP Coderate"));
-        setHelpText(QObject::tr("[DVB-T] Low Priority Code Rate "
-                    "(Default: Auto)\n???"));
+        setHelpText(QObject::tr("Low Priority Code Rate (Default: Auto)"));
     };
 };
 
@@ -413,8 +374,7 @@ public:
     DvbTCoderateHP(const DVBTID& id):
         DvbTFecSetting(), DvbTransSetting(id, "hp_code_rate") {
         setLabel(QObject::tr("HP Coderate"));
-        setHelpText(QObject::tr("[DVB-T] High Priority Code Rate "
-                    "(Default: Auto)\n???"));
+        setHelpText(QObject::tr("High Priority Code Rate (Default: Auto)"));
     };
 };
 
@@ -423,8 +383,7 @@ public:
     DvbTGuardInterval(const DVBTID& id):
         ComboBoxSetting(), DvbTransSetting(id, "guard_interval") {
         setLabel(QObject::tr("Guard Interval"));
-        setHelpText(QObject::tr("[DVB-T] Guard Interval (Default: Auto)\n"
-                    "???"));
+        setHelpText(QObject::tr("Guard Interval (Default: Auto)"));
         addSelection(QObject::tr("Auto"),"auto");
         addSelection("1/4");
         addSelection("1/8");
@@ -438,8 +397,7 @@ public:
     DvbTTransmissionMode(const DVBTID& id):
         ComboBoxSetting(), DvbTransSetting(id, "transmission_mode") {
         setLabel(QObject::tr("Trans. Mode"));
-        setHelpText(QObject::tr("[DVB-T] Transmission Mode (Default: Auto)\n"
-                    "???"));
+        setHelpText(QObject::tr("Transmission Mode (Default: Auto)"));
         addSelection(QObject::tr("Auto"),"a");
         addSelection("2K","2");
         addSelection("8K","8");
@@ -451,8 +409,7 @@ public:
     DvbTHierarchy(const DVBTID& id):
         ComboBoxSetting(), DvbTransSetting(id, "hierarchy") {
         setLabel(QObject::tr("Hierarchy"));
-        setHelpText(QObject::tr("[DVB-T] Hierarchy (Default: Auto)\n"
-                    "???"));
+        setHelpText(QObject::tr("Hierarchy (Default: Auto)"));
         addSelection(QObject::tr("Auto"),"a");
         addSelection(QObject::tr("None"), "n");
         addSelection("1");
@@ -529,7 +486,7 @@ DVBTransportPage::DVBTransportPage(const DVBTID& id, unsigned nType)
         right->addChild(fec = new DvbTFec(id));
         break;
     case CardUtil::ATSC:
-        left->addChild(atscfrequency = new DvbTATSCFrequency(id));
+        left->addChild(frequency  = new DvbTFrequency(id));
         right->addChild(atscmodulation = new DvbTATSCModulation(id));
         break;
     default:

@@ -44,7 +44,6 @@
 #include "videosource.h"
 
 class DTVTStandard;
-class DvbTATSCFrequency;
 class DvbTATSCModulation;
 class DvbTFrequency;
 class DvbTSymbolrate;
@@ -155,7 +154,6 @@ private:
     QSqlDatabase* db;
 
     DTVTStandard*      dtvStandard;
-    DvbTATSCFrequency* atscfrequency;
     DvbTATSCModulation* atscmodulation;
     DvbTFrequency* frequency;
     DvbTSymbolrate* symbolrate;

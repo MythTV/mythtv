@@ -68,6 +68,8 @@ DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
     diseqc = NULL;
     currentTID = -1;
 
+    stopTuning = false;
+
     siparser = NULL;
     monitor = NULL;
     dvbcam = new DVBCam(cardnum);
@@ -122,6 +124,11 @@ void DVBChannel::CloseDVB()
             diseqc = NULL;
         }
     }
+}
+
+void DVBChannel::StopTuning()
+{
+    stopTuning = true;
 }
 
 bool DVBChannel::Open()
@@ -1106,6 +1113,10 @@ bool DVBChannel::Tune(dvb_channel_t& channel, bool all)
  */
 bool DVBChannel::TuneTransport(dvb_channel_t& channel, bool all, int timeout)
 {
+
+    if (stopTuning)
+        return false;
+
     dvb_tuning_t& tuning = channel.tuning;
 
     if (fd_frontend < 0)
@@ -1158,7 +1169,6 @@ bool DVBChannel::TuneTransport(dvb_channel_t& channel, bool all, int timeout)
                obtained.  For DVB-C/T/S with no Dish Movement it could be
                immediatly started */
             siparser->Reset();
-//            siparser->FillPMap(channel.serviceID,30 /* 10 Second Timeout */);
 
             if (havetuned == false)
             {
@@ -1212,7 +1222,7 @@ bool DVBChannel::TuneTransport(dvb_channel_t& channel, bool all, int timeout)
             }
 
             usleep(TUNER_INTERVAL);
-        } while (++timeout <= max_tune_timeout_count);
+        } while ((++timeout <= max_tune_timeout_count) && (!stopTuning));
 
         status += "NO LOCK!";
         WARNING(status);

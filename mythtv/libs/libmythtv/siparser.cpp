@@ -1553,7 +1553,7 @@ TransportObject SIParser::ParseDescriptorTerrestrialDeliverySystem(uint8_t* buff
     // Heiarchy
     switch ((buffer[7] & 0x38) >> 3) {
        case 0:
-               retval.Hiearchy = "none";
+               retval.Hiearchy = "n";
                break;
        case 1:
                retval.Hiearchy = "1";
@@ -1565,7 +1565,7 @@ TransportObject SIParser::ParseDescriptorTerrestrialDeliverySystem(uint8_t* buff
                retval.Hiearchy = "4";
                break;
        default:
-               retval.Hiearchy = "auto";
+               retval.Hiearchy = "a";
                break;
     }
 
@@ -2076,42 +2076,50 @@ void SIParser::ParseMGT(tablehead_t* head, uint8_t* buffer, int size)
                         (buffer[pos+8]);
 
         uint16_t descriptors_length = (buffer[pos+9] & 0x0F) << 8 | buffer[pos+10];
-        if (table_type < 0x04)
-        {
-            TableSourcePIDs.ServicesPID = table_type_pid;
-            TableSourcePIDs.ServicesMask = 0xFF;
-            if (table_type == 0x02)
-            {
-                TableSourcePIDs.ServicesTable = 0xC9;
-                SIPARSER("CVCT Present on this Transport");
-            }
-            if (table_type == 0x00)
-            {
-                TableSourcePIDs.ServicesTable = 0xC8;
-                SIPARSER("TVCT Present on this Transport");
-            }
 
-        }
-        if (table_type == 0x0004)
+        switch (table_type)
         {
-            TableSourcePIDs.ChannelETT = table_type_pid;
-            SIPARSER(QString("Channel ETT Present on PID %1 (%2)").arg(table_type_pid,4,16).arg(size));
-        }
-        if (table_type >= 0x100 && table_type <= 0x17F)
-        {
-            SIPARSER(QString("EIT-%1 Present on PID %2")
-                     .arg(table_type - 0x100)
-                     .arg(table_type_pid,4,16));
+            case 0x00 ... 0x03:
+                               TableSourcePIDs.ServicesPID = table_type_pid;
+                               TableSourcePIDs.ServicesMask = 0xFF;
+                               if (table_type == 0x02)
+                               {
+                                    TableSourcePIDs.ServicesTable = 0xC9;
+                                    SIPARSER("CVCT Present on this Transport");
+                               }
+                               if (table_type == 0x00)
+                               {
+                                   TableSourcePIDs.ServicesTable = 0xC8;
+                                   SIPARSER("TVCT Present on this Transport");
+                               }
+                               break;
+            case 0x04:
+                               TableSourcePIDs.ChannelETT = table_type_pid;
+                               SIPARSER(QString("Channel ETT Present on PID %1 (%2)")
+                                        .arg(table_type_pid,4,16).arg(size));
+                               break;
 
-            Table[EVENTS]->AddPid(table_type_pid,0xCB,0xFF,table_type - 0x100);
-        }
-        if (table_type >= 0x200 && table_type <= 0x27F)
-        {
-            SIPARSER(QString("ETT-%1 Present on PID %2")
-                     .arg(table_type - 0x200)
-                     .arg(table_type_pid,4,16));
-            Table[EVENTS]->AddPid(table_type_pid,0xCC,0xFF,table_type - 0x200);
-        }
+            case 0x100 ... 0x17F:
+                               SIPARSER(QString("EIT-%1 Present on PID %2")
+                                       .arg(table_type - 0x100)
+                                       .arg(table_type_pid,4,16));
+
+                               Table[EVENTS]->AddPid(table_type_pid,0xCB,0xFF,table_type - 0x100);
+                               break;
+
+            case 0x200 ... 0x27F:
+                               SIPARSER(QString("ETT-%1 Present on PID %2")
+                                       .arg(table_type - 0x200)
+                                       .arg(table_type_pid,4,16));
+                               Table[EVENTS]->AddPid(table_type_pid,0xCC,0xFF,table_type - 0x200);
+                               break;
+
+            default:
+                               SIPARSER(QString("Unknown Table %1 in MGT on PID %2")
+                                       .arg(table_type,4,16)
+                                       .arg(table_type_pid,4,16));
+                               break;
+        }                    
         pos += 11;
         pos += descriptors_length;
 

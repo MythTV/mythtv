@@ -52,6 +52,7 @@ class ScanCodeRateHP;
 class ScanTransmissionMode;
 class ScanGuardInterval;
 class ScanHierarchy;
+class ScanATSCTransport;
 class SIScan;
 
 class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
@@ -112,6 +113,20 @@ public slots:
     void sourceID(const QString& str);
 };
 
+class ScanATSCTransport: public ComboBoxSetting, public TransientStorage
+{
+public:
+    enum Type {Terrestrial,Cable} ;
+    ScanATSCTransport()
+    {
+        addSelection(tr("Terrestrial"),QString::number(Terrestrial),true);
+        addSelection(tr("Cable"),QString::number(Cable));
+
+        setLabel(QObject::tr("ATSC Transport"));
+        setHelpText(QObject::tr("ATSC transport, cable or terrestrial"));
+    }
+};
+
 class ScanWizardScanner;
 
 class ScanWizard: public ConfigurationWizard {
@@ -149,6 +164,7 @@ private:
     unsigned nVideoDev;
     unsigned nVideoSource;
     unsigned nCardType;
+    unsigned nATSCTransport;
 
 public slots:
     void frequency(const QString& str) { strFrequency = str; };
@@ -169,6 +185,7 @@ public slots:
     void videoSource(const QString& str);
     void transport(const QString& str);
     void captureCard(const QString& str);
+    void atscTransport(const QString& str);
 
 public:
     QString frequency() {return strFrequency;}
@@ -190,6 +207,7 @@ public:
     unsigned captureCard() {return nCaptureCard;}
     unsigned cardType() {return nCardType;}
     unsigned videoDev() {return nVideoDev;}
+    unsigned atscTransport() {return nATSCTransport;}
 
 signals:
     void cardTypeChanged(unsigned);
@@ -215,30 +233,26 @@ public:
     ScanSignalMeter(int steps): ProgressSetting(steps) {};
 };
 
-class ScanWizardTuningPage : public HorizontalConfigurationGroup
+class OFDMPane;
+class QPSKPane;
+class ATSCPane;
+class QAMPane;
+
+class ScanWizardTuningPage : public HorizontalConfigurationGroup, public TriggeredConfigurationGroup
 {
     Q_OBJECT
 public:
     ScanWizardTuningPage(ScanWizard* parent);
 
 protected slots:
+    virtual void triggerChanged(const QString& value);
     void cardTypeChanged(unsigned nType);
     void scanType(ScanTypeSetting::Type _type);
-
 protected:
-    ScanFrequency *frequency;
-    ScanSymbolRate *symbolrate;
-    ScanPolarity *polarity;
-    ScanFec *fec;
-    ScanModulation *modulation;
-    ScanInversion *inversion;
-    ScanBandwidth *bandwidth;
-    ScanConstellation *constellation;
-    ScanCodeRateLP *coderate_lp;
-    ScanCodeRateHP *coderate_hp;
-    ScanTransmissionMode *trans_mode;
-    ScanGuardInterval *guard_interval;
-    ScanHierarchy *hierarchy;
+    ATSCPane *atsc;
+    OFDMPane *ofdm;
+    QAMPane *qam;
+    QPSKPane *qpsk;
 };
 
 class LogList: public ListBoxSetting, public TransientStorage

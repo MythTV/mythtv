@@ -3,10 +3,15 @@
 #include <qstring.h>
 #include "dvbchannel.h"
 #include "sitypes.h"
+#include "dvbtypes.h"
 
 typedef QValueList<Event> QList_Events;
 typedef QValueList<QList_Events*> QListList_Events;
 
+typedef enum { IDLE, TRANSPORT_LIST, EIT_CRAWL } SCANMODE;
+
+/* Class used for doing a list of frequencies / transports 
+   This is used for ATSC/NA Digital Cable and also scan all transports */
 class TransportScanList
 {
 public:
@@ -15,16 +20,26 @@ public:
         mplexid = -1;
         complete = false;
         scanning = false;
+        Frequency = "";
+        Modulation = "";
+        FriendlyName = "";
     }
     TransportScanList(int _mplexid)
     {
-         mplexid = _mplexid;
-         complete = false;
-         scanning = false;
+        mplexid = _mplexid;
+        complete = false;
+        scanning = false;
     }
-    int mplexid;
-    bool complete;
-    bool scanning;
+    int mplexid;                /* DB Mplexid */
+    bool complete;              /* scan status */
+    dvb_tuning_t tuning;        /* DVB Tuning struct if mplexid == -1 */
+    QString FriendlyName;       /* Name to display in scanner dialog */
+    QString Frequency;          /* Frequency as QString */
+    QString Modulation;         /* Modulation as QString */
+    int SourceID;               /* Associated SourceID */
+    bool UseTimer;              /* Set if timer is used after lock for getting PAT */
+
+    bool scanning;              /* Probbably Unnecessary */
 
 };
 
@@ -40,14 +55,15 @@ public:
     void StartScanner();
     void StopScanner();
 
+    bool ATSCScanTransport(int SourceID, int FrequencyBand);
     bool ScanTransports();
     bool ScanServices(int TransportID = -1);
     bool ScanServicesSourceID(int SourceID);
-    bool FillEvents(int SourceID);
     void SetSourceID(int _SourceID);
 
     void SetFTAOnly(bool _fFTAOnly) { FTAOnly = _fFTAOnly;}
     void SetForceUpdate(bool _force) { forceUpdate = _force;}
+    void SetScanTimeout(int _timeout) { ScanTimeout = _timeout;}
 
 public slots:
 
@@ -78,9 +94,8 @@ private:
     int  GetDVBTID(uint16_t NetworkID,uint16_t TransportID,int CurrentMplexID);
     void AddEvents();
 
-    bool scannerRunning;
+    bool scannerRunning;                 
     bool serviceListReady;
-    bool sourceIDTransportScan;
     bool sourceIDTransportTuned;
     bool transportListReady;
     bool eventsReady;
@@ -97,13 +112,15 @@ private:
     int sourceID;
     QValueList<TransportScanList> scanTransports;
 
-    bool fillingEvents;
+    QTime timer;
 
     bool threadExit;
     bool FTAOnly;
     bool forceUpdate;
+    int ScanTimeout;
+    SCANMODE scanMode;
     pthread_mutex_t events_lock;
 };
 
 #define SISCAN(args...) \
-    VERBOSE(VB_GENERAL, QString("SIScan#%1: ").arg(chan->GetCardNum()) << args);
+    VERBOSE(VB_SIPARSER, QString("SIScan#%1: ").arg(chan->GetCardNum()) << args);

@@ -40,7 +40,7 @@ public:
 
     bool SetTransportByInt(int mplexid);
     bool SetChannelByString(const QString &chan);
-
+    void StopTuning();
     void SetFreqTable(const QString &name);
     void SwitchToInput(const QString &inputname, const QString &chan);
     void SwitchToInput(int newcapchannel, bool setstarting)
@@ -73,6 +73,7 @@ public:
     bool Tune(dvb_channel_t& channel, bool all=false);
     bool TuneTransport(dvb_channel_t& channel, bool all=false, int timeout=30000);
     int  GetCurrentTransportDBID() { return currentTID; };
+    void SetCurrentTransportDBID(int _id) { currentTID = _id; };
     int  GetCardNum() { return cardnum; };
     void RecorderStarted();
 
@@ -122,6 +123,8 @@ private:
     volatile int fd_frontend;
     int     currentTID;
 
+
+    bool    stopTuning;
     bool    force_channel_change;
     bool    first_tune;
 };

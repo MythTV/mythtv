@@ -1,4 +1,3 @@
-
 #include <pthread.h>
 #include <stdio.h>
 #include <qmutex.h>
@@ -7,24 +6,27 @@
 #include "siparser.h"
 #include "dvbtypes.h"
 #include "libmythtv/scheduledrecording.h"
+#include "frequencies.h"
 
 #define CHECKNIT_TIMER 5000
 //#define SISCAN_DEBUG
 
-
 SIScan::SIScan(DVBChannel* advbchannel,QSqlDatabase *thedb, pthread_mutex_t* _db_lock, int _sourceID)
 {
+    /* setup links to parents and db connections */
     chan = advbchannel;
     sourceID = _sourceID;
     db = thedb;
     db_lock = _db_lock;
 
+    /* setup boolean values for thread */
     scannerRunning = false;
     serviceListReady = false;
     transportListReady = false;
-    sourceIDTransportScan = false;
     eventsReady = false;
-    fillingEvents = false;
+
+    scanMode = IDLE;
+    ScanTimeout = 0; 		/* Set scan timeout off by default */
 
     FTAOnly = false;
     forceUpdate = false;
@@ -46,22 +48,11 @@ SIScan::~SIScan()
     pthread_mutex_destroy(&events_lock);
 }
 
-// 3 different ways of handling a scan
-// Seed the scan with a starting transport (DVB-S method)
-// Scan all possible frequencies (DVB-T/C ATSC)
-// Scan list of transport in the database
-
-// When running in auto-scan mode inside of myth the only way of running a
-// scan should be scan know transports on known SourceIDs
-
 void SIScan::SetSourceID(int _SourceID)
 {
     // Todo: this needs to be used more so you don't get data fubared running in auto-scan mode
     sourceID = _SourceID;
 }
-
-// TODO: Have a way to do a seeded scan, and a non-seeded scan (DVB-T/C use non-seeded)
-//       but DVB-S will have to be seeded.
 
 bool SIScan::ScanTransports()
 {
@@ -70,11 +61,12 @@ bool SIScan::ScanTransports()
 
 bool SIScan::ScanServicesSourceID(int SourceID)
 {
-    // This function will scan all the transports on a specific sourceID
-    // TODO: Clean this up this is way too messy to really use at this point..
 
-    // Run DB query to get transports on sourceid SourceID connected to this card
-    QString theQuery = QString("select mplexid from dtv_multiplex where "
+    if (scanMode == TRANSPORT_LIST)
+        return false;
+
+    /* Run DB query to get transports on sourceid SourceID connected to this card */
+    QString theQuery = QString("select mplexid, sistandard, transportid from dtv_multiplex where "
                        "sourceid = %1")
                        .arg(SourceID);
 
@@ -91,18 +83,25 @@ bool SIScan::ScanServicesSourceID(int SourceID)
         return false;
     }
 
+    scanTransports.clear();
+
     transportsCount = transportsToScan = query.numRowsAffected();
     int tmp = transportsToScan;
     while (tmp--)
     {
         query.next();
-        int mplexid = query.value(0).toInt();
-        scanTransports += TransportScanList(mplexid);
+        if (query.value(1).toString() == QString("atsc"))
+            ScanTimeout = CHECKNIT_TIMER;
+        TransportScanList t;
+        t.mplexid = query.value(0).toInt();
+        t.SourceID = SourceID;
+        t.FriendlyName = QString("Transport ID %1").arg(query.value(2).toString());
+        scanTransports += t;
     }
     pthread_mutex_unlock(db_lock);
-    sourceID = SourceID;
+
     sourceIDTransportTuned = false;
-    sourceIDTransportScan = true;
+    scanMode = TRANSPORT_LIST;    
     return true;
 }
 
@@ -145,25 +144,25 @@ void SIScan::StartScanner()
                 emit ServiceScanUpdateText("Finished processing Transport");
             }
             serviceListReady = false;
-            if (sourceIDTransportScan)
+            if (scanMode == TRANSPORT_LIST)
             {
-                transportsCount--;
-                emit PctServiceScanComplete(((transportsToScan-transportsCount)*100)/transportsToScan);
-                //We could just look at the transportsCount here but
-                //it's not really thread safe
-                QValueList<TransportScanList>::Iterator i;
+
+                /* We could just look at the transportsCount here but it's not really thread safe */
+/*                QValueList<TransportScanList>::Iterator i;
                 bool fAll = true;
                 for (i = scanTransports.begin() ; i != scanTransports.end() && fAll ; ++i)
                     if (!(*i).complete)
                         fAll = false;
                 if (fAll)
                     emit ServiceScanComplete();
-
+*/
                 sourceIDTransportTuned = false;
             }
             else
+            {
+                emit PctServiceScanComplete(100);
                 emit ServiceScanComplete();
-
+            }
         }
         if (transportListReady)
         {
@@ -180,42 +179,80 @@ void SIScan::StartScanner()
             emit TransportScanComplete();
         }
 
-        // TODO: Handle progresive transport scanning here properly this loop sucks
-        if (sourceIDTransportScan)
+        if (scanMode == TRANSPORT_LIST)
         {
-            if (!sourceIDTransportTuned)
+            if (transportsCount == 0)
+            {
+                emit PctServiceScanComplete(100);
+                emit ServiceScanComplete();
+                scanMode = IDLE; 
+            }
+            if ((!sourceIDTransportTuned) || ((ScanTimeout > 0) && (timer.elapsed() > ScanTimeout)))
             {
                 QValueList<TransportScanList>::Iterator i;
                 bool done = false;
                 for (i = scanTransports.begin() ; i != scanTransports.end() ; ++i)
                 {
-                    if (!done && !(*i).complete)
+                    if (!done && !(*i).complete && !threadExit)
                     {
                         (*i).complete = true;
+                        if ((ScanTimeout > 0) && (timer.elapsed() > ScanTimeout))
+                            emit ServiceScanUpdateText("Timeout Scaning Channel");
+                        emit ServiceScanUpdateText((*i).FriendlyName);
                         SISCAN(QString("Tuning to mplexid %1").arg((*i).mplexid));
-                        if (!chan->SetTransportByInt((*i).mplexid))
+                        transportsCount--;
+                        emit PctServiceScanComplete(((transportsToScan-transportsCount-1)*100)/transportsToScan);
+         
+                        bool result = false;                
+                        if ((*i).mplexid == -1)
                         {
-                           SISCAN("Transport Failed to Tune");
+                            /* For ATSC / Cable try for 2 seconds to tune otherwise give up */
+                            dvb_channel_t t;
+                            t.tuning = (*i).tuning;
+                            t.sistandard = "atsc";
+                            result = chan->TuneTransport(t,true,2000);
                         }
+                        else 
+                            result = chan->SetTransportByInt((*i).mplexid);
+
+                        if (!result)
+                            emit ServiceScanUpdateText("Failed to tune");
                         else
                         {
+                            if ((*i).mplexid == -1)
+                            {
+                                pthread_mutex_lock(db_lock);
+                                QSqlQuery query(QString::null, db);
+                                query.prepare("INSERT into dtv_multiplex (frequency, "
+                                               "modulation, sistandard, sourceid) "
+                                               "VALUES (:FREQUENCY,:MODULATION,\"atsc\",:SOURCEID);");
+                                query.bindValue(":FREQUENCY",(*i).Frequency);
+                                query.bindValue(":MODULATION",(*i).Modulation);
+                                query.bindValue(":SOURCEID",(*i).SourceID);
+                                if(!query.exec())
+                                    MythContext::DBError("Inserting new transport", query);
+                                if (!query.isActive())
+                                     MythContext::DBError("Adding transport to Database.", query);
+
+                                query.prepare("select max(mplexid) from dtv_multiplex;");
+                                if(!query.exec())
+                                    MythContext::DBError("Getting ID of new Transport", query);
+                                if (!query.isActive())
+                                    MythContext::DBError("Getting ID of new Transport.", query);
+
+                                if (query.numRowsAffected() > 0)
+                                {
+                                    query.next();
+                                    chan->SetCurrentTransportDBID(query.value(0).toInt());
+                                }
+                                pthread_mutex_unlock(db_lock);
+
+                            }
+                            timer.start();
                             chan->siparser->FindServices();
                             sourceIDTransportTuned = true;
                             done = true;
                         }
-/*                      else
-                        {
-                            SISCAN("Tuned to Transport");
-                            sourceIDTransportTuned=true;
-                            if(chan->siparser->FindServices(30))
-                            {
-                                SISCAN("Service Table(s) Requested");
-                                done = true;
-                            }
-                            else
-                                SISCAN("Failed to request Service Table");
-                        }
-*/
                     }
                 }
             }
@@ -227,29 +264,85 @@ void SIScan::StartScanner()
 void SIScan::StopScanner()
 {
     threadExit = true;
+    /* Force dvbchannel to exit */
+    chan->StopTuning();
     SIPARSER("Stopping SIScanner");
     while (scannerRunning)
        usleep(50);
 
 }
 
-// TODO: Most likely remove this code
-bool SIScan::FillEvents(int SourceID)
+bool SIScan::ATSCScanTransport(int SourceID, int FrequencyBand)
 {
-    (void) SourceID;
-    // See if you are already trying to fill events
-    if (fillingEvents)
+
+    if (scanMode == TRANSPORT_LIST)
         return false;
 
-    fillingEvents = true;
+    struct CHANLIST* curList;
+    QString Modulation;
+    QString NamePrefix;
 
-    // Check if you are tuned to a transport that is on SourceID x
+    switch (FrequencyBand)
+    {
+        case 0:
+                   curList = chanlists[0].list;
+                   /* Ensure scan only does 2-69 */
+                   transportsCount = transportsToScan = 68;
+                   Modulation = "8vsb";
+                   NamePrefix = "ATSC Channel";
+                   break;
+        case 1:
+                   curList = chanlists[1].list;
+                   transportsCount = transportsToScan = chanlists[1].count; 
+                   Modulation = "qam_256";
+                   NamePrefix = "QAM Channel";
+                   break;
+        default:
+                   return false;
+    }
 
-#ifdef SISCAN_DEBUG
-    printf("current transport = %d\n",chan->GetCurrentTransportDBID());
-#endif
-    fillingEvents = false;
+    scanTransports.clear();
+	
+    /* Now generate a list of frequencies to scan and add it to the atscScanTransportList */
+    for (int x = 0 ; x < transportsToScan ; x++)
+    {
+        TransportScanList a;
+        uint32_t freq = (curList[x].freq + 1750) * 1000;
+        a.FriendlyName = QString("%1 %2").arg(NamePrefix).arg(curList[x].name);
+        QString Frequency = QString("%1").arg(freq);
+        a.Frequency = Frequency;
+        a.Modulation = Modulation;
+        a.SourceID = SourceID;
+        chan->ParseATSC(Frequency,Modulation,a.tuning);
 
+        /* See if mplexid is already in the database */
+        QString theQuery = QString("select mplexid from dtv_multiplex where "
+                           "sourceid = %1 and frequency = %2")
+                           .arg(SourceID)
+                           .arg(Frequency);
+
+        pthread_mutex_lock(db_lock);
+        QSqlQuery query = db->exec(theQuery);
+    
+        if (!query.isActive())
+            MythContext::DBError("Check for existing transport", query);
+    
+        if (query.numRowsAffected() <= 0)
+            a.mplexid = -1;
+        else
+        {
+            query.next();
+            a.mplexid = query.value(0).toInt();            
+        }
+        pthread_mutex_unlock(db_lock);
+        scanTransports += a;
+
+    }    
+
+    timer.start();
+    ScanTimeout = CHECKNIT_TIMER;
+    sourceIDTransportTuned = false;
+    scanMode = TRANSPORT_LIST;    
     return true;
 }
 
@@ -280,6 +373,9 @@ void SIScan::TransportTableComplete()
 
 void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
 {
+
+    /* This will be fixed post .17 to be more elegant */
+    int localSourceID = -1;
 
     if (SDT.empty())
     {
@@ -334,7 +430,7 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
     TODO: If you get a Version mismatch and you are not in setupscan mode you will want to issue a
           scan of the other transports that have the same networkID */
 
-    QString versionQuery = QString("SELECT serviceversion FROM dtv_multiplex "
+    QString versionQuery = QString("SELECT serviceversion,sourceid FROM dtv_multiplex "
                                    "WHERE mplexid = %1")
                                    .arg(DVBTID);
     pthread_mutex_lock(db_lock);
@@ -350,6 +446,9 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
     if (query.numRowsAffected() > 0)
     {
         query.next();
+
+        localSourceID = query.value(1).toInt();
+
         if (!forceUpdate && (query.value(0).toInt() == (*s).Version))
         {
             SISCAN("Service table up to date for this network.");
@@ -449,7 +548,7 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
                                ":NAME,:MPLEXID,:SERVICEID,:ATSCSRCID,:USEOAG);");
                      query.bindValue(":CHANID",chanid);
                      query.bindValue(":CHANNUM",ChanNum);
-                     query.bindValue(":SOURCEID",sourceID);
+                     query.bindValue(":SOURCEID",localSourceID);
                      query.bindValue(":CALLSIGN",(*s).ServiceName.utf8());
                      query.bindValue(":NAME",(*s).ServiceName.utf8());
                      query.bindValue(":MPLEXID",chan->GetCurrentTransportDBID());
