@@ -25,6 +25,7 @@ ProgramInfo::ProgramInfo(void)
 
     conflicting = false;
     recording = true;
+    duplicate = false;
 
     sourceid = -1;
     inputid = -1;
@@ -55,6 +56,7 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
  
     conflicting = other.conflicting;
     recording = other.recording;
+    duplicate = other.duplicate;
 
     sourceid = other.sourceid;
     inputid = other.inputid;
@@ -104,6 +106,7 @@ void ProgramInfo::ToStringList(QStringList &list)
     list << endts.toString();
     list << QString::number(conflicting);
     list << QString::number(recording);
+    list << QString::number(duplicate);
     list << hostname;
 }
 
@@ -130,7 +133,8 @@ void ProgramInfo::FromStringList(QStringList &list, int offset)
     endts = QDateTime::fromString(list[offset + 12]);
     conflicting = list[offset + 13].toInt();
     recording = list[offset + 14].toInt();
-    hostname = list[offset += 15];
+    duplicate = list[offset + 15].toInt();
+    hostname = list[offset += 16];
 
     if (title == " ")
         title = "";
@@ -410,17 +414,7 @@ void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
 
     QSqlQuery qquery = db->exec(query);
     if (!qquery.isActive())
-        MythContext::DBError("WriteRecordedToDB (recorded)", qquery);
-
-    query = QString("INSERT INTO oldrecorded (chanid,starttime,endtime,title,"
-                    "subtitle,description) "
-                    "VALUES(%1,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\");")
-                    .arg(chanid).arg(starts).arg(ends).arg(sqltitle.utf8()) 
-                    .arg(sqlsubtitle.utf8()).arg(sqldescription.utf8());
-
-    qquery = db->exec(query);
-    if (!qquery.isActive())
-        MythContext::DBError("WriteRecordedToDB (oldrecorded)", qquery);
+        MythContext::DBError("WriteRecordedToDB", qquery);
 
     GetProgramRecordingStatus(db);
     record->doneRecording(db, *this);

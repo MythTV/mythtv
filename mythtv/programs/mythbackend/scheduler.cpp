@@ -218,7 +218,8 @@ void Scheduler::PrintList(void)
         cout << first->title << " " << first->chanstr << " " << first->chanid 
              << " \"" << first->startts.toString() << "\" " << first->sourceid 
              << " " << first->inputid << " " << first->cardid << " --\t"  
-             << first->conflicting << " " << first->recording << endl;
+             << first->conflicting << " " << first->recording << " "
+             << first->duplicate << endl;
     }
 
     cout << endl << endl;
@@ -328,39 +329,6 @@ void Scheduler::MarkConflicts(list<ProgramInfo *> *uselist)
     }
 }
 
-bool Scheduler::FindInOldRecordings(ProgramInfo *pginfo)
-{
-    QString thequery;
-  
-    if (pginfo->subtitle.length() <= 2 || pginfo->description.length() < 2)
-        return false;
-
-    QString title=pginfo->title;
-    QString subtitle=pginfo->subtitle;
-    QString description=pginfo->description;
-
-    title.replace(QRegExp("\""), QString("\\\""));
-    subtitle.replace(QRegExp("\""), QString("\\\""));
-    description.replace(QRegExp("\""), QString("\\\""));
-
-    thequery = QString("SELECT NULL FROM oldrecorded WHERE "
-                       "title = \"%1\" AND subtitle = \"%2\" AND "
-                       "description = \"%3\";").arg(title.utf8())
-                       .arg(subtitle.utf8()).arg(description.utf8());
-
-    QSqlQuery query = db->exec(thequery);
-
-    if (!query.isActive()) {
-        MythContext::DBError("find in oldrecorded", query);
-        return false;
-    }
-
-    if (query.numRowsAffected() > 0)
-        return true;
-
-    return false;
-}
-
 void Scheduler::PruneList(void)
 {
     list<ProgramInfo *>::reverse_iterator i = recordingList.rbegin();
@@ -377,7 +345,7 @@ void Scheduler::PruneList(void)
         if (first->GetProgramRecordingStatus(db) > ScheduledRecording::SingleRecord &&
             (first->subtitle.length() > 2 && first->description.length() > 2))
         {
-            if (FindInOldRecordings(first))
+            if (first->duplicate)
             {
                 delete first;
                 deliter = i.base();

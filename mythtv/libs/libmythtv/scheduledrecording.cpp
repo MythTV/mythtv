@@ -161,18 +161,27 @@ void ScheduledRecording::fromProgramInfo(const ProgramInfo& proginfo) {
 void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
                                                  list<ProgramInfo*>& proglist) {
      QString query = QString(
-"SELECT channel.chanid, channel.sourceid, "
+"SELECT DISTINCT channel.chanid, channel.sourceid, "
 "program.starttime, program.endtime, "
 "program.title, program.subtitle, program.description, "
 "channel.channum, channel.callsign, channel.name, "
-"record.recordid "
-"FROM channel, program, record "
+"record.recordid, oldrecorded.starttime IS NOT NULL AS duplicate "
+"FROM record "
+" INNER JOIN channel ON (channel.chanid = program.chanid) "
+" INNER JOIN program ON (program.title = record.title) "
+" LEFT JOIN oldrecorded ON "
+"  ( "
+"    oldrecorded.title IS NOT NULL AND oldrecorded.title <> '' AND program.title = oldrecorded.title "
+"     AND "
+"    oldrecorded.subtitle IS NOT NULL AND oldrecorded.subtitle <> '' AND program.subtitle = oldrecorded.subtitle "
+"     AND "
+"    oldrecorded.description IS NOT NULL AND oldrecorded.description <> '' AND program.description = oldrecorded.description"
+"  ) "
 "WHERE "
 "channel.chanid = program.chanid "
 "AND "
 "record.title = program.title "
 "AND "
-
 "((record.type = %1) " // allrecord
 " OR "
 " ((record.chanid = program.chanid) " // channel matches
@@ -215,6 +224,9 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
              proginfo->chanstr = result.value(7).toString();
              proginfo->chansign = result.value(8).toString();
              proginfo->channame = result.value(9).toString();
+             // XXX recordid ignored for now, should create and populate a ScheduledRecording
+             // and put it in the proginfo
+             proginfo->duplicate = result.value(11).toInt();
 
              if (proginfo->title == QString::null)
                  proginfo->title = "";
@@ -374,6 +386,29 @@ void ScheduledRecording::doneRecording(QSqlDatabase* db, const ProgramInfo& prog
 
     if (getRecordingType() == SingleRecord)
         remove(db);
+
+    QString sqltitle = proginfo.title;
+    QString sqlsubtitle = proginfo.subtitle;
+    QString sqldescription = proginfo.description;
+
+    sqltitle.replace(QRegExp("\""), QString("\\\""));
+    sqlsubtitle.replace(QRegExp("\""), QString("\\\""));
+    sqldescription.replace(QRegExp("\""), QString("\\\""));
+
+    QString query = QString("INSERT INTO oldrecorded (chanid,starttime,endtime,title,"
+                            "subtitle,description) "
+                            "VALUES(%1,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\");")
+        .arg(proginfo.chanid)
+        .arg(proginfo.startts.toString(Qt::ISODate))
+        .arg(proginfo.endts.toString(Qt::ISODate))
+        .arg(sqltitle.utf8()) 
+        .arg(sqlsubtitle.utf8())
+        .arg(sqldescription.utf8());
+
+    QSqlQuery result = db->exec(query);
+    if (!result.isActive())
+        MythContext::DBError("doneRecording", result);
+
 }
 
 MythDialog* ScheduledRecording::dialogWidget(QWidget* parent, const char* name)

@@ -7,7 +7,7 @@
 #include <qmap.h>
 #include "scheduledrecording.h"
 
-#define NUMPROGRAMLINES 16
+#define NUMPROGRAMLINES 17
 
 class QSqlDatabase;
 
@@ -82,11 +82,13 @@ class ProgramInfo
 
     bool conflicting;
     bool recording;
+    bool duplicate;
 
     int sourceid;
     int inputid;
     int cardid;
     bool conflictfixed;
+
 
     QString schedulerid;
 
