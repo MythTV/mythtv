@@ -298,6 +298,7 @@ void Database::parseItems(TagInput& dmap_data, int how_many_now)
         int     new_item_rating = -1;
         int     new_item_year = -1;
         QString new_item_url = "";  // not daap url, url for extra info ?
+        QString new_item_myth_digest = "";
         
         TagInput internal_listing(listing);
         while(!internal_listing.isFinished())
@@ -355,6 +356,16 @@ void Database::parseItems(TagInput& dmap_data, int how_many_now)
                 
                     internal_listing >> a_string;
                     new_item_name = QString::fromUtf8(a_string.c_str());
+                    break;
+                
+                case 'mypi':
+                
+                    //
+                    //  Myth persistent id
+                    //
+                    
+                    internal_listing >> a_string;
+                    new_item_myth_digest = QString::fromUtf8(a_string.c_str());
                     break;
                 
                 case 'asal':
@@ -707,6 +718,11 @@ void Database::parseItems(TagInput& dmap_data, int how_many_now)
             new_item->setStopTime(new_item_stop_time);
             new_item->setTrackCount(new_item_track_count);
             new_item->setRating(new_item_rating);
+            if(new_item_myth_digest.length() > 0)
+            {
+                new_item->setMythDigest(new_item_myth_digest);
+                // cout << "wow, I got a myth digest of \"" << new_item_myth_digest << "\"" << endl;
+            }
             
             new_metadata->insert(new_item->getId(), new_item);
 

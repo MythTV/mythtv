@@ -125,6 +125,17 @@ TypeRegistry::Var    TypeRegistry::list[] = {
 	
 	{ 'aeNV', "com.apple.itunes.norm-volume", VT_INT32 },
 	{ 'aeSP', "com.apple.itunes.smart-playlist", VT_INT8 },
+	
+	//
+	//  This type was added for myth <--> myth to enable exchange of myth
+	//  digests (oddly calculated md5 checksums). It is not part of
+	//  "official" daap and should almost certainly never be exchanged with
+	//  a non mfd
+	//
+
+	{ 'mypi', "myth.persistentiddigest", VT_STRING },
+
+
 };
 
 

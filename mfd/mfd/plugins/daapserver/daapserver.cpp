@@ -602,6 +602,15 @@ void DaapServer::addItemToResponse(DaapRequest *daap_request, TagOutput &respons
     response << Tag('minm') << which_item->getTitle().utf8() << end;
 
     //
+    //  If the client is another mfd, send the mythdigest of this track
+    //
+
+    if(daap_request->getClientType() == DAAP_CLIENT_MFDDAAPCLIENT)
+    {
+        response << Tag('mypi') << which_item->getMythDigest().utf8() << end;
+    }
+
+    //
     //  Everything else is optional depending on
     //  what the client passed in its meta=foo
     //  GET variable

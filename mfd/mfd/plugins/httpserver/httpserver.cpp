@@ -449,6 +449,9 @@ void ClientHttpServer::handleIncoming(HttpRequest *http_request, int)
     //  Build our response (the http_request automatically has an http
     //  response attached to it)
     //
+
+    QTime page_build_time;
+    page_build_time.start();
     
     addTopHTML(http_request);
     startCoreTable(http_request);
@@ -457,7 +460,9 @@ void ClientHttpServer::handleIncoming(HttpRequest *http_request, int)
     showCurrentSection(http_request, branch_one, branch_two);
     endCoreTable(http_request);
     addBottomHTML(http_request);
-    
+
+    log(QString("built HTML response for client in %1 second(s)")
+        .arg(page_build_time.elapsed() / 1000.0), 9);    
     //
     //  And we're done. Our parent class takes care of sending the response
     //

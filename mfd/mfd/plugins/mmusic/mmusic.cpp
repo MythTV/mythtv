@@ -276,7 +276,8 @@ void MMusicWatcher::run()
 bool MMusicWatcher::sweepMetadata()
 {
 
-    
+    QTime sweep_timer;
+    sweep_timer.start();
 
     //
     //  Figure out where the files are. We do this ever sweep, so ... in
@@ -361,6 +362,12 @@ bool MMusicWatcher::sweepMetadata()
         playlist_deletions.count() > 0
       )
     {
+        log(QString("processed +%1/-%2 item(s) and +%3/-%4 playlist(s) in %5 second(s)")
+            .arg(metadata_additions.count())
+            .arg(metadata_deletions.count())
+            .arg(playlist_additions.count())
+            .arg(playlist_deletions.count())
+            .arg(sweep_timer.elapsed() / 1000.0), 8);
         return true;
     }
     return false;
@@ -607,8 +614,6 @@ void MMusicWatcher::compareToMasterList(MusicFileMap &music_files, const QString
     //  MusicFilesAtATime)
     //
 
-    QTime master_add_timer;
-    master_add_timer.start();
     int music_files_at_a_time = mfdContext->getNumSetting("MusicFilesAtATime", 100);
     int counter = 0;
     MusicFileMap::Iterator it;
@@ -648,12 +653,9 @@ void MMusicWatcher::compareToMasterList(MusicFileMap &music_files, const QString
             if(updateMetadata(new_item))
             {
                 persistMetadata(new_item);
-                //new_metadata->insert(new_item->getId(), new_item);
-                //metadata_additions.push_back(new_item->getId());
                 MusicFile new_master_item(file_name, it.data().lastModified());
                 new_master_item.setMetadataId(new_item->getId());
                 new_master_item.setDbId(new_item->getDbId());
-                //new_master_item.checkedDatabase(true);
                 new_master_item.setMythDigest(new_item->getMythDigest());
 
                 master_list[file_name] = new_master_item;
@@ -695,13 +697,6 @@ void MMusicWatcher::compareToMasterList(MusicFileMap &music_files, const QString
             force_sweep_mutex.unlock();
             
         }
-    }
-    if(counter > 0)
-    {
-        log(QString("added %1 audio files (total now %2) to the master list in %3 second(s)")
-            .arg(counter)
-            .arg(master_list.count())
-            .arg(master_add_timer.elapsed() / 1000.0), 10);
     }
 }
 
