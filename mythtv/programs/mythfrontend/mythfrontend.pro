@@ -1,9 +1,6 @@
 INCLUDEPATH += ../../libs/libmythtv ../../libs ../../libs/libmyth
-DEPENDPATH += ../../libs/libmythtv ../../libs/libmyth ../../libs/libvbitext
-DEPENDPATH += ../../libs/libavcodec ../../libs/libavformat
-
-LIBS += -L../../libs/libmythtv -L../../libs/libavcodec -L../../libs/libmyth
-LIBS += -L../../libs/libvbitext -L../../libs/libavformat
+DEPENDPATH += ../../libs/libmythtv ../../libs/libmyth ../../libs/libavcodec
+DEPENDPATH += ../../libs/libavformat
 
 include ( ../../settings.pro )
 
@@ -20,13 +17,8 @@ setting.extra = -ldconfig
 
 INSTALLS += setting
 
-LIBS += -lmythtv -lavformat -lavcodec -lvbitext -lmyth-$$LIBVERSION
-LIBS += $$EXTRA_LIBS -lmp3lame 
-
-TARGETDEPS += ../../libs/libmythtv/libmythtv.a
-TARGETDEPS += ../../libs/libavcodec/libavcodec.a
-TARGETDEPS += ../../libs/libvbitext/libvbitext.a
-TARGETDEPS += ../../libs/libavformat/libavformat.a
+LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION
+LIBS += -lmythavcodec-$$LIBVERSION -lmyth-$$LIBVERSION $$EXTRA_LIBS
 
 # Input
 HEADERS += manualbox.h playbackbox.h viewscheduled.h globalsettings.h
@@ -36,11 +28,3 @@ HEADERS += search.h
 SOURCES += main.cpp manualbox.cpp playbackbox.cpp viewscheduled.cpp
 SOURCES += globalsettings.cpp manualschedule.cpp programrecpriority.cpp 
 SOURCES += channelrecpriority.cpp search.cpp
-
-using_dvb {
-    LIBS += -ldvbdev
-    LIBS += -L../../libs/libdvbdev
-    TARGETDEPS += ../../libs/libdvbdev/libdvbdev.a
-    DEPENDPATH += ../../libs/libdvbdev
-}
-

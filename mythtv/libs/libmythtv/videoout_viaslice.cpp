@@ -20,9 +20,9 @@ using namespace std;
 
 extern "C" {
 #include "via_videosdk.h"
-#include "../libavcodec/avcodec.h"
-#include "../libavcodec/viaslice.h"
-#include "../libavcodec/via_mpegsdk.h"
+#include "libavcodec/avcodec.h"
+#include "libavcodec/viaslice.h"
+#include "libavcodec/via_mpegsdk.h"
 }
 
 #include <X11/keysym.h>

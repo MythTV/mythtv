@@ -34,7 +34,7 @@ using namespace std;
 #include "ivtvdecoder.h"
 
 extern "C" {
-#include "../libvbitext/vbi.h"
+#include "vbitext/vbi.h"
 #include "vsync.h"
 }
 

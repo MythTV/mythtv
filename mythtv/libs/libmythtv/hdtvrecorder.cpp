@@ -64,9 +64,9 @@ using namespace std;
 #include "programinfo.h"
 
 extern "C" {
-#include "../libavcodec/avcodec.h"
-#include "../libavformat/avformat.h"
-#include "../libavformat/mpegts.h"
+#include "libavcodec/avcodec.h"
+#include "libavformat/avformat.h"
+#include "libavformat/mpegts.h"
 }
 
 // n.b. at 19 Mbits/sec, default buffer size is approx. 1/10 sec.

@@ -6,21 +6,16 @@ TEMPLATE = app
 CONFIG -= moc
 CONFIG += thread
 
-INCLUDEPATH += ../libs/libmythtv ../libs ../libs/libmyth ../libs/libdvbdev
-DEPENDPATH += ../libs/libmythtv ../libs/libmyth ../libs/libvbitext
-DEPENDPATH += ../libs/libavcodec ../libs/libavformat
-LIBS += -L../libs/libmyth -L../libs/libmythtv -L../libs/libvbitext
-LIBS += -L../libs/libavformat -L../libs/libavcodec
+INCLUDEPATH += ../libs/libmythtv ../libs ../libs/libmyth
+
+LIBS += -L../../libs/libmyth -L../../libs/libmythtv
 
 include ( ../settings.pro )
 
-LIBS += -lmythtv -lavformat -lavcodec -lvbitext -lmyth-$$LIBVERSION
-LIBS += $$EXTRA_LIBS -lmp3lame
+LIBS += -lmythtv-$$LIBVERSION -lmyth-$$LIBVERSION $$EXTRA_LIBS
 
-TARGETDEPS += ../libs/libmythtv/libmythtv.a
-TARGETDEPS += ../libs/libavcodec/libavcodec.a
-TARGETDEPS += ../libs/libvbitext/libvbitext.a
-TARGETDEPS += ../libs/libavformat/libavformat.a
+DEPENDPATH += ../../libs/libmythtv ../../libs/libmyth ../../libs/libavcodec
+DEPENDPATH += ../../libs/libavformat
 
 # Input
 HEADERS += backendsettings.h
@@ -30,11 +25,3 @@ menu.path = $${PREFIX}/share/mythtv/
 menu.files += setup.xml
 
 INSTALLS += menu
-
-using_dvb {
-    LIBS += -ldvbdev
-    LIBS += -L../libs/libdvbdev
-    TARGETDEPS += ../libs/libdvbdev/libdvbdev.a
-    DEPENDPATH += ../libs/libdvbdev
-}
-

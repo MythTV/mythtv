@@ -1,26 +1,20 @@
 INCLUDEPATH += ../../libs/ ../../libs/libmyth
 
 LIBS += -L../../libs/libmyth -L../../libs/libmythtv -L../../libs/libavcodec
-LIBS += -L../../libs/libavformat -L../../libs/libvbitext
+LIBS += -L../../libs/libavformat
 
 include (../../settings.pro)
 
 TEMPLATE = app
 CONFIG += thread
 
-LIBS += -lmyth-$$LIBVERSION -lmythtv $$EXTRA_LIBS
+LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION
+LIBS += -lmythavcodec-$$LIBVERSION -lmyth-$$LIBVERSION $$EXTRA_LIBS
 
-DEPENDPATH += ../../libs/libmyth
+DEPENDPATH += ../../libs/libmythtv ../../libs/libmyth ../../libs/libavcodec
+DEPENDPATH += ../../libs/libavformat
 
 # Input
 HEADERS += mythlcd.h
 
 SOURCES += main.cpp mythlcd.cpp
-
-using_dvb {
-    LIBS += -ldvbdev
-    LIBS += -L../../libs/libdvbdev
-    TARGETDEPS += ../../libs/libdvbdev/libdvbdev.a
-    DEPENDPATH += ../../libs/libdvbdev
-}
-

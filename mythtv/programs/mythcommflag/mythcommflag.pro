@@ -1,7 +1,7 @@
 INCLUDEPATH += ../../libs/ ../../libs/libmyth
 
-LIBS += -L../../libs/libmyth -L../../libs/libmythtv -L../../libs/libavcodec 
-LIBS += -L../../libs/libavformat -L../../libs/libvbitext
+LIBS += -L../../libs/libmyth -L../../libs/libmythtv -L../../libs/libavcodec
+LIBS += -L../../libs/libavformat
 
 include (../../settings.pro)
 
@@ -10,24 +10,11 @@ CONFIG += thread
 target.path = $${PREFIX}/bin
 INSTALLS = target
 
-LIBS += -lmythtv -lavformat -lavcodec -lvbitext -lmyth-$$LIBVERSION 
-LIBS += $$EXTRA_LIBS -lmp3lame
+LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION
+LIBS += -lmythavcodec-$$LIBVERSION -lmyth-$$LIBVERSION $$EXTRA_LIBS
 
-DEPENDPATH += ../../libs/libmyth ../../libs/libmythtv ../../libs/vbitext 
+DEPENDPATH += ../../libs/libmythtv ../../libs/libmyth ../../libs/libavcodec
 DEPENDPATH += ../../libs/libavformat
-
-TARGETDEPS += ../../libs/libmythtv/libmythtv.a
-TARGETDEPS += ../../libs/libavcodec/libavcodec.a
-TARGETDEPS += ../../libs/libvbitext/libvbitext.a
-TARGETDEPS += ../../libs/libavformat/libavformat.a
 
 # Input
 SOURCES += main.cpp
-
-using_dvb {
-    LIBS += -ldvbdev
-    LIBS += -L../../libs/libdvbdev
-    TARGETDEPS += ../../libs/libdvbdev/libdvbdev.a
-    DEPENDPATH += ../../libs/libdvbdev
-}
-

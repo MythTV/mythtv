@@ -679,7 +679,7 @@ DVBCardVerificationWizard::DVBCardVerificationWizard(int cardNum) {
 
     DVBVideoSource* source;
 
-    sl = new DVBStatusLabel();
+    DVBStatusLabel* sl = new DVBStatusLabel();
     DVBSignalMeter* sn = new DVBSignalMeter(65535);
     DVBSignalMeter* ss = new DVBSignalMeter(65535);
     testGroup->addChild(sl);

@@ -13,9 +13,9 @@ using namespace std;
 
 extern "C" {
 #ifdef USING_XVMC
-#include "../libavcodec/xvmc_render.h"
+#include "libavcodec/xvmc_render.h"
 #endif
-#include "../libavcodec/liba52/a52.h"
+#include "libavcodec/liba52/a52.h"
 }
 
 #define MAX_AC3_FRAME_SIZE 6144

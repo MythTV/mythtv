@@ -18,12 +18,12 @@ using namespace std;
 #include "mythcontext.h"
 #include "NuppelVideoRecorder.h"
 #include "commercial_skip.h"
-#include "../libvbitext/cc.h"
+#include "vbitext/cc.h"
 #include "channelbase.h"
 #include "filtermanager.h"
 
 extern "C" {
-#include "../libvbitext/vbi.h"
+#include "vbitext/vbi.h"
 }
 
 #include "videodev_myth.h"

@@ -19,8 +19,8 @@ using namespace std;
 #include "mythcontext.h"
 
 extern "C" {
-#include "../libavcodec/avcodec.h"
-#include "../libavcodec/xvmc_render.h"
+#include "libavcodec/avcodec.h"
+#include "libavcodec/xvmc_render.h"
 }
 
 #include <X11/keysym.h>

@@ -3,7 +3,7 @@ CONFIG += release
 
 PREFIX = /usr/local
 
-LIBVERSION = 0.13
+LIBVERSION = 0.14
 
 INCLUDEPATH += $${PREFIX}/include
 INCLUDEPATH *= /usr/local/include
@@ -18,7 +18,7 @@ release {
         QMAKE_CFLAGS_RELEASE = $${QMAKE_CXXFLAGS_RELEASE}
 }
 
-EXTRA_LIBS = -lfreetype
+EXTRA_LIBS = -lfreetype -lmp3lame
 
 # Default Xv support
 CONFIG += using_xv

@@ -23,7 +23,7 @@ using namespace std;
 #include "filtermanager.h"
 
 extern "C" {
-#include "../libavcodec/avcodec.h"
+#include "libavcodec/avcodec.h"
 }
 
 #include <X11/keysym.h>

@@ -23,8 +23,8 @@ using namespace std;
 #include "programinfo.h"
 
 extern "C" {
-#include "../libavcodec/avcodec.h"
-#include "../libavformat/avformat.h"
+#include "libavcodec/avcodec.h"
+#include "libavformat/avformat.h"
 }
 
 const int MpegRecorder::audRateL1[] = { 32, 64, 96, 128, 160, 192, 224, 
