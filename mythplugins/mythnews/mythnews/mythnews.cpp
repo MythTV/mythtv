@@ -29,6 +29,8 @@
 #include <qtimer.h>
 #include <qregexp.h>
 
+#include "mythtv/mythdbcon.h"
+
 #include "mythnews.h"
 
 MythNews::MythNews(QSqlDatabase *db, MythMainWindow *parent,
@@ -70,7 +72,7 @@ MythNews::MythNews(QSqlDatabase *db, MythMainWindow *parent,
 
     // Load sites from database
 
-    QSqlQuery query("SELECT name, url, updated FROM newssites ORDER BY name",
+    MSqlQuery query("SELECT name, url, updated FROM newssites ORDER BY name",
                     db);
     if (!query.isActive()) {
         cerr << "MythNews: Error in loading Sites from DB" << endl;
@@ -80,8 +82,8 @@ MythNews::MythNews(QSqlDatabase *db, MythMainWindow *parent,
         QString url;
         QDateTime time;
         while ( query.next() ) {
-            name = query.value(0).toString();
-            url  = query.value(1).toString();
+            name = QString::fromUtf8(query.value(0).toString());
+            url  = QString::fromUtf8(query.value(1).toString());
             time.setTime_t(query.value(2).toUInt());
             m_NewsSites.append(new NewsSite(name,url,time));
         }
@@ -468,13 +470,13 @@ void MythNews::slotNewsRetrieved(NewsSite* site)
 {
     unsigned int updated = site->lastUpdated().toTime_t();
 
-    QSqlQuery query("UPDATE newssites SET updated=" +
-                    QString::number(updated) +
-                    " WHERE name='" +
-                    site->name() + "'",  m_DB);
-    if (!query.isActive()) {
-        cerr << "MythNews: Error in updating time in DB" << endl;
-    }
+    MSqlQuery query(QString::null, m_DB);
+    query.prepare("UPDATE newssites SET updated = :UPDATED "
+                  "WHERE name = :NAME ;");
+    query.bindValue(":UPDATED", updated);
+    query.bindValue(":NAME", site->name().utf8());
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("news update time", query);
 
     processAndShowNews(site);
 }

@@ -28,6 +28,8 @@
 #include <qdom.h>
 #include <qtimer.h>
 
+#include "mythtv/mythdbcon.h"
+
 #include "mythnewsconfig.h"
 
 using namespace std;
@@ -112,7 +114,7 @@ MythNewsConfig::MythNewsConfig(QSqlDatabase *db,
                          "  url  VARCHAR(255) NOT NULL,"
                          "  ico  VARCHAR(255),"
                          "  updated INT UNSIGNED );");
-    QSqlQuery query(QString::null, m_db);
+    MSqlQuery query(QString::null, m_db);
     if (!query.exec(queryString)) {
 	    cerr << "MythNewsConfig: Error in creating sql table" << endl;
     }
@@ -440,10 +442,11 @@ bool MythNewsConfig::findInDB(const QString& name)
 {
     bool val = false;
 
-    QSqlQuery query( "SELECT name FROM newssites WHERE name='"
-                     + name + "'", m_db);
-    if (!query.isActive()) {
-        cerr << "MythNewsConfig: Error in finding in DB" << endl;
+    MSqlQuery query(QString::null, m_db);
+    query.prepare("SELECT name FROM newssites WHERE name = :NAME ;");
+    query.bindValue(":NAME", name.utf8());
+    if (!query.exec() || !query.isActive()) {
+        MythContext::DBError("new find in db", query);
         return val;
     }
 
@@ -459,15 +462,15 @@ bool MythNewsConfig::insertInDB(NewsSiteItem* site)
     if (findInDB(site->name))
         return false;
 
-    QSqlQuery query( QString("INSERT INTO newssites "
-                             " (name,category,url,ico) "
-                             " VALUES( '") +
-                     site->name     + "', '" +
-                     site->category + "', '" +
-                     site->url      + "', '" +
-                     site->ico      + "' );");
-    if (!query.isActive()) {
-        cerr << "MythNewsConfig: Error in inserting in DB" << endl;
+    MSqlQuery query(QString::null, m_db);
+    query.prepare("INSERT INTO newssites (name,category,url,ico) "
+                  " VALUES( :NAME, :CATEGORY, :URL, :ICON );");
+    query.bindValue(":NAME", site->name.utf8());
+    query.bindValue(":CATEGORY", site->category.utf8());
+    query.bindValue(":URL", site->url.utf8());
+    query.bindValue(":ICON", site->ico.utf8());
+    if (!query.exec() || !query.isActive()) {
+        MythContext::DBError("news: inserting in DB", query);
         return false;
     }
 
@@ -478,10 +481,11 @@ bool MythNewsConfig::removeFromDB(NewsSiteItem* site)
 {
     if (!site) return false;
 
-    QSqlQuery query( "DELETE FROM newssites WHERE name='"
-                     + site->name + "'", m_db);
-    if (!query.isActive()) {
-        cerr << "MythNewsConfig: Error in Deleting from DB" << endl;
+    MSqlQuery query(QString::null, m_db);
+    query.prepare("DELETE FROM newssites WHERE name = :NAME ;");
+    query.bindValue(":NAME", site->name.utf8());
+    if (!query.exec() || !query.isActive()) {
+        MythContext::DBError("news: delete from db", query);
         return false;
     }
 
