@@ -700,14 +700,6 @@
         <translation>Jobbinställningar</translation>
     </message>
     <message>
-        <source>Playlist Actions</source>
-        <translation type="obsolete">Spellistehandlingar</translation>
-    </message>
-    <message>
-        <source>There are %1 items in the list.</source>
-        <translation type="obsolete">Det finns %1 poster i listan.</translation>
-    </message>
-    <message>
         <source>Shuffle Play</source>
         <translation>Blandad spelning</translation>
     </message>
@@ -3688,101 +3680,6 @@ MythTV kommer nu att avslutas.</translation>
         <translation>Ett kommando som ska exekveras innan inspelningsservern stängs ner. Returvärdet avgör om nedstängningen ska fortsätta: 0 - ja, 1 - försök senare, 2 - vänta på uppspelningsklient</translation>
     </message>
     <message>
-        <source>S</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">E</translation>
-    </message>
-    <message>
-        <source>T</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">T</translation>
-    </message>
-    <message>
-        <source>W</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">V</translation>
-    </message>
-    <message>
-        <source>C</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">K</translation>
-    </message>
-    <message>
-        <source>A</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">A</translation>
-    </message>
-    <message>
-        <source>F</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">H</translation>
-    </message>
-    <message>
-        <source>O</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">Ö</translation>
-    </message>
-    <message>
-        <source>D</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">B</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">S</translation>
-    </message>
-    <message>
-        <source>R</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">I</translation>
-    </message>
-    <message>
-        <source>X</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">X</translation>
-    </message>
-    <message>
-        <source>P</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">F</translation>
-    </message>
-    <message>
-        <source>E</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">T</translation>
-    </message>
-    <message>
-        <source>T</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">M</translation>
-    </message>
-    <message>
-        <source>N</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">A</translation>
-    </message>
-    <message>
-        <source>C</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">K</translation>
-    </message>
-    <message>
-        <source>L</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">S</translation>
-    </message>
-    <message>
-        <source>K</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">D</translation>
-    </message>
-    <message>
-        <source>B</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">U</translation>
-    </message>
-    <message>
         <source>Startup command</source>
         <translation>Uppstartskommando</translation>
     </message>
@@ -3839,11 +3736,6 @@ som du startade detta programmet ifrån.</translation>
     <message>
         <source>stars</source>
         <translation>stjärnor</translation>
-    </message>
-    <message>
-        <source>r</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">R</translation>
     </message>
     <message>
         <source>this episode is a repeat.</source>
@@ -5300,16 +5192,6 @@ som du startade detta programmet ifrån.</translation>
         <translation>Återgå till meny</translation>
     </message>
     <message>
-        <source>d</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">d</translation>
-    </message>
-    <message>
-        <source>w</source>
-        <comment>RecTypeChar</comment>
-        <translation type="obsolete">v</translation>
-    </message>
-    <message>
         <source>Single Record</source>
         <translation>Enstaka inspelning</translation>
     </message>
@@ -5428,11 +5310,6 @@ som du startade detta programmet ifrån.</translation>
     <message>
         <source>If set the guide information will be taken from the On Air Channel guide.</source>
         <translation>Hämta tablåinformationen från kanalens egen inbyggda programguide.</translation>
-    </message>
-    <message>
-        <source>x</source>
-        <comment>RecStatusChar</comment>
-        <translation type="obsolete">x</translation>
     </message>
     <message>
         <source>Inactive</source>
@@ -5681,6 +5558,66 @@ Kanalens frekvens i Hz.</translation>
         <source>x</source>
         <comment>RecStatusChar rsInactive</comment>
         <translation>x</translation>
+    </message>
+    <message>
+        <source>Firewire Model</source>
+        <translation>Firewire-modell</translation>
+    </message>
+    <message>
+        <source>Firewire Model is for future use incase there is a need to model specific work arounds.</source>
+        <translation>Firewire-modell är för framtida bruk ifall det behövs några modellspecifika lösningar.</translation>
+    </message>
+    <message>
+        <source>Firewire Port</source>
+        <translation>Firewire-port</translation>
+    </message>
+    <message>
+        <source>Firewire port on your firewire card.</source>
+        <translation>Firewire-port på ditt firewire-kort.</translation>
+    </message>
+    <message>
+        <source>Firewire Node</source>
+        <translation>Firewire-nod</translation>
+    </message>
+    <message>
+        <source>Firewire node is the remote device.</source>
+        <translation>Firewire-nod är fjärrenheten.</translation>
+    </message>
+    <message>
+        <source>Firewire Speed</source>
+        <translation>Firewire-hastighet</translation>
+    </message>
+    <message>
+        <source>100Mbps</source>
+        <translation>100Mbps</translation>
+    </message>
+    <message>
+        <source>200Mbps</source>
+        <translation>200Mbps</translation>
+    </message>
+    <message>
+        <source>400Mbps</source>
+        <translation>400Mbps</translation>
+    </message>
+    <message>
+        <source>Default Input</source>
+        <translation>Ingångsformat</translation>
+    </message>
+    <message>
+        <source>Only MPEG2TS is supported at this time.</source>
+        <translation>För närvarande stöds endast MPEG2TS.</translation>
+    </message>
+    <message>
+        <source>FireWire Input</source>
+        <translation>Firewire-ingång</translation>
+    </message>
+    <message>
+        <source>Allow channel jumping in guide</source>
+        <translation>Tillåt kanalhopp i guide</translation>
+    </message>
+    <message>
+        <source>If enabled, you will be able to press numbers and jump the selection to whatever channel you enter.</source>
+        <translation>Flytta programguidens väljare till en viss kanal genom att ange kanalens nummer.</translation>
     </message>
 </context>
 <context>
@@ -6255,20 +6192,8 @@ Kanalens frekvens i Hz.</translation>
         <translation>Prioritet:</translation>
     </message>
     <message>
-        <source>(1) Sort by Title    (2) Sort by Priority</source>
-        <translation type="obsolete">(1) Sortera efter titel  (2) Sortera efter prioritet</translation>
-    </message>
-    <message>
         <source>Record Type:</source>
         <translation>Inspelningstyp:</translation>
-    </message>
-    <message>
-        <source>Select a recording to permanently delete:</source>
-        <translation type="obsolete">Välj en inspelning du vill radera permanent:</translation>
-    </message>
-    <message>
-        <source>Select a recording to view:</source>
-        <translation type="obsolete">Välj den inspelning du önskar se:</translation>
     </message>
     <message>
         <source>Sorry, No Recordings Available</source>
@@ -6287,16 +6212,8 @@ Kanalens frekvens i Hz.</translation>
         <translation>Välj en bokstav...</translation>
     </message>
     <message>
-        <source>Pick the letter in which the show starts with, then hit ENTER or the right arrow</source>
-        <translation type="obsolete">Välj den bokstav som programnamnet börjar med. Tryck sedan ENTER eller högerpil</translation>
-    </message>
-    <message>
         <source>Select a program...</source>
         <translation>Välj ett program...</translation>
-    </message>
-    <message>
-        <source>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting &apos;info&apos; will allow you to setup recording options.</source>
-        <translation type="obsolete">Välj titeln på det program du vill hitta. När du är klar, återgå med vänsterpil. Genom att trycka på infoknappen kan du göra inspelningsinställningar.</translation>
     </message>
     <message>
         <source>No Programs</source>
@@ -6337,18 +6254,6 @@ Kanalens frekvens i Hz.</translation>
     <message>
         <source>Final Priority</source>
         <translation>Slutlig prioritet</translation>
-    </message>
-    <message>
-        <source>[</source>
-        <translation type="obsolete">[</translation>
-    </message>
-    <message>
-        <source>]</source>
-        <translation type="obsolete">]</translation>
-    </message>
-    <message>
-        <source>]  = </source>
-        <translation type="obsolete">] =</translation>
     </message>
     <message>
         <source>Source:</source>

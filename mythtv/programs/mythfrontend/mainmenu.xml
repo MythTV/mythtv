@@ -21,7 +21,7 @@
    <button>
      <type>MENU_MEDIA_LIBRARY</type>
      <text>Media Library</text>
-     <text lang="DE">Medienbibliothek</text>
+     <text lang="DE">Mediathek</text>
      <text lang="FR">Médiathèque</text>
      <text lang="NL">Media-Center</text>     
      <text lang="SV">Mediabibliotek</text>
@@ -55,13 +55,14 @@
    <button>
      <type>MENU_INFO_CENTER</type>
      <text>Information Center</text>
-     <text lang="DE">Informationszentrale</text>
+     <text lang="DE">Informationen</text>
      <text lang="FR">Centre d'informations</text>
      <text lang="NL">Informatie Centrale</text>
      <text lang="SV">Informationscenter</text>
      <text lang="JA">インフォメーションセンター</text>
      <text lang="FI">Tiedotepalvelu</text>
      <text lang="ZH_TW">資訊中心</text>
+     <alttext lang="DE">Infocenter</alttext>
      <alttext lang="SV">Infocenter</alttext>
      <action>MENU info_menu.xml</action>
    </button>
@@ -69,7 +70,7 @@
    <button>
      <type>MENU_OPTICAL_DISKS</type>
      <text>Optical Disks</text>
-     <text lang="DE">Optische Medien</text>
+     <text lang="DE">CD/DVD</text>
      <text lang="FR">Disques optiques</text>
      <text lang="NL">DVD-CD media</text>
      <text lang="SV">Optiska diskar</text>
@@ -84,7 +85,7 @@
      <type>PHONE</type>
      <text>Phone</text>
      <text lang="JA">電話</text>
-     <text lang="DE">Telephon</text>
+     <text lang="DE">Telefon</text>
      <text lang="FI">Puhelin</text>
      <text lang="NL">Telefoon</text>     
      <text lang="SV">Telefon</text>

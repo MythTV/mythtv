@@ -3,7 +3,7 @@
    <button>
       <type>TV_SEARCH_NEW_TITLES</type>
       <text>New Titles</text>
-      <text lang="DE">Neue Titel</text>
+      <text lang="DE">Neue Sendungen</text>
       <text lang="FR">Nouveaux titres</text>
       <text lang="SV">Nya titlar</text>
       <text lang="JA">新タイトル</text>
@@ -29,7 +29,7 @@
    <button>
       <type>TV_SEARCH_CATEGORIES</type>
       <text>Categories</text>
-      <text lang="DE">Kategorie</text>
+      <text lang="DE">Kategorien</text>
       <text lang="SV">Kategori</text>
       <text lang="FR">Catégories</text>
       <text lang="JA">カテゴリー</text>

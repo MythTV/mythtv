@@ -61,7 +61,7 @@
       <type>TV_SEARCH_WORDS</type>
       <text>Search Words</text>
       <text lang="FR">Recherche textuelle</text>
-      <text lang="DE">Wortsuche</text>
+      <text lang="DE">Volltextsuche</text>
       <text lang="SV">Sök ord</text>
       <text lang="NL">Zoek Woorden</text>
       <text lang="JA">単語検索</text>
@@ -126,6 +126,7 @@
       <text lang="NL">Geavanceerd Opnameschema</text>
       <text lang="JA">カスタム録画</text>
       <text lang="FR">Enregistrement avancé</text>
+      <text lang="DE">freie Planung</text>
       <text lang="NL">Opname op maat</text>      
       <action>TV_CUSTOM_RECORD</action>
    </button>

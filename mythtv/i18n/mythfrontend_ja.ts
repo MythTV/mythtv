@@ -1113,7 +1113,7 @@
     </message>
     <message>
         <source>Recording %1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>録画中 %1 / %2</translation>
     </message>
 </context>
 <context>
@@ -5656,11 +5656,11 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Find Daily</source>
-        <translation type="unfinished"></translation>
+        <translation>一日一回</translation>
     </message>
     <message>
         <source>Find Weekly</source>
-        <translation type="unfinished"></translation>
+        <translation>週一回</translation>
     </message>
     <message>
         <source>Previously Recorded</source>
@@ -5850,19 +5850,19 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Follow symbolic links when deleting files</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルを削除するときにシンボリックリンクをたどる</translation>
     </message>
     <message>
         <source>Sort Episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>番組並び替え</translation>
     </message>
     <message>
         <source>Record date</source>
-        <translation type="unfinished"></translation>
+        <translation>録画日</translation>
     </message>
     <message>
         <source>Selects how to sort a shows episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>番組の並び替え方法を選択</translation>
     </message>
     <message>
         <source>Sort shows</source>
@@ -5871,121 +5871,181 @@ The frequency for this channel in Hz.</source>
     <message>
         <source>S</source>
         <comment>RecTypeChar kSingleRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>T</source>
         <comment>RecTypeChar kTimeslotRecord</comment>
-        <translation type="unfinished">T</translation>
+        <translation>T</translation>
     </message>
     <message>
         <source>W</source>
         <comment>RecTypeChar kWeekslotRecord</comment>
-        <translation type="unfinished">W</translation>
+        <translation>W</translation>
     </message>
     <message>
         <source>C</source>
         <comment>RecTypeChar kChannelRecord</comment>
-        <translation type="unfinished">C</translation>
+        <translation>C</translation>
     </message>
     <message>
         <source>A</source>
         <comment>RecTypeChar kAllRecord</comment>
-        <translation type="unfinished">A</translation>
+        <translation>A</translation>
     </message>
     <message>
         <source>F</source>
         <comment>RecTypeChar kFindOneRecord</comment>
-        <translation type="unfinished">F</translation>
+        <translation>F</translation>
     </message>
     <message>
         <source>d</source>
         <comment>RecTypeChar kFindDailyRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>w</source>
         <comment>RecTypeChar kFindWeeklyRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>O</source>
         <comment>RecTypeChar kOverrideRecord/kDontRecord</comment>
-        <translation type="unfinished">O</translation>
+        <translation>O</translation>
     </message>
     <message>
         <source>D</source>
         <comment>RecStatusChar rsDeleted</comment>
-        <translation type="unfinished">D</translation>
+        <translation>D</translation>
     </message>
     <message>
         <source>S</source>
         <comment>RecStatusChar rsStopped</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>R</source>
         <comment>RecStatusChar rsRecorded</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>X</source>
         <comment>RecStatusChar rsDontRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>P</source>
         <comment>RecStatusChar rsPreviousRecording</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>R</source>
         <comment>RecStatusChar rsCurrentRecording</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>r</source>
         <comment>RecStatusChar rsRepeat</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>E</source>
         <comment>RecStatusChar rsEarlierShowing</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>T</source>
         <comment>RecStatusChar rsTooManyRecordings</comment>
-        <translation type="unfinished">T</translation>
+        <translation>T</translation>
     </message>
     <message>
         <source>N</source>
         <comment>RecStatusChar rsCancelled</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>C</source>
         <comment>RecStatusChar rsConflict</comment>
-        <translation type="unfinished">C</translation>
+        <translation>C</translation>
     </message>
     <message>
         <source>L</source>
         <comment>RecStatusChar rsLaterShowing</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>K</source>
         <comment>RecStatusChar rsLowDiskSpace</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>B</source>
         <comment>RecStatusChar rsTunerBusy</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>x</source>
         <comment>RecStatusChar rsInactive</comment>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Firewire Model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Firewire Model is for future use incase there is a need to model specific work arounds.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Firewire Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Firewire port on your firewire card.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Firewire Node</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Firewire node is the remote device.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Firewire Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>100Mbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>200Mbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>400Mbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only MPEG2TS is supported at this time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FireWire Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow channel jumping in guide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, you will be able to press numbers and jump the selection to whatever channel you enter.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6662,47 +6722,47 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Select a recording to permanently erase</source>
-        <translation type="unfinished">削除する録画を選択してください</translation>
+        <translation>削除する録画を選択してください</translation>
     </message>
     <message>
         <source>Select a recording to watch</source>
-        <translation type="unfinished">再生する録画を選択してください</translation>
+        <translation>再生する録画を選択してください</translation>
     </message>
     <message>
         <source>Source:</source>
-        <translation type="unfinished">ソース:</translation>
+        <translation>ソース:</translation>
     </message>
     <message>
         <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
-        <translation type="unfinished">(1) タイトルで並び替え (2) 優先順位で並び替え (4) タイプで並び替え</translation>
+        <translation>(1) タイトルで並び替え   (2) 優先順位で並び替え   (4) タイプで並び替え</translation>
     </message>
     <message>
         <source>System Status - Select a category to view the status</source>
-        <translation type="unfinished">システムステータス - 表示するカテゴリーを選択してください</translation>
+        <translation>システムステータス - 表示するカテゴリーを選択してください</translation>
     </message>
     <message>
         <source>This screen displays the status of various system components</source>
-        <translation type="unfinished">この画面は様様なシステムステータスを表示します</translation>
+        <translation>この画面は様様なシステムステータスを表示します</translation>
     </message>
     <message>
         <source>Select a recording to permanently erase:</source>
-        <translation type="unfinished"></translation>
+        <translation>削除する録画を選択してください:</translation>
     </message>
     <message>
         <source>Select a recording to watch:</source>
-        <translation type="unfinished"></translation>
+        <translation>再生する録画を選択してください:</translation>
     </message>
     <message>
         <source>Select a recording to permanently erase.</source>
-        <translation type="unfinished"></translation>
+        <translation>削除する録画を選択してください.</translation>
     </message>
     <message>
         <source>Select a recording to watch.</source>
-        <translation type="unfinished"></translation>
+        <translation>再生する録画を選択してください.</translation>
     </message>
     <message>
         <source>Pick the letter in which the show starts with, then press SELECT or the right arrow</source>
-        <translation type="unfinished"></translation>
+        <translation>頭文字を選択してください。そしてSELECTか右矢印を押してください</translation>
     </message>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
@@ -6710,11 +6770,11 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Airdate:</source>
-        <translation type="unfinished"></translation>
+        <translation>放送日:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation type="unfinished">内容:</translation>
+        <translation>内容:</translation>
     </message>
 </context>
 <context>

@@ -5,7 +5,7 @@
      <text lang="ES">Configurar Música</text>
      <text lang="FR">Configuration de la musique</text>
      <text lang="CA">Configurar Música</text>
-     <text lang="DE">Musik Einstellungen</text>
+     <text lang="DE">Musik</text>
      <text lang="DK">Musik indstillinger</text>
      <text lang="NL">Muziek Instellingen</text>
      <text lang="PT">Configurar Música</text>
@@ -13,7 +13,6 @@
      <text lang="JA">ミュージック設定</text>
      <text lang="FI">Musiikkiasetukset</text>
      <text lang="ZH_TW">音樂設定</text>
-     <alttext lang="DE">Musik</alttext>
      <action>CONFIGPLUGIN mythmusic</action>
      <depends>mythmusic</depends>
    </button>
@@ -24,7 +23,7 @@
        <text lang="ES">Configurar Videos</text>
        <text lang="CA">Configurar Videos</text>
        <text lang="FR">Configuration de la vidéo</text>
-       <text lang="DE">Videos Einstellungen</text>
+       <text lang="DE">Videos</text>
        <text lang="DK">Video indstillinger</text>
        <text lang="NL">Films Instellingen</text>
        <text lang="PT">Configurar Filmes</text>
@@ -32,7 +31,6 @@
        <text lang="JA">ビデオ設定</text>
        <text lang="FI">Videoasetukset</text>
        <text lang="ZH_TW">電影設定</text>
-       <alttext lang="DE">Videos</alttext>
        <action>CONFIGPLUGIN mythvideo</action>
        <depends>mythvideo</depends>
    </button>
@@ -40,7 +38,7 @@
    <button>
      <type>SETTINGS_DVD</type>
      <text>DVD Settings</text>
-     <text lang="DE">DVD Einstellungen</text>
+     <text lang="DE">DVD</text>
      <text lang="PT">Configurar DVD</text>
      <text lang="ES">Configurar DVD</text>
      <text lang="CA">Configurar DVD</text>
@@ -50,7 +48,6 @@
      <text lang="JA">DVD設定</text>
      <text lang="FI">DVD Asetukset</text>
      <text lang="ZH_TW">DVD設定</text>
-     <alttext lang="DE">DVD</alttext>
      <action>CONFIGPLUGIN mythdvd</action>
      <depends>mythdvd</depends>
    </button>
@@ -61,7 +58,7 @@
       <text lang="ES">Configurar Fotos</text>
       <text lang="CA">Configurar Imatges</text>
       <text lang="FR">Configuration des images</text>
-      <text lang="DE">Photos Einstellungen</text>
+      <text lang="DE">Bilder</text>
       <text lang="DK">Billed indstillinger</text>
       <text lang="NL">Beelden Instellingen</text>
       <text lang="PT">Configurar Fotos</text>
@@ -69,7 +66,6 @@
       <text lang="JA">イメージ設定</text>
       <text lang="FI">Kuva-asetukset</text>
       <text lang="ZH_TW">照相館設定</text>
-      <alttext lang="DE">Photos</alttext>
       <action>CONFIGPLUGIN mythgallery</action>
       <depends>mythgallery</depends>
    </button>
@@ -79,7 +75,7 @@
      <text>Game Settings</text>
      <text lang="ES">Configurar Juegos</text>
      <text lang="CA">Configurar Jocs</text>
-     <text lang="DE">Spiele Einstellungen</text>
+     <text lang="DE">Spiele</text>
      <text lang="FR">Configuration des jeux</text>
      <text lang="DK">Spil indstillinger</text>
      <text lang="NL">Spelen Instellingen</text>
@@ -88,7 +84,6 @@
      <text lang="JA">ゲーム設定</text>
      <text lang="FI">Peliasetukset</text>
      <text lang="ZH_TW">遊戲設定</text>
-     <alttext lang="DE">Spiele</alttext>
      <action>CONFIGPLUGIN mythgame</action>
      <depends>mythgame</depends>
    </button>
@@ -98,10 +93,9 @@
      <text>Radio Settings</text>
      <text lang="SV">Radioinställningar</text>
      <text lang="JA">ラジオ設定</text>
-     <text lang="DE">Radio Einstellungen</text>
+     <text lang="DE">Radio</text>
      <text lang="FR">Configuration de la radio</text>
      <text lang="FI">Radioasetukset</text>
-     <alttext lang="DE">Radio</alttext>
      <action>CONFIGPLUGIN mythfm</action>
      <depends>mythfm</depends>
    </button>

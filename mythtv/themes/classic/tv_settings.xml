@@ -69,10 +69,9 @@
    <button>
       <type>TV_SETTINGS_RECPRIORITIES</type>
       <text>Recording Priorities</text>
-      <text lang="DE">Aufnahmeprioritäten</text>
+      <text lang="DE">Prioritäten</text>
       <text lang="SV">Inspelningsprioriteter</text>
       <text lang="JA">録画優先順位</text>
-      <alttext lang="DE">Prioritäten</alttext>
       <action>MENU recpriorities_settings.xml</action>
    </button>
 

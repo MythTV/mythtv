@@ -97,6 +97,7 @@
       <text>Custom Record</text>
       <text lang="SV">Avancerad</text>
       <text lang="JA">カスタム録画</text>
+      <text lang="DE">freie Planung</text>
       <action>TV_CUSTOM_RECORD</action>
    </button>
 

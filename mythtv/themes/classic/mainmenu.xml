@@ -69,7 +69,7 @@
      <text lang="CA">Imatges</text>
      <text lang="NL">Beelden</text>
      <text lang="FR">Images</text>
-     <text lang="DE">Photos</text>
+     <text lang="DE">Bilder</text>
      <text lang="DK">Billeder</text>
      <text lang="PT">Fotos</text>
      <text lang="SV">Galleri</text>
@@ -138,7 +138,7 @@
    <button>
       <type>PHONE</type>
       <text>Phone</text>
-      <text lang="DE">Telephon</text>
+      <text lang="DE">Telefon</text>
       <action>PLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>

@@ -5870,6 +5870,66 @@ The frequency for this channel in Hz.</source>
         <comment>RecStatusChar rsInactive</comment>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Firewire Model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Firewire Model is for future use incase there is a need to model specific work arounds.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Firewire Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Firewire port on your firewire card.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Firewire Node</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Firewire node is the remote device.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Firewire Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>100Mbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>200Mbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>400Mbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only MPEG2TS is supported at this time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FireWire Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow channel jumping in guide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, you will be able to press numbers and jump the selection to whatever channel you enter.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanProgressPopup</name>

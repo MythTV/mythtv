@@ -3,7 +3,7 @@
    <button>
       <type>TV_SEARCH_TITLES</type>
       <text>Titles</text>
-      <text lang="DE">Titel</text>
+      <text lang="DE">nach Titel</text>
       <text lang="SV">Titel</text>
       <text lang="JA">タイトル</text>
       <text lang="NL">Titels</text>
@@ -15,7 +15,7 @@
    <button>
       <type>TV_SEARCH_KEYWORDS</type>
       <text>Keywords</text>
-      <text lang="DE">Inhalt</text>
+      <text lang="DE">nach Inhalt</text>
       <text lang="SV">Nyckelord</text>
       <text lang="NL">Beschrijving</text>      
       <text lang="JA">キーワード</text>
@@ -29,7 +29,7 @@
       <text>People</text>
       <text lang="SV">Person</text>
       <text lang="JA">人</text>
-      <text lang="DE">Personen</text>
+      <text lang="DE">nach Personen</text>
       <text lang="FI">Ihmiset</text>
       <action>TV_SEARCH_PEOPLE</action>
    </button>
@@ -39,7 +39,7 @@
       <text>Advanced</text>
       <text lang="SV">Avancerad</text>
       <text lang="JA">アドバンスト</text>
-      <text lang="DE">Erweitert</text>
+      <text lang="DE">Erweiterte Suche</text>
       <text lang="FI">Lisävalinnat</text>
       <action>TV_SEARCH_POWER</action>
    </button>
@@ -71,7 +71,7 @@
    <button>
       <type>TV_SEARCH_CATEGORIES</type>
       <text>Categories</text>
-      <text lang="DE">Kategorie</text>
+      <text lang="DE">Kategorien</text>
       <text lang="SV">Kategori</text>
       <text lang="JA">カテゴリー</text>
       <text lang="NL">Categorie</text>

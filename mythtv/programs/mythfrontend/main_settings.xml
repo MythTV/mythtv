@@ -7,7 +7,7 @@
       <text lang="ES">General</text>
       <text lang="CA">General</text>
       <text lang="FR">Général</text>
-      <text lang="DE">Allgemeines</text>
+      <text lang="DE">Grundeinstellungen</text>
       <text lang="DK">Generelt</text>
       <text lang="NL">Algemeen</text>
       <text lang="PT">Configurações Gerais</text>
@@ -25,7 +25,7 @@
       <text lang="ES">Aspecto</text>
       <text lang="CA">Aspecte</text>
       <text lang="FR">Apparence</text>
-      <text lang="DE">Aussehen</text>
+      <text lang="DE">Erscheinungsbild</text>
       <text lang="DK">Udseende</text>
       <text lang="NL">Uiterlijk</text>
       <text lang="PT">Configurar Aparência</text>
@@ -39,7 +39,7 @@
    <button>
      <type>SETTINGS_TV</type>
      <text>TV Settings</text>
-     <text lang="DE">Fernsehen</text>
+     <text lang="DE">TV</text>
      <text lang="SV">TV</text>
      <text lang="NL">TV</text>     
      <text lang="FR">Configuration TV</text>
@@ -84,13 +84,12 @@
      <text lang="CA">Configurar XBox</text>
      <text lang="ES">Configurar XBox</text>
      <text lang="FR">Configuration XBox</text>
-     <text lang="DE">XBox Einstellungen</text>
+     <text lang="DE">Xbox</text>
      <text lang="NL">Xbox Instellingen</text>
      <text lang="SV">Xbox</text>
      <text lang="JA">XBox設定</text>
      <text lang="FI">Xbox Asetukset</text>
      <text lang="ZH_TW">XBox設定</text>
-     <alttext lang="DE">XBox</alttext>
      <action>SETTINGS XBOXSETTINGS</action>
      <dependssetting>EnableXbox</dependssetting>
    </button>
@@ -99,10 +98,9 @@
       <type>PHONE</type>
       <text>Phone Settings</text>
       <text lang="FR">Configuration téléphone</text>
-      <text lang="DE">Telephon Einstellungen</text>
+      <text lang="DE">Telefon</text>
       <text lang="NL">Telefoon Instellingen</text>      
       <text lang="FI">Puhelimen Asetukset</text>
-      <alttext lang="DE">Telephon</alttext>
       <action>CONFIGPLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>
