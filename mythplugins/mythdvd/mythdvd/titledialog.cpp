@@ -474,7 +474,18 @@ void TitleDialog::ripTitles()
             //  The spec for this command, which I'm
             //  making up on the fly is:
             //  
-            //  job {type} {title #} {audio_track} {quality} {ac3 flag} {subtitle #} {directory to end up in} {name}
+            //  job 
+            //  {type} 
+            //  {title #} 
+            //  {audio_track} 
+            //  {quality} 
+            //  {ac3 flag} 
+            //  {subtitle #} 
+            //  {directory to end up in and final name} 
+            //
+            //  note that everything after subtitle #
+            //  may include spaces (for subdirs and/or
+            //  riptitle that includes spaces)
             //
             
             
@@ -489,14 +500,15 @@ void TitleDialog::ripTitles()
                 return; 
             }            
             
-            QString job_string = QString("job dvd %1 %2 %3 %4 %5 %6 %7")
+            QString final_dir_and_file = destination_directory + "/" + dvd_titles->at(i)->getName();
+            
+            QString job_string = QString("job dvd %1 %2 %3 %4 %5 %6")
                                  .arg(dvd_titles->at(i)->getTrack())
                                  .arg(dvd_titles->at(i)->getAudio())
                                  .arg(dvd_titles->at(i)->getQuality())
                                  .arg(dvd_titles->at(i)->getAC3())
                                  .arg(dvd_titles->at(i)->getSubTitle())
-                                 .arg(destination_directory)
-                                 .arg(dvd_titles->at(i)->getName());
+                                 .arg(final_dir_and_file);
             
             QTextStream os(socket_to_mtd);
             os << job_string << "\n" ;

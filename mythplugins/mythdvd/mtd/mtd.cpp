@@ -583,7 +583,7 @@ void MTD::startDVD(const QStringList &tokens)
     QString flat = tokens.join(" ");
     bool ok;
 
-    if(tokens.count() < 9)
+    if(tokens.count() < 8)
     {
         emit writeToLog(QString("bad dvd job request: %1").arg(flat));
         return;
@@ -635,22 +635,31 @@ void MTD::startDVD(const QStringList &tokens)
         return;
     }
 
-    QDir dest_dir(tokens[7]);
+    //
+    //  Parse the dir and file as one string
+    //  and then break it up
+    //
+
+    QString dir_and_file = "";
+
+    for(uint i=7; i < tokens.count(); i++)
+    {
+        dir_and_file += tokens[i];
+        if(i != tokens.count() - 1)
+        {
+            dir_and_file += " ";
+        }        
+    }
+
+    QDir dest_dir(dir_and_file.section("/", 0, -2));
     if(!dest_dir.exists())
     {
         emit writeToLog(QString("bad destination directory in job request: %1").arg(flat));
         return;
     }
 
-    QString file_name = "";
-    for(uint i=8; i < tokens.count(); i++)
-    {
-        file_name += tokens[i];
-        if(i != tokens.count() - 1)
-        {
-            file_name += " ";
-        }        
-    }
+    QString file_name = dir_and_file.section("/", -1, -1);
+
 
     QString dvd_device = gContext->GetSetting("DVDDeviceLocation");
     if(dvd_device.length() < 1)
