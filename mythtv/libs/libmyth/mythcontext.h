@@ -76,7 +76,7 @@ class MythEvent : public QCustomEvent
     QString extradata;
 };
 
-#define MYTH_BINARY_VERSION "0.15.20040216-1"
+#define MYTH_BINARY_VERSION "0.15.20040225-1"
 #define MYTH_PROTO_VERSION "3"
 
 extern int print_verbose_messages;
@@ -171,6 +171,9 @@ class MythContext : public QObject
 
     bool CheckProtoVersion(QSocketDevice* socket);
     bool CheckProtoVersion(QSocket* socket);
+    
+    void DisableScreensaver(void);
+    void RestoreScreensaver(void);
     
   private slots:
     void EventSocketRead();

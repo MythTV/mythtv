@@ -24,6 +24,8 @@
 #include "mythdialogs.h"
 #include "mythplugin.h"
 
+#include <X11/Xlib.h>
+
 MythContext *gContext = NULL;
 
 int print_verbose_messages = VB_IMPORTANT | VB_GENERAL;
@@ -81,6 +83,15 @@ class MythContextPrivate
     bool disablelibrarypopup;
 
     MythPluginManager *pluginmanager;
+
+    struct {
+        bool saved;
+        int timeout;
+        int interval;
+        int preferblank;
+        int allowexposure;
+    } m_screensaver;
+
 };
 
 MythContextPrivate::MythContextPrivate(MythContext *lparent)
@@ -103,6 +114,7 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
     m_backgroundimage = NULL;
 
     m_db = QSqlDatabase::addDatabase("QMYSQL3", "MythContext");
+    m_screensaver.saved = false;
 }
 
 void MythContextPrivate::Init(bool gui, bool lcd)
@@ -1428,3 +1440,25 @@ MythPluginManager *MythContext::getPluginManager(void)
     return d->pluginmanager;
 }
 
+
+void MythContext::DisableScreensaver(void)
+{
+    if (!d->m_screensaver.saved)
+    {
+        XGetScreenSaver(qt_xdisplay(),
+                        &d->m_screensaver.timeout, &d->m_screensaver.interval,
+                        &d->m_screensaver.preferblank, &d->m_screensaver.allowexposure);
+        d->m_screensaver.saved = true;
+    }
+
+    XSetScreenSaver(qt_xdisplay(), 0, 0, 0, 0);
+}
+
+void MythContext::RestoreScreensaver(void)
+{
+    XResetScreenSaver(qt_xdisplay());
+    XSetScreenSaver(qt_xdisplay(),
+                    d->m_screensaver.timeout, d->m_screensaver.interval,
+                    d->m_screensaver.preferblank, d->m_screensaver.allowexposure);
+    d->m_screensaver.saved = false;
+}

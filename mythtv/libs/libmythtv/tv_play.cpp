@@ -571,6 +571,7 @@ void TV::HandleStateChange(void)
 
         recorder->SpawnLiveTV();
 
+        gContext->DisableScreensaver();
         StartPlayerAndRecorder(true, true);
     }
     else if (internalState == kState_WatchingLiveTV && 
@@ -580,6 +581,7 @@ void TV::HandleStateChange(void)
         changed = true;
 
         StopPlayerAndRecorder(true, true);
+        gContext->RestoreScreensaver();
     }
     else if (internalState == kState_WatchingRecording &&
              nextState == kState_WatchingPreRecorded)
@@ -617,6 +619,7 @@ void TV::HandleStateChange(void)
         }
 
         prbuffer = new RingBuffer(tmpFilename, false);
+	gContext->DisableScreensaver();
 
         if (nextState == kState_WatchingRecording)
         {
@@ -654,6 +657,7 @@ void TV::HandleStateChange(void)
         changed = true;
 
         StopPlayerAndRecorder(true, false);
+        gContext->RestoreScreensaver();
     }
     else if (internalState == kState_None && 
              nextState == kState_None)
@@ -1765,9 +1769,15 @@ void TV::DoPause(void)
         return;
 
     if (paused)
+    {
         UpdatePosOSD(time, tr("Paused"));
+	gContext->RestoreScreensaver();
+    }
     else
+    {
         UpdatePosOSD(time, tr("Play"));
+        gContext->DisableScreensaver();
+    }
 }
 
 void TV::DoInfo(void)
@@ -2082,8 +2092,11 @@ void TV::ToggleInputs(void)
     if (activenvp == nvp)
     {
         if (paused)
+	{
             osd->EndPause();
-        paused = false;
+	    gContext->DisableScreensaver();
+            paused = false;
+	}
     }
 
     activenvp->Pause(false);
@@ -2147,8 +2160,11 @@ void TV::ChangeChannel(int direction, bool force)
     if (activenvp == nvp)
     {
         if (paused)
+	{
             osd->EndPause();
-        paused = false;
+	    gContext->DisableScreensaver();
+            paused = false;
+	}
     }
 
     activenvp->Pause(false);
@@ -2337,8 +2353,11 @@ void TV::ChangeChannelByString(QString &name, bool force)
     if (activenvp == nvp)
     {
         if (paused)
+	{
             osd->EndPause();
-        paused = false;
+	    gContext->DisableScreensaver();
+            paused = false;
+	}
     }
 
     activenvp->Pause(false);
