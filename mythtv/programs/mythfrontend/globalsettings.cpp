@@ -963,7 +963,7 @@ public:
     LircKeyPressedApp():
         GlobalSetting("LircKeyPressedApp") {
         setLabel(QObject::tr("Keypress Application"));
-        setValue("halt");
+        setValue("");
         setHelpText(QObject::tr("External application or script to run when "
                     "a keypress is received by lirc"));
     };
