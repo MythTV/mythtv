@@ -43,16 +43,14 @@
 //#include "xvmc_debug.h"
 
 #undef fprintf
+
+static inline xvmc_render_state_t *render_state(const MpegEncContext *s);
+
 //set s->block
-inline void XVMC_init_block(MpegEncContext *s){
-xvmc_render_state_t * render;
-    render = (xvmc_render_state_t*)s->current_picture.data[2];
-    assert(render != NULL);
-    if( (render == NULL) || (render->magic != MP_XVMC_RENDER_MAGIC) ){
-        assert(0);
-        return;//make sure that this is render packet
-    }
-    s->block =(DCTELEM *)(render->data_blocks+(render->next_free_data_block_num)*64);
+void XVMC_init_block(MpegEncContext *s)
+{
+    xvmc_render_state_t *render = render_state(s);
+    s->block= (DCTELEM*) (render->data_blocks+(render->next_free_data_block_num)*64);
 }
 
 void XVMC_pack_pblocks(MpegEncContext *s, int cbp){
@@ -166,15 +164,10 @@ xvmc_render_state_t * render,* last, * next;
 return -1;
 }
 
-void XVMC_field_end(MpegEncContext *s){
-xvmc_render_state_t * render;
-    render = (xvmc_render_state_t*)s->current_picture.data[2];
-    assert(render != NULL);
-
-    if(render->filled_mv_blocks_num > 0){
-//        printf("xvmcvideo.c: rendering %d left blocks after last slice!!!\n",render->filled_mv_blocks_num );
+void XVMC_field_end(MpegEncContext *s)
+{
+    if (render_state(s)->filled_mv_blocks_num > 0)
         ff_draw_horiz_band(s,0,0);
-    }
 }
 
 void XVMC_decode_mb(MpegEncContext *s){
@@ -207,10 +200,7 @@ const int mb_xy = s->mb_y * s->mb_stride + s->mb_x;
     s->current_picture.qscale_table[mb_xy] = s->qscale;
 
 //START OF XVMC specific code
-    render = (xvmc_render_state_t*)s->current_picture.data[2];
-    assert(render!=NULL);
-    assert(render->magic==MP_XVMC_RENDER_MAGIC);
-    assert(render->mv_blocks);
+    render = render_state(s);
 
     //take the next free macroblock
     mv_block = &render->mv_blocks[render->start_mv_blocks_num + 
@@ -392,6 +382,17 @@ const int mb_xy = s->mb_y * s->mb_stride + s->mb_x;
 // DumpRenderInfo(render);
 // DumpMBlockInfo(mv_block);
 
+}
+
+// The remainder of this file is all helper functions
+
+static inline xvmc_render_state_t *render_state(const MpegEncContext *s)
+{
+    xvmc_render_state_t *render = (xvmc_render_state_t*)s->current_picture.data[2];
+    assert(render!=NULL);
+    assert(render->magic==MP_XVMC_RENDER_MAGIC);
+    assert(render->mv_blocks);
+    return render;
 }
 
 #endif
