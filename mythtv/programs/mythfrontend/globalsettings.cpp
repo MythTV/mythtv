@@ -422,8 +422,8 @@ public:
         GlobalSetting("OSDFont") {
 
         setLabel(QObject::tr("OSD font"));
-        addSelection("FreeSans.ttf");
-        addSelection("FreeMono.ttf");
+        QDir ttf(PREFIX"/share/mythtv", "*ttf");
+        fillSelectionsFromDir(ttf, false);
     };
 };
 
@@ -433,8 +433,8 @@ public:
         GlobalSetting("OSDCCFont") {
 
         setLabel(QObject::tr("Closed Caption font"));
-        addSelection("FreeMono.ttf");
-        addSelection("FreeSans.ttf");
+        QDir ttf(PREFIX"/share/mythtv", "*ttf");
+        fillSelectionsFromDir(ttf, false);
     };
 };
 

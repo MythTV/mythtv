@@ -609,6 +609,7 @@ new_filter (char *options)
     double LumSpac, LumTmp, ChromSpac, ChromTmp;
     double Param1, Param2, Param3;
     ThisFilter *filter = malloc (sizeof (ThisFilter));
+    int mm_flags = mm_support ();
 
     if (filter == NULL)
     {
@@ -616,7 +617,6 @@ new_filter (char *options)
         return NULL;
     }
 
-    int mm_flags = mm_support ();
     if (mm_flags & MM_MMX)
     {
         fprintf (stderr, "Using MMX filter\n");

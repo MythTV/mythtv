@@ -88,55 +88,28 @@ QString ProgramInfo::MakeUniqueKey(void)
 
 void ProgramInfo::ToStringList(QStringList &list)
 {
-    if (title == "")
-        title = " ";
-    if (subtitle == "")
-        subtitle = " ";
-    if (description == "")
-        description = " ";
-    if (category == "")
-        category = " ";
-    if (pathname == "")
-        pathname = " ";
-    if (hostname == "")
-        hostname = " ";
-    if (chanid == "")
-        chanid = " ";
-    if (chanstr == "")
-        chanstr = " ";
-    if (chansign == "")
-        chansign = " ";
-    if (channame == "")
-        channame = " ";
-    if (pathname == "")
-        pathname = " ";
-    if (rank == "")
-        rank = " ";
-    if (reasonsuppressed == "")
-        reasonsuppressed = " ";
-
-    list << title;
-    list << subtitle;
-    list << description;
-    list << category;
-    list << chanid;
-    list << chanstr;
-    list << chansign;
-    list << channame;
-    list << pathname;
+    list << ((title != "") ? title : " ");
+    list << ((subtitle != "") ? subtitle : " ");
+    list << ((description != "") ? description : " ");
+    list << ((category != "") ? category : " ");
+    list << ((chanid != "") ? chanid : " ");
+    list << ((chanstr != "") ? chanstr : " ");
+    list << ((chansign != "") ? chansign : " ");
+    list << ((channame != "") ? channame : " ");
+    list << ((pathname != "") ? pathname : " ");
     encodeLongLong(list, filesize);
     list << startts.toString(Qt::ISODate);
     list << endts.toString(Qt::ISODate);
     list << QString::number(conflicting);
     list << QString::number(recording);
     list << QString::number(duplicate);
-    list << hostname;
+    list << ((hostname != "") ? hostname : " ");
     list << QString::number(sourceid);
     list << QString::number(cardid);
     list << QString::number(inputid);
-    list << rank;
+    list << ((rank != "") ? rank : " ");
     list << QString::number(suppressed);
-    list << reasonsuppressed;
+    list << ((reasonsuppressed != "") ? reasonsuppressed : " ");
 }
 
 void ProgramInfo::FromStringList(QStringList &list, int offset)

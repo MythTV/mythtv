@@ -271,7 +271,7 @@ public:
 
     virtual void clearSelections(void);
 
-    virtual void fillSelectionsFromDir(const QDir& dir);
+    virtual void fillSelectionsFromDir(const QDir& dir, bool absPath=true);
 
 signals:
     void selectionAdded(const QString& label, QString value);

@@ -242,8 +242,13 @@ void OSDSet::SetTextByRegexp(QMap<QString, QString> &regexpMap)
             else
                 for (; riter != regexpMap.end(); riter++)
                 {
-                    full_regex = "%" + riter.key().upper() + "%";
-                    new_text.replace(QRegExp(full_regex), riter.data());
+                   full_regex = "%" + riter.key().upper() + 
+                     "(\\|([^%|]*))?" + "(\\|([^%|]*))?" + "(\\|([^%]*))?%";
+                   if (riter.data() != "")
+                       new_text.replace(QRegExp(full_regex), 
+                                        "\\2" + riter.data() + "\\4");
+                   else
+                       new_text.replace(QRegExp(full_regex), "\\6");
                 }
 
             if (new_text != "")

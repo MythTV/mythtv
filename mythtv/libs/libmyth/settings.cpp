@@ -236,7 +236,7 @@ void SelectSetting::addSelection(const QString& label, QString value, bool selec
         setValue(value);
 }
 
-void SelectSetting::fillSelectionsFromDir(const QDir& dir) {
+void SelectSetting::fillSelectionsFromDir(const QDir& dir, bool absPath) {
      const QFileInfoList *il = dir.entryInfoList();
      if (!il)
          return;
@@ -245,7 +245,10 @@ void SelectSetting::fillSelectionsFromDir(const QDir& dir) {
      QFileInfo *fi;
 
      for(; (fi = it.current()) != 0; ++it)
-         addSelection(fi->absFilePath());
+         if (absPath)
+             addSelection(fi->absFilePath());
+         else
+             addSelection(fi->fileName());
 }
 
 void SelectSetting::clearSelections(void) {
