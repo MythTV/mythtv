@@ -1176,7 +1176,7 @@ bool NuppelDecoder::DoFastForward(long long desiredFrame)
         framesPlayed = lastKey - 1;
         needflush = true;
     }
-    else
+    else if (!livetv && !watchingrecording)
     {
         while (lastKey < desiredKey && !fileend)
         {

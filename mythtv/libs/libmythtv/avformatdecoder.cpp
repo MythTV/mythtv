@@ -768,7 +768,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame)
         framesPlayed = lastKey;
         framesRead = lastKey;
     }
-    else if (desiredKey != lastKey)
+    else if (desiredKey != lastKey && !livetv && !watchingrecording)
     {
         while (framesRead < desiredKey + 1 || 
                !positionMap.contains(desiredKey / keyframedist))
