@@ -1275,6 +1275,16 @@ void PlaybackBox::expireSelected()
     expire(curitem);
 }
 
+void PlaybackBox::details()
+{
+    state = kStopping;
+
+    if (!curitem)
+        return;
+
+    curitem->showDetails(QSqlDatabase::database());
+}
+
 void PlaybackBox::selected()
 {
     state = kStopping;
@@ -1983,6 +1993,8 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                 playSelected();
             else if (action == "INFO")
                 showActionsSelected();
+            else if (action == "DETAILS")
+                details();
             else if (action == "SELECT")
                 selected();
             else if (action == "UP")

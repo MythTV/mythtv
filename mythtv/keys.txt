@@ -8,12 +8,15 @@ mythfrontend
 - Space or Enter to take action on the item under the highlight point.
 - P to play in both "Watch a Recording" and "Delete a Recording".
 - D to delete in both "Watch a Recording" and "Delete a Recording".
+- U to view details for the currently selected show on the Watch or
+    Delete screens, EPG, "Program Finder", "Fix Scheduling Conflicts"
+    or search results screens.
 - O to list the upcoming episodes for the currently selected show
     on the EPG, "Program Finder", "Program Recording Priorities",
     "Fix Scheduling Conflicts" or search results screens.
 - I to edit recording options from the EPG, "Program Finder",
-    "Program Recording Priorities", or "Fix Scheduling Conflicts" screens.
-    From the Playback and Delete screens, 'I' presents options
+    "Program Recording Priorities", or "Fix Scheduling Conflicts"
+    screens. From the Watch and Delete screens, 'I' presents options
     for recorded shows such as Auto Expire or Stop Recording.
 
 Watching TV or a recording

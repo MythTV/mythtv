@@ -60,6 +60,7 @@ ProgramInfo::ProgramInfo(void)
     recpriority = 0;
     recgroup = QString("Default");
 
+    hasAirDate = false;
     repeat = false;
 
     record = NULL;
@@ -125,6 +126,7 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     recgroup = other.recgroup;
     programflags = other.programflags;
 
+    hasAirDate = other.hasAirDate;
     repeat = other.repeat;
 
     seriesid = other.seriesid;
@@ -492,11 +494,16 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
         proginfo->repeat = query.value(16).toInt();
         
         if(query.value(17).isNull() || query.value(17).toString().isEmpty())
+        {
             proginfo->originalAirDate = proginfo->startts.date();
+            proginfo->hasAirDate = false;
+        }
         else
+        {
             proginfo->originalAirDate = QDate::fromString(query.value(17).toString(),
                                                           Qt::ISODate);
-
+            proginfo->hasAirDate = true;
+        }
         proginfo->hostname = query.value(18).toString();
 
         proginfo->spread = -1;
@@ -1944,6 +1951,195 @@ void ProgramInfo::EditScheduled(QSqlDatabase *db)
     }
 }
 
+void ProgramInfo::showDetails(QSqlDatabase *db)
+{
+    MythContext::KickDatabase(db);
+
+    QString oldDateFormat = gContext->GetSetting("OldDateFormat", "M/d/yyyy");
+
+    QString querytext;
+    QString category_type, airdate, epinum, rating;
+    int partnumber = 0, parttotal = 0;
+    int stereo = 0, subtitled = 0, hdtv = 0, closecaptioned = 0;
+
+    if (endts != startts)
+    {
+        querytext = QString("SELECT category_type, airdate, partnumber, "
+                            "parttotal, stereo, subtitled, hdtv, "
+                            "closecaptioned, syndicatedepisodenumber "
+                            "FROM program WHERE chanid = %1 "
+                            "AND starttime=\'%2\';")
+                            .arg(chanid).arg(startts.toString(Qt::ISODate));
+
+        QSqlQuery query = db->exec(querytext);
+
+        if (query.isActive() && query.numRowsAffected())
+        {
+            query.next();
+            category_type = query.value(0).toString();
+            airdate = query.value(1).toString();
+            partnumber = query.value(2).toInt();
+            parttotal = query.value(3).toInt();
+            stereo = query.value(4).toInt();
+            subtitled = query.value(5).toInt();
+            hdtv = query.value(6).toInt();
+            closecaptioned = query.value(7).toInt();
+            epinum = query.value(8).toString();
+        }
+
+        querytext = QString("SELECT rating FROM programrating "
+                            "WHERE chanid = %1 AND starttime=\'%2\';")
+                            .arg(chanid).arg(startts.toString(Qt::ISODate));
+        
+        QSqlQuery rquery = db->exec(querytext);
+        
+        if (rquery.isActive() && rquery.numRowsAffected())
+        {
+            rquery.next();
+            rating = rquery.value(0).toString();
+        }
+    }
+    if (category_type == "" && programid != "")
+    {
+        QString prefix = programid.left(2);
+
+        if (prefix == "MV")
+           category_type = "movie";
+        else if (prefix == "EP")
+           category_type = "series";
+        else if (prefix == "SP")
+           category_type = "sports";
+        else if (prefix == "SH")
+           category_type = "tvshow";
+    }
+
+    QString msg = title;
+
+    if (subtitle != "")
+        msg += " - \"" + subtitle + "\"";
+
+    msg += "\n";
+
+    if (description  != "")
+        msg += "    " + description;
+
+    QString attr = "";
+
+    if(partnumber > 0)
+        attr = QString("Part %1 of %2, ").arg(partnumber).arg(parttotal);
+
+    if (rating != "" && rating != "NR")
+        attr += rating + ", ";
+
+    if (category_type == "movie")
+    {
+        if (airdate != "")
+            attr += airdate + ", ";
+        if (stars > 0)
+            attr +=  QString("%1 %2, ").arg(4.0 * stars)
+                                           .arg(QObject::tr("stars"));
+    }
+
+    if (hdtv)
+        attr += "HDTV, ";
+    if (closecaptioned)
+        attr += "CC, ";
+    if (subtitled)
+        attr += "Subtitled, ";
+    if (stereo)
+        attr += "Stereo, ";
+    if (repeat)
+        attr += "Repeat, ";
+
+    if (attr != "")
+    {
+        attr.truncate(attr.findRev(','));
+        msg += " (" + attr + ")";
+    }
+    msg += "\n\n";
+
+    if(category != "")
+        msg += QObject::tr("Category:  ") + category + "\n";
+
+    if (category_type  != "")
+    {
+        msg += QObject::tr("Type:  ") + category_type;
+        if (seriesid != "")
+            msg += "  (" + seriesid + ")";
+        msg += "\n";
+    }
+
+    if(epinum != "")
+        msg += QObject::tr("Episode Number:  ") + epinum + "\n";
+
+    if (hasAirDate && category_type != "movie")
+    {
+        msg += QObject::tr("Original Airdate:  ");
+        msg += originalAirDate.toString(oldDateFormat) + "\n";
+    }
+    if(programid  != "")
+        msg += QObject::tr("Program ID:  ") + programid + "\n";
+
+    QString role = "", pname = "";
+
+    if (endts != startts)
+    {
+        querytext = QString("SELECT role,people.name from credits "
+                    "LEFT JOIN people ON credits.person = people.person "
+                    "LEFT JOIN program ON credits.chanid = program.chanid "
+                    "AND credits.starttime = program.starttime "
+                    "WHERE program.chanid = %1 "
+                    "AND program.starttime=\'%2\' ORDER BY role;")
+                    .arg(chanid).arg(startts.toString(Qt::ISODate));
+
+        QSqlQuery pquery = db->exec(querytext);
+
+        if (pquery.isActive() && pquery.numRowsAffected())
+        {
+            QString rstr = "", plist = "";
+
+            while(pquery.next())
+            {
+                role = pquery.value(0).toString();
+                pname = pquery.value(1).toString();
+
+                if (rstr == role)
+                    plist += ", " + pname;
+                else
+                {
+                    // if (rstr != "")
+                    //    msg += QString("%1:  %2\n").arg(rstr).arg(plist);
+                    // Only print actors, guest star and director for now.
+
+                    if (rstr == "actor")
+                        msg += "Actors:  " + plist + "\n";
+                    if (rstr == "guest_star")
+                        msg += "Guest Star:  " + plist + "\n";
+                    if (rstr == "director")
+                        msg += "Director:  " + plist + "\n";
+
+                    rstr = role;
+                    plist = pname;
+                }
+            }
+            // if (rstr != "")
+            //    msg += QString("%1:  %2\n").arg(rstr).arg(plist);
+
+            if (rstr == "actor")
+                msg += "Actors:  " + plist + "\n";
+            if (rstr == "guest_star")
+                msg += "Guest Star:  " + plist + "\n";
+            if (rstr == "director")
+                msg += "Director:  " + plist + "\n";
+        }
+    }
+    DialogBox *details_dialog = new DialogBox(gContext->GetMainWindow(), msg);
+    details_dialog->AddButton(QObject::tr("OK"));
+    details_dialog->exec();
+
+    delete details_dialog;
+}
+
 int ProgramInfo::getProgramFlags(QSqlDatabase *db)
 {
     int flags = 0;
@@ -2297,11 +2493,17 @@ bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
         
         
         if(query.value(16).isNull() || query.value(16).toString().isEmpty())
+        {
             p->originalAirDate = p->startts.date();
+            p->hasAirDate = false;
+        }
         else
+        {
             p->originalAirDate = QDate::fromString(query.value(16).toString(),
                                                    Qt::ISODate);
-                                           
+            p->hasAirDate = true;
+        }
+
         ProgramInfo *s;
         for (s = schedList.first(); s; s = schedList.next())
         {

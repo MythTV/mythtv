@@ -145,6 +145,8 @@ void ProgLister::keyPressEvent(QKeyEvent *e)
             edit();
         else if (action == "UPCOMING")
             upcoming();
+        else if (action == "DETAILS")
+            details();
         else if (action == "TOGGLERECORD")
             quickRecord();
         else
@@ -623,6 +625,14 @@ void ProgLister::upcoming()
                                    gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;
+}
+
+void ProgLister::details()
+{
+    ProgramInfo *pi = itemList.at(curItem);
+
+    if (pi)
+        pi->showDetails(QSqlDatabase::database());
 }
 
 void ProgLister::fillViewList(const QString &view)

@@ -102,6 +102,8 @@ void ViewScheduled::keyPressEvent(QKeyEvent *e)
                 edit();
             else if (action == "UPCOMING")
                 upcoming();
+            else if (action == "DETAILS")
+                details();
             else if (action == "ESCAPE")
                 done(MythDialog::Accepted);
             else if (action == "UP")
@@ -535,6 +537,14 @@ void ViewScheduled::upcoming()
                                    gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;
+}
+
+void ViewScheduled::details()
+{
+    ProgramInfo *p = recList[listPos];
+
+    if (p)
+        p->showDetails(QSqlDatabase::database());
 }
 
 void ViewScheduled::selected()

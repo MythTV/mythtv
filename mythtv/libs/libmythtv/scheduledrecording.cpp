@@ -503,6 +503,12 @@ void ScheduledRecording::runProgList(void)
     //proglistButton->setFocus();
 }
 
+void ScheduledRecording::runShowDetails(void)
+{
+    if (m_pginfo)
+        m_pginfo->showDetails(QSqlDatabase::database());
+}
+
 void ScheduledRecording::fillSelections(QSqlDatabase* db, SelectSetting* setting) {
     QSqlQuery result = db->exec("SELECT recordid FROM record");
     if (result.isActive() && result.numRowsAffected() > 0)

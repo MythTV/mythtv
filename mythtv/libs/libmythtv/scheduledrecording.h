@@ -183,6 +183,7 @@ public:
 
 protected slots:
     void runProgList();
+    void runShowDetails();
 
 protected:
     virtual void setDefault(QSqlDatabase *db, bool haschannel);

@@ -383,6 +383,8 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
                 editScheduled();
             else if (action == "UPCOMING")
                 upcoming();
+            else if (action == "DETAILS")
+                details();
             else if (action == "TOGGLERECORD")
                 quickRecord();
             else if (action == "TOGGLEFAV")
@@ -1627,6 +1629,19 @@ void GuideGrid::upcoming()
                                    gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;
+}
+
+void GuideGrid::details()
+{
+    ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
+
+    if (!pginfo)
+        return;
+
+    if (pginfo->title == unknownTitle)
+        return;
+
+    pginfo->showDetails(QSqlDatabase::database());
 }
 
 void GuideGrid::channelUpdate(void)

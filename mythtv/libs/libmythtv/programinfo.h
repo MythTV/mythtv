@@ -132,6 +132,8 @@ class ProgramInfo
     QGridLayout* DisplayWidget(QWidget *parent = NULL,
                                QString searchtitle = "");
 
+    void showDetails(QSqlDatabase *db);
+
     QString GetRecordBasename(void);
     QString GetRecordFilename(const QString &prefix);
 
@@ -238,9 +240,8 @@ class ProgramInfo
     float stars;
     QDate originalAirDate;
     QDateTime lastmodified;
-
-
     
+    bool hasAirDate;
     bool repeat;
 
     int spread;

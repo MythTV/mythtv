@@ -72,6 +72,7 @@ class GuideGrid : public MythDialog
     void editRecording();
     void editScheduled();
     void upcoming();
+    void details();
 
     void customEvent(QCustomEvent *e);
 

@@ -188,6 +188,8 @@ void ProgFinder::keyPressEvent(QKeyEvent *e)
             select();
         else if (action == "UPCOMING")
             upcoming();
+        else if (action == "DETAILS")
+            details();
         else if (action == "MENU" || action == "ESCAPE")
             escape();
         else if (action == "TOGGLERECORD")
@@ -581,6 +583,21 @@ void ProgFinder::upcoming()
                                         gContext->GetMainWindow(), "proglist");
         pl->exec();
         delete pl;
+    }
+    else
+        cursorRight();
+}
+
+void ProgFinder::details()
+{
+    if (inSearch == 2)
+    {
+        ProgramInfo *curPick = showData[curShow];
+
+        if (!curPick)
+            return;
+
+        curPick->showDetails(QSqlDatabase::database());
     }
     else
         cursorRight();

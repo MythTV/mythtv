@@ -1712,11 +1712,11 @@
 %%DESCRIPTION%</value>
       </textarea>
       <textarea name="type" draworder="6">
-        <area>0,160,540,30</area>
+        <area>0,160,560,30</area>
         <font>yellowinfo</font>
       </textarea>
       <textarea name="programid" draworder="6" align="right">
-        <area>520,160,200,30</area>
+        <area>560,160,200,30</area>
         <font>message</font>
       </textarea>
     </container>

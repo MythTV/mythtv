@@ -27,7 +27,8 @@ class RootSRGroup : public ManagedListGroup
          DialogDoneListItem* cancelItem;
          DialogDoneListItem* recordAsShownItem;
          ManagedListItem* upcomingButton;         
-         
+         ManagedListItem* detailsButton;
+
          class SRSchedOptionsGroup* schedOptions;
          class SRStorageOptionsGroup* storageOptions;
          
