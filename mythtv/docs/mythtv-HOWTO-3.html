@@ -89,7 +89,7 @@ may be useful if you are running multiple encoders.</P>
 <P>Encoded video takes up a lot of hard disk space. The exact amount depends
 on the encoding scheme, the size of the raw images, and the frames per
 second, but typical values for MythTV range from 700 megabytes/hour to 2
-gigabyte/hour.</P>
+gigabyte/hour for MPEG-4 and larger for MPEG-2 and RTJPEG.</P>
 <P><B>NOTE</B>:  You <EM>must</EM> use DMA for hard drive access to prevent
 choppy or jittery video.  Red Hat Linux 8.0 apparently does not enable DMA
 at boot time.  See the Troubleshooting Section for 
@@ -124,8 +124,7 @@ Desktop PVR" card, both of which use the bttv kernel module.</P>
 the kernel sees it with <CODE>lspci</CODE>. Look for an entry labeled "Multimedia 
 video controller". To get more detailed information about the card, use 
 <CODE>lspci -v</CODE> or <CODE>lspci -vv</CODE>.  Ensure that your system is loading
-the bttv modules by typing:</P>
-<P>
+the bttv modules by typing:
 <BLOCKQUOTE><CODE>
 <PRE>
 # lsmod |grep bttv
@@ -140,9 +139,9 @@ from Hauppauge and the driver from the IvyTV project
 <A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A> will
 allow you to use dedicated hardware encoders rather than your CPU. As of
 2003-04-15, the CVS version MythTV is now able to use the PVR-250/350 cards
-as an input device for live TV and for scheduled recordings. As of
-2003-04-23, seek support is still being written. Using the onboard MPEG-2
-encoder drastically reduces the CPU requirements for encoding. </P>
+as an input device for live TV and for scheduled recordings.  Using the
+onboard MPEG-2 encoder drastically reduces the CPU requirements for
+encoding.</P>
 <P>Here are some data points for encoding:
 <UL>
 <LI>A Celeron 450 uses 2% CPU for encoding a 480x480 16Mbps MPEG-2 stream.</LI>
@@ -251,6 +250,11 @@ which may be obtained from
 <A HREF="http://atrpms.physik.fu-berlin.de/name/mythtv/">http://atrpms.physik.fu-berlin.de/name/mythtv/</A>.  If you have
 problems with the RPMs, please send him email directly at 
 <A HREF="mailto:Axel.Thimm@physik.fu-berlin.de">mailto:Axel.Thimm@physik.fu-berlin.de</A>.</P>
+<P><B>NOTE for Mandrake users</B>:  Thac has created RPMs for MythTV for
+Mandrake 9.0 and 9.1 which may be obtained from 
+<A HREF="http://rpm.nyvalls.se/">http://rpm.nyvalls.se/</A> If you have
+problems with the RPMs, please send him email directly at 
+<A HREF="thac@nyvalls.se">thac@nyvalls.se</A>.</P>
 <P><B>NOTE</B>: you must have the MySQL database software installed on a
 system to store the master database.  This does not necessarily mean that
 MySQL must run on one of the MythTV boxes.</P>

@@ -72,12 +72,21 @@ $
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cat > .xinitrc
+xset -dpms s off &amp;
 irxevent &amp;
 mythfrontend &amp;
 blackbox
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P>Make sure that your <CODE>.blackboxrc</CODE> file has:
+<BLOCKQUOTE><CODE>
+<PRE>
+session.screen0.focusNewWindows:        True
+session.screen0.focusModel:     SloppyFocus
+</PRE>
+</CODE></BLOCKQUOTE>
+ in it.</P>
 
 <H2><A NAME="capture_resolution_"></A> <A NAME="ss19.4">19.4</A> <A HREF="mythtv-HOWTO.html#toc19.4">What capture resolution should I use?  How does video work?</A>
 </H2>

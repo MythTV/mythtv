@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-05-09, v2.32
+<date>2003-05-10, v2.33
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -51,10 +51,10 @@ name="http://www.snowman.net/mailman/listinfo/mythtv-users">.
 This HOWTO is for MythTV v0.8.
 
 <sect>Introduction.
-<p>This HOWTO document will focus on MythTV in a North American environment.
-If you have installation instructions for a different region or Linux
-distribution, please send them to the author so that it can be included in other
-versions of this document.
+<p>This HOWTO document will focus on manually building MythTV in a North
+American environment. If you have installation instructions for a different
+region or Linux distribution, please send them to the author so that it can
+be included in other versions of this document.
 
 Erik Arendse has setup a website that focuses on running MythTV in a
 non-North American environment.  See the website at <url
@@ -72,6 +72,8 @@ The contributors to MythTV are:
 <item>Gentoo documentation and package: Tony Clark, <url url="mailto:tclark@telia.com">
 <item>Debian package: Matthew Zimmerman, <url url="mailto:mdz@debian.org">
 <item>Mandrake 8.2 documentation: Harondel J. Sibble, <url url="mailto:help@pdscc.com">
+<item>Mandrake 9.0 and 9.1 packages: Thac, <url url="mailto:thac@nyvalls.se">
+<item>Red Hat Linux package: Axel Thimm, <url url="mailto:Axel.Thimm@physik.fu-berlin.de">
 </itemize>
 
 <sect>Checking prerequisites. 
@@ -150,7 +152,7 @@ may be useful if you are running multiple encoders.
 <p>Encoded video takes up a lot of hard disk space. The exact amount depends
 on the encoding scheme, the size of the raw images, and the frames per
 second, but typical values for MythTV range from 700 megabytes/hour to 2
-gigabyte/hour.
+gigabyte/hour for MPEG-4 and larger for MPEG-2 and RTJPEG.
 
 <bf>NOTE</bf>:  You <em>must</em> use DMA for hard drive access to prevent
 choppy or jittery video.  Red Hat Linux 8.0 apparently does not enable DMA
@@ -191,7 +193,6 @@ the kernel sees it with <tt>lspci</tt>. Look for an entry labeled "Multimedia
 video controller". To get more detailed information about the card, use 
 <tt>lspci -v</tt> or <tt>lspci -vv</tt>.  Ensure that your system is loading
 the bttv modules by typing:
-
 <tscreen><verb>
 # lsmod |grep bttv
 </verb</tscreen>
@@ -205,9 +206,9 @@ from Hauppauge and the driver from the IvyTV project <url
 url="http://ivtv.sourceforge.net/" name="http://ivtv.sourceforge.net/"> will
 allow you to use dedicated hardware encoders rather than your CPU. As of
 2003-04-15, the CVS version MythTV is now able to use the PVR-250/350 cards
-as an input device for live TV and for scheduled recordings. As of
-2003-04-23, seek support is still being written. Using the onboard MPEG-2
-encoder drastically reduces the CPU requirements for encoding. 
+as an input device for live TV and for scheduled recordings.  Using the
+onboard MPEG-2 encoder drastically reduces the CPU requirements for
+encoding.
 
 Here are some data points for encoding:
 <itemize>
@@ -323,6 +324,12 @@ name="http://atrpms.physik.fu-berlin.de/name/mythtv/">.  If you have
 problems with the RPMs, please send him email directly at <url
 url="mailto:Axel.Thimm@physik.fu-berlin.de"
 name="mailto:Axel.Thimm@physik.fu-berlin.de">.
+
+<bf>NOTE for Mandrake users</bf>:  Thac has created RPMs for MythTV for
+Mandrake 9.0 and 9.1 which may be obtained from <url
+url="http://rpm.nyvalls.se/" name="http://rpm.nyvalls.se/"> If you have
+problems with the RPMs, please send him email directly at <url
+url="thac@nyvalls.se" name="thac@nyvalls.se">.
 
 <bf>NOTE</bf>: you must have the MySQL database software installed on a
 system to store the master database.  This does not necessarily mean that
@@ -2926,10 +2933,17 @@ $
 The following also works with blackbox:
 <tscreen><verb>
 $ cat > .xinitrc
+xset -dpms s off &
 irxevent &
 mythfrontend &
 blackbox
 </verb></tscreen>
+
+Make sure that your <tt>.blackboxrc</tt> file has:
+<tscreen><verb>
+session.screen0.focusNewWindows:        True
+session.screen0.focusModel:     SloppyFocus
+</verb></tscreen> in it.
 
 <sect1>What capture resolution should I use?  How does video work?
 <label id="capture_resolution_">
@@ -3528,6 +3542,9 @@ v2.29, 2003-05-04.  Updated CVS path.
 v2.30, 2003-05-05.  Updated PVR-250 instructions.  
 v2.31, 2003-05-06.  Blackbox focus update.
 v2.32, 2003-05-09.  Speeling correction.
+v2.33, 2003-05-10.  Added xset command to .xinitrc for blackbox.  Added
+.blackboxrc example.  Added link to nyvalls.se RPMS for Mandrake.  Added
+people to the contributors section.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
