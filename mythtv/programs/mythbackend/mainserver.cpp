@@ -2608,7 +2608,7 @@ void MainServer::PrintStatus(QSocket *socket)
                QString timeToRecstart = "in";
                int totalSecsToRecstart = qdtNow.secsTo((*iter)->recstartts);
                int preRollSeconds = gContext->GetNumSetting("RecordPreRoll", 0);
-               totalSecsToRecstart -= preRollSeconds; //get preroll per recording as well
+               totalSecsToRecstart -= preRollSeconds;
                totalSecsToRecstart -= 60; //since we're not displaying seconds
                int totalDaysToRecstart = totalSecsToRecstart / 86400;
                int hoursToRecstart = (totalSecsToRecstart / 3600)
@@ -2706,11 +2706,12 @@ void MainServer::PrintStatus(QSocket *socket)
 
     QSqlQuery query = m_db->exec(querytext);
 
-    if (query.isActive() && query.numRowsAffected() && query.isValid())
+    if (query.isActive() && query.numRowsAffected())
     {
         query.next();
-        GuideDataThrough = QDateTime::fromString(query.value(0).toString(),
-                                                 Qt::ISODate);
+        if (query.isValid())
+            GuideDataThrough = QDateTime::fromString(query.value(0).toString(),
+                                                     Qt::ISODate);
     }
     dblock.unlock();
 
