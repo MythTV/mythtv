@@ -588,10 +588,7 @@ void DatabaseBox::alternateDoMenus(UIListGenericTree *item, int keypad_number)
             a_number = (int)(a_number * ( keypad_number / 10.0));
            
             tree->MoveUp(UIListTreeType::MoveMax);
-            for (int i = 0; i < a_number; i++)
-            {
-                tree->MoveDown();
-            }
+            tree->MoveDown(a_number);
         }
     }
     else if (PlaylistTitle *item_ptr = dynamic_cast<PlaylistTitle*>(item))
