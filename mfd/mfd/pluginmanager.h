@@ -105,6 +105,7 @@ class MFDPluginManager : public QObject
     void tellPluginsMetadataChanged(int which_collection);
     
     void setShutdownFlag(bool true_or_false){shutdown_flag = true_or_false;}
+    void setDeadPluginTimer(int an_int);
 
     //
     //  Bit odd to have this sitting here, but it has to go somewhere that

@@ -34,8 +34,10 @@ LIBS += -lmythavcodec-$$LIBVERSION
 LIBS += -Wl,-rpath,$${PREFIX}/lib
 
 HEADERS +=          mfd.h   pluginmanager.h   serversocket.h   logging.h   \
-           mdserver.h   dbcheck.h   mdcaprequest.h   mdcapsession.h
+           mdserver.h   dbcheck.h   mdcaprequest.h   mdcapsession.h \
+           signalthread.h
 SOURCES += main.cpp mfd.cpp pluginmanager.cpp serversocket.cpp logging.cpp \
-           mdserver.cpp dbcheck.cpp mdcaprequest.cpp mdcapsession.cpp
+           mdserver.cpp dbcheck.cpp mdcaprequest.cpp mdcapsession.cpp \
+           signalthread.cpp
 
 

@@ -115,3 +115,12 @@ int MetadataChangeEvent::getIdentifier()
     return identifier;
 }
 
+/*
+---------------------------------------------------------------------
+*/
+
+ShutdownEvent::ShutdownEvent()
+            :QCustomEvent(65426)
+{
+}
+

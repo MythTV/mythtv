@@ -135,4 +135,16 @@ class MetadataChangeEvent : public QCustomEvent
     int identifier;
 };
 
+class ShutdownEvent : public QCustomEvent
+{
+    //
+    //  When anything wants us to shutdown. This is used by the signal
+    //  thread to asynchronously tell the mfd to shutdown on SIG INT/TERM
+    //
+    
+  public:
+  
+    ShutdownEvent();
+};
+
 #endif

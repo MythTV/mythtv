@@ -257,7 +257,7 @@ MFDPluginManager::MFDPluginManager(MFD *owner)
     dead_plugin_timer = new QTimer();
     connect(dead_plugin_timer, SIGNAL(timeout()),
            this, SLOT(cleanDeadPlugins()));
-    dead_plugin_timer->start(2000); // 2 seconds
+    dead_plugin_timer->start(10000); // 10 seconds, in shutdown process, this gets set faster
 
     //
     //  Do initial plugin load
@@ -675,6 +675,18 @@ void MFDPluginManager::printPlugins()
              << endl;
     }
     cout << endl;
+}
+
+void MFDPluginManager::setDeadPluginTimer(int an_int)
+{
+    if(dead_plugin_timer)
+    {
+        dead_plugin_timer->changeInterval(an_int);
+    }
+    else
+    {
+        cerr << "can't set dead plugin timer because there isn't one" << endl;
+    }
 }
 
 MFDPluginManager::~MFDPluginManager()

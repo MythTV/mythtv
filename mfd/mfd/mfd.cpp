@@ -19,6 +19,9 @@
 #include "mfd.h"
 #include "../mfdlib/mfd_events.h"
 #include "mdserver.h"
+#include "signalthread.h"
+
+extern SignalThread *signal_thread;
 
 MFD::MFD(QSqlDatabase *ldb, int port, bool log_stdout, int logging_verbosity)
     :QObject()
@@ -31,6 +34,13 @@ MFD::MFD(QSqlDatabase *ldb, int port, bool log_stdout, int logging_verbosity)
     shutting_down = false;
     watchdog_flag = false;
     port_number = port;
+
+    //
+    //  Create a thread just to watch for INT/TERM signals and deal with them
+    //
+    
+    signal_thread = new SignalThread(this);
+    signal_thread->start();
 
     //
     //  Assign the database if one exists
@@ -81,6 +91,7 @@ MFD::MFD(QSqlDatabase *ldb, int port, bool log_stdout, int logging_verbosity)
     connect(plugin_manager, SIGNAL(allPluginsLoaded(void)),
             this, SLOT(registerMFDService(void)));
     registerMFDService();
+
     
 }
 
@@ -201,6 +212,18 @@ void MFD::customEvent(QCustomEvent *ce)
         
         MetadataChangeEvent *mce = (MetadataChangeEvent*)ce;
         plugin_manager->tellPluginsMetadataChanged(mce->getIdentifier());
+                
+    }
+    else if(ce->type() == 65426)
+    {
+        //
+        //  Time to shutdown!
+        //        
+        
+        shutting_down = true;
+        plugin_manager->setShutdownFlag(true);
+        log("got a Shutdown Event, will call shutDown()", 1);
+        shutDown();
                 
     }
     else
@@ -383,6 +406,7 @@ void MFD::doListCapabilities(const QStringList& tokens,
 void MFD::shutDown()
 {
     log("beginning shutdown", 1);
+    plugin_manager->setDeadPluginTimer(500);
 
     //
     //  Clean things up and go away.
@@ -390,6 +414,18 @@ void MFD::shutDown()
     
     sendMessage("bye");
     
+    //
+    //  Get rid of the signal thread
+    //
+    
+    if(signal_thread)
+    {
+        signal_thread->stop();
+        signal_thread->wait();
+        delete signal_thread;
+        signal_thread = NULL;
+    }
+
     //
     //  Close the socket(s)
     //

@@ -8,6 +8,8 @@
 
 */
 
+#include <signal.h>
+
 #include <qapplication.h>
 #include <qsqldatabase.h>
 #include <qfile.h>
@@ -46,6 +48,20 @@ MFD *the_mfd;
 
 int main(int argc, char **argv)
 {
+
+    //
+    //  Set up to ignore all signals. A seperate thread (signalthread) will
+    //  handle signals (ie. user hitting CTRL-C, kill pid, etc) and shut
+    //  things down cleanly
+    //
+    
+    sigset_t signal_mask;
+    sigemptyset(&signal_mask);
+    sigprocmask(0, 0, &signal_mask);
+    sigaddset(&signal_mask, SIGINT);
+    sigaddset(&signal_mask, SIGTERM);
+    sigprocmask(SIG_SETMASK, &signal_mask, 0);
+
     QApplication a(argc, argv, false);
 
     bool daemon_mode = false;

@@ -79,7 +79,6 @@ class MFD : public QObject
     bool                        shutting_down;    
     bool                        watchdog_flag;
     int                         port_number;
-    
 };
 
 #endif  // mfd_h_

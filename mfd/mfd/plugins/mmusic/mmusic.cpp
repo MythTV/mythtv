@@ -739,7 +739,7 @@ void MMusicWatcher::compareToMasterList(MusicFileMap &music_files, const QString
     int counter = 0;
     MusicFileMap::Iterator it;
     it = music_files.begin();
-    while(counter < music_files_at_a_time && it != music_files.end())
+    while(counter < music_files_at_a_time && it != music_files.end() && keep_going)
     {
         counter++;
 
@@ -955,7 +955,7 @@ AudioMetadata* MMusicWatcher::loadFromDatabase(
     {
         if(query.numRowsAffected() > 0)
         {
-            while (query.next())
+            while (query.next() && keep_going)
             {
                 //
                 //  Convert datetime stuff
