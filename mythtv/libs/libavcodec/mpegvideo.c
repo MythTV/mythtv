@@ -218,6 +218,9 @@ int DCT_common_init(MpegEncContext *s)
 #ifdef HAVE_MMI
     MPV_common_init_mmi(s);
 #endif
+#ifdef ARCH_ARMV4L
+    MPV_common_init_armv4l();
+#endif
 
     /* load & permutate scantables
        note: only wmv uses differnt ones 
@@ -592,7 +595,7 @@ int MPV_encode_init(AVCodecContext *avctx)
         s->h263_pred = 1;
         s->unrestricted_mv = 1;
         s->has_b_frames= s->max_b_frames ? 1 : 0;
-        s->low_delay=0;
+        s->low_delay= !s->has_b_frames;
         avctx->delay= s->low_delay ? 0 : (s->max_b_frames + 1); 
         break;
     case CODEC_ID_MSMPEG4V1:
