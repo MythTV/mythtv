@@ -228,16 +228,35 @@ void DaapClient::readSocket()
 
 void DaapClient::addDaapServer(QString server_address, uint server_port, QString service_name)
 {
-    log(QString("daapclient will attempt to add service \"%1\" (%2:%3)")
-        .arg(service_name)
-        .arg(server_address)
-        .arg(server_port), 10);
+    //
+    //  If it's new, add it ... otherwise ignore it
+    //
+
+
+    bool already_have_it = false;
+    DaapInstance *an_instance;
+    for ( an_instance = daap_instances.first(); an_instance; an_instance = daap_instances.next() )
+    {
+        if(an_instance->isThisYou(service_name, server_address, server_port))
+        {
+            already_have_it = true;
+            break;
+        }
+    }
+    
+    if(!already_have_it)
+    {
+        log(QString("daapclient will attempt to add service \"%1\" (%2:%3)")
+            .arg(service_name)
+            .arg(server_address)
+            .arg(server_port), 10);
         
-    DaapInstance *new_daap_instance = new DaapInstance(parent, this, server_address, server_port, service_name);
-    new_daap_instance->start();
-    daap_instances.append(new_daap_instance);
-    log(QString("added a daap client instance (total now %1)")
-        .arg(daap_instances.count()), 5);
+        DaapInstance *new_daap_instance = new DaapInstance(parent, this, server_address, server_port, service_name);
+        new_daap_instance->start();
+        daap_instances.append(new_daap_instance);
+        log(QString("added a daap client instance (total now %1)")
+                    .arg(daap_instances.count()), 5);
+    }
 }
 
 void DaapClient::removeDaapServer(QString server_address, uint server_port, QString service_name)
