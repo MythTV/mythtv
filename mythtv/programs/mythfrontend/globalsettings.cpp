@@ -2527,6 +2527,17 @@ public:
     };
 };
 
+class WatchTVGuide: public CheckBoxSetting, public GlobalSetting {
+public:
+    WatchTVGuide():
+        GlobalSetting("WatchTVGuide") {
+        setLabel(QObject::tr("Shows Program Guide when starting Live TV"));
+        setHelpText(QObject::tr("This starts the program guide immediately "
+             "upon starting to watch Live TV."));
+        setValue(false);
+    };
+};
+
 MainGeneralSettings::MainGeneralSettings()
 {
     AudioSettings *audio = new AudioSettings();
@@ -2695,6 +2706,7 @@ EPGSettings::EPGSettings()
     epg->addChild(new EPGScrollType());
     epg->addChild(new EPGShowChannelIcon());
     epg->addChild(new EPGShowFavorites());
+    epg->addChild(new WatchTVGuide());
     epg->addChild(new EPGChanDisplay());
     epg->addChild(new EPGTimeDisplay());
     addChild(epg);

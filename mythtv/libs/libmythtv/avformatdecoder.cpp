@@ -65,8 +65,6 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
         av_log_set_level(AV_LOG_DEBUG);
     else
         av_log_set_level(AV_LOG_ERROR);
-
-    do_ac3_passthru = gContext->GetNumSetting("AC3PassThru", false);
 }
 
 AvFormatDecoder::~AvFormatDecoder()
@@ -419,7 +417,10 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             {
                 bitrate += enc->bit_rate;
                 m_parent->SetEffDsp(enc->sample_rate * 100);
-                if (do_ac3_passthru && enc->codec_id == CODEC_ID_AC3) 
+
+                do_ac3_passthru = enc->codec_id == CODEC_ID_AC3 &&
+                                  gContext->GetNumSetting("AC3PassThru", false);
+                if (do_ac3_passthru)
                 {
                     // An AC3 stream looks like a 48KHz 2ch audio stream to 
                     // the sound card 

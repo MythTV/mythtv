@@ -1027,6 +1027,28 @@ void TV::RunTV(void)
     paused = false;
     QKeyEvent *keypressed;
 
+    if (gContext->GetNumSetting("WatchTVGuide", 0))
+    {
+        QString thequery = QString("SELECT keylist FROM keybindings WHERE "
+                                   "context = \"TV Playback\" AND action = \"GUIDE\" AND "
+                                   "hostname = \"%1\";")
+                                  .arg(gContext->GetHostName());
+
+        QSqlQuery query = m_db->db()->exec(thequery);
+
+        if (query.isActive() && query.numRowsAffected() > 0)
+        {
+            query.next();
+
+            QKeySequence keyseq(query.value(0).toString());
+
+            int keynum = keyseq[0];
+            keynum &= ~Qt::UNICODE_ACCEL;
+   
+            keyList.prepend(new QKeyEvent(QEvent::KeyPress, keynum, 0, 0));
+        }
+    }
+
     stickykeys = gContext->GetNumSetting("StickyKeys");
     ff_rew_repos = gContext->GetNumSetting("FFRewRepos", 1);
     ff_rew_reverse = gContext->GetNumSetting("FFRewReverse", 1);
