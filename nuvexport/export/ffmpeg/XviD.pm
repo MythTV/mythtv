@@ -1,12 +1,12 @@
 #!/usr/bin/perl -w
 #Last Updated: 2005.01.26 (xris)
 #
-#  export::transcode::XviD
+#  export::ffmpeg::XviD
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
 #
 
-package export::transcode::XviD;
-    use base 'export::transcode';
+package export::ffmpeg::XviD;
+    use base 'export::ffmpeg';
 
 # Load the myth and nuv utilities, and make sure we're connected to the database
     use nuv_export::shared_utils;
@@ -32,8 +32,7 @@ package export::transcode::XviD;
                      'deinterlace'     => 1,
                      'crop'            => 1,
                     # VBR-specific settings
-                     'vbr'             => 1,        # This enables vbr, and the multipass/quantisation options
-                     'multipass'       => 0,        # You get multipass or quantisation, multipass will override
+                     'vbr'             => 1,
                      'quantisation'    => 6,        # 4 through 6 is probably right...
                     # Other video options
                      'a_bitrate'       => 128,
@@ -42,8 +41,8 @@ package export::transcode::XviD;
                     };
         bless($self, $class);
 
-    # Initialize and check for transcode
-        $self->init_transcode();
+    # Initialize and check for ffmpeg
+        $self->init_ffmpeg();
 
     # Any errors?  disable this function
         $self->{'enabled'} = 0 if ($self->{'errors'} && @{$self->{'errors'}} > 0);
@@ -66,11 +65,7 @@ package export::transcode::XviD;
                                               $self->{'a_bitrate'});
         }
     # VBR options
-        if ($Args{'multipass'}) {
-            $self->{'multipass'} = 1;
-            $self->{'vbr'}       = 1;
-        }
-        elsif ($Args{'quantisation'}) {
+        if ($Args{'quantisation'}) {
             die "Quantisation must be a number between 1 and 31 (lower means better quality).\n" if ($Args{'quantisation'} < 1 || $Args{'quantisation'} > 31);
             $self->{'quantisation'} = $Args{'quantisation'};
             $self->{'vbr'}          = 1;
@@ -80,22 +75,17 @@ package export::transcode::XviD;
                                         'yesno',
                                         $self->{'vbr'} ? 'Yes' : 'No');
             if ($self->{'vbr'}) {
-                $self->{'multipass'} = query_text('Multi-pass (slower, but better quality)?',
-                                                  'yesno',
-                                                  $self->{'multipass'} ? 'Yes' : 'No');
-                if (!$self->{'multipass'}) {
-                    while (1) {
-                        my $quantisation = query_text('VBR quality/quantisation (1-31)?', 'float', $self->{'quantisation'});
-                        if ($quantisation < 1) {
-                            print "Too low; please choose a number between 1 and 31.\n";
-                        }
-                        elsif ($quantisation > 31) {
-                            print "Too high; please choose a number between 1 and 31\n";
-                        }
-                        else {
-                            $self->{'quantisation'} = $quantisation;
-                            last;
-                        }
+                while (1) {
+                    my $quantisation = query_text('VBR quality/quantisation (1-31)?', 'float', $self->{'quantisation'});
+                    if ($quantisation < 1) {
+                        print "Too low; please choose a number between 1 and 31.\n";
+                    }
+                    elsif ($quantisation > 31) {
+                        print "Too high; please choose a number between 1 and 31\n";
+                    }
+                    else {
+                        $self->{'quantisation'} = $quantisation;
+                        last;
                     }
                 }
             }
@@ -105,7 +95,7 @@ package export::transcode::XviD;
             die "Video bitrate must be > 0\n" unless ($Args{'v_bitrate'} > 0);
             $self->{'v_bitrate'} = $Args{'v_bitrate'};
         }
-        elsif ($self->{'multipass'} || !$self->{'vbr'}) {
+        elsif (!$self->{'vbr'}) {
             # make sure we have v_bitrate on the commandline
             $self->{'v_bitrate'} = query_text('Video bitrate?',
                                               'int',
@@ -120,40 +110,15 @@ package export::transcode::XviD;
         my $episode = shift;
     # Make sure we have finfo
         load_finfo($episode);
-    # Build the transcode string
-        my $params = ' -b ' . $self->{'v_bitrate'}
-                   . ' -vcodec xvid'
-                   . ' -ab ' . $self->{'a_vbitrate'}
-                   . ' -acodec mp3'
-                   . " -s $self->{'width'}x$self->{'height'}";
-    # Dual pass?
-        if ($self->{'multipass'}) {
-        # Add the temporary file to the list
-            push @tmpfiles, "/tmp/xvid.$$.log";
-        # Back up the path and use /dev/null for the first pass
-            my $path_bak = $self->{'path'};
-            $self->{'path'} = "/dev/null";
-        # First pass
-            print "First pass...\n";
-            $self->{'ffmpeg_xtra'} = " $params -pass 1 "
-                                   . "--passlogfile /tmp/xvid.$$.log";
-            $self->SUPER::export($episode);
-        # Restore the path
-            $self->{'path'} = $path_bak;
-        # Second pass
-            print "Final pass...\n";
-            $self->{'ffmpeg_xtra'} = " $params -pass 2 "
-                                   . "--passlogfile /tmp/xvid.$$.log";
-            $self->SUPER::export($episode, '.avi');
-        }
-    # Single pass
-        else {
-            $self->{'ffmpeg_xtra'} = " $params";
-            if ($self->{'quantisation'}) {
-                $self->{'ffmpeg_xtra'} .= " -qmin ".$self->{'quantisation'};
-            }
-            $self->SUPER::export($episode, '.avi');
-        }
+    # Build the ffmpeg string
+        $self->{'ffmpeg_xtra'} = ' -b ' . $self->{'v_bitrate'}
+                               . (($self->{'vbr'}) ? 
+                                 " -qmin $self->{'quantisation'} -qmax 31" : '')
+                               . ' -vcodec xvid'
+                               . ' -ab ' . $self->{'a_bitrate'}
+                               . ' -acodec mp3'
+                               . " -s $self->{'width'}x$self->{'height'}";
+        $self->SUPER::export($episode, '.avi');
     }
 
 1;  #return true

@@ -345,6 +345,8 @@ package nuv_export::ui;
     }
 
     sub query_exporters {
+        my $export_prog = shift;
+
         die "No export modules were found!\n" unless (@Exporters);
     # Load the mode from the commandline?
         if ($Args{'mode'}) {
@@ -355,7 +357,8 @@ package nuv_export::ui;
             die "Unknown exporter mode:  $Args{'mode'}\n";
         }
     # Build the query
-        my $query = "What would you like to do?\n\n";
+        my $query = "Using $export_prog for exporting.\n"
+                  . "What would you like to do?\n\n";
     # What are our function options?
         my ($count);
         foreach my $exporter (@Exporters) {

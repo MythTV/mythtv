@@ -18,9 +18,14 @@ EXPORT_MODULES	  = export/generic.pm         \
 		    export/transcode/SVCD.pm  \
 		    export/transcode/VCD.pm   \
 		    export/transcode/XviD.pm  \
+		    export/ffmpeg/XviD.pm     \
 		    export/ffmpeg/DivX.pm     \
 		    export/ffmpeg/MP3.pm      \
-		    export/ffmpeg/ASF.pm
+		    export/ffmpeg/ASF.pm      \
+		    export/ffmpeg/SVCD.pm     \
+		    export/ffmpeg/DVCD.pm     \
+		    export/ffmpeg/DVD.pm      \
+		    export/ffmpeg/VCD.pm
 MODULE_SUBDIRS    = transcode \
 		    ffmpeg
 MYTHTV_MODULES	  = mythtv/nuvinfo.pm \

@@ -36,24 +36,48 @@
 # Load the recordings, and the $video_dir variable
     use mythtv::recordings;
 
-# Load the transcode-based export modules
-    use export::transcode::XviD;
-        push @Exporters, export::transcode::XviD->new;
-    use export::transcode::SVCD;
-        push @Exporters, export::transcode::SVCD->new;
-    use export::transcode::VCD;
-        push @Exporters, export::transcode::VCD->new;
-    use export::transcode::DVCD;
-        push @Exporters, export::transcode::DVCD->new;
-    use export::transcode::DVD;
-        push @Exporters, export::transcode::DVD->new;
-# Load the ffmpeg-based export modules
-    use export::ffmpeg::DivX;
-        push @Exporters, export::ffmpeg::DivX->new;
-    use export::ffmpeg::ASF;
-        push @Exporters, export::ffmpeg::ASF->new;
-    use export::ffmpeg::MP3;
-        push @Exporters, export::ffmpeg::MP3->new;
+# Decipher --ffmpeg/--transcode.  default is --ffmpeg
+
+    my $export_prog = 'ffmpeg';
+
+    use Getopt::Long qw(:config pass_through);
+
+    GetOptions( 'ffmpeg' => sub { $export_prog = 'ffmpeg' },
+                'transcode' => sub { $export_prog = 'transcode' } );
+
+    # Load the exporters based on which suite was selected above
+    if( $export_prog eq 'transcode' ) {
+        # Transcode - doesn't seem to work for many MPEG recordings
+        use export::transcode::XviD;
+            push @Exporters, export::transcode::XviD->new;
+        use export::transcode::SVCD;
+            push @Exporters, export::transcode::SVCD->new;
+        use export::transcode::VCD;
+            push @Exporters, export::transcode::VCD->new;
+        use export::transcode::DVCD;
+            push @Exporters, export::transcode::DVCD->new;
+        use export::transcode::DVD;
+            push @Exporters, export::transcode::DVD->new;
+    } elsif ( $export_prog eq 'ffmpeg' ) {
+        # Ffmpeg - seems to work better and is the default
+        use export::ffmpeg::XviD;
+            push @Exporters, export::ffmpeg::XviD->new;
+        use export::ffmpeg::SVCD;
+            push @Exporters, export::ffmpeg::SVCD->new;
+        use export::ffmpeg::VCD;
+            push @Exporters, export::ffmpeg::VCD->new;
+        use export::ffmpeg::DVCD;
+            push @Exporters, export::ffmpeg::DVCD->new;
+        use export::ffmpeg::DVD;
+            push @Exporters, export::ffmpeg::DVD->new;
+        use export::ffmpeg::DivX;
+            push @Exporters, export::ffmpeg::DivX->new;
+        use export::ffmpeg::ASF;
+            push @Exporters, export::ffmpeg::ASF->new;
+        use export::ffmpeg::MP3;
+            push @Exporters, export::ffmpeg::MP3->new;
+    }
+
 # Load the other export modules
     use export::MPEG2_cut;
         push @Exporters, export::MPEG2_cut->new;
@@ -82,7 +106,7 @@
     my @episodes = load_cli_episodes();
 
 # Which exporter to use
-    my $exporter = query_exporters();
+    my $exporter = query_exporters($export_prog);
 
 # Gather the episodes we want to transcode (unless we have them from the cli already)
     @episodes = &load_episodes(@episodes) unless ($is_cli);
