@@ -27,8 +27,9 @@ class Channel
     bool ChannelDown(void);
  
     void ToggleInputs(void); 
+    void SwitchToInput(const string &input);
  
-    char *GetCurrentName(void);
+    string GetCurrentName(void);
     int GetCurrent(void) { return curchannel + 1; }
     
     void SetFd(int fd) { videofd = fd; } 

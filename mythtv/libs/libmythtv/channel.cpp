@@ -128,18 +128,23 @@ bool Channel::SetChannelByString(const string &chan)
         Open();
     if (!isopen)
         return false;
-    
+   
     bool foundit = false;
     int i;
     for (i = 0; i < totalChannels; i++)
     {
         if (chan == curList[i].name)
-	{
-	    foundit = true;
-	    break;
-	}
+        {
+            foundit = true;
+            break;
+        }
     }
 
+    if (foundit)
+    {
+        if (currentcapchannel != 0)
+            SwitchToInput("Television");
+    }
     if (!foundit)
         return false;
 
@@ -148,29 +153,30 @@ bool Channel::SetChannelByString(const string &chan)
    
 bool Channel::SetChannel(int i)
 {
-    if (pParent->CheckChannel(i+1))
+    char channame[128];
+ 
+    if (currentcapchannel == 0)
+        sprintf(channame, "%d", i+1);
+    else
+        sprintf(channame, "%s:%d", channelnames[currentcapchannel].c_str(), 
+                                   i+1);
+
+    if (pParent->CheckChannel(channame))
     {
-        int frequency = curList[i].freq * 16 / 1000;
-        if (ioctl(videofd, VIDIOCSFREQ, &frequency) == -1)
-            perror("channel set:");
-
-	curchannel = i;
-	return true;
-	
-	/*
-	struct video_tuner tuner;
-
-	usleep(200000);
-
-	if (-1 == ioctl(videofd, VIDIOCGTUNER, &tuner))
-            return false;
-	
-	if (tuner.signal)
+        if (currentcapchannel == 0)
         {
-            curchannel = i;
-	    printf("%d has signal\n", i + 1);
-            return true;
-	}*/
+            int frequency = curList[i].freq * 16 / 1000;
+            if (ioctl(videofd, VIDIOCSFREQ, &frequency) == -1)
+                perror("channel set:");
+
+	    curchannel = i;
+	    return true;
+        }
+        else
+        {
+            sprintf(channame, "%d", i+1);
+            return pParent->ChangeExternalChannel(channame);
+        }
     }
     return false;
 }
@@ -195,7 +201,6 @@ bool Channel::ChannelUp(void)
 bool Channel::ChannelDown(void)
 {
     bool finished = false;
-
     while (!finished)
     {
         curchannel--;
@@ -209,12 +214,20 @@ bool Channel::ChannelDown(void)
     return finished;
 }
 
-char *Channel::GetCurrentName(void)
+string Channel::GetCurrentName(void)
 {
     if (currentcapchannel == 0)
         return curList[curchannel].name;
     else
-        return (char *)(channelnames[currentcapchannel].c_str());
+    {
+        string ret = channelnames[currentcapchannel];
+        ret += ":";
+        char temp[10];
+        sprintf(temp, "%d", curchannel);
+
+        ret += temp;
+        return temp;
+    }
 }
 
 void Channel::ToggleInputs(void)
@@ -222,6 +235,28 @@ void Channel::ToggleInputs(void)
     currentcapchannel++;
     if (currentcapchannel >= capchannels)
         currentcapchannel = 0;
+
+    struct video_channel set;
+    memset(&set, 0, sizeof(set));
+    ioctl(videofd, VIDIOCGCHAN, &set);
+    set.channel = currentcapchannel;
+    set.norm = videomode;
+    ioctl(videofd, VIDIOCSCHAN, &set);
+}
+
+void Channel::SwitchToInput(const string &input)
+{
+    int inputnum = 0;
+    for (int i = 0; i < capchannels; i++)
+    {
+        if (channelnames[i] == input)
+            inputnum = i;
+    }
+
+    if (inputnum == currentcapchannel)
+        return;
+
+    currentcapchannel = inputnum;
 
     struct video_channel set;
     memset(&set, 0, sizeof(set));

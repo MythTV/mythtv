@@ -943,7 +943,7 @@ void TV::ChannelCommit(void)
 
 void TV::ChangeChannel(char *name)
 {
-    if (!CheckChannel(atoi(name)))
+    if (!CheckChannel(name))
         return;
 
     nvp->Pause();
@@ -1080,14 +1080,14 @@ void TV::DisconnectDB(void)
         mysql_close(db_conn);
 }
 
-bool TV::CheckChannel(int channum)
+bool TV::CheckChannel(char *channum)
 {
     if (!db_conn)
         return true;
 
     bool ret = false;
     char query[1024];
-    sprintf(query, "SELECT * FROM channel WHERE channum = %d", channum);
+    sprintf(query, "SELECT * FROM channel WHERE channum = %s", channum);
 
     MYSQL_RES *res_set;
 
@@ -1108,6 +1108,19 @@ bool TV::CheckChannel(int channum)
     }
 
     return ret;
+}
+
+bool TV::ChangeExternalChannel(char *channum)
+{
+    string command = settings->GetSetting("ExternalChannelCommand");
+
+    command += string(" ") + string(channum);
+
+    int ret = system(command.c_str());
+
+    if (ret > 0)
+        return true;
+    return false;
 }
 
 void TV::doLoadMenu(void)

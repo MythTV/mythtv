@@ -49,7 +49,8 @@ class TV
 
     TVState GetState(void) { return internalState; }
 
-    bool CheckChannel(int channum); 
+    bool CheckChannel(char *channum); 
+    bool ChangeExternalChannel(char *channum);
 
     string GetFilePrefix() { return settings->GetSetting("RecordFilePrefix"); }
  protected:

@@ -321,6 +321,22 @@ void GuideGrid::paintChannels(QPainter *p)
     QPainter tmp(&pix);
     tmp.setBrush(black);
     tmp.setPen(QPen(black, 2));
+    tmp.setFont(*m_largerFont);
+
+    QString date = m_currentStartTime.toString("ddd");
+    QFontMetrics lfm(*m_largerFont);
+    int datewidth = lfm.width(date);
+    int dateheight = lfm.height();
+
+    tmp.drawText((75 - datewidth) / 2, (55 - dateheight) / 2,
+                 date);
+
+    date = m_currentStartTime.toString("MMM d");
+    datewidth = lfm.width(date);
+
+    tmp.drawText((75 - datewidth) / 2, (55 - dateheight) / 2 + dateheight,
+                 date);
+
     tmp.setFont(*m_font);
 
     for (unsigned int i = 0; i < 6; i++)
@@ -586,6 +602,10 @@ void GuideGrid::scrollLeft()
 
     t = m_currentStartTime.addSecs(-1800);
 
+    bool updatechannel = false;
+    if (t.date().day() != m_currentStartTime.date().day())
+        updatechannel = true;
+
     m_currentStartTime = t;
 
     fillTimeInfos();
@@ -615,6 +635,8 @@ void GuideGrid::scrollLeft()
     }
 
     update(programRect().unite(timeRect()));
+    if (updatechannel) 
+        update(channelRect());
 }
 
 void GuideGrid::scrollRight()
@@ -622,6 +644,10 @@ void GuideGrid::scrollRight()
     QDateTime t = m_currentStartTime;
 
     t = m_currentStartTime.addSecs(1800);
+
+    bool updatechannel = false;
+    if (t.date().day() != m_currentStartTime.date().day())
+        updatechannel = true;
 
     m_currentStartTime = t;
 
@@ -652,6 +678,8 @@ void GuideGrid::scrollRight()
     }
 
     update(programRect().unite(timeRect()));
+    if (updatechannel)
+        update(channelRect());
 }
 
 void GuideGrid::scrollDown()
