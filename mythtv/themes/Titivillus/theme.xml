@@ -2,7 +2,7 @@
     <font name="basefont"  face="Trebuchet Ms">
       <color>#ffffff</color>
       <dropcolor>#000000</dropcolor>
-      <size>17</size>
+      <size>15</size>
       <size:small>14</size:small>
       <size:big>20</size:big>
       <shadow>2,2</shadow>
@@ -10,7 +10,7 @@
     </font>
    <font name="title" base="basefont" face="Arial Black">
       <color>#ffffdd</color>
-      <size>22</size>
+      <size>18</size>
       <bold>yes</bold>
       <size:big>24</size:big>
       <size:small>18</size:small>
@@ -19,7 +19,7 @@
     
     <font name="subtitle" base="basefont">
       <color>#ffffdd</color>
-      <size>19</size>
+      <size>16</size>
       <size:big>21</size:big>
       <size:small>17</size:small>
       <shadow>2,2</shadow>
