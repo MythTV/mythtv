@@ -251,8 +251,8 @@ void avfDecoder::run()
         if (seekTime >= 0.0) 
         {
             cerr << "avfdecoder.o: seek time " << seekTime << endl;
-            if (av_seek_frame(ic, 0, (int64_t)(seekTime * AV_TIME_BASE),
-                              AVSEEK_FLAG_BACKWARD) < 0)
+            if (av_seek_frame(ic, -1, (int64_t)(seekTime * AV_TIME_BASE), 0)
+                              < 0)
             {
                 cerr << "avfdecoder.o: error seeking" << endl;
             }

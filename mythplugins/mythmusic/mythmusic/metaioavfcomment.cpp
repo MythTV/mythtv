@@ -80,9 +80,9 @@ Metadata* MetaIOAVFComment::read(QString filename)
         genre += (char *)p_context->genre;
         year = p_context->year;
         tracknum = p_context->track;
-        length = getTrackLength(p_context);
     }
     
+    length = getTrackLength(p_context);
 
     Metadata *retdata = new Metadata(filename, artist, album, title, genre,
                                      year, tracknum, length);
