@@ -47,6 +47,8 @@ class NuppelVideoPlayer
     NuppelVideoPlayer(QSqlDatabase *ldb = NULL, ProgramInfo *info = NULL);
    ~NuppelVideoPlayer();
 
+    void SetParentWidget(QWidget *widget) { parentWidget = widget; }
+
     void SetAsPIP(void) { disableaudio = disablevideo = true; }
     void SetNoAudio(void) { disableaudio = true; }
 
@@ -402,6 +404,8 @@ class NuppelVideoPlayer
     bool experimentalsync;
 
     bool limitKeyRepeat;
+
+    QWidget *parentWidget;
 };
 
 #endif

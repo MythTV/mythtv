@@ -434,6 +434,7 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
             else if (info.tagName() == "solidcolor")
             {
                 color = getFirstText(info);
+                catColors["none"] = color;
             }
             else if (info.tagName() == "area")
             {

@@ -772,9 +772,13 @@ void UIGuideType::drawBackground(QPainter *dr, int num)
     }
     else if (m_filltype == 5)
     {
-        dr->setBrush(QBrush(categoryColors[categoryMap[num]], Qt::Dense4Pattern));
-        dr->setPen(QPen(QColor(categoryColors[categoryMap[num]]), (int)(2 * m_wmult)));
-        dr->fillRect(area, QBrush( QColor(categoryColors[categoryMap[num]]), Qt::Dense4Pattern));
+        QString color = categoryColors[categoryMap[num]];
+        if (color == "")
+            color = categoryColors["none"];
+
+        dr->setBrush(QBrush(color, Qt::Dense4Pattern));
+        dr->setPen(QPen(QColor(color), (int)(2 * m_wmult)));
+        dr->fillRect(area, QBrush(QColor(color), Qt::Dense4Pattern));
     }
     else if (m_filltype == 6 && categoryMap[num] != "Other")
          Blender(dr, area, num);
@@ -788,6 +792,9 @@ void UIGuideType::Blender(QPainter *dr, QRect area, int num, QString force)
         return;
     }
     QString color = categoryColors[categoryMap[num]];
+    if (color == "")
+        color = categoryColors["none"];
+
     if (force.length() > 0)
         color = force;
     int alpha = 96;

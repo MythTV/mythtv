@@ -264,9 +264,6 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
 
     data->XJ_curwin = data->XJ_win = winid;
     
-    if (embedid > 0)
-        data->XJ_curwin = data->XJ_win = embedid;
-
     old_handler = XSetErrorHandler(XJ_error_catcher);
     XSync(data->XJ_disp, 0);
 

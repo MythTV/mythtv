@@ -44,6 +44,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
 {
     m_db = ldb;
     m_playbackinfo = NULL;
+    parentWidget = NULL;
 
     if (info)
         m_playbackinfo = new ProgramInfo(*info);
@@ -295,18 +296,31 @@ void NuppelVideoPlayer::InitVideo(void)
     }
     else
     {
-        MythMainWindow *window = gContext->GetMainWindow();
-        if (!window)
-        {
-            cerr << "No main window, aborting\n";
-            exit(0);
-        }
+        QWidget *widget = parentWidget;
 
-        QWidget *widget = window->currentWidget();
         if (!widget)
         {
-            cerr << "No top level widget, aborting\n";
-            exit(0);
+            MythMainWindow *window = gContext->GetMainWindow();
+            if (!window)
+            {
+                cerr << "No main window, aborting\n";
+                exit(0);
+            }
+
+            QObject *playbackwin = window->child("tv playback");
+        
+            QWidget *widget = (QWidget *)playbackwin;
+
+            if (!widget)
+            {
+                cerr << "Couldn't find 'tv playback' widget\n";
+                widget = window->currentWidget();
+                if (!widget)
+                {
+                    cerr << "No top level widget, aborting\n";
+                    exit(0);
+                }
+            }  
         }
 
         videoOutput = VideoOutput::InitVideoOut(forceVideoOutput);
@@ -316,7 +330,7 @@ void NuppelVideoPlayer::InitVideo(void)
 
         videoOutput->Init(video_width, video_height, video_aspect,
                           widget->winId(), 0, 0, widget->width(), 
-                          widget->height(), embedid);
+                          widget->height(), 0);
     }
 
     if (embedid > 0)

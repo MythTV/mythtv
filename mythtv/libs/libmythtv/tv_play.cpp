@@ -572,6 +572,7 @@ void TV::SetupPlayer(void)
 
     QString filters = "";
     nvp = new NuppelVideoPlayer(m_db, playbackinfo);
+    nvp->SetParentWidget(myWindow);
     nvp->SetRingBuffer(prbuffer);
     nvp->SetRecorder(recorder);
     nvp->SetOSDFontName(gContext->GetSetting("OSDFont"),
