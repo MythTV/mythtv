@@ -71,6 +71,16 @@ int mythplugin_run(void);
 int mythplugin_config(void);
 }
 
+void runGames(void);
+
+void setupKeys(void)
+{
+    REG_JUMP("MythGame", "Game frontend", "-", runGames);
+
+    REG_KEY("Game", "TOGGLEFAV", "Toggle the current game as a favorite", 
+            "?,/");
+}
+
 int mythplugin_init(const char *libversion)
 {
     if (!gContext->TestPopupVersion("mythgame", libversion,
@@ -84,10 +94,12 @@ int mythplugin_init(const char *libversion)
     settings.load(QSqlDatabase::database());
     settings.save(QSqlDatabase::database());
 
+    setupKeys();
+
     return 0;
 }
 
-int mythplugin_run(void)
+void runGames(void)
 {
     QTranslator translator( 0 );
     translator.load(PREFIX + QString("/share/mythtv/i18n/mythgame_") +
@@ -129,7 +141,11 @@ int mythplugin_run(void)
     gametree.exec();
 
     qApp->removeTranslator(&translator);
+}
 
+int mythplugin_run(void)
+{
+    runGames();
     return 0;
 }
 

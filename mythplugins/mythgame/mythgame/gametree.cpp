@@ -39,23 +39,62 @@ GameTree::~GameTree()
 
 void GameTree::keyPressEvent(QKeyEvent *e)
 {
-    switch (e->key())
+    bool handled = false;
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("Game", e, actions);
+
+    for (unsigned int i = 0; i < actions.size(); i++)
     {
-        case Key_Space: case Key_Enter: case Key_Return:
-            game_tree_list->select(); break;
-
-        case Key_E: edit(); break;
-        case Key_Question: case Key_Slash: toggleFavorite(); break;
-
-        case Key_Up: game_tree_list->moveUp(); break;
-        case Key_Down: game_tree_list->moveDown(); break;
-        case Key_Left: game_tree_list->popUp(); break;
-        case Key_Right: goRight(); break;
-        case Key_PageUp: game_tree_list->pageUp(); break;
-        case Key_PageDown: game_tree_list->pageDown(); break;
-
-        default: MythThemedDialog::keyPressEvent(e); break;
+        QString action = actions[i];
+        if (action == "SELECT")
+        {
+            game_tree_list->select();
+            handled = true;
+        }
+        else if (action == "MENU" || action == "INFO") 
+        {
+            edit();
+            handled = true;
+        }
+        else if (action == "UP")
+        {
+            game_tree_list->moveUp();
+            handled = true;
+        }
+        else if (action == "DOWN")
+        {
+            game_tree_list->moveDown();
+            handled = true;
+        }
+        else if (action == "LEFT")
+        {
+            game_tree_list->popUp();
+            handled = true;
+        }
+        else if (action == "RIGHT")
+        {
+            goRight();
+            handled = true;
+        }
+        else if (action == "PAGEUP")
+        {
+            game_tree_list->pageUp();
+            handled = true;
+        }
+        else if (action == "PAGEDOWN")
+        {
+            game_tree_list->pageDown();
+            handled = true;
+        }
+        else if (action == "TOGGLEFAV")
+        {
+            toggleFavorite();
+            handled = true;
+        }
     }
+
+    if (!handled)
+        MythThemedDialog::keyPressEvent(e);
 }
 
 void GameTree::buildGameList(void)
