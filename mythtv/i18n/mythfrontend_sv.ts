@@ -2409,12 +2409,6 @@
         <translation>Symbolhastighet</translation>
     </message>
     <message>
-        <source>[DVB-S/C] Symbol Rate (Option has no default)
-???</source>
-        <translation type="obsolete">[DVB-S/C] Symboltakt (Inget standardvärde)
-???</translation>
-    </message>
-    <message>
         <source>Polarity</source>
         <translation>Polaritet</translation>
     </message>
@@ -2439,12 +2433,6 @@
         <translation>Inversion</translation>
     </message>
     <message>
-        <source>[Common] Inversion (Default: Auto):
-Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
-        <translation type="obsolete">[Gemensam] Inversion (Standard: Auto)
-De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</translation>
-    </message>
-    <message>
         <source>Auto</source>
         <translation>Auto</translation>
     </message>
@@ -2457,90 +2445,36 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
         <translation>Bandbredd</translation>
     </message>
     <message>
-        <source>[DVB-C/T] Bandwidth (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-C/T] Bandbredd (Standard: Auto)
-???</translation>
-    </message>
-    <message>
         <source>Modulation</source>
         <translation>Modulering</translation>
-    </message>
-    <message>
-        <source>[DVB-C] Modulation (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-C] Modulation (Standard: Auto)
-???</translation>
     </message>
     <message>
         <source>Constellation</source>
         <translation>Konstellation</translation>
     </message>
     <message>
-        <source>[DVB-T] Constellation (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-T] Konstellation (Standard: Auto)
-???</translation>
-    </message>
-    <message>
         <source>FEC</source>
         <translation>FEC</translation>
-    </message>
-    <message>
-        <source>[DVB-S/C] Forward Error Correction (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-S/C] Främre felkorrektion (Standard: Auto)
-???</translation>
     </message>
     <message>
         <source>LP Coderate</source>
         <translation>LP kodhastighet</translation>
     </message>
     <message>
-        <source>[DVB-T] Low Priority Code Rate (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-T] Lågprioriterad kodhastighet (Standard: Auto)
-???</translation>
-    </message>
-    <message>
         <source>HP Coderate</source>
         <translation>HP kodhastighet</translation>
-    </message>
-    <message>
-        <source>[DVB-T] High Priority Code Rate (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-T] Högprioriterad kodhastighet (Standard: Auto)
-???</translation>
     </message>
     <message>
         <source>Guard Interval</source>
         <translation>Skyddsintervall</translation>
     </message>
     <message>
-        <source>[DVB-T] Guard Interval (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-T] Skyddsintervall (Standard: Auto)
-???</translation>
-    </message>
-    <message>
         <source>Trans. Mode</source>
         <translation>Överföringsläge</translation>
     </message>
     <message>
-        <source>[DVB-T] Transmission Mode (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-T] Överföringsläge (Standard: Auto)
-???</translation>
-    </message>
-    <message>
         <source>Hierarchy</source>
         <translation>Hierarki</translation>
-    </message>
-    <message>
-        <source>[DVB-T] Hierarchy (Default: Auto)
-???</source>
-        <translation type="obsolete">[DVB-T] Hierarki (Standard: Auto)
-???</translation>
     </message>
     <message>
         <source>Channel Options - Common</source>
@@ -5376,18 +5310,6 @@ som du startade detta programmet ifrån.</translation>
         <translation>DiSEqC-inställningar</translation>
     </message>
     <message>
-        <source>[Common] Frequency (Option has no default)
-The frequency for this channel in Hz.</source>
-        <translation type="obsolete">[Gemensam] Frekvens (Inget standardvärde)
-Kanalens frekvens i Hz.</translation>
-    </message>
-    <message>
-        <source>[DVB-S] Polarity (Option has no default)
-</source>
-        <translation type="obsolete">[DVB-S] Polaritet (Inget standardvärde)
-</translation>
-    </message>
-    <message>
         <source>6 MHz</source>
         <translation>6 MHz</translation>
     </message>
@@ -5638,57 +5560,59 @@ Kanalens frekvens i Hz.</translation>
     <message>
         <source>Frequency (Option has no default)
 The frequency for this channel in Hz.</source>
-        <translation type="unfinished"></translation>
+        <translation>Frekvens (Inget standardvärde)
+Frekvensen för denna kanal i Hz.</translation>
     </message>
     <message>
         <source>Symbol Rate (Option has no default)</source>
-        <translation type="unfinished"></translation>
+        <translation>Symboltakt (Inget standardvärde)</translation>
     </message>
     <message>
         <source>Polarity (Option has no default)</source>
-        <translation type="unfinished"></translation>
+        <translation>Polaritet (Inget standardvärde)</translation>
     </message>
     <message>
         <source>Inversion (Default: Auto):
 Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
-        <translation type="unfinished"></translation>
+        <translation>Invertering (Standard: Auto)
+De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</translation>
     </message>
     <message>
         <source>Bandwidth (Default: Auto)
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Bandbredd (Standard: Auto)</translation>
     </message>
     <message>
         <source>Modulation (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Modulation (Standard: Auto)</translation>
     </message>
     <message>
         <source>Constellation (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Konstellation (Standard: Auto)</translation>
     </message>
     <message>
         <source>Forward Error Correction (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Felkorrigering (Standard: Auto)</translation>
     </message>
     <message>
         <source>Low Priority Code Rate (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Lågprioriterad kodhastighet (Standard: Auto)</translation>
     </message>
     <message>
         <source>High Priority Code Rate (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Högprioriterad kodhastighet (Standard: Auto)</translation>
     </message>
     <message>
         <source>Guard Interval (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Skyddsintervall (Standard: Auto)</translation>
     </message>
     <message>
         <source>Transmission Mode (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Överföringsläge (Standard: Auto)</translation>
     </message>
     <message>
         <source>Hierarchy (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Hierarki (Standard: Auto)</translation>
     </message>
 </context>
 <context>
@@ -5744,11 +5668,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Failed to open the card</source>
-        <translation type="unfinished"></translation>
+        <translation>Misslyckades med att öppna kortet</translation>
     </message>
     <message>
         <source>Failed to probe the card</source>
-        <translation type="unfinished"></translation>
+        <translation>Misslyckades med att känna av kortet</translation>
     </message>
 </context>
 <context>
