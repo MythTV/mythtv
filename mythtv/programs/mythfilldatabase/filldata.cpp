@@ -681,11 +681,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                                  id);
 
                 if (!query.exec(querystr))
-                {
-                    cerr << "DB Error: Channel insert failed, SQL query "
-                         << "was:" << endl;
-                    cerr << querystr << endl;
-                }
+                    MythContext::DBError("channel insert", query);
 
             }
         }
@@ -771,9 +767,7 @@ void handlePrograms(int id, int offset, QMap<QString,
 
             if (!query.exec(querystr.utf8().data()))
             {
-                cerr << "DB Error: Program insertion failed, SQL query "
-                     << "was: " << endl;
-                cerr << querystr.utf8().data() << endl;
+                MythContext::DBError("program insert", query);
             }
         }
     }
@@ -791,7 +785,7 @@ void grabDataFromFile(int id, int offset, QString &filename)
     handlePrograms(id, offset, &proglist);
 }
 
-void grabData(Source source, int offset)
+bool grabData(Source source, int offset)
 {
     char tempfilename[128];
     strcpy(tempfilename, "/tmp/mythXXXXXX");
@@ -827,7 +821,7 @@ void grabData(Source source, int offset)
          QDate::currentDate().addDays(offset).toString() << "...\n";
     cout << "----------------- Start of XMLTV output -----------------" << endl;
  
-     system(command.ascii());
+    int status = system(command.ascii());
  
     cout << "------------------ End of XMLTV output ------------------" << endl;
 
@@ -835,6 +829,8 @@ void grabData(Source source, int offset)
 
     QFile thefile(filename);
     thefile.remove();
+
+    return (status == 0);
 }
 
 void clearOldDBEntries(void)
@@ -846,17 +842,19 @@ void clearOldDBEntries(void)
     query.exec(querystr);
 }
 
-void fillData(QValueList<Source> &sourcelist)
+bool fillData(QValueList<Source> &sourcelist)
 {
     QValueList<Source>::Iterator it;
 
+    int failures = 0;
     for (it = sourcelist.begin(); it != sourcelist.end(); ++it) {
         QString xmltv_grabber = (*it).xmltvgrabber;
         if (xmltv_grabber == "tv_grab_uk" || xmltv_grabber == "tv_grab_de")
         {
             // tv_grab_uk|de doesn't support the --offset option, so just grab a 
             // week.
-            grabData(*it, -1);
+            if (!grabData(*it, -1))
+                ++failures;
         }
         else if (xmltv_grabber == "tv_grab_nz")
         {
@@ -893,7 +891,8 @@ void fillData(QValueList<Source> &sourcelist)
         else if (xmltv_grabber == "tv_grab_na" || xmltv_grabber == "tv_grab_aus" ||
              xmltv_grabber == "tv_grab_sn")
         {
-            grabData(*it, 1);
+            if (!grabData(*it, 1))
+                ++failures;
 
             for (int i = 0; i < 9; i++)
             {
@@ -914,11 +913,11 @@ void fillData(QValueList<Source> &sourcelist)
 
                     query.next();
                     if (query.value(0).toInt() < 20)
-                        grabData(*it, i);
+                        if (!grabData(*it, i))
+                            ++failures;
 
                 } else {
-                    cout << "DB error when checking for existing program data: "
-                         << query.lastError().databaseText() << endl;
+                    MythContext::DBError("checking existing program data", query);
                 }
             }
         }
@@ -930,6 +929,8 @@ void fillData(QValueList<Source> &sourcelist)
     }
 
     clearOldDBEntries();
+
+    return (failures == 0);
 }
 
 ChanInfo *xawtvChannel(QString &id, QString &channel, QString &fine)
@@ -1166,7 +1167,12 @@ int main(int argc, char *argv[])
              exit(-1);
         }
     
-        fillData(sourcelist);
+        bool ret = fillData(sourcelist);
+        if (!ret)
+        {
+             cerr << "Failed to fetch some program info\n";
+             exit(1);
+        }
     }
 
     delete context;
