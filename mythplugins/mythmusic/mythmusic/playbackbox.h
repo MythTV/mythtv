@@ -121,6 +121,8 @@ class PlaybackBox : public MythThemedDialog
 
     bool showrating;
     bool vis_is_big;
+    bool tree_is_done;
+    bool first_playlist_check;
     
     AllMusic *all_music;
     PlaylistsContainer *all_playlists;

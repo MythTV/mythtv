@@ -36,8 +36,11 @@ PlaybackBox::PlaybackBox(MythMainWindow *parent, QString window_name,
     lcd_update_timer = NULL;
     waiting_for_playlists_timer = NULL;
     playlist_tree = NULL;
+    
  
     isplaying = false;
+    tree_is_done = false;
+    first_playlist_check = true;
     outputBufferSize = 256;
     currentTime = 0;
     maxTime = 0;
@@ -415,6 +418,13 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
 
 void PlaybackBox::checkForPlaylists()
 {
+    if(first_playlist_check)
+    {
+        first_playlist_check = false;
+        repaint();
+        return;
+    }
+
     //
     //  This is only done off a timer on startup
     //
@@ -422,25 +432,31 @@ void PlaybackBox::checkForPlaylists()
     if(all_playlists->doneLoading() &&
        all_music->doneLoading())
     {
-        music_tree_list->showWholeTree(show_whole_tree);
-        waiting_for_playlists_timer->stop();
-        constructPlaylistTree();
-        QValueList <int> branches_to_current_node;
-        branches_to_current_node.append(0);                  //  Root node
-        branches_to_current_node.append(1);                  //  We're on a playlist (not "My Music")
-        branches_to_current_node.append(0);                  //  Active play Queue
-        music_tree_list->moveToNodesFirstChild(branches_to_current_node);
-        music_tree_list->refresh();
-        if(show_whole_tree)
+        if(tree_is_done)
         {
-            setContext(1);
+            music_tree_list->showWholeTree(show_whole_tree);
+            waiting_for_playlists_timer->stop();
+            QValueList <int> branches_to_current_node;
+            branches_to_current_node.append(0);                  //  Root node
+            branches_to_current_node.append(1);                  //  We're on a playlist (not "My Music")
+            branches_to_current_node.append(0);                  //  Active play Queue
+            music_tree_list->moveToNodesFirstChild(branches_to_current_node);
+            music_tree_list->refresh();
+            if(show_whole_tree)
+            {
+                setContext(1);
+            }
+            else
+            {
+                setContext(2);
+            }
+            updateForeground();
+            mainvisual->setVisual(visual_mode);
         }
         else
         {
-            setContext(2);
+            constructPlaylistTree();
         }
-        updateForeground();
-        mainvisual->setVisual(visual_mode);
     }
     else
     {
@@ -1034,6 +1050,7 @@ void PlaybackBox::constructPlaylistTree()
 
     all_playlists->writeTree(playlist_tree);
     music_tree_list->assignTreeData(playlist_tree);
+    tree_is_done = true;
 }
 
 void PlaybackBox::editPlaylist()
