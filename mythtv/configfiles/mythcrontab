@@ -1,7 +1,8 @@
-# The following will run the mythfilldatabase shell script at 18:00 every day.  Format is
+# The following will run the mythfilldatabase shell script at 0430
+# every day.  Format is
 # minutes hour day_of_month month day_of_week
-# In the case of mythfilldatabase, we want it to run at 0430 daily.
 # man 5 crontab for more information
 # Need to use a shell script because the QTDIR environment variable isn't
 # being honored by crontab?
-30 04 * * * /bin/bash $HOME/mythtv/MC/programs/mythfilldatabase/mythfilldatabasecron
+# The next text should be all on the same line.
+30 04 * * * /bin/bash $HOME/mythtv-0.7/MC/programs/mythfilldatabase/mythfilldatabasecron
