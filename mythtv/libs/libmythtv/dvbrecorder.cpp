@@ -469,27 +469,6 @@ long long DVBRecorder::GetFramesWritten(void)
     return framesWritten;
 }
 
-void DVBRecorder::TransitionToFile(const QString &lfilename)
-{
-    ringBuffer->TransitionToFile(lfilename);
-}
-
-void DVBRecorder::TransitionToRing(void)
-{
-    if (curRecording)
-    {
-        pthread_mutex_lock(db_lock);
-        MythContext::KickDatabase(db_conn);
-        curRecording->SetPositionMap(positionMap, MARK_GOP_START, db_conn);
-        pthread_mutex_unlock(db_lock);
-
-        delete curRecording;
-        curRecording = NULL;
-    }
-
-    ringBuffer->TransitionToRing();
-}
-
 long long DVBRecorder::GetKeyframePosition(long long desired)
 {
     long long ret = -1;

@@ -23,12 +23,6 @@ class RingBuffer
     int Write(const void *buf, int count);
     void Sync(void);
 
-    // this should _only_ be used when transitioning from livetv->recording
-    int WriteToDumpFile(const void *buf, int count);
-
-    void TransitionToFile(const QString &lfilename);
-    void TransitionToRing(void);
-
     long long Seek(long long pos, int whence);
     long long WriterSeek(long long pos, int whence);
 
@@ -79,7 +73,7 @@ class RingBuffer
 
     QString filename;
 
-    ThreadedFileWriter *tfw, *dumpfw;
+    ThreadedFileWriter *tfw;
     int fd2;
  
     bool normalfile;
@@ -87,7 +81,6 @@ class RingBuffer
     
     long long writepos;
     long long totalwritepos;
-    long long dumpwritepos;
 
     long long readpos;
     long long totalreadpos;

@@ -25,8 +25,4 @@ void GetMythTVGeometry(Display *dpy, int screen_num, int *x, int *y,
 
 QRgb blendColors(QRgb source, QRgb add, int alpha);
 
-void blendImageToPixmap(QPixmap *source, int sourcex, int sourcey,
-                        QImage *image, QPainter *destination, int destx,
-                        int desty);
-
 #endif

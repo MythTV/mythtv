@@ -255,33 +255,3 @@ QRgb blendColors(QRgb source, QRgb add, int alpha)
     return qRgb(sred, sgreen, sblue);
 }
 
-void blendImageToPixmap(QPixmap *source, int sourcex, int sourcey,
-                        QImage *image, QPainter *destination, int destx,
-                        int desty)
-{
-    int width = image->width();
-    int height = image->height();
-
-    if (sourcex + width > source->width())
-        width = source->width() - sourcex;
-    if (sourcey + height > source->height())
-        height = source->height() - sourcey;
-
-    QImage bgimage = source->convertToImage();
-
-    for (int y = sourcey; y < height + sourcey; y++)
-    {
-        unsigned int *dest = (unsigned int *)bgimage.scanLine(y);
-        unsigned int *src = (unsigned int *)image->scanLine(y - sourcey);
-
-        for (int x = sourcex; x < width + sourcex; x++)
-        {
-            QRgb origcolor = dest[x];
-            QRgb destcolor = src[x - sourcex];
-
-            dest[x] = blendColors(origcolor, destcolor, qAlpha(destcolor));
-        }
-    }
-
-    destination->drawImage(destx, desty, bgimage);
-}

@@ -896,7 +896,7 @@ void NuppelVideoRecorder::StartRecording(void)
     KillChildren();
 
     if (!livetv)
-        WriteSeekTable(false);
+        WriteSeekTable();
 
     recording = false;
     close(fd);
@@ -1053,7 +1053,7 @@ again:
     KillChildren();
 
     if (!livetv)
-        WriteSeekTable(false);
+        WriteSeekTable();
 
     recording = false;
     close(fd);
@@ -1180,25 +1180,10 @@ void NuppelVideoRecorder::DoMJPEG(void)
     KillChildren();
             
     if (!livetv)
-        WriteSeekTable(false);
+        WriteSeekTable();
             
     recording = false;
     close(fd);
-}
-
-// Must be called while paused.
-void NuppelVideoRecorder::TransitionToFile(const QString &lfilename)
-{
-    ringBuffer->TransitionToFile(lfilename);
-    //WriteHeader(true);
-    WriteHeader(false);
-}
-
-// Must be called while paused.
-void NuppelVideoRecorder::TransitionToRing(void)
-{
-    WriteSeekTable(true);
-    ringBuffer->TransitionToRing();
 }
 
 int NuppelVideoRecorder::SpawnChildren(void)
@@ -1318,7 +1303,7 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len)
     return;
 }
 
-void NuppelVideoRecorder::WriteHeader(bool todumpfile)
+void NuppelVideoRecorder::WriteHeader(void)
 {
     struct rtfileheader fileheader;
     struct rtframeheader frameheader;
@@ -1346,10 +1331,7 @@ void NuppelVideoRecorder::WriteHeader(bool todumpfile)
     fileheader.textsblocks = -1; // TODO: make only -1 if VBI support active?
     fileheader.keyframedist = KEYFRAMEDIST;
 
-    if (todumpfile)
-        ringBuffer->WriteToDumpFile(&fileheader, FILEHEADERSIZE);
-    else
-        ringBuffer->Write(&fileheader, FILEHEADERSIZE);
+    ringBuffer->Write(&fileheader, FILEHEADERSIZE);
 
     memset(&frameheader, 0, sizeof(frameheader));
     frameheader.frametype = 'D'; // compressor data
@@ -1359,16 +1341,8 @@ void NuppelVideoRecorder::WriteHeader(bool todumpfile)
         frameheader.comptype = 'F';
         frameheader.packetlength = mpa_ctx->extradata_size;
 
-        if (todumpfile)
-            ringBuffer->WriteToDumpFile(&frameheader, FRAMEHEADERSIZE);
-        else
-            ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
-
-        if (todumpfile)
-            ringBuffer->WriteToDumpFile(mpa_ctx->extradata, 
-                                        frameheader.packetlength);
-        else
-            ringBuffer->Write(mpa_ctx->extradata, frameheader.packetlength);
+        ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+        ringBuffer->Write(mpa_ctx->extradata, frameheader.packetlength);
     }
     else
     {
@@ -1376,16 +1350,10 @@ void NuppelVideoRecorder::WriteHeader(bool todumpfile)
         frameheader.packetlength = sizeof(tbls);
 
         // compression configuration header
-        if (todumpfile)
-            ringBuffer->WriteToDumpFile(&frameheader, FRAMEHEADERSIZE);
-        else
-            ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+        ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
 
         memset(tbls, 0, sizeof(tbls));
-        if (todumpfile)
-            ringBuffer->WriteToDumpFile(tbls, sizeof(tbls));
-        else
-            ringBuffer->Write(tbls, sizeof(tbls));
+        ringBuffer->Write(tbls, sizeof(tbls));
     }
 
     memset(&frameheader, 0, sizeof(frameheader));
@@ -1393,10 +1361,7 @@ void NuppelVideoRecorder::WriteHeader(bool todumpfile)
     frameheader.packetlength = sizeof(extendeddata);
 
     // extended data header
-    if (todumpfile)
-        ringBuffer->WriteToDumpFile(&frameheader, FRAMEHEADERSIZE);
-    else
-        ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+    ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
     
     struct extendeddata moredata;
     memset(&moredata, 0, sizeof(extendeddata));
@@ -1451,17 +1416,14 @@ void NuppelVideoRecorder::WriteHeader(bool todumpfile)
 
     extendeddataOffset = ringBuffer->GetFileWritePosition();
 
-    if (todumpfile)
-        ringBuffer->WriteToDumpFile(&moredata, sizeof(moredata));
-    else
-        ringBuffer->Write(&moredata, sizeof(moredata));
+    ringBuffer->Write(&moredata, sizeof(moredata));
 
     last_block = 0;
     lf = 0; // that resets framenumber so that seeking in the
             // continues parts works too
 }
 
-void NuppelVideoRecorder::WriteSeekTable(bool todumpfile)
+void NuppelVideoRecorder::WriteSeekTable(void)
 {
     int numentries = seektable->size();
 
@@ -1472,10 +1434,7 @@ void NuppelVideoRecorder::WriteSeekTable(bool todumpfile)
 
     long long currentpos = ringBuffer->GetFileWritePosition();
 
-    if (todumpfile)
-        ringBuffer->WriteToDumpFile(&frameheader, sizeof(frameheader));
-    else
-        ringBuffer->Write(&frameheader, sizeof(frameheader));    
+    ringBuffer->Write(&frameheader, sizeof(frameheader));    
 
     char *seekbuf = new char[frameheader.packetlength];
     int offset = 0;
@@ -1488,23 +1447,17 @@ void NuppelVideoRecorder::WriteSeekTable(bool todumpfile)
         offset += sizeof(struct seektable_entry);
     }
 
-    if (todumpfile)
-        ringBuffer->WriteToDumpFile(seekbuf, frameheader.packetlength);
-    else
-        ringBuffer->Write(seekbuf, frameheader.packetlength);
+    ringBuffer->Write(seekbuf, frameheader.packetlength);
 
     ringBuffer->WriterSeek(extendeddataOffset + 
                            offsetof(struct extendeddata, seektable_offset),
                            SEEK_SET);
 
-    if (todumpfile)
-        ringBuffer->WriteToDumpFile(&currentpos, sizeof(long long));
-    else
-        ringBuffer->Write(&currentpos, sizeof(long long));
+    ringBuffer->Write(&currentpos, sizeof(long long));
 
     ringBuffer->WriterSeek(0, SEEK_END);
 
-    if (!todumpfile && curRecording && positionMap.size() && db_lock && db_conn)
+    if (curRecording && positionMap.size() && db_lock && db_conn)
     {
         pthread_mutex_lock(db_lock);
         MythContext::KickDatabase(db_conn);
@@ -1513,7 +1466,7 @@ void NuppelVideoRecorder::WriteSeekTable(bool todumpfile)
     }
 }
 
-void NuppelVideoRecorder::WriteKeyFrameAdjustTable(bool todumpfile,
+void NuppelVideoRecorder::WriteKeyFrameAdjustTable(
                                      QPtrList<struct kfatable_entry> *kfa_table)
 {
     int numentries = kfa_table->count();
@@ -1525,10 +1478,7 @@ void NuppelVideoRecorder::WriteKeyFrameAdjustTable(bool todumpfile,
 
     long long currentpos = ringBuffer->GetFileWritePosition();
 
-    if (todumpfile)
-        ringBuffer->WriteToDumpFile(&frameheader, sizeof(frameheader));
-    else
-        ringBuffer->Write(&frameheader, sizeof(frameheader));
+    ringBuffer->Write(&frameheader, sizeof(frameheader));
 
     char *kfa_buf = new char[frameheader.packetlength];
     int offset = 0;
@@ -1541,20 +1491,14 @@ void NuppelVideoRecorder::WriteKeyFrameAdjustTable(bool todumpfile,
         offset += sizeof(struct kfatable_entry);
     }
 
-    if (todumpfile)
-        ringBuffer->WriteToDumpFile(kfa_buf, frameheader.packetlength);
-    else
-        ringBuffer->Write(kfa_buf, frameheader.packetlength);
+    ringBuffer->Write(kfa_buf, frameheader.packetlength);
 
 
     ringBuffer->WriterSeek(extendeddataOffset +
                            offsetof(struct extendeddata, keyframeadjust_offset),
                            SEEK_SET);
 
-    if (todumpfile)
-        ringBuffer->WriteToDumpFile(&currentpos, sizeof(long long));
-    else
-        ringBuffer->Write(&currentpos, sizeof(long long));
+    ringBuffer->Write(&currentpos, sizeof(long long));
 
     ringBuffer->WriterSeek(0, SEEK_END);
 

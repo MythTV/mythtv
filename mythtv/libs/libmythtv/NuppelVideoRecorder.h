@@ -75,18 +75,14 @@ class NuppelVideoRecorder : public RecorderBase
 
     void SetVideoFilters(QString &filters);
 
-    void TransitionToFile(const QString &lfilename);
-    void TransitionToRing(void);
-
     long long GetKeyframePosition(long long desired);
     void GetBlankFrameMap(QMap<long long, int> &blank_frame_map);
 
     // reencode stuff
     void StreamAllocate(void);
-    void WriteHeader(bool todumpfile = false);
-    void WriteSeekTable(bool todumpfile);
-    void WriteKeyFrameAdjustTable(bool todumpfile,
-                                  QPtrList<struct kfatable_entry> *kfa_table);
+    void WriteHeader(void);
+    void WriteSeekTable(void);
+    void WriteKeyFrameAdjustTable(QPtrList<struct kfatable_entry> *kfa_table);
     void UpdateSeekTable(int frame_num, bool update_db);
 
     bool SetupAVCodec(void);

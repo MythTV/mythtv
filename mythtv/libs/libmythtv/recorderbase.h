@@ -43,9 +43,6 @@ class RecorderBase
     
     virtual int GetVideoFd(void) = 0;
     
-    virtual void TransitionToFile(const QString &lfilename) = 0;
-    virtual void TransitionToRing(void) = 0;
-
     virtual long long GetKeyframePosition(long long desired) = 0;
     virtual void GetBlankFrameMap(QMap<long long, int> &blank_frame_map) = 0;
 

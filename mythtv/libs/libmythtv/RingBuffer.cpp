@@ -359,8 +359,6 @@ void RingBuffer::Init(void)
     totalreadpos = readpos = 0;
 
     stopreads = false;
-    dumpfw = NULL;
-    dumpwritepos = 0;
 
     pthread_rwlock_init(&rwlock, NULL);
 }
@@ -383,11 +381,6 @@ RingBuffer::~RingBuffer(void)
     {
         close(fd2);
     }
-    if (dumpfw)
-    {
-	delete dumpfw; 
-	dumpfw = NULL;
-    }
 }
 
 void RingBuffer::Start(void)
@@ -399,23 +392,6 @@ void RingBuffer::Start(void)
     }
     else if (!readaheadrunning)
         StartupReadAheadThread();
-}
-
-// guaranteed to be paused, so don't need to lock this
-void RingBuffer::TransitionToFile(const QString &lfilename)
-{
-    dumpfw = new ThreadedFileWriter(lfilename.ascii(), 
-                  O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 0644);
-    dumpwritepos = 0;
-}
-
-// guaranteed to be paused, so don't need to lock this
-void RingBuffer::TransitionToRing(void)
-{
-    dumpfw->Seek(0, SEEK_CUR);
-    delete dumpfw;
-    dumpfw = NULL;
-    dumpwritepos = 0;
 }
 
 void RingBuffer::Reset(void)
@@ -958,40 +934,20 @@ int RingBuffer::Read(void *buf, int count)
     return ret;
 }
 
-int RingBuffer::WriteToDumpFile(const void *buf, int count)
-{
-    pthread_rwlock_rdlock(&rwlock);
-
-    if (!dumpfw)
-    {
-        pthread_rwlock_unlock(&rwlock);
-        return -1;
-    }
-
-    int ret = dumpfw->Write(buf, count);
-    dumpwritepos += ret;
-    pthread_rwlock_unlock(&rwlock);
-
-    return ret;
-}
-
 bool RingBuffer::IsIOBound(void)
 {
     bool ret = false;
     int used, free;
-    ThreadedFileWriter *fw;
     pthread_rwlock_rdlock(&rwlock);
 
-    fw = dumpfw ? dumpfw : tfw;
-
-    if (!fw)
+    if (!tfw)
     {
         pthread_rwlock_unlock(&rwlock);
         return ret;
     }
 
-    used = fw->BufUsed();
-    free = fw->BufFree();
+    used = tfw->BufUsed();
+    free = tfw->BufFree();
 
     ret = (used * 5 > free);
 
@@ -1049,12 +1005,6 @@ int RingBuffer::Write(const void *buf, int count)
             writepos += ret;
             totalwritepos += ret;
         }
-
-        if (dumpfw)
-        {
-            int ret2 = dumpfw->Write(buf, count);
-            dumpwritepos += ret2;
-        }
     }
 
     pthread_rwlock_unlock(&rwlock);
@@ -1068,13 +1018,7 @@ void RingBuffer::Sync(void)
 
 long long RingBuffer::GetFileWritePosition(void)
 {
-    long long ret = -1;
-    if (dumpfw)
-        ret = dumpwritepos;
-    else
-        ret = totalwritepos;
-
-    return ret;
+    return totalwritepos;
 }
 
 long long RingBuffer::Seek(long long pos, int whence)
@@ -1153,12 +1097,7 @@ long long RingBuffer::WriterSeek(long long pos, int whence)
 {
     long long ret = -1;
 
-    if (dumpfw)
-    {
-	ret = dumpfw->Seek(pos, whence);
-        dumpwritepos = ret;
-    }
-    else if (tfw)
+    if (tfw)
     {
 	ret = tfw->Seek(pos, whence);
         totalwritepos = ret;

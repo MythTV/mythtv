@@ -389,27 +389,6 @@ long long MpegRecorder::GetFramesWritten(void)
     return framesWritten;
 }
 
-void MpegRecorder::TransitionToFile(const QString &lfilename)
-{
-    ringBuffer->TransitionToFile(lfilename);
-}
-
-void MpegRecorder::TransitionToRing(void)
-{
-    if (curRecording && db_lock && db_conn)
-    {
-        pthread_mutex_lock(db_lock);
-        MythContext::KickDatabase(db_conn);
-        curRecording->SetPositionMap(positionMap, MARK_GOP_START, db_conn);
-        pthread_mutex_unlock(db_lock);
-
-        delete curRecording;
-        curRecording = NULL;
-    }
-
-    ringBuffer->TransitionToRing();
-}
-
 long long MpegRecorder::GetKeyframePosition(long long desired)
 {
     long long ret = -1;

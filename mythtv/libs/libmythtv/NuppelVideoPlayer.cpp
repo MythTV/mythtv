@@ -2734,7 +2734,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
 
     RingBuffer *outRingBuffer = new RingBuffer(outputname, true, false);
     nvr->SetRingBuffer(outRingBuffer);
-    nvr->WriteHeader(false);
+    nvr->WriteHeader();
     nvr->StreamAllocate();
 
     playing = true;
@@ -2923,9 +2923,9 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
         frame.frameNumber++;
     }
 
-    nvr->WriteSeekTable(false);
+    nvr->WriteSeekTable();
     if (!kfa_table.isEmpty())
-        nvr->WriteKeyFrameAdjustTable(false, &kfa_table);
+        nvr->WriteKeyFrameAdjustTable(&kfa_table);
     delete outRingBuffer;
     delete nvr;
     return REENCODE_OK;
