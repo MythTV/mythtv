@@ -1,62 +1,18 @@
 <mythuitheme>
 
   <window name="programguide">
-
-    <font name="title" face="Arial">
-      <color>#ffffdd</color>
-      <dropcolor>#000000</dropcolor>
-      <size>25</size>
-      <size:small>14</size:small>
-      <shadow>3,3</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="info" face="Arial">
-      <color>#ffffff</color>
-      <size>17</size>
-      <size:small>13</size:small>
-      <shadow>2,2</shadow>
-      <bold>yes</bold>
-    </font>
-    
-    <font name="descinfo2" face="Arial">
-      <color>#ffffee</color>
-      <size>14</size>
-      <size:small>12</size:small>
-      <size:big>16</size:big>
-      <shadow>2,2</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="descinfo" face="Arial">
-      <shadow>2,2</shadow>
-      <color>#ffffff</color>
-      <size>16</size>
-      <size:small>9</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="chaninfo" face="Arial">
-      <shadow>1,1</shadow>
-      <color>#ffffff</color>
+    <font name="chaninfo" base="info">
       <size>15</size>
       <size:small>12</size:small>
-      <bold>yes</bold>
+      <size:big>17</size:big>
     </font>
-
-    <font name="recstatus" face="Arial">
-      <color>#ffff33</color>
-      <size>17</size>
+    
+    <font name="small" base="info">
+      <size>15</size>
       <size:small>12</size:small>
-      <shadow>2,2</shadow>
-      <bold>yes</bold>
+      <size:big>17</size:big>
     </font>
 
-    <font name="small" face="Arial">
-      <color>#ffff33</color>
-      <size>14</size>
-      <size:small>10</size:small>
-    </font>
 
     <container name="background">
       <image name="backup" draworder="0" fleximage="no">
@@ -95,7 +51,7 @@
         <area>0,0,640,31</area>
         <align>allcenter</align>
         <imagefile>gg-times.png</imagefile>
-        <font>descinfo</font>
+        <font>info</font>
       </bar>
     </container>
 
@@ -265,7 +221,7 @@
         <recordstatus type="OverrideRecord" image="gg-rs-override.png"></recordstatus>
         <arrow direction="left" image="gg-arrow-left.png"></arrow>
         <arrow direction="right" image="gg-arrow-right.png"></arrow>
-        <font>descinfo</font>
+        <font>small-info</font>
       </guidegrid>
     </container>
 
@@ -295,12 +251,12 @@
       </textarea>
       <textarea name="subtitle" draworder="6">
         <area>4,62,376,30</area>
-        <font>info</font>
+        <font>subtitle</font>
         <!--<value>%SUBTITLE|"|"%</value> -->
       </textarea>
       <textarea name="description" draworder="6">
         <area>4,86,760,60</area>
-        <font>descinfo</font>
+        <font>description</font>
         <multiline>yes</multiline>
         <value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
       </textarea>
@@ -314,52 +270,12 @@
 
    <window name="programguide-video">
 
-    <font name="title" face="Arial">
-      <color>#ffffdd</color>
-      <dropcolor>#000000</dropcolor>
-      <size>25</size>
-      <size:small>12</size:small>
-      <shadow>3,3</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="info" face="Arial">
-      <color>#ffffff</color>
-      <size>17</size>
-      <size:small>10</size:small>
-      <shadow>2,2</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="descinfo" face="Arial">
-      <shadow>2,2</shadow>
-      <color>#ffffff</color>
-      <size>16</size>
-      <size:small>8</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="chaninfo" face="Arial">
-      <shadow>1,1</shadow>
-      <color>#ffffff</color>
+    <font name="chaninfo" base="info">
       <size>15</size>
-      <size:small>10</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="recstatus" face="Arial">
-      <color>#ffff33</color>
-      <size>17</size>
       <size:small>12</size:small>
-      <shadow>2,2</shadow>
-      <bold>yes</bold>
+      <size:big>17</size:big>
     </font>
-
-    <font name="small" face="Arial">
-      <color>#ffff33</color>
-      <size>16</size>
-      <size:small>8</size:small>
-    </font>
+    
 
     <container name="background">
       <image name="backup" draworder="0" fleximage="no">
@@ -402,7 +318,7 @@
         <area>0,0,640,31</area>
         <align>allcenter</align>
         <imagefile>gg-times.png</imagefile>
-        <font>descinfo</font>
+        <font>info</font>
       </bar>
     </container>
 
@@ -569,7 +485,7 @@
         <recordstatus type="FindOneRecord" image="gg-rs-findone.png"></recordstatus>
         <arrow direction="left" image="gg-arrow-left.png"></arrow>
         <arrow direction="right" image="gg-arrow-right.png"></arrow>
-        <font>descinfo</font>
+        <font>small-info</font>
       </guidegrid>
     </container>
 
@@ -593,11 +509,11 @@
       </textarea>
       <textarea name="subtitle" draworder="6">
         <area>4,46,504,30</area>
-        <font>info</font>
+        <font>subtitle</font>
       </textarea>
       <textarea name="description" draworder="6">
         <area>4,100,500,159</area>
-        <font>descinfo</font>
+        <font>description</font>
         <multiline>yes</multiline>
         <value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
       </textarea>
@@ -611,88 +527,6 @@
 
   <window name="conflict">
 
-    <font name="active_font" face="Arial">
-      <color>#ffffff</color>
-      <size>16</size>
-      <size:small>11</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="inactive_font" face="Arial">
-      <color>#9999cc</color>
-      <size>16</size>
-      <size:small>11</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="record_font" face="Arial">
-      <color>#33ff33</color>
-      <size>16</size>
-      <size:small>11</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="norecordfnt" face="Arial">
-      <color>#999999</color>
-      <size>16</size>
-      <size:small>11</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="conflictfnt" face="Arial">
-      <color>#ffff33</color>
-      <size>16</size>
-      <size:small>11</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="currenttitle" face="Arial">
-      <color>#ffff33</color>
-      <size>18</size>
-      <size:small>12</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="title" face="Arial">
-      <color>#ffffdd</color>
-      <dropcolor>#000000</dropcolor>
-      <size>27</size>
-      <size:small>13</size:small>
-      <shadow>3,3</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="info" face="Arial">
-      <color>#ffffff</color>
-      <size>17</size>
-      <size:small>8</size:small>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="message" face="Arial">
-      <color>#ffffff</color>
-      <size>16</size>
-      <size:small>10</size:small>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="messagegray" face="Arial">
-      <color>#999999</color>
-      <size>16</size>
-      <size:small>10</size:small>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="messageyellow" face="Arial">
-      <color>#ffff33</color>
-      <size>16</size>
-      <size:small>10</size:small>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
 
     <container name="background">
       <area> 0, 0, 800, 600</area>
@@ -707,7 +541,7 @@
       </image>
       <textarea name="showinstr" align="center" draworder="0">
         <area>0,550,800,30</area>
-        <font>message</font>
+        <font>help</font>
         <value>Show  (1) All  (2) Important</value>
       </textarea>
     </container>
@@ -724,12 +558,12 @@
       <area>25,345,280,20</area>
       <textarea name="showing" draworder="4">
         <area>0,0,105,20</area>
-        <font>message</font>
+        <font>info</font>
         <value>Showing:</value>
       </textarea>
       <textarea name="showlevel" draworder="4">
         <area>110,0,150,30</area>
-        <font>message</font>
+        <font>info</font>
       </textarea>
     </container>
 
@@ -737,12 +571,12 @@
       <area>0,39,800,290</area>
       <listarea name="conflictlist" draworder="4">
         <area>20,12,760,265</area>
-        <fcnfont name="conflictfnt" function="conflictingrecording"></fcnfont>
-        <fcnfont name="norecordfnt" function="disabledrecording"></fcnfont>
-        <fcnfont name="active_font" function="active"></fcnfont>
-        <fcnfont name="inactive_font" function="inactive"></fcnfont>
-        <fcnfont name="record_font" function="recording"></fcnfont>
-        <fcnfont name="active_font" function="selected"></fcnfont>
+        <fcnfont name="list-conflict" function="conflictingrecording"></fcnfont>
+        <fcnfont name="list-norecord" function="disabledrecording"></fcnfont>
+        <fcnfont name="list-active" function="active"></fcnfont>
+        <fcnfont name="list-inactive" function="inactive"></fcnfont>
+        <fcnfont name="list-record" function="recording"></fcnfont>
+        <fcnfont name="list-selected" function="selected"></fcnfont>
         <columnpadding>10</columnpadding>
         <column number="1" width="150" context="-1"></column>
         <column number="2" width="110" context="-1"></column>
@@ -775,7 +609,7 @@
       </textarea>
       <textarea name="subdescr" draworder="6">
         <area>0,70,720,140</area>
-        <font>info</font>
+        <font>description</font>
         <multiline>yes</multiline>
         <value>%SUBTITLE|"|"
 %%REPEAT%%STARS%%DESCRIPTION%</value>
@@ -786,7 +620,7 @@
       <area>300,345,480,30</area>
       <textarea name="recordingstatus" align="right" draworder="6">
         <area>0,0,480,30</area>
-        <font>message</font>
+        <font>recstatus</font>
       </textarea>
     </container>
 
@@ -817,52 +651,6 @@
 
   <window name="recprioritychannels">
 
-    <font name="active_font" face="Arial">
-      <color>#ffffff</color>
-      <size>16</size>
-      <size:small>10</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="inactive_font" face="Arial">
-      <color>#9999cc</color>
-      <size>16</size>
-      <size:small>10</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="currenttitle" face="Arial">
-      <color>#ffff33</color>
-      <size>18</size>
-      <size:small>12</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="title" face="Arial">
-      <color>#ffffdd</color>
-      <dropcolor>#000000</dropcolor>
-      <size>29</size>
-      <size:small>13</size:small>
-      <shadow>3,3</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="info" face="Arial">
-      <color>#ffffff</color>
-      <size>17</size>
-      <size:small>10</size:small>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="message" face="Arial">
-      <color>#ffffff</color>
-      <size>16</size>
-      <size:small>10</size:small>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
     <container name="background">
       <textarea name="sched" draworder="0">
         <area>20,10,800,40</area>
@@ -875,7 +663,7 @@
       </image>
       <textarea name="keyinstr" align="center" draworder="0">
         <area>0,570,800,30</area>
-        <font>message</font>
+        <font>help</font>
         <value>(1) Sort by Channel    (2) Sort by Priority</value>
       </textarea>
     </container>
@@ -884,9 +672,9 @@
      <area>0,40,800,300</area>
       <listarea name="recprioritylist" draworder="4">
         <area>20,15,760,280</area>
-        <fcnfont name="active_font" function="active"></fcnfont>
-        <fcnfont name="inactive_font" function="inactive"></fcnfont>
-        <fcnfont name="active_font" function="selected"></fcnfont>
+        <fcnfont name="list-active" function="active"></fcnfont>
+        <fcnfont name="list-inactive" function="inactive"></fcnfont>
+        <fcnfont name="list-selected" function="selected"></fcnfont>
         <columnpadding>1</columnpadding>
         <column number="1" width="665" context="-1"></column>
         <column number="2" width="17" context="-1"></column>
@@ -954,54 +742,7 @@
 
   <window name="recpriorityprograms">
 
-    <font name="active_font" face="Arial">
-      <color>#ffffff</color>
-      <size>16</size>
-      <size:small>11</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="inactive_font" face="Arial">
-      <color>#9999cc</color>
-      <size>16</size>
-      <size:small>11</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="currenttitle" face="Arial">
-      <color>#ffff33</color>
-      <size>18</size>
-      <size:small>12</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="title" face="Arial">
-      <color>#ffffdd</color>
-      <dropcolor>#000000</dropcolor>
-      <size>27</size>
-      <size:small>13</size:small>
-      <shadow>3,3</shadow>
-      <bold>yes</bold>
-    </font>
-    
-    <font name="subtitle" face="Arial">
-      <color>#ffffff</color>
-      <dropcolor>#000000</dropcolor>
-      <size>20</size>
-      <size:small>17</size:small>
-      <shadow>2,2</shadow>
-      <bold>yes</bold>
-    </font>
-    
-    <font name="info" face="Arial">
-      <color>#ffffff</color>
-      <size>17</size>
-      <size:small>10</size:small>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="tinyinfo" face="Arial">
+    <font name="tinyinfo" base="info">
       <color>#cccccc</color>
       <size>12</size>
       <size:small>8</size:small>
@@ -1009,7 +750,7 @@
       <bold>yes</bold>
     </font>
 
-    <font name="grayinfo" face="Arial">
+    <font name="grayinfo" base="info">
       <color>#cccccc</color>
       <size>17</size>
       <size:small>10</size:small>
@@ -1017,7 +758,7 @@
       <bold>yes</bold>
     </font>
 
-    <font name="yellowinfo" face="Arial">
+    <font name="yellowinfo" base="info">
       <color>#ffff33</color>
       <size>17</size>
       <size:small>10</size:small>
@@ -1025,13 +766,6 @@
       <bold>yes</bold>
     </font>
 
-    <font name="message" face="Arial">
-      <color>#ffffff</color>
-      <size>16</size>
-      <size:small>10</size:small>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
 
     <container name="background">
       <textarea name="sched" draworder="0">
@@ -1055,7 +789,8 @@
       </image>
       <textarea name="keyinstr" align="center" draworder="0">
         <area>0,570,800,30</area>
-        <font>message</font>
+
+        <font>help</font>
         <value>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</value>
       </textarea>
     </container>
@@ -1064,9 +799,9 @@
       <area>0,40,800,300</area>
       <listarea name="recprioritylist" draworder="4">
         <area>20,15,760,280</area>
-        <fcnfont name="active_font" function="active"></fcnfont>
-        <fcnfont name="inactive_font" function="inactive"></fcnfont>
-        <fcnfont name="active_font" function="selected"></fcnfont>
+        <fcnfont name="list-active" function="active"></fcnfont>
+        <fcnfont name="list-inactive" function="inactive"></fcnfont>
+        <fcnfont name="list-selected" function="selected"></fcnfont>
         <columnpadding>1</columnpadding>
         <column number="1" width="35" context="-1"></column>
         <column number="2" width="575" context="-1"></column>
@@ -1208,73 +943,8 @@
 
   <window name="playback">
 
-    <font name="active" face="Arial">
-      <color>#ffffff</color>
-      <size>16</size>
-      <size:small>11</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="inactive" face="Arial">
-      <color>#9999cc</color>
-      <size>16</size>
-      <size:small>11</size:small>
-      <bold>yes</bold>
-    </font>
-
-
-    <font name="record_font" face="Arial">
-      <color>#33ff33</color>
-      <size>16</size>
-      <size:small>11</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="overunderrecfont" face="Arial">
+    <font name="overunderrecfont" base="list-record">
       <color>#ffffAA</color>
-      <size>16</size>
-      <size:small>11</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="currenttitle" face="Arial">
-      <color>#ffff33</color>
-      <size>18</size>
-      <size:small>12</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="title" face="Arial">
-      <color>#ffffdd</color>
-      <dropcolor>#000000</dropcolor>
-      <size>24</size>
-      <size:big>26</size:big>
-      <size:small>14</size:small>
-      <shadow>4,4</shadow>
-      <bold>yes</bold>
-    </font>
-  <font name="subtitle" face="Arial">
-      <color>#ffffee</color>
-      <size>17</size>
-      <size:big>20</size:big>
-      <size:small>13</size:small>
-      <shadow>3,3</shadow>
-      <bold>yes</bold>
-    </font>
-    <font name="info" face="Arial">
-      <color>#ffffff</color>
-      <size>17</size>
-      <size:small>10</size:small>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="message" face="Arial">
-      <color>#ffffff</color>
-      <size>17</size>
-      <size:small>12</size:small>
-      <shadow>3,3</shadow>
-      <bold>yes</bold>
     </font>
 
     <container name="background">
@@ -1284,13 +954,13 @@
       </image>
       <textarea name="messagedel" draworder="0">
         <area>20,15,800,35</area>
-        <font>message</font>
+        <font>info</font>
         <value>Select a recording to permanently erase:</value>
         <context>1</context>
       </textarea>
       <textarea name="messageplay" draworder="0">
         <area>20,15,800,35</area>
-        <font>message</font>
+        <font>info</font>
         <value>Select a recording to watch:</value>
         <context>0</context>
       </textarea>
@@ -1300,9 +970,9 @@
       <area>0,40,800,310</area>
       <listarea name="toptitles" draworder="2">
         <area>30,22,190,105</area>
-        <fcnfont name="active" function="active"></fcnfont>
-        <fcnfont name="active" function="selected"></fcnfont>
-        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <fcnfont name="list-active" function="active"></fcnfont>
+        <fcnfont name="list-selected" function="selected"></fcnfont>
+        <fcnfont name="list-inactive" function="inactive"></fcnfont>
         <items>3</items>
       </listarea>
       <image name="titlelines" draworder="3" fleximage="no">
@@ -1311,25 +981,25 @@
       </image>
       <listarea name="bottomtitles" draworder="2">
         <area>30,172,190,105</area>
-        <fcnfont name="active" function="active"></fcnfont>
-        <fcnfont name="active" function="selected"></fcnfont>
-        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <fcnfont name="list-active" function="active"></fcnfont>
+        <fcnfont name="list-selected" function="selected"></fcnfont>
+        <fcnfont name="list-inactive" function="inactive"></fcnfont>
         <items>3</items>
       </listarea>
       <listarea name="showing" draworder="4">
         <area>240,18,600,265</area>
-        <fcnfont name="record_font" function="recording"></fcnfont>
+        <fcnfont name="list-record" function="recording"></fcnfont>
         <fcnfont name="overunderrecfont" function="overunderrecording"></fcnfont>
-        <fcnfont name="active" function="active"></fcnfont>
-        <fcnfont name="active" function="selected"></fcnfont>
-        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <fcnfont name="list-active" function="active"></fcnfont>
+        <fcnfont name="list-selected" function="selected"></fcnfont>
+        <fcnfont name="list-inactive" function="inactive"></fcnfont>
         <columnpadding>10</columnpadding>
         <column number="1" width="353" context="-1"></column>
         <column number="2" width="55" context="-1"></column>
         <column number="3" width="110" context="0"></column>
         <column number="4" width="110" context="1"></column>
         <items>7</items>
-        <image function="selectionbar" filename="bar.png" location="-20,-13"></image>
+        <image function="selectionbar" filename="bar.png" location="-20,-7"></image>
         <image function="uparrow" filename="uparrow.png" location="743,12"></image>
         <image function="downarrow" filename="downarrow.png" location="743,251"></image>
       </listarea>
@@ -1339,7 +1009,7 @@
       </image>
       <textarea name="current" draworder="6">
         <area>34,131,185,40</area>
-        <font>currenttitle</font>
+        <font>list-selected</font>
       </textarea>
     </container>
 
@@ -1356,7 +1026,7 @@
       <textarea name="description" draworder="6">
         <area>25,50,600,120</area>
         <altarea>25,50,600,120</altarea>
-        <font>info</font>
+        <font>description</font>
         <multiline>yes</multiline>
       </textarea>
     </container>
@@ -1390,7 +1060,7 @@
       <textarea name="description" draworder="6">
         <area>25,140,750,125</area>
         <altarea>25,140,755,125</altarea>
-        <font>info</font>
+        <font>description</font>
         <multiline>yes</multiline>
         <value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
         </textarea>
@@ -1439,7 +1109,7 @@
       <textarea name="subdescr" draworder="6">
         <area>20,70,600,125</area>
         <altarea>20,70,760,125</altarea>
-        <font>info</font>
+        <font>description</font>
         <multiline>yes</multiline>
         <value>%SUBTITLE|"|"
 %%STARS%%DESCRIPTION%</value>
@@ -1494,59 +1164,6 @@
 
   <window name="programfind">
 
-    <font name="active" face="Arial">
-      <color>#ffffff</color>
-      <size>16</size>
-      <size:small>11</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="inactive" face="Arial">
-      <color>#999999</color>
-      <size>16</size>
-      <size:small>11</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="record_font" face="Arial">
-      <color>#33ff33</color>
-      <size>16</size>
-      <size:small>11</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="titleinfo" face="Arial">
-      <color>#ffffff</color>
-      <dropcolor>#000000</dropcolor>
-      <size>18</size>
-      <size:small>12</size:small>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-    
-    <font name="subtitle" face="Arial">
-      <color>#ffffee</color>
-      <size>17</size>
-      <size:small>13</size:small>
-      <shadow>3,3</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="info" face="Arial">
-      <color>#ffffff</color>
-      <size>17</size>
-      <size:small>10</size:small>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="recinfo" face="Arial">
-      <color>#ffff33</color>
-      <size>17</size>
-      <size:small>10</size:small>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
 
     <font name="channel" face="Arial">
       <color>#ffffff</color>
@@ -1567,7 +1184,7 @@
       </image>
       <textarea name="prgrambar" align="center">
         <area>0,570,800,30</area>
-        <font>info</font>
+        <font>help</font>
         <value>(4) Program Guide   **(6) Program Finder **</value>
         <context>1</context>
       </textarea>
@@ -1577,27 +1194,27 @@
       <area>25,260,770,310</area>
       <listarea name="alphabet" draworder="2">
         <area>23,8,65,295</area>
-        <fcnfont name="active" function="active"></fcnfont>
-        <fcnfont name="active" function="selected"></fcnfont>
-        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <fcnfont name="list-active" function="active"></fcnfont>
+        <fcnfont name="list-selected" function="selected"></fcnfont>
+        <fcnfont name="list-inactive" function="inactive"></fcnfont>
         <items>9</items>
         <image function="selectionbar" filename="progfind_sel1.png" location="-14,-9"></image>
       </listarea>
       <listarea name="shows" draworder="2">
         <area>88,8,380,295</area>
-        <fcnfont name="active" function="active"></fcnfont>
-        <fcnfont name="active" function="selected"></fcnfont>
-        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <fcnfont name="list-active" function="active"></fcnfont>
+        <fcnfont name="list-selected" function="selected"></fcnfont>
+        <fcnfont name="list-inactive" function="inactive"></fcnfont>
         <column number="1" width="380" context="-1"></column>
         <items>9</items>
         <image function="selectionbar" filename="progfind_sel2.png" location="-14,-9"></image>
       </listarea>
       <listarea name="times" draworder="2">
         <area>470,8,280,295</area>
-        <fcnfont name="active" function="active"></fcnfont>
-        <fcnfont name="active" function="selected"></fcnfont>
-        <fcnfont name="inactive" function="inactive"></fcnfont>
-        <fcnfont name="record_font" function="recording"></fcnfont>
+        <fcnfont name="list-active" function="active"></fcnfont>
+        <fcnfont name="list-selected" function="selected"></fcnfont>
+        <fcnfont name="list-inactive" function="inactive"></fcnfont>
+        <fcnfont name="list-record" function="recording"></fcnfont>
         <items>9</items>
         <image function="selectionbar" filename="progfind_sel3.png" location="-6,-9"></image>
       </listarea>
@@ -1611,7 +1228,7 @@
       <area>25,25,750,220</area>
       <textarea name="title" draworder="6">
         <area>25,15,515,45</area>
-        <font>titleinfo</font>
+        <font>title</font>
       </textarea>
       <textarea name="subtitle" draworder="6">
         <area>25,48,700,35</area>
@@ -1627,13 +1244,13 @@
       </textarea>
       <textarea name="description" draworder="6">
         <area>25,75,715,90</area>
-        <font>info</font>
+        <font>description</font>
         <multiline>yes</multiline>
         <value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
       </textarea>
       <textarea name="recordingstatus" draworder="6">
         <area>25,180,500,35</area>
-        <font>recinfo</font>
+        <font>recstatus</font>
       </textarea>
     </container>
 
@@ -1641,12 +1258,12 @@
       <area>40,40,750,220</area>
       <textarea name="selectinfo" draworder="6">
         <area>20,20,500,30</area>
-        <font>info</font>
+        <font>help</font>
         <value>Select a letter...</value>
       </textarea>
       <textarea name="pickinfo" draworder="6">
         <area>20,75,720,120</area>
-        <font>info</font>
+        <font>help</font>
         <value>Pick the letter in which the show starts with, then press SELECT or the right arrow</value>
         <multiline>yes</multiline>
       </textarea>
@@ -1656,12 +1273,12 @@
       <area>25,25,750,220</area>
       <textarea name="selectprog" draworder="6">
         <area>20,20,500,30</area>
-        <font>info</font>
+        <font>help</font>
         <value>Select a program...</value>
       </textarea>
       <textarea name="pickprog" draworder="6">
         <area>20,75,720,120</area>
-        <font>info</font>
+        <font>help</font>
         <value>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</value>
         <multiline>yes</multiline>
       </textarea>
@@ -1686,51 +1303,6 @@
 
   <window name="programlist">
 
-    <font name="active_font" face="Arial">
-      <color>#ffffff</color>
-      <size>16</size>
-      <size:small>11</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="inactive_font" face="Arial">
-      <color>#9999cc</color>
-      <size>16</size>
-      <size:small>11</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="record_font" face="Arial">
-      <color>#33ff33</color>
-      <size>16</size>
-      <size:small>11</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="conflict_font" face="Arial">
-      <color>#ffff33</color>
-      <size>16</size>
-      <size:small>11</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="title" face="Arial">
-      <color>#ffffdd</color>
-      <dropcolor>#000000</dropcolor>
-      <size>27</size>
-      <size:small>12</size:small>
-      <shadow>3,3</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="info" face="Arial">
-      <color>#ffffff</color>
-      <size>17</size>
-      <size:small>10</size:small>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
     <font name="yellowinfo" face="Arial">
       <color>#ffff33</color>
       <size>17</size>
@@ -1739,13 +1311,6 @@
       <bold>yes</bold>
     </font>
 
-    <font name="message" face="Arial">
-      <color>#ffffff</color>
-      <size>16</size>
-      <size:small>10</size:small>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
 
     <container name="background">
       <textarea name="sched" draworder="0">
@@ -1771,11 +1336,11 @@
      <area>0,40,800,300</area>
       <listarea name="proglist" draworder="4">
         <area>20,15,760,280</area>
-        <fcnfont name="active_font" function="active"></fcnfont>
-        <fcnfont name="inactive_font" function="inactive"></fcnfont>
-        <fcnfont name="active_font" function="selected"></fcnfont>
-        <fcnfont name="record_font" function="recording"></fcnfont>
-        <fcnfont name="conflict_font" function="conflicting"></fcnfont>
+        <fcnfont name="list-active" function="active"></fcnfont>
+        <fcnfont name="list-inactive" function="inactive"></fcnfont>
+        <fcnfont name="list-selected" function="selected"></fcnfont>
+        <fcnfont name="list-record" function="recording"></fcnfont>
+        <fcnfont name="list-conflict" function="conflicting"></fcnfont>
         <columnpadding>5</columnpadding>
         <column number="1" width="160" context="-1"></column>
         <column number="2" width="120" context="-1"></column>
@@ -1808,7 +1373,7 @@
       </textarea>
       <textarea name="subdescr" draworder="6">
         <area>0,70,720,90</area>
-        <font>info</font>
+        <font>description</font>
         <multiline>yes</multiline>
         <value>%SUBTITLE|"|"
 %%STARS%%DESCRIPTION%</value>
@@ -1819,7 +1384,7 @@
       </textarea>
       <textarea name="programid" draworder="6" align="right">
         <area>530,175,200,30</area>
-        <font>message</font>
+        <font>info</font>
       </textarea>
     </container>
 
@@ -1838,68 +1403,11 @@
 
   <window name="recording_options">
 
-    <font name="active" face="Arial">
-      <color>#ffffff</color>
-      <size>18</size>
-      <size:small>11</size:small>
-      <bold>yes</bold>
-    </font>
-
-    <font name="inactive" face="Arial">
-      <color>#9999cc</color>
-      <size>18</size>
-      <size:small>11</size:small>
-      <bold>yes</bold>
-    </font>
-
-
+    
     <font name="enabled_state_0_font" face="Arial">
       <color>#ffffff</color>
       <size>18</size>
       <size:small>11</size:small>
-      <bold>yes</bold>
-    </font>
-
-
-    <font name="title" face="Arial">
-      <color>#ffffdd</color>
-      <dropcolor>#000000</dropcolor>
-      <size>27</size>
-      <size:small>14</size:small>
-      <shadow>3,3</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="subtitle" face="Arial">
-      <color>#ffffff</color>
-      <dropcolor>#000000</dropcolor>
-      <size>20</size>
-      <size:small>14</size:small>
-      <shadow>3,3</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="info" face="Arial">
-      <color>#ffffff</color>
-      <size>18</size>
-      <size:small>10</size:small>
-      <shadow>2,2</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="infob" face="Arial">
-      <color>#ffffff</color>
-      <size>18</size>
-      <size:small>10</size:small>
-        <shadow>2,2</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="message" face="Arial">
-      <color>#ffffff</color>
-      <size>20</size>
-      <size:small>12</size:small>
-      <shadow>2,2</shadow>
       <bold>yes</bold>
     </font>
 
@@ -1914,10 +1422,10 @@
       <area>0,300,800,300</area>
       <listarea name="menu_list" draworder="4">
         <area>20,15,760,274</area>
-        <fcnfont name="active" function="active"></fcnfont>
-        <fcnfont name="inactive" function="inactive"></fcnfont>
-        <fcnfont name="inactive" function="disabled"></fcnfont>
-        <fcnfont name="active" function="selected"></fcnfont>
+        <fcnfont name="list-active" function="active"></fcnfont>
+        <fcnfont name="list-inactive" function="inactive"></fcnfont>
+        <fcnfont name="list-inactive" function="disabled"></fcnfont>
+        <fcnfont name="list-selected" function="selected"></fcnfont>
         <fcnfont name="enabled_state_0_font" function="enabled_state_0"></fcnfont>
         <columnpadding>1</columnpadding>
         <column number="1" width="745" context="-1"></column>
@@ -1947,7 +1455,7 @@
       </textarea>
       <textarea name="infotime" draworder="6" align="right">
         <area>0,70,120,30</area>
-        <font>infob</font>
+        <font>info</font>
         <value>Airdate:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
@@ -1956,7 +1464,7 @@
       </textarea>
       <textarea name="infochan" draworder="6" align="right">
         <area>0,100,120,30</area>
-        <font>infob</font>
+        <font>info</font>
         <value>Channel:</value>
       </textarea>
       <textarea name="channel" draworder="6">
@@ -1965,12 +1473,12 @@
       </textarea>
       <textarea name="infodesc" draworder="6" align="right">
         <area>0,130,120,30</area>
-        <font>infob</font>
+        <font>info</font>
         <value>Description:</value>
       </textarea>
       <textarea name="description" draworder="6">
         <area>125,130,620,100</area>
-        <font>info</font>
+        <font>description</font>
         <multiline>yes</multiline>
       </textarea>
     </container>
