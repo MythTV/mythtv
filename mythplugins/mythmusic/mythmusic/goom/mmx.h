@@ -70,6 +70,9 @@ mm_support(void)
 	register int rval = 0;
 
 	__asm__ __volatile__ (
+                /* ebx is clobbered by cpuid, but is needed for PIC */
+                "pushl %%ebx\n\t"
+
 		/* See if CPUID instruction is supported ... */
 		/* ... Get copies of EFLAGS into eax and ecx */
 		"pushf\n\t"
@@ -212,9 +215,10 @@ mm_support(void)
 		"movl $0, %0\n\n\t"
 
 		"Return:\n\t"
+                "popl %%ebx\n\t"
 		: "=X" (rval)
 		: /* no input */
-		: "eax", "ebx", "ecx", "edx"
+		: "eax", "ecx", "edx"
 	);
 
 	/* Return */

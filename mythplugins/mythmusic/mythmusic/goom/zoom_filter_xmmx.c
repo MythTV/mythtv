@@ -107,24 +107,24 @@ void zoom_filter_xmmx (int prevX, int prevY,
 			 * post : mm3 & mm4 : coefs for this position
 			 *              mm1 : X vector [0|X]
 			 *
-			 * modif : eax,ebx
+			 * modif : eax,ecx
 			 */
 			__asm__ __volatile__ (
-				"movd %%mm0,%%ebx\n"
+				"movd %%mm0,%%ecx\n"
 				"movq %%mm0,%%mm1\n"
 
-				"andl $15,%%ebx\n"
+				"andl $15,%%ecx\n"
 				"psrlq $32,%%mm1\n"
 
-				"shll $6,%%ebx\n"
+				"shll $6,%%ecx\n"
 				"movd %%mm1,%%eax\n"
 
-				"addl %0,%%ebx\n"
+				"addl %0,%%ecx\n"
 				"andl $15,%%eax\n"
 
-				"movd (%%ebx,%%eax,4),%%mm3\n"
-				/* ::"X"(precalCoef):"eax","ebx"); */
-				::"m"(precalCoef):"eax","ebx");
+				"movd (%%ecx,%%eax,4),%%mm3\n"
+				/* ::"X"(precalCoef):"eax","ecx"); */
+				::"m"(precalCoef):"eax","ecx");
 				
 
 			/*
@@ -153,7 +153,7 @@ void zoom_filter_xmmx (int prevX, int prevY,
 			 * post : mm0 : expix1[position]
 			 *        mm2 : expix1[position+largeur]
 			 *
-			 * modif : eax,ebx
+			 * modif : eax,ecx
 			 */
 			psrld_i2r (PERTEDEC,mm0);
 			psrld_i2r (PERTEDEC,mm1);
@@ -162,23 +162,23 @@ void zoom_filter_xmmx (int prevX, int prevY,
 				/*^*/ "movq %%mm3,%%mm5\n"       /*^*/
 
 				"mull %1\n"
-				"movd %%mm0,%%ebx\n"
+				"movd %%mm0,%%ecx\n"
 				/*^*/ "punpcklbw %%mm5, %%mm3\n" /*^*/
 
-				"addl %%ebx,%%eax\n"
+				"addl %%ecx,%%eax\n"
 				/*^*/ "movq %%mm3,%%mm4\n"       /*^*/
 				/*^*/ "movq %%mm3,%%mm5\n"       /*^*/
 
-				"movl %0,%%ebx\n"
+				"movl %0,%%ecx\n"
 				/*^*/ "punpcklbw %%mm5,%%mm3\n"  /*^*/
 
-				"movq (%%ebx,%%eax,4),%%mm0\n"
+				"movq (%%ecx,%%eax,4),%%mm0\n"
 				/*^*/ "punpckhbw %%mm5,%%mm4\n"  /*^*/
 
 				"addl %1,%%eax\n"
-				"movq (%%ebx,%%eax,4),%%mm2\n"
+				"movq (%%ecx,%%eax,4),%%mm2\n"
 				
-				: : "X"(expix1), "X"(prevX):"eax","ebx"
+				: : "X"(expix1), "X"(prevX):"eax","ecx"
 				);
 
 			/*
