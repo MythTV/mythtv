@@ -35,15 +35,11 @@ void startRecording(TV *tv, ProgramInfo *rec)
     char startt[128];
     char endt[128];
 
-    QDateTime starttime = QDateTime::fromString(rec->starttime, Qt::ISODate);
-    QDateTime endtime = QDateTime::fromString(rec->endtime, Qt::ISODate);
+    QString starts = rec->startts.toString("yyyyMMddhhmm");
+    QString endts = rec->endts.toString("yyyyMMddhhmm");
 
-    sprintf(startt, "%4d%02d%02d%02d%02d00", starttime.date().year(),
-            starttime.date().month(), starttime.date().day(), 
-            starttime.time().hour(), starttime.time().minute());
-    sprintf(endt, "%4d%02d%02d%02d%02d00", endtime.date().year(),
-            endtime.date().month(), endtime.date().day(), 
-            endtime.time().hour(), endtime.time().minute());
+    sprintf(startt, "%s00", starts.ascii());
+    sprintf(endt, "%s00", starts.ascii());
 
     RecordingInfo *tvrec = new RecordingInfo(rec->channum.ascii(),
                                              startt, endt, rec->title.ascii(),
@@ -66,8 +62,7 @@ void *runScheduler(void *dummy)
     ProgramInfo *nextRecording = sched->GetNextRecording();
     QDateTime nextrectime;
     if (nextRecording)
-        nextrectime = QDateTime::fromString(nextRecording->starttime, 
-                                            Qt::ISODate);
+        nextrectime = nextRecording->startts;
     QDateTime curtime = QDateTime::currentDateTime();
     int secsleft = -1;
 
@@ -83,10 +78,7 @@ void *runScheduler(void *dummy)
             }
             nextRecording = sched->GetNextRecording();
             if (nextRecording)
-            {   
-                nextrectime = QDateTime::fromString(nextRecording->starttime,
-                                                    Qt::ISODate);
-            }   
+                nextrectime = nextRecording->startts;
         }
 
         if (nextRecording)
@@ -105,8 +97,7 @@ void *runScheduler(void *dummy)
 
                 if (nextRecording)
                 {
-                   nextrectime = QDateTime::fromString(nextRecording->starttime,
-                                                       Qt::ISODate);
+                   nextrectime = nextRecording->startts;
                    curtime = QDateTime::currentDateTime();
                    secsleft = curtime.secsTo(nextrectime);
                 }

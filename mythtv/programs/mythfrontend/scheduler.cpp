@@ -61,7 +61,7 @@ class comp_proginfo
   public:
     bool operator()(ProgramInfo *a, ProgramInfo *b)
     {
-        return (a->starttime < b->starttime);
+        return (a->startts < b->startts);
     }
 };
 
@@ -90,8 +90,10 @@ bool Scheduler::FillRecordLists(void)
             proginfo->title = query.value(3).toString();
             proginfo->subtitle = query.value(4).toString();
             proginfo->description = query.value(5).toString();
-            proginfo->starttime = query.value(1).toString();
-            proginfo->endtime = query.value(2).toString();
+            proginfo->startts = QDateTime::fromString(query.value(1).toString(),
+                                                      Qt::ISODate);
+            proginfo->endts = QDateTime::fromString(query.value(2).toString(),
+                                                    Qt::ISODate);
             proginfo->channum = query.value(0).toString();
             proginfo->recordtype = 1;
 
@@ -140,8 +142,12 @@ bool Scheduler::FillRecordLists(void)
                     proginfo->title = subquery.value(3).toString();
                     proginfo->subtitle = subquery.value(4).toString();
                     proginfo->description = subquery.value(5).toString();
-                    proginfo->starttime = subquery.value(1).toString();
-                    proginfo->endtime = subquery.value(2).toString();
+                    proginfo->startts = 
+                             QDateTime::fromString(subquery.value(1).toString(),
+                                                   Qt::ISODate);
+                    proginfo->endts = 
+                             QDateTime::fromString(subquery.value(2).toString(),
+                                                   Qt::ISODate);
                     proginfo->channum = subquery.value(0).toString();
                     proginfo->recordtype = 2;
 
@@ -187,8 +193,12 @@ bool Scheduler::FillRecordLists(void)
                     proginfo->title = subquery.value(3).toString();
                     proginfo->subtitle = subquery.value(4).toString();
                     proginfo->description = subquery.value(5).toString();
-                    proginfo->starttime = subquery.value(1).toString();
-                    proginfo->endtime = subquery.value(2).toString();
+                    proginfo->startts = 
+                             QDateTime::fromString(subquery.value(1).toString(),
+                                                   Qt::ISODate);
+                    proginfo->endts = 
+                             QDateTime::fromString(subquery.value(2).toString(),
+                                                   Qt::ISODate);
                     proginfo->channum = subquery.value(0).toString();
                     proginfo->recordtype = 3;
 
@@ -225,15 +235,11 @@ void Scheduler::RemoveFirstRecording(void)
         char startt[128];
         char endt[128];
 
-        QDateTime starttim = QDateTime::fromString(rec->starttime, Qt::ISODate);
-        QDateTime endtime = QDateTime::fromString(rec->endtime, Qt::ISODate);
+        QString starts = rec->startts.toString("yyyyMMddhhmm");
+        QString ends = rec->endts.toString("yyyyMMddhhmm");
     
-        sprintf(startt, "%4d%02d%02d%02d%02d00", starttim.date().year(),
-                starttim.date().month(), starttim.date().day(),
-                starttim.time().hour(), starttim.time().minute());
-        sprintf(endt, "%4d%02d%02d%02d%02d00", endtime.date().year(),
-                endtime.date().month(), endtime.date().day(), 
-                endtime.time().hour(), endtime.time().minute());
+        sprintf(startt, "%s00", starts.ascii());
+        sprintf(endt, "%s00", ends.ascii());
     
         QSqlDatabase *db = QSqlDatabase::database("SUBDB");
         QSqlQuery query;                                          

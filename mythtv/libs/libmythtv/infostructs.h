@@ -37,18 +37,14 @@ class TimeInfo
 class ProgramInfo
 {
   public:
-    QDate *getStartDate(void);
-    QDate *getEndDate(void);
-    QTime *getStartTime(void);
-    QTime *getEndTime(void);
-
     QString title;
     QString subtitle;
     QString description;
     QString category;
-    QString starttime;
-    QString endtime;
     QString channum;
+
+    QDateTime startts;
+    QDateTime endts;
 
     int spread;
     int startCol;

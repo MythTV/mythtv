@@ -128,18 +128,14 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
 
 QLabel *InfoDialog::getDateLabel(ProgramInfo *pginfo)
 {
-    QTime *start = pginfo->getStartTime();
-    QTime *end = pginfo->getEndTime();
-    QDate *thedate = pginfo->getEndDate();
-    
-    QString timedate = thedate->toString("ddd MMMM d") + QString(", ") +
-                       start->toString("h:mm AP") + QString(" - ") +
-                       end->toString("h:mm AP");
-    QLabel *date = new QLabel(timedate, this);
+    QDateTime startts = pginfo->startts;
+    QDateTime endts = pginfo->endts;
 
-    delete start;
-    delete end;
-    delete thedate;
+    QString timedate = endts.date().toString("ddd MMMM d") + QString(", ") +
+                       startts.time().toString("h:mm AP") + QString(" - ") +
+                       endts.time().toString("h:mm AP");
+
+    QLabel *date = new QLabel(timedate, this);
 
     return date;
 }

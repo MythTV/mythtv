@@ -233,24 +233,20 @@ ProgramInfo *GuideGrid::getProgramInfo(unsigned int row, unsigned int col)
         return pginfo;
     }
   
-    char temp[512];
-  
     ProgramInfo *proginfo = new ProgramInfo;
     proginfo->title = "Unknown"; 
-    
     TimeInfo *tinfo = m_timeInfos[col];
-    sprintf(temp, "%4d%02d%02d%02d%02d50", tinfo->year, tinfo->month,
-            tinfo->day, tinfo->hour, tinfo->min); 
-    proginfo->starttime = temp;
-
+    QDateTime ts;
+    ts.setDate(QDate(tinfo->year, tinfo->month, tinfo->day));
+    ts.setTime(QTime(tinfo->hour, tinfo->min));
+    proginfo->startts = ts;
     if (col < 5)
     { 
         tinfo = m_timeInfos[col + 1];
-        sprintf(temp, "%4d%02d%02d%02d%02d50", tinfo->year, tinfo->month,
-                tinfo->day, tinfo->hour, tinfo->min);
+        ts.setDate(QDate(tinfo->year, tinfo->month, tinfo->day));
+        ts.setTime(QTime(tinfo->hour, tinfo->min));
     }
-
-    proginfo->endtime = temp;
+    proginfo->endts = ts;
     proginfo->spread = 1;
     proginfo->startCol = col;
     return proginfo;
@@ -406,14 +402,14 @@ void GuideGrid::paintPrograms(QPainter *p)
         if (!m_channelInfos[y])
             break;
 
-        QString lastprog;
+        QDateTime lastprog;
         int lastxoffset = 0;
         for (int x = 0; x < 5; x++)
         {
             ProgramInfo *pginfo = m_programInfos[y][x];
 
             int spread = 1;
-            if (pginfo->starttime != lastprog)
+            if (pginfo->startts != lastprog)
             {
                 QFontMetrics fm(*m_largerFont);
                 int height = fm.height();
@@ -426,8 +422,7 @@ void GuideGrid::paintPrograms(QPainter *p)
                 {
                     for (int z = x + 1; z < 5; z++)
                     {
-                        if (m_programInfos[y][z]->starttime == 
-                            pginfo->starttime)
+                        if (m_programInfos[y][z]->startts == pginfo->startts)
                             spread++;
                     }
                     pginfo->spread = spread;
@@ -478,7 +473,7 @@ void GuideGrid::paintPrograms(QPainter *p)
                 }
                 lastxoffset = newxoffset;
             }
-            lastprog = pginfo->starttime;
+            lastprog = pginfo->startts;
         }
     }
 
