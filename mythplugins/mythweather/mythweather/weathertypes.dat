@@ -1,0 +1,40 @@
+1,Cloudy,cloudy.png
+3,Mostly Cloudy,mcloudy.png
+4,Partly Cloudy,pcloudy.png
+13,Light Rain,showers.png
+14,Showers,showers.png
+19,AM Showers,showers.png
+20,Fog,fog.png
+21,Few Showers,showers.png
+22,Mostly Sunny,sunny.png
+24,Sunny,sunny.png
+26,AM Clouds/PM Sun,acouldpsun.png
+29,PM Showers,showers.png
+31,Rain/Snow Showers,rainsnow.png
+32,Few Snow Showers,flurries.png
+34,Flurries/Wind,flurries.png
+35,Mostly Cloudy/Windy,mcloudy.png
+37,Partly Cloudy/Windy,pcloudy.png
+41,Showers/Wind,showers.png
+45,Flurries,flurries.png
+55,Sunny/Windy,sunny.png
+67,AM Showers/Wind,showers.png
+77,Snow to Rain,snowshow.png
+84,Snow Showers,snowshow.png
+85,Rain to Snow,rainsnow.png
+86,PM Rain/Snow,snowshow.png
+98,Light Snow,flurries.png
+100,PM Snow,snowshow.png
+103,Light Snow/Wind,flurries.png
+104,Wintry Mix,flurries.png
+108,AM Light Snow,flurries.png
+125,AM Snow Showers,snowshow.png
+132,Snow to Wintry Mix,snowshow.png
+155,PM Snow Shower,snowshow.png
+164,PM Light Rain/Ice,showers.png
+167,AM Snow,snowshow.png
+175,PM Light Snow,flurries.png
+271,Snow Showers/Windy,snowshow.png
+997,Clear,clear.png
+998,A Few Clouds,pcloudy.png
+999,Fair,fair.png

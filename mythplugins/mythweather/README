@@ -1,0 +1,109 @@
+                                   MythWeather
+			           Release 0.8c
+
+BUILD/CONFIGURATION INSTRUCTIONS
+--------------------------------
+
+Requirements:
+	MythTV (v0.8) installed and working
+	Internet Access (to get the weather!)
+
+If you have met the requirements above, simply type 'make' in the main directory
+to begin compiling.
+
+Compiling note:  If you get an error on building this, that says something
+                 about 'mkspecs', then you don't have the QTDIR environment
+                 variable set.  On debian, this should be set to /usr/share/qt.
+                 I hear on mandrake, it's /usr/lib/qt3.  You'll need to figure
+                 out what it should be on your system, set the variable,
+                 and attempt to compile again.
+
+
+Once the make is completed, do a 'make install'.  
+
+- mythweather will go into /usr/local/bin
+- images and weathertype file will be put into the newly created
+  /usr/local/share/mythtv/mythweather directory
+
+The software is now installed, one simple configuration must be made:
+
+1. Connect to your SQL server you already have running for MythTV.
+2. Issue the following commands (be sure to replace the YOUR_ZIPCODE_OR_AREA_ID,
+   see below for more information):
+
+use mythconverg;
+insert into settings (value, data) VALUES ('locale', 'YOUR_ZIPCODE_OR_AREA_ID');
+
+  2A. If you want to default to SI units, do the following, if not, skip to #3:
+      insert into settings (value, data) VALUES ('SIUnits', 'Yes');
+
+3. Exit out of the SQL server
+4. Edit 'mainmenu.xml' in /usr/local/share/mythtv, add the following:
+
+<button>
+     <type>WEATHER</type>
+     <text>Weather</text>
+     <action>EXEC mythweather</action>
+     <depends>mythweather</depends>
+</button>
+
+5. You're done! Enjoy! See below if you have any problems, ideas, concerns...
+
+
+MYTHWEATHER KEYBOARD COMMANDS
+-----------------------------
+   Left Key 		Goes back one page, this also extends the time spent
+			on the page you are at. 
+   Right Key		Goes forward one page, see above.
+   Space		Pause, wait on the current page until space is hit
+			again.
+   Numeric Keys		You can check other weather by keying in other ZIP codes.
+   Enter Key		Switch between celsius and fahrenheit. Can also
+			be used a way to force a data update.
+
+OTHER INFORMATION
+-----------------
+Current the program cycles through the three pages. Each page is 
+shown for 10 seconds. When the user intervens and changes the page
+it waits for 20 seconds. The weather data is updated every 30 minutes
+or until the user selects a new zip code (or even the current zip code
+again).  See below for the todo list!
+
+
+YOUR_ZIPCODE_OR_AREA_ID Information
+-----------------------------------
+In the United States this is simply your zip code.
+It can be an Airport code as well. 
+
+If you're not sure what to put here, goto:
+http://www.msnbc.com/news/wea_front.asp?0wl=w3&tab=oth&ta=y
+And type in your city name, select the city you live in.
+
+   For Example
+   -----------
+   If you live in Paris, France -- you would type in Paris.
+   A list of 15 or so 'Paris' cities come up, select 'Paris, France'
+   Now, in your browser's address bar is:
+   http://www.msnbc.com/news/wea_front.asp?pos=&tab=oth&ta=y& \\
+   czstr=Paris%2C+France&action=&inst=n&accid=FRXX0076
+   Your AREA_ID is   FRXX0076
+
+
+TODO LIST
+---------
+   - Ability to save a new location using MythWeather
+   - Radar Map Page
+   - Finish list of weather types and icons
+   - Get a real graphics person to make the weather icons :)
+
+KNOWN ISSUES
+------------
+I don't have all the weather descriptions and icons. If you see a '?' 
+icon or weather description as 'Unknown [XX]', please email and let
+me know the XX number, the type of weather at www.msnbc.com for that
+day. THANKS!
+
+If you have any questions, you can find me on the #mythtv channel at
+irc.freenode.net (IRC Name: moegreen)
+
+or you can email me: John Danner <johndanner@psu.edu>
