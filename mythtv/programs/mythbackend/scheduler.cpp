@@ -761,8 +761,10 @@ void Scheduler::RunScheduler(void)
         curtime = QDateTime::currentDateTime();
         bool statuschanged = false;
 
-        if (CheckForChanges() ||
-            (lastupdate.date().day() != curtime.date().day()))
+        if ((startIter == reclist.end() ||
+             curtime.secsTo((*startIter)->recstartts) > 30) &&
+            (CheckForChanges() ||
+             (lastupdate.date().day() != curtime.date().day())))
         {
             VERBOSE(VB_GENERAL, "Found changes in the todo list.");
             FillEncoderFreeSpaceCache();
