@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2004-05-25, v0.15.00
+  2004-05-30, v0.15.01
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -1327,6 +1327,9 @@
   For Mandrake, you should see a value like /usr/lib/qt3 for QTDIR and
   /usr/lib/qt3/bin should be in $PATH.
 
+  For Gentoo, you should see a value like /usr/qt/3 for QTDIR and
+  /usr/qt/3/bin should be in $PATH.
+
   If you don't, do not proceed past this step until you have resolved
   this error. You may need to manually specify the QTDIR and PATH at the
   shell prompt before compiling.
@@ -2458,8 +2461,8 @@
        [1mNOTE[22m:  The above example assumes that your receiver uses the
   standard serial driver.  Some receivers do not, including receivers
   that plug into a TV capture card.  Check the lirc documentation, but
-  it may be necessary to replace the link created above with a a
-  character pipe:
+  it may be necessary to replace the link created above with a character
+  pipe:
 
 
        # mknod /dev/lirc c 61 0
@@ -3252,11 +3255,10 @@
   once a day.
 
   There are three ways to accomplish this:  use the built-in capability
-  of MythTV to run the [1mmythfilldatabase [22mprogram (recommended, but only
-  available in CVS), as a user-based cron job, or as a system based
-  cron.  If you use a user-based cron, you can select the time that the
-  cron job will be run.  A system-based cron job will run at the same
-  time as any other system cron jobs.
+  of MythTV to run the [1mmythfilldatabase [22mprogram, as a user-based cron
+  job, or as a system based cron.  If you use a user-based cron, you can
+  select the time that the cron job will be run.  A system-based cron
+  job will run at the same time as any other system cron jobs.
 
 
   [1m9.4.1.1.  Using the built-in method.[0m
@@ -3527,7 +3529,7 @@
   Kerneldeint is a more complex deinterlacing filter which applies a
   filter kernel using input from several lines.  It generally removes
   combing without a "ghost" image, sometimes leaving a faint outline of
-  the the image from the other field. It is considered to be less
+  the image from the other field. It is considered to be less
   distracting to watch than linearblend or no filter at all. It accepts
   one or two integer parameters separated by a colon.
 
@@ -4120,7 +4122,7 @@
 
   The scheduler keeps track of the idle status of the MythTV system. To
   determine whether or not the MythTV system is idle, the following
-  conditions must be met for a a period of time defined in the "Idle
+  conditions must be met for a period of time defined in the "Idle
   timeout (secs)" parameter.
 
   +o  no client is connected to the server
@@ -5360,8 +5362,8 @@
   audio subsystem.
 
   You can not use [1mxawtv [22mto determine if your audio is working correctly,
-  since [1mxawtv [22mis simply using the the analog sound patched through line-
-  in to line-out. It doesn't need to digitize the sound unless you are
+  since [1mxawtv [22mis simply using the analog sound patched through line-in
+  to line-out. It doesn't need to digitize the sound unless you are
   using the recording function.
 
   A better test to verify that sound will work for MythTV (and recording
@@ -5801,7 +5803,7 @@
   should 'fit' regardless of the resolution you choose.
 
   Edit your X configuration file, usually "XF86Config-4", so that the
-  the resolution you want to use is listed first in the lists under
+  resolution you want to use is listed first in the lists under
   "Screen". If this resolution is higher than the resolutions supported
   by your output device, you will see a 'panning' effect where moving
   the mouse to the edge will scroll around a desktop area which is

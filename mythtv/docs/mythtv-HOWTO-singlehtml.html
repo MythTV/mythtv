@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-05-25, v0.15.00
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-05-30, v0.15.01
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1187,6 +1187,8 @@ $ which qmake
 </P>
 <P>For Mandrake, you should see a value like <CODE>/usr/lib/qt3</CODE> for
 <CODE>QTDIR</CODE> and <CODE>/usr/lib/qt3/bin</CODE> should be in $PATH.</P>
+<P>For Gentoo, you should see a value like <CODE>/usr/qt/3</CODE> for <CODE>QTDIR</CODE> 
+and <CODE>/usr/qt/3/bin</CODE> should be in $PATH.</P>
 <P>If you don't, do not proceed past this step until you have resolved this
 error. You may need to manually specify the QTDIR and PATH at the shell
 prompt before compiling.</P>
@@ -2321,7 +2323,7 @@ $
 <CAPTION><B>NOTE</B>:  The above example assumes that your receiver uses the
 standard serial driver.  Some receivers do not, including receivers that
 plug into a TV capture card.  Check the lirc documentation, but it may be
-necessary to replace the link created above with a a character pipe:</CAPTION>
+necessary to replace the link created above with a character pipe:</CAPTION>
 </FIGURE>
 
 <BLOCKQUOTE><CODE>
@@ -3078,11 +3080,10 @@ today (in case of late-breaking changes to the schedule).</P>
 <P>In order to keep your database filled, <B>mythfilldatabase</B> should be
 run once a day.</P>
 <P>There are three ways to accomplish this:  use the built-in capability of
-MythTV to run the <B>mythfilldatabase</B> program (recommended, but only
-available in CVS), as a user-based cron job, or as a system based cron.  If
-you use a user-based cron, you can select the time that the cron job will be
-run.  A system-based cron job will run at the same time as any other system
-cron jobs.</P>
+MythTV to run the <B>mythfilldatabase</B> program, as a user-based cron
+job, or as a system based cron.  If you use a user-based cron, you can
+select the time that the cron job will be run.  A system-based cron job will
+run at the same time as any other system cron jobs.</P>
 
 <H3>Using the built-in method.</H3>
 
@@ -3326,7 +3327,7 @@ playback".</CAPTION>
 <P>o  The "kerneldeint" filter</P>
 <P>Kerneldeint is a more complex deinterlacing filter which applies a filter
 kernel using input from several lines.  It generally removes combing without
-a "ghost" image, sometimes leaving a faint outline of the the image from the
+a "ghost" image, sometimes leaving a faint outline of the image from the
 other field. It is considered to be less distracting to watch than
 linearblend or no filter at all. It accepts one or two integer parameters
 separated by a colon.</P>
@@ -3911,7 +3912,7 @@ that supports BIOS wakeup, and some tools.  Two that work are:
 
 <P>The scheduler keeps track of the idle status of the MythTV system. To
 determine whether or not the MythTV system is idle, the following conditions
-must be met for a a period of time defined in the "Idle timeout (secs)"
+must be met for a period of time defined in the "Idle timeout (secs)"
 parameter.
 <UL>
 <LI>no client is connected to the server</LI>
@@ -5070,7 +5071,7 @@ often appear to hang, when in fact it is trying to manipulate the audio
 subsystem and failing.  You may or may not receive error messages indicating
 that the source of the error is the audio subsystem.</P>
 <P>You can not use <B>xawtv</B> to determine if your audio is working
-correctly, since <B>xawtv</B> is simply using the the analog sound patched
+correctly, since <B>xawtv</B> is simply using the analog sound patched
 through line-in to line-out. It doesn't need to digitize the sound unless
 you are using the recording function.</P>
 <P>A better test to verify that sound will work for MythTV (and recording with
@@ -5475,7 +5476,7 @@ some rare devices support 1024x768. Generally, higher resolutions are
 better. However, you may find that you prefer the picture quality at one of
 the lower resolutions. Everything in MythTV is scalable and should 'fit'
 regardless of the resolution you choose.</P>
-<P>Edit your X configuration file, usually "XF86Config-4", so that the the
+<P>Edit your X configuration file, usually "XF86Config-4", so that the
 resolution you want to use is listed first in the lists under "Screen". If
 this resolution is higher than the resolutions supported by your output
 device, you will see a 'panning' effect where moving the mouse to the edge

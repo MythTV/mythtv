@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2004-05-25, v0.15.00
+<date>2004-05-30, v0.15.01
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -934,6 +934,9 @@ $ which qmake
 
 For Mandrake, you should see a value like <tt>/usr/lib/qt3</tt> for
 <tt>QTDIR</tt> and <tt>/usr/lib/qt3/bin</tt> should be in $PATH.
+
+For Gentoo, you should see a value like <tt>/usr/qt/3</tt> for <tt>QTDIR</tt> 
+and <tt>/usr/qt/3/bin</tt> should be in $PATH.
 
 If you don't, do not proceed past this step until you have resolved this
 error. You may need to manually specify the QTDIR and PATH at the shell
@@ -1955,7 +1958,7 @@ $
 <caption><bf>NOTE</bf>:  The above example assumes that your receiver uses the
 standard serial driver.  Some receivers do not, including receivers that
 plug into a TV capture card.  Check the lirc documentation, but it may be
-necessary to replace the link created above with a a character pipe:
+necessary to replace the link created above with a character pipe:
 </caption>
 </figure>
 <tscreen><verb>
@@ -2666,11 +2669,10 @@ today (in case of late-breaking changes to the schedule).
 run once a day.
 
 There are three ways to accomplish this:  use the built-in capability of
-MythTV to run the <bf>mythfilldatabase</bf> program (recommended, but only
-available in CVS), as a user-based cron job, or as a system based cron.  If
-you use a user-based cron, you can select the time that the cron job will be
-run.  A system-based cron job will run at the same time as any other system
-cron jobs.
+MythTV to run the <bf>mythfilldatabase</bf> program, as a user-based cron
+job, or as a system based cron.  If you use a user-based cron, you can
+select the time that the cron job will be run.  A system-based cron job will
+run at the same time as any other system cron jobs.
 
 <sect3>Using the built-in method.
 <p>To use MythTV's built-in capability, you'll need to run the
@@ -2908,7 +2910,7 @@ o  The "kerneldeint" filter
 
 Kerneldeint is a more complex deinterlacing filter which applies a filter
 kernel using input from several lines.  It generally removes combing without
-a "ghost" image, sometimes leaving a faint outline of the the image from the
+a "ghost" image, sometimes leaving a faint outline of the image from the
 other field. It is considered to be less distracting to watch than
 linearblend or no filter at all. It accepts one or two integer parameters
 separated by a colon.
@@ -3507,7 +3509,7 @@ name="http://www.malloc.de/tools/wakeup_clock.html">
 <sect2>A deeper look into the operation
 <p>The scheduler keeps track of the idle status of the MythTV system. To
 determine whether or not the MythTV system is idle, the following conditions
-must be met for a a period of time defined in the "Idle timeout (secs)"
+must be met for a period of time defined in the "Idle timeout (secs)"
 parameter.
 <itemize>
 <item>no client is connected to the server
@@ -4550,7 +4552,7 @@ subsystem and failing.  You may or may not receive error messages indicating
 that the source of the error is the audio subsystem.
 
 You can not use <bf>xawtv</bf> to determine if your audio is working
-correctly, since <bf>xawtv</bf> is simply using the the analog sound patched
+correctly, since <bf>xawtv</bf> is simply using the analog sound patched
 through line-in to line-out. It doesn't need to digitize the sound unless
 you are using the recording function.
 
@@ -4921,7 +4923,7 @@ better. However, you may find that you prefer the picture quality at one of
 the lower resolutions. Everything in MythTV is scalable and should 'fit'
 regardless of the resolution you choose.
 
-Edit your X configuration file, usually "XF86Config-4", so that the the
+Edit your X configuration file, usually "XF86Config-4", so that the
 resolution you want to use is listed first in the lists under "Screen". If
 this resolution is higher than the resolutions supported by your output
 device, you will see a 'panning' effect where moving the mouse to the edge
@@ -6380,7 +6382,8 @@ removing unwanted DD channels.  Chris Pinkham's save icon thing for MySQL
 v3.  Update rest of gossamer-threads links. Axel Thimms' Fedora update.
 Adjust the MySQL v3 instructions since I wasn't paying attention the first
 time.  Instructions for grabbing icons for DataDirect.
-
+v0.15.01, 2004-05-30  Get rid of a "CVS only" holdover.  Ramon Redondo's
+patch for Gentoo.  Get rid of some doubled doubled words. (Ian Forde)
 -->
 
 <!--
