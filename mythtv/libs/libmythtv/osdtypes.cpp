@@ -8,6 +8,8 @@ using namespace std;
 #include "osdtypes.h"
 #include "ttfont.h"
 
+#include "mythcontext.h"
+
 OSDSet::OSDSet(const QString &name, bool cache, int screenwidth, 
                int screenheight, float wmult, float hmult)
 {
@@ -379,9 +381,22 @@ void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
         m_alpha = NULL;
     }
 
-    QImage tmpimage;
+    QImage tmpimage(filename);
 
-    if (!tmpimage.load(filename))
+    if (tmpimage.width() == 0)
+    {
+        QString url = gContext->GetMasterHostPrefix();
+        if (url.length() < 1)
+            return;
+
+        url += filename;
+
+        QImage *cached = gContext->CacheRemotePixmap(url);
+        if (cached)
+            tmpimage = *cached;
+    }
+
+    if (tmpimage.width() == 0)
         return;
 
     float mult = wmult;

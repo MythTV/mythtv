@@ -239,15 +239,19 @@ QListViewItem *PlaybackBox::FillList(bool selectsomething)
         delete infoList;
     }
 
+    if (!selected && selectsomething && item)
+        selected = item;
+
     if (selected)
     {
         listview->setCurrentItem(selected);
         listview->setSelected(selected, true);
-    }
-    else if (selectsomething && item)
-    {
-        listview->setCurrentItem(item);
-        listview->setSelected(item, true);
+
+        if (selected->itemBelow())
+            listview->ensureItemVisible(selected->itemBelow());
+        if (selected->itemAbove())
+            listview->ensureItemVisible(selected->itemAbove());
+        listview->ensureItemVisible(selected);
     }
 
     lastUpdateTime = QDateTime::currentDateTime();
@@ -423,6 +427,12 @@ void PlaybackBox::changed(QListViewItem *lvitem)
         if (pix.width() > 0)
             pixlabel->setPixmap(pix);
     }
+
+    if (pgitem->itemBelow())
+        listview->ensureItemVisible(pgitem->itemBelow());
+    if (pgitem->itemAbove())
+        listview->ensureItemVisible(pgitem->itemAbove());
+    listview->ensureItemVisible(pgitem);
 
     ignoreevents = false;
 

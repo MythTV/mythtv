@@ -128,25 +128,56 @@ ViewScheduled::ViewScheduled(QSqlDatabase *ldb, QWidget *parent,
 
 void ViewScheduled::FillList(void)
 {
+    QString chanid = "";
+    QDateTime startts;
+
+    QListViewItem *curitem = listview->selectedItem();
+
+    if (curitem)
+    {
+        ProgramListItem *pgitem = (ProgramListItem *)curitem;
+        ProgramInfo *rec = pgitem->getProgramInfo();
+        startts = rec->startts;
+        chanid = rec->chanid;
+    }
+
     listview->clear();
 
     bool conflicts = false;
     vector<ProgramInfo *> recordinglist;
+    ProgramListItem *selected = NULL;
+    ProgramListItem *item = NULL;
 
     conflicts = RemoteGetAllPendingRecordings(recordinglist);
 
     vector<ProgramInfo *>::reverse_iterator pgiter = recordinglist.rbegin();
 
     for (; pgiter != recordinglist.rend(); pgiter++)
-        new ProgramListItem(listview, (*pgiter), 2);
+    {
+        item = new ProgramListItem(listview, (*pgiter), 2);
+        if (startts == (*pgiter)->startts && chanid == (*pgiter)->chanid)
+            selected = item;
+    }
 
     if (conflicts)
         desclabel->setText("You have time conflicts.");
     else
         desclabel->setText("You have no recording conflicts.");
 
-    listview->setCurrentItem(listview->firstChild());
-    listview->setSelected(listview->firstChild(), true);
+    if (!selected)
+        selected = item;
+
+    if (selected)
+    {
+        listview->setCurrentItem(selected);
+        listview->setSelected(selected, true);
+
+        if (selected->itemBelow())
+            listview->ensureItemVisible(selected->itemBelow());
+        if (selected->itemAbove())
+            listview->ensureItemVisible(selected->itemAbove());
+        listview->ensureItemVisible(selected);
+    }
 }
 
 void ViewScheduled::changed(QListViewItem *lvitem)
@@ -199,6 +230,12 @@ void ViewScheduled::changed(QListViewItem *lvitem)
 
     description->setMinimumWidth(minwidth);
     description->setMaximumWidth(minwidth);
+
+    if (pgitem->itemBelow())
+        listview->ensureItemVisible(pgitem->itemBelow());
+    if (pgitem->itemAbove())
+        listview->ensureItemVisible(pgitem->itemAbove());
+    listview->ensureItemVisible(pgitem);
 }
 
 void ViewScheduled::selected(QListViewItem *lvitem)
