@@ -432,7 +432,7 @@ void Channel::SwitchToInput(int newcapchannel, bool setstarting)
     {
         if (ioctl(videofd, VIDIOC_S_INPUT, &newcapchannel) < 0)
             perror("VIDIOC_S_INPUT");
-    
+   
         if (ioctl(videofd, VIDIOC_S_STD, &videomode) < 0)
             perror("VIDIOC_S_STD");
     }

@@ -186,6 +186,7 @@ CREATE TABLE IF NOT EXISTS people
     PRIMARY KEY (person),
     KEY name (name(20))
 ) TYPE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS credits
 (
     person MEDIUMINT(8) UNSIGNED NOT NULL default '0',
@@ -197,6 +198,12 @@ CREATE TABLE IF NOT EXISTS credits
 ) TYPE=MyISAM;
 
 
+CREATE TABLE IF NOT EXISTS transcoding (
+    chanid INT NOT NULL,
+    starttime TIMESTAMP,
+    isdone INT UNSIGNED NOT NULL DEFAULT 0
+);
+
 INSERT INTO recordingprofiles (name) VALUES ('Default');
 INSERT INTO recordingprofiles (name) VALUES ('Live TV');
-
+INSERT INTO recordingprofiles (name) VALUES ('Transcode');

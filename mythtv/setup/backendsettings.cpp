@@ -200,6 +200,19 @@ public:
     };
 };
 
+class MaxTranscoders: public SliderSetting, public BackendHostSetting {
+public:
+    MaxTranscoders():
+        SliderSetting(0, 10, 1),
+        BackendHostSetting("MaxTranscoders") {
+        setLabel("Number of simultaneous transcoders");
+        setValue(0);
+        setHelpText("Maximum number of transcoders that can run "
+                    "simultaneously.  Set to 0 to disable automatic "
+                    "transcoding.");
+        };
+};
+
 class TimeOffset: public ComboBoxSetting, public BackendSetting {
 public:
     TimeOffset():
@@ -252,6 +265,7 @@ BackendSettings::BackendSettings() {
     group1->addChild(new LiveBufferPrefix());
     group1->addChild(new BufferSize());
     group1->addChild(new MaxBufferFill());
+    group1->addChild(new MaxTranscoders());
     addChild(group1);
 
     VerticalConfigurationGroup* group2 = new VerticalConfigurationGroup(false);

@@ -18,10 +18,19 @@ CREATE TABLE IF NOT EXISTS credits
     KEY person (person, role)
 ) TYPE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS transcoding (
+    chanid INT NOT NULL,
+    starttime TIMESTAMP,
+    isdone INT UNSIGNED NOT NULL DEFAULT 0
+);
+
 ALTER TABLE program ADD COLUMN previouslyshown TINYINT NOT NULL default '0';
 
 ALTER TABLE videosource ADD COLUMN userid VARCHAR(128) NOT NULL default '';
 
 CREATE INDEX progid ON record (chanid, starttime);
 CREATE INDEX title ON record (title(10)); 
-CREATE INDEX title ON program (title(10));   
+CREATE INDEX title ON program (title(10));
+
+INSERT INTO recordingprofiles (name) VALUES ('Transcode');
+  

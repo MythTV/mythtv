@@ -150,7 +150,12 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
         vbuffer[i] = NULL;
 
     for (int i = 0; i <= MAXTBUFFER; i++)
-        tbuffer[i] = NULL;
+    {
+        txtbuffers[i].len = 0;
+        txtbuffers[i].timecode = 0;
+        txtbuffers[i].type = 0;
+        txtbuffers[i].buffer = NULL;
+    }
 
     own_vidbufs = false;
 
@@ -189,8 +194,8 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
 
     for (int i = 0; i < MAXTBUFFER; i++)
     {
-        if (tbuffer[i])
-            delete [] tbuffer[i];
+        if (txtbuffers[i].buffer)
+            delete [] txtbuffers[i].buffer;
     }
 
     if (decoder)
@@ -777,11 +782,15 @@ void NuppelVideoPlayer::AddTextData(char *buffer, int len,
             return;
         }
 
-        memcpy(tbuffer[wtxt], buffer, len);
-        txttimecodes[wtxt] = timecode;
-        txttype[wtxt] = type;
-        txtlen[wtxt] = len;  
- 
+        if (len > text_size)
+            len = text_size;
+
+        txtbuffers[wtxt].timecode = timecode;
+        txtbuffers[wtxt].type = type;
+        txtbuffers[wtxt].len = len;
+        memset(txtbuffers[wtxt].buffer, 0, text_size);
+        memcpy(txtbuffers[wtxt].buffer, buffer, len);
+
         pthread_mutex_lock(&text_buflock);
         wtxt = (wtxt+1) % MAXTBUFFER;
         pthread_mutex_unlock(&text_buflock);
@@ -972,10 +981,10 @@ void NuppelVideoPlayer::ToggleCC(void)
 void NuppelVideoPlayer::ShowText(void)
 {
     // check if subtitles need to be updated on the OSD
-    if (tbuffer_numvalid() && txttimecodes[rtxt] && 
-        (txttimecodes[rtxt] <= timecodes[rpos]))
+    if (tbuffer_numvalid() && txtbuffers[rtxt].timecode && 
+        (txtbuffers[rtxt].timecode <= timecodes[rpos]))
     {
-        if (txttype[rtxt] == 'T')
+        if (txtbuffers[rtxt].type == 'T')
         {
             // display full page of teletext
             //
@@ -984,7 +993,7 @@ void NuppelVideoPlayer::ShowText(void)
             // is handled by the broadcaster:
             // the pages are then very often transmitted (sometimes as often as
             // every 2 frames) with small differences between them
-            unsigned char *inpos = tbuffer[rtxt];
+            unsigned char *inpos = txtbuffers[rtxt].buffer;
             int pagenr;
             memcpy(&pagenr, inpos, sizeof(int));
             inpos += sizeof(int);
@@ -1005,10 +1014,10 @@ void NuppelVideoPlayer::ShowText(void)
                 }
             }
         }
-        else if (txttype[rtxt] == 'C')
+        else if (txtbuffers[rtxt].type == 'C')
         {
             int j;
-            unsigned char *inpos = tbuffer[rtxt];
+            unsigned char *inpos = txtbuffers[rtxt].buffer;
             struct ccsubtitle subtitle;
 
             memcpy(&subtitle, inpos, sizeof(subtitle));
@@ -1582,7 +1591,7 @@ void NuppelVideoPlayer::StartPlaying(void)
     }
 
     for (int i = 0; i < MAXTBUFFER; i++)
-        tbuffer[i] = new unsigned char[text_size];
+        txtbuffers[i].buffer = new unsigned char[text_size];
 
     wpos = 0;
     ClearAfterSeek();
@@ -1907,7 +1916,7 @@ void NuppelVideoPlayer::ClearAfterSeek(void)
 
     for (int i = 0; i < MAXTBUFFER; i++)
     {
-        txttimecodes[i] = 0;
+        txtbuffers[i].timecode = 0;
     }
     wtxt = 0;
     rtxt = 0;
@@ -2560,7 +2569,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
         vbuffer[i] = new unsigned char[video_size];
 
     for (int i = 0; i < MAXTBUFFER; i++)
-        tbuffer[i] = new unsigned char[text_size];
+        txtbuffers[i].buffer = new unsigned char[text_size];
 
     wpos = 0;
     ClearAfterSeek();
@@ -2695,7 +2704,7 @@ bool NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
         vbuffer[i] = new unsigned char[video_size];
 
     for (int i = 0; i < MAXTBUFFER; i++)
-        tbuffer[i] = new unsigned char[text_size];
+        txtbuffers[i].buffer = new unsigned char[text_size];
 
     wpos = 0;
     ClearAfterSeek();
@@ -2749,14 +2758,15 @@ bool NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
             while (tbuffer_numvalid()) 
             {
                 int pagenr = 0; 
-                unsigned char *inpos = tbuffer[rtxt];
-                if (txttype[rtxt] == 'T') 
+                unsigned char *inpos = txtbuffers[rtxt].buffer;
+                if (txtbuffers[rtxt].type == 'T') 
                 {
                     memcpy(&pagenr, inpos, sizeof(int));
                     inpos += sizeof(int);
-                    txtlen[rtxt] -= sizeof(int);
+                    txtbuffers[rtxt].len -= sizeof(int);
                 }
-                nvr->WriteText(inpos, txtlen[rtxt], txttimecodes[rtxt], pagenr);
+                nvr->WriteText(inpos, txtbuffers[rtxt].len, 
+                               txtbuffers[rtxt].timecode, pagenr);
                 rtxt = (rtxt + 1) % MAXTBUFFER;
             }
 
@@ -2802,7 +2812,7 @@ int NuppelVideoPlayer::FlagCommercials(int show_percentage)
         vbuffer[i] = new unsigned char[video_size];
 
     for (int i = 0; i < MAXTBUFFER; i++)
-        tbuffer[i] = new unsigned char[text_size];
+        txtbuffers[i].buffer = new unsigned char[text_size];
 
     wpos = 0;
     ClearAfterSeek();

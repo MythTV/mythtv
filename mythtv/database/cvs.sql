@@ -1,5 +1,13 @@
 USE mythconverg;
 
+INSERT INTO recordingprofiles (name) VALUES ('Transcode');
+
+CREATE TABLE IF NOT EXISTS transcoding (
+    chanid INT NOT NULL,
+    starttime TIMESTAMP,
+    isdone INT UNSIGNED NOT NULL DEFAULT 0
+);
+
 CREATE TABLE IF NOT EXISTS people
 (
     person MEDIUMINT(8) UNSIGNED NOT NULL AUTO_INCREMENT,

@@ -28,6 +28,14 @@ class QSqlDatabase;
 class ProgramInfo;
 class DecoderBase;
 
+struct TextContainer
+{
+    int timecode;
+    char type;
+    int len;
+    unsigned char *buffer;
+};
+
 class NuppelVideoPlayer
 {
  public:
@@ -260,10 +268,7 @@ class NuppelVideoPlayer
     /* Text circular buffer */
     int wtxt;          /* next slot to write */
     int rtxt;          /* next slot to read */
-    int txttimecodes[MAXTBUFFER];      /* timecode for each slot */
-    char txttype[MAXTBUFFER];  /* texttype for each slot */
-    int txtlen[MAXTBUFFER];  /* size of tbuffer for each slot */
-    unsigned char *tbuffer[MAXTBUFFER+1];      /* decoded subtitles */
+    struct TextContainer txtbuffers[MAXTBUFFER+1];
 
     pthread_mutex_t audio_buflock; /* adjustments to audiotimecode, waud, and
                                       raud can only be made while holding this
