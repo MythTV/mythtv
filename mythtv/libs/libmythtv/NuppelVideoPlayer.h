@@ -143,6 +143,7 @@ class NuppelVideoPlayer
                       long long timecode);
     void AddTextData(char *buffer, int len, long long timecode, char type);
     void SetEof(void) { eof = 1; }
+    int GetEof(void) { return eof; }
     void SetFramesPlayed(long long played) { framesPlayed = played; }
 
  protected:

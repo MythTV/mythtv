@@ -784,7 +784,11 @@ void NuppelDecoder::WriteStoredData(RingBuffer *rb, bool storevid)
     }
 }
 
-void NuppelDecoder::GetFrame(int onlyvideo)
+// avignore = 0  : get audio and video
+//          = 1  : video only
+//          = -1 : neither, just parse
+
+void NuppelDecoder::GetFrame(int avignore)
 {
     bool gotvideo = false;
     bool ret = false;
@@ -879,6 +883,12 @@ void NuppelDecoder::GetFrame(int onlyvideo)
 
         if (frameheader.frametype == 'V')
         {
+            if (avignore == -1)
+            {
+                framesPlayed++;
+                continue;
+            }
+
             unsigned char *buf = m_parent->GetNextVideoFrame();
 
             ret = DecodeFrame(&frameheader, strm, buf);
@@ -913,7 +923,7 @@ void NuppelDecoder::GetFrame(int onlyvideo)
             continue;
         }
 
-        if (frameheader.frametype=='A' && !onlyvideo)
+        if (frameheader.frametype=='A' && avignore == 0)
         {
             if (frameheader.comptype=='3')
             {
@@ -952,7 +962,7 @@ void NuppelDecoder::GetFrame(int onlyvideo)
             }
         }
 
-        if (frameheader.frametype == 'T')
+        if (frameheader.frametype == 'T' && avignore >= 0)
         {
             if (getrawframes)
                 StoreRawData(strm);
@@ -1066,51 +1076,35 @@ bool NuppelDecoder::DoRewind(long long desiredFrame)
     if (mpa_codec)
         avcodec_flush_buffers(mpa_ctx);
 
-    while (normalframes > 0)
+    // disbale frame storage
+    int oldrawstate = getrawframes;
+    getrawframes = 0;
+
+    while (normalframes > 0 && !fileend)
     {
-        fileend = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader,
-                                                       FRAMEHEADERSIZE));
-
-        if (fileend)
-            continue;
-        if (frameheader.frametype == 'R')
-            continue;
-
-        if (frameheader.frametype == 'S')
+        if (normalframes != 1)
+            GetFrame(1);
+        else
         {
-            if (frameheader.comptype == 'A')
-            {
-                if (frameheader.timecode > 0)
-                {
-                    effdsp = frameheader.timecode;
-                    m_parent->SetEffDsp(effdsp);
-                }
-            }
+            getrawframes = oldrawstate;
+            GetFrame(0);
         }
 
-        fileend = (ringBuffer->Read(strm, frameheader.packetlength) !=
-                                    frameheader.packetlength);
-
-        if (fileend)
-            continue;
-        if (frameheader.frametype == 'V')
-        {
-            normalframes--;
-
-            unsigned char *buf = m_parent->GetNextVideoFrame();
-            DecodeFrame(&frameheader, strm, buf);
-            m_parent->ReleaseNextVideoFrame(buf, frameheader.timecode);
-
-            framesPlayed++;
-        }
+        fileend = m_parent->GetEof();
+        normalframes--;
     }
 
-    m_parent->SetFramesPlayed(framesPlayed);
+    getrawframes = oldrawstate;
+
     return true;
 }
 
 bool NuppelDecoder::DoFastForward(long long desiredFrame)
 {
+    // disable frame storage
+    int oldrawstate = getrawframes;
+    getrawframes = 0;
+
     long long number = desiredFrame - framesPlayed;
     long long desiredKey = lastKey;
     int lastKeyIndex = GetKeyIndex(lastKey);
@@ -1186,40 +1180,9 @@ bool NuppelDecoder::DoFastForward(long long desiredFrame)
     {
         while (lastKey < desiredKey && !fileend)
         {
+            GetFrame(-1);
             needflush = true;
-            fileend = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader,
-                                                       FRAMEHEADERSIZE));
-
-
-            if (frameheader.frametype == 'S')
-            {
-                if (frameheader.comptype == 'V')
-                {
-                    lastKey = frameheader.timecode;
-                    if (!hasFullPositionMap)
-                        (*positionMap)[lastKey / keyframedist] =
-                                             ringBuffer->GetTotalReadPosition();
-                    framesPlayed = lastKey - 1;
-                }
-                else if (frameheader.comptype == 'A')
-                {
-                    if (frameheader.timecode > 0)
-                    {
-                        effdsp = frameheader.timecode;
-                        m_parent->SetEffDsp(effdsp);
-                    }
-                }
-            }
-            else if (frameheader.frametype == 'V')
-            {
-                framesPlayed++;
-            }
-
-            if (frameheader.frametype != 'R' && frameheader.packetlength > 0)
-            {
-                fileend = (ringBuffer->Read(strm, frameheader.packetlength) !=
-                           frameheader.packetlength);
-            }
+            fileend = m_parent->GetEof();
         }
     }
 
@@ -1233,43 +1196,19 @@ bool NuppelDecoder::DoFastForward(long long desiredFrame)
 
     while (normalframes > 0 && !fileend)
     {
-        fileend = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader,
-                                                       FRAMEHEADERSIZE));
-
-        if (fileend)
-            continue;
-        if (frameheader.frametype == 'R')
-            continue;
-        else if (frameheader.frametype == 'S')
+        if (normalframes != 1)
+            GetFrame(1);
+        else
         {
-            if (frameheader.comptype == 'A')
-            {
-                if (frameheader.timecode > 0)
-                {
-                    effdsp = frameheader.timecode;
-                    m_parent->SetEffDsp(effdsp);
-                }
-            }
+            getrawframes = oldrawstate;
+            GetFrame(false);
         }
-
-        fileend = (ringBuffer->Read(strm, frameheader.packetlength) !=
-                                    frameheader.packetlength);
-
-        if (fileend)
-            continue;
-        if (frameheader.frametype == 'V')
-        {
-            normalframes--;
-
-            unsigned char *buf = m_parent->GetNextVideoFrame();
-            DecodeFrame(&frameheader, strm, buf);
-            m_parent->ReleaseNextVideoFrame(buf, frameheader.timecode);
-
-            framesPlayed++;
-        }
+        fileend = m_parent->GetEof();
+        normalframes--;
     }
 
-    m_parent->SetFramesPlayed(framesPlayed);
+    getrawframes = oldrawstate;
+
     return true;
 }
 
