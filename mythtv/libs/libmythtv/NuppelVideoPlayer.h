@@ -175,7 +175,7 @@ class NuppelVideoPlayer
     void ReinitVideo(void);
     void ReinitAudio(void);
 
-    void ToggleLetterbox(void);
+    void ToggleLetterbox(int letterboxMode = -1);
     void Zoom(int direction);
     int GetLetterbox(void);
 

@@ -121,7 +121,7 @@ class TV : public QObject
 
     void ChangeVolume(bool up);
     void ToggleMute(void);
-    void ToggleLetterbox(void);
+    void ToggleLetterbox(int letterboxMode = -1);
     void ChangeContrast(bool up, bool recorder);
     void ChangeBrightness(bool up, bool recorder);
     void ChangeColour(bool up, bool recorder);
@@ -154,6 +154,9 @@ class TV : public QObject
     void DoEditMode(void);
 
     void DoQueueTranscode(void);  
+
+    void SetAutoCommercialSkip(int skipMode = 0);
+    void SetManualZoom(bool zoomON = false);
  
     void ToggleOSD(void); 
     void UpdateOSD(void);
@@ -177,6 +180,8 @@ class TV : public QObject
     void ToggleActiveWindow(void);
     void SwapPIP(void);
 
+    void ToggleAutoExpire(void);
+
     void BrowseStart(void);
     void BrowseEnd(bool change);
     void BrowseDispInfo(int direction);
@@ -186,9 +191,6 @@ class TV : public QObject
     void DoTogglePictureAttribute(void);
     void DoToggleRecPictureAttribute(void);
     void DoChangePictureAttribute(int control, bool up, bool rec);
-
-    void DoProgramMenu(void);
-    void ProgramMenuAction(int result);
 
     void BuildOSDTreeMenu(void);
     void ShowOSDTreeMenu(void);

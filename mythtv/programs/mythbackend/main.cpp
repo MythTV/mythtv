@@ -242,6 +242,11 @@ int main(int argc, char **argv)
                             print_verbose_messages |= VB_NETWORK;
                             verboseString += " " + *it;
                         }
+                        else if(!strcmp(*it,"commflag"))
+                        {
+                            print_verbose_messages |= VB_COMMFLAG;
+                            verboseString += " " + *it;
+                        }
                         else
                         {
                             cerr << "Unknown argument for -v/--verbose: "
@@ -286,7 +291,7 @@ int main(int argc, char **argv)
                     "-v or --verbose debug-level    Prints more information" << endl <<
                     "                               Accepts any combination (separated by comma)" << endl << 
                     "                               of all,none,quiet,record,playback," << endl <<
-                    "                               channel,osd,file,schedule,network" << endl <<
+                    "                               channel,osd,file,schedule,network,commflag" << endl <<
                     "--printexpire                  List of auto-expire programs" << endl <<
                     "--printsched                   Upcoming scheduled programs" << endl <<
                     "--version                      Version information" << endl;

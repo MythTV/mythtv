@@ -257,6 +257,16 @@ public:
             while (query.next())
                 addSelection(query.value(0).toString(),
                              query.value(0).toString());
+
+        thequery = QString("SELECT DISTINCT recgroup from record "
+                           "WHERE recgroup <> '%1'")
+                           .arg(QString("Default"));
+        query = m_db->exec(thequery);
+
+        if (query.isActive() && query.numRowsAffected() > 0)
+            while (query.next())
+                addSelection(query.value(0).toString(),
+                             query.value(0).toString());
     };
 };
 

@@ -254,10 +254,16 @@ int main(int argc, char *argv[])
     QString starttime;
     time_t time_now;
     int all_recorded = 0;
+    QString verboseString = QString(" important general");
+
+    QFileInfo finfo(a.argv()[0]);
+
+    QString binname = finfo.baseName();
 
     while (argpos < a.argc())
     {
-        if (!strcmp(a.argv()[argpos], "--chanid"))
+        if (!strcmp(a.argv()[argpos],"-c") ||
+            !strcmp(a.argv()[argpos],"--chanid"))
         {
             if (((argpos + 1) >= a.argc()) ||
                 !strncmp(a.argv()[argpos + 1], "--", 2))
@@ -268,7 +274,8 @@ int main(int argc, char *argv[])
             
             chanid += a.argv()[++argpos];
         }
-        else if (!strcmp(a.argv()[argpos], "--starttime"))
+        else if (!strcmp(a.argv()[argpos],"-s") ||
+                 !strcmp(a.argv()[argpos],"--starttime"))
         {
             if (((argpos + 1) >= a.argc()) ||
                 !strncmp(a.argv()[argpos + 1], "--", 2))
@@ -279,7 +286,8 @@ int main(int argc, char *argv[])
             
             starttime += a.argv()[++argpos];
         }
-        else if (!strcmp(a.argv()[argpos], "--file"))
+        else if (!strcmp(a.argv()[argpos],"-f") ||
+                 !strcmp(a.argv()[argpos],"--file"))
         {
             QDir fullfile(a.argv()[++argpos]);
 
@@ -332,58 +340,125 @@ int main(int argc, char *argv[])
         {
             be_nice = false;
         }
-        else if (!strcmp(a.argv()[argpos], "--help"))
+        else if (!strcmp(a.argv()[argpos],"-v") ||
+                 !strcmp(a.argv()[argpos],"--verbose"))
         {
-            cout << "usage:\n";
-            cout << "--chanid <chanid>\n";
-            cout << "   Run Commercial Flagging routine only for recordings\n";
-            cout << "   from given channel ID.\n";
-            cout << "\n";
-            cout << "--starttime <starttime>\n";
-            cout << "   Run Commercial Flagging routine only for recordings\n";
-            cout << "   starting at starttime.\n";
-            cout << "\n";
-            cout << "--file <filename>\n";
-            cout << "   Run Commercial Flagging for specified file.\n";
-            cout << "\n";
-            cout << "--sleep\n";
-            cout << "   Give up some cpu time after processing each frame.\n";
-            cout << "\n";
-            cout << "--quiet\n";
-            cout << "   Turn OFF display (also causes the program to sleep\n";
-            cout << "   a little every frame so it doesn't hog cpu)\n";
-            cout << "   (takes precedence over --blanks if specified first)\n";
-            cout << "\n";
-            cout << "--blanks\n";
-            cout << "   Show list of blank frames if already in database\n";
-            cout << "   (takes precedence over --quiet if specified first)\n";
-            cout << "\n";
-            cout << "--fps <fps>\n";
-            cout << "   Set the Frames Per Second.  Only necessary when\n";
-            cout << "   running with the '--blanks' option since all other\n";
-            cout << "   processing modes get the frame rate from the player.\n";
-            cout << "\n";
-            cout << "--all\n";
-            cout << "   Re-run commercial flagging for all recorded\n";
-            cout << "   programs using current detection method.\n";
-            cout << "\n";
-            cout << "--force\n";
-            cout << "   Force flagging of a video even if mythcommflag\n";
-            cout << "   thinks it is already in use by another instance.\n";
-            cout << "\n";
-            cout << "--hogcpu\n";
-            cout << "   Do not nice the flagging process.\n";
-            cout << "   WARNING: This will consume all free cpu time.\n";
-            cout << "\n";
-            cout << "--help\n";
-            cout << "   This text\n";
-            cout << "\n";
-            cout << "Note: both --chanid and --starttime must be used together\n";
-            cout << "      if either is used.\n";
-            cout << "\n";
-            cout << "If no command line arguments are specified, all\n";
-            cout << "unflagged videos will be flagged.\n";
-            cout << "\n";
+            if (a.argc() > argpos)
+            {
+                QString temp = a.argv()[argpos+1];
+                if (temp.startsWith("-"))
+                {
+                    cerr << "Invalid or missing argument to -v/--verbose option\n";
+                    return -1;
+                } else
+                {
+                    QStringList verboseOpts;
+                    verboseOpts = QStringList::split(',',a.argv()[argpos+1]);
+                    ++argpos;
+                    for (QStringList::Iterator it = verboseOpts.begin(); 
+                         it != verboseOpts.end(); ++it )
+                    {
+                        if(!strcmp(*it,"none"))
+                        {
+                            print_verbose_messages = VB_NONE;
+                            verboseString = "";
+                        }
+                        else if(!strcmp(*it,"all"))
+                        {
+                            print_verbose_messages = VB_ALL;
+                            verboseString = "all";
+                        }
+                        else if(!strcmp(*it,"quiet"))
+                        {
+                            print_verbose_messages = VB_IMPORTANT;
+                            verboseString = "important";
+                        }
+                        else if(!strcmp(*it,"record"))
+                        {
+                            print_verbose_messages |= VB_RECORD;
+                            verboseString += " " + *it;
+                        }
+                        else if(!strcmp(*it,"playback"))
+                        {
+                            print_verbose_messages |= VB_PLAYBACK;
+                            verboseString += " " + *it;
+                        }
+                        else if(!strcmp(*it,"channel"))
+                        {
+                            print_verbose_messages |= VB_CHANNEL;
+                            verboseString += " " + *it;
+                        }
+                        else if(!strcmp(*it,"osd"))
+                        {
+                            print_verbose_messages |= VB_OSD;
+                            verboseString += " " + *it;
+                        }
+                        else if(!strcmp(*it,"file"))
+                        {
+                            print_verbose_messages |= VB_FILE;
+                            verboseString += " " + *it;
+                        }
+                        else if(!strcmp(*it,"schedule"))
+                        {
+                            print_verbose_messages |= VB_SCHEDULE;
+                            verboseString += " " + *it;
+                        }
+                        else if(!strcmp(*it,"network"))
+                        {
+                            print_verbose_messages |= VB_NETWORK;
+                            verboseString += " " + *it;
+                        }
+                        else if(!strcmp(*it,"commflag"))
+                        {
+                            print_verbose_messages |= VB_COMMFLAG;
+                            verboseString += " " + *it;
+                        }
+                        else
+                        {
+                            cerr << "Unknown argument for -v/--verbose: "
+                                 << *it << endl;;
+                        }
+                    }
+                }
+            } else
+            {
+                cerr << "Missing argument to -v/--verbose option\n";
+                return -1;
+            }
+        }
+        else if (!strcmp(a.argv()[argpos],"-h") ||
+                 !strcmp(a.argv()[argpos],"--help"))
+        {
+            cerr << "Valid Options are:" << endl <<
+                    "-c OR --chanid chanid        Flag recording with given channel ID" << endl <<
+                    "-s OR --starttime starttime  Flag recording with given starttime" << endl <<
+                    "-f OR --file filename        Flag recording with specific filename" << endl <<
+                    "--sleep                      Give up some cpu time after processing" << endl <<
+                    "                             each frame." << endl <<
+                    "-v OR --verbose debug-level  Prints more information" << endl <<
+                    "                             Accepts any combination (separated by comma)" << endl << 
+                    "                             of all,none,quiet,record,playback," << endl <<
+                    "                             channel,osd,file,schedule,network,commflag" << endl <<
+                    "--quiet                      Turn OFF display (also causes the program to" << endl <<
+                    "                             sleep a little every frame so it doesn't hog cpu)" << endl <<
+                    "                             (takes precedence over --blanks if given first)" << endl <<
+                    "--blanks                     Show list of blank frames if already in database" << endl <<
+                    "                             (takes precedence over --quiet if given first)" << endl <<
+                    "--fps fps                    Set the Frames Per Second.  Only necessary when" << endl <<
+                    "                             running with the '--blanks' option since all" << endl <<
+                    "                             other processing modes get the frame rate from" << endl <<
+                    "                             the player." << endl <<
+                    "--all                        Re-run commercial flagging for all recorded" << endl <<
+                    "                             programs using current detection method." << endl <<
+                    "--force                      Force flagging of a video even if mythcommflag" << endl <<
+                    "                             thinks it is already in use by another instance." << endl <<
+                    "--hogcpu                     Do not nice the flagging process." << endl <<
+                    "                             WARNING: This will consume all free cpu time." << endl <<
+                    "-h OR --help                 This text" << endl << endl <<
+                    "Note: both --chanid and --starttime must be used together" << endl <<
+                    "      if either is used." << endl << endl <<
+                    "If no command line arguments are specified, all" << endl <<
+                    "unflagged videos will be flagged." << endl << endl;
             exit(-1);
         }
         else
@@ -418,6 +493,11 @@ int main(int argc, char *argv[])
     time_now = time(NULL);
     if (!quiet)
     {
+        VERBOSE(VB_ALL, QString("%1 version: %2 www.mythtv.org")
+                                .arg(binname).arg(MYTH_BINARY_VERSION));
+
+        VERBOSE(VB_ALL, QString("Enabled verbose msgs :%1").arg(verboseString));
+
         printf( "\n" );
         printf( "MythTV Commercial Flagging, started at %s", ctime(&time_now));
 

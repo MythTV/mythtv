@@ -51,6 +51,10 @@ CommDetect::~CommDetect(void)
 
 void CommDetect::Init(int w, int h, double frame_rate, int method)
 {
+    VERBOSE(VB_COMMFLAG, "Commercial Detection initialized: width = " <<
+            w << ", height = " << h << ", fps = " << frame_rate <<
+            ", method = " << method);
+
     commDetectMethod = method;
 
     width = w;
@@ -1308,6 +1312,8 @@ void CommDetect::SearchForLogo(NuppelVideoPlayer *nvp, bool fullSpeed,
     long long endFrame = seekFrame + (long long)(secs * fps);
     int counter = 0;
     unsigned char *mask[loops];
+
+    VERBOSE(VB_COMMFLAG, "Searching for Station Logo");
 
     for (int i = 0; i < loops; i++)
         mask[i] = new unsigned char[height * width];

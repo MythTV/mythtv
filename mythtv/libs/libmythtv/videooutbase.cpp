@@ -372,13 +372,13 @@ void VideoOutput::MoveResize(void)
     {
         // Video is 4:3
         if (letterbox == -1)
-            letterbox = 0;
+            letterbox = kLetterbox_4_3;
     }
     else
     {
         // Video is 16:9
         if (letterbox == -1)
-            letterbox = 1;
+            letterbox = kLetterbox_16_9;
     }
 
     if (GetDisplayAspect() > XJ_aspect)
@@ -396,7 +396,8 @@ void VideoOutput::MoveResize(void)
         disphoff = (int)pixNeeded;
     }
 
-    if ((letterbox > 1) && (letterbox < 4))
+    if ((letterbox == kLetterbox_4_3_Zoom) ||
+        (letterbox == kLetterbox_16_9_Zoom))
     {
         // Zoom mode
         //printf("Before zoom: %dx%d%+d%+d\n", dispwoff, disphoff,
@@ -408,7 +409,7 @@ void VideoOutput::MoveResize(void)
         disphoff = disphoff*4/3;
     }
 
-    if (letterbox > 3)
+    if (letterbox == kLetterbox_16_9_Stretch)
     {
         //Stretch mode
         //Should be used to eliminate side bars on 4:3 material
@@ -496,15 +497,28 @@ void VideoOutput::Zoom(int direction)
     }
 }
 
-void VideoOutput::ToggleLetterbox(void)
+void VideoOutput::ToggleLetterbox(int letterboxMode)
 {
-    if (++letterbox > 4)
-        letterbox = 0;
+    if (letterboxMode == kLetterbox_Toggle)
+    {
+        if (++letterbox >= kLetterbox_END)
+            letterbox = 0;
+    }
+    else
+    {
+        letterbox = letterboxMode;
+    }
 
     switch (letterbox) 
     {
-        default: case 0: case 2: AspectChanged(4.0 / 3); break;
-        case 1: case 3: case 4: AspectChanged(16.0 / 9); break;
+        default:
+        case kLetterbox_4_3:
+        case kLetterbox_4_3_Zoom:      AspectChanged(4.0 / 3);
+                                       break;
+        case kLetterbox_16_9:
+        case kLetterbox_16_9_Zoom:
+        case kLetterbox_16_9_Stretch:  AspectChanged(16.0 / 9);
+                                       break;
     }
 }
 

@@ -60,6 +60,17 @@ enum ZoomDirections
     kZoomRight
 };
 
+enum letterboxModes
+{
+    kLetterbox_Toggle = -1,
+    kLetterbox_4_3 = 0,
+    kLetterbox_16_9,
+    kLetterbox_4_3_Zoom,
+    kLetterbox_16_9_Zoom,
+    kLetterbox_16_9_Stretch,
+    kLetterbox_END
+};
+
 class VideoOutput
 {
   public:
@@ -98,7 +109,7 @@ class VideoOutput
     virtual float GetDisplayAspect(void) { return 4.0/3; }
 
     int GetLetterbox(void) { return letterbox; }
-    void ToggleLetterbox(void);
+    void ToggleLetterbox(int letterboxMode = kLetterbox_Toggle);
 
     int ValidVideoFrames(void);
     int FreeVideoFrames(void);

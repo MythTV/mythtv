@@ -232,13 +232,24 @@ void SelectSetting::addSelection(const QString& label, QString value, bool selec
     if (value == QString::null)
         value = label;
     
-    labels.push_back(label);
-    values.push_back(value);
+    bool found = false;
+    for(unsigned i = 0 ; i < values.size() ; ++i)
+        if ((values[i] == value) &&
+            (labels[i] == label)) {
+            found = true;
+            break;
+        }
+
+    if (!found)
+    {
+        labels.push_back(label);
+        values.push_back(value);
     
-    emit selectionAdded(label, value);
+        emit selectionAdded(label, value);
     
-    if (select || !isSet)
-        setValue(value);
+        if (select || !isSet)
+            setValue(value);
+    }
 }
 
 void SelectSetting::fillSelectionsFromDir(const QDir& dir, bool absPath) {

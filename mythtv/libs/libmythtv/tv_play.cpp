@@ -632,7 +632,7 @@ void TV::HandleStateChange(void)
         }
 
         prbuffer = new RingBuffer(tmpFilename, false);
-	gContext->DisableScreensaver();
+        gContext->DisableScreensaver();
 
         if (nextState == kState_WatchingRecording)
         {
@@ -703,8 +703,6 @@ void TV::HandleStateChange(void)
 
     internalState = tmpInternalState;
     changeState = false;
-
-    BuildOSDTreeMenu();
 
     if (recorder)
         recorder->FrontendReady();
@@ -1084,6 +1082,7 @@ bool TV::eventFilter(QObject *o, QEvent *e)
 void TV::ProcessKeypress(QKeyEvent *e)
 {
     bool was_doing_ff_rew = false;
+    bool redisplayBrowseInfo = false;
 
     if (editmode)
     {   
@@ -1155,6 +1154,13 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 passThru = 1;
                 handled = false;
             }
+            else if (action == "TOGGLEPIPWINDOW" || action == "TOGGLEPIPMODE" ||
+                     action == "SWAPPIP")
+            {
+                passThru = 1;
+                handled = false;
+                redisplayBrowseInfo = true;
+            }
             else
                 handled = false;
         }
@@ -1183,17 +1189,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else if (action == "ESCAPE")
             {
                 nvp->Zoom(kZoomHome);
-                zoomMode = false;
+                SetManualZoom(false);
             }
             else if (action == "SELECT")
-            {
-                zoomMode = false;
-                QString desc = tr("Zoom Mode OFF");
-                QString curTime = "";
-                int pos = nvp->calcSliderPos(curTime);
-                osd->StartPause(pos, false, desc, curTime, 1);
-                update_osd_pos = false;
-            }
+                SetManualZoom(false);
             else if (action == "JUMPFFWD")
                 nvp->Zoom(kZoomIn);
             else if (action == "JUMPRWND")
@@ -1271,15 +1270,6 @@ void TV::ProcessKeypress(QKeyEvent *e)
                             exitPlayer = true;
                             break;
                     }
-                }
-                else if (dialogname == "programmenubox") 
-                {
-                    int result = osd->GetDialogResponse(dialogname);
-
-                    osd->HideAll();
-                    dialogname = "";
-
-                    ProgramMenuAction(result);
                 }
                 else if (dialogname == "ccwarningdirection")
                 {
@@ -1575,6 +1565,9 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else
                 handled = false;
         }
+
+        if (redisplayBrowseInfo)
+            BrowseStart();
     }
     else if (StateIsPlaying(internalState))
     {
@@ -1606,7 +1599,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else if (action == "TOGGLEEDIT")
                 DoEditMode();
             else if (action == "TOGGLEBROWSE")
-                DoProgramMenu();
+                ShowOSDTreeMenu();
             else if (action == "CHANNELUP")
                 DoSeek(-jumptime * 60, tr("Jump Back"));
             else if (action == "CHANNELDOWN")
@@ -1731,13 +1724,13 @@ void TV::DoPlay(void)
     {
         time = StopFFRew();
         activenvp->Play(1.0, true);
-    	speed_index = 0;
+        speed_index = 0;
     }
     else if (paused || (speed_index != 0))
     {
         activenvp->Play(1.0, true);
         paused = false;
-    	speed_index = 0;
+        speed_index = 0;
     }
 
 
@@ -1765,7 +1758,7 @@ void TV::DoPause(void)
     if (paused)
     {
         UpdatePosOSD(time, tr("Paused"));
-	gContext->RestoreScreensaver();
+        gContext->RestoreScreensaver();
     }
     else
     {
@@ -2091,11 +2084,11 @@ void TV::ToggleInputs(void)
     if (activenvp == nvp)
     {
         if (paused)
-	{
+        {
             osd->EndPause();
-	    gContext->DisableScreensaver();
+            gContext->DisableScreensaver();
             paused = false;
-	}
+        }
     }
 
     activenvp->Pause(false);
@@ -2159,11 +2152,11 @@ void TV::ChangeChannel(int direction, bool force)
     if (activenvp == nvp)
     {
         if (paused)
-	{
+        {
             osd->EndPause();
-	    gContext->DisableScreensaver();
+            gContext->DisableScreensaver();
             paused = false;
-	}
+        }
     }
 
     activenvp->Pause(false);
@@ -2352,11 +2345,11 @@ void TV::ChangeChannelByString(QString &name, bool force)
     if (activenvp == nvp)
     {
         if (paused)
-	{
+        {
             osd->EndPause();
-	    gContext->DisableScreensaver();
+            gContext->DisableScreensaver();
             paused = false;
-	}
+        }
     }
 
     activenvp->Pause(false);
@@ -2919,22 +2912,22 @@ void TV::SleepEndTimer(void)
     wantsToQuit = true;
 }
 
-void TV::ToggleLetterbox(void)
+void TV::ToggleLetterbox(int letterboxMode)
 {
-    nvp->ToggleLetterbox();
+    nvp->ToggleLetterbox(letterboxMode);
     int letterbox = nvp->GetLetterbox();
     QString text;
 
     switch (letterbox)
     {
-        case 4: text = tr("16:9 Stretch"); break;
-        case 3: text = tr("16:9 Zoom"); break;
-        case 2: text = tr("4:3 Zoom"); break;
-        case 1: text = tr("16:9"); break;
-        default: text = tr("4:3"); break;
+        case kLetterbox_4_3: default: text = tr("4:3"); break;
+        case kLetterbox_16_9:         text = tr("16:9"); break;
+        case kLetterbox_4_3_Zoom:     text = tr("4:3 Zoom"); break;
+        case kLetterbox_16_9_Zoom:    text = tr("16:9 Zoom"); break;
+        case kLetterbox_16_9_Stretch: text = tr("16:9 Stretch"); break;
     }
 
-    if (osd && !browsemode )
+    if (osd && !browsemode && !osd->IsRunningTreeMenu())
         osd->SetSettingsText(text, 3);
 }
 
@@ -3313,115 +3306,6 @@ OSD *TV::GetOSD(void)
     return nvp->GetOSD();
 }
 
-void TV::DoProgramMenu(void)
-{
-    if (GetState() == kState_WatchingLiveTV)
-       return;
-
-    if (!osd)
-        return;
-
-    NormalSpeed();
-
-    osd->HideAll();
-
-    dialogname = "programmenubox";
-
-    QString message = tr("Program Menu");
-
-    QStringList options;
-
-    if (autoCommercialSkip == 1)
-        options += tr("Set Commercial Auto-Skip OFF");
-    else if (autoCommercialSkip == 2)
-        options += tr("Set Commercial Auto-Skip ON");
-    else
-        options += tr("Set Commercial Auto-Skip to Notify");
-
-    m_db->lock();
-
-    if (playbackinfo->GetAutoExpireFromRecorded(m_db->db()))
-        options += tr("Don't Auto Expire");
-    else
-        options += tr("Auto Expire");
-
-    if (!zoomMode)
-        options += tr("Activate Zoom Mode");
-
-    options += tr("Cancel");
-
-    m_db->unlock();
-
-    osd->NewDialogBox(dialogname, message, options, 10); 
-}
-
-void TV::ProgramMenuAction(int result)
-{
-    QString desc = "";
-
-    while (osd->Visible())
-        usleep(50);
-
-    switch(result)
-    {
-        case 1:
-            if (autoCommercialSkip == 1)
-            {
-                autoCommercialSkip = 0;
-                desc = tr("Auto-Skip OFF");
-            }
-            else if (autoCommercialSkip == 2)
-            {
-                autoCommercialSkip = 1;
-                desc = tr("Auto-Skip ON");
-            }
-            else
-            {
-                autoCommercialSkip = 2;
-                desc = tr("Auto-Skip Notify");
-            }
-
-            nvp->SetAutoCommercialSkip(autoCommercialSkip);
-            break;
-
-        case 2:
-            m_db->lock();
-            if (playbackinfo->GetAutoExpireFromRecorded(m_db->db()))
-            {
-                playbackinfo->SetAutoExpire(false, m_db->db());
-                desc = tr("Auto-Expire OFF");
-            }
-            else
-            {
-                playbackinfo->SetAutoExpire(true, m_db->db());
-                desc = tr("Auto-Expire ON");
-            }
-            m_db->unlock();
-            break;
-
-        case 3:
-            if (!zoomMode)
-            {
-                zoomMode = true;
-                desc = tr("Zoom Mode ON");
-            }
-            else
-            {
-                zoomMode = false;
-                desc = tr("Zoom Mode OFF");
-            }
-            break;
-    }
-
-    if (activenvp == nvp && desc != "" )
-    {
-        QString curTime = "";
-        int pos = nvp->calcSliderPos(curTime);
-        osd->StartPause(pos, false, desc, curTime, 1);
-        update_osd_pos = false;
-    }
-}
-
 void TV::TreeMenuEntered(OSDListTreeType *tree, OSDGenericTree *item)
 {
     // show help text somewhere, perhaps?
@@ -3467,6 +3351,13 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         DoToggleCC(0);
     else if (action.left(6) == "DISPCC")
         DoToggleCC(action.right(1).toInt());
+    else if (action == "TOGGLEMANUALZOOM")
+        SetManualZoom(true);
+    else if (action.left(12) == "TOGGLEASPECT")
+    {
+        ToggleLetterbox(action.right(1).toInt());
+        hidetree = false;
+    }
     else if (internalState == kState_WatchingLiveTV)
     {
         if (action == "GUIDE")
@@ -3491,6 +3382,10 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
     {
         if (action == "TOGGLEEDIT")
             DoEditMode();
+        else if (action == "TOGGLEAUTOEXPIRE")
+            ToggleAutoExpire();
+        else if (action.left(14) == "TOGGLECOMMSKIP")
+            SetAutoCommercialSkip(action.right(1).toInt());
         else
         {
             cout << "unknown menu action selected: " << action << endl;
@@ -3512,6 +3407,8 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
 
 void TV::ShowOSDTreeMenu(void)
 {
+    BuildOSDTreeMenu();
+
     if (nvp->GetOSD())
     {
         OSDListTreeType *tree = osd->ShowTreeMenu("menu", treeMenu);
@@ -3557,6 +3454,26 @@ void TV::BuildOSDTreeMenu(void)
     else if (StateIsPlaying(internalState))
     {
         item = new OSDGenericTree(treeMenu, tr("Edit Recording"), "TOGGLEEDIT");
+
+        item = new OSDGenericTree(treeMenu, tr("Commercial Auto-Skip"));
+        if (autoCommercialSkip != 0)
+            subitem = new OSDGenericTree(item, tr("Auto-Skip OFF"),
+                                         "TOGGLECOMMSKIP0");
+        if (autoCommercialSkip != 2)
+            subitem = new OSDGenericTree(item, tr("Auto-Skip Notify"),
+                                         "TOGGLECOMMSKIP2");
+        if (autoCommercialSkip != 1)
+            subitem = new OSDGenericTree(item, tr("Auto-Skip ON"),
+                                         "TOGGLECOMMSKIP1");
+
+        m_db->lock();
+        if (playbackinfo->GetAutoExpireFromRecorded(m_db->db()))
+            item = new OSDGenericTree(treeMenu, tr("Turn Auto-Expire OFF"),
+                                      "TOGGLEAUTOEXPIRE");
+        else
+            item = new OSDGenericTree(treeMenu, tr("Turn Auto-Expire ON"),
+                                      "TOGGLEAUTOEXPIRE");
+        m_db->unlock();
     }
 
     if (vbimode == 1)
@@ -3570,5 +3487,88 @@ void TV::BuildOSDTreeMenu(void)
             subitem = new OSDGenericTree(item, QString(tr("CC%1")).arg(i),
                                          QString("DISPCC%1").arg(i));
     }
+
+    item = new OSDGenericTree(treeMenu, tr("Change Aspect Ratio"));
+    subitem = new OSDGenericTree(item, tr("4:3"), "TOGGLEASPECT" +
+                                 QString("%1").arg(kLetterbox_4_3));
+    subitem = new OSDGenericTree(item, tr("16:9"), "TOGGLEASPECT" +
+                                 QString("%1").arg(kLetterbox_16_9));
+    subitem = new OSDGenericTree(item, tr("4:3 Zoom"), "TOGGLEASPECT" +
+                                 QString("%1").arg(kLetterbox_4_3_Zoom));
+    subitem = new OSDGenericTree(item, tr("16:9 Zoom"), "TOGGLEASPECT" +
+                                 QString("%1").arg(kLetterbox_16_9_Zoom));
+    subitem = new OSDGenericTree(item, tr("16:9 Stretch"), "TOGGLEASPECT" +
+                                 QString("%1").arg(kLetterbox_16_9_Stretch));
+
+    item = new OSDGenericTree(treeMenu, tr("Manual Zoom Mode"), 
+                             "TOGGLEMANUALZOOM");
 }
 
+void TV::ToggleAutoExpire(void)
+{
+    QString desc = "";
+
+    m_db->lock();
+    if (playbackinfo->GetAutoExpireFromRecorded(m_db->db()))
+    {
+        playbackinfo->SetAutoExpire(false, m_db->db());
+        desc = tr("Auto-Expire OFF");
+    }
+    else
+    {
+        playbackinfo->SetAutoExpire(true, m_db->db());
+        desc = tr("Auto-Expire ON");
+    }
+    m_db->unlock();
+
+    if (activenvp == nvp && desc != "" )
+    {
+        QString curTime = "";
+        int pos = nvp->calcSliderPos(curTime);
+        osd->StartPause(pos, false, desc, curTime, 1);
+        update_osd_pos = false;
+    }
+}
+
+void TV::SetAutoCommercialSkip(int skipMode)
+{
+    QString desc = "";
+
+    autoCommercialSkip = skipMode;
+
+    if (autoCommercialSkip == 0)
+        desc = tr("Auto-Skip OFF");
+    else if (autoCommercialSkip == 1)
+        desc = tr("Auto-Skip ON");
+    else if (autoCommercialSkip == 2)
+        desc = tr("Auto-Skip Notify");
+
+    nvp->SetAutoCommercialSkip(autoCommercialSkip);
+
+    if (activenvp == nvp && desc != "" )
+    {
+        QString curTime = "";
+        int pos = nvp->calcSliderPos(curTime);
+        osd->StartPause(pos, false, desc, curTime, 1);
+        update_osd_pos = false;
+    }
+}
+
+void TV::SetManualZoom(bool zoomON)
+{
+    QString desc = "";
+
+    zoomMode = zoomON;
+    if (zoomON)
+        desc = tr("Zoom Mode ON");
+    else
+        desc = tr("Zoom Mode OFF");
+
+    if (activenvp == nvp && desc != "" )
+    {
+        QString curTime = "";
+        int pos = nvp->calcSliderPos(curTime);
+        osd->StartPause(pos, false, desc, curTime, 1);
+        update_osd_pos = false;
+    }
+}

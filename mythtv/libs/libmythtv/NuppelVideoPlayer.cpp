@@ -2704,10 +2704,10 @@ int NuppelVideoPlayer::GetLetterbox(void)
     return false;
 }
 
-void NuppelVideoPlayer::ToggleLetterbox(void)
+void NuppelVideoPlayer::ToggleLetterbox(int letterboxMode)
 {
     if (videoOutput)
-        videoOutput->ToggleLetterbox();
+        videoOutput->ToggleLetterbox(letterboxMode);
 }
 
 void NuppelVideoPlayer::Zoom(int direction)
