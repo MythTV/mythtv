@@ -572,7 +572,7 @@ void RingBuffer::CalcReadAheadThresh(int estbitrate)
     if (estbitrate > 17000)
         readblocksize = 256000;
 
-    fill_min = readblocksize;
+    fill_min = 1;
 
     readsallowed = false;
 
