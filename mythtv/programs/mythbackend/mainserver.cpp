@@ -644,14 +644,11 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 
             // Taken out of programinfo.cpp just to reduce the number of queries
             int flags = 0;
-            flags |= query.value(10).toInt() ? FL_COMMFLAG : 0;
+            flags |= (query.value(10).toInt() == 1) ? FL_COMMFLAG : 0;
             flags |= query.value(11).toString().length() > 1 ? FL_CUTLIST : 0;
             flags |= query.value(12).toInt() ? FL_AUTOEXP : 0;
-            if (query.value(13).toInt() || 
-                proginfo->CheckMarkupFlag(MARK_PROCESSING, m_db))
-            {
+            if (query.value(13).toInt() || (query.value(10).toInt() == 2))
                 flags |= FL_EDITING;
-            }
             flags |= query.value(14).toString().length() > 1 ? FL_BOOKMARK : 0;
 
             proginfo->programflags = flags;

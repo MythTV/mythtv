@@ -56,7 +56,7 @@ void FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
             chanid.ascii(), starttime.ascii(), program_info->title.ascii());
         fflush( stdout );
     
-        if ((!force) && (program_info->CheckMarkupFlag(MARK_PROCESSING, db)))
+        if ((!force) && (program_info->IsCommProcessing(db)))
         {
             printf( "IN USE\n" );
             printf( "                        "
@@ -66,7 +66,7 @@ void FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
     }
     else
     {
-        if ((!force) && (program_info->CheckMarkupFlag(MARK_PROCESSING, db)))
+        if ((!force) && (program_info->IsCommProcessing(db)))
             return;
     }
 

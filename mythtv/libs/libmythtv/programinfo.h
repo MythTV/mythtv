@@ -124,7 +124,9 @@ class ProgramInfo
     bool IsEditing(QSqlDatabase *db);
     void SetEditing(bool edit, QSqlDatabase *db);
     bool IsCommFlagged(QSqlDatabase *db);
-    void SetCommFlagged(bool edit, QSqlDatabase *db);
+    // 1 = flagged, 2 = processing
+    void SetCommFlagged(int flag, QSqlDatabase *db);
+    bool IsCommProcessing(QSqlDatabase *db);
     void SetAutoExpire(bool autoExpire, QSqlDatabase *db);
     bool GetAutoExpireFromRecorded(QSqlDatabase *db);
 

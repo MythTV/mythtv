@@ -3112,6 +3112,8 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
         return(0);
 
     db_lock.lock();
+    // set to processing
+    m_playbackinfo->SetCommFlagged(2, m_db);
     m_playbackinfo->SetMarkupFlag(MARK_PROCESSING, true, m_db);
     db_lock.unlock();
 
@@ -3206,7 +3208,8 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
         decoder->SetPositionMap();
 
     m_playbackinfo->SetMarkupFlag(MARK_PROCESSING, false, m_db);
-    m_playbackinfo->SetCommFlagged(true, m_db);
+    // also clears processing status
+    m_playbackinfo->SetCommFlagged(1, m_db);
     db_lock.unlock();
 
     return(comms_found);

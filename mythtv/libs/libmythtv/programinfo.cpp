@@ -1021,13 +1021,13 @@ bool ProgramInfo::IsCommFlagged(QSqlDatabase *db)
     {
         query.next();
 
-        result = query.value(0).toInt();
+        result = (query.value(0).toInt() == 1);
     }
 
     return result;
 }
 
-void ProgramInfo::SetCommFlagged(bool flagged, QSqlDatabase *db)
+void ProgramInfo::SetCommFlagged(int flag, QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
 
@@ -1036,11 +1036,35 @@ void ProgramInfo::SetCommFlagged(bool flagged, QSqlDatabase *db)
 
     QString querystr = QString("UPDATE recorded SET commflagged = '%1', "
                                "starttime = '%2' WHERE chanid = '%3' AND "
-                               "starttime = '%4';").arg(flagged).arg(starts)
+                               "starttime = '%4';").arg(flag).arg(starts)
                                                    .arg(chanid).arg(starts);
     QSqlQuery query = db->exec(querystr);
     if (!query.isActive())
         MythContext::DBError("Commercial Flagged status update", querystr);
+}
+
+bool ProgramInfo::IsCommProcessing(QSqlDatabase *db)
+{
+    MythContext::KickDatabase(db);
+
+    bool result = false;
+
+    QString starts = recstartts.toString("yyyyMMddhhmm");
+    starts += "00";
+
+    QString querystr = QString("SELECT commflagged FROM recorded WHERE "
+                               "chanid = '%1' AND starttime = '%2';")
+                              .arg(chanid).arg(starts);
+
+    QSqlQuery query = db->exec(querystr);
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+
+        result = (query.value(0).toInt() == 2);
+    }
+
+    return result;
 }
 
 void ProgramInfo::SetAutoExpire(bool autoExpire, QSqlDatabase *db)
@@ -1817,12 +1841,11 @@ int ProgramInfo::getProgramFlags(QSqlDatabase *db)
     {
         query.next();
 
-        flags |= query.value(0).toInt() ? FL_COMMFLAG : 0;
+        flags |= (query.value(0).toInt() == 1) ? FL_COMMFLAG : 0;
         flags |= query.value(1).toString().length() > 1 ? FL_CUTLIST : 0;
         flags |= query.value(2).toInt() ? FL_AUTOEXP : 0;
-        flags |= query.value(3).toInt() ? (FL_EDITING |
-                                           CheckMarkupFlag(MARK_PROCESSING, 
-                                                           db)) : 0;
+        if (query.value(3).toInt() || (query.value(0).toInt() == 2))
+            flags |= FL_EDITING;
         flags |= query.value(4).toString().length() > 1 ? FL_BOOKMARK : 0;
     }
 

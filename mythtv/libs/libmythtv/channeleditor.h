@@ -33,6 +33,8 @@ class ChannelWizard: public ConfigurationWizard {
 public:
     ChannelWizard(int id, QSqlDatabase* _db);
     QString getCardtype();
+    bool cardTypesInclude(const QString& cardtype); 
+    int countCardtypes();
 
 private:
     ChannelID *cid;

@@ -1,5 +1,9 @@
 INCLUDEPATH += ../../libs/
-LIBS += -L../../libs/libmyth -L/usr/local/lib
+DEPENDPATH += ../../libs/libmythtv ../../libs/libmyth ../../libs/libavcodec
+DEPENDPATH += ../../libs/libavformat
+
+LIBS += -L../../libs/libmyth -L../../libs/libmythtv -L../../libs/libavcodec
+LIBS += -L../../libs/libavformat
 
 include ( ../../settings.pro )
 
@@ -10,9 +14,8 @@ TARGET = mythfilldatabase
 target.path = $${PREFIX}/bin
 INSTALLS = target
 
-LIBS += -lmyth-$$LIBVERSION $$EXTRA_LIBS
-
-DEPENDPATH += ../../libs/libmyth
+LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION
+LIBS += -lmythavcodec-$$LIBVERSION -lmyth-$$LIBVERSION $$EXTRA_LIBS
 
 # Input
 SOURCES += filldata.cpp

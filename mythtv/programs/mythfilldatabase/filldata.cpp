@@ -23,6 +23,7 @@
 #include <signal.h>
 
 #include "libmyth/mythcontext.h"
+#include "libmythtv/scheduledrecording.h"
 
 using namespace std;
 
@@ -2041,6 +2042,8 @@ int main(int argc, char *argv[])
          cerr << "fix_end_times failed!\a\n";
     else if (!quiet)
          cout << update_count << " replacements made.\n";
+
+    ScheduledRecording::signalChange(db);
 
     delete gContext;
 

@@ -238,10 +238,8 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     QDateTime curtime = QDateTime::currentDateTime();
     if (honorCutList && m_proginfo)
     {
-        if (m_proginfo->IsEditing(m_db) ||
-                m_proginfo->CheckMarkupFlag(MARK_PROCESSING, m_db)) {
+        if (m_proginfo->IsEditing(m_db) || m_proginfo->IsCommProcessing(m_db))
             return REENCODE_CUTLIST_CHANGE;
-        }
         m_proginfo->SetMarkupFlag(MARK_UPDATED_CUT, false, m_db);
         curtime = curtime.addSecs(60);
     }

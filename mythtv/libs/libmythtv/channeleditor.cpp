@@ -38,13 +38,19 @@ ChannelWizard::ChannelWizard(int id, QSqlDatabase* _db)
     ChannelOptionsCommon* common = new ChannelOptionsCommon(*cid);
     addChild(common);
 
+    int cardtypes = countCardtypes();
+    bool hasDVB = cardTypesInclude("DVB");
+
+    // add v4l options if no dvb or if dvb and some other card type
+    // present
     QString cardtype = getCardtype();
-    if (cardtype != "DVB" || id == 0) {
+    if (!hasDVB || cardtypes > 1 || id == 0) {
         ChannelOptionsV4L* v4l = new ChannelOptionsV4L(*cid);
         addChild(v4l);
     }
 
-    if (cardtype == "DVB" || id == 0)
+    // add dvb options if dvb is present
+    if (hasDVB || id == 0)
     {
         ChannelOptionsDVB* dvb = new ChannelOptionsDVB(*cid);
         ChannelOptionsDVBPids* pids = new ChannelOptionsDVBPids(*cid);
@@ -66,6 +72,43 @@ QString ChannelWizard::getCardtype() {
         return query.value(0).toString();
     } else
         return "";
+}
+
+bool ChannelWizard::cardTypesInclude(const QString& thecardtype) {
+    QSqlQuery query = db->exec(QString("SELECT count(cardtype)"
+        " FROM capturecard, cardinput, channel"
+        " WHERE channel.chanid=%1"
+        " AND channel.sourceid = cardinput.sourceid"
+        " AND cardinput.cardid = capturecard.cardid"
+        " AND capturecard.cardtype=\"%2\"")
+        .arg(cid->getValue())
+        .arg(thecardtype));
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+        int count = query.value(0).toInt();
+
+        if (count > 0)
+            return true;
+        else
+            return false;
+    } else
+        return false;
+}
+
+int ChannelWizard::countCardtypes() {
+    QSqlQuery query = db->exec(QString("SELECT count(DISTINCT cardtype)"
+        " FROM capturecard, cardinput, channel"
+        " WHERE channel.chanid=%1"
+        " AND channel.sourceid = cardinput.sourceid"
+        " AND cardinput.cardid = capturecard.cardid")
+        .arg(cid->getValue()));
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+        return query.value(0).toInt();
+    } else
+        return 0;
 }
 
 void ChannelListSetting::fillSelections(const QString& sourceid) 
