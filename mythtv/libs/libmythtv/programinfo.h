@@ -9,18 +9,20 @@
 
 #define NUMPROGRAMLINES 21
 
-#define MARK_UPDATED_CUT  -3
-#define MARK_EDIT_MODE    -2
-#define MARK_PROCESSING   -1
-#define MARK_CUT_END       0
-#define MARK_CUT_START     1
-#define MARK_BOOKMARK      2
-#define MARK_BLANK_FRAME   3
-#define MARK_COMM_START    4
-#define MARK_COMM_END      5
-#define MARK_GOP_START     6
-#define MARK_KEYFRAME      7
-#define MARK_SCENE_CHANGE  8
+enum MarkTypes {
+    MARK_UPDATED_CUT = -3,
+    MARK_EDIT_MODE = -2,
+    MARK_PROCESSING = -1,
+    MARK_CUT_END = 0,
+    MARK_CUT_START = 1,
+    MARK_BOOKMARK = 2,
+    MARK_BLANK_FRAME = 3,
+    MARK_COMM_START = 4,
+    MARK_COMM_END = 5,
+    MARK_GOP_START = 6,
+    MARK_KEYFRAME = 7,
+    MARK_SCENE_CHANGE = 8
+};
 
 class QSqlDatabase;
 
