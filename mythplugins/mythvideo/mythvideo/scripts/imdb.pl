@@ -401,7 +401,7 @@ sub getMovieList {
    #         sort=[smart]        ??
    #         tv=[no|both|only]   limits between tv and movies (broken at imdb)
    #$options = "tt=on;nm=on;mx=20";  # not exactly clear what these options do
-   my $request = "http://www.imdb.com/find?$options;q=$query";
+   my $request = "http://www.imdb.com/find?q=$query;$options";
    if (defined $opt_d) { printf("# request: '%s'\n", $request); }
    my $response = get $request;
    if (defined $opt_r) {
@@ -425,24 +425,26 @@ sub getMovieList {
    # extract possible matches
    #    possible matches are grouped in several catagories:  
    #        exact, partial, and approximate
-   my $exact_matches = parseBetween($response, "<b>Exact Matches</b>",
-                                              "</table>");
-   my $partial_matches = parseBetween($response, "<b>Partial Matches</b>", 
-                                              "</table>");
-   my $approx_matches = parseBetween($response, "<b>Approximate Matches</b>", 
-                                              "</table>");
+   my $popular_results = parseBetween($response, "<b>Popular Titles</b>",
+                                              "</ol>");
+   my $exact_matches = parseBetween($response, "<b>Titles (Exact Matches)</b>",
+                                              "</ol>");
+   my $partial_matches = parseBetween($response, "<b>Titles (Partial Matches)</b>", 
+                                              "</ol>");
+#   my $approx_matches = parseBetween($response, "<b>Approximate Matches</b>", 
+#                                               "</ol>");
    # parse movie list from matches
-   my $beg = "<a href=\"/title/tt";
-   my $end = "</a>";
+   my $beg = "<li>";
+   my $end = "</li>";
    my $count = 0;
    my @movies;
 
 #   my $data = $exact_matches.$partial_matches;
-   my $data = $exact_matches;
+   my $data = $popular_results.$exact_matches;
    # resort to partial matches if no exact
    if ($data eq "") { $data = $partial_matches; }
    # resort to approximate matches if no exact or partial
-   if ($data eq "") { $data = $approx_matches; }
+#   if ($data eq "") { $data = $approx_matches; }
    if ($data eq "") {
       if (defined $opt_d) { printf("# no results\n"); }
       return; 
@@ -452,25 +454,38 @@ sub getMovieList {
    my $year;
    my $type;
    my $title;
-   while ($start != -1) {
+   while ($start != -1 && $start < length($data)) {
       $start += length($beg);
-      my $sub = substr($data, $start, $finish - $start);
-      my ($movienum, $moviename) = split("/\">", $sub);
+      my $entry = substr($data, $start, $finish - $start);
+      $start = index($data, $beg, $finish + 1);
+      $finish = index($data, $end, $start);
 
-      # parse year / type from title
-      $year = "";
-      $type = "";
-      $title = $moviename;
-      $moviename =~ m#(.+) \((\d+.+)\)#;
-      if ($1) { $title = $1; }
-      if ($2) { $year = $2; } 
-      $moviename =~ m#(.+) \((\d+.+)\) \((.+)\)#;
-      if ($1) { $title = $1; }
-      if ($2) { $year = $2; } 
-      if ($3) { $type = $3; } # VG = video game, TV = television, V = Video
-      if (defined $opt_d) {
-         print "# '$movienum:$moviename'";
-         print ", title:'$title', year:$year, type:$type\n";
+      my $title = "";
+      my $year = "";
+      my $type = "";
+      my $movienum = "";
+
+      my $link_end = "</a>";
+      $fl_end = index($entry, $link_end);
+      $fl_end += length($link_end);
+      my $lhs = substr($entry, 0, $fl_end);
+      my $rhs = substr($entry, $fl_end);
+
+      if ($lhs =~ m/<a href="\/title\/tt(\d+)\/.*\">(.+)<\/a>/i) {
+          $movienum = $1;
+          $title = $2;
+      } else {
+           if (defined $opt_d) {
+               print("Unrecognized entry format\n");
+           }
+           next;
+      }
+
+      if ($rhs =~ m/\((\d+)\) \((.+)\)/) {
+          $year = $1;
+          $type = $2;
+      } elsif ($rhs =~ m/\((\d+)\)/) {
+          $year = $1;
       }
 
       my $skip = 0;
@@ -519,13 +534,13 @@ sub getMovieList {
          $skip = 1; 
       }
 
-      # advance data to next movie
-      $data = substr($data, - (length($data) - $finish));
-      $start = index($data, $beg);
-      $finish = index($data, $end, $start + 1); 
-
       # add to array
       if (!$skip) {
+          my $moviename = $title;
+          if ($year ne "") {
+              $moviename .= " ($year)";
+          }
+
 #         $movies[$count++] = $movienum . ":" . $title;
          $movies[$count++] = $movienum . ":" . $moviename;
       }
