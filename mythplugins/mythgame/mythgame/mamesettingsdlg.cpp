@@ -144,9 +144,9 @@ public:
         setLabel(QObject::tr("Scaling"));
         setValue(1);
         setHelpText(QObject::tr("Set X-Y Scale to the same aspect ratio. For "
-                                "vector games scale may have value's like 1.5 and even "
-                                "0.5. For scaling of regular games this will be "
-                                "rounded to an int"));
+                    "vector games scale may have values like 1.5 and even "
+                    "0.5. For scaling of regular games this will be " 
+                    "rounded to an int"));
     };
 };
 
@@ -167,7 +167,7 @@ public:
         MameSetting("translucency", rom) {
         setLabel(QObject::tr("Translucency"));
         setValue(false);
-        setHelpText(QObject::tr("Enable tranlucency"));
+        setHelpText(QObject::tr("Enable translucency"));
     };
 };
 
@@ -183,8 +183,7 @@ public:
         addSelection(QObject::tr("1280 x 1024"), "4");
         addSelection(QObject::tr("1600 x 1200"), "5");
         setHelpText(QObject::tr("Always scale vectorgames to X x Y, keeping "
-                                "their aspect ratio. This overrides the scale "
-                                "options"));
+                    "their aspect ratio. This overrides the scale options."));
     };
 };
 
@@ -235,9 +234,9 @@ public:
         MameSetting("fakesound", rom) {
         setLabel(QObject::tr("Fake sound"));
         setValue(false);
-        setHelpText(QObject::tr("Generate sound even when sound is disabled, "
-                                "this is needed for some games which won't run "
-                                "without sound"));
+        setHelpText(QObject::tr("Generate sound even when sound is disabled. "
+                    "This is needed for some games which won't run without "
+                    "sound."));
     };
 };
 
@@ -248,7 +247,7 @@ public:
         MameSetting("volume", rom) {
         setLabel(QObject::tr("Volume"));
         setValue(-3);
-        setHelpText(QObject::tr("Set volume to x db, (-32 (soft) - 0(loud) )"));
+        setHelpText(QObject::tr("Set volume to x db, (-32 (soft) - 0 (loud) )"));
     };
 };
 
