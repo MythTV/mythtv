@@ -46,6 +46,9 @@ private:
     long bitrate, freq, len;
     unsigned int bks;
     mad_fixed_t eqbands[32];
+    int ignore_id3;
+
+    QString filename_format;
 
     char *input_buf;
     unsigned long input_bytes;

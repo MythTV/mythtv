@@ -4,6 +4,7 @@
 #include <iostream>
 #include <math.h>
 #include <stdio.h>
+#include <qregexp.h>
 using namespace std;
 
 #include <mad.h>
@@ -14,6 +15,8 @@ using namespace std;
 #include "constants.h"
 #include "buffer.h"
 #include "output.h"
+
+#include <mythtv/mythcontext.h>
 
 #define XING_MAGIC     (('X' << 24) | ('i' << 16) | ('n' << 8) | 'g')
 
@@ -42,6 +45,9 @@ MadDecoder::MadDecoder(MythContext *context, const QString &file,
     output_bytes = 0;
     output_at = 0;
     output_size = 0;
+
+    filename_format = context->GetSetting("NonID3FileNameFormat").upper();
+    ignore_id3 = context->GetNumSetting("Ignore_ID3", 0);
 }
 
 MadDecoder::~MadDecoder(void)
@@ -531,74 +537,116 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
     QString artist = "", album = "", title = "", genre = "";
     int year = 0, tracknum = 0, length = 0;
 
-    id3_file *id3file = id3_file_open(filename.ascii(), ID3_FILE_MODE_READONLY);
-    if (!id3file)
+    if (!ignore_id3)
     {
-        return NULL;
-    }
-
-    id3_tag *tag = id3_file_tag(id3file);
-
-    if (!tag)
-    {
-        id3_file_close(id3file);
-        return NULL;
-    }
-
-    struct {
-        char const *id;
-        char const *name;
-    } const info[] = {
-        { ID3_FRAME_TITLE,  "Title"  },
-        { ID3_FRAME_ARTIST, "Artist" },
-        { ID3_FRAME_ALBUM,  "Album"  },
-        { ID3_FRAME_YEAR,   "Year"   },
-        { ID3_FRAME_TRACK,  "Track"  },
-        { ID3_FRAME_GENRE,  "Genre"  },
-    };
-
-    for (unsigned int i = 0; i < sizeof(info) / sizeof(info[0]); ++i)
-    {
-        struct id3_frame *frame = id3_tag_findframe(tag, info[i].id, 0);
-        if (!frame)
-            continue;
-
-        id3_ucs4_t const *ucs4;
-        id3_latin1_t *latin1;
-        union id3_field *field;
-        unsigned int nstrings;
-
-        field = &frame->fields[1];
-        nstrings = id3_field_getnstrings(field);
-
-        for (unsigned int j = 0; j < nstrings; ++j)
+        // use ID3 header
+        id3_file *id3file = id3_file_open(filename.ascii(), 
+                                          ID3_FILE_MODE_READONLY);
+        if (!id3file)
         {
-            ucs4 = id3_field_getstrings(field, j);
-            assert(ucs4);
+            return NULL;
+        }
 
-            if (!strcmp(info[i].id, ID3_FRAME_GENRE))
-                ucs4 = id3_genre_name(ucs4);
+        id3_tag *tag = id3_file_tag(id3file);
 
-            latin1 = id3_ucs4_latin1duplicate(ucs4);
-            if (!latin1)
+        if (!tag)
+        {
+            id3_file_close(id3file);
+            return NULL;
+        }
+
+        struct {
+            char const *id;
+            char const *name;
+        } const info[] = {
+            { ID3_FRAME_TITLE,  "Title"  },
+            { ID3_FRAME_ARTIST, "Artist" },
+            { ID3_FRAME_ALBUM,  "Album"  },
+            { ID3_FRAME_YEAR,   "Year"   },
+            { ID3_FRAME_TRACK,  "Track"  },
+            { ID3_FRAME_GENRE,  "Genre"  },
+        };
+
+        for (unsigned int i = 0; i < sizeof(info) / sizeof(info[0]); ++i)
+        {
+            struct id3_frame *frame = id3_tag_findframe(tag, info[i].id, 0);
+            if (!frame)
                 continue;
 
-            switch (i)
-            {
-                case 0: title = (char *)latin1; break;
-                case 1: artist = (char *)latin1; break;
-                case 2: album = (char *)latin1; break;
-                case 3: year = atoi((char *)latin1); break;
-                case 4: tracknum = atoi((char *)latin1); break;
-                case 5: genre = (char *)latin1; break;
-                default: break;
-            }
+            id3_ucs4_t const *ucs4;
+            id3_latin1_t *latin1;
+            union id3_field *field;
+            unsigned int nstrings;
 
-            free(latin1);
+            field = &frame->fields[1];
+            nstrings = id3_field_getnstrings(field);
+
+            for (unsigned int j = 0; j < nstrings; ++j)
+            {
+                ucs4 = id3_field_getstrings(field, j);
+                assert(ucs4);
+
+                if (!strcmp(info[i].id, ID3_FRAME_GENRE))
+                    ucs4 = id3_genre_name(ucs4);
+
+                latin1 = id3_ucs4_latin1duplicate(ucs4);
+                if (!latin1)
+                    continue;
+
+                switch (i)
+                {
+                    case 0: title = (char *)latin1; break;
+                    case 1: artist = (char *)latin1; break;
+                    case 2: album = (char *)latin1; break;
+                    case 3: year = atoi((char *)latin1); break;
+                    case 4: tracknum = atoi((char *)latin1); break;
+                    case 5: genre = (char *)latin1; break;
+                    default: break;
+                }
+
+                free(latin1);
+            }
+        }
+
+        id3_file_close(id3file);
+    }
+    else
+    {
+        // Ignore_ID3 header 
+        int part_num = 0;
+        QStringList fmt_list = QStringList::split( "/", filename_format );
+        QStringList::iterator fmt_it = fmt_list.begin();
+
+        // go through loop once to get minimum part number
+        for( ; fmt_it != fmt_list.end(); fmt_it++, part_num-- );
+
+        // reset to go through loop for real
+        fmt_it = fmt_list.begin();
+        for( ; fmt_it != fmt_list.end(); fmt_it++, part_num++ )
+        {
+            QString part_str = filename.section( "/", part_num, part_num );
+            part_str.replace( QRegExp(QString("_")), QString(" ") );
+            part_str.replace( QRegExp(QString(".mp3$"), FALSE), QString("") );
+
+            if ( *fmt_it == "GENRE" ) {
+                genre = part_str;
+            } else if ( *fmt_it == "ARTIST" ) {
+                artist = part_str;
+            } else if ( *fmt_it == "ALBUM" ) {
+                album = part_str;
+            } else if ( *fmt_it == "TITLE" ) {
+                title = part_str;
+            } else if ( *fmt_it == "TRACK_TITLE" ) {
+                part_str.replace( QRegExp(QString("-")), QString(" ") );
+                QString s_tmp = part_str;
+                s_tmp.replace( QRegExp(QString(" .*"), FALSE), QString("") );
+                tracknum = s_tmp.toInt();
+                title = part_str;
+                title.replace( QRegExp(QString("^[0-9][0-9] "), FALSE),
+                    QString("") );
+            }
         }
     }
-
-    id3_file_close(id3file);
 
     struct mad_stream stream;
     struct mad_header header;
