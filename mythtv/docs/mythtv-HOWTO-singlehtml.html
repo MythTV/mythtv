@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-03-14, v0.14.06
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-03-21, v0.14.07
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -492,9 +492,9 @@ at
 <A HREF="http://www.ethics-gradient.net/myth/mythdvb.html">http://www.ethics-gradient.net/myth/mythdvb.html</A> for more
 information.  To see if your DVB card is supported, see the list of cards at
 <A HREF="http://www.linuxtv.org/download/dvb/CARDS">http://www.linuxtv.org/download/dvb/CARDS</A> for more information.</P>
-<P>There are no known satellite systems available in the United States which
-will allow you to use a DVB card and obtain an unencrypted stream suitable
-for use with MythTV.</P>
+<P>In the United States, you may use a card such as the TwinHan to obtain
+unencrypted Free-To-Air satellite channels.</P>
+
 <H3>HDTV.</H3>
 
 <P>Currently there is only one HDTV card with Linux drivers which is known
@@ -529,8 +529,7 @@ series of cards supported by the IvyTV driver)</LI>
 set-top box provided by your digital cable provider and capture the analog
 video output using either composite or S-Video.</P>
 <P>There are no known capture cards for HDTV content.</P>
-<P>There are no known capture cards for component (RGB or YPbPr)
-video.</P>
+<P>There are no known capture cards for component (RGB or YPbPr) video.</P>
 <H3>Sound card</H3>
 
 <P>The system needs a sound card or an on-board equivalent on the motherboard
@@ -1173,10 +1172,11 @@ the if / fi block.</CAPTION>
 
 As root, create the following file in <CODE>/etc/profile.d</CODE> The example
 filename is "mythtv.sh". Use what you feel is appropriate.</P>
-<P>Open a shell, and switch to superuser mode. 
+<P>Open a shell, and switch to superuser mode. </P>
+<P>
 <FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
+<EPS FILE="warning.eps">
+<IMG SRC="warning.png">
 <CAPTION><B>NOTE</B>: ^D means press CTRL and d at the same time.</CAPTION>
 </FIGURE>
 
@@ -1290,8 +1290,8 @@ $ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs checkout mythtv
 </P>
 <P>
 <FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
+<EPS FILE="warning.eps">
+<IMG SRC="warning.png">
 <CAPTION><B>NOTE</B>:  You may get an error about cvs not finding a
 <CODE>.cvspass</CODE> file the very first time you run it.  This is normal.</CAPTION>
 </FIGURE>
@@ -1663,9 +1663,10 @@ Center->System->Services, find MySQL and click the "On Boot" button and the
 "Start" button if the MySQL status shows that it isn't running yet.</P>
 <P>
 <FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  There have been reports that MySQL isn't starting at boot.</CAPTION>
+<EPS FILE="warning.eps">
+<IMG SRC="warning.png">
+<CAPTION><B>NOTE</B>:  There have been reports that MySQL isn't starting at boot.
+If this is happening to you, try running the following commands.</CAPTION>
 </FIGURE>
 
 <BLOCKQUOTE><CODE>
@@ -2058,8 +2059,8 @@ if the user had pressed the keys on the keyboard.  The file
 <CODE>keys.txt</CODE> describes the keys used to control MythTV.</P>
 <P>
 <FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
+<EPS FILE="warning.eps">
+<IMG SRC="warning.png">
 <CAPTION><B>NOTE</B>:If you are running Mandrake 9.1, you may install
 <B>lirc</B> by executing: <CODE># urpmi lirc lirc-remotes</CODE> and bypass
 the manual compilation steps described below by jumping to the 
@@ -2252,8 +2253,8 @@ if you run into trouble) of how to do this go to
 <A HREF="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/ch-custom-kernel.html">http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/ch-custom-kernel.html</A></P>
 <P>
 <FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
+<EPS FILE="warning.eps">
+<IMG SRC="warning.png">
 <CAPTION><B>NOTE</B>: Suitable Red Hat kernels for MythTV (i2c update, v4l2 API,
 CONFIG_SERIAL modularized) are available from ATrpms: 
 <A HREF="http://atrpms.physik.fu-berlin.de/name/kernel/">http://atrpms.physik.fu-berlin.de/name/kernel/</A>. You will also find
@@ -2316,8 +2317,8 @@ kernel modules (ALSA, etc) you will have to recompile/reinstall those.</P>
 
 <P>
 <FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
+<EPS FILE="warning.eps">
+<IMG SRC="warning.png">
 <CAPTION><B>NOTE to Mandrake 9.1 users</B>: skip to the manual start paragraph
 below.</CAPTION>
 </FIGURE>
@@ -2709,8 +2710,8 @@ always be the first choice. You will then want to add your
 preference for recording.</P>
 <P>
 <FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
+<EPS FILE="warning.eps">
+<IMG SRC="warning.png">
 <CAPTION><B>NOTE</B>:  It is possible to <EM>not</EM> have the cards on the Master
 backend be the first ones used.  However, if you are new to MythTV it is
 easier to configure the Master backend first before moving on to the Slaves,

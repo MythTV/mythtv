@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2004-03-14, v0.14.06
+  2004-03-21, v0.14.07
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -564,9 +564,9 @@
   http://www.linuxtv.org/download/dvb/CARDS
   <http://www.linuxtv.org/download/dvb/CARDS> for more information.
 
-  There are no known satellite systems available in the United States
-  which will allow you to use a DVB card and obtain an unencrypted
-  stream suitable for use with MythTV.
+  In the United States, you may use a card such as the TwinHan to obtain
+  unencrypted Free-To-Air satellite channels.
+
 
   [1m3.1.5.4.  HDTV.[0m
 
@@ -1799,6 +1799,7 @@
 
 
     [1mNOTE[22m:  There have been reports that MySQL isn't starting at boot.
+  If this is happening to you, try running the following commands.
 
 
        $ su

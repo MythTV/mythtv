@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2004-03-14, v0.14.06
+<date>2004-03-21, v0.14.07
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -287,9 +287,9 @@ information.  To see if your DVB card is supported, see the list of cards at
 <url url="http://www.linuxtv.org/download/dvb/CARDS"
 name="http://www.linuxtv.org/download/dvb/CARDS"> for more information.
 
-There are no known satellite systems available in the United States which
-will allow you to use a DVB card and obtain an unencrypted stream suitable
-for use with MythTV.
+In the United States, you may use a card such as the TwinHan to obtain
+unencrypted Free-To-Air satellite channels.
+
 <sect3>HDTV.
 <p>Currently there is only one HDTV card with Linux drivers which is known
 to operate in the United States - the card available from <url
@@ -324,8 +324,7 @@ video output using either composite or S-Video.
 
 There are no known capture cards for HDTV content.
 
-There are no known capture cards for component (RGB or YPbPr)
-video.
+There are no known capture cards for component (RGB or YPbPr) video.
 <sect2>Sound card
 <p>The system needs a sound card or an on-board equivalent on the motherboard
 to play back and in most cases, to record sound. Any sound card that can be
@@ -933,9 +932,10 @@ As root, create the following file in <tt>/etc/profile.d</tt> The example
 filename is "mythtv.sh". Use what you feel is appropriate.
 
 Open a shell, and switch to superuser mode. 
+
 <figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
+<eps file="warning.eps" height="1cm">
+<img src="warning.png">
 <caption><bf>NOTE</bf>: ^D means press CTRL and d at the same time.
 </caption>
 </figure>
@@ -1033,8 +1033,8 @@ $ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs checkout mythtv
 </verb></tscreen>
 
 <figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
+<eps file="warning.eps" height="1cm">
+<img src="warning.png">
 <caption><bf>NOTE</bf>:  You may get an error about cvs not finding a
 <tt>.cvspass</tt> file the very first time you run it.  This is normal.
 </caption>
@@ -1354,9 +1354,10 @@ Center->System->Services, find MySQL and click the "On Boot" button and the
 "Start" button if the MySQL status shows that it isn't running yet.
 
 <figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
+<eps file="warning.eps" height="1cm">
+<img src="warning.png">
 <caption><bf>NOTE</bf>:  There have been reports that MySQL isn't starting at boot.
+If this is happening to you, try running the following commands.
 </caption>
 </figure>
 <tscreen><verb>
@@ -1692,8 +1693,8 @@ if the user had pressed the keys on the keyboard.  The file
 <tt>keys.txt</tt> describes the keys used to control MythTV.
 
 <figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
+<eps file="warning.eps" height="1cm">
+<img src="warning.png">
 <caption><bf>NOTE</bf>:If you are running Mandrake 9.1, you may install
 <bf>lirc</bf> by executing: <tt># urpmi lirc lirc-remotes</tt> and bypass
 the manual compilation steps described below by jumping to the <ref
@@ -1862,8 +1863,8 @@ if you run into trouble) of how to do this go to
 name="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/ch-custom-kernel.html">
 
 <figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
+<eps file="warning.eps" height="1cm">
+<img src="warning.png">
 <caption><bf>NOTE</bf>: Suitable Red Hat kernels for MythTV (i2c update, v4l2 API,
 CONFIG_SERIAL modularized) are available from ATrpms: <url
 url="http://atrpms.physik.fu-berlin.de/name/kernel/"
@@ -1919,8 +1920,8 @@ kernel modules (ALSA, etc) you will have to recompile/reinstall those.
 
 <sect1>Completing the lirc install. <label id="completing_lirc_install">
 <p><figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
+<eps file="warning.eps" height="1cm">
+<img src="warning.png">
 <caption><bf>NOTE to Mandrake 9.1 users</bf>: skip to the manual start paragraph
 below.
 </caption>
@@ -2266,8 +2267,8 @@ id="nonmaster_backend" name="other backends"> in the order of your
 preference for recording.
 
 <figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
+<eps file="warning.eps" height="1cm">
+<img src="warning.png">
 <caption><bf>NOTE</bf>:  It is possible to <em>not</em> have the cards on the Master
 backend be the first ones used.  However, if you are new to MythTV it is
 easier to configure the Master backend first before moving on to the Slaves,
@@ -6135,6 +6136,9 @@ the section title for 7 to "Configuring Sound."  William Powers' Advanced
 Partitioning contribution.
 v0.14.06, 2004-03-14.  Fix things.  Ramon Redondo's mysql priv contribution. 
 Bump XMLTV version.  David Blevins' DVD burning contribution.
+v0.14.07, 2004-03-21.  Update DVB; TwinHan card is supported by
+linuxtv.org DVB driver.  Don't know if anyone is using it in US though. 
+Change some more "stop"s to "notes".
 -->
 
 <!--
