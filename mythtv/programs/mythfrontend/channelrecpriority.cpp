@@ -419,10 +419,10 @@ void ChannelRecPriority::FillList(void)
             ChannelInfo *chaninfo = new ChannelInfo;
             chaninfo->chanid = result.value(0).toInt();
             chaninfo->chanstr = result.value(1).toString();
-            chaninfo->callsign = result.value(2).toString();
+            chaninfo->callsign = QString::fromUtf8(result.value(2).toString());
             chaninfo->iconpath = result.value(3).toString();
             chaninfo->recpriority = result.value(4).toString();
-            chaninfo->channame = result.value(5).toString();
+            chaninfo->channame = QString::fromUtf8(result.value(5).toString());
             channelData[QString::number(cnt)] = *chaninfo;
 
             // save recording priority value in map so we don't have to save 
