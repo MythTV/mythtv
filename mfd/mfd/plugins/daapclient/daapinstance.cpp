@@ -69,7 +69,10 @@ DaapInstance::DaapInstance(
     server_supports_index = false;
     server_supports_resolve = false;
     server_numb_databases = -1;
-
+    daap_version.hi = 0;
+    daap_version.lo = 0;
+    dmap_version.hi = 0;
+    dmap_version.lo = 0;
 
     //
     //  Data that comes from /login
@@ -505,9 +508,23 @@ bool DaapInstance::checkServerType(const QString &server_description)
         
         if(server_description.left(6) == "iTunes")
         {
-            if(daap_server_type != DAAP_SERVER_ITUNES)
+            QString version_string = server_description.section(" ", 0, 0);
+            version_string = version_string.section("/", 1, 1);
+            bool ok = true;
+            float itunes_version = version_string.toFloat(&ok);
+            if(itunes_version == 4.5)
             {
-                copasetic = false;
+                if(daap_server_type != DAAP_SERVER_ITUNES45)
+                {
+                    copasetic = false;
+                }
+            }
+            else
+            {
+                if(daap_server_type != DAAP_SERVER_ITUNES4X)
+                {
+                    copasetic = false;
+                }
             }
         }
         else if(server_description.left(6) == "MythTV")
@@ -538,11 +555,23 @@ bool DaapInstance::checkServerType(const QString &server_description)
         if(server_description.left(6) == "iTunes")
         {
             service_details_mutex.lock();
-            daap_server_type = DAAP_SERVER_ITUNES;
+            daap_server_type = DAAP_SERVER_ITUNES4X;
+            QString version_string = server_description.section(" ", 0, 0);
+            version_string = version_string.section("/", 1, 1);
+            bool ok = true;
+            float itunes_version = version_string.toFloat(&ok);
+            if(itunes_version == 4.5)
+            {
+                daap_server_type = DAAP_SERVER_ITUNES45;
+                warning("cannot talk to iTunes 4.5 (please complain to Apple "
+                        "and/or wait for an update to libopendaap)");
+                return false;
+            }
             log(QString("discovered service "
                         "named \"%1\" is being served by "
-                        "iTunes :-)")
-                        .arg(service_name), 2);
+                        "iTunes version %2")
+                        .arg(service_name)
+                        .arg(itunes_version), 2);
             service_details_mutex.unlock();
             
             //
@@ -580,6 +609,7 @@ bool DaapInstance::checkServerType(const QString &server_description)
 
 void DaapInstance::processResponse(DaapResponse *daap_response)
 {
+    
     //
     //  Check server type
     //
@@ -934,7 +964,6 @@ void DaapInstance::doServerInfoResponse(TagInput& dmap_data)
         u32 a_u32_variable;
         u8  a_u8_variable;
         
-
         switch(a_tag.type)
         {
             case 'mstt':
@@ -951,14 +980,21 @@ void DaapInstance::doServerInfoResponse(TagInput& dmap_data)
                 break;
 
             case 'mpro':
+            
+                //
+                //  DMAP version number
+                //
+                
+                dmap_data >> dmap_version;
+                break;
+                    
             case 'apro':
 
                 //
-                //  DMAP and DAAP version numbers ... which we ignore (!)
-                //  for the time being.
+                //  DAAP version numbers
                 //
                 
-                dmap_data >> a_u32_variable;
+                dmap_data >> daap_version;
                 break;
 
             case 'minm':

@@ -246,6 +246,21 @@ void DaapServer::parsePath(HttpInRequest *http_request, DaapRequest *daap_reques
     QString the_path = http_request->getUrl();
 
     //
+    //  iTunes 4.5 (and above?) send a fully formed URL rather than a
+    //  relative GET request, so munge the_path a bit if it looks like it's
+    //  a full URL
+    //
+    
+    if(the_path.contains("daap://"))
+    {
+        the_path = the_path.section(":",2,2);
+        the_path = the_path.section("/", 1, -1);
+        the_path = QString("/%1").arg(the_path);
+    }
+    
+   
+
+    //
     //  Figure out what kind of request this is
     //
     
@@ -308,7 +323,7 @@ void DaapServer::parsePath(HttpInRequest *http_request, DaapRequest *daap_reques
 
 void DaapServer::sendServerInfo(HttpInRequest *http_request)
 {
-    Version daapVersion( 2, 0 );
+    Version daapVersion( 3, 0 );
     Version dmapVersion( 1, 0 );
  
     TagOutput response;
@@ -393,7 +408,21 @@ void DaapServer::parseVariables(HttpInRequest *http_request, DaapRequest *daap_r
 
     if(user_agent.contains("iTunes/4"))
     {
+
         daap_request->setClientType(DAAP_CLIENT_ITUNES4X);
+
+        //
+        //  See if it's version 4.5
+        //
+        
+        QString version_string = user_agent.section(" ",0,0);
+        version_string = version_string.section("/",1,1);
+        bool ok = true;
+        float itunes_version = version_string.toFloat(&ok);
+        if(ok && itunes_version == 4.5)
+        {
+            daap_request->setClientType(DAAP_CLIENT_ITUNES45);
+        }
     }
     else if(user_agent.contains("MythTV/1"))
     {
@@ -484,6 +513,20 @@ void DaapServer::sendMetadata(HttpInRequest *http_request, QString request_path,
     //  databases there are, then it recursively requests the items and
     //  containers inside of each.
     //
+    
+    //
+    //  if, however, the requesting client is iTunes 4.5 (or higher?), we
+    //  have to munge the path a bit
+    //
+
+    if(
+        daap_request->getClientType() == DAAP_CLIENT_ITUNES45 &&
+        request_path.contains("daap://")
+      )
+    {
+        request_path = request_path.section(":", 2, -1);
+        request_path = request_path.section("/", 1, -1);
+    }
     
     QStringList components = QStringList::split("/", request_path);
     

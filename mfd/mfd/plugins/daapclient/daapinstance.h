@@ -25,7 +25,8 @@ class DaapResponse;
 
 enum DaapServerType {
     DAAP_SERVER_UNKNOWN = 0,
-    DAAP_SERVER_ITUNES,
+    DAAP_SERVER_ITUNES4X,
+    DAAP_SERVER_ITUNES45,
     DAAP_SERVER_MYTH
 };
     
@@ -113,6 +114,8 @@ class DaapInstance: public QThread
     bool    server_supports_index;
     bool    server_supports_resolve;
     int     server_numb_databases;
+    Version daap_version;
+    Version dmap_version;
     
     //
     //  from /login
