@@ -214,7 +214,7 @@
       <textarea name="ld1" draworder="0">
         <area>68,140,350,90</area>
         <font>titlefnt</font>
-        <value>retriving data...</value>
+        <value>retrieving data...</value>
         <value lang="ES">obteniendo información...</value>
         <value lang="CA">obtenient informació...</value>
       </textarea>

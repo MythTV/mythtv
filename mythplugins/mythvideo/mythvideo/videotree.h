@@ -20,10 +20,8 @@ class VideoTree : public MythThemedDialog
 
     typedef QValueVector<int> IntVector;
 
-    VideoTree(QSqlDatabase *ldb,
-              QString window_name,
-              QString theme_filename,
-              QWidget *parent = 0, 
+    VideoTree(MythMainWindow *parent, QSqlDatabase *ldb,
+              QString window_name, QString theme_filename,
               const char *name = 0);
 
     void buildVideoList();

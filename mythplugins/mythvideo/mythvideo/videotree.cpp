@@ -11,13 +11,10 @@ using namespace std;
 #include <mythtv/mythwidgets.h>
 #include <mythtv/uitypes.h>
 
-VideoTree::VideoTree(QSqlDatabase *ldb,
-                     QString window_name,
-                     QString theme_filename,
-                     QWidget *parent, 
+VideoTree::VideoTree(MythMainWindow *parent, QSqlDatabase *ldb,
+                     QString window_name, QString theme_filename,
                      const char *name)
-
-           : MythThemedDialog(window_name, theme_filename, parent, name)
+         : MythThemedDialog(parent, window_name, theme_filename, name)
 {
     db = ldb;
     currentParentalLevel = gContext->GetNumSetting("VideoDefaultParentalLevel", 4);

@@ -20,13 +20,10 @@ class VideoBrowser : public MythDialog
     Q_OBJECT
   public:
     VideoBrowser(QSqlDatabase *ldb, 
-                 QWidget *parent = 0, const char *name = 0);
+                 MythMainWindow *parent, const char *name = 0);
     ~VideoBrowser();
     void VideoBrowser::processEvents() { qApp->processEvents(); }
     
-
-  signals:
-    void killTheApp();
 
   protected slots:
     void selected();
@@ -38,6 +35,7 @@ class VideoBrowser : public MythDialog
 
   protected:
     void paintEvent(QPaintEvent *);
+    void keyPressEvent(QKeyEvent *e);
 
   private:
     bool updateML;
@@ -64,8 +62,6 @@ class VideoBrowser : public MythDialog
     void grayOut(QPainter *);
     void resizeImage(QPixmap *, QString);
 
-    QAccel *accel;
-
     QPixmap *bgTransBackup;
     Metadata *curitem;
     QString curitemMovie;
@@ -79,14 +75,11 @@ class VideoBrowser : public MythDialog
     QString m_title;
     QString m_cmd;
 
-    int space_itemid;
-    int enter_itemid;
-    int return_itemid;
-
     QRect infoRect;
     QRect browsingRect;
-    QRect fullRect() const;
+    QRect fullRect;
 
+    bool allowselect;
 };
 
 #endif

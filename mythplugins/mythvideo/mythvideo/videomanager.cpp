@@ -1,5 +1,4 @@
 #include <qlayout.h>
-#include <qaccel.h>
 #include <qapplication.h>
 #include <qsqldatabase.h>
 #include <qcursor.h>
@@ -17,6 +16,7 @@ using namespace std;
 #include "metadata.h"
 #include "videomanager.h"
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdialogs.h>
 
 #ifdef ENABLE_LIRC
 #include "lirc_client.h"
@@ -24,14 +24,16 @@ extern struct lirc_config *config;
 #endif
 
 VideoManager::VideoManager(QSqlDatabase *ldb,
-                         QWidget *parent, const char *name)
-           : MythDialog(parent, name)
+                           MythMainWindow *parent, const char *name)
+            : MythDialog(parent, name)
 {
     qInitNetworkProtocols();
     db = ldb;
     updateML = false;
 
     RefreshMovieList();
+
+    fullRect = QRect(0, 0, (int)(800*wmult), (int)(600*hmult));
 
     noUpdate = false;
     curIMDBNum = "";
@@ -56,36 +58,6 @@ VideoManager::VideoManager(QSqlDatabase *ldb,
 
     m_state = 0;
     InetGrabber = NULL;
-
-    accel = new QAccel(this);
-
-    space_itemid = accel->insertItem(Key_Space);
-    enter_itemid = accel->insertItem(Key_Enter);
-    return_itemid = accel->insertItem(Key_Return);
-
-    accel->connectItem(accel->insertItem(Key_Down), this, SLOT(cursorDown()));
-    accel->connectItem(accel->insertItem(Key_Up), this, SLOT(cursorUp()));
-    accel->connectItem(accel->insertItem(Key_Left), this, SLOT(cursorLeft()));
-    accel->connectItem(accel->insertItem(Key_Right), this, SLOT(cursorRight()));
-    accel->connectItem(space_itemid, this, SLOT(selected()));
-    accel->connectItem(enter_itemid, this, SLOT(selected()));
-    accel->connectItem(return_itemid, this, SLOT(selected()));
-    accel->connectItem(accel->insertItem(Key_PageUp), this, SLOT(pageUp()));
-    accel->connectItem(accel->insertItem(Key_PageDown), this, SLOT(pageDown()));
-    accel->connectItem(accel->insertItem(Key_Escape), this, SLOT(exitWin()));
-    accel->connectItem(accel->insertItem(Key_M), this, SLOT(videoMenu()));
-    accel->connectItem(accel->insertItem(Key_0), this, SLOT(num0()));
-    accel->connectItem(accel->insertItem(Key_1), this, SLOT(num1()));
-    accel->connectItem(accel->insertItem(Key_2), this, SLOT(num2()));
-    accel->connectItem(accel->insertItem(Key_3), this, SLOT(num3()));
-    accel->connectItem(accel->insertItem(Key_4), this, SLOT(num4()));
-    accel->connectItem(accel->insertItem(Key_5), this, SLOT(num5()));
-    accel->connectItem(accel->insertItem(Key_6), this, SLOT(num6()));
-    accel->connectItem(accel->insertItem(Key_7), this, SLOT(num7()));
-    accel->connectItem(accel->insertItem(Key_8), this, SLOT(num8()));
-    accel->connectItem(accel->insertItem(Key_9), this, SLOT(num9()));
-
-    connect(this, SIGNAL(killTheApp()), this, SLOT(accept()));
 
     urlTimer = new QTimer(this);
     connect(urlTimer, SIGNAL(timeout()), SLOT(GetMovieListingTimeOut()));
@@ -126,15 +98,10 @@ VideoManager::VideoManager(QSqlDatabase *ldb,
 
     updateBackground();
 
-    WFlags flags = getWFlags();
-    flags |= WRepaintNoErase;
-    setWFlags(flags);
-
-    showFullScreen();
-    setActiveWindow();
+    setNoErase();
 }
 
-VideoManager::~VideoManager()
+VideoManager::~VideoManager(void)
 {
     if (InetGrabber)
     {
@@ -143,35 +110,41 @@ VideoManager::~VideoManager()
     }
     delete urlTimer;
 
-    delete accel;
     delete theme;
 }
 
-void VideoManager::num0()
+void VideoManager::keyPressEvent(QKeyEvent *e)
 {
-    if (m_state == 3 && curIMDBNum.length() != 7)
+    if (allowselect)
     {
-        curIMDBNum = curIMDBNum + "0";
-        update(imdbEnterRect);
-        if (curIMDBNum.length() == 7)
+        switch (e->key())
         {
-            movieNumber = curIMDBNum;
-            GetMovieData(curIMDBNum);
-            backup.begin(this);
-            backup.drawPixmap(0, 0, myBackground);
-            backup.end();
-            m_state = 0;
-            noUpdate = false;
-            update(fullRect());
+            case Key_Space: case Key_Enter: case Key_Return: selected(); return;
+            default: break;
         }
+    }
+
+    switch (e->key())
+    {
+        case Key_Down: cursorDown(); break;
+        case Key_Up: cursorUp(); break;
+        case Key_Left: cursorLeft(); break;
+        case Key_Right: cursorRight(); break;
+        case Key_PageUp: pageUp(); break;
+        case Key_PageDown: pageDown(); break;
+        case Key_Escape: exitWin(); break;
+        case Key_M: case Key_I: videoMenu(); break;
+        case Key_0: case Key_1: case Key_2: case Key_3: case Key_4: case Key_5:
+        case Key_6: case Key_7: case Key_8: case Key_9: num(e); break;
+        default: MythDialog::keyPressEvent(e);
     }
 }
 
-void VideoManager::num1()
+void VideoManager::num(QKeyEvent *e)
 {
     if (m_state == 3 && curIMDBNum.length() != 7)
     {
-        curIMDBNum = curIMDBNum + "1";
+        curIMDBNum = curIMDBNum + e->text();
         update(imdbEnterRect);
         if (curIMDBNum.length() == 7)
         {
@@ -182,167 +155,7 @@ void VideoManager::num1()
             backup.end();
             m_state = 0;
             noUpdate = false;
-            update(fullRect());
-        }
-    }
-}
-
-void VideoManager::num2()
-{
-    if (m_state == 3 && curIMDBNum.length() != 7)
-    {
-        curIMDBNum = curIMDBNum + "2";
-        update(imdbEnterRect);
-        if (curIMDBNum.length() == 7)
-        {
-            movieNumber = curIMDBNum;
-            GetMovieData(curIMDBNum);
-            backup.begin(this);
-            backup.drawPixmap(0, 0, myBackground);
-            backup.end();
-            m_state = 0;
-            noUpdate = false;
-            update(fullRect());
-        }
-    }
-}
-
-void VideoManager::num3()
-{
-    if (m_state == 3 && curIMDBNum.length() != 7)
-    {
-        curIMDBNum = curIMDBNum + "3";
-        update(imdbEnterRect);
-        if (curIMDBNum.length() == 7)
-        {
-            movieNumber = curIMDBNum;
-            GetMovieData(curIMDBNum);
-            backup.begin(this);
-            backup.drawPixmap(0, 0, myBackground);
-            backup.end();
-            m_state = 0;
-            noUpdate = false;
-            update(fullRect());
-        }
-    }
-}
-
-void VideoManager::num4()
-{
-    if (m_state == 3 && curIMDBNum.length() != 7)
-    {
-        curIMDBNum = curIMDBNum + "4";
-        update(imdbEnterRect);
-        if (curIMDBNum.length() == 7)
-        {
-            movieNumber = curIMDBNum;
-            GetMovieData(curIMDBNum);
-            backup.begin(this);
-            backup.drawPixmap(0, 0, myBackground);
-            backup.end();
-            m_state = 0;
-            noUpdate = false;
-            update(fullRect());
-        }
-    }
-}
-
-void VideoManager::num5()
-{
-    if (m_state == 3 && curIMDBNum.length() != 7)
-    {
-        curIMDBNum = curIMDBNum + "5";
-        update(imdbEnterRect);
-        if (curIMDBNum.length() == 7)
-        {
-            movieNumber = curIMDBNum;
-            GetMovieData(curIMDBNum);
-            backup.begin(this);
-            backup.drawPixmap(0, 0, myBackground);
-            backup.end();
-            m_state = 0;
-            noUpdate = false;
-            update(fullRect());
-        }
-    }
-}
-
-void VideoManager::num6()
-{
-    if (m_state == 3 && curIMDBNum.length() != 7)
-    {
-        curIMDBNum = curIMDBNum + "6";
-        update(imdbEnterRect);
-        if (curIMDBNum.length() == 7)
-        {
-            movieNumber = curIMDBNum;
-            GetMovieData(curIMDBNum);
-            backup.begin(this);
-            backup.drawPixmap(0, 0, myBackground);
-            backup.end();
-            m_state = 0;
-            noUpdate = false;
-            update(fullRect());
-        }
-    }
-}
-
-void VideoManager::num7()
-{
-    if (m_state == 3 && curIMDBNum.length() != 7)
-    {
-        curIMDBNum = curIMDBNum + "7";
-        update(imdbEnterRect);
-        if (curIMDBNum.length() == 7)
-        {
-            movieNumber = curIMDBNum;
-            GetMovieData(curIMDBNum);
-            backup.begin(this);
-            backup.drawPixmap(0, 0, myBackground);
-            backup.end();
-            m_state = 0;
-            noUpdate = false;
-            update(fullRect());
-        }
-    }
-}
-
-void VideoManager::num8()
-{
-    if (m_state == 3 && curIMDBNum.length() != 7)
-    {
-        curIMDBNum = curIMDBNum + "8";
-        update(imdbEnterRect);
-        if (curIMDBNum.length() == 7)
-        {
-            movieNumber = curIMDBNum;
-            GetMovieData(curIMDBNum);
-            backup.begin(this);
-            backup.drawPixmap(0, 0, myBackground);
-            backup.end();
-            m_state = 0;
-            noUpdate = false;
-            update(fullRect());
-        }
-    }
-}
-
-void VideoManager::num9()
-{
-    if (m_state == 3 && curIMDBNum.length() != 7)
-    {
-        curIMDBNum = curIMDBNum + "9";
-        update(imdbEnterRect);
-        if (curIMDBNum.length() == 7)
-        {
-            movieNumber = curIMDBNum;
-            GetMovieData(curIMDBNum);
-            backup.begin(this);
-            backup.drawPixmap(0, 0, myBackground);
-            backup.end();
-            m_state = 0;
-            noUpdate = false;
-            update(fullRect());
+            update(fullRect);
         }
     }
 }
@@ -597,14 +410,11 @@ int VideoManager::GetMovieListing(QString movieName)
     res = InetGrabber->getData();
 
     QString movies = parseData(res, "<A NAME=\"mov\">Movies</A></H2>", "</TABLE>");
-    if (movies == "<NULL>")
+
+    movieList.clear();
+
+    if (movies != "<NULL>")
     {
-        // Individual Movie Page or Title Lookup Failure, either way cancel!
-        ret = 1;
-    }
-    else
-    {
-        movieList.clear();
         movieList = parseMovieList(movies);
 
         QMap<QString, QString>::Iterator it;
@@ -623,11 +433,12 @@ int VideoManager::GetMovieListing(QString movieName)
             }
             //cout << it.data() << endl;
         }
-        movieList["manual"] = "Manually Enter IMDB #";
-        movieList["reset"] = "Reset Entry";
-        movieList["cancel"] = "Cancel";
-        ret = 2;
     }
+
+    movieList["manual"] = "Manually Enter IMDB #";
+    movieList["reset"] = "Reset Entry";
+    movieList["cancel"] = "Cancel";
+    ret = 2;
 
     return ret;
 }
@@ -1049,6 +860,7 @@ void VideoManager::updateInfo(QPainter *p)
            container->Draw(&tmp, 7, 0);
            container->Draw(&tmp, 8, 0);
        }
+       allowselect = true;
     }
     else
     {
@@ -1062,10 +874,7 @@ void VideoManager::updateInfo(QPainter *p)
            norec->Draw(&tmp, 8, 0);
        }
 
-       accel->setItemEnabled(space_itemid, false);
-       accel->setItemEnabled(enter_itemid, false);
-       accel->setItemEnabled(return_itemid, false);
-
+       allowselect = false;
     }
     tmp.end();
     p->drawPixmap(pr.topLeft(), pix);
@@ -1168,12 +977,12 @@ void VideoManager::exitWin()
         backup.begin(this);
         backup.drawPixmap(0, 0, myBackground);
         backup.end();
-        update(fullRect());
+        update(fullRect);
         noUpdate = false;
 	urlTimer->stop();
     }
     else
-        emit killTheApp();
+        emit accept();
 }
 
 void VideoManager::cursorLeft()
@@ -1300,7 +1109,7 @@ void VideoManager::cursorDown(bool page)
     if (inListMovie >= listCountMovie && m_state == 2)
         inListMovie = listCountMovie - 1;
 
-    update(fullRect());
+    update(fullRect);
 }
 
 void VideoManager::cursorUp(bool page)
@@ -1393,7 +1202,7 @@ void VideoManager::cursorUp(bool page)
 
     if (inList > -1 && m_state == 0)
     {
-        update(fullRect());
+        update(fullRect);
     }
     else if (m_state == 0)
         inList = 0;
@@ -1478,7 +1287,7 @@ void VideoManager::selected()
               backup.drawPixmap(0, 0, myBackground);
               backup.end();
               m_state = 0;
-              update(fullRect());
+              update(fullRect);
               return;
           }
           //cout << "GETTING MOVIE #" << movieNumber << endl;
@@ -1520,8 +1329,7 @@ void VideoManager::selected()
            backup.drawPixmap(0, 0, myBackground);
            backup.end();
            m_state = 0;
-           update(fullRect());
-           update(fullRect());
+           update(fullRect);
            movieNumber = "";
            return;
        }
@@ -1532,8 +1340,7 @@ void VideoManager::selected()
            backup.end();
            curIMDBNum = "";
            m_state = 3;
-           update(fullRect());
-           update(fullRect());
+           update(fullRect);
            movieNumber = "";
            return;
        } 
@@ -1546,8 +1353,7 @@ void VideoManager::selected()
            backup.end();
  
            m_state = 0;
-           update(fullRect());
-           update(fullRect());
+           update(fullRect);
            movieNumber = "";
            return;
        }
@@ -1559,7 +1365,7 @@ void VideoManager::selected()
                backup.begin(this);
                backup.drawPixmap(0, 0, myBackground);
                backup.end();
-               update(fullRect());
+               update(fullRect);
                return;
            }
            //cout << "GETTING MOVIE #" << movieNumber << endl;
@@ -1570,7 +1376,7 @@ void VideoManager::selected()
            m_state = 0;
            update(infoRect);
            update(listRect);
-           update(fullRect());
+           update(fullRect);
            movieNumber = "";
        }
    }
@@ -1590,7 +1396,7 @@ void VideoManager::ResetCurrentItem()
     curitem->setCoverFile(coverFile);
     curitem->setYear(1895);
     curitem->setInetRef("00000000");
-    curitem->setDirector("Uknown");
+    curitem->setDirector("Unknown");
     curitem->setPlot("None");
     curitem->setUserRating(0.0);
     curitem->setRating("NR");
@@ -1624,8 +1430,3 @@ void VideoManager::GetMovieListingTimeOut()
     return;
 }
 
-QRect VideoManager::fullRect() const
-{
-    QRect r(0, 0, (int)(800*wmult), (int)(600*hmult));
-    return r;
-}

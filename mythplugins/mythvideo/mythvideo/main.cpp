@@ -84,6 +84,10 @@ int main(int argc, char *argv[])
                     ".");
     a.installTranslator(&translator);
 
+    MythMainWindow *mainWindow = new MythMainWindow();
+    mainWindow->Show();
+    gContext->SetMainWindow(mainWindow);
+
     QString themename = gContext->GetSetting("Theme");
     QString themedir = gContext->FindThemeDir(themename);
     if (themedir == "")
@@ -94,7 +98,8 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
-    QString startdir = gContext->GetSetting("VideoStartupDir", "/share/Movies/dvd");
+    QString startdir = gContext->GetSetting("VideoStartupDir", 
+                                            "/share/Movies/dvd");
 
     runMenu(themedir, db, startdir);
 
@@ -107,8 +112,8 @@ int main(int argc, char *argv[])
 
 void runMenu(QString themedir, QSqlDatabase *db, QString startdir)
 {
-    ThemedMenu *diag = new ThemedMenu(themedir.ascii(),
-                                      "videomenu.xml");
+    ThemedMenu *diag = new ThemedMenu(themedir.ascii(), "videomenu.xml",
+                                      gContext->GetMainWindow(), "videomenu");
 
     GenericData data;
 
@@ -121,7 +126,6 @@ void runMenu(QString themedir, QSqlDatabase *db, QString startdir)
     if (diag->foundTheme())
     {
         gContext->LCDswitchToTime();
-        diag->Show();
         diag->exec();
     }
     else
@@ -142,21 +146,26 @@ void VideoCallback(void *data, QString &selection)
     {
         SearchDir(mdata->db, mdata->startdir);
 
-        VideoManager *manage = new VideoManager(mdata->db);
-        manage->Show();
+        VideoManager *manage = new VideoManager(mdata->db, 
+                                                gContext->GetMainWindow(),
+                                                "video manager");
         manage->exec();
+        delete manage;
     }
     else if (sel == "browser")
     {
-        VideoBrowser *browse = new VideoBrowser(mdata->db);
-        browse->Show();
+        VideoBrowser *browse = new VideoBrowser(mdata->db,
+                                                gContext->GetMainWindow(),
+                                                "video browser");
         browse->exec();
+        delete browse;
     }
     else if (sel == "listing")
     {
-        VideoTree *tree = new VideoTree(mdata->db, "videotree", "video-");
-        tree->Show();
+        VideoTree *tree = new VideoTree(gContext->GetMainWindow(),
+                                        mdata->db, "videotree", "video-");
         tree->exec();
+        delete tree;
     }
     else if (sel == "settings_general")
     {
@@ -168,7 +177,6 @@ void VideoCallback(void *data, QString &selection)
         PlayerSettings settings;
         settings.exec(QSqlDatabase::database());
     }
-  
 }
 
 void SearchDir(QSqlDatabase *db, QString &directory)
@@ -225,7 +233,7 @@ void SearchDir(QSqlDatabase *db, QString &directory)
             title = title.left(title.find("("));
 
             myNewFile = new Metadata(name, "No Cover", title, 1895, "00000000", 
-                                     "Uknown", "None", 0.0, "NR", 0, 0, 1);
+                                     "Unknown", "None", 0.0, "NR", 0, 0, 1);
             myNewFile->dumpToDatabase(db);
             if (myNewFile)
                 delete myNewFile;

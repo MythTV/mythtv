@@ -24,8 +24,8 @@ extern struct lirc_config *config;
 #endif
 
 VideoBrowser::VideoBrowser(QSqlDatabase *ldb,
-                         QWidget *parent, const char *name)
-           : MythDialog(parent, name)
+                           MythMainWindow *parent, const char *name)
+            : MythDialog(parent, name)
 {
     qInitNetworkProtocols();
     db = ldb;
@@ -40,24 +40,7 @@ VideoBrowser::VideoBrowser(QSqlDatabase *ldb,
     curitem = NULL;
     inData = 0;
 
-    accel = new QAccel(this);
-
-    space_itemid = accel->insertItem(Key_Space);
-    enter_itemid = accel->insertItem(Key_Enter);
-    return_itemid = accel->insertItem(Key_Return);
-
-    accel->connectItem(accel->insertItem(Key_Down), this, SLOT(cursorDown()));
-    accel->connectItem(accel->insertItem(Key_Up), this, SLOT(cursorUp()));
-    accel->connectItem(accel->insertItem(Key_Left), this, SLOT(cursorLeft()));
-    accel->connectItem(accel->insertItem(Key_Right), this, SLOT(cursorRight()));
-    accel->connectItem(space_itemid, this, SLOT(selected()));
-    accel->connectItem(enter_itemid, this, SLOT(selected()));
-    accel->connectItem(return_itemid, this, SLOT(selected()));
-    //accel->connectItem(accel->insertItem(Key_PageUp), this, SLOT(pageUp()));
-    //accel->connectItem(accel->insertItem(Key_PageDown), this, SLOT(pageDown()));
-    accel->connectItem(accel->insertItem(Key_Escape), this, SLOT(exitWin()));
-
-    connect(this, SIGNAL(killTheApp()), this, SLOT(accept()));
+    fullRect = QRect(0, 0, (int)(800*wmult), (int)(600*hmult));
 
     theme = new XMLParse();
     theme->SetWMult(wmult);
@@ -71,18 +54,33 @@ VideoBrowser::VideoBrowser(QSqlDatabase *ldb,
     SetCurrentItem();
     updateBackground();
 
-    WFlags flags = getWFlags();
-    flags |= WRepaintNoErase;
-    setWFlags(flags);
-
-    showFullScreen();
-    setActiveWindow();
+    setNoErase();
 }
 
 VideoBrowser::~VideoBrowser()
 {
-    delete accel;
     delete theme;
+}
+
+void VideoBrowser::keyPressEvent(QKeyEvent *e)
+{ 
+    if (allowselect)
+    {
+        switch (e->key())
+        {
+            case Key_Space: case Key_Enter: case Key_Return: selected(); return;
+            default: break;
+        }
+    }
+
+    switch (e->key())
+    {
+        case Key_Down: cursorDown(); break;
+        case Key_Up: cursorUp(); break;
+        case Key_Left: cursorLeft(); break;
+        case Key_Right: cursorRight(); break;
+        default: MythDialog::keyPressEvent(e);
+    }
 }
 
 void VideoBrowser::updateBackground(void)
@@ -213,7 +211,7 @@ void VideoBrowser::updatePlayWait(QPainter *p)
         container->Draw(p, 3, 0);
     }
     m_state++;
-    update(fullRect());
+    update(fullRect);
   }
   else if (m_state == 4)
   {
@@ -224,11 +222,12 @@ void VideoBrowser::updatePlayWait(QPainter *p)
     backup.end();
     noUpdate = false;
 
-    raise();
-    setActiveWindow();
+    gContext->GetMainWindow()->raise();
+    gContext->GetMainWindow()->setActiveWindow();
+    gContext->GetMainWindow()->currentWidget()->setFocus();
 
     m_state = 0;
-    update(fullRect());
+    update(fullRect);
   }
 }
 
@@ -378,6 +377,8 @@ void VideoBrowser::updateInfo(QPainter *p)
            container->Draw(&tmp, 7, 0);
            container->Draw(&tmp, 8, 0);
        }
+
+       allowselect = true;
     }
     else
     {
@@ -391,10 +392,7 @@ void VideoBrowser::updateInfo(QPainter *p)
            norec->Draw(&tmp, 8, 0);
        }
 
-       accel->setItemEnabled(space_itemid, false);
-       accel->setItemEnabled(enter_itemid, false);
-       accel->setItemEnabled(return_itemid, false);
-
+       allowselect = false;
     }
     tmp.end();
     p->drawPixmap(pr.topLeft(), pix);
@@ -442,7 +440,7 @@ void VideoBrowser::parseContainer(QDomElement &element)
  
 void VideoBrowser::exitWin()
 {
-    emit killTheApp();
+    emit accept();
 }
 
 void VideoBrowser::cursorLeft()
@@ -511,11 +509,5 @@ void VideoBrowser::selected()
     }
     m_cmd = command;
     m_state = 1;
-    update(fullRect());
-}
-
-QRect VideoBrowser::fullRect() const
-{
-    QRect r(0, 0, (int)(800*wmult), (int)(600*hmult));
-    return r;
+    update(fullRect);
 }

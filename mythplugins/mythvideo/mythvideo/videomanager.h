@@ -21,13 +21,10 @@ class VideoManager : public MythDialog
     Q_OBJECT
   public:
     VideoManager(QSqlDatabase *ldb, 
-                 QWidget *parent = 0, const char *name = 0);
-    ~VideoManager();
+                 MythMainWindow *parent, const char *name = 0);
+    ~VideoManager(void);
     void VideoManager::processEvents() { qApp->processEvents(); }
     
-
-  signals:
-    void killTheApp();
 
   protected slots:
     void selected();
@@ -43,18 +40,10 @@ class VideoManager : public MythDialog
 
   protected:
     void paintEvent(QPaintEvent *);
+    void keyPressEvent(QKeyEvent *e);
 
   private slots:
-    void num0();
-    void num1();
-    void num2();
-    void num3();
-    void num4();
-    void num5();
-    void num6();
-    void num7();
-    void num8();
-    void num9();
+    void num(QKeyEvent *e);
 
   private:
     bool updateML;
@@ -93,8 +82,6 @@ class VideoManager : public MythDialog
     void grayOut(QPainter *);
     void resizeImage(QPixmap *, QString);
 
-    QAccel *accel;
-
     QPixmap *bgTransBackup;
     Metadata *curitem;
     QString curitemMovie;
@@ -116,16 +103,12 @@ class VideoManager : public MythDialog
 
     int m_state;
 
-    int space_itemid;
-    int enter_itemid;
-    int return_itemid;
-
     int listsize;
     int listsizeMovie;
     QRect listRect;
     QRect movieListRect;
     QRect infoRect;
-    QRect fullRect() const;
+    QRect fullRect;
     QRect imdbEnterRect;
 
     QString m_cmd;   
@@ -145,6 +128,7 @@ class VideoManager : public MythDialog
     bool stopProcessing;
     QString theMovieName;
 
+    bool allowselect;
 };
 
 #endif
