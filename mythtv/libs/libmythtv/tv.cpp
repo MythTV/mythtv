@@ -704,7 +704,7 @@ void TV::SetupPipRecorder(void)
         pipnvr->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
 
     pipnvr->SetAudioDevice(pipaudiodev);
-    pipnvr->SetAudioCompression(!settings->GetNumSetting("DontCompressAudio"));
+    pipnvr->SetAudioCompression(false);
 
     pipnvr->Initialize();
 }

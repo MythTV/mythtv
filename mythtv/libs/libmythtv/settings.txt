@@ -24,6 +24,9 @@ int Height=480
 # What codec to use?  Tested values are rtjpeg (the default) and mpeg4
 str Codec=rtjpeg
 #
+# I normally use 640x480 with the mpeg4 codec and the below settings.
+#
+#
 # RTjpeg specific settings
 #
 # Quality level to capture at (higher better, 255 being best)
@@ -35,7 +38,7 @@ int ChromaFilter=0
 # MPEG4 specific settings
 # 
 # Desired bitrate, in bits/second.  2200 means about a gigabyte an hour.
-int TargetBitrate=2200
+int TargetBitrate=3300
 # Scale bitrate by frame size.  If this is set to 1, the target bitrate given
 # above will be used as a guideline for 640x480.  Other resolutions will scale
 # the target bitrate down according to the framesize.
@@ -52,7 +55,7 @@ int QualDiff=3
 # dsp device -- output only
 str AudioDevice=/dev/dsp
 # Audio Sample Rate: one of 32000, 44100, 48000
-int AudioSampleRate=44100
+int AudioSampleRate=32000
 # Turn off the audio compression? 1 for yes, 0 for no.  Compression saves 500 
 # megabytes an hour, but takes extra CPU time.
 int DontCompressAudio=0
@@ -65,7 +68,7 @@ int MP3Quality=7
 # Deinterlace playback (1 for on, 0 for no) -- adds to CPU usage
 int Deinterlace=1
 # How long to skip forward on a fast forward?
-int FastForwardAmount=5
+int FastForwardAmount=30
 # How long to skip backwards on a rewind?
 int RewindAmount=5
 # Are the fast forward and rewind keys sticky (auto-repeat after letting go)?
@@ -96,6 +99,6 @@ str TVFormat=NTSC
 str FreqTable=us-cable
 
 # Picture-in-picture options
-#int PIPBufferSize=1
-#int PIPMaxBufferFill=50
-#str PIPBufferName=/mnt/store/ringbuf2.nuv
+int PIPBufferSize=1
+int PIPMaxBufferFill=50
+str PIPBufferName=/mnt/store/ringbuf2.nuv

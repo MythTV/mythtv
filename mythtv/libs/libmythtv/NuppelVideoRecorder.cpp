@@ -390,7 +390,6 @@ void NuppelVideoRecorder::StartRecording(void)
 
     if (!useavcodec)
     {
-        cout << "using rtjpeg\n";
         int setval;
         rtjc = new RTjpeg();
         setval = RTJ_YUV420;
