@@ -383,15 +383,11 @@ bool WriteBlock(QSocket *socket, void *data, int len)
 
     unsigned int errorcount = 0;
 
-cout << "write block start: " << len << endl;
-
     while (size > 0)
     {
         qApp->lock();
-cout << "socket writeblock\n";
         int temp = socket->writeBlock((char *)data + written, size);
         qApp->unlock();
-cout << "done\n";
         written += temp;
         size -= temp;
         if (size > 0)
@@ -405,19 +401,14 @@ cout << "done\n";
     }
 
     qApp->lock();
-cout << "flushing\n";
     if (socket->bytesToWrite() > 0)
         socket->flush();
     qApp->unlock();
     
-cout << "done flushing\n";
-
     while (socket->bytesToWrite() >= (unsigned) written)
     {
-cout << socket->bytesToWrite() << " " << written << endl;
         usleep(50000);
     }    
-cout << "done with write\n";
 
     return true;
 }
