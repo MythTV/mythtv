@@ -3,7 +3,7 @@
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-01-11, v1.070
+<date>2003-01-11, v1.071
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -831,6 +831,12 @@ if the user had pressed the keys on the keyboard.
 Some IR devices require a kernel recompile, and some don't. However, all at
 least require having the kernel source available as a resource for the lirc
 build process. 
+
+<sect1>Gentoo
+<p>To install lirc on Gentoo, all you need to do is:
+<tscreen><verb>
+$ emerge lirc
+</verb></tscreen>
 
 <sect1>Mandrake
 <p>lircd has two prerequisites:  <bf>dialog</bf>, available in Mandrake through the
@@ -1862,10 +1868,10 @@ You can also turn off DPMS from the Command Line, but this will not survive
 a reboot.
 
 <tscreen><verb>
-$ xset -DPMS
+$ xset -dpms
 </verb></tscreen>
 
-Using <tt>xset +DPMS</tt> will turn it back on.
+Using <tt>xset +dpms</tt> will turn it back on.
 
 Finally, depending on your distribution, you may be able to turn it off from
 within the control panel.
@@ -2238,6 +2244,7 @@ Added info to audio troubleshooting on disabling sound managers, like esd
 and artsd.  Added mythweather international example.
 v1.069, 2003-01-11.  Fixed keyboard commands for mythweather.
 v1.070, 2003-01-11.  Remove Mark Cooper's email address, per request.
+v1.071, 2003-01-11.  Added Gentoo lirc instructions.  Fixed xset command.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

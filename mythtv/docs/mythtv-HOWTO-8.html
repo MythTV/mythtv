@@ -23,7 +23,18 @@ if the user had pressed the keys on the keyboard.</P>
 least require having the kernel source available as a resource for the lirc
 build process. </P>
 
-<H2><A NAME="ss8.1">8.1</A> <A HREF="mythtv-HOWTO.html#toc8.1">Mandrake</A>
+<H2><A NAME="ss8.1">8.1</A> <A HREF="mythtv-HOWTO.html#toc8.1">Gentoo</A>
+</H2>
+
+<P>To install lirc on Gentoo, all you need to do is:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ emerge lirc
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss8.2">8.2</A> <A HREF="mythtv-HOWTO.html#toc8.2">Mandrake</A>
 </H2>
 
 <P>lircd has two prerequisites:  <B>dialog</B>, available in Mandrake through the
@@ -58,7 +69,7 @@ $
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss8.2">8.2</A> <A HREF="mythtv-HOWTO.html#toc8.2">Red Hat Linux 8.0</A>
+<H2><A NAME="ss8.3">8.3</A> <A HREF="mythtv-HOWTO.html#toc8.3">Red Hat Linux 8.0</A>
 </H2>
 
 <P>You should already have the source from the "Kernel Development" package
@@ -74,7 +85,7 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss8.3">8.3</A> <A HREF="mythtv-HOWTO.html#toc8.3">Obtaining and compiling lirc.</A>
+<H2><A NAME="ss8.4">8.4</A> <A HREF="mythtv-HOWTO.html#toc8.4">Obtaining and compiling lirc.</A>
 </H2>
 
 <P>You're going to need to download and compile lircd.  Go to 
@@ -175,7 +186,7 @@ according to
 <A HREF="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/  s1-custom-kernel-bootloader.html">http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/  s1-custom-kernel-bootloader.html</A> Remember, if you have any custom  
 kernel modules (alsa, etc) you will have to recompile/reinstall those.</P>
 
-<H2><A NAME="ss8.4">8.4</A> <A HREF="mythtv-HOWTO.html#toc8.4">Completing the lirc install.</A>
+<H2><A NAME="ss8.5">8.5</A> <A HREF="mythtv-HOWTO.html#toc8.5">Completing the lirc install.</A>
 </H2>
 
 <P>If configure did not mention anything about a kernel module, then you  
@@ -305,7 +316,7 @@ the <B>irexec</B> program can accomplish this fairly easily.  The
 configfiles/lircrc.example.pinnaclestudiopctv file has an example of calling
 an external program from a remote control button.</P>
 
-<H2><A NAME="ss8.5">8.5</A> <A HREF="mythtv-HOWTO.html#toc8.5">Additional information for lirc.</A>
+<H2><A NAME="ss8.6">8.6</A> <A HREF="mythtv-HOWTO.html#toc8.6">Additional information for lirc.</A>
 </H2>
 
 <P>Take a look at the lircrc.example files in the <CODE>configfiles/</CODE>
@@ -367,7 +378,7 @@ the <B>irw</B> program to make sure that your remote is working, you can
 create the appropriate mappings in <CODE>.lircrc</CODE> to get excellent remote
 functionality with mythtv.</P>
 
-<H2><A NAME="ss8.6">8.6</A> <A HREF="mythtv-HOWTO.html#toc8.6">Configuring lirc for use with an IR blaster.</A>
+<H2><A NAME="ss8.7">8.7</A> <A HREF="mythtv-HOWTO.html#toc8.7">Configuring lirc for use with an IR blaster.</A>
 </H2>
 
 <P>By Carlos Talbot, 

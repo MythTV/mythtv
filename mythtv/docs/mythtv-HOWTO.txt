@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-01-11, v1.070
+  2003-01-11, v1.071
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -60,14 +60,15 @@
      7.2 Setting the mixer from the command line.
 
   8. Setting up a remote control.
-     8.1 Mandrake
-        8.1.1 Obtaining the kernel.
-     8.2 Red Hat Linux 8.0
-     8.3 Obtaining and compiling lirc.
-        8.3.1 Recompiling your kernel on Red Hat Linux
-     8.4 Completing the lirc install.
-     8.5 Additional information for lirc.
-     8.6 Configuring lirc for use with an IR blaster.
+     8.1 Gentoo
+     8.2 Mandrake
+        8.2.1 Obtaining the kernel.
+     8.3 Red Hat Linux 8.0
+     8.4 Obtaining and compiling lirc.
+        8.4.1 Recompiling your kernel on Red Hat Linux
+     8.5 Completing the lirc install.
+     8.6 Additional information for lirc.
+     8.7 Configuring lirc for use with an IR blaster.
 
   9. Configuring mythtv.
      9.1 Editing the settings.txt file.
@@ -965,7 +966,13 @@
   all at least require having the kernel source available as a resource
   for the lirc build process.
 
-  [1m8.1.  Mandrake[0m
+  [1m8.1.  Gentoo[0m
+
+  To install lirc on Gentoo, all you need to do is:
+
+       $ emerge lirc
+
+  [1m8.2.  Mandrake[0m
 
   lircd has two prerequisites:  [1mdialog[22m, available in Mandrake through
   the "cdialog" RPM, and the kernel source.  Mandrake 9.0 is using the
@@ -974,7 +981,7 @@
   http://www.kernel.org/pub/linux/kernel/v2.4/
   <http://www.kernel.org/pub/linux/kernel/v2.4/>.
 
-  [1m8.1.1.  Obtaining the kernel.[0m
+  [1m8.2.1.  Obtaining the kernel.[0m
 
   An easy way is to use the wget command:
 
@@ -982,17 +989,17 @@
 
   Next, open a shell and login as superuser.
 
-  $ su
-  # mkdir /usr/src
-  # mv linux-2.4.19.tar.bz2 /usr/src
-  # cd /usr/src
-  # tar -xjf linux-2.4.19.tar.bz2
-  # chown -R root.root linux-2.4.19
-  # ln -sf linux-2.4.19 linux
-  # exit
-  $
+       $ su
+       # mkdir /usr/src
+       # mv linux-2.4.19.tar.bz2 /usr/src
+       # cd /usr/src
+       # tar -xjf linux-2.4.19.tar.bz2
+       # chown -R root.root linux-2.4.19
+       # ln -sf linux-2.4.19 linux
+       # exit
+       $
 
-  [1m8.2.  Red Hat Linux 8.0[0m
+  [1m8.3.  Red Hat Linux 8.0[0m
 
   You should already have the source from the "Kernel Development"
   package you installed in section 3.2. Ensure that a symlink has been
@@ -1003,7 +1010,7 @@
        # ln -s linux-2.4.18-x.x.x linux
        # exit
 
-  [1m8.3.  Obtaining and compiling lirc.[0m
+  [1m8.4.  Obtaining and compiling lirc.[0m
 
   You're going to need to download and compile lircd.  Go to
   http://www.lirc.org <http://www.lirc.org> and download lirc; as of
@@ -1034,6 +1041,7 @@
   you will have to load the lirc_serial module. If you did not get any
   such messages skip the kernel recompile steps below and go directly to
   making and installing the lirc driver.
+
   Once the configuration step is complete:
 
        $ make
@@ -1041,7 +1049,7 @@
        # make install
        # chmod 666 /dev/lircd
 
-  [1m8.3.1.  Recompiling your kernel on Red Hat Linux[0m
+  [1m8.4.1.  Recompiling your kernel on Red Hat Linux[0m
 
   Don't Panic! Red Hat makes a kernel recompile very easy. They provide
   configuration files that make it so you can recompile your kernel with
@@ -1080,11 +1088,11 @@
   Only change things you know you can change. If you are not sure, just
   stick to the one required change. Click "save and exit".  Next:
 
-  # make dep
-  # make clean
-  # make bzImage modules
-  # make modules_install
-  # make install
+       # make dep
+       # make clean
+       # make bzImage modules
+       # make modules_install
+       # make install
 
   if you are using [1mgrub[22m, that should be it, reboot and select your
   custom kernel upon boot. If you are using [1mlilo[22m, change your lilo
@@ -1095,7 +1103,7 @@
   s1-custom-kernel-bootloader.html> Remember, if you have any custom
   kernel modules (alsa, etc) you will have to recompile/reinstall those.
 
-  [1m8.4.  Completing the lirc install.[0m
+  [1m8.5.  Completing the lirc install.[0m
 
   If configure did not mention anything about a kernel module, then you
   are finished. If it did mention a kernel module, you must edit the
@@ -1163,7 +1171,7 @@
 
   or
 
-       $ cp lircrc.example.pinnaclestudiopctv ~/.lircrc
+  $ cp lircrc.example.pinnaclestudiopctv ~/.lircrc
 
   if you've got a Pinnacle Studio PCTV remote.
 
@@ -1192,7 +1200,7 @@
   configfiles/lircrc.example.pinnaclestudiopctv file has an example of
   calling an external program from a remote control button.
 
-  [1m8.5.  Additional information for lirc.[0m
+  [1m8.6.  Additional information for lirc.[0m
 
   Take a look at the lircrc.example files in the configfiles/ directory.
   In my case, (Pinnacle Studio card) the channel up and down functions
@@ -1222,17 +1230,17 @@
   rather than "ChannelUp" and "ChannelDown".  I added the following to
   my /home/[yourusername]/.lircrc file:
 
-  begin
-      prog = irxevent
-      button = channel+
-      config = Key Up CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = channel+
+           config = Key Up CurrentWindow
+       end
 
-  begin
-      prog = irxevent
-      button = channel-
-      config = Key Down CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = channel-
+           config = Key Down CurrentWindow
+       end
 
   which took care of basic functionality.  Because the PCTV Studio
   remote has additional buttons, look at the configfiles/lircrc.exam-
@@ -1245,7 +1253,7 @@
   the appropriate mappings in .lircrc to get excellent remote
   functionality with mythtv.
 
-  [1m8.6.  Configuring lirc for use with an IR blaster.[0m
+  [1m8.7.  Configuring lirc for use with an IR blaster.[0m
 
   By Carlos Talbot,  <mailto:carlos@talbot.net>
 
@@ -1271,19 +1279,19 @@
   Depending on whether you have your serial port driver configured as a
   kernel module you might see the following message during make:
 
-  lirc_sir.c:56:2: warning: #warning
-  "******************************************"
+       lirc_sir.c:56:2: warning: #warning
+       "******************************************"
 
-  lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
+       lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
 
-  lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
+       lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
 
-  lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
+       lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
 
-  lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
+       lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
 
-  lirc_sir.c:61:2: warning: #warning
-  "******************************************"
+       lirc_sir.c:61:2: warning: #warning
+       "******************************************"
 
   If you do receive this statement make sure to run the [1msetserial[0m
   command before you load the lirc_sir module. Follow this with the
@@ -1319,10 +1327,10 @@
   being received. If everything is configured correctly you should see
   something similar to the following:
 
-  $ irw
-  0000000000007ff0 00 1 gi-motorola-dct2000
-  000000000000bff8 00 2 gi-motorola-dct2000
-  000000000000f7f0 00 ENTER gi-motorola-dct2000
+       $ irw
+       0000000000007ff0 00 1 gi-motorola-dct2000
+       000000000000bff8 00 2 gi-motorola-dct2000
+       000000000000f7f0 00 ENTER gi-motorola-dct2000
 
   Once you've verified lirc is working you can press [1mCTRL-C [22mto exit [1mirw[0m
   and configure the channel changing script.
@@ -1973,9 +1981,9 @@
   You can also turn off DPMS from the Command Line, but this will not
   survive a reboot.
 
-       $ xset -DPMS
+       $ xset -dpms
 
-  Using xset +DPMS will turn it back on.
+  Using xset +dpms will turn it back on.
 
   Finally, depending on your distribution, you may be able to turn it
   off from within the control panel.
