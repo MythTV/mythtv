@@ -1432,6 +1432,8 @@ static GenericComboBox *MythShortDateFormat()
     gc->addSelection(sampdate.toString("MM-dd"), "MM-dd");
     gc->addSelection(sampdate.toString("ddd d"), "ddd d");
     gc->addSelection(sampdate.toString("d ddd"), "d ddd");
+    gc->addSelection(sampdate.toString("ddd M/d"), "ddd M/d");
+    gc->addSelection(sampdate.toString("M/d ddd"), "M/d ddd");
     gc->setHelpText(QObject::tr("Your preferred short date format."));
     return gc;
 }
