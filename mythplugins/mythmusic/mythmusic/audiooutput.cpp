@@ -19,15 +19,12 @@
 
 using namespace std;
 
-extern Q_EXPORT QApplication* qApp;
-
-
-void AudioOutput::stop()
+void MMAudioOutput::stop()
 {
     user_stop = TRUE;
 }
 
-void AudioOutput::status()
+void MMAudioOutput::status()
 {
     long ct = (total_written - latency()) / bps;
 
@@ -41,12 +38,12 @@ void AudioOutput::status()
     }
 }
 
-long AudioOutput::written()
+long MMAudioOutput::written()
 {
     return total_written;
 }
 
-void AudioOutput::seek(long pos)
+void MMAudioOutput::seek(long pos)
 {
     recycler()->mutex()->lock();
     recycler()->clear();
@@ -70,7 +67,7 @@ void AudioOutput::seek(long pos)
 #endif
 
 
-AudioOutput::AudioOutput(unsigned int sz, const QString &d)
+MMAudioOutput::MMAudioOutput(unsigned int sz, const QString &d)
     : Output(sz), audio_device(d), inited(FALSE), paus(FALSE), play(FALSE),
       user_stop(FALSE),
       total_written(0), current_seconds(-1),
@@ -80,7 +77,7 @@ AudioOutput::AudioOutput(unsigned int sz, const QString &d)
 {
 }
 
-AudioOutput::~AudioOutput()
+MMAudioOutput::~MMAudioOutput()
 {
     if (audio_fd > 0) {
 	close(audio_fd);
@@ -88,7 +85,7 @@ AudioOutput::~AudioOutput()
     }
 }
 
-void AudioOutput::configure(long freq, int chan, int prec, int rate)
+void MMAudioOutput::configure(long freq, int chan, int prec, int rate)
 {
     // we need to configure
     if (freq != lf || chan != lc || prec != lp) {
@@ -132,7 +129,7 @@ void AudioOutput::configure(long freq, int chan, int prec, int rate)
 }
 
 
-void AudioOutput::reset()
+void MMAudioOutput::reset()
 {
     if (audio_fd > 0) {
 	close(audio_fd);
@@ -190,12 +187,12 @@ void AudioOutput::reset()
 }
 
 
-void AudioOutput::pause()
+void MMAudioOutput::pause()
 {
     paus = (paus) ? FALSE : TRUE;
 }
 
-void AudioOutput::post()
+void MMAudioOutput::post()
 {
     if (audio_fd < 1)
 	return;
@@ -204,7 +201,7 @@ void AudioOutput::post()
     ioctl(audio_fd, SNDCTL_DSP_POST, &unused);
 }
 
-void AudioOutput::sync()
+void MMAudioOutput::sync()
 {
     if (audio_fd < 1)
 	return;
@@ -213,8 +210,7 @@ void AudioOutput::sync()
     ioctl(audio_fd, SNDCTL_DSP_SYNC, &unused);
 }
 
-
-void AudioOutput::resetDSP()
+void MMAudioOutput::resetDSP()
 {
     if (audio_fd < 1)
 	return;
@@ -223,8 +219,7 @@ void AudioOutput::resetDSP()
     ioctl(audio_fd, SNDCTL_DSP_RESET, &unused);
 }
 
-
-void AudioOutput::resetTime()
+void MMAudioOutput::resetTime()
 {
     mutex()->lock();
     current_seconds = -1;
@@ -232,7 +227,7 @@ void AudioOutput::resetTime()
     mutex()->unlock();
 }
 
-bool AudioOutput::initialize()
+bool MMAudioOutput::initialize()
 {
     inited = paus = play = user_stop = FALSE;
 
@@ -255,7 +250,7 @@ bool AudioOutput::initialize()
 }
 
 
-long AudioOutput::latency()
+long MMAudioOutput::latency()
 {
     ulong used = 0;
 
@@ -267,7 +262,7 @@ long AudioOutput::latency()
     return used;
 }
 
-void AudioOutput::run()
+void MMAudioOutput::run()
 {
     mutex()->lock();
 
@@ -384,3 +379,4 @@ void AudioOutput::run()
 
     mutex()->unlock();
 }
+

@@ -7,7 +7,7 @@
 #ifndef   __audiooutput_h
 #define   __audiooutput_h
 
-class AudioOutput;
+class MMAudioOutput;
 
 #include "output.h"
 
@@ -17,11 +17,11 @@ class AudioOutput;
 #endif
 
 
-class AudioOutput : public Output
+class MMAudioOutput : public Output
 {
 public:
-    AudioOutput(unsigned int, const QString &);
-    virtual ~AudioOutput();
+    MMAudioOutput(unsigned int, const QString &);
+    virtual ~MMAudioOutput();
 
     bool initialized() const { return inited; }
 

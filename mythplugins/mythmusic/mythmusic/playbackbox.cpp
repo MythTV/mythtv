@@ -473,7 +473,7 @@ void PlaybackBox::play()
     {
         QString adevice = gContext->GetSetting("AudioDevice");
 
-        output = new AudioOutput(outputBufferSize * 1024, adevice);
+        output = new MMAudioOutput(outputBufferSize * 1024, adevice);
         output->setBufferSize(outputBufferSize * 1024);
         output->addListener(this);
         output->addListener(mainvisual);
