@@ -50,7 +50,7 @@ class MythEvent : public QCustomEvent
     QString extradata;
 };
 
-#define MYTH_BINARY_VERSION "0.9.05062003-1"
+#define MYTH_BINARY_VERSION "0.9.05142003-1"
 
 extern bool print_verbose_messages;
 
@@ -147,13 +147,13 @@ class MythContext : public QObject
     QSocket *serverSock;
     QString m_localhostname;
 
-    pthread_mutex_t serverSockLock;
+    QMutex serverSockLock;
     bool expectingReply;
 
     QPtrList<QObject> listeners;
 
     QSqlDatabase* m_db;
-    pthread_mutex_t dbLock;
+    QMutex dbLock;
 
     QMap<QString, QImage> imageCache;
 

@@ -55,4 +55,5 @@
      <action>EXEC mythweather</action>
      <depends>mythweather</depends>
    </button>
+
 </mythmenu>

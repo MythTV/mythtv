@@ -33,6 +33,16 @@
     <position>270,40</position>
   </logo>
 
+  <uparrow>
+    <image>uparrow.png</image>
+    <position>750,200</position>
+  </uparrow>
+
+  <downarrow>
+    <image>downarrow.png</image>
+    <position>750,510</position>
+  </downarrow>
+
   <buttondef name="TV">
     <image>watch_tv.png</image>
     <offset>20,10</offset>

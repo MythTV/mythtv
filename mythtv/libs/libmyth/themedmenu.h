@@ -36,13 +36,25 @@ struct ThemedButton
     QString altText;
     QString action;
 
+    int row;
+    int col;
+
     int status;
+    bool visible;
 };
 
 struct MenuRow
 {
     int numitems;
+    bool visible;
     vector<ThemedButton *> buttons;
+};
+
+struct MenuState
+{
+    QString name;
+    int row;
+    int col;
 };
 
 class ThemedMenu : public MythDialog
@@ -71,12 +83,13 @@ class ThemedMenu : public MythDialog
     void keyPressEvent(QKeyEvent *e);
 
   private:
-    void parseMenu(QString menuname);
+    void parseMenu(QString menuname, int row = -1, int col = -1);
 
     void parseSettings(QString dir, QString menuname);
 
     void parseBackground(QString dir, QDomElement &element);
     void parseLogo(QString dir, QDomElement &element);
+    void parseArrow(QString dir, QDomElement &element, bool up);
     void parseTitle(QString dir, QDomElement &element);
     void parseButtonDefinition(QString dir, QDomElement &element);
     void parseButton(QString dir, QDomElement &element);
@@ -91,7 +104,9 @@ class ThemedMenu : public MythDialog
     void addButton(QString &type, QString &text, QString &alttext,
                    QString &action);
     void layoutButtons(void);
-   
+    void positionButtons(bool resetpos);   
+    bool makeRowVisible(int newrow, int oldrow);
+
     void handleAction(QString &action);
     bool findDepends(QString file);
     QString findMenuFile(QString menuname);
@@ -111,12 +126,12 @@ class ThemedMenu : public MythDialog
 
     void clearToBackground(void);
     void drawInactiveButtons(void);
+    void drawScrollArrows(QPainter *p);
 
     QString prefix;
     
     QRect buttonArea;    
     
-    QPoint logopos;
     QRect logoRect;
     QPixmap *logo;
 
@@ -150,7 +165,7 @@ class ThemedMenu : public MythDialog
     bool foundtheme;
 
     int menulevel;
-    vector<QString> menufiles;
+    vector<MenuState> menufiles;
 
     void (*callback)(void *, QString &);
     void *callbackdata;
@@ -170,6 +185,14 @@ class ThemedMenu : public MythDialog
     QPixmap backgroundPixmap;
 
     bool ignorekeys;
+
+    int maxrows;
+    int visiblerows;
+
+    QPixmap *uparrow;
+    QRect uparrowRect;
+    QPixmap *downarrow;
+    QRect downarrowRect;
 };
 
 #endif

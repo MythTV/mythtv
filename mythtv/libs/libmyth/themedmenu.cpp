@@ -57,6 +57,10 @@ ThemedMenu::~ThemedMenu(void)
         delete buttonnormal;
     if (buttonactive)
         delete buttonactive;
+    if (uparrow)
+        delete uparrow;
+    if (downarrow)
+        delete downarrow;
 
     QMap<QString, ButtonIcon>::Iterator it;
     for (it = allButtonIcons.begin(); it != allButtonIcons.end(); ++it)
@@ -418,6 +422,8 @@ void ThemedMenu::parseLogo(QString dir, QDomElement &element)
     bool hasimage = false;
     bool hasposition = false;
 
+    QPoint logopos;
+
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
     {
@@ -521,6 +527,69 @@ void ThemedMenu::parseTitle(QString dir, QDomElement &element)
     titlePos.setY((int)(titlePos.y() * hmult));
 }
 
+void ThemedMenu::parseArrow(QString dir, QDomElement &element, bool up)
+{
+    QRect arrowrect;
+    QPoint arrowpos;
+    QPixmap *pix = NULL;    
+
+    bool hasimage = false;
+    bool hasposition = false;
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "image")
+            {
+                QString arrowpath = dir + getFirstText(info);
+                pix = gContext->LoadScalePixmap(arrowpath);
+                hasimage = true;
+            }
+            else if (info.tagName() == "position")
+            {
+                arrowpos = parsePoint(getFirstText(info));
+                hasposition = true;
+            }
+            else
+            {
+                cerr << "Unknown tag " << info.tagName() << " in arrow\n";
+                exit(0);
+            }
+        }
+    }
+
+    if (!hasimage)
+    {
+        cerr << "Missing image tag in arrow\n";
+        exit(0);
+    }
+
+    if (!hasposition)
+    {
+        cerr << "Missing position tag in arrow\n";
+        exit(0);
+    }
+
+    arrowpos.setX((int)(arrowpos.x() * wmult));
+    arrowpos.setY((int)(arrowpos.y() * hmult));
+    arrowrect = QRect(arrowpos.x(), arrowpos.y(), pix->width(),
+                      pix->height());
+
+    if (up)
+    {
+        uparrow = pix;
+        uparrowRect = arrowrect;
+    }
+    else
+    {
+        downarrow = pix;
+        downarrowRect = arrowrect;
+    }
+}
+
 void ThemedMenu::parseButton(QString dir, QDomElement &element)
 {
     bool hasname = false;
@@ -608,6 +677,8 @@ void ThemedMenu::setDefaults(void)
     titleText = "";
     curTitle = NULL;
     drawTitle = false;
+    uparrow = NULL;
+    downarrow = NULL;
 }
 
 void ThemedMenu::parseSettings(QString dir, QString menuname)
@@ -629,9 +700,9 @@ void ThemedMenu::parseSettings(QString dir, QString menuname)
 
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
-        cout << "Error parsing: " << filename << endl;
-        cout << "at line: " << errorLine << "  column: " << errorColumn << endl;
-        cout << errorMsg << endl;
+        cerr << "Error parsing: " << filename << endl;
+        cerr << "at line: " << errorLine << "  column: " << errorColumn << endl;
+        cerr << errorMsg << endl;
         f.close();
         return;
     }
@@ -671,6 +742,14 @@ void ThemedMenu::parseSettings(QString dir, QString menuname)
             else if (e.tagName() == "titles")
             {
                 parseTitle(dir, e);
+            }
+            else if (e.tagName() == "uparrow")
+            {
+                parseArrow(dir, e, true);
+            }
+            else if (e.tagName() == "downarrow")
+            {
+                parseArrow(dir, e, false);
             }
             else
             {
@@ -764,7 +843,7 @@ void ThemedMenu::parseThemeButton(QDomElement &element)
         addButton(type, text, alttext, action);
 }
 
-void ThemedMenu::parseMenu(QString menuname)
+void ThemedMenu::parseMenu(QString menuname, int row, int col)
 {
     QString filename = findMenuFile(menuname);
 
@@ -783,9 +862,9 @@ void ThemedMenu::parseMenu(QString menuname)
 
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
-        cout << "Error parsing: " << filename << endl;
-        cout << "at line: " << errorLine << "  column: " << errorColumn << endl;
-        cout << errorMsg << endl;
+        cerr << "Error parsing: " << filename << endl;
+        cerr << "at line: " << errorLine << "  column: " << errorColumn << endl;
+        cerr << errorMsg << endl;
         f.close();
         return;
     }
@@ -825,12 +904,37 @@ void ThemedMenu::parseMenu(QString menuname)
     }
 
     layoutButtons();
+    positionButtons(true);
+
+    if (row != -1 && col != -1)
+    {
+        int oldrow = currentrow;
+
+        if (row < (int)buttonRows.size() && col < buttonRows[row].numitems)
+        {
+            currentrow = row;
+            currentcolumn = col;
+        }
+
+        while (!buttonRows[currentrow].visible)
+        {
+            makeRowVisible(oldrow + 1, oldrow);
+            oldrow = oldrow + 1;
+        }
+
+        activebutton = buttonRows[currentrow].buttons[currentcolumn];
+    }
 
     WFlags flags = getWFlags();
     setWFlags(flags | Qt::WRepaintNoErase);
 
     menulevel++;
-    menufiles.push_back(menuname);
+
+    MenuState state;
+    state.name = menuname;
+    state.row = currentrow;
+    state.col = currentcolumn;
+    menufiles.push_back(state);
 
     if (titleIcons.contains(menumode))
     {
@@ -886,6 +990,7 @@ void ThemedMenu::addButton(QString &type, QString &text, QString &alttext,
     newbutton.altText = alttext;
     newbutton.action = action;
     newbutton.status = -1;
+    newbutton.visible = false;
 
     buttonList.push_back(newbutton);
 }
@@ -894,16 +999,10 @@ void ThemedMenu::layoutButtons(void)
 {
     int numbuttons = buttonList.size();
   
-    if (numbuttons > 6)
-    {
-        cerr << "Only displaying 6 buttons\n";
-        numbuttons = 6;
-    }
-
     int columns = buttonArea.width() / buttonnormal->width();
-    int rows = buttonArea.height() / buttonnormal->height();
+    maxrows = buttonArea.height() / buttonnormal->height();
 
-    if (rows < 2)
+    if (maxrows < 2)
     {
         cerr << "Must have room for at least 2 rows of buttons\n";
         exit(0);
@@ -915,28 +1014,30 @@ void ThemedMenu::layoutButtons(void)
         exit(0);
     }
 
-    if (rows * columns < numbuttons)
-    {
-        cerr << "Not enough room to display " << numbuttons << " buttons\n";
-        numbuttons = rows * columns;
-    }
-
     // keep the rows balanced
     if (numbuttons <= 4)
     {
         if (columns > 2)
             columns = 2;
     }
-    else if (numbuttons <= 6)
+    else
     {
         if (columns > 3)
             columns = 3;
     }    
 
+    // limit it to 6 items displayed at one time
+    if (columns * maxrows > 6)
+    {
+        maxrows = 6 / columns;
+    }
+                             
     vector<ThemedButton>::iterator iter = buttonList.begin();
 
-    rows = numbuttons / columns;
+    int rows = numbuttons / columns;
     rows++;
+
+    visiblerows = 0;
 
     for (int i = 0; i < rows; i++)
     {
@@ -953,12 +1054,22 @@ void ThemedMenu::layoutButtons(void)
             newrow.numitems++;
         }
 
+        if (i < maxrows && newrow.numitems > 0)
+        {
+            newrow.visible = true;
+            visiblerows++;
+        }
+        else
+            newrow.visible = false;
+ 
         if (newrow.numitems > 0)
             buttonRows.push_back(newrow);
     }            
+}
 
-    rows = buttonRows.size();
-
+void ThemedMenu::positionButtons(bool resetpos)
+{
+    int rows = visiblerows;
     int yspacing = (buttonArea.height() - buttonnormal->height() * rows) /
                    (rows + 1);
     int ystart = 0;
@@ -971,11 +1082,21 @@ void ThemedMenu::layoutButtons(void)
 
     int row = 1;
 
-    activebutton = &(*(buttonList.begin()));
-
     vector<MenuRow>::iterator menuiter = buttonRows.begin();
     for (; menuiter != buttonRows.end(); menuiter++)
     {
+        if (!(*menuiter).visible)
+        {
+            vector<ThemedButton *>::iterator biter;
+            biter = (*menuiter).buttons.begin();
+            for (; biter != (*menuiter).buttons.end(); biter++)
+            {
+                ThemedButton *tbutton = (*biter);
+                tbutton->visible = false;
+            }
+            continue;
+        }
+
         int ypos = yspacing * row + (buttonnormal->height() * (row - 1));
         ypos += buttonArea.y() + ystart;
 
@@ -989,12 +1110,10 @@ void ThemedMenu::layoutButtons(void)
             xpos += buttonArea.x();
 
             ThemedButton *tbutton = (*biter);
-            if (activebutton == tbutton)
-            {
-                currentrow = row - 1;
-                currentcolumn = col - 1;
-            }
 
+            tbutton->visible = true;
+            tbutton->row = row;
+            tbutton->col = col;
             tbutton->pos = QPoint(xpos, ypos);
             tbutton->posRect = QRect(tbutton->pos.x(), tbutton->pos.y(),
                                      buttonnormal->width(),
@@ -1015,7 +1134,57 @@ void ThemedMenu::layoutButtons(void)
         row++;
     }
 
-    activebutton = &(*(buttonList.begin()));
+    if (resetpos)
+    {
+        activebutton = &(*(buttonList.begin()));
+        currentrow = activebutton->row - 1;
+        currentcolumn = activebutton->col - 1;
+    }
+}
+
+bool ThemedMenu::makeRowVisible(int newrow, int oldrow)
+{
+    if (buttonRows[newrow].visible)
+        return true;
+
+    int need = abs(newrow - oldrow);
+    if (need != 1)
+    {
+        cerr << "moving: " << need << " rows, bad.\n";
+        return false;
+    }
+
+    if (newrow > oldrow)
+    {
+        vector<MenuRow>::iterator menuiter = buttonRows.begin();
+        for (; menuiter != buttonRows.end(); menuiter++)
+        {
+            if ((*menuiter).visible)
+            {
+                (*menuiter).visible = false;
+                break;
+            }
+        }
+    }
+    else
+    {
+        vector<MenuRow>::reverse_iterator menuiter = buttonRows.rbegin();
+        for (; menuiter != buttonRows.rend(); menuiter++)
+        {
+            if ((*menuiter).visible)
+            {
+                (*menuiter).visible = false;
+                break;
+            }
+        }
+    }
+
+    buttonRows[newrow].visible = true;
+
+    positionButtons(false);
+    clearToBackground();
+
+    return true;
 }
 
 QRect ThemedMenu::menuRect() const
@@ -1046,6 +1215,8 @@ void ThemedMenu::drawInactiveButtons(void)
         paintButton(i, &tmp, true, true);
     }
 
+    drawScrollArrows(&tmp);
+
     activebutton = store;
 
     tmp.end();
@@ -1053,6 +1224,28 @@ void ThemedMenu::drawInactiveButtons(void)
     setPaletteBackgroundPixmap(bground);
 
     erase(menuRect());
+}
+
+void ThemedMenu::drawScrollArrows(QPainter *p)
+{
+    if (!uparrow || !downarrow)
+        return;
+
+    bool needup = false;
+    bool needdown = false;
+
+    if (!buttonRows.front().visible)
+        needup = true;
+    if (!buttonRows.back().visible)
+        needdown = true;
+
+    if (!needup && !needdown)
+        return;
+
+    if (needup)
+        p->drawPixmap(uparrowRect.topLeft(), *uparrow);
+    if (needdown)
+        p->drawPixmap(downarrowRect.topLeft(), *downarrow);
 }
 
 void ThemedMenu::paintEvent(QPaintEvent *e)
@@ -1088,36 +1281,38 @@ void ThemedMenu::paintTitle(QPainter *p)
 void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased,
                              bool drawinactive)
 {
+    ThemedButton *tbutton = &(buttonList[button]);
+
+    if (!tbutton->visible)
+        return;
+
     QRect cr;
-    if (buttonList[button].buttonicon)
-        cr = buttonList[button].posRect.unite(buttonList[button].iconRect);
+    if (tbutton->buttonicon)
+        cr = tbutton->posRect.unite(tbutton->iconRect);
     else
-        cr = buttonList[button].posRect;
+        cr = tbutton->posRect;
 
     if (!erased)
     {
-        if (buttonList[button].status == 1 && 
-            activebutton == &(buttonList[button]))
+        if (tbutton->status == 1 && activebutton == tbutton)
             return;
-        if (buttonList[button].status == 0 && 
-            activebutton != &(buttonList[button]))
+        if (tbutton->status == 0 && activebutton != tbutton)
             return;
     }
 
-    QRect newRect(0, 0, buttonList[button].posRect.width(),
-                  buttonList[button].posRect.height());
-    newRect.moveBy(buttonList[button].posRect.x() - cr.x(), 
-                   buttonList[button].posRect.y() - cr.y());
+    QRect newRect(0, 0, tbutton->posRect.width(), tbutton->posRect.height());
+    newRect.moveBy(tbutton->posRect.x() - cr.x(), 
+                   tbutton->posRect.y() - cr.y());
 
     QImage *buttonback = NULL;
-    if (&(buttonList[button]) == activebutton)
+    if (tbutton == activebutton)
     {
         buttonback = buttonactive;
-        buttonList[button].status = 1;
+        tbutton->status = 1;
     }
     else
     {
-        buttonList[button].status = 0;
+        tbutton->status = 0;
 
         if (!drawinactive)
         {
@@ -1139,16 +1334,11 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased,
     QRect buttonTextRect = textRect;
     buttonTextRect.moveBy(newRect.x(), newRect.y());
 
-    QString message = buttonList[button].text;
+    QString message = tbutton->text;
+    QRect testBound = tmp.boundingRect(buttonTextRect, textflags, message);
 
-    QRect testBound = tmp.boundingRect(buttonTextRect, textflags, 
-                                       message);
-
-    if (testBound.height() > buttonTextRect.height() && 
-        buttonList[button].altText != "")
-    {
+    if (testBound.height() > buttonTextRect.height() && tbutton->altText != "")
         message = buttonList[button].altText;
-    }
 
     if (hasshadow && shadowalpha > 0)
     {
@@ -1196,16 +1386,14 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased,
 
     if (buttonList[button].buttonicon)
     {
-        newRect = QRect(buttonList[button].iconRect.x() - cr.x(), 
-                        buttonList[button].iconRect.y() - cr.y(), 
-                        buttonList[button].iconRect.width(),
-                        buttonList[button].iconRect.height());
+        newRect = QRect(tbutton->iconRect.x() - cr.x(), 
+                        tbutton->iconRect.y() - cr.y(), 
+                        tbutton->iconRect.width(), tbutton->iconRect.height());
 
-        QImage *blendImage = buttonList[button].buttonicon->icon;
+        QImage *blendImage = tbutton->buttonicon->icon;
 
-        if ((&(buttonList[button]) == activebutton) && 
-            (buttonList[button].buttonicon->activeicon))
-            blendImage = buttonList[button].buttonicon->activeicon;
+        if (tbutton == activebutton && tbutton->buttonicon->activeicon)
+            blendImage = tbutton->buttonicon->activeicon;
 
         blendImageToPixmap(&pix, newRect.x(), newRect.y(), blendImage,
                            &tmp, 0, 0);
@@ -1293,6 +1481,14 @@ void ThemedMenu::ReloadTheme(void)
         delete buttonactive;
     buttonactive = NULL;
 
+    if (uparrow)
+        delete uparrow;
+    uparrow = NULL;
+
+    if (downarrow)
+        delete downarrow;
+    downarrow = NULL;
+
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     int x = 0, y = 0, w, h;
@@ -1316,11 +1512,13 @@ void ThemedMenu::ReloadTheme(void)
 
     parseSettings(themedir + "/", "theme.xml");
 
-    QString file = menufiles.back();
+    QString file = menufiles.back().name;
+    int row = menufiles.back().row;
+    int col = menufiles.back().col;
     menufiles.pop_back();
     menulevel--;
 
-    parseMenu(file);
+    parseMenu(file, row, col);
 }
 
 void ThemedMenu::keyPressEvent(QKeyEvent *e)
@@ -1333,18 +1531,14 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
 
     ignorekeys = true;
 
+    int oldrow = currentrow;
+
     switch (e->key())
     {
         case Key_Up:
-        {
-            currentrow--;
-            if (currentrow < 0)
-            {
-                currentrow = buttonRows.size() - 1;
-                currentcolumn--;
-                if (currentcolumn < 0)
-                    currentcolumn = buttonRows[currentrow].numitems - 1;
-            }
+        { 
+            if (currentrow > 0)
+                currentrow--;
 
             if (currentcolumn >= buttonRows[currentrow].numitems)
                 currentcolumn = buttonRows[currentrow].numitems - 1;
@@ -1354,28 +1548,16 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
         }
         case Key_Left:
         {
-            currentcolumn--;
-            if (currentcolumn < 0)
-            {
-                currentrow--;
-                if (currentrow < 0)
-                    currentrow = buttonRows.size() - 1;
-                currentcolumn = buttonRows[currentrow].numitems - 1;
-            }
+            if (currentcolumn > 0)
+                currentcolumn--;
 
             handled = true;
             break;
         }
         case Key_Down:
         {
-            currentrow++;
-            if (currentrow >= (int)buttonRows.size())
-            {
-                currentrow = 0;
-                currentcolumn++;
-                if (currentcolumn >= buttonRows[currentrow].numitems)
-                    currentcolumn = 0;
-            }
+            if (currentrow < (int)buttonRows.size() - 1)
+                currentrow++;
 
             if (currentcolumn >= buttonRows[currentrow].numitems)
                 currentcolumn = buttonRows[currentrow].numitems - 1;
@@ -1385,14 +1567,9 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
         }
         case Key_Right:
         {
-            currentcolumn++;
-            if (currentcolumn >= buttonRows[currentrow].numitems)
-            {
-                currentrow++;
-                if (currentrow >= (int)buttonRows.size())
-                    currentrow = 0;
-                currentcolumn = 0;
-            }
+            if (currentcolumn < buttonRows[currentrow].numitems - 1)
+                currentcolumn++;
+
             handled = true;
             break;
         }
@@ -1417,6 +1594,9 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
 
     if (handled)
     {
+        if (!buttonRows[currentrow].visible)
+            makeRowVisible(currentrow, oldrow);
+
         activebutton = buttonRows[currentrow].buttons[currentcolumn];
         gContext->LCDpopMenu(activebutton->text, titleText);
         update(lastbutton->posRect);
@@ -1461,17 +1641,22 @@ void ThemedMenu::handleAction(QString &action)
     {
         QString rest = action.right(action.length() - 5);
 
+        menufiles.back().row = currentrow;
+        menufiles.back().col = currentcolumn;
+
         parseMenu(rest);
     }
     else if (action.left(6) == "UPMENU")
     {
         menufiles.pop_back();
-        QString file = menufiles.back();
+        QString file = menufiles.back().name;
+        int row = menufiles.back().row;
+        int col = menufiles.back().col;
         menufiles.pop_back();
 
         menulevel -= 2;
  
-        parseMenu(file);
+        parseMenu(file, row, col);
     }
     else if (action.left(7) == "PLUGIN")
     {

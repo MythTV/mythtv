@@ -17,7 +17,6 @@ RemoteFile::RemoteFile(const QString &url, bool needevents, int lrecordernum)
     path = url;
     readposition = 0;
     filesize = -1;
-    pthread_mutex_init(&lock, NULL);
 
     if (lrecordernum > 0)
     {
@@ -156,10 +155,10 @@ void RemoteFile::Close(void)
     QStringList strlist = QString(query).arg(recordernum);
     strlist << "DONE" + append;
 
-    pthread_mutex_lock(&lock);
+    lock.lock();
     WriteStringList(controlSock, strlist);
     ReadStringList(controlSock, strlist);
-    pthread_mutex_unlock(&lock);
+    lock.unlock();
 
     if (sock)
         sock->close();
@@ -176,14 +175,14 @@ void RemoteFile::Reset(void)
 
     while (sock->bytesAvailable() > 0)
     {
-        pthread_mutex_lock(&lock);
+        lock.lock();
         qApp->lock();
         avail = sock->bytesAvailable();
         trash = new char[avail + 1];
         sock->readBlock(trash, avail);
         delete [] trash;
         qApp->unlock();
-        pthread_mutex_unlock(&lock);
+        lock.unlock();
 
         // cerr << avail << " bytes available during reset.\n";
         usleep(30000);
@@ -196,10 +195,10 @@ bool RemoteFile::RequestBlock(int size)
     strlist << "REQUEST_BLOCK" + append;
     strlist << QString::number(size);
 
-    pthread_mutex_lock(&lock);
+    lock.lock();
     WriteStringList(controlSock, strlist);
     ReadStringList(controlSock, strlist);
-    pthread_mutex_unlock(&lock);
+    lock.unlock();
 
     return strlist[0].toInt();
 }
@@ -209,10 +208,10 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
     QStringList strlist = QString(query).arg(recordernum);
     strlist << "PAUSE" + append;
 
-    pthread_mutex_lock(&lock);
+    lock.lock();
     WriteStringList(controlSock, strlist);
     ReadStringList(controlSock, strlist);
-    pthread_mutex_unlock(&lock);
+    lock.unlock();
 
     strlist.clear();
 
@@ -225,10 +224,10 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
     else
         encodeLongLong(strlist, readposition);
 
-    pthread_mutex_lock(&lock);
+    lock.lock();
     WriteStringList(controlSock, strlist);
     ReadStringList(controlSock, strlist);
-    pthread_mutex_unlock(&lock);
+    lock.unlock();
 
     long long retval = decodeLongLong(strlist, 0);
     readposition = retval;

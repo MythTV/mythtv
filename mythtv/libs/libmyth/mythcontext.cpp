@@ -38,7 +38,6 @@ MythContext::MythContext(const QString &binversion, bool gui)
     language = "";
     m_themeloaded = false;
 
-    pthread_mutex_init(&dbLock, NULL);
     m_db = QSqlDatabase::addDatabase("QMYSQL3", "MythContext");
 
     char localhostname[1024];
@@ -89,7 +88,6 @@ MythContext::~MythContext()
 
 bool MythContext::ConnectServer(const QString &hostname, int port)
 {
-    pthread_mutex_init(&serverSockLock, NULL);
     serverSock = new QSocket();
 
     cout << "connecting to backend server: " << hostname << ":" << port << endl;
@@ -227,7 +225,7 @@ QString MythContext::FindThemeDir(QString themename)
 
 int MythContext::OpenDatabase(QSqlDatabase *db)
 {
-    pthread_mutex_lock(&dbLock);
+    dbLock.lock();
     if (!m_db->isOpen()) {
         m_db->setDatabaseName(m_settings->GetSetting("DBName"));
         m_db->setUserName(m_settings->GetSetting("DBUserName"));
@@ -235,7 +233,7 @@ int MythContext::OpenDatabase(QSqlDatabase *db)
         m_db->setHostName(m_settings->GetSetting("DBHostName"));
         m_db->open();
     }
-    pthread_mutex_unlock(&dbLock);
+    dbLock.unlock();
         
     db->setDatabaseName(m_settings->GetSetting("DBName"));
     db->setUserName(m_settings->GetSetting("DBUserName"));
@@ -290,7 +288,7 @@ void MythContext::SaveSetting(QString key, int newValue)
 
 void MythContext::SaveSetting(QString key, QString newValue)
 {
-    pthread_mutex_lock(&dbLock);
+    dbLock.lock();
 
     if (m_db->isOpen()) 
     {
@@ -313,7 +311,7 @@ void MythContext::SaveSetting(QString key, QString newValue)
             MythContext::DBError("Save new setting", querystr);
     }
 
-    pthread_mutex_unlock(&dbLock);
+    dbLock.unlock();
 }
 
 QString MythContext::GetSetting(const QString &key, const QString &defaultval) 
@@ -321,7 +319,7 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
     bool found = false;
     QString value;
 
-    pthread_mutex_lock(&dbLock);
+    dbLock.lock();
 
     if (m_db->isOpen()) 
     {
@@ -354,7 +352,7 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
             }
         }
     }
-    pthread_mutex_unlock(&dbLock);
+    dbLock.unlock();
 
     if (found)
         return value;
@@ -375,7 +373,7 @@ QString MythContext::GetSettingOnHost(const QString &key, const QString &host,
     bool found = false;
     QString value = defaultval;
 
-    pthread_mutex_lock(&dbLock);
+    dbLock.lock();
 
     if (m_db->isOpen())
     {
@@ -394,7 +392,7 @@ QString MythContext::GetSettingOnHost(const QString &key, const QString &host,
         }
     }
 
-    pthread_mutex_unlock(&dbLock);
+    dbLock.unlock();
 
     return value;
 }
@@ -527,6 +525,16 @@ QImage *MythContext::LoadScaleImage(QString filename)
     if (filename.left(5) == "myth:")
         return NULL;
 
+    QString baseDir = m_installprefix + "/share/mythtv/themes/default/";
+
+    QFile checkFile(filename);
+
+    if (!checkFile.exists())
+    {
+        QFileInfo fi(filename);
+        filename = baseDir + fi.fileName();
+    }
+
     QImage *ret = NULL;
 
     int width, height;
@@ -565,6 +573,16 @@ QPixmap *MythContext::LoadScalePixmap(QString filename)
 { 
     if (filename.left(5) == "myth:")
         return NULL;
+
+    QString baseDir = m_installprefix + "/share/mythtv/themes/default/";
+
+    QFile checkFile(filename);
+
+    if (!checkFile.exists())
+    {
+        QFileInfo fi(filename);
+        filename = baseDir + fi.fileName();
+    }
               
     QPixmap *ret = new QPixmap();
 
@@ -638,7 +656,7 @@ void MythContext::SetSetting(const QString &key, const QString &newValue)
 
 void MythContext::SendReceiveStringList(QStringList &strlist)
 {
-    pthread_mutex_lock(&serverSockLock);
+    serverSockLock.lock();
     expectingReply = true;
 
     WriteStringList(serverSock, strlist);
@@ -657,7 +675,7 @@ void MythContext::SendReceiveStringList(QStringList &strlist)
     }
 
     expectingReply = false;
-    pthread_mutex_unlock(&serverSockLock);
+    serverSockLock.unlock();
 }
 
 void MythContext::readSocket(void)
@@ -665,7 +683,7 @@ void MythContext::readSocket(void)
     if (expectingReply)
         return;
 
-    pthread_mutex_lock(&serverSockLock);
+    serverSockLock.lock();
 
     while (serverSock->bytesAvailable() > 0)
     {
@@ -688,7 +706,7 @@ void MythContext::readSocket(void)
         }
     }
 
-    pthread_mutex_unlock(&serverSockLock);
+    serverSockLock.unlock();
 }
 
 void MythContext::addListener(QObject *obj)
