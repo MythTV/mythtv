@@ -1260,6 +1260,25 @@ int MythPopupBox::show2ButtonPopup(MythMainWindow *parent, QString title,
     return popup.ExecPopup();
 }
 
+int MythPopupBox::showButtonPopup(MythMainWindow *parent, QString title,
+                                  QString message, QStringList buttonmsgs,
+                                  int defvalue)
+{
+    MythPopupBox popup(parent, title);
+
+    popup.addLabel(message, Medium, true);
+    popup.addLabel("");
+
+    for( int i = 0; i < buttonmsgs.size(); i++ )
+    {
+        QButton *but = popup.addButton(buttonmsgs[i]);
+        if (defvalue == i)
+            but->setFocus();
+    }
+
+    return popup.ExecPopup();
+}
+
 MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)
                   : MythDialog(gContext->GetMainWindow(), "progress", false)
 {

@@ -107,7 +107,8 @@ void JobQueue::customEvent(QCustomEvent *e)
 
             if (((action == "STOP") ||
                  (action == "PAUSE") ||
-                 (action == "RESTART" )) &&
+                 (action == "RESTART") ||
+                 (action == "RESUME" )) &&
                 (jobControlFlags.contains(key)) &&
                 (runningJobTypes.contains(key)) &&
                 (runningJobTypes[key] == jobType))
@@ -118,8 +119,10 @@ void JobQueue::customEvent(QCustomEvent *e)
                     *(jobControlFlags[key]) = JOB_STOP;
                 else if (action == "PAUSE")
                     *(jobControlFlags[key]) = JOB_PAUSE;
-                else if (action == "RESTART")
+                else if (action == "RESUME")
                     *(jobControlFlags[key]) = JOB_RUN;
+                else if (action == "RESTART")
+                    *(jobControlFlags[key]) = JOB_RESTART;
 
                 controlFlagsLock.unlock();
             }
@@ -549,6 +552,15 @@ bool JobQueue::PauseJob(QSqlDatabase* db, int jobID)
     return ChangeJobCmds(db, jobID, JOB_PAUSE);
 }
 
+bool JobQueue::ResumeJob(QSqlDatabase* db, int jobID)
+{
+    QString message = QString("GLOBAL_JOB RESUME ID %1").arg(jobID);
+    MythEvent me(message);
+    gContext->dispatch(me);
+
+    return ChangeJobCmds(db, jobID, JOB_RUN);
+}
+
 bool JobQueue::RestartJob(QSqlDatabase* db, int jobID)
 {
     QString message = QString("GLOBAL_JOB RESTART ID %1").arg(jobID);
@@ -835,7 +847,7 @@ int JobQueue::GetJobsInQueue(QSqlDatabase* db, QMap<int, JobQueueEntry> &jobs,
 {
     JobQueueEntry thisJob;
     QSqlQuery query(QString::null, db);
-    QDateTime recentDate = QDateTime::currentDateTime().addSecs(-7200);
+    QDateTime recentDate = QDateTime::currentDateTime().addSecs(-4 * 3600);
     int jobCount = 0;
 
     jobs.clear();

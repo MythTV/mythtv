@@ -1579,7 +1579,7 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
 "record.subtitle, record.description, record.recpriority, record.type, "
 "channel.name, record.recordid, record.recgroup, record.dupin, "
 "record.dupmethod, channel.commfree, channel.channum, record.station, "
-"record.seriesid, record.programid "
+"record.seriesid, record.programid, record.category "
 "FROM record "
 "LEFT JOIN channel ON channel.callsign = record.station "
 "GROUP BY recordid "
@@ -1636,6 +1636,7 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
             proginfo->chansign = result.value(17).toString();
             proginfo->seriesid = result.value(18).toString();
             proginfo->programid = result.value(19).toString();
+            proginfo->category = result.value(20).toString();
             
             proginfo->recstartts = proginfo->startts;
             proginfo->recendts = proginfo->endts;

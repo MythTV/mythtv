@@ -220,6 +220,18 @@ public:
     };
 };
 
+class DeletesFollowLinks: public CheckBoxSetting, public BackendSetting {
+public:
+    DeletesFollowLinks():
+        BackendSetting("DeletesFollowLinks") {
+        setLabel(QObject::tr("Follow Symlinks when deleting files"));
+        setValue(false);
+        setHelpText(QObject::tr("This will cause Myth to follow symlinks "
+                    "when recordings and related files are deleted, instead "
+                    "of deleting the symlink and leaving the actual file."));
+    };
+};
+
 class TimeOffset: public ComboBoxSetting, public BackendSetting {
 public:
     TimeOffset():
@@ -682,6 +694,7 @@ BackendSettings::BackendSettings() {
     group2->addChild(new FreqTable());
     group2->addChild(new TimeOffset());
     group2->addChild(new MasterBackendOverride());
+    group2->addChild(new DeletesFollowLinks());
     addChild(group2);
 
     VerticalConfigurationGroup* group3 = new VerticalConfigurationGroup(false);

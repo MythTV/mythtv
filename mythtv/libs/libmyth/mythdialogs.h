@@ -197,6 +197,9 @@ class MythPopupBox : public MythDialog
     static int show2ButtonPopup(MythMainWindow *parent, QString title,
                                 QString message, QString button1msg,
                                 QString button2msg, int defvalue);
+    static int showButtonPopup(MythMainWindow *parent, QString title,
+                               QString message, QStringList buttonmsgs,
+                               int defvalue);
 
     static bool showGetTextPopup(MythMainWindow *parent, QString title,
                                  QString message, QString& text);

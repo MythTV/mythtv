@@ -110,6 +110,7 @@ class JobQueue : public QObject
                                  QString comment = "");
 
     static bool PauseJob(QSqlDatabase* db, int jobID);
+    static bool ResumeJob(QSqlDatabase* db, int jobID);
     static bool RestartJob(QSqlDatabase* db, int jobID);
     static bool StopJob(QSqlDatabase* db, int jobID);
     static bool DeleteJob(QSqlDatabase* db, int jobID);

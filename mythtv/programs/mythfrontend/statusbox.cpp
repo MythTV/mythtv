@@ -437,51 +437,132 @@ void StatusBox::setHelpText()
 
 void StatusBox::clicked()
 {
-    if ((inContent) &&
-        (icon_list->GetItemText(icon_list->GetCurrentItem()) == QObject::tr("Log Entries")))
+    QString currentItem = icon_list->GetItemText(icon_list->GetCurrentItem());
+
+    if (inContent)
     {
-        int retval = MythPopupBox::show2ButtonPopup(my_parent,
+        if (currentItem == QObject::tr("Log Entries"))
+        {
+            int retval;
+
+            retval = MythPopupBox::show2ButtonPopup(my_parent,
                                    QString("AckLogEntry"),
                                    QObject::tr("Acknowledge this log entry?"),
                                    QObject::tr("Yes"), QObject::tr("No"), 0);
-        if (retval == 0)
-        {
-            QString query = QString("UPDATE mythlog SET acknowledged = 1 "
-                                    "WHERE logid = %1")
-                                    .arg(contentData[contentPos]);
-            QSqlDatabase *db = QSqlDatabase::database();
-            db->exec(query);
-            doLogEntries();
+            if (retval == 0)
+            {
+                QString query = QString("UPDATE mythlog SET acknowledged = 1 "
+                                        "WHERE logid = %1")
+                                        .arg(contentData[contentPos]);
+                QSqlDatabase *db = QSqlDatabase::database();
+                db->exec(query);
+                doLogEntries();
+            }
         }
-    } else {
-        // Clear all visible content elements here
-        // I'm sure there's a better way to do this but I can't find it
-        content->ClearAllText();
-        list_area->ResetList();
-        contentLines.clear();
-        contentDetail.clear();
-        contentFont.clear();
-        contentData.clear();
+        else if (currentItem == QObject::tr("Job Queue"))
+        {
+            QSqlDatabase *db = QSqlDatabase::database();
+            QStringList msgs;
+            int jobStatus;
+            int retval;
 
-        QString currentItem;
+            jobStatus = JobQueue::GetJobStatus(db,
+                                               contentData[contentPos].toInt());
 
-        currentItem = icon_list->GetItemText(icon_list->GetCurrentItem());
+            if (jobStatus == JOB_QUEUED)
+            {
+                retval = MythPopupBox::show2ButtonPopup(my_parent,
+                                       QString("JobQueuePopup"),
+                                       QObject::tr("Delete Job?"),
+                                       QObject::tr("Yes"),
+                                       QObject::tr("No"), 1);
+                if (retval == 0)
+                {
+                    JobQueue::DeleteJob(db, contentData[contentPos].toInt());
+                    doJobQueueStatus();
+                }
+            }
+            else if ((jobStatus == JOB_PENDING) ||
+                     (jobStatus == JOB_STARTING) ||
+                     (jobStatus == JOB_RUNNING))
+            {
+                msgs << QObject::tr("Pause");
+                msgs << QObject::tr("Stop");
+                msgs << QObject::tr("No Change");
+                retval = MythPopupBox::showButtonPopup(my_parent,
+                                       QString("JobQueuePopup"),
+                                       QObject::tr("Job Queue Actions:"),
+                                       msgs, 2);
+                if (retval == 0)
+                {
+                    JobQueue::PauseJob(db, contentData[contentPos].toInt());
+                    doJobQueueStatus();
+                }
+                else if (retval == 1)
+                {
+                    JobQueue::StopJob(db, contentData[contentPos].toInt());
+                    doJobQueueStatus();
+                }
+            }
+            else if (jobStatus == JOB_PAUSED)
+            {
+                msgs << QObject::tr("Resume");
+                msgs << QObject::tr("Stop");
+                msgs << QObject::tr("No Change");
+                retval = MythPopupBox::showButtonPopup(my_parent,
+                                       QString("JobQueuePopup"),
+                                       QObject::tr("Job Queue Actions:"),
+                                       msgs, 2);
+                if (retval == 0)
+                {
+                    JobQueue::ResumeJob(db, contentData[contentPos].toInt());
+                    doJobQueueStatus();
+                }
+                else if (retval == 1)
+                {
+                    JobQueue::StopJob(db, contentData[contentPos].toInt());
+                    doJobQueueStatus();
+                }
+            }
+            else if (jobStatus & JOB_DONE)
+            {
+                retval = MythPopupBox::show2ButtonPopup(my_parent,
+                                       QString("JobQueuePopup"),
+                                       QObject::tr("Requeue Job?"),
+                                       QObject::tr("Yes"),
+                                       QObject::tr("No"), 1);
+                if (retval == 0)
+                {
+                    JobQueue::ChangeJobStatus(db,
+                                              contentData[contentPos].toInt(),
+                                              JOB_QUEUED);
+                    doJobQueueStatus();
+                }
+            }
+        }
 
-        if (currentItem == QObject::tr("Listings Status"))
-            doListingsStatus();
-
-        if (currentItem == QObject::tr("Tuner Status"))
-            doTunerStatus();
-
-        if (currentItem == QObject::tr("DVB Status"))
-            doDVBStatus();
-
-        if (currentItem == QObject::tr("Log Entries"))
-            doLogEntries();
-
-        if (currentItem == QObject::tr("Job Queue"))
-            doJobQueueStatus();
+        return;
     }
+    
+    // Clear all visible content elements here
+    // I'm sure there's a better way to do this but I can't find it
+    content->ClearAllText();
+    list_area->ResetList();
+    contentLines.clear();
+    contentDetail.clear();
+    contentFont.clear();
+    contentData.clear();
+
+    if (currentItem == QObject::tr("Listings Status"))
+        doListingsStatus();
+    else if (currentItem == QObject::tr("Tuner Status"))
+        doTunerStatus();
+    else if (currentItem == QObject::tr("DVB Status"))
+        doDVBStatus();
+    else if (currentItem == QObject::tr("Log Entries"))
+        doLogEntries();
+    else if (currentItem == QObject::tr("Job Queue"))
+        doJobQueueStatus();
 }
 
 void StatusBox::doListingsStatus()
@@ -826,6 +907,7 @@ void StatusBox::doJobQueueStatus()
                                   starttime.toString(timeDateFormat);
 
             contentDetail[count] = detail;
+            contentData[count] = QString("%1").arg(it.data().id);
 
             if (it.data().status == JOB_ERRORED)
                 contentFont[count] = "error";

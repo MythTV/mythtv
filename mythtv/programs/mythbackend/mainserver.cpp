@@ -991,17 +991,42 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     if (checkFile.exists())
     {
         QString filename;
+        bool followLinks = gContext->GetNumSetting("DeletesFollowLinks", 0);
 
         filename = ds->filename;
+        if (followLinks)
+        {
+            QFileInfo finfo(filename);
+            if (finfo.isSymLink())
+                unlink(finfo.readLink().ascii());
+        }
         unlink(filename.ascii());
     
         filename = ds->filename + ".png";
+        if (followLinks)
+        {
+            QFileInfo finfo(filename);
+            if (finfo.isSymLink())
+                unlink(finfo.readLink().ascii());
+        }
         unlink(filename.ascii());
     
         filename = ds->filename + ".bookmark";
+        if (followLinks)
+        {
+            QFileInfo finfo(filename);
+            if (finfo.isSymLink())
+                unlink(finfo.readLink().ascii());
+        }
         unlink(filename.ascii());
     
         filename = ds->filename + ".cutlist";
+        if (followLinks)
+        {
+            QFileInfo finfo(filename);
+            if (finfo.isSymLink())
+                unlink(finfo.readLink().ascii());
+        }
         unlink(filename.ascii());
 
         sleep(2);
@@ -3074,6 +3099,10 @@ void MainServer::PrintStatus(QSocket *socket)
        << "    height:7em;\r\n"
        << "    float:right;\r\n"
        << "  }\r\n"
+       << "  .jobfinished { color: #0000ff; }\r\n"
+       << "  .jobaborted { color: #7f0000; }\r\n"
+       << "  .joberrored { color: #ff0000; }\r\n"
+       << "  .jobrunning { color: #005f00; }\r\n"
        << "  -->\r\n"
        << "  </style>\r\n"
        << "  <title>MythTV Status - " 
@@ -3290,123 +3319,98 @@ void MainServer::PrintStatus(QSocket *socket)
 
     if (jobs.size())
     {
-        QString lastchanid = "";
-        QDateTime laststarttime = QDateTime::currentDateTime();
+        QString statusColor;
+        QString jobColor;
         QString timeDateFormat;
-        QString indent = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-
         timeDateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d") +
                          " " + gContext->GetSetting("TimeFormat", "h:mm AP");
 
 
         os << "    Jobs currently in Queue or recently ended:\r\n<br />"
-           << "<table border=0 cellpadding=0 cellspacing=6>\r\n"
-           << "<tr>"
-           << "<th align=left colspan=3>Title/Subtitle</th>"
-           << "<th align=left>Channel</th>"
-           << "<th align=left>Program StartTime</th></tr>\r\n"
-           << "<tr>"
-           << "<th align=left>" << indent << "Job</th>"
-           << "<th align=left>Host</th>"
-           << "<th align=left>Status</th>"
-           << "<th align=left>Status Time</th>"
-           << "<th align=left>Comment</th></tr>"
-           << "\r\n";
-
-        os << "<tr><td colspan=5 bgcolor=#000000 height=3></td></tr>\r\n";
+           << "    <div id=\"schedule\">\r\n";
 
         for (it = jobs.begin(); it != jobs.end(); ++it)
         {
-            bool sameRecording = false;
-            QString chanid = it.data().chanid;
-            QDateTime starttime = it.data().starttime;
             ProgramInfo *pginfo;
 
             dblock.lock();
-            pginfo = ProgramInfo::GetProgramFromRecorded(m_db, chanid,
-                                                         starttime);
+            pginfo = ProgramInfo::GetProgramFromRecorded(m_db, it.data().chanid,
+                                                         it.data().starttime);
             dblock.unlock();
 
             if (!pginfo)
                 continue;
 
-           QString qstrTitle = pginfo->title.replace(QRegExp("\""), 
-                                                        "&quot;");
-           QString qstrSubtitle = pginfo->subtitle.replace(
-                                                 QRegExp("\""), "&quot;");
-            if ((lastchanid != chanid) ||
-                (laststarttime != starttime))
+            if (it.data().status == JOB_ABORTED)
             {
-                if (lastchanid != "")
-                    os << "<tr><td colspan=5 bgcolor=#999999 height=1></td>"
-                          "</tr>\r\n";
-
-                os << "<tr><td colspan=3 valign=top>" << qstrTitle;
-
-                if (qstrSubtitle != "")
-                    os << "<br>" << indent << "&quot;" << qstrSubtitle
-                       << "&quot;";
-
-                os << "</td>"
-                   << "<td valign=top>" << pginfo->channame << " "
-                      << pginfo->chanstr
-                      << "</td>"
-                   << "<td valign=top>" << starttime.toString(timeDateFormat)
-                   << "</td>"
-                   << "</tr>\r\n";
-
-                sameRecording = true;
+                statusColor = " class=\"jobaborted\"";
+                jobColor = "";
+            }
+            else if (it.data().status == JOB_ERRORED)
+            {
+                statusColor = " class=\"joberrored\"";
+                jobColor = " class=\"joberrored\"";
+            }
+            else if (it.data().status == JOB_FINISHED)
+            {
+                statusColor = " class=\"jobfinished\"";
+                jobColor = " class=\"jobfinished\"";
+            }
+            else if (it.data().status == JOB_RUNNING)
+            {
+                statusColor = " class=\"jobrunning\"";
+                jobColor = " class=\"jobrunning\"";
+            }
+            else
+            {
+                statusColor = "";
+                jobColor = "";
             }
 
-            dblock.lock();
-            os << "<tr><td valign=top>" << indent
-                  << JobQueue::JobText(it.data().type) << "</td>";
-            dblock.unlock();
+            QString qstrTitle = pginfo->title.replace(QRegExp("\""), 
+                                                        "&quot;");
+            QString qstrSubtitle = pginfo->subtitle.replace(
+                                                 QRegExp("\""), "&quot;");
+
+            os << "<a href=\"#\">"
+               << pginfo->recstartts.toString("ddd") << " "
+               << pginfo->recstartts.toString(shortdateformat) << " "
+               << pginfo->recstartts.toString(timeformat) << " - "
+               << qstrTitle << " - <font" << jobColor << ">"
+               << JobQueue::JobText(it.data().type) << "</font><br />"
+               << "<span><strong>" << qstrTitle << "</strong> ("
+               << pginfo->startts.toString(timeformat) << "-"
+               << pginfo->endts.toString(timeformat) << ")<br />"
+               << (qstrSubtitle == "" ? QString("") : "<em>" + qstrSubtitle
+                                                          + "</em><br /><br />")
+               << "Job: " << JobQueue::JobText(it.data().type) << "<br />"
+               << "Status: <font" << statusColor << ">"
+               << JobQueue::StatusText(it.data().status)
+               << "</font><br />"
+               << "Status Time: "
+               << it.data().statustime.toString(timeDateFormat)
+               << "<br />";
 
             if (it.data().status != JOB_QUEUED)
             {
-                os << "<td valign=top>";
+                os << "Host: ";
                 if (it.data().hostname == "")
                     os << QObject::tr("master");
                 else
                     os << it.data().hostname;
-                os << "</td>";
+                os << "<br />";
             }
-            else
-            {
-                os << "<td>&nbsp;</td>";
-            }
-
-            os << "<td valign=top><b>";
-
-            if (it.data().status == JOB_ABORTED)
-                os << "<font color='#ff8429'>";
-            else if (it.data().status == JOB_ERRORED)
-                os << "<font color='#ff0000'>";
-            else if (it.data().status == JOB_FINISHED)
-                os << "<font color='#0000ff'>";
-            else
-                os << "<font color='#000000'>";
-
-            os << JobQueue::StatusText(it.data().status);
-
-            os << "</font></b></td>"
-               << "<td valign=top>"
-                  << it.data().statustime.toString(timeDateFormat)
-                  << "</td>";
 
             if (it.data().comment != "")
             {
-                os << "<td valign=top>" << it.data().comment << "</td>";
+                os << "<br />Comments:<br />" << it.data().comment << "<br />";
             }
-            os << "</tr>\r\n";
 
-            lastchanid = chanid;
-            laststarttime = starttime;
+            os << "</span></a><hr />\r\n";
 
             delete pginfo;
         }
-        os << "</table>\r\n\r\n";
+        os << "      </div>\r\n";
     }
     else
     {
