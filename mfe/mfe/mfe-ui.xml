@@ -13,91 +13,73 @@
             <bold>yes</bold>
         </font>
     
-        <font name="title" face="Arial">
-            <color>#ffffff</color>
-            <size>19</size>
-            <bold>no</bold>
+        <font name="now_playing_font" face="Arial">
+            <color>#8cc4fc</color>
+            <size>26</size>
+            <bold>yes</bold>
         </font>
 
-        <container name="musicselector">
-            <area>0,0,800,310</area>
-            <managedtreelist name="musictreelist" draworder="1" bins="2">
-                <area>0,0,800,310</area>
-                <image function="selectionbar" filename="selectionbar.png"></image>
-                <image function="uparrow" filename="mm_up_arrow.png"></image>
-                <image function="downarrow" filename="mm_down_arrow.png"></image>
-                <image function="leftarrow" filename="mm_left_arrow.png"></image>
-                <image function="rightarrow" filename="mm_right_arrow.png"></image>
-                <bin number="1">
-                    <area>10,16,230,250</area>
-                    <fcnfont name="active" function="active"></fcnfont>
-                    <fcnfont name="inactive" function="inactive"></fcnfont>
-                    <fcnfont name="active" function="selected"></fcnfont>
-                </bin>
-                <bin number="2">
-                    <area>240,10,550,270</area>
-                    <fcnfont name="active" function="active"></fcnfont>
-                    <fcnfont name="active" function="selected"></fcnfont>
-                    <fcnfont name="inactive" function="inactive"></fcnfont>
-                </bin>
-            </managedtreelist>
+        <font name="current_mfd_font" face="Arial">
+            <color>#8cc4fc</color>
+            <size>12</size>
+        </font>
+
+        <container name="background">
+            <area>0,0,800,600</area>
+            <image name="mfe_background" draworder="0" fleximage="no">
+                <filename>mfe_back.png</filename>
+                <position>0,0</position>
+            </image>
+            <image name="mfe_brushed_top" draworder="0" fleximage="no">
+                <filename>mfe_brushed_top.png</filename>
+                <position>0,0</position>
+            </image>
+            <image name="mfe_brushed_bottom" draworder="0" fleximage="no">
+                <filename>mfe_brushed_bottom.png</filename>
+                <position>0,520</position>
+            </image>
         </container>
 
-        <container name="status">
-            <area>0,350,800,250</area>
-
-            <textarea name="mfd_text_label" draworder="1" align="right">
-                <font>inactive</font>
-                <area>100,10,190,40</area>
-                <value>(1) Current MFD:</value>
+        <container name="nowplaying">
+            <area>0,0,800,80</area>
+            <textarea name="now_playing_text" draworder="0" align="center">
+                <font>now_playing_font</font>
+                <area>100,12,600,40</area>
+                <value>M for Menu ... should scroll</value>
             </textarea>
-            <textarea name="mfd_text" draworder="1" align="lfet">
-                <font>active</font>
-                <area>300,10,490,40</area>
-                <value>--none--</value>
-            </textarea>
-
-            <textarea name="playlist_text_label" draworder="1" align="right">
-                <font>inactive</font>
-                <area>100,50,190,40</area>
-                <value>Playlist id:</value>
-            </textarea>
-            <textarea name="playlist_text" draworder="1" align="lfet">
-                <font>active</font>
-                <area>300,50,490,40</area>
-            </textarea>
-
-            <textarea name="container_text_label" draworder="1" align="right">
-                <font>inactive</font>
-                <area>100,90,190,40</area>
-                <value>Container id:</value>
-            </textarea>
-            <textarea name="container_text" draworder="1" align="lfet">
-                <font>active</font>
-                <area>300,90,490,40</area>
-            </textarea>
-
-            <textarea name="metadata_text_label" draworder="1" align="right">
-                <font>inactive</font>
-                <area>100,130,190,40</area>
-                <value>Metadata id:</value>
-            </textarea>
-            <textarea name="metadata_text" draworder="1" align="lfet">
-                <font>active</font>
-                <area>300,130,490,40</area>
-            </textarea>
-
-            <textarea name="audio_text_label" draworder="1" align="right">
-                <font>inactive</font>
-                <area>100,170,190,40</area>
-                <value>Audio data:</value>
-            </textarea>
-            <textarea name="audio_text" draworder="1" align="lfet">
-                <font>active</font>
-                <area>300,170,490,40</area>
-            </textarea>
-
-
+            <image name="mfe_time_bar" draworder="0" fleximage="no">
+                <filename>mfe_time_bar.png</filename>
+                <position>58,64</position>
+            </image>
         </container>
+
+    
+        
+        <container name="musictree">
+            <area>20,110,780,400</area>
+
+            <listtreearea name="musictree" draworder="0">
+            <area>0,0,760,400</area>
+            <listsize>0,0,370,380</listsize>
+            <leveloffset>10</leveloffset>
+            <gradient type="unselected" start="#505050" end="#ffffff" alpha="100">
+            </gradient>
+            <!-- <gradient type="selected" start="#52CA38" end="#349838" alpha="255"> -->
+            <gradient type="selected" start="#0000ff" end="#505050" alpha="255">
+            </gradient>
+            <fcnfont name="active" function="active"></fcnfont>
+            <fcnfont name="inactive" function="inactive"></fcnfont>
+            </listtreearea>
+        </container>
+
+        <container name="playstatus">
+            <area>0,520,800,80</area>
+            <textarea name="current_mfd_text" draworder="0" align="center">
+                <font>current_mfd_font</font>
+                <area>19,33,114,40</area>
+                <value>SomewhereatSomethinglong</value>
+            </textarea>
+        </container>
+
     </window>
 </mythuitheme>

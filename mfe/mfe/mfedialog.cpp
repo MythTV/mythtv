@@ -16,6 +16,7 @@ MfeDialog::MfeDialog(
                     )
           :MythThemedDialog(parent, window_name, theme_filename)
 {
+    
     //
     //  Pointer to the mfd client library
     //
@@ -38,16 +39,6 @@ MfeDialog::MfeDialog(
     connectUpMfd();
 
     //
-    //  Build our backstop GenericTree data to show when there is no mfd
-    //  available anywhere
-    //
-    
-    no_mfds_tree = new GenericTree("", 0, false);
-    no_mfds_tree->addNode("", 0, false);
-    music_tree_list->assignTreeData(no_mfds_tree);
-        
-    
-    //
     //  Redraw ourselves
     //
 
@@ -62,28 +53,43 @@ void MfeDialog::keyPressEvent(QKeyEvent *e)
     {
         case Key_Up:
             
-            music_tree_list->moveUp();            
+            menu->MoveUp();            
             handled = true;
             break;
             
         case Key_Down:
         
-            music_tree_list->moveDown();
+            menu->MoveDown();
             handled = true;
             break;
             
         case Key_Left:
         
-            music_tree_list->popUp();
+            menu->MoveLeft();
             handled = true;
             break;
             
         case Key_Right:
         
-            music_tree_list->pushDown();
+            menu->MoveRight();
             handled = true;
             break;
 
+        case Key_M:
+
+            if(menu->toggleShow())
+            {
+                //
+                //  true means it will now be drawn ... we should (?) move
+                //  to top menu node (maybe turn this off in some kind of
+                //  "expert" mode ?)
+                //
+                
+                menu->GoHome();
+            }
+            handled = true;
+            break;
+            
         case Key_1:
         case Key_C:
 
@@ -102,82 +108,106 @@ void MfeDialog::keyPressEvent(QKeyEvent *e)
         case Key_Space:
         case Key_Return:
         
-            music_tree_list->select();
+            menu->select();
             handled = true;
             break;
+            
+        //
+        //  If the menu's on, just escape out of that, otherwise let the
+        //  escape go up to the parent (escape dialog)
+        //
+        
+        case Key_Escape:
+        
+            if(menu->isShown())
+            {
+                menu->toggleShow();
+                handled = true;
+            }
+            break;
+            
     }
 
     if (!handled)
         MythThemedDialog::keyPressEvent(e);
 }
 
-void MfeDialog::clearPlayingDisplay()
+void MfeDialog::handleTreeSignals(UIListGenericTree *node)
 {
-    playlist_text->SetText("");
-    container_text->SetText("");
-    metadata_text->SetText("");
-    audio_text->SetText("");
-
-}
-
-void MfeDialog::handleTreeListSignals(int node_int, QValueVector<int> *attributes)
-{
-    if(attributes->at(1) == 1)
+    
+    //
+    //  The user hit Enter/Select/OK somewhere in the menu tree. Find out
+    //  what they select, and then take action accordingly
+    //
+    
+    if( node->getAttribute(1) == 1)
     {
         //
-        //  Item
+        //  It's a pure metadata item
         //
 
         mfd_interface->playAudio(
                                     current_mfd->getId(),
-                                    attributes->at(0),
-                                    attributes->at(1),
-                                    node_int
+                                    node->getAttribute(0),
+                                    node->getAttribute(1),
+                                    node->getInt()
                                 );
+        //
+        //  See if we can get everything about this puppy
+        //
+    
+        AudioMetadata *current_item = current_mfd->getAudioMetadata( node->getAttribute(0), node->getInt());
+        if(current_item)
+        {
+            cout << "this item exists: " << current_item->getTitle() << endl;
+        }
+        else
+        {
+            cerr << "mfedialog.o: weird ... couldn't find an audio item"
+                 << endl;
+        }
+
+        
     }
-    else if(attributes->at(1) == 2)
+    else if(node->getAttribute(1) == 2)
     {
         //
-        //  playlist item
+        //  It's an entry in a playlist
         //
-
-        mfd_interface->playAudio(
-                                    current_mfd->getId(),
-                                    attributes->at(0),
-                                    attributes->at(1),
-                                    attributes->at(2),
-                                    node_int
-                                );
     }
-
-
 }
 
 
 void MfeDialog::wireUpTheme()
 {
 
-    music_tree_list = getUIManagedTreeListType("musictreelist");
-    if (!music_tree_list)
-    {
-        cerr << "mfedialog.o: Couldn't find a music tree list in your theme"
-             << endl;
-        exit(0);
-    }
-    music_tree_list->showWholeTree(true);
-    connect(music_tree_list, SIGNAL(nodeSelected(int, IntVector*)),
-                this, SLOT(handleTreeListSignals(int, IntVector*)));
 
-    //
-    //  Basic textual displays
-    //
+    menu = getUIListTreeType("musictree");
+    if (!menu)
+    {
+        cerr << "no musictree in your theme doofus" << endl;
+    }
+    menu->hide();
     
-    mfd_text = getUITextType("mfd_text");
-    playlist_text = getUITextType("playlist_text");
-    container_text = getUITextType("container_text");
-    metadata_text = getUITextType("metadata_text");
-    audio_text = getUITextType("audio_text");
+    connect(menu, SIGNAL(selected(UIListGenericTree*)),
+            this, SLOT(handleTreeSignals(UIListGenericTree*)));
+ 
+    current_mfd_text = getUITextType("current_mfd_text");
+    current_mfd_text->SetText("No mfd!!!");
+ 
+    //
+    // Make the first few nodes in the tree that everything else hangs off
+    // as children
+    //
+
+    menu_root_node = new UIListGenericTree(NULL, "Menu Root Node");
+
+    browse_node =  new UIListGenericTree(menu_root_node, "Browse");
+    manage_node =  new UIListGenericTree(menu_root_node, "Manage");
+    connect_node = new UIListGenericTree(menu_root_node, "Connect");
+    setup_node   = new UIListGenericTree(menu_root_node, "Setup");
     
+    menu->SetTree(menu_root_node);
 }
 
 
@@ -203,8 +233,8 @@ void MfeDialog::connectUpMfd()
     connect(mfd_interface, SIGNAL(audioPlaying(int, int, int, int, int, int, int, int, int)),
             this, SLOT(playing(int, int, int, int, int, int, int, int, int)));
 
-    connect(mfd_interface, SIGNAL(metadataChanged(int, GenericTree *)),
-            this, SLOT(changeMetadata(int, GenericTree *)));
+    connect(mfd_interface, SIGNAL(metadataChanged(int, MfdContentCollection *)),
+            this, SLOT(changeMetadata(int, MfdContentCollection *)));
 
 }
 
@@ -227,11 +257,8 @@ void MfeDialog::mfdDiscovered(int which_mfd, QString name, QString host, bool fo
             if(current_mfd == NULL)
             {
                 current_mfd = new_mfd;
+                current_mfd_text->SetText(name);
             }
-            mfd_text->SetText(QString("%1 (%2) [%3]")
-                                .arg(current_mfd->getName())
-                                .arg(current_mfd->getHost())
-                                .arg(available_mfds.count()));
         }
     }
     else
@@ -250,46 +277,47 @@ void MfeDialog::mfdDiscovered(int which_mfd, QString name, QString host, bool fo
         {
             if(available_mfds.count() > 0)
             {
-                cout << "doin dat" << endl;
                 current_mfd = available_mfds[0];
-                mfd_text->SetText(QString("%1 (%2) [%3]")
-                                  .arg(current_mfd->getName())
-                                  .arg(current_mfd->getHost())
-                                  .arg(available_mfds.count()));
             }
             else
             {
                 current_mfd = NULL;
-                mfd_text->SetText("--none--");
-                music_tree_list->assignTreeData(no_mfds_tree);
             }
-            updateForeground();
         }
     }
 }
 
-void MfeDialog::changeMetadata(int which_mfd, GenericTree *new_tree)
+void MfeDialog::changeMetadata(int which_mfd, MfdContentCollection *new_collection)
 {
     if(available_mfds.find(which_mfd))
     {
-        available_mfds[which_mfd]->setMetadata(new_tree);
+        available_mfds[which_mfd]->setMfdContentCollection(new_collection);
+
         if(current_mfd->getId() == which_mfd)
         {
-            int current_bin = music_tree_list->getActiveBin();
-            QStringList route_to_current = music_tree_list->getRouteToCurrent();
-            music_tree_list->assignTreeData(new_tree);
-            if( route_to_current.count() > 0)
-            {
-                if(music_tree_list->tryToSetCurrent(route_to_current))
-                {
-                    music_tree_list->setActiveBin(current_bin);
-                }
-                else
-                {
-                    music_tree_list->setCurrentNode(new_tree->findLeaf());
-                }
-            }
-            updateForeground();
+
+            QStringList route_to_current = menu->getRouteToCurrent();
+            //menu->GoHome();
+
+            //
+            //  If there's anything there already, delete it
+            //
+    
+            browse_node->pruneAllChildren();
+    
+            //
+            //  add all the branches to content
+            //
+            
+            browse_node->addNode(new_collection->getAudioArtistTree());
+            browse_node->addNode(new_collection->getAudioGenreTree());
+            browse_node->addNode(new_collection->getAudioPlaylistTree());
+            browse_node->addNode(new_collection->getAudioCollectionTree());
+
+            browse_node->setDrawArrow(true);
+            menu->tryToSetCurrent(route_to_current);
+            menu->refresh();
+    
         }
     }
     else
@@ -302,11 +330,11 @@ void MfeDialog::changeMetadata(int which_mfd, GenericTree *new_tree)
 
 void MfeDialog::cycleMfd()
 {
-    clearPlayingDisplay();
     if(current_mfd && available_mfds.count() > 1)
     {
-        QStringList route_to_current = music_tree_list->getRouteToCurrent();
+        QStringList route_to_current = menu->getRouteToCurrent();
         current_mfd->setPreviousTreePosition(route_to_current);
+
         QIntDictIterator<MfdInfo> it( available_mfds ); 
         for ( ; it.current(); ++it )
         {
@@ -318,38 +346,29 @@ void MfeDialog::cycleMfd()
                     it.toFirst();
                 }
                 current_mfd = it.current();
-                GenericTree *switched_metadata = current_mfd->getMetadata();
-                if(switched_metadata)
-                {
-                    music_tree_list->assignTreeData(current_mfd->getMetadata());
-                    QStringList route_to_current = current_mfd->getPreviousTreePosition();
-                    if( route_to_current.count() > 0)
-                    {
-                        if(!music_tree_list->tryToSetCurrent(route_to_current))
-                        {
-                            //music_tree_list->setActiveBin(current_bin);
-                        }
-                        else
-                        {
-                            music_tree_list->setCurrentNode(current_mfd->getMetadata()->findLeaf());
-                        }
-                    }
-                }
-                else
-                {
-                    music_tree_list->assignTreeData(no_mfds_tree);
-                }
                 break;
             }
         }
+        
+        //
+        //  Ok, we now have a new mfd set as current. Update the display
+        //
+        
+        current_mfd_text->SetText(current_mfd->getName());
+        
+        //
+        //  
+        //
+        
+        MfdContentCollection *collection = current_mfd->getMfdContentCollection();
+        browse_node->deleteAllChildren();
+        browse_node->addNode(collection->getAudioArtistTree());
+        browse_node->addNode(collection->getAudioGenreTree());
+        browse_node->addNode(collection->getAudioPlaylistTree());
+        browse_node->addNode(collection->getAudioCollectionTree());
+        
+        
     }
-
-    mfd_text->SetText(QString("%1 (%2) [%3]")
-                      .arg(current_mfd->getName())
-                      .arg(current_mfd->getHost())
-                      .arg(available_mfds.count()));
-
-    updateForeground();
 }
 
 void MfeDialog::stopAudio()
@@ -383,10 +402,10 @@ void MfeDialog::stopped(int which_mfd)
             //
             //  Clear out all the audio-related text entries
             //
-            playlist_text->SetText("");
-            container_text->SetText("");
-            metadata_text->SetText("");
-            audio_text->SetText("");
+            //playlist_text->SetText("");
+            //container_text->SetText("");
+            //metadata_text->SetText("");
+            //audio_text->SetText("");
         }
     }
 }
@@ -411,6 +430,7 @@ void MfeDialog::playing(
             //  Set all the audio related text entries
             //
             
+            /*
             playlist_text->SetText(QString("%1 (index=%2)").arg(playlist).arg(playlist_index));
             container_text->SetText(QString("%1").arg(container_id));
             metadata_text->SetText(QString("%1").arg(metadata_id));
@@ -420,6 +440,7 @@ void MfeDialog::playing(
                                 .arg(bitrate)
                                 .arg(frequency)
                                 );
+            */
         }
     }
 }
@@ -429,10 +450,10 @@ void MfeDialog::playing(
 MfeDialog::~MfeDialog()
 {
     available_mfds.clear();
-    if(no_mfds_tree)
+    if(menu_root_node)
     {
-        delete no_mfds_tree;
-        no_mfds_tree = NULL;
+        delete menu_root_node;
+        menu_root_node = NULL;
     }
 }
 

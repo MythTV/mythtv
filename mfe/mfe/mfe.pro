@@ -9,7 +9,8 @@ target.path = $${PREFIX}/lib/mythtv/plugins
 INSTALLS += target
 
 uifiles.path = $${PREFIX}/share/mythtv/themes/default
-uifiles.files = mfe-ui.xml
+uifiles.files = mfe-ui.xml images/*.png
+
 
 INSTALLS += uifiles
 
