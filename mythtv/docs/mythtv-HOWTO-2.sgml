@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-03-15, v2.00
+<date>2003-03-16, v2.00
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -695,7 +695,8 @@ $ su
 # mysql < /usr/share/mythtv/database/mc.sql
 </verb></tscreen>
 
-<sect2>Modifying access to the MySQL database for multiple systems
+<sect2>Modifying access to the MySQL database for multiple systems <label
+id="modify_perm_mysql">
 <p>If you're going to have multiple systems accessing a master backend server,
 you must grant access to the database from remote systems.  By default, the
 <tt>mc.sql</tt> script is only granting access to the localhost.
@@ -1399,7 +1400,7 @@ the IRDA device within a few feet of the box.
 <bf>mysql</bf> is running and has had its initial database setup.  It's now
 time to configure MythTV.
 
-<sect1>Configuring a backend system.
+<sect1>Configuring the master backend system.
 <p>Open a shell and decide where you will store your video files.  By
 default, MythTV will assume that you will be using <tt>/mnt/store</tt>. You
 may wish to create a <tt>/var/video</tt> subdirectory, so you would change
@@ -1417,6 +1418,9 @@ running multiple backend systems, the master backend will maintain the
 database and will make all decisions about which programs will be recorded
 on which tuners.  If you have only one backend, then it will be its own
 master.
+
+<bf>NOTE</bf>: Red Hat 8.0 users, if you haven't followed <ref id="RH80-LANG" name="these">
+steps, you <em>must</em> do so before continuing.
 
 Switch to the setup directory and run the setup program:
 <tscreen><verb>
@@ -1485,7 +1489,7 @@ if you have additional capture cards in this machine, press the space bar
 when the highlight is on the (New Capture Card) row to define another card. 
 Once you have no additional cards to setup, press ESC.
 
-<sect3>Video Sources
+<sect2>Video Sources
 <p>When you start, the highlight should be on (New Video Source).  Press the
 space bar to begin.  The first field asks for the name of the video source.
 You may choose something easy to remember, like "Antenna" or "Cable".  Once
@@ -1507,18 +1511,20 @@ listings provider and the speed of your connection to the internet.  Be
 patient!
 
 You will then be returned to the Video Sources screen.  If you have multiple
-video sources available at a particular machine, such as Antenna, Cable,
-etc, go ahead and define them all.  Once you're done, press ESC to return to
-the main screen.
+video sources available, such as Antenna, Cable, etc, go ahead and define
+them all, even if they're not all going to be physically connected to the
+master backend server.  Once you're done, press ESC to return to the main
+screen.
 
+<sect2>Input Connections
 The final configuration item is Input Connections.  On this screen, you will
 associate the various video sources you defined earlier with a physical
-input to a tuner card.  It's entirely possible that you have multiple
+input to a encoder card.  It's entirely possible that you have multiple
 tuners, and each tuner has a different input, so on this screen you let
 MythTV know which device will connect to which input source.
 
 When you start this screen, you should see a listing of the various input
-connections available on each the Capture cards you defined earlier.  For
+connections available on each of the Capture cards you defined earlier.  For
 example, you may have a capture card with a tuner, a SVideo and a Composite
 connection.  If you wanted to associate the tuner (aka, "Television") with
 an "Antenna" source you defined in Video Sources, you would move to the
@@ -1535,10 +1541,52 @@ devices you have available.
 Press ESC to return to the main menu, and press ESC again if you have no
 further items to configure, thereby returning you to the command line.
 
-Run the <tt>mythfilldatabase</tt> as directed.  This should be done on all
-backend systems, including slaves.  The master backend will obtain guide
-data for all slave backend video sources that have registered with the
-master backend.
+Run the <tt>mythfilldatabase</tt> as directed.  The master backend will
+obtain guide data for all the video sources you defined during setup.
+
+Once <tt>mythfilldatabase</tt> has finished, start the master server before
+continuing.
+<tscreen><verb>
+$ mythbackend
+</verb></tscreen>
+
+mythbackend will print information about connections and what it's doing to
+the console.
+
+<sect1>Configuring a non-master backend.
+<p>Configuration of a non-master backend follows the same general procedure
+as that of the master backend, with the exception that you skip over the
+"Video Sources" step.  All possible video sources need to be defined on the
+master backend system; only the master backend will query a listings
+provider to obtain guide data for all the slave backends.
+
+Make sure that the IP addresses on the General setup screen are accurate. 
+If the slave backend can't communicate with the master backend due to IP
+address misconfiguration then MythTV will not function properly.
+
+Ensure that you've granted access to the master MySQL database for remote
+backends as discussed in the section titled <ref id="modify_perm_mysql" name="Modifying
+access to the MySQL database for multiple systems">.
+
+<bf>NOTE</bf>: Do not run <tt>mythfilldatabase</tt> on a non-master backend.
+
+<sect>Configuring mythfrontend
+<p>Once you have completed configuration of your backend systems, the next
+step is to configure the frontend client.  You should run the MythTV setup
+program before using any other modules such as MythMusic, etc. to correctly
+initialize the database.
+
+Because MythTV now uses a database to store most configuration variables,
+you need to let the frontend know where to connect to the master backend
+system.  If the frontend and backend are all going to be running on the same
+box, you can continue to the next step.  If your frontend is not running on
+the same system as the backend, you'll need to edit the
+<tt>/usr/local/share/mythtv/mysql.txt</tt> file and change the first line to
+the IP address of your master backend system.  All other configuration is
+within the mythfrontend GUI.
+
+When you start mythfrontend, you should have a number of choices.  Before
+doing anything, go to the setup option and configure the frontend client.
 
 
 Currently, MythTV supports two different video encoders, MPEG4 and RTJPEG. 
@@ -1569,17 +1617,7 @@ cmov pat pse36 mmx fxsr sse
 
 Notice the <bf>sse</bf> at the end of the line.
 
-Users in North America can now exit and save the file.  Users in other parts
-of the world need to modify the first line and modify the XMLTVGrabber
-variable to the correct grabber for their region.  <bf>tv_grab_uk</bf> for the
-UK, etc.  Use the name from the xmltv directory.
-
 <sect1>Running setup.
-<p>Now that you've edited your <tt>settings.txt</tt> file, it's time to run the
-setup program and perform the initial configuration.
-
-<bf>NOTE</bf>: Red Hat 8.0 users, if you haven't followed <ref id="RH80-LANG" name="these">
-steps, you <em>must</em> do so before continuing.
 
 Open a shell, and switch to the setup directory:
 
