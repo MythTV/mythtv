@@ -25,9 +25,12 @@ using namespace std;
 #include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
 #include "dirlist.h"
+#ifdef ENABLE_LIRC
 #include "lirc_client.h"
+
 int lfd;
     struct lirc_config *config;
+#endif
 
 void startDatabaseTree(MythContext *context, QSqlDatabase *db, QString &paths, 
                        QValueList<Metadata> *playlist)
@@ -35,6 +38,8 @@ void startDatabaseTree(MythContext *context, QSqlDatabase *db, QString &paths,
   int flags;
     DatabaseBox dbbox(context, db, paths, playlist);
     QSocketNotifier *sn;
+
+#ifdef ENABLE_LIRC
     fcntl(lfd,F_SETOWN,getpid());
     flags=fcntl(lfd,F_GETFL,0);
     if(flags!=-1)
@@ -46,7 +51,7 @@ void startDatabaseTree(MythContext *context, QSqlDatabase *db, QString &paths,
     QObject::connect( sn, SIGNAL(activated(int)),
 		      &dbbox, SLOT(dataReceived()) );
 
-
+#endif
     dbbox.Show();
 
     dbbox.exec();
@@ -69,10 +74,13 @@ int main(int argc, char *argv[])
 
     
     MythContext *context = new MythContext();
-
+#ifdef ENABLE_LIRC
     lfd=lirc_init("mythvideo",1);
     lirc_readconfig(NULL,&config,NULL);
+#endif
+    QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
 
+    context->OpenDatabase(db);
     context->LoadQtConfig();
 
     context->LoadSettingsFiles("mythexplorer-settings.txt");
@@ -82,7 +90,6 @@ int main(int argc, char *argv[])
       context->SetSetting("LoadProfile",QString("profile_%1").arg(a.argv()[2]));
     context->SetSetting("Profile",context->GetSetting(context->GetSetting("LoadProfile")));
       
-    QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
     {
         printf("Couldn't connect to database\n");

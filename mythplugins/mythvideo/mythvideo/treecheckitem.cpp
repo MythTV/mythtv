@@ -36,7 +36,7 @@ void TreeCheckItem::paintCell(QPainter* p, const QColorGroup& cg,
 	    //	    cout << "Genre:" << metadata->Genre().ascii() << endl;
 	    if(metadata->Genre() == "dir")
 	      {
-	   	    cout << "Genre:" << metadata->Genre().ascii() << endl;
+//	   	    cout << "Genre:" << metadata->Genre().ascii() << endl;
 		
 		newCg.setColor(QColorGroup::Foreground, "Yellow");
 		newCg.setColor(QColorGroup::Text, "Yellow");

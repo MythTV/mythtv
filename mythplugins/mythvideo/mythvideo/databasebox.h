@@ -23,12 +23,8 @@ class DatabaseBox : public QDialog
                 QWidget *parent = 0, const char *name = 0);
 
     void Show();
-
-    protected slots:
-    
-      void selected(QListViewItem *);
-    void dataReceived();
-     
+	public slots:
+	void 	selected(QListViewItem *);
   private:
     void doSelected(QListViewItem *);
     void fillList(QListView *listview, QValueList<Metadata> *playlist );

@@ -20,8 +20,10 @@ using namespace std;
 #include "dirlist.h"
 #include "lirc_client.h"
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythwidgets.h>
+
 extern struct lirc_config *config;
-QListView *listview;
+MythListView *listview;
 DatabaseBox::DatabaseBox(MythContext *context, QSqlDatabase *ldb, 
                          QString &paths, QValueList<Metadata> *playlist, 
                          QWidget *parent, const char *name)
@@ -47,7 +49,7 @@ DatabaseBox::DatabaseBox(MythContext *context, QSqlDatabase *ldb,
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
-    listview = new QListView(this);
+    listview = new MythListView(this);
     listview->addColumn("Select file to be played:");
     
     listview->setSorting(-1);
@@ -74,6 +76,7 @@ void DatabaseBox::Show()
     showFullScreen();
 }
 
+#ifdef ENABLE_LIRC
 
 void DatabaseBox::dataReceived()
 {
@@ -115,7 +118,7 @@ int ret;
    }
 
 }
-
+#endif
 void DatabaseBox::fillList(QListView *listview, QValueList<Metadata> *playlist)
 {
       QString title;
