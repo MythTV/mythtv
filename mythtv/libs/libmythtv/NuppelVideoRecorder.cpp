@@ -931,26 +931,28 @@ void NuppelVideoRecorder::StartRecording(void)
         usingv4l2 = false;
     }
 
-    usingv4l2 = false;
-
     if (usingv4l2)
     {
         if (vcap.card[0] == 'B' && vcap.card[1] == 'T' &&
             vcap.card[2] == '8' && vcap.card[4] == '8')
             correct_bttv = true;
-        channelfd = open(videodevice.ascii(), O_RDWR);
-        if (channelfd < 0)
+
+        if (QString("cx8800") == QString((char *)vcap.driver))
         {
-            cerr << "Can't open video device: " << videodevice << endl;
-            perror("open video:");
-            KillChildren();
+            channelfd = open(videodevice.ascii(), O_RDWR);
+            if (channelfd < 0)
+            {
+                cerr << "Can't open video device: " << videodevice << endl;
+                perror("open video:");
+                KillChildren();
+                return;
+            }
+     
+            inpixfmt = FMT_NONE;
+            InitFilters();
+            DoV4L2();
             return;
         }
-     
-        inpixfmt = FMT_NONE;
-        InitFilters();
-        DoV4L2();
-        return;
     }
 
     channelfd = fd;
@@ -1060,7 +1062,8 @@ void NuppelVideoRecorder::StartRecording(void)
 
     int syncerrors = 0;
 
-    while (encoding) {
+    while (encoding) 
+    {
         if (paused)
         {
            mainpaused = true;
@@ -1290,8 +1293,8 @@ again:
                 uint8_t conversion_buffer[conversion_buffer_size];
 
                 uint8_t *y_plane = conversion_buffer;
-                uint8_t *cr_plane = y_plane + w * h;
-                uint8_t *cb_plane = cr_plane + w * h / 4;
+                uint8_t *cb_plane = y_plane + w * h;
+                uint8_t *cr_plane = cr_plane + w * h / 4;
 
                 uint8_t *src = buffers[frame];
 

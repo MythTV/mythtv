@@ -65,6 +65,9 @@ struct XvData
     map<unsigned char *, XvImage *> buffers;
 
     XImage *fallbackImage;
+
+    int colorkey;
+    bool needdrawcolor;
 };
 
 #define GUID_I420_PLANAR 0x30323449
@@ -424,6 +427,49 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
     pauseFrame.buf = new unsigned char[pauseFrame.size];
     pauseFrame.qscale_table = NULL;
     pauseFrame.qstride = 0;
+
+    data->needdrawcolor = true;
+
+    Atom xv_atom;
+    XvAttribute *attributes;
+    int attrib_count;
+
+    attributes = XvQueryPortAttributes(data->XJ_disp, xv_port, &attrib_count);
+    if (attributes)
+    {
+        for (int i = 0; i < attrib_count; i++)
+        {
+            if (!strcmp(attributes[i].name, "XV_AUTOPAINT_COLORKEY"))
+            {
+                xv_atom = XInternAtom(data->XJ_disp, "XV_AUTOPAINT_COLORKEY",
+                                      False);
+                if (xv_atom != None)
+                {
+                    ret = XvSetPortAttribute(data->XJ_disp, xv_port, xv_atom,
+                                             1);
+                    if (ret == Success)
+                        data->needdrawcolor = false;
+                }
+            }
+        }
+        XFree(attributes);
+    }
+
+    if (data->needdrawcolor)
+    {
+        xv_atom = XInternAtom(data->XJ_disp, "XV_COLORKEY", False);
+        if (xv_atom != None)
+        {
+            ret = XvGetPortAttribute(data->XJ_disp, xv_port, xv_atom, 
+                                     &data->colorkey);
+            if (ret != Success)
+            {
+                cerr << "Couldn't get the color key color, and we need it.\n";
+                cerr << "You likely won't get any video.\n";
+                data->colorkey = 0;
+            }
+        }
+    }
 
     MoveResize();
  
@@ -822,6 +868,13 @@ void VideoOutputXv::Show(FrameScanType )
 
 void VideoOutputXv::DrawUnusedRects(void)
 {
+    if (data->needdrawcolor)
+    {
+        XSetForeground(data->XJ_disp, data->XJ_gc, data->colorkey);
+        XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, dispx, 
+                       dispy, dispw, disph);
+    }
+
     // Draw black in masked areas
     XSetForeground(data->XJ_disp, data->XJ_gc, XJ_black);
 
