@@ -54,7 +54,7 @@
      <text lang="NL">Films</text>
      <text lang="FR">Vidéos</text>
      <text lang="DE">Videos</text>
-     <action>EXEC mythvideo</action>
+     <action>PLUGIN mythvideo</action>
      <depends>videomenu.xml</depends>
    </button>
 

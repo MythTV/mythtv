@@ -44,13 +44,18 @@
       <depends>mythgallery</depends>
    </button>
 
-<!--
+   <button>
+       <type>VIDEO</type>
+       <text>Videos Settings</text>
+       <action>CONFIGPLUGIN mythvideo</action>
+       <depends>mythvideo</depends>
+   </button>
+
    <button>
      <type>WEATHER</type>
      <text>Weather Settings</text>
-     <action>EXEC mythweather -c</action>
+     <action>CONFIGPLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
--->
 
 </mythmenu>

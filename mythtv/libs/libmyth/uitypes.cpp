@@ -2409,11 +2409,6 @@ UIManagedTreeListType::UIManagedTreeListType(const QString & name)
 
 UIManagedTreeListType::~UIManagedTreeListType()
 {
-    //
-    //  Funny, I have yet to see this appear
-    //  (even when it isn't commented out)
-    //
-    cout << "Rage, rage against the dying of the light" << endl;
 }
 
 void UIManagedTreeListType::drawText(QPainter *p, 
