@@ -41,6 +41,7 @@
      <text>TV Settings</text>
      <text lang="DE">Fernsehen</text>
      <text lang="SV">TV</text>
+     <text lang="NL">TV</text>     
      <text lang="FR">Configuration TV</text>
      <text lang="JA">TV設定</text>
      <text lang="FI">TV:n Asetukset</text>
@@ -53,6 +54,7 @@
      <text>Media Settings</text>
      <text lang="DE">Medien</text>
      <text lang="SV">Media</text>
+     <text lang="NL">Media</text>
      <text lang="FR">Configuration multimédia</text>
      <text lang="JA">メディア設定</text>
      <text lang="FI">Media</text>
@@ -65,6 +67,7 @@
      <type>SETTINGS_INFO_CENTER</type>
      <text>Info Center Settings</text>
      <text lang="DE">Informationszentrale</text>
+     <text lang="NL">Informatiecentrale</text>     
      <text lang="FR">Configuration centre d'informations</text>
      <text lang="SV">Informationscenter</text>
      <text lang="JA">インフォセンター設定</text>
@@ -97,6 +100,7 @@
       <text>Phone Settings</text>
       <text lang="FR">Configuration téléphone</text>
       <text lang="DE">Telephon Einstellungen</text>
+      <text lang="NL">Telefoon Instellingen</text>      
       <text lang="FI">Puhelimen Asetukset</text>
       <alttext lang="DE">Telephon</alttext>
       <action>CONFIGPLUGIN mythphone</action>

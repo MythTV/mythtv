@@ -43,6 +43,7 @@
      <text lang="SV">Webb-inställningar</text>
      <text lang="JA">Web設定</text>
      <text lang="FR">Configuration du web</text>
+     <text lang="NL">Web Instellingen</text>     
      <text lang="FI">Nettiasetukset</text>
      <text lang="ZH_TW">互聯網設定</text>
      <alttext lang="DE">WWW</alttext>
@@ -58,6 +59,7 @@
      <text lang="DE">Rezepte Einstellungen</text>
      <text lang="FR">Configuration des recettes</text>
      <text lang="FI">Reseptiasetukset</text>
+     <text lang="NL">Kookboek Instellingen</text>     
      <alttext lang="DE">Rezepte</alttext>
      <action>CONFIGPLUGIN mythrecipe</action>
      <depends>mythrecipe</depends>

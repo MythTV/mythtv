@@ -86,6 +86,7 @@
      <text lang="JA">電話</text>
      <text lang="DE">Telephon</text>
      <text lang="FI">Puhelin</text>
+     <text lang="NL">Telefoon</text>     
      <text lang="SV">Telefon</text>
      <text lang="FR">Téléphone</text>
      <action>PLUGIN mythphone</action>
@@ -101,7 +102,7 @@
      <text lang="FR">Configuration</text>
      <text lang="DE">Zubehör/Konfiguration</text>
      <text lang="DK">Konfiguration</text>
-     <text lang="NL">Instellingen</text>
+     <text lang="NL">Beheer</text>
      <text lang="PT">Configurações</text>
      <text lang="SV">Verktyg/Inställningar</text>
      <text lang="JA">設定</text>

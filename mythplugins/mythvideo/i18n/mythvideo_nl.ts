@@ -529,23 +529,23 @@
     <name>VideoDialog</name>
     <message>
         <source>Switch to Browse View</source>
-        <translation type="unfinished">Ga naar Browsermodus</translation>
+        <translation>Browsermodus</translation>
     </message>
     <message>
         <source>Switch to Gallery View</source>
-        <translation type="unfinished">Ga naar Gallerijmodus</translation>
+        <translation>Gallerijmodus</translation>
     </message>
     <message>
         <source>Switch to List View</source>
-        <translation type="unfinished"></translation>
+        <translation>Lijstmodus</translation>
     </message>
     <message>
         <source>Select action</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies actie</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <source>Parental Pin:</source>
@@ -556,62 +556,62 @@
     <name>VideoFilterDialog</name>
     <message>
         <source>Result of this filter : %1 video(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Resultaat van deze filer : %1 video(s)</translation>
     </message>
     <message>
         <source>Result of this filter : No Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Resultaat van deze filer : Geen videos</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">Onbekend</translation>
+        <translation>Onbekend</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished">minuten</translation>
+        <translation>minuten</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle</translation>
     </message>
     <message>
         <source>Save as default</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewaar als standaard</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation type="unfinished">Klaar</translation>
+        <translation>Klaar</translation>
     </message>
 </context>
 <context>
     <name>VideoGallery</name>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruik Filterweergave</translation>
     </message>
     <message>
         <source>Watch This Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Bekijk deze video</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation type="unfinished">Beschrijving Inhoud</translation>
+        <translation>Beschrijving Inhoud</translation>
     </message>
     <message>
         <source>View Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Bekijk Details</translation>
     </message>
     <message>
         <source>Plain View</source>
-        <translation type="unfinished"></translation>
+        <translation>Overzicht alle folders</translation>
     </message>
     <message>
         <source>Folder View</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruik Folders</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Annuleer</translation>
+        <translation>Annuleer</translation>
     </message>
 </context>
 <context>
@@ -693,11 +693,11 @@
     <name>VideoSelected</name>
     <message>
         <source>No rating available.</source>
-        <translation type="unfinished">Geen beoordeling beschikbaar.</translation>
+        <translation>Geen beoordeling beschikbaar.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished">minuten</translation>
+        <translation>minuten</translation>
     </message>
 </context>
 <context>

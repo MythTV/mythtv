@@ -104,111 +104,111 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     <name>CustomRecord</name>
     <message>
         <source>Power Search Recording Rule Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Geavanceerde Opnameregels Maken</translation>
     </message>
     <message>
         <source>Rule Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Naam Opnameregel</translation>
     </message>
     <message>
         <source>Match words in the title</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoek woorden in de titel</translation>
     </message>
     <message>
         <source>Match in any descriptive field</source>
-        <translation type="unfinished"></translation>
+        <translation>Woorden in elk infoveld</translation>
     </message>
     <message>
         <source>Limit by category</source>
-        <translation type="unfinished"></translation>
+        <translation>Beperk per Categorie</translation>
     </message>
     <message>
         <source>New episodes only</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkel nieuwe afleveringen</translation>
     </message>
     <message>
         <source>Exclude unidentified episodes (Data Direct)</source>
-        <translation type="unfinished"></translation>
+        <translation>Sluit onherkende afleveringen uit (US)</translation>
     </message>
     <message>
         <source>Exclude unidentified episodes (XMLTV)</source>
-        <translation type="unfinished"></translation>
+        <translation>Sluit onherkende afleveringen uit (EUR)</translation>
     </message>
     <message>
         <source>Category type</source>
-        <translation type="unfinished"></translation>
+        <translation>Categorie type</translation>
     </message>
     <message>
         <source>Limit movies by the year of release</source>
-        <translation type="unfinished"></translation>
+        <translation>Beperk film op jaar van release</translation>
     </message>
     <message>
         <source>Minimum star rating (0.0 to 1.0 for movies only)</source>
-        <translation type="unfinished"></translation>
+        <translation>Minimaal aantal sterren voor film (afhankelijk van gidsdata)</translation>
     </message>
     <message>
         <source>Exclude one station</source>
-        <translation type="unfinished"></translation>
+        <translation>Sluit een zender uit</translation>
     </message>
     <message>
         <source>Match related callsigns</source>
-        <translation type="unfinished"></translation>
+        <translation>Beperk tot bepaalde zenders</translation>
     </message>
     <message>
         <source>Only channels from a specific video source</source>
-        <translation type="unfinished"></translation>
+        <translation>Alleen zenders van een bepaalde input bron</translation>
     </message>
     <message>
         <source>Only channels marked as commercial free</source>
-        <translation type="unfinished"></translation>
+        <translation>Alleen zenders zonder reclame</translation>
     </message>
     <message>
         <source>Anytime on a specific day of the week</source>
-        <translation type="unfinished"></translation>
+        <translation>Altijd op een bepaalde dag van de week</translation>
     </message>
     <message>
         <source>Only on weekdays (Monday through Friday)</source>
-        <translation type="unfinished"></translation>
+        <translation>Alleen op weekdagen (maa-vrij)</translation>
     </message>
     <message>
         <source>Only on weekends</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkel in het weekend</translation>
     </message>
     <message>
         <source>Only in primetime</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkel in primetime</translation>
     </message>
     <message>
         <source>Not in primetime</source>
-        <translation type="unfinished"></translation>
+        <translation>Niet in primetime</translation>
     </message>
     <message>
         <source>Multiple sports teams (complete example)</source>
-        <translation type="unfinished"></translation>
+        <translation>Vrschillende sportteams (volledig voorbeeld)</translation>
     </message>
     <message>
         <source>Sci-fi B-movies (complete example)</source>
-        <translation type="unfinished"></translation>
+        <translation>Sci-fi B-films (volledig voorbeeld)</translation>
     </message>
     <message>
         <source>Add this example clause</source>
-        <translation type="unfinished"></translation>
+        <translation>Voeg deze voorbeeldregel toe</translation>
     </message>
     <message>
         <source>Test</source>
-        <translation type="unfinished"></translation>
+        <translation>Test</translation>
     </message>
     <message>
         <source>Record</source>
-        <translation type="unfinished">Neem op</translation>
+        <translation>Neem op</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Annuleer</translation>
+        <translation>Annuleer</translation>
     </message>
     <message>
         <source>or</source>
-        <translation type="unfinished"></translation>
+        <translation>of</translation>
     </message>
 </context>
 <context>
@@ -290,7 +290,7 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>Record one showing of this title</source>
-        <translation type="unfinished"></translation>
+        <translation>Neem een aflevering op van deze serie</translation>
     </message>
 </context>
 <context>
@@ -468,11 +468,11 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     <name>MythSearchDialog</name>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Annuleer</translation>
+        <translation>Annuleer</translation>
     </message>
 </context>
 <context>
@@ -694,103 +694,123 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>Play from beginning</source>
-        <translation type="unfinished"></translation>
+        <translation>Speel van begin</translation>
     </message>
     <message>
         <source>Play from bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Speel vanaf bladwijzer</translation>
     </message>
     <message>
         <source>A preserved episode is ignored in calculations for deleting episodes above the limit.  Auto-expiration is used to remove eligable programs when disk space is low.</source>
-        <translation type="unfinished"></translation>
+        <translation>Met een gevrijwaarde aflevering wordt geen rekening gehouden bij de bepaling van maximaal bij te houden afleveringen. Automatisch vervalen zal het bestand verwijderen als je schijf vol raakt.</translation>
     </message>
     <message>
         <source>Do not preserve this episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze aflevering niet vrijwaren</translation>
     </message>
     <message>
         <source>Preserve this episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze aflevering vrijwaren</translation>
     </message>
     <message>
         <source>Play from...</source>
-        <translation type="unfinished"></translation>
+        <translation>Speel vanaf...</translation>
     </message>
     <message>
         <source>Storage Options</source>
-        <translation type="unfinished">Opslag opties</translation>
+        <translation>Opslag opties</translation>
     </message>
     <message>
         <source>Recording Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opname Opties</translation>
     </message>
     <message>
         <source>Job Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Taak Opties</translation>
     </message>
     <message>
         <source>Show group list as recording groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Groepeer per opnamegroep</translation>
     </message>
     <message>
         <source>Show group list as titles</source>
-        <translation type="unfinished"></translation>
+        <translation>Groepeer op titels</translation>
+    </message>
+    <message>
+        <source>Playlist Actions</source>
+        <translation>Afspeellijst Taken</translation>
+    </message>
+    <message>
+        <source>There are %1 items in the list.</source>
+        <translation>Er zijn %1 items in de lijst.</translation>
     </message>
     <message>
         <source>Shuffle Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Willekeurige Volgorde</translation>
+    </message>
+    <message>
+        <source>Show group list as recording groups</source>
+        <translation>Groepeer per opnamegroep</translation>
+    </message>
+    <message>
+        <source>Show group list as titles</source>
+        <translation>Groepeer per Titel</translation>
+    </message>
+    <message>
+        <source>Shuffle Play</source>
+        <translation>Willekeurige Volgorde</translation>
     </message>
     <message>
         <source>Playlist options</source>
-        <translation type="unfinished"></translation>
+        <translation>Afspeellijst Opties</translation>
     </message>
     <message>
         <source>Add this Category/Title Group to Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Voeg deze Titelgroep toe aan de Afspeellijst</translation>
     </message>
     <message>
         <source>Add this Recording Group to Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Voeg deze Opnamegroep toe aan de Afspeellijst</translation>
     </message>
     <message>
         <source>Add this recording to Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Voeg deze Opname toe aan de Afspeellijst</translation>
     </message>
     <message>
         <source>There are %1 items in the playlist.</source>
-        <translation type="unfinished"></translation>
+        <translation>Er zijn %1 items in de Afspeellijst.</translation>
     </message>
     <message>
         <source>There is %1 item in the playlist.</source>
-        <translation type="unfinished"></translation>
+        <translation>Er is %1 item in de Afspeellijst.</translation>
     </message>
     <message>
         <source>Clear Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Maak de Afspeellijst leeg</translation>
     </message>
     <message>
         <source>Toggle playlist for this Category/Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Afspeellijst aan/uit voor de Categorie/Titel</translation>
     </message>
     <message>
         <source>Toggle playlist for this Recording Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Afspeellijst aan/uit voor de Opnamegroep</translation>
     </message>
     <message>
         <source>Toggle playlist for this recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Afspeellijst aan/uit voor de Opname</translation>
     </message>
     <message>
         <source>These actions affect all items in the playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze taken hebben betrekking op alle items in de afspeellijst</translation>
     </message>
     <message>
         <source>Remove from Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwijder uit de Afspeellijst</translation>
     </message>
     <message>
         <source>Add to Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Voeg toe aan Afspeellijst</translation>
     </message>
 </context>
 <context>
@@ -1095,11 +1115,11 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>Recording a showing daily</source>
-        <translation type="unfinished"></translation>
+        <translation>Uitzending dagelijks opnemen</translation>
     </message>
     <message>
         <source>Recording a showing weekly</source>
-        <translation type="unfinished"></translation>
+        <translation>Uitzending wekelijks opnemen</translation>
     </message>
 </context>
 <context>
@@ -5612,35 +5632,35 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     </message>
     <message>
         <source>Single Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Eenmalige Opname</translation>
     </message>
     <message>
         <source>Record Daily</source>
-        <translation type="unfinished"></translation>
+        <translation>Dagelijkse Opname</translation>
     </message>
     <message>
         <source>Record Weekly</source>
-        <translation type="unfinished"></translation>
+        <translation>Wekelijkse Opname</translation>
     </message>
     <message>
         <source>Channel Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Opname Per Kanaal</translation>
     </message>
     <message>
         <source>Record All</source>
-        <translation type="unfinished"></translation>
+        <translation>Neem altijd op</translation>
     </message>
     <message>
         <source>Find One</source>
-        <translation type="unfinished"></translation>
+        <translation>Eenmalige opname</translation>
     </message>
     <message>
         <source>Find Daily</source>
-        <translation type="unfinished"></translation>
+        <translation>Vind dagelijkse opname</translation>
     </message>
     <message>
         <source>Find Weekly</source>
-        <translation type="unfinished"></translation>
+        <translation>Vind wekelijkse opname</translation>
     </message>
     <message>
         <source>x</source>
@@ -5649,23 +5669,23 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     </message>
     <message>
         <source>Previously Recorded</source>
-        <translation type="unfinished">Eerder Opgenomen</translation>
+        <translation>Eerder Opgenomen</translation>
     </message>
     <message>
         <source>Currently Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Nog aanwezige opnames</translation>
     </message>
     <message>
         <source>Inactive</source>
-        <translation type="unfinished"></translation>
+        <translation>Inactief</translation>
     </message>
     <message>
         <source>this recording schedule is inactive.</source>
-        <translation type="unfinished"></translation>
+        <translation>dit opnameschema in inactief.</translation>
     </message>
     <message>
         <source>Find ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Vind ID</translation>
     </message>
     <message>
         <source>[Common] Frequency (Option has no default)
@@ -5815,7 +5835,7 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>16/9 Stretch</source>
-        <translation type="unfinished">16/9 Uitgerekt</translation>
+        <translation>16/9 Uitgerekt</translation>
     </message>
     <message>
         <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback. Fill will &quot;fill&quot; the screen with the image clipping as required. Fill is useful when using 4:3 interlaced TV&apos;s for display.</source>
@@ -5866,7 +5886,7 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Annuleer</translation>
+        <translation>Annuleer</translation>
     </message>
 </context>
 <context>
@@ -5910,7 +5930,7 @@ The frequency for this channel in Hz.</source>
     <name>ScheduledRecording</name>
     <message>
         <source>or later</source>
-        <translation type="unfinished"></translation>
+        <translation>of later</translation>
     </message>
 </context>
 <context>
@@ -6392,11 +6412,11 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Fill</source>
-        <translation type="unfinished">Vullen</translation>
+        <translation>Vullen</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation type="unfinished">Uit</translation>
+        <translation>Uit</translation>
     </message>
 </context>
 <context>

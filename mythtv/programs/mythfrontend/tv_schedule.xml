@@ -122,6 +122,7 @@
       <type>TV_CUSTOM_RECORD</type>
       <text>Custom Record</text>
       <text lang="SV">Avancerad</text>
+      <text lang="NL">Geavanceerd Opnameschema</text>
       <text lang="JA">カスタム録画</text>
       <text lang="FR">Enregistrement avancé</text>
       <action>TV_CUSTOM_RECORD</action>
