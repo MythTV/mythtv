@@ -4,191 +4,240 @@
 
 <category name="Arts">
 
-<item>
-<title>Bureau 42</title>
-<url>http://www.bureau42.com/rdf/</url>
-<ico>http://www.bureau42.com/favicon.ico</ico>
-</item>
+    <item>
+        <title>Bureau 42</title>
+        <url>http://www.bureau42.com/rdf/</url>
+        <ico>http://www.bureau42.com/favicon.ico</ico>
+    </item>
 
-<item>
-<title>eFilmCritic</title>
-<url>http://efilmcritic.com/fo.rdf</url>
-<ico>http://efilmcritic.com/favicon.ico</ico>
-</item>
+    <item>
+        <title>eFilmCritic</title>
+        <url>http://efilmcritic.com/fo.rdf</url>
+        <ico>http://efilmcritic.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Scotsman.com Entertainment News</title>
+        <url>http://news.scotsman.com/entertainment.cfm?format=rss</url>
+        <ico>http://www.scotsman.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Yahoo News Entertainment</title>
+        <url>http://rss.news.yahoo.com/rss/entertainment</url>
+    </item>
+
+    <item>
+        <title>Reuters Entertainment</title>
+        <url>http://www.microsite.reuters.com/rss/Entertainment</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>BBC - Entertainment</title>
+        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/entertainment/rss091.xml</url>
+    </item>
 
 </category>
+
 
 <category name="Business">
 
-<item>
-<title>Internet.com Business</title>
-<url>http://headlines.internet.com/internetnews/bus-news/news.rss</url>
-<ico></ico>
-</item>
+    <item>
+        <title>BBC - Business</title>
+        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/business/rss091.xml</url>
+    </item>
 
-<item>
-<title>TradeSims</title>
-<url>http://www.tradesims.com/AEX.rdf</url>
-<ico></ico>
-</item>
+    <item>
+        <title>Reuters Business</title>
+        <url>http://www.microsite.reuters.com/rss/businessNews</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Internet.com Business</title>
+        <url>http://headlines.internet.com/internetnews/bus-news/news.rss</url>
+    </item>
+
+    <item>
+        <title>TradeSims</title>
+        <url>http://www.tradesims.com/AEX.rdf</url>
+    </item>
+
+
+    <item>
+        <title>Topix: Business</title>
+        <url>http://rss.topix.net/rss/business/business.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
 
 </category>
+
 
 <category name="Computers">
 
-<item>
-<title>KDE Deutschland</title>
-<url>http://www.kde.de/news/news.rdf</url>
-<ico>http://www.kde.de/favicon.ico</ico>
-</item>
+    <item>
+        <title>BBC - Technology</title>
+        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/business/rss091.xml</url>
+    </item>
 
-<item>
-<title>FreeBSD Project News</title>
-<url>http://www.freebsd.org/news/news.rdf</url>
-<ico>http://www.freebsd.org/favicon.ico</ico>
-</item>
 
-<item>
-<title>dot.kde.org</title>
-<url>http://www.kde.org/dotkdeorg.rdf</url>
-<ico>http://www.kde.org/favicon.ico</ico>
-</item>
+    <item>
+        <title>Reuters Technology</title>
+        <url>http://www.microsite.reuters.com/rss/technologyNews</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item>
 
-<item>
-<title>GNOME News</title>
-<url>http://www.gnomedesktop.org/backend.php</url>
-</item>
 
-<item>
-<title>Slashdot</title>
-<url>http://slashdot.org/slashdot.rss</url>
-<ico>http://slashdot.org/favicon.ico</ico>
-</item>
+    <item>
+        <title>KDE Deutschland</title>
+        <url>http://www.kde.de/news/news.rdf</url>
+        <ico>http://www.kde.de/favicon.ico</ico>
+    </item>
 
-<item>
-<title>Freshmeat</title>
-<url>http://freshmeat.net/backend/fm.rdf</url>
-<ico>http://freshmeat.net/favicon.ico</ico>
-</item>
+    <item>
+        <title>FreeBSD Project News</title>
+        <url>http://www.freebsd.org/news/news.rdf</url>
+        <ico>http://www.freebsd.org/favicon.ico</ico>
+    </item>
 
-<item>
-<title>Linux Weekly News</title>
-<url>http://lwn.net/headlines/rss</url>
-<ico>http://lwn.net/favicon.ico"</ico>
-</item>
+    <item>
+        <title>dot.kde.org</title>
+        <url>http://www.kde.org/dotkdeorg.rdf</url>
+        <ico>http://www.kde.org/favicon.ico</ico>
+    </item>
 
-<item>
-<title>Debian Security Advisories</title>
-<url>http://www.debian.org/security/dsa-long.rdf</url>
-<ico>http://www.debian.org/favicon.ico</ico>
-</item>
+    <item>
+        <title>GNOME News</title>
+        <url>http://www.gnomedesktop.org/backend.php</url>
+    </item>
 
-<item> 
-<title>heise online news</title>
-<url>http://www.heise.de/newsticker/heise.rdf</url>
-<ico>http://www.heise.de/favicon.ico</ico>
-</item>
+    <item>
+        <title>Slashdot</title>
+        <url>http://slashdot.org/slashdot.rss</url>
+        <ico>http://slashdot.org/favicon.ico</ico>
+    </item>
 
-<item> 
-<title>Kuro5hin</title>
-<url>http://www.kuro5hin.org/backend.rdf</url>
-<ico>http://www.kuro5hin.org/favicon.ico</ico>
-</item>
+    <item>
+        <title>Freshmeat</title>
+        <url>http://freshmeat.net/backend/fm.rdf</url>
+        <ico>http://freshmeat.net/favicon.ico</ico>
+    </item>
 
-<item> 
-<title>LinuxSecurity.com</title>
-<url>http://www.linuxsecurity.com/linuxsecurity_hybrid.rdf</url>
-<ico></ico>  
-</item>
+    <item>
+        <title>Linux Weekly News</title>
+        <url>http://lwn.net/headlines/rss</url>
+        <ico>http://lwn.net/favicon.ico"</ico>
+    </item>
 
-<item> 
-<title>Linux Game Tome</title>
-<url>http://happypenguin.org/html/news.rdf</url>
-<ico></ico>
-</item>
+    <item>
+        <title>Debian Security Advisories</title>
+        <url>http://www.debian.org/security/dsa-long.rdf</url>
+        <ico>http://www.debian.org/favicon.ico</ico>
+    </item>
 
-<item> 
-<title>Mozilla</title>
-<url>http://www.mozilla.org/news.rdf</url>
-<ico>http://www.mozillazine.org/favicon.ico</ico>
-</item>
+    <item>
+        <title>heise online news</title>
+        <url>http://www.heise.de/newsticker/heise.rdf</url>
+        <ico>http://www.heise.de/favicon.ico</ico>
+    </item>
 
-<item> 
-<title>MozillaZine</title>
-<url>http://www.mozillazine.org/contents.rdf</url>
-<ico>http://www.mozillazine.org/favicon.ico</ico>
-</item>
+    <item>
+        <title>Kuro5hin</title>
+        <url>http://www.kuro5hin.org/backend.rdf</url>
+        <ico>http://www.kuro5hin.org/favicon.ico</ico>
+    </item>
 
-<item> 
-<title>Daemon News</title>
-<url>http://daily.daemonnews.org/ddn.rdf.php3</url>
-<ico></ico>
-</item>
+    <item>
+        <title>LinuxSecurity.com</title>
+        <url>http://www.linuxsecurity.com/linuxsecurity_hybrid.rdf</url>
+    </item>
 
-<item> 
-<title>use Perl</title>
-<url>http://use.perl.org/useperl.rdf</url>
-<ico></ico>  
-</item>
+    <item>
+        <title>Linux Game Tome</title>
+        <url>http://happypenguin.org/html/news.rdf</url>
+    </item>
 
-<item> 
-<title>desktopian.org</title>
-<url>http://www.desktopian.org/includes/headlines.xml</url>
-<ico>http://www.desktopian.org/favicon.ico</ico>
-</item>
+    <item>
+        <title>Mozilla</title>
+        <url>http://www.mozilla.org/news.rdf</url>
+        <ico>http://www.mozillazine.org/favicon.ico</ico>
+    </item>
 
-<item> 
-<title>Root prompt</title>
-<url>http://www.rootprompt.org/rss/</url>
-<ico>http://www.rootprompt.org/favicon.ico</ico>
-</item>
+    <item>
+        <title>MozillaZine</title>
+        <url>http://www.mozillazine.org/contents.rdf</url>
+        <ico>http://www.mozillazine.org/favicon.ico</ico>
+    </item>
 
-<item> 
-<title>SecurityFocus News</title>
-<url>http://www.securityfocus.com/rss/news.xml</url>
-<ico>http://www.securityfocus.com/favicon.ico</ico>
-</item>
+    <item>
+        <title>Daemon News</title>
+        <url>http://daily.daemonnews.org/ddn.rdf.php3</url>
+    </item>
 
-<item> 
-<title>SecurityFocus Bugtraq</title>
-<url>http://www.securityfocus.com/rss/vulnerabilities.xml</url>
-<ico>http://www.securityfocus.com/favicon.ico</ico>
-</item>
+    <item>
+        <title>use Perl</title>
+        <url>http://use.perl.org/useperl.rdf</url>
+    </item>
 
-<item> 
-<title>Arstechnica</title>
-<url>http://arstechnica.com/etc/rdf/ars.rdf</url>
-<ico>http://arstechnica.com/favicon.ico</ico>
-</item>
+    <item>
+        <title>desktopian.org</title>
+        <url>http://www.desktopian.org/includes/headlines.xml</url>
+        <ico>http://www.desktopian.org/favicon.ico</ico>
+    </item>
 
-<item> 
-<title>FreshPorts - the place for ports</title>
-<url>http://www.freshports.org/news.php</url>
-<ico>http://www.freshports.org/favicon.ico</ico>
-</item>
+    <item>
+        <title>Root prompt</title>
+        <url>http://www.rootprompt.org/rss/</url>
+        <ico>http://www.rootprompt.org/favicon.ico</ico>
+    </item>
 
-<item> 
-<title>Groklaw</title>
-<url>http://www.groklaw.net/backend/GrokLaw.rdf</url>
-<ico>http://www.groklaw.net/favicon.ico</ico>
-</item>
-http://www.groklaw.net/backend/GrokLaw.rdf
+    <item>
+        <title>SecurityFocus News</title>
+        <url>http://www.securityfocus.com/rss/news.xml</url>
+        <ico>http://www.securityfocus.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>SecurityFocus Bugtraq</title>
+        <url>http://www.securityfocus.com/rss/vulnerabilities.xml</url>
+        <ico>http://www.securityfocus.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Arstechnica</title>
+        <url>http://arstechnica.com/etc/rdf/ars.rdf</url>
+        <ico>http://arstechnica.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>FreshPorts - the place for ports</title>
+        <url>http://www.freshports.org/news.php</url>
+        <ico>http://www.freshports.org/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Groklaw</title>
+        <url>http://www.groklaw.net/backend/GrokLaw.rdf</url>
+        <ico>http://www.groklaw.net/favicon.ico</ico>
+    </item>
 
 </category>
 
+
 <category name="Miscellaneous">
 
-<item> 
-<title>HotWired</title>
-<url>http://hotwired.lycos.com/webmonkey/meta/headlines.rdf</url>
-<ico>http://www.hotwired.com/favicon.ico</ico>
-</item> 
+    <item>
+        <title>HotWired</title>
+        <url>http://hotwired.lycos.com/webmonkey/meta/headlines.rdf</url>
+        <ico>http://www.hotwired.com/favicon.ico</ico>
+    </item>
 
-<item> 
-<title>The Register</title>
-<url>http://www.theregister.co.uk/tonys/slashdot.rdf</url>
-<ico>http://www.theregister.co.uk/favicon.ico</ico>
-</item> 
+    <item>
+        <title>The Register</title>
+        <url>http://www.theregister.co.uk/tonys/slashdot.rdf</url>
+        <ico>http://www.theregister.co.uk/favicon.ico</ico>
+    </item>
 
 </category>
 
@@ -196,34 +245,800 @@ http://www.groklaw.net/backend/GrokLaw.rdf
 
 </category>
 
-<category name="News">
+<category name="International">
 
-<item>
-<title>CNN (World Edition)</title>
-<url>http://csociety.purdue.org/~jacoby/XML/CNN_WORLD.xml</url>
-<ico>http://www.cnn.com/favicon.ico</ico>
-</item>
+    <item>
+        <title>Reuters World News</title>
+        <url>http://www.microsite.reuters.com/rss/worldNews</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item>
 
-<item>
-<title>CNN (US Edition)</title>
-<url>http://csociety.purdue.org/~jacoby/XML/CNN_US.xml</url>
-<ico>http://www.cnn.com/favicon.ico</ico>
-</item>
+    <item>
+        <title>BBC (World Edition)</title>
+        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/front_page/rss091.xml</url>
+    </item>
 
-<item>
-<title>BBC (World Edition)</title>
-<url>http://news.bbc.co.uk/rss/newsonline_world_edition/front_page/rss091.xml</url>
-<ico></ico>
-</item>
+    <item>
+        <title>CNN (World Edition)</title>
+        <url>http://csociety.purdue.org/~jacoby/XML/CNN_WORLD.xml</url>
+        <ico>http://www.cnn.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Scotsman.com International News</title>
+        <url>http://news.scotsman.com/international.cfm?format=rss</url>
+        <ico>http://www.scotsman.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: World News</title>
+        <url>http://rss.topix.net/rss/world/world.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
 
 </category>
 
+
+<category name="Regional (non-US)">
+
+    <item>
+        <title>Scotsman.com Headlines</title>
+        <url>http://news.scotsman.com/index.cfm?format=rss</url>
+        <ico>http://www.scotsman.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Scotsman.com UK News</title>
+        <url>http://news.scotsman.com/uk.cfm?format=rss</url>
+        <ico>http://www.scotsman.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>The Globe and Mail</title>
+        <url>http://www.theglobeandmail.com/generated/headlines/pickup/rdf/ROB.rdf</url>
+        <ico>http://www.globeandmail.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Asia</title>
+        <url>http://rss.topix.net/rss/world/asia.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Europe</title>
+        <url>http://rss.topix.net/rss/world/europe.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Oceania</title>
+        <url>http://rss.topix.net/rss/world/oceania.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Middle-East</title>
+        <url>http://rss.topix.net/rss/world/middle-east.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Africa</title>
+        <url>http://rss.topix.net/rss/world/africa.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: North America</title>
+        <url>http://rss.topix.net/rss/world/north-america.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: South America</title>
+        <url>http://rss.topix.net/rss/world/south-america.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Afghanistan</title>
+        <url>http://rss.topix.net/rss/world/afghanistan.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Albania</title>
+        <url>http://rss.topix.net/rss/world/albania.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Algeria</title>
+        <url>http://rss.topix.net/rss/world/algeria.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: American Samoa</title>
+        <url>http://rss.topix.net/rss/world/american-samoa.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Angola</title>
+        <url>http://rss.topix.net/rss/world/angola.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Australia</title>
+        <url>http://rss.topix.net/rss/world/australia.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Belgium</title>
+        <url>http://rss.topix.net/rss/world/belgium.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Brazil</title>
+        <url>http://rss.topix.net/rss/world/brazil.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Canada</title>
+        <url>http://rss.topix.net/rss/world/canada.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: China</title>
+        <url>http://rss.topix.net/rss/world/china.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Cuba</title>
+        <url>http://rss.topix.net/rss/world/cuba.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Egypt</title>
+        <url>http://rss.topix.net/rss/world/egypt.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: France</title>
+        <url>http://rss.topix.net/rss/world/france.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Iran</title>
+        <url>http://rss.topix.net/rss/world/iran.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Hong Kong</title>
+        <url>http://rss.topix.net/rss/world/hong-kong.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+
+    <item>
+        <title>Topix: Iraq</title>
+        <url>http://rss.topix.net/rss/world/iraq.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+
+    <item>
+        <title>Topix: North Korea</title>
+        <url>http://rss.topix.net/rss/world/north-korea.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+
+    <item>
+        <title>Topix: Israel</title>
+        <url>http://rss.topix.net/rss/world/israel.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+
+    <item>
+        <title>Topix: Italy</title>
+        <url>http://rss.topix.net/rss/world/italy.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+
+    <item>
+        <title>Topix: Ireland</title>
+        <url>http://rss.topix.net/rss/world/ireland.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+
+    <item>
+        <title>Topix: Russia</title>
+        <url>http://rss.topix.net/rss/world/russia.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Poland</title>
+        <url>http://rss.topix.net/rss/world/poland.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: South Africa</title>
+        <url>http://rss.topix.net/rss/world/south-africa.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+
+    <item>
+        <title>BBC News - Africa</title>
+        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/africa/rss091.xml</url>
+    </item>
+
+    <item>
+        <title>BBC News - Americas</title>
+        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/americas/rss091.xml</url>
+    </item>
+
+    <item>
+        <title>BBC News - Asia-Pacific</title>
+        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/asia-pacific/rss091.xml</url>
+    </item>
+
+    <item>
+        <title>BBC News - Europe</title>
+        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/europe/rss091.xml</url>
+    </item>
+
+    <item>
+        <title>BBC News - Middle East</title>
+        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/middle_east/rss091.xml</url>
+    </item>
+
+    <item>
+        <title>BBC News - South Asia</title>
+        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/south_asia/rss091.xml</url>
+    </item>
+
+
+    <item>
+        <title>BBC News - UK</title>
+        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/uk_news/rss091.xml</url>
+    </item>
+
+</category>
+
+
+<category name="Regional (US)">
+
+    <item>
+        <title>Reuters US News</title>
+        <url>http://www.microsite.reuters.com/rss/domesticNews</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>CNN (US Edition)</title>
+        <url>http://csociety.purdue.org/~jacoby/XML/CNN_US.xml</url>
+        <ico>http://www.cnn.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>The New York Times</title>
+        <url>http://partners.userland.com/nytRss/nytHomepage.xml</url>
+    </item>
+
+    <item>
+        <title>Topix: US</title>
+        <url>http://rss.topix.net/rss/us/us.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix - Alabama</title>
+        <url>http://rss.topix.net/rss/state/al.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Alaska</title>
+        <url>http://rss.topix.net/rss/state/ak.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Arizona</title>
+        <url>http://rss.topix.net/rss/state/az.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+
+    <item>
+        <title>Topix: Arkansas</title>
+        <url>http://rss.topix.net/rss/state/ar.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: California</title>
+        <url>http://rss.topix.net/rss/state/ca.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Colorado</title>
+        <url>http://rss.topix.net/rss/state/co.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Connecticut</title>
+        <url>http://rss.topix.net/rss/state/ct.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Delaware</title>
+        <url>http://rss.topix.net/rss/state/de.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Florida</title>
+        <url>http://rss.topix.net/rss/state/fl.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Georgia</title>
+        <url>http://rss.topix.net/rss/state/ga.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Hawaii</title>
+        <url>http://rss.topix.net/rss/state/hi.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Idaho</title>
+        <url>http://rss.topix.net/rss/state/id.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Illinois</title>
+        <url>http://rss.topix.net/rss/state/il.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Indiana</title>
+        <url>http://rss.topix.net/rss/state/in.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Iowa</title>
+        <url>http://rss.topix.net/rss/state/ia.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix:  Kansas</title>
+        <url>http://rss.topix.net/rss/state/ks.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Kentucky</title>
+        <url>http://rss.topix.net/rss/state/ky.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Louisiana</title>
+        <url>http://rss.topix.net/rss/state/la.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Main</title>
+        <url>http://rss.topix.net/rss/state/me.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Maryland</title>
+        <url>http://rss.topix.net/rss/state/md.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Massachusetts</title>
+        <url>http://rss.topix.net/rss/state/ma.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Michigan</title>
+        <url>http://rss.topix.net/rss/state/mi.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Minnesota</title>
+        <url>http://rss.topix.net/rss/state/mn.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Mississippi</title>
+        <url>http://rss.topix.net/rss/state/ms.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Missouri</title>
+        <url>http://rss.topix.net/rss/state/mo.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Montana</title>
+        <url>http://rss.topix.net/rss/state/mt.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Nebraska</title>
+        <url>http://rss.topix.net/rss/state/ne.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Nevada</title>
+        <url>http://rss.topix.net/rss/state/nv.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: New Hampshire</title>
+        <url>http://rss.topix.net/rss/state/nh.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: New Jersey</title>
+        <url>http://rss.topix.net/rss/state/nj.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: New Mexico</title>
+        <url>http://rss.topix.net/rss/state/nm.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: New York</title>
+        <url>http://rss.topix.net/rss/state/ny.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: North Carolina</title>
+        <url>http://rss.topix.net/rss/state/nc.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: North Dakota</title>
+        <url>http://rss.topix.net/rss/state/nd.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Ohio</title>
+        <url>http://rss.topix.net/rss/state/oh.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Oklahoma</title>
+        <url>http://rss.topix.net/rss/state/ok.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Oregon</title>
+        <url>http://rss.topix.net/rss/state/or.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Pennsylvania</title>
+        <url>http://rss.topix.net/rss/state/pa.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Rhode Island</title>
+        <url>http://rss.topix.net/rss/state/ri.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: South Carolina</title>
+        <url>http://rss.topix.net/rss/state/sc.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: South Dakota</title>
+        <url>http://rss.topix.net/rss/state/sd.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Tennesee</title>
+        <url>http://rss.topix.net/rss/state/tn.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Texas</title>
+        <url>http://rss.topix.net/rss/state/tx.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+
+    <item>
+        <title>Topix: Utah</title>
+        <url>http://rss.topix.net/rss/state/ut.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Vermont</title>
+        <url>http://rss.topix.net/rss/state/vt.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Virginia</title>
+        <url>http://rss.topix.net/rss/state/va.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+
+    <item>
+        <title>Topix: Washington DC</title>
+        <url>http://rss.topix.net/rss/state/dc.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Washington</title>
+        <url>http://rss.topix.net/rss/state/wa.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: West Virginia</title>
+        <url>http://rss.topix.net/rss/state/wv.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Wisconsin</title>
+        <url>http://rss.topix.net/rss/state/wi.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+        </item>
+
+    <item>
+        <title>Topix: Wyoming</title>
+        <url>http://rss.topix.net/rss/state/wi.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+</category>
+
+
+<category name="OpEd">
+
+    <item>
+        <title>Scotsman.com Opinion</title>
+        <url>http://news.scotsman.com/opinion.cfm?format=rss</url>
+        <ico>http://www.scotsman.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>BBC - Talking Point</title>
+        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/talking_point/rss091.xml</url>
+    </item>
+
+    <item>
+        <title>New York Times - Opinion</title>
+        <url>http://partners.userland.com/nytRss/opinion.xml</url>
+    </item>
+
+</category>
+
+
+<category name="Politics (US)">
+
+    <item>
+        <title>Political Wire</title>
+        <url>http://politicalwire.com/headlines.xml</url>
+        <ico>http://politicalwire.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Reuters Politics</title>
+        <url>http://www.microsite.reuters.com/rss/ElectionCoverage</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item>
+
+</category>
+
+
+<category name="Sports">
+
+    <item>
+        <title>Reuters Sports</title>
+        <url>http://www.microsite.reuters.com/rss/sportsNews</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>ESPN Headlines</title>
+        <url>http://sports.espn.go.com/espn/rss/news</url>
+    </item>
+
+    <item>
+        <title>Google Sports Headlines</title>
+        <url>http://michaelthompson.org/news/goo-sports.xml</url>
+    </item>
+
+    <item>
+        <title>MetaMuscle</title>
+        <url>http://metamuscle.com/backend.php</url>
+        <ico>http://metamuscle.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Baseball Primer</title>
+        <url>http://www.baseballprimer.com/primer_daily.xml</url>
+    </item>
+
+    <item>
+        <title>Topix: Sports</title>
+        <url>http://rss.topix.net/rss/sports/sports.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: Racing</title>
+        <url>http://rss.topix.net/rss/racing/racing.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: NFL</title>
+        <url>http://rss.topix.net/rss/nfl/nfl.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Topix: World Soccer</title>
+        <url>http://rss.topix.net/rss/world-soccer/world-soccer.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+</category>
+
+
+<category name="Offbeat">
+
+    <item>
+        <title>Topix: Offbeat</title>
+        <url>http://rss.topix.net/rss/news/weird.xml</url>
+        <ico>http://rss.topix.net/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Fark</title>
+        <url>http://www.pluck.com/rss/fark.rss</url>
+        <ico>http://www.fark.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Reuters Oddly Enough</title>
+        <url>http://www.microsite.reuters.com/rss/oddlyEnoughNews</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item>
+
+</category>
+
+
+<category name="Humor">
+
+    <item>
+        <title>Fark</title>
+        <url>http://www.pluck.com/rss/fark.rss</url>
+        <ico>http://www.fark.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Dilbert</title>
+        <url>http://dwlt.net/tapestry/dilbert.rdf</url>
+    </item>
+
+</category>
+
+
 <category name="Recreation">
+
+    <item>
+        <title>Reuters Life and Leisure</title>
+        <url>http://www.microsite.reuters.com/rss/lifeAndLeisureNews</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item>
 
 </category>
 
 <category name="Society">
 
 </category>
+
+<category name="Health">
+
+    <item>
+        <title>Reuters Health</title>
+        <url>http://www.microsite.reuters.com/rss/healthNews</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>BBC News - Health</title>
+        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/health/rss091.xml</url>
+    </item>
+
+</category>
+
+
+<category name="Science">
+
+    <item>
+        <title>Reuters Science</title>
+        <url>http://www.microsite.reuters.com/rss/scienceNews</url>
+        <ico>http://www.reuters.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>BBC News - Science</title>
+        <url>http://news.bbc.co.uk/rss/newsonline_world_edition/science/nature/rss091.xml</url>
+    </item>
+
+</category>
+
 
 </sites>

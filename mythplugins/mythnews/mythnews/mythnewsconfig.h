@@ -60,14 +60,14 @@ public:
     ~MythNewsConfig();
 
 private:
-
+    void changeContext();
     void paintEvent(QPaintEvent *e);
     void keyPressEvent(QKeyEvent *e);
 
     void populateSites();
     void loadTheme();
 
-    void updateSelector();
+
     void updateSites();
     void updateFreq();
     void updateBot();
@@ -89,13 +89,12 @@ private:
     uint                m_Context;
     uint                m_InColumn;
 
-    UIListBtnType      *m_UISelector;
     UIListBtnType      *m_UICategory;
     UIListBtnType      *m_UISite;
 
     MythNewsSpinBox    *m_SpinBox;
 
-    QRect               m_SelectorRect;
+
     QRect               m_SiteRect;
     QRect               m_FreqRect;
     QRect               m_BotRect;
@@ -107,7 +106,6 @@ private slots:
 
     void slotUpdateFreqChanged();
     void slotUpdateFreqTimerTimeout();
-    void slotContextChanged(UIListBtnTypeItem* item);
     void slotCategoryChanged(UIListBtnTypeItem* item);
 };
 
