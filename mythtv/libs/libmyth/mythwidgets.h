@@ -88,10 +88,10 @@ protected:
             focusNextPrevChild(true);
             break;
         case Key_Left:
-            subtractStep();
+            setValue(value() - lineStep());
             break;
         case Key_Right:
-            addStep();
+            setValue(value() + lineStep());
             break;
         default:
             e->ignore();
