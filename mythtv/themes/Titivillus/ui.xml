@@ -1385,8 +1385,8 @@
 
     <container name="background">
       <image name="filler" draworder="0" fleximage="yes">
-        <filename>playback_box/pbb_back.jpg</filename>
-        <position>0,0</position>
+        <filename>playback_box/pbb_back.png</filename>
+        <position>0,50</position>
       </image>
       <textarea name="messagedel" draworder="0" align="hcenter">
         <area>20,10,760,35</area>
