@@ -149,7 +149,7 @@ QChar DtmfFilter::CheckAnyDTMF()
     if (Debounce[key] != 1) 
         return 0;
         
-    cout << "DTMF Filter matched" << key << endl;    
+    cout << "DTMF Filter matched " << key << endl;    
     return key;
 }
 
