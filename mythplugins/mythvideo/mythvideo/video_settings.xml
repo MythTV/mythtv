@@ -9,7 +9,7 @@
       <text lang="DE">Allgemeine Einstellungen</text>
       <text lang="PT">Configurações Gerais</text>
       <text lang="SV">Generella inställningar</text>
-      <text lang="FR">Options générales</text>
+      <text lang="FR">Configuration générale</text>
       <text lang="NL">Algemene Instellingen</text>
       <text lang="JA">全般設定</text>
       <action>SETTINGS_GENERAL</action>
@@ -38,7 +38,7 @@
       <text lang="cA">Tipus d'arxius</text>
       <text lang="DE">Dateitypen</text>
       <text lang="ES">Tipos de archivos</text>
-      <text lang="FR">Types de fichier</text>
+      <text lang="FR">Types de fichiers</text>
       <text lang="NL">Bestandstypes</text>
       <text lang="JA">ファイルタイプ</text>
       <action>SETTINGS_ASSOCIATIONS</action>

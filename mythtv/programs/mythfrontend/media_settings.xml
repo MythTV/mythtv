@@ -3,6 +3,7 @@
      <type>SETTINGS_MUSIC</type>
      <text>Music Settings</text>
      <text lang="ES">Configurar Música</text>
+     <text lang="FR">Configuration de la musique</text>
      <text lang="CA">Configurar Música</text>
      <text lang="DE">Musik Einstellungen</text>
      <text lang="DK">Musik indstillinger</text>
@@ -22,6 +23,7 @@
        <text>Videos Settings</text>
        <text lang="ES">Configurar Videos</text>
        <text lang="CA">Configurar Videos</text>
+       <text lang="FR">Configuration de la vidéo</text>
        <text lang="DE">Videos Einstellungen</text>
        <text lang="DK">Video indstillinger</text>
        <text lang="NL">Films Instellingen</text>
@@ -42,6 +44,7 @@
      <text lang="PT">Configurar DVD</text>
      <text lang="ES">Configurar DVD</text>
      <text lang="CA">Configurar DVD</text>
+     <text lang="FR">Configuration des DVD</text>
      <text lang="NL">DVD Instellingen</text>
      <text lang="SV">DVD-inställningar</text>
      <text lang="JA">DVD設定</text>
@@ -57,6 +60,7 @@
       <text>Images Settings</text>
       <text lang="ES">Configurar Fotos</text>
       <text lang="CA">Configurar Imatges</text>
+      <text lang="FR">Configuration des images</text>
       <text lang="DE">Photos Einstellungen</text>
       <text lang="DK">Billed indstillinger</text>
       <text lang="NL">Beelden Instellingen</text>
@@ -76,6 +80,7 @@
      <text lang="ES">Configurar Juegos</text>
      <text lang="CA">Configurar Jocs</text>
      <text lang="DE">Spiele Einstellungen</text>
+     <text lang="FR">Configuration des jeux</text>
      <text lang="DK">Spil indstillinger</text>
      <text lang="NL">Spelen Instellingen</text>
      <text lang="PT">Configurar Jogos</text>
@@ -94,6 +99,7 @@
      <text lang="SV">Radioinställningar</text>
      <text lang="JA">ラジオ設定</text>
      <text lang="DE">Radio Einstellungen</text>
+     <text lang="FR">Configuration de la radio</text>
      <text lang="FI">Radioasetukset</text>
      <alttext lang="DE">Radio</alttext>
      <action>CONFIGPLUGIN mythfm</action>

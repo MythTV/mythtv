@@ -7,7 +7,7 @@
       <text lang="ES">Ver Grabaciones</text>
       <text lang="CA">Veure Gravacions</text>
       <text lang="NL">Opnames Bekijken</text>
-      <text lang="FR">Visionner</text>
+      <text lang="FR">Visionner les enregistrements</text>
       <text lang="DE">Aufnahmen ansehen</text>
       <text lang="DK">Afspil optagelser</text>
       <text lang="PT">Ver Gravações</text>
@@ -27,7 +27,7 @@
      <text lang="DK">Gennemse film</text>
      <text lang="PT">Ver Filmes</text>
      <text lang="SV">Visa filmer</text>
-     <text lang="FR">Liste des vidéos</text>
+     <text lang="FR">Regarder des vidéos</text>
      <text lang="NL">Blader door videos</text>
      <text lang="JA">ビデオブラウズ</text>
      <text lang="FI">Katso Videoita</text>
@@ -47,7 +47,7 @@
       <text lang="NL">Muziek Afspelen</text>
       <text lang="PT">Tocar Músicas</text>
       <text lang="SV">Spela musik</text>
-      <text lang="FR">Jouer de la musique</text>
+      <text lang="FR">Écouter de la musique</text>
       <text lang="JA">ミュージック再生</text>
       <text lang="FI">Kuuntele Musiikkia</text>
       <text lang="ZH_TW">播放音樂</text>
@@ -62,6 +62,7 @@
      <text lang="NL">Radio Luisteren</text>
      <text lang="JA">ラジオ放送</text>
      <text lang="DE">Radio hören</text>
+     <text lang="FR">Écouter la radio</text>
      <text lang="FI">Kuuntele Radiota</text>
      <action>PLUGIN mythFM</action>
      <depends>mythFM mythfm</depends>

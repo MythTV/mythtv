@@ -7,7 +7,7 @@
       <text lang="ES">Guía de programas</text>
       <text lang="CA">Guia de programes</text>
       <text lang="NL">Programma Gids</text>
-      <text lang="FR">Grille Horaire</text>
+      <text lang="FR">Guide des programmes</text>
       <text lang="DE">Programmübersicht</text>
       <text lang="DK">Program Guide</text>
       <text lang="PT">Guia de Programação</text>
@@ -36,7 +36,7 @@
       <text lang="ES">Buscar programas</text>
       <text lang="CA">Cercar programes</text>
       <text lang="NL">Programma Zoeker</text>
-      <text lang="FR">Recherche de programmes</text>
+      <text lang="FR">Recherche d'émission</text>
       <text lang="DE">Alphabetische Suche</text>
       <text lang="DK">Program Finder</text>
       <text lang="PT">Procurar Programa</text>
@@ -61,6 +61,7 @@
    <button>
       <type>TV_SEARCH_WORDS</type>
       <text>Search Words</text>
+      <text lang="FR">Recherche textuelle</text>
       <text lang="DE">Wortsuche</text>
       <text lang="SV">Sök ord</text>
       <text lang="NL">Zoek Woorden</text>
@@ -68,6 +69,7 @@
       <text lang="FI">Etsi Sanoista</text>
       <text lang="ZH_TW">關鍵字</text>
       <alttext>Search</alttext>
+      <alttext lang="FR">Texte</alttext>
       <alttext lang="SV">Sök</alttext>
       <alttext lang="DE">Wörter</alttext>
       <action>MENU tv_search.xml</action>
@@ -78,12 +80,14 @@
       <text>Search Lists</text>
       <text lang="SV">Sök listor</text>
       <text lang="NL">Overzichtslijsten</text>
+      <text lang="FR">Listes de recherches</text>
       <text lang="JA">リスト検索</text>
       <text lang="DE">Listensuche</text>
       <text lang="FI">Etsi Oppaasta</text>
       <alttext>Lists</alttext>
       <alttext lang="DE">Listen</alttext>
       <alttext lang="SV">Listor</alttext>
+      <alttext lang="FR">Listes</alttext>
       <action>MENU tv_lists.xml</action>
    </button>
 
@@ -119,6 +123,7 @@
       <text>Custom Record</text>
       <text lang="SV">Avancerad</text>
       <text lang="JA">カスタム録画</text>
+      <text lang="FR">Enregistrement avancé</text>
       <action>TV_CUSTOM_RECORD</action>
    </button>
 
@@ -129,6 +134,7 @@
       <text lang="CA">Programar Gravacions</text>
       <text lang="DE">Manuelle Aufnahme</text>
       <text lang="DK">Manuel programmering</text>
+      <text lang="FR">Programmation manuelle</text>
       <text lang="NL">Manuele Opname</text>
       <text lang="PT">Gravação Manual</text>
       <text lang="SV">Manuell schemaläggning</text>
@@ -139,6 +145,7 @@
       <alttext lang="ES">Programar</alttext>
       <alttext lang="CA">Programar</alttext>
       <alttext lang="DE">Manuell</alttext>
+      <alttext lang="FR">Prog. Man.</alttext>
       <alttext lang="DK">Manuel prog.</alttext>
       <alttext lang="NL">Manueel</alttext>
       <alttext lang="PT">Manual</alttext>

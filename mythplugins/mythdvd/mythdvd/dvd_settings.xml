@@ -9,7 +9,7 @@
       <text lang="SV">Generella inställningar</text>
       <text lang="CA">Opcions generals</text>
       <text lang="ES">Opciones generales</text>
-      <text lang="FR">Options générales</text>
+      <text lang="FR">Configuration générale</text>
       <text lang="NL">Algemene DVD Opties</text>
       <text lang="JA">全般設定</text>
       <action>DVD_SETTINGS_GENERAL</action>
@@ -24,7 +24,7 @@
       <text lang="SV">Inställningar för avspelning</text>
       <text lang="ES">Opciones de reproducción</text>
       <text lang="CA">Opcions de reproducció</text>
-      <text lang="FR">Options de copie/encoage</text>
+      <text lang="FR">Configuration du lecteur</text>
       <text lang="NL">DVD Afspeelinstelingen</text>
       <text lang="JA">再生設定</text>
       <action>DVD_SETTINGS_PLAY</action>
@@ -40,7 +40,7 @@
       <text lang="SV">Inställningar för kopiering</text>
       <text lang="ES">Opciones de "ripear"</text>
       <text lang="CA">Opcions de volcat</text>
-      <text lang="FR">Options de copie/endodage</text>
+      <text lang="FR">Configuration de copie/encodage</text>
       <text lang="NL">DVD RIP instellingen</text>
       <text lang="JA">再生設定</text>
       <action>DVD_SETTINGS_RIP</action>

@@ -11,7 +11,7 @@
       <text lang="NL">Muziek Afspelen</text>
       <text lang="PT">Tocar Músicas</text>
       <text lang="SV">Spela musik</text>
-      <text lang="FR">Jouer de la musique</text>
+      <text lang="FR">Écouter de la musique</text>
       <text lang="JA">ミュージック再生</text>
       <text lang="FI">Soita Musiikkia</text>
       <action>MUSIC_PLAY</action>
@@ -28,7 +28,7 @@
       <text lang="NL">Muziek Kiezen</text>
       <text lang="PT">Escolher Músicas</text>
       <text lang="SV">Välj musik</text>
-      <text lang="FR">Sélectionner de la musicale</text>
+      <text lang="FR">Choisir de la musique</text>
       <text lang="JA">ミュージック選択</text>
       <text lang="FI">Valitse Musiikkia</text>
       <action>MUSIC_CREATE_PLAYLIST</action>
@@ -45,7 +45,7 @@
       <text lang="NL">CD Importeren</text>
       <text lang="PT">Ler do CD</text>
       <text lang="SV">Importera CD</text>
-      <text lang="FR">Importer un CD</text>
+      <text lang="FR">Ripper un CD</text>
       <text lang="JA">CD取込</text>
       <text lang="FI">Tuo CD</text>
       <action>MUSIC_RIP</action>
@@ -62,7 +62,7 @@
       <text lang="NL">Muziek Zoeken</text>
       <text lang="PT">Procurar no Disco</text>
       <text lang="SV">Scanna efter ny musik</text>
-      <text lang="FR">Rechercher de la musique</text>
+      <text lang="FR">Mettre à jour la liste</text>
       <text lang="JA">新しいミュージックを検索</text>
       <text lang="FI">Hae Uutta Musiikkia</text>
       <action>SETTINGS_SCAN</action>

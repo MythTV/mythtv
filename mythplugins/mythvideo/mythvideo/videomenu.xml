@@ -9,7 +9,7 @@
      <text lang="DK">Gennemse film</text>
      <text lang="PT">Ver Filmes</text>
      <text lang="SV">Bläddra bland filmer</text>
-     <text lang="FR">Liste des vidéos</text>
+     <text lang="FR">Parcourir les vidéos</text>
      <text lang="NL">Blader door videos</text>
      <text lang="JA">ビデオブラウズ</text>
      <action>BROWSER</action>
@@ -24,7 +24,7 @@
      <text lang="DE">Video-Liste</text>
      <text lang="PT">Lista de Filmes</text>
      <text lang="SV">Filmlista</text>
-     <text lang="FR">Parcourir les vidéos</text>
+     <text lang="FR">Liste des vidéos</text>
      <text lang="NL">Video Verkenner</text>
      <text lang="JA">ビデオリスト</text>
      <action>LISTING</action>
@@ -33,6 +33,7 @@
    <button>
      <type>VIDEO_GALLERY</type>
      <text>Video Gallery</text>
+     <text lang="FR">Gallerie vidéo</text>
    <action>GALLERY</action>
    </button>
 

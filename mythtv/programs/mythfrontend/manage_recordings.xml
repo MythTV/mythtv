@@ -22,6 +22,7 @@
       <type>TV_RECPRIORITIES</type>
       <text>Set Priorities</text>
       <text lang="DE">Prioritäten</text>
+      <text lang="FR">Fixer les priorités</text>
       <text lang="NL">Prioriteiten</text>
       <text lang="SV">Prioriteter</text>
       <text lang="JA">録画優先順位</text>
@@ -55,7 +56,7 @@
       <text lang="ES">Borrar Grabaciones</text>
       <text lang="CA">Esborrar Gravacions</text>
       <text lang="NL">Opnames Verwijderen</text>
-      <text lang="FR">Supprimer</text>
+      <text lang="FR">Supprimer des enregistrements</text>
       <text lang="DE">Löschen</text>
       <text lang="DK">Slet optagelser</text>
       <text lang="PT">Apagar Gravações</text>
@@ -72,6 +73,7 @@
       <text lang="SV">Föregående</text>
       <text lang="JA">以前の録画</text>
       <text lang="DE">Alte Aufnahmen</text>
+      <text lang="FR">Anciens enregistrements</text>
       <text lang="FI">Aiemmin Nauhoitetut</text>
       <text lang="ZH_TW">以前的錄影</text>
       <action>TV_PREVIOUS</action>

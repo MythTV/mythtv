@@ -7,6 +7,7 @@
       <text lang="SV">Titel</text>
       <text lang="JA">タイトル</text>
       <text lang="NL">Titels</text>
+      <text lang="FR">Titres</text>
       <text lang="FI">Nimikkeet</text>
       <text lang="ZH_TW">標題</text>
       <action>TV_SEARCH_TITLE</action>
@@ -16,6 +17,7 @@
       <type>TV_SEARCH_KEYWORDS</type>
       <text>Keywords</text>
       <text lang="DE">Inhalt</text>
+      <text lang="FR">Mots clefs</text>
       <text lang="SV">Nyckelord</text>
       <text lang="NL">Beschrijving</text>      
       <text lang="JA">キーワード</text>
@@ -28,6 +30,7 @@
       <type>TV_SEARCH_PEOPLE</type>
       <text>People</text>
       <text lang="SV">Person</text>
+      <text lang="FR">Personnes</text>
       <text lang="JA">人</text>
       <text lang="DE">Personen</text>
       <text lang="FI">Ihmiset</text>
@@ -38,6 +41,7 @@
       <type>TV_SEARCH_POWER</type>
       <text>Advanced</text>
       <text lang="SV">Avancerad</text>
+      <text lang="FR">Avancée</text>
       <text lang="JA">アドバンスト</text>
       <text lang="DE">Erweitert</text>
       <text lang="FI">Lisävalinnat</text>

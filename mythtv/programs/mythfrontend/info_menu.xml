@@ -6,6 +6,7 @@
      <text lang="DE">Nachrichten</text>
      <text lang="CA">Notícies</text>
      <text lang="ES">Noticias</text>
+     <text lang="FR">Nouvelles</text>
      <text lang="NL">Nieuws</text>
      <text lang="SV">Nyheter</text>
      <text lang="JA">ニュース</text>
@@ -38,6 +39,7 @@
       <type>WEBPAGE</type>
       <text>Web</text>
       <text lang="DE">WWW</text>
+      <text lang="FR">Web</text>
       <text lang="SV">Webb</text>
       <text lang="JA">ウェブ</text>
       <text lang="FI">Nettiselain</text>
@@ -50,6 +52,7 @@
      <type>RECIPE</type>
      <text>Recipes</text>
      <text lang="SV">Recept</text>
+     <text lang="FR">Recettes</text>
      <text lang="NL">Recepten</text>
      <text lang="JA">レシピ</text>
      <text lang="DE">Rezepte</text>
@@ -62,6 +65,7 @@
       <type>TV_STATUS</type>
       <text>System Status</text>
       <text lang="DE">Systemstatus</text>
+      <text lang="FR">État système</text>
       <text lang="NL">Systeemstatus</text>
       <text lang="SV">Systemstatus</text>
       <text lang="JA">システムステータス</text>

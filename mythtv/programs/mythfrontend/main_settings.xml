@@ -41,6 +41,7 @@
      <text>TV Settings</text>
      <text lang="DE">Fernsehen</text>
      <text lang="SV">TV</text>
+     <text lang="FR">Configuration TV</text>
      <text lang="JA">TV設定</text>
      <text lang="FI">TV:n Asetukset</text>
      <text lang="ZH_TW">電視設定</text>
@@ -52,6 +53,7 @@
      <text>Media Settings</text>
      <text lang="DE">Medien</text>
      <text lang="SV">Media</text>
+     <text lang="FR">Configuration multimédia</text>
      <text lang="JA">メディア設定</text>
      <text lang="FI">Media</text>
      <text lang="ZH_TW">媒體設定</text>
@@ -63,6 +65,7 @@
      <type>SETTINGS_INFO_CENTER</type>
      <text>Info Center Settings</text>
      <text lang="DE">Informationszentrale</text>
+     <text lang="FR">Configuration centre d'informations</text>
      <text lang="SV">Informationscenter</text>
      <text lang="JA">インフォセンター設定</text>
      <text lang="FI">Tiedoteasetukset</text>
@@ -77,6 +80,7 @@
      <text lang="PT">Configurar XBox</text>
      <text lang="CA">Configurar XBox</text>
      <text lang="ES">Configurar XBox</text>
+     <text lang="FR">Configuration XBox</text>
      <text lang="DE">XBox Einstellungen</text>
      <text lang="NL">Xbox Instellingen</text>
      <text lang="SV">Xbox</text>
@@ -91,6 +95,7 @@
     <button>
       <type>PHONE</type>
       <text>Phone Settings</text>
+      <text lang="FR">Configuration téléphone</text>
       <text lang="DE">Telephon Einstellungen</text>
       <text lang="FI">Puhelimen Asetukset</text>
       <alttext lang="DE">Telephon</alttext>

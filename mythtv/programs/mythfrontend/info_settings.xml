@@ -4,6 +4,7 @@
      <type>SETTINGS_WEATHER</type>
      <text>Weather Settings</text>
      <text lang="ES">Configurar El Tiempo</text>
+     <text lang="FR">Configuration de la météo</text>
      <text lang="CA">Configurar El Temps</text>
      <text lang="DE">Wetter Einstellungen</text>
      <text lang="DK">Vejr indstililnger</text>
@@ -25,6 +26,7 @@
      <text lang="CA">Configurar Notícies</text>
      <text lang="ES">Configurar Noticias</text>
      <text lang="NL">Nieuws Instellingen</text>
+     <text lang="FR">Configuration des nouvelles</text>
      <text lang="SV">Nyhetsinställningar</text>
      <text lang="JA">ニュース設定</text>
      <text lang="FI">Uutisten Asetukset</text>
@@ -40,6 +42,7 @@
      <text lang="DE">WWW Einstellungen</text>
      <text lang="SV">Webb-inställningar</text>
      <text lang="JA">Web設定</text>
+     <text lang="FR">Configuration du web</text>
      <text lang="FI">Nettiasetukset</text>
      <text lang="ZH_TW">互聯網設定</text>
      <alttext lang="DE">WWW</alttext>
@@ -53,6 +56,7 @@
      <text lang="SV">ReceptinstÃ¤llningar</text>
      <text lang="JA">レシピ設定</text>
      <text lang="DE">Rezepte Einstellungen</text>
+     <text lang="FR">Configuration des recettes</text>
      <text lang="FI">Reseptiasetukset</text>
      <alttext lang="DE">Rezepte</alttext>
      <action>CONFIGPLUGIN mythrecipe</action>

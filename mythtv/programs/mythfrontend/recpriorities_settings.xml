@@ -7,6 +7,7 @@
       <text lang="DK">Generelt</text>
       <text lang="NL">Algemeen</text>
       <text lang="PT">Configurações Gerais</text>
+      <text lang="FR">Général</text>
       <text lang="SV">Generellt</text>
       <text lang="JA">一般</text>
       <text lang="FI">Yleiset Asetukset</text>
@@ -19,10 +20,12 @@
       <text>Set Channel Recording Priorities</text>
       <text lang="DE">Aufnahmeprioritäten</text>
       <text lang="SV">Kanalprioriteter</text>
+      <text lang="FR">Fixer les priorités des chaînes</text>
       <text lang="JA">チャンネル録画優先順位設定</text>
       <text lang="FI">Nauhoitusprioriteetit</text>
       <text lang="ZH_TW">電視台錄影優先次序</text>
       <alttext>Channel Priorities</alttext>
+      <alttext lang="FR">Priorités</alttext>
       <alttext lang="JA">チャンネル優先順位</alttext>
       <alttext lang="DE">Prioritäten</alttext>
       <action>SETTINGS CHANNELRECPRIORITIES</action>

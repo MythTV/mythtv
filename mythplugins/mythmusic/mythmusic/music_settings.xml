@@ -11,7 +11,7 @@
       <text lang="NL">Algemeen</text>
       <text lang="PT">Configurações Gerais</text>
       <text lang="SV">Generella inställningar</text>
-      <text lang="FR">Générales</text>
+      <text lang="FR">Configuration générale</text>
       <text lang="JA">全般設定</text>
       <text lang="FI">Yleiset Asetukset</text>
       <action>MUSIC_SET_GENERAL</action>
@@ -28,7 +28,7 @@
       <text lang="NL">Afspelen</text>
       <text lang="PT">Configurações de Leitura</text>
       <text lang="SV">Inställningar för avspelning</text>
-      <text lang="FR">Lecteur</text>
+      <text lang="FR">Configuration du lecteur</text>
       <text lang="JA">プレイヤー設定</text>
       <text lang="FI">Soittoasetukset</text>
       <action>MUSIC_SET_PLAYER</action>
@@ -43,7 +43,7 @@
       <text lang="SV">Inställningar för kopiering</text>
       <text lang="CA">Configuració de volcat</text>
       <text lang="ES">Configuració del riper</text>
-      <text lang="FR">Copie des CDs</text>
+      <text lang="FR">Configuration de l'extraction</text>
       <text lang="JA">リッパー設定</text>
       <text lang="FI">Tuontiasetukset</text>
       <action>MUSIC_SET_RIPPER</action>

@@ -22,6 +22,7 @@
      <type>MENU_MEDIA_LIBRARY</type>
      <text>Media Library</text>
      <text lang="DE">Medienbibliothek</text>
+     <text lang="FR">Médiathèque</text>
      <text lang="NL">Media-Center</text>     
      <text lang="SV">Mediabibliotek</text>
      <text lang="JA">メディアライブラリ</text>
@@ -38,7 +39,7 @@
       <text lang="ES">Programar Grabaciones</text>
       <text lang="CA">Programar Gravacions</text>
       <text lang="NL">Opnames Beheren</text>
-      <text lang="FR">Programmer des enregistrements</text>
+      <text lang="FR">Gérer les enregistrements</text>
       <text lang="DE">Aufnahmen verwalten</text>
       <text lang="DK">Optag udsendelse</text>
       <text lang="PT">Gravação Programada</text>
@@ -55,6 +56,7 @@
      <type>MENU_INFO_CENTER</type>
      <text>Information Center</text>
      <text lang="DE">Informationszentrale</text>
+     <text lang="FR">Centre d'informations</text>
      <text lang="NL">Informatiecentrale</text>
      <text lang="SV">Informationscenter</text>
      <text lang="JA">インフォメーションセンター</text>
@@ -68,6 +70,7 @@
      <type>MENU_OPTICAL_DISKS</type>
      <text>Optical Disks</text>
      <text lang="DE">Optische Medien</text>
+     <text lang="FR">Disques optiques</text>
      <text lang="NL">DVD-CD media</text>
      <text lang="SV">Optiska diskar</text>
      <text lang="JA">オプティカルディスク</text>
@@ -84,6 +87,7 @@
      <text lang="DE">Telephon</text>
      <text lang="FI">Puhelin</text>
      <text lang="SV">Telefon</text>
+     <text lang="FR">Téléphone</text>
      <action>PLUGIN mythphone</action>
      <depends>mythphone</depends>
    </button>
