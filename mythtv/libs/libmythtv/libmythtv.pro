@@ -9,7 +9,7 @@ CONFIG += thread staticlib
 include ( ../../settings.pro )
 
 INCLUDEPATH += ../libNuppelVideo ../
-TARGETDEPS = ../libNuppelVideo/libNuppelVideo.a 
+TARGETDEPS = ../libNuppelVideo/libNuppelVideo.a
 
 installfiles.path = $${PREFIX}/share/mythtv
 installfiles.files = helr.ttf

@@ -1363,9 +1363,6 @@ void TV::DoPosition(void)
 
 void TV::DoFF(void)
 {
-    if (paused)
-        return;
-
     bool slidertype = false;
     if (internalState == kState_WatchingLiveTV)
         slidertype = true;
@@ -1382,9 +1379,6 @@ void TV::DoFF(void)
 
 void TV::DoRew(void)
 {
-    if (paused)
-        return;
-
     bool slidertype = false;
     if (internalState == kState_WatchingLiveTV)
         slidertype = true;

@@ -1403,7 +1403,6 @@ void NuppelVideoPlayer::StartPlaying(void)
     gettimeofday(&audiotime_updated, NULL);
 
     weseeked = 0;
-    urewindtime = ufftime = 0;
     rewindtime = fftime = 0;
 
     resetplaying = false;
@@ -1475,7 +1474,25 @@ void NuppelVideoPlayer::StartPlaying(void)
                 advancedecoder = false;
                 continue;
             }
-	    else
+            else if (rewindtime > 0)
+            {   
+                DoRewind();
+                    
+                rewindtime = 0;
+                GetFrame(audiofd <= 0);
+                resetvideo = true;
+            }       
+            else if (fftime > 0)
+            {
+                fftime = CalcMaxFFTime(fftime);
+
+                DoFastForward();
+
+                fftime = 0;
+                GetFrame(audiofd <= 0);
+                resetvideo = true;
+            }
+            else
             {
                 //printf("startplaying waiting for unpause\n");
                 usleep(50);
@@ -1483,24 +1500,20 @@ void NuppelVideoPlayer::StartPlaying(void)
             }
 	}
 	
-	if (urewindtime > 0)
+	if (rewindtime > 0)
 	{
-	    rewindtime = (long long)(urewindtime * video_frame_rate);
-
             if (rewindtime >= 5)
                 DoRewind();
 
-            urewindtime = 0;
             rewindtime = 0;
 	}
-	if (ufftime > 0)
+	if (fftime > 0)
 	{
-            fftime = (long long)(CalcMaxFFTime(ufftime) * video_frame_rate);
+            fftime = CalcMaxFFTime(fftime);
 
             if (fftime >= 5)
                 DoFastForward();
 
-            ufftime = 0;
             fftime = 0;
 	}
 
@@ -1634,20 +1647,19 @@ bool NuppelVideoPlayer::DoRewind(void)
     return true;
 }
 
-float NuppelVideoPlayer::CalcMaxFFTime(float ff)
+long long NuppelVideoPlayer::CalcMaxFFTime(long long ff)
 {
-    float maxtime = 1.0;
+    long long maxtime = (long long)(1.0 * video_frame_rate);
     if (watchingrecording && nvr)
-        maxtime = 3.0;
+        maxtime = (long long)(3.0 * video_frame_rate);
     
-    float ret = ff;
+    long long ret = ff;
 
     if (livetv || (watchingrecording && nvr))
     {
-        float behind = (float)(nvr->GetFramesWritten() - framesPlayed) / 
-                       video_frame_rate;
+        long long behind = nvr->GetFramesWritten() - framesPlayed;
 	if (behind < maxtime) // if we're close, do nothing
-	    ret = 0.0;
+	    ret = 0;
 	else if (behind - fftime <= maxtime)
 	{
             ret = behind - maxtime;
