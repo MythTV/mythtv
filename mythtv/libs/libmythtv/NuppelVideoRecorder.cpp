@@ -1775,6 +1775,11 @@ void NuppelVideoRecorder::doVbiThread(void)
         }
         else if (vbimode == 2)
         {
+            char buffer[65536];
+            if (read(vbi->fd, buffer, 65536) < 65536) 
+            {
+                cerr << "Can't read vbi data\n";
+            }
             // TODO: decode VBI as US close caption
         }
     }
