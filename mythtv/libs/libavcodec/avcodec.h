@@ -5,8 +5,8 @@
 
 #define LIBAVCODEC_VERSION_INT 0x000406
 #define LIBAVCODEC_VERSION     "0.4.6"
-#define LIBAVCODEC_BUILD       4633
-#define LIBAVCODEC_BUILD_STR   "4633"
+#define LIBAVCODEC_BUILD       4634
+#define LIBAVCODEC_BUILD_STR   "4634"
 
 enum CodecID {
     CODEC_ID_NONE, 
@@ -32,6 +32,8 @@ enum CodecID {
     CODEC_ID_VORBIS,
     CODEC_ID_WMAV1,
     CODEC_ID_WMAV2,
+    CODEC_ID_MACE3,
+    CODEC_ID_MACE6,
 
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE,
@@ -130,6 +132,7 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
                                                 allows the last part of a frame to be decoded earlier */
 #define CODEC_FLAG_NORMALIZE_AQP  0x00020000 /* normalize adaptive quantization */
 #define CODEC_FLAG_INTERLACED_DCT 0x00040000 /* use interlaced dct */
+#define CODEC_FLAG_LOW_DELAY      0x00080000 /* force low delay / will fail on b frames */
 
 /* codec capabilities */
 
@@ -648,6 +651,7 @@ typedef struct AVCodecContext {
 #define FF_DCT_INT     2
 #define FF_DCT_MMX     3
 #define FF_DCT_MLIB    4
+#define FF_DCT_ALTIVEC 5
 
     /**
      * presentation timestamp in micro seconds (time when frame should be shown to user)
@@ -714,6 +718,7 @@ typedef struct AVCodecContext {
 #define FF_IDCT_PS2          5
 #define FF_IDCT_MLIB         6
 #define FF_IDCT_ARM          7
+#define FF_IDCT_ALTIVEC      8
 
     /**
      * slice count
@@ -805,6 +810,8 @@ extern AVCodec wmav2_decoder;
 extern AVCodec mjpeg_decoder;
 extern AVCodec mp2_decoder;
 extern AVCodec mp3_decoder;
+extern AVCodec mace3_decoder;
+extern AVCodec mace6_decoder;
 
 /* pcm codecs */
 #define PCM_CODEC(id, name) \

@@ -24,7 +24,7 @@ SOURCES += jfdctfst.c mpegaudio.c ac3enc.c mjpeg.c resample.c dsputil.c
 SOURCES += motion_est.c imgconvert.c imgresample.c msmpeg4.c mpeg12.c
 SOURCES += h263dec.c svq1.c rv10.c mpegaudiodec.c pcm.c simple_idct.c
 SOURCES += ratecontrol.c adpcm.c eval.c jfdctint.c dv.c error_resilience.c
-SOURCES += wmadec.c fft.c mdct.c
+SOURCES += wmadec.c fft.c mdct.c mace.c
 
 contains( CONFIG_AC3, yes ) {
     SOURCES += a52dec.c
@@ -70,10 +70,10 @@ contains( TARGET_ARCH_ALPHA, yes ) {
 }
 
 contains( TARGET_ARCH_POWERPC, yes ) {
-    OBJS += ppc/dsputil_ppc.c
+    OBJS += ppc/dsputil_ppc.c ppc/mpegvideo_ppc.c
 }
 
 contains( TARGET_ARCH_ALTIVEC, yes ) {
-    OBJS += ppc/dsputil_altivec.c
+    OBJS += ppc/dsputil_altivec.c ppc/mpegvideo_altivec.c ppc/idct_altivec.c
     QMAKE_CFLAGS_RELEASE += -faltivec
 }

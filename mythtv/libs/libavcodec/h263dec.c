@@ -60,7 +60,6 @@ static int h263_decode_init(AVCodecContext *avctx)
     switch(avctx->codec->id) {
     case CODEC_ID_H263:
         s->gob_number = 0;
-        s->first_slice_line = 0;
         break;
     case CODEC_ID_MPEG4:
         s->time_increment_bits = 4; /* default value for broken headers */
@@ -252,10 +251,10 @@ static int decode_slice(MpegEncContext *s){
         
         if(bits_left==0 || bits_left>8){
             s->padding_bug_score++;
-        } else {
+        } else if(bits_left != 1){
             int v= show_bits(&s->gb, 8);
             v|= 0x7F >> (7-(bits_count&7));
-                
+
             if(v==0x7F)
                 s->padding_bug_score--;
             else
@@ -351,6 +350,9 @@ retry:
             ret = ff_mpeg4_decode_picture_header(s, &gb);
         }
         ret = ff_mpeg4_decode_picture_header(s, &s->gb);
+
+        if(s->flags& CODEC_FLAG_LOW_DELAY)
+            s->low_delay=1;
 
         s->has_b_frames= !s->low_delay;
     } else if (s->h263_intel) {
@@ -479,7 +481,7 @@ retry:
     
     decode_slice(s);
     s->error_status_table[0]|= VP_START;
-    while(s->mb_y<s->mb_height && s->gb.size*8 - get_bits_count(&s->gb)>32){
+    while(s->mb_y<s->mb_height && s->gb.size*8 - get_bits_count(&s->gb)>16){
         if(s->msmpeg4_version){
             if(s->mb_x!=0 || (s->mb_y%s->slice_height)!=0)
                 break;

@@ -157,6 +157,9 @@ void ff_init_scantable(MpegEncContext *s, ScanTable *st, const UINT8 *src_scanta
         int j;
         j = src_scantable[i];
         st->permutated[i] = s->idct_permutation[j];
+#ifdef ARCH_POWERPC
+        st->inverse[j] = i;
+#endif
     }
     
     end=-1;
@@ -220,6 +223,9 @@ int DCT_common_init(MpegEncContext *s)
 #endif
 #ifdef ARCH_ARMV4L
     MPV_common_init_armv4l();
+#endif
+#ifdef ARCH_POWERPC
+    MPV_common_init_ppc(s);
 #endif
 
     switch(s->idct_permutation_type){
@@ -2616,7 +2622,7 @@ static void encode_picture(MpegEncContext *s, int picture_number)
 //printf("Scene change detected, encoding as I Frame %d %d\n", s->mb_var_sum, s->mc_mb_var_sum);
     }
     
-    if(s->pict_type==P_TYPE || s->pict_type==S_TYPE){
+    if(s->pict_type==P_TYPE || s->pict_type==S_TYPE){ 
         s->f_code= ff_get_best_fcode(s, s->p_mv_table, MB_TYPE_INTER);
         ff_fix_long_p_mvs(s);
     }
@@ -3012,7 +3018,7 @@ static int dct_quantize_c(MpegEncContext *s,
     int bias;
     int max=0;
     unsigned int threshold1, threshold2;
-    
+
     s->fdct (&(s->fdct_ctx), block);
 
     if (s->mb_intra) {
