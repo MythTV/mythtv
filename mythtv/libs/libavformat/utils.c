@@ -1475,7 +1475,7 @@ static void av_estimate_timings_from_pts(AVFormatContext *ic)
     url_fseek(&ic->pb, 0, SEEK_SET);
 }
 
-static void av_estimate_timings(AVFormatContext *ic)
+void av_estimate_timings(AVFormatContext *ic)
 {
     URLContext *h;
     int64_t file_size;
