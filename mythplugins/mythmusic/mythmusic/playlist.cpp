@@ -294,6 +294,10 @@ PlaylistsContainer::PlaylistsContainer(QSqlDatabase *db_ptr, AllMusic *all_music
     active_widget = NULL;
     my_host = "";
  
+    active_playlist = NULL;
+    backup_playlist = NULL;
+    all_other_playlists = NULL;
+
     all_available_music = all_music;
 
     done_loading = false;
@@ -301,9 +305,20 @@ PlaylistsContainer::PlaylistsContainer(QSqlDatabase *db_ptr, AllMusic *all_music
     playlists_loader = new PlaylistLoadingThread(this, all_music);
     playlists_loader->start();
     
-
     // load();  <-- this is now in the thread
-    
+}
+
+PlaylistsContainer::~PlaylistsContainer()
+{
+    if (active_playlist)
+        delete active_playlist;
+    if (backup_playlist)
+        delete backup_playlist;
+    if (all_other_playlists)
+        delete all_other_playlists;
+
+    playlists_loader->wait();
+    delete playlists_loader;
 }
 
 void PlaylistsContainer::load()
@@ -453,6 +468,8 @@ int Playlist::getFirstTrackID()
 
 Playlist::~Playlist()
 {
+    songs.setAutoDelete(true);
+    songs.clear();
 }
 
 Playlist& Playlist::operator=(const Playlist& rhs)
@@ -759,32 +776,6 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
     return a_counter;
 }
 
-void Playlist::writeMetadata(QPtrList<Metadata> *list_to_write_to)
-{
-    Track *it;
-    for(it = songs.first(); it; it = songs.next())
-    {
-        if(it->getValue() == 0)
-        {
-            cerr << "playlist.o: Oh crap ... how did we get something with an ID of 0 on a playlist?" << endl ;
-        }
-        if(it->getValue() > 0)
-        {
-            // Normal track
-            Metadata *tmpdata = all_available_music->getMetadata(it->getValue());
-            if (tmpdata)
-                list_to_write_to->append(tmpdata);
-        }
-        if(it->getValue() < 0)
-        {
-            // it's a playlist, recurse (mildly)
-            Playlist *level_down = parent->getPlaylist((it->getValue()) * -1);
-            if (level_down)
-                level_down->writeMetadata(list_to_write_to);
-        }
-    }  
-}
-
 void PlaylistsContainer::writeTree(GenericTree *tree_to_write_to)
 {
     all_available_music->writeTree(tree_to_write_to);
@@ -842,28 +833,6 @@ void PlaylistsContainer::writeTree(GenericTree *tree_to_write_to)
         ++iterator;
     }
     
-}
-
-
-void PlaylistsContainer::writeActive(QPtrList<Metadata> *list_to_write_to)
-{
-    
-    list_to_write_to->clear();
-    active_playlist->writeMetadata(list_to_write_to);
-
-    //  Add in any CD data if there is any
-    for(int i = 0; i < (int) cd_playlist.count(); i++)
-    {
-        Metadata *temp = new Metadata("CD Ooops");
-        if(all_available_music->getCDMetadata(cd_playlist[i], temp))
-        {
-            list_to_write_to->append(temp);
-        }
-        else
-        {
-            cerr << "playlist.o: Failed to get metadata for a CD track" << endl ;
-        }
-    }    
 }
 
 void PlaylistsContainer::save()

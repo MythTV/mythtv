@@ -207,6 +207,7 @@ void
 goom_lines_free (GMLine ** l)
 {
 	free ((*l)->points);
+	free ((*l)->points2);
 	free (*l);
 	l = NULL;
 }

@@ -54,6 +54,7 @@ class Playlist
     
     Playlist(AllMusic *all_music_ptr);
     ~Playlist();
+
     Playlist& operator=(const Playlist& rhs);
 
     void setParent(PlaylistsContainer *myparent){parent=myparent;}
@@ -63,7 +64,6 @@ class Playlist
     void savePlaylist(QString a_name, QSqlDatabase *a_db);
     void saveNewPlaylist(QSqlDatabase *a_db, QString a_host);
     void putYourselfOnTheListView(QListViewItem *a_parent);
-    void writeMetadata(QPtrList<Metadata> *list_to_write_to);
     int writeTree(GenericTree *tree_to_write_to, int a_counter);
     void describeYourself(); //  debugging
     void fillSongsFromSonglist();
@@ -115,6 +115,7 @@ class PlaylistsContainer
   public:
   
     PlaylistsContainer(QSqlDatabase *db_ptr, AllMusic *all_music);
+   ~PlaylistsContainer();
 
     void            load();
     void            describeYourself();    // debugging
@@ -122,7 +123,6 @@ class PlaylistsContainer
     Playlist*       getPlaylist(int id);
     void            setActiveWidget(PlaylistTitle *widget);
     PlaylistTitle*  getActiveWidget(){return active_widget;}
-    void            writeActive(QPtrList<Metadata> *list_to_write_to);
     void            writeTree(GenericTree *tree_to_write_to);
     void            clearCDList();
     void            addCDTrack(int x);

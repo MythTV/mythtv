@@ -94,6 +94,7 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
 
     listview->setCurrentItem(listview->firstChild());
 
+    cd_reader_thread = NULL;
     if(cd_checking_flag)
     {
         //  Start the CD checking thread, and set up a timer
@@ -103,7 +104,7 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
         cd_reader_thread = new ReadCDThread(the_playlists, all_music);
         cd_reader_thread->start();
     
-        cd_watcher = new QTimer();
+        cd_watcher = new QTimer(this);
         connect(cd_watcher, SIGNAL(timeout()), this, SLOT(occasionallyCheckCD()));
         cd_watcher->start(1000); // Every second?
         fillCD();
@@ -132,13 +133,24 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
         //
 
         wait_counter = 0;
-        fill_list_timer = new QTimer();
+        fill_list_timer = new QTimer(this);
         connect(fill_list_timer, SIGNAL(timeout()), this, SLOT(keepFilling()));
         fill_list_timer->start(300);
         //allmusic->setCheckable(false);
         //alllists->setCheckable(false);
     }
 
+}
+
+DatabaseBox::~DatabaseBox()
+{
+    if (cd_reader_thread)
+    {
+        cd_watcher->stop();
+
+        cd_reader_thread->wait();
+        delete cd_reader_thread;
+    }
 }
 
 void DatabaseBox::keepFilling()
@@ -973,11 +985,16 @@ void ReadCDThread::run()
         {
             cd_status_changed = false;
         }
+
+        delete checker;
     } 
 
     while (tracknum > 0 && redo) 
     {
         Metadata *track = decoder->getMetadata(tracknum);
+        if (!track)
+            continue;
+
         all_music->addCDTrack(track);
 
         if (!setTitle)
@@ -1003,6 +1020,10 @@ void ReadCDThread::run()
             all_music->setCDTitle(parenttitle);
             setTitle = true;
         }
+
+        delete track;
         tracknum--;
     }
+
+    delete decoder;
 }

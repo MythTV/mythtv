@@ -136,13 +136,16 @@ class MusicNode
     
   public:
   
-    MusicNode(QString a_title, const QString& a_startdir, const QString& a_paths, QStringList tree_levels, uint depth);
+    MusicNode(QString a_title, const QString& a_startdir, 
+              const QString& a_paths, QStringList tree_levels, uint depth);
+   ~MusicNode();
 
     void        insert(Metadata* inserter);
     QString     getTitle(){return my_title;}
-    MusicNode*  findRightNode(QStringList tree_levels, Metadata *inserter, uint depth);
+    MusicNode*  findRightNode(QStringList tree_levels, Metadata *inserter, 
+                uint depth);
     void        printYourself(int indent_amount);   // debugging
-    void        clearTracks(){my_tracks.clear();}
+    void        clearTracks() { my_tracks.clear(); }
     void        putYourselfOnTheListView(TreeCheckItem *parent, bool show_node);
     void        writeTree(GenericTree *tree_to_write_to, int a_counter);
     void        sort();

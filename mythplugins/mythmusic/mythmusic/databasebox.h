@@ -39,6 +39,7 @@ class DatabaseBox : public MythDialog
     DatabaseBox(PlaylistsContainer *all_playlists,
                 AllMusic *music_ptr,
                 MythMainWindow *parent, const char *name = 0);
+   ~DatabaseBox();
 
     void dealWithTracks(PlaylistItem *item_ptr);
     void setCDTitle(const QString& title);

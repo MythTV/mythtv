@@ -387,6 +387,19 @@ AllMusic::AllMusic(QSqlDatabase *ldb, QString path_assignment, QString a_startdi
     metadata_loader = new MetadataLoadingThread(this);
     metadata_loader->start();
 
+    all_music.setAutoDelete(true);
+    top_nodes.setAutoDelete(true);
+}
+
+AllMusic::~AllMusic()
+{
+    all_music.clear();
+    top_nodes.clear();
+
+    delete root_node;
+
+    metadata_loader->wait();
+    delete metadata_loader;
 }
 
 bool AllMusic::cleanOutThreads()
@@ -423,7 +436,6 @@ void AllMusic::resync()
     QSqlQuery query = db->exec(aquery);
 
     all_music.clear();
-    all_music.setAutoDelete(true);      //  I **own** these pointers
     
     if(query.isActive() && query.numRowsAffected() > 0)
     {
@@ -821,7 +833,9 @@ void AllMusic::setSorting(QString a_paths)
     }
 }
 
-MusicNode::MusicNode(QString a_title, const QString& a_startdir, const QString& a_paths, QStringList tree_levels, uint depth)
+MusicNode::MusicNode(QString a_title, const QString& a_startdir, 
+                     const QString& a_paths, QStringList tree_levels, 
+                     uint depth)
 {
     my_title = a_title;
     startdir = a_startdir;
@@ -843,6 +857,13 @@ MusicNode::MusicNode(QString a_title, const QString& a_startdir, const QString& 
         }
        
     }
+
+    my_subnodes.setAutoDelete(true);
+}
+
+MusicNode::~MusicNode()
+{
+    my_subnodes.clear();
 }
 
 void MusicNode::insert(Metadata* inserter)
@@ -850,7 +871,8 @@ void MusicNode::insert(Metadata* inserter)
     my_tracks.append(inserter);
 }
 
-MusicNode*  MusicNode::findRightNode(QStringList tree_levels, Metadata *inserter, uint depth)
+MusicNode* MusicNode::findRightNode(QStringList tree_levels, 
+                                    Metadata *inserter, uint depth)
 {
     QString a_field = "";
 

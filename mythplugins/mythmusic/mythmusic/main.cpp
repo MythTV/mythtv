@@ -492,6 +492,9 @@ int main(int argc, char *argv[])
             SavePending(db, x);
             all_music->save();
         }
+
+        delete all_music;
+        delete all_playlists;
     }
     
     //  Clean up

@@ -76,6 +76,9 @@ MainVisual::~MainVisual()
         delete vis;
         vis = 0;
     }
+
+    nodes.setAutoDelete(TRUE);
+    nodes.clear();
 }
 
 void MainVisual::setVisual( const QString &visualname )

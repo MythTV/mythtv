@@ -42,7 +42,7 @@ PlaybackBox::PlaybackBox(MythMainWindow *parent, QString window_name,
     currentTime = 0;
     maxTime = 0;
     setContext(0);
-    visual_mode_timer = new QTimer();
+    visual_mode_timer = new QTimer(this);
     visualizer_status = 0;
     curMeta = NULL;
 
@@ -80,7 +80,7 @@ PlaybackBox::PlaybackBox(MythMainWindow *parent, QString window_name,
     //
     
     volume_control = NULL;
-    volume_display_timer = new QTimer();
+    volume_display_timer = new QTimer(this);
     if(gContext->GetNumSetting("MythControlsVolume", 0))
     {
         volume_control = new VolumeControl(true);
@@ -137,7 +137,7 @@ PlaybackBox::PlaybackBox(MythMainWindow *parent, QString window_name,
     //
 
 
-    waiting_for_playlists_timer = new QTimer();
+    waiting_for_playlists_timer = new QTimer(this);
     connect(waiting_for_playlists_timer, SIGNAL(timeout()), this, SLOT(checkForPlaylists()));
     waiting_for_playlists_timer->start(100);
 
@@ -189,6 +189,14 @@ PlaybackBox::PlaybackBox(MythMainWindow *parent, QString window_name,
     updateForeground();
 }
 
+PlaybackBox::~PlaybackBox(void)
+{
+    stopAll();
+    if (volume_control)
+        delete volume_control;
+    if (playlist_tree)
+        delete playlist_tree;
+}
 
 void PlaybackBox::keyPressEvent(QKeyEvent *e)
 {
@@ -381,11 +389,6 @@ void PlaybackBox::checkForPlaylists()
     }
 
 
-}
-
-PlaybackBox::~PlaybackBox(void)
-{
-    stopAll();
 }
 
 void PlaybackBox::changeVolume(bool up_or_down)
@@ -933,10 +936,8 @@ void PlaybackBox::toggleRepeat()
 
 void PlaybackBox::constructPlaylistTree()
 {
-    if(playlist_tree)
-    {
+    if (playlist_tree)
         delete playlist_tree;
-    }
 
     playlist_tree = new GenericTree("playlist root", 0);
     playlist_tree->setAttribute(0, 0);
