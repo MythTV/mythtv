@@ -1,4 +1,3 @@
-#include "mainvisual.h"
 #include "mythgoom.h"
 
 #ifdef SDL_SUPPORT
