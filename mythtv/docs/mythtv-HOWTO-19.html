@@ -406,10 +406,7 @@ appropriate modules directory:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
-# cd /lib/modules/2.4.21-0.16mdk/kernel/drivers/media/video
-# cp /home/[yourusername]/ivtv/ivtv/driver/msp3400.o .
-# cp /home/[yourusername]/ivtv/ivtv/driver/saa7115.o .
-# cp /home/[yourusername]/ivtv/ivtv/driver/ivtv.o .
+# make install
 # depmod -a
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -452,7 +449,7 @@ crw-------    1 mythtv   root      81,  32 Dec 31  1969 /dev/v4l/video32
 </CODE></BLOCKQUOTE>
 </P>
 <P>In this case, the ivtv device is <CODE>video0</CODE>.</P>
-<P>Go into <CODE>setup/setup</CODE> on the machine hosting the hardware MPEG2 card.
+<P>Go into <CODE>setup/setup</CODE> on the machine hosting the hardware MPEG-2 card.
 When you add a new capture card, ensure that you are using the
 <CODE>video0</CODE> device.  </P>
 <P><B>NOTE</B>:  As of 2003-04-25 the ivtv driver does not support VBI, so
@@ -464,25 +461,6 @@ press ENTER.</P>
 <P>The remaining setup is just like a standard V4L card; define a video source
 if you have not already done so, and assign the video source to a video card
 input on the Input Connections screen.</P>
-<P>If you'd like to use the <B>ptune.pl</B> command to check that your card
-is working before trying to use it in MythTV, you'll need to install a
-module first:
-<BLOCKQUOTE><CODE>
-<PRE>
-# perl -MCPAN -e shell
-perl> install Video::Capture::V4l
-perl> exit
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>You may then change the channel:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ ./ptune.pl 42
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>will change the Tuner channel to "42".</P>
 <P>You should also <B>modprobe</B> the ivtv driver before using it.  The
 simplest technique is to add the <B>modprobe</B>> command to
 <CODE>/etc/rc.d/rc.local</CODE>:

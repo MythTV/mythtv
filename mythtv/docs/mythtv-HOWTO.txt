@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-05-10, v2.33
+  2003-05-14, v2.34
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -306,17 +306,17 @@
      watching it later.
 
   +o  The developer states that his AMD1800+ system can [1malmost [22mencode two
-     MPEG4 video streams and watch one program simultaneously.
+     MPEG-4 video streams and watch one program simultaneously.
 
   +o  A PIII/800Mhz system with 512MB RAM can encode one video stream
      using the RTJPEG codec with 480x480 capture resolution and play it
      back simultaneously, thereby allowing live TV watching.
 
-  +o  A dual Celeron/450Mhz is able to view a 480x480 MPEG4/3300Kbps file
-     created on a different system with 30% CPU usage.
+  +o  A dual Celeron/450Mhz is able to view a 480x480 MPEG-4/3300Kbps
+     file created on a different system with 30% CPU usage.
 
-  +o  A P4 2.4Ghz machine can encode two 3300Kbps 480x480 MPEG4 files and
-     simultaneously serve content to a remote frontend.
+  +o  A P4 2.4Ghz machine can encode two 3300Kbps 480x480 MPEG-4 files
+     and simultaneously serve content to a remote frontend.
 
   The second mode of operation is where MythTV is paired with a
   hardware-based video encoder, such as a Matrox G200 or a Hauppauge
@@ -2576,9 +2576,9 @@
 
   [1m10.5.  Recording[0m
 
-  Currently, MythTV supports two different video encoders, MPEG4 and
+  Currently, MythTV supports two different video encoders, MPEG-4 and
   RTJPEG.  Take note that RTJPEG has lower CPU demands, but makes large
-  files, and MPEG4 has high CPU demands, but makes smaller files.
+  files, and MPEG-4 has high CPU demands, but makes smaller files.
 
   [1mNOTE[22m: although the width and height can be changed to almost anything,
   if you start MythTV and don't see video or you get "segmentation
@@ -3358,15 +3358,17 @@
   [1m18.8.  I can't checkout using CVS anymore![0m
 
   Isaac has changed some things around.  The CVS repository is now known
-  as cvs.mythtv.org, rather than www.mythtv.org or mythtv.org.  Make
-  sure you change your CVSROOT to point to the new server, delete your
-  old tree, and re-do the checkout.
+  as cvs.mythtv.org, rather than www.mythtv.org or mythtv.org and the
+  path has changed.  Make sure you change your CVSROOT to point to the
+  new server and path, delete your old tree, and re-do the checkout.
+  See Section 1, ``How to Obtain this document'' for the full name and
+  path.
 
 
   [1m18.9.  I get segfaults / MythTV isn't doing anything.[0m
 
   Without details, the developers will not be able to determine if you
-  have discovered a genuine code-bug,  or it the problem is with your
+  have discovered a genuine code-bug,  or if the problem is with your
   system.  In order to determine what's going on, you must recompile
   MythTV with debugging support and run MythTV within [1mgdb[22m, the GNU
   debugger.
@@ -3409,9 +3411,9 @@
        Type "show copying" to see the conditions.
        There is absolutely no warranty for GDB.  Type "show warranty" for details.
        This GDB was configured as "i586-mandrake-linux-gnu"...
-       (gdb)
-
-
+       (gdb) handle SIGPIPE nostop
+       Signal        Stop      Print   Pass to program Description
+       SIGPIPE       No        Yes     Yes             Broken pipe
 
   [1mgdb [22mhas a number of options, read the man page for more information.
 
@@ -3422,6 +3424,15 @@
   The backtrace information for all the threads should be posted to the
   mythtv-dev mailing list, along with the steps you followed to get the
   program to crash.
+
+  If you're trying to troubleshoot and you can't get back to the gdb
+  window for some reason, it may be easier to use two systems.
+
+  First, connect to the system that you're going to test using [1mssh [22mor
+  [1mtelnet[22m>, then type $ export DISPLAY=localhost:0.0.  This will allow
+  the grpahics to be displayed on one machine (the one that you're
+  testing) and still have text-mode output available.  You can now
+  continue troubleshooting using [1mgdb[22m> as detailed in the instructions.
 
 
   [1m18.10.  MythTV makes my system crash.[0m
@@ -3469,6 +3480,7 @@
   muted to prevent patching through the analog sound. The volume of this
   source will not affect the record level.
 
+
   Capture mixer - this sets the level for the analog to digital
   recording.  While a volume of 100% is recommended for testing,
   distortion may occur.  Lowering this level to 75% to 85% may result in
@@ -3479,6 +3491,7 @@
   While a volume of 100% is recommended for testing, distortion may
   occur. Lowering this level to 75% to 85% may result in better audio
   quality.
+
   Master mixer - sets the level for the analog signal sent to line-out
   or the speakers.
 
@@ -3530,6 +3543,7 @@
   will need to get btaudio ``operational''.
 
 
+
   [1m18.14.  My remote doesn't work / works sometimes and not others /[0m
   [1m"ghost" keypresses.[0m
 
@@ -3544,6 +3558,7 @@
   will eventually cause [1mlircd [22mto stop responding; even though [1mlircd [22mis
   configured for the Pinnacle Systems remote, the Tivo remote IR
   patterns are being seen by the IR receiver.
+
   If your remote has been properly configured, and [1mirw [22mand [1mirxevent [22mare
   working correctly, then it's highly likely that your window manager is
   not giving focus correctly to the various Myth programs as they run.
@@ -3595,7 +3610,6 @@
   http://www.mplayerhq.hu <http://www.mplayerhq.hu> that allows you view
   the files created by MythTV.  MythTV doesn't use standard Nupplevideo
   files, which is why you MPlayer complains if you try to view them.
-
   Download the patch to MPlayer from Matt's website.
   http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/
   <http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/>.
@@ -3608,12 +3622,11 @@
   Download the source to MPlayer and patch:
 
 
-
-  $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
-  $ tar -xjf MPlayer-0.90rc1.tar.bz2
-  $ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
-  $ cd MPlayer-0.90rc1
-  $ patch -p1 < mplayer-0.90pre10+mythtv.patch
+       $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
+       $ tar -xjf MPlayer-0.90rc1.tar.bz2
+       $ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
+       $ cd MPlayer-0.90rc1
+       $ patch -p1 < mplayer-0.90pre10+mythtv.patch
 
 
 
@@ -3659,8 +3672,8 @@
   Make sure that your .blackboxrc file has:
 
 
-       session.screen0.focusNewWindows:        True
-       session.screen0.focusModel:     SloppyFocus
+  session.screen0.focusNewWindows:        True
+  session.screen0.focusModel:     SloppyFocus
 
 
 
@@ -3738,6 +3751,7 @@
   There are three sizes that are important for matching the MythTV GUI
   and full screen TV playback to fit the screen:
 
+
   +o  the X display size
 
   +o  the X Desktop (virtual) dimensions
@@ -3787,6 +3801,7 @@
   you can specify a screen in Setup->General. The picture will be
   stretched to fit the entire screen regardless of the ``capture
   resolutions'' used.
+
 
 
   [1m19.5.3.  Overscan Dimensions[0m
@@ -3853,8 +3868,6 @@
   [1mNOTE[22m:  Performing this step will remove the entire database.  You will
   lose all of your settings and will need to re-run the mc.sql script to
   setup the database structure before running the setup program.
-
-
        $ mysql -u root
        mysql> drop database mythconverg;
        mysql> quit
@@ -3980,8 +3993,6 @@
 
   This should create an ivtv directory.  Switch to it and perform the
   following commands:
-
-
        $ cd ivtv/ivtv/utils
        $ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_16_21062.exe
        $ su
@@ -3993,6 +4004,8 @@
   The [1mivtvfwextract [22mprogram extracts the firmware required for the card.
   You may want to go to the website and download the latest Windows
   driver if the [1mwget [22mcommand fails.
+
+
        $ cd ~/ivtv/ivtv/driver
        $ make
 
@@ -4021,10 +4034,7 @@
 
 
        $ su
-       # cd /lib/modules/2.4.21-0.16mdk/kernel/drivers/media/video
-       # cp /home/[yourusername]/ivtv/ivtv/driver/msp3400.o .
-       # cp /home/[yourusername]/ivtv/ivtv/driver/saa7115.o .
-       # cp /home/[yourusername]/ivtv/ivtv/driver/ivtv.o .
+       # make install
        # depmod -a
 
 
@@ -4043,15 +4053,16 @@
   Check that the card is being recognized on the PCI bus:
 
 
-       $ lspci -v
-       <snip>
 
-       00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
-       Encoder (rev 01)
-               Subsystem: Hauppauge computer works Inc.: Unknown device 4801
-               Flags: bus master, medium devsel, latency 32, IRQ 11
-               Memory at d0000000 (32-bit, prefetchable) [size=64M]
-               Capabilities: <available only to root>
+  $ lspci -v
+  <snip>
+
+  00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
+  Encoder (rev 01)
+          Subsystem: Hauppauge computer works Inc.: Unknown device 4801
+          Flags: bus master, medium devsel, latency 32, IRQ 11
+          Memory at d0000000 (32-bit, prefetchable) [size=64M]
+          Capabilities: <available only to root>
 
 
 
@@ -4070,7 +4081,7 @@
 
   In this case, the ivtv device is video0.
 
-  Go into setup/setup on the machine hosting the hardware MPEG2 card.
+  Go into setup/setup on the machine hosting the hardware MPEG-2 card.
   When you add a new capture card, ensure that you are using the video0
   device.
 
@@ -4085,26 +4096,6 @@
   The remaining setup is just like a standard V4L card; define a video
   source if you have not already done so, and assign the video source to
   a video card input on the Input Connections screen.
-
-  If you'd like to use the [1mptune.pl [22mcommand to check that your card is
-  working before trying to use it in MythTV, you'll need to install a
-  module first:
-
-
-       # perl -MCPAN -e shell
-       perl> install Video::Capture::V4l
-       perl> exit
-
-
-
-  You may then change the channel:
-
-
-       $ ./ptune.pl 42
-
-
-
-  will change the Tuner channel to "42".
 
   You should also [1mmodprobe [22mthe ivtv driver before using it.  The
   simplest technique is to add the [1mmodprobe[22m> command to
@@ -4124,8 +4115,6 @@
 
 
        /var/video (rw)
-
-
 
   To export the /var/video directory with read / write privileges.
 
@@ -4178,6 +4167,8 @@
        $ su
        # cp etc.sysconfig.mythbackend /etc/sysconfig/mythbackend
 
+
+
   Edit /etc/sysconfig/mythbackend if you want to change the defaults
   (the userid that should start mythbackend, location of the logfile and
   (if required) the name and location of the mythbackend binary).
@@ -4186,10 +4177,11 @@
   runlevels 3, 4 or 5:
 
 
-       $ su
-       # chkconfig 345 mythbackend on
-       # exit
-       $
+
+  $ su
+  # chkconfig 345 mythbackend on
+  # exit
+  $
 
 
 
@@ -4244,10 +4236,11 @@
   may add it by typing:
 
 
-       $ cd contrib
-       $ su
-       # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
-       # exit
+
+  $ cd contrib
+  $ su
+  # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
+  # exit
 
 
 

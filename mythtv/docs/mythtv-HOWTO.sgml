@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-05-10, v2.33
+<date>2003-05-14, v2.34
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -14,7 +14,7 @@ necessary.
 
 <toc>
 
-<sect>How to obtain this document. 
+<sect>How to obtain this document. <label id="how_to_obtain">
 <p>This HOWTO document is maintained at
 the primary MythTV website: <url url="http://www.mythtv.org"
 name="http://www.mythtv.org">.  The latest version of this document can be
@@ -126,13 +126,13 @@ Here are a few data points:
 codec using 480x480 capture resolution.  This does not allow for live TV
 watching, but does allow for encoding video and then watching it later.
 <item>The developer states that his AMD1800+ system can <bf>almost</bf>
-encode two MPEG4 video streams and watch one program simultaneously.
+encode two MPEG-4 video streams and watch one program simultaneously.
 <item>A PIII/800Mhz system with 512MB RAM can encode one video
 stream using the RTJPEG codec with 480x480 capture resolution and play it back
 simultaneously, thereby allowing live TV watching.
-<item>A dual Celeron/450Mhz is able to view a 480x480 MPEG4/3300Kbps file
+<item>A dual Celeron/450Mhz is able to view a 480x480 MPEG-4/3300Kbps file
 created on a different system with 30% CPU usage.
-<item>A P4 2.4Ghz machine can encode two 3300Kbps 480x480 MPEG4 files and
+<item>A P4 2.4Ghz machine can encode two 3300Kbps 480x480 MPEG-4 files and
 simultaneously serve content to a remote frontend.
 </itemize>
 
@@ -2028,8 +2028,8 @@ implementation of SSE instructions, so if your processor has 3dnow you
 shouldn't have any issues with deinterlacing.
 
 <sect1>Recording
-<p>Currently, MythTV supports two different video encoders, MPEG4 and RTJPEG. 
-Take note that RTJPEG has lower CPU demands, but makes large files, and MPEG4
+<p>Currently, MythTV supports two different video encoders, MPEG-4 and RTJPEG. 
+Take note that RTJPEG has lower CPU demands, but makes large files, and MPEG-4
 has high CPU demands, but makes smaller files.
 
 <bf>NOTE</bf>: although the width and height can be changed to almost
@@ -2682,15 +2682,17 @@ $ xset -dpms s off
 Finally, depending on your distribution, you may be able to turn it off from
 within the control panel.
 
-<sect1>I can't checkout using CVS anymore!
+<sect1>I can't checkout using CVS anymore! 
 <p>Isaac has changed some things around.  The CVS repository is now known as
 <tt>cvs.mythtv.org</tt>, rather than <tt>www.mythtv.org</tt> or
-<tt>mythtv.org</tt>.  Make sure you change your <tt>CVSROOT</tt> to point to
-the new server, delete your old tree, and re-do the checkout.
+<tt>mythtv.org</tt> and the path has changed.  Make sure you change your
+<tt>CVSROOT</tt> to point to the new server and path, delete your old tree,
+and re-do the checkout.  See Section 1, <ref id="how_to_obtain" name="How to
+Obtain this document"> for the full name and path.
 
 <sect1>I get segfaults / MythTV isn't doing anything.
 <p>Without details, the developers will not be able to determine if you have
-discovered a genuine code-bug,  or it the problem is with your system.  In
+discovered a genuine code-bug,  or if the problem is with your system.  In
 order to determine what's going on, you must recompile MythTV with debugging
 support and run MythTV within <bf>gdb</bf>, the GNU debugger.
 
@@ -2726,7 +2728,9 @@ conditions.
 Type "show copying" to see the conditions.
 There is absolutely no warranty for GDB.  Type "show warranty" for details.
 This GDB was configured as "i586-mandrake-linux-gnu"...
-(gdb)
+(gdb) handle SIGPIPE nostop
+Signal        Stop      Print   Pass to program Description
+SIGPIPE       No        Yes     Yes             Broken pipe
 </verb></tscreen>
 
 <bf>gdb</bf> has a number of options, read the <tt>man</tt> page for more
@@ -2739,6 +2743,15 @@ type <tt>thread apply all bt full</tt>.
 The backtrace information for all the threads should be posted to the
 mythtv-dev mailing list, along with the steps you followed to get the
 program to crash.
+
+If you're trying to troubleshoot and you can't get back to the gdb window
+for some reason, it may be easier to use two systems.
+
+First, connect to the system that you're going to test using <bf/ssh</> or
+<bf/telnet/>, then type <tt>$ export DISPLAY=localhost:0.0</tt>.  This will
+allow the grpahics to be displayed on one machine (the one that you're
+testing) and still have text-mode output available.  You can now continue
+troubleshooting using <bf/gdb/> as detailed in the instructions.
 
 <sect1>MythTV makes my system crash. 
 <p>MythTV <em>can not</em> crash your system - it is a user-level program. 
@@ -3252,10 +3265,7 @@ Next, copy the files that were compiled in the driver directory into the
 appropriate modules directory:
 <tscreen><verb>
 $ su
-# cd /lib/modules/2.4.21-0.16mdk/kernel/drivers/media/video
-# cp /home/[yourusername]/ivtv/ivtv/driver/msp3400.o .
-# cp /home/[yourusername]/ivtv/ivtv/driver/saa7115.o .
-# cp /home/[yourusername]/ivtv/ivtv/driver/ivtv.o .
+# make install
 # depmod -a
 </verb></tscreen>
 
@@ -3294,7 +3304,7 @@ crw-------    1 mythtv   root      81,  32 Dec 31  1969 /dev/v4l/video32
 
 In this case, the ivtv device is <tt>video0</tt>.
 
-Go into <tt>setup/setup</tt> on the machine hosting the hardware MPEG2 card.
+Go into <tt>setup/setup</tt> on the machine hosting the hardware MPEG-2 card.
 When you add a new capture card, ensure that you are using the
 <tt>video0</tt> device.  
 
@@ -3309,22 +3319,6 @@ press ENTER.
 The remaining setup is just like a standard V4L card; define a video source
 if you have not already done so, and assign the video source to a video card
 input on the Input Connections screen.
-
-If you'd like to use the <bf>ptune.pl</bf> command to check that your card
-is working before trying to use it in MythTV, you'll need to install a
-module first:
-<tscreen><verb>
-# perl -MCPAN -e shell
-perl> install Video::Capture::V4l
-perl> exit
-</verb></tscreen>
-
-You may then change the channel:
-<tscreen><verb>
-$ ./ptune.pl 42
-</verb></tscreen>
-
-will change the Tuner channel to "42".
 
 You should also <bf>modprobe</bf> the ivtv driver before using it.  The
 simplest technique is to add the <bf/modprobe/> command to
@@ -3545,6 +3539,9 @@ v2.32, 2003-05-09.  Speeling correction.
 v2.33, 2003-05-10.  Added xset command to .xinitrc for blackbox.  Added
 .blackboxrc example.  Added link to nyvalls.se RPMS for Mandrake.  Added
 people to the contributors section.
+v2.34, 2003-05-14.  Updated PVR-250 example.  Remove ptune.pl stuff; it's
+changing too fast.  Updated gdb troubleshooting section.  Updated "can't CVS
+checkout anymore" section.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

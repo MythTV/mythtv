@@ -205,19 +205,21 @@ $ xset -dpms s off
 <P>Finally, depending on your distribution, you may be able to turn it off from
 within the control panel.</P>
 
-<H2><A NAME="ss18.8">18.8</A> <A HREF="mythtv-HOWTO.html#toc18.8">I can't checkout using CVS anymore!</A>
+<H2><A NAME="ss18.8">18.8</A> <A HREF="mythtv-HOWTO.html#toc18.8">I can't checkout using CVS anymore! </A>
 </H2>
 
 <P>Isaac has changed some things around.  The CVS repository is now known as
 <CODE>cvs.mythtv.org</CODE>, rather than <CODE>www.mythtv.org</CODE> or
-<CODE>mythtv.org</CODE>.  Make sure you change your <CODE>CVSROOT</CODE> to point to
-the new server, delete your old tree, and re-do the checkout.</P>
+<CODE>mythtv.org</CODE> and the path has changed.  Make sure you change your
+<CODE>CVSROOT</CODE> to point to the new server and path, delete your old tree,
+and re-do the checkout.  See Section 1, 
+<A HREF="mythtv-HOWTO-1.html#how_to_obtain">How to Obtain this document</A> for the full name and path.</P>
 
 <H2><A NAME="ss18.9">18.9</A> <A HREF="mythtv-HOWTO.html#toc18.9">I get segfaults / MythTV isn't doing anything.</A>
 </H2>
 
 <P>Without details, the developers will not be able to determine if you have
-discovered a genuine code-bug,  or it the problem is with your system.  In
+discovered a genuine code-bug,  or if the problem is with your system.  In
 order to determine what's going on, you must recompile MythTV with debugging
 support and run MythTV within <B>gdb</B>, the GNU debugger.</P>
 <P>Edit the settings.pro file.  Make sure that the top of the file looks like this:
@@ -257,7 +259,9 @@ conditions.
 Type "show copying" to see the conditions.
 There is absolutely no warranty for GDB.  Type "show warranty" for details.
 This GDB was configured as "i586-mandrake-linux-gnu"...
-(gdb)
+(gdb) handle SIGPIPE nostop
+Signal        Stop      Print   Pass to program Description
+SIGPIPE       No        Yes     Yes             Broken pipe
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -269,6 +273,13 @@ type <CODE>thread apply all bt full</CODE>.</P>
 <P>The backtrace information for all the threads should be posted to the
 mythtv-dev mailing list, along with the steps you followed to get the
 program to crash.</P>
+<P>If you're trying to troubleshoot and you can't get back to the gdb window
+for some reason, it may be easier to use two systems.</P>
+<P>First, connect to the system that you're going to test using <B>ssh</B> or
+<B>telnet</B>>, then type <CODE>$ export DISPLAY=localhost:0.0</CODE>.  This will
+allow the grpahics to be displayed on one machine (the one that you're
+testing) and still have text-mode output available.  You can now continue
+troubleshooting using <B>gdb</B>> as detailed in the instructions.</P>
 
 <H2><A NAME="ss18.10">18.10</A> <A HREF="mythtv-HOWTO.html#toc18.10">MythTV makes my system crash. </A>
 </H2>
