@@ -532,7 +532,7 @@ TTFFont::TTFFont(char *file, int size, int video_width, int video_height)
 	   max_ascent = ((bbox.yMax + 63) & -64);
    }
 
-   use_kerning = FT_HAS_KERNING(face);
+   use_kerning = 0; //FT_HAS_KERNING(face);
 
    valid = true;
 }
