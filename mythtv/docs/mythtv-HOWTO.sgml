@@ -14,6 +14,9 @@ documentation so that it's not dependant on CVSROOT being set, pointer to
 Tarek's DirecTV and external channel changing script, moved text around so
 that external tuner / DirecTV are located under "using mythtv".  Added
 troubleshooting information about KDE vs. Gnome on RH 8.0
+v1.033, 2002-11-23.  Fixed the XMLTV/mythfilldatabase instruction to point
+to the correct file.  Slight wording changes to the DirecTV stuff.  Moved
+some CVS parameters around.
 -->
 <!--
 To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
@@ -24,7 +27,7 @@ To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-11-22, v1.032
+<date>2002-11-23, v1.033
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -48,7 +51,7 @@ documentation from CVS this way:
 % cvs -d :pserver:mythtv@mythtv.org:/var/lib/cvs login
 Logging in to :pserver:mythtv@mythtv.org:/var/lib/cvs
 CVS password: mythtv
-% cvs -d :pserver:mythtv@mythtv.org:/var/lib/cvs -z3 checkout MC
+% cvs -z3 -d :pserver:mythtv@mythtv.org:/var/lib/cvs checkout MC
 </verb></tscreen>
 This documentation will be in the <tt>docs/</tt> subdirectory.
 
@@ -934,7 +937,7 @@ recorded, so it's important that this program is always running.
 <p>mythtv is "themeable", meaning that the visual appearance of the program
 can be modified by the user without re-compiling or altering the program
 functionality.
-<tt>usr/local/share/mythtv/theme.txt</tt> allows you to alter the theme
+<tt>/usr/local/share/mythtv/theme.txt</tt> allows you to alter the theme
 for mythtv.  The default theme is called "blue".  Other themes that ship
 with mythtv can be found in the <tt>/usr/local/share/mythtv/themes</tt>
 directory.  Change the first variable in the <tt>theme.txt</tt> file and
@@ -955,7 +958,7 @@ the author.
 <sect1>Adding support for an external tuner.
 <!-- Make this better -->
 <p>mythtv supports changing the channel on an external tuner.  If you have
-an external tuner, like a DirecTV or digital cable set top box, the
+an external tuner, such as a DirecTV or digital cable set top box, the
 following command should be added to your settings.txt file:
 <tscreen><verb>
 str ExternalChannelCommand=/usr/local/bin/changechannel
@@ -1144,8 +1147,9 @@ variable is set correctly.
 </itemize>
 <sect1>mythfilldatabase failing.
 <p>If mythtvfilldatabase appears to be failing, edit the
-<tt>/usr/bin/tv_grab_na</tt> file and replace "tvlistings2" with
-"tvlistings" in line 1187.
+<tt>/usr/lib/perl5/site_perl/5.8.0/XMLTV/ZapListings.pm</tt> file and
+perform a global search and replace, searching for "tvlistings2" and
+replacing it with "tvlistings".
 <sect1>mythtv seems to disappear; can't see video
 <p>If you're using Gnome as your window manager, try switching to KDE.  For
 Red Hat Linux 8.0 users, edit <tt>/etc/sysconfig/desktop</tt> and

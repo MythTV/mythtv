@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2002-11-22, v1.032
+  2002-11-23, v1.033
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -103,7 +103,7 @@
        % cvs -d :pserver:mythtv@mythtv.org:/var/lib/cvs login
        Logging in to :pserver:mythtv@mythtv.org:/var/lib/cvs
        CVS password: mythtv
-       % cvs -d :pserver:mythtv@mythtv.org:/var/lib/cvs -z3 checkout MC
+       % cvs -z3 -d :pserver:mythtv@mythtv.org:/var/lib/cvs checkout MC
 
   This documentation will be in the docs/ subdirectory.
 
@@ -1003,7 +1003,7 @@
 
   mythtv is "themeable", meaning that the visual appearance of the
   program can be modified by the user without re-compiling or altering
-  the program functionality.  usr/local/share/mythtv/theme.txt allows
+  the program functionality.  /usr/local/share/mythtv/theme.txt allows
   you to alter the theme for mythtv.  The default theme is called
   "blue".  Other themes that ship with mythtv can be found in the
   /usr/local/share/mythtv/themes directory.  Change the first variable
@@ -1025,8 +1025,8 @@
   [1m10.3.  Adding support for an external tuner.[0m
 
   mythtv supports changing the channel on an external tuner.  If you
-  have an external tuner, like a DirecTV or digital cable set top box,
-  the following command should be added to your settings.txt file:
+  have an external tuner, such as a DirecTV or digital cable set top
+  box, the following command should be added to your settings.txt file:
 
        str ExternalChannelCommand=/usr/local/bin/changechannel
 
@@ -1221,8 +1221,9 @@
   [1m15.2.  mythfilldatabase failing.[0m
 
   If mythtvfilldatabase appears to be failing, edit the
-  /usr/bin/tv_grab_na file and replace "tvlistings2" with "tvlistings"
-  in line 1187.
+  /usr/lib/perl5/site_perl/5.8.0/XMLTV/ZapListings.pm file and perform a
+  global search and replace, searching for "tvlistings2" and replacing
+  it with "tvlistings".
 
   [1m15.3.  mythtv seems to disappear; can't see video[0m
 
