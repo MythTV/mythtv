@@ -1020,19 +1020,19 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         {
             cerr << "2xx STATUS did not contain a valid Audio codec\n";
             BuildSendAck();  // What is the right thing to do here?
-            BuildSendBye();
+            BuildSendBye(0);
             State = SIP_DISCONNECTING;
         }
         break;
     case SIP_OCONNECTING1_INVITE:
         // This is usually because we sent the INVITE to ourselves, & when we receive it matches the call-id for this call leg
         (parent->Timer())->Stop(this, SIP_RETX);
-        BuildSendCancel();
+        BuildSendCancel(0);
         State = SIP_DISCONNECTING;
         break;
     case SIP_OCONNECTING1_HANGUP:
         (parent->Timer())->Stop(this, SIP_RETX);
-        BuildSendCancel();
+        BuildSendCancel(0);
         State = SIP_IDLE;
         break;
     case SIP_OCONNECTING1_RETX:
@@ -1042,7 +1042,7 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
             State = SIP_IDLE;
         break;
     case SIP_OCONNECTING2_HANGUP:
-        BuildSendCancel();
+        BuildSendCancel(0);
         State = SIP_DISCONNECTING;
         break;
     case SIP_ICONNECTING_ANSWER:
@@ -1077,7 +1077,7 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
             BuildSendStatus(400, "BYE"); //400 Bad Request
         break;
     case SIP_CONNECTED_HANGUP:
-        BuildSendBye();
+        BuildSendBye(0);
         State = SIP_DISCONNECTING;
         break;
     case SIP_DISCONNECTING_ACK:
@@ -1097,11 +1097,21 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         break;
     case SIP_DISCONNECTING_BYESTATUS:
         (parent->Timer())->Stop(this, SIP_RETX); 
-        State = SIP_IDLE;
+        if ((sipMsg->getStatusCode() == 407) && (viaRegProxy != 0) && (viaRegProxy->isRegistered())) // Authentication Required
+        {
+            BuildSendBye(sipMsg);
+        }
+        else
+            State = SIP_IDLE;
         break;
     case SIP_DISCONNECTING_CANCELSTATUS:
         (parent->Timer())->Stop(this, SIP_RETX); 
-        State = SIP_IDLE;
+        if ((sipMsg->getStatusCode() == 407) && (viaRegProxy != 0) && (viaRegProxy->isRegistered())) // Authentication Required
+        {
+            BuildSendCancel(sipMsg);
+        }
+        else
+            State = SIP_IDLE;
         break;
     case SIP_DISCONNECTING_BYE:
         (parent->Timer())->Stop(this, SIP_RETX); 
@@ -1184,7 +1194,9 @@ void SipCall::BuildSendInvite(SipMsg *authMsg)
     Invite.addFrom(*myFromUrl);
     Invite.addTo(*remoteUrl);
     Invite.addCallId(CallId);
-    Invite.addCSeq(++cseq);
+    if (!authMsg)
+        ++cseq;
+    Invite.addCSeq(cseq);
     Invite.addUserAgent();
 
     if (authMsg)
@@ -1194,7 +1206,6 @@ void SipCall::BuildSendInvite(SipMsg *authMsg)
         else
             cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod() << endl;
     }
-
 
     //Invite.addAllow();
     Invite.addContact(*myContactUrl);
@@ -1257,7 +1268,7 @@ void SipCall::BuildSendAck()
 }
 
 
-void SipCall::BuildSendCancel()
+void SipCall::BuildSendCancel(SipMsg *authMsg)
 {
     debugSent.append("Cancel ");
 
@@ -1275,6 +1286,15 @@ void SipCall::BuildSendCancel()
     Cancel.addCallId(CallId);
     Cancel.addCSeq(cseq);
     Cancel.addUserAgent();
+
+    if (authMsg)
+    {
+        if (authMsg->getAuthMethod() == "Digest")
+            Cancel.addProxyAuthorization(authMsg->getAuthMethod(), viaRegProxy->registeredAs(), viaRegProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), "sip:" + viaRegProxy->registeredTo());
+        else
+            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod() << endl;
+    }
+
     Cancel.addNullContent();
 
     // Send new transactions to (a) record route, (b) contact URL or (c) configured URL
@@ -1333,7 +1353,7 @@ void SipCall::BuildSendStatus(int Code, QString Method, int Option)
 }
 
 
-void SipCall::BuildSendBye()
+void SipCall::BuildSendBye(SipMsg *authMsg)
 {
     debugSent.append("Bye ");
 
@@ -1357,8 +1377,19 @@ void SipCall::BuildSendBye()
         Bye.addTo(*remoteUrl, remoteTag);
     }
     Bye.addCallId(CallId);
-    Bye.addCSeq(++cseq);
+    if (!authMsg)
+        ++cseq;
+    Bye.addCSeq(cseq);
     Bye.addUserAgent();
+
+    if (authMsg)
+    {
+        if (authMsg->getAuthMethod() == "Digest")
+            Bye.addProxyAuthorization(authMsg->getAuthMethod(), viaRegProxy->registeredAs(), viaRegProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), "sip:" + viaRegProxy->registeredTo());
+        else
+            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod() << endl;
+    }
+
     Bye.addNullContent();
 
     // Send new transactions to (a) record route, (b) contact URL or (c) configured URL

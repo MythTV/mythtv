@@ -269,8 +269,8 @@ class SipCall : public SipFsmBase
     void ForwardMessage(SipMsg *msg);
     void BuildSendInvite(SipMsg *authMsg);
     void BuildSendAck();
-    void BuildSendBye();
-    void BuildSendCancel();
+    void BuildSendBye(SipMsg *authMsg);
+    void BuildSendCancel(SipMsg *authMsg);
     void BuildSendStatus(int Status, QString Method, int Option=0);
     bool Retransmit(bool force);
     void AlertUser(SipMsg *rxMsg);
