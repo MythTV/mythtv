@@ -304,14 +304,16 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 enc->debug = 0;
                 enc->rate_emu = 0;
 
+                if (enc->codec_id == CODEC_ID_MPEG1VIDEO || 
+                    enc->codec_id == CODEC_ID_MPEG2VIDEO)
+                {
 #ifdef USING_XVMC
-                if (enc->codec_id == CODEC_ID_MPEG1VIDEO)
                     enc->codec_id = CODEC_ID_MPEG2VIDEO_XVMC;
 #endif            
 #ifdef USING_VIASLICE
-                if (enc->codec_id == CODEC_ID_MPEG1VIDEO)
                     enc->codec_id = CODEC_ID_MPEG2VIDEO_VIA;
 #endif
+                }
 
                 AVCodec *codec = avcodec_find_decoder(enc->codec_id);
 
@@ -784,7 +786,9 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
         {
             AVCodecContext *context = &(curstream->codec);
             if (context->codec_id == CODEC_ID_MPEG1VIDEO ||
-                context->codec_id == CODEC_ID_MPEG2VIDEO_XVMC)
+                context->codec_id == CODEC_ID_MPEG2VIDEO ||
+                context->codec_id == CODEC_ID_MPEG2VIDEO_XVMC ||
+                context->codec_id == CODEC_ID_MPEG2VIDEO_VIA)
             {
                 int startpos = 0;
                 if ((startpos = PacketHasHeader(ptr, len, SEQ_START)))
@@ -956,7 +960,10 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                             newvpts = (long long)((double)pkt->pts * 
                                                   ptsmultiplier); 
                         }
-                        else if (context->codec_id == CODEC_ID_MPEG1VIDEO)
+                        else if (context->codec_id == CODEC_ID_MPEG1VIDEO ||
+                                 context->codec_id == CODEC_ID_MPEG2VIDEO ||
+                                 context->codec_id == CODEC_ID_MPEG2VIDEO_XVMC ||
+                                 context->codec_id == CODEC_ID_MPEG2VIDEO_VIA)
                         {
                             // guess, based off of the audio timestamp and 
                             // the prebuffer size

@@ -33,7 +33,6 @@ using namespace std;
 extern "C" {
 #include "../libavcodec/avcodec.h"
 #include "../libavformat/avformat.h"
-extern AVInputFormat mpegps_demux;  // change me possible
 }
 
 //#define BUFFER_SIZE 4096

@@ -69,6 +69,8 @@ static int h263_pred_dc(MpegEncContext * s, int n, uint16_t **dc_val_ptr);
 #ifdef CONFIG_ENCODERS
 static void mpeg4_inv_pred_ac(MpegEncContext * s, DCTELEM *block, int n,
                               int dir);
+static void mpeg4_encode_visual_object_header(MpegEncContext * s);
+static void mpeg4_encode_vol_header(MpegEncContext * s, int vo_number, int vol_number);
 #endif //CONFIG_ENCODERS
 static void mpeg4_decode_sprite_trajectory(MpegEncContext * s);
 static inline int ff_mpeg4_pred_dc(MpegEncContext * s, int n, uint16_t **dc_val_ptr, int *dir_ptr);
@@ -563,7 +565,6 @@ void mpeg4_encode_mb(MpegEncContext * s,
 		    int motion_x, int motion_y)
 {
     int cbpc, cbpy, pred_x, pred_y;
-    int bits;
     PutBitContext * const pb2    = s->data_partitioning                         ? &s->pb2    : &s->pb;
     PutBitContext * const tex_pb = s->data_partitioning && s->pict_type!=B_TYPE ? &s->tex_pb : &s->pb;
     PutBitContext * const dc_pb  = s->data_partitioning && s->pict_type!=I_TYPE ? &s->pb2    : &s->pb;
@@ -1580,6 +1581,19 @@ void h263_encode_init(MpegEncContext *s)
         s->luma_dc_vlc_length= uni_DCtab_lum_len;
         s->chroma_dc_vlc_length= uni_DCtab_chrom_len;
         s->ac_esc_length= 7+2+1+6+1+12+1;
+        
+        if(s->flags & CODEC_FLAG_GLOBAL_HEADER){
+            s->avctx->extradata= av_malloc(1024);
+            init_put_bits(&s->pb, s->avctx->extradata, 1024, NULL, NULL);
+            
+            mpeg4_encode_visual_object_header(s);
+            mpeg4_encode_vol_header(s, 0, 0);
+
+//            ff_mpeg4_stuffing(&s->pb); ?
+            flush_put_bits(&s->pb);
+            s->avctx->extradata_size= (get_bit_count(&s->pb)+7)>>3;
+        }
+        
         break;
     case CODEC_ID_H263P:
         s->fcode_tab= umv_fcode_tab;
@@ -1716,13 +1730,6 @@ void ff_mpeg4_stuffing(PutBitContext * pbc)
 void ff_set_mpeg4_time(MpegEncContext * s, int picture_number){
     int time_div, time_mod;
 
-    if(s->pict_type==I_TYPE){ //we will encode a vol header
-        int dummy;
-        av_reduce(&s->time_increment_resolution, &dummy, s->avctx->frame_rate, s->avctx->frame_rate_base, (1<<16)-1);
-        
-        s->time_increment_bits = av_log2(s->time_increment_resolution - 1) + 1;
-    }
-    
     if(s->current_picture.pts)
         s->time= (s->current_picture.pts*s->time_increment_resolution + 500*1000)/(1000*1000);
     else
@@ -1859,7 +1866,11 @@ static void mpeg4_encode_vol_header(MpegEncContext * s, int vo_number, int vol_n
     s->quant_precision=5;
     put_bits(&s->pb, 1, 0);		/* not 8 bit == false */
     put_bits(&s->pb, 1, s->mpeg_quant);	/* quant type= (0=h263 style)*/
-    if(s->mpeg_quant) put_bits(&s->pb, 2, 0); /* no custom matrixes */
+
+    if(s->mpeg_quant){
+        ff_write_quant_matrix(&s->pb, s->avctx->intra_matrix);
+        ff_write_quant_matrix(&s->pb, s->avctx->inter_matrix);
+    }
 
     if (vo_ver_id != 1)
         put_bits(&s->pb, 1, s->quarter_sample);
@@ -4551,14 +4562,15 @@ static int decode_vol_header(MpegEncContext *s, GetBitContext *gb){
         skip_bits(gb, 4);  //video_object_layer_shape_extension
     }
 
-    skip_bits1(gb);   /* marker */
+    check_marker(gb, "before time_increment_resolution");
     
     s->time_increment_resolution = get_bits(gb, 16);
     
     s->time_increment_bits = av_log2(s->time_increment_resolution - 1) + 1;
     if (s->time_increment_bits < 1)
         s->time_increment_bits = 1;
-    skip_bits1(gb);   /* marker */
+        
+    check_marker(gb, "before fixed_vop_rate");
 
     if (get_bits1(gb) != 0) {   /* fixed_vop_rate  */
         skip_bits(gb, s->time_increment_bits);
@@ -4648,8 +4660,8 @@ static int decode_vol_header(MpegEncContext *s, GetBitContext *gb){
                 /* replicate last value */
                 for(; i<64; i++){
 		    int j= s->dsp.idct_permutation[ ff_zigzag_direct[i] ];
-                    s->intra_matrix[j]= v;
-                    s->chroma_intra_matrix[j]= v;
+                    s->intra_matrix[j]= last;
+                    s->chroma_intra_matrix[j]= last;
                 }
             }
 
@@ -4833,7 +4845,7 @@ static int decode_vop_header(MpegEncContext *s, GetBitContext *gb){
     check_marker(gb, "before time_increment");
     
     if(s->time_increment_bits==0){
-        printf("hmm, seems the headers arnt complete, trying to guess time_increment_bits\n"); 
+        printf("hmm, seems the headers arnt complete, trying to guess time_increment_bits\n");
 
         for(s->time_increment_bits=1 ;s->time_increment_bits<16; s->time_increment_bits++){
             if(show_bits(gb, s->time_increment_bits+1)&1) break;
@@ -4842,7 +4854,10 @@ static int decode_vop_header(MpegEncContext *s, GetBitContext *gb){
         printf("my guess is %d bits ;)\n",s->time_increment_bits);
     }
     
-    time_increment= get_bits(gb, s->time_increment_bits);
+    if(IS_3IV1) time_increment= get_bits1(gb); //FIXME investigate further
+    else time_increment= get_bits(gb, s->time_increment_bits);
+    
+//    printf("%d %X\n", s->time_increment_bits, time_increment);
 //printf(" type:%d modulo_time_base:%d increment:%d\n", s->pict_type, time_incr, time_increment);
     if(s->pict_type!=B_TYPE){
         s->last_time_base= s->time_base;
@@ -5070,7 +5085,7 @@ int ff_mpeg4_decode_picture_header(MpegEncContext * s, GetBitContext *gb)
 
         switch(startcode){
         case 0x120:
-            if(decode_vol_header(s, gb) < 0)
+            if(decode_vol_header(s, gb) < 0) 
                 return -1;
             break;
         case USER_DATA_STARTCODE:

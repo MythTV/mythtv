@@ -15,14 +15,15 @@ extern "C" {
 
 #define LIBAVCODEC_VERSION_INT 0x000406
 #define LIBAVCODEC_VERSION     "0.4.6"
-#define LIBAVCODEC_BUILD       4673
-#define LIBAVCODEC_BUILD_STR   "4673"
+#define LIBAVCODEC_BUILD       4676
+#define LIBAVCODEC_BUILD_STR   "4676"
 
 #define LIBAVCODEC_IDENT	"FFmpeg" LIBAVCODEC_VERSION "b" LIBAVCODEC_BUILD_STR
 
 enum CodecID {
     CODEC_ID_NONE, 
     CODEC_ID_MPEG1VIDEO,
+    CODEC_ID_MPEG2VIDEO,
     CODEC_ID_MPEG2VIDEO_XVMC,
     CODEC_ID_MPEG2VIDEO_VIA,
     CODEC_ID_H263,
@@ -64,6 +65,7 @@ enum CodecID {
     CODEC_ID_4XM,
     CODEC_ID_VCR1,
     CODEC_ID_CLJR,
+    CODEC_ID_MDEC,
 
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE,
@@ -456,7 +458,10 @@ typedef struct AVCodecContext {
 
     /**
      * pixel format, see PIX_FMT_xxx.
-     * - encoding: unused
+     * - encoding: FIXME: used by ffmpeg to decide whether an pix_fmt
+     *                    conversion is in order. This only works for
+     *                    codecs with one supported pix_fmt, we should
+     *                    do something for a generic case as well.
      * - decoding: set by lavc.
      */
     enum PixelFormat pix_fmt;
@@ -609,7 +614,7 @@ typedef struct AVCodecContext {
     /**
      * fourcc (LSB first, so "ABCD" -> ('D'<<24) + ('C'<<16) + ('B'<<8) + 'A').
      * this is used to workaround some encoder bugs
-     * - encoding: unused
+     * - encoding: set by user, if not then the default based on codec_id will be used
      * - decoding: set by user, will be converted to upper case by lavc during init
      */
     unsigned int codec_tag;
@@ -1185,12 +1190,26 @@ typedef struct AVCodecContext {
 #define FF_MB_DECISION_RD     2        ///< rate distoration
 
     /**
+     * custom intra quantization matrix
+     * - encoding: set by user, can be NULL
+     * - decoding: set by lavc
+     */
+    uint16_t *intra_matrix;
+
+    /**
+     * custom inter quantization matrix
+     * - encoding: set by user, can be NULL
+     * - decoding: set by lavc
+     */
+    uint16_t *inter_matrix;
+   
+    /**
      * VIA CLE266 Hardware MPEG decoding
      * - encoding: forbidden
      * - decoding: set by decoder
      */
-     int via_hwslice;
-    
+    int via_hwslice;
+ 
 } AVCodecContext;
 
 
@@ -1271,6 +1290,7 @@ extern AVCodec mp2_encoder;
 extern AVCodec mp3lame_encoder;
 extern AVCodec oggvorbis_encoder;
 extern AVCodec mpeg1video_encoder;
+extern AVCodec mpeg2video_encoder;
 extern AVCodec h263_encoder;
 extern AVCodec h263p_encoder;
 extern AVCodec flv_encoder;
@@ -1288,6 +1308,7 @@ extern AVCodec h264_encoder;
 extern AVCodec asv1_encoder;
 extern AVCodec vcr1_encoder;
 extern AVCodec ffv1_encoder;
+extern AVCodec mdec_encoder;
 
 extern AVCodec h263_decoder;
 extern AVCodec mpeg4_decoder;
@@ -1296,7 +1317,8 @@ extern AVCodec msmpeg4v2_decoder;
 extern AVCodec msmpeg4v3_decoder;
 extern AVCodec wmv1_decoder;
 extern AVCodec wmv2_decoder;
-extern AVCodec mpeg_decoder;
+extern AVCodec mpeg1video_decoder;
+extern AVCodec mpeg2video_decoder;
 extern AVCodec mpeg_xvmc_decoder;
 extern AVCodec mpeg_via_decoder;
 extern AVCodec h263i_decoder;
@@ -1329,6 +1351,7 @@ extern AVCodec vcr1_decoder;
 extern AVCodec cljr_decoder;
 extern AVCodec ffv1_decoder;
 extern AVCodec fourxm_decoder;
+extern AVCodec mdec_decoder;
 extern AVCodec ra_144_decoder;
 extern AVCodec ra_288_decoder;
 

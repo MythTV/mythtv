@@ -315,6 +315,9 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
             goto fail;
         }
     }
+
+    ic->duration = AV_NOPTS_VALUE;
+    ic->start_time = AV_NOPTS_VALUE;
     pstrcpy(ic->filename, sizeof(ic->filename), filename);
     pd->filename = ic->filename;
     pd->buf = buf;
@@ -694,8 +697,14 @@ AVStream *av_new_stream(AVFormatContext *s, int id)
         return NULL;
     avcodec_get_context_defaults(&st->codec);
 
+    if (s->iformat) {
+        /* no default bitrate if decoding */
+        st->codec.bit_rate = 0;
+    }
     st->index = s->nb_streams;
     st->id = id;
+    st->start_time = AV_NOPTS_VALUE;
+    st->duration = AV_NOPTS_VALUE;
     s->streams[s->nb_streams++] = st;
     return st;
 }
@@ -1038,12 +1047,6 @@ int get_frame_filename(char *buf, int buf_size,
                     nd = nd * 10 + *p++ - '0';
                 }
                 c = *p++;
-                if (c == '*' && nd > 0) {
-                    // The nd field is actually the modulus
-                    number = number % nd;
-                    c = *p++;
-                    nd = 0;
-                }
             } while (isdigit(c));
 
             switch(c) {

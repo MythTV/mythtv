@@ -39,13 +39,14 @@ int VIA_field_start(MpegEncContext*s, AVCodecContext *avctx)
     }
 
     s->mb_width = (s->width + 15) / 16;
-    s->mb_height = (s->mpeg2 && !s->progressive_sequence) ?
+    s->mb_height = (s->codec_id == CODEC_ID_MPEG2VIDEO && 
+                    !s->progressive_sequence) ?
                       2 * ((s->height + 31) / 32) : (s->height + 15) / 16;
 
     VIAMPGSurface.dwAlternateScan = s->alternate_scan;
     VIAMPGSurface.dwMBwidth = s->width >> 4;
 
-    if (s->mpeg2)
+    if (s->codec_id == CODEC_ID_MPEG2VIDEO)
         VIAMPGSurface.dwMpeg2 = 1;
     else
         VIAMPGSurface.dwMpeg2 = 0;

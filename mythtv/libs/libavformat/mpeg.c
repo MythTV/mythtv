@@ -1,4 +1,4 @@
-/*
+/* 
  * MPEG1/2 mux/demux
  * Copyright (c) 2000, 2001, 2002 Fabrice Bellard.
  *

@@ -287,6 +287,8 @@ typedef struct Vp3DecodeContext {
     int last_coded_y_fragment;
     int last_coded_c_fragment;
 
+    uint8_t edge_emu_buffer[9*2048]; //FIXME dynamic alloc
+    uint8_t qscale_table[2048]; //FIXME dynamic alloc (width+15)/16
 } Vp3DecodeContext;
 
 /************************************************************************
@@ -1185,6 +1187,8 @@ static void init_dequantizer(Vp3DecodeContext *s)
             s->inter_dequant[j] = MIN_DEQUANT_VAL * 2;
         s->inter_dequant[j] *= SCALER;
     }
+    
+    memset(s->qscale_table, (FFMAX(s->intra_y_dequant[1], s->intra_c_dequant[1])+8)/16, 512); //FIXME finetune
 
     /* print debug information as requested */
     debug_dequantizers("intra Y dequantizers:\n");
@@ -2340,7 +2344,7 @@ static void render_fragments(Vp3DecodeContext *s,
     int motion_x, motion_y;
     int upper_motion_limit, lower_motion_limit;
     int motion_halfpel_index;
-    unsigned int motion_source;
+    uint8_t *motion_source;
 
     debug_vp3("  vp3: rendering final fragments for %s\n",
         (plane == 0) ? "Y plane" : (plane == 1) ? "U plane" : "V plane");
@@ -2386,63 +2390,55 @@ static void render_fragments(Vp3DecodeContext *s,
             /* transform if this block was coded */
             if (s->all_fragments[i].coding_method != MODE_COPY) {
 
-                motion_source = s->all_fragments[i].first_pixel;
+                if ((s->all_fragments[i].coding_method == MODE_USING_GOLDEN) ||
+                    (s->all_fragments[i].coding_method == MODE_GOLDEN_MV))
+                    motion_source= golden_plane;
+                else 
+                    motion_source= last_plane;
+
+                motion_source += s->all_fragments[i].first_pixel;
                 motion_halfpel_index = 0;
 
                 /* sort out the motion vector if this fragment is coded
                  * using a motion vector method */
                 if ((s->all_fragments[i].coding_method > MODE_INTRA) &&
                     (s->all_fragments[i].coding_method != MODE_USING_GOLDEN)) {
+                    int src_x, src_y;
                     motion_x = s->all_fragments[i].motion_x;
                     motion_y = s->all_fragments[i].motion_y;
+                    if(plane){
+                        motion_x= (motion_x>>1) | (motion_x&1);
+                        motion_y= (motion_y>>1) | (motion_y&1);
+                    }
+
+                    src_x= (motion_x>>1) + x;
+                    src_y= (motion_y>>1) + y;
 if ((motion_x == 0xbeef) || (motion_y == 0xbeef))
 printf (" help! got beefy vector! (%X, %X)\n", motion_x, motion_y);
 
-                    if (motion_x >= 0) {
-                        motion_halfpel_index = motion_x & 0x01;
-                        motion_source += (motion_x >> 1);
-                    } else  {
-                        motion_x = -motion_x;
-                        motion_halfpel_index = motion_x & 0x01;
-                        motion_source -= ((motion_x + 1) >> 1);
-                    }
+                    motion_halfpel_index = motion_x & 0x01;
+                    motion_source += (motion_x >> 1);
 
 //                    motion_y = -motion_y;
-                    if (motion_y >= 0) {
-                        motion_halfpel_index |= (motion_y & 0x01) << 1;
-                        motion_source += ((motion_y >> 1) * stride);
-                    } else  {
-                        motion_y = -motion_y;
-                        motion_halfpel_index |= (motion_y & 0x01) << 1;
-                        motion_source -= (((motion_y + 1) >> 1) * stride);
-                    }
+                    motion_halfpel_index |= (motion_y & 0x01) << 1;
+                    motion_source += ((motion_y >> 1) * stride);
 
-                    /* if the are any problems with a motion vector, refuse
-                     * to render the block */
-                    if ((motion_source < upper_motion_limit) ||
-                        (motion_source > lower_motion_limit)) {
-                        printf ("  vp3: help! motion source (%d) out of range (%d..%d), fragment %d\n",
-                            motion_source, upper_motion_limit, lower_motion_limit, i);
-                        continue;
+                    if(src_x<0 || src_y<0 || src_x + 9 >= width || src_y + 9 >= height){
+                        uint8_t *temp= s->edge_emu_buffer;
+                        if(stride<0) temp -= 9*stride;
+
+                        ff_emulated_edge_mc(temp, motion_source, stride, 9, 9, src_x, src_y, width, height);
+                        motion_source= temp;
                     }
                 }
 
                 /* first, take care of copying a block from either the
                  * previous or the golden frame */
-                if ((s->all_fragments[i].coding_method == MODE_USING_GOLDEN) ||
-                    (s->all_fragments[i].coding_method == MODE_GOLDEN_MV)) {
-
-                    s->dsp.put_pixels_tab[1][motion_halfpel_index](
-                        output_plane + s->all_fragments[i].first_pixel,
-                        golden_plane + motion_source,
-                        stride, 8);
-
-                } else 
                 if (s->all_fragments[i].coding_method != MODE_INTRA) {
 
-                    s->dsp.put_pixels_tab[1][motion_halfpel_index](
+                    s->dsp.put_no_rnd_pixels_tab[1][motion_halfpel_index](
                         output_plane + s->all_fragments[i].first_pixel,
-                        last_plane + motion_source,
+                        motion_source,
                         stride, 8);
                 }
 
@@ -2699,10 +2695,10 @@ static int vp3_decode_frame(AVCodecContext *avctx,
         debug_vp3(", keyframe\n");
         /* skip the other 2 header bytes for now */
         skip_bits(&gb, 16);
-
         if (s->last_frame.data[0] == s->golden_frame.data[0]) {
             if (s->golden_frame.data[0])
                 avctx->release_buffer(avctx, &s->golden_frame);
+            s->last_frame= s->golden_frame; /* ensure that we catch any access to this released frame */
         } else {
             if (s->golden_frame.data[0])
                 avctx->release_buffer(avctx, &s->golden_frame);
@@ -2710,7 +2706,7 @@ static int vp3_decode_frame(AVCodecContext *avctx,
                 avctx->release_buffer(avctx, &s->last_frame);
         }
 
-        s->golden_frame.reference = 0;
+        s->golden_frame.reference = 3;
         if(avctx->get_buffer(avctx, &s->golden_frame) < 0) {
             printf("vp3: get_buffer() failed\n");
             return -1;
@@ -2728,12 +2724,15 @@ static int vp3_decode_frame(AVCodecContext *avctx,
         debug_vp3("\n");
 
         /* allocate a new current frame */
-        s->current_frame.reference = 0;
+        s->current_frame.reference = 3;
         if(avctx->get_buffer(avctx, &s->current_frame) < 0) {
             printf("vp3: get_buffer() failed\n");
             return -1;
         }
     }
+
+    s->current_frame.qscale_table= s->qscale_table; //FIXME allocate individual tables per AVFrame
+    s->current_frame.qstride= 0;
 
     init_frame(s, &gb);
 
@@ -2789,6 +2788,7 @@ if (!s->keyframe) {
 
     /* shuffle frames (last = current) */
     memcpy(&s->last_frame, &s->current_frame, sizeof(AVFrame));
+    s->current_frame.data[0]= NULL; /* ensure that we catch any access to this released frame */
 
     return buf_size;
 }
@@ -2806,9 +2806,9 @@ static int vp3_decode_end(AVCodecContext *avctx)
     av_free(s->superblock_macroblocks);
     av_free(s->macroblock_fragments);
     av_free(s->macroblock_coding);
-
+    
     /* release all frames */
-    if (s->golden_frame.data[0])
+    if (s->golden_frame.data[0] && s->golden_frame.data[0] != s->last_frame.data[0])
         avctx->release_buffer(avctx, &s->golden_frame);
     if (s->last_frame.data[0])
         avctx->release_buffer(avctx, &s->last_frame);

@@ -644,11 +644,10 @@ typedef struct MpegEncContext {
     int repeat_first_field;
     int chroma_420_type;
     int progressive_frame;
-    int mpeg2;
     int full_pel[2];
     int interlaced_dct;
     int first_slice;
-    int first_field;
+    int first_field;         ///< is 1 for the first field of a field picture 0 otherwise
     
     /* RTP specific */
     /* These are explained on avcodec.h */
@@ -656,16 +655,14 @@ typedef struct MpegEncContext {
     int rtp_payload_size;
     void (*rtp_callback)(void *data, int size, int packet_number);
     uint8_t *ptr_lastgob;
-   
-    int16_t __align8 dct_quantize_temp_block[64];
- 
+    
     DCTELEM (*block)[64]; ///< points to one of the following blocks 
     DCTELEM blocks[2][6][64] __align8; // for HQ mode we need to keep the best block
     int (*decode_mb)(struct MpegEncContext *s, DCTELEM block[6][64]); // used by some codecs to avoid a switch()
 #define SLICE_OK         0
 #define SLICE_ERROR     -1
-#define SLICE_END       -2 //end marker found
-#define SLICE_NOEND     -3 //no end marker or error found but mb count exceeded
+#define SLICE_END       -2 ///<end marker found
+#define SLICE_NOEND     -3 ///<no end marker or error found but mb count exceeded
     
     void (*dct_unquantize_mpeg1)(struct MpegEncContext *s, 
                            DCTELEM *block/*align 16*/, int n, int qscale);
@@ -719,6 +716,7 @@ int ff_combine_frame( MpegEncContext *s, int next, uint8_t **buf, int *buf_size)
 void ff_mpeg_flush(AVCodecContext *avctx);
 void ff_mpegcontext_flush(MpegEncContext *s);
 void ff_print_debug_info(MpegEncContext *s, Picture *pict);
+void ff_write_quant_matrix(PutBitContext *pb, int16_t *matrix);
 
 void ff_er_frame_start(MpegEncContext *s);
 void ff_er_frame_end(MpegEncContext *s);
