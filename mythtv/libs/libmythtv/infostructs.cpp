@@ -27,7 +27,9 @@ void ChannelInfo::LoadIcon(void)
 
         url += iconpath;
 
-        tempimage = *(gContext->CacheRemotePixmap(url));
+        QImage *cached = gContext->CacheRemotePixmap(url);
+        if (cached)
+            tempimage = *cached;
     }
 
     if (tempimage.width() > 0)
