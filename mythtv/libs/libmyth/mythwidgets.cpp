@@ -1050,10 +1050,21 @@ void MythListBox::setCurrentItem(const QString& matchText, bool caseSensitive,
     {
         if (partialMatch)
         {
-            if (text(i).startsWith(matchText, caseSensitive))
+            if (caseSensitive)
             {
-                setCurrentItem(i);
-                break;
+                if (text(i).startsWith(matchText))
+                {
+                    setCurrentItem(i);
+                    break;
+                }
+            }
+            else
+            {
+                if (text(i).lower().startsWith(matchText.lower()))
+                {
+                    setCurrentItem(i);
+                    break;
+                }
             }
         }
         else
