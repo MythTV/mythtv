@@ -30,7 +30,7 @@ void RecordingProfile::loadByName(QSqlDatabase* db, QString name) {
     QString query = QString("SELECT id FROM recordingprofiles WHERE name = '%1'").arg(name);
     QSqlQuery result = db->exec(query);
     if (result.isActive() && result.numRowsAffected() > 0) {
-        query.next();
+        result.next();
         loadByID(db, result.value(0).toInt());
     } else {
         cout << "Profile not found: " << name << endl;
