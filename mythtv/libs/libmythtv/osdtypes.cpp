@@ -220,7 +220,12 @@ void OSDSet::ClearAllText(void)
     {
         OSDType *type = (*iter);
         if (OSDTypeText *item = dynamic_cast<OSDTypeText *>(type))
-            item->SetText(QString(""));
+        {
+            QString defText = item->GetDefaultText();
+            if ((defText == "") ||
+                (defText.contains(QRegExp("%"))))
+                item->SetText(QString(""));
+        }
     }
 }
 

@@ -75,8 +75,12 @@ void LayerSet::ClearAllText(void)
     {
         UIType *type = (*i);
         if (UITextType *item = dynamic_cast<UITextType *>(type))
-            if (item->GetDefaultText().contains(QRegExp("%")))
+        {
+            QString defText = item->GetDefaultText();
+            if ((defText == "" ) ||
+                (defText.contains(QRegExp("%"))))
                 item->SetText(QString(""));
+        }
     }
 }
 
