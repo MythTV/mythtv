@@ -7,7 +7,7 @@ target.path = $${PREFIX}/lib
 INSTALLS = target
 INCLUDEPATH += ../../libs/libmyth
 LIBS += -L../libmyth -lmyth-$$LIBVERSION
-VERSION = 0.16.0
+VERSION = 0.17.0
 
 # Input
 HEADERS  = mythmainwindow.h mythpainter.h mythimage.h
