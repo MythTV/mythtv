@@ -3,7 +3,7 @@
 ######################################################################
 
 TEMPLATE = app
-CONFIG += thread debug
+CONFIG += thread release
 TARGET = mythfrontend
 target.path = /usr/local/bin
 INSTALLS = target

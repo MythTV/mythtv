@@ -49,14 +49,6 @@ int startDelete(TV *tv, QString prefix)
 void startTV(TV *tv)
 {
     tv->LiveTV();
-
-    TVState tvstate;
-
-    while ((tvstate = tv->GetState()) == kState_None)
-        usleep(1000);
-    tvstate = tv->GetState();
-    while (tv->GetState() == tvstate)
-        usleep(1000);
 }
 
 void startRecording(TV *tv, ProgramInfo *rec)
