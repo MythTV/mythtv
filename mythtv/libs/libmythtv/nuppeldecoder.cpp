@@ -737,7 +737,8 @@ void NuppelDecoder::GetFrame(int onlyvideo)
                     }
                     else if (lameret < 0)
                     {
-                        cout << "lame decode error, exiting\n";
+                        cerr << "lame decode error: " << lameret 
+                             << ", exiting\n";
                         exit(-1);
                     }
                     packetlen = 0;
