@@ -6135,7 +6135,7 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>(1) Sort by Title    (2) Sort by Priority</source>
-        <translation>(1) Ordenar por Título  (2) Ordenar por Preferencia</translation>
+        <translation type="obsolete">(1) Ordenar por Título  (2) Ordenar por Preferencia</translation>
     </message>
     <message>
         <source>Record Type:</source>
@@ -6143,11 +6143,11 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Select a recording to permanently delete:</source>
-        <translation>Seleccione una grabación a borrar:</translation>
+        <translation type="obsolete">Seleccione una grabación a borrar:</translation>
     </message>
     <message>
         <source>Select a recording to view:</source>
-        <translation>Seleccione una grabación a ver:</translation>
+        <translation type="obsolete">Seleccione una grabación a ver:</translation>
     </message>
     <message>
         <source>Sorry, No Recordings Available</source>
@@ -6167,7 +6167,7 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Pick the letter in which the show starts with, then hit ENTER or the right arrow</source>
-        <translation>Seleccione la letra inicial del programa y pulse OK o cursor derecha</translation>
+        <translation type="obsolete">Seleccione la letra inicial del programa y pulse OK o cursor derecha</translation>
     </message>
     <message>
         <source>Select a program...</source>
@@ -6175,7 +6175,7 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting &apos;info&apos; will allow you to setup recording options.</source>
-        <translation>Seleccione el nombre del programa que busca. Cuando lo encuentre vuelva con flecha izquierda. Pulsando &apos;info&apos; podra determinar las opciones de grabacion.</translation>
+        <translation type="obsolete">Seleccione el nombre del programa que busca. Cuando lo encuentre vuelva con flecha izquierda. Pulsando &apos;info&apos; podra determinar las opciones de grabacion.</translation>
     </message>
     <message>
         <source>No Programs</source>
@@ -6218,15 +6218,59 @@ The frequency for this channel in Hz.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>[</source>
+        <source>Source:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>]</source>
+        <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>]  = </source>
+        <source>Select a recording to permanently erase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a recording to watch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a recording to permanently erase:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a recording to watch:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a recording to permanently erase.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a recording to watch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pick the letter in which the show starts with, then press SELECT or the right arrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Airdate:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation type="unfinished">Descripción:</translation>
+    </message>
+    <message>
+        <source>System Status - Select a category to view the status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This screen displays the status of various system components</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

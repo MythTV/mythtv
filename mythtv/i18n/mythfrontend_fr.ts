@@ -6492,15 +6492,15 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>[</source>
-        <translation>[</translation>
+        <translation type="obsolete">[</translation>
     </message>
     <message>
         <source>]</source>
-        <translation>]</translation>
+        <translation type="obsolete">]</translation>
     </message>
     <message>
         <source>]  = </source>
-        <translation>]  =</translation>
+        <translation type="obsolete">]  =</translation>
     </message>
     <message>
         <source>Sorry, No Recordings Available</source>
@@ -6512,7 +6512,7 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Pick the letter in which the show starts with, then hit ENTER or the right arrow</source>
-        <translation>Choisissez la première lettre de l&apos;émission, et appuyez ENTRÉE ou flèche droite</translation>
+        <translation type="obsolete">Choisissez la première lettre de l&apos;émission, et appuyez ENTRÉE ou flèche droite</translation>
     </message>
     <message>
         <source>No Programs</source>
@@ -6548,7 +6548,7 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>(1) Sort by Title    (2) Sort by Priority</source>
-        <translation>(1) Tri par titre    (2) Tri par priorité</translation>
+        <translation type="obsolete">(1) Tri par titre    (2) Tri par priorité</translation>
     </message>
     <message>
         <source>Record Type:</source>
@@ -6556,11 +6556,11 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Select a recording to permanently delete:</source>
-        <translation>Choisir l&apos;enregistrement a supprimer définitivement:</translation>
+        <translation type="obsolete">Choisir l&apos;enregistrement a supprimer définitivement:</translation>
     </message>
     <message>
         <source>Select a recording to view:</source>
-        <translation>Choisir l&apos;enregistrement à visualiser:</translation>
+        <translation type="obsolete">Choisir l&apos;enregistrement à visualiser:</translation>
     </message>
     <message>
         <source>Select &apos;Schedule a Recording&apos; from the Main Menu</source>
@@ -6576,7 +6576,63 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting &apos;info&apos; will allow you to setup recording options.</source>
-        <translation>Sélectionner le titre du programme recherché. Presser flèche droite puis ENTRER pour paramétrer les options d&apos;enregistrement. Presser la touche flèche gauche pour finir.</translation>
+        <translation type="obsolete">Sélectionner le titre du programme recherché. Presser flèche droite puis ENTRER pour paramétrer les options d&apos;enregistrement. Presser la touche flèche gauche pour finir.</translation>
+    </message>
+    <message>
+        <source>Source:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a recording to permanently erase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a recording to watch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a recording to permanently erase:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a recording to watch:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a recording to permanently erase.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a recording to watch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pick the letter in which the show starts with, then press SELECT or the right arrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Airdate:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation type="unfinished">Description:</translation>
+    </message>
+    <message>
+        <source>System Status - Select a category to view the status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This screen displays the status of various system components</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

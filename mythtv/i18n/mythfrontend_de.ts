@@ -6431,7 +6431,7 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>(1) Sort by Title    (2) Sort by Priority</source>
-        <translation>(1) Sortiert nach Sender (2) Sortiert nach Rang</translation>
+        <translation type="obsolete">(1) Sortiert nach Sender (2) Sortiert nach Rang</translation>
     </message>
     <message>
         <source>Record Type:</source>
@@ -6439,11 +6439,11 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Select a recording to permanently delete:</source>
-        <translation type="unfinished">Welche Aufnahme soll gelöscht werden:</translation>
+        <translation type="obsolete">Welche Aufnahme soll gelöscht werden:</translation>
     </message>
     <message>
         <source>Select a recording to watch:</source>
-        <translation type="obsolete">Welche Aufnahme möchten Sie sehen:</translation>
+        <translation type="unfinished">Welche Aufnahme möchten Sie sehen:</translation>
     </message>
     <message>
         <source>Sorry, No Recordings Available</source>
@@ -6463,7 +6463,7 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Pick the letter in which the show starts with, then press SELECT or the right arrow</source>
-        <translation type="obsolete">Wählen Sie den Anfangsbuchstaben der Sendung. Weiter mit &quot;SELECT&quot; oder Pfeil-Rechts.</translation>
+        <translation type="unfinished">Wählen Sie den Anfangsbuchstaben der Sendung. Weiter mit &quot;SELECT&quot; oder Pfeil-Rechts.</translation>
     </message>
     <message>
         <source>Select a program...</source>
@@ -6471,7 +6471,7 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
-        <translation type="obsolete">Wählen Sie den Titel der gesuchten Sendung. Beenden mit Pfeil-Links oder &quot;SELECT&quot; um eine Aufnahme zu planen.</translation>
+        <translation type="unfinished">Wählen Sie den Titel der gesuchten Sendung. Beenden mit Pfeil-Links oder &quot;SELECT&quot; um eine Aufnahme zu planen.</translation>
     </message>
     <message>
         <source>No Programs</source>
@@ -6507,15 +6507,15 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>[</source>
-        <translation>[</translation>
+        <translation type="obsolete">[</translation>
     </message>
     <message>
         <source>]</source>
-        <translation>]</translation>
+        <translation type="obsolete">]</translation>
     </message>
     <message>
         <source>]  = </source>
-        <translation>]  =</translation>
+        <translation type="obsolete">]  =</translation>
     </message>
     <message>
         <source>Program Listings</source>
@@ -6527,7 +6527,7 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Airdate:</source>
-        <translation type="obsolete">Sendezeit:</translation>
+        <translation type="unfinished">Sendezeit:</translation>
     </message>
     <message>
         <source>Loading...</source>
@@ -6535,15 +6535,55 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Select a recording to view:</source>
-        <translation type="unfinished">Welche Aufnahme möchten Sie sehen:</translation>
+        <translation type="obsolete">Welche Aufnahme möchten Sie sehen:</translation>
     </message>
     <message>
         <source>Pick the letter in which the show starts with, then hit ENTER or the right arrow</source>
-        <translation type="unfinished">Wählen Sie den Anfangsbuchstaben der Sendung. Weiter mit &quot;SELECT&quot; oder Pfeil-Rechts</translation>
+        <translation type="obsolete">Wählen Sie den Anfangsbuchstaben der Sendung. Weiter mit &quot;SELECT&quot; oder Pfeil-Rechts</translation>
     </message>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting &apos;info&apos; will allow you to setup recording options.</source>
-        <translation type="unfinished">Wählen Sie den Titel der gesuchten Sendung. Beenden mit Pfeil-Links oder &quot;SELECT&quot; um eine Aufnahme zu planen.</translation>
+        <translation type="obsolete">Wählen Sie den Titel der gesuchten Sendung. Beenden mit Pfeil-Links oder &quot;SELECT&quot; um eine Aufnahme zu planen.</translation>
+    </message>
+    <message>
+        <source>Source:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a recording to permanently erase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a recording to watch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a recording to permanently erase:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a recording to permanently erase.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a recording to watch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation type="unfinished">Inhalt:</translation>
+    </message>
+    <message>
+        <source>System Status - Select a category to view the status</source>
+        <translation type="unfinished">Systemstatus - Bitte eine Kategorie wählen</translation>
+    </message>
+    <message>
+        <source>This screen displays the status of various system components</source>
+        <translation type="unfinished">Zeigt den Status verschiedener Systemkomponenten</translation>
     </message>
 </context>
 <context>

@@ -6594,7 +6594,7 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>(1) Sort by Title    (2) Sort by Priority</source>
-        <translation>(1) タイトルで並べ替え  (2) 優先順位で並べ替え</translation>
+        <translation type="obsolete">(1) タイトルで並べ替え  (2) 優先順位で並べ替え</translation>
     </message>
     <message>
         <source>Record Type:</source>
@@ -6602,11 +6602,11 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Select a recording to permanently delete:</source>
-        <translation>完全に削除する録画を選択してください:</translation>
+        <translation type="obsolete">完全に削除する録画を選択してください:</translation>
     </message>
     <message>
         <source>Select a recording to view:</source>
-        <translation>再生する録画を選択してください:</translation>
+        <translation type="obsolete">再生する録画を選択してください:</translation>
     </message>
     <message>
         <source>Sorry, No Recordings Available</source>
@@ -6626,7 +6626,7 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Pick the letter in which the show starts with, then hit ENTER or the right arrow</source>
-        <translation>文字を選んでENTERキーか右矢印キーを押してください</translation>
+        <translation type="obsolete">文字を選んでENTERキーか右矢印キーを押してください</translation>
     </message>
     <message>
         <source>Select a program...</source>
@@ -6634,7 +6634,7 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting &apos;info&apos; will allow you to setup recording options.</source>
-        <translation>探したい番組のタイトルを選択してください．左矢印キーで戻ることができます．&apos;情報&apos;を押すと録画オプションを設定することが出来ます．</translation>
+        <translation type="obsolete">探したい番組のタイトルを選択してください．左矢印キーで戻ることができます．&apos;情報&apos;を押すと録画オプションを設定することが出来ます．</translation>
     </message>
     <message>
         <source>No Programs</source>
@@ -6654,39 +6654,71 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>[</source>
-        <translation>[</translation>
+        <translation type="obsolete">[</translation>
     </message>
     <message>
         <source>]</source>
-        <translation>]</translation>
+        <translation type="obsolete">]</translation>
     </message>
     <message>
         <source>]  = </source>
-        <translation>]  = </translation>
+        <translation type="obsolete">]  = </translation>
     </message>
     <message>
         <source>Select a recording to permanently erase</source>
-        <translation type="obsolete">削除する録画を選択してください</translation>
+        <translation type="unfinished">削除する録画を選択してください</translation>
     </message>
     <message>
         <source>Select a recording to watch</source>
-        <translation type="obsolete">再生する録画を選択してください</translation>
+        <translation type="unfinished">再生する録画を選択してください</translation>
     </message>
     <message>
         <source>Source:</source>
-        <translation type="obsolete">ソース:</translation>
+        <translation type="unfinished">ソース:</translation>
     </message>
     <message>
         <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
-        <translation type="obsolete">(1) タイトルで並び替え (2) 優先順位で並び替え (4) タイプで並び替え</translation>
+        <translation type="unfinished">(1) タイトルで並び替え (2) 優先順位で並び替え (4) タイプで並び替え</translation>
     </message>
     <message>
         <source>System Status - Select a category to view the status</source>
-        <translation type="obsolete">システムステータス - 表示するカテゴリーを選択してください</translation>
+        <translation type="unfinished">システムステータス - 表示するカテゴリーを選択してください</translation>
     </message>
     <message>
         <source>This screen displays the status of various system components</source>
-        <translation type="obsolete">この画面は様様なシステムステータスを表示します</translation>
+        <translation type="unfinished">この画面は様様なシステムステータスを表示します</translation>
+    </message>
+    <message>
+        <source>Select a recording to permanently erase:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a recording to watch:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a recording to permanently erase.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a recording to watch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pick the letter in which the show starts with, then press SELECT or the right arrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Airdate:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation type="unfinished">内容:</translation>
     </message>
 </context>
 <context>
