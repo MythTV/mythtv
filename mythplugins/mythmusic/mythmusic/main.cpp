@@ -19,7 +19,7 @@ using namespace std;
 #include "cdrip.h"
 #include "settings.h"
 
-Settings *settings;
+Settings *globalsettings;
 
 char theprefix[] = "/usr/local";
 
@@ -192,11 +192,11 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    settings = new Settings();
+    globalsettings = new Settings();
 
-    settings->LoadSettingsFiles("mythmusic-settings.txt", theprefix);
-    settings->LoadSettingsFiles("theme.txt", theprefix);
-    settings->LoadSettingsFiles("mysql.txt", theprefix);
+    globalsettings->LoadSettingsFiles("mythmusic-settings.txt", theprefix);
+    globalsettings->LoadSettingsFiles("theme.txt", theprefix);
+    globalsettings->LoadSettingsFiles("mysql.txt", theprefix);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
@@ -217,15 +217,15 @@ int main(int argc, char *argv[])
 
     CheckFreeDBServerFile();
 
-    QString startdir = settings->GetSetting("MusicLocation");
+    QString startdir = globalsettings->GetSetting("MusicLocation");
 
     if (startdir != "")
         SearchDir(startdir);
 
-    QString paths = settings->GetSetting("TreeLevels");
+    QString paths = globalsettings->GetSetting("TreeLevels");
     QValueList<Metadata> playlist;
 
-    QString themename = settings->GetSetting("Theme");
+    QString themename = globalsettings->GetSetting("Theme");
 
     QString themedir = findThemeDir(themename, theprefix);
     bool usetheme = true;
@@ -240,7 +240,7 @@ int main(int argc, char *argv[])
 
     db->close();
 
-    delete settings;
+    delete globalsettings;
 
     return 0;
 }

@@ -9,9 +9,12 @@
 #include <qpainter.h>
 #include <qimage.h>
 #include <qdir.h>
+#include <math.h>
 
 #include "themedmenu.h"
 #include "settings.h"
+
+extern Settings *globalsettings;
 
 ThemedMenu::ThemedMenu(const char *cdir, const char *menufile, 
                        QWidget *parent, const char *name)
@@ -20,10 +23,13 @@ ThemedMenu::ThemedMenu(const char *cdir, const char *menufile,
     screenheight = QApplication::desktop()->height();
     screenwidth = QApplication::desktop()->width();
 
-    screenwidth = 800; screenheight = 600;
+    if (globalsettings->GetNumSetting("GuiWidth") > 0)
+        screenwidth = globalsettings->GetNumSetting("GuiWidth");
+    if (globalsettings->GetNumSetting("GuiHeight") > 0)
+        screenheight = globalsettings->GetNumSetting("GuiHeight");
 
-    //float wmult = screenwidth / 800.0;
-    float hmult = screenheight / 600.0;
+    wmult = screenwidth / 800.0;
+    hmult = screenheight / 600.0;
 
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedWidth(screenwidth);
@@ -62,7 +68,7 @@ ThemedMenu::ThemedMenu(const char *cdir, const char *menufile,
     {
         tiledbackground = true;
         setting = dir + setting;
-        bground = new QPixmap(setting);
+        bground = scalePixmap(setting);
     }
     else
     {
@@ -70,7 +76,7 @@ ThemedMenu::ThemedMenu(const char *cdir, const char *menufile,
         if (setting.length() > 1)
         {
             setting = dir + setting;
-            bground = new QPixmap(setting);
+            bground = scalePixmap(setting);
         }
     }
 
@@ -96,23 +102,28 @@ ThemedMenu::ThemedMenu(const char *cdir, const char *menufile,
     if (setting.length() > 1)
     {
         setting = dir + setting;
-        logo = new QPixmap(setting);
+        logo = scalePixmap(setting);
     }
 
     if (logo)
     {
         logopos = parsePoint(settings->GetSetting("LogoPos"));
+        logopos.setX(logopos.x() * wmult);
+        logopos.setY(logopos.y() * hmult);
         logoRect = QRect(logopos.x(), logopos.y(), logo->width(), 
                          logo->height());
     }
 
     setting = dir + settings->GetSetting("ButtonNormal");
-    buttonnormal = new QPixmap(setting);
+    buttonnormal = scalePixmap(setting);
     setting = dir + settings->GetSetting("ButtonActive");
-    buttonactive = new QPixmap(setting);
+    buttonactive = scalePixmap(setting);
 
     textRect = parseRect(settings->GetSetting("ButtonTextArea"));
-
+    textRect.setX(textRect.x() * wmult);
+    textRect.setY(textRect.y() * hmult);
+    textRect.setWidth(textRect.width() * wmult);
+    textRect.setHeight(textRect.height() * hmult);
     textRect = QRect(textRect.x(), textRect.y(), 
                      buttonnormal->width() - textRect.width() - textRect.x(), 
                      buttonnormal->height() - textRect.height() - textRect.y());
@@ -132,6 +143,8 @@ ThemedMenu::ThemedMenu(const char *cdir, const char *menufile,
         setting = QString("ButtonPos%1").arg(i+1);
         
         newbutton.pos = parsePoint(settings->GetSetting(setting));
+        newbutton.pos.setX(newbutton.pos.x() * wmult);
+        newbutton.pos.setY(newbutton.pos.y() * hmult);
         newbutton.posRect = QRect(newbutton.pos.x(), newbutton.pos.y(), 
                                   buttonnormal->width(), 
                                   buttonnormal->height());
@@ -147,10 +160,12 @@ ThemedMenu::ThemedMenu(const char *cdir, const char *menufile,
         if (setting.length() > 1)
         {
             setting = dir + setting;
-            newbutton.icon = new QPixmap(setting);
+            newbutton.icon = scalePixmap(setting);
             setting = QString("ButtonIconOffset%1").arg(i+1);
 
             newbutton.iconPos = parsePoint(settings->GetSetting(setting));
+            newbutton.iconPos.setX(newbutton.iconPos.x() * wmult);
+            newbutton.iconPos.setY(newbutton.iconPos.y() * hmult);
             newbutton.iconPos += newbutton.pos;
             newbutton.iconRect = QRect(newbutton.iconPos.x(), 
                                        newbutton.iconPos.y(),
@@ -240,6 +255,23 @@ ThemedMenu::~ThemedMenu(void)
     }
 }
 
+QPixmap *ThemedMenu::scalePixmap(QString filename)
+{
+    QPixmap *ret = new QPixmap();
+
+    if (screenwidth != 800 || screenheight != 600)
+    {
+        QImage tmpimage(filename);
+        QImage tmp2 = tmpimage.smoothScale(tmpimage.width() * wmult, 
+                                           tmpimage.height() * hmult);
+        ret->convertFromImage(tmp2);
+    }
+    else
+        ret->load(filename);
+
+    return ret;
+}
+
 void ThemedMenu::Show()
 {
     showFullScreen();
@@ -305,7 +337,7 @@ void ThemedMenu::paintEvent(QPaintEvent *e)
 void ThemedMenu::paintLogo(QPainter *p)
 {
     if (logo)
-        p->drawPixmap(logopos, *logo);
+        p->drawPixmap(logoRect, *logo);
 }
 
 void ThemedMenu::paintButton(unsigned int button, QPainter *p)
@@ -329,11 +361,11 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p)
 
     if (button == activebutton)
     {
-        tmp.drawPixmap(newRect, *buttonactive);
+        tmp.drawPixmap(newRect.topLeft(), *buttonactive);
     }
     else
     {
-        tmp.drawPixmap(newRect, *buttonnormal);
+        tmp.drawPixmap(newRect.topLeft(), *buttonnormal);
     }
 
     QRect buttonTextRect = textRect;
@@ -393,7 +425,7 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p)
         newRect.moveBy(buttonList[button].iconRect.x() - cr.x(),     
                        buttonList[button].iconRect.y() - cr.y());
 
-        tmp.drawPixmap(newRect, *(buttonList[button].icon));
+        tmp.drawPixmap(newRect.topLeft(), *(buttonList[button].icon));
     }
 
 

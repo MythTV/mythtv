@@ -11,6 +11,7 @@
 #include <qtoolbutton.h>
 #include <qslider.h>
 #include <qstyle.h>
+#include <qimage.h>
 
 #include "scrolllabel.h"
 #include "metadata.h"
@@ -31,7 +32,7 @@
 #include "res/prev.xpm"
 #include "res/stop.xpm"
 
-extern Settings *settings;
+extern Settings *globalsettings;
 
 class MyButton : public QToolButton
 {   
@@ -47,8 +48,6 @@ void MyButton::drawButton( QPainter * p )
 {
     QStyle::SCFlags controls = QStyle::SC_ToolButton;
     QStyle::SCFlags active = QStyle::SC_None;
-
-//    Qt::ArrowType arrowtype = d->arrow;
 
     if (isDown())
         active |= QStyle::SC_ToolButton;
@@ -74,7 +73,6 @@ void MyButton::drawButton( QPainter * p )
 
     style().drawComplexControl(QStyle::CC_ToolButton, p, this, rect(), 
                                colorGroup(), flags, controls, active,
-                               //hasArrow ? QStyleOption(arrowtype) :
                                QStyleOption());
     drawButtonLabel(p);
 }
@@ -88,10 +86,13 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     int screenheight = QApplication::desktop()->height();
     int screenwidth = QApplication::desktop()->width();
 
-    screenwidth = 800; screenheight = 600;
+    if (globalsettings->GetNumSetting("GuiWidth") > 0)
+        screenwidth = globalsettings->GetNumSetting("GuiWidth");
+    if (globalsettings->GetNumSetting("GuiHeight") > 0)
+        screenheight = globalsettings->GetNumSetting("GuiHeight");
 
-    float wmult = screenwidth / 800.0;
-    float hmult = screenheight / 600.0;
+    wmult = screenwidth / 800.0;
+    hmult = screenheight / 600.0;
 
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
@@ -138,37 +139,37 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
 
     MyButton *prevfileb = new MyButton(this);
     prevfileb->setAutoRaise(true);
-    prevfileb->setIconSet(QPixmap((const char **)prevfile_pix));  
+    prevfileb->setIconSet(scalePixmap((const char **)prevfile_pix));  
     connect(prevfileb, SIGNAL(clicked()), this, SLOT(previous()));
  
     MyButton *prevb = new MyButton(this);
     prevb->setAutoRaise(true);
-    prevb->setIconSet(QPixmap((const char **)prev_pix));
+    prevb->setIconSet(scalePixmap((const char **)prev_pix));
     connect(prevb, SIGNAL(clicked()), this, SLOT(seekback()));
 
     MyButton *pauseb = new MyButton(this);
     pauseb->setAutoRaise(true);
-    pauseb->setIconSet(QPixmap((const char **)pause_pix));
+    pauseb->setIconSet(scalePixmap((const char **)pause_pix));
     connect(pauseb, SIGNAL(clicked()), this, SLOT(pause()));
 
     MyButton *playb = new MyButton(this);
     playb->setAutoRaise(true);
-    playb->setIconSet(QPixmap((const char **)play_pix));
+    playb->setIconSet(scalePixmap((const char **)play_pix));
     connect(playb, SIGNAL(clicked()), this, SLOT(play()));
 
     MyButton *stopb = new MyButton(this);
     stopb->setAutoRaise(true);
-    stopb->setIconSet(QPixmap((const char **)stop_pix));
+    stopb->setIconSet(scalePixmap((const char **)stop_pix));
     connect(stopb, SIGNAL(clicked()), this, SLOT(stop()));
     
     MyButton *nextb = new MyButton(this);
     nextb->setAutoRaise(true);
-    nextb->setIconSet(QPixmap((const char **)next_pix));
+    nextb->setIconSet(scalePixmap((const char **)next_pix));
     connect(nextb, SIGNAL(clicked()), this, SLOT(seekforward()));
 
     MyButton *nextfileb = new MyButton(this);
     nextfileb->setAutoRaise(true);
-    nextfileb->setIconSet(QPixmap((const char **)nextfile_pix));
+    nextfileb->setIconSet(scalePixmap((const char **)nextfile_pix));
     connect(nextfileb, SIGNAL(clicked()), this, SLOT(next()));    
 
     controlbox->addWidget(prevfileb);
@@ -255,6 +256,17 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
 PlaybackBox::~PlaybackBox(void)
 {
     stopAll();
+}
+
+QPixmap PlaybackBox::scalePixmap(const char **xpmdata)
+{
+    QImage tmpimage(xpmdata);
+    QImage tmp2 = tmpimage.smoothScale(tmpimage.width() * wmult,
+                                       tmpimage.height() * hmult);
+    QPixmap ret;
+    ret.convertFromImage(tmp2);
+
+    return ret;
 }
 
 void PlaybackBox::Show(void)
@@ -384,7 +396,7 @@ void PlaybackBox::play()
     }
     else if (!output)
     {
-        QString adevice = settings->GetSetting("AudioDevice");
+        QString adevice = globalsettings->GetSetting("AudioDevice");
 
         output = new AudioOutput(outputBufferSize * 1024, adevice);
         output->setBufferSize(outputBufferSize * 1024);
@@ -680,7 +692,7 @@ void PlaybackBox::editPlaylist()
     Metadata firstdata = curMeta;
     
     QValueList<Metadata> dblist = *plist; 
-    QString paths = settings->GetSetting("TreeLevels");
+    QString paths = globalsettings->GetSetting("TreeLevels");
     DatabaseBox dbbox(db, paths, &dblist);
 
     dbbox.Show();

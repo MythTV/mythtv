@@ -29,7 +29,7 @@ extern "C" {
 #include "flacencoder.h"
 #include "settings.h"
 
-extern Settings *settings;
+extern Settings *globalsettings;
 
 class MyLineEdit : public QLineEdit
 {
@@ -147,7 +147,10 @@ Ripper::Ripper(QSqlDatabase *ldb, QWidget *parent, const char *name)
     int screenheight = QApplication::desktop()->height();
     int screenwidth = QApplication::desktop()->width();
   
-    screenwidth = 800; screenheight = 600;
+    if (globalsettings->GetNumSetting("GuiWidth") > 0)
+        screenwidth = globalsettings->GetNumSetting("GuiWidth");
+    if (globalsettings->GetNumSetting("GuiHeight") > 0)
+        screenheight = globalsettings->GetNumSetting("GuiHeight");
  
     float wmult = screenwidth / 800.0;
     float hmult = screenheight / 600.0;
@@ -363,7 +366,10 @@ void Ripper::ripthedisc(void)
     int screenheight = QApplication::desktop()->height();
     int screenwidth = QApplication::desktop()->width();
 
-    screenwidth = 800; screenheight = 600;
+    if (globalsettings->GetNumSetting("GuiWidth") > 0)
+        screenwidth = globalsettings->GetNumSetting("GuiWidth");
+    if (globalsettings->GetNumSetting("GuiHeight") > 0)
+        screenheight = globalsettings->GetNumSetting("GuiHeight");
 
     float hmult = screenheight / 600.0;
 
@@ -398,15 +404,15 @@ void Ripper::ripthedisc(void)
     qApp->processEvents();
 
     QString textstatus;
-    QString cddevice = settings->GetSetting("CDDevice");
+    QString cddevice = globalsettings->GetSetting("CDDevice");
 
     char tempfile[512], outfile[4096];
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
 
     int encodequal = qualitygroup->id(qualitygroup->selected());
 
-    QString tempdir = settings->GetSetting("TemporarySpace");
-    QString findir = settings->GetSetting("MusicLocation");
+    QString tempdir = globalsettings->GetSetting("TemporarySpace");
+    QString findir = globalsettings->GetSetting("MusicLocation");
 
     for (int i = 0; i < totaltracks; i++)
     {

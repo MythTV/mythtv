@@ -47,6 +47,9 @@ class ThemedMenu : public QDialog
     void paintLogo(QPainter *p);
     void paintButton(unsigned int button, QPainter *p);
 
+    QPixmap *scalePixmap(QString filename);
+    float wmult, hmult;
+
     int screenwidth, screenheight;
 
     QPoint logopos;

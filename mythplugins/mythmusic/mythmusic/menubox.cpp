@@ -8,6 +8,9 @@
 #include <qbitmap.h>
 
 #include "menubox.h"
+#include "settings.h"
+
+extern Settings *globalsettings;
 
 MenuBox::MenuBox(const char *text, QWidget *parent, 
                  const char *name)
@@ -16,7 +19,10 @@ MenuBox::MenuBox(const char *text, QWidget *parent,
     int screenheight = QApplication::desktop()->height();
     int screenwidth = QApplication::desktop()->width();
 
-    screenwidth = 800; screenheight = 600;
+    if (globalsettings->GetNumSetting("GuiWidth") > 0)
+        screenwidth = globalsettings->GetNumSetting("GuiWidth");
+    if (globalsettings->GetNumSetting("GuiHeight") > 0)
+        screenheight = globalsettings->GetNumSetting("GuiHeight");
 
     float wmult = screenwidth / 800.0;
     float hmult = screenheight / 600.0;

@@ -15,7 +15,7 @@ using namespace std;
 #include "metadata.h"
 #include "settings.h"
 
-extern Settings *settings;
+extern Settings *globalsettings;
 
 CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, 
                      QIODevice *i, Output *o) 
@@ -37,7 +37,7 @@ CdDecoder::CdDecoder(const QString &file, DecoderFactory *d,
     output_size = 0;
     settracknum = -1;
 
-    devicename = settings->GetSetting("CDDevice");
+    devicename = globalsettings->GetSetting("CDDevice");
 }
 
 CdDecoder::~CdDecoder(void)

@@ -65,6 +65,10 @@ class PlaybackBox : public QDialog
 
     void setupPlaylist(bool toggle = false);
 
+    QPixmap scalePixmap(const char **xpmdata);
+
+    float wmult, hmult;
+
     QIODevice *input;
     Output *output;
     Decoder *decoder;

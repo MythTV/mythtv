@@ -10,6 +10,9 @@
 #include "databasebox.h"
 #include "treecheckitem.h"
 #include "cddecoder.h"
+#include "settings.h"
+
+extern Settings *globalsettings;
 
 DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QString &paths, 
                          QValueList<Metadata> *playlist, 
@@ -22,7 +25,10 @@ DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QString &paths,
     int screenheight = QApplication::desktop()->height();
     int screenwidth = QApplication::desktop()->width();
 
-    screenwidth = 800; screenheight = 600;
+    if (globalsettings->GetNumSetting("GuiWidth") > 0)
+        screenwidth = globalsettings->GetNumSetting("GuiWidth");
+    if (globalsettings->GetNumSetting("GuiHeight") > 0)
+        screenheight = globalsettings->GetNumSetting("GuiHeight");
 
     float wmult = screenwidth / 800.0;
     float hmult = screenheight / 600.0;

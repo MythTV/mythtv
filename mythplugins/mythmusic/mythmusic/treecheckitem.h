@@ -4,6 +4,8 @@
 #include <qlistview.h>
 #include "metadata.h"
 
+class QPixmap;
+
 class TreeCheckItem : public QCheckListItem
 {
   public:
@@ -20,8 +22,18 @@ class TreeCheckItem : public QCheckListItem
   private:
     void pickPixmap();
 
+    static void setupPixmaps();
+    static QPixmap *scalePixmap(const char **xpmdata, float wmult, float hmult);
+
     Metadata *metadata;
     QString level;
+
+    static bool pixmapsSet;
+    static QPixmap *artist;
+    static QPixmap *album;
+    static QPixmap *track;
+    static QPixmap *catalog;
+    static QPixmap *cd;
 };
 
 #endif
