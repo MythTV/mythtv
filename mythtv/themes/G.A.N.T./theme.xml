@@ -2,7 +2,7 @@
 
   <background style="normal">
     <image>bkg/grey.jpeg</image>
-    <buttonarea>115,155,415,390</buttonarea>
+    <buttonarea>115,155,410,390</buttonarea>
     <visiblerowlimit>6</visiblerowlimit>
   </background>
 
