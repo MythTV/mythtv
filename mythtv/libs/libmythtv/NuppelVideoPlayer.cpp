@@ -128,7 +128,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     autocommercialskip = 0;
     commercialskipmethod = COMMERCIAL_SKIP_BLANKS;
     commercialskipeverywhere =
-        gContext->GetNumSetting("CommercialSkipEverythere", 1);
+        gContext->GetNumSetting("CommercialSkipEverywhere", 1);
 
     eventvalid = false;
 
@@ -1679,7 +1679,7 @@ void NuppelVideoPlayer::StartPlaying(void)
 
         GetFrame(audiofd <= 0);
 
-        if (autocommercialskip)
+        if (!hasdeletetable && autocommercialskip)
             AutoCommercialSkip();
 
         if (hasdeletetable && deleteIter.data() == 1 && 
@@ -1949,6 +1949,9 @@ bool NuppelVideoPlayer::EnableEdit(void)
     if (m_playbackinfo->IsEditing(m_db))
         return false;
 
+    if (GetPause())
+        osd->EndPause();
+
     editmode = true;
     Pause();
     while (!GetPause())
@@ -2093,10 +2096,13 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
             {
                 QMap<long long, int>::Iterator it;
                 for (it = commBreakMap.begin(); it != commBreakMap.end(); ++it)
-                    if (it.data() == MARK_COMM_START)
-                        AddMark(it.key(), 1);
-                    else
-                        AddMark(it.key(), 0);
+                {
+                    if (!deleteMap.contains(it.key()))
+                        if (it.data() == MARK_COMM_START)
+                            AddMark(it.key(), 1);
+                        else
+                            AddMark(it.key(), 0);
+                }
             }
             break;
         }
@@ -2156,7 +2162,8 @@ void NuppelVideoPlayer::UpdateTimeDisplay(void)
                              (hours * 60 * 60 * fps));
 
     char timestr[128];
-    sprintf(timestr, "%1d:%02d:%02d.%02d", hours, mins, secs, frames);
+    sprintf(timestr, "%1d:%02d:%02d.%02d (frm %lld)",
+        hours, mins, secs, frames, framesPlayed);
 
     QString cutmarker = "";
     if (IsInDelete(framesPlayed))
