@@ -90,7 +90,7 @@ void GameTree::buildGameList(void)
 
             treeList.push_back(titem);
 
-            game_tree_data->addNode(current, treeList.count(), false);
+            game_tree_data->addNode(current, treeList.size(), false);
         }
     }
 
@@ -247,7 +247,7 @@ void GameTree::FillListFrom(GameTreeItem *item)
             current = current.stripWhiteSpace();
 
             if (node)
-                node->addNode(current, treeList.count(), isleaf);
+                node->addNode(current, treeList.size(), isleaf);
             else
             {
                 cerr << "Couldn't get active node\n";
