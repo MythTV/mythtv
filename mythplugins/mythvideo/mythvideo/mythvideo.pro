@@ -25,8 +25,8 @@ INSTALLS += installfiles uifiles installimages installscripts
 
 HEADERS += metadata.h videomanager.h videobrowser.h videofilter.h dbcheck.h
 HEADERS += globalsettings.h videotree.h fileassoc.h editmetadata.h
-HEADERS += videogallery.h videoselected.h
+HEADERS += videogallery.h videoselected.h videodlg.h
 
 SOURCES += main.cpp metadata.cpp videomanager.cpp videobrowser.cpp videofilter.cpp dbcheck.cpp
 SOURCES += globalsettings.cpp videotree.cpp fileassoc.cpp editmetadata.cpp
-SOURCES += videogallery.cpp videoselected.cpp
+SOURCES += videogallery.cpp videoselected.cpp videodlg.cpp

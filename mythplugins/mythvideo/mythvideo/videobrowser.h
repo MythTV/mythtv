@@ -11,89 +11,66 @@
 #include <qdom.h>
 #include <mythtv/uitypes.h>
 #include <mythtv/xmlparse.h>
-#include "videofilter.h"
+
+#include "videodlg.h"
 
 class QSqlDatabase;
 typedef QValueList<Metadata>  ValueMetadata;
 
-class VideoBrowser : public MythDialog
+class VideoBrowser : public VideoDialog
 {
     Q_OBJECT
+  
   public:
     VideoBrowser(QSqlDatabase *ldb, 
                  MythMainWindow *parent, const char *name = 0);
-    ~VideoBrowser();
-    void VideoBrowser::processEvents() { qApp->processEvents(); }
-    
-
+    virtual ~VideoBrowser();
+   
   protected slots:
     void selected(Metadata *someItem);
     void cursorLeft();
     void cursorRight();
-    void exitWin();
-    void setParentalLevel(int which_level);
-    bool checkParentPassword();
-
-    void slotWatchVideo();
-    void slotViewPlot();
-    void slotDoFilter();
-    void slotDoCancel();
-    void slotVideoTree();
+    
+    virtual void slotParentalLevelChanged();
+    
 
   protected:
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
-    void cancelPopup(void);
     void doMenu(bool info=false);
+    virtual void fetchVideos();
+    virtual void handleMetaFetch(Metadata* meta);
+  
   private:
-    MythPopupBox* popup;
-    bool expectingPopup;
-    bool updateML;
-    bool noUpdate;
-    VideoFilterSettings	*currentVideoFilter;
-
     QPixmap getPixmap(QString &level);
-    QSqlDatabase *db;
-    ValueMetadata m_list;
-
-    void LoadWindow(QDomElement &);
-    void parseContainer(QDomElement &);
-    XMLParse *theme;
-    QDomElement xmldata;
-
-    void doParental(int amount);
     void jumpSelection(int amount);
-    int currentParentalLevel;
     void RefreshMovieList();
     void SetCurrentItem();
-    
-
     void updateBackground(void);
     void updateInfo(QPainter *);
     void updateBrowsing(QPainter *);
     void updatePlayWait(QPainter *);
-
     void grayOut(QPainter *);
 
+    bool updateML;
+    bool noUpdate;
+    bool allowselect;
+           
+    ValueMetadata m_list;
+    
     QPixmap *bgTransBackup;
-    Metadata *curitem;
-    QString curitemMovie;
-
-    QPainter backup;
     QPixmap myBackground;
 
-    int inData;
- 
-    int m_state;
-    QString m_title;
-    QString m_cmd;
+    QPainter backup;
 
+    int inData;
+    int m_state;
+
+    QString m_title;
+    QString curitemMovie;
+    
     QRect infoRect;
     QRect browsingRect;
-    QRect fullRect;
-
-    
-    bool allowselect;
 };
 
 #endif

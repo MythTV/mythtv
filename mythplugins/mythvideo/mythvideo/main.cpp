@@ -54,9 +54,14 @@ void runVideoManager(void);
 void runVideoBrowser(void);
 void runVideoTree(void);
 void runVideoGallery(void);
+void runDefaultView(void);
+
 
 void setupKeys(void)
 {
+    REG_JUMP("MythVideo", "The MythVideo default view", "", 
+             runDefaultView);
+             
     REG_JUMP("Video Manager", "The MythVideo video manager", "", 
              runVideoManager);
     REG_JUMP("Video Browser", "The MythVideo video browser", "", 
@@ -236,17 +241,38 @@ void runVideoBrowser(void)
 
 void runVideoTree(void)
 {
-    VideoTree *tree = new VideoTree(gContext->GetMainWindow(),
-                                    QSqlDatabase::database(), "videotree", 
-                                    "video-");
+    VideoTree *tree = new VideoTree(QSqlDatabase::database(),
+                                    gContext->GetMainWindow(),
+                                    "video tree");
     tree->exec();
     delete tree;
 }
 
+void runDefaultView(void)
+{
+    int viewType = gContext->GetNumSetting("Default MythVideo View", VideoDialog::DLG_GALLERY);
+    switch (viewType)
+    {
+        case VideoDialog::DLG_BROWSER:
+            runVideoBrowser();
+            break;
+        case VideoDialog::DLG_GALLERY:
+            runVideoGallery();
+            break;
+        case VideoDialog::DLG_TREE:
+            runVideoTree();
+            break;
+        default:            
+            runVideoGallery();
+            break;
+    };
+    
+}
+
 void runVideoGallery(void)
 {
-    VideoGallery *gallery = new VideoGallery(gContext->GetMainWindow(),
-                                             QSqlDatabase::database(),
+    VideoGallery *gallery = new VideoGallery(QSqlDatabase::database(),
+                                             gContext->GetMainWindow(),
                                              "video gallery");
     gallery->exec();
     delete gallery;

@@ -13,14 +13,10 @@ using namespace std;
 #include <mythtv/uitypes.h>
 #include <mythtv/util.h>
 
-VideoTree::VideoTree(MythMainWindow *parent, QSqlDatabase *ldb,
-                     QString window_name, QString theme_filename,
-                     const char *name)
-         : MythThemedDialog(parent, window_name, theme_filename, name)
+VideoTree::VideoTree(QSqlDatabase *ldb,
+                     MythMainWindow *parent, const char *name)
+         : VideoDialog(DLG_TREE, ldb, parent, "videotree", name)
 {
-    db = ldb;
-    current_parental_level = gContext->GetNumSetting("VideoDefaultParentalLevel", 1);
-
     file_browser = gContext->GetNumSetting("VideoTreeNoDB", 0);
     browser_mode_files.clear();
         
@@ -32,7 +28,7 @@ VideoTree::VideoTree(MythMainWindow *parent, QSqlDatabase *ldb,
     video_tree_root = new GenericTree("video root", -2, false);
     video_tree_data = video_tree_root->addNode("videos", -2, false);
 
-    buildVideoList();
+    fetchVideos();
     
     //  
     //  Tell the tree list to highlight the 
@@ -45,10 +41,15 @@ VideoTree::VideoTree(MythMainWindow *parent, QSqlDatabase *ldb,
         video_tree_list->setCurrentNode(video_tree_data->getChildAt(0, 0));
     }
     updateForeground();
+    
+    handleTreeListEntry(video_tree_list->getCurrentNode()->getInt());
 }
 
 VideoTree::~VideoTree()
 {
+    if (curitem)
+        delete curitem;
+
     delete video_tree_root;
 }
 
@@ -65,6 +66,10 @@ void VideoTree::keyPressEvent(QKeyEvent *e)
 
         if (action == "SELECT")
             video_tree_list->select();
+        else if (action == "MENU")
+            doMenu(false);
+        else if (action == "INFO")
+            doMenu(true);           
         else if (action == "UP")
             video_tree_list->moveUp();
         else if (action == "DOWN")
@@ -90,107 +95,9 @@ void VideoTree::keyPressEvent(QKeyEvent *e)
         MythThemedDialog::keyPressEvent(e);
 }
 
-bool VideoTree::checkParentPassword()
+void VideoTree::slotParentalLevelChanged()
 {
-    QDateTime curr_time = QDateTime::currentDateTime();
-    QString last_time_stamp = gContext->GetSetting("VideoPasswordTime");
-    QString password = gContext->GetSetting("VideoAdminPassword");
-    if(password.length() < 1)
-    {
-        return true;
-    }
-    //
-    //  See if we recently (and succesfully)
-    //  asked for a password
-    //
-    
-    if(last_time_stamp.length() < 1)
-    {
-        //
-        //  Probably first time used
-        //
-
-        cerr << "videotree.o: Could not read password/pin time stamp. "
-             << "This is only an issue if it happens repeatedly. " << endl;
-    }
-    else
-    {
-        QDateTime last_time = QDateTime::fromString(last_time_stamp, Qt::TextDate);
-        if(last_time.secsTo(curr_time) < 120)
-        {
-            //
-            //  Two minute window
-            //
-            last_time_stamp = curr_time.toString(Qt::TextDate);
-            gContext->SetSetting("VideoPasswordTime", last_time_stamp);
-            gContext->SaveSetting("VideoPasswordTime", last_time_stamp);
-            return true;
-        }
-    }
-    
-    //
-    //  See if there is a password set
-    //
-    
-    if(password.length() > 0)
-    {
-        bool ok = false;
-        MythPasswordDialog *pwd = new MythPasswordDialog(tr("Parental Pin:"),
-                                                         &ok,
-                                                         password,
-                                                         gContext->GetMainWindow());
-        pwd->exec();
-        delete pwd;
-        if(ok)
-        {
-            //
-            //  All is good
-            //
-
-            last_time_stamp = curr_time.toString(Qt::TextDate);
-            gContext->SetSetting("VideoPasswordTime", last_time_stamp);
-            gContext->SaveSetting("VideoPasswordTime", last_time_stamp);
-            return true;
-        }
-    }   
-    else
-    {
-        return true;
-    } 
-    return false;
-}
-
-void VideoTree::setParentalLevel(int which_level)
-{
-    if(which_level < 1)
-    {
-        which_level = 1;
-    }
-    if(which_level > 4)
-    {
-        which_level = 4;
-    }
-    
-    if(checkParentPassword())
-    {
-        current_parental_level = which_level;
-        pl_value->SetText(QString("%1").arg(current_parental_level));
-        video_tree_data->deleteAllChildren();
-        buildVideoList();
-    
-        //  
-        //  Tell the tree list to highlight the 
-        //  first child and then draw the GUI as
-        //  it now stands
-        //
-    
-        video_tree_list->setCurrentNode(video_tree_data);
-        if(video_tree_data->childCount() > 0)
-        {
-            video_tree_list->setCurrentNode(video_tree_data->getChildAt(0, 0));
-        }
-        updateForeground();
-    }
+    pl_value->SetText(QString("%1").arg(currentParentalLevel));
 }
 
 bool VideoTree::ignoreExtension(QString extension)
@@ -254,144 +161,119 @@ void VideoTree::buildFileList(QString directory)
     }
 }
 
-void VideoTree::buildVideoList()
+void VideoTree::fetchVideos()
 {
-    if(file_browser)
-    {
-        //
-        //  Fill metadata from directory structure
-        //
-        
-        buildFileList(gContext->GetSetting("VideoStartupDir"));
+    video_tree_data->deleteAllChildren();
 
-        for(uint i=0; i < browser_mode_files.count(); i++)
-        {
-            QString file_string = *(browser_mode_files.at(i));
-            QString prefix = gContext->GetSetting("VideoStartupDir");
-            if(prefix.length() < 1)
-            {
-                cerr << "videotree.o: Seems unlikely that this is going to work" << endl;
-            }
-            file_string.remove(0, prefix.length());
-            QStringList list(QStringList::split("/", file_string));
-
-            GenericTree *where_to_add;
-            where_to_add = video_tree_data;
-            int a_counter = 0;
-            QStringList::Iterator an_it = list.begin();
-            for( ; an_it != list.end(); ++an_it)
-            {
-                if(a_counter + 1 >= (int) list.count())
-                {
-                    QString title = (*an_it);
-                    where_to_add->addNode(title.section(".",0,-2), i, true);
-                    
-                }
-                else
-                {
-                    QString dirname = *an_it + "/";
-                    GenericTree *sub_node;
-                    sub_node = where_to_add->getChildByName(dirname);
-                    if(!sub_node)
-                    {
-                        sub_node = where_to_add->addNode(dirname, -1, false);
-                    }
-                    where_to_add = sub_node;
-                }
-                ++a_counter;
-            }
-        }
-        if(video_tree_data->childCount() < 1)
-        {
-            //
-            //  Nothing survived the requirements
-            //
-
-            video_tree_data->addNode(tr("No files found"), -1, false);
-        }        
-    }
+    if (file_browser)
+        fillTreeFromFilesystem();
     else
-    {
-        //
-        //  This just asks the database for a list
-        //  of metadata, builds it into a tree and
-        //  passes that tree structure to the GUI
-        //  widget that handles navigation
-        //
-
-        QSqlQuery query("SELECT intid FROM videometadata ;", db);
-        Metadata *myData;
-    
-        if(!query.isActive())
-        {
-            cerr << "videotree.o: Your database sucks" << endl;
-        }
-        else if (query.numRowsAffected() > 0)
-        {
-            QString prefix = gContext->GetSetting("VideoStartupDir");
-            if(prefix.length() < 1)
-            {
-                  cerr << "videotree.o: Seems unlikely that this is going to work" << endl;
-            }
-            while (query.next())
-            {
-                unsigned int idnum = query.value(0).toUInt();
-
-                //
-                //  Create metadata object and fill it
-                //
-            
-                myData = new Metadata();
-                myData->setID(idnum);
-                myData->fillDataFromID(db);
-                if (myData->ShowLevel() <= current_parental_level && myData->ShowLevel() != 0)
-                {
-                    QString file_string = myData->Filename();
-
-                    file_string.remove(0, prefix.length());
-                    QStringList list(QStringList::split("/", file_string));
-
-                    GenericTree *where_to_add;
-                    where_to_add = video_tree_data;
-                    int a_counter = 0;
-                    QStringList::Iterator an_it = list.begin();
-                    for( ; an_it != list.end(); ++an_it)
-                    {
-                        if(a_counter + 1 >= (int) list.count())
-                        {
-                            where_to_add->addNode(myData->Title(), idnum, true);                    
-                        }
-                        else
-                        {
-                            QString dirname = *an_it + "/";
-                            GenericTree *sub_node;
-                            sub_node = where_to_add->getChildByName(dirname);
-                            if(!sub_node)
-                            {
-                                sub_node = where_to_add->addNode(dirname, -1, false);
-                            }
-                            where_to_add = sub_node;
-                        }
-                        ++a_counter;
-                    }
-                }
-            
-                //
-                //  Kill it off
-                //
-            
-                delete myData;
-            }
-        }
-        else
-        {
-            video_tree_data->addNode(tr("No files found"), -2, false);
-        }
-    }
+        VideoDialog::fetchVideos();
     
     video_tree_list->assignTreeData(video_tree_root);
     video_tree_list->sortTreeByString();
     video_tree_list->sortTreeBySelectable();
+    
+    //  
+    //  Tell the tree list to highlight the 
+    //  first child and then draw the GUI as
+    //  it now stands
+    //
+    video_tree_list->setCurrentNode(video_tree_data);
+    if(video_tree_data->childCount() > 0)
+    {
+        video_tree_list->setCurrentNode(video_tree_data->getChildAt(0, 0));
+    }
+
+    handleTreeListEntry(video_tree_list->getCurrentNode()->getInt());
+    updateForeground();
+}
+
+
+void VideoTree::fillTreeFromFilesystem()
+{
+    //
+    //  Fill metadata from directory structure
+    //
+    buildFileList(gContext->GetSetting("VideoStartupDir"));
+    
+    for (uint i=0; i < browser_mode_files.count(); i++)
+    {
+        QString file_string = *(browser_mode_files.at(i));
+        QString prefix = gContext->GetSetting("VideoStartupDir");
+        if(prefix.length() < 1)
+        {
+            cerr << "videotree.o: Seems unlikely that this is going to work" << endl;
+        }
+        file_string.remove(0, prefix.length());
+        QStringList list(QStringList::split("/", file_string));
+    
+        GenericTree *where_to_add;
+        where_to_add = video_tree_data;
+        int a_counter = 0;
+        QStringList::Iterator an_it = list.begin();
+        for ( ; an_it != list.end(); ++an_it)
+        {
+            if (a_counter + 1 >= (int) list.count())
+            {
+                QString title = (*an_it);
+                where_to_add->addNode(title.section(".",0,-2), i, true);
+                
+            }
+            else
+            {
+                QString dirname = *an_it + "/";
+                GenericTree *sub_node;
+                sub_node = where_to_add->getChildByName(dirname);
+                if(!sub_node)
+                {
+                    sub_node = where_to_add->addNode(dirname, -1, false);
+                }
+                where_to_add = sub_node;
+            }
+            ++a_counter;
+        }
+    }
+    
+    if (video_tree_data->childCount() < 1)
+    {
+        //  Nothing survived the requirements
+        video_tree_data->addNode(tr("No files found"), -1, false);
+    }        
+}
+
+
+void VideoTree::handleMetaFetch(Metadata* myData)
+{
+    QString prefix = gContext->GetSetting("VideoStartupDir");
+    QString file_string = myData->Filename();
+    
+    file_string.remove(0, prefix.length());
+    QStringList list(QStringList::split("/", file_string));
+    
+    GenericTree *where_to_add;
+    where_to_add = video_tree_data;
+    int a_counter = 0;
+    QStringList::Iterator an_it = list.begin();
+    for( ; an_it != list.end(); ++an_it)
+    {
+        if(a_counter + 1 >= (int) list.count())
+        {
+            where_to_add->addNode(myData->Title(), myData->ID(), true);                    
+        }
+        else
+        {
+            QString dirname = *an_it + "/";
+            GenericTree *sub_node;
+            sub_node = where_to_add->getChildByName(dirname);
+            if(!sub_node)
+            {
+                sub_node = where_to_add->addNode(dirname, -1, false);
+            }
+            where_to_add = sub_node;
+        }
+        ++a_counter;
+    }
 }
 
 
@@ -422,6 +304,11 @@ void VideoTree::handleTreeListEntry(int node_int, IntVector*)
                 video_file->SetText(base_name);
                 extension = the_file.section(".", -1);
                 player = gContext->GetSetting("VideoDefaultPlayer");
+                
+                if (curitem)
+                    delete curitem;
+                
+                curitem = new Metadata(the_file);
             }
         }
         else
@@ -444,7 +331,11 @@ void VideoTree::handleTreeListEntry(int node_int, IntVector*)
             {
                 player = gContext->GetSetting("VideoDefaultPlayer");
             }
-            delete node_data;
+            
+            if (curitem)
+                delete curitem;
+
+            curitem = node_data;
         }
 
         //
@@ -490,124 +381,33 @@ void VideoTree::handleTreeListEntry(int node_int, IntVector*)
     
 }
 
-void VideoTree::playVideo(int node_number)
+void VideoTree::syncMetaToTree(int nodeNumber)
 {
-    if(node_number > -1)
+    if(file_browser)
     {
-        //
-        //  User has selected a video file
-        //
+        QString filename;
+        filename = *(browser_mode_files.at(nodeNumber));
+        if (curitem)
+            delete curitem;
     
-        QString filename = "";
-        QString handler = gContext->GetSetting("VideoDefaultPlayer");
-        QString unique_handler = "";
-        
-        if(file_browser)
-        {
-            filename = *(browser_mode_files.at(node_number));
-        }
-        else
-        {
-            Metadata *node_data;
-            node_data = new Metadata();
-            node_data->setID(node_number);
-            node_data->fillDataFromID(db);
-            filename = node_data->Filename();
-            
-            //
-            //  Player command unique to this file?
-            //
-
-            unique_handler = node_data->PlayCommand();
-            if(unique_handler.length() > 0)
-            {
-                handler = unique_handler;
-            }
-            delete node_data;
-        }
-        
-
-        //
-        //  Do we have a specialized player for this
-        //  type of file?
-        //
-        
-        QString extension = filename.section(".", -1, -1);
-
-        QString q_string = QString("SELECT playcommand, use_default FROM "
-                                   "videotypes WHERE extension = \"%1\" ;")
-                                   .arg(extension);
-
-        QSqlQuery a_query(q_string, db);
-        
-        if( a_query.isActive() && 
-            a_query.numRowsAffected() > 0 && 
-            unique_handler.length() < 1)
-        {
-            a_query.next();
-            if(!a_query.value(1).toBool())
-            {
-                //
-                //  This file type is defined and
-                //  it is not set to use default player
-                //
-                handler = a_query.value(0).toString();                
-            }
-        }
-
-        // See if this is being handled by a plugin..
-        if (gContext->GetMainWindow()->HandleMedia(handler, filename))
-            return;
-
-        QString arg;
-        arg.sprintf("\"%s\"", 
-                    filename.replace(QRegExp("\""), "\\\"").utf8().data());
-
-        //
-        //  Did the user specify %s in the player
-        //  command?
-        //
-
-        QString command = "";
-
-    	// If handler contains %d, substitute default player command
-    	// This would be used to add additional switches to the default without
-    	// needing to retype the whole default command.  But, if the
-    	// command and the default command both contain %s, drop the %s from
-    	// the default since the new command already has it
-    	//
-    	// example: default: mplayer -fs %s
-    	//          custom : %d -ao alsa9:spdif %s
-    	//          result : mplayer -fs -ao alsa9:spdif %s
-    	if(handler.contains("%d"))
-    	{
-        	QString default_handler = gContext->GetSetting("VideoDefaultPlayer");
-        	if(handler.contains("%s") && default_handler.contains("%s"))
-        	{
-                	default_handler = default_handler.replace(QRegExp("%s"), "");
-        	}
-        	command = handler.replace(QRegExp("%d"), default_handler);
-    	}
-
-        if(handler.contains("%s"))
-        {
-            command = handler.replace(QRegExp("%s"), arg);
-        }
-        else
-        {
-            command = handler + " " + arg;
-        }
-
-        // cout << "command:" << command << endl;
-        
-        //
-        //  Run the player
-        //
-        
-        myth_system((QString("%1 ").arg(command)).local8Bit());
-
-        
+        curitem = new Metadata(filename);
     }
+    else
+    {
+        if (curitem)
+            delete curitem;
+            
+        curitem = new Metadata();
+        curitem->setID(nodeNumber);
+        curitem->fillDataFromID(db);
+    }
+}
+
+
+void VideoTree::slotWatchVideo()
+{
+    VideoDialog::slotWatchVideo();
+    video_tree_list->deactivate();
 }
 
 
@@ -618,50 +418,8 @@ void VideoTree::handleTreeListSelection(int node_int, IntVector *)
         //
         //  Play this (chain of?) file(s) 
         //
-        
-        int which_file = node_int;
-        QTime playing_time;
-
-        while(which_file > -1)
-        {
-            playing_time.start();
-            playVideo(which_file);
-            if(!file_browser)
-            {
-                if(playing_time.elapsed() > 10000)
-                {
-                    //
-                    //  More than ten seconds have gone by,
-                    //  so we'll keep following the chain of
-                    //  files to play
-                    //
-
-                    Metadata *node_data = new Metadata();
-                    node_data->setID(which_file);
-                    node_data->fillDataFromID(db);
-                    which_file = node_data->ChildID();
-                    //cout << "Just set which file to " << which_file << endl;
-                    delete node_data;
-                }
-                else
-                {
-                    which_file = -1;
-                }
-            }
-            else
-            {
-                which_file = -1;
-            }
-        }
-        
-        //
-        //  Go back to tree browsing
-        //
-
-        video_tree_list->deactivate();
-        gContext->GetMainWindow()->raise();
-        gContext->GetMainWindow()->setActiveWindow();
-        gContext->GetMainWindow()->currentWidget()->setFocus();
+        syncMetaToTree(node_int);
+        slotWatchVideo();
     }
 }
 
@@ -685,8 +443,11 @@ void VideoTree::wireUpTheme()
     }
     video_tree_list->showWholeTree(true);
     video_tree_list->colorSelectables(true);
-    connect(video_tree_list, SIGNAL(nodeSelected(int, IntVector*)), this, SLOT(handleTreeListSelection(int, IntVector*)));
-    connect(video_tree_list, SIGNAL(nodeEntered(int, IntVector*)), this, SLOT(handleTreeListEntry(int, IntVector*)));
+    connect(video_tree_list, SIGNAL(nodeSelected(int, IntVector*)), this, 
+            SLOT(handleTreeListSelection(int, IntVector*)));
+    
+    connect(video_tree_list, SIGNAL(nodeEntered(int, IntVector*)), this, 
+            SLOT(handleTreeListEntry(int, IntVector*)));
 
     //
     //  Text area's
@@ -723,7 +484,36 @@ void VideoTree::wireUpTheme()
     pl_value = getUITextType("pl_value");
     if(pl_value)
     {
-        pl_value->SetText(QString("%1").arg(current_parental_level));
+        pl_value->SetText(QString("%1").arg(currentParentalLevel));
+    }
+    
+}
+
+void VideoTree::doMenu(bool info)
+{
+    if (createPopup())
+    {
+        QButton *focusButton = NULL;
+        
+        if(info)
+        {
+            focusButton = popup->addButton(tr("Watch This Video"), this, SLOT(slotWatchVideo())); 
+            popup->addButton(tr("View Full Plot"), this, SLOT(slotViewPlot()));
+        }
+        else
+        {
+            if (!file_browser)
+                focusButton = popup->addButton(tr("Filter Display"), this, SLOT(slotDoFilter()));
+            
+            QButton *tempButton = addDests();
+            focusButton = focusButton ? focusButton : tempButton;
+        }
+        
+        popup->addButton(tr("Cancel"), this, SLOT(slotDoCancel()));
+        
+        popup->ShowPopup(this, SLOT(slotDoCancel()));
+        if (focusButton)
+            focusButton->setFocus();
     }
     
 }

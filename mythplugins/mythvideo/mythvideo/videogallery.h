@@ -19,59 +19,53 @@ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <qapplication.h>
 #include <qstringlist.h>
 
-#include "metadata.h"
 #include <mythtv/mythwidgets.h>
 #include <qdom.h>
 #include <mythtv/uitypes.h>
 #include <mythtv/xmlparse.h>
 #include <mythtv/uilistbtntype.h>
-#include "videofilter.h"
+
+#include "videodlg.h"
+
 
 class QSqlDatabase;
 typedef QValueList<Metadata>  ValueMetadata;
 
-class VideoGallery : public MythDialog
+class VideoGallery : public VideoDialog
 {
     Q_OBJECT
   public:
-    VideoGallery(MythMainWindow *parent, 
-		QSqlDatabase *ldb, const char *name = 0);
+    VideoGallery(QSqlDatabase *ldb, 
+                 MythMainWindow *parent, const char *name = 0);
     ~VideoGallery();
+    
     void VideoGallery::processEvents() { qApp->processEvents(); }
     
 
   protected slots:
     void moveCursor(QString action);
     void exitWin();
-    void setParentalLevel(int which_level);
-    bool checkParentPassword();
-
+    void slotChangeView();
+    void slotItemSelected();
+    void handleVideoSelect();
+    
   protected:
+    virtual void handleMetaFetch(Metadata*);
+    virtual void fetchVideos();
+    void doMenu(bool info=false);
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
+    bool handleSelect();
+    void handleDirSelect();
+    void handleUpDirSelect();
+    bool goBack();
 
   private:
-    bool updateML;
-    VideoFilterSettings	*currentVideoFilter;
 
     QPixmap getPixmap(QString &level);
-    QSqlDatabase *db;
-
-    GenericTree *video_tree_root;
-    GenericTree *video_tree_data;
-    GenericTree *where_we_are;
-
-    void LoadWindow(QDomElement &);
-    void parseContainer(QDomElement &);
-    XMLParse *theme;
-    QDomElement xmldata;
-
     void LoadIconWindow();
 
-    int currentParentalLevel;
-    void BuildVideoList();
-
-    void updateMenu(QPainter *);
+    
     void updateText(QPainter *);
     void updateView(QPainter *);
     void updateArrows(QPainter *);
@@ -82,20 +76,20 @@ class VideoGallery : public MythDialog
     void actionFilter(UIListBtnTypeItem*);
 
     void positionIcon();
-
+    
+    //typedef QValueVector<Metadata> MetaVector;
+    //MetaVector metas;
+    QMap<int, Metadata> metas;
+    
     int curView;
     bool subtitleOn;
     bool keepAspectRatio;
     QString curPath;
 
-    QRect fullRect;
-    QRect menuRect;
+    
     QRect textRect;
     QRect viewRect;
     QRect arrowsRect;
-
-    bool inMenu;
-    UIListBtnType *menuType;
 
     QPixmap backRegPix;
     QPixmap backSelPix;
@@ -116,8 +110,15 @@ class VideoGallery : public MythDialog
     int thumbH;
 
     bool allowselect;
+    bool updateML;
+    
+    QString prefix;
+    
+    GenericTree *video_tree_root;
+    GenericTree *video_tree_data;
+    GenericTree *where_we_are;
 
-    typedef void (VideoGallery::*Action)(UIListBtnTypeItem*);
+    //typedef void (VideoGallery::*Action)(UIListBtnTypeItem*);
 };
 
 #endif

@@ -5,6 +5,8 @@
 #include <qstring.h>
 
 #include <mythtv/mythcontext.h>
+#include <qpixmap.h>
+#include <qimage.h>
 
 class QSqlDatabase;
 
@@ -17,10 +19,12 @@ class Metadata
              float luserrating = 0.0, QString lrating = "", int llength = 0, 
              int lid = 0, int lshowlevel = 1, int lchildID = -1,
              bool lbrowse = true, QString lplaycommand = "",
-	     QString lcategory = "",
- 	     QStringList lgenres = QStringList(),
-	     QStringList lcountries = QStringList())
+             QString lcategory = "",
+             QStringList lgenres = QStringList(),
+             QStringList lcountries = QStringList())
     {
+        coverImage = NULL;
+        
         filename = lfilename;
         coverfile = lcoverfile;
         title = ltitle;
@@ -36,13 +40,15 @@ class Metadata
         childID = lchildID;
         browse = lbrowse;
         playcommand = lplaycommand;
-	category = lcategory;
-	genres = lgenres;
-	countries = lcountries;
+        category = lcategory;
+        genres = lgenres;
+        countries = lcountries;
     }
 
     Metadata(const Metadata &other) 
     {
+        coverImage = NULL;
+        
         filename = other.filename;
         coverfile = other.coverfile;
         title = other.title;
@@ -58,12 +64,12 @@ class Metadata
         childID = other.childID;
         browse = other.browse;
         playcommand = other.playcommand;
-	category = other.category;
-	genres = other.genres;
-	countries = other.countries;
+        category = other.category;
+        genres = other.genres;
+        countries = other.countries;
     }
 
-   ~Metadata() {}
+    ~Metadata() { if (coverImage) delete coverImage; }
 
     QString Title() { return title; }
     void setTitle(const QString &ltitle) { title = ltitle; }
@@ -127,6 +133,8 @@ class Metadata
     int getIdCategory(QSqlDatabase *db);
     void setIdCategory(QSqlDatabase *db, int id);
     bool Remove(QSqlDatabase *db);
+    
+    QImage* getCoverImage();
 
   private:
     void fillCategory(QSqlDatabase *db);
@@ -134,7 +142,8 @@ class Metadata
     void updateCountries(QSqlDatabase *db);
     void fillGenres(QSqlDatabase *db);
     void updateGenres(QSqlDatabase *db);
- 
+    QImage* coverImage;
+    
     QString title;
     QString inetref;
     QString director;

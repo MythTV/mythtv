@@ -6,7 +6,7 @@
 #include <qcursor.h>
 #include <qdir.h>
 #include <qimage.h>
-
+#include "videodlg.h"
 // General Settings
 
 class VideoDefaultParentalLevel: public ComboBoxSetting, public GlobalSetting {
@@ -24,6 +24,22 @@ public:
                     "should be set to limit changing of the default level."));
     }
 };
+
+
+class VideoDefaultView: public ComboBoxSetting, public GlobalSetting {
+public:
+    VideoDefaultView() :
+      GlobalSetting("Default MythVideo View") {
+        setLabel(QObject::tr("Default View"));
+        addSelection(QObject::tr("Gallery"), "1");
+        addSelection(QObject::tr("Browser"), "0");
+        addSelection(QObject::tr("Listings"), "2"); 
+        setHelpText(QObject::tr("The defualt view for MythVideo. "
+                    "Other views can be reached via the popup menu available "
+                    "via the MENU key."));
+    }
+};
+
 
 class VideoAdminPassword: public LineEditSetting, public GlobalSetting {
 public:
@@ -217,6 +233,7 @@ VideoGeneralSettings::VideoGeneralSettings()
     general->addChild(new VideoListUnknownFiletypes());
     general->addChild(new VideoTreeNoDB());
     general->addChild(new VideoNewBrowsable());
+    general->addChild(new VideoDefaultView());
     addChild(general);
 
     VerticalConfigurationGroup* vman = new VerticalConfigurationGroup(false);

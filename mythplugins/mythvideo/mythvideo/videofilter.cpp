@@ -198,13 +198,24 @@ QString VideoFilterSettings::BuildClauseWhere()
             where = QString(" WHERE userrating >= %1").arg(userrating);
     }
     
-    if(browse !=-1)
+    if (allowBrowse)
+    {
+        if (browse !=-1)
+        {
+            if (where)
+                where += QString(" AND browse = %1").arg(browse);
+            else 
+                where = QString(" WHERE browse = %1").arg(browse);
+        } 
+    }
+    else
     {
         if (where)
-            where += QString(" AND browse = %1").arg(browse);
+            where += QString(" AND browse = 1");
         else 
-            where = QString(" WHERE browse = %1").arg(browse);
+            where = QString(" WHERE browse = 1");
     }
+    
 
     return where;
 }

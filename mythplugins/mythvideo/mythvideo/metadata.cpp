@@ -70,83 +70,94 @@ void Metadata::setField(QString field, QString data)
 
 bool Metadata::Remove(QSqlDatabase *db)
 {
-	QFile videofile;
-	videofile.setName(filename);
-	bool isremoved = videofile.remove();
-	if (isremoved){
-		QString thequery;
-		thequery.sprintf("DELETE FROM videometadatagenre "
- 				" WHERE idvideo = %d",id);
-		QSqlQuery query(thequery,db);
-		if (!query.isActive()){
-			cerr << "metadata.o: The following metadata update failed :" << thequery << endl;
-    		}
-		thequery.sprintf("DELETE FROM videometadatacountry "
- 				" WHERE idvideo = %d",id);
-		query.exec(thequery);
-		if (!query.isActive()){
-			cerr << "metadata.o: The following metadata update failed :" << thequery << endl;
-    		}
-		thequery.sprintf("DELETE FROM videometadata "
- 				" WHERE intid = %d",id);
-		query.exec(thequery);
-		if (!query.isActive()){
-			cerr << "metadata.o: The following metadata update failed :" << thequery << endl;
-    		}
-	}else{
-		cout << "impossible de supprimmer le fichier" << endl;
-	}
-	return isremoved;
+    QFile videofile;
+    videofile.setName(filename);
+    bool isremoved = videofile.remove();
+    if (isremoved)
+    {
+        QString thequery;
+        thequery.sprintf("DELETE FROM videometadatagenre "
+                        " WHERE idvideo = %d",id);
+        QSqlQuery query(thequery,db);
+        if (!query.isActive()){
+                cerr << "metadata.o: The following metadata update failed :" << thequery << endl;
+        }
+        thequery.sprintf("DELETE FROM videometadatacountry "
+                        " WHERE idvideo = %d",id);
+        query.exec(thequery);
+        if (!query.isActive()){
+                cerr << "metadata.o: The following metadata update failed :" << thequery << endl;
+        }
+        thequery.sprintf("DELETE FROM videometadata "
+                        " WHERE intid = %d",id);
+        query.exec(thequery);
+        if (!query.isActive()){
+                cerr << "metadata.o: The following metadata update failed :" << thequery << endl;
+        }
+    }
+    else
+    {
+            cout << "impossible de supprimmer le fichier" << endl;
+    }
+    return isremoved;
 }
 
 void Metadata::fillCategory(QSqlDatabase *db)
 {
-	QString thequery;
-	thequery.sprintf("SELECT videocategory.category"
-			" FROM videometadata INNER JOIN videocategory"
-			" ON videometadata.category = videocategory.intid"
-			" WHERE videometadata.intid = %d",id);
-	QSqlQuery query(thequery,db);
-	if (query.isActive()){
-		if (query.numRowsAffected()>0){
-			query.next();
-			category = query.value(0).toString();
-		}
-	}else{
-		cerr << "metadata.o : SELECT Failed : " << thequery << endl;
-	}
+    QString thequery;
+    thequery.sprintf("SELECT videocategory.category"
+                    " FROM videometadata INNER JOIN videocategory"
+                    " ON videometadata.category = videocategory.intid"
+                    " WHERE videometadata.intid = %d",id);
+    QSqlQuery query(thequery,db);
+    if (query.isActive())
+    {
+        if (query.numRowsAffected()>0)
+        {
+                query.next();
+                category = query.value(0).toString();
+        }
+    }
+    else
+    {
+            cerr << "metadata.o : SELECT Failed : " << thequery << endl;
+    }
 
 }
 void Metadata::fillGenres(QSqlDatabase *db)
 {
-	QString thequery;
-	thequery.sprintf("SELECT genre"
-			" FROM videometadatagenre INNER JOIN videogenre"
-			" ON videometadatagenre.idgenre = videogenre.intid"
-			" WHERE idvideo=%d",id);
-	QSqlQuery query(thequery,db);
-	genres.clear();
-	if (query.isActive() && query.numRowsAffected()>1){
-	    while(query.next()){
-		genres.append(query.value(0).toString());
-	    }
-	}
+    QString thequery;
+    thequery.sprintf("SELECT genre"
+                    " FROM videometadatagenre INNER JOIN videogenre"
+                    " ON videometadatagenre.idgenre = videogenre.intid"
+                    " WHERE idvideo=%d",id);
+    QSqlQuery query(thequery,db);
+    genres.clear();
+    if (query.isActive() && query.numRowsAffected()>1)
+    {
+        while(query.next())
+        {
+            genres.append(query.value(0).toString());
+        }
+    }
 }
 
 void Metadata::fillCountries(QSqlDatabase *db)
 {
-	QString thequery;
-	thequery.sprintf("SELECT country" 
-			" FROM videometadatacountry INNER JOIN videocountry"
-			" ON videometadatacountry.idcountry = videocountry.intid"
-			" WHERE idvideo=%d",id);
-	QSqlQuery query(thequery,db);
-	countries.clear();
-	if (query.isActive() && query.numRowsAffected()>1){
-	    while(query.next()){
-		genres.append(query.value(0).toString());
-	    }
-	}
+    QString thequery;
+    thequery.sprintf("SELECT country" 
+                    " FROM videometadatacountry INNER JOIN videocountry"
+                    " ON videometadatacountry.idcountry = videocountry.intid"
+                    " WHERE idvideo=%d",id);
+    QSqlQuery query(thequery,db);
+    countries.clear();
+    if (query.isActive() && query.numRowsAffected() > 1)
+    {
+        while(query.next())
+        {
+            genres.append(query.value(0).toString());
+        }
+    }
 
 }
 
@@ -200,9 +211,9 @@ void Metadata::fillDataFromID(QSqlDatabase *db)
     thequery = QString("SELECT title,director,plot,rating,year,userrating,"
                        "length,filename,showlevel,coverfile,inetref,childid,"
                        "browse,playcommand, videocategory.category "
-			" FROM videometadata LEFT JOIN videocategory"
-			" ON videometadata.category = videocategory.intid"
-			"  WHERE videometadata.intid=%1;")
+                       " FROM videometadata LEFT JOIN videocategory"
+                       " ON videometadata.category = videocategory.intid"
+                       "  WHERE videometadata.intid=%1;")
                        .arg(id);
         
     QSqlQuery query = db->exec(thequery);
@@ -225,15 +236,17 @@ void Metadata::fillDataFromID(QSqlDatabase *db)
         childID = query.value(11).toUInt();
         browse = query.value(12).toBool();
         playcommand = query.value(13).toString();
-	category = query.value(14).toString();
-	
-	// Genres
-	fillGenres(db);
-
-	//Countries
-	fillCountries(db);
-    }else{
-	cerr << "metadata.o : SELECT Failed : " << thequery << endl;
+        category = query.value(14).toString();
+        
+        // Genres
+        fillGenres(db);
+    
+        //Countries
+        fillCountries(db);
+    }
+    else
+    {
+        cerr << "metadata.o : SELECT Failed : " << thequery << endl;
     }
 }
 
@@ -351,7 +364,7 @@ void Metadata::updateDatabase(QSqlDatabase *db)
                      "plot=\"%s\",rating=\"%s\",year=%d,userrating=%f,"
                      "length=%d,filename=\"%s\",showlevel=%d,coverfile=\"%s\","
                      "inetref=\"%s\",browse=%d,playcommand=\"%s\",childid=%d,"
-		     "category=%d"
+                     "category=%d"
                      " WHERE intid=%d",
                      title.utf8().data(), director.utf8().data(),
                      plot.utf8().data(), rating.utf8().data(), year,
@@ -371,54 +384,62 @@ void Metadata::updateDatabase(QSqlDatabase *db)
 
 int Metadata::getIdCategory(QSqlDatabase *db)
 {
-	int idcategory = 0;
-	if (category != ""){
-		QString thequery;
-		thequery.sprintf("SELECT intid FROM videocategory"
-				" WHERE category like \"%s\"",category.utf8().data());
-		QSqlQuery a_query(thequery,db);
-		if (a_query.isActive() && a_query.numRowsAffected()>0){
-			a_query.next();
-			idcategory = a_query.value(0).toInt();
-		}else{
-			thequery.sprintf("INSERT INTO videocategory (category)"
-				" VALUES (\"%s\");",category.utf8().data());
-			a_query.exec(thequery);
-			if (a_query.isActive() && a_query.numRowsAffected()>0){
-				thequery.sprintf("SELECT intid"
-						" FROM videocategory"
-						" WHERE category like \"%s\"",
-						category.utf8().data());
-				a_query.exec(thequery);
-				if (a_query.isActive() && 
-					a_query.numRowsAffected()>0){
-					a_query.next();
-					idcategory = a_query.value(0).toInt();
-				}else
-					cerr << "metadata.o : SELECT Failed : " << thequery << endl;
-			}
-		}
-	}
-	return idcategory;
-	
+    int idcategory = 0;
+    if (category != "")
+    {
+        QString thequery;
+        thequery.sprintf("SELECT intid FROM videocategory"
+                        " WHERE category like \"%s\"",category.utf8().data());
+        QSqlQuery a_query(thequery,db);
+        if (a_query.isActive() && a_query.numRowsAffected()>0)
+        {
+            a_query.next();
+            idcategory = a_query.value(0).toInt();
+        }
+        else
+        {
+            thequery.sprintf("INSERT INTO videocategory (category)"
+                             " VALUES (\"%s\");", category.utf8().data());
+            a_query.exec(thequery);
+            if (a_query.isActive() && a_query.numRowsAffected()>0)
+            {
+                thequery.sprintf("SELECT intid"
+                                " FROM videocategory"
+                                " WHERE category like \"%s\"",
+                                category.utf8().data());
+                a_query.exec(thequery);
+                if (a_query.isActive() && 
+                        a_query.numRowsAffected()>0)
+                {
+                        a_query.next();
+                        idcategory = a_query.value(0).toInt();
+                }
+                else
+                    cerr << "metadata.o : SELECT Failed : " << thequery << endl;
+            }
+        }
+    }
+    return idcategory;
+    
 }
 
 void Metadata::setIdCategory(QSqlDatabase *db, int id)
 {
-	if (id==0)
-		category = "";
-	else 
-	{
-		QString thequery;
-		thequery.sprintf("SELECT category FROM videocategory"
-				" WHERE intid = \"%d\"",id);
-		QSqlQuery a_query(thequery,db);
-		if (a_query.isActive() && a_query.numRowsAffected()>0){
-			a_query.next();
-			category = a_query.value(0).toString();
-		}
-	}
-	
+    if (id==0)
+            category = "";
+    else 
+    {
+        QString thequery;
+        thequery.sprintf("SELECT category FROM videocategory"
+                        " WHERE intid = \"%d\"",id);
+        QSqlQuery a_query(thequery,db);
+        if (a_query.isActive() && a_query.numRowsAffected()>0)
+        {
+            a_query.next();
+            category = a_query.value(0).toString();
+        }
+    }
+    
 }
 
 void Metadata::updateGenres(QSqlDatabase *db)
@@ -427,50 +448,71 @@ void Metadata::updateGenres(QSqlDatabase *db)
     //remove genres  for this video
     thequery.sprintf("DELETE FROM videometadatagenre where idvideo=%d",id);
     QSqlQuery a_query(thequery,db);
-    if (!a_query.isActive()){
-	cerr << "metadata.o: The following metadata update failed :" << thequery << endl;
+    if (!a_query.isActive())
+    {
+        cerr << "metadata.o: The following metadata update failed :" << thequery << endl;
     }
     QStringList::Iterator genre;
-    for (genre = genres.begin() ; genre != genres.end() ; ++genre){
-	// Search id of genre
-	thequery.sprintf("SELECT intid FROM videogenre where genre like \"%s\";",(*genre).utf8().data());
-	a_query.exec(thequery);
-	int idgenre=0;
-	if (a_query.isActive()){
-		if (a_query.numRowsAffected()>0){
-			a_query.next();
-			idgenre = a_query.value(0).toInt();
-		}else{
-		//We must add a new genre
-			thequery.sprintf("INSERT INTO videogenre (genre) VALUES (\"%s\");",(*genre).utf8().data());
-			a_query.exec(thequery);
-			if (a_query.isActive()){
-				//search the new idgenre
-				thequery.sprintf("SELECT intid FROM videogenre WHERE genre like \"%s\"",(*genre).utf8().data());
-				a_query.exec(thequery);
-				if (a_query.isActive()){
-					if (a_query.numRowsAffected()>0){
-						a_query.next();
-						idgenre=a_query.value(0).toInt();
-					}
-				}else{
-					cerr << "metadata.o : The following search failed : " << thequery << endl;
-				}
-			}else{
-				cerr << "metadata.o : The Following insert failed" << thequery << endl;
-			}
-		}
-	}else{
-		cerr << "metadata.o : The Following search failed : "<< thequery << endl;
-	}
-	if (idgenre>0){
-		// add current genre for this video
-		thequery.sprintf("INSERT INTO videometadatagenre (idvideo, idgenre) VALUES (%d,\"%d\")",id, idgenre);
-		a_query.exec(thequery);
-		if (!a_query.isActive()){
-		    cerr << "metadata.o: The following metadata update failed :" << thequery << endl;
-		}
-	}
+    for (genre = genres.begin() ; genre != genres.end() ; ++genre)
+    {
+        // Search id of genre
+        thequery.sprintf("SELECT intid FROM videogenre where genre like \"%s\";",(*genre).utf8().data());
+        a_query.exec(thequery);
+        int idgenre=0;
+        if (a_query.isActive())
+        {
+            if (a_query.numRowsAffected()>0)
+            {
+                a_query.next();
+                idgenre = a_query.value(0).toInt();
+            }
+            else
+            {
+                //We must add a new genre
+                thequery.sprintf("INSERT INTO videogenre (genre) VALUES (\"%s\");",
+                                 (*genre).utf8().data());
+                a_query.exec(thequery);
+                if (a_query.isActive())
+                {
+                    //search the new idgenre
+                    thequery.sprintf("SELECT intid FROM videogenre WHERE genre "
+                                     "like \"%s\"",(*genre).utf8().data());
+                    a_query.exec(thequery);
+                    if (a_query.isActive())
+                    {
+                        if (a_query.numRowsAffected()>0)
+                        {
+                            a_query.next();
+                            idgenre=a_query.value(0).toInt();
+                        }
+                    }
+                    else
+                    {
+                        cerr << "metadata.o : The following search failed : " << thequery << endl;
+                    }
+                }
+                else
+                {
+                    cerr << "metadata.o : The Following insert failed" << thequery << endl;
+                }
+            }
+        }
+        else
+        {
+        cerr << "metadata.o : The Following search failed : "<< thequery << endl;
+        }
+        
+        if (idgenre>0)
+        {
+            // add current genre for this video
+            thequery.sprintf("INSERT INTO videometadatagenre (idvideo, idgenre) "
+                             "VALUES (%d,\"%d\")",id, idgenre);
+            a_query.exec(thequery);
+            if (!a_query.isActive())
+            {
+            cerr << "metadata.o: The following metadata update failed :" << thequery << endl;
+            }
+        }
     }
 }
 
@@ -480,50 +522,87 @@ void Metadata::updateCountries(QSqlDatabase *db)
     //remove countries for this video
     thequery.sprintf("DELETE FROM videometadatacountry where idvideo=%d",id);
     QSqlQuery a_query(thequery,db);
-    if (!a_query.isActive()){
-	cerr << "metadata.o: The following metadata update failed :" << thequery << endl;
+    if (!a_query.isActive())
+    {
+        cerr << "metadata.o: The following metadata update failed :" << thequery << endl;
     }
     QStringList::Iterator country;
-    for (country = countries.begin() ; country != countries.end() ; ++country){
-	// Search id of country
-	thequery.sprintf("SELECT intid FROM videocountry where country like \"%s\";",(*country).utf8().data());
-	a_query.exec(thequery);
-	int idcountry=0;
-	if (a_query.isActive()){
-		if (a_query.numRowsAffected()>0){
-			a_query.next();
-			idcountry = a_query.value(0).toInt();
-		}else{
-		//We must add a new country
-			thequery.sprintf("INSERT INTO videocountry (country) VALUES (\"%s\");",(*country).utf8().data());
-			a_query.exec(thequery);
-			if (a_query.isActive()){
-				//search the new idcountry
-				thequery.sprintf("SELECT intid FROM videocountry WHERE country like \"%s\"",(*country).utf8().data());
-				a_query.exec(thequery);
-				if (a_query.isActive()){
-					if (a_query.numRowsAffected()>0){
-						a_query.next();
-						idcountry=a_query.value(0).toInt();
-					}
-				}else{
-					cerr << "metadata.o : The following search failed : " << thequery << endl;
-				}
-			}else{
-				cerr << "metadata.o : The Following insert failed" << thequery << endl;
-			}
-		}
-	}else{
-		cerr << "metadata.o : The Following search failed : "<< thequery << endl;
-	}
-	if (idcountry>0){
-		// add current country for this video
-		thequery.sprintf("INSERT INTO videometadatacountry (idvideo, idcountry) VALUES (%d,\"%d\")",id, idcountry);
-		a_query.exec(thequery);
-		if (!a_query.isActive()){
-		    cerr << "metadata.o: The following metadata update failed :" << thequery << endl;
-		}
-	}
+    for (country = countries.begin() ; country != countries.end() ; ++country)
+    {
+        // Search id of country
+        thequery.sprintf("SELECT intid FROM videocountry where country "
+                         "like \"%s\";",(*country).utf8().data());
+        a_query.exec(thequery);
+        int idcountry=0;
+        if (a_query.isActive())
+        {
+            if (a_query.numRowsAffected()>0)
+            {
+                a_query.next();
+                idcountry = a_query.value(0).toInt();
+            }
+            else
+            {
+                //We must add a new country
+                thequery.sprintf("INSERT INTO videocountry (country) "
+                                 "VALUES (\"%s\");",(*country).utf8().data());
+                a_query.exec(thequery);
+                if (a_query.isActive())
+                {
+                    //search the new idcountry
+                    thequery.sprintf("SELECT intid FROM videocountry "
+                                     "WHERE country like \"%s\"",(*country).utf8().data());
+                    a_query.exec(thequery);
+                    if (a_query.isActive())
+                    {
+                        if (a_query.numRowsAffected()>0)
+                        {
+                                a_query.next();
+                                idcountry=a_query.value(0).toInt();
+                        }
+                    }
+                    else
+                    {
+                        cerr << "metadata.o : The following search failed : " << thequery << endl;
+                    }
+                }
+                else
+                {
+                    cerr << "metadata.o : The Following insert failed" << thequery << endl;
+                }
+            }
+        }
+        else
+        {
+            cerr << "metadata.o : The Following search failed : "<< thequery << endl;
+        }
+        
+        if (idcountry>0)
+        {
+            // add current country for this video
+            thequery.sprintf("INSERT INTO videometadatacountry (idvideo, idcountry) "
+                             "VALUES (%d,\"%d\")",id, idcountry);
+            a_query.exec(thequery);
+            if (!a_query.isActive())
+            {
+            cerr << "metadata.o: The following metadata update failed :" << thequery << endl;
+            }
+        }
     }
 }
 
+
+QImage* Metadata::getCoverImage()
+{
+    if (!coverImage && (CoverFile() != "No Cover"))
+    {
+        coverImage = new QImage();
+        if (!coverImage->load(CoverFile()))
+        {
+            delete coverImage;
+            coverImage = NULL;
+        }
+    }
+        
+    return coverImage;
+}
