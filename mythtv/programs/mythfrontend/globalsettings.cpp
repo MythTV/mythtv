@@ -1296,6 +1296,18 @@ public:
     };
 };
 
+class EPGShowFavorites: public CheckBoxSetting, public GlobalSetting {
+public:
+    EPGShowFavorites():
+        GlobalSetting("EPGShowFavorites") {
+        setLabel(QObject::tr("Display 'favorite' channels"));
+        setHelpText(QObject::tr("If set, the EPG will initally display "
+                    "only the channels marked as favorites. \"4\" will "
+                    "toggle between favorites and all channels."));
+        setValue(false);
+    };
+};
+
 class EPGChanDisplay: public SpinBoxSetting, public GlobalSetting {
 public:
     EPGChanDisplay():
@@ -1816,6 +1828,7 @@ EPGSettings::EPGSettings()
     epg->addChild(new EPGShowCategoryText());
     epg->addChild(new EPGScrollType());
     epg->addChild(new EPGShowChannelIcon());
+    epg->addChild(new EPGShowFavorites());
     epg->addChild(new EPGChanDisplay());
     epg->addChild(new EPGTimeDisplay());
     addChild(epg);
