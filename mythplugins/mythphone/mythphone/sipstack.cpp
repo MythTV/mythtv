@@ -341,7 +341,7 @@ void SipMsg::decode(QString sipString)
     // Split the attribute lines into a string list for easier access
     attList = QStringList::split("\r\n", sipString, true);
 
-    // Deccode main body of SIP message
+    // Decode main body of SIP message
     decodeRequestLine(attList[0]);
     QStringList::Iterator it;
     for (it=attList.begin(); (it != attList.end()) && (*it != ""); it++)
@@ -564,7 +564,6 @@ void SipMsg::decodeSdp(QString content)
     for (it=sdpList.begin(); (it != sdpList.end()) && (*it != ""); it++)
     {
         codecList = decodeSDPLine(*it, codecList);
-        it++;
     }
 }
 

@@ -1234,6 +1234,7 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         }
         break;
     case SIP_IDLE_OUTCALL:
+        cseq = 1;
         remoteUrl = new SipUrl(DestinationUri, "");
         if ((remoteUrl->getHostIp()).length() == 0)
         {
@@ -1674,7 +1675,6 @@ void SipCall::GetSDPInfo(SipMsg *sipMsg)
     rxVideoResolution = "AUDIOONLY";
 
     SipSdp *Sdp = sipMsg->getSdp();
-
     if (Sdp != 0)
     {
         remoteIp = Sdp->getMediaIP();
@@ -1717,8 +1717,10 @@ void SipCall::GetSDPInfo(SipMsg *sipMsg)
         }
 
         if (debugStream)
-            *debugStream << "SDP contains IP " << remoteIp << " A-Port " << remoteAudioPort << " V-Port " << remoteVideoPort << " Audio Codec:" << audioPayloadIdx << " Video Codec:" << videoPayload << " Format:" << rxVideoResolution << " DTMF: " << dtmfPayload << endl;
+            *debugStream << "SDP contains IP " << remoteIp << " A-Port " << remoteAudioPort << " V-Port " << remoteVideoPort << " Audio Codec:" << audioPayloadIdx << " Video Codec:" << videoPayload << " Format:" << rxVideoResolution << " DTMF: " << dtmfPayload << endl << endl;
     }
+    else
+        cout << "SIP: No SDP in message\n";
 }
 
 

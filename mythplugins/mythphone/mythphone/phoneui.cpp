@@ -762,7 +762,8 @@ void PhoneUIBox::fsmTimerExpiry()
                     QString spk = gContext->GetSetting("AudioOutputDevice");
                     ringbackTone->Play(spk, true);
                 }
-                break;
+
+                // fall through
     
             default:
                 phoneUIStatusBar->DisplayCallState(NotifyParam2);
@@ -776,7 +777,7 @@ void PhoneUIBox::fsmTimerExpiry()
             DirContainer->ChangePresenceStatus(NotifyUrl, (NotifyParam1 == "offline" ? 0 : 1), NotifyParam2, true);
             DirectoryList->refresh();
         }
-        else if (NotifyType == "PRESENCE")
+        else 
             cerr << "SIP: Unknown Notify type " << NotifyType << endl;
     }
 
