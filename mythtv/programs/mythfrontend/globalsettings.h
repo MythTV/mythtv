@@ -4,7 +4,7 @@
 #include "libmyth/settings.h"
 #include "libmyth/mythcontext.h"
 
-class ThemeSelector: public ImageSelectSetting, public GlobalSetting {
+class ThemeSelector: public HostImageSelect {
 public:
     ThemeSelector();
 };
