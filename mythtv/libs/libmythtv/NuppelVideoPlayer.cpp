@@ -1157,7 +1157,8 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             }
             continue;
         }
-	video_actually_paused = false;
+        video_actually_paused = false;
+        resetvideo = false;
 
         if (prebuffering)
         {
@@ -1651,13 +1652,14 @@ void NuppelVideoPlayer::StartPlaying(void)
                 DoRewind();
 
             UnpauseVideo();
+            while (GetVideoPause())
+                usleep(50);
             rewindtime = 0;
 	}
 
 	if (fftime > 0)
 	{
             fftime = CalcMaxFFTime(fftime);
-
             PauseVideo();
 
             if (fftime >= 5)

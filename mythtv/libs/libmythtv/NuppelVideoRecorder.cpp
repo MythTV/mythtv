@@ -255,8 +255,8 @@ void NuppelVideoRecorder::Pause(bool clear)
 
 void NuppelVideoRecorder::Unpause(void)
 {
+    pausewritethread = false;
     paused = false;
-    pausewritethread = true;
 }
 
 bool NuppelVideoRecorder::GetPause(void)
