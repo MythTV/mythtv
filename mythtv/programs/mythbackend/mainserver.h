@@ -31,8 +31,7 @@ class MainServer : public QObject
     void customEvent(QCustomEvent *e);
     void PrintStatus(QSocket *socket);
 
-    void ProcessRequest(QStringList &listline, QStringList &tokens, 
-                        PlaybackSock *pbs);
+    void ProcessRequest(QSocket *sock); 
     void MarkUnused(ProcessRequestThread *prt);
 
   protected slots:
@@ -108,6 +107,8 @@ class MainServer : public QObject
     bool masterBackendOverride;
 
     QSqlDatabase *m_db;
+
+    QMutex readReadyLock;
 };
 
 #endif

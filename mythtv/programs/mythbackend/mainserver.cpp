@@ -32,11 +32,9 @@ class ProcessRequestThread : public QThread
   public:
     ProcessRequestThread(MainServer *ms) { parent = ms; dostuff = false; }
    
-    void setup(QStringList list, QStringList tok, PlaybackSock *pb)
+    void setup(QSocket *sock)
     {
-        listline = list;
-        tokens = tok;
-        pbs = pb;
+        socket = sock;
         dostuff = true;
         waitCond.wakeOne();
     }
@@ -58,7 +56,7 @@ class ProcessRequestThread : public QThread
 
             if (dostuff)
             {
-                parent->ProcessRequest(listline, tokens, pbs);
+                parent->ProcessRequest(socket);
                 dostuff = false;
                 parent->MarkUnused(this);
             }
@@ -68,9 +66,7 @@ class ProcessRequestThread : public QThread
   private:
     MainServer *parent;
 
-    QStringList listline;
-    QStringList tokens;
-    PlaybackSock *pbs;   
+    QSocket *socket;
 
     QWaitCondition waitCond;
     bool dostuff;
@@ -141,64 +137,66 @@ void MainServer::readSocket(void)
     if (testsock && testsock->isExpectingReply())
         return;
 
-    if (socket->bytesAvailable() > 0)
+    readReadyLock.lock();
+
+    ProcessRequestThread *prt = NULL;
+    while (!prt)
     {
-        QStringList listline;
-        ReadStringList(socket, listline);
-        QString line = listline[0];
-
-        line = line.simplifyWhiteSpace();
-        QStringList tokens = QStringList::split(" ", line);
-        QString command = tokens[0];
-        if (command == "ANN")
+        threadPoolLock.lock();
+        if (!threadPool.empty())
         {
-            if (tokens.size() < 3 || tokens.size() > 4)
-                cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                     << " Bad ANN query" << endl;
-            else
-                HandleAnnounce(listline, tokens, socket);
-            return;
+            prt = threadPool.back();
+            threadPool.pop_back();
         }
-        else if (command == "DONE")
+        threadPoolLock.unlock();
+
+        if (!prt)
         {
-            HandleDone(socket);
-            return;
-        }
-
-        PlaybackSock *pbs = getPlaybackBySock(socket);
-        if (pbs)
-        {
-            ProcessRequestThread *prt = NULL;
-            while (!prt)
-            {
-                threadPoolLock.lock();
-                if (!threadPool.empty())
-                {
-                    prt = threadPool.back();
-                    threadPool.pop_back();
-                }
-                threadPoolLock.unlock();
-
-                if (!prt)
-                {
-                    cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                         << " waiting for a thread.." << endl;
-                    usleep(50);
-                }
-            }
-
-            prt->setup(listline, tokens, pbs);
-        }
-        else
             cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                 << " Unknown socket" << endl;    
+                 << " waiting for a thread.." << endl;
+            usleep(50);
+        }
     }
+
+    prt->setup(socket);
+
+    readReadyLock.unlock();
 }
 
-void MainServer::ProcessRequest(QStringList &listline, QStringList &tokens,
-                                PlaybackSock *pbs)
+void MainServer::ProcessRequest(QSocket *sock)
 {
+    if (sock->bytesAvailable() <= 0)
+        return;
+
+    QStringList listline;
+    ReadStringList(sock, listline);
+    QString line = listline[0];
+
+    line = line.simplifyWhiteSpace();
+    QStringList tokens = QStringList::split(" ", line);
     QString command = tokens[0];
+    if (command == "ANN")
+    {
+        if (tokens.size() < 3 || tokens.size() > 4)
+            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                 << " Bad ANN query" << endl;
+        else
+            HandleAnnounce(listline, tokens, sock);
+        return;
+    }
+    else if (command == "DONE")
+    {
+        HandleDone(sock);
+        return;
+    }
+
+    PlaybackSock *pbs = getPlaybackBySock(sock);
+    if (!pbs)
+    {
+        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+             << " Unknown socket" << endl;
+        return;
+    }
 
     if (command == "QUERY_RECORDINGS")
     {
