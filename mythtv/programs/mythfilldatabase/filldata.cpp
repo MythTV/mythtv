@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <signal.h>
 
 #include "libmyth/mythcontext.h"
 
@@ -32,6 +33,7 @@ bool from_file = false;
 bool quiet = false;
 bool no_delete = false;
 bool isNorthAmerica = false;
+bool interrupted = false;
 
 MythContext *gContext;
 
@@ -1426,6 +1428,9 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
         query.exec(QString("UPDATE settings SET data ='%1' "
                            "WHERE value='mythfilldatabaseLastRunStatus'")
                            .arg(status));
+        if (WIFSIGNALED(systemcall_status) &&
+            (WTERMSIG(systemcall_status) == SIGINT || WTERMSIG(systemcall_status) == SIGQUIT))
+            interrupted = true;
     }
  
     if (!quiet)
@@ -1638,7 +1643,13 @@ bool fillData(QValueList<Source> &sourcelist)
                     if (!quiet)
                         cout << "Fetching data for " << date << endl;
                     if (!grabData(*it, i, &qCurrentDate))
+                    {
                         ++failures;
+                        if (interrupted)
+                        {
+                            break;
+                        }
+                    }
                 }
                 else
                 {
@@ -1652,6 +1663,10 @@ bool fillData(QValueList<Source> &sourcelist)
         {
             cerr << "Grabbing XMLTV data using " << xmltv_grabber.ascii() 
                  << " is not verified as working.\n";
+        }
+        if (interrupted)
+        {
+            break;
         }
     }
 
