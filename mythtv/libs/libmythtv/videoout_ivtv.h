@@ -48,7 +48,7 @@ class VideoOutputIvtv: public VideoOutput
     int fbfd;
 
     int storedglobalalpha;
-    bool initglobalalpha;
+    unsigned long initglobalalpha;
 
     float fps;
     QString videoDevice;

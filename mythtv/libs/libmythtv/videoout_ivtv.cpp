@@ -59,14 +59,7 @@ VideoOutputIvtv::~VideoOutputIvtv()
             return;
         }
 
-        initglobalalpha = fbstate.status & IVTVFB_STATUS_GLOBAL_ALPHA;
-        storedglobalalpha = fbstate.alpha;
-
-        if (initglobalalpha)
-            fbstate.status |= IVTVFB_STATUS_GLOBAL_ALPHA;
-        else
-            fbstate.status &= ~IVTVFB_STATUS_GLOBAL_ALPHA;
-
+        fbstate.status = initglobalalpha;
         fbstate.alpha = storedglobalalpha;
 
         if (ioctl(fbfd, IVTVFB_IOCTL_SET_STATE, &fbstate) < 0)
@@ -180,7 +173,7 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
             return false;
         }
 
-        initglobalalpha = fbstate.status & IVTVFB_STATUS_GLOBAL_ALPHA;
+        initglobalalpha = fbstate.status;
         storedglobalalpha = fbstate.alpha;
 
         fbstate.status &= ~IVTVFB_STATUS_GLOBAL_ALPHA;
