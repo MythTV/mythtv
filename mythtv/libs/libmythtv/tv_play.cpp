@@ -392,6 +392,7 @@ TV::~TV(void)
             MythMainWindow *mainWindow = gContext->GetMainWindow();
             mainWindow->setGeometry(xbase, ybase, width, height);
             mainWindow->setFixedSize(QSize(width, height));
+            mainWindow->move(QPoint(xbase, ybase));
         }
     }
     if (recorderPlaybackInfo)
@@ -722,31 +723,38 @@ void TV::HandleStateChange(void)
         }
 
         prbuffer = new RingBuffer(tmpFilename, false);
-        gContext->DisableScreensaver();
-
-        if (nextState == kState_WatchingRecording)
+        if (prbuffer->IsOpen())
         {
-            recorder = RemoteGetExistingRecorder(playbackinfo);
-            if (!recorder || !recorder->IsValidRecorder())
+            gContext->DisableScreensaver();
+    
+            if (nextState == kState_WatchingRecording)
             {
-                cerr << "ERROR: couldn't find recorder for in-progress "
-                     << "recording\n";
-                nextState = kState_WatchingPreRecorded;
-                if (recorder)
-                    delete recorder;
-                activerecorder = recorder = NULL;
+                recorder = RemoteGetExistingRecorder(playbackinfo);
+                if (!recorder || !recorder->IsValidRecorder())
+                {
+                    cerr << "ERROR: couldn't find recorder for in-progress "
+                         << "recording\n";
+                    nextState = kState_WatchingPreRecorded;
+                    if (recorder)
+                        delete recorder;
+                    activerecorder = recorder = NULL;
+                }
+                else
+                {
+                    activerecorder = recorder;
+                    recorder->Setup();
+                }
             }
-            else
-            {
-                activerecorder = recorder;
-                recorder->Setup();
-            }
+    
+            tmpInternalState = nextState;
+            changed = true;
+    
+            StartPlayerAndRecorder(true, false);
         }
-
-        tmpInternalState = nextState;
-        changed = true;
-
-        StartPlayerAndRecorder(true, false);
+        else
+        {
+            nextState = kState_None;
+        }
     }
     else if ((internalState == kState_WatchingPreRecorded && 
               nextState == kState_None) || 
