@@ -727,13 +727,35 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
                         putenv((char *)"GGI_DISPLAY=X");
         }
 
-        *exec = general_prefs.xmame_exe;
+        if (!general_prefs.xmame_exe.isEmpty())
+            *exec = general_prefs.xmame_exe;
+        else
+        {
+            cerr << "XMameBinary not set in mythgame.settings.txt, using "
+                 << "default.";
+            *exec = "/usr/X11R6/bin/xmame";
+        }
         *exec+= " -rompath ";
-        *exec+= general_prefs.rom_dir;
-        *exec+= " -cheatfile ";
-        *exec+= general_prefs.cheat_file;
-        *exec+= " -historyfile ";
-        *exec+= general_prefs.game_history_file;
+        if (!general_prefs.rom_dir.isEmpty())
+        {
+            *exec+= general_prefs.rom_dir;
+        }
+        else
+        {
+            cerr << "MameRomLocation not set in mythgame-settings.txt, using "
+                 << "default.";
+            *exec+= "/roms";
+        }
+        if (!general_prefs.cheat_file.isEmpty())
+        {
+           *exec+= " -cheatfile ";
+           *exec+= general_prefs.cheat_file;
+        }
+        if (!general_prefs.game_history_file.isEmpty())
+        {
+           *exec+= " -historyfile ";
+           *exec+= general_prefs.game_history_file;
+        }
         if (!screenshotdir.isEmpty())
         {
           *exec+= " -screenshotdir ";
