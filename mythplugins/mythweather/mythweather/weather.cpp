@@ -1,7 +1,7 @@
 /*
         MythWeather
         Version 0.8
-	January 8th, 2003
+        January 8th, 2003
 
         By John Danner & Dustin Doris
 
@@ -93,48 +93,48 @@ Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent,
     accidFile.open(accid, ios::in | ios::binary);
     if (!accidFile)
     {
-	noACCID = true;
-	if (debug == true)
-	     cerr << "MythWeather: ACCID Data File Error (file missing!)" << endl;
+        noACCID = true;
+        if (debug == true)
+             cerr << "MythWeather: ACCID Data File Error (file missing!)" << endl;
     }
     else
-    	loadAccidBreaks();
+        loadAccidBreaks();
 
     config_Aggressiveness = (gContext->GetSetting("WeatherAggressiveLvl")).toInt();
     if (config_Aggressiveness > 15)
-	config_Aggressiveness = 15;
+        config_Aggressiveness = 15;
 
     if (debug == true)
-	cerr << "MythWeather: Reading 'locale' from context.\n";
+        cerr << "MythWeather: Reading 'locale' from context.\n";
     locale = gContext->GetSetting("locale");
     config_Location = locale;
 
     if (locale.length() == 0)
     {
-	if (debug == true)
-		cerr << "MythWeather: --- No locale set, entering setup\n";
-	readReadme = true;
+        if (debug == true)
+                cerr << "MythWeather: --- No locale set, entering setup\n";
+        readReadme = true;
     }
     else
     {
-	QString temp = findNamebyAccid(locale);
-	if (debug == true)
-		cerr << "MythWeather: --- Locale: " << locale << endl;
+        QString temp = findNamebyAccid(locale);
+        if (debug == true)
+                cerr << "MythWeather: --- Locale: " << locale << endl;
     }
 
     if (debug == true)
-	cerr << "MythWeather: Reading 'SIUnits' from context.\n";
+        cerr << "MythWeather: Reading 'SIUnits' from context.\n";
     
     QString convertFlag = gContext->GetSetting("SIUnits");
     if (convertFlag.upper() == "YES")
     {
-	config_Units = 2;
-	if (debug == true)
-		cerr << "MythWeather: --- Converting Data\n";
-   	convertData = true;
+        config_Units = 2;
+        if (debug == true)
+                cerr << "MythWeather: --- Converting Data\n";
+        convertData = true;
     }
     else
-	config_Units = 1;
+        config_Units = 1;
 
     updateInterval = 30;
     nextpageInterval = 10;
@@ -142,7 +142,7 @@ Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent,
     currentPage = 0;
 
     if (debug == true)
-	cerr << "MythWeather: Loading Weather Types.\n";
+        cerr << "MythWeather: Loading Weather Types.\n";
     loadWeatherTypes();
    
     con_attempt = 0;
@@ -151,7 +151,7 @@ Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent,
     showLayout(0);
 
     if (debug == true)
-	cerr << "MythWeather: Setting up timers.\n";
+        cerr << "MythWeather: Setting up timers.\n";
     QTimer *showtime_Timer = new QTimer(this);
     connect(showtime_Timer, SIGNAL(timeout()), SLOT(showtime_timeout()) );
     showtime_Timer->start((int)(60 * 1000));
@@ -159,7 +159,7 @@ Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent,
     update_Timer = new QTimer(this);
     connect(update_Timer, SIGNAL(timeout()), SLOT(update_timeout()) );
     if (readReadme == false)
-	update_Timer->start((int)(10));   
+        update_Timer->start((int)(10));   
 
     nextpage_Timer = new QTimer(this);
     connect(nextpage_Timer, SIGNAL(timeout()), SLOT(nextpage_timeout()) );
@@ -170,12 +170,12 @@ Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent,
     setNoErase();
 
     if (debug == true)
-	cerr << "MythWeather: Finish Object Initialization.\n";
+        cerr << "MythWeather: Finish Object Initialization.\n";
 
     if (readReadme == true || appCode == 2)
     {
-	lastCityNum = (int)(accidBreaks[0]) - 1;
-    	setupPage();
+        lastCityNum = (int)(accidBreaks[0]) - 1;
+        setupPage();
     }
 }
 
@@ -382,101 +382,101 @@ void Weather::updatePage(QPainter *dr)
 
 void Weather::loadAccidBreaks()
 {
-	for (int i = 0; i < 26; i++)
-	{
-		if (accidFile.eof())
-		{
-			noACCID = true;
-			if (debug == true)
-			    cerr << "MythWeather: ACCID Data File Error (unexpected eof)" << endl;
-		}
+        for (int i = 0; i < 26; i++)
+        {
+                if (accidFile.eof())
+                {
+                        noACCID = true;
+                        if (debug == true)
+                            cerr << "MythWeather: ACCID Data File Error (unexpected eof)" << endl;
+                }
 
-		accidFile >> accidBreaks[i];
-		if (accidFile.eof())
-		{
-			i = 26;
-		}
-		accidFile >> accidBreaks[i + 26];
-		if (accidFile.eof())
-		{
+                accidFile >> accidBreaks[i];
+                if (accidFile.eof())
+                {
                         i = 26;
-		}
-	}
+                }
+                accidFile >> accidBreaks[i + 26];
+                if (accidFile.eof())
+                {
+                        i = 26;
+                }
+        }
 
-	startData = accidFile.tellg() + (streampos)1;
+        startData = accidFile.tellg() + (streampos)1;
 
 
 }
 
 void Weather::saveConfig()
 {
-	QString config_accid; 
-	QString agWriter;
-	QString units;
+        QString config_accid; 
+        QString agWriter;
+        QString units;
 
-	if (changeLoc == true)
-	{
+        if (changeLoc == true)
+        {
             if (cfgCity.stripWhiteSpace().length() != 0)
             {
-	         config_accid = findAccidbyName(cfgCity.stripWhiteSpace());
-	         gContext->SetSetting("locale", config_accid);
-	         locale = config_accid;
-	         setSetting("locale", locale, false);
-	    }
-	}
+                 config_accid = findAccidbyName(cfgCity.stripWhiteSpace());
+                 gContext->SetSetting("locale", config_accid);
+                 locale = config_accid;
+                 setSetting("locale", locale, false);
+            }
+        }
 
-	if (changeTemp == true)
-	{
+        if (changeTemp == true)
+        {
 
-	    if (config_Units == 2)
-	    {
-		units = "YES";
-		gContext->SetSetting("SIUnits", "YES");
-		convertData = true;
-	    }
-	    else
-	    {
-		units = "NO";
-		gContext->SetSetting("SIUnits", "NO");
-		convertData = false;
-	    }
-	    setSetting("SIUnits", units, false);
-    	}
+            if (config_Units == 2)
+            {
+                units = "YES";
+                gContext->SetSetting("SIUnits", "YES");
+                convertData = true;
+            }
+            else
+            {
+                units = "NO";
+                gContext->SetSetting("SIUnits", "NO");
+                convertData = false;
+            }
+            setSetting("SIUnits", units, false);
+        }
 
- 	if (changeAgg == true)
-	{
-	    agWriter = QString("%1").arg(config_Aggressiveness);
-	    gContext->SetSetting("WeatherAggressiveLvl", agWriter);
-	    setSetting("WeatherAggressiveLvl", agWriter, false);
-	}
+        if (changeAgg == true)
+        {
+            agWriter = QString("%1").arg(config_Aggressiveness);
+            gContext->SetSetting("WeatherAggressiveLvl", agWriter);
+            setSetting("WeatherAggressiveLvl", agWriter, false);
+        }
 
-	config_accid = "";
+        config_accid = "";
 }
 
 void Weather::setSetting(QString value, QString data, bool global)
 {
-	QString thequery;
+        QString thequery;
 
-	if (global == false)
-		thequery = QString("SELECT * FROM settings WHERE value=\"%1\" AND hostname=\"%2\";")
-			   .arg(value).arg(gContext->GetHostName());
-	else
-		thequery = QString("SELECT * FROM settings WHERE value=\"%1\";")
+        if (global == false)
+                thequery = QString("SELECT * FROM settings WHERE value=\"%1\" AND hostname=\"%2\";")
+                           .arg(value).arg(gContext->GetHostName());
+        else
+                thequery = QString("SELECT * FROM settings WHERE value=\"%1\";")
                            .arg(value);
 
-	QSqlQuery query = config->exec(thequery);
+        QSqlQuery query = config->exec(thequery);
         int rows = query.numRowsAffected();
-		
-	if (rows > 0)
-	{
+                
+        if (rows > 0)
+        {
 
-	   if (global == false)
-	        thequery = QString("UPDATE settings SET data=\"%1\" WHERE value=\"%2\" AND hostname=\"%3\";")
+           if (global == false)
+                thequery = QString("UPDATE settings SET data=\"%1\" WHERE value=\"%2\" AND hostname=\"%3\";")
                         .arg(data).arg(value).arg(gContext->GetHostName());
-	   else
-	        thequery = QString("UPDATE settings SET data=\"%1\" WHERE value=\"%2\";")
+           else
+                thequery = QString("UPDATE settings SET data=\"%1\" WHERE value=\"%2\";")
                         .arg(data).arg(value);
-	
+        
            query = config->exec(thequery);
            rows = query.numRowsAffected();
 
@@ -486,18 +486,18 @@ void Weather::setSetting(QString value, QString data, bool global)
                 cerr << "MythWeather: QUERY = " << thequery << endl;
                 return;
            }
-	}	
-	else
-	{
-	   if (global == false)
-		thequery = QString("INSERT INTO settings VALUES ('%1', '%2', '%3');")
-	 		   .arg(value).arg(data).arg(gContext->GetHostName());
-	   else
-		thequery = QString("INSERT INTO settings VALUES ('%1', '%2');").arg(value).arg(data);
+        }	
+        else
+        {
+           if (global == false)
+                thequery = QString("INSERT INTO settings VALUES ('%1', '%2', '%3');")
+                           .arg(value).arg(data).arg(gContext->GetHostName());
+           else
+                thequery = QString("INSERT INTO settings VALUES ('%1', '%2');").arg(value).arg(data);
 
-	   QSqlQuery query = config->exec(thequery);
+           QSqlQuery query = config->exec(thequery);
 
-	   rows = query.numRowsAffected();
+           rows = query.numRowsAffected();
 
            if (rows == -1)
            {
@@ -505,7 +505,7 @@ void Weather::setSetting(QString value, QString data, bool global)
                 cerr << "MythWeather: QUERY = " << thequery << endl;
                 return;
            }
-	}
+        }
 }
 
 QString Weather::findAccidbyName(QString name)
@@ -523,18 +523,18 @@ QString Weather::findAccidbyName(QString name)
                 accidFile.getline(temp, 1023);
                 hold = strtok(temp, "::");
                 hold = strtok(NULL, "::");
-	        accid = hold;
+                accid = hold;
                 hold = strtok(NULL, "::");	
 
                 if (strcmp(hold, name) == 0)
                 {
-			accidFile.seekg(startData);
+                        accidFile.seekg(startData);
                         return accid;
                 }
         }
 
-	accidFile.seekg(startData);
-	accidFile.clear();
+        accidFile.seekg(startData);
+        accidFile.clear();
      }
 
      accid = "<NOTFOUND>";
@@ -548,52 +548,52 @@ QString Weather::findNamebyAccid(QString accid)
     QString name;
     if (noACCID == false)
     {
-	int cnt = 0;
-	char temp[1024];
-	char *hold;
+        int cnt = 0;
+        char temp[1024];
+        char *hold;
 
-	accidFile.seekg(startData);
+        accidFile.seekg(startData);
 
-	while (!accidFile.eof())
-	{
-		accidFile.getline(temp, 1023);
-		cnt++;
+        while (!accidFile.eof())
+        {
+                accidFile.getline(temp, 1023);
+                cnt++;
 
-		if (strstr(temp, accid) != NULL)
-		{
-			streampos curp;
-			int rt = 0;
-			
-			hold = strtok(temp, "::");
-                	hold = strtok(NULL, "::");
-                	hold = strtok(NULL, "::");
+                if (strstr(temp, accid) != NULL)
+                {
+                        streampos curp;
+                        int rt = 0;
+                        
+                        hold = strtok(temp, "::");
+                        hold = strtok(NULL, "::");
+                        hold = strtok(NULL, "::");
 
-			curp = accidFile.tellg();
+                        curp = accidFile.tellg();
 
-			for (int i = 0; i < 26; i++)
-			{
-				if (curp > accidBreaks[i + 26] && curp < accidBreaks[i + 27])
-				{
-					curLetter = i;
-					cnt = cnt - rt;
-					i = 26;
-				}
-				else
-				{
-					rt = rt + accidBreaks[i]; 
-				}
-			}
+                        for (int i = 0; i < 26; i++)
+                        {
+                                if (curp > accidBreaks[i + 26] && curp < accidBreaks[i + 27])
+                                {
+                                        curLetter = i;
+                                        cnt = cnt - rt;
+                                        i = 26;
+                                }
+                                else
+                                {
+                                        rt = rt + accidBreaks[i]; 
+                                }
+                        }
 
-			curCity = cnt - 1;
+                        curCity = cnt - 1;
 
-			name = hold;
-			accidFile.seekg(startData);
-			return name;
-		}
-	}
+                        name = hold;
+                        accidFile.seekg(startData);
+                        return name;
+                }
+        }
 
-	accidFile.seekg(startData);
-	accidFile.clear();
+        accidFile.seekg(startData);
+        accidFile.clear();
     }
     name = "<NOTFOUND>";
 
@@ -604,49 +604,49 @@ void Weather::loadCityData(int dat)
 {
     if (noACCID == false)
     {
-	int start = 0;
-	int end = 9;
+        int start = 0;
+        int end = 9;
 
-	if (dat < 0)
-		dat = 0;
-	if (dat > lastCityNum)
-		dat = lastCityNum;
+        if (dat < 0)
+                dat = 0;
+        if (dat > lastCityNum)
+                dat = lastCityNum;
 
-	char temporary[1024];
-	char *hold;
-	accidFile.seekg(startData + accidBreaks[curLetter + 26], ios::beg);
+        char temporary[1024];
+        char *hold;
+        accidFile.seekg(startData + accidBreaks[curLetter + 26], ios::beg);
 
-	if (dat > 4) 
-	{
-	    for (int i = 0; i < (dat - 4); i++)
-	    {
-		accidFile.getline(temporary,1023);
-		if (accidFile.eof())
+        if (dat > 4) 
+        {
+            for (int i = 0; i < (dat - 4); i++)
+            {
+                accidFile.getline(temporary,1023);
+                if (accidFile.eof())
                 {
                         accidFile.seekg(-25, ios::end);
                         accidFile.clear();
                 }
-	    }
-	}
-	if (dat < 4)
-	{
-	    if (curLetter != 0)
-	    	backupCity(4 - dat);
-	}
+            }
+        }
+        if (dat < 4)
+        {
+            if (curLetter != 0)
+                backupCity(4 - dat);
+        }
 
 
-	if (curLetter == 0 && dat < 4)
-	{
-		start = 4 - dat;
-		for (int k = 0; k < start; k++)
-		      cityNames[k] = "";
-	}
+        if (curLetter == 0 && dat < 4)
+        {
+                start = 4 - dat;
+                for (int k = 0; k < start; k++)
+                      cityNames[k] = "";
+        }
 
-	for (int j = start; j < end; j++)
-	{
-		accidFile.getline(temporary, 1023);
+        for (int j = start; j < end; j++)
+        {
+                accidFile.getline(temporary, 1023);
 /*
-		if (accidFile.eof())
+                if (accidFile.eof())
                 {
                         accidFile.seekg(-25, ios::end);
                         accidFile.clear();
@@ -657,35 +657,35 @@ void Weather::loadCityData(int dat)
                 hold = strtok(NULL, "::");
                 hold = strtok(NULL, "::");
 
-	
-		if (hold != NULL)
-		{
-		    if (strcmp(hold, "XXXXXXXXXX") == 0)
+        
+                if (hold != NULL)
+                {
+                    if (strcmp(hold, "XXXXXXXXXX") == 0)
                     {
-			accidFile.seekg(-25, ios::end);
-			accidFile.clear();
+                        accidFile.seekg(-25, ios::end);
+                        accidFile.clear();
                         for (int k = j; k < 9; k++)
                                 cityNames[k] = "";
 
                         j = end;
                     }
-		    else
-		    {
+                    else
+                    {
 
-		        cityNames[j] = hold;
+                        cityNames[j] = hold;
 
-		        if ((int)hold[0] != (curLetter + 65))
+                        if ((int)hold[0] != (curLetter + 65))
                         {
                              cityNames[j] = "";
                         }
 
-		     }
-		}
-		else
-		{	
-			cityNames[j] = "";
-		}
-	}
+                     }
+                }
+                else
+                {	
+                        cityNames[j] = "";
+                }
+        }
     }
 
 }
@@ -704,26 +704,26 @@ void Weather::updateLetters()
        {
            ltype->ResetList();
            ltype->SetItemCurrent(4);
-	   for (int j = curLetter - 4; j < (curLetter + 5); j++)
+           for (int j = curLetter - 4; j < (curLetter + 5); j++)
            {
-		if (j == curLetter)
-			lastCityNum = (int)(accidBreaks[curLetter]) - 1;
+                if (j == curLetter)
+                        lastCityNum = (int)(accidBreaks[curLetter]) - 1;
 
                 h = j;
                 if (h < 0)
-			h = h + 26;
-		if (h > 25)
-			h = h - 26;
+                        h = h + 26;
+                if (h > 25)
+                        h = h - 26;
 
-		h = h + 65;
-			
+                h = h + 65;
+                        
                 temp = QString(" %1 ").arg((char)(h));
                 ltype->SetItemText(cnt, temp);
                 cnt++;
            }
 
-	   loadCityData(0);
-	   showCityName();
+           loadCityData(0);
+           showCityName();
        }
    }
    update(fullRect);
@@ -731,30 +731,30 @@ void Weather::updateLetters()
 
 void Weather::backupCity(int num)
 {
-	char temporary[1024];
-	char temp2[1024];
-	char *np;
-	int prev = 0;
-	num++;
+        char temporary[1024];
+        char temp2[1024];
+        char *np;
+        int prev = 0;
+        num++;
 
-	for (int i = num; i > 0; i--)
-	{
-		accidFile.getline(temporary, 1023);
-		strcpy(temp2, temporary);
+        for (int i = num; i > 0; i--)
+        {
+                accidFile.getline(temporary, 1023);
+                strcpy(temp2, temporary);
 
-		np = strtok(temp2, "::");
+                np = strtok(temp2, "::");
 
-		if (np != NULL)
-		{
-		    prev = atol(np);
+                if (np != NULL)
+                {
+                    prev = atol(np);
 
-		    prev = -1 * (prev + strlen(temporary) + 1);
-		}
+                    prev = -1 * (prev + strlen(temporary) + 1);
+                }
 
-		accidFile.seekg((long)prev, ios::cur);
-	}
+                accidFile.seekg((long)prev, ios::cur);
+        }
 
-	accidFile.getline(temporary, 1023);
+        accidFile.getline(temporary, 1023);
 
 
 }
@@ -769,13 +769,13 @@ void Weather::showCityName()
        {
            ltype->ResetList();
            ltype->SetItemCurrent(4);
-	   int cnt = 0;
-	   for (int i = 0; i < 9; i++)
-	   {
+           int cnt = 0;
+           for (int i = 0; i < 9; i++)
+           {
                 ltype->SetItemText(i, tr(cityNames[i].left(cityNames[i].find("(",0)-1)) 
-				+ cityNames[i].mid(cityNames[i].find("(",0)-1));
-		cnt++;
-	   }
+                                + cityNames[i].mid(cityNames[i].find("(",0)-1));
+                cnt++;
+           }
            cfgCity = cityNames[4];
        }
    }
@@ -784,12 +784,12 @@ void Weather::showCityName()
 
 void Weather::processEvents()
 {
-	qApp->processEvents();
+        qApp->processEvents();
 }
 
 QString Weather::getLocation()
 {
-	return locale;
+        return locale;
 }
 
 void Weather::loadWeatherTypes()
@@ -801,27 +801,27 @@ void Weather::loadWeatherTypes()
    ifstream weather_data(baseDir + "/share/mythtv/mythweather/weathertypes.dat", ios::in);
    if (weather_data == NULL)
    {
-	cerr << "MythWeather: Error reading " << baseDir << "/share/mythtv/mythweather/weathertypes.dat...exiting...\n";
-	exit(-1); 
+        cerr << "MythWeather: Error reading " << baseDir << "/share/mythtv/mythweather/weathertypes.dat...exiting...\n";
+        exit(-1); 
    }
 
    QString tempStr;
 
    while (!weather_data.eof())
    {
-	weather_data.getline(temporary, 1023);
-	tempStr = temporary;
-	if (tempStr.length() > 0)
-	{
+        weather_data.getline(temporary, 1023);
+        tempStr = temporary;
+        if (tempStr.length() > 0)
+        {
 
- 	QStringList datas = QStringList::split(",", tempStr);
+        QStringList datas = QStringList::split(",", tempStr);
 
-	wData[wCount].typeNum = datas[0].toInt();
-	wData[wCount].typeName = datas[1];
+        wData[wCount].typeNum = datas[0].toInt();
+        wData[wCount].typeName = datas[1];
         wData[wCount].typeIcon = datas[2];
 
-	wCount++;
-	}
+        wCount++;
+        }
    }
 
 }
@@ -852,7 +852,7 @@ void Weather::newLocaleX(int newDigit)
 {
     if (inSetup == true && deepSetup == true && curConfig == 2 && gotLetter == true)
     {
-	changeLoc = true;
+        changeLoc = true;
 
         switch (newDigit)
     {
@@ -873,7 +873,7 @@ void Weather::newLocaleX(int newDigit)
         if (curCity < 0)
         curCity = 0;
 
-	if (curCity > lastCityNum)
+        if (curCity > lastCityNum)
                 curCity = lastCityNum;
 
         loadCityData(curCity);
@@ -907,7 +907,7 @@ void Weather::newLocaleX(int newDigit)
         if (newLocaleHold.length() == 5)
         {
                 locale = newLocaleHold;
-		newLocaleHold = "";
+                newLocaleHold = "";
                 update(newlocRect);
                 update_timeout();
         }
@@ -921,36 +921,36 @@ void Weather::holdPage()
   {
    if (nextpage_Timer->isActive() == false)
    {
- 	nextpage_Timer->start((int)(1000 * nextpageInterval));
-	QString txtLocale = city + ", ";
-    	if (state.length() == 0)
-	{
-        	txtLocale += country + " (" + locale;
-		if (validArea == false)
-			txtLocale += tr(" is invalid)");
-		else
-			txtLocale += ")";
-	}
-    	else
-	{
-        	txtLocale += state + ", " + country + " (" + locale;
+        nextpage_Timer->start((int)(1000 * nextpageInterval));
+        QString txtLocale = city + ", ";
+        if (state.length() == 0)
+        {
+                txtLocale += country + " (" + locale;
                 if (validArea == false)
                         txtLocale += tr(" is invalid)");
                 else
                         txtLocale += ")";
-	}
+        }
+        else
+        {
+                txtLocale += state + ", " + country + " (" + locale;
+                if (validArea == false)
+                        txtLocale += tr(" is invalid)");
+                else
+                        txtLocale += ")";
+        }
 
-	if (readReadme == true)
-		txtLocale += tr("   No Location Set, Please read the README");
+        if (readReadme == true)
+                txtLocale += tr("   No Location Set, Please read the README");
 
         LayerSet *container = theme->GetSet("weatherpages");
         if (container)
             SetText(container, "location", tr(txtLocale.left(txtLocale.find("(",0)-1)) 
-				+ txtLocale.mid(txtLocale.find("(",0)-1));
+                                + txtLocale.mid(txtLocale.find("(",0)-1));
    }
    else
    {
-	nextpage_Timer->stop();
+        nextpage_Timer->stop();
         LayerSet *container = theme->GetSet("weatherpages");
         if (container)
         {
@@ -970,8 +970,8 @@ void Weather::resetLocale()
 {
      if (inSetup == false)
      {
-	locale = gContext->GetSetting("locale");
-	update_timeout();
+        locale = gContext->GetSetting("locale");
+        update_timeout();
      }
 }
 
@@ -1021,68 +1021,68 @@ void Weather::setupPage()
                 ltype->ResetList();
         }
 
-	inSetup = true;
-  	nextpage_Timer->stop();
-	showLayout(5);
+        inSetup = true;
+        nextpage_Timer->stop();
+        showLayout(5);
     }
     else
     {
-	inSetup = false;
-	deepSetup = false;
-	curConfig = 1;
-	gotLetter = false;
-	
-	saveConfig();
+        inSetup = false;
+        deepSetup = false;
+        curConfig = 1;
+        gotLetter = false;
+        
+        saveConfig();
 
-	if (readReadme == true)
-	{
+        if (readReadme == true)
+        {
                 LayerSet *container = theme->GetSet("weatherpages");
                 if (container)
                 {
                     SetText(container, "location", tr("Configuration Saved..."));
                     SetText(container, "updatetime", tr("Retrieving weather data..."));
                 }
-		readReadme = false;
-		update_Timer->start((int)(10));
-		showLayout(1);
-	}
-	else
-	{
-		firstRun = true;	
+                readReadme = false;
+                update_Timer->start((int)(10));
+                showLayout(1);
+        }
+        else
+        {
+                firstRun = true;	
 
-		if (changeLoc == true || changeTemp == true)
-			update_Timer->changeInterval((int)(100));
-		else
-		{
-			QString txtLocale = city + ", ";
-    			if (state.length() == 0)
-    			{
-        			txtLocale += country + " (" + locale;
-                		if (validArea == false)
-                        		txtLocale += tr(" is invalid)");
-                		else
-                        		txtLocale += ")";
-    			}
-    			else
-    			{
-        			txtLocale += state + ", " + country + " (" + locale;
-                		if (validArea == false)
-                        		txtLocale += tr(" is invalid)");
-                		else
-                        		txtLocale += ")";
-    			}
-		}
+                if (changeLoc == true || changeTemp == true)
+                        update_Timer->changeInterval((int)(100));
+                else
+                {
+                        QString txtLocale = city + ", ";
+                        if (state.length() == 0)
+                        {
+                                txtLocale += country + " (" + locale;
+                                if (validArea == false)
+                                        txtLocale += tr(" is invalid)");
+                                else
+                                        txtLocale += ")";
+                        }
+                        else
+                        {
+                                txtLocale += state + ", " + country + " (" + locale;
+                                if (validArea == false)
+                                        txtLocale += tr(" is invalid)");
+                                else
+                                        txtLocale += ")";
+                        }
+                }
 
-		nextpage_Timer->changeInterval((int)(1000 * nextpageInterval));
-		if (validArea == true)
-			showLayout(1);
-		else
-			showLayout(0);
-	}
+                nextpage_Timer->changeInterval((int)(1000 * nextpageInterval));
+                if (validArea == true)
+                        showLayout(1);
+                else
+                        showLayout(0);
+        }
 
-	changeTemp = false;
-	changeLoc = false;
-	changeAgg = false;
+        changeTemp = false;
+        changeLoc = false;
+        changeAgg = false;
     }
 }
 
@@ -1090,25 +1090,25 @@ void Weather::convertFlip()
 {
     if (inSetup == false)
     {
-	if (convertData == false)
+        if (convertData == false)
         {
-		if (debug == true)	
-			cerr << "MythWeather: Converting weather data.\n";
-		convertData = true;
-	}
-	else
- 	{
-		if (debug == true)
-			cerr << "MythWeather: Not converting weather data.\n";
-		convertData = false;
-	}
+                if (debug == true)	
+                        cerr << "MythWeather: Converting weather data.\n";
+                convertData = true;
+        }
+        else
+        {
+                if (debug == true)
+                        cerr << "MythWeather: Not converting weather data.\n";
+                convertData = false;
+        }
 
-	update_timeout();
+        update_timeout();
         update(fullRect);
     }
     else
     {
-	setupPage();
+        setupPage();
     }
 }
 
@@ -1116,11 +1116,11 @@ void Weather::upKey()
 {
    if (inSetup == true)
    {
-	if (deepSetup == false)
-	{
-	    curConfig--;
-	    if (curConfig == 0)
-	  	curConfig = 3;
+        if (deepSetup == false)
+        {
+            curConfig--;
+            if (curConfig == 0)
+                curConfig = 3;
 
             LayerSet *container = theme->GetSet("setup");
             if (container)
@@ -1137,7 +1137,7 @@ void Weather::upKey()
                     ltype->ResetList();
             }
             UITextType *type = NULL;
-	    switch (curConfig)
+            switch (curConfig)
             {
                 case 1:
                        if (container)
@@ -1175,45 +1175,45 @@ void Weather::upKey()
                        }
                        updateAggr();
                        break;
-	    }
-	}
-	else
-	{
-	    if (curConfig == 1)
-	    {
+            }
+        }
+        else
+        {
+            if (curConfig == 1)
+            {
                 LayerSet *container = theme->GetSet("setup");
                 if (container)
                 {
                     UIListType *type = (UIListType *)container->GetType("mainlist");
-		    changeTemp = true;
-		    if (config_Units == 1 && container)
-		    {
+                    changeTemp = true;
+                    if (config_Units == 1 && container)
+                    {
                         type->SetItemCurrent(1);
-			config_Units = 2;
-		    }	
-		    else if (container)
-	   	    {
+                        config_Units = 2;
+                    }	
+                    else if (container)
+                    {
                         type->SetItemCurrent(0);
-			config_Units = 1;
-		    }
+                        config_Units = 1;
+                    }
                 }
-	    }
+            }
 
-	    if (curConfig == 2)
-	    {
-		if (gotLetter == false)
-		{
-			curLetter--;
-			if (curLetter < 0)
-				curLetter = 25;
-	
-			curCity = 0;
+            if (curConfig == 2)
+            {
+                if (gotLetter == false)
+                {
+                        curLetter--;
+                        if (curLetter < 0)
+                                curLetter = 25;
+        
+                        curCity = 0;
 
-			updateLetters();
-		}
-		else
-		{
- 	  	    changeLoc = true;
+                        updateLetters();
+                }
+                else
+                {
+                    changeLoc = true;
 
                     LayerSet *container = theme->GetSet("setup");
                     if (container)
@@ -1223,30 +1223,30 @@ void Weather::upKey()
                         if ((type->GetItemText(3)).length() > 2)
                         {
 
-				curCity--;
-				if (curCity < 0)
-					curCity = 0;
+                                curCity--;
+                                if (curCity < 0)
+                                        curCity = 0;
 
-				loadCityData(curCity);
-				showCityName();
-			}
+                                loadCityData(curCity);
+                                showCityName();
+                        }
                     }
-		}
-		
-	    }
+                }
+                
+            }
 
- 	    if (curConfig == 3)
-	    {
-    		changeAgg = true;
-		config_Aggressiveness--;
-		if (config_Aggressiveness < 1)
-			config_Aggressiveness = 15 + config_Aggressiveness;
-		if (config_Aggressiveness > 15)
-			config_Aggressiveness = config_Aggressiveness - 15;
-	
-		updateAggr();
-	    }
-	}
+            if (curConfig == 3)
+            {
+                changeAgg = true;
+                config_Aggressiveness--;
+                if (config_Aggressiveness < 1)
+                        config_Aggressiveness = 15 + config_Aggressiveness;
+                if (config_Aggressiveness > 15)
+                        config_Aggressiveness = config_Aggressiveness - 15;
+        
+                updateAggr();
+            }
+        }
        update(fullRect);
    }
 }
@@ -1255,8 +1255,8 @@ void Weather::pgupKey()
 {
     if (inSetup == true && deepSetup == true && curConfig == 2 && gotLetter == true)
     {
-    	changeLoc =true;
-	curCity = curCity - 9;
+        changeLoc =true;
+        curCity = curCity - 9;
         if (curCity < 0)
                curCity = 0;
 
@@ -1269,10 +1269,10 @@ void Weather::pgdnKey()
 {
     if (inSetup == true && deepSetup == true && curConfig == 2 && gotLetter == true)
     {
-    	changeLoc =true;
+        changeLoc =true;
         curCity = curCity + 9;
-	if (curCity > lastCityNum)
-		curCity = lastCityNum;
+        if (curCity > lastCityNum)
+                curCity = lastCityNum;
 
         loadCityData(curCity);
         showCityName();
@@ -1284,11 +1284,11 @@ void Weather::dnKey()
 {
    if (inSetup == true)
    {
-	if (deepSetup == false)
-	{
-	    curConfig++;
-	    if (curConfig == 4)
-		curConfig = 1;
+        if (deepSetup == false)
+        {
+            curConfig++;
+            if (curConfig == 4)
+                curConfig = 1;
    
             LayerSet *container = theme->GetSet("setup");
             if (container)
@@ -1304,8 +1304,8 @@ void Weather::dnKey()
                     ltype->ResetList();
             }
             UITextType *type = NULL;
-	    switch (curConfig)
-	    {
+            switch (curConfig)
+            {
                 case 1:
                        if (container)
                        {
@@ -1344,10 +1344,10 @@ void Weather::dnKey()
                        updateAggr();
                        break;
             }
-	}
-	else
-	{
-	    if (curConfig == 1)
+        }
+        else
+        {
+            if (curConfig == 1)
             {
                 LayerSet *container = theme->GetSet("setup");
                 if (container)
@@ -1366,55 +1366,55 @@ void Weather::dnKey()
                     }
                 }
             }
-	    if (curConfig == 2)
-	    {
+            if (curConfig == 2)
+            {
                 if (gotLetter == false)
                 {
                         curLetter++;
                         if (curLetter > 25)
                                 curLetter = 0;
 
-			curCity = 0;
+                        curCity = 0;
                         updateLetters();
                 }
-		else
-		{
-   		   changeLoc = true;
+                else
+                {
+                   changeLoc = true;
 
-		   lastCityNum = (int)(accidBreaks[curLetter]) - 1;
+                   lastCityNum = (int)(accidBreaks[curLetter]) - 1;
                    LayerSet *container = theme->GetSet("setup");
                    if (container)
                    {
                        UIListType *type = (UIListType *)container->GetType("mainlist");
 
-  		       if ((type->GetItemText(5)).length() > 2)
-		       {
+                       if ((type->GetItemText(5)).length() > 2)
+                       {
 
-			   curCity++;
+                           curCity++;
                            if (curCity > lastCityNum)
                                curCity = lastCityNum;
 
-		   	   loadCityData(curCity);
+                           loadCityData(curCity);
                            showCityName();
- 		       }
+                       }
                    }
-		
-		}
+                
+                }
 
-  	    }
-	    if (curConfig == 3)
-	    {
-    		changeAgg = true;
-		config_Aggressiveness++;
+            }
+            if (curConfig == 3)
+            {
+                changeAgg = true;
+                config_Aggressiveness++;
                 if (config_Aggressiveness < 1)
                         config_Aggressiveness = 15 + config_Aggressiveness;
                 if (config_Aggressiveness > 15)
                         config_Aggressiveness = config_Aggressiveness - 15;
 
-		updateAggr();
- 	   }
-	}
-	update(fullRect);
+                updateAggr();
+           }
+        }
+        update(fullRect);
    }
 }
 
@@ -1425,7 +1425,7 @@ void Weather::updateAggr()
     {
         UIListType *type = (UIListType *)container->GetType("mainlist");
         type->ResetList();
-	QString temp;
+        QString temp;
         int h;
         int cnt = 0;
 
@@ -1449,7 +1449,7 @@ void Weather::updateAggr()
                     type->SetItemCurrent(cnt);
                 type->SetItemText(cnt, 2, temp);
                 cnt++;
-       	}
+        }
     }
 }
 
@@ -1544,7 +1544,7 @@ void Weather::cursorRight()
       {
           UIListType *ltype = NULL;
 
-	  gotLetter = true;
+          gotLetter = true;
           ltype = (UIListType *)container->GetType("alpha");
           if (ltype)
           {
@@ -1568,20 +1568,20 @@ void Weather::cursorLeft()
    if (inSetup == false)
    {
         if (nextpage_Timer->isActive())
-   	    nextpage_Timer->changeInterval((int)(1000 * nextpageIntArrow));
-   	int tp = currentPage;
-   	tp--;
-	
-   	if (tp == 0)
-   	     tp = 5;
+            nextpage_Timer->changeInterval((int)(1000 * nextpageIntArrow));
+        int tp = currentPage;
+        tp--;
+        
+        if (tp == 0)
+             tp = 5;
 
-   	if (tp == 3 && pastTime == true)
-		tp = 2;
+        if (tp == 3 && pastTime == true)
+                tp = 2;
 
-   	if (tp == 4 && pastTime == false)
-		tp = 3;
+        if (tp == 4 && pastTime == false)
+                tp = 3;
 
-   	showLayout(tp);
+        showLayout(tp);
    }
    else if (deepSetup == true)
    {
@@ -1650,12 +1650,12 @@ void Weather::nextpage_timeout()
    int tp = currentPage;
    tp++;
    if (tp > 5) 
-	tp = 1;
+        tp = 1;
 
    if (tp == 3 && pastTime == true)
-	tp = 4;
+        tp = 4;
    if (tp == 4 && pastTime == false)
-	tp = 5;
+        tp = 5;
 
    showLayout(tp);
 
@@ -1666,7 +1666,7 @@ void Weather::update_timeout()
 {
     bool result = false;
     if (debug == true)
-	cerr << "MythWeather: update_timeout() : Updating....\n";
+        cerr << "MythWeather: update_timeout() : Updating....\n";
 
     LayerSet *container = theme->GetSet("weatherpages");
 
@@ -1674,9 +1674,9 @@ void Weather::update_timeout()
     {
         if (container)
             SetText(container, "updatetime", tr("Obtaining initial weather data..."));
-	if (debug == true)
-		cerr << "MythWeather: First run, reset timer to updateInterval.\n";
-    	update_Timer->changeInterval((int)(1000 * 60 * updateInterval));
+        if (debug == true)
+                cerr << "MythWeather: First run, reset timer to updateInterval.\n";
+        update_Timer->changeInterval((int)(1000 * 60 * updateInterval));
     }
     else
     {
@@ -1700,12 +1700,12 @@ void Weather::update_timeout()
     {
 
     if (pastTime == true && currentPage == 3 && inSetup == false)
-	nextpage_timeout();
+        nextpage_timeout();
     if (pastTime == false && currentPage == 4 && inSetup == false)
-	nextpage_timeout();
+        nextpage_timeout();
 
     if (firstRun == true && inSetup == false)
-	nextpage_Timer->start((int)(1000 * nextpageInterval));
+        nextpage_Timer->start((int)(1000 * nextpageInterval));
 
     container = theme->GetSet("weatherpages");
     if (container)
@@ -1727,7 +1727,7 @@ void Weather::update_timeout()
         if (winddir == "CALM")
             SetText(container, "winddata", tr("Calm"));
         else if (winddir == "VAR")
-	{
+        {
             if (convertData == false)
                 SetText(container, "winddata", curWind + " mph");
             else
@@ -1778,7 +1778,7 @@ void Weather::update_timeout()
     QString txtLocale = city + ", ";
     if (state.length() == 0)
     {
-	txtLocale += country + " (" + locale;
+        txtLocale += country + " (" + locale;
                 if (validArea == false)
                         txtLocale += tr(" is invalid)");
                 else
@@ -1786,7 +1786,7 @@ void Weather::update_timeout()
     }
     else
     {
-	txtLocale += state + ", " + country + " (" + locale;
+        txtLocale += state + ", " + country + " (" + locale;
                 if (validArea == false)
                         txtLocale += tr(" is invalid)");
                 else
@@ -1800,7 +1800,7 @@ void Weather::update_timeout()
     if (container)
     {
         SetText(container, "location", tr(txtLocale.left(txtLocale.find("(",0)-1)) 
-				+ txtLocale.mid(txtLocale.find("(",0)-1));
+                                + txtLocale.mid(txtLocale.find("(",0)-1));
         SetText(container, "curcond", description);
     }
 
@@ -1814,21 +1814,21 @@ void Weather::update_timeout()
          todayDesc += tr(" calm.");
     else
     {
-	if (convertData == false)
-		todayDesc += tr(" coming in at ") + curWind + tr(" mph from the ") + tr(winddir) + ".";
-	else 
-		todayDesc += tr(" coming in at ") + curWind + tr(" Km/h from the ") + tr(winddir) + ".";
+        if (convertData == false)
+                todayDesc += tr(" coming in at ") + curWind + tr(" mph from the ") + tr(winddir) + ".";
+        else 
+                todayDesc += tr(" coming in at ") + curWind + tr(" Km/h from the ") + tr(winddir) + ".";
     }
   
     if (visibility.toFloat() == 999.00)
-	todayDesc += tr(" Visibility will be unlimited for today.");
+        todayDesc += tr(" Visibility will be unlimited for today.");
     else
     {
-	if (visibility == "")
-	   todayDesc += tr(" Visibility conditions are unknown.");
-	else if (convertData == false)
-	   todayDesc += tr(" There will be a visibility of ") + visibility + tr(" miles.");
-	else
+        if (visibility == "")
+           todayDesc += tr(" Visibility conditions are unknown.");
+        else if (convertData == false)
+           todayDesc += tr(" There will be a visibility of ") + visibility + tr(" miles.");
+        else
            todayDesc += tr(" There will be a visibility of ") + visibility + tr(" km.");
     }
 
@@ -1923,9 +1923,9 @@ void Weather::update_timeout()
 
     if (firstRun == true)
     {
-    	firstRun = false;
-	if (inSetup == false)
-		nextpage_timeout();
+        firstRun = false;
+        if (inSetup == false)
+                nextpage_timeout();
     }
 
     }
@@ -1963,66 +1963,66 @@ void Weather::showLayout(int pageNum)
 bool Weather::UpdateData()
 {
 
-	timeoutCounter = 0;
+        timeoutCounter = 0;
         LayerSet *container = theme->GetSet("weatherpages");
         if (container)
         {
             SetText(container, "updatetime", tr("Updating..."));
         }
 
-	bool result = false;
+        bool result = false;
         allowkeys = false;
-	if (debug == true)
-	    cerr << "MythWeather: COMMS : GetWeatherData() ...\n";
+        if (debug == true)
+            cerr << "MythWeather: COMMS : GetWeatherData() ...\n";
 
-	int cnt = 3;
-	while (cnt > 0)
+        int cnt = 3;
+        while (cnt > 0)
         {
             stopProcessing = false;
             urlTimer->start(weatherTimeoutInt);
-	    result = GetWeatherData();
-	    urlTimer->stop();
-	    if (result == true)
-		cnt = 0;
-	    else
-		cnt--;
-	}
+            result = GetWeatherData();
+            urlTimer->stop();
+            if (result == true)
+                cnt = 0;
+            else
+                cnt--;
+        }
 
-	if (result == false)
+        if (result == false)
             cout << "MythWeather: Failed to get weather data.\n"; 
 
         update(fullRect);
         allowkeys = true;
 
-	if (result == true)
-	{
+        if (result == true)
+        {
 
-	updated = GetString("this.swLastUp");
+        updated = GetString("this.swLastUp");
 
-	city = GetString("this.swCity");
-	state = GetString("this.swSubDiv");
-	country = GetString("this.swCountry");
-	curTemp = GetString("this.swTemp");
-	if (curTemp.length() == 0)
-	{
-		curTemp = "-na-";
-		updated = updated + tr(" (Not All Information Available)");
-	}
-	else
-	{
-	    if (convertData == true)
-	    {
-		char tempHold[32];
-		double tTemp = curTemp.toDouble();
-		double nTemp = (double)(5.0/9.0)*(tTemp - 32.0);
-		sprintf (tempHold, "%d", (int)nTemp);
-		curTemp = tempHold;
-	    }
-	}
+        city = GetString("this.swCity");
+        state = GetString("this.swSubDiv");
+        country = GetString("this.swCountry");
+        curTemp = GetString("this.swTemp");
+        if (curTemp.length() == 0)
+        {
+                curTemp = "-na-";
+                updated = updated + tr(" (Not All Information Available)");
+        }
+        else
+        {
+            if (convertData == true)
+            {
+                char tempHold[32];
+                double tTemp = curTemp.toDouble();
+                double nTemp = (double)(5.0/9.0)*(tTemp - 32.0);
+                sprintf (tempHold, "%d", (int)nTemp);
+                curTemp = tempHold;
+            }
+        }
 
-	curIcon = GetString("this.swCIcon");
-	curWind = GetString("this.swWindS");
-	if (convertData == true)
+        curIcon = GetString("this.swCIcon");
+        curWind = GetString("this.swWindS");
+        if (convertData == true)
         {
                 char tempHold[32];
                 double tTemp = curWind.toDouble();
@@ -2031,10 +2031,10 @@ bool Weather::UpdateData()
                 curWind = tempHold;
         }
 
-	winddir = GetString("this.swWindD");
+        winddir = GetString("this.swWindD");
 
-	barometer = GetString("this.swBaro");
-	if (convertData == true)
+        barometer = GetString("this.swBaro");
+        if (convertData == true)
         {
                 char tempHold[32];
                 double tTemp = barometer.toDouble();
@@ -2042,9 +2042,9 @@ bool Weather::UpdateData()
                 sprintf (tempHold, "%.1f", nTemp);
                 barometer = tempHold;
         }
-	curHumid = GetString("this.swHumid");
-	curFeel = GetString("this.swReal");
-	if (convertData == true)
+        curHumid = GetString("this.swHumid");
+        curFeel = GetString("this.swReal");
+        if (convertData == true)
         {
                 char tempHold[32];
                 double tTemp = curFeel.toDouble();
@@ -2052,9 +2052,9 @@ bool Weather::UpdateData()
                 sprintf (tempHold, "%d", (int)nTemp);
                 curFeel = tempHold;
         }
-	uvIndex = GetString("this.swUV");
-	visibility = GetString("this.swVis");
-	if (convertData == true && visibility.toDouble() != 999.0)
+        uvIndex = GetString("this.swUV");
+        visibility = GetString("this.swVis");
+        if (convertData == true && visibility.toDouble() != 999.0)
         {
                 char tempHold[32];
                 double tTemp = visibility.toDouble();
@@ -2062,68 +2062,55 @@ bool Weather::UpdateData()
                 sprintf (tempHold, "%.1f", nTemp);
                 visibility = tempHold;
         }
-	description = GetString("this.swConText");
-   	if (description.length() == 0)
-		description = curIcon;
-	
-	QString forecastData;
-	forecastData = GetString("this.swFore");
+        description = GetString("this.swConText");
+        if (description.length() == 0)
+                description = curIcon;
+        
+        QString forecastData;
+        forecastData = GetString("this.swFore");
 
-  	QStringList holdings = QStringList::split("|", forecastData);
+        QStringList holdings = QStringList::split("|", forecastData);
   
- 	int years, mons, days;
+        int years, mons, days;
 
-	int dayNum = (holdings[0]).toInt();
-	QDate curDay(QDate::currentDate());
-	int curDayNum = curDay.dayOfWeek();
-	if (curDayNum == 7)
-		curDayNum = 1;
-	else
-		curDayNum++;
+        int dayNum = (holdings[0]).toInt();
+        QDate curDay(QDate::currentDate());
+        int curDayNum = curDay.dayOfWeek();
+        if (curDayNum == 7)
+                curDayNum = 1;
+        else
+                curDayNum++;
 
-	if (curDayNum != dayNum)
-		pastTime = true;
-	else
-		pastTime = false;
+        if (curDayNum != dayNum)
+                pastTime = true;
+        else
+                pastTime = false;
 
-	for (int i = 5; i < 9; i++)
+        for (int i = 5; i < 9; i++)
         {
-  		QStringList dates = QStringList::split("/", holdings[i]);
-		years = dates[2].toInt();
-		mons = dates[0].toInt();
-		days = dates[1].toInt();
-   		QDate doDate(years, mons, days);
-		switch (doDate.dayOfWeek())
-		{
-			case 1: date[i - 5] = QString("MON"); break;
-			case 2: date[i - 5] = QString("TUE"); break;
-			case 3: date[i - 5] = QString("WED"); break;
-			case 4: date[i - 5] = QString("THU"); break;
-			case 5: date[i - 5] = QString("FRI"); break;
-			case 6: date[i - 5] = QString("SAT"); break;
-			case 7: date[i - 5] = QString("SUN"); break;
-		}
+                QStringList dates = QStringList::split("/", holdings[i]);
+                years = dates[2].toInt();
+                mons = dates[0].toInt();
+                days = dates[1].toInt();
+                QDate doDate(years, mons, days);
+                switch (doDate.dayOfWeek())
+                {
+                        case 1: date[i - 5] = QString("MON"); break;
+                        case 2: date[i - 5] = QString("TUE"); break;
+                        case 3: date[i - 5] = QString("WED"); break;
+                        case 4: date[i - 5] = QString("THU"); break;
+                        case 5: date[i - 5] = QString("FRI"); break;
+                        case 6: date[i - 5] = QString("SAT"); break;
+                        case 7: date[i - 5] = QString("SUN"); break;
+                }
         }
 
-	for (int i = 9; i < 13; i++)
-		weatherIcon[i - 9] = holdings[i];
+        for (int i = 9; i < 13; i++)
+                weatherIcon[i - 9] = holdings[i];
 
-	for (int i = 20; i < 24; i++)
-	{
-		if (convertData == true)
-        	{
-                	char tempHold[32];
-                	double tTemp = holdings[i].toDouble();
-                	double nTemp = (double)(5.0/9.0)*(tTemp - 32.0);
-                	sprintf (tempHold, "%d", (int)nTemp);
-                	holdings[i] = tempHold;
-        	}
-		highTemp[i - 20] = holdings[i];
-	}
-
-	for (int i = 40; i < 44; i++)
-	{	
-		if (convertData == true)
+        for (int i = 20; i < 24; i++)
+        {
+                if (convertData == true)
                 {
                         char tempHold[32];
                         double tTemp = holdings[i].toDouble();
@@ -2131,84 +2118,97 @@ bool Weather::UpdateData()
                         sprintf (tempHold, "%d", (int)nTemp);
                         holdings[i] = tempHold;
                 }
-		lowTemp[i - 40] = holdings[i];
-	}
+                highTemp[i - 20] = holdings[i];
+        }
 
-	for (int i = 15; i < 19; i++)
-		weatherType[i - 15] = holdings[i];
+        for (int i = 40; i < 44; i++)
+        {	
+                if (convertData == true)
+                {
+                        char tempHold[32];
+                        double tTemp = holdings[i].toDouble();
+                        double nTemp = (double)(5.0/9.0)*(tTemp - 32.0);
+                        sprintf (tempHold, "%d", (int)nTemp);
+                        holdings[i] = tempHold;
+                }
+                lowTemp[i - 40] = holdings[i];
+        }
 
-	setWeatherTypeIcon(weatherType);
-	setWeatherIcon(description);
+        for (int i = 15; i < 19; i++)
+                weatherType[i - 15] = holdings[i];
 
-	return true;
+        setWeatherTypeIcon(weatherType);
+        setWeatherIcon(description);
 
-	}
-	return false;
+        return true;
+
+        }
+        return false;
 
 }
 
 void Weather::setWeatherTypeIcon(QString wt[5])
 {
-	bool isSet = false;
+        bool isSet = false;
         int start = 1;
-	if (pastTime == true)
-		start = 0;
+        if (pastTime == true)
+                start = 0;
 
-	for (int i = start; i < 5; i++)
-	{
-		isSet = false;
-		for (int j = 0; j < 128; j++)
-        	{
-                	if (wt[i].toInt() == wData[j].typeNum)
-                	{
-				wt[i] = tr(wData[j].typeName);
-                	        weatherIcon[i] = wData[j].typeIcon;
-				isSet = true;
-				j = 128;
-                	}
-        	}
+        for (int i = start; i < 5; i++)
+        {
+                isSet = false;
+                for (int j = 0; j < 128; j++)
+                {
+                        if (wt[i].toInt() == wData[j].typeNum)
+                        {
+                                wt[i] = tr(wData[j].typeName);
+                                weatherIcon[i] = wData[j].typeIcon;
+                                isSet = true;
+                                j = 128;
+                        }
+                }
 
-		if (isSet == false)
-		{
-			wt[i] = tr("Unknown") + " [" + wt[i] + "]";
+                if (isSet == false)
+                {
+                        wt[i] = tr("Unknown") + " [" + wt[i] + "]";
                         weatherIcon[i] = "unknown.png";
-		}
-	}
+                }
+        }
 }
 
 void Weather::setWeatherIcon(QString txtType)
 {
-	for (int j = 0; j < 128; j++)
-	{
-		if (txtType.replace(QRegExp("  "),  "" ) == 
-		    (wData[j].typeName).replace(QRegExp("  "),  "" ))
-		{
-			curIcon = wData[j].typeIcon;
-			description = tr(wData[j].typeName);
-			return;
-		}
-		if (txtType.toInt() == wData[j].typeNum)
-		{
-			curIcon = wData[j].typeIcon;
-			description = tr(wData[j].typeName);
+        for (int j = 0; j < 128; j++)
+        {
+                if (txtType.replace(QRegExp("  "),  "" ) == 
+                    (wData[j].typeName).replace(QRegExp("  "),  "" ))
+                {
+                        curIcon = wData[j].typeIcon;
+                        description = tr(wData[j].typeName);
                         return;
-		}
-	}
-	
-	curIcon = "unknown.png";
-	
+                }
+                if (txtType.toInt() == wData[j].typeNum)
+                {
+                        curIcon = wData[j].typeIcon;
+                        description = tr(wData[j].typeName);
+                        return;
+                }
+        }
+        
+        curIcon = "unknown.png";
+        
 }
 
 QString Weather::GetString(QString tag)
 {
-	QString data;
+        QString data;
         int start = 0;
         int len = 0;
 
         start = httpData.find(tag, 0);
-	len = httpData.find("\"", start + tag.length() + 4) - start - tag.length() - 4;
-	
-	data = httpData.mid(start + tag.length() + 4, len);
+        len = httpData.find("\"", start + tag.length() + 4) - start - tag.length() - 4;
+        
+        data = httpData.mid(start + tag.length() + 4, len);
 
 return data;
 
@@ -2216,21 +2216,21 @@ return data;
 
 int Weather::GetInt(QString tag)
 {
-	QString data;
+        QString data;
         int start = 0;
         int len = 0;
 
         start = httpData.find(tag, 0);
         len = httpData.find("\"", start + tag.length() + 4) - start - tag.length() - 4;
         data = httpData.mid(start + tag.length() + 4, len);
-	int ret = data.toInt();
+        int ret = data.toInt();
 
 return ret;
 }
 
 float Weather::GetFloat(QString tag)
 {
-	QString data;
+        QString data;
         int start = 0;
         int len = 0;
 
@@ -2247,7 +2247,7 @@ bool Weather::GetWeatherData()
 {
      QUrl weatherDataURL("http://www.msnbc.com/m/chnk/d/weather_d_src.asp?acid=" + locale);
      QUrl weatherMapLink1URL("http://w3.weather.com/weather/map/" + locale 
-		          + "?from=LAPmaps&setcookie=1 HTTP/1.1\nConnection: close\nHost: w3.weather.com\n\n\n");
+                          + "?from=LAPmaps&setcookie=1 HTTP/1.1\nConnection: close\nHost: w3.weather.com\n\n\n");
 
 
      INETComms *weatherData = new INETComms(weatherDataURL);
@@ -2257,21 +2257,21 @@ bool Weather::GetWeatherData()
      { 
          cerr << "MythWeather: Grabbing Weather From: " << weatherDataURL.toString() << endl;
          cerr << "MythWeather: Grabbing Weather Map Link (part 1) From: " 
-		  << weatherMapLink1URL.toString() << endl;
+                  << weatherMapLink1URL.toString() << endl;
      }
 
      while (!weatherData->isDone())
      {
           qApp->processEvents();
-	  if (stopProcessing)
-	      return false;
+          if (stopProcessing)
+              return false;
 
      }
      while (!weatherMapLink1->isDone())
      {
-	  qApp->processEvents();
-	  if (stopProcessing)
-	      return false;
+          qApp->processEvents();
+          if (stopProcessing)
+              return false;
      }
      
      LayerSet *container = theme->GetSet("weatherpages");
@@ -2305,20 +2305,20 @@ bool Weather::GetWeatherData()
 
      QString mapLoc = parseData(tempData, "if (isMinNS4) var mapNURL = \"", "\";");
      if (mapLoc == "<NULL>")
-	 return true;
+         return true;
      
      QUrl weatherMapLink2URL("http://w3.weather.com/" + mapLoc); 
      
      if (debug)
-	 cerr << "MythWeather: Grabbing Weather Map Link (part 2) From: " 
-		 << weatherMapLink2URL.toString() << endl;
+         cerr << "MythWeather: Grabbing Weather Map Link (part 2) From: " 
+                 << weatherMapLink2URL.toString() << endl;
 
      INETComms *weatherMapLink2 = new INETComms(weatherMapLink2URL);
      while (!weatherMapLink2->isDone())
      {
            qApp->processEvents();
-	   if (stopProcessing)
-	       return false;
+           if (stopProcessing)
+               return false;
 
      }
 
@@ -2333,7 +2333,7 @@ bool Weather::GetWeatherData()
          if (debug)
              cerr << "MythWeather: Warning: Failed to find link to map image.\n";
 
-	 return true;
+         return true;
      }
 
      char *home = getenv("HOME");
@@ -2368,12 +2368,12 @@ bool Weather::GetWeatherData()
          QString filename = imageLoc.mid(imageLoc.findRev("/"), imageLoc.length() - imageLoc.findRev("/"));
          UIImageType *type = (UIImageType *)container->GetType("radarimg");
          if (type)
-	 {
-	     QString fullfile = fileprefix + filename;
-	     if (debug)
-	     cerr << "MythWeather: Full path to radar image: " << fullfile << endl;
+         {
+             QString fullfile = fileprefix + filename;
+             if (debug)
+             cerr << "MythWeather: Full path to radar image: " << fullfile << endl;
              type->SetImage(fullfile);
-	 }
+         }
      }
      return true;
 }
@@ -2384,16 +2384,16 @@ void Weather::radarImgDone(QNetworkOperation *op)
       if (op->operation() == QNetworkProtocol::OpListChildren) 
       {
           if (op->state() == QNetworkProtocol::StFailed)
-	  {
+          {
               cerr << "MythWeather: Error while grabbing the radar map." << endl;
-	      return;
-	  }
+              return;
+          }
       }
       
       LayerSet *container = theme->GetSet("weatherpages");
 
       if (debug)
-	  cerr << "MythWeather: Radar Image Done. (Loading...)\n";
+          cerr << "MythWeather: Radar Image Done. (Loading...)\n";
 
       if (container)
       {
