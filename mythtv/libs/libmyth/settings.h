@@ -199,10 +199,17 @@ public:
 
 class LineEditSetting: virtual public Setting {
 protected:
-    LineEditSetting() {};
+    LineEditSetting(bool readwrite = true) { rw = readwrite; };
 public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                   const char* widgetName = 0);
+
+    void setRW(bool readwrite = true) { rw = readwrite; edit->setRW(rw); };
+    void setRO() { rw = false; edit->setRO(); };
+
+private:
+    MythLineEdit* edit;
+    bool rw;
 };
 
 // TODO: set things up so that setting the value as a string emits

@@ -138,7 +138,8 @@ void MythLineEdit::keyPressEvent(QKeyEvent *e)
     case Key_Return:
         e->ignore();
     default:
-        QLineEdit::keyPressEvent(e);
+        if (rw || e->key() == Key_Escape)
+            QLineEdit::keyPressEvent(e);
     }
 }
 

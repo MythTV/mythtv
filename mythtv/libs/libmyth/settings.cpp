@@ -302,7 +302,7 @@ QWidget* LineEditSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     label->setText(getLabel() + ":     ");
     label->setBackgroundOrigin(QWidget::WindowOrigin);
 
-    MythLineEdit* edit = new MythLineEdit(settingValue, widget,
+    edit = new MythLineEdit(settingValue, widget,
                                           QString(widgetName) + "-edit");
     edit->setHelpText(getHelpText());
     edit->setBackgroundOrigin(QWidget::WindowOrigin);
@@ -316,6 +316,8 @@ QWidget* LineEditSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     if (cg)
         connect(edit, SIGNAL(changeHelpText(QString)), cg, 
                 SIGNAL(changeHelpText(QString)));
+
+    edit->setRW(rw);
 
     return widget;
 }

@@ -48,17 +48,13 @@ protected:
         };
     };
 
-    class Name: public ComboBoxSetting, public RecordingProfileParam {
+    class Name: public LineEditSetting, public RecordingProfileParam {
     public:
         Name(const RecordingProfile& parent):
-            ComboBoxSetting(true),
+            LineEditSetting(false),
             RecordingProfileParam(parent, "name") {
 
             setLabel("Profile name");
-            addSelection("Default");
-            addSelection("Live TV");
-            addSelection("Custom");
-            addSelection("Movies");
         };
     };
 public:
@@ -74,6 +70,7 @@ public:
     };
 
     QString getName(void) const { return name->getValue(); };
+    void setName(QString newName) { name->setValue(newName); name->setRW(); };
     const ImageSize& getImageSize(void) const { return *imageSize; };
     
 private:
@@ -93,16 +90,7 @@ public:
     virtual void save(QSqlDatabase* db) { (void)db; };
 
 protected slots:
-    void open(int id) {
-        RecordingProfile* profile = new RecordingProfile();
-
-        if (id != 0)
-            profile->loadByID(db,id);
-
-        if (profile->exec(db) == QDialog::Accepted)
-            profile->save(db);
-        delete profile;
-    };
+    void open(int id);
 
 protected:
     QSqlDatabase* db;

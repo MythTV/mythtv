@@ -388,6 +388,27 @@ bool RecordingProfile::loadByName(QSqlDatabase* db, QString name) {
     }
 }
 
+void RecordingProfileEditor::open(int id) {
+    RecordingProfile* profile = new RecordingProfile();
+
+    if (id != 0)
+    {
+        profile->loadByID(db,id);
+
+        QString profName = profile->getName();
+        if ((profName != "Default") &&
+            (profName != "Live TV") &&
+            (profName != "Transcode"))
+            profile->setName(profName);
+    }
+    else
+        profile->setName("New Profile Name");
+
+    if (profile->exec(db) == QDialog::Accepted)
+        profile->save(db);
+    delete profile;
+};
+
 void RecordingProfileEditor::load(QSqlDatabase* db) {
     clearSelections();
     addSelection("(Create new profile)", "0");

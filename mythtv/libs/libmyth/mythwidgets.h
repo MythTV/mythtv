@@ -112,7 +112,9 @@ class MythLineEdit : public QLineEdit
                  const char* widgetName=0) :
       QLineEdit(contents, parent, widgetName) { };
 
-    void setHelpText(QString help) { helptext = help; }
+    void setHelpText(QString help) { helptext = help; };
+    void setRW(bool readwrite = true) { rw = readwrite; };
+    void setRO() { rw = false; };
 
  public slots:
      virtual void setText(const QString& text);
@@ -127,6 +129,7 @@ class MythLineEdit : public QLineEdit
 
   private:
     QString helptext;
+    bool rw;
 };
 
 
