@@ -216,6 +216,7 @@ int main(int argc, char **argv)
 
     if (printsched) {
         sched = new Scheduler(false, &tvList, db);
+        sched->FillRecordLists();
         sched->PrintList();
         cleanup();
         exit(0);
