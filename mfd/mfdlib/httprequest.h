@@ -14,6 +14,7 @@
 #include <qdict.h>
 
 class HttpResponse;
+class MFDHttpPlugin;
 
 //
 //  Some defines ... probably want to get rid of these at some point
@@ -62,27 +63,30 @@ class HttpRequest
 
   public:
 
-    HttpRequest(char *raw_incoming, int incoming_length);
+    HttpRequest(MFDHttpPlugin *owner, char *raw_incoming, int incoming_length);
     ~HttpRequest();
     
     HttpResponse*   getResponse(){return my_response;}
     bool            allIsWell(){return all_is_well;}
     const QString&  getUrl(){return url;} 
-    QString         getHeader(const QString &field_lable);
+    QString         getHeader(const QString &field_label);
     QString         getVariable(const QString &variable_name);
     void            sendResponse(bool yes_or_no){send_response = yes_or_no;}
     bool            sendResponse(){return send_response;}
+    void            printHeaders();
+    MFDHttpPlugin*  getParent(){return parent;}
 
   private:
 
-    int          readLine(int *index, char* parsing_buffer);
-    char         *raw_request;
-    int          raw_length;
-    QString      top_line;
-    QString      url;
-    bool         all_is_well;
-    HttpResponse *my_response;
-    bool         send_response;
+    MFDHttpPlugin *parent; 
+    int           readLine(int *index, char* parsing_buffer);
+    char          *raw_request;
+    int           raw_length;
+    QString       top_line;
+    QString       url;
+    bool          all_is_well;
+    HttpResponse  *my_response;
+    bool          send_response;
 
     QDict<HttpHeader>      headers;
     QDict<HttpGetVariable> get_variables;

@@ -17,7 +17,7 @@ using namespace std;
 #include <qfile.h>
 
 #include "httpresponse.h"
-
+#include "mfd_plugin.h"
 
 HttpResponse::HttpResponse(HttpRequest *requestor)
 {
@@ -27,6 +27,9 @@ HttpResponse::HttpResponse(HttpRequest *requestor)
     status_code = 200;
     status_string = "OK";
     payload.clear();
+    range_begin = -1;
+    range_end = -1;
+    total_possible_range = -1;
 }
 
 void HttpResponse::setError(int error_number)
@@ -207,15 +210,47 @@ void HttpResponse::send(MFDServiceClientSocket *which_client)
         //  No errors, set the Content-Length Header
         //
         
-        QString content_length_header = QString("Content-Length: %1\r\n").arg(payload.size());
+        QString content_length_header = QString("Content-Length: %1\r\n")
+                                        .arg(payload.size());
         addText(&header_block, content_length_header);
         
         //
-        //  Explain that we are happy to accept content ranges (which we'll figure out real soon now)
+        //  If the request said it was going to close the connection after
+        //  the response, let the requesting client know that's just fine.
+        //
+        
+        if(my_request->getHeader("Connection") == "close")
+        {
+            QString connection_header = QString("Connection: close\r\n");
+            addText(&header_block, connection_header);
+        }
+
+        //
+        //  Explain that we are happy to accept content ranges (which now
+        //  actually work - hurray!)
         //
         
         QString content_ranges_header = QString("Accept-Ranges: bytes\r\n");
         addText(&header_block, content_ranges_header);
+        
+        //
+        //  If the request that lead to this response was an Accept-Ranges:
+        //  request (eg. seeking in an mp3) explain the byte ranges returned
+        //
+        
+        if(
+            my_request->getHeader("Range") &&
+            range_begin          > -1 &&
+            range_end            > -1 &&
+            total_possible_range > -1
+          )
+        {
+            QString file_range_header = QString("Content-Range: %1-%2/%3\r\n")
+                                        .arg(range_begin)
+                                        .arg(range_end)
+                                        .arg(total_possible_range);
+            addText(&header_block, file_range_header);
+        }
 
         //
         //  Set any other headers that were assigned
@@ -368,30 +403,58 @@ void HttpResponse::setPayload(char *new_payload, int new_payload_size)
     payload.insert(payload.end(), new_payload, new_payload + new_payload_size);
 }
 
-void HttpResponse::sendFile(QString file_path)
+void HttpResponse::sendFile(QString file_path, int skip)
 {
-
-    int	 fd;
-    int  len;
-	char buf[10000];
-
-    fd = open(file_path.ascii(),O_RDONLY);
-    if (fd < 0)
-	{
-	    //  my_request-> do a real warning()
-	    cout << "Crappity crap crap, there's no file called \"" << file_path.ascii() << "\"" << endl;
+    //
+    //  Because we're sending a file, we need to fill in the boundaries of
+    //  the file size, so that the client can send seeking requests.
+    //
+    
+    QFile the_file(file_path.local8Bit());
+    if(!the_file.exists())
+    {
+	    my_request->getParent()->warning(QString("httpresponse was asked to send "
+	                                           "a file that does not exist: %1")
+	                                   .arg(file_path.local8Bit()));
 	    setError(404);
         return;
     }
 
-    //  lseek(fd, 0, SEEK_SET);
-    len = read(fd, buf, 10000);
+    range_begin = skip;
+    range_end = the_file.size() - 1;
+    total_possible_range = the_file.size();
+
+    int  len;
+	char buf[10000];
+
+    if(!the_file.open(IO_ReadOnly | IO_Raw))
+    {
+	    my_request->getParent()->warning(QString("httpresponse could not open (permissions?) a "
+	                                           "file it was asked to send: %1")
+	                                   .arg(file_path.local8Bit()));
+        setError(404);
+        return;
+    }
+    
+    if(!the_file.at(skip))
+    {
+	    my_request->getParent()->warning(QString("httpresponse could not seek in a "
+	                                           "file it was asked to send: %1")
+	                                   .arg(file_path.local8Bit()));
+        setError(404);
+        the_file.close();
+        return;
+    }
+    
+    len = the_file.readBlock(buf, 10000);
     while(len > 0)
     {
         payload.insert(payload.end(), buf, buf + len);
-		len = read(fd, buf, 10000);
+		len = the_file.readBlock(buf, 10000);
     }
-	close(fd);
+    the_file.close();
+    
+
 }
     
 HttpResponse::~HttpResponse()

@@ -337,7 +337,7 @@ void DaapServer::parseVariables(HttpRequest *http_request, DaapRequest *daap_req
     //
     //  Check the user agent header that httpd returns to take note of which
     //  kind of client this is (for iTunes we (will) need to re-encode some
-    //  content on the fly.
+    //  content on the fly.)
     //
 
     QString user_agent = http_request->getHeader("User-Agent");
@@ -829,13 +829,38 @@ void DaapServer::sendDatabaseItem(HttpRequest *http_request, u32 song_id)
             //  that's what iTunes does ... so that's what we do
             //
 
+            //  http_request->printHeaders();   //  If you want to see the request
+
             http_request->getResponse()->addHeader("Content-Type: application/x-dmap-tagged");
 
             AudioMetadata *which_audio = (AudioMetadata*)which_one;
             QUrl file_url = which_audio->getUrl();
             QString file_path = file_url.path();
 
-            http_request->getResponse()->sendFile(file_path);
+            //
+            //  If we got a Range: header in the request, send only the
+            //  relevant part of the file.
+            //
+
+            int skip = 0;
+            
+            if(http_request->getHeader("Range"))
+            {
+                QString range_string = http_request->getHeader("Range");
+                
+                range_string = range_string.remove("bytes=");
+                range_string = range_string.section("-",0,0);
+                bool ok;
+                skip = range_string.toInt(&ok);
+                if(!ok)
+                {
+                    warning(QString("daapserver did not understand this Range request in an http request %1")
+                            .arg(http_request->getHeader("Range")));
+                    skip = 0;
+                }
+            }
+            
+            http_request->getResponse()->sendFile(file_path, skip);
 
         }
         else

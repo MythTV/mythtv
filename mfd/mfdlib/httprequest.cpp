@@ -15,6 +15,7 @@ using namespace std;
 
 #include "httprequest.h"
 #include "httpresponse.h"
+#include "mfd_plugin.h"
 
 HttpGetVariable::HttpGetVariable(const QString &text_segment)
 {
@@ -84,8 +85,9 @@ HttpHeader::~HttpHeader()
 */
 
 
-HttpRequest::HttpRequest(char *raw_incoming, int incoming_length)
+HttpRequest::HttpRequest(MFDHttpPlugin *owner, char *raw_incoming, int incoming_length)
 {
+    parent = owner;
     raw_request = NULL;
     top_line = "";
     all_is_well = true;
@@ -305,6 +307,24 @@ QString HttpRequest::getVariable(const QString& variable_name)
         return which_one->getValue();
     }
     return NULL;
+}
+
+void HttpRequest::printHeaders()
+{
+    //
+    //  Debugging code to print all the headers that came in on this request
+    //
+    
+    cout << "==============================Debugging output==============================" << endl;
+    cout << "HTTP request contained the following headers:" << endl;
+
+    QDictIterator<HttpHeader> iterator( headers );
+    for( ; iterator.current(); ++iterator )
+    {
+        cout << "\t" << iterator.currentKey() << ": " << iterator.current()->getValue() << endl;
+    }
+    cout << "============================================================================" << endl;
+    
 }
 
 HttpRequest::~HttpRequest()

@@ -34,7 +34,7 @@ class HttpResponse
     bool sendBlock(MFDServiceClientSocket *which_client, std::vector<char> block_to_send);
     void addHeader(const QString &new_header);
     void setPayload(char *new_payload, int new_payload_size);
-    void sendFile(QString file_path);
+    void sendFile(QString file_path, int skip);
     
   private:
     
@@ -47,6 +47,10 @@ class HttpResponse
 
     QDict<HttpHeader> headers;
     HttpRequest *my_request;
+    
+    int     range_begin;
+    int     range_end;
+    int     total_possible_range;
 };
 
 #endif

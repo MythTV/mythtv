@@ -809,7 +809,7 @@ void MFDHttpPlugin::processRequest(MFDServiceClientSocket *a_client)
             length = MAX_CLIENT_INCOMING;
         }
 
-        HttpRequest *new_request = new HttpRequest(incoming, length);
+        HttpRequest *new_request = new HttpRequest(this, incoming, length);
         if(new_request->allIsWell())
         {
             //
