@@ -237,7 +237,7 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
 "channel.channum, channel.callsign, channel.name, "
 "oldrecorded.starttime IS NOT NULL AS oldrecduplicate, program.category, "
 "record.rank, record.recorddups, "
-"recorded.starttime IS NOT NULL as recduplicate "
+"recorded.starttime IS NOT NULL as recduplicate, record.type "
 "FROM record "
 " INNER JOIN channel ON (channel.chanid = program.chanid) "
 " INNER JOIN program ON (program.title = record.title) "
@@ -309,12 +309,20 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
              proginfo->chansign = result.value(8).toString();
              proginfo->channame = result.value(9).toString();
 
-             // if recorddups is set then check if recording still exists
-             // in recorded table otherwise check for dup in oldrecorded.
-             if (result.value(13).toInt())
-                 proginfo->duplicate = result.value(14).toInt();
+             if (result.value(15).toInt() == kSingleRecord)
+             {
+                 // force single-recording to be non-duplicate
+                 proginfo->duplicate = false;
+             }
              else
-                 proginfo->duplicate = result.value(10).toInt();
+             {
+                 // if recorddups is set then check if recording still exists
+                 // in recorded table otherwise check for dup in oldrecorded.
+                 if (result.value(13).toInt())
+                     proginfo->duplicate = result.value(14).toInt();
+                 else
+                     proginfo->duplicate = result.value(10).toInt();
+             }
 
              if (proginfo->duplicate)
                  proginfo->recording = false;
