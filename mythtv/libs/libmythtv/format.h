@@ -79,7 +79,7 @@ typedef struct vidbuffertype
     int timecode;
     int freeToEncode;
     int freeToBuffer;
-    unsigned char *buffer_offset;
+    unsigned char *buffer;
 } vidbuffertyp;
 
 typedef struct audbuffertype
@@ -88,6 +88,6 @@ typedef struct audbuffertype
     int timecode;
     int freeToEncode;
     int freeToBuffer;
-    unsigned char *buffer_offset;
+    unsigned char *buffer;
 } audbuffertyp;
 

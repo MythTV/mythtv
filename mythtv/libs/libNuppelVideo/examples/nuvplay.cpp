@@ -287,8 +287,8 @@ int main(int argc, char *argv[])
   if (playfast!=1 || tf%7==0) {
     if (!skipframes || usecs > (-1000000/rtjpeg_video_frame_rate)) {
 
-      if (deinterlace) 
-         linearBlendYUV420(buf3, w, h); 
+      //if (deinterlace) 
+      //   linearBlendYUV420(buf3, w, h); 
 
       // Need to flip the U + V parts for Xv (to be proper YV12)
       memcpy(sbuf, buf3, w*h);

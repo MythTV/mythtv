@@ -1042,7 +1042,7 @@ static lzo_bool ptr_check(void)
     memset(&a,0,sizeof(a));
     r &= __lzo_assert(a.a_charp == NULL);
     r &= __lzo_assert(a.a_lzo_bytep == NULL);
-    r &= __lzo_assert(NULL == 0);
+    r &= __lzo_assert(0 == NULL);
     if (r == 1)
     {
 	for (i = 0; i < 10; i++)
