@@ -170,6 +170,12 @@ void ts_to_ps(uint8_t* buf, uint16_t *pids, int npids, ipack **ipacks,
   if (buf[0] != 0x47)   // NOT A TS?
     return;
 
+  if (buf[1] >> 7)      // ERROR?
+    return;
+
+  if (buf[3] >> 6)      // SCRAMBLED..
+    return;
+
   pid = ((buf[1] & 0x1f)<<8) | buf[2];
   for (i = 0; i < npids; i++)
     if (pid == pids[i])

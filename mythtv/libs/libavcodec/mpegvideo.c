@@ -951,7 +951,7 @@ int MPV_frame_start(MpegEncContext *s, AVCodecContext *avctx)
     assert(s->last_picture_ptr==NULL || s->out_format != FMT_H264 || s->codec_id == CODEC_ID_SVQ3);
 
     /* mark&release old frames */
-    if (s->pict_type != B_TYPE && s->last_picture_ptr) {
+    if (s->pict_type != B_TYPE && s->last_picture_ptr && s->last_picture_ptr->data[0]) {
         avctx->release_buffer(avctx, (AVFrame*)s->last_picture_ptr);
 
         /* release forgotten pictures */
@@ -1364,7 +1364,6 @@ static int load_input_picture(MpegEncContext *s, AVFrame *pic_arg){
        // empty
         }else{
             int h_chroma_shift, v_chroma_shift;
-        
             avcodec_get_chroma_sub_sample(s->avctx->pix_fmt, &h_chroma_shift, &v_chroma_shift);
         
             for(i=0; i<3; i++){
@@ -1547,6 +1546,11 @@ int MPV_encode_picture(AVCodecContext *avctx,
     MpegEncContext *s = avctx->priv_data;
     AVFrame *pic_arg = data;
     int i;
+
+    if(avctx->pix_fmt != PIX_FMT_YUV420P){
+        fprintf(stderr, "this codec supports only YUV420P\n");
+        return -1;
+    }
 
     init_put_bits(&s->pb, buf, buf_size, NULL, NULL);
 

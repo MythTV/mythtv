@@ -64,6 +64,9 @@ class DVBRecorder : public RecorderBase
     int keyframedist;
     bool gopset;
 
+    // Used to signal a 'clean stream' procedure (see ProcessData).
+    bool clean_start;
+
     QMap<long long, long long> positionMap;
 
   // DVB-specific

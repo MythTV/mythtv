@@ -1948,6 +1948,11 @@ void ps_pes(ipack *p)
 	if (p->mpeg == 2){
 		switch(p->buf[3]){
 		case VIDEO_STREAM_S ... VIDEO_STREAM_E:
+			/* FIXME: this is a workaround so that libavformat does
+			 * not create multiple video streams during decoding 
+			 */
+			p->buf[3] = VIDEO_STREAM_S;
+
 			if (!p->has_vi){
 				if(get_vinfo(p->buf, p->count, &p->vi,1) >=0) {
 					p->has_vi = 1;
@@ -2153,8 +2158,8 @@ void instant_repack (uint8_t *buf, int count, ipack *p)
 			case PADDING_STREAM :
 			case DSM_CC_STREAM  :
 			case ISO13522_STREAM:
-			case PRIVATE_STREAM1:
 				p->done = 1;
+			case PRIVATE_STREAM1:
 			case VIDEO_STREAM_S ... VIDEO_STREAM_E:
 			case AUDIO_STREAM_S ... AUDIO_STREAM_E:
 				p->found++;

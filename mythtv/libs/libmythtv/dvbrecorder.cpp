@@ -68,8 +68,11 @@ void DVBRecorder::SetOption(const QString &name, int value)
    set, this Recorder doesn't exist yet. */
 void DVBRecorder::SetPID(const vector<int>& some_pids)
 {
-  pid = some_pids;
-  pid_changed = true;
+    pid = some_pids;
+    pid_changed = true;
+
+    // Correct the start of the stream on channel change (see ProcessData).
+    clean_start = true;
 }
 
 bool DVBRecorder::Open()
@@ -137,7 +140,7 @@ void DVBRecorder::StartRecording()
     {
         if (paused)
         {
-            Close();
+            ioctl(dvr_fd, DMX_STOP);
             mainpaused = true;
             was_paused = true;
             usleep(50);
@@ -146,7 +149,7 @@ void DVBRecorder::StartRecording()
         else if (was_paused)
         {
             // Re-open
-            if (Open())
+            if (ioctl(dvr_fd, DMX_START) < 0)
                 was_paused = false;
                 // XXX need to set mainpaused = false? mpegrecorder doesn't.
             else
@@ -223,15 +226,6 @@ int DVBRecorder::GetVideoFd(void)
 {
     return -1;
 }
-
-
-
-
-/* ===========================================================================
-   Generic MPEG code follows (identical in MpegRecorder, DVBRecorder and co).
-   I would have liked to use a common base class for that, but Isaac preferred
-   to have all the code for a given class in one file
-   ========================================================================= */
 
 static void mpg_write_packet(void *opaque, uint8_t *buf, int buf_size)
 {
@@ -317,6 +311,7 @@ void DVBRecorder::Initialize(void)
 {
 }
 
+#define SEQ_START     0x000001B3
 #define GOP_START     0x000001B8
 #define PICTURE_START 0x00000100
 #define SLICE_MIN     0x00000101
@@ -357,6 +352,8 @@ void DVBRecorder::ProcessData(unsigned char *buffer, int len)
     ic->pb.eof_reached = 0;
     ic->pb.pos = len;
 
+    bool seq_start = false;
+
     while (ic->pb.eof_reached == 0)
     {
         if (av_read_packet(ic, &pkt) < 0)
@@ -376,6 +373,9 @@ void DVBRecorder::ProcessData(unsigned char *buffer, int len)
 
             bool pic_start = PacketHasHeader(pkt.data, pkt.size, PICTURE_START);
             bool gop_start = PacketHasHeader(pkt.data, pkt.size, GOP_START);
+
+            if (clean_start)
+                seq_start = PacketHasHeader(pkt.data, pkt.size, SEQ_START);
 
             if (pic_start)
                 framesWritten++;
@@ -411,6 +411,17 @@ void DVBRecorder::ProcessData(unsigned char *buffer, int len)
 
         av_free_packet(&pkt);
     }
+
+    /*
+        We deny writing packets until a SEQ_HEADER arrives (above).
+        The reason for doing this is that on a channel change we will
+        (most likely) end up between packets with SEQ_HEADER, which
+        produces bad decoding (skipping/distortion).
+    */
+    if (clean_start && !seq_start)
+        return;
+    else
+        clean_start = false;
 
     ringBuffer->Write(buffer, len);
 }
