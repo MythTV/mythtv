@@ -252,6 +252,8 @@ class OSDListBtnTypeItem
     void  setChecked(CheckState state);
     void  setData(void *data);
     void* getData();
+
+    void  Reinit(float wchange, float hchange, float wmult, float hmult);
     
     void  paint(OSDSurface *surface, TTFFont *font, int fade, int maxfade, 
                 int x, int y);

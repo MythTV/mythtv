@@ -1538,10 +1538,8 @@ void OSDTypePositionRectangle::Reinit(float wchange, float hchange)
         int x = (int)(tmp.x() * wchange);
         int y = (int)(tmp.y() * hchange);
 
-        positions[i].setX(x);
-        positions[i].setY(y);
-        positions[i].setWidth(width);
-        positions[i].setHeight(height);
+        tmp = QRect(x, y, width, height);
+        positions[i] = tmp;
     }
 }
 
@@ -1565,10 +1563,10 @@ void OSDTypePositionRectangle::Draw(OSDSurface *surface, int fade, int maxfade,
     QRect rect = positions[m_curposition];
 
     unsigned char *src;
-    int ystart = rect.top();
-    int yend = rect.bottom();
-    int xstart = rect.left();
-    int xend = rect.right();
+    int ystart = rect.top() + yoff;
+    int yend = rect.bottom() + yoff;
+    int xstart = rect.left() + xoff;
+    int xend = rect.right() + xoff;
 
     int height = yend - ystart + 1, width = xend - xstart + 1;
 

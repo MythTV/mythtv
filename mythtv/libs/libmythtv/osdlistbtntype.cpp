@@ -89,10 +89,14 @@ OSDListTreeType::OSDListTreeType(const QString &name, const QRect &area,
 }
 
 void OSDListTreeType::Reinit(float wchange, float hchange, float wmult,
-                              float hmult)
+                             float hmult)
 {
     m_wmult = wmult;
     m_hmult = hmult;
+
+    m_spacing = (int)(m_spacing * wchange);
+    m_margin = (int)(m_margin * wchange);
+
     int width = (int)(m_totalarea.width() * wchange);
     int height = (int)(m_totalarea.height() * hchange);
     int x = (int)(m_totalarea.x() * wchange);
@@ -417,10 +421,14 @@ OSDListBtnType::~OSDListBtnType()
 }
 
 void OSDListBtnType::Reinit(float wchange, float hchange, float wmult,
-                              float hmult)
+                            float hmult)
 {
     m_wmult = wmult;
     m_hmult = hmult;
+
+    m_itemHeight = (int)(m_itemHeight * hchange);
+    m_itemSpacing = (int)(m_itemSpacing * wchange);
+    m_itemMargin = (int)(m_itemMargin * wchange);
 
     int width = (int)(m_rect.width() * wchange);
     int height = (int)(m_rect.height() * hchange);
@@ -428,6 +436,14 @@ void OSDListBtnType::Reinit(float wchange, float hchange, float wmult,
     int y = (int)(m_rect.y() * hchange);
 
     m_rect = QRect(x, y, width, height);
+
+    Init();
+
+    OSDListBtnTypeItem* item = 0;
+    for (item = m_itemList.first(); item; item = m_itemList.next()) {
+        item->Reinit(wchange, hchange, wmult, hmult);
+    }
+
 }
 
 void OSDListBtnType::SetItemRegColor(const QColor& beg, const QColor& end, 
@@ -1058,5 +1074,40 @@ void OSDListBtnTypeItem::paint(OSDSurface *surface, TTFFont *font,
     tr.moveBy(x, y);
     tr.moveBy(0, font->Size() / 4);
     font->DrawString(surface, tr.x(), tr.y(), m_text, tr.right(), tr.bottom());
+}
+
+void OSDListBtnTypeItem::Reinit(float wchange, float hchange, 
+                                float wmult, float hmult)
+{
+    (void)wmult;
+    (void)hmult;
+
+    int width = (int)(m_checkRect.width() * wchange);
+    int height = (int)(m_checkRect.height() * hchange);
+    int x = (int)(m_checkRect.x() * wchange);
+    int y = (int)(m_checkRect.y() * hchange);
+
+    m_checkRect = QRect(x, y, width, height);
+
+    width = (int)(m_pixmapRect.width() * wchange);
+    height = (int)(m_pixmapRect.height() * hchange);
+    x = (int)(m_pixmapRect.x() * wchange);
+    y = (int)(m_pixmapRect.y() * hchange);
+
+    m_pixmapRect = QRect(x, y, width, height);
+
+    width = (int)(m_textRect.width() * wchange);
+    height = (int)(m_textRect.height() * hchange);
+    x = (int)(m_textRect.x() * wchange);
+    y = (int)(m_textRect.y() * hchange);
+
+    m_textRect = QRect(x, y, width, height);
+
+    width = (int)(m_arrowRect.width() * wchange);
+    height = (int)(m_arrowRect.height() * hchange);
+    x = (int)(m_arrowRect.x() * wchange);
+    y = (int)(m_arrowRect.y() * hchange);
+
+    m_arrowRect = QRect(x, y, width, height);
 }
 
