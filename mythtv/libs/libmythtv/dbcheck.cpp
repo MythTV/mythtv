@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythcontext.h"
 
-const QString currentDatabaseVersion = "1014";
+const QString currentDatabaseVersion = "1016";
 
 void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -364,6 +364,39 @@ void UpgradeTVDatabaseSchema(void)
 ""
 };
         performActualUpdate(updates, "1014", dbver);
+    }
+
+    if (dbver == "1014")
+    {
+        const QString updates[] = {
+"ALTER TABLE dvb_sat CHANGE lnb_log_switch lnb_lof_switch INTEGER DEFAULT 11700000;",
+"UPDATE settings SET value='RecPriorityOrder' WHERE value='RecPriorityingOrder';",
+""
+};
+
+        performActualUpdate(updates, "1015", dbver);
+    }
+
+    if (dbver == "1015")
+    {
+        const QString updates[] = {
+"CREATE TABLE jumppoints ("
+"  destination varchar(128) NOT NULL,"
+"  description varchar(255) default NULL,"
+"  keylist varchar(32) default NULL,"
+"  hostname varchar(255) NOT NULL"
+");",
+"CREATE TABLE keybindings ("
+"  context varchar(32) NOT NULL,"
+"  action varchar(32) NOT NULL,"
+"  description varchar(255) default NULL,"
+"  keylist varchar(32) default NULL,"
+"  hostname varchar(255) NOT NULL"
+");",
+""
+};
+
+        performActualUpdate(updates, "1016", dbver);
     }
 }
 

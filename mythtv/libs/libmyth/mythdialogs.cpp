@@ -10,6 +10,7 @@
 #include <qaccel.h>
 #include <qfocusdata.h>
 #include <qdict.h>
+#include <qsqldatabase.h>
 
 #include <iostream>
 using namespace std;
@@ -114,9 +115,7 @@ MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal)
     RegisterKey("Global", "DOWN", "Down Arrow", "Down");
     RegisterKey("Global", "LEFT", "Left Arrow", "Left");
     RegisterKey("Global", "RIGHT", "Right Arrow", "Right");
-    RegisterKey("Global", "SELECT", "Select", "Return");
-    RegisterKey("Global", "SELECT", "Select", "Enter");
-    RegisterKey("Global", "SELECT", "Select", "Space");
+    RegisterKey("Global", "SELECT", "Select", "Return,Enter,Space");
     RegisterKey("Global", "ESCAPE", "Escape", "Esc");
     RegisterKey("Global", "MENU", "Pop-up menu", "M");
     RegisterKey("Global", "INFO", "More information", "I");
@@ -274,7 +273,38 @@ bool MythMainWindow::TranslateKeyPress(const QString &context,
 void MythMainWindow::RegisterKey(const QString &context, const QString &action,
                                  const QString &description, const QString &key)
 {
-    QKeySequence keyseq(key);
+    QString keybind = key;
+
+    QSqlDatabase *db = QSqlDatabase::database();
+
+    QString thequery = QString("SELECT keylist FROM keybindings WHERE "
+                               "context = \"%1\" AND action = \"%2\" AND "
+                               "hostname = \"%2\";")
+                              .arg(context).arg(action)
+                              .arg(gContext->GetHostName());
+
+    QSqlQuery query = db->exec(thequery);
+
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+
+        keybind = query.value(0).toString();
+    }
+    else
+    {
+        thequery = QString("INSERT INTO keybindings (context, action, "
+                           "description, keylist, hostname) VALUES "
+                           "(\"%1\", \"%2\", \"%3\", \"%4\", \"%5\");")
+                           .arg(context).arg(action).arg(description)
+                           .arg(keybind).arg(gContext->GetHostName());
+
+        query = db->exec(thequery);
+        if (!query.isActive())
+            MythContext::DBError("Insert Keybinding", query);
+    }
+
+    QKeySequence keyseq(keybind);
 
     if (!d->keyContexts[context])
         d->keyContexts.insert(context, new KeyContext());
@@ -288,7 +318,7 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
         if (d->keyContexts[context]->GetMapping(keynum, dummyaction))
         {
             VERBOSE(VB_GENERAL, QString("Key %1 is already bound in context "
-                                        "%2.").arg(key).arg(context));
+                                        "%2.").arg(keybind).arg(context));
         }
         else
         {
@@ -307,7 +337,36 @@ void MythMainWindow::RegisterJump(const QString &destination,
                                   const QString &description,
                                   const QString &key, void (*callback)(void))
 {
-    QKeySequence keyseq(key);
+    QString keybind = key;
+
+    QSqlDatabase *db = QSqlDatabase::database();
+
+    QString thequery = QString("SELECT keylist FROM jumppoints WHERE "
+                               "destination = \"%1\" and hostname = \"%2\";")
+                              .arg(destination).arg(gContext->GetHostName());
+
+    QSqlQuery query = db->exec(thequery);
+
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+ 
+        keybind = query.value(0).toString();
+    }
+    else
+    {
+        thequery = QString("INSERT INTO jumppoints (destination, description, "
+                           "keylist, hostname) VALUES (\"%1\", \"%2\", \"%3\", "
+                           "\"%4\");").arg(destination).arg(description)
+                                      .arg(keybind)
+                                      .arg(gContext->GetHostName());
+
+        query = db->exec(thequery);
+        if (!query.isActive())
+            MythContext::DBError("Insert Jump Point", query);
+    }
+    
+    QKeySequence keyseq(keybind);
 
     if (!keyseq.isEmpty())
     {
@@ -318,20 +377,20 @@ void MythMainWindow::RegisterJump(const QString &destination,
         {
             JumpData jd = { callback, destination, description };
 
-            VERBOSE(VB_GENERAL, QString("Binding: %1 to JumpPoint: %2")
-                                       .arg(key).arg(destination));
+            //VERBOSE(VB_GENERAL, QString("Binding: %1 to JumpPoint: %2")
+            //                           .arg(keybind).arg(destination));
 
             d->jumpMap[keynum] = jd;
         }
         else
         {
             VERBOSE(VB_GENERAL, QString("Key %1 is already bound to a jump "
-                                        "point.").arg(key));
+                                        "point.").arg(keybind));
         }
     }
-    else
-        VERBOSE(VB_GENERAL, QString("JumpPoint: %2 exists, no keybinding")
-                                   .arg(destination));
+    //else
+    //    VERBOSE(VB_GENERAL, QString("JumpPoint: %2 exists, no keybinding")
+    //                               .arg(destination));
 }
 
 void MythMainWindow::keyPressEvent(QKeyEvent *e)
