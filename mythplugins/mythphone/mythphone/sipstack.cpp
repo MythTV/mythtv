@@ -231,13 +231,13 @@ void SipMsg::insertVia(QString Hostname, int Port)
     QStringList::Iterator it;
     for (it=attList.begin(); (it != attList.end()) && (*it != ""); it++)
     {
-        if ((*it).startsWith("Via:", false))
+        if ((*it).find("Via:", 0, false) >= 0)
             break;
     }
 
     // Insert new Via
     QString Via = "Via: SIP/2.0/UDP " + Hostname + ":" + QString::number(Port);
-    if ((*it).startsWith("Via:", false))
+    if ((*it).find("Via:", 0, false) >= 0)
         attList.insert(it, Via);
     else
         attList.insert(attList.at(1), Via);
@@ -252,12 +252,12 @@ void SipMsg::removeVia()
     QStringList::Iterator it;
     for (it=attList.begin(); (it != attList.end()) && (*it != ""); it++)
     {
-        if ((*it).startsWith("Via:", false))
+        if ((*it).find("Via:", 0, false) >= 0)
             break;
     }
 
     // Remove the first Via. It may be on a line on its own (remove line) or may be part of a comma-separated list
-    if ((*it).startsWith("Via:", false))
+    if ((*it).find("Via:", 0, false) >= 0)
     {
         int commaPosn;
         if ((commaPosn = (*it).find(',')) != -1)
@@ -274,7 +274,7 @@ void SipMsg::removeVia()
     viaPort = 0;
     for (it=attList.begin(); (it != attList.end()) && (*it != ""); it++)
     {
-        if ((*it).startsWith("Via:", false))
+        if ((*it).find("Via:", 0, false) >= 0)
         {
             decodeVia(*it);
             break;
@@ -329,25 +329,25 @@ void SipMsg::decode(QString sipString)
 
 void SipMsg::decodeLine(QString line)
 {
-    if (line.startsWith("Via:", false))
+    if (line.find("Via:", 0, false) >= 0)
         decodeVia(line);
-    else if (line.startsWith("To:", false))
+    else if (line.find("To:", 0, false) >= 0)
         decodeTo(line);
-    else if (line.startsWith("From:", false))
+    else if (line.find("From:", 0, false) >= 0)
         decodeFrom(line);
-    else if (line.startsWith("Contact:", false))
+    else if (line.find("Contact:", 0, false) >= 0)
         decodeContact(line);
-    else if (line.startsWith("Record-Route:", false))
+    else if (line.find("Record-Route:", 0, false) >= 0)
         decodeRecordRoute(line);
-    else if (line.startsWith("Call-ID:", false))
+    else if (line.find("Call-ID:", 0, false) >= 0)
         decodeCallid(line);
-    else if (line.startsWith("CSeq:", false))
+    else if (line.find("CSeq:", 0, false) >= 0)
         decodeCseq(line);
-    else if (line.startsWith("Expires:", false))
+    else if (line.find("Expires:", 0, false) >= 0)
         decodeExpires(line);
-    else if (line.startsWith("Content-Type:", false))
+    else if (line.find("Content-Type:", 0, false) >= 0)
         decodeContentType(line);
-    else if (line.startsWith("WWW-Authenticate:", false))
+    else if (line.find("WWW-Authenticate:", 0, false) >= 0)
         decodeWWWAuthenticate(line);
 }
 
@@ -368,7 +368,7 @@ void SipMsg::decodeRequestLine(QString line)
 
 void SipMsg::decodeVia(QString via)
 {
-    if ((via.startsWith("Via: SIP/2.0/UDP", false)) && (viaIp.length() == 0))
+    if ((via.find("Via: SIP/2.0/UDP", 0, false) >= 0) && (viaIp.length() == 0))
     {
         QString str1 = via.mid(17);
         QString str2 = str1.section(';', 0, 0);
