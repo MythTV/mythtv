@@ -121,7 +121,7 @@ public:
         setValue(false);
         setHelpText("If this is set, fast forward and rewind continue after the key is released, until "
                     "the key is pressed again.  If enabled, set FastForwardAmount "
-                    and RewindAmount to one second.");
+                    "and RewindAmount to one second.");
     };
 };
 
