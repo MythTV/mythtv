@@ -465,7 +465,7 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
         image = meta->getCoverImage();
         myImage = false;
     }
-    
+
     int bw  = backRegPix.width();
     int bh  = backRegPix.height();
     int sw  = (int)(7*wmult);
@@ -488,7 +488,7 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
         delete pixmap;
     }
     
-    
+    cerr << "2" << endl;
     
     UITextType *itype = (UITextType*)0;
     UITextType *ttype = (UITextType*)0;
@@ -506,7 +506,7 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
     }
 
     // text instead of an image
-    if (itype && image->isNull()) 
+    if (itype && (!image || image->isNull())) 
     {
         QRect area = itype->DisplayArea();
 
@@ -523,7 +523,7 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
         itype->Draw(p, 2, 0);
         itype->Draw(p, 3, 0);
     }
-    
+
 
     // text underneath an icon
     if (ttype && subtitleOn) 
@@ -544,7 +544,6 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
         ttype->Draw(p, 3, 0);
     }
 
-    
     if (image && myImage) 
         delete image;
 }
