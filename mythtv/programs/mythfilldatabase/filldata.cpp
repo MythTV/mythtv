@@ -943,6 +943,9 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
 
                 promptForChannelUpdates(i, atoi(chanid.ascii()));
 
+                if ((*i).callsign == QString::null || (*i).callsign == "")
+                    (*i).callsign = chanid;
+
                 if (name     != (*i).name ||
                     callsign != (*i).callsign ||
                     chanstr  != (*i).chanstr ||
@@ -1025,6 +1028,9 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
 
                 unsigned int chanid = promptForChannelUpdates(i,0);
 
+                if ((*i).callsign == QString::null || (*i).callsign == "")
+                    (*i).callsign = chanid;
+
                 if (chanid > 0)
                 {
                     querystr = QString("INSERT INTO channel (chanid,name"
@@ -1084,6 +1090,9 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                     else
                         break;
                 }
+
+                if ((*i).callsign == QString::null || (*i).callsign == "")
+                    (*i).callsign = chanid;
 
                 querystr = QString("INSERT INTO channel (chanid,name,callsign,"
                                    "channum,finetune,icon,xmltvid,sourceid,"

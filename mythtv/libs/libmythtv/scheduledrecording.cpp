@@ -173,6 +173,13 @@ public:
     };
 };
 
+class SRStation: public LineEditSetting, public SRSetting {
+public:
+    SRStation(const ScheduledRecording& parent): SRSetting(parent, "station") {
+        setVisible(false);
+    };
+};
+
 class SRTitle: public LineEditSetting, public SRSetting {
 public:
     SRTitle(const ScheduledRecording& parent):
@@ -290,6 +297,7 @@ ScheduledRecording::ScheduledRecording() {
     addChild(endoffset = new SREndOffset(*this));
     addChild(maxnewest = new SRMaxNewest(*this));
     addChild(channel = new SRChannel(*this));
+    addChild(station = new SRStation(*this));
     addChild(title = new SRTitle(*this));
     addChild(subtitle = new SRSubtitle(*this));
     addChild(description = new SRDescription(*this));
@@ -307,6 +315,7 @@ ScheduledRecording::ScheduledRecording() {
 void ScheduledRecording::fromProgramInfo(ProgramInfo* proginfo)
 {
     channel->setValue(proginfo->chanid);
+    station->setValue(proginfo->chansign);
     title->setValue(proginfo->title);
     subtitle->setValue(proginfo->subtitle);
     description->setValue(proginfo->description);
@@ -369,7 +378,7 @@ bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
         .arg(kAllRecord)
         .arg(kFindOneRecord)
         .arg(chanid)
-        .arg(chansign)
+        .arg(station->getValue().utf8())
         .arg(kChannelRecord)
         .arg(proginfo->startts.time().toString(Qt::ISODate))
         .arg(proginfo->endts.time().toString(Qt::ISODate));

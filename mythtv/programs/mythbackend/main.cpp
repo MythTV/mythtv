@@ -39,6 +39,23 @@ bool setupTVs(bool ismaster)
 
     QSqlQuery query;
 
+    if (ismaster)
+    {
+        // Hack to make sure record.station gets set if the user
+        // downgrades to a prior version and creates new entries
+        // without it.
+        query.exec("UPDATE channel SET callsign=chanid "
+                   "WHERE callsign IS NULL OR callsign='';");
+        query.exec("UPDATE record,channel "
+                   "SET record.station=channel.callsign "
+                   "WHERE record.station='' "
+                   "AND record.chanid=channel.chanid;");
+        query.exec("UPDATE recordoverride,channel "
+                   "SET recordoverride.station=channel.callsign "
+                   "WHERE recordoverride.station='' "
+                   "AND recordoverride.chanid=channel.chanid;");
+    }
+
     query.exec("SELECT cardid,hostname FROM capturecard ORDER BY cardid;");
 
     if (query.isActive() && query.numRowsAffected())

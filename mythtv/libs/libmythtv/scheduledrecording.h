@@ -121,6 +121,7 @@ private:
     class SRMaxEpisodes* maxepisodes;
     class SRMaxNewest* maxnewest;
     class SRChannel* channel;
+    class SRStation* station;
     class SRTitle* title;
     class SRSubtitle* subtitle;
     class SRDescription* description;
