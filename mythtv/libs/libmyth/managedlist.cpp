@@ -172,7 +172,7 @@ void BoundedIntegerManagedListItem::setTemplates(const QString& negStr, const QS
     posTemplate = posStr;
     posOneTemplate = oneStr;
     zeroTemplate = zeroStr;
-    generateList();
+//    generateList();
 }
 
 void BoundedIntegerManagedListItem::setValue(int val)
