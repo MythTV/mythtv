@@ -1880,7 +1880,6 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
     QSqlDatabase *db = QSqlDatabase::database();
     QButton *playButton;
 
-    
     if (playList.count())
     {
         playButton = popup->addButton(tr("Play"), this, SLOT(doPlay()));
@@ -1890,7 +1889,7 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
     }
     else
     {
-        if ((curitem->programflags & FL_BOOKMARK) || (!playList.count()))
+        if (curitem->programflags & FL_BOOKMARK)
         {
             playButton = popup->addButton(tr("Play from..."), this, SLOT(showPlayFromPopup()));
         }
