@@ -383,7 +383,7 @@ void NuppelVideoRecorder::Initialize(void)
     else
         audio_buffer_count = 0;
 
-    mp3buf_size = (int)(1.25 * 8192 + 7200);
+    mp3buf_size = (int)(1.25 * 16384 + 7200);
     mp3buf = new char[mp3buf_size];
 
     text_buffer_size = 8 * (sizeof(teletextsubtitle) + VT_WIDTH);
