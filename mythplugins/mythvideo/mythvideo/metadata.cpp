@@ -602,7 +602,7 @@ void Metadata::updateCountries(QSqlDatabase *db)
         if (idcountry>0)
         {
             // add current country for this video
-            query.prepare("INSERT INTO videometadatacountry (idvideo, idgenre) "
+            query.prepare("INSERT INTO videometadatacountry (idvideo, idcountry) "
                           "VALUES (:ID,:COUNTRYID);");
             query.bindValue(":ID", id);
             query.bindValue(":COUNTRYID", idcountry);
