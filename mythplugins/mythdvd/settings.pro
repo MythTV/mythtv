@@ -3,7 +3,7 @@ CONFIG += debug
 
 PREFIX = /usr/local
 
-LIBVERSION = 0.10
+LIBVERSION = 0.11
 
 INCLUDEPATH += $${PREFIX}/include
 INCLUDEPATH *= /usr/local/include
