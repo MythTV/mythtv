@@ -417,7 +417,7 @@ public:
 class DVBSwFilter: public CheckBoxSetting, public CCSetting {
 public:
     DVBSwFilter(const CaptureCard& parent):
-        CCSetting(parent, "use_swfilter") {
+        CCSetting(parent, "dvb_swfilter") {
         setLabel(QObject::tr("Do NOT use DVB driver for filtering."));
         setHelpText(QObject::tr("(BROKEN) This option is used to get around "
                     "filtering limitations on some DVB cards."));
@@ -427,7 +427,7 @@ public:
 class DVBRecordTS: public CheckBoxSetting, public CCSetting {
 public:
     DVBRecordTS(const CaptureCard& parent):
-        CCSetting(parent, "record_ts") {
+        CCSetting(parent, "dvb_recordts") {
         setLabel(QObject::tr("Record the TS, not PS."));
         setHelpText(QObject::tr("This will make the backend not perform "
                     "Transport Stream to Program Stream conversion."));
@@ -437,8 +437,9 @@ public:
 class DVBNoSeqStart: public CheckBoxSetting, public CCSetting {
 public:
     DVBNoSeqStart(const CaptureCard& parent):
-        CCSetting(parent, "no_seq_start") {
-        setLabel(QObject::tr("Do not wait for SEQ start header."));
+        CCSetting(parent, "dvb_wait_for_seqstart") {
+        setLabel(QObject::tr("Wait for SEQ start header."));
+        setValue(true);
         setHelpText(QObject::tr("Normally the dvb-recording will drop packets "
                     "from the card untill a sequence start header is seen. "
                     "This option turns off this feature."));
@@ -449,7 +450,7 @@ class DVBPidBufferSize: public SpinBoxSetting, public CCSetting {
 public:
     DVBPidBufferSize(const CaptureCard& parent):
         SpinBoxSetting(0, 180000, 188),
-        CCSetting(parent, "dmx_buf_size") {
+        CCSetting(parent, "dvb_dmx_buf_size") {
         setLabel(QObject::tr("Per PID driver buffer size"));
         setValue(188*50);
     };
@@ -459,7 +460,7 @@ class DVBBufferSize: public SpinBoxSetting, public CCSetting {
 public:
     DVBBufferSize(const CaptureCard& parent):
         SpinBoxSetting(0, 188000, 188),
-        CCSetting(parent, "pkt_buf_size") {
+        CCSetting(parent, "dvb_pkt_buf_size") {
         setLabel(QObject::tr("Packet buffer"));
         setValue(188*100);
     };

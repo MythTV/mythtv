@@ -812,13 +812,28 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
 
     int avail = ReadBufAvail();
 
+    int readErr = 0;
+
     while (avail < count && !stopreads)
     {
         availWaitMutex.lock();
         wanttoread = count;
         if (!availWait.wait(&availWaitMutex, 2000))
+        {
             cerr << "Waited 2 seconds for data to become available, waiting "
                     "again...\n";
+            readErr++;
+            if (readErr > 7)
+            {
+                cerr << "Waited 14 seconds for data to become available, "
+                        "aborting\n";
+                wanttoread = 0;
+                stopreads = true;
+                availWaitMutex.unlock();
+                return 0;
+            }
+        }
+
         wanttoread = 0;
         availWaitMutex.unlock();
 

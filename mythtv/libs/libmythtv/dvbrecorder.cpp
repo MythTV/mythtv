@@ -92,8 +92,9 @@ void DVBRecorder::SetOption(const QString &name, int value)
         swfilter = (value == 1);
     else if (name == "recordts")
     {
-        GENERAL("Was told to record transport stream,"
-                " but this feature is broken, not enabling.");
+        if (value == 1)
+            GENERAL("Was told to record transport stream,"
+                    " but this feature is broken, not enabling.");
 //        recordts = (value == 1);
     }
     else if (name == "wait_for_seqstart")
