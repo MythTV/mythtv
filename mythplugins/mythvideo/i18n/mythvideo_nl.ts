@@ -3,7 +3,7 @@
     <name>EditMetadataDialog</name>
     <message>
         <source>Level %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Niveau %1</translation>
     </message>
     <message>
         <source>None</source>
@@ -11,26 +11,26 @@
     </message>
     <message>
         <source>No Cover</source>
-        <translation>Geen cover</translation>
+        <translation>Geen Cover</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation>KLaar</translation>
+        <translation>Klaar</translation>
     </message>
 </context>
 <context>
     <name>FileAssocDialog</name>
     <message>
         <source>Please enter the new extension:</source>
-        <translation>Geef nieuwe extentie:</translation>
+        <translation>Geef nieuwe extensie:</translation>
     </message>
     <message>
         <source>Create new extension</source>
-        <translation>Maak nieuwe extentie</translation>
+        <translation>Maak nieuwe extensie</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Anuleer</translation>
+        <translation>Annuleer</translation>
     </message>
     <message>
         <source>Done</source>
@@ -49,71 +49,71 @@
     <name>QObject</name>
     <message>
         <source>Directory that holds videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Map voor videobestanden</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythVideo only needs to have read permission to the directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze map moet bestaan en de gebruiker moet enkel leesbevoegdheid voor deze map hebben.</translation>
     </message>
     <message>
         <source>Starting Parental Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Startniveau &apos;Parental Control&apos;</translation>
     </message>
     <message>
         <source>4 - Highest</source>
-        <translation type="unfinished"></translation>
+        <translation>4 -Hoogste</translation>
     </message>
     <message>
         <source>1 - Lowest</source>
-        <translation type="unfinished"></translation>
+        <translation>1 - Laagste</translation>
     </message>
     <message>
         <source>2</source>
-        <translation type="unfinished"></translation>
+        <translation>2</translation>
     </message>
     <message>
         <source>3</source>
-        <translation type="unfinished"></translation>
+        <translation>3</translation>
     </message>
     <message>
         <source>This is the &apos;level&apos; that MythVideo starts at. Any videos with a level at or below this will be shown in the list or while browsing by default. The Parental PIN should be set to limit changing of the default level.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit is het niveau waarin MythVideo start. Alle films met een gelijk of lager niveau worden standaard getoond. De &apos;Parental Control&apos; PIN kan best zo ingesteld worden dat het niveau zo weinig mogelijk veranderd moet worden.</translation>
     </message>
     <message>
         <source>Parental Control PIN</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;Parental Control&apos; PIN</translation>
     </message>
     <message>
         <source>If set, you will not be able to return to this screen and reset the Parental PIN without first entering the current PIN. You have been warned.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien ingesteld is het niet meer mogelijk naar dit scherm terug te keren om de PIN te resetten zonder de bestaande PIN in te voeren. U bent gewaarschuwd!</translation>
     </message>
     <message>
         <source>Show Unknown File Types</source>
-        <translation type="unfinished"></translation>
+        <translation>Toon onbekende bestandstypes</translation>
     </message>
     <message>
         <source>If set, all files below the Myth Video directory will be displayed unless their extension is explicitly set to be ignored. </source>
-        <translation type="unfinished"></translation>
+        <translation>Indien geselecteerd worden alle bestanden in de MythVideo-map getoond tenzij de extensie expliciet ingesteld werd op negeren.</translation>
     </message>
     <message>
         <source>Video List browses files</source>
-        <translation type="unfinished"></translation>
+        <translation>Film Lijst bladert bestanden</translation>
     </message>
     <message>
         <source>If set, this will cause the Video List screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien geselecteerd worden alle relevante bestanden in de MythVideo-map getoond. Gescand of niet.</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Algemene Instellingen</translation>
     </message>
     <message>
         <source>Player Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Instellingen voor het Afspeelprogramma</translation>
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;Parental PIN&apos;:</translation>
     </message>
     <message>
         <source>Searching for video files</source>
@@ -121,7 +121,7 @@
     </message>
     <message>
         <source>Updating video database</source>
-        <translation>Bezig met bijwerken video-databank</translation>
+        <translation>Bezig met bijwerken film-databank</translation>
     </message>
     <message>
         <source>No Cover</source>
@@ -137,11 +137,11 @@
     </message>
     <message>
         <source>NR</source>
-        <translation type="unfinished"></translation>
+        <translation>Niet Beoordeeld</translation>
     </message>
     <message>
         <source>Unknown Rating</source>
-        <translation>Onbekende Rating</translation>
+        <translation>Onbekende Beoordeling</translation>
     </message>
     <message>
         <source>Default Player</source>
@@ -149,47 +149,47 @@
     </message>
     <message>
         <source>Newly scanned files are browsable by default</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieuw gescande bestanden worden standaard getoond</translation>
     </message>
     <message>
         <source>If set, newly scanned files in the Video Manager will be marked as browsable and will appear in the &apos;Browse&apos; menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien geselecteerd worden nieuw gescande bestanden in de Video Manager gemarkeerd als &quot;bladerbaar&quot;.</translation>
     </message>
     <message>
         <source>New category</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieuwe categorie</translation>
     </message>
     <message>
         <source>This PIN is used to control the current Parental Level. If you want to use this feature, then setting the value to all numbers will make your life much easier.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze PIN wordt gebruikt om het huidige &apos;Parental Control&apos; niveau te controleren. Als U dit wil instellen is het handig om enkel numerieke invoer te gebruiken.</translation>
     </message>
     <message>
         <source>Command to search for movie listings</source>
-        <translation type="unfinished"></translation>
+        <translation>Commando om te zoeken naar filminfo</translation>
     </message>
     <message>
         <source>This command must be executable by the user running MythVideo.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit commando moet uitgevoerd kunnen worden door de huidige gebruiker.</translation>
     </message>
     <message>
         <source>Command to search for movie posters</source>
-        <translation type="unfinished"></translation>
+        <translation>Commando om te zoeken naar filmcovers</translation>
     </message>
     <message>
         <source>Command to extract data for movies</source>
-        <translation type="unfinished"></translation>
+        <translation>Commando om filmdata te extraheren</translation>
     </message>
     <message>
         <source>Directory that holds movie posters</source>
-        <translation type="unfinished"></translation>
+        <translation>Map voor filmcovers</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythVideo needs to have read/write permission to the directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze map moet bestaan en de gebruiker moet lees- en schrijfbevoegdheid hebben.</translation>
     </message>
     <message>
         <source>Video Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Video Manager</translation>
     </message>
     <message>
         <source>Could not retrieve poster</source>
@@ -198,63 +198,65 @@
     <message>
         <source>A movie poster exists for this movie but Myth could not retrieve it within a reasonable amount of time.
 </source>
-        <translation>Er bestaat een cover voor deze film maar die kan momenteel niet gedownload worden</translation>
+        <translation>Er bestaat een cover voor deze film maar die kan momenteel niet gedownload worden.
+
+</translation>
     </message>
     <message>
         <source>Default View</source>
-        <translation type="unfinished"></translation>
+        <translation>Standaard uiterlijk</translation>
     </message>
     <message>
         <source>Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Gallerij</translation>
     </message>
     <message>
         <source>Browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Browser</translation>
     </message>
     <message>
         <source>Listings</source>
-        <translation type="unfinished"></translation>
+        <translation>Lijst</translation>
     </message>
     <message>
         <source>The defualt view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
-        <translation type="unfinished"></translation>
+        <translation>Het standaard uiterlijk voor MythVideo. Een ander uiterlijk kiezen is mogelijk via het pop-up menu (MENU-toets).</translation>
     </message>
     <message>
         <source>Aggressive Parental Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Agressieve &apos;Parental Control&apos;</translation>
     </message>
     <message>
         <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit commando wordt gebruikt voor elk bestand met een niet gedefinieerde extensie. U kan ook de naam van een van de afspeel-plugins (bv. &apos;Internal&apos;) invoeren.</translation>
     </message>
     <message>
         <source>Rows to display</source>
-        <translation type="unfinished"></translation>
+        <translation>Getoond aantal rijen</translation>
     </message>
     <message>
         <source>Columns to display</source>
-        <translation type="unfinished"></translation>
+        <translation>Getoond aantal kolommen</translation>
     </message>
     <message>
         <source>Show title below thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Toon titel onder thumbnail</translation>
     </message>
     <message>
         <source>If set, the additional text will make the thumbnails smaller.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien geselecteerd zal de tekst de thumbnail kleiner maken.</translation>
     </message>
     <message>
         <source>Maintain aspect ratio of thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Verhouding van de thumbnails behouden</translation>
     </message>
     <message>
         <source>If set, the scaled thumbnails will maintain their original aspect ratio. If not set, they are scaled to match the size of the background icon.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien geselecteerd zal de verhouding van de thumbnails behouden worden. Zo niet worden ze geschaald tot de afmeting van het achtergrondicoon.</translation>
     </message>
     <message>
         <source>Video Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Video Gallerij</translation>
     </message>
 </context>
 <context>
@@ -269,11 +271,11 @@
     </message>
     <message>
         <source>Rated:</source>
-        <translation>Rating:</translation>
+        <translation>Beoordeling:</translation>
     </message>
     <message>
         <source>Parental Level:</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;Parental Control&apos; Niveau:</translation>
     </message>
     <message>
         <source>Browsable:</source>
@@ -297,11 +299,11 @@
     </message>
     <message>
         <source>IMDB Num.:</source>
-        <translation type="unfinished"></translation>
+        <translation>IMDBnr.:</translation>
     </message>
     <message>
         <source>retrieving data...</source>
-        <translation>downloaden gegevens...</translation>
+        <translation>downloaden van gegevens ...</translation>
     </message>
     <message>
         <source>[ looking for ]</source>
@@ -309,11 +311,11 @@
     </message>
     <message>
         <source>Enter IMDB #</source>
-        <translation>Geen IMDB nr.</translation>
+        <translation>Geef IMDBnr.</translation>
     </message>
     <message>
         <source>loading...</source>
-        <translation>inlezen...</translation>
+        <translation>bezig met inlezen ...</translation>
     </message>
     <message>
         <source>No Videos Found</source>
@@ -321,11 +323,11 @@
     </message>
     <message>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation>1</translation>
     </message>
     <message>
         <source>Directed by</source>
-        <translation>Gemaakt door</translation>
+        <translation>Regie</translation>
     </message>
     <message>
         <source>File:</source>
@@ -333,11 +335,11 @@
     </message>
     <message>
         <source>Player:</source>
-        <translation type="unfinished"></translation>
+        <translation>Afspeelprogramma:</translation>
     </message>
     <message>
         <source>PL </source>
-        <translation type="unfinished"></translation>
+        <translation>PL</translation>
     </message>
     <message>
         <source>MythVideo File Associations</source>
@@ -345,7 +347,7 @@
     </message>
     <message>
         <source>Extension:</source>
-        <translation>Extentie:</translation>
+        <translation>Extensie:</translation>
     </message>
     <message>
         <source>Command:</source>
@@ -369,11 +371,11 @@
     </message>
     <message>
         <source>Parental Control:</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;Parental Control&apos;:</translation>
     </message>
     <message>
         <source>File to Always Play Next:</source>
-        <translation>Bestand dat hier dient afgespeeld:</translation>
+        <translation>Bestand dat hierna dient afgespeeld:</translation>
     </message>
     <message>
         <source>Include while Browsing:</source>
@@ -381,23 +383,23 @@
     </message>
     <message>
         <source>Cover Art:</source>
-        <translation type="unfinished"></translation>
+        <translation>Cover:</translation>
     </message>
     <message>
         <source>Unique Player Command:</source>
-        <translation type="unfinished"></translation>
+        <translation>Uniek afspeelcommando:</translation>
     </message>
     <message>
         <source>/path/to/the/thing.jpg</source>
-        <translation type="unfinished"></translation>
+        <translation>/path/naar/afbeelding.jpg</translation>
     </message>
     <message>
         <source>Category:</source>
-        <translation>Categorie</translation>
+        <translation>Categorie:</translation>
     </message>
     <message>
         <source>Filters video list</source>
-        <translation>Filter op video-overzicht</translation>
+        <translation>Filter op filmoverzicht</translation>
     </message>
     <message>
         <source>Category :</source>
@@ -405,7 +407,7 @@
     </message>
     <message>
         <source>Genre :</source>
-        <translation type="unfinished"></translation>
+        <translation>Genre :</translation>
     </message>
     <message>
         <source>Country :</source>
@@ -421,7 +423,7 @@
     </message>
     <message>
         <source>User Rating :</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruikersbeoordeling :</translation>
     </message>
     <message>
         <source>Browse :</source>
@@ -441,7 +443,7 @@
     </message>
     <message>
         <source></source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>MENU: Options</source>
@@ -449,7 +451,7 @@
     </message>
     <message>
         <source>Up/Down, Page Up/Down - Browse</source>
-        <translation>Gebruik navigatietoetsen op te bladeren</translation>
+        <translation>Gebruik navigatietoetsen om te bladeren</translation>
     </message>
     <message>
         <source>Menu - Options</source>
@@ -457,11 +459,11 @@
     </message>
     <message>
         <source>Parental</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;Parental Control&apos;</translation>
     </message>
     <message>
         <source>Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Niveau</translation>
     </message>
     <message>
         <source>Year</source>
@@ -473,7 +475,7 @@
     </message>
     <message>
         <source>User Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruikersbeoordeling</translation>
     </message>
 </context>
 <context>
@@ -488,7 +490,7 @@
     </message>
     <message>
         <source>No rating available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen beoordeling beschikbaar.</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -520,7 +522,7 @@
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Anuleer</translation>
+        <translation>Annuleer</translation>
     </message>
 </context>
 <context>
@@ -551,7 +553,7 @@
     </message>
     <message>
         <source>NR</source>
-        <translation type="unfinished"></translation>
+        <translation>Niet Beoordeeld</translation>
     </message>
     <message>
         <source>delete failed</source>
@@ -563,15 +565,15 @@
     </message>
     <message>
         <source>Edit Metadata</source>
-        <translation>Bewerk videogegevens</translation>
+        <translation>Bewerk filmgegevens</translation>
     </message>
     <message>
         <source>Search IMDB</source>
-        <translation>Zoek op internet</translation>
+        <translation>Zoek IMDB</translation>
     </message>
     <message>
         <source>Manually Enter IMDB #</source>
-        <translation>Geef manueel IMDB nr.</translation>
+        <translation>Geef handmatig IMDBnr.</translation>
     </message>
     <message>
         <source>Reset Metadata</source>
@@ -583,15 +585,15 @@
     </message>
     <message>
         <source>Remove Video</source>
-        <translation>Wis video</translation>
+        <translation>Wis Film</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation>Filter weergave</translation>
+        <translation>Filter Weergave</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Anuleer</translation>
+        <translation>Annuleer</translation>
     </message>
     <message>
         <source>Delete this file?</source>
@@ -602,7 +604,7 @@
     <name>VideoTree</name>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;Parental Control&apos; PIN:</translation>
     </message>
     <message>
         <source>No files found</source>
@@ -610,35 +612,35 @@
     </message>
     <message>
         <source>Select action</source>
-        <translation type="unfinished">Kies bewerking</translation>
+        <translation>Kies Actie</translation>
     </message>
     <message>
         <source>Watch This Video</source>
-        <translation type="unfinished">Bekijk deze Film</translation>
+        <translation>Bekijk Film</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation type="unfinished">Beschrijving Inhoud</translation>
+        <translation>Beschrijving Inhoud</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished">Filter weergave</translation>
+        <translation>Filter Weergave</translation>
     </message>
     <message>
         <source>Switch to Browse View</source>
-        <translation type="unfinished"></translation>
+        <translation>Ga naar Browsermodus</translation>
     </message>
     <message>
         <source>Switch to Gallery View</source>
-        <translation type="unfinished"></translation>
+        <translation>Ga naar Gallerijmodus</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Anuleer</translation>
+        <translation>Annuleer</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
 </context>
 </TS>
