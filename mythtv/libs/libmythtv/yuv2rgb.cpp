@@ -27,11 +27,12 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
+#ifdef MMX
 #include "mmx.h"
-#include "yuv2rgb.h"
-
 #define CPU_MMXEXT 0
 #define CPU_MMX 1
+#endif
+#include "yuv2rgb.h"
 
 static void yuv420_argb32_non_mmx(unsigned char *image, unsigned char *py,
                            unsigned char *pu, unsigned char *pv,
@@ -48,6 +49,7 @@ do {                            \
         movq_r2m (src, dest);   \
 } while (0)
 
+#ifdef MMX
 static inline void mmx_yuv2rgb (uint8_t * py, uint8_t * pu, uint8_t * pv)
 {
     static mmx_t mmx_80w = {0x0080008000800080LL};
@@ -313,6 +315,7 @@ static void mmx_argb32 (uint8_t * image,
     yuv420_argb32 (image, py, pu, pv, width, height,
                    rgb_stride, y_stride, uv_stride, CPU_MMX, alphaones);
 }
+#endif
 
 yuv2rgb_fun yuv2rgb_init_mmxext (int bpp, int mode)
 {
