@@ -866,19 +866,184 @@ installed as a DVB device and is supported within MythTV.  </P>
 <P>First, you must compile a version of the Linux kernel to support the new
 tuner device.  Version 2.6.11 supports the card in 8VSB mode.  If you wish
 to use QAM, you will need to patch the kernel, or wait until 2.6.12.</P>
-<P>Download the source to 2.6.11.  At the time of this writing (2005-02-09), the latest
-is 2.6.11-rc3.
+<P>Download the source to 2.6.11.  At the time of this writing (2005-02-15), the latest
+is 2.6.11-rc5.  Downloading the <CODE>nxt2002-qam.patch</CODE> file will allow you to use QAM mode
+to capture unencrypted HDTV.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
 # cd /usr/src
-# wget http://www.kernel.org/pub/linux/kernel/v2.6/testing/linux-2.6.11-rc3.tar.bz2
-# tar -xjf linux-2.6.11-rc3.tar.bz2
-# cd linux-2.6.11-rc3
+# wget http://www.kernel.org/pub/linux/kernel/v2.6/testing/linux-2.6.11-rc5.tar.bz2
+# tar -xjf linux-2.6.11-rc5.tar.bz2
+# pushd .
+# cd linux-2.6.11-rc5/drivers/media/dvb/frontends
+# wget http://www.digitalregime.com/patches/nxt2002-qam.patch
+# patch -p0 &lt; nxt2002-qam.patch
+# popd
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>To be continued...</P>
+<P>If you already have a 2.6 kernel running, copy the <CODE>.config</CODE> file and
+use it as your starting point.  If not, then go straight to the <CODE>make
+menuconfig</CODE> portion below.</P>
+<P>On Debian with a 2.6.10 kernel:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+# cp /lib/modules/`uname -r`/build/.config .
+# make oldconfig
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Read the prompts that come up; for the most part you should be able to
+answer "No".
+<BLOCKQUOTE><CODE>
+<PRE>
+# make menuconfig
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>For Gentoo:
+<BLOCKQUOTE><CODE>
+<PRE>
+# emerge genkernel udev hotplug coldplug
+# genkernel --menuconfig --udev --save-config all
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Go to the Device Drivers->Multimedia->Digital Video Broadcasting Devices</P>
+<P>Enable DVB for Linux and select B2C2/Technisat Air/Sky/CableStar 2 PCI.</P>
+<P>Exit menuconfig, then compile modules and the kernel.  (Gentoo will do this
+automatically as a part of the <B>genkernel</B> step.
+<BLOCKQUOTE><CODE>
+<PRE>
+# make modules
+# make
+# make install modules_install
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Make any modifications necessary to your boot configuration files (lilo or
+grub) as required to boot your new kernel.</P>
+<P>Download and compile the dvb applications you'll need to configure the card. 
+At the password prompt, press ENTER.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cvs -d :pserver:anonymous@linuxtv.org:/cvs/linuxtv login
+$ cvs -d :pserver:anonymous@linuxtv.org:/cvs/linuxtv co dvb-apps dvb-kernel
+$ cd dvb-apps
+$ make
+</PRE>
+</CODE></BLOCKQUOTE>
+
+<B>NOTE</B>: As of 2005-02-16, the compile aborts with an error, however
+not before the <B>azap</B> is compiled, so you should be able to continue.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# cp utils/szap/azap /usr/local/bin
+</PRE>
+</CODE></BLOCKQUOTE>
+
+On Gentoo, execute the following:
+<BLOCKQUOTE><CODE>
+<PRE>
+# mkdir /lib/firmware
+# cp ~/dvb-kernel/firmware/dvb-fe-nxt2002.fw /lib/firmware
+# echo skystar2 >> /etc/modules.autoload.d/kernel-2.6
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+
+On Debian:
+<BLOCKQUOTE><CODE>
+<PRE>
+# cp ~/dvb-kernel/firmware/dvb-fe-nxt2002.fw /usr/lib/hotplug/firmware
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Shutdown your machine, install the card and restart.  Ensure that you're
+using your newly compiled kernel.</P>
+<P>Once you've rebooted, confirm that the card is detected.  If you type
+<B>dmesg</B>, you should see something like this:
+<BLOCKQUOTE><CODE>
+<PRE>
+drivers/media/dvb/b2c2/skystar2.c: FlexCopIIB(rev.195) chip found
+drivers/media/dvb/b2c2/skystar2.c: the chip has 38 hardware filters
+DVB: registering new adapter (SkyStar2).
+DVB: registering frontend 0 (Nextwave nxt2002 VSB/QAM frontend)...
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If you are using 8VSB (Over-the-Air HDTV), run the <B>azap</B> program. 
+Replace ZIPCODE with your zipcode.  The perl script will connect to 
+<A HREF="http://www.antennaweb.org">http://www.antennaweb.org</A> to obtain
+your HDTV channels.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd /usr/src/dvb-apps/util/szap/channels-conf/atsc
+$ test ~/.azap || mkdir ~/.azap
+$ perl ./make_atsc_chanconf.pl ZIPCODE >~/.azap/channels.conf
+</PRE>
+</CODE></BLOCKQUOTE>
+
+<BLOCKQUOTE><CODE>
+<PRE>
+$ /usr/local/bin/azap wsvn
+using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
+tuning to 183000000 Hz
+video pid 0x0000, audio pid 0x0000
+status 00 | signal fff0 | snr ea60 | ber 00000000 | unc 00000000 |
+status 1f | signal f840 | snr ce6e | ber 00000068 | unc 00000000 | FE_HAS_LOCK
+status 1f | signal f600 | snr d2d8 | ber 00000018 | unc 00000000 | FE_HAS_LOCK
+status 1f | signal f290 | snr cd54 | ber 00000008 | unc 00000000 | FE_HAS_LOCK
+status 1f | signal f340 | snr c658 | ber 00000030 | unc 00000000 | FE_HAS_LOCK
+CTRL-C
+$
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If you're using QAM, you can skip the <CODE>perl ./make_atsc_chanconf.pl</CODE> step shown
+above and do the following:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd ~/.azap
+$ wget http://www.digitalregime.com/patches/channels.conf-qam
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Starting at "c80", increment by one until you get to a channel that returns FE_HAS_LOCK.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ azap -c channels.conf-qam -r c80
+using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
+tuning to 525000000 Hz
+video pid 0x0000, audio pid 0x0000
+status 00 | signal ef00 | snr ae50 | ber 00000000 | unc 00000000 |
+CTRL-C
+$ azap -c channels.conf-qam -r c81
+using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
+tuning to 531000000 Hz
+video pid 0x0000, audio pid 0x0000
+status 00 | signal a600 | snr 4f50 | ber 00000000 | unc 00000000 |
+CTRL-C
+(etc)
+$ azap -c channels.conf-qam -r c93
+using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
+tuning to 603000000 Hz
+video pid 0x0000, audio pid 0x0000
+status 00 | signal fff0 | snr 0000 | ber 00000000 | unc 00000000 |
+status 1f | signal fc30 | snr de3e | ber 00007ff8 | unc 0000000d | FE_HAS_LOCK
+status 1f | signal fc00 | snr df28 | ber 00007ff8 | unc 0000000f | FE_HAS_LOCK
+status 1f | signal fbf0 | snr df28 | ber 00007ff8 | unc 0000000e | FE_HAS_LOCK
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><B>NOTE</B>: if you have anything in the unc column ("uncorrectable
+errors") you will probably have problems with HDTV.  Check you antenna, cables, etc.</P>
+
+
 
 <HR>
 Next

@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2005-02-11, v0.17.01
+<date>2005-02-27, v0.17.01
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -687,7 +687,7 @@ successful MythTV installation:
 </figure>
 <itemize>
 <item>Suse 8.2 - Broken Qt package
-<item>Red Hat 8 - does not meet minimum version requirement for Qt (3.1)
+<item>Red Hat 8 - does not meet minimum version requirement for Qt (3.1+)
 </itemize>
 
 <sect2>Pre-compiled packages <label id="precompiled">
@@ -792,7 +792,7 @@ pre-requisites required to compile MythTV.
 <figure loc="here">
 <eps file="warning.eps" height="1cm">
 <img src="warning.png">
-<caption><bf>NOTE</bf>:  Due to the requirement for Qt 3.1, there are no packages for
+<caption><bf>NOTE</bf>:  Due to the requirement for Qt 3.1+, there are no packages for
 Debian woody/stable.
 </caption></figure>
 
@@ -1314,7 +1314,7 @@ wish to specify your particular model. Replace
 <item><bf>-march=pentium-mmx</bf> for the Intel PentiumMMX CPU based on Pentium core with MMX
 <item>-march=pentium2    for the Intel Pentium2 CPU based on Pentium Pro core with MMX
 <item>-march=pentium3    for the Intel Pentium3 CPU based on Pentium Pro core with MMX and SSE
-<item>-march=pentium-m   for the Low power version of Intel Pentium3 CPU with MMX, SSE and SSE2
+<item>-march=pentium-m   for the Intel Pentium-M CPU with MMX, SSE and SSE2.  Used in Centrino notebooks.
 <item>-march=pentium4    for the Intel Pentium4 CPU with MMX, SSE and SSE2
 <item>-march=prescott    for the Intel Pentium4 CPU with MMX, SSE, SSE2 and SSE3
 <item>-march=nocona      for the Intel Pentium4 CPU with 64-bit extensions, MMX, SSE, SSE2 and SSE3
@@ -7289,7 +7289,6 @@ issues if you do not have the spare CPU capacity to handle XFS, potentially
 leading to dropped frames.
 
 <sect1>HDTV with the Air2PC-ATSC-PCI card
-
 <p>The Air2PC card has the capability to capture over-the-air HDTV signals
 (8VSB) and unencrypted HDTV (QAM) off of cable TV.  The Air2PC card is
 installed as a DVB device and is supported within MythTV.  
@@ -7298,15 +7297,16 @@ First, you must compile a version of the Linux kernel to support the new
 tuner device.  Version 2.6.11 supports the card in 8VSB mode.  If you wish
 to use QAM, you will need to patch the kernel, or wait until 2.6.12.
 
-Download the source to 2.6.11.  At the time of this writing (2005-02-09), the latest
-is 2.6.11-rc3.
+Download the source to 2.6.11.  At the time of this writing (2005-02-15), the latest
+is 2.6.11-rc5.  Downloading the <tt>nxt2002-qam.patch</tt> file will allow you to use QAM mode
+to capture unencrypted HDTV.
 <tscreen><verb>
 $ su
 # cd /usr/src
-# wget http://www.kernel.org/pub/linux/kernel/v2.6/testing/linux-2.6.11-rc3.tar.bz2
-# tar -xjf linux-2.6.11-rc3.tar.bz2
+# wget http://www.kernel.org/pub/linux/kernel/v2.6/testing/linux-2.6.11-rc5.tar.bz2
+# tar -xjf linux-2.6.11-rc5.tar.bz2
 # pushd .
-# cd linux-2.6.11-rc3/drivers/media/dvb/frontends
+# cd linux-2.6.11-rc5/drivers/media/dvb/frontends
 # wget http://www.digitalregime.com/patches/nxt2002-qam.patch
 # patch -p0 < nxt2002-qam.patch
 # popd
@@ -7328,19 +7328,26 @@ answer "No".
 # make menuconfig
 </verb></tscreen>
 
+For Gentoo:
+<tscreen><verb>
+# emerge genkernel udev hotplug coldplug
+# genkernel --menuconfig --udev --save-config all
+</verb></tscreen>
+
 Go to the Device Drivers->Multimedia->Digital Video Broadcasting Devices
 
 Enable DVB for Linux and select B2C2/Technisat Air/Sky/CableStar 2 PCI.
 
-Exit menuconfig, then compile modules and the kernel:
+Exit menuconfig, then compile modules and the kernel.  (Gentoo will do this
+automatically as a part of the <bf>genkernel</bf> step.
 <tscreen><verb>
 # make modules
 # make
-# make install
+# make install modules_install
 </verb></tscreen>
 
-Make any modifications necessary to your boot configuration files; lilo or
-grub.
+Make any modifications necessary to your boot configuration files (lilo or
+grub) as required to boot your new kernel.
 
 Download and compile the dvb applications you'll need to configure the card. 
 At the password prompt, press ENTER.
@@ -7349,8 +7356,22 @@ $ cvs -d :pserver:anonymous@linuxtv.org:/cvs/linuxtv login
 $ cvs -d :pserver:anonymous@linuxtv.org:/cvs/linuxtv co dvb-apps dvb-kernel
 $ cd dvb-apps
 $ make
+</verb</tscreen>
+<bf>NOTE</bf>: As of 2005-02-16, the compile aborts with an error, however
+not before the <bf>azap</bf> is compiled, so you should be able to continue.
+<tscreen><verb>
 $ su
 # cp utils/szap/azap /usr/local/bin
+</verb></tscreen>
+On Gentoo, execute the following:
+<tscreen><verb>
+# mkdir /lib/firmware
+# cp ~/dvb-kernel/firmware/dvb-fe-nxt2002.fw /lib/firmware
+# echo skystar2 >> /etc/modules.autoload.d/kernel-2.6
+# exit
+</verb></tscreen>
+On Debian:
+<tscreen><verb>
 # cp ~/dvb-kernel/firmware/dvb-fe-nxt2002.fw /usr/lib/hotplug/firmware
 # exit
 </verb></tscreen>
@@ -7358,12 +7379,74 @@ $ su
 Shutdown your machine, install the card and restart.  Ensure that you're
 using your newly compiled kernel.
 
-Once you've rebooted, confirm that the card is detected.
-<sect>Glossary.
-<p>Here are a few terms used throughout the documentation.
+Once you've rebooted, confirm that the card is detected.  If you type
+<bf>dmesg</bf>, you should see something like this:
+<tscreen><verb>
+drivers/media/dvb/b2c2/skystar2.c: FlexCopIIB(rev.195) chip found
+drivers/media/dvb/b2c2/skystar2.c: the chip has 38 hardware filters
+DVB: registering new adapter (SkyStar2).
+DVB: registering frontend 0 (Nextwave nxt2002 VSB/QAM frontend)...
+</verb></tscreen>
 
-<bf>EPG</bf>- Electronic Program Guide.
-<bf>OSD</bf>- On Screen Display.
+If you are using 8VSB (Over-the-Air HDTV), run the <bf>azap</bf> program. 
+Replace ZIPCODE with your zipcode.  The perl script will connect to <url
+url="http://www.antennaweb.org" name="http://www.antennaweb.org"> to obtain
+your HDTV channels.
+<tscreen><verb>
+$ cd /usr/src/dvb-apps/util/szap/channels-conf/atsc
+$ test ~/.azap || mkdir ~/.azap
+$ perl ./make_atsc_chanconf.pl ZIPCODE >~/.azap/channels.conf
+</verb></tscreen>
+<tscreen><verb>
+$ /usr/local/bin/azap wsvn
+using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
+tuning to 183000000 Hz
+video pid 0x0000, audio pid 0x0000
+status 00 | signal fff0 | snr ea60 | ber 00000000 | unc 00000000 |
+status 1f | signal f840 | snr ce6e | ber 00000068 | unc 00000000 | FE_HAS_LOCK
+status 1f | signal f600 | snr d2d8 | ber 00000018 | unc 00000000 | FE_HAS_LOCK
+status 1f | signal f290 | snr cd54 | ber 00000008 | unc 00000000 | FE_HAS_LOCK
+status 1f | signal f340 | snr c658 | ber 00000030 | unc 00000000 | FE_HAS_LOCK
+CTRL-C
+$
+</verb></tscreen>
+
+If you're using QAM, you can skip the <tt>perl ./make_atsc_chanconf.pl</tt> step shown
+above and do the following:
+<tscreen><verb>
+$ cd ~/.azap
+$ wget http://www.digitalregime.com/patches/channels.conf-qam
+</verb></tscreen>
+Starting at "c80", increment by one until you get to a channel that returns FE_HAS_LOCK.
+<tscreen><verb>
+$ azap -c channels.conf-qam -r c80
+using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
+tuning to 525000000 Hz
+video pid 0x0000, audio pid 0x0000
+status 00 | signal ef00 | snr ae50 | ber 00000000 | unc 00000000 |
+CTRL-C
+$ azap -c channels.conf-qam -r c81
+using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
+tuning to 531000000 Hz
+video pid 0x0000, audio pid 0x0000
+status 00 | signal a600 | snr 4f50 | ber 00000000 | unc 00000000 |
+CTRL-C
+(etc)
+$ azap -c channels.conf-qam -r c93
+using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
+tuning to 603000000 Hz
+video pid 0x0000, audio pid 0x0000
+status 00 | signal fff0 | snr 0000 | ber 00000000 | unc 00000000 |
+status 1f | signal fc30 | snr de3e | ber 00007ff8 | unc 0000000d | FE_HAS_LOCK
+status 1f | signal fc00 | snr df28 | ber 00007ff8 | unc 0000000f | FE_HAS_LOCK
+status 1f | signal fbf0 | snr df28 | ber 00007ff8 | unc 0000000e | FE_HAS_LOCK
+</verb></tscreen>
+
+<bf>NOTE</bf>: if you have anything in the unc column ("uncorrectable
+errors") you will probably have problems with HDTV.  Check you antenna, cables, etc.
+
+
+
 </article>
 <!-- Revision History
 
@@ -7376,11 +7459,10 @@ section 6 slightly (Suggestions from Max Waterman).  Add a little extra hint
 in LVM section about boot-time messages.  (Wendy Seltzer).  Add caveat about
 IP addresses on general setup page. (James Casbon).  Update "mythtv is
 crashing my system".  Add + key for audio streams.
-v0.17.01, 2005-02-11.  Add upgrade instructions at the top.  Add section on
+v0.17.01, 2005-02-27.  Add upgrade instructions at the top.  Add section on
 running commercial flagging on host other than it was recorded on.  Add
-stuff to HDTV QAM section.  Add note for march=k8 needing gcc 3.4.  Add
-Glossary section - drop it if there's no use for it.  Update link to
-snapstream's store.
+stuff to HDTV QAM section.  Add note for march=k8 needing gcc 3.4.  Update
+link to snapstream's store.  Update description on Pentium-M.
 
 -->
 

@@ -1204,7 +1204,7 @@ $
 </H2>
 
 <P>Press "1" or F1 to get a popup.</P>
-<H2><A NAME="ss21.23">21.23</A> <A HREF="mythtv-HOWTO.html#toc21.23">What is the difference between a PVR-250 and a PVR-350.</A>
+<H2><A NAME="ss21.23">21.23</A> <A HREF="mythtv-HOWTO.html#toc21.23">What is the difference between a PVR-250 and a PVR-350</A>
 </H2>
 
 <P>This is covered in the hardware section, and extensively covered on the
@@ -1249,7 +1249,29 @@ the Tivo has a direct-connect capability.</LI>
 contrib directory which may work for you.</LI>
 </OL>
 </P>
+<H2><A NAME="ss21.25">21.25</A> <A HREF="mythtv-HOWTO.html#toc21.25">Configuring one machine to flag all commercials.</A>
+</H2>
 
+<P>Commercial flagging can be CPU intensive.  By default, the backend that
+created a recording is the one which will flag commercials.  You may wish to
+use a different machine to run commercial flagging.</P>
+<P>On the slower machine:</P>
+<P>Start the backend setup program.  Advance through the pages until you get to
+the Job Queue page.  Turn off the setting that says "Allow Commercial
+Detection jobs", thereby preventing any commercial flagging jobs from
+running on this machine.</P>
+<P>Next, make sure that "Run Jobs only on original recording host" is turned
+OFF so that new jobs are allowed to run anywhere.</P>
+<P>Restart <B>mythbackend</B> since it only reads this setting when it starts up.</P>
+<P>On the faster machine:</P>
+<P>Start the backend setup program.  Advance through the pages until you get to
+the Job Queue page.  Ensure that "Allow Commercial Detection jobs" is turned
+ON for this machine.</P>
+<P>Run <B>mythjobqueue</B>.  <B>mythjobqueue</B> will examine the JobQueue
+and run any jobs it finds.  <B>mythjobqueue</B> should be left running so
+that it will pick up any new commercial flagging jobs that are added to the
+queue, otherwise new jobs will be added to the queue and your programs won't
+be flagged until you run manually run <B>mythjobqueue</B>.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-22.html">Next</A>

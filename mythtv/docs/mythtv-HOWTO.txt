@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2005-02-09, v0.17.00
+  2005-02-27, v0.17.01
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -17,12 +17,13 @@
   1. First things first.
      1.1 What is MythTV?
      1.2 QuickStart
-     1.3 How to obtain this document
-     1.4 Document conventions
-     1.5 Mailing lists / getting help
-     1.6 IRC
-     1.7 Bugzilla
-     1.8 Contributing to this document
+     1.3 Upgrading from previous versions.
+     1.4 How to obtain this document
+     1.5 Document conventions
+     1.6 Mailing lists / getting help
+     1.7 IRC
+     1.8 Bugzilla
+     1.9 Contributing to this document
 
   2. Introduction.
   3. Checking prerequisites.
@@ -145,7 +146,6 @@
         10.4.4 Usage Considerations
      10.5 Recording
      10.6 Xbox Frontends
-
   11. Using MythTV.
      11.1 Keyboard commands
         11.1.1 mythfrontend
@@ -294,8 +294,9 @@
         21.20.2 Authoring the DVD
      21.21 Migrating from XMLTV to DataDirect
      21.22 What do the icons on the Watch Recordings screen mean?
-     21.23 What is the difference between a PVR-250 and a PVR-350.
+     21.23 What is the difference between a PVR-250 and a PVR-350
      21.24 Changing channels on an external Set Top Box
+     21.25 Configuring one machine to flag all commercials.
 
   22. Example Configurations.
      22.1 Hauppauge PVR-250/350 hardware MPEG-2 encoder
@@ -344,6 +345,7 @@
      MPEG-2, MJPEG, DVB or HDTV capture devices.  With appropriate
      hardware, MythTV can control set top boxes, often found in digital
      cable and satellite TV systems.
+
   +o  Program Guide Data in North America is downloaded from Zap2It.com,
      a subsidiary of Tribune Media Services.  This free service is
      called DataDirect, and provides MythTV almost two weeks of
@@ -398,8 +400,17 @@
   See http://wilsonet.com/mythtv/ <http://wilsonet.com/mythtv/> for
   instructions tailored to RedHat's Fedora Core distribution.
 
+  [1m1.3.  Upgrading from previous versions.[0m
 
-  [1m1.3.  How to obtain this document[0m
+  The upgrade from previous versions should be transparent.  Any changes
+  to the database structure should be applied automatically.
+
+  It is [4mstrongly[24m recommended that you back up your database before
+  installing a new version of MythTV.
+
+  See ``Saving or Restoring the database'' for instructions.
+
+  [1m1.4.  How to obtain this document[0m
 
   This HOWTO document is maintained at the primary MythTV website:
   http://www.mythtv.org <http://www.mythtv.org> by Robert Kulagowski
@@ -422,7 +433,7 @@
   This HOWTO is for MythTV v0.17.
 
 
-  [1m1.4.  Document conventions[0m
+  [1m1.5.  Document conventions[0m
 
   The following conventions are used throughout this document.
   [1mboldface [22m- used for program names.
@@ -438,7 +449,7 @@
                         Ignore at your own peril.
 
 
-  [1m1.5.  Mailing lists / getting help[0m
+  [1m1.6.  Mailing lists / getting help[0m
 
   It's recommended that you join the user list at
   http://www.mythtv.org/mailman/listinfo/mythtv-users
@@ -452,11 +463,10 @@
   threads.com/lists/mythtv/>.
 
 
-  [1m1.6.  IRC[0m
+  [1m1.7.  IRC[0m
 
   There are two IRC channels dedicated to MythTV which can be found on
   irc.freenode.net
-
   +o  mythtv
 
   +o  mythtv-users
@@ -471,13 +481,13 @@
   seems to be ignoring you.
 
 
-  [1m1.7.  Bugzilla[0m
+  [1m1.8.  Bugzilla[0m
 
   If you feel you need to contribute to a bug database, use the MythTV
   Bugzilla at http://www.mythtv.org/bugs/ <http://www.mythtv.org/bugs/>.
 
 
-  [1m1.8.  Contributing to this document[0m
+  [1m1.9.  Contributing to this document[0m
 
   Contributions to the HOWTO are welcome, especially if you find a
   grammatical or spelling error, or if the wording of something is just
@@ -520,8 +530,6 @@
   (TCP ports 6543 and 6544) must be open.  It is [4mstrongly[24m recommended
   that you do [4mnot[24m expose the MythTV and MySQL ports to the Internet or
   your "Outside" LAN.
-
-
   [1m3.1.  Hardware[0m
 
   Hardware selection is a complex topic, one this HOWTO will only
@@ -586,6 +594,7 @@
   +o  A PIII/800MHz system with 512MB RAM can encode one video stream
      using the RTjpeg codec with 480x480 capture resolution and play it
      back simultaneously, thereby allowing live TV watching.
+
 
   +o  A dual Celeron/450MHz is able to view a 480x480 MPEG-4/3300kbps
      file created on a different system with 30% CPU usage.
@@ -660,8 +669,6 @@
   devices with Linux drivers.  There are a number of classes of hardware
   available for capturing video.
 
-
-
   [1m3.1.5.1.  Frame Grabbers.[0m
 
   This class of card is the simplest and is usually the cheapest.  There
@@ -707,7 +714,8 @@
   bttv modules by typing:
 
 
-       # lsmod |grep bttv
+
+  # lsmod |grep bttv
 
 
 
@@ -769,6 +777,7 @@
   unencrypted Free-To-Air satellite channels.
 
 
+
   [1m3.1.5.4.  HDTV.[0m
 
   Currently there are two HDTV card with Linux drivers which are known
@@ -781,7 +790,6 @@
   configured to capture unencrypted QAM and 8VSB.  8VSB is the standard
   used for over-the-air ATSC signals, QAM is used on cable TV systems.
   The Air2PC is supported using the linux-dvb drivers.
-
 
   To playback HDTV content, plan on a powerful CPU.  "How powerful?"
   depends on a number of factors, such as the capture resolution,
@@ -962,8 +970,6 @@
   +o  Matrox Millennium 550GX AGP. Uses external adapter to provide
      Composite and S-Video ports. TV-out implementation does [4mNOT[24m support
      XVideo.
-
-
   [1m3.1.9.3.  NVIDIA[0m
 
   Some NVIDIA cards with TV-out can be run using the standard nv driver
@@ -973,7 +979,6 @@
   versions of the NVIDIA driver have better support for overscan and
   other features useful with TV-Out, so the [1mnvtv [22mapplication may not be
   required.
-
 
   Some NVIDIA cards can be run with a proprietary NVIDIA X driver made
   available by NVIDIA. See http://www.nvidia.com/view.asp?IO=linux
@@ -1066,7 +1071,7 @@
 
   +o  Suse 8.2 - Broken Qt package
 
-  +o  Red Hat 8 - does not meet minimum version requirement for Qt (3.1)
+  +o  Red Hat 8 - does not meet minimum version requirement for Qt (3.1+)
 
 
   [1m3.2.1.  Pre-compiled packages[0m
@@ -1087,7 +1092,6 @@
   perform any additional configuration steps in this HOWTO.  The next
   logical step is ``configuring MySQL'', which you may or may not have
   to perform.  See your package documentation.
-
 
   [1m3.2.1.1.  Red Hat Linux/Fedora Core[0m
 
@@ -1152,8 +1156,6 @@
   may be obtained from http://rpm.nyvalls.se/ <http://rpm.nyvalls.se/>
   If you have problems with the RPMs, please send him email directly at
   thac@nyvalls.se <thac@nyvalls.se>.
-
-
   [1m3.2.1.3.  Debian[0m
 
   Debian packages for MythTV and most of its add-on modules are
@@ -1179,7 +1181,7 @@
 
 
 
-   [1mNOTE[22m:  Due to the requirement for Qt 3.1, there are no packages for
+   [1mNOTE[22m:  Due to the requirement for Qt 3.1+, there are no packages for
   Debian woody/stable.
 
 
@@ -1210,6 +1212,7 @@
   [1mperl[22m.
 
 
+
   ______________________________________________________________________
   NOTE:  Qt v3.1 or higher is required.
 
@@ -1221,6 +1224,7 @@
   NOTE:  Other than where noted, Mandrake 9.1 and 10.0 users may follow the
   Mandrake 9.0 instructions.
   ______________________________________________________________________
+
 
 
   [1m3.2.3.  Graphical installation tools[0m
@@ -1282,7 +1286,6 @@
 
   This section details the various methods for installing prerequisites
   from the command line.
-
 
 
   [1m3.2.4.1.  Mandrake[0m
@@ -1389,24 +1392,25 @@
   and executing:
 
 
-       sh-2.05b# apt-get build-dep mythtv
-       Reading Package Lists...
-       Building Dependency Tree...
-       The following NEW packages will be installed:
-         debconf-utils debhelper file fontconfig gettext html2text intltool-debian
-         libaudio2 libexpat1 libfontconfig1 libfontconfig1-dev libfreetype6
-         libfreetype6-dev libglib2.0-0 libjpeg62 libjpeg62-dev liblame-dev liblame0
-         liblcms1 liblcms1-dev libmagic1 libmng-dev libmng1 libmysqlclient-dev
-         libmysqlclient12 libogg-dev libogg0 libpng12-0 libpng12-dev libqt3-headers
-         libqt3-mt-dev libqt3c102-mt libvorbis-dev libvorbis0a libvorbisenc2
-         libvorbisfile3 libxcursor-dev libxcursor1 libxft2 libxft2-dev libxrender-dev
-         libxrender1 mysql-common pkg-config po-debconf qt3-dev-tools xfree86-common
-         xlibmesa-gl-dev xlibmesa-glu-dev xlibmesa3-gl xlibmesa3-glu xlibs xlibs-dev
-         zlib1g-dev
-       0 upgraded, 54 newly installed, 0 to remove and 0 not upgraded.
-       Need to get 0B/24.0MB of archives.
-       After unpacking 78.7MB of additional disk space will be used.
-       Do you want to continue? [Y/n]
+
+  sh-2.05b# apt-get build-dep mythtv
+  Reading Package Lists...
+  Building Dependency Tree...
+  The following NEW packages will be installed:
+    debconf-utils debhelper file fontconfig gettext html2text intltool-debian
+    libaudio2 libexpat1 libfontconfig1 libfontconfig1-dev libfreetype6
+    libfreetype6-dev libglib2.0-0 libjpeg62 libjpeg62-dev liblame-dev liblame0
+    liblcms1 liblcms1-dev libmagic1 libmng-dev libmng1 libmysqlclient-dev
+    libmysqlclient12 libogg-dev libogg0 libpng12-0 libpng12-dev libqt3-headers
+    libqt3-mt-dev libqt3c102-mt libvorbis-dev libvorbis0a libvorbisenc2
+    libvorbisfile3 libxcursor-dev libxcursor1 libxft2 libxft2-dev libxrender-dev
+    libxrender1 mysql-common pkg-config po-debconf qt3-dev-tools xfree86-common
+    xlibmesa-gl-dev xlibmesa-glu-dev xlibmesa3-gl xlibmesa3-glu xlibs xlibs-dev
+    zlib1g-dev
+  0 upgraded, 54 newly installed, 0 to remove and 0 not upgraded.
+  Need to get 0B/24.0MB of archives.
+  After unpacking 78.7MB of additional disk space will be used.
+  Do you want to continue? [Y/n]
 
 
 
@@ -1454,9 +1458,6 @@
   programs, if it is not already there.  You do this, as root, by
   editing /etc/ld.so.conf, then running [1mldconfig[22m. There are many ways to
   do this; one that works is to enter this series of commands:
-
-
-
        $ su -
        # echo /usr/local/lib >> /etc/ld.so.conf
        # /sbin/ldconfig
@@ -1530,17 +1531,16 @@
             [1mNOTE[22m: ^D means press CTRL and d at the same time.
 
 
+       $ su
+       # cd /etc/profile.d
+       cat > mythtv.sh
+       export QTDIR=/usr/lib/qt3
+       export PATH=$PATH:/usr/lib/qt3/bin
+       ^D
 
-  $ su
-  # cd /etc/profile.d
-  cat > mythtv.sh
-  export QTDIR=/usr/lib/qt3
-  export PATH=$PATH:/usr/lib/qt3/bin
-  ^D
-
-  # chmod a+x mythtv.sh
-  # exit
-  $ exit
+       # chmod a+x mythtv.sh
+       # exit
+       $ exit
 
 
 
@@ -1741,6 +1741,12 @@
      x86-64 instruction set support with MMX, 3dNOW!, enhanced 3dNOW!,
      SSE and SSE2. (pentium4 compatible)
 
+
+
+        [1mNOTE[22m:  If you wish to compile with the -march=k8 flag you
+  must use gcc v3.4 or higher.
+
+
   If you have a Via processor change the following in the settings.pro
   file. Replace
 
@@ -1748,7 +1754,6 @@
 
 
   you compile with one of:
-
 
   +o  [1m-march=c3        [22mfor the Via C3 CPU with MMX and 3dNOW! instruction
      set support. (pentium-mmx compatible)
@@ -1788,8 +1793,8 @@
   +o  -march=pentium3    for the Intel Pentium3 CPU based on Pentium Pro
      core with MMX and SSE
 
-  +o  -march=pentium-m   for the Low power version of Intel Pentium3 CPU
-     with MMX, SSE and SSE2
+  +o  -march=pentium-m   for the Intel Pentium-M CPU with MMX, SSE and
+     SSE2.  Used in Centrino notebooks.
 
   +o  -march=pentium4    for the Intel Pentium4 CPU with MMX, SSE and
      SSE2
@@ -1808,7 +1813,6 @@
 
   -march=pentiumpro
 
-
   Athlon XP.
 
 
@@ -1816,13 +1820,14 @@
 
   Open a shell and switch to the directory where you saved lame.
 
-  $ tar -xzf lame-3.93.1.tar.gz
-  $ cd lame-3.93.1
-  $ ./configure
-  $ make
-  $ make test
-  $ su
-  # make install
+
+       $ tar -xzf lame-3.93.1.tar.gz
+       $ cd lame-3.93.1
+       $ ./configure
+       $ make
+       $ make test
+       $ su
+       # make install
 
 
 
@@ -1870,14 +1875,12 @@
        # urpmi xmltv xmltv-grabbers
 
 
-
   If this does not work, it is possible that contrib for your Mandrake
   version does not have [1mXMLTV[22m, so you may install the XMLTV prerequi-
   sites by typing:
 
 
-
-  # urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
+       # urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
 
 
 
@@ -2876,16 +2879,14 @@
 
   [1m8.7.  Configuring lirc for use with an IR blaster[0m
 
-  By Carlos Talbot,  <mailto:carlos@talbot.net>
-
   Lirc has support for various IR transmitters. A popular model is the
-  Actisys IR-200L http://store.yahoo.com/snapstreammedia/irblasbun.html
-  <http://store.yahoo.com/snapstreammedia/irblasbun.html>. It was
-  originally designed for IRDA communication, but can be used to
-  transmit A/V remote control codes. By using the lirc SIR driver, this
-  device can easily be integrated with MythTV. I have tested this device
-  with an AT&T DCT2000 digital cable box but the instructions can be
-  used to configure other IRDA devices and A/V remotes.
+  Actisys IR-200L http://store.snapstreamstore.com/accessories.html
+  <http://store.snapstreamstore.com/accessories.html>. It was originally
+  designed for IRDA communication, but can be used to transmit A/V
+  remote control codes. By using the lirc SIR driver, this device can
+  easily be integrated with MythTV. I have tested this device with an
+  AT&T DCT2000 digital cable box but the instructions can be used to
+  configure other IRDA devices and A/V remotes.
 
   Follow the steps in the previous section.  When you run setup.sh,
   select option 1, driver configuration. From here select option 6, IrDA
@@ -2902,6 +2903,7 @@
   lircd in addition to a kernel module for the SIR transmitter.
   Depending on whether you have your serial port driver configured as a
   kernel module you might see the following message during make:
+
 
 
   lirc_sir.c:56:2: warning: #warning
@@ -7532,7 +7534,7 @@
 
   Press "1" or F1 to get a popup.
 
-  [1m21.23.  What is the difference between a PVR-250 and a PVR-350.[0m
+  [1m21.23.  What is the difference between a PVR-250 and a PVR-350[0m
 
   This is covered in the hardware section, and extensively covered on
   the Hauppauge website.  Briefly recapping:
@@ -7584,6 +7586,36 @@
   3. Use a firewire connection.  There is a 6200ch.c in the MythTV
      contrib directory which may work for you.
 
+  [1m21.25.  Configuring one machine to flag all commercials.[0m
+
+  Commercial flagging can be CPU intensive.  By default, the backend
+  that created a recording is the one which will flag commercials.  You
+  may wish to use a different machine to run commercial flagging.
+
+  On the slower machine:
+
+  Start the backend setup program.  Advance through the pages until you
+  get to the Job Queue page.  Turn off the setting that says "Allow
+  Commercial Detection jobs", thereby preventing any commercial flagging
+  jobs from running on this machine.
+
+  Next, make sure that "Run Jobs only on original recording host" is
+  turned OFF so that new jobs are allowed to run anywhere.
+
+  Restart [1mmythbackend [22msince it only reads this setting when it starts
+  up.
+
+  On the faster machine:
+
+  Start the backend setup program.  Advance through the pages until you
+  get to the Job Queue page.  Ensure that "Allow Commercial Detection
+  jobs" is turned ON for this machine.
+
+  Run [1mmythjobqueue[22m.  [1mmythjobqueue [22mwill examine the JobQueue and run any
+  jobs it finds.  [1mmythjobqueue [22mshould be left running so that it will
+  pick up any new commercial flagging jobs that are added to the queue,
+  otherwise new jobs will be added to the queue and your programs won't
+  be flagged until you run manually run [1mmythjobqueue[22m.
 
 
   [1m22.  Example Configurations.[0m
@@ -7653,8 +7685,6 @@
 
        KERNELDIR= /lib/modules/$(KERNVER)/build
 
-
-
   edit it so that it looks like:
 
 
@@ -7673,7 +7703,6 @@
 
 
   and remove the "#" from the line containing CFLAGS.
-
 
   Next, compile the driver:
 
@@ -7762,15 +7791,16 @@
   Check that the card is being recognized on the PCI bus:
 
 
-       $ lspci -v
-       <snip>
 
-       00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
-       Encoder (rev 01)
-               Subsystem: Hauppauge computer works Inc.: Unknown device 4801
-               Flags: bus master, medium devsel, latency 32, IRQ 11
-               Memory at d0000000 (32-bit, prefetchable) [size=64M]
-               Capabilities: <available only to root>
+  $ lspci -v
+  <snip>
+
+  00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
+  Encoder (rev 01)
+          Subsystem: Hauppauge computer works Inc.: Unknown device 4801
+          Flags: bus master, medium devsel, latency 32, IRQ 11
+          Memory at d0000000 (32-bit, prefetchable) [size=64M]
+          Capabilities: <available only to root>
 
 
 
@@ -7785,6 +7815,7 @@
        crw-------    1 mythtv   sys       81, 224 Dec 31  1969 vbi0
        crw-------    1 mythtv   sys       81,   0 Dec 31  1969 video0
        crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
+
 
 
   In this case, the ivtv device is video0.
@@ -7895,11 +7926,10 @@
   going to be version 0.6.6, and that won't work.  Uninstall it:
 
 
-
-  $ su
-  # urpme lirc lirc-remotes liblirc-devel
-  # rm -rf /dev/lirc*
-  # exit
+       $ su
+       # urpme lirc lirc-remotes liblirc-devel
+       # rm -rf /dev/lirc*
+       # exit
 
 
 
@@ -7907,39 +7937,40 @@
   programs on your system:
 
 
-       $ su
-       # updatedb
-       # locate lirc_i2c|grep `uname -r`
-       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_i2c.c
-       /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_i2c.o.gz
 
-       # locate lirc_dev|grep `uname -r`
-       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.c
-       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.h
-       /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.stamp
-       /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.ver
-       /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_dev.o.gz
+  $ su
+  # updatedb
+  # locate lirc_i2c|grep `uname -r`
+  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_i2c.c
+  /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_i2c.o.gz
 
-       # locate irw|grep "/usr"
-       /usr/bin/irw
-       /usr/local/bin/irw
-       /usr/local/man/man1/irw.1
+  # locate lirc_dev|grep `uname -r`
+  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.c
+  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.h
+  /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.stamp
+  /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.ver
+  /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_dev.o.gz
 
-       # locate lircd|grep "/usr"
-       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lircd.conf.RM-050
-       /usr/share/man/man8/lircd.8.bz2
-       /usr/share/doc/lirc-0.6.6/html/lircd.html
-       /usr/sbin/lircd
-       /usr/local/sbin/lircd
-       /usr/local/man/man8/lircd.8
+  # locate irw|grep "/usr"
+  /usr/bin/irw
+  /usr/local/bin/irw
+  /usr/local/man/man1/irw.1
 
-       # locate irxevent|grep "/usr"
-       /usr/share/man/man1/irxevent.1.bz2
-       /usr/share/doc/lirc-0.6.6/html/irxevent.html
-       /usr/share/doc/lirc-0.6.6/irxevent.keys
-       /usr/bin/irxevent
-       /usr/local/bin/irxevent
-       /usr/local/man/man1/irxevent.1
+  # locate lircd|grep "/usr"
+  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lircd.conf.RM-050
+  /usr/share/man/man8/lircd.8.bz2
+  /usr/share/doc/lirc-0.6.6/html/lircd.html
+  /usr/sbin/lircd
+  /usr/local/sbin/lircd
+  /usr/local/man/man8/lircd.8
+
+  # locate irxevent|grep "/usr"
+  /usr/share/man/man1/irxevent.1.bz2
+  /usr/share/doc/lirc-0.6.6/html/irxevent.html
+  /usr/share/doc/lirc-0.6.6/irxevent.keys
+  /usr/bin/irxevent
+  /usr/local/bin/irxevent
+  /usr/local/man/man1/irxevent.1
 
 
 
@@ -7959,8 +7990,9 @@
 
   Download the lirc-0.7.0pre2 tarball:
 
-  $ wget http://lirc.sourceforge.net/software/snapshots/lirc-0.7.0pre2.tar.bz2
-  $ tar -xjf lirc-0.7.0pre2.tar.bz2
+
+       $ wget http://lirc.sourceforge.net/software/snapshots/lirc-0.7.0pre2.tar.bz2
+       $ tar -xjf lirc-0.7.0pre2.tar.bz2
 
 
 
@@ -7969,9 +8001,9 @@
   work correctly.  Download the patch and install:
 
 
-       $ cd lirc-0.7.0pre2
-       $ wget http://delvare.nerim.net/i2c/other/lirc-CVS-i2c-2.8.0.patch
-       $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
+  $ cd lirc-0.7.0pre2
+  $ wget http://delvare.nerim.net/i2c/other/lirc-CVS-i2c-2.8.0.patch
+  $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
 
 
 
@@ -8019,21 +8051,22 @@
   your /var/log/messages and /var/log/lircd files.
 
 
-       $ su
-       # modprobe lirc_i2c
-       # lsmod
-       Module                  Size  Used by    Not tainted
-       lirc_i2c                5124   0
-       lirc_dev               10096   1  [lirc_i2c]
-       ...
-       # lircd
-       # tail /var/log/messages
-       Sep 18 15:38:26 frontend kernel: lirc_i2c: chip found @ 0x18 (Hauppauge IR)
-       Sep 18 15:38:26 frontend kernel: lirc_dev: lirc_register_plugin:sample_rate:
-       10
-       ...
-       # tail /var/log/lircd
-       Sep 18 15:24:52 frontend lircd 0.7.0pre2: lircd(hauppauge) ready
+
+  $ su
+  # modprobe lirc_i2c
+  # lsmod
+  Module                  Size  Used by    Not tainted
+  lirc_i2c                5124   0
+  lirc_dev               10096   1  [lirc_i2c]
+  ...
+  # lircd
+  # tail /var/log/messages
+  Sep 18 15:38:26 frontend kernel: lirc_i2c: chip found @ 0x18 (Hauppauge IR)
+  Sep 18 15:38:26 frontend kernel: lirc_dev: lirc_register_plugin:sample_rate:
+  10
+  ...
+  # tail /var/log/lircd
+  Sep 18 15:24:52 frontend lircd 0.7.0pre2: lircd(hauppauge) ready
 
 
 
@@ -8080,9 +8113,12 @@
   native LIRC support within MythTV, you will need to modify your
   settings.pro file and recompile.  Your settings.pro should look like
   this:
-       # Native lirc support
-       CONFIG += using_lirc
-       LIRC_LIBS = -llirc_client
+
+
+
+  # Native lirc support
+  CONFIG += using_lirc
+  LIRC_LIBS = -llirc_client
 
 
 
@@ -8438,18 +8474,188 @@
   2.6.12.
 
   Download the source to 2.6.11.  At the time of this writing
-  (2005-02-09), the latest is 2.6.11-rc3.
+  (2005-02-15), the latest is 2.6.11-rc5.  Downloading the
+  nxt2002-qam.patch file will allow you to use QAM mode to capture
+  unencrypted HDTV.
 
 
        $ su
        # cd /usr/src
-       # wget http://www.kernel.org/pub/linux/kernel/v2.6/testing/linux-2.6.11-rc3.tar.bz2
-       # tar -xjf linux-2.6.11-rc3.tar.bz2
-       # cd linux-2.6.11-rc3
+       # wget http://www.kernel.org/pub/linux/kernel/v2.6/testing/linux-2.6.11-rc5.tar.bz2
+       # tar -xjf linux-2.6.11-rc5.tar.bz2
+       # pushd .
+       # cd linux-2.6.11-rc5/drivers/media/dvb/frontends
+       # wget http://www.digitalregime.com/patches/nxt2002-qam.patch
+       # patch -p0 < nxt2002-qam.patch
+       # popd
 
 
 
-  To be continued...
+  If you already have a 2.6 kernel running, copy the .config file and
+  use it as your starting point.  If not, then go straight to the make
+  menuconfig portion below.
+
+  On Debian with a 2.6.10 kernel:
+
+
+
+       # cp /lib/modules/`uname -r`/build/.config .
+       # make oldconfig
+
+
+
+  Read the prompts that come up; for the most part you should be able to
+  answer "No".
+
+
+       # make menuconfig
+
+
+
+  For Gentoo:
+
+
+       # emerge genkernel udev hotplug coldplug
+       # genkernel --menuconfig --udev --save-config all
+
+
+
+  Go to the Device Drivers->Multimedia->Digital Video Broadcasting
+  Devices
+
+  Enable DVB for Linux and select B2C2/Technisat Air/Sky/CableStar 2
+  PCI.
+
+  Exit menuconfig, then compile modules and the kernel.  (Gentoo will do
+  this automatically as a part of the [1mgenkernel [22mstep.
+
+
+       # make modules
+       # make
+       # make install modules_install
+
+
+  Make any modifications necessary to your boot configuration files
+  (lilo or grub) as required to boot your new kernel.
+
+  Download and compile the dvb applications you'll need to configure the
+  card.  At the password prompt, press ENTER.
+
+
+       $ cvs -d :pserver:anonymous@linuxtv.org:/cvs/linuxtv login
+       $ cvs -d :pserver:anonymous@linuxtv.org:/cvs/linuxtv co dvb-apps dvb-kernel
+       $ cd dvb-apps
+       $ make
+
+
+
+  [1mNOTE[22m: As of 2005-02-16, the compile aborts with an error, however not
+  before the [1mazap [22mis compiled, so you should be able to continue.
+
+
+       $ su
+       # cp utils/szap/azap /usr/local/bin
+
+
+
+  On Gentoo, execute the following:
+
+
+       # mkdir /lib/firmware
+       # cp ~/dvb-kernel/firmware/dvb-fe-nxt2002.fw /lib/firmware
+       # echo skystar2 >> /etc/modules.autoload.d/kernel-2.6
+       # exit
+
+
+
+  On Debian:
+
+
+       # cp ~/dvb-kernel/firmware/dvb-fe-nxt2002.fw /usr/lib/hotplug/firmware
+       # exit
+
+
+
+  Shutdown your machine, install the card and restart.  Ensure that
+  you're using your newly compiled kernel.
+
+  Once you've rebooted, confirm that the card is detected.  If you type
+  [1mdmesg[22m, you should see something like this:
+
+
+       drivers/media/dvb/b2c2/skystar2.c: FlexCopIIB(rev.195) chip found
+       drivers/media/dvb/b2c2/skystar2.c: the chip has 38 hardware filters
+       DVB: registering new adapter (SkyStar2).
+       DVB: registering frontend 0 (Nextwave nxt2002 VSB/QAM frontend)...
+
+
+
+  If you are using 8VSB (Over-the-Air HDTV), run the [1mazap [22mprogram.
+  Replace ZIPCODE with your zipcode.  The perl script will connect to
+  http://www.antennaweb.org <http://www.antennaweb.org> to obtain your
+  HDTV channels.
+
+
+  $ cd /usr/src/dvb-apps/util/szap/channels-conf/atsc
+  $ test ~/.azap || mkdir ~/.azap
+  $ perl ./make_atsc_chanconf.pl ZIPCODE >~/.azap/channels.conf
+
+
+
+       $ /usr/local/bin/azap wsvn
+       using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
+       tuning to 183000000 Hz
+       video pid 0x0000, audio pid 0x0000
+       status 00 | signal fff0 | snr ea60 | ber 00000000 | unc 00000000 |
+       status 1f | signal f840 | snr ce6e | ber 00000068 | unc 00000000 | FE_HAS_LOCK
+       status 1f | signal f600 | snr d2d8 | ber 00000018 | unc 00000000 | FE_HAS_LOCK
+       status 1f | signal f290 | snr cd54 | ber 00000008 | unc 00000000 | FE_HAS_LOCK
+       status 1f | signal f340 | snr c658 | ber 00000030 | unc 00000000 | FE_HAS_LOCK
+       CTRL-C
+       $
+
+
+
+  If you're using QAM, you can skip the perl ./make_atsc_chanconf.pl
+  step shown above and do the following:
+
+
+       $ cd ~/.azap
+       $ wget http://www.digitalregime.com/patches/channels.conf-qam
+
+
+
+  Starting at "c80", increment by one until you get to a channel that
+  returns FE_HAS_LOCK.
+
+
+       $ azap -c channels.conf-qam -r c80
+       using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
+       tuning to 525000000 Hz
+       video pid 0x0000, audio pid 0x0000
+       status 00 | signal ef00 | snr ae50 | ber 00000000 | unc 00000000 |
+       CTRL-C
+       $ azap -c channels.conf-qam -r c81
+       using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
+       tuning to 531000000 Hz
+       video pid 0x0000, audio pid 0x0000
+       status 00 | signal a600 | snr 4f50 | ber 00000000 | unc 00000000 |
+       CTRL-C
+       (etc)
+       $ azap -c channels.conf-qam -r c93
+       using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
+       tuning to 603000000 Hz
+       video pid 0x0000, audio pid 0x0000
+       status 00 | signal fff0 | snr 0000 | ber 00000000 | unc 00000000 |
+       status 1f | signal fc30 | snr de3e | ber 00007ff8 | unc 0000000d | FE_HAS_LOCK
+       status 1f | signal fc00 | snr df28 | ber 00007ff8 | unc 0000000f | FE_HAS_LOCK
+       status 1f | signal fbf0 | snr df28 | ber 00007ff8 | unc 0000000e | FE_HAS_LOCK
+
+
+
+  [1mNOTE[22m: if you have anything in the unc column ("uncorrectable errors")
+  you will probably have problems with HDTV.  Check you antenna, cables,
+  etc.
 
 
 

@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-02-09, v0.17.00
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-02-27, v0.17.01
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -22,12 +22,13 @@ necessary.</EM>
 <UL>
 <LI><A NAME="toc1.1">1.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.1">What is MythTV?</A>
 <LI><A NAME="toc1.2">1.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.2">QuickStart</A>
-<LI><A NAME="toc1.3">1.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.3">How to obtain this document </A>
-<LI><A NAME="toc1.4">1.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.4">Document conventions</A>
-<LI><A NAME="toc1.5">1.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.5">Mailing lists / getting help</A>
-<LI><A NAME="toc1.6">1.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.6">IRC</A>
-<LI><A NAME="toc1.7">1.7</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.7">Bugzilla</A>
-<LI><A NAME="toc1.8">1.8</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.8">Contributing to this document</A>
+<LI><A NAME="toc1.3">1.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.3">Upgrading from previous versions.</A>
+<LI><A NAME="toc1.4">1.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.4">How to obtain this document </A>
+<LI><A NAME="toc1.5">1.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.5">Document conventions</A>
+<LI><A NAME="toc1.6">1.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.6">Mailing lists / getting help</A>
+<LI><A NAME="toc1.7">1.7</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.7">IRC</A>
+<LI><A NAME="toc1.8">1.8</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.8">Bugzilla</A>
+<LI><A NAME="toc1.9">1.9</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.9">Contributing to this document</A>
 </UL>
 <P>
 <H2><A NAME="toc2">2.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s2">Introduction.</A></H2>
@@ -200,8 +201,9 @@ necessary.</EM>
 <LI><A NAME="toc21.20">21.20</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.20">Creating a DVD with Menus</A>
 <LI><A NAME="toc21.21">21.21</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.21">Migrating from XMLTV to DataDirect </A>
 <LI><A NAME="toc21.22">21.22</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.22">What do the icons on the Watch Recordings screen mean?</A>
-<LI><A NAME="toc21.23">21.23</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.23">What is the difference between a PVR-250 and a PVR-350.</A>
+<LI><A NAME="toc21.23">21.23</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.23">What is the difference between a PVR-250 and a PVR-350</A>
 <LI><A NAME="toc21.24">21.24</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.24">Changing channels on an external Set Top Box</A>
+<LI><A NAME="toc21.25">21.25</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.25">Configuring one machine to flag all commercials.</A>
 </UL>
 <P>
 <H2><A NAME="toc22">22.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s22">Example Configurations.</A></H2>
@@ -285,8 +287,17 @@ like to install MythTV on an XBox.</P>
 <P>See 
 <A HREF="http://wilsonet.com/mythtv/">http://wilsonet.com/mythtv/</A> for instructions tailored to RedHat's
 Fedora Core distribution.</P>
+<H2><A NAME="ss1.3">1.3</A> <A HREF="#toc1.3">Upgrading from previous versions.</A>
+</H2>
 
-<H2><A NAME="how_to_obtain"></A> <A NAME="ss1.3">1.3</A> <A HREF="#toc1.3">How to obtain this document </A>
+<P>The upgrade from previous versions should be transparent.  Any changes to
+the database structure should be applied automatically.</P>
+<P>It is <EM>strongly</EM> recommended that you back up your database before
+installing a new version of MythTV.</P>
+<P>See 
+<A HREF="#backupdb">Saving or Restoring the database</A> for instructions.</P>
+
+<H2><A NAME="how_to_obtain"></A> <A NAME="ss1.4">1.4</A> <A HREF="#toc1.4">How to obtain this document </A>
 </H2>
 
 <P>This HOWTO document is maintained at the primary MythTV website: 
@@ -309,7 +320,7 @@ at
 <A HREF="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">http://www.mythtv.org/docs/mythtv-HOWTO.pdf</A>.</P>
 <P>This HOWTO is for MythTV v0.17.</P>
 
-<H2><A NAME="ss1.4">1.4</A> <A HREF="#toc1.4">Document conventions</A>
+<H2><A NAME="ss1.5">1.5</A> <A HREF="#toc1.5">Document conventions</A>
 </H2>
 
 <P>The following conventions are used throughout this document.<BR>
@@ -331,7 +342,7 @@ at
 </FIGURE>
 </P>
 
-<H2><A NAME="ss1.5">1.5</A> <A HREF="#toc1.5">Mailing lists / getting help</A>
+<H2><A NAME="ss1.6">1.6</A> <A HREF="#toc1.6">Mailing lists / getting help</A>
 </H2>
 
 <P>It's recommended that you join the user list at 
@@ -342,7 +353,7 @@ the developer list strictly for development-related issues.</P>
 <P>Searchable archives for the lists are available at 
 <A HREF="http://www.gossamer-threads.com/lists/mythtv/">http://www.gossamer-threads.com/lists/mythtv/</A>.</P>
 
-<H2><A NAME="ss1.6">1.6</A> <A HREF="#toc1.6">IRC</A>
+<H2><A NAME="ss1.7">1.7</A> <A HREF="#toc1.7">IRC</A>
 </H2>
 
 <P>There are two IRC channels dedicated to MythTV which can be found on
@@ -364,14 +375,14 @@ seems to be ignoring you.</CAPTION>
 </FIGURE>
 </P>
 
-<H2><A NAME="ss1.7">1.7</A> <A HREF="#toc1.7">Bugzilla</A>
+<H2><A NAME="ss1.8">1.8</A> <A HREF="#toc1.8">Bugzilla</A>
 </H2>
 
 <P>If you feel you need to contribute to a bug database, use the MythTV
 Bugzilla at 
 <A HREF="http://www.mythtv.org/bugs/">http://www.mythtv.org/bugs/</A>.</P>
 
-<H2><A NAME="ss1.8">1.8</A> <A HREF="#toc1.8">Contributing to this document</A>
+<H2><A NAME="ss1.9">1.9</A> <A HREF="#toc1.9">Contributing to this document</A>
 </H2>
 
 <P>Contributions to the HOWTO are welcome, especially if you find a
@@ -889,7 +900,7 @@ successful MythTV installation:</CAPTION>
 
 <UL>
 <LI>Suse 8.2 - Broken Qt package</LI>
-<LI>Red Hat 8 - does not meet minimum version requirement for Qt (3.1)</LI>
+<LI>Red Hat 8 - does not meet minimum version requirement for Qt (3.1+)</LI>
 </UL>
 </P>
 
@@ -1001,7 +1012,7 @@ pre-requisites required to compile MythTV.</P>
 <FIGURE>
 <EPS FILE="warning.eps">
 <IMG SRC="warning.png">
-<CAPTION><B>NOTE</B>:  Due to the requirement for Qt 3.1, there are no packages for
+<CAPTION><B>NOTE</B>:  Due to the requirement for Qt 3.1+, there are no packages for
 Debian woody/stable.</CAPTION>
 </FIGURE>
 </P>
@@ -1539,6 +1550,14 @@ you compile with one of:
 with MMX, 3dNOW!, enhanced 3dNOW!, SSE and SSE2. (pentium4 compatible)</LI>
 </UL>
 </P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  If you wish to compile with the <CODE>-march=k8</CODE> flag you
+must use gcc v3.4 or higher.</CAPTION>
+</FIGURE>
+</P>
 <P>If you have a Via processor change the following in the
 <CODE>settings.pro</CODE> file. Replace 
 <PRE>
@@ -1574,7 +1593,7 @@ wish to specify your particular model. Replace
 <LI><B>-march=pentium-mmx</B> for the Intel PentiumMMX CPU based on Pentium core with MMX</LI>
 <LI>-march=pentium2    for the Intel Pentium2 CPU based on Pentium Pro core with MMX</LI>
 <LI>-march=pentium3    for the Intel Pentium3 CPU based on Pentium Pro core with MMX and SSE</LI>
-<LI>-march=pentium-m   for the Low power version of Intel Pentium3 CPU with MMX, SSE and SSE2</LI>
+<LI>-march=pentium-m   for the Intel Pentium-M CPU with MMX, SSE and SSE2.  Used in Centrino notebooks.</LI>
 <LI>-march=pentium4    for the Intel Pentium4 CPU with MMX, SSE and SSE2</LI>
 <LI>-march=prescott    for the Intel Pentium4 CPU with MMX, SSE, SSE2 and SSE3</LI>
 <LI>-march=nocona      for the Intel Pentium4 CPU with 64-bit extensions, MMX, SSE, SSE2 and SSE3</LI>
@@ -2653,11 +2672,9 @@ system, so experiment and see which value works best for you.</P>
 <H2><A NAME="ss8.7">8.7</A> <A HREF="#toc8.7">Configuring lirc for use with an IR blaster</A>
 </H2>
 
-<P>By Carlos Talbot, 
-<A HREF="mailto:carlos@talbot.net">mailto:carlos@talbot.net</A></P>
 <P>Lirc has support for various IR transmitters. A popular model is the Actisys
 IR-200L 
-<A HREF="http://store.yahoo.com/snapstreammedia/irblasbun.html">http://store.yahoo.com/snapstreammedia/irblasbun.html</A>. It was
+<A HREF="http://store.snapstreamstore.com/accessories.html">http://store.snapstreamstore.com/accessories.html</A>. It was
 originally designed for IRDA communication, but can be used to transmit A/V remote
 control codes. By using the lirc SIR driver, this device can easily be
 integrated with MythTV. I have tested this device with an AT&amp;T DCT2000
@@ -7011,7 +7028,7 @@ $
 </H2>
 
 <P>Press "1" or F1 to get a popup.</P>
-<H2><A NAME="ss21.23">21.23</A> <A HREF="#toc21.23">What is the difference between a PVR-250 and a PVR-350.</A>
+<H2><A NAME="ss21.23">21.23</A> <A HREF="#toc21.23">What is the difference between a PVR-250 and a PVR-350</A>
 </H2>
 
 <P>This is covered in the hardware section, and extensively covered on the
@@ -7056,7 +7073,29 @@ the Tivo has a direct-connect capability.</LI>
 contrib directory which may work for you.</LI>
 </OL>
 </P>
+<H2><A NAME="ss21.25">21.25</A> <A HREF="#toc21.25">Configuring one machine to flag all commercials.</A>
+</H2>
 
+<P>Commercial flagging can be CPU intensive.  By default, the backend that
+created a recording is the one which will flag commercials.  You may wish to
+use a different machine to run commercial flagging.</P>
+<P>On the slower machine:</P>
+<P>Start the backend setup program.  Advance through the pages until you get to
+the Job Queue page.  Turn off the setting that says "Allow Commercial
+Detection jobs", thereby preventing any commercial flagging jobs from
+running on this machine.</P>
+<P>Next, make sure that "Run Jobs only on original recording host" is turned
+OFF so that new jobs are allowed to run anywhere.</P>
+<P>Restart <B>mythbackend</B> since it only reads this setting when it starts up.</P>
+<P>On the faster machine:</P>
+<P>Start the backend setup program.  Advance through the pages until you get to
+the Job Queue page.  Ensure that "Allow Commercial Detection jobs" is turned
+ON for this machine.</P>
+<P>Run <B>mythjobqueue</B>.  <B>mythjobqueue</B> will examine the JobQueue
+and run any jobs it finds.  <B>mythjobqueue</B> should be left running so
+that it will pick up any new commercial flagging jobs that are added to the
+queue, otherwise new jobs will be added to the queue and your programs won't
+be flagged until you run manually run <B>mythjobqueue</B>.</P>
 
 <H2><A NAME="s22">22.</A> <A HREF="#toc22">Example Configurations.</A></H2>
 
@@ -7913,19 +7952,184 @@ installed as a DVB device and is supported within MythTV.  </P>
 <P>First, you must compile a version of the Linux kernel to support the new
 tuner device.  Version 2.6.11 supports the card in 8VSB mode.  If you wish
 to use QAM, you will need to patch the kernel, or wait until 2.6.12.</P>
-<P>Download the source to 2.6.11.  At the time of this writing (2005-02-09), the latest
-is 2.6.11-rc3.
+<P>Download the source to 2.6.11.  At the time of this writing (2005-02-15), the latest
+is 2.6.11-rc5.  Downloading the <CODE>nxt2002-qam.patch</CODE> file will allow you to use QAM mode
+to capture unencrypted HDTV.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
 # cd /usr/src
-# wget http://www.kernel.org/pub/linux/kernel/v2.6/testing/linux-2.6.11-rc3.tar.bz2
-# tar -xjf linux-2.6.11-rc3.tar.bz2
-# cd linux-2.6.11-rc3
+# wget http://www.kernel.org/pub/linux/kernel/v2.6/testing/linux-2.6.11-rc5.tar.bz2
+# tar -xjf linux-2.6.11-rc5.tar.bz2
+# pushd .
+# cd linux-2.6.11-rc5/drivers/media/dvb/frontends
+# wget http://www.digitalregime.com/patches/nxt2002-qam.patch
+# patch -p0 &lt; nxt2002-qam.patch
+# popd
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>To be continued...</P>
+<P>If you already have a 2.6 kernel running, copy the <CODE>.config</CODE> file and
+use it as your starting point.  If not, then go straight to the <CODE>make
+menuconfig</CODE> portion below.</P>
+<P>On Debian with a 2.6.10 kernel:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+# cp /lib/modules/`uname -r`/build/.config .
+# make oldconfig
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Read the prompts that come up; for the most part you should be able to
+answer "No".
+<BLOCKQUOTE><CODE>
+<PRE>
+# make menuconfig
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>For Gentoo:
+<BLOCKQUOTE><CODE>
+<PRE>
+# emerge genkernel udev hotplug coldplug
+# genkernel --menuconfig --udev --save-config all
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Go to the Device Drivers->Multimedia->Digital Video Broadcasting Devices</P>
+<P>Enable DVB for Linux and select B2C2/Technisat Air/Sky/CableStar 2 PCI.</P>
+<P>Exit menuconfig, then compile modules and the kernel.  (Gentoo will do this
+automatically as a part of the <B>genkernel</B> step.
+<BLOCKQUOTE><CODE>
+<PRE>
+# make modules
+# make
+# make install modules_install
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Make any modifications necessary to your boot configuration files (lilo or
+grub) as required to boot your new kernel.</P>
+<P>Download and compile the dvb applications you'll need to configure the card. 
+At the password prompt, press ENTER.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cvs -d :pserver:anonymous@linuxtv.org:/cvs/linuxtv login
+$ cvs -d :pserver:anonymous@linuxtv.org:/cvs/linuxtv co dvb-apps dvb-kernel
+$ cd dvb-apps
+$ make
+</PRE>
+</CODE></BLOCKQUOTE>
+
+<B>NOTE</B>: As of 2005-02-16, the compile aborts with an error, however
+not before the <B>azap</B> is compiled, so you should be able to continue.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# cp utils/szap/azap /usr/local/bin
+</PRE>
+</CODE></BLOCKQUOTE>
+
+On Gentoo, execute the following:
+<BLOCKQUOTE><CODE>
+<PRE>
+# mkdir /lib/firmware
+# cp ~/dvb-kernel/firmware/dvb-fe-nxt2002.fw /lib/firmware
+# echo skystar2 >> /etc/modules.autoload.d/kernel-2.6
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+
+On Debian:
+<BLOCKQUOTE><CODE>
+<PRE>
+# cp ~/dvb-kernel/firmware/dvb-fe-nxt2002.fw /usr/lib/hotplug/firmware
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Shutdown your machine, install the card and restart.  Ensure that you're
+using your newly compiled kernel.</P>
+<P>Once you've rebooted, confirm that the card is detected.  If you type
+<B>dmesg</B>, you should see something like this:
+<BLOCKQUOTE><CODE>
+<PRE>
+drivers/media/dvb/b2c2/skystar2.c: FlexCopIIB(rev.195) chip found
+drivers/media/dvb/b2c2/skystar2.c: the chip has 38 hardware filters
+DVB: registering new adapter (SkyStar2).
+DVB: registering frontend 0 (Nextwave nxt2002 VSB/QAM frontend)...
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If you are using 8VSB (Over-the-Air HDTV), run the <B>azap</B> program. 
+Replace ZIPCODE with your zipcode.  The perl script will connect to 
+<A HREF="http://www.antennaweb.org">http://www.antennaweb.org</A> to obtain
+your HDTV channels.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd /usr/src/dvb-apps/util/szap/channels-conf/atsc
+$ test ~/.azap || mkdir ~/.azap
+$ perl ./make_atsc_chanconf.pl ZIPCODE >~/.azap/channels.conf
+</PRE>
+</CODE></BLOCKQUOTE>
+
+<BLOCKQUOTE><CODE>
+<PRE>
+$ /usr/local/bin/azap wsvn
+using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
+tuning to 183000000 Hz
+video pid 0x0000, audio pid 0x0000
+status 00 | signal fff0 | snr ea60 | ber 00000000 | unc 00000000 |
+status 1f | signal f840 | snr ce6e | ber 00000068 | unc 00000000 | FE_HAS_LOCK
+status 1f | signal f600 | snr d2d8 | ber 00000018 | unc 00000000 | FE_HAS_LOCK
+status 1f | signal f290 | snr cd54 | ber 00000008 | unc 00000000 | FE_HAS_LOCK
+status 1f | signal f340 | snr c658 | ber 00000030 | unc 00000000 | FE_HAS_LOCK
+CTRL-C
+$
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If you're using QAM, you can skip the <CODE>perl ./make_atsc_chanconf.pl</CODE> step shown
+above and do the following:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd ~/.azap
+$ wget http://www.digitalregime.com/patches/channels.conf-qam
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Starting at "c80", increment by one until you get to a channel that returns FE_HAS_LOCK.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ azap -c channels.conf-qam -r c80
+using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
+tuning to 525000000 Hz
+video pid 0x0000, audio pid 0x0000
+status 00 | signal ef00 | snr ae50 | ber 00000000 | unc 00000000 |
+CTRL-C
+$ azap -c channels.conf-qam -r c81
+using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
+tuning to 531000000 Hz
+video pid 0x0000, audio pid 0x0000
+status 00 | signal a600 | snr 4f50 | ber 00000000 | unc 00000000 |
+CTRL-C
+(etc)
+$ azap -c channels.conf-qam -r c93
+using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
+tuning to 603000000 Hz
+video pid 0x0000, audio pid 0x0000
+status 00 | signal fff0 | snr 0000 | ber 00000000 | unc 00000000 |
+status 1f | signal fc30 | snr de3e | ber 00007ff8 | unc 0000000d | FE_HAS_LOCK
+status 1f | signal fc00 | snr df28 | ber 00007ff8 | unc 0000000f | FE_HAS_LOCK
+status 1f | signal fbf0 | snr df28 | ber 00007ff8 | unc 0000000e | FE_HAS_LOCK
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><B>NOTE</B>: if you have anything in the unc column ("uncorrectable
+errors") you will probably have problems with HDTV.  Check you antenna, cables, etc.</P>
+
+
 
 </BODY>
 </HTML>
