@@ -430,12 +430,12 @@ void rtp::OpenSocket()
         rtpSocket = 0;
     }
 
-    if (!rtpSocket->connect(yourIP, yourPort))
-    {
-        cerr << "Failed to connect for RTP connection " << myIP.toString() << ":" << myPort << endl;
-        delete rtpSocket;
-        rtpSocket = 0;
-    }
+    //if (!rtpSocket->connect(yourIP, yourPort))
+    //{
+    //    cerr << "Failed to connect for RTP connection " << myIP.toString() << ":" << myPort << endl;
+    //    delete rtpSocket;
+    //    rtpSocket = 0;
+    //}
 }        
 
 
