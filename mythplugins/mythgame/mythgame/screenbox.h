@@ -19,7 +19,7 @@ class ScreenBox : public MythDialog
 {
     Q_OBJECT
   public:
-    ScreenBox(QSqlDatabase *ldb, QString &paths, QWidget *parent = 0, 
+    ScreenBox(QSqlDatabase *ldb, QString &paths, MythMainWindow *parent, 
               const char *name = 0);
 
   protected slots:

@@ -27,9 +27,9 @@ using namespace std;
 #define SAVE_SETTINGS 1
 #define DONT_SAVE_SETTINGS 0
 
-MameSettingsDlg::MameSettingsDlg(QWidget* parent, const char* name, 
-                                 bool modal, bool system, WFlags fl)
-               : QDialog( parent, name, modal, fl ), bSystem(system)
+MameSettingsDlg::MameSettingsDlg(MythMainWindow* parent, const char* name, 
+                                 bool system)
+               : MythDialog(parent, name), bSystem(system)
 {
     setCursor(QCursor(Qt::BlankCursor));
     if ( !name )
@@ -466,8 +466,8 @@ int MameSettingsDlg::Show(Prefs *prefs, GameSettings *settings, bool vector)
     WinkeyCheck->setChecked(game_settings->winkeys);
     MouseCheck->setChecked(game_settings->mouse);
     GrabCheck->setChecked(game_settings->grab_mouse);
-    showFullScreen();
-    setActiveWindow();
+
+    show();
     if(exec())
     {
         SaveSettings();

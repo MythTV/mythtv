@@ -6,6 +6,8 @@
 #include <qpixmap.h>
 #include "snesrominfo.h"
 
+#include <mythtv/mythdialogs.h>
+
 class QVBoxLayout;
 class QHBoxLayout;
 class QGridLayout;
@@ -21,14 +23,13 @@ class QTabWidget;
 class QWidget;
 class MythContext;
 
-class SnesSettingsDlg : public QDialog
+class SnesSettingsDlg : public MythDialog
 {
     Q_OBJECT
 
 public:
-    SnesSettingsDlg(QWidget* parent = 0,
-        const char* name = 0, bool modal = FALSE,
-        bool system = false,WFlags fl = 0 );
+    SnesSettingsDlg(MythMainWindow* parent, const char *name = 0, 
+                    bool system = false);
     ~SnesSettingsDlg();
 
     QTabWidget* SnesTab;

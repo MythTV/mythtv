@@ -13,7 +13,9 @@ using namespace std;
 #include "gamehandler.h"
 #include "extendedlistview.h"
 
-ScreenBox::ScreenBox(QSqlDatabase *ldb, QString &paths, QWidget *parent, 
+#include <mythtv/mythcontext.h>
+
+ScreenBox::ScreenBox(QSqlDatabase *ldb, QString &paths, MythMainWindow *parent, 
                      const char *name)
          : MythDialog(parent, name)
 {
@@ -185,7 +187,8 @@ void ScreenBox::editSettings(QListViewItem *item)
 
     if("system" == tcitem->getLevel())
     {
-        GameHandler::EditSystemSettings(this, tcitem->getRomInfo());
+        GameHandler::EditSystemSettings(gContext->GetMainWindow(), 
+                                        tcitem->getRomInfo());
     }
 }
 

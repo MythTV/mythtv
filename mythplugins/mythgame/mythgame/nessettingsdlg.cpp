@@ -27,9 +27,8 @@ using namespace std;
 #define SAVE_SETTINGS 1
 #define DONT_SAVE_SETTINGS 0
 
-NesSettingsDlg::NesSettingsDlg(QWidget* parent,  
-                               const char* name, bool modal)
-    : MythDialog( parent, name, modal)
+NesSettingsDlg::NesSettingsDlg(MythMainWindow *parent, const char *name)
+              : MythDialog(parent, name)
 {
     setCursor(QCursor(Qt::BlankCursor));
     if ( !name )

@@ -38,14 +38,14 @@ void NesHandler::start_game(RomInfo* romdata)
     pclose(command);
 }
 
-void NesHandler::edit_settings(QWidget* parent, RomInfo* romdata)
+void NesHandler::edit_settings(MythMainWindow* parent, RomInfo* romdata)
 {
     // Eliminate unused parameter warning from the compiler.        
     parent = parent;
     romdata = romdata;
 }
 
-void NesHandler::edit_system_settings(QWidget* parent, RomInfo* romdata)
+void NesHandler::edit_system_settings(MythMainWindow* parent, RomInfo* romdata)
 {
     // Eliminate unused parameter warning from the compiler.                
     romdata = romdata;

@@ -5,6 +5,8 @@
 #include <qapplication.h>
 #include "gamehandler.h"
 
+#include <mythtv/mythdialogs.h>
+
 using namespace std;
 
 class NesHandler : public GameHandler
@@ -17,8 +19,8 @@ class NesHandler : public GameHandler
     virtual ~NesHandler() {};
 
     void start_game(RomInfo* romdata);
-    void edit_settings(QWidget* parent, RomInfo* romdata);
-    void edit_system_settings(QWidget* parent, RomInfo* romdata);
+    void edit_settings(MythMainWindow* parent, RomInfo* romdata);
+    void edit_system_settings(MythMainWindow* parent, RomInfo* romdata);
     void processGames();
     RomInfo* create_rominfo(RomInfo* parent);
     

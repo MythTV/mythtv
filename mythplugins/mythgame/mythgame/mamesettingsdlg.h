@@ -6,6 +6,8 @@
 #include <qpixmap.h>
 #include "mametypes.h"
 
+#include <mythtv/mythdialogs.h>
+
 class QVBoxLayout; 
 class QHBoxLayout; 
 class QGridLayout; 
@@ -20,13 +22,13 @@ class QSlider;
 class QTabWidget;
 class QWidget;
 
-class MameSettingsDlg : public QDialog
+class MameSettingsDlg : public MythDialog
 { 
     Q_OBJECT
 
 public:
-    MameSettingsDlg(QWidget* parent = 0, const char* name = 0, 
-                    bool modal = FALSE, bool system = false, WFlags fl = 0 );
+    MameSettingsDlg(MythMainWindow *parent, const char* name = 0, 
+                    bool system = false);
     ~MameSettingsDlg();
 
     QTabWidget* MameTab;

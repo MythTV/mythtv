@@ -7,6 +7,8 @@
 #include <qapplication.h>
 #include <map>
 
+#include <mythtv/mythdialogs.h>
+
 using namespace std;
 
 class MameHandler : public GameHandler
@@ -21,8 +23,8 @@ class MameHandler : public GameHandler
 
     void error(const QString &e);
     void start_game(RomInfo *romdata);
-    void edit_settings(QWidget *parent,RomInfo *romdata);
-    void edit_system_settings(QWidget *parent,RomInfo *romdata);
+    void edit_settings(MythMainWindow *parent, RomInfo *romdata);
+    void edit_system_settings(MythMainWindow *parent, RomInfo *romdata);
     RomInfo* create_rominfo(RomInfo* parent);
     QString Systemname() { return systemname; }
     void processGames();

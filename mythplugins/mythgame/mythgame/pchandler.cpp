@@ -111,20 +111,20 @@ void PCHandler::start_game(RomInfo * romdata)
     pclose(command);
 }
 
-void PCHandler::edit_settings(QWidget *parent,RomInfo * romdata)
+void PCHandler::edit_settings(MythMainWindow *parent,RomInfo * romdata)
 {
     PCRomInfo *pcdata = dynamic_cast<PCRomInfo*>(romdata);
-    PCSettingsDlg settingsdlg(parent, "gamesettings", true);
+    PCSettingsDlg settingsdlg(parent, "gamesettings");
     QString ImageFile;
     if(pcdata->FindImage("screenshot", &ImageFile))
         settingsdlg.SetScreenshot(ImageFile);
     settingsdlg.Show(pcdata);
 }
 
-void PCHandler::edit_system_settings(QWidget *parent,RomInfo * romdata)
+void PCHandler::edit_system_settings(MythMainWindow *parent,RomInfo * romdata)
 {
     romdata = romdata;
-    PCSettingsDlg settingsDlg(parent, "pcsettings", true, true);
+    PCSettingsDlg settingsDlg(parent, "pcsettings", true);
     settingsDlg.Show(NULL);    
 }
 

@@ -84,14 +84,14 @@ void GameHandler::Launchgame(RomInfo *romdata)
         handler->start_game(romdata);
 }
 
-void GameHandler::EditSettings(QWidget *parent, RomInfo *romdata)
+void GameHandler::EditSettings(MythMainWindow *parent, RomInfo *romdata)
 {
     GameHandler *handler;
     if((handler = GetHandler(romdata)))
         handler->edit_settings(parent,romdata);
 }
 
-void GameHandler::EditSystemSettings(QWidget *parent, RomInfo *romdata)
+void GameHandler::EditSystemSettings(MythMainWindow *parent, RomInfo *romdata)
 {
     GameHandler *handler;
     if((handler = GetHandler(romdata)))

@@ -6,6 +6,7 @@
 
 #include "rominfo.h"
 
+class MythMainWindow;
 class GameHandler;
 class QSqlDatabase;
 class QObject;
@@ -22,13 +23,14 @@ class GameHandler
     static void processAllGames(void);
     static void registerHandler(GameHandler *);
     static void Launchgame(RomInfo *romdata);
-    static void EditSettings(QWidget* parent, RomInfo *romdata);
-    static void EditSystemSettings(QWidget* parent, RomInfo *romdata);
+    static void EditSettings(MythMainWindow *parent, RomInfo *romdata);
+    static void EditSystemSettings(MythMainWindow *parent, RomInfo *romdata);
     static RomInfo* CreateRomInfo(RomInfo* parent);
 
     virtual void start_game(RomInfo *romdata) = 0;
-    virtual void edit_settings(QWidget *parent,RomInfo *romdata) = 0;
-    virtual void edit_system_settings(QWidget *parent,RomInfo *romdata) = 0;
+    virtual void edit_settings(MythMainWindow *parent, RomInfo *romdata) = 0;
+    virtual void edit_system_settings(MythMainWindow *parent,
+                                      RomInfo *romdata) = 0;
     virtual void processGames() = 0;
     virtual RomInfo* create_rominfo(RomInfo* parent) = 0;
     QString Systemname() const { return systemname; }

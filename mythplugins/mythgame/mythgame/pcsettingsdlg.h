@@ -6,6 +6,8 @@
 #include <qpixmap.h>
 #include "pcrominfo.h"
 
+#include <mythtv/mythdialogs.h>
+
 class QVBoxLayout;
 class QHBoxLayout;
 class QGridLayout;
@@ -21,15 +23,13 @@ class QTabWidget;
 class QWidget;
 class MythContext;
 
-class PCSettingsDlg : public QDialog
+class PCSettingsDlg : public MythDialog
 {
     Q_OBJECT
-
 public:
-    PCSettingsDlg(QWidget* parent = 0,
-        const char* name = 0, bool modal = FALSE,
-        bool system = false,WFlags fl = 0 );
-    ~PCSettingsDlg();
+    PCSettingsDlg(MythMainWindow* parent, const char* name = 0,
+                  bool system = false);
+   ~PCSettingsDlg();
 
     QTabWidget* PCTab;
     QWidget* SettingsTab;

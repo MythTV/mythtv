@@ -20,15 +20,13 @@ void startDatabaseTree(QSqlDatabase *db, QString &paths)
 {
     if(gContext->GetNumSetting("ShotCount")) // this will be a choice in the settings menu.
     {
-        ScreenBox screenbox(db, paths);
-        screenbox.Show();
+        ScreenBox screenbox(db, paths, gContext->GetMainWindow(), 
+                            "game screen");
         screenbox.exec();
     }
     else
     {
-        DatabaseBox dbbox(db, paths);
-        dbbox.Show();
-
+        DatabaseBox dbbox(db, paths, gContext->GetMainWindow(), "game list");
         dbbox.exec();
     }
 }
@@ -53,7 +51,8 @@ void GameCallback(void *data, QString &selection)
 void runMenu(QString themedir, QSqlDatabase *db, QString paths, 
              QValueList<RomInfo> &romlist)
 {
-    ThemedMenu *diag = new ThemedMenu(themedir.ascii(), "gamemenu.xml");
+    ThemedMenu *diag = new ThemedMenu(themedir.ascii(), "gamemenu.xml",
+                                      gContext->GetMainWindow(), "game menu");
 
     GameCBData data;
     data.paths = paths;
@@ -65,7 +64,6 @@ void runMenu(QString themedir, QSqlDatabase *db, QString paths,
         
     if (diag->foundTheme())
     {
-        diag->Show();
         diag->exec();
     }     
     else
@@ -95,6 +93,10 @@ int main(int argc, char *argv[])
     }
 
     gContext->LoadQtConfig();
+
+    MythMainWindow *mainWindow = new MythMainWindow();
+    mainWindow->Show();
+    gContext->SetMainWindow(mainWindow);
 
     //look for new systems that haven't been added to the database
     //yet and tell them to scan their games

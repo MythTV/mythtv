@@ -192,7 +192,7 @@ void SnesHandler::processGames(bool bValidate)
         int Year = 0;
         bool bRomFound;
 
-        MythProgressDialog pdial("Looking for SNES gams...", List->count());
+        MythProgressDialog pdial("Looking for SNES games...", List->count());
         int progress = 0;
 
         for (QFileInfoListIterator it(*List); it; ++it)
@@ -431,13 +431,13 @@ void SnesHandler::start_game(RomInfo * romdata)
     pclose(command);
 }
 
-void SnesHandler::edit_settings(QWidget *parent,RomInfo * romdata)
+void SnesHandler::edit_settings(MythMainWindow *parent,RomInfo * romdata)
 {
     SnesGameSettings game_settings;
     SnesRomInfo *snesdata = dynamic_cast<SnesRomInfo*>(romdata);
     SetGameSettings(game_settings, snesdata);
 
-    SnesSettingsDlg settingsdlg(parent, "gamesettings", true);
+    SnesSettingsDlg settingsdlg(parent, "gamesettings");
     QString ImageFile;
     if(snesdata->FindImage("screenshot", &ImageFile))
         settingsdlg.SetScreenshot(ImageFile);
@@ -445,10 +445,10 @@ void SnesHandler::edit_settings(QWidget *parent,RomInfo * romdata)
         SaveGameSettings(game_settings, snesdata);
 }
 
-void SnesHandler::edit_system_settings(QWidget *parent,RomInfo * romdata)
+void SnesHandler::edit_system_settings(MythMainWindow *parent,RomInfo * romdata)
 {
     romdata = romdata;
-    SnesSettingsDlg settingsDlg(parent, "snessettings", true, true);
+    SnesSettingsDlg settingsDlg(parent, "snessettings", true);
     if(settingsDlg.Show(&defaultSettings))
         SaveGameSettings(defaultSettings, NULL);    
 }

@@ -36,8 +36,8 @@ class SnesHandler : public GameHandler
     virtual ~SnesHandler();
 
     void start_game(RomInfo *romdata);
-    void edit_settings(QWidget *parent,RomInfo *romdata);
-    void edit_system_settings(QWidget *parent,RomInfo *romdata);
+    void edit_settings(MythMainWindow *parent,RomInfo *romdata);
+    void edit_system_settings(MythMainWindow *parent,RomInfo *romdata);
     RomInfo* create_rominfo(RomInfo* parent);
     void processGames();
     void processGames(bool);

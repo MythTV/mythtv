@@ -23,10 +23,9 @@
 
 using namespace std;
 
-PCSettingsDlg::PCSettingsDlg(QWidget* parent,
-                               const char* name, bool modal,
-                               bool system, WFlags fl)
-    : QDialog( parent, name, modal, fl ), bSystem(system)
+PCSettingsDlg::PCSettingsDlg(MythMainWindow* parent,
+                             const char* name, bool system)
+    : MythDialog(parent, name), bSystem(system)
 {
     setCursor(QCursor(Qt::BlankCursor));
     if ( !name )
@@ -131,8 +130,7 @@ void PCSettingsDlg::Show(PCRomInfo* rominfo)
         GenreValLabel->setText( trUtf8(rominfo->Genre()) );
         YearValLabel->setNum(int(rominfo->Year()));
     }
-    showFullScreen();
-    setActiveWindow();
+    show();
     exec();
 }
 

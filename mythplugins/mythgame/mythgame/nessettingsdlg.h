@@ -26,8 +26,8 @@ class NesSettingsDlg : public MythDialog
     Q_OBJECT
 
 public:
-    NesSettingsDlg(QWidget* parent = 0, 
-        const char* name = 0, bool modal = FALSE);
+    NesSettingsDlg(MythMainWindow *parent, 
+                   const char* name = 0);
     ~NesSettingsDlg();
 
     QTabWidget* NesTab;

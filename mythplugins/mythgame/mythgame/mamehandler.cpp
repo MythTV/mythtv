@@ -125,6 +125,8 @@ void MameHandler::processGames()
 
         map<QString, QString> CatMap;
         LoadCatfile(&CatMap);
+ 
+        MythProgressDialog pdial("Looking for Mame games...", supported_games);
 
         while (fgets(line, 500, xmame_info)) {
                 if (!strncmp(line, "game (", 6)) {
@@ -389,9 +391,13 @@ void MameHandler::processGames()
                         done_roms++;
                         done = (float) ((float) (done_roms) /
                                          (float) (supported_games));
+
+                        pdial.setProgress(done_roms);
                 }
 
         }
+
+        pdial.Close();
 
         pclose(xmame_info);
         pclose(xmame_vrfy);
@@ -438,7 +444,7 @@ void MameHandler::start_game(RomInfo * romdata)
         pclose(command);
 }
 
-void MameHandler::edit_settings(QWidget *parent,RomInfo * romdata)
+void MameHandler::edit_settings(MythMainWindow *parent,RomInfo * romdata)
 {
     GameSettings game_settings;
     MameRomInfo *mamedata = dynamic_cast<MameRomInfo*>(romdata);
@@ -457,10 +463,10 @@ void MameHandler::edit_settings(QWidget *parent,RomInfo * romdata)
         SaveGameSettings(game_settings, mamedata);
 }
 
-void MameHandler::edit_system_settings(QWidget *parent,RomInfo * romdata)
+void MameHandler::edit_system_settings(MythMainWindow *parent,RomInfo * romdata)
 {
     romdata = romdata;
-    MameSettingsDlg settingsDlg(parent, "mamesettings", true, true);
+    MameSettingsDlg settingsDlg(parent, "mamesettings", true);
     check_xmame_exe();
     if(settingsDlg.Show(&general_prefs, &defaultSettings, true))
         SaveGameSettings(defaultSettings, NULL);    

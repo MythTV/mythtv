@@ -27,10 +27,9 @@ using namespace std;
 #define SAVE_SETTINGS 1
 #define DONT_SAVE_SETTINGS 0
 
-SnesSettingsDlg::SnesSettingsDlg(QWidget* parent,
-                               const char* name, bool modal,
-                               bool system, WFlags fl)
-    : QDialog( parent, name, modal, fl ), bSystem(system)
+SnesSettingsDlg::SnesSettingsDlg(MythMainWindow *parent,
+                                 const char *name, bool system)
+    : MythDialog(parent, name), bSystem(system)
 {
     setCursor(QCursor(Qt::BlankCursor));
     if ( !name )
@@ -448,8 +447,7 @@ int SnesSettingsDlg::Show(SnesGameSettings *settings)
     {
         DefaultCheck->setChecked(game_settings->default_options);
     }
-    showFullScreen();
-    setActiveWindow();
+    show();
     if(exec())
     {
         SaveSettings();

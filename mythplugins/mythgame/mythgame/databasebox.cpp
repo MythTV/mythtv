@@ -14,8 +14,10 @@ using namespace std;
 #include "gamehandler.h"
 #include "extendedlistview.h"
 
-DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QString &paths, QWidget *parent, 
-                         const char *name)
+#include <mythtv/mythcontext.h>
+
+DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QString &paths, 
+                         MythMainWindow *parent, const char *name)
            : MythDialog(parent, name)
 {
     db = ldb;
@@ -120,11 +122,13 @@ void DatabaseBox::editSettings(QListViewItem *item)
 
     if("system" == tcitem->getLevel())
     {
-        GameHandler::EditSystemSettings(this, tcitem->getRomInfo());
+        GameHandler::EditSystemSettings(gContext->GetMainWindow(), 
+                                        tcitem->getRomInfo());
     }
     else if (tcitem->childCount() <= 0)
     {
-        GameHandler::EditSettings(this, tcitem->getRomInfo());
+        GameHandler::EditSettings(gContext->GetMainWindow(), 
+                                  tcitem->getRomInfo());
     }
 }
 

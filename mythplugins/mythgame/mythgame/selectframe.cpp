@@ -74,7 +74,7 @@ void SelectFrame::focusInEvent(QFocusEvent* e)
 
 void SelectFrame::EditEvent()
 {
-    GameHandler::EditSettings(this, RomList->current());
+    GameHandler::EditSettings(gContext->GetMainWindow(), RomList->current());
 }
 
 void SelectFrame::focusOutEvent(QFocusEvent* e)
