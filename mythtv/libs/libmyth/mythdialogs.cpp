@@ -28,6 +28,11 @@ using namespace std;
 #include "lircevent.h"
 #endif
 
+#ifdef USE_JOYSTICK_MENU
+#include "jsmenu.h"
+#include "jsmenuevent.h"
+#endif
+
 #include "uitypes.h"
 #include "uilistbtntype.h"
 #include "xmlparse.h"
@@ -45,6 +50,19 @@ static void *SpawnLirc(void *param)
     LircClient *cl = new LircClient(main_window);
     if (!cl->Init(config_file, program))
         cl->Process();
+
+    return NULL;
+}
+#endif
+
+#ifdef USE_JOYSTICK_MENU
+static void *SpawnJoystickMenu(void *param)
+{
+    MythMainWindow *main_window = (MythMainWindow *)param;
+    QString config_file = QDir::homeDirPath() + "/.mythtv/joystickmenurc";
+    JoystickMenuClient *js = new JoystickMenuClient(main_window);
+    if (!js->Init(config_file))
+        js->Process();
 
     return NULL;
 }
@@ -102,7 +120,13 @@ class MythMainWindowPrivate
 
     vector<QWidget *> widgetList;
 
+#ifdef USE_JOYSTICK_MENU
+    bool ignore_joystick_keys;
+#endif
+
+#ifdef USE_LIRC
     bool ignore_lirc_keys;
+#endif
 
     bool exitingtomain;
 
@@ -151,7 +175,6 @@ MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal)
     d = new MythMainWindowPrivate;
 
     Init();
-    d->ignore_lirc_keys = false;
     d->exitingtomain = false;
     d->exitmenucallback = false;
     d->exitmenumediadevicecallback = false;
@@ -159,12 +182,23 @@ MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal)
     d->escapekey = Key_Escape;
 
 #ifdef USE_LIRC
+    d->ignore_lirc_keys = false;
     pthread_t lirc_tid;
     pthread_attr_t attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
     pthread_create(&lirc_tid, &attr, SpawnLirc, this);
+#endif
+
+#ifdef USE_JOYSTICK_MENU
+    d->ignore_joystick_keys = false;
+    pthread_t js_tid;
+
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+    pthread_create(&js_tid, &attr, SpawnJoystickMenu, this);
 #endif
 
     d->keyContexts.setAutoDelete(true);
@@ -684,6 +718,48 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
     {
         LircMuteEvent *lme = (LircMuteEvent *)ce;
         d->ignore_lirc_keys = lme->eventsMuted();
+    }
+#endif
+#ifdef USE_JOYSTICK_MENU
+    else if (ce->type() == kJoystickKeycodeEventType && !d->ignore_joystick_keys) 
+    {
+        JoystickKeycodeEvent *jke = (JoystickKeycodeEvent *)ce;
+        int keycode = jke->getKeycode();
+
+        if (keycode) 
+        {
+            gContext->ResetScreensaver();
+
+            int mod = keycode & MODIFIER_MASK;
+            int k = keycode & ~MODIFIER_MASK; /* trim off the mod */
+            int ascii = 0;
+            QString text;
+
+            if (k & UNICODE_ACCEL)
+            {
+                QChar c(k & ~UNICODE_ACCEL);
+                ascii = c.latin1();
+                text = QString(c);
+            }
+
+            QKeyEvent key(jke->isKeyDown() ? QEvent::KeyPress :
+                          QEvent::KeyRelease, k, ascii, mod, text);
+
+            QObject *key_target = getTarget(key);
+
+            QApplication::sendEvent(key_target, &key);
+        }
+        else
+        {
+            cerr << "JoystickMenuClient warning: attempt to convert '"
+                 << jke->getJoystickMenuText() << "' to a key sequence failed. Fix"
+                                           " your key mappings.\n";
+        }
+    }
+    else if (ce->type() == kJoystickMuteEventType)
+    {
+        JoystickMenuMuteEvent *jme = (JoystickMenuMuteEvent *)ce;
+        d->ignore_joystick_keys = jme->eventsMuted();
     }
 #endif
     else if (ce->type() == ScreenSaverEvent::kScreenSaverEventType)

@@ -40,6 +40,7 @@ void GetMythTVGeometry(Display *dpy, int screen_num, int *x, int *y,
 QRgb blendColors(QRgb source, QRgb add, int alpha);
 
 #define MYTH_SYSTEM_DONT_BLOCK_LIRC (1)
+#define MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU (2)
 int myth_system(const QString &command, int flags = 0);
 
 QString cutDownString(QString text, QFont *testFont, int maxwidth);

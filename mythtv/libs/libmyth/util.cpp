@@ -24,6 +24,10 @@ extern "C" {
 #include "lircevent.h"
 #endif
 
+#ifdef USE_JOYSTICK_MENU
+#include "jsmenuevent.h"
+#endif
+
 #define SOCKET_BUF_SIZE  128000
 
 QString SocDevErrStr(int error)
@@ -641,7 +645,14 @@ int myth_system(const QString &command, int flags)
 {
 #ifdef USE_LIRC
     LircEventLock lirc_lock(!(flags & MYTH_SYSTEM_DONT_BLOCK_LIRC));
-#else
+#endif
+
+#ifdef USE_JOYSTICK_MENU
+    JoystickMenuEventLock joystick_lock(!(flags & MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU));
+#endif
+
+    /* Kill warning, I presume */
+#if ! defined(USE_LIRC) && ! defined(USE_JOYSTICK_MENU)
     (void)flags;
 #endif
 

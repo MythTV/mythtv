@@ -75,6 +75,12 @@ using_alsa {
     LIBS += $$ALSA_LIBS
 }
 
+using_joystick_menu {
+    DEFINES += USE_JOYSTICK_MENU
+    HEADERS += jsmenu.h jsmenuevent.h
+    SOURCES += jsmenu.cpp jsmenuevent.cpp
+}
+
 using_lirc {
     DEFINES += USE_LIRC
     HEADERS += lirc.h lircevent.h

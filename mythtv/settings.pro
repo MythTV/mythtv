@@ -73,6 +73,9 @@ DEFINES += USING_OSS
 #   'linux/dvb/frontend.h', not the directory with frontend.h
 #INCLUDEPATH += /usr/src/linuxtv-dvb-1.0.1/include
 
+# Joystick menu support
+CONFIG += using_joystick_menu
+
 # Native lirc support
 #CONFIG += using_lirc
 #LIRC_LIBS = -llirc_client
