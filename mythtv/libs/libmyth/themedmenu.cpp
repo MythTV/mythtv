@@ -1666,8 +1666,7 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
 
 QString ThemedMenu::findMenuFile(QString menuname)
 {
-    char *home = getenv("HOME");
-    QString testdir = QString(home) + "/.mythtv/" + menuname;
+    QString testdir = QDir::homeDirPath() + "/.mythtv/" + menuname;
    
     QFile file(testdir);
     if (file.exists())

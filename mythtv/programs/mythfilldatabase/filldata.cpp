@@ -688,8 +688,7 @@ unsigned int promptForChannelUpdates(QValueList<ChanInfo>::iterator chaninfo,
 
 void handleChannels(int id, QValueList<ChanInfo> *chanlist)
 {
-    char *home = getenv("HOME");
-    QString fileprefix = QString(home) + "/.mythtv";
+    QString fileprefix = QDir::homeDirPath() + "/.mythtv";
 
     QDir dir(fileprefix);
     if (!dir.exists())
@@ -1244,7 +1243,7 @@ bool grabData(Source source, int offset)
 
     QString filename = QString(tempfilename);
 
-    char *home = getenv("HOME");
+    QString home = QDir::homeDirPath();
     QString configfile = QString("%1/.mythtv/%2.xmltv").arg(home)
                                                        .arg(source.name);
     QString command;

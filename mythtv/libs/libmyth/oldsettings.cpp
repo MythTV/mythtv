@@ -21,6 +21,8 @@
 #include <string>
 using namespace std;
 
+#include <qdir.h>
+
 Settings::Settings(QString strSettingsFile)
 {
     if (strSettingsFile.length() == 0)
@@ -118,7 +120,7 @@ bool Settings::LoadSettingsFiles(QString filename, QString prefix)
     if (ReadSettings(setname))
          result = true;
 
-    setname = QString(getenv("HOME")) + "/.mythtv/" + filename;
+    setname = QDir::homeDirPath() + "/.mythtv/" + filename;
 
     if (ReadSettings(setname))
          result = true;

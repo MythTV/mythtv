@@ -123,8 +123,7 @@ int main(int argc, char *argv[])
     gContext->SetSetting("Theme", "blue");
     gContext->LoadQtConfig();
 
-    char *home = getenv("HOME");
-    QString fileprefix = QString(home) + "/.mythtv";
+    QString fileprefix = QDir::homeDirPath() + "/.mythtv";
 
     QDir dir(fileprefix);
     if (!dir.exists())

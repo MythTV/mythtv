@@ -20,11 +20,16 @@ release {
 
 EXTRA_LIBS = -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm
 
-
+# Native ALSA support
 #CONFIG += using_alsa
+#EXTRA_LIBS += -lasound
 
 # DVB stuff
 #CONFIG += using_dvb
 #DEFINES += USING_DVB
 #INCLUDEPATH += /usr/src/linux/include/linux/dvb/
+
+# Native lirc support
+#CONFIG += using_lirc
+#EXTRA_LIBS += -llirc_client
 

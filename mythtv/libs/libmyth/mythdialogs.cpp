@@ -8,14 +8,41 @@
 #include <iostream>
 using namespace std;
 
+#ifdef USE_LIRC
+#include <pthread.h>
+#include "lirc.h"
+#endif
+
 #include "uitypes.h"
 #include "xmlparse.h"
 #include "mythdialogs.h"
+
+#ifdef USE_LIRC
+static void *SpawnLirc(void *param)
+{
+    MythMainWindow *main_window = (MythMainWindow *)param;
+    QString config_file = QDir::homeDirPath() + "/.mythtv/lircrc";
+    QString program("mythtv");
+    LircClient *cl = new LircClient(main_window);
+    if (!cl->Init(config_file, program))
+        cl->Process();
+
+    return NULL;
+}
+#endif
 
 MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal)
               : QDialog(parent, name, modal)
 {
     Init();
+#ifdef USE_LIRC
+    pthread_t lirc_tid;
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+    pthread_create(&lirc_tid, &attr, SpawnLirc, this);
+#endif
 }
 
 void MythMainWindow::Init(void)

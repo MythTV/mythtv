@@ -31,10 +31,15 @@ inc.files += settings.h uitypes.h xmlparse.h mythplugin.h mythdialogs.h
 inc.files += audiooutput.h inetcomms.h
 
 using_alsa {
-    LIBS += -lasound
     DEFINES += USE_ALSA
     HEADERS += audiooutputalsa.h
     SOURCES += audiooutputalsa.cpp
+}
+
+using_lirc {
+    DEFINES += USE_LIRC
+    HEADERS += lirc.h
+    SOURCES += lirc.cpp
 }
 
 INSTALLS += inc

@@ -396,8 +396,7 @@ void MythContext::InitializeScreenSettings(void)
 
 QString MythContext::FindThemeDir(QString themename)
 {
-    char *home = getenv("HOME");
-    QString testdir = QString(home) + "/.mythtv/themes/" + themename;
+    QString testdir = QDir::homeDirPath() + "/.mythtv/themes/" + themename;
 
     QDir dir(testdir);
     if (dir.exists())
