@@ -154,8 +154,7 @@ public:
         setHelpText(QObject::tr("Make the video look normal on a progressive "
                     "display (i.e. monitor).  Deinterlace requires that your "
                     "CPU supports SSE instructions.  Enabling this without "
-                    "proper CPU support will cause the program to segfault. "
-                    "See the HOWTO document for more information."));
+                    "proper CPU support will cause the program to segfault. "));
     };
 };
 
@@ -565,10 +564,9 @@ public:
         setLabel(QObject::tr("Reposition after fast forward/rewind"));
         setValue(true);
         setHelpText(QObject::tr("When exiting sticky keys fast forward/rewind "
-                    "mode, reposition before resuming normal playback.  This "
-                    "is to compensate for the reaction time between seeing "
-                    "where to resume playback and actually exiting fast "
-                    "forward/rewind mode."));
+                    "mode, reposition before resuming normal playback. This "
+                    "compensates for the reaction time between seeing "
+                    "where to resume playback and actually exiting seeking."));
     };
 };
 
@@ -579,9 +577,9 @@ public:
         setLabel(QObject::tr("Reverse direction in fast forward/rewind"));
         setValue(true);
         setHelpText(QObject::tr("If set, pressing the sticky rewind key "
-                    "in fast forward mode will switch to rewind mode, and "
-                    "vice versa.  If not set, doing so will decrease the "
-                    "speed in the current direction or switch to play mode if "
+                    "in fast forward mode switches to rewind mode, and "
+                    "vice versa. If not set, it will decrease the "
+                    "current speed or switch to play mode if "
                     "the speed can't be decreased further."));
     };
 };
