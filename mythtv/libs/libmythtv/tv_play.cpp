@@ -1632,7 +1632,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             DoSeek(jumptime * 60, tr("Jump Ahead"));
         else if (action == "JUMPSTART" && activenvp)
         {
-            DoSeek(-activenvp->GetFramesPlayed(), tr("Jump to Begining"));
+            DoSeek(-activenvp->GetFramesPlayed(), tr("Jump to Beginning"));
         }
         else if (action == "ESCAPE")
         {
