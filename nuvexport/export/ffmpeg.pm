@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.10.02 (xris)
+#Last Updated: 2004.10.04 (xris)
 #
 #  ffmpeg.pm
 #
@@ -158,6 +158,17 @@ package export::ffmpeg;
             $ffmpeg .= ' /dev/null';
         }
         else {
+        # Make sure we don't have a duplicate filename
+            if (-e $self->{'path'}.'/'.$episode->{'outfile'}.$suffix) {
+                my $count = 1;
+                my $out   = $episode->{'outfile'};
+                while (-e $self->{'path'}.'/'.$out.$suffix) {
+                    $count++;
+                    $out = $episode->{'outfile'}.".$count";
+                }
+                $episode->{'outfile'} = $out;
+            }
+        # Add the output command
             $ffmpeg .= " " . shell_escape($self->{'path'}.'/'.$episode->{'outfile'}.$suffix);
         }
     # ffmpeg pids
