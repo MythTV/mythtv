@@ -26,6 +26,34 @@ extern "C" {
 
 #define SOCKET_BUF_SIZE  128000
 
+QString SocDevErrStr(int error)
+{
+    QString errorMsg = "N/A";
+        
+    if (error == QSocketDevice::NoError)
+        errorMsg = "NoError";
+    else if (error == QSocketDevice::AlreadyBound)    
+        errorMsg = "AlreadyBound";
+    else if (error == QSocketDevice::Inaccessible)    
+        errorMsg = "Inaccessible";
+    else if (error == QSocketDevice::NoResources)    
+        errorMsg = "NoResources";
+    else if (error == QSocketDevice::Bug)    
+        errorMsg = "Bug";
+    else if (error == QSocketDevice::Impossible)    
+        errorMsg = "Impossible";
+    else if (error == QSocketDevice::NoFiles)    
+        errorMsg = "NoFiles";
+    else if (error == QSocketDevice::ConnectionRefused)    
+        errorMsg = "ConnectionRefused";
+    else if (error == QSocketDevice::NetworkFailure)    
+        errorMsg = "NetworkFailure";
+    else if (error == QSocketDevice::UnknownError)    
+        errorMsg = "UnknownError";
+        
+   return errorMsg;         
+}
+
 bool connectSocket(QSocketDevice *socket, const QString &host, int port)
 {
     QHostAddress hadr;
@@ -43,32 +71,9 @@ bool connectSocket(QSocketDevice *socket, const QString &host, int port)
     }                                          
     else
     {
-        QString errorMsg = "N/A";
-        
-        if (socket->error() == QSocketDevice::NoError)
-            errorMsg = "NoError";
-        else if (socket->error() == QSocketDevice::AlreadyBound)    
-            errorMsg = "AlreadyBound";
-        else if (socket->error() == QSocketDevice::Inaccessible)    
-            errorMsg = "Inaccessible";
-        else if (socket->error() == QSocketDevice::NoResources)    
-            errorMsg = "NoResources";
-        else if (socket->error() == QSocketDevice::Bug)    
-            errorMsg = "Bug";
-        else if (socket->error() == QSocketDevice::Impossible)    
-            errorMsg = "Impossible";
-        else if (socket->error() == QSocketDevice::NoFiles)    
-            errorMsg = "NoFiles";
-        else if (socket->error() == QSocketDevice::ConnectionRefused)    
-            errorMsg = "ConnectionRefused";
-        else if (socket->error() == QSocketDevice::NetworkFailure)    
-            errorMsg = "NetworkFailure";
-        else if (socket->error() == QSocketDevice::UnknownError)    
-            errorMsg = "UnknownError";
-        
         VERBOSE(VB_NETWORK, 
              QString("Socket error connecting to host: %1, port: %2, error: %3")
-                   .arg(host).arg(port).arg(errorMsg));
+                   .arg(host).arg(port).arg(SocDevErrStr(socket->error())));
     }
     
     return result;
@@ -76,20 +81,22 @@ bool connectSocket(QSocketDevice *socket, const QString &host, int port)
 
 bool WriteStringList(QSocketDevice *socket, QStringList &list)
 {// QSocketDevice (frontend)
+    
+    if (!socket->isOpen() || socket->error())
+    {
+        VERBOSE(VB_ALL, "WriteStringList: Bad socket");
+        return false;
+    }    
+    
     QString str = list.join("[]:[]");
     QCString utf8 = str.utf8();
 
-    int size = utf8.length();
-
-    int written = 0;
-
     QCString payload;
-
-    payload = payload.setNum(size);
+    payload = payload.setNum(utf8.length());
     payload += "        ";
     payload.truncate(8);
     payload += utf8;
-    size = payload.length();
+    
 
     if ((print_verbose_messages & VB_NETWORK) != 0)
     {
@@ -103,34 +110,49 @@ bool WriteStringList(QSocketDevice *socket, QStringList &list)
         VERBOSE(VB_NETWORK, msg);
     }
 
-    unsigned int errorcount = 0;
-    bool retval = true;
+    int btw = payload.length();
+    int written = 0;
+    
+    QTime timer;
+    timer.start();
 
-    while (size > 0)
+    while (btw > 0)
     {
-        int temp = socket->writeBlock(payload.data() + written, size);
+        int sret = socket->writeBlock(payload.data() + written, btw);
         // cerr << "  written: " << temp << endl; //DEBUG
-        if (temp < 0)
+        if (sret > 0)
         {
-            VERBOSE(VB_GENERAL, "Error writing stringlist");
-            break;
-        }
-
-        written += temp;
-        size -= temp;
-        if (size > 0)
-        {
-            cerr << "Partial WriteStringList " << written << endl;
-
-            if (++errorcount > 50)
+            written += sret;
+            btw -= sret;
+            
+            if (btw > 0)
             {
-                retval = false;
-                break;
+                timer.start();
+                VERBOSE(VB_GENERAL, QString("Partial WriteStringList: %1")
+                                            .arg(written));
+            }                                
+        }
+        else if (sret < 0 && socket->error() != QSocketDevice::NoError)
+        {
+            VERBOSE(VB_GENERAL, QString("Error writing stringlist "
+                                        "(writeBlock): %1")
+                                        .arg(SocDevErrStr(socket->error())));
+            socket->close();
+            return false;
+        }
+        else
+        {
+            if (timer.elapsed() > 10000)
+            {
+                VERBOSE(VB_GENERAL, "WriteStringList timeout");
+                return false;
             }  
+            
+            usleep(50);
         }
     }
 
-    return retval;
+    return true;
 }
 
 bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
@@ -138,7 +160,10 @@ bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
     list.clear();
 
     if (!socket->isOpen() || socket->error())
+    {
+        VERBOSE(VB_ALL, "ReadStringList: Bad socket");
         return false;
+    }    
 
     QTime timer;
     timer.start();
@@ -164,35 +189,65 @@ bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
     }
 
     QCString sizestr(8 + 1);
-    socket->readBlock(sizestr.data(), 8);
+    if (socket->readBlock(sizestr.data(), 8) < 0)
+    {
+        VERBOSE(VB_GENERAL, QString("Error reading stringlist (sizestr): %1")
+                                    .arg(SocDevErrStr(socket->error())));
+        socket->close();
+        return false;
+    }
 
     sizestr = sizestr.stripWhiteSpace();
-    int size = sizestr.toInt();
+    int btr = sizestr.toInt();
 
-    QCString utf8(size + 1);
+    QCString utf8(btr + 1);
 
     int read = 0;
-    unsigned int zerocnt = 0;
-
-    while (size > 0)
+    int errmsgtime = 0;
+    timer.start();
+    
+    while (btr > 0)
     {
-        int temp = socket->readBlock(utf8.data() + read, size);
+        int sret = socket->readBlock(utf8.data() + read, btr);
         // cerr << "  read: " << temp << endl; //DEBUG
-        read += temp;
-        size -= temp;
-        if (size > 0)
+        if (sret > 0)
         {
-            if (++zerocnt >= 100)
+            read += sret;
+            btr -= sret;
+            if (btr > 0)
             {
-                printf("EOF readStringList %u\n", read);
-                break; 
+                usleep(50);
+                timer.start();
+            }    
+        }
+        else if (sret < 0 && socket->error() != QSocketDevice::NoError)
+        {
+            VERBOSE(VB_GENERAL, QString("Error reading stringlist"
+                                        " (readBlock): %1")
+                                        .arg(SocDevErrStr(socket->error())));
+            socket->close();
+            return false;
+        }
+        else
+        {
+            elapsed = timer.elapsed();
+            if (elapsed  > 1000)
+            {
+                if ((elapsed - errmsgtime) > 1000)
+                {
+                    errmsgtime = elapsed;
+                    VERBOSE(VB_GENERAL, QString("Waiting for data: %1 %2")
+                                                .arg(read).arg(btr));
+                }                            
             }
-            usleep(50);
             
-            if (zerocnt == 5)
+            if (elapsed > 10000)
             {
-                printf("Waiting for data: %u %u\n", read, size);
+                VERBOSE(VB_GENERAL, "ReadStringList timeout. (readBlock)");
+                return false;
             }
+            
+            usleep(50);
         }
     }
 
@@ -205,9 +260,15 @@ bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
 
 bool WriteBlock(QSocketDevice *socket, void *data, int len)
 {// QSocketDevice
+    
+    if (!socket->isOpen() || socket->error())
+    {
+        VERBOSE(VB_ALL, "WriteBlock: Bad socket");
+        return false;
+    }    
+    
     int written = 0;
-    int errorcount = 0;
-    bool bRet = true;
+    int zerocnt = 0;
     
     while (written < len)
     {
@@ -219,61 +280,36 @@ bool WriteBlock(QSocketDevice *socket, void *data, int len)
         int btw = len - written >= SOCKET_BUF_SIZE ? 
                                    SOCKET_BUF_SIZE : len - written;
         
-        int ret = socket->writeBlock((char *)data + written, btw);
-        if (ret > 0)
+        int sret = socket->writeBlock((char *)data + written, btw);
+        if (sret > 0)
         {
-            errorcount = 0;
-            written += ret;
+            zerocnt = 0;
+            written += sret;
             if (written < len)
                 usleep(10);
         }
-        else if (ret < 0 && socket->error() != QSocketDevice::NoError)
+        else if (sret < 0 && socket->error() != QSocketDevice::NoError)
         {
-            VERBOSE(VB_IMPORTANT, QString("WriteBlock(): Socket write error,"
-                                        " error =  %1").arg(socket->error()));
-            bRet = false;
-            break;
+            VERBOSE(VB_IMPORTANT, 
+                    QString("Socket write error (writeBlock): %1")
+                            .arg(SocDevErrStr(socket->error())));
+            socket->close();
+            return false;
         }
         else 
         {
-            if (++errorcount > 150)
+            if (++zerocnt > 200)
             {
-                bRet = false;
-                VERBOSE(VB_IMPORTANT, "WriteBlock(): Aborting WriteBlock,"
-                                    " write to socket failed!");
-                break;
+                VERBOSE(VB_IMPORTANT, "WriteBlock zerocnt timeout");
+                return false;
             }    
             usleep(100); // We're waiting on the client.
         }
     }
     
-    return bRet;
+    return true;
 }
 
-int ReadBlock(QSocketDevice *socket, void *data, int maxlen)
-{// QSocketDevice (frontend)
-    int read = 0;
-    int size = maxlen;
-    unsigned int zerocnt = 0;
-
-    while (size > 0)
-    {
-        int temp = socket->readBlock((char *)data + read, size);
-        read += temp;
-        size -= temp;
-        if (size > 0)
-        {
-            if (++zerocnt >= 100)
-            {
-                printf("EOF ReadBlock %u\n", read);
-                break; 
-            }
-            usleep(50);
-        }
-    }
-    
-    return maxlen;
-}
 
 // QSocket (backend version)
 bool WriteStringList(QSocket *socket, QStringList &list)

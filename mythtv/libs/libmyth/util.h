@@ -10,6 +10,8 @@ class QImage;
 class QPainter;
 class QFont;
 
+QString SocDevErrStr(int error);
+
 // QSockectDevice (frontend)
 bool connectSocket(QSocketDevice *socket, const QString &host, int port);
 
@@ -18,7 +20,6 @@ bool ReadStringList(QSocketDevice *socket, QStringList &list,
                     bool quickTimeout = false);
 
 bool WriteBlock(QSocketDevice *socket, void *data, int len);
-int ReadBlock(QSocketDevice *socket, void *data, int maxlen);
 
 // QSockect (backend)
 bool WriteStringList(QSocket *socket, QStringList &list);
