@@ -43,7 +43,7 @@ ViewScheduled::ViewScheduled(MythContext *context, TV *ltv, QSqlDatabase *ldb,
             QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
-    context->ThemeWidget(this, screenwidth, screenheight, wmult, hmult);
+    context->ThemeWidget(this);
            
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(10 * wmult));
 

@@ -95,9 +95,7 @@ QPixmap *ProgramListItem::getPixmap(void)
 
     m_context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
-    pixmap = m_context->LoadScalePixmap(filename, screenwidth, screenheight,
-                                        wmult, hmult);
-
+    pixmap = m_context->LoadScalePixmap(filename);
     if (pixmap)
         return pixmap;
 
@@ -117,9 +115,7 @@ QPixmap *ProgramListItem::getPixmap(void)
 
         delete [] data;
  
-        pixmap = m_context->LoadScalePixmap(filename, screenwidth, screenheight,
-                                            wmult, hmult);
-
+        pixmap = m_context->LoadScalePixmap(filename);
         if (pixmap)
             return pixmap;
     }

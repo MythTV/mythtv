@@ -25,7 +25,7 @@ DialogBox::DialogBox(MythContext *context, const QString &text,
             QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
-    //context->ThemeWidget(this, screenwidth, screenheight, wmult, hmult);
+    //context->ThemeWidget(this);
 
     QLabel *maintext = new QLabel(text, this);
     maintext->setBackgroundOrigin(WindowOrigin);

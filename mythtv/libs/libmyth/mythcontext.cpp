@@ -17,6 +17,8 @@ MythContext::MythContext(void)
     m_installprefix = PREFIX;
     m_settings = new Settings;
 
+    m_themeloaded = false;
+
     LoadSettingsFiles("settings.txt");
     LoadSettingsFiles("mysql.txt");
     LoadSettingsFiles("theme.txt");
@@ -32,6 +34,17 @@ MythContext::MythContext(void)
     qtfontsmall = m_settings->GetNumSetting("QtFontSmall");
     if (qtfontsmall <= 0)
         qtfontsmall = 25;
+
+    m_height = QApplication::desktop()->height();
+    m_width = QApplication::desktop()->width();
+
+    if (m_settings->GetNumSetting("GuiWidth") > 0)
+        m_width = m_settings->GetNumSetting("GuiWidth");
+    if (m_settings->GetNumSetting("GuiHeight") > 0)
+        m_height = m_settings->GetNumSetting("GuiHeight");
+
+    m_wmult = m_width / 800.0;
+    m_hmult = m_height / 600.0;
 }
 
 MythContext::~MythContext()
@@ -64,16 +77,11 @@ void MythContext::LoadQtConfig(void)
 void MythContext::GetScreenSettings(int &width, float &wmult, 
                                     int &height, float &hmult)
 {
-    height = QApplication::desktop()->height();
-    width = QApplication::desktop()->width();
+    height = m_height;
+    width = m_width;
 
-    if (m_settings->GetNumSetting("GuiWidth") > 0)
-        width = m_settings->GetNumSetting("GuiWidth");
-    if (m_settings->GetNumSetting("GuiHeight") > 0)
-        height = m_settings->GetNumSetting("GuiHeight");
-
-    wmult = width / 800.0;
-    hmult = height / 600.0;
+    wmult = m_wmult;
+    hmult = m_hmult;
 }
 
 QString MythContext::FindThemeDir(QString themename)
@@ -129,12 +137,6 @@ int MythContext::GetNumSetting(const QString &key)
 
 void MythContext::SetPalette(QWidget *widget)
 {
-    QColor bgcolor = QColor(m_settings->GetSetting("BackgroundColor"));
-    QColor fgcolor = QColor(m_settings->GetSetting("ForegroundColor"));
-
-    //widget->setPaletteBackgroundColor(bgcolor);
-    //widget->setPaletteForegroundColor(fgcolor);
-
     QPalette pal = widget->palette();
 
     QColorGroup active = pal.active();
@@ -176,15 +178,24 @@ void MythContext::SetPalette(QWidget *widget)
     widget->setPalette(pal);
 }
 
-void MythContext::ThemeWidget(QWidget *widget, int screenwidth, 
-                              int screenheight, float wmult, float hmult)
+void MythContext::ThemeWidget(QWidget *widget)
 {
     bool usetheme = m_settings->GetNumSetting("ThemeQt");
     QColor bgcolor, fgcolor;
 
     if (usetheme)
     {
+        if (m_themeloaded)
+        {
+            widget->setPalette(m_palette);
+            if (m_backgroundimage.width() > 0)
+                widget->setPaletteBackgroundPixmap(m_backgroundimage);
+            return;
+        }
+
         SetPalette(widget);
+
+        m_palette = widget->palette();
 
         QPixmap *bgpixmap = NULL;
 
@@ -193,30 +204,33 @@ void MythContext::ThemeWidget(QWidget *widget, int screenwidth,
             QString pmapname = m_settings->GetSetting("ThemePathName") +
                                m_settings->GetSetting("BackgroundPixmap");
 
-            bgpixmap = LoadScalePixmap(pmapname, screenwidth, screenheight,
-                                       wmult, hmult);
-
+            bgpixmap = LoadScalePixmap(pmapname);
             if (bgpixmap)
+            {
                 widget->setPaletteBackgroundPixmap(*bgpixmap);
+                m_backgroundimage = *bgpixmap;
+            }
         }
         else if (m_settings->GetSetting("TiledBackgroundPixmap") != "")
         {
             QString pmapname = m_settings->GetSetting("ThemePathName") +
                                m_settings->GetSetting("TiledBackgroundPixmap");
 
-            bgpixmap = LoadScalePixmap(pmapname, screenwidth, screenheight,
-                                       wmult, hmult);
-
+            bgpixmap = LoadScalePixmap(pmapname);
             if (bgpixmap)
             {
-                QPixmap background(screenwidth, screenheight);
+                QPixmap background(m_width, m_height);
                 QPainter tmp(&background);
 
-                tmp.drawTiledPixmap(0, 0, screenwidth, screenheight, *bgpixmap);
+                tmp.drawTiledPixmap(0, 0, m_width, m_height, *bgpixmap);
                 tmp.end();
+
+                m_backgroundimage = background;
                 widget->setPaletteBackgroundPixmap(background);
             }
         }
+
+        m_themeloaded = true;
 
         if (bgpixmap)
             delete bgpixmap;
@@ -229,13 +243,11 @@ void MythContext::ThemeWidget(QWidget *widget, int screenwidth,
     }
 }
 
-QPixmap *MythContext::LoadScalePixmap(QString filename, int screenwidth, 
-                                      int screenheight, float wmult, 
-                                      float hmult)
+QPixmap *MythContext::LoadScalePixmap(QString filename) 
 {               
     QPixmap *ret = new QPixmap();
 
-    if (screenwidth != 800 || screenheight != 600)
+    if (m_width != 800 || m_height != 600)
     {           
         QImage tmpimage;
 
@@ -245,8 +257,8 @@ QPixmap *MythContext::LoadScalePixmap(QString filename, int screenwidth,
             delete ret;
             return NULL;
         }
-        QImage tmp2 = tmpimage.smoothScale((int)(tmpimage.width() * wmult),
-                                           (int)(tmpimage.height() * hmult));
+        QImage tmp2 = tmpimage.smoothScale((int)(tmpimage.width() * m_wmult),
+                                           (int)(tmpimage.height() * m_hmult));
         ret->convertFromImage(tmp2);
     }       
     else

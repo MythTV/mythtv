@@ -39,7 +39,7 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel,
     showtitle = m_settings->GetNumSetting("EPGShowTitle");
     showIcon = m_settings->GetNumSetting("EPGShowChannelIcon");
 
-    m_context->ThemeWidget(this, screenwidth, screenheight, wmult, hmult);
+    m_context->ThemeWidget(this);
 
     bgcolor = paletteBackgroundColor();
     fgcolor = paletteForegroundColor();

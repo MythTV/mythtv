@@ -2,6 +2,8 @@
 #define MYTHCONTEXT_H_
 
 #include <qstring.h>
+#include <qpixmap.h>
+#include <qpalette.h>
 
 class Settings;
 class QSqlDatabase;
@@ -35,11 +37,9 @@ class MythContext
     int GetMediumFontSize() { return qtfontmed; }
     int GetSmallFontSize() { return qtfontsmall; }
 
-    void ThemeWidget(QWidget *widget, int screenwidth, int screenheight,
-                     float wmult, float hmult);
+    void ThemeWidget(QWidget *widget);
 
-    QPixmap *LoadScalePixmap(QString filename, int screenwidth, 
-                             int screenheight, float wmult, float hmult);
+    QPixmap *LoadScalePixmap(QString filename); 
 
   private:
     void SetPalette(QWidget *widget);
@@ -49,6 +49,13 @@ class MythContext
 
     Settings *m_settings;
     QString m_installprefix;
+
+    bool m_themeloaded;
+    QPixmap m_backgroundimage;
+    QPalette m_palette;
+
+    int m_height, m_width;
+    float m_wmult, m_hmult;
 };
 
 #endif

@@ -55,7 +55,7 @@ InfoDialog::InfoDialog(MythContext *context, ProgramInfo *pginfo,
     setFont(QFont("Arial", (int)(mediumfont * hmult), QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
-    m_context->ThemeWidget(this, screenwidth, screenheight, wmult, hmult);
+    m_context->ThemeWidget(this);
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
@@ -72,7 +72,7 @@ InfoDialog::InfoDialog(MythContext *context, ProgramInfo *pginfo,
     subtitlelabel->setBackgroundOrigin(WindowOrigin);
     QLabel *subtitlefield = new QLabel(pginfo->subtitle, this);
     subtitlefield->setBackgroundOrigin(WindowOrigin);
-    subtitlefield->setAlignment(Qt::WordBreak | Qt::AlignLeft | Qt::AlignTop);
+    subtitlefield->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     QLabel *descriptionlabel = new QLabel("Description:", this);
     descriptionlabel->setBackgroundOrigin(WindowOrigin);
     QLabel *descriptionfield = new QLabel(pginfo->description, this);
