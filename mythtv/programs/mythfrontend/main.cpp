@@ -1,6 +1,7 @@
 #include <qapplication.h>
 #include <qsqldatabase.h>
 #include <qfile.h>
+#include <qfileinfo.h>
 #include <qmap.h>
 #include <unistd.h>
 #include <qdir.h>
@@ -639,7 +640,9 @@ int main(int argc, char **argv)
 
     QString pluginname = "";
 
-    QString binname = basename(a.argv()[0]);
+    QFileInfo finfo(a.argv()[0]);
+
+    QString binname = finfo.baseName();
 
     if (binname != "mythfrontend")
         pluginname = binname;
@@ -888,6 +891,7 @@ int main(int argc, char **argv)
     qApp->lock();
     qApp->unlock();
 
+#ifndef _WIN32
     MediaMonitor *mon = NULL;
 
     if (gContext->GetNumSetting("MonitorDrives") == 1)
@@ -897,17 +901,20 @@ int main(int argc, char **argv)
         VERBOSE(VB_ALL, QString("Starting media monitor."));
         mon->startMonitoring();
     }
+#endif
 
     int exitstatus = RunMenu(themedir);
 
     if (exitstatus == HALT)
         haltnow();
 
+#ifndef _WIN32
     if (mon)
     {
         mon->stopMonitoring();
         delete mon;
     }
+#endif
 
     delete gContext;
     return exitstatus;

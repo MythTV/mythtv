@@ -124,8 +124,8 @@ int VideoOutputIvtv::GetRefreshRate(void)
 }
 
 bool VideoOutputIvtv::Init(int width, int height, float aspect, 
-                           unsigned int winid, int winx, int winy, int winw, 
-                           int winh, unsigned int embedid)
+                           WId winid, int winx, int winy, int winw, 
+                           int winh, WId embedid)
 {
     videoDevice = gContext->GetSetting("PVR350VideoDev");
 
@@ -249,8 +249,7 @@ void VideoOutputIvtv::Open(void)
         perror("VIDIOC_S_CTRL numbuffers");
 }
 
-void VideoOutputIvtv::EmbedInWidget(unsigned long wid, int x, int y, int w, 
-                                    int h)
+void VideoOutputIvtv::EmbedInWidget(WId wid, int x, int y, int w, int h)
 {
     if (embedding)
         return;

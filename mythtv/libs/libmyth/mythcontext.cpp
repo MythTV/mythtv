@@ -894,7 +894,7 @@ void MythContext::ThemeWidget(QWidget *widget)
     if (d->m_themeloaded)
     {
         widget->setPalette(d->m_palette);
-        if (d->m_backgroundimage->width() > 0)
+        if (d->m_backgroundimage && d->m_backgroundimage->width() > 0)
             widget->setPaletteBackgroundPixmap(*(d->m_backgroundimage));
         return;
     }

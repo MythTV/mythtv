@@ -672,10 +672,9 @@ MythDialog::~MythDialog()
 void MythDialog::setNoErase(void)
 {
     WFlags flags = getWFlags();
-#ifdef QWS
-    flags |= WNoAutoErase;
-#else
     flags |= WRepaintNoErase;
+#ifdef QWS
+    flags |= WResizeNoErase;
 #endif
     setWFlags(flags);
 }

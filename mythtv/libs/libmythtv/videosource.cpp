@@ -20,7 +20,10 @@
 #include <stdlib.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
+
+#ifndef _WIN32
 #include "videodev_myth.h"
+#endif
 
 QString VSSetting::whereClause(void) {
     return QString("sourceid = %1").arg(parent.getSourceID());
@@ -475,6 +478,7 @@ CardInputEditor::~CardInputEditor() {
 QStringList VideoDevice::probeInputs(QString device) {
     QStringList ret;
 
+#ifndef _WIN32
     int videofd = open(device.ascii(), O_RDWR);
     if (videofd < 0) {
         cerr << "Couldn't open " << device << " to probe its inputs.\n";
@@ -532,6 +536,11 @@ QStringList VideoDevice::probeInputs(QString device) {
         ret += "ERROR, No inputs found";
 
     close(videofd);
+
+#else
+    ret += "ERROR, V4L support unavailable on Windows";
+#endif
+
     return ret;
 }
 

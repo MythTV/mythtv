@@ -20,11 +20,14 @@ using namespace std;
 #include "programinfo.h"
 #include "recorderbase.h"
 #include "NuppelVideoRecorder.h"
-#include "mpegrecorder.h"
 #include "hdtvrecorder.h"
 #include "NuppelVideoPlayer.h"
 #include "channel.h"
 #include "commercial_skip.h"
+
+#ifdef USING_IVTV
+#include "mpegrecorder.h"
+#endif
 
 #ifdef USING_DVB
 #include "dvbchannel.h"
@@ -523,12 +526,16 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
 {
     if (cardtype == "MPEG")
     {
+#ifdef USING_IVTV
         nvr = new MpegRecorder();
         nvr->SetRingBuffer(rbuffer);
 
         nvr->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
 
         nvr->Initialize();
+#else
+        cerr << "Compiled without ivtv support\n";
+#endif
         return;
     }
     else if (cardtype == "HDTV")

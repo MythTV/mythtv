@@ -70,7 +70,7 @@ class TV : public QObject
                         QString &channelname, QString &chanid);
 
     // for the guidegrid to use
-    void EmbedOutput(unsigned long wid, int x, int y, int w, int h);
+    void EmbedOutput(WId wid, int x, int y, int w, int h);
     void StopEmbeddingOutput(void);
     void EPGChannelUpdate(QString chanstr);
    
@@ -246,7 +246,7 @@ class TV : public QObject
 
     VolumeControl *volumeControl;
 
-    unsigned int embedid;
+    WId embedid;
     int embx, emby, embw, embh;
 
     typedef QValueVector<QString> PrevChannelVector;

@@ -2284,7 +2284,7 @@ void TV::GetChannelInfo(RemoteEncoder *enc, QString &title, QString &subtitle,
                         callsign, iconpath, channelname, chanid);
 }
 
-void TV::EmbedOutput(unsigned long wid, int x, int y, int w, int h)
+void TV::EmbedOutput(WId wid, int x, int y, int w, int h)
 {
     embedid = wid;
     embx = x;

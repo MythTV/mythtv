@@ -12,22 +12,25 @@ VERSION = 0.14.0
 HEADERS += dialogbox.h lcddevice.h mythcontext.h mythwidgets.h oldsettings.h  
 HEADERS += remotefile.h settings.h themedmenu.h util.h mythwizard.h
 HEADERS += volumecontrol.h uitypes.h xmlparse.h mythplugin.h
-HEADERS += mythdialogs.h audiooutput.h audiooutputoss.h inetcomms.h
-HEADERS += httpcomms.h mythmedia.h mythcdrom.h mythmediamonitor.h
+HEADERS += mythdialogs.h audiooutput.h inetcomms.h httpcomms.h mythmedia.h 
 
 SOURCES += dialogbox.cpp lcddevice.cpp mythcontext.cpp mythwidgets.cpp 
 SOURCES += oldsettings.cpp remotefile.cpp settings.cpp themedmenu.cpp
 SOURCES += util.cpp mythwizard.cpp volumecontrol.h uitypes.cpp xmlparse.cpp
-SOURCES += mythplugin.cpp mythdialogs.cpp audiooutput.cpp audiooutputoss.cpp
-SOURCES += inetcomms.cpp httpcomms.cpp mythmedia.cpp mythcdrom.cpp 
-SOURCES += mythmediamonitor.cpp
+SOURCES += mythplugin.cpp mythdialogs.cpp audiooutput.cpp inetcomms.cpp 
+SOURCES += httpcomms.cpp mythmedia.cpp 
 
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = dialogbox.h lcddevice.h themedmenu.h mythcontext.h 
 inc.files += mythwidgets.h remotefile.h util.h oldsettings.h volumecontrol.h
 inc.files += settings.h uitypes.h xmlparse.h mythplugin.h mythdialogs.h
-inc.files += audiooutput.h inetcomms.h httpcomms.h mythmedia.h mythcdrom.h 
-inc.files += mythmediamonitor.h mythwizard.h
+inc.files += audiooutput.h inetcomms.h httpcomms.h mythmedia.h mythwizard.h
+
+!win32 {
+    SOURCES += audiooutputoss.cpp mythcdrom.cpp mythmediamonitor.cpp
+    HEADERS += audiooutputoss.h mythcdrom.h mythmediamonitor.h
+    inc.files += mythcdrom.h mythmediamonitor.h
+}
 
 INSTALLS += inc
 
@@ -51,3 +54,9 @@ using_arts {
     SOURCES += audiooutputarts.cpp
     LIBS += $$ARTS_LIBS
 }
+
+using_directx {
+    HEADERS += audiooutputdx.h
+    SOURCES += audiooutputdx.cpp
+}
+

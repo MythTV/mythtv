@@ -286,6 +286,9 @@ void MpegRecorder::StartRecording(void)
     ivtvcodec.bitrate = bitrate * 1000;
     ivtvcodec.bitrate_peak = maxbitrate * 1000;
 
+    if (ivtvcodec.bitrate > ivtvcodec.bitrate_peak)
+        ivtvcodec.bitrate = ivtvcodec.bitrate_peak;
+
     // framerate (1 = 25fps, 0 = 30fps)
     ivtvcodec.framerate = (!ntsc);
     ivtvcodec.stream_type = streamtype;

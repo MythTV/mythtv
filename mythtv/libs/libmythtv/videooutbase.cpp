@@ -11,7 +11,9 @@
 #include "videoout_xv.h"
 #endif
 
+#ifdef USING_IVTV
 #include "videoout_ivtv.h"
+#endif
 
 #ifdef USING_XVMC
 #include "videoout_xvmc.h"
@@ -25,6 +27,10 @@
 #include "videoout_directfb.h"
 #endif
 
+#ifdef USING_DIRECTX
+#include "videoout_dx.h"
+#endif
+
 #include "dithertable.h"
 
 #include "../libavcodec/avcodec.h"
@@ -33,8 +39,10 @@ VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type)
 {
     (void)type;
 
+#ifdef USING_IVTV
     if (type == kVideoOutput_IVTV)
         return new VideoOutputIvtv();
+#endif
 
 #ifdef USING_XVMC
     if (type == kVideoOutput_XvMC)
@@ -48,6 +56,10 @@ VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type)
 
 #ifdef USING_DIRECTFB
     return new VideoOutputDirectfb();
+#endif
+
+#ifdef USING_DIRECTX
+    return new VideoOutputDX();
 #endif
 
 #ifdef USING_XV
@@ -102,9 +114,8 @@ VideoOutput::~VideoOutput()
         delete [] vbuffers;
 }
 
-bool VideoOutput::Init(int width, int height, float aspect, unsigned int winid,
-                       int winx, int winy, int winw, int winh, 
-                       unsigned int embedid)
+bool VideoOutput::Init(int width, int height, float aspect, WId winid,
+                       int winx, int winy, int winw, int winh, WId embedid)
 {
     (void)winid;
     (void)embedid;
@@ -188,7 +199,7 @@ void VideoOutput::InputChanged(int width, int height, float aspect)
     video_buflock.unlock();
 }
 
-void VideoOutput::EmbedInWidget(unsigned long wid, int x, int y, int w, int h)
+void VideoOutput::EmbedInWidget(WId wid, int x, int y, int w, int h)
 {
     (void)wid;
 

@@ -141,8 +141,8 @@ int VideoOutputVIA::GetRefreshRate(void)
 }
 
 bool VideoOutputVIA::Init(int width, int height, float aspect,
-                          unsigned int winid, int winx, int winy, int winw, 
-                          int winh, unsigned int embedid)
+                          WId winid, int winx, int winy, int winw, 
+                          int winh, WId embedid)
 {
     int w_mm, h_mm;
     bool usingXinerama;

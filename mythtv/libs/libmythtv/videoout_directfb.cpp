@@ -233,8 +233,8 @@ int VideoOutputDirectfb::GetRefreshRate(void)
     return 60;
 }
 
-bool VideoOutputDirectfb::Init(int width, int height, float aspect, unsigned int winid,
-              int winx, int winy, int winw, int winh, unsigned int embedid)
+bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
+              int winx, int winy, int winw, int winh, WId embedid)
 {
     DFBResult ret;
     DFBSurfaceDescription desc;

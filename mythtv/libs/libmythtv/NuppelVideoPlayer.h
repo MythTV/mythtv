@@ -5,6 +5,7 @@
 #include <qmutex.h>
 #include <qwaitcondition.h>
 #include <qptrqueue.h>
+#include <sys/time.h>
 
 #include "RingBuffer.h"
 #include "osd.h"
@@ -134,7 +135,7 @@ class NuppelVideoPlayer
     bool DoKeypress(QKeyEvent *e);
     bool GetEditMode(void) { return editmode; }
 
-    void EmbedInWidget(unsigned long wid, int x, int y, int w, int h);
+    void EmbedInWidget(WId wid, int x, int y, int w, int h);
     void StopEmbedding(void);
 
     // decoder stuff..
@@ -361,7 +362,7 @@ class NuppelVideoPlayer
     bool hascommbreaktable;
     bool hasFullPositionMap;
 
-    unsigned int embedid;
+    WId embedid;
     int embx, emby, embw, embh;
 
     QSqlDatabase *m_db;

@@ -1,6 +1,9 @@
 #include "volumecontrol.h"
 
+#ifndef _WIN32
 #include <linux/soundcard.h>
+#endif
+
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <cstdio>
@@ -13,6 +16,10 @@ using namespace std;
 
 VolumeControl::VolumeControl(bool setstartingvolume)
 {
+    mixerfd = 0;
+    volume = 0;
+
+#ifndef _WIN32
     mute = false;
   
     QString device = gContext->GetSetting("MixerDevice", "/dev/mixer");
@@ -53,6 +60,7 @@ VolumeControl::VolumeControl(bool setstartingvolume)
     }
 
     internal_volume = GetCurrentVolume();
+#endif
 }
 
 VolumeControl::~VolumeControl()
@@ -63,6 +71,7 @@ VolumeControl::~VolumeControl()
 
 int VolumeControl::GetCurrentVolume(void)
 {
+#ifndef _WIN32
     int realvol;
     
     if(mute)
@@ -79,12 +88,14 @@ int VolumeControl::GetCurrentVolume(void)
         volume = realvol & 0xff; // just use the left channel
         internal_volume = volume;
     }
-    
+#endif    
+
     return volume;
 }
 
 void VolumeControl::SetCurrentVolume(int value)
 {
+#ifndef _WIN32
     volume = value;
 
     if (volume > 100)
@@ -109,6 +120,7 @@ void VolumeControl::SetCurrentVolume(int value)
     QString controlLabel = gContext->GetSetting("MixerControl", "PCM");
     controlLabel += "MixerVolume";
     gContext->SaveSetting(controlLabel, volume);
+#endif
 }
 
 void VolumeControl::AdjustCurrentVolume(int change)
@@ -120,6 +132,7 @@ void VolumeControl::AdjustCurrentVolume(int change)
 
 void VolumeControl::SetMute(bool on)
 {
+#ifndef _WIN32
     int realvol;
 
     if (on)
@@ -138,6 +151,7 @@ void VolumeControl::SetMute(bool on)
     }
 
     mute = on;
+#endif
 }
 
 void VolumeControl::ToggleMute(void)

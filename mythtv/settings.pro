@@ -24,6 +24,10 @@ EXTRA_LIBS = -lfreetype -lmp3lame
 CONFIG += using_xv
 EXTRA_LIBS += -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm
 
+# IVTV output (PVR-350) support.  No need to disable unless building on windows
+CONFIG += using_ivtv
+DEFINES += USING_IVTV
+
 # LCDProc support
 #DEFINES += LCD_DEVICE
 
@@ -62,4 +66,12 @@ EXTRA_LIBS += -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm
 #CONFIG += using_directfb
 #EXTRA_LIBS += `directfb-config --libs`
 #QMAKE_CXXFLAGS += `directfb-config --cflags`
+
+# Windows support
+#CONFIG += win32
+#DEFINES += _WIN32
+
+# DirectX support
+#CONFIG += using_directx
+#DEFINES += USING_DIRECTX
 

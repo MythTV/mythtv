@@ -26,6 +26,10 @@ using namespace std;
 #define O_STREAMING 0
 #endif
 
+#ifndef O_LARGEFILE
+#define O_LARGEFILE 0
+#endif
+
 class ThreadedFileWriter
 {
 public:
@@ -186,7 +190,12 @@ long long ThreadedFileWriter::Seek(long long pos, int whence)
 
 void ThreadedFileWriter::Sync(void)
 {
+#ifdef _WIN32
+    // Cynwin doesn't have a fdatasync
+    fsync(fd);
+#else
     fdatasync(fd);
+#endif
 }
 
 void ThreadedFileWriter::DiskLoop()

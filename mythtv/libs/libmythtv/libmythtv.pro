@@ -11,6 +11,12 @@ VERSION = 0.14.0
 INCLUDEPATH += ../libmyth ../ dvbdev/ ../libavcodec
 DEPENDPATH += ../libmyth ../libavcodec ../libavformat
 
+# Win32 needs to resolve all import symbols when linking DLLs
+win32 {
+    LIBS += -L ../libmyth -L ../libavcodec -L ../libavformat
+    LIBS += -lmyth-$${LIBVERSION} -lmythavcodec-$${LIBVERSION} -lmythavformat-$${LIBVERSION} $$EXTRA_LIBS
+}
+
 TARGETDEPS += ../libmyth/libmyth-$${LIBVERSION}.so
 TARGETDEPS += ../libavcodec/libmythavcodec-$${LIBVERSION}.so
 TARGETDEPS += ../libavformat/libmythavformat-$${LIBVERSION}.so
@@ -23,43 +29,50 @@ QMAKE_CXXFLAGS_DEBUG += `freetype-config --cflags`
 
 # old libvbitext
 
-HEADERS += vbitext/cc.h vbitext/dllist.h vbitext/hamm.h vbitext/lang.h 
-HEADERS += vbitext/vbi.h vbitext/vt.h
-SOURCES += vbitext/cc.cpp vbitext/vbi.c vbitext/hamm.c vbitext/lang.c
-
+!win32 {
+    HEADERS += vbitext/cc.h vbitext/dllist.h vbitext/hamm.h vbitext/lang.h 
+    HEADERS += vbitext/vbi.h vbitext/vt.h
+    SOURCES += vbitext/cc.cpp vbitext/vbi.c vbitext/hamm.c vbitext/lang.c
+}
 
 # libmythtv proper
 
-HEADERS += channel.h commercial_skip.h filter.h format.h frame.h frequencies.h 
+HEADERS += commercial_skip.h filter.h format.h frame.h frequencies.h 
 HEADERS += guidegrid.h infodialog.h infostructs.h jitterometer.h lzoconf.h 
 HEADERS += minilzo.h mmx.h NuppelVideoPlayer.h NuppelVideoRecorder.h osd.h 
 HEADERS += osdtypes.h programinfo.h profilegroup.h recordingprofile.h 
 HEADERS += remoteencoder.h remoteutil.h RingBuffer.h scheduledrecording.h 
 HEADERS += RTjpegN.h ttfont.h tv_play.h tv_rec.h videosource.h yuv2rgb.h
 HEADERS += progfind.h decoderbase.h nuppeldecoder.h avformatdecoder.h
-HEADERS += recorderbase.h mpegrecorder.h channelbase.h
-HEADERS += vsync.h proglist.h hdtvrecorder.h fifowriter.h filtermanager.h
-HEADERS += videooutbase.h videoout_null.h xbox.h
-HEADERS += ivtvdecoder.h videoout_ivtv.h dbcheck.h udpnotify.h
-HEADERS += channeleditor.h channelsettings.h
+HEADERS += recorderbase.h channelbase.h vsync.h proglist.h hdtvrecorder.h 
+HEADERS += fifowriter.h filtermanager.h videooutbase.h videoout_null.h xbox.h
+HEADERS += dbcheck.h udpnotify.h channeleditor.h channelsettings.h
 
-SOURCES += channel.cpp commercial_skip.cpp frequencies.c guidegrid.cpp
-SOURCES += infodialog.cpp infostructs.cpp jitterometer.cpp minilzo.cpp 
-SOURCES += NuppelVideoPlayer.cpp NuppelVideoRecorder.cpp osd.cpp
-SOURCES += osdtypes.cpp programinfo.cpp recordingprofile.cpp remoteencoder.cpp
-SOURCES += remoteutil.cpp RingBuffer.cpp RTjpegN.cpp scheduledrecording.cpp
-SOURCES += ttfont.cpp tv_play.cpp tv_rec.cpp videosource.cpp yuv2rgb.cpp
-SOURCES += progfind.cpp nuppeldecoder.cpp avformatdecoder.cpp recorderbase.cpp
-SOURCES += mpegrecorder.cpp channelbase.cpp filtermanager.cpp
-SOURCES += vsync.c proglist.cpp hdtvrecorder.cpp videooutbase.cpp 
-SOURCES += fifowriter.cpp videoout_null.cpp xbox.cpp
-SOURCES += ivtvdecoder.cpp videoout_ivtv.cpp dbcheck.cpp profilegroup.cpp
+SOURCES += commercial_skip.cpp frequencies.c guidegrid.cpp infodialog.cpp 
+SOURCES += infostructs.cpp jitterometer.cpp minilzo.cpp NuppelVideoPlayer.cpp 
+SOURCES += osd.cpp osdtypes.cpp programinfo.cpp recordingprofile.cpp 
+SOURCES += remoteencoder.cpp remoteutil.cpp RingBuffer.cpp RTjpegN.cpp 
+SOURCES += scheduledrecording.cpp ttfont.cpp tv_play.cpp videosource.cpp 
+SOURCES += yuv2rgb.cpp progfind.cpp nuppeldecoder.cpp avformatdecoder.cpp 
+SOURCES += recorderbase.cpp filtermanager.cpp proglist.cpp videooutbase.cpp 
+SOURCES += videoout_null.cpp xbox.cpp dbcheck.cpp profilegroup.cpp
 SOURCES += udpnotify.cpp channeleditor.cpp channelsettings.cpp
+
+!win32 {
+    HEADERS += channel.h
+    SOURCES += channel.cpp NuppelVideoRecorder.cpp tv_rec.cpp channelbase.cpp
+    SOURCES += vsync.c hdtvrecorder.cpp fifowriter.cpp
+}
 
 using_xv {
     SOURCES += videoout_xv.cpp
     HEADERS += videoout_xv.h
     DEFINES += USING_XV
+}
+
+using_ivtv {
+    SOURCES += mpegrecorder.cpp ivtvdecoder.cpp videoout_ivtv.cpp
+    HEADERS += mpegrecorder.h ivtvdecoder.h videoout_ivtv.h
 }
 
 using_xvmc {
@@ -88,5 +101,10 @@ using_directfb {
     SOURCES += videoout_directfb.cpp
     HEADERS += videoout_directfb.h
     DEFINES += USING_DIRECTFB
+}
+
+using_directx {
+    SOURCES += videoout_dx.cpp
+    HEADERS += videoout_dx.h
 }
 

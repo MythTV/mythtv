@@ -160,8 +160,8 @@ int VideoOutputXvMC::GetRefreshRate(void)
 }
 
 bool VideoOutputXvMC::Init(int width, int height, float aspect,
-                           unsigned int winid, int winx, int winy, int winw, 
-                           int winh, unsigned int embedid)
+                           WId winid, int winx, int winy, int winw, 
+                           int winh, WId embedid)
 {
     pthread_mutex_init(&lock, NULL);
 
@@ -623,8 +623,7 @@ void VideoOutputXvMC::DeleteXvMCBuffers()
     XvMCDestroyContext(data->XJ_disp, &data->ctx);
 }
 
-void VideoOutputXvMC::EmbedInWidget(unsigned long wid, int x, int y, int w, 
-                                    int h)
+void VideoOutputXvMC::EmbedInWidget(WId wid, int x, int y, int w, int h)
 {
     if (embedding)
         return;

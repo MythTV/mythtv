@@ -6,6 +6,7 @@ extern "C" {
 #include "filter.h"
 }
 
+#include <qframe.h>
 #include <qmutex.h>
 #include <qmap.h>
 #include <qptrqueue.h>
@@ -60,8 +61,8 @@ class VideoOutput
                      int needprebuffer);
 
     virtual bool Init(int width, int height, float aspect,
-                      unsigned int winid, int winx, int winy, int winw, 
-                      int winh, unsigned int embedid = 0);
+                      WId winid, int winx, int winy, int winw, 
+                      int winh, WId embedid = 0);
 
     virtual void PrepareFrame(VideoFrame *buffer) = 0;
     virtual void Show(void) = 0;
@@ -69,7 +70,7 @@ class VideoOutput
     virtual void InputChanged(int width, int height, float aspect);
     virtual void AspectChanged(float aspect);
 
-    virtual void EmbedInWidget(unsigned long wid, int x, int y, int w, int h);
+    virtual void EmbedInWidget(WId wid, int x, int y, int w, int h);
     virtual void StopEmbedding(void);
 
     virtual void MoveResize(void);

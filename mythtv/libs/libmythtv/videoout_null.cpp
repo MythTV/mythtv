@@ -58,8 +58,8 @@ int VideoOutputNull::GetRefreshRate(void)
 }
 
 bool VideoOutputNull::Init(int width, int height, float aspect,
-                           unsigned int winid, int winx, int winy, int winw, 
-                           int winh, unsigned int embedid)
+                           WId winid, int winx, int winy, int winw, 
+                           int winh, WId embedid)
 {
     VideoOutput::InitBuffers(kNumBuffers, true, kNeedFreeFrames, 
                              kPrebufferFrames, kKeepPrebuffer);
@@ -120,8 +120,7 @@ void VideoOutputNull::DeleteNullBuffers()
     }
 }
 
-void VideoOutputNull::EmbedInWidget(unsigned long wid, int x, int y, int w, 
-                                    int h)
+void VideoOutputNull::EmbedInWidget(WId wid, int x, int y, int w, int h)
 {
     if (embedding)
         return;

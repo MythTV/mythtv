@@ -11,15 +11,15 @@ class VideoOutputXvMC : public VideoOutput
     VideoOutputXvMC();
    ~VideoOutputXvMC();
 
-    bool Init(int width, int height, float aspect, unsigned int winid,
-              int winx, int winy, int winw, int winh, unsigned int embedid = 0);
+    bool Init(int width, int height, float aspect, WId winid,
+              int winx, int winy, int winw, int winh, WId embedid = 0);
     void PrepareFrame(VideoFrame *buffer);
     void Show(void);
 
     void InputChanged(int width, int height, float aspect);
     void AspectChanged(float aspect);
 
-    void EmbedInWidget(unsigned long wid, int x, int y, int w, int h);
+    void EmbedInWidget(WId wid, int x, int y, int w, int h);
     void StopEmbedding(void);
 
     int GetRefreshRate(void);

@@ -11,7 +11,10 @@
 #include <qsqldatabase.h>
 #include <qmap.h>
 
+#ifdef __linux__
 #include <linux/rtc.h>
+#endif
+
 #include <sys/ioctl.h>
 
 #include <iostream>
@@ -31,7 +34,6 @@ using namespace std;
 #include "decoderbase.h"
 #include "nuppeldecoder.h"
 #include "avformatdecoder.h"
-#include "ivtvdecoder.h"
 
 extern "C" {
 #include "vbitext/vbi.h"
@@ -41,7 +43,17 @@ extern "C" {
 #include "remoteencoder.h"
 
 #include "videoout_null.h"
+
+#ifdef USING_IVTV
 #include "videoout_ivtv.h"
+#include "ivtvdecoder.h"
+#endif
+
+#ifdef USING_DIRECTX
+#include "videoout_dx.h"
+#undef GetFreeSpace
+#undef GetFileSize
+#endif
 
 NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
                                      ProgramInfo *info)
@@ -268,6 +280,11 @@ bool NuppelVideoPlayer::Play(float speed, bool normal, bool unpauseaudio)
     if (audioOutput && unpauseaudio)
         audioOutput->Pause(false);
 
+#ifdef USING_DIRECTX
+    if (audioOutput && !normal_speed)
+        audioOutput->Reset();
+#endif
+
     if (ringBuffer)
         ringBuffer->Unpause();
 
@@ -464,12 +481,14 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
     if (NuppelDecoder::CanHandle(testbuf))
         decoder = new NuppelDecoder(this, m_db, m_playbackinfo);
+#ifdef USING_IVTV
     else if (!disablevideo && IvtvDecoder::CanHandle(testbuf,
                                                      ringBuffer->GetFilename()))
     {
         decoder = new IvtvDecoder(this, m_db, m_playbackinfo);
         disableaudio = true; // no audio with ivtv.
     }
+#endif
     else if (AvFormatDecoder::CanHandle(testbuf, ringBuffer->GetFilename()))
         decoder = new AvFormatDecoder(this, m_db, m_playbackinfo);
 
@@ -611,11 +630,13 @@ void NuppelVideoPlayer::AddTextData(char *buffer, int len,
 
 void NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
 {
+#ifdef USING_IVTV
     if (forceVideoOutput == kVideoOutput_IVTV)
     {
         decoder->GetFrame(onlyvideo);
         return;
     }
+#endif
 
     while (!videoOutput->EnoughFreeFrames() && !unsafe)
     {
@@ -726,8 +747,7 @@ void NuppelVideoPlayer::ReleaseCurrentFrame(VideoFrame *frame)
         vidExitLock.unlock();
 }
 
-void NuppelVideoPlayer::EmbedInWidget(unsigned long wid, int x, int y, int w, 
-                                      int h)
+void NuppelVideoPlayer::EmbedInWidget(WId wid, int x, int y, int w, int h)
 {
     if (videoOutput)
     {
@@ -1004,6 +1024,7 @@ void NuppelVideoPlayer::InitVTAVSync(void)
             vsynctol = refreshrate / 4; 
             // How far out can the vsync be for us to use it?
         } 
+#ifdef __linux__
         else 
         {
             rtcfd = open("/dev/rtc", O_RDONLY);
@@ -1023,6 +1044,7 @@ void NuppelVideoPlayer::InitVTAVSync(void)
                 }
             }
         }
+#endif
 
         nice(-19);
 
@@ -1079,8 +1101,10 @@ void NuppelVideoPlayer::VTAVSync(void)
 
             if (hasvsync) 
                 vsync_wait_for_retrace();
+#ifdef __linux__
             else 
                 read(rtcfd,&rtcdata,sizeof(rtcdata));
+#endif
 
             delay = UpdateDelay(&nexttrigger);
             while (delay > vsynctol) 
@@ -1161,11 +1185,13 @@ void NuppelVideoPlayer::ShutdownVTAVSync(void)
     }
     warpbuffsize = 0;
 
+#ifdef __linux__
     if (rtcfd >= 0)
     {
         close(rtcfd);
         rtcfd = -1;
     }
+#endif
 }
 
 void NuppelVideoPlayer::InitExAVSync(void)
@@ -1587,6 +1613,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         ShutdownExAVSync();
 }
 
+#ifdef USING_IVTV
 void NuppelVideoPlayer::IvtvVideoLoop(void)
 {
     refreshrate = frame_interval;
@@ -1625,14 +1652,17 @@ void NuppelVideoPlayer::IvtvVideoLoop(void)
     delete videoOutput;
     videoOutput = NULL;
 }
+#endif
 
 void *NuppelVideoPlayer::kickoffOutputVideoLoop(void *player)
 {
     NuppelVideoPlayer *nvp = (NuppelVideoPlayer *)player;
 
+#ifdef USING_IVTV
     if (nvp->forceVideoOutput == kVideoOutput_IVTV)
         nvp->IvtvVideoLoop();
     else
+#endif
         nvp->OutputVideoLoop();
     return NULL;
 }
@@ -1756,11 +1786,13 @@ void NuppelVideoPlayer::StartPlaying(void)
         { 
             if (!previously_paused)
             {
+#ifdef USING_IVTV
                 if (forceVideoOutput == kVideoOutput_IVTV)
                 {
                     VideoOutputIvtv *vidout = (VideoOutputIvtv *)videoOutput;
                     vidout->Pause();
                 }
+#endif
                 decoder->UpdateFramesPlayed();
                 previously_paused = true;
             }
@@ -1814,11 +1846,13 @@ void NuppelVideoPlayer::StartPlaying(void)
 
         if (previously_paused)
         {
+#ifdef USING_IVTV
             if (forceVideoOutput == kVideoOutput_IVTV)
             {
                 VideoOutputIvtv *vidout = (VideoOutputIvtv *)videoOutput;
                 vidout->Play(play_speed, normal_speed);
             }
+#endif
             previously_paused = false;
         }
 

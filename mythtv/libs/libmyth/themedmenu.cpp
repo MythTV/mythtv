@@ -1619,11 +1619,11 @@ void ThemedMenuPrivate::paintButton(unsigned int button, QPainter *p,
     if (testBound.height() > buttonTextRect.height() && tbutton->altText != "")
         message = buttonList[button].altText;
 
-#ifndef QWS
+#if !defined(QWS) || defined(_WIN32)
     if (attributes.hasshadow && attributes.shadowalpha > 0)
     {
         QPixmap textpix(buttonTextRect.size());
-        textpix.fill(QColor(QWidget::color0));
+        textpix.fill(QColor(attributes.shadowColor));
         textpix.setMask(textpix.createHeuristicMask());
 
         QRect myrect = buttonTextRect;
