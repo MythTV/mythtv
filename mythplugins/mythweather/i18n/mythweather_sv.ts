@@ -480,16 +480,8 @@
         <translation>Nordost</translation>
     </message>
     <message>
-        <source>NEE</source>
-        <translation type="obsolete">ÖNÖ</translation>
-    </message>
-    <message>
         <source>E</source>
         <translation>Öst</translation>
-    </message>
-    <message>
-        <source>SEE</source>
-        <translation type="obsolete">ÖSÖ</translation>
     </message>
     <message>
         <source>SE</source>
@@ -512,16 +504,8 @@
         <translation>Sydväst</translation>
     </message>
     <message>
-        <source>SWW</source>
-        <translation type="obsolete">VSV</translation>
-    </message>
-    <message>
         <source>W</source>
         <translation>Väst</translation>
-    </message>
-    <message>
-        <source>NWW</source>
-        <translation type="obsolete">VNV</translation>
     </message>
     <message>
         <source>NW</source>
@@ -880,6 +864,14 @@
     <message>
         <source>*** Invalid Area ID or Server Error ***</source>
         <translation>*** Ogiltigt plats-ID eller serverfel ***</translation>
+    </message>
+    <message>
+        <source>doppler radar</source>
+        <translation>dopplerradar</translation>
+    </message>
+    <message>
+        <source>satellite image</source>
+        <translation>satellitbild</translation>
     </message>
 </context>
 </TS>
