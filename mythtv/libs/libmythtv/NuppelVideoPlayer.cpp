@@ -2299,7 +2299,42 @@ void NuppelVideoPlayer::DoPlay(void)
     if (osd && forceVideoOutput != kVideoOutput_IVTV)
         osd->SetFrameInterval(frame_interval);
     if (videosync != NULL)
-        videosync->SetFrameInterval(frame_interval, m_double_framerate);
+    {
+        // We have to do the deinterlacer setup again in case we've
+        // changed to or from synchronous playback speed.
+        videofiltersLock.lock();
+        m_double_framerate = false;
+        if (!normal_speed || play_speed < 0.99 || play_speed > 1.01)
+        {
+            m_scan = kScan_Ignore;
+            if (videosync != NULL)
+                videosync->SetFrameInterval(frame_interval, false);
+        }
+        else
+            m_scan = detectInterlace(kScan_Detect, m_scan, video_frame_rate,
+                                 video_height);
+        if (videoOutput)
+            videoOutput->SetupDeinterlace(false);
+        if (m_scan == kScan_Interlaced && m_DeintSetting) {
+            if (videoOutput && videoOutput->SetupDeinterlace(true)) {
+                if (videoOutput->NeedsDoubleFramerate())
+                    m_double_framerate = true;
+            }
+        }
+        // Make sure video sync can do it
+        if (videosync != NULL && m_double_framerate)
+        {
+            // We have to do all this work again
+            videosync->SetFrameInterval(frame_interval, m_double_framerate);
+            if (!videosync->isInterlaced()) {
+                m_scan = kScan_Ignore;
+                m_double_framerate = false;
+                if (videoOutput)
+                    videoOutput->SetupDeinterlace(false);
+            }
+        }
+        videofiltersLock.unlock();
+    }
 
 #ifdef USING_IVTV
     if (forceVideoOutput == kVideoOutput_IVTV)
