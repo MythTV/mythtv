@@ -22,15 +22,17 @@ protected:
     const VideoSource& parent;
 };
 
-class VideoSource: public VerticalConfigurationGroup {
+class VideoSource: public VerticalConfigurationGroup, public ConfigurationDialog {
 public:
-    VideoSource() {
+    VideoSource(MythContext* context): ConfigurationDialog(context) {
         // must be first
         addChild(id = new ID());
         addChild(new Name(*this));
     };
         
     int getSourceID(void) const { return id->intValue(); };
+
+    void loadByID(QSqlDatabase* db, int id);
 
     static void fillSelections(QSqlDatabase* db, StringSelectSetting* setting);
 
@@ -123,9 +125,9 @@ public:
     };
 };
 
-class CaptureCard: public VerticalConfigurationGroup {
+class CaptureCard: public VerticalConfigurationGroup, public ConfigurationDialog {
 public:
-    CaptureCard() {
+    CaptureCard(MythContext* context): ConfigurationDialog(context) {
         setLabel("Capture card");
         // must be first
         addChild(id = new ID());
@@ -137,6 +139,8 @@ public:
     int getCardID(void) const {
         return id->intValue();
     };
+
+    void loadByID(QSqlDatabase* db, int id);
 
     static void fillSelections(QSqlDatabase* db, StringSelectSetting* setting);
 
@@ -239,9 +243,9 @@ public:
     };
 };
 
-class CardInput: public VerticalConfigurationGroup {
+class CardInput: public VerticalConfigurationGroup, public ConfigurationDialog {
 public:
-    CardInput() {
+    CardInput(MythContext* context): ConfigurationDialog(context) {
         setLabel("Associate input with source");
         addChild(id = new ID());
         addChild(selector = new VideoInputSelector(*this));
@@ -251,6 +255,8 @@ public:
     void fillSelections(QSqlDatabase* db);
 
     int getInputID(void) const { return id->intValue(); };
+
+    void loadByID(QSqlDatabase* db, int id);
 
 private:
     class ID: virtual public IntegerSetting,
@@ -274,31 +280,77 @@ private:
     QSqlDatabase* db;
 };
 
-class CaptureCardDialog: public ConfigurationDialog, public VerticalConfigurationGroup {
+class CaptureCardEditor: public ListBoxSetting, public ConfigurationDialog {
+    Q_OBJECT
 public:
-    CaptureCardDialog(MythContext *context) : ConfigurationDialog(context) {
-        CaptureCard* cc = new CaptureCard();
-        cc->setLabel("Configure new capture card");
-        addChild(cc);
+    CaptureCardEditor(MythContext* context, QSqlDatabase* _db):
+        ConfigurationDialog(context), db(_db) {};
+
+    virtual int exec(QSqlDatabase* db);
+    virtual void load(QSqlDatabase* db);
+    virtual void save(QSqlDatabase* db) { (void)db; };
+
+protected slots:
+    void open(int id) {
+        CaptureCard cc(m_context);
+
+        if (id != 0)
+            cc.loadByID(db,id);
+
+        cc.exec(db);
     };
+
+protected:
+    QSqlDatabase* db;
 };
 
-class VideoSourceDialog: public ConfigurationDialog, public VerticalConfigurationGroup {
+class VideoSourceEditor: public ListBoxSetting, public ConfigurationDialog {
+    Q_OBJECT
 public:
-    VideoSourceDialog(MythContext *context) : ConfigurationDialog(context) {
-        VideoSource* vs = new VideoSource();
-        vs->setLabel("Configure new video source");
-        addChild(vs);
+    VideoSourceEditor(MythContext* context, QSqlDatabase* _db):
+        ConfigurationDialog(context), db(_db) {};
+
+    virtual int exec(QSqlDatabase* db);
+    virtual void load(QSqlDatabase* db);
+    virtual void save(QSqlDatabase* db) { (void)db; };
+
+protected slots:
+    void open(int id) {
+        VideoSource vs(m_context);
+
+        if (id != 0)
+            vs.loadByID(db,id);
+
+        vs.exec(db);
     };
+
+protected:
+    QSqlDatabase* db;
 };
 
-class CardInputDialog: public ConfigurationDialog, public VerticalConfigurationGroup {
+class CardInputEditor: public ListBoxSetting, public ConfigurationDialog {
+    Q_OBJECT
 public:
-    CardInputDialog(MythContext *context) : ConfigurationDialog(context) {
-        CardInput* ci = new CardInput();
-        ci->setLabel("Configure capture card input");
-        addChild(ci);
+    CardInputEditor(MythContext* context, QSqlDatabase* _db):
+        ConfigurationDialog(context), db(_db) {};
+
+    virtual int exec(QSqlDatabase* db);
+    virtual void load(QSqlDatabase* db);
+    virtual void save(QSqlDatabase* db) { (void)db; };
+
+protected slots:
+    void open(int id) {
+        CardInput ci(m_context);
+
+        ci.fillSelections(db);
+        if (id != 0)
+            ci.loadByID(db,id);
+
+        ci.exec(db);
     };
+
+protected:
+    QSqlDatabase* db;
 };
 
 #endif

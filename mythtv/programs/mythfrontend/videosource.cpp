@@ -56,20 +56,35 @@ void VideoSource::fillSelections(QSqlDatabase* db,
                                   result.value(0).toString());
 }
 
+void VideoSource::loadByID(QSqlDatabase* db, int sourceid) {
+    id->setValue(sourceid);
+    load(db);
+}
+
 void CaptureCard::fillSelections(QSqlDatabase* db,
                                  StringSelectSetting* setting) {
-    QString query = QString("SELECT cardid, videodevice FROM capturecard");
+    QString query = QString("SELECT videodevice, cardid FROM capturecard");
     QSqlQuery result = db->exec(query);
 
     if (result.isActive() && result.numRowsAffected() > 0)
         while (result.next())
-            setting->addSelection(result.value(1).toString(),
-                                  result.value(0).toString());
+            setting->addSelection(result.value(0).toString(),
+                                  result.value(1).toString());
+}
+
+void CaptureCard::loadByID(QSqlDatabase* db, int cardid) {
+    id->setValue(cardid);
+    load(db);
 }
 
 void CardInput::fillSelections(QSqlDatabase* db) {
     selector->fillSelections(db);
     sourceid->fillSelections(db);
+}
+
+void CardInput::loadByID(QSqlDatabase* db, int inputid) {
+    id->setValue(inputid);
+    load(db);
 }
 
 int CISetting::getInputID(void) const {
@@ -115,4 +130,64 @@ void VideoInputSelector::probeInputs(const QString& videoDevice, QString cardID)
 
         name->addSelection(test.name);
     }
+}
+
+int CaptureCardEditor::exec(QSqlDatabase* db) {
+    if (ConfigurationDialog::exec(db) == QDialog::Accepted) {
+        open(getValue().toInt());
+        return QDialog::Accepted;
+    }
+
+    return QDialog::Rejected;
+}
+
+void CaptureCardEditor::load(QSqlDatabase* db) {
+    addSelection("(New capture card)", "0");
+    QSqlQuery query = db->exec("SELECT videodevice, cardid FROM capturecard");
+    if (query.isActive() && query.numRowsAffected() > 0)
+        while (query.next())
+            addSelection(query.value(0).toString(), query.value(1).toString());
+}
+
+int VideoSourceEditor::exec(QSqlDatabase* db) {
+    if (ConfigurationDialog::exec(db) == QDialog::Accepted) {
+        open(getValue().toInt());
+        return QDialog::Accepted;
+    }
+
+    return QDialog::Rejected;
+}
+
+void VideoSourceEditor::load(QSqlDatabase* db) {
+    addSelection("(New video source)", "0");
+    QSqlQuery query = db->exec("SELECT name, sourceid FROM videosource");
+    if (query.isActive() && query.numRowsAffected() > 0)
+        while (query.next())
+            addSelection(query.value(0).toString(), query.value(1).toString());
+
+}
+
+int CardInputEditor::exec(QSqlDatabase* db) {
+    if (ConfigurationDialog::exec(db) == QDialog::Accepted) {
+        open(getValue().toInt());
+        return QDialog::Accepted;
+    }
+
+    return QDialog::Rejected;
+}
+
+void CardInputEditor::load(QSqlDatabase* db) {
+    addSelection("(New input)", "0");
+    // XXX make this pretty
+    QSqlQuery query = db->exec("SELECT cardinput.cardinputid,videosource.name,capturecard.videodevice,cardinput.inputname
+FROM cardinput, capturecard, videosource
+WHERE cardinput.cardid = capturecard.cardid AND cardinput.sourceid = videosource.sourceid");
+    if (query.isActive() && query.numRowsAffected() > 0)
+        while (query.next())
+            addSelection(QString("%1 -> %2(%3)")
+                         .arg(query.value(1).toString())
+                         .arg(query.value(2).toString())
+                         .arg(query.value(3).toString()),
+                         query.value(0).toString());
+
 }
