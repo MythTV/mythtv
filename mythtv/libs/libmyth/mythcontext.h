@@ -68,6 +68,7 @@ class MythContext : public QObject
 
     QString GetHostName(void) { return m_localhostname; }
 
+    void ConnectToMasterServer(void);
     bool ConnectServer(const QString &hostname, int port);
 
     QString GetInstallPrefix() { return m_installprefix; }

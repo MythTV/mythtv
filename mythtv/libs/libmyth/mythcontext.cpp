@@ -88,8 +88,18 @@ MythContext::~MythContext()
     }
 }
 
+void MythContext::ConnectToMasterServer(void)
+{
+    QString server = gContext->GetSetting("MasterServerIP", "localhost");
+    int port = gContext->GetNumSetting("MasterServerPort", 6543);
+    ConnectServer(server, port);
+}
+
 bool MythContext::ConnectServer(const QString &hostname, int port)
 {
+    if (serverSock)
+        return true;
+
     serverSock = new QSocket();
 
     cout << "connecting to backend server: " << hostname << ":" << port << endl;
@@ -130,7 +140,7 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
 QString MythContext::GetMasterHostPrefix(void)
 {
     if (!serverSock)
-        return "";
+        ConnectToMasterServer();
 
     QString ret = QString("myth://%1:%2/").arg(serverSock->peerName())
                                           .arg(serverSock->peerPort());
@@ -694,6 +704,9 @@ void MythContext::SetSetting(const QString &key, const QString &newValue)
 
 void MythContext::SendReceiveStringList(QStringList &strlist)
 {
+    if (!serverSock)
+        ConnectToMasterServer();
+
     serverSockLock.lock();
     expectingReply = true;
 
