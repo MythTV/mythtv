@@ -61,30 +61,26 @@ Metadata& Metadata::operator=(Metadata *rhs)
     return *this;
 }
 
+QString Metadata::m_startdir = "";
+
+void Metadata::SetStartdir(const QString &dir)
+{
+    Metadata::m_startdir = dir;
+}
+
 void Metadata::persist(QSqlDatabase *db)
 {
+    QSqlQuery query(QString::null, db);
+    query.prepare("UPDATE musicmetadata set rating = :RATING , "
+                  "playcount = :PLAYCOUNT , lastplay = :LASTPLAY "
+                  "where intid = :ID ;");
+    query.bindValue(":RATING", rating);
+    query.bindValue(":PLAYCOUNT", playcount);
+    query.bindValue(":LASTPLAY", lastplay);
+    query.bindValue(":ID", id);
 
-    QString sqlfilename = filename;
-    sqlfilename.replace(QRegExp("\\\\"), QString("\\\\"));
-    sqlfilename.replace(QRegExp("\""), QString("\\\""));
-
-    QString thequery = QString("UPDATE musicmetadata set "
-                               "rating = %1 , "
-                               "playcount = %2 , "
-                               "lastplay = \"%3\" "
-                               "where intid = %4 ;")
-                               .arg(rating)
-                               .arg(playcount)
-                               .arg(lastplay, lastplay.length())
-                               .arg(id);
-
-    QSqlQuery query = db->exec(thequery);
-
-    if (query.numRowsAffected() < 1)
-    {
-        cerr << "metadata.o: Had a problem updating metadata. Couldn't find row in database" << endl;
-    }
-    
+    if (!query.exec() || query.numRowsAffected() < 1)
+        MythContext::DBError("music persist", query);
 }
 
 bool Metadata::isInDatabase(QSqlDatabase *db, QString startdir)
@@ -93,24 +89,21 @@ bool Metadata::isInDatabase(QSqlDatabase *db, QString startdir)
 
     QString sqlfilename = filename;
     sqlfilename = filename.remove(0, startdir.length());
-    sqlfilename.replace(QRegExp("\\\\"), QString("\\\\"));
-    sqlfilename.replace(QRegExp("\""), QString("\\\""));
 
-    QString thequery = QString("SELECT artist,album,title,genre,year,tracknum,"
-                               "length,intid,rating,playcount,lastplay,compilation FROM "
-                               "musicmetadata WHERE filename = \"%1\";")
-                               .arg(sqlfilename);
+    QSqlQuery query(QString::null, db);
+    query.prepare("SELECT artist,album,title,genre,year,tracknum,"
+                  "length,intid,rating,playcount,lastplay,compilation FROM "
+                  "musicmetadata WHERE filename = :FILENAME ;");
+    query.bindValue(":FILENAME", sqlfilename.utf8());
 
-    QSqlQuery query = db->exec(thequery);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
   
-        artist = query.value(0).toString();
-        album = query.value(1).toString();
-        title = query.value(2).toString();
-        genre = query.value(3).toString();
+        artist = QString::fromUtf8(query.value(0).toString());
+        album = QString::fromUtf8(query.value(1).toString());
+        title = QString::fromUtf8(query.value(2).toString());
+        genre = QString::fromUtf8(query.value(3).toString());
         year = query.value(4).toInt();
         tracknum = query.value(5).toInt();
         length = query.value(6).toInt();
@@ -137,52 +130,44 @@ void Metadata::dumpToDatabase(QSqlDatabase *db, QString startdir)
     if (genre == "")
         genre = QObject::tr("Unknown Genre");
 
-    title.replace(QRegExp("\\\\"), QString("\\\\"));
-    title.replace(QRegExp("\""), QString("\\\""));
-    artist.replace(QRegExp("\\\\"), QString("\\\\"));
-    artist.replace(QRegExp("\""), QString("\\\""));
-    album.replace(QRegExp("\\\\"), QString("\\\\"));
-    album.replace(QRegExp("\""), QString("\\\""));
-    genre.replace(QRegExp("\\\\"), QString("\\\\"));
-    genre.replace(QRegExp("\""), QString("\\\""));
-
     QString sqlfilename = filename;
     sqlfilename = filename.remove(0, startdir.length());
-    sqlfilename.replace(QRegExp("\\\\"), QString("\\\\"));
-    sqlfilename.replace(QRegExp("\""), QString("\\\""));
 
     // Don't update the database if a song with the exact same
     // metadata is already there
-    QString checkquery = QString("SELECT filename FROM musicmetadata WHERE "
-                                 "( ( artist = \"%1\" ) AND "
-                                 "( album = \"%2\" ) AND ( title = \"%3\" ) "
-                                 "AND ( genre = \"%4\" ) AND "
-                                 "( year = \"%5\" ) AND ( tracknum = \"%6\" ) "
-                                 "AND ( length = \"%7\" ) );")
-                                 .arg(artist.latin1())
-                                 .arg(album.latin1())
-                                 .arg(title.latin1())
-                                 .arg(genre)
-                                 .arg(year)
-                                 .arg(tracknum)
-                                 .arg(length);
-    QSqlQuery query = db->exec(checkquery);
-    if (query.isActive() && query.numRowsAffected() > 0)
+    QSqlQuery query(QString::null, db);
+    query.prepare("SELECT filename FROM musicmetadata WHERE "
+                  "( ( artist = :ARTIST ) AND "
+                  "( album = :ALBUM ) AND ( title = :TITLE ) "
+                  "AND ( genre = :GENRE ) AND "
+                  "( year = :YEAR ) AND ( tracknum = :TRACKNUM ) "
+                  "AND ( length = :LENGTH ) );");
+    query.bindValue(":ARTIST", artist.utf8());
+    query.bindValue(":ALBUM", album.utf8());
+    query.bindValue(":TITLE", title.utf8());
+    query.bindValue(":GENRE", genre.utf8());
+    query.bindValue(":YEAR", year);
+    query.bindValue(":TRACKNUM", tracknum);
+    query.bindValue(":LENGTH", length);
+
+    if (query.exec() && query.isActive() && query.size() > 0)
         return;
 
-    QString thequery = QString("INSERT INTO musicmetadata (artist,album,title,"
-                               "genre,year,tracknum,length,filename,compilation) VALUES "
-                               "(\"%1\",\"%2\",\"%3\",\"%4\",%5,%6,%7,\"%8\", %9);")
-                              .arg(artist.latin1())
-                              .arg(album.latin1())
-                              .arg(title.latin1())
-                              .arg(genre)
-                              .arg(year)
-                              .arg(tracknum)
-                              .arg(length)
-                              .arg(sqlfilename)
-                              .arg((int) compilation);
-    db->exec(thequery);
+    query.prepare("INSERT INTO musicmetadata (artist,album,title,"
+                  "genre,year,tracknum,length,filename,compilation) VALUES "
+                  "(:ARTIST, :ALBUM, :TITLE, :GENRE, :YEAR, :TRACKNUM, "
+                  ":LENGTH, :FILENAME, :COMPILATION );");
+    query.bindValue(":ARTIST", artist.utf8());
+    query.bindValue(":ALBUM", album.utf8());
+    query.bindValue(":TITLE", title.utf8());
+    query.bindValue(":GENRE", genre.utf8());
+    query.bindValue(":YEAR", year);
+    query.bindValue(":TRACKNUM", tracknum);
+    query.bindValue(":LENGTH", length);
+    query.bindValue(":FILENAME", sqlfilename.utf8());
+    query.bindValue(":COMPILATION", compilation);
+
+    query.exec();
 
     // easiest way to ensure we've got 'id' filled.
     fillData(db);
@@ -207,20 +192,20 @@ void Metadata::updateDatabase(QSqlDatabase *db, QString startdir)
     QSqlQuery query(QString::null, db);
 
     query.prepare("UPDATE musicmetadata SET artist = :ARTIST, album = :ALBUM, "
-                  "title = :TITLE, genre = :GENRE, year = :YEAR, tracknum = :TRACKNUM, "
-                  "compilation = :COMPILATION "
+                  "title = :TITLE, genre = :GENRE, year = :YEAR, "
+                  "tracknum = :TRACKNUM, compilation = :COMPILATION "
                   "WHERE intid = :ID;");
-    query.bindValue(":ARTIST", artist.latin1());
-    query.bindValue(":ALBUM", album.latin1());
-    query.bindValue(":TITLE", title.latin1());
-    query.bindValue(":GENRE", genre);
+    query.bindValue(":ARTIST", artist.utf8());
+    query.bindValue(":ALBUM", album.utf8());
+    query.bindValue(":TITLE", title.utf8());
+    query.bindValue(":GENRE", genre.utf8());
     query.bindValue(":YEAR", year);
     query.bindValue(":TRACKNUM", tracknum);
-    query.bindValue(":COMPILATION", (int) compilation);
+    query.bindValue(":COMPILATION", compilation);
     query.bindValue(":ID", id);
 
     if (!query.exec())
-         MythContext::DBError("Update musicmetadata", query.lastQuery());
+         MythContext::DBError("Update musicmetadata", query);
 }
 
 void Metadata::setField(const QString &field, const QString &data)
@@ -333,50 +318,43 @@ void Metadata::fillData(QSqlDatabase *db)
     if (title == "")
         return;
 
-    QString sqltitle = title;
-    sqltitle.replace(QRegExp("\\\\"), QString("\\\\"));
-    sqltitle.replace(QRegExp("\""), QString("\\\""));
-
     QString thequery = "SELECT artist,album,title,genre,year,tracknum,length,"
-                       "filename,intid,rating,playcount,lastplay,compilation FROM "
-                       "musicmetadata WHERE title=\"" + sqltitle + "\"";
+                       "filename,intid,rating,playcount,lastplay,compilation "
+                       "FROM musicmetadata WHERE title = :TITLE";
 
     if (album != "")
-    {
-        QString temp = album;
-        temp.replace(QRegExp("\\\\"), QString("\\\\"));
-        temp.replace(QRegExp("\""), QString("\\\""));
-        thequery += " AND album=\"" + temp + "\"";
-    }
+        thequery += " AND album = :ALBUM";
     if (artist != "")
-    {
-        QString temp = artist;
-        temp.replace(QRegExp("\\\\"), QString("\\\\"));
-        temp.replace(QRegExp("\""), QString("\\\""));
-        thequery += " AND artist=\"" + temp + "\"";
-    }
+        thequery += " AND artist = :ARTIST";
 
     thequery += ";";
 
-    QSqlQuery query = db->exec(thequery);
+    QSqlQuery query(QString::null, db);
+    query.prepare(thequery);
+    query.bindValue(":TITLE", title.utf8());
+    query.bindValue(":ALBUM", album.utf8());
+    query.bindValue(":ARTIST", artist.utf8());
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
 
-        artist = query.value(0).toString();
-        album = query.value(1).toString();
-        title = query.value(2).toString();
-        genre = query.value(3).toString();
+        artist = QString::fromUtf8(query.value(0).toString());
+        album = QString::fromUtf8(query.value(1).toString());
+        title = QString::fromUtf8(query.value(2).toString());
+        genre = QString::fromUtf8(query.value(3).toString());
         year = query.value(4).toInt();
         tracknum = query.value(5).toInt();
         length = query.value(6).toInt();
-        filename = query.value(7).toString();
+        filename = QString::fromUtf8(query.value(7).toString());
         id = query.value(8).toUInt();
         rating = query.value(9).toInt();
         playcount = query.value(10).toInt();
         lastplay = query.value(11).toString();
         compilation = (query.value(12).toInt() > 0);
+
+        if (!filename.contains("://"))
+            filename = m_startdir + filename;
     }
 }
 
@@ -385,30 +363,32 @@ void Metadata::fillDataFromID(QSqlDatabase *db)
     if (id == 0)
         return; 
         
-    QString thequery;
-    thequery = QString("SELECT title,artist,album,title,genre,year,tracknum,"
-                       "length,filename,rating,playcount,lastplay,compilation FROM "
-                       "musicmetadata WHERE intid=%1;").arg(id);
+    QSqlQuery query(QString::null, db);
+    query.prepare("SELECT title,artist,album,title,genre,year,tracknum,"
+                  "length,filename,rating,playcount,lastplay,compilation FROM "
+                  "musicmetadata WHERE intid = :ID ;");
+    query.bindValue(":ID", id);
         
-    QSqlQuery query = db->exec(thequery);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.numRowsAffected() > 0)
     {
         query.next();
 
-        title = query.value(0).toString();
-        artist = query.value(1).toString();
-        album = query.value(2).toString();
-        title = query.value(3).toString();
-        genre = query.value(4).toString();
+        title = QString::fromUtf8(query.value(0).toString());
+        artist = QString::fromUtf8(query.value(1).toString());
+        album = QString::fromUtf8(query.value(2).toString());
+        title = QString::fromUtf8(query.value(3).toString());
+        genre = QString::fromUtf8(query.value(4).toString());
         year = query.value(5).toInt();
         tracknum = query.value(6).toInt();
         length = query.value(7).toInt();
-        filename = query.value(8).toString();
+        filename = QString::fromUtf8(query.value(8).toString());
         rating = query.value(9).toInt();
         playcount = query.value(10).toInt();
         lastplay = query.value(11).toString();
         compilation = (query.value(12).toInt() > 0);
+
+        if (!filename.contains("://"))
+            filename = m_startdir + filename;
     }
 }
 
@@ -546,21 +526,21 @@ void AllMusic::resync()
 
     all_music.clear();
     
-    if(query.isActive() && query.numRowsAffected() > 0)
+    if (query.isActive() && query.size() > 0)
     {
         while(query.next())
         {
-            filename = query.value(8).toString();
+            filename = QString::fromUtf8(query.value(8).toString());
             if (!filename.contains("://"))
                 filename = startdir + filename;
 
             Metadata *temp = new Metadata
                                     (
                                         filename,
-                                        query.value(1).toString(),
-                                        query.value(2).toString(),
-                                        query.value(3).toString(),
-                                        query.value(4).toString(),
+                                 QString::fromUtf8(query.value(1).toString()),
+                                 QString::fromUtf8(query.value(2).toString()),
+                                 QString::fromUtf8(query.value(3).toString()),
+                                 QString::fromUtf8(query.value(4).toString()),
                                         query.value(5).toInt(),
                                         query.value(6).toInt(),
                                         query.value(7).toInt(),
@@ -589,11 +569,11 @@ void AllMusic::resync()
     {
         if(query.isActive())
         {
-            cerr << "metadata.o: Your database is out of whack. This is not good." << endl ;
+//            cerr << "metadata.o: Your database is out of whack. This is not good." << endl ;
         }
         else
         {
-            cerr << "metadata.o: Your don't seem to have any tracks. That's ok with me if it's ok with you." << endl; 
+//            cerr << "metadata.o: Your don't seem to have any tracks. That's ok with me if it's ok with you." << endl; 
         }
     }    
  

@@ -115,6 +115,8 @@ class Metadata
     void persist(QSqlDatabase *db);
     bool hasChanged(){return changed;}
 
+    static void SetStartdir(const QString &dir);
+
   private:
     QString artist;
     QString album;
@@ -131,6 +133,8 @@ class Metadata
     unsigned int id;
     QString filename;
     bool    changed;
+
+    static QString m_startdir;
 };
 
 bool operator==(const Metadata& a, const Metadata& b);

@@ -119,56 +119,58 @@ void SavePending(QSqlDatabase *db, int pending)
     //  Temporary Hack until mythmusic
     //  has a proper settings/setup
 
-    QString some_query_string = QString("SELECT * FROM settings WHERE "
-                                       "value=\"LastMusicPlaylistPush\" "
-                                       "and hostname = \"%1\" ;")
-                                       .arg(gContext->GetHostName());
+    QSqlQuery query(QString::null, db);
+    query.prepare("SELECT * FROM settings "
+                  "WHERE value = :LASTPUSH "
+                  "AND hostname = :HOST ;");
+    query.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
+    query.bindValue(":HOST", gContext->GetHostName());
 
-    QSqlQuery some_query(some_query_string, db);
-    
-    if (some_query.numRowsAffected() == 0)
+    if (query.exec() && query.size() == 0)
     {
         //  first run from this host / recent version
-        QString a_query_string = QString("INSERT INTO settings (value,data,"
-                                         "hostname) VALUES "
-                                         "(\"LastMusicPlaylistPush\", \"%1\", "
-                                         " \"%2\");").arg(pending)
-                                         .arg(gContext->GetHostName());
-        
-        QSqlQuery another_query(a_query_string, db);
-
+        QSqlQuery subquery(QString::null, db);
+        subquery.prepare("INSERT INTO settings (value,data,hostname) VALUES "
+                         "(:LASTPUSH, :DATA, :HOST );");
+        subquery.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
+        subquery.bindValue(":DATA", pending);
+        subquery.bindValue(":HOST", gContext->GetHostName());
+       
+        subquery.exec(); 
     }
-    else if (some_query.numRowsAffected() == 1)
+    else if (query.size() == 1)
     {
         //  ah, just right
-        
-        QString a_query_string = QString("UPDATE settings SET data = \"%1\" "
-                                         "WHERE value=\"LastMusicPlaylistPush\""
-                                         " AND hostname = \"%2\" ;")
-                                         .arg(pending)
-                                         .arg(gContext->GetHostName());
+        QSqlQuery subquery(QString::null, db);
+        subquery.prepare("UPDATE settings SET data = :DATA WHERE "
+                         "WHERE value = :LASTPUSH "
+                         "AND hostname = :HOST ;");
+        subquery.bindValue(":DATA", pending);
+        subquery.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
+        subquery.bindValue(":HOST", gContext->GetHostName());
 
-        QSqlQuery another_query(a_query_string, db);
+        subquery.exec();
     }                       
     else
     {
         //  correct thor's diabolical plot to 
         //  consume all table space
-        
-        QString a_query_string = QString("DELETE FROM settings WHERE "
-                                         "value=\"LastMusicPlaylistPush\" "
-                                         "and hostname = \"%1\" ;")
-                                         .arg(gContext->GetHostName());
-        
-        QSqlQuery another_query(a_query_string, db);
 
-        a_query_string = QString("INSERT INTO settings (value, data, hostname) "
-                                 " VALUES (\"LastMusicPlaylistPush\", \"%1\",   "
-                                 " \"%2\");").arg(pending)
-                                 .arg(gContext->GetHostName());
-
-        QSqlQuery one_more_query(a_query_string, db);
+        QSqlQuery subquery(QString::null, db);
+        subquery.prepare("DELETE FROM settings WHERE "
+                         "WHERE value = :LASTPUSH "
+                         "AND hostname = :HOST ;");
+        subquery.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
+        subquery.bindValue(":HOST", gContext->GetHostName());
+        subquery.exec(); 
         
+        subquery.prepare("INSERT INTO settings (value,data,hostname) VALUES "
+                         "(:LASTPUSH, :DATA, :HOST );");
+        subquery.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
+        subquery.bindValue(":DATA", pending);
+        subquery.bindValue(":HOST", gContext->GetHostName());
+
+        subquery.exec();
     }
 }
 
@@ -193,7 +195,7 @@ void SearchDir(QString &directory)
     {
         while (query.next())
         {
-            QString name = directory + query.value(0).toString();
+            QString name = directory + QString::fromUtf8(query.value(0).toString());
             if (name != QString::null)
             {
                 if ((iter = music_files.find(name)) != music_files.end())
@@ -222,11 +224,11 @@ void SearchDir(QString &directory)
         {
             QString name(iter.key());
             name.remove(0, directory.length());
-            name.replace(quote_regex, "\"\"");
 
-            QString querystr = QString("DELETE FROM musicmetadata WHERE "
-                                       "filename=\"%1\"").arg(name);
-            query.exec(querystr);
+            query.prepare("DELETE FROM musicmetadata WHERE "
+                          "filename = :NAME ;");
+            query.bindValue(":NAME", name.utf8());
+            query.exec();
         }
 
         file_checking->setProgress(++counter);
@@ -237,10 +239,10 @@ void SearchDir(QString &directory)
 
 void startPlayback(PlaylistsContainer *all_playlists, AllMusic *all_music)
 {
-    PlaybackBox *pbb = new PlaybackBox(gContext->GetMainWindow(),
-                                       "music_play", "music-", 
-                                       all_playlists, all_music,
-                                       "music_playback");
+    PlaybackBoxMusic *pbb = new PlaybackBoxMusic(gContext->GetMainWindow(),
+                                                 "music_play", "music-", 
+                                                 all_playlists, all_music,
+                                                 "music_playback");
     qApp->unlock();
     pbb->exec();
     qApp->lock();
@@ -447,6 +449,8 @@ static void preMusic(MusicData *mdata)
     if (!startdir.endsWith("/"));
         startdir += "/";
 
+    Metadata::SetStartdir(startdir);
+
     Decoder::SetLocationFormatUseTags();
 
     // Only search music files if a directory was specified & there
@@ -516,6 +520,8 @@ int mythplugin_config(void)
     
     if (!mdata.startdir.endsWith("/"))
         mdata.startdir += "/";
+
+    Metadata::SetStartdir(mdata.startdir);
 
     Decoder::SetLocationFormatUseTags();
 

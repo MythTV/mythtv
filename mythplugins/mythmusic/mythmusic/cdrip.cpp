@@ -273,26 +273,26 @@ void Ripper::tableChanged(int row, int col)
 
 void Ripper::fillComboBox(MythComboBox &box, const QString &db_column)
 {
-   QString querystr = QString("SELECT DISTINCT %1 FROM musicmetadata;")
-                             .arg(db_column);
+    QString querystr = QString("SELECT DISTINCT %1 FROM musicmetadata;")
+                               .arg(db_column);
       
-   QSqlQuery query(querystr, db);
+    QSqlQuery query(querystr, db);
    
-   QValueList<QString> list;
+    QValueList<QString> list;
    
-   if (query.isActive() && query.numRowsAffected() > 0)
-   {
-       while (query.next())
-       {
-           list.push_front(query.value(0).toString());
-       }
-   }
+    if (query.isActive() && query.numRowsAffected() > 0)
+    { 
+        while (query.next())
+        {
+            list.push_front(query.value(0).toString());
+        }
+    }
    
-   QStringList strlist(list);
+    QStringList strlist(list);
    
-   strlist.sort();
+    strlist.sort();
    
-   box.insertStringList(strlist);
+    box.insertStringList(strlist);
 }
 
 void Ripper::handleFileTokens(QString &filename, Metadata *track)

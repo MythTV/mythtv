@@ -322,15 +322,16 @@ void PlaylistsContainer::load()
 
     all_other_playlists->clear();
 
-    QString aquery;
-    aquery = QString("SELECT playlistid FROM musicplaylist "
-                     "WHERE name != \"default_playlist_storage\"  "
-                     "AND name != \"backup_playlist_storage\"  "
-                     "AND hostname = \"%1\" ORDER BY playlistid ;")
-                     .arg(my_host);
+    QSqlQuery query(QString::null, db);
+    query.prepare("SELECT playlistid FROM musicplaylist "
+                  "WHERE name != :DEFAULT  "
+                  "AND name != :BACKUP  "
+                  "AND hostname = :HOST ORDER BY playlistid ;");
+    query.bindValue(":DEFAULT", "default_playlist_storage");
+    query.bindValue(":BACKUP", "backup_playlist_storage"); 
+    query.bindValue(":HOST", my_host);
 
-    QSqlQuery query = db->exec(aquery);
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         while (query.next())
         {
@@ -436,10 +437,12 @@ Playlist& Playlist::operator=(const Playlist& rhs)
 void Playlist::describeYourself()
 {
     //  This is for debugging
+/*
     cout << "Playlist with name of \"" << name << "\"" << endl;
     cout << "        playlistid is " << playlistid << endl;
     cout << "     songlist(raw) is \"" << raw_songlist << "\"" << endl;
     cout << "     songlist list is ";
+*/
 
     Track *it;
     for(it = songs.first(); it; it = songs.next())
@@ -460,22 +463,21 @@ void Playlist::loadPlaylist(QString a_name, QSqlDatabase *a_db, QString a_host)
                 "me a hostname!" << endl; 
         return;
     }
-    
-    thequery = QString("SELECT playlistid, name, songlist FROM "
-                       "musicplaylist WHERE name = \"%1\" AND "
-                       "hostname = \"%2\"  ;")
-                      .arg(a_name)
-                      .arg(a_host);
+   
+    QSqlQuery query(QString::null, a_db);
+    query.prepare("SELECT playlistid, name, songlist FROM "
+                  "musicplaylist WHERE name = :NAME AND "
+                  "hostname = :HOST ;");
+    query.bindValue(":NAME", a_name);
+    query.bindValue(":HOST", a_host);
 
-    QSqlQuery somequery = a_db->exec(thequery);
-  
-    if (somequery.numRowsAffected() > 0)
+    if (query.exec() && query.size() > 0)
     {
-        while (somequery.next())
+        while (query.next())
         {
-            this->playlistid = somequery.value(0).toInt();
-            this->name = somequery.value(1).toString();
-            this->raw_songlist = somequery.value(2).toString();
+            this->playlistid = query.value(0).toInt();
+            this->name = QString::fromUtf8(query.value(1).toString());
+            this->raw_songlist = query.value(2).toString();
         }
         if (name == "default_playlist_storage")
             name = "the user should never see this";
@@ -492,19 +494,20 @@ void Playlist::loadPlaylist(QString a_name, QSqlDatabase *a_db, QString a_host)
 
 void Playlist::loadPlaylistByID(int id, QSqlDatabase *a_db, QString a_host)
 {
-    QString thequery;
-    
-    thequery = QString("SELECT playlistid, name, songlist FROM musicplaylist "
-                       "WHERE playlistid = \"%1\" AND hostname=\"%2\" ;")
-                      .arg(id)
-                      .arg(a_host);
-    QSqlQuery somequery = a_db->exec(thequery);
-  
-    while (somequery.next())
+    QSqlQuery query(QString::null, a_db);
+    query.prepare("SELECT playlistid, name, songlist FROM "
+                  "musicplaylist WHERE playlistid = :ID AND "
+                  "hostname = :HOST ;");
+    query.bindValue(":ID", id);
+    query.bindValue(":HOST", a_host);
+
+    query.exec();
+
+    while (query.next())
     {
-        this->playlistid = somequery.value(0).toInt();
-        this->name = somequery.value(1).toString();
-        this->raw_songlist = somequery.value(2).toString();
+        this->playlistid = query.value(0).toInt();
+        this->name = QString::fromUtf8(query.value(1).toString());
+        this->raw_songlist = query.value(2).toString();
     }
 
     if (name == "default_playlist_storage")
@@ -572,24 +575,28 @@ void Playlist::savePlaylist(QString a_name, QSqlDatabase *a_db)
         return;
 
     fillSonglistFromSongs();
-    
-    QString thequery  = QString("SELECT NULL FROM musicplaylist WHERE playlistid = %1 ;").arg(playlistid);
 
-    QSqlQuery query = a_db->exec(thequery);
+    QSqlQuery query(QString::null, a_db);        
+    query.prepare("SELECT NULL FROM musicplaylist WHERE playlistid = :ID ;");
+    query.bindValue(":ID", playlistid);
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
-        thequery = QString("UPDATE musicplaylist SET songlist = \"%1\", name = \"%2\" WHERE "
-                           "playlistid = \"%3\" ;")
-                           .arg(raw_songlist).arg(a_name).arg(playlistid);
+        query.prepare("UPDATE musicplaylist SET songlist = :LIST , "
+                      "name = :NAME WHERE playlistid = :ID ;");
+        query.bindValue(":LIST", raw_songlist);
+        query.bindValue(":NAME", a_name.utf8());
+        query.bindValue(":ID", playlistid);
     }
     else
     {
-        thequery = QString("INSERT musicplaylist (name,songlist) "
-                           "VALUES(\"%2\",\"%1\");")
-                           .arg(raw_songlist).arg(a_name);
+        query.prepare("INSERT INTO musicplaylist (name,songlist) "
+                      "VALUES(:NAME, :LIST);");
+        query.bindValue(":LIST", raw_songlist);
+        query.bindValue(":NAME", a_name.utf8());
     }
-    query = a_db->exec(thequery);
+
+    query.exec();
 }
 
 void Playlist::saveNewPlaylist(QSqlDatabase *a_db, QString a_host)
@@ -614,15 +621,20 @@ void Playlist::saveNewPlaylist(QSqlDatabase *a_db, QString a_host)
 
     fillSonglistFromSongs();
     
+    QSqlQuery query(QString::null, a_db);
+    query.prepare("INSERT musicplaylist (name, hostname) "
+                  "VALUES(:NAME, :HOST);");
+    query.bindValue(":NAME", name.utf8());
+    query.bindValue(":HOST", a_host);
 
-    QString thequery  = QString("INSERT INTO musicplaylist (name, hostname) VALUES (\"%1\", \"%2\") ;").arg(name).arg(a_host);
+    query.exec();
 
-    QSqlQuery query = a_db->exec(thequery);
+    query.prepare("SELECT playlistid FROM musicplaylist WHERE "
+                  "name = :NAME AND hostname = :HOST ;");
+    query.bindValue(":NAME", name.utf8());
+    query.bindValue(":HOST", a_host);
 
-    thequery = QString("SELECT playlistid FROM musicplaylist WHERE name = \"%1\" AND hostname = \"%2\" ;").arg(name).arg(a_host);
-
-    query = a_db->exec(thequery);
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         while(query.next())
         {
@@ -633,7 +645,7 @@ void Playlist::saveNewPlaylist(QSqlDatabase *a_db, QString a_host)
     }
     else
     {
-        cerr << "playlist.o: This is not good. Couldn't get an id back on something I just inserted" << endl ;
+        MythContext::DBError("playlist insert", query);
     }
 }
 
@@ -970,11 +982,13 @@ void PlaylistsContainer::deletePlaylist(int kill_me)
         }
     }
 
-    QString aquery = QString("DELETE FROM musicplaylist WHERE playlistid = %1 ;").arg(kill_me);
-    QSqlQuery query = db->exec(aquery);
-    if(query.numRowsAffected() < 1)
+    QSqlQuery query(QString::null, db);
+    query.prepare("DELETE FROM musicplaylist WHERE playlistid = :ID ;");
+    query.bindValue(":ID", kill_me);
+
+    if (query.exec() || query.size() < 1)
     {
-        cerr << "playlist.o: Hmmm, that's odd ... I tried to delete a playlist but the database couldn't find it" << endl ;
+        MythContext::DBError("playlist delete", query);
     }
     list_to_kill->removeAllTracks();
     all_other_playlists->remove(list_to_kill);

@@ -17,12 +17,12 @@ using namespace std;
 #include <mythtv/mythwidgets.h>
 #include <mythtv/lcddevice.h>
 
-PlaybackBox::PlaybackBox(MythMainWindow *parent, QString window_name,
-                         QString theme_filename, 
-                         PlaylistsContainer *the_playlists,
-                         AllMusic *the_music, const char *name)
+PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
+                                   QString theme_filename, 
+                                   PlaylistsContainer *the_playlists,
+                                   AllMusic *the_music, const char *name)
 
-           : MythThemedDialog(parent, window_name, theme_filename, name)
+                : MythThemedDialog(parent, window_name, theme_filename, name)
 {
     //  A few internal variable defaults
  
@@ -182,7 +182,7 @@ PlaybackBox::PlaybackBox(MythMainWindow *parent, QString window_name,
     updateForeground();
 }
 
-PlaybackBox::~PlaybackBox(void)
+PlaybackBoxMusic::~PlaybackBoxMusic(void)
 {
     stopAll();
     if (playlist_tree)
@@ -203,7 +203,7 @@ PlaybackBox::~PlaybackBox(void)
         gContext->SaveSetting("RepeatMode", "none");
 }
 
-void PlaybackBox::keyPressEvent(QKeyEvent *e)
+void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
 
@@ -406,7 +406,7 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
         MythThemedDialog::keyPressEvent(e);
 }
 
-void PlaybackBox::showEditMetadataDialog()
+void PlaybackBoxMusic::showEditMetadataDialog()
 {
     // stop music playing
     stop();
@@ -431,7 +431,7 @@ void PlaybackBox::showEditMetadataDialog()
     music_tree_list->select();    
 }
 
-void PlaybackBox::checkForPlaylists()
+void PlaybackBoxMusic::checkForPlaylists()
 {
     if (first_playlist_check)
     {
@@ -487,7 +487,7 @@ void PlaybackBox::checkForPlaylists()
     }
 }
 
-void PlaybackBox::changeVolume(bool up_or_down)
+void PlaybackBoxMusic::changeVolume(bool up_or_down)
 {
     if (volume_control)
     {
@@ -499,7 +499,7 @@ void PlaybackBox::changeVolume(bool up_or_down)
     }
 }
 
-void PlaybackBox::toggleMute()
+void PlaybackBoxMusic::toggleMute()
 {
     if (volume_control)
     {
@@ -508,7 +508,7 @@ void PlaybackBox::toggleMute()
     }
 }
 
-void PlaybackBox::showVolume(bool on_or_off)
+void PlaybackBoxMusic::showVolume(bool on_or_off)
 {
     float volume_level;
     if (volume_control)
@@ -566,13 +566,13 @@ void PlaybackBox::showVolume(bool on_or_off)
     }
 }
 
-void PlaybackBox::resetTimer()
+void PlaybackBoxMusic::resetTimer()
 {
     if (visual_mode_delay > 0)
         visual_mode_timer->changeInterval(visual_mode_delay * 1000);
 }
 
-void PlaybackBox::play()
+void PlaybackBoxMusic::play()
 {
     if (isplaying)
         stop();
@@ -599,7 +599,7 @@ void PlaybackBox::play()
         output = AudioOutput::OpenAudio(adevice, 16, 2, 44100, 
 	                                 AUDIOOUTPUT_MUSIC, true );	
         output->setBufferSize(outputBufferSize * 1024);
-        output->SetBlocking(true);
+        output->SetBlocking(false);
         output->addListener(this);
         output->addListener(mainvisual);
         output->addVisual(mainvisual);
@@ -667,7 +667,7 @@ void PlaybackBox::play()
     }
 }
 
-void PlaybackBox::visEnable()
+void PlaybackBoxMusic::visEnable()
 {
     if (!visualizer_status != 2 && isplaying)
     {
@@ -677,7 +677,7 @@ void PlaybackBox::visEnable()
     }
 }
 
-void PlaybackBox::CycleVisualizer()
+void PlaybackBoxMusic::CycleVisualizer()
 {
     QString new_visualizer;
 
@@ -727,7 +727,7 @@ void PlaybackBox::CycleVisualizer()
 }
 
 
-void PlaybackBox::pause(void)
+void PlaybackBoxMusic::pause(void)
 {
     if (output) 
     {
@@ -744,7 +744,7 @@ void PlaybackBox::pause(void)
 
 }
 
-void PlaybackBox::stopDecoder(void)
+void PlaybackBoxMusic::stopDecoder(void)
 {
     if (decoder && decoder->running()) 
     {
@@ -764,7 +764,7 @@ void PlaybackBox::stopDecoder(void)
         decoder->wait();
 }
 
-void PlaybackBox::stop(void)
+void PlaybackBoxMusic::stop(void)
 {
     if (decoder && decoder->running()) 
     {
@@ -813,7 +813,7 @@ void PlaybackBox::stop(void)
     isplaying = false;
 }
 
-void PlaybackBox::stopAll()
+void PlaybackBoxMusic::stopAll()
 {
     if (class LCD * lcd = LCD::Get())
     {
@@ -829,7 +829,7 @@ void PlaybackBox::stopAll()
     }
 }
 
-void PlaybackBox::previous()
+void PlaybackBoxMusic::previous()
 {
     if (repeatmode == REPEAT_ALL)
     {
@@ -846,7 +846,7 @@ void PlaybackBox::previous()
         CycleVisualizer();
 }
 
-void PlaybackBox::next()
+void PlaybackBoxMusic::next()
 {
     if (repeatmode == REPEAT_ALL)
     {
@@ -866,7 +866,7 @@ void PlaybackBox::next()
         CycleVisualizer();
 }
 
-void PlaybackBox::nextAuto()
+void PlaybackBoxMusic::nextAuto()
 {
     stopDecoder();
 
@@ -878,7 +878,7 @@ void PlaybackBox::nextAuto()
         next();
 }
 
-void PlaybackBox::seekforward()
+void PlaybackBoxMusic::seekforward()
 {
     int nextTime = currentTime + 5;
     if (nextTime > maxTime)
@@ -886,7 +886,7 @@ void PlaybackBox::seekforward()
     seek(nextTime);
 }
 
-void PlaybackBox::seekback()
+void PlaybackBoxMusic::seekback()
 {
     int nextTime = currentTime - 5;
     if (nextTime < 0)
@@ -894,7 +894,7 @@ void PlaybackBox::seekback()
     seek(nextTime);
 }
 
-void PlaybackBox::seek(int pos)
+void PlaybackBoxMusic::seek(int pos)
 {
     if (output)
     {
@@ -918,7 +918,7 @@ void PlaybackBox::seek(int pos)
     }
 }
 
-void PlaybackBox::setShuffleMode(unsigned int mode)
+void PlaybackBoxMusic::setShuffleMode(unsigned int mode)
 {
     shufflemode = mode;
 
@@ -963,12 +963,12 @@ void PlaybackBox::setShuffleMode(unsigned int mode)
     music_tree_list->refresh();
 }
 
-void PlaybackBox::toggleShuffle(void)
+void PlaybackBoxMusic::toggleShuffle(void)
 {
     setShuffleMode(++shufflemode % MAX_SHUFFLE_MODES);
 }
 
-void PlaybackBox::increaseRating()
+void PlaybackBoxMusic::increaseRating()
 {
     if(!curMeta)
         return;
@@ -984,7 +984,7 @@ void PlaybackBox::increaseRating()
     }
 }
 
-void PlaybackBox::decreaseRating()
+void PlaybackBoxMusic::decreaseRating()
 {
     if(!curMeta)
         return;
@@ -997,7 +997,7 @@ void PlaybackBox::decreaseRating()
     }
 }
 
-void PlaybackBox::setRepeatMode(unsigned int mode)
+void PlaybackBoxMusic::setRepeatMode(unsigned int mode)
 {
     repeatmode = mode;
 
@@ -1027,12 +1027,12 @@ void PlaybackBox::setRepeatMode(unsigned int mode)
     }
 }
 
-void PlaybackBox::toggleRepeat()
+void PlaybackBoxMusic::toggleRepeat()
 {
     setRepeatMode(++repeatmode % MAX_REPEAT_MODES);
 }
 
-void PlaybackBox::constructPlaylistTree()
+void PlaybackBoxMusic::constructPlaylistTree()
 {
     if (playlist_tree)
         delete playlist_tree;
@@ -1053,7 +1053,7 @@ void PlaybackBox::constructPlaylistTree()
     tree_is_done = true;
 }
 
-void PlaybackBox::editPlaylist()
+void PlaybackBoxMusic::editPlaylist()
 {
     // Get a reference to the current track
 
@@ -1104,7 +1104,7 @@ void PlaybackBox::editPlaylist()
     music_tree_list->refresh();
 }
 
-void PlaybackBox::closeEvent(QCloseEvent *event)
+void PlaybackBoxMusic::closeEvent(QCloseEvent *event)
 {
     stopAll();
 
@@ -1112,12 +1112,12 @@ void PlaybackBox::closeEvent(QCloseEvent *event)
     event->accept();
 }
 
-void PlaybackBox::showEvent(QShowEvent *event)
+void PlaybackBoxMusic::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
 }
 
-void PlaybackBox::customEvent(QCustomEvent *event)
+void PlaybackBoxMusic::customEvent(QCustomEvent *event)
 {
     switch ((int)event->type()) 
     {
@@ -1262,7 +1262,7 @@ void PlaybackBox::customEvent(QCustomEvent *event)
     QWidget::customEvent(event);
 }
 
-void PlaybackBox::wipeTrackInfo()
+void PlaybackBoxMusic::wipeTrackInfo()
 {
         if (title_text)
             title_text->SetText("");
@@ -1280,7 +1280,7 @@ void PlaybackBox::wipeTrackInfo()
             current_visualization_text->SetText("");
 }
 
-void PlaybackBox::handleTreeListSignals(int node_int, IntVector *attributes)
+void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes)
 {
     if (attributes->size() < 4)
     {
@@ -1355,7 +1355,7 @@ void PlaybackBox::handleTreeListSignals(int node_int, IntVector *attributes)
 }
 
 
-void PlaybackBox::toggleFullBlankVisualizer()
+void PlaybackBoxMusic::toggleFullBlankVisualizer()
 {
     if( mainvisual->getCurrentVisual() == "Blank" &&
         visualizer_status == 2)
@@ -1397,7 +1397,7 @@ void PlaybackBox::toggleFullBlankVisualizer()
     }
 }
 
-void PlaybackBox::wireUpTheme()
+void PlaybackBoxMusic::wireUpTheme()
 {
     // The self managed music tree list
     //

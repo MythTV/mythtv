@@ -17,7 +17,7 @@
 class Output;
 class Decoder;
 
-class PlaybackBox : public MythThemedDialog
+class PlaybackBoxMusic : public MythThemedDialog
 {
     Q_OBJECT
 
@@ -28,11 +28,11 @@ class PlaybackBox : public MythThemedDialog
     //
     typedef QValueVector<int> IntVector;
     
-    PlaybackBox(MythMainWindow *parent, QString window_name,
+    PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
                 QString theme_filename, PlaylistsContainer *the_playlists,
                 AllMusic *the_music, const char *name = 0);
 
-    ~PlaybackBox(void);
+    ~PlaybackBoxMusic(void);
 
     void closeEvent(QCloseEvent *);
     void customEvent(QCustomEvent *);
