@@ -27,6 +27,7 @@ using namespace std;
 #include <X11/extensions/Xv.h>
 #include <X11/extensions/Xvlib.h>
 
+#include "yuv2rgb.h"
 
 extern "C" {
 extern int      XShmQueryExtension(Display*);
@@ -45,6 +46,7 @@ struct XvData
     Display *XJ_disp;
     XShmSegmentInfo *XJ_SHMInfo;
     map<unsigned char *, XvImage *> buffers;
+    map<unsigned char *, XImage *> xbuffers;
 };
 
 #define GUID_I420_PLANAR 0x30323449
@@ -164,12 +166,55 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
   
     data->XJ_root = DefaultRootWindow(data->XJ_disp);
 
+    ret = XvQueryExtension(data->XJ_disp, &p_version, &p_release, 
+                           &p_request_base, &p_event_base, &p_error_base);
+    if (ret != Success) 
+    {
+        printf("XvQueryExtension failed.\n");
+    }
+
+    ai = NULL;
+    xv_port = -1;
+    ret = XvQueryAdaptors(data->XJ_disp, data->XJ_root,
+                          (unsigned int *)&p_num_adaptors, &ai);
+
+    if (ret != Success) 
+    {
+        printf("XvQueryAdaptors failed.\n");
+        ai = NULL;
+    }
+    else
+        if ( ai )
+        {
+            for (i = 0; i < p_num_adaptors; i++) 
+            {
+                if ((ai[i].type & XvInputMask) &&
+                    (ai[i].type & XvImageMask))
+                {
+                    xv_port = ai[i].base_id;
+                    break;
+                }
+            }
+ 
+            if (p_num_adaptors > 0)
+                XvFreeAdaptorInfo(ai);
+        }
+
     GetMythTVGeometry(data->XJ_disp, XJ_screen_num,
                       &XJ_screenx, &XJ_screeny, 
                       &XJ_screenwidth, &XJ_screenheight);
 
     curx = XJ_screenx + 4; cury = XJ_screeny + 20;
     curw = XJ_width; curh = XJ_height;
+
+    // if non-XV mode then run full-screen
+    if ( xv_port == -1 )
+    {
+        curx = 0;
+        cury = 0;
+        curw = XJ_screenwidth;
+        curh = XJ_screenheight;
+    }
 
     dispx = 0; dispy = 0;
     dispw = curw; disph = curh;
@@ -189,8 +234,8 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
         if (XJ_aspect)
             curw = 4 * curh / 3;
 
-        data->XJ_win = XCreateSimpleWindow(data->XJ_disp, data->XJ_root, curx, 
-                                           cury, XJ_width, XJ_height, 0, 
+        data->XJ_win = XCreateSimpleWindow(data->XJ_disp, data->XJ_root, curx,
+                                           cury, curw, curh, 0, 
                                            XJ_white, XJ_black);
         data->XJ_curwin = data->XJ_win;
 
@@ -225,103 +270,98 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
     old_handler = XSetErrorHandler(XJ_error_catcher);
     XSync(data->XJ_disp, 0);
 
-    ret = XvQueryExtension(data->XJ_disp, &p_version, &p_release, 
-                           &p_request_base, &p_event_base, &p_error_base);
-    if (ret != Success) 
-    {
-        printf("XvQueryExtension failed.\n");
-    }
-
-    ret = XvQueryAdaptors(data->XJ_disp, data->XJ_root,
-                          (unsigned int *)&p_num_adaptors, &ai);
-
-    if (ret != Success) 
-    {
-        printf("XvQueryAdaptors failed.\n");
-    }
-
-    xv_port = -1;
-    for (i = 0; i < p_num_adaptors; i++) 
-    {
-        if ((ai[i].type & XvInputMask) &&
-            (ai[i].type & XvImageMask))
-        {
-            xv_port = ai[i].base_id;
-            break;
-        }
-    }
- 
-    if (p_num_adaptors > 0)
-        XvFreeAdaptorInfo(ai);
     if (xv_port == -1)
     {
-        printf("Couldn't find Xv support, exiting\n");
-        exit (0);
+        printf("Couldn't find Xv support, falling back to non-Xv mode\n");
     }
 
     int formats;
     XvImageFormatValues *fo;
     bool foundimageformat = false;
 
-    fo = XvListImageFormats(data->XJ_disp, xv_port, &formats);
-    for (i = 0; i < formats; i++)
+    if ( xv_port != -1 )
     {
-        if (fo[i].id == GUID_I420_PLANAR)
-        {
-            foundimageformat = true;
-            colorid = GUID_I420_PLANAR;
-        }
-    }
-
-    if (!foundimageformat)
-    {
+        fo = XvListImageFormats(data->XJ_disp, xv_port, &formats);
         for (i = 0; i < formats; i++)
         {
-            if (fo[i].id == GUID_YV12_PLANAR)
+            if (fo[i].id == GUID_I420_PLANAR)
             {
                 foundimageformat = true;
-                colorid = GUID_YV12_PLANAR;
+                colorid = GUID_I420_PLANAR;
             }
         }
-    } 
 
-    if (!foundimageformat)
-    {
-        printf("Couldn't find the proper Xv image format\n");
-        exit(0);
+        if (!foundimageformat)
+        {
+            for (i = 0; i < formats; i++)
+            {
+                if (fo[i].id == GUID_YV12_PLANAR)
+                {
+                    foundimageformat = true;
+                    colorid = GUID_YV12_PLANAR;
+                }
+            }
+        } 
+
+        if (!foundimageformat)
+        {
+            printf("Couldn't find the proper Xv image format\n");
+            exit(0);
+        }
+
+        if (fo)
+            XFree(fo);
+
+        printf("Using XV port %d\n", xv_port);
+        XvGrabPort(data->XJ_disp, xv_port, CurrentTime);
     }
-
-    if (fo)
-        XFree(fo);
-
-    printf("Using XV port %d\n", xv_port);
-    XvGrabPort(data->XJ_disp, xv_port, CurrentTime);
 
     data->XJ_gc = XCreateGC(data->XJ_disp, data->XJ_win, 0, 0);
     XJ_depth = DefaultDepthOfScreen(data->XJ_screen);
-    data->XJ_SHMInfo = new XShmSegmentInfo[num_buffers];
-    for (int i = 0; i < num_buffers; i++)
+
+    if ( xv_port != -1 )
     {
-        XvImage *image = XvShmCreateImage(data->XJ_disp, xv_port, colorid, 0,
-                                          XJ_width, XJ_height, 
-                                          &(data->XJ_SHMInfo)[i]);
-        (data->XJ_SHMInfo)[i].shmid = shmget(IPC_PRIVATE, image->data_size,
-                                             IPC_CREAT|0777);
-        if ((data->XJ_SHMInfo)[i].shmid < 0)
+        data->XJ_SHMInfo = new XShmSegmentInfo[num_buffers];
+        for (int i = 0; i < num_buffers; i++)
         {
-            perror("shmget failed:");
-            return false;
-        }
+            XvImage *image = XvShmCreateImage(data->XJ_disp, xv_port, colorid,
+                                              0, XJ_width, XJ_height, 
+                                              &(data->XJ_SHMInfo)[i]);
+            (data->XJ_SHMInfo)[i].shmid = shmget(IPC_PRIVATE, image->data_size,
+                                             IPC_CREAT|0777);
+            if ((data->XJ_SHMInfo)[i].shmid < 0)
+            {
+                perror("shmget failed:");
+                return false;
+            }
  
-        image->data = (data->XJ_SHMInfo)[i].shmaddr = 
-                         (char *)shmat((data->XJ_SHMInfo)[i].shmid, 0, 0);
-        data->buffers[(unsigned char *)image->data] = image;
-        out_buffers[i] = (unsigned char *)image->data;
+            image->data = (data->XJ_SHMInfo)[i].shmaddr = 
+                             (char *)shmat((data->XJ_SHMInfo)[i].shmid, 0, 0);
+            data->buffers[(unsigned char *)image->data] = image;
+            out_buffers[i] = (unsigned char *)image->data;
 
-        (data->XJ_SHMInfo)[i].readOnly = False;
+            (data->XJ_SHMInfo)[i].readOnly = False;
 
-        XShmAttach(data->XJ_disp, &(data->XJ_SHMInfo)[i]);
-        XSync(data->XJ_disp, 0);
+            XShmAttach(data->XJ_disp, &(data->XJ_SHMInfo)[i]);
+            XSync(data->XJ_disp, 0);
+        }
+    }
+    else
+    {
+        for (int i = 0; i < num_buffers; i++)
+        {
+            char *sbuf = new char[XJ_depth / 8 * XJ_screenwidth * XJ_screenheight];
+            XImage *image = XCreateImage(data->XJ_disp,
+                                        DefaultVisual(data->XJ_disp, 0),
+                                        XJ_depth, ZPixmap, 0, sbuf,
+                                        curw, curh,
+                                        XJ_depth, 0);
+
+            data->xbuffers[(unsigned char *)image->data] = image;
+            out_buffers[i] = (unsigned char *)image->data;
+
+            XSync(data->XJ_disp, 0);
+        }
     }
 
     XSetErrorHandler(old_handler);
@@ -336,7 +376,8 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
     if (createwindow)
         ToggleFullScreen();
 
-    if (colorid != GUID_I420_PLANAR)
+    if ((xv_port != -1) &&
+        (colorid != GUID_I420_PLANAR))
     {
         scratchspace = new unsigned char[width * height * 3 / 2];
     }
@@ -351,23 +392,38 @@ void XvVideoOutput::Exit(void)
         XJ_started = false;
 
         int i = 0;
-        map<unsigned char *, XvImage *>::iterator iter = data->buffers.begin();
-        for(; iter != data->buffers.end(); ++iter, ++i) 
+
+        if ( xv_port != -1 )
         {
-            XShmDetach(data->XJ_disp, &(data->XJ_SHMInfo)[i]);
-            if ((data->XJ_SHMInfo)[i].shmaddr)
-                shmdt((data->XJ_SHMInfo)[i].shmaddr);
-            if ((data->XJ_SHMInfo)[i].shmid > 0)
-            shmctl((data->XJ_SHMInfo)[i].shmid, IPC_RMID, 0);
-            XFree(iter->second);
+            map<unsigned char *, XvImage *>::iterator iter =
+                data->buffers.begin();
+            for(; iter != data->buffers.end(); ++iter, ++i) 
+            {
+                XShmDetach(data->XJ_disp, &(data->XJ_SHMInfo)[i]);
+                if ((data->XJ_SHMInfo)[i].shmaddr)
+                    shmdt((data->XJ_SHMInfo)[i].shmaddr);
+                if ((data->XJ_SHMInfo)[i].shmid > 0)
+                    shmctl((data->XJ_SHMInfo)[i].shmid, IPC_RMID, 0);
+                XFree(iter->second);
+            }
+
+            delete [] (data->XJ_SHMInfo);
+
+            if (scratchspace)
+                delete [] scratchspace;
+
+            XvUngrabPort(data->XJ_disp, xv_port, CurrentTime);
+        }
+        else
+        {
+            map<unsigned char *, XImage *>::iterator iter =
+                data->xbuffers.begin();
+            for(; iter != data->xbuffers.end(); ++iter, ++i) 
+            {
+                XFree(iter->second);
+            }
         }
 
-        delete [] (data->XJ_SHMInfo);
-
-        if (scratchspace)
-            delete [] scratchspace;
-
-        XvUngrabPort(data->XJ_disp, xv_port, CurrentTime);
         XDestroyWindow(data->XJ_disp, data->XJ_win);
         XCloseDisplay(data->XJ_disp);
     }
@@ -403,6 +459,9 @@ void XvVideoOutput::show_cursor(void)
 
 void XvVideoOutput::ToggleFullScreen(void)
 {
+    if ( xv_port == -1 )
+        return;
+
     pthread_mutex_lock(&lock);
 
     if (XJ_fullscreen)
@@ -480,29 +539,102 @@ void XvVideoOutput::StopEmbedding(void)
     pthread_mutex_unlock(&lock);
 }
 
+void scale_image( unsigned char *src, int src_w, int src_h,
+        unsigned char *dest, int dest_w, int dest_h, int bpp )
+{
+    unsigned int *src_32 = (unsigned int *)src;
+    unsigned short *src_16 = (unsigned short *)src;
+    unsigned char *src_8 = (unsigned char *)src;
+    unsigned int *dest_32 = (unsigned int *)dest;
+    unsigned short *dest_16 = (unsigned short *)dest;
+    unsigned char *dest_8 = (unsigned char *)dest;
+
+    if (( src_w == dest_w ) &&
+        ( src_h == dest_h ))
+    {
+        memcpy( dest, src, src_w * src_h * bpp / 8 );
+        return;
+    }
+
+    int row, col;
+
+    for( row = 0; row < dest_h; row++ )
+    {
+        int src_row = row * src_h / dest_h;
+        for( col = 0; col < dest_w; col++ )
+        {
+            int src_col = col * src_w / dest_w;
+            switch(bpp)
+            {
+                case 8:  dest_8[row * dest_w + col]
+                             = src_8[src_row * src_w + src_col];
+                         break;
+                case 16: dest_16[row * dest_w + col]
+                             = src_16[src_row * src_w + src_col];
+                         break;
+                case 32: dest_32[row * dest_w + col]
+                             = src_32[src_row * src_w + src_col];
+                         break;
+            }
+        }
+    }
+}
+
 void XvVideoOutput::Show(unsigned char *buffer, int width, int height)
 {
-    XvImage *image = data->buffers[buffer];
-
-    if (colorid == GUID_YV12_PLANAR)
+    if ( xv_port != -1 )
     {
-        memcpy(scratchspace, (unsigned char *)image->data + (width * height),
-               width * height / 4);
-        memcpy((unsigned char *)image->data + (width * height),
-               (unsigned char *)image->data + (width * height) * 5 / 4,
-               width * height / 4);
-        memcpy((unsigned char *)image->data + (width * height) * 5 / 4,
-               scratchspace, width * height / 4);
-    }
-   
-    pthread_mutex_lock(&lock);
- 
-    XvShmPutImage(data->XJ_disp, xv_port, data->XJ_curwin, data->XJ_gc, image, 
-                  imgx, imgy, imgw, imgh, dispxoff, dispyoff, dispwoff, 
-                  disphoff, False);
-    XSync(data->XJ_disp, False);
+        XvImage *image = data->buffers[buffer];
+        if (colorid == GUID_YV12_PLANAR)
+        {
+            memcpy(scratchspace, (unsigned char *)image->data + (width * height),
+                   width * height / 4);
+            memcpy((unsigned char *)image->data + (width * height),
+                   (unsigned char *)image->data + (width * height) * 5 / 4,
+                   width * height / 4);
+            memcpy((unsigned char *)image->data + (width * height) * 5 / 4,
+                   scratchspace, width * height / 4);
+        }
 
-    pthread_mutex_unlock(&lock);
+        pthread_mutex_lock(&lock);
+ 
+        XvShmPutImage(data->XJ_disp, xv_port, data->XJ_curwin, data->XJ_gc,
+                      image, imgx, imgy, imgw, imgh, dispxoff, dispyoff,
+                      dispwoff, disphoff, False);
+        XSync(data->XJ_disp, False);
+
+        pthread_mutex_unlock(&lock);
+    }
+    else
+    {
+        unsigned char *y_ptr;
+        unsigned char *u_ptr;
+        unsigned char *v_ptr;
+
+        unsigned char *sbuf = new unsigned char[curw * curh * XJ_depth / 8];
+        XImage *image = data->xbuffers[buffer];
+
+        y_ptr = (unsigned char *)image->data;
+        u_ptr = y_ptr + (width * height);
+        v_ptr = y_ptr + (width * height * 5 / 4);
+
+        yuv2rgb_fun convert = yuv2rgb_init_mmx(XJ_depth, MODE_RGB);
+        convert( sbuf, y_ptr, u_ptr, v_ptr, width, height, width * XJ_depth / 8,
+            width, width / 2);
+
+        scale_image((unsigned char *)sbuf, width, height,
+            (unsigned char *)image->data, curw, curh, XJ_depth );
+   
+        pthread_mutex_lock(&lock);
+
+        XPutImage(data->XJ_disp, data->XJ_curwin, data->XJ_gc, image, 
+                  0, 0, 0, 0, curw, curh );
+        XSync(data->XJ_disp, False);
+
+        pthread_mutex_unlock(&lock);
+
+        delete sbuf;
+    }
 }
 
 int XvVideoOutput::CheckEvents(void)
@@ -550,6 +682,9 @@ void XvVideoOutput::ReConfigure(int x, int y, int w, int h)
         return;
 
     if (oldx == x && oldy == y && oldw == w && oldh == h)
+        return;
+
+    if (oldx == (x+1) && oldy == (y+1) && oldw == w && oldh == h)
         return;
 
     if (XJ_aspect)
