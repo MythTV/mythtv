@@ -178,14 +178,26 @@ ChanInfo *parseChannel(QDomElement &element, QUrl baseUrl)
     QString xmltvid = element.attribute("id", "");
     QStringList split = QStringList::split(" ", xmltvid);
 
+    bool xmltvisjunk = false;
+
     if (isNorthAmerica)
     {
-        chaninfo->xmltvid = split[0];
-        chaninfo->chanstr = split[0];
-        if (split.size() > 1)
-            chaninfo->callsign = split[1];
-        else
+        if (xmltvid.contains("zap2it"))
+        {
+            xmltvisjunk = true;
+            chaninfo->xmltvid = "";
+            chaninfo->chanstr = "";
             chaninfo->callsign = "";
+        }
+        else
+        {
+            chaninfo->xmltvid = split[0];
+            chaninfo->chanstr = split[0];
+            if (split.size() > 1)
+                chaninfo->callsign = split[1];
+            else
+                chaninfo->callsign = "";
+        }
     }
     else
     {
@@ -214,6 +226,16 @@ ChanInfo *parseChannel(QDomElement &element, QUrl baseUrl)
                 if (chaninfo->name.length() == 0)
                 {
                     chaninfo->name = info.text();
+                    if (xmltvisjunk)
+                    {
+                        QStringList split = QStringList::split(" ", 
+                                                               chaninfo->name);
+           
+                        chaninfo->xmltvid = split[1];
+                        chaninfo->chanstr = split[1];
+                        if (split.size() > 2)
+                            chaninfo->callsign = split[2];
+                    }
                 }
             }
         }
@@ -329,6 +351,14 @@ ProgInfo *parseProgram(QDomElement &element)
     split = QStringList::split(" ", text);
     
     pginfo->channel = split[0];
+
+    if (pginfo->channel.contains("zap2it"))
+    {
+        QRegExp rx("C(\\d+)(\\w+)");
+        int pos = rx.search(pginfo->channel);
+        if (pos >= 0)
+            pginfo->channel = rx.cap(1);
+    }
 
     pginfo->start = fromXMLTVDate(pginfo->startts);
     pginfo->end = fromXMLTVDate(pginfo->endts);
