@@ -1329,8 +1329,8 @@ void DaapServer::sendContainer(HttpRequest *http_request, u32 container_id, int 
                     if(container_id != 1)
                     {
                     
-                        QValueList<uint> songs_in_list = the_playlist->getList();
-                        QValueList<uint>::iterator iter;
+                        QValueList<int> songs_in_list = the_playlist->getList();
+                        QValueList<int>::iterator iter;
                         for ( iter = songs_in_list.begin(); iter != songs_in_list.end(); ++iter )
                         {
                             int actual_id = (*iter) + (METADATA_UNIVERSAL_ID_DIVIDER * the_playlist->getCollectionId());

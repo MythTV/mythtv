@@ -341,7 +341,13 @@ void MetadataContainer::mapPlaylists(
     QIntDictIterator<Playlist> mapout_it( *current_playlists );
     for ( ; mapout_it.current(); ++mapout_it )
     {
-        mapout_it.current()->mapDatabaseToId(current_metadata);
+        mapout_it.current()->mapDatabaseToId(
+                                                current_metadata, 
+                                                mapout_it.current()->getDbList(), 
+                                                mapout_it.current()->getListPtr(),
+                                                current_playlists, 
+                                                0   // initial depth is 0
+                                            );
     }
                                                                 
 

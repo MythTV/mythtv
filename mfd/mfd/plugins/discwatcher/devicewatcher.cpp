@@ -371,10 +371,16 @@ void DeviceWatcher::updateAudioCDMetadata()
                                             songlist,
                                             1
                                          );
-
-    new_playlist->mapDatabaseToId(new_metadata);
     new_playlists->insert(1, new_playlist);
     playlist_additions.push_back(1);
+
+    new_playlist->mapDatabaseToId(
+                                    new_metadata,
+                                    new_playlist->getDbList(),
+                                    new_playlist->getListPtr(),
+                                    new_playlists,
+                                    0
+                                 );
 
     //
     //  Stuff the new metadata and playlists into the metadata server

@@ -184,7 +184,12 @@ AudioMetadata::~AudioMetadata()
 ---------------------------------------------------------------------
 */
 
-Playlist::Playlist(int l_collection_id, QString new_name, QString raw_songlist, uint new_id)
+Playlist::Playlist(
+                    int l_collection_id, 
+                    QString new_name, 
+                    QString raw_songlist, 
+                    uint new_id
+                  )
 {
     collection_id = l_collection_id;
     id = new_id;
@@ -196,11 +201,19 @@ Playlist::Playlist(int l_collection_id, QString new_name, QString raw_songlist, 
     for (; it != list.end(); it++)
     {
         //
-        //  FIX THIS; throwing away playlists within playlists
+        //  Map string list of integers to actual metadata
         //
-        if((*it).toInt() > 0)
+
+        bool ok;
+        if((*it).toInt(&ok) != 0 && ok)
         {
-            db_references.append((*it).toUInt());
+            db_references.append((*it).toInt());
+        }
+        else
+        {
+            cerr << "this is not a valid entry for a playlist: \""
+                 <<  (*it)
+                 << "\"" << endl;
         }
     }
 
@@ -208,29 +221,85 @@ Playlist::Playlist(int l_collection_id, QString new_name, QString raw_songlist, 
     waiting_for_list = false;
 }
 
-void Playlist::mapDatabaseToId(QIntDict<Metadata> *the_metadata)
+void Playlist::mapDatabaseToId(
+                                QIntDict<Metadata> *the_metadata, 
+                                QValueList<int> *reference_list,
+                                QValueList<int> *song_list,
+                                QIntDict<Playlist> *the_playlists,
+                                int depth
+                              )
 {
-    typedef QValueList<uint> UINTList;
-    UINTList::iterator iter;
-    for ( iter = db_references.begin(); iter != db_references.end(); ++iter )
+    if(depth == 0)
     {
-        Metadata *which_one = NULL;
-        QIntDictIterator<Metadata> md_it( *the_metadata );
-        for ( ; md_it.current(); ++md_it )
+        song_list->clear();
+    }
+    else if(depth > 20)
+    {
+        //
+        //  Arbitrary recursion limit (to avoid endless recursion if people
+        //  futz with their database directly
+        //
+        
+        cerr << "playlists within playlists stopped trying to go any "
+             << "deeper after hitting a depth of 20" 
+             << endl;
+        return;
+    }
+
+    QValueList<int>::iterator iter;
+    for ( iter = reference_list->begin(); iter != reference_list->end(); ++iter )
+    {
+        if((*iter) > 0)
         {
-            if((uint) md_it.current()->getDbId() == (*iter))
+            Metadata *which_one = NULL;
+            QIntDictIterator<Metadata> md_it( *the_metadata );
+            for ( ; md_it.current(); ++md_it )
             {
-                which_one = md_it.current();
-                break;
+                if(md_it.current()->getDbId() == (*iter))
+                {
+                    which_one = md_it.current();
+                    break;
+                }
             }
-        }
-        if(which_one)
-        {
-            song_references.append(which_one->getId());
+            if(which_one)
+            {
+                song_list->append(which_one->getId());
+            }
+            else
+            {
+                //warning("playlist has entry that does not map to metadata");
+            }
         }
         else
         {
-            // warning("playlist had an entry that did not map to any metadata");
+            Playlist *which_one = NULL;
+            QIntDictIterator<Playlist> pl_it( *the_playlists );
+            for ( ; pl_it.current(); ++pl_it )
+            {
+                cout << "checking " << pl_it.current()->getDbId() << " against " << (*iter) * -1 << endl;
+                if(pl_it.current()->getDbId() == (*iter) * -1)
+                {
+                    which_one = pl_it.current();
+                    break;
+                }
+            }
+            if(which_one)
+            {
+                which_one->mapDatabaseToId(
+                                            the_metadata, 
+                                            which_one->getDbList(),
+                                            song_list,
+                                            the_playlists,
+                                            depth + 1
+                                          );
+            }
+            else
+            {
+                cerr << "playlist had a reference to another playlist "
+                     << "that does not exist" 
+                     << endl;
+            }
+            
         }
     }
 }

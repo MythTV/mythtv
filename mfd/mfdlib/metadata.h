@@ -253,16 +253,26 @@ class Playlist
     ~Playlist();
 
     uint             getId(){return id;}
-    uint             getDbId(){return db_id;}
+    int              getDbId(){return db_id;}
     void             setId(int an_int){id = an_int;}
     void             setDbId(int an_int){db_id = an_int;}
     uint             getUniversalId();
     QString          getName(){return name;}
     QString          getRawSongList(){return raw_song_list;}
     uint             getCount(){return song_references.count();}
-    QValueList<uint> getList(){return song_references;}
+    QValueList<int>  getList(){return song_references;}
+    QValueList<int>* getListPtr(){return &song_references;}
+    QValueList<int>* getDbList(){return &db_references;}
     void             addToList(int an_id);
-    void             mapDatabaseToId(QIntDict<Metadata> *the_metadata);    
+
+    void             mapDatabaseToId(
+                                        QIntDict<Metadata> *the_metadata, 
+                                        QValueList<int>* reference_list,
+                                        QValueList<int>* song_list,
+                                        QIntDict<Playlist> *the_playlists,
+                                        int depth
+                                    );    
+
     uint             getCollectionId(){return collection_id;}    
     bool             internalChange(){ return internal_change; }
     void             internalChange(bool uh_huh_or_nope_not_me){internal_change = uh_huh_or_nope_not_me;}
@@ -272,10 +282,10 @@ class Playlist
   private:
   
     QString          name;
-    QValueList<uint> song_references;
-    QValueList<uint> db_references;
+    QValueList<int>  song_references;
+    QValueList<int>  db_references;
     uint             id;
-    uint             db_id;
+    int              db_id;
     uint             collection_id;
     bool             internal_change;
     bool             waiting_for_list;

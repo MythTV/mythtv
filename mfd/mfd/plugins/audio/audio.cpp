@@ -768,7 +768,7 @@ void AudioPlugin::playFromPlaylist(int augment_index)
     //  Get the list of references.
     //
         
-    QValueList<uint> song_list = playlist_to_play->getList();
+    QValueList<int> song_list = playlist_to_play->getList();
 
 
     //
