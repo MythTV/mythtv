@@ -12,6 +12,7 @@
 ## 24 Jun 03  1.2	Large patch by Mike Nugent to make things right
 ##			Now runs under strict and added debug option
 ##			Also allows a hostname to be passed to mythname
+## 2003-07-16 1.3       Added quality options to one pass
 ##
 ## TODO:
 ## 1) Fine tune the --autoscale function
@@ -194,17 +195,27 @@ if ($debug) {
 #
 if ($passes==1) {
   print "Doing a one pass encode.\n";
-  my $pass1="$nicestr " . mencoder . " -idx $path$show.nuv -fps $fps -oac mp3lame -lameopts vbr=3:br=$aud_br -ovc lavc -lavcopts vcodec=mpeg4:vbitrate=$vid_br:vhq:v4mv -vop lavcdeint,scale=$scale -aspect 4:3 -o $outname.avi";
+  my $pass1="$nicestr " . mencoder . " -idx $path$show.nuv -fps $fps " .
+  "-oac mp3lame -lameopts vbr=3:br=$aud_br -ovc lavc " .
+  "-lavcopts  vcodec=mpeg4:vbitrate=$vid_br:vhq:v4mv:vpass=1 " .
+  "-vop lavcdeint,scale=$scale -aspect 4:3 -o $outname.avi";
   print "\tPASS ONE=$pass1\n";
 
   if(!$test) {
-    exec $pass1;
+    system $pass1;
   }
 }
 else {
   print "Doing a two pass encode.\n";
-  my $pass1="$nicestr " . mencoder . " -idx $path$show.nuv -fps $fps -oac mp3lame -lameopts vbr=3:br=$aud_br -ovc lavc -lavcopts vcodec=mpeg4:vbitrate=$vid_br:vpass=1 -vop lavcdeint,scale=$scale -aspect 4:3 -o $outname.avi";
-  my $pass2="$nicestr " . mencoder . " -idx $path$show.nuv -fps $fps -oac mp3lame -lameopts vbr=3:br=$aud_br -ovc lavc -lavcopts vcodec=mpeg4:vbitrate=$vid_br:vhq:v4mv:vpass=2 -vop lavcdeint,scale=$scale -aspect 4:3 -o $outname.avi";
+  my $pass1="$nicestr " . mencoder . " -idx $path$show.nuv -fps $fps " .
+  "-oac mp3lame -lameopts vbr=3:br=$aud_br -ovc lavc -lavcopts " .
+  "vcodec=mpeg4:vbitrate=$vid_br:vpass=1 -vop lavcdeint,scale=$scale " .
+  "-aspect 4:3 -o $outname.avi";
+
+  my $pass2="$nicestr " . mencoder . " -idx $path$show.nuv -fps $fps " .
+  "-oac mp3lame -lameopts vbr=3:br=$aud_br -ovc lavc -lavcopts " .
+  "vcodec=mpeg4:vbitrate=$vid_br:vhq:v4mv:vpass=2 -vop lavcdeint," .
+  "scale=$scale -aspect 4:3 -o $outname.avi";
   print "\tPASS ONE=$pass1\n";
   print "\tPASS TWO=$pass2\n";
 
