@@ -2209,7 +2209,7 @@ void NuppelVideoPlayer::AddAudioData(short int *lbuffer, short int *rbuffer,
             }
 
             buffers[0] = (char *)newlbuffer;
-            buffers[1] = (char *)newlbuffer;
+            buffers[1] = (char *)newrbuffer;
 
             for (incount = 0, outcount = 0; 
                  (incount < samples) && (outcount < newsamples); 
