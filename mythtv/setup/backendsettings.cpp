@@ -2,47 +2,10 @@
 #include "libmyth/mythcontext.h"
 #include "libmyth/settings.h"
 
-class BackendSetting: public SimpleDBStorage, virtual public Configurable {
-public:
-    BackendSetting(QString name):
-        SimpleDBStorage("settings", "data") {
-        setName(name);
-    };
-
-protected:
-    virtual QString whereClause(void) {
-        return QString("value = '%1'").arg(getName());
-    };
-
-    virtual QString setClause(void) {
-        return QString("value = '%1', data = '%2'").arg(getName()).arg(getValue());
-    };
-};
-
-class BackendHostSetting: public SimpleDBStorage, virtual public Configurable {
-public:
-    BackendHostSetting(QString name):
-        SimpleDBStorage("settings", "data") {
-        setName(name);
-    };
-
-protected:
-    virtual QString whereClause(void) {
-        return QString("value = '%1' AND hostname = '%2'")
-                       .arg(getName()).arg(gContext->GetHostName());
-    };
-
-    virtual QString setClause(void) {
-        return QString("value = '%1', data = '%2', hostname = '%3'")
-                       .arg(getName()).arg(getValue())
-                       .arg(gContext->GetHostName());
-    };
-};
-
-class LocalServerIP: public LineEditSetting, public BackendHostSetting {
+class LocalServerIP: public GlobalLineEdit {
 public:
     LocalServerIP():
-        BackendHostSetting("BackendServerIP") {
+        GlobalLineEdit("BackendServerIP") {
             QString hostname = gContext->GetHostName();
             QString label = QObject::tr("IP address for") + QString(" ") + 
                             gContext->GetHostName();
@@ -55,10 +18,10 @@ public:
     };
 };
 
-class LocalServerPort: public LineEditSetting, public BackendHostSetting {
+class LocalServerPort: public GlobalLineEdit {
 public:
     LocalServerPort():
-        BackendHostSetting("BackendServerPort") {
+        GlobalLineEdit("BackendServerPort") {
             setLabel(QObject::tr("Port the server runs on"));
             setValue("6543");
             setHelpText(QObject::tr("Unless you've got good reason to, don't "
@@ -66,10 +29,10 @@ public:
     };
 };
 
-class LocalStatusPort: public LineEditSetting, public BackendHostSetting {
+class LocalStatusPort: public GlobalLineEdit {
 public:
     LocalStatusPort():
-        BackendHostSetting("BackendStatusPort") {
+        GlobalLineEdit("BackendStatusPort") {
             setLabel(QObject::tr("Port the server shows status on"));
             setValue("6544");
             setHelpText(QObject::tr("Port which the server will listen to for "
@@ -78,10 +41,10 @@ public:
     };
 };
 
-class MasterServerIP: public LineEditSetting, public BackendSetting {
+class MasterServerIP: public BackendLineEdit {
 public:
     MasterServerIP():
-        BackendSetting("MasterServerIP") {
+        BackendLineEdit("MasterServerIP") {
             setLabel(QObject::tr("Master Server IP address"));
             setValue("127.0.0.1");
             setHelpText(QObject::tr("The IP address of the master backend "
@@ -92,10 +55,10 @@ public:
     };
 };
 
-class MasterServerPort: public LineEditSetting, public BackendSetting {
+class MasterServerPort: public BackendLineEdit {
 public:
     MasterServerPort():
-        BackendSetting("MasterServerPort") {
+        BackendLineEdit("MasterServerPort") {
             setLabel(QObject::tr("Port the master server runs on"));
             setValue("6543");
             setHelpText(QObject::tr("Unless you've got good reason to, "
@@ -103,10 +66,10 @@ public:
     };
 };
 
-class RecordFilePrefix: public LineEditSetting, public BackendHostSetting {
+class RecordFilePrefix: public GlobalLineEdit {
 public:
     RecordFilePrefix():
-        BackendHostSetting("RecordFilePrefix") {
+        GlobalLineEdit("RecordFilePrefix") {
         setLabel(QObject::tr("Directory to hold recordings"));
         setValue("/mnt/store/");
         setHelpText(QObject::tr("All recordings get stored in this "
@@ -114,10 +77,10 @@ public:
     };
 };
 
-class LiveBufferPrefix: public LineEditSetting, public BackendHostSetting {
+class LiveBufferPrefix: public GlobalLineEdit {
 public:
     LiveBufferPrefix():
-        BackendHostSetting("LiveBufferDir") {
+        GlobalLineEdit("LiveBufferDir") {
         setLabel(QObject::tr("Directory to hold the Live-TV buffers"));
         setValue("/mnt/store/");
         setHelpText(QObject::tr("All Live-TV buffers will get stored in this "
@@ -126,10 +89,10 @@ public:
     };
 };
 
-class TVFormat: public ComboBoxSetting, public BackendSetting {
+class TVFormat: public BackendComboBox {
 public:
     TVFormat():
-        BackendSetting("TVFormat") {
+        BackendComboBox("TVFormat") {
         setLabel(QObject::tr("TV format"));
         addSelection("NTSC");
         addSelection("ATSC");
@@ -143,10 +106,10 @@ public:
     };
 };
 
-class VbiFormat: public ComboBoxSetting, public BackendSetting {
+class VbiFormat: public BackendComboBox {
 public:
     VbiFormat():
-        BackendSetting("VbiFormat") {
+        BackendComboBox("VbiFormat") {
         setLabel(QObject::tr("VBI format"));
         addSelection("None");
         addSelection("PAL Teletext");
@@ -157,10 +120,10 @@ public:
     };
 };
 
-class FreqTable: public ComboBoxSetting, public BackendSetting {
+class FreqTable: public BackendComboBox {
 public:
     FreqTable():
-        BackendSetting("FreqTable") {
+        BackendComboBox("FreqTable") {
         setLabel(QObject::tr("Channel frequency table"));
         addSelection("us-cable");
         addSelection("us-bcast");
@@ -184,11 +147,10 @@ public:
     };
 };
 
-class BufferSize: public SliderSetting, public BackendHostSetting {
+class BufferSize: public GlobalSlider {
 public:
     BufferSize():
-        SliderSetting(1, 100, 1),
-        BackendHostSetting("BufferSize") {
+        GlobalSlider("BufferSize", 1, 100, 1)  {
         setLabel(QObject::tr("Live TV buffer (GB)"));
         setValue(5);
         setHelpText(QObject::tr("How large the live TV buffer is allowed to "
@@ -196,11 +158,10 @@ public:
     };
 };
 
-class MaxBufferFill: public SliderSetting, public BackendHostSetting {
+class MaxBufferFill: public GlobalSlider {
 public:
     MaxBufferFill():
-        SliderSetting(1, 100, 1),
-        BackendHostSetting("MaxBufferFill") {
+        GlobalSlider("MaxBufferFill", 1, 100, 1) {
         setLabel(QObject::tr("Minimum free Live TV buffer (MB)"));
         setValue(50);
         setHelpText(QObject::tr("How full the live TV buffer is allowed to "
@@ -208,10 +169,10 @@ public:
     };
 };
 
-class SaveTranscoding: public CheckBoxSetting, public BackendSetting {
+class SaveTranscoding: public BackendCheckBox {
 public:
     SaveTranscoding():
-        BackendSetting("SaveTranscoding") {
+        BackendCheckBox("SaveTranscoding") {
         setLabel(QObject::tr("Save original files after transcoding"));
         setValue(false);
         setHelpText(QObject::tr("When set and the transcoder is active, the "
@@ -220,10 +181,10 @@ public:
     };
 };
 
-class DeletesFollowLinks: public CheckBoxSetting, public BackendSetting {
+class DeletesFollowLinks: public BackendCheckBox {
 public:
     DeletesFollowLinks():
-        BackendSetting("DeletesFollowLinks") {
+        BackendCheckBox("DeletesFollowLinks") {
         setLabel(QObject::tr("Follow symbolic links when deleting files"));
         setValue(false);
         setHelpText(QObject::tr("This will cause Myth to follow symlinks "
@@ -232,10 +193,10 @@ public:
     };
 };
 
-class TimeOffset: public ComboBoxSetting, public BackendSetting {
+class TimeOffset: public BackendComboBox {
 public:
     TimeOffset():
-        BackendSetting("TimeOffset") {
+        BackendComboBox("TimeOffset") {
         setLabel(QObject::tr("Time offset for XMLTV listings"));
         addSelection("None");
         addSelection("Auto");
@@ -293,10 +254,10 @@ public:
     };
 };
 
-class MasterBackendOverride: public CheckBoxSetting, public BackendSetting {
+class MasterBackendOverride: public BackendCheckBox {
 public:
     MasterBackendOverride():
-        BackendSetting("MasterBackendOverride") {
+        BackendCheckBox("MasterBackendOverride") {
         setLabel(QObject::tr("Master Backend Override"));
         setValue(true);
         setHelpText(QObject::tr("If enabled, the master backend will stream and"
@@ -306,11 +267,10 @@ public:
     };
 };
 
-class WOLbackendReconnectWaitTime: public SpinBoxSetting, public BackendSetting {
+class WOLbackendReconnectWaitTime: public BackendSpinBox {
 public:
     WOLbackendReconnectWaitTime():
-        SpinBoxSetting(0,1200, 5), 
-        BackendSetting("WOLbackendReconnectWaitTime") {
+        BackendSpinBox("WOLbackendReconnectWaitTime", 0, 1200, 5) {
         setLabel(QObject::tr("Reconnect wait time (secs)"));
         setValue(0);
         setHelpText(QObject::tr("Length of time the frontend waits between the "
@@ -320,11 +280,10 @@ public:
     };
 };
 
-class WOLbackendConnectRetry: public SpinBoxSetting, public BackendSetting {
+class WOLbackendConnectRetry: public BackendSpinBox {
 public:
     WOLbackendConnectRetry():
-        SpinBoxSetting(1, 60, 1), 
-        BackendSetting("WOLbackendConnectRetry") {
+        BackendSpinBox("WOLbackendConnectRetry", 1, 60, 1) {
         setLabel(QObject::tr("Count of reconnect tries"));
         setHelpText(QObject::tr("Number of times the frontend will try to wake "
                     "up the master backend."));
@@ -332,10 +291,10 @@ public:
     };
 };
 
-class WOLbackendCommand: public LineEditSetting, public BackendSetting {
+class WOLbackendCommand: public BackendLineEdit {
 public:
     WOLbackendCommand():
-        BackendSetting("WOLbackendCommand") {
+        BackendLineEdit("WOLbackendCommand") {
         setLabel(QObject::tr("Wake Command"));
         setValue("");
         setHelpText(QObject::tr("The command used to wake up your master "
@@ -343,10 +302,10 @@ public:
     };
 };
 
-class WOLslaveBackendsCommand: public LineEditSetting, public BackendSetting {
+class WOLslaveBackendsCommand: public BackendLineEdit {
 public:
     WOLslaveBackendsCommand():
-        BackendSetting("WOLslaveBackendsCommand") {
+        BackendLineEdit("WOLslaveBackendsCommand") {
         setLabel(QObject::tr("Wake command for slaves"));
         setValue("");
         setHelpText(QObject::tr("The command used to wakeup your slave "
@@ -354,11 +313,10 @@ public:
     };
 };
 
-class idleTimeoutSecs: public SpinBoxSetting, public BackendSetting {
+class idleTimeoutSecs: public BackendSpinBox {
 public:
     idleTimeoutSecs():
-        SpinBoxSetting(0, 1200, 5), 
-        BackendSetting("idleTimeoutSecs") {
+        BackendSpinBox("idleTimeoutSecs", 0, 1200, 5) {
         setLabel(QObject::tr("Idle timeout (secs)"));
         setValue(0);
         setHelpText(QObject::tr("The amount of time the master backend idles "
@@ -367,10 +325,10 @@ public:
     };
 };
     
-class idleWaitForRecordingTime: public SpinBoxSetting, public BackendSetting {
+class idleWaitForRecordingTime: public BackendSpinBox {
 public:
     idleWaitForRecordingTime():
-        SpinBoxSetting(0, 120, 1), BackendSetting("idleWaitForRecordingTime") {
+        BackendSpinBox("idleWaitForRecordingTime", 0, 120, 1) {
         setLabel(QObject::tr("Max. wait for recording (min)"));
         setValue(15);
         setHelpText(QObject::tr("The amount of time the master backend waits "
@@ -379,11 +337,10 @@ public:
     };
 };
 
-class StartupSecsBeforeRecording: public SpinBoxSetting, public BackendSetting {
+class StartupSecsBeforeRecording: public BackendSpinBox {
 public:
     StartupSecsBeforeRecording():
-        SpinBoxSetting(0, 1200, 5), 
-        BackendSetting("StartupSecsBeforeRecording") {
+        BackendSpinBox("StartupSecsBeforeRecording", 0, 1200, 5) {
         setLabel(QObject::tr("Startup before rec. (secs)"));
         setValue(120);
         setHelpText(QObject::tr("The amount of time the master backend will be "
@@ -391,10 +348,10 @@ public:
     };
 };
 
-class WakeupTimeFormat: public LineEditSetting, public BackendSetting {
+class WakeupTimeFormat: public BackendLineEdit {
 public:
     WakeupTimeFormat():
-        BackendSetting("WakeupTimeFormat") {
+        BackendLineEdit("WakeupTimeFormat") {
         setLabel(QObject::tr("Wakeup time format"));
         setValue("hh:mm yyyy-MM-dd");
         setHelpText(QObject::tr("The format of the time string passed to the "
@@ -404,10 +361,10 @@ public:
     };
 };
 
-class SetWakeuptimeCommand: public LineEditSetting, public BackendSetting {
+class SetWakeuptimeCommand: public BackendLineEdit {
 public:
     SetWakeuptimeCommand():
-        BackendSetting("SetWakeuptimeCommand") {
+        BackendLineEdit("SetWakeuptimeCommand") {
         setLabel(QObject::tr("Set wakeuptime command"));
         setValue("");
         setHelpText(QObject::tr("The command used to set the time (passed as "
@@ -415,20 +372,20 @@ public:
     };
 };
 
-class ServerHaltCommand: public LineEditSetting, public BackendSetting {
+class ServerHaltCommand: public BackendLineEdit {
 public:
     ServerHaltCommand():
-        BackendSetting("ServerHaltCommand") {
+        BackendLineEdit("ServerHaltCommand") {
         setLabel(QObject::tr("Server halt command"));
         setValue("sudo /sbin/halt -p");
         setHelpText(QObject::tr("The command used to halt the backends."));
     };
 };
 
-class preSDWUCheckCommand: public LineEditSetting, public BackendSetting {
+class preSDWUCheckCommand: public BackendLineEdit {
 public:
     preSDWUCheckCommand():
-        BackendSetting("preSDWUCheckCommand") {
+        BackendLineEdit("preSDWUCheckCommand") {
         setLabel(QObject::tr("Pre Shutdown check-command"));
         setValue("");
         setHelpText(QObject::tr("A command executed before the backend would "
@@ -439,10 +396,10 @@ public:
     };
 };
 
-class blockSDWUwithoutClient: public CheckBoxSetting, public BackendSetting {
+class blockSDWUwithoutClient: public BackendCheckBox {
 public:
     blockSDWUwithoutClient():
-        BackendSetting("blockSDWUwithoutClient") {
+        BackendCheckBox("blockSDWUwithoutClient") {
         setLabel(QObject::tr("Block shutdown before client connected"));
         setValue(true);
         setHelpText(QObject::tr("If set, the automatic shutdown routine will "
@@ -450,10 +407,10 @@ public:
     };
 };
 
-class startupCommand: public LineEditSetting, public BackendSetting {
+class startupCommand: public BackendLineEdit {
 public:
     startupCommand():
-        BackendSetting("startupCommand") {
+        BackendLineEdit("startupCommand") {
         setLabel(QObject::tr("Startup command"));
         setValue("");
         setHelpText(QObject::tr("This command is executed right after starting "
@@ -463,12 +420,10 @@ public:
     };
 };
 
-class JobQueueMaxSimultaneousJobs: public SpinBoxSetting,
-                                   public BackendHostSetting {
+class JobQueueMaxSimultaneousJobs: public GlobalSpinBox {
 public:
     JobQueueMaxSimultaneousJobs():
-        SpinBoxSetting(1, 5, 1),
-        BackendHostSetting("JobQueueMaxSimultaneousJobs") {
+        GlobalSpinBox("JobQueueMaxSimultaneousJobs", 1, 5, 1) {
         setLabel(QObject::tr("Maximum simultaneous jobs on this backend"));
         setHelpText(QObject::tr("The Job Queue will be limited to running "
                     "this many simultaneous jobs on this backend."));
@@ -476,12 +431,10 @@ public:
     };
 };
 
-class JobQueueCheckFrequency: public SpinBoxSetting,
-                              public BackendHostSetting {
+class JobQueueCheckFrequency: public GlobalSpinBox {
 public:
     JobQueueCheckFrequency():
-        SpinBoxSetting(10, 300, 5),
-        BackendHostSetting("JobQueueCheckFrequency") {
+        GlobalSpinBox("JobQueueCheckFrequency", 10, 300, 5) {
         setLabel(QObject::tr("Job Queue Check frequency (in seconds)"));
         setHelpText(QObject::tr("When looking for new jobs to process, the "
                     "Job Queue will wait this long between checks."));
@@ -489,10 +442,10 @@ public:
     };
 };
 
-class JobQueueCPU: public ComboBoxSetting, public BackendHostSetting {
+class JobQueueCPU: public GlobalComboBox {
 public:
     JobQueueCPU():
-        BackendHostSetting("JobQueueCPU") {
+        GlobalComboBox("JobQueueCPU") {
 
         setLabel(QObject::tr("CPU Usage"));
         addSelection(QObject::tr("Low"), "0");
@@ -505,10 +458,10 @@ public:
     };
 };
 
-class JobsRunOnRecordHost: public CheckBoxSetting, public BackendSetting {
+class JobsRunOnRecordHost: public BackendCheckBox {
 public:
     JobsRunOnRecordHost():
-        BackendSetting("JobsRunOnRecordHost") {
+        BackendCheckBox("JobsRunOnRecordHost") {
         setLabel(QObject::tr("Run Jobs only on original recording host"));
         setValue(false);
         setHelpText(QObject::tr("If set, jobs in the queue will be required "
@@ -517,20 +470,20 @@ public:
     };
 };
 
-class UserJobDesc1: public LineEditSetting, public BackendSetting {
+class UserJobDesc1: public BackendLineEdit {
 public:
     UserJobDesc1():
-        BackendSetting("UserJobDesc1") {
+        BackendLineEdit("UserJobDesc1") {
         setLabel(QObject::tr("User Job #1 Description"));
         setValue("User Job #1");
         setHelpText(QObject::tr("The Description for this User Job."));
     };
 };
 
-class UserJob1: public LineEditSetting, public BackendSetting {
+class UserJob1: public BackendLineEdit {
 public:
     UserJob1():
-        BackendSetting("UserJob1") {
+        BackendLineEdit("UserJob1") {
         setLabel(QObject::tr("User Job #1 Command"));
         setValue("");
         setHelpText(QObject::tr("The command to run whenever this User Job "
@@ -538,20 +491,20 @@ public:
     };
 };
 
-class UserJobDesc2: public LineEditSetting, public BackendSetting {
+class UserJobDesc2: public BackendLineEdit {
 public:
     UserJobDesc2():
-        BackendSetting("UserJobDesc2") {
+        BackendLineEdit("UserJobDesc2") {
         setLabel(QObject::tr("User Job #2 Description"));
         setValue("User Job #2");
         setHelpText(QObject::tr("The Description for this User Job."));
     };
 };
 
-class UserJob2: public LineEditSetting, public BackendSetting {
+class UserJob2: public BackendLineEdit {
 public:
     UserJob2():
-        BackendSetting("UserJob2") {
+        BackendLineEdit("UserJob2") {
         setLabel(QObject::tr("User Job #2 Command"));
         setValue("");
         setHelpText(QObject::tr("The command to run whenever this User Job "
@@ -559,20 +512,20 @@ public:
     };
 };
 
-class UserJobDesc3: public LineEditSetting, public BackendSetting {
+class UserJobDesc3: public BackendLineEdit {
 public:
     UserJobDesc3():
-        BackendSetting("UserJobDesc3") {
+        BackendLineEdit("UserJobDesc3") {
         setLabel(QObject::tr("User Job #3 Description"));
         setValue("User Job #3");
         setHelpText(QObject::tr("The Description for this User Job."));
     };
 };
 
-class UserJob3: public LineEditSetting, public BackendSetting {
+class UserJob3: public BackendLineEdit {
 public:
     UserJob3():
-        BackendSetting("UserJob3") {
+        BackendLineEdit("UserJob3") {
         setLabel(QObject::tr("User Job #3 Command"));
         setValue("");
         setHelpText(QObject::tr("The command to run whenever this User Job "
@@ -580,20 +533,20 @@ public:
     };
 };
 
-class UserJobDesc4: public LineEditSetting, public BackendSetting {
+class UserJobDesc4: public BackendLineEdit {
 public:
     UserJobDesc4():
-        BackendSetting("UserJobDesc4") {
+        BackendLineEdit("UserJobDesc4") {
         setLabel(QObject::tr("User Job #4 Description"));
         setValue("User Job #4");
         setHelpText(QObject::tr("The Description for this User Job."));
     };
 };
 
-class UserJob4: public LineEditSetting, public BackendSetting {
+class UserJob4: public BackendLineEdit {
 public:
     UserJob4():
-        BackendSetting("UserJob4") {
+        BackendLineEdit("UserJob4") {
         setLabel(QObject::tr("User Job #4 Command"));
         setValue("");
         setHelpText(QObject::tr("The command to run whenever this User Job "
@@ -601,10 +554,10 @@ public:
     };
 };
 
-class JobAllowTranscode: public CheckBoxSetting, public BackendHostSetting {
+class JobAllowTranscode: public GlobalCheckBox {
 public:
     JobAllowTranscode():
-        BackendHostSetting("JobAllowTranscode") {
+        GlobalCheckBox("JobAllowTranscode") {
         setLabel(QObject::tr("Allow Transcoding jobs"));
         setValue(true);
         setHelpText(QObject::tr("Allow jobs of this type to run on this "
@@ -612,10 +565,10 @@ public:
     };
 };
 
-class JobAllowCommFlag: public CheckBoxSetting, public BackendHostSetting {
+class JobAllowCommFlag: public GlobalCheckBox {
 public:
     JobAllowCommFlag():
-        BackendHostSetting("JobAllowCommFlag") {
+        GlobalCheckBox("JobAllowCommFlag") {
         setLabel(QObject::tr("Allow Commercial Detection jobs"));
         setValue(true);
         setHelpText(QObject::tr("Allow jobs of this type to run on this "
@@ -623,10 +576,10 @@ public:
     };
 };
 
-class JobAllowUserJob1: public CheckBoxSetting, public BackendHostSetting {
+class JobAllowUserJob1: public GlobalCheckBox {
 public:
     JobAllowUserJob1():
-        BackendHostSetting("JobAllowUserJob1") {
+        GlobalCheckBox("JobAllowUserJob1") {
         setLabel(QObject::tr("Allow 'User Job #1' jobs"));
         setValue(false);
         setHelpText(QObject::tr("Allow jobs of this type to run on this "
@@ -634,10 +587,10 @@ public:
     };
 };
 
-class JobAllowUserJob2: public CheckBoxSetting, public BackendHostSetting {
+class JobAllowUserJob2: public GlobalCheckBox {
 public:
     JobAllowUserJob2():
-        BackendHostSetting("JobAllowUserJob2") {
+        GlobalCheckBox("JobAllowUserJob2") {
         setLabel(QObject::tr("Allow 'User Job #2' jobs"));
         setValue(false);
         setHelpText(QObject::tr("Allow jobs of this type to run on this "
@@ -645,10 +598,10 @@ public:
     };
 };
 
-class JobAllowUserJob3: public CheckBoxSetting, public BackendHostSetting {
+class JobAllowUserJob3: public GlobalCheckBox {
 public:
     JobAllowUserJob3():
-        BackendHostSetting("JobAllowUserJob3") {
+        GlobalCheckBox("JobAllowUserJob3") {
         setLabel(QObject::tr("Allow 'User Job #3' jobs"));
         setValue(false);
         setHelpText(QObject::tr("Allow jobs of this type to run on this "
@@ -656,10 +609,10 @@ public:
     };
 };
 
-class JobAllowUserJob4: public CheckBoxSetting, public BackendHostSetting {
+class JobAllowUserJob4: public GlobalCheckBox {
 public:
     JobAllowUserJob4():
-        BackendHostSetting("JobAllowUserJob4") {
+        GlobalCheckBox("JobAllowUserJob4") {
         setLabel(QObject::tr("Allow 'User Job #4' jobs"));
         setValue(false);
         setHelpText(QObject::tr("Allow jobs of this type to run on this "

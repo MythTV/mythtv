@@ -1725,30 +1725,10 @@ public:
     }
 };
 
-class BackendSettingVS: public SimpleDBStorage, virtual public Configurable
+class DiseqcLatitude : public BackendLineEdit
 {
 public:
-    BackendSettingVS(QString name): SimpleDBStorage("settings", "data")
-    {
-        setName(name);
-    }
-
-protected:
-    virtual QString whereClause(void)
-    {
-        return QString("value = '%1'").arg(getName());
-    }
-
-    virtual QString setClause(void)
-    {
-        return QString("value = '%1', data = '%2'").arg(getName()).arg(getValue());
-    }
-};
-
-class DiseqcLatitude : public LineEditSetting, public BackendSettingVS
-{
-public:
-    DiseqcLatitude() : BackendSettingVS("latitude")
+    DiseqcLatitude() : BackendLineEdit("latitude")
     {
         setLabel("Latitude");
         setHelpText(QObject::tr("The Latitude of your satellite dishes "
@@ -1758,10 +1738,10 @@ public:
     }
 };
 
-class DiseqcLongitude : public LineEditSetting, public BackendSettingVS
+class DiseqcLongitude : public BackendLineEdit
 {
 public:
-    DiseqcLongitude() : BackendSettingVS("longitude")
+    DiseqcLongitude() : BackendLineEdit("longitude")
     {
         setLabel("Longitude");
         setHelpText(QObject::tr("The Longitude of your satellite dishes "

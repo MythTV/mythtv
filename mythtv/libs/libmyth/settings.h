@@ -696,4 +696,99 @@ public:
     TransCheckBoxSetting() {};
 };
 
+class GlobalSetting: public SimpleDBStorage, virtual public Configurable {
+public:
+    GlobalSetting(QString name):
+        SimpleDBStorage("settings", "data") {
+        setName(name);
+    };
+
+protected:
+    virtual QString whereClause(void);
+    virtual QString setClause(void);
+};
+
+class BackendSetting: public SimpleDBStorage, virtual public Configurable {
+public:
+    BackendSetting(QString name):
+        SimpleDBStorage("settings", "data") {
+        setName(name);
+    };
+
+protected:
+    virtual QString whereClause(void);
+    virtual QString setClause(void);
+};
+
+class GlobalSlider: public SliderSetting, public GlobalSetting {
+  public:
+    GlobalSlider(const QString &name, int min, int max, int step) :
+        SliderSetting(min, max, step),
+        GlobalSetting(name) { }
+};
+
+class GlobalSpinBox: public SpinBoxSetting, public GlobalSetting {
+  public:
+    GlobalSpinBox(const QString &name, int min, int max, int step, 
+                  bool allow_single_step = false) :
+        SpinBoxSetting(min, max, step, allow_single_step),
+        GlobalSetting(name) { }
+};
+
+class GlobalCheckBox: public CheckBoxSetting, public GlobalSetting {
+  public:
+    GlobalCheckBox(const QString &name) :
+        GlobalSetting(name) { }
+};
+
+class GlobalComboBox: public ComboBoxSetting, public GlobalSetting {
+  public:
+    GlobalComboBox(const QString &name, bool rw = false) :
+        ComboBoxSetting(rw),
+        GlobalSetting(name) { }
+};
+
+class GlobalLineEdit: public LineEditSetting, public GlobalSetting {
+  public:
+    GlobalLineEdit(const QString &name, bool rw = true) :
+        LineEditSetting(rw),
+        GlobalSetting(name) { }
+};
+
+class BackendSlider: public SliderSetting, public BackendSetting {
+  public:
+    BackendSlider(const QString &name, int min, int max, int step) :
+        SliderSetting(min, max, step),
+        BackendSetting(name) { }
+};
+
+class BackendSpinBox: public SpinBoxSetting, public BackendSetting {
+  public:
+    BackendSpinBox(const QString &name, int min, int max, int step,
+                   bool allow_single_step = false) :
+        SpinBoxSetting(min, max, step, allow_single_step),
+        BackendSetting(name) { }
+};
+
+class BackendCheckBox: public CheckBoxSetting, public BackendSetting {
+  public:
+    BackendCheckBox(const QString &name) :
+        BackendSetting(name) { }
+};
+
+class BackendComboBox: public ComboBoxSetting, public BackendSetting {
+  public:
+    BackendComboBox(const QString &name, bool rw = false) :
+        ComboBoxSetting(rw),
+        BackendSetting(name) { }
+};
+
+class BackendLineEdit: public LineEditSetting, public BackendSetting {
+  public:
+    BackendLineEdit(const QString &name, bool rw = true) :
+        LineEditSetting(rw),
+        BackendSetting(name) { }
+};
+
+
 #endif

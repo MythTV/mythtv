@@ -1105,3 +1105,26 @@ int ConfigurationPopupDialog::exec(QSqlDatabase* db, bool saveOnAccept)
     return ret;
 }
 
+QString GlobalSetting::whereClause(void)
+{
+    return QString("value = '%1' AND hostname = '%2'")
+                   .arg(getName()).arg(gContext->GetHostName());
+}
+
+QString GlobalSetting::setClause(void)
+{
+    return QString("value = '%1', data = '%2', hostname = '%3'")
+                   .arg(getName()).arg(getValue())
+                   .arg(gContext->GetHostName());
+}
+
+QString BackendSetting::whereClause(void)
+{
+    return QString("value = '%1'").arg(getName());
+}
+
+QString BackendSetting::setClause(void)
+{
+    return QString("value = '%1', data = '%2'")
+                   .arg(getName()).arg(getValue());
+}
