@@ -101,9 +101,9 @@ ThreadedFileWriter::ThreadedFileWriter(const char *filename,
     if (fd <= 0)
     {
         /* oops! */
-        cerr << "ERROR opening file '" << filename 
-             << "' in ThreadedFileWriter.\n";
-        exit(0);
+        cerr << "ERROR opening file in ThreadedFileWriter.\n";
+        perror(filename);
+        exit(1);
     }
     else
     {
