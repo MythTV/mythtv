@@ -1149,7 +1149,7 @@
   # Need to use a shell script because the QTDIR environment variable isn't
   # being honored by crontab?
   # The next text should be all on the same line.
-  30 04 * * * /bin/bash $HOME/mythtv-0.7/MC/programs/mythfilldatabase/mythfilldatabasecron
+  30 04 * * * /bin/bash $HOME/mythtv-0.7/MC/configfiles/mythfilldatabasecron
   %
 
 
@@ -1418,6 +1418,9 @@
   +o  You have an Intel Celeron or Pentium Pro.  If you have either of
      these processors, make sure that your ``deinterlace'' variable is
      set correctly.
+
+  +o  If mythtvfilldatabase appears to be failing, edit the
+     /usr/bin/tv_grab_na file and replace tvlistings2 with tvlistings
 
 
 

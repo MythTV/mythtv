@@ -9,6 +9,7 @@ v1.031, 2002-11-19.  Added text on the ALSA 0.9.0rc5/rc6 hanging bug, started
 development on mythmusic instructions, added text on obtaining document and
 using CVS.  Merged some more RH 8.0 documentation from Cedar McKay.  Applied
 Debian information patch from Matt Zimmerman.
+v1.032, 2002-11-22.  Added stuff on modifying xmltv.
 -->
 <!--
 To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
@@ -19,7 +20,7 @@ To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-11-19, v1.03
+<date>2002-11-19, v1.031
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -895,7 +896,7 @@ mythfilldatabase</bf> will run, save and exit, and return to the shell prompt.
 # Need to use a shell script because the QTDIR environment variable isn't
 # being honored by crontab?
 # The next text should be all on the same line.
-30 04 * * * /bin/bash $HOME/mythtv-0.7/MC/programs/mythfilldatabase/mythfilldatabasecron
+30 04 * * * /bin/bash $HOME/mythtv-0.7/MC/configfiles/mythfilldatabasecron
 %
 </verb></tscreen>
 
@@ -1118,6 +1119,8 @@ name="section">.
 <item>You have an Intel Celeron or Pentium Pro.  If you have either of these
 processors, make sure that your <ref id="deinterlace_" name="deinterlace">
 variable is set correctly.
+<item>If mythtvfilldatabase appears to be failing, edit the
+<tt>/usr/bin/tv_grab_na</tt> file and replace tvlistings2 with tvlistings
 </itemize>
 
 </article>

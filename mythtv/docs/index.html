@@ -15,7 +15,7 @@ Contents
 <H1>Installing and using mythtv</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2002-11-12, v1.03
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2002-11-19, v1.031
 <HR>
 <EM>Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -24,94 +24,101 @@ instructions, as well as including distribution-specific instructions where
 necessary.</EM>
 <HR>
 <P>
-<H2><A NAME="toc1">1.</A> <A HREF="mythtv-HOWTO-1.html">Introduction. </A></H2>
+<H2><A NAME="toc1">1.</A> <A HREF="mythtv-HOWTO-1.html">How to obtain this document.</A></H2>
 
 <P>
-<H2><A NAME="toc2">2.</A> <A HREF="mythtv-HOWTO-2.html">Checking prerequisites.</A></H2>
+<H2><A NAME="toc2">2.</A> <A HREF="mythtv-HOWTO-2.html">Introduction.</A></H2>
 
-<UL>
-<LI><A NAME="toc2.1">2.1</A> <A HREF="mythtv-HOWTO-2.html#ss2.1">Hardware.</A>
-<LI><A NAME="toc2.2">2.2</A> <A HREF="mythtv-HOWTO-2.html#ss2.2">Software.</A>
-</UL>
 <P>
-<H2><A NAME="toc3">3.</A> <A HREF="mythtv-HOWTO-3.html">Setting up paths and ldconfig.</A></H2>
+<H2><A NAME="toc3">3.</A> <A HREF="mythtv-HOWTO-3.html">Checking prerequisites.</A></H2>
 
 <UL>
-<LI><A NAME="toc3.1">3.1</A> <A HREF="mythtv-HOWTO-3.html#ss3.1">Distribution-specific information.</A>
-<LI><A NAME="toc3.2">3.2</A> <A HREF="mythtv-HOWTO-3.html#ss3.2">Checking that it worked.</A>
-<LI><A NAME="toc3.3">3.3</A> <A HREF="mythtv-HOWTO-3.html#ss3.3">Modifying <CODE>/etc/ld.so.conf</CODE></A>
+<LI><A NAME="toc3.1">3.1</A> <A HREF="mythtv-HOWTO-3.html#ss3.1">Hardware.</A>
+<LI><A NAME="toc3.2">3.2</A> <A HREF="mythtv-HOWTO-3.html#ss3.2">Software.</A>
 </UL>
 <P>
-<H2><A NAME="toc4">4.</A> <A HREF="mythtv-HOWTO-4.html">Downloading and compiling.</A></H2>
+<H2><A NAME="toc4">4.</A> <A HREF="mythtv-HOWTO-4.html">Setting up paths and ldconfig.</A></H2>
 
 <UL>
-<LI><A NAME="toc4.1">4.1</A> <A HREF="mythtv-HOWTO-4.html#ss4.1">Notes on compiling on a system with non-Intel processors. </A>
-<LI><A NAME="toc4.2">4.2</A> <A HREF="mythtv-HOWTO-4.html#ss4.2">Building LAME.</A>
-<LI><A NAME="toc4.3">4.3</A> <A HREF="mythtv-HOWTO-4.html#ss4.3">Building XMLTV. </A>
-<LI><A NAME="toc4.4">4.4</A> <A HREF="mythtv-HOWTO-4.html#ss4.4">Building mythtv.</A>
+<LI><A NAME="toc4.1">4.1</A> <A HREF="mythtv-HOWTO-4.html#ss4.1">Distribution-specific information.</A>
+<LI><A NAME="toc4.2">4.2</A> <A HREF="mythtv-HOWTO-4.html#ss4.2">Checking that it worked.</A>
+<LI><A NAME="toc4.3">4.3</A> <A HREF="mythtv-HOWTO-4.html#ss4.3">Modifying <CODE>/etc/ld.so.conf</CODE></A>
 </UL>
 <P>
-<H2><A NAME="toc5">5.</A> <A HREF="mythtv-HOWTO-5.html">MySQL.</A></H2>
+<H2><A NAME="toc5">5.</A> <A HREF="mythtv-HOWTO-5.html">Downloading and compiling.</A></H2>
 
 <UL>
-<LI><A NAME="toc5.1">5.1</A> <A HREF="mythtv-HOWTO-5.html#ss5.1">Mandrake 9.0</A>
-<LI><A NAME="toc5.2">5.2</A> <A HREF="mythtv-HOWTO-5.html#ss5.2">Red Hat Linux 8.0</A>
-<LI><A NAME="toc5.3">5.3</A> <A HREF="mythtv-HOWTO-5.html#ss5.3">Gentoo.</A>
-<LI><A NAME="toc5.4">5.4</A> <A HREF="mythtv-HOWTO-5.html#ss5.4">Setting up the initial database.</A>
+<LI><A NAME="toc5.1">5.1</A> <A HREF="mythtv-HOWTO-5.html#ss5.1">Notes on compiling on a system with non-Intel processors. </A>
+<LI><A NAME="toc5.2">5.2</A> <A HREF="mythtv-HOWTO-5.html#ss5.2">Building LAME.</A>
+<LI><A NAME="toc5.3">5.3</A> <A HREF="mythtv-HOWTO-5.html#ss5.3">Building XMLTV. </A>
+<LI><A NAME="toc5.4">5.4</A> <A HREF="mythtv-HOWTO-5.html#ss5.4">Building mythtv.</A>
 </UL>
 <P>
-<H2><A NAME="toc6">6.</A> <A HREF="mythtv-HOWTO-6.html">Setting up alsa and the mixer.</A></H2>
+<H2><A NAME="toc6">6.</A> <A HREF="mythtv-HOWTO-6.html">MySQL.</A></H2>
 
 <UL>
-<LI><A NAME="toc6.1">6.1</A> <A HREF="mythtv-HOWTO-6.html#ss6.1">Graphically setting up the mixer.</A>
-<LI><A NAME="toc6.2">6.2</A> <A HREF="mythtv-HOWTO-6.html#ss6.2">Setting the mixer from the command line.</A>
+<LI><A NAME="toc6.1">6.1</A> <A HREF="mythtv-HOWTO-6.html#ss6.1">Mandrake 9.0</A>
+<LI><A NAME="toc6.2">6.2</A> <A HREF="mythtv-HOWTO-6.html#ss6.2">Red Hat Linux 8.0</A>
+<LI><A NAME="toc6.3">6.3</A> <A HREF="mythtv-HOWTO-6.html#ss6.3">Gentoo.</A>
+<LI><A NAME="toc6.4">6.4</A> <A HREF="mythtv-HOWTO-6.html#ss6.4">Setting up the initial database.</A>
 </UL>
 <P>
-<H2><A NAME="toc7">7.</A> <A HREF="mythtv-HOWTO-7.html">Setting up a remote control.</A></H2>
+<H2><A NAME="toc7">7.</A> <A HREF="mythtv-HOWTO-7.html">Setting up ALSA and the mixer.</A></H2>
 
 <UL>
-<LI><A NAME="toc7.1">7.1</A> <A HREF="mythtv-HOWTO-7.html#ss7.1">Obtaining the kernel.</A>
-<LI><A NAME="toc7.2">7.2</A> <A HREF="mythtv-HOWTO-7.html#ss7.2">Obtaining and compiling lirc.</A>
-<LI><A NAME="toc7.3">7.3</A> <A HREF="mythtv-HOWTO-7.html#ss7.3">Additional information for lirc.</A>
+<LI><A NAME="toc7.1">7.1</A> <A HREF="mythtv-HOWTO-7.html#ss7.1">Graphically setting up the mixer.</A>
+<LI><A NAME="toc7.2">7.2</A> <A HREF="mythtv-HOWTO-7.html#ss7.2">Setting the mixer from the command line.</A>
 </UL>
 <P>
-<H2><A NAME="toc8">8.</A> <A HREF="mythtv-HOWTO-8.html">Configuring mythtv.</A></H2>
+<H2><A NAME="toc8">8.</A> <A HREF="mythtv-HOWTO-8.html">Setting up a remote control.</A></H2>
 
 <UL>
-<LI><A NAME="toc8.1">8.1</A> <A HREF="mythtv-HOWTO-8.html#ss8.1">Editing the settings.txt file.</A>
-<LI><A NAME="toc8.2">8.2</A> <A HREF="mythtv-HOWTO-8.html#ss8.2">Running setup.</A>
-<LI><A NAME="toc8.3">8.3</A> <A HREF="mythtv-HOWTO-8.html#ss8.3">Running mythfilldatabase.</A>
+<LI><A NAME="toc8.1">8.1</A> <A HREF="mythtv-HOWTO-8.html#ss8.1">Obtaining the kernel.</A>
+<LI><A NAME="toc8.2">8.2</A> <A HREF="mythtv-HOWTO-8.html#ss8.2">Obtaining and compiling lirc.</A>
+<LI><A NAME="toc8.3">8.3</A> <A HREF="mythtv-HOWTO-8.html#ss8.3">Additional information for lirc.</A>
 </UL>
 <P>
-<H2><A NAME="toc9">9.</A> <A HREF="mythtv-HOWTO-9.html">Using mythtv.</A></H2>
+<H2><A NAME="toc9">9.</A> <A HREF="mythtv-HOWTO-9.html">Configuring mythtv.</A></H2>
 
 <UL>
-<LI><A NAME="toc9.1">9.1</A> <A HREF="mythtv-HOWTO-9.html#ss9.1">Using themes with mythtv.</A>
+<LI><A NAME="toc9.1">9.1</A> <A HREF="mythtv-HOWTO-9.html#ss9.1">Editing the settings.txt file.</A>
+<LI><A NAME="toc9.2">9.2</A> <A HREF="mythtv-HOWTO-9.html#ss9.2">Running setup.</A>
+<LI><A NAME="toc9.3">9.3</A> <A HREF="mythtv-HOWTO-9.html#ss9.3">Running mythfilldatabase.</A>
 </UL>
 <P>
-<H2><A NAME="toc10">10.</A> <A HREF="mythtv-HOWTO-10.html">mythweb.</A></H2>
+<H2><A NAME="toc10">10.</A> <A HREF="mythtv-HOWTO-10.html">Using mythtv.</A></H2>
 
 <UL>
-<LI><A NAME="toc10.1">10.1</A> <A HREF="mythtv-HOWTO-10.html#ss10.1">Installation and pre-requisites.</A>
-<LI><A NAME="toc10.2">10.2</A> <A HREF="mythtv-HOWTO-10.html#ss10.2">Completing the installation.</A>
+<LI><A NAME="toc10.1">10.1</A> <A HREF="mythtv-HOWTO-10.html#ss10.1">Using themes with mythtv.</A>
 </UL>
 <P>
-<H2><A NAME="toc11">11.</A> <A HREF="mythtv-HOWTO-11.html">mythgallery.</A></H2>
+<H2><A NAME="toc11">11.</A> <A HREF="mythtv-HOWTO-11.html">mythweb.</A></H2>
 
 <UL>
 <LI><A NAME="toc11.1">11.1</A> <A HREF="mythtv-HOWTO-11.html#ss11.1">Installation and pre-requisites.</A>
+<LI><A NAME="toc11.2">11.2</A> <A HREF="mythtv-HOWTO-11.html#ss11.2">Completing the installation.</A>
 </UL>
 <P>
-<H2><A NAME="toc12">12.</A> <A HREF="mythtv-HOWTO-12.html">mythgame.</A></H2>
-
-<P>
-<H2><A NAME="toc13">13.</A> <A HREF="mythtv-HOWTO-13.html">mythmusic.</A></H2>
-
-<P>
-<H2><A NAME="toc14">14.</A> <A HREF="mythtv-HOWTO-14.html">Troubleshooting.</A></H2>
+<H2><A NAME="toc12">12.</A> <A HREF="mythtv-HOWTO-12.html">mythgallery.</A></H2>
 
 <UL>
-<LI><A NAME="toc14.1">14.1</A> <A HREF="mythtv-HOWTO-14.html#ss14.1">Illegal Instruction.</A>
+<LI><A NAME="toc12.1">12.1</A> <A HREF="mythtv-HOWTO-12.html#ss12.1">Installation and pre-requisites.</A>
+</UL>
+<P>
+<H2><A NAME="toc13">13.</A> <A HREF="mythtv-HOWTO-13.html">mythgame.</A></H2>
+
+<P>
+<H2><A NAME="toc14">14.</A> <A HREF="mythtv-HOWTO-14.html">mythmusic. </A></H2>
+
+<UL>
+<LI><A NAME="toc14.1">14.1</A> <A HREF="mythtv-HOWTO-14.html#ss14.1">Manual installation of pre-requisites</A>
+<LI><A NAME="toc14.2">14.2</A> <A HREF="mythtv-HOWTO-14.html#ss14.2">Mandrake 9.0</A>
+</UL>
+<P>
+<H2><A NAME="toc15">15.</A> <A HREF="mythtv-HOWTO-15.html">Troubleshooting.</A></H2>
+
+<UL>
+<LI><A NAME="toc15.1">15.1</A> <A HREF="mythtv-HOWTO-15.html#ss15.1">Illegal Instruction.</A>
 </UL>
 <HR>
 <A HREF="mythtv-HOWTO-1.html">Next</A>
