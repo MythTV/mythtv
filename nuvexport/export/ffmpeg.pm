@@ -210,7 +210,7 @@ package export::ffmpeg;
                     $frames = int($1);
                 }
             # ffmpeg warnings?
-                elsif ($l =~ /^Unknown.+?(codec|format)/
+                elsif ($l =~ /^Unknown.+?(codec|format)/m) {
                     $warnings .= $l;
                     die "\n\nffmpeg had critical errors:\n\n$warnings";
                 }
