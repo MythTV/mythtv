@@ -25,6 +25,7 @@ using namespace std;
 #include <mythtv/mythplugin.h>
 #include <mythtv/dialogbox.h>
 #include <mythtv/util.h>
+#include <mythtv/mythmedia.h>
 
 #include "config.h"
 #include "settings.h"
@@ -60,6 +61,10 @@ void playVCD()
     //  Get the command string to play a VCD
     //
     QString command_string = gContext->GetSetting("VCDPlayerCommand");
+
+    if (gContext->GetMainWindow()->HandleMedia( command_string, "DVD://"))
+        return;
+
     if(command_string.length() < 1)
     {
         //
@@ -114,6 +119,10 @@ void playDVD(void)
     //
     
     QString command_string = gContext->GetSetting("DVDPlayerCommand");
+
+    if (gContext->GetMainWindow()->HandleMedia( command_string, "DVD://"))
+        return;
+
     if(command_string.length() < 1)
     {
         //
@@ -230,9 +239,15 @@ int mythplugin_run(void);
 int mythplugin_config(void);
 }
 
+void handleMedia(void) 
+{
+    mythplugin_run();
+}
+
 void initKeys(void)
 {
     REG_JUMP("Play DVD", "Play a DVD", "", playDVD);
+    REG_MEDIA_HANDLER("MythDVD Media Handler", "", "", handleMedia, MEDIATYPE_VIDEO);
 #ifdef VCD_SUPPORT
     REG_JUMP("Play VCD", "Play a VCD", "", playVCD);
 #endif
