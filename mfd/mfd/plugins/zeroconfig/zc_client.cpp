@@ -239,9 +239,9 @@ const QString& MFDService::getFormalServiceDescription()
     {
         formal_type = "mdcap";
     }
-    else if(service_type == "_mhttp._tcp.")
+    else if(service_type == "_http._tcp.")
     {
-        formal_type = "mhttp";
+        formal_type = "http";
     }
 
     formal_description = QString("services found %1 %2 %3.%4.%5.%6 %7 %8")
@@ -294,9 +294,9 @@ const QString& MFDService::getFormalServiceRemoval()
     {
         formal_type = "mdcap";
     }
-    else if(service_type == "_mhttp._tcp.")
+    else if(service_type == "_http._tcp.")
     {
-        formal_type = "mhttp";
+        formal_type = "http";
     }
 
     formal_removal = QString("services lost %1 %2 %3.%4.%5.%6 %7 %8")
@@ -583,7 +583,7 @@ void ZeroConfigClient::run()
     browseForService(&mDNSStorage, "_macp._tcp.");
     browseForService(&mDNSStorage, "_daap._tcp.");
     browseForService(&mDNSStorage, "_mdcap._tcp.");
-    browseForService(&mDNSStorage, "_mhttp._tcp.");
+    browseForService(&mDNSStorage, "_http._tcp.");
 
     //
     //  Set up some file descriptors and a pipe. This lets a separate thread

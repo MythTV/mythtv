@@ -45,10 +45,10 @@ void ClientHttpServer::run()
     QString service_name = QString("UFPI on %1").arg(mfdContext->getHostName()); 
 
     //
-    //  Register this (mhttp) service
+    //  Register this (http) service
     //
 
-    ServiceEvent *se = new ServiceEvent(QString("services add mhttp %1 %2")
+    ServiceEvent *se = new ServiceEvent(QString("services add http %1 %2")
                                        .arg(port_number)
                                        .arg(service_name));
     QApplication::postEvent(parent, se);
@@ -291,7 +291,7 @@ void ClientHttpServer::readFromMFD()
             {
                 if(tokens[0] == "services" &&
                    tokens[2] == "lan" &&
-                   tokens[3] == "mhttp")
+                   tokens[3] == "http")
                 {
                     QString service_name = tokens[6];
                     for(uint i = 7; i < tokens.count(); i++)
@@ -348,7 +348,7 @@ void ClientHttpServer::addMHttpServer(QString server_address, uint server_port, 
         }
         else
         {
-            log(QString("httpserver has noticed a new mhttp service: \"%1\" (%2:%3)")
+            log(QString("httpserver has noticed a new http service: \"%1\" (%2:%3)")
                         .arg(service_name)
                         .arg(server_address)
                         .arg(server_port), 10);
