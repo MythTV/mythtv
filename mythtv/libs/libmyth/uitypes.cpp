@@ -137,7 +137,7 @@ void UIType::refresh()
 QString UIType::cutDown(QString info, QFont *testFont, bool multiline, int overload_width, int overload_height)
 {
     QFontMetrics fm(*testFont);
-    QRect curFontSize;
+    // QRect curFontSize;
     int maxwidth = screen_area.width();
     if (overload_width != -1)
         maxwidth = overload_width;
@@ -1611,6 +1611,7 @@ void GenericTree::init()
     my_stringlist.clear();
     my_int = 0;
     my_subnodes.clear();
+    my_flatened_subnodes.clear();
     my_ordered_subnodes.clear();
     my_selected_subnode = NULL;
     current_ordering_index = -1;
@@ -2047,6 +2048,127 @@ void GenericTree::reorderSubnodes(int ordering_index)
     }
 }
 
+void GenericTree::addYourselfIfSelectable(QPtrList<GenericTree> *flat_list)
+{
+    if(selectable)
+    {
+        flat_list->append(this);
+    }
+    QPtrListIterator<GenericTree> it( my_subnodes );
+    GenericTree *my_kids;
+    while( (my_kids = it.current()) != 0)
+    {
+        my_kids->addYourselfIfSelectable(flat_list);
+        ++it;
+    }
+}
+
+void GenericTree::buildFlatListOfSubnodes(int ordering_index, bool scrambled_parents)
+{
+    //
+    //  This builds a flat list of every SELECTABLE child 
+    //  according to some some_ordering index.
+    //
+    
+    my_flatened_subnodes.clear();
+
+    QPtrListIterator<GenericTree> it( my_subnodes );
+    GenericTree *my_kids;
+    while( (my_kids = it.current()) != 0)
+    {
+        my_kids->addYourselfIfSelectable(&my_flatened_subnodes);
+        ++it;
+    }
+
+    if(scrambled_parents)
+    {
+        //
+        //  sort the flatened list in the order indicated
+        //  by ordering_index
+        //
+        
+        bool something_changed = false;
+        if(my_flatened_subnodes.count() > 1)
+        {
+            something_changed = true;
+        }
+
+        while(something_changed)
+        {
+            something_changed = false;
+            for(uint i = 0; i < my_flatened_subnodes.count() - 1;)
+            {
+                if(my_flatened_subnodes.at(i)->getAttribute(ordering_index)   >
+                   my_flatened_subnodes.at(i+1)->getAttribute(ordering_index) )
+                {
+                    something_changed = true;
+                    GenericTree *temp = my_flatened_subnodes.take(i + 1);
+                    my_flatened_subnodes.insert(i, temp); 
+                }
+                ++i;
+            }
+        }
+    }
+    
+    /*
+    
+    //
+    //  Debugging
+    //
+    
+    QPtrListIterator<GenericTree> iterator(my_flatened_subnodes);
+    GenericTree *selectable_node;
+    while( (selectable_node = iterator.current()) != 0)
+    {
+        cout << selectable_node->getString() << endl ;
+        ++iterator;
+    }
+    
+    */
+}
+
+GenericTree* GenericTree::nextPrevFromFlatList(bool forward_or_backward, bool wrap_around, GenericTree *active)
+{
+    int i = my_flatened_subnodes.findRef(active);
+    if(i < 0)
+    {
+        cerr << "uitypes.o: Can't find active item on flatened list of subnodes" << endl;
+        return NULL;
+    }
+    if(forward_or_backward)
+    {
+        ++i;
+        if(i >= (int) my_flatened_subnodes.count())
+        {
+            if(wrap_around)
+            {
+                i = 0;
+            }
+            else
+            {
+                return NULL;
+            }
+        }
+    }
+    else
+    {
+        --i;
+        if(i < 0)
+        {
+            if(wrap_around)
+            {
+                i = my_flatened_subnodes.count() - 1;
+            }
+            else
+            {
+                return NULL;
+            }
+        }
+        
+    }
+    return my_flatened_subnodes.at(i);
+}
+
 GenericTree::~GenericTree()
 {
 }
@@ -2063,11 +2185,13 @@ UIManagedTreeListType::UIManagedTreeListType(const QString & name)
     my_tree_data = NULL;
     current_node = NULL;
     active_node = NULL;
+    active_parent = NULL;
     m_justification = (Qt::AlignLeft | Qt::AlignVCenter);
     active_bin = 0;
     tree_order = -1;
     visual_order = -1;
     show_whole_tree = false;
+    scrambled_parents = false;
 }
 
 UIManagedTreeListType::~UIManagedTreeListType()
@@ -2440,56 +2564,6 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
     */
 }
 
-/*
-QString UIManagedTreeListType::cutDown(QString info, QFont *testFont, int maxwidth, int maxheight)
-{
-    QFontMetrics fm(*testFont);
-    QRect curFontSize;
-
-    curFontSize = fm.boundingRect(0, 0, maxwidth, maxheight, m_justification, info);
-
-    if (curFontSize.height() > maxheight)
-    {
-        QString testInfo = info;
-        curFontSize = fm.boundingRect(0, 0, maxwidth, maxheight, m_justification, testInfo);
-        int count = info.length();
-
-        while (curFontSize.height() >= maxheight)
-        {
-            testInfo = info.left(count);
-            curFontSize = fm.boundingRect(0, 0, maxwidth, maxheight, m_justification, testInfo);
-            count = count--;
-            if (count < 0)
-                break;
-        }
-        testInfo = testInfo + "...";
-        info = testInfo;
-    }
-    else if (curFontSize.width() > maxwidth)
-    {
-        int curFontWidth = fm.width(info);
-        if (curFontWidth > maxwidth)
-        {
-            QString testInfo = "";
-            curFontWidth = fm.width(testInfo);
-            int tmaxwidth = maxwidth - fm.width("LLL");
-            int count = 0;
-
-            while (curFontWidth < tmaxwidth)
-            {
-                testInfo = info.left(count);
-                curFontWidth = fm.width(testInfo);
-                count = count + 1;
-            }
-            testInfo = testInfo + "...";
-            info = testInfo;
-        }
-    }
-    return info;
-
-}
-*/
-
 void UIManagedTreeListType::moveToNode(QValueList<int> route_of_branches)
 {
     current_node = my_tree_data->findNode(route_of_branches);
@@ -2498,6 +2572,7 @@ void UIManagedTreeListType::moveToNode(QValueList<int> route_of_branches)
         current_node = my_tree_data->findLeaf();
     }
     active_node = current_node;
+    active_parent = active_node->getParent();
     emit nodeSelected(current_node->getInt(), current_node->getAttributes());
 }
 
@@ -2522,6 +2597,7 @@ void UIManagedTreeListType::moveToNodesFirstChild(QValueList<int> route_of_branc
     }
 
     active_node = current_node;
+    active_parent = active_node->getParent();
     emit nodeSelected(current_node->getInt(), current_node->getAttributes());
 }
 
@@ -2552,6 +2628,7 @@ bool UIManagedTreeListType::tryToSetActive(QValueList <int> route)
         {
             active_node = a_node;
             current_node = a_node;
+            active_parent = active_node->getParent();
             return true;
         }
     }
@@ -2765,6 +2842,7 @@ void UIManagedTreeListType::select()
         if(current_node->isSelectable())
         {
             active_node = current_node;
+            active_parent = active_node->getParent();
             if(show_whole_tree)
             {
                 emit requestUpdate(screen_corners[active_bin]);
@@ -2781,6 +2859,8 @@ void UIManagedTreeListType::select()
             if(first_leaf->isSelectable())
             {
                 active_node = first_leaf;
+                active_parent = current_node;
+                active_parent->buildFlatListOfSubnodes(tree_order, scrambled_parents);
                 refresh();
                 emit nodeSelected(active_node->getInt(), active_node->getAttributes());
             }
@@ -2797,14 +2877,34 @@ void UIManagedTreeListType::activate()
     }
 }
 
-bool UIManagedTreeListType::nextActive(bool wrap_around)
+bool UIManagedTreeListType::nextActive(bool wrap_around, bool traverse_up_down)
 {
+    if(traverse_up_down && active_parent != active_node->getParent())
+    {
+        return complexInternalNextPrevActive(true, wrap_around);
+    }
+
+    //
+    //  set a flag if active and current are sync'd
+    //
+    
+    bool in_sync = false;
+    
+    if(current_node == active_node)
+    {
+        in_sync = true;
+    }
+    
     if(active_node)
     {
         GenericTree *test_node = active_node->nextSibling(1, tree_order);
         if(test_node)
         {
             active_node = test_node;
+            if(in_sync)
+            {
+                current_node = active_node;
+            }
             if(show_whole_tree)
             {
                 emit requestUpdate(screen_corners[active_bin]);
@@ -2824,6 +2924,10 @@ bool UIManagedTreeListType::nextActive(bool wrap_around)
                 if(test_node)
                 {
                     active_node = test_node;
+                    if(in_sync)
+                    {
+                        current_node = active_node;
+                    }
                     if(show_whole_tree)
                     {
                         emit requestUpdate(screen_corners[active_bin]);
@@ -2840,14 +2944,29 @@ bool UIManagedTreeListType::nextActive(bool wrap_around)
     return false;
 }
 
-bool UIManagedTreeListType::prevActive(bool wrap_around)
+bool UIManagedTreeListType::prevActive(bool wrap_around, bool traverse_up_down)
 {
+    if(traverse_up_down && active_parent != active_node->getParent())
+    {
+        return complexInternalNextPrevActive(false, wrap_around);
+    }
+    bool in_sync = false;
+    
+    if(current_node == active_node)
+    {
+        in_sync = true;
+    }
+    
     if(active_node)
     {
         GenericTree *test_node = active_node->prevSibling(1, tree_order);
         if(test_node)
         {
             active_node = test_node;
+            if(in_sync)
+            {
+                current_node = active_node;
+            }
             if(show_whole_tree)
             {
                 emit requestUpdate(screen_corners[active_bin]);
@@ -2870,6 +2989,10 @@ bool UIManagedTreeListType::prevActive(bool wrap_around)
                     if(test_node)
                     {
                         active_node = test_node;
+                        if(in_sync)
+                        {
+                            current_node = active_node;
+                        }
                         if(show_whole_tree)
                         {
                             emit requestUpdate(screen_corners[active_bin]);
@@ -2882,6 +3005,30 @@ bool UIManagedTreeListType::prevActive(bool wrap_around)
                     }
                 }
             }
+        }
+    }
+    return false;
+}
+
+bool UIManagedTreeListType::complexInternalNextPrevActive(bool forward_or_back, bool wrap_around)
+{
+    if(active_parent)
+    {
+        bool in_sync = false;
+        if(current_node == active_node)
+        {
+            in_sync = true;
+        }
+        GenericTree *next;
+        next = active_parent->nextPrevFromFlatList(forward_or_back, wrap_around, active_node);
+        if(next)
+        {
+            active_node = next;
+            if(in_sync)
+            {
+                current_node = active_node;
+            }
+            return true;
         }
     }
     return false;

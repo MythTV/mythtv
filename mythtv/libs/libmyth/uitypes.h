@@ -472,6 +472,9 @@ class GenericTree
     int           getOrderingIndex(){return current_ordering_index;}
     void          becomeSelectedChild();
     void          setSelectedChild(GenericTree* a_node){my_selected_subnode = a_node;}
+    void          addYourselfIfSelectable(QPtrList<GenericTree> *flat_list);
+    void          buildFlatListOfSubnodes(int ordering_index, bool scrambled_parents);
+    GenericTree*  nextPrevFromFlatList(bool forward_or_back, bool wrap_around, GenericTree *active);
     
   private:
 
@@ -480,6 +483,7 @@ class GenericTree
     int                   my_int;
     QPtrList<GenericTree> my_subnodes;
     QPtrList<GenericTree> my_ordered_subnodes;
+    QPtrList<GenericTree> my_flatened_subnodes;
     GenericTree*          my_selected_subnode;
     IntVector             *my_attributes;
     GenericTree*          my_parent;
@@ -527,7 +531,6 @@ class UIManagedTreeListType : public UIType
                           }
     void    setFonts(QMap<QString, QString> fonts, QMap<QString, fontProp> fontfcn) { 
                           m_fonts = fonts; m_fontfcns = fontfcn; }
-    //QString cutDown(QString, QFont *, int, int);
     void    drawText(QPainter *p, QString the_text, QString font_name, int x, int y, int bin_number);
     void    setJustification(int jst) { m_justification = jst; }
     int     getJustification() { return m_justification; }
@@ -537,6 +540,7 @@ class UIManagedTreeListType : public UIType
     void    setTreeOrdering(int an_int){tree_order = an_int;}
     void    setVisualOrdering(int an_int){visual_order = an_int;}    
     void    showWholeTree(bool yes_or_no){ show_whole_tree = yes_or_no; }
+    void    scrambleParents(bool yes_or_no){ scrambled_parents = yes_or_no; }
 
   public slots:
 
@@ -545,8 +549,8 @@ class UIManagedTreeListType : public UIType
     bool    pushDown();
     bool    moveUp();
     bool    moveDown();
-    bool    nextActive(bool wrap_around);
-    bool    prevActive(bool wrap_around);
+    bool    nextActive(bool wrap_around, bool traverse_up_down);
+    bool    prevActive(bool wrap_around, bool traverse_up_down);
     void    select();
     void    activate();
     
@@ -557,6 +561,7 @@ class UIManagedTreeListType : public UIType
 
   private:
 
+    bool  complexInternalNextPrevActive(bool forward_or_reverse, bool wrap_around);    
     QRect area;
     int   bins;
     int   active_bin;
@@ -565,6 +570,7 @@ class UIManagedTreeListType : public UIType
     CornerMap   screen_corners;
     GenericTree *my_tree_data;
     GenericTree *current_node;
+    GenericTree *active_parent;
     GenericTree *active_node;
     int         tree_order;
     int         visual_order;
@@ -581,6 +587,8 @@ class UIManagedTreeListType : public UIType
     QMap<int, QPixmap*>     highlight_map;
     QValueList <int>        route_to_active;
     bool                    show_whole_tree;
+    bool                    scrambled_parents;
+
 };
 
 class UIPushButtonType : public UIType
