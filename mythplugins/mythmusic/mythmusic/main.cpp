@@ -29,8 +29,10 @@ void CheckFreeDBServerFile(void)
 {
     char filename[1024];
     if (getenv("HOME") == NULL)
+    {
+        cerr << "main.o: You don't have a HOME environment variable. CD lookup will almost certainly not work." << endl;
         return;
-
+    }
     sprintf(filename, "%s/.cdserverrc", getenv("HOME"));
 
     QFile file(filename);

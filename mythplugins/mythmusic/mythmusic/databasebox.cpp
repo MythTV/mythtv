@@ -146,7 +146,7 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
     
         cd_watcher = new QTimer();
         connect(cd_watcher, SIGNAL(timeout()), this, SLOT(occasionallyCheckCD()));
-        cd_watcher->start(10000); // Every 10 seconds?
+        cd_watcher->start(1000); // Every second?
         fillCD();
     }
     
@@ -213,7 +213,11 @@ void DatabaseBox::keepFilling()
 
 void DatabaseBox::occasionallyCheckCD()
 {
-    fillCD();
+    if(cd_reader_thread->statusChanged())
+    {
+        active_playlist->ripOutAllCDTracksNow();
+        fillCD();
+    }
     if(!cd_reader_thread->running())
     {
         cd_reader_thread->start();
@@ -601,25 +605,11 @@ void DatabaseBox::doSelected(QListViewItem *item, bool cd_flag)
     {
         if (tcitem->isOn())
         {
-            if(cd_flag)
-            {
-                the_playlists->addCDTrack(tcitem->getID());
-            }
-            else
-            {
-                active_playlist->addTrack(tcitem->getID(), true);
-            }
+            active_playlist->addTrack(tcitem->getID(), true, cd_flag);
         }
         else
         {
-            if(cd_flag)
-            {
-                the_playlists->removeCDTrack(tcitem->getID());                    
-            }
-            else
-            {
-                active_playlist->removeTrack(tcitem->getID());
-            }
+            active_playlist->removeTrack(tcitem->getID(), cd_flag);
         }
     }
 }
@@ -673,7 +663,7 @@ void DatabaseBox::checkParent(QListViewItem *item)
 
 void DatabaseBox::deleteTrack(QListViewItem *item)
 {
-    if(PlaylistTrack *delete_item = dynamic_cast<PlaylistTrack*>(item) )
+    if(PlaylistTrack *delete_item = dynamic_cast<PlaylistCD*>(item) )
     {
         if(delete_item->itemBelow())
         {
@@ -685,19 +675,46 @@ void DatabaseBox::deleteTrack(QListViewItem *item)
             listview->ensureItemVisible(delete_item->itemAbove());
             listview->setCurrentItem(delete_item->itemAbove());
         }
-   
-    
         QListViewItem *item = delete_item->parent();
-    
         if(TreeCheckItem *item_owner = dynamic_cast<TreeCheckItem*>(item))
         {
             Playlist *owner = the_playlists->getPlaylist(item_owner->getID() * -1);
-            owner->removeTrack(delete_item->getID());
+            owner->removeTrack(delete_item->getID(), true);
         }
         else if(PlaylistTitle *item_owner = dynamic_cast<PlaylistTitle*>(item))
         {
             (void)item_owner;
-            active_playlist->removeTrack(delete_item->getID());
+            active_playlist->removeTrack(delete_item->getID(), true);
+        }
+        else
+        {
+            cerr << "databasebox.o: I don't know how to delete whatever you're trying to get rid of" << endl;
+        }
+        the_playlists->refreshRelevantPlaylists(alllists);
+        checkTree();
+    }
+    else if(PlaylistTrack *delete_item = dynamic_cast<PlaylistTrack*>(item) )
+    {
+        if(delete_item->itemBelow())
+        {
+            listview->ensureItemVisible(delete_item->itemBelow());
+            listview->setCurrentItem(delete_item->itemBelow());
+        }
+        else if(delete_item->itemAbove())
+        {
+            listview->ensureItemVisible(delete_item->itemAbove());
+            listview->setCurrentItem(delete_item->itemAbove());
+        }
+        QListViewItem *item = delete_item->parent();
+        if(TreeCheckItem *item_owner = dynamic_cast<TreeCheckItem*>(item))
+        {
+            Playlist *owner = the_playlists->getPlaylist(item_owner->getID() * -1);
+            owner->removeTrack(delete_item->getID(), false);
+        }
+        else if(PlaylistTitle *item_owner = dynamic_cast<PlaylistTitle*>(item))
+        {
+            (void)item_owner;
+            active_playlist->removeTrack(delete_item->getID(), false);
         }
         else
         {
@@ -793,6 +810,7 @@ ReadCDThread::ReadCDThread(PlaylistsContainer *all_the_playlists, AllMusic *all_
 {
     the_playlists = all_the_playlists;
     all_music = all_the_music;
+    cd_status_changed = false;
 }
 
 void ReadCDThread::run()
@@ -802,6 +820,15 @@ void ReadCDThread::run()
 
     bool setTitle = false;
     bool redo = false;
+
+    if(tracknum != all_music->getCDTrackCount())
+    {
+        cd_status_changed = true;
+    }
+    else
+    {
+        cd_status_changed = false;
+    }
 
     if(tracknum == 0)
     {
@@ -818,8 +845,13 @@ void ReadCDThread::run()
         if(!all_music->checkCDTrack(checker))
         {
             redo = true;
+            cd_status_changed = true;
             all_music->clearCDData();
             the_playlists->clearCDList();
+        }
+        else
+        {
+            cd_status_changed = false;
         }
     } 
 
@@ -830,17 +862,27 @@ void ReadCDThread::run()
 
         if (!setTitle)
         {
-            QString parenttitle = " " + track->Artist() + " ~ " + 
-                                  track->Album();
+            
+            QString parenttitle = " ";
+            if(track->Artist().length() > 0)
+            {
+                    parenttitle += track->Artist();
+                    parenttitle += " ~ "; 
+            }
+            if(track->Album().length() > 0)
+            {
+                    parenttitle += track->Album();
+            }
+            else
+            {
+                parenttitle = " Unknown";
+                cerr << "databasebox.o: Couldn't find your CD. It may not be in the freedb database." << endl;
+                cerr << "               More likely, however, is that you need to delete ~/.cddb and" << endl;
+                cerr << "               ~/.cdserverrc and restart mythmusic. Have a nice day." << endl;
+            }
             all_music->setCDTitle(parenttitle);
             setTitle = true;
         }
-
-        QString title = QString(" %1").arg(tracknum);
-        title += " - " + track->Title();
-
-        QString level = "title";
-        
         tracknum--;
     }
 }

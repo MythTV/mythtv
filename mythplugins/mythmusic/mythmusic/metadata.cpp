@@ -1,4 +1,4 @@
-    #include <iostream> 
+#include <iostream> 
 #include <qsqldatabase.h> 
 #include <qregexp.h> 
 #include <qdatetime.h>
@@ -610,7 +610,16 @@ void AllMusic::putCDOnTheListView(CDCheckItem *where)
     ValueMetadata::iterator anit;
     for(anit = cd_data.begin(); anit != cd_data.end(); ++anit)
     {
-        QString title_temp = QString("%1 - %2").arg((*anit).Track()).arg((*anit).Title());
+        QString title_string = "";
+        if((*anit).Title().length() > 0)
+        {
+            title_string = (*anit).Title();
+        }
+        else
+        {
+            title_string = "Unknown";
+        }
+        QString title_temp = QString("%1 - %2").arg((*anit).Track()).arg(title_string);
         QString level_temp = "title";
         CDCheckItem *new_item = new CDCheckItem(where, title_temp, level_temp, (*anit).Track());
         new_item->setOn(false); //  Avoiding -Wall     
@@ -661,35 +670,71 @@ MusicNode* AllMusic::findRightNode(Metadata* inserter, uint depth)
 QString AllMusic::getLabel(int an_id, bool *error_flag)
 {
     QString a_label = "";
-   
-    if (!music_map.contains(an_id))
+    if(an_id > 0)
     {
-        a_label = QString("Missing database entry: %1").arg(an_id);
-        *error_flag = true;
-        return a_label;
-    }
+   
+        if (!music_map.contains(an_id))
+        {
+            a_label = QString("Missing database entry: %1").arg(an_id);
+            *error_flag = true;
+            return a_label;
+        }
       
-    a_label += music_map[an_id]->Artist();
-    a_label += " ~ ";
-    a_label += music_map[an_id]->Title();
+        a_label += music_map[an_id]->Artist();
+        a_label += " ~ ";
+        a_label += music_map[an_id]->Title();
     
 
-    if(a_label.length() < 1)
-    {
-        a_label = "Ooops";
-        *error_flag = true;
+        if(a_label.length() < 1)
+        {
+            a_label = "Ooops";
+            *error_flag = true;
+        }
+        else
+        {
+            *error_flag = false;
+        }
+        return a_label;
     }
     else
     {
-        *error_flag = false;
+        ValueMetadata::iterator anit;
+        for(anit = cd_data.begin(); anit != cd_data.end(); ++anit)
+        {
+            if( (*anit).Track() == an_id * -1)
+            {
+                a_label = QString("%1 ~ %2").arg((*anit).Artist()).arg((*anit).Title());
+                *error_flag = false;
+                return a_label;
+            }
+        }
     }
+
+    a_label = "";
+    *error_flag = true;
     return a_label;
 }
 
 Metadata* AllMusic::getMetadata(int an_id)
 {
-    if (music_map.contains(an_id))
-        return music_map[an_id];    
+    if(an_id > 0)
+    {
+        if (music_map.contains(an_id))
+        {
+            return music_map[an_id];    
+        }
+    }
+    else if(an_id < 0)
+    {
+        ValueMetadata::iterator anit;
+        for(anit = cd_data.begin(); anit != cd_data.end(); ++anit)
+        {
+            if( (*anit).Track() == an_id * -1)
+            {
+                return &(*anit);
+            }
+        }
+    }
     return NULL;
 }
 

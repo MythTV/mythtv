@@ -35,7 +35,8 @@ class Track
     void moveUpDown(bool flag);
     PlaylistTrack* getWidget(){return my_widget;}
     bool badReference(){return bad_reference;}
-    
+    void setCDFlag(bool yes_or_no){cd_flag = yes_or_no;}
+    bool getCDFlag(){return cd_flag;}
   private:
     
     int           index_value;
@@ -44,6 +45,7 @@ class Track
     QString       label;
     Playlist      *parent;
     bool          bad_reference;
+    bool          cd_flag;
 };
 
 class Playlist
@@ -62,14 +64,14 @@ class Playlist
     void saveNewPlaylist(QSqlDatabase *a_db, QString a_host);
     void putYourselfOnTheListView(QListViewItem *a_parent);
     void writeMetadata(QPtrList<Metadata> *list_to_write_to);
-    void writeTree(GenericTree *tree_to_write_to, int a_counter);
+    int writeTree(GenericTree *tree_to_write_to, int a_counter);
     void describeYourself(); //  debugging
     void fillSongsFromSonglist();
     void fillSonglistFromSongs();
     void moveTrackUpDown(bool flag, Track *the_track);
     bool checkTrack(int a_track_id);
-    void addTrack(int the_track_id, bool update_display);
-    void removeTrack(int the_track_id);
+    void addTrack(int the_track_id, bool update_display, bool cd_flag);
+    void removeTrack(int the_track_id, bool cd_flag);
     void removeAllTracks();
     void copyTracks(Playlist *to_ptr, bool update_display);
     bool hasChanged(){return changed;}
@@ -80,6 +82,7 @@ class Playlist
     int     getFirstTrackID();
     void    setID(int x){playlistid = x;}
     bool    containsReference(int to_check, int depth);
+    void    ripOutAllCDTracksNow();
 
   private:
 

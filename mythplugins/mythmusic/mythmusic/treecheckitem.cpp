@@ -363,5 +363,40 @@ int PlaylistTrack::getID()
 
 void PlaylistTitle::removeTrack(int x)
 {
-    ptr_to_owner->removeTrack(x);
+    ptr_to_owner->removeTrack(x, false);
 }
+
+
+PlaylistPlaylist::PlaylistPlaylist(QListViewItem *parent, const QString &title)
+    : PlaylistTrack(parent, title)
+{
+    pixmap = getPixmap("playlist");
+    if (pixmap)
+        setPixmap(0, *pixmap);
+}
+
+PlaylistPlaylist::PlaylistPlaylist(QListViewItem *parent, QListViewItem *after, const QString &title)
+    : PlaylistTrack(parent, after, title)
+{
+    pixmap = getPixmap("playlist");
+    if (pixmap)
+        setPixmap(0, *pixmap);
+}
+
+PlaylistCD::PlaylistCD(QListViewItem *parent, const QString &title)
+    : PlaylistTrack(parent, title)
+{
+    pixmap = getPixmap("cd");
+    if (pixmap)
+        setPixmap(0, *pixmap);
+}
+
+PlaylistCD::PlaylistCD(QListViewItem *parent, QListViewItem *after, const QString &title)
+    : PlaylistTrack(parent, after, title)
+{
+
+    pixmap = getPixmap("cd");
+    if (pixmap)
+        setPixmap(0, *pixmap);
+}
+

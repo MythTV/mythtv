@@ -76,11 +76,29 @@ class PlaylistTrack : public PlaylistItem
     void beMoving(bool flag);
     void moveUpDown(bool flag);
     int  getID();
+    QPixmap         *pixmap;
 
   private:
     Track           *ptr_to_owner;
     bool            held;    
-    QPixmap         *pixmap;
+};
+
+class PlaylistPlaylist : public PlaylistTrack
+{
+  public:
+    PlaylistPlaylist(QListViewItem *parent, const QString &title);
+    PlaylistPlaylist(QListViewItem *parent, QListViewItem *after, 
+                  const QString &title);
+
+};
+
+class PlaylistCD : public PlaylistTrack
+{
+  public:
+    PlaylistCD(QListViewItem *parent, const QString &title);
+    PlaylistCD(QListViewItem *parent, QListViewItem *after, 
+                  const QString &title);
+
 };
 
 #endif

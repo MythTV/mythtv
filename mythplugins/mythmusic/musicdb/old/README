@@ -14,14 +14,14 @@ existing mythmusic install.
 On or around April 16th 2003, the powers that be decided to add an extra
 column to the playlists table. You need to do two things:
 
-    1. Edit the cvs.sql file and change MY_HOST_NAME to the machine 
+    1. Edit the 0-8-to-0-9.sql file and change MY_HOST_NAME to the machine 
        that you will be running this instance of mythmusic from. 
        Once you've done that, you need to remove the first line 
        of the file (the one that says "quit").
 
-    2. Run the cvs.sql script like this:
+    2. Run the sql script like this:
 
-        mysql -p -u mythtv < cvs.sql
+        mysql -p -u mythtv < 0-8-to-0-9.sql
 
 Only do this once, not every time you update your cvs copy. Why the
 complications? This saves you from having to rebuild all of your playlists.

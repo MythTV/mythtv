@@ -201,6 +201,7 @@ class AllMusic
     void        putCDOnTheListView(CDCheckItem *where);
     bool        doneLoading(){return done_loading;}
     bool        cleanOutThreads();
+    int         getCDTrackCount(){return cd_data.count();}
     
   private:
   

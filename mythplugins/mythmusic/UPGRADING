@@ -1,3 +1,10 @@
+UPGRADING FROM RELEASE 0.8
+--------------------------
+You need to run musicdb/0.8-to-0.9.sql to your database after reading the
+contents of that file and editing it appropriately. Also a good idea to 
+delete .cddb and .cdserverrc from the home directory of whatever user
+myth/mythmusic runs as on your system.
+
 UPGRADING FROM RELEASE 0.7
 --------------------------
 You need to add musicdb/0-7-to-0-8.sql to your database.

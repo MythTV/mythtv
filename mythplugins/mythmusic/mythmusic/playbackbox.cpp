@@ -1002,9 +1002,22 @@ void PlaybackBox::customEvent(QCustomEvent *event)
             //gContext->LCDsetChannelProgress(percent_heard);
 
             QString info_string;
-            info_string.sprintf("%d kbps   %.1f kHz   %s",
-                               oe->bitrate(), float(oe->frequency()) / 1000.0,
-                               oe->channels() > 1 ? "stereo" : "mono");
+
+            //
+            //  Hack around for cd bitrates
+            //
+            if(oe->bitrate() < 2000)
+            {
+                info_string.sprintf("%d kbps   %.1f kHz   %s",
+                                   oe->bitrate(), float(oe->frequency()) / 1000.0,
+                                   oe->channels() > 1 ? "stereo" : "mono");
+            }
+            else
+            {
+                info_string.sprintf("%.1f kHz   %s",
+                                   float(oe->frequency()) / 1000.0,
+                                   oe->channels() > 1 ? "stereo" : "mono");
+            }
 
             time_text->SetText(time_string);
             info_text->SetText(info_string);

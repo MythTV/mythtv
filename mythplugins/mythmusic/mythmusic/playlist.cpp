@@ -13,23 +13,30 @@ Track::Track(int x, AllMusic *all_music_ptr)
     parent = NULL;    
     bad_reference = false;
     label = "Not Initialized";
+    cd_flag = false;
 }
 
 void Track::postLoad(PlaylistsContainer *grandparent)
 {
-    if(index_value == 0)
+    if(!cd_flag)
     {
-        cerr << "playlist.o: Not sure how I got 0 as a track number, but it ain't good" << endl;
+        if(index_value == 0)
+        {
+            cerr << "playlist.o: Not sure how I got 0 as a track number, but it ain't good" << endl;
+        }
+        if(index_value > 0)
+        {
+            //  Normal Track
+            label = all_available_music->getLabel(index_value, &bad_reference);
+        }
+        if(index_value < 0)
+        {
+            label = grandparent->getPlaylistName(index_value * -1, bad_reference);
+        }
     }
-    if(index_value > 0)
+    else
     {
-        //  Normal Track
-        label = all_available_music->getLabel(index_value, &bad_reference);
-    }
-    if(index_value < 0)
-    {
-        label  = "Playlist ~ ";
-        label += grandparent->getPlaylistName(index_value * -1, bad_reference);
+        label = all_available_music->getLabel(index_value * -1, &bad_reference);
     }
 }
 
@@ -80,18 +87,22 @@ void Playlist::copyTracks(Playlist *to_ptr, bool update_display)
     Track *it;
     for(it = songs.first(); it; it = songs.next())
     {
-        to_ptr->addTrack((*it).getValue(), update_display);
+        if(!it->getCDFlag())
+        {
+            to_ptr->addTrack((*it).getValue(), update_display, false);
+        }
     }  
 }
 
 
 
-void Playlist::addTrack(int the_track, bool update_display)
+void Playlist::addTrack(int the_track, bool update_display, bool cd)
 {
     //  Given a track id number, add that track to 
     //  this playlist
 
     Track *a_track = new Track(the_track, all_available_music);
+    a_track->setCDFlag(cd);
     a_track->postLoad(parent);
     a_track->setParent(this);
     songs.append(a_track);
@@ -99,7 +110,6 @@ void Playlist::addTrack(int the_track, bool update_display)
 
     //  If I'm part of a GUI, display the existence
     //  of this new track
-
 
     if(!update_display)
     {
@@ -131,7 +141,7 @@ void Playlist::addTrack(int the_track, bool update_display)
 
 void Track::deleteYourself()
 {
-    parent->removeTrack(index_value);
+    parent->removeTrack(index_value, cd_flag);
 }
 
 void Track::deleteYourWidget()
@@ -153,14 +163,32 @@ void Playlist::removeAllTracks()
     changed = true;
 }
 
-void Playlist::removeTrack(int the_track)
+void Playlist::ripOutAllCDTracksNow()
+{
+    Track *it;
+    for(it = songs.first(); it; it = songs.current())
+    {
+        if(it->getCDFlag())
+        {
+            it->deleteYourWidget();
+            songs.remove(it);
+        }
+        else
+        {
+            it = songs.next();
+        }
+    }  
+    changed = true;
+}
+
+void Playlist::removeTrack(int the_track, bool cd_flag)
 {
     //  NB SPEED THIS UP
     //  Should be a straight lookup against cached index
     Track *it;
     for(it = songs.first(); it; it = songs.current())
     {
-        if(it->getValue() == the_track)
+        if(it->getValue() == the_track && cd_flag == it->getCDFlag())
         {
             it->deleteYourWidget();
             songs.remove(it);
@@ -359,14 +387,46 @@ Playlist::Playlist(AllMusic *all_music_ptr)
 
 void Track::putYourselfOnTheListView(QListViewItem *a_listviewitem, QListViewItem *current_last_item)
 {
-    my_widget = new PlaylistTrack(a_listviewitem, current_last_item, label);
-    my_widget->setOwner(this); 
+    if(cd_flag)
+    {
+        my_widget = new PlaylistCD(a_listviewitem, current_last_item, label);
+        my_widget->setOwner(this); 
+    }
+    else
+    {
+        if(index_value > 0)
+        {
+            my_widget = new PlaylistTrack(a_listviewitem, current_last_item, label);
+            my_widget->setOwner(this); 
+        }
+        else if(index_value < 0)
+        {
+            my_widget = new PlaylistPlaylist(a_listviewitem, current_last_item, label);
+            my_widget->setOwner(this); 
+        }
+    }
 }
 
 void Track::putYourselfOnTheListView(QListViewItem *a_listviewitem)
 {
-    my_widget = new PlaylistTrack(a_listviewitem, label);
-    my_widget->setOwner(this); 
+    if(cd_flag)
+    {
+        my_widget = new PlaylistCD(a_listviewitem, label);
+        my_widget->setOwner(this); 
+    }
+    else
+    {
+        if(index_value > 0)
+        {
+            my_widget = new PlaylistTrack(a_listviewitem, label);
+            my_widget->setOwner(this); 
+        }
+        else if(index_value < 0)
+        {
+            my_widget = new PlaylistPlaylist(a_listviewitem, label);
+            my_widget->setOwner(this); 
+        }
+    }
 }
 
 void Playlist::putYourselfOnTheListView(QListViewItem *a_listviewitem)
@@ -530,14 +590,17 @@ void Playlist::fillSonglistFromSongs()
     Track *it;
     for(it = songs.first(); it; it = songs.next())
     {
-        if(first)
+        if(!it->getCDFlag())
         {
-            first = false;
-            a_list = QString("%1").arg(it->getValue());
-        }
-        else
-        {
-            a_list += QString(",%1").arg(it->getValue());
+            if(first)
+            {
+                first = false;
+                a_list = QString("%1").arg(it->getValue());
+            }
+            else
+            {
+                a_list += QString(",%1").arg(it->getValue());
+            }
         }
     }  
     raw_songlist = a_list;
@@ -622,54 +685,78 @@ void Playlist::saveNewPlaylist(QSqlDatabase *a_db, QString a_host)
     }
 }
 
-void Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
+int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
 {
     Track *it;
     for(it = songs.first(); it; it = songs.next())
     {
-        if(it->getValue() == 0)
+        if(!it->getCDFlag())
         {
-            cerr << "playlist.o: Oh crap ... how did we get something with an ID of 0 on a playlist?" << endl ;
+            if(it->getValue() == 0)
+            {
+                cerr << "playlist.o: Oh crap ... how did we get something with an ID of 0 on a playlist?" << endl ;
+            }
+            if(it->getValue() > 0)
+            {
+                // Normal track
+                Metadata *tmpdata = all_available_music->getMetadata(it->getValue());
+                if (tmpdata)
+                {
+                    QString a_string = QString("%1 ~ %2").arg(tmpdata->Artist()).arg(tmpdata->Title());
+                    GenericTree *added_node = tree_to_write_to->addNode(a_string, it->getValue(), true);
+                    ++a_counter;
+                    added_node->setAttribute(0, 1);
+                    added_node->setAttribute(1, a_counter); //  regular order
+                    added_node->setAttribute(2, rand()); //  random order
+                    
+                    //
+                    //  Compute "intelligent" weighting
+                    //
+                    
+                    QDateTime cTime = QDateTime::currentDateTime();
+                    double currentDateTime = cTime.toString("yyyyMMddhhmmss").toDouble();
+                    int rating = tmpdata->Rating();
+                    int playcount = tmpdata->PlayCount();
+                    double lastplay = tmpdata->LastPlay();
+                    double ratingValue = (double)rating / 10;
+                    double playcountValue = (double)playcount / 50;
+                    double lastplayValue = (currentDateTime - lastplay) / currentDateTime * 2000;
+                    double rating_value =  (35 * ratingValue - 25 * playcountValue + 25 * lastplayValue + 
+                                            15 * (double)rand() / (RAND_MAX + 1.0));
+                    int integer_rating = (int) rating_value * 100000;
+                    added_node->setAttribute(3, integer_rating); //  "intelligent" order
+                }
+            }
+            if(it->getValue() < 0)
+            {
+                // it's a playlist, recurse (mildly)
+                Playlist *level_down = parent->getPlaylist((it->getValue()) * -1);
+                if (level_down)
+                {
+                    a_counter = level_down->writeTree(tree_to_write_to, a_counter);
+                }
+            }
         }
-        if(it->getValue() > 0)
+        else
         {
-            // Normal track
-            Metadata *tmpdata = all_available_music->getMetadata(it->getValue());
+            //
+            //  f'ing CD tracks to keep Isaac happy
+            //
+
+            Metadata *tmpdata = all_available_music->getMetadata(it->getValue() * -1);
             if (tmpdata)
             {
-                QString a_string = QString("%1 ~ %2").arg(tmpdata->Artist()).arg(tmpdata->Title());
-                GenericTree *added_node = tree_to_write_to->addNode(a_string, it->getValue(), true);
+                QString a_string = QString("%2 ~ %3").arg(tmpdata->Track()).arg(tmpdata->Artist()).arg(tmpdata->Title());
+                GenericTree *added_node = tree_to_write_to->addNode(a_string, it->getValue() * -1, true);
                 ++a_counter;
                 added_node->setAttribute(0, 1);
                 added_node->setAttribute(1, a_counter); //  regular order
                 added_node->setAttribute(2, rand()); //  random order
-                
-                //
-                //  Compute "intelligent" weighting
-                //
-                
-                QDateTime cTime = QDateTime::currentDateTime();
-                double currentDateTime = cTime.toString("yyyyMMddhhmmss").toDouble();
-                int rating = tmpdata->Rating();
-                int playcount = tmpdata->PlayCount();
-                double lastplay = tmpdata->LastPlay();
-                double ratingValue = (double)rating / 10;
-                double playcountValue = (double)playcount / 50;
-                double lastplayValue = (currentDateTime - lastplay) / currentDateTime * 2000;
-                double rating_value =  (35 * ratingValue - 25 * playcountValue + 25 * lastplayValue + 
-                                        15 * (double)rand() / (RAND_MAX + 1.0));
-                int integer_rating = (int) rating_value * 100000;
-                added_node->setAttribute(3, integer_rating); //  "intelligent" order
+                added_node->setAttribute(3, rand()); //  "intelligent" order
             }
         }
-        if(it->getValue() < 0)
-        {
-            // it's a playlist, recurse (mildly)
-            Playlist *level_down = parent->getPlaylist((it->getValue()) * -1);
-            if (level_down)
-                level_down->writeTree(tree_to_write_to, a_counter);
-        }
     }  
+    return a_counter;
 }
 
 void Playlist::writeMetadata(QPtrList<Metadata> *list_to_write_to)
@@ -716,13 +803,37 @@ void PlaylistsContainer::writeTree(GenericTree *tree_to_write_to)
 
     active_playlist->writeTree(subsub_node, 0);
 
-    QPtrListIterator<Playlist> iterator( *all_other_playlists );  
     int a_counter = 0;  
+    
+    //
+    //  Write the CD playlist (if there's anything in it)
+    //
+    
+/*
+    if(cd_playlist.count() > 0)
+    {
+        ++a_counter;
+        QString a_string = "CD: ";
+        a_string += all_available_music->getCDTitle();
+        GenericTree *cd_node = sub_node->addNode(a_string, 0);
+        cd_node->setAttribute(0, 0);
+        cd_node->setAttribute(1, a_counter);
+        cd_node->setAttribute(2, rand());
+        cd_node->setAttribute(3, rand());
+        
+    }
+*/
+
+    //
+    //  Write the other playlists
+    //
+    
+    QPtrListIterator<Playlist> iterator( *all_other_playlists );  
     Playlist *a_list;
     while( ( a_list = iterator.current() ) != 0)
     {
         ++a_counter;
-        GenericTree *new_node = sub_node->addNode(a_list->getName(), a_counter);
+        GenericTree *new_node = sub_node->addNode(a_list->getName(), 0);
         new_node->setAttribute(0, 0);
         new_node->setAttribute(1, a_counter);
         new_node->setAttribute(2, rand());
@@ -730,6 +841,7 @@ void PlaylistsContainer::writeTree(GenericTree *tree_to_write_to)
         a_list->writeTree(new_node, 0);
         ++iterator;
     }
+    
 }
 
 
@@ -800,7 +912,7 @@ void PlaylistsContainer::copyNewPlaylist(QString name)
     pending_writeback_index = 0;
     active_widget->setText(0, "Active Play Queue");
     active_playlist->removeAllTracks();
-    active_playlist->addTrack(new_list->getID() * -1, true);
+    active_playlist->addTrack(new_list->getID() * -1, true, false);
 }
 
 void PlaylistsContainer::setActiveWidget(PlaylistTitle *widget)
@@ -888,7 +1000,7 @@ void PlaylistsContainer::deletePlaylist(int kill_me)
     //  playlist that is actually a reference to this
     //  playlist
     
-    active_playlist->removeTrack(kill_me * -1);
+    active_playlist->removeTrack(kill_me * -1, false);
 
     QPtrListIterator<Playlist> iterator( *all_other_playlists );    
     Playlist *a_list;
@@ -897,7 +1009,7 @@ void PlaylistsContainer::deletePlaylist(int kill_me)
         ++iterator;
         if(a_list != list_to_kill)
         {
-            a_list->removeTrack(kill_me * -1);
+            a_list->removeTrack(kill_me * -1, false);
         }
     }
 

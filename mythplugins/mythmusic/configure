@@ -60,17 +60,17 @@ if test "$opengl" = "no" ; then
 fi
 
 if test "$fftw_lib" = "yes" ; then
-  echo "        FFTW support will be included"
+  echo "        FFTW   support will be included"
   echo "#define FFTW_SUPPORT 1" >> ./mythmusic/config.h
   echo "LIBS += -lrfftw -lfftw" >> ./mythmusic/config.pro
 fi
 
 if test "$fftw_lib" = "no" ; then
-  echo "        FFTW support will not be included"
+  echo "        FFTW   support will not be included"
 fi
 
 if test "$sdl" = "yes" ; then
-  echo "        SDL support will be included"
+  echo "        SDL    support will be included"
   echo "#define SDL_SUPPORT 1" >> ./mythmusic/config.h
   echo "LIBS += `sdl-config --libs`" >> ./mythmusic/config.pro
   echo "QMAKE_CXXFLAGS_RELEASE += `sdl-config --cflags`" >> ./mythmusic/config.pro
@@ -78,7 +78,7 @@ if test "$sdl" = "yes" ; then
 fi
 
 if test "$sdl" = "no" ; then
-  echo "        SDL support will not be included"
+  echo "        SDL    support will not be included"
 fi
 echo ""
 

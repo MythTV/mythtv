@@ -23,11 +23,13 @@ class ReadCDThread : public QThread
 
     ReadCDThread(PlaylistsContainer *all_the_playlist, AllMusic *all_the_music);
     virtual void run();
+    bool    statusChanged(){return cd_status_changed;}
 
   private:
 
     AllMusic*           all_music;
     PlaylistsContainer* the_playlists;
+    bool                cd_status_changed;
 };
 
 class DatabaseBox : public MythDialog
