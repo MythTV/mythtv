@@ -5,7 +5,7 @@
 using namespace std;
 
 #include "mythcontext.h"
-#include "audioputputalsa.h"
+#include "audiooutputalsa.h"
 
 
 static int set_params(snd_pcm_t *handle,

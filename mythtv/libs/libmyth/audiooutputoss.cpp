@@ -7,6 +7,7 @@
 #include <time.h>
 #include <sys/soundcard.h>
 #include <sys/ioctl.h>
+#include <errno.h>
 
 #include <iostream>
 #include <qdatetime.h>
