@@ -192,6 +192,7 @@ public:
         GlobalSetting("VertScanPercentage") {
         setLabel("Vertical over/underscan percentage");
         setValue(0);
+        setHelpText("Adjust this if the image does not fill your screen vertically.");
     };
 };
 
@@ -202,6 +203,7 @@ public:
         GlobalSetting("HorizScanPercentage") {
         setLabel("Horizontal over/underscan percentage");
         setValue(0);
+        setHelpText("Adjust this if the image does not fill your screen horizontally.");
     };
 };
 
@@ -212,6 +214,7 @@ public:
         GlobalSetting("XScanDisplacement") {
         setLabel("Scan displacement (X)");
         setValue(0);
+        setHelpText("Adjust this to move the image horizontally.");
     };
 };
 
@@ -222,6 +225,8 @@ public:
         GlobalSetting("YScanDisplacement") {
         setLabel("Scan displacement (Y)");
         setValue(0);
+        setHelpText("Adjust this to move the image vertically.");
+
     };
 };
 
@@ -242,9 +247,10 @@ public:
         GlobalSetting("PlaybackExitPrompt") {
         setLabel("Prompt on playback exit");
         setValue(false);
-        setHelpText("If this is set, when you exit playback a menu will be "
-                    "displayed with options to save your position, "
-                    "delete the recording, or continue watching.");
+        setHelpText("If set, a menu will be displayed when you exit "
+                    "playback mode.  The options available will "
+                    "allow you to save your position, delete the "
+                    "recording, or continue watching.");
     };
 };
 
@@ -255,9 +261,9 @@ public:
         GlobalSetting("EndOfRecordingExitPrompt") {
         setLabel("Prompt at end of recording");
         setValue(false);
-        setHelpText("If this is set, when a recording is finished playing a "
+        setHelpText("If this is set, a "
                     "menu will be displayed allowing you to delete the "
-                    "recording if you want.");
+                    "recording when it has finished playing.");
     };
 };
 
@@ -312,7 +318,7 @@ public:
         GlobalSetting("XineramaScreen") {
         setLabel("Xinerama screen");
         setValue(0);
-        setHelpText("If using Xinerama, run only on the specified screen");
+        setHelpText("If using Xinerama, run only on the specified screen.");
     };
 };
 
@@ -346,6 +352,9 @@ public:
         addSelection("+1000");
         addSelection("+1100");
         addSelection("+1200");
+        setHelpText("If your local timezone does not match the timezone "
+                    "returned by XMLTV, use this setting to automatically adjust the "
+                    "program start and end times.");
     };
 };
 
