@@ -130,8 +130,13 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     }
     else
     {
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), QObject::tr("Failed to get selector object"),
+                                  QObject::tr("Myth could not locate the selector object within your "
+                                  "theme.\nPlease make that your ui.xml is valid.\n\nMyth will now exit."));
+                                  
         cerr << "Failed to get selector object.\n";
         exit(0);
+        return;
     }
 
     if(theme->GetSet("group_info") && gContext->GetNumSetting("ShowGroupInfo", 0) == 1)
@@ -990,7 +995,7 @@ void PlaybackBox::cursorLeft()
             killPlayerSafe();
         inTitle = true;
         skipUpdate = false;
-        updateBackground();
+        
         update(fullRect);
         leftRight = true;
     }
