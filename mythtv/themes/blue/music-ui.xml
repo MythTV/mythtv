@@ -9,16 +9,8 @@
 
     <!-- music selection screen -->
     <window name="music_select">
-      <font name="active" face="Arial">
-         <color>#ffffff</color>
-         <size>18</size>
-         <bold>yes</bold>
-      </font>
-
-      <font name="inactive" face="Arial">
-        <color>#9999cc</color>
-        <size>18</size>
-        <bold>yes</bold>
+      <font name="inactive" base="list-inactive">
+        <color>#aaaaee</color>
       </font>
 
       <container name="musictree">
@@ -27,13 +19,13 @@
         <listtreearea name="musictree" draworder="0">
           <area>0,0,760,400</area>
           <listsize>0,0,450,360</listsize>
-          <leveloffset>10</leveloffset>
+          <leveloffset>5</leveloffset>
           <gradient type="unselected" start="#505050" end="#000000" alpha="100">
           </gradient>
           <gradient type="selected" start="#52CA38" end="#349838" alpha="255">
           </gradient>
-          <fcnfont name="active" function="active"></fcnfont>
-          <fcnfont name="inactive" function="inactive"></fcnfont>
+          <fcnfont name="list-active" function="active"></fcnfont>
+          <fcnfont name="list-inactive" function="inactive"></fcnfont>
         </listtreearea>
       </container>
 
@@ -46,37 +38,37 @@
         </image>
 
         <textarea name="line1" draworder="1" align="left">
-            <font>active</font>
+            <font>metadata</font>
             <area>10,0,780,30</area>
             <cutdown>yes</cutdown>
         </textarea>
 
         <textarea name="line2" draworder="1" align="left">
-            <font>active</font>
+            <font>metadata</font>
             <area>10,30,780,30</area>
             <cutdown>yes</cutdown>
         </textarea>
 
         <textarea name="line3" draworder="1" align="left">
-            <font>active</font>
+            <font>metadata</font>
             <area>10,60,780,30</area>
             <cutdown>yes</cutdown>
         </textarea>
 
         <textarea name="line4" draworder="1" align="left">
-            <font>active</font>
+            <font>metadata</font>
             <area>10,90,780,30</area>
             <cutdown>yes</cutdown>
         </textarea>
 
         <textarea name="line5" draworder="1" align="left">
-            <font>active</font>
+            <font>metadata</font>
             <area>10,120,780,30</area>
             <cutdown>yes</cutdown>
         </textarea>
 
         <textarea name="line6" draworder="1" align="left">
-            <font>active</font>
+            <font>metadata</font>
             <area>10,150,780,30</area>
             <cutdown>yes</cutdown>
         </textarea>
@@ -94,47 +86,11 @@
         <!--
             First, define all the fonts we need on this screen
         -->
-        <font name="active" face="Arial">
-            <color>#ffffff</color>
-            <size>18</size>
-            <bold>yes</bold>
-        </font>
 
-        <font name="inactive" face="Arial">
-            <color>#9999cc</color>
-            <size>18</size>
-            <bold>yes</bold>
-        </font>
-  
-        <font name="selected" face="Arial">
-            <color>#ffff00</color>
-            <size>18</size>
-            <bold>yes</bold>
-        </font>
-
-        <font name="currenttitle" face="Arial">
-            <color>#ffffff</color>
-            <size>20</size>
-            <bold>yes</bold>
-        </font>
-
-        <font name="currentartist" face="Arial">
-            <color>#ffffff</color>
-            <size>16</size>
-            <bold>yes</bold>
-        </font>
-
-        <font name="infotext" face="Arial">
-            <color>#ffffff</color>
+        <font name="infotext" base="info">
             <size>12</size>
-            <bold>yes</bold>
         </font>
 
-        <font name="buttons" face="Arial">
-            <color>#ffffff</color>
-            <size>12</size>
-            <bold>yes</bold>
-        </font>
 
         <!--
             The (unchanging) background
@@ -192,15 +148,15 @@
                 -->
                 <bin number="1">
                     <area>30,16,190,250</area>
-                    <fcnfont name="active" function="active"></fcnfont>
-                    <fcnfont name="inactive" function="inactive"></fcnfont>
-                    <fcnfont name="selected" function="selected"></fcnfont>
+                    <fcnfont name="list-active" function="active"></fcnfont>
+                    <fcnfont name="list-inactive" function="inactive"></fcnfont>
+                    <fcnfont name="list-selected" function="selected"></fcnfont>
                 </bin>
                 <bin number="2">
                     <area>235,10,535,270</area>
-                    <fcnfont name="active" function="active"></fcnfont>
-                    <fcnfont name="selected" function="selected"></fcnfont>
-                    <fcnfont name="inactive" function="inactive"></fcnfont>
+                    <fcnfont name="list-active" function="active"></fcnfont>
+                    <fcnfont name="list-selected" function="selected"></fcnfont>
+                    <fcnfont name="list-inactive" function="inactive"></fcnfont>
                 </bin>
             </managedtreelist>
 
@@ -224,7 +180,7 @@
             </image>
             <textarea name="waiting_text" draworder="1" align="center">
                 <context>0</context>
-                <font>currenttitle</font>
+                <font>info</font>
                 <area>190,140,380,40</area>
                 <value>Please Wait...</value>
             </textarea>
@@ -249,19 +205,19 @@
             <area>0,315,680,160</area>
 
             <textarea name="title_text" draworder="1" align="left">
-                <font>currenttitle</font>
+                <font>title</font>
                 <area>270,15,415,34</area>
                 <cutdown>yes</cutdown>
             </textarea>
 
             <textarea name="artist_text" draworder="1" align="left">
-                <font>currentartist</font>
+                <font>subtitle</font>
                 <area>270,50,415,25</area>
                 <cutdown>yes</cutdown>
             </textarea>
 
             <textarea name="album_text" draworder="1" align="left">
-                <font>currentartist</font>
+                <font>metadata</font>
                 <area>270,73,415,25</area>
                 <cutdown>yes</cutdown>
             </textarea>
@@ -273,7 +229,7 @@
             </repeatedimage>
 
             <textarea name="current_visualization_text" draworder="1" align="right">
-                <font>currentartist</font>
+                <font>info</font>
                 <area>470,100,200,25</area>
                 <cutdown>no</cutdown>
             </textarea>
@@ -284,7 +240,7 @@
             </textarea>
 
             <textarea name="time_text" draworder="1" align="right">
-                <font>currentartist</font>
+                <font>info</font>
                 <area>485,125,185,25</area>
             </textarea>
 
@@ -313,14 +269,14 @@
         -->
 
         <container name="musicbuttons">
-            <area>15,490,785,110</area>
+            <area>15,475,785,110</area>
 
             <textbutton name="shuffle_button" draworder="0">
                 <position>20,0</position>
                 <image function="on" filename="text_button_on.png"></image>
                 <image function="off" filename="text_button_off.png"></image>
                 <image function="pushed" filename="text_button_pushed.png"></image>
-                <font>buttons</font>
+                <font>small-info</font>
             </textbutton>
 
             <textbutton name="repeat_button" draworder="0">
@@ -328,7 +284,7 @@
                 <image function="on" filename="text_button_on.png"></image>
                 <image function="off" filename="text_button_off.png"></image>
                 <image function="pushed" filename="text_button_pushed.png"></image>
-                <font>buttons</font>
+                <font>small-info</font>
             </textbutton>
 
             <textbutton name="pledit_button" draworder="0">
@@ -336,7 +292,7 @@
                 <image function="on" filename="text_button_on.png"></image>
                 <image function="off" filename="text_button_off.png"></image>
                 <image function="pushed" filename="text_button_pushed.png"></image>
-                <font>buttons</font>
+                <font>small-info</font>
             </textbutton>
 
             <textbutton name="vis_button" draworder="0">
@@ -344,53 +300,53 @@
                 <image function="on" filename="text_button_on.png"></image>
                 <image function="off" filename="text_button_off.png"></image>
                 <image function="pushed" filename="text_button_pushed.png"></image>
-                <font>buttons</font>
+                <font>small-info</font>
             </textbutton>
 
             <pushbutton name="prev_button" draworder="0">
-                <position>10,40</position>
+                <position>10,50</position>
                 <image function="on" filename="prev_button_on.png"></image>
                 <image function="off" filename="prev_button_off.png"></image>
                 <image function="pushed" filename="prev_button_pushed.png"></image>
             </pushbutton>
             
             <pushbutton name="rew_button" draworder="0">
-                <position>125,40</position>
+                <position>125,50</position>
                 <image function="on" filename="rew_button_on.png"></image>
                 <image function="off" filename="rew_button_off.png"></image>
                 <image function="pushed" filename="rew_button_pushed.png"></image>
             </pushbutton>
             
             <pushbutton name="pause_button" draworder="0">
-                <position>240,40</position>
+                <position>240,50</position>
                 <image function="on" filename="pause_button_on.png"></image>
                 <image function="off" filename="pause_button_off.png"></image>
                 <image function="pushed" filename="pause_button_pushed.png"></image>
             </pushbutton>
             
             <pushbutton name="play_button" draworder="0">
-                <position>355,40</position>
+                <position>355,50</position>
                 <image function="on" filename="play_button_on.png"></image>
                 <image function="off" filename="play_button_off.png"></image>
                 <image function="pushed" filename="play_button_pushed.png"></image>
             </pushbutton>
             
             <pushbutton name="stop_button" draworder="0">
-                <position>470,40</position>
+                <position>470,50</position>
                 <image function="on" filename="stop_button_on.png"></image>
                 <image function="off" filename="stop_button_off.png"></image>
                 <image function="pushed" filename="stop_button_pushed.png"></image>
             </pushbutton>
             
             <pushbutton name="ff_button" draworder="0">
-                <position>585,40</position>
+                <position>585,50</position>
                 <image function="on" filename="ff_button_on.png"></image>
                 <image function="off" filename="ff_button_off.png"></image>
                 <image function="pushed" filename="ff_button_pushed.png"></image>
             </pushbutton>
             
             <pushbutton name="next_button" draworder="0">
-                <position>700,40</position>
+                <position>700,50</position>
                 <image function="on" filename="next_button_on.png"></image>
                 <image function="off" filename="next_button_off.png"></image>
                 <image function="pushed" filename="next_button_pushed.png"></image>
