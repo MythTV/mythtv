@@ -51,8 +51,9 @@ bool VideoOutput::Init(int width, int height, float aspect, unsigned int winid,
         img_hscanf = 0 - img_hscanf;
     }
 
-    printf("Over/underscanning. V: %f, H: %f, XOff: %d, YOff: %d\n",
-           img_vscanf, img_hscanf, img_xoff, img_yoff);
+    if (winw && winh)
+        printf("Over/underscanning. V: %f, H: %f, XOff: %d, YOff: %d\n",
+               img_vscanf, img_hscanf, img_xoff, img_yoff);
 
     dispx = 0; dispy = 0;
     dispw = winw; disph = winh;
