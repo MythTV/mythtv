@@ -239,6 +239,25 @@
         <catcolor category="Transport" color="#33ff99"></catcolor>
         <catcolor category="Travel" color="#aa00aa"></catcolor>
 
+ <!-- Categories introduced by belgian and dutch grabbers teveblad.be -->
+        <catcolor category="nieuws" color="DarkOrange3"></catcolor>
+        <catcolor category="actua" color="sienna"></catcolor>
+        <catcolor category="documentaire" color="goldenrod"></catcolor>
+        <catcolor category="wielrennen" color="DarkCyan"></catcolor>
+        <catcolor category="sport" color="DarkCyan"></catcolor>
+        <catcolor category="voetbal" color="DarkCyan"></catcolor>
+        <catcolor category="soap" color="SlateGrey"></catcolor>
+        <catcolor category="muziek" color="DarkRed"></catcolor>
+        <catcolor category="film" color="Blue"></catcolor>
+        <catcolor category="talkshow" color="MediumTurquoise"></catcolor>
+        <catcolor category="serie" color="DarkOrchid"></catcolor>
+        <catcolor category="spelprogramma" color="orchid"></catcolor>
+        <catcolor category="quiz" color="orchid"></catcolor>
+        <catcolor category="kinderprogramma" color="MediumSlateBlue"></catcolor>
+        <catcolor category="tekenfilm" color="MediumSlateBlue"></catcolor>
+        <catcolor category="tekenfilm kind" color="MediumSlateBlue"></catcolor>
+
+
         <!-- Categories introduced by tv_grab_jp -->
         <catcolor category="ドラマ" color="rosybrown3"></catcolor>
         <catcolor category="映画" color="Blue"></catcolor>
@@ -502,6 +521,25 @@
         <catcolor category="tourism/travel" color="#aa00aa"></catcolor>
         <catcolor category="arts/culture" color="goldenrod"></catcolor>
         <catcolor category="movie" color="Blue"></catcolor>
+
+ <!-- Categories introduced by belgian and dutch grabbers teveblad.be -->
+        <catcolor category="nieuws" color="DarkOrange3"></catcolor>
+        <catcolor category="actua" color="sienna"></catcolor>
+        <catcolor category="documentaire" color="goldenrod"></catcolor>
+        <catcolor category="wielrennen" color="DarkCyan"></catcolor>
+        <catcolor category="sport" color="DarkCyan"></catcolor>
+        <catcolor category="voetbal" color="DarkCyan"></catcolor>
+        <catcolor category="soap" color="SlateGrey"></catcolor>
+        <catcolor category="muziek" color="DarkRed"></catcolor>
+        <catcolor category="film" color="Blue"></catcolor>
+        <catcolor category="talkshow" color="MediumTurquoise"></catcolor>
+        <catcolor category="serie" color="DarkOrchid"></catcolor>
+        <catcolor category="spelprogramma" color="orchid"></catcolor>
+        <catcolor category="quiz" color="orchid"></catcolor>
+        <catcolor category="kinderprogramma" color="MediumSlateBlue"></catcolor>
+        <catcolor category="tekenfilm" color="MediumSlateBlue"></catcolor>
+        <catcolor category="tekenfilm kind" color="MediumSlateBlue"></catcolor>
+
 
         <!-- Categories introduced by tv_grab_uk_rt -->
         <catcolor category="Animation" color="MediumSlateBlue"></catcolor>
