@@ -97,9 +97,12 @@ package export::transcode;
         $transcode = "nice -n $Args{'nice'} transcode"
                    # -V is now the default, but need to keep using it because people are still using an older version of transcode
                     .' -V'                     # use YV12/I420 instead of RGB, for faster processing
-                    #.' -u 100,'.($num_cpus);   # Take advantage of multiple CPU's?  currently disabled because it actually seems to slow things down
                     .' --print_status 16'      # Only print status every 16 frames -- prevents buffer-related slowdowns
                     ;
+    # Take advantage of multiple CPU's?
+        if ($num_cpus > 1) {
+            $transcode .= ' -u 100,'.($num_cpus);
+        }
     # Not an mpeg
         unless ($episode->{'finfo'}{'is_mpeg'}) {
         # swap red/blue -- used with svcd, need to see if it's needed everywhere
