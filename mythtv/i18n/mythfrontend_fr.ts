@@ -852,6 +852,666 @@
         <source>If set, you will not be able to return to this screen and reset the Setup PIN without first entering the current PIN.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Reposition after fast forward/rewind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When exiting sticky keys fast forward/rewind mode, reposition before resuming normal playback.  This is to compensate for the reaction time between seeing where to resume playback and actually exiting fast forward/rewind mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of seconds for OSD information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How long the program information remains on the On Screen Display after a channel change.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OSD theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OSD font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Closed Caption font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel ordering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>channel number (numeric)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>channel number (alpha)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>database order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>channel name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical over/underscan percentage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust this if the image does not fill your screen vertically.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal over/underscan percentage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust this if the image does not fill your screen horizontally.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan displacement (X)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust this to move the image horizontally.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan displacement (Y)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust this to move the image vertically.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jitter reduction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If this is set, frame timing will be adjusted for smoother motion.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Experimental A/V Sync</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If this is set, more experimental code will be in charge of video output. Use at your own risk.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default setting for Closed Captioning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If this is set, captions will be on by default when playing back recordings or watching live TV.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always use Browse mode when changing channels in LiveTV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If this is set, Browse mode will automatically be activated whenever you use Channel UP/DOWN when watching Live TV.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aggressive Soundcard Buffering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If this is set, MythTV will pretend to have a smaller soundcard buffer than is really present.  This may speed up seeking, but can also cause playback problems.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Saved Position on playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically clear saved position on a recording when the recording is played back.  If UNset, you can mark the beginning with rewind then save position.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alternate Clear Saved Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, during playback the select key (Enter or Space) will alternate between &quot;Position Saved&quot; and &quot;Position Cleared&quot;. If UNset, select will save the current position for each keypress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Action on playback exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Just exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save position and exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always prompt</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set to prompt, a menu will be displayed when you exit playback mode.  The options available will allow you to save your position, delete the recording, or continue watching.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Prompt at end of recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, a menu will be displayed allowing you to delete the recording when it has finished playing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generate thumbnail preview images for recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display live preview of recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, a preview of the recording will play in a small window on the &quot;Watch a Recording&quot; menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Transparent Boxes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the Watch Recording and Delete Recording screens will use transparency. Unset this option if selecting the recordings is slow.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Popup Background Shading Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fill</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fill is the quickest method, but it doesn&apos;t look good up close. Image looks good from up close, but is somewhat slow. And of course no shading will be the fastest.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always use Advanced Recording Options screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always use the Advanced Recording Options screen when editing a scheduled recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System shutdown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ESC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No exit key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Control-ESC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Meta-ESC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt-ESC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is designed to run continuously. If you wish, you may use the ESC key or the ESC key + a modifier to exit MythTV. Do not choose a key combination that will be intercepted by your window manager.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Halt command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you have configured an exit key on the System Shutdown menu, you will be given the opportunity to exit MythTV or halt the system completely. Another possibility for this field is poweroff</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Xinerama screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If using Xinerama, run only on the specified screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GUI width</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The width of the GUI.  Do not make the GUI wider than your actual screen resolution.  Set to 0 to automatically scale to fullscreen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GUI height</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The height of the GUI.  Do not make the GUI taller than your actual screen resolution.  Set to 0 to automatically scale to fullscreen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GUI X offset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The horizontal offset the GUI will be displayed at.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GUI Y offset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The vertical offset the GUI will be displayed at.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run the frontend in a window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggles between borderless operation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use a random theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use a random theme each time MythTV is started.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Date format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ddd MMM d</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ddd MMMM d</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MMM d</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MM/dd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MM.dd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ddd d MMM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd.MM.yyyy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your preferred date format.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Short Date format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>M/d</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>d/M</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd/MM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>d.M.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd.MM.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your preferred short date format.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>h:mm AP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>h:mm ap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>hh:mm AP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>hh:mm ap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>h:mm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>hh:mm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your preferred time format.  Choose a format with &quot;AP&quot; in it for an AM/PM display, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Problem reading theme preview image </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display channel names instead of numbers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&quot;Big&quot; font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&quot;Medium&quot; font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&quot;Small&quot; font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Guide Selection Placement</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If unchecked, the program guide&apos;s selector will stay in the middle of the guide at all times.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guide Shading Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colorized (alpha)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Colorized (shaded)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Embossed (shaded)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Embossed (solid)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rounded (shaded)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rounded (solid)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display the channel icon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channels to Display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time Blocks (30 mins) to Display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Rankings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use program rankings to resolve conflicts.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rankings First.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use rankings to resolve conflicts before using traditional conflict resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single Recordings Rank</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single Recordings will receive this additional ranking value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weekslot Recordings Rank</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weekslot Recordings will receive this additional ranking value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timeslot Recordings Rank</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timeslot Recordings will receive this additional ranking value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Recordings Rank</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Recordings will receive this additional ranking value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Recordings Rank</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Recording types will receive this additional ranking value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guide starts at channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The program guide starts on this channel if it is run from outside of LiveTV mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>What to call &apos;unknown&apos; programs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>What category to give &apos;unknown&apos; programs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable Xbox Hardware</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This enables support for Xbox Specific hardware. Requires a frontend restart for changes to take effect.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Xbox Linux Distribution</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Other</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is used to determine the name of the blink binary led will be used on GentooX, blink otherwise.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default LED mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Green</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Orange</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Red</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This sets the LED mode when there is nothing else to display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording LED mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This sets the LED mode when a backend is recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Check Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This specifies how often in seconds to check if a recording is in progress and update the Xbox LED.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seeking</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Detection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Overscan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On-screen display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Global Auto Expire Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Guide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Ranking Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Localization</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RankPrograms</name>

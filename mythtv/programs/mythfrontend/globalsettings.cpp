@@ -87,7 +87,7 @@ MixerControl::MixerControl():
 class MixerVolume: public SliderSetting, public GlobalSetting {
 public:
     MixerVolume():
-	SliderSetting(0, 100, 1),
+        SliderSetting(0, 100, 1),
         GlobalSetting("MasterMixerVolume") {
         setLabel(QObject::tr("Master Mixer Volume"));
         setValue(70);
@@ -313,7 +313,6 @@ public:
     RecordPreRoll():
         SpinBoxSetting(0, 600, 1),
         BackendSetting("RecordPreRoll") {
-        setLabel("Time to record before start of show (in seconds)");
         setLabel(QObject::tr("Time to record before start of show "
                  "(in seconds)"));
         setValue(0);
@@ -361,13 +360,13 @@ class FFRewRepos: public CheckBoxSetting, public GlobalSetting {
 public:
     FFRewRepos():
         GlobalSetting("FFRewRepos") {
-        setLabel("Reposition after fast forward/rewind");
+        setLabel(QObject::tr("Reposition after fast forward/rewind"));
         setValue(true);
-        setHelpText("When exiting sticky keys fast forward/rewind mode, "
-                   "reposition before resuming normal playback.  This is to "
-                   "compensate for the reaction time between seeing where to "
-                   "resume playback and actually exiting fast forward/rewind "
-                   "mode.");
+        setHelpText(QObject::tr("When exiting sticky keys fast forward/rewind "
+                    "mode, reposition before resuming normal playback.  This "
+                    "is to compensate for the reaction time between seeing "
+                    "where to resume playback and actually exiting fast "
+                    "forward/rewind mode."));
     };
 };
 
@@ -376,10 +375,10 @@ public:
     OSDDisplayTime():
         SpinBoxSetting(0, 30, 1),
         GlobalSetting("OSDDisplayTime") {
-        setLabel("Number of seconds for OSD information");
+        setLabel(QObject::tr("Number of seconds for OSD information"));
         setValue(3);
-        setHelpText("How long the program information remains on the On "
-                    "Screen Display after a channel change.");
+        setHelpText(QObject::tr("How long the program information remains on "
+                    "the On Screen Display after a channel change."));
     };
 };
 
@@ -387,7 +386,7 @@ class OSDTheme: public ComboBoxSetting, public GlobalSetting {
 public:
     OSDTheme():
         GlobalSetting("OSDTheme") {
-        setLabel("OSD theme");
+        setLabel(QObject::tr("OSD theme"));
 
         QDir themes(PREFIX"/share/mythtv/themes");
         themes.setFilter(QDir::Dirs);
@@ -415,7 +414,7 @@ public:
     OSDFont():
         GlobalSetting("OSDFont") {
 
-        setLabel("OSD font");
+        setLabel(QObject::tr("OSD font"));
         addSelection("FreeSans.ttf");
         addSelection("FreeMono.ttf");
     };
@@ -426,7 +425,7 @@ public:
     OSDCCFont():
         GlobalSetting("OSDCCFont") {
 
-        setLabel("Closed Caption font");
+        setLabel(QObject::tr("Closed Caption font"));
         addSelection("FreeMono.ttf");
         addSelection("FreeSans.ttf");
     };
@@ -436,11 +435,11 @@ class ChannelOrdering: public ComboBoxSetting, public GlobalSetting {
 public:
     ChannelOrdering():
         GlobalSetting("ChannelOrdering") {
-        setLabel("Channel ordering");
-        addSelection("channel number (numeric)", "channum + 0");
-        addSelection("channel number (alpha)", "channum");
-        addSelection("database order", "chanid");
-        addSelection("channel name", "callsign");
+        setLabel(QObject::tr("Channel ordering"));
+        addSelection(QObject::tr("channel number (numeric)"), "channum + 0");
+        addSelection(QObject::tr("channel number (alpha)"), "channum");
+        addSelection(QObject::tr("database order"), "chanid");
+        addSelection(QObject::tr("channel name"), "callsign");
     };
 };
 
@@ -449,10 +448,10 @@ public:
     VertScanPercentage():
         SpinBoxSetting(-100, 100, 1),
         GlobalSetting("VertScanPercentage") {
-        setLabel("Vertical over/underscan percentage");
+        setLabel(QObject::tr("Vertical over/underscan percentage"));
         setValue(0);
-        setHelpText("Adjust this if the image does not fill your screen "
-                    "vertically.");
+        setHelpText(QObject::tr("Adjust this if the image does not fill your "
+                    "screen vertically."));
     };
 };
 
@@ -461,10 +460,10 @@ public:
     HorizScanPercentage():
         SpinBoxSetting(-100, 100, 1),
         GlobalSetting("HorizScanPercentage") {
-        setLabel("Horizontal over/underscan percentage");
+        setLabel(QObject::tr("Horizontal over/underscan percentage"));
         setValue(0);
-        setHelpText("Adjust this if the image does not fill your screen "
-                    "horizontally.");
+        setHelpText(QObject::tr("Adjust this if the image does not fill your "
+                    "screen horizontally."));
     };
 };
 
@@ -473,9 +472,9 @@ public:
     XScanDisplacement():
         SpinBoxSetting(-50, 50, 1),
         GlobalSetting("XScanDisplacement") {
-        setLabel("Scan displacement (X)");
+        setLabel(QObject::tr("Scan displacement (X)"));
         setValue(0);
-        setHelpText("Adjust this to move the image horizontally.");
+        setHelpText(QObject::tr("Adjust this to move the image horizontally."));
     };
 };
 
@@ -484,9 +483,9 @@ public:
     YScanDisplacement():
         SpinBoxSetting(-50, 50, 1),
         GlobalSetting("YScanDisplacement") {
-        setLabel("Scan displacement (Y)");
+        setLabel(QObject::tr("Scan displacement (Y)"));
         setValue(0);
-        setHelpText("Adjust this to move the image vertically.");
+        setHelpText(QObject::tr("Adjust this to move the image vertically."));
 
     };
 };
@@ -495,10 +494,10 @@ class ReduceJitter: public CheckBoxSetting, public GlobalSetting {
 public:
     ReduceJitter():
        GlobalSetting("ReduceJitter") {
-       setLabel("Jitter reduction");
+       setLabel(QObject::tr("Jitter reduction"));
        setValue(false);
-       setHelpText("If this is set, frame timing will be adjusted for "
-                   "smoother motion.");
+       setHelpText(QObject::tr("If this is set, frame timing will be adjusted "
+                    "for smoother motion."));
     };
 };
 
@@ -506,10 +505,10 @@ class ExperimentalSync: public CheckBoxSetting, public GlobalSetting {
 public:
     ExperimentalSync():
         GlobalSetting("ExperimentalAVSync") {
-        setLabel("Experimental A/V Sync");
+        setLabel(QObject::tr("Experimental A/V Sync"));
         setValue(false);
-        setHelpText("If this is set, more experimental code will be in charge "
-                    "of video output.  Use at your own risk.");
+        setHelpText(QObject::tr("If this is set, more experimental code will "
+                    "be in charge of video output. Use at your own risk."));
     };
 };
 
@@ -517,10 +516,11 @@ class DefaultCCMode: public CheckBoxSetting, public GlobalSetting {
 public:
     DefaultCCMode():
         GlobalSetting("DefaultCCMode") {
-        setLabel("Default setting for Closed Captioning");
+        setLabel(QObject::tr("Default setting for Closed Captioning"));
         setValue(false);
-        setHelpText("If this is set, captions will be on by default when"
-                   "playing back recordings or watching live TV.");
+        setHelpText(QObject::tr("If this is set, captions will be on by "
+                    "default when playing back recordings or watching "
+                    "live TV."));
     };
 };
 
@@ -528,11 +528,12 @@ class PersistentBrowseMode: public CheckBoxSetting, public GlobalSetting {
 public:
     PersistentBrowseMode():
         GlobalSetting("PersistentBrowseMode") {
-        setLabel("Always use Browse mode when changing channels in LiveTV");
+        setLabel(QObject::tr("Always use Browse mode when changing channels "
+                "in LiveTV"));
         setValue(false);
-        setHelpText("If this is set, Browse mode will automatically be "
-                   "activated whenever you use Channel UP/DOWN when "
-                   "watching Live TV.");
+        setHelpText(QObject::tr("If this is set, Browse mode will "
+                    "automatically be activated whenever you use Channel "
+                    "UP/DOWN when watching Live TV."));
     };
 };
 
@@ -540,11 +541,12 @@ class AggressiveBuffer: public CheckBoxSetting, public GlobalSetting {
 public:
     AggressiveBuffer():
        GlobalSetting("AggressiveSoundcardBuffer") {
-       setLabel("Aggressive Soundcard Buffering");
+       setLabel(QObject::tr("Aggressive Soundcard Buffering"));
        setValue(false);
-       setHelpText("If this is set, MythTV will pretend to have a smaller "
-                   "soundcard buffer than is really present.  This may speed up "
-                   "seeking, but can also cause playback problems.");
+       setHelpText(QObject::tr("If this is set, MythTV will pretend to have "
+                    "a smaller soundcard buffer than is really present.  This "
+                    "may speed up seeking, but can also cause playback "
+                    "problems."));
     };
 };
 
@@ -552,11 +554,12 @@ class ClearSavedPosition: public CheckBoxSetting, public GlobalSetting {
 public:
     ClearSavedPosition():
        GlobalSetting("ClearSavedPosition") {
-       setLabel("Clear Saved Position on playback");
+       setLabel(QObject::tr("Clear Saved Position on playback"));
        setValue(true);
-       setHelpText("Automatically clear saved position on a recording "
-                   "when the recording is played back.  If UNset, you can "
-                   "mark the beginning with rewind then save position.");
+       setHelpText(QObject::tr("Automatically clear saved position on a "
+                    "recording when the recording is played back.  If UNset, "
+                    "you can mark the beginning with rewind then save "
+                    "position."));
     };
 };
 
@@ -564,12 +567,12 @@ class AltClearSavedPosition: public CheckBoxSetting, public GlobalSetting {
 public:
     AltClearSavedPosition():
        GlobalSetting("AltClearSavedPosition") {
-       setLabel("Alternate Clear Saved Position");
+       setLabel(QObject::tr("Alternate Clear Saved Position"));
        setValue(true);
-       setHelpText("If set, during playback the select key (Enter or Space) "
-                   "will alternate between \"Position Saved\" and \"Position "
-                   "Cleared\". If UNset, select will save the current "
-                   "position for each keypress.");
+       setHelpText(QObject::tr("If set, during playback the select key "
+                    "(Enter or Space) will alternate between \"Position "
+                    "Saved\" and \"Position Cleared\". If UNset, select "
+                    "will save the current position for each keypress."));
     };
 };
 
@@ -590,27 +593,26 @@ class PlaybackExitPrompt: public ComboBoxSetting, public GlobalSetting {
 public:
     PlaybackExitPrompt():
         GlobalSetting("PlaybackExitPrompt") {
-        setLabel("Action on playback exit");
-        addSelection("Just exit", "0");
-        addSelection("Save position and exit", "2");
-        addSelection("Always prompt", "1");
-        setHelpText("If set to prompt, a menu will be displayed when you exit "
-                    "playback mode.  The options available will "
+        setLabel(QObject::tr("Action on playback exit"));
+        addSelection(QObject::tr("Just exit"), "0");
+        addSelection(QObject::tr("Save position and exit"), "2");
+        addSelection(QObject::tr("Always prompt"), "1");
+        setHelpText(QObject::tr("If set to prompt, a menu will be displayed "
+                    "when you exit playback mode.  The options available will "
                     "allow you to save your position, delete the "
-                    "recording, or continue watching.");
+                    "recording, or continue watching."));
     };
 };
-
 
 class EndOfRecordingExitPrompt: public CheckBoxSetting, public GlobalSetting {
 public:
     EndOfRecordingExitPrompt():
         GlobalSetting("EndOfRecordingExitPrompt") {
-        setLabel("Prompt at end of recording");
+        setLabel(QObject::tr("Prompt at end of recording"));
         setValue(false);
-        setHelpText("If set, a "
+        setHelpText(QObject::tr("If set, a "
                     "menu will be displayed allowing you to delete the "
-                    "recording when it has finished playing.");
+                    "recording when it has finished playing."));
     };
 };
 
@@ -618,10 +620,11 @@ class GeneratePreviewPixmaps: public CheckBoxSetting, public GlobalSetting {
 public:
     GeneratePreviewPixmaps():
         GlobalSetting("GeneratePreviewPixmaps") {
-        setLabel("Generate thumbnail preview images for recordings");
+        setLabel(QObject::tr("Generate thumbnail preview images for "
+                    "recordings"));
         setValue(false);
-	setHelpText("If set, a static image of the recording will be "
-                    "displayed on the \"Watch a Recording\" menu.");
+        setHelpText(QObject::tr("If set, a static image of the recording will "
+                    "be displayed on the \"Watch a Recording\" menu."));
     };
 };
 
@@ -629,10 +632,10 @@ class PlaybackPreview: public CheckBoxSetting, public GlobalSetting {
 public:
     PlaybackPreview():
         GlobalSetting("PlaybackPreview") {
-        setLabel("Display live preview of recordings");
+        setLabel(QObject::tr("Display live preview of recordings"));
         setValue(true);
-        setHelpText("If set, a preview of the recording will play in a "
-                    "small window on the \"Watch a Recording\" menu.");
+        setHelpText(QObject::tr("If set, a preview of the recording will play "
+                    "in a small window on the \"Watch a Recording\" menu."));
 
     };
 };
@@ -641,11 +644,11 @@ class PlayBoxTransparency: public CheckBoxSetting, public GlobalSetting {
 public:
     PlayBoxTransparency():
         GlobalSetting("PlayBoxTransparency") {
-        setLabel("Use Transparent Boxes");
+        setLabel(QObject::tr("Use Transparent Boxes"));
         setValue(true);
-        setHelpText("If set, the Watch Recording and Delete Recording "
-                    "screens will use transparency. Unset this option "
-		    "if selecting the recordings is slow.");
+        setHelpText(QObject::tr("If set, the Watch Recording and Delete "
+                    "Recording screens will use transparency. Unset this "
+                    "option if selecting the recordings is slow."));
 
     };
 };
@@ -654,13 +657,14 @@ class PlayBoxShading: public ComboBoxSetting, public GlobalSetting {
 public:
     PlayBoxShading():
         GlobalSetting("PlayBoxShading") {
-        setLabel("Popup Background Shading Method");
-        addSelection("Fill", "0");
-        addSelection("Image", "1");
-        addSelection("None", "2");
-        setHelpText("Fill is the quickest method, but it doesn't look good up close. "
-                    "Image looks good from up close, but is somewhat slow. "
-                    "And of course no shading will be the fastest.");
+        setLabel(QObject::tr("Popup Background Shading Method"));
+        addSelection(QObject::tr("Fill"), "0");
+        addSelection(QObject::tr("Image"), "1");
+        addSelection(QObject::tr("None"), "2");
+        setHelpText(QObject::tr("Fill is the quickest method, but it doesn't "
+                    "look good up close. Image looks good from up close, but "
+                    "is somewhat slow. And of course no shading will be the "
+                    "fastest."));
     };
 };
 
@@ -668,10 +672,10 @@ class AdvancedRecord: public CheckBoxSetting, public GlobalSetting {
 public:
     AdvancedRecord():
         GlobalSetting("AdvancedRecord") {
-        setLabel("Always use Advanced Recording Options screen");
+        setLabel(QObject::tr("Always use Advanced Recording Options screen"));
         setValue(false);
-        setHelpText("Always use the Advanced Recording Options screen "
-                    "when editing a scheduled recording.");
+        setHelpText(QObject::tr("Always use the Advanced Recording Options "
+                    "screen when editing a scheduled recording."));
     };
 };
 
@@ -679,16 +683,16 @@ class AllowQuitShutdown: public ComboBoxSetting, public GlobalSetting {
 public:
     AllowQuitShutdown():
         GlobalSetting("AllowQuitShutdown") {
-        setLabel("System shutdown");
-        addSelection("No exit key", "0");
-	addSelection("ESC", "4");
-        addSelection("Control-ESC", "1");
-        addSelection("Meta-ESC", "2");
-        addSelection("Alt-ESC", "3");
-        setHelpText("MythTV is designed to run continuously.  If you wish, "
-                    "you may use the ESC key or the ESC key + a modifier to exit "
-                    "MythTV.  Do not choose a key combination that will be "
-                    "intercepted by your window manager.");
+        setLabel(QObject::tr("System shutdown"));
+        addSelection(QObject::tr("ESC"), "4");
+        addSelection(QObject::tr("No exit key"), "0");
+        addSelection(QObject::tr("Control-ESC"), "1");
+        addSelection(QObject::tr("Meta-ESC"), "2");
+        addSelection(QObject::tr("Alt-ESC"), "3");
+        setHelpText(QObject::tr("MythTV is designed to run continuously. If "
+                    "you wish, you may use the ESC key or the ESC key + a "
+                    "modifier to exit MythTV. Do not choose a key combination "
+                    "that will be intercepted by your window manager."));
     };
 };
 
@@ -696,13 +700,13 @@ class HaltCommand: public LineEditSetting, public GlobalSetting {
 public:
     HaltCommand():
         GlobalSetting("HaltCommand") {
-        setLabel("Halt command");
+        setLabel(QObject::tr("Halt command"));
         setValue("halt");
-	setHelpText("If you have configured an exit key on the System "
-                    "Shutdown menu, you will be given the opportunity "
+        setHelpText(QObject::tr("If you have configured an exit key on the "
+                    "System Shutdown menu, you will be given the opportunity "
                     "to exit MythTV or halt the system completely. "
                     "Another possibility for this field is "
-                    "poweroff");
+                    "poweroff"));
     };
 };
 
@@ -735,9 +739,10 @@ public:
     XineramaScreen():
         SpinBoxSetting(0, 8, 1),
         GlobalSetting("XineramaScreen") {
-        setLabel("Xinerama screen");
+        setLabel(QObject::tr("Xinerama screen"));
         setValue(0);
-        setHelpText("If using Xinerama, run only on the specified screen.");
+        setHelpText(QObject::tr("If using Xinerama, run only on the specified "
+                    "screen."));
     };
 };
 
@@ -747,11 +752,11 @@ class GuiWidth: public SpinBoxSetting, public GlobalSetting {
 public:
     GuiWidth():
         SpinBoxSetting(0, 1920, 8), GlobalSetting("GuiWidth") {
-        setLabel("GUI width");
+        setLabel(QObject::tr("GUI width"));
         setValue(0);
-	setHelpText("The width of the GUI.  Do not make the GUI "
+        setHelpText(QObject::tr("The width of the GUI.  Do not make the GUI "
                     "wider than your actual screen resolution.  Set to 0 to "
-                    "automatically scale to fullscreen.");
+                    "automatically scale to fullscreen."));
     };
 };
 
@@ -759,11 +764,11 @@ class GuiHeight: public SpinBoxSetting, public GlobalSetting {
 public:
     GuiHeight():
         SpinBoxSetting(0, 1600, 8), GlobalSetting("GuiHeight") {
-        setLabel("GUI height");
+        setLabel(QObject::tr("GUI height"));
         setValue(0);
-	setHelpText("The height of the GUI.  Do not make the GUI "
+        setHelpText(QObject::tr("The height of the GUI.  Do not make the GUI "
                     "taller than your actual screen resolution.  Set to 0 to "
-                    "automatically scale to fullscreen.");
+                    "automatically scale to fullscreen."));
 
     };
 };
@@ -772,9 +777,10 @@ class GuiOffsetX: public SpinBoxSetting, public GlobalSetting {
 public:
     GuiOffsetX():
         SpinBoxSetting(-1600, 1600, 1), GlobalSetting("GuiOffsetX") {
-        setLabel("GUI X offset");
+        setLabel(QObject::tr("GUI X offset"));
         setValue(0);
-        setHelpText("The horizontal offset the GUI will be displayed at.");
+        setHelpText(QObject::tr("The horizontal offset the GUI will be "
+                    "displayed at."));
     };
 };
 
@@ -782,9 +788,10 @@ class GuiOffsetY: public SpinBoxSetting, public GlobalSetting {
 public:
     GuiOffsetY():
         SpinBoxSetting(-1600, 1600, 1), GlobalSetting("GuiOffsetY") {
-        setLabel("GUI Y offset");
+        setLabel(QObject::tr("GUI Y offset"));
         setValue(0);
-        setHelpText("The vertical offset the GUI will be displayed at.");
+        setHelpText(QObject::tr("The vertical offset the GUI will be "
+                    "displayed at."));
     };
 };
 
@@ -792,9 +799,9 @@ class RunInWindow: public CheckBoxSetting, public GlobalSetting {
 public:
     RunInWindow():
         GlobalSetting("RunFrontendInWindow") {
-        setLabel("Run the frontend in a window");
+        setLabel(QObject::tr("Run the frontend in a window"));
         setValue(false);
-        setHelpText("Toggles between borderless operation.");
+        setHelpText(QObject::tr("Toggles between borderless operation."));
     };
 };
 
@@ -802,9 +809,10 @@ class RandomTheme: public CheckBoxSetting, public GlobalSetting {
 public:
     RandomTheme():
         GlobalSetting("RandomTheme") {
-        setLabel("Use a random theme");
+        setLabel(QObject::tr("Use a random theme"));
         setValue(false);
-        setHelpText("Use a random theme each time MythTV is started.");
+        setHelpText(QObject::tr("Use a random theme each time MythTV is "
+                    "started."));
     };
 };
 
@@ -812,15 +820,15 @@ class MythDateFormat: public ComboBoxSetting, public GlobalSetting {
 public:
     MythDateFormat():
         ComboBoxSetting(true), GlobalSetting("DateFormat") {
-        setLabel("Date format");
-        addSelection("ddd MMM d");
-        addSelection("ddd MMMM d");
-        addSelection("MMM d");
-        addSelection("MM/dd");
-        addSelection("MM.dd");
-        addSelection("ddd d MMM");
-        addSelection("dd.MM.yyyy");
-	setHelpText("Your preferred date format.");
+        setLabel(QObject::tr("Date format"));
+        addSelection(QObject::tr("ddd MMM d"), "ddd MMM d");
+        addSelection(QObject::tr("ddd MMMM d"), "ddd MMMM d");
+        addSelection(QObject::tr("MMM d"), "MMM d");
+        addSelection(QObject::tr("MM/dd"), "MM/dd");
+        addSelection(QObject::tr("MM.dd"), "MM.dd");
+        addSelection(QObject::tr("ddd d MMM"), "ddd d MMM");
+        addSelection(QObject::tr("dd.MM.yyyy"), "dd.MM.yyyy");
+        setHelpText(QObject::tr("Your preferred date format."));
     };
 };
 
@@ -828,15 +836,15 @@ class MythShortDateFormat: public ComboBoxSetting, public GlobalSetting {
 public:
     MythShortDateFormat():
         ComboBoxSetting(true), GlobalSetting("ShortDateFormat") {
-        setLabel("Short Date format");
-        addSelection("M/d");
-        addSelection("d/M");
-        addSelection("MM/dd");
-        addSelection("dd/MM");
-        addSelection("MM.dd");
-        addSelection("d.M.");
-        addSelection("dd.MM.");
-        setHelpText("Your preferred short date format.");
+        setLabel(QObject::tr("Short Date format"));
+        addSelection(QObject::tr("M/d"), "M/d");
+        addSelection(QObject::tr("d/M"), "d/M");
+        addSelection(QObject::tr("MM/dd"), "MM/dd");
+        addSelection(QObject::tr("dd/MM"), "dd/MM");
+        addSelection(QObject::tr("MM.dd"), "MM.dd");
+        addSelection(QObject::tr("d.M."), "d.M.");
+        addSelection(QObject::tr("dd.MM."), "dd.MM.");
+        setHelpText(QObject::tr("Your preferred short date format."));
     };
 };
 
@@ -844,24 +852,24 @@ class MythTimeFormat: public ComboBoxSetting, public GlobalSetting {
 public:
     MythTimeFormat():
         ComboBoxSetting(true), GlobalSetting("TimeFormat") {
-        setLabel("Time format");
-        addSelection("h:mm AP");
-        addSelection("h:mm ap");
-        addSelection("hh:mm AP");
-        addSelection("hh:mm ap");
-        addSelection("h:mm");
-        addSelection("hh:mm");
-	setHelpText("Your preferred time format.  Choose a format "
+        setLabel(QObject::tr("Time format"));
+        addSelection(QObject::tr("h:mm AP"), "h:mm AP");
+        addSelection(QObject::tr("h:mm ap"), "h:mm ap");
+        addSelection(QObject::tr("hh:mm AP"), "hh:mm AP");
+        addSelection(QObject::tr("hh:mm ap"), "hh:mm ap");
+        addSelection(QObject::tr("h:mm"), "h:mm");
+        addSelection(QObject::tr("hh:mm"), "hh:mm");
+        setHelpText(QObject::tr("Your preferred time format.  Choose a format "
                     "with \"AP\" in it for an AM/PM display, otherwise "
                     "your time display will be 24-hour or \"military\" "
-                    "time.");
+                    "time."));
     };
 };
 
 ThemeSelector::ThemeSelector():
     GlobalSetting("Theme") {
 
-    setLabel("Theme");
+    setLabel(QObject::tr("Theme"));
 
     QDir themes(PREFIX"/share/mythtv/themes");
     themes.setFilter(QDir::Dirs);
@@ -886,7 +894,8 @@ ThemeSelector::ThemeSelector():
 
         QImage* previewImage = new QImage(preview.absFilePath());
         if (previewImage->width() == 0 || previewImage->height() == 0) {
-            cout << "Problem reading theme preview image " << preview.dirPath() << endl;
+            cout << QObject::tr("Problem reading theme preview image ")
+                 << preview.dirPath() << endl;
             continue;
         }
 
@@ -898,7 +907,7 @@ class DisplayChanNum: public CheckBoxSetting, public GlobalSetting {
 public:
     DisplayChanNum():
         GlobalSetting("DisplayChanNum") {
-        setLabel("Display channel names instead of numbers");
+        setLabel(QObject::tr("Display channel names instead of numbers"));
         setValue(false);
     };
 };
@@ -907,7 +916,7 @@ class QtFontBig: public SpinBoxSetting, public GlobalSetting {
 public:
     QtFontBig():
         SpinBoxSetting(1, 48, 1), GlobalSetting("QtFontBig") {
-        setLabel("\"Big\" font");
+        setLabel(QObject::tr("\"Big\" font"));
         setValue(25);
     };
 };
@@ -916,7 +925,7 @@ class QtFontMedium: public SpinBoxSetting, public GlobalSetting {
 public:
     QtFontMedium():
         SpinBoxSetting(1, 48, 1), GlobalSetting("QtFontMedium") {
-        setLabel("\"Medium\" font");
+        setLabel(QObject::tr("\"Medium\" font"));
         setValue(16);
     };
 };
@@ -925,7 +934,7 @@ class QtFontSmall: public SpinBoxSetting, public GlobalSetting {
 public:
     QtFontSmall():
         SpinBoxSetting(1, 48, 1), GlobalSetting("QtFontSmall") {
-        setLabel("\"Small\" font");
+        setLabel(QObject::tr("\"Small\" font"));
         setValue(12);
     };
 };
@@ -936,10 +945,10 @@ class EPGScrollType: public CheckBoxSetting, public GlobalSetting {
 public:
     EPGScrollType():
         GlobalSetting("EPGScrollType") {
-        setLabel("Program Guide Selection Placement");
+        setLabel(QObject::tr("Program Guide Selection Placement"));
         setValue(true);
-        setHelpText("If unchecked, the program guide's selector will "
-                    "stay in the middle of the guide at all times.");
+        setHelpText(QObject::tr("If unchecked, the program guide's selector "
+                    "will stay in the middle of the guide at all times."));
     };
 };
 
@@ -947,13 +956,13 @@ class EPGFillType: public ComboBoxSetting, public GlobalSetting {
 public:
     EPGFillType():
         GlobalSetting("EPGFillType") {
-        setLabel("Guide Shading Method");
-        addSelection("Colorized (alpha)", "6");
-        addSelection("Colorized (shaded)", "5");
-        addSelection("Embossed (shaded)", "3");
-        addSelection("Embossed (solid)", "4");
-        addSelection("Rounded (shaded)", "1");
-        addSelection("Rounded (solid)", "2");
+        setLabel(QObject::tr("Guide Shading Method"));
+        addSelection(QObject::tr("Colorized (alpha)"), "6");
+        addSelection(QObject::tr("Colorized (shaded)"), "5");
+        addSelection(QObject::tr("Embossed (shaded)"), "3");
+        addSelection(QObject::tr("Embossed (solid)"), "4");
+        addSelection(QObject::tr("Rounded (shaded)"), "1");
+        addSelection(QObject::tr("Rounded (solid)"), "2");
     };
 };
 
@@ -961,7 +970,7 @@ class EPGShowChannelIcon: public CheckBoxSetting, public GlobalSetting {
 public:
     EPGShowChannelIcon():
         GlobalSetting("EPGShowChannelIcon") {
-        setLabel("Display the channel icon");
+        setLabel(QObject::tr("Display the channel icon"));
         setValue(true);
     };
 };
@@ -970,9 +979,8 @@ class EPGChanDisplay: public SpinBoxSetting, public GlobalSetting {
 public:
     EPGChanDisplay():
         SpinBoxSetting(3, 12, 1), GlobalSetting("chanPerPage") {
-        setLabel("Channels to Display");
-	setValue(5);
-	
+        setLabel(QObject::tr("Channels to Display"));
+        setValue(5);
     };
 };
 
@@ -980,9 +988,8 @@ class EPGTimeDisplay: public SpinBoxSetting, public GlobalSetting {
 public:
     EPGTimeDisplay():
         SpinBoxSetting(1, 5, 1), GlobalSetting("timePerPage") {
-        setLabel("Time Blocks (30 mins) to Display");
+        setLabel(QObject::tr("Time Blocks (30 mins) to Display"));
         setValue(4);
-
     };
 };
 
@@ -992,8 +999,8 @@ class GRUseRanking: public CheckBoxSetting, public BackendSetting {
 public:
     GRUseRanking():
         BackendSetting("RankingActive") {
-        setLabel("Use Rankings");
-        setHelpText("Use program rankings to resolve conflicts.");
+        setLabel(QObject::tr("Use Rankings"));
+        setHelpText(QObject::tr("Use program rankings to resolve conflicts."));
         setValue(false);
     };
 };
@@ -1002,9 +1009,9 @@ class GRRankingFirst: public CheckBoxSetting, public BackendSetting {
 public:
     GRRankingFirst():
         BackendSetting("RankingOrder") {
-        setLabel("Rankings First.");
-        setHelpText("Use rankings to resolve conflicts before using "
-                    "traditional conflict resolution.");
+        setLabel(QObject::tr("Rankings First."));
+        setHelpText(QObject::tr("Use rankings to resolve conflicts before "
+                    "using traditional conflict resolution."));
         setValue(true);
     };
 };
@@ -1013,9 +1020,9 @@ class GRSingleRecordRank: public SpinBoxSetting, public BackendSetting {
 public:
     GRSingleRecordRank():
         SpinBoxSetting(-99, 99, 1), BackendSetting("SingleRecordRank") {
-        setLabel("Single Recordings Rank");
-        setHelpText("Single Recordings will receive this additional "
-                    "ranking value.");
+        setLabel(QObject::tr("Single Recordings Rank"));
+        setHelpText(QObject::tr("Single Recordings will receive this "
+                    "additional ranking value."));
         setValue(0);
     };
 };
@@ -1024,9 +1031,9 @@ class GRWeekslotRecordRank: public SpinBoxSetting, public BackendSetting {
 public:
     GRWeekslotRecordRank():
         SpinBoxSetting(-99, 99, 1), BackendSetting("WeekslotRecordRank") {
-        setLabel("Weekslot Recordings Rank");
-        setHelpText("Weekslot Recordings will receive this additional "
-                    "ranking value.");
+        setLabel(QObject::tr("Weekslot Recordings Rank"));
+        setHelpText(QObject::tr("Weekslot Recordings will receive this "
+                    "additional ranking value."));
         setValue(0);
     };
 };
@@ -1035,9 +1042,9 @@ class GRTimeslotRecordRank: public SpinBoxSetting, public BackendSetting {
 public:
     GRTimeslotRecordRank():
         SpinBoxSetting(-99, 99, 1), BackendSetting("TimeslotRecordRank") {
-        setLabel("Timeslot Recordings Rank");
-        setHelpText("Timeslot Recordings will receive this additional "
-                    "ranking value.");
+        setLabel(QObject::tr("Timeslot Recordings Rank"));
+        setHelpText(QObject::tr("Timeslot Recordings will receive this "
+                    "additional ranking value."));
         setValue(0);
     };
 };
@@ -1046,9 +1053,9 @@ class GRChannelRecordRank: public SpinBoxSetting, public BackendSetting {
 public:
     GRChannelRecordRank():
         SpinBoxSetting(-99, 99, 1), BackendSetting("ChannelRecordRank") {
-        setLabel("Channel Recordings Rank");
-        setHelpText("Channel Recordings will receive this additional "
-                    "ranking value.");
+        setLabel(QObject::tr("Channel Recordings Rank"));
+        setHelpText(QObject::tr("Channel Recordings will receive this "
+                    "additional ranking value."));
         setValue(0);
     };
 };
@@ -1057,9 +1064,9 @@ class GRAllRecordRank: public SpinBoxSetting, public BackendSetting {
 public:
     GRAllRecordRank():
         SpinBoxSetting(-99, 99, 1), BackendSetting("AllRecordRank") {
-        setLabel("All Recordings Rank");
-        setHelpText("All Recording types will receive this additional "
-                    "ranking value.");
+        setLabel(QObject::tr("All Recordings Rank"));
+        setHelpText(QObject::tr("All Recording types will receive this "
+                    "additional ranking value."));
         setValue(0);
     };
 };
@@ -1068,10 +1075,10 @@ class DefaultTVChannel: public LineEditSetting, public GlobalSetting {
 public:
     DefaultTVChannel():
         GlobalSetting("DefaultTVChannel") {
-        setLabel("Guide starts at channel");
+        setLabel(QObject::tr("Guide starts at channel"));
         setValue("3");
-        setHelpText("The program guide starts on this channel if it is run "
-                    "from outside of LiveTV mode.");
+        setHelpText(QObject::tr("The program guide starts on this channel if "
+                    "it is run from outside of LiveTV mode."));
     };
 };
 
@@ -1079,8 +1086,8 @@ class UnknownTitle: public LineEditSetting, public GlobalSetting {
 public:
     UnknownTitle():
         GlobalSetting("UnknownTitle") {
-        setLabel("What to call 'unknown' programs");
-        setValue("Unknown");
+        setLabel(QObject::tr("What to call 'unknown' programs"));
+        setValue(QObject::tr("Unknown"));
     };
 };
 
@@ -1088,8 +1095,8 @@ class UnknownCategory: public LineEditSetting, public GlobalSetting {
 public:
     UnknownCategory():
         GlobalSetting("UnknownCategory") {
-        setLabel("What category to give 'unknown' programs");
-        setValue("Unknown");
+        setLabel(QObject::tr("What category to give 'unknown' programs"));
+        setValue(QObject::tr("Unknown"));
     };
 };
 
@@ -1099,7 +1106,7 @@ public:
      AudioSettings():
          VerticalConfigurationGroup(false),
          TriggeredConfigurationGroup(false) {
-         setLabel("Audio");
+         setLabel(QObject::tr("Audio"));
          setUseLabel(false);
 
          addChild(new AudioOutputDevice());
@@ -1144,9 +1151,10 @@ class EnableXbox: public CheckBoxSetting, public GlobalSetting {
 public:
     EnableXbox():
         GlobalSetting("EnableXbox") {
-        setLabel("Enable Xbox Hardware");
-        setHelpText("This enables support for Xbox Specific hardware.  "
-                    "Requires a frontend restart for changes to take effect.");
+        setLabel(QObject::tr("Enable Xbox Hardware"));
+        setHelpText(QObject::tr("This enables support for Xbox Specific "
+                    "hardware. Requires a frontend restart for changes to "
+                    "take effect."));
         setValue(false);
     };
 };
@@ -1155,11 +1163,12 @@ class XboxBlinkBIN: public ComboBoxSetting, public GlobalSetting {
 public:
     XboxBlinkBIN():
         GlobalSetting("XboxBlinkBIN") {
-        setLabel("Xbox Linux Distribution");
+        setLabel(QObject::tr("Xbox Linux Distribution"));
         addSelection("GentooX","led");
-        addSelection("Other","blink");
-        setHelpText("This is used to determine the name of the blink binary "
-                    "led will be used on GentooX, blink otherwise.");
+        addSelection(QObject::tr("Other"),"blink");
+        setHelpText(QObject::tr("This is used to determine the name of the "
+                    "blink binary led will be used on GentooX, blink "
+                    "otherwise."));
     };
 };
 
@@ -1167,13 +1176,13 @@ class XboxLEDDefault: public ComboBoxSetting, public GlobalSetting {
 public:
     XboxLEDDefault():
         GlobalSetting("XboxLEDDefault") {
-        setLabel("Default LED mode");
-        addSelection("Off", "nnnn");
-        addSelection("Green","gggg");
-        addSelection("Orange","oooo");
-        addSelection("Red","rrrr");
-        setHelpText("The sets the LED mode when there is nothing else "
-                    "to display");
+        setLabel(QObject::tr("Default LED mode"));
+        addSelection(QObject::tr("Off"), "nnnn");
+        addSelection(QObject::tr("Green"),"gggg");
+        addSelection(QObject::tr("Orange"),"oooo");
+        addSelection(QObject::tr("Red"),"rrrr");
+        setHelpText(QObject::tr("This sets the LED mode when there is nothing "
+                    "else to display"));
     };
 };
 
@@ -1181,12 +1190,13 @@ class XboxLEDRecording: public ComboBoxSetting, public GlobalSetting {
 public:
     XboxLEDRecording():
         GlobalSetting("XboxLEDRecording") {
-        setLabel("Recording LED mode");
-        addSelection("Off", "nnnn");
-        addSelection("Green","gggg");
-        addSelection("Orange","oooo");
-        addSelection("Red","rrrr");
-        setHelpText("The sets the LED mode when a backend is recording");
+        setLabel(QObject::tr("Recording LED mode"));
+        addSelection(QObject::tr("Off"), "nnnn");
+        addSelection(QObject::tr("Green"),"gggg");
+        addSelection(QObject::tr("Orange"),"oooo");
+        addSelection(QObject::tr("Red"),"rrrr");
+        setHelpText(QObject::tr("This sets the LED mode when a backend is "
+                    "recording"));
     };
 };
 
@@ -1195,10 +1205,11 @@ public:
     XboxCheckRec():
         SpinBoxSetting(1, 600, 2),
         GlobalSetting("XboxCheckRec") {
-        setLabel("Recording Check Frequency");
+        setLabel(QObject::tr("Recording Check Frequency"));
         setValue(5);
-        setHelpText("This specifies how often in seconds to check if a " 
-                    "recording is in progress and update the Xbox LED.");
+        setHelpText(QObject::tr("This specifies how often in seconds to "
+                    "check if a recording is in progress and update the "
+                    "Xbox LED."));
     };
 };
 
@@ -1219,7 +1230,7 @@ MainGeneralSettings::MainGeneralSettings()
 PlaybackSettings::PlaybackSettings()
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
-    general->setLabel("General playback");
+    general->setLabel(QObject::tr("General playback"));
     general->addChild(new Deinterlace());
     general->addChild(new ReduceJitter());
     general->addChild(new ExperimentalSync());
@@ -1232,7 +1243,7 @@ PlaybackSettings::PlaybackSettings()
     addChild(general);
 
     VerticalConfigurationGroup* seek = new VerticalConfigurationGroup(false);
-    seek->setLabel("Seeking");
+    seek->setLabel(QObject::tr("Seeking"));
     seek->addChild(new FastForwardAmount());
     seek->addChild(new RewindAmount());
     seek->addChild(new SmartForward());
@@ -1243,7 +1254,7 @@ PlaybackSettings::PlaybackSettings()
     addChild(seek);
 
     VerticalConfigurationGroup* comms = new VerticalConfigurationGroup(false);
-    comms->setLabel("Commercial Detection");
+    comms->setLabel(QObject::tr("Commercial Detection"));
     comms->addChild(new AutoCommercialFlag());
     comms->addChild(new CommercialSkipMethod());
     comms->addChild(new AggressiveCommDetect());
@@ -1251,7 +1262,7 @@ PlaybackSettings::PlaybackSettings()
     addChild(comms);
 
     VerticalConfigurationGroup* oscan = new VerticalConfigurationGroup(false);
-    oscan->setLabel("Overscan");
+    oscan->setLabel(QObject::tr("Overscan"));
     oscan->addChild(new VertScanPercentage());
     oscan->addChild(new HorizScanPercentage());
     oscan->addChild(new XScanDisplacement());
@@ -1259,7 +1270,7 @@ PlaybackSettings::PlaybackSettings()
     addChild(oscan);
 
     VerticalConfigurationGroup* osd = new VerticalConfigurationGroup(false);
-    osd->setLabel("On-screen display");
+    osd->setLabel(QObject::tr("On-screen display"));
     osd->addChild(new OSDTheme());
     osd->addChild(new OSDDisplayTime());
     osd->addChild(new OSDFont());
@@ -1272,7 +1283,7 @@ PlaybackSettings::PlaybackSettings()
 GeneralSettings::GeneralSettings()
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
-    general->setLabel("General");
+    general->setLabel(QObject::tr("General"));
     general->addChild(new RecordPreRoll());
     general->addChild(new RecordOverTime());
     general->addChild(new PlayBoxOrdering());
@@ -1284,7 +1295,7 @@ GeneralSettings::GeneralSettings()
     addChild(general);
 
     VerticalConfigurationGroup* autoexp = new VerticalConfigurationGroup(false);
-    autoexp->setLabel("Global Auto Expire Settings");
+    autoexp->setLabel(QObject::tr("Global Auto Expire Settings"));
     autoexp->addChild(new AutoExpireDiskThreshold());
     autoexp->addChild(new AutoExpireFrequency());
     autoexp->addChild(new AutoExpireMethod());
@@ -1296,7 +1307,7 @@ GeneralSettings::GeneralSettings()
 EPGSettings::EPGSettings()
 {
     VerticalConfigurationGroup* epg = new VerticalConfigurationGroup(false);
-    epg->setLabel("Program Guide");
+    epg->setLabel(QObject::tr("Program Guide"));
 
     epg->addChild(new EPGFillType());
     epg->addChild(new EPGScrollType());
@@ -1306,7 +1317,7 @@ EPGSettings::EPGSettings()
     addChild(epg);
 
     VerticalConfigurationGroup* gen = new VerticalConfigurationGroup(false);
-    gen->setLabel("Program Guide");
+    gen->setLabel(QObject::tr("Program Guide"));
     gen->addChild(new UnknownTitle());
     gen->addChild(new UnknownCategory());
     gen->addChild(new DefaultTVChannel());
@@ -1316,7 +1327,7 @@ EPGSettings::EPGSettings()
 GeneralRankingSettings::GeneralRankingSettings()
 {
     VerticalConfigurationGroup* gr = new VerticalConfigurationGroup(false);
-    gr->setLabel("General Ranking Settings");
+    gr->setLabel(QObject::tr("General Ranking Settings"));
 
     gr->addChild(new GRUseRanking());
     gr->addChild(new GRRankingFirst());
@@ -1331,14 +1342,14 @@ GeneralRankingSettings::GeneralRankingSettings()
 AppearanceSettings::AppearanceSettings()
 {
     VerticalConfigurationGroup* theme = new VerticalConfigurationGroup(false);
-    theme->setLabel("Theme");
+    theme->setLabel(QObject::tr("Theme"));
 
     theme->addChild(new ThemeSelector());
     theme->addChild(new RandomTheme());
     addChild(theme);
 
     VerticalConfigurationGroup* screen = new VerticalConfigurationGroup(false);
-    screen->setLabel("Screen settings");
+    screen->setLabel(QObject::tr("Screen settings"));
     screen->addChild(new XineramaScreen());
     screen->addChild(new GuiWidth());
     screen->addChild(new GuiHeight());
@@ -1348,7 +1359,7 @@ AppearanceSettings::AppearanceSettings()
     addChild(screen);
 
     VerticalConfigurationGroup* dates = new VerticalConfigurationGroup(false);
-    dates->setLabel("Localization");    
+    dates->setLabel(QObject::tr("Localization"));    
     dates->addChild(new MythLanguage());
     dates->addChild(new MythDateFormat());
     dates->addChild(new MythShortDateFormat());
