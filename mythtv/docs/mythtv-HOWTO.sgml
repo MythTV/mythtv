@@ -222,7 +222,7 @@ video controller". To get more detailed information about the card, use
 the bttv modules by typing:
 <tscreen><verb>
 # lsmod |grep bttv
-</verb</tscreen>
+</verb></tscreen>
 
 You want to see the <tt>bttv</tt> module listed.
 <sect3>Hardware MPEG-2 encoders.
