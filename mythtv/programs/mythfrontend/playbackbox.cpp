@@ -1237,17 +1237,30 @@ void PlaybackBox::play(ProgramInfo *rec)
 
     update(fullRect);
 
+    bool doremove = false;
+    bool doprompt = false;
+
     if (tv->getRequestDelete())
+    {
+        doremove = true;
+    }
+    else if (tv->getEndOfRecording() &&
+             gContext->GetNumSetting("EndOfRecordingExitPrompt"))
+    {
+        doprompt = true;
+    }
+
+    delete tv;
+
+    if (doremove)
     {
         remove(tvrec);
     }
-    else if (tv->getEndOfRecording() && 
-             gContext->GetNumSetting("EndOfRecordingExitPrompt"))
+    else if (doprompt) 
     {
         promptEndOfRecording(tvrec);
     }
 
-    delete tv;
     delete tvrec;
 
     FillList();
