@@ -46,13 +46,13 @@ FROM timeslotrecord;
 
 INSERT INTO record
 (type,chanid,title,profile)
-SELECT 4, chanid, title, profile
+SELECT 3, chanid, title, profile
 FROM allrecord
 WHERE chanid IS NOT NULL;
 
 INSERT INTO record
 (type,chanid,title,profile)
-SELECT 3, chanid, title, profile
+SELECT 4, chanid, title, profile
 FROM allrecord
 WHERE chanid IS NULL;
 
