@@ -127,14 +127,11 @@ MediaError MythMediaDevice::lock()
     return MEDIAERR_FAILED;
 }
 
-MediaError MythMediaDevice::unlock() 
+MediaError MythMediaDevice::unlock()
 { 
     m_Locked = false;
     
-    if (closeDevice())
-        return MEDIAERR_OK;
-    
-    return MEDIAERR_FAILED;
+    return MEDIAERR_OK;
 }
 
 bool MythMediaDevice::isMounted(bool Verify)

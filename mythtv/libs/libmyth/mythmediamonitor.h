@@ -5,6 +5,7 @@
 #include <qvaluelist.h>
 #include <qguardedptr.h>
 #include <qthread.h>
+#include <fstab.h>
 
 const int kMediaEventType = 30042;
 
@@ -48,6 +49,7 @@ class MediaMonitor : public QObject
     bool addFSTab(void);
     void addDevice(MythMediaDevice* pDevice);
     bool addDevice(const char* dev);
+    bool addDevice(struct fstab* mep);
 
     bool isActive(void) const { return m_Active; }
     void checkDevices(void);

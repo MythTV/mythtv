@@ -82,7 +82,7 @@ bool MediaMonitor::addFSTab()
     {
         perror("setfsent");
         cerr << "MediaMonitor::addFSTab - Failed to open "
-		_PATH_FSTAB
+                _PATH_FSTAB
                 " for reading." << endl;
         return false;
     }
@@ -90,7 +90,7 @@ bool MediaMonitor::addFSTab()
     {
         // Add all the entries
         while ((mep = getfsent()) != NULL)
-            addDevice(mep->fs_spec);
+            (void) addDevice(mep);
         
         endfsent();
     }
@@ -109,6 +109,94 @@ void MediaMonitor::addDevice(MythMediaDevice* pDevice)
     m_Devices.push_back( pDevice );
 }
 
+// Given a fstab entry to a media device determine what type of device it is 
+bool MediaMonitor::addDevice(struct fstab * mep) 
+{
+    QString devicePath( mep->fs_spec );
+    //cout << "addDevice - " << devicePath << endl;
+
+    MythMediaDevice* pDevice = NULL;
+    struct stat sbuf;
+
+    bool is_supermount = false;
+    bool is_cdrom = false;
+
+    if (mep == NULL)
+       return false;
+
+    if (stat(mep->fs_spec, &sbuf) < 0)
+       return false;   
+
+    //  Can it be mounted?  
+    if ( ! ( ((strstr(mep->fs_mntops, "owner") && 
+        (sbuf.st_mode & S_IRUSR)) || strstr(mep->fs_mntops, "user")) && 
+        (strstr(mep->fs_vfstype, MNTTYPE_ISO9660) || 
+         strstr(mep->fs_vfstype, MNTTYPE_UDF) || 
+         strstr(mep->fs_vfstype, MNTTYPE_AUTO)) ) ) 
+    {
+       if ( strstr(mep->fs_mntops, MNTTYPE_ISO9660) && 
+            strstr(mep->fs_vfstype, MNTTYPE_SUPERMOUNT) ) 
+          {
+             is_supermount = true;
+          }
+          else
+          {
+             return false;
+          }
+     }
+
+     if (strstr(mep->fs_mntops, MNTTYPE_ISO9660) || 
+         strstr(mep->fs_vfstype, MNTTYPE_ISO9660)) 
+     {
+         is_cdrom = true;
+         //cout << "Device is a CDROM" << endl;
+     }
+
+     if (!is_supermount) 
+     {
+         if (is_cdrom)
+             pDevice = MythCDROM::get(this, QString(mep->fs_spec),
+                                     is_supermount, m_AllowEject);
+     }
+     else 
+     {
+         char *dev;
+         int len = 0;
+         dev = strstr(mep->fs_mntops, SUPER_OPT_DEV);
+         dev += sizeof(SUPER_OPT_DEV)-1;
+         while (dev[len] != ',' && dev[len] != ' ' && dev[len] != 0)
+             len++;
+
+         if (dev[len] != 0) 
+         {
+             char devstr[256];
+             strncpy(devstr, dev, len);
+             devstr[len] = 0;
+             if (is_cdrom)
+                 MythCDROM::get(this, QString(devstr),
+                                is_supermount, m_AllowEject);
+         }
+         else
+             return false;   
+     }
+        
+     if (pDevice) 
+     {
+         pDevice->setMountPath(mep->fs_file);
+         VERBOSE(VB_ALL, QString("Mediamonitor: Adding %1")
+                         .arg(pDevice->getDevicePath()));
+         if (pDevice->testMedia() == MEDIAERR_OK) 
+         {
+             addDevice(pDevice);
+             return true;
+         }
+            else
+                delete pDevice;
+      }
+
+     return false;
+}
+
 // Given a path to a media device determine what type of device it is and 
 // add it to our collection.
 bool MediaMonitor::addDevice(const char* devPath ) 
@@ -116,13 +204,8 @@ bool MediaMonitor::addDevice(const char* devPath )
     QString devicePath( devPath );
     //cout << "addDevice - " << devicePath << endl;
 
-    MythMediaDevice* pDevice = NULL;
-
     struct fstab * mep = NULL;
     char lpath[PATH_MAX];
-    struct stat sbuf;
-    bool is_supermount = false;
-    bool is_cdrom = false;
 
     // Resolve the simlink for the device.
     int len = readlink(devicePath, lpath, PATH_MAX);
@@ -134,7 +217,7 @@ bool MediaMonitor::addDevice(const char* devPath )
     {
         perror("setfsent");
         cerr << "MediaMonitor::addDevice - Failed to open "
-		_PATH_FSTAB
+                _PATH_FSTAB
                 " for reading." << endl;
         return false;
     }
@@ -157,79 +240,13 @@ bool MediaMonitor::addDevice(const char* devPath )
                  (len && (strcmp(lpath, mep->fs_spec) != 0)))
                 continue;
 
-            stat(mep->fs_spec, &sbuf);
-
-            if (((strstr(mep->fs_mntops, "owner") && 
-                (sbuf.st_mode & S_IRUSR)) || strstr(mep->fs_mntops, "user")) && 
-                (strstr(mep->fs_vfstype, MNTTYPE_ISO9660) || 
-                 strstr(mep->fs_vfstype, MNTTYPE_UDF) || 
-                 strstr(mep->fs_vfstype, MNTTYPE_AUTO))) 
-            {
-                break;        
-            }
-
-            if (strstr(mep->fs_mntops, MNTTYPE_ISO9660) && 
-                strstr(mep->fs_vfstype, MNTTYPE_SUPERMOUNT)) 
-            {
-                is_supermount = true;
-                break;
-            }
         }
 
         endfsent();
     }
 
     if (mep) 
-    {
-        if (strstr(mep->fs_mntops, MNTTYPE_ISO9660) || 
-            strstr(mep->fs_vfstype, MNTTYPE_ISO9660)) 
-        {
-            is_cdrom = true;
-            //cout << "Device is a CDROM" << endl;
-        }
-
-        if (!is_supermount) 
-        {
-            if (is_cdrom)
-                pDevice = MythCDROM::get(this, QString(mep->fs_spec),
-                                         is_supermount, m_AllowEject);
-        }
-        else 
-        {
-            char *dev;
-            int len = 0;
-            dev = strstr(mep->fs_mntops, SUPER_OPT_DEV);
-            dev += sizeof(SUPER_OPT_DEV)-1;
-            while (dev[len] != ',' && dev[len] != ' ' && dev[len] != 0)
-                len++;
-
-            if (dev[len] != 0) 
-            {
-                char devstr[256];
-                strncpy(devstr, dev, len);
-                devstr[len] = 0;
-                if (is_cdrom)
-                    MythCDROM::get(this, QString(devstr),
-                                   is_supermount, m_AllowEject);
-            }
-            else
-                return false;   
-        }
-        
-        if (pDevice) 
-        {
-            pDevice->setMountPath(mep->fs_file);
-            VERBOSE(VB_ALL, QString("Mediamonitor: Adding %1")
-                            .arg(pDevice->getDevicePath()));
-            if (pDevice->testMedia() == MEDIAERR_OK) 
-            {
-                addDevice(pDevice);
-                return true;
-            }
-            else
-                delete pDevice;
-        }
-    }
+       return addDevice(mep); 
 
     return false;
 }

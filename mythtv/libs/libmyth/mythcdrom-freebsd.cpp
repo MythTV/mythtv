@@ -74,10 +74,9 @@ MediaError MythCDROMFreeBSD::lock()
 
 MediaError MythCDROMFreeBSD::unlock() 
 {
-    if (openDevice()) 
+    if (isDeviceOpen() || openDevice()) 
     { 
-        // The call to the base unlock will close it if needed.
-        VERBOSE( VB_ALL, "Unlocking CDROM door");
+        //cout <<  "Unlocking CDROM door" << endl;
 	ioctl(m_DeviceHandle, CDIOCALLOW);
     }
     else
