@@ -1548,14 +1548,13 @@ void NuppelVideoPlayer::StartPlaying(void)
         }
     }
 
+    killvideo = true;
+    pthread_join(output_video, NULL);
+
+    // need to make sure video has exited first.
     if (audioOutput)
         delete audioOutput;
     audioOutput = NULL;
-
-    killvideo = true;
-
-    // these threads will also exit when killplayer or eof is true
-    pthread_join(output_video, NULL);
 
     playing = false;
 }
