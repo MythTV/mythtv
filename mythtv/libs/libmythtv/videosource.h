@@ -212,6 +212,7 @@ public:
         addChild(new VideoDevice(*this));
         addChild(new AudioDevice(*this));
         addChild(new AudioRateLimit(*this));
+        addChild(new Hostname(*this));
     };
 
     int getCardID(void) const {
@@ -231,13 +232,12 @@ private:
             setVisible(false);
             setName("ID");
         };
-        virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
-                                      const char* widgetName = 0) {
-            (void)cg; (void)parent; (void)widgetName;
-            return NULL;
-        };
     };
 
+    class Hostname: public HostnameSetting, public CCSetting {
+    public:
+        Hostname(const CaptureCard& parent): CCSetting(parent, "hostname") {};
+    };
 
 private:
     ID* id;

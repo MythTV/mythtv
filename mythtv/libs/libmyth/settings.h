@@ -25,7 +25,7 @@ public:
 
     // Create and return a widget for configuring this entity
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                  const char* widgetName = 0) = 0;
+                                  const char* widgetName = 0);
 
     virtual void load(QSqlDatabase* db) = 0;
     virtual void save(QSqlDatabase* db) = 0;
@@ -422,6 +422,11 @@ public:
 
 protected:
     bool mustexist;
+};
+
+class HostnameSetting: virtual public Setting {
+public:
+    HostnameSetting();
 };
 
 class DBStorage: virtual public Setting {

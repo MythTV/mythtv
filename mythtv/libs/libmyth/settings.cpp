@@ -22,9 +22,19 @@
 #include <qcursor.h>
 #include <qapplication.h>
 #include <qwidget.h>
+#include <unistd.h>
 
 #include "mythcontext.h"
 #include "mythwizard.h"
+
+QWidget* Configurable::configWidget(ConfigurationGroup *cg, QWidget* parent,
+                                    const char* widgetName) {
+    (void)cg;
+    (void)parent;
+    (void)widgetName;
+    cout << "BUG: Configurable is visible, but has no configWidget\n";
+    return NULL;
+}
 
 ConfigurationGroup::~ConfigurationGroup()  {
     for(childList::iterator i = children.begin() ;
@@ -467,7 +477,7 @@ MythDialog* ConfigurationDialog::dialogWidget(QWidget* parent,
     MythDialog* dialog = new ConfigurationDialogWidget(m_context, parent, 
                                                        widgetName);
     QVBoxLayout* layout = new QVBoxLayout(dialog, 20);
-    layout->addWidget(configWidget(NULL, dialog));
+    layout->addWidget(configWidget(NULL, dialog)); // XXX
 
     return dialog;
 }
@@ -656,4 +666,14 @@ QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg,
     cg = cg;
 
     return box;
+}
+
+HostnameSetting::HostnameSetting(void)  {
+    setVisible(false);
+    
+    char buf[1024];
+    if (gethostname(buf,sizeof(buf)) == 0) {
+        buf[sizeof(buf)-1] = 0;
+        setValue(QString(buf));
+    }
 }
