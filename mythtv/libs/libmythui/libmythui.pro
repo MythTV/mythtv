@@ -5,6 +5,7 @@ TARGET = mythui-$$LIBVERSION
 CONFIG += thread dll
 target.path = $${PREFIX}/lib
 INSTALLS = target
+LIBS += $$EXTRALIBS
 
 # Input
 HEADERS  = mythmainwindow.h mythpainter.h mythimage.h
@@ -33,3 +34,14 @@ inc.files += mythcontext.h oldsettings.h remotefile.h util.h themedmenu.h
 inc.files += dialogbox.h
 
 INSTALLS += inc
+
+#
+#	Configuration dependent stuff (depending on what is set in mythtv top
+#	level settings.pro)
+#
+
+using_x11 {
+    LIBS += -L/usr/X11R6/lib -lXinerama
+}
+
+
