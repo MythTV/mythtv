@@ -152,7 +152,7 @@
         <value lang="DE">Kindersicherungs-Level:</value>
         <value lang="PT">Nível de Acesso:</value>
         <value lang="SV">Barnlåsnivå:</value>
-	<Value lang="FR">Niveau parental:</value>
+        <value lang="FR">Niveau parental:</value>
       </textarea>
       <textarea name="level" draworder="4">
         <area>680,105,100,35</area>
@@ -1002,7 +1002,7 @@
                 <value lang="SV">Namn:</value>
                 <value lang="CA">Nom:</value>
                 <value lang="ES">Nombre:</value>
-		<value =lang="FR">Nom:</value>
+                <value lang="FR">Nom:</value>
             </textarea>
 
             <textarea name="level_text" draworder="0" align="right">
