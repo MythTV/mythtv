@@ -49,6 +49,10 @@ int MaxQuality=2
 int MinQuality=15
 # Maximum quality difference between frames.
 int QualDiff=3
+#
+# Hardware MJPEG specific settings
+int HardwareMJPEGQuality=90
+int HardwareMJPEGDecimation=2
 # 
 # Audio settings
 #

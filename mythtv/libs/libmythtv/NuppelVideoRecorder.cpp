@@ -104,6 +104,8 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
 
     pip = false;
     hardware_encode = false;
+    hmjpg_quality = 80;
+    hmjpg_decimation = 2;
 	
     videoFilterList = "";
 }
@@ -776,19 +778,18 @@ void NuppelVideoRecorder::DoMJPEG(void)
         return;
     }
 
-    cout << bparm.img_width << " " << bparm.img_height << endl;
-    cout << bparm.HorDcm << " " << bparm.VerDcm << " " << bparm.TmpDcm << endl;
-    cout << bparm.field_per_buff << " " << bparm.img_x << " " << bparm.img_y << " " << bparm.decimation << " " << endl;
-
-    cout << bparm.input << " " << bparm.norm << " " << bparm.quality << endl;
-    cout << bparm.APPn << " " << bparm.APP_len << " " << bparm.odd_even << endl;
+//    cout << bparm.img_width << " " << bparm.img_height << endl;
+//    cout << bparm.HorDcm << " " << bparm.VerDcm << " " << bparm.TmpDcm << endl;
+//    cout << bparm.field_per_buff << " " << bparm.img_x << " " << bparm.img_y << " " << bparm.decimation << " " << endl;
+//
+//    cout << bparm.input << " " << bparm.norm << " " << bparm.quality << endl;
+//    cout << bparm.APPn << " " << bparm.APP_len << " " << bparm.odd_even << endl;
 
     bparm.input = 2;
     bparm.norm = 1;
-    bparm.quality = 60;
+    bparm.quality = hmjpg_quality;
 
-    bparm.HorDcm = 1;
-    bparm.VerDcm = 1;
+    bparm.decimation = hmjpg_decimation;
 
     for (int n = 0; n < 14; n++)
          bparm.APP_data[n] = 0;
