@@ -38,6 +38,7 @@
       <alttext lang="PT">Programar</alttext>
       <alttext lang="SV">Schemalägg</alttext>
       <alttext lang="JA">予約</alttext>
+      <alttext lang="IT">Programmazione</alttext>
       <action>MENU tv_schedule.xml</action>
    </button>
 
