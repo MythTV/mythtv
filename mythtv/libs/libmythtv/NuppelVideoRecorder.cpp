@@ -464,12 +464,15 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
 
     if (!skipdevice)
     {
-        if (-1 == (afd = open(audiodevice.ascii(), O_RDONLY)))
+        if (-1 == (afd = open(audiodevice.ascii(), O_RDONLY | O_NONBLOCK)))
         {
             cerr << "Cannot open DSP '" << audiodevice << "', dying.\n";
+            perror("open");
             return 1;
         }
-  
+ 
+        fcntl(afd, F_SETFL, fcntl(afd, F_GETFL) & ~O_NONBLOCK);
+ 
         //ioctl(afd, SNDCTL_DSP_RESET, 0);
    
         frag = (8 << 16) | (10); //8 buffers, 1024 bytes each
@@ -1569,12 +1572,14 @@ void NuppelVideoRecorder::doAudioThread(void)
 
     act_audio_sample = 0;
 
-    if (-1 == (afd = open(audiodevice.ascii(), O_RDONLY))) 
+    if (-1 == (afd = open(audiodevice.ascii(), O_RDONLY | O_NONBLOCK))) 
     {
         cerr << "Cannot open DSP '" << audiodevice << "', exiting";
+        perror("open");
         return;
     }
 
+    fcntl(afd, F_SETFL, fcntl(afd, F_GETFL) & ~O_NONBLOCK);
     //ioctl(afd, SNDCTL_DSP_RESET, 0);
 
     frag = (8 << 16) | (10); //8 buffers, 1024 bytes each

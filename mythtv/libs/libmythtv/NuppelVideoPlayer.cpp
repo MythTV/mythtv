@@ -348,10 +348,7 @@ void NuppelVideoPlayer::InitSound(void)
         return;
     }
 
-    close(audiofd);
-    audiofd = -1;
-
-    audiofd = open(audiodevice.ascii(), O_WRONLY);
+    fcntl(audiofd, F_SETFL, fcntl(audiofd, F_GETFL) & ~O_NONBLOCK);
 
     if (ioctl(audiofd, SNDCTL_DSP_SAMPLESIZE, &audio_bits) < 0 ||
         ioctl(audiofd, SNDCTL_DSP_CHANNELS, &audio_channels) < 0 ||

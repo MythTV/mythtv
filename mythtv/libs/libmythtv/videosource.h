@@ -294,6 +294,7 @@ public:
         fillSelectionsFromDir(dev);
         dev.setPath("/dev/sound");
         fillSelectionsFromDir(dev);
+        addSelection("(None)", "/dev/null");
     };
 };
 

@@ -404,7 +404,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
             if (audiodevice.right(4) == audiooutputdevice.right(4)) //they match
             {
-                int dsp_fd = open(audiodevice, O_RDWR);
+                int dsp_fd = open(audiodevice, O_RDWR | O_NONBLOCK);
                 if (dsp_fd != -1)
                 {
                     dsp_status = ioctl(dsp_fd, SNDCTL_DSP_GETCAPS,
@@ -412,11 +412,11 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                     if (dsp_status != -1)
                     {
                         if (!(soundcardcaps & DSP_CAP_DUPLEX))
-                        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                             << " WARNING:  Capture device " << audiodevice 
-                             << " is not reporting full duplex "
-                             << "capability.\nSee docs/mythtv-HOWTO, "
-                             << "section 18 for more information." << endl;
+                            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                                 << " WARNING:  Capture device " << audiodevice 
+                                 << " is not reporting full duplex "
+                                 << "capability.\nSee docs/mythtv-HOWTO, "
+                                 << "section 18 for more information." << endl;
                     }
                     else 
                         cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
@@ -425,9 +425,12 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                     close(dsp_fd);
                 }
                 else 
+                {
                     cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
                          << " Could not open audio device: " 
                          << audiodevice << endl;
+                    perror("open");
+                }
             }
         }
     }
