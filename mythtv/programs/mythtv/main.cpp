@@ -89,7 +89,9 @@ int main(int argc, char *argv[])
     QString themedir = gContext->FindThemeDir(themename);
     if (themedir == "")
     {   
-        cerr << "Couldn't find theme " << themename << endl;
+        QString msg = QString("Fatal Error 44: Couldn't find theme '%1'.")
+            .arg(themename);
+        VERBOSE(VB_IMPORTANT, msg);
         return 44; // exit(44)
     }
     
@@ -103,7 +105,7 @@ int main(int argc, char *argv[])
 
     if (!MSqlQuery::testDBConnection())
     {
-        printf("couldn't open db\n");
+        VERBOSE(VB_IMPORTANT, "Fatal Error 46: Couldn't open the database.");
         return 46; // exit(46)
     }
 
@@ -112,7 +114,8 @@ int main(int argc, char *argv[])
     QString auddevice = gContext->GetSetting("AudioOutputDevice");
     if (auddevice == "" || auddevice == QString::null)
     {
-        cerr << "You need to run 'mythfrontend', not 'mythtv'.\n";
+        VERBOSE(VB_IMPORTANT, "Fatal Error 47: You need "
+                "to run 'mythfrontend', not 'mythtv'.");
         return 47; // exit(47)
     }
 
@@ -125,7 +128,11 @@ int main(int argc, char *argv[])
     TV::InitKeys();
 
     TV *tv = new TV();
-    tv->Init();
+    if (!tv->Init())
+    {
+        VERBOSE(VB_IMPORTANT, "Fatal Error 51: Error initializing TV class.");
+        return 51; // exit(51)
+    }
 
     if (a.argc() > 1)
     {

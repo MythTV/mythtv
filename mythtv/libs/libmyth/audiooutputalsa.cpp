@@ -49,6 +49,9 @@ bool AudioOutputALSA::OpenDevice()
     { 
         Error(QString("snd_pcm_open(%1): %2")
               .arg(audiodevice).arg(snd_strerror(err)));
+        if (pcm_handle)
+            CloseDevice();
+        return false;
     }
 
     /* the audio fragment size was computed by using the next lower power of 2
@@ -91,6 +94,7 @@ bool AudioOutputALSA::OpenDevice()
                         period_time);
     if (err < 0) 
     {
+        Error("Unable to set ALSA parameters");
         CloseDevice();
         return false;
     }    

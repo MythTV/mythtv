@@ -242,7 +242,13 @@ void startTV(void)
     QTime timer;
     timer.start();
 
-    tv->Init();
+    if (!tv->Init())
+    {
+        VERBOSE(VB_IMPORTANT, "Experienced fatal error "
+                "initializing TV class in startTV().");
+        delete tv;
+        return;
+    }
 
     bool tryTV = false;
     bool tryRecorder = false;
@@ -580,7 +586,13 @@ int internal_play_media(const char *mrl, const char* plot, const char* title,
    
     TV *tv = new TV();
 
-    tv->Init();
+    if (!tv->Init())
+    {
+        VERBOSE(VB_IMPORTANT, "Experienced fatal error initializing "
+                "TV class in internal_play_media().");
+        delete tv;
+        return res;
+    }
 
     ProgramInfo *pginfo = new ProgramInfo();
     pginfo->recstartts = QDateTime::currentDateTime().addSecs((0 - (lenMins + 1)) * 60 );

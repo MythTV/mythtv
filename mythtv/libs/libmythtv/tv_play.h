@@ -33,7 +33,7 @@ class TV : public QObject
 
     static void InitKeys(void);
 
-    void Init(bool createWindow = true);
+    bool Init(bool createWindow = true);
 
     int LiveTV(bool showDialogs = true);
     void StopLiveTV(void) { exitPlayer = true; }
@@ -89,6 +89,7 @@ class TV : public QObject
 
     OSD *GetOSD(void);
 
+    bool IsErrored() { return errored; }
   public slots:
     void HandleOSDClosed(int osdType);
 
@@ -330,6 +331,7 @@ class TV : public QObject
     
     QString baseFilters;
     int repoLevel;
+    bool errored;
 };
 
 #endif

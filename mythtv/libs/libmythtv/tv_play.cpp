@@ -39,10 +39,12 @@ struct SeekSpeedInfo {
 };
 
 #define MAX_REPO_LEVEL 3
-SeekSpeedInfo seek_speed_array[MAX_REPO_LEVEL][7] =
+SeekSpeedInfo seek_speed_array[MAX_REPO_LEVEL][9] =
 {
     // Less adjustment overall, no adjustment on the low end
-    {{  "5X",    5.0,   2.50,   2.50},
+    {
+     {  "3X",    3.0,   1.50,   2.50},
+     {  "5X",    5.0,   2.50,   2.50},
      { "10X",   10.0,   5.00,   5.00},
      { "20X",   20.0,  10.00,  10.00},
      { "30X",   30.0,  15.00,  15.00},
@@ -51,7 +53,9 @@ SeekSpeedInfo seek_speed_array[MAX_REPO_LEVEL][7] =
      {"180X",  180.0,  90.00,  90.00}},
     
     // Less adjustment overall
-    {{  "5X",    5.0,   3.75,   3.75},
+    {
+     {  "3X",    3.0,   2.50,   2.50},
+     {  "5X",    5.0,   3.75,   3.75},
      { "10X",   10.0,   7.50,   7.50},
      { "20X",   20.0,  15.00,  15.00},
      { "30X",   30.0,  22.50,  22.50},
@@ -60,7 +64,9 @@ SeekSpeedInfo seek_speed_array[MAX_REPO_LEVEL][7] =
      {"180X",  180.0, 135.00, 135.00}},
     
     // More adjustment (this is the default)
-    {{  "5X",    5.0,   5.00,   5.00},
+    {
+     {  "3X",    3.0,   3.00,   3.00},
+     {  "5X",    5.0,   5.00,   5.00},
      { "10X",   10.0,  10.00,  10.00},
      { "20X",   20.0,  20.00,  20.00},
      { "30X",   30.0,  30.00,  30.00},
@@ -202,20 +208,6 @@ void *SpawnDecode(void *param)
 TV::TV(void)
   : QObject()
 {
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    if (!query.isConnected())
-    {
-        VERBOSE(VB_IMPORTANT, "TV: Couldn't open DB connection in player, exiting");
-        exit(-18);
-    }
-    
-    repoLevel = gContext->GetNumSetting("TVRepositionLevel", 2);
-    
-    if((repoLevel >= MAX_REPO_LEVEL) || (repoLevel < 0) )
-        repoLevel = MAX_REPO_LEVEL - 1;
-    
-    
     treeMenu = NULL;
     switchingCards = false;
     dialogname = "";
@@ -246,9 +238,8 @@ TV::TV(void)
     udpnotify = NULL;
 
     normal_speed = 1.0;
+    errored = false;
     
-    baseFilters += gContext->GetSetting("CustomFilters");
-
     gContext->addListener(this);
 
     PrevChannelVector channame_vector(30);
@@ -269,8 +260,22 @@ TV::TV(void)
     connect(sleepTimer, SIGNAL(timeout()), SLOT(SleepEndTimer()));
 }
 
-void TV::Init(bool createWindow)
+bool TV::Init(bool createWindow)
 {
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (!query.isConnected())
+    {
+        VERBOSE(VB_IMPORTANT, "TV::Init(): Error, could "
+                "not open DB connection in player");
+        errored = true;
+        return false;
+    }
+    
+    repoLevel = gContext->GetNumSetting("TVRepositionLevel", 2);
+    if ((repoLevel >= MAX_REPO_LEVEL) || (repoLevel < 0))
+        repoLevel = MAX_REPO_LEVEL - 1;
+    
+    baseFilters += gContext->GetSetting("CustomFilters");
     fftime = gContext->GetNumSetting("FastForwardAmount", 30);
     rewtime = gContext->GetNumSetting("RewindAmount", 5);
     jumptime = gContext->GetNumSetting("JumpAmount", 10);
@@ -354,8 +359,10 @@ void TV::Init(bool createWindow)
 
     pthread_create(&event, NULL, EventThread, this);
 
-    while (!runMainLoop)
+    while (!runMainLoop && !IsErrored())
         usleep(50);
+
+    return !IsErrored();
 }
 
 TV::~TV(void)
@@ -614,6 +621,13 @@ TVState TV::RemovePlaying(TVState state)
 
 void TV::HandleStateChange(void)
 {
+    if (IsErrored())
+    {
+        VERBOSE(VB_IMPORTANT, "TV::HandleStateChange() Error, "
+                "called after fatal error detected.");
+        return;
+    }
+
     bool changed = false;
 
     TVState tmpInternalState = internalState;
@@ -625,8 +639,10 @@ void TV::HandleStateChange(void)
 
     if (nextState == kState_Error)
     {
-        VERBOSE(VB_IMPORTANT, "TV: Attempting to set to an error state, exiting");
-        exit(-19);
+        VERBOSE(VB_IMPORTANT, "TV::HandleStateChange() Error, "
+                "attempting to set to an error state, exiting");
+        errored = true;
+        return;
     }
 
     if (internalState == kState_None && nextState == kState_WatchingLiveTV)
@@ -1125,7 +1141,7 @@ void TV::RunTV(void)
             }
         }
 
-        if (recorder && recorder->GetErrorStatus())
+        if ((recorder && recorder->GetErrorStatus()) || IsErrored())
         {
             exitPlayer = true;
             wantsToQuit = true;
@@ -1215,8 +1231,11 @@ void TV::RunTV(void)
         }
     }
   
-    nextState = kState_None;
-    HandleStateChange();
+    if (!IsErrored())
+    {
+        nextState = kState_None;
+        HandleStateChange();
+    }
 }
 
 bool TV::eventFilter(QObject *o, QEvent *e)

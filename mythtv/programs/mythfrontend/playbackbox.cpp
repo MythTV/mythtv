@@ -1606,14 +1606,24 @@ bool PlaybackBox::play(ProgramInfo *rec)
 
     if (fileExists(rec) == false)
     {
-        cerr << "Error: " << rec->pathname << " file not found\n";
+        QString msg = 
+            QString("PlaybackBox::play(): Error, %1 file not found")
+            .arg(rec->pathname);
+        VERBOSE(VB_IMPORTANT, msg);
         return false;
     }
 
     ProgramInfo *tvrec = new ProgramInfo(*rec);
 
     TV *tv = new TV();
-    tv->Init();
+    if (!tv->Init())
+    {
+        VERBOSE(VB_IMPORTANT, "PlaybackBox::play(): "
+                "Error, initializing TV class.");
+        delete tv;
+        delete tvrec;
+        return false;
+    }
 
     setEnabled(false);
     state = kKilling; // stop preview playback and don't restart it

@@ -204,7 +204,16 @@ void ManualBox::startPlayer(void)
         tvstarting = true;
 
         m_tv = new TV();
-        m_tv->Init(false);
+        if (!m_tv->Init(false))
+        {
+            VERBOSE(VB_IMPORTANT, "Experienced fatal error initialzing "
+                    "TV class in ManualBox::startPlayer().");
+            delete m_tv;
+            m_tv = 0;
+            tvstarting = false;
+            return;
+        }
+        
 
         m_tv->EmbedOutput(m_pixlabel->winId(), 0, 0, (int)(320 * wmult),
                                                      (int)(240 * hmult));
