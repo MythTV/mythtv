@@ -59,6 +59,7 @@ private:
 class Setting: virtual public Configurable {
     Q_OBJECT
 public:
+    Setting(): changed(false) {};
     virtual ~Setting() {};
 
     virtual QString getValue(void) const {
@@ -74,12 +75,17 @@ public:
 public slots:
     virtual void setValue(const QString& newValue) {
         settingValue = newValue;
+        changed = true;
         emit valueChanged(settingValue);
     };
 signals:
     void valueChanged(const QString&);
 protected:
+    bool isChanged(void) { return changed; };
+    void setUnchanged(void) { changed = false; };
+
     QString settingValue;
+    bool changed;
 };
 
 class ConfigurationGroup: virtual public Configurable 

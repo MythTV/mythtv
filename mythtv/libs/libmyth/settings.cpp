@@ -548,9 +548,13 @@ void SimpleDBStorage::load(QSqlDatabase* db) {
         if (result != QString::null)
           setValue(result);
     }
+    setUnchanged();
 }
 
 void SimpleDBStorage::save(QSqlDatabase* db) {
+    if (!isChanged())
+        return;
+
     QString querystr = QString("SELECT * FROM %1 WHERE %2;")
         .arg(table).arg(whereClause());
     QSqlQuery query = db->exec(querystr);
