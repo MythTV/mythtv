@@ -139,27 +139,19 @@
 
    <button>
       <type>TV_CONFLICTS</type>
-      <text>Fix Scheduling Conflicts</text>
+      <text>Upcoming Recordings</text>
       <text lang="IT">Correggi i conflitti</text>
       <text lang="ES">Resolver conflictos</text>
       <text lang="CA">Resoldre Conflictes</text>
-      <text lang="NL">Conflicten Oplossen</text>
+      <text lang="NL">Geplande Opnames</text>
       <text lang="FR">Gestion des conflits</text>
       <text lang="DE">Aufnahmeplan</text>
       <text lang="DK">Løs optagelseskonflikter</text>
       <text lang="PT">Resolver Conflitos</text>
-      <text lang="SV">Åtgärda schemakonflikter</text>
+      <text lang="SV">Kommande inspelningar</text>
       <text lang="JA">予約衝突修正</text>
-      <alttext>Fix Conflicts</alttext>
-      <alttext lang="FR">Conflits</alttext>
-      <alttext lang="ES">Conflictos</alttext>
-      <alttext lang="FR">Conflictes</alttext>
-      <alttext lang="DE">Konflikte</alttext>
-      <alttext lang="DK">Løs konflikter</alttext>
-      <alttext lang="NL">Conflicten</alttext>
-      <alttext lang="PT">Conflitos</alttext>
-      <alttext lang="SV">Åtgärda konflikter</alttext>
-      <alttext lang="JA">予約修正</alttext>
+      <text lang="FI">Tulevat Nauhoitukset</text>
+      <text lang="ZH_TW">修正預設錄影衝突</text>
       <action>TV_FIX_CONFLICTS</action>
    </button>
 

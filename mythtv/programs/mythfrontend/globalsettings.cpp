@@ -1802,8 +1802,9 @@ static BackendSpinBox *GRFindOneRecordRecPriority()
     BackendSpinBox *bs = new BackendSpinBox("FindOneRecordRecPriority",
                                             -99, 99, 1);
     bs->setLabel(QObject::tr("Find One Recordings Priority"));
-    bs->setHelpText(QObject::tr("Find One Recording types will receive this "
-                    "additional recording priority value."));
+    bs->setHelpText(QObject::tr("Find One, Find Weekly and Find Daily "
+                                "recording types will receive this "
+                                "additional recording priority value."));
     bs->setValue(0);
     return bs;
 }

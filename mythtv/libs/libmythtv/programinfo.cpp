@@ -1840,21 +1840,21 @@ QString ProgramInfo::RecTypeText(void)
     switch (rectype)
     {
     case kSingleRecord:
-        return QObject::tr("Single Recording");
+        return QObject::tr("Single Record");
     case kTimeslotRecord:
-        return QObject::tr("Daily Recording");
+        return QObject::tr("Record Daily");
     case kWeekslotRecord:
-        return QObject::tr("Weekly Recording");
+        return QObject::tr("Record Weekly");
     case kChannelRecord:
-        return QObject::tr("Channel Recording");
+        return QObject::tr("Channel Record");
     case kAllRecord:
-        return QObject::tr("All Recording");
+        return QObject::tr("Record All");
     case kFindOneRecord:
-        return QObject::tr("Find One Recording");
+        return QObject::tr("Find One");
     case kFindDailyRecord:
-        return QObject::tr("Find Daily Recording");
+        return QObject::tr("Find Daily");
     case kFindWeeklyRecord:
-        return QObject::tr("Find Weekly Recording");
+        return QObject::tr("Find Weekly");
     case kOverrideRecord:
     case kDontRecord:
         return QObject::tr("Override Recording");
@@ -1925,9 +1925,9 @@ QString ProgramInfo::RecStatusText(void)
         case rsDontRecord:
             return QObject::tr("Don't Record");
         case rsPreviousRecording:
-            return QObject::tr("Previous Recording");
+            return QObject::tr("Previously Recorded");
         case rsCurrentRecording:
-            return QObject::tr("Current Recording");
+            return QObject::tr("Currently Recorded");
         case rsEarlierShowing:
             return QObject::tr("Earlier Showing");
         case rsTooManyRecordings:
@@ -2357,7 +2357,7 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
         QString dfmt = gContext->GetSetting("OldDateFormat", "M/d/yyyy");
         QDate fdate = QDate::QDate (1970, 1, 1);
         fdate = fdate.addDays(findid - 719528);
-        msg += QString("%1: %2 ( %3 )\n").arg(QObject::tr("Find ID"))
+        msg += QString("%1: %2 (%3)\n").arg(QObject::tr("Find ID"))
                        .arg(findid).arg(fdate.toString(dfmt));
     }
     QString role = "", pname = "";
