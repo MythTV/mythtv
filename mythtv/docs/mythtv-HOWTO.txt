@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-05-06, v2.30
+  2003-05-06, v2.31
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -3054,7 +3054,7 @@
 
   +o  fvwm
 
-  +o  blackbox
+  +o  blackbox  (using "Sloppy Focus" and "Focus New Windows")
 
   [1m18.15.  My PVR-250 card doesn't show inputs in the setup screen.[0m
 
