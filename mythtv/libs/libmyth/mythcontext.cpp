@@ -250,8 +250,7 @@ void MythContext::KickDatabase(QSqlDatabase *db)
         if (result.isActive())
             break;
         else
-            cout << "KickDatabase: "
-                 << result.lastError().databaseText() << endl;
+            DBError("KickDatabase", result);
     }
 }
 
