@@ -42,7 +42,7 @@ int main(int argc, char **argv)
 
     int chan = 0;
     
-    if (chanstr != QString::null)
+    if (chanstr != "")
         chan = atoi(chanstr.ascii());
 
     delete gContext;

@@ -264,17 +264,10 @@ void AutoExpire::FillOldestFirst(void)
             proginfo->description = QString::fromUtf8(query.value(5).toString());
             proginfo->hostname = query.value(6).toString();
 
-            if (proginfo->hostname.isEmpty() || proginfo->hostname.isNull())
+            if (proginfo->hostname.isEmpty())
                 proginfo->hostname = gContext->GetHostName();
 
-            if (proginfo->title == QString::null)
-                proginfo->title = "";
-            if (proginfo->subtitle == QString::null)
-                proginfo->subtitle = "";
-            if (proginfo->description == QString::null)
-                proginfo->description = "";
-
-            if (!query.value(7).toString().isNull())
+            if (!query.value(7).toString().isEmpty())
             {
                 proginfo->chanstr = query.value(7).toString();
                 proginfo->channame = query.value(8).toString();
@@ -288,14 +281,7 @@ void AutoExpire::FillOldestFirst(void)
             }
 
             proginfo->seriesid = query.value(10).toString();
-
-            if (proginfo->seriesid == QString::null)
-                proginfo->seriesid = "";
-
             proginfo->programid = query.value(11).toString();
-
-            if (proginfo->programid == QString::null)
-                proginfo->programid = "";
 
             proginfo->pathname = proginfo->GetRecordFilename(fileprefix);
 

@@ -314,17 +314,8 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
     int hours, minutes, seconds;
 
     progMap["title"] = title;
-
-    if (subtitle != "(null)")
-        progMap["subtitle"] = subtitle;
-    else
-        progMap["subtitle"] = "";
-
-    if (description != "(null)")
-        progMap["description"] = description;
-    else
-        progMap["description"] = "";
-
+    progMap["subtitle"] = subtitle;
+    progMap["description"] = description;
     progMap["category"] = category;
     progMap["callsign"] = chansign;
     progMap["commfree"] = chancommfree;
@@ -444,21 +435,6 @@ void ProgramInfo::GetProgramListByQuery(QSqlDatabase *db,
 
             proginfo->spread = -1;
 
-            if (proginfo->title == QString::null)
-                proginfo->title = "";
-            if (proginfo->subtitle == QString::null)
-                proginfo->subtitle = "";
-            if (proginfo->description == QString::null)
-                proginfo->description = "";
-            if (proginfo->category == QString::null)
-                proginfo->category = "";
-            if (proginfo->chanOutputFilters == QString::null)
-                proginfo->chanOutputFilters = "";    
-            if (proginfo->seriesid == QString::null)
-                proginfo->seriesid = "";    
-            if (proginfo->programid == QString::null)
-                proginfo->programid = "";    
-
             proglist->append(proginfo);
         }
     }
@@ -523,21 +499,6 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(QSqlDatabase *db,
         proginfo->programid = query.value(14).toString();
         
         proginfo->spread = -1;
-
-        if (proginfo->title == QString::null)
-            proginfo->title = "";
-        if (proginfo->subtitle == QString::null)
-            proginfo->subtitle = "";
-        if (proginfo->description == QString::null)
-            proginfo->description = "";
-        if (proginfo->category == QString::null)
-            proginfo->category = "";
-        if (proginfo->chanOutputFilters == QString::null)
-            proginfo->chanOutputFilters = "";
-        if (proginfo->seriesid == QString::null)
-            proginfo->seriesid = "";
-        if (proginfo->programid == QString::null)
-            proginfo->programid = "";
 
         return proginfo;
     }
@@ -612,30 +573,6 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
         proginfo->programid = query.value(12).toString();
 
         proginfo->spread = -1;
-
-        if (proginfo->title == QString::null)
-            proginfo->title = "";
-        if (proginfo->subtitle == QString::null)
-            proginfo->subtitle = "";
-        if (proginfo->description == QString::null)
-            proginfo->description = "";
-        if (proginfo->category == QString::null)
-            proginfo->category = "";
-
-        if (proginfo->chanstr == QString::null)
-            proginfo->chanstr = "";
-        if (proginfo->chansign == QString::null)
-            proginfo->chansign = "";
-        if (proginfo->channame == QString::null)
-            proginfo->channame = "";
-
-        if (proginfo->chanOutputFilters == QString::null)
-            proginfo->chanOutputFilters = "";
-
-        if (proginfo->seriesid == QString::null)
-            proginfo->seriesid = "";
-        if (proginfo->programid == QString::null)
-            proginfo->programid = "";
 
         proginfo->programflags = proginfo->getProgramFlags(db);
 

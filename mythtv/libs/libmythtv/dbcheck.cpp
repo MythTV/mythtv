@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythcontext.h"
 
-const QString currentDatabaseVersion = "1043";
+const QString currentDatabaseVersion = "1044";
 
 void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -800,6 +800,59 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 ""
 };
         performActualUpdate(updates, "1043", dbver);
+    }
+
+    if (dbver == "1043")
+    {
+        const QString updates[] = {
+"ALTER TABLE program CHANGE title title VARCHAR(128) NOT NULL DEFAULT '';",
+"ALTER TABLE program CHANGE subtitle subtitle VARCHAR(128) NOT NULL DEFAULT '';",
+"ALTER TABLE program CHANGE description description TEXT NOT NULL DEFAULT '';",
+"ALTER TABLE program CHANGE category category VARCHAR(64) NOT NULL DEFAULT '';",
+"ALTER TABLE program CHANGE category_type category_type VARCHAR(64) NOT NULL DEFAULT '';",
+"ALTER TABLE program CHANGE title_pronounce title_pronounce VARCHAR(128) NOT NULL DEFAULT '';",
+"ALTER TABLE program CHANGE seriesid seriesid VARCHAR(12) NOT NULL DEFAULT '';",
+"ALTER TABLE program CHANGE showtype showtype VARCHAR(30) NOT NULL DEFAULT '';",
+"ALTER TABLE program CHANGE colorcode colorcode VARCHAR(20) NOT NULL DEFAULT '';",
+"ALTER TABLE program CHANGE syndicatedepisodenumber syndicatedepisodenumber VARCHAR(20) NOT NULL DEFAULT '';",
+"ALTER TABLE program CHANGE programid programid VARCHAR(12) NOT NULL DEFAULT '';",
+
+"ALTER TABLE channel CHANGE channum channum VARCHAR(5) NOT NULL DEFAULT '';",
+"ALTER TABLE channel CHANGE callsign callsign VARCHAR(20) NOT NULL DEFAULT '';",
+"ALTER TABLE channel CHANGE name name VARCHAR(64) NOT NULL DEFAULT '';",
+"ALTER TABLE channel CHANGE icon icon VARCHAR(255) NOT NULL DEFAULT 'none';",
+"ALTER TABLE channel CHANGE videofilters videofilters VARCHAR(255) NOT NULL DEFAULT '';",
+"ALTER TABLE channel CHANGE xmltvid xmltvid VARCHAR(64) NOT NULL DEFAULT '';",
+"ALTER TABLE channel CHANGE outputfilters outputfilters VARCHAR(255) NOT NULL DEFAULT '';",
+
+"ALTER TABLE record CHANGE title title VARCHAR(128) NOT NULL DEFAULT '';",
+"ALTER TABLE record CHANGE subtitle subtitle VARCHAR(128) NOT NULL DEFAULT '';",
+"ALTER TABLE record CHANGE description description TEXT NOT NULL DEFAULT '';",
+"ALTER TABLE record CHANGE profile profile VARCHAR(128) NOT NULL DEFAULT 'Default';",
+"ALTER TABLE record CHANGE category category VARCHAR(64) NOT NULL DEFAULT '';",
+"ALTER TABLE record CHANGE recgroup recgroup VARCHAR(32) NOT NULL DEFAULT 'Default';",
+"ALTER TABLE record CHANGE station station VARCHAR(20) NOT NULL DEFAULT '';",
+"ALTER TABLE record CHANGE seriesid seriesid VARCHAR(12) NOT NULL DEFAULT '';",
+"ALTER TABLE record CHANGE programid programid VARCHAR(12) NOT NULL DEFAULT '';",
+
+"ALTER TABLE recorded CHANGE title title VARCHAR(128) NOT NULL DEFAULT '';",
+"ALTER TABLE recorded CHANGE subtitle subtitle VARCHAR(128) NOT NULL DEFAULT '';",
+"ALTER TABLE recorded CHANGE description description TEXT NOT NULL DEFAULT '';",
+"ALTER TABLE recorded CHANGE hostname hostname VARCHAR(255) NOT NULL DEFAULT '';",
+"ALTER TABLE recorded CHANGE category category VARCHAR(64) NOT NULL DEFAULT '';",
+"ALTER TABLE recorded CHANGE recgroup recgroup VARCHAR(32) NOT NULL DEFAULT 'Default';",
+"ALTER TABLE recorded CHANGE seriesid seriesid VARCHAR(12) NOT NULL DEFAULT '';",
+"ALTER TABLE recorded CHANGE programid programid VARCHAR(12) NOT NULL DEFAULT '';",
+
+"ALTER TABLE oldrecorded CHANGE title title VARCHAR(128) NOT NULL DEFAULT '';",
+"ALTER TABLE oldrecorded CHANGE subtitle subtitle VARCHAR(128) NOT NULL DEFAULT '';",
+"ALTER TABLE oldrecorded CHANGE description description TEXT NOT NULL DEFAULT '';",
+"ALTER TABLE oldrecorded CHANGE category category VARCHAR(64) NOT NULL DEFAULT '';",
+"ALTER TABLE oldrecorded CHANGE seriesid seriesid VARCHAR(12) NOT NULL DEFAULT '';",
+"ALTER TABLE oldrecorded CHANGE programid programid VARCHAR(12) NOT NULL DEFAULT '';",
+""
+};
+        performActualUpdate(updates, "1044", dbver);
     }
 
 }

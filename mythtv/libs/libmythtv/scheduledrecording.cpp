@@ -471,7 +471,7 @@ bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
 "OR record.type = %3) " // findonerecord
 " OR "
 " ((record.chanid = %4 " // channel matches
-" OR (callsign IS NOT NULL AND callsign <> '' AND callsign = '%5')) "
+" OR (callsign <> '' AND callsign = '%5')) "
 "  AND "
 "  ((record.type = %6) " // channelrecord
 "   OR"

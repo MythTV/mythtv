@@ -2392,8 +2392,7 @@ void PlaybackBox::showRecGroupChooser(void)
         if (query.isActive() && query.numRowsAffected() > 0)
             while (query.next())
                 if ((query.value(0).toString() != recGroup) &&
-                    (query.value(0).toString() != "") &&
-                    (query.value(0).toString() != QString::null))
+                    (query.value(0).toString() != ""))
                 {
                     QString key = query.value(0).toString();
                     groups += key;

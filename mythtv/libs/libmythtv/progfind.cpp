@@ -1250,19 +1250,6 @@ void ProgFinder::getRecordingInfo()
                 curRecordings[recordingCount].seriesid = QString::fromUtf8(query.value(8).toString());
                 curRecordings[recordingCount].programid = QString::fromUtf8(query.value(9).toString());
 
-                if (curRecordings[recordingCount].title == QString::null)
-                    curRecordings[recordingCount].title = "";
-                if (curRecordings[recordingCount].subtitle == QString::null)
-                    curRecordings[recordingCount].subtitle = "";
-                if (curRecordings[recordingCount].description == QString::null)
-                    curRecordings[recordingCount].description = "";
-                if (curRecordings[recordingCount].chansign == QString::null)
-                    curRecordings[recordingCount].chansign = "";
-                if (curRecordings[recordingCount].seriesid == QString::null)
-                    curRecordings[recordingCount].seriesid = "";
-                if (curRecordings[recordingCount].programid == QString::null)
-                    curRecordings[recordingCount].programid = "";
-
                 recordingCount++;
             }
         }
@@ -1354,14 +1341,6 @@ void ProgFinder::selectShowData(QString progTitle)
             showData[showCount].seriesid = query.value(9).toString();
             showData[showCount].programid = query.value(10).toString();
 
-            if (showData[showCount].subtitle == QString::null)
-                showData[showCount].subtitle = "";
-            if (showData[showCount].description == QString::null)
-                showData[showCount].description = "";
-            if (showData[showCount].seriesid == QString::null)
-                showData[showCount].seriesid = "";
-            if (showData[showCount].programid == QString::null)
-                showData[showCount].programid = "";
             switch (rectype)
             {
                 case kSingleRecord:

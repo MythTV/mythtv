@@ -255,7 +255,7 @@ void DataDirectStationUpdate(Source source)
 
             QString xmltvid = query1.value(0).toString();
             QString callsign = query1.value(1).toString();
-            if (callsign == QString::null || callsign == "")
+            if (callsign == "")
                 callsign = QString::number(chanid);
             QString name = query1.value(2).toString();
             QString channel = query1.value(3).toString();
@@ -1196,7 +1196,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
 
         QString querystr;
 
-        if ((*i).old_xmltvid != QString::null) {
+        if ((*i).old_xmltvid != "") {
             querystr.sprintf("SELECT xmltvid FROM channel WHERE xmltvid = \"%s\"",
                              (*i).old_xmltvid.ascii());
             query.exec(querystr);
@@ -1260,7 +1260,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
 
                 promptForChannelUpdates(i, atoi(chanid.ascii()));
 
-                if ((*i).callsign == QString::null || (*i).callsign == "")
+                if ((*i).callsign == "")
                     (*i).callsign = chanid;
 
                 if (name     != (*i).name ||
@@ -1345,7 +1345,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
 
                 unsigned int chanid = promptForChannelUpdates(i,0);
 
-                if ((*i).callsign == QString::null || (*i).callsign == "")
+                if ((*i).callsign == "")
                     (*i).callsign = QString::number(chanid);
 
                 if (chanid > 0)
@@ -1408,7 +1408,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                         break;
                 }
 
-                if ((*i).callsign == QString::null || (*i).callsign == "")
+                if ((*i).callsign == "")
                     (*i).callsign = QString::number(chanid);
 
                 querystr = QString("INSERT INTO channel (chanid,name,callsign,"

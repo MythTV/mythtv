@@ -901,40 +901,21 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
 
     QSqlQuery query = db_conn->exec(thequery);
 
-    QString test;
     if (query.isActive() && query.numRowsAffected() > 0)
     {
         query.next();
 
         starttime = query.value(0).toString();
         endtime = query.value(1).toString();
-        test = query.value(2).toString();
-        if (test != QString::null)
-            title = QString::fromUtf8(test);
-        test = query.value(3).toString();
-        if (test != QString::null)
-            subtitle = QString::fromUtf8(test);
-        test = query.value(4).toString();
-        if (test != QString::null)
-            desc = QString::fromUtf8(test);
-        test = query.value(5).toString();
-        if (test != QString::null)
-            category = QString::fromUtf8(test);
-        test = query.value(6).toString();
-        if (test != QString::null)
-            callsign = test;
-        test = query.value(7).toString();
-        if (test != QString::null)
-            iconpath = test;
-        test = query.value(8).toString();
-        if (test != QString::null)
-            chanid = test;
-        test = query.value(9).toString();
-        if (test != QString::null)
-            seriesid = test;
-        test = query.value(10).toString();
-        if (test != QString::null)
-            programid = test;
+        title = QString::fromUtf8(query.value(2).toString());
+        subtitle = QString::fromUtf8(query.value(3).toString());
+        desc = QString::fromUtf8(query.value(4).toString());
+        category = QString::fromUtf8(query.value(5).toString());
+        callsign = query.value(6).toString();
+        iconpath = query.value(7).toString();
+        chanid = query.value(8).toString();
+        seriesid = query.value(9).toString();
+        programid = query.value(10).toString();
     }
     else
     {
@@ -953,20 +934,13 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
 
         QSqlQuery query = db_conn->exec(thequery);
 
-        QString test;
         if (query.isActive() && query.numRowsAffected() > 0)
         {
             query.next();
 
-            test = query.value(0).toString();
-            if (test != QString::null)
-                callsign = test;
-            test = query.value(1).toString();
-            if (test != QString::null)
-                iconpath = test;
-            test = query.value(2).toString();
-            if (test != QString::null)
-                chanid = test;
+            callsign = query.value(0).toString();
+            iconpath = query.value(1).toString();
+            chanid = query.value(2).toString();
         }
      }
 
@@ -1294,9 +1268,6 @@ bool TVRec::SetVideoFiltersForChannel(ChannelBase *chan, const QString &channum)
         query.next();
 
         videoFilters = query.value(0).toString();
-
-        if (videoFilters == QString::null) 
-            videoFilters = "";
 
         if (nvr != NULL)
         {
@@ -1951,20 +1922,10 @@ void TVRec::GetNextProgram(int direction,
     {
         if (sqlquery.next())
         {
-            QString test;
-
-            test = sqlquery.value(0).toString();
-            if (test != QString::null)
-                title = QString::fromUtf8(test);
-            test = sqlquery.value(1).toString();
-            if (test != QString::null)
-                subtitle = QString::fromUtf8(test);
-            test = sqlquery.value(2).toString();
-            if (test != QString::null)
-                desc = QString::fromUtf8(test);
-            test = sqlquery.value(3).toString();
-            if (test != QString::null)
-                category = QString::fromUtf8(test);
+            title = QString::fromUtf8(sqlquery.value(0).toString());
+            subtitle = QString::fromUtf8(sqlquery.value(1).toString());
+            desc = QString::fromUtf8(sqlquery.value(2).toString());
+            category = QString::fromUtf8(sqlquery.value(3).toString());
             starttime =  sqlquery.value(4).toString();
             endtime = sqlquery.value(5).toString();
             callsign = sqlquery.value(6).toString();

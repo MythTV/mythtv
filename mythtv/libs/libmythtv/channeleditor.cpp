@@ -117,9 +117,7 @@ void ChannelListSetting::fillSelections(void)
     QSqlQuery query = db->exec(querystr);
     if (query.isActive() && query.numRowsAffected() > 0)
         while(query.next()) {
-            QString name = "";
-            if (query.value(0).toString() != QString::null)
-                name = QString::fromUtf8(query.value(0).toString());
+            QString name = QString::fromUtf8(query.value(0).toString());
             QString channum = query.value(1).toString();
             QString chanid = query.value(2).toString();
              

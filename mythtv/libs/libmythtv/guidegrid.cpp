@@ -65,9 +65,6 @@ QString RunProgramGuide(QString startchannel, bool thread, TV *player,
     if (thread)
         qApp->unlock();
 
-    if (chanstr == QString::null)
-        chanstr = "";
-
     return chanstr;
 }
 
@@ -549,24 +546,14 @@ void GuideGrid::fillChannelInfos(int &maxchannel, bool gotostartchannel)
         {
             ChannelInfo val;
             val.chanstr = query.value(0).toString();
-            if ((val.chanstr != QString::null) && (val.chanstr != ""))
+            if (val.chanstr != "")
             {
                 val.callsign = query.value(1).toString();
-                if (val.callsign == QString::null)
-                    val.callsign = "";
                 val.iconpath = query.value(2).toString();
-                if (val.iconpath == QString::null)
-                    val.iconpath = "none";
-                if (val.iconpath.stripWhiteSpace().length() == 0)
-                    val.iconpath = "none";
                 val.chanstr = query.value(0).toString();
-                if (val.chanstr == QString::null)
-                val.chanstr = "";
                 val.chanid = query.value(3).toInt();
                 val.favid = query.value(4).toInt();
                 val.channame = query.value(5).toString();
-                if (val.channame == QString::null)
-                    val.channame = "";
                 val.icon = NULL;
         
                 if (gotostartchannel && val.chanstr == m_startChanStr && !set)

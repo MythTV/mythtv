@@ -1182,7 +1182,7 @@ void Scheduler::AddNewRecords(void) {
 "channel.channum, channel.callsign, channel.name, "
 "oldrecorded.endtime IS NOT NULL AS oldrecduplicate, program.category, "
 "record.recpriority + channel.recpriority + "
-"IF(cardinput.preference IS NOT NULL,cardinput.preference,0), "
+"cardinput.preference, "
 "record.dupin, "
 "recorded.endtime IS NOT NULL AND recorded.endtime < NOW() AS recduplicate, "
 "record.type, record.recordid, 0, "
@@ -1203,14 +1203,17 @@ void Scheduler::AddNewRecords(void) {
 "    program.title = oldrecorded.title "
 "     AND "
 "     ( "
-"      (program.programid IS NOT NULL AND program.programid <> '' AND program.programid NOT LIKE 'SH%0000' AND program.programid = oldrecorded.programid) "
+"      (program.programid <> '' AND program.programid NOT LIKE 'SH%0000' "
+"       AND program.programid = oldrecorded.programid) "
 "      OR "
 "      ( "
-"       (program.programid IS NULL OR program.programid = '' OR oldrecorded.programid IS NULL OR oldrecorded.programid = '') "
+"       (program.programid = '' OR oldrecorded.programid = '') "
 "       AND "
-"       (((record.dupmethod & 0x02) = 0) OR (program.subtitle IS NOT NULL AND program.subtitle <> '' AND program.subtitle = oldrecorded.subtitle)) "
+"       (((record.dupmethod & 0x02) = 0) OR (program.subtitle <> '' "
+"          AND program.subtitle = oldrecorded.subtitle)) "
 "       AND "
-"       (((record.dupmethod & 0x04) = 0) OR (program.description IS NOT NULL AND program.description <> '' AND program.description = oldrecorded.description)) "
+"       (((record.dupmethod & 0x04) = 0) OR (program.description <> '' "
+"          AND program.description = oldrecorded.description)) "
 "      ) "
 "     ) "
 "  ) "
@@ -1220,14 +1223,17 @@ void Scheduler::AddNewRecords(void) {
 "    program.title = recorded.title "
 "     AND "
 "     ( "
-"      (program.programid IS NOT NULL AND program.programid <> '' AND program.programid NOT LIKE 'SH%0000' AND program.programid = recorded.programid) "
+"      (program.programid <> '' AND program.programid NOT LIKE 'SH%0000' "
+"       AND program.programid = recorded.programid) "
 "      OR "
 "      ( "
-"       (program.programid IS NULL OR program.programid = '' OR recorded.programid IS NULL OR recorded.programid = '') "
+"       (program.programid = '' OR recorded.programid = '') "
 "       AND "
-"       (((record.dupmethod & 0x02) = 0) OR (program.subtitle IS NOT NULL AND program.subtitle <> '' AND program.subtitle = recorded.subtitle)) "
+"       (((record.dupmethod & 0x02) = 0) OR (program.subtitle <> '' "
+"          AND program.subtitle = recorded.subtitle)) "
 "       AND "
-"       (((record.dupmethod & 0x04) = 0) OR (program.description IS NOT NULL AND program.description <> '' AND program.description = recorded.description)) "
+"       (((record.dupmethod & 0x04) = 0) OR (program.description <> '' "
+"          AND program.description = recorded.description)) "
 "      ) "
 "     ) "
 "  ) ");
@@ -1342,21 +1348,6 @@ void Scheduler::AddNewRecords(void) {
         // ScheduledRecording and put it in the proginfo at the
         // same time, since it will be loaded later anyway with
         // multiple queries
-
-        if (p->title == QString::null)
-            p->title = "";
-        if (p->subtitle == QString::null)
-            p->subtitle = "";
-        if (p->description == QString::null)
-            p->description = "";
-        if (p->category == QString::null)
-            p->category = "";
-        if (p->chansign == QString::null)
-            p->chansign = "";
-        if (p->seriesid == QString::null)
-            p->seriesid = "";
-        if (p->programid == QString::null)
-            p->programid = "";
 
         // Chedk if already in reclist and don't bother if so
         RecIter rec = reclist.begin();
@@ -1503,17 +1494,6 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
             
             proginfo->recstartts = proginfo->startts;
             proginfo->recendts = proginfo->endts;
-
-            if (proginfo->title == QString::null)
-                proginfo->title = "";
-            if (proginfo->subtitle == QString::null)
-                proginfo->subtitle = "";
-            if (proginfo->description == QString::null)
-                proginfo->description = "";
-            if (proginfo->seriesid == QString::null)
-                proginfo->seriesid = "";
-            if (proginfo->programid == QString::null)
-                proginfo->programid = "";
 
             proglist.push_back(proginfo);
         }

@@ -678,23 +678,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             if (proginfo->hostname.isEmpty() || proginfo->hostname.isNull())
                 proginfo->hostname = gContext->GetHostName();
 
-            if (proginfo->title == QString::null)
-                proginfo->title = "";
-            if (proginfo->subtitle == QString::null)
-                proginfo->subtitle = "";
-            if (proginfo->description == QString::null)
-                proginfo->description = "";
-
-            if (proginfo->chanOutputFilters == QString::null)
-                proginfo->chanOutputFilters = "";
-
-            if (proginfo->seriesid == QString::null)
-                proginfo->seriesid = "";
-
-            if (proginfo->programid == QString::null)
-                proginfo->programid = "";
-
-            if (!query.value(7).toString().isNull())
+            if (!query.value(7).toString().isEmpty())
             {
                 proginfo->chanstr = query.value(7).toString();
                 proginfo->channame = QString::fromUtf8(query.value(8).toString());
@@ -718,9 +702,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 
             proginfo->programflags = flags;
 
-            QString test = query.value(15).toString();
-            if (test != QString::null) 
-               proginfo->category = QString::fromUtf8(test);
+            proginfo->category = QString::fromUtf8(query.value(15).toString());
 
             proginfo->recgroup = query.value(16).toString();
 
