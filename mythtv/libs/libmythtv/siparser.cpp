@@ -584,12 +584,6 @@ void SIParser::ParsePAT(tablehead_t* head,uint8_t *buffer,int size)
 
     // Check to see if you have already loaded all of the PAT sections
     // ISO 13818-1 state that PAT can be segmented, although it rarely is
-    if (!verifyPAT(head,buffer,size))
-    {
-        SIPARSER("Malformed PAT!");
-        return;
-    }
-
     if(((PATHandler*) Table[PAT])->Tracker.AddSection(head))
         return;
 
@@ -658,12 +652,6 @@ void SIParser::ParsePMT(tablehead_t* head, uint8_t* buffer, int size)
 {
     // TODO: Catch serviceMove descriptor and send a signal when you get one
     //       to retune to correct transport or send an error tuning the channel
-
-    if (!verifyPMT(buffer,size))
-    {
-        SIPARSER("Malformed PMT!");
-        return;
-    }
 
     if (Table[PMT]->AddSection(head,head->table_id_ext,0))
         return;
@@ -2151,6 +2139,7 @@ void SIParser::ParseVCT(tablehead_t* head, uint8_t* buffer, int size)
 {
 
 // Prerequisites: MGT, and CHANNEL_ETT
+    (void) size;
 
     emit TableLoaded();
 
@@ -2172,6 +2161,7 @@ void SIParser::ParseVCT(tablehead_t* head, uint8_t* buffer, int size)
 
         uint16_t major_channel_number = ((buffer[pos+14] & 0x0F) >> 2) | ((buffer[pos+15] & 0xFC) >> 2);
         uint16_t minor_channel_number = (buffer[pos+15] & 0x03) << 2 | (buffer[pos+16]);
+        uint8_t modulation = buffer[pos+17];
         s.ChanNum = (major_channel_number * 10) + minor_channel_number;
 
         s.TransportID = buffer[pos+22] << 8 | buffer[pos+23];
@@ -2185,15 +2175,21 @@ void SIParser::ParseVCT(tablehead_t* head, uint8_t* buffer, int size)
 
         s.ATSCSourceID = buffer[pos+28] << 8 | buffer[pos+29];
 #ifdef USING_DVB_EIT
-        Table[EVENTS]->RequestEmit(s.ATSCSourceID);
+        /* Do not add in Analog Channels in the VCT */
+        if (modulation != 1)
+            Table[EVENTS]->RequestEmit(s.ATSCSourceID);
 #endif
 
         s.Version = head->version;
         s.ServiceType = 1;
         s.EITPresent = 1;
 
-        SIPARSER(QString("Found Channel %1-%2 - %3 CAStatus=%4").arg(major_channel_number)
-                 .arg(minor_channel_number).arg(s.ServiceName).arg(s.CAStatus));
+        SIPARSER(QString("Found Channel %1-%2 - %3 CAStatus=%4 Modulation=%5")
+                 .arg(major_channel_number)
+                 .arg(minor_channel_number)
+                 .arg(s.ServiceName)
+                 .arg(s.CAStatus)
+                 .arg(modulation));
 
         uint16_t descriptors_length = (buffer[pos+30] & 0x02) << 8 | buffer[pos+31];
 
@@ -2217,8 +2213,9 @@ void SIParser::ParseVCT(tablehead_t* head, uint8_t* buffer, int size)
 
         pos += (32 + descriptors_length);
 
-        /* TODO: Need different method to detect analog channels in the VCT */
-        ((ServiceHandler*) Table[SERVICES])->Services[0][s.ServiceID] = s;
+        /* Do not add in Analog Channels in the VCT */
+        if (modulation != 1)
+            ((ServiceHandler*) Table[SERVICES])->Services[0][s.ServiceID] = s;
         s.Reset();
 
     }
@@ -2227,10 +2224,6 @@ void SIParser::ParseVCT(tablehead_t* head, uint8_t* buffer, int size)
     Table[EVENTS]->DependencyMet(SERVICES);
 
     emit FindServicesComplete();
-
-    (void)head;
-    (void)buffer;
-    (void)size;
 }
 
 /*
@@ -2455,136 +2448,6 @@ void SIParser::ParseDescriptorATSCContentAdvisory(uint8_t* buffer, int size)
     }
 
 }
-
-// TO BE WRITTEN
-
-/*------------------------------------------------------------------------
- *   TABLE VERIFIERS - These need to be re-written or placed into the Parse
- *                     functions
- *------------------------------------------------------------------------*/
-
-bool SIParser::verifyPAT(tablehead_t* head, uint8_t *data, int len)
-{
-    (void) data;
-
-    // Verify the length the table suggests is really the length
-    if (head->section_length != (len + 5))
-        return false;
-
-    // Make sure the length a multiple of four
-    if (len %4 != 0)
-        return false;
-
-    return true;
-}
-
-bool SIParser::verifySDT(uint8_t *buf, int len)
-{
-    if (len < 10)
-        return false;
-
-    if (WORD(buf[1] & 0x0f, buf[2]) >= 1021)
-        return false;
-    if (len >= 1024)
-        return false;
-    if (!(buf[5] & 0x01))
-        return false;
-
-    int pos = 11;
-     while(pos + 5 < len)
-    {
-    uint16_t dlen = WORD(buf[pos+3] & 0xf, buf[pos+4]);
-
-    pos += 5;
-    while (dlen > 0)
-    {
-      dlen -= 2 + buf[pos+1];
-      pos += 2 + buf[pos+1];
-      if (pos > len)
-        return false;
-    }
-
-    if (dlen != 0)
-      return false;
-  }
-
-  pos += 4;
-  if (len != pos)
-    return false;
-
-  return true;
- }
-
-bool SIParser::verifyNIT(uint8_t *buf, int len)
- {
-  if (len < 10)
-    return false;
-
-  uint16_t nd_len = WORD(buf[8] & 0xf, buf[9]);
-
-  int pos = 10;
-  while (pos < nd_len + 10)
-    pos += 2 + buf[pos+1];
-
-  if (pos != nd_len + 10)
-    return false;
-
-  pos += 2;
-  while (pos + 6 < len)
-  {
-    uint16_t td_len = WORD(buf[pos+4] & 0x0f, buf[pos+5]);
-    pos += 6;
-    while (td_len > 0)
-    {
-      td_len -= 2 + buf[pos+1];
-      pos += 2 + buf[pos+1];
-    }
-    if (td_len != 0)
-      return false;
-  }
-
-  pos += 4;
-  if (pos != len)
-    return false;
-
-  return true;
- }
-
-bool SIParser::verifyPMT(uint8_t *data, int len)
-{
-  if (len < 4)
-    return false;
-
-  int pinfo_len = (data[2] & 0x0f) << 8 | data[3];
-  int pos = 4;
-
-  while (pos < pinfo_len + 4)
-    pos += 2 + data[pos+1];
-
-  if (pos != pinfo_len + 4)
-    return false;
-
-  while (pos + 5 < len)
-  {
-    int es_len = (data[pos+3] & 0x0f) << 8 | data[pos+4];
-    pos += 5;
-    while (es_len > 0)
-    {
-      es_len -= 2 + data[pos+1];
-      pos += data[pos+1];
-      pos += 2;
-    }
-    if (es_len != 0)
-      return false;
-  }
-
-  pos += 4; /* crc */
-
-  if (pos != len)
-    return false;
-
-  return true;
- }
 
 /*------------------------------------------------------------------------
  * Huffman Text Decompressors - 1 and 2 level routines. Tables defined in
