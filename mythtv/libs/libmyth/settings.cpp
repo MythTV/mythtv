@@ -147,7 +147,7 @@ int Settings::ReadSettings(QString pszFile)
                 if (strType == "flt" || strType == "int" || strType == "str")
                     strKey = line.mid(4, nSplitPoint - 4);
                 else
-                    strKey = = line.mid(0, nSplitPoint);
+                    strKey = line.mid(0, nSplitPoint);
 
                 strVal = line.mid(nSplitPoint + 1, strLine.size());
 
