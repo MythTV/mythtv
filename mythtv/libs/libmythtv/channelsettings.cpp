@@ -103,9 +103,9 @@ public:
     };
 };
 
-class TVFormat: public ComboBoxSetting, public CSetting {
+class ChannelTVFormat: public ComboBoxSetting, public CSetting {
 public:
-    TVFormat(const ChannelID& id):
+    ChannelTVFormat(const ChannelID& id):
        ComboBoxSetting(), CSetting(id, "tvformat") {
        setLabel("TV Format");
        setHelpText("If this channel uses a format other than TV Format "
@@ -521,7 +521,7 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID& id)
 
     VerticalConfigurationGroup* right = new VerticalConfigurationGroup(false, true);
     right->addChild(new Source(id));
-    right->addChild(new TVFormat(id));
+    right->addChild(new ChannelTVFormat(id));
     right->addChild(new Rank(id));
     group1->addChild(right);
 
