@@ -475,7 +475,7 @@ void DataDirectProcessor::grabData(bool plineupsOnly, QDateTime pstartDate,
 
     QString command = QString("wget --http-user='%1' --http-passwd='%2' "
                               "--post-file='%3' --header='Accept-Encoding:gzip'"
-                              " %4 --output-document=- | gzip -d")
+                              " %4 --output-document=- | gzip -df")
                              .arg(getUserID())
                              .arg(getPassword())
                              .arg(tmpfilename)
