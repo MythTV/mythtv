@@ -998,15 +998,18 @@ QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
                 return ret;
         }
 
-        QString tmpfilename = filename;
-        tmpfilename.remove(0, d->m_themepathname.length());
-        cachefilepath = d->themecachedir + tmpfilename;
-        cachecheck.setName(cachefilepath);
-        if (cachecheck.exists())
+        if (filename.length() > d->m_themepathname.length())
         {
-            QImage *ret = new QImage(cachefilepath);
-            if (ret)
-                return ret;
+            QString tmpfilename = filename;
+            tmpfilename.remove(0, d->m_themepathname.length());
+            cachefilepath = d->themecachedir + tmpfilename;
+            cachecheck.setName(cachefilepath);
+            if (cachecheck.exists())
+            {
+                QImage *ret = new QImage(cachefilepath);
+                if (ret)
+                    return ret;
+            }
         }
     }
 
@@ -1054,7 +1057,7 @@ QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
 }
 
 QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache) 
-{ 
+{
     if (filename.left(5) == "myth:")
         return NULL;
 
@@ -1074,15 +1077,18 @@ QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache)
                 return ret;
         }
 
-        QString tmpfilename = filename;
-        tmpfilename.remove(0, d->m_themepathname.length());
-        cachefilepath = d->themecachedir + tmpfilename;
-        cachecheck.setName(cachefilepath);
-        if (cachecheck.exists())
+        if (filename.length() > d->m_themepathname.length())
         {
-            QPixmap *ret = new QPixmap(cachefilepath);
-            if (ret)
-                return ret;
+            QString tmpfilename = filename;
+            tmpfilename.remove(0, d->m_themepathname.length());
+            cachefilepath = d->themecachedir + tmpfilename;
+            cachecheck.setName(cachefilepath);
+            if (cachecheck.exists())
+            {
+                QPixmap *ret = new QPixmap(cachefilepath);
+                if (ret)
+                    return ret;
+            }
         }
     }
 
@@ -1094,7 +1100,7 @@ QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache)
         if (!checkFile.exists())
             filename = baseDir + fi.fileName();
     }
-              
+        
     QPixmap *ret = new QPixmap();
 
     int width, height;
