@@ -731,7 +731,7 @@ bool DVDProbe::probe()
                                 new_title->setSize(720, c_height);
                                 break;
                             case 1:
-                                new_title->setSize(040, c_height);
+                                new_title->setSize(704, c_height);
                                 break;
                             case 2:
                                 new_title->setSize(352, c_height);
