@@ -1106,6 +1106,20 @@ void NuppelVideoPlayer::SetAudiotime(void)
     pthread_mutex_unlock(&audio_buflock);
 }
 
+bool NuppelVideoPlayer::isValidFrametype(char type)
+{
+    switch (type)
+    {
+        case 'A': case 'V': case 'S': case 'T': case 'R': case 'X':
+        case 'M': case 'D':
+            return true;
+        default:
+            return false;
+    }
+
+    return false;
+}
+
 void NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
 {
     int gotvideo = 0;
@@ -1130,10 +1144,7 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
             return;
         }
 
-        while (frameheader.frametype != 'A' && frameheader.frametype != 'V' &&
-               frameheader.frametype != 'S' && frameheader.frametype != 'T' &&
-               frameheader.frametype != 'R' && frameheader.frametype != 'X' &&
-               frameheader.frametype != 'M' && frameheader.frametype != 'D')
+        while (!isValidFrametype(frameheader.frametype))
         {
             ringBuffer->Seek((long long)seeklen-FRAMEHEADERSIZE, SEEK_CUR);
 
@@ -3297,19 +3308,29 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
 
     long long int maxRead = 200000000;
 
+    struct stat st;
+    if (stat(ringBuffer->GetFilename().ascii(), &st) == 0 && 
+        st.st_size < maxRead)
+    {
+        maxRead = st.st_size - 1024 * 1024;
+    }
+
     bool frame = false;
 
     long long keyPos = -1;
 
-    if (positionMap->find(desiredKey / keyframedist) != positionMap->end())
+    if (positionMap && 
+        positionMap->find(desiredKey / keyframedist) != positionMap->end())
+    {
         keyPos = (*positionMap)[desiredKey / keyframedist];
+    }
 
     GetFrame(1);
 
     if (mpa_codec)
         avcodec_flush_buffers(mpa_ctx);
 
-    if (keyPos != -1)
+    if (keyPos > 0)
     {
         long long diff = keyPos - ringBuffer->GetTotalReadPosition();
   
@@ -3342,6 +3363,12 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
                 framesPlayed++;
             }
 
+            if (!isValidFrametype(frameheader.frametype))
+            {
+                fileend = true;
+                break;
+            }
+
             if (frameheader.frametype != 'R' && frameheader.packetlength > 0)
             {
                 fileend = (ringBuffer->Read(strm, frameheader.packetlength) !=
@@ -3349,7 +3376,10 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
             }
 
             if (ringBuffer->GetTotalReadPosition() > maxRead)
+            {
+                fileend = true;
                 break;
+            }
         }
     }
 

@@ -213,6 +213,8 @@ class NuppelVideoPlayer
     void SetBlankIter(void);
     void SetCommBreakIter(void);
 
+    bool isValidFrametype(char type);
+
     int audiofd;
 
     QString filename;
