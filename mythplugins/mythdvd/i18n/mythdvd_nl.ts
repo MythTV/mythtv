@@ -3,19 +3,19 @@
     <name>DVDRipBox</name>
     <message>
         <source>Your connection to the Myth Transcoding Daemon has gone away. This is not a good thing.</source>
-        <translation>Probleem: Uw verbinding met het Transcode Programma is weg. </translation>
+        <translation>De verbinding met MTD is verbroken. Dit is niet goed.</translation>
     </message>
     <message>
         <source>Cannot connect to your Myth Transcoding Daemon. You can try hitting any number key to start it. If you still see this message, then something is really wrong.</source>
-        <translation>Kan geen verbinding krijgen met het Transcode Programma. Probeer het op te starten door op een nr. toets te drukken. Als dit bericht blijft staan is er iets ernstig fout.</translation>
+        <translation>Kan geen verbinding maken met MTD. Probeer MTD te starten door op een nr. toets te drukken. Als dit bericht blijft staan is er iets ernstig fout.</translation>
     </message>
     <message>
         <source>Attempting to connect to your mtd said host not found. This is unrecoverably bad. </source>
-        <translation>Kan geen verbinding maken met het Transcode Programma</translation>
+        <translation>Kan geen verbinding maken met MTD.</translation>
     </message>
     <message>
         <source>Socket communication errors. This is unrecoverably bad. </source>
-        <translation>Netwerk error.</translation>
+        <translation>Netwerk error (socket-communicatie).</translation>
     </message>
     <message>
         <source>Something is wrong, but I don&apos;t know what.</source>
@@ -27,27 +27,27 @@
     </message>
     <message>
         <source>No jobs and nothing else to do. You could hit 0 to rip a DVD.</source>
-        <translation>Geen taken. Druk 0 om een DVD te &quot;Rippen&quot;.</translation>
+        <translation>Geen taken. Druk 0 om een DVD te &quot;rippen&quot;.</translation>
     </message>
     <message>
         <source>No Jobs. Checking and/or waiting for DVD.</source>
-        <translation>Geen taken. Bezig met controleren/wachten op DVD.</translation>
+        <translation>Geen taken. Bezig met controleren en/of wachten op DVD.</translation>
     </message>
     <message>
         <source>No jobs and nothing else to do. You could hit 0 to rip a disc if you like.</source>
-        <translation>Geen taken. Druk 0 om een CD te &quot;Rippen&quot;.</translation>
+        <translation>Geen taken. Druk 0 om een CD te &quot;rippen&quot;.</translation>
     </message>
     <message>
         <source>Cancelling ...</source>
-        <translation>Bezig met anuleren...</translation>
+        <translation>Bezig met annuleren...</translation>
     </message>
     <message>
         <source>0 New Rip</source>
-        <translation>0 Nieuwe Rip</translation>
+        <translation>0 Nieuwe rip</translation>
     </message>
     <message>
         <source>9 Cancel Job</source>
-        <translation>9 Anuleer taak</translation>
+        <translation>9 Annuleer taak</translation>
     </message>
 </context>
 <context>
@@ -58,12 +58,12 @@
 You have no VCD Player command defined.</source>
         <translation>
         
-Geen VCD afpeel commando gedefinieerd.
+U heeft geen VCD-afspeelcommando gedefinieerd.
 </translation>
     </message>
     <message>
         <source>OK, I&apos;ll go run Setup</source>
-        <translation>Ik ga naar het Instelling scherm.</translation>
+        <translation>OK, ik ga naar het Instellingen-scherm</translation>
     </message>
     <message>
         <source>
@@ -71,7 +71,7 @@ Geen VCD afpeel commando gedefinieerd.
 You have no VCD Device defined.</source>
         <translation>
 
-Er is geen VCD lezer ingesteld.</translation>
+Er is geen VCD-apparaat ingesteld.</translation>
     </message>
     <message>
         <source>
@@ -79,7 +79,7 @@ Er is geen VCD lezer ingesteld.</translation>
 You have no DVD Player command defined.</source>
         <translation>
 
-Geen DVD afpeel commando gedefinieerd.
+U heeft geen DVD-afspeelcommando gedefinieerd.
 </translation>
     </message>
     <message>
@@ -88,20 +88,20 @@ Geen DVD afpeel commando gedefinieerd.
 You have no DVD Device defined.</source>
         <translation>
 
-Er is geen VCD lezer ingesteld.
+Er is geen DVD-apparaat ingesteld.
 </translation>
     </message>
     <message>
         <source>Location of VCD device</source>
-        <translation>Path naar VCD lezer</translation>
+        <translation>Path naar VCD-apparaat</translation>
     </message>
     <message>
         <source>This device must exist, and the user running MythDVD needs to have read permission on the device.</source>
-        <translation>Deze lezer moet bestaan en de juister permissies moeten ingesteld worden.</translation>
+        <translation>Dit apparaat moet bestaan en de gebruiker moet leesbevoegdheid hebben.</translation>
     </message>
     <message>
         <source>Location of DVD device</source>
-        <translation>Path naar DVD lezer</translation>
+        <translation>Path naar DVD-apparaat</translation>
     </message>
     <message>
         <source>General Settings</source>
@@ -109,27 +109,27 @@ Er is geen VCD lezer ingesteld.
     </message>
     <message>
         <source>DVD Player Command</source>
-        <translation>DVD afspeel commando</translation>
+        <translation>DVD-afspeelcommando</translation>
     </message>
     <message>
         <source>This can be any command to launch a DVD player (e.g. MPlayer, ogle, etc.). If present, %d will be substituted for the DVD device (e.g. /dev/dvd).</source>
-        <translation>Dit kan elke DVD speler zijn (bvb. MPlayer, ogle, xine). %d wordt vervangen door het hierboven ingestelde DVD lezer.</translation>
+        <translation>Dit kan elke DVD-speler zijn (bv. MPlayer, ogle, xine, enz.). %d wordt vervangen door het hierboven ingestelde DVD-apparaat (bv. /dev/dvd).</translation>
     </message>
     <message>
         <source>VCD Player Command</source>
-        <translation>VCD Afspeel commando</translation>
+        <translation>VCD-afspeelcommando</translation>
     </message>
     <message>
         <source>This can be any command to launch a VCD player (e.g. MPlayer, xine, etc.). If present, %d will be substituted for the VCD device (e.g. /dev/cdrom).</source>
-        <translation>Dit kan elke VCD speler zijn (bvb. MPlayer, xine). %d wordt vervangen door het hierboven ingestelde VCD lezer.</translation>
+        <translation>Dit kan elke VCD-speler zijn (bv. MPlayer, xine, enz). %d wordt vervangen door het hierboven ingestelde VCD-apparaat (bv. /dev/cdrom).</translation>
     </message>
     <message>
         <source>DVD Player Settings</source>
-        <translation>DVD afspeel Instellingen</translation>
+        <translation>DVD-afspeelinstellingen</translation>
     </message>
     <message>
         <source>VCD Player Settings</source>
-        <translation>VCD afspeel Instellingen</translation>
+        <translation>VCD-afspeelinstellingen</translation>
     </message>
     <message>
         <source>Directory to hold temporary files</source>
@@ -137,7 +137,7 @@ Er is geen VCD lezer ingesteld.
     </message>
     <message>
         <source>This directory must exist, and the user running MythDVD needs to have write permission to the directory.</source>
-        <translation>Deze map moet bestaan en de juister permissies moeten ingesteld worden.</translation>
+        <translation>Deze map moet bestaan en de gebruiker moet schrijfbevoegdheid tot deze map hebben.</translation>
     </message>
     <message>
         <source>Title Playing Command</source>
@@ -145,79 +145,79 @@ Er is geen VCD lezer ingesteld.
     </message>
     <message>
         <source>This is a command used to preview a given title on a DVD. If present %t will be set to the title, %d for device, %a for audio track, %c for audio channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit commando wordt gebruikt om de geselecteerde titel vooraf af te spelen. Indien aanwezig wordt %t vervangen door titel, %d door apparaat, %a door audiospoor en %c door audiokanaal.</translation>
     </message>
     <message>
         <source>Subtitle arguments:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ondertitel argument:</translation>
     </message>
     <message>
         <source>If you choose any subtitles for ripping, this command is added to the end of the Title Play Command to allow previewing of subtitles. If  present %s will be set to the subtitle track. </source>
-        <translation type="unfinished"></translation>
+        <translation>Wanneer er ondertitels gekozen werden, wordt dit commando toegevoegd aan het afspeelcommando om ondertitels vooraf te bekijken. Indien aanwezig wordt %s vervangen door ondertiteltrack.</translation>
     </message>
     <message>
         <source>Base transcode command</source>
-        <translation type="unfinished"></translation>
+        <translation>Basis transcode-commando</translation>
     </message>
     <message>
         <source>This is the base (without arguments) command to run transcode on your system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit is het basiscommando (zonder argumenten) om transcode te starten.</translation>
     </message>
     <message>
         <source>MTD port number</source>
-        <translation type="unfinished"></translation>
+        <translation>MTD-poortnummer</translation>
     </message>
     <message>
         <source>The port number that should be used for communicating with the MTD (Myth Transcoding Daemon)</source>
-        <translation type="unfinished"></translation>
+        <translation>Het poortnummer dat gebruikt wordt voor communicatie met MTD (Myth Transcoding Daemon)</translation>
     </message>
     <message>
         <source>MTD logs to terminal window</source>
-        <translation type="unfinished"></translation>
+        <translation>MTD logt naar het terminalvenster</translation>
     </message>
     <message>
         <source>If set, the MTD (Myth Transcoding Daemon) will log to the window it is started from. Otherwise, it will write to a file called  mtd.log in the top level ripping directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien geselecteerd, zal MTD naar het terminalvenster waaruit het gestart werd loggen. Anders wordt er een bestand aangemaakt (mtd.log) in de rip-map.</translation>
     </message>
     <message>
         <source>Transcode AC3 Audio</source>
-        <translation type="unfinished"></translation>
+        <translation>Transcode AC3-audio</translation>
     </message>
     <message>
         <source>If set, the MTD (Myth Transcoding Daemon) will, by default, preserve AC3 (Dolby Digital) audio in transcoded files. </source>
-        <translation type="unfinished"></translation>
+        <translation>Indien geselecteerd, zal MTD AC3-audio (Dolby Digital) standaard in de uiteindelijke bestanden bewaren.</translation>
     </message>
     <message>
         <source>Use xvid rather than divx</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruik liever xvid dan divx</translation>
     </message>
     <message>
         <source>If set, mythdvd will use the (open, free) xvid codec rather than divx whenever possible.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien geselecteerd, zal MTD de (open, vrije) xvid-codec gebruiken i.pv. divx waar mogelijk.</translation>
     </message>
     <message>
         <source>Nice level for MTD</source>
-        <translation type="unfinished"></translation>
+        <translation>Nice level voor MTD</translation>
     </message>
     <message>
         <source>This determines the priority of the Myth Transcoding Daemon. Higher numbers mean lower priority (more CPU to other tasks).</source>
-        <translation type="unfinished"></translation>
+        <translation>Bepaalt de prioriteit voor MTD. Een hoger cijfer betekent lagere prioriteit (meer CPU naar andere taken).</translation>
     </message>
     <message>
         <source>Ripped video segments</source>
-        <translation type="unfinished"></translation>
+        <translation>Geripte video-segmenten</translation>
     </message>
     <message>
         <source>If set to something other than 0, ripped video titles will be broken up into files of this size (in MB). Applies to both perfect quality recordings and intermediate files used for transcoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wanneer ingesteld op iets anders dan 0, zullen geripte video-bestanden opgedeeld worden in bestanden van dit formaat (in MB). Zowel voor &quot;perfecte kwaliteit&quot; als &quot;gemiddelde kwaliteit&quot;.</translation>
     </message>
     <message>
         <source>DVD Ripper Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD-ripper instellingen</translation>
     </message>
     <message>
         <source>MTD Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>MTD instellingen</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -229,7 +229,7 @@ Er is geen VCD lezer ingesteld.
     </message>
     <message>
         <source>Ripping to file ~</source>
-        <translation>Bezig met copieren ~</translation>
+        <translation>Bezig met importeren ~</translation>
     </message>
     <message>
         <source>Perfect DVD Rip of %1</source>
@@ -241,19 +241,19 @@ Er is geen VCD lezer ingesteld.
     </message>
     <message>
         <source>Waiting for Permission to Start Transcoding</source>
-        <translation>Wacht op toelating op te beginnen met Transcode</translation>
+        <translation>Wacht op toestemming om te beginnen met transcode</translation>
     </message>
     <message>
         <source>Transcoding Pass 1 of 2 ~</source>
-        <translation>Transcode Pass 1 van 2</translation>
+        <translation>Transcode Pass 1 van 2 ~</translation>
     </message>
     <message>
         <source>Transcoding Pass 2 of 2 ~</source>
-        <translation>Transcode Pass 2 van 2</translation>
+        <translation>Transcode Pass 2 van 2 ~</translation>
     </message>
     <message>
         <source>Transcoding ~</source>
-        <translation>Bezig met Transcode ~</translation>
+        <translation>Bezig met transcode ~</translation>
     </message>
     <message>
         <source>Transcode is thinking </source>
@@ -261,42 +261,42 @@ Er is geen VCD lezer ingesteld.
     </message>
     <message>
         <source>Simultaneous Transcode Jobs</source>
-        <translation>Gelijktijdige Transcode Taken</translation>
+        <translation>Gelijktijdige Transcode-taken</translation>
     </message>
     <message>
         <source>This determines the number of simultaneous transcode jobs. If set at 1 (the default), there will only be one active job at a time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bepaalt het aantal gelijktijdige transcode taken. Indien 1 (standaard), zal er slechts een actieve taak zijn.</translation>
     </message>
     <message>
         <source>On DVD insertion</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Display mythdvd menu menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Bij invoer DVD</translation>
     </message>
     <message>
         <source>Do nothing</source>
-        <translation type="unfinished"></translation>
+        <translation>Doe niets</translation>
     </message>
     <message>
         <source>Play DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Speel DVD</translation>
     </message>
     <message>
         <source>Rip DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Importeer DVD</translation>
     </message>
     <message>
         <source>Media Monitoring should be turned on to allow this feature (Setup -&gt; General -&gt; CD/DVD Monitor</source>
-        <translation type="unfinished"></translation>
+        <translation>Media-monitoring moet geactiveerd zijn om dit toe te laten (Instellingen -&gt; Algemeen -&gt; CD/DVD Monitor)</translation>
+    </message>
+    <message>
+        <source>Display mythdvd menu</source>
+        <translation>Toon MythDVD menu</translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
         <source>Rip/Transcode</source>
-        <translation type="unfinished"></translation>
+        <translation>Importeer/Transcode</translation>
     </message>
     <message>
         <source>Job 1 of 1</source>
@@ -324,7 +324,7 @@ Er is geen VCD lezer ingesteld.
     </message>
     <message>
         <source>AC3 Audio:</source>
-        <translation>AC3 Geluid:</translation>
+        <translation>AC3-geluid:</translation>
     </message>
     <message>
         <source>Subtitles:</source>
@@ -332,11 +332,11 @@ Er is geen VCD lezer ingesteld.
     </message>
     <message>
         <source>View:</source>
-        <translation>Preview:</translation>
+        <translation>Bekijken:</translation>
     </message>
     <message>
         <source>0:00:00</source>
-        <translation type="unfinished"></translation>
+        <translation>0:00:00</translation>
     </message>
     <message>
         <source>Title 1 of 1</source>
@@ -355,7 +355,7 @@ Er is geen VCD lezer ingesteld.
     </message>
     <message>
         <source>Perfect</source>
-        <translation type="unfinished"></translation>
+        <translation>Perfect</translation>
     </message>
     <message>
         <source>None</source>
@@ -367,11 +367,11 @@ Er is geen VCD lezer ingesteld.
     </message>
     <message>
         <source>0 Process Selected Title</source>
-        <translation>0 Verwerk de geselecteerde Titel</translation>
+        <translation>0 Verwerk de geselecteerde titel</translation>
     </message>
     <message>
         <source>0 Process Selected Titles</source>
-        <translation>0 Verwerk de geselecteerde Titels</translation>
+        <translation>0 Verwerk de geselecteerde titels</translation>
     </message>
 </context>
 </TS>
