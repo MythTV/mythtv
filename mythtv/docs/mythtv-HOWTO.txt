@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-01-09, v1.067
+  2003-01-09, v1.068
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -191,8 +191,8 @@
   function, where the CPU is both encoding and decoding video
   simultaneously to allow Pause, Fast Forward and Rewind functions for
   live TV requires more CPU then just encoding or decoding.  mythtv also
-  supports multiple encoder cards in a single PC, increasing the CPU
-  requirements if you are going to simultaneously encode multiple
+  supports multiple encoder cards in a single PC, thereby increasing the
+  CPU requirements if you plan on simultaneously encoding multiple
   programs.
 
   Here are a few data points:
@@ -216,6 +216,12 @@
   jittery video.  Red Hat Linux 8.0 apparently does not enable DMA at
   boot time.  See the Troubleshooting Section for ``instructions'' on
   how to do this.
+
+  Mark Cooper  <mailto:mythtv-dev@mcooper.demon.co.uk> has setup a
+  hardware database at http://www.goldfish.org/~mcooper/pvrhw/
+  <http://www.goldfish.org/~mcooper/pvrhw/>.  The website will let you
+  browse what other users have reported as their hardware configuration,
+  and how happy they are with the results.
 
   [1m3.2.  Software.[0m
 
@@ -466,7 +472,6 @@
   you run setup or mythfilldatabase you will have to set a variable to
   correct this problem.  Failure to set this variable will result in a
   lot of UTF-8 errors.
-
   There are two modifications that you can make to your system to avoid
   this problem. The first is a system wide solution, the second will
   only apply to your current user.
@@ -1851,6 +1856,14 @@
        mysql> exit
        $
 
+  An example for Paris, France:
+
+       $ mysql -u root
+       mysql> use mythconverg;
+       mysql> insert into settings (value, data) VALUES ('locale','FRXX0076');
+       mysql> exit
+       $
+
   If you wish to use Celsius as the default:
 
        mysql> insert into settings (value, data) VALUES ('SIUnits', 'Yes');
@@ -1941,6 +1954,7 @@
   that it's not being used.  Since it's likely that watching TV will not
   generate keyboard or mouse events for a time, you need to turn off
   DPMS.  There are a few ways to do this.
+
   You can edit your /etc/X11/XF86Config-4 file, and look for:
 
        Section "Device"
@@ -1990,13 +2004,13 @@
   Now, you need to clear out the old versions of the software to ensure
   that you're running with the debugging code, then compile and install.
 
-  $ make clean
-  $ make distclean
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
+       $ make clean
+       $ make distclean
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
 
   At this point, you now have debug-enabled software ready.  Let's
   assume that the problem you're having is in the setup program.
@@ -2079,8 +2093,9 @@
   or the speakers.
 
   You may also want to ensure that /dev/dsp hasn't already been grabbed
-  by another process, like [1mesd[22m.  If /dev/dsp isn't available, then
-  mythtv won't work.
+  by another process, like [1mesd [22mor [1martsd[22m.  If /dev/dsp isn't available,
+  then mythtv won't work.  Check your windowmanager documentation for
+  instructions on disabling the sound manager.
 
   [1m18.  Miscellaneous.[0m
 
@@ -2100,11 +2115,11 @@
 
   Download the source to MPlayer and patch:
 
-  $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
-  $ tar -xjf MPlayer-0.90rc1.tar.bz2
-  $ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
-  $ cd MPlayer-0.90rc1
-  $ patch -p1 < mplayer-0.90pre10+mythtv.patch
+       $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
+       $ tar -xjf MPlayer-0.90rc1.tar.bz2
+       $ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
+       $ cd MPlayer-0.90rc1
+       $ patch -p1 < mplayer-0.90pre10+mythtv.patch
 
   At this point, you can read the MPlayer documentation and start the
   compile process.
@@ -2149,6 +2164,7 @@
 
   [1mTHERE IS NO GUARANTEE THAT THESE INSTRUCTIONS WILL WORK.  USE AT YOUR[0m
   [1mOWN RISK.[0m
+
   Here are some of the features in version 0.8:
 
   +o  A front-end and back-end system.  The back-end is responsible for
