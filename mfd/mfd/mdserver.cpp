@@ -24,6 +24,7 @@ MetadataServer::MetadataServer(MFD* owner, int port)
 {
     metadata_containers = new QPtrList<MetadataContainer>;
     metadata_audio_generation = 4;  //  don't ask
+    container_identifier = 0;
 }
 
 void MetadataServer::run()
@@ -180,7 +181,7 @@ Metadata* MetadataServer::getMetadataByUniversalId(uint universal_id)
     }
     
     int collection_id = universal_id / METADATA_UNIVERSAL_ID_DIVIDER;
-    int item_id = universal_id - collection_id;
+    int item_id = universal_id % METADATA_UNIVERSAL_ID_DIVIDER;
     
     //
     //  Find the collection
@@ -203,6 +204,7 @@ Metadata* MetadataServer::getMetadataByUniversalId(uint universal_id)
                 break; 
             }
         }
+
     unlockMetadata();        
     
     return return_value;
@@ -218,7 +220,7 @@ Playlist* MetadataServer::getPlaylistByUniversalId(uint universal_id)
     }
     
     int collection_id = universal_id / METADATA_UNIVERSAL_ID_DIVIDER;
-    int playlist_id = universal_id - collection_id;
+    int playlist_id = universal_id % METADATA_UNIVERSAL_ID_DIVIDER;
     
     //
     //  Find the collection
@@ -245,6 +247,88 @@ Playlist* MetadataServer::getPlaylistByUniversalId(uint universal_id)
     
     return return_value;
 }
+
+MetadataContainer* MetadataServer::createContainer(
+                                                    MetadataCollectionContentType content_type,
+                                                    MetadataCollectionLocationType location_type
+                                                  )
+{
+    MetadataContainer *return_value;
+    lockMetadata();
+        return_value = new MetadataContainer(parent, bumpContainerId(), content_type, location_type);
+        metadata_containers->append(return_value);
+    unlockMetadata();
+    
+    return return_value;
+}                                                                                                                                                        
+
+int MetadataServer::bumpContainerId()
+{
+    int return_value;
+
+    container_identifier_mutex.lock();
+        ++container_identifier;
+        return_value = container_identifier;
+    container_identifier_mutex.unlock();
+    
+    return return_value;
+}
+
+void MetadataServer::doAtomicDataSwap(
+                                        MetadataContainer *which_one,
+                                        QIntDict<Metadata>* new_metadata,
+                                        QIntDict<Playlist>* new_playlists
+                                     )
+{
+    //
+    //  Lock the metadata, find the right container, and swap out its data.
+    //  The idea is that a plugin can take as long as it wants to build a
+    //  new metadata collection, but this call (which has the needed locks)
+    //  is very quick. Thus the name.
+    //
+
+    lockMetadata();
+
+        MetadataContainer *target = NULL;
+        MetadataContainer *a_container;
+        for (
+                a_container = metadata_containers->first(); 
+                a_container; 
+                a_container = metadata_containers->next()
+            )
+        {
+            if(a_container == which_one)
+            {
+                target = a_container;
+                break; 
+            }
+        }
+        
+        if(target)
+        {
+            cout << "I'm supposed to swap the data with "
+                 << new_metadata->count() 
+                 << " items and "
+                 << new_playlists->count()
+                 << " playlists "
+                 << endl;
+                 
+            target->dataSwap(new_metadata, new_playlists);
+            if(target->isAudio())
+            {
+                metadata_audio_generation_mutex.lock();
+                    ++metadata_audio_generation;
+                metadata_audio_generation_mutex.unlock();
+            }
+        }
+        else
+        {
+            //  Crap!
+        }
+        
+    unlockMetadata();
+}
+
 
 MetadataServer::~MetadataServer()
 {

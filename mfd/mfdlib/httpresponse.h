@@ -6,8 +6,7 @@
 	(c) 2003 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
-	Headers for an object to build http responses
-
+	Headers for an object to build http responses and send them
 */
 
 #include <vector>

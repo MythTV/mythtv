@@ -26,18 +26,20 @@ INFORMATION FOR DEVELOPERS
 --------------------------
 
     The mfd is not terribly complicated. There is a core little object
-(called MFD) that main() creates and hands over control to. It handles
-metadata (a collection of MetadataContainers) and loads in plugins. Plugins
-can either present their own (socket-based) interface to the world, or get
-passed commands that begin with a given token from the mfd. For example, the
-audio plugin has it's own interface, while the dummy plugin just uses the
-mfd's interface and asks for any string of command tokens that begin with
-the term "dummy". The former is called a "service", the latter a
-"capability".
+(called MFD) that main() creates and hands over control to. It creates a
+metadata server to be the holding pen for all metadata (a collection of
+MetadataContainers). It also creates a plugin manager. Plugins can either
+present their own (socket-based) interface to the world, or get passed
+commands that begin with a given token from the mfd. For example, the audio
+plugin has it's own interface, while the dummy plugin just uses the mfd's
+interface and asks for any string of command tokens that begin with the term
+"dummy". The former is called a "service", the latter a "capability".
 
 Every plugin (can! must?) run as a separate thread. They can and do create
-their own sub-threads. Any information they want to pass up to the mfd is
-send by QCustomEvents (see mfd_events.h/.cpp in mfdlib).
+their own sub-threads. Most information they want to pass up to the mfd is
+send by QCustomEvents (see mfd_events.h/.cpp in mfdlib). If they need to
+describe metadata (appearance of, changes in), they get a pointer to the
+MetadataServer and make calls on it.
 
 The mfd itself speaks a protocol called mfdp (mfd protocol). This is a
 classic example of YAMUP (yet another made up protocol). The audio plugin

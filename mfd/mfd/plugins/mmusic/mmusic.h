@@ -42,6 +42,9 @@ class MMusicWatcher: public MFDServicePlugin
 
   private:
   
+    int             bumpMetadataId();
+    int             bumpPlaylistId();
+  
     QTime           metadata_sweep_time;
     bool            first_time;
     bool            force_sweep;
@@ -49,11 +52,19 @@ class MMusicWatcher: public MFDServicePlugin
     QSqlDatabase    *db;
 
     QMutex              metadata_mutex;
+
     QIntDict<Metadata>  *current_metadata;
     QIntDict<Metadata>  *new_metadata;
-    QIntDict<Playlist>  *current_playlists;
-    MetadataServer      *metadata_server;
 
+    QIntDict<Playlist>  *current_playlists;
+    QIntDict<Playlist>  *new_playlists;
+    
+    MetadataServer      *metadata_server;
+    MetadataContainer   *metadata_container;
+    int                  container_id;
+
+    int                  metadata_id;
+    int                  playlist_id;
 };
 
 

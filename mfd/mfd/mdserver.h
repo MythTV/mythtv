@@ -47,8 +47,19 @@ class MetadataServer : public MFDServicePlugin
 
     Metadata*                    getMetadataByUniversalId(uint id);
     Playlist*                    getPlaylistByUniversalId(uint id);
+    
 
 
+    MetadataContainer*           createContainer(
+                                                    MetadataCollectionContentType content_type, 
+                                                    MetadataCollectionLocationType location_type
+                                                );
+
+    void                         doAtomicDataSwap(
+                                                    MetadataContainer *which_one,
+                                                    QIntDict<Metadata>* new_metadata,
+                                                    QIntDict<Playlist>* new_playlists
+                                                 );
 
     //uint                         getMetadataVideoGeneration(){return metadata_video_generation;}
     //int                          bumpMetadataId();
@@ -65,6 +76,9 @@ class MetadataServer : public MFDServicePlugin
 
   private:
 
+    int                          bumpContainerId();
+
+
     QPtrList<MetadataContainer> *metadata_containers;
     QMutex                      metadata_mutex;
     QMutex                      playlists_mutex;
@@ -72,7 +86,8 @@ class MetadataServer : public MFDServicePlugin
     QMutex                      metadata_audio_generation_mutex;
     uint                        metadata_audio_generation;
 
-    //int                         metadata_container_identifier;
+    int                         container_identifier;
+    QMutex                      container_identifier_mutex;
 
     //uint                        metadata_video_generation;
     

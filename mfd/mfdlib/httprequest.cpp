@@ -68,7 +68,8 @@ HttpRequest::HttpRequest(MFDHttpPlugin *owner, char *raw_incoming, int incoming_
         {
             //  
             //  First line of an http request is pretty important ... do
-            //  some checking that things are sane GET /server-info HTTP/1.1
+            //  some checking that things are sane 
+            //  (ie. GET /some_url HTTP/1.1)
             //
             
             raw_request_line = QString(parsing_buffer);

@@ -124,6 +124,12 @@ Playlist* MetadataContainer::getPlaylist(int pl_id)
     return NULL;
 }
 
+void MetadataContainer::dataSwap(QIntDict<Metadata>* new_metadata, QIntDict<Playlist>* new_playlists)
+{
+    current_metadata = new_metadata;
+    current_playlists = new_playlists;
+}
+
 MetadataContainer::~MetadataContainer()
 {
 }
@@ -131,6 +137,8 @@ MetadataContainer::~MetadataContainer()
 /*
 ---------------------------------------------------------------------
 */
+
+/*
 
 MetadataMythDBContainer::MetadataMythDBContainer(
                                         MFD *l_parent, 
@@ -160,7 +168,7 @@ MetadataMythDBContainer::MetadataMythDBContainer(
     current_metadata = NULL;
 }
 
-/*
+
 bool MetadataMythDBContainer::tryToUpdate()
 {
     parent->lockMetadata();
@@ -187,9 +195,10 @@ bool MetadataMythDBContainer::tryToUpdate()
     }
     return return_value;
 }
-*/
+
 
 MetadataMythDBContainer::~MetadataMythDBContainer()
 {
 }
 
+*/

@@ -41,11 +41,20 @@ MMusicWatcher::MMusicWatcher(MFD *owner, int identity)
     current_metadata = new QIntDict<Metadata>;
     current_metadata->setAutoDelete(true);
     new_metadata = NULL;
+    metadata_id = 1;
 
     current_playlists = new QIntDict<Playlist>;
     current_playlists->setAutoDelete(true);
+    new_playlists = NULL;
+    playlist_id = 1;
 
-
+    //
+    //  Put these collections into a new container that the metadata server
+    //  provides us
+    //
+    
+    metadata_container = metadata_server->createContainer(MCCT_audio, MCLT_host);
+    container_id = metadata_container->getIdentifier();
 }
 
 void MMusicWatcher::run()
@@ -74,8 +83,8 @@ void MMusicWatcher::run()
         //  set force sweep on.
         //
 
-        if( metadata_sweep_time.elapsed() >  5000 || force_sweep)
-        //if( metadata_sweep_time.elapsed() >  300000 || force_sweep)
+        //if( metadata_sweep_time.elapsed() >  5000 || force_sweep)
+        if( metadata_sweep_time.elapsed() >  300000 || force_sweep)
         {
             //
             //  Check to see if anything has changed
@@ -83,6 +92,12 @@ void MMusicWatcher::run()
             
             if(sweepMetadata())
             {
+                //
+                //  Do the atomic switchero (sing it with me now ...)
+                //
+                
+                metadata_server->doAtomicDataSwap(metadata_container, new_metadata, new_playlists);
+
                 //
                 //  Something changed. Fire off an event (this will tell the
                 //  container "above" me that it's time to update
@@ -125,6 +140,7 @@ bool MMusicWatcher::sweepMetadata()
     sweep_timer.start();
     log("beginning content sweep", 3);
     bool something_changed = false;
+
     if(first_time)
     {
         //
@@ -149,7 +165,8 @@ bool MMusicWatcher::sweepMetadata()
 
         QSqlQuery pl_query = db->exec(pl_query_string);
 
-
+        new_playlists = new QIntDict<Playlist>;
+        
                                                                                                                                                                                                                                                                                                                                      
         
         if(pl_query.isActive())
@@ -159,13 +176,13 @@ bool MMusicWatcher::sweepMetadata()
                 while(pl_query.next())
                 {
                     Playlist *new_playlist = new Playlist(
-                                                            1, // container id when that works
+                                                            container_id,
                                                             pl_query.value(0).toString(), 
                                                             pl_query.value(1).toString(),
-                                                            1, //->bumpPlaylistId(), 
+                                                            bumpPlaylistId(), 
                                                             pl_query.value(2).toUInt()
                                                          );
-                    current_playlists->insert(new_playlist->getId(), new_playlist);
+                    new_playlists->insert(new_playlist->getId(), new_playlist);
                 }
             }
             else
@@ -320,6 +337,9 @@ bool MMusicWatcher::sweepMetadata()
         new_metadata = new QIntDict<Metadata>;
         new_metadata->setAutoDelete(true);
     
+        new_playlists = new QIntDict<Playlist>;
+        new_playlists->setAutoDelete(true);
+    
         //
         //  Load the metadata
         //
@@ -352,8 +372,8 @@ bool MMusicWatcher::sweepMetadata()
 
                 AudioDBMetadata *new_audio = new AudioDBMetadata
                                     (
-                                        1, // container id when that works
-                                        1, //parent->bumpMetadataId(),
+                                        container_id,
+                                        bumpMetadataId(),
                                         query.value(0).toInt(),
                                         QUrl(startdir + query.value(8).toString()),
                                         query.value(9).toInt(),
@@ -379,7 +399,7 @@ bool MMusicWatcher::sweepMetadata()
             //  metadata id's that exist now in memory
             //
             
-            QIntDictIterator<Playlist> pl_it( *current_playlists );
+            QIntDictIterator<Playlist> pl_it( *new_playlists );
             for ( ; pl_it.current(); ++pl_it )
             {
                 pl_it.current()->mapDatabaseToId(new_metadata);
@@ -389,7 +409,7 @@ bool MMusicWatcher::sweepMetadata()
             log(QString("found %1 audio file(s) and %2 playlist(s) "
                         "in %3 second(s)")
                        .arg(new_metadata->count())
-                       .arg(current_playlists->count())
+                       .arg(new_playlists->count())
                        .arg(sweep_timer.elapsed() / 1000.0), 2);
             return true;
         }
@@ -484,7 +504,17 @@ bool MMusicWatcher::checkNewMusicFile(const QString &filename)
     return true;
 }
 
+int MMusicWatcher::bumpMetadataId()
+{
+    ++metadata_id;
+    return metadata_id;
+}
 
+int MMusicWatcher::bumpPlaylistId()
+{
+    ++playlist_id;
+    return playlist_id;
+}
 
 MMusicWatcher::~MMusicWatcher()
 {

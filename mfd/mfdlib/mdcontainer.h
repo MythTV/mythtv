@@ -71,6 +71,8 @@ class MetadataContainer
     Playlist*           getPlaylist(int pl_id);
     QIntDict<Playlist>* getPlaylists(){return current_playlists;}
 
+    void                dataSwap(QIntDict<Metadata>* new_metadata, QIntDict<Playlist>* new_playlists);
+ 
   protected:
   
     MFD *parent;
@@ -83,6 +85,7 @@ class MetadataContainer
     QIntDict<Playlist>   *current_playlists;
 };
 
+/*
 
 class MetadataMythDBContainer: public MetadataContainer
 {
@@ -111,6 +114,7 @@ class MetadataMythDBContainer: public MetadataContainer
 
 };
                             
+*/
 
 
 #endif

@@ -53,7 +53,7 @@ HttpResponse::HttpResponse(MFDHttpPlugin *owner, HttpRequest *requestor)
     file_transformation = FILE_TRANSFORM_NONE;
 
     //
-    //  flac stuff (only used if this response is going to end up streamins
+    //  flac stuff (only used if this response is going to end up streaming
     //  a flac as a wav)
     //
     
