@@ -65,6 +65,19 @@ Webcam::Webcam(QObject *parent, const char *name)
 }
 
 
+QString Webcam::devName(QString WebcamName)
+{
+  int handle = open(WebcamName, O_RDWR);
+  if (handle <= 0)
+    return "";
+  
+  struct video_capability tempCaps;
+  ioctl(handle, VIDIOCGCAP, &tempCaps);
+  ::close(handle);
+  return tempCaps.name;
+}
+
+
 bool Webcam::camOpen(QString WebcamName, int width, int height)
 {
   DevName = WebcamName;

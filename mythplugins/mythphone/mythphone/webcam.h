@@ -47,6 +47,7 @@ class Webcam : public QObject
 
     Webcam(QObject *parent = 0, const char * = 0);
     virtual ~Webcam(void);
+    static QString devName(QString WebcamName);
     bool camOpen(QString WebcamName, int width, int height);
     void camClose(void);
     bool SetPalette(int palette);
