@@ -3,6 +3,7 @@ INCLUDEPATH += ../../libs/ ../../libs/libmyth
 LIBS += -L../../libs/libavcodec -L../../libs/libavformat
 LIBS += -L../../libs/libmyth -L../../libs/libmythtv
 
+include ( ../../config.mak )
 include (../../settings.pro)
 
 TEMPLATE = app

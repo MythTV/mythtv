@@ -6,6 +6,7 @@ DEPENDPATH += ../../libs/libavformat
 LIBS += -L../../libs/libmyth -L../../libs/libmythtv -L../../libs/libavcodec
 LIBS += -L../../libs/libavformat
 
+include ( ../../config.mak )
 include ( ../../settings.pro )
 
 TEMPLATE = app

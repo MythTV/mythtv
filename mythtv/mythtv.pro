@@ -5,5 +5,9 @@
 TEMPLATE = subdirs
 CONFIG += ordered
 
+!exists(config.mak) {
+    error(Please run the configure script first)
+}
+
 # Directories
 SUBDIRS += libs filters programs themes setup i18n

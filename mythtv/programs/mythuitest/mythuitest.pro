@@ -1,3 +1,4 @@
+include ( ../../config.mak )
 include ( ../../settings.pro )
 
 INCLUDEPATH += ../../libs/libmythui ../../libs/libmyth

@@ -7,11 +7,6 @@ isEmpty( PREFIX ) {
 
 LIBVERSION = 0.17
 
-include( config.mak )
-!exists( config.mak ) {
-    error(Please run the configure script first)
-}
-
 INCLUDEPATH += $${PREFIX}/include
 
 DEFINES += _GNU_SOURCE
