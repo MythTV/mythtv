@@ -934,6 +934,7 @@ UIListType::UIListType(const QString &name, QRect area, int dorder)
     m_uarrow = false;
     m_darrow = false;
     m_fill_type = -1;
+    m_showSelAlways = gContext->GetNumSetting("ShowSelAlways", 1);
 }
 
 UIListType::~UIListType()
@@ -1052,7 +1053,7 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
 
         dr->setFont(tmpfont->face);
 
-        if (m_active == true)
+        if (m_active == true || m_showSelAlways)
             dr->drawPixmap(m_area.left() + m_selection_loc.x(),
                            m_area.top() + m_selection_loc.y() + 
                            (int)(m_current * m_selheight),

@@ -97,6 +97,8 @@ class PlaybackBox : public MythDialog
     void expire(ProgramInfo *);
     void showActions(ProgramInfo *);
 
+    bool haveGroupInfoSet;
+    
     bool skipUpdate;
     bool pageDowner;
     bool connected;

@@ -53,7 +53,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     // of spaces available for data to be shown).
     listCount = 0;          
 
-    inTitle = gContext->GetNumSetting("PlaybackBoxStartInTitle", 1);
+    inTitle = gContext->GetNumSetting("PlaybackBoxStartInTitle", 0);
 
  
     skipNum = 0;            // Amount of records to skip (for scrolling)
@@ -76,6 +76,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     popup = NULL;
     curitem = NULL;
     delitem = NULL;
+
 
     groupnameAsAllProg = gContext->GetNumSetting("DispRecGroupAsAllProg",1);
     
@@ -128,6 +129,10 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
         cerr << "Failed to get selector object.\n";
         exit(0);
     }
+
+    if(theme->GetSet("group_info"))
+        haveGroupInfoSet = true;
+
 
     connected = FillList();
 
@@ -364,11 +369,11 @@ void PlaybackBox::grayOut(QPainter *tmp)
 
 void PlaybackBox::updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix)
 {
-    QPainter tmp(&pix);
     LayerSet *container = theme->GetSet("group_info");
 
     if (container)
     {
+        QPainter tmp(&pix);
         QMap<QString, QString> infoMap;
         if(titleData[curTitle] == groupDisplayName)
             infoMap["title"] = titleData[curTitle];
@@ -396,6 +401,8 @@ void PlaybackBox::updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix)
         tmp.end();
         p->drawPixmap(pr.topLeft(), pix);
     }
+    else
+        updateProgramInfo(p, pr, pix);
 
 }
 
@@ -526,7 +533,8 @@ void PlaybackBox::updateInfo(QPainter *p)
 
 void PlaybackBox::updateVideo(QPainter *p)
 {
-    if(inTitle)
+    // If we're displaying group infor don't update the video.
+    if(inTitle && haveGroupInfoSet)
         return;
         
     /* show a still frame if the user doesn't want a video preview or nvp 
@@ -964,14 +972,15 @@ void PlaybackBox::cursorLeft()
 {
     if(!inTitle)
     {
-        killPlayerSafe();
+        if(haveGroupInfoSet)
+            killPlayerSafe();
         inTitle = true;
         skipUpdate = false;
         update(fullRect);
         leftRight = true;
     }
     else
-        showMenu();    
+        exitWin();
         
 }
 
@@ -1376,7 +1385,7 @@ void PlaybackBox::selected()
 {
     state = kStopping;
 
-    if(inTitle)
+    if(inTitle && haveGroupInfoSet)
     {
         cursorRight();
         return;
