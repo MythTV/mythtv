@@ -336,7 +336,7 @@
     </message>
     <message>
         <source>Order in which to sort the Music Selection Tree. Possible values are space-separated list of genre, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the actual directory tree.</source>
-        <translation>Indiquer comment doit être trier l&apos;arborescence de la selection musicale.  Les valeurs possibles sont en liste avec des espace comme séparateur: genre, artiste, album, et titre OU le mot-clé &quot;annuaire&quot; pour indiquer l&apos;affichage de l&apos;arborescence.</translation>
+        <translation type="obsolete">Indiquer comment doit être trier l&apos;arborescence de la selection musicale.  Les valeurs possibles sont en liste avec des espace comme séparateur: genre, artiste, album, et titre OU le mot-clé &quot;annuaire&quot; pour indiquer l&apos;affichage de l&apos;arborescence.</translation>
     </message>
     <message>
         <source>Script Path</source>
@@ -850,6 +850,10 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

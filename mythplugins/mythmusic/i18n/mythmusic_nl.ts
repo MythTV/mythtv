@@ -256,10 +256,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Order in which to sort the Music Selection Tree. Possible values are space-separated list of genre, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the actual directory tree.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Script Path</source>
         <translation type="unfinished"></translation>
     </message>
@@ -753,6 +749,10 @@
     </message>
     <message>
         <source>?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

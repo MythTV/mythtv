@@ -336,7 +336,7 @@
     </message>
     <message>
         <source>Order in which to sort the Music Selection Tree. Possible values are space-separated list of genre, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the actual directory tree.</source>
-        <translation>Ordenació a fer servir en l&apos;arbre de sel·lecció. Es poden fer servir diferents valors separats per espais (genre, artist, album, title o la paraula &quot;directori&quot; per a indicar que l&apos;arbre representa l&apos;arbre de directoris).</translation>
+        <translation type="obsolete">Ordenació a fer servir en l&apos;arbre de sel·lecció. Es poden fer servir diferents valors separats per espais (genre, artist, album, title o la paraula &quot;directori&quot; per a indicar que l&apos;arbre representa l&apos;arbre de directoris).</translation>
     </message>
     <message>
         <source>Script Path</source>
@@ -852,6 +852,10 @@ No disposa de les taules de MythMusic en la seva Base de Dades.</translation>
     </message>
     <message>
         <source>?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

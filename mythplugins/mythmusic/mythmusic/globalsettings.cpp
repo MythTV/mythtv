@@ -89,13 +89,12 @@ public:
     TreeLevels():
         GlobalSetting("TreeLevels") {
         setLabel(QObject::tr("Tree Sorting"));
-        setValue("artist album title");
-        setHelpText(QObject::tr("Order in which to sort the Music Selection "
-                    "Tree. Possible values are space-separated list of "
-                    "genre, artist, album, and title OR the "
+        setValue("splitartist artist album title");
+        setHelpText(QObject::tr("Order in which to sort the Music "
+                    "Tree. Possible values are a space-separated list of "
+                    "genre, splitartist, artist, album, and title OR the "
                     "keyword \"directory\" to indicate that "
-                    "the onscreen tree mirrors the actual directory "
-                    "tree."));
+                    "the onscreen tree mirrors the filesystem."));
     };
 };
 

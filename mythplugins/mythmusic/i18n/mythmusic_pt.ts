@@ -496,7 +496,7 @@
     </message>
     <message>
         <source>Order in which to sort the Music Selection Tree. Possible values are space-separated list of genre, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the actual directory tree.</source>
-        <translation>A ordem a ser usada na àrvode de selecção das músicas. Os valores possíveis deverâo ser separados por espaços e incluir da seguinte lista: &quot;genre&quot; (género), &quot;artist&quot; (artista), &quot;album&quot; (àlbum) ou &quot;title&quot; (título). Também pode incluir o valor &quot;directory&quot; para indicar que a àrvore no ecrâ representa a ârvore actual.</translation>
+        <translation type="obsolete">A ordem a ser usada na àrvode de selecção das músicas. Os valores possíveis deverâo ser separados por espaços e incluir da seguinte lista: &quot;genre&quot; (género), &quot;artist&quot; (artista), &quot;album&quot; (àlbum) ou &quot;title&quot; (título). Também pode incluir o valor &quot;directory&quot; para indicar que a àrvore no ecrâ representa a ârvore actual.</translation>
     </message>
     <message>
         <source>Script Path</source>
@@ -1068,6 +1068,10 @@ Não existem dados do MythMusic na base de dados.</translation>
     </message>
     <message>
         <source>?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -257,7 +257,7 @@
     </message>
     <message>
         <source>Order in which to sort the Music Selection Tree. Possible values are space-separated list of genre, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the actual directory tree.</source>
-        <translation>Sortierreihenfolge in der Musikauswahl. Mögliche Werte sind (durch Leerzeichen getrennt): Genre, Künstler, Album, Titel ODER das Schlüsselwort Verzeichnis. Damit entspricht die Darstellung der tatsächlichen Verzeichnisstruktur.</translation>
+        <translation type="obsolete">Sortierreihenfolge in der Musikauswahl. Mögliche Werte sind (durch Leerzeichen getrennt): Genre, Künstler, Album, Titel ODER das Schlüsselwort Verzeichnis. Damit entspricht die Darstellung der tatsächlichen Verzeichnisstruktur.</translation>
     </message>
     <message>
         <source>Script Path</source>
@@ -773,6 +773,10 @@ MythMusic Tabellen fehlen in der Datenbank.</translation>
     </message>
     <message>
         <source>?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
