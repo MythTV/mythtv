@@ -43,34 +43,6 @@ bool MetaIOID3v2::write(Metadata* mdata, bool exclusive)
     if (!mdata)
         return false;
 
-    // libid3tag hack....
-    // Read the first 4 bytes of the file id3file. This is just a quick and
-    // dirty way to determin the id3v2 tag version.
-    // 49 44 33 03 Where the 03 denotes id3v2.3
-    // When writing, libid3tag used 49 44 33 04 which is id3v2.4 which is not
-    // as widely accepted. So, as we know we're not going to be doing anything
-    // fancy, we will manually check this number. If it is 04, we leave well
-    // alone, but if it's not, we will make it 03 for better compatibility.
-
-    FILE* p_hack = fopen(mdata->Filename().local8Bit(), "rb");
-    if (!p_hack)
-        p_hack = fopen(mdata->Filename().ascii(), "rb");
-    if (!p_hack)
-        return false;
-
-    unsigned char sig[4];
-    bool bln_hack_version = false;
-    
-    if (4 == fread(&sig, 1, 4, p_hack)
-        && 'I' == sig[0]
-        && 'D' == sig[1]
-        && '3' == sig[2]
-        && sig[3] < 0x04)
-    {
-        bln_hack_version = true;
-    }
-    fclose(p_hack);
-    
     id3_file* p_input = NULL;
     
     p_input = id3_file_open(mdata->Filename().local8Bit(), ID3_FILE_MODE_READWRITE);
@@ -145,28 +117,30 @@ bool MetaIOID3v2::write(Metadata* mdata, bool exclusive)
     if (mdata->Year() > 999
         && mdata->Year() < 10000) // 4 digit year.
     {
-        // User our old version of the ID3_FRAME_YEAR as newer libid3tags use
-        // v2.4 of ID3 which is less compatible and changes the TYER to use TDRC
-        // instead.
-        // For compatibility, we will try to stick to ID3 v2.3 for now.
-        if (!exclusive) removeComment(tag, MYTH_ID3_FRAME_YEAR);
-        setComment(tag, MYTH_ID3_FRAME_YEAR, QString("%1").arg(mdata->Year()));
+        if (!exclusive) removeComment(tag, ID3_FRAME_YEAR);
+        setComment(tag, ID3_FRAME_YEAR, QString("%1").arg(mdata->Year()));
     }
 
+    // Write Genre maintaining the ID3v1 genre number if applicable
     QString data = mdata->Genre();
     if (!data.isEmpty())
     {
         if (!exclusive) removeComment(tag, ID3_FRAME_GENRE);
-        
-        id3_ucs4_t* p_ucs4 = id3_utf8_ucs4duplicate((const id3_utf8_t*)(const char*)data.utf8());
-   
+
+        id3_ucs4_t* p_ucs4 = 
+          id3_utf8_ucs4duplicate((const id3_utf8_t*)(const char*)data.utf8());
+
         int genrenum = id3_genre_number(p_ucs4);
 
         free(p_ucs4);
 
+        // Use the number if it's standard, otherwise just write it (valid in ID3v2)
         if (genrenum >= 0)
-            setComment(tag, ID3_FRAME_GENRE, QString("%1").arg(genrenum));
-    }
+            setComment(tag, ID3_FRAME_GENRE, 
+                       QString("%1").arg(genrenum));
+        else
+            setComment(tag, ID3_FRAME_GENRE, data);
+    }    
     
     if (0 != mdata->Track())
     {
@@ -185,33 +159,7 @@ bool MetaIOID3v2::write(Metadata* mdata, bool exclusive)
     // See the files: metaio_libid3hack.c/h
     bool rv = (0 == ID3_FILE_UPDATE(p_input));
 
-    rv = (0 == id3_file_close(p_input)) && rv;
-
-    // Hack the tag version if necessary
-    if (rv && bln_hack_version)
-    {
-        p_hack = fopen(mdata->Filename().local8Bit(), "rb+");
-        if (!p_hack)
-            p_hack = fopen(mdata->Filename().ascii(), "rb+");
-    
-        if (!p_hack)
-            return rv; // This hack failing doesn't really denote a failure...
-        
-        rewind(p_hack);
-        if (4 == fread(&sig, 1, 4, p_hack)
-            && 'I' == sig[0]
-            && 'D' == sig[1]
-            && '3' == sig[2]
-            && 0x04 == sig[3])
-        {
-            sig[3] = 0x03;
-            rewind(p_hack);
-            fwrite(&sig, 1, 4, p_hack);
-        }
-        fclose(p_hack); 
-    }
-
-    return rv;
+    return (0 == id3_file_close(p_input)) && rv;
 }
 
 
@@ -224,7 +172,8 @@ bool MetaIOID3v2::write(Metadata* mdata, bool exclusive)
  */
 Metadata* MetaIOID3v2::read(QString filename)
 {
-    QString artist = "", compilation_artist = "", album = "", title = "", genre = "";
+    QString artist = "", compilation_artist = "", album = "", title = "", 
+            genre = "";
     int year = 0, tracknum = 0, length = 0;
     bool compilation = false;
     id3_file *p_input = NULL;
@@ -264,23 +213,33 @@ Metadata* MetaIOID3v2::read(QString filename)
         
         // Depending on the version of libid3tag, it will reassign a #define,
         // but we want to look for both.
-        year = getComment(tag, "TDRC")
+        year = getComment(tag, ID3_FRAME_YEAR)
             .replace(QRegExp("^([0-9]{4}).*"), QString("\\1")).toInt();
         if (0 == year)
             year = getComment(tag, "TYER").toInt();
         
         // Genre.
         genre = getComment(tag, ID3_FRAME_GENRE);
-
-        id3_ucs4_t *p_tmp = id3_utf8_ucs4duplicate((const id3_utf8_t*)(const char*)genre.utf8());
         
-        id3_ucs4_t const *p_ucs4 = id3_genre_name(p_tmp);
-        free(p_tmp);
-
-        id3_utf8_t *p_utf8 = id3_ucs4_utf8duplicate(p_ucs4);  
-        genre = (const char*)p_utf8;
+        // Genre in ID3v2 = "genrenum|Genre Name"
+        QString genrenumtest = genre;
+        genrenumtest.replace(QRegExp("^[0-9]*$"), QString(""));
         
-        free(p_utf8);
+        if (genrenumtest.isEmpty())
+        {
+            // This means the genre is 100% numeric
+            // Try and decode genre number        
+            id3_ucs4_t *p_tmp = 
+                id3_utf8_ucs4duplicate((const id3_utf8_t*)(const char*)genre.utf8());
+            
+            id3_ucs4_t const *p_ucs4 = id3_genre_name(p_tmp);
+            free(p_tmp);
+    
+            id3_utf8_t *p_utf8 = id3_ucs4_utf8duplicate(p_ucs4);  
+            genre = QString::fromUtf8((const char*)p_utf8);
+            
+            free(p_utf8);
+        }
 
         id3_file_close(p_input);
     }

@@ -131,16 +131,16 @@ bool MetaIOMP4::write(Metadata* mdata, bool exclusive)
     }
 
     mp4ff_mdata->tags[0].item = "artist";
-    mp4ff_mdata->tags[0].value = mdata->Artist().utf8().data();
+    mp4ff_mdata->tags[0].value = (char*)mdata->Artist().ascii();
 
     mp4ff_mdata->tags[1].item = "album";
-    mp4ff_mdata->tags[1].value = mdata->Album().utf8().data();
+    mp4ff_mdata->tags[1].value = (char*)mdata->Album().ascii();
 
     mp4ff_mdata->tags[2].item = "title";
-    mp4ff_mdata->tags[2].value = mdata->Title().utf8().data();
+    mp4ff_mdata->tags[2].value = (char*)mdata->Title().ascii();
 
     mp4ff_mdata->tags[3].item = "genre";
-    mp4ff_mdata->tags[3].value = mdata->Genre().utf8().data();
+    mp4ff_mdata->tags[3].value = (char*)mdata->Genre().ascii();
 
     mp4ff_mdata->tags[4].item = "date";
     mp4ff_mdata->tags[4].value = (char*)malloc(128);
@@ -151,7 +151,9 @@ bool MetaIOMP4::write(Metadata* mdata, bool exclusive)
     snprintf(mp4ff_mdata->tags[5].value, 128, "%d", mdata->Track());
 
     mp4ff_mdata->tags[6].item = "compilation";
-    mp4ff_mdata->tags[6].value = (char*)(mdata->Compilation() ? "1" : "0");
+    mp4ff_mdata->tags[6].value = (char*)malloc(2);
+    mp4ff_mdata->tags[6].value[0] = mdata->Compilation() ? 1 : 0;
+    mp4ff_mdata->tags[6].value[1] = 0;
 
     mp4ff_mdata->count = 7;
 
@@ -163,6 +165,7 @@ bool MetaIOMP4::write(Metadata* mdata, bool exclusive)
     fclose(callback_data.file);
     free(mp4ff_mdata->tags[4].value);
     free(mp4ff_mdata->tags[5].value);
+    free(mp4ff_mdata->tags[6].value);
     free(mp4ff_mdata->tags);
     free(mp4ff_mdata);
 
@@ -271,7 +274,7 @@ Metadata* MetaIOMP4::read(QString filename)
 
     if (mp4ff_meta_get_compilation(mp4_ifile, &char_storage))
     {
-        compilation = (0 == strncmp("1", char_storage, 1));
+        compilation = (1 == char_storage[0]);
         free(char_storage);
     }
 

@@ -8,7 +8,6 @@ extern "C" {
 }
 
 // Similar to the ones define in id3tag.h
-#define MYTH_ID3_FRAME_YEAR "TYER"
 #define MYTH_ID3_FRAME_COMPILATIONARTIST "TPE4"
 #define MYTH_ID3_FRAME_COMMENT "TXXX"
 #define MYTH_ID3_FRAME_MUSICBRAINZ_ALBUMARTISTDESC "MusicBrainz Album Artist Id"

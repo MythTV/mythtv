@@ -14,6 +14,11 @@ In addition to MythTV's requirements, you'll need these software packages:
 
    MAD - mp3 decoder library, and its libid3tag library.  
          http://www.mars.org/home/rob/proj/mpeg/
+         __NB__: The libid3tag library writes ID3v2.4 format tags, which
+         seem to be less supported than the v2.3 version. Any MP3 file created
+         or editited in MythMusic will use ID3v2.4 tags.
+         amarok and Juk both support this format of tags as does the libmad output
+         plugin for xmms.
 
    Vorbis - I've just used this with version 1.0.  You'll need a full install,
             encoding and decoding support.  http://www.vorbis.com
