@@ -7,7 +7,7 @@
 #include "mythuianimatedimage.h"
 #include "mythmainwindow.h"
 #include "dialogbox.h"
-
+#include "mythfontproperties.h"
 #include "mythcontext.h"
 #include "themedmenu.h"
 
