@@ -1,6 +1,7 @@
 include (../../../settings.pro)
 
 INCLUDEPATH += ../../../mfdlib
+INCLUDEPATH *= /usr/include/cdda
 
 TEMPLATE = lib
 CONFIG += plugin thread
