@@ -38,6 +38,8 @@ class XMLParse
     void parseRepeatedImage(LayerSet *, QDomElement &);
     void parsePushButton(LayerSet *, QDomElement &);
     void parseTextButton(LayerSet *, QDomElement &);
+    void parseCheckBox(LayerSet *, QDomElement &);
+    void parseSelector(LayerSet *, QDomElement &);
     void parseBlackHole(LayerSet *, QDomElement &);
   
   private:

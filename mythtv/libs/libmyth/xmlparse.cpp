@@ -809,6 +809,14 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
             {
                 parseTextButton(container, info);
             }
+            else if (info.tagName() == "checkbox")
+            {
+                parseCheckBox(container, info);
+            }
+            else if (info.tagName() == "selector")
+            {
+                parseSelector(container, info);
+            }
             else if (info.tagName() == "blackhole")
             {
                 parseBlackHole(container, info);
@@ -1876,6 +1884,263 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
     tbt->calculateScreenArea();
     container->AddType(tbt);
 }
+
+void XMLParse::parseCheckBox(LayerSet *container, QDomElement &element)
+{
+    int context = -1;
+    QPoint pos = QPoint(0, 0);
+    QPixmap *image_checked = NULL;
+    QPixmap *image_unchecked = NULL;
+    QPixmap *image_checked_high = NULL;
+    QPixmap *image_unchecked_high = NULL;
+
+    QString name = element.attribute("name", "");
+    if (name.isNull() || name.isEmpty())
+    {
+        cerr << "CheckBox needs a name\n";
+        exit(0);
+    }
+
+    QString order = element.attribute("draworder", "");
+    if (order.isNull() || order.isEmpty())
+    {
+        cerr << "CheckBox needs an order\n";
+        exit(0);
+    }
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "context")
+            {
+                context = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "position")
+            {
+                pos = parsePoint(getFirstText(info));
+                pos.setX((int)(pos.x() * wmult));
+                pos.setY((int)(pos.y() * hmult));
+            }
+            else if(info.tagName() == "image")
+            {
+                QString imgname = "";
+                QString file = "";
+
+                imgname = info.attribute("function", "");
+                if (imgname.isNull() || imgname.isEmpty())
+                {
+                    cerr << "Image in a CheckBox needs a function\n";
+                    exit(0);
+                }
+
+                file = info.attribute("filename", "");
+                if (file.isNull() || file.isEmpty())
+                {
+                    cerr << "Image in a CheckBox needs a filename\n";
+                    exit(0);
+                }
+
+                if (imgname.lower() == "checked")
+                {
+                    image_checked = gContext->LoadScalePixmap(file);
+                    if(!image_checked)
+                    {
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                    }
+                }
+                if (imgname.lower() == "unchecked")
+                {
+                    image_unchecked = gContext->LoadScalePixmap(file);
+                    if(!image_unchecked)
+                    {
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                    }
+                }
+                if (imgname.lower() == "checked_high")
+                {
+                    image_checked_high = gContext->LoadScalePixmap(file);
+                    if(!image_checked_high)
+                    {
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                    }
+                }
+                if (imgname.lower() == "unchecked_high")
+                {
+                    image_unchecked_high = gContext->LoadScalePixmap(file);
+                    if(!image_unchecked_high)
+                    {
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                    }
+                }
+            }
+            else
+            {
+                cerr << "Unknown: " << info.tagName() << " in CheckBox\n";
+                exit(0);
+            }
+        }
+    }
+
+    if (!image_checked)
+        image_checked = new QPixmap();
+    if (!image_unchecked)
+        image_unchecked = new QPixmap();
+    if (!image_checked_high)
+        image_checked_high = new QPixmap();
+    if (!image_unchecked_high)
+        image_unchecked_high = new QPixmap();
+
+    UICheckBoxType *cbt = new UICheckBoxType(name, 
+                                             *image_checked, *image_unchecked, 
+                                             *image_checked_high, *image_unchecked_high);
+
+    delete image_checked;
+    delete image_unchecked;
+    delete image_checked_high;
+    delete image_unchecked_high;
+
+    cbt->setPosition(pos);
+    cbt->SetOrder(order.toInt());
+    if (context != -1)
+    {
+        cbt->SetContext(context);
+    }
+    cbt->SetParent(container);
+    cbt->calculateScreenArea();
+    container->AddType(cbt);
+}
+
+void XMLParse::parseSelector(LayerSet *container, QDomElement &element)
+{
+    int context = -1;
+    QString font = "";
+    QRect area;
+    QPixmap *image_on = NULL;
+    QPixmap *image_off = NULL;
+    QPixmap *image_pushed = NULL;
+
+    QString name = element.attribute("name", "");
+    if (name.isNull() || name.isEmpty())
+    {
+        cerr << "Selector needs a name\n";
+        exit(0);
+    }
+
+    QString order = element.attribute("draworder", "");
+    if (order.isNull() || order.isEmpty())
+    {
+        cerr << "Selector needs an order\n";
+        exit(0);
+    }
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "context")
+            {
+                context = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "area")
+            {
+                area = parseRect(getFirstText(info));
+                normalizeRect(area);
+            }
+            else if (info.tagName() == "font")
+            {
+                font = getFirstText(info);
+            }
+            else if(info.tagName() == "image")
+            {
+                QString imgname = "";
+                QString file = "";
+
+                imgname = info.attribute("function", "");
+                if (imgname.isNull() || imgname.isEmpty())
+                {
+                    cerr << "Image in a selector needs a function\n";
+                    exit(0);
+                }
+
+                file = info.attribute("filename", "");
+                if (file.isNull() || file.isEmpty())
+                {
+                    cerr << "Image in a selector needs a filename\n";
+                    exit(0);
+                }
+
+                if (imgname.lower() == "on")
+                {
+                    image_on = gContext->LoadScalePixmap(file);
+                    if(!image_on)
+                    {
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                    }
+                }
+                if (imgname.lower() == "off")
+                {
+                    image_off = gContext->LoadScalePixmap(file);
+                    if(!image_off)
+                    {
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                    }
+                }
+                if (imgname.lower() == "pushed")
+                {
+                    image_pushed = gContext->LoadScalePixmap(file);
+
+                    if(!image_pushed)
+                    {
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                    }
+                }
+            }
+            else
+            {
+                cerr << "Unknown: " << info.tagName() << " in Selector\n";
+                exit(0);
+            }
+        }
+    }
+
+    fontProp *testfont = GetFont(font);
+    if (!testfont)
+    {
+        cerr << "Unknown font: " << font << " in Selector: " << name << endl;
+        exit(0);
+    }
+
+    if (!image_on)
+        image_on = new QPixmap();
+    if (!image_off)
+        image_off = new QPixmap();
+    if (!image_pushed)
+        image_pushed = new QPixmap();
+
+    UISelectorType *st = new UISelectorType(name, *image_on, *image_off, 
+                                                 *image_pushed, area);
+
+    delete image_on;
+    delete image_off;
+    delete image_pushed;
+
+    st->setPosition(area.topLeft());
+    st->setFont(testfont);
+    st->SetOrder(order.toInt());
+    if (context != -1)
+    {
+        st->SetContext(context);
+    }
+    st->SetParent(container);
+    st->calculateScreenArea();
+    container->AddType(st);
+}
+
 
 void XMLParse::parseBlackHole(LayerSet *container, QDomElement &element)
 {

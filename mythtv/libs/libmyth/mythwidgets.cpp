@@ -157,15 +157,24 @@ void MythLineEdit::setText(const QString& text) {
 
 // thor feb 18 2003
 
+MythRemoteLineEdit::MythRemoteLineEdit(QFont *a_font, QWidget * parent, const char * name)
+                   :QTextEdit(parent, name)
+{
+    my_font = a_font;
+    this->Init();
+}
+
 MythRemoteLineEdit::MythRemoteLineEdit( QWidget * parent, const char * name)
     : QTextEdit(parent, name)
 {
+    my_font = NULL;
     this->Init();
 }
 
 MythRemoteLineEdit::MythRemoteLineEdit( const QString & contents, QWidget * parent, const char * name)
     : QTextEdit(parent, name)
 {
+    my_font = NULL;
     this->Init();
     setText(contents);
 }
@@ -212,7 +221,13 @@ void MythRemoteLineEdit::Init()
     QScrollView::setVScrollBarMode(QScrollView::AlwaysOff);
     QScrollView::setHScrollBarMode(QScrollView::AlwaysOff);
 
+    if(my_font)
+    {
+        setFont(*my_font);
+    }
+
     QFontMetrics fontsize(font());
+    
 
     setMinimumHeight(fontsize.height() * 5 / 4);
     setMaximumHeight(fontsize.height() * 5 / 4);
@@ -443,12 +458,14 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
             // through links (even if you're in
             // PlainText Mode !!)
             QWidget::focusNextPrevChild(false);
+            emit tryingToLooseFocus(false);
             break;
    
         case Key_Down:
             handled = true;
             endCycle();
             QWidget::focusNextPrevChild(true);
+            emit tryingToLooseFocus(true);
             break;
     
         case Key_Enter:

@@ -21,6 +21,8 @@ class UITextType;
 class UIPushButtonType;
 class UITextButtonType;
 class UIRepeatedImageType;
+class UICheckBoxType;
+class UISelectorType;
 class UIBlackHoleType;
 class UIImageType;
 class UIStatusBarType;
@@ -126,6 +128,7 @@ class MythThemedDialog : public MythDialog
     virtual void parseContainer(QDomElement &);
     virtual void parseFont(QDomElement &);
     virtual void parsePopup(QDomElement &);
+    bool buildFocusList();
 
     UIType *getUIObject(const QString &name);
     UIManagedTreeListType *getUIManagedTreeListType(const QString &name);
@@ -133,6 +136,8 @@ class MythThemedDialog : public MythDialog
     UIPushButtonType *getUIPushButtonType(const QString &name);
     UITextButtonType *getUITextButtonType(const QString &name);
     UIRepeatedImageType *getUIRepeatedImageType(const QString &name);
+    UICheckBoxType *getUICheckBoxType(const QString &name);
+    UISelectorType *getUISelectorType(const QString &name);
     UIBlackHoleType *getUIBlackHoleType(const QString &name);
     UIImageType *getUIImageType(const QString &name);
     UIStatusBarType*        getUIStatusBarType(const QString &name);

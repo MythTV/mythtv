@@ -149,6 +149,7 @@ class MythRemoteLineEdit : public QTextEdit
     
         MythRemoteLineEdit( QWidget * parent, const char * name = 0 );
         MythRemoteLineEdit( const QString & contents, QWidget * parent, const char * name = 0 );    
+        MythRemoteLineEdit( QFont *a_font, QWidget * parent, const char * name = 0 );    
         ~MythRemoteLineEdit();
         void setHelpText(QString help) { helptext = help; }
         void setCycleTime(float desired_interval); // in seconds
@@ -161,6 +162,7 @@ class MythRemoteLineEdit : public QTextEdit
         void    changeHelpText(QString);
         void    gotFocus();
         void    lostFocus();
+        void    tryingToLooseFocus(bool up_or_down);
         void    textChanged(QString);
 
     public slots:
@@ -181,6 +183,7 @@ class MythRemoteLineEdit : public QTextEdit
 
     private:
     
+        QFont   *my_font;
         void    Init(void);
         void    cycleKeys(QString cycleList);
         void    toggleShift(void);

@@ -119,6 +119,7 @@ bool UIType::takeFocus()
     {
         has_focus = true;
         refresh();
+        emit takingFocus();
         return true;
     }
     has_focus = false;
@@ -127,6 +128,7 @@ bool UIType::takeFocus()
 
 void UIType::looseFocus()
 {
+    emit loosingFocus();
     has_focus = false;
     refresh();
 }
@@ -3570,6 +3572,235 @@ void UITextButtonType::calculateScreenArea()
     }
     
     screen_area = QRect(x, y, width, height);
+}
+
+// ********************************************************************
+
+UICheckBoxType::UICheckBoxType(const QString &name, 
+                               QPixmap checkedp, QPixmap uncheckedp,
+                               QPixmap checked_highp, QPixmap unchecked_highp)
+               :UIType(name)
+{
+    checked_pixmap = checkedp;
+    unchecked_pixmap = uncheckedp;
+    checked_pixmap_high = checked_highp;
+    unchecked_pixmap_high = unchecked_highp;
+    checked = false;
+    label = "";
+    takes_focus = true;
+}
+
+void UICheckBoxType::Draw(QPainter *p, int drawlayer, int context)
+{
+    if(context != m_context)
+    {
+        if(m_context != -1)
+        {
+            return;
+        }
+    }
+    if(drawlayer != m_order)
+    {   
+    }
+    if(has_focus)
+    {
+        if(checked)
+        {
+            p->drawPixmap(m_displaypos.x(), m_displaypos.y(), checked_pixmap_high);
+        }
+        else
+        {
+            p->drawPixmap(m_displaypos.x(), m_displaypos.y(), unchecked_pixmap_high);
+        }
+    }
+    else
+    {
+        if(checked)
+        {
+            p->drawPixmap(m_displaypos.x(), m_displaypos.y(), checked_pixmap);
+        }
+        else
+        {
+            p->drawPixmap(m_displaypos.x(), m_displaypos.y(), unchecked_pixmap);
+        }
+    }
+}
+
+void UICheckBoxType::calculateScreenArea()
+{
+    int x, y, width, height;
+    
+    x  = m_displaypos.x();
+    x += m_parent->GetAreaRect().left();
+
+    y  = m_displaypos.y();
+    y += m_parent->GetAreaRect().top();
+
+    width = checked_pixmap.width();
+    if(unchecked_pixmap.width() > width)
+    {
+        width = unchecked_pixmap.width();
+    }
+    if(checked_pixmap_high.width() > width)
+    {
+        width = checked_pixmap_high.width();
+    }
+    if(unchecked_pixmap_high.width() > width)
+    {
+        width = unchecked_pixmap_high.width();
+    }
+
+    height = checked_pixmap.height();
+    if(unchecked_pixmap.height() > height)
+    {
+        height = unchecked_pixmap.height();
+    }
+    if(checked_pixmap_high.height() > height)
+    {
+        height = checked_pixmap_high.height();
+    }
+    if(unchecked_pixmap_high.height() > height)
+    {
+        height = unchecked_pixmap_high.height();
+    }
+    
+    screen_area = QRect(x, y, width, height);
+
+}
+
+void UICheckBoxType::push()
+{
+    checked = !checked;
+    refresh();
+    emit pushed(checked);
+}
+
+void UICheckBoxType::setState(bool checked_or_not)
+{
+    checked = checked_or_not;
+    refresh();
+}
+
+// ********************************************************************
+
+UISelectorType::UISelectorType(const QString &name, 
+                               QPixmap on, 
+                               QPixmap off, 
+                               QPixmap pushed,
+                               QRect area)
+               :UIPushButtonType(name, on, off, pushed)
+{
+    m_area = area;
+    my_data.clear();
+    my_data.setAutoDelete(true);
+    current_data = NULL;
+}
+
+void UISelectorType::Draw(QPainter *p, int drawlayer, int context)
+{
+    if(context != m_context)
+    {
+        if(m_context != -1)
+        {
+            return;
+        }
+    }
+
+    if(drawlayer != m_order)
+    {
+        // not my turn
+        return;
+    }
+
+    if(currently_pushed)
+    {
+        p->drawPixmap(m_displaypos.x(), m_displaypos.y(), pushed_pixmap);
+    }
+    else
+    {
+        if(has_focus)
+        {
+            p->drawPixmap(m_displaypos.x(), m_displaypos.y(), on_pixmap);
+        }
+        else
+        {
+            p->drawPixmap(m_displaypos.x(), m_displaypos.y(), off_pixmap);
+        }
+    }
+    if(current_data)
+    {
+        p->setFont(m_font->face);
+        p->setBrush(m_font->color);
+        p->setPen(QPen(m_font->color, (int)(2 * m_wmult)));
+        p->drawText(m_displaypos.x() + on_pixmap.width() + 4,
+                    m_displaypos.y() + 4,   // HACK!!!
+                    m_area.right(),
+                    m_area.bottom(),
+                    Qt::AlignLeft,
+                    current_data->getString());
+    }
+}
+
+void UISelectorType::calculateScreenArea()
+{
+    QRect r = m_area;
+    r.moveBy(m_parent->GetAreaRect().left(),
+             m_parent->GetAreaRect().top());
+    screen_area = r;
+}
+
+void UISelectorType::addItem(int an_int, const QString &a_string)
+{
+    IntStringPair *new_data = new IntStringPair(an_int, a_string);
+    my_data.append(new_data);
+    if(!current_data)
+    {
+        current_data = new_data;
+    }
+}
+
+void UISelectorType::push(bool up_or_down)
+{
+    if(currently_pushed)
+    {
+        return;
+    }
+    currently_pushed = true;
+    push_timer.start(300, TRUE);
+    refresh();
+
+    if(current_data)
+    {
+        my_data.find(current_data);
+        if(up_or_down)
+        {
+            if(!(current_data = my_data.next()))
+            {
+                current_data = my_data.first();
+            }
+            
+        }
+        else
+        {
+            if(!(current_data = my_data.prev()))
+            {
+                current_data = my_data.last();
+            }
+        }
+        emit pushed(current_data->getInt());
+    }
+    refresh();
+}
+
+void UISelectorType::unPush()
+{
+    currently_pushed = false;    
+    refresh();
+}
+
+UISelectorType::~UISelectorType()
+{
+    my_data.clear();
 }
 
 // ********************************************************************

@@ -83,6 +83,7 @@ class UIType : public QObject
     void SetScreen(double wmult, double hmult) { m_wmult = wmult; m_hmult = hmult; }
     void SetContext(int con) { m_context = con; }
     void SetDebug(bool db) { m_debug = db; }
+    void allowFocus(bool yes_or_no){takes_focus = yes_or_no;}
     QString Name();
 
 
@@ -92,6 +93,7 @@ class UIType : public QObject
     virtual void calculateScreenArea();
     QRect   getScreenArea(){return screen_area;}
     QString cutDown(QString, QFont *, bool multiline = false, int ow = -1, int oh = -1);
+    QString getName(){return m_name;}
 
     
   public slots:
@@ -109,6 +111,8 @@ class UIType : public QObject
 
     void requestUpdate();
     void requestUpdate(const QRect &);
+    void takingFocus();
+    void loosingFocus();
 
   protected:
   
@@ -653,21 +657,21 @@ class UIPushButtonType : public UIType
     
     UIPushButtonType(const QString &name, QPixmap on, QPixmap off, QPixmap pushed);
 
-    void    Draw(QPainter *, int drawlayer, int context);
+    virtual void Draw(QPainter *, int drawlayer, int context);
     void    setPosition(QPoint pos){m_displaypos = pos;}
-    void    calculateScreenArea();
+    virtual void calculateScreenArea();
     
   public slots:  
   
-    void    push();
-    void    unPush();
-    void    activate(){push();}
+    virtual void push();
+    virtual void unPush();
+    virtual void activate(){push();}
  
   signals:
   
     void    pushed();
   
-  private:
+  protected:
   
     QPoint  m_displaypos;
     QPixmap on_pixmap;
@@ -715,8 +719,122 @@ class UITextButtonType : public UIType
     
 };
 
+
+
+class UICheckBoxType : public UIType
+{
+    Q_OBJECT
+    
+    //
+    //  A simple, theme-able check box
+    //
+
+  public: 
+     
+    UICheckBoxType(const QString &name, 
+                   QPixmap checkedp, 
+                   QPixmap uncheckedp,
+                   QPixmap checked_highp,
+                   QPixmap unchecked_highp);
+                   
+    void    Draw(QPainter *, int drawlayer, int context);
+    void    setPosition(QPoint pos){m_displaypos = pos;}
+    void    calculateScreenArea();
+  
+  public slots:
+  
+    void    push();
+    void    setState(bool checked_or_not);
+    void    toggle(){push();}
+    void    activate(){push();}
+    
+  signals:
+  
+    void    pushed(bool state);
+
+  private:
+  
+    QPoint  m_displaypos;
+    QPixmap checked_pixmap;
+    QPixmap unchecked_pixmap;
+    QPixmap checked_pixmap_high;
+    QPixmap unchecked_pixmap_high;
+    bool    checked;
+    QString label;
+};
+
+class IntStringPair
+{
+    //  Miniscule class for holding data
+    //  in a UISelectorType (below)
+    
+  public:
+  
+    IntStringPair(int an_int, const QString a_string){my_int = an_int; my_string = a_string;}
+
+    void    setString(const QString &a_string){my_string = a_string;}
+    void    setInt(int an_int){my_int = an_int;}
+    QString getString(){return my_string;}
+    int     getInt(){return my_int;}
+    
+
+  private:
+  
+    int     my_int;
+    QString my_string;
+
+};
+
+
+class UISelectorType : public UIPushButtonType
+{
+    Q_OBJECT
+    
+    //
+    //  A theme-able "thingy" (that's the 
+    //  offical term) that can hold a list
+    //  of strings and emit an int and/or
+    //  the string when the user selects
+    //  from among them.
+    //
+
+  public:
+  
+    UISelectorType(const QString &name, QPixmap on, QPixmap off, QPixmap pushed, QRect area);
+    ~UISelectorType();
+        
+    void    Draw(QPainter *, int drawlayer, int context);
+    void    calculateScreenArea();
+    void    addItem(int an_int, const QString &a_string);
+    void    setFont(fontProp *font) { m_font = font; }
+    
+  public slots:  
+  
+    void push(bool up_or_down);
+    void unPush();
+    void activate(){push(true);}
+    void cleanOut(){current_data = NULL; my_data.clear();}
+ 
+  signals:
+  
+    void    pushed(int);
+  
+  private:
+  
+    QRect                   m_area;
+    fontProp                *m_font;
+    QPtrList<IntStringPair> my_data;
+    IntStringPair           *current_data;
+
+};
+
+
+
+
 class UIBlackHoleType : public UIType
 {
+    Q_OBJECT
+    
     //
     //  This just holds a blank area of the screen
     //  originally designed to "hold" the place where
@@ -730,10 +848,9 @@ class UIBlackHoleType : public UIType
     void setArea(QRect an_area) { area = an_area; }
     virtual void Draw(QPainter *, int, int){}
 
-  private:
+  protected:
   
     QRect area;
 };
- 
 
 #endif

@@ -372,7 +372,6 @@ MythThemedDialog::MythThemedDialog(MythMainWindow *parent, QString window_name,
     context = -1;
     my_containers.clear();
     widget_with_current_focus = NULL;
-    focus_taking_widgets.clear();
 
     //
     //  Load the theme. Crap out if we can't find it.
@@ -412,11 +411,23 @@ MythThemedDialog::MythThemedDialog(MythMainWindow *parent, QString window_name,
         ++an_it;
     }
 
+    buildFocusList();
+
+    updateBackground();
+    initForeground();
+}
+
+bool MythThemedDialog::buildFocusList()
+{
     //
     //  Build a list of widgets that will take focus
     //
 
+    focus_taking_widgets.clear();
+
+
     //  Loop over containers
+    LayerSet *looper;
     QPtrListIterator<LayerSet> another_it(my_containers);
     while ((looper = another_it.current()) != 0)
     {
@@ -433,9 +444,11 @@ MythThemedDialog::MythThemedDialog(MythMainWindow *parent, QString window_name,
         }
         ++another_it;
     }
-
-    updateBackground();
-    initForeground();
+    if(focus_taking_widgets.count() > 0)
+    {
+        return true;
+    }
+    return false;
 }
 
 MythThemedDialog::~MythThemedDialog()
@@ -615,8 +628,8 @@ void MythThemedDialog::updateForeground(const QRect &r)
             //  Debugging
             //
             /*
-            cout << "A container called \"" << looper->GetName() << "\" said its
- area is "
+            cout << "A container called \"" << looper->GetName() 
+                 << "\" said its area is "
                  << container_area.left()
                  << ","
                  << container_area.top()
@@ -680,11 +693,17 @@ bool MythThemedDialog::assignFirstFocus()
         widget_with_current_focus->looseFocus();
     }
 
-    if (focus_taking_widgets.count() > 0)
+    QPtrListIterator<UIType> an_it(focus_taking_widgets);
+    UIType *looper;
+
+    while ((looper = an_it.current()) != 0)
     {
-        widget_with_current_focus = focus_taking_widgets.first();
-        widget_with_current_focus->takeFocus();
-        return true;
+        if(looper->canTakeFocus())
+        {
+            widget_with_current_focus = looper;
+            widget_with_current_focus->takeFocus();
+            return true;
+        }
     }
 
     return false;
@@ -700,7 +719,7 @@ bool MythThemedDialog::nextPrevWidgetFocus(bool up_or_down)
 
         while ((looper = an_it.current()) != 0)
         {
-            if (reached_current)
+            if (reached_current && looper->canTakeFocus())
             {
                 widget_with_current_focus->looseFocus();
                 widget_with_current_focus = looper;
@@ -730,7 +749,7 @@ bool MythThemedDialog::nextPrevWidgetFocus(bool up_or_down)
 
         while ((looper = an_it.current()) != 0)
         {
-            if (reached_current)
+            if (reached_current && looper->canTakeFocus())
             {
                 widget_with_current_focus->looseFocus();
                 widget_with_current_focus = looper;
@@ -747,10 +766,18 @@ bool MythThemedDialog::nextPrevWidgetFocus(bool up_or_down)
 
         if (reached_current)
         {
-            widget_with_current_focus->looseFocus();
-            widget_with_current_focus = focus_taking_widgets.last();
-            widget_with_current_focus->takeFocus();
-            return true;
+            an_it.toLast();
+            while ((looper = an_it.current()) != 0)
+            {
+                if(looper->canTakeFocus())
+                {
+                    widget_with_current_focus->looseFocus();
+                    widget_with_current_focus = looper;
+                    widget_with_current_focus->takeFocus();
+                    return true;
+                }
+                --an_it;
+            }
         }
         return false;
     }
@@ -891,6 +918,48 @@ UIRepeatedImageType* MythThemedDialog::getUIRepeatedImageType(const QString &nam
         {
             UIRepeatedImageType *hunted;
             if( (hunted = dynamic_cast<UIRepeatedImageType*>(hunter)) )
+            {
+                return hunted;
+            }
+        }
+        ++an_it;
+    }
+    return NULL;
+}
+
+UICheckBoxType* MythThemedDialog::getUICheckBoxType(const QString &name)
+{
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
+
+    while( (looper = an_it.current()) != 0)
+    {
+        UIType *hunter = looper->GetType(name);
+        if(hunter)
+        {
+            UICheckBoxType *hunted;
+            if( (hunted = dynamic_cast<UICheckBoxType*>(hunter)) )
+            {
+                return hunted;
+            }
+        }
+        ++an_it;
+    }
+    return NULL;
+}
+
+UISelectorType* MythThemedDialog::getUISelectorType(const QString &name)
+{
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
+
+    while( (looper = an_it.current()) != 0)
+    {
+        UIType *hunter = looper->GetType(name);
+        if(hunter)
+        {
+            UISelectorType *hunted;
+            if( (hunted = dynamic_cast<UISelectorType*>(hunter)) )
             {
                 return hunted;
             }
