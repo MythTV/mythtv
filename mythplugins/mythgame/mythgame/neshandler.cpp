@@ -6,12 +6,14 @@
 #include "neshandler.h"
 #include "nesrominfo.h"
 #include "nessettingsdlg.h"
+#include "unzip.h"
 
 #include <iostream>
 
 using namespace std;
 
 NesHandler* NesHandler::pInstance = 0;
+const char* NesHandler::Magic = "NES\032";
 
 NesHandler* NesHandler::getHandler()
 {
@@ -108,24 +110,50 @@ RomInfo* NesHandler::create_rominfo(RomInfo* parent)
 bool NesHandler::IsNesRom(QString Path)
 {
     bool NesRom = false;
+    char First4Bytes[4];
 
-    QFile f(Path);
-    if (f.open(IO_ReadOnly)) 
+    // See if the file is a zip file first
+    unzFile zf;
+    if ((zf = unzOpen(Path)))
     {
-        // Use the magic number for iNes files to check against the file.
-        const char Magic[] = "NES\032";
-        char First4Bytes[4];
-        f.readBlock(First4Bytes, 4);
-        if (strncmp(Magic, First4Bytes, 4) == 0)
+        // TODO Does this loop check the last file?
+        int FoundFile;
+        for (FoundFile = unzGoToFirstFile(zf); FoundFile == UNZ_OK;
+             FoundFile = unzGoToNextFile(zf))
         {
-            NesRom = true;
+            if (unzOpenCurrentFile(zf) == UNZ_OK)
+            {
+                unzReadCurrentFile(zf, First4Bytes, 4);
+                if (strncmp(Magic, First4Bytes, 4) == 0)
+                {
+                    // We found a NES rom in the zip, so exit the loop.
+                    // Assume that this is the one the emulator will find
+                    // also.
+                    NesRom = true;
+                    unzCloseCurrentFile(zf);
+                    break;
+                }
+                unzCloseCurrentFile(zf);
+            }
         }
-        else
-        {
-            NesRom = false;
-        }
-        f.close();
+        unzClose(zf);
     }
+    else
+    {
+        // Normal file
+        QFile qf(Path);
+        if (qf.open(IO_ReadOnly))
+        {
+            // Use the magic number for iNes files to check against the file.
+            qf.readBlock(First4Bytes, 4);
+            if (strncmp(Magic, First4Bytes, 4) == 0)
+            {
+                NesRom = true;
+            }
+            qf.close();
+        }
+    }
+
     return  NesRom;
 }
 
@@ -143,33 +171,75 @@ QString NesHandler::GetGameName(QString Path)
 
     // Try to get the GoodNES name for this file.
     QString GoodName;
-    QFile f(Path);
-    if (f.open(IO_ReadOnly))
+
+    // Get CRC of file
+    char block[8192];
+    uLong crc = crc32(0, Z_NULL, 0);
+
+    unzFile zf;
+    if ((zf = unzOpen(Path)))
     {
-        // Get CRC of file
-        char block[8192];
-        Q_LONG count;
-        uLong crc = crc32(0, Z_NULL, 0);
-
-        // Skip past iNes header
-        f.readBlock(block, 16);
-
-        // Get CRC of rom data
-        while ((count = f.readBlock(block, 8192))) 
+        // Find NES Rom in zip
+        char First4Bytes[4];
+        // TODO Does this loop check the last file?
+        int FoundFile;
+        for (FoundFile = unzGoToFirstFile(zf); FoundFile == UNZ_OK;
+             FoundFile = unzGoToNextFile(zf))
         {
-            crc = crc32(crc, (Bytef *)block, (uInt)count);
-        }
-        QString CRC;
-        CRC.setNum(crc, 16);
+            if (unzOpenCurrentFile(zf) == UNZ_OK)
+            {
+                unzReadCurrentFile(zf, First4Bytes, 4);
+                if (strncmp(Magic, First4Bytes, 4) == 0)
+                {
+                    // We found a NES rom in the zip, so exit the loop.
+                    // Assume that this is the one the emulator will find
+                    // also.
 
-        // Match CRC against crc file
-        map<QString, QString>::iterator i;
-        if ((i = CRCMap.find(CRC)) != CRCMap.end())
+                    // Skip past iNes header
+                    unzReadCurrentFile(zf, block, 16);
+
+                    // Get CRC of rom data
+                    int count;
+                    while ((count = unzReadCurrentFile(zf, block, 8192)))
+                    {
+                        crc = crc32(crc, (Bytef *)block, (uInt)count);
+                    }
+
+                    unzCloseCurrentFile(zf);
+                    break;
+                }
+                unzCloseCurrentFile(zf);
+            }
+        }
+        unzClose(zf);
+    }
+    else
+    {
+        QFile f(Path);
+        if (f.open(IO_ReadOnly))
         {
-            GoodName = i->second;
-        }
+            // Skip past iNes header
+            f.readBlock(block, 16);
 
-        f.close();
+            // Get CRC of rom data
+            Q_LONG count;
+            while ((count = f.readBlock(block, 8192)))
+            {
+                crc = crc32(crc, (Bytef *)block, (uInt)count);
+            }
+
+            f.close();
+        }
+    }
+
+    QString CRC;
+    CRC.setNum(crc, 16);
+
+    // Match CRC against crc file
+    map<QString, QString>::iterator i;
+    if ((i = CRCMap.find(CRC)) != CRCMap.end())
+    {
+        GoodName = i->second;
     }
 
     return GoodName;

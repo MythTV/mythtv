@@ -17,7 +17,6 @@
 #include <qtooltip.h>
 #include <qwhatsthis.h>
 #include <qimage.h>
-#include <qmsgbox.h>
 
 #include "neshandler.h"
 

@@ -23,6 +23,7 @@ class NesHandler : public GameHandler
     RomInfo* create_rominfo(RomInfo* parent);
     
     static NesHandler* getHandler();
+    static const char* Magic;
 
   private:
     static NesHandler* pInstance;
