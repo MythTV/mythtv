@@ -635,6 +635,11 @@ void LCD::switchToChannel(QString channum, QString title, QString subtitle)
 	startChannel(channum, title, subtitle);
 }
 
+void LCD::switchToNothing()
+{
+	stopAll();
+}
+
 LCD::~LCD()
 {
 #ifdef LCD_DEVICE_DEBUG

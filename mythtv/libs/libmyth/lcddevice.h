@@ -77,6 +77,15 @@ class LCD : public QObject
 				
 		void	setChannelProgress(float percentViewed);
 		
+				//	
+				//	If some other process should be getting all the
+				//	LCDd screen time (e.g. mythMusic) we can use this
+				//	to try and prevent and screens from showing up
+				//	without having to actual destroy the LCD object
+				//
+				
+		void	switchToNothing();
+		
 
 
 	private slots:
