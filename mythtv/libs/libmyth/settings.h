@@ -34,7 +34,7 @@ public:
             setLabel(str);
     };
     QString getName(void) const { return configName; };
-    virtual QString byName(QString name) const = 0;
+    virtual class Setting* byName(QString name) = 0;
 
     // A label displayed to the user
     void setLabel(QString str) { label = str; };
@@ -59,10 +59,10 @@ public:
         return settingValue;
     };
 
-    virtual QString byName(QString name) const {
+    virtual Setting* byName(QString name) {
         if (name == getName())
-            return getValue();
-        return QString::null;
+            return this;
+        return NULL;
     };
 
 public slots:
@@ -91,17 +91,17 @@ public:
         children.push_back(child);
     };
 
-    virtual QString byName(QString name) const {
-        for(childList::const_iterator i = children.begin() ;
+    virtual Setting* byName(QString name) {
+        for(childList::iterator i = children.begin() ;
             i != children.end() ;
             ++i ) {
 
-            QString c = (*i)->byName(name);
-            if (c != QString::null)
+            Setting* c = (*i)->byName(name);
+            if (c != NULL)
                 return c;
         }
 
-        return QString::null;
+        return NULL;
     }
 
     virtual void load(QSqlDatabase* db) {
@@ -144,13 +144,6 @@ signals:
 
 protected:
     unsigned top;
-};
-
-class TabbedConfigurationGroup: virtual public ConfigurationGroup {
-    Q_OBJECT
-public:
-    virtual QWidget* configWidget(QWidget* parent,
-                                  const char* widgetName = 0);
 };
 
 class ConfigurationDialog: virtual public Configurable {
@@ -231,19 +224,29 @@ class StringSelectSetting: virtual public Setting {
 protected:
     StringSelectSetting() { isSet = false; };
 public:
-    void addSelection(const QString& label,
-                      QString value=QString::null,
-                      bool select=false) {
+    virtual void addSelection(const QString& label,
+                              QString value=QString::null,
+                              bool select=false) {
 
         if (value == QString::null)
             value = label;
 
         labels.push_back(label);
         values.push_back(value);
+        emit selectionAdded(label, value);
 
         if (select || !isSet)
             setValue(value);
     };
+
+    virtual void clearSelections(void) {
+        labels.clear();
+        values.clear();
+        isSet = false;
+    };
+
+signals:
+    void selectionAdded(const QString& label, QString value);
 
 public slots:
 
@@ -319,6 +322,60 @@ public:
     virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
 };
 
+
+class TriggeredConfigurationGroup: virtual public ConfigurationGroup {
+    Q_OBJECT
+public:
+    TriggeredConfigurationGroup() {
+        trigger = configStack = NULL;
+    };
+
+    void setTrigger(Configurable* _trigger) {
+        trigger = _trigger;
+        // Make sure the stack is after the trigger
+        addChild(configStack = new StackedConfigurationGroup());
+
+        connect(trigger, SIGNAL(valueChanged(const QString&)),
+                this, SLOT(triggerChanged(const QString&)));
+    };
+
+    void addTrigger(QString triggerValue, Configurable* target) {
+        configStack->addChild(target);
+        triggerMap[triggerValue] = target;
+    };
+
+protected slots:
+    virtual void triggerChanged(const QString& value) {
+        cerr << "trigger changed: " << value << endl;
+        configStack->raise(triggerMap[value]);
+    };
+protected:
+    StackedConfigurationGroup* configStack;
+    Configurable* trigger;
+    map<QString,Configurable*> triggerMap;
+};
+    
+class TabbedConfigurationGroup: virtual public ConfigurationGroup {
+    Q_OBJECT
+public:
+    virtual QWidget* configWidget(QWidget* parent,
+                                  const char* widgetName = 0);
+};
+
+class PathSetting: public ComboBoxSetting {
+public:
+    PathSetting(bool _mustexist):
+        ComboBoxSetting(true), mustexist(_mustexist) {
+    };
+    virtual void addSelection(const QString& label,
+                              QString value=QString::null,
+                              bool select=false);
+    // Use combobox for now, maybe a modified file dialog later
+    //virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
+protected:
+    bool mustexist;
+};
+
 class DBStorage: virtual public Setting {
 public:
     DBStorage(QString _table, QString _column):
@@ -329,6 +386,7 @@ public:
 
 protected:
     QString getColumn(void) const { return column; };
+    QString getTable(void) const { return table; };
 
     QString table;
     QString column;
@@ -362,5 +420,32 @@ public:
     virtual void load(QSqlDatabase* db) { (void)db; };
     virtual void save(QSqlDatabase* db);
 };
+
+// class Browsable: public QObject {
+//     Q_OBJECT
+// public:
+//     Browsable(QString _title,
+//               QString _table, QString _valueColumn, QString _labelColumn):
+//         title(_title),
+//         table(_table), valueColumn(_valueColumn), labelColumn(_labelColumn) {};
+
+//     QDialog* browseDialog(QSqlDatabase* db,
+//                           QWidget* parent = NULL, const char* widgetName = 0);
+
+// signals:
+//     void selected(QString value);
+
+// protected slots:
+//     void select(class QListViewItem* item) {
+//         emit selected(itemToValue[item]);
+//     };
+
+// private:
+//     QString title;
+//     QString table;
+//     QString valueColumn;
+//     QString labelColumn;
+//     map<class QListViewItem*,QString> itemToValue;
+// };
 
 #endif

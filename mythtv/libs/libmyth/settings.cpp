@@ -19,6 +19,8 @@
 #include <qwidgetstack.h>
 #include <qdialog.h>
 #include <qtabdialog.h>
+#include <qfile.h>
+#include <qlistview.h>
 
 QWidget* VerticalConfigurationGroup::configWidget(QWidget* parent,
                                                   const char* widgetName) {
@@ -156,6 +158,19 @@ QWidget* ComboBoxSetting::configWidget(QWidget* parent,
     return box;
 }
 
+void PathSetting::addSelection(const QString& label,
+                               QString value,
+                               bool select) {
+    QString pathname = label;
+    if (value != QString::null)
+        pathname = value;
+
+    if (mustexist && !QFile(pathname).exists())
+        return;
+
+    ComboBoxSetting::addSelection(label, value, select);
+}
+
 QWidget* RadioSetting::configWidget(QWidget* parent,
                                     const char* widgetName) {
     QButtonGroup* widget = new QButtonGroup(parent, widgetName);
@@ -282,3 +297,35 @@ void AutoIncrementStorage::save(QSqlDatabase* db) {
         setValue(result.value(0).toInt());
     }
 }
+
+// QDialog* Browsable::browseDialog(QSqlDatabase* db,
+//                                  QWidget* parent, const char* widgetName) {
+//     QString query = QString("SELECT %1, %2 FROM %3")
+//         .arg(valueColumn).arg(labelColumn).arg(table);
+//     QSqlQuery result = db->exec(query);
+
+//     QDialog* dialog = new QDialog(parent, widgetName);
+//     QVBoxLayout* vbox = new QVBoxLayout(dialog);
+
+//     QListView* listview = new QListView(dialog);
+//     vbox->addWidget(listview);
+
+//     listview->setAllColumnsShowFocus(TRUE);
+
+//     if (result.isActive() && result.numRowsAffected() > 0)
+//         while (result.next()) {
+//             QString value = result.value(0).toString();
+//             QString label = result.value(1).toString();
+//             QListViewItem* item = new QListViewItem(listview,
+//                                                     result.value(1).toString());
+//             itemToValue[item] = value;
+//             listview->insertItem(item);
+//         }
+
+//     connect(listview, SIGNAL(clicked(QListViewItem*)),
+//             this, SLOT(select(QListViewItem*)));
+//     connect(listview, SIGNAL(returnPressed(QListViewItem*)),
+//             this, SLOT(select(QListViewItem*)));
+
+//     return dialog;
+// }
