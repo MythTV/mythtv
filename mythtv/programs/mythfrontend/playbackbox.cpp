@@ -652,8 +652,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                      {
                          tempInfo = &(it.data());
 
-                         if (curtime < tempInfo->endts && 
-                             curtime > tempInfo->startts)
+                         if (curtime < tempInfo->endts)
                              tempCurrent = true;
                          else
                              tempCurrent = false;
