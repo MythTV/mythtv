@@ -106,9 +106,13 @@ void MameHandler::processGames()
                         i++;
                 value[i] = 0;
         }
-        supported_games = atoi(value);
-
         pclose(xmame_info);
+
+        if (value)
+            supported_games = atoi(value);
+        else
+            return;
+
         /* Generate the list */
         makecmd_line("-listinfo 2>/dev/null", &infocmd, NULL);
         xmame_info = popen(infocmd, "r");
@@ -758,7 +762,13 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
         }
         if (!screenshotdir.isEmpty())
         {
-          *exec+= " -screenshotdir ";
+          tmp = general_prefs.xmame_minor;
+          /* The screenshot dir argument name changed in 0.62. */
+          if (atoi(tmp) >= 62) {
+            *exec+= " -snapshot_directory ";
+          } else {
+            *exec+= " -screenshotdir ";
+          }
           *exec+= screenshotdir;
         }
         if (!general_prefs.highscore_dir.isEmpty())
