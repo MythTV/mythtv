@@ -730,6 +730,12 @@ void XvVideoOutput::Show(unsigned char *buffer, int width, int height)
         v_ptr = y_ptr + (width * height * 5 / 4);
 
         yuv2rgb_fun convert = yuv2rgb_init_mmx(XJ_depth, MODE_RGB);
+        if (!convert)
+        {
+            cerr << "Non Xv mode only supports 16 or 32 bpp displays\n";
+            exit(0);
+        }
+
         convert( sbuf, y_ptr, u_ptr, v_ptr, width, height, width * XJ_depth / 8,
             width, width / 2);
 

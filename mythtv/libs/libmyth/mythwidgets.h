@@ -342,4 +342,15 @@ public slots:
     void setCurrentItem(int index) { QListBox::setCurrentItem(index); };
 };
 
+class MythPopupBox : public QFrame
+{
+  public:
+    MythPopupBox(QWidget *parent);
+
+    void addWidget(QWidget *widget);
+
+  private:
+    QVBoxLayout *vbox;
+};
+
 #endif

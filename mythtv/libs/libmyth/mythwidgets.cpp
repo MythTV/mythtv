@@ -193,7 +193,11 @@ void MythRemoteLineEdit::Init()
     setWordWrap(QTextEdit::NoWrap);
     QScrollView::setVScrollBarMode(QScrollView::AlwaysOff);
     QScrollView::setHScrollBarMode(QScrollView::AlwaysOff);
-    
+
+    QFontMetrics fontsize(font());
+
+    setMinimumHeight(fontsize.height() * 5 / 4);
+    setMaximumHeight(fontsize.height() * 5 / 4);
 
     connect(cycle_timer, SIGNAL(timeout()), this, SLOT(endCycle()));
 }
@@ -700,7 +704,7 @@ void MythToolButton::drawButton(QPainter *p)
         flags |= QStyle::Style_Raised;
 
     if (!origcolor.isValid())
-        origcolor = colorGroup().button();
+        origcolor = palette().color(QPalette::Inactive, QColorGroup::Button);;
 
     QColor set;
 
@@ -773,7 +777,7 @@ void MythPushButton::drawButton( QPainter * p )
         flags |= QStyle::Style_Raised;
 
     if (!origcolor.isValid())
-        origcolor = colorGroup().button();
+        origcolor = palette().color(QPalette::Inactive, QColorGroup::Button);
 
     QColor set;
 
@@ -1035,3 +1039,29 @@ void MythListBox::keyPressEvent(QKeyEvent* e) {
         e->ignore();
     }
 }
+
+MythPopupBox::MythPopupBox(QWidget *parent)
+            : QFrame(parent, 0, WType_Popup)
+{
+    int w, h;
+    float wmult, hmult;
+
+    gContext->GetScreenSettings(w, wmult, h, hmult);
+
+    setLineWidth(3);
+    setMidLineWidth(3);
+    setFrameShape(QFrame::Panel);
+    setFrameShadow(QFrame::Raised);
+    setPalette(parent->palette());
+    setFont(parent->font());
+
+    vbox = new QVBoxLayout(this, (int)(10 * hmult));
+}
+
+void MythPopupBox::addWidget(QWidget *widget)
+{
+    widget->setPalette(palette());
+    widget->setFont(font());
+    vbox->addWidget(widget);
+}
+
