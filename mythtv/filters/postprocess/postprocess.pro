@@ -10,6 +10,9 @@ CONFIG += plugin thread
 target.path = $${PREFIX}/lib/mythtv/filters
 INSTALLS = target
 
+CONFIG -= debug
+CONFIG += release
+
 INCLUDEPATH += ../../libs/libNuppelVideo
 
 QMAKE_CFLAGS_RELEASE += -Wno-missing-prototypes -O2 -fomit-frame-pointer

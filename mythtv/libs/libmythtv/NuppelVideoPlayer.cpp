@@ -247,7 +247,11 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     }
     startpos = ringBuffer->Seek(0, SEEK_CUR);
     
-    ringBuffer->Read(&fileheader, FILEHEADERSIZE);
+    if (ringBuffer->Read(&fileheader, FILEHEADERSIZE) != FILEHEADERSIZE)
+    {
+        cerr << "Error reading file: " << ringBuffer->GetFilename() << endl;
+        return -1;
+    }
 
     while (QString(fileheader.finfo) != "NuppelVideo")
     {
@@ -257,7 +261,11 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
         startpos = ringBuffer->Seek(0, SEEK_CUR);
  
-        ringBuffer->Read(&fileheader, FILEHEADERSIZE);
+        if (ringBuffer->Read(&fileheader, FILEHEADERSIZE) != FILEHEADERSIZE)
+        {
+            cerr << "Error reading file: " << ringBuffer->GetFilename() << endl;
+            return -1;
+        }
 
         if (startpos > 20000)
         {
@@ -335,12 +343,16 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
         startpos = ringBuffer->Seek(0, SEEK_CUR);
 
-        ringBuffer->Read(&frameheader, FRAMEHEADERSIZE);
+        if (ringBuffer->Read(&frameheader, FRAMEHEADERSIZE) != FRAMEHEADERSIZE)
+        {
+            delete [] space;
+            return -1;
+        }
 
         if (startpos > 20000)
         {
             delete [] space;
-            return 0;
+            return -1;
         }
     }
 
