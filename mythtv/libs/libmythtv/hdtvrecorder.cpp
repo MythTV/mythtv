@@ -158,11 +158,14 @@ bool HDTVRecorder::Open()
 
 #if FAKE_VIDEO
     // open file instead of device
-    if (_stream_fd >=0)
+    if (_stream_fd >=0 && close(_stream_fd))
     {
-        int ret = close(_stream_fd);
-        assert(ret);
+        VERBOSE(VB_IMPORTANT,
+                QString("HDTVRecorder::Open(): Error, failed to close "
+                        "existing fd (%1)").arg(strerror(errno)));
+        return false;
     }
+
     _stream_fd = open(FAKE_VIDEO_FILES[fake_video_index], O_RDWR);
     VERBOSE(VB_IMPORTANT, QString("Opened fake video source %1").arg(FAKE_VIDEO_FILES[fake_video_index]));
     fake_video_index = (fake_video_index+1)%FAKE_VIDEO_NUM;
@@ -688,15 +691,23 @@ void HDTVRecorder::WritePMT() {
             WABV_started = true;
             WABV_wait_a_while = WABV_WAIT;
             WABV_base_pid = (((WABV_base_pid-0x100)+1)%32)+0x100;
-            VERBOSE(VB_IMPORTANT, QString("Whack a Bug: new video pid %1").arg(WABV_base_pid));
-            // rewrite video pid
-            assert(StreamID::MPEG2Video == StreamData()->PMT()->StreamType(0));
-            const uint old_video_pid=StreamData()->PMT()->StreamPID(0);
-            StreamData()->PMT()->SetStreamPID(0, WABV_base_pid);
-            if (StreamData()->PMT()->PCRPID() == old_video_pid)
-                StreamData()->PMT()->SetPCRPID(WABV_base_pid);
-            StreamData()->PMT()->SetCRC(StreamData()->PMT()->CalcCRC());
-            VERBOSE(VB_IMPORTANT, StreamData()->PMT()->toString());
+            if (StreamID::MPEG2Video != StreamData()->PMT()->StreamType(0))
+            {
+                VERBOSE(VB_IMPORTANT, "HDTVRecorder::WritePMT(): Error,"
+                        "Whack a Bug can not rewrite PMT, wrong stream type");
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT, QString("Whack a Bug: new video pid %1").
+                        arg(WABV_base_pid));
+                // rewrite video pid
+                const uint old_video_pid=StreamData()->PMT()->StreamPID(0);
+                StreamData()->PMT()->SetStreamPID(0, WABV_base_pid);
+                if (StreamData()->PMT()->PCRPID() == old_video_pid)
+                    StreamData()->PMT()->SetPCRPID(WABV_base_pid);
+                StreamData()->PMT()->SetCRC(StreamData()->PMT()->CalcCRC());
+                VERBOSE(VB_IMPORTANT, StreamData()->PMT()->toString());
+            }
         }
 #endif
 #if WHACK_A_BUG_AUDIO

@@ -5,8 +5,6 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-#include <cassert>
-
 using namespace std;
 
 #include "RingBuffer.h"
@@ -132,13 +130,11 @@ void DTVRecorder::FindKeyframes(const TSPacket* tspacket)
             _position_within_gop_header = (k == 0x00) ? 2 : 0;
         else 
         {
-            assert(2 == _position_within_gop_header);
             if (0x01 != k)
             {
                 _position_within_gop_header = (k) ? 0 : 2;
                 continue;
             }
-            assert(0x01 == k);
             const unsigned char k1 = buffer[i+1];
             if (0x00 == k1)
             {   //   00 00 01 00: picture_start_code
