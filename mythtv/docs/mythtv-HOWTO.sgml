@@ -1574,20 +1574,19 @@ compilation procedure is the same as when you're setting up both a backend
 and a frontend.  However, you <em>will</em> need to install the database
 access libraries.
 
-Once MythTV is compiled and installed, you must change your
-<tt>/usr/local/share/mythtv/mysql.txt</tt> or <tt>~/.mythtv/mysql.txt</tt>
-file's "DBHostName" field to point to your Master backend's IP address.
-
-<bf>NOTE</bf>: The <tt>/usr/local/share/mythtv/mysql.txt</tt> file is
-overwritten each time you upgrade, so any changes you make there will be
-lost.  Use <tt>~/.mythtv/mysql.txt</tt> to avoid losing your custom
-configuration.
-
+Once MythTV is compiled and installed:
+<list>
+<item>
 Run the MythTV setup program on your Master backend. Under the "General"
 menu, change the IP address of the current machine (by default, "127.0.0.1")
 to the real external IP address - 127.0.0.1 is the loopback address and no
 external machine can access it. Change the Master Server IP setting to the
 same IP address as well.
+<item>
+Run the mythfrontend program on your frontend machine,
+and a "Database Configuration" screen should appear.
+Set the "Host name" field to point to your Master backend's IP address.
+</list>
 
 <sect1>Gentoo <label id="Gentoo_build">
 <p>Installation of MythTV on Gentoo consists of simply emerging the desired
@@ -2537,13 +2536,8 @@ Because MythTV now uses a database to store all configuration variables,
 part of the bootstrap of MythTV is to indicate the location of the MySQL
 database server. If the frontend, backend and MySQL database server are all
 going to be running on the same box, you can continue to the next step.  If
-not, you'll need to edit the <tt>/usr/local/share/mythtv/mysql.txt</tt> or
-<tt>~/.mythtv/mysql.txt</tt> file and change the first line to the IP
-address of the database server.  Customizing <tt>~/.mythtv/mysql.txt</tt> is
-preferred, since changes to <tt>/usr/local/share/mythtv/mysql.txt</tt> will
-be lost the next time you upgrade. All other configuration is within the
-MythTV GUI screens.
-
+not, you'll need to change the Host Name in the "Database Configuration"
+screen of the mythfrontend program.
 
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
@@ -2775,9 +2769,8 @@ name="Automatically starting mythbackend at system boot time">.
 <p>Ensure that you've granted access to the master MySQL database for remote
 backends as discussed in the section titled <ref id="modify_perm_mysql"
 name="Modifying access to the MySQL database for multiple systems"> and that
-you've edited the <tt>/usr/local/share/mythtv/mysql.txt</tt> or
-<tt>~/.mythtv/mysql.txt</tt> file and put the correct IP
-address for the database server.
+you have the correct IP address for the database server in the "Database
+Configuration" screen of the setup application on this slave backend.
 
 Make sure that the IP addresses on the General setup screen are accurate. 
 If the slave backend can't communicate with the master backend due to IP
@@ -2969,7 +2962,18 @@ $ mythfilldatabase --import-icon-map iconmap.xml --update-icon-map
 <p>Once you have completed configuration of your backend systems, the next
 step is to configure the frontend client.  
 
-When you start mythfrontend, you should have a number of choices.  Before
+When you start mythfrontend for the first time, it will attempt to
+connect to a configuration database on the local machine.  If there is none,
+a "Database Configuration" screen will appear, and you will need to
+fill in some details.  The "Host name" field needs the backend or
+database server's IP address or DNS name, and the User or password fields
+may need to be set to match your database user accounts.  After editing those
+fields, press enter twice to write these configurations on your local machine,
+and attempt to connect to the database.  If you make any mistakes, the screens
+will pop up again.
+
+Now that mythfrontend has started up,
+you should have a number of buttons/choices.  Before
 doing anything, go to TV, then to Setup and configure the frontend client.
 
 <figure loc="here">
@@ -3858,7 +3862,8 @@ command" with the "Wakeup time format" suitable for that tool.
 <sect2>Wakeup the MySQL server using WOL
 <p>If your MySQL server and your Master backend are not on the same machine,
 you can have the Master backend wake your MySQL server using WOL. You will
-find the settings for this in mysql.txt. The meanings are the same as
+find the settings for this in the second page of the setup program,
+or at the end of mysql.txt.  The meanings are the same as
 discussed in "The WakeOnLan settings" above.
 
 <sect2>Tips/Tricks:
@@ -4875,12 +4880,6 @@ first choice is the better solution.
 <p>You didn't set your <tt>QTDIR</tt>.  Re-read the section on <ref
 id="Setting_up_paths" name="Setting up paths">.
 
-<sect2>Settings get reset at every compile.
-<p>MythTV will overwrite any settings in <tt>/usr/local/share/mythtv</tt>.
-If you want to make sure that you don't lose your modifications, make a
-directory <tt>~/.mythtv</tt> and copy your mysql.txt file to this
-location.
-
 <sect1>Debugging
 <sect2>MythTV segfaults
 <sect2>MythTV isn't doing anything
@@ -5007,7 +5006,7 @@ need to be edited for your setup.  Go to Settings->TV Settings->Recording
 Profiles and adjust the <bf>Default</bf> and <bf>Live TV</bf> options to
 480 or 576 from their defaults.
 
-<sect2>Screen goes blank but returns when mouse if moved or keyboard is used
+<sect2>Screen goes blank but returns when mouse is moved or keyboard is used
 <p>This is due to DPMS, the Display Power Management System, which is used
 to save power by turning off your monitor when the system decides that it's
 not being used or due to a screensaver that has defaulted to a blank screen. 
