@@ -167,6 +167,8 @@ class NuppelVideoPlayer
     void ToggleLetterbox(void);
     bool GetLetterbox(void);
 
+    void ExposeEvent(void);
+
  protected:
     void OutputVideoLoop(void);
 

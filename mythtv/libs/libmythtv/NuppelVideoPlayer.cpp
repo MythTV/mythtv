@@ -2011,6 +2011,12 @@ void NuppelVideoPlayer::ToggleLetterbox(void)
         videoOutput->ToggleLetterbox();
 }
 
+void NuppelVideoPlayer::ExposeEvent(void)
+{
+    if (videoOutput)
+        videoOutput->ExposeEvent();
+}
+
 void NuppelVideoPlayer::UpdateSeekAmount(bool up)
 {
     if (seekamountpos > 0 && !up)

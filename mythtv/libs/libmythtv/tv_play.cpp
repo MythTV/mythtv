@@ -800,17 +800,28 @@ bool TV::eventFilter(QObject *o, QEvent *e)
 {
     (void)o;
 
-    if (e->type() != QEvent::KeyPress)
-        return false;
-
-    QKeyEvent *k = (QKeyEvent *)e;
+    switch (e->type())
+    {
+        case QEvent::KeyPress:
+        {
+            QKeyEvent *k = (QKeyEvent *)e;
   
-    // can't process these events in the Qt event loop. 
-    keyListLock.lock();
-    keyList.push_back(k->key());
-    keyListLock.unlock();
+            // can't process these events in the Qt event loop. 
+            keyListLock.lock();
+            keyList.push_back(k->key());
+            keyListLock.unlock();
 
-    return true;
+            return true;
+        }
+        case QEvent::Paint:
+        {
+            if (nvp)
+                nvp->ExposeEvent();
+            return true;
+	}
+        default:
+            return false;
+    }
 }
 
 void TV::ProcessKeypress(int keypressed)

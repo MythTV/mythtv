@@ -181,6 +181,8 @@ VideoOutput::VideoOutput()
 
     vbuffers = NULL;
     numbuffers = 0;
+
+    needrepaint = false;
 }
 
 VideoOutput::~VideoOutput()

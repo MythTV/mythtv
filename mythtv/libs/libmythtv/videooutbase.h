@@ -86,6 +86,8 @@ class VideoOutput
 
     void ClearAfterSeek(void);
 
+    void ExposeEvent(void) { needrepaint = true; }
+
   protected:
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
                      int needprebuffer, int keepprebuffer);
@@ -129,6 +131,8 @@ class VideoOutput
     int needfreeframes;
     int needprebufferframes;
     int keepprebufferframes;
+
+    bool needrepaint;
 };
 
 #endif

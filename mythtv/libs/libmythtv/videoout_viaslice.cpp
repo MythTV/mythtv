@@ -340,6 +340,12 @@ void VideoOutputVIA::PrepareFrame(VideoFrame *buffer)
     via_slice_state_t *curdata = (via_slice_state_t *)buffer->buf;
 
     data->display_frame = curdata->image_number;
+
+    if (needrepaint)
+    {
+        DrawUnusedRects();
+        needrepaint = false;
+    }
 }
 
 void VideoOutputVIA::Show()
@@ -412,13 +418,13 @@ void VideoOutputVIA::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
 void VideoOutputVIA::DrawUnusedRects(void)
 {
     XSetForeground(data->XJ_disp, data->XJ_gc, colorkey);
-    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 0, 0,
+    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, dispx, dispy,
                    dispw, disph);
 
     XSetForeground(data->XJ_disp, data->XJ_gc, XJ_black);
-    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 0, 0, dispw,
-                   dispyoff);
-    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 0,
+    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, dispx, dispy, 
+                   dispw, dispyoff);
+    XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, dispx,
                    dispyoff + disphoff, dispw, dispyoff);
 
     data->ddUpdateOverlay.rDest.left = dispxoff;
@@ -435,6 +441,8 @@ void VideoOutputVIA::DrawUnusedRects(void)
     data->ddUpdateOverlay.dwColorSpaceLowValue = colorkey;
 
     VIADriverProc(UPDATEOVERLAY, &data->ddUpdateOverlay);
+
+    XSync(data->XJ_disp, false);
 }
 
 void VideoOutputVIA::UpdatePauseFrame(void)
