@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythcontext.h"
 
-const QString currentDatabaseVersion = "1038";
+const QString currentDatabaseVersion = "1039";
 
 void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -33,6 +33,17 @@ void performActualUpdate(const QString updates[], QString version,
     while (thequery != "")
     {
         db_conn->exec(thequery);
+
+        if (db_conn->lastError().type() != QSqlError::None)
+        {
+            cerr << "DB Error (Performing database upgrade):" << endl;
+            cerr << "Query was:" << endl
+                 << thequery << endl
+                 << MythContext::DBErrorMessage(db_conn->lastError()) << endl;
+
+            exit(-1);
+        }
+
         counter++;
         thequery = updates[counter];
     }
@@ -700,7 +711,6 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 
     if (dbver == "1037")
     {
-
         const QString updates[] = {
 "ALTER TABLE videosource ADD lineupid VARCHAR(64) NULL;",
 "ALTER TABLE videosource ADD password VARCHAR(64) NULL;",
@@ -723,15 +733,30 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE people DROP INDEX name;",
 "ALTER TABLE people ADD UNIQUE name (name(41));",
 "CREATE TABLE programgenres ( "
-"    chanid int unsigned, "
-"    starttime timestamp, "
-"    relevance char(1), "
+"    chanid int unsigned NOT NULL, "
+"    starttime timestamp NOT NULL, "
+"    relevance char(1) NOT NULL, "
 "    genre char(30), "
 "    PRIMARY KEY (chanid, starttime, relevance) "
 ");",
 ""
 };
         performActualUpdate(updates, "1038", dbver);
+    }
+
+    if (dbver == "1038")
+    {
+        const QString updates[] = {
+"CREATE TABLE IF NOT EXISTS programgenres ( "
+"    chanid int unsigned NOT NULL, "
+"    starttime timestamp NOT NULL, "
+"    relevance char(1) NOT NULL, "
+"    genre char(30), "
+"    PRIMARY KEY (chanid, starttime, relevance) "
+");",
+""
+};
+        performActualUpdate(updates, "1039", dbver);
     }
 }
 

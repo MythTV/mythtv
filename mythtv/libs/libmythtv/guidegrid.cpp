@@ -295,7 +295,8 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
         return; //check for Escape in case something goes wrong 
                 //with KeyRelease events, shouldn't happen.
 
-    if (e->key() != Key_Control)
+    if (e->key() != Key_Control && e->key() != Key_Shift && 
+        e->key() != Key_Meta && e->key() != Key_Alt)
         keyDown = true;    
 
     if (e->state() == Qt::ControlButton)

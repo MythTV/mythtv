@@ -171,23 +171,36 @@ void AudioOutputALSA::AddSamples(char *buffers[], int frames, long long timecode
     int err;
 
  retry:
-    if(pcm_handle == NULL)
+    if (pcm_handle == NULL)
         return;
 
 //    printf("Trying to write %d non-i frames to soundbuffer\n", frames);
-    err = snd_pcm_mmap_writen(pcm_handle, (void **)buffers, frames);
-    if (err == -EAGAIN || (err >= 0 && err != frames))
-        VERBOSE(VB_IMPORTANT, "Audio buffer overflow, audio data lost!");
-    else if (err < 0) {
-        if (XRunRecovery(pcm_handle, err) < 0) {
-            Error(QString("Write error, disabling sound output: %1")
-                  .arg(snd_strerror(err)));
-            snd_pcm_close(pcm_handle);
-            pcm_handle = NULL;
+    while (frames > 0)
+    {
+       err = snd_pcm_mmap_writen(pcm_handle, (void **)buffers, frames);
+       if (err >= 0)
+       {
+            buffers[0] += err * audio_bytes_per_sample;
+            buffers[1] += err * audio_bytes_per_sample;
+            frames -= err;
         }
-        goto retry;
+        else if (err == -EAGAIN)
+        {
+            snd_pcm_wait(pcm_handle,10);
+        }
+        else if (err < 0)
+        {
+            if (XRunRecovery(pcm_handle, err) < 0)
+           {
+                Error(QString("Write error, disabling sound output: %1")
+                      .arg(snd_strerror(err)));
+                snd_pcm_close(pcm_handle);
+                pcm_handle = NULL;
+            }
+            goto retry;
+        }
     }
-    
+
     if(timecode < 0) 
         timecode = audbuf_timecode; // add to current timecode
     

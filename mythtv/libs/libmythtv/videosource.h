@@ -378,6 +378,8 @@ protected:
     DVBSatelliteList* list;
 };
 
+class DVBSignalChannelOptions;
+
 class DVBCardVerificationWizard: public ConfigurationWizard {
     Q_OBJECT
 public:
