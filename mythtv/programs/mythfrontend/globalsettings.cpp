@@ -83,7 +83,7 @@ public:
         GlobalSetting("ExactSeeking") {
         setLabel("Seek to exact frame");
         setValue(false);
-        setHelpText("If this is set, seeking is frame exact, and takes extra time");
+        setHelpText("If this is set, seeking is frame exact (slower)");
     };
 };
 
@@ -103,6 +103,8 @@ public:
         GlobalSetting("StickyKeys") {
         setLabel("Sticky keys");
         setValue(false);
+        setHelpText("If this is set, fast forward and rewind continue after the key is released, until "
+                    "it is pressed again");
     };
 };
 
@@ -219,6 +221,9 @@ public:
         GlobalSetting("PlaybackExitPrompt") {
         setLabel("Prompt on playback exit");
         setValue(false);
+        setHelpText("If this is set, a menu will be displayed when you exit "
+                    "playback, with alternative options to save your position, "
+                    "delete the recording, or continue watching");
     };
 };
 
@@ -270,7 +275,7 @@ public:
         GlobalSetting("XineramaScreen") {
         setLabel("Xinerama screen");
         setValue(0);
-        // ignored if not using xinerama
+        setHelpText("If using Xinerama, run only on the specified screen");
     };
 };
 
