@@ -51,42 +51,6 @@ public:
     };
 };
 
-// Manages selection of a codec and its associated settings
-class CompressionSettings: public VerticalConfigurationGroup {
-    Q_OBJECT
-protected:
-    CompressionSettings(StringSelectSetting* _codecName) {
-        codecName = _codecName;
-        codecSettingStack = new StackedConfigurationGroup();
-
-        addChild(codecName);
-        addChild(codecSettingStack);
-
-        // Switch the stack when the codec changes
-        connect(codecName, SIGNAL(valueChanged(const QString&)),
-                this, SLOT(codecChanged(const QString&)));
-    };
-
-    void addCodec(QString codec, Configurable* settings) {
-        codecSettingStack->addChild(settings);
-        codecSettingMap[codec] = settings;
-        codecName->addSelection(codec);
-    };
-
-protected slots:
-    void codecChanged(const QString& str) {
-        codecSettingStack->raise(codecSettingMap[str]);
-    };
-
-private:
-    StackedConfigurationGroup* codecSettingStack;
-    StringSelectSetting* codecName;
-
-    // For raising codec settings to the top
-    typedef map<QString,Configurable*> CodecSettingMap;
-    CodecSettingMap codecSettingMap;
-};
-
 class MP3Quality: public CodecParam, public SliderSetting {
 public:
     MP3Quality(const RecordingProfile& parent):
@@ -108,20 +72,25 @@ public:
     };
 };
 
-class AudioCompressionSettings: public CompressionSettings {
-    Q_OBJECT
+class AudioCompressionSettings: public VerticalConfigurationGroup,
+                                public TriggeredConfigurationGroup {
 public:
-    AudioCompressionSettings(const RecordingProfile& parent):
-        CompressionSettings(new AudioCodecName(parent)) {
+    AudioCompressionSettings(const RecordingProfile& parent) {
 
         setLabel("Audio Compression");
+
+        AudioCodecName* codecName = new AudioCodecName(parent);
+        addChild(codecName);
+        setTrigger(codecName);
 
         ConfigurationGroup* params = new VerticalConfigurationGroup();
         params->setLabel("MP3");
         params->addChild(new MP3Quality(parent));
-        addCodec("MP3", params);
+        codecName->addSelection("MP3");
+        addTrigger("MP3", params);
 
-        addCodec("Uncompressed", new VerticalConfigurationGroup());
+        codecName->addSelection("Uncompressed");
+        addTrigger("Uncompressed", new VerticalConfigurationGroup());
     };
 };
 
@@ -236,13 +205,16 @@ public:
     };
 };
 
-class VideoCompressionSettings: public CompressionSettings {
-    Q_OBJECT
+class VideoCompressionSettings: public VerticalConfigurationGroup,
+                                public TriggeredConfigurationGroup {
 public:
-    VideoCompressionSettings(const RecordingProfile& parent):
-        CompressionSettings(new VideoCodecName(parent)) {
+    VideoCompressionSettings(const RecordingProfile& parent) {
 
         setName("Video Compression");
+
+        VideoCodecName* codecName = new VideoCodecName(parent);
+        addChild(codecName);
+        setTrigger(codecName);
 
         ConfigurationGroup* allParams = new VerticalConfigurationGroup();
         allParams->setLabel("RTjpeg");
@@ -260,7 +232,8 @@ public:
 
         allParams->addChild(params);
 
-        addCodec("RTjpeg", allParams);
+        codecName->addSelection("RTjpeg");
+        addTrigger("RTjpeg", allParams);
 
         allParams = new VerticalConfigurationGroup();
         allParams->setLabel("MPEG-4");
@@ -279,7 +252,8 @@ public:
 
         allParams->addChild(params);
 
-        addCodec("MPEG-4", allParams);
+        codecName->addSelection("MPEG-4");
+        addTrigger("MPEG-4", allParams);
 
         allParams = new VerticalConfigurationGroup();
         allParams->setLabel("Hardware MJPEG");
@@ -290,7 +264,8 @@ public:
 
         allParams->addChild(params);
 
-        addCodec("Hardware MJPEG", allParams);
+        codecName->addSelection("Hardware MJPEG");
+        addTrigger("Hardware MJPEG", allParams);
     };
 };
 
