@@ -197,6 +197,7 @@ void BoundedIntegerManagedListItem::generateList()
         }
 
         listBuilt = true;
+        selectValue(valueText);
     }
 
 }
