@@ -1103,7 +1103,7 @@ void NuppelDecoder::GetFrame(int avignore)
         }
     }
 
-    UpdateFramesPlayed();
+    framesRead = framesPlayed;
 }
 
 void NuppelDecoder::SeekReset(long long newKey, int skipFrames,
