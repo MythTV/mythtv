@@ -1,5 +1,0 @@
-# Location of where to start looking for pictures
-GalleryDir=/mnt/store/pictures
-
-# Delay between updates in the slideshow.
-SlideshowDelay=5

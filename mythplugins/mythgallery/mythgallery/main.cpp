@@ -6,6 +6,8 @@ using namespace std;
 #include <qsqldatabase.h>
 
 #include "iconview.h"
+#include "gallerysettings.h"
+
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdialogs.h>
 #include <mythtv/mythplugin.h>
@@ -33,6 +35,9 @@ int mythplugin_run(void)
 
 int mythplugin_config(void)
 {
+    GallerySettings settings;
+    settings.exec(QSqlDatabase::database());
+
     return 0;
 }
 
