@@ -28,7 +28,11 @@ Dirlist::Dirlist(QString &directory)
     d.setSorting(QDir::DirsFirst| QDir::Name | QDir::IgnoreCase);
     Metadata *data;
     if (!d.exists())
-      ;
+    {
+        cerr << "mythvideo: start directory is not valid" << endl ; 
+        return;
+    }
+     
     const QFileInfoList *list = d.entryInfoList();
     if (!list)
       ;
@@ -58,7 +62,7 @@ Dirlist::Dirlist(QString &directory)
             {
                 Metadata retdata(fi->absFilePath(), fi->absFilePath(), "album",
                                  "(Up one level)", "dir",1900, 3, 40);
-                playlist.append(retdata);
+                playlist.prepend(retdata);
                 ++it;
                 continue;
             }
@@ -68,8 +72,8 @@ Dirlist::Dirlist(QString &directory)
         if (fi->isDir())
         {
             QString s = filename.section( '/',-1);
-	    Metadata retdata(filename, s, "album", "title", "dir",1900, 3, 40);
-            playlist.append(retdata);
+	    Metadata retdata(filename, filename, "album", s, "dir",1900, 3, 40);
+            playlist.prepend(retdata);
         }
         else
         {
@@ -79,7 +83,7 @@ Dirlist::Dirlist(QString &directory)
 	    if (prof.contains(ext, FALSE))
             {
                 data = CheckFile(filename);
-                playlist.append(*data);
+                playlist.prepend(*data);
                 delete data;
 	    }
 	}
