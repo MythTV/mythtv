@@ -252,7 +252,7 @@ void NuppelVideoPlayer::PauseVideo(bool wait)
     if (wait && !video_actually_paused)
     {
         if (!videoThreadPaused.wait(1000))
-            VERBOSE(VB_IMPORTANT, "Waited too long for decoder to pause\n");
+            VERBOSE(VB_IMPORTANT, "Waited too long for video out to pause\n");
     }
 }
 
@@ -1281,13 +1281,14 @@ void NuppelVideoPlayer::IvtvVideoLoop(void)
             }
 
             video_actually_paused = true;
+            videoThreadPaused.wakeAll();
 
             videoOutput->ProcessFrame(NULL, osd, videoFilters, pipplayer);
 
             previously_paused = true;
 
             //printf("video waiting for unpause\n");
-            usleep(frame_interval * 2);
+            usleep(frame_interval);
             continue;
         }
 
