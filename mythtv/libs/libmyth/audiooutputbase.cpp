@@ -303,10 +303,11 @@ int AudioOutputBase::GetAudiotime(void)
 
     gettimeofday(&now, NULL);
 
-    ret = audiotime;
- 
-    ret += (now.tv_sec - audiotime_updated.tv_sec) * 1000;
+    ret = (now.tv_sec - audiotime_updated.tv_sec) * 1000;
     ret += (now.tv_usec - audiotime_updated.tv_usec) / 1000;
+    ret = (int)(ret * audio_stretchfactor);
+
+    ret += audiotime;
 
     pthread_mutex_unlock(&avsync_lock);
     return ret;
@@ -347,8 +348,8 @@ void AudioOutputBase::SetAudiotime(void)
     if (pSoundStretch)
     {
         // add the effect of unprocessed samples in time stretch algo
-        totalbuffer += (int)(pSoundStretch->numUnprocessedSamples() / 
-                             audio_stretchfactor);
+        totalbuffer += (int)((pSoundStretch->numUnprocessedSamples() *
+                              audio_bytes_per_sample) / audio_stretchfactor);
     }
                
     audiotime = audbuf_timecode - (int)(totalbuffer * 100000.0 /
