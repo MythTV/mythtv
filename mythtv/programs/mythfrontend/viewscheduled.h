@@ -74,18 +74,10 @@ class ViewScheduled : public MythDialog
     int listCount;
     int dataCount;
 
-    int rectListLeft;
-    int rectListTop;
-    int rectListWidth;
-    int rectListHeight;
-    int rectInfoLeft;
-    int rectInfoTop;
-    int rectInfoWidth;
-    int rectInfoHeight;
-    int rectConLeft;
-    int rectConTop;
-    int rectConWidth;
-    int rectConHeight;
+    QRect listRect;
+    QRect infoRect;
+    QRect conflictRect;
+    QRect fullRect;
 
     int space_itemid;
     int enter_itemid;
@@ -97,11 +89,6 @@ class ViewScheduled : public MythDialog
     QColor popupForeground;
     QColor popupBackground;
     QColor popupHighlight;
-
-    QRect listRect() const;
-    QRect infoRect() const;
-    QRect conflictRect() const;
-    QRect fullRect() const;
 
     bool doingSel;
 };

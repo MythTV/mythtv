@@ -71,31 +71,13 @@ class PlaybackBox : public MythDialog
     ProgramInfo *curitem;
     ProgramInfo *delitem;
 
-//    bool LoadTheme(void);
     void LoadWindow(QDomElement &);
     XMLParse *theme;
     QDomElement xmldata;
-/*
-    QString getFirstText(QDomElement &);
-    void parseFont(QDomElement &);
-    fontProp *GetFont(const QString &);
-    void normalizeRect(QRect *);
-    QPoint parsePoint(QString);
-    QRect parseRect(QString);
-*/
+
     void parsePopup(QDomElement &);
     void parseContainer(QDomElement &);
-/*
-    LayerSet *GetSet(const QString &text);
-    void parseListArea(LayerSet *, QDomElement &);
-    void parseTextArea(LayerSet *, QDomElement &);
-    void parseStatusBar(LayerSet *, QDomElement &);
-    void parseImage(LayerSet *, QDomElement &);
 
-    QMap<QString, fontProp> fontMap;
-    QMap<QString, LayerSet*> layerMap;
-    vector<LayerSet *> *allTypes;
-*/
     int skipNum;
     int skipCnt;
     int listCount;
@@ -145,12 +127,6 @@ class PlaybackBox : public MythDialog
     QString showDateFormat;
     QString showTimeFormat;
 
-    QRect fullRect() const;
-    QRect usageRect() const;
-    QRect infoRect() const;
-    QRect listRect() const;
-    QRect videoRect() const;
-
     MythPopupBox *popup;
     QPixmap myBackground;
 
@@ -159,26 +135,11 @@ class PlaybackBox : public MythDialog
   
     QPixmap *bgTransBackup;
 
-    int rectTopLeft;
-    int rectTopTop;
-    int rectTopWidth;
-    int rectTopHeight;
-    int rectListLeft;
-    int rectListTop;
-    int rectListWidth;
-    int rectListHeight;
-    int rectInfoLeft;
-    int rectInfoTop;
-    int rectInfoWidth;
-    int rectInfoHeight;
-    int rectUsageLeft;
-    int rectUsageTop;
-    int rectUsageWidth;
-    int rectUsageHeight;
-    int rectVideoLeft;
-    int rectVideoTop;
-    int rectVideoWidth;
-    int rectVideoHeight;
+    QRect fullRect;
+    QRect listRect;
+    QRect infoRect;
+    QRect usageRect;
+    QRect videoRect;
 
     int listsize;
     int titleitems;

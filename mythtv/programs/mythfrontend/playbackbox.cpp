@@ -42,14 +42,14 @@ PlaybackBox::PlaybackBox(BoxType ltype, QWidget *parent, const char *name)
 
     ignoreevents = false;
 
-    titleitems = 0;	 // Number of items available in list, = showData.count() for "All Programs"
-			 // In other words, this is the number of shows selected by the title selector
-    listCount = 0;	 // How full the actual list is (list in this context being the number
-			 // of spaces available for data to be shown).
+    titleitems = 0;         // Number of items available in list, = showData.count() for "All Programs"
+                         // In other words, this is the number of shows selected by the title selector
+    listCount = 0;         // How full the actual list is (list in this context being the number
+                         // of spaces available for data to be shown).
     inTitle = true;      // Cursor in Title Listing
-    skipNum = 0;	 // Amount of records to skip (for scrolling)
-    curShowing = 0;	 // Where in the list (0 - # in list)
-    pageDowner = false;	 // Is there enough records to page down?
+    skipNum = 0;         // Amount of records to skip (for scrolling)
+    curShowing = 0;         // Where in the list (0 - # in list)
+    pageDowner = false;         // Is there enough records to page down?
     skipUpdate = false;
     skipCnt = 0;
 
@@ -62,7 +62,11 @@ PlaybackBox::PlaybackBox(BoxType ltype, QWidget *parent, const char *name)
     curitem = NULL;
     delitem = NULL;
 
-    //allTypes = new vector<LayerSet *>;
+    fullRect = QRect(0, 0, size().width(), size().height());
+    listRect = QRect(0, 0, 0, 0);
+    infoRect = QRect(0, 0, 0, 0);
+    usageRect = QRect(0, 0, 0, 0);
+    videoRect = QRect(0, 0, 0, 0);
 
     connect(this, SIGNAL(killTheApp()), this, SLOT(accept()));
 
@@ -80,22 +84,20 @@ PlaybackBox::PlaybackBox(BoxType ltype, QWidget *parent, const char *name)
     theme->LoadTheme(xmldata, "playback");
 
     LoadWindow(xmldata);
-    
 
     LayerSet *container = theme->GetSet("selector");
     if (container)
     {
         UIListType *ltype = (UIListType *)container->GetType("showing");
         if (ltype)
-        {
             listsize = ltype->GetItems();
-	}
     }
     else
     {
         cerr << "Failed to get selector object.\n";
         exit(0);
     }
+
     FillList(); 
 
     curTitle = 0;
@@ -137,7 +139,6 @@ PlaybackBox::~PlaybackBox(void)
         delete [] titleData;
 }
 
-
 void PlaybackBox::LoadWindow(QDomElement &element)
 {
     for (QDomNode child = element.firstChild(); !child.isNull();
@@ -175,40 +176,15 @@ void PlaybackBox::parseContainer(QDomElement &element)
     theme->parseContainer(element, name, context, area);
 
     if (name.lower() == "selector")
-    {
-        rectListLeft = area.left();
-        rectListTop = area.top();
-        rectListWidth = area.width();
-        rectListHeight = area.height();
-    }
+        listRect = area;
     if (name.lower() == "program_info_play" && context == 0 && type != Delete)
-    {
-        rectInfoLeft = area.left();
-        rectInfoTop = area.top();
-        rectInfoWidth = area.width();
-        rectInfoHeight = area.height();
-    }
+        infoRect = area;
     if (name.lower() == "program_info_del" && context == 1 && type == Delete)
-    {
-        rectInfoLeft = area.left();
-        rectInfoTop = area.top();
-        rectInfoWidth = area.width();
-        rectInfoHeight = area.height();
-    }
+        infoRect = area;
     if (name.lower() == "video")
-    {
-        rectVideoLeft = area.left();
-        rectVideoTop = area.top();
-        rectVideoWidth = area.width();
-        rectVideoHeight = area.height();
-    }
+        videoRect = area;
     if (name.lower() == "usage")
-    {
-        rectUsageLeft = area.left();
-        rectUsageTop = area.top();
-        rectUsageWidth = area.width();
-        rectUsageHeight = area.height();
-    }
+        usageRect = area;
 }
 
 void PlaybackBox::parsePopup(QDomElement &element)
@@ -253,7 +229,6 @@ void PlaybackBox::parsePopup(QDomElement &element)
                 cerr << "Unknown popup child: " << info.tagName() << endl;
                 exit(0);
             }
-
         }
     }
 }
@@ -280,13 +255,13 @@ void PlaybackBox::resizeImage(QPixmap *dst, QString file)
     QFile checkFile(themeDir + file);
 
     if (checkFile.exists())
-         file = themeDir + file;
+        file = themeDir + file;
     else
-         file = baseDir + file;
+        file = baseDir + file;
 
     if (hmult == 1 && wmult == 1)
     {
-         dst->load(file);
+        dst->load(file);
     }
     else 
     {
@@ -334,19 +309,19 @@ void PlaybackBox::paintEvent(QPaintEvent *e)
         QRect r = e->rect();
         QPainter p(this);
 
-        if (r.intersects(listRect()) && skipUpdate == false)
+        if (r.intersects(listRect) && skipUpdate == false)
         {
             updateShowTitles(&p);
         }
-        if (r.intersects(infoRect()) && skipUpdate == false)
+        if (r.intersects(infoRect) && skipUpdate == false)
         {
             updateInfo(&p);
         }
-        if (r.intersects(usageRect()) && skipUpdate == false)
+        if (r.intersects(usageRect) && skipUpdate == false)
         {
             updateUsage(&p);
         }
-        if (r.intersects(videoRect()) && ignoreevents == false)
+        if (r.intersects(videoRect) && ignoreevents == false)
         {
             updateVideo(&p);
         }
@@ -361,142 +336,143 @@ void PlaybackBox::paintEvent(QPaintEvent *e)
 
 void PlaybackBox::grayOut(QPainter *tmp)
 {
-  if (noUpdate == false)
-  {
-    int transparentFlag = gContext->GetNumSetting("PlayBoxShading", 0);
-    if (transparentFlag == 0)
-        tmp->fillRect(QRect(QPoint(0, 0), size()), QBrush(QColor(10, 10, 10), Dense4Pattern));
-    else if (transparentFlag == 1)
-        tmp->drawPixmap(0, 0, *bgTransBackup, 0, 0, (int)(800*wmult), (int)(600*hmult));
-  }
+    if (noUpdate == false)
+    {
+        int transparentFlag = gContext->GetNumSetting("PlayBoxShading", 0);
+        if (transparentFlag == 0)
+            tmp->fillRect(QRect(QPoint(0, 0), size()), 
+                          QBrush(QColor(10, 10, 10), Dense4Pattern));
+        else if (transparentFlag == 1)
+            tmp->drawPixmap(0, 0, *bgTransBackup, 0, 0, (int)(800*wmult), 
+                            (int)(600*hmult));
+    }
 }
 
 void PlaybackBox::updateInfo(QPainter *p)
 {
-  if (noUpdate == true)
-      return;
+    if (noUpdate == true)
+        return;
 
-  QRect pr = infoRect();
-  QPixmap pix(pr.size());
-  pix.fill(this, pr.topLeft());
-  QPainter tmp(&pix);
+    QRect pr = infoRect;
+    QPixmap pix(pr.size());
+    pix.fill(this, pr.topLeft());
+    QPainter tmp(&pix);
 
-  if (showData.count() > 0)
-  {
-    ignoreevents = true;
-
-    if (playingVideo == true)
-        killPlayer();
-
-    QDateTime startts = curitem->startts;
-    QDateTime endts = curitem->endts;
-
-    QString timedate = startts.date().toString(dateformat) + QString(", ") +
-                       startts.time().toString(timeformat) + QString(" - ") +
-                       endts.time().toString(timeformat);
-
-    QString chantext = "";
-    if (displayChanNum)
-        chantext = curitem->channame + " [" + curitem->chansign + "]";
-    else
-        chantext = curitem->chanstr;
-
-    QString subtitle = curitem->subtitle;
-    if (subtitle.length() > 1)
-        subtitle = "\"" + curitem->subtitle + "\"";
-
-    LayerSet *container = NULL;
-    if (type != Delete)
-        container = theme->GetSet("program_info_play");
-    else
-        container = theme->GetSet("program_info_del");
-    if (container)
+    if (showData.count() > 0)
     {
-        UITextType *type = (UITextType *)container->GetType("title");
-        if (type)
-            type->SetText(curitem->title);
+        ignoreevents = true;
 
-        type = (UITextType *)container->GetType("subtitle");
-        if (type)
-            type->SetText(subtitle);
+        if (playingVideo == true)
+            killPlayer();
+
+        QDateTime startts = curitem->startts;
+        QDateTime endts = curitem->endts;
+
+        QString timedate = startts.date().toString(dateformat) + ", " +
+                           startts.time().toString(timeformat) + " - " +
+                           endts.time().toString(timeformat);
+
+        QString chantext = "";
+        if (displayChanNum)
+            chantext = curitem->channame + " [" + curitem->chansign + "]";
+        else
+            chantext = curitem->chanstr;
+
+        QString subtitle = curitem->subtitle;
+        if (subtitle.length() > 1)
+            subtitle = "\"" + curitem->subtitle + "\"";
+
+        LayerSet *container = NULL;
+        if (type != Delete)
+            container = theme->GetSet("program_info_play");
+        else
+            container = theme->GetSet("program_info_del");
+        if (container)
+        {
+            UITextType *type = (UITextType *)container->GetType("title");
+            if (type)
+                type->SetText(curitem->title);
+
+            type = (UITextType *)container->GetType("subtitle");
+            if (type)
+                type->SetText(subtitle);
     
-        type = (UITextType *)container->GetType("timedate");
-        if (type)
-            type->SetText(timedate);
+            type = (UITextType *)container->GetType("timedate");
+            if (type)
+                type->SetText(timedate);
 
-        type = (UITextType *)container->GetType("description");
-        if (type)
-            type->SetText(curitem->description);
+            type = (UITextType *)container->GetType("description");
+            if (type)
+                type->SetText(curitem->description);
 
-        type = (UITextType *)container->GetType("channel");
-        if (type)
-            type->SetText(chantext);
+            type = (UITextType *)container->GetType("channel");
+            if (type)
+                type->SetText(chantext);
+        }
+
+        if (container && type != Delete)
+            container->Draw(&tmp, 6, 0);
+        else
+            container->Draw(&tmp, 6, 1);
+
+        tmp.end();
+        p->drawPixmap(pr.topLeft(), pix);
+
+        ignoreevents = false;
+
+        timer->start(1000 / 30);
     }
-
-    if (container && type != Delete)
-        container->Draw(&tmp, 6, 0);
     else
-        container->Draw(&tmp, 6, 1);
+    {
+        LayerSet *norec = theme->GetSet("norecordings_info");
+        if (type != Delete && norec)
+            norec->Draw(&tmp, 8, 0);
+        else if (norec)
+            norec->Draw(&tmp, 8, 1);
 
-    tmp.end();
-    p->drawPixmap(pr.topLeft(), pix);
-
-    ignoreevents = false;
-
-    timer->start(1000 / 30);
-  }
-  else
-  {
-
-    LayerSet *norec = theme->GetSet("norecordings_info");
-    if (type != Delete && norec)
-        norec->Draw(&tmp, 8, 0);
-    else if (norec)
-        norec->Draw(&tmp, 8, 1);
-
-    tmp.end();
-    p->drawPixmap(pr.topLeft(), pix);
-  }
+        tmp.end();
+        p->drawPixmap(pr.topLeft(), pix);
+    }
 }
 
 void PlaybackBox::updateVideo(QPainter *p)
 {
-  if (noUpdate == true)
-      return;
+    if (noUpdate == true)
+        return;
 
-  if (playbackPreview == 0 && curitem)
-  {
-
-    QPixmap temp = getPixmap(curitem);
-    if (temp.width() > 0)
+    if (playbackPreview == 0 && curitem)
     {
-        p->drawPixmap(rectVideoLeft, rectVideoTop, temp);
+        QPixmap temp = getPixmap(curitem);
+        if (temp.width() > 0)
+        {
+            p->drawPixmap(videoRect.x(), videoRect.y(), temp);
+        }
     }
+    else
+    {
+        if (!nvp)
+            return;
 
-  }
-  else
-  {
-    if (!nvp)
-        return;
+        int w = 0, h = 0;
+        unsigned char *buf = nvp->GetCurrentFrame(w, h);
 
-    int w = 0, h = 0;
-    unsigned char *buf = nvp->GetCurrentFrame(w, h);
+        if (w == 0 || h == 0 || !buf)
+            return;
 
-    if (w == 0 || h == 0 || !buf)
-        return;
+        unsigned char *outputbuf = new unsigned char[w * h * 4];
+        yuv2rgb_fun convert = yuv2rgb_init_mmx(32, MODE_RGB);
 
-    unsigned char *outputbuf = new unsigned char[w * h * 4];
-    yuv2rgb_fun convert = yuv2rgb_init_mmx(32, MODE_RGB);
+        convert(outputbuf, buf, buf + (w * h), buf + (w * h * 5 / 4), w, h, 
+                w * 4, w, w / 2);
 
-    convert(outputbuf, buf, buf + (w * h), buf + (w * h * 5 / 4), w, h, w * 4, w, w / 2);
+        QImage img(outputbuf, w, h, 32, NULL, 65536 * 65536, 
+                   QImage::LittleEndian);
+        img = img.scale(videoRect.width(), videoRect.height());
 
-    QImage img(outputbuf, w, h, 32, NULL, 65536 * 65536, QImage::LittleEndian);
-    img = img.scale(rectVideoWidth, rectVideoHeight);
+        delete [] outputbuf;
 
-    delete [] outputbuf;
-
-    p->drawImage(rectVideoLeft, rectVideoTop, img);
-  }
+        p->drawImage(videoRect.x(), videoRect.y(), img);
+    }
 }
 
 void PlaybackBox::updateUsage(QPainter *p)
@@ -517,8 +493,8 @@ void PlaybackBox::updateUsage(QPainter *p)
     usestr = usestr + tr("% used");
 
     QString rep;
-    rep.sprintf(tr(", %d,%03d MB free"), (total - used) / 1000, (total - used) % 1000);
-
+    rep.sprintf(tr(", %d,%03d MB free"), (total - used) / 1000, 
+                                         (total - used) % 1000);
     usestr = usestr + rep;
 
     LayerSet *container = NULL;
@@ -535,7 +511,7 @@ void PlaybackBox::updateUsage(QPainter *p)
                 return;
         }
 
-        QRect pr = usageRect();
+        QRect pr = usageRect;
         QPixmap pix(pr.size());
         pix.fill(this, pr.topLeft());
         QPainter tmp(&pix);
@@ -585,7 +561,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
     bool tempCurrent;
 
     QString match;
-    QRect pr = listRect();
+    QRect pr = listRect;
     QPixmap pix(pr.size());
 
     LayerSet *container = NULL;
@@ -642,7 +618,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
         {
             int cnt = 0;
             ltype->ResetList();
-	    ltype->SetActive(inTitle);
+            ltype->SetActive(inTitle);
 
             itemCnt = ltype->GetItems();
 
@@ -655,18 +631,18 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                     h = i - showList.count();
 
                 ltype->SetItemText(cnt, titleData[h]);
-		cnt++;
+                cnt++;
             }
         }
 
-	UITextType *typeText = (UITextType *)container->GetType("current");
-	if (typeText)
-	    typeText->SetText(titleData[curTitle]);
+        UITextType *typeText = (UITextType *)container->GetType("current");
+        if (typeText)
+            typeText->SetText(titleData[curTitle]);
 
-	ltype = (UIListType *)container->GetType("showing");
-	if (ltype)
-	{
-	  ltype->ResetList();
+        ltype = (UIListType *)container->GetType("showing");
+        if (ltype)
+        {
+          ltype->ResetList();
           ltype->SetActive(!inTitle);
   
           titleitems = 0;
@@ -674,61 +650,64 @@ void PlaybackBox::updateShowTitles(QPainter *p)
           {
              if (cnt < listsize)
              {
-	         match = (it.key()).left((it.key()).find("-!-"));
+                 match = (it.key()).left((it.key()).find("-!-"));
                  if (match == (titleData[curTitle]).lower() 
                      || titleData[curTitle] == tr("All Programs"))
-	         {
-	             if (pastSkip <= 0)
-	             {
+                 {
+                     if (pastSkip <= 0)
+                     {
                          tempInfo = &(it.data());
 
-	       	         if (curtime < tempInfo->endts && curtime > tempInfo->startts)
-		             tempCurrent = true;
+                                if (curtime < tempInfo->endts && 
+                             curtime > tempInfo->startts)
+                             tempCurrent = true;
                          else
                              tempCurrent = false;
 
                          if (titleData[curTitle] == tr("All Programs"))
                              tempSubTitle = tempInfo->title; 
                          else
- 	                     tempSubTitle = tempInfo->subtitle;
-  		         if (tempSubTitle.stripWhiteSpace().length() == 0)
+                              tempSubTitle = tempInfo->subtitle;
+                           if (tempSubTitle.stripWhiteSpace().length() == 0)
                              tempSubTitle = tempInfo->title;
                          if ((tempInfo->subtitle).stripWhiteSpace().length() > 0 
                              && titleData[curTitle] == tr("All Programs"))
-                             tempSubTitle = tempSubTitle + " - \"" + tempInfo->subtitle + "\"";
+                         {
+                             tempSubTitle = tempSubTitle + " - \"" + 
+                                            tempInfo->subtitle + "\"";
+                         }
 
+                         tempDate = (tempInfo->startts).toString(showDateFormat);
+                         tempTime = (tempInfo->startts).toString(showTimeFormat);
 
- 		         tempDate = (tempInfo->startts).toString(showDateFormat);
-		         tempTime = (tempInfo->startts).toString(showTimeFormat);
-
-		         long long size = tempInfo->filesize;
+                         long long size = tempInfo->filesize;
                          long int mbytes = size / 1024 / 1024;
                          tempSize = QString("%1 MB").arg(mbytes);
 
-	 	         if (cnt == curShowing)
+                         if (cnt == curShowing)
                          {
-                            if (curitem)
-                                delete curitem;
-                            curitem = new ProgramInfo(*tempInfo);
-			    ltype->SetItemCurrent(cnt);
+                             if (curitem)
+                                 delete curitem;
+                             curitem = new ProgramInfo(*tempInfo);
+                             ltype->SetItemCurrent(cnt);
                          }
 
-			 ltype->SetItemText(cnt, 1, tempSubTitle);
-			 ltype->SetItemText(cnt, 2, tempDate);
-		  	 ltype->SetItemText(cnt, 3, tempTime);
-			 ltype->SetItemText(cnt, 4, tempSize);
+                         ltype->SetItemText(cnt, 1, tempSubTitle);
+                         ltype->SetItemText(cnt, 2, tempDate);
+                         ltype->SetItemText(cnt, 3, tempTime);
+                         ltype->SetItemText(cnt, 4, tempSize);
                          if (tempCurrent == true)
                              ltype->EnableForcedFont(cnt, "recording");
 
-	   	         cnt++;
-	             }
+                            cnt++;
+                     }
                      pastSkip--;
                      titleitems++;
-	             pageDowner = false;
+                     pageDowner = false;
 
-	         }  // match else
-	         //else
-	         //    pageDowner = true;
+                 }  // match else
+                 //else
+                 //    pageDowner = true;
             } // cnt < listsiz else
             else
             {
@@ -736,15 +715,13 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                 if (match == (titleData[curTitle]).lower() || 
                     titleData[curTitle] == tr("All Programs"))
                 {
-	            titleitems++;
-	            pageDowner = true;
-	        }
+                    titleitems++;
+                    pageDowner = true;
+                }
             } 
-	    // end of cnt < listsize if
-
+            // end of cnt < listsize if
          }
-	 // for (iterator)
-
+         // for (iterator)
        } 
        // end of type check
  
@@ -752,29 +729,29 @@ void PlaybackBox::updateShowTitles(QPainter *p)
        if (skipNum > 0)
            ltype->SetUpArrow(true);
        else
-	   ltype->SetUpArrow(false);
+           ltype->SetUpArrow(false);
 
     } 
     // end of container check
 
     listCount = cnt;
 
-   // DRAW LAYERS
-   if (container && type != Delete)
-   {
+    // DRAW LAYERS
+    if (container && type != Delete)
+    {
         container->Draw(&tmp, 0, 0);
         container->Draw(&tmp, 1, 0);
-	container->Draw(&tmp, 2, 0);
+        container->Draw(&tmp, 2, 0);
         container->Draw(&tmp, 3, 0);
         container->Draw(&tmp, 4, 0);
         container->Draw(&tmp, 5, 0);
         container->Draw(&tmp, 6, 0);
         container->Draw(&tmp, 7, 0);
-   	container->Draw(&tmp, 8, 0);
-   }
-   else
-   {
-	container->Draw(&tmp, 0, 1);
+        container->Draw(&tmp, 8, 0);
+    }
+    else
+    {
+        container->Draw(&tmp, 0, 1);
         container->Draw(&tmp, 1, 1);
         container->Draw(&tmp, 2, 1);
         container->Draw(&tmp, 3, 1);
@@ -783,24 +760,24 @@ void PlaybackBox::updateShowTitles(QPainter *p)
         container->Draw(&tmp, 6, 1);
         container->Draw(&tmp, 7, 1);
         container->Draw(&tmp, 8, 1);
-   }
+    }
 
-   leftRight = false;
+    leftRight = false;
 
-   if (showData.count() == 0)
-   {
+    if (showData.count() == 0)
+    {
         LayerSet *norec = theme->GetSet("norecordings_list");
         if (type != Delete && norec)
             norec->Draw(&tmp, 8, 0);
         else if (norec)
             norec->Draw(&tmp, 8, 1);
-   }
+    }
   
-   tmp.end();
-   p->drawPixmap(pr.topLeft(), pix);
+    tmp.end();
+    p->drawPixmap(pr.topLeft(), pix);
 
-   if (showData.count() == 0)
-	update(infoRect());
+    if (showData.count() == 0)
+        update(infoRect);
 }
 
 QString PlaybackBox::cutDown(QString info, QFont *testFont, int maxwidth)
@@ -825,22 +802,22 @@ QString PlaybackBox::cutDown(QString info, QFont *testFont, int maxwidth)
         info = testInfo;
     }
     return info;
-
 }
 
 void PlaybackBox::cursorLeft()
 {
     inTitle = true;
     skipUpdate = false;
-    update(fullRect());
+    update(fullRect);
     leftRight = true;
 }
+
 void PlaybackBox::cursorRight()
 {
     leftRight = true;
     inTitle = false;
     skipUpdate = false;
-    update(fullRect());
+    update(fullRect);
 }
 
 void PlaybackBox::cursorDown(bool page)
@@ -850,35 +827,35 @@ void PlaybackBox::cursorDown(bool page)
         skipNum = 0;
         curShowing = 0;
         if (page == false)
-             curTitle++;
+            curTitle++;
         else if (page == true)
-             curTitle = curTitle + 5;
+            curTitle = curTitle + 5;
 
         if (curTitle >= (signed int)showList.count() && page == true)
-           curTitle = curTitle - (signed int)showList.count();
+            curTitle = curTitle - (signed int)showList.count();
         else if (curTitle >= (signed int)showList.count() && page == false)
-           curTitle = 0;
+            curTitle = 0;
 
         if (curTitle < 0)
             curTitle = 0;
 
         while (titleData[curTitle] == "***FILLER***")
         {
-           curTitle++;
-           if (curTitle >= (signed int)showList.count())
-               curTitle = 0;
+            curTitle++;
+            if (curTitle >= (signed int)showList.count())
+                curTitle = 0;
         }
 
         skipUpdate = false;
-        update(fullRect());
+        update(fullRect);
     }
     else
     {
         if (page == false)
         {
             if (curShowing > (int)((int)(listsize / 2) - 1) 
-		&& ((int)(skipNum + listsize) <= (int)(titleitems - 1)) 
-		&& pageDowner == true)
+                && ((int)(skipNum + listsize) <= (int)(titleitems - 1)) 
+                && pageDowner == true)
             {
                 skipNum++;
                 curShowing = (int)(listsize / 2);
@@ -888,16 +865,16 @@ void PlaybackBox::cursorDown(bool page)
                 curShowing++;
 
                 if (curShowing >= listCount)
-                        curShowing = listCount - 1;
+                    curShowing = listCount - 1;
             }
 
         }
-	else if (page == true && pageDowner == true)
+        else if (page == true && pageDowner == true)
         {
             if (curShowing >= (int)(listsize / 2) || skipNum != 0)
-	    {
+            {
                 skipNum = skipNum + listsize;
- 	    }
+            }
             else if (curShowing < (int)(listsize / 2) && skipNum == 0)
             {
                 skipNum = (int)(listsize / 2) + curShowing;
@@ -911,19 +888,19 @@ void PlaybackBox::cursorDown(bool page)
 
         if ((int)(skipNum + curShowing) >= (int)(titleitems - 1))
         {
-                skipNum = titleitems - listsize;
-                curShowing = listsize - 1;
+            skipNum = titleitems - listsize;
+            curShowing = listsize - 1;
         }
         else if ((int)(skipNum + listsize) >= (int)titleitems)
         {
-                skipNum = titleitems - listsize;
+            skipNum = titleitems - listsize;
         }
 
         if (curShowing >= listCount)
-                curShowing = listCount - 1;
+            curShowing = listCount - 1;
 
         skipUpdate = false;
-        update(fullRect());
+        update(fullRect);
     }
 }
 
@@ -931,77 +908,77 @@ void PlaybackBox::cursorUp(bool page)
 {
     if (inTitle == true)
     {
-	curShowing = 0;
-	skipNum = 0;
+        curShowing = 0;
+        skipNum = 0;
 
-	if (page == false)
+        if (page == false)
             curTitle--;
-  	else
-	    curTitle = curTitle - 5;
+          else
+            curTitle = curTitle - 5;
 
         if (curTitle < 0 && page == false)
-	    curTitle = (signed int)showList.count() - 1;
-	if (curTitle < 0 && page == true)
-	    curTitle = (signed int)showList.count() + curTitle;
+            curTitle = (signed int)showList.count() - 1;
+        if (curTitle < 0 && page == true)
+            curTitle = (signed int)showList.count() + curTitle;
 
-	while (titleData[curTitle] == "***FILLER***")
+        while (titleData[curTitle] == "***FILLER***")
         {
            curTitle--;
            if (curTitle < 0)
                curTitle = showList.count() - 1;
         }
-   	skipUpdate = false;
-        update(fullRect());
+        skipUpdate = false;
+        update(fullRect);
     }
     else
     {
-	if (page == false)
-	{
-	    if (curShowing < ((int)(listsize / 2) + 1) && skipNum > 0)
-	    {
-     	        curShowing = (int)(listsize / 2);
-		skipNum--;
-		if (skipNum < 0)
-		{
-		     skipNum = 0;
-		     curShowing--;
-		}
-	    }
-	    else
-	    {
-		curShowing--;
-   	    }
-	}
-	else if (page == true && skipNum > 0)
-	{
-		skipNum = skipNum - listsize;
-		if (skipNum < 0)
-		{
-			curShowing = curShowing + skipNum;
-			skipNum = 0;
-			if (curShowing < 0)
-			    curShowing = 0;
-		}
+        if (page == false)
+        {
+            if (curShowing < ((int)(listsize / 2) + 1) && skipNum > 0)
+            {
+                     curShowing = (int)(listsize / 2);
+                skipNum--;
+                if (skipNum < 0)
+                {
+                     skipNum = 0;
+                     curShowing--;
+                }
+            }
+            else
+            {
+                curShowing--;
+            }
+        }
+        else if (page == true && skipNum > 0)
+        {
+            skipNum = skipNum - listsize;
+            if (skipNum < 0)
+            {
+                curShowing = curShowing + skipNum;
+                skipNum = 0;
+                if (curShowing < 0)
+                    curShowing = 0;
+            }
 
-		if (curShowing > (int)(listsize / 2))	
-		{
-			curShowing = (int)(listsize / 2);
-			skipNum = skipNum + (int)(listsize / 2) - 1;
-		}
-	}
-	else if (page == true)
-	{
-		skipNum = 0;
-		curShowing = 0;
-	}
+            if (curShowing > (int)(listsize / 2))        
+            {
+                curShowing = (int)(listsize / 2);
+                skipNum = skipNum + (int)(listsize / 2) - 1;
+            }
+        }
+        else if (page == true)
+        {
+            skipNum = 0;
+            curShowing = 0;
+        }
 
-	if (curShowing > -1)
-	{
-		skipUpdate = false;
-		update(fullRect());
-	}
-	else
-		curShowing = 0;
+        if (curShowing > -1)
+        {
+            skipUpdate = false;
+            update(fullRect);
+        }
+        else
+            curShowing = 0;
     }
 }
 
@@ -1013,13 +990,13 @@ void PlaybackBox::FillList()
     order = gContext->GetNumSetting("PlayBoxOrdering", 1);
     int cnt = 999;
     if (order == 0 && type != Delete)
-    	cnt = 100;
+        cnt = 100;
 
     showData.clear();
     showDateData.clear();
     if (showList.count() > 0)
     {
-	showList.clear();
+        showList.clear();
     }
 
     if (titleData)
@@ -1033,20 +1010,20 @@ void PlaybackBox::FillList()
     infoList = RemoteGetRecordedList(type == Delete);
     if (infoList)
     {
-	QString temp;
+        QString temp;
 
         vector<ProgramInfo *>::iterator i = infoList->begin();
         for (; i != infoList->end(); i++)
         {
-  	    showList[((*i)->title).lower()] = (*i)->title;
-	    temp = QString("%1-!-%2").arg(((*i)->title).lower()).arg(cnt);
-	    showData[temp] = *(*i);
-	    temp = QString("%1").arg(cnt);
- 	    showDateData[temp] = *(*i);
-	    if (order == 0 && type != Delete)
-		cnt++;
-	    else 
-	    	cnt--;
+            showList[((*i)->title).lower()] = (*i)->title;
+            temp = QString("%1-!-%2").arg(((*i)->title).lower()).arg(cnt);
+            showData[temp] = *(*i);
+            temp = QString("%1").arg(cnt);
+            showDateData[temp] = *(*i);
+            if (order == 0 && type != Delete)
+                cnt++;
+            else 
+                cnt--;
             delete (*i);
         }
         delete infoList;
@@ -1054,28 +1031,28 @@ void PlaybackBox::FillList()
 
     if ((signed int)showList.count() < (listsize - 1))
     {
-	QString temp;
-	titleData = new QString[listsize - 1];
+        QString temp;
+        titleData = new QString[listsize - 1];
         for (int j = showList.count(); j < (listsize - 1); j++)
         {
-		temp = QString("%1").arg(j);
-		showList[temp] = "***FILLER***";
-		titleData[j] = "***FILLER***";
+            temp = QString("%1").arg(j);
+            showList[temp] = "***FILLER***";
+            titleData[j] = "***FILLER***";
         }
     }
     else
-    	titleData = new QString[showList.count() + 1];
+        titleData = new QString[showList.count() + 1];
 
     cnt = 0;
 
     ShowData::Iterator it;
-    for ( it = showList.begin(); it != showList.end(); ++it )
+    for (it = showList.begin(); it != showList.end(); ++it)
     {
         if (it.data() != "***FILLER***")
-	{
-             titleData[cnt] = it.data();
-	     cnt++;
-	}
+        {
+            titleData[cnt] = it.data();
+            cnt++;
+        }
     }
 
     lastUpdateTime = QDateTime::currentDateTime();
@@ -1148,50 +1125,50 @@ void PlaybackBox::killPlayer(void)
 
         ignoreevents = false;
     }
-}	
+}        
 
 void PlaybackBox::startPlayer(ProgramInfo *rec)
 {
-  playingVideo = true;
+    playingVideo = true;
 
-  if (rec != NULL)
-  {
-    if (rbuffer || nvp)
+    if (rec != NULL)
     {
-        cerr << "ERROR: preview window didn't clean up\n";
-        return;
-    }
+        if (rbuffer || nvp)
+        {
+            cerr << "ERROR: preview window didn't clean up\n";
+            return;
+        }
 
-    rbuffer = new RingBuffer(rec->pathname, false, true);
+        rbuffer = new RingBuffer(rec->pathname, false, true);
 
-    nvp = new NuppelVideoPlayer();
-    nvp->SetRingBuffer(rbuffer);
-    nvp->SetAsPIP();
-    nvp->SetOSDFontName(gContext->GetSetting("OSDFont"),
-                        gContext->GetSetting("OSDCCFont"),
-                        gContext->GetInstallPrefix());
-    QString filters = "";
-    nvp->SetVideoFilters(filters);
+        nvp = new NuppelVideoPlayer();
+        nvp->SetRingBuffer(rbuffer);
+        nvp->SetAsPIP();
+        nvp->SetOSDFontName(gContext->GetSetting("OSDFont"),
+                            gContext->GetSetting("OSDCCFont"),
+                            gContext->GetInstallPrefix());
+        QString filters = "";
+        nvp->SetVideoFilters(filters);
  
-    pthread_create(&decoder, NULL, SpawnDecoder, nvp);
+        pthread_create(&decoder, NULL, SpawnDecoder, nvp);
 
-    QTime curtime = QTime::currentTime();
-    curtime = curtime.addSecs(2);
+        QTime curtime = QTime::currentTime();
+        curtime = curtime.addSecs(2);
  
-    ignoreevents = true;
+        ignoreevents = true;
 
-    while (nvp && !nvp->IsPlaying())
-    {
-         if (QTime::currentTime() > curtime)
-             break;
-         usleep(50);
-         qApp->unlock();
-         qApp->processEvents();
-         qApp->lock();
+        while (nvp && !nvp->IsPlaying())
+        {
+            if (QTime::currentTime() > curtime)
+                break;
+            usleep(50);
+            qApp->unlock();
+            qApp->processEvents();
+            qApp->lock();
+        }
+
+        ignoreevents = false;
     }
-
-    ignoreevents = false;
-  }
 }
 
 void PlaybackBox::playSelected()
@@ -1212,7 +1189,6 @@ void PlaybackBox::deleteSelected()
         return;
 
     remove(curitem);
-
 }
 
 void PlaybackBox::selected()
@@ -1267,7 +1243,7 @@ void PlaybackBox::play(ProgramInfo *rec)
 
     ignoreevents = false;
 
-    update(fullRect());
+    update(fullRect);
 
     if (tv->getRequestDelete())
     {
@@ -1284,7 +1260,7 @@ void PlaybackBox::play(ProgramInfo *rec)
 
     FillList();
     skipUpdate = false;
-    update(fullRect());
+    update(fullRect);
 
     ignoreevents = false;
 
@@ -1299,47 +1275,44 @@ void PlaybackBox::doRemove(ProgramInfo *rec)
 
     if (titleitems == 1)
     {
-	inTitle = true;
-	curTitle = 0;
-	curShowing = 0;
-	skipNum = 0;
-	FillList();
+        inTitle = true;
+        curTitle = 0;
+        curShowing = 0;
+        skipNum = 0;
+        FillList();
     }
     else 
     {
+        titleitems--;
+        if (titleitems < listsize)
+            listCount--;
 
-      titleitems--;
-      if (titleitems < listsize)
-	  listCount--;
+        FillList();
 
-      FillList();
+        if (skipNum < 0)
+            skipNum = 0;
 
-     if (skipNum < 0)
-         skipNum = 0;
+        if (inTitle == false)
+        {
+            cursorDown(false);
+        }
+        else
+        {
+            if (curTitle >= (signed int)showList.count())
+                curTitle = 0;
 
-      if (inTitle == false)
-      {
-          cursorDown(false);
+            if (curTitle < 0)
+                curTitle = 0;
 
-       }
-       else
-       {
-          if (curTitle >= (signed int)showList.count())
-             curTitle = 0;
-
-          if (curTitle < 0)
-              curTitle = 0;
-
-          while (titleData[curTitle] == "***FILLER***")
-          {
-             curTitle++;
-             if (curTitle >= (signed int)showList.count())
-                 curTitle = 0;
-          }
-       }
-     }
-
-    update(listRect());
+            while (titleData[curTitle] == "***FILLER***")
+            {
+                curTitle++;
+                if (curTitle >= (signed int)showList.count())
+                    curTitle = 0;
+            }
+        }
+    }
+    update(listRect);
 }
 
 void PlaybackBox::remove(ProgramInfo *toDel)
@@ -1357,9 +1330,12 @@ void PlaybackBox::remove(ProgramInfo *toDel)
 
 void PlaybackBox::showDeletePopup(int types)
 {
-    QFont bigFont("Arial", (int)(gContext->GetBigFontSize() * hmult), QFont::Bold);
-    QFont medFont("Arial", (int)(gContext->GetMediumFontSize() * hmult), QFont::Bold);
-    QFont smallFont("Arial", (int)(gContext->GetSmallFontSize() * hmult), QFont::Bold);
+    QFont bigFont("Arial", (int)(gContext->GetBigFontSize() * hmult), 
+                  QFont::Bold);
+    QFont medFont("Arial", (int)(gContext->GetMediumFontSize() * hmult), 
+                  QFont::Bold);
+    QFont smallFont("Arial", (int)(gContext->GetSmallFontSize() * hmult), 
+                    QFont::Bold);
 
     ignoreevents = true;
 
@@ -1388,13 +1364,13 @@ void PlaybackBox::showDeletePopup(int types)
     if (graphicPopup == false)
         popup->setPaletteBackgroundColor(popupBackground);
     else
-	gContext->ThemeWidget(popup);
+        gContext->ThemeWidget(popup);
     popup->setPaletteForegroundColor(popupHighlight);
     QLabel *msg = NULL;
     if (types == 1)
-	msg = new QLabel(tr("You have finished watching:"), popup);
+        msg = new QLabel(tr("You have finished watching:"), popup);
     else if (types == 2)
-    	msg = new QLabel(tr("Are you sure you want to delete:"), popup);
+        msg = new QLabel(tr("Are you sure you want to delete:"), popup);
     msg->setBackgroundOrigin(WindowOrigin); 
     msg->setPaletteForegroundColor(popupForeground);
     QLabel *filler1 = new QLabel("", popup);
@@ -1417,10 +1393,10 @@ void PlaybackBox::showDeletePopup(int types)
     filler2->setBackgroundOrigin(WindowOrigin);
     QLabel *msg2 = NULL;
     if (types == 1)
-	msg2 = new QLabel(tr("Delete this recording? It will be gone forever."),
+        msg2 = new QLabel(tr("Delete this recording? It will be gone forever."),
                           popup);
     else if (types == 2)
-    	msg2 = new QLabel(tr("It will be gone forever."), popup);
+            msg2 = new QLabel(tr("It will be gone forever."), popup);
     msg2->setPaletteForegroundColor(popupForeground);
     msg2->setBackgroundOrigin(WindowOrigin);
 
@@ -1429,10 +1405,10 @@ void PlaybackBox::showDeletePopup(int types)
     MythPushButton *noButton = NULL;
 
     if (types == 1)
-   	noButton = new MythPushButton(tr("No, I might want to watch it again."),
+        noButton = new MythPushButton(tr("No, I might want to watch it again."),
                                       popup);
     else if (types == 2)
-    	noButton = new MythPushButton(tr("No, keep it, I changed my mind"),
+        noButton = new MythPushButton(tr("No, keep it, I changed my mind"),
                                       popup);
 
     popup->addWidget(msg, false);
@@ -1441,12 +1417,12 @@ void PlaybackBox::showDeletePopup(int types)
     if ((delitem->subtitle).stripWhiteSpace().length() > 0)
         popup->addWidget(subtitle, false);
     else
-	subtitle->hide();
+        subtitle->hide();
     popup->addWidget(times, false);
     if ((delitem->description).stripWhiteSpace().length() > 0)
         popup->addWidget(desc, false);
     else
-	desc->hide();
+        desc->hide();
     popup->addWidget(filler2, false);
     popup->addWidget(msg2, false);
 
@@ -1468,20 +1444,20 @@ void PlaybackBox::showDeletePopup(int types)
     popup->polish();
 
     int x, y, maxw, poph;
-    poph = msg->height() + msg2->height() + filler1->height() + filler2->height()
-  	   + title->height() + times->height() + desc->height() + yesButton->height() +
-	   noButton->height();
+    poph = msg->height() + msg2->height() + filler1->height() + 
+           filler2->height() + title->height() + times->height() + 
+           desc->height() + yesButton->height() + noButton->height();
     popup->setMaximumHeight(poph);
     maxw = 0;
 
     if (title->width() > maxw)
-	maxw = title->width();
+        maxw = title->width();
     if (times->width() > maxw)
-	maxw = times->width();
+        maxw = times->width();
     if (subtitle->width() > maxw)
-	maxw = subtitle->width();
+        maxw = subtitle->width();
     if (noButton->width() > maxw)
-	maxw = noButton->width();
+        maxw = noButton->width();
 
     x = (int)(width() / 2) - (int)(maxw / 2);
     y = (int)(height() / 2) - (int)(popup->height() / 1.5);
@@ -1493,7 +1469,8 @@ void PlaybackBox::showDeletePopup(int types)
     connect(yesButton, SIGNAL(pressed()), this, SLOT(doDelete()));
     connect(noButton, SIGNAL(pressed()), this, SLOT(noDelete()));
     QAccel *popaccel = new QAccel(popup);
-    popaccel->connectItem(popaccel->insertItem(Key_Escape), this, SLOT(noDelete()));
+    popaccel->connectItem(popaccel->insertItem(Key_Escape), this, 
+                          SLOT(noDelete()));
 }
 
 void PlaybackBox::noDelete()
@@ -1513,7 +1490,7 @@ void PlaybackBox::noDelete()
 
     skipUpdate = false;
     skipCnt = 2;
-    update(fullRect());
+    update(fullRect);
 
     setActiveWindow();
 
@@ -1539,7 +1516,7 @@ void PlaybackBox::doDelete()
 
     skipUpdate = false;
     skipCnt = 2;
-    update(fullRect());
+    update(fullRect);
 
     setActiveWindow();
 
@@ -1567,15 +1544,15 @@ void PlaybackBox::promptEndOfRecording(ProgramInfo *rec)
 
 void PlaybackBox::UpdateProgressBar(void)
 {
-    update(usageRect());
+    update(usageRect);
 }
 
 void PlaybackBox::timeout(void)
 {
     if (ignoreevents == true)
-    	return;
+        return;
     if (noUpdate)
-	return;
+        return;
     if (showData.count() == 0)
         return;
 
@@ -1589,7 +1566,7 @@ void PlaybackBox::timeout(void)
 
                 if (fileExists(rec) == false)
                 {
-		    cerr << "Error: File Missing!\n";
+                    cerr << "Error: File Missing!\n";
                     QPixmap temp((int)(160 * wmult), (int)(120 * hmult));
 
                     killPlayer();
@@ -1601,10 +1578,10 @@ void PlaybackBox::timeout(void)
         }
     }
 
-    update(videoRect());
+    update(videoRect);
 
     if (playbackPreview == 0)
-	timer->stop();
+        timer->stop();
 }
 
 void PlaybackBox::keyPressEvent(QKeyEvent *e)
@@ -1665,7 +1642,7 @@ void PlaybackBox::customEvent(QCustomEvent *e)
             if (QDateTime::currentDateTime() > lastUpdateTime.addSecs(1))
             {
                 FillList();      
-                update(fullRect());
+                update(fullRect);
             }
             if (type == Delete)
                 UpdateProgressBar();
@@ -1686,43 +1663,6 @@ bool PlaybackBox::fileExists(ProgramInfo *pginfo)
     QFile checkFile(pginfo->pathname);
 
     return checkFile.exists();
-}
-
-QRect PlaybackBox::fullRect() const
-{
-    QRect r(0, 0, (int)(800*wmult), (int)(600*hmult));
-    return r;
-}
-
-QRect PlaybackBox::listRect() const
-{
-    // 0, 50, 800, 310
-    QRect r(rectListLeft, rectListTop, rectListWidth, rectListHeight);
-    return r;
-}
-
-QRect PlaybackBox::infoRect() const
-{
-    // if (type == Delete)
-    // 0, 360, 599, 190
-    // else
-    // 0, 360, 599, 240
-    QRect r(rectInfoLeft, rectInfoTop, rectInfoWidth, rectInfoHeight);
-    return r;
-}
-
-QRect PlaybackBox::usageRect() const
-{
-    // 0, 550, 800, 50
-    QRect r(rectUsageLeft, rectUsageTop, rectUsageWidth, rectUsageHeight);
-    return r;
-}
-
-QRect PlaybackBox::videoRect() const
-{
-     // 600, 400, 160, 120
-    QRect r(rectVideoLeft, rectVideoTop, rectVideoWidth, rectVideoHeight);
-    return r;
 }
 
 QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)

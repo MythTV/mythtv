@@ -38,6 +38,11 @@ ViewScheduled::ViewScheduled(QSqlDatabase *ldb, QWidget *parent,
     listCount = 0;
     dataCount = 0;
 
+    fullRect = QRect(0, 0, size().width(), size().height());
+    listRect = QRect(0, 0, 0, 0);
+    infoRect = QRect(0, 0, 0, 0);
+    conflictRect = QRect(0, 0, 0, 0);
+
     accel = new QAccel(this);
 
     space_itemid = accel->insertItem(Key_Space);
@@ -96,7 +101,7 @@ ViewScheduled::ViewScheduled(QSqlDatabase *ldb, QWidget *parent,
 ViewScheduled::~ViewScheduled()
 {
     gContext->removeListener(this);
-    //delete XMLParse;
+    delete theme;
     delete accel;
     delete bgTransBackup;
     if (curitem)
@@ -105,7 +110,6 @@ ViewScheduled::~ViewScheduled()
 
 void ViewScheduled::LoadWindow(QDomElement &element)
 {
-
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
     {
@@ -141,26 +145,11 @@ void ViewScheduled::parseContainer(QDomElement &element)
     theme->parseContainer(element, name, context, area);
 
     if (name.lower() == "selector")
-    {
-        rectListLeft = area.left();
-        rectListTop = area.top();
-        rectListWidth = area.width();
-        rectListHeight = area.height();
-    }
+        listRect = area;
     if (name.lower() == "program_info")
-    {
-        rectInfoLeft = area.left();
-        rectInfoTop = area.top();
-        rectInfoWidth = area.width();
-        rectInfoHeight = area.height();
-    }
+        infoRect = area;
     if (name.lower() == "conflict_info")
-    {
-        rectConLeft = area.left();
-        rectConTop = area.top();
-        rectConWidth = area.width();
-        rectConHeight = area.height();
-    }
+        conflictRect = area;
 }
 
 void ViewScheduled::parsePopup(QDomElement &element)
@@ -205,7 +194,6 @@ void ViewScheduled::parsePopup(QDomElement &element)
                 cerr << "Unknown popup child: " << info.tagName() << endl;
                 exit(0);
             }
-
         }
     }
 }
@@ -220,13 +208,13 @@ void ViewScheduled::resizeImage(QPixmap *dst, QString file)
     QFile checkFile(themeDir + file);
 
     if (checkFile.exists())
-         file = themeDir + file;
+        file = themeDir + file;
     else
-         file = baseDir + file;
+        file = baseDir + file;
 
     if (hmult == 1 && wmult == 1)
     {
-         dst->load(file);
+        dst->load(file);
     }
     else
     {
@@ -266,15 +254,15 @@ void ViewScheduled::paintEvent(QPaintEvent *e)
     QRect r = e->rect();
     QPainter p(this);
  
-    if (r.intersects(listRect()))
+    if (r.intersects(listRect))
     {
         updateList(&p);
     }
-    if (r.intersects(infoRect()))
+    if (r.intersects(infoRect))
     {
         updateInfo(&p);
     }
-    if (r.intersects(conflictRect()))
+    if (r.intersects(conflictRect))
     {
         updateConflict(&p);
     }
@@ -284,9 +272,11 @@ void ViewScheduled::grayOut(QPainter *tmp)
 {
     int transparentFlag = gContext->GetNumSetting("PlayBoxShading", 0);
     if (transparentFlag == 0)
-        tmp->fillRect(QRect(QPoint(0, 0), size()), QBrush(QColor(10, 10, 10), Dense4Pattern));
+        tmp->fillRect(QRect(QPoint(0, 0), size()), QBrush(QColor(10, 10, 10), 
+                      Dense4Pattern));
     else if (transparentFlag == 1)
-        tmp->drawPixmap(0, 0, *bgTransBackup, 0, 0, (int)(800*wmult), (int)(600*hmult));
+        tmp->drawPixmap(0, 0, *bgTransBackup, 0, 0, (int)(800*wmult), 
+                        (int)(600*hmult));
 }
 
 void ViewScheduled::exitWin()
@@ -312,7 +302,6 @@ void ViewScheduled::cursorDown(bool page)
             if (inList >= listCount)
                 inList = listCount - 1;
         }
-
     }
     else if (page == true && pageDowner == true)
     {
@@ -344,12 +333,11 @@ void ViewScheduled::cursorDown(bool page)
     if (inList >= listCount)
         inList = listCount - 1;
 
-    update(fullRect());
+    update(fullRect);
 }
 
 void ViewScheduled::cursorUp(bool page)
 {
-
     if (page == false)
     {
         if (inList < ((int)(listsize / 2) + 1) && inData > 0)
@@ -376,30 +364,27 @@ void ViewScheduled::cursorUp(bool page)
              inData = 0;
              if (inList < 0)
                  inList = 0;
-          }
+         }
 
-          if (inList > (int)(listsize / 2))
-          {
-               inList = (int)(listsize / 2);
-               inData = inData + (int)(listsize / 2) - 1;
-           }
-       }
-       else if (page == true)
-       {
-           inData = 0;
-           inList = 0;
-       }
+         if (inList > (int)(listsize / 2))
+         {
+             inList = (int)(listsize / 2);
+             inData = inData + (int)(listsize / 2) - 1;
+         }
+     }
+     else if (page == true)
+     {
+         inData = 0;
+         inList = 0;
+     }
 
-       if (inList > -1)
-       {
-           update(fullRect());
-       }
-       else
-           inList = 0;
-
+     if (inList > -1)
+     {
+         update(fullRect);
+     }
+     else
+         inList = 0;
 }
-
-
 
 void ViewScheduled::FillList(void)
 {
@@ -431,7 +416,7 @@ void ViewScheduled::FillList(void)
 
 void ViewScheduled::updateList(QPainter *p)
 {
-    QRect pr = listRect();
+    QRect pr = listRect;
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
@@ -470,49 +455,52 @@ void ViewScheduled::updateList(QPainter *p)
 
             for (it = start; it != end; ++it)
             {
-               if (cnt < listsize)
-               {
-                  if (pastSkip <= 0)
-                  {
-                      tempInfo = &(it.data());
+                if (cnt < listsize)
+                {
+                    if (pastSkip <= 0)
+                    {
+                        tempInfo = &(it.data());
 
-                      tempSubTitle = tempInfo->title;
-                      if ((tempInfo->subtitle).stripWhiteSpace().length() > 0)
-                          tempSubTitle = tempSubTitle + " - \"" + tempInfo->subtitle + "\"";
+                        tempSubTitle = tempInfo->title;
+                        if ((tempInfo->subtitle).stripWhiteSpace().length() > 0)
+                            tempSubTitle = tempSubTitle + " - \"" + 
+                                           tempInfo->subtitle + "\"";
 
-                      tempDate = (tempInfo->startts).toString(showDateFormat);
-                      tempTime = (tempInfo->startts).toString(showTimeFormat);
+                        tempDate = (tempInfo->startts).toString(showDateFormat);
+                        tempTime = (tempInfo->startts).toString(showTimeFormat);
 
-                      tempChan = tempInfo->chanstr;
+                        tempChan = tempInfo->chanstr;
 
-                      if (cnt == inList)
-                      {
-                          if (curitem)
-                              delete curitem;
-                          curitem = new ProgramInfo(*tempInfo);
-                          ltype->SetItemCurrent(cnt);
-                      }
+                        if (cnt == inList)
+                        {
+                            if (curitem)
+                                delete curitem;
+                            curitem = new ProgramInfo(*tempInfo);
+                            ltype->SetItemCurrent(cnt);
+                        }
 
-                      ltype->SetItemText(cnt, 1, tempChan);
-                      ltype->SetItemText(cnt, 2, tempDate + " " + tempTime);
-                      ltype->SetItemText(cnt, 3, tempSubTitle);
+                        ltype->SetItemText(cnt, 1, tempChan);
+                        ltype->SetItemText(cnt, 2, tempDate + " " + tempTime);
+                        ltype->SetItemText(cnt, 3, tempSubTitle);
 
-                      if (tempInfo->conflicting)
-                      {
-                          ltype->EnableForcedFont(cnt, "conflictingrecording");
-                      }
-                      if (!tempInfo->recording)
-                      {
-                          ltype->EnableForcedFont(cnt, "disabledrecording");
-                      }
+                        if (tempInfo->conflicting)
+                        {
+                            ltype->EnableForcedFont(cnt, 
+                                                    "conflictingrecording");
+                        }
 
-                      cnt++;
-                      listCount++;
-                  }
-                  pastSkip--;
-               }
-               else
-                   pageDowner = true;
+                        if (!tempInfo->recording)
+                        {
+                            ltype->EnableForcedFont(cnt, "disabledrecording");
+                        }
+
+                        cnt++;
+                        listCount++;
+                    }
+                    pastSkip--;
+                }
+                else
+                    pageDowner = true;
             }
         }
 
@@ -541,12 +529,11 @@ void ViewScheduled::updateList(QPainter *p)
 
     tmp.end();
     p->drawPixmap(pr.topLeft(), pix);
-
 }
 
 void ViewScheduled::updateConflict(QPainter *p)
 {
-    QRect pr = conflictRect();
+    QRect pr = conflictRect;
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
@@ -587,7 +574,7 @@ void ViewScheduled::updateConflict(QPainter *p)
 
 void ViewScheduled::updateInfo(QPainter *p)
 {
-    QRect pr = infoRect();
+    QRect pr = infoRect;
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
@@ -595,89 +582,88 @@ void ViewScheduled::updateInfo(QPainter *p)
     if (conflictData.count() > 0 && curitem)
     {  
 
-       QDateTime startts = curitem->startts;
-       QDateTime endts = curitem->endts;
+        QDateTime startts = curitem->startts;
+        QDateTime endts = curitem->endts;
 
-       QString dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
-       QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
+        QString dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+        QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
         
-       QString timedate = startts.date().toString(dateformat) + QString(", ") +
-                          startts.time().toString(timeformat) + QString(" - ") +
-                          endts.time().toString(timeformat);
+        QString timedate = startts.date().toString(dateformat) + ", " +
+                           startts.time().toString(timeformat) + " - " +
+                           endts.time().toString(timeformat);
 
-       QString subtitle = "";
-       QString chantext = "";
-       QString description = "";
+        QString subtitle = "";
+        QString chantext = "";
+        QString description = "";
 
-       if (gContext->GetNumSetting("DisplayChanNum") != 0)
-           chantext = curitem->channame + " [" + curitem->chansign + "]";
-       else
-           chantext = curitem->chanstr;
+        if (gContext->GetNumSetting("DisplayChanNum") != 0)
+            chantext = curitem->channame + " [" + curitem->chansign + "]";
+        else
+            chantext = curitem->chanstr;
 
-       if (curitem->subtitle != "(null)")
-           subtitle = curitem->subtitle;
-       else
-           subtitle = "";
+        if (curitem->subtitle != "(null)")
+            subtitle = curitem->subtitle;
+        else
+            subtitle = "";
 
-       if (curitem->description != "(null)")
-           description = curitem->description;
-       else
-           description = "";
+        if (curitem->description != "(null)")
+            description = curitem->description;
+        else
+            description = "";
 
-       LayerSet *container = NULL;
-       container = theme->GetSet("program_info");
-       if (container)
-       {
-           UITextType *type = (UITextType *)container->GetType("title");
-           if (type)
-               type->SetText(curitem->title);
+        LayerSet *container = NULL;
+        container = theme->GetSet("program_info");
+        if (container)
+        {
+            UITextType *type = (UITextType *)container->GetType("title");
+            if (type)
+                type->SetText(curitem->title);
+ 
+            type = (UITextType *)container->GetType("subtitle");
+            if (type)
+                type->SetText(subtitle);
 
-           type = (UITextType *)container->GetType("subtitle");
-           if (type)
-               type->SetText(subtitle);
+            type = (UITextType *)container->GetType("timedate");
+            if (type)
+                type->SetText(timedate);
 
-           type = (UITextType *)container->GetType("timedate");
-           if (type)
-               type->SetText(timedate);
+            type = (UITextType *)container->GetType("description");
+            if (type)
+                type->SetText(curitem->description);
 
-           type = (UITextType *)container->GetType("description");
-           if (type)
-               type->SetText(curitem->description);
+            type = (UITextType *)container->GetType("channel");
+            if (type)
+                type->SetText(chantext);
 
-           type = (UITextType *)container->GetType("channel");
-           if (type)
-               type->SetText(chantext);
-
-       }
+        }
        
-       if (container)
-       {
-           container->Draw(&tmp, 4, 0);
-           container->Draw(&tmp, 5, 0);
-           container->Draw(&tmp, 6, 0);
-           container->Draw(&tmp, 7, 0);
-           container->Draw(&tmp, 8, 0);
-       }
-
+        if (container)
+        {
+            container->Draw(&tmp, 4, 0);
+            container->Draw(&tmp, 5, 0);
+            container->Draw(&tmp, 6, 0);
+            container->Draw(&tmp, 7, 0);
+            container->Draw(&tmp, 8, 0);
+        }
     }
     else
     {
-       LayerSet *norec = theme->GetSet("norecordings_info");
-       if (norec)
-       {
-           norec->Draw(&tmp, 4, 0);
-           norec->Draw(&tmp, 5, 0);
-           norec->Draw(&tmp, 6, 0);
-           norec->Draw(&tmp, 7, 0);
-           norec->Draw(&tmp, 8, 0);
-       }
+        LayerSet *norec = theme->GetSet("norecordings_info");
+        if (norec)
+        {
+            norec->Draw(&tmp, 4, 0);
+            norec->Draw(&tmp, 5, 0);
+            norec->Draw(&tmp, 6, 0);
+            norec->Draw(&tmp, 7, 0);
+            norec->Draw(&tmp, 8, 0);
+        }
 
-       //Disable the accelorators when there is nothing to delete
-       accel->setItemEnabled(space_itemid, false);
-       accel->setItemEnabled(enter_itemid, false);
-       accel->setItemEnabled(return_itemid, false);
-
+        //Disable the accelorators when there is nothing to delete
+        accel->setItemEnabled(space_itemid, false);
+        accel->setItemEnabled(enter_itemid, false);
+        accel->setItemEnabled(return_itemid, false);
     }
+
     tmp.end();
     p->drawPixmap(pr.topLeft(), pix);
 }
@@ -1008,28 +994,4 @@ void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
     db->exec(thequery);
 
     FillList();
-}
-
-QRect ViewScheduled::listRect() const
-{
-    QRect r(rectListLeft, rectListTop, rectListWidth, rectListHeight);
-    return r;
-}
-
-QRect ViewScheduled::infoRect() const
-{
-    QRect r(rectInfoLeft, rectInfoTop, rectInfoWidth, rectInfoHeight);
-    return r;
-}
-
-QRect ViewScheduled::fullRect() const
-{
-    QRect r(0, 0, (int)(800*wmult), (int)(600*hmult));
-    return r;
-}
-
-QRect ViewScheduled::conflictRect() const
-{
-    QRect r(rectConLeft, rectConTop, rectConWidth, rectConHeight);
-    return r;
 }
