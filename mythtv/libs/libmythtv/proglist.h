@@ -98,6 +98,8 @@ class ProgLister : public MythDialog
     bool allowUpdates;
     bool updateAll;
     bool refillAll;
+    bool titleSort;
+    bool reverseSort;
 
     void updateBackground(void);
     void updateView(QPainter *);

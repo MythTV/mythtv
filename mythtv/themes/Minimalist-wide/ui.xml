@@ -1416,17 +1416,22 @@
 
  
        <textarea name="sched" draworder="0">
-        <area>20,10,800,40</area>
+        <area>20,10,250,40</area>
         <font>info</font>
         <value>Program Listings</value>
       </textarea>
-   
+      <textarea name="keyinstr" align="center" draworder="0">
+        <area>260,10,240,30</area>
+        <font>info</font>
+        <value>(1)Time (2)Title</value>
+      </textarea>
+
     </container>
 
     <container name="view">
-      <area>300,10,900,30</area>
+      <area>500,10,700,30</area>
       <textarea name="curview" draworder="4" align="right">
-        <area>0,0,900,30</area>
+        <area>0,0,700,30</area>
         <font>info</font>
       </textarea>
     </container>

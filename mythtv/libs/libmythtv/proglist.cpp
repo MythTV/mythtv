@@ -53,6 +53,8 @@ ProgLister::ProgLister(ProgListType pltype, const QString &view,
     allowUpdates = true;
     updateAll = false;
     refillAll = false;
+    titleSort = false;
+    reverseSort = false;
 
     fullRect = QRect(0, 0, size().width(), size().height());
     viewRect = QRect(0, 0, 0, 0);
@@ -166,6 +168,32 @@ void ProgLister::keyPressEvent(QKeyEvent *e)
             details();
         else if (action == "TOGGLERECORD")
             quickRecord();
+        else if (action == "1")
+        {
+            if (titleSort == true)
+            {
+                titleSort = false;
+                reverseSort = false;
+            }
+            else
+            {
+                reverseSort = !reverseSort;
+            }
+            refillAll = true;
+        }
+        else if (action == "2")
+        {
+            if (titleSort == false)
+            {
+                titleSort = true;
+                reverseSort = false;
+            }
+            else
+            {
+                reverseSort = !reverseSort;
+            }
+            refillAll = true;
+        }
         else
             handled = false;
     }
@@ -1053,35 +1081,35 @@ QString ProgLister::powerStringToSQL(QString &qphrase)
                        .arg(field[0]);
     if (field[1])
     {
-	if (str > "")
+        if (str > "")
             str += "AND ";
         str += QString("program.subtitle LIKE \"\%%1\%\" ")
                        .arg(field[1]);
     }
     if (field[2])
     {
-	if (str > "")
+        if (str > "")
             str += "AND ";
         str += QString("program.description LIKE \"\%%1\%\" ")
                        .arg(field[2]);
     }
     if (field[3])
     {
-	if (str > "")
+        if (str > "")
             str += "AND ";
         str += QString("program.category_type=\"%1\" ")
                        .arg(field[3]);
     }
     if (field[4])
     {
-	if (str > "")
+        if (str > "")
             str += "AND ";
         str += QString("program.category=\"%1\" ")
                        .arg(field[4]);
     }
     if (field[5])
     {
-	if (str > "")
+        if (str > "")
             str += "AND ";
         str += QString("channel.callsign=\"%1\" ")
                        .arg(field[5]);
@@ -1302,6 +1330,43 @@ void ProgLister::fillViewList(const QString &view)
         curView = viewList.count() - 1;
 }
 
+class plTitleSort
+{
+    public:
+        plTitleSort(bool reverseSort = false) {m_reverse = reverseSort;}
+
+        bool operator()(const ProgramInfo *a, const ProgramInfo *b) 
+        {
+            if (m_reverse)
+                return (a->sortTitle > b->sortTitle);
+            else
+                return (a->sortTitle < b->sortTitle);
+        }
+
+    private:
+        bool m_reverse;
+};
+
+class plTimeSort
+{
+    public:
+        plTimeSort(bool reverseSort = false) {m_reverse = reverseSort;}
+
+        bool operator()(const ProgramInfo *a, const ProgramInfo *b) 
+        {
+            if (a->startts == b->startts)
+                return (a->chanid < b->chanid);
+
+            if (m_reverse)
+                return (a->startts > b->startts);
+            else
+                return (a->startts < b->startts);
+        }
+
+    private:
+        bool m_reverse;
+};
+
 void ProgLister::fillItemList(void)
 {
     if (curView < 0)
@@ -1346,7 +1411,6 @@ void ProgLister::fillItemList(void)
             where += "AND (program.category_type <> 'movie' ";
             where += "OR program.airdate >= YEAR(NOW() - INTERVAL 2 YEAR)) ";
         }
-        where += "GROUP BY title ";
     }
     else if (type == plTitleSearch) // keyword search
     {
@@ -1417,10 +1481,42 @@ void ProgLister::fillItemList(void)
         where = QString("WHERE channel.visible = 1 "
                         "  AND program.starttime >= %1 ")
                         .arg(searchTime.toString("yyyyMMddhh0000"));
+        if (titleSort)
+            where += QString("  AND program.starttime < DATE_ADD(%1, "
+                             "INTERVAL 1 HOUR) ")
+                             .arg(searchTime.toString("yyyyMMddhh0000"));
     }
+
+    if (type == plNewListings || titleSort)
+        where += " GROUP BY title ";
 
     schedList.FromScheduler();
     itemList.FromProgram(where, schedList);
+
+    if (titleSort || reverseSort)
+    {
+        ProgramInfo *s;
+
+        vector<ProgramInfo *> sortedList;
+        while (itemList.count())
+        {
+            s = itemList.take();
+            s->sortTitle = s->title;
+            s->sortTitle.remove(QRegExp("^(The |A |An )"));
+            sortedList.push_back(s);
+        }
+
+        if (titleSort)
+            sort(sortedList.begin(), sortedList.end(),
+                 plTitleSort(reverseSort));
+        else
+            sort(sortedList.begin(), sortedList.end(),
+                 plTimeSort(reverseSort));
+
+        vector<ProgramInfo *>::iterator i = sortedList.begin();
+        for (; i != sortedList.end(); i++)
+            itemList.append(*i);
+    }
 
     if (curItem < 0 && itemList.count() > 0)
         curItem = 0;
