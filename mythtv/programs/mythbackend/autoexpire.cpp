@@ -143,7 +143,8 @@ void AutoExpire::ExpireEpisodesOverMax(void)
 
     QString fileprefix = gContext->GetFilePrefix();
     QString querystr = "SELECT title, maxepisodes "
-                       "FROM record WHERE maxepisodes > 0 ORDER BY title";
+                       "FROM record WHERE maxepisodes > 0 "
+                       "ORDER BY title ASC, maxepisodes DESC";
 
     QSqlQuery query = db->exec(querystr);
 
