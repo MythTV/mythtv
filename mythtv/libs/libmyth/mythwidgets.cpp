@@ -996,6 +996,28 @@ MythListView::MythListView(QWidget *parent)
     setAllColumnsShowFocus(TRUE);
 }
 
+
+
+void MythListView::ensureItemVCentered ( const QListViewItem * i )
+{
+    if ( !i )
+	return;
+
+    int y = itemPos( i );
+    int h = i->height();
+    
+    if (y - h/2 < visibleHeight()/2 || y - h/2 > contentsHeight() - visibleHeight()/2)
+    {
+       ensureItemVisible(i);
+    }
+    else
+    {
+       ensureVisible(contentsX(), y, 0, visibleHeight()/2);
+    }
+}
+
+
+
 void MythListView::keyPressEvent(QKeyEvent *e)
 {
     if (!allowkeypress)
