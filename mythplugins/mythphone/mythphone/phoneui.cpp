@@ -2162,14 +2162,17 @@ void PhoneUIBox::handleTreeListSignals(int , IntVector *attributes)
 
 PhoneUIBox::~PhoneUIBox(void)
 {
+    sipStack->UiStopWatchAll();
+    sipStack->UiClosed();
+    
     // Just in case we are still mid-call; kill the RTP threads
     if (rtpAudio != 0)
         delete rtpAudio;
     if (rtpVideo != 0)
         StopVideo();
-
-    sipStack->UiStopWatchAll();
-    sipStack->UiClosed();
+    rtpAudio = 0;
+    rtpVideo = 0;
+        
     if (localClient != 0)
         webcam->UnregisterClient(localClient);
     if (txClient != 0)
