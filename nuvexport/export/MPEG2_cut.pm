@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.09.26 (gjhurlbu)
+#Last Updated: 2004.12.26 (xris)
 #
 #  export::MPEG2_cut
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
@@ -68,9 +68,9 @@ package export::MPEG2_cut;
         }
 
     # Generate some names for the temporary audio and video files
-        my $safe_outfile = shell_escape($self->{'path'}.'/'.$episode->{'outfile'});
+        my $safe_outfile = shell_escape($self->get_outfile($episode, '.mpg'));
 
-        my $command = "mpeg2cut $episode->{'filename'} $safe_outfile.mpg $episode->{'lastgop'} ";
+        my $command = "mpeg2cut $episode->{'filename'} $safe_outfile $episode->{'lastgop'} ";
 
         @cuts = split("\n",$episode->{'cutlist'});
         my @skiplist;

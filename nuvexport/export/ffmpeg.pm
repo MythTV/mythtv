@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.10.04 (xris)
+#Last Updated: 2004.12.26 (xris)
 #
 #  ffmpeg.pm
 #
@@ -153,23 +153,13 @@ package export::ffmpeg;
     # Add any additional settings from the child module
         $ffmpeg .= ' '.$self->{'ffmpeg_xtra'};
 
-    # Output directory
+    # Output directory set to null means the first pass of a multipass
         if (!$self->{'path'} || $self->{'path'} =~ /^\/dev\/null\b/) {
             $ffmpeg .= ' /dev/null';
         }
+    # Add the output filename
         else {
-        # Make sure we don't have a duplicate filename
-            if (-e $self->{'path'}.'/'.$episode->{'outfile'}.$suffix) {
-                my $count = 1;
-                my $out   = $episode->{'outfile'};
-                while (-e $self->{'path'}.'/'.$out.$suffix) {
-                    $count++;
-                    $out = $episode->{'outfile'}.".$count";
-                }
-                $episode->{'outfile'} = $out;
-            }
-        # Add the output command
-            $ffmpeg .= " " . shell_escape($self->{'path'}.'/'.$episode->{'outfile'}.$suffix);
+            $ffmpeg .= ' '.shell_escape($self->get_outfile($episode, $suffix));
         }
     # ffmpeg pids
         my ($mythtrans_pid, $ffmpeg_pid, $mythtrans_h, $ffmpeg_h);

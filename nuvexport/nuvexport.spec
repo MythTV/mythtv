@@ -23,7 +23,10 @@ Requires:  divx4linux
 Requires:  perl-Time-HiRes
 # mpeg2cut needs some others:
 Requires:  avidemux >= 2
-Requires:  lvemux
+Requires:  lve
+
+# Provides some of its own perl modules -- rpm complains if this isn't included
+Provides:  perl(nuvexport::shared_utils)
 
 %description
 nuvexport is a perl script wrapper to several encoders, which is capable of

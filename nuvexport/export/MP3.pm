@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.09.27 (xris)
+#Last Updated: 2004.12.26 (xris)
 #
 #  export::MP3
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -67,16 +67,15 @@ package export::MP3;
         load_finfo($episode);
     # Build the ffmpeg string
         $self->{'ffmpeg_xtra'} = " -acodec mp3 -f mp3";
-
     # Execute ffmpeg
-        $self->SUPER::export($episode, ".mp3");
+        $self->SUPER::export($episode, '.mp3');
     # Now tag it
         my $safe_title       = shell_escape($episode->{'title'});
         my $safe_channel     = shell_escape($episode->{'channel'});
         my $safe_description = shell_escape($episode->{'description'});
         my $safe_show_name   = shell_escape($episode->{'show_name'});
-        my $safe_outfile     = shell_escape($self->{'path'}.'/'.$episode->{'outfile'});
-        $command = "id3tag -A $safe_title -a $safe_channel -c $safe_description -s $safe_show_name $safe_outfile.mp3";
+        my $safe_outfile     = shell_escape($self->get_outfile($episode, '.mp3'));
+        my $command = "id3tag -A $safe_title -a $safe_channel -c $safe_description -s $safe_show_name $safe_outfile";
         system($command);
     }
 

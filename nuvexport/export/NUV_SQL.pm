@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.09.27 (xris)
+#Last Updated: 2004.12.26 (xris)
 #
 #  export::NUV_SQL
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -68,7 +68,7 @@ package export::NUV_SQL;
         load_finfo($episode);
     # Create a show-name directory?
         if ($self->{'create_dir'}) {
-            $self->{'path'} .= '/'.$episode->{'outfile'};
+            $self->{'path'} .= '/'.$self->get_outfile($episode);
             mkdir($self->{'path'}, 0755) or die "Can't create $self->{'path'}:  $!\n\n";
         }
     # Load the three files we'll be using

@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.10.02 (xris)
+#Last Updated: 2004.12.26 (xris)
 #
 #  export::SVCD
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -123,12 +123,14 @@ package export::SVCD;
                                    .' -w '.$self->{'v_bitrate'}
                                    .' -E 44100 -b '.$self->{'a_bitrate'};
     # Add the temporary files that will need to be deleted
-        push @tmpfiles, "$self->{'path'}/$episode->{'outfile'}.m2v", "$self->{'path'}/$episode->{'outfile'}.mpa";
+        push @tmpfiles, $self->get_outfile($episode, ".$$.m2v"), $self->get_outfile($episode, ".$$.mpa");
     # Execute the parent method
         $self->SUPER::export($episode);
     # Multiplex the streams
-        my $safe_outfile = shell_escape($self->{'path'}.'/'.$episode->{'outfile'});
-        $command = "nice -n $Args{'nice'} tcmplex -m s -i $safe_outfile.m2v -p $safe_outfile.mpa -o $safe_outfile.mpg";
+        my $command = "nice -n $Args{'nice'} tcmplex -m s"
+                      .' -i '.shell_escape($self->get_outfile($episode, ".$$.m2v"))
+                      .' -p '.shell_escape($self->get_outfile($episode, ".$$.mpa"))
+                      .' -o '.shell_escape($self->get_outfile($episode, '.mpg'));
         system($command);
     }
 

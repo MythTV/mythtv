@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.12.14 (xris)
+#Last Updated: 2004.12.26 (xris)
 #
 #  transcode.pm
 #
@@ -153,23 +153,13 @@ package export::transcode;
         }
     # Add any additional settings from the child module
         $transcode .= ' '.$self->{'transcode_xtra'};
-    # Output directory
+    # Output directory set to null means the first pass of a multipass
         if (!$self->{'path'} || $self->{'path'} =~ /^\/dev\/null\b/) {
             $transcode .= ' -o /dev/null';
         }
+    # Add the output filename
         else {
-        # Make sure we don't have a duplicate filename
-            if (-e $self->{'path'}.'/'.$episode->{'outfile'}.$suffix) {
-                my $count = 1;
-                my $out   = $episode->{'outfile'};
-                while (-e $self->{'path'}.'/'.$out.$suffix) {
-                    $count++;
-                    $out = $episode->{'outfile'}.".$count";
-                }
-                $episode->{'outfile'} = $out;
-            }
-        # Add the output command
-            $transcode .= ' -o '.shell_escape($self->{'path'}.'/'.$episode->{'outfile'}.$suffix);
+            $transcode .= ' -o '.shell_escape($self->get_outfile($episode, $suffix));
         }
     # Transcode pids
         my ($mythtrans_pid, $trans_pid, $mythtrans_h, $trans_h);

@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.10.02 (xris)
+#Last Updated: 2004.12.26 (xris)
 #
 #  export::DVCD
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
@@ -59,12 +59,14 @@ package export::DVCD;
         $self->{'transcode_xtra'} = " -y mpeg2enc,mp2enc -Z $size"
                                    .' -F 1 -E 48000 -b 224';
     # Add the temporary files that will need to be deleted
-        push @tmpfiles, "$self->{'path'}/$episode->{'outfile'}.m1v", "$self->{'path'}/$episode->{'outfile'}.mpa";
+        push @tmpfiles, $self->get_outfile($episode, ".$$.m1v"), $self->get_outfile($episode, ".$$.mpa");
     # Execute the parent method
         $self->SUPER::export($episode);
     # Multiplex the streams
-        my $safe_outfile = shell_escape($self->{'path'}.'/'.$episode->{'outfile'});
-        $command = "nice -n $Args{'nice'} mplex -f 1 $safe_outfile.m1v $safe_outfile.mpa -o $safe_outfile.mpg";
+        my $command = "nice -n $Args{'nice'} tcmplex -m v"
+                      .' -i '.shell_escape($self->get_outfile($episode, ".$$.m1v"))
+                      .' -p '.shell_escape($self->get_outfile($episode, ".$$.mpa"))
+                      .' -o '.shell_escape($self->get_outfile($episode, '.mpg'));
         system($command);
     }
 

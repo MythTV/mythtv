@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.12.14 (xris)
+#Last Updated: 2004.12.26 (xris)
 #
 #  generic.pm
 #
@@ -39,6 +39,48 @@ package export::generic;
         $self->{'use_cutlist'} = query_text('Enable Myth cutlist?',
                                             'yesno',
                                             'Yes');
+    }
+
+# Check for a duplicate filename, and return a full path to the output filename
+    sub get_outfile {
+        my $self    = shift;
+        my $episode = shift;
+        my $suffix  = ($self->{'suffix'} or shift);
+    # Build a clean filename
+        my $outfile;
+        if ($episode->{'outfile'}) {
+            $outfile = $episode->{'outfile'};
+        }
+        else {
+            if ($episode->{'show_name'} ne 'Untitled' and $episode ne 'Untitled') {
+                $outfile = $episode->{'show_name'}.' - '.$episode->{'title'};
+            }
+            elsif($episode->{'show_name'} ne 'Untitled') {
+                $outfile = $episode->{'show_name'};
+            }
+            elsif($episode ne 'Untitled') {
+                $outfile = $episode->{'title'};
+            }
+            else {
+                $outfile = 'Untitled';
+            }
+            $outfile =~ s/(?:[\/\\\:\*\?\<\>\|\-]+\s*)+(?=[^\s\/\\\:\*\?\<\>\|\-])/- /sg;
+            $outfile =~ tr/"/'/s;
+        # Store it so we don't have to recalculate this next time
+            $episode->{'outfile'} = $outfile;
+        }
+    # Make sure we don't have a duplicate filename
+        if (-e $self->{'path'}.'/'.$outfile.$suffix) {
+            my $count = 1;
+            my $out   = $outfile;
+            while (-e $self->{'path'}.'/'.$out.$suffix) {
+                $count++;
+                $out = "$outfile.$count";
+            }
+            $outfile = $out;
+        }
+    # return
+        return $self->{'path'}.'/'.$outfile.$suffix;
     }
 
 # A routine to grab resolutions
