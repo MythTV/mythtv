@@ -3898,8 +3898,11 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
             return;
 
         if ((commBreakIter.data() == MARK_COMM_START) &&
-            (framesPlayed + commnotifyamount * video_frame_rate >=
-             commBreakIter.key()))
+            (((autocommercialskip == 1) &&
+              (framesPlayed >= commBreakIter.key())) ||
+             ((autocommercialskip == 2) &&
+              (framesPlayed + commnotifyamount * video_frame_rate >=
+               commBreakIter.key()))))
         {
             ++commBreakIter;
             if (commBreakIter == commBreakMap.end())
