@@ -46,6 +46,8 @@ gsmCodec::~gsmCodec()
 int gsmCodec::Encode(short *In, unsigned char *Out, int Samples, short &maxPower, int gain)
 {
     (void)gain;
+    if (Samples != 160)
+        cout << "GSM Encode unsupported length " << Samples << endl;
     gsm_encode(gsmEncData, In, Out);
     maxPower = 0;
     for (int i=0;i<Samples;i++)
@@ -69,18 +71,18 @@ int gsmCodec::Decode(unsigned char *In, short *Out, int Len, short &maxPower)
         }
         gsm_decode(gsmDecData, In, Out);
         gsm_decode(gsmDecData, In+33, Out+160);
+        maxPower = 0;
         for (int i=0;i<320;i++)
             maxPower = QMAX(maxPower, *Out++);
-        maxPower = 0;
         return (320*sizeof(short)); 
     }    
     
     if (Len != 33)
         cout << "GSM Invalid receive length " << Len << endl;
     gsm_decode(gsmDecData, In, Out);
+    maxPower = 0;
     for (int i=0;i<160;i++)
         maxPower = QMAX(maxPower, *Out++);
-    maxPower = 0;
     return (160*sizeof(short)); // One packet of 33 bytes translates into 20ms of data
 }
 
