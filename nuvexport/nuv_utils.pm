@@ -216,15 +216,18 @@ package nuv_utils;
 	}
 
 	sub Quit {
-	# Allow the functions to clean up after themselves
+	# Print a nice goodbye message, and leave
+		print "\nThanks for using nuvexport!\n\n";
+		exit;
+	}
+
+	# Allow the functions to clean up after themselves - and make sure that they can
+	END {
 		if (@main::Functions) {
 			foreach $function (@main::Functions) {
 				$function->cleanup;
 			}
 		}
-	# Print a nice goodbye message, and leave
-		print "\nThanks for using nuvexport!\n\n";
-		exit;
 	}
 
 1;	#return true

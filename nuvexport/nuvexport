@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Last Updated: 2003.09.22 (xris)
+# Last Updated: 2004.01.07 (xris)
 
 =head1 NAME
 
@@ -108,6 +108,7 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
 
 # Load the gui modules
 	use gui_text;
+	use gui_cli;
 
 # Load the export modules
 	use export_DivX;
@@ -131,9 +132,24 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
 	$Prog{nice} = find_program('nice');
 	die "You need ffmpeg to use this program.\n\n" unless ($Prog{nice});
 
+# Find out which encoders are available to use, and load any extra command line argument variables
+	push @Functions, export_SVCD->new,
+					 export_NUV_SQL->new,
+					 export_DivX->new,
+					 export_WMV->new,
+					 export_VCD->new,
+					 export_Trans_XviD->new,
+					 export_Trans_VCD->new,
+					 export_Trans_SVCD->new;
+
+# Set up the signal handlers
+	$SIG{INT}  = \&Quit;
+	$SIG{QUIT} = \&Quit;
+
 # Load the commandline options
 	%Args = ('debug' => \$DEBUG);
-	@Arg_str = ('help',
+	push @Arg_str,
+				'help',
 				'debug',
 			# GUI override - not really needed at this point
 				'gui|ui=s',
@@ -142,12 +158,12 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
 				'subtitle|episode=s',
 				'description=s',
 			# CLI for which export mode to use
-				'function|export|mode=s',
+				'mode|function|export=s',
 			# Used to specify a program
 				'chanid|channel=i',
 				'starttime|start_time=i',
-				'endtime|end_time=i',
-			   );
+			# Save path - used by most exporters, so it's included here
+				'outfile|out=s';
 	GetOptions(\%Args, @Arg_str);
 
 # Print the help - for now, this is just perldoc
@@ -164,20 +180,6 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
 		print "ui: $Args{ui}\n\n";
 		exit;
 	}
-
-# Find out which encoders are available to use
-	push @Functions, export_SVCD->new,
-					 export_NUV_SQL->new,
-					 export_DivX->new,
-					 export_WMV->new,
-					 export_VCD->new,
-					 export_Trans_XviD->new,
-					 export_Trans_VCD->new,
-					 export_Trans_SVCD->new;
-
-# Set up the signal handlers
-	$SIG{INT}  = \&Quit;
-	$SIG{QUIT} = \&Quit;
 
 # Read the mysql.txt file in use by MythTV.
 # could be in a couple places, so try the usual suspects
@@ -303,8 +305,20 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
 		Quit();
 	}
 
-# Load the chosen gui
-	$gui = gui_text->new;
+# Command line export request?
+	if ($Args{starttime} || $Args{chanid} || $Args{mode}) {
+		$gui = gui_cli->new;
+	}
+
+# Load another gui here?
+	# Nope, we don't have one
+
+# Load the text-based gui by default
+	else {
+		$gui = gui_text->new;
+	}
+
+# Run the main GUI loop
 	$gui->main_loop;
 
 # Exit gracefully, in case we might accidentally execute some code below

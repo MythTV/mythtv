@@ -1,9 +1,19 @@
 package export_SVCD;
 
+# Define any command line parameters used by this module
+	*Arg_str  = *main::Arg_str;
+	push @Arg_str,
+			'a_bitrate|ar:i',
+			'v_bitrate|vr:i',
+			'quantisation:i',
+			'use_cutlist',
+			'noise_reduction|denoise';
+
 # Load the nuv utilities
 	use nuv_utils;
 
 # Make sure we have pointers to the main:: namespace for certain variables
+	*Args  = *main::Args;
 	*Prog  = *main::Prog;
 	*gui   = *main::gui;
 	*DEBUG = *main::DEBUG;
@@ -11,13 +21,22 @@ package export_SVCD;
 	sub new {
 		my $class = shift;
 		my $self  = {
+					# The name of this export function - displayed to users in interactive mode
 					 'name'            => 'Export to SVCD',
+					# The --mode match (regex) for non-interactive command line interface
+					 'cli_mode'        => 'svcd',
+					# Set to 0 to disable this export function (eg. if there are errors)
 					 'enabled'         => 1,
-					 'started'         => 0,
-					 'fifodir'         => "fifodir.$$",
-					 'children'        => [],
+					# An array of errors - generally displayed to users when they try to use a disabled function
 					 'errors'          => undef,
+					# Misc variables all export functions should keep track of
+					 'started'         => 0,
+					 'children'        => [],
 					 'episode'         => undef,
+					 'is_cli'          => 0,
+					# Variables specific to export_SVCD
+					 'fifodir'         => "fifodir.$$",
+					 'default_outfile' => 'Untitled',
 					 'savepath'        => '.',
 					 'outfile'         => 'out.mpg',
 					 'tmp_a'           => 'out.mp2',
@@ -44,26 +63,48 @@ package export_SVCD;
 		return $self;
 	}
 
+	sub gather_cli_data {
+		my $self = shift;
+		return undef unless ($Args{mode} && $Args{mode} =~ /$self->{cli_mode}/i);
+	# Get the save path
+		($self->{savepath}, $self->{outfile}) = $gui->query_filename($self->{default_outfile}, 'mpg', $self->{savepath});
+	# Audio bitrate
+		$self->{a_bitrate} = $Args{a_bitrate} if ($Args{a_bitrate});
+		die "Audio bitrate is too low; please choose a bitrate >= 64.\n\n"  if ($self->{a_bitrate} < 64);
+		die "Audio bitrate is too high; please choose a bitrate <= 384\n\n" if ($self->{a_bitrate} > 384);
+	# Video Bitrate
+		my $max_v_bitrate = $self->{v_bitrate} = 2742 - $self->{a_bitrate} > 2500 ? 2500 : 2742 - $self->{a_bitrate};
+		$self->{v_bitrate} = $Args{v_bitrate} if ($Args{v_bitrate});
+		die "Video bitrate is too low; please choose a bitrate >= 1000.\n\n"           if ($self->{v_bitrate} < 1000);
+		die "Video bitrate is too high; please choose a bitrate <= $max_v_bitrate\n\n" if ($self->{v_bitrate} > $max_v_bitrate);
+	# Quantisation
+		$self->{quantisation}    = $Args{quantisation} if ($Args{quantisation});
+	# Cutlist and noise reduction don't require checking
+		$self->{use_cutlist}     = ($self->{episode}->{cutlist} && $self->{episode}->{cutlist} =~ /\d/ && $Args{use_cutlist}) ? 1 : 0;
+	# Noise reduction
+		$self->{noise_reduction} = $Args{noise_reduction};
+	# Return true, so we skip the interactive data gathering
+		return 1;
+	}
+
 	sub gather_data {
 		my $self    = shift;
 		my $default_filename = '';
+	# Build a default filename
+		if ($self->{episode}->{show_name} ne 'Untitled' and $self->{episode}->{title} ne 'Untitled') {
+			$self->{default_outfile} = $self->{episode}->{show_name}.' - '.$self->{episode}->{title};
+		}
+		elsif ($self->{episode}->{show_name} ne 'Untitled') {
+			$self->{default_outfile} = $self->{episode}->{show_name};
+		}
+		elsif ($self->{episode}->{title} ne 'Untitled') {
+			$self->{default_outfile} = $self->{episode}->{title};
+		}
+	# grabbing data from the command line?
+		return if ($self->gather_cli_data());
 	# Get the save path
 		$self->{savepath} = $gui->query_savepath();
-	# Ask the user for the filename
-		if($self->{episode}->{show_name} ne 'Untitled' and $self->{episode}->{title} ne 'Untitled')
-		{
-			$default_filename = $self->{episode}->{show_name}.' - '.$self->{episode}->{title};
-		}
-		elsif($self->{episode}->{show_name} ne 'Untitled')
-		{
-			$default_filename = $self->{episode}->{show_name};
-		}
-		elsif($self->{episode}->{title} ne 'Untitled')
-		{
-			$default_filename = $self->{episode}->{title};
-		}
-
-		$self->{outfile} = $gui->query_filename($default_filename, 'mpg', $self->{savepath});
+		$self->{outfile}  = $gui->query_filename($self->{default_outfile}, 'mpg', $self->{savepath});
 	# Ask the user if he/she wants to use the cutlist
 		if ($self->{episode}->{cutlist} && $self->{episode}->{cutlist} =~ /\d/) {
 			$self->{use_cutlist} = $gui->query_text('Enable Myth cutlist?',
@@ -91,15 +132,15 @@ package export_SVCD;
 		$self->{a_bitrate} = $a_bitrate;
 	# Ask the user what video bitrate he/she wants, or calculate the max bitrate (2756 max, though we round down a bit since some dvd players can't handle the max)
 	# Then again, mpeg2enc seems to have trouble with bitrates > 2500
-		$self->{v_bitrate} = 2742 - $self->{a_bitrate} ? 2500 : 2742 - $self->{a_bitrate};
+		$self->{v_bitrate} = 2742 - $self->{a_bitrate} > 2500 ? 2500 : 2742 - $self->{a_bitrate};
 		my $v_bitrate = $gui->query_text('Maximum video bitrate for VBR?',
 										 'int',
 										 $self->{v_bitrate});
-		while ($v_bitrate < 1000 && $v_bitrate > $max_v_bitrate) {
+		while ($v_bitrate < 1000 && $v_bitrate > $self->{v_bitrate}) {
 			if ($v_bitrate < 1000) {
 				$gui->notify('Too low; please choose a bitrate >= 1000.');
 			}
-			elsif ($v_bitrate > $max_v_bitrate) {
+			elsif ($v_bitrate > $self->{v_bitrate}) {
 				$gui->notify("Too high; please choose a bitrate <= $self->{v_bitrate}.");
 			}
 			$v_bitrate = $gui->query_text('Maximum video bitrate for VBR?',
@@ -225,7 +266,7 @@ package export_SVCD;
 		1 while (wait > 0);
 		$self->{children} = undef;
 	# Multiplex the streams
-		my $safe_outfile = shell_escape($self->{outfile});
+		my $safe_outfile = shell_escape($self->{savepath} eq '.' ? $self->{outfile} : "$self->{savepath}/$self->{outfile}");
 		if ($Prog{mplexer} =~ /\btcmplex$/) {
 			$command = "nice -n 19 tcmplex -m s -i $self->{tmp_v} -p $self->{tmp_a} -o $safe_outfile";
 		}
@@ -241,7 +282,11 @@ package export_SVCD;
 
 	sub cleanup {
 		my $self = shift;
-		return unless ($self->{started});
+	# Remove any temporary files
+		foreach my $file ("$self->{fifodir}/audout", "$self->{fifodir}/vidout", $self->{tmp_a}, $self->{tmp_v}) {
+			unlink $file if (-e $file);
+		}
+		rmdir $self->{fifodir} if (-d $self->{fifodir});
 	# Make sure any child processes also go away
 		if ($self->{children} && @{$self->{children}}) {
 			foreach my $child (@{$self->{children}}) {
@@ -249,11 +294,6 @@ package export_SVCD;
 			}
 			1 while (wait > 0);
 		}
-	# Remove any temporary files
-		foreach my $file ("$self->{fifodir}/audout", "$self->{fifodir}/vidout", $self->{tmp_a}, $self->{tmp_v}) {
-			unlink $file if (-e $file);
-		}
-		rmdir $self->{fifodir} if (-e $self->{fifodir});
 	}
 
 1;	#return true
