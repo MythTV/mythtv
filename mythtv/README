@@ -20,17 +20,21 @@ This is what you need, software wise, to have installed:
                 so get it from http://www.mp3dev.org/mp3/
 
    QT - Version 3.1 or greater is strongly recommended.  MythTV will probably
-        compile with version 3.0, but there are known to be bugs in that version        which can crash MythTV.  Again, the best way to get this is from your
-        distro.  You need it compiled threadsafe version, and the mysql
-        bindings as well.  I'm using version 3.1.1.  http://www.trolltech.com
+        compile with version 3.0, but there are known bugs in that version        
+        which can crash MythTV.  MythTV will not include any workarounds for
+        bugs in QT 3.0.  Again, the best way to get this is from your
+        distro.  You need it compiled threadsafe and with the MySQL
+        bindings.  I'm using version 3.1.1.  http://www.trolltech.com
 
    MySQL - You need this setup and working.  A recent version, I think, would
            be best.  I don't know, though, I'm utterly new to it.  Get it from
            your distro, or from http://www.mysql.com
 
-   XMLTV - You need at the latest version (0.5.25 at the time of this writing).
-           This will do the work of actually grabbing the program information.
-           Get it from: http://membled.com/work/apps/xmltv/
+   XMLTV - If you are in North America, you need at least the latest version
+           (0.5.28 as of 2004-01-31).  This will do the work of actually 
+           grabbing the program information. Get it from http://xmltv.sf.net
+           If you're not, then you need some sort of listings grabber and
+           will need to run the mythfilldatabase program in --manual mode.
           
 See the mythtv-HOWTO.html or mythtv-HOWTO.txt file in the docs/ subdirectory
 or on http://www.mythtv.org/docs/ for in-depth instructions on installing and 
@@ -41,10 +45,10 @@ You also need v4l setup and working properly.  If xawtv works (in grabdisplay
 mode and with xv), this should, too.
 
 Hardware wise, you need a computer.  Really.  Helps to have a fast one, too.
-You also need a video card with working Xv support (to scale and convert 
-colorspaces), and a TV tuner card.  If you're using ALSA for sound support 
-(which _is_ the recommended thing to do), you should be using version 0.9, not
-0.5.
+You also need a video card with working Xv support (to scale and convert
+colorspaces), and a capture card.  If you're using ALSA for sound support
+(which _is_ the recommended thing to do), you should be using at least
+version 0.9, not 0.5.
 
 See the UPGRADING file for information on upgrading between releases.
 
@@ -61,7 +65,7 @@ subdirs.
 Feel free to subscribe to the development mailing list at:
 http://www.mythtv.org/mailman/listinfo/mythtv-dev
 
-A users list exists as well, subscrube at:
+A users list exists as well, subscribe at:
 http://www.mythtv.org/mailman/listinfo/mythtv-users
 
 A list that's restricted to the CVS commit messages is available at:
