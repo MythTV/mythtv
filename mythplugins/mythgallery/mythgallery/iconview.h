@@ -1,80 +1,140 @@
-#ifndef ICONVIEW_H_
-#define ICONVIEW_H_
+/* ============================================================
+ * File  : iconview.h
+ * Description : 
+ * 
 
-#include <qwidget.h>
+ * This program is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU General
+ * Public License as published bythe Free Software Foundation;
+ * either version 2, or (at your option)
+ * any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * ============================================================ */
+
+#ifndef ICONVIEW_H
+#define ICONVIEW_H
+
+#include <qptrlist.h>
+#include <qdict.h>
+#include <qmap.h>
 #include <qstring.h>
-#include <qsqldatabase.h>
 #include <qpixmap.h>
 
-#include <vector>
-using namespace std;
-
+#include <mythtv/uitypes.h>
+#include <mythtv/xmlparse.h>
 #include <mythtv/mythdialogs.h>
+#include <mythtv/dialogbox.h>
 
-class QFont;
+class QSqlDatabase;
+class ThumbGenerator;
 
-#define THUMBS_W 3
-#define THUMBS_H 3
-
-class Thumbnail
+class ThumbItem
 {
-  public:
-    Thumbnail() { pixmap = NULL; thumbfilename = (const char*)0;
-                  filename = ""; name = ""; isdir = false; }
-    Thumbnail(const Thumbnail &other) { pixmap = other.pixmap; 
-                                        filename = other.filename;
-                                        isdir = other.isdir;
-                                        name = other.name;
-                                      }
+public:
+
+    ThumbItem() {
+        pixmap = 0;
+        name   = "";
+        path   = "";
+        isDir  = false;
+    }
+
+    ~ThumbItem() {
+        if (pixmap)
+            delete pixmap;
+    }
 
     QPixmap *pixmap;
-    QString thumbfilename;
-    QString filename;
-    QString name;
-    bool isdir;
+    QString  name;
+    QString  path;
+    bool     isDir;
 };
-
+    
 class IconView : public MythDialog
 {
     Q_OBJECT
-  public:
-    IconView(QSqlDatabase *db, const QString &startdir, 
-             MythMainWindow *parent, const char *name = 0);
-   ~IconView();
+    
+public:
 
-  protected:
+    IconView(QSqlDatabase *db, const QString& galleryDir,
+              MythMainWindow* parent, const char* name = 0);
+    ~IconView();
+
+protected:
+
     void paintEvent(QPaintEvent *e);
     void keyPressEvent(QKeyEvent *e);
+    void customEvent(QCustomEvent *e);
 
-  private:
-    void fillList(const QString &dir);
-    void loadThumbPixmap(Thumbnail *thumb);
+private slots:
 
-    bool moveDown();
+    void slotMenuPressed(int itemPos, bool);
+    
+private:
+
+    void loadTheme();
+    void loadDirectory(const QString& dir);
+
+    void updateMenu();
+    void updateText();
+    void updateView();
+
     bool moveUp();
+    bool moveDown();
     bool moveLeft();
     bool moveRight();
-    void importPics();
+
+    void actionRotateCW();
+    void actionRotateCCW();
+    void actionSlideShow();
+    void actionSettings();
+    void actionImport();
+
     void importFromDir(const QString &fromDir, const QString &toDir);
+    
+    QSqlDatabase*       m_db;
+    QPtrList<ThumbItem> m_itemList;
+    QDict<ThumbItem>    m_itemDict;
+    QString             m_galleryDir;
 
-    QFont m_font;
+    XMLParse           *m_theme;
+    QRect               m_menuRect;
+    QRect               m_textRect;
+    QRect               m_viewRect;
 
-    QColor fgcolor;
-    QColor highlightcolor;
+    bool                m_inMenu;
+    UIListBtnType      *m_menuType;
+    
+    QPixmap             m_backRegPix;
+    QPixmap             m_backSelPix;
+    QPixmap             m_folderRegPix;
+    QPixmap             m_folderSelPix;
 
-    int thumbw, thumbh;
-    int spacew, spaceh;
+    QString             m_currDir;
 
-    vector<Thumbnail> thumbs;
-    unsigned int screenposition;
+    int                 m_currRow;
+    int                 m_currCol;
+    int                 m_lastRow;
+    int                 m_lastCol;
+    int                 m_topRow;
+    int                 m_nRows;
+    int                 m_nCols;
+    
+    int                 m_spaceW;
+    int                 m_spaceH;
+    int                 m_thumbW;
+    int                 m_thumbH;
 
-    int currow, curcol;
+    ThumbGenerator     *m_thumbGen;
 
-    QPixmap *foldericon;
-
-    QSqlDatabase *m_db;
-    QString curdir;
-    MythProgressDialog *cacheprogress;
+    typedef void (IconView::*Action)();
+    QMap<QString,Action> m_actions;
 };
 
-#endif
+
+#endif /* ICONVIEW_H */

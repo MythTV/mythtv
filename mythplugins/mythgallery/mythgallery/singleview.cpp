@@ -1,340 +1,442 @@
-#include <qapplication.h>
-#include <qpixmap.h>
+/* ============================================================
+ * File  : singleview.cpp
+ * Description : 
+ * 
+
+ * This program is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU General
+ * Public License as published bythe Free Software Foundation;
+ * either version 2, or (at your option)
+ * any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * ============================================================ */
+
+#include <iostream>
+
+#include <qsqldatabase.h>
+#include <qevent.h>
 #include <qimage.h>
-#include <qcursor.h>
-#include <qpainter.h>
 #include <qtimer.h>
 #include <qfileinfo.h>
+#include <qdir.h>
 
-#include <unistd.h>
-
+#include "thumbgenerator.h"
 #include "singleview.h"
 
-#include <mythtv/mythcontext.h>
-#include <mythtv/dialogbox.h>
-
-SingleView::SingleView(QSqlDatabase *db, vector<Thumbnail> *imagelist, int pos,
-                       MythMainWindow *parent, const char *name)
-	  : MythDialog(parent, name)
+SingleView::SingleView(QSqlDatabase *db, const QPtrList<ThumbItem>& images,
+                     int pos, ThumbGenerator *thumbGen,
+                     MythMainWindow *parent, const char *name )
+    : MythDialog(parent, name)
 {
-    m_db = db;
-    redraw = false;
-    rotateAngle = 0; 
-    imageRotateAngle = 0;
-    zoomfactor = newzoom = 0;
+    m_db        = db;
+    m_imageList = images;
+    m_imageList.setAutoDelete(false);
+    m_pos       = pos;
+    m_thumbGen  = thumbGen;
+    
+    m_pixmap      = 0;
+    m_rotateAngle = 0;
+    m_zoom        = 1;
+    m_sx          = 0;
+    m_sy          = 0;
 
-    images = imagelist;
-    imagepos = pos;
-    displaypos = -1;
+    m_info        = false;
+    m_infoBgPix   = 0;
 
-    image = NULL;
-
-    timerrunning = false;
-    timersecs = gContext->GetNumSetting("SlideshowDelay");
-    if (!timersecs)
-        timersecs = 5;
-
-    timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), SLOT(advanceFrame()));    
-
+    m_timer = new QTimer(this);
+    connect(m_timer, SIGNAL(timeout()),
+            SLOT(slotTimeOut()));
+    m_timerSecs = gContext->GetNumSetting("SlideshowDelay");
+    if (!m_timerSecs)
+        m_timerSecs = 2;
+    
     setNoErase();
+    QString bgtype = gContext->GetSetting("SlideshowBackground");
+    if (bgtype != "theme" && !bgtype.isEmpty())
+        setPalette(QPalette(QColor(bgtype)));
+
+    loadImage();
 }
 
 SingleView::~SingleView()
 {
-    if (image)
-        delete image;
-    if (timer)
-    {
-        timer->stop(); 
-        while (timer->isActive())
-            usleep(50);
-        delete timer;
-    }
+    m_timer->stop();
+    delete m_timer;
+    
+    if (m_pixmap)
+        delete m_pixmap;
+
+    if (m_infoBgPix)
+        delete m_infoBgPix;
 }
 
-void SingleView::paintEvent(QPaintEvent *e)
+void SingleView::paintEvent(QPaintEvent *)
 {
-    e = e;
-
-    erase();
-    QString bgtype = gContext->GetSetting("SlideshowBackground");
-    if (bgtype != "theme" && !bgtype.isEmpty())
-        setPalette(QPalette (QColor(bgtype)));
-
-    QPainter p(this);
-
-    if (displaypos != imagepos || zoomfactor != newzoom || redraw)
-    {
-        QString filename = (*images)[imagepos].filename;
-
-        // retrieve metadata for new image
-        if (displaypos != imagepos) 
-        {
-            QString querystr = "SELECT angle FROM gallerymetadata WHERE "
-                               "image=\"" + filename + "\";";
-            QSqlQuery query = m_db->exec(querystr);
-			
-            if (query.isActive()  && query.numRowsAffected() > 0) 
-            {
-                query.next();
-                imageRotateAngle = rotateAngle = query.value(0).toInt();
-            }
-        }
-
-        QImage tmpimage(filename);
-        origWidth = tmpimage.width();
-        origHeight = tmpimage.height();
-        QWMatrix matrix;
-        matrix.rotate(rotateAngle);
-        QImage tmp1 = tmpimage.xForm(matrix);
-        QImage tmp2;
- 
-        if (newzoom)
-            tmp2 = tmp1.smoothScale(screenwidth * newzoom,
-                                    screenheight * newzoom,
-                                    QImage::ScaleMax);
-        else 
-            tmp2 = tmp1.smoothScale(screenwidth, screenheight,
-                                    QImage::ScaleMin);
-
-        zoomed_h = tmp2.height();
-        zoomed_w = tmp2.width();
-
-        if (image)
-            delete image;
-
-        image = new QImage(tmp2);
-    
-        displaypos = imagepos;
-
-        // save settings for image
-        QString querystr = "REPLACE INTO gallerymetadata SET image=\"" +
-                           filename + "\", angle=" + 
-                           QString::number(rotateAngle) + ";";
-        QSqlQuery query = m_db->exec(querystr);
-
-        // invalidate thumbnail for this image
-        if (imageRotateAngle != rotateAngle) 
-        {
-            delete (*images)[imagepos].pixmap;
-            (*images)[imagepos].pixmap = 0;
-        }
-    }
-
-    if (newzoom)
-    {
-        if (!zoomfactor)
-        {
-            sx = (zoomed_w - screenwidth) / 2;
-            sy = (zoomed_h - screenheight) / 2;
-        } 
-        else if (newzoom != zoomfactor)
-        {
-            sx = ((newzoom * (sx + (screenwidth / 2))) / zoomfactor) - 
-                 (screenwidth / 2);
-            sy = ((newzoom * (sy + (screenheight / 2))) / zoomfactor) - 
-                 (screenheight / 2);
-        }
-        // boundary checks
-        sx = (sx > (zoomed_w - screenwidth)) ? (zoomed_w - screenwidth) : sx;
-        sy = (sy > (zoomed_h - screenheight)) ? (zoomed_h - screenheight) : sy;
-        sx = (sx < 0) ? 0 : sx;
-        sy = (sy < 0) ? 0 : sy;
-
-        p.drawImage(0, 0, *image, sx, sy, screenwidth, screenheight);
-
-        QString zoomstring;
-        if (newzoom > 1)
-            zoomstring = QString("%1x Zoom").arg(newzoom);
-        else if (screenheight != zoomed_h)
-            zoomstring = "Screenwidth Zoom";
-        else if (screenwidth != zoomed_w)
-            zoomstring = "Screenheight Zoom";
+    QPixmap pix(screenwidth, screenheight);
+    pix.fill(this, 0, 0);
+    if (m_pixmap) {
+        if (m_pixmap->width() <= screenwidth &&
+            m_pixmap->height() <= screenheight)
+            bitBlt(&pix, screenwidth/2-m_pixmap->width()/2,
+                   screenheight/2-m_pixmap->height()/2,
+                   m_pixmap,0,0,-1,-1,Qt::CopyROP);
         else
-            zoomstring = "1x Zoom";
-        p.drawText(screenwidth / 10, screenheight / 10, zoomstring);
-        zoomfactor = newzoom;
-    } else
-    {
-        p.drawImage((screenwidth - image->width()) / 2, 
-                    (screenheight - image->height()) / 2, *image);
-        sx = sy = 0;
+            bitBlt(&pix, 0, 0, m_pixmap, m_sx, m_sy,
+                   pix.width(), pix.height());
+        if (m_zoom != 1) {
+            QPainter p(&pix, this);
+            p.drawText(screenwidth / 10, screenheight / 10,
+                       QString::number(m_zoom) + "x Zoom");
+            p.end();
+        }
+
+        if (m_info) {
+
+            if (!m_infoBgPix)
+                createInfoBg();
+
+            bitBlt(&pix, screenwidth/10, screenheight/10,
+                   m_infoBgPix,0,0,-1,-1,Qt::CopyROP);
+
+            QPainter p(&pix, this);
+            ThumbItem* item = m_imageList.at(m_pos);
+            QFileInfo fi(item->path);
+            QString info(item->name);
+            info += "\n\n" + tr("Folder: ") + fi.dir().dirName();
+            info += "\n" + tr("Created: ") + fi.created().toString();
+            info += "\n" + tr("Modified: ") + fi.lastModified().toString();
+            info += "\n" + QString(tr("Bytes") + ": %1").arg(fi.size());
+            info += "\n" + QString(tr("Width") + ": %1 " + tr("pixels"))
+                    .arg(m_image.width());
+            info += "\n" + QString(tr("Height") + ": %1 " + tr("pixels"))
+                    .arg(m_image.height());
+            info += "\n" + QString(tr("Pixel Count") + ": %1 " + 
+                                   tr("megapixels"))
+                    .arg((float)m_image.width() * m_image.height() / 1000000,
+                         0, 'f', 2);
+            info += "\n" + QString(tr("Rotation Angle") + ": %1 " +
+                                   tr("degrees")).arg(m_rotateAngle);
+            p.drawText(screenwidth/10 + (int)(10*wmult),
+                       screenheight/10 + (int)(10*hmult),
+                       m_infoBgPix->width()-2*(int)(10*wmult),
+                       m_infoBgPix->height()-2*(int)(10*hmult),
+                       Qt::AlignLeft, info);
+            p.end();
+        }
+
     }
+        
+    bitBlt(this,0,0,&pix,0,0,-1,-1,Qt::CopyROP);
 }
 
 void SingleView::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
-
-    int oldpos = imagepos;
-    timer->stop();
-
+    bool timerWasRunning = m_timerRunning;
+    m_timerRunning = false;
+    m_timer->stop();
+    
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
 
+    int scrollX = (int)(10*wmult);
+    int scrollY = (int)(10*hmult);
+    
     for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
 
-        if (action == "ROTRIGHT")
+        if (action == "LEFT" || action == "UP")
         {
-            rotateAngle += 90;
-            redraw = true;
-            newzoom = 1;
+            m_rotateAngle = 0;
+            m_zoom = 1;
+            m_sx   = 0;
+            m_sy   = 0;
+            loadPrev();
+            loadImage();
         }
-        else if (action == "ROTLEFT")
+        else if (action == "RIGHT" || action == "DOWN")
         {
-            rotateAngle -= 90;
-            redraw = true;
-            newzoom = 1;
-        }
-        else if (action == "LEFT" || action == "UP")
-        {
-            retreatFrame(false);
-            rotateAngle = 0;
-        }
-        else if (action == "INFO")
-        {
-            QString filename = (*images)[imagepos].filename;
-            QFileInfo fi(filename);
-            QString info((*images)[imagepos].name);
-            info += "\n\n" + tr("Filename: ") + filename;
-            info += "\n" + tr("Created: ") + fi.created().toString();
-            info += "\n" + tr("Modified: ") + fi.lastModified().toString();
-            info += "\n" + QString(tr("Bytes") + ": %1").arg(fi.size());
-            info += "\n" + QString(tr("Width") + ": %1 " + tr("pixels"))
-                                   .arg(origWidth);
-            info += "\n" + QString(tr("Height") + ": %1 " + tr("pixels"))
-                                   .arg(origHeight);
-            info += "\n" + QString(tr("Pixel Count") + ": %1 " + 
-                                   tr("megapixels"))
-                                   .arg((float)origHeight * origWidth / 1000000,
-                                   0, 'f', 2);
-            info += "\n" + QString(tr("Rotation Angle") + ": %1 " +
-                                   tr("degrees")).arg(rotateAngle);
-            DialogBox fiDlg(gContext->GetMainWindow(), info);
-            fiDlg.AddButton(tr("OK"));
-            fiDlg.exec();
+            m_rotateAngle = 0;
+            m_zoom = 1;
+            m_sx   = 0;
+            m_sy   = 0;
+            loadNext();
+            loadImage();
         }
         else if (action == "ZOOMOUT")
         {
-            handled = zoomfactor;
-            newzoom = (zoomfactor < 1) ? zoomfactor : (zoomfactor / 2);
+            m_sx   = 0;
+            m_sy   = 0;
+            if (m_zoom > 0.5) {
+                m_zoom = m_zoom /2;
+                zoom();
+            }
+            else
+                handled = false;
         }
         else if (action == "ZOOMIN")
         {
-            newzoom = zoomfactor ? (zoomfactor * 2) : 2;
-            timerrunning = false;
-        }
-        else if (action == "SCROLLUP")
-        {
-            handled = zoomfactor;
-            sy -= screenheight/2;
-            sy = (sy < 0) ? 0 : sy;
-        }
-        else if (action == "SCROLLLEFT")
-        {
-            handled = zoomfactor;
-            sx -= screenwidth/2;
-            sx = (sx < 0) ? 0 : sx;
-        }
-        else if (action == "SCROLLRIGHT")
-        {
-            handled = zoomfactor;
-            sx += screenwidth/2;
-            sx = (sx > (zoomed_w-screenwidth)) ? (zoomed_w - screenwidth) : sx;
-        }
-        else if (action == "SCROLLDOWN")
-        {
-            handled = zoomfactor;
-            sy += screenheight/2;
-            sy = (sy>(zoomed_h-screenheight)) ? (zoomed_h - screenheight):sy;
-        }
-        else if (action == "RECENTER")
-        {
-            handled = zoomfactor;
-            sx = (zoomed_w - screenwidth)/2;
-            sy = (zoomed_h - screenheight)/2;
+            m_sx   = 0;
+            m_sy   = 0;
+            if (m_zoom < 4.0) {
+                m_zoom = m_zoom * 2;
+                zoom();
+            }
+            else
+                handled = true;
         }
         else if (action == "FULLSIZE")
         {
-            handled = zoomfactor;
-            newzoom = 1;
+            m_sx = 0;
+            m_sy = 0;
+            if (m_zoom != 1) {
+                m_zoom = 1.0;
+                zoom();
+            }
+            else
+                handled = true;
+        }
+        else if (action == "SCROLLLEFT")
+        {
+            if (m_zoom > 1.0) {
+                m_sx -= scrollX;
+                m_sx  = (m_sx < 0) ? 0 : m_sx;
+            }
+            else
+                handled = false;
+        }
+        else if (action == "SCROLLRIGHT")
+        {
+            if (m_zoom > 1.0 && m_pixmap) {
+                m_sx += scrollX;
+                m_sx  = QMIN(m_sx, m_pixmap->width()-
+                             scrollX-screenwidth);
+            }
+            else
+                handled = false;
+        }
+        else if (action == "SCROLLUP")
+        {
+            if (m_zoom > 1.0 && m_pixmap) {
+                m_sy += scrollY;
+                m_sy  = QMIN(m_sy, m_pixmap->height()-
+                             scrollY-screenheight);
+            }
+            else
+                handled = false;
+        }
+        else if (action == "SCROLLDOWN")
+        {
+            if (m_zoom > 1.0) {
+                m_sy -= scrollY;
+                m_sy  = (m_sy < 0) ? 0 : m_sy;
+            }
+            else
+                handled = false;
+        }
+        else if (action == "RECENTER")
+        {
+            if (m_zoom > 1.0 && m_pixmap) {
+                m_sx = (m_pixmap->width()-screenwidth)/2;
+                m_sy = (m_pixmap->height()-screenheight)/2;
+            }
+            else
+                handled = false;
         }
         else if (action == "UPLEFT")
         {
-            handled = zoomfactor;
-            sx = sy = 0;
+            if (m_zoom > 1.0) {
+                m_sx = m_sy = 0;
+            }
+            else
+                handled = false;
         }
         else if (action == "LOWRIGHT")
         {
-            handled = zoomfactor;
-            sx = zoomed_w - screenwidth;
-            sy = zoomed_h - screenheight;
+            if (m_zoom > 1.0 && m_pixmap) {
+                m_sx  = m_pixmap->width()-scrollX-screenwidth;
+                m_sy  = m_pixmap->height()-scrollY-screenheight;
+            }
+            else
+                handled = false;
         }
-        else if (action == "RIGHT" || action == "DOWN" || action == "SELECT")
+        else if (action == "ROTRIGHT")
         {
-            advanceFrame(false);
-            rotateAngle = 0;
+            m_sx = 0;
+            m_sy = 0;
+            rotate(90);
+        }
+        else if (action == "ROTLEFT")
+        {
+            m_sx = 0;
+            m_sy = 0;
+            rotate(-90);
         }
         else if (action == "PLAY")
         {
-            timerrunning = !timerrunning;
-            rotateAngle = 0;
+            m_timerRunning = !timerWasRunning;
+            m_rotateAngle = 0;
+            m_zoom        = 1.0;
+            m_sx          = 0;
+            m_sy          = 0;
         }
-        else
+        else if (action == "INFO")
+        {
+            m_info = !m_info;
+        }
+        else 
             handled = false;
     }
 
-    if (handled)
-    {
+    if (handled) {
         update();
-        if (timerrunning)
-            timer->start(timersecs * 1000);
+        if (m_timerRunning)
+            startShow();
     }
-    else
-    {
-        imagepos = oldpos;
+    else {
         MythDialog::keyPressEvent(e);
     }
 }
 
-void SingleView::retreatFrame(bool doUpdate)
+void SingleView::loadNext()
 {
-    imagepos--;
-    if (imagepos < 0)
-        imagepos = images->size() - 1;
+    m_pos++;
+    if (m_pos >= (int)m_imageList.count())
+        m_pos = 0;
 
-    if ((*images)[imagepos].isdir)
-        retreatFrame(doUpdate);
-
-    newzoom = 0;
-    if (doUpdate)
-        update();
+    ThumbItem *item = m_imageList.at(m_pos);
+    if (item->isDir) 
+        loadNext();
 }
 
-void SingleView::advanceFrame(bool doUpdate)
+void SingleView::loadPrev()
 {
-    imagepos++;
-    if (imagepos == (int)images->size())
-        imagepos = 0;
+    m_pos--;
+    if (m_pos < 0)
+        m_pos = m_imageList.count()-1;
 
-    if (imagepos == displaypos) // oops, we wrapped
-        return;
-
-    if ((*images)[imagepos].isdir)
-        advanceFrame(doUpdate);
-
-    newzoom = 0;
-    if (doUpdate)
-        update();
+    ThumbItem *item = m_imageList.at(m_pos);
+    if (item->isDir) 
+        loadPrev();
 }
 
-void SingleView::startShow(void)
+void SingleView::loadImage()
 {
-    timerrunning = true;
-    timer->start(timersecs * 1000);
+    if (m_pixmap) {
+        delete m_pixmap;
+        m_pixmap = 0;
+    }
+    
+    ThumbItem *item = m_imageList.at(m_pos);
+    if (item) {
+
+        m_image.load(item->path);
+
+        if (!m_image.isNull()) {
+
+            QString queryStr = "SELECT angle FROM gallerymetadata WHERE "
+                               "image=\"" + item->path + "\";";
+            QSqlQuery query = m_db->exec(queryStr);
+			
+            if (query.isActive()  && query.numRowsAffected() > 0) 
+            {
+                query.next();
+                m_rotateAngle = query.value(0).toInt();
+                if (m_rotateAngle != 0) {
+                    QWMatrix matrix;
+                    matrix.rotate(m_rotateAngle);
+                    m_image = m_image.xForm(matrix);
+                }
+            }
+
+            m_pixmap = new QPixmap(m_image.smoothScale(screenwidth, screenheight,
+                                                       QImage::ScaleMin));
+        }
+    
+    }
 }
 
+void SingleView::rotate(int angle)
+{
+    m_rotateAngle += angle;
+    if (m_rotateAngle >= 360)
+        m_rotateAngle -= 360;
+    if (m_rotateAngle < 0)
+        m_rotateAngle += 360;
+
+    ThumbItem *item = m_imageList.at(m_pos);
+    if (item) {
+        QString queryStr = "REPLACE INTO gallerymetadata SET image=\"" +
+                           item->path + "\", angle=" + 
+                           QString::number(m_rotateAngle) + ";";
+        m_db->exec(queryStr);
+
+        // Regenerate thumbnail for this
+        m_thumbGen->addFile(item->name);
+    }
+    
+    if (!m_image.isNull()) {
+        QWMatrix matrix;
+        matrix.rotate(angle);
+        m_image = m_image.xForm(matrix);
+        if (m_pixmap) {
+            delete m_pixmap;
+            m_pixmap = 0;
+        }
+        m_pixmap = new QPixmap(m_image.smoothScale((int)(m_zoom*screenwidth),
+                                                   (int)(m_zoom*screenheight),
+                                                   QImage::ScaleMin));
+    }
+}
+
+void SingleView::zoom()
+{
+    if (!m_image.isNull()) {
+        if (m_pixmap) {
+            delete m_pixmap;
+            m_pixmap = 0;
+        }
+        m_pixmap =
+            new QPixmap(m_image.smoothScale((int)(screenwidth*m_zoom),
+                                            (int)(screenheight*m_zoom),
+                                            QImage::ScaleMin));
+    }
+}
+
+void SingleView::startShow()
+{
+    m_timerRunning = true;
+    m_timer->start(m_timerSecs * 1000);
+}
+
+void SingleView::slotTimeOut()
+{
+    loadNext();
+    loadImage();
+    update();
+}
+
+void SingleView::createInfoBg()
+{
+    QImage img(screenwidth-2*screenwidth/10,
+               screenheight-2*screenheight/10,32);
+    img.setAlphaBuffer(true);
+
+    for (int y = 0; y < img.height(); y++) 
+    {
+        for (int x = 0; x < img.width(); x++) 
+        {
+            uint *p = (uint *)img.scanLine(y) + x;
+            *p = qRgba(0, 0, 0, 120);
+        }
+    }
+
+    m_infoBgPix = new QPixmap(img);
+}

@@ -1,172 +1,535 @@
-#include <qapplication.h>
-#include <qpixmap.h>
+/* ============================================================
+ * File  : iconview.cpp
+ * Description : 
+ * 
+
+ * This program is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU General
+ * Public License as published bythe Free Software Foundation;
+ * either version 2, or (at your option)
+ * any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * ============================================================ */
+
+#include <iostream>
+
+#include <qsqldatabase.h>
+#include <qevent.h>
 #include <qimage.h>
-#include <qcursor.h>
-#include <qpainter.h>
 #include <qdir.h>
-#include <qfileinfo.h>
 
-#include "iconview.h"
-#include "singleview.h"
+extern "C" {
+#include <math.h>
+}
+
 #include "gallerysettings.h"
+#include "thumbgenerator.h"
+#include "singleview.h"
+#include "iconview.h"
 
-#include "mythtv/mythcontext.h"
-#include "mythtv/dialogbox.h"
-
-IconView::IconView(QSqlDatabase *db, const QString &startdir, 
-                   MythMainWindow *parent, const char *name)
-        : MythDialog(parent, name)
+IconView::IconView(QSqlDatabase *db, const QString& galleryDir,
+                     MythMainWindow* parent, const char* name )
+    : MythDialog(parent, name)
 {
-    m_db = db;
-    cacheprogress = NULL;
+    m_db         = db;
+    m_galleryDir = galleryDir;    
 
-    fgcolor = paletteForegroundColor();
-    highlightcolor = fgcolor;
-
-    m_font = gContext->GetMediumFont(); 
-
-    thumbw = screenwidth / (THUMBS_W + 1);
-    thumbh = screenheight / (THUMBS_H + 1);
-
-    spacew = thumbw / (THUMBS_W + 1);
-    spaceh = (thumbh * 5 / 4) / (THUMBS_H + 1);
-
-    thumbh = (screenheight - spaceh * (THUMBS_H + 1)) / THUMBS_H;
-
-    fillList(startdir);
-    screenposition = 0;
-    currow = 0;
-    curcol = 0;
-
-    QImage *tmpimage = gContext->LoadScaleImage("galleryfolder.png");
-    if (tmpimage)
-    {
-        QImage tmp2 = tmpimage->smoothScale(thumbw, thumbh, QImage::ScaleMin);
-
-        foldericon = new QPixmap();
-        foldericon->convertFromImage(tmp2);
-
-        delete tmpimage;
-    }
+    m_inMenu     = false;
+    m_itemList.setAutoDelete(true);
+    m_itemDict.setAutoDelete(false);
 
     setNoErase();
+    loadTheme();
+
+    m_thumbGen = new ThumbGenerator(this, (int)(m_thumbW-10*wmult),
+                                    (int)(m_thumbH-10*hmult));
+    
+    loadDirectory(galleryDir);
 }
 
 IconView::~IconView()
 {
-    while (thumbs.size() > 0)
-    {
-        if (thumbs.back().pixmap)
-            delete thumbs.back().pixmap;
-        thumbs.pop_back();
-    }
-
-    if (foldericon)
-        delete foldericon;
+    delete m_thumbGen;    
 }
 
 void IconView::paintEvent(QPaintEvent *e)
 {
-    e = e;
-
-    QString bgtype = gContext->GetSetting("SlideshowBackground");
-    if (bgtype != "theme" && !bgtype.isEmpty())
-        setPalette(QPalette (QColor(bgtype)));
-
-    if (bgtype == "black") 
-    {
-        fgcolor = Qt::white;
-        highlightcolor = fgcolor;
-    }
-
-    QRect r = QRect(0, 0, screenwidth, screenheight);
-    QPainter p(this);
-
-    QPixmap pix(r.size());
-    pix.fill(this, r.topLeft());
-
-    QPainter tmp;
-    tmp.begin(&pix, this);
-
-    tmp.setFont(m_font);
-    tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
-
-    unsigned int curpos = screenposition;
-    for (int y = 0; y < THUMBS_H; y++)
-    {
-        int ypos = spaceh * (y + 1) + thumbh * y;
-
-        for (int x = 0; x < THUMBS_W; x++)
-        {
-             if (curpos >= thumbs.size())
-                 continue;
-
-             Thumbnail *thumb = &(thumbs[curpos]);
-
-             int xpos = spacew * (x + 1) + thumbw * x;
-
-             if (thumb->isdir && thumb->thumbfilename.isNull())
-             {
-                 if (foldericon)
-                     tmp.drawPixmap(xpos + (thumbw - foldericon->width()) / 2,
-                                    ypos, *foldericon);
-             }
-             else
-             {
-                 if (!thumb->pixmap)
-                     loadThumbPixmap(thumb);
-
-                 if (thumb->pixmap)
-                     tmp.drawPixmap(xpos + 
-                                    (thumbw - thumb->pixmap->width()) / 2, 
-                                    ypos, *thumb->pixmap);        
-             }
-
-             tmp.drawText(xpos, ypos + thumbh, thumbw, spaceh, 
-                          AlignVCenter | AlignCenter, thumb->name); 
-
-             if (currow == y && curcol == x)
-             {
-                 tmp.setPen(QPen(highlightcolor, (int)(3.75 * wmult))); 
-                 tmp.drawRect(xpos, ypos - (int)(10 * hmult),
-                              thumbw, thumbh + spaceh);
-                 tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
-             }
-
-             curpos++;
-        }
-    }
- 
-    if (cacheprogress)
-    {
-        cacheprogress->Close();
-        delete cacheprogress;
-        cacheprogress = NULL;
-    }
- 
-    tmp.flush();
-    tmp.end();
-
-    p.drawPixmap(r.topLeft(), pix);
+    if (e->rect().intersects(m_menuRect))
+        updateMenu();
+    if (e->rect().intersects(m_textRect))
+        updateText();
+    if (e->rect().intersects(m_viewRect))
+        updateView();
 }
 
-void IconView::fillList(const QString &dir)
+void IconView::updateMenu()
+{
+    QPixmap pix(m_menuRect.size());
+    pix.fill(this, m_menuRect.topLeft());
+    QPainter p(&pix);
+
+    LayerSet* container = m_theme->GetSet("menu");
+    if (container) {
+        container->Draw(&p, 0, 0);
+        container->Draw(&p, 1, 0);
+        container->Draw(&p, 2, 0);
+        container->Draw(&p, 3, 0);
+        container->Draw(&p, 4, 0);
+        container->Draw(&p, 5, 0);
+        container->Draw(&p, 6, 0);
+        container->Draw(&p, 7, 0);
+        container->Draw(&p, 8, 0);
+    }
+    p.end();
+
+    bitBlt(this, m_menuRect.left(), m_menuRect.top(),
+           &pix, 0, 0, -1, -1, Qt::CopyROP);
+}
+
+void IconView::updateText()
+{
+    QPixmap pix(m_textRect.size());
+    pix.fill(this, m_textRect.topLeft());
+    QPainter p(&pix);
+
+    LayerSet* container = m_theme->GetSet("text");
+    if (container) {
+        UITextType *ttype = (UITextType*)container->GetType("text");
+        if (ttype) {
+            ThumbItem* item = m_itemList.at(m_currRow * m_nCols +
+                                            m_currCol);
+            ttype->SetText(item ? item->name : "");
+        }
+        
+        container->Draw(&p, 0, 0);
+        container->Draw(&p, 1, 0);
+        container->Draw(&p, 2, 0);
+        container->Draw(&p, 3, 0);
+        container->Draw(&p, 4, 0);
+        container->Draw(&p, 5, 0);
+        container->Draw(&p, 6, 0);
+        container->Draw(&p, 7, 0);
+        container->Draw(&p, 8, 0);
+    }
+    p.end();
+
+    bitBlt(this, m_textRect.left(), m_textRect.top(),
+           &pix, 0, 0, -1, -1, Qt::CopyROP);
+}
+
+void IconView::updateView()
+{
+    QPixmap pix(m_viewRect.size());
+    pix.fill(this, m_viewRect.topLeft());
+    QPainter p(&pix);
+    p.setPen(Qt::white);
+
+    LayerSet* container = m_theme->GetSet("view");
+    if (container) {
+
+        int upArrow = (m_topRow == 0) ? 0 : 1;
+        int dnArrow = (m_currRow == m_lastRow) ? 0 : 1;
+
+        container->Draw(&p, 0, upArrow);
+        container->Draw(&p, 1, dnArrow);
+    }
+
+    int bw  = m_backRegPix.width();
+    int bh  = m_backRegPix.height();
+    int bw2 = m_backRegPix.width()/2;
+    int bh2 = m_backRegPix.height()/2;
+    int sw  = (int)(7*wmult);
+    int sh  = (int)(7*hmult);
+
+    int curPos = m_topRow*m_nCols;
+
+    for (int y = 0; y < m_nRows; y++)    {
+
+        int ypos = m_spaceH * (y + 1) + m_thumbH * y;
+
+        for (int x = 0; x < m_nCols; x++)
+        {
+            if (curPos >= (int)m_itemList.count())
+                continue;
+
+            ThumbItem* item = m_itemList.at(curPos);
+
+            int xpos = m_spaceW * (x + 1) + m_thumbW * x;
+
+            if (item->isDir) {
+
+                if (curPos == (m_currRow*m_nCols+m_currCol))
+                    p.drawPixmap(xpos, ypos , m_folderSelPix);
+                else
+                    p.drawPixmap(xpos, ypos , m_folderRegPix);
+
+                if (item->pixmap) 
+                    p.drawPixmap(xpos + sw, ypos + sh + (int)(15*hmult),
+                                 *item->pixmap,
+                                 item->pixmap->width()/2-bw2+sw,
+                                 item->pixmap->height()/2-bh2+sh,
+                                 bw-2*sw, bh-2*sh-(int)(15*hmult));
+
+            }
+            else {
+
+                if (curPos == (m_currRow*m_nCols+m_currCol))
+                    p.drawPixmap(xpos, ypos , m_backSelPix);
+                else
+                    p.drawPixmap(xpos, ypos , m_backRegPix);
+               
+                if (item->pixmap) 
+                    p.drawPixmap(xpos + sw, ypos + sh,
+                                 *item->pixmap,
+                                 item->pixmap->width()/2-bw2+sw,
+                                 item->pixmap->height()/2-bh2+sh,
+                                 bw-2*sw, bh-2*sh);
+            }
+           
+            curPos++;
+        }
+    }
+
+    p.end();
+    
+    bitBlt(this, m_viewRect.left(), m_viewRect.top(),
+           &pix, 0, 0, -1, -1, Qt::CopyROP);
+}
+
+void IconView::keyPressEvent(QKeyEvent *e)
+{
+    if (!e) return;
+
+    bool handled = false;
+    bool menuHandled = false;
+
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
+
+    for (unsigned int i = 0; i < actions.size() && !handled && !menuHandled; i++)
+    {
+        QString action = actions[i];
+        if (action == "MENU") {
+            m_inMenu = !m_inMenu;
+            m_menuType->SetActive(m_inMenu);
+            menuHandled = true;
+        }
+        else if (action == "UP") {
+            if (m_inMenu) {
+                m_menuType->MoveUp();
+                menuHandled = true;
+            }
+            else
+                handled = moveUp();
+        }
+        else if (action == "DOWN") {
+            if (m_inMenu) {
+                m_menuType->MoveDown();
+                menuHandled = true;
+            }
+            else
+                handled = moveDown();
+        }
+        else if (action == "LEFT") {
+            handled = moveLeft();
+        }
+        else if (action == "RIGHT") {
+            handled = moveRight();
+        }
+        else if (action == "PAGEUP") {
+            bool h = true;
+            for (int i = 0; i < m_nRows && h; i++) 
+                  h = moveUp();
+            handled = true;
+        }
+        else if (action == "PAGEDOWN") {
+            bool h = true;
+            for (int i = 0; i < m_nRows && h; i++)
+                h = moveDown();
+            handled = true;
+        }
+        else if (action == "HOME")
+        {
+            m_topRow = m_currRow = m_currCol = 0;
+            handled = true;
+        }
+        else if (action == "END")
+        {
+            m_currRow = m_lastRow;
+            m_currCol = m_lastCol;
+            m_topRow  = QMAX(m_currRow-(m_nRows-1),0);
+            handled = true;
+        }
+        else if (action == "SELECT" || action == "PLAY")
+        {
+            if (m_inMenu) {
+                m_menuType->Toggle();
+                menuHandled = true;
+            }
+            else {
+                int pos = m_currRow * m_nCols + m_currCol;
+                ThumbItem *item = m_itemList.at(pos);
+                if (!item) 
+                    std::cerr << "The impossible happened" << std::endl;
+                if (item->isDir) {
+                    loadDirectory(item->path);
+                    handled = true;
+                }
+                else {
+                    SingleView iv(m_db, m_itemList, pos, m_thumbGen,
+                                 gContext->GetMainWindow());
+                    if (action == "PLAY")
+                        iv.startShow();
+                    iv.exec();
+                }
+            }
+        }
+        
+    }
+
+    if (!handled && !menuHandled) {
+        gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions);
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        {
+            QString action = actions[i];
+            if (action == "ESCAPE") {
+                QDir d(m_currDir);
+                if (d != QDir(m_galleryDir)) {
+
+                    QString oldDirName = d.dirName();
+                    d.cdUp();
+                    loadDirectory(d.absPath());
+
+                    // make sure up-directory is visible and selected
+                    ThumbItem* item = m_itemDict.find(oldDirName);
+                     if (item) {
+                         int pos = m_itemList.find(item);
+                         if (pos != -1) {
+                             m_currRow = pos/m_nCols;
+                             m_currCol = pos-m_currRow*m_nCols;
+                             m_topRow  = QMAX(0, m_currRow-(m_nRows-1));
+                         }
+                     }
+                     handled = true;
+                }
+            }
+        }
+    }
+
+    if (handled || menuHandled) {
+        update();
+    }
+    else
+    {
+        MythDialog::keyPressEvent(e);
+    }
+
+}
+
+void IconView::customEvent(QCustomEvent *e)
+{
+    if (!e || (e->type() != QEvent::User))
+        return;
+
+    ThumbData* td = (ThumbData*)(e->data());
+    if (!td) return;
+
+    ThumbItem* item = m_itemDict.find(td->fileName);
+    if (item) {
+        if (item->pixmap)
+            delete item->pixmap;
+
+        QString queryStr = "SELECT angle FROM gallerymetadata WHERE image =\"" +
+                           item->path + "\";";
+        QSqlQuery query = m_db->exec(queryStr);
+        int rotateAngle = 0;
+
+        if (query.isActive() && query.numRowsAffected() > 0) 
+        {
+            query.next();
+            rotateAngle = query.value(0).toInt();
+        }
+
+        if (rotateAngle)
+        {
+            QWMatrix matrix;
+            matrix.rotate(rotateAngle);
+            td->thumb = td->thumb.xForm(matrix);
+        }
+
+        item->pixmap = new QPixmap(td->thumb);
+
+        int pos = m_itemList.find(item);
+        
+        if ((m_topRow*m_nCols <= pos) &&
+            (pos <= (m_topRow*m_nCols + m_nRows*m_nCols)))
+            update(m_viewRect);
+        
+    }
+    delete td;
+
+}
+
+void IconView::loadTheme()
+{
+    m_theme = new XMLParse();
+    m_theme->SetWMult(wmult);
+    m_theme->SetHMult(hmult);
+
+    QDomElement xmldata;
+    m_theme->LoadTheme(xmldata, "gallery", "gallery-");
+
+    for (QDomNode child = xmldata.firstChild(); !child.isNull();
+         child = child.nextSibling()) {
+        
+        QDomElement e = child.toElement();
+        if (!e.isNull()) {
+
+            if (e.tagName() == "font") {
+                m_theme->parseFont(e);
+            }
+            else if (e.tagName() == "container") {
+                QRect area;
+                QString name;
+                int context;
+                m_theme->parseContainer(e, name, context, area);
+
+                if (name.lower() == "menu")
+                    m_menuRect = area;
+                else if (name.lower() == "text")
+                    m_textRect = area;
+                else if (name.lower() == "view")
+                    m_viewRect = area;
+            }
+            else {
+                std::cerr << "Unknown element: " << e.tagName()
+                          << std::endl;
+                exit(-1);
+            }
+        }
+    }
+
+    LayerSet *container = m_theme->GetSet("menu");
+    if (!container) {
+        std::cerr << "MythGallery: Failed to get menu container."
+                  << std::endl;
+        exit(-1);
+    }
+
+    m_menuType = (UIListBtnType*)container->GetType("menu");
+    if (!m_menuType) {
+        std::cerr << "MythGallery: Failed to get menu area."
+                  << std::endl;
+        exit(-1);
+    }
+    connect(m_menuType, SIGNAL(itemChecked(int,bool)),
+            SLOT(slotMenuPressed(int,bool)));
+
+    // Menu Actions (Insert in reverse order)
+    m_actions.insert("SlideShow", &IconView::actionSlideShow);
+    m_actions.insert("Rotate CW", &IconView::actionRotateCW);
+    m_actions.insert("Rotate CCW", &IconView::actionRotateCCW);
+    m_actions.insert("Import", &IconView::actionImport);
+    m_actions.insert("Settings", &IconView::actionSettings);
+
+    // sucks ... can't use an iterator. qmap sorts items alphabetically
+    m_menuType->AddItem("SlideShow");
+    m_menuType->AddItem("Rotate CW");
+    m_menuType->AddItem("Rotate CCW");
+    m_menuType->AddItem("Import");
+    m_menuType->AddItem("Settings");
+    m_menuType->SetActive(false);
+
+    container = m_theme->GetSet("view");
+    if (!container) {
+        std::cerr << "MythGallery: Failed to get view container."
+                  << std::endl;
+        exit(-1);
+    }
+
+    UIBlackHoleType* bhType = (UIBlackHoleType*)container->GetType("view");
+    if (!bhType) {
+        std::cerr << "MythGallery: Failed to get view area."
+                  << std::endl;
+        exit(-1);
+    }
+
+    {
+        QImage *img = gContext->LoadScaleImage("gallery-back-reg.png");
+        if (!img) {
+            std::cerr << "Failed to load gallery-back-reg.png"
+                      << std::endl;
+            exit(-1);
+        }
+        m_backRegPix = QPixmap(*img);
+        delete img;
+
+        img = gContext->LoadScaleImage("gallery-back-sel.png");
+        if (!img) {
+            std::cerr << "Failed to load gallery-back-sel.png"
+                      << std::endl;
+            exit(-1);
+        }
+        m_backSelPix = QPixmap(*img);
+        delete img;
+
+        img = gContext->LoadScaleImage("gallery-folder-reg.png");
+        if (!img) {
+            std::cerr << "Failed to load gallery-folder-reg.png"
+                      << std::endl;
+            exit(-1);
+        }
+        m_folderRegPix = QPixmap(*img);
+        delete img;
+
+        img = gContext->LoadScaleImage("gallery-folder-sel.png");
+        if (!img) {
+            std::cerr << "Failed to load gallery-folder-sel.png"
+                      << std::endl;
+            exit(-1);
+        }
+        m_folderSelPix = QPixmap(*img);
+        delete img;
+
+        m_thumbW = m_backRegPix.width();
+        m_thumbH = m_backRegPix.height();
+        m_nCols  = m_viewRect.width()/m_thumbW - 1;
+        m_nRows  = m_viewRect.height()/m_thumbH - 1;
+        m_spaceW = m_thumbW / (m_nCols + 1);
+        m_spaceH = m_thumbH / (m_nRows + 1);
+
+    }
+}
+
+void IconView::loadDirectory(const QString& dir)
 {
     QDir d(dir);
-
     if (!d.exists())
         return;
 
-    curdir = d.absPath();
+    m_currDir = d.absPath();
+    m_itemList.clear();
+    m_itemDict.clear();
 
+    m_currRow = 0;
+    m_currCol = 0;
+    m_lastRow = 0;
+    m_lastCol = 0;
+    m_topRow  = 0;
+    
     bool isGallery = d.entryInfoList("serial*.dat", QDir::Files);
 
-    QFileInfo cdir(curdir + "/.thumbcache");
+    QFileInfo cdir(d.absPath() + "/.thumbcache");
     if (!cdir.exists())
         d.mkdir(".thumbcache");
 
     d.setNameFilter("*.jpg *.JPG *.jpeg *.JPEG *.png *.PNG *.tiff *.TIFF "
-                    "*.bmp *.BMP *.gif *.GIF");
+                    "*.tif *.TIF *.bmp *.BMP *.gif *.GIF *.ppm *.PPM");
     d.setSorting(QDir::Name | QDir::DirsFirst | QDir::IgnoreCase);
 
     d.setMatchAllDirs(true);
@@ -177,292 +540,199 @@ void IconView::fillList(const QString &dir)
     QFileInfoListIterator it(*list);
     QFileInfo *fi;
 
+    m_thumbGen->cancel();
+    m_thumbGen->setDirectory(m_currDir, isGallery);
+        
     while ((fi = it.current()) != 0)
     {
         ++it;
         if (fi->fileName() == "." || fi->fileName() == "..")
             continue;
 
-        // remove these already-resized pictures.  we'll look
-        // specifially for thumbnails a few lines down..
+        // remove these already-resized pictures.  
         if (isGallery && (
             (fi->fileName().find(".thumb.") > 0) ||
             (fi->fileName().find(".sized.") > 0) ||
             (fi->fileName().find(".highlight.") > 0)))
             continue;
+        
+        ThumbItem* item = new ThumbItem;
+        item->name      = fi->fileName();
+        item->path      = QDir::cleanDirPath(fi->absFilePath());
+        item->isDir     = fi->isDir();
 
-        QString filename = fi->absFilePath();
-
-        Thumbnail thumb;
-        thumb.filename = filename;
-        if (isGallery) 
-        {
-            // if the image name is xyz.jpg, then look
-            // for a file named xyz.thumb.jpg.
-            QString fn = fi->fileName();
-            int firstDot = fn.find('.');
-            if (firstDot > 0) 
-            {
-                fn.insert(firstDot, ".thumb");
-                QFileInfo galThumb(curdir + "/" + fn);
-                if (galThumb.exists()) 
-                {
-                    thumb.thumbfilename = galThumb.absFilePath();
-                }
-            }
-        }
-
-        if (fi->isDir()) 
-        {
-            thumb.isdir = true;
-            if (isGallery) 
-            {
-                // try to find a highlight so we can replace the
-                // normal folder pixmap with the chosen one
-                QDir subdir(fi->absFilePath(), "*.highlight.*", QDir::Name, 
-                            QDir::Files);
-                if (subdir.count()>0) {
-                    thumb.thumbfilename = subdir.entryInfoList()->getFirst()->absFilePath();
-                }
-            }
-            thumb.name = fi->fileName();
-        }
-        else
-            thumb.name = fi->baseName(true);
-
-        thumbs.push_back(thumb);
+        m_itemList.append(item);
+        m_itemDict.insert(item->name, item);
+        m_thumbGen->addFile(item->name);
     }
+
+    m_lastRow = QMAX((int)ceilf((float)m_itemList.count()/(float)m_nCols)-1,0);
+    m_lastCol = QMAX(m_itemList.count()-m_lastRow*m_nCols-1,0);
 }
 
-void IconView::loadThumbPixmap(Thumbnail *thumb)
+bool IconView::moveUp()
 {
-    QImage tmpimage;
-    QFileInfo thumbinfo(thumb->filename);
-    QString cachename;
+    if (m_currRow == 0)
+        return false;
 
-    if (!thumb->thumbfilename.isNull())
-        cachename = thumb->thumbfilename;
-    else
-        cachename = curdir + "/.thumbcache/" + thumbinfo.fileName();
-    QFileInfo cacheinfo(cachename);
+    m_currRow--;
+    if (m_currRow < m_topRow)
+        m_topRow = m_currRow;
 
-    // scale thumb and cache it if outdated or not exist
-    if (!cacheinfo.exists() ||
-        ((cacheinfo.lastModified() < thumbinfo.lastModified()) &&
-        thumb->thumbfilename.isNull()))
-    {
-        if (!cacheprogress)
-            cacheprogress = new MythProgressDialog(tr("Caching thumbnails..."),
-                                                   0);
-        tmpimage.load(thumb->filename);
-        if (tmpimage.width() == 0 || tmpimage.height() == 0)
-            return;
-        QImage tmp2 = tmpimage.smoothScale(thumbw, thumbh, QImage::ScaleMin);
-        tmp2.save(cachename, "JPEG");
-        tmpimage = tmp2;
+    return true;
+}
+
+bool IconView::moveDown()
+{
+    if (m_currRow == m_lastRow)
+        return false;
+
+    m_currRow++;
+    if (m_currRow >= m_topRow+m_nRows)
+        m_topRow++;
+    if (m_currRow == m_lastRow)
+        m_currCol = QMIN(m_currCol,m_lastCol);
+
+    return true;
+}
+
+bool IconView::moveLeft()
+{
+    if (m_currRow == 0 && m_currCol == 0)
+        return false;
+
+    m_currCol--;
+    if (m_currCol < 0) {
+        m_currCol = m_nCols - 1;
+        m_currRow--;
+        if (m_currRow < m_topRow)
+            m_topRow = m_currRow;
     }
-    else
-        tmpimage.load(cachename);
 
-    if (tmpimage.width() == 0 || tmpimage.height() == 0)
+    return true;
+}
+
+bool IconView::moveRight()
+{
+    if (m_currRow*m_nCols+m_currCol >= (int)m_itemList.count()-1)
+        return false;
+
+    m_currCol++;
+    if (m_currCol >= m_nCols) {
+        m_currCol = 0;
+        m_currRow++;
+        if (m_currRow >= m_topRow+m_nRows)
+            m_topRow++;
+    }
+    
+    return true;
+}
+
+void IconView::actionRotateCW()
+{
+    ThumbItem* item = m_itemList.at(m_currRow * m_nCols +
+                                    m_currCol);
+    if (!item || item->isDir)
         return;
 
-    QString querystr = "SELECT angle FROM gallerymetadata WHERE image =\"" +
-                       thumb->filename + "\";";
-    QSqlQuery query = m_db->exec(querystr);
-
-    int rotateAngle = 0;
-
-    if (query.isActive() && query.numRowsAffected() > 0) 
+    int rotAngle = 0;
+    
+    QString queryStr = "SELECT angle FROM gallerymetadata WHERE "
+                       "image=\"" + item->path + "\";";
+    QSqlQuery query = m_db->exec(queryStr);
+			
+    if (query.isActive()  && query.numRowsAffected() > 0) 
     {
         query.next();
-        rotateAngle = query.value(0).toInt();
+        rotAngle = query.value(0).toInt();
     }
 
-    if (rotateAngle)
-    {
+    rotAngle += 90;
+    if (rotAngle >= 360)
+        rotAngle -= 360;
+    if (rotAngle < 0)
+        rotAngle += 360;
+
+    queryStr = "REPLACE INTO gallerymetadata SET image=\"" +
+               item->path + "\", angle=" + 
+               QString::number(rotAngle) + ";";
+    query = m_db->exec(queryStr);
+
+    if (item->pixmap) {
+        QPixmap pix(*item->pixmap);
+
         QWMatrix matrix;
-        matrix.rotate(rotateAngle);
-        tmpimage = tmpimage.xForm(matrix);
-    }
+        matrix.rotate(90);
+        pix = pix.xForm(matrix);
 
-    thumb->pixmap = new QPixmap();
-    thumb->pixmap->convertFromImage(tmpimage);
+        delete item->pixmap;
+        item->pixmap = new QPixmap(pix);
+    }
 }
 
-bool IconView::moveDown() 
+void IconView::actionRotateCCW()
 {
-    currow++;
-    if (currow >= THUMBS_H)
-    {
-        if (screenposition < thumbs.size() - 1)  
-            screenposition += 3;
-        currow = THUMBS_H - 1;
-    }
+    ThumbItem* item = m_itemList.at(m_currRow * m_nCols +
+                                    m_currCol);
+    if (!item || item->isDir)
+        return;
 
-    if (screenposition + currow * THUMBS_H + curcol >= thumbs.size())
-    {
-        if (screenposition + currow * THUMBS_H < thumbs.size())
-        {
-            curcol = 0;
-            return true;
-        }
-        else
-            return false;
-    }
-    else
-        return true;
-}
-
-bool IconView::moveUp() 
-{
-    currow--;
-    if (currow < 0)
-    {
-        if (screenposition > 0)
-            screenposition -= 3;
-        currow = 0;
-    }
-    return true;
-}
-
-bool IconView::moveLeft() 
-{
-    curcol--;
-    if (curcol < 0)
-    {
-        currow--;
-        curcol = THUMBS_W - 1;
-        if (currow < 0)
-        {
-            if (screenposition > 0)
-                screenposition -= 3;
-            else
-                curcol = 0;
-            currow = 0;
-        }
-    }
-    return true;
-}
-
-bool IconView::moveRight() 
-{
-    curcol++;
-    if (curcol >= THUMBS_W)
-    {
-        currow++;
-        if (currow >= THUMBS_H)
-        {
-            if (screenposition < thumbs.size() - 1)
-                screenposition += 3;
-            currow = THUMBS_H - 1;
-        }
-        curcol = 0;
-    }
-
-    if (screenposition + currow * THUMBS_H + curcol >= thumbs.size())
-        return false;
-    else 
-        return true;
-}
-
-void IconView::keyPressEvent(QKeyEvent *e)
-{
-    bool handled = false;
- 
-    int oldrow = currow;
-    int oldcol = curcol;
-    int oldpos = screenposition;
-
-    QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
+    int rotAngle = 0;
     
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    QString queryStr = "SELECT angle FROM gallerymetadata WHERE "
+                       "image=\"" + item->path + "\";";
+    QSqlQuery query = m_db->exec(queryStr);
+			
+    if (query.isActive()  && query.numRowsAffected() > 0) 
     {
-        QString action = actions[i];
-        if (action == "UP")
-            handled = moveUp();
-        else if (action == "LEFT")
-            handled = moveLeft();
-        else if (action == "DOWN")
-            handled = moveDown();
-        else if (action == "RIGHT")
-            handled = moveRight();
-        else if (action == "SELECT" || action == "PLAY")
-        {
-            int pos = screenposition + currow * THUMBS_W + curcol;
-
-            if (thumbs[pos].isdir)
-            {
-                IconView iv(m_db, thumbs[pos].filename, 
-                            gContext->GetMainWindow()); 
-                iv.exec();
-            }
-            else
-            {
-                SingleView sv(m_db, &thumbs, pos, gContext->GetMainWindow());
-                if (e->key() == Key_P)
-                    sv.startShow();
-                sv.exec();
-            }
-
-            handled = true;
-        }
-        else if (action == "PAGEUP")
-        {
-            for (int i = 0; i < THUMBS_H; ++i) 
-                 moveUp();
-            handled = true;
-        }
-        else if (action == "PAGEDOWN")
-        {
-            for (int i = 0; i < THUMBS_H; ++i) 
-                 moveDown();
-            handled = true;
-        }
-        else if (action == "HOME")
-        {
-            screenposition = curcol = currow = 0;
-            handled = true;
-        }
-        else if (action == "END")
-        {
-            screenposition = ((thumbs.size() - 1) / (THUMBS_W * THUMBS_H)) * 
-                             (THUMBS_W * THUMBS_H);
-            currow = (thumbs.size() - screenposition) / THUMBS_W;
-            if (screenposition + currow * THUMBS_W + curcol >= thumbs.size())
-                curcol = thumbs.size() - (screenposition + currow * THUMBS_W) -
-                         1;
-            handled = true;
-        }
-        else if (action == "MENU")
-        {
-            GallerySettings settings;
-            settings.exec(QSqlDatabase::database());
-            break;
-        }
-        else if (action == "IMPORT")
-        {
-            handled = true;
-            importPics();
-            screenposition = 0;
-        }
+        query.next();
+        rotAngle = query.value(0).toInt();
     }
 
-    if (handled)
-    {
-        update();
-    }
-    else
-    {
-        screenposition = oldpos;
-        currow = oldrow;
-        curcol = oldcol;
-        MythDialog::keyPressEvent(e);
+    rotAngle -= 90;
+    if (rotAngle >= 360)
+        rotAngle -= 360;
+    if (rotAngle < 0)
+        rotAngle += 360;
+
+    queryStr = "REPLACE INTO gallerymetadata SET image=\"" +
+               item->path + "\", angle=" + 
+               QString::number(rotAngle) + ";";
+    query = m_db->exec(queryStr);
+
+    if (item->pixmap) {
+        QPixmap pix(*item->pixmap);
+
+        QWMatrix matrix;
+        matrix.rotate(-90);
+        pix = pix.xForm(matrix);
+
+        delete item->pixmap;
+        item->pixmap = new QPixmap(pix);
     }
 }
 
-void IconView::importPics()
+void IconView::actionSlideShow()
+{
+    ThumbItem* item = m_itemList.at(m_currRow * m_nCols +
+                                    m_currCol);
+    if (!item || item->isDir)
+        return;
+
+    int pos = m_currRow * m_nCols + m_currCol;
+    SingleView iv(m_db, m_itemList, pos, m_thumbGen,
+                 gContext->GetMainWindow());
+    iv.startShow();
+    iv.exec();
+}
+
+void IconView::actionSettings()
+{
+    GallerySettings settings;
+    settings.exec(QSqlDatabase::database());
+}
+
+void IconView::actionImport()
 {
     QFileInfo path;
     QDir importdir;
@@ -476,7 +746,7 @@ void IconView::importPics()
     QStringList paths = QStringList::split(":",
                                     gContext->GetSetting("GalleryImportDirs"));
 
-    QString idirname(curdir + "/" +
+    QString idirname(m_currDir + "/" +
                      (QDateTime::currentDateTime()).toString(Qt::ISODate));
     importdir.mkdir(idirname);
     importdir.setPath(idirname);
@@ -514,13 +784,13 @@ void IconView::importPics()
             return;
         }
 
-    Thumbnail thumb;
-    thumb.filename = importdir.absPath();
-    thumb.isdir = true;
-    thumb.name = importdir.dirName();
-
-    vector<Thumbnail>::iterator thumbshead = thumbs.begin();
-    thumbs.insert(thumbshead, thumb);
+    ThumbItem *item = new ThumbItem;
+    item->name  = importdir.dirName();
+    item->path  = importdir.absPath();
+    item->isDir = true;
+    m_itemList.append(item);
+    m_itemDict.insert(item->name, item);
+    m_thumbGen->addFile(item->name);
 }
 
 void IconView::importFromDir(const QString &fromDir, const QString &toDir)
@@ -555,10 +825,24 @@ void IconView::importFromDir(const QString &fromDir, const QString &toDir)
         } 
         else 
         {
-            cerr << "copying " << fi->absFilePath() << "to " << toDir << "\n";
+            cerr << "copying " << fi->absFilePath() << " to " << toDir << "\n";
             QString cmd = "cp \"" + fi->absFilePath() + "\" \"" + toDir + "\"";
             system(cmd);
         }
     }
 }
 
+
+void IconView::slotMenuPressed(int itemPos, bool)
+{
+    const UIListBtnType::UIListBtnTypeItem* item =
+        m_menuType->GetItem(itemPos);
+
+    if (!item)
+        return;
+
+    if (m_actions.contains(item->text)) {
+        Action act = m_actions[item->text];
+        (this->*act)();
+    }
+}

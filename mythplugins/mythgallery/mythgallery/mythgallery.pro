@@ -9,7 +9,17 @@ CONFIG += plugin thread
 TARGET = mythgallery
 target.path = $${PREFIX}/lib/mythtv/plugins
 INSTALLS += target
+LIBS += -ltiff
+
+uifiles.path = $${PREFIX}/share/mythtv/themes/default
+uifiles.files = gallery-ui.xml
+installimages.path = $${PREFIX}/share/mythtv/themes/default
+installimages.files = images/*.png
+
+INSTALLS += installimages uifiles
 
 # Input
-HEADERS += iconview.h singleview.h gallerysettings.h dbcheck.h
-SOURCES += iconview.cpp main.cpp singleview.cpp gallerysettings.cpp dbcheck.cpp
+HEADERS += iconview.h singleview.h gallerysettings.h dbcheck.h \
+           thumbgenerator.h qtiffio.h
+SOURCES += iconview.cpp main.cpp singleview.cpp gallerysettings.cpp dbcheck.cpp \
+           thumbgenerator.cpp qtiffio.cpp
