@@ -1449,8 +1449,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
             ToggleMute();
         else if (action == "TOGGLEASPECT")
             ToggleLetterbox();
-        //else if (action == "MENU")
-        //    ShowOSDTreeMenu();
+        else if (action == "MENU")
+            ShowOSDTreeMenu();
         else
             handled = false;
     }
@@ -1544,7 +1544,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 SwitchCards();
             else if (action == "SELECT")
                 ChannelCommit();
-            else if (action == "MENU" || action == "GUIDE")
+            else if (action == "GUIDE")
                 LoadMenu();
             else if (action == "TOGGLEPIPMODE")
                 TogglePIPView();
@@ -1591,30 +1591,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 else
                     handled = false;
             }
-            else if (action == "MENU" || action == "TOGGLEEDIT")
-            {
-                m_db->lock();
-                bool isEditing = playbackinfo->IsEditing(m_db->db());
-                m_db->unlock();
-
-                if (isEditing)
-                {
-                    nvp->Pause();
-
-                    dialogname = "alreadybeingedited";
-
-                    QString message = tr("This program is currently being "
-                                         "edited");
-
-                    QStringList options;
-                    options += tr("Continue Editing");
-                    options += tr("Do not edit");
-
-                    osd->NewDialogBox(dialogname, message, options, 0); 
-                    return;
-                }
-                editmode = nvp->EnableEdit();
-            }
+            else if (action == "TOGGLEEDIT")
+                DoEditMode();
             else if (action == "TOGGLEBROWSE")
                 DoProgramMenu();
             else if (action == "CHANNELUP")
@@ -3424,17 +3402,87 @@ void TV::ProgramMenuAction(int result)
     }
 }
 
-void TV::TreeMenuEntered(OSDGenericTree *item)
+void TV::TreeMenuEntered(OSDListTreeType *tree, OSDGenericTree *item)
 {
     // show help text somewhere, perhaps?
+    (void)tree;
     (void)item;
 }
 
-void TV::TreeMenuSelected(OSDGenericTree *item)
+void TV::DoEditMode(void)
 {
-    if (item)
+    m_db->lock();
+    bool isEditing = playbackinfo->IsEditing(m_db->db());
+    m_db->unlock();
+
+    if (isEditing)
     {
-        cout << "menu action selected: " << item->getAction() << endl;
+        nvp->Pause();
+
+        dialogname = "alreadybeingedited";
+
+        QString message = tr("This program is currently being edited");
+
+        QStringList options;
+        options += tr("Continue Editing");
+        options += tr("Do not edit");
+
+        osd->NewDialogBox(dialogname, message, options, 0);
+        return;
+    }
+
+    editmode = nvp->EnableEdit();
+}
+
+void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
+{
+    if (!tree || !item)
+        return;
+
+    bool hidetree = true;
+
+    QString action = item->getAction();
+
+    if (internalState == kState_WatchingLiveTV)
+    {
+        if (action == "GUIDE")
+            LoadMenu();
+        else if (action == "TOGGLEPIPMODE")
+            TogglePIPView();
+        else if (action == "TOGGLEPIPWINDOW")
+            ToggleActiveWindow();
+        else if (action == "SWAPPIP")
+            SwapPIP();
+        else if (action == "TOGGLEBROWSE")
+            BrowseStart();
+        else if (action == "PREVCHAN")
+            PreviousChannel();
+        else
+        {
+            cout << "unknown menu action selected: " << action << endl;
+            hidetree = false;
+        }
+    }
+    else if (StateIsPlaying(internalState))
+    {
+        if (action == "TOGGLEEDIT")
+            DoEditMode();
+        else
+        {
+            cout << "unknown menu action selected: " << action << endl;
+            hidetree = false;
+        }
+    }
+    else
+    {
+        cout << "unknown menu action selected: " << action << endl;
+        hidetree = false;
+    }
+
+    if (hidetree)
+    {
+        tree->SetVisible(false);
+        tree->disconnect();
     }
 }
 
@@ -3445,10 +3493,14 @@ void TV::ShowOSDTreeMenu(void)
         OSDListTreeType *tree = osd->ShowTreeMenu("menu", treeMenu);
         if (tree)
         {
-            connect(tree, SIGNAL(itemSelected(OSDGenericTree *)), 
-                    this, SLOT(TreeMenuSelected(OSDGenericTree *)));
-            connect(tree, SIGNAL(itemEntered(OSDGenericTree *)),
-                    this, SLOT(TreeMenuEntered(OSDGenericTree *)));
+            connect(tree, SIGNAL(itemSelected(OSDListTreeType *, 
+                                 OSDGenericTree *)), 
+                    this, SLOT(TreeMenuSelected(OSDListTreeType *,
+                               OSDGenericTree *)));
+            connect(tree, SIGNAL(itemEntered(OSDListTreeType *,
+                                 OSDGenericTree *)),
+                    this, SLOT(TreeMenuEntered(OSDListTreeType *,
+                               OSDGenericTree *)));
         }
     }
 }

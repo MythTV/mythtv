@@ -78,8 +78,8 @@ class OSDListTreeType : public OSDType
     void SetVisible(bool visible) { m_visible = visible; }
 
   signals:
-    void itemSelected(OSDGenericTree *item);
-    void itemEntered(OSDGenericTree *item);
+    void itemSelected(OSDListTreeType *parent, OSDGenericTree *item);
+    void itemEntered(OSDListTreeType *parent, OSDGenericTree *item);
 
   private:
     void FillLevelFromTree(OSDGenericTree *item, OSDListBtnType *list);

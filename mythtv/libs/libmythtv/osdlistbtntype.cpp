@@ -188,7 +188,7 @@ void OSDListTreeType::SetAsTree(OSDGenericTree *toplevel)
     currentpos = (OSDGenericTree *)(currentlevel->GetItemFirst()->getData());
     curlevel = 0;
 
-    emit itemEntered(currentpos);
+    emit itemEntered(this, currentpos);
 }
 
 OSDGenericTree *OSDListTreeType::GetCurrentPosition(void)
@@ -255,7 +255,7 @@ bool OSDListTreeType::HandleKeypress(QKeyEvent *e)
             else if (action == "ESCAPE")
                 m_visible = false;
             else if (action == "SELECT")
-                emit itemSelected(currentpos);
+                emit itemSelected(this, currentpos);
             else
                 handled = false;
         }
@@ -326,7 +326,7 @@ void OSDListTreeType::SetCurrentPosition(void)
         return;
 
     currentpos = (OSDGenericTree *)(lbt->getData());
-    emit itemEntered(currentpos);
+    emit itemEntered(this, currentpos);
 }
  
 //////////////////////////////////////////////////////////////////////////

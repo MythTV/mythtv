@@ -102,6 +102,7 @@ int ChannelWizard::countCardtypes() {
 
 void ChannelListSetting::fillSelections(void) 
 {
+    QString currentValue = getValue();
     clearSelections();
     addSelection("(New Channel)");
     QString querystr = QString("SELECT name, channum, chanid FROM channel");
@@ -135,7 +136,7 @@ void ChannelListSetting::fillSelections(void)
                     name = "???. " + name;
             }
 
-            addSelection(name, chanid, (chanid == current) ? true : false);
+            addSelection(name, chanid, (chanid == currentValue) ? true : false);
         }
 }
 

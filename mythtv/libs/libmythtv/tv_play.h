@@ -23,6 +23,7 @@ class RingBuffer;
 class ProgramInfo;
 class MythDialog;
 class UDPNotify;
+class OSDListTreeType;
 class OSDGenericTree;
 
 class TV : public QObject
@@ -96,8 +97,8 @@ class TV : public QObject
     void KeyRepeatOK(void);
     void BrowseEndTimer(void) { BrowseEnd(false); }
     void SleepEndTimer(void);
-    void TreeMenuEntered(OSDGenericTree *item);
-    void TreeMenuSelected(OSDGenericTree *item);
+    void TreeMenuEntered(OSDListTreeType *tree, OSDGenericTree *item);
+    void TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item);
 
   protected:
     void doLoadMenu(void);
@@ -149,6 +150,7 @@ class TV : public QObject
     void ChangeFFRew(int direction);
     void RepeatFFRew(void);
     void DoSkipCommercials(int direction);
+    void DoEditMode(void);
 
     void DoQueueTranscode(void);  
  

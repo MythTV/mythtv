@@ -149,6 +149,56 @@ void OSD::SetDefaults(void)
                                           displaywidth, displayheight);
         container->AddType(ccpage);
     }
+
+    container = GetSet("menu");
+    if (!container)
+    {
+        QString name = "menu";
+        container = new OSDSet(name, true, vid_width, vid_height,
+                               wmult, hmult, frameint);
+        AddSet(container, name);
+ 
+        QRect area = QRect(20, 40, 620, 300);
+        QRect listarea = QRect(20, 40, 294, 300);
+
+        normalizeRect(area);
+        normalizeRect(listarea);
+        listarea.moveBy(-xoffset, -yoffset);
+
+        OSDListTreeType *lb = new OSDListTreeType("menu", area, listarea, 10,
+                                                  wmult, hmult);
+ 
+        lb->SetItemRegColor(QColor("#505050"), QColor("#000000"), 100);
+        lb->SetItemSelColor(QColor("#52CA38"), QColor("#349838"), 255);
+ 
+        lb->SetSpacing((int)(2 * hmult));
+        lb->SetMargin((int)(3 * wmult));
+
+        TTFFont *actfont = GetFont("infofont");
+        TTFFont *inactfont = GetFont("infofont");
+
+        if (!actfont)
+        {
+            actfont = LoadFont(fontname, 16);
+
+            if (actfont)
+                fontMap["treemenulistfont"] = actfont;
+        }
+
+        if (!actfont)
+        {
+            QMap<QString, TTFFont *>::Iterator it = fontMap.begin();
+            actfont = it.data();
+        }
+
+        if (!inactfont)
+            inactfont = actfont;
+
+        lb->SetFontActive(actfont);
+        lb->SetFontInactive(inactfont);
+
+        container->AddType(lb);
+    }
 }
 
 void OSD::Reinit(int width, int height, int frint, int dispx, int dispy, 
@@ -2031,6 +2081,7 @@ OSDListTreeType *OSD::ShowTreeMenu(const QString &name,
         if (rettree)
         {
             rettree->SetAsTree(treeToShow);
+            rettree->SetVisible(true);
             runningTreeMenu = rettree;
             treeMenuContainer = name;
             container->Display();
@@ -2056,9 +2107,9 @@ bool OSD::TreeMenuHandleKeypress(QKeyEvent *e)
     if (!runningTreeMenu)
         return false;
 
-    osdlock.lock();
-    
     bool ret = runningTreeMenu->HandleKeypress(e);
+
+    osdlock.lock();
 
     if (!runningTreeMenu->IsVisible())
     {
