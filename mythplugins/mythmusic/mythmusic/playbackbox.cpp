@@ -681,7 +681,7 @@ void PlaybackBoxMusic::checkForPlaylists()
 
 void PlaybackBoxMusic::changeVolume(bool up_or_down)
 {
-    if (volume_control)
+    if (volume_control && output)
     {
         if (up_or_down)
             output->AdjustCurrentVolume(2);
@@ -693,7 +693,7 @@ void PlaybackBoxMusic::changeVolume(bool up_or_down)
 
 void PlaybackBoxMusic::toggleMute()
 {
-    if (volume_control)
+    if (volume_control && output)
     {
         output->ToggleMute();
         showVolume(true);
