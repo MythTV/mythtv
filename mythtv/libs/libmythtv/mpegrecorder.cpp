@@ -200,8 +200,8 @@ void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 
     if (ispip)
     {
-        SetOption("width", 160);
-        SetOption("height", 128);
+        SetOption("width", 320);
+        SetOption("height", 240);
     }
 }
 

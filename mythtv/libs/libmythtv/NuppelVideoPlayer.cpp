@@ -1590,6 +1590,12 @@ void NuppelVideoPlayer::IvtvVideoLoop(void)
 
     while (!eof && !killvideo)
     {
+        if (needsetpipplayer)
+        {
+            pipplayer = setpipplayer;
+            needsetpipplayer = false;
+        }
+
         resetvideo = false;
         video_actually_paused = pausevideo;
 
@@ -1602,7 +1608,7 @@ void NuppelVideoPlayer::IvtvVideoLoop(void)
         {
             if (cc)
                 ShowText();
-            videoOutput->ProcessFrame(NULL, osd, videoFilters, NULL);
+            videoOutput->ProcessFrame(NULL, osd, videoFilters, pipplayer);
         }
 
         usleep(delay);

@@ -543,7 +543,7 @@ void PlaybackBox::updateVideo(QPainter *p)
         yuv2rgb_fun convert = yuv2rgb_init_mmx(32, MODE_RGB);
 
         convert(outputbuf, buf, buf + (w * h), buf + (w * h * 5 / 4), w, h, 
-                w * 4, w, w / 2);
+                w * 4, w, w / 2, 0);
 
         QImage img(outputbuf, w, h, 32, NULL, 65536 * 65536, 
                    QImage::LittleEndian);

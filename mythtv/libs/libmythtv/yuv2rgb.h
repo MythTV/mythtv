@@ -27,9 +27,10 @@
 #define MODE_BGR  0x2
 
 typedef void (* yuv2rgb_fun) (uint8_t * image, uint8_t * py,
-			      uint8_t * pu, uint8_t * pv,
-			      int h_size, int v_size,
-			      int rgb_stride, int y_stride, int uv_stride);
+                              uint8_t * pu, uint8_t * pv,
+                              int h_size, int v_size,
+                              int rgb_stride, int y_stride, int uv_stride,
+                              int alphaones);
 
 extern yuv2rgb_fun yuv2rgb;
 

@@ -328,19 +328,19 @@ void VideoOutputIvtv::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
     {
         default:
         case kPIPTopLeft:
-                xoff = 30;
+                xoff = 50;
                 yoff = 40;
                 break;
         case kPIPBottomLeft:
-                xoff = 30;
+                xoff = 50;
                 yoff = frame->height - piph - 40;
                 break;
         case kPIPTopRight:
-                xoff = frame->width - pipw - 30;
+                xoff = frame->width - pipw - 50;
                 yoff = 40;
                 break;
         case kPIPBottomRight:
-                xoff = frame->width - pipw - 30;
+                xoff = frame->width - pipw - 50;
                 yoff = frame->height - piph - 40;
                 break;
     }
@@ -372,13 +372,16 @@ void VideoOutputIvtv::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
 
     convert(outputbuf, pipbuf, pipbuf + (pipw * piph), 
             pipbuf + (pipw * piph * 5 / 4), pipw, piph,
-            pipw * 4, pipw, pipw / 2);
+            pipw * 4, pipw, pipw / 2, 1);
 
     if (frame->width < 0)
         frame->width = XJ_width;
 
-    memcpy(frame->buf + yoff * frame->width + xoff,
-           outputbuf, pipw * piph * 4);
+    for (int i = 0; i < piph; i++)
+    {
+        memcpy(frame->buf + (i + yoff) * frame->width + xoff * 4,
+               outputbuf + i * pipw * 4, pipw * 4);
+    }
 }
 
 void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
@@ -407,13 +410,11 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
             drawanyway = true;
         }
 
-#if 0
         if (pipPlayer)
         {
             ShowPip(&tmpframe, pipPlayer);
             drawanyway = true;
         }
-#endif
 
         if (ret >= 0)
             lastcleared = false;
