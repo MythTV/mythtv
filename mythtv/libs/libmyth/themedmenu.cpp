@@ -827,8 +827,13 @@ void ThemedMenu::layoutButtons(void)
 
     int yspacing = (buttonArea.height() - buttonnormal->height() * rows) /
                    (rows + 1);
+    int ystart = 0;
+    
     if (!spreadbuttons)
+    {
         yspacing = 0;
+        ystart = (buttonArea.height() - buttonnormal->height() * rows) / 2;
+    }
 
     int row = 1;
 
@@ -838,7 +843,7 @@ void ThemedMenu::layoutButtons(void)
     for (; menuiter != buttonRows.end(); menuiter++)
     {
         int ypos = yspacing * row + (buttonnormal->height() * (row - 1));
-        ypos += buttonArea.y();
+        ypos += buttonArea.y() + ystart;
 
         int xspacing = (buttonArea.width() - buttonnormal->width() *
                        (*menuiter).numitems) / ((*menuiter).numitems + 1);
