@@ -257,6 +257,18 @@ void VideoOutputIvtv::EmbedInWidget(unsigned long wid, int x, int y, int w,
     if (embedding)
         return;
 
+    struct ivtvfb_ioctl_state_info fbstate;
+    memset(&fbstate, 0, sizeof(fbstate));
+
+    if (ioctl(fbfd, IVTVFB_IOCTL_GET_STATE, &fbstate) < 0)
+        perror("IVTVFB_IOCTL_GET_STATE");
+
+    fbstate.status = initglobalalpha;
+    fbstate.alpha = 164;
+
+    if (ioctl(fbfd, IVTVFB_IOCTL_SET_STATE, &fbstate) < 0)
+        perror("IVTVFB_IOCTL_SET_STATE");
+
     VideoOutput::EmbedInWidget(wid, x, y, w, h);
 }
 
@@ -264,6 +276,19 @@ void VideoOutputIvtv::StopEmbedding(void)
 {
     if (!embedding)
         return;
+
+    struct ivtvfb_ioctl_state_info fbstate;
+    memset(&fbstate, 0, sizeof(fbstate));
+
+    if (ioctl(fbfd, IVTVFB_IOCTL_GET_STATE, &fbstate) < 0)
+        perror("IVTVFB_IOCTL_GET_STATE");
+
+    fbstate.status &= ~IVTVFB_STATUS_GLOBAL_ALPHA;
+    fbstate.status |= IVTVFB_STATUS_LOCAL_ALPHA;
+    fbstate.alpha = 0;
+
+    if (ioctl(fbfd, IVTVFB_IOCTL_SET_STATE, &fbstate) < 0)
+        perror("IVTVFB_IOCTL_SET_STATE");
 
     VideoOutput::StopEmbedding();
 }
