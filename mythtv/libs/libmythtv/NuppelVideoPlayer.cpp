@@ -17,6 +17,7 @@
 #include <iostream>
 using namespace std;
 
+#include "config.h"
 #include "mythdbcon.h"
 #include "dialogbox.h"
 #include "NuppelVideoPlayer.h"

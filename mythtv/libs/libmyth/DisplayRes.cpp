@@ -1,4 +1,4 @@
-
+#include "config.h"
 #include "DisplayRes.h"
 #include "mythcontext.h"
 

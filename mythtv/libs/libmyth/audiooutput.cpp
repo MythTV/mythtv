@@ -3,6 +3,8 @@
 #include <cstdlib>
 
 using namespace std;
+
+#include "config.h"
 #include "audiooutput.h"
 #ifdef USING_DIRECTX
 #include "audiooutputdx.h"

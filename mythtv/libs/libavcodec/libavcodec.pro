@@ -8,12 +8,6 @@ INSTALLS = target
 
 VERSION = 0.17.0
 
-include ( ../../config.mak )
-
-!exists( ../../config.mak ) {
-    error(Please run the configure script first)
-}
-
 INCLUDEPATH = ../../
 
 # Debug mode on x86 must compile without -fPIC and with -O, otherwise gcc runs 

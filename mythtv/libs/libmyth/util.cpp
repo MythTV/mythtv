@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include "config.h"
+
 #ifdef __linux__
 #include <sys/statvfs.h>
 #include <sys/sysinfo.h>

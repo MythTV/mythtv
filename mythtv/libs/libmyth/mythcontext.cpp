@@ -16,6 +16,7 @@
 #include <cmath>
 #include <queue>
 
+#include "config.h"
 #include "mythcontext.h"
 #include "oldsettings.h"
 #include "themedmenu.h"

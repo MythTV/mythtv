@@ -1,4 +1,5 @@
 using namespace std;
+#include "config.h"
 #include "screensaver.h"
 #include "screensaver-null.h"
 #if defined(Q_WS_X11)

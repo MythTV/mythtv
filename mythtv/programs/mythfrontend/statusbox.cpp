@@ -26,6 +26,7 @@
 #include <cerrno>
 using namespace std;
 
+#include "config.h"
 #include "statusbox.h"
 #include "mythcontext.h"
 #include "remoteutil.h"

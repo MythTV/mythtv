@@ -7,6 +7,11 @@ isEmpty( PREFIX ) {
 
 LIBVERSION = 0.17
 
+include( config.mak )
+!exists( config.mak ) {
+    error(Please run the configure script first)
+}
+
 INCLUDEPATH += $${PREFIX}/include
 
 DEFINES += _GNU_SOURCE
@@ -31,11 +36,9 @@ EXTRA_LIBS = -lfreetype -lmp3lame
 
 unix:linux*: {
     CONFIG  += linux backend
-    DEFINES += CONFIG_VIDEO4LINUX
 }
 unix:freebsd*: {
     CONFIG  += freebsd backend
-    DEFINES += CONFIG_VIDEO4LINUX
 }
 
 # X11 support
@@ -110,24 +113,8 @@ win32 {
     DEFINES += _WIN32
 }
 
-# Mac OS X support
-macx {
-    # For source that uses Qt, Q_OS_MACX is defined.
-    # For source that uses config.h, CONFIG_DARWIN is defined.
-    # For other source (e.g. libmythtv), we define this
-    DEFINES += CONFIG_DARWIN
-
-    # This .pro file doesn't include config.mak. Force processor architecture:
-    TARGET_ARCH_POWERPC=yes
-    # Also force Altivec support:
-    TARGET_ALTIVEC=yes
-}
-
+# Altivec support
 contains( TARGET_ALTIVEC, yes ) {
-    # Altivec support
-    CONFIG  += using_altivec
-    # The USING_ALTIVEC define is deprecated; Altivec code should 
-    # include "config.h" instead.
     macx {
         QMAKE_CFLAGS   += -faltivec
         QMAKE_CXXFLAGS += -faltivec

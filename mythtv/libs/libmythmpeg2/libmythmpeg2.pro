@@ -8,12 +8,6 @@ INSTALLS = target
 
 VERSION = 0.17.0 
 
-include ( ../../config.mak )
-
-!exists( ../../config.mak ) {
-    error(Please run the configure script first)
-}
-
 QMAKE_CFLAGS_RELEASE += -fPIC -fno-common
 QMAKE_CFLAGS_DEBUG += -fPIC -fno-common
 

@@ -1,3 +1,4 @@
+#include "config.h"
 #include "videosource.h"
 #include "libmyth/mythwidgets.h"
 #include "libmyth/mythcontext.h"

@@ -8,12 +8,6 @@ INSTALLS = target
 
 VERSION = 0.17.0 
 
-include ( ../../config.mak )
-
-!exists( ../../config.mak ) {
-    error(Please run the configure script first)
-}
-
 INCLUDEPATH += ../../ 
 
 QMAKE_CFLAGS_RELEASE = $$OPTFLAGS -DHAVE_AV_CONFIG_H -I.. -fPIC -DPIC -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE

@@ -8,12 +8,6 @@ INSTALLS = target
 
 VERSION = 0.17.0 
 
-include ( ../../config.mak )
-
-!exists( ../../config.mak ) {
-    error(Please run the configure script first)
-}
-
 INCLUDEPATH += ../../ 
 
 QMAKE_CXXFLAGS_RELEASE += -fPIC -DPIC
