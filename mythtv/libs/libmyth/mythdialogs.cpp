@@ -275,8 +275,7 @@ void MythMainWindow::Init(void)
     if (d->does_fill_screen)
         flags = Qt::WStyle_Customize  |
                 Qt::WStyle_NoBorder   |
-                Qt::WStyle_StaysOnTop |
-                Qt::WX11BypassWM;
+                Qt::WStyle_StaysOnTop;
     else
         flags = Qt::WStyle_Customize | Qt::WStyle_NormalBorder;
 
