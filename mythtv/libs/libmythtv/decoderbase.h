@@ -57,6 +57,8 @@ class DecoderBase
 
     virtual void UpdateFramesPlayed(void) { };
 
+    virtual void SetPixelFormat(const int) { }
+
   protected:
     NuppelVideoPlayer *m_parent;
     MythSqlDatabase *m_db;

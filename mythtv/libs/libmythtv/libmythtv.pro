@@ -72,7 +72,7 @@ using_x11 {
 
     using_xvmc {
         SOURCES += videoout_xvmc.cpp
-        HEADERS += videoout_xvmc.h
+        HEADERS += videoout_xvmc.h XvMCSurfaceTypes.h
     }
 }
 

@@ -38,6 +38,8 @@ class VideoOutputXvMC : public VideoOutput
 
     int ChangePictureAttribute(int attributeType, int newValue);
 
+    bool hasIDCTAcceleration() const;
+
   private:
     void Exit(void);
     bool CreateXvMCBuffers(void);
@@ -60,6 +62,7 @@ class VideoOutputXvMC : public VideoOutput
     pthread_mutex_t lock;
 
     int colorkey;
+    int chroma;
 };
 
 #endif

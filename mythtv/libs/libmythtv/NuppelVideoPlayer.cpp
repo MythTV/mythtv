@@ -56,6 +56,10 @@ extern "C" {
 #undef GetFileSize
 #endif
 
+#ifdef USING_XVMC
+#include "videoout_xvmc.h" // for hasIDCTAcceleration() call
+#endif
+
 NuppelVideoPlayer::NuppelVideoPlayer(MythSqlDatabase *ldb,
                                      ProgramInfo *info)
 {
@@ -386,6 +390,18 @@ void NuppelVideoPlayer::InitVideo(void)
         videoOutput->Init(video_width, video_height, video_aspect,
                           widget->winId(), 0, 0, widget->width(), 
                           widget->height(), 0);
+
+#ifdef USING_XVMC
+        // We must tell the AvFormatDecoder whether we are using
+        // an IDCT or MC pixel format.
+        if (kVideoOutput_XvMC == forceVideoOutput) 
+        {
+            bool idct = videoOutput->hasIDCTAcceleration();
+            decoder->SetPixelFormat((idct) ? PIX_FMT_XVMC_MPEG2_IDCT :
+                                             PIX_FMT_XVMC_MPEG2_MC);
+        }
+#endif
+
     }
 
     if (embedid > 0)

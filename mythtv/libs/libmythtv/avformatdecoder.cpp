@@ -239,6 +239,31 @@ void AvFormatDecoder::InitByteContext(void)
 
 #define ALIGN(x, a) (((x) + (a) - 1) & ~((a) - 1))
 
+static QMap<void*, enum PixelFormat> _PixelFormatsMap;
+
+static enum PixelFormat getFormat(struct AVCodecContext *cc,
+                                  const enum PixelFormat *pixfmts) 
+{
+    if (_PixelFormatsMap.end() != _PixelFormatsMap.find(cc))
+    {
+        return _PixelFormatsMap[cc];
+    }
+
+    VERBOSE(VB_IMPORTANT, "Pixel format not set, returning pixfmts[0]");
+    return pixfmts[0];
+}
+
+void AvFormatDecoder::SetPixelFormat(const int pixFormat) 
+{
+    PixelFormat pix = (PixelFormat)pixFormat;
+    for (int i = 0; i < ic->nb_streams; i++) 
+    {
+        AVCodecContext *cc = &ic->streams[i]->codec;
+        if (CODEC_TYPE_VIDEO == cc->codec_type)
+            _PixelFormatsMap[cc]=pix;
+    }
+}
+
 int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                               char testbuf[2048])
 {
@@ -318,19 +343,23 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                                          ALIGN(enc->height, 16), fps, 
                                          keyframedist, aspect_ratio);
              
-                enc->error_resilience = 2;
+                enc->error_resilience = FF_ER_COMPLIANT;
                 enc->workaround_bugs = FF_BUG_AUTODETECT;
-                enc->error_concealment = 3;
-                enc->idct_algo = 0;
+                enc->error_concealment = FF_EC_GUESS_MVS | FF_EC_DEBLOCK;
+                enc->idct_algo = FF_IDCT_AUTO;
                 enc->debug = 0;
                 enc->rate_emu = 0;
+                enc->error_rate = 0;
 
                 if (!novideo && (enc->codec_id == CODEC_ID_MPEG1VIDEO || 
                     enc->codec_id == CODEC_ID_MPEG2VIDEO))
                 {
 #ifdef USING_XVMC
                     if (gContext->GetNumSetting("UseXVMC", 1))
+                    {
                         enc->codec_id = CODEC_ID_MPEG2VIDEO_XVMC;
+                        //enc->get_format = getFormat;
+                    }
 #endif            
 #ifdef USING_VIASLICE
                     if (gContext->GetNumSetting("UseViaSlice", 1))

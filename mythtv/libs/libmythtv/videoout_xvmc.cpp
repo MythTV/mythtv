@@ -9,11 +9,13 @@
 #include <sys/shm.h>
 #include <cmath>
 #include <ctime>
+#include <cassert>
 
 #include <map>
 #include <iostream>
 using namespace std;
 
+#include "XvMCSurfaceTypes.h"
 #include "videoout_xvmc.h"
 #include "../libmyth/util.h"
 #include "../libmyth/mythcontext.h"
@@ -104,6 +106,8 @@ VideoOutputXvMC::VideoOutputXvMC(void)
 {
     XJ_started = 0; 
     xv_port = -1; 
+
+    chroma = XVMC_CHROMA_FORMAT_420;
 
     data = new XvMCData();
     memset(data, 0, sizeof(XvMCData));
@@ -262,9 +266,6 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
     ret = XvQueryAdaptors(data->XJ_disp, data->XJ_root,
                           (unsigned int *)&p_num_adaptors, &ai);
 
-    int mc_surf_num = 0;
-    XvMCSurfaceInfo *mc_surf_list;
-
     if (ret != Success) 
     {
         printf("XvQueryAdaptors failed.\n");
@@ -279,40 +280,34 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
                 if (ai[i].type == 0)
                     continue;
 
-                for (unsigned long p = ai[i].base_id; p < ai[i].base_id +
-                     ai[i].num_ports; p++)
+                XvPortID p = 0;
+                int s;
+                XvMCSurfaceTypes::find(width, height, chroma,
+                                       true, 2, 0, 0,
+                                       data->XJ_disp, ai[i].base_id,
+                                       ai[i].base_id + ai[i].num_ports - 1,
+                                       p, s);
+                if (0 == p) 
                 {
-                    mc_surf_list = XvMCListSurfaceTypes(data->XJ_disp, p,
-                                                        &mc_surf_num);
-                    if (mc_surf_list == NULL || mc_surf_num == 0)
-                        continue;
-
-                    for (int s = 0; s < mc_surf_num; s++)
-                    {
-                        if (width > mc_surf_list[s].max_width)
-                            continue;
-                        if (height > mc_surf_list[s].max_height)
-                            continue;
-                        if (mc_surf_list[s].chroma_format != 
-                            XVMC_CHROMA_FORMAT_420)
-                            continue;
-
-                        xv_port = p;
-                        memcpy(&data->surface_info, &mc_surf_list[s],
-                               sizeof(XvMCSurfaceInfo));
-                        data->mode_id = mc_surf_list[s].surface_type_id;
-                        break;
-                    }
-
-                    XFree(mc_surf_list);
-
-                    if (xv_port > 0)
-                        break;
+                    // No IDCT surface found, try to find MC surface
+                    XvMCSurfaceTypes::find(width, height, chroma,
+                                           false, 2, 0, 0,
+                                           data->XJ_disp, ai[i].base_id,
+                                           ai[i].base_id + ai[i].num_ports - 1,
+                                           p, s);
                 }
-                if (xv_port > 0)
+
+                if (p != 0) 
+                {
+                    xv_port = p;
+                    XvMCSurfaceTypes surf(data->XJ_disp, p);
+                    assert(surf.size()>0);
+                    surf.set(s, &data->surface_info);
+                    data->mode_id = surf.surfaceTypeID(s);
                     break;
+                }
             }
- 
+
             if (p_num_adaptors > 0)
                 XvFreeAdaptorInfo(ai);
         }
@@ -508,7 +503,7 @@ bool VideoOutputXvMC::CreateXvMCBuffers(void)
         render->mv_blocks = data->mv_blocks[i].macro_blocks;
         render->total_number_of_mv_blocks = numblocks;
         render->total_number_of_data_blocks = numblocks * blocks_per_macroblock;
-        render->mc_type = data->surface_info.mc_type & (~XVMC_IDCT);
+        render->mc_type = data->surface_info.mc_type;
         render->idct = (data->surface_info.mc_type & XVMC_IDCT) == XVMC_IDCT;
         render->chroma_format = data->surface_info.chroma_format;
         render->unsigned_intra = (data->surface_info.flags & 
@@ -679,6 +674,9 @@ void VideoOutputXvMC::StopEmbedding(void)
 
 static void SyncSurface(Display *disp, XvMCSurface *surf)
 {
+    if (!surf)
+        return;
+
     int res = 0, status = 0;
 
     res = XvMCGetSurfaceStatus(disp, surf, &status);
@@ -979,3 +977,10 @@ int VideoOutputXvMC::ChangePictureAttribute(int attributeType, int newValue)
     
     return -1;
 }
+
+// This is used to set the correct pixel format for the avdecoder.
+bool VideoOutputXvMC::hasIDCTAcceleration() const 
+{
+    return XVMC_IDCT == (data->surface_info.mc_type & XVMC_IDCT);
+}
+

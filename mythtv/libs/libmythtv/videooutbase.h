@@ -159,6 +159,8 @@ class VideoOutput
 
     bool AllowPreviewEPG(void) { return allowpreviewepg; }
 
+    virtual bool hasIDCTAcceleration() const { return false; }
+
   protected:
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
                      int needprebuffer, int keepprebuffer);

@@ -54,6 +54,8 @@ class AvFormatDecoder : public DecoderBase
 
     QString GetEncodingType(void) { return QString("MPEG-2"); }
 
+    void SetPixelFormat(const int);
+
   protected:
     RingBuffer *getRingBuf(void) { return ringBuffer; }
 
