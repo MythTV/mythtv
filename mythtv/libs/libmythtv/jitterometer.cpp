@@ -78,7 +78,7 @@ bool Jitterometer::RecordEndTime()
       /* compute standard deviation */
       standard_deviation = sqrt(sum_of_squared_deviations / (num_cycles - 1));
 
-      printf("'%s' mean = '%f', std. dev. = '%f', fps = '%f'\n", name, mean, standard_deviation, fps);
+      printf("'%s' mean = '%.2f', std. dev. = '%.2f', fps = '%.2f'\n", name, mean, standard_deviation, fps);
 
       count = 0;
 

@@ -167,7 +167,7 @@ int main(int argc, char **argv)
                 } else
                 {
                     QStringList verboseOpts;
-                    verboseOpts.split(',',a.argv()[argpos+1]);
+                    verboseOpts = QStringList::split(',',a.argv()[argpos+1]);
                     ++argpos;
                     for (QStringList::Iterator it = verboseOpts.begin(); 
                          it != verboseOpts.end(); ++it )
@@ -211,6 +211,11 @@ int main(int argc, char **argv)
                         {
                             print_verbose_messages |= VB_FILE;
                             verboseString += " " + *it;
+                        }
+                        else
+                        {
+                            cerr << "Unknown argument for -v/--verbose: "
+				 << *it << endl;;
                         }
                     }
                 }
