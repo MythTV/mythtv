@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.10.22 (xris)
+#Last Updated: 2004.12.26 (xris)
 #
 #   nuvexport::ui
 #
@@ -296,6 +296,8 @@ package nuv_export::ui;
     sub confirm_shows {
         my @episodes = @_;
         my $num_episodes = @episodes;
+    # CLI-only?  Just return the "continue" choice
+        return ('x', @episodes) if ($is_cli);
     # Define a newline + whitespace so we can tab out extra lines of episode description
         my $newline = "\n" . ' ' x (4 + length $num_episodes);
     # Build the query
