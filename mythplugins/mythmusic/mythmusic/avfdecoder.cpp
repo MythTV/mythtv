@@ -183,6 +183,9 @@ bool avfDecoder::initialize()
         return FALSE;
     totalTime = (ic->duration / AV_TIME_BASE) * 1000;
 
+    freq = audio_dec->sample_rate;
+    chan = audio_dec->channels;
+
     if (output())
     {
         output()->Reconfigure(16, audio_dec->channels, audio_dec->sample_rate);
