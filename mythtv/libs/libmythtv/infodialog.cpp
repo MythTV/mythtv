@@ -191,7 +191,7 @@ QLabel *InfoDialog::getDateLabel(ProgramInfo *pginfo)
 
 void InfoDialog::hideEvent(QHideEvent *e)
 {
-    selected(NULL);
+//    selected(NULL);
     QDialog::hideEvent(e);
 }
 

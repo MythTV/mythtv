@@ -1188,5 +1188,6 @@ void GuideGrid::displayInfo()
     setActiveWindow();
     setFocus();
 
+    fillProgramInfos();
     update(programRect());
 }
