@@ -333,7 +333,6 @@ void PlaybackBox::selected(QListViewItem *lvitem)
     ProgramInfo *tvrec = new ProgramInfo(*rec);
     tv->Playback(tvrec);
 
-    TVState curstate = tv->GetState();
     while (tv->IsPlaying() || tv->ChangingState())
         usleep(50);
 

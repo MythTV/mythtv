@@ -133,7 +133,8 @@ void *runScheduler(void *dummy)
         asked = false;
         if (tvList.find(nextRecording->cardid) == tvList.end())
         {
-            cerr << "cardid is higher than number of cards.\n";
+            cerr << "cardid: " << nextRecording->cardid 
+                 << " isn't in the databae of capture cards.\n";
             exit(0);
         }
         nexttv = tvList[nextRecording->cardid];

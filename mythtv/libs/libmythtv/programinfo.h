@@ -56,6 +56,7 @@ class ProgramInfo
     int sourceid;
     int inputid;
     int cardid;
+    bool conflictfixed;
 };
 
 ProgramInfo *GetProgramAtDateTime(QString channel, const QString &time);

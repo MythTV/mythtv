@@ -59,32 +59,31 @@ void Scheduler::setupCards(void)
     if (query.isActive())
     {
         numsources = query.numRowsAffected();
-        numCardsPerSource.resize(numsources);
-        sourceToInput.resize(numsources);
 
-        int i = 0;
+        int source = 0;
 
         while (query.next())
         {
+            source = query.value(0).toInt();
+
             thequery = QString("SELECT cardinputid FROM cardinput WHERE "
-                               "sourceid = %1 ORDER BY cardid;")
-                              .arg(query.value(0).toInt());
+                               "sourceid = %1 ORDER BY cardinputid;")
+                              .arg(source);
             subquery = db->exec(thequery);
-          
+            
             if (subquery.isActive() && subquery.numRowsAffected() > 0)
             {
-                numCardsPerSource[i] = subquery.numRowsAffected();
+                numInputsPerSource[source] = subquery.numRowsAffected();
  
                 while (subquery.next())
-                    sourceToInput[i].push_back(subquery.value(0).toInt());
+                    sourceToInput[source].push_back(subquery.value(0).toInt());
             }
             else
             {
-                numCardsPerSource[i] = -1;
+                numInputsPerSource[source] = -1;
                 cerr << query.value(1).toString() << " is defined, but isn't "
                      << "attached to a cardinput.\n";
             }
-            i++;
         }
     }
 
@@ -94,7 +93,7 @@ void Scheduler::setupCards(void)
         exit(0);
     }
 
-    thequery = "SELECT cardid FROM cardinput ORDER BY cardinputid;";
+    thequery = "SELECT cardid,cardinputid FROM cardinput ORDER BY cardinputid;";
 
     query = db->exec(thequery);
 
@@ -102,7 +101,7 @@ void Scheduler::setupCards(void)
     {
         while (query.next())
         {
-            inputToCard.push_back(query.value(0).toInt());
+            inputToCard[query.value(1).toInt()] = query.value(0).toInt();
         }  
     }
 }
@@ -450,10 +449,10 @@ void Scheduler::MarkKnownInputs(void)
         ProgramInfo *first = (*i);
         if (first->inputid == -1)
         {
-            if (numCardsPerSource[first->sourceid - 1] == 1)
+            if (numInputsPerSource[first->sourceid] == 1)
             {
-                first->inputid = sourceToInput[first->sourceid - 1][0];
-                first->cardid = inputToCard[first->inputid - 1];
+                first->inputid = sourceToInput[first->sourceid][0];
+                first->cardid = inputToCard[first->inputid];
             }
         }
     }
@@ -874,10 +873,12 @@ list<ProgramInfo *> *Scheduler::CopyList(list<ProgramInfo *> *sourcelist)
         ProgramInfo *first = (*i);
         ProgramInfo *second = new ProgramInfo(*first);
 
+        second->conflictfixed = false;
+
         if (second->cardid <= 0)
         {
-            second->inputid = sourceToInput[first->sourceid - 1][0];
-            second->cardid = inputToCard[second->inputid - 1];
+            second->inputid = sourceToInput[first->sourceid][0];
+            second->cardid = inputToCard[second->inputid];
         }
 
         retlist->push_back(second);
@@ -905,7 +906,7 @@ void Scheduler::DoMultiCard(void)
         {
             numconflicts++;
             allConflictList.push_back(first);
-            if (numCardsPerSource[first->sourceid - 1] == 1) 
+            if (numInputsPerSource[first->sourceid] == 1) 
                 canMoveList.push_back(false);
             else
                 canMoveList.push_back(true);
@@ -928,18 +929,21 @@ void Scheduler::DoMultiCard(void)
         {
             ProgramInfo *second = (*j);
 
-            bool secondmove = (numCardsPerSource[second->sourceid - 1] > 1);
+            bool secondmove = (numInputsPerSource[second->sourceid] > 1);
+
+            if (second->conflictfixed)
+                secondmove = false;
 
             bool fixed = false;
             if (secondmove)
             {
                 int storeinput = second->inputid;
-                int numinputs = numCardsPerSource[second->sourceid - 1];
+                int numinputs = numInputsPerSource[second->sourceid];
 
                 for (int z = 0; z < numinputs; z++)
                 {
-                    second->inputid = sourceToInput[second->sourceid - 1][z];
-                    second->cardid = inputToCard[second->inputid - 1];
+                    second->inputid = sourceToInput[second->sourceid][z];
+                    second->cardid = inputToCard[second->inputid];
 
                     if (!Conflict(first, second))
                     {
@@ -950,19 +954,19 @@ void Scheduler::DoMultiCard(void)
                 if (!fixed)
                 {
                     second->inputid = storeinput;
-                    second->cardid = inputToCard[second->inputid - 1];
+                    second->cardid = inputToCard[second->inputid];
                 }
             }
 
             if (!fixed && firstmove)
             {
                 int storeinput = first->inputid;
-                int numinputs = numCardsPerSource[first->sourceid - 1];
+                int numinputs = numInputsPerSource[first->sourceid];
 
                 for (int z = 0; z < numinputs; z++)
                 {
-                    first->inputid = sourceToInput[first->sourceid - 1][z];
-                    first->cardid = inputToCard[first->inputid - 1];
+                    first->inputid = sourceToInput[first->sourceid][z];
+                    first->cardid = inputToCard[first->inputid];
 
                     if (!Conflict(first, second))
                     {
@@ -973,10 +977,15 @@ void Scheduler::DoMultiCard(void)
                 if (!fixed)
                 {
                     first->inputid = storeinput;
-                    first->cardid = inputToCard[first->inputid - 1];
+                    first->cardid = inputToCard[first->inputid];
                 }
             }
         }
+
+        delete conflictList;
+        conflictList = getConflicting(first, true, copylist);
+        if (!conflictList || conflictList->size() == 0)
+            first->conflictfixed = true;
 
         delete conflictList;
     }

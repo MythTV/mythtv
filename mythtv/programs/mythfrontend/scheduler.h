@@ -3,7 +3,8 @@
 
 class ProgramInfo;
 class QSqlDatabase;
- 
+
+#include <qmap.h> 
 #include <list>
 #include <vector>
 using namespace std;
@@ -65,9 +66,9 @@ class Scheduler
       int numcards;
       int numsources;
 
-      vector<int> numCardsPerSource;
-      vector<vector<int> > sourceToInput;
-      vector<int> inputToCard;
+      QMap<int, int> numInputsPerSource;
+      QMap<int, vector<int> > sourceToInput;
+      QMap<int, int> inputToCard;
 };
 
 #endif
