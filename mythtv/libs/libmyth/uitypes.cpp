@@ -2402,6 +2402,23 @@ void GenericTree::sortBySelectable()
     }
 }
 
+void GenericTree::deleteAllChildren()
+{
+    my_flatened_subnodes.clear();
+    my_ordered_subnodes.clear();
+    my_selected_subnode = NULL;
+    current_ordering_index = -1;
+    my_subnodes.setAutoDelete(true);
+    
+    //
+    //  This may (?) be a memory leak ?
+    //  perhaps we should recursively descend
+    //  and prune from the bottom up (?).
+    //
+    my_subnodes.clear();
+    my_subnodes.setAutoDelete(false);
+}
+
 GenericTree::~GenericTree()
 {
     delete my_attributes;
@@ -2470,7 +2487,6 @@ void UIManagedTreeListType::drawText(QPainter *p,
 
 void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
 {
-
     //  Do nothing if context is wrong;
 
     if(m_context != context)
@@ -2821,6 +2837,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
     //
     //  Debugging, draw edges around bins
     //
+
     /*
     p->setPen(QColor(255,0,0));
     CornerMap::Iterator it;
@@ -2829,6 +2846,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
         p->drawRect(it.data());
     }
     */
+
 }
 
 void UIManagedTreeListType::moveToNode(QValueList<int> route_of_branches)

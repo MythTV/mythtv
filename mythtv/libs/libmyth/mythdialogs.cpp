@@ -6,6 +6,7 @@
 #include <qlayout.h>
 #include <qobjectlist.h>
 #include <qdir.h>
+#include <qregexp.h>
 
 #include <iostream>
 using namespace std;
@@ -453,8 +454,9 @@ void MythProgressDialog::keyPressEvent(QKeyEvent *e)
 }
 
 MythThemedDialog::MythThemedDialog(MythMainWindow *parent, QString window_name,
-                                   QString theme_filename, const char* name)
-                : MythDialog(parent, name)
+                                   QString theme_filename, const char* name,
+                                   bool setsize)
+                : MythDialog(parent, name, setsize)
 {
     setNoErase();
     context = -1;
@@ -1127,5 +1129,318 @@ UIStatusBarType* MythThemedDialog::getUIStatusBarType(const QString &name)
         ++an_it;
     }
     return NULL;
+}
+
+/*
+---------------------------------------------------------------------
+*/
+
+MythPasswordDialog::MythPasswordDialog(QString message,
+                                       bool *success,
+                                       QString target,
+                                       MythMainWindow *parent, 
+                                       const char *name, 
+                                       bool)
+                   :MythDialog(parent, name, false)
+{
+    success_flag = success;
+    target_text = target;
+
+    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+    this->setGeometry((screenwidth - 250 ) / 2,
+                      (screenheight - 50 ) / 2,
+                      300,50);
+    QFrame *outside_border = new QFrame(this);
+    outside_border->setGeometry(0,0,300,50);
+    outside_border->setFrameStyle(QFrame::Panel | QFrame::Raised );
+    outside_border->setLineWidth(4);
+    QLabel *message_label = new QLabel(message, this);
+    message_label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    message_label->setGeometry(15,10,130,30);
+    message_label->setBackgroundOrigin(ParentOrigin);
+    password_editor = new MythLineEdit(this);
+    password_editor->setEchoMode(QLineEdit::Password);
+    password_editor->setGeometry(150,10,135,30);
+    password_editor->setBackgroundOrigin(ParentOrigin);
+    connect(password_editor, SIGNAL(textChanged(const QString &)),
+            this, SLOT(checkPassword(const QString &)));
+
+    this->setActiveWindow();
+    password_editor->setFocus();
+    
+}
+
+void MythPasswordDialog::checkPassword(const QString &the_text)
+{
+    if(the_text == target_text)
+    {
+        *success_flag = true;
+        done(0);
+    }
+    else
+    {
+        //  Oh to beep 
+    }
+}
+
+MythPasswordDialog::~MythPasswordDialog()
+{
+    if(password_editor)
+    {
+        delete password_editor;
+    }
+}
+
+/*
+---------------------------------------------------------------------
+*/
+
+MythImageFileDialog::MythImageFileDialog(QString *result,
+                                         QString top_directory,
+                                         MythMainWindow *parent, 
+                                         QString window_name,
+                                         QString theme_filename,
+                                         const char *name, 
+                                         bool setsize)
+                   :MythThemedDialog(parent, 
+                                     window_name, 
+                                     theme_filename,
+                                     name,
+                                     setsize)
+{
+    selected_file = result;
+    //
+    //  MythImageFileDialog's expect there to be certain
+    //  elements in the theme, or they will fail.
+    //
+
+    //
+    //  For example, we use the size of the background
+    //  pixmap to define the geometry of the dialog. If
+    //  the pixmap ain't there, we need to fail.
+    //
+    
+
+    UIImageType *file_browser_background = getUIImageType("file_browser_background");
+    if(file_browser_background)
+    {
+        QPixmap background = file_browser_background->GetImage();
+        
+        this->setFixedSize(QSize(background.width(), background.height()));
+        this->move((screenwidth - background.width()) / 2,
+                   (screenheight - background.height()) / 2);
+    }
+    else
+    {
+        cerr << "myhdialogs.o: Could not find a UIImageType called file_browser_background in your theme." << endl;
+        exit(0);
+    }
+
+    //
+    //  Make a nice border
+    //
+
+    this->setFrameStyle(QFrame::Panel | QFrame::Raised );
+    this->setLineWidth(4);
+
+
+    //
+    //  Find the managed tree list that handles browsing.
+    //  Fail if we can't find it.
+    //
+
+    file_browser = getUIManagedTreeListType("file_browser");
+    if(file_browser)
+    {
+        file_browser->calculateScreenArea();
+        file_browser->showWholeTree(true);
+        connect(file_browser, SIGNAL(nodeSelected(int, IntVector*)),
+                this, SLOT(handleTreeListSelection(int, IntVector*)));
+        connect(file_browser, SIGNAL(nodeEntered(int, IntVector*)),
+                this, SLOT(handleTreeListEntered(int, IntVector*)));
+    }
+    else
+    {
+        cerr << "mythdialogs.o: Could not find a UIManagedTreeListType called file_browser in your theme." << endl;
+        exit(0);
+    }    
+    
+    //
+    //  Find the UIImageType for previewing
+    //  No image_box, no preview.
+    //
+    
+    image_box = getUIImageType("image_box");
+    if(image_box)
+    {
+        image_box->calculateScreenArea();
+    }
+    
+    image_files.clear();
+    buildTree(top_directory);
+
+    file_browser->assignTreeData(file_root);
+    file_browser->enter();
+    file_browser->refresh();
+    
+}
+
+void MythImageFileDialog::keyPressEvent(QKeyEvent *e)
+{
+    switch(e->key())
+    {
+        case Key_Up:       file_browser->moveUp();             break;
+        case Key_Down:     file_browser->moveDown();           break;
+        case Key_Left:     file_browser->popUp();              break;
+        case Key_Right:    file_browser->pushDown();           break;
+        case Key_PageUp:   file_browser->pageUp();             break;
+        case Key_PageDown: file_browser->pageDown();           break;
+        
+        case Key_Space:
+        case Key_Enter:
+        case Key_Return:   file_browser->select();             break;
+        
+        default:           MythThemedDialog::keyPressEvent(e); break;
+    }
+}
+
+void MythImageFileDialog::buildTree(QString starting_where)
+{
+    buildFileList(starting_where);
+    
+    file_root = new GenericTree("Image Files", -1, false);
+
+    //
+    //  Go through the files and build a tree
+    //    
+    for(uint i = 0; i < image_files.count(); ++i)
+    {
+        QString file_string = *(image_files.at(i));
+        QString prefix = gContext->GetSetting("VideoStartupDir");
+        if(prefix.length() < 1)
+        {
+            cerr << "mythdialogs.o: Seems unlikely that this is going to work" << endl;
+        }
+        file_string.remove(0, prefix.length());
+        QStringList list(QStringList::split("/", file_string));
+        GenericTree *where_to_add;
+        where_to_add = file_root;
+        int a_counter = 0;
+        QStringList::Iterator an_it = list.begin();
+        for( ; an_it != list.end(); ++an_it)
+        {
+            if(a_counter + 1 >= (int) list.count())
+            {
+                QString title = (*an_it);
+                where_to_add->addNode(title.section(".",0,0), i, true);
+            }
+            else
+            {
+                QString dirname = *an_it + "/";
+                GenericTree *sub_node;
+                sub_node = where_to_add->getChildByName(dirname);
+                if(!sub_node)
+                {
+                    sub_node = where_to_add->addNode(dirname, -1, false);
+                }
+                where_to_add = sub_node;
+            }
+            ++a_counter;
+        }
+    }
+    if(file_root->childCount() < 1)
+    {
+        //
+        //  Nothing survived the requirements
+        //
+        file_root->addNode("No files found", -1, false);
+    }
+}
+
+void MythImageFileDialog::buildFileList(QString directory)
+{
+    QStringList imageExtensions = QImage::inputFormatList();
+
+    QDir d(directory);
+       
+    if (!d.exists())
+        return;
+
+    const QFileInfoList *list = d.entryInfoList();
+
+    if (!list)
+        return;
+
+    QFileInfoListIterator it(*list);
+    QFileInfo *fi;
+    QRegExp r;
+    while ((fi = it.current()) != 0)
+    {
+        ++it;
+        if (fi->fileName() == "." ||
+            fi->fileName() == ".." )
+        {
+            continue;
+        }
+            
+        if(fi->isDir())
+        {
+            buildFileList(fi->absFilePath());
+        }
+        else
+        {
+            r.setPattern("^" + fi->extension() + "$");
+            r.setCaseSensitive(false);
+            QStringList result = imageExtensions.grep(r);
+            if(!result.isEmpty())
+            {
+                image_files.append(fi->absFilePath());
+            }
+            else
+            {
+                r.setPattern("^" + fi->extension());
+                r.setCaseSensitive(false);
+                QStringList other_result = imageExtensions.grep(r);
+                if(!result.isEmpty())
+                {
+                    image_files.append(fi->absFilePath());
+                }
+            }
+        }
+    }                                                                                                                                                                                                                                                               
+}
+
+void MythImageFileDialog::handleTreeListEntered(int type, IntVector*)
+{
+    if(image_box)
+    {
+        if(type > -1)
+        {
+            image_box->SetImage(image_files[type]);
+        }
+        else
+        {
+            image_box->SetImage("");
+        }
+        image_box->LoadImage();
+    }
+}
+
+void MythImageFileDialog::handleTreeListSelection(int type, IntVector*)
+{
+    if(type > -1)
+    {
+        *selected_file = image_files[type];
+        done(0);
+    }   
+}
+
+MythImageFileDialog::~MythImageFileDialog()
+{
+    if(file_root)
+    {
+        file_root->deleteAllChildren();
+        delete file_root;
+    }
 }
 

@@ -527,6 +527,7 @@ class GenericTree
     GenericTree*  getChildByName(QString a_name);
     void          sortByString();
     void          sortBySelectable();
+    void          deleteAllChildren();
 
   private:
 

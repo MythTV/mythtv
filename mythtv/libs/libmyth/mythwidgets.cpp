@@ -500,7 +500,7 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
             //
 
         case Key_1:
-            cycleKeys("_X-/.?()1");
+            cycleKeys("_X%-/.?()1");
             handled = true;
             break;
 

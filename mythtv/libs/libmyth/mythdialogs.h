@@ -29,6 +29,7 @@ class UIBlackHoleType;
 class UIImageType;
 class UIStatusBarType;
 class LayerSet;
+class GenericTree;
 
 const int kExternalKeycodeEventType = 33213;
 
@@ -144,7 +145,8 @@ class MythThemedDialog : public MythDialog
     Q_OBJECT
   public:
     MythThemedDialog(MythMainWindow *parent, QString window_name,
-                     QString theme_filename = "", const char *name = 0);
+                     QString theme_filename = "", const char *name = 0,
+                     bool setsize = true);
    ~MythThemedDialog();
 
     virtual void loadWindow(QDomElement &);
@@ -184,17 +186,96 @@ class MythThemedDialog : public MythDialog
     void paintEvent(QPaintEvent* e);
     UIType              *widget_with_current_focus;
 
+    //
+    //  These need to be just "protected"
+    //  so that subclasses can mess with them
+    //
+
+    QPixmap my_background;
+    QPixmap my_foreground;
+
   private:
 
     XMLParse *theme;
     QDomElement xmldata;
-    QPixmap my_background;
-    QPixmap my_foreground;
     int context;
 
     QPtrList<LayerSet>  my_containers;
     QPtrList<UIType>    focus_taking_widgets;
 };
+
+class MythPasswordDialog: public MythDialog
+{
+  Q_OBJECT
+
+    //
+    //  Very simple class, not themeable
+    //
+
+  public:
+
+    MythPasswordDialog( QString message,
+                        bool *success,
+                        QString target,
+                        MythMainWindow *parent, 
+                        const char *name = 0, 
+                        bool setsize = true);
+    ~MythPasswordDialog();
+
+  public slots:
+  
+    void checkPassword(const QString &);
+
+  private:
+  
+    MythLineEdit        *password_editor;
+    QString             target_text;
+    bool                *success_flag;
+};
+
+
+class MythImageFileDialog: public MythThemedDialog
+{
+    //
+    //  Simple little popup dialog (themeable)
+    //  that lets a user find files/directories
+    //
+
+    Q_OBJECT
+
+  public:
+
+    typedef QValueVector<int> IntVector;
+    
+    MythImageFileDialog(QString *result,
+                        QString top_directory,
+                        MythMainWindow *parent, 
+                        QString window_name,
+                        QString theme_filename = "", 
+                        const char *name = 0,
+                        bool setsize=true);
+    ~MythImageFileDialog();
+
+  public slots:
+  
+    void handleTreeListSelection(int, IntVector*);
+    void handleTreeListEntered(int, IntVector*);
+    void buildTree(QString starting_where);
+    void buildFileList(QString directory);
+
+  protected:
+  
+    void keyPressEvent(QKeyEvent *e);
+
+  private:
+
+    QString               *selected_file;
+    UIManagedTreeListType *file_browser;
+    GenericTree           *file_root;
+    UIImageType           *image_box;
+    QStringList           image_files;
+};
+
 
 #endif
 
