@@ -1094,7 +1094,8 @@ void TV::ProcessKeypress(int keypressed)
             {
                 if (!was_doing_ff_rew)
                 {
-                    if (nvp->GetBookmark())
+                    if (gContext->GetNumSetting("ClearSavedPosition", 1)
+			&& nvp->GetBookmark())
                         nvp->ClearBookmark(); 
                     else
                         nvp->SetBookmark(); 

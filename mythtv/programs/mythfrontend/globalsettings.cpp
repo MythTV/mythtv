@@ -514,8 +514,8 @@ public:
        setLabel("Clear Saved Position");
        setValue(true);
        setHelpText("Automatically clear saved position on a recording "
-                   "when the recording is played back.  If UNset, the "
-                   "saved position must be unset manually.");
+                   "when the recording is played back.  If UNset, you can "
+                   "mark the beginning with rewind then save position.");
     };
 };
 
