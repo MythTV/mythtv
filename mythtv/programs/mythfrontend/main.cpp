@@ -914,7 +914,11 @@ int main(int argc, char **argv)
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
-    gContext->Init();
+    if(!gContext->Init())
+    {
+        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        return -1;
+    }
 
     // Create priveleged thread, then drop privs
     pthread_t priv_thread;
@@ -926,18 +930,6 @@ int main(int argc, char **argv)
         priv_thread = 0;
     }
     setuid(getuid());
-
-    //if (!db)
-    //{
-    //    printf("Couldn't connect to database\n");
-    //    return -1;
-    //}
-
-    if (!MSqlQuery::testDBConnection())
-    {
-        printf("couldn't open db\n");
-        return -1;
-    }
 
     if (!UpgradeTVDatabaseSchema())
     {

@@ -72,7 +72,11 @@ int main(int argc, char *argv[])
 
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
-    gContext->Init();
+    if (!gContext->Init())
+    {
+        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        return -1;
+    }
 
     // Create priveleged thread, then drop privs
     pthread_t priv_thread;
@@ -95,20 +99,6 @@ int main(int argc, char *argv[])
         return 44; // exit(44)
     }
     
-    gContext->LoadQtConfig();
-
-    //if (!db)
-    //{
-    //    printf("Couldn't connect to database\n");
-    //    return 45; // exit(45)
-    //}       
-
-    if (!MSqlQuery::testDBConnection())
-    {
-        VERBOSE(VB_IMPORTANT, "Fatal Error 46: Couldn't open the database.");
-        return 46; // exit(46)
-    }
-
     gContext->LoadQtConfig();
 
     QString auddevice = gContext->GetSetting("AudioOutputDevice");

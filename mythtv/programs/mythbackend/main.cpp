@@ -436,15 +436,12 @@ int main(int argc, char **argv)
 
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
-    gContext->Init(false);
-    gContext->SetBackend(true);
-
-    if (!MSqlQuery::testDBConnection())
+    if(!gContext->Init(false))
     {
-        cerr << "Couldn't connect to database\n";
+        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return -1;
     }
-
+    gContext->SetBackend(true);
 
     close(0);
 

@@ -32,16 +32,9 @@ int main(int argc, char **argv)
 
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
-    gContext->Init(false);
-
-    if (!MSqlQuery::testDBConnection())
+    if(!gContext->Init(false))
     {
-        cerr << "Unable to open database.\n" << endl;
-             //<< "Driver error was:" << endl
-             //<< db->lastError().driverText() << endl
-             //<< "Database error was:" << endl
-             //<< db->lastError().databaseText() << endl;
-
+        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return -1;
     }
 

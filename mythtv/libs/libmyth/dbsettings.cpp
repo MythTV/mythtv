@@ -1,8 +1,8 @@
 #include "mythcontext.h"
+#include "mythdbcon.h"
 #include "dbsettings.h"
 #include <qfile.h>
 #include <qdir.h>
-#include <qsqldatabase.h>
 
 class TransientSetting: public TransientStorage, virtual public Configurable {
 public:
@@ -42,8 +42,8 @@ class MythDbSettings1: public VerticalConfigurationGroup {
 public:
     MythDbSettings1();
     
-    void load(QSqlDatabase* db);
-    void save(QSqlDatabase* db);
+    void load();
+    void save();
     
 protected:
     TransientLabel    *info;
@@ -58,8 +58,8 @@ class MythDbSettings2: public VerticalConfigurationGroup {
 public:
     MythDbSettings2();
     
-    void load(QSqlDatabase* db);
-    void save(QSqlDatabase* db);
+    void load();
+    void save();
     
 protected:
     TransientCheckBox *localEnabled;
@@ -113,9 +113,9 @@ MythDbSettings1::MythDbSettings1()
     setUseLabel(false);
     
     info = new TransientLabel();
-    QSqlDatabase *db = QSqlDatabase::database(QSqlDatabase::defaultConnection,
-                                              false);
-    if (db && db->isOpen())
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (query.isConnected())
         info->setValue(QObject::tr("All database settings take effect when "
                                    "you restart this program."));
     else
@@ -231,10 +231,8 @@ MythDbSettings2::MythDbSettings2(void)
     addChild(sub4);
 }
 
-void MythDbSettings1::load(QSqlDatabase* db)
+void MythDbSettings1::load()
 {
-    (void)db;
-    
     DatabaseParams params = gContext->GetDatabaseParams();
     
     if (params.dbHostName.isEmpty() ||
@@ -263,10 +261,8 @@ void MythDbSettings1::load(QSqlDatabase* db)
         dbType->setValue(1);
 }
 
-void MythDbSettings2::load(QSqlDatabase* db)
+void MythDbSettings2::load()
 {
-    (void)db;
-    
     DatabaseParams params = gContext->GetDatabaseParams();
     
     localEnabled->setValue(params.localEnabled);
@@ -278,9 +274,8 @@ void MythDbSettings2::load(QSqlDatabase* db)
     wolCommand->setValue(params.wolCommand);
 }
 
-void MythDbSettings1::save(QSqlDatabase* db)
+void MythDbSettings1::save()
 {
-    (void)db;
     DatabaseParams params = gContext->GetDatabaseParams();
     
     params.dbHostName    = dbHostName->getValue();
@@ -292,9 +287,8 @@ void MythDbSettings1::save(QSqlDatabase* db)
     gContext->SaveDatabaseParams(params);
 }
 
-void MythDbSettings2::save(QSqlDatabase* db)
+void MythDbSettings2::save()
 {
-    (void)db;
     DatabaseParams params = gContext->GetDatabaseParams();
     
     params.localEnabled  = localEnabled->boolValue();

@@ -51,7 +51,7 @@ class MythContextPrivate
     MythContextPrivate(MythContext *lparent);
    ~MythContextPrivate();
 
-    void Init(bool gui);
+    bool Init(bool gui);
     bool IsWideMode() const {return (m_baseWidth == 1280);}
     void SetWideMode() {m_baseWidth = 1280; m_baseHeight = 720;}
     bool IsSquareMode() const {return (m_baseWidth == 800);}
@@ -65,7 +65,7 @@ class MythContextPrivate
     bool WriteSettingsFile(const DatabaseParams &params,
                            bool overwrite = false);
     bool FindSettingsProbs(void);
-//    bool RetryDatabaseConnection(QSqlDatabase *db);
+
     QString getResponse(const QString &query, const QString &def);
     int intResponse(const QString &query, int def);
     bool PromptForDatabaseParams(void);
@@ -177,7 +177,7 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
     m_baseWidth = 800;
 }
 
-void MythContextPrivate::Init(bool gui)
+bool MythContextPrivate::Init(bool gui)
 {
     m_gui = gui;
     LoadDatabaseSettings(false);
@@ -194,14 +194,6 @@ void MythContextPrivate::Init(bool gui)
         m_height = m_width = 0;
     }
 
-    int tmpwidth = parent->GetNumSetting("GuiWidth");
-    int tmpheight = parent->GetNumSetting("GuiHeight");
-
-    if (tmpwidth > 0)
-        m_width = tmpwidth;
-    if (tmpheight > 0)
-        m_height = tmpheight;
-
     serverSock = NULL;
     eventSock = new QSocket(0);
 
@@ -216,6 +208,33 @@ void MythContextPrivate::Init(bool gui)
     display_res = NULL;
 
     m_priv_mutex = new QMutex(true);
+
+    if (!MSqlQuery::testDBConnection())
+    {
+        if (m_gui && PromptForDatabaseParams())
+        {
+            if(!MSqlQuery::testDBConnection())
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    // ---- keep all DB-using stuff below this line ----
+
+    int tmpwidth = parent->GetNumSetting("GuiWidth");
+    int tmpheight = parent->GetNumSetting("GuiHeight");
+
+    if (tmpwidth > 0)
+        m_width = tmpwidth;
+    if (tmpheight > 0)
+        m_height = tmpheight;
+
+    return true;
 }
 
 MythContextPrivate::~MythContextPrivate()
@@ -396,49 +415,6 @@ bool MythContextPrivate::FindSettingsProbs(void)
     return problems;
 }
 
-/* needs to be refitted...
-bool MythContextPrivate::RetryDatabaseConnection(QSqlDatabase *db)
-{
-    while (!parent->OpenDatabase(db, false))
-    {
-        printf("couldn't open db\n");
-        int pause = m_settings->GetNumSetting("WOLsqlReconnectWaitTime", 0);
-        if (pause > 0)
-        {
-            int acttry = 1;
-            int retries = m_settings->GetNumSetting("WOLsqlConnectRetry", 5);
-
-            QString WOLsqlCommand = m_settings->GetSetting("WOLsqlCommand", 
-                                                   "echo \'WOLsqlServerCommand "
-                                                   "not set\nPlease do so in "
-                                                   "your mysql.txt!\'");
-
-            if (!WOLsqlCommand.isEmpty())
-            {
-                while (acttry <= retries && !parent->OpenDatabase(db, false))
-                {
-                    printf("Trying to wakeup SQLserver (Try %d of %d)\n",
-                           acttry, retries);
-                    system(WOLsqlCommand);
-                    sleep(pause);
-                    ++acttry;
-                }
-            }
-
-            if (WOLsqlCommand.isEmpty() || (acttry > retries))
-            {
-                printf("Sorry, couldn't open db\n");
-                if (!PromptForDatabaseParams())
-                    return false;
-            }
-        }
-        else if (!PromptForDatabaseParams())
-            return false;
-    }
-    return true;
-}
-*/
-
 QString MythContextPrivate::getResponse(const QString &query,
                                         const QString &def)
 {
@@ -489,9 +465,10 @@ bool MythContextPrivate::PromptForDatabaseParams(void)
         m_settings->SetSetting("Style", "Windows");
 #endif
         parent->LoadQtConfig();
+   
         MythMainWindow *mainWindow = new MythMainWindow();
         parent->SetMainWindow(mainWindow);
-    
+
         // ask user for language settings
         LanguageSettings::prompt();
         LanguageSettings::load("mythfrontend");
@@ -501,7 +478,7 @@ bool MythContextPrivate::PromptForDatabaseParams(void)
         accepted = (settings.exec() == QDialog::Accepted);
         if (!accepted)
             VERBOSE(VB_IMPORTANT, "User canceled database configuration");
-    
+
         // tear down temporary main window
         delete mainWindow;
     }
@@ -575,10 +552,11 @@ MythContext::MythContext(const QString &binversion)
 
 }
 
-void MythContext::Init(bool gui)
+bool MythContext::Init(bool gui)
 {
 
-    d->Init(gui);
+    if (!d->Init(gui))
+        return false;
 
     connect(d->eventSock, SIGNAL(connected()), 
             this, SLOT(EventSocketConnected()));
@@ -586,6 +564,8 @@ void MythContext::Init(bool gui)
             this, SLOT(EventSocketRead()));
     connect(d->eventSock, SIGNAL(connectionClosed()), 
             this, SLOT(EventSocketClosed()));
+
+    return true;
 }
 
 MythContext::~MythContext()
@@ -1269,23 +1249,31 @@ void MythContext::SaveSetting(const QString &key, int newValue)
 void MythContext::SaveSetting(const QString &key, const QString &newValue)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare("DELETE FROM settings WHERE value = :KEY "
-                  "AND hostname = :HOSTNAME ;");
-    query.bindValue(":KEY", key);
-    query.bindValue(":HOSTNAME", d->m_localhostname);
+    if (query.isConnected())
+    {
+        query.prepare("DELETE FROM settings WHERE value = :KEY "
+                      "AND hostname = :HOSTNAME ;");
+        query.bindValue(":KEY", key);
+        query.bindValue(":HOSTNAME", d->m_localhostname);
+        
+        if (!query.exec() || !query.isActive())
+                MythContext::DBError("Clear setting", query);
     
-    if (!query.exec() || !query.isActive())
-            MythContext::DBError("Clear setting", query);
-
-    query.prepare("INSERT settings ( value, data, hostname ) "
-                  "VALUES ( :VALUE, :DATA, :HOSTNAME );");
-    query.bindValue(":VALUE", key);
-    query.bindValue(":DATA", newValue);
-    query.bindValue(":HOSTNAME", d->m_localhostname);
-    
-    if (!query.exec() || !query.isActive())
-            MythContext::DBError("Save new setting", query);
+        query.prepare("INSERT settings ( value, data, hostname ) "
+                      "VALUES ( :VALUE, :DATA, :HOSTNAME );");
+        query.bindValue(":VALUE", key);
+        query.bindValue(":DATA", newValue);
+        query.bindValue(":HOSTNAME", d->m_localhostname);
+        
+        if (!query.exec() || !query.isActive())
+                MythContext::DBError("Save new setting", query);
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, 
+             QString("Database not open while trying to save setting: %1")
+                                .arg(key));
+    }
 
 }
 
@@ -1295,22 +1283,11 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
     QString value;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    
-    QString querystr = QString("SELECT data FROM settings WHERE value = '%1' "
-                               "AND hostname = '%2';")
-                               .arg(key).arg(d->m_localhostname);
-    query.exec(querystr);
-
-    if (query.isActive() && query.size() > 0)
+    if (query.isConnected())
     {
-        query.next();
-        value = QString::fromUtf8(query.value(0).toString());
-        found = true;
-    }
-    else
-    {
-        querystr = QString("SELECT data FROM settings WHERE value = '%1' AND "
-                           "hostname IS NULL;").arg(key);
+        QString querystr = QString("SELECT data FROM settings WHERE value "
+                                   " = '%1' AND hostname = '%2';")
+                                  .arg(key).arg(d->m_localhostname);
         query.exec(querystr);
 
         if (query.isActive() && query.size() > 0)
@@ -1319,6 +1296,25 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
             value = QString::fromUtf8(query.value(0).toString());
             found = true;
         }
+        else
+        {
+            querystr = QString("SELECT data FROM settings WHERE value = '%1' AND "
+                               "hostname IS NULL;").arg(key);
+            query.exec(querystr);
+
+            if (query.isActive() && query.size() > 0)
+            {
+                query.next();
+                value = QString::fromUtf8(query.value(0).toString());
+                found = true;
+            }
+        }
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, 
+             QString("Database not open while trying to load setting: %1")
+                                .arg(key));
     }
 
     if (found)
@@ -1341,16 +1337,25 @@ QString MythContext::GetSettingOnHost(const QString &key, const QString &host,
     QString value = defaultval;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT data FROM settings WHERE value = :VALUE "
-                  "AND hostname = :HOSTNAME ;");
-    query.bindValue(":VALUE", key);
-    query.bindValue(":HOSTNAME", host);
-
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.isConnected())
     {
-        query.next();
-        value = query.value(0).toString();
-        found = true;
+        query.prepare("SELECT data FROM settings WHERE value = :VALUE "
+                      "AND hostname = :HOSTNAME ;");
+        query.bindValue(":VALUE", key);
+        query.bindValue(":HOSTNAME", host);
+
+        if (query.exec() && query.isActive() && query.size() > 0)
+        {
+            query.next();
+            value = query.value(0).toString();
+            found = true;
+        }
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, 
+             QString("Database not open while trying to load setting: %1")
+                                .arg(key));
     }
 
     return value;

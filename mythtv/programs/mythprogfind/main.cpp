@@ -15,11 +15,9 @@ int main(int argc, char **argv)
 
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
-    gContext->Init(false);
-
-    if (!MSqlQuery::testDBConnection())
+    if(!gContext->Init(false))
     {
-        printf("couldn't open db\n");
+        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return -1;
     }
 

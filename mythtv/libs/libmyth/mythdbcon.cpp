@@ -37,12 +37,12 @@ bool MSqlDatabase::OpenDatabase()
 {
     if (!m_db)
     {
-        VERBOSE(VB_IMPORTANT, 
+        VERBOSE(VB_IMPORTANT,
               "MSqlDatabase::OpenDatabase(), db object is NULL!");
         return false;
     }
 
-    bool res = true;
+    bool connected = true;
     
     if (!m_db->isOpen())
     {
@@ -51,16 +51,37 @@ bool MSqlDatabase::OpenDatabase()
         m_db->setUserName(dbparms.dbUserName);
         m_db->setPassword(dbparms.dbPassword);
         m_db->setHostName(dbparms.dbHostName);
-        res = m_db->open();
+        connected = m_db->open();
+
+        if (!connected && dbparms.wolEnabled)
+        {
+            int trycount = 0;
+                
+            while (!connected && trycount++ < dbparms.wolRetry)
+            {
+                VERBOSE(VB_GENERAL, QString(
+                         "Using WOL to wakeup database server (Try %1 of %2)")
+                         .arg(trycount).arg(dbparms.wolRetry));
+
+                system(dbparms.wolCommand);
+                sleep(dbparms.wolReconnect);
+                connected = m_db->open();
+            }
+    
+            if (!connected)
+            {
+                VERBOSE(VB_IMPORTANT, "WOL failed, unable to connect to database!");
+            }
+        }
     }
 
-    if (!res)
+    if (!connected)
     {
         VERBOSE(VB_IMPORTANT, "Unable to connect to database!");
         VERBOSE(VB_IMPORTANT, MythContext::DBErrorMessage(m_db->lastError()));
     }
 
-    return res;
+    return connected;
 }
 
 bool MSqlDatabase::KickDatabase()

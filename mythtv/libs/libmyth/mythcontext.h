@@ -143,7 +143,7 @@ class MythContext : public QObject
     MythContext(const QString &binversion);
     virtual ~MythContext();
 
-    void Init(bool gui = true);
+    bool Init(bool gui = true);
 
     QString GetMasterHostPrefix(void);
 
