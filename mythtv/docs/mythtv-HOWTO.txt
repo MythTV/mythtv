@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-01-29, v1.084
+  2003-01-29, v1.085
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -28,8 +28,9 @@
 
   4. Setting up paths, ldconfig and other shell variables.
      4.1 Distribution-specific information.
-        4.1.1 Red Hat Linux 8.0
-     4.2 Checking that it worked.
+        4.1.1 Mandrake 9.0
+        4.1.2 Red Hat Linux 8.0
+     4.2 Checking QTDIR and the PATH.
      4.3 Modifying /etc/ld.so.conf
 
   5. Downloading and compiling.
@@ -138,6 +139,7 @@
        $ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/cvs checkout MC
 
   This documentation will be in the docs/ subdirectory.
+
   [1mNOTE[22m: If you are going to use CVS to compile MythTV rather than using
   the distribution tarballs, it is [1mstrongly [22mrecommended that you join
   <http://www.snowman.net/mailman/listinfo/mythtv-commits/> the mythtv-
@@ -202,6 +204,7 @@
   supports multiple encoder cards in a single PC, thereby increasing the
   CPU requirements if you plan on simultaneously encoding multiple
   programs.
+
   Here are a few data points:
 
   +o  A PIII/733Mhz system can encode one video stream using the RTJPEG
@@ -378,8 +381,8 @@
 
   The "ls -l" command will show you a directory listing.  There should
   be two files, one will be named "qt3" and the other will be
-  "qt3-devel".  The full filenames will vary, so one you know the
-  filename, you can install them with
+  "qt3-devel".  The full filenames will vary, so one you know the file-
+  name, you can install them with
 
        # rpm -Uvh [filename1]
        # rpm -Uvh [filename2]
@@ -422,7 +425,7 @@
   locate the "USE" variable. If the line is commented out, remove the
   comment. The line should have at least:
 
-       USE="mysql qt alsa"
+  USE="mysql qt alsa"
 
   Next you need to build KDE. If you don't plan on using the ebuilds as
   described in the Gentoo section then you also need to install lame.
@@ -445,11 +448,16 @@
 
   [1m4.  Setting up paths, ldconfig and other shell variables.[0m
 
-  There are some paths that need to be modified before starting the main
-  compile of MythTV, otherwise you will get errors.
+  There are modifications that need to be made to your system before you
+  start compiling.
 
   QTDIR needs to be set, and /usr/lib/qt3/bin must be added to your
-  path.
+  path.  Your distribution may already be making these changes as a part
+  of the installation of the software pre-requisites detailed earlier.
+
+  [1m4.1.  Distribution-specific information.[0m
+
+  [1m4.1.1.  Mandrake 9.0[0m
 
   The following instructions work for Mandrake 9.0 using bash as the
   shell, and may be applicable for a distribution which uses
@@ -461,23 +469,21 @@
   Open a shell, and switch to superuser mode.  [1mNOTE: ^D [22mmeans press [1mCTRL[0m
   and [1md [22mat the same time.
 
-       $ su
-       # cd /etc/profile.d
-       cat > mythtv.sh
-       export QTDIR=/usr/lib/qt3
-       export PATH=$PATH:/usr/lib/qt3/bin
-       ^D
+  $ su
+  # cd /etc/profile.d
+  cat > mythtv.sh
+  export QTDIR=/usr/lib/qt3
+  export PATH=$PATH:/usr/lib/qt3/bin
+  ^D
 
-       # chmod a+x mythtv.sh
-       # exit
-       $ exit
+  # chmod a+x mythtv.sh
+  # exit
+  $ exit
 
   The last two commands are to exit out of the shell.  This way, when
   you next open a shell your new commands will take effect.
 
-  [1m4.1.  Distribution-specific information.[0m
-
-  [1m4.1.1.  Red Hat Linux 8.0[0m
+  [1m4.1.2.  Red Hat Linux 8.0[0m
 
   Red Hat Linux 8.0 uses an unusual character encoding scheme which
   causes problems when running certain programs. As a result, whenever
@@ -498,7 +504,7 @@
        ^D
        $ exit
 
-  [1m4.2.  Checking that it worked.[0m
+  [1m4.2.  Checking QTDIR and the PATH.[0m
 
   Open a new shell and switch to superuser mode.
 
@@ -509,7 +515,7 @@
        QTDIR=/usr/lib/qt3
        PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
 
-  You should see QTDIR and the path changes you made.
+  You should see QTDIR and /usr/lib/qt3/bin in your path.
 
   If you don't, do not proceed past this step until you have resolved
   this error.  You may need to manually specify the QTDIR and PATH at
@@ -522,14 +528,14 @@
 
   Switch to /etc and execute the following:
 
-  # cd /etc
-  # cat >> ld.so.conf
-  /usr/local/lib
-  ^D
+       # cd /etc
+       # cat >> ld.so.conf
+       /usr/local/lib
+       ^D
 
-  # /sbin/ldconfig
-  # exit
-  $
+       # /sbin/ldconfig
+       # exit
+       $
 
   [1mNOTE[22m:  It appears that Red Hat Linux 8.0 requires that the [1mldconfig[0m
   command needs to be run twice. Red Hat will also frequently "forget"
@@ -571,13 +577,13 @@
 
   Open a shell and switch to the directory where you saved lame.
 
-       $ tar -xzf lame-3.93.1.tar.gz
-       $ cd lame-3.93.1
-       $ ./configure
-       $ make
-       $ make test
-       $ su
-       # make install
+  $ tar -xzf lame-3.93.1.tar.gz
+  $ cd lame-3.93.1
+  $ ./configure
+  $ make
+  $ make test
+  $ su
+  # make install
 
   Check that it worked:
 
@@ -616,15 +622,15 @@
 
   Open a shell prompt:
 
-       $ tar -xzf expat-1.95.5.tar.gz
-       $ cd expat-1.95.5
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # /sbin/ldconfig
-       # exit
-       $
+  $ tar -xzf expat-1.95.5.tar.gz
+  $ cd expat-1.95.5
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # /sbin/ldconfig
+  # exit
+  $
 
   [1mNOTE[22m:  Red Hat Linux 8.0 users, make sure that you set your LANG as
   described in ``Section 4''.
@@ -772,7 +778,7 @@
 
   [1m6.4.2.  Debian 3.0[0m
 
-  $ mysql < mc.sql
+       $ mysql < mc.sql
 
   [1m6.4.3.  Red Hat Linux 8.0[0m
 
@@ -869,15 +875,15 @@
 
   Start with the alsa-driver package:
 
-       $ tar -xjf alsa-driver-0.9.x.tar.bz2
-       $ cd alsa-driver-0.9.x
-       $ ./configure --with-cards=XXX --with-sequencer=yes
-       $ make
-       $ su
-       # make install
-       # ./snddevices
-       # exit
-       $
+  $ tar -xjf alsa-driver-0.9.x.tar.bz2
+  $ cd alsa-driver-0.9.x
+  $ ./configure --with-cards=XXX --with-sequencer=yes
+  $ make
+  $ su
+  # make install
+  # ./snddevices
+  # exit
+  $
 
   This will compile and install the kernel modules and initialization
   scripts, as well as create device nodes in /dev.
@@ -1014,15 +1020,15 @@
 
   Next, open a shell and login as superuser.
 
-       $ su
-       # mkdir /usr/src
-       # mv linux-2.4.19.tar.bz2 /usr/src
-       # cd /usr/src
-       # tar -xjf linux-2.4.19.tar.bz2
-       # chown -R root.root linux-2.4.19
-       # ln -sf linux-2.4.19 linux
-       # exit
-       $
+  $ su
+  # mkdir /usr/src
+  # mv linux-2.4.19.tar.bz2 /usr/src
+  # cd /usr/src
+  # tar -xjf linux-2.4.19.tar.bz2
+  # chown -R root.root linux-2.4.19
+  # ln -sf linux-2.4.19 linux
+  # exit
+  $
 
   [1m8.3.  Red Hat Linux 8.0[0m
 
@@ -1030,10 +1036,10 @@
   package you installed in section 3.2. Ensure that a symlink has been
   created:
 
-  $ cd /usr/src
-  $ su
-  # ln -s linux-2.4.18-x.x.x linux
-  # exit
+       $ cd /usr/src
+       $ su
+       # ln -s linux-2.4.18-x.x.x linux
+       # exit
 
   [1m8.4.  Obtaining and compiling lirc.[0m
 
@@ -1066,7 +1072,6 @@
   you will have to load the lirc_serial module. If you did not get any
   such messages skip the kernel recompile steps below and go directly to
   making and installing the lirc driver.
-
   Once the configuration step is complete:
 
        $ make
@@ -1113,11 +1118,11 @@
   Only change things you know you can change. If you are not sure, just
   stick to the one required change. Click "save and exit".  Next:
 
-       # make dep
-       # make clean
-       # make bzImage modules
-       # make modules_install
-       # make install
+  # make dep
+  # make clean
+  # make bzImage modules
+  # make modules_install
+  # make install
 
   if you are using [1mgrub[22m, that should be it, reboot and select your
   custom kernel upon boot. If you are using [1mlilo[22m, change your lilo
@@ -1135,7 +1140,7 @@
   /etc/modules.conf file. Add this line as the first thing in the file.
   It must come first, or it may not work.
 
-  alias char-major-61 XXX
+       alias char-major-61 XXX
 
   replace XXX with the name which you determined earlier, which in this
   example was "lirc_serial"
@@ -1174,13 +1179,13 @@
   Now, we're going to add the commands necessary for lircd to run each
   time we boot:
 
-  # cd /etc/rc.d
-  # cat >> rc.local
-  echo "Starting lircd"
-  /usr/local/sbin/lircd
-  ^D
-  # exit
-  $
+       # cd /etc/rc.d
+       # cat >> rc.local
+       echo "Starting lircd"
+       /usr/local/sbin/lircd
+       ^D
+       # exit
+       $
 
   This takes care of the lircd portion, which "listens" for the IR sig-
   nals. If everything went well, the install script for lircd put an
@@ -1255,17 +1260,17 @@
   rather than "ChannelUp" and "ChannelDown".  I added the following to
   my /home/[yourusername]/.lircrc file:
 
-       begin
-           prog = irxevent
-           button = channel+
-           config = Key Up CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = channel+
+      config = Key Up CurrentWindow
+  end
 
-       begin
-           prog = irxevent
-           button = channel-
-           config = Key Down CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = channel-
+      config = Key Down CurrentWindow
+  end
 
   which took care of basic functionality.  Because the PCTV Studio
   remote has additional buttons, look at the configfiles/lircrc.exam-
@@ -1304,19 +1309,19 @@
   Depending on whether you have your serial port driver configured as a
   kernel module you might see the following message during make:
 
-       lirc_sir.c:56:2: warning: #warning
-       "******************************************"
+  lirc_sir.c:56:2: warning: #warning
+  "******************************************"
 
-       lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
+  lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
 
-       lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
+  lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
 
-       lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
+  lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
 
-       lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
+  lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
 
-       lirc_sir.c:61:2: warning: #warning
-       "******************************************"
+  lirc_sir.c:61:2: warning: #warning
+  "******************************************"
 
   If you do receive this statement make sure to run the [1msetserial[0m
   command before you load the lirc_sir module. Follow this with the
@@ -1352,10 +1357,10 @@
   being received. If everything is configured correctly you should see
   something similar to the following:
 
-       $ irw
-       0000000000007ff0 00 1 gi-motorola-dct2000
-       000000000000bff8 00 2 gi-motorola-dct2000
-       000000000000f7f0 00 ENTER gi-motorola-dct2000
+  $ irw
+  0000000000007ff0 00 1 gi-motorola-dct2000
+  000000000000bff8 00 2 gi-motorola-dct2000
+  000000000000f7f0 00 ENTER gi-motorola-dct2000
 
   Once you've verified lirc is working you can press [1mCTRL-C [22mto exit [1mirw[0m
   and configure the channel changing script.
@@ -1373,44 +1378,44 @@
   /dev/device. Unlike bourne or bash, csh scripts automatically close
   parent file descriptors before they start.
 
-  $ cd /usr/local/bin
-  # su
-  # cat > change_channel.csh
-  #!/bin/csh
-  echo "changing to $1"
-  /usr/local/bin/channel.pl $1 &
-  ^D
-  # chmod a+x change_channel.csh
-  # exit
-  $ exit
+       $ cd /usr/local/bin
+       # su
+       # cat > change_channel.csh
+       #!/bin/csh
+       echo "changing to $1"
+       /usr/local/bin/channel.pl $1 &
+       ^D
+       # chmod a+x change_channel.csh
+       # exit
+       $ exit
 
   The following file should be saved as /usr/local/bin/channel.pl
 
-       #!/usr/bin/perl
+  #!/usr/bin/perl
 
-       # make sure to set this string to
-       # the corresponding remote in /etc/lircd.conf
-       $remote_name = "gi-motorola-dct2000";
+  # make sure to set this string to
+  # the corresponding remote in /etc/lircd.conf
+  $remote_name = "gi-motorola-dct2000";
 
-       sub change_channel {
-               my($channel_digit) = @_;
-               system ("rc SEND_ONCE $remote_name $channel_digit");
-               sleep 1;
-       }
+  sub change_channel {
+          my($channel_digit) = @_;
+          system ("rc SEND_ONCE $remote_name $channel_digit");
+          sleep 1;
+  }
 
-       $channel=$ARGV[0];
-       sleep 1;
-       if (length($channel) > 2) {
-               change_channel(substr($channel,0,1));
-               change_channel(substr($channel,1,1));
-               change_channel(substr($channel,2,1));
-       } elsif (length($channel) > 1) {
-               change_channel(substr($channel,0,1));
-               change_channel(substr($channel,1,1));
-       } else {
-               change_channel(substr($channel,0,1));
-       }
-       system ("rc SEND_ONCE $remote_name ENTER");
+  $channel=$ARGV[0];
+  sleep 1;
+  if (length($channel) > 2) {
+          change_channel(substr($channel,0,1));
+          change_channel(substr($channel,1,1));
+          change_channel(substr($channel,2,1));
+  } elsif (length($channel) > 1) {
+          change_channel(substr($channel,0,1));
+          change_channel(substr($channel,1,1));
+  } else {
+          change_channel(substr($channel,0,1));
+  }
+  system ("rc SEND_ONCE $remote_name ENTER");
 
   The last statement within the perl script is the lirc rc command. This
   is the command that transmits the code to your cable/dss box. Make
@@ -1530,26 +1535,25 @@
   If you want to know what time your job will run, you can do the
   following:
 
-  # cat /etc/crontab
-  SHELL=/bin/bash
-  PATH=/sbin:/bin:/usr/sbin:/usr/bin
-  MAILTO=root
-  HOME=/
+       # cat /etc/crontab
+       SHELL=/bin/bash
+       PATH=/sbin:/bin:/usr/sbin:/usr/bin
+       MAILTO=root
+       HOME=/
 
-  # run-parts
-  01 * * * * root nice -n 19 run-parts /etc/cron.hourly
-  02 4 * * * root nice -n 19 run-parts /etc/cron.daily
-  22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
-  42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
-  # exit
-  $
+       # run-parts
+       01 * * * * root nice -n 19 run-parts /etc/cron.hourly
+       02 4 * * * root nice -n 19 run-parts /etc/cron.daily
+       22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
+       42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
+       # exit
+       $
 
   We can see from the display that the cron.daily job will run at 0402
   every morning.
 
   If you wish to specify a custom time, then the user-based cron job is
   the better method.
-
   The default [1mconfigfiles/mythcrontab [22mfile will run the [1mmythfilldatabase[0m
   program every day at 0430.  If you want to change this, then open the
   configfiles/mythcrontab file in your favorite editor and modify it as
@@ -1640,7 +1644,7 @@
   have an external tuner, such as a DirecTV or digital cable set top
   box, the following command should be added to your settings.txt file:
 
-  str ExternalChannelCommand=/usr/local/bin/changechannel
+       str ExternalChannelCommand=/usr/local/bin/changechannel
 
   The [1mchangechannel [22mprogram is not supplied with MythTV, so this is
   going to be dependent on what sort of external tuner you have.
@@ -1694,6 +1698,7 @@
 
   [1mNOTE[22m: Make sure that you have a trailing slash on the URL, otherwise
   you will get a 404 Page not Found error.
+
   [1m12.  MythGallery.[0m
 
   MythGallery is a photo and slideshow application.  MythGallery is a
@@ -1706,13 +1711,13 @@
   <http://www.mythtv.org/> and save it to a location where you can find
   it.
 
-       $ tar -xjf mythgallery-0.7.tar.bz2
-       $ cd mythgallery-0.7
-       $ make
-       # su
-       # make install
-       # exit
-       $
+  $ tar -xjf mythgallery-0.7.tar.bz2
+  $ cd mythgallery-0.7
+  $ make
+  # su
+  # make install
+  # exit
+  $
 
   The configuration file for MythGallery is located in
   /usr/local/share/mythtv.  This file needs to be edited:  ensure that
@@ -1803,19 +1808,19 @@
   <http://www.xiph.org/paranoia/download/cdparanoia-III-
   alpha9.8.src.tgz>.
 
-  $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
-  $ cd cdparanoia-III-alpha9.8
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  <!-- see if the next step is a Mandrake only issue -->
-  # cp interface/cdda_interface.h /usr/local/include
-  # cd /usr/lib
-  # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
-  # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
-  # exit
-  $
+       $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
+       $ cd cdparanoia-III-alpha9.8
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       <!-- see if the next step is a Mandrake only issue -->
+       # cp interface/cdda_interface.h /usr/local/include
+       # cd /usr/lib
+       # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
+       # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
+       # exit
+       $
 
   [1m14.2.  Mandrake 9.0[0m
 
@@ -1854,6 +1859,7 @@
 
   The MythWeather module will obtain the weather information for the
   location that you specify.
+
   Change into the MythWeather directory, then make and make install:
 
        $ cd mythweather
@@ -1911,15 +1917,15 @@
 
   These are the keyboard commands for MythWeather:
 
-       Left Key             Goes back one page, and extends the time spent
-                            on the page you are on.
-       Right Key            Goes forward one page, see above.
-       Space                Pause, wait on the current page until space is hit
-                            again.
-       Numeric Keys         You can check other weather by keying in other ZIP codes.
-       Enter Key            Switch between celsius and fahrenheit. Can also
-                            be used a way to force a data update.
-       "m" Key              Resets the location to the database default, then updates the data.
+  Left Key             Goes back one page, and extends the time spent
+                       on the page you are on.
+  Right Key            Goes forward one page, see above.
+  Space                Pause, wait on the current page until space is hit
+                       again.
+  Numeric Keys         You can check other weather by keying in other ZIP codes.
+  Enter Key            Switch between celsius and fahrenheit. Can also
+                       be used a way to force a data update.
+  "m" Key              Resets the location to the database default, then updates the data.
 
   [1m16.  MythVideo[0m
 
@@ -1982,6 +1988,19 @@
 
   will tell you the DMA status for your hard drives.  If you run [1mhdparm[0m
   with the -d1 parameter, it will turn DMA on.
+
+  You may also setup your PC to do this at boot time, either by adding
+  the command to your /etc/rc.local file, or by adding files to
+  /etc/sysconfig.
+
+  On Mandrake and other distributions, if you install hdparm from an RPM
+  you will most likely get a /etc/sysconfig/harddisks file installed.
+  This file will be parsed by the /etc/rc.sysinit script.  If you use
+  the default harddisks file, your changes will affect all IDE devices
+  (including CD ROMs).  If you wish to use different parameters for
+  various devices, rename and/or copy the file to harddiskhda,
+  harddiskhdb, etc.  Edit the file to your liking and on the next reboot
+  your setting will be preserved.
 
   [1m17.5.  I keep losing all of my settings every time I compile![0m
 
@@ -2066,7 +2085,7 @@
   You can also turn off DPMS from the Command Line, but this will not
   survive a reboot.
 
-  $ xset -dpms
+       $ xset -dpms
 
   Using xset +dpms will turn it back on.
 

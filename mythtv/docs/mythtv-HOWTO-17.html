@@ -60,6 +60,18 @@ the <B>hdparm</B> program to check and enable DMA.
 </CODE></BLOCKQUOTE>
  will tell you the DMA status for your hard drives.  If you run
 <B>hdparm</B> with the <CODE>-d1</CODE> parameter, it will turn DMA on.</P>
+<P>You may also setup your PC to do this at boot time, either by adding the
+command to your <CODE>/etc/rc.local</CODE> file, or by adding files to
+/etc/sysconfig.</P>
+<P>On Mandrake and other distributions, if you install hdparm from an RPM you
+will most likely get a <CODE>/etc/sysconfig/harddisks</CODE> file installed. 
+This file will be parsed by the <CODE>/etc/rc.sysinit</CODE> script.  If you use
+the default <CODE>harddisks</CODE> file, your changes will affect all IDE devices
+(including CD ROMs).  If you wish to use different parameters for various
+devices, rename and/or copy the file to <CODE>harddiskhda</CODE>,
+<CODE>harddiskhdb</CODE>, etc.  Edit the file to your liking and on the next
+reboot your setting will be preserved.</P>
+
 <H2><A NAME="ss17.5">17.5</A> <A HREF="mythtv-HOWTO.html#toc17.5">I keep losing all of my settings every time I compile!</A>
 </H2>
 

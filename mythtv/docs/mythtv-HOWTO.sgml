@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-01-29, v1.084
+<date>2003-01-29, v1.085
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -313,13 +313,17 @@ of time, even on a fast machine if you have to do a full KDE build.
 
 <sect>Setting up paths, ldconfig and other shell variables. <label
 id="Setting_up_paths">
-<p>There are some paths that need to be modified before starting the main
-compile of MythTV, otherwise you will get errors.
+<p>There are modifications that need to be made to your system before you
+start compiling.
 
 <tt>QTDIR</tt> needs to be set, and <tt>/usr/lib/qt3/bin</tt> must be added
-to your path.
+to your path.  Your distribution may already be making these changes as a part of the
+installation of the software pre-requisites detailed earlier.
 
-The following instructions work for Mandrake 9.0 using <tt>bash</tt> as the
+<sect1>Distribution-specific information. <label
+id="Distribution-specific_information">
+<sect2>Mandrake 9.0
+<p>The following instructions work for Mandrake 9.0 using <tt>bash</tt> as the
 shell, and may be applicable for a distribution which uses
 <tt>/etc/profile.d</tt>.
 
@@ -344,9 +348,6 @@ $ exit
 The last two commands are to exit out of the shell.  This way, when you next
 open a shell your new commands will take effect.
 
-<sect1>Distribution-specific information. <label
-id="Distribution-specific_information">
-
 <sect2>Red Hat Linux 8.0 <label id="RH80-LANG">
 <!-- Content submitted by Michael D. Cencula" <mike@cencula.com> -->
 <p>Red Hat Linux 8.0 uses an unusual character encoding scheme which causes
@@ -369,7 +370,7 @@ LANG="en_US"
 $ exit
 </verb></tscreen>
 
-<sect1>Checking that it worked. <label id="Checking_that_it_worked">
+<sect1>Checking QTDIR and the PATH. <label id="Checking_that_it_worked">
 <p>Open a new shell and switch to superuser mode.
 <tscreen><verb>
 $ su
@@ -379,7 +380,7 @@ $ su
 QTDIR=/usr/lib/qt3
 PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
 </verb></tscreen>
-You should see QTDIR and the path changes you made.
+You should see QTDIR and <tt>/usr/lib/qt3/bin</tt> in your path.
 
 If you don't, do not proceed past this step until you have resolved this
 error.  You may need to manually specify the QTDIR and PATH at the shell
@@ -1871,6 +1872,22 @@ the <bf>hdparm</bf> program to check and enable DMA.<tscreen><verb>
 # hdparm -d /dev/hd?
 </verb></tscreen> will tell you the DMA status for your hard drives.  If you run
 <bf>hdparm</bf> with the <tt>-d1</tt> parameter, it will turn DMA on.
+<!-- Next section adopted from a post by Dwaine Garden
+dwainegarden@rogers.com to the mailing list. -->
+
+You may also setup your PC to do this at boot time, either by adding the
+command to your <tt>/etc/rc.local</tt> file, or by adding files to
+/etc/sysconfig.
+
+On Mandrake and other distributions, if you install hdparm from an RPM you
+will most likely get a <tt>/etc/sysconfig/harddisks</tt> file installed. 
+This file will be parsed by the <tt>/etc/rc.sysinit</tt> script.  If you use
+the default <tt>harddisks</tt> file, your changes will affect all IDE devices
+(including CD ROMs).  If you wish to use different parameters for various
+devices, rename and/or copy the file to <tt>harddiskhda</tt>,
+<tt>harddiskhdb</tt>, etc.  Edit the file to your liking and on the next
+reboot your setting will be preserved.
+
 <sect1>I keep losing all of my settings every time I compile!
 <p>MythTV will overwrite any settings in <tt>/usr/local/share/mythtv</tt>.
 If you want to make sure that you don't lose your modifications, make a
@@ -2424,6 +2441,9 @@ v1.083, 2003-01-26.  Fixed link to webcvs in section 1.  (Cedar McKay)
 v1.084, 2003-01-29.  Modified section 4 to make it a little clearer. 
 Modified libexpat instructions.  Added fuser for /dev/dsp.  Added resolution
 hints.
+v1.085, 2003-01-29.  Instructions for setting /etc/sysconfig/harddiskhda,
+etc.  Adjusted section 4 again; didn't know that RH8 sets the paths in the
+RPM install.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

@@ -14,10 +14,17 @@
 <HR>
 <H2><A NAME="Setting_up_paths"></A> <A NAME="s4">4.</A> <A HREF="mythtv-HOWTO.html#toc4">Setting up paths, ldconfig and other shell variables. </A></H2>
 
-<P>There are some paths that need to be modified before starting the main
-compile of MythTV, otherwise you will get errors.</P>
+<P>There are modifications that need to be made to your system before you
+start compiling.</P>
 <P><CODE>QTDIR</CODE> needs to be set, and <CODE>/usr/lib/qt3/bin</CODE> must be added
-to your path.</P>
+to your path.  Your distribution may already be making these changes as a part of the
+installation of the software pre-requisites detailed earlier.</P>
+
+<H2><A NAME="Distribution-specific_information"></A> <A NAME="ss4.1">4.1</A> <A HREF="mythtv-HOWTO.html#toc4.1">Distribution-specific information. </A>
+</H2>
+
+<H3>Mandrake 9.0</H3>
+
 <P>The following instructions work for Mandrake 9.0 using <CODE>bash</CODE> as the
 shell, and may be applicable for a distribution which uses
 <CODE>/etc/profile.d</CODE>.</P>
@@ -44,9 +51,6 @@ $ exit
 The last two commands are to exit out of the shell.  This way, when you next
 open a shell your new commands will take effect.</P>
 
-<H2><A NAME="Distribution-specific_information"></A> <A NAME="ss4.1">4.1</A> <A HREF="mythtv-HOWTO.html#toc4.1">Distribution-specific information. </A>
-</H2>
-
 <H3><A NAME="RH80-LANG"></A> Red Hat Linux 8.0 </H3>
 
 <P>Red Hat Linux 8.0 uses an unusual character encoding scheme which causes
@@ -70,7 +74,7 @@ $ exit
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="Checking_that_it_worked"></A> <A NAME="ss4.2">4.2</A> <A HREF="mythtv-HOWTO.html#toc4.2">Checking that it worked. </A>
+<H2><A NAME="Checking_that_it_worked"></A> <A NAME="ss4.2">4.2</A> <A HREF="mythtv-HOWTO.html#toc4.2">Checking QTDIR and the PATH. </A>
 </H2>
 
 <P>Open a new shell and switch to superuser mode.
@@ -85,7 +89,7 @@ PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/ho
 </PRE>
 </CODE></BLOCKQUOTE>
 
-You should see QTDIR and the path changes you made.</P>
+You should see QTDIR and <CODE>/usr/lib/qt3/bin</CODE> in your path.</P>
 <P>If you don't, do not proceed past this step until you have resolved this
 error.  You may need to manually specify the QTDIR and PATH at the shell
 prompt before compiling.</P>
