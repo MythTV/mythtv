@@ -41,7 +41,7 @@ CONFIG += using_x11
 
 # Default Xv support
 CONFIG += using_xv
-EXTRA_LIBS += -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm
+EXTRA_LIBS += $${LOCAL_LIBDIR_X11} -lXinerama -lXv -lX11 -lXext -lXxf86vm
 
 # IVTV (PVR-x50) support
 CONFIG += using_ivtv
@@ -77,6 +77,8 @@ CONFIG += using_oss
 #DEFINES += USING_DVB
 # Note: INCLUDEPATH should point to the directory with
 #   'linux/dvb/frontend.h', not the directory with frontend.h
+# Note: This _must not_ be your linux kernel source includes.  Copy the dvb
+#       includes into a separate directory for now.
 #INCLUDEPATH += /usr/src/linuxtv-dvb-1.0.1/include
 #define the following if you want On Air Guide information
 #DEFINES += USING_DVB_EIT
