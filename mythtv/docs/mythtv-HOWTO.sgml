@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-03-06, v1.102
+<date>2003-03-10, v1.103
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2175,8 +2175,9 @@ you are using the recording function.
 
 A better test to verify that sound will work for MythTV (and recording with
 <bf>xawtv</bf> for that matter) is to startup <bf>xawtv</bf>, mute the
-line-in then run <tt>aplay /dev/dsp</tt>. Once this test succeeds, MythTV
-should also work correctly because it writes to and read from /dev/dsp in
+line-in then run <tt>aplay /dev/dsp</tt>. You should hear the recorded audio
+slightly delayed behind the realtime video.  Once this test succeeds, MythTV
+should work correctly because it writes to and read from /dev/dsp in
 the same way that <bf>aplay</bf> does.
 
 To record audio along with video the audio signal must be digitized by a DSP
@@ -2220,10 +2221,6 @@ uncheck the "Start aRts soundserver on KDE startup" box.
 If you're using multiple sound cards and multiple tuners, use <tt>alsamixer
 -c 1</tt> to work with the second sound card.  The first card is #0, the
 second card is #1, etc.
-
-<sect1>MythWeather is showing me the weather in the Bahamas!
-<p>You didn't read the documentation.  Ensure that you set your locale
-correctly.
 
 <sect1>I can't see parts of the On Screen Display.
 <p>If you're a Red Hat 8.0 user, make sure that you've followed the
@@ -2320,12 +2317,11 @@ vertical lines lost.  In a PAL country, the you would use values like
 
 The higher resolutions will be more CPU intensive. If the CPU is overtaxed,
 frames will be dropped causing uneven motion. You will likely see the best
-results at resolutions which average at least 10% CPU idle time (meaning
-that the first value shown in the load average using <tt>w</tt> or
-<tt>top</tt> is no more than .90) while recording.  If the load average is
-consistently exceeding .90, your CPU will not have enough cycles to service
-other system events, thereby causing frame drops when it context switches
-away from MythTV to service other processes.
+results at resolutions which average at least 10% CPU idle time.  You can
+use system tools such as <tt>top</tt> or <tt>sar</tt> to check the CPU %
+idle while recording.  If the CPU average usage is consistently exceeding
+90%, frames will need to be dropped during peak times when more than 100% of
+the available CPU would be needed to process all of the frames.
 
 If you'd like to read more on this, go to the vcdhelp website at <url
 url="http://www.vcdhelp.com/forum/userguides/94382.php"
@@ -2370,8 +2366,10 @@ restart X.
 <sect2>MythTV Dimensions
 <p>Set the MythTV GUI size to these same dimensions as the X display. In
 0.7, edit the file <tt>theme.txt</tt>. In 0.8, from "mythfrontend" go to
-Setup->Appearance.  To ensure that your new dimension settings, exit and
-restart MythTV.  
+Setup->Appearance.  The default for the height and width on 0.8 is "0" -
+this will cause MythTV to automatically size itself to full screen. To
+ensure that your new dimension settings take effect, exit and restart
+MythTV.
 
 <bf>NOTE</bf>: When the GUI is full screen, you may need to set your window
 manager to 'Click to Focus' for windows to stack properly.
@@ -2416,17 +2414,6 @@ recording resolution for its dimensions. If you check the box "Fixed
 Aspect Ratio" in Setup->Playback, the windowed picture will always be
 resized to normal 4:3 shape.
 
-<sect1>I'd like to delete the mysql database.
-<p><bf>NOTE</bf>:  Performing this step will remove the entire database. 
-You will lose all of your settings and will need to re-run the mc.sql script
-to setup the database structure before running the setup program.
-
-<tscreen><verb>
-$ mysql -u root
-mysql> drop database mythconverg;
-mysql> quit
-</verb></tscreen>
-
 <sect1>I'd like to save or restore my database
 <p>See the <bf>mysqldump</bf> manpage for more information.
 
@@ -2437,6 +2424,17 @@ $ mysqldump -u mythtv --password=mythtv mythconverg > mythtv_backup.sql
 To restore:
 <tscreen><verb>
 $ mysql -u mythtv --password=mythtv mythconverg < mythtv_backup.sql
+</verb></tscreen>
+
+<sect1>I'd like to delete the mysql database.
+<p><bf>NOTE</bf>:  Performing this step will remove the entire database. 
+You will lose all of your settings and will need to re-run the mc.sql script
+to setup the database structure before running the setup program.
+
+<tscreen><verb>
+$ mysql -u root
+mysql> drop database mythconverg;
+mysql> quit
 </verb></tscreen>
 
 <sect1>I'd like to start using the development version of MythTV.
@@ -2450,16 +2448,23 @@ OWN RISK.</bf>
 
 Here are some of the features in version 0.8:
 <itemize>
-<item>A front-end and back-end system.  The back-end is responsible for
-maintaining the database and capturing and encoding the video.  The
-front-end is responsible for displaying the video.  This allows you to put a
-lightweight, quiet, diskless and fanless machine in "the living room", with a large server-type
-machine in "the basement".  The front-end and back-end communicate over TCP
-on a specified port.
-<item>GUI-based configuration.  Much of the configuration of MythTV can now
+
+<item>A frontend and backend system.  MythTV supports multiple frontend
+and backend systems.  The master backend is responsible for maintaining
+the central database and determining which system will capture and encode
+the video.  The non-master (or slave) backends register themselves with the
+master when they startup.  The frontend is responsible for displaying the video.  This
+allows you to put a lightweight, quiet, diskless and fanless machine in "the
+living room", with a large server-type machine in "the basement".  The
+frontend and backend communicate over TCP on a specified port.  MythTV
+still supports running the frontend and the backend on the same machine if
+you don't have multiple systems available.
+<item>GUI-based configuration.  Almost all of the configuration of MythTV can now
 be done using a GUI-based setup, avoiding the necessity to edit the
-<tt>settings.txt</tt> file.
-<item>Themes.  MythTV now has more themes for the user to choose from.
+<tt>settings.txt</tt> file.  You must still edit the <tt>mysql.txt</tt> file
+to indicate the IP address of the master database server.
+<item>Themes.  MythTV now has more themes for the user to choose from.  See
+the website for examples.
 <item>Recording profiles.  You may now setup various encoder profiles from
 the GUI, giving you the flexibility to record programs using various quality
 levels.
@@ -2495,18 +2500,18 @@ This will open the setup wizard which will allow you to graphically
 configure your system.
 
 Once the setup wizard is done: to run the new version of MythTV, you must
-first start the back-end server:
+first start the backend server:
 
 <tscreen><verb>
 $ mythbackend &
 </verb></tscreen>
 
-and then run the front-end client:
+and then run the frontend client:
 <tscreen><verb>
 $ mythfrontend
 </verb></tscreen>
 
-You should see the connection established between the front-end and back-end
+You should see the connection established between the frontend and backend
 systems by examining the mythbackend window; it will display the client
 connection attempts.
 
@@ -2684,6 +2689,11 @@ v1.101, 2003-03-04.  Typo on the theme.txt.  Changed some text on RH8 and
 OSS/ALSA.  Added some information about the NonID3FileFormat in mythmusic. 
 Added link to mythtv-users list.  More developers.
 v1.102, 2003-03-06.  MySQL dump command.
+v1.103, 2003-03-10.  More on 0.8.  Got rid of the mythweather "Bahamas"
+troubleshooting step since you're now forced to go through setup.  Change to
+the CPU % idle tip.  Reversed the save database / delete database steps. 
+Altered text on MythTV height/width since we now fullscreen by default. 
+Added some more about sound troubleshooting.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

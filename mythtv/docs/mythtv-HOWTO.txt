@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-03-06, v1.102
+  2003-03-10, v1.103
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -111,8 +111,7 @@
      17.9 I get segfaults / MythTV isn't doing anything.
      17.10 MythTV makes my system crash.
      17.11 Troubleshooting audio
-     17.12 MythWeather is showing me the weather in the Bahamas!
-     17.13 I can't see parts of the On Screen Display.
+     17.12 I can't see parts of the On Screen Display.
 
   18. Miscellaneous.
      18.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
@@ -124,8 +123,8 @@
         18.5.2 MythTV Dimensions
         18.5.3 Overscan Dimensions
         18.5.4 MythTV on the Desktop
-     18.6 I'd like to delete the mysql database.
-     18.7 I'd like to save or restore my database
+     18.6 I'd like to save or restore my database
+     18.7 I'd like to delete the mysql database.
      18.8 I'd like to start using the development version of MythTV.
 
   ______________________________________________________________________
@@ -2294,9 +2293,10 @@
 
   A better test to verify that sound will work for MythTV (and recording
   with [1mxawtv [22mfor that matter) is to startup [1mxawtv[22m, mute the line-in then
-  run aplay /dev/dsp. Once this test succeeds, MythTV should also work
-  correctly because it writes to and read from /dev/dsp in the same way
-  that [1maplay [22mdoes.
+  run aplay /dev/dsp. You should hear the recorded audio slightly
+  delayed behind the realtime video.  Once this test succeeds, MythTV
+  should work correctly because it writes to and read from /dev/dsp in
+  the same way that [1maplay [22mdoes.
 
   To record audio along with video the audio signal must be digitized by
   a DSP so that the audio data can be stored in a file. On playback, the
@@ -2340,12 +2340,7 @@
   alsamixer -c 1 to work with the second sound card.  The first card is
   #0, the second card is #1, etc.
 
-  [1m17.12.  MythWeather is showing me the weather in the Bahamas![0m
-
-  You didn't read the documentation.  Ensure that you set your locale
-  correctly.
-
-  [1m17.13.  I can't see parts of the On Screen Display.[0m
+  [1m17.12.  I can't see parts of the On Screen Display.[0m
 
   If you're a Red Hat 8.0 user, make sure that you've followed the
   instructions which tell you how to modify the Themes makefile.
@@ -2377,6 +2372,7 @@
 
   At this point, you can read the MPlayer documentation and start the
   compile process.
+
   [1m18.2.  I'd like to use some other window manager.[0m
 
   MythTV is not dependent on any particular window manager.  If you wish
@@ -2447,11 +2443,11 @@
   The higher resolutions will be more CPU intensive. If the CPU is
   overtaxed, frames will be dropped causing uneven motion. You will
   likely see the best results at resolutions which average at least 10%
-  CPU idle time (meaning that the first value shown in the load average
-  using w or top is no more than .90) while recording.  If the load
-  average is consistently exceeding .90, your CPU will not have enough
-  cycles to service other system events, thereby causing frame drops
-  when it context switches away from MythTV to service other processes.
+  CPU idle time.  You can use system tools such as top or sar to check
+  the CPU % idle while recording.  If the CPU average usage is
+  consistently exceeding 90%, frames will need to be dropped during peak
+  times when more than 100% of the available CPU would be needed to
+  process all of the frames.
 
   If you'd like to read more on this, go to the vcdhelp website at
   http://www.vcdhelp.com/forum/userguides/94382.php
@@ -2500,8 +2496,10 @@
 
   Set the MythTV GUI size to these same dimensions as the X display. In
   0.7, edit the file theme.txt. In 0.8, from "mythfrontend" go to
-  Setup->Appearance.  To ensure that your new dimension settings, exit
-  and restart MythTV.
+  Setup->Appearance.  The default for the height and width on 0.8 is "0"
+  - this will cause MythTV to automatically size itself to full screen.
+  To ensure that your new dimension settings take effect, exit and
+  restart MythTV.
 
   [1mNOTE[22m: When the GUI is full screen, you may need to set your window
   manager to 'Click to Focus' for windows to stack properly.
@@ -2548,17 +2546,7 @@
   the box "Fixed Aspect Ratio" in Setup->Playback, the windowed picture
   will always be resized to normal 4:3 shape.
 
-  [1m18.6.  I'd like to delete the mysql database.[0m
-
-  [1mNOTE[22m:  Performing this step will remove the entire database.  You will
-  lose all of your settings and will need to re-run the mc.sql script to
-  setup the database structure before running the setup program.
-
-  $ mysql -u root
-  mysql> drop database mythconverg;
-  mysql> quit
-
-  [1m18.7.  I'd like to save or restore my database[0m
+  [1m18.6.  I'd like to save or restore my database[0m
 
   See the [1mmysqldump [22mmanpage for more information.
 
@@ -2567,6 +2555,16 @@
   To restore:
 
        $ mysql -u mythtv --password=mythtv mythconverg < mythtv_backup.sql
+
+  [1m18.7.  I'd like to delete the mysql database.[0m
+
+  [1mNOTE[22m:  Performing this step will remove the entire database.  You will
+  lose all of your settings and will need to re-run the mc.sql script to
+  setup the database structure before running the setup program.
+
+       $ mysql -u root
+       mysql> drop database mythconverg;
+       mysql> quit
 
   [1m18.8.  I'd like to start using the development version of MythTV.[0m
 
@@ -2581,19 +2579,25 @@
 
   Here are some of the features in version 0.8:
 
-  +o  A front-end and back-end system.  The back-end is responsible for
-     maintaining the database and capturing and encoding the video.  The
-     front-end is responsible for displaying the video.  This allows you
+  +o  A frontend and backend system.  MythTV supports multiple frontend
+     and backend systems.  The master backend is responsible for
+     maintaining the central database and determining which system will
+     capture and encode the video.  The non-master (or slave) backends
+     register themselves with the master when they startup.  The
+     frontend is responsible for displaying the video.  This allows you
      to put a lightweight, quiet, diskless and fanless machine in "the
      living room", with a large server-type machine in "the basement".
-     The front-end and back-end communicate over TCP on a specified
-     port.
+     The frontend and backend communicate over TCP on a specified port.
+     MythTV still supports running the frontend and the backend on the
+     same machine if you don't have multiple systems available.
 
-  +o  GUI-based configuration.  Much of the configuration of MythTV can
-     now be done using a GUI-based setup, avoiding the necessity to edit
-     the settings.txt file.
+  +o  GUI-based configuration.  Almost all of the configuration of MythTV
+     can now be done using a GUI-based setup, avoiding the necessity to
+     edit the settings.txt file.  You must still edit the mysql.txt file
+     to indicate the IP address of the master database server.
 
   +o  Themes.  MythTV now has more themes for the user to choose from.
+     See the website for examples.
 
   +o  Recording profiles.  You may now setup various encoder profiles
      from the GUI, giving you the flexibility to record programs using
@@ -2631,16 +2635,16 @@
   configure your system.
 
   Once the setup wizard is done: to run the new version of MythTV, you
-  must first start the back-end server:
+  must first start the backend server:
 
        $ mythbackend &
 
-  and then run the front-end client:
+  and then run the frontend client:
 
        $ mythfrontend
 
-  You should see the connection established between the front-end and
-  back-end systems by examining the mythbackend window; it will display
+  You should see the connection established between the frontend and
+  backend systems by examining the mythbackend window; it will display
   the client connection attempts.
 
   The cvs version of MythTV now supports pressing the ESC key to exit

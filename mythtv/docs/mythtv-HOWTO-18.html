@@ -106,12 +106,11 @@ vertical lines lost.  In a PAL country, the you would use values like
 720x576 or x288.</P>
 <P>The higher resolutions will be more CPU intensive. If the CPU is overtaxed,
 frames will be dropped causing uneven motion. You will likely see the best
-results at resolutions which average at least 10% CPU idle time (meaning
-that the first value shown in the load average using <CODE>w</CODE> or
-<CODE>top</CODE> is no more than .90) while recording.  If the load average is
-consistently exceeding .90, your CPU will not have enough cycles to service
-other system events, thereby causing frame drops when it context switches
-away from MythTV to service other processes.</P>
+results at resolutions which average at least 10% CPU idle time.  You can
+use system tools such as <CODE>top</CODE> or <CODE>sar</CODE> to check the CPU %
+idle while recording.  If the CPU average usage is consistently exceeding
+90%, frames will need to be dropped during peak times when more than 100% of
+the available CPU would be needed to process all of the frames.</P>
 <P>If you'd like to read more on this, go to the vcdhelp website at 
 <A HREF="http://www.vcdhelp.com/forum/userguides/94382.php">http://www.vcdhelp.com/forum/userguides/94382.php</A>.</P>
 
@@ -155,8 +154,10 @@ restart X.</P>
 
 <P>Set the MythTV GUI size to these same dimensions as the X display. In
 0.7, edit the file <CODE>theme.txt</CODE>. In 0.8, from "mythfrontend" go to
-Setup->Appearance.  To ensure that your new dimension settings, exit and
-restart MythTV.  </P>
+Setup->Appearance.  The default for the height and width on 0.8 is "0" -
+this will cause MythTV to automatically size itself to full screen. To
+ensure that your new dimension settings take effect, exit and restart
+MythTV.</P>
 <P><B>NOTE</B>: When the GUI is full screen, you may need to set your window
 manager to 'Click to Focus' for windows to stack properly.</P>
 <P>The fonts for the GUI and OSD will scale to whatever sizes you use. Most
@@ -197,23 +198,7 @@ recording resolution for its dimensions. If you check the box "Fixed
 Aspect Ratio" in Setup->Playback, the windowed picture will always be
 resized to normal 4:3 shape.</P>
 
-<H2><A NAME="ss18.6">18.6</A> <A HREF="mythtv-HOWTO.html#toc18.6">I'd like to delete the mysql database.</A>
-</H2>
-
-<P><B>NOTE</B>:  Performing this step will remove the entire database. 
-You will lose all of your settings and will need to re-run the mc.sql script
-to setup the database structure before running the setup program.</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-$ mysql -u root
-mysql> drop database mythconverg;
-mysql> quit
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
-<H2><A NAME="ss18.7">18.7</A> <A HREF="mythtv-HOWTO.html#toc18.7">I'd like to save or restore my database</A>
+<H2><A NAME="ss18.6">18.6</A> <A HREF="mythtv-HOWTO.html#toc18.6">I'd like to save or restore my database</A>
 </H2>
 
 <P>See the <B>mysqldump</B> manpage for more information.</P>
@@ -232,6 +217,22 @@ $ mysql -u mythtv --password=mythtv mythconverg &lt; mythtv_backup.sql
 </CODE></BLOCKQUOTE>
 </P>
 
+<H2><A NAME="ss18.7">18.7</A> <A HREF="mythtv-HOWTO.html#toc18.7">I'd like to delete the mysql database.</A>
+</H2>
+
+<P><B>NOTE</B>:  Performing this step will remove the entire database. 
+You will lose all of your settings and will need to re-run the mc.sql script
+to setup the database structure before running the setup program.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root
+mysql> drop database mythconverg;
+mysql> quit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
 <H2><A NAME="ss18.8">18.8</A> <A HREF="mythtv-HOWTO.html#toc18.8">I'd like to start using the development version of MythTV.</A>
 </H2>
 
@@ -243,16 +244,22 @@ version of MythTV will work for you.</P>
 OWN RISK.</B></P>
 <P>Here are some of the features in version 0.8:
 <UL>
-<LI>A front-end and back-end system.  The back-end is responsible for
-maintaining the database and capturing and encoding the video.  The
-front-end is responsible for displaying the video.  This allows you to put a
-lightweight, quiet, diskless and fanless machine in "the living room", with a large server-type
-machine in "the basement".  The front-end and back-end communicate over TCP
-on a specified port.</LI>
-<LI>GUI-based configuration.  Much of the configuration of MythTV can now
+<LI>A frontend and backend system.  MythTV supports multiple frontend
+and backend systems.  The master backend is responsible for maintaining
+the central database and determining which system will capture and encode
+the video.  The non-master (or slave) backends register themselves with the
+master when they startup.  The frontend is responsible for displaying the video.  This
+allows you to put a lightweight, quiet, diskless and fanless machine in "the
+living room", with a large server-type machine in "the basement".  The
+frontend and backend communicate over TCP on a specified port.  MythTV
+still supports running the frontend and the backend on the same machine if
+you don't have multiple systems available.</LI>
+<LI>GUI-based configuration.  Almost all of the configuration of MythTV can now
 be done using a GUI-based setup, avoiding the necessity to edit the
-<CODE>settings.txt</CODE> file.</LI>
-<LI>Themes.  MythTV now has more themes for the user to choose from.</LI>
+<CODE>settings.txt</CODE> file.  You must still edit the <CODE>mysql.txt</CODE> file
+to indicate the IP address of the master database server.</LI>
+<LI>Themes.  MythTV now has more themes for the user to choose from.  See
+the website for examples.</LI>
 <LI>Recording profiles.  You may now setup various encoder profiles from
 the GUI, giving you the flexibility to record programs using various quality
 levels.</LI>
@@ -285,7 +292,7 @@ $ ./setup
 <P>This will open the setup wizard which will allow you to graphically
 configure your system.</P>
 <P>Once the setup wizard is done: to run the new version of MythTV, you must
-first start the back-end server:</P>
+first start the backend server:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -293,14 +300,14 @@ $ mythbackend &amp;
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>and then run the front-end client:
+<P>and then run the frontend client:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mythfrontend
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>You should see the connection established between the front-end and back-end
+<P>You should see the connection established between the frontend and backend
 systems by examining the mythbackend window; it will display the client
 connection attempts.</P>
 <P>The cvs version of MythTV now supports pressing the ESC key to exit the

@@ -264,8 +264,9 @@ through line-in to line-out. It doesn't need to digitize the sound unless
 you are using the recording function.</P>
 <P>A better test to verify that sound will work for MythTV (and recording with
 <B>xawtv</B> for that matter) is to startup <B>xawtv</B>, mute the
-line-in then run <CODE>aplay /dev/dsp</CODE>. Once this test succeeds, MythTV
-should also work correctly because it writes to and read from /dev/dsp in
+line-in then run <CODE>aplay /dev/dsp</CODE>. You should hear the recorded audio
+slightly delayed behind the realtime video.  Once this test succeeds, MythTV
+should work correctly because it writes to and read from /dev/dsp in
 the same way that <B>aplay</B> does.</P>
 <P>To record audio along with video the audio signal must be digitized by a DSP
 so that the audio data can be stored in a file. On playback, the audio data
@@ -305,13 +306,7 @@ uncheck the "Start aRts soundserver on KDE startup" box.</P>
 -c 1</CODE> to work with the second sound card.  The first card is #0, the
 second card is #1, etc.</P>
 
-<H2><A NAME="ss17.12">17.12</A> <A HREF="mythtv-HOWTO.html#toc17.12">MythWeather is showing me the weather in the Bahamas!</A>
-</H2>
-
-<P>You didn't read the documentation.  Ensure that you set your locale
-correctly.</P>
-
-<H2><A NAME="ss17.13">17.13</A> <A HREF="mythtv-HOWTO.html#toc17.13">I can't see parts of the On Screen Display.</A>
+<H2><A NAME="ss17.12">17.12</A> <A HREF="mythtv-HOWTO.html#toc17.12">I can't see parts of the On Screen Display.</A>
 </H2>
 
 <P>If you're a Red Hat 8.0 user, make sure that you've followed the
