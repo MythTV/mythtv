@@ -1091,8 +1091,6 @@ void GuideGrid::paintPrograms(QPainter *p)
                     {
                         m_programInfos[y][z]->spread = spread;
                         m_programInfos[y][z]->startCol = x;
-                        // xxx
-                        // m_programInfos[y][z]->recordtype = pginfo->recordtype;
                     }
                 }
 
@@ -2068,16 +2066,6 @@ void GuideGrid::displayInfo()
     showInfo = 0;
 
     pginfo->GetProgramRecordingStatus();
-
-    int startcol = pginfo->startCol;
-    int spread = pginfo->spread;
-    ScheduledRecording::RecordingType rectype = pginfo->GetProgramRecordingStatus();
-
-    for (int i = 0; i < spread; i++)
-    {
-        // xxx
-        //m_programInfos[m_currentRow][startcol + i]->recordtype = rectype;
-    }
 
     setActiveWindow();
     setFocus();
