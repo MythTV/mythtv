@@ -216,16 +216,41 @@ public:
     };
 };
 
-class WeatherAggressiveness: public SpinBoxSetting, public GlobalSetting {
+class WeatherAggressiveness: public SliderSetting, public GlobalSetting {
 public:
     WeatherAggressiveness():
-        SpinBoxSetting(1, 15, 1), GlobalSetting("WeatherAggressiveLvl") {
+        SliderSetting(1, 15, 1), GlobalSetting("WeatherAggressiveLvl") {
         setLabel("MythWeather Aggressiveness Level");
         setValue(1);
 	setHelpText("In an effort to make MythWeather more robust the aggressiveness value "
 		    "has been added into the connection code. This value determines how quickly "
 		    "MythWeather will timeout a failed connection. The \'fastest\' value is 1.");
 
+    };
+};
+
+class WeatherF_or_SI: public CheckBoxSetting, public GlobalSetting {
+public:
+    WeatherF_or_SI():
+        GlobalSetting("SIUnits") {
+        setLabel("Use metric units");
+        setValue(false);
+        setHelpText("If set, MythWeather will use metric units for "
+                    "temperature, windspeed, etc.  Default is Imperial "
+                    "(Fahrenheit, miles per hour, inches mercury).");
+
+    };
+};
+
+class WeatherLocale: public LineEditSetting, public GlobalSetting {
+public:
+    WeatherLocale():
+        GlobalSetting("locale") {
+        setLabel("Your location");
+        setValue("44106");
+        setHelpText("Insert your zip code (in North America), an Airport "
+                    "Code or your ACCID.  See the documentation for "
+                    "instructions on how to obtain your ACCID.");
     };
 };
 
@@ -819,7 +844,6 @@ GeneralSettings::GeneralSettings()
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
     general->setLabel("General");
     general->addChild(new RecordOverTime());
-    general->addChild(new WeatherAggressiveness());
     addChild(general);
 
     VerticalConfigurationGroup* general2 = new VerticalConfigurationGroup(false);
@@ -898,4 +922,15 @@ AppearanceSettings::AppearanceSettings()
     osd->addChild(new OSDFont());
     osd->addChild(new OSDCCFont());
     addChild(osd);
+}
+
+WeatherSettings::WeatherSettings()
+{
+    VerticalConfigurationGroup* weather = new VerticalConfigurationGroup(false);
+    weather->setLabel("Weather");
+
+    weather->addChild(new WeatherAggressiveness());
+    weather->addChild(new WeatherF_or_SI());
+    weather->addChild(new WeatherLocale());
+    addChild(weather);    
 }

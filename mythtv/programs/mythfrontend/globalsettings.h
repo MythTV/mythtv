@@ -24,4 +24,9 @@ public:
     AppearanceSettings();
 };
 
+class WeatherSettings: virtual public ConfigurationWizard {
+public:
+    WeatherSettings();
+};
+
 #endif
