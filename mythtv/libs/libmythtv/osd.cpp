@@ -714,7 +714,7 @@ void OSD::DrawStringCentered(unsigned char *yuvptr, QRect rect,
     int xoffset = (rect.width() - textlength) / 2;
 
     if (xoffset > 0)
-        rect.setLeft(rect.left() + xoffset);
+        rect.moveBy(xoffset, 0);
 
     DrawStringWithOutline(yuvptr, rect, text, font);
 }
@@ -890,6 +890,9 @@ void OSD::BlendImage(OSDImage *image, int xstart, int ystart,
     int width = image->width;
     int height = image->height;
 
+    if (height + ystart > vid_height)
+        height = vid_height - ystart - 1;
+	
     int ysrcwidth;
     int ydestwidth;
 
@@ -961,6 +964,9 @@ void OSD::BlendFillSlider(OSDImage *image, int xstart, int ystart,
 
     int width = drawwidth;
     int height = image->height;
+
+    if (height + ystart > vid_height)
+        height = vid_height - ystart - 1;
 
     int ysrcwidth;
     int ydestwidth;

@@ -302,6 +302,9 @@ merge_text(unsigned char *yuv, TT_Raster_Map * rmap, int offset_x, int offset_y,
    vptr = uptr + (video_height * video_width) / 4;   
    int offset; 
 
+   if (height + ystart > video_height)
+       height = video_height - ystart - 1;
+ 
    for (y = 0; y < height; y++)
      {
 	ptr = (unsigned char *)rmap->bitmap + offset_x + 
