@@ -79,6 +79,8 @@ void DaapServer::handleIncoming(HttpRequest *http_request, int client_id)
 
     if(daap_request->getRequestType()       == DAAP_REQUEST_NOREQUEST)
     {
+        delete daap_request;
+        daap_request = NULL;
         return;
     }
     
@@ -89,6 +91,8 @@ void DaapServer::handleIncoming(HttpRequest *http_request, int client_id)
     else if( daap_request->getRequestType() == DAAP_REQUEST_SERVINFO )
     {
         sendServerInfo(http_request);
+        delete daap_request;
+        daap_request = NULL;
         return;
     }   
 
@@ -96,6 +100,8 @@ void DaapServer::handleIncoming(HttpRequest *http_request, int client_id)
     {
         u32 session_id = daap_sessions.getNewId();
         sendLogin( http_request, session_id);
+        delete daap_request;
+        daap_request = NULL;
         return;
     }
 
@@ -116,6 +122,8 @@ void DaapServer::handleIncoming(HttpRequest *http_request, int client_id)
         //
         
         http_request->getResponse()->setError(403); // forbidden
+        delete daap_request;
+        daap_request = NULL;
         return;
     }
     
@@ -240,6 +248,7 @@ void DaapServer::handleIncoming(HttpRequest *http_request, int client_id)
 
     
     delete daap_request;
+    daap_request = NULL;
     
 }
 
