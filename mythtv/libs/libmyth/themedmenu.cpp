@@ -1307,8 +1307,16 @@ void ThemedMenu::paintEvent(QPaintEvent *e)
 
 void ThemedMenu::paintLogo(QPainter *p)
 {
+    QPixmap pix(logoRect.size());
+   
+    QPainter tmp(&pix, this);
+    tmp.drawPixmap(QPoint(0, 0), backgroundPixmap, logoRect);
+
     if (logo)
-        p->drawPixmap(logoRect.topLeft(), *logo);
+        tmp.drawPixmap(QPoint(0, 0), *logo);
+
+    tmp.end();
+    p->drawPixmap(logoRect.topLeft(), pix);
 }
 
 void ThemedMenu::paintTitle(QPainter *p)
