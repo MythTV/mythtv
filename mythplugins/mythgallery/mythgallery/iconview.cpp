@@ -109,7 +109,7 @@ void IconView::updateText()
         if (ttype) {
             ThumbItem* item = m_itemList.at(m_currRow * m_nCols +
                                             m_currCol);
-            ttype->SetText(item ? item->name : "");
+            ttype->SetText(item ? item->name : QString(""));
         }
         
         container->Draw(&p, 0, 0);

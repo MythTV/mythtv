@@ -1,5 +1,6 @@
 .qmake.internal.cache
 Makefile
-moc_iconview.cpp
-moc_singleview.cpp
+moc_*
 mythgallery
+config.h
+config.pro
