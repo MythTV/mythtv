@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.16 (xris)
+#Last Updated: 2005.02.25 (xris)
 #
 #  cli.pm
 #
@@ -18,18 +18,79 @@ package nuv_export::cli;
         use Exporter;
         our @ISA = qw/ Exporter /;
 
-        our @EXPORT = qw/ &add_arg      &arg        &load_cli_args
+        our @EXPORT = qw/ &add_arg      &load_cli_args
+                          &arg          &rc_arg
                           $export_prog  $is_cli
                           $DEBUG
                         /;
     }
 
 # Load some options early, before anything else:
-# --ffmpeg, --transcode.  Default is --ffmpeg
-    our $export_prog = find_program('ffmpeg') ? 'ffmpeg' : 'transcode';
+# --ffmpeg, --transcode and --config
+    our $export_prog = undef;
+    our $config_file = undef;
     GetOptions('ffmpeg'    => sub { $export_prog = 'ffmpeg';    },
                'transcode' => sub { $export_prog = 'transcode'; },
+               'config|c=s'  => \$config_file,
               );
+
+# Make sure the specified config file exists
+    if ($config_file && !-e $config_file) {
+        die "configuration file $config_file does not exist!\n\n";
+    }
+
+# Load the nuvexportrc file
+    my %rc_args;
+    foreach my $file ($config_file, 'nuvexportrc', "$ENV{'HOME'}/.nuvexportrc", "/etc/.nuvexportrc") {
+    # No file
+        next unless ($file && -e $file);
+    # Slurp
+        local $/ = undef;
+    # Read the file
+        my $data = '';
+        open(DATA, $file) or die "Couldn't read $file:  $!\n\n";
+        $data .= $_ while (<DATA>);
+        close DATA;
+    # Clean out any comments
+        $data =~ s/\s*#[^\n]*?\s*\n/\n/sg;
+        $data =~ s/\n\s*\n/\n/sg;
+    # Nothing there
+        next unless ($data);
+    # Parse the contents
+        while ($data =~ /<\s*([^>]+)\s*>(.+?)<\s*\/\s*\1\s*>/sg) {
+            my $section = lc($1);
+            my $args    = $2;
+            while ($args =~ /^\s*(\S+?)\s*=\s*(.+?)\s*$/mg) {
+                my $var = lc($1);
+                my $val = $2;
+            # Boolean arg?
+                if ($val =~ /^([yt1]|yes|true)$/i) {
+                    $rc_args{$section}{$var} = 1;
+                }
+                elsif ($val =~ /^([nf0]|no|false)$/i) {
+                    $rc_args{$section}{$var} = 0;
+                }
+                else {
+                    $rc_args{$section}{$var} = $val;
+                }
+            }
+        }
+    # Time to leave
+        last;
+    }
+
+# Make sure the export_prog exists
+    if (!$export_prog) {
+        if ($export_prog = lc($rc_args{'nuvexport'}{'export_prog'})) {
+            if ($export_prog !~ /(?:ffmpeg|transcode)$/) {
+                print "Unknown export_prog in nuvexportrc:  $export_prog\n\n";
+                exit;
+            }
+        }
+        else {
+            $export_prog = find_program('ffmpeg') ? 'ffmpeg' : 'transcode';
+        }
+    }
 
 # Debug mode?
     our $DEBUG;
@@ -104,6 +165,24 @@ package nuv_export::cli;
     sub arg {
         my ($arg, $default) = @_;
         return defined($args{$arg}) ? $args{$arg} : $default;
+    }
+
+# Retrieve the value of a nuvexportrc argument
+    sub rc_arg {
+        my $arg     = lc(shift);
+        my $package = lc(shift or (caller())[0]);
+    # Remove an unused package parent name, and any leftovers from $self
+        $package =~ s/^export:://;
+        $package =~ s/=.+?$//;
+    # Scan the package from child to parent, looking for matches
+        while ($package) {
+            return $rc_args{$package}{$arg} if (defined $rc_args{$package}{$arg});
+            last unless ($package =~ s/::.+?$//);
+        }
+    # Finally, try "generic"
+        return $rc_args{'generic'}{$arg} if (defined $rc_args{'generic'}{$arg});
+    # Lastly, try "nuvexport" (or just return undef)
+        return $rc_args{'nuvexport'}{$arg};
     }
 
 1;  #return true

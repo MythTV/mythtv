@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.16 (xris)
+#Last Updated: 2005.02.23 (xris)
 #
 #   nuvexport::ui
 #
@@ -9,6 +9,7 @@
 package nuv_export::ui;
 
     use File::Path;
+    use English;
 
 # Load the myth and nuv utilities, and make sure we're connected to the database
     use nuv_export::shared_utils;
@@ -366,7 +367,7 @@ package nuv_export::ui;
     # No need?
         return undef unless (arg('noserver') || arg('path'));
     # Grab a path from the commandline?
-        my $path = (arg('path') or '');
+        my $path = (shift or arg('path') or '.');
         $path =~ s/\/+$//s;
         if ($is_cli) {
         # Need a pathname
@@ -379,12 +380,10 @@ package nuv_export::ui;
             die "$path isn't writable.\n" unless (-w $path);
         }
     # Where are we saving the files to?
-        until ($path && -d $path && -w $path) {
+        while (1) {
         # Query
-            if (!$path) {
-                $path = query_text('Where would you like to export the files to?', 'string', '.');;
-                $path =~ s/\/+$//s;
-            }
+            $path = query_text('Where would you like to export the files to?', 'string', $path);
+            $path =~ s/\/+$//s;
         # Doesn't exist - query the user to create it
             if (!-e $path) {
                 my $create = query_text("$path doesn't exist.  Create it?", 'yesno', 'Yes');
@@ -392,19 +391,21 @@ package nuv_export::ui;
                    mkpath($path, 1, 0711) or die "Couldn't create $path:  $!\n\n";
                 }
                 else {
-                    $path = undef;
+                    next;
                 }
             }
         # Make sure this is a valid directory
             elsif (!-d $path) {
                 print "$path exists, but is not a directory.\n";
-                $path = undef;
+                next;
             }
         # Not writable
             elsif (!-w $path) {
                 print "$path isn't writable.\n";
-                $path = undef;
+                next;
             }
+        # All done
+            last;
         }
         return $path;
     }
@@ -414,7 +415,17 @@ package nuv_export::ui;
         my $type          = shift;
         my $default       = shift;
         my $default_extra = shift;
-        my $return = undef;
+        my $return        = undef;
+    # Clean up boolean default values
+        if ($type =~ /yes.*no|bool/i) {
+            $type = 'yesno';
+            if (!$default || $default =~ /^\W*[nf0]/i) {
+                $default = 'No';
+            }
+            else {
+                $default = 'Yes';
+            }
+        }
     # Loop until we get a valid response
         while (1) {
         # Ask the question, get the answer
@@ -428,7 +439,7 @@ package nuv_export::ui;
                 $return = $default;
             }
         # Looking for a boolean/yesno response?
-            if ($type =~ /yes.*no|bool/i) {
+            if ($type eq 'yesno') {
                 return $return =~ /^\W*[nf0]/i ? 0 : 1;
             }
         # Looking for an integer?

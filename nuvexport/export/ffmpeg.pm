@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.17 (xris)
+#Last Updated: 2005.02.23 (xris)
 #
 #  ffmpeg.pm
 #
@@ -82,7 +82,7 @@ package export::ffmpeg;
             die "Possibly stale mythtranscode fifo's in /tmp/fifodir_$$/.\nPlease remove them before running nuvexport.\n\n";
         }
 
-    # Here, we have to fork off a copy of mythtranscode (no need to use --fifosync with transcode -- it seems to do this on its own)
+    # Here, we have to fork off a copy of mythtranscode (Do not use --fifosync with ffmpeg or it will hang)
         $mythtranscode = "$NICE mythtranscode --showprogress -p autodetect -c $episode->{channel} -s $episode->{start_time_sep} -f \"/tmp/fifodir_$$/\"";
         $mythtranscode .= ' --honorcutlist' if ($self->{use_cutlist});
 
@@ -103,7 +103,7 @@ package export::ffmpeg;
             $ffmpeg .= "cat /tmp/fifodir_$$/vidout > /dev/null | ";
         }
         else {
-        # Do noise reduction
+        # Do noise reduction -- ffmpeg's -nr flag doesn't seem to do anything other than prevent denoise from working
             if ($self->{'noise_reduction'}) {
                 $ffmpeg .= "$NICE ffmpeg -f rawvideo";
                 $ffmpeg .= " -s " . $episode->{'finfo'}{'width'} . "x" . $episode->{'finfo'}{'height'};
@@ -115,15 +115,15 @@ package export::ffmpeg;
                     $ffmpeg .= " -b $crop_w,$crop_h,-$crop_w,-$crop_h";
                 }
                 $ffmpeg .= " 2> /dev/null | ";
-                $videofifo = "-";
-                $videotype = "yuv4mpegpipe";
+                $videofifo = '-';
+                $videotype = 'yuv4mpegpipe';
             }
         }
 
     # Start the ffmpeg command
-        $ffmpeg .= "$NICE ffmpeg";
+        $ffmpeg .= "$NICE ffmpeg -hq";
         if ($num_cpus > 1) {
-            $transcode .= ' -threads '.($num_cpus);
+            $ffmpeg .= ' -threads '.($num_cpus);
         }
         $ffmpeg .= " -y -f s16le";
         $ffmpeg .= " -ar " . $episode->{'finfo'}{'audio_sample_rate'};

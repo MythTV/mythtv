@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.17 (xris)
+#Last Updated: 2005.02.23 (xris)
 #
 #  export::transcode::XviD
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -32,16 +32,23 @@ package export::transcode::XviD;
                      'noise_reduction' => 1,
                      'deinterlace'     => 1,
                      'crop'            => 1,
-                    # VBR-specific settings
-                     'vbr'             => 1,        # This enables vbr, and the multipass/quantisation options
-                     'multipass'       => 0,        # You get multipass or quantisation, multipass will override
-                     'quantisation'    => 6,        # 4 through 6 is probably right...
-                    # Other video options
-                     'a_bitrate'       => 128,
-                     'v_bitrate'       => 960,      # Remember, quantisation overrides video bitrate
-                     'width'           => 624,
                     };
         bless($self, $class);
+
+    # Verify any commandline or config file options
+        die "Audio bitrate must be > 0\n" unless (defined $self->val('a_bitrate') && $self->{'a_bitrate'} > 0);
+        die "Video bitrate must be > 0\n" unless (defined $self->val('v_bitrate') && $self->{'v_bitrate'} > 0);
+        die "Width must be > 0\n"         unless (!defined $self->val('width')    || $self->{'width'} =~ /^\s*\D/  || $self->{'width'}  > 0);
+        die "Height must be > 0\n"        unless (!defined $self->val('height')   || $self->{'height'} =~ /^\s*\D/ || $self->{'height'} > 0);
+
+    # VBR, multipass, etc.
+        if ($self->val('multipass')) {
+            $self->{'vbr'} = 1;
+        }
+        elsif ($self->val('quantisation')) {
+            die "Quantisation must be a number between 1 and 31 (lower means better quality).\n" if ($self->{'quantisation'} < 1 || $self->{'quantisation'} > 31);
+            $self->{'vbr'} = 1;
+        }
 
     # Initialize and check for transcode
         $self->init_transcode();
@@ -57,36 +64,21 @@ package export::transcode::XviD;
     # Load the parent module's settings
         $self->SUPER::gather_settings();
     # Audio Bitrate
-        if (arg('a_bitrate')) {
-            $self->{'a_bitrate'} = arg('a_bitrate');
-            die "Audio bitrate must be > 0\n" unless (arg('a_bitrate') > 0);
-        }
-        else {
-            $self->{'a_bitrate'} = query_text('Audio bitrate?',
-                                              'int',
-                                              $self->{'a_bitrate'});
-        }
+        $self->{'a_bitrate'} = query_text('Audio bitrate?',
+                                          'int',
+                                          $self->val('a_bitrate'));
     # VBR options
-        if (arg('multipass')) {
-            $self->{'multipass'} = 1;
-            $self->{'vbr'}       = 1;
-        }
-        elsif (arg('quantisation')) {
-            die "Quantisation must be a number between 1 and 31 (lower means better quality).\n" if (arg('quantisation') < 1 || arg('quantisation') > 31);
-            $self->{'quantisation'} = arg('quantisation');
-            $self->{'vbr'}          = 1;
-        }
-        elsif (!$is_cli) {
+        if (!$is_cli) {
             $self->{'vbr'} = query_text('Variable bitrate video?',
                                         'yesno',
-                                        $self->{'vbr'} ? 'Yes' : 'No');
+                                        $self->val('vbr'));
             if ($self->{'vbr'}) {
                 $self->{'multipass'} = query_text('Multi-pass (slower, but better quality)?',
                                                   'yesno',
-                                                  $self->{'multipass'} ? 'Yes' : 'No');
+                                                  $self->val('multipass'));
                 if (!$self->{'multipass'}) {
                     while (1) {
-                        my $quantisation = query_text('VBR quality/quantisation (1-31)?', 'float', $self->{'quantisation'});
+                        my $quantisation = query_text('VBR quality/quantisation (1-31)?', 'float', $self->val('quantisation'));
                         if ($quantisation < 1) {
                             print "Too low; please choose a number between 1 and 31.\n";
                         }
@@ -100,17 +92,12 @@ package export::transcode::XviD;
                     }
                 }
             }
-        }
-    # Ask the user what audio and video bitrates he/she wants
-        if (arg('v_bitrate')) {
-            die "Video bitrate must be > 0\n" unless (arg('v_bitrate') > 0);
-            $self->{'v_bitrate'} = arg('v_bitrate');
-        }
-        elsif ($self->{'multipass'} || !$self->{'vbr'}) {
-            # make sure we have v_bitrate on the commandline
-            $self->{'v_bitrate'} = query_text('Video bitrate?',
-                                              'int',
-                                              $self->{'v_bitrate'});
+        # Ask the user what audio and video bitrates he/she wants
+            if ($self->{'multipass'} || !$self->{'vbr'}) {
+                $self->{'v_bitrate'} = query_text('Video bitrate?',
+                                                  'int',
+                                                  $self->val('v_bitrate'));
+            }
         }
     # Query the resolution
         $self->query_resolution();
@@ -149,7 +136,6 @@ package export::transcode::XviD;
             $self->{'transcode_xtra'} = " -y xvid $params"
                                        ." -R 2,/tmp/xvid.$$.log"
                                        ." -w $self->{'v_bitrate'} ";
-            $self->SUPER::export($episode, '.avi');
         }
     # Single pass
         else {
@@ -160,8 +146,9 @@ package export::transcode::XviD;
             else {
                 $self->{'transcode_xtra'} .= " -w $self->{'v_bitrate'} ";
             }
-            $self->SUPER::export($episode, '.avi');
         }
+    # Execute the (final pass) encode
+        $self->SUPER::export($episode, '.avi');
     }
 
 1;  #return true

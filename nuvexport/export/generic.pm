@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.21 (xris)
+#Last Updated: 2005.02.25 (xris)
 #
 #  generic.pm
 #
@@ -26,11 +26,11 @@ package export::generic;
 # Load the following extra parameters from the commandline
     add_arg('path:s',                        'Save path (only used with the noserver option)');
     add_arg('underscores!',                  'Convert spaces to underscores for output filename.');
-    add_arg('cutlist|use_cutlist!',          'Use the myth cutlist (or not)');
+    add_arg('use_cutlist|cutlist!',          'Use the myth cutlist (or not)');
 
 # These aren't used by all modules, but the routine to define them is here, so here they live
-    add_arg('height|v_res|h=i',              'Output height.');
-    add_arg('width|h_res|w=i',               'Output width.');
+    add_arg('height|v_res|h=s',              'Output height.');
+    add_arg('width|h_res|w=s',               'Output width.');
     add_arg('deinterlace!',                  'Deinterlace video.');
     add_arg('noise_reduction|denoise|nr!',   'Enable noise reduction.');
     add_arg('crop!',                         'Crop out broadcast overscan.');
@@ -39,21 +39,21 @@ package export::generic;
     sub gather_settings {
         my $self = shift;
     # Load the save path, if requested
-        $self->{'path'} = query_savepath();
+        $self->{'path'} = query_savepath($self->val('path'));
     # Ask the user if he/she wants to use the cutlist
         $self->{'use_cutlist'} = query_text('Enable Myth cutlist?',
                                             'yesno',
-                                            arg('cutlist', 1) ? 'No' : 'Yes');
+                                            $self->val('use_cutlist'));
     # Video settings
         if (!$self->{'audioonly'}) {
         # Noise reduction?
             $self->{'noise_reduction'} = query_text('Enable noise reduction (slower, but better results)?',
                                                     'yesno',
-                                                    arg('noise_reduction', $self->{'noise_reduction'}) ? 'Yes' : 'No');
+                                                    $self->val('noise_reduction'));
         # Deinterlace video?
             $self->{'deinterlace'} = query_text('Enable deinterlacing?',
                                                 'yesno',
-                                                arg('deinterlace', $self->{'deinterlace'}) ? 'Yes' : 'No');
+                                                $self->val('deinterlace'));
         # Crop video to get rid of broadcast padding
             if (arg('crop')) {
                 $self->{'crop'} = 1;
@@ -61,7 +61,7 @@ package export::generic;
             else {
                 $self->{'crop'} = query_text('Crop broadcast overscan (2% border)?',
                                              'yesno',
-                                             $self->{'crop'} ? 'Yes' : 'No');
+                                             $self->val('crop'));
             }
         }
     }
@@ -115,56 +115,50 @@ package export::generic;
 # A routine to grab resolutions
     sub query_resolution {
         my $self = shift;
-    # Ask the user what resolution he/she wants
-        if (arg('width')) {
-            die "Width must be > 0\n" unless (arg('width') > 0);
-            $self->{'width'} = arg('width');
+    # No height given -- use auto?
+        if (!$self->val('width') || $self->val('width') =~ /^\s*\D/) {
+            $self->{'width'} = $episodes[0]->{'finfo'}{'width'};
         }
-        else {
-            while (1) {
-                my $w = query_text('Width?',
-                                   'int',
-                                   $self->{'width'});
-            # Make sure this is a multiple of 16
-                if ($w % 16 == 0) {
-                    $self->{'width'} = $w;
-                    last;
-                }
-            # Alert the user
-                print "Width must be a multiple of 16.\n";
+    # Ask the user what resolution he/she wants
+        while (1) {
+            my $w = query_text('Width?',
+                               'int',
+                               $self->val('width'));
+        # Make sure this is a multiple of 16
+            if ($w % 16 == 0) {
+                $self->{'width'} = $w;
+                last;
             }
+        # Alert the user
+            print "Width must be a multiple of 16.\n";
         }
     # Height will default to whatever is the appropriate aspect ratio for the width
     # someday, we should check the aspect ratio here, too...  Round up/down as needed.
-        $self->{'height'} = sprintf('%.0f', $self->{'width'} * 3/4);
-        if ($self->{'height'} % 16 > 8) {
-            while ($self->{'height'} % 16 > 0) {
-                $self->{'height'}++;
+        if (!$self->val('height') || $self->val('height') =~ /^\s*\D/) {
+            $self->{'height'} = sprintf('%.0f', $self->{'width'} * 3/4);
+            if ($self->{'height'} % 16 > 8) {
+                while ($self->{'height'} % 16 > 0) {
+                    $self->{'height'}++;
+                }
             }
-        }
-        elsif ($self->{'height'} % 16 > 0) {
-            while ($self->{'height'} % 16 > 0) {
-                $self->{'height'}--;
+            elsif ($self->{'height'} % 16 > 0) {
+                while ($self->{'height'} % 16 > 0) {
+                    $self->{'height'}--;
+                }
             }
         }
     # Ask about the height
-        if (arg('height')) {
-            die "Height must be > 0\n" unless (arg('height') > 0);
-            $self->{'height'} = arg('height');
-        }
-        else {
-            while (1) {
-                my $h = query_text('Height?',
-                                   'int',
-                                   $self->{'height'});
-            # Make sure this is a multiple of 16
-                if ($h % 16 == 0) {
-                    $self->{'height'} = $h;
-                    last;
-                }
-            # Alert the user
-                print "Height must be a multiple of 16.\n";
+        while (1) {
+            my $h = query_text('Height?',
+                               'int',
+                               $self->{'height'});
+        # Make sure this is a multiple of 16
+            if ($h % 16 == 0) {
+                $self->{'height'} = $h;
+                last;
             }
+        # Alert the user
+            print "Height must be a multiple of 16.\n";
         }
     }
 
@@ -260,6 +254,16 @@ package export::generic;
                 die "Waited too long for mythtranscode to create its fifos.  Please try again.\n\n";
             }
         }
+    }
+
+    sub val {
+        my $self = shift;
+        my $arg  = shift;
+        if (!defined $self->{$arg}) {
+        # Look for a config option, or a commandline option
+            $self->{$arg} = arg($arg, rc_arg($arg, $self));
+        }
+        return $self->{$arg};
     }
 
 # Return true

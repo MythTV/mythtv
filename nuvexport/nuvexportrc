@@ -1,0 +1,98 @@
+#
+# nuvexportrc:
+#
+#  This file contains the configuration for nuvexport, and should be installed
+#    as /etc/nuvexportrc or ~/.nuvexportrc (if you use both, the one in your
+#    home directory will take precedence).
+#
+#  The config in this file likely will NOT work, which is why this file has
+#    been left out of the makefile and rpm for the time being.
+#
+
+#
+#   Anything placed within the <nuvexport> section
+#
+<nuvexport>
+
+#
+#  Set export_prog to ffmpeg or transcode, depending on your preference of
+#    program for exports.  This is equivalent to --ffmpeg or --transcode.
+#
+export_prog=transcode
+
+#
+#  Any other parameters set in this file are equivalent to using the equivalent
+#    setting as a commandline option.  For boolean options like --deinterlace
+#    (--nodeinterlace), use deinterlace=yes (or no, true or false) instead.
+#    Actual commandline options will override anything in this file.
+#
+
+#
+#  Preferred mode -- if you don't set this, nuvexport will ask you what you
+#    would like to do.  Use --mode or any of the mode symlinks (like
+#    nuvexport-xvid) to override.
+#
+# mode=xvid
+
+#
+#  Setting underscores to yes will convert whitespace in filenames to an
+#    underscore character (which some people seem to prefer)
+underscores=no
+
+</nuvexport>
+
+#
+#  The sections below work as above, with each more specific section overriding
+#    the more generic.
+#
+
+<generic>
+
+path = /home/xris/Video
+
+use_cutlist   = yes
+multipass     = yes
+
+noise_reduction = yes
+deinterlace     = yes
+crop            = yes
+
+</generic>
+
+
+<ffmpeg>
+</ffmpeg>
+
+<ffmpeg::XviD>
+
+vbr             = yes   # Enable vbr to get the multipass/quantisation options
+                        # (enabling multipass or quantisation automatically enables vbr)
+multipass       = yes   # You get either multipass or quantisation; multipass will override
+quantisation    = 6     # 4 through 6 is probably right...  1..31 are allowed (lower is better quality)
+
+a_bitrate       = 128   # Audio bitrate of 128 kbps
+v_bitrate       = 960   # Remember, quantisation overrides video bitrate
+
+width           = 624   # Height adjusts automatically to width, according to aspect ratio
+height          = auto
+
+</ffmpeg::XviD>
+
+<transcode>
+</transcode>
+
+<transcode::XviD>
+
+vbr             = yes   # Enable vbr to get the multipass/quantisation options
+                        # (enabling multipass or quantisation automatically enables vbr)
+multipass       = yes   # You get either multipass or quantisation; multipass will override
+quantisation    = 6     # 4 through 6 is probably right...  1..31 are allowed (lower is better quality)
+
+a_bitrate       = 128   # Audio bitrate of 128 kbps
+v_bitrate       = 960   # Remember, quantisation overrides video bitrate
+
+width           = 624   # Height adjusts automatically to width, according to aspect ratio
+height          = auto
+
+</transcode::XviD>
+

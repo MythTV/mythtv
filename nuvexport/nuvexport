@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Last Updated: 2005.02.16 (xris)
+# Last Updated: 2005.02.25 (xris)
 
 # Version
     $VERSION = '0.2 cvs20050221';
@@ -34,46 +34,56 @@
 
 # Load the exporters based on which suite was selected above
     if ($export_prog eq 'transcode') {
+        find_program('transcode')
+            or die "You need transcode in order to use nuvexport in --transcode mode\n";
     # transcode - doesn't seem to work for many MPEG recordings these days
         require export::transcode::XviD;
-            push @Exporters, export::transcode::XviD->new;
         require export::transcode::SVCD;
-            push @Exporters, export::transcode::SVCD->new;
         require export::transcode::VCD;
-            push @Exporters, export::transcode::VCD->new;
         require export::transcode::DVCD;
-            push @Exporters, export::transcode::DVCD->new;
         require export::transcode::DVD;
-            push @Exporters, export::transcode::DVD->new;
     }
     elsif ($export_prog eq 'ffmpeg') {
+        find_program('ffmpeg')
+            or die "You need ffmpeg in order to use nuvexport in --ffmpeg mode\n";
     # ffmpeg - seems to work better and is the default
         require export::ffmpeg::XviD;
-            push @Exporters, export::ffmpeg::XviD->new;
         require export::ffmpeg::SVCD;
-            push @Exporters, export::ffmpeg::SVCD->new;
         require export::ffmpeg::VCD;
-            push @Exporters, export::ffmpeg::VCD->new;
         require export::ffmpeg::DVCD;
-            push @Exporters, export::ffmpeg::DVCD->new;
         require export::ffmpeg::DVD;
-            push @Exporters, export::ffmpeg::DVD->new;
         require export::ffmpeg::DivX;
-            push @Exporters, export::ffmpeg::DivX->new;
         require export::ffmpeg::ASF;
-            push @Exporters, export::ffmpeg::ASF->new;
         require export::ffmpeg::MP3;
-            push @Exporters, export::ffmpeg::MP3->new;
     }
 
 # Load the other export modules
     require export::MPEG2_cut;
-        push @Exporters, export::MPEG2_cut->new;
     require export::NUV_SQL;
-        push @Exporters, export::NUV_SQL->new;
 
 # Load the ui
     load_cli_args();
+
+# Now that we've loaded the cli args, we can define the exporters
+    if ($export_prog eq 'transcode') {
+        push @Exporters, export::transcode::XviD->new;
+        push @Exporters, export::transcode::SVCD->new;
+        push @Exporters, export::transcode::VCD->new;
+        push @Exporters, export::transcode::DVCD->new;
+        push @Exporters, export::transcode::DVD->new;
+    }
+    elsif ($export_prog eq 'ffmpeg') {
+        push @Exporters, export::ffmpeg::XviD->new;
+        push @Exporters, export::ffmpeg::SVCD->new;
+        push @Exporters, export::ffmpeg::VCD->new;
+        push @Exporters, export::ffmpeg::DVCD->new;
+        push @Exporters, export::ffmpeg::DVD->new;
+        push @Exporters, export::ffmpeg::DivX->new;
+        push @Exporters, export::ffmpeg::ASF->new;
+        push @Exporters, export::ffmpeg::MP3->new;
+    }
+    push @Exporters, export::MPEG2_cut->new;
+    push @Exporters, export::NUV_SQL->new;
 
 # Show the version?
     if (arg('version')) {
@@ -90,7 +100,7 @@
     load_recordings();
 
 # Load episodes from the commandline (and display/quit if this is search-only)
-    my @episodes = load_cli_episodes();
+    @episodes = load_cli_episodes();
 
 # Which exporter to use
     my $exporter = query_exporters($export_prog);

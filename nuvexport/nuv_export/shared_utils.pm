@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.16 (xris)
+#Last Updated: 2005.02.25 (xris)
 #
 #  nuv_export::shared_utils
 #
@@ -17,7 +17,7 @@ package nuv_export::shared_utils;
         our @EXPORT = qw/ &clear        &find_program       &shell_escape
                           &wrap         &wipe_tmpfiles
                           &system       &mkdir
-                          @Exporters
+                          @Exporters    @episodes
                           $DEBUG        $NICE
                           $num_cpus     $is_child
                           @tmpfiles     %children
@@ -26,6 +26,7 @@ package nuv_export::shared_utils;
 
 # Variables that we export so all other modules can share them
     our @Exporters;     # A list of the various exporters
+    our @episodes;      # A list of the requested episodes
     our $is_child = 0;  # This is set to 1 after forking to a new process
     our @tmpfiles;      # Keep track of temporary files, so we can clean them up upon quit
     our %children;      # Keep track of child pid's so we can kill them off if we quit unexpectedly
@@ -82,31 +83,43 @@ package nuv_export::shared_utils;
         print $DEBUG ? "\n" : $terminal->Tputs('cl');
     }
 
-# This searches the path for the specified programs, and returns the lowest-index-value program found
+# This searches the path for the specified programs, and returns the
+#   lowest-index-value program found, caching the results
+BEGIN {
+    my %find_program_cache;
     sub find_program {
-    # Load the programs, and get a count of the priorities
-        my (%programs, $num_programs);
-        foreach my $program (@_) {
-            $programs{$program} = ++$num_programs;
-        }
-    # No programs requested?
-        return undef unless ($num_programs > 0);
-    # Search for the program(s)
-        my %found;
-        foreach my $path (split(/:/, $ENV{'PATH'}), '.') {
-            foreach my $program (keys %programs) {
-                if (-e "$path/$program" && (!$found{'name'} || $programs{$program} < $programs{$found{'name'}})) {
-                    $found{'name'} = $program;
-                    $found{'path'} = $path;
-                }
-            # Leave early if we found the highest priority program
-                last if ($found{'name'} && $programs{$found{'name'}} == 1);
+    # Get the hash id
+        my $hash_id = join("\n", @_);
+    # No cache?
+        if (!defined($find_program_cache{$hash_id})) {
+        # Load the programs, and get a count of the priorities
+            my (%programs, $num_programs);
+            foreach my $program (@_) {
+                $programs{$program} = ++$num_programs;
             }
+        # No programs requested?
+            return undef unless ($num_programs > 0);
+        # Search for the program(s)
+            my %found;
+            foreach my $path (split(/:/, $ENV{'PATH'}), '.') {
+                foreach my $program (keys %programs) {
+                    if (-e "$path/$program" && (!$found{'name'} || $programs{$program} < $programs{$found{'name'}})) {
+                        $found{'name'} = $program;
+                        $found{'path'} = $path;
+                    }
+                # Leave early if we found the highest priority program
+                    last if ($found{'name'} && $programs{$found{'name'}} == 1);
+                }
+            }
+        # Set the cache
+            $find_program_cache{$hash_id} = ($found{'path'} && $found{'name'})
+                                               ? $found{'path'}.'/'.$found{'name'}
+                                               : '';
         }
     # Return
-        return undef unless ($found{'path'} && $found{'name'});
-        return $found{'path'}.'/'.$found{'name'};
+        return $find_program_cache{$hash_id};
     }
+}
 
 # Escape a parameter for safe use in a commandline call
     sub shell_escape {
