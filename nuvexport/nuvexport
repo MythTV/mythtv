@@ -193,7 +193,8 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
 
 # Read the mysql.txt file in use by MythTV.
 # could be in a couple places, so try the usual suspects
-	open(CONF, "/usr/share/mythtv/mysql.txt")
+	open(CONF, "$ENV{HOME}/.mythtv/mysql.txt")
+		or open(CONF, "/usr/share/mythtv/mysql.txt")
 		or open(CONF, "/usr/local/share/mythtv/mysql.txt")
 		or die ("Unable to open /usr/share/mythtv/mysql.txt:  $!\n\n");
 	while (my $line = <CONF>) {
