@@ -951,7 +951,7 @@ void ProgFinder::selectSearchData()
 
     thequery = QString("SELECT DISTINCT title "
                        "FROM program "
-                       "WHERE title LIKE '%1%' OR title LIKE 'The %2%' OR title LIKE 'A %3%' "
+                       "WHERE ( title LIKE '%1%' OR title LIKE 'The %2%' OR title LIKE 'A %3%' ) "
 		       "AND starttime > %4 "
                        "ORDER BY title;")
                         .arg(searchData[curSearch])
@@ -1278,8 +1278,10 @@ void ProgFinder::selectShowData(QString progTitle)
 		// DATE, CHANNEL NUM, CHANNEL CALLSIGN, SUBTITLE, DESCRIPTION, SQL START, SQL END
 
 		showData[showCount].startdatetime = progStart;
-		showData[showCount].startDisplay = progStart.toString("ddd M/dd     h:mm ap");
-		showData[showCount].endDisplay = progEnd.toString("hh:mm ap");
+		QString DateTimeFormat = gContext->GetSetting("DateFormat")+" "+gContext->GetSetting("TimeFormat");
+
+		showData[showCount].startDisplay = progStart.toString(DateTimeFormat);
+		showData[showCount].endDisplay = progEnd.toString(gContext->GetSetting("TimeFormat"));
 		showData[showCount].channelNum = query.value(2).toString();
 		showData[showCount].channelCallsign = query.value(3).toString();
 		showData[showCount].title = progTitle;
@@ -1377,7 +1379,7 @@ void ProgFinder::getSearchData(int charNum)
 
     thequery = QString("SELECT DISTINCT title "
                        "FROM program "
-                       "WHERE title LIKE '%1%' OR title LIKE 'The %2%' OR title LIKE 'A %3%' "
+                       "WHERE ( title LIKE '%1%' OR title LIKE 'The %2%' OR title LIKE 'A %3%' ) "
 		       "AND starttime > %4 "
                        "ORDER BY title;")
 			.arg(searchData[charNum])

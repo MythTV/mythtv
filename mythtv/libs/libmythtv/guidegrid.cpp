@@ -1828,7 +1828,7 @@ QRect GuideGrid::dateRect() const
     if (programGuideType != 1)
         r = QRect(0, 0, programRect().left(), programRect().top());
     else
-        r = QRect(0, (int)(300 * wmult), programRect().left(), 
+        r = QRect(0, (int)(300 * hmult), programRect().left(), 
                   (int)(26 * wmult));
 
     return r;
