@@ -1741,7 +1741,8 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
 
     DialogBox diag(gContext->GetMainWindow(), QObject::tr(message));
     diag.AddButton(QObject::tr("OK"));
-    diag.AddButton(QObject::tr("Don't record it"));
+    diag.AddButton(QObject::tr("Don't record this showing"));
+    diag.AddButton(QObject::tr("I've already seen this episode"));
 
     int ret = diag.exec();
 
@@ -1749,6 +1750,16 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
       return;
 
     setOverride(db, 2);
+
+    if (ret <= 2)
+      return;
+
+    if (record == NULL) 
+    {
+        record = new ScheduledRecording();
+        record->loadByProgram(db, this);
+    }
+    record->doneRecording(db, *this);
 }
 
 void ProgramInfo::handleNotRecording(QSqlDatabase *db)
