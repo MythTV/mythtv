@@ -69,6 +69,7 @@ class PlaybackBox : public MythThemedDialog
     void resetTimer();
     void hideVolume(){showVolume(false);}
     void showVolume(bool on_or_off);
+    void wipeTrackInfo();
     
   signals:
   
@@ -151,9 +152,9 @@ class PlaybackBox : public MythThemedDialog
     UITextType            *info_text;
     
     UIRepeatedImageType   *ratings_image;
-    UIRepeatedImageType   *volume_ticks;
-    UIImageType           *volume_background;
     UIBlackHoleType       *visual_blackhole;
+
+    UIStatusBarType       *volume_status;
 
     UIPushButtonType      *prev_button;
     UIPushButtonType      *rew_button;

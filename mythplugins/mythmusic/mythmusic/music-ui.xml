@@ -245,15 +245,12 @@
 
         <container name="volumedisplay">
             <area>690,315,40,160</area>
-            <image name="volume_background" draworder="-1" fleximage="no">
-                <filename>mm_volume_background.png</filename>
+            <statusbar name="volume_status" draworder="-1" whitespace="5">
+                <container fleximage="no">mm_volume_background.png</container>
+                <fill>mm_volume_tick.png</fill>
                 <position>0,0</position>
-            </image>
-            <repeatedimage name="volume_ticks" draworder="1" fleximage="no">
-                <filename>mm_volume_tick.png</filename>
-                <position>5,152</position>
                 <orientation>BottomToTop</orientation>
-            </repeatedimage>
+            </statusbar>
         </container>
 
         <!--

@@ -42,6 +42,7 @@ PlaybackBox::PlaybackBox(QString window_name,
     setContext(0);
     visual_mode_timer = new QTimer();
     visualizer_status = 0;
+    curMeta = NULL;
 
     //
     //  Set our pointers the playlists and the
@@ -414,20 +415,19 @@ void PlaybackBox::showVolume(bool on_or_off)
 {
     if(volume_control)
     {
-        if(volume_ticks && volume_background)
+        if(volume_status)
         {
             if(on_or_off)
             {
-                volume_background->SetOrder(0);
-                volume_ticks->setRepeat(volume_control->GetCurrentVolume() / 2);
-                volume_background->refresh();
+                volume_status->SetUsed(volume_control->GetCurrentVolume());
+                volume_status->SetOrder(0);
+                volume_status->refresh();
                 volume_display_timer->changeInterval(2000);
             }
             else
             {
-                volume_background->SetOrder(-1);
-                volume_ticks->setRepeat(0);
-                volume_background->refresh();
+                volume_status->SetOrder(-1);
+                volume_status->refresh();
             }
         }
     }
@@ -452,6 +452,10 @@ void PlaybackBox::play()
     }
     else
     {
+        //
+        //  Perhaps we can descend to something playable?
+        //
+        wipeTrackInfo();
         return;
     }
 
@@ -956,11 +960,25 @@ void PlaybackBox::editPlaylist()
     //  Get a reference to the current track
     //  
 
-    QValueList <int> *branches_to_current_node = NULL;
+    QValueList <int> branches_to_current_node;
 
     if(curMeta)
     {
-        branches_to_current_node = music_tree_list->getRouteToActive();
+        QValueList <int> *a_route;
+        a_route = music_tree_list->getRouteToActive();
+        branches_to_current_node = *a_route;
+    }
+    else
+    {
+        //
+        //  No current metadata, so when we come back we'll
+        //  try and play the first thing on the active queue
+        //
+        
+        branches_to_current_node.clear();
+        branches_to_current_node.append(0);                  //  Root node
+        branches_to_current_node.append(1);                  //  We're on a playlist (not "My Music")
+        branches_to_current_node.append(0);                  //  Active play Queue
     }
 
     visual_mode_timer->stop();
@@ -976,21 +994,23 @@ void PlaybackBox::editPlaylist()
     //  at the same level
     //
 
+    wipeTrackInfo();
     constructPlaylistTree();
-    if(music_tree_list->tryToSetActive(*branches_to_current_node))
+    if(music_tree_list->tryToSetActive(branches_to_current_node))
     {
         //  All is well
     }
     else
     {
         stop();
-        QValueList <int> branches_to_current_node;
+        branches_to_current_node.clear();
         branches_to_current_node.append(0);                  //  Root node
         branches_to_current_node.append(1);                  //  We're on a playlist (not "My Music")
         branches_to_current_node.append(0);                  //  Active play Queue
         music_tree_list->moveToNodesFirstChild(branches_to_current_node);
     }
     music_tree_list->refresh();
+    
 }
 
 void PlaybackBox::closeEvent(QCloseEvent *event)
@@ -1074,9 +1094,12 @@ void PlaybackBox::customEvent(QCustomEvent *event)
                                    float(oe->frequency()) / 1000.0,
                                    oe->channels() > 1 ? "2" : "1");
             }
-
-            time_text->SetText(time_string);
-            info_text->SetText(info_string);
+        
+            if(curMeta)
+            {
+                time_text->SetText(time_string);
+                info_text->SetText(info_string);
+            }
 
             break;
         }
@@ -1124,6 +1147,16 @@ void PlaybackBox::customEvent(QCustomEvent *event)
     QWidget::customEvent(event);
 }
 
+void PlaybackBox::wipeTrackInfo()
+{
+        title_text->SetText("");
+        artist_text->SetText("");
+        album_text->SetText("");
+        time_text->SetText("");
+        info_text->SetText("");
+        ratings_image->setRepeat(0);
+}
+
 void PlaybackBox::handleTreeListSignals(int node_int, IntVector *attributes)
 {
     //  Debugging
@@ -1167,6 +1200,11 @@ void PlaybackBox::handleTreeListSignals(int node_int, IntVector *attributes)
 
         play();
         
+    }
+    else
+    {
+        curMeta = NULL;
+        wipeTrackInfo();
     }
 }
 
@@ -1248,11 +1286,15 @@ void PlaybackBox::wireUpTheme()
     }
 
     //
-    //  Ticks for volume display
+    //  Status bar for volume display
     //  (but don't complain if we can't find it)
-    volume_ticks = getUIRepeatedImageType("volume_ticks");
-    volume_background = getUIImageType("volume_background");
-    
+    volume_status = getUIStatusBarType("volume_status");
+    if(volume_status)
+    {
+        volume_status->SetTotal(100);
+        volume_status->SetOrder(-1);
+    }
+        
     //
     //  Black Hole for visualizer
     //

@@ -216,7 +216,7 @@ bool Spectrum::draw(QPainter *p, const QColor &back)
     // Oops ... user doesn't have a Fast Fourier Library
     p->fillRect(0, 0, size.width(), size.height(), back);
     p->setPen(Qt::white);
-    p->setFont(QFont("Helvetica", 20));
+    p->setFont(QFont("Helvetica", 12));
     p->drawText(size.width() / 2 - 200, size.height() / 2 - 20, 400, 20, Qt::AlignCenter, "Visualization requires FFT library");
     p->drawText(size.width() / 2 - 200, size.height() / 2, 400, 20, Qt::AlignCenter, "Did you run configure?");
 #endif
