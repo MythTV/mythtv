@@ -44,6 +44,44 @@
           <filename>music-sel-bg.png</filename>
           <position>0,0</position>
         </image>
+
+        <textarea name="line1" draworder="1" align="left">
+            <font>active</font>
+            <area>10,0,780,30</area>
+            <cutdown>yes</cutdown>
+        </textarea>
+
+        <textarea name="line2" draworder="1" align="left">
+            <font>active</font>
+            <area>10,30,780,30</area>
+            <cutdown>yes</cutdown>
+        </textarea>
+
+        <textarea name="line3" draworder="1" align="left">
+            <font>active</font>
+            <area>10,60,780,30</area>
+            <cutdown>yes</cutdown>
+        </textarea>
+
+        <textarea name="line4" draworder="1" align="left">
+            <font>active</font>
+            <area>10,90,780,30</area>
+            <cutdown>yes</cutdown>
+        </textarea>
+
+        <textarea name="line5" draworder="1" align="left">
+            <font>active</font>
+            <area>10,120,780,30</area>
+            <cutdown>yes</cutdown>
+        </textarea>
+
+        <textarea name="line6" draworder="1" align="left">
+            <font>active</font>
+            <area>10,150,780,30</area>
+            <cutdown>yes</cutdown>
+        </textarea>
+
+
       </container>
 
     </window>

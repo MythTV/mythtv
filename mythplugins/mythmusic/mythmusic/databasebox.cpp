@@ -69,6 +69,28 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
         return;
     }
 
+    UITextType *line = NULL;
+
+    for (int i = 1; i <= 6; i++)
+    {
+        QString linename = QString("line%1").arg(i);
+        if ((line = getUITextType(linename)))
+            m_lines.append(line);
+    }
+
+    if (m_lines.count() < 3)
+    {
+        DialogBox diag(gContext->GetMainWindow(), tr("The theme you are using "
+                       "does not contain any info lines in the music element.  "
+                       "Please contact the theme creator and ask if they could "
+                       "please update it.<br><br>The next screen will be empty."
+                       "  Escape out of it to return to the menu."));
+        diag.AddButton(tr("OK"));
+        diag.exec();
+
+        return;
+    }
+
     connect(tree, SIGNAL(itemEntered(UIListTreeType *, UIListGenericTree *)),
             this, SLOT(entered(UIListTreeType *, UIListGenericTree *)));
 
@@ -574,28 +596,95 @@ void DatabaseBox::entered(UIListTreeType *treetype, UIListGenericTree *item)
     if (!item || !treetype)
         return;
 
-    cout << endl;
-/*
-    if (item == allmusic || item == alllists || item == allcurrent ||
-        item == cditem)
+    TreeCheckItem *item_ptr = dynamic_cast<TreeCheckItem*>(item);
+
+    if (item_ptr && item->childCount() == 0 && item_ptr->getLevel() == "title")
     {
-        cout << item->getString();
-        return;
-    }
-*/
-    if (CDCheckItem *item_ptr = dynamic_cast<CDCheckItem*>(item))
-    {
-        cout << "cd: " << cditem->getString() << endl;
-        cout << "track: " << item_ptr->getString() << endl;
+        int id = item_ptr->getID();
+
+        Metadata *mdata = all_music->getMetadata(id);
+
+        if (!mdata)
+            return;
+
+        QString tmpstr = tr("Artist:\t") + mdata->Artist();
+        m_lines.at(0)->SetText(tmpstr);
+        tmpstr = tr("Album:\t") + mdata->Album();
+        m_lines.at(1)->SetText(tmpstr);
+        tmpstr = tr("Title:\t") + mdata->Title();
+        m_lines.at(2)->SetText(tmpstr);
+
+        if (m_lines.at(3))
+        {
+            int maxTime = mdata->Length() / 1000;
+
+            int maxh = maxTime / 3600;
+            int maxm = (maxTime / 60) % 60;
+            int maxs = maxTime % 60;
+
+            QString timeStr;
+            if (maxh > 0)
+                timeStr.sprintf("%02d:%02d:%02d", maxh, maxm, maxs);
+            else
+                timeStr.sprintf("%02d:%02d", maxm, maxs);
+
+            tmpstr = tr("Length:\t") + timeStr;
+
+            if (mdata->Genre().length() > 0)
+            {
+                tmpstr += "            " + tr("Genre: ") + mdata->Genre();
+            }
+
+            m_lines.at(3)->SetText(tmpstr);
+        }
+
+        for (unsigned int i = 4; i < m_lines.count(); i++)
+            m_lines.at(i)->SetText("");
+
         return;
     }
 
-    if (TreeCheckItem *item_ptr = dynamic_cast<TreeCheckItem*>(item))
+    QStringList pathto = treetype->getRouteToCurrent();
+
+    int linelen = 0;
+    int dispat = 0;
+    QString data = "";
+
+    for (QStringList::Iterator it = pathto.begin(); 
+         it != pathto.end(); ++it) 
     {
-        cout << "level: " << item_ptr->getLevel() << endl;
-        cout << "text: " << item_ptr->getString() << endl;
-        return;
+        if (it == pathto.begin())
+            continue;
+
+        if (data != "")
+            data += "  /  ";
+
+        data += *it;
+        linelen++;
+        if (linelen == 2)
+        {
+            if (m_lines.at(dispat))
+            {
+                m_lines.at(dispat)->SetText(data);
+            }
+
+            data = "";
+            linelen = 0;
+            dispat++;
+        }
     }
+
+    if (linelen != 0)
+    {
+        if (m_lines.at(dispat))
+        {
+            m_lines.at(dispat)->SetText(data);
+        } 
+        dispat++;
+    }
+
+    for (unsigned int i = dispat; i < m_lines.count(); i++)
+        m_lines.at(i)->SetText("");
 }
     
 void DatabaseBox::selected(UIListGenericTree *item)

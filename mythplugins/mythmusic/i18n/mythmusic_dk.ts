@@ -19,7 +19,7 @@
     </message>
     <message>
         <source>Move to Active Play Queue</source>
-        <translation>Flyt til den aktive spillekø</translation>
+        <translation>Flyt til aktiv spillekø</translation>
     </message>
     <message>
         <source>Delete This Playlist</source>
@@ -35,7 +35,7 @@
     </message>
     <message>
         <source>Clear the Active Play Queue</source>
-        <translation>Ryd den aktive spillekø</translation>
+        <translation>Ryd aktiv spillekø</translation>
     </message>
     <message>
         <source>Save Back to Playlist Tree</source>
@@ -47,11 +47,11 @@
     </message>
     <message>
         <source>All My Music ~ Loading Music Data </source>
-        <translation type="unfinished"></translation>
+        <translation>Al min musik ~ Indlæser musik</translation>
     </message>
     <message>
         <source>Loading Music Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Indlæser musik</translation>
     </message>
     <message>
         <source>The theme you are using does not contain a &apos;musictree&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
@@ -59,31 +59,31 @@
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <source>Couldn&apos;t create CD</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunne ikke generere CD</translation>
     </message>
     <message>
         <source>CD Created</source>
-        <translation type="unfinished"></translation>
+        <translation>CD genereret</translation>
     </message>
     <message>
         <source>CD-RW Blanking Progress</source>
-        <translation type="unfinished"></translation>
+        <translation>CD-RW slettes</translation>
     </message>
     <message>
         <source>Create Audio CD from Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Dan almindelig musik-CD fra spilleliste</translation>
     </message>
     <message>
         <source>Create MP3 CD from Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Generér MP3-CD fra spilleliste</translation>
     </message>
     <message>
         <source>Clear CD-RW Disk</source>
-        <translation type="unfinished"></translation>
+        <translation>Slet CD-RW disk</translation>
     </message>
 </context>
 <context>
@@ -154,35 +154,35 @@
     </message>
     <message>
         <source>Playing stream.</source>
-        <translation>Afspiller stykket.</translation>
+        <translation>Afspiller musik.</translation>
     </message>
     <message>
         <source>Buffering stream.</source>
-        <translation>Forlagrer stykket.</translation>
+        <translation>Forbereder musik.</translation>
     </message>
     <message>
         <source>Stream paused.</source>
-        <translation>Stykket er pauset.</translation>
+        <translation>Musik sat på pause.</translation>
     </message>
     <message>
         <source>Output error.</source>
-        <translation>Output fejl.</translation>
+        <translation>Output-fejl.</translation>
     </message>
     <message>
         <source>Stream stopped.</source>
-        <translation>Stykket er stoppet.</translation>
+        <translation>Musik stoppet.</translation>
     </message>
     <message>
         <source>Finished playing stream.</source>
-        <translation>Færdig med stykket.</translation>
+        <translation>Musik afsluttet.</translation>
     </message>
     <message>
         <source>Decoder error.</source>
-        <translation>Dekoder fejl.</translation>
+        <translation>Dekoder-fejl.</translation>
     </message>
     <message>
         <source>playlist root</source>
-        <translation type="unfinished"></translation>
+        <translation>rod af spilleliste</translation>
     </message>
     <message>
         <source>kbps</source>
@@ -194,18 +194,18 @@
     </message>
     <message>
         <source>ch</source>
-        <translation type="unfinished"></translation>
+        <translation>kanaler</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Searching for music files</source>
-        <translation>Søger efter musik filer</translation>
+        <translation>Søger efter musik-filer</translation>
     </message>
     <message>
         <source>Updating music database</source>
-        <translation>Opdaterer musik databasen</translation>
+        <translation>Opdaterer musik-databasen</translation>
     </message>
     <message>
         <source>BumpScope</source>
@@ -213,7 +213,7 @@
     </message>
     <message>
         <source>Various Artists</source>
-        <translation type="unfinished"></translation>
+        <translation>Diverse kunstnere</translation>
     </message>
     <message>
         <source>Ogg Vorbis Audio</source>
@@ -221,7 +221,7 @@
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukendt</translation>
     </message>
     <message>
         <source>FLAC Audio</source>
@@ -229,75 +229,75 @@
     </message>
     <message>
         <source>Directory to hold music</source>
-        <translation type="unfinished"></translation>
+        <translation>Bibliotek der indeholder musik</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythMusic needs to have write permission to the directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dette underbibliotek skal eksistere, og brugeren der kører MythMusic skal have skrive-rettigheder hertil.</translation>
     </message>
     <message>
         <source>Audio device</source>
-        <translation type="unfinished"></translation>
+        <translation>Lyd-enhed</translation>
     </message>
     <message>
         <source>Audio Device used for playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lyd-enhed, der anvendes til afspilning</translation>
     </message>
     <message>
         <source>CD device</source>
-        <translation type="unfinished"></translation>
+        <translation>CD-enhed</translation>
     </message>
     <message>
         <source>CDRom device used for ripping/playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>CDROM-enhed der anvendes til kopiering (rip) og afspilning af CD'er.</translation>
     </message>
     <message>
         <source>Tree Sorting</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortering af træ</translation>
     </message>
     <message>
         <source>Script Path</source>
-        <translation type="unfinished"></translation>
+        <translation>Sti til script</translation>
     </message>
     <message>
         <source>If present this script will be executed after a CD Rip is completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette er udfyldt, vil det angivne script blive udført efter en CD er kopieret (rippet).</translation>
     </message>
     <message>
         <source>Filename Format</source>
-        <translation type="unfinished"></translation>
+        <translation>Format af filnavne</translation>
     </message>
     <message>
         <source>Directory and filename Format used to grab information if no ID3 information is found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Formatet af underbiblioteker og filnavne, der anvendendes når der ikke er ID3-information tilgængelig.</translation>
     </message>
     <message>
         <source>Ignore ID3 Tags</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignorér ID3-information</translation>
     </message>
     <message>
         <source>If set, MythMusic will skip checking ID3 tags in files and just try to determine Genre, Artist, Album, and Track number and title from the filename.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette felt er markeret, vil MythMusic ikke læste information fra de såkaldte ID3-tags, og blot forsøge at fastlægge genre, kunstner, album, spor-nummmer, og titel udfra filnavnet.</translation>
     </message>
     <message>
         <source>Automatically lookup CDs</source>
-        <translation type="unfinished"></translation>
+        <translation>Hent CD-information automatisk</translation>
     </message>
     <message>
         <source>Automatically lookup an audio CD if it is present and show its information in the Music Selection Tree.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette felt er markeret, vil MythMusic automatisk hente information om CD'er i drevet og vise denne.</translation>
     </message>
     <message>
         <source>Use Keyboard/Remote Accelerated Buttons</source>
-        <translation type="unfinished"></translation>
+        <translation>Anvend accelererede taster på tastatur &amp; fjernbetjening</translation>
     </message>
     <message>
         <source>If this is not set, you will need to use arrow keys to select and activate various functions.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette felt ikke er markeret, skal du anvende piletaster til at vælge og aktivere diverse funktionaliteter.</translation>
     </message>
     <message>
         <source>Encoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Musik-format</translation>
     </message>
     <message>
         <source>Ogg Vorbis</source>
@@ -309,19 +309,19 @@
     </message>
     <message>
         <source>Audio encoder to use for CD ripping. Note that the quality level &apos;Perfect&apos; will use the FLAC encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Formatet der anvendes ved kopiering (rip) af CD'er. Bemærk, at kvalitetsniveauet &apos;Perfekt&apos; vil resultere i anvendelsen af FLAC-formatet.</translation>
     </message>
     <message>
         <source>File storage location</source>
-        <translation type="unfinished"></translation>
+        <translation>Fil-placering</translation>
     </message>
     <message>
         <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / and -. &apos;-&apos; will be replaced by the Token separator</source>
-        <translation type="unfinished"></translation>
+        <translation>Placeringen af nye musik-filer. Gyldige makroer er: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / og -. &apos;-&apos; vil blive erstattet af makro-separatoreren.</translation>
     </message>
     <message>
         <source>Token separator</source>
-        <translation type="unfinished"></translation>
+        <translation>Makro-separator</translation>
     </message>
     <message>
         <source> - </source>
@@ -329,99 +329,99 @@
     </message>
     <message>
         <source>Filename tokens will be separated by this string.</source>
-        <translation type="unfinished"></translation>
+        <translation>Filnavns-makroer vil blive separeret af denne streng.</translation>
     </message>
     <message>
         <source>Replace &apos; &apos; with &apos;_&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Erstat &apos; &apos; med &apos;_&apos;</translation>
     </message>
     <message>
         <source>If set, whitespace characters in filenames will be replaced with underscore characters.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette felt er markeret, vil mellemrum i filnavne blive erstattet af &apos;underscore&apos;.</translation>
     </message>
     <message>
         <source>Paranoia Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Paranoia-niveau</translation>
     </message>
     <message>
         <source>Full</source>
-        <translation type="unfinished"></translation>
+        <translation>Færre fejl</translation>
     </message>
     <message>
         <source>Faster</source>
-        <translation type="unfinished"></translation>
+        <translation>Hurtigt</translation>
     </message>
     <message>
         <source>Paranoia level of the CD ripper. Set to faster if you&apos;re not concerned about possible errors in the audio.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fastsætter trade-off imellem hastighed og antal fejl ved kopiering (rip) af CD'er. Sæt dette til &apos;hurtigt&apos; hvis du er ligeglad med eventuelle fejl i de færdige lyd-filer.</translation>
     </message>
     <message>
         <source>Automatically eject CDs after ripping</source>
-        <translation type="unfinished"></translation>
+        <translation>Skub automatisk skuffen ud efter kopiering</translation>
     </message>
     <message>
         <source>If set, the CD tray will automatically open after the CD has been ripped.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette felt er markeret, vil CD-skuffen automatisk blive skubbet ud efter en CD er kopieret (rippet).</translation>
     </message>
     <message>
         <source>Rating Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Vægt, karakter</translation>
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to your rating of a given track when ordering a group of songs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Anvendes ved afspilning med &quot;Bland: Smart&quot;. Denne vægt fastsætter hvor meget din karakter af en given sang betyder ved sortering af en gruppe sange.</translation>
     </message>
     <message>
         <source>Play Count Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Vægt, hyppighed</translation>
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how many times a given track has been played when ordering a group of songs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Anvendes ved afspilning med &quot;Bland: Smart&quot;. Denne vægt fastsætter hvor meget afspilnings-hyppigheden for en given sang betyder ved sortering af en gruppe sange.</translation>
     </message>
     <message>
         <source>Last Play Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Vægt, sidst spillet</translation>
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how long it has been since a given track was played when ordering a group of songs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Anvendes ved afspilning med &quot;Bland: Smart&quot;. Denne vægt fastsætter hvor meget længden af tidsrummet siden sidste afspilning af en given sang betyder ved sortering af en gruppe sange.</translation>
     </message>
     <message>
         <source>Random Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Vægt, tilfældighed</translation>
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to good old (peudo-)randomness when ordering a group of songs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Anvendes ved afspilning med &quot;Bland: Smart&quot;. Denne vægt fastsætter hvor meget tilfældigheder spiller ind ved sortering af en gruppe sange.</translation>
     </message>
     <message>
         <source>Show Song Ratings</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis karakterer</translation>
     </message>
     <message>
         <source>Show song ratings on the playback screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette felt er markeret, vil karakterer for de enkelte sange blive vist i afspilnings-skærmbilledet.</translation>
     </message>
     <message>
         <source>List as Shuffled</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis tilfældig rækkefølge</translation>
     </message>
     <message>
         <source>List songs on the playback screen in the order they will be played.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis sange i afspilnings-skærmbilledet i den rækkefølge de bliver afspillet tilfældigt.</translation>
     </message>
     <message>
         <source>Show entire music tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis hele musik-hierarkiet</translation>
     </message>
     <message>
         <source>If selected, you can navigate your entire music tree from the playing screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette felt er markeret, kan du navigere rundt i hele musik-hierarkiet i afspilnings-skærmbilledet.</translation>
     </message>
     <message>
         <source>Play mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Afspilnings-måde</translation>
     </message>
     <message>
         <source>Normal</source>
@@ -429,51 +429,51 @@
     </message>
     <message>
         <source>Random</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilfældig</translation>
     </message>
     <message>
         <source>Intelligent</source>
-        <translation type="unfinished"></translation>
+        <translation>Smart</translation>
     </message>
     <message>
         <source>Starting shuffle mode for the player.  Can be either normal, random, or intelligent (random).</source>
-        <translation type="unfinished"></translation>
+        <translation>Fastsætter hvordan afspilning foregår som standard.</translation>
     </message>
     <message>
         <source>Delay before Visualizations start (seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Forsinkelse før visualiseringer starter (sekunder)</translation>
     </message>
     <message>
         <source>If set to 0, visualizations will never automatically start.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis denne værdi sættes til 0, vil visualiseringer aldrig starte automatisk</translation>
     </message>
     <message>
         <source>Change Visualizer on each song</source>
-        <translation type="unfinished"></translation>
+        <translation>Skift visualisering ved hver sang</translation>
     </message>
     <message>
         <source>Change the visualizer when the song change.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fastsætter om visualiseringen skal skifte ved hver ny sang.</translation>
     </message>
     <message>
         <source>Width for Visual Scaling</source>
-        <translation type="unfinished"></translation>
+        <translation>Vandret skalering af visualisering</translation>
     </message>
     <message>
         <source>If set to &quot;2&quot;, visualizations will be scaled in half.  Currently only used by the goom visualization.  Reduces CPU load on slower machines.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis denne værdi sættes til &apos;2&apos;, vil visualiseringer blive vist i halv størrelse, og reducerer dermed CPU-belastningen. (I øjeblikket kun anvendt ved visualiseringen &apos;Goom&apos;.)</translation>
     </message>
     <message>
         <source>Height for Visual Scaling</source>
-        <translation type="unfinished"></translation>
+        <translation>Lodret skalering af visualisering</translation>
     </message>
     <message>
         <source>Visualizations</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualiseringer</translation>
     </message>
     <message>
         <source>List of visualizations to use during playback. Possible values are space-separated list of </source>
-        <translation type="unfinished"></translation>
+        <translation>Liste over visualiseringer, der skal anvendes ved afspilning. Mulige værdier er følgende (med mellemrum imellem) </translation>
     </message>
     <message>
         <source>MonoScope</source>
@@ -505,43 +505,43 @@
     </message>
     <message>
         <source>Default Rip Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard kvalitet ved kopiering (rip)</translation>
     </message>
     <message>
         <source>Low</source>
-        <translation type="unfinished">Lav</translation>
+        <translation>Lav</translation>
     </message>
     <message>
         <source>Medium</source>
-        <translation type="unfinished">Mellem</translation>
+        <translation>Mellem</translation>
     </message>
     <message>
         <source>High</source>
-        <translation type="unfinished">Høj</translation>
+        <translation>Høj</translation>
     </message>
     <message>
         <source>Perfect</source>
-        <translation type="unfinished">Perfekt</translation>
+        <translation>Perfekt</translation>
     </message>
     <message>
         <source>Default quality for new CD rips.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fastsætter standard-kvaliteten ved nye CD-kopieringer (rip).</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Generelle indstillinger</translation>
     </message>
     <message>
         <source>Playback Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Indstillinger for afspilning</translation>
     </message>
     <message>
         <source>Visualization Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Indstillinger for visualisering</translation>
     </message>
     <message>
         <source>CD Ripper Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Indstillinger for CD-kopiering</translation>
     </message>
     <message>
         <source>MPEG Layer 1/2/3 Audio (MAD decoder)</source>
@@ -549,23 +549,23 @@
     </message>
     <message>
         <source>Unknown Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukendt kunstner</translation>
     </message>
     <message>
         <source>Unknown Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukendt album</translation>
     </message>
     <message>
         <source>Unknown Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukendt genre</translation>
     </message>
     <message>
         <source>CD -- none</source>
-        <translation type="unfinished"></translation>
+        <translation>CD -- ingen</translation>
     </message>
     <message>
         <source>All My Music</source>
-        <translation type="unfinished">Al min musik</translation>
+        <translation>Al min musik</translation>
     </message>
     <message>
         <source>%1 - %2</source>
@@ -573,11 +573,11 @@
     </message>
     <message>
         <source>title</source>
-        <translation type="unfinished"></translation>
+        <translation>titel</translation>
     </message>
     <message>
         <source>Missing database entry: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Manglende post i database: %1</translation>
     </message>
     <message>
         <source> ~ </source>
@@ -585,7 +585,7 @@
     </message>
     <message>
         <source>Ooops</source>
-        <translation type="unfinished"></translation>
+        <translation>Hovsa</translation>
     </message>
     <message>
         <source>%1 ~ %2</source>
@@ -593,11 +593,11 @@
     </message>
     <message>
         <source>Not Initialized</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikke initialiseret</translation>
     </message>
     <message>
         <source>oops</source>
-        <translation type="unfinished"></translation>
+        <translation>hovsa</translation>
     </message>
     <message>
         <source>,%1</source>
@@ -605,39 +605,39 @@
     </message>
     <message>
         <source>All My Playlists</source>
-        <translation type="unfinished">Alle mine musiklister</translation>
+        <translation>Alle mine musiklister</translation>
     </message>
     <message>
         <source>Active Play Queue</source>
-        <translation type="unfinished">Aktiv spillekø</translation>
+        <translation>Aktiv spillekø</translation>
     </message>
     <message>
         <source>Active Play Queue (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiv spillekø (%1)</translation>
     </message>
     <message>
         <source>Something is Wrong</source>
-        <translation type="unfinished"></translation>
+        <translation>Der er noget galt</translation>
     </message>
     <message>
         <source>Visualization requires FFT library</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualisering kræver FFT biblioteksfil</translation>
     </message>
     <message>
         <source>Did you run configure?</source>
-        <translation type="unfinished"></translation>
+        <translation>Har du kørt konfigurations-scriptet?</translation>
     </message>
     <message>
         <source>and</source>
-        <translation type="unfinished"></translation>
+        <translation>og</translation>
     </message>
     <message>
         <source>Use variable bitrates</source>
-        <translation type="unfinished"></translation>
+        <translation>Anvend variabel bitrate</translation>
     </message>
     <message>
         <source>If set, the MP3 encoder will use variable bitrates (VBR) except for the low quality setting. The Ogg encoder will always use variable bitrates.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis dette felt er markeret, vil MP3-algoritmen anvende variable bitrater (VBR) undtaget ved indstillingen &apos;lav kvalitet&apos;. Ogg-algoritmen vil dog altid anvende variable bitrater.</translation>
     </message>
     <message>
         <source>AlbumArt</source>
@@ -645,27 +645,27 @@
     </message>
     <message>
         <source>CD Ripper Settings (part 2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Indstillinger for CD-kopiering (del 2)</translation>
     </message>
     <message>
         <source>Enable CD Writing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Anvend skrivning af CD'er</translation>
     </message>
     <message>
         <source>Requires a SCSI or an IDE-SCSI CD Writer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kræver en SCSI eller IDE-SCSI CD-brænder.</translation>
     </message>
     <message>
         <source>CD-Writer Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Enhed for CD-brænding</translation>
     </message>
     <message>
         <source>Select the SCSI Device for CD Writing.  If your IDE device is not present, try adding hdd(or hdc/hdb)=ide-scsi to your boot options</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg SCSI-enheden til CD-brænding. Hvis din IDE-enhed ikke er tilgængelig, så prøv at tilføje hdd(eller hdc/hdb)=ide-scsi til dine boot-options</translation>
     </message>
     <message>
         <source>Disk Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Disk-størrelse</translation>
     </message>
     <message>
         <source>650MB/75min</source>
@@ -677,19 +677,19 @@
     </message>
     <message>
         <source>Default CD Capacity.</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard CD-kapacitet</translation>
     </message>
     <message>
         <source>Enable directories on MP3 Creation</source>
-        <translation type="unfinished"></translation>
+        <translation>Anvend underbiblioteker ved MP3-generering</translation>
     </message>
     <message>
         <source>CD Write Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Hastighed ved CD-brænding</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisk</translation>
     </message>
     <message>
         <source>1x</source>
@@ -713,39 +713,39 @@
     </message>
     <message>
         <source>CD Writer speed. Auto will use the recomended speed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hastigheden som CD-brænderen anvender. Det anbefales at anvende &apos;Automatisk&apos;.</translation>
     </message>
     <message>
         <source>CD Blanking Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Metode ved sletning af CDRW</translation>
     </message>
     <message>
         <source>Fast</source>
-        <translation type="unfinished"></translation>
+        <translation>Hurtig</translation>
     </message>
     <message>
         <source>Complete</source>
-        <translation type="unfinished"></translation>
+        <translation>Komplet</translation>
     </message>
     <message>
         <source>Blanking Method. Fast takes 1 minute. Complete can take up to 20 minutes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fastsætter metoden, hvorved CDRW-skiver slettes for tidligere data. &apos;Hurtig&apos; tager ca. 1 minut. &apos;Komplet&apos; kan tage op til 20 minutter.</translation>
     </message>
     <message>
         <source>CD Recording Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Indstillinger for CD-brænding</translation>
     </message>
     <message>
         <source>Artists</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunstnere</translation>
     </message>
     <message>
         <source>Creating CD File System</source>
-        <translation type="unfinished"></translation>
+        <translation>Genererer CD-filsystem</translation>
     </message>
     <message>
         <source>Burning CD</source>
-        <translation type="unfinished"></translation>
+        <translation>Brænder CD</translation>
     </message>
     <message>
         <source>?</source>
@@ -753,14 +753,14 @@
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation type="unfinished"></translation>
+        <translation>Orden for musik-hierarkiet. Mulige værdier er en liste (adskilt af mellemrum) med følgende mulige værdier: genre, splitartist, artist, album, og title ELLER &quot;directory&quot; for at indikere at billedet på skærmen har samme struktur som filsystemet.</translation>
     </message>
 </context>
 <context>
     <name>Ripper</name>
     <message>
         <source>Please select a quality level and check the album information below:</source>
-        <translation>Vælgt venligst et kvalitets niveau og tjek album informationen nedenfor:</translation>
+        <translation>Vælgt venligst et kvalitets-niveau og kontrollér album-informationen nedenfor:</translation>
     </message>
     <message>
         <source>Low</source>
@@ -808,7 +808,7 @@
     </message>
     <message>
         <source>Ripping...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopierer...</translation>
     </message>
 </context>
 <context>

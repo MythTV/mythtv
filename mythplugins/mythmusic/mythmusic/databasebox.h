@@ -122,6 +122,8 @@ class DatabaseBox : public MythThemedDialog
     int                 numb_wait_dots;
 
     QStringList         treelevels;
+
+    QPtrList<UITextType> m_lines;
 };
 
 #endif
