@@ -10,6 +10,8 @@
      <type>MUSIC</type>
      <text>Music</text>
      <text lang="IT">Musica</text>
+     <text lang="ES">Música</text>
+     <text lang="CA">Música</text>
      <action>EXEC mythmusic</action>
      <depends>musicmenu.xml</depends>
    </button>
@@ -18,6 +20,8 @@
      <type>GAME</type>
      <text>Games</text>
      <text lang="IT">Giochi</text>
+     <text lang="ES">Juegos</text>
+     <text lang="CA">Jocs</text>
      <action>EXEC mythgame</action>
      <depends>gamemenu.xml</depends>
    </button>
@@ -26,6 +30,8 @@
      <type>IMAGES</type>
      <text>Images</text>
      <text lang="IT">Immagini</text>
+     <text lang="ES">Fotos</text>
+     <text lang="CA">Imatges</text>
      <action>EXEC mythgallery</action>
      <depends>mythgallery-settings.txt</depends>
    </button>
@@ -34,6 +40,8 @@
      <type>VIDEO</type>
      <text>Videos</text>
      <text lang="IT">Video</text>
+     <text lang="ES">Video</text>
+     <text lang="CA">Vídeo</text>
      <action>EXEC mythvideo</action>
      <depends>mythvideo-settings.txt</depends>
    </button>
@@ -42,6 +50,8 @@
      <type>WEATHER</type>
      <text>Weather</text>
      <text lang="IT">Meteo</text>
+     <text lang="ES">El Tiempo</text>
+     <text lang="CA">El Temps</text>
      <action>EXEC mythweather</action>
      <depends>mythweather</depends>
    </button>

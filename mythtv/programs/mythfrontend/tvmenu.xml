@@ -4,6 +4,8 @@
       <type>TV</type>
       <text>Watch TV</text>
       <text lang="IT">Guarda la TV</text>
+      <text lang="ES">Ver la TV</text>
+      <text lang="CA">Veure la TV</text>
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -11,6 +13,8 @@
       <type>TV_SCHEDULE</type>
       <text>Schedule Recordings</text>
       <text lang="IT">Programma una registrazione</text>
+      <text lang="ES">Programar Grabaciones</text>
+      <text lang="CA">Programar Gravacions</text>
       <alttext>Schedule</alttext>
       <action>MENU tv_schedule.xml</action>
    </button>
@@ -19,6 +23,8 @@
       <type>TV_PLAYBACK</type>
       <text>Watch Recordings</text>
       <text lang="IT">Guarda una registrazione</text>
+      <text lang="ES">Ver Grabaciones</text>
+      <text lang="CA">Veure Gravacions</text>
       <action>TV_WATCH_RECORDING</action>
    </button>
 
@@ -26,6 +32,8 @@
       <type>TV_DELETE</type>
       <text>Delete Recordings</text>
       <text lang="IT">Elimina una registrazione</text>
+      <text lang="ES">Borrar Grabaciones</text>
+      <text lang="CA">Esborrar Gravacions</text>
       <action>TV_DELETE</action>
    </button> 
 
@@ -33,6 +41,8 @@
       <type>SETUP</type>
       <text>Setup</text>
       <text lang="IT">Impostazioni</text>
+      <text lang="ES">Configurar</text>
+      <text lang="CA">Configurar</text>
       <action>MENU tv_settings.xml</action>
    </button>
 

@@ -4,6 +4,8 @@
       <type>TV_SCHEDULE</type>
       <text>Program Guide</text>
       <text lang="IT">Guida programmi</text>
+      <text lang="ES">Guía de programas</text>
+      <text lang="CA">Guia de programes</text>
       <alttext>Guide</alttext>
       <action>TV_SCHEDULE</action>
    </button>
@@ -12,6 +14,8 @@
       <type>TV_SCHEDULE</type>
       <text>Program Finder</text>
       <text lang="IT">Ricerca programmi</text>
+      <text lang="ES">Buscar programas</text>
+      <text lang="CA">Cercar programes</text>
       <alttext>Finder</alttext>
       <action>TV_PROGFIND</action>
    </button>
@@ -20,6 +24,8 @@
       <type>TV_SCHEDULE</type>
       <text>Manual Recording</text>
       <text lang="IT">Registrazione manuale</text>
+      <text lang="ES">Grabacion manual</text>
+      <text lang="CA">Gravar manualment</text>
       <alttext>Manual Record</alttext>
       <action>TV_MANUAL</action>
    </button>
@@ -28,6 +34,8 @@
       <type>TV_CONFLICTS</type>
       <text>Fix Scheduling Conflicts</text>
       <text lang="IT">Correggi i conflitti</text>
+      <text lang="ES">Resolver conflictos</text>
+      <text lang="CA">Resoldre Conflictes</text>
       <alttext>Fix Conflicts</alttext>
       <action>TV_FIX_CONFLICTS</action>
    </button>

@@ -3,6 +3,8 @@
       <type>SETUP</type>
       <text>General</text>
       <text lang="IT">Generale</text>
+      <text lang="ES">General</text>
+      <text lang="CA">General</text>
       <action>SETTINGS GENERAL</action>
    </button>
 
@@ -10,6 +12,8 @@
       <type>SETUP</type>
       <text>Appearance</text>
       <text lang="IT">Aspetto</text>
+      <text lang="ES">Aspecto</text>
+      <text lang="CA">Aspecte</text>
       <action>SETTINGS APPEARANCE</action>
    </button>
 
@@ -17,6 +21,8 @@
       <type>TV_SCHEDULE</type>
       <text>Program Guide</text>
       <text lang="IT">Guida programmi</text>
+      <text lang="ES">Guía de programas</text>
+      <text lang="CA">Guia de programes</text>
       <action>SETTINGS EPG</action>
    </button>
 
@@ -24,6 +30,8 @@
       <type>TV_PLAYBACK</type>
       <text>Playback</text>
       <text lang="IT">Riproduzione</text>
+      <text lang="ES">Reproducción</text>
+      <text lang="CA">Reproducció</text>
       <action>SETTINGS PLAYBACK</action>
    </button>
 
@@ -31,6 +39,8 @@
       <type>TV_SCHEDULE</type>
       <text>Recording</text>
       <text lang="IT">Registrazione</text>
+      <text lang="ES">Grabación</text>
+      <text lang="CA">Gravació</text>
       <action>SETTINGS RECORDING</action>
    </button>
 

@@ -165,12 +165,12 @@ void TVMenuCallback(void *data, QString &selection)
 
 int handleExit(void)
 {
-    QString title = "Do you really want to exit MythTV?";
+    QString title = QObject::tr("Do you really want to exit MythTV?");
 
     DialogBox diag(title);
-    diag.AddButton("No");
-    diag.AddButton("Yes, Exit now");
-    diag.AddButton("Yes, Exit and shutdown the computer");
+    diag.AddButton(QObject::tr("No"));
+    diag.AddButton(QObject::tr("Yes, Exit now"));
+    diag.AddButton(QObject::tr("Yes, Exit and shutdown the computer"));
 //    bool haltNwakeup = context->GetNumSetting("UseHaltWakeup");
 //    if (haltNwakeup)
 //        diag.AddButton("Yes, Shutdown and set wakeup time");

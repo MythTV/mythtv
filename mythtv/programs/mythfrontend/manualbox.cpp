@@ -76,7 +76,7 @@ ManualBox::ManualBox(QWidget *parent, const char *name)
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(15 * wmult));
 
     // Window title
-    QString message = "Manual Recording";
+    QString message = tr("Manual Recording");
     QLabel *label = new QLabel(message, this);
     label->setBackgroundOrigin(WindowOrigin);
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
@@ -110,7 +110,7 @@ ManualBox::ManualBox(QWidget *parent, const char *name)
     // Title edit box
     hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
 
-    message = "Title:";
+    message = tr("Title:");
     label = new QLabel(message, this);
     label->setBackgroundOrigin(WindowOrigin);
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
@@ -124,7 +124,7 @@ ManualBox::ManualBox(QWidget *parent, const char *name)
     // Subtitle edit box
     hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
 
-    message = "Subtitle:";
+    message = tr("Subtitle:");
     label = new QLabel(message, this);
     label->setBackgroundOrigin(WindowOrigin);
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
@@ -138,7 +138,7 @@ ManualBox::ManualBox(QWidget *parent, const char *name)
     // Duration spin box
     hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
 
-    message = "Duration:";
+    message = tr("Duration:");
     label = new QLabel(message, this);
     label->setBackgroundOrigin(WindowOrigin);
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
@@ -151,7 +151,7 @@ ManualBox::ManualBox(QWidget *parent, const char *name)
     m_duration->setBackgroundOrigin(WindowOrigin);
     hbox->addWidget(m_duration);
 
-    message = "minutes";
+    message = tr("minutes");
     label = new QLabel(message, this);
     label->setBackgroundOrigin(WindowOrigin);
     hbox->addWidget(label);

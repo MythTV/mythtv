@@ -823,6 +823,8 @@ public:
         setLabel("Language");
         addSelection("English", "EN");
         addSelection("Italian", "IT");
+        addSelection("Catalan", "CA");
+        addSelection("Spanish", "ES");
         setHelpText("Your preferred language.");
     };
 };
