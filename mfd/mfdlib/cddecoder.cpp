@@ -1,7 +1,7 @@
 /*
     cddecoder.cpp
 
-    (c) 2003, 2004 Thor Sigvaldason and Isaac Richards
+    (c) 2003-2005 Thor Sigvaldason and Isaac Richards
     Part of the mythTV project
     
     cd decoder
@@ -23,18 +23,18 @@
 #include <qfileinfo.h>
 using namespace std;
 
+#include <mythtv/audiooutput.h>
+
 #include "cddecoder.h"
 #include "constants.h"
 #include "buffer.h"
-#include "output.h"
-#include "recycler.h"
 //  #include "metadata.h"
 
 
 #include "settings.h"
 
 CdDecoder::CdDecoder(const QString &url_path, DecoderFactory *d, QIODevice *i, 
-                     Output *o) 
+                     AudioOutput *o) 
          : Decoder(d, i, o)
 {
     inited = FALSE;
@@ -88,43 +88,32 @@ void CdDecoder::flush(bool final)
 {
     ulong min = final ? 0 : bks;
 
-    while ((! done && ! finish) && output_bytes > min) {
-        output()->recycler()->mutex()->lock();
-
-        while ((! done && ! finish) && output()->recycler()->full()) {
-            mutex()->unlock();
-
-            output()->recycler()->cond()->wait(output()->recycler()->mutex());
-
-            mutex()->lock();
-            done = user_stop;
-        }
-
-        if (user_stop || finish) {
+    while ((! done && ! finish) && output_bytes > min)
+    {
+        if (user_stop || finish) 
+        {
             inited = FALSE;
             done = TRUE;
-        } else {
+        } 
+        else 
+        {
             ulong sz = output_bytes < bks ? output_bytes : bks;
-            Buffer *b = output()->recycler()->get();
 
-            memcpy(b->data, output_buf, sz);
-            if (sz != bks) memset(b->data + sz, 0, bks - sz);
-
-            b->nbytes = bks;
-            b->rate = bitrate;
-            output_size += b->nbytes;
-            output()->recycler()->add();
-
-            output_bytes -= sz;
-            memmove(output_buf, output_buf + sz, output_bytes);
-            output_at = output_bytes;
+            int samples = (sz*8)/(chan*16);
+            if (output()->AddSamples(output_buf, samples, -1))
+            {
+                output_bytes -= sz;
+                memmove(output_buf, output_buf + sz, output_bytes);
+                output_at = output_bytes;
+            } 
+            else 
+            {
+                mutex()->unlock();
+                usleep(500);
+                mutex()->lock();
+                done = user_stop;
+            }
         }
-
-        if (output()->recycler()->full()) {
-            output()->recycler()->cond()->wakeOne();
-        }
-
-        output()->recycler()->mutex()->unlock();
     }
 }
 
@@ -182,7 +171,10 @@ bool CdDecoder::initialize()
     totalTime = ((end - start + 1) * CD_FRAMESAMPLES) / 44100.0;
 
     if (output())
-        output()->configure(44100, 2, 16, 44100 * 2 * 16);
+    {
+        output()->Reconfigure(16, chan, freq);
+        output()->SetSourceBitrate(44100 * 2 * 16);
+    }
 
     inited = TRUE;
     return TRUE;
@@ -263,17 +255,9 @@ void CdDecoder::run()
 
             if (output())
             {
-                output()->recycler()->mutex()->lock();
-                while (! output()->recycler()->empty() && ! user_stop)
-                {
-                    output()->recycler()->cond()->wakeOne();
-                    mutex()->unlock();
-                    output()->recycler()->cond()->wait(
-                                                output()->recycler()->mutex());
-                    mutex()->lock();
-                }
-                output()->recycler()->mutex()->unlock();
+                output()->Drain();
             }
+
 
             done = TRUE;
             if (! user_stop)
@@ -513,7 +497,7 @@ const QString &CdDecoderFactory::description() const
 }
 
 Decoder *CdDecoderFactory::create(const QString &file, QIODevice *input, 
-                                  Output *output, bool deletable)
+                                  AudioOutput *output, bool deletable)
 {
     if (deletable)
         return new CdDecoder(file, this, input, output);

@@ -3,7 +3,7 @@
 /*
 	audio.h
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
+	(c) 2003-2005 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
 	Headers for the audio plugin
@@ -15,11 +15,14 @@
 #include <qptrlist.h>
 #include <qvaluestack.h>
 
+#include <mythtv/audiooutput.h>
+
 #include "mfd_plugin.h"
 #include "../../mdserver.h"
 
-#include "output.h"
 #include "decoder.h"
+
+class AudioListener;
 
 class AudioPlugin: public MFDServicePlugin
 {
@@ -47,10 +50,8 @@ class AudioPlugin: public MFDServicePlugin
         
   private:
   
-    QString     audio_device;
-
     QIODevice   *input;
-    Output      *output;
+    AudioOutput *output;
     Decoder     *decoder;
     bool        is_playing;
     bool        is_paused;
@@ -79,6 +80,7 @@ class AudioPlugin: public MFDServicePlugin
     int     current_playlist_id;
     int     current_playlist_item_index;
 
+    AudioListener *audio_listener;
 };
 
 #endif  // audio_h_

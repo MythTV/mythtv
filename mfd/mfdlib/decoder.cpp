@@ -1,7 +1,7 @@
 /*
 	decoder.cpp
 
-	(c) 2003, 2004 Thor Sigvaldason and Isaac Richards
+	(c) 2003-2005 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
 	Methods for decoder classes
@@ -11,18 +11,19 @@
 
 */
 
-#include "decoder.h"
-#include "constants.h"
-#include "buffer.h"
-#include "output.h"
-#include "visual.h"
-
 #include <qobject.h>
 #include <qptrlist.h>
 #include <qstringlist.h>
 #include <qregexp.h>
 
-Decoder::Decoder(DecoderFactory *d, QIODevice *i, Output *o)
+#include <mythtv/output.h>
+
+#include "decoder.h"
+#include "constants.h"
+#include "buffer.h"
+#include "visual.h"
+
+Decoder::Decoder(DecoderFactory *d, QIODevice *i, AudioOutput *o)
        : fctry(d), in(i), out(o), blksize(0)
 {
     parent = NULL;
@@ -43,7 +44,7 @@ void Decoder::setInput(QIODevice *i)
     mutex()->unlock();
 }
 
-void Decoder::setOutput(Output *o)
+void Decoder::setOutput(AudioOutput *o)
 {
     mutex()->lock();
     out = o;
@@ -207,7 +208,7 @@ void Decoder::registerFactory(DecoderFactory *fact)
 }
 
 Decoder *Decoder::create(const QString &source, QIODevice *input,
-                         Output *output, bool deletable)
+                         AudioOutput *output, bool deletable)
 {
     checkFactories();
 

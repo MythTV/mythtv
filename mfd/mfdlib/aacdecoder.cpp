@@ -4,7 +4,7 @@
 /*
 	aacdecoder.cpp
 
-	(c) 2003, 2004 Thor Sigvaldason and Isaac Richards
+	(c) 2003-2005 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
 	aac decoder methods
@@ -20,11 +20,11 @@
 
 #include <faad.h>
 
+#include <mythtv/audiooutput.h>
+
 #include "aacdecoder.h"
 #include "constants.h"
 #include "buffer.h"
-#include "output.h"
-#include "recycler.h"
 #include "metadata.h"
 
 #include <mythtv/mythcontext.h>
@@ -65,7 +65,7 @@ uint32_t seek_callback(void *user_data, uint64_t position)
 
 
 aacDecoder::aacDecoder(const QString &file, DecoderFactory *d, QIODevice *i, 
-                       Output *o) 
+                       AudioOutput *o) 
           : Decoder(d, i, o)
 {
     filename = file;
@@ -88,6 +88,7 @@ aacDecoder::aacDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     
     mp4_file_flag = false;
     mp4_callback = NULL;
+    mp4_input_file = NULL;
     timescale = 0;
     framesize = 0;
 }
@@ -113,22 +114,9 @@ void aacDecoder::flush(bool final)
 {
     ulong min = final ? 0 : bks;
 
-    while ((!done && !finish && seekTime <= 0) && output_bytes > min) 
+    while ((! done && ! finish) && output_bytes > min)
     {
-        output()->recycler()->mutex()->lock();
-
-        while ((!done && !finish && seekTime <= 0) && 
-               output()->recycler()->full()) 
-        {
-            mutex()->unlock();
-
-            output()->recycler()->cond()->wait(output()->recycler()->mutex());
-
-            mutex()->lock();
-            done = user_stop;
-        }
-
-        if (user_stop || finish) 
+        if (user_stop || finish)
         {
             inited = FALSE;
             done = TRUE;
@@ -136,26 +124,22 @@ void aacDecoder::flush(bool final)
         else 
         {
             ulong sz = output_bytes < bks ? output_bytes : bks;
-            Buffer *b = output()->recycler()->get();
 
-            memcpy(b->data, output_buf, sz);
-            if (sz != bks) 
-                memset(b->data + sz, 0, bks - sz);
-
-            b->nbytes = bks;
-            b->rate = bitrate;
-            output_size += b->nbytes;
-            output()->recycler()->add();
-
-            output_bytes -= sz;
-            memmove(output_buf, output_buf + sz, output_bytes);
-            output_at = output_bytes;
+            int samples = (sz*8)/(channels*16);
+            if (output()->AddSamples(output_buf, samples, -1))
+            {
+                output_bytes -= sz;
+                memmove(output_buf, output_buf + sz, output_bytes);
+                output_at = output_bytes;
+            } 
+            else 
+            {
+                mutex()->unlock();
+                usleep(500);
+                mutex()->lock();
+                done = user_stop;
+            }
         }
-
-        if (output()->recycler()->full()) 
-            output()->recycler()->cond()->wakeOne();
-
-        output()->recycler()->mutex()->unlock();
     }
 }
 
@@ -381,20 +365,26 @@ bool aacDecoder::initializeMP4()
         warning("accDecoder: possible confusion on frequency");
     }
 
+    // 
+    //  If max_bitrate == avg_bitrate, then file is fixed bitrate
+    //  (Mmmmm  ... math)
+    //
+    
+    if (mp4ff_get_avg_bitrate(mp4_input_file, aac_track_number) ==
+	    mp4ff_get_max_bitrate(mp4_input_file, aac_track_number))
+    {
+	    bitrate = mp4ff_get_avg_bitrate(mp4_input_file, aac_track_number) 
+	              / 1000;
+    }
 
     //
     //  Setup the output
     //
 
-    if (output())
+    if (output()) 
     {
-
-        output()->configure(sample_rate, 
-                            channels, 
-                            16, 
-                            sample_rate * 
-                            2 * 16);
-
+        output()->Reconfigure(16, channels, sample_rate);
+        output()->SetSourceBitrate(bitrate);
     }
 
     inited = TRUE;
@@ -512,17 +502,9 @@ void aacDecoder::run()
 
             if (output())
             {
-                output()->recycler()->mutex()->lock();
-                while (! output()->recycler()->empty() && ! user_stop)
-                {
-                    output()->recycler()->cond()->wakeOne();
-                    mutex()->unlock();
-                    output()->recycler()->cond()->wait(
-                                                output()->recycler()->mutex());
-                    mutex()->lock();
-                }
-                output()->recycler()->mutex()->unlock();
+		        output()->Drain();
             }
+
 
             done = TRUE;
             if (! user_stop)
@@ -590,9 +572,23 @@ void aacDecoder::run()
                 {
                     output_at += sample_count * 2;
                     output_bytes += sample_count * 2;
-                    if(output())
+                    if (output())
                     {
-                        flush();
+			            // If source is VBR, bitrate == 0
+			            if (bitrate)
+			            {
+			                output()->SetSourceBitrate(bitrate);
+			            } 
+                        else 
+                        {
+			                output()->SetSourceBitrate(
+				                (int) ((float) (frame_info.bytesconsumed * 8) /
+				                (frame_info.samples / 
+				                frame_info.num_front_channels) 
+				                * frame_info.samplerate) / 1000);
+			            }
+
+                    flush();
                     }
                 }
             
@@ -856,7 +852,7 @@ const QString &aacDecoderFactory::description() const
 }
 
 Decoder *aacDecoderFactory::create(const QString &file, QIODevice *input, 
-                                  Output *output, bool deletable)
+                                  AudioOutput *output, bool deletable)
 {
     if (deletable)
         return new aacDecoder(file, this, input, output);

@@ -3,7 +3,7 @@
 /*
 	aacdecoder.h
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
+	(c) 2003-2005 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
 	Header for aac (m4a) decoder
@@ -28,7 +28,7 @@ class Metadata;
 class aacDecoder : public Decoder
 {
   public:
-    aacDecoder(const QString &file, DecoderFactory *, QIODevice *, Output *);
+    aacDecoder(const QString &file, DecoderFactory *, QIODevice *, AudioOutput *);
     virtual ~aacDecoder(void);
 
     bool initialize();

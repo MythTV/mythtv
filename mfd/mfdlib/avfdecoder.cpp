@@ -23,14 +23,13 @@
 #include <qobject.h>
 #include <qiodevice.h>
 #include <qfile.h>
-
 using namespace std;
+
+#include <mythtv/audiooutput.h>
 
 #include "avfdecoder.h"
 #include "constants.h"
 #include "buffer.h"
-#include "output.h"
-#include "recycler.h"
 #include "metadata.h"
 
 #include <mythtv/mythcontext.h>
@@ -85,7 +84,7 @@ static void get_str16_nolen(ByteIOContext *pb, int len, char *buf, int buf_size)
 // Begin the class definition
 
 avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, QIODevice *i, 
-                       Output *o) 
+                       AudioOutput *o) 
           : Decoder(d, i, o)
 {
     filename = file;
@@ -134,19 +133,6 @@ void avfDecoder::flush(bool final)
 
     while ((!done && !finish && seekTime <= 0) && output_bytes > min) 
     {
-        output()->recycler()->mutex()->lock();
-
-        while ((!done && !finish && seekTime <= 0) && 
-               output()->recycler()->full()) 
-        {
-            mutex()->unlock();
-
-            output()->recycler()->cond()->wait(output()->recycler()->mutex());
-
-            mutex()->lock();
-            done = user_stop;
-        }
-
         if (user_stop || finish) 
         {
             inited = FALSE;
@@ -155,26 +141,22 @@ void avfDecoder::flush(bool final)
         else 
         {
             ulong sz = output_bytes < bks ? output_bytes : bks;
-            Buffer *b = output()->recycler()->get();
 
-            memcpy(b->data, output_buf, sz);
-            if (sz != bks) 
-                memset(b->data + sz, 0, bks - sz);
-
-            b->nbytes = bks;
-            b->rate = bitrate;
-            output_size += b->nbytes;
-            output()->recycler()->add();
-
-            output_bytes -= sz;
-            memmove(output_buf, output_buf + sz, output_bytes);
-            output_at = output_bytes;
+            int samples = (sz*8)/(chan*16);
+            if (output()->AddSamples(output_buf, samples, -1))
+            {
+                output_bytes -= sz;
+                memmove(output_buf, output_buf + sz, output_bytes);
+                output_at = output_bytes;
+            } 
+            else 
+            {
+                mutex()->unlock();
+                usleep(500);
+                mutex()->lock();
+                done = user_stop;
+            }
         }
-
-        if (output()->recycler()->full()) 
-            output()->recycler()->cond()->wakeOne();
-
-        output()->recycler()->mutex()->unlock();
     }
 }
 
@@ -250,11 +232,8 @@ bool avfDecoder::initialize()
 
     if (output())
     {
-        output()->configure(audio_dec->sample_rate, 
-                            audio_dec->channels, 
-                            16, 
-                            audio_dec->sample_rate * 
-                            audio_dec->channels * 16);
+        output()->Reconfigure(16, audio_dec->channels, audio_dec->sample_rate);
+        output()->SetSourceBitrate(audio_dec->bit_rate);
     }
 
     inited = TRUE;
@@ -486,7 +465,7 @@ const QString &avfDecoderFactory::description() const
 }
 
 Decoder *avfDecoderFactory::create(const QString &file, QIODevice *input, 
-                                  Output *output, bool deletable)
+                                  AudioOutput *output, bool deletable)
 {
     if (deletable)
         return new avfDecoder(file, this, input, output);

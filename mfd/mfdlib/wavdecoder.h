@@ -3,7 +3,7 @@
 /*
 	wavdecoder.h
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
+	(c) 2003-2005 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
 	Header for wav decoder
@@ -19,7 +19,7 @@ class WavDecoder : public Decoder
 {
   public:
 
-    WavDecoder(const QString &file, DecoderFactory *, QIODevice *, Output *);
+    WavDecoder(const QString &file, DecoderFactory *, QIODevice *, AudioOutput *);
     virtual ~WavDecoder(void);
 
     bool   initialize();

@@ -21,7 +21,7 @@
 class VorbisDecoder : public Decoder
 {
   public:
-    VorbisDecoder(const QString &file, DecoderFactory *, QIODevice *, Output *);
+    VorbisDecoder(const QString &file, DecoderFactory *, QIODevice *, AudioOutput *);
     virtual ~VorbisDecoder(void);
 
     bool initialize();

@@ -3,7 +3,7 @@
 /*
 	flacdecoder.h
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
+	(c) 2003-2005 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
 	Header for flac decoder
@@ -22,7 +22,7 @@
 class FlacDecoder : public Decoder
 {
   public:
-    FlacDecoder(const QString &file, DecoderFactory *, QIODevice *, Output *);
+    FlacDecoder(const QString &file, DecoderFactory *, QIODevice *, AudioOutput *);
     virtual ~FlacDecoder(void);
 
     bool initialize();

@@ -13,8 +13,10 @@
 #include "mfd_events.h"
 
 #include "audio.h"
-#include "audiooutput.h"
 #include "daapinput.h"
+#include "constants.h"
+#include "audiolistener.h"
+
 
 AudioPlugin::AudioPlugin(MFD *owner, int identity)
       :MFDServicePlugin(owner, identity, 2343, "audio")
@@ -26,10 +28,10 @@ AudioPlugin::AudioPlugin(MFD *owner, int identity)
     elapsed_time = 0;
     is_playing = false;
     is_paused = false;
-    audio_device = "/dev/dsp";  //  <--- ewww ... change that soon
     state_of_play_mutex = new QMutex(true);    
     metadata_server = parent->getMetadataServer();
     stopPlaylistMode();
+    audio_listener = new AudioListener(this);
 }
 
 void AudioPlugin::swallowOutputUpdate(int type, int numb_seconds, int channels, int bitrate, int frequency)
@@ -412,22 +414,17 @@ bool AudioPlugin::playUrl(QUrl url, int collection_id)
 
         if (!output)
         {
-            //
-            //  output may not exist because this is a first run
-            //  or stopAudio() killed it off.
-            //
-        
-            output = new MMAudioOutput(this, output_buffer_size * 1024, "/dev/dsp");
+
+            QString adevice = gContext->GetSetting("AudioDevice");
+
+            // TODO: Error checking that device is opened correctly!
+            output = AudioOutput::OpenAudio(adevice, 16, 2, 44100, 
+	                                     AUDIOOUTPUT_MUSIC, true );	
             output->setBufferSize(output_buffer_size * 1024);
-            if (!output->initialize())
-            {
-                warning("could not initialize an output object");
-                delete output;
-                output = NULL;
-                state_of_play_mutex->unlock();
-                return false;
-            }
+            output->SetBlocking(false);
+            output->addListener(audio_listener);
             start_output = true;
+
         }
     
         //
@@ -551,11 +548,7 @@ bool AudioPlugin::playUrl(QUrl url, int collection_id)
             {
                 if (start_output)
                 {
-                    output->start();
-                }
-                else
-                {
-                    output->resetTime();
+                    output->Reset();
                 }
             }
             decoder->start();
@@ -655,13 +648,6 @@ void AudioPlugin::stopAudio()
             decoder->mutex()->unlock();
         }
     
-        if (output && output->running())
-        {
-            output->mutex()->lock();
-                output->stop();
-            output->mutex()->unlock();
-        }
-    
         //
         //  wake them up 
         //
@@ -675,9 +661,8 @@ void AudioPlugin::stopAudio()
 
         if (output)
         {
-            output->recycler()->mutex()->lock();
-                output->recycler()->cond()->wakeAll();
-            output->recycler()->mutex()->unlock();
+            delete output;
+            output = NULL;
         }
 
         if (decoder)
@@ -685,17 +670,6 @@ void AudioPlugin::stopAudio()
             decoder->wait();
         }
 
-        if (output)
-        {
-            output->wait();
-        }
-
-        if (output)
-        {
-            delete output;
-            output = 0;
-        }
-    
         if (input)
         {
             delete input;
@@ -736,7 +710,7 @@ void AudioPlugin::pauseAudio(bool true_or_false)
             if (output)
             {
                 output->mutex()->lock();
-                    output->pause();
+                    output->Pause(is_paused);
                 output->mutex()->unlock();
             }
             if (decoder)
@@ -744,12 +718,6 @@ void AudioPlugin::pauseAudio(bool true_or_false)
                 decoder->mutex()->lock();
                     decoder->cond()->wakeAll();
                 decoder->mutex()->unlock();
-            }
-            if (output)
-            {
-                output->recycler()->mutex()->lock();
-                    output->recycler()->cond()->wakeAll();
-                output->recycler()->mutex()->unlock();
             }
         }
        
@@ -777,28 +745,17 @@ void AudioPlugin::seekAudio(int seek_amount)
             position = 0;
         }
 
-        if (output && output->running())
+        if (output)
         {
-            output->mutex()->lock();
-            output->seek(position);
-    
+            output->Reset();
+            output->SetTimecode(position * 1000);
+
             if (decoder && decoder->running())
             {
                 decoder->mutex()->lock();
-                decoder->seek(position);
-    
-                /*
-                if (mainvisual)
-                {
-                    mainvisual->mutex()->lock();
-                    mainvisual->prepare();
-                    mainvisual->mutex()->unlock();
-                }
-                */
-    
+                    decoder->seek(position);
                 decoder->mutex()->unlock();
             }
-            output->mutex()->unlock();
         }
     state_of_play_mutex->unlock();
 }
@@ -1152,5 +1109,11 @@ AudioPlugin::~AudioPlugin()
     {
         delete state_of_play_mutex;
         state_of_play_mutex = NULL;
+    }
+    
+    if (audio_listener)
+    {
+        delete audio_listener;
+        audio_listener = NULL;
     }
 }

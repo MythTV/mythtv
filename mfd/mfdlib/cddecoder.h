@@ -3,7 +3,7 @@
 /*
 	cddecoder.h
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
+	(c) 2003-2005 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
 	Header for cd decoder
@@ -26,7 +26,7 @@ extern "C" {
 class CdDecoder : public Decoder
 {
   public:
-    CdDecoder(const QString &file, DecoderFactory *, QIODevice *, Output *);
+    CdDecoder(const QString &file, DecoderFactory *, QIODevice *, AudioOutput *);
     virtual ~CdDecoder(void);
 
     bool initialize();

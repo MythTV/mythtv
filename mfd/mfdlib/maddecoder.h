@@ -3,7 +3,7 @@
 /*
 	maddecoder.h
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
+	(c) 2003-2005 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
 	Header for mad mp3 decoder
@@ -23,7 +23,7 @@ extern "C" {
 class MadDecoder : public Decoder
 {
   public:
-    MadDecoder(const QString &file, DecoderFactory *, QIODevice *, Output *);
+    MadDecoder(const QString &file, DecoderFactory *, QIODevice *, AudioOutput *);
     virtual ~MadDecoder(void);
 
     bool initialize();

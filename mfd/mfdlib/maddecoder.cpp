@@ -25,18 +25,18 @@ using namespace std;
 #include <mad.h>
 #include <id3tag.h>
 
+#include <mythtv/audiooutput.h>
+
 #include "maddecoder.h"
-//  #include "metadata.h"
 #include "constants.h"
 #include "buffer.h"
-#include "output.h"
 
 #include "settings.h"
 
 #define XING_MAGIC     (('X' << 24) | ('i' << 16) | ('n' << 8) | 'g')
 
 MadDecoder::MadDecoder(const QString &file, DecoderFactory *d, QIODevice *i, 
-                       Output *o)
+                       AudioOutput *o)
           : Decoder(d, i, o)
 {
     filename = file;
@@ -131,7 +131,10 @@ bool MadDecoder::initialize()
     }
 
     if (output())
-        output()->configure(freq, channels, 16, bitrate);
+    {
+        output()->Reconfigure(16, channels, freq);
+        output()->SetSourceBitrate(bitrate);
+    }
 
     inited = TRUE;
     return TRUE;
@@ -309,43 +312,32 @@ void MadDecoder::flush(bool final)
 {
     ulong min = final ? 0 : bks;
 
-    while ((! done && ! finish) && output_bytes > min) {
-        output()->recycler()->mutex()->lock();
-
-        while ((! done && ! finish) && output()->recycler()->full()) {
-            mutex()->unlock();
-
-            output()->recycler()->cond()->wait(output()->recycler()->mutex());
-
-            mutex()->lock();
-            done = user_stop;
-        }
-
-        if (user_stop || finish) {
+    while ((! done && ! finish) && output_bytes > min)
+    {
+        if (user_stop || finish)
+        {
             inited = FALSE;
             done = TRUE;
-        } else {
+        } 
+        else 
+        {
             ulong sz = output_bytes < bks ? output_bytes : bks;
-            Buffer *b = output()->recycler()->get();
 
-            memcpy(b->data, output_buf, sz);
-            if (sz != bks) memset(b->data + sz, 0, bks - sz);
-
-            b->nbytes = bks;
-            b->rate = bitrate;
-            output_size += b->nbytes;
-            output()->recycler()->add();
-
-            output_bytes -= sz;
-            memmove(output_buf, output_buf + sz, output_bytes);
-            output_at = output_bytes;
+            int samples = (sz*8)/(channels*16);
+            if (output()->AddSamples(output_buf, samples, -1))
+            {
+                output_bytes -= sz;
+                memmove(output_buf, output_buf + sz, output_bytes);
+                output_at = output_bytes;
+            } 
+            else 
+            {
+                mutex()->unlock();
+                usleep(500);
+                mutex()->lock();
+                done = user_stop;
+            }
         }
-
-        if (output()->recycler()->full()) {
-            output()->recycler()->cond()->wakeOne();
-        }
-
-        output()->recycler()->mutex()->unlock();
     }
 }
 
@@ -463,16 +455,7 @@ void MadDecoder::run()
 
         if (output())
         {
-            output()->recycler()->mutex()->lock();
-            while (! output()->recycler()->empty() && ! user_stop)
-            {
-                output()->recycler()->cond()->wakeOne();
-                mutex()->unlock();
-                output()->recycler()->cond()->wait(
-                                                 output()->recycler()->mutex());
-                mutex()->lock();
-            }
-            output()->recycler()->mutex()->unlock();
+            output()->Drain();
         }
 
         done = TRUE;
@@ -809,7 +792,7 @@ const QString &MadDecoderFactory::description() const
 }
 
 Decoder *MadDecoderFactory::create(const QString &file, QIODevice *input, 
-                                   Output *output, bool deletable)
+                                   AudioOutput *output, bool deletable)
 {
     if (deletable)
         return new MadDecoder(file, this, input, output);
