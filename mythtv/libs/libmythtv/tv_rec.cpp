@@ -345,6 +345,8 @@ void TVRec::HandleStateChange(void)
         else
             profile.loadByName(db_conn, "Live TV");
 
+        SetupRecorder(profile);
+
         pthread_create(&encode, NULL, SpawnEncode, nvr);
 
         while (!nvr->IsRecording())
