@@ -88,6 +88,8 @@ ProgLister::ProgLister(ProgListType pltype, const QString &view,
 
     setNoErase();
 
+    displaychannum = gContext->GetNumSetting("DisplayChanNum");
+
     gContext->addListener(this);
 }
 
@@ -364,14 +366,14 @@ void ProgLister::setViewFromEdit(void)
         {
             QString querystr = QString("DELETE FROM keyword "
                                        "WHERE phrase = '%1';")
-                                       .arg(viewList[oldview]);
+                                       .arg(viewList[oldview].utf8());
             QSqlQuery query;
             query.exec(querystr);
         }
         if (newview < 0)
         {
             QString querystr = QString("REPLACE INTO keyword "
-                                       "VALUES('%1');").arg(text);
+                                       "VALUES('%1');").arg(text.utf8());
             QSqlQuery query;
             query.exec(querystr);
         }
@@ -398,7 +400,7 @@ void ProgLister::deleteKeyword(void)
     QString text = viewList[view];
 
     QString querystr = QString("DELETE FROM keyword WHERE phrase = '%1';")
-                               .arg(text);
+                               .arg(text.utf8());
     QSqlQuery query;
     query.exec(querystr);
 
@@ -578,7 +580,9 @@ void ProgLister::fillViewList(const QString &view)
                 QString chanid = query.value(0).toString();
                 QString chantext;
                 QString channum = query.value(1).toString();
-                if (channum != QString::null && channum != "")
+                if(displaychannum)
+                    chantext="";
+                else if (channum != QString::null && channum != "")
                     chantext = channum;
                 else
                     chantext = "???";
@@ -605,6 +609,7 @@ void ProgLister::fillViewList(const QString &view)
                 QString category = query.value(0).toString();
                 if (category <= " ")
                     continue;
+                category = QString::fromUtf8(query.value(0).toString());
                 viewList << category;
                 viewTextList << category;
                 viewCount++;
@@ -625,6 +630,7 @@ void ProgLister::fillViewList(const QString &view)
                 QString phrase = query.value(0).toString();
                 if (phrase <= " ")
                     continue;
+                phrase = QString::fromUtf8(query.value(0).toString());
                 viewList << phrase;
                 viewTextList << phrase;
                 viewCount++;
@@ -826,7 +832,10 @@ void ProgLister::updateList(QPainter *p)
                 ProgramInfo *pi = itemList.at(i+skip);
 
                 ltype->SetItemText(i, 1, pi->startts.toString(timeFormat));
-                ltype->SetItemText(i, 2, pi->chanstr + " " + pi->chansign);
+                if(displaychannum)
+                    ltype->SetItemText(i, 2, pi->chansign);
+                else
+                    ltype->SetItemText(i, 2, pi->chanstr + " " + pi->chansign);
 
                 if (pi->subtitle == "")
                     tmptitle = pi->title;

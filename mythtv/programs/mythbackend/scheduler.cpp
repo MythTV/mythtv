@@ -257,8 +257,8 @@ void Scheduler::PrintList(bool onlyFutureRecordings)
 
         cout << episode.leftJustify(33, ' ', true) << " "
              << first->chanstr.rightJustify(4, ' ') << " " << first->chanid 
-             << first->recstartts.toString("  dd hh:mm-")
-             << first->recendts.toString("hh:mm  ")
+             << first->recstartts.toString("  dd hh:mm-").local8Bit()
+             << first->recendts.toString("hh:mm  ").local8Bit()
              << first->sourceid 
              << " " << first->inputid << " " << first->cardid << "  "  
              << first->conflicting << " " << first->recording << " "
@@ -1324,7 +1324,7 @@ void Scheduler::RunScheduler(void)
                     msg = QString("SUPPRESSED recording '%1' on channel"
                                   " %2 on cardid %3, sourceid %4.  Only"
                                   " %5 Megs of disk space available.")
-                        .arg(nextRecording->title)
+                        .arg(nextRecording->title.utf8())
                         .arg(nextRecording->chanid)
                         .arg(nextRecording->cardid)
                         .arg(nextRecording->sourceid)
@@ -1344,7 +1344,7 @@ void Scheduler::RunScheduler(void)
                 msg = QString("SUPPRESSED recording \"%1\" on channel: "
                               "%2 on cardid: %3, sourceid %4. Tuner "
                               "is locked by an external application.")
-                    .arg(nextRecording->title)
+                    .arg(nextRecording->title.utf8())
                     .arg(nextRecording->chanid)
                     .arg(nextRecording->cardid)
                     .arg(nextRecording->sourceid);

@@ -104,6 +104,7 @@ private:
     QMap<long long, long long> positionMap;
     long long prev_gop_save_pos;
 
+    bool    dvb_on_demand;
     bool    isopen;
     int     cardnum;
     bool    swfilter;

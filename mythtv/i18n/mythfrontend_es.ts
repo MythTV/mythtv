@@ -1,5 +1,20 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>CaptureCard</name>
+    <message>
+        <source>You have to save the current card before configuring it, would you like to do this now?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, save now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, don&apos;t</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture cards</source>
@@ -73,42 +88,7 @@
     </message>
 </context>
 <context>
-    <name>GuideGrid</name>
-    <message>
-        <source>Recording Once</source>
-        <translation type="obsolete">Grabar una vez</translation>
-    </message>
-    <message>
-        <source>Timeslot Recording</source>
-        <translation type="obsolete">Grabar en esta franja horaria</translation>
-    </message>
-    <message>
-        <source>Channel Recording</source>
-        <translation type="obsolete">Grabar en el canal</translation>
-    </message>
-    <message>
-        <source>All Recording</source>
-        <translation type="obsolete">Grabar en todas partes</translation>
-    </message>
-    <message>
-        <source>Not Recording</source>
-        <translation type="obsolete">No grabar</translation>
-    </message>
-    <message>
-        <source>Weekly Recording</source>
-        <translation type="obsolete">Grabación semanal</translation>
-    </message>
-</context>
-<context>
     <name>InfoDialog</name>
-    <message>
-        <source>Episode:</source>
-        <translation type="obsolete">Episodio:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="obsolete">Descripción:</translation>
-    </message>
     <message>
         <source>Record this program whenever it&apos;s shown anywhere</source>
         <translation>Grabar este programa en cualquier siempre que aparezca</translation>
@@ -239,10 +219,6 @@
 <context>
     <name>MythContext</name>
     <message>
-        <source>Connection to the master backend server timed out.  You probably should modify the Master Server setting in the setup program and set the proper IP address there.</source>
-        <translation type="obsolete">Tiempo de espera agotado para conectar con el backend. Probablemente debes de configurar correctamente la dirección IP.</translation>
-    </message>
-    <message>
         <source>Could not connect to the master backend server -- is it running?  Is the IP address set for it in the setup program correct?</source>
         <translation>No puedo conectar con el servidor backend, ¿está funcionando? ¿La IP establecida en la configuración es la correcta?</translation>
     </message>
@@ -282,21 +258,10 @@
     </message>
 </context>
 <context>
-    <name>NuppelVideoPlayer</name>
-    <message>
-        <source>SKIP</source>
-        <translation type="obsolete">SALTO</translation>
-    </message>
-</context>
-<context>
     <name>PlaybackBox</name>
     <message>
         <source>% used</source>
         <translation>% ocupado</translation>
-    </message>
-    <message>
-        <source>, %d,%03d MB free</source>
-        <translation type="obsolete">, %d,%03d MB libres</translation>
     </message>
     <message>
         <source>All Programs</source>
@@ -309,18 +274,6 @@
     <message>
         <source>Are you sure you want to delete:</source>
         <translation>¿Está seguro que quiere borrar?:</translation>
-    </message>
-    <message>
-        <source>Delete this recording? It will be gone forever.</source>
-        <translation type="obsolete">¿Borrar esta grabación? Se borrará definitivamente.</translation>
-    </message>
-    <message>
-        <source>It will be gone forever.</source>
-        <translation type="obsolete">Será definitivo.</translation>
-    </message>
-    <message>
-        <source>Yes, get rid of it</source>
-        <translation type="obsolete">Si, borrarla</translation>
     </message>
     <message>
         <source>No, I might want to watch it again.</source>
@@ -426,6 +379,50 @@
         <source>Ok</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Recording List Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Group View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Group Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Recording Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Recording Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Change Recording Group Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Old Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgFinder</name>
@@ -440,10 +437,6 @@
     <message>
         <source>Recording just this showing</source>
         <translation>Graba el programa solamente esta vez</translation>
-    </message>
-    <message>
-        <source>Recording when shown in this timeslot</source>
-        <translation type="obsolete">Grabarlo cuando aparezca a esta hora</translation>
     </message>
     <message>
         <source>Recording when shown on this channel</source>
@@ -480,34 +473,6 @@
 </context>
 <context>
     <name>ProgLister</name>
-    <message>
-        <source>Recording just this showing</source>
-        <translation type="obsolete">Graba el programa solamente esta vez</translation>
-    </message>
-    <message>
-        <source>Recording every day when shown in this timeslot</source>
-        <translation type="obsolete">Graba el programa cada dia en esta franja</translation>
-    </message>
-    <message>
-        <source>Recording every week when shown in this timeslot</source>
-        <translation type="obsolete">Graba el programa cada semana en esta franja</translation>
-    </message>
-    <message>
-        <source>Recording when shown on this channel</source>
-        <translation type="obsolete">Grabarlo cuando aparezca en este canal</translation>
-    </message>
-    <message>
-        <source>Recording all showings</source>
-        <translation type="obsolete">Grabarlo siempre que aparezca</translation>
-    </message>
-    <message>
-        <source>Not recording this showing</source>
-        <translation type="obsolete">No grabar este programa</translation>
-    </message>
-    <message>
-        <source>Error!</source>
-        <translation type="obsolete">¡ Error !</translation>
-    </message>
     <message>
         <source>Program Listings</source>
         <translation type="unfinished">Lista de Programas</translation>
@@ -623,10 +588,6 @@
         <translation>Si, salir ahora</translation>
     </message>
     <message>
-        <source>Yes, Exit and shutdown the computer</source>
-        <translation type="obsolete">Si, salir ahora y apagar el equipo</translation>
-    </message>
-    <message>
         <source>Do you really want to exit MythTV?</source>
         <translation>¿Realmente desea salir de MythTV?</translation>
     </message>
@@ -715,20 +676,8 @@
         <translation>Borrar después de este fotograma</translation>
     </message>
     <message>
-        <source>Auto-Skip %1 seconds</source>
-        <translation type="obsolete">Salto automático de %1 segs</translation>
-    </message>
-    <message>
-        <source>SKIP</source>
-        <translation type="obsolete">SALTO</translation>
-    </message>
-    <message>
         <source>Found %1 sec. commercial</source>
         <translation>Encontrados %1 segs. de anuncios</translation>
-    </message>
-    <message>
-        <source>At Start of program.</source>
-        <translation type="obsolete">AL inicio del programa.</translation>
     </message>
     <message>
         <source>At End, can not Skip.</source>
@@ -745,10 +694,6 @@
     <message>
         <source>Schedule</source>
         <translation>Parrilla</translation>
-    </message>
-    <message>
-        <source>Do not record this proram</source>
-        <translation type="obsolete">No grabar este programa</translation>
     </message>
     <message>
         <source>Record only this showing</source>
@@ -775,52 +720,16 @@
         <translation>No grabar este programa</translation>
     </message>
     <message>
-        <source>Record only this showing of the program</source>
-        <translation type="obsolete">Graba este programa solamente esta vez</translation>
-    </message>
-    <message>
-        <source>Record this program in this timeslot every day</source>
-        <translation type="obsolete">Grabar este programa a esta hora cada dia</translation>
-    </message>
-    <message>
-        <source>Record this program whenever it&apos;s shown on this channel</source>
-        <translation type="obsolete">Grabar este programa siempre que aparezca en este canal</translation>
-    </message>
-    <message>
-        <source>Record this program whenever it&apos;s shown anywhere</source>
-        <translation type="obsolete">Grabar este programa en cualquier siempre que aparezca</translation>
-    </message>
-    <message>
-        <source>Record this program in this timeslot every week</source>
-        <translation type="obsolete">Grabar este programa a esta hora cada semana</translation>
-    </message>
-    <message>
         <source>Profile</source>
         <translation>Perfil</translation>
-    </message>
-    <message>
-        <source>(unspecified)</source>
-        <translation type="obsolete">(sin especificar)</translation>
     </message>
     <message>
         <source>Rank</source>
         <translation type="unfinished">Ránking</translation>
     </message>
     <message>
-        <source>Record duplicates</source>
-        <translation>Grabar aunque se trate de episodios duplicados</translation>
-    </message>
-    <message>
         <source>Auto Expire</source>
         <translation>Permitir que las grabaciones autoexpiren</translation>
-    </message>
-    <message>
-        <source>Maximum number of episodes to keep (set to 0 for ALL)</source>
-        <translation>Màximo de episodios a mantener (0 para todos)</translation>
-    </message>
-    <message>
-        <source>Record new episodes and delete oldest once maximum count is reached</source>
-        <translation type="obsolete">Grabar nuevos episodios y borrar el más antiguo cuando se alcance el máximo</translation>
     </message>
     <message>
         <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
@@ -851,24 +760,8 @@
         <translation>Salta %1 segundos</translation>
     </message>
     <message>
-        <source>Not Currently Suppressed</source>
-        <translation type="obsolete">Sin suprimir</translation>
-    </message>
-    <message>
         <source>Not Recording</source>
         <translation>No grabar</translation>
-    </message>
-    <message>
-        <source>Recording Once</source>
-        <translation type="obsolete">Grabar una vez</translation>
-    </message>
-    <message>
-        <source>Timeslot Recording</source>
-        <translation type="obsolete">Grabar en esta franja horaria</translation>
-    </message>
-    <message>
-        <source>Weekslot Recording</source>
-        <translation type="obsolete">Grabar semanalmente</translation>
     </message>
     <message>
         <source>Channel Recording</source>
@@ -881,10 +774,6 @@
     <message>
         <source>Air Date:</source>
         <translation>Fecha de emisión:</translation>
-    </message>
-    <message>
-        <source>Record Schedule:</source>
-        <translation type="obsolete">Grabación programada:</translation>
     </message>
     <message>
         <source>Episode:</source>
@@ -1007,10 +896,6 @@
         <translation>Salto automático de anuncios</translation>
     </message>
     <message>
-        <source>Automatically skip commercial breaks that have been flagged during Automatic Commercial Flagging or by the mythcommflag program.</source>
-        <translation type="obsolete">Saltarse automáticamente los anuncios cuando fueron detectados por el proceso automático de detección o el programa mythcommflag.</translation>
-    </message>
-    <message>
         <source>Automatically Flag Commercials</source>
         <translation>Marcar automáticamente los anuncios</translation>
     </message>
@@ -1097,46 +982,6 @@
     <message>
         <source>Language</source>
         <translation>Idioma</translation>
-    </message>
-    <message>
-        <source>English</source>
-        <translation type="obsolete">Inglés</translation>
-    </message>
-    <message>
-        <source>Italian</source>
-        <translation type="obsolete">Italiano</translation>
-    </message>
-    <message>
-        <source>Catalan</source>
-        <translation type="obsolete">Catalàn</translation>
-    </message>
-    <message>
-        <source>Spanish</source>
-        <translation type="obsolete">Español</translation>
-    </message>
-    <message>
-        <source>Dutch</source>
-        <translation type="obsolete">Holandés</translation>
-    </message>
-    <message>
-        <source>French</source>
-        <translation type="obsolete">Francés</translation>
-    </message>
-    <message>
-        <source>German</source>
-        <translation type="obsolete">Alemán</translation>
-    </message>
-    <message>
-        <source>Danish</source>
-        <translation type="obsolete">Danés</translation>
-    </message>
-    <message>
-        <source>Swedish</source>
-        <translation type="obsolete">Sueco</translation>
-    </message>
-    <message>
-        <source>Portuguese</source>
-        <translation type="obsolete">Portugués</translation>
     </message>
     <message>
         <source>Your preferred language.</source>
@@ -1956,18 +1801,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Never</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If deleted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Always</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Skip blank frames after commercials</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2221,10 +2054,6 @@
     </message>
     <message>
         <source>Not Flagged</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Record new and delete oldest once maximum count is reached</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3476,81 +3305,124 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <source>If set, the automatic shutdown routine will be disabled until a client connects.</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>RankPrograms</name>
     <message>
-        <source>Recording just this showing</source>
-        <translation type="obsolete">Graba el programa solamente esta vez</translation>
+        <source>(All)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording every week</source>
-        <translation type="obsolete">Grabar cada semana</translation>
+        <source>If set automatic commercial flagging will be skipped for this channel.  Useful for premium channels like HBO.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording when shown in this timeslot</source>
-        <translation type="obsolete">Grabarlo cuando aparezca a esta hora</translation>
+        <source>Position Saved</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording when shown on this channel</source>
-        <translation type="obsolete">Grabarlo cuando aparezca en este canal</translation>
+        <source>Position Cleared</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording all showings</source>
-        <translation type="obsolete">Grabarlo siempre que aparezca</translation>
+        <source>Default</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Not recording this showing</source>
-        <translation type="obsolete">No grabar este programa</translation>
+        <source>Duplicate Location</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error!</source>
-        <translation type="obsolete">¡ Error !</translation>
+        <source>All places</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Recs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Recs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duplicate Check</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub &amp; Desc</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Even if Empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete oldest over Max</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open DVB card on demand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option makes the backend dvb-recorder only open the card when it is actually in-use leaving it free for other programs at other times.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password required to view all recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If given, a password must be entered to view the complete list of all recordings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Recording Group to display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Recording Group to display on the view recordings screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save current Recording Group view when changed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remember the last selected Recording Group instead of displaying the Default group whenever you enter the playback screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use program categories as display groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add the list of program categories to the list of Recording Groups used for display.  Only programs in non-password protected groups will be listed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View Recordings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ScheduledRecording</name>
     <message>
-        <source>Episode:</source>
-        <translation type="obsolete">Episodio:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="obsolete">Descripción:</translation>
-    </message>
-    <message>
         <source>See a list of all up-coming episodes/playtimes.</source>
         <translation>Ver cuándo se emiten los próximos episodios.</translation>
-    </message>
-</context>
-<context>
-    <name>Scheduler</name>
-    <message>
-        <source>the maximum number of episodes have already been recorded.</source>
-        <translation type="obsolete">se alcanzó el número máximo de episodios a grabar.</translation>
-    </message>
-</context>
-<context>
-    <name>SetRecTimeDialog</name>
-    <message>
-        <source>Change recording time:</source>
-        <translation type="obsolete">Cambiar el tiempo de grabación:</translation>
-    </message>
-    <message>
-        <source>Episode:</source>
-        <translation type="obsolete">Episodio:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="obsolete">Descripción:</translation>
-    </message>
-    <message>
-        <source>Start Time: </source>
-        <translation type="obsolete">Fecha de Inicio:</translation>
-    </message>
-    <message>
-        <source>End Time: </source>
-        <translation type="obsolete">Fecha de Fin:</translation>
     </message>
 </context>
 <context>
@@ -3628,30 +3500,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Con Sonido</translation>
     </message>
     <message>
-        <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="obsolete">%02d:%02d:%02d atrás -- %.2f%% lleno</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d behind</source>
-        <translation type="obsolete">%02d:%02d:%02d atrás</translation>
-    </message>
-    <message>
-        <source>%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="obsolete">%02d:%02d atrás -- %.2f%% lleno</translation>
-    </message>
-    <message>
-        <source>%02d:%02d behind</source>
-        <translation type="obsolete">%02d:%02d atrás</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d of %02d:%02d:%02d</source>
-        <translation type="obsolete">%02d:%02d:%02d de %02d:%02d:%02d</translation>
-    </message>
-    <message>
-        <source>%02d:%02d of %02d:%02d</source>
-        <translation type="obsolete">%02d:%02d de %02d:%02d</translation>
-    </message>
-    <message>
         <source>Paused</source>
         <translation>Pausado</translation>
     </message>
@@ -3674,10 +3522,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Jump Back</source>
         <translation>Salto Atràs</translation>
-    </message>
-    <message>
-        <source>SKIP</source>
-        <translation type="obsolete">SALTO</translation>
     </message>
     <message>
         <source>Searching...</source>
@@ -3845,6 +3689,26 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Change the channel anyway</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Mode OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activate Zoom Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-Expire OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-Expire ON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Mode ON</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4033,48 +3897,12 @@ Your grabber does not provide channel numbers, so you have to set them manually.
 <context>
     <name>ViewScheduled</name>
     <message>
-        <source>Recording this program has been deactivated because it conflicts with another scheduled recording.  Do you want to re-enable this recording?</source>
-        <translation type="obsolete">La grabación de este programa ha sido desactivada porque estaba en conflicto con otra grabación. ¿Desea volver a activar esta grabación?</translation>
-    </message>
-    <message>
-        <source>Yes, I want to record it.</source>
-        <translation type="obsolete">Si, quiero grabarlo.</translation>
-    </message>
-    <message>
-        <source>No, leave it disabled.</source>
-        <translation type="obsolete">No, mantener desactivada.</translation>
-    </message>
-    <message>
-        <source>Recording this program has been suppressed because it has already been recorded in the past.</source>
-        <translation type="obsolete">Esta grabación fué cancelada porque ya se grabó anteriormente.</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
-        <source>The follow scheduled recordings conflict with each other.  Which would you like to record?</source>
-        <translation type="obsolete">Estas grabaciones programadas estan en conflicto entre sí. ¿Cuál quiere mantener?</translation>
-    </message>
-    <message>
-        <source>Remember this choice and use it automatically in the future</source>
-        <translation type="obsolete">Recordar esta opción y usarla automáticamente en el futuro</translation>
-    </message>
-    <message>
         <source>Time Conflict</source>
         <translation>Conflicto en el tiempo</translation>
     </message>
     <message>
         <source>No Conflicts</source>
         <translation>Sin conflictos</translation>
-    </message>
-    <message>
-        <source>Unsuppress recording</source>
-        <translation type="obsolete">Desuprimir grabación</translation>
-    </message>
-    <message>
-        <source>Recording this program has been suppressed because: </source>
-        <translation type="obsolete">Esta grabación se suspendió por la siguiente causa:</translation>
     </message>
     <message>
         <source>All</source>

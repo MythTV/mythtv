@@ -457,6 +457,18 @@ public:
     };
 };
 
+class DVBOnDemand: public CheckBoxSetting, public CCSetting {
+public:
+    DVBOnDemand(const CaptureCard& parent):
+        CCSetting(parent, "dvb_on_demand") {
+        setLabel(QObject::tr("Open DVB card on demand"));
+        setValue(true);
+        setHelpText(QObject::tr("This option makes the backend dvb-recorder "
+                    "only open the card when it is actually in-use leaving "
+                    "it free for other programs at other times."));
+    };
+};
+
 class DVBPidBufferSize: public SpinBoxSetting, public CCSetting {
 public:
     DVBPidBufferSize(const CaptureCard& parent):
@@ -775,6 +787,7 @@ public:
         rec->addChild(new DVBSwFilter(parent));
         rec->addChild(new DVBRecordTS(parent));
         rec->addChild(new DVBNoSeqStart(parent));
+        rec->addChild(new DVBOnDemand(parent));
         rec->addChild(new DVBPidBufferSize(parent));
         rec->addChild(new DVBBufferSize(parent));
         addChild(rec);

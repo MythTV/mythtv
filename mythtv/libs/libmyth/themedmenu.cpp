@@ -526,9 +526,17 @@ void ThemedMenuPrivate::parseText(TextAttributes &attributes,
             }
             else if (info.tagName() == "centered")
             {
-                if (getFirstText(info) == "yes")
-                    attributes.textflags = Qt::AlignTop | Qt::AlignHCenter | 
+                if (getFirstText(info) == "yes" && 
+                    gContext->GetLanguage() != "ja")
+                {
+                    attributes.textflags = Qt::AlignTop | Qt::AlignHCenter |
                                            Qt::WordBreak;
+                }
+                else
+                {
+                    attributes.textflags = Qt::AlignVCenter | Qt::AlignHCenter |
+                                           Qt::WordBreak;
+                }
             } 
             else if (info.tagName() == "outline")
             {
@@ -1841,6 +1849,8 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
         { 
             if (currentrow > 0)
                 currentrow--;
+            else if (columns == 1)
+                currentrow = buttonRows.size() - 1;
 
             if (currentcolumn >= buttonRows[currentrow].numitems)
                 currentcolumn = buttonRows[currentrow].numitems - 1;
@@ -1861,6 +1871,8 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
         {
             if (currentrow < (int)buttonRows.size() - 1)
                 currentrow++;
+            else if (columns == 1)
+                currentrow = 0;
 
             if (currentcolumn >= buttonRows[currentrow].numitems)
                 currentcolumn = buttonRows[currentrow].numitems - 1;

@@ -65,6 +65,7 @@ DVBRecorder::DVBRecorder(DVBChannel* advbchannel): RecorderBase()
     was_paused = true;
     channel_changed = true;
     dvbchannel = advbchannel;
+    dvb_on_demand = false;
 
     paused = false;
     mainpaused = false;
@@ -135,6 +136,10 @@ void DVBRecorder::SetOption(const QString &name, int value)
         if (expire_data_days < 1)
             expire_data_days = 1;
     }
+    else if (name == "dvb_on_demand")
+    {
+        dvb_on_demand = value;
+    }
     else
         RecorderBase::SetOption(name, value);
 }
@@ -173,6 +178,12 @@ bool DVBRecorder::Open()
     if (isopen)
         return true;
 
+    if (dvb_on_demand && dvbchannel->Open())
+    {
+        // this is required to trigger a re-tune
+        dvbchannel->SetChannelByString(dvbchannel->GetCurrentName());
+    }
+
     fd_dvr = open(dvbdevice(DVB_DEV_DVR,cardnum), O_RDONLY | O_NONBLOCK);
     if(fd_dvr < 0)
     {
@@ -196,10 +207,15 @@ void DVBRecorder::Close()
     if (!isopen)
         return;
 
+    VERBOSE(VB_ALL, "Closing DVB recorder");
+
     CloseFilters();
 
     if (fd_dvr > 0)
         close(fd_dvr);
+
+    if (dvb_on_demand && dvbchannel)
+        dvbchannel->CloseDVB();
 
     isopen = false;
 }

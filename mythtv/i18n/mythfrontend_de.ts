@@ -1,5 +1,20 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>CaptureCard</name>
+    <message>
+        <source>You have to save the current card before configuring it, would you like to do this now?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, save now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, don&apos;t</source>
+        <translation type="unfinished">Nicht löschen</translation>
+    </message>
+</context>
+<context>
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture cards</source>
@@ -73,42 +88,7 @@
     </message>
 </context>
 <context>
-    <name>GuideGrid</name>
-    <message>
-        <source>Recording Once</source>
-        <translation type="obsolete">Einmalige Aufnahme</translation>
-    </message>
-    <message>
-        <source>Timeslot Recording</source>
-        <translation type="obsolete">Zeitgesteuerte Aufnahme</translation>
-    </message>
-    <message>
-        <source>Channel Recording</source>
-        <translation type="obsolete">Sendergesteuerte Aufnahme</translation>
-    </message>
-    <message>
-        <source>All Recording</source>
-        <translation type="obsolete">Alle Aufnahmen</translation>
-    </message>
-    <message>
-        <source>Not Recording</source>
-        <translation type="obsolete">Nicht Aufnehmen</translation>
-    </message>
-    <message>
-        <source>Weekly Recording</source>
-        <translation type="obsolete">Wöchentliche Aufnahme</translation>
-    </message>
-</context>
-<context>
     <name>InfoDialog</name>
-    <message>
-        <source>Episode:</source>
-        <translation type="obsolete">Episode:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="obsolete">Beschreibung:</translation>
-    </message>
     <message>
         <source>Record this program whenever it&apos;s shown anywhere</source>
         <translation>Auf jedem Sender aufnehmen</translation>
@@ -239,10 +219,6 @@
 <context>
     <name>MythContext</name>
     <message>
-        <source>Connection to the master backend server timed out.  You probably should modify the Master Server setting in the setup program and set the proper IP address there.</source>
-        <translation type="obsolete">Konnte nicht zum Master Backend verbinden. Sie sollten im Setup Programm die IP Adresse des Master Servers kontrollieren.</translation>
-    </message>
-    <message>
         <source>Could not connect to the master backend server -- is it running?  Is the IP address set for it in the setup program correct?</source>
         <translation>Konnte nicht zum Master Backend Server verbinden -- ist er gestartet? Stimmt seine IP Adresse im Setup?</translation>
     </message>
@@ -288,10 +264,6 @@
         <translation>% belegt</translation>
     </message>
     <message>
-        <source>, %d,%03d MB free</source>
-        <translation type="obsolete">, %d,%03d MB frei</translation>
-    </message>
-    <message>
         <source>All Programs</source>
         <translation>Alle Sendungen</translation>
     </message>
@@ -302,18 +274,6 @@
     <message>
         <source>Are you sure you want to delete:</source>
         <translation>Aufnahme löschen:</translation>
-    </message>
-    <message>
-        <source>Delete this recording? It will be gone forever.</source>
-        <translation type="obsolete">Diese Aufnahme löschen? Es gibt kein Zurück.</translation>
-    </message>
-    <message>
-        <source>It will be gone forever.</source>
-        <translation type="obsolete">Es gibt kein Zurück.</translation>
-    </message>
-    <message>
-        <source>Yes, get rid of it</source>
-        <translation type="obsolete">Ja, weg damit!</translation>
     </message>
     <message>
         <source>No, I might want to watch it again.</source>
@@ -334,10 +294,6 @@
     <message>
         <source>Yes, AutoExpire</source>
         <translation>Ja, automatisch löschen</translation>
-    </message>
-    <message>
-        <source>No, Do Not AutoExpire</source>
-        <translation type="obsolete">Nein. Nicht automatisch löschen</translation>
     </message>
     <message>
         <source>Are you sure you want to stop:</source>
@@ -384,10 +340,6 @@
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <source>Yes; allow re-recording</source>
-        <translation type="obsolete">Ja, und wieder aufnehmen</translation>
-    </message>
-    <message>
         <source>, %0.2f GB free</source>
         <translation>, %0.2f GB frei</translation>
     </message>
@@ -427,6 +379,50 @@
         <source>Ok</source>
         <translation>Ok</translation>
     </message>
+    <message>
+        <source>Recording List Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Group View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Group Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Recording Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Recording Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">Ok</translation>
+    </message>
+    <message>
+        <source>Change Recording Group Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Old Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgFinder</name>
@@ -441,10 +437,6 @@
     <message>
         <source>Recording just this showing</source>
         <translation>Nehme diese Ausstrahlung auf</translation>
-    </message>
-    <message>
-        <source>Recording when shown in this timeslot</source>
-        <translation type="obsolete">Nehme zu dieser Zeit auf</translation>
     </message>
     <message>
         <source>Recording when shown on this channel</source>
@@ -481,34 +473,6 @@
 </context>
 <context>
     <name>ProgLister</name>
-    <message>
-        <source>Recording just this showing</source>
-        <translation type="obsolete">Nehme diese Ausstrahlung auf</translation>
-    </message>
-    <message>
-        <source>Recording every day when shown in this timeslot</source>
-        <translation type="obsolete">Nehme täglich zu dieser Zeit auf</translation>
-    </message>
-    <message>
-        <source>Recording every week when shown in this timeslot</source>
-        <translation type="obsolete">Nehme wöchentlich zu dieser Zeit auf</translation>
-    </message>
-    <message>
-        <source>Recording when shown on this channel</source>
-        <translation type="obsolete">Nehme auf diesem Sender auf</translation>
-    </message>
-    <message>
-        <source>Recording all showings</source>
-        <translation type="obsolete">Nehme alle Ausstrahlungen auf</translation>
-    </message>
-    <message>
-        <source>Not recording this showing</source>
-        <translation type="obsolete">Wird nicht aufgenommen</translation>
-    </message>
-    <message>
-        <source>Error!</source>
-        <translation type="obsolete">Fehler!</translation>
-    </message>
     <message>
         <source>Program Listings</source>
         <translation>Fernsehprogramm</translation>
@@ -556,10 +520,6 @@
     <message>
         <source>Movie</source>
         <translation>Spielfilm</translation>
-    </message>
-    <message>
-        <source>Enter Search Phrase</source>
-        <translation type="obsolete">Suchtext eingeben</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -630,10 +590,6 @@
     <message>
         <source>Yes, Exit now</source>
         <translation>Ja, jetzt beenden</translation>
-    </message>
-    <message>
-        <source>Yes, Exit and shutdown the computer</source>
-        <translation type="obsolete">Ja, beenden und den Rechner abschalten</translation>
     </message>
     <message>
         <source>cut point</source>
@@ -724,20 +680,8 @@
         <translation>Nach diesem Frame löschen</translation>
     </message>
     <message>
-        <source>Auto-Skip %1 seconds</source>
-        <translation type="obsolete">Eine Sekunde überspringen</translation>
-    </message>
-    <message>
-        <source>SKIP</source>
-        <translation type="obsolete">Überspringe</translation>
-    </message>
-    <message>
         <source>Found %1 sec. commercial</source>
         <translation>%1 Sekunden Werbung erkannt</translation>
-    </message>
-    <message>
-        <source>At Start of program.</source>
-        <translation type="obsolete">Am Beginn der Sendung</translation>
     </message>
     <message>
         <source>At End, can not Skip.</source>
@@ -750,10 +694,6 @@
     <message>
         <source>Schedule</source>
         <translation>Modus</translation>
-    </message>
-    <message>
-        <source>Do not record this proram</source>
-        <translation type="obsolete">Nicht aufnehmen</translation>
     </message>
     <message>
         <source>Record only this showing</source>
@@ -780,60 +720,16 @@
         <translation>Nicht aufnehmen</translation>
     </message>
     <message>
-        <source>Record only this showing of the program</source>
-        <translation type="obsolete">Einmalige Aufnahme</translation>
-    </message>
-    <message>
-        <source>Record this program in this timeslot every day</source>
-        <translation type="obsolete">Täglich zu dieser Zeit aufnehmen</translation>
-    </message>
-    <message>
-        <source>Record this program whenever it&apos;s shown on this channel</source>
-        <translation type="obsolete">Nur auf diesem Sender aufnehmen</translation>
-    </message>
-    <message>
-        <source>Record this program whenever it&apos;s shown anywhere</source>
-        <translation type="obsolete">Auf jedem Sender aufnehmen</translation>
-    </message>
-    <message>
-        <source>Record this program in this timeslot every week</source>
-        <translation type="obsolete">Wöchentlich zu dieser Zeit aufnehmen</translation>
-    </message>
-    <message>
         <source>Profile</source>
         <translation>Profil</translation>
-    </message>
-    <message>
-        <source>(unspecified)</source>
-        <translation type="obsolete">(unbestimmt)</translation>
     </message>
     <message>
         <source>Rank</source>
         <translation>Wertung</translation>
     </message>
     <message>
-        <source>Auto-Expire recordings</source>
-        <translation type="obsolete">Aufnahmen autom. löschen</translation>
-    </message>
-    <message>
-        <source>Number of most recent episodes to keep (set to 0 for ALL)</source>
-        <translation type="obsolete">Wieviele Episoden behalten (0 für alle)</translation>
-    </message>
-    <message>
-        <source>Record duplicates</source>
-        <translation>Wdh. aufnehmen</translation>
-    </message>
-    <message>
         <source>Auto Expire</source>
         <translation>Automatisch löschen</translation>
-    </message>
-    <message>
-        <source>Maximum number of episodes to keep (set to 0 for ALL)</source>
-        <translation>Wieviele Folgen behalten (&apos;0&apos; für Alle)</translation>
-    </message>
-    <message>
-        <source>Record new episodes and delete oldest once maximum count is reached</source>
-        <translation type="obsolete">Neue Folgen aufnehmen und ggf. die älteste Folge löschen</translation>
     </message>
     <message>
         <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
@@ -864,24 +760,8 @@
         <translation>Springe %1 Sekunden</translation>
     </message>
     <message>
-        <source>Not Currently Suppressed</source>
-        <translation type="obsolete">Momentan nicht blockiert</translation>
-    </message>
-    <message>
         <source>Not Recording</source>
         <translation>Nicht aufnehmen</translation>
-    </message>
-    <message>
-        <source>Recording Once</source>
-        <translation type="obsolete">Einmalige Aufnahme</translation>
-    </message>
-    <message>
-        <source>Timeslot Recording</source>
-        <translation type="obsolete">Zeitgesteuerte Aufnahme</translation>
-    </message>
-    <message>
-        <source>Weekslot Recording</source>
-        <translation type="obsolete">Wöchentliche Aufnahme</translation>
     </message>
     <message>
         <source>Channel Recording</source>
@@ -894,10 +774,6 @@
     <message>
         <source>Air Date:</source>
         <translation>Sendezeit:</translation>
-    </message>
-    <message>
-        <source>Record Schedule:</source>
-        <translation type="obsolete">Aufnahmeplan:</translation>
     </message>
     <message>
         <source>Episode:</source>
@@ -926,10 +802,6 @@
     <message>
         <source>Mixer Device</source>
         <translation>Mischer Gerät</translation>
-    </message>
-    <message>
-        <source>PCM</source>
-        <translation type="obsolete">PCM</translation>
     </message>
     <message>
         <source>Changing the volume adjusts the selected mixer.</source>
@@ -1024,10 +896,6 @@
         <translation>Werbung autom. überspringen</translation>
     </message>
     <message>
-        <source>Automatically skip commercial breaks that have been flagged during Automatic Commercial Flagging or by the mythcommflag program.</source>
-        <translation type="obsolete">Werbeblöcke bei der Wiedergabe automatisch überspringen.</translation>
-    </message>
-    <message>
         <source>Automatically Flag Commercials</source>
         <translation>Werbung autom. markieren</translation>
     </message>
@@ -1114,46 +982,6 @@
     <message>
         <source>Language</source>
         <translation>Sprache</translation>
-    </message>
-    <message>
-        <source>English</source>
-        <translation type="obsolete">Englisch</translation>
-    </message>
-    <message>
-        <source>Italian</source>
-        <translation type="obsolete">Italienisch</translation>
-    </message>
-    <message>
-        <source>Catalan</source>
-        <translation type="obsolete">Katalanisch</translation>
-    </message>
-    <message>
-        <source>Spanish</source>
-        <translation type="obsolete">Spanisch</translation>
-    </message>
-    <message>
-        <source>Dutch</source>
-        <translation type="obsolete">Niederländisch</translation>
-    </message>
-    <message>
-        <source>French</source>
-        <translation type="obsolete">Französisch</translation>
-    </message>
-    <message>
-        <source>German</source>
-        <translation type="obsolete">Deutsch</translation>
-    </message>
-    <message>
-        <source>Danish</source>
-        <translation type="obsolete">Dänisch</translation>
-    </message>
-    <message>
-        <source>Swedish</source>
-        <translation type="obsolete">Schwedisch</translation>
-    </message>
-    <message>
-        <source>Portuguese</source>
-        <translation type="obsolete">Portugiesisch</translation>
     </message>
     <message>
         <source>Your preferred language.</source>
@@ -1274,10 +1102,6 @@
     <message>
         <source>Default setting for Closed Captioning</source>
         <translation>Voreinstellung für Untertitel</translation>
-    </message>
-    <message>
-        <source>If this is set, captions will be on by default when playing back recordings or watching live TV.</source>
-        <translation type="obsolete">Falls gesetzt, werden Untertitel beim Fernsehen oder der Wiedergabe von Aufnahmen eingeblendet.</translation>
     </message>
     <message>
         <source>Always use Browse mode when changing channels in LiveTV</source>
@@ -1556,38 +1380,6 @@
         <translation>Wieviele Zeitblöcke (je 30min.)</translation>
     </message>
     <message>
-        <source>Use Rankings</source>
-        <translation type="obsolete">Bewertungen nutzen</translation>
-    </message>
-    <message>
-        <source>Use program rankings to resolve conflicts.</source>
-        <translation type="obsolete">Nutze Bewertungen um Überschneidungen bei geplanten Aufnahmen aufzulösen.</translation>
-    </message>
-    <message>
-        <source>Rankings First.</source>
-        <translation type="obsolete">Bewertungen zuerst.</translation>
-    </message>
-    <message>
-        <source>Use rankings to resolve conflicts before using traditional conflict resolution.</source>
-        <translation type="obsolete">Bevorzuge Bewertungen vor der traditionellen Methode um Aufnahmekonflikte zu lösen.</translation>
-    </message>
-    <message>
-        <source>Single Recordings Rank</source>
-        <translation type="obsolete">Einmalige Aufnahme</translation>
-    </message>
-    <message>
-        <source>Single Recordings will receive this additional ranking value.</source>
-        <translation type="obsolete">Einmalige Aufnahmen um diesen Wert höher bewerten.</translation>
-    </message>
-    <message>
-        <source>Weekslot Recordings Rank</source>
-        <translation type="obsolete">Wöchentliche Aufnahmen</translation>
-    </message>
-    <message>
-        <source>Weekslot Recordings will receive this additional ranking value.</source>
-        <translation type="obsolete">Wöchentliche Aufnahmen um diesen Wert höher bewerten.</translation>
-    </message>
-    <message>
         <source>Guide starts at channel</source>
         <translation>EPG startet bei Sender</translation>
     </message>
@@ -1702,10 +1494,6 @@
     <message>
         <source>Program Guide</source>
         <translation>Programmübersicht (EPG)</translation>
-    </message>
-    <message>
-        <source>General Ranking Settings</source>
-        <translation type="obsolete">Bewertungen</translation>
     </message>
     <message>
         <source>Screen settings</source>
@@ -1948,10 +1736,6 @@
         <translation>Videogerät für den PVR-350 MPEG Dekoder</translation>
     </message>
     <message>
-        <source>PVR-350 Settings</source>
-        <translation type="obsolete">PVR-350 Einstellungen</translation>
-    </message>
-    <message>
         <source>Custom Filters</source>
         <translation>Spezielle Filter</translation>
     </message>
@@ -2017,18 +1801,6 @@
         <translation>Falls eine Portnummer gesetzt ist, wird MythTV während der Wiedergabe auf Verbindungen von &quot;mythtvosd&quot; oder &quot;mythudprelay&quot; warten. Einzelheiten dazu finden Sie in der README Datei in contrib/mythnotify.</translation>
     </message>
     <message>
-        <source>Never</source>
-        <translation>Niemals</translation>
-    </message>
-    <message>
-        <source>If deleted</source>
-        <translation>Falls gelöscht</translation>
-    </message>
-    <message>
-        <source>Always</source>
-        <translation>Immer</translation>
-    </message>
-    <message>
         <source>Skip blank frames after commercials</source>
         <translation>Dunkle Frames überspringen</translation>
     </message>
@@ -2041,32 +1813,12 @@
         <translation>Ok</translation>
     </message>
     <message>
-        <source>Recording on cardid: </source>
-        <translation type="obsolete">Benutze Tuner (cardid):</translation>
-    </message>
-    <message>
-        <source>Not Recording: </source>
-        <translation type="obsolete">Keine Aufnahme:</translation>
-    </message>
-    <message>
         <source>Manual Override</source>
         <translation>Überstimmt</translation>
     </message>
     <message>
-        <source>Previously Recorded</source>
-        <translation type="obsolete">Schon aufgenommen</translation>
-    </message>
-    <message>
-        <source>Currently Recording</source>
-        <translation type="obsolete">Momentan aufnehmen</translation>
-    </message>
-    <message>
         <source>Other Showing</source>
         <translation>Andere Ausstrahlung</translation>
-    </message>
-    <message>
-        <source>Too Many Recordings</source>
-        <translation type="obsolete">Zu viele Aufnahmen</translation>
     </message>
     <message>
         <source>Manual Conflict</source>
@@ -2079,10 +1831,6 @@
     <message>
         <source>Overlap</source>
         <translation>Überschneidung</translation>
-    </message>
-    <message>
-        <source>Reason Unknown</source>
-        <translation type="obsolete">Ursache unbekannt</translation>
     </message>
     <message>
         <source>Repeat</source>
@@ -2131,10 +1879,6 @@
     <message>
         <source>Will Record</source>
         <translation>Aufnehmen</translation>
-    </message>
-    <message>
-        <source>Won&apos;t Record</source>
-        <translation type="obsolete">Keine Aufnahme</translation>
     </message>
     <message>
         <source>Don&apos;t record it</source>
@@ -2311,10 +2055,6 @@
     <message>
         <source>Not Flagged</source>
         <translation>Nicht markiert</translation>
-    </message>
-    <message>
-        <source>Record new and delete oldest once maximum count is reached</source>
-        <translation>Neue Folgen aufnehmen und ggf. die älteste löschen</translation>
     </message>
     <message>
         <source>Use video as timebase</source>
@@ -3574,85 +3314,124 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <source>If set, the automatic shutdown routine will be disabled until a client connects.</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>RankPrograms</name>
     <message>
-        <source>Recording just this showing</source>
-        <translation type="obsolete">Nehme diese Ausstrahlung auf</translation>
+        <source>(All)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording every week</source>
-        <translation type="obsolete">Nehme wöchentlich auf</translation>
+        <source>If set automatic commercial flagging will be skipped for this channel.  Useful for premium channels like HBO.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording when shown in this timeslot</source>
-        <translation type="obsolete">Nehme zu dieser Zeit auf</translation>
+        <source>Position Saved</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording when shown on this channel</source>
-        <translation type="obsolete">Nehme auf diesem Sender auf</translation>
+        <source>Position Cleared</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording all showings</source>
-        <translation type="obsolete">Nehme alle Ausstrahlungen auf</translation>
+        <source>Default</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Not recording this showing</source>
-        <translation type="obsolete">Wird nicht aufgenommen</translation>
+        <source>Duplicate Location</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error!</source>
-        <translation type="obsolete">Fehler!</translation>
+        <source>All places</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Recs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Recs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duplicate Check</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub &amp; Desc</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Even if Empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete oldest over Max</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open DVB card on demand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option makes the backend dvb-recorder only open the card when it is actually in-use leaving it free for other programs at other times.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password required to view all recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If given, a password must be entered to view the complete list of all recordings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Recording Group to display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">Alle</translation>
+    </message>
+    <message>
+        <source>Default Recording Group to display on the view recordings screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save current Recording Group view when changed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remember the last selected Recording Group instead of displaying the Default group whenever you enter the playback screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use program categories as display groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add the list of program categories to the list of Recording Groups used for display.  Only programs in non-password protected groups will be listed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View Recordings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ScheduledRecording</name>
     <message>
-        <source>Episode:</source>
-        <translation type="obsolete">Episode:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="obsolete">Beschreibung:</translation>
-    </message>
-    <message>
-        <source>Advanced Recording Options</source>
-        <translation type="obsolete">Erweiterte Aufnahmeoptionen</translation>
-    </message>
-    <message>
         <source>See a list of all up-coming episodes/playtimes.</source>
         <translation>Liste der kommenden Folgen/Sendezeiten.</translation>
-    </message>
-</context>
-<context>
-    <name>Scheduler</name>
-    <message>
-        <source>the maximum number of episodes have already been recorded.</source>
-        <translation type="obsolete">Es können keine weiteren Folgen mehr aufgenommen werden.</translation>
-    </message>
-</context>
-<context>
-    <name>SetRecTimeDialog</name>
-    <message>
-        <source>Change recording time:</source>
-        <translation type="obsolete">Aufnahmezeit ändern:</translation>
-    </message>
-    <message>
-        <source>Episode:</source>
-        <translation type="obsolete">Episode:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="obsolete">Beschreibung:</translation>
-    </message>
-    <message>
-        <source>Start Time: </source>
-        <translation type="obsolete">Anfangszeit: </translation>
-    </message>
-    <message>
-        <source>End Time: </source>
-        <translation type="obsolete">Endzeit: </translation>
     </message>
 </context>
 <context>
@@ -3698,30 +3477,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>Diese Aufnahme löschen</translation>
     </message>
     <message>
-        <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="obsolete">%02d:%02d:%02d zurück  -- %.2f%% voll</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d behind</source>
-        <translation type="obsolete">%02d:%02d:%02d zurück</translation>
-    </message>
-    <message>
-        <source>%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="obsolete">%02d:%02d zurück  --  %.2f%% voll</translation>
-    </message>
-    <message>
-        <source>%02d:%02d behind</source>
-        <translation type="obsolete">%02d:%02d zurück</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d of %02d:%02d:%02d</source>
-        <translation type="obsolete">%02d:%02d:%02d von %02d:%02d:%02d</translation>
-    </message>
-    <message>
-        <source>%02d:%02d of %02d:%02d</source>
-        <translation type="obsolete">%02d:%02d von %02d:%02d</translation>
-    </message>
-    <message>
         <source>Paused</source>
         <translation>Pause</translation>
     </message>
@@ -3748,10 +3503,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     <message>
         <source>Searching...</source>
         <translation>Suche...</translation>
-    </message>
-    <message>
-        <source>SKIP</source>
-        <translation type="obsolete">Überspringe</translation>
     </message>
     <message>
         <source>Brightness %1 %</source>
@@ -3784,10 +3535,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     <message>
         <source>Mute Off</source>
         <translation>Stumm aus</translation>
-    </message>
-    <message>
-        <source>Transcode</source>
-        <translation type="obsolete">Umwandlung</translation>
     </message>
     <message>
         <source>Hue %1 %</source>
@@ -3930,16 +3677,8 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>Auto-Sprung Hinweisen</translation>
     </message>
     <message>
-        <source>Zoom</source>
-        <translation type="obsolete">Zoom</translation>
-    </message>
-    <message>
         <source>16:9 Zoom</source>
         <translation>16:9 Zoom</translation>
-    </message>
-    <message>
-        <source>Color %1 %</source>
-        <translation type="obsolete">Farbe %1 %</translation>
     </message>
     <message>
         <source>Adjust Recording</source>
@@ -3960,6 +3699,26 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     <message>
         <source>Change the channel anyway</source>
         <translation>Trotzdem umschalten</translation>
+    </message>
+    <message>
+        <source>Zoom Mode OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activate Zoom Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-Expire OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-Expire ON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Mode ON</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4155,60 +3914,12 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation>Keine Überschneidungen</translation>
     </message>
     <message>
-        <source>Recording this program has been deactivated because it conflicts with another scheduled recording.  Do you want to re-enable this recording?</source>
-        <translation type="obsolete">Diese Aufnahme wurde blockiert, da sie mit einer anderen Aufnahme kollidiert. Möchten Sie sie wieder aktivieren?</translation>
-    </message>
-    <message>
-        <source>Yes, I want to record it.</source>
-        <translation type="obsolete">Ja, Ich möchte es aufnehmen</translation>
-    </message>
-    <message>
-        <source>No, leave it disabled.</source>
-        <translation type="obsolete">Nein, alles bleibt beim alten.</translation>
-    </message>
-    <message>
-        <source>Recording this program has been suppressed because it has already been recorded in the past.</source>
-        <translation type="obsolete">Diese Aufnahme wurde blockiert, da diese Sendung schon aufgezeichnet wurde.</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">Ok</translation>
-    </message>
-    <message>
-        <source>Unsuppress recording</source>
-        <translation type="obsolete">Aufnahme wieder aktivieren</translation>
-    </message>
-    <message>
-        <source>The follow scheduled recordings conflict with each other.  Which would you like to record?</source>
-        <translation type="obsolete">Die folgenden Aufnahmen überlappen sich. Welche Aufnahme möchten Sie behalten?</translation>
-    </message>
-    <message>
-        <source>Remember this choice and use it automatically in the future</source>
-        <translation type="obsolete">Diese Auswahl für die Zukunft merken</translation>
-    </message>
-    <message>
-        <source>Recording this program has been suppressed because: </source>
-        <translation type="obsolete">Diese Aufnahme wurde blockiert weil: </translation>
-    </message>
-    <message>
-        <source>Record it anyway</source>
-        <translation type="obsolete">Dennoch aufnehmen</translation>
-    </message>
-    <message>
-        <source>Don&apos;t record it</source>
-        <translation type="obsolete">Nicht aufnehmen</translation>
-    </message>
-    <message>
         <source>All</source>
         <translation>Alle</translation>
     </message>
     <message>
         <source>Important</source>
         <translation>Wichtige</translation>
-    </message>
-    <message>
-        <source>Recording</source>
-        <translation type="obsolete">Aufnehmen</translation>
     </message>
 </context>
 </TS>

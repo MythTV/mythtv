@@ -1,5 +1,20 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>CaptureCard</name>
+    <message>
+        <source>You have to save the current card before configuring it, would you like to do this now?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, save now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, don&apos;t</source>
+        <translation type="unfinished">Neen, niet doen.</translation>
+    </message>
+</context>
+<context>
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture cards</source>
@@ -46,7 +61,7 @@
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Neen, niet doen.</translation>
     </message>
     <message>
         <source>Channel Menu</source>
@@ -54,11 +69,11 @@
     </message>
     <message>
         <source>Edit..</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bewerk..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Verwijder..</translation>
     </message>
 </context>
 <context>
@@ -73,42 +88,7 @@
     </message>
 </context>
 <context>
-    <name>GuideGrid</name>
-    <message>
-        <source>Recording Once</source>
-        <translation type="obsolete">Eenmalig Opnemen</translation>
-    </message>
-    <message>
-        <source>Timeslot Recording</source>
-        <translation type="obsolete">Opnemen per Tijdsblok</translation>
-    </message>
-    <message>
-        <source>Channel Recording</source>
-        <translation type="obsolete">Opnemen per Kanaal</translation>
-    </message>
-    <message>
-        <source>All Recording</source>
-        <translation type="obsolete">Alles Opnemen</translation>
-    </message>
-    <message>
-        <source>Not Recording</source>
-        <translation type="obsolete">Niet Opnemen</translation>
-    </message>
-    <message>
-        <source>Weekly Recording</source>
-        <translation type="obsolete">Wekelijks Opnemen</translation>
-    </message>
-</context>
-<context>
     <name>InfoDialog</name>
-    <message>
-        <source>Episode:</source>
-        <translation>Aflevering:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation>Beschrijving:</translation>
-    </message>
     <message>
         <source>Record this program whenever it&apos;s shown anywhere</source>
         <translation>Dit programma altijd en op alle kanalen opnemen</translation>
@@ -278,21 +258,10 @@
     </message>
 </context>
 <context>
-    <name>NuppelVideoPlayer</name>
-    <message>
-        <source>SKIP</source>
-        <translation type="obsolete">Overslaan</translation>
-    </message>
-</context>
-<context>
     <name>PlaybackBox</name>
     <message>
         <source>% used</source>
         <translation>% gebruikt</translation>
-    </message>
-    <message>
-        <source>, %d,%03d MB free</source>
-        <translation type="obsolete">, %d,%03d MB vrij</translation>
     </message>
     <message>
         <source>All Programs</source>
@@ -305,18 +274,6 @@
     <message>
         <source>Are you sure you want to delete:</source>
         <translation>Bent U zeker van het verwijderen van:</translation>
-    </message>
-    <message>
-        <source>Delete this recording? It will be gone forever.</source>
-        <translation type="obsolete">Verwijder deze opname? Ze verdwijnt voorgoed.</translation>
-    </message>
-    <message>
-        <source>It will be gone forever.</source>
-        <translation type="obsolete">Ze verdwijnt voorgoed.</translation>
-    </message>
-    <message>
-        <source>Yes, get rid of it</source>
-        <translation type="obsolete">Ja, verwijder deze opname</translation>
     </message>
     <message>
         <source>No, I might want to watch it again.</source>
@@ -422,6 +379,50 @@
         <source>Ok</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Recording List Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Group View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Group Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Recording Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Recording Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Change Recording Group Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Old Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgFinder</name>
@@ -436,10 +437,6 @@
     <message>
         <source>Recording just this showing</source>
         <translation>Neem enkel deze vertoning op</translation>
-    </message>
-    <message>
-        <source>Recording when shown in this timeslot</source>
-        <translation type="obsolete">Neem enkel vertoningen op in dit tijdsblok</translation>
     </message>
     <message>
         <source>Recording when shown on this channel</source>
@@ -476,34 +473,6 @@
 </context>
 <context>
     <name>ProgLister</name>
-    <message>
-        <source>Recording just this showing</source>
-        <translation type="obsolete">Neem enkel deze vertoning op</translation>
-    </message>
-    <message>
-        <source>Recording every day when shown in this timeslot</source>
-        <translation type="obsolete">Dagelijkse vertoningen opnemen in dit tijdsblok</translation>
-    </message>
-    <message>
-        <source>Recording every week when shown in this timeslot</source>
-        <translation type="obsolete">Wekelijkse vertoningen opnemen in dit tijdsblok</translation>
-    </message>
-    <message>
-        <source>Recording when shown on this channel</source>
-        <translation type="obsolete">Neem enkel vertoningen op dit kanaal op</translation>
-    </message>
-    <message>
-        <source>Recording all showings</source>
-        <translation type="obsolete">Neem alle vertoningen op</translation>
-    </message>
-    <message>
-        <source>Not recording this showing</source>
-        <translation type="obsolete">Neem deze vertoning niet op</translation>
-    </message>
-    <message>
-        <source>Error!</source>
-        <translation type="obsolete">Fout!</translation>
-    </message>
     <message>
         <source>Program Listings</source>
         <translation>Programmaoverzicht</translation>
@@ -623,10 +592,6 @@
         <translation>Ja, sluit nu af</translation>
     </message>
     <message>
-        <source>Yes, Exit and shutdown the computer</source>
-        <translation>Ja, sluit nu af en zet de computer uit</translation>
-    </message>
-    <message>
         <source>cut point</source>
         <translation>knippunt</translation>
     </message>
@@ -711,20 +676,8 @@
         <translation>Verwijder na dit frame</translation>
     </message>
     <message>
-        <source>Auto-Skip %1 seconds</source>
-        <translation type="obsolete">Automatisch %1 seconden overslaan</translation>
-    </message>
-    <message>
-        <source>SKIP</source>
-        <translation type="obsolete">Overslaan</translation>
-    </message>
-    <message>
         <source>Found %1 sec. commercial</source>
         <translation>%1 seconden reclame gevonden</translation>
-    </message>
-    <message>
-        <source>At Start of program.</source>
-        <translation type="obsolete">In het begin.</translation>
     </message>
     <message>
         <source>At End, can not Skip.</source>
@@ -741,10 +694,6 @@
     <message>
         <source>Schedule</source>
         <translation>Plannen</translation>
-    </message>
-    <message>
-        <source>Do not record this proram</source>
-        <translation type="obsolete">Dit programma niet opnemen</translation>
     </message>
     <message>
         <source>Record only this showing</source>
@@ -771,48 +720,16 @@
         <translation>Dit programma niet opnemen</translation>
     </message>
     <message>
-        <source>Record only this showing of the program</source>
-        <translation type="obsolete">Enkel deze vertoning van het programma opnemen</translation>
-    </message>
-    <message>
-        <source>Record this program in this timeslot every day</source>
-        <translation type="obsolete">Dit programma dagelijks in dit tijdsblok opnemen</translation>
-    </message>
-    <message>
-        <source>Record this program whenever it&apos;s shown on this channel</source>
-        <translation type="obsolete">Dit programma altijd op dit kanaal opnemen</translation>
-    </message>
-    <message>
-        <source>Record this program whenever it&apos;s shown anywhere</source>
-        <translation type="obsolete">Dit programma altijd en op alle kanalen opnemen</translation>
-    </message>
-    <message>
-        <source>Record this program in this timeslot every week</source>
-        <translation type="obsolete">Dit programma wekelijks in dit tijdsblok opnemen</translation>
-    </message>
-    <message>
         <source>Profile</source>
         <translation>Profiel</translation>
-    </message>
-    <message>
-        <source>(unspecified)</source>
-        <translation type="obsolete">Automatisch %1 seconden overslaan</translation>
     </message>
     <message>
         <source>Rank</source>
         <translation>Rang</translation>
     </message>
     <message>
-        <source>Record duplicates</source>
-        <translation>Copies opnemen</translation>
-    </message>
-    <message>
         <source>Auto Expire</source>
         <translation>Automatisch vervallen</translation>
-    </message>
-    <message>
-        <source>Maximum number of episodes to keep (set to 0 for ALL)</source>
-        <translation>Aantal afleveringen om te bewaren (kies 0 voor alle)</translation>
     </message>
     <message>
         <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
@@ -845,14 +762,6 @@
     <message>
         <source>Not Recording</source>
         <translation>Wordt niet Opgenomen</translation>
-    </message>
-    <message>
-        <source>Recording Once</source>
-        <translation>Eenmalige Opname</translation>
-    </message>
-    <message>
-        <source>Timeslot Recording</source>
-        <translation>Opname per Tijdsblok</translation>
     </message>
     <message>
         <source>Channel Recording</source>
@@ -1892,18 +1801,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Never</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If deleted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Always</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Skip blank frames after commercials</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2157,10 +2054,6 @@
     </message>
     <message>
         <source>Not Flagged</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Record new and delete oldest once maximum count is reached</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3412,78 +3305,124 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <source>If set, the automatic shutdown routine will be disabled until a client connects.</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>RankPrograms</name>
     <message>
-        <source>Recording just this showing</source>
-        <translation type="obsolete">Neem enkel deze vertoning op</translation>
+        <source>(All)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording every week</source>
-        <translation type="obsolete">Neem wekelijks op</translation>
+        <source>If set automatic commercial flagging will be skipped for this channel.  Useful for premium channels like HBO.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording when shown in this timeslot</source>
-        <translation type="obsolete">Neem enkel vertoningen op in dit tijdsblok</translation>
+        <source>Position Saved</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording when shown on this channel</source>
-        <translation type="obsolete">Neem enkel vertoningen op dit kanaal op</translation>
+        <source>Position Cleared</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording all showings</source>
-        <translation type="obsolete">Neem alle vertoningen op</translation>
+        <source>Default</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Not recording this showing</source>
-        <translation type="obsolete">Neem deze vertoning niet op</translation>
+        <source>Duplicate Location</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error!</source>
-        <translation type="obsolete">Fout!</translation>
+        <source>All places</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Recs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Recs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duplicate Check</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub &amp; Desc</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Even if Empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete oldest over Max</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open DVB card on demand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option makes the backend dvb-recorder only open the card when it is actually in-use leaving it free for other programs at other times.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password required to view all recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If given, a password must be entered to view the complete list of all recordings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Recording Group to display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">Alle</translation>
+    </message>
+    <message>
+        <source>Default Recording Group to display on the view recordings screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save current Recording Group view when changed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remember the last selected Recording Group instead of displaying the Default group whenever you enter the playback screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use program categories as display groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add the list of program categories to the list of Recording Groups used for display.  Only programs in non-password protected groups will be listed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View Recordings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ScheduledRecording</name>
     <message>
-        <source>Episode:</source>
-        <translation type="obsolete">Aflevering:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="obsolete">Beschrijving:</translation>
-    </message>
-    <message>
-        <source>Advanced Recording Options</source>
-        <translation type="obsolete">Geavanceerde Opname Opties</translation>
-    </message>
-    <message>
         <source>See a list of all up-coming episodes/playtimes.</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>SetRecTimeDialog</name>
-    <message>
-        <source>Change recording time:</source>
-        <translation type="obsolete">Wijzig opname-tijd:</translation>
-    </message>
-    <message>
-        <source>Episode:</source>
-        <translation type="obsolete">Aflevering:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="obsolete">Beschrijving:</translation>
-    </message>
-    <message>
-        <source>Start Time: </source>
-        <translation type="obsolete">Begintijd:</translation>
-    </message>
-    <message>
-        <source>End Time: </source>
-        <translation type="obsolete">Eindtijd:</translation>
     </message>
 </context>
 <context>
@@ -3529,30 +3468,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Verwijder deze opname</translation>
     </message>
     <message>
-        <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="obsolete">%02d:%02d:%02d achter  --  %.2f%% vol</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d behind</source>
-        <translation type="obsolete">%02d:%02d:%02d achter</translation>
-    </message>
-    <message>
-        <source>%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="obsolete">%02d:%02d achter  --  %.2f%% vol</translation>
-    </message>
-    <message>
-        <source>%02d:%02d behind</source>
-        <translation type="obsolete">%02d:%02d achter</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d of %02d:%02d:%02d</source>
-        <translation type="obsolete">%02d:%02d:%02d van %02d:%02d:%02d</translation>
-    </message>
-    <message>
-        <source>%02d:%02d of %02d:%02d</source>
-        <translation type="obsolete">%02d:%02d van %02d:%02d</translation>
-    </message>
-    <message>
         <source>Paused</source>
         <translation>Pause</translation>
     </message>
@@ -3579,10 +3494,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Searching...</source>
         <translation>Bezig met zoeken...</translation>
-    </message>
-    <message>
-        <source>SKIP</source>
-        <translation type="obsolete">Overslaan</translation>
     </message>
     <message>
         <source>Brightness %1 %</source>
@@ -3617,10 +3528,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Geluid aan</translation>
     </message>
     <message>
-        <source>Transcode</source>
-        <translation type="obsolete">Omzetten</translation>
-    </message>
-    <message>
         <source>Hue %1 %</source>
         <translation>Hue %1 %</translation>
     </message>
@@ -3650,7 +3557,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Afspelen</translation>
     </message>
     <message>
         <source>Speed 5X</source>
@@ -3734,7 +3641,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Don&apos;t Auto Expire</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Niet automatisch laten vervallen</translation>
     </message>
     <message>
         <source>Auto Expire</source>
@@ -3782,6 +3689,26 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Change the channel anyway</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Mode OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activate Zoom Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-Expire OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-Expire ON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Mode ON</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3929,7 +3856,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Program Listings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Programmaoverzicht</translation>
     </message>
     <message>
         <source>No listings found for this program. </source>
@@ -3948,11 +3875,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Edit..</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bewerk..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Verwijder..</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this video source?</source>
@@ -3964,7 +3891,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Neen, niet doen.</translation>
     </message>
 </context>
 <context>
@@ -3976,38 +3903,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>No Conflicts</source>
         <translation>Geen conflicten</translation>
-    </message>
-    <message>
-        <source>Recording this program has been deactivated because it conflicts with another scheduled recording.  Do you want to re-enable this recording?</source>
-        <translation type="obsolete">Opname van dit programma is gedesactiveerd omdat het in conflict is met een andere opname. Wilt U deze opname heractiveren?</translation>
-    </message>
-    <message>
-        <source>Yes, I want to record it.</source>
-        <translation type="obsolete">Ja, ik wil het opnemen.</translation>
-    </message>
-    <message>
-        <source>No, leave it disabled.</source>
-        <translation type="obsolete">Nee, laat het gedesactiveerd.</translation>
-    </message>
-    <message>
-        <source>Recording this program has been suppressed because it has already been recorded in the past.</source>
-        <translation type="obsolete">Opname van dit programma is uitgeschakeld, omdat het vroeger al is opgenomen.</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
-        <source>The follow scheduled recordings conflict with each other.  Which would you like to record?</source>
-        <translation type="obsolete">De volgende opnames zijn in conflict. Welk programma wenst U op te nemen?</translation>
-    </message>
-    <message>
-        <source>Remember this choice and use it automatically in the future</source>
-        <translation type="obsolete">Onthou deze keuze en gebruik ze later automatisch</translation>
-    </message>
-    <message>
-        <source>Unsuppress recording</source>
-        <translation type="obsolete">Heractiveer opname</translation>
     </message>
     <message>
         <source>All</source>

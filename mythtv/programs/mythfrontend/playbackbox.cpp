@@ -145,7 +145,8 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     gContext->addListener(this);
 
     freeSpaceTimer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(setUpdateFreeSpace()));
+    connect(freeSpaceTimer, SIGNAL(timeout()), this, 
+            SLOT(setUpdateFreeSpace()));
 
     if (recGroupPassword != "")
         showRecGroupChooser();

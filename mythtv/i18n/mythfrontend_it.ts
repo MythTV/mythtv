@@ -1,5 +1,20 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>CaptureCard</name>
+    <message>
+        <source>You have to save the current card before configuring it, would you like to do this now?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, save now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, don&apos;t</source>
+        <translation type="unfinished">No, non lo fare</translation>
+    </message>
+</context>
+<context>
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture cards</source>
@@ -364,6 +379,50 @@
         <source>Ok</source>
         <translation>Ok</translation>
     </message>
+    <message>
+        <source>Recording List Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Group View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Group Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Recording Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Recording Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Change Recording Group Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Old Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgFinder</name>
@@ -391,32 +450,25 @@
         <source>Recording one showing of this program</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>ProgLister</name>
-    <message>
-        <source>Recording just this showing</source>
-        <translation type="obsolete">Registrazione singolo evento</translation>
-    </message>
     <message>
         <source>Recording when shown on this channel</source>
-        <translation>Registra quando presente su questo canale</translation>
+        <translation type="unfinished">Registra quando presente su questo canale</translation>
     </message>
     <message>
         <source>Recording all showings</source>
-        <translation>Registra ogni passaggio</translation>
+        <translation type="unfinished">Registra ogni passaggio</translation>
     </message>
     <message>
         <source>Not recording this showing</source>
-        <translation>Non registrare questo passaggio</translation>
+        <translation type="unfinished">Non registrare questo passaggio</translation>
     </message>
     <message>
         <source>Error!</source>
-        <translation>Errore!</translation>
+        <translation type="unfinished">Errore!</translation>
     </message>
     <message>
         <source>       !! No Programs !!</source>
-        <translation>      !! Nessun programma !!</translation>
+        <translation type="unfinished">      !! Nessun programma !!</translation>
     </message>
 </context>
 <context>
@@ -460,10 +512,6 @@
     <message>
         <source>Select Category</source>
         <translation>Seleziona la categoria</translation>
-    </message>
-    <message>
-        <source>Enter Search Phrase</source>
-        <translation type="obsolete">Inserisci la frase di ricerca</translation>
     </message>
     <message>
         <source>OK</source>
@@ -956,32 +1004,8 @@
         <translation>Profilo</translation>
     </message>
     <message>
-        <source>Record duplicates</source>
-        <translation>Registra duplicati</translation>
-    </message>
-    <message>
-        <source>Never</source>
-        <translation>Mai</translation>
-    </message>
-    <message>
-        <source>If deleted</source>
-        <translation>Se cancellato</translation>
-    </message>
-    <message>
-        <source>Always</source>
-        <translation>Sempre</translation>
-    </message>
-    <message>
         <source>Auto Expire</source>
         <translation>Autocancellazione</translation>
-    </message>
-    <message>
-        <source>Maximum number of episodes to keep (set to 0 for ALL)</source>
-        <translation>Numero massimo di episodi da tenere (metti a 0 per tutti)</translation>
-    </message>
-    <message>
-        <source>Record new and delete oldest once maximum count is reached</source>
-        <translation>Registra i nuovi e cancella i più vecchi quando arrivi al numero massimo</translation>
     </message>
     <message>
         <source>Priority</source>
@@ -2363,7 +2387,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Channels</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Canali</translation>
     </message>
     <message>
         <source>This box contains all channels from the selected video source. Select a channel here and press the &apos;Load and Tune&apos; button to load the channel settings into the previous screen and try to tune it.</source>
@@ -3218,26 +3242,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Start Early (minutes)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>End Late   (minutes)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Wait for SEQ start header.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable channel change buffer warnings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If set, MythTV will warn you whenever you change the channel but are not caught up to live TV.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>F</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3299,6 +3303,118 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>If set, the automatic shutdown routine will be disabled until a client connects.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(All)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set automatic commercial flagging will be skipped for this channel.  Useful for premium channels like HBO.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Position Saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Position Cleared</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duplicate Location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All places</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Recs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Recs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duplicate Check</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub &amp; Desc</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Even if Empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete oldest over Max</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open DVB card on demand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option makes the backend dvb-recorder only open the card when it is actually in-use leaving it free for other programs at other times.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password required to view all recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If given, a password must be entered to view the complete list of all recordings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Recording Group to display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">Tutti</translation>
+    </message>
+    <message>
+        <source>Default Recording Group to display on the view recordings screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save current Recording Group view when changed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remember the last selected Recording Group instead of displaying the Default group whenever you enter the playback screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use program categories as display groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add the list of program categories to the list of Recording Groups used for display.  Only programs in non-password protected groups will be listed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View Recordings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3574,6 +3690,26 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Auto-Skip Notify</source>
         <translation>Salto automatico Notify </translation>
+    </message>
+    <message>
+        <source>Zoom Mode OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activate Zoom Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-Expire OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-Expire ON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Mode ON</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -69,6 +69,8 @@ ProgFinder::ProgFinder(MythMainWindow *parent, const char *name)
 {
     curSearch = 10;
     searchCount = 37;
+
+    displaychannum = gContext->GetNumSetting("DisplayChanNum");
 }
 
 void ProgFinder::Initialize(void)
@@ -332,7 +334,8 @@ void ProgFinder::updateInfo(QPainter *p)
         QString channame = "";
         QString recording = "";
 
-        channum = showData[curShow].channelNum;
+        if(!displaychannum)
+           channum = showData[curShow].channelNum;
         channame = showData[curShow].channelCallsign;
         title = progData[curProgram];
         timedate = showData[curShow].startDisplay + " - " +
@@ -1184,7 +1187,7 @@ void ProgFinder::getRecordingInfo()
     if (rows == -1)
     {
         cerr << "MythProgFind: Error executing query! (getRecordingInfo)\n";
-        cerr << "MythProgFind: QUERY = " << thequery << endl;
+        cerr << "MythProgFind: QUERY = " << thequery.local8Bit() << endl;
         return;
     }
 
@@ -1582,18 +1585,8 @@ void ProgFinder::getAllProgramData()
 
 // japanese HIRAGANA list and more
 const char* JaProgFinder::searchChars[] = {
-    "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
-    "あ", "い", "う", "え", "お",
-    "か", "き", "く", "け", "こ",
-    "さ", "し", "す", "せ", "そ",
-    "た", "ち", "つ", "て", "と",
-    "な", "に", "ぬ", "ね", "の",
-    "は", "ひ", "ふ", "へ", "ほ",
-    "ま", "み", "む", "め", "も",
-    "や",       "ゆ",       "よ",
-    "ら", "り", "る", "れ", "ろ",
-    "わ", "を", "ん",
-    "(ス)",  "(字)", "(多)",
+    "あ", "か", "さ", "た", "な", "は", "ま", "や", "ら", "わ",
+    "英", "数",
     0,
 };
 
@@ -1619,25 +1612,58 @@ void JaProgFinder::fillSearchData()
     }
 }
 
-// searching subtitle, i hope subtitle inserted japanese HIRAGANA
+// searching subtitle
+// we hope japanese HIRAGANA and alphabets, numerics is inserted
+// these character must required ZENKAKU
+// because query work not fine, if mysql's default charset latin1
 QString JaProgFinder::whereClauseGetSearchData(int charNum)
 {
     QDateTime progStart = QDateTime::currentDateTime();
     QString thequery;
-    thequery = QString("SELECT DISTINCT title "
-                       "FROM program "
-                       "WHERE ( title LIKE '%1%' OR subtitle LIKE '(す)%2%' "
-                       "OR subtitle LIKE '(じ)%3%' "
-                       "OR subtitle LIKE '(じ)(す)%4%' "
-                       "OR subtitle LIKE '(た)%5%' ) "
-                       "AND starttime > %6 "
-                       "ORDER BY title;")
-                        .arg(searchData[charNum].utf8())
-                        .arg(searchData[charNum].utf8())
-                        .arg(searchData[charNum].utf8())
-                        .arg(searchData[charNum].utf8())
-                        .arg(searchData[charNum].utf8())
-                        .arg(progStart.toString("yyyyMMddhhmm50"));
+
+    thequery = QString("SELECT DISTINCT title FROM program ");
+
+    switch (charNum) {
+    case 0:
+        thequery += QString("WHERE ( subtitle >= 'あ' AND subtitle <= 'お') ");
+        break;
+    case 1:
+        thequery += QString("WHERE ( subtitle >= 'か' AND subtitle <= 'ご') ");
+        break;
+    case 2:
+        thequery += QString("WHERE ( subtitle >= 'さ' AND subtitle <= 'そ') ");
+        break;
+    case 3:
+        thequery += QString("WHERE ( subtitle >= 'た' AND subtitle <= 'ど') ");
+        break;
+    case 4:
+        thequery += QString("WHERE ( subtitle >= 'な' AND subtitle <= 'の') ");
+        break;
+    case 5:
+        thequery += QString("WHERE ( subtitle >= 'は' AND subtitle <= 'ぽ') ");
+        break;
+    case 6:
+        thequery += QString("WHERE ( subtitle >= 'ま' AND subtitle <= 'も') ");
+        break;
+    case 7:
+        thequery += QString("WHERE ( subtitle >= 'や' AND subtitle <= 'よ') ");
+        break;
+    case 8:
+        thequery += QString("WHERE ( subtitle >= 'ら' AND subtitle <= 'ろ') ");
+        break;
+    case 9:
+        thequery += QString("WHERE ( subtitle >= 'わ' AND subtitle <= 'ん') ");
+        break;
+    case 10:
+        thequery += QString("WHERE ( subtitle >= 'Ａ' AND subtitle <= 'ｚ') ");
+        break;
+    case 11:
+        thequery += QString("WHERE ( subtitle >= '０' AND subtitle <= '９') ");
+        break;
+    }
+
+    thequery += QString("AND starttime > %1 ORDER BY subtitle;")
+                       .arg(progStart.toString("yyyyMMddhhmm50"));
     return thequery;
 }
 

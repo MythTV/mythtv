@@ -46,7 +46,7 @@ class ChannelListSetting: public ListBoxSetting {
 public:
     ChannelListSetting(): ListBoxSetting() {
         currentSourceID = "";
-        currentSortMode = "Channel Name";
+        currentSortMode = QObject::tr("Channel Name");
         currentHideMode = false;
     };
 

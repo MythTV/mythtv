@@ -25,6 +25,7 @@
 
 using namespace std;
 
+QTranslator *translator;
 QSqlDatabase* db;
 
 QString getResponse(const QString &query, const QString &def)
@@ -113,6 +114,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     gContext = new MythContext(MYTH_BINARY_VERSION, true);
+    translator = new QTranslator(0);
 
     db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!gContext->OpenDatabase(db))
@@ -127,6 +129,11 @@ int main(int argc, char *argv[])
     }
 
     UpgradeTVDatabaseSchema();
+
+    translator->load(PREFIX + QString("/share/mythtv/i18n/mythfrontend_") + 
+                     QString(gContext->GetSetting("Language").lower()) + 
+                     QString(".qm"), ".");
+    a.installTranslator(translator);
 
     gContext->SetSetting("Theme", "blue");
     gContext->LoadQtConfig();

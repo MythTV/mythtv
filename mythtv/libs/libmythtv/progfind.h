@@ -146,6 +146,8 @@ class ProgFinder : public MythDialog
     QString timeFormat;
 
     bool allowkeypress;
+
+    int displaychannum;
 };
 
 class JaProgFinder : public ProgFinder

@@ -37,6 +37,7 @@ typedef struct _dvb_options_t
     int wait_for_seqstart;
     int dmx_buf_size;
     int pkt_buf_size;
+    bool dvb_on_demand;
 } dvb_options_t;
 
 class TVRec

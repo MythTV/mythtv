@@ -88,6 +88,8 @@ ChannelRecPriority::ChannelRecPriority(QSqlDatabase *ldb,
     inData = 0;
     setNoErase();
 
+    displaychannum = gContext->GetNumSetting("DisplayChanNum");
+
     gContext->addListener(this);
 }
 
@@ -431,7 +433,7 @@ void ChannelRecPriority::FillList(void)
         }
     }
     else if (!result.isActive())
-        MythContext::DBError("Get channel recording prioritiess query", query);
+        MythContext::DBError("Get channel recording priorities query", query);
 }
 
 typedef struct RecPriorityInfo 
@@ -572,8 +574,11 @@ void ChannelRecPriority::updateList(QPainter *p)
                             curitem = new ChannelInfo(*chanInfo);
                             ltype->SetItemCurrent(cnt);
                         }
-                        
-                        ltype->SetItemText(cnt, 1, chanInfo->chanstr);
+
+                        if(displaychannum)
+                            ltype->SetItemText(cnt, 1, "");
+                        else
+                            ltype->SetItemText(cnt, 1, chanInfo->chanstr);
                         ltype->SetItemText(cnt, 2, chanInfo->callsign);
                         if (chanInfo->recpriority.toInt() > 0)
                             ltype->SetItemText(cnt, 3, "+");

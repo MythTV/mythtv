@@ -96,6 +96,8 @@ class ProgLister : public MythDialog
     MythRemoteLineEdit *chooseLineEdit;
     MythPushButton *chooseOkButton;
     MythPushButton *chooseDeleteButton;
+
+    int displaychannum;
 };
 
 #endif

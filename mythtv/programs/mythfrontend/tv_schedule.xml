@@ -56,6 +56,7 @@
       <type>TV_PROGFIND</type>
       <text>Search Listings</text>
       <text lang="DE">Suche</text>
+      <text lang="JA">リスト検索</text>
       <alttext>Search</alttext>
       <action>MENU tv_search.xml</action>
    </button>
@@ -141,7 +142,7 @@
       <alttext lang="NL">Conflicten</alttext>
       <alttext lang="PT">Conflitos</alttext>
       <alttext lang="SV">Konflikter</alttext>
-      <alttext lang="JA">衝突修正</alttext>
+      <alttext lang="JA">予約修正</alttext>
       <action>TV_FIX_CONFLICTS</action>
    </button>
 

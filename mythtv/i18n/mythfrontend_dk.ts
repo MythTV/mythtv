@@ -1,5 +1,20 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>CaptureCard</name>
+    <message>
+        <source>You have to save the current card before configuring it, would you like to do this now?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, save now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, don&apos;t</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture cards</source>
@@ -70,33 +85,6 @@
     <message>
         <source>OK</source>
         <translation type="unfinished">Ok</translation>
-    </message>
-</context>
-<context>
-    <name>GuideGrid</name>
-    <message>
-        <source>Recording Once</source>
-        <translation type="obsolete">Enkelt optagelse</translation>
-    </message>
-    <message>
-        <source>Timeslot Recording</source>
-        <translation type="obsolete">Klokkeslet optagelse</translation>
-    </message>
-    <message>
-        <source>Weekly Recording</source>
-        <translation type="obsolete">Ugentling optagelse</translation>
-    </message>
-    <message>
-        <source>Channel Recording</source>
-        <translation type="obsolete">Optag på denne kanal</translation>
-    </message>
-    <message>
-        <source>All Recording</source>
-        <translation type="obsolete">Optag altid</translation>
-    </message>
-    <message>
-        <source>Not Recording</source>
-        <translation type="obsolete">Optag ikke</translation>
     </message>
 </context>
 <context>
@@ -224,10 +212,6 @@
         <translation>Afbryd</translation>
     </message>
     <message>
-        <source> mins.) - </source>
-        <translation type="obsolete">min.) -</translation>
-    </message>
-    <message>
         <source>Manual recording</source>
         <translation>Manuel optagelse</translation>
     </message>
@@ -280,10 +264,6 @@
         <translation>% brugt</translation>
     </message>
     <message>
-        <source>, %d,%03d MB free</source>
-        <translation type="obsolete">, %d,%03d MB fri</translation>
-    </message>
-    <message>
         <source>All Programs</source>
         <translation>Alle programmer</translation>
     </message>
@@ -300,10 +280,6 @@
         <translation>Slet denne optagelse?</translation>
     </message>
     <message>
-        <source>Yes, get rid of it</source>
-        <translation type="obsolete">Ja, slet den</translation>
-    </message>
-    <message>
         <source>No, I might want to watch it again.</source>
         <translation>Nej, det kan være jeg vil se den igen.</translation>
     </message>
@@ -318,10 +294,6 @@
     <message>
         <source>Yes, AutoExpire</source>
         <translation>Ja, auto-udløb er OK</translation>
-    </message>
-    <message>
-        <source>No, Do Not AutoExpire</source>
-        <translation type="obsolete">Nej, undlad auto-udløb</translation>
     </message>
     <message>
         <source>Are you sure you want to stop:</source>
@@ -407,6 +379,50 @@
         <source>Ok</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Recording List Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Group View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Group Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Recording Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Recording Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">Ok</translation>
+    </message>
+    <message>
+        <source>Change Recording Group Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Old Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgFinder</name>
@@ -457,34 +473,6 @@
 </context>
 <context>
     <name>ProgLister</name>
-    <message>
-        <source>Recording just this showing</source>
-        <translation type="obsolete">Optager kun denne sending</translation>
-    </message>
-    <message>
-        <source>Recording every day when shown in this timeslot</source>
-        <translation type="obsolete">Optager hver dag når programmet vises på dette klokkeslet</translation>
-    </message>
-    <message>
-        <source>Recording every week when shown in this timeslot</source>
-        <translation type="obsolete">Optager hver uge når programmet vises på dette klokkeslet</translation>
-    </message>
-    <message>
-        <source>Recording when shown on this channel</source>
-        <translation type="obsolete">Optager når programmet vises på denne kanal</translation>
-    </message>
-    <message>
-        <source>Recording all showings</source>
-        <translation type="obsolete">Optager alle sendinger af programmet</translation>
-    </message>
-    <message>
-        <source>Not recording this showing</source>
-        <translation type="obsolete">Optager ikke denne sending</translation>
-    </message>
-    <message>
-        <source>Error!</source>
-        <translation type="obsolete">Fejl!</translation>
-    </message>
     <message>
         <source>Program Listings</source>
         <translation type="unfinished"></translation>
@@ -604,16 +592,8 @@
         <translation>Ja, afslut nu</translation>
     </message>
     <message>
-        <source>Yes, Exit and shutdown the computer</source>
-        <translation type="obsolete">Ja, afslut og luk computeren</translation>
-    </message>
-    <message>
         <source>Schedule</source>
         <translation>Programmér</translation>
-    </message>
-    <message>
-        <source>Do not record this proram</source>
-        <translation type="obsolete">Optag ikke dette program</translation>
     </message>
     <message>
         <source>Record only this showing</source>
@@ -640,32 +620,8 @@
         <translation>Optag ikke dette program</translation>
     </message>
     <message>
-        <source>Record only this showing of the program</source>
-        <translation type="obsolete">Optag kun denne sending af udsendelsen</translation>
-    </message>
-    <message>
-        <source>Record this program in this timeslot every day</source>
-        <translation type="obsolete">Optag denne udsendelse på dette klokkeslet hver dag</translation>
-    </message>
-    <message>
-        <source>Record this program whenever it&apos;s shown on this channel</source>
-        <translation type="obsolete">Optag denne udsendelse når den vises på denne kanal</translation>
-    </message>
-    <message>
-        <source>Record this program whenever it&apos;s shown anywhere</source>
-        <translation type="obsolete">Optag denne udsendelse nårsomhelst, hvorsomhelst</translation>
-    </message>
-    <message>
-        <source>Record this program in this timeslot every week</source>
-        <translation type="obsolete">Optag denne udsendelse på dette klokkeslet hver uge</translation>
-    </message>
-    <message>
         <source>Profile</source>
         <translation>Profil</translation>
-    </message>
-    <message>
-        <source>(unspecified)</source>
-        <translation type="obsolete">(uspecificeret)</translation>
     </message>
     <message>
         <source>cut point</source>
@@ -756,20 +712,8 @@
         <translation>Slet efter denne ramme</translation>
     </message>
     <message>
-        <source>Auto-Skip %1 seconds</source>
-        <translation type="obsolete">Auto-hop %1 sekunder</translation>
-    </message>
-    <message>
-        <source>SKIP</source>
-        <translation type="obsolete">Hop</translation>
-    </message>
-    <message>
         <source>Found %1 sec. commercial</source>
         <translation>Fandt %1 sek. reklame</translation>
-    </message>
-    <message>
-        <source>At Start of program.</source>
-        <translation type="obsolete">ved starten af udsendelsen.</translation>
     </message>
     <message>
         <source>At End, can not Skip.</source>
@@ -784,20 +728,8 @@
         <translation type="unfinished">Rang</translation>
     </message>
     <message>
-        <source>Record duplicates</source>
-        <translation>Tillad optagelse af tidligere optagede episoder</translation>
-    </message>
-    <message>
         <source>Auto Expire</source>
         <translation>Tillad at optagelser auto-udløber</translation>
-    </message>
-    <message>
-        <source>Maximum number of episodes to keep (set to 0 for ALL)</source>
-        <translation>Maksimalt antal episoder der beholdes (sæt til 0 for alle)</translation>
-    </message>
-    <message>
-        <source>Record new episodes and delete oldest once maximum count is reached</source>
-        <translation type="obsolete">Optag nye episoder og slet de ældste når maksimalt antal er nået</translation>
     </message>
     <message>
         <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
@@ -828,24 +760,8 @@
         <translation>Hop %1 sekunder</translation>
     </message>
     <message>
-        <source>Not Currently Suppressed</source>
-        <translation type="obsolete">Ikke udeladt i øjeblikket</translation>
-    </message>
-    <message>
         <source>Not Recording</source>
         <translation>Optager ikke</translation>
-    </message>
-    <message>
-        <source>Recording Once</source>
-        <translation type="obsolete">Enkelt optagelse</translation>
-    </message>
-    <message>
-        <source>Timeslot Recording</source>
-        <translation type="obsolete">Klokkeslet optagelse</translation>
-    </message>
-    <message>
-        <source>Weekslot Recording</source>
-        <translation type="obsolete">Ugentlig optagelse</translation>
     </message>
     <message>
         <source>Channel Recording</source>
@@ -858,10 +774,6 @@
     <message>
         <source>Air Date:</source>
         <translation>Sendt:</translation>
-    </message>
-    <message>
-        <source>Record Schedule:</source>
-        <translation type="obsolete">Optagelsestype:</translation>
     </message>
     <message>
         <source>Episode:</source>
@@ -984,10 +896,6 @@
         <translation>Automatisk skipning af reklamer</translation>
     </message>
     <message>
-        <source>Automatically skip commercial breaks that have been flagged during Automatic Commercial Flagging or by the mythcommflag program.</source>
-        <translation type="obsolete">Hopper automatisk over reklameblokke der er blevet markeret af automatick reklame markering eller via mythcommflag programmet.</translation>
-    </message>
-    <message>
         <source>Automatically Flag Commercials</source>
         <translation>Markér reklamer automatisk</translation>
     </message>
@@ -1074,46 +982,6 @@
     <message>
         <source>Language</source>
         <translation>Sprog</translation>
-    </message>
-    <message>
-        <source>English</source>
-        <translation type="obsolete">Engelsk</translation>
-    </message>
-    <message>
-        <source>Italian</source>
-        <translation type="obsolete">Italiensk</translation>
-    </message>
-    <message>
-        <source>Catalan</source>
-        <translation type="obsolete">Katalansk(?)</translation>
-    </message>
-    <message>
-        <source>Spanish</source>
-        <translation type="obsolete">Spansk</translation>
-    </message>
-    <message>
-        <source>Dutch</source>
-        <translation type="obsolete">Hollandsk</translation>
-    </message>
-    <message>
-        <source>French</source>
-        <translation type="obsolete">Fransk</translation>
-    </message>
-    <message>
-        <source>German</source>
-        <translation type="obsolete">Tysk</translation>
-    </message>
-    <message>
-        <source>Danish</source>
-        <translation type="obsolete">Dansk</translation>
-    </message>
-    <message>
-        <source>Swedish</source>
-        <translation type="obsolete">Svensk</translation>
-    </message>
-    <message>
-        <source>Portuguese</source>
-        <translation type="obsolete">Portugisisk</translation>
     </message>
     <message>
         <source>Your preferred language.</source>
@@ -1933,18 +1801,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Never</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If deleted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Always</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Skip blank frames after commercials</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2198,10 +2054,6 @@
     </message>
     <message>
         <source>Not Flagged</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Record new and delete oldest once maximum count is reached</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3453,54 +3305,124 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <source>If set, the automatic shutdown routine will be disabled until a client connects.</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>RankPrograms</name>
     <message>
-        <source>Recording just this showing</source>
-        <translation type="obsolete">Optager kun denne sending</translation>
+        <source>(All)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording every week</source>
-        <translation type="obsolete">Optager hver uge</translation>
+        <source>If set automatic commercial flagging will be skipped for this channel.  Useful for premium channels like HBO.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording when shown in this timeslot</source>
-        <translation type="obsolete">Optager, når udsendelsen vises på dette klokkeslet</translation>
+        <source>Position Saved</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording when shown on this channel</source>
-        <translation type="obsolete">Optager når programmet vises på denne kanal</translation>
+        <source>Position Cleared</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording all showings</source>
-        <translation type="obsolete">Optager alle sendinger af programmet</translation>
+        <source>Default</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Not recording this showing</source>
-        <translation type="obsolete">Optager ikke denne sending</translation>
+        <source>Duplicate Location</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error!</source>
-        <translation type="obsolete">Fejl!</translation>
+        <source>All places</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Recs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Recs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duplicate Check</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub &amp; Desc</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Even if Empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete oldest over Max</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open DVB card on demand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option makes the backend dvb-recorder only open the card when it is actually in-use leaving it free for other programs at other times.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password required to view all recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If given, a password must be entered to view the complete list of all recordings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Recording Group to display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Recording Group to display on the view recordings screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save current Recording Group view when changed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remember the last selected Recording Group instead of displaying the Default group whenever you enter the playback screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use program categories as display groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add the list of program categories to the list of Recording Groups used for display.  Only programs in non-password protected groups will be listed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View Recordings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ScheduledRecording</name>
     <message>
-        <source>Advanced Recording Options</source>
-        <translation type="obsolete">Avancerede optagelsesindstillinger</translation>
-    </message>
-    <message>
         <source>See a list of all up-coming episodes/playtimes.</source>
         <translation>Se en liste med kommende episoder/visninger.</translation>
-    </message>
-</context>
-<context>
-    <name>Scheduler</name>
-    <message>
-        <source>the maximum number of episodes have already been recorded.</source>
-        <translation type="obsolete">Det maksimale antal episoder er allerede blevet optaget.</translation>
     </message>
 </context>
 <context>
@@ -3546,30 +3468,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Slet denne optagelse</translation>
     </message>
     <message>
-        <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="obsolete">%02d:%02d:%02d bagud  --  %.2f%% fuld</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d behind</source>
-        <translation type="obsolete">%02d:%02d:%02d bagud</translation>
-    </message>
-    <message>
-        <source>%02d:%02d behind  --  %.2f%% full</source>
-        <translation type="obsolete">%02d:%02d bagud  --  %.2f%% fuld</translation>
-    </message>
-    <message>
-        <source>%02d:%02d behind</source>
-        <translation type="obsolete">%02d:%02d bagud</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d of %02d:%02d:%02d</source>
-        <translation type="obsolete">%02d:%02d:%02d af %02d:%02d:%02d</translation>
-    </message>
-    <message>
-        <source>%02d:%02d of %02d:%02d</source>
-        <translation type="obsolete">%02d:%02d af %02d:%02d</translation>
-    </message>
-    <message>
         <source>Paused</source>
         <translation>Pause</translation>
     </message>
@@ -3594,16 +3492,8 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>Hop bagud</translation>
     </message>
     <message>
-        <source>Transcode</source>
-        <translation type="obsolete">Genkodning</translation>
-    </message>
-    <message>
         <source>Searching...</source>
         <translation>Søger...</translation>
-    </message>
-    <message>
-        <source>SKIP</source>
-        <translation type="obsolete">Hop</translation>
     </message>
     <message>
         <source>Brightness %1 %</source>
@@ -3801,6 +3691,26 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <source>Change the channel anyway</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Zoom Mode OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activate Zoom Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-Expire OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-Expire ON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Mode ON</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -3993,42 +3903,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>No Conflicts</source>
         <translation>Ingen konflikter</translation>
-    </message>
-    <message>
-        <source>Recording this program has been deactivated because it conflicts with another scheduled recording.  Do you want to re-enable this recording?</source>
-        <translation type="obsolete">Optagelse af dette program er slået fra, da det vil foresage en konflikt med et andet programmeret program. Vil du genaktivere optagelse af dette program?</translation>
-    </message>
-    <message>
-        <source>Yes, I want to record it.</source>
-        <translation type="obsolete">Ja, jeg vil optage det.</translation>
-    </message>
-    <message>
-        <source>No, leave it disabled.</source>
-        <translation type="obsolete">Nej, lad det være slået fra.</translation>
-    </message>
-    <message>
-        <source>Recording this program has been suppressed because it has already been recorded in the past.</source>
-        <translation type="obsolete">Optagelse af dette program er undertrykt, da det allerede er blevet optaget tidligere.</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">Ok</translation>
-    </message>
-    <message>
-        <source>Unsuppress recording</source>
-        <translation type="obsolete">Lad være med at undertrykke denne optagelse</translation>
-    </message>
-    <message>
-        <source>The follow scheduled recordings conflict with each other.  Which would you like to record?</source>
-        <translation type="obsolete">Følgende programmerede optagelser har indbyrdes konflikt. Hvilket af dem vil du optage?</translation>
-    </message>
-    <message>
-        <source>Remember this choice and use it automatically in the future</source>
-        <translation type="obsolete">Husk dette valg og brug det automatisk i fremtiden</translation>
-    </message>
-    <message>
-        <source>Recording this program has been suppressed because: </source>
-        <translation type="obsolete">Optagelse af dette progam er blevet undertrykt fordi:</translation>
     </message>
     <message>
         <source>All</source>

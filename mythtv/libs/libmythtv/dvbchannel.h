@@ -33,6 +33,7 @@ public:
 
     bool Open();
     void Close() {};
+    void CloseDVB();
 
     fe_type_t GetCardType() { return info.type; };
 
@@ -106,6 +107,7 @@ private:
 
     struct dvb_frontend_info info;
 
+    bool force_channel_change;
     bool first_tune;
     dvb_channel_t   chan_opts;
     dvb_tuning_t    prev_tuning;

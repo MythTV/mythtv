@@ -76,6 +76,8 @@ class ChannelRecPriority : public MythDialog
     int listsize;
 
     SortType sortType;
+
+    int displaychannum;
 };
 
 #endif

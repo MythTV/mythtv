@@ -840,6 +840,19 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent):
 }
 
 void CaptureCard::execDVBConfigMenu() {
+    if (getCardID() == 0)
+    {
+        int val = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(), "",
+                    tr("You have to save the current card before configuring it"
+                       ", would you like to do this now?"),
+                    tr("Yes, save now"), tr("No, don't"), 2);
+
+        if (val != 0)
+            return;
+        save(db);
+        load(db);
+    }
+
     DVBAdvancedConfigMenu acm(*this);
     acm.exec(db);
 }

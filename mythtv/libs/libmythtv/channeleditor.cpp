@@ -109,15 +109,17 @@ void ChannelListSetting::fillSelections(const QString& sourceid)
     if (sourceid != "")
         querystr += QString(" WHERE sourceid='%1'").arg(sourceid);
         
-    if (currentSortMode == "Channel Name")
+    if (currentSortMode == QObject::tr("Channel Name"))
         querystr += " ORDER BY name";
-    else if (currentSortMode == "Channel Number")
+    else if (currentSortMode == QObject::tr("Channel Number"))
         querystr += " ORDER BY channum + 0";
 
     QSqlQuery query = db->exec(querystr);
     if (query.isActive() && query.numRowsAffected() > 0)
         while(query.next()) {
-            QString name = query.value(0).toString();
+            QString name = "";
+            if (query.value(0).toString() != QString::null)
+                name = QString::fromUtf8(query.value(0).toString());
             QString channum = query.value(1).toString();
             QString chanid = query.value(2).toString();
              
@@ -125,9 +127,9 @@ void ChannelListSetting::fillSelections(const QString& sourceid)
 
             if (name == "") name = "(Unnamed : " + chanid + ")";
 
-            if (currentSortMode == "Channel Name") {
+            if (currentSortMode == QObject::tr("Channel Name")) {
                 if (channum != "") name += " (" + channum + ")";
-            } else if (currentSortMode == "Channel Number") {
+            } else if (currentSortMode == QObject::tr("Channel Number")) {
                 if (channum != "")
                     name = channum + ". " + name;
                 else
@@ -142,7 +144,7 @@ class SourceSetting: public ComboBoxSetting {
 public:
     SourceSetting(): ComboBoxSetting() {
         setLabel(QObject::tr("Video Source"));
-        addSelection("(All)","");
+        addSelection(QObject::tr("(All)"),"");
     };
 
     void save(QSqlDatabase* db) { (void)db; };
@@ -161,8 +163,8 @@ class SortMode: public ComboBoxSetting, public TransientStorage {
 public:
     SortMode(): ComboBoxSetting() {
         setLabel(QObject::tr("Sort Mode"));
-        addSelection("Channel Name");
-        addSelection("Channel Number");
+        addSelection(QObject::tr("Channel Name"));
+        addSelection(QObject::tr("Channel Number"));
     };
 };
 

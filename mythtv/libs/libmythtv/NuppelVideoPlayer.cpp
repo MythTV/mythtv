@@ -2071,7 +2071,7 @@ void NuppelVideoPlayer::SetBookmark(void)
     QMutexLocker lockit(&db_lock);
 
     m_playbackinfo->SetBookmark(framesPlayed, m_db);
-    osd->SetSettingsText("Position Saved", 1); 
+    osd->SetSettingsText(QObject::tr("Position Saved"), 1); 
 }
 
 void NuppelVideoPlayer::ClearBookmark(void)
@@ -2084,7 +2084,7 @@ void NuppelVideoPlayer::ClearBookmark(void)
     QMutexLocker lockit(&db_lock);
 
     m_playbackinfo->SetBookmark(0, m_db);
-    osd->SetSettingsText("Position Cleared", 1); 
+    osd->SetSettingsText(QObject::tr("Position Cleared"), 1); 
 }
 
 long long NuppelVideoPlayer::GetBookmark(void)

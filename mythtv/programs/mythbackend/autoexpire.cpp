@@ -215,9 +215,9 @@ void AutoExpire::PrintExpireList(void)
         if (first->subtitle != "")
             title += ": \"" + first->subtitle + "\"";
 
-        cout << title.leftJustify(40, ' ', true) << " "
-             << first->startts.toString().leftJustify(24, ' ', true) << "  "
-             << first->filesize / 1024 / 1024 << " MBytes"
+        cout << title.local8Bit().leftJustify(40, ' ', true) << " "
+             << first->startts.toString().local8Bit().leftJustify(24, ' ', true)
+             << "  " << first->filesize / 1024 / 1024 << " MBytes"
              << endl;
     }
 }

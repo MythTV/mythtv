@@ -894,7 +894,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
             }
             else
             {
-                if (!non_us_updating)
+                if (!non_us_updating && localfile != "")
                 {
                     querystr.sprintf("UPDATE channel SET icon = \"%s\" WHERE "
                                      "chanid = \"%s\"",

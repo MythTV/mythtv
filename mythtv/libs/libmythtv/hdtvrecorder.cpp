@@ -726,14 +726,14 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
 
             for (i = sec_start + 8; i < sec_start + 3 + sec_len - 4; i += 4) {
                 int prog_num = (buffer[i] << 8) | buffer[i + 1];
-                int prog_pid = (buffer[i + 2] & 0x0e) << 8 | buffer[i + 3];
+                int prog_pid = (buffer[i + 2] & 0x1f) << 8 | buffer[i + 3];
                 if (prog_num == desired_program) {
                     pmt_pid = prog_pid;
                     break;
                 }
             }
             if (pmt_pid == -1) {
-                pmt_pid = (buffer[sec_start + 8 + 2] & 0x0e) << 8 |
+                pmt_pid = (buffer[sec_start + 8 + 2] & 0x1f) << 8 |
                                 buffer[sec_start + 8 + 3];
             }
             output_base_pid = 16;

@@ -1,5 +1,20 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>CaptureCard</name>
+    <message>
+        <source>You have to save the current card before configuring it, would you like to do this now?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, save now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, don&apos;t</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture cards</source>
@@ -70,33 +85,6 @@
     <message>
         <source>OK</source>
         <translation type="unfinished">OK</translation>
-    </message>
-</context>
-<context>
-    <name>GuideGrid</name>
-    <message>
-        <source>Recording Once</source>
-        <translation type="obsolete">Inspelning av denna visning</translation>
-    </message>
-    <message>
-        <source>Timeslot Recording</source>
-        <translation type="obsolete">Inspelning vid denna tid varje dag</translation>
-    </message>
-    <message>
-        <source>Weekly Recording</source>
-        <translation type="obsolete">Inspelning varje vecka denna tid</translation>
-    </message>
-    <message>
-        <source>Channel Recording</source>
-        <translation type="obsolete">Spela in alla visningar på denna kanal</translation>
-    </message>
-    <message>
-        <source>All Recording</source>
-        <translation type="obsolete">Spela in alla visningar</translation>
-    </message>
-    <message>
-        <source>Not Recording</source>
-        <translation type="obsolete">Ingen inspelning</translation>
     </message>
 </context>
 <context>
@@ -231,10 +219,6 @@
 <context>
     <name>MythContext</name>
     <message>
-        <source>Connection to the master backend server timed out.  You probably should modify the Master Server setting in the setup program and set the proper IP address there.</source>
-        <translation type="obsolete">Huvudinspelningsservern svarar ej. Du måste troligtvis modifiera inställningarna i huvudinspelningsservern för att sätta rätt IP-adress där.</translation>
-    </message>
-    <message>
         <source>Could not connect to the master backend server -- is it running?  Is the IP address set for it in the setup program correct?</source>
         <translation>Kunde ej ansluta till huvudinspelningsservern -- är den startad? Är den konfigurerade IP-adressen för den korrekt?</translation>
     </message>
@@ -280,10 +264,6 @@
         <translation>% använt</translation>
     </message>
     <message>
-        <source>, %d,%03d MB free</source>
-        <translation type="obsolete">, %d, %03d MB ledigt</translation>
-    </message>
-    <message>
         <source>All Programs</source>
         <translation>Alla program</translation>
     </message>
@@ -304,10 +284,6 @@
         <translation>Radera denna inspelning?</translation>
     </message>
     <message>
-        <source>Yes, get rid of it</source>
-        <translation type="obsolete">Ja, radera inspelningen</translation>
-    </message>
-    <message>
         <source>Yes, AutoExpire</source>
         <translation>Japp, auto-radera</translation>
     </message>
@@ -318,10 +294,6 @@
     <message>
         <source>No, keep it, I changed my mind</source>
         <translation>Nej, spar den. Jag ändrade mig</translation>
-    </message>
-    <message>
-        <source>No, Do Not AutoExpire</source>
-        <translation type="obsolete">Nä, auto-radera inte</translation>
     </message>
     <message>
         <source>Are you sure you want to stop:</source>
@@ -407,6 +379,50 @@
         <source>Ok</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Recording List Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Group View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Group Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Recording Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Recording Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Change Recording Group Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Old Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgFinder</name>
@@ -457,34 +473,6 @@
 </context>
 <context>
     <name>ProgLister</name>
-    <message>
-        <source>Recording just this showing</source>
-        <translation type="obsolete">Spelar bara in denna visning</translation>
-    </message>
-    <message>
-        <source>Recording every day when shown in this timeslot</source>
-        <translation type="obsolete">Spelar in varje dag när programmet visas denna tid</translation>
-    </message>
-    <message>
-        <source>Recording every week when shown in this timeslot</source>
-        <translation type="obsolete">Spelar in varje vecka när programmet visas denna tid</translation>
-    </message>
-    <message>
-        <source>Recording when shown on this channel</source>
-        <translation type="obsolete">Spelar in när programmet visas på denna kanal</translation>
-    </message>
-    <message>
-        <source>Recording all showings</source>
-        <translation type="obsolete">Spelar in alla visningar</translation>
-    </message>
-    <message>
-        <source>Not recording this showing</source>
-        <translation type="obsolete">Spelar inte in denna visning</translation>
-    </message>
-    <message>
-        <source>Error!</source>
-        <translation type="obsolete">Fel!</translation>
-    </message>
     <message>
         <source>Program Listings</source>
         <translation type="unfinished">Programlistning</translation>
@@ -604,16 +592,8 @@
         <translation>Ja, avsluta nu</translation>
     </message>
     <message>
-        <source>Yes, Exit and shutdown the computer</source>
-        <translation type="obsolete">Ja, avsluta och stäng av datorn</translation>
-    </message>
-    <message>
         <source>Schedule</source>
         <translation>Schemalägg</translation>
-    </message>
-    <message>
-        <source>Do not record this proram</source>
-        <translation type="obsolete">Spela inte in detta program</translation>
     </message>
     <message>
         <source>Record only this showing</source>
@@ -640,48 +620,12 @@
         <translation>Spela inte in detta program</translation>
     </message>
     <message>
-        <source>Record only this showing of the program</source>
-        <translation type="obsolete">Spela bara in denna visning av detta program</translation>
-    </message>
-    <message>
-        <source>Record this program in this timeslot every day</source>
-        <translation type="obsolete">Spela in detta program denna tid varje dag</translation>
-    </message>
-    <message>
-        <source>Record this program whenever it&apos;s shown on this channel</source>
-        <translation type="obsolete">Spela in detta program närhelst det visas på denna kanal</translation>
-    </message>
-    <message>
-        <source>Record this program whenever it&apos;s shown anywhere</source>
-        <translation type="obsolete">Spela in detta program närhelst det visas på vilken kanal som helst</translation>
-    </message>
-    <message>
-        <source>Record this program in this timeslot every week</source>
-        <translation type="obsolete">Spela in detta program denna tid varje vecka</translation>
-    </message>
-    <message>
         <source>Profile</source>
         <translation>Profil</translation>
     </message>
     <message>
-        <source>(unspecified)</source>
-        <translation type="obsolete">(ospecifierad)</translation>
-    </message>
-    <message>
-        <source>Record duplicates</source>
-        <translation>Tillåt inspelning även vid dublerat avsnitt</translation>
-    </message>
-    <message>
         <source>Auto Expire</source>
         <translation>Tillåt inspelningar att auto-raderas</translation>
-    </message>
-    <message>
-        <source>Maximum number of episodes to keep (set to 0 for ALL)</source>
-        <translation>Maximalt antal avsnitt att behålla (0 för alla)</translation>
-    </message>
-    <message>
-        <source>Record new episodes and delete oldest once maximum count is reached</source>
-        <translation type="obsolete">Spela in nytt avsnitt och radera det äldsta när maximalt antal inspelningar är gjorda</translation>
     </message>
     <message>
         <source>Rank</source>
@@ -816,24 +760,8 @@
         <translation>Vid slutet, kan ej hoppa.</translation>
     </message>
     <message>
-        <source>Not Currently Suppressed</source>
-        <translation type="obsolete">Ej undertryckt</translation>
-    </message>
-    <message>
         <source>Not Recording</source>
         <translation>Ingen inspelning</translation>
-    </message>
-    <message>
-        <source>Recording Once</source>
-        <translation type="obsolete">Inspelning av denna visning</translation>
-    </message>
-    <message>
-        <source>Timeslot Recording</source>
-        <translation type="obsolete">Inspelning vid denna tid varje dag</translation>
-    </message>
-    <message>
-        <source>Weekslot Recording</source>
-        <translation type="obsolete">Inspelning varje vecka denna tid</translation>
     </message>
     <message>
         <source>Channel Recording</source>
@@ -846,10 +774,6 @@
     <message>
         <source>Air Date:</source>
         <translation>Sändningstid:</translation>
-    </message>
-    <message>
-        <source>Record Schedule:</source>
-        <translation type="obsolete">Inspelningsschema:</translation>
     </message>
     <message>
         <source>Episode:</source>
@@ -972,10 +896,6 @@
         <translation>Hoppa över reklam automatiskt</translation>
     </message>
     <message>
-        <source>Automatically skip commercial breaks that have been flagged during Automatic Commercial Flagging or by the mythcommflag program.</source>
-        <translation type="obsolete">Hoppar automatiskt över reklam som har flaggats under automatisk reklamdeteltering eller m h a programmet mythcommflag.</translation>
-    </message>
-    <message>
         <source>Automatically Flag Commercials</source>
         <translation>Automatisk reklamdetektering</translation>
     </message>
@@ -1062,46 +982,6 @@
     <message>
         <source>Language</source>
         <translation>Språk</translation>
-    </message>
-    <message>
-        <source>English</source>
-        <translation type="obsolete">Engelska (English)</translation>
-    </message>
-    <message>
-        <source>Italian</source>
-        <translation type="obsolete">Italienska (Italian)</translation>
-    </message>
-    <message>
-        <source>Catalan</source>
-        <translation type="obsolete">Katalanska (Catalan)</translation>
-    </message>
-    <message>
-        <source>Spanish</source>
-        <translation type="obsolete">Spanska (Spanish)</translation>
-    </message>
-    <message>
-        <source>Dutch</source>
-        <translation type="obsolete">Holländska (Dutch)</translation>
-    </message>
-    <message>
-        <source>French</source>
-        <translation type="obsolete">Franska (French)</translation>
-    </message>
-    <message>
-        <source>German</source>
-        <translation type="obsolete">Tyska (German)</translation>
-    </message>
-    <message>
-        <source>Danish</source>
-        <translation type="obsolete">Danska (Danish)</translation>
-    </message>
-    <message>
-        <source>Swedish</source>
-        <translation type="obsolete">Svenska (Swedish)</translation>
-    </message>
-    <message>
-        <source>Portuguese</source>
-        <translation type="obsolete">Portugisiska (Portuguese)</translation>
     </message>
     <message>
         <source>Your preferred language.</source>
@@ -1222,10 +1102,6 @@
     <message>
         <source>Default setting for Closed Captioning</source>
         <translation>Textning aktiverad som standard</translation>
-    </message>
-    <message>
-        <source>If this is set, captions will be on by default when playing back recordings or watching live TV.</source>
-        <translation type="obsolete">Aktiverar textning som standard vid uppspelning av inspelningar och vid TV-tittande.</translation>
     </message>
     <message>
         <source>Always use Browse mode when changing channels in LiveTV</source>
@@ -1436,34 +1312,6 @@
         <translation>Datumformat</translation>
     </message>
     <message>
-        <source>ddd MMM d</source>
-        <translation type="obsolete">ddd MMM d</translation>
-    </message>
-    <message>
-        <source>ddd MMMM d</source>
-        <translation type="obsolete">ddd MMMM d</translation>
-    </message>
-    <message>
-        <source>MMM d</source>
-        <translation type="obsolete">MMM d</translation>
-    </message>
-    <message>
-        <source>MM/dd</source>
-        <translation type="obsolete">MM/dd</translation>
-    </message>
-    <message>
-        <source>MM.dd</source>
-        <translation type="obsolete">MM.dd</translation>
-    </message>
-    <message>
-        <source>ddd d MMM</source>
-        <translation type="obsolete">ddd d MMM</translation>
-    </message>
-    <message>
-        <source>dd.MM.yyyy</source>
-        <translation type="obsolete">dd.MM.åååå</translation>
-    </message>
-    <message>
         <source>Your preferred date format.</source>
         <translation>Välj det datumformat du föredrar.</translation>
     </message>
@@ -1472,56 +1320,12 @@
         <translation>Kort datumformat</translation>
     </message>
     <message>
-        <source>M/d</source>
-        <translation type="obsolete">M/d</translation>
-    </message>
-    <message>
-        <source>d/M</source>
-        <translation type="obsolete">d/M</translation>
-    </message>
-    <message>
-        <source>dd/MM</source>
-        <translation type="obsolete">dd/MM</translation>
-    </message>
-    <message>
-        <source>d.M.</source>
-        <translation type="obsolete">d.M.</translation>
-    </message>
-    <message>
-        <source>dd.MM.</source>
-        <translation type="obsolete">dd.MM.</translation>
-    </message>
-    <message>
         <source>Your preferred short date format.</source>
         <translation>Välj den korta representationen av det datumformat du föredrar.</translation>
     </message>
     <message>
         <source>Time format</source>
         <translation>Tidformat</translation>
-    </message>
-    <message>
-        <source>h:mm AP</source>
-        <translation type="obsolete">t:mm AP</translation>
-    </message>
-    <message>
-        <source>h:mm ap</source>
-        <translation type="obsolete">t:mm ap</translation>
-    </message>
-    <message>
-        <source>hh:mm AP</source>
-        <translation type="obsolete">tt:mm AP</translation>
-    </message>
-    <message>
-        <source>hh:mm ap</source>
-        <translation type="obsolete">tt:mm ap</translation>
-    </message>
-    <message>
-        <source>h:mm</source>
-        <translation type="obsolete">t:mm</translation>
-    </message>
-    <message>
-        <source>hh:mm</source>
-        <translation type="obsolete">tt:mm</translation>
     </message>
     <message>
         <source>Your preferred time format.  Choose a format with &quot;AP&quot; in it for an AM/PM display, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
@@ -1564,30 +1368,6 @@
         <translation>Skuggningsmetod för programguiden</translation>
     </message>
     <message>
-        <source>Colorized (alpha)</source>
-        <translation type="obsolete">Färgad (genomskinlig)</translation>
-    </message>
-    <message>
-        <source>Colorized (shaded)</source>
-        <translation type="obsolete">Färgad (skuggad)</translation>
-    </message>
-    <message>
-        <source>Embossed (shaded)</source>
-        <translation type="obsolete">Relief (skuggad)</translation>
-    </message>
-    <message>
-        <source>Embossed (solid)</source>
-        <translation type="obsolete">Relief (solid)</translation>
-    </message>
-    <message>
-        <source>Rounded (shaded)</source>
-        <translation type="obsolete">Rundad (skuggad)</translation>
-    </message>
-    <message>
-        <source>Rounded (solid)</source>
-        <translation type="obsolete">Rundad (solid)</translation>
-    </message>
-    <message>
         <source>Display the channel icon</source>
         <translation>Visa kanalikonen</translation>
     </message>
@@ -1598,62 +1378,6 @@
     <message>
         <source>Time Blocks (30 mins) to Display</source>
         <translation>Antal tidluckor (30 min) att visa</translation>
-    </message>
-    <message>
-        <source>Use Rankings</source>
-        <translation type="obsolete">Använd rankning</translation>
-    </message>
-    <message>
-        <source>Use program rankings to resolve conflicts.</source>
-        <translation type="obsolete">Använd programrankningar för att reda ut inspelningskonflikter.</translation>
-    </message>
-    <message>
-        <source>Rankings First.</source>
-        <translation type="obsolete">Rankningar först.</translation>
-    </message>
-    <message>
-        <source>Use rankings to resolve conflicts before using traditional conflict resolution.</source>
-        <translation type="obsolete">Använd rankningar för att reda ut inspelningskonflikter innan traditionell konfliktlösning används.</translation>
-    </message>
-    <message>
-        <source>Single Recordings Rank</source>
-        <translation type="obsolete">Rank för enstaka inspelning</translation>
-    </message>
-    <message>
-        <source>Single Recordings will receive this additional ranking value.</source>
-        <translation type="obsolete">Det angivna värdet kommer att läggas till rankningen för inspelningar av typen &quot;enstaka inspelning&quot;.</translation>
-    </message>
-    <message>
-        <source>Weekslot Recordings Rank</source>
-        <translation type="obsolete">Rank för veckovis inspelning</translation>
-    </message>
-    <message>
-        <source>Weekslot Recordings will receive this additional ranking value.</source>
-        <translation type="obsolete">Det angivna värdet kommer att läggas till rankningen för inspelningar av typen &quot;veckovis inspelning&quot;.</translation>
-    </message>
-    <message>
-        <source>Timeslot Recordings Rank</source>
-        <translation type="obsolete">Rank för daglig inspelning</translation>
-    </message>
-    <message>
-        <source>Timeslot Recordings will receive this additional ranking value.</source>
-        <translation type="obsolete">Det angivna värdet kommer att läggas till rankningen för inspelningar av typen &quot;daglig inspelning&quot;.</translation>
-    </message>
-    <message>
-        <source>Channel Recordings Rank</source>
-        <translation type="obsolete">Rank för kanalinspelning</translation>
-    </message>
-    <message>
-        <source>Channel Recordings will receive this additional ranking value.</source>
-        <translation type="obsolete">Det angivna värdet kommer att läggas till rankningen för inspelningar av typen &quot;kanalinspelning&quot;.</translation>
-    </message>
-    <message>
-        <source>All Recordings Rank</source>
-        <translation type="obsolete">Rank för &quot;spela in alla&quot;</translation>
-    </message>
-    <message>
-        <source>All Recording types will receive this additional ranking value.</source>
-        <translation type="obsolete">Det angivna värdet kommer att läggas till rankningen för inspelningar av typen &quot;spela in alla visningar&quot;.</translation>
     </message>
     <message>
         <source>Guide starts at channel</source>
@@ -1766,10 +1490,6 @@
     <message>
         <source>Program Guide</source>
         <translation>Programguide</translation>
-    </message>
-    <message>
-        <source>General Ranking Settings</source>
-        <translation type="obsolete">Generella inställningar för rankning</translation>
     </message>
     <message>
         <source>Screen settings</source>
@@ -2081,18 +1801,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Never</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If deleted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Always</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Skip blank frames after commercials</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2346,10 +2054,6 @@
     </message>
     <message>
         <source>Not Flagged</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Record new and delete oldest once maximum count is reached</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3601,36 +3305,117 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <source>If set, the automatic shutdown routine will be disabled until a client connects.</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>RankPrograms</name>
     <message>
-        <source>Recording just this showing</source>
-        <translation type="obsolete">Spelar endast in denna visning</translation>
+        <source>(All)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording every week</source>
-        <translation type="obsolete">Spelar in varje vecka</translation>
+        <source>If set automatic commercial flagging will be skipped for this channel.  Useful for premium channels like HBO.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording when shown in this timeslot</source>
-        <translation type="obsolete">Spelar in när programmet visas denna tid</translation>
+        <source>Position Saved</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording when shown on this channel</source>
-        <translation type="obsolete">Spelar in när programmet visas på denna kanal</translation>
+        <source>Position Cleared</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording all showings</source>
-        <translation type="obsolete">Spelar in alla visningar</translation>
+        <source>Default</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Not recording this showing</source>
-        <translation type="obsolete">Spelar inte in denna visning</translation>
+        <source>Duplicate Location</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error!</source>
-        <translation type="obsolete">Fel!</translation>
+        <source>All places</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Recs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Recs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duplicate Check</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sub &amp; Desc</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Even if Empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete oldest over Max</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open DVB card on demand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option makes the backend dvb-recorder only open the card when it is actually in-use leaving it free for other programs at other times.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password required to view all recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If given, a password must be entered to view the complete list of all recordings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Recording Group to display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Recording Group to display on the view recordings screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save current Recording Group view when changed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remember the last selected Recording Group instead of displaying the Default group whenever you enter the playback screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use program categories as display groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add the list of program categories to the list of Recording Groups used for display.  Only programs in non-password protected groups will be listed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View Recordings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3638,13 +3423,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>See a list of all up-coming episodes/playtimes.</source>
         <translation>Visa en lista på alla kommande avsnitt/speltider.</translation>
-    </message>
-</context>
-<context>
-    <name>Scheduler</name>
-    <message>
-        <source>the maximum number of episodes have already been recorded.</source>
-        <translation type="obsolete">maximalt antal avsnitt har redan spelats in.</translation>
     </message>
 </context>
 <context>
@@ -3913,6 +3691,26 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <source>Change the channel anyway</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Zoom Mode OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activate Zoom Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-Expire OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto-Expire ON</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Mode ON</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -4105,42 +3903,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>No Conflicts</source>
         <translation>Inga konflikter</translation>
-    </message>
-    <message>
-        <source>Recording this program has been deactivated because it conflicts with another scheduled recording.  Do you want to re-enable this recording?</source>
-        <translation type="obsolete">Inspelning av detta program har deaktiverats eftersom det konfliktar med en annan schemalagd inspelning. Vill du återaktivera denna inspelning?</translation>
-    </message>
-    <message>
-        <source>Yes, I want to record it.</source>
-        <translation type="obsolete">Ja, jag vill spela in det.</translation>
-    </message>
-    <message>
-        <source>No, leave it disabled.</source>
-        <translation type="obsolete">Nej, lämna det deaktiverat.</translation>
-    </message>
-    <message>
-        <source>Recording this program has been suppressed because it has already been recorded in the past.</source>
-        <translation type="obsolete">Inspelning av detta program har undertryckts eftersom det redan har spelats in tidigare.</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
-        <source>Unsuppress recording</source>
-        <translation type="obsolete">Undertryck ej inspelning</translation>
-    </message>
-    <message>
-        <source>Recording this program has been suppressed because: </source>
-        <translation type="obsolete">Inspelning av detta program av blivit undertryckt på grund av:</translation>
-    </message>
-    <message>
-        <source>The follow scheduled recordings conflict with each other.  Which would you like to record?</source>
-        <translation type="obsolete">Följande schemalagda inspelningar konfliktar med varandra. Vilket program vill du spela in?</translation>
-    </message>
-    <message>
-        <source>Remember this choice and use it automatically in the future</source>
-        <translation type="obsolete">Kom ihåg detta val och använd det automatiskt i framtiden</translation>
     </message>
     <message>
         <source>All</source>

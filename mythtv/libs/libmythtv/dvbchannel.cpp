@@ -59,6 +59,7 @@ DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
            : ChannelBase(parent), cardnum(aCardNum)
 {
     fd_frontend = 0;
+    force_channel_change = false;
     first_tune = true;
     isOpen = false;
     diseqc = NULL;
@@ -78,8 +79,19 @@ DVBChannel::~DVBChannel()
     if (dvbcam)
         delete dvbcam;
 
-    if (isOpen && (fd_frontend > 0))
+    CloseDVB();
+}
+
+void DVBChannel::CloseDVB()
+{
+    VERBOSE(VB_ALL, "Closing DVB channel");
+
+    if (fd_frontend > 0)
+    {
         close(fd_frontend);
+        fd_frontend = 0;
+        isOpen = false;
+    }
 }
 
 bool DVBChannel::Open()
@@ -132,16 +144,20 @@ bool DVBChannel::Open()
                 dvbcam, SLOT(ChannelChanged(dvb_channel_t&, uint8_t*, int)));
     }
 
+    force_channel_change = true;
+
     return isOpen = true;
 }
 
 bool DVBChannel::SetChannelByString(const QString &chan)
 {
-    if (curchannelname == chan)
+    if (curchannelname == chan && !force_channel_change)
         return true;
 
     if (!isOpen)
         return false;
+
+    force_channel_change = false;
 
     CHANNEL(QString("Trying to tune to channel %1.").arg(chan));
 

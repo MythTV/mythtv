@@ -82,6 +82,8 @@ TVRec::TVRec(int capturecardnum)
             channel->SwitchToInput(inputname, startchannel);
         channel->SetChannelOrdering(chanorder);
         // don't close this channel, otherwise we cannot read data
+        if (dvb_options.dvb_on_demand) 
+            ((DVBChannel *)channel)->CloseDVB();
 #else
         VERBOSE(VB_IMPORTANT, "ERROR: DVB Card configured, "
                               "but no DVB support compiled in!");
@@ -490,6 +492,15 @@ void TVRec::HandleStateChange(void)
             nvr->ChannelNameChanged(channel->GetCurrentName());
 
         SetVideoFiltersForChannel(channel, channel->GetCurrentName());
+        if (channel->Open())
+        {
+            channel->SetBrightness();
+            channel->SetContrast();
+            channel->SetColour();
+            channel->SetHue();
+            channel->Close();
+        }
+
         pthread_create(&encode, NULL, SpawnEncode, nvr);
 
         while (!nvr->IsRecording() && !nvr->IsErrored())
@@ -560,6 +571,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
 
         nvr->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
 
+        nvr->SetOption("dvb_on_demand", dvb_options.dvb_on_demand);
         nvr->SetOption("swfilter", dvb_options.swfilter);
         nvr->SetOption("recordts", dvb_options.recordts);
         nvr->SetOption("wait_for_seqstart", dvb_options.wait_for_seqstart);
@@ -1023,7 +1035,7 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
                                "audioratelimit,defaultinput,cardtype,"
                                "dvb_swfilter, dvb_recordts,"
                                "dvb_wait_for_seqstart,dvb_dmx_buf_size,"
-                               "dvb_pkt_buf_size, skipbtaudio "
+                               "dvb_pkt_buf_size, skipbtaudio, dvb_on_demand "
                                "FROM capturecard WHERE cardid = %1;")
                               .arg(cardnum);
 
@@ -1067,6 +1079,7 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
         dvb_opts.pkt_buf_size = query.value(10).toInt();
 
         skip_bt = query.value(11).toInt();
+        dvb_opts.dvb_on_demand = query.value(12).toInt();
     }
 
     thequery = QString("SELECT if(startchan!='', startchan, '3') "
