@@ -221,7 +221,7 @@ void MythContext::KickDatabase(QSqlDatabase *db)
 
 void MythContext::DBError(QString where, const QSqlQuery& query) {
     cerr << "DB Error (" << where << "):\n"
-         << "was:" << endl
+         << "Query was:" << endl
          << query.lastQuery() << endl
          << "Driver error was:" << endl
          << query.lastError().driverText() << endl
@@ -495,3 +495,7 @@ void MythContext::dispatch(MythEvent &e)
     }
 }
 
+
+QString MythContext::DBQuote(const QString& str) {
+     
+}
