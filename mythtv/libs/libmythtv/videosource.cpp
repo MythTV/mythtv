@@ -101,7 +101,7 @@ void XMLTV_na_config::save(QSqlDatabase* db) {
 
     QString filename = QString("%1/.mythtv/%2.xmltv")
         .arg(getenv("HOME")).arg(parent.getSourceName());
-    QString command = QString("tv_grab_na --config-file %1 --configure --retry-limit %2 --retry-delay %3 --postalcode %4 --provider %5 --auto-new-channels add")
+    QString command = QString("tv_grab_na --config-file '%1' --configure --retry-limit %2 --retry-delay %3 --postalcode %4 --provider %5 --auto-new-channels add")
         .arg(filename)
         .arg(2)
         .arg(30)
@@ -119,7 +119,7 @@ void XMLTV_uk_config::save(QSqlDatabase* db) {
 
     QString filename = QString("%1/.mythtv/%2.xmltv")
         .arg(getenv("HOME")).arg(parent.getSourceName());
-    QString command = QString("tv_grab_uk --config-file %1 --configure --retry-limit %2 --retry-delay %3 --postalcode %4 --provider %5 --auto-new-channels add")
+    QString command = QString("tv_grab_uk --config-file '%1' --configure --retry-limit %2 --retry-delay %3 --postalcode %4 --provider %5 --auto-new-channels add")
         .arg(filename)
         .arg(2)
         .arg(30)
@@ -141,7 +141,7 @@ void XMLTV_generic_config::save(QSqlDatabase* db) {
         QString filename = QString("%1/.mythtv/%2.xmltv")
             .arg(getenv("HOME")).arg(parent.getSourceName());
 
-        command = QString("%1 --config-file %2 --configure")
+        command = QString("%1 --config-file '%2' --configure")
             .arg(grabber).arg(filename);
     }
 

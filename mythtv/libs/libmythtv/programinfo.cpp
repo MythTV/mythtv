@@ -107,8 +107,8 @@ void ProgramInfo::ToStringList(QStringList &list)
     list << channame;
     list << pathname;
     encodeLongLong(list, filesize);
-    list << startts.toString();
-    list << endts.toString();
+    list << startts.toString(Qt::ISODate);
+    list << endts.toString(Qt::ISODate);
     list << QString::number(conflicting);
     list << QString::number(recording);
     list << QString::number(duplicate);
@@ -137,8 +137,8 @@ void ProgramInfo::FromStringList(QStringList &list, int offset)
     channame = list[offset + 7];
     pathname = list[offset + 8];
     filesize = decodeLongLong(list, offset + 9);
-    startts = QDateTime::fromString(list[offset + 11]);
-    endts = QDateTime::fromString(list[offset + 12]);
+    startts = QDateTime::fromString(list[offset + 11], Qt::ISODate);
+    endts = QDateTime::fromString(list[offset + 12], Qt::ISODate);
     conflicting = list[offset + 13].toInt();
     recording = list[offset + 14].toInt();
     duplicate = list[offset + 15].toInt();

@@ -1172,11 +1172,11 @@ bool grabData(Source source, int offset)
     QString xmltv_grabber = source.xmltvgrabber;
 
     if (xmltv_grabber == "tv_grab_uk")
-        command.sprintf("nice -19 %s --days 7 --config-file %s --output %s",
+        command.sprintf("nice -19 %s --days 7 --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), configfile.ascii(), 
                         filename.ascii());
     else if (xmltv_grabber == "tv_grab_nz")
-        command.sprintf("nice -19 %s -n 1 -f %d -o %s",
+        command.sprintf("nice -19 %s -n 1 -f %d -o '%s'",
                         xmltv_grabber.ascii(), offset,
                         configfile.ascii());
     else if (xmltv_grabber == "tv_grab_de")
@@ -1185,12 +1185,12 @@ bool grabData(Source source, int offset)
                         filename.ascii());
     else if (xmltv_grabber == "tv_grab_fi")
         // Use the default of 10 days for Finland's grabber
-        command.sprintf("nice -19 %s --offset %d --config-file %s --output %s",
+        command.sprintf("nice -19 %s --offset %d --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), offset,
                         configfile.ascii(), filename.ascii());
     else if (xmltv_grabber == "tv_grab_es")
         // Use fixed of 4 days for Spanish grabber
-        command.sprintf("nice -19 %s --days=4 --offset %d --config-file %s --output %s",
+        command.sprintf("nice -19 %s --days=4 --offset %d --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), offset,
                         configfile.ascii(), filename.ascii());
     else if (xmltv_grabber == "gist")
@@ -1224,7 +1224,7 @@ bool grabData(Source source, int offset)
                         day.ascii(), reqtz.ascii());
     }
     else
-        command.sprintf("nice -19 %s --days 1 --offset %d --config-file %s "
+        command.sprintf("nice -19 %s --days 1 --offset %d --config-file '%s' "
                         "--output %s", xmltv_grabber.ascii(),
                         offset, configfile.ascii(), filename.ascii());
 
