@@ -587,6 +587,7 @@ void MythRemoteLineEdit::toggleShift()
 void MythRemoteLineEdit::focusInEvent(QFocusEvent *e)
 {
     emit changeHelpText(helptext);
+    emit gotFocus();    //perhaps we need to save a playlist?
     QTextEdit::focusInEvent(e);
 }
 
