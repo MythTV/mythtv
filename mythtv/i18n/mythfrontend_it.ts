@@ -385,10 +385,7 @@
     </message>
     <message>
         <source>Recording every week when shown in this timeslot</source>
-<<<<<<< mythfrontend_it.ts
         <translation>Registra ogni settimana quando presente in questo orario</translation>
-=======
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Recording one showing of this program</source>
@@ -400,7 +397,6 @@
     <message>
         <source>Recording just this showing</source>
         <translation type="obsolete">Registrazione singolo evento</translation>
->>>>>>> 1.33
     </message>
     <message>
         <source>Recording when shown on this channel</source>
@@ -3221,8 +3217,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <source>MasterBackend</source>
         <translation type="unfinished"></translation>
     </message>
-<<<<<<< mythfrontend_it.ts
-=======
     <message>
         <source>Start Early (minutes)</source>
         <translation type="unfinished"></translation>
@@ -3307,7 +3301,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <source>If set, the automatic shutdown routine will be disabled until a client connects.</source>
         <translation type="unfinished"></translation>
     </message>
->>>>>>> 1.33
 </context>
 <context>
     <name>ScheduledRecording</name>
