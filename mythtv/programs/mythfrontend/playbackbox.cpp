@@ -1107,10 +1107,13 @@ void PlaybackBox::killPlayer(void)
         while (!nvp->IsPlaying())
         {
             if (QDateTime::currentDateTime() > curtime)
+            {
+                cerr << "Took too long to start playing\n";
                 break;
-            usleep(50);
+            }
             qApp->unlock();
             qApp->processEvents();
+            usleep(50);
             qApp->lock();
         }
         curtime = QDateTime::currentDateTime();
@@ -1119,9 +1122,14 @@ void PlaybackBox::killPlayer(void)
         rbuffer->Pause();
         while (!rbuffer->isPaused())
         {
-            usleep(50);
+            if (QDateTime::currentDateTime() > curtime)
+            {
+                cerr << "Took too long to pause ringbuffer\n";
+                break;
+            }
             qApp->unlock();
             qApp->processEvents();
+            usleep(50);
             qApp->lock();
         }
 
@@ -1130,10 +1138,13 @@ void PlaybackBox::killPlayer(void)
         while (nvp->IsPlaying())
         {
             if (QDateTime::currentDateTime() > curtime)
+            {
+                cerr << "Took too long to stop playing\n";
                 break;
-            usleep(50);
+            }
             qApp->unlock();
             qApp->processEvents();
+            usleep(50);
             qApp->lock();
         }
 
