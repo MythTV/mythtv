@@ -63,6 +63,7 @@
    <button>
       <type>TV_SEARCH_POWER</type>
       <text>Advanced</text>
+      <text lang="SV">Avancerad</text>
       <text lang="DE">Erweitert</text>
       <action>TV_SEARCH_POWER</action>
    </button>

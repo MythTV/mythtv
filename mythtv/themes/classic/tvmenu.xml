@@ -94,6 +94,7 @@
    <button>
       <type>TV_PREVIOUS</type>
       <text>Previously Recorded</text>
+      <text lang="SV">Föregående</text>
       <text lang="DE">Alte Aufnahmen</text>
       <action>TV_PREVIOUS</action>
    </button>

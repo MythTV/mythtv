@@ -65,6 +65,7 @@
    <button>
       <type>TV_PREVIOUS</type>
       <text>Previously Recorded</text>
+      <text lang="SV">Föregående</text>
       <text lang="JA">以前の録画</text>
       <text lang="DE">Alte Aufnahmen</text>
       <text lang="FI">Aiemmin Nauhoitetut</text>
