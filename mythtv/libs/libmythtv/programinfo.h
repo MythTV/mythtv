@@ -3,12 +3,13 @@
 
 #include <qsqldatabase.h>
 #include <qstring.h>
-#include <qregexp.h>
 #include <qdatetime.h>
 #include <qmap.h>
 #include "scheduledrecording.h"
 
 #define NUMPROGRAMLINES 16
+
+class QSqlDatabase;
 
 class ProgramInfo
 {

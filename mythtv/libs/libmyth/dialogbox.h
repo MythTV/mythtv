@@ -1,14 +1,12 @@
 #ifndef DIALOGBOX_H_
 #define DIALOGBOX_H_
 
-#include <qwidget.h>
-#include <qcheckbox.h>
-
 #include "mythwidgets.h"
 
 class QVBoxLayout;
 class QButtonGroup;
 class QString;
+class QCheckBox;
 
 class DialogBox : public MythDialog
 {

@@ -1,8 +1,6 @@
 #ifndef VIEWSCHEDULED_H_
 #define VIEWSCHEDULED_H_
 
-#include <qwidget.h>
-
 #include "libmyth/mythwidgets.h"
 
 class QSqlDatabase;

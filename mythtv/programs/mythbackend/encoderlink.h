@@ -1,7 +1,6 @@
 #ifndef ENCODERLINK_H_
 #define ENCODERLINK_H_
 
-#include <qsocket.h>
 #include <qstring.h>
 
 #include "tv.h"

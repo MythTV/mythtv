@@ -1,12 +1,11 @@
 #ifndef REMOTEENCODER_H_
 #define REMOTEENCODER_H_
 
-#include <qsocket.h>
 #include <qstringlist.h>
-
 #include <pthread.h>
 
 class ProgramInfo;
+class QSocket;
 
 class RemoteEncoder
 {

@@ -16,10 +16,8 @@
 #define MMX
 #endif
 
-#include "RTjpegN.h"
 #include "minilzo.h"
 #include "format.h"
-#include "RingBuffer.h"
 
 extern "C" {
 #include "../libavcodec/avcodec.h"
@@ -30,6 +28,8 @@ using namespace std;
 
 struct video_audio;
 struct VBIData;
+class RTjpeg;
+class RingBuffer;
 
 class NuppelVideoRecorder
 {

@@ -2,7 +2,6 @@
 #define REMOTEFILE_H_
 
 #include <qstring.h>
-#include <qcstring.h>
 #include <pthread.h>
 
 class MythContext;

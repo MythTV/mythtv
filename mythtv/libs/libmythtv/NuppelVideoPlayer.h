@@ -1,7 +1,6 @@
 #ifndef NUPPELVIDEOPLAYER
 #define NUPPELVIDEOPLAYER
 
-#include <map>
 #include <vector>
 #include <qstring.h>
 
@@ -314,7 +313,7 @@ class NuppelVideoPlayer
     bool editmode;
     bool resetvideo;
 
-    map<long long, long long> *positionMap;
+    QMap<long long, long long> *positionMap;
     long long lastKey;
     
     long long rewindtime, fftime;

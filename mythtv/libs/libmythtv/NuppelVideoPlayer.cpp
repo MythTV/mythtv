@@ -407,7 +407,7 @@ int NuppelVideoPlayer::InitSubs(void)
         return -1;
     }
 
-    positionMap = new map<long long, long long>;
+    positionMap = new QMap<long long, long long>;
     return 0;
 }
 
@@ -2068,7 +2068,7 @@ void NuppelVideoPlayer::StartPlaying(void)
 
 	    //OpenFile(true);
 	    delete positionMap;
-	    positionMap = new map<long long, long long>;
+	    positionMap = new QMap<long long, long long>;
 
 	    resetplaying = false;
 	    actuallyreset = true;

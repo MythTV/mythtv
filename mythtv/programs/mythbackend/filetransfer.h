@@ -2,10 +2,10 @@
 #define FILETRANSFER_H_
 
 #include <qstring.h>
-#include <qsocket.h>
 #include <pthread.h>
 
 class RingBuffer;
+class QSocket;
 
 class FileTransfer
 {

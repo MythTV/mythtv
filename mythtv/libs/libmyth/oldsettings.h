@@ -9,7 +9,6 @@
 
 #ifndef OLDSETTINGS_H
 #define OLDSETTINGS_H
-#include <iostream>
 #include <qstring.h>
 #include <map>
 

@@ -2,8 +2,6 @@
 #define VIDEOSOURCE_H
 
 #include "libmyth/settings.h"
-#include <qlistview.h>
-#include <qdialog.h>
 #include <qregexp.h>
 #include <vector>
 

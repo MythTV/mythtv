@@ -1,9 +1,6 @@
 #ifndef XJ_H_
 #define XJ_H_
 
-#include <map>
-using namespace std;
-
 struct XvData;
 
 class XvVideoOutput

@@ -1,7 +1,6 @@
 #ifndef THEMEDMENU_H_
 #define THEMEDMENU_H_
 
-#include <qwidget.h>
 #include <qvaluelist.h>
 #include <qdom.h>
 #include <qmap.h>
@@ -13,6 +12,7 @@
 using namespace std;
 
 class QPixmap;
+class QWidget;
 
 struct ButtonIcon
 {

@@ -1,17 +1,13 @@
 #ifndef GUIDEGRID_H_
 #define GUIDEGRID_H_
 
-#include <qwidget.h>
-#include <qlabel.h>
 #include <qstring.h>
-#include <qtimer.h>
-#include <qpixmap.h>
 #include <qdatetime.h>
 #include <qptrlist.h>
+#include <qlayout.h>
 #include <vector>
 
 #include "libmyth/mythwidgets.h"
-#include "progfind.h"
 
 using namespace std;
 
@@ -21,6 +17,9 @@ class TimeInfo;
 class ChannelInfo;
 class QSqlDatabase;
 class TV;
+class QTimer;
+class QLabel;
+class QWidget;
 
 #define MAX_DISPLAY_CHANS 8
 #define MAX_DISPLAY_TIMES 30

@@ -11,6 +11,7 @@
 #include <sys/shm.h>
 #include <math.h>
 
+#include <map>
 #include <iostream>
 using namespace std;
 

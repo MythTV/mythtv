@@ -2,8 +2,8 @@
 #define INFOSTRUCTS_H_
 
 #include <qstring.h>
-#include <qpixmap.h>
-#include <qdatetime.h>
+
+class QPixmap;
 
 class ChannelInfo
 {

@@ -1,7 +1,6 @@
 #ifndef PLAYBACKBOX_H_
 #define PLAYBACKBOX_H_
 
-#include <qwidget.h>
 #include <qdatetime.h>
 //#include <qpixmap.h>
 #include "libmyth/mythwidgets.h"

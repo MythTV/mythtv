@@ -1,8 +1,6 @@
 #ifndef SETRECTIME_H_
 #define SETRECTIME_H_
 
-#include <qwidget.h>
-
 #include "libmyth/mythwidgets.h"
 
 class QSqlDatabase;

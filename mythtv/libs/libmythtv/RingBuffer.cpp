@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <pthread.h>
+#include <qsocket.h>
 
 #include <iostream>
 using namespace std;

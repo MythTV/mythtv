@@ -1,9 +1,10 @@
+#include <iostream>
+#include <qsocket.h>
+#include <qregexp.h>
+
 #include "programinfo.h"
 #include "scheduledrecording.h"
 #include "util.h"
-#include <iostream>
-#include <qsocket.h>
-
 #include "mythcontext.h"
 
 using namespace std;

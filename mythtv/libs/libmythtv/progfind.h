@@ -14,20 +14,18 @@
 #ifndef PROGFIND_H_
 #define PROGFIND_H_
 
-#include <qsqldatabase.h>
-#include <qsocket.h>
-#include <qwidget.h>
-#include <qdialog.h>
-#include <qstringlist.h>
-#include <qlayout.h>
+#include <qdatetime.h>
 
 #include "libmyth/mythwidgets.h"
-#include "guidegrid.h"
-#include "tv.h"
 
 class QLabel;
 class QListView;
 class ProgramInfo;
+class QSqlDatabase;
+class QWidget;
+class QVBoxLayout;
+class QHBoxLayout;
+class TV;
 
 void RunProgramFind(bool thread = false);
 

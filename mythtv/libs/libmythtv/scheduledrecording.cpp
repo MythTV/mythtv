@@ -383,7 +383,7 @@ MythDialog* ScheduledRecording::dialogWidget(QWidget* parent, const char* name)
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     int bigfont = gContext->GetBigFontSize();
-    int mediumfont = gContext->GetMediumFontSize();
+    //int mediumfont = gContext->GetMediumFontSize();
 
     MythDialog* dialog = new ConfigurationDialogWidget(parent, name);
     QVBoxLayout* vbox = new QVBoxLayout(dialog);

@@ -2,7 +2,6 @@
 #define SETTINGS_H
 
 #include <qobject.h>
-#include <qwidget.h>
 #include <qstring.h>
 #include <iostream>
 #include <vector>

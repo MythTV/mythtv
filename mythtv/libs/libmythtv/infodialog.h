@@ -1,15 +1,15 @@
 #ifndef INFODIALOG_H_
 #define INFODIALOG_H_
 
-#include <qwidget.h>
-
-#include "programinfo.h"
 #include "mythwidgets.h"
+#include "scheduledrecording.h"
 
 class QLabel;
 class QCheckBox;
 class QListView;
 class QListViewItem;
+class ProgramInfo;
+class QWidget;
 
 class InfoDialog : public MythDialog
 {

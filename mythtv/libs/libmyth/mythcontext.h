@@ -4,7 +4,6 @@
 #include <qstring.h>
 #include <qpixmap.h>
 #include <qpalette.h>
-#include <qsocket.h>
 #include <qobject.h>
 #include <qptrlist.h>
 #include <qevent.h>
@@ -15,6 +14,7 @@ using namespace std;
 class Settings;
 class QSqlDatabase;
 class QSqlQuery;
+class QSocket;
 class LCD;				// thor feb 7 2003
 
 class MythEvent : public QCustomEvent

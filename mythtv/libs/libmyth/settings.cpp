@@ -450,6 +450,9 @@ void TimeSetting::setValue(const QTime& newValue) {
 QWidget* TimeSetting::configWidget(ConfigurationGroup* cg, QWidget* parent,
                                    const char* widgetName) {
     //QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
+    (void)cg;
+    (void)parent;
+    (void)widgetName;
     return NULL;
 }
 
@@ -464,6 +467,9 @@ void DateSetting::setValue(const QDate& newValue) {
 QWidget* DateSetting::configWidget(ConfigurationGroup* cg, QWidget* parent,
                                    const char* widgetName) {
     //QString dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    (void)cg;
+    (void)parent;
+    (void)widgetName;
     return NULL;
 }
 

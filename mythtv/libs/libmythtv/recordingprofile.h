@@ -4,9 +4,6 @@
 #include "libmyth/settings.h"
 #include "libmyth/mythwidgets.h"
 
-#include <qlistview.h>
-#include <vector>
-
 class RecordingProfile;
 
 // Any setting associated with a recording profile

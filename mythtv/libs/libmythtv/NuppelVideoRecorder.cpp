@@ -28,6 +28,9 @@ extern "C" {
 
 #define KEYFRAMEDIST   30
 
+#include "RingBuffer.h"
+#include "RTjpegN.h"
+
 pthread_mutex_t avcodeclock = PTHREAD_MUTEX_INITIALIZER;
 
 NuppelVideoRecorder::NuppelVideoRecorder(void)

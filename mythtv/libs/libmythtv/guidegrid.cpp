@@ -25,6 +25,7 @@ using namespace std;
 #include "programinfo.h"
 #include "oldsettings.h"
 #include "tv.h"
+#include "progfind.h"
 
 QString RunProgramGuide(QString startchannel, bool thread, TV *player)
 {
