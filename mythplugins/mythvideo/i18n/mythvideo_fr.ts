@@ -218,7 +218,7 @@
     </message>
     <message>
         <source>The defualt view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
-        <translation>La vue par défaut pour MythVideo. Les autres vues peuvent être atteintes à travers le menu popup accessible par la touche MENU</translation>
+        <translation type="obsolete">La vue par défaut pour MythVideo. Les autres vues peuvent être atteintes à travers le menu popup accessible par la touche MENU</translation>
     </message>
     <message>
         <source>Aggressive Parental Control</source>
@@ -259,6 +259,10 @@
     <message>
         <source>Manually Enter IMDB #</source>
         <translation type="obsolete">Entrer le n° allociné</translation>
+    </message>
+    <message>
+        <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

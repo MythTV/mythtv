@@ -32,7 +32,7 @@ static HostComboBox *VideoDefaultView()
     gc->addSelection(QObject::tr("Gallery"), "1");
     gc->addSelection(QObject::tr("Browser"), "0");
     gc->addSelection(QObject::tr("Listings"), "2"); 
-    gc->setHelpText(QObject::tr("The defualt view for MythVideo. "
+    gc->setHelpText(QObject::tr("The default view for MythVideo. "
                     "Other views can be reached via the popup menu available "
                     "via the MENU key."));
     return gc;

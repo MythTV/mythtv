@@ -229,10 +229,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The defualt view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Aggressive Parental Control</source>
         <translation type="unfinished"></translation>
     </message>
@@ -266,6 +262,10 @@
     </message>
     <message>
         <source>Video Gallery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

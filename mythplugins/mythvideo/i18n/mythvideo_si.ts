@@ -93,7 +93,7 @@
     </message>
     <message>
         <source>The defualt view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
-        <translation>Privzeti pogled MythVidea. Ostali pogledi so dosegljivi preko popup menuja z MENU tipko.</translation>
+        <translation type="obsolete">Privzeti pogled MythVidea. Ostali pogledi so dosegljivi preko popup menuja z MENU tipko.</translation>
     </message>
     <message>
         <source>Parental Control PIN</source>
@@ -256,6 +256,10 @@
 </source>
         <translation>Ovitek filma obstaja, vendar ga Myth ni uspel pridobiti v sprejemljivem času.
 </translation>
+    </message>
+    <message>
+        <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
