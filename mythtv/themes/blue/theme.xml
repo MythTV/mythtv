@@ -128,4 +128,19 @@
     <offset>15,10</offset>
   </buttondef>
 
+  <buttondef name="DVD">
+    <image>dvd.png</image>
+    <offset>62,30</offset>
+  </buttondef>
+
+  <buttondef name="DVD_PLAY">
+    <image>watch_dvd.png</image>
+    <offset>10,25</offset>
+  </buttondef>
+
+  <buttondef name="DVD_RIP">
+    <image>rip_dvd.png</image>
+    <offset>10,25</offset>
+  </buttondef>
+
 </myththeme>

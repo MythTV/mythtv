@@ -77,6 +77,13 @@
    </button>
 
    <button>
+     <type>DVD</type>
+     <text>DVD</text>
+     <action>PLUGIN mythdvd</action>
+     <depends>mythdvd</depends>
+   </button>
+
+   <button>
       <type>SETUP</type>
       <text>Setup</text>
       <text lang="IT">Impostazioni</text>
