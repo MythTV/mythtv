@@ -468,7 +468,7 @@ void StatusBox::setHelpText()
                                              "some operating system "
                                              "statistics of this machine");
             if (!isBackend)
-                machineStr.append(QObject::tr(" and the MythTV server"));
+                machineStr.append(" " + QObject::tr("and the MythTV server"));
 
             helptext->SetText(machineStr);
         }
