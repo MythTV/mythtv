@@ -166,8 +166,8 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     secondcontrol->addWidget(vis);
     connect(vis, SIGNAL(clicked()), this, SLOT(visEnable()));
 
-    QString keyboard_accelerator_flag = gContext->GetSetting("KeyboardAccelerators");
-    if(keyboard_accelerator_flag.lower() == "true")
+    keyboard_accelerator_flag = gContext->GetSetting("KeyboardAccelerators").lower();
+    if(keyboard_accelerator_flag == "true")
     {
         // There may be a better key press
         // mapping, but I have a pretty
@@ -224,6 +224,7 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
 
     plist = playlist;
     playlistindex = 0;
+    shuffleindex = 0;
     setupListView();
 
     vbox->addWidget(playview, 1);
@@ -239,13 +240,16 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     shufflemode = false;
     repeatmode = false;  
 
-    curMeta = ((*plist)[playlistindex]);
+    curMeta = Metadata("dummy.music");
 
     QString playmode = gContext->GetSetting("PlayMode");
     if (playmode.lower() == "random")
         toggleShuffle();
     else
         setupPlaylist();
+
+    playlistindex = playlistorder[shuffleindex];
+    curMeta = (*plist)[playlistindex];
 
     // this is a hack to fix the playlist's refusal to update w/o a SIG
     playlist_timer = new QTimer();
@@ -384,12 +388,16 @@ void PlaybackBox::setupPlaylist(void)
     if (playlistorder.size() > 0)
         playlistorder.clear();
 
-    playlistindex = 0;
-    shuffleindex = 0;
+    if (playlistindex >= (int)plist->size())
+    {
+        playlistindex = 0;
+        shuffleindex = 0;
+    }
 
     if (plist->size() == 0)
     {
         curMeta = Metadata("dummy.music");
+        shuffleindex = 0;
         return;
     }
 
@@ -766,8 +774,7 @@ void PlaybackBox::toggleShuffle()
     else
         randomize->setText("Shuffle: Normal"); 
 
-    QString accelerator_flag = gContext->GetSetting("KeyboardAccelerators");
-    if (accelerator_flag.lower() == "true")
+    if (keyboard_accelerator_flag == "true")
         randomize->setAccel(Key_1);
 }
 
@@ -780,8 +787,7 @@ void PlaybackBox::toggleRepeat()
     else
         repeat->setText("Repeat: Playlist");
 
-    QString accelerator_flag = gContext->GetSetting("KeyboardAccelerators");
-    if (accelerator_flag.lower() == "true")
+    if (keyboard_accelerator_flag == "true")
         repeat->setAccel(Key_2);
 }
 

@@ -21,9 +21,12 @@ bool Metadata::isInDatabase(QSqlDatabase *db)
 {
     bool retval = false;
 
+    QString sqlfilename = filename;
+    sqlfilename.replace(QRegExp("\""), QString("\\\""));
+
     QString thequery = QString("SELECT artist,album,title,genre,year,tracknum,"
                                "length,intid FROM musicmetadata WHERE "
-                               "filename = \"%1\";").arg(filename);
+                               "filename = \"%1\";").arg(sqlfilename);
 
     QSqlQuery query = db->exec(thequery);
 
@@ -62,12 +65,15 @@ void Metadata::dumpToDatabase(QSqlDatabase *db)
     album.replace(QRegExp("\""), QString("\\\""));
     genre.replace(QRegExp("\""), QString("\\\""));
 
+    QString sqlfilename = filename;
+    sqlfilename.replace(QRegExp("\""), QString("\\\""));
+
     QString thequery = QString("INSERT INTO musicmetadata (artist,album,title,"
                                "genre,year,tracknum,length,filename) VALUES "
                                "(\"%1\",\"%2\",\"%3\",\"%4\",%5,%6,%7,\"%8\");")
                               .arg(artist.latin1()).arg(album.latin1())
                               .arg(title.latin1()).arg(genre).arg(year)
-                              .arg(tracknum).arg(length).arg(filename);
+                              .arg(tracknum).arg(length).arg(sqlfilename);
     db->exec(thequery);
 
     // easiest way to ensure we've got 'id' filled.
@@ -97,14 +103,25 @@ void Metadata::fillData(QSqlDatabase *db)
     if (title == "")
         return;
 
+    QString sqltitle = title;
+    sqltitle.replace(QRegExp("\""), QString("\\\""));
+
     QString thequery = "SELECT artist,album,title,genre,year,tracknum,length,"
                        "filename,intid FROM musicmetadata WHERE title=\"" + 
-                       title + "\"";
+                       sqltitle + "\"";
 
     if (album != "")
-        thequery += " AND album=\"" + album + "\"";
+    {
+        QString temp = album;
+        temp.replace(QRegExp("\""), QString("\\\""));
+        thequery += " AND album=\"" + temp + "\"";
+    }
     if (artist != "")
-        thequery += " AND artist=\"" + artist + "\"";
+    {
+        QString temp = artist;
+        temp.replace(QRegExp("\""), QString("\\\""));
+        thequery += " AND artist=\"" + temp + "\"";
+    }
 
     thequery += ";";
 

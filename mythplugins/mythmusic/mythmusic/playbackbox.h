@@ -120,6 +120,7 @@ class PlaybackBox : public MythDialog
     QTimer *lcd_update_timer;
     QTimer *playlist_timer;
     bool visualizer_is_active;
+    QString keyboard_accelerator_flag;
 };
 
 #endif
