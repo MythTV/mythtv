@@ -85,6 +85,11 @@
     <offset>20,10</offset>
   </buttondef>
 
+  <buttondef name="TV_STATUS">
+    <image>showstatus.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+ 
   <buttondef name="TV_CONFLICTS">
     <image>conflict.png</image>
     <offset>20,10</offset>
