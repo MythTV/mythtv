@@ -913,6 +913,51 @@ void MythListView::keyPressEvent(QKeyEvent *e)
                 emit playPressed(currentItem()); 
                 return;
                 
+            case 'i':
+            case 'I':
+                emit infoPressed(currentItem());
+                return;
+                
+            case '0':
+                emit numberPressed(currentItem(), 0);
+                return;
+                
+            case '1':
+                emit numberPressed(currentItem(), 1);
+                return;
+                
+            case '2':
+                emit numberPressed(currentItem(), 2);
+                return;
+                
+            case '3':
+                emit numberPressed(currentItem(), 3);
+                return;
+                
+            case '4':
+                emit numberPressed(currentItem(), 4);
+                return;
+                
+            case '5':
+                emit numberPressed(currentItem(), 5);
+                return;
+                
+            case '6':
+                emit numberPressed(currentItem(), 6);
+                return;
+                
+            case '7':
+                emit numberPressed(currentItem(), 7);
+                return;
+                
+            case '8':
+                emit numberPressed(currentItem(), 8);
+                return;
+                
+            case '9':
+                emit numberPressed(currentItem(), 9);
+                return;
+                
         }
         if(e->key() == Key_Up && currentItem() == firstChild())
         {

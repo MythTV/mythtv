@@ -322,6 +322,8 @@ class MythListView : public QListView
   signals:
     void playPressed(QListViewItem *);
     void deletePressed(QListViewItem *);
+    void infoPressed(QListViewItem *);
+    void numberPressed(QListViewItem *, int);
 
   private:
     bool allowkeypress;
