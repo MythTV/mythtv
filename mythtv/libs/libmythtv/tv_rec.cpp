@@ -1762,18 +1762,27 @@ void TVRec::GetInputName(QString &inputname)
 
 void TVRec::PauseRingBuffer(void)
 {
+    if (!rbuffer)
+        return;
+
     rbuffer->StopReads();
     pthread_mutex_lock(&readthreadLock);
 }
 
 void TVRec::UnpauseRingBuffer(void)
 {
+    if (!rbuffer)
+        return;
+
     rbuffer->StartReads();
     pthread_mutex_unlock(&readthreadLock);
 }
 
 void TVRec::PauseClearRingBuffer(void)
 {
+    if (!rbuffer)
+        return;
+
     rbuffer->StopReads();
     pthread_mutex_lock(&readthreadLock);
 }
