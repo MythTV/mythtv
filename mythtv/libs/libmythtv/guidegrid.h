@@ -6,6 +6,7 @@
 #include <qstring.h>
 #include <qpixmap.h>
 #include <qdatetime.h>
+#include <qptrlist.h>
 #include <vector>
 
 using namespace std;
@@ -47,6 +48,13 @@ class GuideGrid : public QDialog
     void scrollDown();
     void scrollUp();
 
+    void dayLeft();
+    void dayRight();
+    void pageLeft();
+    void pageRight();
+    void pageDown();
+    void pageUp();
+
     void enter();
     void escape();
 
@@ -73,11 +81,13 @@ class GuideGrid : public QDialog
 
     void fillTimeInfos();
 
-    ProgramInfo *getProgramInfo(unsigned int row, unsigned int col);
     void fillProgramInfos(void);
+    void fillProgramRowInfos(unsigned int row);
 
     QBrush getBGColor(const QString &category);
     
+    void setStartChannel(int newStartChannel);
+
     QFont *m_timeFont;
     QFont *m_chanFont;
     QFont *m_chanCallsignFont;
@@ -86,10 +96,12 @@ class GuideGrid : public QDialog
 
     vector<ChannelInfo> m_channelInfos;
     TimeInfo *m_timeInfos[DISPLAY_TIMES];
+    QPtrList<ProgramInfo> *m_programs[DISPLAY_CHANS];
     ProgramInfo *m_programInfos[DISPLAY_CHANS][DISPLAY_TIMES];
 
     QDateTime m_originalStartTime;
     QDateTime m_currentStartTime;
+    QDateTime m_currentEndTime;
     unsigned int m_currentStartChannel;
     QString m_startChanStr;
     
@@ -106,8 +118,6 @@ class GuideGrid : public QDialog
     bool usetheme;
     QColor fgcolor;
     QColor bgcolor;
-
-    ProgramInfo *lastLookup;
 
     MythContext *m_context;
     Settings *m_settings;

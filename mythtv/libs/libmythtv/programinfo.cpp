@@ -47,7 +47,57 @@ int ProgramInfo::CalculateLength(void)
 {
     return startts.secsTo(endts);
 }
-    
+
+void GetProgramRangeDateTime(QPtrList<ProgramInfo> *proglist, QString channel, 
+                             const QString &ltime, const QString &rtime)
+{
+    QSqlQuery query;
+    QString thequery;
+
+    thequery = QString("SELECT channel.chanid,starttime,endtime,title,subtitle,"
+                       "description,category,channel.channum,channel.callsign, "
+                       "channel.name FROM program,channel "
+                       "WHERE program.chanid = %1 AND endtime >= %1 AND "
+                       "starttime <= %3 AND program.chanid = channel.chanid "
+                       "ORDER BY starttime;")
+                       .arg(channel).arg(ltime).arg(rtime);
+    query.exec(thequery);
+
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        while (query.next())
+        {
+            ProgramInfo *proginfo = new ProgramInfo;
+            proginfo->chanid = query.value(0).toString();
+            proginfo->startts = QDateTime::fromString(query.value(1).toString(),
+                                                      Qt::ISODate);
+            proginfo->endts = QDateTime::fromString(query.value(2).toString(),
+                                                    Qt::ISODate);
+            proginfo->title = QString::fromUtf8(query.value(3).toString());
+            proginfo->subtitle = QString::fromUtf8(query.value(4).toString());
+            proginfo->description = 
+                                   QString::fromUtf8(query.value(5).toString());
+            proginfo->category = QString::fromUtf8(query.value(6).toString());
+            proginfo->chanstr = query.value(7).toString();
+            proginfo->chansign = query.value(8).toString();
+            proginfo->channame = query.value(9).toString();
+            proginfo->spread = -1;
+            proginfo->recordtype = kUnknown;
+
+            if (proginfo->title == QString::null)
+                proginfo->title = "";
+            if (proginfo->subtitle == QString::null)
+                proginfo->subtitle = "";
+            if (proginfo->description == QString::null)
+                proginfo->description = "";
+            if (proginfo->category == QString::null)
+                proginfo->category = "";
+
+            proglist->append(proginfo);
+        }
+    }
+}    
+
 ProgramInfo *GetProgramAtDateTime(QString channel, const QString &ltime)
 {
     QSqlQuery query;

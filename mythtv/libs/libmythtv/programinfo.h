@@ -59,6 +59,8 @@ class ProgramInfo
     bool conflictfixed;
 };
 
+void GetProgramRangeDateTime(QPtrList<ProgramInfo> *proglist, QString channel, 
+                             const QString &ltime, const QString &rtime);
 ProgramInfo *GetProgramAtDateTime(QString channel, const QString &time);
 ProgramInfo *GetProgramAtDateTime(QString channel, QDateTime &dtime);
 

@@ -27,13 +27,7 @@ class TimeInfo
 {
   public:
     QString usertime;
-    QString sqltime;
 
-    QDateTime sqlts;
-
-    int year;
-    int month;
-    int day;
     int hour;
     int min;
 };

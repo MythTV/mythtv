@@ -48,4 +48,7 @@ int EPGTitleFontSize=19
 str ChannelSorting=channum + 0
 # Starting channel
 str DefaultTVChannel=3
-
+# What to call 'unknown' programs
+str UnknownTitle=Unknown
+# What category to give 'unknown' programs
+#str UnknownCategory=Unknown
