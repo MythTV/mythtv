@@ -70,8 +70,6 @@ QPixmap *ProgramListItem::getPixmap(void)
     recinfo->GetRecordFilename(prefix.ascii(), filename);
     filename += ".png";
 
-    pixmap = new QPixmap();
-
     int screenheight = QApplication::desktop()->height();
     int screenwidth = QApplication::desktop()->width();
  
@@ -80,24 +78,22 @@ QPixmap *ProgramListItem::getPixmap(void)
     float wmult = screenwidth / 800.0;
     float hmult = screenheight / 600.0;
 
-    QImage *tmpimage = new QImage();
+    QImage tmpimage;
 
-    if (tmpimage->load(filename.c_str()))
+    if (tmpimage.load(filename.c_str()))
     {
+        pixmap = new QPixmap();
+
         if (screenwidth != 800 || screenheight != 600)
         {
-            QImage tmp2 = tmpimage->smoothScale(160 * wmult, 120 * hmult);
+            QImage tmp2 = tmpimage.smoothScale(160 * wmult, 120 * hmult);
             pixmap->convertFromImage(tmp2);
         }
         else
-            pixmap->convertFromImage(*tmpimage);
-
-        delete tmpimage;
+            pixmap->convertFromImage(tmpimage);
 
         return pixmap;
     }
-
-cout << "generating pixmap\n";
 
     int len = 0;
     int video_width, video_height;
@@ -107,36 +103,29 @@ cout << "generating pixmap\n";
 
     if (data)
     {
-cout << "converting to png\n";
         QImage img(data, video_width, video_height, 32, NULL, 65536 * 65536, 
                    QImage::LittleEndian);
         img = img.smoothScale(160, 120);
 
         img.save(filename.c_str(), "PNG");
 
-cout << "done\n";
         delete [] data;
-    }
 
-cout << "loading\n";
-    if (tmpimage->load(filename.c_str()))
-    {
-        if (screenwidth != 800 || screenheight != 600)
+        if (tmpimage.load(filename.c_str()))
         {
-            QImage tmp2 = tmpimage->smoothScale(160 * wmult, 120 * hmult);
-            pixmap->convertFromImage(tmp2);
+            pixmap = new QPixmap();
+
+            if (screenwidth != 800 || screenheight != 600)
+            {
+                QImage tmp2 = tmpimage.smoothScale(160 * wmult, 120 * hmult);
+                pixmap->convertFromImage(tmp2);
+            }
+            else
+                pixmap->convertFromImage(tmpimage);
+
+            return pixmap;
         }
-        else
-            pixmap->convertFromImage(*tmpimage);
-
-        delete tmpimage;
-    
-cout << "done\n";    
-        return pixmap;
     }
-
-    delete tmpimage;
-    delete pixmap;
 
     return NULL;
 }

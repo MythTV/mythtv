@@ -1241,10 +1241,16 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
     desiredKey -= 30;
 
     int normalframes = number - desiredKey;
+
+    if (normalframes < 3)
+        normalframes = 3;
+
     int fileend = 0;
 
     buf = new unsigned char[video_width * video_height * 3 / 2];
     strm = new unsigned char[video_width * video_height * 2];
+
+    long long int maxRead = 200000000;
 
     unsigned char *frame = NULL;
 
@@ -1277,8 +1283,12 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
             fileend = (ringBuffer->Read(strm, frameheader.packetlength) !=
                        frameheader.packetlength);
         }
+
+        if (ringBuffer->GetReadPosition() > maxRead)
+            break;
     }
 
+    int decodedframes = 0;
     while (normalframes > 0 && !fileend)
     {
         fileend = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader,
@@ -1305,7 +1315,11 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
         {
             framesPlayed++;
             normalframes--;
+            decodedframes++;
             frame = DecodeFrame(&frameheader, strm);
+
+            if (ringBuffer->GetReadPosition() > maxRead && decodedframes > 2)
+                break;
         }
     }
 
