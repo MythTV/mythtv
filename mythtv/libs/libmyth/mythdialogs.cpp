@@ -956,6 +956,10 @@ void MythPopupBox::ShowPopupAtXY(int destx, int desty,
             QString objname = objs->name();
             if (objname != "nopopsize")
             {
+                // little extra padding for these guys
+                if (objs->isA("MythListBox"))
+                    poph += (int)(25 * hmult);
+
                 QWidget *widget = (QWidget *)objs;
                 poph += widget->height();
                 if (widget->width() > maxw)
