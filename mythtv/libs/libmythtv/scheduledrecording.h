@@ -8,6 +8,7 @@
 using namespace std;
 
 class ProgramInfo;
+class QSqlDatabase;
 class ScheduledRecording: public ConfigurationGroup, public ConfigurationDialog {
 public:
     enum RecordingType
@@ -31,7 +32,7 @@ public:
     void setEnd(const QDateTime& end);
 
     virtual MythDialog* dialogWidget(MythContext* context,
-                                  QWidget* parent=NULL, const char* name=0);
+                                     QWidget* parent=NULL, const char* name=0);
     virtual void save(QSqlDatabase* db);
 
     void loadByID(QSqlDatabase* db, int id);
