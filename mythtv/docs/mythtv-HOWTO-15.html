@@ -40,11 +40,18 @@ replacing it with "tvlistings".</P>
 <P>If you're using Gnome as your window manager, try switching to KDE.  For
 Red Hat Linux 8.0 users, edit <CODE>/etc/sysconfig/desktop</CODE> and
 change "GNOME" to "KDE".</P>
-<H2><A NAME="ss15.4">15.4</A> <A HREF="mythtv-HOWTO.html#toc15.4">Fast CPU, choppy video.</A>
+<H2><A NAME="ss15.4">15.4</A> <A HREF="mythtv-HOWTO.html#toc15.4">Fast CPU, choppy or jittery video.</A>
 </H2>
 
 <P>This is most likely because your hard drive isn't setup to use DMA.  Use
-the <B>hdparm</B> program to check and enable DMA.</P>
+the <B>hdparm</B> program to check and enable DMA.
+<BLOCKQUOTE><CODE>
+<PRE>
+# hdparm -d /dev/hd?
+</PRE>
+</CODE></BLOCKQUOTE>
+ will tell you the DMA status for your hard drives.  If you run
+<B>hdparm</B> with the <CODE>-d1</CODE> parameter, it will turn DMA on.</P>
 <HR>
 Next
 <A HREF="mythtv-HOWTO-14.html">Previous</A>

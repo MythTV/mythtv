@@ -27,6 +27,7 @@ Gentoo instructions.
 v1.039, 2002-11-29.  More work on the Gentoo instructions.
 v1.040, 2002-11-29.  Slight change to the RH 8.0 LANG instructions; put a
 reference to the "special" instructions for RH 8.0 users.
+v1.041, 2002-11-29.  Added some explanatory text about hdparm.
 -->
 <!--
 To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
@@ -37,7 +38,7 @@ To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-11-29, v1.040
+<date>2002-11-29, v1.041
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1439,7 +1440,10 @@ replacing it with "tvlistings".
 <p>If you're using Gnome as your window manager, try switching to KDE.  For
 Red Hat Linux 8.0 users, edit <tt>/etc/sysconfig/desktop</tt> and
 change "GNOME" to "KDE".
-<sect1>Fast CPU, choppy video.
+<sect1>Fast CPU, choppy or jittery video.
 <p>This is most likely because your hard drive isn't setup to use DMA.  Use
-the <bf>hdparm</bf> program to check and enable DMA.
+the <bf>hdparm</bf> program to check and enable DMA.<tscreen><verb>
+# hdparm -d /dev/hd?
+</verb></tscreen> will tell you the DMA status for your hard drives.  If you run
+<bf>hdparm</bf> with the <tt>-d1</tt> parameter, it will turn DMA on.
 </article>

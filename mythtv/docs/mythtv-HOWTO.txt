@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2002-11-29, v1.040
+  2002-11-29, v1.041
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -88,7 +88,7 @@
      15.1 Illegal Instruction.
      15.2 mythfilldatabase failing.
      15.3 mythtv seems to disappear; can't see video
-     15.4 Fast CPU, choppy video.
+     15.4 Fast CPU, choppy or jittery video.
 
   ______________________________________________________________________
 
@@ -1484,8 +1484,13 @@
   For Red Hat Linux 8.0 users, edit /etc/sysconfig/desktop and change
   "GNOME" to "KDE".
 
-  [1m15.4.  Fast CPU, choppy video.[0m
+  [1m15.4.  Fast CPU, choppy or jittery video.[0m
 
   This is most likely because your hard drive isn't setup to use DMA.
   Use the [1mhdparm [22mprogram to check and enable DMA.
+
+       # hdparm -d /dev/hd?
+
+  will tell you the DMA status for your hard drives.  If you run [1mhdparm[0m
+  with the -d1 parameter, it will turn DMA on.
 
