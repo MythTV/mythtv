@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-02-14, v1.094
+  2003-02-16, v1.095
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -566,7 +566,7 @@
   the tarball to a directory you can find.
 
   Get XMLTV from http://xmltv.sourceforge.net
-  <http://xmltv.sourceforge.net>.  Download version 0.5.7
+  <http://xmltv.sourceforge.net>.  Download version 0.5.8
 
   Get lame from http://www.mp3dev.org/mp3 <http://www.mp3dev.org/mp3>.
   Download the source code to v3.93.1 by following the links to
@@ -656,8 +656,8 @@
 
   Untar the xmltv file:
 
-       $ tar -xjf xmltv-0.5.7.tar.bz2
-       $ cd xmltv-0.5.7
+       $ tar -xjf xmltv-0.5.8.tar.bz2
+       $ cd xmltv-0.5.8
 
   Install the xmltv prerequisites:
 
@@ -672,7 +672,7 @@
 
   Change to the XMLTV directory and compile it:
 
-       $ cd xmltv-0.5.7
+       $ cd xmltv-0.5.8
        $ perl Makefile.PL
 
   You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes"
