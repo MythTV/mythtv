@@ -77,6 +77,7 @@ void UIListGenericTree::setPixmap(QPixmap *pixmap)
 {
     if (m_physitem)
         m_physitem->setPixmap(pixmap);
+    m_image = pixmap;
 }
 
 void UIListGenericTree::setDrawArrow(bool flag)
