@@ -874,7 +874,7 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
         if (!QDir::root().rename(oldfilename, newfilename, TRUE))
         {
             VERBOSE(VB_IMPORTANT, QString("Could not rename: %1 to %2")
-                                         .arg(oldfilename, newfilename));
+                                         .arg(oldfilename).arg(newfilename));
         }
     }
     else
