@@ -81,6 +81,7 @@
       <text lang="ES">TV directo</text>
       <text lang="CA">TV directe</text>
       <text lang="DE">TV direkt</text>
+      <text lang="SV">TV direkt</text>
       <text lang="JA">パススルーモード</text>
       <action>EXECTV xawtv -f -device %s -dspdev %s -vbidev %s</action>
    </button>
@@ -90,6 +91,7 @@
       <type>TV_STATUS</type>
       <text>System Status</text>
       <text lang="DE">Systemstatus</text>
+      <text lang="SV">Systemstatus</text>
       <text lang="JA">システムステータス</text>
       <action>TV_STATUS</action>
    </button>

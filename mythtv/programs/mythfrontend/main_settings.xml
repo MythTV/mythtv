@@ -55,7 +55,7 @@
      <text lang="DK">Musik indstillinger</text>
      <text lang="NL">Muziek Instellingen</text>
      <text lang="PT">Configurar Música</text>
-     <text lang="SV">Musikspelarens inställningar</text>
+     <text lang="SV">Musikinställningar</text>
      <text lang="JA">ミュージック設定</text>
      <action>CONFIGPLUGIN mythmusic</action>
      <depends>mythmusic</depends>
@@ -85,7 +85,7 @@
       <text lang="DK">Billed indstillinger</text>
       <text lang="NL">Beelden Instellingen</text>
       <text lang="PT">Configurar Fotos</text>
-      <text lang="SV">Bildvisarens inställningar</text>
+      <text lang="SV">Galleriinställningar</text>
       <text lang="JA">イメージ設定</text>
       <action>CONFIGPLUGIN mythgallery</action>
       <depends>mythgallery</depends>
@@ -100,7 +100,7 @@
        <text lang="DK">Video indstillinger</text>
        <text lang="NL">Films Instellingen</text>
        <text lang="PT">Configurar Filmes</text>
-       <text lang="SV">Filmvisarens inställningar</text>
+       <text lang="SV">Videoinställningar</text>
        <text lang="JA">ビデオ設定</text>
        <action>CONFIGPLUGIN mythvideo</action>
        <depends>mythvideo</depends>
@@ -115,7 +115,7 @@
      <text lang="DK">Vejr indstililnger</text>
      <text lang="NL">"Het Weer" Instellingen</text>
      <text lang="PT">Configurar Meteorologia</text>
-     <text lang="SV">Vädervisarens inställningar</text>
+     <text lang="SV">Väderinställningar</text>
      <text lang="JA">天気設定</text>
      <action>CONFIGPLUGIN mythweather</action>
      <depends>mythweather</depends>
@@ -126,10 +126,10 @@
      <text>DVD Settings</text>
      <text lang="DE">DVD Einstellungen</text>
      <text lang="PT">Configurar DVD</text>
-     <text lang="SV">Inställningar för DVD</text>
      <text lang="ES">Configurar DVD</text>
      <text lang="CA">Configurar DVD</text>
      <text lang="NL">DVD Instellingen</text>
+     <text lang="SV">DVD-inställningar</text>
      <text lang="JA">DVD設定</text>
      <action>CONFIGPLUGIN mythdvd</action>
      <depends>mythdvd</depends>
@@ -142,6 +142,7 @@
      <text lang="CA">Configurar Notícies</text>
      <text lang="ES">Configurar Noticias</text>
      <text lang="NL">Nieuws Instellingen</text>
+     <text lang="SV">Nyhetsinställningar</text>
      <text lang="JA">ニュース設定</text>
      <action>CONFIGPLUGIN mythnews</action>
      <depends>mythnews</depends>
@@ -151,6 +152,7 @@
      <type>WEBPAGE</type>
      <text>Web Settings</text>
      <text lang="DE">WWW Einstellungen</text>
+     <text lang="SV">Webb-inställningar</text>
      <text lang="JA">Web設定</text>
      <action>CONFIGPLUGIN mythbookmarkmanager</action>
      <depends>mythbookmarkmanager</depends>
@@ -164,6 +166,7 @@
      <text lang="ES">Configurar XBox</text>
      <text lang="DE">Xbox Einstellungen</text>
      <text lang="NL">Xbox Instellingen</text>
+     <text lang="SV">Xbox-inställningar</text>
      <text lang="JA">XBox設定</text>
      <action>SETTINGS XBOXSETTINGS</action>
      <dependssetting>EnableXbox</dependssetting>

@@ -42,7 +42,7 @@
       <text lang="DE">Wiedergabe</text>
       <text lang="DK">Afspilning</text>
       <text lang="PT">Configurações de Leitura</text>
-      <text lang="SV">Avspelning</text>
+      <text lang="SV">Uppspelning</text>
       <text lang="JA">再生</text>
       <action>SETTINGS PLAYBACK</action>
    </button>
@@ -58,8 +58,9 @@
       <text lang="DE">Aufnahme- profile</text>
       <text lang="DK">Optagelse</text>
       <text lang="PT">Configurações de Gravação</text>
-      <text lang="SV">Inspelning</text>
+      <text lang="SV">Inspelningsprofiler</text>
       <text lang="JA">録画プロフィール</text>
+      <alttext lang="SV">Inspelning</alttext>
       <action>SETTINGS RECORDING</action>
    </button>
 
@@ -67,6 +68,7 @@
       <type>TV_RECPRIORITIES</type>
       <text>Recording Priorities</text>
       <text lang="DE">Aufnahme- prioritäten</text>
+      <text lang="SV">Inspelningsprioriteter</text>
       <text lang="JA">録画優先順位</text>
       <action>MENU recpriorities_settings.xml</action>
    </button>
