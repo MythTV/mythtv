@@ -638,7 +638,7 @@ bool Channel::ChangeExternalChannel(const QString &channum)
     {
         for(int i = 3; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
             close(i);
-        execl("/bin/sh", "sh", "-c", command.ascii());
+        execl("/bin/sh", "sh", "-c", command.ascii(), NULL);
         perror("exec");
         exit(1);
     }
