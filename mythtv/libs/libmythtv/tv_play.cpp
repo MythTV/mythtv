@@ -51,6 +51,79 @@ const int SSPEED_MAX = sizeof seek_speed_array / sizeof seek_speed_array[0];
 
 const int kMuteTimeout = 800;
 
+void TV::InitKeys(void)
+{
+    REG_KEY("TV Frontend", "PAGEUP", "Page Up", "3");
+    REG_KEY("TV Frontend", "PAGEDOWN", "Page Down", "9");
+    REG_KEY("TV Frontend", "DELETE", "Delete Program", "D");
+    REG_KEY("TV Frontend", "PLAYBACK", "Play Program", "P");
+
+    REG_KEY("TV Playback", "PAUSE", "Pause", "P");
+    REG_KEY("TV Playback", "SEEKFFWD", "Fast Forward", "Right");
+    REG_KEY("TV Playback", "SEEKRWND", "Rewind", "Left");
+    REG_KEY("TV Playback", "CHANNELUP", "Channel up", "Up");
+    REG_KEY("TV Playback", "CHANNELDOWN", "Channel down", "Down");
+    REG_KEY("TV Playback", "NEXTFAV", "Switch to the next favorite channel",
+            "/");
+    REG_KEY("TV Playback", "PREVCHAN", "Switch to the previous channel", "H");
+    REG_KEY("TV Playback", "JUMPFFWD", "Jump ahead", "PgDown");
+    REG_KEY("TV Playback", "JUMPRWND", "Jump back", "PgUp");
+    REG_KEY("TV Playback", "FFWDSTICKY", "Fast Forward (Sticky) or Forward one "
+            "frame while paused", ">,.");
+    REG_KEY("TV Playback", "RWNDSTICKY", "Rewind (Sticky) or Rewind one frame "
+            "while paused", ",,<");
+    REG_KEY("TV Playback", "TOGGLEINPUTS", "Toggle Inputs", "C");
+    REG_KEY("TV Playback", "SKIPCOMMERCIAL", "Skip Commercial", "Z,End");
+    REG_KEY("TV Playback", "SKIPCOMMBACK", "Skip Commercial (Reverse)",
+            "Q,Home");
+    REG_KEY("TV Playback", "TOGGLEBROWSE", "Toggle channel browse mode", "O");
+    REG_KEY("TV Playback", "TOGGLERECORD", "Toggle recording status of current "
+            "program", "R");
+    REG_KEY("TV Playback", "TOGGLEFAV", "Toggle the current channel as a "
+            "favorite", "?");
+    REG_KEY("TV Playback", "VOLUMEDOWN", "Volume down", "[,{,F10");
+    REG_KEY("TV Playback", "VOLUMEUP", "Volume up", "],},F11");
+    REG_KEY("TV Playback", "MUTE", "Mute", "|,\\,F9");
+    REG_KEY("TV Playback", "TOGGLEPIPMODE", "Toggle Picture-in-Picture mode",
+            "V");
+    REG_KEY("TV Playback", "TOGGLEPIPWINDOW", "Toggle active PiP window", "B");
+    REG_KEY("TV Playback", "SWAPPIP", "Swap the PiP window channels", "N");
+    REG_KEY("TV Playback", "TOGGLEASPECT", "Toggle the display aspect ratio",
+            "W");
+    REG_KEY("TV Playback", "TOGGLECC", "Toggle Closed Captioning/Teletext",
+            "T");
+    REG_KEY("TV Playback", "QUEUETRANSCODE", "Queue the current recording for "
+            "transcoding", "X");
+    REG_KEY("TV Playback", "SPEEDINC", "Increase the playback speed", "U");
+    REG_KEY("TV Playback", "SPEEDDEC", "Decrease the playback speed", "J");
+    REG_KEY("TV Playback", "TOGGLEPICCONTROLS", "Turn on the playback picture "
+            "adjustment controls", "F");
+    REG_KEY("TV Playback", "CONTRASTDOWN", "Decrease the recording contrast",
+            "F1");
+    REG_KEY("TV Playback", "CONTRASTUP", "Increase the recording contrast",
+            "F2");
+    REG_KEY("TV Playback", "BRIGHTDOWN", "Decrease the recording brightness",
+            "F3");
+    REG_KEY("TV Playback", "BRIGHTUP", "Increase the recording brightness",
+            "F4");
+    REG_KEY("TV Playback", "COLORDOWN", "Decrease the recording color", "F5");
+    REG_KEY("TV Playback", "COLORUP", "Increase the recording color", "F6");
+    REG_KEY("TV Playback", "HUEDOWN", "Decrease the recording hue", "F7");
+    REG_KEY("TV Playback", "HUEUP", "Increase the recording hue", "F8");
+    REG_KEY("TV Playback", "TOGGLEEDIT", "Start Edit Mode", "E");
+
+    REG_KEY("TV Editing", "CLEARMAP", "Clear editing cut points", "C,Q,Home");
+    REG_KEY("TV Editing", "LOADCOMMSKIP", "Load cut list from commercial skips",
+            "Z,End");
+    REG_KEY("TV Editing", "NEXTCUT", "Jump to the next cut point", "PgDown");
+    REG_KEY("TV Editing", "PREVCUT", "Jump to the previous cut point", "PgUp");
+    REG_KEY("TV Editing", "BIGJUMPREW", "Jump back 10x the normal amount",
+            ",,<");
+    REG_KEY("TV Editing", "BIGJUMPFWD", "Jump forward 10x the normal amount",
+            ">,.");
+    REG_KEY("TV Editing", "TOGGLEEDIT", "Exit out of Edit Mode", "E");
+}
+
 void *SpawnDecode(void *param)
 {
     NuppelVideoPlayer *nvp = (NuppelVideoPlayer *)param;
@@ -712,7 +785,7 @@ void *TV::EventThread(void *param)
 void TV::RunTV(void)
 { 
     paused = false;
-    int keypressed;
+    QKeyEvent *keypressed;
 
     stickykeys = gContext->GetNumSetting("StickyKeys");
     ff_rew_repos = gContext->GetNumSetting("FFRewRepos", 1);
@@ -759,14 +832,15 @@ void TV::RunTV(void)
 
         if (nvp)
         {
-            if (keyList.size() > 0)
+            if (keyList.count() > 0)
             { 
                 keyListLock.lock();
-                keypressed = keyList.front();
-                keyList.pop_front();
+                keypressed = keyList.first();
+                keyList.removeFirst();
                 keyListLock.unlock();
 
                 ProcessKeypress(keypressed);
+                delete keypressed;
             }
             else
                 RepeatFFRew();
@@ -836,11 +910,11 @@ bool TV::eventFilter(QObject *o, QEvent *e)
     {
         case QEvent::KeyPress:
         {
-            QKeyEvent *k = (QKeyEvent *)e;
+            QKeyEvent *k = new QKeyEvent(*(QKeyEvent *)e);
   
             // can't process these events in the Qt event loop. 
             keyListLock.lock();
-            keyList.push_back(k->key());
+            keyList.append(k);
             keyListLock.unlock();
 
             return true;
@@ -861,48 +935,65 @@ bool TV::eventFilter(QObject *o, QEvent *e)
     }
 }
 
-void TV::ProcessKeypress(int keypressed)
+void TV::ProcessKeypress(QKeyEvent *e)
 {
     bool was_doing_ff_rew = false;
 
     if (editmode)
     {   
-        nvp->DoKeypress(keypressed);
-        if (keypressed == Key_Escape || 
-            keypressed == Key_E || keypressed == Key_M)
+        if (!nvp->DoKeypress(e))
             editmode = nvp->GetEditMode();
         if (!editmode)
             nvp->SetPlaySpeed(1.0, true);
         return;
     }
 
+    QStringList actions;
+    QString action;
+    if (!gContext->GetMainWindow()->TranslateKeyPress("TV Playback", e, 
+                                                      actions))
+        return;
+
     if (browsemode)
     {
         int passThru = 0;
-        switch (keypressed)
+
+        for (unsigned int i = 0; i < actions.size(); i++)
         {
-            case Key_Up: BrowseDispInfo(BROWSE_UP); break;
-            case Key_Down: BrowseDispInfo(BROWSE_DOWN); break;
-            case Key_Left: BrowseDispInfo(BROWSE_LEFT); break;
-            case Key_Right: BrowseDispInfo(BROWSE_RIGHT); break;
-            case Key_Slash: BrowseDispInfo(BROWSE_FAVORITE); break;
+            action = actions[i];
 
-            case Key_0: case Key_1: case Key_2: case Key_3: case Key_4:
-            case Key_5: case Key_6: case Key_7: case Key_8: case Key_9:
-                    ChannelKey(keypressed); break;
-
-            case Key_O: case Key_Escape: 
-                    ChannelCommit(); BrowseEnd(false); break;
-
-            case Key_Space: case Key_Enter: case Key_Return: 
-                    ChannelCommit(); BrowseEnd(true); break;
-
-            case Key_R: BrowseToggleRecord(); break;
-
-            case Key_BracketLeft: case Key_BracketRight:
-            case Key_Bar: passThru = 1; break;
-
-            case Key_W: passThru = 1; break;
+            if (action == "UP")
+                BrowseDispInfo(BROWSE_UP);
+            else if (action == "DOWN")
+                BrowseDispInfo(BROWSE_DOWN);
+            else if (action == "LEFT")
+                BrowseDispInfo(BROWSE_LEFT);
+            else if (action == "RIGHT")
+                BrowseDispInfo(BROWSE_RIGHT);
+            else if (action == "NEXTFAV")
+                BrowseDispInfo(BROWSE_FAVORITE);
+            else if (action == "0" || action == "1" || action == "2" ||
+                     action == "3" || action == "4" || action == "5" ||
+                     action == "6" || action == "7" || action == "8" ||
+                     action == "9")
+            {
+                ChannelKey(action.toInt());
+            }
+            else if (action == "TOGGLEBROWSE" || action == "ESCAPE")
+            {
+                ChannelCommit(); 
+                BrowseEnd(false);
+            }
+            else if (action == "SELECT")
+            {
+                ChannelCommit(); 
+                BrowseEnd(true);
+            }
+            else if (action == "TOGGLERECORD")
+                BrowseToggleRecord();
+            else if (action == "VOLUMEDOWN" || action == "VOLUMEUP" ||
+                     action == "MUTE" || action == "TOGGLEASPECT")
+                passThru = 1;
         }
 
         if (!passThru)
@@ -911,14 +1002,18 @@ void TV::ProcessKeypress(int keypressed)
 
     if (nvp->GetOSD() && osd->DialogShowing(dialogname))
     {
-        switch (keypressed)
+        for (unsigned int i = 0; i < actions.size(); i++)
         {
-            case Key_Up: osd->DialogUp(dialogname); break;
-            case Key_Down: osd->DialogDown(dialogname); break;
-            case Key_Escape: osd->DialogAbort(dialogname);
-                // fall through
-            case Key_Space: case Key_Enter: case Key_Return: 
+            action = actions[i];
+
+            if (action == "UP")
+                osd->DialogUp(dialogname); 
+            else if (action == "DOWN")
+                osd->DialogDown(dialogname);
+            else if (action == "SELECT" || action == "ESCAPE")
             {
+                if (action == "ESCAPE")
+                    osd->DialogAbort(dialogname);
                 osd->TurnDialogOff(dialogname);
                 if (dialogname == "alreadybeingedited")
                 {
@@ -932,7 +1027,7 @@ void TV::ProcessKeypress(int keypressed)
                            nvp->SetPlaySpeed(1.0, false);
                     }
                 }
-                if (dialogname == "exitplayoptions") 
+                else if (dialogname == "exitplayoptions") 
                 {
                     int result = osd->GetDialogResponse(dialogname);
                     dialogname = "";
@@ -958,7 +1053,7 @@ void TV::ProcessKeypress(int keypressed)
                             break;
                     }
                 }
-                if (dialogname == "programmenubox") 
+                else if (dialogname == "programmenubox") 
                 {
                     int result = osd->GetDialogResponse(dialogname);
 
@@ -967,62 +1062,66 @@ void TV::ProcessKeypress(int keypressed)
 
                     ProgramMenuAction(result);
                 }
-                break;
             }
-            default: break;
         }
-        
         return;
     }
 
-    switch (keypressed) 
+    bool handled = false;
+    for (unsigned int i = 0; i < actions.size(); i++)
     {
-        case Key_T:
+        action = actions[i];
+
+        if (action == "TOGGLECC")
         {
             nvp->ToggleCC();
-            break;
+            handled = true;
         }
-        case Key_Z: case Key_End:
+        else if (action == "SKIPCOMMERCIAL")
         {
             DoSkipCommercials(1);
-            break;
+            handled = true;
         }
-        case Key_X:
-        {
-            DoQueueTranscode();
-            break;
-        }
-        case Key_Q: case Key_Home:
+        else if (action == "SKIPCOMMBACK")
         {
             DoSkipCommercials(-1);
-            break;
+            handled = true;
         }
-        case Key_S: case Key_P: 
+        else if (action == "QUEUETRANSCODE")
+        {
+            DoQueueTranscode();
+            handled = true;
+        }
+        else if (action == "PAUSE") 
         {
             DoPause();
-            break;
+            handled = true;
         }
-        case Key_U:
+        else if (action == "SPEEDINC")
         {
             ChangeSpeed(1);
-            break;
+            handled = true;
         }
-        case Key_J:
+        else if (action == "SPEEDDEC")
         {
             ChangeSpeed(-1);
-            break;
+            handled = true;
         }
-        case Key_F:
+        else if (action == "TOGGLEPICCONTROLS")
         {
             if (usePicControls)
                 DoTogglePictureAttribute();
-            break;
+            handled = true;
         }
-        case Key_Right: case Key_D: 
+        else if (action == "RIGHT")
         {
             if (picAdjustment)
                 DoChangePictureAttribute(true);
-            else if (paused)
+            handled = true;
+        }
+        else if (action == "SEEKFFWD")
+        {
+            if (paused)
                 DoSeek(1.001 / frameRate, tr("Forward"));
             else if (!stickykeys)
             {
@@ -1033,21 +1132,25 @@ void TV::ProcessKeypress(int keypressed)
             }
             else
                 ChangeFFRew(1);
-            break;
+            handled = true;
         }
-        case Key_Greater: case Key_Period:
+        else if (action == "FFWDSTICKY")
         {
             if (paused)
                 DoSeek(1.0, tr("Forward"));
             else
                 ChangeFFRew(1);
-            break;
+            handled = true;
         }
-        case Key_Left: case Key_A:
+        else if (action == "LEFT")
         {
             if (picAdjustment)
                 DoChangePictureAttribute(false);
-            else if (paused)
+            handled = true;
+        }
+        else if (action == "SEEKRWND")
+        {
+            if (paused)
                 DoSeek(-1.001 / frameRate, tr("Rewind"));
             else if (!stickykeys)
             {
@@ -1057,27 +1160,27 @@ void TV::ProcessKeypress(int keypressed)
             }
             else
                 ChangeFFRew(-1);
-            break;
+            handled = true;
         }
-        case Key_Less: case Key_Comma:
+        else if (action == "RWNDSTICKY")
         {
             if (paused)
                 DoSeek(-1.0, tr("Rewind"));
             else
                 ChangeFFRew(-1);
-            break;
+            handled = true;
         }
-        case Key_PageUp:
+        else if (action == "JUMPRWND")
         {
             DoSeek(-jumptime * 60, tr("Jump Back"));
-            break;
+            handled = true;
         }
-        case Key_PageDown:
+        else if (action == "JUMPFFWD")
         {
             DoSeek(jumptime * 60, tr("Jump Ahead"));
-            break;
+            handled = true;
         }
-        case Key_Escape:
+        else if (action == "ESCAPE")
         {
             StopFFRew();
 
@@ -1114,96 +1217,142 @@ void TV::ProcessKeypress(int keypressed)
                     nvp->SetBookmark();
                 exitPlayer = true;
                 wantsToQuit = true;
-                break;
             }
+            handled = true;
             break;
         }
-        case Key_BracketLeft: case Key_F10: ChangeVolume(false); break;
-        case Key_BracketRight: case Key_F11: ChangeVolume(true); break;
-        case Key_Bar: case Key_F9: ToggleMute(); break;
-        case Key_W: ToggleLetterbox(); break;
-
-        default: 
+        else if (action == "VOLUMEDOWN")
         {
-            if (doing_ff_rew)
+            ChangeVolume(false);
+            handled = true;
+        }
+        else if (action == "VOLUMEUP")
+        {
+            ChangeVolume(true);
+            handled = true;
+        }
+        else if (action == "MUTE")
+        {
+            ToggleMute();
+            handled = true;
+        }
+        else if (action == "TOGGLEASPECT")
+        {
+            ToggleLetterbox();
+            handled = true;
+        }
+    }
+
+    if (!handled)
+    {
+        if (doing_ff_rew)
+        {
+            handled = false;
+            for (unsigned int i = 0; i < actions.size(); i++)
             {
-                if (keypressed >= Key_0 && keypressed < Key_0 + SSPEED_MAX)
-                    ff_rew_index = keypressed - Key_0;
-                else
+                action = actions[0];
+                bool ok = false;
+                int val = action.toInt(&ok);
+
+                if (ok && val < SSPEED_MAX)
                 {
-                    float time = StopFFRew();
-                    UpdatePosOSD(time, tr("Play"));
-                    was_doing_ff_rew = true;
+                    ff_rew_index = val;
+                    handled = true;
                 }
             }
-            if (speed_index)
+
+            if (!handled)
             {
-                NormalSpeed();
-                UpdatePosOSD(0.0, tr("Play"));
+                float time = StopFFRew();
+                UpdatePosOSD(time, tr("Play"));
                 was_doing_ff_rew = true;
             }
-            break;
+        }
+
+        if (speed_index)
+        {
+            NormalSpeed();
+            UpdatePosOSD(0.0, tr("Play"));
+            was_doing_ff_rew = true;
         }
     }
 
     if (internalState == kState_WatchingLiveTV)
     {
-        switch (keypressed)
+        for (unsigned int i = 0; i < actions.size(); i++)
         {
-            case Key_I: ToggleOSD(); break;
+            action = actions[i];
 
-            case Key_Up:
-                     if (persistentbrowsemode)
-                         BrowseDispInfo(BROWSE_UP);
-                     else
-                         ChangeChannel(CHANNEL_DIRECTION_UP);
-                     break;
-            case Key_Down:
-                     if (persistentbrowsemode)
-                         BrowseDispInfo(BROWSE_DOWN);
-                     else
-                         ChangeChannel(CHANNEL_DIRECTION_DOWN);
-                     break;
-            case Key_Slash: ChangeChannel(CHANNEL_DIRECTION_FAVORITE); break;
-
-            case Key_Question: ToggleChannelFavorite(); break;
-
-            case Key_C: ToggleInputs(); break;
-
-            case Key_0: case Key_1: case Key_2: case Key_3: case Key_4:
-            case Key_5: case Key_6: case Key_7: case Key_8: case Key_9:
-                     ChannelKey(keypressed); break;
-
-            case Key_Space: case Key_Enter: case Key_Return: 
-                     ChannelCommit(); break;
-
-            case Key_M: LoadMenu(); break;
-
-            case Key_V: TogglePIPView(); break;
-            case Key_B: ToggleActiveWindow(); break;
-            case Key_N: SwapPIP(); break;
-
-            case Key_F1: ChangeContrast(false, true); break;
-            case Key_F2: ChangeContrast(true, true); break;
-            case Key_F3: ChangeBrightness(false, true); break;
-            case Key_F4: ChangeBrightness(true, true); break;
-            case Key_F5: ChangeColour(false, true); break;
-            case Key_F6: ChangeColour(true, true); break;
-            case Key_F7: ChangeHue(false, true); break;
-            case Key_F8: ChangeHue(true, true); break;
-
-            case Key_O: BrowseStart(); break;
-            case Key_H: PreviousChannel(); break;
-
-            default: break;
+            if (action == "INFO")
+                ToggleOSD();
+            else if (action == "CHANNELUP")
+            {
+                if (persistentbrowsemode)
+                    BrowseDispInfo(BROWSE_UP);
+                else
+                    ChangeChannel(CHANNEL_DIRECTION_UP);
+            }
+            else if (action == "CHANNELDOWN")
+            {
+                if (persistentbrowsemode)
+                    BrowseDispInfo(BROWSE_DOWN);
+                else
+                    ChangeChannel(CHANNEL_DIRECTION_DOWN);
+            }
+            else if (action == "NEXTFAV")
+                ChangeChannel(CHANNEL_DIRECTION_FAVORITE);
+            else if (action == "TOGGLEFAV")
+                ToggleChannelFavorite();
+            else if (action == "TOGGLEINPUTS")
+                ToggleInputs();
+            else if (action == "0" || action == "1" || action == "2" ||
+                     action == "3" || action == "4" || action == "5" ||
+                     action == "6" || action == "7" || action == "8" ||
+                     action == "9")
+            {
+                ChannelKey(action.toInt());
+            }
+            else if (action == "SELECT")
+                ChannelCommit();
+            else if (action == "MENU")
+                LoadMenu();
+            else if (action == "TOGGLEPIPMODE")
+                TogglePIPView();
+            else if (action == "TOGGLEPIPWINDOW")
+                ToggleActiveWindow();
+            else if (action == "SWAPPIP")
+                SwapPIP();
+            else if (action == "CONTRASTDOWN")
+                ChangeContrast(false, true);
+            else if (action == "CONTRASTUP")
+                ChangeContrast(true, true);
+            else if (action == "BRIGHTDOWN")
+                ChangeBrightness(false, true);
+            else if (action == "BRIGHTUP")
+                ChangeBrightness(true, true);
+            else if (action == "COLORDOWN")
+                ChangeColour(false, true);
+            else if (action == "COLORUP")
+                ChangeColour(true, true);
+            else if (action == "HUEDOWN")
+                ChangeHue(false, true);
+            else if (action == "HUEUP")
+                ChangeHue(true, true);
+            else if (action == "TOGGLEBROWSE")
+                BrowseStart();
+            else if (action == "PREVCHAN")
+                PreviousChannel();
         }
     }
     else if (StateIsPlaying(internalState))
     {
-        switch (keypressed)
+        for (unsigned int i = 0; i < actions.size(); i++)
         {
-            case Key_I: DoInfo(); break;
-            case Key_Space: case Key_Enter: case Key_Return: 
+            action = actions[i];
+
+            if (action == "INFO")
+                DoInfo();
+            else if (action == "SELECT")
             {
                 if (!was_doing_ff_rew)
                 {
@@ -1213,9 +1362,8 @@ void TV::ProcessKeypress(int keypressed)
                     else
                         nvp->SetBookmark(); 
                 }
-                break;
             }
-            case Key_E: case Key_M: 
+            else if (action == "MENU" || action == "TOGGLEEDIT")
             {
                 if (playbackinfo->IsEditing(m_db))
                 {
@@ -1223,37 +1371,26 @@ void TV::ProcessKeypress(int keypressed)
 
                     dialogname = "alreadybeingedited";
 
-                    QString message = tr("This program is currently being edited");
+                    QString message = tr("This program is currently being "
+                                         "edited");
 
                     QStringList options;
                     options += tr("Continue Editing");
                     options += tr("Do not edit");
 
                     osd->NewDialogBox(dialogname, message, options, 0); 
-                    break;
+                    return;
                 }
-
                 editmode = nvp->EnableEdit();
                 if (editmode)
                     nvp->SetPlaySpeed(1.0, false);
-                break;        
             }
-            case Key_O:
-            {
+            else if (action == "TOGGLEBROWSE")
                 DoProgramMenu();
-                break;
-            }
-            case Key_Up:
-            {
+            else if (action == "CHANNELUP")
                 DoSeek(-jumptime * 60, tr("Jump Back"));
-                break;
-            }
-            case Key_Down:
-            {
+            else if (action == "CHANNELDOWN")
                 DoSeek(jumptime * 60, tr("Jump Ahead"));
-                break;
-            }
-            default: break;
         }
     }
 }
@@ -1727,10 +1864,7 @@ void TV::ChannelClear(void)
 
 void TV::ChannelKey(int key)
 {
-    char thekey = key;
-
-    if (key > 256)
-        thekey = key - 256 - 0xb0 + '0';
+    char thekey = key + '0';
 
     if (channelkeysstored == 4)
     {

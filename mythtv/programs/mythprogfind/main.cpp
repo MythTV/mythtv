@@ -6,6 +6,7 @@
 #include "libmyth/settings.h"
 
 #include "libmythtv/progfind.h"
+#include "libmythtv/tv.h"
 
 MythContext *gContext;
 
@@ -28,6 +29,8 @@ int main(int argc, char **argv)
     mainWindow->Show();
     gContext->SetMainWindow(mainWindow);
     
+    TV::InitKeys();
+
     RunProgramFind();
 
     delete gContext;

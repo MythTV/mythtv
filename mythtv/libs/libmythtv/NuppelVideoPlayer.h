@@ -129,8 +129,7 @@ class NuppelVideoPlayer
 
     // edit mode stuff
     bool EnableEdit(void);
-    void DoKeypress(int keypress);
-
+    bool DoKeypress(QKeyEvent *e);
     bool GetEditMode(void) { return editmode; }
 
     void EmbedInWidget(unsigned long wid, int x, int y, int w, int h);

@@ -1962,38 +1962,42 @@ void NuppelVideoPlayer::DisableEdit(void)
     Unpause();
 }
 
-void NuppelVideoPlayer::DoKeypress(int keypress)
+bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
 {
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("TV Editing", e, actions);
+
     if (dialogname != "")
     {
-        switch(keypress)
+        for (unsigned int i = 0; i < actions.size(); i++)
         {
-            case Qt::Key_Up: osd->DialogUp(dialogname); break;
-            case Qt::Key_Down: osd->DialogDown(dialogname); break;
-            case Qt::Key_Escape: osd->DialogAbort(dialogname);
-                // fall through
-            case Qt::Key_Space: case Qt::Key_Enter: case Qt::Key_Return: 
+            QString action = actions[i];
+            if (action == "UP")
+                osd->DialogUp(dialogname);
+            else if (action == "DOWN")
+                osd->DialogDown(dialogname);
+            else if (action == "SELECT" || action == "ESCAPE")
             {
-                osd->TurnDialogOff(dialogname); 
+                if (action == "ESCAPE")
+                    osd->DialogAbort(dialogname);
+                osd->TurnDialogOff(dialogname);
                 HandleResponse();
-                break;
             }
-            default: break;
         }
-        return;
+
+        return true;
     }
 
+    bool retval = true;
     bool exactstore = exactseeks;
     decoder->setExactSeeks(true);
 
-    switch (keypress)
+    for (unsigned int i = 0; i < actions.size(); i++)
     {
-        case Qt::Key_Space: case Qt::Key_Enter: case Qt::Key_Return:
-        {
+        QString action = actions[i];
+        if (action == "SELECT")
             HandleSelect();
-            break;
-        }
-        case Qt::Key_Left: case Qt::Key_A: 
+        else if (action == "LEFT")
         {
             if (seekamount > 0)
             {
@@ -2005,9 +2009,8 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
             else
                 HandleArbSeek(false);
             UpdateTimeDisplay();
-            break;           
         }
-        case Qt::Key_Right: case Qt::Key_D:
+        else if (action == "RIGHT")
         {
             if (seekamount > 0)
             {
@@ -2019,22 +2022,19 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
             else
                 HandleArbSeek(true);
             UpdateTimeDisplay();
-            break;
         }
-        case Qt::Key_Up: case Qt::Key_W:
+        else if (action == "UP")
         {
             UpdateSeekAmount(true);
             UpdateTimeDisplay();
-            break;
         }
-        case Qt::Key_Down: case Qt::Key_S:
+        else if (action == "DOWN")
         {
             UpdateSeekAmount(false);
             UpdateTimeDisplay();
             break; 
         }
-        case Qt::Key_C:
-        case Qt::Key_Q:
+        else if (action == "CLEARMAP")
         {
             QMap<long long, int>::Iterator it;
             for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
@@ -2042,9 +2042,8 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
 
             deleteMap.clear();
             UpdateEditSlider();
-            break;
         }
-        case Qt::Key_Z:
+        else if (action == "LOADCOMMSKIP")
         {
             if (hascommbreaktable)
             {
@@ -2061,18 +2060,16 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
                 }
                 UpdateEditSlider();
             }
-            break;
         }
-        case Qt::Key_PageUp:
+        else if (action == "PREVCUT")
         {
             int old_seekamount = seekamount;
             seekamount = -2;
             HandleArbSeek(false);
             seekamount = old_seekamount;
             UpdateTimeDisplay();
-            break;
         }
-        case Qt::Key_PageDown:
+        else if (action == "NEXTCUT")
         {
             int old_seekamount = seekamount;
             seekamount = -2;
@@ -2082,7 +2079,7 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
             break;
         }
 #define FFREW_MULTICOUNT 10
-        case Qt::Key_Less: case Qt::Key_Comma:
+        else if (action == "BIGJUMPREW")
         {
              if (seekamount > 0)
                  rewindtime = seekamount * FFREW_MULTICOUNT;
@@ -2095,9 +2092,8 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
                 usleep(50);
             UpdateEditSlider();
             UpdateTimeDisplay();
-            break;
         }
-        case Qt::Key_Greater: case Qt::Key_Period:
+        else if (action == "BIGJUMPFWD")
         {
              if (seekamount > 0)
                  fftime = seekamount * FFREW_MULTICOUNT;
@@ -2110,17 +2106,18 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
                 usleep(50);
             UpdateEditSlider();
             UpdateTimeDisplay();
-            break;
         }
-        case Qt::Key_Escape: case Qt::Key_E: case Qt::Key_M:
+        else if (action == "ESCAPE" || action == "MENU" || 
+                 action == "TOGGLEEDIT")
         {
             DisableEdit();
+            retval = false;
             break;
         }
-        default: break;
     }
 
     decoder->setExactSeeks(exactstore);
+    return retval;
 }
 
 int NuppelVideoPlayer::GetLetterbox(void)

@@ -173,7 +173,7 @@ bool ManualBox::eventFilter(QObject *, QEvent *e)
         {
             QKeyEvent* k = (QKeyEvent*)e;
             qApp->unlock();
-            m_tv->ProcessKeypress(k->key());
+            m_tv->ProcessKeypress(k);
             qApp->lock();
         }
     }

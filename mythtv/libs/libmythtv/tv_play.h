@@ -6,7 +6,7 @@
 #include <qdatetime.h>
 #include <pthread.h>
 #include <qvaluevector.h>
-#include <qvaluelist.h>
+#include <qptrlist.h>
 #include <qmutex.h>
 
 #include "tv.h"
@@ -30,6 +30,8 @@ class TV : public QObject
   public:
     TV(QSqlDatabase *db);
    ~TV(void);
+
+    static void InitKeys(void);
 
     void Init(bool createWindow = true);
 
@@ -75,7 +77,7 @@ class TV : public QObject
     bool getRequestDelete(void) { return requestDelete; }
     bool getEndOfRecording(void) { return endOfRecording; }
 
-    void ProcessKeypress(int keypressed);
+    void ProcessKeypress(QKeyEvent *e);
     void customEvent(QCustomEvent *e);
 
     void AddPreviousChannel(void);
@@ -253,7 +255,7 @@ class TV : public QObject
 
     MythDialog *myWindow;
 
-    QValueList<int> keyList;
+    QPtrList<QKeyEvent> keyList;
     QMutex keyListLock;
 
     bool wantsToQuit;

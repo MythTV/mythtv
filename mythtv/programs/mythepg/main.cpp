@@ -6,6 +6,7 @@
 #include "libmyth/settings.h"
 
 #include "libmythtv/guidegrid.h"
+#include "libmythtv/tv.h"
 
 MythContext *gContext;
 
@@ -36,6 +37,8 @@ int main(int argc, char **argv)
     MythMainWindow *mainWindow = new MythMainWindow();
     mainWindow->Show();
     gContext->SetMainWindow(mainWindow);
+
+    TV::InitKeys();
     
     QString chanstr = RunProgramGuide(startchannel);
 

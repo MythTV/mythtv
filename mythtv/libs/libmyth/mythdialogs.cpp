@@ -279,9 +279,9 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
     if (!d->keyContexts[context])
         d->keyContexts.insert(context, new KeyContext());
 
-    if (!keyseq.isEmpty())
+    for (unsigned int i = 0; i < keyseq.count(); i++)
     {
-        int keynum = keyseq[0];
+        int keynum = keyseq[i];
         keynum &= ~Qt::UNICODE_ACCEL;
 
         QString dummyaction = "";
@@ -293,11 +293,12 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
         else
         {
             d->keyContexts[context]->AddMapping(keynum, action);
-            VERBOSE(VB_GENERAL, QString("Binding: %1 to action: %2 (%3)")
-                                       .arg(key).arg(action).arg(context));
+            //VERBOSE(VB_GENERAL, QString("Binding: %1 to action: %2 (%3)")
+            //                           .arg(key).arg(action)
+            //                           .arg(context));
         }
 
-        if (action == "ESCAPE" && context == "Global")
+        if (action == "ESCAPE" && context == "Global" && i == 0)
             d->escapekey = keynum;
     }
 }

@@ -485,10 +485,7 @@ void InitJumpPoints(void)
     REG_JUMP("Live TV", "", "", startTV);
     REG_JUMP("Manual Record Scheduling", "", "", startManual);
 
-    REG_KEY("TV Frontend", "PAGEUP", "Page Up", "3");
-    REG_KEY("TV Frontend", "PAGEDOWN", "Page Down", "9");
-    REG_KEY("TV Frontend", "DELETE", "Delete Program", "D");
-    REG_KEY("TV Frontend", "PLAYBACK", "Play Program", "P");
+    TV::InitKeys();
 }
 
 int main(int argc, char **argv)

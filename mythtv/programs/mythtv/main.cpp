@@ -53,6 +53,8 @@ int main(int argc, char *argv[])
     mainWindow->Show();
     gContext->SetMainWindow(mainWindow);
 
+    TV::InitKeys();
+
     TV *tv = new TV(db);
     tv->Init();
 
