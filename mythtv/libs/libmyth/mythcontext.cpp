@@ -70,6 +70,7 @@ class MythContextPrivate
     QString m_installprefix;
 
     bool m_gui;
+    bool m_backend;
     bool m_themeloaded;
     QString m_menuthemepathname;
     QString m_themepathname;
@@ -153,6 +154,7 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
                                 .arg(m_installprefix));
     }
 
+    m_backend = false;
     m_settings = new Settings;
     m_qtThemeSettings = new Settings;
 
@@ -666,6 +668,16 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
 bool MythContext::IsConnectedToMaster(void)
 {
     return d->serverSock;
+}
+
+void MythContext::SetBackend(bool backend)
+{
+    d->m_backend = backend;
+}
+
+bool MythContext::IsBackend(void)
+{
+    return d->m_backend;
 }
 
 QString MythContext::GetMasterHostPrefix(void)

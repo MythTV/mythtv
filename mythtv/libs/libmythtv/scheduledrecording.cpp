@@ -376,11 +376,19 @@ void ScheduledRecording::remove(QSqlDatabase* db) {
 }
 
 void ScheduledRecording::signalChange(int recordid) {
-    QStringList slist;
-    slist << QString("RESCHEDULE_RECORDINGS %1").arg(recordid);
-    if (!gContext->SendReceiveStringList(slist))
-        cerr << "error resceduling id " << recordid << 
-            " in ScheduledRecording::signalChange" << endl;
+    if (gContext->IsBackend())
+    {
+        MythEvent me(QString("RESCHEDULE_RECORDINGS %1").arg(recordid));
+        gContext->dispatch(me);
+    }
+    else
+    {
+        QStringList slist;
+        slist << QString("RESCHEDULE_RECORDINGS %1").arg(recordid);
+        if (!gContext->SendReceiveStringList(slist))
+            cerr << "error resceduling id " << recordid << 
+                " in ScheduledRecording::signalChange" << endl;
+    }
 }
 
 bool ScheduledRecording::hasChanged(QSqlDatabase* db) {

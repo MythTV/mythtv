@@ -148,6 +148,8 @@ class MythContext : public QObject
     bool ConnectToMasterServer(void);
     bool ConnectServer(const QString &hostname, int port);
     bool IsConnectedToMaster(void);
+    void SetBackend(bool backend);
+    bool IsBackend(void);
 
     QString GetInstallPrefix(void);
     QString GetShareDir(void);

@@ -419,6 +419,7 @@ int main(int argc, char **argv)
     }
 
     gContext = new MythContext(MYTH_BINARY_VERSION, false);
+    gContext->SetBackend(true);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)

@@ -465,6 +465,17 @@ void MainServer::customEvent(QCustomEvent *e)
             return;
         }
 
+        if (me->Message().left(21) == "RESCHEDULE_RECORDINGS")
+        {
+            QStringList tokens = QStringList::split(" ", me->Message());
+            int recordid = tokens[1].toInt();
+            if (m_sched)
+            {
+                m_sched->Reschedule(recordid);
+                return;
+            }
+        }
+
         if (me->Message().left(6) == "LOCAL_")
             return;
 
@@ -1752,7 +1763,8 @@ void MainServer::HandleLockTuner(PlaybackSock *pbs)
                         << query.value(1).toString()
                         << query.value(2).toString();
 
-                ScheduledRecording::signalChange(0);
+                if (m_sched)
+                    m_sched->Reschedule(0);
 
                 SendResponse(pbssock, strlist);
                 return;
@@ -1797,7 +1809,8 @@ void MainServer::HandleFreeTuner(int cardid, PlaybackSock *pbs)
                               .arg(cardid).arg(pbs->getHostname());
         VERBOSE(VB_GENERAL, msg);
 
-        ScheduledRecording::signalChange(0);
+        if (m_sched)
+            m_sched->Reschedule(0);
         
         strlist << "OK";
     }
