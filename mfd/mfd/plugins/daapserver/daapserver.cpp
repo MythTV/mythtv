@@ -1057,7 +1057,18 @@ void DaapServer::sendDatabaseItem(HttpRequest *http_request, u32 song_id, DaapRe
             
             if(daap_request->getClientType() == DAAP_CLIENT_MFDDAAPCLIENT)
             {
-                http_request->getResponse()->sendFile(file_path, skip);
+                //
+                //  Only translate wma's
+                //
+                
+                if(file_path.section('.', -1,-1) == "wma")
+                {
+                    http_request->getResponse()->sendFile(file_path, skip, FILE_TRANSFORM_TOWAV);
+                }
+                else
+                {
+                    http_request->getResponse()->sendFile(file_path, skip);
+                }
             }
             else
             {

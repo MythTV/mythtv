@@ -697,7 +697,7 @@ void HttpResponse::streamFile(MFDServiceClientSocket *which_client)
             if(parent)
             {
                 parent->log("httpresponse failed to send block "
-                            "while streaming ogg file (client gone?)", 9);
+                            "while streaming file (client gone?)", 9);
             }
 
             return;
