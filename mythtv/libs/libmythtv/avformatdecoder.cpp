@@ -45,6 +45,12 @@ AvFormatDecoder::~AvFormatDecoder()
 {
     if (ic)
     {
+        for (int i = 0; i < ic->nb_streams; i++) 
+        {
+            AVStream *st = ic->streams[i];
+            avcodec_close(&st->codec);
+        } 
+
         ic->iformat->flags |= AVFMT_NOFILE;
 
         av_free(ic->pb.buffer);

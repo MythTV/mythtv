@@ -514,6 +514,8 @@ void MPV_common_end(MpegEncContext *s)
     av_freep(&s->error_status_table);
     av_freep(&s->mb_index2xy);
 
+    av_freep(&s->parse_context.buffer);
+
     for(i=0; i<MAX_PICTURE_COUNT; i++){
         free_picture(s, &s->picture[i]);
     }
