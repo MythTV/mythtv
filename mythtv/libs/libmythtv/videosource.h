@@ -30,6 +30,13 @@ public:
     };
 };
 
+class UserID: public LineEditSetting, public VSSetting {
+public:
+    UserID(const VideoSource& parent): VSSetting(parent, "userid") {
+        setLabel("Gist.com user id");
+    };
+};
+
 class PostalCode: public LineEditSetting, public TransientStorage {
 public: PostalCode() { setLabel("ZIP/postal code"); };
 };
@@ -111,6 +118,17 @@ protected:
     ProviderSelector* provider;
 };
 
+class Grabber_gist_config: public VerticalConfigurationGroup {
+public:
+    Grabber_gist_config(const VideoSource& _parent): parent(_parent) {
+        setLabel("gist.com listings configuration");
+        addChild(new UserID(parent));
+    };
+
+protected:
+    const VideoSource& parent;
+};
+
 class XMLTV_generic_config: public LabelSetting {
 public:
     XMLTV_generic_config(const VideoSource& _parent, QString _grabber):
@@ -140,6 +158,9 @@ public:
 
         addTarget("tv_grab_na", new XMLTV_na_config(parent));
         grabber->addSelection("North America", "tv_grab_na");
+
+        addTarget("gist", new Grabber_gist_config(parent));
+        grabber->addSelection("North America (gist)", "gist");
 
         addTarget("tv_grab_de", new XMLTV_generic_config(parent, "tv_grab_de"));
         grabber->addSelection("Germany/Austria", "tv_grab_de");

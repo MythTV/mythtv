@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS program
     category VARCHAR(64) NULL,
     airdate YEAR NOT NULL,
     stars FLOAT UNSIGNED NOT NULL,
+    previouslyshown TINYINT NOT NULL default '0',
     PRIMARY KEY (chanid, starttime),
     INDEX (endtime),
     INDEX (title)
@@ -139,7 +140,8 @@ CREATE TABLE IF NOT EXISTS videosource
 (
     sourceid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
     name VARCHAR(128),
-    xmltvgrabber VARCHAR(128)
+    xmltvgrabber VARCHAR(128),
+    userid VARCHAR(128) NOT NULL DEFAULT ''
 );
 CREATE TABLE IF NOT EXISTS cardinput
 (
@@ -177,6 +179,23 @@ CREATE TABLE IF NOT EXISTS programrating
     UNIQUE KEY chanid (chanid,starttime,system,rating),
     INDEX (starttime, system)
 );
+CREATE TABLE IF NOT EXISTS people
+(
+    person MEDIUMINT(8) UNSIGNED NOT NULL AUTO_INCREMENT,
+    name CHAR(128) NOT NULL default '',
+    PRIMARY KEY (person),
+    KEY name (name(20))
+) TYPE=MyISAM;
+CREATE TABLE IF NOT EXISTS credits
+(
+    person MEDIUMINT(8) UNSIGNED NOT NULL default '0',
+    chanid INT UNSIGNED NOT NULL default '0',
+    starttime TIMESTAMP NOT NULL,
+    role SET('actor','director','producer','executive_producer','writer','guest_star','host','adapter','presenter','commentator','guest') NOT NULL default '',
+    UNIQUE KEY chanid (chanid, starttime, person, role),
+    KEY person (person, role)
+) TYPE=MyISAM;
+
 
 INSERT INTO recordingprofiles (name) VALUES ('Default');
 INSERT INTO recordingprofiles (name) VALUES ('Live TV');
