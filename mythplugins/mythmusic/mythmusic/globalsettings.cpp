@@ -10,6 +10,7 @@
 #include <qimage.h>
 #include <qstringlist.h>
 #include <qprocess.h>
+#include <qapplication.h>
 
 class GlobalSetting: public SimpleDBStorage, virtual public Configurable {
 public:

@@ -7,6 +7,7 @@ using namespace std;
 
 #include <qfileinfo.h>
 #include <qprocess.h>
+#include <qapplication.h>
 
 Track::Track(int x, AllMusic *all_music_ptr)
 {

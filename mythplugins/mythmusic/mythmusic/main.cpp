@@ -336,7 +336,8 @@ void runMenu(MusicData *mdata, QString which_menu)
 
     if (diag->foundTheme())
     {
-        gContext->GetLCDDevice()->switchToTime();
+        if (class LCD * lcd = LCD::Get())
+            lcd->switchToTime();
         diag->exec();
     }
     else

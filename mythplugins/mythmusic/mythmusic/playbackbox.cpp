@@ -121,13 +121,16 @@ PlaybackBox::PlaybackBox(MythMainWindow *parent, QString window_name,
             vis_button->setText(tr("4 Visualize"));
     }
 
-    // Set please wait on the LCD
-    QPtrList<LCDTextItem> textItems;
-    textItems.setAutoDelete(true);
+    if (class LCD * lcd = LCD::Get())
+    {
+        // Set please wait on the LCD
+        QPtrList<LCDTextItem> textItems;
+        textItems.setAutoDelete(true);
 
-    textItems.append(new LCDTextItem(1, ALIGN_CENTERED, "Please Wait", 
-                     "Generic"));
-    gContext->GetLCDDevice()->switchToGeneric(&textItems);
+        textItems.append(new LCDTextItem(1, ALIGN_CENTERED, "Please Wait", 
+                         "Generic"));
+        lcd->switchToGeneric(&textItems);
+    }
 
     // We set a timer to load the playlists. We do this for two reasons: 
     // (1) the playlists may not be fully loaded, and (2) even if they are 
@@ -481,7 +484,8 @@ void PlaybackBox::showVolume(bool on_or_off)
                 if (!lcd_volume_visible)
                 {
                     lcd_volume_visible = true;
-                    gContext->GetLCDDevice()->switchToVolume("Music");
+                    if (class LCD * lcd = LCD::Get())
+                        lcd->switchToVolume("Music");
                 }
                 if (volume_control->GetMute())
                     volume_level = 0.0;
@@ -489,7 +493,8 @@ void PlaybackBox::showVolume(bool on_or_off)
                     volume_level = (float)volume_control->GetCurrentVolume() / 
                                    (float)100;
 
-                gContext->GetLCDDevice()->setVolumeLevel(volume_level);
+                if (class LCD * lcd = LCD::Get())
+                    lcd->setVolumeLevel(volume_level);
             }
             else
             {
@@ -498,18 +503,20 @@ void PlaybackBox::showVolume(bool on_or_off)
                     volume_status->SetOrder(-1);
                     volume_status->refresh();
 
-                    //Show the artist stuff on the LCD
-                    QPtrList<LCDTextItem> textItems;
-                    textItems.setAutoDelete(true);
+                    if (class LCD * lcd = LCD::Get())
+                    {
+                        //Show the artist stuff on the LCD
+                        QPtrList<LCDTextItem> textItems;
+                        textItems.setAutoDelete(true);
 
-                    textItems.append(new LCDTextItem(1, ALIGN_CENTERED,
-                                     curMeta->Artist() +" [" + 
-                                     curMeta->Album() + "] " +
-                                     curMeta->Title(), "Generic", true));
+                        textItems.append(new LCDTextItem(1, ALIGN_CENTERED,
+                                         curMeta->Artist() +" [" + 
+                                         curMeta->Album() + "] " +
+                                         curMeta->Title(), "Generic", true));
 
-                    gContext->GetLCDDevice()->switchToGeneric(&textItems);
-
-                    lcd_volume_visible = false;
+                        lcd->switchToGeneric(&textItems);
+                        lcd_volume_visible = false;
+                    }
                 }
             }
         }
@@ -793,7 +800,9 @@ void PlaybackBox::stop(void)
 
 void PlaybackBox::stopAll()
 {
-    gContext->GetLCDDevice()->switchToTime();
+    if (class LCD * lcd = LCD::Get())
+        lcd->switchToTime();
+
     stop();
 
     if (decoder) 
@@ -1138,19 +1147,22 @@ void PlaybackBox::customEvent(QCustomEvent *event)
                 time_string.sprintf("%02d:%02d / %02d:%02d", em, es, maxm, 
                                     maxs);
             
-            float percent_heard = ((float)rs / 
-                                   (float)curMeta->Length()) * 1000.0;
-            // Changed to use the Channel stuff as it allows us to
-            // display Artist, Album, and Title, as well as a progress bar
-            gContext->GetLCDDevice()->setGenericProgress(percent_heard);
+            if (class LCD * lcd = LCD::Get())
+            {
+                float percent_heard = ((float)rs / 
+                                       (float)curMeta->Length()) * 1000.0;
+                // Changed to use the Channel stuff as it allows us to
+                // display Artist, Album, and Title, as well as a progress bar
+                lcd->setGenericProgress(percent_heard);
 
-            QPtrList<LCDTextItem> textItems;
-            textItems.setAutoDelete(true);
+                QPtrList<LCDTextItem> textItems;
+                textItems.setAutoDelete(true);
 
-            textItems.append(new LCDTextItem(3, ALIGN_RIGHT,
-                                             time_string, "Generic"));
+                textItems.append(new LCDTextItem(3, ALIGN_RIGHT,
+                                                 time_string, "Generic"));
 
-            gContext->GetLCDDevice()->outputText(&textItems);
+                lcd->outputText(&textItems);
+            }
 
             QString info_string;
 
@@ -1270,15 +1282,18 @@ void PlaybackBox::handleTreeListSignals(int node_int, IntVector *attributes)
         if (album_text)
             album_text->SetText(curMeta->Album());
 
-        // Set the Artist and Tract on the LCD
-        QPtrList<LCDTextItem> textItems;
-        textItems.setAutoDelete(true);
+        if (class LCD * lcd = LCD::Get())
+        {
+            // Set the Artist and Tract on the LCD
+            QPtrList<LCDTextItem> textItems;
+            textItems.setAutoDelete(true);
 
-        textItems.append(new LCDTextItem(1, ALIGN_CENTERED,
-                         curMeta->Artist() + " [" + curMeta->Album() + "] " +
-                         curMeta->Title(), "Generic", true));
+            textItems.append(new LCDTextItem(1, ALIGN_CENTERED,
+                             curMeta->Artist() + " [" + curMeta->Album() + "] " +
+                             curMeta->Title(), "Generic", true));
 
-        gContext->GetLCDDevice()->outputText(&textItems);
+            lcd->outputText(&textItems);
+        }
 
         maxTime = curMeta->Length() / 1000;
 
