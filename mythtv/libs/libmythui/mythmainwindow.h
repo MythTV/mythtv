@@ -4,6 +4,7 @@
 #include <qwidget.h>
 #include <qdialog.h>
 #include <qevent.h>
+#include <qfont.h>
 #include <qgl.h>
 
 #include "mythuitype.h"
@@ -93,6 +94,9 @@ class MythMainWindow : public QGLWidget
 
 MythMainWindow *GetMythMainWindow();
 MythPainter *GetMythPainter();
+
+QFont CreateFont(const QString &face, int pointSize = 12, 
+                 int weight = QFont::Normal, bool italic = FALSE);
 
 #endif
 

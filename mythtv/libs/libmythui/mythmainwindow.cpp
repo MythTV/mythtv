@@ -6,6 +6,7 @@
 #include <qpixmap.h>
 #include <qsqldatabase.h>
 #include <qkeysequence.h>
+#include <qpaintdevicemetrics.h>
 #ifdef QWS
 #include <qwindowsystem_qws.h>
 #endif
@@ -841,5 +842,20 @@ QObject *MythMainWindow::getTarget(QKeyEvent &key)
         key_target = this;
 
     return key_target;
+}
+
+QFont CreateFont(const QString &face, int pointSize, int weight, bool italic)
+{
+    // Store w/h mult in MainWindow, and query here
+    //pointSize = pointSize * GetMythMainWindow()->GetHMult();
+
+    // cache this in MainWindow as well.
+    QPaintDeviceMetrics pdm(GetMythMainWindow());
+
+    // Maybe just a helper function in MyhtMainWindow to calc this all?
+    float desired = 100.0;
+    pointSize = (int)(pointSize * desired / pdm.logicalDpiY());
+
+    return QFont(face, pointSize, weight, italic);
 }
 
