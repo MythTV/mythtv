@@ -250,12 +250,7 @@ bool MythMainWindow::TranslateKeyPress(const QString &context,
 
     bool retval = false;
 
-    QString action = "";
-    if (d->keyContexts["Global"]->GetMapping(keynum, action))
-    {
-        actions += action;
-        retval = true;
-    }
+    QString action;
 
     if (d->keyContexts[context])
     {
@@ -265,6 +260,13 @@ bool MythMainWindow::TranslateKeyPress(const QString &context,
             actions += action;
             retval = true;
         }
+    }
+
+    action = "";
+    if (d->keyContexts["Global"]->GetMapping(keynum, action))
+    {
+        actions += action;
+        retval = true;
     }
 
     return retval;

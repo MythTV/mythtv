@@ -975,13 +975,16 @@ void TV::ProcessKeypress(QKeyEvent *e)
                                                       actions))
         return;
 
+    bool handled = false;
+
     if (browsemode)
     {
         int passThru = 0;
 
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             action = actions[i];
+            handled = true;
 
             if (action == "UP")
                 BrowseDispInfo(BROWSE_UP);
@@ -1014,7 +1017,12 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 BrowseToggleRecord();
             else if (action == "VOLUMEDOWN" || action == "VOLUMEUP" ||
                      action == "MUTE" || action == "TOGGLEASPECT")
+            {
                 passThru = 1;
+                handled = false;
+            }
+            else
+                handled = false;
         }
 
         if (!passThru)
@@ -1023,9 +1031,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
     if (nvp->GetOSD() && osd->DialogShowing(dialogname))
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             action = actions[i];
+            handled = true;
 
             if (action == "UP")
                 osd->DialogUp(dialogname); 
@@ -1084,64 +1093,54 @@ void TV::ProcessKeypress(QKeyEvent *e)
                     ProgramMenuAction(result);
                 }
             }
+            else
+                handled = false;
         }
         return;
     }
 
-    bool handled = false;
-    for (unsigned int i = 0; i < actions.size(); i++)
+    if (picAdjustment)
+    {
+        for (unsigned int i = 0; i < actions.size(); i++)
+        {
+            action = actions[i];
+            handled = true;
+
+            if (action == "LEFT")
+                DoChangePictureAttribute(false);
+            else if (action == "RIGHT")
+                DoChangePictureAttribute(true);
+            else
+                handled = false;
+        }
+    }
+   
+    if (handled)
+        return;
+
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         action = actions[i];
+        handled = true;
 
         if (action == "TOGGLECC")
-        {
             nvp->ToggleCC();
-            handled = true;
-        }
         else if (action == "SKIPCOMMERCIAL")
-        {
             DoSkipCommercials(1);
-            handled = true;
-        }
         else if (action == "SKIPCOMMBACK")
-        {
             DoSkipCommercials(-1);
-            handled = true;
-        }
         else if (action == "QUEUETRANSCODE")
-        {
             DoQueueTranscode();
-            handled = true;
-        }
         else if (action == "PAUSE") 
-        {
             DoPause();
-            handled = true;
-        }
         else if (action == "SPEEDINC")
-        {
             ChangeSpeed(1);
-            handled = true;
-        }
         else if (action == "SPEEDDEC")
-        {
             ChangeSpeed(-1);
-            handled = true;
-        }
         else if (action == "TOGGLEPICCONTROLS")
         {
             if (usePicControls)
                 DoTogglePictureAttribute();
-            handled = true;
-        }
-        else if (action == "RIGHT")
-        {
-            if (picAdjustment)
-            {
-                DoChangePictureAttribute(true);
-                break;
-            }
-            handled = true;
         }
         else if (action == "SEEKFFWD")
         {
@@ -1156,7 +1155,6 @@ void TV::ProcessKeypress(QKeyEvent *e)
             }
             else
                 ChangeFFRew(1);
-            handled = true;
         }
         else if (action == "FFWDSTICKY")
         {
@@ -1164,16 +1162,6 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 DoSeek(1.0, tr("Forward"));
             else
                 ChangeFFRew(1);
-            handled = true;
-        }
-        else if (action == "LEFT")
-        {
-            if (picAdjustment)
-            {
-                DoChangePictureAttribute(false);
-                break;
-            }
-            handled = true;
         }
         else if (action == "SEEKRWND")
         {
@@ -1187,7 +1175,6 @@ void TV::ProcessKeypress(QKeyEvent *e)
             }
             else
                 ChangeFFRew(-1);
-            handled = true;
         }
         else if (action == "RWNDSTICKY")
         {
@@ -1195,18 +1182,11 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 DoSeek(-1.0, tr("Rewind"));
             else
                 ChangeFFRew(-1);
-            handled = true;
         }
         else if (action == "JUMPRWND")
-        {
             DoSeek(-jumptime * 60, tr("Jump Back"));
-            handled = true;
-        }
         else if (action == "JUMPFFWD")
-        {
             DoSeek(jumptime * 60, tr("Jump Ahead"));
-            handled = true;
-        }
         else if (action == "ESCAPE")
         {
             StopFFRew();
@@ -1245,36 +1225,24 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 exitPlayer = true;
                 wantsToQuit = true;
             }
-            handled = true;
             break;
         }
         else if (action == "VOLUMEDOWN")
-        {
             ChangeVolume(false);
-            handled = true;
-        }
         else if (action == "VOLUMEUP")
-        {
             ChangeVolume(true);
-            handled = true;
-        }
         else if (action == "MUTE")
-        {
             ToggleMute();
-            handled = true;
-        }
         else if (action == "TOGGLEASPECT")
-        {
             ToggleLetterbox();
-            handled = true;
-        }
+        else
+            handled = false;
     }
 
     if (!handled)
     {
         if (doing_ff_rew)
         {
-            handled = false;
             for (unsigned int i = 0; i < actions.size(); i++)
             {
                 action = actions[0];
@@ -1306,9 +1274,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
     if (internalState == kState_WatchingLiveTV)
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             action = actions[i];
+            handled = true;
 
             if (action == "INFO")
                 ToggleOSD();
@@ -1369,13 +1338,16 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 BrowseStart();
             else if (action == "PREVCHAN")
                 PreviousChannel();
+            else
+                handled = false;
         }
     }
     else if (StateIsPlaying(internalState))
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             action = actions[i];
+            handled = true;
 
             if (action == "INFO")
                 DoInfo();
@@ -1389,6 +1361,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                     else
                         nvp->SetBookmark(); 
                 }
+                else
+                    handled = false;
             }
             else if (action == "MENU" || action == "TOGGLEEDIT")
             {
@@ -1418,6 +1392,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 DoSeek(-jumptime * 60, tr("Jump Back"));
             else if (action == "CHANNELDOWN")
                 DoSeek(jumptime * 60, tr("Jump Ahead"));
+            else
+                handled = false;
         }
     }
 }
