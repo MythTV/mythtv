@@ -170,10 +170,10 @@ QLabel *InfoDialog::getDateLabel(ProgramInfo *pginfo)
     QDateTime startts = pginfo->startts;
     QDateTime endts = pginfo->endts;
 
-    QString dateformat = m_context->settings()->GetSetting("DateFormat");
+    QString dateformat = m_context->GetSetting("DateFormat");
     if (dateformat == "")
         dateformat = "ddd MMMM d";
-    QString timeformat = m_context->settings()->GetSetting("TimeFormat");
+    QString timeformat = m_context->GetSetting("TimeFormat");
     if (timeformat == "")
         timeformat = "h:mm AP";
 
