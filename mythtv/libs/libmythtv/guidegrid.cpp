@@ -1012,7 +1012,14 @@ void GuideGrid::displayInfo()
 
     pginfo->GetProgramRecordingStatus();
 
-    m_programInfos[m_currentRow][m_currentCol] = pginfo;
+    int startcol = pginfo->startCol;
+    int spread = pginfo->spread;
+    int rectype = pginfo->recordtype;
+
+    for (int i = 0; i < spread; i++)
+    {
+        m_programInfos[m_currentRow][startcol + i]->recordtype = rectype;
+    }
 
     setActiveWindow();
     setFocus();

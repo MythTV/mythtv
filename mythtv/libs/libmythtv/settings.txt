@@ -26,11 +26,6 @@ str RecordFilePrefix=/mnt/store
 #
 # Video settings
 #
-# V4L device
-str V4LDevice=/dev/video
-# Audio device to record with
-str RecordAudioDevice=/dev/dsp
-#
 # Resolution to capture at
 int Width=480
 int Height=480
@@ -62,7 +57,7 @@ int QualDiff=3
 # 
 # Audio settings
 #
-# dsp device
+# dsp device -- output only
 str AudioDevice=/dev/dsp
 # Audio Sample Rate: one of 32000, 44100, 48000
 int AudioSampleRate=44100
@@ -101,6 +96,3 @@ str FreqTable=us-cable
 #int PIPBufferSize=1
 #int PIPMaxBufferFill=50
 #str PIPBufferName=/mnt/store/ringbuf2.nuv
-#str PIPV4LDevice=/dev/video1
-#str PIPRecordAudioDevice=/dev/dsp
-

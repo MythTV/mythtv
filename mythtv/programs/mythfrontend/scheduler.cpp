@@ -4,6 +4,7 @@
 #include <qstring.h>
 #include <qdatetime.h>
 
+#include <iostream>
 #include <algorithm>
 using namespace std;
 
