@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-08-20, v2.62
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-08-20, v2.63
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -253,7 +253,7 @@ American environment.  See the website at
 <UL>
 <LI>Lead developer:  Isaac Richards, 
 <A HREF="mailto:ijr@po.cwru.edu">mailto:ijr@po.cwru.edu</A></LI>
-<LI>Developer:  Matthew Zimmerman, 
+<LI>Developer:  Matt Zimmerman, 
 <A HREF="mailto:mdz@debian.org">mailto:mdz@debian.org</A></LI>
 <LI>Developer:  John Danner, 
 <A HREF="mailto:jdanner@untzuntz.com">mailto:jdanner@untzuntz.com</A></LI>
@@ -267,7 +267,7 @@ American environment.  See the website at
 <A HREF="mailto:tclark@telia.com">mailto:tclark@telia.com</A></LI>
 <LI>Gentoo documentation and package: Max Kalika, 
 <A HREF="mailto:max@gentoo.org">mailto:max@gentoo.org</A></LI>
-<LI>Debian package: Matthew Zimmerman, 
+<LI>Debian package: Matt Zimmerman, 
 <A HREF="mailto:mdz@debian.org">mailto:mdz@debian.org</A></LI>
 <LI>Mandrake 8.2 documentation: Harondel J. Sibble, 
 <A HREF="mailto:help@pdscc.com">mailto:help@pdscc.com</A></LI>
@@ -682,16 +682,35 @@ obtained from
 send him email directly at 
 <A HREF="thac@nyvalls.se">thac@nyvalls.se</A>.</P>
 
-<H3>Debian </H3>
+<H3>Debian</H3>
 
-<P>Debian packages for MythTV and some of its add-on modules
-have been packaged by Matt Zimmerman 
-<A HREF="mailto:mdz@debian.org">mailto:mdz@debian.org</A> and
-are available at 
-<A HREF="http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/">http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/</A>,
-including installation instructions.  All of the prerequisites for MythTV
-are available as Debian packages.</P>
-<P>See <CODE>/usr/share/doc/packagename/README.Debian</CODE> for more information.</P>
+<P>Debian packages for MythTV and most of its add-on
+modules are maintained by Matt Zimmerman 
+<A HREF="mailto:mdz@debian.org">mailto:mdz@debian.org</A> and are available at 
+<A HREF="http://dijkstra.csh.rit.edu/~mdz/debian/dists/woody/mythtv/">http://dijkstra.csh.rit.edu/~mdz/debian/dists/woody/mythtv/</A>
+(for Debian 3.0/woody) and 
+<A HREF="http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/">http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/</A>
+(for unstable).  Installation instructions can be found on those pages
+as well.  All of the prerequisites for MythTV are available as Debian
+packages, most of them from the official Debian archive.</P>
+
+<P>If you are running woody, be sure to follow the instructions on the
+above page to ensure that the MySQL server starts up immediately after
+it is installed.  If you are running unstable, this is the default
+behavior.</P>
+
+
+<P>The Debian packages are configured such that MythTV programs should be
+run as the <CODE>mythtv</CODE> user, which is automatically created during
+installation.  This user has access to write new recordings to disk in
+the default directory, read and write the database, access the audio
+and video devices, and everything else that MythTV needs to do.</P>
+
+
+<P>See <CODE>/usr/share/doc/<I>packagename</I>/README.Debian</CODE> for
+more information, including copies of the MythTV documentation.  The
+<CODE>mythtv-doc</CODE> package contains a copy of this HOWTO in
+<CODE>/usr/share/doc/mythtv-doc</CODE>.</P>
 
 <H3>Manual installation</H3>
 
@@ -3939,10 +3958,10 @@ PVR-250/350 you don't need to convert - the files are actually standard
 MPEG2 with a <CODE>.nuv</CODE> extension.  Change it to <CODE>.mpg</CODE> and the
 files should display properly in other media players.</P>
 <P>Download the patch to MPlayer from Matt's website. 
-<A HREF="http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/">http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/</A>.
+<A HREF="http://dijkstra.csh.rit.edu/~mdz/mythtv/">http://dijkstra.csh.rit.edu/~mdz/mythtv/</A>.
 <BLOCKQUOTE><CODE>
 <PRE>
-$ wget http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/mplayer-0.90rc5-mythtv-20030407.diff
+$ wget http://dijkstra.csh.rit.edu/~mdz/mythtv/mplayer-0.90rc5-mythtv-20030407.diff
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
