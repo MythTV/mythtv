@@ -3,8 +3,9 @@
 
 ### BEGIN INIT INFO
 # Provides:       mythbackend
-# Required-Start: $network $remote_fs mysql
+# Required-Start: $network $remote_fs
 # Required-Stop:
+# Should-State:  mysql
 # Default-Start:  2 3 5
 # Default-Stop:
 # Description:    Start the MythTV backend
@@ -25,6 +26,12 @@
 rc_reset
 
 unset MBE
+
+# Check for existence of needed config file and read it
+backend_CONFIG=/etc/sysconfig/mythbackend
+test -r $backend_CONFIG || exit 6
+. $backend_CONFIG
+
 
 logdir=/var/log
 
