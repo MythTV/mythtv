@@ -708,11 +708,10 @@ void MPV_common_init_ppc(MpegEncContext *s);
 extern void (*draw_edges)(uint8_t *buf, int wrap, int width, int height, int w);
 void ff_copy_bits(PutBitContext *pb, uint8_t *src, int length);
 void ff_clean_intra_table_entries(MpegEncContext *s);
-void ff_init_scantable(MpegEncContext *s, ScanTable *st, const uint8_t *src_scantable);
+void ff_init_scantable(uint8_t *, ScanTable *st, const uint8_t *src_scantable);
 void ff_draw_horiz_band(MpegEncContext *s, int y, int h);
 void ff_emulated_edge_mc(MpegEncContext *s, uint8_t *src, int linesize, int block_w, int block_h, 
                                     int src_x, int src_y, int w, int h);
-char ff_get_pict_type_char(int pict_type);
 #define END_NOT_FOUND -100
 int ff_combine_frame( MpegEncContext *s, int next, uint8_t **buf, int *buf_size);
 void ff_print_debug_info(MpegEncContext *s, Picture *pict);

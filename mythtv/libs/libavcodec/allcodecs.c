@@ -64,8 +64,10 @@ void avcodec_register_all(void)
 #endif
     register_avcodec(&mjpeg_encoder);
     register_avcodec(&huffyuv_encoder);
+    register_avcodec(&asv1_encoder);
 #endif /* CONFIG_ENCODERS */
-    register_avcodec(&rawvideo_codec);
+    register_avcodec(&rawvideo_encoder);
+    register_avcodec(&rawvideo_decoder);
 
     /* decoders */
 #ifdef CONFIG_DECODERS
@@ -80,9 +82,14 @@ void avcodec_register_all(void)
     register_avcodec(&h263i_decoder);
     register_avcodec(&rv10_decoder);
     register_avcodec(&svq1_decoder);
+    register_avcodec(&svq3_decoder);
     register_avcodec(&wmav1_decoder);
     register_avcodec(&wmav2_decoder);
     register_avcodec(&indeo3_decoder);
+#ifdef CONFIG_FAAD
+    register_avcodec(&aac_decoder);
+    register_avcodec(&mpeg4aac_decoder);
+#endif
 #endif
     register_avcodec(&mpeg_decoder);
     register_avcodec(&dvvideo_decoder);
@@ -96,11 +103,16 @@ void avcodec_register_all(void)
     register_avcodec(&huffyuv_decoder);
     register_avcodec(&cyuv_decoder);
     register_avcodec(&h264_decoder);
+    register_avcodec(&vp3_decoder);
+    register_avcodec(&asv1_decoder);
 #ifdef CONFIG_AC3
     register_avcodec(&ac3_decoder);
 #endif
 #endif /* CONFIG_DECODERS */
 
+#ifdef AMR_NB
+    register_avcodec(&amr_nb_decoder);
+#endif /* AMR_NB */
     /* pcm codecs */
 
 #define PCM_CODEC(id, name) \

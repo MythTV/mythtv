@@ -78,8 +78,6 @@ static int msmpeg4v12_decode_mb(MpegEncContext *s, DCTELEM block[6][64]);
 static int msmpeg4v34_decode_mb(MpegEncContext *s, DCTELEM block[6][64]);
 static int wmv2_decode_mb(MpegEncContext *s, DCTELEM block[6][64]);
 
-extern uint32_t inverse[256];
-
 
 #ifdef DEBUG
 int intra_count = 0;
@@ -182,10 +180,10 @@ static void common_init(MpegEncContext * s)
 
     
     if(s->msmpeg4_version>=4){
-        ff_init_scantable(s, &s->intra_scantable  , wmv1_scantable[1]);
-        ff_init_scantable(s, &s->intra_h_scantable, wmv1_scantable[2]);
-        ff_init_scantable(s, &s->intra_v_scantable, wmv1_scantable[3]);
-        ff_init_scantable(s, &s->inter_scantable  , wmv1_scantable[0]);
+        ff_init_scantable(s->dsp.idct_permutation, &s->intra_scantable  , wmv1_scantable[1]);
+        ff_init_scantable(s->dsp.idct_permutation, &s->intra_h_scantable, wmv1_scantable[2]);
+        ff_init_scantable(s->dsp.idct_permutation, &s->intra_v_scantable, wmv1_scantable[3]);
+        ff_init_scantable(s->dsp.idct_permutation, &s->inter_scantable  , wmv1_scantable[0]);
     }
     //Note the default tables are set in common_init in mpegvideo.c
     
@@ -699,7 +697,7 @@ static int get_dc(uint8_t *src, int stride, int scale)
             sum+=src[x + y*stride];
         }
     }
-    return (sum + (scale>>1))/scale;
+    return FASTDIV((sum + (scale>>1)), scale);
 }
 
 /* dir = 0: left, dir = 1: top prediction */
@@ -763,9 +761,9 @@ static inline int msmpeg4_pred_dc(MpegEncContext * s, int n,
 	b = (b + (8 >> 1)) / 8;
 	c = (c + (8 >> 1)) / 8;
     } else {
-	a = (a + (scale >> 1)) / scale;
-	b = (b + (scale >> 1)) / scale;
-	c = (c + (scale >> 1)) / scale;
+	a = FASTDIV((a + (scale >> 1)), scale);
+	b = FASTDIV((b + (scale >> 1)), scale);
+	c = FASTDIV((c + (scale >> 1)), scale);
     }
 #endif
     /* XXX: WARNING: they did not choose the same test as MPEG4. This
@@ -1481,10 +1479,12 @@ static int msmpeg4v2_decode_motion(MpegEncContext * s, int pred, int f_code)
         return pred;
     sign = get_bits1(&s->gb);
     shift = f_code - 1;
-    val = (code - 1) << shift;
-    if (shift > 0)
+    val = code;
+    if (shift) {
+        val = (val - 1) << shift;
         val |= get_bits(&s->gb, shift);
-    val++;
+        val++;
+    }
     if (sign)
         val = -val;
 

@@ -852,16 +852,13 @@ static inline int get_dmv(MpegEncContext *s)
 
 static inline int get_qscale(MpegEncContext *s)
 {
-    int qscale;
+    int qscale = get_bits(&s->gb, 5);
     if (s->mpeg2) {
         if (s->q_scale_type) {
-            qscale = non_linear_qscale[get_bits(&s->gb, 5)];
+            return non_linear_qscale[qscale];
         } else {
-            qscale = get_bits(&s->gb, 5) << 1;
+            return qscale << 1;
         }
-    } else {
-        /* for mpeg1, we use the generic unquant code */
-        qscale = get_bits(&s->gb, 5);
     }
     return qscale;
 }
@@ -1179,7 +1176,7 @@ static int mpeg_decode_mb(MpegEncContext *s,
 /* as h263, but only 17 codes */
 static int mpeg_decode_motion(MpegEncContext *s, int fcode, int pred)
 {
-    int code, sign, val, m, l, shift;
+    int code, sign, val, l, shift;
 
     code = get_vlc2(&s->gb, mv_vlc.table, MV_VLC_BITS, 2);
     if (code == 0) {
@@ -1191,22 +1188,19 @@ static int mpeg_decode_motion(MpegEncContext *s, int fcode, int pred)
 
     sign = get_bits1(&s->gb);
     shift = fcode - 1;
-    val = (code - 1) << shift;
-    if (shift > 0)
+    val = code;
+    if (shift) {
+        val = (val - 1) << shift;
         val |= get_bits(&s->gb, shift);
-    val++;
+        val++;
+    }
     if (sign)
         val = -val;
     val += pred;
     
     /* modulo decoding */
     l = 1 << (shift+4);
-    m = 2 * l;
-    if (val < -l) {
-        val += m;
-    } else if (val >= l) {
-        val -= m;
-    }
+    val = ((val + l)&(l*2-1)) - l;
     return val;
 }
 
@@ -1226,9 +1220,7 @@ static inline int decode_dc(MpegEncContext *s, int component)
     if (code == 0) {
         diff = 0;
     } else {
-        diff = get_bits(&s->gb, code);
-        if ((diff & (1 << (code - 1))) == 0) 
-            diff = (-1 << code) | (diff + 1);
+        diff = get_xbits(&s->gb, code);
     }
     return diff;
 }
@@ -1723,15 +1715,15 @@ static void mpeg_decode_picture_coding_extension(MpegEncContext *s)
     }
     
     if(s->alternate_scan){
-        ff_init_scantable(s, &s->inter_scantable  , ff_alternate_vertical_scan);
-        ff_init_scantable(s, &s->intra_scantable  , ff_alternate_vertical_scan);
-        ff_init_scantable(s, &s->intra_h_scantable, ff_alternate_vertical_scan);
-        ff_init_scantable(s, &s->intra_v_scantable, ff_alternate_vertical_scan);
+        ff_init_scantable(s->dsp.idct_permutation, &s->inter_scantable  , ff_alternate_vertical_scan);
+        ff_init_scantable(s->dsp.idct_permutation, &s->intra_scantable  , ff_alternate_vertical_scan);
+        ff_init_scantable(s->dsp.idct_permutation, &s->intra_h_scantable, ff_alternate_vertical_scan);
+        ff_init_scantable(s->dsp.idct_permutation, &s->intra_v_scantable, ff_alternate_vertical_scan);
     }else{
-        ff_init_scantable(s, &s->inter_scantable  , ff_zigzag_direct);
-        ff_init_scantable(s, &s->intra_scantable  , ff_zigzag_direct);
-        ff_init_scantable(s, &s->intra_h_scantable, ff_alternate_horizontal_scan);
-        ff_init_scantable(s, &s->intra_v_scantable, ff_alternate_vertical_scan);
+        ff_init_scantable(s->dsp.idct_permutation, &s->inter_scantable  , ff_zigzag_direct);
+        ff_init_scantable(s->dsp.idct_permutation, &s->intra_scantable  , ff_zigzag_direct);
+        ff_init_scantable(s->dsp.idct_permutation, &s->intra_h_scantable, ff_alternate_horizontal_scan);
+        ff_init_scantable(s->dsp.idct_permutation, &s->intra_v_scantable, ff_alternate_vertical_scan);
     }
     
     /* composite display not parsed */
@@ -2292,7 +2284,6 @@ static int mpeg_decode_frame(AVCodecContext *avctx,
                     break;
                 }
     }
-
     return -1;
 }
 

@@ -195,6 +195,9 @@ typedef struct H264Context{
     int b_stride;
     int b8_stride;
 
+    int halfpel_flag;
+    int thirdpel_flag;
+
     SPS sps_buffer[MAX_SPS_COUNT];
     SPS sps; ///< current sps
     
@@ -291,6 +294,17 @@ static VLC chroma_dc_total_zeros_vlc[3];
 static VLC run_vlc[6];
 static VLC run7_vlc;
 
+static void svq3_luma_dc_dequant_idct_c(DCTELEM *block, int qp);
+static void svq3_add_idct_c(uint8_t *dst, DCTELEM *block, int stride, int qp, int dc);
+
+static inline uint32_t pack16to32(int a, int b){
+#ifdef WORDS_BIGENDIAN
+   return (b&0xFFFF) + (a<<16);
+#else
+   return (a&0xFFFF) + (b<<16);
+#endif
+}
+
 /**
  * fill a rectangle.
  * @param h height of the recatangle, should be a constant
@@ -313,6 +327,8 @@ static inline void fill_rectangle(void *vp, int w, int h, int stride, uint32_t v
         *(uint16_t*)(p + 1*stride)=
         *(uint16_t*)(p + 2*stride)=
         *(uint16_t*)(p + 3*stride)= size==4 ? val : val*0x0101;
+    }else if(w==4 && h==1){
+        *(uint32_t*)(p + 0*stride)= size==4 ? val : val*0x01010101;
     }else if(w==4 && h==2){
         *(uint32_t*)(p + 0*stride)=
         *(uint32_t*)(p + 1*stride)= size==4 ? val : val*0x01010101;
@@ -1676,7 +1692,7 @@ static void pred16x16_128_dc_c(uint8_t *src, int stride){
     }
 }
 
-static void pred16x16_plane_c(uint8_t *src, int stride){
+static inline void pred16x16_plane_compat_c(uint8_t *src, int stride, const int svq3){
   int i, j, k;
   int a;
   uint8_t *cm = cropTbl + MAX_NEG_CROP;
@@ -1690,8 +1706,13 @@ static void pred16x16_plane_c(uint8_t *src, int stride){
     H += k*(src0[k] - src0[-k]);
     V += k*(src1[0] - src2[ 0]);
   }
-  H = ( 5*H+32 ) >> 6;
-  V = ( 5*V+32 ) >> 6;
+  if(svq3){
+    H = ( 5*(H/4) ) / 16;
+    V = ( 5*(V/4) ) / 16;
+  }else{
+    H = ( 5*H+32 ) >> 6;
+    V = ( 5*V+32 ) >> 6;
+  }
 
   a = 16*(src1[0] + src2[16] + 1) - 7*(V+H);
   for(j=16; j>0; --j) {
@@ -1706,6 +1727,10 @@ static void pred16x16_plane_c(uint8_t *src, int stride){
     }
     src += stride;
   }
+}
+
+static void pred16x16_plane_c(uint8_t *src, int stride){
+    pred16x16_plane_compat_c(src, stride, 0);
 }
 
 static void pred8x8_vertical_c(uint8_t *src, int stride){
@@ -2240,15 +2265,22 @@ static void hl_decode_mb(H264Context *h){
                     }
 
                     h->pred4x4[ dir ](ptr, topright, linesize);
-                    if(h->non_zero_count_cache[ scan8[i] ])
-                        h264_add_idct_c(ptr, h->mb + i*16, linesize);
+                    if(h->non_zero_count_cache[ scan8[i] ]){
+                        if(s->codec_id == CODEC_ID_H264)
+                            h264_add_idct_c(ptr, h->mb + i*16, linesize);
+                        else
+                            svq3_add_idct_c(ptr, h->mb + i*16, linesize, s->qscale, 0);
+                    }
                 }
             }
         }else{
             h->pred16x16[ h->intra16x16_pred_mode ](dest_y , linesize);
-            h264_luma_dc_dequant_idct_c(h->mb, s->qscale);
+            if(s->codec_id == CODEC_ID_H264)
+                h264_luma_dc_dequant_idct_c(h->mb, s->qscale);
+            else
+                svq3_luma_dc_dequant_idct_c(h->mb, s->qscale);
         }
-    }else{
+    }else if(s->codec_id == CODEC_ID_H264){
         hl_motion(h, dest_y, dest_cb, dest_cr,
                   s->dsp.put_h264_qpel_pixels_tab, s->dsp.put_h264_chroma_pixels_tab, 
                   s->dsp.avg_h264_qpel_pixels_tab, s->dsp.avg_h264_chroma_pixels_tab);
@@ -2256,10 +2288,19 @@ static void hl_decode_mb(H264Context *h){
 
 
     if(!IS_INTRA4x4(mb_type)){
-        for(i=0; i<16; i++){
-            if(h->non_zero_count_cache[ scan8[i] ] || h->mb[i*16]){ //FIXME benchmark weird rule, & below
-                uint8_t * const ptr= dest_y + h->block_offset[i];
-                h264_add_idct_c(ptr, h->mb + i*16, linesize);
+        if(s->codec_id == CODEC_ID_H264){
+            for(i=0; i<16; i++){
+                if(h->non_zero_count_cache[ scan8[i] ] || h->mb[i*16]){ //FIXME benchmark weird rule, & below
+                    uint8_t * const ptr= dest_y + h->block_offset[i];
+                    h264_add_idct_c(ptr, h->mb + i*16, linesize);
+                }
+            }
+        }else{
+            for(i=0; i<16; i++){
+                if(h->non_zero_count_cache[ scan8[i] ] || h->mb[i*16]){ //FIXME benchmark weird rule, & below
+                    uint8_t * const ptr= dest_y + h->block_offset[i];
+                    svq3_add_idct_c(ptr, h->mb + i*16, linesize, s->qscale, IS_INTRA(mb_type) ? 1 : 0);
+                }
             }
         }
     }
@@ -2267,16 +2308,31 @@ static void hl_decode_mb(H264Context *h){
     if(!(s->flags&CODEC_FLAG_GRAY)){
         chroma_dc_dequant_idct_c(h->mb + 16*16, h->chroma_qp);
         chroma_dc_dequant_idct_c(h->mb + 16*16+4*16, h->chroma_qp);
-        for(i=16; i<16+4; i++){
-            if(h->non_zero_count_cache[ scan8[i] ] || h->mb[i*16]){
-                uint8_t * const ptr= dest_cb + h->block_offset[i];
-                h264_add_idct_c(ptr, h->mb + i*16, uvlinesize);
+        if(s->codec_id == CODEC_ID_H264){
+            for(i=16; i<16+4; i++){
+                if(h->non_zero_count_cache[ scan8[i] ] || h->mb[i*16]){
+                    uint8_t * const ptr= dest_cb + h->block_offset[i];
+                    h264_add_idct_c(ptr, h->mb + i*16, uvlinesize);
+                }
             }
-        }
-        for(i=20; i<20+4; i++){
-            if(h->non_zero_count_cache[ scan8[i] ] || h->mb[i*16]){
-                uint8_t * const ptr= dest_cr + h->block_offset[i];
-                h264_add_idct_c(ptr, h->mb + i*16, uvlinesize);
+            for(i=20; i<20+4; i++){
+                if(h->non_zero_count_cache[ scan8[i] ] || h->mb[i*16]){
+                    uint8_t * const ptr= dest_cr + h->block_offset[i];
+                    h264_add_idct_c(ptr, h->mb + i*16, uvlinesize);
+                }
+            }
+        }else{
+            for(i=16; i<16+4; i++){
+                if(h->non_zero_count_cache[ scan8[i] ] || h->mb[i*16]){
+                    uint8_t * const ptr= dest_cb + h->block_offset[i];
+                    svq3_add_idct_c(ptr, h->mb + i*16, uvlinesize, chroma_qp[s->qscale + 12] - 12, 2);
+                }
+            }
+            for(i=20; i<20+4; i++){
+                if(h->non_zero_count_cache[ scan8[i] ] || h->mb[i*16]){
+                    uint8_t * const ptr= dest_cr + h->block_offset[i];
+                    svq3_add_idct_c(ptr, h->mb + i*16, uvlinesize, chroma_qp[s->qscale + 12] - 12, 2);
+                }
             }
         }
     }
@@ -2515,7 +2571,7 @@ static Picture * remove_short(H264Context *h, int frame_num){
     for(i=0; i<h->short_ref_count; i++){
         Picture *pic= h->short_ref[i];
         if(s->avctx->debug&FF_DEBUG_MMCO)
-            printf("%d %d %X\n", i, pic->frame_num, (int)pic);
+            printf("%d %d %p\n", i, pic->frame_num, pic);
         if(pic->frame_num == frame_num){
             h->short_ref[i]= NULL;
             memmove(&h->short_ref[i], &h->short_ref[i+1], (h->short_ref_count - i - 1)*sizeof(Picture*));
@@ -2967,7 +3023,7 @@ static int decode_slice_header(H264Context *h){
     if(s->avctx->debug&FF_DEBUG_PICT_INFO){
         printf("mb:%d %c pps:%d frame:%d poc:%d/%d ref:%d/%d qp:%d loop:%d\n", 
                first_mb_in_slice, 
-               ff_get_pict_type_char(h->slice_type),
+               av_get_pict_type_char(h->slice_type),
                pps_id, h->frame_num,
                s->current_picture_ptr->field_poc[0], s->current_picture_ptr->field_poc[1],
                h->ref_count[0], h->ref_count[1],
@@ -3151,7 +3207,7 @@ static int decode_mb(H264Context *h){
     const int mb_xy= s->mb_x + s->mb_y*s->mb_stride;
     int mb_type, partition_count, cbp;
 
-    memset(h->mb, 0, sizeof(int16_t)*24*16); //FIXME avoid if allready clear (move after skip handlong?
+    s->dsp.clear_blocks(h->mb); //FIXME avoid if allready clear (move after skip handlong?    
 
     tprintf("pic:%d mb:%d/%d\n", h->frame_num, s->mb_x, s->mb_y);
 
@@ -3178,7 +3234,7 @@ static int decode_mb(H264Context *h){
             fill_caches(h, mb_type); //FIXME check what is needed and what not ...
             pred_pskip_motion(h, &mx, &my);
             fill_rectangle(&h->ref_cache[0][scan8[0]], 4, 4, 8, 0, 1);
-            fill_rectangle(  h->mv_cache[0][scan8[0]], 4, 4, 8, (mx&0xFFFF)+(my<<16), 4);
+            fill_rectangle(  h->mv_cache[0][scan8[0]], 4, 4, 8, pack16to32(mx,my), 4);
             write_back_motion(h, mb_type);
 
             s->current_picture.mb_type[mb_xy]= mb_type; //FIXME SKIP type
@@ -3217,7 +3273,7 @@ static int decode_mb(H264Context *h){
        assert(h->slice_type == I_TYPE);
 decode_intra_mb:
         if(mb_type > 25){
-            fprintf(stderr, "mb_type %d in %c slice to large at %d %d\n", mb_type, ff_get_pict_type_char(h->slice_type), s->mb_x, s->mb_y);
+            fprintf(stderr, "mb_type %d in %c slice to large at %d %d\n", mb_type, av_get_pict_type_char(h->slice_type), s->mb_x, s->mb_y);
             return -1;
         }
         partition_count=0;
@@ -3408,7 +3464,7 @@ decode_intra_mb:
                     my += get_se_golomb(&s->gb);
                     tprintf("final mv:%d %d\n", mx, my);
 
-                    fill_rectangle(h->mv_cache[list][ scan8[0] ], 4, 4, 8, (mx&0xFFFF) + (my<<16), 4);
+                    fill_rectangle(h->mv_cache[list][ scan8[0] ], 4, 4, 8, pack16to32(mx,my), 4);
                 }
             }
         }
@@ -3431,7 +3487,7 @@ decode_intra_mb:
                         my += get_se_golomb(&s->gb);
                         tprintf("final mv:%d %d\n", mx, my);
 
-                        fill_rectangle(h->mv_cache[list][ scan8[0] + 16*i ], 4, 2, 8, (mx&0xFFFF) + (my<<16), 4);
+                        fill_rectangle(h->mv_cache[list][ scan8[0] + 16*i ], 4, 2, 8, pack16to32(mx,my), 4);
                     }
                 }
             }
@@ -3455,7 +3511,7 @@ decode_intra_mb:
                         my += get_se_golomb(&s->gb);
                         tprintf("final mv:%d %d\n", mx, my);
 
-                        fill_rectangle(h->mv_cache[list][ scan8[0] + 2*i ], 2, 4, 8, (mx&0xFFFF) + (my<<16), 4);
+                        fill_rectangle(h->mv_cache[list][ scan8[0] + 2*i ], 2, 4, 8, pack16to32(mx,my), 4);
                     }
                 }
             }
@@ -3951,7 +4007,7 @@ static int decode_nal_units(H264Context *h, uint8_t *buf, int buf_size){
     AVCodecContext * const avctx= s->avctx;
     int buf_index=0;
     int i;
-#if 0    
+#if 0
     for(i=0; i<32; i++){
         printf("%X ", buf[i]);
     }
@@ -4370,3 +4426,4 @@ AVCodec h264_decoder = {
     /*CODEC_CAP_DRAW_HORIZ_BAND |*/ CODEC_CAP_DR1 | CODEC_CAP_TRUNCATED,
 };
 
+#include "svq3.c"

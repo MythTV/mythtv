@@ -136,7 +136,7 @@ static void convert_matrix(MpegEncContext *s, int (*qmat)[64], uint16_t (*qmat16
 }
 #endif //CONFIG_ENCODERS
 
-void ff_init_scantable(MpegEncContext *s, ScanTable *st, const uint8_t *src_scantable){
+void ff_init_scantable(uint8_t *permutation, ScanTable *st, const uint8_t *src_scantable){
     int i;
     int end;
     
@@ -145,7 +145,7 @@ void ff_init_scantable(MpegEncContext *s, ScanTable *st, const uint8_t *src_scan
     for(i=0; i<64; i++){
         int j;
         j = src_scantable[i];
-        st->permutated[i] = s->dsp.idct_permutation[j];
+        st->permutated[i] = permutation[j];
 #ifdef ARCH_POWERPC
         st->inverse[j] = i;
 #endif
@@ -202,10 +202,10 @@ int DCT_common_init(MpegEncContext *s)
     /* load & permutate scantables
        note: only wmv uses differnt ones 
     */
-    ff_init_scantable(s, &s->inter_scantable  , ff_zigzag_direct);
-    ff_init_scantable(s, &s->intra_scantable  , ff_zigzag_direct);
-    ff_init_scantable(s, &s->intra_h_scantable, ff_alternate_horizontal_scan);
-    ff_init_scantable(s, &s->intra_v_scantable, ff_alternate_vertical_scan);
+    ff_init_scantable(s->dsp.idct_permutation, &s->inter_scantable  , ff_zigzag_direct);
+    ff_init_scantable(s->dsp.idct_permutation, &s->intra_scantable  , ff_zigzag_direct);
+    ff_init_scantable(s->dsp.idct_permutation, &s->intra_h_scantable, ff_alternate_horizontal_scan);
+    ff_init_scantable(s->dsp.idct_permutation, &s->intra_v_scantable, ff_alternate_vertical_scan);
 
     s->picture_structure= PICT_FRAME;
     
@@ -928,8 +928,8 @@ int MPV_frame_start(MpegEncContext *s, AVCodecContext *avctx)
 
     s->mb_skiped = 0;
 
-    assert(s->last_picture_ptr==NULL || s->out_format != FMT_H264);
-        
+    assert(s->last_picture_ptr==NULL || s->out_format != FMT_H264 || s->codec_id == CODEC_ID_SVQ3);
+
     /* mark&release old frames */
     if (s->pict_type != B_TYPE && s->last_picture_ptr) {
         avctx->release_buffer(avctx, (AVFrame*)s->last_picture_ptr);
@@ -945,9 +945,15 @@ int MPV_frame_start(MpegEncContext *s, AVCodecContext *avctx)
             }
         }
     }
-    
 alloc:
     if(!s->encoding){
+        /* release non refernce frames */
+        for(i=0; i<MAX_PICTURE_COUNT; i++){
+            if(s->picture[i].data[0] && !s->picture[i].reference /*&& s->picture[i].type!=FF_BUFFER_TYPE_SHARED*/){
+                s->avctx->release_buffer(s->avctx, (AVFrame*)&s->picture[i]);
+            }
+        }
+
         i= find_unused_picture(s, 0);
     
         pic= (AVFrame*)&s->picture[i];
@@ -967,7 +973,7 @@ alloc:
 
     s->current_picture= *s->current_picture_ptr;
   
-  if(s->out_format != FMT_H264){
+  if(s->out_format != FMT_H264 || s->codec_id == CODEC_ID_SVQ3){
     if (s->pict_type != B_TYPE) {
         s->last_picture_ptr= s->next_picture_ptr;
         s->next_picture_ptr= s->current_picture_ptr;
@@ -1041,12 +1047,14 @@ void MPV_frame_end(MpegEncContext *s)
     assert(i<MAX_PICTURE_COUNT);
 #endif    
 
-    /* release non refernce frames */
-    for(i=0; i<MAX_PICTURE_COUNT; i++){
-        if(s->picture[i].data[0] && !s->picture[i].reference /*&& s->picture[i].type!=FF_BUFFER_TYPE_SHARED*/)
-            s->avctx->release_buffer(s->avctx, (AVFrame*)&s->picture[i]);
+    if(s->encoding){
+        /* release non refernce frames */
+        for(i=0; i<MAX_PICTURE_COUNT; i++){
+            if(s->picture[i].data[0] && !s->picture[i].reference /*&& s->picture[i].type!=FF_BUFFER_TYPE_SHARED*/){
+                s->avctx->release_buffer(s->avctx, (AVFrame*)&s->picture[i]);
+            }
+        }
     }
-    
     // clear copies, to avoid confusion
 #if 0
     memset(&s->last_picture, 0, sizeof(Picture));
@@ -1861,6 +1869,18 @@ inline int ff_h263_round_chroma(int x){
     }
 }
 
+/**
+ * motion compesation of a single macroblock
+ * @param s context
+ * @param dest_y luma destination pointer
+ * @param dest_cb chroma cb/u destination pointer
+ * @param dest_cr chroma cr/v destination pointer
+ * @param dir direction (0->forward, 1->backward)
+ * @param ref_picture array[3] of pointers to the 3 planes of the reference picture
+ * @param pic_op halfpel motion compensation function (average or put normally)
+ * @param pic_op qpel motion compensation function (average or put normally)
+ * the motion vectors are taken from s->mv and the MV type from s->mv_type
+ */
 static inline void MPV_motion(MpegEncContext *s, 
                               uint8_t *dest_y, uint8_t *dest_cb, uint8_t *dest_cr,
                               int dir, uint8_t **ref_picture, 
@@ -4084,18 +4104,6 @@ static void dct_unquantize_h263_c(MpegEncContext *s,
     }
 }
 
-
-char ff_get_pict_type_char(int pict_type){
-    switch(pict_type){
-    case I_TYPE: return 'I'; 
-    case P_TYPE: return 'P'; 
-    case B_TYPE: return 'B'; 
-    case S_TYPE: return 'S'; 
-    case SI_TYPE:return 'i'; 
-    case SP_TYPE:return 'p'; 
-    default:     return '?';
-    }
-}
 
 static const AVOption mpeg4_options[] =
 {

@@ -67,6 +67,8 @@ void init_put_bits(PutBitContext *s,
 #endif
 }
 
+#ifdef CONFIG_ENCODERS
+
 /* return the number of bits output */
 int64_t get_bit_count(PutBitContext *s)
 {
@@ -86,6 +88,8 @@ void align_put_bits(PutBitContext *s)
 #endif
 }
 
+#endif //CONFIG_ENCODERS
+
 /* pad the end of the output stream with zeros */
 void flush_put_bits(PutBitContext *s)
 {
@@ -104,6 +108,8 @@ void flush_put_bits(PutBitContext *s)
 #endif
 }
 
+#ifdef CONFIG_ENCODERS
+
 void put_string(PutBitContext * pbc, char *s)
 {
     while(*s){
@@ -115,6 +121,14 @@ void put_string(PutBitContext * pbc, char *s)
 
 /* bit input functions */
 
+#endif //CONFIG_ENCODERS
+
+/**
+ * init GetBitContext.
+ * @param buffer bitstream buffer, must be FF_INPUT_BUFFER_PADDING_SIZE bytes larger then the actual read bits
+ * because some optimized bitstream readers read 32 or 64 bit at once and could read over the end
+ * @param bit_size the size of the buffer in bits
+ */
 void init_get_bits(GetBitContext *s,
                    const uint8_t *buffer, int bit_size)
 {
@@ -126,9 +140,19 @@ void init_get_bits(GetBitContext *s,
 #ifdef ALT_BITSTREAM_READER
     s->index=0;
 #elif defined LIBMPEG2_BITSTREAM_READER
+#ifdef LIBMPEG2_BITSTREAM_READER_HACK
+  if ((int)buffer&1) {
+     /* word alignment */
+    s->cache = (*buffer++)<<24;
+    s->buffer_ptr = buffer;
+    s->bit_count = 16-8;
+  } else
+#endif
+  {
     s->buffer_ptr = buffer;
     s->bit_count = 16;
     s->cache = 0;
+  }
 #elif defined A32_BITSTREAM_READER
     s->buffer_ptr = (uint32_t*)buffer;
     s->bit_count = 32;
@@ -138,12 +162,36 @@ void init_get_bits(GetBitContext *s,
     {
         OPEN_READER(re, s)
         UPDATE_CACHE(re, s)
-//        UPDATE_CACHE(re, s)
+        UPDATE_CACHE(re, s)
         CLOSE_READER(re, s)
     }
 #ifdef A32_BITSTREAM_READER
     s->cache1 = 0;
 #endif
+}
+
+/** 
+ * reads 0-32 bits.
+ */
+unsigned int get_bits_long(GetBitContext *s, int n){
+    if(n<=17) return get_bits(s, n);
+    else{
+        int ret= get_bits(s, 16) << (n-16);
+        return ret | get_bits(s, n-16);
+    }
+}
+
+/** 
+ * shows 0-32 bits.
+ */
+unsigned int show_bits_long(GetBitContext *s, int n){
+    if(n<=17) return show_bits(s, n);
+    else{
+        GetBitContext gb= *s;
+        int ret= get_bits_long(s, n);
+        *s= gb;
+        return ret;
+    }
 }
 
 void align_get_bits(GetBitContext *s)

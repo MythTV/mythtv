@@ -15,8 +15,8 @@ extern "C" {
 
 #define LIBAVCODEC_VERSION_INT 0x000406
 #define LIBAVCODEC_VERSION     "0.4.6"
-#define LIBAVCODEC_BUILD       4666
-#define LIBAVCODEC_BUILD_STR   "4666"
+#define LIBAVCODEC_BUILD       4668
+#define LIBAVCODEC_BUILD_STR   "4668"
 
 #define LIBAVCODEC_IDENT	"FFmpeg" LIBAVCODEC_VERSION "b" LIBAVCODEC_BUILD_STR
 
@@ -41,6 +41,7 @@ enum CodecID {
     CODEC_ID_H263P,
     CODEC_ID_H263I,
     CODEC_ID_SVQ1,
+    CODEC_ID_SVQ3,
     CODEC_ID_DVVIDEO,
     CODEC_ID_DVAUDIO,
     CODEC_ID_WMAV1,
@@ -51,6 +52,10 @@ enum CodecID {
     CODEC_ID_CYUV,
     CODEC_ID_H264,
     CODEC_ID_INDEO3,
+    CODEC_ID_VP3,
+    CODEC_ID_AAC,
+    CODEC_ID_MPEG4AAC,
+    CODEC_ID_ASV1,
 
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE,
@@ -66,6 +71,9 @@ enum CodecID {
     CODEC_ID_ADPCM_IMA_QT,
     CODEC_ID_ADPCM_IMA_WAV,
     CODEC_ID_ADPCM_MS,
+
+	/* AMR */
+    CODEC_ID_AMR_NB,
 };
 
 enum CodecType {
@@ -307,7 +315,7 @@ static const int Motion_Est_QTab[] = { ME_ZERO, ME_PHODS, ME_LOG,
      * type of the buffer (to keep track of who has to dealloc data[*])\
      * - encoding: set by the one who allocs it\
      * - decoding: set by the one who allocs it\
-     * Note: user allocated (direct rendering) & internal buffers can not coexist currently\ 
+     * Note: user allocated (direct rendering) & internal buffers can not coexist currently\
      */\
     int type;\
     \
@@ -837,6 +845,7 @@ typedef struct AVCodecContext {
 #define FF_IDCT_MLIB         6
 #define FF_IDCT_ARM          7
 #define FF_IDCT_ALTIVEC      8
+#define FF_IDCT_SH4          9
 
     /**
      * slice count.
@@ -1100,6 +1109,15 @@ typedef struct AVCodecContext {
      * Dont touch, used by lavc default_get_buffer()
      */
     void *internal_buffer;
+    
+#define FF_QUALITY_SCALE 256
+    /**
+     * global quality for codecs which cannot change it per frame.
+     * this should be proportional to MPEG1/2/4 qscale.
+     * - encoding: set by user.
+     * - decoding: unused
+     */
+    int global_quality;
 } AVCodecContext;
 
 
@@ -1191,6 +1209,7 @@ extern AVCodec wmv1_encoder;
 extern AVCodec wmv2_encoder;
 extern AVCodec huffyuv_encoder;
 extern AVCodec h264_encoder;
+extern AVCodec asv1_encoder;
 
 extern AVCodec h263_decoder;
 extern AVCodec mpeg4_decoder;
@@ -1203,6 +1222,7 @@ extern AVCodec mpeg_decoder;
 extern AVCodec h263i_decoder;
 extern AVCodec rv10_decoder;
 extern AVCodec svq1_decoder;
+extern AVCodec svq3_decoder;
 extern AVCodec dvvideo_decoder;
 extern AVCodec dvaudio_decoder;
 extern AVCodec wmav1_decoder;
@@ -1218,6 +1238,11 @@ extern AVCodec oggvorbis_decoder;
 extern AVCodec cyuv_decoder;
 extern AVCodec h264_decoder;
 extern AVCodec indeo3_decoder;
+extern AVCodec vp3_decoder;
+extern AVCodec amr_nb_decoder;
+extern AVCodec aac_decoder;
+extern AVCodec mpeg4aac_decoder;
+extern AVCodec asv1_decoder;
 
 /* pcm codecs */
 #define PCM_CODEC(id, name) \
@@ -1242,7 +1267,8 @@ PCM_CODEC(CODEC_ID_ADPCM_MS, adpcm_ms);
 #undef PCM_CODEC
 
 /* dummy raw video codec */
-extern AVCodec rawvideo_codec;
+extern AVCodec rawvideo_encoder;
+extern AVCodec rawvideo_decoder;
 
 /* the following codecs use external GPL libs */
 extern AVCodec ac3_decoder;
@@ -1279,9 +1305,12 @@ void img_resample_close(ImgReSampleContext *s);
 
 int avpicture_fill(AVPicture *picture, uint8_t *ptr,
                    int pix_fmt, int width, int height);
+int avpicture_layout(AVPicture* src, int pix_fmt, int width, int height,
+                     unsigned char *dest, int dest_size);
 int avpicture_get_size(int pix_fmt, int width, int height);
 void avcodec_get_chroma_sub_sample(int pix_fmt, int *h_shift, int *v_shift);
 const char *avcodec_get_pix_fmt_name(int pix_fmt);
+enum PixelFormat avcodec_get_pix_fmt(const char* name);
 
 #define FF_LOSS_RESOLUTION  0x0001 /* loss due to resolution change */
 #define FF_LOSS_DEPTH       0x0002 /* loss due to color depth change */
@@ -1355,6 +1384,12 @@ void avcodec_register_all(void);
 void avcodec_flush_buffers(AVCodecContext *avctx);
 
 /* misc usefull functions */
+
+/**
+ * returns a single letter to describe the picture type
+ */
+char av_get_pict_type_char(int pict_type);
+
 /**
  * reduce a fraction.
  * this is usefull for framerate calculations

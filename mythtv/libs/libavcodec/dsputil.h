@@ -77,6 +77,7 @@ void clear_blocks_c(DCTELEM *blocks);
 /* add and put pixel (decoding) */
 // blocksizes for op_pixels_func are 8x4,8x8 16x8 16x16
 typedef void (*op_pixels_func)(uint8_t *block/*align width (8 or 16)*/, const uint8_t *pixels/*align 1*/, int line_size, int h);
+typedef void (*tpel_mc_func)(uint8_t *block/*align width (8 or 16)*/, const uint8_t *pixels/*align 1*/, int line_size, int w, int h);
 typedef void (*qpel_mc_func)(uint8_t *dst/*align width (8 or 16)*/, uint8_t *src/*align 1*/, int stride);
 typedef void (*h264_chroma_mc_func)(uint8_t *dst/*align 8*/, uint8_t *src/*align 1*/, int srcStride, int h, int x, int y);
 
@@ -146,19 +147,23 @@ typedef struct DSPContext {
     me_cmp_func me_sub_cmp[11];
     me_cmp_func mb_cmp[11];
 
-    /* maybe create an array for 16/8 functions */
+    /* maybe create an array for 16/8/4/2 functions */
     /**
      * Halfpel motion compensation with rounding (a+b+1)>>1.
+     * this is an array[4][4] of motion compensation funcions for 4 
+     * horizontal blocksizes (2,4,8,16) and the 4 halfpel positions<br>
      * *pixels_tab[ 0->16xH 1->8xH ][ xhalfpel + 2*yhalfpel ]
      * @param block destination where the result is stored
      * @param pixels source
      * @param line_size number of bytes in a horizontal line of block
      * @param h height
      */
-    op_pixels_func put_pixels_tab[2][4];
+    op_pixels_func put_pixels_tab[4][4];
 
     /**
      * Halfpel motion compensation with rounding (a+b+1)>>1.
+     * this is an array[2][4] of motion compensation funcions for 2 
+     * horizontal blocksizes (8,16) and the 4 halfpel positions<br>
      * *pixels_tab[ 0->16xH 1->8xH ][ xhalfpel + 2*yhalfpel ]
      * @param block destination into which the result is averaged (a+b+1)>>1
      * @param pixels source
@@ -169,6 +174,8 @@ typedef struct DSPContext {
 
     /**
      * Halfpel motion compensation with no rounding (a+b)>>1.
+     * this is an array[2][4] of motion compensation funcions for 2 
+     * horizontal blocksizes (8,16) and the 4 halfpel positions<br>
      * *pixels_tab[ 0->16xH 1->8xH ][ xhalfpel + 2*yhalfpel ]
      * @param block destination where the result is stored
      * @param pixels source
@@ -179,6 +186,8 @@ typedef struct DSPContext {
 
     /**
      * Halfpel motion compensation with no rounding (a+b)>>1.
+     * this is an array[2][4] of motion compensation funcions for 2 
+     * horizontal blocksizes (8,16) and the 4 halfpel positions<br>
      * *pixels_tab[ 0->16xH 1->8xH ][ xhalfpel + 2*yhalfpel ]
      * @param block destination into which the result is averaged (a+b)>>1
      * @param pixels source
@@ -186,6 +195,18 @@ typedef struct DSPContext {
      * @param h height
      */
     op_pixels_func avg_no_rnd_pixels_tab[2][4];
+    
+    /**
+     * Thirdpel motion compensation with rounding (a+b+1)>>1.
+     * this is an array[12] of motion compensation funcions for the 9 thirdpel positions<br>
+     * *pixels_tab[ xthirdpel + 4*ythirdpel ]
+     * @param block destination where the result is stored
+     * @param pixels source
+     * @param line_size number of bytes in a horizontal line of block
+     * @param h height
+     */
+    tpel_mc_func put_tpel_pixels_tab[11]; //FIXME individual func ptr per width?
+    
     qpel_mc_func put_qpel_pixels_tab[2][16];
     qpel_mc_func avg_qpel_pixels_tab[2][16];
     qpel_mc_func put_no_rnd_qpel_pixels_tab[2][16];
@@ -213,6 +234,7 @@ typedef struct DSPContext {
     /* huffyuv specific */
     void (*add_bytes)(uint8_t *dst/*align 16*/, uint8_t *src/*align 16*/, int w);
     void (*diff_bytes)(uint8_t *dst/*align 16*/, uint8_t *src1/*align 16*/, uint8_t *src2/*align 1*/,int w);
+    void (*bswap_buf)(uint32_t *dst, uint32_t *src, int w);
     
     /* (I)DCT */
     void (*fdct)(DCTELEM *block/* align 16*/);
@@ -232,6 +254,10 @@ typedef struct DSPContext {
     
     /**
      * idct input permutation.
+     * several optimized IDCTs need a permutated input (relative to the normal order of the reference
+     * IDCT)
+     * this permutation must be performed before the idct_put/add, note, normally this can be merged
+     * with the zigzag/alternate scan<br>
      * an example to avoid confusion:
      * - (->decode coeffs -> zigzag reorder -> dequant -> reference idct ->...)
      * - (x -> referece dct -> reference idct -> x)
@@ -255,6 +281,18 @@ void dsputil_init(DSPContext* p, AVCodecContext *avctx);
  * @param last last non zero element in scantable order
  */
 void ff_block_permute(DCTELEM *block, uint8_t *permutation, const uint8_t *scantable, int last);
+
+#define	BYTE_VEC32(c)	((c)*0x01010101UL)
+
+static inline uint32_t rnd_avg32(uint32_t a, uint32_t b)
+{
+    return (a | b) - (((a ^ b) & ~BYTE_VEC32(0x01)) >> 1);
+}
+
+static inline uint32_t no_rnd_avg32(uint32_t a, uint32_t b)
+{
+    return (a & b) + (((a ^ b) & ~BYTE_VEC32(0x01)) >> 1);
+}
 
 /**
  * Empty mmx state.
@@ -340,6 +378,12 @@ void dsputil_init_ppc(DSPContext* c, AVCodecContext *avctx);
 
 void dsputil_init_mmi(DSPContext* c, AVCodecContext *avctx);
 
+#elif defined(ARCH_SH4)
+
+#define __align8 __attribute__ ((aligned (8)))
+
+void dsputil_init_sh4(DSPContext* c, AVCodecContext *avctx);
+
 #else
 
 #define __align8
@@ -350,7 +394,9 @@ void dsputil_init_mmi(DSPContext* c, AVCodecContext *avctx);
 
 struct unaligned_64 { uint64_t l; } __attribute__((packed));
 struct unaligned_32 { uint32_t l; } __attribute__((packed));
+struct unaligned_16 { uint16_t l; } __attribute__((packed));
 
+#define LD16(a) (((const struct unaligned_16 *) (a))->l)
 #define LD32(a) (((const struct unaligned_32 *) (a))->l)
 #define LD64(a) (((const struct unaligned_64 *) (a))->l)
 
@@ -358,6 +404,7 @@ struct unaligned_32 { uint32_t l; } __attribute__((packed));
 
 #else /* __GNUC__ */
 
+#define LD16(a) (*((uint16_t*)(a)))
 #define LD32(a) (*((uint32_t*)(a)))
 #define LD64(a) (*((uint64_t*)(a)))
 

@@ -157,7 +157,7 @@ static const uint16_t block_sizes[6] = {
 };
 
 #ifndef ALT_BITSTREAM_READER
-#error only works with ALT_BITSTREAM_READER
+#warning only works with ALT_BITSTREAM_READER
 #endif
 
 /* decode ac coefs */
@@ -171,7 +171,10 @@ static void dv_decode_ac(DVVideoDecodeContext *s,
     int pos = mb->pos;
     int level, pos1, sign, run;
     int partial_bit_count;
-
+#ifndef ALT_BITSTREAM_READER //FIXME
+    int re_index=0; 
+    int re1_index=0;
+#endif
     OPEN_READER(re, &s->gb);
     
 #ifdef VLC_DEBUG
@@ -278,7 +281,7 @@ static void dv_decode_ac(DVVideoDecodeContext *s,
             if (pos >= 64) {
             read_error:
 #if defined(VLC_DEBUG) || 1
-                printf("error pos=%d\n", pos);
+                fprintf(stderr, "error pos=%d\n", pos);
 #endif
                 /* for errors, we consider the eob is reached */
                 mb->eob_reached = 1;
@@ -364,7 +367,7 @@ static inline void dv_decode_video_segment(DVVideoDecodeContext *s,
 
             /* write the remaining bits  in a new buffer only if the
                block is finished */
-            bits_left = last_index - s->gb.index;
+            bits_left = last_index - get_bits_count(&s->gb);
             if (mb->eob_reached) {
                 mb->partial_bit_count = 0;
                 mb_bit_count += bits_left;
@@ -389,13 +392,13 @@ static inline void dv_decode_video_segment(DVVideoDecodeContext *s,
         mb = mb1;
         init_get_bits(&s->gb, mb_bit_buffer, 80*8);
         for(j = 0;j < 6; j++) {
-            if (!mb->eob_reached && s->gb.index < mb_bit_count) {
+            if (!mb->eob_reached && get_bits_count(&s->gb) < mb_bit_count) {
                 dv_decode_ac(s, mb, block, mb_bit_count);
                 /* if still not finished, no need to parse other blocks */
                 if (!mb->eob_reached) {
                     /* we could not parse the current AC coefficient,
                        so we add the remaining bytes */
-                    bits_left = mb_bit_count - s->gb.index;
+                    bits_left = mb_bit_count - get_bits_count(&s->gb);
                     if (bits_left > 0) {
                         mb->partial_bit_count += bits_left;
                         mb->partial_bit_buffer = 
@@ -410,7 +413,7 @@ static inline void dv_decode_video_segment(DVVideoDecodeContext *s,
         }
         /* all blocks are finished, so the extra bytes can be used at
            the video segment level */
-        bits_left = mb_bit_count - s->gb.index;
+        bits_left = mb_bit_count - get_bits_count(&s->gb);
         vs_bit_count += bits_left;
         bit_copy(&vs_pb, &s->gb, bits_left);
     next_mb:
@@ -473,12 +476,12 @@ static inline void dv_decode_video_segment(DVVideoDecodeContext *s,
                     ptr = pixels;
                     for(y = 0;y < 8; y++) {
                         /* convert to 411P */
-                        c_ptr1 = c_ptr + linesize;
-                        c_ptr1[0] = c_ptr[0] = (ptr[0] + ptr[1]) >> 1;
-                        c_ptr1[1] = c_ptr[1] = (ptr[2] + ptr[3]) >> 1;
-                        c_ptr1[2] = c_ptr[2] = (ptr[4] + ptr[5]) >> 1;
-                        c_ptr1[3] = c_ptr[3] = (ptr[6] + ptr[7]) >> 1;
-                        c_ptr += linesize * 2;
+                        c_ptr1 = c_ptr + 8*linesize;
+                        c_ptr[0]= ptr[0]; c_ptr1[0]= ptr[4];
+                        c_ptr[1]= ptr[1]; c_ptr1[1]= ptr[5];
+                        c_ptr[2]= ptr[2]; c_ptr1[2]= ptr[6];
+                        c_ptr[3]= ptr[3]; c_ptr1[3]= ptr[7];
+                        c_ptr += linesize;
                         ptr += 8;
                     }
                 } else {
@@ -580,6 +583,9 @@ static int dvvideo_decode_frame(AVCodecContext *avctx,
     else
         avctx->aspect_ratio = 4.0 / 3.0;
 
+    if(s->picture.data[0])
+        avctx->release_buffer(avctx, &s->picture);
+    
     s->picture.reference= 0;
     if(avctx->get_buffer(avctx, &s->picture) < 0) {
         fprintf(stderr, "get_buffer() failed\n");
@@ -616,8 +622,6 @@ static int dvvideo_decode_frame(AVCodecContext *avctx,
     /* return image */
     *data_size = sizeof(AVFrame);
     *(AVFrame*)data= s->picture;
-    
-    avctx->release_buffer(avctx, &s->picture);
     
     return packet_size;
 }
