@@ -502,8 +502,8 @@ void ManualSchedule::saveScheduledRecording(void)
         {
             chanid = progInfo.chanid = query.value(0).toString();;
             progInfo.chanstr = query.value(1).toString();
-            progInfo.chansign = query.value(2).toString();
-            progInfo.channame = query.value(3).toString();
+            progInfo.chansign = QString::fromUtf8(query.value(2).toString());
+            progInfo.channame = QString::fromUtf8(query.value(3).toString());
 
             cout << "Program added to channel " 
                  << chanid << " - " << m_channel->currentText()

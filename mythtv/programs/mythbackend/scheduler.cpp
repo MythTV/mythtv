@@ -1510,7 +1510,7 @@ void Scheduler::AddNewRecords(void) {
         p->subtitle = QString::fromUtf8(result.value(5).toString());
         p->description = QString::fromUtf8(result.value(6).toString());
         p->chanstr = result.value(7).toString();
-        p->chansign = result.value(8).toString();
+        p->chansign = QString::fromUtf8(result.value(8).toString());
         p->channame = QString::fromUtf8(result.value(9).toString());
         p->category = QString::fromUtf8(result.value(11).toString());
         p->recpriority = result.value(12).toInt();
@@ -1692,7 +1692,7 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
             proginfo->chanstr = result.value(16).toString();
             if (proginfo->chanstr.isNull())
                 proginfo->chanstr = "";
-            proginfo->chansign = result.value(17).toString();
+            proginfo->chansign = QString::fromUtf8(result.value(17).toString());
             proginfo->seriesid = result.value(18).toString();
             proginfo->programid = result.value(19).toString();
             proginfo->category = result.value(20).toString();
