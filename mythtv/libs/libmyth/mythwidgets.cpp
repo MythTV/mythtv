@@ -174,7 +174,7 @@ void MythRemoteLineEdit::Init()
 
     setTextFormat(Qt::PlainText);    
 
-    cycle_time = 2000;
+    cycle_time = 3000;
 
     pre_cycle_text_upto = "";
     pre_cycle_text_from = "";
@@ -442,7 +442,7 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
             //
 
         case Key_1:
-            cycleKeys("_X-/.?()");
+            cycleKeys("_X-/.?()1");
             handled = true;
             break;
 
