@@ -446,14 +446,24 @@ void TVRec::HandleStateChange(void)
         {
             profileName = curRecording->GetScheduledRecording(
                                                 db_conn)->getProfileName();
+            bool foundProf = false;
             if (profileName != NULL)
+                foundProf = profile.loadByCard(db_conn, profileName,
+                                               m_capturecardnum);
+
+            if (!foundProf)
+            {
                 profileName = QString("Default");
-            profile.loadByCard(db_conn, profileName, m_capturecardnum);
+                profile.loadByCard(db_conn, profileName, m_capturecardnum);
+            }
         }
         else
         {
-            profile.loadByCard(db_conn, "Live TV", m_capturecardnum);
+            profileName = "Live TV";
+            profile.loadByCard(db_conn, profileName, m_capturecardnum);
         }
+        QString msg = QString("Using profile '%1' to record").arg(profileName);
+        VERBOSE(VB_RECORD, msg);
 
         pthread_mutex_unlock(&db_lock);
 
