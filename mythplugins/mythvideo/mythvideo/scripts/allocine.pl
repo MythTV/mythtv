@@ -13,26 +13,28 @@
 use LWP::Simple;      # libwww-perl providing simple HTML get actions
 use HTML::Entities;
 use URI::Escape;
-#use utf8;
 
-use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M $opt_P);
-use Getopt::Std; 
+
+use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M $opt_P $opt_u $opt_originaltitle $opt_casting);
+use Getopt::Long;
 
 $title = "Allocine Query"; 
-$version = "v1.00";
+$version = "v2.00";
 $author = "Xavier Hervy";
 
 # display usage
 sub usage {
-   print "usage: $0 -hdrviMPD [parameters]\n";
-   print "       -h           help\n";
-   print "       -d           debug\n";
-   print "       -r           dump raw query result data only\n";
-   print "       -v           display version\n";
-   print "       -i           display info\n";
+   print "usage: $0 -hviuocMPD [parameters]\n";
+   print "       -h, --help                       help\n";
+   print "       -v, --version                    display version\n";
+   print "       -i, --info                       display info\n";
+   print "       -u, --utf8                       output in utf8\n";
+   print "       -o, --originaltitle              concatenate title and original title\n";
+   print "       -c, --casting                    with -D option, grap the complete actor list (much slower)\n";
    print "\n";
-   print "       -M <query>    get movie list\n";
-   print "       -D <movieid>  get movie data\n";
+   print "       -M <query>,   --movie query>     get movie list\n";
+   print "       -D <movieid>, --data <movieid>   get movie data\n";
+   print "       -P <movieid>, --poster <movieid> get movie poster\n";
    exit(-1);
 }
 
@@ -61,11 +63,7 @@ sub parseBetween {
    my $start = index($ldata, lc($beg)) + length($beg);
    my $finish = index($ldata, lc($end), $start);
    
-   #my $ldata = $data;
-   #my $start = index($ldata, $beg) + length($beg);
-   #my $finish = index($ldata, $end, $start);
-       
-   #print "$start $finish\n";
+
    if ($start != (length($beg) -1) && $finish != -1) {
     	my $result = substr($data, $start, $finish - $start);
     	# dont use decode entities &npsp; => spécial characters bug in html::entities ?
@@ -115,18 +113,23 @@ sub getMovieData {
    my $request = "http://www.allocine.fr/film/fichefilm_gen_cfilm=" . $movieid . ".html";
    if (defined $opt_d) { printf("# request: '%s'\n", $request); }
    my $response = get $request;
-   if (defined $opt_r) { printf("%s", $response); }
 
    # parse title and year
-   my $title = parseBetween($response, "<FONT Class=\"titrePage\">", "</FONT>");
+   my $title = parseBetween($response, "<title>", "</title>");
+   my $original_title = parseBetween($response, "<h4>Titre original : ","</h4><br />");
+   $original_title = removeTag($original_title);
+   if (defined $opt_originaltitle){
+      if ($original_title  ne  ""){
+        $title = $title . " (" . $original_title . ")";
+      }
+   }
+   
    #print "titre = $title\n";
    $title = removeTag($title);
-   #print "titre ap = $title\n";
-   my $year = parseBetween($response,"<TD><font >","</font>.");
-   $year = parseBetween($year,"<font >(",")");
+   my $year = parseBetween($response,"<h4>Année de production : ","</h4>");
 
    # parse director 
-   my $director = parseBetween($response," par&nbsp;</FONT>","</TD></TR>");
+   my $director = parseBetween($response,"<h4>Réalisé par ","</h4>");
    $director = removeTag($director);
 
    # parse writer 
@@ -135,16 +138,14 @@ sub getMovieData {
    $writer = parseBetween($writer, "/\">", "</");
 
    # parse plot
-   my $plot = parseBetween($response,"<DIV Align='Justify'><FONT class=\"size2\">","</FONT></DIV>");
+   my $plot = parseBetween($response,"<td valign=\"top\" style=\"padding:10 0 0 0\"><div align=\"justify\"><h4>","</h4></div></td>");
    #$plot.replace("<BR>","\n");
    $plot = removeTag($plot);
    
 
    # parse user rating
-   #my $userrating = parseBetween($response, ">User Rating:</b>", "> (");
-   #$userrating = parseBetween($userrating, "<b>", "/");
    my $userrating;
-   my $rating = parseBetween($response,"Presse","</TABLE>");
+   my $rating = parseBetween($response,"Presse</a> <img ", " border=\"0\" /></h4></td>");
    my $nbvote = 0;
    my $sommevote = 0;
    $rating = parseBetween($rating,"etoile_",".gif");
@@ -152,12 +153,12 @@ sub getMovieData {
 	    $sommevote += $rating - 1;
 	    $nbvote ++;
    }
-   $rating = parseBetween($response,"Spectateurs","</TABLE>");
+   $rating = parseBetween($response,"Spectateurs</a> <img ", " border=\"0\" /></h4></td>");
    $rating = parseBetween($rating,"etoile_",".gif");
    if (!($rating eq "")){
 	$sommevote += $rating - 1;
 	$nbvote ++;
-   }
+  }
    if ($nbvote==0){$userrating=0};
    if ($nbvote==1){$userrating=$sommevote*2;};
    if ($nbvote==2){$userrating=$sommevote;};
@@ -175,7 +176,7 @@ sub getMovieData {
    
 
    # parse movie length
-   my $runtime = parseBetween($response,">Dur","</FONT>");
+   my $runtime = parseBetween($response,"Durée : ",".</h4>&nbsp;");
    my $heure;
    my $minutes;
    ($heure,$minutes)=($runtime=~/[^\d]*(\d+)[^\d]*(\d*)/);
@@ -191,25 +192,53 @@ sub getMovieData {
 
    # parse cast 
 
-   my $cast = parseBetween($response, "<FONT Class=\"titreDescription\">Avec&nbsp;", "</TD></TR>");
-
-#   $cast = parseBetween($response, "<FONT Class=\"titreDescription\">Avec&nbsp;", "Plus");
+   my $cast = parseBetween($response, "<h4>Avec ","</h4><br />");
    $cast = removeTag($cast);
-   if (parseBetween($cast,"", "Plus") eq ""){
-  }else{
-   	$cast = parseBetween($cast,"", "Plus");
+   if (defined $opt_casting){
+      my $responsecasting = get "http://www.allocine.fr/film/casting_gen_cfilm=" . $movieid . ".html";
+      my $fullcast = parseBetween($responsecasting, "Acteur(s)", "<table");
+      my $oneactor;
+      $fullcast = parseBetween($fullcast,"style=\"background-color", "</table>");
+      my @listactor = split("style=\"background-color", $fullcast);
+      my @cleanlistactor ;
+      for $oneactor (@listactor ) { 
+        $oneactor = parseBetween($oneactor,"<h4>","</h4>");
+        $oneactor =  removeTag($oneactor );        
+        push(@cleanlistactor,$oneactor); 
+	    }
+	    my $finalcast = join (", ",@cleanlistactor);
+	    if ($finalcast  ne "") {$cast = $finalcast;};
    }
+   
+   
 
    #genres
-   my $genres = parseBetween($response,")</font>. ","</FONT>.");#. <FONT Class=\"size2\">Dur");
+   my $genres = parseBetween($response,"<h4>Genre : ","</h4>");
    $genres = removeTag($genres);
    
    #countries
-   my $countries = parseBetween($response,"</font>&nbsp;"," <font >(");
+   my $countries = parseBetween($response,"<h4>Film ",".</h4>&nbsp;");
    $countries = removeTag($countries);
-   
+
+   if (defined $opt_u) { 
+   utf8::encode($title);
+   utf8::encode($year);
+   utf8::encode($director);
+   utf8::encode($plot);
+   utf8::encode($userrating);
+   utf8::encode($movierating);
+   utf8::encode($runtime);
+   utf8::encode($writer);
+   utf8::encode($cast);
+   utf8::encode($genres);
+   utf8::encode($countries);
+   }
+      
    # output fields (these field names must match what MythVideo is looking for)
    print "Title:$title\n";
+   if (!(defined $opt_originaltitle)){
+    print "OriginalTitle:$original_title\n";
+   }  
    print "Year:$year\n";
    print "Director:$director\n";
    print "Plot:$plot\n";
@@ -228,25 +257,24 @@ sub getMoviePoster {
    if (defined $opt_d) { printf("# looking for movie id: '%s'\n", $movieid);}
 
    # get the search results  page
-   my $request = "http://www.allocine.fr/film/galerie_gen_cfilm=" . $movieid . "&big=1&page=1.html";
+   
+   my $request = "http://www.allocine.fr/film/galerie_gen_cfilm=" . $movieid . ".html";
    if (defined $opt_d) { printf("# request: '%s'\n", $request); }
    my $response = get $request;
-   if (defined $opt_r) { printf("%s", $response); }
+   my $page=parseBetween($response,"page=",".html\" class=\"link1\"><span class=\"text2\">Dernière photo");
+   my @pages = split ("page=",$page);
+   $request = "";
+   for $page (@pages ) { 
+	        $request = $page;
+	      }
+	 if (!($request eq "")) {
+	    $request = "http://www.allocine.fr/film/galerie_gen_cfilm=" . $movieid . "&page=" . $request . ".html";
+	    $response = get $request;
+	 }
 
-   my $uri = parseBetween($response, "Ko'></A><BR><CENTER>", "<BR></CENTER></TD></TR></TABLE>");
-   if ($uri eq ""){
-   	$uri = parseBetween($response, "<A HREF=\"/film/galerie_gen_cfilm=" . $movieid . ".html\" target=\"\"><IMG border=0 src=\"", "\" Zalt");
-   	if ($uri eq "") {
-   		my $request = "http://www.allocine.fr/film/fichefilm_gen_cfilm=" . $movieid . ".html";
-   		if (defined $opt_d) { printf("# request: '%s'\n", $request); }
-   		my $response = get $request;
-   		if (defined $opt_r) { printf("%s", $response); }
-   		$uri = parseBetween($response, "<TABLE Border=0 CellPadding=0 CellSpacing=0><TR><TD><IMG Src='", "' Border=0></TD><TD><IMG Border=0 Src='");
-   		
-   	}
-   }
-   
-   
+
+   my $uri = parseBetween($response,"<table style=\"padding:0 0 0 0\" border=\"0\" >","Ko\" />");
+   $uri = parseBetween($uri ,"<img src=\"","\" border=\"0\" class=\"galerie\" ");
    print "$uri\n";
 }
 
@@ -289,24 +317,18 @@ sub getMovieList {
    
    while (($typerecherche <=5) && ($count ==0)){
 	   # get the search results  page
-	   my $request = "http://www.allocine.fr/recherche/rubrique.html?typerecherche=$typerecherche&motcle=$query";
+	   my $request = "http://www.allocine.fr/recherche/?rub=1&motcle=$query";
 	   if (defined $opt_d) { printf("# request: '%s'\n", $request); }
 	   my $response = get $request;
-	   if (defined $opt_r) {
-	      print $response;
-	      exit(0);
-	   }
 	
 	
 	   # extract possible matches
 	   #    possible matches are grouped in several catagories:  
 	   #        exact, partial, and approximate
-	   my $exact_matches = parseBetween($response, "<TABLE width=96% cellPadding=0 cellSpacing=2 border=0>",
-	   						"</TABLE>");
-	   #print "$exact_matches\n";
+	   my $exact_matches = $response;
 	   # parse movie list from matches
-	   my $beg = "<A HREF=\"/film/fichefilm_gen_cfilm=";
-	   my $end = "</TD></TR>";
+	   my $beg = "<h4><a href=\"/film/fichefilm_gen_cfilm=";
+	   my $end = "</a></h4>";
 	   
 	   my @movies;
 	
@@ -323,9 +345,8 @@ sub getMovieList {
 	      while ($start != -1) {
 	         $start += length($beg);
 	         my $sub = substr($data, $start, $finish - $start);
-	         my ($movienum, $moviename) = split(".html\">", $sub);
-	         $title = parseBetween($moviename,"<FONT color=#003399>","</FONT></A>");
-	         $title = removeTag($title);
+	         my ($movienum, $moviename) = split(".html\" class=\"link1\">", $sub);
+	         $title = removeTag($moviename);
 	         $moviename = removeTag($moviename);
 	         my ($movieyear)= $moviename =~/\((\d+)\)/;
 	         if ($movieyear){$title = $title." (".$movieyear.")"; }
@@ -337,11 +358,18 @@ sub getMovieList {
 	         $finish = index($data, $end, $start + 1); 
 	      
 	         # add to array
+#                 my $movienameutf8 = 
+                 utf8::encode($moviename);
 	         $movies[$count++] = $movienum . ":" . $moviename;
 	      }
 	      
 	      # display array of values
-	      for $movie (@movies) { print "$movie\n"; }
+	      for $movie (@movies) { 
+	        if (defined $opt_u) { 
+            utf8::encode($movie);
+          }
+	        print "$movie\n"; 
+	      }
 	   }
       }
 }
@@ -351,7 +379,17 @@ sub getMovieList {
 #
 
 # parse command line arguments 
-getopts('ohrdivDMP');
+
+    GetOptions( "utf8"  => \$opt_u,        # --utf8
+                "version" => \$opt_v,
+                "info" => \$opt_i,
+                "originaltitle" => \$opt_originaltitle,
+                "casting" => \$opt_casting,
+                "Data" => \$opt_D,
+                "Movie" => \$opt_M,
+                "Poster" => \$opt_P
+                );       
+            
 
 # print out info 
 if (defined $opt_v) { version(); exit 1; }
