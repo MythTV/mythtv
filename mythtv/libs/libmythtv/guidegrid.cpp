@@ -153,6 +153,7 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel,
     accel->connectItem(accel->insertItem(Key_I), this, SLOT(displayInfo()));
     accel->connectItem(accel->insertItem(Key_Space), this, SLOT(displayInfo()));
     accel->connectItem(accel->insertItem(Key_Enter), this, SLOT(displayInfo()));
+    accel->connectItem(accel->insertItem(Key_R), this, SLOT(quickRecord()));
 
     connect(this, SIGNAL(killTheApp()), this, SLOT(accept()));
 
@@ -1995,6 +1996,23 @@ void GuideGrid::escape()
     emit killTheApp();
 }
 
+void GuideGrid::quickRecord()
+{
+    ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
+    RecordingType currType = pginfo->GetProgramRecordingStatus();
+
+    if (!pginfo)
+        return;
+
+    if (currType == kSingleRecord)
+        pginfo->ApplyRecordStateChange(kNotRecording);
+    else if (currType == kNotRecording)
+        pginfo->ApplyRecordStateChange(kSingleRecord);
+
+    fillProgramInfos();
+    update(programRect());
+}
+
 void GuideGrid::displayInfo()
 {
     showInfo = 1;
@@ -2007,6 +2025,8 @@ void GuideGrid::displayInfo()
         diag.setCaption("BLAH!!!");
         diag.exec();
     }
+    else
+        return;
 
     showInfo = 0;
 

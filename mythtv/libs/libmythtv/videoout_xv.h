@@ -44,6 +44,7 @@ class XvVideoOutput
     int XJ_width, XJ_height;
     int XJ_screenwidth, XJ_screenheight;
     int XJ_fullscreen;
+    int XJ_aspect;
 
     int oldx, oldy, oldw, oldh;
     int curx, cury, curw, curh;

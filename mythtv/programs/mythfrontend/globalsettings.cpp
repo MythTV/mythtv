@@ -288,6 +288,15 @@ public:
     };
 };
 
+class FixedAspectRatio: public CheckBoxSetting, public GlobalSetting {
+public:
+    FixedAspectRatio():
+       GlobalSetting("FixedAspectRatio") {
+       setLabel("Fixed aspect ratio");
+       setValue(false);
+    };
+};
+
 class PlaybackExitPrompt: public CheckBoxSetting, public GlobalSetting {
 public:
     PlaybackExitPrompt():
@@ -625,6 +634,7 @@ PlaybackSettings::PlaybackSettings(MythContext *context)
     general->addChild(new AudioOutputDevice());
     general->addChild(new Deinterlace());
     general->addChild(new PlaybackExitPrompt());
+    general->addChild(new FixedAspectRatio());
     addChild(general);
 
     VerticalConfigurationGroup* seek = new VerticalConfigurationGroup(false);

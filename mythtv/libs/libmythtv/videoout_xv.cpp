@@ -154,6 +154,8 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
 
     printf("Over/underscanning. V: %f, H: %f, XOff: %d, YOff: %d\n", 
            img_vscanf, img_hscanf, img_xoff, img_yoff);
+ 
+    XJ_aspect = m_context->GetNumSetting("FixedAspectRatio", 0);
 
     XJ_white = XWhitePixel(data->XJ_disp, XJ_screen_num);
     XJ_black = XBlackPixel(data->XJ_disp, XJ_screen_num);
@@ -399,6 +401,10 @@ void XvVideoOutput::ToggleFullScreen(void)
     if (XJ_fullscreen)
     {
         XJ_fullscreen = 0; 
+
+        if (XJ_aspect)
+            curw = 4 * curh / 3;
+
         curx = oldx; cury = oldy; curw = oldw; curh = oldh;
         show_cursor();
         decorate(1);

@@ -63,6 +63,7 @@ class GuideGrid : public MythDialog
     void enter();
     void escape();
 
+    void quickRecord();
     void displayInfo();
 
   protected:

@@ -37,6 +37,12 @@ With the stickykeys option selected
    - 4 - 9 plays back faster than normal ff/rew speed (9 is fastest).
    - Space exits fast forward or rewind mode.
 
+Watching TV only:
+
+- J/j increase/decrease contrast
+- K/k increase/decrease brightness
+- L/l increase/decrease color
+
 If you have two tuner cards:
 
 - V toggle Picture-in-picture on or off
@@ -73,7 +79,9 @@ EPG
      "Instant Record" a program.
 - Pressing M when on a channel will change to that channel.
 - Pressing ESC or C exits without changing the channel.
-
+- Pressing R toggles between "Don't record this program" and "Record only this
+  showing of the program".  It will not do anything if other recording types
+  are selected for the highlighted entry.
 
 Remote Controls
 ---------------
