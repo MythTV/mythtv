@@ -12,6 +12,7 @@
 
 #include <qstring.h>
 #include <qptrlist.h>
+#include <qsqldatabase.h>
 
 #include <dvdread/dvd_reader.h>
 #include <dvdread/ifo_read.h>
@@ -69,7 +70,12 @@ class DVDTitle
     void    setAngles(uint a_uint){numb_angles = a_uint;}
     void    setTrack(uint a_uint){track_number = a_uint;}
     void    setTime(uint h, uint m, uint s, double fr);
-    
+    void    setAR(uint n, uint d, const QString &ar);
+    void    setSize(uint h, uint v){hsize = h; vsize = v;}
+    void    setLBox(bool yes_or_no){letterbox = yes_or_no;}
+    void    setVFormat(const QString &a_string){video_format = a_string;}    
+    void    determineInputID(QSqlDatabase *db);
+
     //
     //  Get
     //
@@ -82,6 +88,8 @@ class DVDTitle
     uint    getHours(){return hours;}
     uint    getMinutes(){return minutes;}
     uint    getSeconds(){return seconds;}
+    uint    getInputID(){return dvdinput_id;}
+    
 
     void                printYourself();
     void                addAudio(DVDAudio *new_audio_track);
@@ -96,7 +104,17 @@ class DVDTitle
     uint    hours;
     uint    minutes;
     uint    seconds;
+    
+    uint    hsize;
+    uint    vsize;
     double  frame_rate;
+    int     fr_code;
+    uint    ar_numerator;
+    uint    ar_denominator;
+    QString aspect_ratio;    
+    bool    letterbox;
+    QString video_format;
+    uint    dvdinput_id;
     
     QPtrList<DVDAudio>  audio_tracks;
 
@@ -111,7 +129,7 @@ class DVDProbe
 
   public:
   
-    DVDProbe(const QString &dvd_device);
+    DVDProbe(const QString &dvd_device, QSqlDatabase *ldb);
     ~DVDProbe();
 
     bool                probe();
@@ -127,6 +145,7 @@ class DVDProbe
 
     QPtrList<DVDTitle>  titles;
     QString             volume_name;
+    QSqlDatabase        *db;
 };
 
 #endif  // dvdprobe_h_

@@ -190,9 +190,22 @@ DVDTitle::DVDTitle()
     minutes = 0;
     seconds = 0;
     frame_rate = 0.0;
+    hsize = 0;
+    vsize = 0;
     audio_tracks.clear();
     audio_tracks.setAutoDelete(true);
 
+    hsize = 0;
+    vsize = 0;
+    fr_code = 0;
+    ar_numerator = 0;
+    ar_denominator = 0;
+    aspect_ratio = "";
+
+    letterbox = false;
+    video_format = "unkown";
+    
+    dvdinput_id = 0;
 }
 
 void DVDTitle::setTime(uint h, uint m, uint s, double fr)
@@ -201,6 +214,77 @@ void DVDTitle::setTime(uint h, uint m, uint s, double fr)
     minutes = m;
     seconds = s;
     frame_rate = fr;
+    
+    //
+    //  These are transocde frame rate codes
+    //
+    
+    if(fr > 23.0 && fr < 24.0)
+    {
+        fr_code = 1;
+    }
+    else if(fr == 24.0)
+    {
+        fr_code = 2;
+    }
+    else if(fr == 25.0)
+    {
+        fr_code = 3;
+    }
+    else if(fr >  20.0 && fr < 30.0)
+    {
+        fr_code = 4;
+    }
+    else if(fr == 30.0)
+    {
+        fr_code = 5;
+    }
+    else if(fr == 50.0)
+    {
+        fr_code = 6;
+    }
+    else if(fr > 59.0 && fr < 60.0)
+    {
+        fr_code = 7;
+    }
+    else if(fr == 60.0)
+    {
+        fr_code = 8;
+    }
+    else if(fr == 1.0)
+    {
+        fr_code = 9;
+    }
+    else if(fr == 5.0)
+    {
+        fr_code = 10;
+    }
+    else if(fr == 10.0)
+    {
+        fr_code = 11;
+    }
+    else if(fr == 12.0)
+    {
+        fr_code = 12;
+    }
+    else if(fr == 15.0)
+    {
+        fr_code = 13;
+    }
+    else
+    {
+        fr_code = 0;
+        cerr << "dvdprobe.o: Could not find a frame rate code given a frame rate of " << fr << endl ;
+    }
+    
+    
+}
+
+void DVDTitle::setAR(uint n, uint d, const QString &ar)
+{
+    ar_numerator = n;
+    ar_denominator = d;
+    aspect_ratio = ar;
 }
 
 uint DVDTitle::getPlayLength()
@@ -247,6 +331,58 @@ void DVDTitle::addAudio(DVDAudio *new_audio_track)
     audio_tracks.append(new_audio_track);
 }
 
+void DVDTitle::determineInputID(QSqlDatabase *db)
+{
+    if(!db)
+    {
+        cerr << "dvdprobe.o: Yeah, right, whatever. I'll look stuff up with nowhere to look. Duh ..." << endl;
+        return;
+    }
+    
+    QString q_string = QString("SELECT intid FROM dvdinput WHERE "
+                              "hsize = %1 and "
+                              "vsize = %2 and "
+                              "ar_num = %3 and "
+                              "ar_denom = %4 and "
+                              "fr_code = %5 and "
+                              "letterbox = %6 and "
+                              "v_format = \"%7\" ;")
+                              .arg(hsize)
+                              .arg(vsize)
+                              .arg(ar_numerator)
+                              .arg(ar_denominator)
+                              .arg(fr_code)
+                              .arg(letterbox)
+                              .arg(video_format);
+
+    QSqlQuery a_query (q_string, db);
+    
+    if(a_query.isActive() && a_query.numRowsAffected() > 0)
+    {
+        a_query.next();
+        dvdinput_id = a_query.value(0).toInt();
+    }
+    else
+    {
+        cerr << "dvdprobe.o: You have a title on your dvd in format myth doesn't understand." << endl;
+        cerr << "dvdprobe.o: You probably want to report this to a mailing list or something: " << endl;
+        cerr << "                  height = " << hsize << endl;
+        cerr << "                   width = " << vsize << endl;
+        cerr << "            aspect ratio = " << aspect_ratio << endl;
+        cerr << "              frame rate = " << frame_rate << endl;
+        cerr << "                 fr_code = " << fr_code << endl;
+        if(letterbox)
+        {
+            cerr << "             letterboxed = true " << endl;
+        }
+        else
+        {
+            cerr << "             letterboxed = false " << endl;
+        }
+        cerr << "                  format = " << video_format << endl;
+    }    
+}
+
 DVDTitle::~DVDTitle()
 {
     audio_tracks.clear();
@@ -257,12 +393,20 @@ DVDTitle::~DVDTitle()
 */
 
 
-DVDProbe::DVDProbe(const QString &dvd_device)
+DVDProbe::DVDProbe(const QString &dvd_device, QSqlDatabase *ldb)
 {
     //
     //  This object just figures out what's on a disc
     //  and tells whoever asks about it.
     //
+    
+    if(!ldb)
+    {
+        cerr << "dvdprobe.o: Hey! You tried to construct me with a null database pointer" << endl;
+        exit(0);
+    }
+    
+    db = ldb;
     
     device = dvd_device;
     dvd = NULL;
@@ -460,7 +604,64 @@ bool DVDProbe::probe()
                             DVDAudio *new_audio = new DVDAudio();
                             new_audio->fill(audio_attributes);
                             new_title->addAudio(new_audio);
-                            
+                        }
+                        
+                        //
+                        //  Figure out size, aspect ratio, etc.
+                        //
+                        
+                        video_attr_t *video_attributes = &video_transport_file->vtsi_mat->vtsm_video_attr;
+                      
+                        switch(video_attributes->display_aspect_ratio)
+                        {
+                            case 0:
+                                new_title->setAR(4, 3, "4:3");   
+                                break;
+                            case 3:
+                                new_title->setAR(16, 9, "16:9");
+                                break;
+                            default:
+                                cerr << "dvdprobe.o: couldn't get aspect ratio for a title" << endl;
+                        }
+                        
+                        switch(video_attributes->video_format)
+                        {
+                            case 0:
+                                new_title->setVFormat("ntsc");
+                                break;
+                            case 1:
+                                new_title->setVFormat("pal");
+                                break;
+                            default:
+                                cerr << "dvdprobe.o: Could not get video format for a title" << endl;
+                        }
+                        
+                        if(video_attributes->letterboxed)
+                        {
+                            new_title->setLBox(true);
+                        }
+                        
+                        uint c_height = 480;
+                        if(video_attributes->video_format != 0)
+                        {
+                            c_height = 576;
+                        }
+                        switch(video_attributes->picture_size)
+                        {
+                            case 0:
+                                new_title->setSize(720, c_height);
+                                break;
+                            case 1:
+                                new_title->setSize(040, c_height);
+                                break;
+                            case 2:
+                                new_title->setSize(352, c_height);
+                                break;
+                            case 3:
+                                new_title->setSize(352, c_height / 2);
+                                break;
+                            default:
+                                cerr << "dvdprobe.o: Could not determine for video size for a title." << endl ;
                         }
                     }
                     else
@@ -474,6 +675,14 @@ bool DVDProbe::probe()
                 //  Debugging output
                 //
                 //  new_title->printYourself();        
+        
+                //
+                //  Have the new title figure out it's
+                //  appropriate id number vis-a-vis the
+                //  dvdinput table
+                //
+                
+                new_title->determineInputID(db);
         
                 //
                 //  Add this new title to the container

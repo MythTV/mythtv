@@ -67,6 +67,7 @@ class DVDTitleInfo
     void    setQuality(int a_level){selected_quality = a_level;}
     void    setAudio(int which_track){selected_audio = which_track;}
     void    setName(QString a_name){name = a_name;}
+    void    setInputID(uint a_uint){dvdinput_id = a_uint;}
     
     //
     //  Get
@@ -81,6 +82,7 @@ class DVDTitleInfo
     int     getQuality(){return selected_quality;}
     QString getName(){return name;}
     int     getAudio(){return selected_audio;}
+    uint    getInputID(){return dvdinput_id;}
 
     void                    addAudio(DVDAudioInfo *new_audio_track);
     QPtrList<DVDAudioInfo>* getAudioTracks(){return &audio_tracks;}
@@ -102,6 +104,8 @@ class DVDTitleInfo
     int     selected_quality;
     int     selected_audio;
     QString name;
+    
+    uint    dvdinput_id;
     
 };
 

@@ -162,7 +162,7 @@ MTD::MTD(QSqlDatabase *ldb, int port, bool log_stdout)
         cerr << "dvdripbox.o: Can't get a value for DVD device location. Did you run setup?" << endl;
         exit(0);
     }
-    dvd_probe = new DVDProbe(dvd_device);
+    dvd_probe = new DVDProbe(dvd_device, db);
     disc_checking_thread = new DiscCheckingThread(this, dvd_probe, dvd_drive_access, titles_mutex);
     disc_checking_thread->start();
     disc_checking_timer = new QTimer();
@@ -396,13 +396,14 @@ void MTD::sendMediaReport(QSocket *socket)
         
         for(uint i = 0; i < dvd_titles->count(); ++i)
         {
-            sendMessage(socket, QString("media dvd title %1 %2 %3 %4 %5 %6")
+            sendMessage(socket, QString("media dvd title %1 %2 %3 %4 %5 %6 %7")
                         .arg(dvd_titles->at(i)->getTrack())
                         .arg(dvd_titles->at(i)->getChapters())
                         .arg(dvd_titles->at(i)->getAngles())
                         .arg(dvd_titles->at(i)->getHours())
                         .arg(dvd_titles->at(i)->getMinutes())
                         .arg(dvd_titles->at(i)->getSeconds())
+                        .arg(dvd_titles->at(i)->getInputID())
                        );
             //
             //  For each track, send all the audio info

@@ -728,7 +728,7 @@ void DVDRipBox::handleMedia(QStringList tokens)
     }
     else if(tokens[2] == "title")
     {
-        if(tokens.count() != 9)
+        if(tokens.count() != 10)
         {
             cerr << "dvdripbox.o: Got wrong number of tokens in media title report." << endl;
             return;
@@ -740,6 +740,7 @@ void DVDRipBox::handleMedia(QStringList tokens)
             new_title->setChapters(tokens[4].toUInt());
             new_title->setAngles(tokens[5].toUInt());
             new_title->setTime(tokens[6].toUInt(), tokens[7].toUInt(), tokens[8].toUInt());
+            new_title->setInputID(tokens[9].toUInt());
             dvd_info->addTitle(new_title);
         }
         return;

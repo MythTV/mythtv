@@ -1,0 +1,28 @@
+
+A Note on the dvddb
+===================
+
+If you are installing mythdvd for the first time, you just need to execute
+the main metadata.sql script as described in ../README and in the online
+documentation at:
+
+        http://www.mythtv.org/docs/
+
+Table schema
+============
+
+        You can get a good sense for how the table is laid out by reading
+metadata.sql. The main things to realize are:
+
+        1. (once the dvdtranscode table exists) You can define as mainy 
+           rows as you like, but if they are not "sensible" to transcode, 
+           then they won't work. If you know nothing about how transcode 
+           works, you probably don't want to mess with the table.
+
+        2. Because mythdvd is designed to transcode *DVD*'s, this is not
+           the place to be thinking of all possible transcode command
+           line combinations. In particular the program logic in mythdvd
+           will limit the GUI to showing the user only options that
+           are valid for the source material. This depends on source 
+           material matching an entry in the dvdinput table.
+
