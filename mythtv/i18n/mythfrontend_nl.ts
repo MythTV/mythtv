@@ -2965,10 +2965,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Do not wait for SEQ start header.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Normally the dvb-recording will drop packets from the card untill a sequence start header is seen. This option turns off this feature.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3326,6 +3322,18 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>End Late   (minutes)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wait for SEQ start header.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable channel change buffer warnings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, MythTV will warn you whenever you change the channel but are not caught up to live TV.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3690,6 +3698,14 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Jump To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are currently behind real time. If you change channels now, you will lose any unwatched video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change the channel anyway</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
