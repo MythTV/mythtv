@@ -660,6 +660,7 @@ void PreviousBox::removalDialog()
                            .arg(pi->chanid)
                            .arg(pi->startts.toString(Qt::ISODate));
         db->exec(thequery);
+        ScheduledRecording::signalChange(0);
         fillItemList();
     }
     else if (ret == rm_title)
@@ -669,6 +670,7 @@ void PreviousBox::removalDialog()
                            "WHERE title = \"%1\"")
                            .arg(pi->title);
         db->exec(thequery.utf8());
+        ScheduledRecording::signalChange(0);
         fillItemList();
     }
 
