@@ -497,6 +497,7 @@ class UITextType : public UIType
     void SetCutDown(bool cut) { m_cutdown = cut; }
 
     QRect DisplayArea() { return m_displaysize; }
+    void SetDisplayArea(const QRect &rect) { m_displaysize = rect; }
     virtual void calculateScreenArea();
 
     void Draw(QPainter *, int, int);
@@ -951,6 +952,70 @@ class UIBlackHoleType : public UIType
   protected:
   
     QRect area;
+};
+
+class UIKeyType : public UIType
+{
+    Q_OBJECT
+
+  public:
+    UIKeyType(const QString &);
+    ~UIKeyType();
+
+    void SetContainer(LayerSet *container) { m_container = container; }
+    UIType *GetType(const QString &name) { return m_container->GetType(name); }
+
+    QString GetAction() { return m_action; }
+    QString GetChars() { return m_chars; }
+    QPoint GetPosition() { return m_pos; }
+    QString GetClicked() { return m_clicked; }
+    QString GetNotClicked() { return m_notclicked; }
+    QString GetSubtitle() { return m_subtitle; }
+
+    void SetAction(QString action) { m_action = action; }
+    void SetClicked(QString filename) { m_clicked = filename; }
+    void SetNotClicked(QString filename) { m_notclicked = filename; }
+    void SetSubtitle(QString filename) { m_subtitle = filename; }
+    void SetChars(QString chars) { m_chars = chars; }
+    void SetFont(QString font) { m_font = font; }
+    void SetPosition(QPoint pos) { m_pos = pos; }
+
+    virtual void Draw(QPainter *, int, int);
+
+  private:
+    QString m_action;
+    QString m_clicked;
+    QString m_notclicked;
+    QString m_subtitle;
+    QString m_chars;
+    QString m_font;
+    QPoint m_pos;
+
+    LayerSet *m_container;
+};
+
+class UIKeyboardType : public UIType
+{
+    Q_OBJECT
+
+  public:
+    UIKeyboardType(const QString &, int);
+    ~UIKeyboardType();
+
+    typedef QValueList <UIKeyType*> KeyList;
+    void SetContainer(LayerSet *container) { m_container = container; }
+    UIType *GetType(const QString &name) { return m_container->GetType(name); }
+    UIKeyType *GetKey(const QString &action);
+    KeyList GetKeys() { return m_keymap.values(); }
+
+    void AddKey(const QString &action, UIKeyType *key) { m_keymap[action] = key; }
+    bool HasKey(const QString &action) { return m_keymap.keys().contains(action); }
+
+    virtual void Draw(QPainter *, int, int);
+
+  private:
+    LayerSet *m_container;
+    QMap <QString, UIKeyType*> m_keymap;
 };
 
 #endif

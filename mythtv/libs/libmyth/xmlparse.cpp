@@ -871,6 +871,10 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
             {
                 parseBar(container, info);
             }
+            else if (info.tagName() == "keyboard")
+            {
+                parseKeyboard(container, info);
+            }
             else if (info.tagName() == "guidegrid")
             {
                 parseGuideGrid(container, info);
@@ -2374,4 +2378,161 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
     l->SetMargin((int)(margin*wmult));
 
     container->AddType(l);
+}
+
+void XMLParse::parseKey(LayerSet *container, QDomElement &element)
+{
+    QString name, action, order, notclicked;
+    QString clicked, chars, font, subtitle;
+    QPoint pos;
+
+    notclicked = clicked = subtitle = chars = font = "";
+    pos = QPoint(0, 0);
+
+    name = element.attribute("name", "");
+    if (name.isNull() || name.isEmpty())
+    {
+        cerr << "key needs a name\n";
+        return;
+    }
+
+    action = element.attribute("action", "");
+    if (action.isNull() || action.isEmpty())
+    {
+        cerr << "key needs an action\n";
+        return;
+    }
+
+    order = element.attribute("draworder", "");
+    if (order.isNull() || order.isEmpty())
+    {
+        cerr << "keyboard needs an order\n";
+        return;
+    }
+
+    LayerSet *c = new LayerSet("_internal");
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement e = child.toElement();
+        if (!e.isNull())
+        {
+            if (e.tagName() == "notclickedimg")
+            {
+                notclicked = getFirstText(e);
+            }
+            else if (e.tagName() == "clickedimg")
+            {
+                clicked = getFirstText(e);
+            }
+            else if (e.tagName() == "subtitleimg")
+            {
+                subtitle = getFirstText(e);
+            }
+            else if (e.tagName() == "position")
+            {
+                pos = parsePoint(getFirstText(e));
+                pos.setX((int)(pos.x() * wmult));
+                pos.setY((int)(pos.y() * hmult));
+
+            }
+            else if (e.tagName() == "chars")
+            {
+                chars = getFirstText(e);
+            }
+            else if (e.tagName() == "textarea")
+            {
+                parseTextArea(c, e);
+            }
+            else if (e.tagName() == "font")
+            {
+                font = getFirstText(e);
+            }
+            else
+            {
+                cerr << "Unknown: " << e.tagName() << " in key\n";
+                return;
+            }
+        }
+    }
+
+    vector<UIType *>::iterator i = c->getAllTypes()->begin();
+    for (; i != c->getAllTypes()->end(); i++)
+    {
+        UIType *type = (*i);
+        if (UITextType *text = dynamic_cast<UITextType*>(type))
+        {
+            QRect rect = text->DisplayArea();
+            rect.moveTopLeft(rect.topLeft() + pos);
+            text->SetDisplayArea(rect);
+        }
+    }
+
+    UIKeyType *key = new UIKeyType(name);
+    key->SetContainer(c);
+    key->SetOrder(order.toInt());
+    key->SetAction(action);
+    key->SetClicked(clicked);
+    key->SetNotClicked(notclicked);
+    key->SetSubtitle(subtitle);
+    key->SetChars(chars);
+    key->SetFont(font);
+    key->SetPosition(pos);
+    container->AddType(key);
+}
+
+void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
+{
+    QString name = element.attribute("name", "");
+    if (name.isNull() || name.isEmpty())
+    {
+        cerr << "keyboard needs a name\n";
+        return;
+    }
+
+    QString order = element.attribute("draworder", "");
+    if (order.isNull() || order.isEmpty())
+    {
+        cerr << "keyboard needs an order\n";
+        return;
+    }
+
+    LayerSet *c = new LayerSet("_internal");
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement e = child.toElement();
+        if (!e.isNull())
+        {
+            if (e.tagName() == "image")
+            {
+                parseImage(c, e);
+            }
+            else if (e.tagName() == "key")
+            {
+                parseKey(c, e);
+            }
+            else
+            {
+                cerr << "Unknown: " << e.tagName() << " in keyboard\n";
+                return;
+            }
+        }
+    }
+
+    UIKeyboardType *kbd = new UIKeyboardType(name, order.toInt());
+    kbd->SetContainer(c);
+    container->AddType(kbd);
+
+    vector<UIType *>::iterator i = c->getAllTypes()->begin();
+    for (; i != c->getAllTypes()->end(); i++)
+    {
+        UIType *type = (*i);
+        if (UIKeyType *keyt = dynamic_cast<UIKeyType*>(type))
+        {
+            kbd->AddKey(keyt->GetAction(), keyt);
+        }
+    }
 }

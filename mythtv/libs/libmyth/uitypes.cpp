@@ -3857,3 +3857,101 @@ void UIBlackHoleType::calculateScreenArea()
              m_parent->GetAreaRect().top());
     screen_area = r;
 }
+
+// ********************************************************************
+
+UIKeyType::UIKeyType(const QString &name)
+         : UIType(name)
+{
+    m_container = NULL;
+    m_action = m_clicked = m_notclicked = m_subtitle = m_chars = 
+    m_font = "";
+    m_pos = QPoint(0, 0);
+}
+
+UIKeyType::~UIKeyType()
+{
+    if (m_container)
+        delete m_container;
+}
+
+void UIKeyType::Draw(QPainter *dr, int drawlayer, int context)
+{
+    if (m_context == context || m_context == -1)
+    {
+        if (drawlayer == m_order)
+        {
+            if (m_container)
+            {
+                // draw textareas
+                m_container->Draw(dr, 0, context);
+            }
+        }
+    }
+}
+
+// ********************************************************************
+
+UIKeyboardType::UIKeyboardType(const QString &name, int order)
+                    : UIType(name)
+{
+    m_order = order;
+    m_container = NULL;
+}
+
+
+UIKeyboardType::~UIKeyboardType()
+{
+    if (m_container)
+        delete m_container;
+}
+
+UIKeyType *UIKeyboardType::GetKey(const QString &action)
+{
+    UIKeyType *key = NULL;
+    if (HasKey(action))
+        key = m_keymap[action];
+
+    return key;
+}
+
+void UIKeyboardType::Draw(QPainter *dr, int drawlayer, int context)
+{
+    if (m_context == context || m_context == -1)
+    {
+        if (drawlayer == m_order)
+        {
+            KeyList keys = GetKeys();
+            KeyList::iterator it;
+            for (it = keys.begin(); it != keys.end(); ++it)
+            {
+                UIKeyType *key = (*it);
+
+                // button bg img (notclicked)
+                QString notclicked = key->GetNotClicked();
+                UIImageType *img;
+                img = (UIImageType*)GetType(notclicked);
+                if (img)
+                {
+                    img->SetPosition(key->GetPosition());
+                    img->Draw(dr, 0, context);
+                }
+
+                // button subtitle img
+                QString subtitle = key->GetSubtitle();
+                img = (UIImageType*)GetType(subtitle);
+                if (img)
+                {
+                    img->Draw(dr, 1, context);
+                }
+            }
+
+            // button text
+            m_container->Draw(dr, 1, context);
+
+            // button bg img (clicked)
+            m_container->Draw(dr, 2, context);
+        }
+    }
+}
+

@@ -186,7 +186,7 @@ ChannelEditor::ChannelEditor():
     NoChanNumHide* hide = new NoChanNumHide();
 
     sort->setValue(sort->getValueIndex(list->getSortMode()));
-    source->setValue(sort->getValueIndex(list->getSourceID()));
+    source->setValue(source->getValueIndex(list->getSourceID()));
     hide->setValue(list->getHideMode());
 
     addChild(sort);
@@ -209,9 +209,12 @@ int ChannelEditor::exec(QSqlDatabase* _db) {
 }
 
 void ChannelEditor::edit() {
+    id = list->getValue().toInt();
     ChannelWizard cw(id,db);
     cw.exec(db);
-    dialog->setFocus();
+
+    if (list != NULL)
+        list->setFocus();
 }
 
 void ChannelEditor::edit(int /*iSelected*/) {

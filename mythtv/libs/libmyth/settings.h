@@ -370,6 +370,8 @@ public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                   const char* widgetName = 0);
 
+    void setFocus() { if (widget) widget->setFocus(); }
+
 signals:
     void accepted(int);
     void menuButtonPressed(int);
