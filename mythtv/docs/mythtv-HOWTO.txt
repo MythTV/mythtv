@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-03-21, v2.02
+  2003-03-24, v2.03
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -228,10 +228,15 @@
   why a device like a Series 1 Tivo can run with only 16MB of RAM and a
   54Mhz CPU.
 
-  Currently, there are no known MPEG-2 encoder cards that have
-  video4linux drivers which would be suitable for use with MythTV.  Once
-  the drivers are written, support for hardware MPEG-2 encoders can be
-  integrated.
+  ______________________________________________________________________
+  The IvyTV project <url url="http://ivtv.sourceforge.net/"
+  name="http://ivtv.sourceforge.net/"> has an alpha-quality driver for MPEG-2
+  encoder cards which use the iTVC15 chip or Conexant CX23415/CX23416 MPEG
+  Codec, such as the Hauppauge WinTV-PVR250/350.  As of 2003-03-24, MythTV can
+  not use these cards as an input device.  If support is integrated into
+  MythTV, this will substantially reduce the CPU requirements for the capture
+  system.
+  ______________________________________________________________________
 
   There are many variables that go into the question: "How fast a CPU do
   I need to run MythTV"?  Obviously, the faster your CPU, the better
@@ -329,6 +334,7 @@
   search term.  You should find it under the "Perl" folder.  You need at
   least the perl 5.80 base package installed.  If not, click on the
   "Mark" button.
+
   If you are going to be installing mysql on this system, search for
   mysql - it should be under "Databases".  Make sure that mysql and
   mysql-clients are installed.  If not, click on "Mark".
@@ -427,8 +433,8 @@
   Open a shell, and execute the following.  You may get asked a number
   of questions regarding dependencies.  It's best to answer "YES".
 
-       $ urpmi mesa-common-devel libmng1-devel mysql-devel libunixodbc2-devel
-       $ urpmi postgresql-devel xfree86-static-libs
+  $ urpmi mesa-common-devel libmng1-devel mysql-devel libunixodbc2-devel
+  $ urpmi postgresql-devel xfree86-static-libs
 
   Once all of the pre-requisites have been installed, the next step is
   to obtain and compile the source RPM.
@@ -514,7 +520,7 @@
   support are not built. To enable SQL support, add "mysql qt" to your
   USE variable in /etc/make.conf and rebuild QT by running
 
-       $ emerge qt
+  $ emerge qt
 
   Install MySQL if this is the master system:
 
@@ -523,6 +529,7 @@
   All the necessary files will be downloaded and built. This will take a
   lot of time, even on a fast machine if you have to do a full KDE
   build.
+
   [1m4.  Setting up paths, ldconfig and other shell variables.[0m
 
   There are modifications that need to be made to your system before you
@@ -576,10 +583,10 @@
   LANG="en_US".  If you want the change to only affect a single user,
   you could create a file called ~/.i18n:
 
-  $ cat > ~/.i18n
-  LANG="en_US"
-  ^D
-  $ exit
+       $ cat > ~/.i18n
+       LANG="en_US"
+       ^D
+       $ exit
 
   [1m4.2.  Checking QTDIR and the PATH.[0m
 
@@ -663,28 +670,28 @@
 
   Open a shell and switch to the directory where you saved lame.
 
-       $ tar -xzf lame-3.93.1.tar.gz
-       $ cd lame-3.93.1
-       $ ./configure
-       $ make
-       $ make test
-       $ su
-       # make install
+  $ tar -xzf lame-3.93.1.tar.gz
+  $ cd lame-3.93.1
+  $ ./configure
+  $ make
+  $ make test
+  $ su
+  # make install
 
   Check that it worked:
 
-  # ls -l /usr/local/lib
-  -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
-  -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
-  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
-  libmp3lame.so.0.0.0*
-  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
-  libmp3lame.so.0.0.0*
-  -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
-  libmp3lame.so.0.0.0*
+       # ls -l /usr/local/lib
+       -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
+       -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
+       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
+       libmp3lame.so.0.0.0*
+       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
+       libmp3lame.so.0.0.0*
+       -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
+       libmp3lame.so.0.0.0*
 
-  # exit
-  $
+       # exit
+       $
 
   [1m5.3.  Building XMLTV.[0m
 
@@ -708,15 +715,15 @@
 
   Open a shell prompt:
 
-       $ tar -xzf expat-1.95.5.tar.gz
-       $ cd expat-1.95.5
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # /sbin/ldconfig
-       # exit
-       $
+  $ tar -xzf expat-1.95.5.tar.gz
+  $ cd expat-1.95.5
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # /sbin/ldconfig
+  # exit
+  $
 
   [1mNOTE[22m:  Red Hat Linux 8.0 users, make sure that you set your LANG as
   described in ``Section 4''.
@@ -725,8 +732,8 @@
 
   Untar the xmltv file:
 
-  $ tar -xjf xmltv-0.5.8.tar.bz2
-  $ cd xmltv-0.5.8
+       $ tar -xjf xmltv-0.5.8.tar.bz2
+       $ cd xmltv-0.5.8
 
   Install the xmltv prerequisites:
 
@@ -857,7 +864,7 @@
 
   To setup the initial mysql databases:
 
-       $ cd database
+  $ cd database
 
   [1m6.4.1.  Mandrake 9.0[0m
 
@@ -1076,7 +1083,7 @@
 
   Test the driver by playing a simple file:
 
-  $ aplay /usr/share/sounds/info.wav
+       $ aplay /usr/share/sounds/info.wav
 
   If it works, you're done installing ALSA!
 
@@ -1178,6 +1185,7 @@
   Each remote is different; some remote receivers connect directly to
   your capture card and not to a serial port, so make sure that you've
   got the correct one.
+
   You then click "Save Configuration and run configure" to continue.
 
   Make sure you read the last text generated by the configure step. It
@@ -1209,7 +1217,6 @@
   as root.  If it still doesn't work, then you must create the link
   manually.  In this example, the IR device is connected to ttyS0.  If
   it were connected to "COM2", then use ttyS1, etc.
-
        $ su
        # cd /dev
        # ln -sf ttyS0 lirc
@@ -1279,7 +1286,7 @@
   module, you must edit the /etc/modules.conf file. Add this line as the
   first thing in the file.  It must come first, or it may not work.
 
-  alias char-major-61 XXX
+       alias char-major-61 XXX
 
   replace XXX with the name which you determined earlier, which in this
   example was "lirc_serial"
@@ -1309,7 +1316,6 @@
   Follow the on-screen directions to train your remote and define keys.
   If your remote ends up working well, you should consider submitting
   your lircd.conf file back to the lirc developers. Once finished:
-
        $ su
        # cp myremote /etc/lircd.conf
 
@@ -1319,6 +1325,7 @@
 
   Now, we're going to add the commands necessary for lircd to run each
   time we boot.  Mandrake 9.1 users, you can execute:
+
        $ su
        # chkconfig --level 35 lircd on
        # exit
@@ -1351,7 +1358,7 @@
 
   if you've got a Pinnacle Studio PCTV remote.
 
-       $ irw
+  $ irw
 
   Start pressing the keys on your remote; [1mirw [22mwill print the name of the
   button as it is defined in your /etc/lircd.conf. If you don't see any-
@@ -1364,7 +1371,7 @@
   [1mirxevent [22misn't a daemon, so if you know that your remote is working
   you need to invoke it like this:
 
-  $ irxevent &
+       $ irxevent &
 
   If [1mirxevent [22misn't running, then MythTV will not respond to your remote
   control.
@@ -1399,22 +1406,22 @@
   rather than "ChannelUp" and "ChannelDown".  I added the following to
   my /home/[yourusername]/.lircrc file:
 
-       begin
-           prog = irxevent
-           button = channel+
-           config = Key Up CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = channel+
+      config = Key Up CurrentWindow
+  end
 
-       begin
-           prog = irxevent
-           button = channel-
-           config = Key Down CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = channel-
+      config = Key Down CurrentWindow
+  end
 
   which took care of basic functionality.  Because the PCTV Studio
   remote has additional buttons, look at the configfiles/lircrc.exam-
-  ple.pinnaclestudiopctv for an example of how to define additional
-  buttons, and how to debug potential button name conflicts between the
+  ple.pinnaclestudiopctv for an example of how to define additional but-
+  tons, and how to debug potential button name conflicts between the
   lircrc.example file and how [1myour [22mremote defines the button names.
 
   By examining the button names defined in /etc/lircd.conf and using the
@@ -1448,26 +1455,26 @@
   Depending on whether you have your serial port driver configured as a
   kernel module you might see the following message during make:
 
-       lirc_sir.c:56:2: warning: #warning
-       "******************************************"
+  lirc_sir.c:56:2: warning: #warning
+  "******************************************"
 
-       lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
+  lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
 
-       lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
+  lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
 
-       lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
+  lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
 
-       lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
+  lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
 
-       lirc_sir.c:61:2: warning: #warning
-       "******************************************"
+  lirc_sir.c:61:2: warning: #warning
+  "******************************************"
 
   If you do receive this statement make sure to run the [1msetserial[0m
   command before you load the lirc_sir module. Follow this with the
   install:
 
-  $ su
-  # make install
+       $ su
+       # make install
 
   You will notice that lirc installs the kernel module in
   /lib/modules/uname -a/misc.
@@ -1496,10 +1503,10 @@
   being received. If everything is configured correctly you should see
   something similar to the following:
 
-       $ irw
-       0000000000007ff0 00 1 gi-motorola-dct2000
-       000000000000bff8 00 2 gi-motorola-dct2000
-       000000000000f7f0 00 ENTER gi-motorola-dct2000
+  $ irw
+  0000000000007ff0 00 1 gi-motorola-dct2000
+  000000000000bff8 00 2 gi-motorola-dct2000
+  000000000000f7f0 00 ENTER gi-motorola-dct2000
 
   Once you've verified lirc is working you can press [1mCTRL-C [22mto exit [1mirw[0m
   and configure the channel changing script.
@@ -1515,16 +1522,16 @@
   /dev/device. Unlike bourne or bash, csh scripts automatically close
   parent file descriptors before they start.
 
-  $ cd /usr/local/bin
-  # su
-  # cat > change_channel.csh
-  #!/bin/csh
-  echo "changing to $1"
-  /usr/local/bin/channel.pl $1 &
-  ^D
-  # chmod a+x change_channel.csh
-  # exit
-  $ exit
+       $ cd /usr/local/bin
+       # su
+       # cat > change_channel.csh
+       #!/bin/csh
+       echo "changing to $1"
+       /usr/local/bin/channel.pl $1 &
+       ^D
+       # chmod a+x change_channel.csh
+       # exit
+       $ exit
 
   See contrib/channel.pl for the actual file.  Copy it to
   /usr/local/bin/
@@ -1542,9 +1549,15 @@
   [1m9.1.  Configuring the master backend system.[0m
 
   Open a shell and decide where you will store your video files.  By
-  default, MythTV will assume that you will be using /mnt/store. You may
-  wish to create a /var/video subdirectory, so you would change
-  /mnt/store to /var/video in the setup screens.
+  default, MythTV will assume that you will be using /mnt/store/, but if
+  this directory doesn't exist, or it exists and you don't have write
+  privileges to it then MythTV will fail when you attempt to make a
+  recording.  The following example is specific for /var/video, but the
+  same instructions would apply if you want to keep the default but
+  don't have the directory structure setup yet.
+
+  If you create a /var/video subdirectory, change /mnt/store/ to
+  /var/video/ in the setup screens.
 
        $ su
        # mkdir /var/video
@@ -1806,6 +1819,7 @@
   configfiles/mythcrontab file in your favorite editor and modify it as
   you like.  Once you're satisfied with the time that [1mmythfilldatabase[0m
   will run, save and exit, and return to the shell prompt.
+
        $ cd configfiles
        $ crontab mythcrontab
        $ crontab -l  NOTE: this is a lowercase L.
@@ -1940,11 +1954,11 @@
 
   Once it's on your machine, you must move the file and untar it:
 
-       $ su
-       # cp funhouse.tar.gz /usr/local/share/mythtv/themes
-       # cd /usr/local/share/mythtv/themes
-       # tar -xjf funhouse.tar.gz
-       # exit
+  $ su
+  # cp funhouse.tar.gz /usr/local/share/mythtv/themes
+  # cd /usr/local/share/mythtv/themes
+  # tar -xjf funhouse.tar.gz
+  # exit
 
   The theme will now be available in the mythfrontend Appearance
   section.
@@ -2100,14 +2114,14 @@
   Download FLAC from http://flac.sourceforge.net
   <http://flac.sourceforge.net> and install:
 
-       $ tar -xzf flac-1.1.0.tar.gz
-       $ cd flac-1.1.0
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
-       $
+  $ tar -xzf flac-1.1.0.tar.gz
+  $ cd flac-1.1.0
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
+  $
 
   Download libcdaudio from libcdaudio.sourceforge.net
   <http://sourceforge.net/project/showfiles.php?group_id=27134> and
@@ -2126,17 +2140,17 @@
   <http://www.xiph.org/paranoia/download/cdparanoia-III-
   alpha9.8.src.tgz>.
 
-  $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
-  $ cd cdparanoia-III-alpha9.8
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # cd /usr/lib
-  # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
-  # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
-  # exit
-  $
+       $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
+       $ cd cdparanoia-III-alpha9.8
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # cd /usr/lib
+       # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
+       # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
+       # exit
+       $
 
   [1m15.2.  Mandrake 9.0[0m
 
@@ -2153,7 +2167,6 @@
   a mirror site and then present the command-line configuration text for
   that mirror.  You will most likely need to add a "Contrib" mirror to
   your setup.  Once you have done that, you can proceed.
-
        # urpmi libmad0 libmad0-devel libflac4 libflac4-devel libcdaudio cdparanoia
        # urpmi libcdda0 libcdda0-devel libvorbis0 libvorbis0-devel
 
@@ -2180,6 +2193,7 @@
   SDL may be obtained from http://www.libsdl.org
   <http://www.libsdl.org>.  On Mandrake 9.1, you may install it by
   executing: # urpmi libsdl1.2 libsdl1.2-devel
+
   [1m15.3.  Red Hat Linux 8.0[0m
 
   Red Hat provides packages for several of the pre-requisites, making
@@ -2294,17 +2308,17 @@
 
   These are the keyboard commands for MythWeather:
 
-  Left Key             Goes back one page, and extends the time spent
-                       on the page you are on.
-  Right Key            Goes forward one page, see above.
-  Space                Pause, wait on the current page until space is hit
-                       again.
-  Numeric Keys         You can check other weather by keying in other ZIP codes.
-  Enter Key            Switch between Celsius and Fahrenheit. Can also
-                       be used a way to force a data update.
-  "m" Key              Resets the location to the database default, then updates the data.
-  "i"                  Enter / Save settings
-  ESC                  Exit the settings screen without saving / Exit the program
+       Left Key             Goes back one page, and extends the time spent
+                            on the page you are on.
+       Right Key            Goes forward one page, see above.
+       Space                Pause, wait on the current page until space is hit
+                            again.
+       Numeric Keys         You can check other weather by keying in other ZIP codes.
+       Enter Key            Switch between Celsius and Fahrenheit. Can also
+                            be used a way to force a data update.
+       "m" Key              Resets the location to the database default, then updates the data.
+       "i"                  Enter / Save settings
+       ESC                  Exit the settings screen without saving / Exit the program
 
   MythWeather also has an "Aggressiveness" setting.  This affects how
   long MythWeather waits for data from the msnbc.com website before
@@ -2351,6 +2365,7 @@
   +o  You have an AMD K6-2 or VIA C3 processor.  If you have either of
      these, make sure that you you followed the instructions in this
      ``section''.
+
   +o  You have an early production Intel Celeron, Pentium Pro or Pentium
      II.  If you have any of these processors, make sure that your
      ``deinterlace'' variable is set correctly.  Your CPU needs to
@@ -2380,7 +2395,6 @@
 
   This is most likely because your hard drive isn't setup to use DMA.
   Use the [1mhdparm [22mprogram to check and enable DMA.
-
        # hdparm -d /dev/hd?
 
   will tell you the DMA status for your hard drives.  If you run [1mhdparm[0m
@@ -2410,10 +2424,10 @@
   Some compile errors are worse than others.  If you get an error that
   doesn't abort the compilation, and says something like:
 
-  cc1plus: warning: changing search order for system directory
-  "/usr/local/include"
-  cc1plus: warning:   as it has already been specified as a non-system
-  directory
+       cc1plus: warning: changing search order for system directory
+       "/usr/local/include"
+       cc1plus: warning:   as it has already been specified as a non-system
+       directory
 
   then it shouldn't be a problem.
 
@@ -2436,11 +2450,11 @@
 
   Edit your /etc/X11/XF86Config-4 file, and look for:
 
-       Section "ServerFlags"
-           #DontZap # disable <Crtl><Alt><BS> (server abort)
-           #DontZoom # disable <Crtl><Alt><KP_+>/<KP_-> (resolution switching)
-           AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
-       EndSection
+  Section "ServerFlags"
+      #DontZap # disable <Crtl><Alt><BS> (server abort)
+      #DontZoom # disable <Crtl><Alt><KP_+>/<KP_-> (resolution switching)
+      AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
+  EndSection
 
   Add Option "NoPM" "true" and Option "BlankTime" "0"to the ServerFlags
   section.
@@ -2461,23 +2475,23 @@
 
   Finally, check:
 
-  Section "Monitor"
-      Identifier "monitor1"
-      VendorName "Plug'n Play"
-      HorizSync 30-85
-      VertRefresh 50-160
+       Section "Monitor"
+           Identifier "monitor1"
+           VendorName "Plug'n Play"
+           HorizSync 30-85
+           VertRefresh 50-160
 
-      # Sony Vaio C1(X,XS,VE,VN)?
-      # 1024x480 @ 85.6 Hz, 48 kHz hsync
-      ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+           # Sony Vaio C1(X,XS,VE,VN)?
+           # 1024x480 @ 85.6 Hz, 48 kHz hsync
+           ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
 
-      # TV fullscreen mode or DVD fullscreen output.
-      # 768x576 @ 79 Hz, 50 kHz hsync
-      ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+           # TV fullscreen mode or DVD fullscreen output.
+           # 768x576 @ 79 Hz, 50 kHz hsync
+           ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
 
-      # 768x576 @ 100 Hz, 61.6 kHz hsync
-      ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
-  EndSection
+           # 768x576 @ 100 Hz, 61.6 kHz hsync
+           ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+       EndSection
 
   Ensure that there isn't an Option "DPMS" in the Monitor configuration.
 
@@ -2533,7 +2547,6 @@
 
   At this point, you now have debug-enabled software ready.  Let's
   assume that the problem you're having is in the setup program.
-
        $ cd setup
        $ gdb ./setup
 
@@ -2618,7 +2631,7 @@
   instructions on disabling the sound manager.  If you wish to see what
   application is grabbing a resource, you can use the fuser command:
 
-  # fuser -v /dev/dsp
+       # fuser -v /dev/dsp
 
   To disable aRts in KDE, go to KDE->Control Center->Sound->Sound System
   and uncheck the "Start aRts soundserver on KDE startup" box.  Run #
@@ -2727,6 +2740,7 @@
   720x240 is possible, but isn't a good tradeoff relative to the number
   of vertical lines lost.  In a PAL country, the you would use values
   like 720x576 or x288.
+
   The higher resolutions will be more CPU intensive. If the CPU is
   overtaxed, frames will be dropped causing uneven motion. You will
   likely see the best results at resolutions which average at least 10%

@@ -27,9 +27,19 @@ responsibility of running the Operating System and reading and writing the
 encoded frames to the disk.  These tasks have fairly low CPU requirements
 compared to encoding video, which is why a device like a Series 1 Tivo can
 run with only 16MB of RAM and a 54Mhz CPU.</P>
-<P>Currently, there are no known MPEG-2 encoder cards that have video4linux
-drivers which would be suitable for use with MythTV.  Once the drivers are
-written, support for hardware MPEG-2 encoders can be integrated.</P>
+<P>
+<HR>
+<PRE>
+The IvyTV project &lt;url url="http://ivtv.sourceforge.net/"
+name="http://ivtv.sourceforge.net/"> has an alpha-quality driver for MPEG-2
+encoder cards which use the iTVC15 chip or Conexant CX23415/CX23416 MPEG
+Codec, such as the Hauppauge WinTV-PVR250/350.  As of 2003-03-24, MythTV can
+not use these cards as an input device.  If support is integrated into
+MythTV, this will substantially reduce the CPU requirements for the capture
+system.
+</PRE>
+<HR>
+</P>
 <P>There are many variables that go into the question: "How fast a CPU do I
 need to run MythTV"?  Obviously, the faster your CPU, the better your
 experience will be with MythTV.  Performing the "Watch TV" function, where

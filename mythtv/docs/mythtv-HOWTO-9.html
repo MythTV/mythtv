@@ -22,9 +22,14 @@ time to configure MythTV.</P>
 </H2>
 
 <P>Open a shell and decide where you will store your video files.  By
-default, MythTV will assume that you will be using <CODE>/mnt/store</CODE>. You
-may wish to create a <CODE>/var/video</CODE> subdirectory, so you would change
-<CODE>/mnt/store</CODE> to <CODE>/var/video</CODE> in the setup screens.</P>
+default, MythTV will assume that you will be using <CODE>/mnt/store/</CODE>, but
+if this directory doesn't exist, or it exists and you don't have write
+privileges to it then MythTV will fail when you attempt to make a recording. 
+The following example is specific for <CODE>/var/video</CODE>, but the same
+instructions would apply if you want to keep the default but don't have the
+directory structure setup yet.</P>
+<P>If you create a <CODE>/var/video</CODE> subdirectory, change
+<CODE>/mnt/store/</CODE> to <CODE>/var/video/</CODE> in the setup screens.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
