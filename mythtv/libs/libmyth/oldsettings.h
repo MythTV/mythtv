@@ -41,9 +41,9 @@ public:
 	/** Generic Setting Setting function for float values */
 	void SetSetting(QString strSetting, float fNewVal);
 
-        void LoadSettingsFiles(QString filename, QString prefix);
+        bool LoadSettingsFiles(QString filename, QString prefix);
         /** parse settings file */
-        int ReadSettings(QString pszFile);
+        bool ReadSettings(QString pszFile);
 private: // Private attributes
 	/** main property-value mapping for strings */
 	map<QString, QString> *m_pSettings;

@@ -15,6 +15,7 @@ using namespace std;
 class Settings;
 class QSqlDatabase;
 class QSqlQuery;
+class QSqlError;
 class QSocket;
 class LCD;
 
@@ -50,7 +51,7 @@ class MythEvent : public QCustomEvent
     QString extradata;
 };
 
-#define MYTH_BINARY_VERSION "0.9.05312003-2"
+#define MYTH_BINARY_VERSION "0.9.06012003-1"
 
 extern bool print_verbose_messages;
 
@@ -72,7 +73,7 @@ class MythContext : public QObject
 
     QString GetFilePrefix();
 
-    void LoadSettingsFiles(const QString &filename);
+    bool LoadSettingsFiles(const QString &filename);
     void LoadQtConfig();
 
     void GetScreenSettings(int &width, float &wmult, int &height, float &hmult);
@@ -83,6 +84,7 @@ class MythContext : public QObject
     int OpenDatabase(QSqlDatabase *db);
     static void KickDatabase(QSqlDatabase *db);
     static void DBError(QString where, const QSqlQuery& query);
+    static QString DBErrorMessage(const QSqlError& err);
 
     Settings *settings() { return m_settings; }
     Settings *qtconfig() { return m_qtThemeSettings; }

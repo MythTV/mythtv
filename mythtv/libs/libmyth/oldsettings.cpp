@@ -106,27 +106,34 @@ void Settings::SetSetting(QString strSetting, float fNewVal)
     (*m_pSettings)[strSetting] = tmp;
 }
 
-void Settings::LoadSettingsFiles(QString filename, QString prefix)
+bool Settings::LoadSettingsFiles(QString filename, QString prefix)
 {
     QString setname = prefix + "/share/mythtv/" + filename;
-    ReadSettings(setname);
+    bool result = false;
+
+    if (ReadSettings(setname))
+         result = true;
 
     setname = prefix + "/etc/mythtv/" + filename;
-    ReadSettings(setname);
+    if (ReadSettings(setname))
+         result = true;
 
-    char *home = getenv("HOME");
-    setname = QString(home) + "/.mythtv/" + filename;
+    setname = QString(getenv("HOME")) + "/.mythtv/" + filename;
 
-    ReadSettings(setname);
+    if (ReadSettings(setname))
+         result = true;
 
     setname = "./" + filename;
-    ReadSettings(setname);
+    if (ReadSettings(setname))
+         result = true;
+
+    return result;
 }
 
-int Settings::ReadSettings(QString pszFile)
+bool Settings::ReadSettings(QString pszFile)
 {
     fstream fin(pszFile.ascii(), ios::in);
-    if (!fin.is_open()) return -1;
+    if (!fin.is_open()) return false;
 	
     string strLine;
     QString strKey;
@@ -158,5 +165,5 @@ int Settings::ReadSettings(QString pszFile)
             }
         }
     } // wend
-    return 0;
+    return true;
 }

@@ -48,7 +48,8 @@ MythContext::MythContext(const QString &binversion, bool gui)
     }
     m_localhostname = localhostname;
 
-    LoadSettingsFiles("mysql.txt");
+    if (!LoadSettingsFiles("mysql.txt"))
+        cerr << "Unable to read configuration file mysql.txt" << endl;
 
     if (gui)
     {
@@ -140,9 +141,9 @@ QString MythContext::GetFilePrefix(void)
     return GetSetting("RecordFilePrefix");
 }
 
-void MythContext::LoadSettingsFiles(const QString &filename)
+bool MythContext::LoadSettingsFiles(const QString &filename)
 {
-    m_settings->LoadSettingsFiles(filename, m_installprefix);
+    return m_settings->LoadSettingsFiles(filename, m_installprefix);
 }
 
 void MythContext::LoadQtConfig(void)
@@ -240,7 +241,11 @@ int MythContext::OpenDatabase(QSqlDatabase *db)
     db->setPassword(m_settings->GetSetting("DBPassword"));
     db->setHostName(m_settings->GetSetting("DBHostName"));
  
-    return db->open();
+    int res = db->open();
+    if (!res)
+        cerr << "Unable to connect to database!" << endl
+             << DBErrorMessage(db->lastError()) << endl;
+    return res;
 }
 
 void MythContext::KickDatabase(QSqlDatabase *db)
@@ -261,22 +266,25 @@ void MythContext::DBError(QString where, const QSqlQuery& query)
     {
         cerr << "DB Error (" << where << "):" << endl;
     }
-    else
-    {
-        cerr << "MythContext::DBError() saw non-error in "
-             << where << ":" << endl;
-    }
 
     cerr << "Query was:" << endl
          << query.lastQuery() << endl
-         << "Driver error was ["
-             << query.lastError().type()
-             << "/"
-             << query.lastError().number()
-         << "]:" << endl
-         << query.lastError().driverText() << endl
-         << "Database error was:" << endl
-         << query.lastError().databaseText() << endl;
+         << DBErrorMessage(query.lastError()) << endl;
+}
+
+QString MythContext::DBErrorMessage(const QSqlError& err)
+{
+    if (!err.type())
+        return "No error type from QSqlError?  Strange...";
+
+    return QString("Driver error was [%1/%2]:\n"
+                   "%3\n"
+                   "Database error was:\n"
+                   "%4\n")
+        .arg(err.type())
+        .arg(err.number())
+        .arg(err.driverText())
+        .arg(err.databaseText());
 }
 
 void MythContext::SaveSetting(QString key, int newValue)
