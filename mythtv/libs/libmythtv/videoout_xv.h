@@ -25,6 +25,8 @@ class XvVideoOutput
 
     void GetDrawSize(int &xoff, int &yoff, int &width, int &height);
 
+    int GetRefreshRate(void);
+
   private:
     void sizehint(int x, int y, int width, int height, int max);
     void Exit(void);

@@ -31,6 +31,8 @@ extern "C" {
 #include <X11/extensions/XShm.h>
 #include <X11/extensions/Xv.h>
 #include <X11/extensions/Xvlib.h>
+#define XMD_H 1
+#include <X11/extensions/xf86vmode.h>
 
 #include "yuv2rgb.h"
 
@@ -78,6 +80,26 @@ XvVideoOutput::~XvVideoOutput()
 {
     Exit();
     delete data;
+}
+
+int XvVideoOutput::GetRefreshRate(void)
+{
+    if (!XJ_started)
+        return -1;
+
+    XF86VidModeModeLine mode_line;
+    int dot_clock;
+
+    if (!XF86VidModeGetModeLine(data->XJ_disp, XJ_screen_num, &dot_clock,
+                                &mode_line))
+        return -1;
+
+    double rate = (double)((double)(dot_clock * 1000.0) /
+                           (double)(mode_line.htotal * mode_line.vtotal));
+
+    rate = 1000000.0 / rate;
+
+    return (int)rate;
 }
 
 void XvVideoOutput::sizehint(int x, int y, int width, int height, int max)
@@ -128,7 +150,6 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
 
     XJ_width = width;
     XJ_height = height;
-
 
     XInitThreads();
 

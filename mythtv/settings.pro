@@ -17,7 +17,7 @@ release {
         QMAKE_CXXFLAGS_RELEASE = -O3 -march=pentiumpro -fomit-frame-pointer
 }
 
-EXTRA_LIBS = -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext
+EXTRA_LIBS = -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm
 
 # DVB stuff
 #CONFIG += using_dvb
