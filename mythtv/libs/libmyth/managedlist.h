@@ -2,6 +2,8 @@
 #define  MANAGED_LIST_H
 
 #include <vector>
+#include <qguardedptr.h>
+
 using namespace std;
 
 #include "uitypes.h"
@@ -67,7 +69,7 @@ class ManagedListItem : public QObject
         int curState;
         int listIndex;
         bool enabled;
-        ManagedList* parentList;
+        QGuardedPtr<ManagedList> parentList;
         
         QString text;
         QString valueText;
@@ -93,7 +95,7 @@ class DialogDoneListItem : public ManagedListItem
         MythDialog* getDialog() { return dialog;}
         
     protected:
-        MythDialog* dialog;
+        QGuardedPtr<MythDialog> dialog;
         int resultValue;
 };
 
@@ -256,8 +258,8 @@ class ManagedListGroup : public ManagedListItem
         QPtrList<ManagedListItem> itemList;
         int curItem;
         int itemCount;
-        ManagedListGroup* parentGroup;
-        ManagedListItem *goBack;
+        QGuardedPtr<ManagedListGroup> parentGroup;
+        QGuardedPtr<ManagedListItem> goBack;
 };
 
 
@@ -342,8 +344,8 @@ class ManagedListSetting: public SimpleDBStorage
             listItem = NULL;
         };
         
-        ManagedList* parentList;
-        ManagedListItem* listItem;
+        QGuardedPtr<ManagedList> parentList;
+        QGuardedPtr<ManagedListItem> listItem;
     
     public slots:
         void itemChanged(ManagedListItem*) { syncDBFromItem(); }
@@ -413,7 +415,7 @@ class SelectManagedListSetting : public ManagedListSetting
             connect(listItem, SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
         }
     
-        SelectManagedListItem* selectItem;
+        QGuardedPtr<SelectManagedListItem> selectItem;
         
         virtual void constructListItem(const QString& listText, ManagedListGroup* _group, 
                                                          ManagedList* _parentList, const QString& listName)
@@ -594,8 +596,8 @@ class ManagedList : public QObject
         void itemChanged(ManagedListItem* itm);
 
     protected:
-        ManagedListGroup *curGroup;
-        XMLParse *theme;
+        QGuardedPtr<ManagedListGroup> curGroup;
+        XMLParse* theme;
         int listSize;
         QString containerName;
         QString listName;
