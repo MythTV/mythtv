@@ -2854,7 +2854,7 @@ void NuppelVideoPlayer::HandleSelect(void)
                           "like to:";
         QString option1 = "Delete this cut point";
         QString option2 = "Move this cut point to the current position";
-        QString option3 = "Filp directions - delete to the ";
+        QString option3 = "Flip directions - delete to the ";
         if (direction == 0)
             option3 += "right";
         else

@@ -362,7 +362,7 @@ void MythContext::SetPalette(QWidget *widget)
 
 void MythContext::ThemeWidget(QWidget *widget)
 {
-    bool usetheme = GetNumSetting("ThemeQt");
+    bool usetheme = GetNumSetting("ThemeQt", 1);
     QColor bgcolor, fgcolor;
 
     if (usetheme)
