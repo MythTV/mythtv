@@ -74,7 +74,7 @@
     </message>
     <message>
         <source>Slideshow Delay</source>
-        <translation type="unfinished"></translation>
+        <translation>Visningstid vid bildspel</translation>
     </message>
 </context>
 <context>
