@@ -196,11 +196,13 @@ void CommDetect::ProcessNextFrame(VideoFrame *frame, long long frame_number)
         stationLogoPresent = CheckEdgeLogo();
     }
 
+#if 0
     if ((commDetectMethod == COMM_DETECT_ALL) &&
         (CheckRatingSymbol()))
     {
         flagMask |= COMM_FRAME_RATING_SYMBOL;
     }
+#endif
 
     if (frameIsBlank)
     {
@@ -232,9 +234,9 @@ void CommDetect::ProcessNextFrame(VideoFrame *frame, long long frame_number)
 bool CommDetect::CheckFrameIsBlank(void)
 {
     int MaxDiff = 25;
-    int MaxBrightness = 70;
-    int DimBrightness = 110;
-    int DimAVG = 35;
+    int DarkBrightness = 50;
+    int DimBrightness = 80;
+    int DimAVG = 20;
     bool abort = false;
     int max = 0;
     int min = 255;
@@ -281,10 +283,10 @@ bool CommDetect::CheckFrameIsBlank(void)
                curFrameNumber, min, max, avg, totBrightness, pixelsChecked);
 
     totalMinBrightness += min;
+    DimAVG = min + 10;
 
     if (((max - min) <= MaxDiff) ||
-        (max < MaxBrightness) ||
-        (avg < MaxDiff) ||
+        (max < DarkBrightness) ||
         ((max < DimBrightness) && (avg < DimAVG)))
         return(true);
 
@@ -821,6 +823,8 @@ void CommDetect::BuildAllMethodsCommList(void)
     int nextScore = 0;
     long long curFrame = 0;
     long long breakStart = 0;
+    long long lastStart = 0;
+    long long lastEnd = 0;
     long long firstLogoFrame = -1;
     bool nextFrameIsBlank = false;
     bool lastFrameWasBlank = false;
@@ -903,7 +907,11 @@ void CommDetect::BuildAllMethodsCommList(void)
     }
 
     fbp->end = curFrame;
-    fbp->length = (fbp->end - fbp->start) / fps;
+    fbp->frames = fbp->end - fbp->start + 1;
+    fbp->length = fbp->frames / fps;
+
+    if ((fbp->sc_count) && (fbp->length > 1.05))
+        fbp->sc_rate = fbp->sc_count / fbp->length;
 
     maxBlock = curBlock;
     curBlock = 0;
@@ -1032,7 +1040,7 @@ void CommDetect::BuildAllMethodsCommList(void)
                 if (verboseDebugging)
                     VERBOSE(VB_COMMFLAG, "      rating symbol present > 25% "
                                          "of time, +10");
-                fbp->score += 20;
+                fbp->score += 10;
             }
         }
 
@@ -1195,6 +1203,8 @@ void CommDetect::BuildAllMethodsCommList(void)
 
             commBreakMap[breakStart] = MARK_COMM_START;
             commBreakMap[fbp->start] = MARK_COMM_END;
+            lastStart = breakStart;
+            lastEnd = fbp->start;
             breakStart = -1;
         }
         if (thisScore == 0)
@@ -1205,20 +1215,38 @@ void CommDetect::BuildAllMethodsCommList(void)
         {
             if ((lastScore > 0) || (curBlock == 0))
             {
-                breakStart = fbp->start;
+                if ((fbp->start - lastEnd) < (MIN_SHOW_LENGTH * fps))
+                {
+                    commBreakMap.erase(lastStart);
+                    commBreakMap.erase(lastEnd);
+                    breakStart = lastStart;
 
-                if (verboseDebugging)
-                    VERBOSE(VB_COMMFLAG,
-                            QString("Starting new commercial block at frame "
-                                    "%1 from start of frame block %2")
-                                    .arg(fbp->start).arg(curBlock));
+                    if (verboseDebugging)
+                        VERBOSE(VB_COMMFLAG,
+                                QString("ReOpening commercial block at "
+                                        "frame %1 because show less than %2 "
+                                        "seconds")
+                                        .arg(breakStart).arg(MIN_SHOW_LENGTH));
+                }
+                else
+                {
+                    breakStart = fbp->start;
+
+                    if (verboseDebugging)
+                        VERBOSE(VB_COMMFLAG,
+                                QString("Starting new commercial block at "
+                                        "frame %1 from start of frame block %2")
+                                        .arg(fbp->start).arg(curBlock));
+                }
             }
             else if (curBlock == maxBlock)
             {
-                if ((fbp->end - breakStart) > MIN_COMM_BREAK_LENGTH)
+                if ((fbp->end - breakStart) > (MIN_COMM_BREAK_LENGTH * fps))
                 {
                     commBreakMap[breakStart] = MARK_COMM_START;
                     commBreakMap[fbp->end] = MARK_COMM_END;
+                    lastStart = breakStart;
+                    lastEnd = fbp->end;
 
                     if (verboseDebugging)
                         VERBOSE(VB_COMMFLAG,
@@ -1243,10 +1271,12 @@ void CommDetect::BuildAllMethodsCommList(void)
         }
         else if ((thisScore > 0) && (lastScore < 0) && (breakStart != -1))
         {
-            if ((fbp->end - breakStart) > MIN_COMM_BREAK_LENGTH)
+            if ((fbp->end - breakStart) > (MIN_COMM_BREAK_LENGTH * fps))
             {
                 commBreakMap[breakStart] = MARK_COMM_START;
                 commBreakMap[fbp->start] = MARK_COMM_END;
+                lastStart = breakStart;
+                lastEnd = fbp->start;
 
                 if (verboseDebugging)
                     VERBOSE(VB_COMMFLAG,

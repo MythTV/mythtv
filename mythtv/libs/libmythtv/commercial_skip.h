@@ -34,6 +34,7 @@ enum frameMaskValues {
 #define MIN_COMM_BREAK_LENGTH   60
 #define MAX_COMM_BREAK_LENGTH  485
 #define MAX_COMM_LENGTH  125
+#define MIN_SHOW_LENGTH  65
 
 extern "C" {
 #include "frame.h"
