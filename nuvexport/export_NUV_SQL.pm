@@ -1,13 +1,16 @@
 package export_NUV_SQL;
 
 	use File::Copy;
+	use DBI;
 
 # Load the nuv utilities
 	use nuv_utils;
 
 # Make sure we have pointers to the main:: namespace for certain variables
-	*Prog = *main::Prog;
-	*gui  = *main::gui;
+	*Prog      = *main::Prog;
+	*gui       = *main::gui;
+	*dbh       = *main::dbh;
+	*video_dir = *main::video_dir;
 
 	sub new {
 		my $class = shift;
@@ -100,15 +103,12 @@ package export_NUV_SQL;
 	# Done savig the database info
 		close DATA;
 	# Rename/move the file
-		print "copy=$self->{copy}\n";
-		if($self->{copy}==1)
-		{
+		if ($self->{copy} == 1) {
 			$gui->notify("\nCopying $video_dir/$self->{episode}->{filename} to $self->{savepath}/$self->{episode}->{filename}\n");
 			copy("$video_dir/$self->{episode}->{filename}", "$self->{savepath}/$self->{episode}->{filename}")
 				or die "Couldn't copy specified .nuv file:  $!\n\n";
 		}
-		else
-		{
+		else {
 			$gui->notify("\nMoving $video_dir/$self->{episode}->{filename} to $self->{savepath}/$self->{episode}->{filename}\n");
 			move("$video_dir/$self->{episode}->{filename}", "$self->{savepath}/$self->{episode}->{filename}")
 				or die "Couldn't move specified .nuv file:  $!\n\n";

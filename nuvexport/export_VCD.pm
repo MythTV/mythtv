@@ -111,11 +111,11 @@ package export_VCD;
 	# Now we fork off a process to encode the audio
 		if ($Prog{mp2_encoder} =~ /\btoolame$/) {
 			$sample = $nuv_info{audio_sample_rate} / 1000;
-			$command = "nice -n 19 toolame -s $sample -m j -b 192 $self->{fifodir}/audout $self->{tmp_a}";
+			$command = "nice -n 19 toolame -s $sample -m j -b 224 $self->{fifodir}/audout $self->{tmp_a}";
 		}
 		else {
 			$command = "nice -n 19 ffmpeg -f s16le -ar $nuv_info{audio_sample_rate} -ac 2 -i $self->{fifodir}/audout -vn -f wav -"
-					  ." | nice -n 19 mp2enc -b 192 -r $nuv_info{audio_sample_rate} -s -o $self->{tmp_a}";
+					  ." | nice -n 19 mp2enc -V -s -o $self->{tmp_a}";
 		}
 		push @{$self->{children}}, fork_command($command);
 	# And lastly, we fork off a process to encode the video

@@ -90,6 +90,8 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
 	our $gui;
 	our $video_dir;
 	our $num_shows;
+	our $dbh;
+	our $hostname;
 
 # Load the nuv utilities
 	use nuv_utils;
@@ -103,6 +105,9 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
 	use export_SVCD;
 	use export_VCD;
 	use export_WMV;
+        use export_Trans_XviD;
+        use export_Trans_VCD;
+        use export_Trans_SVCD;
 
 # Make sure that we have mythtranscode installed
 	$Prog{mythtranscode} = find_program('mythtranscode');
@@ -142,7 +147,10 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
 					 export_NUV_SQL->new,
 					 export_DivX->new,
 					 export_WMV->new,
-					 export_VCD->new;
+					 export_VCD->new,
+                                         export_Trans_XviD->new,
+                                         export_Trans_VCD->new,
+                                         export_Trans_SVCD->new;
 
 # Set up the signal handlers
 	$SIG{INT}  = \&Quit;
@@ -174,11 +182,11 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
 	close CONF;
 
 # Connect to the database
-	my $dbh = DBI->connect("dbi:mysql:database=$db_name:host=$db_host", $db_user, $db_pass)
+	$dbh = DBI->connect("dbi:mysql:database=$db_name:host=$db_host", $db_user, $db_pass)
 		or die "Cannot connect to database: $!\n\n";
 
 # Get the hostname of this machine
-	my $hostname = `hostname`;
+	$hostname = `hostname`;
 	chomp($hostname);
 
 # Find the directory where the recordings are located, and grab all of the filenames
