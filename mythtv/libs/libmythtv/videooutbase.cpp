@@ -1,21 +1,29 @@
 #include <math.h>
 
 #include "videooutbase.h"
+#include "osd.h"
+#include "NuppelVideoPlayer.h"
 
 #include "../libmyth/mythcontext.h"
 
 VideoOutput::VideoOutput()
 {
     letterbox = false;
+    rpos = 0;
+    vpos = 0;
+
+    vbuffers = NULL;
+    numbuffers = 0;
 }
 
 VideoOutput::~VideoOutput()
 {
+    if (vbuffers)
+        delete [] vbuffers;
 }
 
-bool VideoOutput::Init(int width, int height, float aspect, int num_buffers,
-                       VideoFrame *out_buffers, unsigned int winid,
-                       int winx, int winy, int winw, int winh,
+bool VideoOutput::Init(int width, int height, float aspect, unsigned int winid,
+                       int winx, int winy, int winw, int winh, 
                        unsigned int embedid)
 {
     (void)winid;
@@ -24,9 +32,6 @@ bool VideoOutput::Init(int width, int height, float aspect, int num_buffers,
     XJ_width = width;
     XJ_height = height;
     XJ_aspect = aspect;
-
-    numbuffers = num_buffers;
-    videoframes = out_buffers;
 
     QString HorizScanMode = gContext->GetSetting("HorizScanMode", "overscan");
     QString VertScanMode = gContext->GetSetting("VertScanMode", "overscan");
@@ -70,6 +75,21 @@ void VideoOutput::InputChanged(int width, int height, float aspect)
     XJ_width = width;
     XJ_height = height;
     XJ_aspect = aspect;
+
+    video_buflock.lock();
+
+    availableVideoBuffers.clear();
+    vbufferMap.clear();
+
+    for (int i = 0; i < numbuffers; i++)
+    {
+        availableVideoBuffers.enqueue(&(vbuffers[i]));
+        vbufferMap[&(vbuffers[i])] = i;
+    }
+
+    usedVideoBuffers.clear();
+
+    video_buflock.unlock();
 }
 
 void VideoOutput::EmbedInWidget(unsigned long wid, int x, int y, int w, int h)
@@ -253,3 +273,181 @@ void VideoOutput::ToggleLetterbox(void)
     letterbox = !letterbox;
 }
 
+int VideoOutput::ValidVideoFrames(void)
+{
+    video_buflock.lock();
+    int ret = (int)usedVideoBuffers.count();
+    video_buflock.unlock();
+
+    return ret;
+}
+
+int VideoOutput::FreeVideoFrames(void)
+{
+    return (int)availableVideoBuffers.count();
+}
+
+bool VideoOutput::EnoughFreeFrames(void)
+{
+    return (FreeVideoFrames() >= needfreeframes);
+}
+
+bool VideoOutput::EnoughDecodedFrames(void)
+{
+    return (ValidVideoFrames() >= needprebufferframes);
+}
+
+VideoFrame *VideoOutput::GetNextFreeFrame(void)
+{
+    video_buflock.lock();
+    VideoFrame *next = availableVideoBuffers.dequeue();
+
+    // only way this should be triggered if we're in unsafe mode
+    if (!next)
+        next = usedVideoBuffers.dequeue();
+
+    video_buflock.unlock();
+
+    return next;
+}
+
+void VideoOutput::ReleaseFrame(VideoFrame *frame)
+{
+    vpos = vbufferMap[frame];
+
+    video_buflock.lock();
+    usedVideoBuffers.enqueue(frame);
+    video_buflock.unlock();
+}
+
+void VideoOutput::DiscardFrame(VideoFrame *frame)
+{
+    video_buflock.lock();
+    availableVideoBuffers.enqueue(frame);
+    video_buflock.unlock();
+}
+
+VideoFrame *VideoOutput::GetLastDecodedFrame(void)
+{
+    return &(vbuffers[vpos]);
+}
+
+VideoFrame *VideoOutput::GetLastShownFrame(void)
+{
+    return &(vbuffers[rpos]);
+}
+
+void VideoOutput::StartDisplayingFrame(void)
+{
+    rpos = vbufferMap[usedVideoBuffers.head()];
+}
+
+void VideoOutput::DoneDisplayingFrame(void)
+{
+    video_buflock.lock();
+    VideoFrame *buf = usedVideoBuffers.dequeue();
+    availableVideoBuffers.enqueue(buf);
+    video_buflock.unlock();
+}
+
+void VideoOutput::InitBuffers(int numdecode, bool extra_for_pause, int need_free,
+                              int needprebuffer)
+{
+    int numcreate = numdecode + ((extra_for_pause) ? 1 : 0);
+
+    vbuffers = new VideoFrame[numcreate + 1];
+
+    for (int i = 0; i < numdecode; i++)
+    {
+        availableVideoBuffers.enqueue(&(vbuffers[i]));
+        vbufferMap[&(vbuffers[i])] = i;
+    }
+
+    for (int i = 0; i < numcreate; i++)
+    {
+        vbuffers[i].codec = FMT_NONE;
+        vbuffers[i].width = vbuffers[i].height = 0;
+        vbuffers[i].bpp = vbuffers[i].size = 0;
+        vbuffers[i].buf = NULL;
+        vbuffers[i].timecode = 0;
+    }
+
+    numbuffers = numdecode;
+    needfreeframes = need_free;
+    needprebufferframes = needprebuffer;
+}
+
+void VideoOutput::ClearAfterSeek(void)
+{
+    video_buflock.lock();
+
+    for (int i = 0; i < numbuffers; i++)
+        vbuffers[i].timecode = 0;
+
+    while (usedVideoBuffers.count() > 1)
+    {
+        VideoFrame *buffer = usedVideoBuffers.dequeue();
+        availableVideoBuffers.enqueue(buffer);
+    }
+
+    if (usedVideoBuffers.count() > 0)
+    {
+        VideoFrame *buffer = usedVideoBuffers.dequeue();
+        availableVideoBuffers.enqueue(buffer);
+        vpos = vbufferMap[buffer];
+        rpos = vpos;
+    }
+    else
+    {
+        vpos = rpos = 0;
+    }
+
+    video_buflock.unlock();
+}
+
+void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
+{
+    if (!pipplayer)
+        return;
+
+    int pipw, piph;
+
+    VideoFrame *pipimage = pipplayer->GetCurrentFrame(pipw, piph);
+
+    if (!pipimage || !pipimage->buf || pipimage->codec != FMT_YV12)
+        return;
+
+    int xoff = 50;
+    int yoff = 50;
+
+
+    for (int i = 0; i < piph; i++)
+    {
+        memcpy(frame->buf + (i + yoff) * frame->width + xoff,
+               pipimage->buf + i * pipw, pipw);
+    }
+
+    xoff /= 2;
+    yoff /= 2;
+
+    unsigned char *uptr = frame->buf + frame->width * frame->height;
+    unsigned char *vptr = frame->buf + frame->width * frame->height * 5 / 4;
+    int vidw = frame->width / 2;
+
+    unsigned char *pipuptr = pipimage->buf + pipw * piph;
+    unsigned char *pipvptr = pipimage->buf + pipw * piph * 5 / 4;
+    pipw /= 2;
+
+    for (int i = 0; i < piph / 2; i ++)
+    {
+        memcpy(uptr + (i + yoff) * vidw + xoff, pipuptr + i * pipw, pipw);
+        memcpy(vptr + (i + yoff) * vidw + xoff, pipvptr + i * pipw, pipw);
+    }
+}
+
+void VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
+{
+    if (osd)
+        osd->Display(frame);
+}
+ 

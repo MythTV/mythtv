@@ -2,6 +2,19 @@
 #define VIDEOOUTBASE_H_
 
 #include "frame.h"
+extern "C" {
+#include "filter.h"
+}
+
+#include <qmutex.h>
+#include <qmap.h>
+#include <qptrqueue.h>
+
+#include <vector>
+using namespace std;
+
+class NuppelVideoPlayer;
+class OSD;
 
 class VideoOutput
 {
@@ -9,10 +22,12 @@ class VideoOutput
     VideoOutput();
     virtual ~VideoOutput();
 
-    virtual bool Init(int width, int height, float aspect, int num_buffers,
-                      VideoFrame *out_buffers, unsigned int winid,
-                      int winx, int winy, int winw, int winh,
-                      unsigned int embedid = 0);
+    void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
+                     int needprebuffer);
+
+    virtual bool Init(int width, int height, float aspect,
+                      unsigned int winid, int winx, int winy, int winw, 
+                      int winh, unsigned int embedid = 0);
 
     virtual void PrepareFrame(VideoFrame *buffer) = 0;
     virtual void Show(void) = 0;
@@ -36,7 +51,34 @@ class VideoOutput
     bool GetLetterbox(void) { return letterbox; }
     void ToggleLetterbox(void);
 
+    int ValidVideoFrames(void);
+    int FreeVideoFrames(void);
+
+    bool EnoughFreeFrames(void);
+    bool EnoughDecodedFrames(void);
+
+    VideoFrame *GetNextFreeFrame(void);
+    void ReleaseFrame(VideoFrame *frame);
+    void DiscardFrame(VideoFrame *frame);
+
+    VideoFrame *GetLastDecodedFrame(void);
+    VideoFrame *GetLastShownFrame(void);
+
+    void StartDisplayingFrame(void);
+    void DoneDisplayingFrame(void);
+
+    virtual void UpdatePauseFrame(void) = 0;
+    // pass in null to use the pause frame, if it exists.
+    virtual void ProcessFrame(VideoFrame *frame, OSD *osd,
+                              vector<VideoFilter *> &filterList,
+                              NuppelVideoPlayer *pipPlayer) = 0;
+
+    void ClearAfterSeek(void);
+
   protected:
+    void ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer);
+    void DisplayOSD(VideoFrame *frame, OSD *osd);
+
     int XJ_width, XJ_height;
     float XJ_aspect;
 
@@ -51,9 +93,22 @@ class VideoOutput
     bool embedding;
 
     int numbuffers;
-    VideoFrame *videoframes;
 
     bool letterbox;
+
+    VideoFrame *vbuffers;
+
+    QMutex video_buflock;
+
+    QMap<VideoFrame *, int> vbufferMap;
+    QPtrQueue<VideoFrame> availableVideoBuffers;
+    QPtrQueue<VideoFrame> usedVideoBuffers;
+
+    int rpos;
+    int vpos;
+
+    int needfreeframes;
+    int needprebufferframes;
 };
 
 #endif

@@ -5,14 +5,15 @@ struct XvData;
 
 #include "videooutbase.h"
 
+class NuppelVideoPlayer;
+
 class VideoOutputXv : public VideoOutput
 {
   public:
     VideoOutputXv();
    ~VideoOutputXv();
 
-    bool Init(int width, int height, float aspect, int num_buffers, 
-              VideoFrame *out_buffers, unsigned int winid,
+    bool Init(int width, int height, float aspect, unsigned int winid,
               int winx, int winy, int winw, int winh, unsigned int embedid = 0);
     void PrepareFrame(VideoFrame *buffer);
     void Show(void);
@@ -26,6 +27,11 @@ class VideoOutputXv : public VideoOutput
     int GetRefreshRate(void);
 
     void DrawUnusedRects(void);
+
+    void UpdatePauseFrame(void);
+    void ProcessFrame(VideoFrame *frame, OSD *osd,
+                      vector<VideoFilter *> &filterList,
+                      NuppelVideoPlayer *pipPlayer);
 
   private:
     void Exit(void);
@@ -54,6 +60,9 @@ class VideoOutputXv : public VideoOutput
     unsigned char *scratchspace;
 
     pthread_mutex_t lock;
+
+    VideoFrame *scratchFrame;
+    VideoFrame pauseFrame;
 };
 
 #endif

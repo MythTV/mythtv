@@ -36,8 +36,9 @@ contains( CONFIG_AC3, yes ) {
     }
 }
 
-contains( CONFIG_XVMC, yes ) {
+using_xvmc {
     SOURCES += xvmcvideo.c
+    DEFINES += HAVE_XVMC
 }
 
 using_viahwslice {

@@ -32,6 +32,10 @@ extern "C" {
 #define XMD_H 1
 #include <X11/extensions/xf86vmode.h>
 
+const int kNumBuffers = 7;
+const int kPrebufferFrames = 4;
+const int kNeedFreeFrames = 2;
+
 struct XvMCData
 {
     Window XJ_root;
@@ -121,10 +125,9 @@ int VideoOutputXvMC::GetRefreshRate(void)
     return (int)rate;
 }
 
-bool VideoOutputXvMC::Init(int width, int height, float aspect, int num_buffers,
-                           VideoFrame *out_buffers, unsigned int winid,
-                           int winx, int winy, int winw, int winh, 
-                           unsigned int embedid)
+bool VideoOutputXvMC::Init(int width, int height, float aspect,
+                           unsigned int winid, int winx, int winy, int winw, 
+                           int winh, unsigned int embedid)
 {
     pthread_mutex_init(&lock, NULL);
 
@@ -138,8 +141,10 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect, int num_buffers,
 
     XvAdaptorInfo *ai;
 
-    VideoOutput::Init(width, height, aspect, num_buffers, out_buffers, winid,
-                      winx, winy, winw, winh, embedid);
+    VideoOutput::InitBuffers(kNumBuffers, false, kNeedFreeFrames,
+                             kPrebufferFrames);
+    VideoOutput::Init(width, height, aspect, winid, winx, winy, winw, winh, 
+                      embedid);
 
     data->XJ_disp = XOpenDisplay(NULL);
     if (!data->XJ_disp) 
@@ -381,15 +386,15 @@ bool VideoOutputXvMC::CreateXvMCBuffers(void)
         render->p_surface = surface;
         render->state = 0;
 
-        videoframes[i].buf = (unsigned char *)render;
-        videoframes[i].priv[0] = (unsigned char *)&(data->data_blocks[i]);
-        videoframes[i].priv[1] = (unsigned char *)&(data->mv_blocks[i]);
+        vbuffers[i].buf = (unsigned char *)render;
+        vbuffers[i].priv[0] = (unsigned char *)&(data->data_blocks[i]);
+        vbuffers[i].priv[1] = (unsigned char *)&(data->mv_blocks[i]);
 
-        videoframes[i].height = XJ_height;
-        videoframes[i].width = XJ_width;
-        videoframes[i].bpp = -1;
-        videoframes[i].size = sizeof(XvMCSurface);
-        videoframes[i].codec = FMT_XVMC_IDCT_MPEG2;
+        vbuffers[i].height = XJ_height;
+        vbuffers[i].width = XJ_width;
+        vbuffers[i].bpp = -1;
+        vbuffers[i].size = sizeof(XvMCSurface);
+        vbuffers[i].codec = FMT_XVMC_IDCT_MPEG2;
     }
 
     XSync(data->XJ_disp, 0);
@@ -423,7 +428,7 @@ void VideoOutputXvMC::DeleteXvMCBuffers()
 
     for (int i = 0; i < numbuffers; i++)
     {
-        xvmc_render_state_t *render = (xvmc_render_state_t *)(videoframes[i].buf);
+        xvmc_render_state_t *render = (xvmc_render_state_t *)(vbuffers[i].buf);
         if (!render)
             continue;
 
@@ -433,7 +438,7 @@ void VideoOutputXvMC::DeleteXvMCBuffers()
         delete render->p_surface;
         delete render;
 
-        videoframes[i].buf = NULL;
+        vbuffers[i].buf = NULL;
     }
 
     XvMCDestroyContext(data->XJ_disp, &data->ctx);
@@ -477,6 +482,10 @@ static void SyncSurface(Display *disp, XvMCSurface *surf)
 
 void VideoOutputXvMC::PrepareFrame(VideoFrame *buffer)
 {
+    // pause update
+    if (!buffer)
+        return;
+
     pthread_mutex_lock(&lock);
 
     xvmc_render_state_t *render = (xvmc_render_state_t *)buffer->buf;
@@ -575,5 +584,15 @@ void VideoOutputXvMC::DrawUnusedRects(void)
                    dispyoff);
     XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc, 0,
                    dispyoff + disphoff, dispw, dispyoff);
+}
+
+void VideoOutputXvMC::UpdatePauseFrame(void)
+{
+}
+
+void VideoOutputXvMC::ProcessFrame(VideoFrame *frame, OSD *osd,
+                                   vector<VideoFilter *> &filterList,
+                                   NuppelVideoPlayer *pipPlayer)
+{
 }
 

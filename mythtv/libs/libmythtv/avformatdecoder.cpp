@@ -589,9 +589,6 @@ int get_avf_buffer_via(struct AVCodecContext *c, AVFrame *pic)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
 
-    int width = c->width;
-    int height = c->height;
-
     VideoFrame *frame = nd->m_parent->GetNextVideoFrame();
 
     pic->data[0] = frame->buf;

@@ -5,14 +5,15 @@ struct ViaData;
 
 #include "videooutbase.h"
 
+class NuppelVideoPlayer;
+
 class VideoOutputVIA : public VideoOutput
 {
   public:
     VideoOutputVIA();
    ~VideoOutputVIA();
 
-    bool Init(int width, int height, float aspect, int num_buffers, 
-              VideoFrame *out_buffers, unsigned int winid,
+    bool Init(int width, int height, float aspect, unsigned int winid,
               int winx, int winy, int winw, int winh, unsigned int embedid = 0);
     void PrepareFrame(VideoFrame *buffer);
     void Show(void);
@@ -28,6 +29,11 @@ class VideoOutputVIA : public VideoOutput
     void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
 
     void DrawUnusedRects(void);
+
+    void UpdatePauseFrame(void);
+    void ProcessFrame(VideoFrame *frame, OSD *osd,
+                      vector<VideoFilter *> &filterList,
+                      NuppelVideoPlayer *pipPlayer);
 
   private:
     bool CreateViaBuffers(void);

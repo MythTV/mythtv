@@ -17,14 +17,6 @@ extern "C" {
 }
 using namespace std;
 
-#ifdef USING_XVMC
-#define MAXVBUFFER 7
-#elif defined(USING_VIASLICE)
-#define MAXVBUFFER 4
-#else
-#define MAXVBUFFER 31
-#endif
-
 #define MAXTBUFFER 21
 
 #define REENCODE_OK              1
@@ -205,8 +197,8 @@ class NuppelVideoPlayer
 
     int GetStatusbarPos(void);
 
-    bool FrameIsBlank(int vposition);
-    bool LastFrameIsBlank(void) { return FrameIsBlank(vpos); }
+    bool FrameIsBlank(VideoFrame *frame);
+    bool LastFrameIsBlank(void);
     int SkipTooCloseToEnd(int frames);
     void SkipCommercialsByBlanks(void);
     bool DoSkipCommercials(int direction);
@@ -215,8 +207,6 @@ class NuppelVideoPlayer
     void JumpToFrame(long long frame);
     void JumpToNetFrame(long long net) { JumpToFrame(framesPlayed + net); }
  
-    int vbuffer_numvalid(void); // number of valid slots in video buffer
-    int vbuffer_numfree(void); // number of free slots in the video buffer
     int tbuffer_numvalid(void); // number of valid slots in the text buffer
     int tbuffer_numfree(void); // number of free slots in the text buffer
 
@@ -224,7 +214,6 @@ class NuppelVideoPlayer
 
     int UpdateDelay(struct timeval *nexttrigger);
 
-    void ShowPip(VideoFrame *frame);
     void ShowText();
 
     void UpdateTimeDisplay(void);
@@ -266,24 +255,13 @@ class NuppelVideoPlayer
     int text_size;
 
     /* Video circular buffer */
-    int usepre;		/* number of slots to keep full */
     bool prebuffering;	/* don't play until done prebuffering */ 
-    int timecodes[MAXVBUFFER];	/* timecode for each slot */
-    VideoFrame vbuffers[MAXVBUFFER+1];	/* decompressed video data */
-
-    QMap<VideoFrame *, int> vbufferMap;
-    QPtrQueue<VideoFrame> availableVideoBuffers;
-    QPtrQueue<VideoFrame> usedVideoBuffers;
-
-    int rpos;
 
     /* Text circular buffer */
     int wtxt;          /* next slot to write */
     int rtxt;          /* next slot to read */
     struct TextContainer txtbuffers[MAXTBUFFER+1];
 
-    pthread_mutex_t video_buflock; /* adjustments to rpos and wpos can only
-                                      be made while holding this lock */
     pthread_mutex_t text_buflock;  /* adjustments to rtxt and wtxt can only
                                       be made while holding this lock */
 
@@ -371,8 +349,6 @@ class NuppelVideoPlayer
     bool hascommbreaktable;
     bool hasFullPositionMap;
 
-    bool own_vidbufs;
-
     unsigned int embedid;
     int embx, emby, embw, embh;
 
@@ -383,7 +359,6 @@ class NuppelVideoPlayer
     long long bookmarkseek;
 
     int consecutive_blanks;
-    int vpos;
     int skipcommercials;
     int autocommercialskip;
     int commercialskipmethod;
@@ -422,8 +397,6 @@ class NuppelVideoPlayer
     bool experimentalsync;
 
     bool limitKeyRepeat;
-
-    VideoFrame pauseFrame;
 };
 
 #endif

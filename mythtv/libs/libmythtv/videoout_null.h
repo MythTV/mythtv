@@ -1,15 +1,13 @@
-#ifndef VIDEOOUT_XVMC_H_
-#define VIDEOOUT_XVMC_H_
-
-struct XvMCData;
+#ifndef VIDEOOUT_NULL_H_
+#define VIDEOOUT_NULL_H_
 
 #include "videooutbase.h"
 
-class VideoOutputXvMC : public VideoOutput
+class VideoOutputNull : public VideoOutput
 {
   public:
-    VideoOutputXvMC();
-   ~VideoOutputXvMC();
+    VideoOutputNull();
+   ~VideoOutputNull();
 
     bool Init(int width, int height, float aspect, unsigned int winid,
               int winx, int winy, int winw, int winh, unsigned int embedid = 0);
@@ -24,8 +22,6 @@ class VideoOutputXvMC : public VideoOutput
 
     int GetRefreshRate(void);
 
-    void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
-
     void DrawUnusedRects(void);
 
     void UpdatePauseFrame(void);
@@ -35,26 +31,13 @@ class VideoOutputXvMC : public VideoOutput
 
   private:
     void Exit(void);
-    bool CreateXvMCBuffers(void);
-    void DeleteXvMCBuffers(void);
+    bool CreateNullBuffers(void);
+    void DeleteNullBuffers(void);
 
-    XvMCData *data;
+    bool XJ_started;
 
-    int XJ_screen_num;
-    unsigned long XJ_white,XJ_black;
-    int XJ_started;
-    int XJ_depth;
-    int XJ_caught_error;
-    int XJ_screenx, XJ_screeny;
-    int XJ_screenwidth, XJ_screenheight;
-    int XJ_fullscreen;
-
-    int xv_port;
-    int colorid;
-
-    pthread_mutex_t lock;
-
-    int colorkey;
+    VideoFrame *scratchFrame;
+    VideoFrame pauseFrame;
 };
 
 #endif

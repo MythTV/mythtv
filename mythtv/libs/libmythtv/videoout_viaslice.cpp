@@ -31,6 +31,10 @@ extern "C" {
 #define XMD_H 1
 #include <X11/extensions/xf86vmode.h>
 
+const int kNumBuffers = 4;
+const int kPrebufferFrames = 1;
+const int kNeedFreeFrames = 1;
+
 struct ViaData
 {
     Window XJ_root;
@@ -124,15 +128,16 @@ int VideoOutputVIA::GetRefreshRate(void)
     return (int)rate;
 }
 
-bool VideoOutputVIA::Init(int width, int height, float aspect, int num_buffers,
-                          VideoFrame *out_buffers, unsigned int winid,
-                          int winx, int winy, int winw, int winh, 
-                          unsigned int embedid)
+bool VideoOutputVIA::Init(int width, int height, float aspect,
+                          unsigned int winid, int winx, int winy, int winw, 
+                          int winh, unsigned int embedid)
 {
     pthread_mutex_init(&lock, NULL);
 
-    VideoOutput::Init(width, height, aspect, num_buffers, out_buffers, winid,
-                      winx, winy, winw, winh, embedid);
+    VideoOutput::InitBuffers(kNumBuffers, false, kNeedFreeFrames,
+                             kPrebufferFrames);
+    VideoOutput::Init(width, height, aspect, winid, winx, winy, winw, winh, 
+                      embedid);
 
     data->XJ_disp = XOpenDisplay(NULL);
     if (!data->XJ_disp) 
@@ -215,12 +220,12 @@ bool VideoOutputVIA::CreateViaBuffers(void)
 	 data->decode_buffers[i].slice_data = NULL;
 	 data->decode_buffers[i].slice_datalen = 0;
 
-	 videoframes[i].buf = (unsigned char *)&(data->decode_buffers[i]);
-	 videoframes[i].height = XJ_height;
-	 videoframes[i].width = XJ_width;
-	 videoframes[i].bpp = -1;
-	 videoframes[i].size = sizeof(via_slice_state_t);
-	 videoframes[i].codec = FMT_VIA_HWSLICE;
+	 vbuffers[i].buf = (unsigned char *)&(data->decode_buffers[i]);
+	 vbuffers[i].height = XJ_height;
+	 vbuffers[i].width = XJ_width;
+	 vbuffers[i].bpp = -1;
+	 vbuffers[i].size = sizeof(via_slice_state_t);
+	 vbuffers[i].codec = FMT_VIA_HWSLICE;
     }
 
     return true;
@@ -286,6 +291,10 @@ void VideoOutputVIA::StopEmbedding(void)
 
 void VideoOutputVIA::PrepareFrame(VideoFrame *buffer)
 {
+    // pause update
+    if (!buffer)
+        return;
+
     via_slice_state_t *curdata = (via_slice_state_t *)buffer->buf;
 
     data->display_frame = curdata->image_number;
@@ -386,3 +395,12 @@ void VideoOutputVIA::DrawUnusedRects(void)
     VIADriverProc(UPDATEOVERLAY, &data->ddUpdateOverlay);
 }
 
+void VideoOutputVIA::UpdatePauseFrame(void)
+{
+}
+
+void VideoOutputVIA::ProcessFrame(VideoFrame *frame, OSD *osd,
+                                  vector<VideoFilter *> &filterList,
+                                  NuppelVideoPlayer *pipPlayer)
+{
+}
