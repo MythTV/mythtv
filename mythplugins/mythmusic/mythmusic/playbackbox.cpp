@@ -1266,7 +1266,6 @@ void PlaybackBox::handleTreeListSignals(int node_int, IntVector *attributes)
         //
         //  It's a track
         //
-        stop();
 
         curMeta = all_music->getMetadata(node_int);
         if(title_text)
