@@ -268,22 +268,32 @@ void TV::Init(bool createWindow)
     {
         MythMainWindow *mainWindow = gContext->GetMainWindow();
         bool fullscreen = !gContext->GetNumSetting("GuiSizeForTV", 0);
-        if (fullscreen) 
+        int screenwidth = QApplication::desktop()->width();
+        int screenheight = QApplication::desktop()->height();
+        bool switchMode = gContext->GetNumSetting("UseVideoModes", 0);
+        if (switchMode) 
         {
-            mainWindow->setGeometry(0, 0, QApplication::desktop()->width(),
-                                    QApplication::desktop()->height());
-            mainWindow->setFixedSize(QSize(QApplication::desktop()->width(),
-                                           QApplication::desktop()->height()));
+            // xrandr to video size
+            char buf[128];
+            screenwidth = gContext->GetNumSetting("TVVidModeWidth",
+                                                  screenwidth);
+            screenheight = gContext->GetNumSetting("TVVidModeHeight",
+                                                   screenheight);
+            sprintf(buf, "xrandr -s %dx%d", screenwidth, screenheight);
+            system(buf);
+        }
+        if (fullscreen || switchMode) 
+        {
+            mainWindow->setGeometry(0, 0, screenwidth, screenheight);
+            mainWindow->setFixedSize(QSize(screenwidth, screenheight));
         }
         myWindow = new MythDialog(mainWindow, "video playback window");
         myWindow->installEventFilter(this);
         myWindow->setNoErase();
-        if (fullscreen) 
+        if (fullscreen || switchMode) 
         {
-            myWindow->setGeometry(0, 0, QApplication::desktop()->width(),
-                                  QApplication::desktop()->height());
-            myWindow->setFixedSize(QSize(QApplication::desktop()->width(),
-                                         QApplication::desktop()->height()));
+            myWindow->setGeometry(0, 0, screenwidth, screenheight);
+            myWindow->setFixedSize(QSize(screenwidth, screenheight));
         }
         myWindow->show();
         myWindow->setBackgroundColor(Qt::black);
@@ -316,7 +326,17 @@ TV::~TV(void)
     {
         delete myWindow;
         bool fullscreen = !gContext->GetNumSetting("GuiSizeForTV", 0);
-        if (fullscreen) 
+        bool switchMode = gContext->GetNumSetting("UseVideoModes", 0);
+        if (switchMode) 
+        {
+            // xrandr to gui size
+            char buf[128];
+            int screenwidth = gContext->GetNumSetting("GuiVidModeWidth", 0);
+            int screenheight = gContext->GetNumSetting("GuiVidModeHeight", 0);
+            sprintf(buf, "xrandr -s %dx%d", screenwidth, screenheight);
+            system(buf);
+        }
+        if (fullscreen || switchMode) 
         {
             int xbase, width, ybase, height;
             float wmult, hmult;

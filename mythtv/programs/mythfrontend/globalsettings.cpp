@@ -1147,6 +1147,95 @@ public:
     };
 };
 
+class UseVideoModes: public CheckBoxSetting, public GlobalSetting {
+public:
+    UseVideoModes() :
+        GlobalSetting("UseVideoModes") {
+        setLabel(QObject::tr("Separate video modes for GUI and TV playback"));
+        setValue(false);
+        setHelpText(QObject::tr("Switch X Window video modes for TV. "
+                                "Requires 'xrandr' support."));
+    };
+};
+
+class GuiVidModeWidth: public SpinBoxSetting, public GlobalSetting {
+public:
+    GuiVidModeWidth():
+        SpinBoxSetting(0, 1920, 8), GlobalSetting("GuiVidModeWidth") {
+        setLabel(QObject::tr("GUI X size (px)"));
+        setValue(0);
+        setHelpText(QObject::tr("Horizontal resolution for GUI video mode. "
+                                "This mode must be already configured in "
+                                "XF86Config."));
+    };
+};
+
+class GuiVidModeHeight: public SpinBoxSetting, public GlobalSetting {
+public:
+    GuiVidModeHeight():
+        SpinBoxSetting(0, 1200, 4), GlobalSetting("GuiVidModeHeight") {
+        setLabel(QObject::tr("GUI Y size (px)"));
+        setValue(0);
+        setHelpText(QObject::tr("Vertical resolution for GUI video mode. "
+                                "This mode must be already configured in "
+                                "XF86Config."));
+    };
+};
+
+class TVVidModeWidth: public SpinBoxSetting, public GlobalSetting {
+public:
+    TVVidModeWidth():
+        SpinBoxSetting(0, 1920, 8), GlobalSetting("TVVidModeWidth") {
+        setLabel(QObject::tr("TV X size (px)"));
+        setValue(0);
+        setHelpText(QObject::tr("Horizontal resolution for playback video "
+                                "mode. This mode must be already configured "
+                                "in XF86Config."));
+    };
+};
+
+class TVVidModeHeight: public SpinBoxSetting, public GlobalSetting {
+public:
+    TVVidModeHeight():
+        SpinBoxSetting(0, 1200, 4), GlobalSetting("TVVidModeHeight") {
+        setLabel(QObject::tr("TV Y size (px)"));
+        setValue(0);
+        setHelpText(QObject::tr("Vertical resolution for playback video mode. "
+                                "This mode must be already configured in "
+                                "XF86Config."));
+    };
+};
+
+class VideoModeSettings: public VerticalConfigurationGroup,
+                         public TriggeredConfigurationGroup {
+public:
+    VideoModeSettings():
+        VerticalConfigurationGroup(false),
+        TriggeredConfigurationGroup(false) {
+        setLabel(QObject::tr("Video Mode Settings"));
+        setUseLabel(false);
+
+        Setting *videomode = new UseVideoModes();
+        addChild(videomode);
+        setTrigger(videomode);
+
+        ConfigurationGroup* settings = 
+            new HorizontalConfigurationGroup(false);
+        ConfigurationGroup *xres = 
+            new VerticalConfigurationGroup(false, false);
+        ConfigurationGroup *yres = 
+            new VerticalConfigurationGroup(false, false);
+        xres->addChild(new GuiVidModeWidth());
+        yres->addChild(new GuiVidModeHeight());
+        xres->addChild(new TVVidModeWidth());
+        yres->addChild(new TVVidModeHeight());
+        settings->addChild(xres);
+        settings->addChild(yres);
+        addTarget("1", settings);
+        addTarget("0", new VerticalConfigurationGroup(true));
+    }
+};
+
 class RunInWindow: public CheckBoxSetting, public GlobalSetting {
 public:
     RunInWindow():
@@ -2371,6 +2460,8 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(new GuiSizeForTV());
     screen->addChild(new RunInWindow());
     addChild(screen);
+
+    addChild(new VideoModeSettings());
 
     VerticalConfigurationGroup* dates = new VerticalConfigurationGroup(false);
     dates->setLabel(QObject::tr("Localization"));    

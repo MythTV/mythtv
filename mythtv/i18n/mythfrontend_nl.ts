@@ -132,6 +132,18 @@
         <source>Record one showing of this program</source>
         <translation>Dit programma eenmalig opnemen.</translation>
     </message>
+    <message>
+        <source>Don&apos;t record this showing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record this showing with override options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record this showing with normal options</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ManualBox</name>
@@ -222,9 +234,6 @@
         <source>Manual recording</source>
         <translation>Manuele opname</translation>
     </message>
-</context>
-<context>
-    <name>MenuTheme</name>
 </context>
 <context>
     <name>MythContext</name>
@@ -500,6 +509,14 @@
         <source>Recording one showing of this program</source>
         <translation>Neem dit programma eenmalig op</translation>
     </message>
+    <message>
+        <source>Recording this showing with override options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manually not recording this showing</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgLister</name>
@@ -609,6 +626,14 @@
     <message>
         <source>Any</source>
         <translation>Elke</translation>
+    </message>
+    <message>
+        <source>Recording this showing with override options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manually not recording this showing</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1019,10 +1044,6 @@
     </message>
     <message>
         <source>Setup Pin Code</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This PIN is used to control access to the setup menues. If you want to use this feature, then setting the value to all numbers will make your life much easier.  Set it to blank to disable.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1827,14 +1848,6 @@
         <translation type="unfinished">OK</translation>
     </message>
     <message>
-        <source>Manual Override</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Overlap</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Repeat</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1880,15 +1893,15 @@
     </message>
     <message>
         <source>Don&apos;t record it</source>
-        <translation>Neem niet op</translation>
+        <translation type="obsolete">Neem niet op</translation>
     </message>
     <message>
         <source>Never record this episode</source>
-        <translation>Nooit opnemen</translation>
+        <translation type="obsolete">Nooit opnemen</translation>
     </message>
     <message>
         <source>Record it anyway</source>
-        <translation>Altijd openemen</translation>
+        <translation type="obsolete">Altijd openemen</translation>
     </message>
     <message>
         <source>Remember this choice and use it automatically in the future</source>
@@ -2208,7 +2221,7 @@
     </message>
     <message>
         <source>it is covered by another scheduled recording for the same program.</source>
-        <translation>ze op een ander tijdstip opgenomen wordt.</translation>
+        <translation type="obsolete">ze op een ander tijdstip opgenomen wordt.</translation>
     </message>
     <message>
         <source>there wasn&apos;t enough disk space available.</source>
@@ -3060,10 +3073,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>If enabled, the master backend will stream and delete files if it finds them in the video directory. Useful if you are using a central storage location, like an NFS share, and your slave backend isn&apos;t running.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Reconnect wait time (secs)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3165,15 +3174,15 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>MasterBackend</source>
-        <translation type="unfinished"></translation>
+        <translation>Server</translation>
     </message>
     <message>
         <source>Start Early (minutes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Begin Vroeger (minuten)</translation>
     </message>
     <message>
         <source>End Late   (minutes)</source>
-        <translation type="unfinished"></translation>
+        <translation>Stop Later (minuten)</translation>
     </message>
     <message>
         <source>Wait for SEQ start header.</source>
@@ -3197,7 +3206,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Record one showing of this program</source>
-        <translation type="unfinished">Dit programma eenmalig opnemen.</translation>
+        <translation>Dit programma eenmalig opnemen.</translation>
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
@@ -3249,7 +3258,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>(All)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Alle)</translation>
     </message>
     <message>
         <source>If set automatic commercial flagging will be skipped for this channel.  Useful for premium channels like HBO.</source>
@@ -3257,51 +3266,51 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Position Saved</source>
-        <translation type="unfinished"></translation>
+        <translation>Index Bewaard</translation>
     </message>
     <message>
         <source>Position Cleared</source>
-        <translation type="unfinished"></translation>
+        <translation>Index Gewist</translation>
     </message>
     <message>
         <source>Duplicate Location</source>
-        <translation type="unfinished"></translation>
+        <translation>Locatie Dubbels</translation>
     </message>
     <message>
         <source>All places</source>
-        <translation type="unfinished"></translation>
+        <translation>Overal</translation>
     </message>
     <message>
         <source>Current Recs</source>
-        <translation type="unfinished"></translation>
+        <translation>Huidige Opnames</translation>
     </message>
     <message>
         <source>Previous Recs</source>
-        <translation type="unfinished"></translation>
+        <translation>Oude Opnames</translation>
     </message>
     <message>
         <source>Duplicate Check</source>
-        <translation type="unfinished"></translation>
+        <translation>Dubbels Controleren</translation>
     </message>
     <message>
         <source>Sub &amp; Desc</source>
-        <translation type="unfinished"></translation>
+        <translation>Aflevering &amp; Beschr</translation>
     </message>
     <message>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Beschrijving</translation>
     </message>
     <message>
         <source>Max episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Max Afleveringen</translation>
     </message>
     <message>
         <source>Delete oldest over Max</source>
-        <translation type="unfinished"></translation>
+        <translation>Oudste Wissen en Nieuwe Opnemen</translation>
     </message>
     <message>
         <source>Recording Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Opnamegroep</translation>
     </message>
     <message>
         <source>Open DVB card on demand</source>
@@ -3313,15 +3322,15 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Password required to view all recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Paswoord nodig om alle opnamen te zien</translation>
     </message>
     <message>
         <source>If given, a password must be entered to view the complete list of all recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indien ingevuld moet er een paswoord ingevuld worden om de voledige lijst met opnames te zien.</translation>
     </message>
     <message>
         <source>Default Recording Group to display</source>
-        <translation type="unfinished"></translation>
+        <translation>Standaard opnamegroep om weer te geven</translation>
     </message>
     <message>
         <source>All</source>
@@ -3329,11 +3338,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Default Recording Group to display on the view recordings screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Standaard opnamegroep om weer te geven.</translation>
     </message>
     <message>
         <source>Save current Recording Group view when changed</source>
-        <translation type="unfinished"></translation>
+        <translation>Onthoud Opnamegroep als die gewijzigd wordt</translation>
     </message>
     <message>
         <source>Remember the last selected Recording Group instead of displaying the Default group whenever you enter the playback screen.</source>
@@ -3349,7 +3358,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>View Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Bekijk Opnames</translation>
     </message>
     <message>
         <source>%1 behind  --  %2 full</source>
@@ -3610,10 +3619,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The number of days between mythfilldatabase runs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>mythfilldatabase Execution Start</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3650,10 +3655,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Path to use for logging output from mythfilldatabase program.  Leave blank to disable logging.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Myth Database Logging</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3675,15 +3676,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>CC</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Reactivate it</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OND</translation>
     </message>
     <message>
         <source>TXT</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TXT</translation>
     </message>
     <message>
         <source>CC/TXT disabled</source>
@@ -3719,10 +3716,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Keypress Application</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>External application or script to run when a keypress is received by lirc</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3942,6 +3935,146 @@ Your grabber does not provide channel numbers, so you have to set them manually.
 Please make that your ui.xml is valid.
 
 Myth will now exit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filters to be used when recording from this channel.  Not used with hardware encoding cards.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback filters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filters to be used when recordings from this channel are viewed.  Start with a plus to append to the global playback filters.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Override Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reactivate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Never record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Override</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Override</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record anyway</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record this showing with normal options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record this showing with override options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not record this showing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>External application or script to run when a keypress is received by LIRC.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This PIN is used to control access to the setup menus. If you want to use this feature, then setting the value to all numbers will make your life much easier.  Set it to blank to disable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Separate video modes for GUI and TV playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch X Window video modes for TV. Requires &apos;xrandr&apos; support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GUI X size (px)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal resolution for GUI video mode. This mode must be already configured in XF86Config.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GUI Y size (px)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical resolution for GUI video mode. This mode must be already configured in XF86Config.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV X size (px)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal resolution for playback video mode. This mode must be already configured in XF86Config.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV Y size (px)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical resolution for playback video mode. This mode must be already configured in XF86Config.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Mode Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Override Recordings Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Override Recordings will receive this additional recording priority value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The number of days between mythfilldatabase runs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Path to use for logging output from the mythfilldatabase program.  Leave blank to disable logging.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DataDirect Status: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, the master backend will stream and delete files if it finds them in the video directory. Useful if you are using a central storage location, like a NFS share, and your slave backend isn&apos;t running.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4176,15 +4309,15 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Auto-Skip OFF</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch overlaan UIT</translation>
     </message>
     <message>
         <source>Auto-Skip ON</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch overlaan AAN</translation>
     </message>
     <message>
         <source>Auto-Skip Notify</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch overslaan Melding</translation>
     </message>
     <message>
         <source>16:9 Zoom</source>
@@ -4216,7 +4349,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Zoom Mode OFF</source>
-        <translation>Zoom Mode AF</translation>
+        <translation>Zoom Mode UIT</translation>
     </message>
     <message>
         <source>Activate Zoom Mode</source>
@@ -4224,7 +4357,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Auto-Expire OFF</source>
-        <translation>Automatisch vervallen AF</translation>
+        <translation>Automatisch vervallen UIT</translation>
     </message>
     <message>
         <source>Auto-Expire ON</source>
@@ -4260,7 +4393,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Enable/Disable</source>
-        <translation>AAN/AF</translation>
+        <translation>AAN/UIT</translation>
     </message>
     <message>
         <source>Swap Channels</source>
@@ -4292,46 +4425,46 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Closed Captioning</source>
-        <translation type="unfinished"></translation>
+        <translation>Ondertitels</translation>
     </message>
     <message>
         <source>Commercial Auto-Skip</source>
-        <translation type="unfinished"></translation>
+        <translation>Reclameblokken overslaan</translation>
     </message>
     <message>
         <source>Turn Auto-Expire OFF</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch vervallen UIT</translation>
     </message>
     <message>
         <source>Turn Auto-Expire ON</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch vervallen AAN</translation>
     </message>
     <message>
         <source>Change Aspect Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Beeldverhouding</translation>
     </message>
     <message>
         <source>Manual Zoom Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom Mode</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished">minuten</translation>
+        <translation>minuten</translation>
     </message>
     <message>
         <source>CC</source>
-        <translation type="unfinished"></translation>
+        <translation>OND</translation>
     </message>
     <message>
         <source>TXT</source>
-        <translation type="unfinished"></translation>
+        <translation>TXT</translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
         <source>Scheduled Recordings:</source>
-        <translation>Geplande Opnames</translation>
+        <translation>Geplande Opnames:</translation>
     </message>
     <message>
         <source>Conflicting</source>
@@ -4415,7 +4548,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Highlighting:</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemarkeerd:</translation>
     </message>
     <message>
         <source>Show  (1) All  (2) Important</source>

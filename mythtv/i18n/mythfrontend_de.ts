@@ -132,6 +132,18 @@
         <source>Record one showing of this program</source>
         <translation>Diese Ausstrahlung aufnehmen</translation>
     </message>
+    <message>
+        <source>Don&apos;t record this showing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record this showing with override options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record this showing with normal options</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ManualBox</name>
@@ -222,9 +234,6 @@
         <source>Manual recording</source>
         <translation>Manuelle Aufnahme</translation>
     </message>
-</context>
-<context>
-    <name>MenuTheme</name>
 </context>
 <context>
     <name>MythContext</name>
@@ -391,11 +400,11 @@
     </message>
     <message>
         <source>Recording List Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Gruppenmenü</translation>
     </message>
     <message>
         <source>Change Group View</source>
-        <translation type="unfinished"></translation>
+        <translation>Gruppe wechseln</translation>
     </message>
     <message>
         <source>Change Group Password</source>
@@ -411,7 +420,7 @@
     </message>
     <message>
         <source>Recording Group View</source>
-        <translation type="unfinished"></translation>
+        <translation>Gruppenansicht</translation>
     </message>
     <message>
         <source>OK</source>
@@ -439,19 +448,19 @@
     </message>
     <message>
         <source>Yes, but allow future recordings of this episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, aber künftig wieder aufnehmen lassen</translation>
     </message>
     <message>
         <source>There are %1 recordings in this display group</source>
-        <translation type="unfinished"></translation>
+        <translation>Es gibt %1 Aufnahmen in dieser Gruppe</translation>
     </message>
     <message>
         <source>There is one recording in this display group</source>
-        <translation type="unfinished"></translation>
+        <translation>Es gibt eine Aufnahme in dieser Gruppe</translation>
     </message>
     <message>
         <source>There are no recordings in this display group</source>
-        <translation type="unfinished"></translation>
+        <translation>Es gibt keine Aufnahmen in dieser Gruppe</translation>
     </message>
 </context>
 <context>
@@ -499,6 +508,14 @@
     <message>
         <source>Recording one showing of this program</source>
         <translation>Nehme eine Ausstrahlung dieser Sendung auf</translation>
+    </message>
+    <message>
+        <source>Recording this showing with override options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manually not recording this showing</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -608,6 +625,14 @@
     </message>
     <message>
         <source>Any</source>
+        <translation>Jede</translation>
+    </message>
+    <message>
+        <source>Recording this showing with override options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manually not recording this showing</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1027,7 +1052,7 @@
     </message>
     <message>
         <source>This PIN is used to control access to the setup menues. If you want to use this feature, then setting the value to all numbers will make your life much easier.  Set it to blank to disable.</source>
-        <translation>Diese PIN sichert den Zugang zu den Konfigurationsmenüs und sollte für eine einfache Nutzung nur aus Ziffern bestehen. Ein leerer Eintrag schaltet die PIN Kontrolle ab.</translation>
+        <translation type="obsolete">Diese PIN sichert den Zugang zu den Konfigurationsmenüs und sollte für eine einfache Nutzung nur aus Ziffern bestehen. Ein leerer Eintrag schaltet die PIN Kontrolle ab.</translation>
     </message>
     <message>
         <source>Require Setup PIN</source>
@@ -1239,7 +1264,7 @@
     </message>
     <message>
         <source>Fill is the quickest method, but it doesn&apos;t look good up close. Image looks good from up close, but is somewhat slow. And of course no shading will be the fastest.</source>
-        <translation>&apos;Füllen&apos; ist eine schnelle aber qualitativ durchschnittliche Methode; &apos;BIld&apos; ist langsamer aber besser. Und &apos;Keine&apos; Schattierung ist natürlich am schnellsten.</translation>
+        <translation>&apos;Füllen&apos; ist eine schnelle aber qualitativ durchschnittliche Methode; &apos;Bild&apos; ist langsamer aber besser. Und &apos;Keine&apos; Schattierung ist natürlich am schnellsten.</translation>
     </message>
     <message>
         <source>Always use Advanced Recording Options screen</source>
@@ -1411,7 +1436,7 @@
     </message>
     <message>
         <source>Time Blocks (30 mins) to Display</source>
-        <translation>Wieviele Zeitblöcke (je 30min.)</translation>
+        <translation>Wieviele Zeitblöcke (je 30 Min.)</translation>
     </message>
     <message>
         <source>Guide starts at channel</source>
@@ -1840,7 +1865,7 @@
     </message>
     <message>
         <source>When using Blank Frame Detection and Auto-Flagging, flag blank frames following commercial breaks as part of the the commercial break.</source>
-        <translation type="unfinished"></translation>
+        <translation>Für die &apos;Dunkle Frames&apos; Methode und bei aktiver &apos;Werbung autom. markieren&apos; Option. Dunkle Frames nach einem Werbeblock werden wie Werbung behandelt.</translation>
     </message>
     <message>
         <source>OK</source>
@@ -1848,7 +1873,7 @@
     </message>
     <message>
         <source>Manual Override</source>
-        <translation>Überstimmt</translation>
+        <translation type="obsolete">Überstimmt</translation>
     </message>
     <message>
         <source>Other Showing</source>
@@ -1864,7 +1889,7 @@
     </message>
     <message>
         <source>Overlap</source>
-        <translation>Überschneidung</translation>
+        <translation type="obsolete">Überschneidung</translation>
     </message>
     <message>
         <source>Repeat</source>
@@ -1912,15 +1937,15 @@
     </message>
     <message>
         <source>Don&apos;t record it</source>
-        <translation>Nicht aufnehmen</translation>
+        <translation type="obsolete">Nicht aufnehmen</translation>
     </message>
     <message>
         <source>Never record this episode</source>
-        <translation>Diese Folge niemals aufnehmen</translation>
+        <translation type="obsolete">Diese Folge niemals aufnehmen</translation>
     </message>
     <message>
         <source>Record it anyway</source>
-        <translation>Dennoch aufnehmen</translation>
+        <translation type="obsolete">Dennoch aufnehmen</translation>
     </message>
     <message>
         <source>The following scheduled recordings conflict with each other.  Which would you like to record?</source>
@@ -2280,7 +2305,7 @@
     </message>
     <message>
         <source>it is covered by another scheduled recording for the same program.</source>
-        <translation>sie bereits durch eine andere Aufnahme derselben Serie abgedeckt ist.</translation>
+        <translation type="obsolete">sie bereits durch eine andere Aufnahme derselben Serie abgedeckt ist.</translation>
     </message>
     <message>
         <source>there wasn&apos;t enough disk space available.</source>
@@ -3141,10 +3166,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>If enabled, the master backend will stream and delete files if it finds them in the video directory. Useful if you are using a central storage location, like an NFS share, and your slave backend isn&apos;t running.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Reconnect wait time (secs)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3286,11 +3307,11 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Time offset for thumbnail preview images</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeitversatz für Vorschaubilder</translation>
     </message>
     <message>
         <source>How many seconds into the show to capture the static preview images from.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erzeugt das Vorschaubild einer Aufnahme um so viele Sekunden nach dem Beginn einer Sendung.</translation>
     </message>
     <message>
         <source>Find One Recordings Priority</source>
@@ -3394,15 +3415,15 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Password required to view all recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Passwort für alle Aufnahmen</translation>
     </message>
     <message>
         <source>If given, a password must be entered to view the complete list of all recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, muß ein Passwort eingegeben werden um eine vollständige Liste aller Aufnahmen einzusehen.</translation>
     </message>
     <message>
         <source>Default Recording Group to display</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard Aufnahmegruppe</translation>
     </message>
     <message>
         <source>All</source>
@@ -3410,23 +3431,23 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Default Recording Group to display on the view recordings screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard Aufnahmegruppe für das &apos;Aufnahmen ansehen&apos; Menü.</translation>
     </message>
     <message>
         <source>Save current Recording Group view when changed</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktuelle Aufnahmegruppe merken</translation>
     </message>
     <message>
         <source>Remember the last selected Recording Group instead of displaying the Default group whenever you enter the playback screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, so bleibt die zuletzt gewählte Aufnahmegruppe beim Betreten des &apos;Aufnahmen ansehen&apos; Menüs aktiv.</translation>
     </message>
     <message>
         <source>Use program categories as display groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategorien als Gruppen</translation>
     </message>
     <message>
         <source>Add the list of program categories to the list of Recording Groups used for display.  Only programs in non-password protected groups will be listed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nutzt die Kategorien auch als Aufnahmegruppen für die Anzeige. Nur Aufnahmen in nicht-geschützten Gruppen werden angezeigt.</translation>
     </message>
     <message>
         <source>View Recordings</source>
@@ -3450,35 +3471,35 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Commercial Skip Auto-Rewind Amount</source>
-        <translation type="unfinished"></translation>
+        <translation>Werbeblock Sprunglänge</translation>
     </message>
     <message>
         <source>If set, Myth will automatically rewind this many seconds after performing a commercial skip.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, wird Myth autom. so viele Sekunden zurück springen nachdem ein Werbeblock übersprungen wurde.</translation>
     </message>
     <message>
         <source>Skip %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Springe %1</translation>
     </message>
     <message>
         <source>Commercial: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Werbung: %1</translation>
     </message>
     <message>
         <source>Logo Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Logo Erkennung</translation>
     </message>
     <message>
         <source>Unable to create AudioOutput.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kann AudioOutput nicht anlegen.</translation>
     </message>
     <message>
         <source>Continue WITHOUT AUDIO!</source>
-        <translation type="unfinished"></translation>
+        <translation>Ohne Audio fortsetzen!</translation>
     </message>
     <message>
         <source>Return to menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zurück ins Menü.</translation>
     </message>
     <message>
         <source>S</source>
@@ -3486,23 +3507,23 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Earlier Showing</source>
-        <translation type="unfinished"></translation>
+        <translation>Frühere Ausstrahlung</translation>
     </message>
     <message>
         <source>Later Showing</source>
-        <translation type="unfinished"></translation>
+        <translation>Spätere Ausstrahlung</translation>
     </message>
     <message>
         <source>this episode will be recorded at an earlier time instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>diese Folge wird stattdessen früher aufgenommen.</translation>
     </message>
     <message>
         <source>another program with a higher priority will be recorded instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>ein anderes Programm mit höherer Priorität wird stattdessen aufgenommen.</translation>
     </message>
     <message>
         <source>this episode will be recorded at a later time instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>diese Folge wird zu einem späteren Zeitpunkt aufgenommen.</translation>
     </message>
     <message>
         <source>Clear Override</source>
@@ -3511,23 +3532,24 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     <message>
         <source>The following programs will be recorded instead:
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Die folgende Sendung wird stattdessen aufgenommen:
+</translation>
     </message>
     <message>
         <source>30m</source>
-        <translation type="unfinished"></translation>
+        <translation>30 min</translation>
     </message>
     <message>
         <source>1h</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Std</translation>
     </message>
     <message>
         <source>1h30m</source>
-        <translation type="unfinished"></translation>
+        <translation>1,5 Std</translation>
     </message>
     <message>
         <source>2h</source>
-        <translation type="unfinished"></translation>
+        <translation>2 Std</translation>
     </message>
     <message>
         <source>Input preference</source>
@@ -3539,23 +3561,23 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Independent Muting of Left and Right Audio Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Linken/Rechten Kanal stumm schalten</translation>
     </message>
     <message>
         <source>Enable muting of just the left or right channel.  Useful if your broadcaster puts the original language on one channel, and a dubbed version of the program on the other one.  This modifies the behavior of the Mute key.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erlaubt das getrennte Stummschalten des linken oder rechten Kanals. Nützlich für Sendungen die mit Zweikanalton ausgestrahlt werden.</translation>
     </message>
     <message>
         <source>This determines the method used by MythTV to detect when commercials start and end.  You must have &apos;Automatically Flag Commercials&apos; turned on to use anything other than &apos;Blank Frame&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestimmt die Methode mit der MythTV Beginn und Ende eines Werbeblocks sucht. Sie müssen die &apos;Werbung autom. markieren&apos; Option eingeschaltet haben, um auch andere als die &apos;Dunkle Frames&apos; Methode verwenden zu können.</translation>
     </message>
     <message>
         <source>Display &apos;favorite&apos; channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeige bevorzugte Sender</translation>
     </message>
     <message>
         <source>If set, the EPG will initally display only the channels marked as favorites. &quot;4&quot; will toggle between favorites and all channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, werden im EPG nur die als Favoriten markierten Sender angezeigt. Die Taste &apos;4&apos; schaltet zwischen den Favoriten und allen Sendern um.</translation>
     </message>
     <message>
         <source>Reschedule Higher Priorities</source>
@@ -3567,11 +3589,11 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Use select to change the channel in the program guide</source>
-        <translation type="unfinished"></translation>
+        <translation>Umschalten bei &apos;Select&apos; (im EPG)</translation>
     </message>
     <message>
         <source>If checked the select key will change the channel while using the program guide during live TV.  If unchecked the select key will bring up the recording options screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, wird beim Drücken der Select-Taste (Enter) auf den gewählten Sender umgeschaltet. Ansonsten wechselt diese Taste in das Menü mit den Aufnahmeoptionen.</translation>
     </message>
     <message>
         <source>Visible</source>
@@ -3679,18 +3701,14 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Automatically run mythfilldatabase</source>
-        <translation type="unfinished"></translation>
+        <translation>mythfilldatabase autom. starten</translation>
     </message>
     <message>
         <source>This enables the automatic execution of mythfilldatabase.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dies aktiviert die automatische Ausführung von mythfilldatabase.</translation>
     </message>
     <message>
         <source>mythfilldatabase Run Frequency (Days)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The number of days between mythfilldatabase runs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3730,10 +3748,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Path to use for logging output from mythfilldatabase program.  Leave blank to disable logging.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Myth Database Logging</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3758,10 +3772,6 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reactivate it</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>TXT</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3775,35 +3785,35 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>MythTV wants to record &quot;%1&quot; on %2 in %3 seconds. Do you want to:</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV will in %3 Sekunden &quot;%1&quot; auf %2 aufnehmen. Möchten Sie:</translation>
     </message>
     <message>
         <source>Recording volume of the capture card</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnahmelautstärke der Capturekarte</translation>
     </message>
     <message>
         <source>Enable interlaced DCT encoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Interlaced DCT kodierung</translation>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced DCT encoding.  You probably want this when encoding interlaced video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, nutzt der MPEG4 Kodierer interlaced DCT Kodierung. Sie sollten diese Option für die Kodierung von interlaced Videomaterial nutzen.</translation>
     </message>
     <message>
         <source>Enable interlaced motion estimation</source>
-        <translation type="unfinished"></translation>
+        <translation>Interlaced motion estimation</translation>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced motion estimation.  You probably want this when encoding interlaced video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, nutzt der MPEG4 Kodierer interlaced Motion Estimation. Sie sollten diese Option für die Kodierung von interlaced Videomaterial nutzen.</translation>
     </message>
     <message>
         <source>Keypress Application</source>
-        <translation type="unfinished"></translation>
+        <translation>Lirc Skript</translation>
     </message>
     <message>
         <source>External application or script to run when a keypress is received by lirc</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Externes Skript oder Programm das nach Empfang eines Tastendrucks über Lirc gestartet wird</translation>
     </message>
     <message>
         <source>LCD Displays Time</source>
@@ -3899,15 +3909,15 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Start in title section.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mit Titeln beginnen.</translation>
     </message>
     <message>
         <source>If set, focus will initially be on the show titles otherwise focus will be on the recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, wird der Auswahlfokus bei den Sendungsnamen liegen, ansonsten bei den Aufnahmen.</translation>
     </message>
     <message>
         <source>Show group summary.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Gruppenzusammenfassung zeigen.</translation>
     </message>
     <message>
         <source>While selecting a group, show a group summary instead of showing info about the first episode in that group.</source>
@@ -3915,7 +3925,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Menu theme</source>
-        <translation type="unfinished"></translation>
+        <translation>Menüthema</translation>
     </message>
     <message>
         <source>Aspect Override</source>
@@ -3923,19 +3933,19 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>16/9 Anamorphic</source>
-        <translation type="unfinished"></translation>
+        <translation>16:9 Anamorph</translation>
     </message>
     <message>
         <source>4/3 Normal</source>
-        <translation type="unfinished"></translation>
+        <translation>4:3 Normal</translation>
     </message>
     <message>
         <source>16/9 Zoom</source>
-        <translation type="unfinished">16/9 Zoom</translation>
+        <translation>16:9 Zoom</translation>
     </message>
     <message>
         <source>4/3 Zoom</source>
-        <translation type="unfinished">4/3 Zoom</translation>
+        <translation>4:3 Zoom</translation>
     </message>
     <message>
         <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback.</source>
@@ -3943,15 +3953,15 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>GUI width (px)</source>
-        <translation type="unfinished"></translation>
+        <translation>GUI Breite (Pixel)</translation>
     </message>
     <message>
         <source>GUI height (px)</source>
-        <translation type="unfinished"></translation>
+        <translation>GUI Höhe (Pixel)</translation>
     </message>
     <message>
         <source>Qt Style</source>
-        <translation type="unfinished"></translation>
+        <translation>Qt Stil</translation>
     </message>
     <message>
         <source>Desktop Style</source>
@@ -3959,69 +3969,212 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Channel format</source>
-        <translation type="unfinished"></translation>
+        <translation>Senderformat</translation>
     </message>
     <message>
         <source>number</source>
-        <translation type="unfinished"></translation>
+        <translation>Senderplatz</translation>
     </message>
     <message>
         <source>number callsign</source>
-        <translation type="unfinished"></translation>
+        <translation>Senderplatz Senderkürzel</translation>
     </message>
     <message>
         <source>number name</source>
-        <translation type="unfinished"></translation>
+        <translation>Senderplatz Sendername</translation>
     </message>
     <message>
         <source>callsign</source>
-        <translation type="unfinished"></translation>
+        <translation>Senderkürzel</translation>
     </message>
     <message>
         <source>name</source>
-        <translation type="unfinished"></translation>
+        <translation>Sendername</translation>
     </message>
     <message>
         <source>Your preferred channel format.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ihr bevorzugtes Senderformat.</translation>
     </message>
     <message>
         <source>Long Channel format</source>
-        <translation type="unfinished"></translation>
+        <translation>Langes Senderformat</translation>
     </message>
     <message>
         <source>Your preferred long channel format.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ihr bevorzugtes langes Senderformat.</translation>
     </message>
     <message>
         <source>Default size is 25.</source>
-        <translation type="unfinished"></translation>
+        <translation>Standardgröße ist 25.</translation>
     </message>
     <message>
         <source>Default size is 16.</source>
-        <translation type="unfinished"></translation>
+        <translation>Standardgröße ist 16.</translation>
     </message>
     <message>
         <source>Record Threshold</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnahmeschwellwert (Min.)</translation>
     </message>
     <message>
         <source>If the option to use select to change the channel is on, pressing select on a show that is at least this many minutes into the future will schedule a recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nur bei aktiver &apos;Umschalten bei Select&apos; Option gültig. Liegt der Beginn einer Sendung mindestens so viele Minuten in der Zukunft, so wird beim drücken der &apos;Select&apos;-Taste eine neue Aufnahme geplant statt auf diesen Sender umzuschalten.</translation>
     </message>
     <message>
         <source>View Recordings (Recording Groups)</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnahmen ansehen (Aufnahmegruppen)</translation>
     </message>
     <message>
         <source>Failed to get selector object</source>
-        <translation type="unfinished"></translation>
+        <translation>Konnte &apos;selector&apos; Objekt nicht finden</translation>
     </message>
     <message>
         <source>Myth could not locate the selector object within your theme.
 Please make that your ui.xml is valid.
 
 Myth will now exit.</source>
+        <translation>Myth konnte das &apos;selector&apos; Objekt nicht in ihrem Thema finden.
+Bitte stellen Sie sicher daß die &apos;ui.xml&apos; Datei gültig ist.
+
+Myth wird nun beendet.</translation>
+    </message>
+    <message>
+        <source>Filters to be used when recording from this channel.  Not used with hardware encoding cards.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback filters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filters to be used when recordings from this channel are viewed.  Start with a plus to append to the global playback filters.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Override Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reactivate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Never record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Override</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Override</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record anyway</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record this showing with normal options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record this showing with override options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not record this showing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>External application or script to run when a keypress is received by LIRC.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This PIN is used to control access to the setup menus. If you want to use this feature, then setting the value to all numbers will make your life much easier.  Set it to blank to disable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Separate video modes for GUI and TV playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch X Window video modes for TV. Requires &apos;xrandr&apos; support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GUI X size (px)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal resolution for GUI video mode. This mode must be already configured in XF86Config.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GUI Y size (px)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical resolution for GUI video mode. This mode must be already configured in XF86Config.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV X size (px)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal resolution for playback video mode. This mode must be already configured in XF86Config.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV Y size (px)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical resolution for playback video mode. This mode must be already configured in XF86Config.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Mode Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Override Recordings Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Override Recordings will receive this additional recording priority value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The number of days between mythfilldatabase runs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Path to use for logging output from the mythfilldatabase program.  Leave blank to disable logging.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DataDirect Status: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, the master backend will stream and delete files if it finds them in the video directory. Useful if you are using a central storage location, like a NFS share, and your slave backend isn&apos;t running.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4033,15 +4186,15 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>List upcoming episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeige kommende Folgen</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;Abbrechen</translation>
+        <translation>&amp;Abbrechen</translation>
     </message>
     <message>
         <source>&amp;Finish</source>
-        <translation type="unfinished">&amp;Fertig</translation>
+        <translation>&amp;Fertig</translation>
     </message>
 </context>
 <context>
@@ -4140,7 +4293,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Mute On</source>
-        <translation>Stumm ein</translation>
+        <translation>Stumm</translation>
     </message>
     <message>
         <source>Mute Off</source>
@@ -4312,7 +4465,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Zoom Mode OFF</source>
-        <translation>Zoom aus</translation>
+        <translation>Zoom AUS</translation>
     </message>
     <message>
         <source>Activate Zoom Mode</source>
@@ -4320,63 +4473,63 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Auto-Expire OFF</source>
-        <translation type="unfinished"></translation>
+        <translation>Autom. löschen AUS</translation>
     </message>
     <message>
         <source>Auto-Expire ON</source>
-        <translation type="unfinished"></translation>
+        <translation>Autom. löschen EIN</translation>
     </message>
     <message>
         <source>Zoom Mode ON</source>
-        <translation>Zoom ein</translation>
+        <translation>Zoom EIN</translation>
     </message>
     <message>
         <source>Left Channel Muted</source>
-        <translation type="unfinished"></translation>
+        <translation>Linker Kanal stumm</translation>
     </message>
     <message>
         <source>Right Channel Muted</source>
-        <translation type="unfinished"></translation>
+        <translation>Rechter Kanal stumm</translation>
     </message>
     <message>
         <source>Sleep </source>
-        <translation type="unfinished"></translation>
+        <translation>Schlaf</translation>
     </message>
     <message>
         <source>16:9 Stretch</source>
-        <translation type="unfinished"></translation>
+        <translation>16:9 Gedehnt</translation>
     </message>
     <message>
         <source>Program Guide</source>
-        <translation type="unfinished">Programmübersicht (EPG)</translation>
+        <translation>Programmübersicht (EPG)</translation>
     </message>
     <message>
         <source>Picture-in-Picture</source>
-        <translation type="unfinished"></translation>
+        <translation>Bild-im-Bild</translation>
     </message>
     <message>
         <source>Enable/Disable</source>
-        <translation type="unfinished"></translation>
+        <translation>Ein-/Ausschalten</translation>
     </message>
     <message>
         <source>Swap Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Sender tauschen</translation>
     </message>
     <message>
         <source>Change Active Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktives Fenster wechseln</translation>
     </message>
     <message>
         <source>Enable Browse Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Browsemodus</translation>
     </message>
     <message>
         <source>Previous Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorheriger Sender</translation>
     </message>
     <message>
         <source>Edit Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnahme bearbeiten</translation>
     </message>
     <message>
         <source>Toggle CC</source>
@@ -4392,27 +4545,27 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Commercial Auto-Skip</source>
-        <translation type="unfinished"></translation>
+        <translation>Werbung überspringen</translation>
     </message>
     <message>
         <source>Turn Auto-Expire OFF</source>
-        <translation type="unfinished"></translation>
+        <translation>Schalte Autom. löschen AUS</translation>
     </message>
     <message>
         <source>Turn Auto-Expire ON</source>
-        <translation type="unfinished"></translation>
+        <translation>Schalte Autom. löschen EIN</translation>
     </message>
     <message>
         <source>Change Aspect Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Seitenverhältnis</translation>
     </message>
     <message>
         <source>Manual Zoom Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Manueller Zoom</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished">Minuten</translation>
+        <translation>Minuten</translation>
     </message>
     <message>
         <source>CC</source>

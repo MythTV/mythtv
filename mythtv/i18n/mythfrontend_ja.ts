@@ -132,6 +132,18 @@
         <source>Record one showing of this program</source>
         <translation>この番組を一回の放送分だけ録画する</translation>
     </message>
+    <message>
+        <source>Don&apos;t record this showing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record this showing with override options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record this showing with normal options</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ManualBox</name>
@@ -222,9 +234,6 @@
         <source>Manual recording</source>
         <translation>手動録画</translation>
     </message>
-</context>
-<context>
-    <name>MenuTheme</name>
 </context>
 <context>
     <name>MythContext</name>
@@ -500,6 +509,14 @@
         <source>Recording one showing of this program</source>
         <translation>この放送を一回だけ録画する</translation>
     </message>
+    <message>
+        <source>Recording this showing with override options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manually not recording this showing</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgLister</name>
@@ -609,6 +626,14 @@
     <message>
         <source>Any</source>
         <translation>どれか</translation>
+    </message>
+    <message>
+        <source>Recording this showing with override options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manually not recording this showing</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1011,7 +1036,7 @@
     </message>
     <message>
         <source>This PIN is used to control access to the setup menues. If you want to use this feature, then setting the value to all numbers will make your life much easier.  Set it to blank to disable.</source>
-        <translation>ピンコードは設定画面の表示を制限するのに使われます．空白にすれば無効になります．</translation>
+        <translation type="obsolete">ピンコードは設定画面の表示を制限するのに使われます．空白にすれば無効になります．</translation>
     </message>
     <message>
         <source>Require Setup PIN</source>
@@ -1833,7 +1858,7 @@
     </message>
     <message>
         <source>Manual Override</source>
-        <translation>手動で上書き</translation>
+        <translation type="obsolete">手動で上書き</translation>
     </message>
     <message>
         <source>Other Showing</source>
@@ -1849,7 +1874,7 @@
     </message>
     <message>
         <source>Overlap</source>
-        <translation>重複</translation>
+        <translation type="obsolete">重複</translation>
     </message>
     <message>
         <source>Repeat</source>
@@ -1897,15 +1922,15 @@
     </message>
     <message>
         <source>Don&apos;t record it</source>
-        <translation>録画しない</translation>
+        <translation type="obsolete">録画しない</translation>
     </message>
     <message>
         <source>Never record this episode</source>
-        <translation>この番組をもう録画しない</translation>
+        <translation type="obsolete">この番組をもう録画しない</translation>
     </message>
     <message>
         <source>Record it anyway</source>
-        <translation>とにかく録画する</translation>
+        <translation type="obsolete">とにかく録画する</translation>
     </message>
     <message>
         <source>The following scheduled recordings conflict with each other.  Which would you like to record?</source>
@@ -2455,7 +2480,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>it is covered by another scheduled recording for the same program.</source>
-        <translation>同じ番組が別の予約で録画されます．</translation>
+        <translation type="obsolete">同じ番組が別の予約で録画されます．</translation>
     </message>
     <message>
         <source>there wasn&apos;t enough disk space available.</source>
@@ -3177,7 +3202,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>If enabled, the master backend will stream and delete files if it finds them in the video directory. Useful if you are using a central storage location, like an NFS share, and your slave backend isn&apos;t running.</source>
-        <translation>有効にすると，マスターバックエンドはビデオディレクトリで見つかったファイルをストリーム出力したり消去したりするようになります．NFS共有のようなストレージを使っていて，スレーブバックエンドを動作させていないときに役立ちます．</translation>
+        <translation type="obsolete">有効にすると，マスターバックエンドはビデオディレクトリで見つかったファイルをストリーム出力したり消去したりするようになります．NFS共有のようなストレージを使っていて，スレーブバックエンドを動作させていないときに役立ちます．</translation>
     </message>
     <message>
         <source>Reconnect wait time (secs)</source>
@@ -3715,7 +3740,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>The number of days between mythfilldatabase runs</source>
-        <translation>mythfilldatabase実行間隔日数</translation>
+        <translation type="obsolete">mythfilldatabase実行間隔日数</translation>
     </message>
     <message>
         <source>mythfilldatabase Execution Start</source>
@@ -3755,7 +3780,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Path to use for logging output from mythfilldatabase program.  Leave blank to disable logging.</source>
-        <translation>mythfilldatabaseプログラムが使用するログパス。空白はログを無効にします。</translation>
+        <translation type="obsolete">mythfilldatabaseプログラムが使用するログパス。空白はログを無効にします。</translation>
     </message>
     <message>
         <source>Myth Database Logging</source>
@@ -3783,7 +3808,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Reactivate it</source>
-        <translation>有効にする</translation>
+        <translation type="obsolete">有効にする</translation>
     </message>
     <message>
         <source>TXT</source>
@@ -3823,7 +3848,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>External application or script to run when a keypress is received by lirc</source>
-        <translation>lircからキー入力が有った時に実行する外部アプリケーション又はスクリプト</translation>
+        <translation type="obsolete">lircからキー入力が有った時に実行する外部アプリケーション又はスクリプト</translation>
     </message>
     <message>
         <source>LCD Displays Time</source>
@@ -4038,6 +4063,146 @@ Your grabber does not provide channel numbers, so you have to set them manually.
 Please make that your ui.xml is valid.
 
 Myth will now exit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filters to be used when recording from this channel.  Not used with hardware encoding cards.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback filters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filters to be used when recordings from this channel are viewed.  Start with a plus to append to the global playback filters.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Override Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reactivate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Never record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Override</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Override</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record anyway</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record this showing with normal options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record this showing with override options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not record this showing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>External application or script to run when a keypress is received by LIRC.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This PIN is used to control access to the setup menus. If you want to use this feature, then setting the value to all numbers will make your life much easier.  Set it to blank to disable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Separate video modes for GUI and TV playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch X Window video modes for TV. Requires &apos;xrandr&apos; support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GUI X size (px)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal resolution for GUI video mode. This mode must be already configured in XF86Config.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GUI Y size (px)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical resolution for GUI video mode. This mode must be already configured in XF86Config.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV X size (px)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal resolution for playback video mode. This mode must be already configured in XF86Config.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV Y size (px)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical resolution for playback video mode. This mode must be already configured in XF86Config.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Mode Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Override Recordings Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Override Recordings will receive this additional recording priority value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The number of days between mythfilldatabase runs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Path to use for logging output from the mythfilldatabase program.  Leave blank to disable logging.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DataDirect Status: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, the master backend will stream and delete files if it finds them in the video directory. Useful if you are using a central storage location, like a NFS share, and your slave backend isn&apos;t running.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -1513,6 +1513,7 @@ void handlePrograms(int id, int offset, QMap<QString,
             (*i).title.replace(QRegExp("\""), QString("\\\""));
             (*i).subtitle.replace(QRegExp("\""), QString("\\\""));
             (*i).desc.replace(QRegExp("\""), QString("\\\""));
+            (*i).category.replace(QRegExp("\""), QString("\\\""));
             if ("" == (*i).airdate)
                 (*i).airdate = "0";
             if ("" == (*i).stars)

@@ -911,6 +911,17 @@ int main(int argc, char **argv)
 
     gContext->LoadQtConfig();
 
+    bool switchMode = gContext->GetNumSetting("UseVideoModes", 0);
+    if (switchMode) 
+    {
+        // xrandr to gui size
+        char buf[128];
+        int screenwidth = gContext->GetNumSetting("GuiVidModeWidth", 0);
+        int screenheight = gContext->GetNumSetting("GuiVidModeHeight", 0);
+        sprintf(buf, "xrandr -s %dx%d", screenwidth, screenheight);
+        system(buf);
+    }
+
     MythMainWindow *mainWindow = new MythMainWindow();
     mainWindow->Show();
     mainWindow->Init();

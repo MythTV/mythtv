@@ -138,6 +138,7 @@ if ($getname) {
     warn "string to execute:\t$getnamestr\n";
   }
   $outname=`$getnamestr`;
+  $outname = quotemeta($outname);
   chomp $outname;
 }
 if ($debug) {

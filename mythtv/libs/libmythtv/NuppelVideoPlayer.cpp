@@ -1344,6 +1344,8 @@ void NuppelVideoPlayer::InitExAVSync(void)
             else if ( ret == 2 )
                 timing_type = "DRM vblank";
             */
+            else if (ret == 3)
+                timing_type = "OpenGL vsync";
         }
         /*
         // not yet implemented
