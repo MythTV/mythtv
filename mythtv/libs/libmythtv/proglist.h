@@ -13,7 +13,9 @@ enum ProgListType {
     plTitle = 1,
     plNewListings = 2,
     plTitleSearch = 3,
-    plDescSearch = 4
+    plDescSearch = 4,
+    plChannel = 5,
+    plCategory = 6
 };
 
 class QSqlDatabase;

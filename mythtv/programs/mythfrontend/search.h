@@ -25,15 +25,23 @@ class Search : public MythDialog
 
   protected slots:
     void textChanged(void);
+    void channelChanged(void);
+    void categoryChanged(void);
     void runSearch(void);
     void runDescSearch(void);
     void runNewList(void);
+    void runChannelList(void);
+    void runCategoryList(void);
     void cancelClicked(void);
 
   private:
     MythRemoteLineEdit *m_title;
     MythPushButton *m_searchButton;
     MythPushButton *m_descButton;
+    MythComboBox *m_channel;
+    MythPushButton *m_chanButton;
+    MythComboBox *m_category;
+    MythPushButton *m_catButton;
     MythPushButton *m_newButton;
     MythPushButton *m_cancelButton;
 };

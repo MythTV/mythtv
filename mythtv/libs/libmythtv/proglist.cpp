@@ -305,6 +305,25 @@ void ProgLister::fillItemList(void)
                         .arg(title.utf8()).arg(title.utf8()).arg(title.utf8())
                         .arg(startTime.toString("yyyyMMddhhmm50"));
     }
+    else if (type == plChannel) // list by channel
+    {
+        where = QString("WHERE channel.name = \"%1\" "
+                        "AND program.endtime > %2 "
+                        "AND program.chanid = channel.chanid "
+                        "ORDER BY program.starttime;")
+                        .arg(title.utf8())
+                        .arg(startTime.toString("yyyyMMddhhmm50"));
+    }
+    else if (type == plCategory) // list by category
+    {
+        where = QString("WHERE program.category = \"\%1\" "
+                        "AND program.endtime > %2 "
+                        "AND program.chanid = channel.chanid "
+                        "ORDER BY program.starttime,channel.channum "
+                        "LIMIT 500;")
+                        .arg(title.utf8())
+                        .arg(startTime.toString("yyyyMMddhhmm50"));
+    }
 
     itemList.clear();
     ProgramInfo::GetProgramListByQuery(db, &itemList, where);
