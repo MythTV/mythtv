@@ -350,6 +350,12 @@ void WriteDefaults(QSqlDatabase* db) {
     AppearanceSettings as;
     as.load(db);
     as.save(db);
+    MainGeneralSettings mgs;
+    mgs.load(db);
+    mgs.save(db);
+    GeneralRankingSettings grs;
+    grs.load(db);
+    grs.save(db);
 }
 
 QString RandTheme(QString &themename, QSqlDatabase *db)

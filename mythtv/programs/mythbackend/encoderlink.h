@@ -86,9 +86,6 @@ class EncoderLink
     void KillReadThread(void);
     QSocket *GetReadThreadSocket(void);
 
-    void PauseRingBuffer(void);
-    void UnpauseRingBuffer(void);
-    void PauseClearRingBuffer(void);
     void RequestRingBufferBlock(int size);
     long long SeekRingBuffer(long long curpos, long long pos, int whence);
 

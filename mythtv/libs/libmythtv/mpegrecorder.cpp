@@ -246,10 +246,8 @@ void MpegRecorder::Initialize(void)
 bool MpegRecorder::PacketHasHeader(unsigned char *buf, int len,
                                    unsigned int startcode)
 {
-    unsigned char *bufptr;
-    unsigned int state = 0xFFFFFFFF, v;
-
-    bufptr = buf;
+    unsigned char *bufptr = buf;
+    unsigned int state = 0xFFFFFFFF, v = 0;
 
     while (bufptr < buf + len)
     {

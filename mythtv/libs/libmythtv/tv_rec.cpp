@@ -1878,15 +1878,6 @@ void TVRec::GetInputName(QString &inputname)
     inputname = channel->GetCurrentInput();
 }
 
-void TVRec::PauseRingBuffer(void)
-{
-    if (!rbuffer)
-        return;
-
-    rbuffer->StopReads();
-    pthread_mutex_lock(&readthreadLock);
-}
-
 void TVRec::UnpauseRingBuffer(void)
 {
     if (!rbuffer)
@@ -1911,6 +1902,8 @@ long long TVRec::SeekRingBuffer(long long curpos, long long pos, int whence)
         return -1;
     if (!readthreadlive)
         return -1;
+
+    PauseClearRingBuffer();
 
     if (whence == SEEK_CUR)
     {

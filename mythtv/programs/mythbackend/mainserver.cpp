@@ -1377,24 +1377,6 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
 
         retlist << input;
     }
-    else if (command == "PAUSE_RINGBUF")
-    {
-        enc->PauseRingBuffer();
-
-        retlist << "OK";
-    }
-    else if (command == "UNPAUSE_RINGBUF")
-    {
-        enc->UnpauseRingBuffer();
-       
-        retlist << "OK";
-    }
-    else if (command == "PAUSECLEAR_RINGBUF")
-    {
-        enc->PauseClearRingBuffer();
-
-        retlist << "OK";
-    }
     else if (command == "REQUEST_BLOCK_RINGBUF")
     {
         int size = slist[2].toInt();
@@ -1518,16 +1500,6 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
     else if (command == "DONE")
     {
         ft->Stop();
-        retlist << "ok";
-    }
-    else if (command == "PAUSE")
-    {
-        ft->Pause();
-        retlist << "ok";
-    }
-    else if (command == "UNPAUSE")
-    {
-        ft->Unpause();
         retlist << "ok";
     }
     else if (command == "REQUEST_BLOCK")

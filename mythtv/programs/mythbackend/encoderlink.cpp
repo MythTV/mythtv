@@ -579,39 +579,6 @@ QSocket *EncoderLink::GetReadThreadSocket(void)
     return NULL;
 }
 
-void EncoderLink::PauseRingBuffer(void)
-{
-    if (local)
-    {
-        tv->PauseRingBuffer();
-        return;
-    }
-
-    cerr << "Should be local only query: PauseRingBuffer\n";
-}
-
-void EncoderLink::UnpauseRingBuffer(void)
-{
-    if (local)
-    {
-        tv->UnpauseRingBuffer();
-        return;
-    }
-
-    cerr << "Should be local only query: UnpauseRingBuffer\n";
-}
-
-void EncoderLink::PauseClearRingBuffer(void)
-{
-    if (local)
-    {
-        tv->PauseClearRingBuffer();
-        return;
-    }
-
-    cerr << "Should be local only query: PauseClearRingBuffer\n";
-}
-
 void EncoderLink::RequestRingBufferBlock(int size)
 {
     if (local)

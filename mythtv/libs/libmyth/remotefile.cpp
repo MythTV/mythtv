@@ -209,16 +209,6 @@ bool RemoteFile::RequestBlock(int size)
 long long RemoteFile::Seek(long long pos, int whence, long long curpos)
 {
     QStringList strlist = QString(query).arg(recordernum);
-    strlist << "PAUSE" + append;
-
-    lock.lock();
-    WriteStringList(controlSock, strlist);
-    ReadStringList(controlSock, strlist);
-    lock.unlock();
-
-    strlist.clear();
-
-    strlist = QString(query).arg(recordernum);
     strlist << "SEEK" + append;
     encodeLongLong(strlist, pos);
     strlist << QString::number(whence);

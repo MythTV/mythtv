@@ -117,7 +117,6 @@ class TVRec
     void KillReadThread(void);
     QSocket *GetReadThreadSocket(void);
 
-    void PauseRingBuffer(void);
     void UnpauseRingBuffer(void);
     void PauseClearRingBuffer(void);
     void RequestRingBufferBlock(int size);

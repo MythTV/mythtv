@@ -121,6 +121,8 @@ long long FileTransfer::Seek(long long curpos, long long pos, int whence)
 
     ateof = false;
 
+    Pause();
+
     if (whence == SEEK_CUR)
     {
         long long desired = curpos + pos;
