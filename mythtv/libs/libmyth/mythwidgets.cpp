@@ -226,7 +226,7 @@ void MythLineEdit::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    if (gContext->GetMainWindow()->TranslateKeyPress("qtNoJump", e, actions))
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
@@ -542,7 +542,7 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    if (gContext->GetMainWindow()->TranslateKeyPress("qtNoJump", e, actions))
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {

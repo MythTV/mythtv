@@ -1168,6 +1168,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
 
                     lastvpts += frame_delay;
 
+/* XXX: Broken.
                     if (mpa_pic.qscale_table != NULL && mpa_pic.qstride > 0 &&
                         context->height == picframe->height)
                     {
@@ -1186,6 +1187,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                         memcpy(picframe->qscale_table, mpa_pic.qscale_table,
                                tblsize);
                     }
+*/
 
                     m_parent->ReleaseNextVideoFrame(picframe, temppts);
                     if (directrendering)

@@ -724,6 +724,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
             return false;
         }
 
+/* XXX: Broken
         if (mpa_pic->qscale_table != NULL && mpa_pic->qstride > 0)
         {
             int tablesize = mpa_pic->qstride * ((video_height + 15) / 16);
@@ -741,6 +742,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
 
             memcpy(frame->qscale_table, mpa_pic->qscale_table, tablesize);
         }
+*/
 
         if (directrendering)
             return true;

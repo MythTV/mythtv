@@ -1078,7 +1078,7 @@ blendimageargbend:
     }
 }
 
-void VideoOutput::CopyFrame(VideoFrame* to, VideoFrame* from)
+void VideoOutput::CopyFrame(VideoFrame *to, VideoFrame *from)
 {
     if (to == NULL || from == NULL)
         return;
@@ -1086,6 +1086,7 @@ void VideoOutput::CopyFrame(VideoFrame* to, VideoFrame* from)
     // guaranteed to be correct sizes.
     memcpy(to->buf, from->buf, from->size);
 
+/* XXX: Broken.
     if (from->qstride > 0 && from->qscale_table != NULL)
     {
         int tablesize = from->qstride * ((from->height + 15) / 16);
@@ -1101,5 +1102,6 @@ void VideoOutput::CopyFrame(VideoFrame* to, VideoFrame* from)
 
         memcpy(to->qscale_table, from->qscale_table, tablesize);
     }
+*/
 }
 
