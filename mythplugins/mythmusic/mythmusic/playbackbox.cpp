@@ -994,7 +994,6 @@ void PlaybackBox::editPlaylist()
     //  at the same level
     //
 
-    wipeTrackInfo();
     constructPlaylistTree();
     if(music_tree_list->tryToSetActive(branches_to_current_node))
     {
@@ -1003,6 +1002,7 @@ void PlaybackBox::editPlaylist()
     else
     {
         stop();
+        wipeTrackInfo();
         branches_to_current_node.clear();
         branches_to_current_node.append(0);                  //  Root node
         branches_to_current_node.append(1);                  //  We're on a playlist (not "My Music")
