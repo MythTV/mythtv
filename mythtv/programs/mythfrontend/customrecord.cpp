@@ -79,7 +79,7 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
     m_csql << "AND NOT (program.subtitle = \"\" AND program.description = \"\") \n";
 
     m_clause->insertItem(QString(tr("Category type") +
-            " (\"movie\", \"series\", \"sports\" or \"tvshow\")"));
+            " (\"movie\", \"series\", \"sports\" " + tr("or") + " \"tvshow\")"));
     m_csql << "AND program.category_type = \"sports\" \n";
 
     m_clause->insertItem(tr("Limit movies by the year of release"));
