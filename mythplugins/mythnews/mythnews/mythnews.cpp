@@ -471,47 +471,32 @@ void MythNews::keyPressEvent(QKeyEvent *e)
 
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("News", e, actions);
    
-    for (unsigned int i = 0; i < actions.size(); i++)
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
-         QString action = actions[i];
+        QString action = actions[i];
+        handled = true;
 
         if (action == "UP")
-        {
             cursorUp();
-            handled = true;
-        }
         else if (action == "DOWN")
-        {
             cursorDown();
-            handled = true;
-        }
         else if (action == "LEFT")
-        {
             cursorLeft();
-            handled = true;
-        }
         else if (action == "RIGHT")
-        {
             cursorRight();
-            handled = true;
-        }
         else if (action == "RETRIEVENEWS")
-        {
             slotRetrieveNews();
-            handled = true;
-        }
         else if (action == "FORCERETRIEVE")
-        {
             forceRetrieveNews();
-            handled = true;
-        }
         else if (action == "CANCEL")
         {
             if (m_RetrievingNews)
                 cancelRetrieve();
         }
+        else
+            handled = false;
     }
 
     if (!handled)
