@@ -250,8 +250,7 @@ int mythplugin_init(const char *libversion)
     mpSettings.save(QSqlDatabase::database());
 
     // Make sure all the required directories exist
-    char *homeDir = getenv("HOME");
-    QString dirName = QString(homeDir) + "/.mythtv";
+    QString dirName = MythContext::GetConfDir();
     QDir dir(dirName);
     if (!dir.exists())
         dir.mkdir(dirName);

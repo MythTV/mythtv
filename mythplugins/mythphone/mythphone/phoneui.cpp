@@ -29,7 +29,6 @@ using namespace std;
 #include "phoneui.h"
 #include "vxml.h"
 
-#define DEFAULTTHEMEPATH  PREFIX "/share/mythtv/themes/default/"
 
 
 
@@ -96,7 +95,7 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
     volume_control = NULL;
     volume_display_timer = new QTimer(this);
     VolumeMode = VOL_VOLUME;
-    volume_icon->SetImage(DEFAULTTHEMEPATH "mp_volume_icon.png");
+    volume_icon->SetImage(gContext->FindThemeDir("default") + "/mp_volume_icon.png");
     volume_icon->LoadImage();
     if (gContext->GetNumSetting("MythControlsVolume", 0))
     {
@@ -1488,7 +1487,7 @@ void PhoneUIBox::doAddEntryPopup(DirEntry *edit, QString nn, QString Url)
 
 #ifdef PHOTO
     // Fill the photos from the directory
-    QDir photos(DEFAULTTHEMEPATH, "mp_photo-*", QDir::Name, QDir::Files);
+    QDir photos(gContext->FindThemeDir("default"), "mp_photo-*", QDir::Name, QDir::Files);
     const QFileInfoList *il = photos.entryInfoList();
     int PhotoIndex = 0;
     if (il)
@@ -1955,34 +1954,35 @@ void PhoneUIBox::changeVolumeControl(bool up_or_down)
         case VOL_TXRATE:     VolumeMode = (up_or_down ? VOL_VOLUME : VOL_TXSIZE);       break;
         }
 
+        QString themepath = gContext->FindThemeDir("default") + "/";
         switch (VolumeMode)
         {
         default:
-        case VOL_VOLUME:     volume_icon->SetImage(DEFAULTTHEMEPATH "mp_volume_icon.png");     
+        case VOL_VOLUME:     volume_icon->SetImage(themepath + "mp_volume_icon.png");     
                              volume_setting->SetText("Volume");
                              volume_value->SetText("");
                              break;
-        case VOL_MICVOLUME:  volume_icon->SetImage(DEFAULTTHEMEPATH "mp_microphone_icon.png"); 
+        case VOL_MICVOLUME:  volume_icon->SetImage(themepath + "mp_microphone_icon.png"); 
                              volume_setting->SetText("Mic Volume (not impl.)");
                              volume_value->SetText("");
                              break;
-        case VOL_BRIGHTNESS: volume_icon->SetImage(DEFAULTTHEMEPATH "mp_brightness_icon.png"); 
+        case VOL_BRIGHTNESS: volume_icon->SetImage(themepath + "mp_brightness_icon.png"); 
                              volume_setting->SetText("Brightness");
                              volume_value->SetText("");
                              break;
-        case VOL_CONTRAST:   volume_icon->SetImage(DEFAULTTHEMEPATH "mp_contrast_icon.png");   
+        case VOL_CONTRAST:   volume_icon->SetImage(themepath + "mp_contrast_icon.png");   
                              volume_setting->SetText("Contrast");
                              volume_value->SetText("");
                              break;
-        case VOL_COLOUR:     volume_icon->SetImage(DEFAULTTHEMEPATH "mp_colour_icon.png");     
+        case VOL_COLOUR:     volume_icon->SetImage(themepath + "mp_colour_icon.png");     
                              volume_setting->SetText("Colour");
                              volume_value->SetText("");
                              break;
-        case VOL_TXSIZE:     volume_icon->SetImage(DEFAULTTHEMEPATH "mp_framesize_icon.png");  
+        case VOL_TXSIZE:     volume_icon->SetImage(themepath + "mp_framesize_icon.png");  
                              volume_setting->SetText("Transmit Video Size");
                              volume_value->SetText(getVideoFrameSizeText());
                              break;
-        case VOL_TXRATE:     volume_icon->SetImage(DEFAULTTHEMEPATH "mp_framerate_icon.png");  
+        case VOL_TXRATE:     volume_icon->SetImage(themepath + "mp_framerate_icon.png");  
                              volume_setting->SetText("Transmit Video FPS");
                              volume_value->SetText(QString::number(txFps));
                              break;
@@ -2072,7 +2072,7 @@ void PhoneUIBox::showVolume(bool on_or_off)
                     volume_status->refresh();
                     volume_icon->SetOrder(-1);
                     volume_icon->refresh();
-                    volume_icon->SetImage(DEFAULTTHEMEPATH "mp_volume_icon.png");
+                    volume_icon->SetImage(gContext->FindThemeDir("default") + "/mp_volume_icon.png");
                     volume_icon->LoadImage();
                     volume_setting->SetOrder(-1);
                     volume_setting->refresh();
@@ -2189,9 +2189,8 @@ void PhoneUIBox::handleTreeListSignals(int , IntVector *attributes)
     // SELECT on a voicemail --- play it
     else if (attributes->at(0) == TA_VMAIL_ENTRY)
     {
-        char *homeDir = getenv("HOME");
         GenericTree *node = DirectoryList->getCurrentNode();
-        QString fileName = QString(homeDir) + "/.mythtv/MythPhone/Voicemail/" + node->getString() + ".wav";
+        QString fileName = MythContext::GetConfDir() + "/MythPhone/Voicemail/" + node->getString() + ".wav";
         wavfile *vmailWav = new wavfile();
         if (vmailWav->load(fileName))
         {

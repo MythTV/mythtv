@@ -272,8 +272,7 @@ void SipThread::SipThreadWorker()
 #endif
 
     // Open a file for writing debug info into
-    char *homeDir = getenv("HOME");
-    QString debugFileName = QString(homeDir) + "/.mythtv/MythPhone/siplog.txt";
+    QString debugFileName = MythContext::GetConfDir() + "/MythPhone/siplog.txt";
     debugFile = new QFile(debugFileName);
     if (debugFile->open(IO_WriteOnly))
         debugStream = new QTextStream (debugFile);

@@ -902,12 +902,11 @@ DirEntry *DirectoryContainer::FindMatchingDirectoryEntry(QString url)
 
 void DirectoryContainer::PutVoicemailInTree(GenericTree *tree_to_write_to)
 {
-    char *homeDir = getenv("HOME");
-    QString dirName = QString(homeDir) + "/.mythtv/MythPhone/Voicemail";
+    QString dirName = MythContext::GetConfDir() + "/MythPhone/Voicemail";
     QDir dir(dirName, "*.wav", QDir::Time, QDir::Files);
     if (!dir.exists())
     {
-        cout << "~/.mythtv/MythPhone/Voicemail does not exist -- its meant to get created earlier so this is wrong\n";
+        cout << MythContext::GetConfDir() << "/MythPhone/Voicemail does not exist -- its meant to get created earlier so this is wrong\n";
         return;
     }
 
@@ -931,12 +930,11 @@ void DirectoryContainer::PutVoicemailInTree(GenericTree *tree_to_write_to)
 void DirectoryContainer::deleteVoicemail(QString vmailName)
 {
     // Get Voicemail Directory
-    char *homeDir = getenv("HOME");
-    QString dirName = QString(homeDir) + "/.mythtv/MythPhone/Voicemail";
+    QString dirName = MythContext::GetConfDir() + "/MythPhone/Voicemail";
     QDir dir(dirName, "*.wav", QDir::Time, QDir::Files);
     if (!dir.exists())
     {
-        cout << "~/.mythtv/MythPhone/Voicemail does not exist -- its meant to get created earlier so this is wrong\n";
+        cout << MythContext::GetConfDir() << "/MythPhone/Voicemail does not exist -- its meant to get created earlier so this is wrong\n";
         return;
     }
 
@@ -953,12 +951,11 @@ void DirectoryContainer::deleteVoicemail(QString vmailName)
 void DirectoryContainer::clearAllVoicemail()
 {
     // Get Voicemail Directory
-    char *homeDir = getenv("HOME");
-    QString dirName = QString(homeDir) + "/.mythtv/MythPhone/Voicemail";
+    QString dirName = MythContext::GetConfDir() + "/MythPhone/Voicemail";
     QDir dir(dirName, "*.wav", QDir::Time, QDir::Files);
     if (!dir.exists())
     {
-        cout << "~/.mythtv/MythPhone/Voicemail does not exist -- its meant to get created earlier so this is wrong\n";
+        cout << MythContext::GetConfDir() << "/MythPhone/Voicemail does not exist -- its meant to get created earlier so this is wrong\n";
         return;
     }
 
