@@ -1,3 +1,5 @@
+#include "unistd.h"
+
 #include "mythdbcon.h"
 
 
