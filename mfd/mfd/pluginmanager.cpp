@@ -633,6 +633,17 @@ void MFDPluginManager::fillValidationHeader(const QString &request, unsigned cha
     hashing_mutex.unlock();
 }
 
+bool MFDPluginManager::haveLibOpenDaap()
+{
+    if(lib_open_daap)
+    {
+        if(generateHashFunction)
+        {
+            return true;
+        }
+    }
+    return false;
+}
 
 
 //
@@ -671,6 +682,11 @@ MFDPluginManager::~MFDPluginManager()
     if(dead_plugin_timer)
     {
         delete dead_plugin_timer;
+    }
+    if(lib_open_daap)
+    {
+        delete lib_open_daap;
+        lib_open_daap = NULL;
     }
 }
 

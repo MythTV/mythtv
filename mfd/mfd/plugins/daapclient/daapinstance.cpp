@@ -544,6 +544,18 @@ bool DaapInstance::checkServerType(const QString &server_description)
                         "iTunes :-)")
                         .arg(service_name), 2);
             service_details_mutex.unlock();
+            
+            //
+            //  If we don't have libopen daap, return false, cause that
+            //  means we can't talk to this server
+            //
+            
+            if(the_mfd->getPluginManager()->haveLibOpenDaap())
+            {
+                return true;
+            }
+            return false;
+            
         }
         else if(server_description.left(6) == "MythTV")
         {
@@ -568,6 +580,19 @@ bool DaapInstance::checkServerType(const QString &server_description)
 
 void DaapInstance::processResponse(DaapResponse *daap_response)
 {
+    //
+    //  Check server type
+    //
+
+
+    if(!checkServerType(daap_response->getHeader("DAAP-Server")))
+    {
+        warning("I can't talk to this server, "
+                "installing libopendaap might help");
+        delete client_socket_to_daap_server;     
+        client_socket_to_daap_server = NULL;    
+        return;
+    }
 
     //
     //  Sanity check ... is the payload xdmap-tagged ?

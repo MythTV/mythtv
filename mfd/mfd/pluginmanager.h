@@ -112,7 +112,8 @@ class MFDPluginManager : public QObject
     //
 
     void fillValidationHeader(const QString &request, unsigned char *resulting_hash );
-
+    bool haveLibOpenDaap();
+    
     //
     //  debugging
     //
