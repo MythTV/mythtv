@@ -248,6 +248,8 @@ void MpegRecorder::openV4L2DeviceAsInput(void)
     struct v4l2_format vfmt;
     memset(&vfmt, 0, sizeof(vfmt));
 
+    vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+
     if (ioctl(chanfd, VIDIOC_G_FMT, &vfmt) < 0)
     {
         cerr << "Error getting format\n";
