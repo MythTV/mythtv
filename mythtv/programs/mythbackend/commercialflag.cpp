@@ -65,7 +65,12 @@ void CommercialFlagger::customEvent(QCustomEvent *e)
             dblock.unlock();
 
             if (!pginfo)
+            {
+                cerr << "Commercial Flagger couldn't get ProgramInfo. " <<
+                        "Shouldn't happen, but did for chanid: '" <<
+                        chanid << "', starttime: '" << tokens[3] << "'\n";
                 return;
+            }
 
             if ((action == "START") &&
                 (!flaggingList.contains(key)) &&
