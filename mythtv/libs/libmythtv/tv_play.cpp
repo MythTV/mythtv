@@ -2158,11 +2158,11 @@ bool TV::UpdatePosOSD(float time, const QString &mesg, int disptime)
         update_osd_pos = true;
     }
 
-    bool res;
+    bool res = false;
 
     if (time > 0.0)
         res = activenvp->FastForward(time);
-    else
+    else if (time < 0.0)
         res = activenvp->Rewind(-time);
 
     if (muted) 
