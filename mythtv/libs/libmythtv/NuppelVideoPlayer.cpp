@@ -1579,7 +1579,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     int pause_rpos = 0;
     unsigned char *pause_buf = new unsigned char[video_size];
 
-    ResetNexttrigger(&nexttrigger);
+    gettimeofday(&nexttrigger, NULL);
 
     while (!eof && !killvideo)
     {
