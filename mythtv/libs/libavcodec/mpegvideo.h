@@ -138,7 +138,6 @@ typedef struct Picture{
      */
     uint8_t *interpolated[3];
     int16_t (*motion_val_base[2])[2];
-    int8_t *ref_index[2];
     uint32_t *mb_type_base;
 #define MB_TYPE_INTRA MB_TYPE_INTRA4x4 //default mb_type if theres just one type
 #define IS_INTRA4x4(a)   ((a)&MB_TYPE_INTRA4x4)
@@ -197,10 +196,15 @@ struct MpegEncContext;
  * Motion estimation context.
  */
 typedef struct MotionEstContext{
+    AVCodecContext *avctx;
     int skip;                          ///< set if ME is skiped for the current MB 
     int co_located_mv[4][2];           ///< mv from last p frame for direct mode ME 
     int direct_basis_mv[4][2];
     uint8_t *scratchpad;               ///< data area for the me algo, so that the ME doesnt need to malloc/free 
+    uint8_t *best_mb;
+    uint8_t *temp_mb[2];
+    uint8_t *temp;
+    int best_bits;
     uint32_t *map;                     ///< map to avoid duplicate evaluations 
     uint32_t *score_map;               ///< map to store the scores 
     int map_generation;  
@@ -208,31 +212,36 @@ typedef struct MotionEstContext{
     int penalty_factor;
     int sub_penalty_factor;
     int mb_penalty_factor;
+    int flags;
+    int sub_flags;
+    int mb_flags;
     int pre_pass;                      ///< = 1 for the pre pass 
     int dia_size;
     int xmin;
     int xmax;
     int ymin;
     int ymax;
+    int pred_x;
+    int pred_y;
+    uint8_t *src[4][4];
+    uint8_t *ref[4][4];
+    int stride;
+    int uvstride;
+    /* temp variables for picture complexity calculation */
+    int mc_mb_var_sum_temp;
+    int mb_var_sum_temp;
+    int scene_change_score;
+/*    cmp, chroma_cmp;*/
+    op_pixels_func (*hpel_put)[4];
+    op_pixels_func (*hpel_avg)[4];
+    qpel_mc_func (*qpel_put)[16];
+    qpel_mc_func (*qpel_avg)[16];
     uint8_t (*mv_penalty)[MAX_MV*2+1];  ///< amount of bits needed to encode a MV 
+    uint8_t *current_mv_penalty;
     int (*sub_motion_search)(struct MpegEncContext * s,
 				  int *mx_ptr, int *my_ptr, int dmin,
-                                  int pred_x, int pred_y, uint8_t *src_data[3],
-                                  uint8_t *ref_data[6], int stride, int uvstride,
-                                  int size, int h, uint8_t * const mv_penalty);
-    int (*motion_search[7])(struct MpegEncContext * s,
-                             int *mx_ptr, int *my_ptr,
-                             int P[10][2], int pred_x, int pred_y, uint8_t *src_data[3],
-                             uint8_t *ref_data[6], int stride, int uvstride, int16_t (*last_mv)[2], 
-                             int ref_mv_scale, uint8_t * const mv_penalty);
-    int (*pre_motion_search)(struct MpegEncContext * s,
-                             int *mx_ptr, int *my_ptr,
-                             int P[10][2], int pred_x, int pred_y, uint8_t *src_data[3], 
-                             uint8_t *ref_data[6], int stride, int uvstride, int16_t (*last_mv)[2], 
-                             int ref_mv_scale, uint8_t * const mv_penalty);
-    int (*get_mb_score)(struct MpegEncContext * s, int mx, int my, int pred_x, int pred_y, uint8_t *src_data[3],
-                                  uint8_t *ref_data[6], int stride, int uvstride,    
-                                  uint8_t * const mv_penalty);
+                                  int src_index, int ref_index,
+                                  int size, int h);
 }MotionEstContext;
 
 /**
@@ -321,13 +330,16 @@ typedef struct MpegEncContext {
     Picture *current_picture_ptr;  ///< pointer to the current picture
     uint8_t *visualization_buffer[3]; //< temporary buffer vor MV visualization
     int last_dc[3];                ///< last DC values for MPEG1 
+    int16_t *dc_val_base;
     int16_t *dc_val[3];            ///< used for mpeg4 DC prediction, all 3 arrays must be continuous 
     int16_t dc_cache[4*5];
     int y_dc_scale, c_dc_scale;
     uint8_t *y_dc_scale_table;     ///< qscale -> y_dc_scale table 
     uint8_t *c_dc_scale_table;     ///< qscale -> c_dc_scale table 
     const uint8_t *chroma_qscale_table;  ///< qscale -> chroma_qscale (h263)
+    uint8_t *coded_block_base;
     uint8_t *coded_block;          ///< used for coded block pattern prediction (msmpeg4v3, wmv1)
+    int16_t (*ac_val_base)[16];
     int16_t (*ac_val[3])[16];      ///< used for for mpeg4 AC prediction, all 3 arrays must be continuous 
     int ac_pred;
     uint8_t *prev_pict_types;     ///< previous picture types in bitstream order, used for mb skip 
@@ -352,8 +364,9 @@ typedef struct MpegEncContext {
     int adaptive_quant;         ///< use adaptive quantization 
     int dquant;                 ///< qscale difference to prev qscale  
     int pict_type;              ///< I_TYPE, P_TYPE, B_TYPE, ... 
-    int last_pict_type;
+    int last_pict_type; //FIXME removes
     int last_non_b_pict_type;   ///< used for mpeg4 gmc b-frames & ratecontrol 
+    int dropable;
     int frame_rate_index;
     int frame_rate_ext_n;       ///< MPEG-2 specific framerate modificators (numerator)
     int frame_rate_ext_d;       ///< MPEG-2 specific framerate modificators (denominator)
@@ -385,7 +398,6 @@ typedef struct MpegEncContext {
     uint8_t (*p_field_select_table[2]);
     uint8_t (*b_field_select_table[2][2]);
     int me_method;                       ///< ME algorithm 
-    int scene_change_score;
     int mv_dir;
 #define MV_DIR_BACKWARD  1
 #define MV_DIR_FORWARD   2
@@ -500,10 +512,6 @@ typedef struct MpegEncContext {
     int misc_bits; ///< cbp, mb_type
     int last_bits; ///< temp var used for calculating the above vars
     
-    /* temp variables for picture complexity calculation */
-    int mc_mb_var_sum_temp;
-    int mb_var_sum_temp;
-
     /* error concealment / resync */
     int error_count;
     uint8_t *error_status_table;       ///< table of the error status of each MB  
@@ -741,7 +749,8 @@ void ff_draw_horiz_band(MpegEncContext *s, int y, int h);
 void ff_emulated_edge_mc(uint8_t *buf, uint8_t *src, int linesize, int block_w, int block_h, 
                                     int src_x, int src_y, int w, int h);
 #define END_NOT_FOUND -100
-int ff_combine_frame( MpegEncContext *s, int next, uint8_t **buf, int *buf_size);
+int ff_combine_frame(ParseContext *pc, int next, uint8_t **buf, int *buf_size);
+void ff_parse_close(AVCodecParserContext *s);
 void ff_mpeg_flush(AVCodecContext *avctx);
 void ff_mpegcontext_flush(MpegEncContext *s);
 void ff_print_debug_info(MpegEncContext *s, AVFrame *pict);
@@ -805,6 +814,7 @@ void mpeg1_encode_mb(MpegEncContext *s,
 void ff_mpeg1_encode_init(MpegEncContext *s);
 void ff_mpeg1_encode_slice_header(MpegEncContext *s);
 void ff_mpeg1_clean_buffers(MpegEncContext *s);
+int ff_mpeg1_find_frame_end(ParseContext *pc, const uint8_t *buf, int buf_size);
 
 
 /** RLTable. */
@@ -844,6 +854,7 @@ extern const uint8_t ff_h263_chroma_qscale_table[32];
 extern const uint8_t ff_h263_loop_filter_strength[32];
 
 
+/* h263.c, h263dec.c */
 int ff_h263_decode_init(AVCodecContext *avctx);
 int ff_h263_decode_frame(AVCodecContext *avctx, 
                              void *data, int *data_size,
@@ -858,7 +869,7 @@ void mpeg4_encode_mb(MpegEncContext *s,
 void h263_encode_picture_header(MpegEncContext *s, int picture_number);
 void ff_flv_encode_picture_header(MpegEncContext *s, int picture_number);
 void h263_encode_gob_header(MpegEncContext * s, int mb_line);
-int16_t *h263_pred_motion(MpegEncContext * s, int block, 
+int16_t *h263_pred_motion(MpegEncContext * s, int block, int dir,
                         int *px, int *py);
 void mpeg4_pred_ac(MpegEncContext * s, DCTELEM *block, int n, 
                    int dir);
@@ -895,6 +906,7 @@ int ff_h263_resync(MpegEncContext *s);
 int ff_h263_get_gob_height(MpegEncContext *s);
 int ff_mpeg4_set_direct_mv(MpegEncContext *s, int mx, int my);
 inline int ff_h263_round_chroma(int x);
+void ff_h263_encode_motion(MpegEncContext * s, int val, int f_code);
 
 
 /* rv10.c */

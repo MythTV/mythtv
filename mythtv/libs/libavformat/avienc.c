@@ -127,6 +127,7 @@ const CodecTag codec_bmp_tags[] = {
     { CODEC_ID_DVVIDEO, MKTAG('d', 'v', '2', '5') },
     { CODEC_ID_MPEG1VIDEO, MKTAG('m', 'p', 'g', '1') }, 
     { CODEC_ID_MPEG1VIDEO, MKTAG('m', 'p', 'g', '2') }, 
+    { CODEC_ID_MPEG2VIDEO, MKTAG('m', 'p', 'g', '2') }, 
     { CODEC_ID_MPEG1VIDEO, MKTAG('P', 'I', 'M', '1') }, 
     { CODEC_ID_MPEG1VIDEO, MKTAG('V', 'C', 'R', '2') }, 
     { CODEC_ID_MJPEG, MKTAG('M', 'J', 'P', 'G') },
@@ -157,6 +158,9 @@ const CodecTag codec_bmp_tags[] = {
     { CODEC_ID_TRUEMOTION1, MKTAG('D', 'U', 'C', 'K') },
     { CODEC_ID_MSZH, MKTAG('M', 'S', 'Z', 'H') },
     { CODEC_ID_ZLIB, MKTAG('Z', 'L', 'I', 'B') },
+    { CODEC_ID_4XM, MKTAG('4', 'X', 'M', 'V') },
+    { CODEC_ID_FLV1, MKTAG('F', 'L', 'V', '1') },
+    { CODEC_ID_SVQ1, MKTAG('s', 'v', 'q', '1') },
     { 0, 0 },
 };
 

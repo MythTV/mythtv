@@ -332,6 +332,27 @@ static void put_pixels_clamped_c(const DCTELEM *block, uint8_t *restrict pixels,
     }
 }
 
+static void put_signed_pixels_clamped_c(const DCTELEM *block, 
+                                        uint8_t *restrict pixels,
+                                        int line_size)
+{
+    int i, j;
+
+    for (i = 0; i < 8; i++) {
+        for (j = 0; j < 8; j++) {
+            if (*block < -128)
+                *pixels = 0;
+            else if (*block > 127)
+                *pixels = 255;
+            else
+                *pixels = (uint8_t)(*block + 128);
+            block++;
+            pixels++;
+        }
+        pixels += (line_size - 8);
+    }
+}
+
 static void add_pixels_clamped_c(const DCTELEM *block, uint8_t *restrict pixels,
                           int line_size)
 {
@@ -3126,12 +3147,12 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
 
     /* VP3 DSP support */
     c->vp3_dsp_init = vp3_dsp_init_c;
-    c->vp3_idct_put = vp3_idct_put_c;
-    c->vp3_idct_add = vp3_idct_add_c;
+    c->vp3_idct = vp3_idct_c;
 
     c->get_pixels = get_pixels_c;
     c->diff_pixels = diff_pixels_c;
     c->put_pixels_clamped = put_pixels_clamped_c;
+    c->put_signed_pixels_clamped = put_signed_pixels_clamped_c;
     c->add_pixels_clamped = add_pixels_clamped_c;
     c->gmc1 = gmc1_c;
     c->gmc = gmc_c;
@@ -3285,6 +3306,9 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
 #endif
 #ifdef HAVE_MLIB
     dsputil_init_mlib(c, avctx);
+#endif
+#ifdef ARCH_SPARC
+   dsputil_init_vis(c,avctx);
 #endif
 #ifdef ARCH_ALPHA
     dsputil_init_alpha(c, avctx);

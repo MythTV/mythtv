@@ -17,7 +17,7 @@ extern "C" {
 
 #define FFMPEG_VERSION_INT     0x000408
 #define FFMPEG_VERSION         "0.4.8"
-#define LIBAVCODEC_BUILD       4707
+#define LIBAVCODEC_BUILD       4714
 
 #define LIBAVCODEC_VERSION_INT FFMPEG_VERSION_INT
 #define LIBAVCODEC_VERSION     FFMPEG_VERSION
@@ -443,7 +443,7 @@ typedef struct AVPanScan{
 \
     /**\
      * Motion vector table\
-     * - encoding: unused\
+     * - encoding: set by user\
      * - decoding: set by lavc\
      */\
     int16_t (*motion_val[2])[2];\
@@ -451,7 +451,7 @@ typedef struct AVPanScan{
     /**\
      * Macroblock type table\
      * mb_type_base + mb_width + 2\
-     * - encoding: unused\
+     * - encoding: set by user\
      * - decoding: set by lavc\
      */\
     uint32_t *mb_type;\
@@ -539,13 +539,20 @@ typedef struct AVPanScan{
      * - decoding: set by lavc\
      */\
     short *dct_coeff;\
+\
+    /**\
+     * Motion referece frame index\
+     * - encoding: set by user\
+     * - decoding: set by lavc\
+     */\
+    int8_t *ref_index[2];
 
 #define FF_QSCALE_TYPE_MPEG1	0
 #define FF_QSCALE_TYPE_MPEG2	1
 
 #define FF_BUFFER_TYPE_INTERNAL 1
 #define FF_BUFFER_TYPE_USER     2 ///< Direct rendering buffers (image is (de)allocated by user)
-#define FF_BUFFER_TYPE_SHARED   4 ///< buffer from somewher else, dont dealloc image (data/base)
+#define FF_BUFFER_TYPE_SHARED   4 ///< buffer from somewher else, dont dealloc image (data/base), all other tables are not shared
 #define FF_BUFFER_TYPE_COPY     8 ///< just a (modified) copy of some other buffer, dont dealloc anything
 
 
@@ -786,7 +793,7 @@ typedef struct AVCodecContext {
     /* every time the encoder as a packet to send */
     /* Depends on the encoder if the data starts  */
     /* with a Start Code (it should) H.263 does   */
-    void (*rtp_callback)(void *data, int size, int packet_number); 
+    void (*rtp_callback)(struct AVCodecContext *avctx, void *data, int size, int packet_number); 
 
     /* statistics, used for 2-pass encoding */
     int mv_bits;
@@ -835,12 +842,15 @@ typedef struct AVCodecContext {
 #define FF_BUG_XVID_ILACE       4
 #define FF_BUG_UMP4             8
 #define FF_BUG_NO_PADDING       16
+#define FF_BUG_AMV              32
 #define FF_BUG_AC_VLC           0  ///< will be removed, libavcodec can now handle these non compliant files by default
 #define FF_BUG_QPEL_CHROMA      64
 #define FF_BUG_STD_QPEL         128
 #define FF_BUG_QPEL_CHROMA2     256
 #define FF_BUG_DIRECT_BLOCKSIZE 512
 #define FF_BUG_EDGE             1024
+#define FF_BUG_HPEL_CHROMA      2048
+#define FF_BUG_DC_CLIP          4096
 //#define FF_BUG_FAKE_SCALABILITY 16 //autodetection should work 100%
         
     /**
@@ -888,7 +898,8 @@ typedef struct AVCodecContext {
     /**
      * called at the beginning of each frame to get a buffer for it.
      * if pic.reference is set then the frame will be read later by lavc
-     * width and height should be rounded up to the next multiple of 16
+     * avcodec_align_dimensions() should be used to find the required width and
+     * height, as they normally need to be rounded up to the next multiple of 16
      * - encoding: unused
      * - decoding: set by lavc, user can override
      */
@@ -1563,6 +1574,29 @@ typedef struct AVCodecContext {
     void *thread_opaque;
 
     /**
+     * Motion estimation threshold. under which no motion estimation is 
+     * performed, but instead the user specified motion vectors are used
+     * 
+     * - encoding: set by user
+     * - decoding: unused
+     */
+     int me_threshold;
+
+    /**
+     * Macroblock threshold. under which the user specified macroblock types will be used
+     * - encoding: set by user
+     * - decoding: unused
+     */
+     int mb_threshold;
+
+    /**
+     * 
+     * - encoding: set by user
+     * - decoding: unused
+     */
+     int intra_dc_precision;
+
+    /**
      * VIA CLE266 Hardware MPEG decoding
      * - encoding: forbidden
      * - decoding: set by decoder
@@ -1634,6 +1668,7 @@ typedef struct AVCodec {
     struct AVCodec *next;
     void (*flush)(AVCodecContext *);
     const AVRational *supported_framerates; ///array of supported framerates, or NULL if any, array is terminated by {0,0}
+    const enum PixelFormat *pix_fmts;       ///array of supported pixel formats, or NULL if unknown, array is terminanted by -1
 } AVCodec;
 
 /**
@@ -1695,6 +1730,7 @@ extern AVCodec vcr1_encoder;
 extern AVCodec ffv1_encoder;
 extern AVCodec mdec_encoder;
 extern AVCodec zlib_encoder;
+extern AVCodec svq1_encoder;
 
 extern AVCodec h263_decoder;
 extern AVCodec mpeg4_decoder;
@@ -1830,7 +1866,10 @@ ImgReSampleContext *img_resample_init(int output_width, int output_height,
 ImgReSampleContext *img_resample_full_init(int owidth, int oheight,
                                       int iwidth, int iheight,
                                       int topBand, int bottomBand,
-                                      int leftBand, int rightBand);
+                                      int leftBand, int rightBand,
+                                      int padtop, int padbottom,
+                                      int padleft, int padright);
+
 
 void img_resample(ImgReSampleContext *s, 
                   AVPicture *output, const AVPicture *input);
@@ -1910,7 +1949,6 @@ AVFrame *avcodec_alloc_frame(void);
 
 int avcodec_default_get_buffer(AVCodecContext *s, AVFrame *pic);
 void avcodec_default_release_buffer(AVCodecContext *s, AVFrame *pic);
-void avcodec_default_free_buffers(AVCodecContext *s);
 
 int avcodec_thread_init(AVCodecContext *s, int thread_count);
 void avcodec_thread_free(AVCodecContext *s);
@@ -1962,7 +2000,7 @@ int av_reduce(int *dst_nom, int *dst_den, int64_t nom, int64_t den, int64_t max)
  * rescale a 64bit integer.
  * a simple a*b/c isnt possible as it can overflow
  */
-int64_t av_rescale(int64_t a, int b, int c);
+int64_t av_rescale(int64_t a, int64_t b, int64_t c);
 
 
 /**
@@ -2119,6 +2157,7 @@ void img_copy(AVPicture *dst, const AVPicture *src,
 
 #include <stdarg.h>
 
+#define AV_LOG_QUIET -1
 #define AV_LOG_ERROR 0
 #define AV_LOG_INFO 1
 #define AV_LOG_DEBUG 2
@@ -2130,6 +2169,7 @@ extern void av_log_set_level(int);
 extern void av_log_set_callback(void (*)(void*, int, const char*, va_list));
 
 /* endian macros */
+#if !defined(BE_16) || !defined(BE_32) || !defined(LE_16) || !defined(LE_32)
 #define BE_16(x)  ((((uint8_t*)(x))[0] << 8) | ((uint8_t*)(x))[1])
 #define BE_32(x)  ((((uint8_t*)(x))[0] << 24) | \
                    (((uint8_t*)(x))[1] << 16) | \
@@ -2140,6 +2180,7 @@ extern void av_log_set_callback(void (*)(void*, int, const char*, va_list));
                    (((uint8_t*)(x))[2] << 16) | \
                    (((uint8_t*)(x))[1] << 8) | \
                     ((uint8_t*)(x))[0])
+#endif
 
 #ifdef __cplusplus
 }

@@ -1475,7 +1475,7 @@ int mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
         if (len < TS_PACKET_SIZE)
             return -1;
         if (buf[0] != 0x47) {
-            buf--;
+            buf++;
             len--;
         } else {
             handle_packet(ts, buf, position);

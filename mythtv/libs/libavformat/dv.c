@@ -582,9 +582,11 @@ static int dv_extract_video_info(DVDemuxContext *c, uint8_t* frame)
         avctx->height = sys->height;
         avctx->pix_fmt = sys->pix_fmt;
         
+	/* finding out SAR is a little bit messy */
 	vsc_pack = dv_extract_pack(frame, dv_video_control);
         apt = frame[4] & 0x07;
-	is16_9 = (vsc_pack && (vsc_pack[2] & 0x07) == (apt?0x02:0x07));
+	is16_9 = (vsc_pack && ((vsc_pack[2] & 0x07) == 0x02 ||
+	                       (!apt && (vsc_pack[2] & 0x07) == 0x07)));
 	avctx->sample_aspect_ratio = sys->sar[is16_9];
 	
 	size = sys->frame_size;
@@ -685,7 +687,7 @@ DVMuxContext* dv_init_mux(AVFormatContext* s)
     /* Ok, everything seems to be in working order */
     c->frames = 0;
     c->has_audio = c->has_video = 0;
-    c->start_time = time(NULL);
+    c->start_time = (time_t)s->timestamp;
     c->aspect = 0; /* 4:3 is the default */
     if ((int)(av_q2d(vst->codec.sample_aspect_ratio) * vst->codec.width / vst->codec.height * 10) == 17) /* 16:9 */ 
         c->aspect = 0x07;

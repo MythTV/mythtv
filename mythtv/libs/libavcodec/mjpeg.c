@@ -1340,7 +1340,7 @@ static int mjpeg_decode_scan(MJpegDecodeContext *s){
                         (h * mb_x + x) * 8;
                     if (s->interlaced && s->bottom_field)
                         ptr += s->linesize[c] >> 1;
-//printf("%d %d %d %d %d %d %d %d \n", mb_x, mb_y, x, y, c, s->bottom_field, (v * mb_y + y) * 8, (h * mb_x + x) * 8);
+//av_log(NULL, AV_LOG_DEBUG, "%d %d %d %d %d %d %d %d \n", mb_x, mb_y, x, y, c, s->bottom_field, (v * mb_y + y) * 8, (h * mb_x + x) * 8);
                     s->idct_put(ptr, s->linesize[c], s->block);
                     if (++x == h) {
                         x = 0;
@@ -1530,15 +1530,21 @@ static int mjpeg_decode_app(MJpegDecodeContext *s)
     
     if (id == ff_get_fourcc("JFIF"))
     {
-	int t_w, t_h;
+	int t_w, t_h, v1, v2;
 	skip_bits(&s->gb, 8); /* the trailing zero-byte */
-        if (s->avctx->debug & FF_DEBUG_PICT_INFO)
-            av_log(s->avctx, AV_LOG_INFO, "mjpeg: JFIF header found (version: %x.%x)\n",
-	    get_bits(&s->gb, 8), get_bits(&s->gb, 8));
+	v1= get_bits(&s->gb, 8);
+        v2= get_bits(&s->gb, 8);
         skip_bits(&s->gb, 8);
 
         s->avctx->sample_aspect_ratio.num= get_bits(&s->gb, 16);
         s->avctx->sample_aspect_ratio.den= get_bits(&s->gb, 16);
+
+        if (s->avctx->debug & FF_DEBUG_PICT_INFO)
+            av_log(s->avctx, AV_LOG_INFO, "mjpeg: JFIF header found (version: %x.%x) SAR=%d/%d\n",
+                v1, v2,
+                s->avctx->sample_aspect_ratio.num,
+                s->avctx->sample_aspect_ratio.den
+            );
 
 	t_w = get_bits(&s->gb, 8);
 	t_h = get_bits(&s->gb, 8);
@@ -1636,7 +1642,8 @@ static int mjpeg_decode_com(MJpegDecodeContext *s)
 	    else
 		cbuf[i] = 0;
 
-	    av_log(s->avctx, AV_LOG_INFO, "mjpeg comment: '%s'\n", cbuf);
+            if(s->avctx->debug & FF_DEBUG_PICT_INFO)
+                av_log(s->avctx, AV_LOG_INFO, "mjpeg comment: '%s'\n", cbuf);
 
 	    /* buggy avid, it puts EOI only at every 10th frame */
 	    if (!strcmp(cbuf, "AVID"))
@@ -2164,7 +2171,6 @@ static int mjpeg_decode_end(AVCodecContext *avctx)
 
     av_free(s->buffer);
     av_free(s->qscale_table);
-    avcodec_default_free_buffers(avctx);
     
     for(i=0;i<2;i++) {
         for(j=0;j<4;j++)

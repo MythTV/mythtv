@@ -22,6 +22,7 @@
 
 #include "../dsputil.h"
 #include "../simple_idct.h"
+#include "mmx.h"
 
 //#undef NDEBUG
 //#include <assert.h>
@@ -291,6 +292,24 @@ void put_pixels_clamped_mmx(const DCTELEM *block, uint8_t *pixels, int line_size
 	    "movq	%%mm6, (%0, %2)\n\t"
 	    ::"r" (pix), "r" (line_size), "r" (line_size*3), "r"(p)
 	    :"memory");
+}
+
+static unsigned char __align8 vector128[8] =
+  { 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80 };
+
+void put_signed_pixels_clamped_mmx(const DCTELEM *block, uint8_t *pixels, int line_size)
+{
+    int i;
+
+    movq_m2r(*vector128, mm1);
+    for (i = 0; i < 8; i++) {
+        movq_m2r(*(block), mm0);
+        packsswb_m2r(*(block + 4), mm0);
+        block += 8;
+        paddb_r2r(mm1, mm0);
+        movq_r2m(mm0, *pixels);
+        pixels += line_size;
+    }
 }
 
 void add_pixels_clamped_mmx(const DCTELEM *block, uint8_t *pixels, int line_size)
@@ -2113,10 +2132,10 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
 #endif
 
     if (mm_flags & MM_MMX) {
-        const int dct_algo = avctx->dct_algo;
         const int idct_algo= avctx->idct_algo;
 
 #ifdef CONFIG_ENCODERS
+        const int dct_algo = avctx->dct_algo;
         if(dct_algo==FF_DCT_AUTO || dct_algo==FF_DCT_MMX){
             if(mm_flags & MM_SSE2){
                 c->fdct = ff_fdct_sse2;
@@ -2147,15 +2166,20 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
         }
 
         /* VP3 optimized DSP functions */
-        c->vp3_dsp_init = vp3_dsp_init_mmx;
-        c->vp3_idct_put = vp3_idct_put_mmx;
-        c->vp3_idct_add = vp3_idct_add_mmx;
-        
+        if (mm_flags & MM_SSE2) {
+            c->vp3_dsp_init = vp3_dsp_init_sse2;
+            c->vp3_idct = vp3_idct_sse2;
+        } else {
+            c->vp3_dsp_init = vp3_dsp_init_mmx;
+            c->vp3_idct = vp3_idct_mmx;
+        }
+
 #ifdef CONFIG_ENCODERS
         c->get_pixels = get_pixels_mmx;
         c->diff_pixels = diff_pixels_mmx;
 #endif //CONFIG_ENCODERS
         c->put_pixels_clamped = put_pixels_clamped_mmx;
+        c->put_signed_pixels_clamped = put_signed_pixels_clamped_mmx;
         c->add_pixels_clamped = add_pixels_clamped_mmx;
         c->clear_blocks = clear_blocks_mmx;
 #ifdef CONFIG_ENCODERS

@@ -268,9 +268,11 @@ typedef struct Vp3DecodeContext {
     VLC ac_vlc_3[16];
     VLC ac_vlc_4[16];
 
-    int16_t intra_y_dequant[64];
-    int16_t intra_c_dequant[64];
-    int16_t inter_dequant[64];
+    /* these arrays need to be on 16-byte boundaries since SSE2 operations
+     * index into them */
+    int16_t __align16 intra_y_dequant[64];
+    int16_t __align16 intra_c_dequant[64];
+    int16_t __align16 inter_dequant[64];
 
     /* This table contains superblock_count * 16 entries. Each set of 16
      * numbers corresponds to the fragment indices 0..15 of the superblock.
@@ -2049,6 +2051,7 @@ static void render_fragments(Vp3DecodeContext *s,
     int m, n;
     int i = first_fragment;
     int16_t *dequantizer;
+    DCTELEM __align16 output_samples[64];
     unsigned char *output_plane;
     unsigned char *last_plane;
     unsigned char *golden_plane;
@@ -2174,16 +2177,16 @@ av_log(s->avctx, AV_LOG_ERROR, " help! got beefy vector! (%X, %X)\n", motion_x, 
                     s->all_fragments[i].coeffs[0], dequantizer[0]);
 
                 /* invert DCT and place (or add) in final output */
+                s->dsp.vp3_idct(s->all_fragments[i].coeffs,
+                    dequantizer,
+                    s->all_fragments[i].coeff_count,
+                    output_samples);
                 if (s->all_fragments[i].coding_method == MODE_INTRA) {
-                    s->dsp.vp3_idct_put(s->all_fragments[i].coeffs, 
-                        dequantizer,
-                        s->all_fragments[i].coeff_count,
+                    s->dsp.put_signed_pixels_clamped(output_samples,
                         output_plane + s->all_fragments[i].first_pixel,
                         stride);
                 } else {
-                    s->dsp.vp3_idct_add(s->all_fragments[i].coeffs, 
-                        dequantizer,
-                        s->all_fragments[i].coeff_count,
+                    s->dsp.add_pixels_clamped(output_samples,
                         output_plane + s->all_fragments[i].first_pixel,
                         stride);
                 }

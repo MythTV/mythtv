@@ -78,16 +78,20 @@ extern const struct AVOption avoptions_workaround_bug[11];
 #    define restrict
 #endif
 
+#ifndef always_inline
 #if defined(__GNUC__) && (__GNUC__ > 3 || __GNUC__ == 3 && __GNUC_MINOR__ > 0)
 #    define always_inline __attribute__((always_inline)) inline
 #else
 #    define always_inline inline
 #endif
+#endif
 
+#ifndef attribute_used
 #if defined(__GNUC__) && (__GNUC__ > 3 || __GNUC__ == 3 && __GNUC_MINOR__ > 0)
 #    define attribute_used __attribute__((used))
 #else
 #    define attribute_used
+#endif
 #endif
 
 #ifndef EMULATE_INTTYPES
@@ -113,6 +117,10 @@ extern const struct AVOption avoptions_workaround_bug[11];
 #define INT64_MAX int64_t_C(9223372036854775807)
 #endif
 
+#ifndef UINT64_MAX
+#define UINT64_MAX uint64_t_C(0xFFFFFFFFFFFFFFFF)
+#endif
+
 #ifdef EMULATE_FAST_INT
 /* note that we don't emulate 64bit ints */
 typedef signed char int_fast8_t;
@@ -133,7 +141,7 @@ static inline float floorf(float f) {
 
 /* windows */
 
-#    ifndef __MINGW32__
+#    if !defined(__MINGW32__) && !defined(__CYGWIN__)
 #        define int64_t_C(c)     (c ## i64)
 #        define uint64_t_C(c)    (c ## i64)
 
@@ -212,14 +220,14 @@ static inline float floorf(float f) {
 #    include <assert.h>
 
 /* dprintf macros */
-#    if defined(CONFIG_WIN32) && !defined(__MINGW32__)
+#    if defined(CONFIG_WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__)
 
 inline void dprintf(const char* fmt,...) {}
 
 #    else
 
 #        ifdef DEBUG
-#            define dprintf(fmt,...) printf(fmt, __VA_ARGS__)
+#            define dprintf(fmt,...) av_log(NULL, AV_LOG_DEBUG, fmt, __VA_ARGS__)
 #        else
 #            define dprintf(fmt,...)
 #        endif
@@ -229,7 +237,7 @@ inline void dprintf(const char* fmt,...) {}
 #    define av_abort()      do { av_log(NULL, AV_LOG_ERROR, "Abort at %s:%d\n", __FILE__, __LINE__); abort(); } while (0)
 
 //rounded divison & shift
-#define RSHIFT(a,b) ((a) > 0 ? ((a) + (1<<((b)-1)))>>(b) : ((a) + (1<<((b)-1))-1)>>(b))
+#define RSHIFT(a,b) ((a) > 0 ? ((a) + ((1<<(b))>>1))>>(b) : ((a) + ((1<<(b))>>1)-1)>>(b))
 /* assume b>0 */
 #define ROUNDED_DIV(a,b) (((a)>0 ? (a) + ((b)>>1) : (a) - ((b)>>1))/(b))
 #define ABS(a) ((a) >= 0 ? (a) : (-(a)))
@@ -374,7 +382,7 @@ typedef struct RL_VLC_ELEM {
     uint8_t run;
 } RL_VLC_ELEM;
 
-#ifdef ARCH_SPARC64
+#ifdef ARCH_SPARC
 #define UNALIGNED_STORES_ARE_BAD
 #endif
 
@@ -425,7 +433,7 @@ static inline void put_bits(PutBitContext *s, int n, unsigned int value)
 	bit_buf<<=bit_left;
         bit_buf |= value >> (n - bit_left);
 #ifdef UNALIGNED_STORES_ARE_BAD
-        if (3 & (int) s->buf_ptr) {
+        if (3 & (intptr_t) s->buf_ptr) {
             s->buf_ptr[0] = bit_buf >> 24;
             s->buf_ptr[1] = bit_buf >> 16;
             s->buf_ptr[2] = bit_buf >>  8;
@@ -1063,7 +1071,7 @@ static inline int get_xbits_trace(GetBitContext *s, int n, char *file, char *fun
 #define get_vlc(s, vlc)            get_vlc_trace(s, (vlc)->table, (vlc)->bits, 3, __FILE__, __PRETTY_FUNCTION__, __LINE__)
 #define get_vlc2(s, tab, bits, max) get_vlc_trace(s, tab, bits, max, __FILE__, __PRETTY_FUNCTION__, __LINE__)
 
-#define tprintf printf
+#define tprintf(...) av_log(NULL, AV_LOG_DEBUG, __VA_ARGS__)
 
 #else //TRACE
 #define tprintf(...) {}
@@ -1278,6 +1286,9 @@ tend= rdtsc();\
 #define malloc please_use_av_malloc
 #define free please_use_av_free
 #define realloc please_use_av_realloc
+#define time time_is_forbidden_due_to_security_issues
+#define rand rand_is_forbidden_due_to_state_trashing
+#define srand srand_is_forbidden_due_to_state_trashing
 #if !(defined(LIBAVFORMAT_BUILD) || defined(_FRAMEHOOK_H))
 #define printf please_use_av_log
 #define fprintf please_use_av_log

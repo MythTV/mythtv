@@ -903,11 +903,11 @@ static int mov_read_stsd(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
                     /* if flag bit 3 is set, use the default palette */
                     color_count = 1 << color_depth;
                     if (color_depth == 2)
-                        color_table = qt_default_palette_4;
+                        color_table = ff_qt_default_palette_4;
                     else if (color_depth == 4)
-                        color_table = qt_default_palette_16;
+                        color_table = ff_qt_default_palette_16;
                     else
-                        color_table = qt_default_palette_256;
+                        color_table = ff_qt_default_palette_256;
 
                     for (j = 0; j < color_count; j++) {
                         r = color_table[j * 4 + 0];
@@ -994,6 +994,34 @@ static int mov_read_stsd(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
                 c->mp4=1;
                 size-=(16);
                 url_fskip(pb, size); /* The mp4s atom also contians a esds atom that we can skip*/
+            }
+            else if( st->codec.codec_tag == MKTAG( 'm', 'p', '4', 'a' ))
+            {
+                /* Handle mp4 audio tag */
+                get_be32(pb); /* version */
+                get_be32(pb);
+                st->codec.channels = get_be16(pb); /* channels */
+                st->codec.bits_per_sample = get_be16(pb); /* bits per sample */
+                get_be32(pb);
+                st->codec.sample_rate = get_be16(pb); /* sample rate, not always correct */
+                get_be16(pb);
+                c->mp4=1;
+		{
+                MOV_atom_t a = { format, url_ftell(pb), size - (20 + 20 + 8) };
+                mov_read_default(c, pb, a);
+		}
+                /* Get correct sample rate from extradata */
+                if(st->codec.extradata_size) {
+                   const int samplerate_table[] = {
+                     96000, 88200, 64000, 48000, 44100, 32000, 
+                     24000, 22050, 16000, 12000, 11025, 8000,
+                     7350, 0, 0, 0
+                   };
+                   unsigned char *px = st->codec.extradata;
+                   // 5 bits objectTypeIndex, 4 bits sampleRateIndex, 4 bits channels
+                   int samplerate_index = ((px[0] & 7) << 1) + ((px[1] >> 7) & 1);
+                   st->codec.sample_rate = samplerate_table[samplerate_index];
+                }
             }
 	    else if(size>=(16+20))
 	    {//16 bytes read, reading atleast 20 more
@@ -1542,7 +1570,7 @@ static int mov_read_header(AVFormatContext *s, AVFormatParameters *ap)
 	atom.size = 0x7FFFFFFFFFFFFFFFLL;
 
     if (atom.size == 0)
-         atom.size = 0x7FFFFFFFFFFFFFFFLL;
+        atom.size = 0x7FFFFFFFFFFFFFFFLL;
 
 #ifdef DEBUG
     printf("filesz=%Ld\n", atom.size);
@@ -1679,7 +1707,13 @@ again:
         for(i=0; i<(sc->sample_to_chunk_sz); i++) {
             if( (sc->sample_to_chunk[i].first)<=(sc->next_chunk) && (sc->sample_size>0) )
             {
-                foundsize=sc->sample_to_chunk[i].count*sc->sample_size;
+		// I can't figure out why for PCM audio sample_size is always 1
+		// (it should actually be channels*bits_per_second/8) but it is.
+		AVCodecContext* cod = &s->streams[sc->ffindex]->codec;
+                if (sc->sample_size == 1 && (cod->codec_id == CODEC_ID_PCM_S16BE || cod->codec_id == CODEC_ID_PCM_S16LE))
+		    foundsize=(sc->sample_to_chunk[i].count*cod->channels*cod->bits_per_sample)/8;
+		else
+		    foundsize=sc->sample_to_chunk[i].count*sc->sample_size;
             }
 #ifdef DEBUG
             /*printf("sample_to_chunk first=%ld count=%ld, id=%ld\n", sc->sample_to_chunk[i].first, sc->sample_to_chunk[i].count, sc->sample_to_chunk[i].id);*/

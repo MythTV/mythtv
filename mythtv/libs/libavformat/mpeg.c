@@ -144,11 +144,14 @@ static int put_system_header(AVFormatContext *ctx, uint8_t *buf,int only_for_str
     } else
         put_bits(&pb, 6, s->audio_bound);
 
-    if (s->is_vcd)
-        put_bits(&pb, 1, 0); /* see VCD standard, p. IV-7*/
-    else
-        put_bits(&pb, 1, 1); /* variable bitrate*/
-    put_bits(&pb, 1, 1); /* non constrainted bit stream */
+    if (s->is_vcd) {
+        /* see VCD standard, p. IV-7*/
+        put_bits(&pb, 1, 0); 
+        put_bits(&pb, 1, 1);
+    } else {
+        put_bits(&pb, 1, 0); /* variable bitrate*/
+        put_bits(&pb, 1, 0); /* non constrainted bit stream */
+    }
     
     if (s->is_vcd) {
         /* see VCD standard p IV-7 */
@@ -286,6 +289,9 @@ static int mpeg_mux_init(AVFormatContext *ctx)
             } else {
                 stream->id = mpa_id++;
             }
+
+            /* This value HAS to be used for VCD (see VCD standard, p. IV-7).
+               Right now it is also used for everything else.*/
             stream->max_buffer_size = 4 * 1024; 
             s->audio_bound++;
             break;
@@ -294,7 +300,13 @@ static int mpeg_mux_init(AVFormatContext *ctx)
             if (s->scr_stream_index == -1)
                 s->scr_stream_index = i;
             stream->id = mpv_id++;
-            stream->max_buffer_size = 46 * 1024; 
+            if (s->is_vcd)
+                /* see VCD standard, p. IV-7*/
+                stream->max_buffer_size = 46 * 1024; 
+            else
+                /* This value HAS to be used for SVCD (see SVCD standard, p. 26 V.2.3.2).
+                   Right now it is also used for everything else.*/
+                stream->max_buffer_size = 230 * 1024; 
             s->video_bound++;
             break;
         default:
@@ -465,7 +477,8 @@ static int get_packet_payload_size(AVFormatContext *ctx, int stream_index,
         }
     }
 
-    if (s->is_vcd && stream->packet_number==0)
+    if ((s->is_vcd && stream->packet_number==0)
+        || (s->is_svcd && s->packet_number==0))
         /* the first pack of each stream contains only the pack header,
            the system header and some padding (see VCD standard p. IV-6) 
            Add the padding size, so that the actual payload becomes 0.*/
@@ -473,8 +486,12 @@ static int get_packet_payload_size(AVFormatContext *ctx, int stream_index,
     else {
         /* packet header size */
         buf_index += 6;
-        if (s->is_mpeg2)
+        if (s->is_mpeg2) {
             buf_index += 3;
+            if (stream->packet_number==0)
+                buf_index += 3; /* PES extension */
+            buf_index += 1;    /* obligatory stuffing byte */
+        }
         if (pts != AV_NOPTS_VALUE) {
             if (dts != pts)
                 buf_index += 5 + 5;
@@ -554,6 +571,8 @@ static void flush_packet(AVFormatContext *ctx, int stream_index,
     uint8_t buffer[128];
     int zero_trail_bytes = 0;
     int pad_packet_bytes = 0;
+    int pes_flags;
+    int general_pack = 0;  /*"general" pack without data specific to one stream?*/
     
     id = stream->id;
     
@@ -595,11 +614,16 @@ static void flush_packet(AVFormatContext *ctx, int stream_index,
            each audio pack (see standard p. IV-8).*/
         zero_trail_bytes += 20;
             
-    if (s->is_vcd && stream->packet_number==0) {
-        /* the first pack of each stream contains only the pack header,
+    if ((s->is_vcd && stream->packet_number==0)
+        || (s->is_svcd && s->packet_number==0)) {
+        /* for VCD the first pack of each stream contains only the pack header,
            the system header and lots of padding (see VCD standard p. IV-6).
            In the case of an audio pack, 20 zero bytes are also added at
            the end.*/
+        /* For SVCD we fill the very first pack to increase compatibility with
+           some DVD players. Not mandated by the standard.*/
+        if (s->is_svcd)
+            general_pack = 1;    /* the system header refers to both streams and no stream data*/
         pad_packet_bytes = packet_size - zero_trail_bytes;
     }
 
@@ -613,6 +637,9 @@ static void flush_packet(AVFormatContext *ctx, int stream_index,
         /* packet header */
         if (s->is_mpeg2) {
             header_len = 3;
+            if (stream->packet_number==0)
+                header_len += 3; /* PES extension */
+            header_len += 1; /* obligatory stuffing byte */
         } else {
             header_len = 0;
         }
@@ -639,6 +666,13 @@ static void flush_packet(AVFormatContext *ctx, int stream_index,
         stuffing_size = payload_size - stream->buffer_ptr;
         if (stuffing_size < 0)
             stuffing_size = 0;
+        if (stuffing_size > 16) {    /*<=16 for MPEG-1, <=32 for MPEG-2*/
+            pad_packet_bytes += stuffing_size;
+            packet_size -= stuffing_size;
+            payload_size -= stuffing_size;
+            stuffing_size = 0;
+        }
+
         put_be32(&ctx->pb, startcode);
 
         put_be16(&ctx->pb, packet_size);
@@ -650,21 +684,39 @@ static void flush_packet(AVFormatContext *ctx, int stream_index,
         if (s->is_mpeg2) {
             put_byte(&ctx->pb, 0x80); /* mpeg2 id */
 
+            pes_flags=0;
+
             if (pts != AV_NOPTS_VALUE) {
-                if (dts != pts) {
-                    put_byte(&ctx->pb, 0xc0); /* flags */
-                    put_byte(&ctx->pb, header_len - 3 + stuffing_size);
-                    put_timestamp(&ctx->pb, 0x03, pts);
-                    put_timestamp(&ctx->pb, 0x01, dts);
-                } else {
-                    put_byte(&ctx->pb, 0x80); /* flags */
-                    put_byte(&ctx->pb, header_len - 3 + stuffing_size);
-                    put_timestamp(&ctx->pb, 0x02, pts);
-                }
-            } else {
-                put_byte(&ctx->pb, 0x00); /* flags */
-                put_byte(&ctx->pb, header_len - 3 + stuffing_size);
+                pes_flags |= 0x80;
+                if (dts != pts)
+                    pes_flags |= 0x40;
             }
+
+            /* Both the MPEG-2 and the SVCD standards demand that the
+               P-STD_buffer_size field be included in the first packet of
+               every stream. (see SVCD standard p. 26 V.2.3.1 and V.2.3.2
+               and MPEG-2 standard 2.7.7) */
+            if (stream->packet_number == 0)
+                pes_flags |= 0x01;
+
+            put_byte(&ctx->pb, pes_flags); /* flags */
+            put_byte(&ctx->pb, header_len - 3 + stuffing_size);
+
+            if (pes_flags & 0x80)  /*write pts*/
+                put_timestamp(&ctx->pb, (pes_flags & 0x40) ? 0x03 : 0x02, pts);
+            if (pes_flags & 0x40)  /*write dts*/
+                put_timestamp(&ctx->pb, 0x01, dts);
+            
+            if (pes_flags & 0x01) {  /*write pes extension*/
+                put_byte(&ctx->pb, 0x10); /* flags */
+
+                /* P-STD buffer info */                
+                if (id == AUDIO_ID)
+                    put_be16(&ctx->pb, 0x4000 | stream->max_buffer_size/128);
+                else
+                    put_be16(&ctx->pb, 0x6000 | stream->max_buffer_size/1024);
+            }
+
         } else {
             if (pts != AV_NOPTS_VALUE) {
                 if (dts != pts) {
@@ -694,9 +746,14 @@ static void flush_packet(AVFormatContext *ctx, int stream_index,
             }
         }
 
-        if (s->is_mpeg2)
+        if (s->is_mpeg2) {
+            /* special stuffing byte that is always written
+               to prevent accidental generation of start codes. */
+            put_byte(&ctx->pb, 0xff);
+
             for(i=0;i<stuffing_size;i++)
                 put_byte(&ctx->pb, 0xff);
+        }
 
         /* output data */
         put_buffer(&ctx->pb, stream->buffer, payload_size - stuffing_size);
@@ -711,7 +768,12 @@ static void flush_packet(AVFormatContext *ctx, int stream_index,
     put_flush_packet(&ctx->pb);
     
     s->packet_number++;
-    stream->packet_number++;
+
+    /* only increase the stream packet number if this pack actually contains
+       something that is specific to this stream! I.e. a dedicated header
+       or some data.*/
+    if (!general_pack)
+        stream->packet_number++;
     stream->nb_frames = 0;
     stream->frame_start_offset = 0;
 }
@@ -781,6 +843,7 @@ static void compute_pts_dts(AVStream *st, int64_t *ppts, int64_t *pdts,
         pts = timestamp;
         dts = timestamp;
     }
+
     *ppts = pts & ((1LL << 33) - 1);
     *pdts = dts & ((1LL << 33) - 1);
 }
@@ -789,8 +852,10 @@ static int64_t update_scr(AVFormatContext *ctx,int stream_index,int64_t pts)
 {
     MpegMuxContext *s = ctx->priv_data;
     int64_t scr;
+    StreamInfo *stream;
+    int i;
 
-    if (s->is_vcd)
+    if (s->is_vcd) {
         /* Since the data delivery rate is constant, SCR is computed
            using the formula C + i * 1200 where C is the start constant
            and i is the pack index.
@@ -802,7 +867,21 @@ static int64_t update_scr(AVFormatContext *ctx,int stream_index,int64_t pts)
            will still be correct according to the standard. It just won't have
            the "recommended" value).*/
         scr = 36000 + s->packet_number * 1200;
+
+
+#if 0
+        for(i=0;i<ctx->nb_streams;i++) {
+            stream = ctx->streams[i]->priv_data;
+            
+            if(scr > stream->start_pts && stream->start_pts!=AV_NOPTS_VALUE) {
+                av_log(ctx, AV_LOG_DEBUG, "mpeg vcd: SCR above PTS (scr=%0.3f, stream index=%d, stream_pts=%0.3f).\n", scr/90000.0, i, stream->start_pts / 90000.0);                 
+            }
+        }
+#endif
+    }
     else {
+        
+        
         /* XXX I believe this calculation of SCR is wrong. SCR
            specifies at which time the data should enter the decoder.
            Two packs cannot enter the decoder at the same time. */
@@ -814,6 +893,17 @@ static int64_t update_scr(AVFormatContext *ctx,int stream_index,int64_t pts)
             scr = pts;
         else
             scr = s->last_scr;
+
+        /* "Sanity hack": make sure that the SCR does not overtake the pts of
+           buffered data that is still waiting to be written.*/
+        for(i=0;i<ctx->nb_streams;i++) {
+            stream = ctx->streams[i]->priv_data;
+            
+            if(scr > stream->start_pts && stream->start_pts!=AV_NOPTS_VALUE) {
+                /* av_log(ctx, AV_LOG_DEBUG, "mpeg: restricting scr to stream pts (scr=%0.3f, stream index=%d, stream_pts=%0.3f).\n", scr/90000.0, i, stream->start_pts / 90000.0); */
+                scr = stream->start_pts;
+            }
+        }
     }
 
     s->last_scr=scr;
@@ -834,6 +924,28 @@ static int mpeg_mux_write_packet(AVFormatContext *ctx, int stream_index,
     
     compute_pts_dts(st, &pts, &dts, timestamp);
 
+    if(s->is_svcd) {
+        /* offset pts and dts slightly into the future to be able
+           to do the compatibility fix below.*/
+        pts = (pts + 2) & ((1LL << 33) - 1);
+        dts = (dts + 2) & ((1LL << 33) - 1);
+
+        if (stream->packet_number == 0 && dts == pts)
+            /* For the very first packet we want to force the DTS to be included.
+               This increases compatibility with lots of DVD players.
+               Since the MPEG-2 standard mandates that DTS is only written when
+               it is different from PTS we have to move it slightly into the past.*/
+            dts = (dts - 2) & ((1LL << 33) - 1);
+    }
+    if(s->is_vcd) {
+        /* We have to offset the PTS, so that it is consistent with the SCR.
+           SCR starts at 36000, but the first two packs contain only padding
+           and the first pack from the other stream, respectively, may also have
+           been written before.
+           So the real data starts at SCR 36000+3*1200. */
+        pts = (pts + 36000 + 3600) & ((1LL << 33) - 1);
+        dts = (dts + 36000 + 3600) & ((1LL << 33) - 1);
+    }
     
 #if 0
     update_scr(ctx,stream_index,pts);
@@ -1077,12 +1189,12 @@ static int find_prev_start_code(ByteIOContext *pb, int *size_ptr)
     return start_code;
 }
 
-/* read the next (or previous) PES header. Return its position in ppos 
+/* read the next PES header. Return its position in ppos 
    (if not NULL), and its start code, pts and dts.
  */
 static int mpegps_read_pes_header(AVFormatContext *s,
                                   int64_t *ppos, int *pstart_code, 
-                                  int64_t *ppts, int64_t *pdts, int find_next)
+                                  int64_t *ppts, int64_t *pdts)
 {
     MpegDemuxContext *m = s->priv_data;
     int len, size, startcode, c, flags, header_len;
@@ -1090,18 +1202,10 @@ static int mpegps_read_pes_header(AVFormatContext *s,
 
     last_pos = -1;
  redo:
-    if (find_next) {
         /* next start code (should be immediately after) */
         m->header_state = 0xff;
         size = MAX_SYNC_SIZE;
         startcode = find_next_start_code(&s->pb, &size, &m->header_state);
-    } else {
-        if (last_pos >= 0)
-            url_fseek(&s->pb, last_pos, SEEK_SET);
-        size = MAX_SYNC_SIZE;
-        startcode = find_prev_start_code(&s->pb, &size);
-        last_pos = url_ftell(&s->pb) - 4;
-    }
     //printf("startcode=%x pos=0x%Lx\n", startcode, url_ftell(&s->pb));
     if (startcode < 0)
         return -EIO;
@@ -1187,6 +1291,9 @@ static int mpegps_read_pes_header(AVFormatContext *s,
             header_len--;
         }
     }
+    else if( c!= 0xf )
+        goto redo;
+
     if (startcode == 0x1bd) {
         if (len < 1)
             goto redo;
@@ -1206,7 +1313,7 @@ static int mpegps_read_pes_header(AVFormatContext *s,
         int i;
         for(i=0; i<s->nb_streams; i++){
             if(startcode == s->streams[i]->id) {
-                av_add_index_entry(s->streams[i], *ppos, dts, 0, 0 /* FIXME keyframe? */);
+                av_add_index_entry(s->streams[i], *ppos, dts*AV_TIME_BASE/90000, 0, 0 /* FIXME keyframe? */);
             }
         }
     }
@@ -1222,10 +1329,10 @@ static int mpegps_read_packet(AVFormatContext *s,
 {
     AVStream *st;
     int len, startcode, i, type, codec_id;
-    int64_t pts, dts, ppos = 0;
+    int64_t pts, dts, ppos = 0; 
 
  redo:
-    len = mpegps_read_pes_header(s, &ppos, &startcode, &pts, &dts, 1);
+    len = mpegps_read_pes_header(s, &ppos, &startcode, &pts, &dts);
     if (len < 0)
         return len;
     
@@ -1297,7 +1404,7 @@ static int mpegps_read_close(AVFormatContext *s)
 }
 
 static int64_t mpegps_read_dts(AVFormatContext *s, int stream_index, 
-                               int64_t *ppos, int find_next)
+                               int64_t *ppos, int64_t pos_limit)
 {
     int len, startcode;
     int64_t pos, pts, dts;
@@ -1308,7 +1415,7 @@ static int64_t mpegps_read_dts(AVFormatContext *s, int stream_index,
 #endif
     url_fseek(&s->pb, pos, SEEK_SET);
     for(;;) {
-        len = mpegps_read_pes_header(s, &pos, &startcode, &pts, &dts, find_next);
+        len = mpegps_read_pes_header(s, &pos, &startcode, &pts, &dts);
         if (len < 0) {
 #ifdef DEBUG_SEEK
             printf("none (ret=%d)\n", len);
@@ -1319,153 +1426,13 @@ static int64_t mpegps_read_dts(AVFormatContext *s, int stream_index,
             dts != AV_NOPTS_VALUE) {
             break;
         }
-        if (find_next) {
-            url_fskip(&s->pb, len);
-        } else {
-            url_fseek(&s->pb, pos, SEEK_SET);
-        }
+        url_fskip(&s->pb, len);
     }
 #ifdef DEBUG_SEEK
     printf("pos=0x%llx dts=0x%llx %0.3f\n", pos, dts, dts / 90000.0);
 #endif
     *ppos = pos;
-    return dts;
-}
-
-static int mpegps_read_seek(AVFormatContext *s, 
-                            int stream_index, int64_t timestamp)
-{
-    int64_t pos_min, pos_max, pos, pos_limit;
-    int64_t dts_min, dts_max, dts;
-    int index, no_change;
-    AVStream *st;
-
-    timestamp = (timestamp * 90000) / AV_TIME_BASE;
-
-#ifdef DEBUG_SEEK
-    printf("read_seek: %d %0.3f\n", stream_index, timestamp / 90000.0);
-#endif
-
-    /* XXX: find stream_index by looking at the first PES packet found */
-    if (stream_index < 0) {
-        stream_index = av_find_default_stream_index(s);
-        if (stream_index < 0)
-            return -1;
-    }
-    
-    dts_max=
-    dts_min= AV_NOPTS_VALUE;
-    pos_limit= -1; //gcc falsely says it may be uninitalized
-
-    st= s->streams[stream_index];
-    if(st->index_entries){
-        AVIndexEntry *e;
-
-        index= av_index_search_timestamp(st, timestamp);
-        e= &st->index_entries[index];
-        if(e->timestamp <= timestamp){
-            pos_min= e->pos;
-            dts_min= e->timestamp;
-#ifdef DEBUG_SEEK
-        printf("unsing cached pos_min=0x%llx dts_min=%0.3f\n", 
-               pos_min,dts_min / 90000.0);
-#endif
-        }else{
-            assert(index==0);
-        }
-        index++;
-        if(index < st->nb_index_entries){
-            e= &st->index_entries[index];
-            assert(e->timestamp >= timestamp);
-            pos_max= e->pos;
-            dts_max= e->timestamp;
-            pos_limit= pos_max - e->min_distance;
-#ifdef DEBUG_SEEK
-        printf("unsing cached pos_max=0x%llx dts_max=%0.3f\n", 
-               pos_max,dts_max / 90000.0);
-#endif
-        }
-    }
-
-    if(dts_min == AV_NOPTS_VALUE){
-        pos_min = 0;
-        dts_min = mpegps_read_dts(s, stream_index, &pos_min, 1);
-        if (dts_min == AV_NOPTS_VALUE) {
-            /* we can reach this case only if no PTS are present in
-               the whole stream */
-            return -1;
-        }
-    }
-    if(dts_max == AV_NOPTS_VALUE){
-        pos_max = url_filesize(url_fileno(&s->pb)) - 1;
-        dts_max = mpegps_read_dts(s, stream_index, &pos_max, 0);
-        pos_limit= pos_max;
-    }
-
-    no_change=0;
-    while (pos_min < pos_limit) {
-#ifdef DEBUG_SEEK
-        printf("pos_min=0x%llx pos_max=0x%llx dts_min=%0.3f dts_max=%0.3f\n", 
-               pos_min, pos_max,
-               dts_min / 90000.0, dts_max / 90000.0);
-#endif
-        int64_t start_pos;
-        assert(pos_limit <= pos_max);
-
-        if(no_change==0){
-            int64_t approximate_keyframe_distance= pos_max - pos_limit;
-            // interpolate position (better than dichotomy)
-            pos = (int64_t)((double)(pos_max - pos_min) *
-                            (double)(timestamp - dts_min) /
-                            (double)(dts_max - dts_min)) + pos_min - approximate_keyframe_distance;
-        }else if(no_change==1){
-            // bisection, if interpolation failed to change min or max pos last time
-            pos = (pos_min + pos_limit)>>1;
-        }else{
-            // linear search if bisection failed, can only happen if there are very few or no keframes between min/max
-            pos=pos_min;
-        }
-        if(pos <= pos_min)
-            pos= pos_min + 1;
-        else if(pos > pos_limit)
-            pos= pos_limit;
-        start_pos= pos;
-
-        // read the next timestamp 
-        dts = mpegps_read_dts(s, stream_index, &pos, 1);
-        if(pos == pos_max)
-            no_change++;
-        else
-            no_change=0;
-#ifdef DEBUG_SEEK
-printf("%Ld %Ld %Ld / %Ld %Ld %Ld target:%Ld limit:%Ld start:%Ld noc:%d\n", pos_min, pos, pos_max, dts_min, dts, dts_max, timestamp, pos_limit, start_pos, no_change);
-#endif
-        assert(dts != AV_NOPTS_VALUE);
-        if (timestamp < dts) {
-            pos_limit = start_pos - 1;
-            pos_max = pos;
-            dts_max = dts;
-        } else {
-            pos_min = pos;
-            dts_min = dts;
-            /* check if we are lucky */
-            if (timestamp == dts)
-                break;
-        }
-    }
-    
-    pos = pos_min;
-#ifdef DEBUG_SEEK
-    pos_min = pos;
-    dts_min = mpegps_read_dts(s, stream_index, &pos_min, 1);
-    pos_min++;
-    dts_max = mpegps_read_dts(s, stream_index, &pos_min, 1);
-    printf("pos=0x%llx %0.3f<=%0.3f<=%0.3f\n", 
-           pos, dts_min / 90000.0, timestamp / 90000.0, dts_max / 90000.0);
-#endif
-    /* do the seek */
-    url_fseek(&s->pb, pos, SEEK_SET);
-    return 0;
+    return dts*AV_TIME_BASE/90000;
 }
 
 #ifdef CONFIG_ENCODERS
@@ -1534,7 +1501,8 @@ AVInputFormat mpegps_demux = {
     mpegps_read_header,
     mpegps_read_packet,
     mpegps_read_close,
-    mpegps_read_seek,
+    NULL, //mpegps_read_seek,
+    mpegps_read_dts,
 };
 
 int mpegps_init(void)

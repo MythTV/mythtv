@@ -286,7 +286,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     fmt->flags |= AVFMT_NOFILE;
 
-    ic = (AVFormatContext *)av_mallocz(sizeof(AVFormatContext));
+    ic = av_alloc_format_context();
     if (!ic)
     {
         cerr << "Couldn't allocate context\n";

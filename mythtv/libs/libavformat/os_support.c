@@ -16,6 +16,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+#include "config.h"
 #include "avformat.h"
 #ifdef CONFIG_WIN32
 #include <sys/types.h>
@@ -33,7 +34,7 @@
 int64_t av_gettime(void)
 {
 #ifdef CONFIG_WIN32
-    struct _timeb tb;
+    struct timeb tb;
     _ftime(&tb);
     return ((int64_t)tb.time * int64_t_C(1000) + (int64_t)tb.millitm) * int64_t_C(1000);
 #else

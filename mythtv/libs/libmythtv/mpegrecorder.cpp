@@ -402,7 +402,7 @@ bool MpegRecorder::SetupRecording(void)
     AVInputFormat *fmt = &mpegps_demux;
     fmt->flags |= AVFMT_NOFILE;
 
-    ic = (AVFormatContext *)av_mallocz(sizeof(AVFormatContext));
+    ic = av_alloc_format_context();
     if (!ic)
     {
         cerr << "Couldn't allocate context\n";

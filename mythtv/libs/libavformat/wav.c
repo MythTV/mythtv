@@ -34,6 +34,7 @@ const CodecTag codec_wav_tags[] = {
     { CODEC_ID_ADPCM_IMA_DK3, 0x62 },  /* rogue format number */
     { CODEC_ID_WMAV1, 0x160 },
     { CODEC_ID_WMAV2, 0x161 },
+    { CODEC_ID_VORBIS, ('V'<<8)+'o' }, //HACK/FIXME, does vorbis in WAV/AVI have an (in)official id?
     { 0, 0 },
 };
 
@@ -104,8 +105,15 @@ int put_wav_header(ByteIOContext *pb, AVCodecContext *enc)
         put_le16(pb, 2); /* wav_extra_size */
         hdrsize += 2;
         put_le16(pb, ((enc->block_align - 4 * enc->channels) / (4 * enc->channels)) * 8 + 1); /* wSamplesPerBlock */
-    } else
-        put_le16(pb, 0); /* wav_extra_size */
+    } else {
+        put_le16(pb, enc->extradata_size);
+        put_buffer(pb, enc->extradata, enc->extradata_size);
+        hdrsize += enc->extradata_size;
+        if(hdrsize&1){
+            hdrsize++;
+            put_byte(pb, 0);
+        }
+    }
 
     return hdrsize;
 }

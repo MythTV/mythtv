@@ -48,6 +48,9 @@ int match_ext(const char *filename, const char *extensions)
     const char *ext, *p;
     char ext1[32], *q;
 
+    if(!filename)
+        return 0;
+
     ext = strrchr(filename, '.');
     if (ext) {
         ext++;
@@ -264,6 +267,8 @@ void fifo_write(FifoBuffer *f, uint8_t *buf, int size, uint8_t **wptr_ptr)
 int filename_number_test(const char *filename)
 {
     char buf[1024];
+    if(!filename)
+        return -1;
     return get_frame_filename(buf, sizeof(buf), filename, 1);
 }
 
@@ -297,6 +302,10 @@ AVInputFormat *av_probe_input_format(AVProbeData *pd, int is_opened)
 /************************************************************/
 /* input media file */
 
+/**
+ * open a media file from an IO stream. 'fmt' must be specified.
+ */
+
 static const char* format_to_name(void* ptr)
 {
     AVFormatContext* fc = (AVFormatContext*) ptr;
@@ -316,9 +325,6 @@ AVFormatContext *av_alloc_format_context(void)
     return ic;
 }
 
-/**
- * open a media file from an IO stream. 'fmt' must be specified.
- */
 int av_open_input_stream(AVFormatContext **ic_ptr, 
                          ByteIOContext *pb, const char *filename, 
                          AVInputFormat *fmt, AVFormatParameters *ap)
@@ -330,7 +336,7 @@ int av_open_input_stream(AVFormatContext **ic_ptr,
         ic = *ic_ptr;
     }
     else {
-        ic = av_mallocz(sizeof(AVFormatContext));
+        ic = av_alloc_format_context();
         if (!ic) {
             err = AVERROR_NOMEM;
             goto fail;
@@ -936,6 +942,9 @@ int av_add_index_entry(AVStream *st,
                 memmove(entries + index + 1, entries + index, sizeof(AVIndexEntry)*(st->nb_index_entries - index));
             }
             st->nb_index_entries++;
+        }else{
+            if(ie->pos == pos && distance < ie->min_distance) //dont reduce the distance
+                distance= ie->min_distance;
         }
     }else{
         index= st->nb_index_entries++;
@@ -1015,6 +1024,156 @@ int av_index_search_timestamp(AVStream *st, int wanted_timestamp)
     return a;
 }
 
+#define DEBUG_SEEK
+
+int av_seek_frame_binary(AVFormatContext *s, int stream_index, int64_t target_ts){
+    AVInputFormat *avif= s->iformat;
+    int64_t pos_min, pos_max, pos, pos_limit;
+    int64_t ts_min, ts_max, ts;
+    int64_t start_pos;
+    int index, no_change;
+    AVStream *st;
+
+    if (stream_index < 0) {
+        stream_index = av_find_default_stream_index(s);
+        if (stream_index < 0)
+            return -1;
+    }
+
+#ifdef DEBUG_SEEK
+    av_log(s, AV_LOG_DEBUG, "read_seek: %d %lld\n", stream_index, target_ts);
+#endif
+
+    ts_max=
+    ts_min= AV_NOPTS_VALUE;
+    pos_limit= -1; //gcc falsely says it may be uninitalized
+
+    st= s->streams[stream_index];
+    if(st->index_entries){
+        AVIndexEntry *e;
+
+        index= av_index_search_timestamp(st, target_ts);
+        e= &st->index_entries[index];
+
+        if(e->timestamp <= target_ts || e->pos == e->min_distance){
+            pos_min= e->pos;
+            ts_min= e->timestamp;
+#ifdef DEBUG_SEEK
+        av_log(s, AV_LOG_DEBUG, "unsing cached pos_min=0x%llx dts_min=%lld\n",
+               pos_min,ts_min);
+#endif
+        }else{
+            assert(index==0);
+        }
+        index++;
+        if(index < st->nb_index_entries){
+            e= &st->index_entries[index];
+            assert(e->timestamp >= target_ts);
+            pos_max= e->pos;
+            ts_max= e->timestamp;
+            pos_limit= pos_max - e->min_distance;
+#ifdef DEBUG_SEEK
+        av_log(s, AV_LOG_DEBUG, "unsing cached pos_max=0x%llx pos_limit=0x%llx dts_max=%lld\n",
+               pos_max,pos_limit, ts_max);
+#endif
+        }
+    }
+
+    if(ts_min == AV_NOPTS_VALUE){
+        pos_min = s->data_offset;
+        ts_min = avif->read_timestamp(s, stream_index, &pos_min, INT64_MAX);
+        if (ts_min == AV_NOPTS_VALUE)
+            return -1;
+    }
+
+    if(ts_max == AV_NOPTS_VALUE){
+        int step= 1024;
+        pos_max = url_filesize(url_fileno(&s->pb)) - 1;
+        do{
+            pos_max -= step;
+            ts_max = avif->read_timestamp(s, stream_index, &pos_max, pos_max + step);
+            step += step;
+        }while(ts_max == AV_NOPTS_VALUE && pos_max >= step);
+        if (ts_max == AV_NOPTS_VALUE)
+            return -1;
+
+        for(;;){
+            int64_t tmp_pos= pos_max + 1;
+            int64_t tmp_ts= avif->read_timestamp(s, stream_index, &tmp_pos, INT64_MAX);
+            if(tmp_ts == AV_NOPTS_VALUE)
+                break;
+            ts_max= tmp_ts;
+            pos_max= tmp_pos;
+        }
+        pos_limit= pos_max;
+    }
+
+    no_change=0;
+    while (pos_min < pos_limit) {
+#ifdef DEBUG_SEEK
+        av_log(s, AV_LOG_DEBUG, "pos_min=0x%llx pos_max=0x%llx dts_min=%lld dts_max=%lld\n",
+               pos_min, pos_max,
+               ts_min, ts_max);
+#endif
+        assert(pos_limit <= pos_max);
+
+        if(no_change==0){
+            int64_t approximate_keyframe_distance= pos_max - pos_limit;
+            // interpolate position (better than dichotomy)
+            pos = (int64_t)((double)(pos_max - pos_min) *
+                            (double)(target_ts - ts_min) /
+                            (double)(ts_max - ts_min)) + pos_min - approximate_keyframe_distance;
+        }else if(no_change==1){
+            // bisection, if interpolation failed to change min or max pos last time
+            pos = (pos_min + pos_limit)>>1;
+        }else{
+            // linear search if bisection failed, can only happen if there are very few or no keframes between min/max
+            pos=pos_min;
+        }
+        if(pos <= pos_min)
+            pos= pos_min + 1;
+        else if(pos > pos_limit)
+            pos= pos_limit;
+        start_pos= pos;
+
+        ts = avif->read_timestamp(s, stream_index, &pos, INT64_MAX); //may pass pos_limit instead of -1
+        if(pos == pos_max)
+            no_change++;
+        else
+            no_change=0;
+#ifdef DEBUG_SEEK
+av_log(s, AV_LOG_DEBUG, "%Ld %Ld %Ld / %Ld %Ld %Ld target:%Ld limit:%Ld start:%Ld noc:%d\n", pos_min, pos, pos_max, ts_min, ts, ts_max, target_ts, pos_limit, start_pos, no_change);
+#endif
+        assert(ts != AV_NOPTS_VALUE);
+        if (target_ts < ts) {
+            pos_limit = start_pos - 1;
+            pos_max = pos;
+            ts_max = ts;
+        } else {
+            pos_min = pos;
+            ts_min = ts;
+            /* check if we are lucky */
+            if (target_ts == ts)
+                break;
+        }
+    }
+
+    pos = pos_min;
+#ifdef DEBUG_SEEK
+    pos_min = pos;
+    ts_min = avif->read_timestamp(s, stream_index, &pos_min, INT64_MAX);
+    pos_min++;
+    ts_max = avif->read_timestamp(s, stream_index, &pos_min, INT64_MAX);
+    av_log(s, AV_LOG_DEBUG, "pos=0x%llx %lld<=%lld<=%lld\n",
+           pos, ts_min, target_ts, ts_max);
+#endif
+    /* do the seek */
+    url_fseek(&s->pb, pos, SEEK_SET);
+    st->cur_dts = ts_min;
+
+    return 0;
+}
+
 static int av_seek_frame_generic(AVFormatContext *s, 
                                  int stream_index, int64_t timestamp)
 {
@@ -1065,8 +1224,11 @@ int av_seek_frame(AVFormatContext *s, int stream_index, int64_t timestamp)
     if (ret >= 0) {
         return 0;
     }
-    
-    return av_seek_frame_generic(s, stream_index, timestamp);
+
+    if(s->iformat->read_timestamp)
+        return av_seek_frame_binary(s, stream_index, timestamp);
+    else
+        return av_seek_frame_generic(s, stream_index, timestamp);
 }
 
 /*******************************************************/
@@ -1497,6 +1659,7 @@ int av_find_stream_info(AVFormatContext *ic)
             (st->codec.codec_id == CODEC_ID_FLV1 ||
              st->codec.codec_id == CODEC_ID_H264 ||
              st->codec.codec_id == CODEC_ID_H263 ||
+             st->codec.codec_id == CODEC_ID_VORBIS ||
              (st->codec.codec_id == CODEC_ID_MPEG4 && !st->need_parsing)))
             try_decode_frame(st, pkt->data, pkt->size);
         
@@ -1718,8 +1881,13 @@ int av_write_frame(AVFormatContext *s, int stream_index, const uint8_t *buf,
 
     st = s->streams[stream_index];
     pts_mask = (1LL << s->pts_wrap_bits) - 1;
-    ret = s->oformat->write_packet(s, stream_index, buf, size, 
-                                   st->pts.val & pts_mask);
+    /* HACK/FIXME we skip all zero size audio packets so a encoder can pass pts by outputing zero size packets */
+    if(st->codec.codec_type==CODEC_TYPE_AUDIO && size==0)
+        ret = 0;
+    else
+        ret = s->oformat->write_packet(s, stream_index, buf, size,
+                                       st->pts.val & pts_mask);
+
     if (ret < 0)
         return ret;
 
@@ -1727,7 +1895,10 @@ int av_write_frame(AVFormatContext *s, int stream_index, const uint8_t *buf,
     switch (st->codec.codec_type) {
     case CODEC_TYPE_AUDIO:
         frame_size = get_audio_frame_size(&st->codec, size);
-        if (frame_size >= 0) {
+
+        /* HACK/FIXME, we skip the initial 0-size packets as they are most likely equal to the encoder delay,
+           but it would be better if we had the real timestamps from the encoder */
+        if (frame_size >= 0 && (size || st->pts.num!=st->pts.den>>1 || st->pts.val)) {
             av_frac_add(&st->pts, 
                         (int64_t)s->pts_den * frame_size);
         }
@@ -1885,7 +2056,7 @@ int parse_frame_rate(int *frame_rate, int *frame_rate_base, const char *arg)
     } 
     else {
         /* Finally we give up and parse it as double */
-        *frame_rate_base = DEFAULT_FRAME_RATE_BASE;
+        *frame_rate_base = DEFAULT_FRAME_RATE_BASE; //FIXME use av_d2q()
         *frame_rate = (int)(strtod(arg, 0) * (*frame_rate_base) + 0.5);
     }
     if (!*frame_rate || !*frame_rate_base)
@@ -1920,6 +2091,7 @@ int64_t parse_date(const char *datestr, int duration)
     const char *q;
     int is_utc, len;
     char lastch;
+#undef time
     time_t now = time(0);
 
     len = strlen(datestr);

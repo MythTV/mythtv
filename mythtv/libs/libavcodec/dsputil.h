@@ -62,17 +62,16 @@ extern uint8_t cropTbl[256 + 2 * MAX_NEG_CROP];
 
 /* VP3 DSP functions */
 void vp3_dsp_init_c(void);
-void vp3_idct_put_c(int16_t *input_data, int16_t *dequant_matrix,
-    int coeff_count, uint8_t *dest, int stride);
-void vp3_idct_add_c(int16_t *input_data, int16_t *dequant_matrix,
-    int coeff_count, uint8_t *dest, int stride);
+void vp3_idct_c(int16_t *input_data, int16_t *dequant_matrix,
+    int coeff_count, DCTELEM *output_data);
 
 void vp3_dsp_init_mmx(void);
-void vp3_idct_put_mmx(int16_t *input_data, int16_t *dequant_matrix,
-    int coeff_count, uint8_t *dest, int stride);
-void vp3_idct_add_mmx(int16_t *input_data, int16_t *dequant_matrix,
-    int coeff_count, uint8_t *dest, int stride);
+void vp3_idct_mmx(int16_t *input_data, int16_t *dequant_matrix,
+    int coeff_count, DCTELEM *output_data);
 
+void vp3_dsp_init_sse2(void);
+void vp3_idct_sse2(int16_t *input_data, int16_t *dequant_matrix,
+    int coeff_count, DCTELEM *output_data);
 
 /* minimum alignment rules ;)
 if u notice errors in the align stuff, need more alignment for some asm code for some cpu
@@ -138,6 +137,7 @@ typedef struct DSPContext {
     void (*get_pixels)(DCTELEM *block/*align 16*/, const uint8_t *pixels/*align 8*/, int line_size);
     void (*diff_pixels)(DCTELEM *block/*align 16*/, const uint8_t *s1/*align 8*/, const uint8_t *s2/*align 8*/, int stride);
     void (*put_pixels_clamped)(const DCTELEM *block/*align 16*/, uint8_t *pixels/*align 8*/, int line_size);
+    void (*put_signed_pixels_clamped)(const DCTELEM *block/*align 16*/, uint8_t *pixels/*align 8*/, int line_size);
     void (*add_pixels_clamped)(const DCTELEM *block/*align 16*/, uint8_t *pixels/*align 8*/, int line_size);
     /**
      * translational global motion compensation.
@@ -312,32 +312,16 @@ typedef struct DSPContext {
 
     /** 
      * This function is responsible for taking a block of zigzag'd,
-     * quantized DCT coefficients, reconstructing the original block of
-     * samples, and placing it into the output.
+     * quantized DCT coefficients and reconstructing the original block of
+     * samples.
      * @param input_data 64 zigzag'd, quantized DCT coefficients
      * @param dequant_matrix 64 zigzag'd quantizer coefficients
      * @param coeff_count index of the last coefficient
-     * @param dest the final output location where the transformed samples
-     * are to be placed
-     * @param stride the width in 8-bit samples of a line on this plane
+     * @param output_samples space for 64 DCTELEMs where the transformed
+     * samples will be stored
      */
-    void (*vp3_idct_put)(int16_t *input_data, int16_t *dequant_matrix,
-        int coeff_count, uint8_t *dest, int stride);
-
-    /** 
-     * This function is responsible for taking a block of zigzag'd,
-     * quantized DCT coefficients, reconstructing the original block of
-     * samples, and adding the transformed samples to an existing block of
-     * samples in the output.
-     * @param input_data 64 zigzag'd, quantized DCT coefficients
-     * @param dequant_matrix 64 zigzag'd quantizer coefficients
-     * @param coeff_count index of the last coefficient
-     * @param dest the final output location where the transformed samples
-     * are to be placed
-     * @param stride the width in 8-bit samples of a line on this plane
-     */
-    void (*vp3_idct_add)(int16_t *input_data, int16_t *dequant_matrix,
-        int coeff_count, uint8_t *dest, int stride);
+    void (*vp3_idct)(int16_t *input_data, int16_t *dequant_matrix,
+        int coeff_count, DCTELEM *output_samples);
 
 } DSPContext;
 
@@ -375,6 +359,8 @@ static inline uint32_t no_rnd_avg32(uint32_t a, uint32_t b)
    one or more MultiMedia extension */
 int mm_support(void);
 
+#define __align16 __attribute__ ((aligned (16)))
+
 #if defined(HAVE_MMX)
 
 #undef emms_c
@@ -389,6 +375,7 @@ extern int mm_flags;
 
 void add_pixels_clamped_mmx(const DCTELEM *block, uint8_t *pixels, int line_size);
 void put_pixels_clamped_mmx(const DCTELEM *block, uint8_t *pixels, int line_size);
+void put_signed_pixels_clamped_mmx(const DCTELEM *block, uint8_t *pixels, int line_size);
 
 static inline void emms(void)
 {
@@ -410,7 +397,7 @@ void dsputil_init_pix_mmx(DSPContext* c, AVCodecContext *avctx);
 #elif defined(ARCH_ARMV4L)
 
 /* This is to use 4 bytes read to the IDCT pointers for some 'zero'
-   line ptimizations */
+   line optimizations */
 #define __align8 __attribute__ ((aligned (4)))
 
 void dsputil_init_armv4l(DSPContext* c, AVCodecContext *avctx);
@@ -421,6 +408,12 @@ void dsputil_init_armv4l(DSPContext* c, AVCodecContext *avctx);
 #define __align8 __attribute__ ((aligned (8)))
 
 void dsputil_init_mlib(DSPContext* c, AVCodecContext *avctx);
+
+#elif defined(ARCH_SPARC)
+
+/* SPARC/VIS IDCT needs 8-byte aligned DCT blocks */
+#define __align8 __attribute__ ((aligned (8)))
+void dsputil_init_vis(DSPContext* c, AVCodecContext *avctx);
 
 #elif defined(ARCH_ALPHA)
 
@@ -571,6 +564,11 @@ static inline long int lrintf(float x)
     return (int)(rint(x));
 #endif
 }
+#else
+#ifndef _ISOC9X_SOURCE
+#define _ISOC9X_SOURCE
+#endif
+#include <math.h>
 #endif
 
 #endif
