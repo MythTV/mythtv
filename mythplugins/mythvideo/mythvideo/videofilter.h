@@ -19,46 +19,47 @@ using namespace std;
 #include "metadata.h"
 class VideoFilterSettings
 {
-	public :
-		VideoFilterSettings(QSqlDatabase *db, bool loaddefaultsettings = true);
-		VideoFilterSettings(VideoFilterSettings *other);
-		~VideoFilterSettings();
-		QString BuildClauseFrom();
-		QString BuildClauseWhere();
-		QString BuildClauseOrderBy();
-		void saveAsDefault();
-
-		int getCategory(void){return category;};
-		void setCategory (int lcategory){category = lcategory;};
-		int getGenre(void){return genre;};
-		void setGenre (int lgenre){genre = lgenre;};
-		int getCountry(void){return country;};
-		void setCountry(int lcountry){country = lcountry;};
-		int getYear(void){return year;};
-		void setYear (int lyear){year = lyear;};
-		int getRuntime(void){return runtime;};
-		void setRuntime (int lruntime){runtime = lruntime;};
-		int getUserrating(void){return userrating;};
-		void setUserrating (int luserrating){userrating = luserrating;};
-/*		int getShowlevel(void){return showlevel;};
-		void setShowlevel (int lshowlevel)
-			{showlevel = lshowlevel;};*/
-		int getBrowse(void){return browse;};
-		void setBrowse(int lbrowse){browse = lbrowse;};
-		int getOrderby (void) {return orderby;};
-		void setOrderby (int lorderby) {orderby = lorderby;};
-	private : 
-		int category;
-		int genre;
-		int country;
-		int year;
-		int runtime;
-		int userrating;
-//		int showlevel;
-		int browse;
-		int orderby;
-		QSqlDatabase	*db;
+    public :
+        VideoFilterSettings(QSqlDatabase *db, bool loaddefaultsettings = true);
+        VideoFilterSettings(VideoFilterSettings *other);
+        ~VideoFilterSettings();
+        QString BuildClauseFrom();
+        QString BuildClauseWhere();
+        QString BuildClauseOrderBy();
+        void saveAsDefault();
+        
+        int getCategory(void){return category;};
+        void setCategory (int lcategory){category = lcategory;};
+        int getGenre(void){return genre;};
+        void setGenre (int lgenre){genre = lgenre;};
+        int getCountry(void){return country;};
+        void setCountry(int lcountry){country = lcountry;};
+        int getYear(void){return year;};
+        void setYear (int lyear){year = lyear;};
+        int getRuntime(void){return runtime;};
+        void setRuntime (int lruntime){runtime = lruntime;};
+        int getUserrating(void){return userrating;};
+        void setUserrating (int luserrating){userrating = luserrating;};
+        /*int getShowlevel(void){return showlevel;};
+        void setShowlevel (int lshowlevel)
+        {showlevel = lshowlevel;};*/
+        int getBrowse(void){return browse;};
+        void setBrowse(int lbrowse){browse = lbrowse;};
+        int getOrderby (void) {return orderby;};
+        void setOrderby (int lorderby) {orderby = lorderby;};
+    private : 
+        int category;
+        int genre;
+        int country;
+        int year;
+        int runtime;
+        int userrating;
+        //int showlevel;
+        int browse;
+        int orderby;
+        QSqlDatabase	*db;
 };
+
 class VideoFilterDialog : public MythThemedDialog
 {
 
@@ -117,7 +118,7 @@ class VideoFilterDialog : public MythThemedDialog
     UISelectorType	*runtime_select;
     UITextButtonType    *save_button;
     UITextButtonType    *done_button;
-    UITextType		*numvideos_text; 
+    UITextType*numvideos_text; 
 };
 
 
