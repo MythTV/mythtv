@@ -276,8 +276,9 @@ struct TranscodeData *Transcoder::CheckTranscodeTable(bool skipPartial)
                     QString oldfile = filename;
                     oldfile += ".old";
                     rename (filename, oldfile);
-                    // unlink(filename);
                     rename (tmpfile, filename);
+                    if (!gContext->GetNumSetting("SaveTranscoding", 0))
+                        unlink(oldfile);
                     DeleteTranscode(pinfo);
                     if (flags & TRANSCODE_USE_CUTLIST)
                     {

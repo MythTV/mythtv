@@ -200,6 +200,18 @@ public:
     };
 };
 
+class SaveTranscoding: public CheckBoxSetting, public BackendSetting {
+public:
+    SaveTranscoding():
+        BackendSetting("SaveTranscoding") {
+        setLabel("Save original files after transcoding");
+        setValue(false);
+        setHelpText("When set and the transcoder is active, the original "
+                    "nuv files will be renamed to nuv.old once the "
+                    "transcoding is complete.");
+    };
+};
+
 class TimeOffset: public ComboBoxSetting, public BackendSetting {
 public:
     TimeOffset():
@@ -290,6 +302,7 @@ BackendSettings::BackendSettings() {
     group1->addChild(new LiveBufferPrefix());
     group1->addChild(new BufferSize());
     group1->addChild(new MaxBufferFill());
+    group1->addChild(new SaveTranscoding());
     addChild(group1);
 
     VerticalConfigurationGroup* group2 = new VerticalConfigurationGroup(false);
