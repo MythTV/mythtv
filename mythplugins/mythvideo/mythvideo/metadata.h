@@ -160,7 +160,6 @@ class Metadata
     void setField(QString field, QString data);
     void dumpToDatabase(QSqlDatabase *db);
     void updateDatabase(QSqlDatabase *db);
-    bool fillData(QSqlDatabase *db);
     bool fillDataFromID(QSqlDatabase *db);
     bool fillDataFromFilename(QSqlDatabase *db);
     int getIdCategory(QSqlDatabase *db);

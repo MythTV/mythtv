@@ -236,14 +236,13 @@ void VideoTree::setParentalLevel(int which_level)
 
 bool VideoTree::ignoreExtension(QString extension)
 {
-    QString q_string = QString("SELECT f_ignore FROM videotypes WHERE extension = \"%1\" ;")
-                              .arg(extension);
-
-    QSqlQuery a_query(q_string, db);
-    if(a_query.isActive() && a_query.numRowsAffected() > 0)
+    QSqlQuery query(QString::null, db);
+    query.prepare("SELECT f_ignore FROM videotypes WHERE extension = :EXT ;");
+    query.bindValue(":EXT", extension);
+    if(query.exec() && query.isActive() && query.size() > 0)
     {
-        a_query.next();
-        return a_query.value(0).toBool();
+        query.next();
+        return query.value(0).toBool();
     }
     
     return !gContext->GetNumSetting("VideoListUnknownFileTypes", 1);
@@ -426,7 +425,7 @@ void VideoTree::buildVideoList()
         {
             cerr << "videotree.o: Your database sucks" << endl;
         }
-        else if (query.numRowsAffected() > 0)
+        else if (query.size() > 0)
         {
             QString prefix = gContext->GetSetting("VideoStartupDir");
             if(prefix.length() < 1)
@@ -586,23 +585,21 @@ void VideoTree::handleTreeListEntry(int node_int, IntVector*)
         //
         
 
+        QSqlQuery query(QString::null, db);
+        query.prepare("SELECT playcommand, use_default FROM "
+                      "videotypes WHERE extension = :EXT ;");
+        query.bindValue(":EXT", extension);
 
-        QString q_string = QString("SELECT playcommand, use_default FROM "
-                                   "videotypes WHERE extension = \"%1\" ;")
-                                   .arg(extension);
-
-        QSqlQuery a_query(q_string, db);
-        
-        if(a_query.isActive() && a_query.numRowsAffected() > 0)
+        if(query.exec() && query.isActive() && query.size() > 0)
         {
-            a_query.next();
-            if(!a_query.value(1).toBool() && unique_player.length() < 1)
+            query.next();
+            if(!query.value(1).toBool() && unique_player.length() < 1)
             {
                 //
                 //  This file type is defined and
                 //  it is not set to use default player
                 //
-                player = a_query.value(0).toString();                
+                player = query.value(0).toString();                
             }
         }
 
@@ -973,23 +970,22 @@ QString VideoTree::getHandler(Metadata *someItem)
         
         QString extension = filename.section(".", -1, -1);
 
-        QString q_string = QString("SELECT playcommand, use_default FROM "
-                                   "videotypes WHERE extension = \"%1\" ;")
-                                   .arg(extension);
+        QSqlQuery query(QString::null, db);
+        query.prepare("SELECT playcommand, use_default FROM "
+                      "videotypes WHERE extension = :EXT ;");
+        query.bindValue(":EXT", extension);
 
-        QSqlQuery a_query(q_string, db);
-    
-        if(a_query.isActive() && a_query.numRowsAffected() > 0)
+        if(query.exec() && query.isActive() && query.size() > 0)
         {
-            a_query.next();
-            if(!a_query.value(1).toBool())
+            query.next();
+            if(!query.value(1).toBool())
             {
                 //
                 //  This file type is defined and
                 //  it is not set to use default player
                 //
 
-                handler = a_query.value(0).toString();                
+                handler = query.value(0).toString();                
             }
         }
     }

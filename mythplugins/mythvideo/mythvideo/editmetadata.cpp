@@ -1,9 +1,9 @@
 /*
-	editmetadata.cpp
+    editmetadata.cpp
 
-	(c) 2003 Thor Sigvaldason, Isaac Richards, and ?? ??
-	Part of the mythTV project
-	
+    (c) 2003 Thor Sigvaldason, Isaac Richards, and ?? ??
+    Part of the mythTV project
+    
 
 */
 
@@ -13,12 +13,12 @@
 
 
 EditMetadataDialog::EditMetadataDialog(QSqlDatabase *ldb,
-                                 Metadata *source_metadata,
-                                 MythMainWindow *parent, 
-                                 QString window_name,
-                                 QString theme_filename,
-                                 const char* name)
-                :MythThemedDialog(parent, window_name, theme_filename, name)
+                                       Metadata *source_metadata,
+                                       MythMainWindow *parent, 
+                                       QString window_name,
+                                       QString theme_filename,
+                                       const char* name)
+                  : MythThemedDialog(parent, window_name, theme_filename, name)
 {
     //
     //  The only thing this screen does is let the
@@ -57,18 +57,18 @@ void EditMetadataDialog::fillWidgets()
     if (category_select)
     {
         category_select->addItem(0,"Unknown");
-	    QString q_string = QString("SELECT intid, category FROM videocategory"
+        QString q_string = QString("SELECT intid, category FROM videocategory"
                                    " ORDER BY category");
         QSqlQuery a_query(q_string,db);
         if (a_query.isActive())
         {
             while (a_query.next())
-	        {
-		        category_select->addItem(a_query.value(0).toInt(),
-					                     a_query.value(1).toString());
-	        }
-	    }
-	    category_select->setToItem(working_metadata->getIdCategory(db));
+            {
+                QString cat = QString::fromUtf8(a_query.value(1).toString());
+                category_select->addItem(a_query.value(0).toInt(), cat);
+            }
+        }
+        category_select->setToItem(working_metadata->getIdCategory(db));
     }
     if(level_select)
     {
@@ -91,12 +91,13 @@ void EditMetadataDialog::fillWidgets()
         child_select->addItem(0, tr("None"));
 
         QString q_string = QString("SELECT intid, title FROM videometadata "
-					"ORDER BY title ;");
+                                   "ORDER BY title ;");
         QSqlQuery a_query(q_string, db);
-        if(a_query.isActive() && a_query.numRowsAffected() > 0)
+        if(a_query.isActive() && a_query.size() > 0)
         {
             while(a_query.next())
             {
+                QString query_name = QString::fromUtf8(a_query.value(1).toString());
                 if(trip_catch)
                 {
                     //
@@ -105,7 +106,7 @@ void EditMetadataDialog::fillWidgets()
                     //  set a default starting point.
                     //
             
-                    QString target_name = a_query.value(1).toString();
+                    QString target_name = query_name;
                     int length_compare = 0;
                     if(target_name.length() < caught_name.length())
                     {
@@ -129,7 +130,7 @@ void EditMetadataDialog::fillWidgets()
                 if(a_query.value(0).toUInt() != working_metadata->ID())
                 {
                     child_select->addItem(a_query.value(0).toInt(),
-                                          a_query.value(1).toString());
+                                          query_name);
                 }
                 else
                 {
@@ -139,7 +140,7 @@ void EditMetadataDialog::fillWidgets()
                     //
 
                     trip_catch = true;
-                    caught_name = a_query.value(1).toString();
+                    caught_name = query_name;
                 }
             }
         }
@@ -218,7 +219,7 @@ void EditMetadataDialog::keyPressEvent(QKeyEvent *e)
                 if (getCurrentFocusWidget() == category_select)
                 {
                     category_select->push(false);
-		    something_pushed = true;
+                    something_pushed = true;
                 }
             }
             if (level_select)
@@ -275,38 +276,38 @@ void EditMetadataDialog::keyPressEvent(QKeyEvent *e)
             }
         }
         else if (action == "SELECT")
-	{
-	    something_pushed = false;
+        {
+            something_pushed = false;
             if (category_select)
             {
                 if (getCurrentFocusWidget() == category_select)
                 {
-		    QString category = QString("");
-		    bool ok = false;
-		    MythInputDialog	*newcategory = new MythInputDialog(
-				QObject::tr("New category"),
-				&ok,
-				&category,
-				gContext->GetMainWindow());
-		    newcategory->exec();
-		    delete newcategory;	
+                    QString category = QString("");
+                    bool ok = false;
+                    MythInputDialog    *newcategory = new MythInputDialog(
+                                    QObject::tr("New category"),
+                                    &ok,
+                                    &category,
+                                    gContext->GetMainWindow());
+                    newcategory->exec();
+                    delete newcategory;    
 
-		    if (ok)
-		    {
-			working_metadata->setCategory(category);
-			int id = working_metadata->getIdCategory(db);
-			category_select->addItem(id, category);
-			category_select->setToItem(id);
-		    }
+                    if (ok)
+                    {
+                        working_metadata->setCategory(category);
+                        int id = working_metadata->getIdCategory(db);
+                        category_select->addItem(id, category);
+                        category_select->setToItem(id);
+                    }
                     something_pushed = true;
                 }
             }
-	
-	    if (!something_pushed)
-	    {
-        	activateCurrent();
-	    }
-	}
+    
+            if (!something_pushed)
+            {
+                activateCurrent();
+            }
+        }
         else if (action == "0")
         {    
             if (done_button)
@@ -348,7 +349,7 @@ void EditMetadataDialog::saveAndExit()
     done(0);
 }
 
-void EditMetadataDialog::setTitle(QString new_title)
+void EditMetadataDialog::setTitle(const QString &new_title)
 {
     working_metadata->setTitle(new_title);
 }
@@ -358,7 +359,7 @@ void EditMetadataDialog::setCategory(int new_category)
     working_metadata->setIdCategory(db, new_category);
 }
 
-void EditMetadataDialog::setPlayer(QString new_command)
+void EditMetadataDialog::setPlayer(const QString &new_command)
 {
     working_metadata->setPlayCommand(new_command);
 }
@@ -577,14 +578,14 @@ void MythInputDialog::keyPressEvent(QKeyEvent *e)
                 handled = true;
                 MythDialog::keyPressEvent(e);
             }
-	    else if (action == "SELECT")
-	    {
-		*success_flag = true;
-		*target_text = QString(text_editor->text());
-		handled = true;
-		MythDialog::keyPressEvent(e);
-		done(0);
-	    }
+            else if (action == "SELECT")
+            {
+                *success_flag = true;
+                *target_text = QString(text_editor->text());
+                handled = true;
+                MythDialog::keyPressEvent(e);
+                done(0);
+            }
         }
     }
 }

@@ -87,25 +87,25 @@ bool Metadata::Remove(QSqlDatabase *db)
                         " WHERE idvideo = %d",id);
         QSqlQuery query(thequery,db);
         if (!query.isActive()){
-                cerr << "metadata.o: The following metadata update failed :" << thequery << endl;
+            MythContext::DBError("delete from videometadatagenre", query);
         }
         thequery.sprintf("DELETE FROM videometadatacountry "
                         " WHERE idvideo = %d",id);
         query.exec(thequery);
         if (!query.isActive()){
-                cerr << "metadata.o: The following metadata update failed :" << thequery << endl;
+            MythContext::DBError("delete from videometadatacountry", query);
         }
         thequery.sprintf("DELETE FROM videometadata "
                         " WHERE intid = %d",id);
         query.exec(thequery);
         if (!query.isActive()){
-                cerr << "metadata.o: The following metadata update failed :" << thequery << endl;
+            MythContext::DBError("delete from videometadata", query);
         }
         thequery = QString("DELETE FROM filemarkup WHERE filename = '%1'")
                            .arg(filename);
         query.exec(thequery);
         if (!query.isActive()){
-                cerr << "metadata.o: The following metadata update failed :" << thequery << endl;
+            MythContext::DBError("delete from filemarkup", query);
         }
 
     }
@@ -118,111 +118,78 @@ bool Metadata::Remove(QSqlDatabase *db)
 
 void Metadata::fillCategory(QSqlDatabase *db)
 {
-    QString thequery;
-    thequery.sprintf("SELECT videocategory.category"
-                    " FROM videometadata INNER JOIN videocategory"
-                    " ON videometadata.category = videocategory.intid"
-                    " WHERE videometadata.intid = %d",id);
-    QSqlQuery query(thequery,db);
-    if (query.isActive())
-    {
-        if (query.numRowsAffected()>0)
-        {
-                query.next();
-                category = query.value(0).toString();
-        }
-    }
-    else
-    {
-            cerr << "metadata.o : SELECT Failed : " << thequery << endl;
-    }
+    QSqlQuery query(QString::null, db);
+    query.prepare("SELECT videocategory.category"
+                  " FROM videometadata INNER JOIN videocategory"
+                  " ON videometadata.category = videocategory.intid"
+                  " WHERE videometadata.intid = :ID ;");
+    query.bindValue(":ID", id);
 
+    if (query.exec() && query.isActive() && query.size()>0)
+    {
+        query.next();
+        category = QString::fromUtf8(query.value(0).toString());
+    }
 }
+
 void Metadata::fillGenres(QSqlDatabase *db)
 {
-    QString thequery;
-    thequery.sprintf("SELECT genre"
-                    " FROM videometadatagenre INNER JOIN videogenre"
-                    " ON videometadatagenre.idgenre = videogenre.intid"
-                    " WHERE idvideo=%d",id);
-    QSqlQuery query(thequery,db);
+    QSqlQuery query(QString::null, db);
+    query.prepare("SELECT genre"
+                  " FROM videometadatagenre INNER JOIN videogenre"
+                  " ON videometadatagenre.idgenre = videogenre.intid"
+                  " WHERE idvideo= :ID ;");
+    query.bindValue(":ID", id);
     genres.clear();
-    if (query.isActive() && query.numRowsAffected()>1)
+    if (query.exec() && query.isActive() && query.size()>0)
     {
         while(query.next())
         {
-            genres.append(query.value(0).toString());
+            genres.append(QString::fromUtf8(query.value(0).toString()));
         }
     }
 }
 
 void Metadata::fillCountries(QSqlDatabase *db)
 {
-    QString thequery;
-    thequery.sprintf("SELECT country" 
-                    " FROM videometadatacountry INNER JOIN videocountry"
-                    " ON videometadatacountry.idcountry = videocountry.intid"
-                    " WHERE idvideo=%d",id);
-    QSqlQuery query(thequery,db);
+    QSqlQuery query(QString::null, db);
+    query.prepare("SELECT country" 
+                  " FROM videometadatacountry INNER JOIN videocountry"
+                  " ON videometadatacountry.idcountry = videocountry.intid"
+                  " WHERE idvideo= :ID ;");
+    query.bindValue(":ID", id);
     countries.clear();
-    if (query.isActive() && query.numRowsAffected() > 1)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         while(query.next())
         {
-            countries.append(query.value(0).toString());
+            countries.append(QString::fromUtf8(query.value(0).toString()));
         }
     }
 
 }
 
-bool Metadata::fillData(QSqlDatabase *db)
+bool Metadata::fillDataFromFilename(QSqlDatabase *db)
 {
-    if (title == "")
+    if (filename == "")
         return false;
 
-    QString thequery = "SELECT title,director,plot,rating,year,userrating,"
-                       "length,filename,showlevel,intid,coverfile,inetref,"
-                       "childid, browse, playcommand FROM videometadata WHERE title=\"" + 
-                        title + "\"";
+    QSqlQuery query(QString::null, db);
+    query.prepare("SELECT intid FROM videometadata WHERE filename = :FILE ;");
+    query.bindValue(":FILE", filename.utf8());
 
-    if (director != "")
-        thequery += " AND director=\"" + director + "\"";
-    if (plot != "")
-        thequery += " AND plot=\"" + plot + "\"";
-
-    thequery += ";";
-
-    QSqlQuery query = db->exec(thequery);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
 
-        title = QString::fromUtf8(query.value(0).toString());
-        director = QString::fromUtf8(query.value(1).toString());
-        plot = QString::fromUtf8(query.value(2).toString());
-        rating = QString::fromUtf8(query.value(3).toString());
-        year = query.value(4).toInt();
-        userrating = (float)query.value(5).toDouble();
-        if (isnan(userrating)) 
-            userrating = 0.0;
-        if (userrating < -10.0 || userrating >= 10.0)
-            userrating = 0.0;
-        length = query.value(6).toInt();
-        filename = QString::fromUtf8(query.value(7).toString());
-        showlevel = query.value(8).toInt();
-        id = query.value(9).toUInt();
-        coverfile = QString::fromUtf8(query.value(10).toString());
-        inetref = QString::fromUtf8(query.value(11).toString());
-        childID = query.value(12).toUInt();
-        browse = query.value(13).toBool();
-        playcommand = query.value(14).toString();
-    return true;
+        id = query.value(0).toInt();
+
+        return fillDataFromID(db);
     }
-    else
-    {
-        return false;
-    }
+
+    MythContext::DBError("fillfromfilename", query);
+
+    return false;
 }
 
 bool Metadata::fillDataFromID(QSqlDatabase *db)
@@ -230,18 +197,15 @@ bool Metadata::fillDataFromID(QSqlDatabase *db)
     if (id == 0)
         return false; 
         
-    
-    QString thequery;
-    thequery = QString("SELECT title,director,plot,rating,year,userrating,"
-                       "length,filename,showlevel,coverfile,inetref,childid,"
-                       "browse,playcommand, videocategory.category "
-                       " FROM videometadata LEFT JOIN videocategory"
-                       " ON videometadata.category = videocategory.intid"
-                       "  WHERE videometadata.intid=%1;")
-                       .arg(id);
-    QSqlQuery query = db->exec(thequery);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
+    QSqlQuery query(QString::null, db); 
+    query.prepare("SELECT title,director,plot,rating,year,userrating,"
+                  "length,filename,showlevel,coverfile,inetref,childid,"
+                  "browse,playcommand, videocategory.category "
+                  " FROM videometadata LEFT JOIN videocategory"
+                  " ON videometadata.category = videocategory.intid"
+                  "  WHERE videometadata.intid= :ID ;");
+    query.bindValue(":ID", id);
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
 
@@ -271,67 +235,11 @@ bool Metadata::fillDataFromID(QSqlDatabase *db)
         //Countries
         fillCountries(db);
 
-    return true;
+        return true;
     }
-    else
-    {
-        cerr << "metadata.o : SELECT by id failed : " << thequery << endl;
+
+    MythContext::DBError("fillfromid", query);
     return false;
-    }
-}
-
-bool Metadata::fillDataFromFilename(QSqlDatabase *db)
-{       
-    if (filename == "")
-        return false; 
-        
-    
-    QString thequery;
-    thequery = QString("SELECT videometadata.intid,title,director,plot"
-               ",rating,year,userrating,length,showlevel,coverfile"
-               ",inetref,childid,browse,playcommand"
-               ", videocategory.category "
-                       " FROM videometadata LEFT JOIN videocategory"
-                       " ON videometadata.category = videocategory.intid"
-                       "  WHERE videometadata.filename='%1';")
-                       .arg(filename.utf8());
-    QSqlQuery query = db->exec(thequery);
-    if (query.isActive() && query.numRowsAffected() > 0)
-    {
-        query.next();
-
-    id = query.value(0).toInt();
-        title = QString::fromUtf8(query.value(1).toString());
-        director = QString::fromUtf8(query.value(2).toString());
-        plot = QString::fromUtf8(query.value(3).toString());
-        rating = query.value(4).toString();
-        year = query.value(5).toInt();
-        userrating = (float)query.value(6).toDouble();
-        if (isnan(userrating)) 
-            userrating = 0.0;
-        if (userrating < -10.0 || userrating >= 10.0)
-            userrating = 0.0;
-        length = query.value(7).toInt();
-        showlevel = query.value(8).toInt();
-        coverfile = QString::fromUtf8(query.value(9).toString());
-        inetref = QString::fromUtf8(query.value(10).toString());
-        childID = query.value(11).toUInt();
-        browse = query.value(12).toBool();
-        playcommand = query.value(13).toString();
-        category = query.value(14).toString();
-
-    // Genres
-        fillGenres(db);
-    
-        //Countries
-        fillCountries(db);
-    return true;
-    }
-    else
-    {
-        cerr << "metadata.o : SELECT by filename failed : " << thequery << endl;
-    return false;
-    }
 }
 
 void Metadata::dumpToDatabase(QSqlDatabase *db)
@@ -358,45 +266,44 @@ void Metadata::dumpToDatabase(QSqlDatabase *db)
         browse = false;
     }
 
-    title.replace(QRegExp("\""), QString("\\\""));
-    director.replace(QRegExp("\""), QString("\\\""));
-    plot.replace(QRegExp("\""), QString("\\\""));
-    rating.replace(QRegExp("\""), QString("\\\""));
+    if (isnan(userrating))
+        userrating = 0.0;
+    if (userrating < -10.0 || userrating >= 10.0)
+        userrating = 0.0;
 
-    QString sqlfilename = filename;
-    sqlfilename.replace(QRegExp("\""), QString("\\\""));
-
-    QString sqlcoverfile = coverfile;
-    sqlcoverfile.replace(QRegExp("\""), QString("\\\""));
-
-    QString thequery;
-    thequery.sprintf("INSERT INTO videometadata (title,director,plot,"
-                     "rating,year,userrating,length,filename,showlevel,"
-                     "coverfile,inetref,browse) VALUES "
-                     "(\"%s\",\"%s\",\"%s\",\"%s\",%d,%f,%d,\"%s\",%d,\"%s\","
-                     "\"%s\", %d);",
-                     title.utf8().data(), director.utf8().data(),
-                     plot.utf8().data(), rating.utf8().data(), year,
-                     userrating, length, sqlfilename.utf8().data(), showlevel,
-                     sqlcoverfile.utf8().data(), inetref.utf8().data(),browse);
+    QSqlQuery a_query(QString::null, db);
+    a_query.prepare("INSERT INTO videometadata (title,director,plot,"
+                    "rating,year,userrating,length,filename,showlevel,"
+                    "coverfile,inetref,browse) VALUES (:TITLE, :DIRECTOR, "
+                    ":PLOT, :RATING, :YEAR, :USERRATING, :LENGTH, "
+                    ":FILENAME, :SHOWLEVEL, :COVERFILE, :INETREF, "
+                    ":BROWSE );");
+    a_query.bindValue(":TITLE", title.utf8());
+    a_query.bindValue(":DIRECTOR", director.utf8());
+    a_query.bindValue(":PLOT", plot.utf8());
+    a_query.bindValue(":RATING", rating.utf8());
+    a_query.bindValue(":YEAR", year);
+    a_query.bindValue(":USERRATING", userrating);
+    a_query.bindValue(":LENGTH", length);
+    a_query.bindValue(":FILENAME", filename.utf8());
+    a_query.bindValue(":SHOWLEVEL", showlevel);
+    a_query.bindValue(":COVERFILE", coverfile.utf8()); 
+    a_query.bindValue(":INETREF", inetref.utf8());
+    a_query.bindValue(":BROWSE", browse);
     
     
-    
-    QSqlQuery a_query(thequery, db);
-
-    if (!a_query.isActive() || a_query.numRowsAffected() < 1)
+    if (!a_query.exec() || !a_query.isActive())
     {
-        cerr << "metadata.o: The following metadata insert failed :" << thequery << endl;
+        MythContext::DBError("Write video metadata", a_query);
         return;
     }
 
     // Must make sure we have 'id' filled before we call updateGenres or updateCountries
-    thequery = "SELECT LAST_INSERT_ID();";
-    a_query.exec(thequery);
+    a_query.exec("SELECT LAST_INSERT_ID();");
 
-    if (!a_query.isActive() || a_query.numRowsAffected() < 1)
+    if (!a_query.isActive() || a_query.size() < 1)
     {
-        cerr << "metadata.o: The following metadata id retreval failed :" << thequery << endl;
+        MythContext::DBError("metadata id get", a_query);
         return;      
     }      
 
@@ -483,37 +390,37 @@ void Metadata::updateDatabase(QSqlDatabase *db)
     if (inetref == "")
         inetref = "00000000";
 
-    title.replace(QRegExp("\""), QString("\\\""));
-    director.replace(QRegExp("\""), QString("\\\""));
-    plot.replace(QRegExp("\""), QString("\\\""));
-    rating.replace(QRegExp("\""), QString("\\\""));
-    playcommand.replace(QRegExp("\""), QString("\\\""));
-    QString sqlfilename = filename;
-    sqlfilename.replace(QRegExp("\""), QString("\\\""));
-
-    QString sqlcoverfile = coverfile;
-    sqlcoverfile.replace(QRegExp("\""), QString("\\\""));
-
     int idCategory = getIdCategory(db);
 
-    QString thequery;
-    thequery.sprintf("UPDATE videometadata SET title=\"%s\",director=\"%s\","
-                     "plot=\"%s\",rating=\"%s\",year=%d,userrating=%f,"
-                     "length=%d,filename=\"%s\",showlevel=%d,coverfile=\"%s\","
-                     "inetref=\"%s\",browse=%d,playcommand=\"%s\",childid=%d,"
-                     "category=%d"
-                     " WHERE intid=%d",
-                     title.utf8().data(), director.utf8().data(),
-                     plot.utf8().data(), rating.utf8().data(), year,
-                     userrating, length, sqlfilename.utf8().data(), showlevel,
-                     sqlcoverfile.utf8().data(), inetref.utf8().data(), browse,
-                     playcommand.utf8().data(), childID, idCategory, id);
+    QSqlQuery query(QString::null, db);
+    query.prepare("UPDATE videometadata SET title = :TITLE, "
+                  "director = :DIRECTOR, plot = :PLOT, rating= :RATING, "
+                  "year = :YEAR, userrating = :USERRATING, length = :LENGTH, "
+                  "filename = :FILENAME, showlevel = :SHOWLEVEL, "
+                  "coverfile = :COVERFILE, inetref = :INETREF, "
+                  "browse = :BROWSE, playcommand = :PLAYCOMMAND, "
+                  "childid = :CHILDID, category = :CATEGORY "
+                  "WHERE intid = :INTID");
+    query.bindValue(":TITLE", title.utf8());
+    query.bindValue(":DIRECTOR", director.utf8());
+    query.bindValue(":PLOT", plot.utf8());
+    query.bindValue(":RATING", rating.utf8());
+    query.bindValue(":YEAR", year);
+    query.bindValue(":USERRATING", userrating);
+    query.bindValue(":LENGTH", length);
+    query.bindValue(":FILENAME", filename.utf8());
+    query.bindValue(":SHOWLEVEL", showlevel);
+    query.bindValue(":COVERFILE", coverfile.utf8());
+    query.bindValue(":INETREF", inetref.utf8());
+    query.bindValue(":BROWSE", browse);
+    query.bindValue(":PLAYCOMMAND", playcommand.utf8());
+    query.bindValue(":CHILDID", childID);
+    query.bindValue(":CATEGORY", idCategory);
+    query.bindValue(":INTID", id);
 
-    QSqlQuery a_query(thequery, db);
-    if(!a_query.isActive())
+    if(!query.exec() || !query.isActive())
     {
-        
-        cerr << "metadata.o: The following metadata update failed: " << thequery << endl;
+        MythContext::DBError("video metadata update", query);
     }
     updateGenres(db);
     updateCountries(db);
@@ -524,35 +431,34 @@ int Metadata::getIdCategory(QSqlDatabase *db)
     int idcategory = 0;
     if (category != "")
     {
-        QString thequery;
-        thequery.sprintf("SELECT intid FROM videocategory"
-                        " WHERE category like \"%s\"",category.utf8().data());
-        QSqlQuery a_query(thequery,db);
-        if (a_query.isActive() && a_query.numRowsAffected()>0)
+        QSqlQuery query(QString::null, db);
+        query.prepare("SELECT intid FROM videocategory"
+                      " WHERE category like :CATEGORY ;");
+        query.bindValue(":CATEGORY" ,category.utf8());
+
+        if (query.exec() && query.isActive() && query.size()>0)
         {
-            a_query.next();
-            idcategory = a_query.value(0).toInt();
+            query.next();
+            idcategory = query.value(0).toInt();
         }
         else
         {
-            thequery.sprintf("INSERT INTO videocategory (category)"
-                             " VALUES (\"%s\");", category.utf8().data());
-            a_query.exec(thequery);
-            if (a_query.isActive() && a_query.numRowsAffected()>0)
+            query.prepare("INSERT INTO videocategory (category) "
+                          "VALUES (:CATEGORY );");
+            query.bindValue(":CATEGORY", category.utf8());
+            if (query.exec() && query.isActive())
             {
-                thequery.sprintf("SELECT intid"
-                                " FROM videocategory"
-                                " WHERE category like \"%s\"",
-                                category.utf8().data());
-                a_query.exec(thequery);
-                if (a_query.isActive() && 
-                        a_query.numRowsAffected()>0)
+                query.prepare("SELECT intid FROM videocategory"
+                              " WHERE category like :CATEGORY ;");
+                query.bindValue(":CATEGORY" ,category.utf8());
+
+                if (query.exec() && query.isActive() && query.size()>0)
                 {
-                        a_query.next();
-                        idcategory = a_query.value(0).toInt();
+                    query.next();
+                    idcategory = query.value(0).toInt();
                 }
                 else
-                    cerr << "metadata.o : SELECT Failed : " << thequery << endl;
+                    MythContext::DBError("get category id", query);
             }
         }
     }
@@ -563,165 +469,145 @@ int Metadata::getIdCategory(QSqlDatabase *db)
 void Metadata::setIdCategory(QSqlDatabase *db, int id)
 {
     if (id==0)
-            category = "";
+        category = "";
     else 
     {
-        QString thequery;
-        thequery.sprintf("SELECT category FROM videocategory"
-                        " WHERE intid = \"%d\"",id);
-        QSqlQuery a_query(thequery,db);
-        if (a_query.isActive() && a_query.numRowsAffected()>0)
+        QSqlQuery query(QString::null, db);
+        query.prepare("SELECT category FROM videocategory"
+                      " WHERE intid = :ID;");
+        query.bindValue(":ID", id);
+
+        if (query.exec() && query.isActive() && query.size()>0)
         {
-            a_query.next();
-            category = a_query.value(0).toString();
+            query.next();
+            category = QString::fromUtf8(query.value(0).toString());
         }
     }
-    
 }
 
 void Metadata::updateGenres(QSqlDatabase *db)
 {
-    QString thequery;
-    //remove genres  for this video
-    thequery.sprintf("DELETE FROM videometadatagenre where idvideo=%d",id);
-    QSqlQuery a_query(thequery,db);
-    if (!a_query.isActive())
-    {
-        cerr << "metadata.o: The following metadata update failed :" << thequery << endl;
-    }
+    QSqlQuery query(QString::null, db);
+    query.prepare("DELETE FROM videometadatagenre where idvideo = :ID;");
+    query.bindValue(":ID", id);
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("delete videometadatagenre", query);
+
     QStringList::Iterator genre;
     for (genre = genres.begin() ; genre != genres.end() ; ++genre)
     {
         // Search id of genre
-        thequery.sprintf("SELECT intid FROM videogenre where genre like \"%s\";",(*genre).utf8().data());
-        a_query.exec(thequery);
+        query.prepare("SELECT intid FROM videogenre where genre like :GENRE ;");
+        query.bindValue(":GENRE", (*genre).utf8());
+
         int idgenre=0;
-        if (a_query.isActive())
+
+        if (query.exec() && query.isActive())
         {
-            if (a_query.numRowsAffected()>0)
+            if (query.size()>0)
             {
-                a_query.next();
-                idgenre = a_query.value(0).toInt();
+                query.next();
+                idgenre = query.value(0).toInt();
             }
             else
             {
-                //We must add a new genre
-                thequery.sprintf("INSERT INTO videogenre (genre) VALUES (\"%s\");",
-                                 (*genre).utf8().data());
-                a_query.exec(thequery);
-                if (a_query.isActive() && a_query.numRowsAffected() > 0)
+                // We must add a new genre
+
+                query.prepare("INSERT INTO videogenre (genre) VALUES (:GENRE);");
+                query.bindValue(":GENRE", (*genre).utf8());
+                if (query.exec() && query.isActive() && query.numRowsAffected() > 0)
                 {
                     //search the new idgenre
-                    thequery = "SELECT LAST_INSERT_ID();";
-                    a_query.exec(thequery);
-                    if (a_query.isActive())
+                    query.prepare("SELECT LAST_INSERT_ID();");
+                    if (query.exec() && query.isActive() && query.size() > 0)
                     {
-                        if (a_query.numRowsAffected()>0)
-                        {
-                            a_query.next();
-                            idgenre=a_query.value(0).toInt();
-                        }
+                        query.next();
+                        idgenre=query.value(0).toInt();
                     }
                     else
-                    {
-                        cerr << "metadata.o : The following id retreval failed : " << thequery << endl;
-                    }
+                        MythContext::DBError("insert genre", query);
                 }
                 else
-                {
-                    cerr << "metadata.o : The Following insert failed" << thequery << endl;
-                }
+                    MythContext::DBError("insert genre 0", query);
             }
         }
         else
-        {
-        cerr << "metadata.o : The Following search failed : "<< thequery << endl;
-        }
+            MythContext::DBError("search genre", query);
         
         if (idgenre>0)
         {
             // add current genre for this video
-            thequery.sprintf("INSERT INTO videometadatagenre (idvideo, idgenre) "
-                             "VALUES (%d,\"%d\")",id, idgenre);
-            a_query.exec(thequery);
-            if (!a_query.isActive())
-            {
-            cerr << "metadata.o: The following metadata update failed :" << thequery << endl;
-            }
+            query.prepare("INSERT INTO videometadatagenre (idvideo, idgenre) "
+                          "VALUES (:ID,:GENREID);");
+            query.bindValue(":ID", id);
+            query.bindValue(":GENREID", idgenre);
+            if (!query.exec() && !query.isActive())
+                MythContext::DBError("metadatagenre insert", query);
         }
     }
 }
 
 void Metadata::updateCountries(QSqlDatabase *db)
 {
-    QString thequery;
     //remove countries for this video
-    thequery.sprintf("DELETE FROM videometadatacountry where idvideo=%d",id);
-    QSqlQuery a_query(thequery,db);
-    if (!a_query.isActive())
-    {
-        cerr << "metadata.o: The following metadata update failed :" << thequery << endl;
-    }
+
+    QSqlQuery query(QString::null, db);
+    query.prepare("DELETE FROM videometadatacountry where idvideo = :ID;");
+    query.bindValue(":ID", id);
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("delete videometadatacountry", query);
+
     QStringList::Iterator country;
     for (country = countries.begin() ; country != countries.end() ; ++country)
     {
         // Search id of country
-        thequery.sprintf("SELECT intid FROM videocountry where country "
-                         "like \"%s\";",(*country).utf8().data());
-        a_query.exec(thequery);
+        query.prepare("SELECT intid FROM videocountry WHERE "
+                      " country LIKE :COUNTRY ;");
+        query.bindValue(":COUNTRY", (*country).utf8());
+
         int idcountry=0;
-        if (a_query.isActive())
+        if (query.exec() && query.isActive())
         {
-            if (a_query.numRowsAffected()>0)
+            if (query.size()>0)
             {
-                a_query.next();
-                idcountry = a_query.value(0).toInt();
+                query.next();
+                idcountry = query.value(0).toInt();
             }
             else
             {
-                //We must add a new country
-                thequery.sprintf("INSERT INTO videocountry (country) "
-                                 "VALUES (\"%s\");",(*country).utf8().data());
-                a_query.exec(thequery);
-                if (a_query.isActive() && a_query.numRowsAffected() > 0)
+                //We must add a new countrya
+
+                query.prepare("INSERT INTO videocountry (country) "
+                              "VALUES (:COUNTRY);");
+                query.bindValue(":COUNTRY", (*country).utf8());
+                if (query.exec() && query.isActive() && query.numRowsAffected()> 0)
                 {
-                    //search the new idcountry
-                    thequery = "SELECT LAST_INSERT_ID();";
-                    a_query.exec(thequery);
-                    if (a_query.isActive())
+                    //search the new idgenre
+                    query.prepare("SELECT LAST_INSERT_ID();");
+                    if (query.exec() && query.isActive() && query.size() > 0)
                     {
-                        if (a_query.numRowsAffected()>0)
-                        {
-                                a_query.next();
-                                idcountry=a_query.value(0).toInt();
-                        }
+                        query.next();
+                        idcountry=query.value(0).toInt();
                     }
                     else
-                    {
-                        cerr << "metadata.o : The following id retreval failed : " << thequery << endl;
-                    }
+                        MythContext::DBError("insert country", query);
                 }
                 else
-                {
-                    cerr << "metadata.o : The Following insert failed" << thequery << endl;
-                }
+                    MythContext::DBError("insert country 0", query);
             }
         }
         else
-        {
-            cerr << "metadata.o : The Following search failed : "<< thequery << endl;
-        }
-        
+            MythContext::DBError("search genre", query);
+
         if (idcountry>0)
         {
             // add current country for this video
-            thequery.sprintf("INSERT INTO videometadatacountry (idvideo, idcountry) "
-                             "VALUES (%d,\"%d\")",id, idcountry);
-            a_query.exec(thequery);
-            if (!a_query.isActive())
-            {
-            cerr << "metadata.o: The following metadata update failed :" << thequery << endl;
-            }
+            query.prepare("INSERT INTO videometadatacountry (idvideo, idgenre) "
+                          "VALUES (:ID,:COUNTRYID);");
+            query.bindValue(":ID", id);
+            query.bindValue(":COUNTRYID", idcountry);
+            if (!query.exec() && !query.isActive())
+                MythContext::DBError("metadatacountry insert", query);
         }
     }
 }

@@ -75,41 +75,31 @@ void FileAssociation::saveYourself()
             //  This one existed before, just need to
             //  save its changes.
             //
-            
-            QString q_string = QString( "UPDATE videotypes "
-                                        "set playcommand = \"%1\", "
-                                        "f_ignore = %2, "
-                                        "use_default = %3 "
-                                        "WHERE intid = %4 ;")
-                                      .arg(player_command)
-                                      .arg(ignore)
-                                      .arg(use_default)
-                                      .arg(id);
-            QSqlQuery a_query(q_string, db);
-            if(!a_query.isActive() || !a_query.numRowsAffected() > 0)
-            {
-                if(!a_query.isActive())
-                {
-                    cerr << "fileassoc.o: problem saving file association with this SQL: " << q_string << endl;
-                }
-            }
+
+            QSqlQuery query(QString::null, db);
+            query.prepare("UPDATE videotypes SET playcommand = :COMMAND, "
+                          "f_ignore = :IGNORE, use_default = :DEFAULT "
+                          "WHERE intid = :ID ;");
+            query.bindValue(":COMMAND", player_command);
+            query.bindValue(":IGNORE", ignore);
+            query.bindValue(":DEFAULT", use_default);
+            query.bindValue(":ID", id);
+            if (!query.exec() && !query.isActive())
+                MythContext::DBError("videotypes update", query);
         }
         else
         {
-            QString q_string = QString( "INSERT INTO videotypes "
-                                        "(extension, playcommand, f_ignore, use_default) "
-                                        "VALUES "
-                                        "(\"%1\", \"%2\", %3, %4) ;")
-                                      .arg(extension)
-                                      .arg(player_command)
-                                      .arg(ignore)
-                                      .arg(use_default);
-            QSqlQuery a_query(q_string, db);
-            if(!a_query.isActive() || !a_query.numRowsAffected() > 0)
-            {
-                cerr << "fileassoc.o: problem creating file association with this SQL: " << q_string << endl;
-            }
-            
+            QSqlQuery query(QString::null, db);
+            query.prepare("INSERT INTO videotypes "
+                          "(extension, playcommand, f_ignore, use_default) "
+                          "VALUES (:EXT, :COMMAND, :IGNORE, :DEFAULT) ;");
+            query.bindValue(":EXT", extension);
+            query.bindValue(":COMMAND", player_command);
+            query.bindValue(":IGNORE", ignore);
+            query.bindValue(":DEFAULT", use_default);
+
+            if(!query.exec() && !query.isActive())
+                MythContext::DBError("videotypes insert", query);
         }
     }
 }
@@ -118,13 +108,11 @@ void FileAssociation::deleteYourselfFromDB()
 {
     if(loaded_from_db)
     {
-        QString q_string = QString("DELETE FROM videotypes WHERE intid = %1 ;")
-                                  .arg(id);
-        QSqlQuery a_query(q_string, db);
-        if(!a_query.isActive() || !a_query.numRowsAffected() > 0)
-        {
-            cerr << "fileassoc.o: problem deleting file association with this SQL: " << q_string << endl;
-        }
+        QSqlQuery query(QString::null, db);
+        query.prepare("DELETE FROM videotypes WHERE intid = :ID ;");
+        query.bindValue(":ID", id);
+        if(!query.exec())
+            MythContext::DBError("delete videotypes", query);
     }
 }
 
@@ -249,7 +237,7 @@ void FileAssocDialog::loadFileAssociations()
                                "FROM videotypes ;");
     
     QSqlQuery a_query(q_string, db);
-    if(a_query.isActive() && a_query.numRowsAffected() > 0)
+    if(a_query.isActive() && a_query.size() > 0)
     {
         while(a_query.next())
         {

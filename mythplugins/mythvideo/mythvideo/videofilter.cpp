@@ -234,7 +234,7 @@ void VideoFilterDialog::update_numvideo()
     
     if (numvideos_text)
     {
-        QString select = QString("SELECT * FROM ");
+        QString select = QString("SELECT NULL FROM ");
         QString from = currentSettings->BuildClauseFrom();
         QString where = currentSettings->BuildClauseWhere();
         QString q_string = QString("%1 %2 %3")
@@ -242,11 +242,11 @@ void VideoFilterDialog::update_numvideo()
         
         QSqlQuery a_query(q_string,db);
         
-        if((a_query.isActive()) && (a_query.numRowsAffected()>0))
+        if((a_query.isActive()) && (a_query.size()>0))
         {
             numvideos_text->SetText(
                     QString(tr("Result of this filter : %1 video(s)"))
-                            .arg(a_query.numRowsAffected()));
+                            .arg(a_query.size()));
         }
         else
         {
@@ -264,12 +264,12 @@ void VideoFilterDialog::fillWidgets()
         QString q_string = QString("SELECT intid, category FROM videocategory "
                                    "ORDER BY category");
         QSqlQuery a_query(q_string,db);
-        if (a_query.isActive() && a_query.numRowsAffected()>0)
+        if (a_query.isActive() && a_query.size()>0)
         {
             while (a_query.next())
             {
-                category_select->addItem(a_query.value(0).toInt(),
-                                         a_query.value(1).toString());
+                QString cat = QString::fromUtf8(a_query.value(1).toString());
+                category_select->addItem(a_query.value(0).toInt(), cat);
             }
         }
         category_select->addItem(0,tr("Unknown"));
@@ -280,16 +280,17 @@ void VideoFilterDialog::fillWidgets()
     {
         genre_select->addItem(-1,"All");
         QString q_string = QString("Select intid, genre FROM videogenre "
-                                                "INNER JOIN videometadatagenre "
-                                                "ON intid = idgenre "
-                                                "GROUP BY intid , genre "
-                                                "ORDER BY genre;");
+                                   "INNER JOIN videometadatagenre "
+                                   "ON intid = idgenre "
+                                   "GROUP BY intid , genre "
+                                   "ORDER BY genre;");
         QSqlQuery a_query(q_string,db);
-        if (a_query.isActive()&&a_query.numRowsAffected()>0)
+        if (a_query.isActive() && a_query.size()>0)
         {
             while (a_query.next())
             {
-                genre_select->addItem(a_query.value(0).toInt() ,a_query.value(1).toString());
+                QString genre = QString::fromUtf8(a_query.value(1).toString());
+                genre_select->addItem(a_query.value(0).toInt(), genre);
             }
         }
         genre_select->addItem(0,tr("Unknown"));
@@ -300,16 +301,17 @@ void VideoFilterDialog::fillWidgets()
     {
         country_select->addItem(-1,"All");
         QString q_string = QString("Select intid, country FROM videocountry "
-                                        "INNER JOIN videometadatacountry "
-                                        "ON intid = idcountry "
-                                        "GROUP BY intid, country "
-                                        "ORDER BY country;");
+                                   "INNER JOIN videometadatacountry "
+                                   "ON intid = idcountry "
+                                   "GROUP BY intid, country "
+                                   "ORDER BY country;");
         QSqlQuery a_query(q_string,db);
-        if (a_query.isActive()&&a_query.numRowsAffected()>0)
+        if (a_query.isActive() && a_query.size()>0)
         {
             while(a_query.next())
             {
-                country_select->addItem(a_query.value(0).toInt(),a_query.value(1).toString());
+                QString country = QString::fromUtf8(a_query.value(1).toString());
+                country_select->addItem(a_query.value(0).toInt(), country);
             }
         }
         country_select->addItem(0,tr("Unknown"));
@@ -320,9 +322,9 @@ void VideoFilterDialog::fillWidgets()
     {
         year_select->addItem(-1,"All");
         QString q_string = QString("SELECT year FROM videometadata "
-                                        "GROUP BY year ORDER BY year DESC;");
+                                   "GROUP BY year ORDER BY year DESC;");
         QSqlQuery a_query(q_string, db);
-        if(a_query.isActive()&& a_query.numRowsAffected()>0)
+        if(a_query.isActive() && a_query.size()>0)
         {
             while(a_query.next())
             {
@@ -345,10 +347,10 @@ void VideoFilterDialog::fillWidgets()
     {
         runtime_select->addItem(-2,"All");
         QString q_string = QString("SELECT FLOOR((length-1)/30) "
-                                        "FROM videometadata "
-                                        "GROUP BY FLOOR((length-1)/30);");
+                                   "FROM videometadata "
+                                   "GROUP BY FLOOR((length-1)/30);");
         QSqlQuery a_query(q_string,db);
-        if (a_query.isActive()&&a_query.numRowsAffected()>0)
+        if (a_query.isActive() && a_query.size()>0)
         {
            while (a_query.next())
            {
@@ -373,10 +375,10 @@ void VideoFilterDialog::fillWidgets()
     {
         userrating_select->addItem(-1,tr("All"));
         QString q_string = QString("SELECT FLOOR(userrating) "
-                                        "FROM videometadata "
-                                        "GROUP BY FLOOR(userrating) DESC;");
+                                   "FROM videometadata "
+                                   "GROUP BY FLOOR(userrating) DESC;");
         QSqlQuery a_query(q_string, db);
-        if(a_query.isActive()&&a_query.numRowsAffected()>0)
+        if(a_query.isActive()&&a_query.size()>0)
         {
             while(a_query.next())
             {

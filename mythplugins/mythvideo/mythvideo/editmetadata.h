@@ -46,9 +46,9 @@ class EditMetadataDialog : public MythThemedDialog
   
     void takeFocusAwayFromEditor(bool up_or_down);
     void saveAndExit();
-    void setTitle(QString new_title);
+    void setTitle(const QString &new_title);
     void setCategory(int new_category);
-    void setPlayer(QString new_player);
+    void setPlayer(const QString &new_player);
     void setLevel(int new_level);
     void toggleChild(bool yes_or_no);
     void setChild(int new_child);

@@ -191,15 +191,14 @@ void VideoManager::RefreshMovieList()
     updateML = true;
     m_list.clear();
 
-//    QSqlQuery query("SELECT intid FROM videometadata ORDER BY title;", db);
     QString thequery = QString("SELECT intid FROM %1 %2 %3")
                                .arg(currentVideoFilter->BuildClauseFrom())
                                .arg(currentVideoFilter->BuildClauseWhere())
                                .arg(currentVideoFilter->BuildClauseOrderBy());
-   QSqlQuery query(thequery,db);
+    QSqlQuery query(thequery,db);
     Metadata *myData;
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.isActive() && query.size() > 0)
     {
         while (query.next())
         {

@@ -395,7 +395,7 @@ void SearchDir(QSqlDatabase *db, QString &directory)
                new MythProgressDialog(QObject::tr("Searching for video files"),
                                       query.numRowsAffected());
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.isActive() && query.size() > 0)
     {
         while (query.next())
         {
@@ -426,7 +426,6 @@ void SearchDir(QSqlDatabase *db, QString &directory)
         if (*iter == kFileSystem)
         {
             QString name(iter.key());
-            name.replace(quote_regex, "\"\"");
 
             myNewFile = new Metadata(name, QObject::tr("No Cover"), "", 
                                      1895, "00000000", QObject::tr("Unknown"), 
@@ -440,12 +439,11 @@ void SearchDir(QSqlDatabase *db, QString &directory)
         if (*iter == kDatabase)
         {
             QString name(iter.key());
-            name.replace(quote_regex, "\"\"");
- 
-            QString querystr;
-            querystr.sprintf("DELETE FROM videometadata WHERE "
-                                       "filename=\"%s\"", name.ascii());
-            query.exec(querystr);
+
+            query.prepare("DELETE FROM videometadata WHERE "
+                          "filename = :FILE ;");
+            query.bindValue(":FILE", name);
+            query.exec();
         }
 
         file_checking->setProgress(++counter);
@@ -460,7 +458,7 @@ bool IgnoreExtension(QSqlDatabase *db, QString extension)
     QString q_string = QString("SELECT f_ignore FROM videotypes WHERE extension = \"%1\" ;")
                               .arg(extension);
     QSqlQuery a_query(q_string, db);
-    if(a_query.isActive() && a_query.numRowsAffected() > 0)
+    if(a_query.isActive() && a_query.size() > 0)
     {
         //
         //  This extension is a recognized
