@@ -12,6 +12,7 @@
 #include <qsocketdevice.h>
 #include <qnetwork.h> 
 
+#include <iostream>
 #include <vector>
 using namespace std;
 
