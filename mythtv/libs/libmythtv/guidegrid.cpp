@@ -72,6 +72,7 @@ GuideGrid::GuideGrid(const QString &channel, TV *player, QWidget *parent,
     desiredDisplayChans = DISPLAY_CHANS = 6;
     DISPLAY_TIMES = 30;
     int maxchannel = 0;
+    m_currentStartChannel = 0;
     showFavorites = false;
 
     m_player = player;
@@ -185,7 +186,8 @@ GuideGrid::GuideGrid(const QString &channel, TV *player, QWidget *parent,
     //int filltime = clock.elapsed();
     //clock.restart();
     fillChannelInfos(maxchannel);
-    setStartChannel(m_currentStartChannel - (int)(desiredDisplayChans / 2));
+    setStartChannel((int)(m_currentStartChannel) - 
+                    (int)(desiredDisplayChans / 2));
     if (DISPLAY_CHANS > maxchannel)
         DISPLAY_CHANS = maxchannel;
 
