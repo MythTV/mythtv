@@ -120,7 +120,6 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    gContext->SetSetting("ThemeQt", "1");
     gContext->SetSetting("Theme", "blue");
     gContext->LoadQtConfig();
 

@@ -495,73 +495,61 @@ void MythContext::SetPalette(QWidget *widget)
 
 void MythContext::ThemeWidget(QWidget *widget)
 {
-    bool usetheme = GetNumSetting("ThemeQt", 1);
     QColor bgcolor, fgcolor;
 
-    if (usetheme)
+    if (m_themeloaded)
     {
-        if (m_themeloaded)
+        widget->setPalette(m_palette);
+        if (m_backgroundimage.width() > 0)
+            widget->setPaletteBackgroundPixmap(m_backgroundimage);
+        return;
+    }
+
+    SetPalette(widget);
+    m_palette = widget->palette();
+
+    QPixmap *bgpixmap = NULL;
+
+    if (m_qtThemeSettings->GetSetting("BackgroundPixmap") != "")
+    {
+        QString pmapname = m_themepathname +
+                           m_qtThemeSettings->GetSetting("BackgroundPixmap");
+ 
+        bgpixmap = LoadScalePixmap(pmapname);
+        if (bgpixmap)
         {
-            widget->setPalette(m_palette);
-            if (m_backgroundimage.width() > 0)
-                widget->setPaletteBackgroundPixmap(m_backgroundimage);
-            return;
+            widget->setPaletteBackgroundPixmap(*bgpixmap);
+            m_backgroundimage = *bgpixmap;
         }
-
-        SetPalette(widget);
-
-        m_palette = widget->palette();
-
-        QPixmap *bgpixmap = NULL;
-
-        if (m_qtThemeSettings->GetSetting("BackgroundPixmap") != "")
-        {
-            QString pmapname = m_themepathname +
-                              m_qtThemeSettings->GetSetting("BackgroundPixmap");
-
-            bgpixmap = LoadScalePixmap(pmapname);
-            if (bgpixmap)
-            {
-                widget->setPaletteBackgroundPixmap(*bgpixmap);
-                m_backgroundimage = *bgpixmap;
-            }
-        }
-        else if (m_qtThemeSettings->GetSetting("TiledBackgroundPixmap") != "")
-        {
-            QString pmapname = m_themepathname +
+    }
+    else if (m_qtThemeSettings->GetSetting("TiledBackgroundPixmap") != "")
+    {
+        QString pmapname = m_themepathname +
                          m_qtThemeSettings->GetSetting("TiledBackgroundPixmap");
 
-            int width, height;
-            float wmult, hmult;
+        int width, height;
+        float wmult, hmult;
 
-            GetScreenSettings(width, wmult, height, hmult);
+        GetScreenSettings(width, wmult, height, hmult);
 
-
-            bgpixmap = LoadScalePixmap(pmapname);
-            if (bgpixmap)
-            {
-                QPixmap background(width, height);
-                QPainter tmp(&background);
-
-                tmp.drawTiledPixmap(0, 0, width, height, *bgpixmap);
-                tmp.end();
-
-                m_backgroundimage = background;
-                widget->setPaletteBackgroundPixmap(background);
-            }
-        }
-
-        m_themeloaded = true;
-
+        bgpixmap = LoadScalePixmap(pmapname);
         if (bgpixmap)
-            delete bgpixmap;
+        {
+            QPixmap background(width, height);
+            QPainter tmp(&background);
+
+            tmp.drawTiledPixmap(0, 0, width, height, *bgpixmap);
+            tmp.end();
+
+            m_backgroundimage = background;
+            widget->setPaletteBackgroundPixmap(background);
+        }
     }
-    else
-    {
-        bgcolor = QColor("white");
-        fgcolor = QColor("black");
-        widget->setPalette(QPalette(bgcolor));
-    }
+
+    m_themeloaded = true;
+
+    if (bgpixmap)
+        delete bgpixmap;
 }
 
 QImage *MythContext::LoadScaleImage(QString filename)

@@ -35,11 +35,16 @@ void MythMainWindow::Init(void)
     setCursor(QCursor(Qt::BlankCursor));
 
     gContext->ThemeWidget(this);
+
+    Show();
 }
 
 void MythMainWindow::Show(void)
 {
-    showFullScreen();
+    if (gContext->GetNumSetting("RunFrontendInWindow", 0))
+        show();
+    else
+        showFullScreen();
     setActiveWindow();
 }
 

@@ -556,12 +556,13 @@ public:
     };
 };
 
-class ThemeQt: public CheckBoxSetting, public GlobalSetting {
+class RunInWindow: public CheckBoxSetting, public GlobalSetting {
 public:
-    ThemeQt():
-        GlobalSetting("ThemeQt") {
-        setLabel("Decorate Qt widgets according to theme");
-        setValue(true);
+    RunInWindow():
+        GlobalSetting("RunFrontendInWindow") {
+        setLabel("Run the frontend in a window");
+        setValue(false);
+        setHelpText("Toggles between borderless operation.");
     };
 };
 
@@ -922,6 +923,7 @@ AppearanceSettings::AppearanceSettings()
     theme->addChild(new XineramaScreen());
     theme->addChild(new GuiWidth());
     theme->addChild(new GuiHeight());
+    theme->addChild(new RunInWindow());
     addChild(theme);
 
     VerticalConfigurationGroup* dates = new VerticalConfigurationGroup(false);
@@ -937,7 +939,6 @@ AppearanceSettings::AppearanceSettings()
     qttheme->addChild(new QtFontSmall());
     qttheme->addChild(new QtFontMedium());
     qttheme->addChild(new QtFontBig());
-    qttheme->addChild(new ThemeQt());
     qttheme->addChild(new PlayBoxTransparency());
     qttheme->addChild(new PlayBoxShading());
     addChild(qttheme);
