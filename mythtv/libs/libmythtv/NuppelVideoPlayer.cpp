@@ -684,11 +684,11 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
         /* Apply just a little feedback. The ComputeAudiotime() function is
            jittery, so if we try to correct our entire A/V drift on each frame,
-           video output is jerky. Instead, correct 1/12 of the computed drift
-           on each frame.
- 
-           This value (1/12) was arrived at through trial and error, it's a 
-           tradeoff between a/v sync and video jitter */
+           video output is jerky. Instead, correct a fraction of the computed
+	   drift on each frame.
+
+	   In steady state, very little feedback is needed. However, if we are
+	   far out of sync, we need more feedback. So, we case on this. */
         if (audiofd > 0)
         {
             laudiotime = GetAudiotime(); // ms, same scale as timecodes
@@ -698,7 +698,11 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
                 /* if we were perfect, timecodes[rpos] and laudiotime would
                    match and this adjustment wouldn't do anything */
                avsync_delay = (timecodes[rpos] - laudiotime) * 1000; // uSecs
-               nexttrigger.tv_usec += avsync_delay / 12;
+
+	       if(avsync_delay < -100000 || avsync_delay > 100000)
+		 nexttrigger.tv_usec += avsync_delay / 10; // re-syncing
+	       else
+		 nexttrigger.tv_usec += avsync_delay / 50; // steady state
             }
         }
 
