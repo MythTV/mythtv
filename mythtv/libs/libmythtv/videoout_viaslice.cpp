@@ -37,7 +37,7 @@ extern "C" {
 #include <X11/extensions/Xinerama.h>
 }
 
-const int kNumBuffers = 4;
+const int kNumBuffers = 7;
 const int kPrebufferFrames = 1;
 const int kNeedFreeFrames = 2;
 const int kKeepPrebuffer = 1;
@@ -52,13 +52,12 @@ struct ViaData
     Display *XJ_disp;
     float display_aspect;
 
-    via_slice_state_t decode_buffers[4];
+    via_slice_state_t decode_buffers[kNumBuffers];
     via_slice_state_t overlay_buffer;
 
     unsigned char *buffer;
     unsigned char *current;
-    unsigned char *subp_buffer;
-   
+
     DDLOCK ddLock;
     VIASUBPICT VIASubPict;
     int fd;
@@ -71,6 +70,7 @@ struct ViaData
 
     VIAMPGSURFACE VIAMPGSurface;
 
+    VideoFrame *display_buffer;
     int display_frame;
 };
 
@@ -231,9 +231,7 @@ bool VideoOutputVIA::Init(int width, int height, float aspect,
     XJ_depth = DefaultDepthOfScreen(data->XJ_screen);
 
     data->current = data->buffer = new unsigned char[1920 * 1080 * 2];
-    data->subp_buffer = new unsigned char[1920 * 1080];
-    memset(data->subp_buffer, 0, 1920 * 1080);
-   
+
     if (VIADriverProc(CREATEDRIVER, NULL))
     {
         cerr << "Unable to initialize VIA CLE266 HW Driver, "
@@ -258,18 +256,21 @@ bool VideoOutputVIA::CreateViaBuffers(void)
 {
     data->ddSurfaceDesc.dwWidth = XJ_width;
     data->ddSurfaceDesc.dwHeight = XJ_height;
-    data->ddSurfaceDesc.dwBackBufferCount = 3;
+    data->ddSurfaceDesc.dwBackBufferCount = kNumBuffers;
     data->ddSurfaceDesc.dwFourCC = FOURCC_VIA;
-    VIADriverProc(CREATESURFACE, &data->ddSurfaceDesc);
+    if (VIADriverProc(CREATESURFACE, &data->ddSurfaceDesc))
+        return false;
 
     data->ddSurfaceDesc.dwWidth  = XJ_width;
     data->ddSurfaceDesc.dwHeight = XJ_height;
     data->ddSurfaceDesc.dwBackBufferCount = 1;
     data->ddSurfaceDesc.dwFourCC = FOURCC_SUBP;
-    VIADriverProc(CREATESURFACE, &data->ddSurfaceDesc);
+    if (VIADriverProc(CREATESURFACE, &data->ddSurfaceDesc))
+        return false;
 
     data->ddLock.dwFourCC = FOURCC_SUBP;
-    VIADriverProc(LOCKSURFACE, &data->ddLock);
+    if (VIADriverProc(LOCKSURFACE, &data->ddLock))
+        return false;
 
     data->fd = open("/dev/mem", O_RDWR);
     if (data->fd >= 0)
@@ -311,7 +312,7 @@ bool VideoOutputVIA::CreateViaBuffers(void)
         exit(1);
     }
      
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < kNumBuffers; i++)
     {
         data->decode_buffers[i].image_number = i;
         data->decode_buffers[i].slice_data = NULL;
@@ -344,7 +345,6 @@ void VideoOutputVIA::Exit(void)
         XCloseDisplay(data->XJ_disp);
 
         delete [] data->buffer;
-        delete [] data->subp_buffer;
     }
 }
 
@@ -393,6 +393,7 @@ void VideoOutputVIA::PrepareFrame(VideoFrame *buffer)
     if (!buffer)
         return;
 
+    data->display_buffer = buffer;
     via_slice_state_t *curdata = (via_slice_state_t *)buffer->buf;
 
     data->display_frame = curdata->image_number;
@@ -407,10 +408,32 @@ void VideoOutputVIA::PrepareFrame(VideoFrame *buffer)
 void VideoOutputVIA::Show(FrameScanType )
 {
     data->VIAMPGSurface.dwTaskType = VIA_TASK_DISPLAY;
-    data->VIAMPGSurface.dwDisplayPictStruct = VIA_PICT_STRUCT_FRAME;
     data->VIAMPGSurface.dwDisplayBuffIndex = data->display_frame;
 
-    VIADisplayControl(DEV_MPEG, &data->VIAMPGSurface);
+    via_slice_state_t *cur = (via_slice_state_t *)data->display_buffer->buf;
+
+    if (cur->progressive_sequence)
+    {
+        data->VIAMPGSurface.dwDisplayPictStruct = VIA_PICT_STRUCT_FRAME;
+        VIADisplayControl(DEV_MPEG, &data->VIAMPGSurface);
+    }
+    else
+    {
+        if (cur->top_field_first)
+        {
+            data->VIAMPGSurface.dwDisplayPictStruct = VIA_PICT_STRUCT_BOTTOM;
+            VIADisplayControl(DEV_MPEG, &data->VIAMPGSurface);
+            data->VIAMPGSurface.dwDisplayPictStruct = VIA_PICT_STRUCT_TOP;
+            VIADisplayControl(DEV_MPEG, &data->VIAMPGSurface);
+        }
+        else
+        {
+            data->VIAMPGSurface.dwDisplayPictStruct = VIA_PICT_STRUCT_TOP;
+            VIADisplayControl(DEV_MPEG, &data->VIAMPGSurface);
+            data->VIAMPGSurface.dwDisplayPictStruct = VIA_PICT_STRUCT_BOTTOM;
+            VIADisplayControl(DEV_MPEG, &data->VIAMPGSurface);
+        }
+    }
 }
 
 void VideoOutputVIA::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
@@ -426,6 +449,12 @@ void VideoOutputVIA::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
     {
         //Slice must be in next frame so flush last buffer first.
         VIASliceReceiveData(curdata->slicecount - 1, data->buffer);
+
+        data->VIAMPGSurface.dwTaskType = VIA_TASK_DECODE;
+        data->VIAMPGSurface.dwDisplayPictStruct = VIA_PICT_STRUCT_FRAME;
+        data->VIAMPGSurface.dwDisplayBuffIndex = curdata->image_number;
+        VIADisplayControl(DEV_MPEG, &data->VIAMPGSurface);
+
         curdata->slicecount = 1;
     }
 
@@ -459,6 +488,12 @@ void VideoOutputVIA::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
     {
         // Send slices to HW Decoder
         VIASliceReceiveData(curdata->slicecount, data->buffer);
+
+        data->VIAMPGSurface.dwTaskType = VIA_TASK_DECODE;
+        data->VIAMPGSurface.dwDisplayPictStruct = VIA_PICT_STRUCT_FRAME;
+        data->VIAMPGSurface.dwDisplayBuffIndex = curdata->image_number;
+        VIADisplayControl(DEV_MPEG, &data->VIAMPGSurface);
+
         curdata->slicecount = 1;
         curdata->lastcode = 0;
     } 

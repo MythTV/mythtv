@@ -175,12 +175,17 @@ static const unsigned int QT_KEYS[DIKI_NUMBER_OF_KEYS][2] =
         {0xffff,0x00}
     };
 
+#ifndef DSCAPS_DOUBLE
+#define DSCAPS_DOUBLE DSCAPS_FLIPPING
+#endif
+
 //8 1 3 2 works, but not for everyone :-(
 const int kNumBuffers = 31;
 const int kNeedFreeFrames = 1;
 const int kPrebufferFrames = 12;
 const int kKeepPrebuffer = 2;
 typedef map<unsigned char *, IDirectFBSurface *> BufferMap;
+
 struct DirectfbData
 {
     //DirectFB hook

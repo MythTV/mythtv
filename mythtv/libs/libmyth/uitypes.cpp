@@ -584,6 +584,7 @@ UIGuideType::UIGuideType(const QString &name, int order)
         
     int alphalevel = 80;
     alphaBlender.init(alphalevel, 307);    
+    prog_past_col = 0;
 }
 
 UIGuideType::~UIGuideType()
@@ -714,13 +715,39 @@ void UIGuideType::drawBox(QPainter *dr, UIGTCon *data, const QColor &color)
 
 void UIGuideType::drawBackground(QPainter *dr, UIGTCon *data)
 {
+    QColor overColor;
+    QRect overArea;
+
     int breakin = 1;
     QRect area = data->drawArea;
-    area.addCoords(breakin, breakin, -breakin, -breakin);
-    
+ 
     QColor fillColor = solidcolor;
     if (drawCategoryColors && data->categoryColor.isValid())
         fillColor = data->categoryColor;
+
+    if (prog_past_col && area.left() < prog_past_col)
+    {
+        if (area.right() < prog_past_col)
+        {
+            fillColor = fillColor.dark();
+            area.addCoords(breakin, breakin, -breakin, -breakin);
+        }
+        else
+        {
+            overColor = fillColor.dark();
+            int first = prog_past_col - area.left();
+            int second = area.width() - first;
+            overArea = area;
+            overArea.setWidth(first);
+            area.moveBy(first, 0);
+            area.setWidth(second);
+
+            area.addCoords(0, breakin, -breakin, -breakin);
+            overArea.addCoords(breakin, breakin, 0, -breakin);
+        }
+    }
+    else
+        area.addCoords(breakin, breakin, -breakin, -breakin);
     
     if (filltype == Alpha) 
     {
@@ -731,18 +758,35 @@ void UIGuideType::drawBackground(QPainter *dr, UIGTCon *data)
 
         alphaBlender.blendImage(tmpimg, fillColor);
         dr->drawImage(area.left(), area.top(), tmpimg);
+
+        if (overArea.width())
+        {
+            orig = QPixmap(overArea.width(), overArea.height());
+            orig.fill(window, screenloc.x() + overArea.left(), 
+                              screenloc.y() + overArea.top());                
+            tmpimg = orig.convertToImage(); 
+
+            alphaBlender.blendImage(tmpimg, overColor);
+            dr->drawImage(overArea.left(), overArea.top(), tmpimg);
+        }
     }     
     else if (filltype == Dense) 
     {
         dr->fillRect(area, QBrush(fillColor, Qt::Dense4Pattern));
+        if (overArea.width())
+            dr->fillRect(overArea, QBrush(overColor, Qt::Dense4Pattern));
     }     
     else if (filltype == Eco)
     {
         dr->fillRect(area, QBrush(fillColor, Qt::Dense4Pattern));
+        if (overArea.width())
+            dr->fillRect(overArea, QBrush(overColor, Qt::Dense4Pattern));
     }
     else if (filltype == Solid)
     {
         dr->fillRect(area, QBrush(fillColor, Qt::SolidPattern));
+        if (overArea.width())
+            dr->fillRect(overArea, QBrush(overColor, Qt::SolidPattern));
     }   
 }
 
@@ -785,7 +829,7 @@ void UIGuideType::drawText(QPainter *dr, UIGTCon *data)
 
 void UIGuideType::SetProgramInfo(int row, int col, const QRect &area, 
                                  const QString &title, const QString &genre, 
-                                 int arrow, int recType, int recStat, 
+                                 int arrow, int recType, int recStat,
                                  bool selected)
 {
     (void)col;
@@ -798,7 +842,7 @@ void UIGuideType::SetProgramInfo(int row, int col, const QRect &area,
         data->categoryColor = categoryColors[data->category];
         if (!data->categoryColor.isValid())
             data->categoryColor = categoryColors["none"];
-    }    
+    }
     
     if (selected)
         selectedItem = *data;
@@ -852,6 +896,12 @@ void UIGuideType::ResetRow(int row)
 {
     allData[row].clear();
 }
+
+void UIGuideType::SetProgPast(int ppast)
+{
+    prog_past_col = area.width() * ppast / 100;
+}
+
 
 // **************************************************************
 
@@ -1868,8 +1918,8 @@ void UIStatusBarType::Draw(QPainter *dr, int drawlayer, int context)
             int height = (int)((double)((double)m_container.height() - (double)(2*m_fillerSpace))
                     * (double)((double)m_used / (double)m_total));
 
-	        if (m_debug == true)
-	        {
+            if (m_debug == true)
+            {
                 cerr << "       -Width  = " << width << "\n";
                 cerr << "       -Height = " << height << endl;
             }

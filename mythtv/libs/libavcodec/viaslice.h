@@ -11,6 +11,9 @@ typedef struct {
     int maxcode;
     int slicecount;
     int lastcode;
+
+    int progressive_sequence;
+    int top_field_first;
 } via_slice_state_t;
 
 #endif

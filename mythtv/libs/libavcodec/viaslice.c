@@ -14,6 +14,9 @@ int VIA_field_start(MpegEncContext*s, AVCodecContext *avctx)
     slicestate = (via_slice_state_t *)s->current_picture.data[0];
     assert(slicestate != NULL);
 
+    slicestate->progressive_sequence = s->progressive_sequence;
+    slicestate->top_field_first = s->top_field_first;
+
     VIAMPGSurface.dwPictureType = s->pict_type;
     VIAMPGSurface.dwDecodePictStruct = s->picture_structure;
     VIAMPGSurface.dwDecodeBuffIndex = slicestate->image_number;

@@ -254,6 +254,7 @@ class UIGuideType : public UIType
                         int arrow, int recType, int recStat, bool selected);
     void ResetData();
     void ResetRow(int row);
+    void SetProgPast(int ppast);
 
   private:
 
@@ -330,6 +331,8 @@ class UIGuideType : public UIType
 
     QMap<QString, QColor> categoryColors;
     AlphaBlender alphaBlender;
+
+    int prog_past_col;
 };
 
 class UIListType : public UIType

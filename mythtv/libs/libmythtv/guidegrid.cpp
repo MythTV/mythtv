@@ -501,6 +501,8 @@ void GuideGrid::timeout()
                                   videoRect.width(), videoRect.height());
     }
 
+    fillProgramInfos();
+    repaint(programRect, false);
     repaint(curInfoRect, false);
 }
 
@@ -688,6 +690,25 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
     proglist->FromProgram(m_db, querystr, m_recList);
 
     QDateTime ts = m_currentStartTime;
+
+    if (type)
+    {
+        QDateTime tnow = QDateTime::currentDateTime();
+        int progPast = 0;
+        if (tnow > m_currentEndTime)
+            progPast = 100;
+        else if (tnow < m_currentStartTime)
+            progPast = 0;
+        else
+        {
+            int played = m_currentStartTime.secsTo(tnow);
+            int length = m_currentStartTime.secsTo(m_currentEndTime);
+            if (length)
+                progPast = played * 100 / length;
+        }
+
+        type->SetProgPast(progPast);
+    }
 
     program = proglist->first();
     QPtrList<ProgramInfo> unknownlist;
