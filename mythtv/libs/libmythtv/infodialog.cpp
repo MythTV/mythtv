@@ -159,6 +159,8 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent,
 
     lview->setCurrentItem(selectItem);
     lview->setSelected(selectItem, true);
+
+    lview->setFocus();
  
     myinfo = pginfo;
 }
@@ -178,17 +180,6 @@ QLabel *InfoDialog::getDateLabel(ProgramInfo *pginfo)
     QLabel *date = new QLabel(timedate, this);
 
     return date;
-}
-
-void InfoDialog::keyPressEvent(QKeyEvent *e)
-{
-    switch (e->key())
-    { 
-        case Key_Space: case Key_Return: case Key_Enter:
-        case Key_Up: case Key_Down:  qApp->notify(lview, e); break;
-
-        default: MythDialog::keyPressEvent(e);
-    }
 }
 
 void InfoDialog::selected(QListViewItem *selitem)

@@ -24,8 +24,6 @@ class InfoDialog : public MythDialog
   private:
     QLabel *getDateLabel(ProgramInfo *pginfo);
 
-    void keyPressEvent(QKeyEvent *e);
-  
     int programtype;
     ScheduledRecording::RecordingType recordstatus;
     ProgramInfo *myinfo;
