@@ -270,6 +270,25 @@ QWidget* SpinBoxSetting::configWidget(QWidget* parent,
     return box;
 }
 
+QWidget* SelectLabelSetting::configWidget(QWidget* parent,
+                                          const char* widgetName) {
+    QWidget* widget = new QHBox(parent, widgetName);
+    widget->setBackgroundOrigin(QWidget::WindowOrigin);
+
+    QLabel* label = new QLabel(widget);
+    label->setText(getLabel() + ":");
+    label->setBackgroundOrigin(QWidget::WindowOrigin);
+
+    QLabel* value = new QLabel(widget);
+    value->setText(labels[current]);
+    value->setBackgroundOrigin(QWidget::WindowOrigin);
+
+    connect(this, SIGNAL(valueChanged(const QString&)),
+            value, SLOT(setText(const QString&)));
+
+    return widget;
+}
+
 QWidget* ComboBoxSetting::configWidget(QWidget* parent,
                                        const char* widgetName) {
     QWidget* box = new QHBox(parent, widgetName);

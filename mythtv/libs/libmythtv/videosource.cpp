@@ -47,13 +47,13 @@ QString CISetting::setClause(void) {
 
 void VideoSource::fillSelections(QSqlDatabase* db,
                                  StringSelectSetting* setting) {
-    QString query = QString("SELECT sourceid, name FROM videosource");
+    QString query = QString("SELECT name, sourceid FROM videosource");
     QSqlQuery result = db->exec(query);
 
     if (result.isActive() && result.numRowsAffected() > 0)
         while (result.next())
-            setting->addSelection(result.value(1).toString(),
-                                  result.value(0).toString());
+            setting->addSelection(result.value(0).toString(),
+                                  result.value(1).toString());
 }
 
 void VideoSource::loadByID(QSqlDatabase* db, int sourceid) {
@@ -77,14 +77,29 @@ void CaptureCard::loadByID(QSqlDatabase* db, int cardid) {
     load(db);
 }
 
-void CardInput::fillSelections(QSqlDatabase* db) {
-    selector->fillSelections(db);
-    sourceid->fillSelections(db);
-}
-
 void CardInput::loadByID(QSqlDatabase* db, int inputid) {
     id->setValue(inputid);
     load(db);
+}
+
+void CardInput::loadByInput(QSqlDatabase* db, int _cardid, QString _inputname) {
+    QString query = QString("SELECT cardinputid FROM cardinput WHERE cardid = %1 AND inputname = '%2'")
+        .arg(_cardid)
+        .arg(_inputname);
+    QSqlQuery result = db->exec(query);
+    if (result.isActive() && result.numRowsAffected() > 0) {
+        result.next();
+        loadByID(db, result.value(0).toInt());
+    } else {
+        load(db); // new
+        cardid->setValue(QString("%1").arg(_cardid));
+        inputname->setValue(_inputname);
+    }
+}
+
+void CardInput::save(QSqlDatabase* db) {
+    if (sourceid->getValue() != "0")
+        VerticalConfigurationGroup::save(db);
 }
 
 int CISetting::getInputID(void) const {
@@ -95,49 +110,9 @@ int CCSetting::getCardID(void) const {
     return parent.getCardID();
 }
 
-void VideoInputSelector::fillSelections(QSqlDatabase* db) {
-    cardid->fillSelections(db);
-}
-
-
-void VideoInputSelector::probeInputs(const QString& videoDevice, QString cardID) {
-    int videofd = open(videoDevice.ascii(), O_RDWR);
-
-    if (videofd <= 0) {
-        cout << "Couldn't open " << videoDevice << " to probe its inputs.\n";
-        return;
-    }
-
-    InputName* name = new InputName(parent);
-    addTarget(cardID, name);
-
-    struct video_capability vidcap;
-    memset(&vidcap, 0, sizeof(vidcap));
-    if (ioctl(videofd, VIDIOCGCAP, &vidcap) != 0) {
-        perror("ioctl");
-        close(videofd);
-        return;
-    }
-    
-    for (int i = 0; i < vidcap.channels; i++) {
-        struct video_channel test;
-        memset(&test, 0, sizeof(test));
-        test.channel = i;
-
-        if (ioctl(videofd, VIDIOCGCHAN, &test) != 0) {
-            perror("ioctl");
-            continue;
-        }
-
-        name->addSelection(test.name);
-    }
-
-    close(videofd);
-}
-
 int CaptureCardEditor::exec(QSqlDatabase* db) {
     while (ConfigurationDialog::exec(db) == QDialog::Accepted)
-        open(getValue().toInt());
+        edit(getValue().toInt());
 
     return QDialog::Rejected;
 }
@@ -153,7 +128,7 @@ void CaptureCardEditor::load(QSqlDatabase* db) {
 
 int VideoSourceEditor::exec(QSqlDatabase* db) {
     while (ConfigurationDialog::exec(db) == QDialog::Accepted)
-        open(getValue().toInt());
+        edit(getValue().toInt());
 
     return QDialog::Rejected;
 }
@@ -170,24 +145,56 @@ void VideoSourceEditor::load(QSqlDatabase* db) {
 
 int CardInputEditor::exec(QSqlDatabase* db) {
     while (ConfigurationDialog::exec(db) == QDialog::Accepted)
-        open(getValue().toInt());
+        edit(getValue().toInt());
 
     return QDialog::Rejected;
 }
 
 void CardInputEditor::load(QSqlDatabase* db) {
     clearSelections();
-    addSelection("(New connection)", "0");
-    // XXX make this pretty
-    QSqlQuery query = db->exec("SELECT cardinput.cardinputid,videosource.name,capturecard.videodevice,cardinput.inputname
-FROM cardinput, capturecard, videosource
-WHERE cardinput.cardid = capturecard.cardid AND cardinput.sourceid = videosource.sourceid");
-    if (query.isActive() && query.numRowsAffected() > 0)
-        while (query.next())
-            addSelection(QString("%1 -> %2(%3)")
-                         .arg(query.value(1).toString())
-                         .arg(query.value(2).toString())
-                         .arg(query.value(3).toString()),
-                         query.value(0).toString());
+    QSqlQuery capturecards = db->exec("SELECT cardid,videodevice FROM capturecard");
+    if (capturecards.isActive() && capturecards.numRowsAffected() > 0)
+        while (capturecards.next()) {
+            int cardid = capturecards.value(0).toInt();
+            QString videodevice(capturecards.value(1).toString());
 
+            int videofd = open(videodevice.ascii(), O_RDWR);
+            if (videofd < 0) {
+                cout << "Couldn't open " << videodevice << " to probe its inputs.\n";
+                continue;
+            }
+
+            struct video_capability vidcap;
+            memset(&vidcap, 0, sizeof(vidcap));
+            if (ioctl(videofd, VIDIOCGCAP, &vidcap) != 0) {
+                perror("ioctl");
+                close(videofd);
+                continue;
+            }
+
+            for (int i = 0; i < vidcap.channels; i++) {
+                struct video_channel test;
+                memset(&test, 0, sizeof(test));
+                test.channel = i;
+
+                if (ioctl(videofd, VIDIOCGCHAN, &test) != 0) {
+                    perror("ioctl");
+                    continue;
+                }
+
+                QString input(test.name);
+                CardInput* cardinput = new CardInput(m_context);
+                cardinput->loadByInput(db, cardid, input);
+                cardinputs.push_back(cardinput);
+                QString index = QString("%1").arg(cardinputs.size()-1);
+
+                QString label = QString("%1 (%2) -> %3")
+                    .arg(videodevice)
+                    .arg(input)
+                    .arg(cardinput->getSourceName());
+                addSelection(label, index);
+            }
+
+            close(videofd);
+        }
 }

@@ -161,7 +161,7 @@ public:
                                   const char* widgetName=0);
 };
 
-// Read-only displa of a setting
+// Read-only display of a setting
 class LabelSetting: virtual public Setting {
 protected:
     LabelSetting() {};
@@ -241,14 +241,33 @@ public slots:
     virtual void setValue(const QString& newValue);
 
     virtual void setValue(int which) {
+        if ((unsigned)which > values.size()-1) {
+            cout << "StringSelectSetting::setValue(): invalid index " << which << endl;
+            return;
+        }
         setValue(values[which]);
     };
+
+    virtual QString getCurrentLabel(void) const {
+        if (!isSet)
+            return QString::null;
+        return labels[current];
+    };
+
 protected:
     typedef vector<QString> selectionList;
     selectionList labels;
     selectionList values;
     unsigned current;
     bool isSet;
+};
+
+class SelectLabelSetting: public LabelSetting, public StringSelectSetting {
+protected:
+    SelectLabelSetting() {};
+
+public:
+    virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
 };
 
 class ComboBoxSetting: public StringSelectSetting {

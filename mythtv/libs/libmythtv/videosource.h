@@ -36,6 +36,7 @@ public:
     void loadByID(QSqlDatabase* db, int id);
 
     static void fillSelections(QSqlDatabase* db, StringSelectSetting* setting);
+    static QString idToName(QSqlDatabase* db, int id);
 
 private:
     class ID: virtual public IntegerSetting,
@@ -200,11 +201,16 @@ private:
     const CardInput& parent;
 };
 
-class CardID: public ComboBoxSetting, public CISetting {
+class CardID: public SelectLabelSetting, public CISetting {
 public:
     CardID(const CardInput& parent):
         CISetting(parent, "cardid") {
         setLabel("Capture device");
+    };
+
+    virtual void load(QSqlDatabase* db) {
+        fillSelections(db);
+        CISetting::load(db);
     };
 
     void fillSelections(QSqlDatabase* db) {
@@ -213,38 +219,17 @@ public:
 };
 
 
-class VideoInputSelector: public TriggeredConfigurationGroup,
-                          public VerticalConfigurationGroup {
-    Q_OBJECT
-public:
-    VideoInputSelector(const CardInput& _parent):
-        parent(_parent) {
-        setLabel("Input");
-        addChild(cardid = new CardID(parent));
-        setTrigger(cardid);
-
-        connect(cardid, SIGNAL(selectionAdded(const QString&,
-                                              QString)),
-                this, SLOT(probeInputs(const QString&,
-                                       QString)));
-    };
-
-    void fillSelections(QSqlDatabase* db);
-
-protected slots:
-    void probeInputs(const QString& videoDevice, QString cardID);
-
-private:
-    CardID* cardid;
-    const CardInput& parent;
-};
-
 class SourceID: public ComboBoxSetting, public CISetting {
 public:
     SourceID(const CardInput& parent):
         CISetting(parent, "sourceid") {
         setLabel("Video source");
-        addSelection("(None)");
+        addSelection("(None)", "0");
+    };
+
+    virtual void load(QSqlDatabase* db) {
+        fillSelections(db);
+        CISetting::load(db);
     };
 
     void fillSelections(QSqlDatabase* db) {
@@ -252,10 +237,11 @@ public:
     };
 };
 
-class InputName: public ComboBoxSetting, public CISetting {
+class InputName: public LabelSetting, public CISetting {
 public:
     InputName(const CardInput& parent):
         CISetting(parent, "inputname") {
+        setLabel("Input");
     };
 };
 
@@ -264,15 +250,18 @@ public:
     CardInput(MythContext* context): ConfigurationDialog(context) {
         setLabel("Associate input with source");
         addChild(id = new ID());
-        addChild(selector = new VideoInputSelector(*this));
+        addChild(cardid = new CardID(*this));
+        addChild(inputname = new InputName(*this));
         addChild(sourceid = new SourceID(*this));
     };
-
-    void fillSelections(QSqlDatabase* db);
 
     int getInputID(void) const { return id->intValue(); };
 
     void loadByID(QSqlDatabase* db, int id);
+    void loadByInput(QSqlDatabase* db, int cardid, QString input);
+    QString getSourceName(void) const { return sourceid->getCurrentLabel(); };
+
+    virtual void save(QSqlDatabase* db);
 
 private:
     class ID: virtual public IntegerSetting,
@@ -291,7 +280,8 @@ private:
 
 private:
     ID* id;
-    VideoInputSelector* selector;
+    CardID* cardid;
+    InputName* inputname;
     SourceID* sourceid;
     QSqlDatabase* db;
 };
@@ -309,7 +299,7 @@ public:
     virtual void save(QSqlDatabase* db) { (void)db; };
 
 protected slots:
-    void open(int id) {
+    void edit(int id) {
         CaptureCard cc(m_context);
 
         if (id != 0)
@@ -335,7 +325,7 @@ public:
     virtual void save(QSqlDatabase* db) { (void)db; };
 
 protected slots:
-    void open(int id) {
+    void edit(int id) {
         VideoSource vs(m_context);
 
         if (id != 0)
@@ -361,17 +351,12 @@ public:
     virtual void save(QSqlDatabase* db) { (void)db; };
 
 protected slots:
-    void open(int id) {
-        CardInput ci(m_context);
-
-        ci.fillSelections(db);
-        if (id != 0)
-            ci.loadByID(db,id);
-
-        ci.exec(db);
+    void edit(int id) {
+        cardinputs[id]->exec(db);
     };
 
 protected:
+    vector<CardInput*> cardinputs;
     QSqlDatabase* db;
 };
 
