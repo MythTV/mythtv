@@ -213,7 +213,8 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
         MarkConflicts();
     }
 
-    // PrintList();
+    if ((print_verbose_messages & VB_SCHEDULE) != 0)
+        PrintList();
 
     return hasconflicts;
 }

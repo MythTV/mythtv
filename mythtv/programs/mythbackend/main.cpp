@@ -212,6 +212,16 @@ int main(int argc, char **argv)
                             print_verbose_messages |= VB_FILE;
                             verboseString += " " + *it;
                         }
+                        else if(!strcmp(*it,"schedule"))
+                        {
+                            print_verbose_messages |= VB_SCHEDULE;
+                            verboseString += " " + *it;
+                        }
+                        else if(!strcmp(*it,"network"))
+                        {
+                            print_verbose_messages |= VB_NETWORK;
+                            verboseString += " " + *it;
+                        }
                         else
                         {
                             cerr << "Unknown argument for -v/--verbose: "
@@ -241,9 +251,9 @@ int main(int argc, char **argv)
                                                     "to filename" << endl <<
                     "-d or --daemon                 Runs mythbackend as a daemon" << endl <<
                     "-v or --verbose debug-level    Prints more information" << endl <<
-                    "                               Allowed is any combination (separated by comma)" << endl << 
-                    "                               of all,none,quiet,record," << endl <<
-                    "                               playback,channel,osd,file" << endl <<
+                    "                               Accepts any combination (separated by comma)" << endl << 
+                    "                               of all,none,quiet,record,playback," << endl <<
+                    "                               channel,osd,file,schedule,network" << endl <<
                     "--printexpire                  List of auto-expire programs" << endl <<
                     "--printsched                   Upcoming scheduled programs" << endl;
             return -1;

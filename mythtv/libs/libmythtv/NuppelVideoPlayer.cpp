@@ -1146,8 +1146,10 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     reducejitter = gContext->GetNumSetting("ReduceJitter", 0);
     experimentalsync = gContext->GetNumSetting("ExperimentalAVSync", 0);
 
-    output_jmeter = NULL;
-    //output_jmeter = new Jitterometer("video_output", 100);
+    if ((print_verbose_messages & VB_PLAYBACK) != 0)
+        output_jmeter = new Jitterometer("video_output", 100);
+    else
+        output_jmeter = NULL;
 
     refreshrate = frame_interval;
 
@@ -1191,7 +1193,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
         if (prebuffering)
         {
-            //printf("prebuffering...\n");
+            VERBOSE(VB_PLAYBACK, "prebuffering...");
             usleep(frame_interval);
             ResetNexttrigger(&nexttrigger);
             continue;

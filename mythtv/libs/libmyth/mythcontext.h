@@ -22,19 +22,21 @@ class LCD;
 class MythMainWindow;
 
 enum VerboseMask {
-    VB_IMPORTANT = 0x01,
-    VB_GENERAL   = 0x02,
-    VB_RECORD    = 0x04,
-    VB_PLAYBACK  = 0x08,
-    VB_CHANNEL   = 0x10,
-    VB_OSD       = 0x20,
-    VB_FILE      = 0x40,
-    VB_NONE      = 0x00,
-    VB_ALL       = 0xff
+    VB_IMPORTANT = 0x0001,
+    VB_GENERAL   = 0x0002,
+    VB_RECORD    = 0x0004,
+    VB_PLAYBACK  = 0x0008,
+    VB_CHANNEL   = 0x0010,
+    VB_OSD       = 0x0020,
+    VB_FILE      = 0x0040,
+    VB_SCHEDULE  = 0x0080,
+    VB_NETWORK   = 0x0100,
+    VB_NONE      = 0x0000,
+    VB_ALL       = 0xffff
 };
 
 #define VERBOSE(mask,args...) \
-if (print_verbose_messages & (mask) != 0) \
+if ((print_verbose_messages & mask) != 0) \
     cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") \
          << " " << args << endl;
 
@@ -65,7 +67,7 @@ class MythEvent : public QCustomEvent
     QString extradata;
 };
 
-#define MYTH_BINARY_VERSION "0.12.09062003-1"
+#define MYTH_BINARY_VERSION "0.12.09082003-1"
 #define MYTH_SCHEMA_VERSION "1003"
 
 extern int print_verbose_messages;

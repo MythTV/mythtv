@@ -39,7 +39,19 @@ bool WriteStringList(QSocket *socket, QStringList &list)
     payload.truncate(8);
     payload += utf8;
     size = payload.length();
-    // cerr << payload << endl; //DEBUG
+
+    if ((print_verbose_messages & VB_NETWORK) != 0)
+    {
+        QString msg = payload;
+
+	if (msg.length() > 58)
+	{
+	    msg.truncate(55);
+	    msg += "...";
+	}
+	VERBOSE(VB_NETWORK, msg);
+    }
+
     while (size > 0)
     {
         qApp->lock();
