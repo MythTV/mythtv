@@ -189,11 +189,12 @@ static int init_try_nvidia(void)
     /* int saved_errno = errno; */
     if (nvidia_fd >= 0) {
         /* Try to poll it to see if we're actually getting data */
+        int ret;
         struct pollfd polldata;
         polldata.fd = nvidia_fd;
         polldata.events = 0xff;
         polldata.revents = 0;
-        int ret = poll( &polldata, 1, 100 );
+        ret = poll( &polldata, 1, 100 );
         if (!ret)
             printf("vblank nvidia retrace timeout\n");
         if (ret < 0)
