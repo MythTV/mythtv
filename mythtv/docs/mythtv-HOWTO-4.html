@@ -99,11 +99,11 @@ found when we need them.</P>
 <H2><A NAME="ss4.3">4.3</A> <A HREF="mythtv-HOWTO.html#toc4.3">Modifying <CODE>/etc/ld.so.conf</CODE></A>
 </H2>
 
-<P>Switch to /etc and execute the following:
+<P>Execute the following:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su -
-# echo /usr/local/lib >> ld.so.conf
+# echo /usr/local/lib >> /etc/ld.so.conf
 # /sbin/ldconfig
 # exit
 $ 

@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-04-25, v2.21
+  2003-04-26, v2.22
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -831,10 +831,10 @@
 
   [1m4.3.  Modifying /etc/ld.so.conf[0m
 
-  Switch to /etc and execute the following:
+  Execute the following:
 
        $ su -
-       # echo /usr/local/lib >> ld.so.conf
+       # echo /usr/local/lib >> /etc/ld.so.conf
        # /sbin/ldconfig
        # exit
        $
@@ -3278,11 +3278,19 @@
 
   See the [1mmysqldump [22mmanpage for more information.
 
-       $ mysqldump -u mythtv --password=mythtv mythconverg > mythtv_backup.sql
+       $ mysqldump -u mythtv -pmythtv mythconverg > mythtv_backup.sql
 
-  To restore:
+  To restore: (assuming that you've dropped the database)
 
-       $ mysql -u mythtv --password=mythtv mythconverg < mythtv_backup.sql
+  $ mysql -u root
+  mysql>create database mythconverg;
+  mysql>exit
+
+  $ mysql -u mythtv -pmythtv mythconverg < mythtv_backup.sql
+
+  You may need to alter the mysql permissions if this database is being
+  shared with multiple systems.  See the ``Modifying access to the MySQL
+  database for multiple systems'' section for more information.
 
   [1m19.7.  I'd like to delete the mysql database.[0m
 
@@ -3490,6 +3498,20 @@
   The remaining setup is just like a standard V4L card; define a video
   source if you have not already done so, and assign the video source to
   a video card input on the Input Connections screen.
+
+  If you'd like to use the [1mptune.pl [22mcommand to check that your card is
+  working before trying to use it in MythTV, you'll need to install a
+  module first:
+
+       # perl -MCPAN -e shell
+       perl> install Video::Capture::V4l
+       perl> exit
+
+  You may then change the channel:
+
+       $ ./ptune.pl 42
+
+  will change the Tuner channel to "42".
 
   [1m19.11.  I'd like to use NFS.[0m
 
