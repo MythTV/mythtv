@@ -29,7 +29,7 @@ str Cat_Crime=MediumVioletRed
 str Cat_Talk=MediumTurquoise
 
 str ActiveForeground=#ffffff
-str ActiveButton=#5799c3
+str ActiveButton=#38689c
 str ActiveLight=#5788c3
 str ActiveMidlight=#4871a2
 str ActiveDark=#162231
@@ -40,7 +40,7 @@ str ActiveButtonText=#ffffff
 str ActiveBase=#002a4e
 str ActiveBackground=#426794
 str ActiveShadow=#000000
-str ActiveHighlight=#5799c3
+str ActiveHighlight=#50a4dc
 str ActiveHighlightedText=#000000
 
 str InactiveForeground=#ffffff
