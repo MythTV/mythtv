@@ -193,6 +193,32 @@ void CdDecoder::run()
     deinit();
 }
 
+int CdDecoder::getNumTracks(void)
+{
+    int cd = cd_init_device((char *)devicename.ascii());
+
+    struct disc_info discinfo;
+    if (cd_stat(cd, &discinfo) != 0)
+    {
+        error("Couldn't stat CD, Error.");
+        cd_finish(cd);
+        return 0;
+    }
+
+    if (!discinfo.disc_present)
+    {
+        error("No disc present");
+        cd_finish(cd);
+        return 0;
+    }
+
+    int retval = discinfo.disc_total_tracks;
+
+    cd_finish(cd);
+
+    return retval;
+}
+
 Metadata *CdDecoder::getMetadata(QSqlDatabase *db, int track)
 {
     settracknum = track;
@@ -226,7 +252,11 @@ Metadata *CdDecoder::getMetadata(QSqlDatabase *db)
     if (settracknum == -1)
         tracknum = atoi(filename.ascii());
     else
+    {
         tracknum = settracknum;
+        filename = QString("%1.cda").arg(tracknum);
+    }
+
     settracknum = -1;
 
     if (tracknum > discinfo.disc_total_tracks)

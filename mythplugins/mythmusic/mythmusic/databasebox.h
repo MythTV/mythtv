@@ -30,7 +30,9 @@ class DatabaseBox : public QDialog
     void doSelected(QListViewItem *);
     void checkParent(QListViewItem *);
 
-    void FillList(QListView *listview, QString &paths);
+    void fillCD(void);
+
+    void fillList(QListView *listview, QString &paths);
     void fillNextLevel(QString level, int num, QString querystr, 
                        QString matchstr, QStringList::Iterator line,
                        QStringList lines, TreeCheckItem *parent);
@@ -38,6 +40,8 @@ class DatabaseBox : public QDialog
     QPixmap getPixmap(QString &level);
 
     QSqlDatabase *db;
+
+    TreeCheckItem *cditem;
 
     QValueList<Metadata> *plist;
 };

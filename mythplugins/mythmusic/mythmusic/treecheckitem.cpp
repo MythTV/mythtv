@@ -7,6 +7,7 @@
 #include "res/artist_pix.xpm"
 #include "res/catalog_pix.xpm" 
 #include "res/track_pix.xpm"
+#include "res/cd_pix.xpm"
 
 TreeCheckItem::TreeCheckItem(QListView *parent, QString &ltext, 
                              const QString &llevel, Metadata *mdata)
@@ -40,4 +41,6 @@ void TreeCheckItem::pickPixmap(void)
         setPixmap(0, QPixmap((const char **)track_pix));
     else if (level == "genre")
         setPixmap(0, QPixmap((const char **)catalog_pix));
+    else if (level == "cd")
+        setPixmap(0, QPixmap((const char **)cd_pix));
 }

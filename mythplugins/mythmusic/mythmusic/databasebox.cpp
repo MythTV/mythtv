@@ -9,6 +9,7 @@
 #include "metadata.h"
 #include "databasebox.h"
 #include "treecheckitem.h"
+#include "cddecoder.h"
 
 DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QString &paths, 
                          QValueList<Metadata> *playlist, 
@@ -38,7 +39,7 @@ DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QString &paths,
     listview->addColumn("Select music to be played:");
 
     listview->setSorting(-1);
-//    listview->setRootIsDecorated(true);
+    listview->setRootIsDecorated(true);
     listview->setAllColumnsShowFocus(true);
     listview->setColumnWidth(0, 730 * wmult);
     listview->setColumnWidthMode(0, QListView::Manual);
@@ -48,7 +49,9 @@ DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QString &paths,
     connect(listview, SIGNAL(spacePressed(QListViewItem *)), this,
             SLOT(selected(QListViewItem *)));
 
-    FillList(listview, paths);
+    cditem = NULL;
+
+    fillList(listview, paths);
 
     vbox->addWidget(listview, 1);
 
@@ -61,8 +64,53 @@ void DatabaseBox::Show()
     setActiveWindow();
 }
 
-void DatabaseBox::FillList(QListView *listview, QString &paths)
+void DatabaseBox::fillCD(void)
 {
+    if (cditem)
+    {
+        while (cditem->firstChild())
+        {
+            delete cditem->firstChild();
+        }
+        cditem->setText(0, "CD -- none");
+    }
+
+    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
+    int tracknum = decoder->getNumTracks();
+
+    bool setTitle = false;
+
+    while (tracknum > 0) 
+    {
+        Metadata *track = decoder->getMetadata(db, tracknum);
+
+        if (!setTitle)
+        {
+            QString parenttitle = " " + track->Artist() + " ~ " + 
+                                  track->Album();
+            cditem->setText(0, parenttitle);
+            setTitle = true;
+        }
+
+        QString title = QString(" %1").arg(tracknum);
+        title += " - " + track->Title();
+
+        QString level = "title";
+
+        new TreeCheckItem(cditem, title, level, track);
+
+        tracknum--;
+    }
+
+    checkParent(cditem);
+}
+
+void DatabaseBox::fillList(QListView *listview, QString &paths)
+{
+    QString title = "CD -- none";
+    QString level = "cd";
+    cditem = new TreeCheckItem(listview, title, level, NULL);
+
     QString templevel = "genre";
     QString temptitle = "All My Music";
     TreeCheckItem *allmusic = new TreeCheckItem(listview, temptitle,
@@ -101,8 +149,14 @@ void DatabaseBox::FillList(QListView *listview, QString &paths)
 
             fillNextLevel(level, num, querystr, matchstr, line, lines,
                           item);
+
+            if (plist->find(*mdata) != plist->end())
+                item->setOn(true);
         }
     }
+
+    fillCD();
+
     listview->setOpen(allmusic, true);
 }
 
