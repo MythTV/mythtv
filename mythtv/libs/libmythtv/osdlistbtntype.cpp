@@ -479,7 +479,8 @@ void OSDListBtnType::SetGroupCheckState(QString group, int newState)
 {
     OSDListBtnTypeItem* item = 0;
     for (item = m_itemList.first(); item; item = m_itemList.next()) {
-        item->setChecked((OSDListBtnTypeItem::CheckState)newState);
+        if (item->getGroup() == group)
+            item->setChecked((OSDListBtnTypeItem::CheckState)newState);
     }
 }
 

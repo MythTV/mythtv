@@ -3990,16 +3990,20 @@ void TV::BuildOSDTreeMenu(void)
         item = new OSDGenericTree(treeMenu, tr("Commercial Auto-Skip"));
         subitem = new OSDGenericTree(item, tr("Auto-Skip OFF"),
                                      "TOGGLECOMMSKIP0",
-                                     (autoCommercialSkip == 0) ? 1 : 0);
+                                     (autoCommercialSkip == 0) ? 1 : 0, NULL,
+                                     "COMMSKIPGROUP");
         subitem = new OSDGenericTree(item, tr("Auto-Skip Notify"),
                                      "TOGGLECOMMSKIP2",
-                                     (autoCommercialSkip == 2) ? 1 : 0);
+                                     (autoCommercialSkip == 2) ? 1 : 0, NULL,
+                                     "COMMSKIPGROUP");
         subitem = new OSDGenericTree(item, tr("Auto-Skip Pre-Notify"),
                                      "TOGGLECOMMSKIP3",
-                                     (autoCommercialSkip == 3) ? 1 : 0);
+                                     (autoCommercialSkip == 3) ? 1 : 0, NULL,
+                                     "COMMSKIPGROUP");
         subitem = new OSDGenericTree(item, tr("Auto-Skip ON"),
                                      "TOGGLECOMMSKIP1",
-                                     (autoCommercialSkip == 1) ? 1 : 0);
+                                     (autoCommercialSkip == 1) ? 1 : 0, NULL,
+                                     "COMMSKIPGROUP");
 
         m_db->lock();
         if (playbackinfo->GetAutoExpireFromRecorded(m_db->db()))
@@ -4030,19 +4034,24 @@ void TV::BuildOSDTreeMenu(void)
     item = new OSDGenericTree(treeMenu, tr("Change Aspect Ratio"));
     subitem = new OSDGenericTree(item, tr("4:3"), "TOGGLEASPECT" +
                                  QString("%1").arg(kLetterbox_4_3),
-                                 (letterbox == kLetterbox_4_3) ? 1 : 0);
+                                 (letterbox == kLetterbox_4_3) ? 1 : 0,
+                                 NULL, "ASPECTGROUP");
     subitem = new OSDGenericTree(item, tr("16:9"), "TOGGLEASPECT" +
                                  QString("%1").arg(kLetterbox_16_9),
-                                 (letterbox == kLetterbox_16_9) ? 1 : 0);
+                                 (letterbox == kLetterbox_16_9) ? 1 : 0,
+                                 NULL, "ASPECTGROUP");
     subitem = new OSDGenericTree(item, tr("4:3 Zoom"), "TOGGLEASPECT" +
                                  QString("%1").arg(kLetterbox_4_3_Zoom),
-                                 (letterbox == kLetterbox_4_3_Zoom) ? 1 : 0);
+                                 (letterbox == kLetterbox_4_3_Zoom) ? 1 : 0,
+                                 NULL, "ASPECTGROUP");
     subitem = new OSDGenericTree(item, tr("16:9 Zoom"), "TOGGLEASPECT" +
                                  QString("%1").arg(kLetterbox_16_9_Zoom),
-                                 (letterbox == kLetterbox_16_9_Zoom) ? 1 : 0);
+                                 (letterbox == kLetterbox_16_9_Zoom) ? 1 : 0,
+                                 NULL, "ASPECTGROUP");
     subitem = new OSDGenericTree(item, tr("16:9 Stretch"), "TOGGLEASPECT" +
                                  QString("%1").arg(kLetterbox_16_9_Stretch),
-                                 (letterbox == kLetterbox_16_9_Stretch) ? 1 : 0);
+                                 (letterbox == kLetterbox_16_9_Stretch) ? 1 : 0,
+                                 NULL, "ASPECTGROUP");
 
     if (usePicControls)
     {
@@ -4072,21 +4081,29 @@ void TV::BuildOSDTreeMenu(void)
     item = new OSDGenericTree(treeMenu, tr("Adjust Time Stretch"), "TOGGLESTRETCH");
     subitem = new OSDGenericTree(item, tr("Adjust"), "TOGGLESTRETCH");
     subitem = new OSDGenericTree(item, tr("0.5X"), "TOGGLESTRETCH0.5",
-                                 (speedX10 == 5) ? 1 : 0);
+                                 (speedX10 == 5) ? 1 : 0, NULL,
+                                 "STRETCHGROUP");
     subitem = new OSDGenericTree(item, tr("0.9X"), "TOGGLESTRETCH0.9",
-                                 (speedX10 == 9) ? 1 : 0);
+                                 (speedX10 == 9) ? 1 : 0, NULL,
+                                 "STRETCHGROUP");
     subitem = new OSDGenericTree(item, tr("1.0X"), "TOGGLESTRETCH1.0",
-                                 (speedX10 == 10) ? 1 : 0);
+                                 (speedX10 == 10) ? 1 : 0, NULL,
+                                 "STRETCHGROUP");
     subitem = new OSDGenericTree(item, tr("1.1X"), "TOGGLESTRETCH1.1",
-                                 (speedX10 == 11) ? 1 : 0);
+                                 (speedX10 == 11) ? 1 : 0, NULL,
+                                 "STRETCHGROUP");
     subitem = new OSDGenericTree(item, tr("1.2X"), "TOGGLESTRETCH1.2",
-                                 (speedX10 == 12) ? 1 : 0);
+                                 (speedX10 == 12) ? 1 : 0, NULL,
+                                 "STRETCHGROUP");
     subitem = new OSDGenericTree(item, tr("1.3X"), "TOGGLESTRETCH1.3",
-                                 (speedX10 == 13) ? 1 : 0);
+                                 (speedX10 == 13) ? 1 : 0, NULL,
+                                 "STRETCHGROUP");
     subitem = new OSDGenericTree(item, tr("1.4X"), "TOGGLESTRETCH1.4",
-                                 (speedX10 == 14) ? 1 : 0);
+                                 (speedX10 == 14) ? 1 : 0, NULL,
+                                 "STRETCHGROUP");
     subitem = new OSDGenericTree(item, tr("1.5X"), "TOGGLESTRETCH1.5",
-                                 (speedX10 == 15) ? 1 : 0);
+                                 (speedX10 == 15) ? 1 : 0, NULL,
+                                 "STRETCHGROUP");
 
     // add sleep items to menu
 

@@ -261,6 +261,7 @@ class OSDListBtnTypeItem
     void  setData(void *data);
     void* getData();
     void  setGroup(QString group) { m_group = group; };
+    QString getGroup(void) { return m_group; }
 
     void  Reinit(float wchange, float hchange, float wmult, float hmult);
     
