@@ -49,6 +49,12 @@ Metadata::Metadata(
     changed = false;
 }
 
+QString Metadata::getFilePath()
+{
+    QString return_value = url.toString(false, false);
+    return return_value;
+}
+
 void Metadata::setRating(int l_rating)
 {
     //

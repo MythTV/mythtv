@@ -746,17 +746,18 @@ void DaapServer::addItemToResponse(
             //
             
             if(
-                which_item->getUrl().fileName().section('.', -1,-1) == "wma" ||
-                which_item->getUrl().fileName().section('.', -1,-1) == "cda"
+                which_item->getFormat() == "wma" ||
+                which_item->getFormat() == "cda"
               )
             {
                 response << Tag('asfm') << "wav" << end;
             }
-            else if(which_item->getUrl().fileName().section('.', -1,-1) == "m4a")
+            else if(which_item->getFormat() == "m4a")
             {
                 //
                 //  Send aac (.m4a) as aac if the client supports it, otherwise wav
                 //
+
                 if(http_request->getHeader("Accept").contains("audio/m4a"))
                 {
                     response << Tag('asfm') << "m4a" << end;
@@ -768,17 +769,17 @@ void DaapServer::addItemToResponse(
             }
             else
             {
-                QString extension = which_item->getUrl().fileName().section('.', -1,-1);
+                QString extension = which_item->getFormat();
                 response << Tag('asfm') << extension.utf8() << end;
             }
         }
         else
         {
-            if(which_item->getUrl().fileName().section('.', -1,-1) == "mp3")
+            if(which_item->getFormat() == "mp3")
             {
                 response << Tag('asfm') << "mp3" << end;
             }
-            else if(which_item->getUrl().fileName().section('.', -1,-1) == "m4a")
+            else if(which_item->getFormat() == "m4a")
             {
                 response << Tag('asfm') << "m4a" << end;
             }
@@ -1098,8 +1099,7 @@ void DaapServer::sendDatabaseItem(HttpInRequest *http_request, u32 song_id, Daap
             http_request->getResponse()->addHeader("Content-Type: application/x-dmap-tagged");
 
             AudioMetadata *which_audio = (AudioMetadata*)which_one;
-            QUrl file_url = which_audio->getUrl();
-            QString file_path = file_url.path();
+            QString file_path = which_audio->getFilePath();
 
             //
             //  If we got a Range: header in the request, send only the
@@ -1137,7 +1137,7 @@ void DaapServer::sendDatabaseItem(HttpInRequest *http_request, u32 song_id, Daap
                 //  Always translate wma's and cda's
                 //
                 
-                if(file_path.section('.', -1,-1) == "m4a")
+                if(which_audio->getFormat() == "m4a")
                 {
                     if(http_request->getHeader("Accept").contains("audio/m4a"))
                     {
@@ -1149,8 +1149,8 @@ void DaapServer::sendDatabaseItem(HttpInRequest *http_request, u32 song_id, Daap
                     }
                 }
                 else if(
-                    file_path.section('.', -1,-1) == "wma" ||
-                    file_path.section('.', -1,-1) == "cda"
+                    which_audio->getFormat() == "wma" ||
+                    which_audio->getFormat() == "cda"
                   )
                 {
                     http_request->getResponse()->sendFile(file_path, skip, FILE_TRANSFORM_TOWAV);
@@ -1168,8 +1168,8 @@ void DaapServer::sendDatabaseItem(HttpInRequest *http_request, u32 song_id, Daap
                 //
                 
                 if(
-                    file_path.section('.', -1,-1) == "mp3" ||
-                    file_path.section('.', -1,-1) == "m4a"
+                    which_audio->getFormat() == "mp3" ||
+                    which_audio->getFormat() == "m4a"
                   )
                 {
                     http_request->getResponse()->sendFile(file_path, skip);

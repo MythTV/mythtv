@@ -55,6 +55,8 @@ class Metadata
     //  Set and get
     //
 
+    QString       getFilePath();
+
     QUrl          getUrl(){return url;}
     void          setUrl(QUrl l_url){url = l_url;}
 
