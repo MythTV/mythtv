@@ -1,7 +1,7 @@
 #CONFIG += debug
 CONFIG += release
 
-PREFIX = /usr
+PREFIX = /usr/local
 
 LIBVERSION = 0.14
 
@@ -14,7 +14,7 @@ DEFINES += PREFIX=\"$${PREFIX}\"
 
 release {
         DEFINES += MMX
-        QMAKE_CXXFLAGS_RELEASE = -O2 -march=pentiumpro -g
+        QMAKE_CXXFLAGS_RELEASE = -O3 -march=pentiumpro -fomit-frame-pointer
         QMAKE_CFLAGS_RELEASE = $${QMAKE_CXXFLAGS_RELEASE}
 }
 
@@ -24,7 +24,7 @@ EXTRA_LIBS = -lfreetype -lmp3lame
 CONFIG += using_xv
 EXTRA_LIBS += -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm
 
-# IVTV (PVR-350) support.  No need to disable unless building on windows
+# IVTV (PVR-350) support.  Disable if building on Windows.
 CONFIG += using_ivtv
 DEFINES += USING_IVTV
 
