@@ -15,7 +15,6 @@
         - 1/9/2004 - Improved seek support
 */
 
-#include <assert.h>
 #include <iostream>
 #include <string>
 #include <qobject.h>

@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
@@ -540,7 +539,9 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
 {
     Metadata *testdb = new Metadata(filename);
     if (testdb->isInDatabase(db, musiclocation))
+    {
         return testdb;
+    }
 
     delete testdb;
 
@@ -583,7 +584,7 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
             if (!frame)
                 continue;
 
-            id3_ucs4_t const *ucs4;
+            id3_ucs4_t const *ucs4 = NULL;
             id3_latin1_t *latin1;
             union id3_field *field;
             unsigned int nstrings;
@@ -594,33 +595,40 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
             for (unsigned int j = 0; j < nstrings; ++j)
             {
                 ucs4 = id3_field_getstrings(field, j);
-                assert(ucs4);
-
-                if (!strcmp(info[i].id, ID3_FRAME_GENRE))
-                    ucs4 = id3_genre_name(ucs4);
-
-                latin1 = id3_ucs4_latin1duplicate(ucs4);
-                if (!latin1)
-                    continue;
-
-                switch (i)
+                if(!ucs4)
                 {
-                    case 0: title += (char *)latin1; break;
-                    case 1: artist += (char *)latin1; break;
-                    case 2: album += (char *)latin1; break;
-                    case 3: if (year == 0) 
-                                year = atoi((char *)latin1); 
-                            break;
-                    case 4: if (tracknum == 0) 
-                                tracknum = atoi((char *)latin1); 
-                            break;
-                    case 5: if (genre != (char *)latin1)
-                                genre += (char *)latin1; 
-                            break;
-                    default: break;
+                    cerr << "maddecoder.o: id3_field_getstrings() did not "
+                         << "return anything."
+                         << endl;
                 }
+                else
+                {
+                    if (!strcmp(info[i].id, ID3_FRAME_GENRE))
+                        ucs4 = id3_genre_name(ucs4);
 
-                free(latin1);
+                    latin1 = id3_ucs4_latin1duplicate(ucs4);
+                    if (!latin1)
+                        continue;
+
+                    switch (i)
+                    {
+                        case 0: title += (char *)latin1; break;
+                        case 1: artist += (char *)latin1; break;
+                        case 2: album += (char *)latin1; break;
+                        case 3: if (year == 0) 
+                                    year = atoi((char *)latin1); 
+                                break;
+                        case 4: if (tracknum == 0) 
+                                    tracknum = atoi((char *)latin1); 
+                                break;
+                        case 5: if (genre != (char *)latin1)
+                                    genre += (char *)latin1; 
+                                break;
+                        default: break;
+                    }
+
+                    free(latin1);
+                }
             }
         }
 
