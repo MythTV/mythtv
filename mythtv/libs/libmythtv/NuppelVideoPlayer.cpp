@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <assert.h>
 #include <sys/soundcard.h>
 #include <sys/types.h>
 #include <sys/stat.h>
