@@ -1350,6 +1350,8 @@ void OSD::StartPause(int position, bool fill, QString msgtext,
 {
     fill = fill;
 
+    HideAllExcept("status");
+
     osdlock.lock();
     OSDSet *container = GetSet("status");
     if (container)
@@ -1369,6 +1371,7 @@ void OSD::StartPause(int position, bool fill, QString msgtext,
             container->DisplayFor(displaytime * 1000000, osdFunctionalType);
         else
             container->Display();
+
         m_setsvisible = true;
         changed = true;
     }
@@ -1500,6 +1503,8 @@ void OSD::UpdateCCText(vector<ccText*> *ccbuf,
 
 void OSD::SetSettingsText(const QString &text, int length)
 {
+    HideAllExcept("settings");
+
     osdlock.lock();
     OSDSet *container = GetSet("settings");
     if (container)
@@ -1770,19 +1775,29 @@ void OSD::HideEditArrow(long long number, int type)
     osdlock.unlock();
 }
 
-void OSD::HideAll(void)
+bool OSD::HideAllExcept(const QString &name1, const QString &name2)
 {
+    bool result = false;
+
     osdlock.lock();
 
     vector<OSDSet *>::iterator i;
     for (i = setList->begin(); i != setList->end(); i++)
-        if (*i)
-            (*i)->Hide();
-
-    runningTreeMenu = NULL;
+        if (*i && (*i)->Displaying())
+        {
+            QString name = (*i)->GetName();
+            if (name != "cc_page" && name != "menu" &&
+                name != name1 && name != name2)
+            {
+                (*i)->Hide();
+                result = true;
+            }
+        }
 
     changed = true;
     osdlock.unlock();
+
+    return result;
 }
 
 bool OSD::HideSet(const QString &name)

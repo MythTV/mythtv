@@ -85,7 +85,9 @@ class OSD : public QObject
 
     bool Visible(void);
 
-    void HideAll(void);
+    bool HideAll(void) { return HideAllExcept(QString::null); };
+    bool HideAllExcept(const QString &name1, 
+                       const QString &name2 = QString::null);
     bool HideSet(const QString &name);
     bool HideSets(QStringList &name);
 

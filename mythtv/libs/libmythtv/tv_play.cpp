@@ -1379,8 +1379,6 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 nvp->Zoom(kZoomLeft);
             else if (action == "RIGHT")
                 nvp->Zoom(kZoomRight);
-            else if (action == "CLEAROSD")
-                ClearOSD();
             else if (action == "ESCAPE")
             {
                 nvp->Zoom(kZoomHome);
@@ -1394,7 +1392,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 nvp->Zoom(kZoomOut);
             else if (action == "VOLUMEDOWN" || action == "VOLUMEUP" ||
                      action == "STRETCHINC" || action == "STRETCHDEC" ||
-                     action == "MUTE" || action == "PAUSE")
+                     action == "MUTE" || action == "PAUSE" ||
+                     action == "CLEAROSD")
             {
                 passThru = 1;
                 handled = false;
@@ -1567,6 +1566,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 ChangeTimeStretch(-1);
             else if (action == "RIGHT")
                 ChangeTimeStretch(1);
+            else if (action == "TOGGLESTRETCH")
+                ClearOSD();
             else
                 handled = false;
         }
@@ -2124,19 +2125,14 @@ void TV::DoInfo(void)
     oset = osd->GetSet("status");
     if ((oset) && (oset->Displaying()))
     {
-        oset->Display(false);
-
         QMap<QString, QString> infoMap;
         playbackinfo->ToMap(infoMap);
+        osd->HideAllExcept("program_info");
         osd->ClearAllText("program_info");
         osd->SetText("program_info", infoMap, osd_display_time);
     }
     else
     {
-        oset = osd->GetSet("program_info");
-        if ((oset) && (oset->Displaying()))
-            oset->Display(false);
-
         QString desc = "";
         int pos = nvp->calcSliderPos(desc);
         osd->StartPause(pos, false, tr("Position"), desc, osd_display_time);
@@ -2162,7 +2158,6 @@ bool TV::UpdatePosOSD(float time, const QString &mesg, int disptime)
         bool slidertype = (internalState == kState_WatchingLiveTV);
         int osdtype = (doSmartForward) ? kOSDFunctionalType_SmartForward :
                                          kOSDFunctionalType_Default;
-
         osd->StartPause(pos, slidertype, mesg, desc, disptime, osdtype);
         update_osd_pos = true;
     }
@@ -2814,15 +2809,20 @@ void TV::SetPreviousChannel()
 
 bool TV::ClearOSD(void)
 {
-    QStringList hidesets;
-    hidesets << "program_info" << "channel_number" << "status" << "settings";
-    bool res = osd->HideSets(hidesets);
-    if (res)
+    bool res = false;
+
+    if (channelqueued)
     {
-        ChannelClear();
-        while (osd->HideSets(hidesets))
-            usleep(1000);
+        ChannelClear(true);
+        res = true;
     }
+
+    if (osd->HideAll())
+        res = true;
+
+    while (res && osd->HideAll())
+        usleep(1000);
+
     return res;
 }
 
@@ -2830,10 +2830,7 @@ void TV::ToggleOSD(void)
 {
     OSDSet *oset = osd->GetSet("program_info");
     if (osd && (oset) && oset->Displaying())
-    {
-        osd->HideSet("program_info");
-        osd->HideSet("channel_number");
-    }
+        osd->HideAll();
     else
         UpdateOSD();
 }
@@ -2859,6 +2856,7 @@ void TV::UpdateOSD(void)
             curPlaybackInfo->ToMap(infoMap);
     }
 
+    osd->HideAllExcept("program_info", "channel_number");
     osd->ClearAllText("program_info");
     osd->SetText("program_info", infoMap, osd_display_time);
     osd->ClearAllText("channel_number");
@@ -3312,8 +3310,7 @@ void TV::ChangeTimeStretch(int dir, bool allowEdit)
 
     QString text = QString(tr("Time Stretch %1X")).arg(normal_speed);
 
-    //if (osd && !browsemode)
-    if (osd)
+    if (osd && !browsemode)
     {
         int val = (int)(normal_speed*500);
         osd->StartPause(val, false, tr("Adjust Time Stretch"), text, 10, 
