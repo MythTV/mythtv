@@ -580,6 +580,10 @@
         <source>Recording one showing of this program</source>
         <translation>この放送を一回だけ録画する</translation>
     </message>
+    <message>
+        <source>Any</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>

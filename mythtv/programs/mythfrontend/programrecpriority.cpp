@@ -946,7 +946,7 @@ void ProgramRecPriority::updateInfo(QPainter *p)
                 if(curitem->channame != "")
                     type->SetText(curitem->channame);
                 else
-                    type->SetText("Any");
+                    type->SetText(tr("Any"));
             }
 
             type = (UITextType *)container->GetType("channelrecpriority");

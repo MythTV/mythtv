@@ -576,6 +576,10 @@
         <source>Recording one showing of this program</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Any</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
