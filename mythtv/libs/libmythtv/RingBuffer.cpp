@@ -453,6 +453,10 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
         qApp->unlock();
     }
 
+    qApp->lock();
+    available = sock->bytesAvailable();
+    qApp->unlock();
+
     if (available >= sz)
     {
         qApp->lock();

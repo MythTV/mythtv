@@ -572,8 +572,8 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     
         if (seek_frameheader.frametype != 'Q')
         {
-          cerr << "Invalid seektable (frametype " 
-               << (int)seek_frameheader.frametype << ")\n";
+            cerr << "Invalid seektable (frametype " 
+                 << (int)seek_frameheader.frametype << ")\n";
         }
         else
         {
