@@ -760,9 +760,9 @@
     </container>
 
     <container name="program_info">
-      <area>25,370,800,210</area>
+      <area>25,370,775,210</area>
       <textarea name="title" draworder="6">
-        <area>0,0,800,40</area>
+        <area>0,0,740,40</area>
         <font>title</font>
       </textarea>
       <textarea name="channel" draworder="6">
@@ -1906,14 +1906,14 @@
     <container name="background">
       <image name="filler" draworder="0" fleximage="yes">
         <filename>sr-background.png</filename>
-        <position>0,305</position>
+        <position>0,0</position>
       </image>
     </container>
 
     <container name="selector">
       <area>0,300,800,300</area>
       <listarea name="menu_list" draworder="4">
-        <area>20,10,760,274</area>
+        <area>20,15,760,274</area>
         <fcnfont name="active" function="active"></fcnfont>
         <fcnfont name="inactive" function="inactive"></fcnfont>
         <fcnfont name="inactive" function="disabled"></fcnfont>
@@ -1922,54 +1922,54 @@
         <columnpadding>1</columnpadding>
         <column number="1" width="745" context="-1"></column>
         <items>8</items>
-        <image function="selectionbar" filename="rk-selectbar.png" location="-8,3"></image>
+        <image function="selectionbar" filename="cr-selectbar.png" location="-10,-8"></image>
         <image function="uparrow" filename="uparrow.png" location="755,15"></image>
         <image function="downarrow" filename="downarrow.png" location="755,235"></image>
-        <image function="rightarrow" filename="rightarrow.png" location="-10,9"></image>
-        <image function="leftarrow" filename="leftarrow.png" location="-5,9"></image>
+        <image function="rightarrow" filename="rightarrow.png" location="0,-5"></image>
+        <image function="leftarrow" filename="leftarrow.png" location="-10,-5"></image>
 
       </listarea>
       <image name="showinglines" draworder="5" fleximage="no">
-        <filename>def-ro-lines.png</filename>
+        <filename>rk-lines.png</filename>
         <position>0,0</position>
       </image>
     </container>
 
     <container name="program_info">
-      <area>20,20,760,275</area>
+      <area>30,35,760,275</area>
       <textarea name="banner" draworder="6">
         <area>0,0,760,45</area>
         <font>title</font>
       </textarea>
       <textarea name="episode" draworder="6">
-        <area>0,45,760,40</area>
+        <area>0,35,760,40</area>
         <font>subtitle</font>
       </textarea>
       <textarea name="infotime" draworder="6" align="right">
-        <area>0,85,150,30</area>
+        <area>0,70,120,30</area>
         <font>infob</font>
         <value>Airdate:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
-        <area>160,85,600,30</area>
+        <area>125,70,600,30</area>
         <font>info</font>
       </textarea>
       <textarea name="infochan" draworder="6" align="right">
-        <area>0,115,150,30</area>
+        <area>0,100,120,30</area>
         <font>infob</font>
         <value>Channel:</value>
       </textarea>
       <textarea name="channel" draworder="6">
-        <area>160,115,600,30</area>
+        <area>125,100,600,30</area>
         <font>info</font>
       </textarea>
       <textarea name="infodesc" draworder="6" align="right">
-        <area>0,145,150,30</area>
+        <area>0,130,120,30</area>
         <font>infob</font>
         <value>Description:</value>
       </textarea>
       <textarea name="description" draworder="6">
-        <area>160,145,600,130</area>
+        <area>125,130,620,100</area>
         <font>info</font>
         <multiline>yes</multiline>
       </textarea>
