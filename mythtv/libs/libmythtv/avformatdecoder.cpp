@@ -280,7 +280,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                     enc->flags |= CODEC_FLAG_TRUNCATED;
 
                 if (codec && codec->capabilities & CODEC_CAP_DR1 && 
-                    enc->codec_id != CODEC_ID_SVQ3 && !enc->width % 16)
+                    enc->codec_id != CODEC_ID_SVQ3 && !(enc->width % 16))
                 {
                     enc->flags |= CODEC_FLAG_EMU_EDGE;
                     enc->draw_horiz_band = NULL;
