@@ -220,7 +220,7 @@
       <textarea name="keyslbl_three" draworder="4" align="right">
         <area>580,275,200,30</area>
         <font>keysfont</font>
-        <value>MENU: Options</value>        
+        <value>INFO - Action Menu</value>        
       </textarea>
     </container>
     
@@ -400,16 +400,11 @@
     <container name="browsing">
       <area>10,440,780,150</area>
       <textarea name="videoin" draworder="3" align="left">
-        <area>10,115,780,35</area>
+        <area>40,115,780,35</area>
         <font>helptext</font>
-        <value>Up/Down, Page Up/Down - Browse</value>
+        <value>Up/Down, Page Up/Down: Browse   MENU: Options   INFO: Action Menu</value>
       </textarea>
 
-      <textarea name="videoin" draworder="3" align="left">
-        <area>620,115,200,35</area>
-        <font>helptext</font>
-        <value>Menu - Options</value>
-      </textarea>
 
       <textarea name="currentvideo" draworder="3" align="hcenter">
         <area>140,46,500,35</area>

@@ -180,8 +180,8 @@ void VideoBrowser::keyPressEvent(QKeyEvent *e)
 
         if ((action == "SELECT" || action == "PLAY") && allowselect)
             selected(curitem);
-        else if (action == "MENU")
-            doMenu();
+        else if (action == "INFO")
+            doMenu(true);
         else if (action == "UP")
             jumpSelection(1);
         else if (action == "DOWN")
@@ -202,8 +202,8 @@ void VideoBrowser::keyPressEvent(QKeyEvent *e)
             setParentalLevel(action.toInt());
         else if (action == "FILTER")
             slotDoFilter();
-        else if (action == "INFO")
-            slotViewPlot();
+        else if (action == "MENU")
+            doMenu(false);
         else
             handled = false;
     }
@@ -212,7 +212,7 @@ void VideoBrowser::keyPressEvent(QKeyEvent *e)
         MythDialog::keyPressEvent(e);
 }
 
-void VideoBrowser::doMenu()
+void VideoBrowser::doMenu( bool info)
 {
     popup = new MythPopupBox(gContext->GetMainWindow(), "video popup");
 
@@ -221,16 +221,23 @@ void VideoBrowser::doMenu()
     popup->addLabel(tr("Select action"));
     popup->addLabel("");
 
-    QButton *viewButton = popup->addButton(tr("Watch This Video"), this, SLOT(slotWatchVideo())); 
-
-    popup->addButton(tr("View Full Plot"), this, SLOT(slotViewPlot()));
-    popup->addButton(tr("Filter Display"), this, SLOT(slotDoFilter()));
-    popup->addButton(tr("Switch to Video Listings"), this, SLOT(slotVideoTree()));    
-
+    QButton *focusButton = NULL;
+    if(info)
+    {
+        focusButton = popup->addButton(tr("Watch This Video"), this, SLOT(slotWatchVideo())); 
+        popup->addButton(tr("View Full Plot"), this, SLOT(slotViewPlot()));
+    }
+    else
+    {
+        focusButton = popup->addButton(tr("Filter Display"), this, SLOT(slotDoFilter()));
+        popup->addButton(tr("Switch to Video Listings"), this, SLOT(slotVideoTree()));    
+    }
+    
+    popup->addButton(tr("Cancel"), this, SLOT(slotDoCancel()));
+    
     popup->ShowPopup(this, SLOT(slotDoCancel()));
 
-    viewButton->setFocus();
-
+    focusButton->setFocus();
 }
 
 void VideoBrowser::slotVideoTree()

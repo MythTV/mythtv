@@ -44,7 +44,7 @@ class VideoBrowser : public MythDialog
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
     void cancelPopup(void);
-    void doMenu(void);
+    void doMenu(bool info=false);
   private:
     MythPopupBox* popup;
     bool expectingPopup;
