@@ -237,6 +237,7 @@ GuideGrid::GuideGrid(const QString &channel, TV *player, QWidget *parent,
     accel->connectItem(accel->insertItem(Key_I), this, SLOT(displayInfo()));
     accel->connectItem(accel->insertItem(Key_Space), this, SLOT(displayInfo()));
     accel->connectItem(accel->insertItem(Key_Enter), this, SLOT(displayInfo()));
+    accel->connectItem(accel->insertItem(Key_Return), this, SLOT(displayInfo()));
     accel->connectItem(accel->insertItem(Key_R), this, SLOT(quickRecord()));
     accel->connectItem(accel->insertItem(Key_X), this, SLOT(channelUpdate()));
 
