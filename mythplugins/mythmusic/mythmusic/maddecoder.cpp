@@ -643,8 +643,7 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
    
     timer = mad_timer_zero;
 
-
-    FILE *input = fopen(filename.ascii(), "r");
+    FILE *input = fopen(filename.local8Bit(), "r");
     struct stat s;
     fstat(fileno(input), &s);
     unsigned long old_bitrate = 0;

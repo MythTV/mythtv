@@ -332,7 +332,7 @@ Metadata *VorbisDecoder::getMetadata(QSqlDatabase *db)
     QString artist = "", album = "", title = "", genre = "";
     int year = 0, tracknum = 0, length = 0;
 
-    FILE *input = fopen(filename.ascii(), "r");
+    FILE *input = fopen(filename.local8Bit(), "r");
 
     if (!input)
         return NULL;
