@@ -595,6 +595,9 @@ public:
         setLabel("Short Date format");
         addSelection("M/d");
         addSelection("d/M");
+        addSelection("MM/dd");
+        addSelection("dd/MM");
+        addSelection("MM.dd");
         setHelpText("Your preferred short date format.");
     };
 };

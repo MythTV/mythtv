@@ -68,6 +68,7 @@ class ViewScheduled : public MythDialog
     QString dateformat;
     QString timeformat;
     QString shortdateformat;
+    bool displayChanNum;
 
     QAccel *accel;
 

@@ -41,6 +41,7 @@ ViewScheduled::ViewScheduled(QSqlDatabase *ldb, QWidget *parent,
     dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
     shortdateformat = gContext->GetSetting("ShortDateFormat", "M/d");
     timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
+    displayChanNum = gContext->GetNumSetting("DisplayChanNum");
 
     fullRect = QRect(0, 0, size().width(), size().height());
     listRect = QRect(0, 0, 0, 0);
@@ -59,7 +60,9 @@ ViewScheduled::ViewScheduled(QSqlDatabase *ldb, QWidget *parent,
     accel->connectItem(enter_itemid, this, SLOT(selected()));
     accel->connectItem(return_itemid, this, SLOT(selected()));
     accel->connectItem(accel->insertItem(Key_PageUp), this, SLOT(pageUp()));
+    accel->connectItem(accel->insertItem(Key_3), this, SLOT(pageUp()));
     accel->connectItem(accel->insertItem(Key_PageDown), this, SLOT(pageDown()));
+    accel->connectItem(accel->insertItem(Key_9), this, SLOT(pageDown()));
     accel->connectItem(accel->insertItem(Key_Escape), this, SLOT(exitWin()));
 
     connect(this, SIGNAL(killTheApp()), this, SLOT(accept()));
@@ -471,7 +474,10 @@ void ViewScheduled::updateList(QPainter *p)
                         tempDate = (tempInfo->startts).toString(shortdateformat);
                         tempTime = (tempInfo->startts).toString(timeformat);
 
-                        tempChan = tempInfo->chanstr;
+                        if (displayChanNum)
+                            tempChan = tempInfo->chansign;
+                        else
+                            tempChan = tempInfo->chanstr;
 
                         if (cnt == inList)
                         {
