@@ -40,8 +40,8 @@ class IvtvDecoder : public DecoderBase
     bool DoFastForward(long long desiredFrame, bool doflush = true);
 
     bool isLastFrameKey(void) { return false; }
-    void WriteStoredData(RingBuffer *rb, bool storevid)
-                           { (void)rb; (void)storevid; }
+    void WriteStoredData(RingBuffer *rb, bool storevid, long timecodeOffset)
+                           { (void)rb; (void)storevid; (long)timecodeOffset;}
     void SetRawAudioState(bool state) { (void)state; }
     bool GetRawAudioState(void) { return false; }
     void SetRawVideoState(bool state) { (void)state; }

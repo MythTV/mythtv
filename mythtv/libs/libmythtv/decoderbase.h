@@ -35,7 +35,9 @@ class DecoderBase
     virtual bool DoFastForward(long long desiredFrame, bool doflush = true);
 
     virtual bool isLastFrameKey() = 0;
-    virtual void WriteStoredData(RingBuffer *rb, bool storevid) = 0;
+    virtual void WriteStoredData(RingBuffer *rb, bool storevid,
+                                 long timecodeOffset) = 0;
+    virtual void ClearStoredData(void) { return; };
     virtual void SetRawAudioState(bool state) { getrawframes = state; }
     virtual bool GetRawAudioState(void) { return getrawframes; }
     virtual void SetRawVideoState(bool state) { getrawvideo = state; }

@@ -665,7 +665,16 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                 }
             }
 
-            if (! nvp->WriteStoredData(outRingBuffer, (did_ff == 0)))
+            if (did_ff == 1)
+            {
+                timecodeOffset +=
+                    (frame.timecode - lasttimecode - (int)vidFrameTime);
+            }
+            lasttimecode = frame.timecode;
+            frame.timecode -= timecodeOffset;
+
+            if (! nvp->WriteStoredData(outRingBuffer, (did_ff == 0),
+                                       timecodeOffset))
             {
                 if (did_ff == 1)
                 {
@@ -694,7 +703,6 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             }
             audioOutput->Reset();
             nvp->FlushTxtBuffers();
-            lasttimecode = frame.timecode;
         } 
         else 
         {

@@ -46,8 +46,8 @@ class AvFormatDecoder : public DecoderBase
     bool isLastFrameKey(void) { return false; }
 
     /// This is a No-op for this class.
-    void WriteStoredData(RingBuffer *rb, bool storevid)
-                           { (void)rb; (void)storevid; }
+    void WriteStoredData(RingBuffer *rb, bool storevid, long timecodeOffset)
+                           { (void)rb; (void)storevid; (void)timecodeOffset;}
 
     /// This is a No-op for this class.
     void SetRawAudioState(bool state) { (void)state; }

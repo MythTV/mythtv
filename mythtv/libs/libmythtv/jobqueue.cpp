@@ -180,6 +180,8 @@ void JobQueue::ProcessQueue(void)
     while (queuePoll)
     {
         maxJobs = gContext->GetNumSetting("JobQueueMaxSimultaneousJobs", 3);
+        VERBOSE(VB_JOBQUEUE, QString("JobQueue currently set to run maximum "
+                                     "of %1 job(s)").arg(maxJobs));
 
         job.clear();
         jobType.clear();

@@ -845,17 +845,29 @@ long NuppelDecoder::UpdateStoredFrameNum(long framenum)
     return 0;
 }
 
-void NuppelDecoder::WriteStoredData(RingBuffer *rb, bool storevid)
+void NuppelDecoder::WriteStoredData(RingBuffer *rb, bool storevid,
+                                    long timecodeOffset)
 {
     RawDataList *data;
     while(! StoredData.isEmpty()) {
         data = StoredData.first();
+        data->frameheader.timecode -= timecodeOffset;
         if (storevid || data->frameheader.frametype != 'V')
         {
             rb->Write(&(data->frameheader), FRAMEHEADERSIZE);
             if (data->packet)
                 rb->Write(data->packet, data->frameheader.packetlength);
         }
+        StoredData.removeFirst();
+        delete data;
+    }
+}
+
+void NuppelDecoder::ClearStoredData()
+{
+    RawDataList *data;
+    while(!StoredData.isEmpty()) {
+        data = StoredData.first();
         StoredData.removeFirst();
         delete data;
     }

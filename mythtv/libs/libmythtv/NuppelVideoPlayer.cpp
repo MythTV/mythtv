@@ -3463,6 +3463,7 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm
                 msg += QString(" to %1").arg((int)dm_iter.key());
                 VERBOSE(VB_GENERAL, msg);
                 decoder->DoFastForward(dm_iter.key());
+                decoder->ClearStoredData();
                 ClearAfterSeek();
                 decoder->GetFrame(0);
                 *did_ff = 1;
@@ -3483,11 +3484,12 @@ long NuppelVideoPlayer::UpdateStoredFrameNum(long curFrameNum)
 {
     return decoder->UpdateStoredFrameNum(curFrameNum);
 }
-bool NuppelVideoPlayer::WriteStoredData(RingBuffer *outRingBuffer, bool writevideo)
+bool NuppelVideoPlayer::WriteStoredData(RingBuffer *outRingBuffer,
+                                        bool writevideo, long timecodeOffset)
 {
     if (writevideo && !decoder->GetRawVideoState())
         writevideo = false;
-    decoder->WriteStoredData(outRingBuffer, writevideo);
+    decoder->WriteStoredData(outRingBuffer, writevideo, timecodeOffset);
     return writevideo;
 }
 bool NuppelVideoPlayer::LastFrameIsBlank(void)
