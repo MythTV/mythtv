@@ -74,6 +74,8 @@ QPixmap *ProgramListItem::getPixmap(void)
     if (pixmap->load(filename.c_str()))
         return pixmap;
 
+cout << "generating pixmap\n";
+
     int len = 0;
     int video_width, video_height;
     unsigned char *data = (unsigned char *)tv->GetScreenGrab(recinfo, 65, len,
@@ -82,17 +84,23 @@ QPixmap *ProgramListItem::getPixmap(void)
 
     if (data)
     {
+cout << "converting to png\n";
         QImage img(data, video_width, video_height, 32, NULL, 65536 * 65536, 
                    QImage::LittleEndian);
         img = img.smoothScale(160, 120);
 
         img.save(filename.c_str(), "PNG");
 
+cout << "done\n";
         delete [] data;
     }
 
+cout << "loading\n";
     if (pixmap->load(filename.c_str()))
+    {
+cout << "done\n";
         return pixmap;
+    }
 
     return NULL;
 }

@@ -46,11 +46,11 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     listview->addColumn("Size");
  
     listview->setColumnWidth(0, 40);
-    listview->setColumnWidth(1, 190); 
+    listview->setColumnWidth(1, 185); 
     listview->setColumnWidth(2, 435);
     listview->setColumnWidth(3, 90);
 
-    listview->setSorting(-1);
+    listview->setSorting(1, false);
     listview->setAllColumnsShowFocus(TRUE);
 
     connect(listview, SIGNAL(returnPressed(QListViewItem *)), this,
