@@ -16,7 +16,8 @@ that external tuner / DirecTV are located under "using mythtv".  Added
 troubleshooting information about KDE vs. Gnome on RH 8.0
 v1.033, 2002-11-23.  Fixed the XMLTV/mythfilldatabase instruction to point
 to the correct file.  Slight wording changes to the DirecTV stuff.  Moved
-some CVS parameters around.
+some CVS parameters around.  Added "DMA" to troubleshooting section.
+v1.034, 2002-11-24.  Added information on setting up mythmusic database.
 -->
 <!--
 To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
@@ -27,7 +28,7 @@ To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-11-23, v1.033
+<date>2002-11-24, v1.034
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1134,6 +1135,21 @@ installer.
 
 Install cdparanoia using urpmi or the Mandrake Control Center.
 
+Once all the pre-requisites have been installed, you can proceed with
+getting mythmusic going.
+<tscreen><verb>
+% ./configure
+% make
+% su
+# make install
+# exit
+% cd musicdb
+% mysql -u root < metadata.sql
+</verb></tscreen>
+
+Edit the <tt>/usr/local/share/mythtv/mythmusic-settings.txt</tt> file for
+your particular system.
+
 <sect>Troubleshooting.
 <sect1>Illegal Instruction.
 <p>This error can happen for the following reasons:
@@ -1154,4 +1170,7 @@ replacing it with "tvlistings".
 <p>If you're using Gnome as your window manager, try switching to KDE.  For
 Red Hat Linux 8.0 users, edit <tt>/etc/sysconfig/desktop</tt> and
 change "GNOME" to "KDE".
+<sect1>Fast CPU, choppy video.
+<p>This is most likely because your hard drive isn't setup to use DMA.  Use
+the <bf>hdparm</bf> program to check and enable DMA.
 </article>

@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2002-11-23, v1.033
+  2002-11-24, v1.034
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -86,6 +86,7 @@
      15.1 Illegal Instruction.
      15.2 mythfilldatabase failing.
      15.3 mythtv seems to disappear; can't see video
+     15.4 Fast CPU, choppy video.
 
   ______________________________________________________________________
 
@@ -1204,6 +1205,20 @@
 
   Install cdparanoia using urpmi or the Mandrake Control Center.
 
+  Once all the pre-requisites have been installed, you can proceed with
+  getting mythmusic going.
+
+       % ./configure
+       % make
+       % su
+       # make install
+       # exit
+       % cd musicdb
+       % mysql -u root < metadata.sql
+
+  Edit the /usr/local/share/mythtv/mythmusic-settings.txt file for your
+  particular system.
+
   [1m15.  Troubleshooting.[0m
 
   [1m15.1.  Illegal Instruction.[0m
@@ -1230,4 +1245,9 @@
   If you're using Gnome as your window manager, try switching to KDE.
   For Red Hat Linux 8.0 users, edit /etc/sysconfig/desktop and change
   "GNOME" to "KDE".
+
+  [1m15.4.  Fast CPU, choppy video.[0m
+
+  This is most likely because your hard drive isn't setup to use DMA.
+  Use the [1mhdparm [22mprogram to check and enable DMA.
 
