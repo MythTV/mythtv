@@ -17,7 +17,6 @@ using namespace std;
 #include "manualschedule.h"
 #include "playbackbox.h"
 #include "viewscheduled.h"
-#include "viewrecommend.h"
 #include "programrecpriority.h"
 #include "channelrecpriority.h"
 #include "globalsettings.h"
