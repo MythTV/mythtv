@@ -1093,9 +1093,9 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
                         dr->setBrush(tmpfont->dropColor);
                         dr->setPen(QPen(tmpfont->dropColor,
                                         (int)(2 * m_wmult)));
-                        dr->drawText((int)(left + fontdrop.x()) + offsetRight,
+                        dr->drawText((int)(left + fontdrop.x()) + offsetLeft,
                                      (int)(m_area.top() + (int)(i*m_selheight) +
-                                     fontdrop.y()), m_area.width() - offsetLeft, m_selheight,
+                                     fontdrop.y()), m_area.width() - offsetRight, m_selheight,
                                      m_justification, tempWrite);
                     }
                     dr->setBrush(tmpfont->color);
