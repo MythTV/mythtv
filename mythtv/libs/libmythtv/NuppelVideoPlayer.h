@@ -62,6 +62,7 @@ class NuppelVideoPlayer
 
     float GetFrameRate(void) { return video_frame_rate; } 
     long long GetFramesPlayed(void) { return framesPlayed; }
+    void ResetFramesPlayed(void) { framesPlayed = 0; }
 
     void SetRecorder(NuppelVideoRecorder *nvcr) { nvr = nvcr; }
 

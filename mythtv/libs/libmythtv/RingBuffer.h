@@ -14,14 +14,13 @@ class RingBuffer
     
    ~RingBuffer();
 
-    bool IsOpen(void) { return (fd > 0); }
+    bool IsOpen(void) { return (fd > 0 || fd2 > 0); }
     
     int Read(void *buf, int count);
     int Write(const void *buf, int count);
 
     void TransitionToFile(const string &lfilename);
     void TransitionToRing(void);
-    bool IsTransitioning(void) { return transitioning; }
 
     long long Seek(long long pos, int whence);
 
@@ -41,12 +40,10 @@ class RingBuffer
 
  private:
     string filename;
-    string savedfilename;
-
-    bool transitioning;    
 
     int fd, fd2;
-    
+    int dumpfd;   
+ 
     bool normalfile;
     bool writemode;
     

@@ -28,7 +28,7 @@ RingBuffer::RingBuffer(const string &lfilename, bool write)
     smudgeamount = 0;
 
     stopreads = false;
-    transitioning = false;
+    dumpfd = -1;
 
     pthread_rwlock_init(&rwlock, NULL);
 }
@@ -52,7 +52,7 @@ RingBuffer::RingBuffer(const string &lfilename, long long size,
     smudgeamount = smudge;
 
     stopreads = false;
-    transitioning = false;
+    dumpfd = -1;
 
     pthread_rwlock_init(&rwlock, NULL);
 }
@@ -63,20 +63,15 @@ RingBuffer::~RingBuffer(void)
         close(fd);
     if (fd2 > 0)
         close(fd2);
+    if (dumpfd > 0)
+        close(dumpfd);
 }
 
 void RingBuffer::TransitionToFile(const string &lfilename)
 {
     pthread_rwlock_wrlock(&rwlock);
 
-    transitionpoint = totalwritepos;
-    savedfilename = filename;
-    filename = lfilename;
-
-    transitioning = true;
-
-    close(fd);
-    fd = open(filename.c_str(), O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 0644);
+    dumpfd = open(filename.c_str(), O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 0644);
 
     pthread_rwlock_unlock(&rwlock);
 }
@@ -85,13 +80,8 @@ void RingBuffer::TransitionToRing(void)
 {
     pthread_rwlock_wrlock(&rwlock);
  
-    transitionpoint = totalwritepos;
-    filename = savedfilename;
-
-    transitioning = true;
-
-    close(fd);
-    fd = open(filename.c_str(), O_WRONLY|O_CREAT|O_LARGEFILE, 0644); 
+    close(dumpfd);
+    dumpfd = -1;
 
     pthread_rwlock_unlock(&rwlock);
 }
@@ -146,26 +136,7 @@ int RingBuffer::Read(void *buf, int count)
             }
 	}
 
-        if (transitioning && totalreadpos + count >= transitionpoint)
-        {
-            int toread = transitionpoint - totalreadpos;
-            ret = read(fd2, buf, toread);
-
-            int left = count - toread;
-
-            close(fd2);
-
-            fd2 = open(filename.c_str(), O_RDONLY|O_LARGEFILE);
-
-            ret = read(fd2, (char *)buf + toread, left);
-            ret += toread;
-
-            totalreadpos += ret;
-            readpos = left;
- 
-            transitioning = false;
-        }     
-	else if (readpos + count > filesize)
+	if (readpos + count > filesize)
         {
 	    int toread = filesize - readpos;
 
@@ -234,6 +205,11 @@ int RingBuffer::Write(const void *buf, int count)
             writepos += ret;
 	    totalwritepos += ret;
 	}
+
+        if (dumpfd > 0)
+        {
+            write(dumpfd, buf, count);
+        }
     }
 
     pthread_rwlock_unlock(&rwlock);

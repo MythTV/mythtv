@@ -12,7 +12,7 @@
 #include "NuppelVideoRecorder.h"
 
 #define KEYFRAMEDISTEND   30
-#define KEYFRAMEDISTSTART 5
+#define KEYFRAMEDISTSTART 30
 
 NuppelVideoRecorder::NuppelVideoRecorder(void)
 {
@@ -669,19 +669,54 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf)
     return;
 }
 
-int NuppelVideoRecorder::CreateNuppelFile(void)
+void NuppelVideoRecorder::WriteHeader(void)
 {
     struct rtfileheader fileheader;
     struct rtframeheader frameheader;
-    char realfname[255];
     static unsigned long int tbls[128];
     static const char finfo[12] = "NuppelVideo";
     static const char vers[5]   = "0.06";
+    
+    memset(&fileheader, 0, sizeof(fileheader));
+    memcpy(fileheader.finfo, finfo, sizeof(fileheader.finfo));
+    memcpy(fileheader.version, vers, sizeof(fileheader.version));
+    fileheader.width  = w;
+    fileheader.height = h;
+    fileheader.desiredwidth  = 0;
+    fileheader.desiredheight = 0;
+    fileheader.pimode = 'P';
+    fileheader.aspect = 1.0;
+    if (ntsc)
+        fileheader.fps = 29.97;
+    else
+        fileheader.fps = 25.0;
+    video_frame_rate = fileheader.fps;
+    fileheader.videoblocks = -1;
+    fileheader.audioblocks = -1;
+    fileheader.textsblocks = 0;
+    fileheader.keyframedist = KEYFRAMEDISTEND;
 
-    snprintf(realfname, 250, "%s", sfilename.c_str());
+    ringBuffer->Write(&fileheader, FILEHEADERSIZE);
 
-    framesWritten = 0;
+    memset(&frameheader, 0, sizeof(frameheader));
+    frameheader.frametype = 'D'; // compressor data
+    frameheader.comptype  = 'R'; // compressor data for RTjpeg
+    frameheader.packetlength = sizeof(tbls);
+
+    // compression configuration header
+    ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+
+    // compression configuration data
+    ringBuffer->Write(tbls, sizeof(tbls));
+
     last_block = 0;
+    lf = 0; // that resets framenumber so that seeking in the
+            // continues parts works too
+}
+
+int NuppelVideoRecorder::CreateNuppelFile(void)
+{
+    framesWritten = 0;
     
     if (!ringBuffer)
     {
@@ -695,39 +730,7 @@ int NuppelVideoRecorder::CreateNuppelFile(void)
     if (!ringBuffer->IsOpen()) 
         return(-1);
 
-    memset(&fileheader, 0, sizeof(fileheader));
-    memcpy(fileheader.finfo, finfo, sizeof(fileheader.finfo));
-    memcpy(fileheader.version, vers, sizeof(fileheader.version));
-    fileheader.width  = w;
-    fileheader.height = h;
-    fileheader.desiredwidth  = 0;
-    fileheader.desiredheight = 0;
-    fileheader.pimode = 'P';
-    fileheader.aspect = 1.0;
-    if (ntsc) 
-        fileheader.fps = 29.97;
-    else  
-        fileheader.fps = 25.0;
-    video_frame_rate = fileheader.fps;
-    fileheader.videoblocks = -1;
-    fileheader.audioblocks = -1;
-    fileheader.textsblocks = 0;
-    fileheader.keyframedist = KEYFRAMEDISTEND;
-    ringBuffer->Write(&fileheader, FILEHEADERSIZE);
-   
-    memset(&frameheader, 0, sizeof(frameheader)); 
-    frameheader.frametype = 'D'; // compressor data
-    frameheader.comptype  = 'R'; // compressor data for RTjpeg
-    frameheader.packetlength = sizeof(tbls);
-
-    // compression configuration header
-    ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
-    
-    // compression configuration data
-    ringBuffer->Write(tbls, sizeof(tbls));
-
-    lf = 0; // that resets framenumber so that seeking in the
-            // continues parts works too
+    WriteHeader();
 
     return(0);
 }
@@ -988,7 +991,7 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
 
     if (lf == 0) 
     { // this will be triggered every new file
-        lf = fnum-2;
+        lf = fnum;
         startnum = fnum;
 	lasttimecode = 0;
 	frameofgop = 0;

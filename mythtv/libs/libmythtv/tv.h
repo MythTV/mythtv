@@ -108,6 +108,7 @@ class TV
     bool exitPlayer;
     bool paused;
     int secsToRecord;
+    time_t recordStartTime;
 
     float frameRate;
 

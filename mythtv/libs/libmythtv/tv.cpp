@@ -330,6 +330,7 @@ void TV::HandleStateChange(void)
         nextState = kState_None;
         changed = true;
 
+        recordStartTime = time(NULL);
         startRecorder = true;
 
         printf("Changing from %s to %s\n", origname.c_str(), statename.c_str());
@@ -408,8 +409,17 @@ void TV::HandleStateChange(void)
     else if (internalState == kState_WatchingLiveTV &&  
              nextState == kState_WatchingRecording)
     {
+        nvr->Pause();
+        while (!nvr->GetPause())
+            usleep(5);
+
         rbuffer->TransitionToFile(outputFilename);
-        
+        nvr->WriteHeader();
+
+        nvr->Unpause();
+
+        recordStartTime = time(NULL);
+ 
         internalState = nextState;
         changed = true;
 
@@ -556,8 +566,15 @@ void TV::TeardownPlayer(void)
 
     if (prbuffer && prbuffer == rbuffer)
     {
-        delete prbuffer;
-        prbuffer = rbuffer = NULL;
+        if (internalState == kState_RecordingOnly)
+        {
+            prbuffer = NULL;
+        }
+        else
+        {
+            delete prbuffer;
+            prbuffer = rbuffer = NULL;
+        }
     }
 }
 
@@ -597,8 +614,7 @@ void TV::RunTV(void)
 
         if (StateIsRecording(internalState))
         {
-            if ((float)nvr->GetFramesWritten() >
-                (float)secsToRecord * frameRate)
+            if (time(NULL) > secsToRecord + recordStartTime)
             {
                 if (watchingLiveTV)
                 {

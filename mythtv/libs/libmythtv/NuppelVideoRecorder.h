@@ -55,14 +55,17 @@ class NuppelVideoRecorder
     bool IsRecording(void) { return recording; }
    
     long long GetFramesWritten(void) { return framesWritten; } 
+    void ResetFramesWritten(void) { framesWritten = 0; }
 
     void SetMP3Quality(int quality) { mp3quality = quality; }
 
     int GetVideoFd(void) { return fd; }
     void Reset(void);
- 
+
     float GetFrameRate(void) { return video_frame_rate; }
-   
+  
+    void WriteHeader(void);
+ 
  protected:
     static void *WriteThread(void *param);
     static void *AudioThread(void *param);
