@@ -184,8 +184,6 @@ TVState TV::LiveTV(void)
     
             DialogBox diag(gContext->GetMainWindow(), title);
             diag.AddButton(tr("Cancel and go back to the TV menu"));
-
-            diag.Show();
             diag.exec();
         
             nextState = kState_None;

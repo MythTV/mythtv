@@ -35,6 +35,7 @@ ManualBox::ManualBox(MythMainWindow *parent, const char *name)
          : MythDialog(parent, name)
 {
     m_tv = NULL;
+    tvstarting = false;
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(15 * wmult));
 
@@ -80,7 +81,9 @@ ManualBox::ManualBox(MythMainWindow *parent, const char *name)
     m_title = new MythLineEdit( this, "title" );
     m_title->setBackgroundOrigin(WindowOrigin);
     hbox->addWidget(m_title);
-    
+   
+    m_title->setFocus();
+ 
     // Subtitle edit box
     hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
 
@@ -199,6 +202,8 @@ void ManualBox::startPlayer(void)
 
     if (NULL == m_tv)
     {
+        tvstarting = true;
+
         TVState nextstate;
 
         QSqlDatabase *db = QSqlDatabase::database();
@@ -228,11 +233,16 @@ void ManualBox::startPlayer(void)
             m_tv = NULL;
             emit dismissWindow();
         }
+
+        tvstarting = false;
     }
 }
 
 void ManualBox::timeout(void)
 {
+    if (tvstarting)
+        return;
+
     startPlayer();
     if (NULL != m_tv)
     {
@@ -266,6 +276,9 @@ void ManualBox::timeout(void)
 
 void ManualBox::refreshTimeout(void)
 {
+    if (tvstarting)
+        return;
+
     if (NULL != m_tv)
     {
         QString dummy;

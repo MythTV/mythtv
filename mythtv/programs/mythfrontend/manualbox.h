@@ -62,6 +62,8 @@ class ManualBox : public MythDialog
     TV *m_tv;
     QTimer *m_timer;
     QTimer *m_refreshTimer;
+
+    bool tvstarting;
 };
 
 #endif
