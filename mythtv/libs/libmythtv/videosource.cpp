@@ -850,8 +850,9 @@ class FirewireModel: public ComboBoxSetting, public CCSetting {
  	CCSetting(parent, "firewire_model") {
             setLabel(QObject::tr("Firewire Model"));
             addSelection(QObject::tr("Other"));
-            setHelpText(QObject::tr("Firewire Model is for future use incase there " 
-                                     "is a need to model specific work arounds.")); 
+            setHelpText(QObject::tr("Firewire Model is for future use in case "
+                                    "there is a need to model specific "
+                                    "workarounds.")); 
 
         }
 };
