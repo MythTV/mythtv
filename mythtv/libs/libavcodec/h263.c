@@ -2317,7 +2317,13 @@ void mpeg4_encode_picture_header(MpegEncContext * s, int picture_number)
     time_div= s->time/s->time_increment_resolution;
     time_mod= s->time%s->time_increment_resolution;
     time_incr= time_div - s->last_time_base;
-    assert(time_incr >= 0);
+
+    if (time_incr < 0)
+    {
+        s->last_time_base = time_div;
+        time_incr = 0;
+    }
+
     while(time_incr--)
         put_bits(&s->pb, 1, 1);
         
