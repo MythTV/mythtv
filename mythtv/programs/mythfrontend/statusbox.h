@@ -36,11 +36,25 @@ class StatusBox : public MythDialog
     XMLParse *theme;
     QDomElement xmldata;
     QRect TopRect, SelectRect, ContentRect;
-    UITextType *heading, *helptext, *text_area;
+    UITextType *heading, *helptext;
     UIListType *icon_list, *list_area;
     LayerSet *selector, *topbar, *content;
 
     int max_icons;
+
+    bool inContent, doScroll;
+    int contentTotalLines;
+    int contentSize;
+    int contentPos;
+    int contentMid;
+    int min_level;
+    QString dateFormat, timeFormat;
+
+    QMap<int, QString> contentLines;
+    QMap<int, QString> contentDetail;
+    QMap<int, QString> contentData;
+
+    MythMainWindow *my_parent;
 };
 
 #endif

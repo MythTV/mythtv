@@ -4,6 +4,7 @@
 #include <qwidgetstack.h>
 #include <qvbox.h>
 #include <qgrid.h>
+#include <qregexp.h>
 
 #include <unistd.h>
 
@@ -21,17 +22,36 @@ StatusBox::StatusBox(MythMainWindow *parent, const char *name)
 {
     // Set this value to the number of items in icon_list
     // to prevent scrolling off the bottom
-    max_icons = 3;
+    int item_count = 0;
+    dateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
+    timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
 
     setNoErase();
     LoadTheme();
   
-    icon_list->SetItemText(0, "Listings Status");
-    icon_list->SetItemText(1, "Tuner Status");
-    icon_list->SetItemText(2, "DVB Status");
-    // icon_list->SetItemText(3, "Log Entries");
+    icon_list->SetItemText(item_count++, QObject::tr("Listings Status"));
+    icon_list->SetItemText(item_count++, QObject::tr("Tuner Status"));
+#ifdef USING_DVB
+    if (gContext->GetNumSetting("DVBMonitorInterval", 0))
+        icon_list->SetItemText(item_count++, QObject::tr("DVB Status"));
+#endif
+    icon_list->SetItemText(item_count++, QObject::tr("Log Entries"));
     icon_list->SetItemCurrent(0);
     icon_list->SetActive(true);
+
+    max_icons = item_count;
+    inContent = false;
+    contentPos = 0;
+    contentTotalLines = 0;
+    contentSize = 0;
+    contentMid = 0;
+    min_level = gContext->GetNumSetting("LogDefaultView",1);
+    my_parent = parent;
+    clicked();
+}
+
+StatusBox::~StatusBox(void)
+{
 }
 
 void StatusBox::paintEvent(QPaintEvent *e)
@@ -53,9 +73,61 @@ void StatusBox::updateContent()
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
     QPainter p(this);
+
+    // Normalize the variables here and set the contentMid
+    contentSize = list_area->GetItems();
+    if (contentSize > contentTotalLines)
+        contentSize = contentTotalLines;
+    contentMid = contentSize / 2;
+
+    // In order to maintain a center scrolling highlight, we need to determine
+    // the point at which to start the content list so that the current item
+    // is in the center
+    int startPos = 0; 
+    if (contentPos > contentMid)
+        startPos = contentPos - contentMid;
  
     if (content  == NULL) return;
     LayerSet *container = content;
+
+    // If the content position is beyond the midpoint and before the end
+    // or if the content is first being displayed, write the content using
+    // the offset we determined above.  If we are before the midpoint or 
+    // close to the end, we stop moving the content up or down to let the 
+    // hightlight move up and down with fixed content
+    if (((contentPos > contentMid) &&
+         (contentPos <= (contentTotalLines - contentMid))) ||
+        (contentPos == 0))
+    {
+        list_area->ResetList();
+        for (int x = startPos; (x - startPos) <= contentSize; x++)
+            if (contentLines.contains(x))
+                list_area->SetItemText(x - startPos, contentLines[x]);
+    }
+
+    // If we are scrolling, the determine the item to highlight
+    if (doScroll)
+    {
+        int newPos = 0;
+
+        if (contentPos < contentMid)
+            newPos = contentPos;
+        else if (contentPos > (contentTotalLines - contentMid))
+            newPos = contentSize - (contentTotalLines - contentPos);
+        else
+            newPos = contentMid;
+
+        list_area->SetItemCurrent(newPos);
+
+        if (inContent)
+        {
+            helptext->SetText(contentDetail[contentPos]);
+            update(TopRect);
+        }
+    }
+
+    list_area->SetUpArrow(contentPos > 0);
+    list_area->SetDownArrow((contentPos + contentSize) < contentTotalLines);
 
     container->Draw(&tmp, 0, 0);
     container->Draw(&tmp, 1, 0);
@@ -175,12 +247,6 @@ void StatusBox::LoadTheme()
         exit(-1);
     }
 
-    text_area = (UITextType*)content->GetType("text_area");
-    if (!text_area) {
-        cerr << "StatusBox: Failed to get text area." << endl;
-        exit(-1);
-    }
-
     topbar = theme->GetSet("topbar");
     if (!topbar) {
         cerr << "StatusBox: Failed to get topbar container." << endl;
@@ -209,25 +275,104 @@ void StatusBox::keyPressEvent(QKeyEvent *e)
     for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
+        QString currentItem;
+        QRegExp logNumberKeys( "^[12345678]$" );
+
+        currentItem = icon_list->GetItemText(icon_list->GetCurrentItem());
         handled = true;
 
         if (action == "SELECT")
         {
             clicked();
         }
+        else if (action == "MENU")
+        {
+            if ((inContent) &&
+                (currentItem == "Log Entries"))
+            {
+                int retval = MythPopupBox::show2ButtonPopup(my_parent,
+                                 QString("AckLogEntry"),
+                                 QObject::tr("Acknowledge all log entries at "
+                                             "this priority level or lower?"),
+                                 QObject::tr("Yes"), QObject::tr("No"), 0);
+                if (retval == 0)
+                {
+                    QString query = QString("UPDATE mythlog "
+                                            "SET acknowledged = 1 "
+                                            "WHERE priority <= %1")
+                                            .arg(min_level);
+                    QSqlDatabase *db = QSqlDatabase::database();
+                    db->exec(query);
+                    doLogEntries();
+                }
+            }
+        }
         else if (action == "UP")
         {
-            if (icon_list->GetCurrentItem() > 0)
-                icon_list->SetItemCurrent(icon_list->GetCurrentItem()-1);
-            setHelpText();
-            update(SelectRect);
+            if (inContent)
+            {
+                if (contentPos > 0)
+                    contentPos--;
+                update(ContentRect);
+            }
+            else
+            {
+                if (icon_list->GetCurrentItem() > 0)
+                    icon_list->SetItemCurrent(icon_list->GetCurrentItem()-1);
+                clicked();
+                setHelpText();
+                update(SelectRect);
+            }
+
         }
         else if (action == "DOWN")
         {
-            if (icon_list->GetCurrentItem() < (max_icons - 1))
-                icon_list->SetItemCurrent(icon_list->GetCurrentItem()+1);
-            setHelpText();
+            if (inContent)
+            {
+                if (contentPos < (contentTotalLines - 1))
+                    contentPos++;
+                update(ContentRect);
+            }
+            else
+            {
+                if (icon_list->GetCurrentItem() < (max_icons - 1))
+                    icon_list->SetItemCurrent(icon_list->GetCurrentItem()+1);
+                clicked();
+                setHelpText();
+                update(SelectRect);
+            }
+        }
+        else if ((action == "RIGHT") &&
+                 (!inContent) &&
+                 ((contentTotalLines > contentSize) ||
+                  (doScroll)))
+        {
+            clicked();
+            inContent = true;
+            contentPos = 0;
+            icon_list->SetActive(false);
+            list_area->SetActive(true);
             update(SelectRect);
+            update(ContentRect);
+        }
+        else if ((action == "LEFT") &&
+                 (inContent))
+        {
+            inContent = false;
+            contentPos = 0;
+            list_area->SetActive(false);
+            icon_list->SetActive(true);
+            update(SelectRect);
+            update(ContentRect);
+        }
+        else if ((currentItem == "Log Entries") &&
+                 (logNumberKeys.search(action) == 0))
+        {
+            min_level = action.toInt();
+            helptext->SetText(QObject::tr("Setting priority level to %1")
+                                          .arg(min_level));
+            update(TopRect);
+            doLogEntries();
         }
         else
             handled = false;
@@ -239,46 +384,80 @@ void StatusBox::keyPressEvent(QKeyEvent *e)
 
 void StatusBox::setHelpText()
 {
-    topbar->ClearAllText();
-    switch (icon_list->GetCurrentItem())
+    if (inContent)
     {
-        case 0:
-            helptext->SetText("Listings Status shows the latest status information from mythfilldatabase");
-            break;
-        case 1:
-            helptext->SetText("Tuner Status shows the current information about the state of backend tuner cards");
-            break;
-        case 2:
-            helptext->SetText("DVB Status shows the quality statistics of all DVB cards, if present");
-            break;
-        case 3:
-            helptext->SetText("Log Entries shows any unread log entries from the system if you have logging enabled");
-            break;
+        helptext->SetText(contentDetail[contentPos]);
+    } else {
+        topbar->ClearAllText();
+        QString currentItem;
+
+        currentItem = icon_list->GetItemText(icon_list->GetCurrentItem());
+
+        if (currentItem == "Listings Status")
+            helptext->SetText(QObject::tr("Listings Status shows the latest "
+                                          "status information from "
+                                          "mythfilldatabase"));
+
+        if (currentItem == "Tuner Status")
+            helptext->SetText(QObject::tr("Tuner Status shows the current "
+                                          "information about the state of "
+                                          "backend tuner cards"));
+
+        if (currentItem == "DVB Status")
+            helptext->SetText(QObject::tr("DVB Status shows the quality "
+                                          "statistics of all DVB cards, if "
+                                          "present"));
+
+        if (currentItem == "Log Entries")
+            helptext->SetText(QObject::tr("Log Entries shows any unread log "
+                                          "entries from the system if you "
+                                          "have logging enabled"));
     }
     update(TopRect);
 }
 
 void StatusBox::clicked()
 {
-    // Clear all visible content elements here
-    // I'm sure there's a better way to do this but I can't find it
-    content->ClearAllText();
-    list_area->ResetList();
-
-    switch (icon_list->GetCurrentItem())
+    if ((inContent) &&
+        (icon_list->GetItemText(icon_list->GetCurrentItem()) == "Log Entries"))
     {
-        case 0:
-            doListingsStatus();
-            break;
-        case 1:
-            doTunerStatus();
-            break;
-        case 2:
-            doDVBStatus();
-            break;
-        case 3:
+        int retval = MythPopupBox::show2ButtonPopup(my_parent,
+                                   QString("AckLogEntry"),
+                                   QObject::tr("Acknowledge this log entry?"),
+                                   QObject::tr("Yes"), QObject::tr("No"), 0);
+        if (retval == 0)
+        {
+            QString query = QString("UPDATE mythlog SET acknowledged = 1 "
+                                    "WHERE logid = %1")
+                                    .arg(contentData[contentPos]);
+            QSqlDatabase *db = QSqlDatabase::database();
+            db->exec(query);
             doLogEntries();
-            break;
+        }
+    } else {
+        // Clear all visible content elements here
+        // I'm sure there's a better way to do this but I can't find it
+        content->ClearAllText();
+        list_area->ResetList();
+        contentLines.clear();
+        contentDetail.clear();
+        contentData.clear();
+
+        QString currentItem;
+
+        currentItem = icon_list->GetItemText(icon_list->GetCurrentItem());
+
+        if (currentItem == "Listings Status")
+            doListingsStatus();
+
+        if (currentItem == "Tuner Status")
+            doTunerStatus();
+
+        if (currentItem == "DVB Status")
+            doDVBStatus();
+
+        if (currentItem == "Log Entries")
+            doLogEntries();
     }
 }
 
@@ -289,6 +468,11 @@ void StatusBox::doListingsStatus()
     int DaysOfData;
     QDateTime qdtNow, GuideDataThrough;
     QSqlDatabase *db = QSqlDatabase::database();
+    int count = 0;
+
+    contentLines.clear();
+    contentDetail.clear();
+    doScroll = false;
 
     qdtNow = QDateTime::currentDateTime();
     querytext = QString("SELECT max(endtime) FROM program;");
@@ -307,78 +491,73 @@ void StatusBox::doListingsStatus()
     mfdLastRunStatus = gContext->GetSetting("mythfilldatabaseLastRunStatus");
     DataDirectMessage = gContext->GetSetting("DataDirectMessage");
 
-    Status = QObject::tr("Myth version:") + " " + MYTH_BINARY_VERSION + "\n";
+    contentLines[count++] = QObject::tr("Myth version:") + " " +
+                                        MYTH_BINARY_VERSION;
+    contentLines[count++] = QObject::tr("Last mythfilldatabase guide update:");
+    contentLines[count++] = QObject::tr("Started:   ") + mfdLastRunStart;
 
-    Status += QObject::tr("Last mythfilldatabase guide update:");
-    Status += "\n   ";
-    Status += QObject::tr("Started:   ");
-    Status += mfdLastRunStart;
-    if (mfdLastRunEnd > mfdLastRunStart)  //if end < start, it's still running.
-    {
-        Status += "\n   ";
-        Status += QObject::tr("Finished: ");
-        Status += mfdLastRunEnd;
-    }
+    if (mfdLastRunEnd >= mfdLastRunStart) //if end < start, it's still running.
+        contentLines[count++] = QObject::tr("Finished: ") + mfdLastRunEnd;
 
-    Status += "\n   ";
-    Status += QObject::tr("Result: ");
-    Status += mfdLastRunStatus;
+    contentLines[count++] = QObject::tr("Result: ") + mfdLastRunStatus;
 
     DaysOfData = qdtNow.daysTo(GuideDataThrough);
 
     if (GuideDataThrough.isNull())
     {
-        Status += "\n\n";
-        Status += QObject::tr("There's no guide data available! ");
-        Status += QObject::tr("Have you run mythfilldatabase?");
-        Status += "\n";
+        contentLines[count++] = "";
+        contentLines[count++] = QObject::tr("There's no guide data available!");
+        contentLines[count++] = QObject::tr("Have you run mythfilldatabase?");
     }
     else
     {
-        Status += "\n\n";
-        Status += QObject::tr("There is guide data until ");
-        Status += QDateTime(GuideDataThrough).toString("yyyy-MM-dd hh:mm");
+        contentLines[count++] = "";
+        contentLines[count++] = QObject::tr("There is guide data until ") + 
+                                QDateTime(GuideDataThrough)
+                                          .toString("yyyy-MM-dd hh:mm");
 
         if (DaysOfData > 0)
         {
-            Status += QString("\n(%1 ").arg(DaysOfData);
+            Status = QString("(%1 ").arg(DaysOfData);
             if (DaysOfData >1)
                 Status += QObject::tr("days");
             else
                 Status += QObject::tr("day");
             Status += ").";
+            contentLines[count++] = Status;
         }
-        else
-            Status += ".";
     }
 
     if (DaysOfData <= 3)
     {
-        Status += "\n";
-        Status += QObject::tr("WARNING: is mythfilldatabase running?");
+        contentLines[count++] = QObject::tr("WARNING: is mythfilldatabase "
+                                            "running?");
     }
 
     if (!DataDirectMessage.isNull())
     {
-        Status += "\n";
-        Status += QObject::tr("DataDirect Status: \n");
-        Status += DataDirectMessage;
+        contentLines[count++] = QObject::tr("DataDirect Status: "); 
+        contentLines[count++] = DataDirectMessage;
     }
    
-    text_area->SetText(Status);
+    contentTotalLines = count;
     update(ContentRect);
 }
 
 void StatusBox::doTunerStatus()
 {
     int count = 0;
+    doScroll = true;
 
     QString querytext = QString("SELECT cardid FROM capturecard;");
     QSqlDatabase *db = QSqlDatabase::database();
     QSqlQuery query = db->exec(querytext);
+
+    contentLines.clear();
+    contentDetail.clear();
+
     if (query.isActive() && query.numRowsAffected())
     {
-        list_area->ResetList();
         while(query.next())
         {
             int cardid = query.value(0).toInt();
@@ -398,8 +577,8 @@ void StatusBox::doTunerStatus()
             else 
                 Status += "is not recording";
 
-            list_area->SetItemText(count, Status);
-            count++;
+            contentLines[count] = Status;
+            contentDetail[count] = Status;
 
             if (strlist[0].toInt()==kState_RecordingOnly)
             {
@@ -409,27 +588,31 @@ void StatusBox::doTunerStatus()
                 ProgramInfo *proginfo = new ProgramInfo;
                 proginfo->FromStringList(strlist, 0);
    
-                Status = "   ";
-                Status += proginfo->title;
-                list_area->SetItemText(count++, Status);
-
-                Status = "   ";
+                Status = proginfo->title;
+                Status += "\n";
                 Status += proginfo->subtitle;
-                if (Status != "   ")
-                    list_area->SetItemText(count++, Status);
+                contentDetail[count] = Status;
             }
+            count++;
         }
     }
+    contentTotalLines = count;
     update(ContentRect);
 }
 
 void StatusBox::doDVBStatus(void)
 {
     QString querytext;
-
     bool doneAnything = false;
-    
-    QString Status = QString("Details of DVB error statistics for last 48 hours:\n");
+  
+    doScroll = false;
+    int count = 0;
+  
+    contentLines.clear();
+    contentDetail.clear();
+ 
+    QString Status = QObject::tr("Details of DVB error statistics for last 48 "
+                                 "hours:\n");
 
     QString outerqry =
         "SELECT starttime,endtime FROM recorded "
@@ -468,18 +651,24 @@ void StatusBox::doDVBStatus(void)
             
             if (query.isActive() && query.numRowsAffected())
             {
-                Status += QString("Recording period from %1 to %2\n").arg(t_start.toString()).arg(t_end.toString());
+                contentLines[count++] =
+                       QObject::tr("Recording period from %1 to %2")
+                                   .arg(t_start.toString())
+                                   .arg(t_end.toString());
                 
                 while (query.next())
                 {
-		    Status += QString("Encoder %1 Min SNR: %2 Avg SNR: %3 Min BER %4 Avg BER %5 Cont Errs: %6 Overflows: %7\n")
-                              .arg(query.value(0).toInt())
-                              .arg(query.value(5).toInt())
-                              .arg(query.value(6).toInt())
-                              .arg(query.value(8).toInt())
-                              .arg(query.value(9).toInt())
-                              .arg(query.value(13).toInt())
-                              .arg(query.value(14).toInt());
+                    contentLines[count++] =
+                           QObject::tr("Encoder %1 Min SNR: %2 Avg SNR: %3 Min "
+                                       "BER %4 Avg BER %5 Cont Errs: %6 "
+                                       "Overflows: %7")
+                                       .arg(query.value(0).toInt())
+                                       .arg(query.value(5).toInt())
+                                       .arg(query.value(6).toInt())
+                                       .arg(query.value(8).toInt())
+                                       .arg(query.value(9).toInt())
+                                       .arg(query.value(13).toInt())
+                                       .arg(query.value(14).toInt());
 
                     doneAnything = true;
                 }
@@ -489,32 +678,79 @@ void StatusBox::doDVBStatus(void)
 
     if (!doneAnything)
     {
-        Status += QString("There is no DVB signal quality data available to display.\n");
+        contentLines[count++] = QObject::tr("There is no DVB signal quality "
+                                            "data available to display.");
     }
 
-    text_area->SetText(Status);
+    contentTotalLines = count;
     update(ContentRect);
 }
 
 void StatusBox::doLogEntries(void)
 {
-/*
-    // int minlevel = gContext->GetNumSetting("LogDefaultView",0);
-    int minlevel = 8;
+    QString timeDateFormat;
+    QString line;
+    int count = 0;
+ 
+    doScroll = true;
 
-    log_list->clear();
+    timeDateFormat = gContext->GetSetting("TimeFormat", "h:mm AP") + " " +
+                     gContext->GetSetting("ShortDateFormat", "M/d");
+
+    contentLines.clear();
+    contentDetail.clear();
+    contentData.clear();
+
     QSqlDatabase *db = QSqlDatabase::database();
-    QString thequery = QString("SELECT logid, module, priority, logdate, host, message, "
-                               "details FROM mythlog WHERE acknowledged = 0 and priority <= %1 "
-                               "order by logdate").arg(minlevel);
+    QString thequery;
+
+    thequery = QString("SELECT logid, module, priority, logdate, host, "
+                       "message, details "
+                       "FROM mythlog WHERE acknowledged = 0 AND priority <= %1 "
+                       "ORDER BY logdate DESC;").arg(min_level);
     QSqlQuery query = db->exec(thequery);
     if (query.isActive())
+    {
         while (query.next())
-            log_list->insertItem(QString("%1 %2").arg(query.value(3).toString()).arg(query.value(5).toString()));
-*/
-}
+        {
+            line = QString("%1").arg(query.value(5).toString());
+            contentLines[count] = line;
 
-StatusBox::~StatusBox(void)
-{
+            if (query.value(6).toString() != "")
+                line = QString("On %1 %2 from %3.%4\n%5\n%6")
+                               .arg(query.value(3).toDateTime()
+                                         .toString(dateFormat))
+                               .arg(query.value(3).toDateTime()
+                                         .toString(timeFormat))
+                               .arg(query.value(4).toString())
+                               .arg(query.value(1).toString())
+                               .arg(query.value(5).toString())
+                               .arg(query.value(6).toString());
+            else
+                line = QString("On %1 %2 from %3.%4\n%5\nNo other details")
+                               .arg(query.value(3).toDateTime()
+                                         .toString(dateFormat))
+                               .arg(query.value(3).toDateTime()
+                                         .toString(timeFormat))
+                               .arg(query.value(4).toString())
+                               .arg(query.value(1).toString())
+                               .arg(query.value(5).toString());
+            contentDetail[count] = line;
+            contentData[count++] = query.value(0).toString();
+        }
+    }
+
+    if (!count)
+    {
+        doScroll = false;
+        contentLines[count++] = QObject::tr("No items found at priority "
+                                            "level %1 or lower.")
+                                            .arg(min_level);
+        contentLines[count++] = QObject::tr("Use 1-8 to change priority "
+                                            "level.");
+    }
+      
+    contentTotalLines = count;
+    update(ContentRect);
 }
 
