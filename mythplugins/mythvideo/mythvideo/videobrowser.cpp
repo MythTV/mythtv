@@ -598,6 +598,7 @@ void VideoBrowser::cursorUp()
     currentParentalLevel++;
     if (currentParentalLevel > 4)
         currentParentalLevel = 4;
+    setParentalLevel(currentParentalLevel);
     inData = 0;
     RefreshMovieList();
     SetCurrentItem();
@@ -610,6 +611,7 @@ void VideoBrowser::cursorDown()
     currentParentalLevel--;
     if (currentParentalLevel < 1)
         currentParentalLevel = 1;
+    setParentalLevel(currentParentalLevel);
     inData = 0;
     RefreshMovieList();
     SetCurrentItem();
