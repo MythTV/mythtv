@@ -113,6 +113,19 @@ public:
     };
 };
 
+class WeatherAggressiveness: public SpinBoxSetting, public GlobalSetting {
+public:
+    WeatherAggressiveness():
+        SpinBoxSetting(1, 15, 1), GlobalSetting("WeatherAggressiveLvl") {
+        setLabel("MythWeather Aggressiveness Level");
+        setValue(1);
+	setHelpText("In an effort to make MythWeather more robust the aggressiveness value "
+		    "has been added into the connection code. This value determines how quickly "
+		    "MythWeather will timeout a failed connection. The \'fastest\' value is 1.");
+
+    };
+};
+
 class StickyKeys: public CheckBoxSetting, public GlobalSetting {
 public:
     StickyKeys():
@@ -535,6 +548,15 @@ public:
     };
 };
 
+class EPGProgramBar: public CheckBoxSetting, public GlobalSetting {
+public:
+    EPGProgramBar():
+        GlobalSetting("EPGProgramBar") {
+        setLabel("Display the guide / program finder information bar at the bottom");
+        setValue(true);
+    };
+};
+
 class EPGShowChannelIcon: public CheckBoxSetting, public GlobalSetting {
 public:
     EPGShowChannelIcon():
@@ -708,6 +730,7 @@ GeneralSettings::GeneralSettings()
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
     general->setLabel("General");
     general->addChild(new RecordOverTime());
+    general->addChild(new WeatherAggressiveness());
     general->addChild(new TimeOffset());
     addChild(general);
 
@@ -737,6 +760,7 @@ EPGSettings::EPGSettings()
     epg->setLabel("Program Guide");
 
     epg->addChild(new EPGShowTitle());
+    epg->addChild(new EPGProgramBar());
     epg->addChild(new EPGShowChannelIcon());
     epg->addChild(new EPGShowCurrentTime());
     epg->addChild(new EPGCurrentTimeColor());
