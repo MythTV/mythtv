@@ -3931,11 +3931,11 @@ void UIListBtnType::Reset()
     m_showDnArrow = false;
 }
 
-void UIListBtnType::AddItem(const QString& text)
+void UIListBtnType::AddItem(const QString& text, bool checked)
 {
     UIListBtnTypeItem* item = new UIListBtnTypeItem;
     item->text = text;
-    item->checked = false;
+    item->checked = checked;
     UIListBtnTypeItem* lastItem = m_itemList.last();
     if (!lastItem) 
     {
@@ -4045,6 +4045,13 @@ void UIListBtnType::Toggle()
 
     m_selItem->checked = !m_selItem->checked;
     emit itemChecked(m_itemList.find(m_selItem), m_selItem->checked);
+}
+
+void UIListBtnType::SetItemChecked(int itemPos, bool checked)
+{
+    UIListBtnTypeItem* item = m_itemList.at(itemPos);
+    if (item)
+        item->checked = checked;
 }
 
 void UIListBtnType::Draw(QPainter *p, int order, int)

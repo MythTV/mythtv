@@ -2247,7 +2247,7 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
     }
 
     QString layerNum = element.attribute("draworder", "");
-    if (layerNum.isNull() && layerNum.isEmpty())
+    if (layerNum.isNull() || layerNum.isEmpty())
     {
         cerr << "ListBtn area needs a draworder\n";
         exit(0);

@@ -983,12 +983,13 @@ class UIListBtnType : public UIType
     void SetActive(bool active) {m_active = active;}
 
     void Reset();
-    void AddItem(const QString& text);
+    void AddItem(const QString& text, bool checked = false);
     void SetItemCurrent(int current);
     int  GetItemCurrent();
     int  GetCount();
     const UIListBtnTypeItem* GetItem(int itemPos);
-    
+    void SetItemChecked(int itemPos, bool checked);
+
     void MoveDown();
     void MoveUp();
     void Toggle();
