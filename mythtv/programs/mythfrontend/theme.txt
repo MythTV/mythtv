@@ -1,4 +1,7 @@
+# What theme to use.  Themes are stored in /usr/local/share/mythtv/themes/
 str Theme=blue
 
+# The desired dimensions to show the GUI at.  If these are commented out, 
+# the GUI will resize to be fullscreen.
 int GuiWidth=800
 int GuiHeight=600

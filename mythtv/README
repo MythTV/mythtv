@@ -1,5 +1,5 @@
                               Mythical Convergence
-			       Preview Release 4
+			             0.4
 
 
 There'll be more information here later, but for now:
@@ -105,6 +105,10 @@ conflict.sql.  Again, not needed for a new install.
 UPGRADING FROM PREVIEW RELEASE 3
 --------------------------------
 Do the same thing for conflictupdate.sql.  Not needed for a new install.
+The channel icons were moved from /usr/local/share/mythtv/ to ~/.mythtv/channels
+They'll be updated the next time you run the filldata script.  You can remove
+all the .jpg and .gif files from the /usr/local/share/mythtv/ directory, if
+you want.
 
 Once the database is setup, run the filldata script also in the same directory.
 This'll take awhile, as it's populating the database with the next week's worth
@@ -129,21 +133,30 @@ without changing the channel.  Pressing 'I' will let you get more information
 about a program, and if you're running mythfrontend, will allow you to schedule
 recordings.
 
-NOTE: mythepg, and all the Qt interfaces included with MythTV are designed to be
-      displayed only at 800x600, so it's full screen on a TV. 
-      Video playback will just go to fullscreen regardless of the resolution, 
-      but it also runs best at 800x600.  Things will look weird at other 
-      resolutions.
-
-Ok, so try running 'mythfrontend'.  You'll see a ugly little menu show up.
-This should be pretty simple to figure out.  Only thing to keep in mind, though,
-is that 'mythfrontend' needs to be running for scheduled recordings to happen.
+Ok, so try running 'mythfrontend'.  You should see a nice menu show up.
+This should be pretty simple to figure out.  mythfrontend is designed to be the
+main interface of the application.  It also provides all the support for
+scheduled recordings, so keep in mind, that it needs to be running for 
+shows to get recorded.
 
 In the 'configfiles' subdir there are some example lirc config files to get a
 remote working with this stuff.  Just use irxevent and it should all work.
 
 Whew.  If you thought this compile process sucked, I'll accept pretty much
 any patch sent my way that improves it.
+
+Ok, some more configuration.  There are a couple .txt files in 
+/usr/local/share/mythtv/.  The theme.txt will let you switch between themes
+for the menus.  There's also settings for the size the GUI is displayed at. 
+Change em if you want.
+
+The mysql.txt file located in there controls the database settings, mainly in 
+case you want to run the mysql server on another machine.
+
+If you want to check out the theme format, and perhaps make your own, just
+look at the .menu files in the /usr/local/share/mythtv/themes/[themename]
+subdirs.  global.menu and tv.menu should be fully commented in both of the
+distributed themes.  
 
 Feel free to subscribe to the development mailing list at:
 http://www.snowman.net/mailman/listinfo/mythtv-dev

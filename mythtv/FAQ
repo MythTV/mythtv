@@ -1,0 +1,17 @@
+                              MythTV FAQ
+
+) My mouse pointer disappears over the windows?
+- This is desired behavior.  The interface is meant for use with a remote 
+  control, or a keyboard.
+
+) What's this 'strange error flushing buffer' mean?
+- Nothing, really.  It's just lame (the mp3 encoder) complaining for some 
+  obscure reason.
+
+) I get an error when compiling about 'mkspecs'?
+- You need to set QTDIR.  On Debian, it should be /usr/share/qt
+  On Mandrake, it should be /usr/lib/qt3
+
+) I can't change the channel when watching TV?
+- Something's wrong with your program database.  Did filldata run with
+  no major errors?

@@ -1,0 +1,20 @@
+(all this information is available in the README as well)
+
+UPGRADING FROM PREVIEW RELEASE 1
+--------------------------------
+You need to add the record.sql script to the database, so, mysql < record.sql
+This is not needed on a new install.
+
+UPGRADING FROM PREVIEW RELEASE 2
+--------------------------------
+Follow the above instructions to add record.sql.  Do the same thing for
+conflict.sql.  Again, not needed for a new install.
+
+UPGRADING FROM PREVIEW RELEASE 3
+--------------------------------
+Do the same thing for conflictupdate.sql.  Not needed for a new install.
+The channel icons were moved from /usr/local/share/mythtv/ to ~/.mythtv/channels
+They'll be updated the next time you run the filldata script.  You can remove
+all the .jpg and .gif files from the /usr/local/share/mythtv/ directory, if
+you want.
+
