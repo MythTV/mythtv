@@ -297,7 +297,7 @@ void DaapInstance::run()
     {
         DaapRequest logout_request(this, "/logout", server_address);
         logout_request.addGetVariable("session-id", session_id);
-        logout_request.send(client_socket_to_daap_server, true);
+        logout_request.send(client_socket_to_daap_server);
         log(QString("sent daap request: \"%1\"")
             .arg(first_request.getRequestString()), 9);
     }
@@ -759,7 +759,7 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
         {
             int which_database = a_database->getDaapId();
             QString request_string = QString("/databases/%1/items").arg(which_database);
-            DaapRequest update_request(this, request_string, server_address);
+            DaapRequest update_request(this, request_string, server_address, daap_server_type);
             update_request.addGetVariable("session-id", session_id);
             
             int generation_delta = a_database->getKnownGeneration();
@@ -828,7 +828,7 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
         {
             int which_database = a_database->getDaapId();
             QString request_string = QString("/databases/%1/containers").arg(which_database);
-            DaapRequest update_request(this, request_string, server_address);
+            DaapRequest update_request(this, request_string, server_address, daap_server_type);
             update_request.addGetVariable("session-id", session_id);
 
             int generation_delta = a_database->getKnownGeneration();
@@ -864,7 +864,7 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
                                     .arg(which_database)
                                     .arg(current_request_playlist);
 
-            DaapRequest update_request(this, request_string, server_address);
+            DaapRequest update_request(this, request_string, server_address, daap_server_type);
             update_request.addGetVariable("session-id", session_id);
 
             int generation_delta = a_database->getKnownGeneration();
@@ -902,7 +902,7 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
             //  If there's nothing to send, do a hanging update request
             //
 
-            DaapRequest update_request(this, "/update", server_address);
+            DaapRequest update_request(this, "/update", server_address, daap_server_type);
             update_request.addGetVariable("session-id", session_id);
             update_request.addGetVariable("revision-number", metadata_generation);
             update_request.send(client_socket_to_daap_server);
@@ -1122,7 +1122,7 @@ void DaapInstance::doServerInfoResponse(TagInput& dmap_data)
     
     have_server_info = true;
 
-    DaapRequest login_request(this, "/login", server_address);
+    DaapRequest login_request(this, "/login", server_address, daap_server_type);
     login_request.send(client_socket_to_daap_server);
     log(QString("sent daap request: \"%1\"")
         .arg(login_request.getRequestString()), 9);
@@ -1195,7 +1195,7 @@ void DaapInstance::doLoginResponse(TagInput& dmap_data)
         //  Time to use our new session id to get ourselves an /update
         //
         
-        DaapRequest update_request(this, "/update", server_address);
+        DaapRequest update_request(this, "/update", server_address, daap_server_type);
         update_request.addGetVariable("session-id", session_id);
         update_request.addGetVariable("revision-number", metadata_generation);
         update_request.send(client_socket_to_daap_server);
@@ -1299,7 +1299,7 @@ void DaapInstance::doUpdateResponse(TagInput& dmap_data)
                     .arg(server_port)
                     .arg(new_metadata_generation), 4);
         
-        DaapRequest database_request(this, "/databases", server_address);
+        DaapRequest database_request(this, "/databases", server_address, daap_server_type);
         database_request.addGetVariable("session-id", session_id);
         database_request.addGetVariable("revision-number", new_metadata_generation);
         service_details_mutex.unlock();

@@ -322,17 +322,44 @@ void ClientHttpServer::readFromMFD()
 
 void ClientHttpServer::addMHttpServer(QString server_address, uint server_port, QString service_name)
 {
-    log(QString("httpserver has noticed a new mhttp service: \"%1\" (%2:%3)")
-        .arg(service_name)
-        .arg(server_address)
-        .arg(server_port), 10);
-
-    QString constructed_url = QString("http://%1:%2/").arg(server_address).arg(server_port);
-
-    OtherUFPI *new_ufpi = new OtherUFPI(service_name, constructed_url);
+    //
+    //  Sometimes these get passed twice, especially at startup, only add we don't have it already
+    //
 
     other_ufpi_mutex.lock();
-        other_ufpi.append(new_ufpi);
+
+        QPtrListIterator<OtherUFPI> it( other_ufpi );
+        OtherUFPI *which_one = NULL;
+        OtherUFPI *a_ufpi;
+        while ( (a_ufpi = it.current()) != 0 )
+        {
+            ++it;
+            if(a_ufpi->getName() == service_name)
+            {
+                which_one = a_ufpi;
+                break;
+            }
+        }
+        if(which_one)
+        {
+            //
+            //  Do nothing
+            //
+        }
+        else
+        {
+            log(QString("httpserver has noticed a new mhttp service: \"%1\" (%2:%3)")
+                        .arg(service_name)
+                        .arg(server_address)
+                        .arg(server_port), 10);
+
+            QString constructed_url = QString("http://%1:%2/").arg(server_address).arg(server_port);
+
+            OtherUFPI *new_ufpi = new OtherUFPI(service_name, constructed_url);
+
+            other_ufpi.append(new_ufpi);
+        }
+
     other_ufpi_mutex.unlock();
 }
 

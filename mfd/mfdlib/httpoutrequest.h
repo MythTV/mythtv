@@ -43,7 +43,7 @@ class HttpOutRequest
 
     virtual void warning(const QString &warn_text);
         
-  private:
+  protected:
 
     bool sendBlock(
                     std::vector<char> what, 

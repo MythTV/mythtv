@@ -17,49 +17,32 @@ using namespace std;
 #include <qsocketdevice.h>
 #include <qdict.h>
 
-#include "httpgetvar.h"
-#include "httpheader.h"
+#include "httpoutrequest.h"
 
 //  class DaapInstance;
 
 #include "daapinstance.h"
 
-class DaapRequest
+
+class DaapRequest : public HttpOutRequest
 {
 
   public:
 
     DaapRequest(
                 DaapInstance *owner,
-                const QString &l_base_url, 
-                const QString &l_host_address,
+                const QString& l_base_url, 
+                const QString& l_host_address,
                 DaapServerType l_server_type = DAAP_SERVER_UNKNOWN
                );
                
     ~DaapRequest();
 
-    bool send(QSocketDevice *where_to_send, bool ignore_shutdown=false);
-    void addGetVariable(const QString &label, int value);
-    void addGetVariable(const QString &label, const QString &value);
-    void addHeader(const QString &new_header);
-    QString getRequestString();
-        
+    void warning(const QString &warn_text);
+    
   private:
 
     DaapInstance *parent;
-    bool sendBlock(
-                    std::vector<char> what, 
-                    QSocketDevice *where, 
-                    bool ignore_shutdown = false
-                  );
-    void addText(std::vector<char> *buffer, QString text_to_add);
-    
-    QString base_url;
-    QString host_address;
-    QString stored_request;
-
-    QDict<HttpGetVariable>   get_variables;
-    QDict<HttpHeader>        headers;
     DaapServerType           server_type;
     
 };
