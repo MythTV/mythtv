@@ -125,7 +125,8 @@ int MythMainWindowPrivate::TranslateKeyNum(QKeyEvent* e)
         // if modifiers have been pressed, rebuild keynum
         if ((modifiers = e->state()) != 0)
         {
-            int modnum = ((modifiers & Qt::ShiftButton) ? Qt::SHIFT : 0) |
+            int modnum = (((modifiers & Qt::ShiftButton) &&
+                           keynum > 0x7f) ? Qt::SHIFT : 0) |
                          ((modifiers & Qt::ControlButton) ? Qt::CTRL : 0) |
                          ((modifiers & Qt::MetaButton) ? Qt::META : 0) |
                          ((modifiers & Qt::AltButton) ? Qt::ALT : 0);
