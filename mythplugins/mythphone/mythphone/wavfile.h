@@ -40,7 +40,7 @@ class wavfile
     void print();
     bool saveToFile(const char *Filename);
     short *getData() { return (short *)audio; };
-    int samples()    { return (w.subChunk2Size / (w.BitsPerSample/8)); }
+    int samples()    { if (loaded) return (w.subChunk2Size / (w.BitsPerSample/8)); else return 0; }
 
   private:
     void transcodeTo8K();
