@@ -3,6 +3,12 @@
   <timeformat>hh:mm</timeformat>
   <fadeaway>30</fadeaway>
 
+  <font name="notifyfont">
+    <color>255</color>
+    <size>12</size>
+    <outline>yes</outline>
+  </font>
+
   <font name="infofont">
     <color>255</color>
     <size>16</size>
