@@ -49,14 +49,16 @@ GeneralSettings::GeneralSettings()
 */
 
 
-class PlayerCommand: public LineEditSetting, public GlobalSetting {
+class PlayerCommand: public ComboBoxSetting, public GlobalSetting {
 public:
     PlayerCommand():
-        GlobalSetting("DVDPlayerCommand") {
+        ComboBoxSetting(true), GlobalSetting("DVDPlayerCommand") {
         setLabel("DVD Player Command");
-        setValue("mplayer dvd:// -dvd-device %d -fs -zoom -vo xv");
+        addSelection("mplayer dvd:// -dvd-device %d -fs -zoom -vo xv");
+        addSelection("xine -pfhq --auto-scan dvd");
+        addSelection("ogle");
         setHelpText("This can be any command to launch a DVD player "
-                    "(e.g. MPlayer, ogle, etc.). If present %d will "
+                    "(e.g. MPlayer, ogle, etc.). If present, %d will "
                     "be substituted for the DVD device (e.g. /dev/dvd).");
     };
 };
