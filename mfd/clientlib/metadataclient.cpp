@@ -1434,7 +1434,7 @@ void MetadataClient::buildTree()
         QIntDictIterator<Metadata> m_it( *metadata ); 
         for ( ; m_it.current(); ++m_it )
         {
-            new_collection->addMetadata(m_it.current(), a_collection->getName());
+            new_collection->addMetadata(m_it.current(), a_collection->getName(), a_collection);
         }
 
 

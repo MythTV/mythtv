@@ -878,8 +878,8 @@ void MetadataServer::doAtomicDataDelta(
         }
         else
         {
-            warning("can not do a an AtomicDataDelta()"
-                    " on a Container I don't own");
+            warning("cannot do a an AtomicDataDelta() "
+                    "on a Container I don't own");
         }
         
     unlockMetadata();

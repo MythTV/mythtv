@@ -121,7 +121,7 @@ MfdContentCollection::MfdContentCollection(
     audio_playlist_tree->setAttribute(1, 2);
 }
 
-void MfdContentCollection::addMetadata(Metadata *new_item, const QString &collection_name)
+void MfdContentCollection::addMetadata(Metadata *new_item, const QString &collection_name, MetadataCollection *collection)
 {
     //
     //  At this point, we only understand audio metadata. If it's not audio
@@ -174,10 +174,14 @@ void MfdContentCollection::addMetadata(Metadata *new_item, const QString &collec
 
         //
         //  Add the same thing to the tree that contains items the user can
-        //  turn on and off while editing a playlist
+        //  turn on and off while editing a playlist if the collection it
+        //  comes from allows editing
         //
         
-        addItemToSelectableTrees(copy);
+        if(collection->isEditable())
+        {
+            addItemToSelectableTrees(copy);
+        }
         
     }
     else
@@ -224,12 +228,6 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, MetadataCol
     playlist_node->setAttribute(2, 0); 
 
     //
-    //  Create an entry in the checkable list user's use to edit playlists
-    //
-    
-    addPlaylistToSelectableTrees(new_playlist);
-
-    //
     //  If it's editable, add it to the list of editable playlists (that is,
     //  list of playlists users can navigate to and select to _begin_
     //  editing a playlist)
@@ -254,6 +252,13 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, MetadataCol
         edit_node->setInt(new_playlist->getId()); 
         edit_node->setAttribute(0, new_playlist->getCollectionId());
         edit_node->setAttribute(1, 5);  //  magic number for edit playlist command
+
+        //
+        //  Create an entry in the checkable list user's use to edit playlists
+        //
+    
+        addPlaylistToSelectableTrees(new_playlist);
+
     }
     
 
@@ -263,19 +268,8 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, MetadataCol
     //
     
     UIListGenericTree *by_playlist_node = NULL;
-
-    /*
-    cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Am trying to add a playlist called \""
-         << new_playlist->getName()
-         << "\" to a collection called \""
-         << collection_name
-         << "\""
-         << ", and the collection's id is "
-         << new_playlist->getCollectionId()
-         << endl;
-    */   
-
     UIListGenericTree *collection_node = NULL;
+
     GenericTree *gt_collection_node = audio_collection_tree->getChildByName(collection_name);
     if (gt_collection_node)
     {
@@ -1262,7 +1256,24 @@ void MfdContentCollection::sort()
         editable_playlist_tree->sortByString();
         editable_playlist_tree->reOrderAsSorted();
     }
+    
+    //
+    //  Sort all the selectable content trees
+    //  
+    //  Yes, yes, this is all a lot of sorting, but it's getting done off in
+    //  it's own thread.
+    //
+    
+    QIntDictIterator<UIListGenericTree> it( selectable_content_trees ); 
+    for ( ; it.current(); ++it )
+    {
+        it.current()->sortByAttributeThenByString(2);
+        it.current()->reOrderAsSorted();
+    }
+    
 }
+
+
 
 void MfdContentCollection::setupPixmaps()
 {
@@ -1379,6 +1390,5 @@ MfdContentCollection::~MfdContentCollection()
         delete editable_playlist_tree;
         editable_playlist_tree = NULL;
     }
-    
 }
 

@@ -31,7 +31,7 @@ class MfdContentCollection
      MfdContentCollection(int an_id, int client_screen_width = 800, int client_screen_height = 600);
     ~MfdContentCollection();
 
-    void addMetadata(Metadata *an_item, const QString &collection_name);
+    void addMetadata(Metadata *an_item, const QString &collection_name, MetadataCollection *collection);
     void addPlaylist(ClientPlaylist *a_playlist, MetadataCollection *collection);
     void addNewPlaylistAbility(const QString &collection_name);
     void recursivelyAddSubPlaylist(

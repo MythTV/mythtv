@@ -1,7 +1,7 @@
 /*
 	discwatcher.cpp
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
+	(c) 2003, 2004 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
     Methods for an optical disc watcher
@@ -67,7 +67,7 @@ void DiscWatcher::run()
         //
             
         FD_SET(u_shaped_pipe[0], &readfds);
-        if(nfds <= u_shaped_pipe[0])
+        if (nfds <= u_shaped_pipe[0])
         {
             nfds = u_shaped_pipe[0] + 1;
         }
@@ -82,7 +82,7 @@ void DiscWatcher::run()
         //
     
         int result = select(nfds, &readfds, NULL, NULL, &timeout);
-        if(result < 0)
+        if (result < 0)
         {
             warning("got an error on select()");
         }
@@ -91,13 +91,26 @@ void DiscWatcher::run()
         //  In case data came in on out u_shaped_pipe, clean it out
         //
 
-        if(FD_ISSET(u_shaped_pipe[0], &readfds))
+        if (FD_ISSET(u_shaped_pipe[0], &readfds))
         {
             u_shaped_pipe_mutex.lock();
                 char read_back[2049];
                 read(u_shaped_pipe[0], read_back, 2048);
             u_shaped_pipe_mutex.unlock();
         }
+    }
+    
+    //
+    //  I'm shutting down, so I need to clean out all the device watchers
+    //  and any data associated with them
+    //
+
+    QPtrListIterator<DeviceWatcher> it( device_watchers );
+    DeviceWatcher *a_device_watcher;
+    while ( (a_device_watcher = it.current()) != 0 )
+    {
+        ++it;
+        a_device_watcher->removeAllMetadata();
     }
 }
 
@@ -124,7 +137,7 @@ void DiscWatcher::buildDiscList()
         it != devices_to_watch.end();
        )
     {
-        if(stat(*it, &fileinfo) < 0)
+        if (stat(*it, &fileinfo) < 0)
         {
             warning(QString("\"%1\" does not exist, will not be watched")
                     .arg(*it));
@@ -148,13 +161,13 @@ void DiscWatcher::buildDiscList()
        )
     {
         int device_handle = open(*it, O_RDONLY | O_NONBLOCK);
-        if(device_handle > 0)
+        if (device_handle > 0)
         {
             //
             //  Device exists and can be opened
             //
 
-            if(ioctl(device_handle, CDROM_GET_CAPABILITY, NULL) < 0)
+            if (ioctl(device_handle, CDROM_GET_CAPABILITY, NULL) < 0)
             {
                 //
                 //  Device is not a CD/DVD
@@ -205,9 +218,15 @@ void DiscWatcher::buildDiscList()
             //
 
             thing_a = QFileInfo(devices_to_watch[i]);
-            if(thing_a.isSymLink())
+            if (thing_a.isSymLink())
             {
-                thing_a = QFileInfo(thing_a.readLink());
+                QString link_name = thing_a.readLink();
+                if (!link_name.contains("/"))
+                {
+                    link_name.prepend("/");
+                    link_name.prepend(thing_a.dirPath());
+                }
+                thing_a = QFileInfo(link_name);
             }
             
             for(uint j=i + 1; j < devices_to_watch.count(); j++)
@@ -215,17 +234,25 @@ void DiscWatcher::buildDiscList()
                 //
                 //  Set thing_b (second of two things to compare
                 //
+
                 thing_b = QFileInfo(devices_to_watch[j]);
-                if(thing_b.isSymLink())
+                if (thing_b.isSymLink())
                 {
-                    thing_b = QFileInfo(thing_b.readLink());
+                    QString link_name = thing_b.readLink();
+                    if (!link_name.contains("/"))
+                    {
+                        link_name.prepend("/");
+                        link_name.prepend(thing_b.dirPath());
+                    }
+                    thing_b = QFileInfo(link_name);
                 }
+
                 
                 //
                 //  Compare them
                 //
                 
-                if(thing_a.absFilePath() == thing_b.absFilePath())
+                if (thing_a.absFilePath() == thing_b.absFilePath())
                 {
                     //
                     //  Ha! they match. Remove the second one, then start
