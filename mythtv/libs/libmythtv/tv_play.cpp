@@ -642,7 +642,7 @@ void TV::TeardownPlayer(void)
     paused = false;
     doing_ff_rew = 0;
     ff_rew_index = SSPEED_NORMAL;
-    ff_rew_scaling = 1.0;
+    speed_index = 0;
 
     nvp = NULL;
     osd = NULL;
@@ -695,8 +695,8 @@ void TV::RunTV(void)
     ff_rew_repos = gContext->GetNumSetting("FFRewRepos", 1);
 
     doing_ff_rew = 0;
-    ff_rew_scaling = 1.0;
     ff_rew_index = SSPEED_NORMAL;
+    speed_index = 0;
 
     int pausecheck = 0;
 
@@ -746,15 +746,8 @@ void TV::RunTV(void)
 
                 ProcessKeypress(keypressed);
             }
-            else if (doing_ff_rew)
-            {
-                if (doing_ff_rew > 0)
-                    DoFF(1);
-                else
-                    DoRew(1);
-                if (ff_rew_index > SSPEED_NORMAL)
-                    usleep(50000);
-            }
+            else
+                RepeatFFRew();
         }
 
         if (StateIsPlaying(internalState))
@@ -912,7 +905,6 @@ void TV::ProcessKeypress(int keypressed)
         }
         case Key_Z:
         {
-            StopFFRew(ff_rew_repos);
             DoSkipCommercials(1);
             break;
         }
@@ -923,68 +915,68 @@ void TV::ProcessKeypress(int keypressed)
         }
         case Key_Q:
         {
-            StopFFRew(ff_rew_repos);
             DoSkipCommercials(-1);
             break;
         }
         case Key_S: case Key_P: 
         {
-            StopFFRew(ff_rew_repos);
             DoPause();
+            break;
+        }
+        case Key_U:
+        {
+            ChangeSpeed(1);
+            break;
+        }
+        case Key_J:
+        {
+            ChangeSpeed(-1);
             break;
         }
         case Key_Right: case Key_D: 
         {
-            if (!stickykeys)
-            {
-                StopFFRew(ff_rew_repos);
-                DoFF(fftime); 
-                break;
-            }
-            // fall through
+            if (paused)
+                DoSeek(1.001 / frameRate, tr("Forward"));
+            else if (!stickykeys)
+                DoSeek(fftime, tr("Skip Ahead"));
+            else
+                ChangeFFRew(1);
+            break;
         }
         case Key_Greater: case Key_Period:
         {
-            if (doing_ff_rew > 0)
-                ff_rew_index = (++ff_rew_index % SSPEED_MAX);
+            if (paused)
+                DoSeek(1.0, tr("Forward"));
             else
-            {
-                doing_ff_rew = 1;
-                ff_rew_index = SSPEED_NORMAL;
-            }
-            DoFF(1); 
+                ChangeFFRew(1);
             break;
         }
         case Key_Left: case Key_A:
         {
-            if (!stickykeys)
-            {
-                StopFFRew(ff_rew_repos);
-                DoRew(rewtime);
-                break;
-            }
-            // fall through
+            if (paused)
+                DoSeek(-1.001 / frameRate, tr("Rewind"));
+            else if (!stickykeys)
+                DoSeek(-rewtime, tr("Skip Back"));
+            else
+                ChangeFFRew(-1);
+            break;
         }
         case Key_Less: case Key_Comma:
         {
-            if (doing_ff_rew < 0)
-                ff_rew_index = (++ff_rew_index % SSPEED_MAX);
+            if (paused)
+                DoSeek(-1.0, tr("Rewind"));
             else
-            {
-                doing_ff_rew = -1;
-                ff_rew_index = SSPEED_NORMAL;
-            }
-            DoRew(1);
+                ChangeFFRew(-1);
             break;
         }
         case Key_PageUp:
         {
-            DoJumpBack(); 
+            DoSeek(-jumptime * 60, tr("Jump Back"));
             break;
         }
         case Key_PageDown:
         {
-            DoJumpAhead(); 
+            DoSeek(jumptime * 60, tr("Jump Ahead"));
             break;
         }
         case Key_Escape:
@@ -1037,10 +1029,17 @@ void TV::ProcessKeypress(int keypressed)
                     case Key_9: ff_rew_index = SSPEED_FAST_6; break;
 
                     default:
-                       StopFFRew(ff_rew_repos);
+                       float time = StopFFRew();
+                       UpdatePosOSD(time, tr("Play"));
                        was_doing_ff_rew = true;
                        break;
                 }
+            }
+            if (speed_index)
+            {
+                NormalSpeed();
+                UpdatePosOSD(0.0, tr("Play"));
+                was_doing_ff_rew = true;
             }
             break;
         }
@@ -1226,20 +1225,16 @@ void TV::SwapPIP(void)
 
 void TV::DoPause(void)
 {
+    NormalSpeed();
+    float time = StopFFRew();
+
     paused = activenvp->TogglePause();
 
     if (activenvp != nvp)
         return;
 
     if (paused)
-    {
-        QString desc = "";
-        int pos = nvp->calcSliderPos(0, desc);
-        if (internalState == kState_WatchingLiveTV)
-            osd->StartPause(pos, true, tr("Paused"), desc, -1);
-	else
-            osd->StartPause(pos, false, tr("Paused"), desc, -1);
-    }
+        UpdatePosOSD(time, tr("Paused"));
     else
         osd->EndPause();
 }
@@ -1275,11 +1270,8 @@ void TV::DoInfo(void)
     }
 }
 
-void TV::DoFF(int time)
+bool TV::UpdatePosOSD(float time, const QString &mesg)
 {
-    if (!keyRepeat)
-        return;
-
     bool muted = false;
 
     if (volumeControl && !volumeControl->GetMute())
@@ -1288,67 +1280,36 @@ void TV::DoFF(int time)
         muted = true;
     }
 
-    bool slidertype = false;
-    if (internalState == kState_WatchingLiveTV)
-        slidertype = true;
-
-    ff_rew_scaling = seek_speed_array[ff_rew_index].scaling;
-    QString scaleString = tr("Forward ");
-    scaleString += seek_speed_array[ff_rew_index].dispString;
-
     if (activenvp == nvp)
     {
         QString desc = "";
-        int pos = nvp->calcSliderPos((int)(time * ff_rew_scaling), desc);
-        osd->StartPause(pos, slidertype, scaleString, desc, 2);
+        int pos = nvp->calcSliderPos(time, desc);
+        bool slidertype = (internalState == kState_WatchingLiveTV);
+        int disptime = (mesg == tr("Paused")) ? -1 : 2;
+        osd->StartPause(pos, slidertype, mesg, desc, disptime);
     }
 
-    if (activenvp->FastForward(time * ff_rew_scaling))
-        StopFFRew(false);
+    bool res;
+
+    if (time > 0.0)
+        res = activenvp->FastForward(time);
+    else
+        res = activenvp->Rewind(-time);
 
     if (muted) 
         muteTimer->start(kMuteTimeout, true);
 
-    if (activenvp->GetLimitKeyRepeat())
-    {
-        keyRepeat = false;
-        keyrepeatTimer->start(300, true);
-    }
+    return res;
 }
 
-void TV::DoRew(int time)
+void TV::DoSeek(float time, const QString &mesg)
 {
     if (!keyRepeat)
         return;
 
-    bool muted = false;
-
-    if (volumeControl && !volumeControl->GetMute())
-    {
-        volumeControl->ToggleMute();
-        muted = true;
-    }
-
-    bool slidertype = false;
-    if (internalState == kState_WatchingLiveTV)
-        slidertype = true;
-
-    ff_rew_scaling = seek_speed_array[ff_rew_index].scaling;
-    QString scaleString = tr("Rewind ");
-    scaleString += seek_speed_array[ff_rew_index].dispString;
-
-    if (activenvp == nvp)
-    {
-        QString desc = "";
-        int pos = nvp->calcSliderPos(0 - (int)(time * ff_rew_scaling), desc);
-        osd->StartPause(pos, slidertype, scaleString, desc, 2);
-    }
-
-    if (activenvp->Rewind(time * ff_rew_scaling))
-        StopFFRew(false);
-
-    if (muted) 
-        muteTimer->start(kMuteTimeout, true);
+    NormalSpeed();
+    time += StopFFRew();
+    UpdatePosOSD(time, mesg);
 
     if (activenvp->GetLimitKeyRepeat())
     {
@@ -1357,94 +1318,113 @@ void TV::DoRew(int time)
     }
 }
 
-void TV::StopFFRew(bool repos)
+void TV::NormalSpeed(void)
 {
+    if (!speed_index)
+        return;
+
+    speed_index = 0;
+    activenvp->SetPlaySpeed(1.0);
+}
+
+void TV::ChangeSpeed(int direction)
+{
+    speed_index += direction;
+    if (speed_index > 4 || speed_index < -4)
+    {
+        speed_index -= direction;
+        return;
+    }
+
+    float time = StopFFRew();
+    float speed;
+    QString mesg;
+
+    if (speed_index > 0)
+    {
+        speed = speed_index+1;
+        mesg = QString(tr("Speed %1X")).arg(speed_index+1);
+    }
+    else if (speed_index < 0)
+    {
+        speed = 1.0 / (-speed_index+1);
+        mesg = QString(tr("Speed 1/%1X")).arg(-speed_index+1);
+    }
+    else
+    {
+        speed = 1.0;
+        mesg = tr("Play");
+    }
+
+    activenvp->SetPlaySpeed(speed);
+    UpdatePosOSD(time, mesg);
+
+    if (paused)
+        paused = activenvp->TogglePause();
+}
+
+float TV::StopFFRew(void)
+{
+    float time = 0.0;
+
     if (!doing_ff_rew)
-        return;
+        return time;
 
-    if (repos)
+    if (ff_rew_repos)
     {
         if (doing_ff_rew > 0)
-            activenvp->Rewind(seek_speed_array[ff_rew_index].ff_repos);
+            time = -seek_speed_array[ff_rew_index].ff_repos;
         else
-            activenvp->FastForward(seek_speed_array[ff_rew_index].rew_repos);
+            time = seek_speed_array[ff_rew_index].rew_repos;
     }
 
     doing_ff_rew = 0;
     ff_rew_index = SSPEED_NORMAL;
-    ff_rew_scaling = 1.0;
+
+    return time;
 }
 
-void TV::DoJumpAhead(void)
+void TV::ChangeFFRew(int direction)
 {
-    if (!keyRepeat)
-        return;
-
-    bool muted = false;
-
-    if (volumeControl && !volumeControl->GetMute())
+    if (doing_ff_rew == direction)
+        ff_rew_index = (++ff_rew_index % SSPEED_MAX);
+    else
     {
-        volumeControl->ToggleMute();
-        muted = true;
-    }
+        NormalSpeed();
 
-    bool slidertype = false;
-    if (internalState == kState_WatchingLiveTV)
-        slidertype = true;
+        doing_ff_rew = direction;
+        ff_rew_index = SSPEED_NORMAL;
 
-    if (activenvp == nvp)
-    {
-        QString desc = "";
-        int pos = nvp->calcSliderPos((int)(jumptime * 60), desc);
-        osd->StartPause(pos, slidertype, tr("Jump Ahead"), desc, 2);
-    }
-
-    activenvp->FastForward(jumptime * 60);
-
-    if (muted) 
-        muteTimer->start(kMuteTimeout, true);
-
-    if (activenvp->GetLimitKeyRepeat())
-    {
-        keyRepeat = false;
-        keyrepeatTimer->start(300, true);
+        if (paused)
+            paused = activenvp->TogglePause();
     }
 }
 
-void TV::DoJumpBack(void)
+void TV::RepeatFFRew(void)
 {
-    if (!keyRepeat)
+    if (!doing_ff_rew)
         return;
 
-    bool muted = false;
-
-    if (volumeControl && !volumeControl->GetMute())
+    float time;
+    QString mesg;
+    if (doing_ff_rew > 0)
     {
-        volumeControl->ToggleMute();
-        muted = true;
+        time = seek_speed_array[ff_rew_index].scaling;
+        mesg = tr("Forward ") + seek_speed_array[ff_rew_index].dispString;
+    }
+    else
+    {
+        time = -seek_speed_array[ff_rew_index].scaling;
+        mesg = tr("Rewind ") + seek_speed_array[ff_rew_index].dispString;
     }
 
-    bool slidertype = false;
-    if (internalState == kState_WatchingLiveTV)
-        slidertype = true;
-
-    if (activenvp == nvp)
+    if (UpdatePosOSD(time, mesg))
     {
-        QString desc = "";
-        int pos = nvp->calcSliderPos(0 - (int)(jumptime * 60), desc);
-        osd->StartPause(pos, slidertype, tr("Jump Back"), desc, 2);
+        StopFFRew();
+        UpdatePosOSD(time, tr("Play"));
     }
-
-    activenvp->Rewind(jumptime * 60);
-
-    if (muted) 
-        muteTimer->start(kMuteTimeout, true);
-
-    if (activenvp->GetLimitKeyRepeat())
-    {
-        keyRepeat = false;
-        keyrepeatTimer->start(300, true);
-    }
+    else if (ff_rew_index > SSPEED_NORMAL)
+        usleep(50000);
 }
 
 void TV::DoQueueTranscode(void)
@@ -1488,6 +1468,9 @@ void TV::DoQueueTranscode(void)
 
 void TV::DoSkipCommercials(int direction)
 {
+    NormalSpeed();
+    StopFFRew();
+
     bool muted = false;
 
     if (volumeControl && !volumeControl->GetMute())

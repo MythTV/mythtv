@@ -82,6 +82,8 @@ class OSD
 
     void Reinit(int width, int height, int fps, int dispx, int dispy, 
                 int dispw, int disph);
+
+    void SetFPS(int newfps) { fps = newfps; }
  
  private:
     void SetDefaults();

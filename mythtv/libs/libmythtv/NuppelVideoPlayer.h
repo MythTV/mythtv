@@ -78,6 +78,13 @@ class NuppelVideoPlayer
     void Unpause(bool unpauseaudio = true); 
     bool GetPause(void);
 
+    float GetPlaySpeed(void) { return play_speed; };
+    void SetPlaySpeed(float speed) 
+    { 
+        play_speed = speed;
+        if (osd) osd->SetFPS((int)ceil(video_frame_rate*speed));
+    }
+
     bool FastForward(float seconds);
     bool Rewind(float seconds);
 
@@ -157,7 +164,7 @@ class NuppelVideoPlayer
     int GetEof(void) { return eof; }
     void SetFramesPlayed(long long played) { framesPlayed = played; }
 
-    int calcSliderPos(int offset, QString &desc);
+    int calcSliderPos(float offset, QString &desc);
 
     bool GetLimitKeyRepeat(void) { return limitKeyRepeat; }
 
@@ -393,7 +400,8 @@ class NuppelVideoPlayer
     int avsync_avg;
     int refreshrate;
     int frame_interval;
-   
+    float play_speed;  
+ 
     bool delay_clipping;
     struct timeval nexttrigger, now;
 

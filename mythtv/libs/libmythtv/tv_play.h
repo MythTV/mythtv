@@ -119,11 +119,13 @@ class TV : public QObject
 
     void DoInfo(void);
     void DoPause(void);
-    void StopFFRew(bool repos);
-    void DoFF(int time);
-    void DoRew(int time);
-    void DoJumpAhead(void);
-    void DoJumpBack(void);
+    bool UpdatePosOSD(float time, const QString &mesg);
+    void DoSeek(float time, const QString &mesg);
+    void NormalSpeed(void);
+    void ChangeSpeed(int direction);
+    float StopFFRew(void);
+    void ChangeFFRew(int direction);
+    void RepeatFFRew(void);
     void DoSkipCommercials(int direction);
 
     void DoQueueTranscode(void);  
@@ -185,7 +187,7 @@ class TV : public QObject
     int ff_rew_repos;
     int doing_ff_rew;
     int ff_rew_index;
-    float ff_rew_scaling;
+    int speed_index;
 
     OSD *osd;
 
