@@ -768,10 +768,6 @@
         <position>0,0</position>
       </image>
 
-      <image name="filler" draworder="0" fleximage="yes">
-        <filename>conflict/cr-background.png</filename>
-        <position>0,39</position>
-      </image>
 
       <textarea name="showinstr" align="left" draworder="0">
         <area>500,558,800,30</area>
@@ -1147,7 +1143,7 @@
       <textarea name="keyinstr" align="center" draworder="0">
         <area>0,563,800,30</area>
         <font>message</font>
-        <value>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</value>
+        <value>(1) Sort by Title    (2) Sort by Priority</value>
       </textarea>
     </container>
 
