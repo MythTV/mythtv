@@ -113,6 +113,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(MythSqlDatabase *ldb,
     nvr_enc = NULL;
 
     paused = false;
+    actuallypaused = false;
+    video_actually_paused = false;
 
     audiodevice = "/dev/dsp";
     audioOutput = NULL;
