@@ -17,25 +17,27 @@ using namespace std;
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythwidgets.h>
 
-PlaybackBox::PlaybackBox(QString window_name,
-                         QString theme_filename,
+PlaybackBox::PlaybackBox(MythMainWindow *parent, QString window_name,
+                         QString theme_filename, 
                          PlaylistsContainer *the_playlists,
-                         AllMusic *the_music,
-                         QWidget *parent, const char *name)
+                         AllMusic *the_music, const char *name)
 
-           : MythThemedDialog(window_name, theme_filename, parent, name),
-             input(NULL), output(NULL), decoder(NULL), mainvisual(NULL),
-             embeddedvisual(NULL), visual_mode_timer(NULL), lcd_update_timer(NULL),
-             waiting_for_playlists_timer(NULL), playlist_tree(NULL)
+           : MythThemedDialog(parent, window_name, theme_filename, name)
 {
     //
     //  A few internal variable defaults
     //
-    
+ 
+    input = NULL;
+    output = NULL;
+    decoder = NULL;
+    mainvisual = NULL;
+    visual_mode_timer = NULL;
+    lcd_update_timer = NULL;
+    waiting_for_playlists_timer = NULL;
+    playlist_tree = NULL;
+ 
     isplaying = false;
-    input = 0; 
-    decoder = 0; 
-    output = 0; 
     outputBufferSize = 256;
     currentTime = 0;
     maxTime = 0;
@@ -982,8 +984,8 @@ void PlaybackBox::editPlaylist()
     }
 
     visual_mode_timer->stop();
-    DatabaseBox dbbox(all_playlists, all_music);
-    dbbox.Show();
+    DatabaseBox dbbox(all_playlists, all_music, gContext->GetMainWindow(),
+                      "database box");
     dbbox.exec();
     if (visual_mode_delay > 0)
         visual_mode_timer->start(visual_mode_delay * 1000);

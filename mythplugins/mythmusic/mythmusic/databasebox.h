@@ -38,7 +38,7 @@ class DatabaseBox : public MythDialog
   public:
     DatabaseBox(PlaylistsContainer *all_playlists,
                 AllMusic *music_ptr,
-                QWidget *parent = 0, const char *name = 0);
+                MythMainWindow *parent, const char *name = 0);
 
     void dealWithTracks(PlaylistItem *item_ptr);
     void setCDTitle(const QString& title);
@@ -58,6 +58,8 @@ class DatabaseBox : public MythDialog
     void renamePlaylist();
     void popBackPlaylist();
     void clearActive();
+    void closeActivePopup();
+    void closePlaylistPopup();
     void occasionallyCheckCD();
     void keepFilling();
     
@@ -85,13 +87,9 @@ class DatabaseBox : public MythDialog
     
     MythPopupBox        *active_popup;
     MythRemoteLineEdit  *active_pl_edit;
-    MythPushButton      *pop_back_button;
 
     MythPopupBox        *playlist_popup;
-    MythPushButton      *playlist_mac_b;
-    MythPushButton      *playlist_del_b;
     MythRemoteLineEdit  *playlist_rename;
-    MythPushButton      *playlist_rename_button;
 
     ReadCDThread        *cd_reader_thread;
     QTimer              *cd_watcher;

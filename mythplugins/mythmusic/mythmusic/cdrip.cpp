@@ -32,7 +32,7 @@ extern "C" {
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythwidgets.h>
 
-Ripper::Ripper(QSqlDatabase *ldb, QWidget *parent, const char *name)
+Ripper::Ripper(QSqlDatabase *ldb, MythMainWindow *parent, const char *name)
       : MythDialog(parent, name)
 {
     db = ldb;
@@ -256,7 +256,7 @@ void Ripper::ripthedisc(void)
 
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
-    MythDialog *newdiag = new MythDialog(NULL, 0, TRUE);
+    MythDialog *newdiag = new MythDialog(gContext->GetMainWindow(), "ripping");
     
     newdiag->setFont(QFont("Arial", (int)(gContext->GetBigFontSize() * hmult),
                      QFont::Bold));
@@ -283,7 +283,7 @@ void Ripper::ripthedisc(void)
     current->setProgress(0);
     vb->addWidget(current);
 
-    newdiag->showFullScreen();
+    newdiag->show();
 
     qApp->processEvents(5);
     qApp->processEvents();

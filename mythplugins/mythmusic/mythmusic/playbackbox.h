@@ -27,11 +27,9 @@ class PlaybackBox : public MythThemedDialog
     //
     typedef QValueVector<int> IntVector;
     
-    PlaybackBox(QString window_name,
-                QString theme_filename,
-                PlaylistsContainer *the_playlists,
-                AllMusic *the_music,
-                QWidget *parent = 0, const char *name = 0);
+    PlaybackBox(MythMainWindow *parent, QString window_name,
+                QString theme_filename, PlaylistsContainer *the_playlists,
+                AllMusic *the_music, const char *name = 0);
 
     ~PlaybackBox(void);
 
@@ -114,7 +112,6 @@ class PlaybackBox : public MythThemedDialog
     bool isplaying;
 
     MainVisual *mainvisual;
-    MainVisual *embeddedvisual;
 
     QString visual_mode;
     int visual_mode_delay;

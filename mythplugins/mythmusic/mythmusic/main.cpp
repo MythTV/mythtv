@@ -233,10 +233,10 @@ void SearchDir(QSqlDatabase *db, QString &directory)
 
 void startPlayback(PlaylistsContainer *all_playlists, AllMusic *all_music)
 {
-    PlaybackBox *pbb = new PlaybackBox("music_play", "music-", 
-                                       all_playlists, all_music);
-    pbb->Show();
-
+    PlaybackBox *pbb = new PlaybackBox(gContext->GetMainWindow(),
+                                       "music_play", "music-", 
+                                       all_playlists, all_music,
+                                       "music_playback");
     qApp->unlock();
     pbb->exec();
     qApp->lock();
@@ -250,9 +250,8 @@ void startPlayback(PlaylistsContainer *all_playlists, AllMusic *all_music)
 
 void startDatabaseTree(PlaylistsContainer *all_playlists, AllMusic *all_music)
 {
-    DatabaseBox dbbox(all_playlists, all_music);
-    dbbox.Show();
-
+    DatabaseBox dbbox(all_playlists, all_music, gContext->GetMainWindow(),
+                      "music database");
     qApp->unlock();
     dbbox.exec();
     qApp->lock();
@@ -260,8 +259,8 @@ void startDatabaseTree(PlaylistsContainer *all_playlists, AllMusic *all_music)
 
 void startRipper(QSqlDatabase *db)
 {
-    Ripper rip(db);
-    rip.Show();
+    Ripper rip(db, gContext->GetMainWindow(), "cd ripper");
+
     qApp->unlock();
     rip.exec();
     qApp->lock();
@@ -321,8 +320,8 @@ void runMenu(QString themedir, QSqlDatabase *db, QString paths,
              PlaylistsContainer *all_playlists, AllMusic *all_music,
              QString which_menu)
 {
-    ThemedMenu *diag = new ThemedMenu(themedir.ascii(),
-                                      which_menu);
+    ThemedMenu *diag = new ThemedMenu(themedir.ascii(), which_menu, 
+                                      gContext->GetMainWindow(), "music menu");
 
     MusicData data;
 
@@ -338,7 +337,6 @@ void runMenu(QString themedir, QSqlDatabase *db, QString paths,
     if (diag->foundTheme())
     {
         gContext->LCDswitchToTime();
-        diag->Show();
         diag->exec();
     }
     else
@@ -393,6 +391,9 @@ int main(int argc, char *argv[])
     }
     gContext->LoadQtConfig();
 
+    MythMainWindow *mainWindow = new MythMainWindow();
+    mainWindow->Show();
+    gContext->SetMainWindow(mainWindow);
 
     CheckFreeDBServerFile();
 
@@ -448,9 +449,9 @@ int main(int argc, char *argv[])
         }
         else
         {
-            DialogBox *no_db_dialog = new DialogBox("\n\nYou have no MythMusic tables in your database.");
+            DialogBox *no_db_dialog = new DialogBox(gContext->GetMainWindow(),
+                         "\n\nYou have no MythMusic tables in your database.");
             no_db_dialog->AddButton("OK, I'll read the documentation");
-            no_db_dialog->Show();
             no_db_dialog->exec();
             db->close();
             delete gContext;
