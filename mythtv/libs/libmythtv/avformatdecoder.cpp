@@ -591,7 +591,8 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     break;
                 }
                 default:
-                    cerr << "error decoding\n";
+                    cerr << "error decoding - " << curstream->codec.codec_type 
+                         << endl;
                     exit(0);
             }
 
