@@ -239,7 +239,7 @@ int mythplugin_run(void);
 int mythplugin_config(void);
 }
 
-void handleDVDMedia(void) 
+void handleDVDMedia(MythMediaDevice *) 
 {
     switch (gContext->GetNumSetting("DVDOnInsertDVD", 1))
     {
@@ -263,7 +263,7 @@ void handleDVDMedia(void)
 }
 
 #ifdef VCD_SUPPORT
-void handleVCDMedia(void) 
+void handleVCDMedia(MythMediaDevice *) 
 {
     switch (gContext->GetNumSetting("DVDOnInsertDVD", 1))
     {
