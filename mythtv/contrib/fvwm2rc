@@ -1,0 +1,3 @@
+# This works nicely for a dedicated MythTV box -mdz
+DeskTopSize 1x1
+Style myth* CascadePlacement, NoTitle, BorderWidth 0, HandleWidth 0
