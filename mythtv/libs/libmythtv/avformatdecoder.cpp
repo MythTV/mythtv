@@ -275,6 +275,13 @@ void AvFormatDecoder::SetPixelFormat(const int pixFormat)
     }
 }
 
+extern "C" void HandleStreamChange(void* data) {
+    AvFormatDecoder* decoder = (AvFormatDecoder*) data;
+    int cnt = decoder->ic->nb_streams;
+    VERBOSE(VB_IMPORTANT, QString("streams_changed() -- stream count %1").arg(cnt));
+    decoder->ScanStreams(false);
+}
+
 int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                               char testbuf[2048])
 {
@@ -323,25 +330,87 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         ic = NULL;
         return -1;
     }
+    ic->streams_changed = HandleStreamChange;
+    ic->stream_change_data = this;
 
     fmt->flags &= ~AVFMT_NOFILE;
 
     bitrate = 0;
     fps = 0;
 
+    ret = ScanStreams(novideo);
+    if (-1 == ret)
+        return ret;
+
+    ringBuffer->CalcReadAheadThresh(bitrate);
+
+    if ((m_playbackinfo && m_db) || livetv || watchingrecording)
+    {
+        recordingHasPositionMap = SyncPositionMap();
+        if (recordingHasPositionMap && !livetv && !watchingrecording)
+        {
+            hasFullPositionMap = true;
+            gopset = true;
+        }
+    }
+
+    if (!recordingHasPositionMap)
+    {
+        // the pvr-250 seems to overreport the bitrate by * 2
+        float bytespersec = (float)bitrate / 8 / 2;
+        float secs = ringBuffer->GetRealFileSize() * 1.0 / bytespersec;
+        m_parent->SetFileLength((int)(secs), (int)(secs * fps));
+
+        // we will not see a position map from db or remote encoder,
+        // set the gop interval to 15 frames.  if we guess wrong, the
+        // auto detection will change it.
+        keyframedist = 15;
+        positionMapType = MARK_GOP_START;
+    }
+
+    //if (livetv || watchingrecording)
+        ic->build_index = 0;
+
+    dump_format(ic, 0, filename, 0);
+    if (hasFullPositionMap)
+    {
+        VERBOSE(VB_PLAYBACK, "Position map found");
+    }
+    else if (recordingHasPositionMap)
+    {
+        VERBOSE(VB_PLAYBACK, "Partial position map found");
+    }
+
+    return recordingHasPositionMap;
+}
+
+int AvFormatDecoder::ScanStreams(bool novideo)
+{
     // Scan for audio tracks and pick one to use.
     if (scanAudioTracks())
     {
         autoSelectAudioTrack();
     }
 
+    bitrate = 0;
+    fps = 0;
+
     for (int i = 0; i < ic->nb_streams; i++)
     {
         AVCodecContext *enc = &ic->streams[i]->codec;
+        VERBOSE(VB_PLAYBACK, "AVFD");
+        VERBOSE(VB_PLAYBACK, QString("AVFD: Opening Stream #%1: codec id %2").
+                arg(i).arg(enc->codec_id));
         switch (enc->codec_type)
         {
             case CODEC_TYPE_VIDEO:
             {
+                VERBOSE(VB_PLAYBACK, QString("AVFD: Video Codec -- codec id %1").arg(enc->codec_id));
+                if (!enc->codec_id)
+                { // default to MPEG2 video
+                    VERBOSE(VB_IMPORTANT, "AVFD: Error, video has no codec_id");
+                    enc->codec_id = CODEC_ID_MPEG2VIDEO;
+                }
                 bitrate += enc->bit_rate;
 
                 fps = (double)enc->frame_rate / enc->frame_rate_base;
@@ -419,6 +488,12 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             }
             case CODEC_TYPE_AUDIO:
             {
+                VERBOSE(VB_PLAYBACK, QString("AVFD: Audio Codec -- codec id %1").arg(enc->codec_id));
+                if (!enc->codec_id)
+                { // default to AC3 audio
+                    VERBOSE(VB_IMPORTANT, "AVFD: Error, audio has no codec_id"); 
+                    enc->codec_id = CODEC_ID_AC3;
+                }
                 if (i == wantedAudioStream)
                 {
                     VERBOSE(VB_AUDIO, QString("Initializing audio parms from stream #%1.").arg(i));
@@ -461,8 +536,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             }
         }
 
-        AVCodec *codec;
-        codec = avcodec_find_decoder(enc->codec_id);
+        VERBOSE(VB_PLAYBACK, QString("AVFD: Looking for decoder for %1").arg(enc->codec_id));
+        AVCodec *codec = avcodec_find_decoder(enc->codec_id);
         if (!codec)
         {
             VERBOSE(VB_IMPORTANT, QString("AvFormatDecoder: Could not find decoder for codec (%1) aborting.")
@@ -472,55 +547,21 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             return -1;
         }
 
-        if (avcodec_open(enc, codec) < 0)
+        if (enc->codec) {
+            VERBOSE(VB_IMPORTANT, QString("Codec already open, closing first"));
+            avcodec_close(enc);
+        }
+
+        int open_val = avcodec_open(enc, codec);
+        if (open_val < 0)
         {
-            VERBOSE(VB_IMPORTANT, QString("AvFormatDecoder: Could not open codec aborting."));
+            VERBOSE(VB_IMPORTANT, QString("AvFormatDecoder: Could not open codec aborting. reason %1").arg(open_val));
             av_close_input_file(ic);
             ic = NULL;
             return -1;
         }
     }
-
-    ringBuffer->CalcReadAheadThresh(bitrate);
-
-    if ((m_playbackinfo && m_db) || livetv || watchingrecording)
-    {
-        recordingHasPositionMap = SyncPositionMap();
-        if (recordingHasPositionMap && !livetv && !watchingrecording)
-        {
-            hasFullPositionMap = true;
-            gopset = true;
-        }
-    }
-
-    if (!recordingHasPositionMap)
-    {
-        // the pvr-250 seems to overreport the bitrate by * 2
-        float bytespersec = (float)bitrate / 8 / 2;
-        float secs = ringBuffer->GetRealFileSize() * 1.0 / bytespersec;
-        m_parent->SetFileLength((int)(secs), (int)(secs * fps));
-
-        // we will not see a position map from db or remote encoder,
-        // set the gop interval to 15 frames.  if we guess wrong, the
-        // auto detection will change it.
-        keyframedist = 15;
-        positionMapType = MARK_GOP_START;
-    }
-
-    //if (livetv || watchingrecording)
-        ic->build_index = 0;
-
-    dump_format(ic, 0, filename, 0);
-    if (hasFullPositionMap)
-    {
-        VERBOSE(VB_PLAYBACK, "Position map found");
-    }
-    else if (recordingHasPositionMap)
-    {
-        VERBOSE(VB_PLAYBACK, "Partial position map found");
-    }
-
-    return recordingHasPositionMap;
+    return 0;
 }
 
 bool AvFormatDecoder::CheckVideoParams(int width, int height)
@@ -539,6 +580,10 @@ bool AvFormatDecoder::CheckVideoParams(int width, int height)
             case CODEC_TYPE_VIDEO:
             {
                 AVCodec *codec = enc->codec;
+                if (!codec) {
+                    VERBOSE(VB_IMPORTANT, QString("codec for stream %1 is null").arg(i));
+                    break;
+                }
                 avcodec_close(enc);
                 avcodec_open(enc, codec);
                 break;

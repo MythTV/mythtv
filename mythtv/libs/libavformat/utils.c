@@ -771,17 +771,18 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                 s->cur_pkt.startpos = startpos;
 
             st = s->streams[s->cur_pkt.stream_index];
-
-            s->cur_st = st;
-            s->cur_ptr = s->cur_pkt.data;
-            s->cur_len = s->cur_pkt.size;
-            if (st->need_parsing && !st->parser) {
-                st->parser = av_parser_init(st->codec.codec_id);
-                if (!st->parser) {
-                    /* no parser available : just output the raw packets */
+	    if (st) {
+		s->cur_st = st;
+		s->cur_ptr = s->cur_pkt.data;
+		s->cur_len = s->cur_pkt.size;
+		if (st->need_parsing && !st->parser) {
+		    st->parser = av_parser_init(st->codec.codec_id);
+		    if (!st->parser) {
+			/* no parser available : just output the raw packets */
                     st->need_parsing = 0;
-                }
-            }
+		    }
+		}
+	    }
         }
     }
 }
@@ -1818,6 +1819,8 @@ AVStream *av_new_stream(AVFormatContext *s, int id)
 {
     AVStream *st;
 
+    av_remove_stream(s, id);
+
     if (s->nb_streams >= MAX_STREAMS)
         return NULL;
 
@@ -1840,7 +1843,27 @@ AVStream *av_new_stream(AVFormatContext *s, int id)
     st->last_IP_pts = AV_NOPTS_VALUE;
 
     s->streams[s->nb_streams++] = st;
+    if (s->streams_changed)
+	s->streams_changed(s->stream_change_data);
     return st;
+}
+
+void av_remove_stream(AVFormatContext *s, int id) {
+    //printf("av_remove_stream 0x%x -- IGNORED \n", id);
+    //return; // TODO HACK 
+    int i;
+    for (i=0; i<s->nb_streams; i++)
+	if (s->streams[i]->id == id) {
+	    printf("av_remove_stream 0x%x\n", id);
+	    s->nb_streams--;
+	    if (s->nb_streams-i>0)
+		memmove(&s->streams[i], &s->streams[i+1], (s->nb_streams-i)*sizeof(AVFormatContext *));
+	    if (s->streams_changed)
+		s->streams_changed(s->stream_change_data);
+	    continue;
+	}
+    for (i=0; i<s->nb_streams; i++)
+	s->streams[i]->index=i;
 }
 
 /************************************************************/

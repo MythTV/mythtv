@@ -114,8 +114,12 @@ void av_freep(void *arg)
 /* encoder management */
 AVCodec *first_avcodec = NULL;
 
+#undef printf
+
 void register_avcodec(AVCodec *format)
 {
+    if (format->id==2 || format->id==12)
+	printf("register_avcodec %s id %i\n", format->name, format->id);
     AVCodec **p;
     p = &first_avcodec;
     while (*p != NULL) p = &(*p)->next;
@@ -567,13 +571,17 @@ AVCodec *avcodec_find_encoder_by_name(const char *name)
 
 AVCodec *avcodec_find_decoder(enum CodecID id)
 {
+    printf("avcodec_find_decoder id %02i ", id);
     AVCodec *p;
     p = first_avcodec;
     while (p) {
-        if (p->decode != NULL && p->id == id)
+        if (p->decode != NULL && p->id == id) {
+	    printf("returning 0x%x\n", p);
             return p;
+	}
         p = p->next;
     }
+    printf("returning NULL\n");
     return NULL;
 }
 

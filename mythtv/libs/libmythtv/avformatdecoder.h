@@ -17,6 +17,8 @@ extern "C" {
 class ProgramInfo;
 class MythSqlDatabase;
 
+extern "C" void HandleStreamChange(void*);
+
 /// A decoder for video files.
 
 /// The AvFormatDecoder is used to decode non-NuppleVideo files.
@@ -24,6 +26,7 @@ class MythSqlDatabase;
 /// and IvtvDecoder (if "USING_IVTV" is defined).
 class AvFormatDecoder : public DecoderBase
 {
+    friend void HandleStreamChange(void*);
   public:
     AvFormatDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
                     ProgramInfo *pginfo);
@@ -68,6 +71,8 @@ class AvFormatDecoder : public DecoderBase
     virtual void incCurrentAudioTrack();
     virtual void decCurrentAudioTrack();
     virtual bool setCurrentAudioTrack(int trackNo);
+
+    int ScanStreams(bool novideo);
 
   protected:
     /// Loop through the streams in the file to identify audio streams.
