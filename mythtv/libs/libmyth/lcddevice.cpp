@@ -389,6 +389,7 @@ void LCD::veryBadThings(int anError)
 #warning ***   You should think seriously about upgrading your Qt to 3.1 or higher   ***
 #warning
     delete socket;
+    socket = NULL;
 #endif
 	
 }
@@ -713,5 +714,8 @@ LCD::~LCD()
 #ifdef LCD_DEVICE
 	socket->close();
 #endif
-	delete socket;
+    if(socket)
+    {
+    	delete socket;
+    }
 }
