@@ -397,8 +397,7 @@ void EditMetadataDialog::findCoverArt()
     // using ~/.mythtv/MythVideo
     if( fileprefix.length() == 0 )
     {
-        char *home = getenv("HOME");
-        fileprefix = QString(home) + "/.mythtv/MythVideo";
+        fileprefix = MythContext::GetConfDir() + "/MythVideo";
     }
 
 

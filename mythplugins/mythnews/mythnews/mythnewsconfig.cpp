@@ -141,8 +141,8 @@ MythNewsConfig::~MythNewsConfig()
 
 void MythNewsConfig::populateSites()
 {
-    QString filename = gContext->GetInstallPrefix()
-                       + "/share/mythtv/mythnews/news-sites.xml";
+    QString filename = gContext->GetShareDir()
+                       + "mythnews/news-sites.xml";
     QFile xmlFile(filename);
 
     if (!xmlFile.exists() || !xmlFile.open(IO_ReadOnly)) {

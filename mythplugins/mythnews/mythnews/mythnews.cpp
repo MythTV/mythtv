@@ -41,8 +41,7 @@ MythNews::MythNews(QSqlDatabase *db, MythMainWindow *parent,
 
     // Setup cache directory
 
-    char *home = getenv("HOME");
-    QString fileprefix = QString(home) + "/.mythtv";
+    QString fileprefix = MythContext::GetConfDir();
 
     QDir dir(fileprefix);
     if (!dir.exists())

@@ -259,7 +259,7 @@ QString VideoManager::GetMoviePoster(QString movieNum)
     // Obtain movie poster
     QStringList args = QStringList::split(' ', 
               gContext->GetSetting("MoviePosterCommandLine", 
-              "/usr/local/share/mythtv/mythvideo/scripts/imdb.pl -P"));
+              gContext->GetShareDir() + "mythvideo/scripts/imdb.pl -P"));
     args += movieNum;
 
     // execute external command to obtain url of movie poster
@@ -285,8 +285,7 @@ QString VideoManager::GetMoviePoster(QString movieNum)
     // using ~/.mythtv/MythVideo
     if( fileprefix.length() == 0 )
     {
-        char *home = getenv("HOME");
-        fileprefix = QString(home) + "/.mythtv";
+        fileprefix = MythContext::GetConfDir();
 
         dir = QDir(fileprefix);
         if (!dir.exists())
@@ -390,7 +389,7 @@ void VideoManager::GetMovieData(QString movieNum)
 {
     QStringList args = QStringList::split(' ',
               gContext->GetSetting("MovieDataCommandLine", 
-              "/usr/local/share/mythtv/mythvideo/scripts/imdb.pl -D"));
+              gContext->GetShareDir() + "mythvideo/scripts/imdb.pl -D"));
     args += movieNum;
 
     // execute external command to obtain list of possible movie matches 
@@ -538,7 +537,7 @@ int VideoManager::GetMovieListing(QString movieName)
 {
     QStringList args = QStringList::split(' ', 
               gContext->GetSetting("MovieListCommandLine", 
-              "/usr/local/share/mythtv/mythvideo/scripts/imdb.pl -M tv=no;video=no"));
+              gContext->GetShareDir() + "mythvideo/scripts/imdb.pl -M tv=no;video=no"));
     args += movieName;
 
     // execute external command to obtain list of possible movie matches 

@@ -147,8 +147,7 @@ static HostLineEdit *VideoArtworkDirectory()
 {
     HostLineEdit *gc = new HostLineEdit("VideoArtworkDir");
     gc->setLabel(QObject::tr("Directory that holds movie posters"));
-    char *home = getenv("HOME");
-    gc->setValue(QString(home) + "/.mythtv/MythVideo");
+    gc->setValue(MythContext::GetConfDir() + "/MythVideo");
     gc->setHelpText(QObject::tr("This directory must exist, and the user "
                     "running MythVideo needs to have read/write permission "
                     "to the directory."));

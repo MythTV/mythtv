@@ -31,6 +31,7 @@ extern "C" {
 }
 
 #include "newsengine.h"
+#include <mythtv/mythcontext.h>
 
 using namespace std;
 
@@ -70,8 +71,7 @@ NewsSite::NewsSite(const QString& name,
     m_updated = updated;
     m_state   = NewsSite::Success;
 
-    char *home = getenv("HOME");
-    m_destDir  = QString(home) + "/.mythtv";
+    m_destDir  = MythContext::GetConfDir();
     m_destDir += "/MythNews";
 
     m_articleList.setAutoDelete(true);
