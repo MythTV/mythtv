@@ -78,6 +78,11 @@ how happy they are with the results.</P>
 use the graphical tools that come with your distribution, or you can use
 command-line utilities.  Either system will get the job done, and it all
 depends on your comfort level with Linux.</P>
+<P><B>NOTE for Red Hat users</B>:  Axel Thimm has created RPMs for MythTV
+which may be obtained from 
+<A HREF="http://atrpms.physik.fu-berlin.de/name/mythtv/">http://atrpms.physik.fu-berlin.de/name/mythtv/</A>.  If you have
+problems with the RPMs, please send him email directly at 
+<A HREF="mailto:Axel.Thimm@physik.fu-berlin.de">mailto:Axel.Thimm@physik.fu-berlin.de</A>.</P>
 <P><B>NOTE</B>: you must have the MySQL database software installed on a
 system to store the master database.  This does not necessarily mean that
 MySQL must run on one of the MythTV boxes.</P>
@@ -88,13 +93,21 @@ XMLTV), <B>mysql</B>, <B>gcc</B>, <B>freetype2-devel</B>,
 remote control with MythTV, you're going to need the <B>cdialog</B>
 package in order to compile <B>lircd</B> if your distribution doesn't have
 a pre-packaged <B>lirc</B>.</P>
-<P><B>NOTE</B>:  QT v3.1 is recommended, but not required.</P>
-<P><B>NOTE</B>:  If you are going to be using RPMs to install various
+<P>
+<HR>
+<PRE>
+NOTE:  QT v3.1 is recommended, but not required.
+
+NOTE:  If you are going to be using RPMs to install various
 components, you should be aware that not all packages include the necessary
 headers for compiling packages.  If you're having trouble compiling, ensure
-that you've installed the <CODE>-devel</CODE> version of a prerequisite.</P>
-<P><B>NOTE</B>:  Other than where noted, Mandrake 9.1 users may follow the
-Mandrake 9.0 instructions.</P>
+that you've installed the -devel version of a prerequisite.
+
+NOTE:  Other than where noted, Mandrake 9.1 users may follow the
+Mandrake 9.0 instructions.
+</PRE>
+<HR>
+</P>
 <P>There appears to be issues with ALSA and simultaneously recording and
 playing sound, which is a core requirement for MythTV.  If you are not
 running ALSA 0.9.0rc6 or higher and experience lock-ups of your system when

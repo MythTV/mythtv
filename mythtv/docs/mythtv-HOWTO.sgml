@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-03-27, v2.05
+<date>2003-03-27, v2.06
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -136,6 +136,14 @@ use the graphical tools that come with your distribution, or you can use
 command-line utilities.  Either system will get the job done, and it all
 depends on your comfort level with Linux.
 
+<bf>NOTE for Red Hat users</bf>:  Axel Thimm has created RPMs for MythTV
+which may be obtained from <url
+url="http://atrpms.physik.fu-berlin.de/name/mythtv/"
+name="http://atrpms.physik.fu-berlin.de/name/mythtv/">.  If you have
+problems with the RPMs, please send him email directly at <url
+url="mailto:Axel.Thimm@physik.fu-berlin.de"
+name="mailto:Axel.Thimm@physik.fu-berlin.de">.
+
 <bf>NOTE</bf>: you must have the MySQL database software installed on a
 system to store the master database.  This does not necessarily mean that
 MySQL must run on one of the MythTV boxes.
@@ -148,15 +156,17 @@ remote control with MythTV, you're going to need the <bf>cdialog</bf>
 package in order to compile <bf>lircd</bf> if your distribution doesn't have
 a pre-packaged <bf>lirc</bf>.
 
-<bf>NOTE</bf>:  QT v3.1 is recommended, but not required.
+<code>
+NOTE:  QT v3.1 is recommended, but not required.
 
-<bf>NOTE</bf>:  If you are going to be using RPMs to install various
+NOTE:  If you are going to be using RPMs to install various
 components, you should be aware that not all packages include the necessary
 headers for compiling packages.  If you're having trouble compiling, ensure
-that you've installed the <tt>-devel</tt> version of a prerequisite.
+that you've installed the -devel version of a prerequisite.
 
-<bf>NOTE</bf>:  Other than where noted, Mandrake 9.1 users may follow the
+NOTE:  Other than where noted, Mandrake 9.1 users may follow the
 Mandrake 9.0 instructions.
+</code>
 
 There appears to be issues with ALSA and simultaneously recording and
 playing sound, which is a core requirement for MythTV.  If you are not
@@ -1595,8 +1605,10 @@ devices you have available.
 Press ESC to return to the main menu, and press ESC again if you have no
 further items to configure, thereby returning you to the command line.
 
-Run the <tt>mythfilldatabase</tt> as directed.  The master backend will
-obtain guide data for all the video sources you defined during setup.
+<sect1>Post-configuration.
+<p>Run the <tt>mythfilldatabase</tt> program as directed.  The master
+backend will obtain guide data for all the video sources you defined during
+setup.
 
 Once <tt>mythfilldatabase</tt> has finished, start the master server before
 continuing.
@@ -1620,7 +1632,8 @@ Valid options are:
 </verb></tscreen>
 
 Running mythbackend as a daemon and using the logfile option will allow you
-to have mythbackend automatically start at reboot.
+to have mythbackend automatically start up during the boot process.  For
+example, you may add this to your <tt>rc.local</tt> file.
 
 <sect1>Configuring a non-master backend.
 <p>Configuration of a non-master backend follows the same general procedure
@@ -2546,9 +2559,9 @@ into issues when you try to record and play sound at the same time.  If your
 backend is a seperate machine than your frontend, then there's no problem,
 since you're only going to be doing one thing at a time with the card. 
 Likewise, if you're running the frontend and backend on the same machine,
-but your using btaudio as your recording source, and using the
-playback function of your soundcard, then you also shouldn't have an issue,
-since the sound card isn't being asked to perform two functions at once.
+but you're using btaudio as your recording source, and using the playback
+function of your soundcard, then you also shouldn't have an issue, since the
+sound card isn't being asked to perform two functions at once.
 
 If you can't get your soundcard to go full duplex and need it to, then check
 your distribution for updated sound drivers.  If your soundcard is not
@@ -2822,6 +2835,8 @@ duplex issues as reported by mythbackend.  Added information on -f flag to
 mysql.  Added info on mythbackend command-line options.
 v2.05, 2003-03-27.  Reformatted the examples in mythmusic a little.  Added
 Mandrake 9.1 mythmusic prereq.
+v2.06, 2003-03-27.  grammar error.  Added link to Axel Thimm's RPMs. 
+Expanded on the command line parameters to mythbackend.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

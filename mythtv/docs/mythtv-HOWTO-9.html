@@ -175,8 +175,13 @@ You would then finish associating the video sources to any other hardware
 devices you have available.</P>
 <P>Press ESC to return to the main menu, and press ESC again if you have no
 further items to configure, thereby returning you to the command line.</P>
-<P>Run the <CODE>mythfilldatabase</CODE> as directed.  The master backend will
-obtain guide data for all the video sources you defined during setup.</P>
+
+<H2><A NAME="ss9.2">9.2</A> <A HREF="mythtv-HOWTO.html#toc9.2">Post-configuration.</A>
+</H2>
+
+<P>Run the <CODE>mythfilldatabase</CODE> program as directed.  The master
+backend will obtain guide data for all the video sources you defined during
+setup.</P>
 <P>Once <CODE>mythfilldatabase</CODE> has finished, start the master server before
 continuing.</P>
 <P>
@@ -202,9 +207,10 @@ Valid options are:
 </CODE></BLOCKQUOTE>
 </P>
 <P>Running mythbackend as a daemon and using the logfile option will allow you
-to have mythbackend automatically start at reboot.</P>
+to have mythbackend automatically start up during the boot process.  For
+example, you may add this to your <CODE>rc.local</CODE> file.</P>
 
-<H2><A NAME="ss9.2">9.2</A> <A HREF="mythtv-HOWTO.html#toc9.2">Configuring a non-master backend.</A>
+<H2><A NAME="ss9.3">9.3</A> <A HREF="mythtv-HOWTO.html#toc9.3">Configuring a non-master backend.</A>
 </H2>
 
 <P>Configuration of a non-master backend follows the same general procedure
@@ -222,7 +228,7 @@ you've edited the <CODE>/usr/local/share/mythtv/mysql.txt</CODE> file and put
 the correct IP address for the database server.</P>
 <P><B>NOTE</B>: Do not run <CODE>mythfilldatabase</CODE> on a non-master backend.</P>
 
-<H2><A NAME="ss9.3">9.3</A> <A HREF="mythtv-HOWTO.html#toc9.3">Configuring and running mythfilldatabase</A>
+<H2><A NAME="ss9.4">9.4</A> <A HREF="mythtv-HOWTO.html#toc9.4">Configuring and running mythfilldatabase</A>
 </H2>
 
 <P><B>NOTE</B>:  <B>mythfilldatabase</B> might take a while to complete,

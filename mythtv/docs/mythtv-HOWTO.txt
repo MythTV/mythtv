@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-03-27, v2.05
+  2003-03-27, v2.06
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -77,9 +77,10 @@
         9.1.2 Capture Cards
         9.1.3 Video Sources
         9.1.4 Input Connections
-     9.2 Configuring a non-master backend.
-     9.3 Configuring and running mythfilldatabase
-        9.3.1 Setting mythfilldatabase to run from cron
+     9.2 Post-configuration.
+     9.3 Configuring a non-master backend.
+     9.4 Configuring and running mythfilldatabase
+        9.4.1 Setting mythfilldatabase to run from cron
 
   10. Configuring mythfrontend
      10.1 General
@@ -284,6 +285,13 @@
   you can use command-line utilities.  Either system will get the job
   done, and it all depends on your comfort level with Linux.
 
+  [1mNOTE for Red Hat users[22m:  Axel Thimm has created RPMs for MythTV which
+  may be obtained from http://atrpms.physik.fu-berlin.de/name/mythtv/
+  <http://atrpms.physik.fu-berlin.de/name/mythtv/>.  If you have
+  problems with the RPMs, please send him email directly at
+  mailto:Axel.Thimm@physik.fu-berlin.de <mailto:Axel.Thimm@physik.fu-
+  berlin.de>.
+
   [1mNOTE[22m: you must have the MySQL database software installed on a system
   to store the master database.  This does not necessarily mean that
   MySQL must run on one of the MythTV boxes.
@@ -295,16 +303,17 @@
   need the [1mcdialog [22mpackage in order to compile [1mlircd [22mif your
   distribution doesn't have a pre-packaged [1mlirc[22m.
 
-  [1mNOTE[22m:  QT v3.1 is recommended, but not required.
+  ______________________________________________________________________
+  NOTE:  QT v3.1 is recommended, but not required.
 
-  [1mNOTE[22m:  If you are going to be using RPMs to install various
-  components, you should be aware that not all packages include the
-  necessary headers for compiling packages.  If you're having trouble
-  compiling, ensure that you've installed the -devel version of a
-  prerequisite.
+  NOTE:  If you are going to be using RPMs to install various
+  components, you should be aware that not all packages include the necessary
+  headers for compiling packages.  If you're having trouble compiling, ensure
+  that you've installed the -devel version of a prerequisite.
 
-  [1mNOTE[22m:  Other than where noted, Mandrake 9.1 users may follow the
+  NOTE:  Other than where noted, Mandrake 9.1 users may follow the
   Mandrake 9.0 instructions.
+  ______________________________________________________________________
 
   There appears to be issues with ALSA and simultaneously recording and
   playing sound, which is a core requirement for MythTV.  If you are not
@@ -434,8 +443,8 @@
   Open a shell, and execute the following.  You may get asked a number
   of questions regarding dependencies.  It's best to answer "YES".
 
-  $ urpmi mesa-common-devel libmng1-devel mysql-devel libunixodbc2-devel
-  $ urpmi postgresql-devel xfree86-static-libs
+       $ urpmi mesa-common-devel libmng1-devel mysql-devel libunixodbc2-devel
+       $ urpmi postgresql-devel xfree86-static-libs
 
   Once all of the pre-requisites have been installed, the next step is
   to obtain and compile the source RPM.
@@ -521,7 +530,7 @@
   support are not built. To enable SQL support, add "mysql qt" to your
   USE variable in /etc/make.conf and rebuild QT by running
 
-  $ emerge qt
+       $ emerge qt
 
   Install MySQL if this is the master system:
 
@@ -1728,8 +1737,10 @@
   no further items to configure, thereby returning you to the command
   line.
 
-  Run the mythfilldatabase as directed.  The master backend will obtain
-  guide data for all the video sources you defined during setup.
+  [1m9.2.  Post-configuration.[0m
+
+  Run the mythfilldatabase program as directed.  The master backend will
+  obtain guide data for all the video sources you defined during setup.
 
   Once mythfilldatabase has finished, start the master server before
   continuing.
@@ -1750,9 +1761,10 @@
        -d or --daemon                 Runs mythbackend as a daemon
 
   Running mythbackend as a daemon and using the logfile option will
-  allow you to have mythbackend automatically start at reboot.
+  allow you to have mythbackend automatically start up during the boot
+  process.  For example, you may add this to your rc.local file.
 
-  [1m9.2.  Configuring a non-master backend.[0m
+  [1m9.3.  Configuring a non-master backend.[0m
 
   Configuration of a non-master backend follows the same general
   procedure as that of the master backend, with the exception that you
@@ -1774,7 +1786,7 @@
 
   [1mNOTE[22m: Do not run mythfilldatabase on a non-master backend.
 
-  [1m9.3.  Configuring and running mythfilldatabase[0m
+  [1m9.4.  Configuring and running mythfilldatabase[0m
 
   [1mNOTE[22m:  [1mmythfilldatabase [22mmight take a while to complete, depending on
   any number of factors, most of which you can't control.  It's best to
@@ -1793,7 +1805,7 @@
   fine-tune your channels and would like to import the fine tuning
   offsets into MythTV.
 
-  [1m9.3.1.  Setting mythfilldatabase  to run from cron[0m
+  [1m9.4.1.  Setting mythfilldatabase  to run from cron[0m
 
   In order to keep your database filled, [1mmythfilldatabase [22mshould be run
   once a day.
@@ -1934,10 +1946,10 @@
 
   To determine if you've got SSE, you can:
 
-       $ cat /proc/cpuinfo
-       [snip]
-       flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca
-       cmov pat pse36 mmx fxsr sse
+  $ cat /proc/cpuinfo
+  [snip]
+  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca
+  cmov pat pse36 mmx fxsr sse
 
   Notice the [1msse [22mat the end of the line - this tells you that this
   processor will be able to deinterlace correctly.
@@ -2159,17 +2171,17 @@
   <http://www.xiph.org/paranoia/download/cdparanoia-III-
   alpha9.8.src.tgz>.
 
-  $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
-  $ cd cdparanoia-III-alpha9.8
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # cd /usr/lib
-  # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
-  # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
-  # exit
-  $
+       $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
+       $ cd cdparanoia-III-alpha9.8
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # cd /usr/lib
+       # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
+       # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
+       # exit
+       $
 
   [1m15.2.  Mandrake 9.0[0m
 
@@ -2688,10 +2700,10 @@
   same time.  If your backend is a seperate machine than your frontend,
   then there's no problem, since you're only going to be doing one thing
   at a time with the card.  Likewise, if you're running the frontend and
-  backend on the same machine, but your using btaudio as your recording
-  source, and using the playback function of your soundcard, then you
-  also shouldn't have an issue, since the sound card isn't being asked
-  to perform two functions at once.
+  backend on the same machine, but you're using btaudio as your
+  recording source, and using the playback function of your soundcard,
+  then you also shouldn't have an issue, since the sound card isn't
+  being asked to perform two functions at once.
 
   If you can't get your soundcard to go full duplex and need it to, then
   check your distribution for updated sound drivers.  If your soundcard
