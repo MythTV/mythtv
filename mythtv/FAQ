@@ -6,11 +6,13 @@
 
 ) When I change windows in the UI, the windows start blinking and going crazy
   and make it otherwise unuseable.
-- See if changing your window manager to 'Click to Focus' helps.
+- See if changing your window manager to 'Click to Focus' helps, or try 
+  a different window manager.
 
 ) What's this 'strange error flushing buffer' mean?
 - Nothing, really.  It's just lame (the mp3 encoder) complaining for some 
-  obscure reason.
+  obscure reason.  This seems to be fixed in more recent versions of
+  the libmp3lame library.
 
 ) The audio's _really_ out of sync, and it doesn't pause when I pause live TV?
 - You need to mute the line-in, and set the mixer to record from the line in.
@@ -52,8 +54,7 @@
 
 ) Whenever I 'make install', it copies over my settings files?
 - Simply copy the files you want to save to ~/.mythtv/ and they won't get
-  overwritten anymore.  Changes to the settings files happen regularly, so you
-  need to watch for these changes.
+  overwritten anymore.
 
 ) Colors are all messed up, people's faces are blue!
 - Using the binary nvidia drivers?  Make sure you're using at least version
@@ -79,13 +80,20 @@
   "Segmentation fault" message
 - You need to use compilation flags appropriate for your processor.  Rebuild
   everything from scratch after editing settings.pro.
+- You are using code from CVS (not a released version), and have more
+  than one copy of the library libmyth on your system.  At runtime, the
+  wrong one is being found.  Remove the old one.
+- You are using code from CVS (not a released version), and your build
+  tree has not been completely rebuilt.  Run "make distclean" and start over.
 
 ) Mythfrontend works, but when I try to watch TV or play a recording, it
   crashes with an "Illegal instruction", "Bus error" or "Segmentation fault"
   message every time
 - Do you have deinterlace=1 in settings.txt?  Try disabling it, and if that
   corrects the problem, read and follow the instructions at the top of
-  filters/linearblend/filter_linearblend.c and rebuild MythTV.
+  filters/linearblend/filter_linearblend.c and rebuild MythTV.  By default,
+  this feature makes use of CPU instructions which are only available on
+  relatively recent processors.
 
 ) All of my channels seem to be off by one, and the picture quality is poor
 - The bttv driver is not autodetecting your tuner type correctly, or
