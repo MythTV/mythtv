@@ -885,7 +885,7 @@
       <textarea name="keyinstr" align="center" draworder="0">
         <area>0,530,800,30</area>
         <font>help</font>
-        <value>(1) Sort by Title    (2) Sort by Priority</value>
+        <value>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</value>
       </textarea>
     </container>
 
@@ -896,6 +896,7 @@
         <fcnfont name="list-active" function="active"></fcnfont>
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
         <fcnfont name="list-selected" function="selected"></fcnfont>
+        <fcnfont name="list-record" function="recording"></fcnfont>
         <columnpadding>1</columnpadding>
         <column number="1" width="35" context="-1"></column>
         <column number="2" width="570" context="-1"></column>
@@ -917,11 +918,11 @@
     <container name="program_info">
       <area>30,350,770,240</area>
       <textarea name="title" draworder="6">
-        <area>0,0,750,50</area>
+        <area>0,0,740,50</area>
         <font>title</font>
       </textarea>
       <textarea name="subtitle" draworder="6">
-        <area>0,40,579,30</area>
+        <area>0,40,740,30</area>
         <font>subtitle</font>
       </textarea>
       <textarea name="infotype" draworder="6">

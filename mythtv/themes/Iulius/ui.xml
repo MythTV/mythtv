@@ -149,7 +149,7 @@
         <catcolor category="Movie" color="Blue"></catcolor>
         <catcolor category="Live" color="DarkOrange3"></catcolor>
 
-        <!-- categories used by the NextView EPG service -->
+        <!-- Categories used by the NextView EPG service -->
         <!-- (available in some european countries) -->
         <catcolor category="news" color="DarkOrange3"></catcolor>
         <catcolor category="music/ballet/dance" color="DarkRed"></catcolor>
@@ -189,37 +189,6 @@
         <catcolor category="Transport" color="#33ff99"></catcolor>
         <catcolor category="Travel" color="#aa00aa"></catcolor>
 
- <!-- Categories introduced by belgian and dutch grabbers teveblad.be -->
-        <catcolor category="nieuws" color="DarkOrange3"></catcolor>
-        <catcolor category="actua" color="sienna"></catcolor>
-        <catcolor category="documentaire" color="goldenrod"></catcolor>
-        <catcolor category="wielrennen" color="DarkCyan"></catcolor>
-        <catcolor category="sport" color="DarkCyan"></catcolor>
-        <catcolor category="voetbal" color="DarkCyan"></catcolor>
-        <catcolor category="soap" color="SlateGrey"></catcolor>
-        <catcolor category="muziek" color="DarkRed"></catcolor>
-        <catcolor category="film" color="Blue"></catcolor>
-        <catcolor category="talkshow" color="MediumTurquoise"></catcolor>
-        <catcolor category="serie" color="DarkOrchid"></catcolor>
-        <catcolor category="spelprogramma" color="orchid"></catcolor>
-        <catcolor category="quiz" color="orchid"></catcolor>
-        <catcolor category="kinderprogramma" color="MediumSlateBlue"></catcolor>
-        <catcolor category="tekenfilm" color="MediumSlateBlue"></catcolor>
-        <catcolor category="tekenfilm kind" color="MediumSlateBlue"></catcolor>
-
-
-        <!-- Categories introduced by tv_grab_jp -->
-        <catcolor category="ドラマ" color="rosybrown3"></catcolor>
-        <catcolor category="映画" color="Blue"></catcolor>
-        <catcolor category="スポーツ" color="DarkCyan"></catcolor>
-        <catcolor category="演劇・伝統芸" color="turquoise3"></catcolor>
-        <catcolor category="音楽" color="DarkRed"></catcolor>
-        <catcolor category="バラエティー" color="DarkOrchid"></catcolor>
-        <catcolor category="教養" color="CornflowerBlue"></catcolor>
-        <catcolor category="アニメ・キッズ" color="MediumSlateBlue"></catcolor>
-        <catcolor category="社会・報道" color="DarkOrange3"></catcolor>
-        <catcolor category="趣味・暮らし" color="goldenrod"></catcolor>
-
         <!-- Categories introduced by belgian and dutch grabbers teveblad.be -->
         <catcolor category="nieuws" color="DarkOrange3"></catcolor>
         <catcolor category="actua" color="sienna"></catcolor>
@@ -237,6 +206,18 @@
         <catcolor category="kinderprogramma" color="MediumSlateBlue"></catcolor>
         <catcolor category="tekenfilm" color="MediumSlateBlue"></catcolor>
         <catcolor category="tekenfilm kind" color="MediumSlateBlue"></catcolor>
+
+        <!-- Categories introduced by tv_grab_jp -->
+        <catcolor category="ドラマ" color="rosybrown3"></catcolor>
+        <catcolor category="映画" color="Blue"></catcolor>
+        <catcolor category="スポーツ" color="DarkCyan"></catcolor>
+        <catcolor category="演劇・伝統芸" color="turquoise3"></catcolor>
+        <catcolor category="音楽" color="DarkRed"></catcolor>
+        <catcolor category="バラエティー" color="DarkOrchid"></catcolor>
+        <catcolor category="教養" color="CornflowerBlue"></catcolor>
+        <catcolor category="アニメ・キッズ" color="MediumSlateBlue"></catcolor>
+        <catcolor category="社会・報道" color="DarkOrange3"></catcolor>
+        <catcolor category="趣味・暮らし" color="goldenrod"></catcolor>
 
 
         <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
@@ -932,6 +913,13 @@
       <bold>yes</bold>
     </font>
 
+    <font name="record_font" face="Arial">
+      <color>#33FF33</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
     <font name="currenttitle" face="Arial">
       <color>#ffff33</color>
       <size>18</size>
@@ -1021,6 +1009,7 @@
         <area>20,12,760,330</area>
         <fcnfont name="active_font" function="active"></fcnfont>
         <fcnfont name="inactive_font" function="inactive"></fcnfont>
+        <fcnfont name="record_font" function="recording"></fcnfont>
         <fcnfont name="active_font" function="selected"></fcnfont>
         <columnpadding>1</columnpadding>
         <column number="1" width="35" context="-1"></column>
@@ -1041,13 +1030,13 @@
     </container>
 
     <container name="program_info">
-      <area>20,410,800,240</area>
+      <area>20,410,760,240</area>
       <textarea name="title" draworder="6">
-        <area>0,0,800,50</area>
+        <area>0,0,740,50</area>
         <font>title</font>
       </textarea>
       <textarea name="subtitle" draworder="6">
-        <area>0,40,579,30</area>
+        <area>0,40,740,30</area>
         <font>info</font>
       </textarea>
       <textarea name="infotype" draworder="6">

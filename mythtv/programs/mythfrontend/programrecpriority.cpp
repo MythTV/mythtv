@@ -763,20 +763,21 @@ void ProgramRecPriority::FillList(void)
     else
         MythContext::DBError("Get program recording priorities query", query);
 
-    query = QString("SELECT recordid, count(*) FROM recordmatch "
-                    "group by recordid;");
+    recMatch.clear();
+    ProgramList schedList;
+    schedList.FromScheduler();
+    QDateTime now = QDateTime::currentDateTime();
 
-    QSqlQuery qcnt = db->exec(query);
-
-    if (qcnt.isActive() && qcnt.numRowsAffected() > 0)
+    ProgramInfo *s;
+    for (s = schedList.first(); s; s = schedList.next())
     {
-        while (qcnt.next()) 
+        if (s->recendts > now)
         {
-            recMatch[qcnt.value(0).toInt()] = qcnt.value(1).toInt();
+            listMatch[s->recordid]++;
+            if (s->recstatus == rsWillRecord || s->recstatus == rsRecording)
+                recMatch[s->recordid]++;
         }
     }
-    else
-        MythContext::DBError("Get recordmatch count query", query);
 }
 
 typedef struct RecPriorityInfo 
@@ -1027,9 +1028,12 @@ void ProgramRecPriority::updateList(QPainter *p)
                                 QString::number(abs(finalRecPriority)));
 
                         if (progInfo->recType == kDontRecord ||
-                            progInfo->recstatus == rsInactive ||
-                            recMatch[progInfo->recordid] < 1)
+                            progInfo->recstatus == rsInactive)
                             ltype->EnableForcedFont(cnt, "inactive");
+                        else if (recMatch[progInfo->recordid] > 0)
+                            ltype->EnableForcedFont(cnt, "recording");
+                        // else if (listMatch[progInfo->recordid] < 1)
+                        //    ltype->EnableForcedFont(cnt, "dormant");
 
                         cnt++;
                         listCount++;
@@ -1097,13 +1101,12 @@ void ProgramRecPriority::updateInfo(QPainter *p)
         }
 
         QString matchInfo;
-        int listings = recMatch[curitem->recordid];
         if (curitem->recstatus == rsInactive)
             matchInfo = curitem->RecStatusText();
-        else if (listings == 1)
-            matchInfo = QString("%1 %2").arg(listings).arg(tr("listing"));
         else
-            matchInfo = QString("%1 %2").arg(listings).arg(tr("listings"));
+            matchInfo = QString(tr("Recording %1 of %2"))
+                                   .arg(recMatch[curitem->recordid])
+                                   .arg(listMatch[curitem->recordid]);
 
         subtitle = QString("(%1) %2").arg(matchInfo).arg(subtitle);
 

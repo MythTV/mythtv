@@ -913,6 +913,13 @@
       <bold>yes</bold>
     </font>
 
+    <font name="record_font" face="Arial">
+      <color>#F7862B</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
     <font name="currenttitle" face="Arial">
       <color>#ffff33</color>
       <size>18</size>
@@ -1002,6 +1009,7 @@
         <area>20,12,760,330</area>
         <fcnfont name="active_font" function="active"></fcnfont>
         <fcnfont name="inactive_font" function="inactive"></fcnfont>
+        <fcnfont name="record_font" function="recording"></fcnfont>
         <fcnfont name="active_font" function="selected"></fcnfont>
         <columnpadding>1</columnpadding>
         <column number="1" width="35" context="-1"></column>
@@ -1022,13 +1030,13 @@
     </container>
 
     <container name="program_info">
-      <area>20,410,800,240</area>
+      <area>20,410,760,240</area>
       <textarea name="title" draworder="6">
-        <area>0,0,800,50</area>
+        <area>0,0,740,50</area>
         <font>title</font>
       </textarea>
       <textarea name="subtitle" draworder="6">
-        <area>0,40,579,30</area>
+        <area>0,40,740,30</area>
         <font>info</font>
       </textarea>
       <textarea name="infotype" draworder="6">
