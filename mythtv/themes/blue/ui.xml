@@ -680,7 +680,7 @@
         <column number="2" width="17" context="-1"></column>
         <column number="3" width="50" context="-1"></column>
         <items>11</items>
-        <image function="selectionbar" filename="cr-selectbar.png" location="-15,-10"></image>
+        <image function="selectionbar" filename="cr-selectbar.png" location="-15,-5"></image>
         <image function="uparrow" filename="uparrow.png" location="745,10"></image>
         <image function="downarrow" filename="downarrow.png" location="745,250"></image>
       </listarea>
@@ -810,7 +810,7 @@
         <column number="5" width="17" context="-1"></column>
         <column number="6" width="50" context="-1"></column>
         <items>9</items>
-        <image function="selectionbar" filename="cr-selectbar.png" location="-15,-10"></image>
+        <image function="selectionbar" filename="cr-selectbar.png" location="-15,-5"></image>
         <image function="uparrow" filename="uparrow.png" location="745,10"></image>
         <image function="downarrow" filename="downarrow.png" location="745,250"></image>
       </listarea>
@@ -999,7 +999,7 @@
         <column number="3" width="134" context="0"></column>
         <column number="4" width="110" context="1"></column>
         <items>7</items>
-        <image function="selectionbar" filename="bar.png" location="-20,-5"></image>
+        <image function="selectionbar" filename="bar.png" location="-20,-8"></image>
         <image function="uparrow" filename="uparrow.png" location="743,12"></image>
         <image function="downarrow" filename="downarrow.png" location="743,251"></image>
       </listarea>
@@ -1199,7 +1199,7 @@
         <fcnfont name="list-selected" function="selected"></fcnfont>
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
         <items>9</items>
-        <image function="selectionbar" filename="progfind_sel1.png" location="-14,0"></image>
+        <image function="selectionbar" filename="progfind_sel1.png" location="-14,-5"></image>
       </listarea>
       <listarea name="shows" draworder="2">
         <area>88,8,380,295</area>
@@ -1208,7 +1208,7 @@
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
         <column number="1" width="380" context="-1"></column>
         <items>9</items>
-        <image function="selectionbar" filename="progfind_sel2.png" location="-14,0"></image>
+        <image function="selectionbar" filename="progfind_sel2.png" location="-14,-5"></image>
       </listarea>
       <listarea name="times" draworder="2">
         <area>470,8,280,295</area>
@@ -1217,11 +1217,11 @@
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
         <fcnfont name="list-record" function="recording"></fcnfont>
         <items>9</items>
-        <image function="selectionbar" filename="progfind_sel3.png" location="-6,0"></image>
+        <image function="selectionbar" filename="progfind_sel3.png" location="-6,-5"></image>
       </listarea>
       <image name="lines" draworder="5" fleximage="no">
         <filename>progfind_lines.png</filename>
-        <position>0,10</position>
+        <position>0,2</position>
       </image>
     </container>
 
@@ -1347,7 +1347,7 @@
         <column number="2" width="120" context="-1"></column>
         <column number="3" width="440" context="-1"></column>
         <items>8</items>
-        <image function="selectionbar" filename="cr-selectbar.png" location="-15,0"></image>
+        <image function="selectionbar" filename="cr-selectbar.png" location="-15,-5"></image>
         <image function="uparrow" filename="uparrow.png" location="745,13"></image>
         <image function="downarrow" filename="downarrow.png" location="745,255"></image>
       </listarea>
@@ -1430,11 +1430,11 @@
         <columnpadding>1</columnpadding>
         <column number="1" width="745" context="-1"></column>
         <items>8</items>
-        <image function="selectionbar" filename="cr-selectbar.png" location="-10,0"></image>
+        <image function="selectionbar" filename="cr-selectbar.png" location="-10,-5"></image>
         <image function="uparrow" filename="uparrow.png" location="755,15"></image>
         <image function="downarrow" filename="downarrow.png" location="755,235"></image>
-        <image function="rightarrow" filename="rightarrow.png" location="0,3"></image>
-        <image function="leftarrow" filename="leftarrow.png" location="-10,3"></image>
+        <image function="rightarrow" filename="rightarrow.png" location="0,0"></image>
+        <image function="leftarrow" filename="leftarrow.png" location="-10,0"></image>
 
       </listarea>
       <image name="showinglines" draworder="3" fleximage="no">
