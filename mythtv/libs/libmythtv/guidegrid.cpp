@@ -384,7 +384,7 @@ void GuideGrid::setupColorScheme()
 void GuideGrid::createProgramBar(QBoxLayout *holdingTank)
 {
     QLabel *leftFiller = NULL;
-    currentButton = new QLabel("   (4) Current Programs   ", this);
+    currentButton = new QLabel("   (4) Favorite Programs   ", this);
     QLabel *futureButton = new QLabel("   (6) Program Finder   ", this);
     QLabel *rightFiller = new QLabel("   ", this);
 
