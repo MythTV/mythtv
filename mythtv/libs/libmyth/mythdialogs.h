@@ -162,8 +162,12 @@ class MythPopupBox : public MythDialog
     static bool showOkCancelPopup(MythMainWindow *parent, QString title,
                                   QString message, bool focusOk);
 
+  signals:
+    void popupDone();
+
   protected:
     bool focusNextPrevChild(bool next);
+    void keyPressEvent(QKeyEvent *e);
 
   protected slots:
     void defaultButtonPressedHandler(void);

@@ -238,6 +238,7 @@ void MythMainWindow::ExitToMainMenu(void)
 bool MythMainWindow::TranslateKeyPress(const QString &context,
                                        QKeyEvent *e, QStringList &actions)
 {
+    actions = QStringList();
     int keynum = e->key();
 
     if (d->jumpMap.count(keynum) > 0 && d->exitmenucallback == NULL)
@@ -755,13 +756,28 @@ void MythPopupBox::ShowPopup(QObject *target, const char *slot)
     setGeometry(x, y, maxw, poph);
 
     if (target && slot)
-    {
-        QAccel *popaccel = new QAccel(this);
-        popaccel->connectItem(popaccel->insertItem(m_parent->Key_Escape),
-                              target, slot);
-    }
+        connect(this, SIGNAL(popupDone()), target, slot);
 
     Show();
+}
+
+void MythPopupBox::keyPressEvent(QKeyEvent *e)
+{
+    bool handled = false;
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions);
+    for (unsigned int i = 0; i < actions.size(); i++)
+    {
+        QString action = actions[i];
+        if (action == "ESCAPE")
+        {
+            emit popupDone();
+            handled = true;
+        }
+    }
+
+    if (!handled)
+        MythDialog::keyPressEvent(e);
 }
 
 int MythPopupBox::ExecPopup(QObject *target, const char *slot)
