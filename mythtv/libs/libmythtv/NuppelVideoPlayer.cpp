@@ -513,7 +513,7 @@ FrameScanType NuppelVideoPlayer::detectInterlace(FrameScanType newScan,
 
 void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
                                        int keyframedistance, float aspect,
-                                       FrameScanType scan)
+                                       FrameScanType scan, bool reinit)
 {
     if (width > 0)
         video_width = width;
@@ -531,6 +531,9 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
 
     if (aspect > 0.0f)
         video_aspect = aspect;
+
+    if (reinit)
+        ReinitVideo();
 
     m_scan = detectInterlace(scan, m_scan, video_frame_rate, video_height);
     VERBOSE(VB_PLAYBACK, QString("Interlaced: %1  video_height: %2  fps: %3")

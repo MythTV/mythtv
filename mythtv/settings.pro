@@ -146,5 +146,5 @@ macx {
     DEFINES    -= USING_IVTV
     CONFIG     -= using_oss
     DEFINES    -= USING_OSS
-    CONFIG     -= using_stick_menu
+    CONFIG     -= using_joystick_menu
 }

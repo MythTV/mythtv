@@ -556,7 +556,7 @@ bool AvFormatDecoder::CheckVideoParams(int width, int height)
     if (width == current_width && height == current_height)
         return false;
 
-    VERBOSE(VB_PLAYBACK, QString("AvFormatDecoder: Video has changed from %1x%2 to %3x%4.")
+    VERBOSE(VB_ALL, QString("AvFormatDecoder: Video has changed from %1x%2 to %3x%4.")
                                 .arg(current_width).arg(current_height).arg(width).arg(height));
 
     for (int i = 0; i < ic->nb_streams; i++)
@@ -906,8 +906,8 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                     {
                         m_parent->SetVideoParams(ALIGN(width, 16),
                                                  ALIGN(height, 16), fps,
-                                                 keyframedist, aspect, kScan_Detect);
-                        m_parent->ReinitVideo();
+                                                 keyframedist, aspect, 
+                                                 kScan_Detect, true);
                         current_width = width;
                         current_height = height;
                         current_aspect = aspect;

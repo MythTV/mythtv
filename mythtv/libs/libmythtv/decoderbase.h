@@ -59,7 +59,8 @@ class DecoderBase
 
     virtual void SetPositionMap(void);
     virtual void SeekReset(long long newKey = 0, int skipFrames = 0,
-                           bool needFlush = false) { }
+                           bool needFlush = false) 
+                          { (void)newKey; (void)skipFrames; (void)needFlush; }
 
     const int getCurrentAudioTrack() const { return currentAudioTrack;}
     virtual void incCurrentAudioTrack(){}

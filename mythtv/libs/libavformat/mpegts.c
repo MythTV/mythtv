@@ -986,7 +986,7 @@ static void handle_packet(MpegTSContext *ts, const uint8_t *packet, int64_t posi
 {
     if (!ts->pids[0]) {
         /* make sure we're always scanning for new PAT's */
-        ts->req_sid = 0x1;
+//        ts->req_sid = 0x1;
         ts->pat_filter = mpegts_open_section_filter(ts, PAT_PID, pat_cb, ts, 1);
     }
     AVFormatContext *s = ts->stream;
@@ -1205,11 +1205,15 @@ static int mpegts_read_header(AVFormatContext *s,
     /* read the first 1024 bytes to get packet size */
     pos = url_ftell(pb);
     len = get_buffer(pb, buf, sizeof(buf));
-    if (len != sizeof(buf))
+    if (len != sizeof(buf)) {
+        av_log(NULL, AV_LOG_ERROR, "mpegts_read_header: unable to read first 1024 bytes\n");
         goto fail;
+    }
     ts->raw_packet_size = get_packet_size(buf, sizeof(buf));
-    if (ts->raw_packet_size <= 0)
+    if (ts->raw_packet_size <= 0) {
+        av_log(NULL, AV_LOG_ERROR, "mpegts_read_header: packet size incorrect\n");
         goto fail;
+    }
     ts->stream = s;
     ts->auto_guess = 0;
 
@@ -1249,7 +1253,7 @@ static int mpegts_read_header(AVFormatContext *s,
            
             /* tune to first service found */
             for(i=0; i<ts->nb_services && ts->set_service_ret; i++){
-                service = ts->services[0];
+                service = ts->services[i];
                 sid = service->sid;
 #ifdef DEBUG_SI
                 printf("tuning to '%s'\n", service->name);
@@ -1266,7 +1270,10 @@ static int mpegts_read_header(AVFormatContext *s,
            
             /* if could not find service, exit */
             if (ts->set_service_ret != 0)
-                return -1;
+            {
+                av_log(NULL, AV_LOG_ERROR, "mpegts_read_header: could not find service\n");
+                goto fail;
+            } 
             
 #ifdef DEBUG_SI
             printf("tuning done\n");
@@ -1283,8 +1290,10 @@ static int mpegts_read_header(AVFormatContext *s,
         /* only read packets */
     do_pcr: 
         st = av_new_stream(s, 0);
-        if (!st)
+        if (!st) {
+            av_log(NULL, AV_LOG_ERROR, "mpegts_read_header: av_new_stream() failed\n");
             goto fail;
+        }
         av_set_pts_info(st, 60, 1, 27000000);
         st->codec.codec_type = CODEC_TYPE_DATA;
         st->codec.codec_id = CODEC_ID_MPEG2TS;
@@ -1295,8 +1304,10 @@ static int mpegts_read_header(AVFormatContext *s,
         nb_packets = 0;
         for(;;) {
             ret = read_packet(&s->pb, packet, ts->raw_packet_size, &position);
-            if (ret < 0)
-                return -1;
+            if (ret < 0) {
+                av_log(NULL, AV_LOG_ERROR, "mpegts_read_header: read_packet() failed\n");
+                goto fail;
+            }
             pid = ((packet[1] & 0x1f) << 8) | packet[2];
             if ((pcr_pid == -1 || pcr_pid == pid) &&
                 parse_pcr(&pcr_h, &pcr_l, packet) == 0) {

@@ -1106,7 +1106,7 @@ void NuppelDecoder::GetFrame(int avignore)
     framesRead = framesPlayed;
 }
 
-void NuppelDecoder::SeekReset(long long newKey, int skipFrames,
+void NuppelDecoder::SeekReset(long long, int skipFrames,
                               bool needFlush)
 {
     if (mpa_codec && needFlush)

@@ -10,6 +10,7 @@ using namespace std;
 #include "osdtypes.h"
 #include "ttfont.h"
 #include "osdsurface.h"
+#include "osdlistbtntype.h"
 
 #include "mythcontext.h"
 
@@ -200,6 +201,11 @@ void OSDSet::Reinit(int screenwidth, int screenheight, int xoff, int yoff,
         else if (OSDTypeCC *item = dynamic_cast<OSDTypeCC*>(type))
         {
             item->Reinit(xoff, yoff, displaywidth, displayheight);
+        }
+        else if (OSDListTreeType *item = dynamic_cast<OSDListTreeType*>(type))
+        {
+            (void)item;
+            cerr << "FIXME: Implement OSDListTreeType reinit\n";
         }
         else
         {

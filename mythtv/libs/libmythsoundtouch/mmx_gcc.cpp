@@ -62,6 +62,10 @@ using namespace soundtouch;
 //
 // implementation of MMX optimized functions of class 'TDStretch'
 //
+// NOTE: ebx in gcc 3.x is not preserved if -fPIC and -DPIC
+//  gcc-3.4 correctly flags this error and wont let you continue.
+//  gcc-2.95 preserves esi correctly
+//
 //////////////////////////////////////////////////////////////////////////////
 
 #include "TDStretch.h"
@@ -77,7 +81,6 @@ long TDStretchMMX::calcCrossCorrStereo(const short *pV1, const short *pV2) const
     int corr;
     uint local_overlapLength = overlapLength;
     uint local_overlapDividerBits = overlapDividerBits;
-    unsigned long shadow_ebx;
 
     asm volatile(
         // Calculate cross-correlation between the tempOffset and tmpbid_buffer.
@@ -86,7 +89,7 @@ long TDStretchMMX::calcCrossCorrStereo(const short *pV1, const short *pV2) const
         // round to improve CPU-level parallellization.
 
         // load address of sloped pV2 buffer to eax
-        // load address of mixing point of the sample data buffer to ebx
+        // load address of mixing point of the sample data buffer to edi
         // load counter to ecx = overlapLength / 8 - 1
         // empty the mm0
 
@@ -94,13 +97,11 @@ long TDStretchMMX::calcCrossCorrStereo(const short *pV1, const short *pV2) const
         // load mm1 = eax[0]
         // load mm2 = eax[1];
 
-        "\n\tmovl        %%ebx, %1"	// this ptr is destroyed and compiler is too stupid
-
-        "\n\tmovl        %2, %%eax"
-        "\n\tmovl        %3, %%ebx"
+        "\n\tmovl        %1, %%eax"
+        "\n\tmovl        %2, %%edi"
 
         "\n\tmovq        (%%eax), %%mm1"
-        "\n\tmovl        %4, %%ecx"
+        "\n\tmovl        %3, %%ecx"
 
         "\n\tmovq        8(%%eax), %%mm2"
         "\n\tshr         $3, %%ecx"
@@ -108,43 +109,43 @@ long TDStretchMMX::calcCrossCorrStereo(const short *pV1, const short *pV2) const
         "\n\tpxor        %%mm0, %%mm0"
         "\n\tsub         $1, %%ecx"
 
-        "\n\tmovd        %5, %%mm5"
+        "\n\tmovd        %4, %%mm5"
 
         "\n1:"
-        // multiply-add mm1 = mm1 * ebx[0]
-        // multiply-add mm2 = mm2 * ebx[1]
+        // multiply-add mm1 = mm1 * edi[0]
+        // multiply-add mm2 = mm2 * edi[1]
         //
         // add mm2 += mm1
         // mm2 >>= mm5 (=overlapDividerBits)
         // add mm0 += mm2
         //
         // load mm3 = eax[2]
-        // multiply-add mm3 = mm3 * ebx[2]
+        // multiply-add mm3 = mm3 * edi[2]
         //
         // load mm4 = eax[3]
-        // multiply-add mm4 = mm4 * ebx[3]
+        // multiply-add mm4 = mm4 * edi[3]
         //
         // add mm3 += mm4
         // mm3 >>= mm5 (=overlapDividerBits)
         // add mm0 += mm3
         //
         // add eax += 4
-        // add ebx += 4
+        // add edi += 4
         // load mm1 = eax[0] (~eax[4])
         // load mm2 = eax[1] (~eax[5])
         //
         // loop
 
-        "\n\tpmaddwd     (%%ebx), %%mm1"   // qword ptr [ebx]
+        "\n\tpmaddwd     (%%edi), %%mm1"   // qword ptr [edi]
         "\n\tmovq        16(%%eax), %%mm3" // qword ptr [eax+16]
 
-        "\n\tpmaddwd     8(%%ebx), %%mm2"  // qword ptr [ebx+8]
+        "\n\tpmaddwd     8(%%edi), %%mm2"  // qword ptr [edi+8]
         "\n\tmovq        24(%%eax), %%mm4" // qword ptr [eax+24]
 
-        "\n\tpmaddwd     16(%%ebx), %%mm3" // qword ptr [ebx+16]
+        "\n\tpmaddwd     16(%%edi), %%mm3" // qword ptr [edi+16]
         "\n\tpaddd       %%mm1, %%mm2"
 
-        "\n\tpmaddwd     24(%%ebx), %%mm4" // qword ptr [ebx+24]
+        "\n\tpmaddwd     24(%%edi), %%mm4" // qword ptr [edi+24]
         "\n\tmovq        32(%%eax), %%mm1" // qword ptr [eax+32]
 
         "\n\tpsrad       %%mm5, %%mm2"
@@ -156,7 +157,7 @@ long TDStretchMMX::calcCrossCorrStereo(const short *pV1, const short *pV2) const
         "\n\tmovq        8(%%eax), %%mm2"  // qword ptr [eax+8]
         "\n\tpsrad       %%mm5, %%mm3"
 
-        "\n\tadd         $32, %%ebx"
+        "\n\tadd         $32, %%edi"
         "\n\tpaddd       %%mm3, %%mm0"
 
         "\n\tdec         %%ecx"
@@ -165,15 +166,15 @@ long TDStretchMMX::calcCrossCorrStereo(const short *pV1, const short *pV2) const
         // Finalize the last partial loop:
 
         "\n\tmovq        16(%%eax), %%mm3" // qword ptr [eax+16]
-        "\n\tpmaddwd     (%%ebx), %%mm1"   // qword ptr [ebx]
+        "\n\tpmaddwd     (%%edi), %%mm1"   // qword ptr [edi]
 
         "\n\tmovq        24(%%eax), %%mm4" // qword ptr [eax+24]
-        "\n\tpmaddwd     8(%%ebx), %%mm2"  // qword ptr [ebx+8]
+        "\n\tpmaddwd     8(%%edi), %%mm2"  // qword ptr [edi+8]
 
-        "\n\tpmaddwd     16(%%ebx), %%mm3" // qword ptr [ebx+16]
+        "\n\tpmaddwd     16(%%edi), %%mm3" // qword ptr [edi+16]
         "\n\tpaddd       %%mm1, %%mm2"
 
-        "\n\tpmaddwd     24(%%ebx), %%mm4" // qword ptr [ebx+24]
+        "\n\tpmaddwd     24(%%edi), %%mm4" // qword ptr [edi+24]
         "\n\tpsrad       %%mm5, %%mm2"
 
         "\n\tpaddd       %%mm4, %%mm3"
@@ -189,12 +190,10 @@ long TDStretchMMX::calcCrossCorrStereo(const short *pV1, const short *pV2) const
         "\n\tpsrlq       $32, %%mm1"
         "\n\tpaddd       %%mm1, %%mm0"
         "\n\tmovd        %%mm0, %0"
-	"\n\tmovl	 %1, %%ebx"	// restore this ptr
-      : "=rm" (corr),
-        "+rim" (shadow_ebx)/* output */
+      : "=rm" (corr)
       : "rim" (pV1), "rim" (pV2), "rim" (local_overlapLength),
         "rim" (local_overlapDividerBits)
-      : "%ecx", "%ebx", "%eax"
+      : "%ecx", "%eax", "%edi"
     );
     return corr;
     
@@ -219,7 +218,6 @@ void TDStretchMMX::overlapStereo(short *output, const short *input) const
     short *local_midBuffer = pMidBuffer;
     uint local_overlapLength = overlapLength;
     uint local_overlapDividerBits = overlapDividerBits;
-    unsigned long shadow_ebx;
 
     asm volatile(
         "\n\t"
@@ -228,19 +226,16 @@ void TDStretchMMX::overlapStereo(short *output, const short *input) const
         // load divider-shifter value to esi
         // load mixing value adder to mm5
         // load address of midBuffer to eax
-        // load address of inputBuffer added with ovlOffset to ebx
+        // load address of inputBuffer added with ovlOffset to edi
         // load address of end of the outputBuffer to edx
         //
         // We need to preserve esi, since gcc uses it for the
         // stack frame.
 
-        "movl        %%ebx, %0\n\t"
-
-        "movl        %1, %%eax\n\t"               // ecx = 0x0000 OVL_
+        "movl        %0, %%eax\n\t"               // ecx = 0x0000 OVL_
         "movl        $0x0002fffe, %%edi\n\t"      // ecx = 0x0002 fffe
 
-        //"movl        %2, %%edx\n\t"
-        "movl        %2, %%esi\n\t"
+        "movl        %1, %%esi\n\t"
         "movd        %%eax, %%mm6\n\t"            // mm6 = 0x0000 0000 0000 OVL_
 
         "movl        %%eax, %%ecx\n\t"
@@ -249,34 +244,33 @@ void TDStretchMMX::overlapStereo(short *output, const short *input) const
         "punpckldq   %%mm6, %%mm6\n\t"            // mm6 = 0x0000 OVL_ 0000 OVL_
 
         "or          $0x00010000, %%eax\n\t"      // eax = 0x0001 overlapLength-1
-        "movl        %4, %%ebx\n\t"
 
         "movd        %%edi, %%mm5\n\t"            // mm5 = 0x0000 0000 0002 fffe
         "movd        %%eax, %%mm7\n\t"            // mm7 = 0x0000 0000 0001 01ff
 
-        "movl        %5, %%eax\n\t"               // dword ptr local_midBuffer
+        "movl        %3, %%edi\n\t"
+
+        "movl        %4, %%eax\n\t"               // dword ptr local_midBuffer
         "punpckldq   %%mm5, %%mm5\n\t"            // mm5 = 0x0002 fffe 0002 fffe
 
         "shr         $2, %%ecx\n\t"               // ecx = overlapLength / 2
         "punpckldq   %%mm7, %%mm7\n\t"            // mm7 = 0x0001 01ff 0001 01ff
 
-        //"push        %%edx\n\t"
-        //"pop         %%esi\n\t"
-        "movl        %3, %%edx\n"
+        "movl        %2, %%edx\n"
 
         "2:\n\t"
         // Process two parallel batches of 2+2 stereo samples during each round 
         // to improve CPU-level parallellization.
         //
         // Load [eax] into mm0 and mm1
-        // Load [ebx] into mm3
+        // Load [edi] into mm3
         // unpack words of mm0, mm1 and mm3 into mm0 and mm1
         // multiply-add mm0*mm6 and mm1*mm7, store results into mm0 and mm1
         // divide mm0 and mm1 by 512 (=right-shift by overlapDividerBits)
         // pack the result into mm0 and store into [edx]
         //
         // Load [eax+8] into mm2 and mm3
-        // Load [ebx+8] into mm4
+        // Load [edi+8] into mm4
         // unpack words of mm2, mm3 and mm4 into mm2 and mm3
         // multiply-add mm2*mm6 and mm3*mm7, store results into mm2 and mm3
         // divide mm2 and mm3 by 512 (=right-shift by overlapDividerBits)
@@ -286,13 +280,13 @@ void TDStretchMMX::overlapStereo(short *output, const short *input) const
         "movq        (%%eax), %%mm0\n\t"             // mm0 = m1l m1r m0l m0r
         "add         $16, %%edx\n\t"
 
-        "movq        (%%ebx), %%mm3\n\t"             // mm3 = i1l i1r i0l i0r
+        "movq        (%%edi), %%mm3\n\t"             // mm3 = i1l i1r i0l i0r
         "movq        %%mm0, %%mm1\n\t"               // mm1 = m1l m1r m0l m0r
 
         "movq        8(%%eax), %%mm2\n\t"            // mm2 = m3l m3r m2l m2r
         "punpcklwd   %%mm3, %%mm0\n\t"               // mm0 = i0l m0l i0r m0r
 
-        "movq        8(%%ebx), %%mm4\n\t"            // mm4 = i3l i3r i2l i2r
+        "movq        8(%%edi), %%mm4\n\t"            // mm4 = i3l i3r i2l i2r
         "punpckhwd   %%mm3, %%mm1\n\t"               // mm1 = i1l m1l i1r m1r
 
         "movq        %%mm2, %%mm3\n\t"               // mm3 = m3l m3r m2l m2r
@@ -325,7 +319,7 @@ void TDStretchMMX::overlapStereo(short *output, const short *input) const
         "paddw       %%mm5, %%mm7\n\t"
 
         "movq        %%mm0, -16(%%edx)\n\t"
-        "add         $16, %%ebx\n\t"
+        "add         $16, %%edi\n\t"
 
         "movq        %%mm2, -8(%%edx)\n\t"
         "dec         %%ecx\n\t"
@@ -334,16 +328,14 @@ void TDStretchMMX::overlapStereo(short *output, const short *input) const
 
         "emms\n\t"
 
-        "movl        %0, %%ebx\n\t"
-
-      : "+rim" (shadow_ebx)/* output */
+      :
       : "rim" (local_overlapLength),
         "rim" (local_overlapDividerBits),
         "rim" (output),
         "rim" (input),
         "rim" (local_midBuffer)
       /* input */
-      : "%edi", "%ecx", "%edx", "%eax", "%ebx", "%esi" /* regs */
+      : "%edi", "%ecx", "%edx", "%eax", "%esi" /* regs */
     );
 #else
     throw runtime_error("MMX not supported");
@@ -414,7 +406,6 @@ uint FIRFilterMMX::evaluateFilterStereo(short *dest, const short *src, const uin
     uint local_resultDivider = resultDivFactor;
     short *local_filterCoeffs = (short*)filterCoeffsAlign;
     short *local_src = (short *)src;
-    unsigned long shadow_ebx;
 
     asm volatile(
         "\n\t"
@@ -422,10 +413,9 @@ uint FIRFilterMMX::evaluateFilterStereo(short *dest, const short *src, const uin
         // Load a pointer to samples to esi
         // Load a pointer to destination to edx
 
-        "movl        %%ebx, %0\n\t"	// this ptr is destroyed and compiler is too stupid
-        "movl        %1, %%edi\n\t"
-        "subl        %3, %%edi\n\t"
-        "movl        %4, %%edx\n\t"
+        "movl        %0, %%edi\n\t"
+        "subl        %2, %%edi\n\t"
+        "movl        %3, %%edx\n\t"
         "sar         $1, %%edi\n"
 
         // Load filter length/8 to ecx
@@ -434,20 +424,20 @@ uint FIRFilterMMX::evaluateFilterStereo(short *dest, const short *src, const uin
         // Load [ebx] to mm3
         // Load pointer to filter coefficients to eax
         "3:\n\t"
-        "movl        %2, %%ebx\n\t"
+        "movl        %1, %%esi\n\t"
         "pxor        %%mm0, %%mm0\n\t"
 
-        "movl        %5, %%ecx\n\t"
+        "movl        %4, %%ecx\n\t"
         "pxor        %%mm7, %%mm7\n\t"
 
-        "movq        (%%ebx), %%mm1\n\t"            // mm1 = l1 r1 l0 r0
-        "movl        %6, %%eax\n"
+        "movq        (%%esi), %%mm1\n\t"            // mm1 = l1 r1 l0 r0
+        "movl        %5, %%eax\n"
         "4:\n\t"
 
-        "movq        8(%%ebx), %%mm2\n\t"           // mm2 = l3 r3 l2 r2
+        "movq        8(%%esi), %%mm2\n\t"           // mm2 = l3 r3 l2 r2
         "movq        %%mm1, %%mm4\n\t"              // mm4 = l1 r1 l0 r0
 
-        "movq        16(%%ebx), %%mm3\n\t"          // mm3 = l5 r5 l4 r4
+        "movq        16(%%esi), %%mm3\n\t"          // mm3 = l5 r5 l4 r4
         "punpckhwd   %%mm2, %%mm1\n\t"              // mm1 = l3 l1 r3 r1
 
         "movq        %%mm2, %%mm6\n\t"              // mm6 = l3 r3 l2 r2
@@ -469,10 +459,10 @@ uint FIRFilterMMX::evaluateFilterStereo(short *dest, const short *src, const uin
         "paddd       %%mm5, %%mm7\n\t"              // mm7 += s13*f02
 
         "pmaddwd     %%mm2, %%mm6\n\t"              // mm6 = l4*f3+l2*f1 r4*f3+f4*f1
-        "movq        24(%%ebx), %%mm2\n\t"          // mm2 = l3 r3 l2 r2
+        "movq        24(%%esi), %%mm2\n\t"          // mm2 = l3 r3 l2 r2
 
         "paddd       %%mm1, %%mm0\n\t"              // mm0 += s31*f31
-        "movq        32(%%ebx), %%mm1\n\t"          // mm1 = l5 r5 l4 r4
+        "movq        32(%%esi), %%mm1\n\t"          // mm1 = l5 r5 l4 r4
 
         "paddd       %%mm6, %%mm7\n\t"              // mm7 += s42*f31
         "punpckhwd   %%mm2, %%mm3\n\t"              // mm3 = l3 l1 r3 r1
@@ -487,7 +477,7 @@ uint FIRFilterMMX::evaluateFilterStereo(short *dest, const short *src, const uin
         "add         $32, %%eax\n\t"
 
         "pmaddwd     %%mm2, %%mm4\n\t"              // mm4 = l2*f2+l0*f0 r2*f2+r0*f0
-        "add         $32, %%ebx\n\t"
+        "add         $32, %%esi\n\t"
 
         "pmaddwd     %%mm2, %%mm5\n\t"              // mm5 = l3*f2+l1*f0 r3*f2+l1*f0
         "movq        -8(%%eax), %%mm2\n\t"          // mm2 = f3 f1 f3 f1
@@ -506,14 +496,14 @@ uint FIRFilterMMX::evaluateFilterStereo(short *dest, const short *src, const uin
 
         // Divide mm0 and mm7 by 8192 (= right-shift by 13),
         // pack and store to [edx]
-        "movd        %7, %%mm4\n\t"
+        "movd        %6, %%mm4\n\t"
 
         "psrad       %%mm4, %%mm0\n\t"              // divide the result
 
         "add         $8, %%edx\n\t"
         "psrad       %%mm4, %%mm7\n\t"              // divide the result
 
-        "add         $8, %2\n\t"
+        "add         $8, %1\n\t"
         "packssdw    %%mm7, %%mm0\n\t"
 
         "movq        %%mm0, -8(%%edx)\n\t"
@@ -522,9 +512,8 @@ uint FIRFilterMMX::evaluateFilterStereo(short *dest, const short *src, const uin
         "jnz         3b\n\t"
 
         "emms\n\t"
-	"movl	 %0, %%ebx\n\t"	// restore this ptr
-      //: /* output */
-      : "+rim" (shadow_ebx)/* output */
+
+      :
       : "rim" (numSamples),
         "rim" (local_src),
         "rim" (local_length),
@@ -532,7 +521,7 @@ uint FIRFilterMMX::evaluateFilterStereo(short *dest, const short *src, const uin
         "rim" (local_lengthDiv8),
         "rim" (local_filterCoeffs),
         "rim" (local_resultDivider) /* input */
-      : "%eax", "%ebx", "%ecx", "%edx", "%edi"/*, "%esi"*/ /* regs */
+      : "%eax", "%ecx", "%edx", "%edi", "%esi" /* regs */
     );
     return (numSamples & 0xfffffffe) - local_length;
 #else
