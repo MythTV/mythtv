@@ -124,11 +124,6 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
     getResolution("TxResolution", txWidth, txHeight);
     txVideoMode = videoResToCifMode(txWidth);
 
-    zoomFactor = 10;
-    zoomWidth = wcWidth;
-    zoomHeight = wcHeight;
-    hPan = wPan = 0;
-
     screenwidth = 0;
     screenheight = 0;
     float wmult = 0, hmult = 0;
@@ -143,12 +138,18 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
     {
         if (webcam->camOpen(WebcamDevice, wcWidth, wcHeight)) 
         {
+            webcam->GetCurSize(&wcWidth, &wcHeight); // See what resolution it actually opened as
             camBrightness = webcam->GetBrightness();
             camContrast = webcam->GetContrast();
             camColour = webcam->GetColour();
             webcam->SetTargetFps(txFps = atoi((const char *)gContext->GetSetting("TransmitFPS")));
         }
     }
+
+    zoomFactor = 10;
+    zoomWidth = wcWidth;
+    zoomHeight = wcHeight;
+    hPan = wPan = 0;
 
     State = -1;
     menuPopup = NULL;
