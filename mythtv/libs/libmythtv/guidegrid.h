@@ -135,19 +135,12 @@ class GuideGrid : public MythDialog
     
     int m_currentRow;
     int m_currentCol;
-    int showProgramBar;
-
-    QLabel *forvideo;
 
     bool showInfo;
     bool selectState;
     bool showFavorites;
     bool displaychannum;
 
-    bool showtitle;
-    bool usetheme;
-
-    int startChannel;
     int desiredDisplayChans;
     int DISPLAY_CHANS;
     int DISPLAY_TIMES;

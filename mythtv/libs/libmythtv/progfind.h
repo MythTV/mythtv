@@ -92,7 +92,6 @@ class ProgFinder : public MythDialog
     void updateList(QPainter *);
     void updateInfo(QPainter *);
    
-    int showProgramBar;
     int showsPerListing;
     int curSearch;
     int curProgram;

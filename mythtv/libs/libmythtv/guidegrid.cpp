@@ -185,8 +185,7 @@ GuideGrid::GuideGrid(const QString &channel, TV *player, QWidget *parent,
     //int filltime = clock.elapsed();
     //clock.restart();
     fillChannelInfos(maxchannel);
-    m_currentStartChannel = m_channelInfos.size() - 
-                            (int)(desiredDisplayChans / 2);
+    setStartChannel(m_currentStartChannel - (int)(desiredDisplayChans / 2));
     if (DISPLAY_CHANS > maxchannel)
         DISPLAY_CHANS = maxchannel;
 
@@ -1279,7 +1278,7 @@ void GuideGrid::scrollDown()
 
 void GuideGrid::scrollUp()
 {
-    setStartChannel(m_currentStartChannel - 1);
+    setStartChannel((int)(m_currentStartChannel) - 1);
 
     QPtrList<ProgramInfo> *proglist = m_programs[DISPLAY_CHANS - 1];
     for (int y = DISPLAY_CHANS - 1; y > 0; y--)
@@ -1367,7 +1366,7 @@ void GuideGrid::pageDown()
 
 void GuideGrid::pageUp()
 {
-    setStartChannel(m_currentStartChannel - DISPLAY_CHANS);
+    setStartChannel((int)(m_currentStartChannel) - DISPLAY_CHANS);
 
     fillProgramInfos();
 
