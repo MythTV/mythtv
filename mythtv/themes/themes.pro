@@ -11,6 +11,7 @@ CONFIG -= moc qt
 
 themes.path = $${PREFIX}/share/mythtv/themes/
 themes.files = blue defaultosd blueosd oldosd default
+themes.files += funhouse Photo PurpleGalaxy SasQuatch-MM SasQuatchOSD-MM visor visorosd sleek simpleosd gant
 
 fonts.path = $${PREFIX}/share/mythtv
 fonts.files = FreeSans.ttf FreeMono.ttf
