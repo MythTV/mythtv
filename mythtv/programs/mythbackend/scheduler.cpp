@@ -1327,6 +1327,12 @@ void Scheduler::RunScheduler(void)
             if (recording && secsleft <= -2)
             {
                 QString msg;
+
+                nextRecording->recstartts = QDateTime::currentDateTime();
+                nextRecording->recstartts.setTime(QTime(
+                                   nextRecording->recstartts.time().hour(),
+                                   nextRecording->recstartts.time().minute()));
+
                 if (nexttv->StartRecording(nextRecording))
                     msg = "Started recording";
                 else

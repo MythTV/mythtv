@@ -3511,7 +3511,7 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
                     }
                     QString desc;
                     int spos = calcSliderPos(skipped_seconds, desc);
-                    osd->StartPause(spos, false, comm_msg, desc, 1);
+                    osd->StartPause(spos, false, comm_msg, desc, 2);
                 }
 
                 if (autocommercialskip == 1)

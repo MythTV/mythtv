@@ -116,7 +116,7 @@ public:
 class SRPostRoll: public SpinBoxSetting, public SRSetting {
 public:
     SRPostRoll(const ScheduledRecording& parent):
-        SpinBoxSetting(-60, 60, 1),
+        SpinBoxSetting(-60, 240, 1),
         SRSetting(parent, "postroll") {
         setLabel(QObject::tr("Post-Roll Minutes"));
     };
@@ -362,8 +362,16 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
              proginfo->rectype = RecordingType(result.value(15).toInt());
              proginfo->recordid = result.value(16).toInt();
              proginfo->override = result.value(17).toInt();
+
              proginfo->recstartts = result.value(18).toDateTime();
              proginfo->recendts = result.value(19).toDateTime();
+
+             if (proginfo->recstartts >= proginfo->recendts)
+             {
+                 // pre/post-roll are invalid so ignore
+                 proginfo->recstartts = proginfo->startts;
+                 proginfo->recendts = proginfo->endts;
+             }
 
              if (proginfo->override == 2)
              {
