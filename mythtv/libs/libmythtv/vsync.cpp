@@ -277,6 +277,8 @@ void DRMVideoSync::WaitForFrame(int sync_delay)
         blank.request.sequence =
             (int)(ceil((double)m_delay / m_refresh_interval));
         drmWaitVBlank(m_dri_fd, &blank);
+	m_delay = CalcDelay();
+	// cerr << blank.request.sequence << " m_delay " << m_delay << endl;
     }
 
     KeepPhase();
