@@ -16,6 +16,8 @@ using namespace std;
 #include <dvdread/ifo_read.h>
 #include <dvdread/nav_read.h>
 
+#include <qdatetime.h>
+
 #include "jobthread.h"
 #include "mtd.h"
 
@@ -104,9 +106,6 @@ void DVDPerfectThread::run()
 
     subjob_name = "Ripping to destination file";
     
-    int overall_size; 
-    int amount_read;   
-    
     //
     //  OK, we got the device. 
     //  Lets open our destination file
@@ -184,6 +183,20 @@ void DVDPerfectThread::run()
 
 
     //
+    //  Hmmmm ... need some sort of total to calculate
+    //  progress display against .... I guess disc
+    //  sectors will have to do .... 
+    //
+
+    int total_sectors = 0;
+
+    for(int i = start_cell; i < cur_pgc->nr_of_cells; i++)
+    {
+        total_sectors += cur_pgc->cell_playback[i].last_sector -
+                         cur_pgc->cell_playback[i].first_sector;
+    }
+
+    //
     //  OK ... now actually open
     //    
     
@@ -201,15 +214,18 @@ void DVDPerfectThread::run()
         return;
     }
     
-    overall_size = DVDFileSize(title);
-    amount_read = 0;
+    int sector_counter = 0;
 
+    QTime job_time;
+    job_time.start();
+    
     int next_cell = start_cell;    
     for(int cur_cell = start_cell; next_cell < cur_pgc->nr_of_cells; )
     {
         cur_cell = next_cell;
         if(cur_pgc->cell_playback[ cur_cell ].block_type == BLOCK_TYPE_ANGLE_BLOCK)
         {
+            
             cur_cell += angle;
             for(int i=0;; ++i)
             {
@@ -252,8 +268,6 @@ void DVDPerfectThread::run()
                 return;
             }
             
-            ++amount_read;
-            
             //
             //  libdvdread example code has an assertion here
             //
@@ -284,6 +298,7 @@ void DVDPerfectThread::run()
             
             //  another assert:  assert( cur_output_size < 1024 );
             cur_pack++;
+            sector_counter++;
 
             //
             //  Read in and output cursize packs
@@ -305,17 +320,39 @@ void DVDPerfectThread::run()
                 return;
             }
             
-            amount_read += len;
+            overall_progress = (double) (sector_counter) / (double) (total_sectors);
+            subjob_progress  = overall_progress;
 
-
-            overall_progress = (double) (amount_read) / (double) (overall_size);
-            subjob_progress = overall_progress;
+            int elapsed = job_time.elapsed() / 1000;
             
-            // write(ripfile->handle(), video_data, cur_output_size * DVD_VIDEO_LB_LEN);
+            int estimated_job_time =(int) ( (double) elapsed / overall_progress );
+            
+            if(estimated_job_time >= 3600)
+            {
+                subjob_name.sprintf("Ripping to destination file  ~  %d:%02d:%02d/%d:%02d:%02d",
+                                     elapsed / 3600,
+                                     (elapsed % 3600) / 60,
+                                     (elapsed % 3600) % 60,
+                                     estimated_job_time / 3600,
+                                     (estimated_job_time % 3600) / 60,
+                                     (estimated_job_time % 3600) % 60);
+            
+            }
+            else
+            {
+                subjob_name.sprintf("Ripping to destination file  ~  %02d:%02d/%02d:%02d",
+                                     elapsed / 60,
+                                     elapsed % 60,
+                                     estimated_job_time / 60,
+                                     estimated_job_time % 60);
+            }        
+            
 
             ripfile->writeBlocks(video_data, cur_output_size * DVD_VIDEO_LB_LEN);
 
+            sector_counter += next_vobu - cur_pack;
             cur_pack = next_vobu;
+
 
             //
             //  Escape out and clean up if mtd main thread
