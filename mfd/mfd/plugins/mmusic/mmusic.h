@@ -42,6 +42,8 @@ class MMusicWatcher: public MFDServicePlugin
     bool    checkNewMusicFile(const QString &filename, const QString &startdir);
 
   private:
+
+    bool            first_time;
   
     QTime           metadata_sweep_time;
     bool            force_sweep;

@@ -33,6 +33,7 @@ MMusicWatcher::MMusicWatcher(MFD *owner, int identity)
     //  On startup, we want it to sweep
     //
 
+    first_time = true;
     force_sweep = true;
 
     //
@@ -200,6 +201,12 @@ bool MMusicWatcher::sweepMetadata()
     log("beginning content sweep", 3);
 
     bool something_changed = false;
+    
+    if(first_time)
+    {
+        first_time = false;
+        something_changed = true;
+    }
     
     //
     //  Do a quick check of the playlists. This is a bit of a hack at the moment.
