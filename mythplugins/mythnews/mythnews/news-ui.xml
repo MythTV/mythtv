@@ -92,7 +92,7 @@
       </textarea>
 
       <textarea name="updated" align="right" draworder="1">
-        <area>670,30,110,100</area>
+        <area>660,30,120,100</area>
         <font>updated</font>
         <multiline>yes</multiline>
       </textarea>
