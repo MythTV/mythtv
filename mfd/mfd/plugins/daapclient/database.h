@@ -54,7 +54,7 @@ class Database
 
     void    doDatabaseListPlaylistsResponse(TagInput &dmap_data, int new_generation);    
     void    parseContainers(TagInput &dmap_data, int how_many);
-    void    parseDeletedContainers(TagInput &dmap_data);
+    void    parseDeletedContainers(TagInput &dmap_data, int new_generation);
 
     void    doDatabasePlaylistResponse(TagInput &dmap_data, int which_playlist, int new_generation);
     void    parsePlaylist(TagInput &dmap_data, int how_many, Playlist *which_playlist);

@@ -207,7 +207,7 @@ void MetadataContainer::dataDelta(
     //  Delete the -deltas
     //
     
-    current_metadata->setAutoDelete(false);    
+    current_metadata->setAutoDelete(true);    
     QValueList<int>::iterator iter;
     for ( iter = metadata_out.begin(); iter != metadata_out.end(); ++iter )
     {
@@ -245,17 +245,40 @@ void MetadataContainer::dataDelta(
     }
     else
     {
-        if(current_playlists)
+        //
+        //  Add the new playlists (and/or change playlists that have changed)
+        //
+
+        QIntDictIterator<Playlist> iterc( *new_playlists ); 
+        for ( ; iterc.current(); ++iterc )
         {
-            current_playlists->setAutoDelete(true);
-            delete current_playlists;
+            current_playlists->remove(iterc.currentKey());
+            current_playlists->insert(iterc.currentKey(), iterc.current());
         }
 
-        current_playlists = new_playlists;
-        new_playlists = NULL;
+        //
+        //  Delete the -deltas
+        //
     
+        current_playlists->setAutoDelete(true);    
+        QValueList<int>::iterator iterb;
+        for ( iterb = playlist_out.begin(); iterb != playlist_out.end(); ++iterb )
+        {
+            if(!current_playlists->remove((*iterb)))
+            {
+                warning(QString("while doing a neg delta, asked "
+                        "to remove a playlist that wasn't there: %1")
+                        .arg((*iterb)));
+            }
+        }
+
+        new_playlists->setAutoDelete(false);
+        delete new_playlists;
+        new_playlists = NULL;
+
         playlist_additions = playlist_in;
         playlist_deletions = playlist_out;
+
     }
     
     ++generation;
