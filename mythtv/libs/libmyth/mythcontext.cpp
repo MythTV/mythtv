@@ -851,7 +851,11 @@ QString MythContext::GetConfDir(void)
     char *tmp_confdir = getenv("MYTHCONFDIR");
     QString dir;
     if (tmp_confdir)
+    {
         dir = QString(tmp_confdir);
+        //VERBOSE(VB_ALL, QString("Read conf dir = %1").arg(dir));
+        dir.replace("$HOME", QDir::homeDirPath());
+    }
     else
         dir = QDir::homeDirPath() + "/.mythtv";
 
