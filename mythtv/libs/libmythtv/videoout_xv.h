@@ -22,6 +22,8 @@ class XvVideoOutput
     void ResizeVideo(int x, int y, int w, int h);
     void MoveResize(void);
 
+    void GetDrawSize(int &xoff, int &yoff, int &width, int &height);
+
   private:
     void sizehint(int x, int y, int width, int height, int max);
     void Exit(void);

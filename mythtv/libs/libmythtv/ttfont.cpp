@@ -324,9 +324,9 @@ void TTFFont::merge_text(unsigned char *yuv, Raster_Map * rmap, int offset_x,
 	       {
                   a = ((a * alphamod) + 0x80) >> 8;
 		  src = yuv + (y + ystart) * video_width + (x + xstart);
-		  if (color != COL_BLACK)
+		  if (color > 0)
                   {
-                      tmp1 = (255 - *src) * a;
+                      tmp1 = (color - *src) * a;
                       tmp2 = *src + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
                       *src = tmp2 & 0xff;
                       if (a >= 230)
@@ -349,7 +349,7 @@ void TTFFont::merge_text(unsigned char *yuv, Raster_Map * rmap, int offset_x,
                   }
 		  else
                   {
-                      tmp1 = (0 - *src) * a;
+                      tmp1 = (color - *src) * a;
                       tmp2 = *src + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
                       *src = tmp2 & 0xff;
                   }
@@ -361,8 +361,7 @@ void TTFFont::merge_text(unsigned char *yuv, Raster_Map * rmap, int offset_x,
 
 void TTFFont::DrawString(unsigned char *yuvptr, int x, int y, 
                          const QString &text, int maxx, int maxy, 
-                         int alphamod, int color, bool rightjustify,
-                         bool outline)
+                         int alphamod)
 {
    int                  width, height, w, h, inx, iny, clipx, clipy;
    Raster_Map          *rmap, *rtmp;
@@ -429,15 +428,16 @@ void TTFFont::DrawString(unsigned char *yuvptr, int x, int y,
 	return;
      }
 
-   if (rightjustify)
-   {
-   }
+   if (m_color > 255)
+       m_color = 255;
+   if (m_color < 0)
+       m_color = 0;
 
-   if (outline)
+   if (m_outline)
    {
-       int outlinecolor = COL_BLACK;
-       if (color == COL_BLACK)
-           outlinecolor = COL_WHITE;
+       int outlinecolor = 0;
+       if (m_color == 0)
+           outlinecolor = 255;
 
        merge_text(yuvptr, rmap, clipx, clipy, x - 1, y - 1, width, height,
                   video_width, video_height, outlinecolor, alphamod);
@@ -449,8 +449,19 @@ void TTFFont::DrawString(unsigned char *yuvptr, int x, int y,
                   video_width, video_height, outlinecolor, alphamod);
    }
 
+   if (m_shadowxoff > 0 || m_shadowyoff > 0)
+   {
+       int shadowcolor = 0;
+       if (m_color == 0)
+           shadowcolor = 255;
+    
+       merge_text(yuvptr, rmap, clipx, clipy, x + m_shadowxoff,
+                  y + m_shadowyoff, width, height, video_width, video_height,
+                  shadowcolor, alphamod);
+   }
+
    merge_text(yuvptr, rmap, clipx, clipy, x, y, width, height, 
-              video_width, video_height, color, alphamod);
+              video_width, video_height, m_color, alphamod);
 
    destroy_font_raster(rmap);
    destroy_font_raster(rtmp);
@@ -488,6 +499,11 @@ TTFFont::TTFFont(char *file, int size, int video_width, int video_height)
    valid = false;
    m_size = size;
    spacewidth = 0;
+
+   m_outline = false;
+   m_shadowxoff = 0;
+   m_shadowyoff = 0;
+   m_color = 255;
 
    if (!have_library)
    {

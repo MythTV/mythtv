@@ -15,12 +15,14 @@ class OSDSet
   public:
     OSDSet(const QString &name, bool cache, int screenwidth, int screenheight, 
            float wmult, float hmult);
+    OSDSet(const OSDSet &other);
    ~OSDSet();
 
     void SetCache(bool cache) { m_cache = cache; }
     bool GetCache() { return m_cache; }
 
     QString GetName() { return m_name; }
+    void SetName(const QString &name) { m_name = name; }
 
     void SetAllowFade(bool allow) { m_allowfade = allow; }
     bool GetAllowFade() { return m_allowfade; }
@@ -104,7 +106,11 @@ class OSDTypeText : public OSDType
   public:
     OSDTypeText(const QString &name, TTFFont *font, const QString &text,
                 QRect displayrect);
+    OSDTypeText(const OSDTypeText &text);
    ~OSDTypeText();
+
+    void SetAltFont(TTFFont *font);
+    void SetUseAlt(bool usealt) { m_usingalt = usealt; }
 
     void SetText(const QString &text);
     QString GetText() { return m_message; }
@@ -112,16 +118,10 @@ class OSDTypeText : public OSDType
     void SetMultiLine(bool multi) { m_multiline = multi; }
     bool GetMultiLine() { return m_multiline; }
 
-    void SetOutline(bool dooutline) { m_outline = dooutline; }
-    bool GetOutline() { return m_outline; }
-
     void SetCentered(bool docenter) { m_centered = docenter; }
     bool GetCentered() { return m_centered; }
 
     QRect DisplayArea() { return m_displaysize; }
-
-    void SetColor(int color) { m_color = color; }
-    int GetColor() { return m_color; }
 
     void Draw(unsigned char *screenptr, int vid_width, int vid_height,
               int fade, int maxfade, int xoff, int yoff);
@@ -135,12 +135,11 @@ class OSDTypeText : public OSDType
     QString m_message;
 
     TTFFont *m_font;
+    TTFFont *m_altfont;
 
-    bool m_outline;
     bool m_centered;
     bool m_multiline;
-
-    int m_color;
+    bool m_usingalt;
 };
     
 class OSDTypeImage : public OSDType
@@ -263,6 +262,7 @@ class OSDTypeBox : public OSDType
 {
   public:
     OSDTypeBox(const QString &name, QRect displayrect); 
+    OSDTypeBox(const OSDTypeBox &other);
    ~OSDTypeBox();
 
     void Draw(unsigned char *screenptr, int vid_width, int vid_height, 
@@ -276,11 +276,15 @@ class OSDTypePositionRectangle : public OSDType
 {
   public:
     OSDTypePositionRectangle(const QString &name);
+    OSDTypePositionRectangle(const OSDTypePositionRectangle &other);
    ~OSDTypePositionRectangle();
+
+    void SetOffset(int offset) { m_offset = offset; }
+    int GetOffset(void) { return m_offset; }
 
     void AddPosition(QRect rect);
 
-    int GetPosition() { return m_curposition; }
+    int GetPosition() { return m_curposition - m_offset; }
     void SetPosition(int pos);
 
     void PositionUp();  
@@ -293,6 +297,7 @@ class OSDTypePositionRectangle : public OSDType
     vector<QRect> positions; 
     int m_numpositions;
     int m_curposition;
+    int m_offset;
 };
 
 class ccText
@@ -308,7 +313,8 @@ class ccText
 class OSDTypeCC : public OSDType
 {
   public:
-    OSDTypeCC(const QString &name, TTFFont *font);
+    OSDTypeCC(const QString &name, TTFFont *font, int xoff, int yoff,
+              int dispw, int disph);
    ~OSDTypeCC();
 
     void AddCCText(const QString &text, int x, int y, int color, 
@@ -321,6 +327,7 @@ class OSDTypeCC : public OSDType
   private:
     TTFFont *m_font;
     vector<ccText *> *m_textlist;
+    int xoffset, yoffset, displaywidth, displayheight;
 };
 
 #endif

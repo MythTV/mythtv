@@ -7,10 +7,6 @@
 
 #include <qstring.h>
 
-#define COL_BLACK 0
-#define COL_WHITE 1
-#define COL_RED   2
-
 struct Raster_Map;
 
 class TTFFont
@@ -19,12 +15,16 @@ class TTFFont
      TTFFont(char *file, int size, int video_width, int video_height);
     ~TTFFont();
 
+     // 0-255
+     void setColor(int color) { m_color = color; }
+     void setOutline(bool outline) { m_outline = outline; }
+     void setShadow(int xoff, int yoff) { m_shadowxoff = xoff; 
+                                          m_shadowyoff = yoff; }
+
      bool isValid(void) { return valid; }
 
      void DrawString(unsigned char *yuvptr, int x, int y, const QString &text,
-                     int maxx, int maxy, int alphamod = 255, 
-                     int color = COL_WHITE, bool rightjustify = false,
-                     bool outline = false); 
+                     int maxx, int maxy, int alphamod = 255); 
      void CalcWidth(const QString &text, int *width_return);
 
      int SpaceWidth() { return spacewidth; }
@@ -58,6 +58,11 @@ class TTFFont
 
      int spacewidth;
      int m_size;
+
+     bool m_outline;
+     int m_shadowxoff;
+     int m_shadowyoff;
+     int m_color;
 };
 
 #endif

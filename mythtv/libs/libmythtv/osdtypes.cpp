@@ -43,6 +43,63 @@ OSDSet::OSDSet(const QString &name, bool cache, int screenwidth,
     allTypes = new vector<OSDType *>;
 }
 
+OSDSet::OSDSet(const OSDSet &other)
+{
+    m_screenwidth = other.m_screenwidth;
+    m_screenheight = other.m_screenheight;
+    m_framerate = other.m_framerate;
+    m_wmult = other.m_wmult;
+    m_hmult = other.m_hmult;
+    m_cache = other.m_cache;
+    m_name = other.m_name;
+    m_notimeout = other.m_notimeout;
+    m_hasdisplayed = other.m_hasdisplayed;
+    m_framesleft = other.m_framesleft;
+    m_displaying = other.m_displaying;
+    m_fadeframes = other.m_fadeframes;
+    m_maxfade = other.m_maxfade;
+    m_priority = other.m_priority;
+    m_xmove = other.m_xmove;
+    m_ymove = other.m_ymove;
+    m_xoff = other.m_xoff;
+    m_yoff = other.m_yoff;
+    m_allowfade = other.m_allowfade;
+
+    allTypes = new vector<OSDType *>;
+
+    vector<OSDType *>::iterator iter = other.allTypes->begin();
+    for (;iter != other.allTypes->end(); iter++)
+    {
+        OSDType *type = (*iter);
+        if (OSDTypeText *item = dynamic_cast<OSDTypeText*>(type))
+        {
+            OSDTypeText *newtext = new OSDTypeText(*item);
+            AddType(newtext);
+        }
+        else if (OSDTypeImage *item = dynamic_cast<OSDTypeImage*>(type))
+        {
+            OSDTypeImage *newimage = new OSDTypeImage(*item);
+            AddType(newimage);
+        }
+        else if (OSDTypeBox *item = dynamic_cast<OSDTypeBox*>(type))
+        {
+            OSDTypeBox *newbox = new OSDTypeBox(*item);
+            AddType(newbox);
+        }
+        else if (OSDTypePositionRectangle *item = 
+                  dynamic_cast<OSDTypePositionRectangle*>(type))
+        {
+            OSDTypePositionRectangle *newrect = 
+                               new OSDTypePositionRectangle(*item);
+            AddType(newrect);
+        }
+        else
+        {
+            cerr << "Unknown conversion\n";
+        }
+    }
+}
+
 OSDSet::~OSDSet()
 {
     vector<OSDType *>::iterator i = allTypes->begin();
@@ -166,17 +223,34 @@ OSDTypeText::OSDTypeText(const QString &name, TTFFont *font,
 {
     m_message = text;
     m_font = font;
+
+    m_altfont = NULL;
     
     m_displaysize = displayrect;
     m_multiline = false;
     m_centered = false;
-    m_outline = true;
+    m_usingalt = false;
+}
 
-    m_color = COL_WHITE;
+OSDTypeText::OSDTypeText(const OSDTypeText &other)
+           : OSDType(other.m_name)
+{
+    m_displaysize = other.m_displaysize;
+    m_message = other.m_message;
+    m_font = other.m_font;
+    m_altfont = other.m_altfont;
+    m_centered = other.m_centered;
+    m_multiline = other.m_multiline;
+    m_usingalt = other.m_usingalt;
 }
 
 OSDTypeText::~OSDTypeText()
 {
+}
+
+void OSDTypeText::SetAltFont(TTFFont *font)
+{
+    m_altfont = font;
 }
 
 void OSDTypeText::SetText(const QString &text)
@@ -289,8 +363,11 @@ void OSDTypeText::DrawString(unsigned char *screenptr, int vid_width,
     if (maxfade > 0 && fade >= 0)
         alphamod = (int)((((float)(fade) / maxfade) * 256.0) + 0.5);
 
-    m_font->DrawString(screenptr, x, y, text, maxx, maxy, alphamod, m_color,
-                       false, m_outline);
+    TTFFont *font = m_font;
+    if (m_usingalt && m_altfont)
+        font = m_altfont;
+
+    font->DrawString(screenptr, x, y, text, maxx, maxy, alphamod);
 } 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -387,17 +464,12 @@ void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
     if (tmpimage.width() == 0)
         return;
 
-    float mult = wmult;
-
-    if (scalew <= 0)
-        mult *= 0.91; 
-
     int width = 0, height = 0;
 
     if (scalew > 0) 
-        width = ((int)(scalew * mult) / 2) * 2;
+        width = ((int)(scalew * wmult) / 2) * 2;
     else
-        width = ((int)(tmpimage.width() * mult) / 2) * 2;
+        width = ((int)(tmpimage.width() * wmult) / 2) * 2;
 
     if (scaleh > 0)
         height = ((int)(scaleh * hmult) / 2) * 2;
@@ -909,6 +981,12 @@ OSDTypeBox::OSDTypeBox(const QString &name, QRect displayrect)
     size = displayrect;
 }
 
+OSDTypeBox::OSDTypeBox(const OSDTypeBox &other)
+          : OSDType(other.m_name)
+{
+    size = other.size;
+}
+
 OSDTypeBox::~OSDTypeBox()
 {
 }
@@ -963,8 +1041,24 @@ OSDTypePositionRectangle::OSDTypePositionRectangle(const QString &name)
 {
     m_numpositions = 0;
     m_curposition = -1;
+    m_offset = 0;
 }       
-    
+   
+OSDTypePositionRectangle::OSDTypePositionRectangle(
+                                        const OSDTypePositionRectangle &other) 
+                        : OSDType(other.m_name)
+{
+    m_numpositions = other.m_numpositions;
+    m_curposition = other.m_curposition;
+    m_offset = other.m_offset;
+
+    for (int i = 0; i < m_numpositions; i++)
+    {
+        QRect tmp = other.positions[i];
+        positions.push_back(tmp);
+    }
+}
+
 OSDTypePositionRectangle::~OSDTypePositionRectangle()
 {
 }
@@ -977,14 +1071,14 @@ void OSDTypePositionRectangle::AddPosition(QRect rect)
 
 void OSDTypePositionRectangle::SetPosition(int pos)
 {
-    m_curposition = pos;
+    m_curposition = pos + m_offset;
     if (m_curposition >= m_numpositions)
         m_curposition = m_numpositions - 1;
 }
 
 void OSDTypePositionRectangle::PositionUp(void)
 {
-    if (m_curposition > 0)
+    if (m_curposition > m_offset)
         m_curposition--;
 }
 
@@ -1044,11 +1138,18 @@ void OSDTypePositionRectangle::Draw(unsigned char *screenptr, int vid_width,
     }
 }
 
-OSDTypeCC::OSDTypeCC(const QString &name, TTFFont *font)
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+OSDTypeCC::OSDTypeCC(const QString &name, TTFFont *font, int xoff, int yoff,
+                     int dispw, int disph)
          : OSDType(name)
 {
     m_font = font;
     m_textlist = NULL;
+    xoffset = xoff;
+    yoffset = yoff;
+    displaywidth = dispw;
+    displayheight = disph;
 }
 
 OSDTypeCC::~OSDTypeCC()
@@ -1112,13 +1213,13 @@ void OSDTypeCC::Draw(unsigned char *screenptr, int vid_width, int vid_height,
             {
                 // position as if we use a fixed size font
                 // on a 24 row / 40 char grid (teletext expects us to)
-                x = cc->y * vid_width / 40;
-                y = cc->x * vid_height / 25;
+                x = cc->y * displaywidth / 40 + xoffset;
+                y = cc->x * displayheight / 25 + yoffset;
             }
             else
             {
-                x = cc->x * vid_width / 40;
-                y = cc->y * vid_height / 18;
+                x = cc->x * displaywidth / 40 + xoffset;
+                y = cc->y * displayheight / 18 + yoffset;
             }
 
             int maxx = x + textlength;
@@ -1130,8 +1231,7 @@ void OSDTypeCC::Draw(unsigned char *screenptr, int vid_width, int vid_height,
             if (maxy > vid_height)
                 maxy = vid_height;
 
-            m_font->DrawString(screenptr, x, y, cc->text, maxx, maxy, 255, 
-                               cc->color, false, true);
+            m_font->DrawString(screenptr, x, y, cc->text, maxx, maxy, 255); 
         }
     }
 }

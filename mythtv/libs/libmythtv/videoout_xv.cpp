@@ -708,7 +708,7 @@ void XvVideoOutput::Show(unsigned char *buffer, int width, int height)
         }
 
         pthread_mutex_lock(&lock);
- 
+
         XvShmPutImage(data->XJ_disp, xv_port, data->XJ_curwin, data->XJ_gc,
                       image, imgx, imgy, imgw, imgh, dispxoff, dispyoff,
                       dispwoff, disphoff, False);
@@ -833,6 +833,14 @@ void XvVideoOutput::ResizeVideo(int x, int y, int w, int h)
     
     MoveResize();
     return;
+}
+
+void XvVideoOutput::GetDrawSize(int &xoff, int &yoff, int &width, int &height)
+{
+    xoff = imgx;
+    yoff = imgy;
+    width = imgw;
+    height = imgh;
 }
 
 void XvVideoOutput::MoveResize(void)

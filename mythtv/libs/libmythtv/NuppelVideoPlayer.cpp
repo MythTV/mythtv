@@ -2044,8 +2044,11 @@ void NuppelVideoPlayer::StartPlaying(void)
     if (!disablevideo)
     {
         InitVideo();
+        int dispx = 0, dispy = 0, dispw = video_width, disph = video_height;
+        videoOutput->GetDrawSize(dispx, dispy, dispw, disph);
         osd = new OSD(video_width, video_height, (int)ceil(video_frame_rate),
-                      osdfontname, osdccfontname, osdprefix, osdtheme);
+                      osdfontname, osdccfontname, osdprefix, osdtheme,
+                      dispx, dispy, dispw, disph);
     }
     else
         own_vidbufs = true;
@@ -2266,9 +2269,7 @@ void NuppelVideoPlayer::SetBookmark(void)
 
     m_playbackinfo->SetBookmark(framesPlayed, m_db);
 
-    osd->ShowText("bookmark", "Position Saved", video_width * 1 / 8, 
-                  video_height * 1 / 8, video_width * 7 / 8, video_height / 2, 
-                  1);
+    osd->SetSettingsText("Position Saved", 1); 
 }
 
 long long NuppelVideoPlayer::GetBookmark(void)
@@ -2750,10 +2751,10 @@ void NuppelVideoPlayer::DisableEdit(void)
     QMap<long long, int>::Iterator i = deleteMap.begin();
     for (; i != deleteMap.end(); ++i)
         osd->HideEditArrow(i.key(), i.data());
-    osd->HideText("seek_desc");
-    osd->HideText("deletemarker");
-    osd->HideText("edittime_display");
-    osd->HideText("editslider");
+    osd->HideSet("seek_desc");
+    osd->HideSet("deletemarker");
+    osd->HideSet("edittime_display");
+    osd->HideSet("editmode");
 
     timedisplay = NULL;
 
@@ -2920,7 +2921,7 @@ void NuppelVideoPlayer::UpdateTimeDisplay(void)
                                  video_height, video_width / 640.0, 
                                  video_height / 480.0);
 
-        TTFFont *font = osd->GetFont("channel_font");
+        TTFFont *font = osd->GetFont("channelfont");
         QRect rect;
         rect.setTop(video_height * 1 / 16);
         rect.setBottom(video_height * 2 / 8);
@@ -2965,10 +2966,10 @@ void NuppelVideoPlayer::UpdateTimeDisplay(void)
     {
         osd->ShowText("deletemarker", "cut", video_width / 8, 
                       video_height / 16, video_width / 2, 
-                      video_height / 8, -1, 2);
+                      video_height / 8, -1);
     }
     else
-        osd->HideText("deletemarker");
+        osd->HideSet("deletemarker");
 }
 
 void NuppelVideoPlayer::HandleSelect(void)

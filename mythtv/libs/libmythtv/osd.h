@@ -7,6 +7,7 @@
 #include <time.h>
 #include <pthread.h>
 #include <qmap.h>
+#include <qdom.h>
 
 #include <vector>
 using namespace std;
@@ -20,7 +21,8 @@ class OSD
 {
  public:
     OSD(int width, int height, int framerate, const QString &font, 
-        const QString &ccfont, const QString &prefix, const QString &osdtheme);
+        const QString &ccfont, const QString &prefix, const QString &osdtheme,
+        int dispx, int dispy, int dispw, int disph);
    ~OSD(void);
 
     void Display(unsigned char *yuvptr);
@@ -55,8 +57,8 @@ class OSD
     bool Visible(void);
 
     OSDSet *ShowText(const QString &name, const QString &message, int xpos,
-                     int ypos, int width, int height, int secs, int color = 1);
-    void HideText(const QString &name);
+                     int ypos, int width, int height, int secs);
+    void HideSet(const QString &name);
 
     void ShowEditArrow(long long number, long long totalframes, int type);
     void HideEditArrow(long long number, int type);
@@ -74,16 +76,28 @@ class OSD
     int getTimeType(void) { return timeType; }
  
  private:
-    void SetNoThemeDefaults();
+    void SetDefaults();
     TTFFont *LoadFont(QString name, int size); 
     QString FindTheme(QString name);
-   
+
+    void HighlightDialogSelection(OSDSet *container, int num);  
+ 
     bool LoadTheme();
     void normalizeRect(QRect *rect);
     QPoint parsePoint(QString text);
     QRect parseRect(QString text);
 
     void RemoveSet(OSDSet *set);
+
+    QString getFirstText(QDomElement &element);
+    void parseFont(QDomElement &element);
+    void parseContainer(QDomElement &element);
+    void parseImage(OSDSet *container, QDomElement &element);
+    void parseTextArea(OSDSet *container, QDomElement &element);
+    void parseSlider(OSDSet *container, QDomElement &element);
+    void parseBox(OSDSet *container, QDomElement &element);
+    void parseEditArrow(OSDSet *container, QDomElement &element);
+    void parsePositionRects(OSDSet *container, QDomElement &element);
 
     QString fontname;
     QString ccfontname;
@@ -93,18 +107,16 @@ class OSD
     int fps;
 
     QString fontprefix;
-    
-    bool usingtheme;
     QString themepath;
 
     float hmult, wmult;
+    int xoffset, yoffset, displaywidth, displayheight;
 
     pthread_mutex_t osdlock;
 
     bool m_setsvisible;
 
     int totalfadeframes;
-    int combinedescsub;
     int timeType;
 
     QString timeFormat;

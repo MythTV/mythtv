@@ -1,0 +1,148 @@
+<mythosdtheme>
+
+  <timeformat>hh:mm</timeformat>
+  <fadeaway>30</fadeaway>
+
+  <font name="infofont">
+    <color>255</color>
+    <size>16</size>
+    <outline>yes</outline>
+  </font>
+
+  <font name="infofontgray">
+    <color>128</color>
+    <size>16</size>
+  </font>
+
+  <font name="channelfont">
+    <color>255</color>
+    <size>50</size>
+    <outline>yes</outline>
+  </font>
+
+  <font name="settings">
+    <color>255</color>
+    <size>24</size>
+    <outline>yes</outline>
+  </font>
+
+  <container name="channel_number">
+    <textarea name="channel_number">
+      <area>460,20,160,90</area>
+      <font>channelfont</font>
+    </textarea>
+  </container> 
+
+  <container name="program_info">
+    <image name="background">
+      <filename>osd-big.png</filename>
+      <position>0,280</position>
+    </image>
+    <textarea name="title">
+      <area>182,294,350,27</area>
+      <font>infofont</font>
+    </textarea>
+    <textarea name="description"> <!-- since there's no 'subtitle' present,
+                                       this will be a combined description 
+                                       and subtitle -->
+      <multiline>yes</multiline>
+      <area>14,344,615,122</area>
+      <font>infofont</font>
+    </textarea>
+    <image name="channelicon"> <!-- set internally, doesn't need a filename -->
+      <position>10,290</position>
+    </image>
+    <textarea name="callsign">
+       <area>48,294,112,27</area>
+       <font>infofont</font>
+    </textarea>
+    <textarea name="time">
+       <area>568,294,60,27</area>
+       <font>infofont</font>
+    </textarea>
+  </container>
+
+  <container name="status" priority="10" fademovement="0,6">
+    <image name="background">
+      <filename>osd-small.png</filename>
+      <position>0,392</position>
+    </image>
+    <textarea name="status">
+      <area>194,406,90,27</area>
+      <font>infofont</font>
+    </textarea>
+    <slider name="statusslider" type="fill">
+      <area>312,446,318,20</area>
+      <filename>fill-blue.png</filename>
+    </slider>
+    <textarea name="slidertext">
+      <area>14,446,280,26</area>
+      <font>infofont</font>
+    </textarea>
+  </container>
+
+  <container name="editmode">
+    <slider name="editslider" type="edit">
+      <area>25,425,590,65</area>
+      <filename>fill-blue.png</filename>
+      <altfilename>red.png</altfilename>
+    </slider>
+    <slider name="editposition" type="position">
+      <area>25,415,590,65</area>
+      <filename>position-indicator.png</filename>
+    </slider>
+    <editarrow name="left">
+      <filename>cut-end.png</filename>
+      <area>25,400,590,65</area>
+    </editarrow>
+    <editarrow name="right">
+      <filename>cut-start.png</filename>
+      <area>25,400,590,65</area>
+    </editarrow>
+  </container>
+
+  <container name="settings">
+    <textarea name="settings">
+      <area>50,50,350,32</area>
+      <font>settings</font>
+    </textarea>
+  </container>
+
+  <container name="basedialog" priority="0"> <!-- must be named this -->
+    <box name="background">
+      <area>80,60,480,360</area>
+    </box>
+    <textarea name="message">
+      <area>85,65,470,220</area>
+      <font>infofont</font>
+      <multiline>yes</multiline>
+    </textarea>
+    <textarea name="option1">
+      <area>85,300,470,30</area>
+      <font>infofont</font>
+      <altfont>infofontgray</altfont>
+    </textarea>
+    <textarea name="option2">
+      <area>85,330,470,30</area>
+      <font>infofont</font>
+      <altfont>infofontgray</altfont>
+    </textarea>
+    <textarea name="option3">
+      <area>85,360,470,30</area>
+      <font>infofont</font>
+      <altfont>infofontgray</altfont>
+    </textarea>
+    <textarea name="option4">
+      <area>85,390,470,30</area>
+      <font>infofont</font>
+      <altfont>infofontgray</altfont>
+    </textarea>
+    <positionrects name="selector">
+      <area>80,296,480,30</area>
+      <area>80,326,480,30</area>
+      <area>80,356,480,30</area>
+      <area>80,386,480,30</area>
+    </positionrects>
+  </container>
+
+</mythosdtheme>
