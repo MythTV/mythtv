@@ -6,7 +6,7 @@
   <font name="infofont">
     <color>255</color>
     <size>16</size>
-    <outline>no</outline>
+    <outline>yes</outline>
   </font>
 
   <font name="infofontgray">
