@@ -269,22 +269,31 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
         printf("XvQueryAdaptors failed.\n");
         ai = NULL;
     }
-    else
-        if (ai)
+    else if (ai)
+    {
+        for (i = 0; (i < p_num_adaptors) && (xv_port == -1); i++) 
         {
-            for (i = 0; i < p_num_adaptors; i++) 
+            if ((ai[i].type & XvInputMask) &&
+                (ai[i].type & XvImageMask))
             {
-                if ((ai[i].type & XvInputMask) &&
-                    (ai[i].type & XvImageMask))
+                for(unsigned int p = ai[i].base_id;
+                        p < (ai[i].base_id + ai[i].num_ports);
+                        p++)
                 {
-                    xv_port = ai[i].base_id;
-                    break;
+                    if(XvGrabPort(data->XJ_disp, p, CurrentTime) == Success)
+                    {
+                        xv_port = p;
+                        VERBOSE(VB_GENERAL,
+                                QString("Using XV port %1").arg(xv_port));
+                        break;
+                    }
                 }
             }
- 
-            if (p_num_adaptors > 0)
-                XvFreeAdaptorInfo(ai);
         }
+ 
+        if (p_num_adaptors > 0)
+            XvFreeAdaptorInfo(ai);
+    }
 
     use_shm = 0;
     char *dispname = DisplayString(data->XJ_disp);
@@ -374,9 +383,6 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
 
         if (fo)
             XFree(fo);
-
-        VERBOSE(VB_GENERAL, QString("Using XV port %1").arg(xv_port));
-        XvGrabPort(data->XJ_disp, xv_port, CurrentTime);
     }
 
     data->XJ_gc = XCreateGC(data->XJ_disp, data->XJ_win, 0, 0);
