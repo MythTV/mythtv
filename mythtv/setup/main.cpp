@@ -354,6 +354,10 @@ int main(int argc, char *argv[])
     if (!dir.exists())
         dir.mkdir(fileprefix);
 
+    if ("y" != getResponse("This will clear all program/channel/recording/card "
+                           "info from the database.\nProceed?", "y"))
+        exit(1);
+
     clearDB();
 
     getCaptureCards();
