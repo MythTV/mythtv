@@ -32,37 +32,46 @@ package mythtv::db;
 
 # Read the mysql.txt file in use by MythTV.
 # could be in a couple places, so try the usual suspects
-    open(CONF, "$ENV{HOME}/.mythtv/mysql.txt")
-        or open(CONF, "/usr/share/mythtv/mysql.txt")
-        or open(CONF, "/usr/local/share/mythtv/mysql.txt")
-        or open(CONF, "/etc/mythtv/mysql.txt")
-        or die ("Unable to locate mysql.txt:  $!\n\n");
-    while (my $line = <CONF>) {
-    # Cleanup
-        next if ($line =~ /^\s*#/);
-        $line =~ s/^str //;
-        chomp($line);
-    # Split off the var=val pairs
-        my ($var, $val) = split(/\=/, $line, 2);
-        next unless ($var && $var =~ /\w/);
-        if ($var eq 'DBHostName') {
-            $db_host = $val;
+    my $found = 0;
+    my @mysql = ("/usr/local/share/mythtv/mysql.txt",
+                 "/usr/share/mythtv/mysql.txt",
+                 "/etc/mythtv/mysql.txt",
+                 "/usr/local/etc/mythtv/mysql.txt",
+                 "$ENV{HOME}/.mythtv/mysql.txt",
+                 "mysql.txt"
+                );
+    foreach my $file (@mysql) {
+        next unless (-e $file);
+        $found = 1;
+        open(CONF, $file) or die "Unable to open $file:  $!\n\n";
+        while (my $line = <CONF>) {
+        # Cleanup
+            next if ($line =~ /^\s*#/);
+            $line =~ s/^str //;
+            chomp($line);
+        # Split off the var=val pairs
+            my ($var, $val) = split(/\=/, $line, 2);
+            next unless ($var && $var =~ /\w/);
+            if ($var eq 'DBHostName') {
+                $db_host = $val;
+            }
+            elsif ($var eq 'DBUserName') {
+                $db_user = $val;
+            }
+            elsif ($var eq 'DBName') {
+                $db_name = $val;
+            }
+            elsif ($var eq 'DBPassword') {
+                $db_pass = $val;
+            }
+        # Hostname override
+            elsif ($var eq 'LocalHostName') {
+                $hostname = $val;
+            }
         }
-        elsif ($var eq 'DBUserName') {
-            $db_user = $val;
-        }
-        elsif ($var eq 'DBName') {
-            $db_name = $val;
-        }
-        elsif ($var eq 'DBPassword') {
-            $db_pass = $val;
-        }
-    # Hostname override
-        elsif ($var eq 'LocalHostName') {
-            $hostname = $val;
-        }
+        close CONF;
     }
-    close CONF;
+    die "Unable to locate mysql.txt:  $!\n\n" unless ($found && $db_host);
 
 # Connect to the database
     $dbh = DBI->connect("dbi:mysql:database=$db_name:host=$db_host", $db_user, $db_pass)
