@@ -1,10 +1,10 @@
 Installing mythtv on Mandrake 9.0
 Robert Kulagowski, rkulagow@rocketmail.com
-2002-11-04, v1.00
+2002-11-07, v1.01
 
 o  Introduction.
 
-Installing on Mandrake 9.0 is made fairmly simple since a lot of the
+Installing on Mandrake 9.0 is made fairly simple since a lot of the
 prerequisites are already packaged.  This README focuses mainly on getting
 mythtv operational in North America.  Other sections will be added once I
 get interested in mythweb, etc.
@@ -27,8 +27,7 @@ term.  You should find it under the "Perl" folder.  You need at least the
 perl 5.80 base package installed.  If not, click on the "Mark" button.
 
 Next, search for mysql - it should be under "Databases".  Make sure that
-mysql
-and mysql-clients are installed.  If not, click on "Mark".
+mysql and mysql-clients are installed.  If not, click on "Mark".
 
 Search for gcc.  You're going to need gcc and gcc-c++ installed.
 
@@ -211,6 +210,96 @@ Setup the initial mysql databases:
 
 % cd database
 % mysql -u root < mc.sql
+
+o  Setting up alsa and the mixer.
+
+If your video doesn't appear to be in-sync with your audio, it could be
+because you are listening to the real-time audio from your video card rather
+than after it's been processed and synced to the video by mythtv.
+
+What you need to do is to mute the "line-in" of your soundcard and also set
+it as the recording source.
+
+Open Kmix by K->Multimedia->Sound->Kmix
+
+Click on Settings->Configure  Make sure that "Tick Marks" and "Show labels"
+have "X"'s in them.  This will make it easier to find the correct audio
+source.  Click OK.
+
+On the mixer page, look for Line-In on your soundcard.  You should see two
+LED's - a green one at the top, and a red one at the bottom.  The green one
+at the top is for muting; you want to make sure that the green LED is a dark
+green, meaning that it's "off".  You also want to click on the red LED so
+that it turns bright red, indicating that it's "ON"; this insures that the
+Line-in is used as the source.  Click OK, and make sure that you save the
+settings so that this is your default.
+
+o  Setting up a remote control.
+
+You're going to need to download and compile lircd.  Go to
+http://www.lircd.org and download lirc; as of 2002-11-07, the version
+available is 0.6.6.  Grab the remotes.tgz file as well.
+
+lircd has two prerequisites:  dialog, available in Mandrake through the
+"cdialog" RPM, and the kernel source.  Mandrake 9.0 is using the 2.4.19
+kernel, so the easiest thing is to go to http://www.kernel.org and download
+the full 2.4.19 tar file.
+
+Open a shell and login as superuser.
+
+% su -
+# cd /home/[yourusername]
+# mkdir /usr/src
+# mv linux-2.4.19.tar.bz2 /usr/src
+# cd /usr/src
+# tar -xjf linux-2.4.19.tar.bz2
+# chown -R root.root linux-2.4.19
+# ln -sf linux-2.4.19 linux
+# exit
+% tar -xjf lirc-0.6.6.tar.bz2
+% cd lirc-0.6.6
+% ./setup.sh
+
+You're going to need to know what sort of receiver you have and where it's
+connected.  In my case, I have a Pinnacle Studio TV card, with the IR
+receiver connected to COM1 (/dev/ttys0), so once the configuration menu came
+up I did Driver Configuration->Other Serial Port Devices->Pinnacle Systems
+Receiver->OK and on the next page selected COM1->OK.
+
+You then click "Save Configuration and run configure" to continue.
+
+Once the configuration step is complete:
+
+% make
+% su -
+# cd /home/[yourusername]
+# make install
+# chmod 666 /dev/lircd
+# /usr/local/sbin/lircd
+# cd /etc/rc.d
+# cat >> rc.local
+echo "Starting lircd"
+/usr/local/sbin/lircd
+^D
+# exit
+% 
+
+This takes care of the lircd portion, which "listens" for the IR signals. 
+The next step is to convert those signals into something that can be used to
+mythtv.
+
+% cd ~/mythtv-0.6/configfiles
+% cp lircrc.example ~/.lircrc
+% irxevent
+
+Start pressing the keys on your remote; you should see them appear
+on-screen.  If you don't see letters and digits at this point, you need to
+troubleshoot further.
+
+If it is working, then press CTRL-C to abort the program.  irxevent isn't a
+daemon, so if it is working you need to run it like this:
+
+% irxevent &
 
 That's it.  Now, you can just follow the rest of the README and continue
 from there.

@@ -48,7 +48,10 @@ static unsigned safe_read(int fd, void *data, unsigned sz)
 	{
 	    tot+=ret;
 	}
-	if(tot < sz) usleep(1000);
+        if (ret == 0) // EOF returns 0
+            break;
+	if(tot < sz) 
+           usleep(1000);
     }
     return tot;
 }
@@ -276,6 +279,7 @@ RingBuffer::RingBuffer(const QString &lfilename, long long size,
 
 RingBuffer::~RingBuffer(void)
 {
+    pthread_rwlock_wrlock(&rwlock);
     if (tfw)
     {
 	delete tfw;

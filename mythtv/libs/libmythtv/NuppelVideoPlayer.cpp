@@ -921,7 +921,7 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
 	    }
         }
 	  
-        if (frameheader.packetlength!=0) {
+        if (frameheader.packetlength!=0 && frameheader.packetlength > 0) {
             if (ringBuffer->Read(strm, frameheader.packetlength) != 
                 frameheader.packetlength) 
             {
