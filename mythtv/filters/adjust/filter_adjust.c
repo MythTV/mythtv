@@ -14,8 +14,7 @@
 
 #include "mmx.h"
 
-static mmx_t mm_cpool[] = {
-    { q: 0x0LL },
+static const mmx_t mm_cpool[] = {
     { w: {1, 1, 1, 1} },
     { ub: {36, 36, 36, 36, 36, 36, 36, 36} },
     { ub: {20, 20, 20, 20, 20, 20, 20, 20} },
@@ -164,7 +163,7 @@ typedef struct ThisFilter
     TF_STRUCT;
 } ThisFilter;
 
-void adjustRegion(uint8_t *buf, uint8_t *end, uint8_t *table)
+void adjustRegion(uint8_t *buf, uint8_t *end, const uint8_t *table)
 {
     while (buf < end)
     {
@@ -173,92 +172,69 @@ void adjustRegion(uint8_t *buf, uint8_t *end, uint8_t *table)
     }
 }
 
-void adjustRegionMMX(uint8_t *buf, uint8_t *end, uint8_t *table, mmx_t *shift,
-                     mmx_t *scale, mmx_t *min, mmx_t *clamp1, mmx_t *clamp2)
+void adjustRegionMMX(uint8_t *buf, uint8_t *end, const uint8_t *table,
+                     const mmx_t *shift, const mmx_t *scale, const mmx_t *min,
+                     const mmx_t *clamp1, const mmx_t *clamp2)
 {
-    while (buf < end - 31)
+    movq_m2r (*scale, mm6);
+    movq_m2r (*min, mm7);
+    while (buf < end - 15)
     {
         movq_m2r (buf[0], mm0);
         movq_m2r (buf[8], mm2);
-        movq_m2r (buf[16], mm4);
-        movq_m2r (buf[24], mm6);
+        movq_m2r (*shift, mm4);
+        pxor_r2r (mm5, mm5);
 
-        psubusb_m2r (*min, mm0);
-        psubusb_m2r (*min, mm2);
-        psubusb_m2r (*min, mm4);
-        psubusb_m2r (*min, mm6);
+        psubusb_r2r (mm7, mm0);
+        psubusb_r2r (mm7, mm2);
 
         movq_r2r (mm0, mm1);
         movq_r2r (mm2, mm3);
-        movq_r2r (mm4, mm5);
-        movq_r2r (mm6, mm7);
 
-        punpcklbw_m2r (mm_cpool[0], mm0);
-        punpckhbw_m2r (mm_cpool[0], mm1);
-        punpcklbw_m2r (mm_cpool[0], mm2);
-        punpckhbw_m2r (mm_cpool[0], mm3);
-        punpcklbw_m2r (mm_cpool[0], mm4);
-        punpckhbw_m2r (mm_cpool[0], mm5);
-        punpcklbw_m2r (mm_cpool[0], mm6);
-        punpckhbw_m2r (mm_cpool[0], mm7);
+        punpcklbw_r2r (mm5, mm0);
+        punpckhbw_r2r (mm5, mm1);
+        punpcklbw_r2r (mm5, mm2);
+        punpckhbw_r2r (mm5, mm3);
 
-        psllw_m2r (*shift, mm0);
-        psllw_m2r (*shift, mm1);
-        psllw_m2r (*shift, mm2);
-        psllw_m2r (*shift, mm3);
-        psllw_m2r (*shift, mm4);
-        psllw_m2r (*shift, mm5);
-        psllw_m2r (*shift, mm6);
-        psllw_m2r (*shift, mm7);
+        movq_m2r (mm_cpool[0], mm5);
 
-        pmulhw_m2r (*scale, mm0);
-        pmulhw_m2r (*scale, mm1);
-        pmulhw_m2r (*scale, mm2);
-        pmulhw_m2r (*scale, mm3);
-        pmulhw_m2r (*scale, mm4);
-        pmulhw_m2r (*scale, mm5);
-        pmulhw_m2r (*scale, mm6);
-        pmulhw_m2r (*scale, mm7);
+        psllw_r2r (mm4, mm0);
+        psllw_r2r (mm4, mm1);
+        psllw_r2r (mm4, mm2);
+        psllw_r2r (mm4, mm3);
 
-        paddw_m2r (mm_cpool[1], mm0);
-        paddw_m2r (mm_cpool[1], mm1);
-        paddw_m2r (mm_cpool[1], mm2);
-        paddw_m2r (mm_cpool[1], mm3);
-        paddw_m2r (mm_cpool[1], mm4);
-        paddw_m2r (mm_cpool[1], mm5);
-        paddw_m2r (mm_cpool[1], mm6);
-        paddw_m2r (mm_cpool[1], mm7);
+        movq_m2r (*clamp1, mm4);
+
+        pmulhw_r2r (mm6, mm0);
+        pmulhw_r2r (mm6, mm1);
+        pmulhw_r2r (mm6, mm2);
+        pmulhw_r2r (mm6, mm3);
+
+        paddw_r2r (mm5, mm0);
+        paddw_r2r (mm5, mm1);
+        paddw_r2r (mm5, mm2);
+        paddw_r2r (mm5, mm3);
+
+        movq_m2r (*clamp2, mm5);
 
         psrlw_i2r (1, mm0);
         psrlw_i2r (1, mm1);
         psrlw_i2r (1, mm2);
         psrlw_i2r (1, mm3);
-        psrlw_i2r (1, mm4);
-        psrlw_i2r (1, mm5);
-        psrlw_i2r (1, mm6);
-        psrlw_i2r (1, mm7);
 
         packuswb_r2r (mm1, mm0);
         packuswb_r2r (mm3, mm2);
-        packuswb_r2r (mm5, mm4);
-        packuswb_r2r (mm7, mm6);
 
-        paddusb_m2r (*clamp1, mm0);
-        paddusb_m2r (*clamp1, mm2);
-        paddusb_m2r (*clamp1, mm4);
-        paddusb_m2r (*clamp1, mm6);
+        paddusb_r2r (mm4, mm0);
+        paddusb_r2r (mm4, mm2);
 
-        psubusb_m2r (*clamp2, mm0);
-        psubusb_m2r (*clamp2, mm2);
-        psubusb_m2r (*clamp2, mm4);
-        psubusb_m2r (*clamp2, mm6);
+        psubusb_r2r (mm5, mm0);
+        psubusb_r2r (mm5, mm2);
 
         movq_r2m (mm0, buf[0]);
         movq_r2m (mm2, buf[8]);
-        movq_r2m (mm4, buf[16]);
-        movq_r2m (mm6, buf[24]);
 
-        buf += 32;
+        buf += 16;
     }
     while (buf < end)
     {
@@ -278,13 +254,13 @@ int adjustFilter (VideoFilter *vf, VideoFrame *frame)
     if (filter->yfilt)
         adjustRegionMMX(frame->buf, frame->buf + filter->yend, filter->ytable,
                         &(filter->yshift), &(filter->yscale), &(filter->ymin),
-                        mm_cpool + 2, mm_cpool + 3);
+                        mm_cpool + 1, mm_cpool + 2);
     else
         adjustRegion(frame->buf, frame->buf + filter->yend, filter->ytable);
     if (filter->cfilt)
         adjustRegionMMX(frame->buf + filter->yend, frame->buf + filter->cend,
                         filter->ctable, &(filter->cshift), &(filter->cscale),
-                        &(filter->cmin), mm_cpool + 2, mm_cpool + 3);
+                        &(filter->cmin), mm_cpool + 3, mm_cpool + 4);
     else
         adjustRegion(frame->buf + filter->yend, frame->buf + filter->cend,
                      filter->ytable);
@@ -366,7 +342,7 @@ newAdjustFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
         numopts = sscanf(options, "%d:%d:%f:%d:%d:%f", &ymin, &ymax, &ygamma,
                          &cmin, &cmax, &cgamma);
 
-    if (numopts != 6)
+    if (numopts != 6 || (numopts !=1 && ymin != -1))
     {
         ymin = 16;
         ymax = 253;
@@ -382,6 +358,13 @@ newAdjustFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     {
         fprintf (stderr, "adjust: failed to allocate memory for filter\n");
         return NULL;
+    }
+
+    if (ymin == -1)
+    {
+        filter->vf.filter = NULL;
+        filter->vf.cleanup = NULL;
+        return (VideoFilter *) filter;
     }
 
 #ifdef i386
