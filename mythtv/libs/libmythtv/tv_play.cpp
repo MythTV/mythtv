@@ -85,7 +85,8 @@ void TV::Init(void)
 
     watchingLiveTV = false;
 
-    volumeControl = new VolumeControl(true);
+    if (gContext->GetNumSetting("MythControlsVolume", 1))
+        volumeControl = new VolumeControl(true);
 
     pthread_create(&event, NULL, EventThread, this);
 

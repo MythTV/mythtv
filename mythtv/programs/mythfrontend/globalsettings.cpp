@@ -56,6 +56,19 @@ AudioOutputDevice::AudioOutputDevice():
     }
 }
 
+class MythControlsVolume: public CheckBoxSetting, public GlobalSetting {
+public:
+    MythControlsVolume():
+        GlobalSetting("MythControlsVolume") {
+        setLabel("Use internal volume controls");
+        setValue(true);
+        setHelpText("MythTV can control the PCM and master "
+                    "mixer volume.  If you prefer to use an external mixer "
+                    "program, uncheck this box.  If you uncheck the box, "
+                    "then ignore the next two settings.");
+    };
+};
+
 class MixerDevice: public ComboBoxSetting, public GlobalSetting {
 public:
     MixerDevice();
@@ -88,7 +101,7 @@ MixerDevice::MixerDevice():
 class MixerVolume: public SliderSetting, public GlobalSetting {
 public:
     MixerVolume():
-	SliderSetting(0, 100, 10),
+	SliderSetting(0, 100, 1),
         GlobalSetting("MasterMixerVolume") {
         setLabel("Master Mixer Volume");
         setValue(70);
@@ -101,7 +114,7 @@ public:
 class PCMVolume: public SliderSetting, public GlobalSetting {
 public:
     PCMVolume():
-        SliderSetting(0, 100, 10),
+        SliderSetting(0, 100, 1),
         GlobalSetting("PCMMixerVolume") {
         setLabel("PCM Mixer Volume");
         setValue(70);
@@ -751,16 +764,21 @@ PlaybackSettings::PlaybackSettings()
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
     general->setLabel("General playback");
-    general->addChild(new AudioOutputDevice());
-    general->addChild(new MixerDevice());
-    general->addChild(new MixerVolume());
-    general->addChild(new PCMVolume());
     general->addChild(new Deinterlace());
     general->addChild(new ReduceJitter());
     general->addChild(new PlaybackExitPrompt());
     general->addChild(new EndOfRecordingExitPrompt());
     general->addChild(new FixedAspectRatio());
     addChild(general);
+
+    VerticalConfigurationGroup *audio = new VerticalConfigurationGroup(false);
+    audio->setLabel("Audio");
+    audio->addChild(new AudioOutputDevice());
+    audio->addChild(new MythControlsVolume());
+    audio->addChild(new MixerDevice());
+    audio->addChild(new MixerVolume());
+    audio->addChild(new PCMVolume());
+    addChild(audio);
 
     VerticalConfigurationGroup* seek = new VerticalConfigurationGroup(false);
     seek->setLabel("Seeking");
@@ -797,7 +815,6 @@ GeneralSettings::GeneralSettings()
     general2->addChild(new DefaultTVChannel());
     general2->addChild(new DisplayChanNum());
     addChild(general2);
-
 
     VerticalConfigurationGroup* general3 = new VerticalConfigurationGroup(false);
     general3->setLabel("General");
