@@ -97,12 +97,11 @@ void MMusicWatcher::run()
     while(keep_going)
     {
         //
-        //  Check to see if our sweep interval has elapsed (default is 5
+        //  Check to see if our sweep interval has elapsed (default is 15
         //  minutes). Set to 0 to only sweep when a sweep is forced
         //
 
-        //  int sweep_wait = mfdContext->getNumSetting("music_sweep_time", 5) * 60 * 1000;  
-        int sweep_wait = mfdContext->getNumSetting("music_sweep_time", 5) * 1000;  
+        int sweep_wait = mfdContext->getNumSetting("music_sweep_time", 15) * 60 * 1000;  
         if( ( metadata_sweep_time.elapsed() > sweep_wait  &&
               sweep_wait > 0 ) || force_sweep)
         {

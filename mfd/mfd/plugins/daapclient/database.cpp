@@ -673,6 +673,12 @@ void Database::parseItems(TagInput& dmap_data, int how_many_now)
                                     new_item_track_number,
                                     new_item_total_time
                                 );
+            /*
+            if(new_item_format == "wma")
+            {
+                cout << "adding wma called " << new_item_name << " with id of " << new_item_id << endl;
+            }
+            */
 
             //
             //  Add in whatever else the daap server told us about

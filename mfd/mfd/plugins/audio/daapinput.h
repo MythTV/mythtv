@@ -71,6 +71,7 @@ class DaapInput: public QIODevice
     int                 payload_bytes_read;
     uint                fake_seek_position;
     MFDServicePlugin    *parent;
+    int                 connection_count;
 
 };
 

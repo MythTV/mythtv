@@ -37,6 +37,7 @@ DaapInput::DaapInput(MFDServicePlugin *owner, QUrl a_url)
     total_possible_range = 0;
     range_begin = 0;
     range_end = 0;
+    connection_count = 0;
     
     //
     //  parse out my url
@@ -57,6 +58,11 @@ DaapInput::DaapInput(MFDServicePlugin *owner, QUrl a_url)
 
 bool DaapInput::open(int)
 {
+    log(QString("beginning to go and retrieve daap://%1:%2%3")
+        .arg(my_host)
+        .arg(my_port)
+        .arg(my_url.path())
+        , 5);
     if(socket_to_daap_server)
     {
         delete socket_to_daap_server;
@@ -106,6 +112,7 @@ bool DaapInput::open(int)
     }
     
     connected = true;   
+    connection_count++;
     
     //
     //  We have made the basic connection, now we need to see if we can get
@@ -221,6 +228,7 @@ bool DaapInput::at(unsigned long int an_offset)
     //
     //  Can't seek beyond the end of the file !
     //
+
     if(an_offset > total_possible_range)
     {
         warning("something wanted me to seek beyond my size");
@@ -291,6 +299,7 @@ bool DaapInput::at(unsigned long int an_offset)
     }
     
     connected = true;   
+    connection_count++;
 
     //
     //  Send a request that positions us exactly where the at(int) seek call asked to be
@@ -469,9 +478,6 @@ void DaapInput::eatThroughHeadersAndGetToPayload()
         uint content_length = content_length_header->getValue().toUInt(&ok);
         if(ok)
         {
-            log(QString("got daap response with payload "
-                        "of size %1")
-                        .arg(content_length), 8);
             payload_size = content_length;
         }
         else
@@ -551,11 +557,13 @@ void DaapInput::eatThroughHeadersAndGetToPayload()
         
         if(all_is_well)
         {
+            /*
             log(QString("parsed content range in daap response as "
                         "%1-%2/%3")
                         .arg(range_begin)
                         .arg(range_end)
                         .arg(total_possible_range), 9);
+            */
             fake_seek_position = range_begin;
         }
         else
@@ -639,6 +647,11 @@ void DaapInput::warning(const QString &warn_message)
 
 DaapInput::~DaapInput()
 {
+    log(QString("finished with daap://%1:%2%3 (took %4 connection(s))")
+        .arg(my_host)
+        .arg(my_port)
+        .arg(my_url.path())
+        .arg(connection_count), 5);
     if(socket_to_daap_server)
     {
         delete socket_to_daap_server;

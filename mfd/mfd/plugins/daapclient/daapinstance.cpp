@@ -153,9 +153,12 @@ void DaapInstance::run()
     
     service_details_mutex.unlock();
     
-    int a_socket = -1;
+    int a_socket;
     while(keep_going)
     {
+    
+        a_socket = -1;
+        
         //
         //  Just keep checking the server socket to look for data
         //
@@ -171,14 +174,37 @@ void DaapInstance::run()
         FD_ZERO(&readfds);
         if(client_socket_to_daap_server)
         {
-            if(client_socket_to_daap_server->socket() > 0)
+            a_socket = client_socket_to_daap_server->socket();
+            if(a_socket > 0)
             {
-                FD_SET(client_socket_to_daap_server->socket(), &readfds);
-                if(nfds <= client_socket_to_daap_server->socket())
+                FD_SET(a_socket, &readfds);
+                if(a_socket)
                 {
-                    nfds = client_socket_to_daap_server->socket() + 1;
+                    nfds = a_socket + 1;
                 }
             }
+            else
+            {
+                //
+                //  Server disappeared
+                //
+
+                log("daap server disappeared ... this instance is terminating", 6);
+                    
+                keep_going_mutex.lock();
+                    keep_going = false;
+                keep_going_mutex.unlock();
+                a_socket = -1;
+            }
+        }
+        else
+        {
+            log("daap server got destroyed (?) ... this client instance is terminating", 6);
+                   
+            keep_going_mutex.lock();
+                keep_going = false;
+            keep_going_mutex.unlock();
+            a_socket = -1;
         }
         
         //
@@ -192,9 +218,17 @@ void DaapInstance::run()
         }
     
 
-        
-        timeout.tv_sec = 10;
-        timeout.tv_usec = 0;
+        if(a_socket > 0)
+        {
+            timeout.tv_sec = 10;
+            timeout.tv_usec = 0;
+        }
+        else
+        {
+            timeout.tv_sec = 0;
+            timeout.tv_usec = 0;
+        }
+
         int result = select(nfds, &readfds, NULL, NULL, &timeout);
         if(result < 0)
         {
@@ -236,7 +270,7 @@ void DaapInstance::run()
                 keep_going_mutex.lock();
                     keep_going = false;
                 keep_going_mutex.unlock();
-                a_socket = 0;
+                a_socket = -1;
             }
             if(FD_ISSET(u_shaped_pipe[0], &readfds))
             {

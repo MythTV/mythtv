@@ -32,10 +32,9 @@ using namespace std;
 
 #include "settings.h"
 
-static FLAC__SeekableStreamDecoderReadStatus flacread(const FLAC__SeekableStreamDecoder *decoder, FLAC__byte bufferp[], unsigned *bytes, void *client_data)
+extern "C" FLAC__SeekableStreamDecoderReadStatus flacread(const FLAC__SeekableStreamDecoder *decoder, FLAC__byte bufferp[], unsigned *bytes, void *client_data)
 {
     decoder = decoder;
-
     FlacDecoder *dflac = (FlacDecoder *) client_data;
     int len = dflac->input()->readBlock((char *)bufferp, *bytes);
 
@@ -48,7 +47,7 @@ static FLAC__SeekableStreamDecoderReadStatus flacread(const FLAC__SeekableStream
     return FLAC__SEEKABLE_STREAM_DECODER_READ_STATUS_OK;
 }
 
-static FLAC__SeekableStreamDecoderSeekStatus flacseek(const FLAC__SeekableStreamDecoder *decoder, FLAC__uint64 absolute_byte_offset, void *client_data) 
+extern "C" FLAC__SeekableStreamDecoderSeekStatus flacseek(const FLAC__SeekableStreamDecoder *decoder, FLAC__uint64 absolute_byte_offset, void *client_data) 
 {
     decoder = decoder;
     FlacDecoder *dflac = (FlacDecoder *)client_data;
@@ -61,7 +60,7 @@ static FLAC__SeekableStreamDecoderSeekStatus flacseek(const FLAC__SeekableStream
     return FLAC__SEEKABLE_STREAM_DECODER_SEEK_STATUS_ERROR;
 }
 
-static FLAC__SeekableStreamDecoderTellStatus flactell(const FLAC__SeekableStreamDecoder *decoder, FLAC__uint64 *absolute_byte_offset, void *client_data)
+extern "C" FLAC__SeekableStreamDecoderTellStatus flactell(const FLAC__SeekableStreamDecoder *decoder, FLAC__uint64 *absolute_byte_offset, void *client_data)
 {
     decoder = decoder;
     FlacDecoder *dflac = (FlacDecoder *)client_data;
@@ -72,7 +71,7 @@ static FLAC__SeekableStreamDecoderTellStatus flactell(const FLAC__SeekableStream
     return FLAC__SEEKABLE_STREAM_DECODER_TELL_STATUS_OK;
 }
 
-static FLAC__SeekableStreamDecoderLengthStatus flaclength(const FLAC__SeekableStreamDecoder *decoder, FLAC__uint64 *stream_length, void *client_data)
+extern "C" FLAC__SeekableStreamDecoderLengthStatus flaclength(const FLAC__SeekableStreamDecoder *decoder, FLAC__uint64 *stream_length, void *client_data)
 {
     decoder = decoder;
 
@@ -82,7 +81,7 @@ static FLAC__SeekableStreamDecoderLengthStatus flaclength(const FLAC__SeekableSt
     return FLAC__SEEKABLE_STREAM_DECODER_LENGTH_STATUS_OK;
 }
 
-static FLAC__bool flaceof(const FLAC__SeekableStreamDecoder *decoder, void *client_data)
+extern "C" FLAC__bool flaceof(const FLAC__SeekableStreamDecoder *decoder, void *client_data)
 {
     decoder = decoder;
 
@@ -91,7 +90,7 @@ static FLAC__bool flaceof(const FLAC__SeekableStreamDecoder *decoder, void *clie
     return dflac->input()->atEnd();
 }
 
-static FLAC__StreamDecoderWriteStatus flacwrite(const FLAC__SeekableStreamDecoder *decoder, const FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data)
+extern "C" FLAC__StreamDecoderWriteStatus flacwrite(const FLAC__SeekableStreamDecoder *decoder, const FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data)
 {
     decoder = decoder;
 
@@ -138,7 +137,7 @@ void FlacDecoder::doWrite(const FLAC__Frame *frame,
     }
 }
 
-/*
+
 
 static void flacmetadata(const FLAC__SeekableStreamDecoder *decoder, const FLAC__StreamMetadata *metadata, void *client_data)
 {
@@ -159,7 +158,7 @@ void FlacDecoder::setFlacMetadata(const FLAC__StreamMetadata *metadata)
     if (output())
         output()->configure(freq, chan, bitspersample, 0);
 }
-*/
+
 
 static void flacerror(const FLAC__SeekableStreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data)
 {
@@ -282,8 +281,10 @@ bool FlacDecoder::initialize()
     output_at = 0;
     output_bytes = 0;
 
-    if (! input()->isOpen()) {
-        if (! input()->open(IO_ReadOnly)) {
+    if (! input()->isOpen())
+    {
+        if (! input()->open(IO_ReadOnly)) 
+        {
             error("FlacOgg: Failed to open input. Error " +
                   QString::number(input()->status()) + ".");
             return FALSE;
@@ -298,7 +299,7 @@ bool FlacDecoder::initialize()
     FLAC__seekable_stream_decoder_set_length_callback(decoder, flaclength);
     FLAC__seekable_stream_decoder_set_eof_callback(decoder, flaceof);
     FLAC__seekable_stream_decoder_set_write_callback(decoder, flacwrite);
-    //FLAC__seekable_stream_decoder_set_metadata_callback(decoder, flacmetadata);
+    FLAC__seekable_stream_decoder_set_metadata_callback(decoder, flacmetadata);
     FLAC__seekable_stream_decoder_set_error_callback(decoder, flacerror);
     FLAC__seekable_stream_decoder_set_client_data(decoder, this);
 
@@ -308,7 +309,6 @@ bool FlacDecoder::initialize()
 
     totalTime = 0; 
     totalTime = totalTime < 0 ? 0 : totalTime;
-
     FLAC__seekable_stream_decoder_init(decoder);
     FLAC__seekable_stream_decoder_process_until_end_of_metadata(decoder);
 
@@ -348,7 +348,6 @@ void FlacDecoder::run()
 
         return;
     }
-
     stat = DecoderEvent::Decoding;
 
     mutex()->unlock();
@@ -361,11 +360,13 @@ void FlacDecoder::run()
     bool flacok = true;
     FLAC__SeekableStreamDecoderState decoderstate;
 
-    while (! done && ! finish) {
+    while (! done && ! finish)
+    {
         mutex()->lock();
         // decode
 
-        if (seekTime >= 0.0) {
+        if (seekTime >= 0.0) 
+        {
             FLAC__uint64 sample = (FLAC__uint64)(seekTime * 44100.0);
             if (sample > totalsamples - 50)
                 sample = totalsamples - 50;
@@ -379,15 +380,19 @@ void FlacDecoder::run()
         if (decoderstate == 0 || decoderstate == 1)
         {
             if (output())
+            {
                 flush();
+            }
         } 
         else 
         {
             flush(TRUE);
 
-            if (output()) {
+            if (output())
+            {
                 output()->recycler()->mutex()->lock();
-                while (! output()->recycler()->empty() && ! user_stop) {
+                while (! output()->recycler()->empty() && ! user_stop)
+                {
                     output()->recycler()->cond()->wakeOne();
                     mutex()->unlock();
                     output()->recycler()->cond()->wait(
@@ -398,13 +403,15 @@ void FlacDecoder::run()
             }
 
             done = TRUE;
-            if (!user_stop) {
+            if (!user_stop) 
+            {
                 finish = TRUE;
             }
         }
 
         mutex()->unlock();
     }
+    
 
     mutex()->lock();
 

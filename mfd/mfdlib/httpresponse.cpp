@@ -733,6 +733,8 @@ void HttpResponse::streamFile(MFDServiceClientSocket *which_client)
 //  uses callbacks
 //
 
+
+
 extern "C" FLAC__StreamDecoderWriteStatus flacWriteCallback(
                                                             const FLAC__FileDecoder *flac_decoder, 
                                                             const FLAC__Frame *frame, 
@@ -1417,7 +1419,7 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
             memcpy(headbuf+8, "WAVE", 4);
             memcpy(headbuf+12, "fmt ", 4);
             WRITE_U32(headbuf+16, 16);
-            WRITE_U16(headbuf+20, 1); /* format */
+            WRITE_U16(headbuf+20, 1); // format
             WRITE_U16(headbuf+22, channels);
             WRITE_U32(headbuf+24, samplerate);
             WRITE_U32(headbuf+28, bytespersec);
