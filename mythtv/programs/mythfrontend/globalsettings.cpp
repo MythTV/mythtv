@@ -1534,7 +1534,7 @@ public:
         GlobalSetting("MonitorDrives") {
         setLabel(QObject::tr("Monitor CD/DVD"));
         setHelpText(QObject::tr("This enables support for monitoring "
-                    "your CD/DVD drives for new disks and launching"
+                    "your CD/DVD drives for new disks and launching "
                     "the proper plugin to handle them."));
         setValue(false);
     };
