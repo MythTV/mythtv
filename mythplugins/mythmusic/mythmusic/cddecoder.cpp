@@ -132,8 +132,11 @@ bool CdDecoder::initialize()
 
     totalTime = ((end - start + 1) * CD_FRAMESAMPLES) / 44100.0;
 
+    chan = 2;
+    freq = 44100;
+
     if (output())
-        output()->Reconfigure(16, 2, 44100);
+        output()->Reconfigure(16, chan, freq);
 
     inited = TRUE;
     return TRUE;
