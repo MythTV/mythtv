@@ -21,7 +21,12 @@ int mythplugin_config(void);
 
 void runMfe(void)
 {
-    MfdInterface *mfd_interface = new MfdInterface();
+    int screen_width = 0;
+    int screen_height = 0;
+    float screen_wmult = 0.0;
+    float screen_hmult = 0.0;
+    gContext->GetScreenSettings(screen_width, screen_wmult, screen_height, screen_hmult);
+    MfdInterface *mfd_interface = new MfdInterface(screen_width, screen_height);
     MfeDialog *mfe_dialog = new MfeDialog(
                                             gContext->GetMainWindow(),
                                             "mfe_dialog",

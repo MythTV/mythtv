@@ -23,7 +23,6 @@ MfeDialog::MfeDialog(
         
     mfd_interface = an_mfd_interface;
 
-
     //
     //  Wire up the theme
     //
