@@ -861,7 +861,7 @@
   once a day.
 
   The default [1mmythcrontab [22mfile will run the [1mmythfilldatabase [22mprogram
-  every day at 1800 (6 PM).  If you want to change this, then open the
+  every day at 0430.  If you want to change this, then open the
   configfiles/mythcrontab file in your favorite editor and modify it as
   you like.  Once you're satisfied with the time that [1mmythfilldatabase[0m
   will run, save and exit, and return to the shell prompt.
@@ -877,22 +877,22 @@
        # The following will run the mythfilldatabase shell script at 18:00 every
        day.  Format is
        # minutes hour day_of_month month day_of_week
-       # In the case of mythfilldatabase, we want it to run at 1800 daily.
+       # In the case of mythfilldatabase, we want it to run at 0430 daily.
        # man 5 crontab for more information
        # Need to use a shell script because the QTDIR environment variable isn't
        # being honored by crontab?
        # The next part is all on one line.
-       0 18 * * * /bin/bash $HOME/mythtv/MC/configfiles/mythfilldatabasecron
+       30 04 * * * /bin/bash $HOME/mythtv/MC/configfiles/mythfilldatabasecron
        %
 
 
 
-  As you can see, [1mmythfilldatabase [22mwill now be run at 1800 (6 PM) every
-  day.
+  As you can see, [1mmythfilldatabase [22mwill now be run at 0430 every day.
 
   If you decide to alter the time that the [1mmythfilldatabase [22mruns, you
   can use the crontab command to open your existing job and edit it in
   place.
+
 
        % crontab -e
 
@@ -941,6 +941,10 @@
   /usr/local/share/mythtv/themes directory.  Change the first variable
   in the theme.txt file and exit and restart [1mmythfrontend [22mfor it to take
   effect.
+
+  [1mNOTE[22m: Exiting [1mmythfrontend [22mwill stop any recordings you have in
+  progress, so make sure that the system isn't busy if you modify the
+  theme while [1mmythfrontend [22mis still running.
 
 
   [1m10.  Using mythweb.[0m

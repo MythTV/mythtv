@@ -104,7 +104,7 @@ the database.</P>
 <P>In order to keep your database filled, <B>mythfilldatabase</B> should be
 run once a day.</P>
 <P>The default <B>mythcrontab</B> file will run the <B>mythfilldatabase</B>
-program every day at 1800 (6 PM).  If you want to change this, then open the
+program every day at 0430.  If you want to change this, then open the
 <CODE>configfiles/mythcrontab</CODE> file in your favorite editor and modify it
 as you like.  Once you're satisfied with the time that
 <B>mythfilldatabase</B> will run, save and exit, and return to the shell
@@ -121,17 +121,17 @@ prompt.</P>
 # The following will run the mythfilldatabase shell script at 18:00 every
 day.  Format is
 # minutes hour day_of_month month day_of_week
-# In the case of mythfilldatabase, we want it to run at 1800 daily.
+# In the case of mythfilldatabase, we want it to run at 0430 daily.
 # man 5 crontab for more information
 # Need to use a shell script because the QTDIR environment variable isn't
 # being honored by crontab?
 # The next part is all on one line.
-0 18 * * * /bin/bash $HOME/mythtv/MC/configfiles/mythfilldatabasecron
+30 04 * * * /bin/bash $HOME/mythtv/MC/configfiles/mythfilldatabasecron
 % 
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>As you can see, <B>mythfilldatabase</B> will now be run at 1800 (6 PM)
+<P>As you can see, <B>mythfilldatabase</B> will now be run at 0430
 every day.</P>
 <P>If you decide to alter the time that the <B>mythfilldatabase</B> runs,
 you can use the crontab command to open your existing job and edit it in
