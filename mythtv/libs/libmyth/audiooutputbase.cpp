@@ -613,11 +613,11 @@ void AudioOutputBase::OutputAudioLoop(void)
                             QString("waiting for space on soundcard "
                                     "to write zeros: have %1 need %2")
                             .arg(space_on_soundcard).arg(fragment_size));
-                    usleep(50);
+                    usleep(5000);
                 }
             }
 
-            usleep(200);
+            usleep(2000);
             continue;
         }
 
@@ -640,7 +640,7 @@ void AudioOutputBase::OutputAudioLoop(void)
                                 "have %1 want %2")
                         .arg(audiolen(true)).arg(fragment_size));
 
-            usleep(200);
+            usleep(2000);
             continue;
         }
         
@@ -663,7 +663,7 @@ void AudioOutputBase::OutputAudioLoop(void)
                 audio_buffer_unused /= 2;
             }
 
-            usleep(200);
+            usleep(5000);
             continue;
         }
         else
