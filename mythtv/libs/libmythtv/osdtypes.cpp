@@ -179,6 +179,9 @@ void OSDTypeText::Draw(unsigned char *screenptr, int vid_width, int vid_height,
                        int fade, int maxfade, int xoff, int yoff)
 {
     int textlength = 0;
+    if (m_message == QString::null)
+        return;
+
     m_font->CalcWidth(m_message, &textlength);
 
     int maxlength = m_displaysize.width();
