@@ -1282,6 +1282,30 @@
         <font>info</font>
         <multiline>yes</multiline>
       </textarea>
+
+<!-- sample status images for current recording
+      <image name="commflagged" draworder="6">
+        <filename>commflagged.png</filename>
+        <position>20,160</position>
+      </image>
+      <image name="cutlist" draworder="6">
+        <filename>cutlist.png</filename>
+        <position>55,160</position>
+      </image>
+      <image name="autoexpire" draworder="6">
+        <filename>autoexpire.png</filename>
+        <position>90,160</position>
+      </image>
+      <image name="processing" draworder="6">
+        <filename>processing.png</filename>
+        <position>20,195</position>
+      </image>
+      <image name="bookmark" draworder="6">
+        <filename>bookmark.png</filename>
+        <position>55,195</position>
+      </image>
+END sample status images -->
+
     </container>
 
     <container name="program_info_del">

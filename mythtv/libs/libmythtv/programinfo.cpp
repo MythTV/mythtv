@@ -760,10 +760,19 @@ void ProgramInfo::SetBookmark(long long pos, QSqlDatabase *db)
     QString starts = startts.toString("yyyyMMddhhmm");
     starts += "00";
 
-    QString querystr = QString("UPDATE recorded SET bookmark = '%1', "
-                               "starttime = '%2' WHERE chanid = '%3' AND "
-                               "starttime = '%4';").arg(position).arg(starts)
-                                                   .arg(chanid).arg(starts);
+    QString querystr;
+
+    if (pos > 0)
+        querystr = QString("UPDATE recorded SET bookmark = '%1', "
+                           "starttime = '%2' WHERE chanid = '%3' AND "
+                           "starttime = '%4';").arg(position).arg(starts)
+                                               .arg(chanid).arg(starts);
+    else
+        querystr = QString("UPDATE recorded SET bookmark = NULL, "
+                           "starttime = '%1' WHERE chanid = '%2' AND "
+                           "starttime = '%3';").arg(starts).arg(chanid)
+                                               .arg(starts);
+
     QSqlQuery query = db->exec(querystr);
     if (!query.isActive())
         MythContext::DBError("Save position update", querystr);

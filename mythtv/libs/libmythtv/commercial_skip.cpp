@@ -53,12 +53,7 @@ void CommDetect::Init(int w, int h, double fps)
 
     frame_ptr = NULL;
 
-    blankFrameMap.clear();
-    blankCommMap.clear();
-    blankCommBreakMap.clear();
-    sceneChangeMap.clear();
-    sceneChangeCommMap.clear();
-    commBreakMap.clear();
+    ClearAllMaps();
 }
 
 void CommDetect::ProcessNextFrame(unsigned char *buf, long long frame_number)

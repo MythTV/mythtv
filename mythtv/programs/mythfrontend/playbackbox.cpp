@@ -323,6 +323,7 @@ void PlaybackBox::updateInfo(QPainter *p)
 
     if (showData.count() > 0 && curitem)
     {
+        QSqlDatabase *m_db = QSqlDatabase::database();
         ignoreevents = true;
 
         if (playingVideo == true)
@@ -371,6 +372,62 @@ void PlaybackBox::updateInfo(QPainter *p)
             type = (UITextType *)container->GetType("channel");
             if (type)
                 type->SetText(chantext);
+
+            UIImageType *itype;
+            itype = (UIImageType *)container->GetType("commflagged");
+            if (itype)
+            {
+                QMap<long long, int> commbreaks;
+                curitem->GetCommBreakList(commbreaks, m_db);
+                if (commbreaks.size())
+                    itype->ResetFilename();
+                else
+                    itype->SetImage("blank.png");
+                itype->LoadImage();
+            }
+
+            itype = (UIImageType *)container->GetType("cutlist");
+            if (itype)
+            {
+                QMap<long long, int> cutlist;
+                curitem->GetCutList(cutlist, m_db);
+                if (cutlist.size())
+                    itype->ResetFilename();
+                else
+                    itype->SetImage("blank.png");
+                itype->LoadImage();
+            }
+
+            itype = (UIImageType *)container->GetType("autoexpire");
+            if (itype)
+            {
+                if (curitem->GetAutoExpireFromRecorded(m_db))
+                    itype->ResetFilename();
+                else
+                    itype->SetImage("blank.png");
+                itype->LoadImage();
+            }
+
+            itype = (UIImageType *)container->GetType("processing");
+            if (itype)
+            {
+                if ((curitem->IsEditing(m_db)) ||
+                    (curitem->CheckMarkupFlag(MARK_PROCESSING, m_db)))
+                    itype->ResetFilename();
+                else
+                    itype->SetImage("blank.png");
+                itype->LoadImage();
+            }
+
+            itype = (UIImageType *)container->GetType("bookmark");
+            if (itype)
+            {
+                if (curitem->GetBookmark(m_db))
+                    itype->ResetFilename();
+                else
+                    itype->SetImage("blank.png");
+                itype->LoadImage();
+            }
         }
 
         if (container && type != Delete)

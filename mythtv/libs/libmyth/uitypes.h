@@ -317,6 +317,7 @@ class UIImageType : public UIType
     void SetPosition(QPoint pos) { m_displaypos = pos; }
   
     void SetFlex(bool flex) { m_flex = flex; }
+    void ResetFilename() { m_filename = orig_filename; };
     void SetImage(QString file) { m_filename = file; }
     void SetImage(QPixmap imgdata) { img = imgdata; }
     void SetSize(int x, int y) { m_force_x = x; m_force_y = y; }
@@ -342,6 +343,7 @@ class UIImageType : public UIType
   protected:
 
     QPoint  m_displaypos;
+    QString orig_filename;
     QString m_filename;
     bool    m_isvalid;
     bool    m_flex;

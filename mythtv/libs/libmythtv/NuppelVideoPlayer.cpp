@@ -1390,6 +1390,10 @@ void NuppelVideoPlayer::StartPlaying(void)
         fftime = 0;
 
         decoder->setExactSeeks(seeks);
+
+        QMutexLocker lockit(&db_lock);
+
+        m_playbackinfo->SetBookmark(0, m_db);
     }
 
     LoadBlankList();
@@ -1575,9 +1579,17 @@ void NuppelVideoPlayer::SetBookmark(void)
         return;
 
     QMutexLocker lockit(&db_lock);
-    m_playbackinfo->SetBookmark(framesPlayed, m_db);
 
-    osd->SetSettingsText("Position Saved", 1); 
+    if (m_playbackinfo->GetBookmark(m_db))
+    {
+        m_playbackinfo->SetBookmark(0, m_db);
+        osd->SetSettingsText("Position Cleared", 1); 
+    }
+    else
+    {
+        m_playbackinfo->SetBookmark(framesPlayed, m_db);
+        osd->SetSettingsText("Position Saved", 1); 
+    }
 }
 
 long long NuppelVideoPlayer::GetBookmark(void)

@@ -1166,6 +1166,7 @@ UIImageType::UIImageType(const QString &name, const QString &filename, int dorde
     img = QPixmap();
 
     m_filename = filename;
+    orig_filename = filename;
     m_displaypos = displaypos;
     m_order = dorder;
     m_force_x = -1;
