@@ -19,6 +19,15 @@ using namespace std;
 #include "../libmyth/mythcontext.h"
 #include "../libmyth/util.h"
 
+extern "C" {
+#define HAVE_LRINTF
+#ifdef MMX
+#define HAVE_MMX
+#endif
+#include "../libavcodec/dsputil.h"
+//extern int mm_flags;
+}
+
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
@@ -238,6 +247,8 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
 
     dispx = 0; dispy = 0;
     dispw = curw; disph = curh;
+    imgx = curx; imgy = cury;
+    imgw = XJ_width; imgh = XJ_height;
 
     embedding = false;
 
@@ -618,85 +629,6 @@ void XvVideoOutput::StopEmbedding(void)
     pthread_mutex_unlock(&lock);
 }
 
-inline void scale_image( unsigned char *src, int src_w, int src_h,
-        unsigned char *dest, int dest_w, int dest_h, int bpp )
-{
-    int src_rows[dest_h];
-    int *src_row = src_rows;
-    int src_cols[dest_w];
-    int *src_col = src_cols;
-    int bytes_per_pixel = bpp / 8;
-    int src_stride = src_w * bytes_per_pixel;
-    int dest_stride = dest_w * bytes_per_pixel;
-    unsigned char *src_row_ptr = src;
-    unsigned char *dest_row_ptr = dest;
-
-    if (( src_w == dest_w ) &&
-        ( src_h == dest_h ))
-    {
-        memcpy( dest, src, src_w * src_h * bytes_per_pixel );
-        return;
-    }
-
-    for( int row = 0; row < dest_h; row++ )
-        src_rows[row] = row * src_h / dest_h;
-    for( int col = 0; col < dest_w; col++ )
-        src_cols[col] = col * src_w / dest_w;
-    
-    int row, col;
-    int last_row = -1;
-
-    for( row = 0; row < dest_h; row++ )
-    {
-        if ( *src_row == last_row )
-        {
-            memcpy( dest_row_ptr, dest_row_ptr - dest_stride, dest_stride );
-        }
-        else
-        {
-            unsigned char *src = src_row_ptr;
-            unsigned char *dest = dest_row_ptr;
-            int last_col = -1;
-            src_col = src_cols;
-            if ( src_w == dest_w )
-            {
-                memcpy( dest, src, src_stride);
-            }
-            else
-            for( col = 0; col < dest_w; col++ )
-            {
-                if ( *src_col == last_col )
-                {
-                    // need to optimize somehow
-                    switch( bytes_per_pixel )
-                    {
-                        case 4: *((int *)dest) = *((int *)dest-1);      break;
-                        case 2: *((short *)dest) = *((short *)dest-1);  break;
-                        case 1: *(dest) = *(dest-1);                    break;
-                    }
-                    dest += bytes_per_pixel;
-                }
-                else
-                {
-                    // need to optimize somehow
-                    switch( bytes_per_pixel )
-                    {
-                        case 4: *((int *)dest) = *((int *)src);        break;
-                        case 2: *((short *)dest) = *((short *)src);    break;
-                        case 1: *(dest) = *(src);                      break;
-                    }
-                    dest += bytes_per_pixel;
-                    src += bytes_per_pixel;
-                }
-                last_col = *(src_col++);
-            }
-            src_row_ptr += src_stride;
-        }
-        last_row = *(src_row++);
-        dest_row_ptr += dest_stride;
-    }
-}
-
 void XvVideoOutput::Show(unsigned char *buffer, int width, int height)
 {
     if ( xv_port != -1 )
@@ -724,30 +656,47 @@ void XvVideoOutput::Show(unsigned char *buffer, int width, int height)
     }
     else
     {
-        unsigned char *y_ptr;
-        unsigned char *u_ptr;
-        unsigned char *v_ptr;
-
         unsigned char *sbuf = new unsigned char[curw * curh * XJ_depth / 8];
         XImage *image = data->xbuffers[buffer];
+        AVPicture image_in, image_out;
+        ImgReSampleContext *scontext;
+        int av_format;
 
-        y_ptr = (unsigned char *)image->data;
-        u_ptr = y_ptr + (width * height);
-        v_ptr = y_ptr + (width * height * 5 / 4);
+#ifdef MMX
+        mm_flags = 1;
+#endif
+        avpicture_fill(&image_out, (uint8_t *)sbuf, PIX_FMT_YUV420P,
+            curw, curh );
 
-        yuv2rgb_fun convert = yuv2rgb_init_mmx(XJ_depth, MODE_RGB);
-        if (!convert)
+        if (( curw == width ) &&
+            ( curh == height ))
         {
-            cerr << "Non Xv mode only supports 16 or 32 bpp displays\n";
-            exit(0);
+            memcpy( sbuf, image->data, width * height * 3 / 2 );
+        }
+        else
+        {
+            avpicture_fill(&image_in, (uint8_t *)image->data, PIX_FMT_YUV420P,
+                width, height );
+            scontext = img_resample_init(curw, curh, width, height);
+            img_resample( scontext, &image_out, &image_in );
         }
 
-        convert( sbuf, y_ptr, u_ptr, v_ptr, width, height, width * XJ_depth / 8,
-            width, width / 2);
+        switch (XJ_depth)
+        {
+            case 16: av_format = PIX_FMT_RGB565; break;
+            case 24: av_format = PIX_FMT_RGB24;  break;
+            case 32: av_format = PIX_FMT_RGBA32; break;
+            default: cerr << "Non Xv mode only supports 16, 24, and 32 bpp "
+                         "displays\n";
+                     exit(0);
+        }
 
-        scale_image((unsigned char *)sbuf, width, height,
-            (unsigned char *)image->data, curw, curh, XJ_depth );
-   
+        avpicture_fill(&image_in, (uint8_t *)image->data, av_format,
+            curw, curh );
+
+        img_convert(&image_in, av_format, &image_out, PIX_FMT_YUV420P,
+            curw, curh);
+
         pthread_mutex_lock(&lock);
 
         if (use_shm)
