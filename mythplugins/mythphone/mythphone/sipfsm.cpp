@@ -275,18 +275,14 @@ void SipThread::SipThreadWorker()
         {
             int OldCallState = CallState;
 
-#ifdef WIN32
-            wait(1000); // In Windows, cannot get the socket-blocking to work properly, so use poll-mode
-#endif
-
             // This blocks for timeout or data in Linux
             CheckNetworkEvents(sipFsm);
             CheckUIEvents(sipFsm);
             CheckRegistrationStatus(sipFsm); // Probably don't need to do this every 1/2 sec but this is a fallout of a non event-driven arch.
             sipFsm->HandleTimerExpiries();
             ChangePrimaryCallState(sipFsm, sipFsm->getPrimaryCallState());
-    
-            // A Ring No Answer timer runs to send calls to voicemail after x seconds
+
+        // A Ring No Answer timer runs to send calls to voicemail after x seconds
 #ifndef WIN32
             if ((CallState == SIP_ICONNECTING) && (rnaTimer != -1))
             {
@@ -300,14 +296,14 @@ void SipThread::SipThreadWorker()
 #endif
 
             ChangePrimaryCallState(sipFsm, sipFsm->getPrimaryCallState());
-    
+
             EventQLock.lock();
             if ((OldCallState != CallState) && (eventWindow))
                 QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipStateChange));
             EventQLock.unlock();
         }
     }
-        
+
     delete sipFsm;
     if (debugStream)
         delete debugStream;
@@ -618,6 +614,7 @@ QString SipFsm::OpenSocket(int Port)
 #ifdef WIN32  // SIOCGIFADDR not supported on Windows
 	char         hostname[100];
 	HOSTENT FAR *hostAddr;
+    int ifNum = atoi(gContext->GetSetting("SipBindInterface"));
 	if ((gethostname(hostname, 100) != 0) || ((hostAddr = gethostbyname(hostname)) == NULL)) 
     {
         cerr << "Failed to find network interface " << endl;
@@ -626,7 +623,11 @@ QString SipFsm::OpenSocket(int Port)
         return "";
     }
     QHostAddress myIP; 
-    myIP.setAddress(htonl(((struct in_addr *)hostAddr->h_addr_list[0])->S_un.S_addr));
+    for (int ifTotal=0; hostAddr->h_addr_list[ifTotal] != 0; ifTotal++)
+        ;
+    if (ifNum >= ifTotal)
+        ifNum = 0;
+    myIP.setAddress(htonl(((struct in_addr *)hostAddr->h_addr_list[ifNum])->S_un.S_addr));
 #endif
 
     if (!sipSocket->bind(myIP, Port))
@@ -664,7 +665,6 @@ QString SipFsm::DetermineNatAddress()
     // contain the NATed IP address. This is based on support for checkip.dyndns.org
     else if (NatTraversalMethodStr == "Web Server")
     {
-#ifndef WIN32
         // Send a HTTP packet to the configured URL asking for our NAT IP addres
         QString natWebServer = gContext->GetSetting("NatIpAddress");
         QUrl Url(natWebServer);
@@ -728,7 +728,6 @@ QString SipFsm::DetermineNatAddress()
             cout << "Could not connect to NAT discovery host " << Url.host() << ":" << Url.port() << endl;
         httpSock->close();
         delete httpSock;
-#endif
     }
 
     return natIP;
@@ -865,11 +864,7 @@ int SipFsm::getPrimaryCallState()
 void SipFsm::CheckRxEvent()
 {
     SipMsg sipRcv;
-#ifndef WIN32  // waitForMore does not seem to work in Windows!!!  Use polling instead
     if ((sipSocket->waitForMore(1000/SIP_POLL_PERIOD) > 0) && (Receive(sipRcv)))
-#else
-    if (Receive(sipRcv)) 
-#endif
     {
         int Event = MsgToEvent(&sipRcv);
 
@@ -1506,11 +1501,15 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         parent->SetNotification("CALLSTATUS", "", QString::number(sipMsg->getStatusCode()), sipMsg->getReasonPhrase());
         // Fall through
     case SIP_OCONNECTING2_INVITESTATUS_3456:
-        if ((sipMsg->getStatusCode() == 407) && (!sentAuthenticated) && (viaRegProxy != 0) && (viaRegProxy->isRegistered())) // Authentication Required
+        if (((sipMsg->getStatusCode() == 407) || (sipMsg->getStatusCode() == 401)) && 
+            (viaRegProxy != 0) && (viaRegProxy->isRegistered())) // Authentication Required
         {
-            BuildSendAck();
-            BuildSendInvite(sipMsg);
-            State = SIP_OCONNECTING1;
+            if (!sentAuthenticated) // This avoids loops where we are not authenticating properly
+            {
+                BuildSendAck();
+                BuildSendInvite(sipMsg);
+                State = SIP_OCONNECTING1;
+            }
         }
         else
         {
@@ -1612,18 +1611,22 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         break;
     case SIP_DISCONNECTING_BYESTATUS:
         (parent->Timer())->Stop(this, SIP_RETX); 
-        if ((sipMsg->getStatusCode() == 407) && (!sentAuthenticated) && (viaRegProxy != 0) && (viaRegProxy->isRegistered())) // Authentication Required
+        if (((sipMsg->getStatusCode() == 407) || (sipMsg->getStatusCode() == 401)) && 
+             (viaRegProxy != 0) && (viaRegProxy->isRegistered())) // Authentication Required
         {
-            BuildSendBye(sipMsg);
+            if (!sentAuthenticated)
+                BuildSendBye(sipMsg);
         }
         else
             State = SIP_IDLE;
         break;
     case SIP_DISCONNECTING_CANCELSTATUS:
         (parent->Timer())->Stop(this, SIP_RETX); 
-        if ((sipMsg->getStatusCode() == 407) && (!sentAuthenticated) && (viaRegProxy != 0) && (viaRegProxy->isRegistered())) // Authentication Required
+        if (((sipMsg->getStatusCode() == 407) || (sipMsg->getStatusCode() == 401)) && 
+            (viaRegProxy != 0) && (viaRegProxy->isRegistered())) // Authentication Required
         {
-            BuildSendCancel(sipMsg);
+            if (!sentAuthenticated)
+                BuildSendCancel(sipMsg);
         }
         else
             State = SIP_IDLE;
@@ -1761,7 +1764,7 @@ void SipCall::BuildSendCancel(SipMsg *authMsg)
     if (authMsg)
     {
         if (authMsg->getAuthMethod() == "Digest")
-            Cancel.addAuthorization(authMsg->getAuthMethod(), viaRegProxy->registeredAs(), viaRegProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), "sip:" + viaRegProxy->registeredTo(), authMsg->getStatusCode() == 407);
+            Cancel.addAuthorization(authMsg->getAuthMethod(), viaRegProxy->registeredAs(), viaRegProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), remoteUrl->formatReqLineUrl(), authMsg->getStatusCode() == 407);
         else
             cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod() << endl;
         sentAuthenticated = true;
@@ -1806,15 +1809,13 @@ void SipCall::BuildSendBye(SipMsg *authMsg)
         Bye.addTo(*remoteUrl, remoteTag);
     }
     Bye.addCallId(CallId);
-    if (!authMsg)
-        ++cseq;
-    Bye.addCSeq(cseq);
+    Bye.addCSeq(++cseq);
     Bye.addUserAgent();
 
     if (authMsg)
     {
         if (authMsg->getAuthMethod() == "Digest")
-            Bye.addAuthorization(authMsg->getAuthMethod(), viaRegProxy->registeredAs(), viaRegProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), "sip:" + viaRegProxy->registeredTo(), authMsg->getStatusCode() == 407);
+            Bye.addAuthorization(authMsg->getAuthMethod(), viaRegProxy->registeredAs(), viaRegProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), remoteUrl->formatReqLineUrl(), authMsg->getStatusCode() == 407);
         else
             cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod() << endl;
         sentAuthenticated = true;
@@ -2195,7 +2196,6 @@ int SipRegistration::FSM(int Event, SipMsg *sipMsg, void *Value)
             break;
         case 401:
         case 407:
-            cseq++;
             SendRegister(sipMsg);
             regRetryCount = REG_RETRY_MAXCOUNT;
             State = SIP_REG_CHALLENGED;
@@ -2241,7 +2241,6 @@ int SipRegistration::FSM(int Event, SipMsg *sipMsg, void *Value)
     case SIP_REG_FAILED_RETX:
         if (--regRetryCount > 0)
         {
-            cseq++; // TODO --- Check if this is correct?
             State = SIP_REG_TRYING;
             SendRegister();
             (parent->Timer())->Start(this, REG_RETRY_TIMER, SIP_RETX); // Retry every 10 seconds
@@ -2268,13 +2267,13 @@ void SipRegistration::SendRegister(SipMsg *authMsg)
     Register.addFrom(*MyUrl);
     Register.addTo(*MyUrl);
     Register.addCallId(CallId);
-    Register.addCSeq(cseq);
+    Register.addCSeq(++cseq);
 
     if (authMsg && (authMsg->getAuthMethod() == "Digest"))
     {
         Register.addAuthorization(authMsg->getAuthMethod(), MyUrl->getUser(), MyPassword, 
                                   authMsg->getAuthRealm(), authMsg->getAuthNonce(), 
-                                  "sip:" + ProxyUrl->getHost(), authMsg->getStatusCode() == 407);
+                                  ProxyUrl->formatReqLineUrl(), authMsg->getStatusCode() == 407);
         sentAuthenticated = true;
     }
     else    
@@ -2372,7 +2371,8 @@ int SipSubscriber::FSM(int Event, SipMsg *sipMsg, void *Value)
 
     case SIP_SUB_SUBS_NOTSTATUS:
         (parent->Timer())->Stop(this, SIP_RETX); 
-        if ((sipMsg->getStatusCode() == 407) && (!sentAuthenticated))
+        if (((sipMsg->getStatusCode() == 407) || (sipMsg->getStatusCode() == 401)) && 
+            (!sentAuthenticated))
             SendNotify(sipMsg);
         break;
 
@@ -2398,9 +2398,7 @@ void SipSubscriber::SendNotify(SipMsg *authMsg)
     Notify.addFrom(*MyUrl);
     Notify.addTo(*watcherUrl, remoteTag, remoteEpid);
     Notify.addCallId(CallId);
-    if (!authMsg)
-        ++cseq;
-    Notify.addCSeq(cseq);
+    Notify.addCSeq(++cseq);
     int expLeft = (parent->Timer())->msLeft(this, SIP_SUBSCRIBE_EXPIRE)/1000;
     Notify.addExpires(expLeft);
     Notify.addUserAgent();
@@ -2411,7 +2409,7 @@ void SipSubscriber::SendNotify(SipMsg *authMsg)
     if (authMsg)
     {
         if (authMsg->getAuthMethod() == "Digest")
-            Notify.addAuthorization(authMsg->getAuthMethod(), regProxy->registeredAs(), regProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), "sip:" + regProxy->registeredTo(), authMsg->getStatusCode() == 407);
+            Notify.addAuthorization(authMsg->getAuthMethod(), regProxy->registeredAs(), regProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), watcherUrl->formatReqLineUrl(), authMsg->getStatusCode() == 407);
         else
             cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod() << endl;
         sentAuthenticated = true;
@@ -2524,9 +2522,10 @@ int SipWatcher::FSM(int Event, SipMsg *sipMsg, void *Value)
 
     case SIP_WATCH_TRYING_SUBSTATUS:
         (parent->Timer())->Stop(this, SIP_RETX); 
-        if ((sipMsg->getStatusCode() == 407) && (!sentAuthenticated))
+        if ((sipMsg->getStatusCode() == 407) || (sipMsg->getStatusCode() == 401))
         {
-            SendSubscribe(sipMsg);
+            if (!sentAuthenticated) // This avoids loops where we are not authenticating properly
+                SendSubscribe(sipMsg);
         }
         else if (sipMsg->getStatusCode() == 200)
         {
@@ -2549,9 +2548,10 @@ int SipWatcher::FSM(int Event, SipMsg *sipMsg, void *Value)
 
     case SIP_WATCH_ACTIVE_SUBSTATUS:
         (parent->Timer())->Stop(this, SIP_RETX); 
-        if ((sipMsg->getStatusCode() == 407) && (!sentAuthenticated))
+        if ((sipMsg->getStatusCode() == 407) || (sipMsg->getStatusCode() == 401))
         {
-            SendSubscribe(sipMsg);
+            if (!sentAuthenticated)
+                SendSubscribe(sipMsg);
         }
         else if (sipMsg->getStatusCode() == 200)
         {
@@ -2599,8 +2599,11 @@ int SipWatcher::FSM(int Event, SipMsg *sipMsg, void *Value)
 
     case SIP_WATCH_STOPPING_SUBSTATUS:
         (parent->Timer())->Stop(this, SIP_RETX); 
-        if ((sipMsg->getStatusCode() == 407) && (!sentAuthenticated))
-            SendSubscribe(sipMsg);
+        if ((sipMsg->getStatusCode() == 407) || (sipMsg->getStatusCode() == 401))
+        {
+            if (!sentAuthenticated)
+                SendSubscribe(sipMsg);
+        }
         else 
             State = SIP_WATCH_IDLE;
         break;
@@ -2630,16 +2633,14 @@ void SipWatcher::SendSubscribe(SipMsg *authMsg)
     Subscribe.addFrom(*MyUrl);
     Subscribe.addTo(*watchedUrl);
     Subscribe.addCallId(CallId);
-    if (authMsg == 0)
-        cseq++;
-    Subscribe.addCSeq(cseq);
+    Subscribe.addCSeq(++cseq);
     if (State == SIP_WATCH_STOPPING)
         Subscribe.addExpires(0);
 
     if (authMsg)
     {
         if (authMsg->getAuthMethod() == "Digest")
-            Subscribe.addAuthorization(authMsg->getAuthMethod(), regProxy->registeredAs(), regProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), "sip:" + regProxy->registeredTo(), authMsg->getStatusCode() == 407);
+            Subscribe.addAuthorization(authMsg->getAuthMethod(), regProxy->registeredAs(), regProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), watchedUrl->formatReqLineUrl(), authMsg->getStatusCode() == 407);
         else
             cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod() << endl;
         sentAuthenticated = true;
@@ -2750,8 +2751,11 @@ int SipIM::FSM(int Event, SipMsg *sipMsg, void *Value)
 
     case SIP_MESSAGESTATUS:
         (parent->Timer())->Stop(this, SIP_RETX); 
-        if ((sipMsg->getStatusCode() == 407) && (!sentAuthenticated))
-            SendMessage(sipMsg, msgToSend); // Note - this "could" have changed if the user is typing quickly
+        if ((sipMsg->getStatusCode() == 407) || (sipMsg->getStatusCode() == 401))
+        {
+            if (!sentAuthenticated)
+                SendMessage(sipMsg, msgToSend); // Note - this "could" have changed if the user is typing quickly
+        }
         else if (sipMsg->getStatusCode() != 200)
             cout << "SIP: Send IM got status code " << sipMsg->getStatusCode() << endl;
         (parent->Timer())->Start(this, 30*60*1000, SIP_IM_TIMEOUT); // 30 min of inactivity and IM session clears
@@ -2785,14 +2789,12 @@ void SipIM::SendMessage(SipMsg *authMsg, QString Text)
     Message.addFrom(*MyUrl);
     Message.addTo(*imUrl, remoteTag, remoteEpid);
     Message.addCallId(CallId);
-    if (authMsg == 0)
-        txCseq++;
-    Message.addCSeq(txCseq);
+    Message.addCSeq(++txCseq);
 
     if (authMsg)
     {
         if (authMsg->getAuthMethod() == "Digest")
-            Message.addAuthorization(authMsg->getAuthMethod(), regProxy->registeredAs(), regProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), "sip:" + regProxy->registeredTo(), authMsg->getStatusCode() == 407);
+            Message.addAuthorization(authMsg->getAuthMethod(), regProxy->registeredAs(), regProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), imUrl->formatReqLineUrl(), authMsg->getStatusCode() == 407);
         else
             cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod() << endl;
         sentAuthenticated = true;
