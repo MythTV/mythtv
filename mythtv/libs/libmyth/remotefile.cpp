@@ -167,10 +167,12 @@ void RemoteFile::Reset(void)
     usleep(10000);
 
     pthread_mutex_lock(&lock);
+    qApp->lock();
     int avail = sock->bytesAvailable();
     char *trash = new char[avail + 1];
     sock->readBlock(trash, avail);
     delete [] trash;
+    qApp->unlock();
     pthread_mutex_unlock(&lock);
 }
     
@@ -201,11 +203,13 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
     strlist.clear();
 
     usleep(50000);
-   
+
+    qApp->lock();   
     int avail = sock->bytesAvailable();
     char *trash = new char[avail + 1];
     sock->readBlock(trash, avail);
     delete [] trash;
+    qApp->unlock();
 
     strlist = QString(query).arg(recordernum);
     strlist << "SEEK" + append;
@@ -224,10 +228,12 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
     long long retval = decodeLongLong(strlist, 0);
     readposition = retval;
 
+    qApp->lock();
     avail = sock->bytesAvailable();
     trash = new char[avail + 1];
     sock->readBlock(trash, avail);
     delete [] trash;
+    qApp->unlock();
 
     return retval;
 }
@@ -238,11 +244,13 @@ int RemoteFile::Read(void *data, int size, bool singlefile)
     unsigned tot = 0;
     unsigned zerocnt = 0;
 
+    qApp->lock();
     while (sock->bytesAvailable() < (unsigned)size)
     {
         int reqsize = 128000;
         if (singlefile && size - sock->bytesAvailable() < 128000)
             reqsize = size - sock->bytesAvailable();
+        qApp->unlock();
 
         RequestBlock(reqsize);
 
@@ -253,6 +261,7 @@ int RemoteFile::Read(void *data, int size, bool singlefile)
             break;
         }
         usleep(50);
+        qApp->lock();
     }
 
     if (sock->bytesAvailable() >= (unsigned)size)
@@ -260,6 +269,8 @@ int RemoteFile::Read(void *data, int size, bool singlefile)
         ret = sock->readBlock(((char *)data) + tot, size - tot);
         tot += ret;
     }
+
+    qApp->unlock();
 
     readposition += tot;
     return tot;

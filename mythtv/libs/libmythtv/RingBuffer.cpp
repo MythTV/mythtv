@@ -1,3 +1,5 @@
+#include <qapplication.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -426,9 +428,14 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
 
     QSocket *sock = rf->getSocket();
 
-    while (sock->bytesAvailable() < sz) 
+    qApp->lock();
+    unsigned int available = sock->bytesAvailable();
+    qApp->unlock();
+
+    while (available < sz) 
     {
         int reqsize = 128000;
+
         if (rf->RequestBlock(reqsize))
             break;
 
@@ -440,11 +447,18 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
         usleep(100);
         if (stopreads)
             break;
+
+        qApp->lock();
+        available = sock->bytesAvailable();
+        qApp->unlock();
     }
 
-    if (sock->bytesAvailable() >= sz)
+    if (available >= sz)
     {
+        qApp->lock();
         ret = sock->readBlock(((char *)data) + tot, sz - tot);
+        qApp->unlock();
+
         tot += ret;
     }
     return tot;

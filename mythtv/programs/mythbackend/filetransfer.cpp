@@ -1,3 +1,5 @@
+#include <qapplication.h>
+
 #include <unistd.h>
 #include <iostream>
 #include <sys/types.h>
@@ -74,7 +76,11 @@ bool FileTransfer::RequestBlock(int size)
     pthread_mutex_unlock(&readthreadLock);
 
     while (readrequest > 0 && readthreadlive && !ateof)
+    {
+        qApp->unlock();
         usleep(100);
+        qApp->lock();
+    }
 
     return ateof;
 }

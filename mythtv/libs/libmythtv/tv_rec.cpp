@@ -1,3 +1,5 @@
+#include <qapplication.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1450,7 +1452,11 @@ void TVRec::RequestRingBufferBlock(int size)
     pthread_mutex_unlock(&readthreadLock);
 
     while (readrequest > 0 && readthreadlive)
+    {
+        qApp->unlock();
         usleep(500);
+        qApp->lock();
+    }
 }
 
 void TVRec::DoReadThread(void)
