@@ -77,12 +77,30 @@ bool AudioOutputOSS::OpenDevice()
     SetFragSize();
 
     bool err = false;
+    int  format;
+
+    switch (audio_bits)
+    {
+        case 8:
+            format = AFMT_S8;
+            break;
+        case 16:
+#ifdef WORDS_BIGENDIAN
+            format = AFMT_S16_BE;
+#else
+            format = AFMT_S16_LE;
+#endif
+            break;
+        default: Error(QString("AudioOutputOSS() - Illegal bitsize of %1")
+                       .arg(audio_bits));
+    }
 
     if (audio_channels > 2)
     {
         if (ioctl(audiofd, SNDCTL_DSP_SAMPLESIZE, &audio_bits) < 0 ||
             ioctl(audiofd, SNDCTL_DSP_CHANNELS, &audio_channels) < 0 ||
-            ioctl(audiofd, SNDCTL_DSP_SPEED, &audio_samplerate) < 0)
+            ioctl(audiofd, SNDCTL_DSP_SPEED, &audio_samplerate) < 0 ||
+            ioctl(audiofd, SNDCTL_DSP_SETFMT, &format) < 0)
             err = true;
     }
     else
@@ -90,7 +108,8 @@ bool AudioOutputOSS::OpenDevice()
         int stereo = audio_channels - 1;
         if (ioctl(audiofd, SNDCTL_DSP_SAMPLESIZE, &audio_bits) < 0 ||
             ioctl(audiofd, SNDCTL_DSP_STEREO, &stereo) < 0 ||
-            ioctl(audiofd, SNDCTL_DSP_SPEED, &audio_samplerate) < 0)
+            ioctl(audiofd, SNDCTL_DSP_SPEED, &audio_samplerate) < 0 ||
+            ioctl(audiofd, SNDCTL_DSP_SETFMT, &format) < 0)
             err = true;
     }
 
