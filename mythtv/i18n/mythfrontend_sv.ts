@@ -554,7 +554,7 @@
     </message>
     <message>
         <source>Select Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj tid</translation>
     </message>
 </context>
 <context>
@@ -1012,7 +1012,7 @@
     </message>
     <message>
         <source>Aggressive Soundcard Buffering</source>
-        <translation>Agressiv ljudkortsbuffring</translation>
+        <translation>Aggressiv ljudkortsbuffring</translation>
     </message>
     <message>
         <source>Clear Saved Position on playback</source>
@@ -3741,31 +3741,31 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>If specified, this command will be run to change the channel for inputs which have an external tuner device such as a cable box. The first argument will be the channel number.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om angivet används detta kommando för att ändra kanal på ingångar som använder en extern TV-mottagare som t.ex. en kabel-TV-låda. Första argumentet blir kanalnumret.</translation>
     </message>
     <message>
         <source>Leave this blank unless you have an external tuner that is connected to the tuner input of your card. If so, you will need to specify the preset channel for the signal (normally 3 or 4).</source>
-        <translation type="unfinished"></translation>
+        <translation>Lämna detta fält blankt såvida du inte har en extern TV-mottagare som är ansluten till tuner-ingången på ditt kort. I så fall måste du ange förvald kanal för signalen (normalt 3 eller 4).</translation>
     </message>
     <message>
         <source>ERROR, V4L support unavailable on this OS</source>
-        <translation type="unfinished"></translation>
+        <translation>FEL, stöd för V4L saknas under detta OS</translation>
     </message>
     <message>
         <source>MythTV can control the PCM and master mixer volume.  If you prefer to use an external mixer program, then disable this option.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV kan kontrollera PCM- och huvudvolymen. Om du föredrar att justera volymen med ett externt program, avaktivera denna funktion.</translation>
     </message>
     <message>
         <source>Initial volume for PCM output.  Using the volume keys in MythTV will adjust this parameter.</source>
-        <translation type="unfinished"></translation>
+        <translation>Initial volym för PCM ut. Volymknapparna i MythTV ändrar denna parameter.</translation>
     </message>
     <message>
         <source>Enable sending AC3 audio directly to your sound card&apos;s SPDIF output, on sources which contain AC3 soundtracks (usually digital TV).  Requires that the audio output device be set to something suitable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Gör det möjligt för ljudkortet att skicka AC3-ljud direkt via SPDIF-utgången med källor som innehåller AC3-ljud (vanligtvis digital-tv). Förutsätter att ljudenheten är inställd till lämplig enhet.</translation>
     </message>
     <message>
         <source>Make the video look normal on a progressive display (i.e. monitor).</source>
-        <translation type="unfinished"></translation>
+        <translation>Gör så att bilden ser normal ut på en progressiv skärm (dvs datorskärm).</translation>
     </message>
     <message>
         <source>Algorithm</source>
@@ -3773,55 +3773,55 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>Linear blend</source>
-        <translation type="unfinished"></translation>
+        <translation>Linjär blandning</translation>
     </message>
     <message>
         <source>Kernel (less motion blur)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kärna (mindre rörelseoskärpa)</translation>
     </message>
     <message>
         <source>Bob (2x framerate)</source>
-        <translation type="unfinished"></translation>
+        <translation>Bob (2x ramhastighet)</translation>
     </message>
     <message>
         <source>One field</source>
-        <translation type="unfinished"></translation>
+        <translation>Ett fält</translation>
     </message>
     <message>
         <source>Deinterlace algorithm.  &apos;Linear blend&apos; and &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
-        <translation type="unfinished"></translation>
+        <translation>Avflätningsalgoritm. &apos;Linjär blandning&apos; och &apos;Kärna&apos; kräver SSE. &apos;Bob&apos; kräver Xv eller XvMC video ut.</translation>
     </message>
     <message>
         <source>Deinterlace settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Avflätningsinställningar</translation>
     </message>
     <message>
         <source>Enable this setting if MythTV is playing &quot;crackly&quot; audio and you are using hardware encoding. This setting will have no effect on MPEG-4 or RTJPEG video. MythTV will keep extra audio data in its internal buffers to workaround this bug.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivera denna inställning om MythTV spelar upp med hack i ljudet och du använder hårdvarukodning. Denna inställning har ingen effekt på MPEG-4- eller RTJPEG-video. MythTV kommer att lagra extra mycket ljuddata i sina interna buffertar för att kringgå denna bugg.</translation>
     </message>
     <message>
         <source>Default Recording Group to display on the View Recordings screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Förvald inspelningsgrupp att visa på skärmen Visa inspelningar.</translation>
     </message>
     <message>
         <source>Use the name of the display group currently being shown in place of the term &quot;All Programs&quot; in the playback screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd namnet på aktuell visningsgruppen i stället för termen &quot;Alla program&quot; på skärmen Visa inspelningar.</translation>
     </message>
     <message>
         <source>Start in Title section</source>
-        <translation type="unfinished"></translation>
+        <translation>Fokus på titlar</translation>
     </message>
     <message>
         <source>If enabled, the selector highlight will start on the Program titles window, otherwise the selector will default to the recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Börja med fokus på titlarna, istället för med fokus på inspelningarna.</translation>
     </message>
     <message>
         <source>This determines the method used by MythTV to detect when commercials start and end.  You must have &apos;Automatically Flag Commercials&apos; enabled to use anything other than &apos;Blank Frame&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta bestämmer metoden som används för att detektera när reklam börjar och slutar. &apos;Automatisk reklamdetektering&apos; måste vara påslagen för att använda något annat än &apos;Svart bild&apos;.</translation>
     </message>
     <message>
         <source>CPU Usage</source>
-        <translation type="unfinished"></translation>
+        <translation>CPU-användning</translation>
     </message>
     <message>
         <source>Low</source>
@@ -3837,379 +3837,379 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>This setting determines approximately how much CPU Commercial Detection threads will consume. On &apos;High&apos;, all available CPU time will be used which may cause problems on slow systems.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denna inställning bestämmer ungefär hur mycket CPU trådarna för automatisk reklamdetektering använder. Vid &apos;Hög&apos; kommer all tillgänglig CPU-tid användas vilket kan orsaka problem på långsamma system.</translation>
     </message>
     <message>
         <source>Commercial Detection Processing Host</source>
-        <translation type="unfinished"></translation>
+        <translation>Värddator för automatisk reklamdetektering</translation>
     </message>
     <message>
         <source>Select &apos;Default&apos; to run Commercial Detection on the same backend which created a recording, or select a hostname to run all detection jobs on a specific host.</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj &apos;Standard&apos; för att köra automatisk reklamdetektering på samma videoserver som skapade inspelningen, eller välj ett värddatornamn för att köra alla detekteringsjobb på en specifik dator.</translation>
     </message>
     <message>
         <source>Enable stricter Commercial Detection code.  Disable if some commercials are not being detected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivera strikt reklamdetektering. Avaktivera om en del reklam inte markeras.</translation>
     </message>
     <message>
         <source>When using Blank Frame Detection and Auto-Flagging, include blank frames following commercial breaks as part of the commercial break.</source>
-        <translation type="unfinished"></translation>
+        <translation>När &apos;Svart bild&apos; och autodetektering används, inkludera svarta rutor som följer reklampausen i reklamen.</translation>
     </message>
     <message>
         <source>Commercial Skip Notify Amount</source>
-        <translation type="unfinished"></translation>
+        <translation>Mängd reklamöverhoppningsavisering</translation>
     </message>
     <message>
         <source>If set, MythTV will act like a commercial begins this many seconds early.  This can be useful when commercial notification is used in place of automatic skipping.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om satt kommer MythTV agera som om en reklampaus börja så här många sekunder tidigt. Detta kan vara användbart när &apos;Meddela vid reklamöverhoppning&apos; används i stället för &apos;Hoppa automatiskt&apos;.</translation>
     </message>
     <message>
         <source>Trigger AutoExpire when available disk space is below this value.  Disable AutoExpire by setting to 0.</source>
-        <translation type="unfinished"></translation>
+        <translation>Utlös autoradera när tillgängligt diskutrymme är mindre än detta värde. Avaktivera autoradera genom att sätta till 0.</translation>
     </message>
     <message>
         <source>How often the AutoExpire process checks for free disk space.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hur ofta autoradera-processen kollar fritt diskutrymme.</translation>
     </message>
     <message>
         <source>When enabled, any newly recorded programs will be marked as eligible for Auto-Expiration. Existing recordings will keep their current value.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverat kommer alla nya inspelade program att markeras som valbara för autoradering. Existerande inspelningar behåller sitt nuvarande värde.</translation>
     </message>
     <message>
         <source>When enabled, the most recent recording will be listed first in the &apos;Watch Recordings&apos; screen, otherwise the oldest recording will be listed first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverat kommer de inspelningar som gjordes senast att listas först under &apos;Titta på inspelningar&apos;, annars de äldsta.</translation>
     </message>
     <message>
         <source>If enabled, fast forward and rewind continue after the key is released.  Pressing the key again increases the fast forward or rewind speed.  The alternate fast forward and rewind keys always behave in this way.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverat fortsätter snabbspolning fram och bakåt efter att knappen släpps. Ytterligare tryck ökar eller minskar hastigheten. De alternativa snabbspolningsknapparna fungerar alltid på detta vis.</translation>
     </message>
     <message>
         <source>If enabled, pressing the sticky rewind key in fast forward mode switches to rewind mode, and vice versa.  If disabled, it will decrease the current speed or switch to play mode if the speed can&apos;t be decreased further.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverat kommer den klistriga återspolningsknappen i snabbspolning framåt att växla till snabbspolning bakåt, och vice versa. Om avaktiverat minskas hastigheten eller återgår till normal uppspelning om den inte kan minskas mer.</translation>
     </message>
     <message>
         <source>Always display Closed Captioning</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa alltid textning</translation>
     </message>
     <message>
         <source>If enabled, captions will be displayed when playing back recordings or watching live TV.  Closed Captioning can be turned on or off by pressing &quot;T&quot; during playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverad visas alltid undertexter vid uppspelning eller i TV-läge. Textning kan slås på/av genom att trycka på &quot;T&quot; under uppspelning.</translation>
     </message>
     <message>
         <source>If enabled, Browse mode will automatically be activated whenever you use Channel UP/DOWN while watching Live TV.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverat kommer bläddringsläget att aktiveras automatiskt när du använder kanal UPP/NER i TV-läge.</translation>
     </message>
     <message>
         <source>If enabled, MythTV will pretend to have a smaller soundcard buffer than is really present.  This may speed up seeking, but can also cause playback problems.</source>
-        <translation type="unfinished"></translation>
+        <translation>Låtsas att ljudkortsbufferten är mindre än vad den egentligen är. Detta kan snabba upp snabbspolning men kan också orsaka uppspelningsproblem.</translation>
     </message>
     <message>
         <source>Automatically clear saved position on a recording when the recording is played back.  If disabled, you can mark the beginning with rewind then save position.</source>
-        <translation type="unfinished"></translation>
+        <translation>Rensa automatiskt bort sparad position i en inspelning när den spelas upp. Om denna funktion INTE är aktiverad kan man markera början på en inspelning genom att spola tillbaka och sedan spara denna position.</translation>
     </message>
     <message>
         <source>During playback the Select key (Enter or Space) will alternate between &quot;Position Saved&quot; and &quot;Position Cleared&quot;. If disabled, the Select key will save the current position for each keypress.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om funktionen aktiveras så kommer OK (enter eller mellanslag) att alternera mellan &quot;Spara position&quot; och &quot;Rensa position&quot;. Om den inte aktiveras kommer den att spara positionen för varje tryck.</translation>
     </message>
     <message>
         <source>If enabled, Xv picture controls (brightness, contrast, etc.) are used during playback. These are independent of the Video4Linux controls used for recording. The Xv controls may not work properly on some systems.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiverar Xv-bildkontrollerna för ljusstyrka, kontrast etc vid uppspelning. Dessa kontroller är skilda från de som används vid inspelning. På vissa system fungerar inte kontrollerna riktigt bra.</translation>
     </message>
     <message>
         <source>If enabled, MythTV will warn you whenever you change the channel but are not caught up to live TV.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om denna funktion aktiveras kommer MythTV att varna dig om du försöker ändra kanal när du ligger efter verklig tid.</translation>
     </message>
     <message>
         <source>During playback, MythTV will listen for connections from the &quot;mythtvosd&quot; or &quot;mythudprelay&quot; programs on this port.  See the README in contrib/mythnotify/ for additional information.</source>
-        <translation type="unfinished"></translation>
+        <translation>Under uppspelning lyssnar MythTV på anslutningar från programmen &quot;mythtvosd&quot; eller &quot;mythudprelay&quot; på denna port. Se README i contrib/mythnotify/ för mer information.</translation>
     </message>
     <message>
         <source>Generate thumbnail preview images of recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Skapa förhandsgranskningsbilder av inspelningar</translation>
     </message>
     <message>
         <source>If enabled, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverat visas en statisk bild av inspelningen i menyn &quot;Titta på inspelningar&quot;.</translation>
     </message>
     <message>
         <source>MythTV will make a thumbnail image this many seconds from the beginning of the recording. Useful to skip over advertisements.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV skapar en förhandsgranskningsbild så här många sekunder från början av inspelningen. Användbart för att hoppa över reklam.</translation>
     </message>
     <message>
         <source>When enabled, a preview of the recording will play in a small window on the &quot;Watch a Recording&quot; menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverat spelas en förhandsgranskning av inspelningen upp i ett litet fönster i menyn &quot;Titta på inspelningar&quot;.</translation>
     </message>
     <message>
         <source>If enabled, the Watch Recording and Delete Recording screens will use transparency. Disable if selecting the recordings is slow due to high CPU usage.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverat använder menyerna &quot;Titta på inspelningar&quot; och &quot;Ta bort inspelningar&quot; transparens. Stäng av om val av inspelning blir för långsamt p.g.a. hög CPU-belastning.</translation>
     </message>
     <message>
         <source>&quot;Fill&quot; is the quickest shading method. &quot;Image&quot; is somewhat slow, but has a higher visual quality. No shading will be the fastest.</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;Fyll&quot; är den snabbaste skuggningsmetoden. &quot;Bild&quot; är något långsammare men ger bättre kvalitet. &quot;Ingen&quot; stänger av skuggning.</translation>
     </message>
     <message>
         <source>System Exit key</source>
-        <translation type="unfinished"></translation>
+        <translation>Systemnedstängningstangent</translation>
     </message>
     <message>
         <source>Confirm Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Bekräfta avsluta</translation>
     </message>
     <message>
         <source>When enabled, MythTV will prompt for confirmation when you press the System Exit key.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverat kommer MythTV att kräva bekräftelse när du trycker på Systemavslutningstangenten.</translation>
     </message>
     <message>
         <source>If you have configured an exit key using the System Shutdown option, you will be given the opportunity to exit MythTV or halt the system completely. Another possibility for this field is &quot;poweroff&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Om du har konfigurerat en avslutningstangent kommer du att få tillfälle att välja mellan att gå ur MythTV eller stänga ner systemet helt. En annan möjlighet för detta fält är &quot;poweroff&quot;</translation>
     </message>
     <message>
         <source>Use Arrow Key Accelerators</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd Piltangentsacceleratorer</translation>
     </message>
     <message>
         <source>If enabled, Arrow key accelerators will be used, with LEFT performing an exit action and RIGHT selecting the current item.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverat används piltangentsacceleratorer med vänsterpil som avsluta och högerpil för att välja aktiv post.</translation>
     </message>
     <message>
         <source>Display Size - Width</source>
-        <translation type="unfinished"></translation>
+        <translation>Skärmstorlek - bredd</translation>
     </message>
     <message>
         <source>Horizontal size of the monitor or TV, is used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Horisontell storlek på monitor eller TV, används för att beräkna den skärmens faktiska bildaspekt. Detta åsidosätter skärmstorleken från systemet.</translation>
     </message>
     <message>
         <source>Display Size - Height</source>
-        <translation type="unfinished"></translation>
+        <translation>Skärmstorlek - höjd</translation>
     </message>
     <message>
         <source>Vertical size of the monitor or TV, is used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vertikal storlek på monitor eller TV, används för att beräkna den skärmens faktiska bildaspekt. Detta åsidosätter skärmstorleken från systemet.</translation>
     </message>
     <message>
         <source>If enabled, use the above size for TV, otherwise use full screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverat, använd ovanstående storlek för TV, annars använd fullskärm.</translation>
     </message>
     <message>
         <source>Switch X Window video modes for TV. Requires &quot;xrandr&quot; support.</source>
-        <translation type="unfinished"></translation>
+        <translation>Växla X Window videolägen för TV. Kräver &quot;xrandr&quot;-stöd.</translation>
     </message>
     <message>
         <source>Horizontal resolution for GUI video mode. This mode must be defined in your X configuration file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Horisontell upplösning för GUI-videoläge. Detta läge måste vara definierat i din X-konfigurationsfil.</translation>
     </message>
     <message>
         <source>Vertical resolution for GUI video mode. This mode must be defined in your X configuration file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vertikal upplösning för GUI-videoläge. Detta läge måste vara definierat i din X-konfigurationsfil.</translation>
     </message>
     <message>
         <source>X</source>
-        <translation type="unfinished">X</translation>
+        <translation>X</translation>
     </message>
     <message>
         <source>Horizontal resolution of video mode which needs a special output resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>Horisontell upplösning för videoläge som kräver en speciell utgångsupplösning.</translation>
     </message>
     <message>
         <source>Y</source>
-        <translation type="unfinished"></translation>
+        <translation>Y</translation>
     </message>
     <message>
         <source>Vertical resolution of video mode which needs a special output resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vertikal upplösning för videoläge som kräver en speciell utgångsupplösning.</translation>
     </message>
     <message>
         <source>Horizontal resolution for playback video mode. This mode must be defined in your X configuration file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Horisontell upplösning för uppspelningsvideoläge. Detta läge måste vara definierat i din X-konfigurationsfil.</translation>
     </message>
     <message>
         <source>Vertical resolution for playback video mode. This mode must be defined in your X configuration file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vertikal upplösning för uppspelningsvideoläge. Detta läge måste vara definierat i din X-konfigurationsfil.</translation>
     </message>
     <message>
         <source>Alt Aspect</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt aspekt</translation>
     </message>
     <message>
         <source>If X&apos;s DisplaySize indicates 16:9, fudge vertical size into 4:3, and visa-versa</source>
-        <translation type="unfinished"></translation>
+        <translation>Om X&apos;s Skärmstorlek anger 16:9, fuska till vertikal storlek till 4:3, och vice versa</translation>
     </message>
     <message>
         <source>GUI Size (px)</source>
-        <translation type="unfinished"></translation>
+        <translation>GUI-storlek (px)</translation>
     </message>
     <message>
         <source>Default Display (px)</source>
-        <translation type="unfinished"></translation>
+        <translation>Förvald skärm (px)</translation>
     </message>
     <message>
         <source>Physical Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Fysisk storlek</translation>
     </message>
     <message>
         <source>Toggles between windowed and borderless operation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Växlar mellan fönsterläge och kantlöst läge.</translation>
     </message>
     <message>
         <source>At startup, MythTV will change the Qt widget style to this setting.  If &quot;Desktop Style&quot; is selected, MythTV will use the existing desktop setting.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vid start kommer MythTV att ändra Qt-stil till denna inställning. Om &quot;Skrivbordsstil&quot; väljs använder MythTV samma stil som skrivbordet.</translation>
     </message>
     <message>
         <source>Time limit for ATSC signal lock (msec)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tidsbegränsning för ATSC signallås (msek)</translation>
     </message>
     <message>
         <source>MythTV can check the signal strength when you tune into a HDTV or other over-the-air digital station. This value is the number of milliseconds to allow before MythTV gives up trying to get an acceptable signal.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV kan kontrollera signalstyrkan när du ställer in en HDTV eller annan digital station. Detta värde är det antal millisekunder som tillåts innan MythTV ger upp försöken att få en acceptabel signal.</translation>
     </message>
     <message>
         <source>Threshold for a signal to be considered acceptable. If you set this too low MythTV may crash, and if you set it too high you may not be able to tune a channel on which reception would be acceptable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tröskelvärde för att signalen ska anses acceptabel. Om du sätter detta värde för lågt kan MythTV krascha och sätter du det för högt är det inte säkert att du kan ställa in en kanal vars mottagning är dålig.</translation>
     </message>
     <message>
         <source>Avoid conflicts between live TV and scheduled shows.</source>
-        <translation type="unfinished"></translation>
+        <translation>Undvik konflikter mellan TV-läge och schemalagda visningar.</translation>
     </message>
     <message>
         <source>If enabled, live TV will choose a tuner card that is less likely to have scheduled recordings rather than the best card available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverat väljer TV-läge ett TV-kort som är mindre sannolikt att ha schemalagda inspelningar i stället för det bästa tillgängliga kortet.</translation>
     </message>
     <message>
         <source>Floating Program Guide Selector</source>
-        <translation type="unfinished"></translation>
+        <translation>Flytande programguidesväljare</translation>
     </message>
     <message>
         <source>If enabled, the program guide&apos;s selector will be free to move throughout the guide, otherwise it will stay in the center of the guide at all times.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverat är programguidens väljare fri att röra sig igenom guiden, annars stannar den alltid i centrum av guiden.</translation>
     </message>
     <message>
         <source>Colorize program guide using genre colors. (Not available for all grabbers.)</source>
-        <translation type="unfinished"></translation>
+        <translation>Färglägg programguiden med genrefärger. (Inte tillgängligt för alla grabbers.)</translation>
     </message>
     <message>
         <source>Only display &apos;favorite&apos; channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa endast favoritkanaler</translation>
     </message>
     <message>
         <source>If enabled, the EPG will initially display only the channels marked as favorites. Pressing &quot;4&quot; will toggle between displaying favorites and all channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverat kommer programguiden initialt att endast visa de kanaler som är markerade som favoritkanaler. Ett tryck på &quot;4&quot; växlar mellan favoriter och alla kanaler.</translation>
     </message>
     <message>
         <source>Move higher priority programs to other cards and showings when resolving conflicts.  This can be used to record lower priority programs that would otherwise not be recorded, but risks missing a higher priority program if the schedule changes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Flytta program med högre prioritet till andra kort och visningar vid konfliktlösning. Detta kan användas för att spela in program med lägre prioritet som annars inte skulle ha spelats in, men riskerar att missa ett högre prioriterat program om schemat ändras.</translation>
     </message>
     <message>
         <source>If enabled, the Select key will change the channel while using the program guide during live TV.  If disabled, the select key will bring up the recording options screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverat ändrar valtangenten kanal när programguiden används i TV-läge. Annars tar valtangenten fram inspelningsinställningarna.</translation>
     </message>
     <message>
         <source>If the option to use Select to change the channel is on, pressing Select on a show that is at least this many minutes into the future will schedule a recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om valet att använda valtangenten för att ändra kanal är på, kommer ett tryck på valtangenten på en visning som är minst så här många minuter framåt i tiden att schemalägga en inspelning.</translation>
     </message>
     <message>
         <source>The program used to control the LED on the Xbox is dependant on which distribution is installed. &quot;led&quot; will be used on GentooX, &quot;blink&quot; on other Xbox distributions.</source>
-        <translation type="unfinished"></translation>
+        <translation>Programmet som används för att kontrollera lysdioden på Xbox beror på vilken distribution som är installerad. &quot;led&quot; används på GentooX, &quot;blink&quot; på andra Xbox-distributioner.</translation>
     </message>
     <message>
         <source>Default LED color</source>
-        <translation type="unfinished"></translation>
+        <translation>Förvald lysdiodfärg</translation>
     </message>
     <message>
         <source>Sets the LED color when it is not being used for status indication.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sätter lysdiodsfärgen när den inte används för statusindikering.</translation>
     </message>
     <message>
         <source>Sets the LED color when a backend is recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sätter lysdiodsfärgen när en videoserver spelar in.</translation>
     </message>
     <message>
         <source>This specifies how frequently (in seconds) to check if a recording is in progress in order to update the Xbox LED.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta anger hur ofta (i sekunder) att kolla om en inspelning pågår för att uppdatera Xbox-lysdioden.</translation>
     </message>
     <message>
         <source>Use hardware XvMC MPEG Decoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd XvMC MPEG-hårdvaruavkodning</translation>
     </message>
     <message>
         <source>Use VIA hardware MPEG Decoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd VIA MPEG-hårdvaruavkodning</translation>
     </message>
     <message>
         <source>Sample interval for DVB signal statistics (in seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Samplingsintervall för DVB signalstatistik (i sekunder)</translation>
     </message>
     <message>
         <source>MythTV will monitor the DVB signal statistics using the specified interval.  Set to &quot;0&quot; to disable.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV kommer att bevaka DVB signalstatistiken med specificerat intervall. Sätt till &quot;0&quot; för att avaktivera.</translation>
     </message>
     <message>
         <source>Log MythTV events to database</source>
-        <translation type="unfinished"></translation>
+        <translation>Logga MythTV-händelser till databas</translation>
     </message>
     <message>
         <source>If enabled, MythTV modules will send event details to the database, where they can be viewed with MythLog or periodically emailed to the administrator.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverat kommer MythTVs moduler skicka händelsedetaljer till databasen, där de kan visas med MythLog eller periodiskt e-postas till administratören.</translation>
     </message>
     <message>
         <source>Maximum Number of Entries per Module</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximalt antal poster per modul</translation>
     </message>
     <message>
         <source>This enables the periodic cleanup of the events stored in the Myth database (see &quot;Log MythTV events to database&quot; on the previous page).</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta aktiverar periodisk rensning av händelser sparade i databasen (se &quot;Logga MythTV-händelser till databas&quot; på föregående sida).</translation>
     </message>
     <message>
         <source>The number of days between log cleanup runs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Antal dagar mellan loggrensningar.</translation>
     </message>
     <message>
         <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denna och följande inställning avgör när mythfilldatabase tillåts köra. Exempelvis genom att sätta Min till 11 och Max till 13 kommer programmet endast tillåtas att köras mellan 11 och 13.</translation>
     </message>
     <message>
         <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denna och föregående inställning avgör när mythfilldatabase tillåts köra. Exempelvis genom att sätta Min till 11 och Max till 13 kommer programmet endast tillåtas att köras mellan 11 och 13.</translation>
     </message>
     <message>
         <source>Commercial Detection (Playback)</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklamdetektering (Uppspelning)</translation>
     </message>
     <message>
         <source>(Unassigned)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Ej angiven)</translation>
     </message>
     <message>
         <source>Save these settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Spara dessa inställningar</translation>
     </message>
     <message>
         <source>Show group name instead of &quot;All Programs&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa gruppnamn i stället för &quot;Alla program&quot;</translation>
     </message>
     <message>
         <source>Show group summary</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa gruppsammanfattning</translation>
     </message>
     <message>
         <source>Shows Program Guide when starting Live TV</source>
-        <translation type="unfinished"></translation>
+        <translation>Visar programguiden när TV-läge startas</translation>
     </message>
     <message>
         <source>This starts the program guide immediately upon starting to watch Live TV.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta visar programguiden direkt när TV-läget startas.</translation>
     </message>
     <message>
         <source>LCD Backlight Always On</source>
-        <translation type="unfinished"></translation>
+        <translation>LCD-bakgrundsbelysning alltid på</translation>
     </message>
     <message>
         <source>Turn on the backlight permanently. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sätter på bakgrundsbelysningen permanent. Kräver omstart av mythfrontend för att börja gälla.</translation>
     </message>
     <message>
         <source>Directed By</source>
-        <translation type="unfinished"></translation>
+        <translation>Regisserad av</translation>
     </message>
 </context>
 <context>
@@ -4596,19 +4596,19 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>Audio track</source>
-        <translation type="unfinished"></translation>
+        <translation>Ljudspår</translation>
     </message>
     <message>
         <source>Jump to Begining</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoppa till början</translation>
     </message>
     <message>
         <source>You are exiting this video</source>
-        <translation type="unfinished"></translation>
+        <translation>Du går ur denna inspelning</translation>
     </message>
     <message>
         <source>Exit to the menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Gå ut till menyn</translation>
     </message>
 </context>
 <context>
