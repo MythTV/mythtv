@@ -174,6 +174,7 @@ int main(int argc, char **argv)
     bool daemonize = false;
     bool printsched = false;
     bool testsched = false;
+    bool resched = false;
     bool nosched = false;
     bool printexpire = false;
     for (int argpos = 1; argpos < a.argc(); ++argpos)
@@ -334,6 +335,10 @@ int main(int argc, char **argv)
         {
             testsched = true;
         } 
+        else if (!strcmp(a.argv()[argpos],"--resched"))
+        {
+            resched = true;
+        } 
         else if (!strcmp(a.argv()[argpos],"--nosched"))
         {
             nosched = true;
@@ -364,6 +369,7 @@ int main(int argc, char **argv)
                     "                               libav,jobqueue" << endl <<
                     "--printexpire                  List of auto-expire programs" << endl <<
                     "--printsched                   Upcoming scheduled programs" << endl <<
+                    "--resched                      Force the scheduler to update" << endl <<
                     "--version                      Version information" << endl;
             return -1;
         }
@@ -505,6 +511,22 @@ int main(int argc, char **argv)
 
         print_verbose_messages |= VB_SCHEDULE;
         sched->PrintList(true);
+        cleanup();
+        exit(0);
+    }
+
+    if (resched)
+    {
+        gContext->SetBackend(false);
+
+        if (gContext->ConnectToMasterServer())
+        {
+            VERBOSE(VB_IMPORTANT, "Connected to master for reschedule");
+            ScheduledRecording::signalChange(-1);
+        }
+        else
+            VERBOSE(VB_IMPORTANT, "Cannot connect to master for reschedule");
+
         cleanup();
         exit(0);
     }
