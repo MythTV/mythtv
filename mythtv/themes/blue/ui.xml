@@ -1299,7 +1299,7 @@
 
     <container name="group_info">
       <context>0</context>
-      <area>0,360,799,240</area>
+      <area>30,360,799,240</area>
       <textarea name="title" draworder="6">
         <area>20,0,779,45</area>
         <font>title</font>
@@ -1314,7 +1314,7 @@
 
     <container name="program_info_play">
       <context>0</context>
-      <area>0,360,800,240</area>
+      <area>15,360,800,240</area>
       <textarea name="title" draworder="6">
         <area>20,0,580,40</area>
         <altarea>20,0,760,40</altarea>
@@ -1325,12 +1325,12 @@
         <font>info</font>
       </textarea>
       <textarea name="timedate" draworder="6">
-        <area>200,40,440,30</area>
+        <area>160,40,440,30</area>
         <altarea>200,40,580,30</altarea>
         <font>info</font>
       </textarea>
       <textarea name="subdescr" draworder="6">
-        <area>20,70,580,125</area>
+        <area>20,93,750,125</area>
         <altarea>20,70,760,125</altarea>
         <font>info</font>
         <multiline>yes</multiline>
@@ -1351,23 +1351,23 @@
 
       <image name="autoexpire" draworder="6">
         <filename>autoexpire.png</filename>
-        <position>20,195</position>
+        <position>20,60</position>
       </image>
       <image name="bookmark" draworder="6">
         <filename>bookmark.png</filename>
-        <position>55,195</position>
+        <position>55,60</position>
       </image>
       <image name="commflagged" draworder="6">
         <filename>commflagged.png</filename>
-        <position>90,195</position>
+        <position>90,60</position>
       </image>
       <image name="cutlist" draworder="6">
         <filename>cutlist.png</filename>
-        <position>125,195</position>
+        <position>125,60</position>
       </image>
       <image name="processing" draworder="6">
         <filename>processing.png</filename>
-        <position>160,195</position>
+        <position>160,60</position>
       </image>
 
     </container>
@@ -1385,12 +1385,12 @@
         <font>info</font>
       </textarea>
       <textarea name="timedate" draworder="6">
-        <area>200,40,440,30</area>
+        <area>160,40,440,30</area>
         <altarea>200,40,580,30</altarea>
         <font>info</font>
       </textarea>
       <textarea name="subdescr" draworder="6">
-        <area>20,70,580,125</area>
+        <area>20,70,600,125</area>
         <altarea>20,70,760,125</altarea>
         <font>info</font>
         <multiline>yes</multiline>
@@ -1400,7 +1400,7 @@
     </container>
 
     <container name="video">
-      <area>620,360,160,120</area>
+      <area>616,351,160,120</area>
     </container>
 
     <popup name="confirmdelete">
