@@ -33,6 +33,17 @@ struct cc;
 class RTjpeg;
 class RingBuffer;
 
+struct MyFilterData
+{
+    int bShowDeinterlacedAreaOnly;
+    int bBlend;
+    // int iThresholdBlend; // here we start blending
+    int iThreshold;         // here we start interpolating TODO FIXME
+    int iEdgeDetect;
+    int picsize;
+    unsigned char *src;
+};
+
 class NuppelVideoRecorder
 {
  public:
@@ -125,6 +136,7 @@ class NuppelVideoRecorder
     void WriteAudio(unsigned char *buf, int fnum, int timecode);
     void WriteText(unsigned char *buf, int len, int timecode, int pagenr);
 
+    Frame * areaDeinterlace(unsigned char *yuvptr, int width, int height);
     Frame * GetField(struct vidbuffertype *vidbuf, bool top_field, 
                      bool interpolate);
     bool SetupAVCodec(void);
@@ -240,13 +252,16 @@ class NuppelVideoRecorder
         DEINTERLACE_BOB_FULLHEIGHT_LINEAR_INTERPOLATION,
         DEINTERLACE_DISCARD_TOP,
         DEINTERLACE_DISCARD_BOTTOM,
+        DEINTERLACE_AREA,
         DEINTERLACE_LAST
     };
 
     DeinterlaceMode deinterlace_mode;
     double framerate_multiplier;
     double height_multiplier;
-    
+
+    struct MyFilterData myfd;   
+ 
     int last_block;
     int firsttc;
     long int oldtc;

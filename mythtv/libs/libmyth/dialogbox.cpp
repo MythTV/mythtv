@@ -24,7 +24,8 @@ DialogBox::DialogBox(const QString &text, const char *checkboxtext,
     checkbox = NULL;
     if (checkboxtext)
     {
-        checkbox = new QCheckBox(checkboxtext, this);
+        checkbox = new MythCheckBox(this);
+        checkbox->setText(checkboxtext); 
         checkbox->setBackgroundOrigin(WindowOrigin);
         box->addWidget(checkbox, 0);
     }

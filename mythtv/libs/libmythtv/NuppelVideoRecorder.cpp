@@ -57,6 +57,8 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     deinterlace_mode = DEINTERLACE_NONE;
     framerate_multiplier = 1.0;
     height_multiplier = 1.0;
+    myfd.src = NULL;
+    myfd.picsize = -1;
 
     mp3quality = 3;
     gf = NULL;
@@ -161,6 +163,9 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         seektable->clear();
         delete seektable;  
     }  
+
+    if (myfd.src)
+        delete [] myfd.src;
 
     while (videobuffer.size() > 0)
     {
@@ -2090,6 +2095,20 @@ void NuppelVideoRecorder::doWriteThread(void)
                         delete bottom_frame;
                     }
                     break;
+                    case DEINTERLACE_AREA:
+                    {
+                        Frame *frame = 
+                            areaDeinterlace(
+                                        videobuffer[act_video_encode]->buffer,
+                                         w, h);
+                        frame->frameNumber =
+                            videobuffer[act_video_encode]->sample;
+                        frame->timecode = 
+                            videobuffer[act_video_encode]->timecode;
+                        WriteVideo(frame);
+                        delete frame;
+                    }
+                    break;
                     case DEINTERLACE_NONE:
                     case DEINTERLACE_LAST:
                     {
@@ -2099,8 +2118,10 @@ void NuppelVideoRecorder::doWriteThread(void)
                         frame.height = h;
                         frame.buf = videobuffer[act_video_encode]->buffer;
                         frame.len = videobuffer[act_video_encode]->bufferlen;
-                        frame.frameNumber = videobuffer[act_video_encode]->sample;
-                        frame.timecode = videobuffer[act_video_encode]->timecode;
+                        frame.frameNumber = 
+                                videobuffer[act_video_encode]->sample;
+                        frame.timecode = 
+                                videobuffer[act_video_encode]->timecode;
                         frame.is_field = FALSE;
     
                         WriteVideo(&frame);
@@ -2169,6 +2190,14 @@ long long NuppelVideoRecorder::GetKeyframePosition(long long desired)
 
 void NuppelVideoRecorder::ChangeDeinterlacer(int deint_mode)
 {
+    if (deinterlace_mode == DEINTERLACE_AREA && deint_mode != DEINTERLACE_AREA)
+    {
+        if (myfd.src)
+            delete [] myfd.src;
+        myfd.src = NULL;
+        myfd.picsize = -1;
+    }
+
     switch (deint_mode)
     {
         case DEINTERLACE_NONE:
@@ -2189,12 +2218,193 @@ void NuppelVideoRecorder::ChangeDeinterlacer(int deint_mode)
             height_multiplier = 0.5;
             framerate_multiplier = 1;
             break;
+        case DEINTERLACE_AREA:
+            height_multiplier = 1;
+            framerate_multiplier = 1;
+            myfd.bShowDeinterlacedAreaOnly = 0;
+            myfd.bBlend = 0;
+            // myfd->bBlend = 1; there should be a another threshold for us to
+            // know from which threshold to begin with blending up to the next
+            // when we start interpolating that would give us much better
+            // results and better resolution within the interlacing area
+
+            // myfd.iThreshold  = 27;
+            myfd.iThreshold  = 50;
+            myfd.iEdgeDetect = 25;
+
+            if (myfd.picsize != (w*h)) 
+            {
+                if (myfd.src) 
+                    delete [] myfd.src;
+                // only width*height coz we only need to save Y
+                myfd.picsize = w * h;
+                myfd.src = new unsigned char[myfd.picsize];
+            }
+            break;
         case DEINTERLACE_LAST:
         default:
             cerr << "Unknown deinterlace mode: " << deint_mode << endl;
             return;
     }
     deinterlace_mode = (DeinterlaceMode)deint_mode;
+}
+
+// Taken from NuppelVideo areaDeinterlace.c
+// GPLed (c)Roman Hochleitner <roman@mars.tuwien.ac.at>
+// based on Area Based Deinterlacer (for RGB frames) by
+// Gunnar Thalin <guth@home.se>
+
+// note: yuvptr gets modified gets modified here
+Frame* NuppelVideoRecorder::areaDeinterlace(unsigned char *yuvptr, int width,
+                                            int height)
+{
+
+    int bShowDeinterlacedAreaOnly = myfd.bShowDeinterlacedAreaOnly;
+    int y0, y1, y2, y3;
+    unsigned char *psrc1, *psrc2, *psrc3, *pdst1;
+    int iInterlaceValue0, iInterlaceValue1, iInterlaceValue2;
+    int x, y;
+    int y_line;
+
+    unsigned char *y_dst, *y_src, *src;
+
+    int picsize;
+
+    int bBlend = myfd.bBlend;
+    int iThreshold = myfd.iThreshold;
+    int iEdgeDetect = myfd.iEdgeDetect;
+
+    if (w*h != myfd.picsize)
+    {
+        if (myfd.src)
+            delete [] myfd.src;
+        myfd.picsize = w*h;
+        myfd.src = new unsigned char[myfd.picsize];
+    }
+
+    src = myfd.src;
+    picsize = myfd.picsize;
+
+    // now copy the real source (which will be overwritten)
+    memcpy(src, yuvptr, picsize);
+    // to src (our buffer)
+
+    // dst y pointer
+    y_dst = yuvptr;
+    // we should not change u,v because one u, v value stands for
+    // 2 pixels per 2 lines = 4 pixel and we don't want to change
+    // the color of
+
+    y_line  = width;
+    y_src = src;
+
+
+    iThreshold = iThreshold * iThreshold * 4;
+    // We don't want an integer overflow in the  interlace calculation.
+    if (iEdgeDetect > 180)
+        iEdgeDetect = 180;
+    iEdgeDetect = iEdgeDetect * iEdgeDetect;
+
+    y1 = 0;                // Avoid compiler warning. The value is not used.
+    for (x = 0; x < width; x++)
+    {
+        psrc3 = y_src + x;
+        y3    = *psrc3;
+        psrc2 = psrc3 + y_line;
+        y2 = *psrc2;
+        pdst1 = y_dst + x;
+        iInterlaceValue1 = iInterlaceValue2 = 0;
+        for (y = 0; y <= height; y++)
+        {
+            psrc1 = psrc2;
+            psrc2 = psrc3;
+            psrc3 = psrc3 + y_line;
+            y0 = y1;
+            y1 = y2;
+            y2 = y3;
+            if (y < height - 1)
+            {
+                y3 = *psrc3;
+            }
+            else
+            {
+                y3 = y1;
+            }
+
+            iInterlaceValue0 = iInterlaceValue1;
+            iInterlaceValue1 = iInterlaceValue2;
+            
+            if (y < height)
+                iInterlaceValue2 = ((y1 - y2) * (y3 - y2) - 
+                                    ((iEdgeDetect * (y1 - y3) *
+                                      (y1 - y3)) >> 12))*10;
+            else
+                iInterlaceValue2 = 0;
+
+            if (y > 0) 
+            {
+                if (iInterlaceValue0 + 2 * iInterlaceValue1 + 
+                    iInterlaceValue2 > iThreshold)
+                {
+                    if (bBlend)
+                    { 
+                        *pdst1 = (unsigned char)((y0 + 2*y1 + y2) >> 2);
+                    } 
+                    else
+                    {
+                        // this method seems to work better than blending if
+                        // the quality is pretty bad and the half pics don't 
+                        // fit together
+                        if ((y % 2)==1) 
+                        {  // if odd simply copy the value
+                            *pdst1 = *psrc1;
+
+                            // FIXME this is for adjusting an initial 
+                            // iThreshold
+                            //*pdst1 = 0; 
+                        }
+                        else 
+                        {   // even interpolate the even line (upper + lower)/2
+                            *pdst1 = (unsigned char)((y0 + y2) >> 1);
+                            // FIXME this is for adjusting an initial
+                            // iThreshold
+                            //*pdst1 = 0;
+                        }
+                    }
+                } 
+                else
+                {
+                    // so we went below the treshold and therefore we don't
+                    // have to  change anything
+                    if (bShowDeinterlacedAreaOnly)
+                    {
+                        // this is for testing to see how we should tune the
+                        // treshhold and shows as the things that haven't 
+                        // change because the  threshhold was to low??
+                        // or shows that everything is ok 
+
+                        *pdst1 = 0; //blank the point and so the interlac area
+                    }
+                    else 
+                    {
+                        *pdst1 = *psrc1;
+                    }
+                }
+                pdst1 = pdst1 + y_line;
+            }
+        }
+    }
+    Frame *frame = new Frame();
+    frame->codec = CODEC_YUV;
+    frame->width = width;
+    frame->height = height;
+    frame->len = (frame->width * frame->height) + 
+                 (frame->width * frame->height) / 2;
+    frame->bpp = -1;
+    frame->is_field = FALSE;
+    frame->buf = yuvptr;
+
+    return frame;
 }
 
 Frame *NuppelVideoRecorder::GetField(struct vidbuffertype *vidbuf,

@@ -76,6 +76,27 @@ SeekSpeedInfo seek_speed_array[] =
    {"10X", 11.18},
    {"16X", 16.72}};
 
+enum DeinterlaceMode {
+  DEINTERLACE_NONE =0,
+  DEINTERLACE_BOB,
+  DEINTERLACE_BOB_FULLHEIGHT_COPY,
+  DEINTERLACE_BOB_FULLHEIGHT_LINEAR_INTERPOLATION,
+  DEINTERLACE_DISCARD_TOP,
+  DEINTERLACE_DISCARD_BOTTOM,
+  DEINTERLACE_AREA,
+  DEINTERLACE_LAST
+};
+
+char *deinterlacer_names[] =
+{ "None",
+  "Field Bob",
+  "Line Doubler",
+  "Interpolated",
+  "Discard Top",
+  "Discard Bottom",
+  "Area Based"
+};
+
 void *SpawnDecode(void *param)
 {
     NuppelVideoPlayer *nvp = (NuppelVideoPlayer *)param;
@@ -98,6 +119,7 @@ TV::TV(QSqlDatabase *db)
     endOfRecording = false;
     volumeControl = NULL;
 
+    deinterlace_mode = DEINTERLACE_NONE;
     gContext->addListener(this);
 }
 
@@ -962,6 +984,8 @@ void TV::ProcessKeypress(int keypressed)
             case 'l': ChangeColour(false); break;
             case 'L': ChangeColour(true); break;
 
+            case 'x': ChangeDeinterlacer(); break;
+
             default: break;
         }
     }
@@ -1563,6 +1587,22 @@ void TV::ChangeColour(bool up)
 
     if (osd)
         osd->StartPause(colour * 10, true, "", text, 5);
+}
+
+void TV::ChangeDeinterlacer()
+{
+    QString text;
+
+    deinterlace_mode++;
+    if (deinterlace_mode == DEINTERLACE_LAST)
+        deinterlace_mode = 0;
+
+    activerecorder->ChangeDeinterlacer(deinterlace_mode);
+
+    text = QString("Deint %1").arg(deinterlacer_names[deinterlace_mode]);
+
+    if (activenvp == nvp)
+        osd->SetSettingsText(text, text.length() );
 }
 
 void TV::ChangeVolume(bool up)

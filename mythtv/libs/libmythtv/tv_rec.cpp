@@ -1472,6 +1472,12 @@ int TVRec::ChangeColour(bool direction)
     return ret;
 }
 
+void TVRec::ChangeDeinterlacer(int deint_mode)
+{
+    deinterlace_mode = deint_mode;
+    return;
+}
+
 void TVRec::SetChannel(QString name)
 {
     rbuffer->Reset();

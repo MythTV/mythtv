@@ -288,6 +288,15 @@ int RemoteEncoder::ChangeColour(bool direction)
     return retval;
 }
 
+void RemoteEncoder::ChangeDeinterlacer(int deint_mode)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    strlist << "CHANGE_DEINTERLACER";
+    strlist << QString::number((int)deint_mode);
+
+    SendReceiveStringList(strlist);
+}
+
 bool RemoteEncoder::CheckChannel(QString channel)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);

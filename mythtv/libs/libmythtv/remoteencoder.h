@@ -36,6 +36,7 @@ class RemoteEncoder
     int ChangeBrightness(bool direction);
     int ChangeColour(bool direction);
     void ChangeChannel(int channeldirection);
+    void ChangeDeinterlacer(int deint_mode);
     void ToggleChannelFavorite(void);
     void SetChannel(QString channel);
     bool CheckChannel(QString channel);
