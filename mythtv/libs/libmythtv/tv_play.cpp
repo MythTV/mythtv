@@ -1725,14 +1725,14 @@ void TV::ChangeChannelByString(QString &name)
 {
     bool muted = false;
 
+    if (!activerecorder->CheckChannel(name))
+        return;
+
     if (volumeControl && !volumeControl->GetMute() && activenvp == nvp)
     {
         volumeControl->ToggleMute();
         muted = true;
     }
-
-    if (!activerecorder->CheckChannel(name))
-        return;
 
     if (activenvp == nvp)
     {
