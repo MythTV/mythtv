@@ -271,6 +271,12 @@ void MfeDialog::wireUpTheme()
     pause_button = getUIImageType("pause_button");
     pause_button->hide();
  
+    ff_button = getUIPushButtonType("ff_button");
+    rew_button = getUIPushButtonType("rew_button");
+ 
+    next_button = getUIPushButtonType("next_button");
+    prev_button = getUIPushButtonType("prev_button");
+ 
     //
     // Make the first few nodes in the tree that everything else hangs off
     // as children
@@ -462,10 +468,12 @@ void MfeDialog::seekAudio(bool forward_or_back)
     {
         if(forward_or_back)
         {
+            ff_button->push();
             mfd_interface->seekAudio(current_mfd->getId(), 5);
         }
         else
         {
+            rew_button->push();
             mfd_interface->seekAudio(current_mfd->getId(), -5);
         }
     }
@@ -477,10 +485,12 @@ void MfeDialog::nextPrevAudio(bool next_or_prev)
     {
         if(next_or_prev)
         {
+            next_button->push();
             mfd_interface->nextAudio(current_mfd->getId());
         }
         else
         {
+            prev_button->push();
             mfd_interface->prevAudio(current_mfd->getId());
         }
     }

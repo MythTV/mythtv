@@ -65,7 +65,7 @@
 
             <listtreearea name="musictree" draworder="0">
             <area>0,0,760,400</area>
-            <listsize>0,0,370,380</listsize>
+            <listsize>0,0,375,380</listsize>
             <leveloffset>10</leveloffset>
             <gradient type="unselected" start="#505050" end="#ffffff" alpha="100">
             </gradient>
@@ -98,6 +98,35 @@
                 <filename>mfe_pause_on.png</filename>
                 <position>440,0</position>
             </image>
+
+            <pushbutton name="ff_button" draworder="0">
+                <position>510,0</position>
+                <image function="on" filename="mfe_1x1_blank.png"></image>
+                <image function="off" filename="mfe_1x1_blank.png"></image>
+                <image function="pushed" filename="mfe_ff_on.png"></image>
+            </pushbutton>
+
+            <pushbutton name="rew_button" draworder="0">
+                <position>230,0</position>
+                <image function="on" filename="mfe_1x1_blank.png"></image>
+                <image function="off" filename="mfe_1x1_blank.png"></image>
+                <image function="pushed" filename="mfe_rew_on.png"></image>
+            </pushbutton>
+
+            <pushbutton name="next_button" draworder="0">
+                <position>580,0</position>
+                <image function="on" filename="mfe_1x1_blank.png"></image>
+                <image function="off" filename="mfe_1x1_blank.png"></image>
+                <image function="pushed" filename="mfe_next_on.png"></image>
+            </pushbutton>
+
+            <pushbutton name="prev_button" draworder="0">
+                <position>163,0</position>
+                <image function="on" filename="mfe_1x1_blank.png"></image>
+                <image function="off" filename="mfe_1x1_blank.png"></image>
+                <image function="pushed" filename="mfe_prev_on.png"></image>
+            </pushbutton>
+
 
         </container>
 

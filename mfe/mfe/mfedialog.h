@@ -102,6 +102,13 @@ class MfeDialog : public MythThemedDialog
     UIImageType *stop_button;
     UIImageType *play_button;
     UIImageType *pause_button;
+
+    UIPushButtonType *ff_button;
+    UIPushButtonType *rew_button;
+
+    UIPushButtonType *next_button;
+    UIPushButtonType *prev_button;
+
 };
 
 
