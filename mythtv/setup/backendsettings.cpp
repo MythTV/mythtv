@@ -290,7 +290,7 @@ public:
         setHelpText(QObject::tr("If enabled, the master backend will stream and"
                     " delete files if it finds them in the video directory. "
                     "Useful if you are using a central storage location, like "
-                    "an NFS share, and your slave backend isn't running."));
+                    "a NFS share, and your slave backend isn't running."));
     };
 };
 
