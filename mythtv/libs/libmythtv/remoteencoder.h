@@ -66,6 +66,9 @@ class RemoteEncoder
     void GetOutputFilters(QString& filters);
  
     QString GetCurrentChannel(void);
+
+    bool GetErrorStatus(void) { bool v = backendError; backendError = false; 
+                                return v; }
  
   private:
     QSocketDevice *openControlSocket(const QString &host, short port);
@@ -80,6 +83,8 @@ class RemoteEncoder
     short remoteport;
 
     QString lastchannel;
+
+    bool backendError;
 };
 
 #endif

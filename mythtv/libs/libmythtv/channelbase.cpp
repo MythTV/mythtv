@@ -74,12 +74,15 @@ void ChannelBase::ToggleInputs(void)
 {
     int newcapchannel = currentcapchannel;
 
-    do 
+    if (capchannels > 0)
     {
-        newcapchannel = (newcapchannel + 1) % capchannels;
-    } while (inputTuneTo[newcapchannel].isEmpty());
+        do 
+        {
+            newcapchannel = (newcapchannel + 1) % capchannels;
+        } while (inputTuneTo[newcapchannel].isEmpty());
 
-    SwitchToInput(newcapchannel, true);
+        SwitchToInput(newcapchannel, true);
+    }
 }
 
 QString ChannelBase::GetInputByNum(int capchannel)

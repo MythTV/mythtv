@@ -15,6 +15,7 @@ RemoteEncoder::RemoteEncoder(int num, const QString &host, short port)
     recordernum = num;
     remotehost = host;
     remoteport = port;
+    backendError = false;
 
     lastchannel = "";
 
@@ -53,10 +54,13 @@ void RemoteEncoder::SendReceiveStringList(QStringList &strlist)
 
     pthread_mutex_lock(&lock);
 
+    backendError = false;
+
     WriteStringList(controlSock, strlist);
     if (!ReadStringList(controlSock, strlist, true))
     {
         cerr << "Remote encoder not responding.\n";
+        backendError = true;
     }
 
     pthread_mutex_unlock(&lock);

@@ -1677,6 +1677,11 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     while (!eof && !killplayer)
     {
+        if (nvr_enc && nvr_enc->GetErrorStatus())
+        {
+            killplayer = true;
+        }
+
         if (paused)
         { 
             if (!previously_paused)

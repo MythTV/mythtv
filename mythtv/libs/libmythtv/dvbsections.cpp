@@ -122,7 +122,9 @@ void DVBSections::Start()
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
-    pthread_create(&thread, &attr, ThreadHelper, this);
+    sectionThreadRunning = true;
+    if (pthread_create(&thread, &attr, ThreadHelper, this) != 0)
+        sectionThreadRunning = false;
 }
 
 void DVBSections::Stop()

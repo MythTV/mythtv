@@ -633,8 +633,17 @@ void PlaybackBox::updateVideo(QPainter *p)
         if (!nvp)
             startPlayer(curitem);
 
-        if (nvp->IsPlaying())
-            state = kPlaying;
+        if (nvp)
+        {
+            if (nvp->IsPlaying())
+                state = kPlaying;
+        }
+        else
+        {
+            // already dead, so clean up
+            killPlayer();
+            return;
+        }
     }
 
     if ((state == kStopping) || (state == kKilling))
