@@ -4,6 +4,7 @@
 
 #include <qfile.h>
 #include <qstring.h>
+#include <cerrno>
 
 // XXX Program duration should be stored as seconds, not as a QTime.
 //     limited to 24 hours this way.

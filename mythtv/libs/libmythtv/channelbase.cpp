@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
+#include <cerrno>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>

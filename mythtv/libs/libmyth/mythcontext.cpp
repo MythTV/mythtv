@@ -281,6 +281,19 @@ bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
     {
         return false;
     }
+
+    QString dirpath = QDir::homeDirPath() + "/.mythtv";
+    QDir createDir(dirpath);
+
+    if (!createDir.exists())
+    {
+        if (!createDir.mkdir(dirpath, true))
+        {
+            VERBOSE(VB_IMPORTANT, "Could not create ~/.mythtv");
+            return false;
+        }
+    }
+
     if (!f->open(IO_WriteOnly))
     {
         VERBOSE(VB_IMPORTANT, QString("Could not open settings file %1 "

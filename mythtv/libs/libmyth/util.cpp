@@ -800,8 +800,7 @@ bool getUptime(time_t &uptime)
 
 #define MB (1024*1024)
 
-static bool diskUsage(const char *fs,
-                      double &total, double &used, double &free)
+bool diskUsage(const char *fs, double &total, double &used, double &free)
 {
     // stat the file system
 
