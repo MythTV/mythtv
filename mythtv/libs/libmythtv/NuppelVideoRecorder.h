@@ -68,6 +68,7 @@ class NuppelVideoRecorder : public RecorderBase
 
     long long GetFramesWritten(void); 
 
+    bool Open(void);
     int GetVideoFd(void);
     void Reset(void);
 

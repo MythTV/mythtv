@@ -82,6 +82,7 @@ extern "C" {
 HDTVRecorder::HDTVRecorder()
             : RecorderBase()
 {
+    _error = false;
     paused = false;
     mainpaused = false;
     recording = false;
@@ -140,6 +141,23 @@ void HDTVRecorder::SetOptionsFromProfile(RecordingProfile *profile,
     SetOption("vbiformat", gContext->GetSetting("VbiFormat"));
 }
 
+bool HDTVRecorder::Open()
+{
+    if (!buffer) 
+        return false;
+
+    if (chanfd < 0)
+        chanfd = open(videodevice.ascii(), O_RDWR);
+
+    if (chanfd < 0)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Can't open video device: %1 chanfd = %2")
+                .arg(videodevice).arg(chanfd));
+        perror("open video:");
+    }
+    return (chanfd>=0);
+}
+
 void HDTVRecorder::StartRecording(void)
 {
     uint8_t * buf;
@@ -150,18 +168,16 @@ void HDTVRecorder::StartRecording(void)
     int insync = 0;
     int ret;
 
-    chanfd = open(videodevice.ascii(), O_RDWR);
-    if (chanfd < 0)
+    if (!Open())
     {
-        cerr << "HD1 Can't open video device: " << videodevice 
-             << " chanfd = "<< chanfd << endl;
-        perror("open video:");
+        _error = true;        
         return;
     }
 
     if (!SetupRecording())
     {
         cerr << "HD Error initializing recording\n";
+        _error = true;
         return;
     }
 
@@ -821,6 +837,8 @@ void HDTVRecorder::StopRecording(void)
 
 void HDTVRecorder::Reset(void)
 {
+    _error = true;
+
     framesWritten = 0;
     framesSeen = 0;
     gopset = false;

@@ -47,7 +47,7 @@ public:
     void WaitForPause(void);
 
     bool IsRecording(void);
-    bool IsErrored(void) { return false; }
+    bool IsErrored(void) { return error; }
 
     long long GetFramesWritten(void);
 
@@ -87,6 +87,7 @@ private:
     void QualityMonitorSample(int cardnum, dvb_stats_t& sample);
     void ExpireQualityData();
 
+    bool error;
     bool recording;
     bool encoding;
 

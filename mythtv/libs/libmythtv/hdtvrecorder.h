@@ -36,6 +36,7 @@ class HDTVRecorder : public RecorderBase
 
     long long GetFramesWritten(void);
 
+    bool Open(void);
     int GetVideoFd(void);
 
     long long GetKeyframePosition(long long desired);
@@ -64,6 +65,7 @@ class HDTVRecorder : public RecorderBase
     bool paused;
     bool mainpaused;
     bool cleartimeonpause;
+    bool _error;
 
     long long framesWritten;
     long long framesSeen;

@@ -825,6 +825,79 @@ void NuppelVideoRecorder::StreamAllocate(void)
     strm = new signed char[w * h * 2 + 10];
 }
 
+bool NuppelVideoRecorder::Open(void)
+{
+    if (channelfd>0)
+        return true;
+
+    int retries = 0;
+    fd = open(videodevice.ascii(), O_RDWR);
+    while (fd < 0)
+    {
+        usleep(30000);
+        fd = open(videodevice.ascii(), O_RDWR);
+        if (retries++ > 5)
+        {
+            cerr << "Can't open video device: " << videodevice << endl;
+            perror("open video:");
+            KillChildren();
+            errored = true;
+            return false;
+        }
+    }
+
+    usingv4l2 = true;
+
+    struct v4l2_capability vcap;
+    memset(&vcap, 0, sizeof(vcap));
+
+    if (ioctl(fd, VIDIOC_QUERYCAP, &vcap) < 0)
+    {
+        usingv4l2 = false;
+    }
+
+    if (usingv4l2 && !(vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE))
+    {
+        cerr << "Not a v4l2 capture device, falling back to v4l\n";
+        usingv4l2 = false;
+    }
+
+    if (usingv4l2 && !(vcap.capabilities & V4L2_CAP_STREAMING))
+    {
+        cerr << "Won't work with the streaming interface, falling back\n";
+        usingv4l2 = false;
+    }
+
+    usingv4l2 = false;
+
+    if (usingv4l2)
+    {
+        if (vcap.card[0] == 'B' && vcap.card[1] == 'T' &&
+            vcap.card[2] == '8' && vcap.card[4] == '8')
+            correct_bttv = true;
+
+        if (QString("cx8800") == QString((char *)vcap.driver))
+        {
+            channelfd = open(videodevice.ascii(), O_RDWR);
+            if (channelfd < 0)
+            {
+                cerr << "Can't open video device: " << videodevice << endl;
+                perror("open video:");
+                KillChildren();
+                return false;
+            }
+            
+            inpixfmt = FMT_NONE;
+            InitFilters();
+            DoV4L2();
+            return false;
+        }
+    }
+
+    channelfd = fd;
+    return true;
+}
+
 void NuppelVideoRecorder::StartRecording(void)
 {
     if (lzo_init() != LZO_E_OK)
@@ -901,69 +974,11 @@ void NuppelVideoRecorder::StartRecording(void)
     if (getuid() == 0)
         nice(-10);
 
-    int retries = 0;
-    fd = open(videodevice.ascii(), O_RDWR);
-    while (fd < 0)
+    if (!Open())
     {
-        usleep(30000);
-        fd = open(videodevice.ascii(), O_RDWR);
-        if (fd < 0 && retries++ > 5)
-        { 
-            cerr << "Can't open video device: " << videodevice << endl;
-            perror("open video:");
-            KillChildren();
-            errored = true;
-            return;
-        }
+        errored = true;
+        return;
     }
-
-    usingv4l2 = true;
-
-    struct v4l2_capability vcap;
-    memset(&vcap, 0, sizeof(vcap));
-
-    if (ioctl(fd, VIDIOC_QUERYCAP, &vcap) < 0)
-    {
-        usingv4l2 = false;
-    }
-
-    if (usingv4l2 && !(vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE))
-    {
-        cerr << "Not a v4l2 capture device, falling back to v4l\n";
-        usingv4l2 = false;
-    }
-
-    if (usingv4l2 && !(vcap.capabilities & V4L2_CAP_STREAMING))
-    {
-        cerr << "Won't work with the streaming interface, falling back\n";
-        usingv4l2 = false;
-    }
-
-    if (usingv4l2)
-    {
-        if (vcap.card[0] == 'B' && vcap.card[1] == 'T' &&
-            vcap.card[2] == '8' && vcap.card[4] == '8')
-            correct_bttv = true;
-
-        if (QString("cx8800") == QString((char *)vcap.driver))
-        {
-            channelfd = open(videodevice.ascii(), O_RDWR);
-            if (channelfd < 0)
-            {
-                cerr << "Can't open video device: " << videodevice << endl;
-                perror("open video:");
-                KillChildren();
-                return;
-            }
-     
-            inpixfmt = FMT_NONE;
-            InitFilters();
-            DoV4L2();
-            return;
-        }
-    }
-
-    channelfd = fd;
 
     struct video_capability vc;
     struct video_mmap mm;
@@ -983,6 +998,7 @@ void NuppelVideoRecorder::StartRecording(void)
     {
         perror("VIDIOCGCAP:");
         KillChildren(); 
+        errored = true;
         return;
     }
 
@@ -993,6 +1009,7 @@ void NuppelVideoRecorder::StartRecording(void)
     if ((vc.type & VID_TYPE_MJPEG_ENCODER) && hardware_encode)
     {
         DoMJPEG();
+        errored = true;
         return;
     }
 
@@ -1003,6 +1020,7 @@ void NuppelVideoRecorder::StartRecording(void)
     {
         perror("VIDOCGMBUF:");
         KillChildren();
+        errored = true;
         return;
     }
 
@@ -1010,6 +1028,7 @@ void NuppelVideoRecorder::StartRecording(void)
     {
         fprintf(stderr, "need a minimum of 2 capture buffers\n");
         KillChildren();
+        errored = true;
         return;
     }
 
@@ -1023,6 +1042,7 @@ void NuppelVideoRecorder::StartRecording(void)
     {
         perror("mmap");
         KillChildren();
+        errored = true;
         return;
     }
 

@@ -31,10 +31,11 @@ class MpegRecorder : public RecorderBase
     bool GetPause(void);
     void WaitForPause(void);
     bool IsRecording(void);
-    bool IsErrored(void) { return false; }
+    bool IsErrored(void) { return errored; }
 
     long long GetFramesWritten(void);
 
+    bool Open(void);
     int GetVideoFd(void);
 
     long long GetKeyframePosition(long long desired);
@@ -47,9 +48,10 @@ class MpegRecorder : public RecorderBase
     bool PacketHasHeader(unsigned char *buf, int len, unsigned int startcode);
     void ProcessData(unsigned char *buffer, int len);
 
-    void openMpegFileAsInput(void);
-    void openV4L2DeviceAsInput(void);
+    bool OpenMpegFileAsInput(void);
+    bool OpenV4L2DeviceAsInput(void);
 
+    bool errored;
     bool deviceIsMpegFile;
     int bufferSize;
 

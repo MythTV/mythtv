@@ -58,6 +58,7 @@ using namespace std;
 
 DVBRecorder::DVBRecorder(DVBChannel* advbchannel): RecorderBase()
 {
+    error = false;
     isopen = false;
     cardnum = 0;
     swfilter = false;
@@ -372,7 +373,10 @@ void DVBRecorder::CorrectStreamNumber(ipack* ip, int pid)
 void DVBRecorder::StartRecording()
 {
     if (!Open())
+    {
+        error = true;
         return;
+    }
 
     int ret, dataflow = -1;
     receiving = false;
@@ -721,6 +725,7 @@ void DVBRecorder::StopRecording(void)
 
 void DVBRecorder::Reset(void)
 {
+    error = false;
     framesWritten = 0;
 
     positionMap.clear();

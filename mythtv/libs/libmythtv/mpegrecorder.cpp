@@ -45,6 +45,7 @@ const char* MpegRecorder::aspectRatio[] = { "Square", "4:3", "16:9",
 MpegRecorder::MpegRecorder()
             : RecorderBase()
 {
+    errored = false;
     paused = false;
     mainpaused = false;
     recording = false;
@@ -223,7 +224,7 @@ void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile,
     }
 }
 
-void MpegRecorder::openMpegFileAsInput(void)
+bool MpegRecorder::OpenMpegFileAsInput(void)
 {
     chanfd = readfd = open(videodevice.ascii(), O_RDONLY);
 
@@ -231,18 +232,19 @@ void MpegRecorder::openMpegFileAsInput(void)
     {
         cerr << "Can't open MPEG File: " << videodevice << endl;
         perror("open mpeg file:");
-        return;
+        return false;
     }
+    return true;
 }
 
-void MpegRecorder::openV4L2DeviceAsInput(void)
+bool MpegRecorder::OpenV4L2DeviceAsInput(void)
 {
     chanfd = open(videodevice.ascii(), O_RDWR);
     if (chanfd < 0)
     {
         cerr << "Can't open video device: " << videodevice << endl;
         perror("open video:");
-        return;
+        return false;
     }
 
     struct v4l2_format vfmt;
@@ -254,7 +256,7 @@ void MpegRecorder::openV4L2DeviceAsInput(void)
     {
         cerr << "Error getting format\n";
         perror("VIDIOC_G_FMT:");
-        return;
+        return false;
     }
 
     vfmt.fmt.pix.width = width;
@@ -264,7 +266,7 @@ void MpegRecorder::openV4L2DeviceAsInput(void)
     {
         cerr << "Error setting format\n";
         perror("VIDIOC_S_FMT:");
-        return;
+        return false;
     }
 
     struct ivtv_ioctl_codec ivtvcodec;
@@ -274,7 +276,7 @@ void MpegRecorder::openV4L2DeviceAsInput(void)
     {
         cerr << "Error getting codec params\n";
         perror("IVTV_IOC_G_CODEC:");
-        return;
+        return false;
     }
 
     // only 48kHz works properly.
@@ -327,7 +329,7 @@ void MpegRecorder::openV4L2DeviceAsInput(void)
     {
         cerr << "Error setting codec params\n";
         perror("IVTV_IOC_S_CODEC:");
-        return;
+        return false;
     }
 
     struct v4l2_control ctrl;
@@ -338,7 +340,7 @@ void MpegRecorder::openV4L2DeviceAsInput(void)
     {
         cerr << "Error setting codec params\n";
         perror("VIDIOC_S_CTRL:");
-        return;
+        return false;
     }
 
     readfd = open(videodevice.ascii(), O_RDWR);
@@ -346,24 +348,32 @@ void MpegRecorder::openV4L2DeviceAsInput(void)
     {
         cerr << "Can't open video device: " << videodevice << endl;
         perror("open video:");
-        return;
+        return false;
     }
+    return true;
+}
+
+bool MpegRecorder::Open(void)
+{
+    if (deviceIsMpegFile)
+        return OpenMpegFileAsInput();
+    else
+        return OpenV4L2DeviceAsInput();
 }
 
 void MpegRecorder::StartRecording(void)
 {
-    if (deviceIsMpegFile)
-        openMpegFileAsInput();
-    else
-        openV4L2DeviceAsInput();
-
-    if ((chanfd < 0) || (readfd < 0))
-        return;
+    if (!Open())
+    {
+	errored = true;
+	return;
+    }
 
     if (!SetupRecording())
     {
-        cerr << "Error initializing recording\n";
-        return;
+        VERBOSE(VB_IMPORTANT, "Error initializing recording");
+	errored = true;
+	return;
     }
 
     encoding = true;
@@ -646,6 +656,7 @@ void MpegRecorder::StopRecording(void)
 
 void MpegRecorder::Reset(void)
 {
+    errored = false;
     AVPacketList *pktl = NULL;
     while ((pktl = ic->packet_buffer))
     {

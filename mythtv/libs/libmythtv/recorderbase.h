@@ -49,6 +49,7 @@ class RecorderBase
 
     virtual long long GetFramesWritten(void) = 0;
     
+    virtual bool Open(void) = 0;
     virtual int GetVideoFd(void) = 0;
     
     virtual long long GetKeyframePosition(long long desired) = 0;
