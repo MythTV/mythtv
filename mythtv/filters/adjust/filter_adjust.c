@@ -342,7 +342,7 @@ newAdjustFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
         numopts = sscanf(options, "%d:%d:%f:%d:%d:%f", &ymin, &ymax, &ygamma,
                          &cmin, &cmax, &cgamma);
 
-    if (numopts != 6 || (numopts !=1 && ymin != -1))
+    if (numopts != 6 && (numopts !=1 && ymin != -1))
     {
         ymin = 16;
         ymax = 253;
