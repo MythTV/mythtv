@@ -51,6 +51,7 @@ Watching TV or a recording
   16:9 Zoom, and 16:9 Stretch (eliminates black sidebars in TV signal)
 - Left (if a jump amount is entered) to jump back that amount.
 - Right (if a jump amount is entered) to jump ahead that amount.
+- F8 to toggle the sleep timer 30m->1hr->1hr30m->2hr->Off
 
 Without the stickykeys option selected:
 
@@ -87,7 +88,6 @@ Watching TV only:
 - H Channel history. Each repeat steps back through the previous channels.
 - O Turns on 'Browse' mode, allowing user to browse channels and program
     info while watching current show FullScreen.
-- F8 to toggle the sleep timer 30m->1hr->1hr30m->2hr->Off
 
 LiveTV Browse Mode:
 - Left          browse program prior to current listed program.

@@ -1599,6 +1599,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 DoSeek(-jumptime * 60, tr("Jump Back"));
             else if (action == "CHANNELDOWN")
                 DoSeek(jumptime * 60, tr("Jump Ahead"));
+            else if (action == "TOGGLESLEEP")
+                ToggleSleepTimer();
             else
                 handled = false;
         }
