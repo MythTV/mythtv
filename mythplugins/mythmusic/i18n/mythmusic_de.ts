@@ -1194,10 +1194,6 @@
         <source>It will also delete any Smart Playlists belonging to this category.</source>
         <translation>Damit werden auch alle intell. Playlists dieser Kategorie gelöscht.</translation>
     </message>
-    <message>
-        <source> </source>
-        <translation> </translation>
-    </message>
 </context>
 <context>
     <name>ThemeUI</name>

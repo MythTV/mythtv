@@ -1292,10 +1292,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source> </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Are you sure you want to delete this Category?</source>
         <translation type="unfinished"></translation>
     </message>

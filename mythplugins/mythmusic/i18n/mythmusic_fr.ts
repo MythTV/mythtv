@@ -111,66 +111,66 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     </message>
     <message>
         <source>Compilation Artist:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Artiste de compil:</translation>
     </message>
 </context>
 <context>
     <name>EditMetadataDialog</name>
     <message>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Fait</translation>
     </message>
     <message>
         <source>DB Statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>Statistiques BDD</translation>
     </message>
     <message>
         <source>Various Artists</source>
-        <translation type="unfinished">Artistes Variés</translation>
+        <translation>Artistes Variés</translation>
     </message>
     <message>
         <source>Select an Artist</source>
-        <translation type="unfinished">Choix d&apos;un Artiste</translation>
+        <translation>Choix d&apos;un Artiste</translation>
     </message>
     <message>
         <source>Select a Compilation Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélection d&apos;un Artiste de compil</translation>
     </message>
     <message>
         <source>Select an Album</source>
-        <translation type="unfinished">Choix d&apos;un Album</translation>
+        <translation>Choix d&apos;un Album</translation>
     </message>
     <message>
         <source>Select a Genre</source>
-        <translation type="unfinished">Choix d&apos;un genre</translation>
+        <translation>Choix d&apos;un genre</translation>
     </message>
     <message>
         <source>Save Changes?</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauver les changements ?</translation>
     </message>
     <message>
         <source>Save to Database Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauver dans la base seule</translation>
     </message>
     <message>
         <source>Save to File Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauver dans le fichier seul</translation>
     </message>
     <message>
         <source>Save to File and Database</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauver dans la base et le fichier</translation>
     </message>
     <message>
         <source>Exit/Do Not Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortir/ Ne pas sauver</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Annuler</translation>
+        <translation>Annuler</translation>
     </message>
     <message>
         <source>Are you sure you want to save the modified metadata to the file?</source>
-        <translation type="unfinished"></translation>
+        <translation>Êtes vous sûr de vouloir sauver les données modifiées dans le fichie</translation>
     </message>
 </context>
 <context>
@@ -868,7 +868,7 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     </message>
     <message>
         <source>CD: %1 ~ %2 - %3</source>
-        <translation type="unfinished"></translation>
+        <translation>CD: %1 ~ %2 - %3</translation>
     </message>
 </context>
 <context>
@@ -927,23 +927,23 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     </message>
     <message>
         <source>Multi-Artist?</source>
-        <translation type="unfinished"></translation>
+        <translation>Multi-Artiste ?</translation>
     </message>
     <message>
         <source>Switch Titles &amp;&amp; Artists</source>
-        <translation type="unfinished"></translation>
+        <translation>Echanger titres et Artistes</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Titre</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Artiste</translation>
     </message>
     <message>
         <source>Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Taille</translation>
     </message>
 </context>
 <context>
@@ -1040,31 +1040,31 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     </message>
     <message>
         <source>ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ID</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Artiste</translation>
     </message>
     <message>
         <source>Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Album</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Titre</translation>
     </message>
     <message>
         <source>Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Genre</translation>
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Année</translation>
     </message>
     <message>
         <source>Track No.</source>
-        <translation type="unfinished"></translation>
+        <translation>Piste N°</translation>
     </message>
 </context>
 <context>
@@ -1107,7 +1107,7 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     </message>
     <message>
         <source>Are you sure you want to delete this SmartPlaylist?</source>
-        <translation type="unfinished"></translation>
+        <translation>Êtes vous sûr de vouloir effacer cette Liste ?</translation>
     </message>
 </context>
 <context>
@@ -1154,7 +1154,7 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     </message>
     <message>
         <source></source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1185,16 +1185,12 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
         <translation>Renommer la catégorie</translation>
     </message>
     <message>
-        <source> </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Are you sure you want to delete this Category?</source>
-        <translation type="unfinished"></translation>
+        <translation>Êtes vous sûr de vouloir effacer cette catégorie ?</translation>
     </message>
     <message>
         <source>It will also delete any Smart Playlists belonging to this category.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ceci supprimera aussi les Listes qui appartiennent à cette catégorie</translation>
     </message>
 </context>
 <context>

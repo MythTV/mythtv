@@ -866,7 +866,7 @@ SmartPlaylistEditor::SmartPlaylistEditor(MythMainWindow *parent, const char *nam
     limitSpinEdit->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     hbox->addWidget(limitSpinEdit);
     
-    message = tr(" "); // spacer
+    message = " "; // spacer
     label = new QLabel(message, this);
     label->setBackgroundOrigin(WindowOrigin);
     hbox->addWidget(label);

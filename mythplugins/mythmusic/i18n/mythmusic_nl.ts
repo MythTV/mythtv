@@ -1299,10 +1299,6 @@ Probeer hdd(of hdc/hdb)=ide-scsi aan uw opstartopties toe te voegen, als uw IDE-
         <translation>Hernoem Categorie</translation>
     </message>
     <message>
-        <source> </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Are you sure you want to delete this Category?</source>
         <translation>Deze Categorie Verwijderen?</translation>
     </message>
