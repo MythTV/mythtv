@@ -170,7 +170,27 @@ $ mysql -u root &lt; metadata.sql
 </CODE></BLOCKQUOTE>
 </P>
 <P>Edit the <CODE>/usr/local/share/mythtv/mythmusic-settings.txt</CODE> file for
-your particular system.</P>
+your particular system.  Here's some explanation about the Ignore_ID3 and
+The NonID3FileNameFormat:</P>
+<P>If Ignore_ID3 is set to TRUE, mythmusic will try to determine the
+Genre, Artist, Album, Track Number, and Title from the filename of the
+mp3 file.  The NonID3FileNameFormat variable should be set to the
+directory/file format where the mp3 files are stored.  For instance, I
+store mine in the above shown Genre/Artist/Album/Track format.  Mythmusic
+will then use this information to fill in the proper fields when it
+populates the musicmetadata table rather than searching for an ID3 tag in
+the mp3 file.</P>
+<P>The files can be layed out in any format, such as:</P>
+<P>Genre/Artist/Album/Title
+Artist/Genre/Album/Title
+Artist/Album/Title (with Genre left as Unknown)</P>
+<P>The track number is optional but can be specified with the title by using
+the TRACK_TITLE keyword instead of TITLE.  If TRACK_TITLE is used,
+then the filename can have a space, hyphen, or underscore separating the
+track number from the track title.  Keywords are case insensitive, so if
+you specify GENRE it's the same as Genre in the format field.</P>
+<P>The Ignore_ID3 option does not disable the code that determines the track
+length, just the portion that tries to read ID3 info.</P>
 
 <H2><A NAME="ss14.4">14.4</A> <A HREF="mythtv-HOWTO.html#toc14.4">Using MythMusic. </A>
 </H2>

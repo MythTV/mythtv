@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-02-28, v1.100
+<date>2003-03-04, v1.101
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -14,13 +14,13 @@ necessary.
 
 <toc>
 
-<sect>How to obtain this document.
-<p>This HOWTO document is maintained at the primary MythTV website:  <url url="
-http://www.mythtv.org" name="http://www.mythtv.org">.  The latest version of
-this document can be found in CVS, accessible either through the <url
-url="http://cvs.mythtv.org/cgi-bin/viewcvs.cgi/" name="ViewCVS"> web interface, or directly from the
-CVS repository.  You may download the latest copy of MythTV and the 
-documentation from CVS this way:
+<sect>How to obtain this document. <p>This HOWTO document is maintained at
+the primary MythTV website: <url url="http://www.mythtv.org"
+name="http://www.mythtv.org">.  The latest version of this document can be
+found in CVS, accessible either through the <url
+url="http://cvs.mythtv.org/cgi-bin/viewcvs.cgi/" name="ViewCVS"> web
+interface, or directly from the CVS repository.  You may download the latest
+copy of MythTV and the documentation from CVS this way: 
 <tscreen><verb>
 $ mkdir mythtv
 $ cd mythtv
@@ -29,12 +29,19 @@ Logging in to :pserver:mythtv@cvs.mythtv.org:/var/lib/cvs
 CVS password: mythtv
 $ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/cvs checkout MC
 </verb></tscreen>
+
 This documentation will be in the <tt>docs/</tt> subdirectory.
 
-<bf>NOTE</bf>: If you are going to use CVS to compile MythTV rather than using
-the distribution tarball, it is <bf>strongly</bf> recommended that you <url
-url="http://www.snowman.net/mailman/listinfo/mythtv-commits/" name="join">
-the mythtv-dev mailing list.
+<bf>NOTE</bf>: If you are going to use CVS to compile MythTV rather than
+using the distribution tarball, it is <bf>strongly</bf> recommended that you
+join the <url url="http://www.snowman.net/mailman/listinfo/mythtv-commits/"
+name="http://www.snowman.net/mailman/listinfo/mythtv-commits/"> and <url
+url="http://www.snowman.net/mailman/listinfo/mythtv-dev/"
+name="http://www.snowman.net/mailman/listinfo/mythtv-dev/"> mailing list.
+
+It's recommended that you join the user list at <url
+url="http://www.snowman.net/mailman/listinfo/mythtv-users"
+name="http://www.snowman.net/mailman/listinfo/mythtv-users">.
 
 This HOWTO is for MythTV v0.7.
 
@@ -54,6 +61,7 @@ The contributors to MythTV are:
 <item>Lead developer:  Isaac Richardson, <url url="mailto:ijr@po.cwru.edu">
 <item>Developer:  Matthew Zimmerman, <url url="mailto:mdz@debian.org">
 <item>Developer:  John Danner, <url url="mailto:jdanner@untzuntz.com">
+<item>Developer:  Chris Pinkham, <url url="mailto:cpinkham@bc2va.org">
 <item>Overall structure of HOWTO and Mandrake 9.0 documentation: Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
 <item>Red Hat Linux 8.0 documentation: Cedar McKay, <url url="mailto:mythhowto.3.ohthetrees@spamgourmet.com">
 <item>Gentoo documentation and package: Tony Clark, <url url="mailto:tclark@telia.com">
@@ -714,14 +722,16 @@ the settings so that this is your default.
 <sect3>Using OSS drivers.
 
 <p>Red Hat Linux 8.0 ships with OSS sound drivers rather than the ALSA
-drivers recommended by the MythTV team. The OSS drivers do work for some
-people, and for some cards, but others report problems (sync and jitter)
-with OSS. In addition, OSS does not support full duplex on some cards, which
-is required if you want to record and play sound using just one sound card.
-ALSA has good full duplex support, and also has drivers for some built-in
-(motherboard) sound cards that OSS does not. Installing ALSA is less painful
-than you might think, so we encourgage you to go that route. For those of
-you who do not wish to install ALSA you must do this:
+drivers recommended by the MythTV team. The OSS drivers do work for many
+people, and for many cards. We recommend that you give OSS a try since it is
+already included in Red Hat 8. However, some people report problems (sync
+and jitter) with OSS, and in addition it does not support full duplex on
+some cards.  Full duplex is required if you want to record and play sound
+using just one sound card. ALSA has good full duplex support, and also has
+drivers for some built-in (motherboard) sound cards that OSS does not.
+Installing ALSA is less painful than you might think, so if OSS does not
+work for you, installing ALSA is not too difficult. For those of you who do
+not wish to install ALSA you must do this:
 
 To configure sound to work with MythTV, select 
 <verb>RedHat Menu>Sound & Video>Volume Control</verb>
@@ -1826,7 +1836,32 @@ $ mysql -u root < metadata.sql
 </verb></tscreen>
 
 Edit the <tt>/usr/local/share/mythtv/mythmusic-settings.txt</tt> file for
-your particular system.
+your particular system.  Here's some explanation about the Ignore_ID3 and
+The NonID3FileNameFormat:
+
+If Ignore_ID3 is set to TRUE, mythmusic will try to determine the
+Genre, Artist, Album, Track Number, and Title from the filename of the
+mp3 file.  The NonID3FileNameFormat variable should be set to the
+directory/file format where the mp3 files are stored.  For instance, I
+store mine in the above shown Genre/Artist/Album/Track format.  Mythmusic
+will then use this information to fill in the proper fields when it
+populates the musicmetadata table rather than searching for an ID3 tag in
+the mp3 file.
+
+The files can be layed out in any format, such as:
+
+Genre/Artist/Album/Title
+Artist/Genre/Album/Title
+Artist/Album/Title (with Genre left as Unknown)
+
+The track number is optional but can be specified with the title by using
+the TRACK_TITLE keyword instead of TITLE.  If TRACK_TITLE is used,
+then the filename can have a space, hyphen, or underscore separating the
+track number from the track title.  Keywords are case insensitive, so if
+you specify GENRE it's the same as Genre in the format field.
+
+The Ignore_ID3 option does not disable the code that determines the track
+length, just the portion that tries to read ID3 info.
 
 <sect1>Using MythMusic.  
 <p>MythMusic is fairly simple to use.  It is
@@ -2334,7 +2369,7 @@ restart X.
 
 <sect2>MythTV Dimensions
 <p>Set the MythTV GUI size to these same dimensions as the X display. In
-0.7, edit the file <tt>themes.txt</tt>. In 0.8, from "mythfrontend" go to
+0.7, edit the file <tt>theme.txt</tt>. In 0.8, from "mythfrontend" go to
 Setup->Appearance.  To ensure that your new dimension settings, exit and
 restart MythTV.  
 
@@ -2633,6 +2668,9 @@ developers.
 v1.099, 2003-02-24.  More on mythmusic.  Added some more MythTV v0.8 items. 
 Update MythWeather now that there's a config page.
 v1.100, 2003-02-28.  Changes to mythtv-0.8 section of docs.
+v1.101, 2003-03-04.  Typo on the theme.txt.  Changed some text on RH8 and
+OSS/ALSA.  Added some information about the NonID3FileFormat in mythmusic. 
+Added link to mythtv-users list.  More developers.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

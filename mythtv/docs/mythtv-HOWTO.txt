@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-02-28, v1.100
+  2003-03-04, v1.101
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -132,7 +132,7 @@
   [1m1.  How to obtain this document.[0m
 
   This HOWTO document is maintained at the primary MythTV website:
-  http://www.mythtv.org < http://www.mythtv.org>.  The latest version of
+  http://www.mythtv.org <http://www.mythtv.org>.  The latest version of
   this document can be found in CVS, accessible either through the
   ViewCVS <http://cvs.mythtv.org/cgi-bin/viewcvs.cgi/> web interface, or
   directly from the CVS repository.  You may download the latest copy of
@@ -148,9 +148,15 @@
   This documentation will be in the docs/ subdirectory.
 
   [1mNOTE[22m: If you are going to use CVS to compile MythTV rather than using
-  the distribution tarball, it is [1mstrongly [22mrecommended that you join
-  <http://www.snowman.net/mailman/listinfo/mythtv-commits/> the mythtv-
-  dev mailing list.
+  the distribution tarball, it is [1mstrongly [22mrecommended that you join the
+  http://www.snowman.net/mailman/listinfo/mythtv-commits/
+  <http://www.snowman.net/mailman/listinfo/mythtv-commits/> and
+  http://www.snowman.net/mailman/listinfo/mythtv-dev/
+  <http://www.snowman.net/mailman/listinfo/mythtv-dev/> mailing list.
+
+  It's recommended that you join the user list at
+  http://www.snowman.net/mailman/listinfo/mythtv-users
+  <http://www.snowman.net/mailman/listinfo/mythtv-users>.
 
   This HOWTO is for MythTV v0.7.
 
@@ -173,6 +179,8 @@
   +o  Developer:  Matthew Zimmerman,  <mailto:mdz@debian.org>
 
   +o  Developer:  John Danner,  <mailto:jdanner@untzuntz.com>
+
+  +o  Developer:  Chris Pinkham,  <mailto:cpinkham@bc2va.org>
 
   +o  Overall structure of HOWTO and Mandrake 9.0 documentation: Robert
      Kulagowski,  <mailto:rkulagow@rocketmail.com>
@@ -253,7 +261,6 @@
   either use the graphical tools that come with your distribution, or
   you can use command-line utilities.  Either system will get the job
   done, and it all depends on your comfort level with Linux.
-
   [1mNOTE[22m: If you are using MythTV on multiple systems, at least one of
   them will maintain the master database and will need mysql installed.
 
@@ -319,7 +326,6 @@
 
   If you marked anything to install, click on Install Marked.  Click
   "Yes" or OK if you get a message about satisfying dependencies.
-
   [1m3.2.1.2.  Red Hat Linux 8.0[0m
 
   Red Hat Linux 8.0 does not have the same graphical package manager
@@ -422,7 +428,6 @@
 
   The simplest tool for installing packages from the command line is
   [1murpmi[22m.
-
   Open a shell, and execute the following, all on the same line. You may
   get asked a number of questions regarding dependencies.  It's best to
   answer "YES".
@@ -468,7 +473,7 @@
   support are not built. To enable SQL support, add "mysql qt" to your
   USE variable in /etc/make.conf and rebuild QT by running
 
-  $ emerge qt
+       $ emerge qt
 
   Install MySQL if this is the master system:
 
@@ -859,14 +864,16 @@
 
   Red Hat Linux 8.0 ships with OSS sound drivers rather than the ALSA
   drivers recommended by the MythTV team. The OSS drivers do work for
-  some people, and for some cards, but others report problems (sync and
-  jitter) with OSS. In addition, OSS does not support full duplex on
-  some cards, which is required if you want to record and play sound
-  using just one sound card.  ALSA has good full duplex support, and
-  also has drivers for some built-in (motherboard) sound cards that OSS
-  does not. Installing ALSA is less painful than you might think, so we
-  encourgage you to go that route. For those of you who do not wish to
-  install ALSA you must do this:
+  many people, and for many cards. We recommend that you give OSS a try
+  since it is already included in Red Hat 8. However, some people report
+  problems (sync and jitter) with OSS, and in addition it does not
+  support full duplex on some cards.  Full duplex is required if you
+  want to record and play sound using just one sound card. ALSA has good
+  full duplex support, and also has drivers for some built-in
+  (motherboard) sound cards that OSS does not.  Installing ALSA is less
+  painful than you might think, so if OSS does not work for you,
+  installing ALSA is not too difficult. For those of you who do not wish
+  to install ALSA you must do this:
 
   To configure sound to work with MythTV, select
 
@@ -1934,7 +1941,32 @@
   $ mysql -u root < metadata.sql
 
   Edit the /usr/local/share/mythtv/mythmusic-settings.txt file for your
-  particular system.
+  particular system.  Here's some explanation about the Ignore_ID3 and
+  The NonID3FileNameFormat:
+
+  If Ignore_ID3 is set to TRUE, mythmusic will try to determine the
+  Genre, Artist, Album, Track Number, and Title from the filename of the
+  mp3 file.  The NonID3FileNameFormat variable should be set to the
+  directory/file format where the mp3 files are stored.  For instance, I
+  store mine in the above shown Genre/Artist/Album/Track format.
+  Mythmusic will then use this information to fill in the proper fields
+  when it populates the musicmetadata table rather than searching for an
+  ID3 tag in the mp3 file.
+
+  The files can be layed out in any format, such as:
+
+  Genre/Artist/Album/Title Artist/Genre/Album/Title Artist/Album/Title
+  (with Genre left as Unknown)
+
+  The track number is optional but can be specified with the title by
+  using the TRACK_TITLE keyword instead of TITLE.  If TRACK_TITLE is
+  used, then the filename can have a space, hyphen, or underscore
+  separating the track number from the track title.  Keywords are case
+  insensitive, so if you specify GENRE it's the same as Genre in the
+  format field.
+
+  The Ignore_ID3 option does not disable the code that determines the
+  track length, just the portion that tries to read ID3 info.
 
   [1m14.4.  Using MythMusic.[0m
 
@@ -1957,11 +1989,11 @@
 
   Change into the MythWeather directory, then make and make install:
 
-       $ cd mythweather
-       $ make
-       $ su
-       # make install
-       # exit
+  $ cd mythweather
+  $ make
+  $ su
+  # make install
+  # exit
 
   MythWeather uses MSNBC.com as its source for weather data.  You may
   specify a number of identifiers in order to obtain your local weather.
@@ -2100,10 +2132,10 @@
   Some compile errors are worse than others.  If you get an error that
   doesn't abort the compilation, and says something like:
 
-  cc1plus: warning: changing search order for system directory
-  "/usr/local/include"
-  cc1plus: warning:   as it has already been specified as a non-system
-  directory
+       cc1plus: warning: changing search order for system directory
+       "/usr/local/include"
+       cc1plus: warning:   as it has already been specified as a non-system
+       directory
 
   then it shouldn't be a problem.
 
@@ -2150,23 +2182,23 @@
 
   Finally, check:
 
-  Section "Monitor"
-      Identifier "monitor1"
-      VendorName "Plug'n Play"
-      HorizSync 30-85
-      VertRefresh 50-160
+       Section "Monitor"
+           Identifier "monitor1"
+           VendorName "Plug'n Play"
+           HorizSync 30-85
+           VertRefresh 50-160
 
-      # Sony Vaio C1(X,XS,VE,VN)?
-      # 1024x480 @ 85.6 Hz, 48 kHz hsync
-      ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+           # Sony Vaio C1(X,XS,VE,VN)?
+           # 1024x480 @ 85.6 Hz, 48 kHz hsync
+           ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
 
-      # TV fullscreen mode or DVD fullscreen output.
-      # 768x576 @ 79 Hz, 50 kHz hsync
-      ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+           # TV fullscreen mode or DVD fullscreen output.
+           # 768x576 @ 79 Hz, 50 kHz hsync
+           ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
 
-      # 768x576 @ 100 Hz, 61.6 kHz hsync
-      ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
-  EndSection
+           # 768x576 @ 100 Hz, 61.6 kHz hsync
+           ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+       EndSection
 
   Ensure that there isn't an Option "DPMS" in the Monitor configuration.
 
@@ -2344,7 +2376,6 @@
 
   At this point, you can read the MPlayer documentation and start the
   compile process.
-
   [1m18.2.  I'd like to use some other window manager.[0m
 
   MythTV is not dependent on any particular window manager.  If you wish
@@ -2467,7 +2498,7 @@
   [1m18.5.2.  MythTV Dimensions[0m
 
   Set the MythTV GUI size to these same dimensions as the X display. In
-  0.7, edit the file themes.txt. In 0.8, from "mythfrontend" go to
+  0.7, edit the file theme.txt. In 0.8, from "mythfrontend" go to
   Setup->Appearance.  To ensure that your new dimension settings, exit
   and restart MythTV.
 
@@ -2522,9 +2553,9 @@
   lose all of your settings and will need to re-run the mc.sql script to
   setup the database structure before running the setup program.
 
-       $ mysql -u root
-       mysql> drop database mythconverg;
-       mysql> quit
+  $ mysql -u root
+  mysql> drop database mythconverg;
+  mysql> quit
 
   [1m18.7.  I'd like to start using the development version of MythTV.[0m
 
@@ -2582,8 +2613,8 @@
 
   Once you're done editing the file, start the setup program:
 
-       $ cd setup
-       $ ./setup
+  $ cd setup
+  $ ./setup
 
   This will open the setup wizard which will allow you to graphically
   configure your system.
