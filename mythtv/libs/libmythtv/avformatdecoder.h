@@ -115,7 +115,8 @@ class AvFormatDecoder : public DecoderBase
     bool CheckVideoParams(int width, int height);
 
     /// See if the audio parameters have changed, return true if so.
-    bool CheckAudioParams(int freq, int channels);
+    void CheckAudioParams(int freq, int channels, bool safe);
+    void SetupAudioStream(void);
 
     int EncodeAC3Frame(unsigned char* data, int len, short *samples,
                        int &samples_size);
