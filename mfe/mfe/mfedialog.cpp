@@ -178,42 +178,82 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
     
     if( node->getAttribute(1) == 1)
     {
-        //
-        //  It's a pure metadata item
-        //
-
-        mfd_interface->playAudio(
-                                    current_mfd->getId(),
-                                    node->getAttribute(0),
-                                    node->getAttribute(1),
-                                    node->getInt()
-                                );
-        //
-        //  See if we can get everything about this puppy
-        //
-    
-        AudioMetadata *current_item = current_mfd->getAudioMetadata( node->getAttribute(0), node->getInt());
-        if(!current_item)
+        if(node->getAttribute(0) > 0 && node->getInt() > 0)
         {
-            cerr << "mfedialog.o: weird ... couldn't find an audio item"
-                 << endl;
-        }
 
+            //
+            //  It's a pure metadata item
+            //
+
+            mfd_interface->playAudio(
+                                        current_mfd->getId(),
+                                        node->getAttribute(0),
+                                        node->getAttribute(1),
+                                        node->getInt()
+                                    );
+        }
+        else
+        {
+        
+            //
+            //  It's in the item tree, but above a selectable item
+            //
+        
+            GenericTree *first_leaf = node->findLeaf();
+            if(first_leaf->getAttribute(0) > 0 && first_leaf->getInt() > 0)
+            {
+
+                mfd_interface->playAudio(
+                                            current_mfd->getId(),
+                                            first_leaf->getAttribute(0),
+                                            first_leaf->getAttribute(1),
+                                            first_leaf->getInt()
+                                        );
+            }
+        }
         
     }
     else if(node->getAttribute(1) == 2)
     {
-        //
-        //  It's an entry in a playlist
-        //
+    
+        if(node->getAttribute(0) > 0 && node->getInt() > 0)
+        {
 
-        mfd_interface->playAudio(
-                                    current_mfd->getId(),
-                                    node->getAttribute(0),
-                                    node->getAttribute(1),
-                                    node->getInt(),
-                                    node->getAttribute(2)
-                                );
+            //
+            //  It's an entry in a playlist
+            //
+
+            mfd_interface->playAudio(
+                                        current_mfd->getId(),
+                                        node->getAttribute(0),
+                                        node->getAttribute(1),
+                                        node->getInt(),
+                                        node->getAttribute(2)
+                                    );
+        }
+        else
+        {
+            //
+            //  It's a playlist thing, but above a leaf item
+            //
+            
+            GenericTree *first_leaf = node->findLeaf();
+            if(first_leaf->getAttribute(0) > 0 && first_leaf->getInt() > 0)
+            {
+
+                //
+                //  It's an entry in a playlist
+                //
+
+                mfd_interface->playAudio(
+                                            current_mfd->getId(),
+                                            first_leaf->getAttribute(0),
+                                            first_leaf->getAttribute(1),
+                                            first_leaf->getInt(),
+                                            first_leaf->getAttribute(2)
+                                        );
+            }
+        }
     }
     else if(node->getAttribute(1) == 3)
     {
@@ -284,11 +324,16 @@ void MfeDialog::wireUpTheme()
 
     menu_root_node = new UIListGenericTree(NULL, "Menu Root Node");
 
-    browse_node =  new UIListGenericTree(menu_root_node, "Browse");
-    manage_node =  new UIListGenericTree(menu_root_node, "Manage");
-    connect_node = new UIListGenericTree(menu_root_node, "Control");
-    setup_node   = new UIListGenericTree(menu_root_node, "Setup");
+    browse_node =  new UIListGenericTree(menu_root_node, "Browse Music");
+    manage_node =  new UIListGenericTree(menu_root_node, "Manage Content and Playlists");
+    connect_node = new UIListGenericTree(menu_root_node, "Control other Myth Boxes");
+    setup_node   = new UIListGenericTree(menu_root_node, "Settings and Controls");
     
+    //
+    //  Some preset subnodes
+    //
+    
+    new_playlist_node = new UIListGenericTree((UIListGenericTree *) manage_node, "Create New Playlist");
     menu->SetTree(menu_root_node);
 
 }
@@ -723,17 +768,23 @@ void MfeDialog::updateConnectionList()
     connect_node->deleteAllChildren();
     connect_node->setDrawArrow(false);
     
-    if(available_mfds.count() > 0)
+    if(available_mfds.count() > 1)
     {
         connect_node->setDrawArrow(true);
     }
     
-    QIntDictIterator<MfdInfo> it(available_mfds); 
-    for( ; it.current(); ++it)
+    if(current_mfd)
     {
-        UIListGenericTree *an_mfd_node = new UIListGenericTree(connect_node, it.current()->getHost());
-        an_mfd_node->setInt(it.current()->getId());
-        an_mfd_node->setAttribute(1, 3);
+        QIntDictIterator<MfdInfo> it(available_mfds); 
+        for( ; it.current(); ++it)
+        {
+            if(it.current()->getId() != current_mfd->getId())
+            {
+                UIListGenericTree *an_mfd_node = new UIListGenericTree(connect_node, it.current()->getHost());
+                an_mfd_node->setInt(it.current()->getId());
+                an_mfd_node->setAttribute(1, 3);
+            }
+        }
     }
     menu->tryToSetCurrent(route_to_current);
     menu->refresh();

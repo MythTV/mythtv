@@ -107,11 +107,18 @@
 
         </container>
 
-    
+        <!--
+        <container name="musicnavigator">
+            <area>0,110,800,400</area>
+            <image name="mfe_navback_upperleft" draworder="0" fleximage="no">
+                <filename>mfe_navback_upperleft.png</filename>
+                <position>0,0</position>
+            </image>
+        </container>    
+        -->
         
         <container name="musictree">
             <area>20,110,780,400</area>
-
             <listtreearea name="musictree" draworder="0">
             <area>0,0,760,400</area>
             <listsize>0,0,376,380</listsize>

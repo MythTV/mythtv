@@ -63,9 +63,9 @@ bool MfdInfo::setCurrentPlayingData(int which_container, int which_metadata, int
     if(whats_playing)
     {
         bool return_value = true;
+        playing_strings.append(whats_playing->getTitle());
         playing_strings.append(whats_playing->getArtist());
         playing_strings.append(whats_playing->getAlbum());
-        playing_strings.append(whats_playing->getTitle());
         played_percentage = (double) ((numb_seconds + 0.0) * 1000.0) / (whats_playing->getLength() + 0.0);
         knows_whats_playing = true;
         
@@ -85,6 +85,7 @@ bool MfdInfo::setCurrentPlayingData(int which_container, int which_metadata, int
         previous_container = -2;
         previous_item = -2;
     }
+    return false;
 }
 
 
