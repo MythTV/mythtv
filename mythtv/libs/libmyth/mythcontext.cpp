@@ -493,6 +493,7 @@ bool MythContextPrivate::PromptForDatabaseParams(void)
     
         // ask user for language settings
         LanguageSettings::prompt();
+        LanguageSettings::load("mythfrontend");
         
         // ask user for database parameters
         DatabaseSettings settings;
