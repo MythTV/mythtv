@@ -40,7 +40,7 @@ TitleDialog::TitleDialog(QSqlDatabase *ldb,
     disc_name = d_name;
     if(disc_name.length() < 1)
     {
-        disc_name = "Unkown";
+        disc_name = tr("Unkown");
     }
     dvd_titles = titles;
 
@@ -74,7 +74,7 @@ TitleDialog::TitleDialog(QSqlDatabase *ldb,
         }
         else
         {
-            dvd_titles->at(i)->setName(QString("%1 - Title %2").arg(disc_name).arg(i + 1));
+            dvd_titles->at(i)->setName(QString(tr("%1 - Title %2")).arg(disc_name).arg(i + 1));
         }
     }
 
@@ -119,7 +119,7 @@ void TitleDialog::showCurrentTitle()
         if(quality_select)
         {
             quality_select->cleanOut();
-            quality_select->addItem(0, "Perfect");
+            quality_select->addItem(0, tr("Perfect"));
             QString q_string = QString("SELECT name,intid FROM dvdtranscode "
                                        "WHERE input = %1 ;")
                                        .arg(current_title->getInputID());
@@ -138,7 +138,7 @@ void TitleDialog::showCurrentTitle()
         if(subtitle_select)
         {
             subtitle_select->cleanOut();
-            subtitle_select->addItem(-1, "None");
+            subtitle_select->addItem(-1, tr("None"));
             QPtrList<DVDSubTitleInfo> *subtitles = current_title->getSubTitles();
             for(uint j = 0; j < subtitles->count(); ++j)
             {
@@ -153,7 +153,7 @@ void TitleDialog::showCurrentTitle()
         }
         if(numb_titles_text)
         {
-            numb_titles_text->SetText(QString("Title %1 of %2").arg(current_title->getTrack()).arg(dvd_titles->count()));
+            numb_titles_text->SetText(QString(tr("Title %1 of %2")).arg(current_title->getTrack()).arg(dvd_titles->count()));
         }
     }
     else
@@ -375,11 +375,11 @@ void TitleDialog::toggleTitle(bool on_or_off)
     }
     if(numb_selected == 1)
     {
-        ripaway_button->setText("0 Process Selected Title");
+        ripaway_button->setText(tr("0 Process Selected Title"));
     }
     else
     {
-        ripaway_button->setText("0 Process Selected Titles");
+        ripaway_button->setText(tr("0 Process Selected Titles"));
     }
     if(ripaway_button->GetContext() != -1)
     {
@@ -568,7 +568,7 @@ void TitleDialog::wireUpTheme()
     ripaway_button = getUITextButtonType("ripaway_button");
     if(ripaway_button)
     {
-        ripaway_button->setText("0 Process Selected Title");
+        ripaway_button->setText(tr("0 Process Selected Title"));
         ripaway_button->allowFocus(false);
         connect(ripaway_button, SIGNAL(pushed()), this, SLOT(ripTitles()));
     }

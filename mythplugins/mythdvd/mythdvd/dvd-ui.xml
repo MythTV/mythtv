@@ -58,6 +58,7 @@
                 <area>200,5,600,95</area>
                 <value>Rip/Transcode</value>
                 <value lang="DK">Rip/Genkod</value>
+                <value lang="PT">Cópia/Recodificação</value>
             </textarea>
             <image name="progress_background" draworder="0">
                 <filename>md_progress_background.png</filename>
@@ -104,6 +105,7 @@
                 <area>275,330,150,30</area>
                 <value>Job 1 of 1</value>
                 <value lang="DK">Job 1 af 1</value>
+                <value lang="PT">Processo 1 de 1</value>
             </textarea>
 
             <statusbar name="overall_status" draworder="1" whitespace="15">
@@ -209,6 +211,7 @@
                 <area>200,5,600,95</area>
                 <value>Rip/Transcode</value>
                 <value lang="DK">Rip/Genkod</value>
+                <value lang="PT">Cópia/Recodificação</value>
             </textarea>
             <image name="progress_background" draworder="0">
                 <filename>md_progress_background.png</filename>
@@ -229,6 +232,7 @@
                 <area>50,35,250,30</area>
                 <value>Length:</value>
                 <value lang="DK">Længde:</value>
+                <value lang="PT">Tamanho:</value>
             </textarea>
 
             <textarea name="ripcheck_text" draworder="0" align="right">
@@ -236,6 +240,7 @@
                 <area>50,75,250,30</area>
                 <value>Select:</value>
                 <value lang="DK">Vælg:</value>
+                <value lang="PT">Copiar:</value>
             </textarea>
 
             <textarea name="ripname_text" draworder="0" align="right">
@@ -243,6 +248,7 @@
                 <area>50,110,250,30</area>
                 <value>Name:</value>
                 <value lang="DK">Navn:</value>
+                <value lang="PT">Nome:</value>
             </textarea>
 
             <textarea name="ripquality_text" draworder="0" align="right">
@@ -250,6 +256,7 @@
                 <area>50,145,250,30</area>
                 <value>Quality:</value>
                 <value lang="DK">Kvalitet:</value>
+                <value lang="PT">Qualidade:</value>
             </textarea>
 
             <textarea name="ripaudio_text" draworder="0" align="right">
@@ -257,6 +264,7 @@
                 <area>50,180,250,30</area>
                 <value>Audio Track:</value>
                 <value lang="DK">Lydspor:</value>
+                <value lang="PT">Pista de �~Audio:</value>
             </textarea>
 
             <textarea name="ripacthree_text" draworder="0" align="right">
@@ -264,6 +272,7 @@
                 <area>50,215,250,30</area>
                 <value>AC3 Audio:</value>
                 <value lang="DK">AC3 lyd:</value>
+                <value lang="PT">�~Audio AC3:</value>
             </textarea>
 
             <textarea name="subtitle_text" draworder="0" align="right">
@@ -271,6 +280,7 @@
                 <area>50,250,250,30</area>
                 <value>Subtitles:</value>
                 <value lang="DK">Undertekster:</value>
+                <value lang="PT">Legendas:</value>
             </textarea>
 
             <textarea name="ripview_text" draworder="0" align="right">
@@ -278,6 +288,7 @@
                 <area>50,285,250,30</area>
                 <value>View:</value>
                 <value lang="DK">Se:</value>
+                <value lang="PT">�~Bngulo:</value>
             </textarea>
 
             <!--
@@ -349,6 +360,7 @@
                 <area>265,330,170,30</area>
                 <value>Title 1 of 1</value>
                 <value lang="DK">Titel 1 af 1</value>
+                <value lang="PT">Título 1 de 1:</value>
             </textarea>
 
             <pushbutton name="prev_title_button" draworder="0">

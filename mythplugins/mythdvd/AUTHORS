@@ -21,4 +21,6 @@ MythDVD relies heavily on the transcode project:
 and, by the time anyone reads this file, probably a lot of patch
 contributors.
 
+Translations:
+    PT: Bruno Rodrigues <bruno.rodrigues at litux dot org>
 

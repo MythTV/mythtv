@@ -4,6 +4,7 @@
       <type>DVD_PLAY</type>
       <text>Play DVD</text>
       <text lang="DK">Afspil DVD</text>
+      <text lang="PT">Tocar DVD</text>
       <action>DVD_PLAY</action>
    </button>
 
@@ -11,6 +12,7 @@
       <type>VCD_PLAY</type>
       <text>Play VCD</text>
       <text lang="DK">Afspil VCD</text>
+      <text lang="PT">Tocar VCD</text>
       <action>VCD_PLAY</action>
    </button>
 
@@ -20,6 +22,7 @@
       <type>DVD_RIP</type>
       <text>Rip DVD</text>
       <text lang="DK">Genkod DVD</text>
+      <text lang="PT">Copiar DVD</text>
       <action>DVD_RIP</action>
    </button>
 

@@ -455,14 +455,14 @@ DVDProbe::DVDProbe(const QString &dvd_device, QSqlDatabase *ldb)
     dvd = NULL;
     titles.setAutoDelete(true);
     titles.clear();
-    volume_name = "Unknown";
+    volume_name = QObject::tr("Unknown");
     first_time = true;
 }
 
 void DVDProbe::wipeClean()
 {
     titles.clear();
-    volume_name = "Unknown";
+    volume_name = QObject::tr("Unknown");
 }
 
 bool DVDProbe::probe()

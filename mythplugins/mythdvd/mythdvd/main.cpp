@@ -64,8 +64,8 @@ void playVCD()
         //  User probably never did setup
         //
         DialogBox *no_player_dialog = new DialogBox(gContext->GetMainWindow(),
-                     "\n\nYou have no VCD Player command defined.");
-        no_player_dialog->AddButton("OK, I'll go run Setup");
+                    QObject::tr("\n\nYou have no VCD Player command defined."));
+        no_player_dialog->AddButton(QObject::tr("OK, I'll go run Setup"));
         no_player_dialog->exec();
         
         delete no_player_dialog;
@@ -85,8 +85,8 @@ void playVCD()
                 //  RTF README
                 //
                 DialogBox *no_device_dialog = new DialogBox(gContext->GetMainWindow(),
-                             "\n\nYou have no VCD Device defined.");
-                no_device_dialog->AddButton("OK, I'll go run Setup");
+                            QObject::tr("\n\nYou have no VCD Device defined."));
+                no_device_dialog->AddButton(QObject::tr("OK, I'll go run Setup"));
                 no_device_dialog->exec();
                 
                 delete no_device_dialog;
@@ -118,8 +118,8 @@ void playDVD()
         //  User probably never did setup
         //
         DialogBox *no_player_dialog = new DialogBox(gContext->GetMainWindow(),
-                     "\n\nYou have no DVD Player command defined.");
-        no_player_dialog->AddButton("OK, I'll go run Setup");
+                   QObject::tr("\n\nYou have no DVD Player command defined."));
+        no_player_dialog->AddButton(QObject::tr("OK, I'll go run Setup"));
         no_player_dialog->exec();
         
         delete no_player_dialog;
@@ -139,8 +139,8 @@ void playDVD()
                 //  RTF README
                 //
                 DialogBox *no_device_dialog = new DialogBox(gContext->GetMainWindow(),
-                             "\n\nYou have no DVD Device defined.");
-                no_device_dialog->AddButton("OK, I'll go run Setup");
+                           QObject::tr("\n\nYou have no DVD Device defined."));
+                no_device_dialog->AddButton(QObject::tr("OK, I'll go run Setup"));
                 no_device_dialog->exec();
         
                 delete no_device_dialog;
@@ -262,13 +262,31 @@ int mythplugin_init(const char *libversion)
 
 int mythplugin_run(void)
 {
+    QTranslator translator( 0 );
+    translator.load(PREFIX + QString("/share/mythtv/i18n/mythdvd_") +
+                    QString(gContext->GetSetting("Language").lower()) +
+                    QString(".qm"), ".");
+    qApp->installTranslator(&translator);
+
     runMenu("dvdmenu.xml");
+
+    qApp->removeTranslator(&translator);
+
     return 0;
 }
 
 int mythplugin_config(void)
 {
+    QTranslator translator( 0 );
+    translator.load(PREFIX + QString("/share/mythtv/i18n/mythdvd_") +
+                    QString(gContext->GetSetting("Language").lower()) +
+                    QString(".qm"), ".");
+    qApp->installTranslator(&translator);
+
     runMenu("dvd_settings.xml");
+
+    qApp->removeTranslator(&translator);
+
     return 0;
 }
 

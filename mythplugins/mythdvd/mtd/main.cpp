@@ -142,12 +142,18 @@ int main(int argc, char **argv)
     //
     //  Nice ourself
     //
-    
+   
+    QTranslator translator( 0 );
+    translator.load(PREFIX + QString("/share/mythtv/i18n/mythdvd_") +
+                    QString(gContext->GetSetting("Language").lower()) +
+                    QString(".qm"), ".");
+    qApp->installTranslator(&translator); 
     
     new MTD(db, assigned_port, log_stdout);
     
     a.exec();
                                 
+    qApp->removeTranslator(&translator);
 
     delete db;
     delete gContext;

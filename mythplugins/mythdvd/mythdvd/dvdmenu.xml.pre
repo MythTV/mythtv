@@ -4,6 +4,7 @@
       <type>DVD_PLAY</type>
       <text>Play DVD</text>
       <text lang="DK">Afspil DVD</text>
+      <text lang="PT">Tocar DVD</text>
       <action>DVD_PLAY</action>
    </button>
 

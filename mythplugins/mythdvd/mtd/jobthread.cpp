@@ -179,7 +179,7 @@ bool DVDThread::ripTitle(int title_number,
 
     bool loop = true;
     
-    setSubName("Waiting For Access to DVD", 1);
+    setSubName(QObject::tr("Waiting For Access to DVD"), 1);
 
     while(loop)
     {
@@ -445,7 +445,8 @@ bool DVDThread::ripTitle(int title_number,
             
             setSubProgress((double) (sector_counter) / (double) (total_sectors), 1);
             overall_progress = subjob_progress * sub_to_overall_multiple;
-            updateSubjobString(job_time.elapsed() / 1000, "Ripping to file ~");
+            updateSubjobString(job_time.elapsed() / 1000, 
+                               QObject::tr("Ripping to file ~"));
             if(!ripfile->writeBlocks(video_data, cur_output_size * DVD_VIDEO_LB_LEN))
             {
                 problem("Couldn't write blocks during a rip. Filesystem size exceeded? Disc full?");
@@ -537,7 +538,7 @@ void DVDPerfectThread::run()
     //
     
     nice(nice_level);
-    job_name = QString("Perfect DVD Rip of %1").arg(rip_name);
+    job_name = QString(QObject::tr("Perfect DVD Rip of %1")).arg(rip_name);
     if(keepGoing())
     {
         ripTitle(dvd_title, destination_file_string, ".vob", true);
@@ -628,12 +629,12 @@ void DVDTranscodeThread::run()
         }
         if(two_pass)
         {
-            job_name = QString("Transcode of %1").arg(rip_name);
+            job_name = QString(QObject::tr("Transcode of %1")).arg(rip_name);
             sub_to_overall_multiple = 0.333333333;
         }
         else
         {
-            job_name = QString("Transcode of %1").arg(rip_name);
+            job_name = QString(QObject::tr("Transcode of %1")).arg(rip_name);
             sub_to_overall_multiple = 0.50;
         }
     }
@@ -658,7 +659,7 @@ void DVDTranscodeThread::run()
     //  transcoding jobs)
     //
     
-    setSubName("Waiting for Permission to Start Transcoding", 1);
+    setSubName(QObject::tr("Waiting for Permission to Start Transcoding"), 1);
     
     bool loop = true;
     
@@ -1094,7 +1095,7 @@ bool DVDTranscodeThread::runTranscode(int which_run)
                 //
 
                 QString status_line = tc_process->readLineStdout();
-                status_line = status_line.section("EMT: ", 1, 1);
+                status_line = status_line.section(QObject::tr("EMT: "), 1, 1);
                 status_line = status_line.section(",",0,0);
                 QString h_string = status_line.section(":",0,0);
                 QString m_string = status_line.section(":",1,1);
@@ -1119,13 +1120,15 @@ bool DVDTranscodeThread::runTranscode(int which_run)
                     {
                         setSubProgress(percent_transcoded, 1);
                         overall_progress = 0.333333 + (0.333333 * percent_transcoded);
-                        updateSubjobString(job_time.elapsed() / 1000, "Transcoding Pass 1 of 2 ~");
+                        updateSubjobString(job_time.elapsed() / 1000, 
+                                           QObject::tr("Transcoding Pass 1 of 2 ~"));
                     }
                     else if(which_run == 2)
                     {
                         setSubProgress(percent_transcoded, 1);
                         overall_progress = 0.666666 + (0.333333 * percent_transcoded);
-                        updateSubjobString(job_time.elapsed() / 1000, "Transcoding Pass 2 of 2 ~");
+                        updateSubjobString(job_time.elapsed() / 1000, 
+                                           QObject::tr("Transcoding Pass 2 of 2 ~"));
                     }
                 }
                 else
@@ -1138,7 +1141,8 @@ bool DVDTranscodeThread::runTranscode(int which_run)
                     
                     setSubProgress(percent_transcoded, 1);
                     overall_progress = 0.50 + (0.50 * percent_transcoded);
-                    updateSubjobString(job_time.elapsed() / 1000, "Transcoding ~");
+                    updateSubjobString(job_time.elapsed() / 1000, 
+                                       QObject::tr("Transcoding ~"));
                 }
             }
             else
@@ -1148,7 +1152,7 @@ bool DVDTranscodeThread::runTranscode(int which_run)
                 {
                     tick_tock = 1;
                 }
-                QString a_string = "Transcode is thinking ";
+                QString a_string = QObject::tr("Transcode is thinking ");
                 for(uint i = 0; i < tick_tock; i++)
                 {
                     a_string += ".";

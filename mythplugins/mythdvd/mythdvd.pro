@@ -5,4 +5,4 @@
 TEMPLATE = subdirs
 
 # Directories
-SUBDIRS = mythdvd mtd
+SUBDIRS = mythdvd mtd i18n

@@ -241,9 +241,9 @@ void DVDRipBox::connectionClosed()
         cancel_button->SetContext(-2);
         cancel_button->refresh();
     }
-    QString warning = "Your connection to the Myth "
-                      "Transcoding Daemon has gone "
-                      "away. This is not a good thing.";
+    QString warning = tr("Your connection to the Myth "
+                         "Transcoding Daemon has gone "
+                         "away. This is not a good thing.");
     warning_text->SetText(warning);
     update();
 }
@@ -437,30 +437,30 @@ void DVDRipBox::connectionError(int error_id)
     //
     if(error_id == QSocket::ErrConnectionRefused)
     {
-        QString warning = "Cannot connect to your Myth "
-                          "Transcoding Daemon. You can try "
-                          "hitting any number key to start "
-                          "it. If you still see this message, "
-                          "then something is really wrong.";
+        QString warning = tr("Cannot connect to your Myth "
+                             "Transcoding Daemon. You can try "
+                             "hitting any number key to start "
+                             "it. If you still see this message, "
+                             "then something is really wrong.");
         warning_text->SetText(warning);
     }
     else if(error_id == QSocket::ErrHostNotFound)
     {
-        QString warning = "Attempting to connect to your "
-                          "mtd said host not found. This "
-                          "is unrecoverably bad. ";
+        QString warning = tr("Attempting to connect to your "
+                             "mtd said host not found. This "
+                             "is unrecoverably bad. ");
         warning_text->SetText(warning);
     }
     else if(error_id == QSocket::ErrSocketRead)
     {
-        QString warning = "Socket communication errors. "
-                          "This is unrecoverably bad. ";
+        QString warning = tr("Socket communication errors. "
+                             "This is unrecoverably bad. ");
         warning_text->SetText(warning);
     }
     else
     {
-        QString warning = "Something is wrong, but I don't "
-                          "know what.";
+        QString warning = tr("Something is wrong, but I don't "
+                             "know what.");
         warning_text->SetText(warning);
         
     }
@@ -571,7 +571,7 @@ void DVDRipBox::showCurrentJob()
         }
         if(numb_jobs_text)
         {
-            numb_jobs_text->SetText(QString("Job %1 of %2").arg(current_job + 1).arg(numb_jobs));
+            numb_jobs_text->SetText(QString(tr("Job %1 of %2")).arg(current_job + 1).arg(numb_jobs));
         }
     }
     else
@@ -657,7 +657,7 @@ void DVDRipBox::handleStatus(QStringList tokens)
                 {
                     if(warning_text)
                     {
-                        warning_text->SetText("No jobs and nothing else to do. You could hit 0 to rip a DVD.");
+                        warning_text->SetText(tr("No jobs and nothing else to do. You could hit 0 to rip a DVD."));
                     }
                 }
             }
@@ -665,7 +665,7 @@ void DVDRipBox::handleStatus(QStringList tokens)
             {
                 if(warning_text)
                 {
-                    warning_text->SetText("No Jobs. Checking and/or waiting for DVD.");
+                    warning_text->SetText(tr("No Jobs. Checking and/or waiting for DVD."));
                 }
             }
         }
@@ -680,14 +680,14 @@ void DVDRipBox::handleStatus(QStringList tokens)
             {
                 if(warning_text)
                 {
-                    warning_text->SetText("No jobs and nothing else to do. You could hit 0 to rip a disc if you like.");
+                    warning_text->SetText(tr("No jobs and nothing else to do. You could hit 0 to rip a disc if you like."));
                 }
             }
             else
             {
                 if(warning_text)
                 {
-                    warning_text->SetText("No Jobs. Checking and/or waiting for DVD.");
+                    warning_text->SetText(tr("No Jobs. Checking and/or waiting for DVD."));
                 }
             }
             
@@ -1018,7 +1018,7 @@ void DVDRipBox::cancelJob()
             sendToServer(QString("abort dvd job %1").arg(jobs.at(current_job)->getNumber()));
             qApp->processEvents();
             jobs.at(current_job)->setSubjob(0.0);
-            jobs.at(current_job)->setActivity("Cancelling ...");
+            jobs.at(current_job)->setActivity(tr("Cancelling ..."));
             jobs.at(current_job)->setCancelled(true);
             showCurrentJob();
             startStatusPolling();
@@ -1071,7 +1071,7 @@ void DVDRipBox::wireUpTheme()
     ripscreen_button = getUITextButtonType("ripscreen_button");
     if(ripscreen_button)
     {
-        ripscreen_button->setText("0 New Rip");
+        ripscreen_button->setText(tr("0 New Rip"));
         connect(ripscreen_button, SIGNAL(pushed()), this, SLOT(goRipScreen()));
         ripscreen_button->SetContext(-2);
     }
@@ -1079,7 +1079,7 @@ void DVDRipBox::wireUpTheme()
     cancel_button = getUITextButtonType("cancel_button");
     if(cancel_button)
     {
-        cancel_button->setText("9 Cancel Job");
+        cancel_button->setText(tr("9 Cancel Job"));
         connect(cancel_button, SIGNAL(pushed()), this, SLOT(cancelJob()));
         cancel_button->SetContext(-2);
     }
