@@ -5,7 +5,6 @@
       <text>General Settings</text>
       <text lang="DK">Generelle indstillinger</text>
       <text lang="PT">Configurações Gerais</text>
-      <text lang="SV">Generella inställningar</text>
       <action>DVD_SETTINGS_GENERAL</action>
    </button>
 
@@ -14,7 +13,6 @@
       <text>Play Settings</text>
       <text lang="DK">Afspilnings indstillinger</text>
       <text lang="PT">Configurações de Leitura</text>
-      <text lang="SV">Inställningar för avspelning</text>
       <action>DVD_SETTINGS_PLAY</action>
    </button>
 
@@ -24,7 +22,6 @@
       <text>Rip Settings</text>
       <text lang="DK">Genkodnings indstillinger</text>
       <text lang="PT">Configurações de Cópia</text>
-      <text lang="SV">Inställningar för kopiering</text>
       <action>DVD_SETTINGS_RIP</action>
    </button>
 

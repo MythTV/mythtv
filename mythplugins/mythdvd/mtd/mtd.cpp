@@ -271,7 +271,7 @@ void MTD::cleanThreads()
             if(problem.length() > 0)
             {   
                 emit writeToLog(QString("job failed: %1").arg(job_command)); 
-                emit writeToLog(QString("    reason: %1").arg(problem));
+                //emit writeToLog(QString("    reason: %1").arg(problem));
             }
             else
             {
@@ -824,5 +824,24 @@ bool MTD::isItOkToStartTranscoding()
     }
     concurrent_transcodings_mutex->unlock();
     return false;
+}
+
+void MTD::customEvent(QCustomEvent *ce)
+{
+    if(ce->type() == 65432)
+    {
+        ErrorEvent *ee = (ErrorEvent*)ce;
+        QString error_string = "Error: " + ee->getString();
+        emit writeToLog(error_string);
+    }
+    else if(ce->type() == 65431)
+    {
+        LoggingEvent *le = (LoggingEvent*)ce;
+        emit writeToLog(le->getString());
+    }
+    else
+    {
+        cerr << "mtd.o: receiving evenets I don't understand" << endl;
+    }
 }
 

@@ -18,22 +18,23 @@ using namespace std;
 
 #include <qdatetime.h>
 #include <qdir.h>
+#include <qapplication.h>
 
 #include <mythtv/mythcontext.h>
 
 #include "jobthread.h"
 #include "mtd.h"
-
+#include "threadevents.h"
 
 JobThread::JobThread(MTD *owner, const QString &start_string, int nice_priority)
           :QThread()
 {
+    problem_string = "";
     job_name = "";
     setSubName("", 1);
     overall_progress = 0.0;
     setSubProgress(0.0, 1);
     parent = owner;
-    problem_string = "";
     job_string = start_string;
     nice_level = nice_priority;
     sub_to_overall_multiple = 1.0;
@@ -139,6 +140,32 @@ void JobThread::setSubName(const QString &new_name, uint priority)
     
 }
 
+void JobThread::problem(const QString &a_problem)
+{
+    //
+    //  Send out an error event
+    //
+
+    ErrorEvent *ee = new ErrorEvent(a_problem);
+    QApplication::postEvent(parent, ee);
+    
+    problem_string = a_problem;
+    
+}
+
+
+void JobThread::sendLoggingEvent(const QString &event_string)
+{
+    //
+    //  Spit out an event that contains the
+    //  logging string
+    //
+    
+    LoggingEvent *le = new LoggingEvent(event_string);
+    QApplication::postEvent(parent, le);
+}
+
+
 /*
 ---------------------------------------------------------------------
 */
@@ -207,6 +234,9 @@ bool DVDThread::ripTitle(int title_number,
         dvd_device_access->unlock();
         return false;
     }
+
+    sendLoggingEvent("job thread beginning to rip dvd title");
+
     
     //
     //  OK, we got the device. 
@@ -496,6 +526,7 @@ bool DVDThread::ripTitle(int title_number,
     DVDClose(the_dvd);
     ripfile->close();
     dvd_device_access->unlock();
+    sendLoggingEvent("job thread finished ripping dvd title");
     return true;
 }
 
@@ -1010,8 +1041,10 @@ bool DVDTranscodeThread::buildTranscodeCommandLine()
         tc_arguments.append("1,twopass.log");
     }    
     
-    // cout << "transcode command: " << tc_arguments.join(" ") << endl;
-    
+
+    QString transcode_command_string = "transcode command will be: " + tc_arguments.join(" ");
+    sendLoggingEvent(transcode_command_string);
+
     tc_process = new QProcess(tc_arguments);
     tc_process->setWorkingDirectory(*working_directory);
     return true;
@@ -1137,7 +1170,6 @@ bool DVDTranscodeThread::runTranscode(int which_run)
                     //  Set feedback strings and calculate
                     //  estimated time left
                     //
-
                     
                     setSubProgress(percent_transcoded, 1);
                     overall_progress = 0.50 + (0.50 * percent_transcoded);

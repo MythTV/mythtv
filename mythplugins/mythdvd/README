@@ -61,9 +61,9 @@ packages installed for *transcoding* to work:
     transcode - The core of the re-encoding process (most
                 of the stuff above are actually things that
                 transcode wants for full functionality). The
-		more codecs you have installed, the better. You
-		almost certainly want to install the divx codec,
-		even if you plan to use xvid (see below).
+                more codecs you have installed, the better. You
+		        almost certainly want to install the divx codec,
+		        even if you plan to use xvid (see below).
                 Developers currently using 0.6.8.
                 http://www.theorie.physik.uni-goettingen.de/
                 ~ostreich/transcode/

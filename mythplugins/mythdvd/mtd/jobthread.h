@@ -43,7 +43,7 @@ class JobThread : public QThread
     double  getProgress(){return overall_progress;}
     double  getSubProgress(){return subjob_progress;}
     
-    void    problem(const QString &a_problem){problem_string = a_problem;}
+    void    problem(const QString &a_problem);
     QString getProblem(){return problem_string;}
     QString getJobString(){return job_string;}
     void    updateSubjobString( int seconds_elapsed, 
@@ -52,16 +52,17 @@ class JobThread : public QThread
     void    setSubProgress(double a_value, uint priority);
     void    setSubName(const QString &new_name, uint priority);
     virtual QString getFinalFileName(){return "";}
+    void    sendLoggingEvent(const QString &event_string);
     
   protected:
   
+    QString problem_string;
     QString job_name;
     QString subjob_name;
     double  overall_progress;
     double  subjob_progress;
     double  sub_to_overall_multiple;
     MTD     *parent;
-    QString problem_string;
     QString job_string;
     int     nice_level;
     bool    cancel_me;

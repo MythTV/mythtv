@@ -20,6 +20,7 @@
 #include "serversocket.h"
 #include "jobthread.h"
 #include "dvdprobe.h"
+#include "threadevents.h"
 
 class DiscCheckingThread : public QThread
 {
@@ -84,6 +85,8 @@ class MTD : public QObject
     bool checkFinalFile(QFile *final_file, const QString &extension);
     
   private:
+
+    void customEvent(QCustomEvent *ce);
   
     MTDLogger           *mtd_log;    
     MTDServerSocket     *server_socket;
