@@ -432,6 +432,8 @@ void MameHandler::start_game(RomInfo * romdata)
         // Adjust for non rom lines.  I think it's always the same.
         romcount -= 6;
 
+        pclose(romlist_info);
+
         FILE *command;
         command = popen(exec + " 2>&1", "r");
 
