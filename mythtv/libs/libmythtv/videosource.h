@@ -247,7 +247,7 @@ public:
     VbiDevice(const CaptureCard& parent):
         PathSetting(true),
         CCSetting(parent, "vbidevice") {
-        setLabel("Vbi device");
+        setLabel("VBI device");
         addSelection("/dev/vbi");
         addSelection("/dev/vbi0");
         addSelection("/dev/vbi1");
