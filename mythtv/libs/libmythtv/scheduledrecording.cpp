@@ -274,7 +274,8 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
 "recorded.starttime IS NOT NULL as recduplicate, record.type, "
 "record.recordid, recordoverride.type, "
 "program.starttime - INTERVAL record.preroll minute, "
-"program.endtime + INTERVAL record.postroll minute "
+"program.endtime + INTERVAL record.postroll minute, "
+"program.previouslyshown "
 "FROM record "
 " INNER JOIN channel ON (channel.chanid = program.chanid) "
 " INNER JOIN program ON (program.title = record.title) "
@@ -372,6 +373,8 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
                  proginfo->recstartts = proginfo->startts;
                  proginfo->recendts = proginfo->endts;
              }
+
+             proginfo->repeat = result.value(20).toInt();
 
              if (proginfo->override == 2)
              {

@@ -7,7 +7,7 @@
 #include <qmap.h>
 #include "scheduledrecording.h"
 
-#define NUMPROGRAMLINES 27
+#define NUMPROGRAMLINES 28
 
 enum MarkTypes {
     MARK_UPDATED_CUT = -3,
@@ -188,6 +188,8 @@ class ProgramInfo
     QDateTime endts;
     QDateTime recstartts;
     QDateTime recendts;
+
+    bool repeat;
 
     int spread;
     int startCol;

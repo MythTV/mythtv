@@ -691,7 +691,7 @@
         <value lang="SV">Sänt:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
-        <area>180,70,430,30</area>
+        <area>180,70,600,30</area>
         <font>info</font>
       </textarea>
       <textarea name="infochan" draworder="6">
@@ -1390,6 +1390,7 @@
       </textarea>
       <textarea name="subtitle" draworder="6">
         <area>20,40,579,30</area>
+        <altarea>20,40,779,30</altarea>
         <font>info</font>
       </textarea>
       <textarea name="infotime" draworder="6">

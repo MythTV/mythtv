@@ -48,6 +48,8 @@ ProgramInfo::ProgramInfo(void)
     schedulerid = "";
     recpriority = "";
 
+    repeat = false;
+
     record = NULL;
 }   
         
@@ -85,6 +87,8 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     cardid = other.cardid;
     schedulerid = other.schedulerid;
     recpriority = other.recpriority;
+
+    repeat = other.repeat;
 
     record = NULL;
 }
@@ -128,6 +132,7 @@ void ProgramInfo::ToStringList(QStringList &list)
     list << QString::number(recdups);
     list << recstartts.toString(Qt::ISODate);
     list << recendts.toString(Qt::ISODate);
+    list << QString::number(repeat);
 }
 
 void ProgramInfo::FromStringList(QStringList &list, int offset)
@@ -165,6 +170,7 @@ void ProgramInfo::FromStringList(QStringList &list, int offset)
     recdups = RecordingDupsType(list[offset + 24].toInt());
     recstartts = QDateTime::fromString(list[offset + 25], Qt::ISODate);
     recendts = QDateTime::fromString(list[offset + 26], Qt::ISODate);
+    repeat = list[offset + 27].toInt();
 
     if (title == " ")
         title = "";
@@ -314,6 +320,11 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
         }
     }
     progMap["RECSTATUS"] = recstatus;
+
+    if (repeat)
+        progMap["REPEAT"] = QObject::tr("Repeat");
+    else
+        progMap["REPEAT"] = "";
 }
 
 int ProgramInfo::CalculateLength(void)
@@ -329,7 +340,8 @@ void ProgramInfo::GetProgramListByQuery(QSqlDatabase *db,
 
     thequery = QString("SELECT channel.chanid,starttime,endtime,title,subtitle,"
                        "description,category,channel.channum,channel.callsign, "
-                       "channel.name FROM program,channel ") + where;
+                       "channel.name,previouslyshown FROM program,channel ")
+                       + where;
 
     QSqlQuery query = db->exec(thequery);
 
@@ -353,6 +365,7 @@ void ProgramInfo::GetProgramListByQuery(QSqlDatabase *db,
             proginfo->chanstr = query.value(7).toString();
             proginfo->chansign = query.value(8).toString();
             proginfo->channame = query.value(9).toString();
+            proginfo->repeat = query.value(10).toInt();
             proginfo->spread = -1;
 
             if (proginfo->title == QString::null)
@@ -393,8 +406,8 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(QSqlDatabase *db,
    
     thequery = QString("SELECT channel.chanid,starttime,endtime,title,subtitle,"
                        "description,category,channel.channum,channel.callsign, "
-                       "channel.name FROM program,channel WHERE "
-                       "program.chanid = %1 AND starttime < %2 AND "
+                       "channel.name,previouslyshown FROM program,channel "
+                       "WHERE program.chanid = %1 AND starttime < %2 AND "
                        "endtime > %3 AND program.chanid = channel.chanid;")
                        .arg(channel).arg(ltime).arg(ltime);
 
@@ -419,6 +432,7 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(QSqlDatabase *db,
         proginfo->chanstr = query.value(7).toString();
         proginfo->chansign = query.value(8).toString();
         proginfo->channame = query.value(9).toString();
+        proginfo->repeat = query.value(10).toInt();
         proginfo->spread = -1;
 
         if (proginfo->title == QString::null)
