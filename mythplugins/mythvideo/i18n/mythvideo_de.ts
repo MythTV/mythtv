@@ -49,11 +49,11 @@
     <name>QObject</name>
     <message>
         <source>Directory that holds videos</source>
-        <translation>Verzeichnis mit Videos</translation>
+        <translation>Verzeichnis mit Filmen</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythVideo only needs to have read permission to the directory.</source>
-        <translation>Das Verzeichnis muss existieren, aber der Benutzer von MythVideo benötigt nur Leserechte für das Verzeichnis.</translation>
+        <translation>Das Verzeichnis muß existieren, und MythVideo Leserechte dafür besitzen.</translation>
     </message>
     <message>
         <source>Starting Parental Level</source>
@@ -105,11 +105,11 @@
     </message>
     <message>
         <source>Video List browses files</source>
-        <translation>Dateien in Video-Liste anzeigen</translation>
+        <translation>Dateien in Videoliste anzeigen</translation>
     </message>
     <message>
         <source>If set, this will cause the Video List screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation>Falls gesetzt, so werden im Video-Listen-Menü alle relevanten Dateien im MythVideo-Verzeichnis und darunter angezeigt, ob sie gescannt sind oder nicht.</translation>
+        <translation>Falls gesetzt, so werden im Videolisten-Menü alle relevanten Dateien im MythVideo Verzeichnis und darunter, unabhängig davon ob sie eingelesen wurden oder nicht, angezeigt.</translation>
     </message>
     <message>
         <source>This is the command used for any file that the extension is not specifically defined.</source>
@@ -121,7 +121,7 @@
     </message>
     <message>
         <source>Player Settings</source>
-        <translation>Wiedergabe-Einstellungen</translation>
+        <translation>Wiedergabe Einstellungen</translation>
     </message>
     <message>
         <source>Parental Pin:</source>
@@ -129,11 +129,11 @@
     </message>
     <message>
         <source>Searching for video files</source>
-        <translation>Suche nach Video-Dateien</translation>
+        <translation>Suche nach Videodateien</translation>
     </message>
     <message>
         <source>Updating video database</source>
-        <translation>Aktualisiere Video-Datenbank</translation>
+        <translation>Aktualisiere Videodatenbank</translation>
     </message>
     <message>
         <source>No Cover</source>
@@ -157,64 +157,65 @@
     </message>
     <message>
         <source>Default Player</source>
-        <translation>Standard-Abspieler</translation>
+        <translation>Abspielkommando</translation>
     </message>
     <message>
         <source>Newly scanned files are browsable by default</source>
-        <translation type="unfinished"></translation>
+        <translation>Neue Videos freigeben</translation>
     </message>
     <message>
         <source>If set, newly scanned files in the Video Manager will be marked as browsable and will appear in the &apos;Browse&apos; menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, werden neue Dateien im Videomanager als freigegeben markiert und erscheinen im &apos;Browse&apos; Menü.</translation>
     </message>
     <message>
         <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos; or &apos;MythXine&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dieser Befehl wird für alle Dateien verwendet für deren Erweiterung nichts anderes definiert wurde. Sie können auch den Namen eines MythTV Moduls wie z.B. &apos;Internal&apos; oder &apos;MythXine&apos; angeben.</translation>
     </message>
     <message>
         <source>New category</source>
-        <translation type="unfinished"></translation>
+        <translation>Neue Kategorie</translation>
     </message>
     <message>
         <source>This PIN is used to control the current Parental Level. If you want to use this feature, then setting the value to all numbers will make your life much easier.</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese PIN schützt bestimmte Videos vor unbefugtem Zugriff. Für eine einfachere Handhabung verwenden Sie für diesen Code bitte nur Ziffern.</translation>
     </message>
     <message>
         <source>Command to search for movie listings</source>
-        <translation type="unfinished"></translation>
+        <translation>Befehl für die Filmsuche</translation>
     </message>
     <message>
         <source>This command must be executable by the user running MythVideo.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dieses Programm muß für MythVideo ausführbar sein.</translation>
     </message>
     <message>
         <source>Command to search for movie posters</source>
-        <translation type="unfinished"></translation>
+        <translation>Befehl für die Titelbildsuche</translation>
     </message>
     <message>
         <source>Command to extract data for movies</source>
-        <translation type="unfinished"></translation>
+        <translation>Befehl für die Suche nach Filminfos</translation>
     </message>
     <message>
         <source>Directory that holds movie posters</source>
-        <translation type="unfinished"></translation>
+        <translation>Verzeichnis für Titelbilder</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythVideo needs to have read/write permission to the directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dieses Verzeichnis muß existieren und MythVideo Schreib-/Leserechte dafür besitzen.</translation>
     </message>
     <message>
         <source>Video Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Video Manager</translation>
     </message>
     <message>
         <source>Could not retrieve poster</source>
-        <translation type="unfinished"></translation>
+        <translation>Konnte Titelbild nicht finden</translation>
     </message>
     <message>
         <source>A movie poster exists for this movie but Myth could not retrieve it within a reasonable amount of time.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Für diesen Film existiert ein Titelbild aber MythVideo konnte es nicht in einer angemessenen Zeitspanne laden.
+</translation>
     </message>
 </context>
 <context>
@@ -365,7 +366,7 @@
     </message>
     <message>
         <source>Category:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategorie :</translation>
     </message>
     <message>
         <source>Filters video list</source>
@@ -373,39 +374,39 @@
     </message>
     <message>
         <source>Category :</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategorie :</translation>
     </message>
     <message>
         <source>Genre :</source>
-        <translation type="unfinished"></translation>
+        <translation>Genre :</translation>
     </message>
     <message>
         <source>Country :</source>
-        <translation type="unfinished"></translation>
+        <translation>Land :</translation>
     </message>
     <message>
         <source>Year :</source>
-        <translation type="unfinished"></translation>
+        <translation>Jahr :</translation>
     </message>
     <message>
         <source>Runtime :</source>
-        <translation type="unfinished"></translation>
+        <translation>Spieldauer :</translation>
     </message>
     <message>
         <source>User Rating :</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewertung :</translation>
     </message>
     <message>
         <source>Browse :</source>
-        <translation type="unfinished"></translation>
+        <translation>Durchsuchen :</translation>
     </message>
     <message>
         <source>Sort by :</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortierung :</translation>
     </message>
     <message>
         <source>Aucune video</source>
-        <translation type="unfinished"></translation>
+        <translation>Kein Video</translation>
     </message>
     <message>
         <source>SELECT: Edit</source>
@@ -417,7 +418,7 @@
     </message>
     <message>
         <source>MENU: Options</source>
-        <translation type="unfinished"></translation>
+        <translation>MENÜ: Optionen</translation>
     </message>
     <message>
         <source>Up/Down, Page Up/Down - Browse</source>
@@ -425,7 +426,7 @@
     </message>
     <message>
         <source>Menu - Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Menü - Optionen</translation>
     </message>
     <message>
         <source>Parental</source>
@@ -437,15 +438,15 @@
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Jahr</translation>
     </message>
     <message>
         <source>Runtime</source>
-        <translation type="unfinished"></translation>
+        <translation>Spieldauer</translation>
     </message>
     <message>
         <source>User Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewertung</translation>
     </message>
 </context>
 <context>
@@ -472,19 +473,19 @@
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <source>Select action</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktion wählen</translation>
     </message>
     <message>
         <source>Watch This Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Film ansehen</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Kompl. Beschreibung ansehen</translation>
     </message>
     <message>
         <source>Filter Display</source>
@@ -492,7 +493,7 @@
     </message>
     <message>
         <source>Switch to Video Listings</source>
-        <translation type="unfinished"></translation>
+        <translation>Zur Videoliste wechseln</translation>
     </message>
 </context>
 <context>
@@ -503,7 +504,7 @@
     </message>
     <message>
         <source>Manually Enter IMDB #</source>
-        <translation type="unfinished">Manuelle Eingabe der IMDB-Nr.</translation>
+        <translation>Manuelle Eingabe der IMDB-Nr.</translation>
     </message>
     <message>
         <source>Reset Entry</source>
@@ -511,7 +512,7 @@
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Abbrechen</translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -543,23 +544,23 @@
     </message>
     <message>
         <source>delete failed</source>
-        <translation type="unfinished"></translation>
+        <translation>löschen fehlgeschlagen</translation>
     </message>
     <message>
         <source>Select action:</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktion wählen:</translation>
     </message>
     <message>
         <source>Edit Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Metadaten bearbeiten</translation>
     </message>
     <message>
         <source>Search IMDB</source>
-        <translation type="unfinished"></translation>
+        <translation>Bei IMDB suchen</translation>
     </message>
     <message>
         <source>Reset Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Metadaten zurücksetzen</translation>
     </message>
     <message>
         <source>Toggle Browseable</source>
@@ -567,7 +568,7 @@
     </message>
     <message>
         <source>Remove Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Video entfernen</translation>
     </message>
     <message>
         <source>Filter Display</source>
@@ -575,7 +576,7 @@
     </message>
     <message>
         <source>Delete this file?</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese Datei löschen?</translation>
     </message>
 </context>
 <context>
