@@ -832,7 +832,11 @@ void Weather::showtime_timeout()
 {
    QDateTime new_time(QDate::currentDate(), QTime::currentTime());
    QString curTime = new_time.toString("h:mm ap");
-   QString curDate = new_time.toString("ddd MMM d");
+   QString curDate;
+   if (QString(gContext->GetSetting("Language")) == "JA")
+     curDate = new_time.toString("M/d (ddd)");
+   else
+     curDate = new_time.toString("ddd MMM d");
    QString temp = "";
    curTime = curTime.upper();
    curDate = curDate.upper();
@@ -1724,6 +1728,13 @@ void Weather::update_timeout()
 
         if (winddir == "CALM")
             SetText(container, "winddata", tr("Calm"));
+        else if (winddir == "VAR")
+	{
+            if (convertData == false)
+                SetText(container, "winddata", curWind + " mph");
+            else
+                SetText(container, "winddata", curWind + " Km/h");
+        }
         else
         {
             if (convertData == false)
@@ -2084,7 +2095,16 @@ bool Weather::UpdateData()
 		mons = dates[0].toInt();
 		days = dates[1].toInt();
    		QDate doDate(years, mons, days);
-		date[i - 5] = (doDate.toString("ddd")).upper();
+		switch (doDate.dayOfWeek())
+		{
+			case 1: date[i - 5] = QString("MON"); break;
+			case 2: date[i - 5] = QString("TUE"); break;
+			case 3: date[i - 5] = QString("WED"); break;
+			case 4: date[i - 5] = QString("THU"); break;
+			case 5: date[i - 5] = QString("FRI"); break;
+			case 6: date[i - 5] = QString("SAT"); break;
+			case 7: date[i - 5] = QString("SUN"); break;
+		}
         }
 
 	for (int i = 9; i < 13; i++)

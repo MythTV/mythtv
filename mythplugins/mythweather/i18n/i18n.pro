@@ -6,7 +6,7 @@ CONFIG -= moc qt
 trans.path   = $${PREFIX}/share/mythtv/i18n/
 trans.files  = mythweather_es.qm mythweather_ca.qm mythweather_nl.qm
 trans.files += mythweather_dk.qm mythweather_pt.qm mythweather_sv.qm
-trans.files += mythweather_de.qm
+trans.files += mythweather_de.qm mythweather_ja.qm
 
 INSTALLS += trans
 
