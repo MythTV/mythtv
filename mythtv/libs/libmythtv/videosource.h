@@ -360,7 +360,7 @@ public:
 
     void loadByID(QSqlDatabase* db, int id);
     void loadByInput(QSqlDatabase* db, int cardid, QString input);
-    QString getSourceName(void) const { return sourceid->getCurrentLabel(); };
+    QString getSourceName(void) const { return sourceid->getSelectionLabel(); };
 
     virtual void save(QSqlDatabase* db);
 
